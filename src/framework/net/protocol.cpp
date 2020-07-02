@@ -111,7 +111,7 @@ void Protocol::internalRecvHeader(uint8* buffer, uint16 size)
 {
     // read message size
     m_inputMessage->fillBuffer(buffer, size);
-    const uint16 remainingSize = m_inputMessage->readSize();
+    uint16 remainingSize = m_inputMessage->readSize();
 
     // read remaining message data
     if(m_connection)
@@ -171,18 +171,18 @@ std::vector<uint32> Protocol::getXteaKey()
 
 bool Protocol::xteaDecrypt(const InputMessagePtr& inputMessage)
 {
-    const uint16 encryptedSize = inputMessage->getUnreadSize();
+    uint16 encryptedSize = inputMessage->getUnreadSize();
     if(encryptedSize % 8 != 0) {
         g_logger.traceError("invalid encrypted network message");
         return false;
     }
 
-    uint32 *buffer = (uint32*)inputMessage->getReadBuffer();
+    uint32 *buffer = (uint32*)(inputMessage->getReadBuffer());
     int readPos = 0;
 
     while(readPos < encryptedSize/4) {
         uint32 v0 = buffer[readPos], v1 = buffer[readPos + 1];
-        const uint32 delta = 0x61C88647;
+        uint32 delta = 0x61C88647;
         uint32 sum = 0xC6EF3720;
 
         for(int32 i = 0; i < 32; i++) {
@@ -194,8 +194,8 @@ bool Protocol::xteaDecrypt(const InputMessagePtr& inputMessage)
         readPos = readPos + 2;
     }
 
-    const uint16 decryptedSize = inputMessage->getU16() + 2;
-    const int sizeDelta = decryptedSize - encryptedSize;
+    uint16 decryptedSize = inputMessage->getU16() + 2;
+    int sizeDelta = decryptedSize - encryptedSize;
     if(sizeDelta > 0 || -sizeDelta > encryptedSize) {
         g_logger.traceError("invalid decrypted network message");
         return false;
@@ -211,8 +211,8 @@ void Protocol::xteaEncrypt(const OutputMessagePtr& outputMessage)
     uint16 encryptedSize = outputMessage->getMessageSize();
 
     //add bytes until reach 8 multiple
-    if(encryptedSize % 8 != 0) {
-        const uint16 n = 8 - encryptedSize % 8;
+    if((encryptedSize % 8) != 0) {
+        uint16 n = 8 - (encryptedSize % 8);
         outputMessage->addPaddingBytes(n);
         encryptedSize += n;
     }
@@ -221,7 +221,7 @@ void Protocol::xteaEncrypt(const OutputMessagePtr& outputMessage)
     uint32 *buffer = (uint32*)(outputMessage->getDataBuffer() - 2);
     while(readPos < encryptedSize / 4) {
         uint32 v0 = buffer[readPos], v1 = buffer[readPos + 1];
-        const uint32 delta = 0x61C88647;
+        uint32 delta = 0x61C88647;
         uint32 sum = 0;
 
         for(int32 i = 0; i < 32; i++) {

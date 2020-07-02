@@ -122,7 +122,7 @@ void UIWidget::setText(std::string text, bool dontFireLuaCall)
     if(m_text == text)
         return;
 
-    const std::string oldText = m_text;
+    std::string oldText = m_text;
     m_text = text;
     updateText();
 

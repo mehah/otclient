@@ -78,8 +78,8 @@ bool UIGridLayout::internalUpdate()
 
     UIWidgetList widgets = parentWidget->getChildren();
 
-    const Rect clippingRect = parentWidget->getPaddingRect();
-    const Point topLeft = clippingRect.topLeft();
+    Rect clippingRect = parentWidget->getPaddingRect();
+    Point topLeft = clippingRect.topLeft();
 
     int numColumns = m_numColumns;
     if (m_flow && m_cellSize.width() > 0) {
@@ -103,8 +103,8 @@ bool UIGridLayout::internalUpdate()
         if (!widget->isExplicitlyVisible())
             continue;
 
-        const int line = index / numColumns;
-        const int column = index % numColumns;
+        int line = index / numColumns;
+        int column = index % numColumns;
         Point virtualPos = Point(column * (m_cellSize.width() + cellSpacing), line * (m_cellSize.height() + cellSpacing));
         preferredHeight = virtualPos.y + m_cellSize.height();
         Point pos = topLeft + virtualPos - parentWidget->getVirtualOffset();

@@ -45,37 +45,29 @@ bool luavalue_cast(int index, double& d);
 
 // float
 inline int push_luavalue(float f) { push_luavalue(static_cast<double>(f)); return 1; }
-inline bool luavalue_cast(int index, float& f) { double d;
-    const bool r = luavalue_cast(index, d); f = d; return r; }
+inline bool luavalue_cast(int index, float& f) { double d; bool r = luavalue_cast(index, d); f = d; return r; }
 
 // int8
 inline int push_luavalue(int8 v) { push_luavalue(static_cast<int>(v)); return 1; }
-inline bool luavalue_cast(int index, int8& v) { int i;
-    const bool r = luavalue_cast(index, i); v = i; return r; }
+inline bool luavalue_cast(int index, int8& v) { int i; bool r = luavalue_cast(index, i); v = i; return r; }
 // uint8
 inline int push_luavalue(uint8 v) { push_luavalue(static_cast<int>(v)); return 1; }
-inline bool luavalue_cast(int index, uint8& v) { int i;
-    const bool r = luavalue_cast(index, i); v = i; return r; }
+inline bool luavalue_cast(int index, uint8& v) { int i; bool r = luavalue_cast(index, i); v = i; return r; }
 // int16
 inline int push_luavalue(int16 v) { push_luavalue(static_cast<int>(v)); return 1; }
-inline bool luavalue_cast(int index, int16& v) { int i;
-    const bool r = luavalue_cast(index, i); v = i; return r; }
+inline bool luavalue_cast(int index, int16& v) { int i; bool r = luavalue_cast(index, i); v = i; return r; }
 // uint16
 inline int push_luavalue(uint16 v) { push_luavalue(static_cast<int>(v)); return 1; }
-inline bool luavalue_cast(int index, uint16& v) { int i;
-    const bool r = luavalue_cast(index, i); v = i; return r; }
+inline bool luavalue_cast(int index, uint16& v) { int i; bool r = luavalue_cast(index, i); v = i; return r; }
 // uint32
 inline int push_luavalue(uint32 v) { push_luavalue(static_cast<double>(v)); return 1; }
-inline bool luavalue_cast(int index, uint32& v) { double d;
-    const bool r = luavalue_cast(index, d); v = d; return r; }
+inline bool luavalue_cast(int index, uint32& v) { double d; bool r = luavalue_cast(index, d); v = d; return r; }
 // int64
 inline int push_luavalue(int64 v) { push_luavalue(static_cast<double>(v)); return 1; }
-inline bool luavalue_cast(int index, int64& v) { double d;
-    const bool r = luavalue_cast(index, d); v = d; return r; }
+inline bool luavalue_cast(int index, int64& v) { double d; bool r = luavalue_cast(index, d); v = d; return r; }
 // uint64
 inline int push_luavalue(uint64 v) { push_luavalue(static_cast<double>(v)); return 1; }
-inline bool luavalue_cast(int index, uint64& v) { double d;
-    const bool r = luavalue_cast(index, d); v = d; return r; }
+inline bool luavalue_cast(int index, uint64& v) { double d; bool r = luavalue_cast(index, d); v = d; return r; }
 
 // string
 int push_luavalue(const char* cstr);
@@ -219,7 +211,7 @@ luavalue_cast(int index, stdext::shared_object_ptr<T>& ptr) {
 template<typename Ret, typename... Args>
 int push_luavalue(const std::function<Ret(Args...)>& func) {
     if (func) {
-        const LuaCppFunction f = luabinder::bind_fun(func);
+        LuaCppFunction f = luabinder::bind_fun(func);
         g_lua.pushCppFunction(f);
     }
     else
@@ -233,15 +225,15 @@ bool luavalue_cast(int index, std::function<void(Args...)>& func) {
         g_lua.pushValue(index);
         // weak references are used here, this means that the script must hold another reference
         // to this function, otherwise it will expire
-        const int funcWeakRef = g_lua.weakRef();
+        int funcWeakRef = g_lua.weakRef();
         func = [=](Args... args) {
             // note that we must catch exceptions, because this lambda can be called from anywhere
             // and most of them won't catch exceptions (e.g. dispatcher)
             g_lua.getWeakRef(funcWeakRef);
             try {
                 if (g_lua.isFunction()) {
-                    const int numArgs = g_lua.polymorphicPush(args...);
-                    const int rets = g_lua.safeCall(numArgs);
+                    int numArgs = g_lua.polymorphicPush(args...);
+                    int rets = g_lua.safeCall(numArgs);
                     g_lua.pop(rets);
                 }
                 else {
@@ -269,14 +261,14 @@ luavalue_cast(int index, std::function<Ret(Args...)>& func) {
         g_lua.pushValue(index);
         // weak references are used here, this means that the script must hold another reference
         // to this function, otherwise it will expire
-        const int funcWeakRef = g_lua.weakRef();
+        int funcWeakRef = g_lua.weakRef();
         func = [=](Args... args) -> Ret {
             // note that we must catch exceptions, because this lambda can be called from anywhere
             // and most of them won't catch exceptions (e.g. dispatcher)
             try {
                 g_lua.getWeakRef(funcWeakRef);
                 if (g_lua.isFunction()) {
-                    const int numArgs = g_lua.polymorphicPush(args...);
+                    int numArgs = g_lua.polymorphicPush(args...);
                     if (g_lua.safeCall(numArgs) != 1)
                         throw LuaException("a function from lua didn't retrieve the expected number of results", 0);
                     return g_lua.polymorphicPop<Ret>();

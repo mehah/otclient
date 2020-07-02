@@ -113,7 +113,7 @@ void UIAnchorLayout::addAnchor(const UIWidgetPtr& anchoredWidget, Fw::AnchorEdge
 
     assert(anchoredWidget != getParentWidget());
 
-    const UIAnchorPtr anchor(new UIAnchor(anchoredEdge, hookedWidgetId, hookedEdge));
+    UIAnchorPtr anchor(new UIAnchor(anchoredEdge, hookedWidgetId, hookedEdge));
     UIAnchorGroupPtr& anchorGroup = m_anchorsGroups[anchoredWidget];
     if (!anchorGroup)
         anchorGroup = UIAnchorGroupPtr(new UIAnchorGroup);
@@ -200,7 +200,7 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
             }
         }
 
-        const int point = anchor->getHookedPoint(hookedWidget, parentWidget);
+        int point = anchor->getHookedPoint(hookedWidget, parentWidget);
 
         switch (anchor->getAnchoredEdge()) {
             case Fw::AnchorHorizontalCenter:

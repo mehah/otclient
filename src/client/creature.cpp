@@ -179,13 +179,13 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
         }
 
         if(animationPhases > 1) {
-            animationPhase = g_clock.millis() % (animateTicks * animationPhases) / animateTicks;
+            animationPhase = (g_clock.millis() % (animateTicks * animationPhases)) / animateTicks;
         }
 
         if(m_outfit.getCategory() == ThingCategoryEffect)
             animationPhase = std::min<int>(animationPhase + 1, animationPhases);
 
-        type->draw(dest - getDisplacement() * scaleFactor, scaleFactor, 0, 0, 0, 0, animationPhase, lightView);
+        type->draw(dest - (getDisplacement() * scaleFactor), scaleFactor, 0, 0, 0, 0, animationPhase, lightView);
     }
 
     g_painter->resetColor();
@@ -232,7 +232,7 @@ void Creature::drawInformation(const Point& point, bool useGray, const Rect& par
         fillColor = m_informationColor;
 
     // calculate main rects
-    Rect backgroundRect = Rect(point.x - 13.5, point.y, 27, 4);
+    Rect backgroundRect = Rect(point.x - (13.5), point.y, 27, 4);
     // backgroundRect.bind(parentRect);
 
     const Size nameSize = m_nameCache.getTextSize();
@@ -252,7 +252,7 @@ void Creature::drawInformation(const Point& point, bool useGray, const Rect& par
 
     // health rect is based on background rect, so no worries
     Rect healthRect = backgroundRect.expanded(-1);
-    healthRect.setWidth(m_healthPercent / 100.0 * 25);
+    healthRect.setWidth((m_healthPercent / 100.0) * 25);
 
     // draw
     if(g_game.getFeature(Otc::GameBlueNpcNameColor) && isNpc() && m_healthPercent == 100 && !useGray)
@@ -415,7 +415,7 @@ void Creature::updateJump()
         auto self = static_self_cast<Creature>();
         g_dispatcher.scheduleEvent([self] {
             self->updateJump();
-            self->requestReDraw();
+            self->requestDrawing();
         }, nextT - m_jumpTimer.ticksElapsed());
     } else
         m_jumpOffset = PointF(0, 0);
@@ -573,7 +573,7 @@ void Creature::nextWalkUpdate()
         self->m_walkUpdateEvent = nullptr;
         self->nextWalkUpdate();
 
-        self->requestReDraw();
+        self->requestDrawing();
 
     }, getStepDuration() / Otc::TILE_PIXELS);
 }
@@ -629,7 +629,7 @@ void Creature::terminateWalk()
         self->m_walkAnimationPhase = 0;
         self->m_walkFinishAnimEvent = nullptr;
 
-        self->requestReDraw();
+        self->requestDrawing();
     }, g_game.getServerBeat());
 
 }
@@ -882,7 +882,7 @@ int Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
 
             uint32_t calculatedStepSpeed;
             if(stepSpeed > -speedB) {
-                calculatedStepSpeed = floor(speedA * log(stepSpeed / 2 + speedB) + speedC + 0.5);
+                calculatedStepSpeed = floor((Creature::speedA * log((stepSpeed / 2) + Creature::speedB) + Creature::speedC) + 0.5);
                 if(calculatedStepSpeed == 0) {
                     calculatedStepSpeed = 1;
                 }
@@ -977,7 +977,7 @@ int Creature::getCurrentAnimationPhase(const bool mount)
 
     if(thingType->isAnimateAlways()) {
         const int ticksPerFrame = std::round(1000 / thingType->getAnimationPhases());
-        return g_clock.millis() % (ticksPerFrame * thingType->getAnimationPhases()) / ticksPerFrame;
+        return (g_clock.millis() % (ticksPerFrame * thingType->getAnimationPhases())) / ticksPerFrame;
     }
 
     return m_walkAnimationPhase;
@@ -1020,9 +1020,9 @@ ThingType* Creature::rawGetMountThingType()
     return g_things.rawGetThingType(m_outfit.getMount(), m_outfit.getCategory());
 }
 
-void Creature::requestReDraw()
+void Creature::requestDrawing()
 {
-    uint32_t redrawFlag = Otc::RedrawAll;
+    uint32_t redrawFlag = Otc::ReDrawTile_Information;
 
     if(isLocalPlayer() || hasLight())
         redrawFlag |= Otc::ReDrawLight;
