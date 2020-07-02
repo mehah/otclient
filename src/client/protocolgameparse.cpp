@@ -86,8 +86,8 @@ void ProtocolGame::parseMessage(const InputMessagePtr &msg)
                 break;
             case Proto::GameServerPing:
             case Proto::GameServerPingBack:
-                if(opcode == Proto::GameServerPing && g_game.getFeature(Otc::GameClientPing) ||
-                   opcode == Proto::GameServerPingBack && !g_game.getFeature(Otc::GameClientPing))
+                if((opcode == Proto::GameServerPing && g_game.getFeature(Otc::GameClientPing)) ||
+                   (opcode == Proto::GameServerPingBack && !g_game.getFeature(Otc::GameClientPing)))
                     parsePingBack(msg);
                 else
                     parsePing(msg);
@@ -2324,7 +2324,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr &msg, int type)
         const int shield = msg->getU8();
 
         // emblem is sent only when the creature is not known
-        const uint8 emblem = !known ? msg->getU8() : -1;
+        const int8 emblem = !known ? msg->getU8() : -1;
         const uint8 creatureType = msg->getU8();
 
         if (creatureType == Proto::CreatureTypeSummonOwn)
@@ -2341,7 +2341,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr &msg, int type)
             int8 vocationId = msg->getU8();
         }
 
-        const int8 icon = msg->getU8();
+        const uint8 icon = msg->getU8();
         const uint8 mark = msg->getU8();
         msg->getU8(); // inspection byte
         const bool unpass = msg->getU8();
@@ -2364,15 +2364,11 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr &msg, int type)
             creature->setShield(shield);
             creature->setPassable(!unpass);
             creature->setLight(light);
+            creature->setType(creatureType);
+            creature->setIcon(icon);
 
             if (emblem != -1)
                 creature->setEmblem(emblem);
-
-            if (creatureType != -1)
-                creature->setType(creatureType);
-
-            if (icon != -1)
-                creature->setIcon(icon);
 
             if (creature == m_localPlayer && !m_localPlayer->isKnown())
                 m_localPlayer->setKnown(true);
