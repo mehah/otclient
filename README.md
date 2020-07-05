@@ -1,3 +1,4 @@
+# This is Optimized Version
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/opentibiabr/canary-client?branch=master&passingText=master%20-%20OK&svg=true)](https://ci.appveyor.com/project/opentibiabr/canary-client)
 [![Build Status](https://secure.travis-ci.org/opentibiabr/canary-client.svg?branch=master)](http://travis-ci.org/opentibiabr/canary-client)
 [![Discord Channel](https://img.shields.io/discord/528117503952551936.svg?label=discord)](https://discord.gg/3NxYnyV)
