@@ -2,7 +2,8 @@ EnterGame = { }
 
 serverConfig = {
   ip = "127.0.0.1",
-  port = 7171
+  port = 7171,
+  version = 1098 --Do not change
 }
 
 -- private variables
@@ -151,7 +152,7 @@ function EnterGame.init()
   if g_app.isRunning() and not g_game.isOnline() then
     enterGame:show()
   end
-  EnterGame.setUniqueServer(serverConfig.ip, serverConfig.port, 270, 210)
+  EnterGame.setUniqueServer(serverConfig.ip, serverConfig.port, serverConfig.version, 270, 210)
 end
 
 function EnterGame.firstShow()
