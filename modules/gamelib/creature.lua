@@ -33,11 +33,11 @@ NpcIconTrade = 2
 NpcIconQuest = 3
 NpcIconTradeQuest = 4
 
-CreatureTypePlayer = 0
-CreatureTypeMonster = 1
-CreatureTypeNpc = 2
-CreatureTypeSummonOwn = 3
-CreatureTypeSummonOther = 4
+CREATURETYPE_PLAYER = 0
+CREATURETYPE_MONSTER = 1
+CREATURETYPE_NPC = 2
+CREATURETYPE_SUMMON_OWN = 3
+CREATURETYPE_SUMMON_OTHERS = 4
 
 -- @}
 
@@ -112,9 +112,9 @@ end
 
 function getTypeImagePath(creatureType)
   local path
-  if creatureType == CreatureTypeSummonOwn then
+  if creatureType == CREATURETYPE_SUMMON_OWN then
     path = '/images/game/creaturetype/summon_own'
-  elseif creatureType == CreatureTypeSummonOther then
+  elseif creatureType == CREATURETYPE_SUMMON_OTHERS then
     path = '/images/game/creaturetype/summon_other'
   end
   return path

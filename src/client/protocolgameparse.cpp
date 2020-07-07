@@ -47,7 +47,7 @@ void ProtocolGame::parseMessage(const InputMessagePtr &msg)
             // must be > so extended will be enabled before GameStart.
             if (!g_game.getFeature(Otc::GameLoginPending))
             {
-                if (!m_gameInitialized && opcode > Proto::GameServerFirstGameOpcode)
+                if (!m_gameInitialized && opcode > CanaryLib::GameServerFirstGameOpcode)
                 {
                     g_game.processGameStart();
                     m_gameInitialized = true;
@@ -63,405 +63,405 @@ void ProtocolGame::parseMessage(const InputMessagePtr &msg)
 
             switch (opcode)
             {
-            case Proto::GameServerLoginOrPendingState:
+            case CanaryLib::GameServerLoginOrPendingState:
                 parsePendingGame(msg);
                 break;
-            case Proto::GameServerGMActions:
+            case CanaryLib::GameServerGMActions:
                 parseGMActions(msg);
                 break;
-            case Proto::GameServerUpdateNeeded:
+            case CanaryLib::GameServerUpdateNeeded:
                 parseUpdateNeeded(msg);
                 break;
-            case Proto::GameServerLoginError:
+            case CanaryLib::GameServerLoginError:
                 parseLoginError(msg);
                 break;
-            case Proto::GameServerLoginAdvice:
+            case CanaryLib::GameServerLoginAdvice:
                 parseLoginAdvice(msg);
                 break;
-            case Proto::GameServerLoginWait:
+            case CanaryLib::GameServerLoginWait:
                 parseLoginWait(msg);
                 break;
-            case Proto::GameServerLoginToken:
+            case CanaryLib::GameServerLoginToken:
                 parseLoginToken(msg);
                 break;
-            case Proto::GameServerPing:
-            case Proto::GameServerPingBack:
-                if((opcode == Proto::GameServerPing && g_game.getFeature(Otc::GameClientPing)) ||
-                   (opcode == Proto::GameServerPingBack && !g_game.getFeature(Otc::GameClientPing)))
+            case CanaryLib::GameServerPing:
+            case CanaryLib::GameServerPingBack:
+                if((opcode == CanaryLib::GameServerPing && g_game.getFeature(Otc::GameClientPing)) ||
+                   (opcode == CanaryLib::GameServerPingBack && !g_game.getFeature(Otc::GameClientPing)))
                     parsePingBack(msg);
                 else
                     parsePing(msg);
                 break;
-            case Proto::GameServerChallenge:
+            case CanaryLib::GameServerChallenge:
                 parseChallenge(msg);
                 break;
-            case Proto::GameServerDeath:
+            case CanaryLib::GameServerDeath:
                 parseDeath(msg);
                 break;
-            case Proto::GameServerFullMap:
+            case CanaryLib::GameServerFullMap:
                 parseMapDescription(msg);
                 break;
-            case Proto::GameServerMapTopRow:
+            case CanaryLib::GameServerMapTopRow:
                 parseMapMoveNorth(msg);
                 break;
-            case Proto::GameServerMapRightRow:
+            case CanaryLib::GameServerMapRightRow:
                 parseMapMoveEast(msg);
                 break;
-            case Proto::GameServerMapBottomRow:
+            case CanaryLib::GameServerMapBottomRow:
                 parseMapMoveSouth(msg);
                 break;
-            case Proto::GameServerMapLeftRow:
+            case CanaryLib::GameServerMapLeftRow:
                 parseMapMoveWest(msg);
                 break;
-            case Proto::GameServerUpdateTile:
+            case CanaryLib::GameServerUpdateTile:
                 parseUpdateTile(msg);
                 break;
-            case Proto::GameServerCreateOnMap:
+            case CanaryLib::GameServerCreateOnMap:
                 parseTileAddThing(msg);
                 break;
-            case Proto::GameServerChangeOnMap:
+            case CanaryLib::GameServerChangeOnMap:
                 parseTileTransformThing(msg);
                 break;
-            case Proto::GameServerDeleteOnMap:
+            case CanaryLib::GameServerDeleteOnMap:
                 parseTileRemoveThing(msg);
                 break;
-            case Proto::GameServerMoveCreature:
+            case CanaryLib::GameServerMoveCreature:
                 parseCreatureMove(msg);
                 break;
-            case Proto::GameServerOpenContainer:
+            case CanaryLib::GameServerOpenContainer:
                 parseOpenContainer(msg);
                 break;
-            case Proto::GameServerCloseContainer:
+            case CanaryLib::GameServerCloseContainer:
                 parseCloseContainer(msg);
                 break;
-            case Proto::GameServerCreateContainer:
+            case CanaryLib::GameServerCreateContainer:
                 parseContainerAddItem(msg);
                 break;
-            case Proto::GameServerChangeInContainer:
+            case CanaryLib::GameServerChangeInContainer:
                 parseContainerUpdateItem(msg);
                 break;
-            case Proto::GameServerDeleteInContainer:
+            case CanaryLib::GameServerDeleteInContainer:
                 parseContainerRemoveItem(msg);
                 break;
-            case Proto::GameServerSetInventory:
+            case CanaryLib::GameServerSetInventory:
                 parseAddInventoryItem(msg);
                 break;
-            case Proto::GameServerDeleteInventory:
+            case CanaryLib::GameServerDeleteInventory:
                 parseRemoveInventoryItem(msg);
                 break;
-            case Proto::GameServerOpenNpcTrade:
+            case CanaryLib::GameServerOpenNpcTrade:
                 parseOpenNpcTrade(msg);
                 break;
-            case Proto::GameServerPlayerGoods:
+            case CanaryLib::GameServerPlayerGoods:
                 parsePlayerGoods(msg);
                 break;
-            case Proto::GameServerCloseNpcTrade:
+            case CanaryLib::GameServerCloseNpcTrade:
                 parseCloseNpcTrade(msg);
                 break;
-            case Proto::GameServerOwnTrade:
+            case CanaryLib::GameServerOwnTrade:
                 parseOwnTrade(msg);
                 break;
-            case Proto::GameServerCounterTrade:
+            case CanaryLib::GameServerCounterTrade:
                 parseCounterTrade(msg);
                 break;
-            case Proto::GameServerCloseTrade:
+            case CanaryLib::GameServerCloseTrade:
                 parseCloseTrade(msg);
                 break;
-            case Proto::GameServerAmbient:
+            case CanaryLib::GameServerAmbient:
                 parseWorldLight(msg);
                 break;
-            case Proto::GameServerGraphicalEffect:
+            case CanaryLib::GameServerGraphicalEffect:
                 parseMagicEffect(msg);
                 break;
-            case Proto::GameServerTextEffect:
+            case CanaryLib::GameServerTextEffect:
                 parseAnimatedText(msg);
                 break;
-            case Proto::GameServerMissleEffect:
+            case CanaryLib::GameServerMissleEffect:
                 parseDistanceMissile(msg);
                 break;
-            case Proto::GameServerMarkCreature:
+            case CanaryLib::GameServerMarkCreature:
                 parseCreatureMark(msg);
                 break;
-            case Proto::GameServerTrappers:
+            case CanaryLib::GameServerTrappers:
                 parseTrappers(msg);
                 break;
-            case Proto::GameServerCreatureHealth:
+            case CanaryLib::GameServerCreatureHealth:
                 parseCreatureHealth(msg);
                 break;
-            case Proto::GameServerCreatureLight:
+            case CanaryLib::GameServerCreatureLight:
                 parseCreatureLight(msg);
                 break;
-            case Proto::GameServerCreatureOutfit:
+            case CanaryLib::GameServerCreatureOutfit:
                 parseCreatureOutfit(msg);
                 break;
-            case Proto::GameServerCreatureSpeed:
+            case CanaryLib::GameServerCreatureSpeed:
                 parseCreatureSpeed(msg);
                 break;
-            case Proto::GameServerCreatureSkull:
+            case CanaryLib::GameServerCreatureSkull:
                 parseCreatureSkulls(msg);
                 break;
-            case Proto::GameServerCreatureParty:
+            case CanaryLib::GameServerCreatureParty:
                 parseCreatureShields(msg);
                 break;
-            case Proto::GameServerCreatureUnpass:
+            case CanaryLib::GameServerCreatureUnpass:
                 parseCreatureUnpass(msg);
                 break;
-            case Proto::GameServerEditText:
+            case CanaryLib::GameServerEditText:
                 parseEditText(msg);
                 break;
-            case Proto::GameServerEditList:
+            case CanaryLib::GameServerEditList:
                 parseEditList(msg);
                 break;
                 // PROTOCOL>=1038
-            case Proto::GameServerPremiumTrigger:
+            case CanaryLib::GameServerPremiumTrigger:
                 parsePremiumTrigger(msg);
                 break;
-            case Proto::GameServerPlayerData:
+            case CanaryLib::GameServerPlayerData:
                 parsePlayerStats(msg);
                 break;
-            case Proto::GameServerPlayerSkills:
+            case CanaryLib::GameServerPlayerSkills:
                 parsePlayerSkills(msg);
                 break;
-            case Proto::GameServerPlayerState:
+            case CanaryLib::GameServerPlayerState:
                 parsePlayerState(msg);
                 break;
-            case Proto::GameServerClearTarget:
+            case CanaryLib::GameServerClearTarget:
                 parsePlayerCancelAttack(msg);
                 break;
-            case Proto::GameServerPlayerModes:
+            case CanaryLib::GameServerPlayerModes:
                 parsePlayerModes(msg);
                 break;
-            case Proto::GameServerTalk:
+            case CanaryLib::GameServerTalk:
                 parseTalk(msg);
                 break;
-            case Proto::GameServerChannels:
+            case CanaryLib::GameServerChannels:
                 parseChannelList(msg);
                 break;
-            case Proto::GameServerOpenChannel:
+            case CanaryLib::GameServerOpenChannel:
                 parseOpenChannel(msg);
                 break;
-            case Proto::GameServerOpenPrivateChannel:
+            case CanaryLib::GameServerOpenPrivateChannel:
                 parseOpenPrivateChannel(msg);
                 break;
-            case Proto::GameServerRuleViolationChannel:
+            case CanaryLib::GameServerRuleViolationChannel:
                 parseRuleViolationChannel(msg);
                 break;
-            case Proto::GameServerRuleViolationRemove:
+            case CanaryLib::GameServerRuleViolationRemove:
                 parseRuleViolationRemove(msg);
                 break;
-            case Proto::GameServerRuleViolationCancel:
+            case CanaryLib::GameServerRuleViolationCancel:
                 parseRuleViolationCancel(msg);
                 break;
-            case Proto::GameServerRuleViolationLock:
+            case CanaryLib::GameServerRuleViolationLock:
                 parseRuleViolationLock(msg);
                 break;
-            case Proto::GameServerOpenOwnChannel:
+            case CanaryLib::GameServerOpenOwnChannel:
                 parseOpenOwnPrivateChannel(msg);
                 break;
-            case Proto::GameServerCloseChannel:
+            case CanaryLib::GameServerCloseChannel:
                 parseCloseChannel(msg);
                 break;
-            case Proto::GameServerTextMessage:
+            case CanaryLib::GameServerTextMessage:
                 parseTextMessage(msg);
                 break;
-            case Proto::GameServerCancelWalk:
+            case CanaryLib::GameServerCancelWalk:
                 parseCancelWalk(msg);
                 break;
-            case Proto::GameServerWalkWait:
+            case CanaryLib::GameServerWalkWait:
                 parseWalkWait(msg);
                 break;
-            case Proto::GameServerFloorChangeUp:
+            case CanaryLib::GameServerFloorChangeUp:
                 parseFloorChangeUp(msg);
                 break;
-            case Proto::GameServerFloorChangeDown:
+            case CanaryLib::GameServerFloorChangeDown:
                 parseFloorChangeDown(msg);
                 break;
-            case Proto::GameServerChooseOutfit:
+            case CanaryLib::GameServerChooseOutfit:
                 parseOpenOutfitWindow(msg);
                 break;
-            case Proto::GameServerVipAdd:
+            case CanaryLib::GameServerVipAdd:
                 parseVipAdd(msg);
                 break;
-            case Proto::GameServerVipState:
+            case CanaryLib::GameServerVipState:
                 parseVipState(msg);
                 break;
-            case Proto::GameServerVipLogout:
+            case CanaryLib::GameServerVipLogout:
                 parseVipLogout(msg);
                 break;
-            case Proto::GameServerTutorialHint:
+            case CanaryLib::GameServerTutorialHint:
                 parseTutorialHint(msg);
                 break;
-            case Proto::GameServerAutomapFlag:
+            case CanaryLib::GameServerAutomapFlag:
                 parseAutomapFlag(msg);
                 break;
-            case Proto::GameServerQuestLog:
+            case CanaryLib::GameServerQuestLog:
                 parseQuestLog(msg);
                 break;
-            case Proto::GameServerQuestLine:
+            case CanaryLib::GameServerQuestLine:
                 parseQuestLine(msg);
                 break;
                 // PROTOCOL>=870
-            case Proto::GameServerSpellDelay:
+            case CanaryLib::GameServerSpellDelay:
                 parseSpellCooldown(msg);
                 break;
-            case Proto::GameServerSpellGroupDelay:
+            case CanaryLib::GameServerSpellGroupDelay:
                 parseSpellGroupCooldown(msg);
                 break;
-            case Proto::GameServerMultiUseDelay:
+            case CanaryLib::GameServerMultiUseDelay:
                 parseMultiUseCooldown(msg);
                 break;
                 // PROTOCOL>=910
-            case Proto::GameServerChannelEvent:
+            case CanaryLib::GameServerChannelEvent:
                 parseChannelEvent(msg);
                 break;
-            case Proto::GameServerItemInfo:
+            case CanaryLib::GameServerItemInfo:
                 parseItemInfo(msg);
                 break;
-            case Proto::GameServerPlayerInventory:
+            case CanaryLib::GameServerPlayerInventory:
                 parsePlayerInventory(msg);
                 break;
                 // PROTOCOL>=950
-            case Proto::GameServerPlayerDataBasic:
+            case CanaryLib::GameServerPlayerDataBasic:
                 parsePlayerInfo(msg);
                 break;
                 // PROTOCOL>=970
-            case Proto::GameServerModalDialog:
+            case CanaryLib::GameServerModalDialog:
                 parseModalDialog(msg);
                 break;
                 // PROTOCOL>=980
-            case Proto::GameServerLoginSuccess:
+            case CanaryLib::GameServerLoginSuccess:
                 parseLogin(msg);
                 break;
-            case Proto::GameServerEnterGame:
+            case CanaryLib::GameServerEnterGame:
                 parseEnterGame(msg);
                 break;
                 // PROTOCOL>=1000
-            case Proto::GameServerCreatureMarks:
+            case CanaryLib::GameServerCreatureMarks:
                 parseCreaturesMark(msg);
                 break;
-            case Proto::GameServerCreatureType:
+            case CanaryLib::GameServerCreatureType:
                 parseCreatureType(msg);
                 break;
                 // PROTOCOL>=1055
-            case Proto::GameServerBlessings:
+            case CanaryLib::GameServerBlessings:
                 parseBlessings(msg);
                 break;
-            case Proto::GameServerUnjustifiedStats:
+            case CanaryLib::GameServerUnjustifiedStats:
                 parseUnjustifiedStats(msg);
                 break;
-            case Proto::GameServerPvpSituations:
+            case CanaryLib::GameServerPvpSituations:
                 parsePvpSituations(msg);
                 break;
-            case Proto::GameServerPreset:
+            case CanaryLib::GameServerPreset:
                 parsePreset(msg);
                 break;
                 // PROTOCOL>=1080
-            case Proto::GameServerCoinBalanceUpdating:
+            case CanaryLib::GameServerCoinBalanceUpdating:
                 parseCoinBalanceUpdating(msg);
                 break;
-            case Proto::GameServerCoinBalance:
+            case CanaryLib::GameServerCoinBalance:
                 parseCoinBalance(msg);
                 break;
-            case Proto::GameServerRequestPurchaseData:
+            case CanaryLib::GameServerRequestPurchaseData:
                 parseRequestPurchaseData(msg);
                 break;
-            case Proto::GameServerSendShowDescription:
+            case CanaryLib::GameServerSendShowDescription:
                 parseShowDescription(msg);
                 break;
-            case Proto::GameServerStoreCompletePurchase:
+            case CanaryLib::GameServerStoreCompletePurchase:
                 parseCompleteStorePurchase(msg);
                 break;
-            case Proto::GameServerStoreOffers:
+            case CanaryLib::GameServerStoreOffers:
                 parseStoreOffers(msg);
                 break;
-            case Proto::GameServerStoreTransactionHistory:
+            case CanaryLib::GameServerStoreTransactionHistory:
                 parseStoreTransactionHistory(msg);
                 break;
-            case Proto::GameServerStoreError:
+            case CanaryLib::GameServerStoreError:
                 parseStoreError(msg);
                 break;
-            case Proto::GameServerStore:
+            case CanaryLib::GameServerStore:
                 parseStore(msg);
                 break;
                 // PROTOCOL>=1097
-            case Proto::GameServerStoreButtonIndicators:
+            case CanaryLib::GameServerStoreButtonIndicators:
                 parseStoreButtonIndicators(msg);
                 break;
-            case Proto::GameServerSetStoreDeepLink:
+            case CanaryLib::GameServerSetStoreDeepLink:
                 parseSetStoreDeepLink(msg);
                 break;
                 // otclient ONLY
-            case Proto::GameServerExtendedOpcode:
+            case CanaryLib::GameServerExtendedOpcode:
                 parseExtendedOpcode(msg);
                 break;
-            case Proto::GameServerChangeMapAwareRange:
+            case CanaryLib::GameServerChangeMapAwareRange:
                 parseChangeMapAwareRange(msg);
                 break;
             // 12.x +
-            case Proto::GameServerSendClientCheck:
+            case CanaryLib::GameServerSendClientCheck:
                 parseClientCheck(msg);
                 break;
-            case Proto::GameServerSendGameNews:
+            case CanaryLib::GameServerSendGameNews:
                 parseGameNews(msg);
                 break;
-            case Proto::GameServerSendBlessDialog:
+            case CanaryLib::GameServerSendBlessDialog:
                 parseBlessDialog(msg);
                 break;
-            case Proto::GameServerSendRestingAreaState:
+            case CanaryLib::GameServerSendRestingAreaState:
                 parseRestingAreaState(msg);
                 break;
-            case Proto::GameServerSendUpdateImpactTracker:
+            case CanaryLib::GameServerSendUpdateImpactTracker:
                 parseUpdateImpactTracker(msg);
                 break;
-            case Proto::GameServerSendItemsPrice:
+            case CanaryLib::GameServerSendItemsPrice:
                 parseItemsPrice(msg);
                 break;
-            case Proto::GameServerSendUpdateSupplyTracker:
+            case CanaryLib::GameServerSendUpdateSupplyTracker:
                 parseUpdateSupplyTracker(msg);
                 break;
-            case Proto::GameServerSendUpdateLootTracker:
+            case CanaryLib::GameServerSendUpdateLootTracker:
                 parseUpdateLootTracker(msg);
                 break;
-            case Proto::GameServerSendKillTrackerUpdate:
+            case CanaryLib::GameServerSendKillTrackerUpdate:
                 parseKillTrackerUpdate(msg);
                 break;
-            case Proto::GameServerSendBestiaryEntryChanged:
+            case CanaryLib::GameServerSendBestiaryEntryChanged:
                 parseBestiaryEntryChanged(msg);
                 break;
-            case Proto::GameServerSendDailyRewardCollectionState:
+            case CanaryLib::GameServerSendDailyRewardCollectionState:
                 parseDailyRewardCollectionState(msg);
                 break;
-            case Proto::GameServerSendOpenRewardWall:
+            case CanaryLib::GameServerSendOpenRewardWall:
                 parseOpenRewardWall(msg);
                 break;
-            case Proto::GameServerSendDailyReward:
+            case CanaryLib::GameServerSendDailyReward:
                 parseDailyReward(msg);
                 break;
-            case Proto::GameServerSendRewardHistory:
+            case CanaryLib::GameServerSendRewardHistory:
                 parseRewardHistory(msg);
                 break;
-            case Proto::GameServerSendPreyTimeLeft:
+            case CanaryLib::GameServerSendPreyTimeLeft:
                 parsePreyTimeLeft(msg);
                 break;
-            case Proto::GameServerSendPreyData:
+            case CanaryLib::GameServerSendPreyData:
                 parsePreyData(msg);
                 break;
-            case Proto::GameServerSendPreyRerollPrice:
+            case CanaryLib::GameServerSendPreyRerollPrice:
                 parsePreyRerollPrice(msg);
                 break;
-            case Proto::GameServerSendImbuementWindow:
+            case CanaryLib::GameServerSendImbuementWindow:
                 parseImbuementWindow(msg);
                 break;
-            case Proto::GameServerSendCloseImbuementWindow:
+            case CanaryLib::GameServerSendCloseImbuementWindow:
                 parseCloseImbuementWindow(msg);
                 break;
-            case Proto::GameServerSendError:
+            case CanaryLib::GameServerSendError:
                 parseError(msg);
                 break;
-            case Proto::GameServerSendCollectionResource:
+            case CanaryLib::GameServerSendCollectionResource:
                 parseCollectionResource(msg);
                 break;
-            case Proto::GameServerSendTibiaTime:
+            case CanaryLib::GameServerSendTibiaTime:
                 parseTibiaTime(msg);
                 break;
             default:
@@ -2084,7 +2084,7 @@ void ProtocolGame::parseCreatureType(const InputMessagePtr &msg)
     const uint32 id = msg->getU32();
     const uint8 type = msg->getU8();
 
-    if (type == Proto::CreatureTypeSummonOwn)
+    if (type == CREATURETYPE_SUMMON_OWN)
     {
         // TODO: implement player summon type specific features
         msg->getU32(); // master id
@@ -2216,9 +2216,9 @@ ThingPtr ProtocolGame::getThing(const InputMessagePtr &msg)
 
     if (id == 0)
         stdext::throw_exception("invalid thing id");
-    else if (id == Proto::UnknownCreature || id == Proto::OutdatedCreature || id == Proto::Creature)
+    else if (id == CanaryLib::UnknownCreature || id == CanaryLib::OutdatedCreature || id == CanaryLib::Creature)
         thing = getCreature(msg, id);
-    else if (id == Proto::StaticText) // otclient only
+    else if (id == CanaryLib::StaticText) // otclient only
         thing = getStaticText(msg, id);
     else // item
         thing = getItem(msg, id);
@@ -2258,8 +2258,8 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr &msg, int type)
         type = msg->getU16();
 
     CreaturePtr creature;
-    const bool known = type != Proto::UnknownCreature;
-    if(type == Proto::OutdatedCreature || type == Proto::UnknownCreature) {
+    const bool known = type != CanaryLib::UnknownCreature;
+    if(type == CanaryLib::OutdatedCreature || type == CanaryLib::UnknownCreature) {
         if(known) {
             const uint32_t id = msg->getU32();
             creature = g_map.getCreatureById(id);
@@ -2273,7 +2273,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr &msg, int type)
 
             const uint8_t creatureType = msg->getU8();
             
-            if(creatureType == Proto::CreatureTypeSummonOwn) {
+            if(creatureType == CREATURETYPE_SUMMON_OWN) {
                 // TODO: Implement player summon creature type specific features
                 msg->getU32(); // master id
                 creature = MonsterPtr(new Monster);
@@ -2283,18 +2283,18 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr &msg, int type)
 
             if (id == m_localPlayer->getId())
                 creature = m_localPlayer;
-            else if (creatureType == Proto::CreatureTypePlayer)
+            else if (creatureType == CREATURETYPE_PLAYER)
             {
                 // fixes a bug server side bug where GameInit is not sent and local player id is unknown
                 if (m_localPlayer->getId() == 0 && name == m_localPlayer->getName())
                     creature = m_localPlayer;
                 else
                     creature = PlayerPtr(new Player);
-            } else if(creatureType == Proto::CreatureTypeMonster)
+            } else if(creatureType == CREATURETYPE_MONSTER)
                 creature = MonsterPtr(new Monster);
-            else if (creatureType == Proto::CreatureTypeNpc)
+            else if (creatureType == CREATURETYPE_NPC)
                 creature = NpcPtr(new Npc);
-            else if (creatureType == Proto::CreatureTypeHidden)
+            else if (creatureType == CREATURETYPE_UNKNOWN)
             {
                 // TODO: Implement hidden creature type specific features
                 creature = CreaturePtr(new Creature);
@@ -2327,16 +2327,16 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr &msg, int type)
         const int8 emblem = !known ? msg->getU8() : -1;
         const uint8 creatureType = msg->getU8();
 
-        if (creatureType == Proto::CreatureTypeSummonOwn)
+        if (creatureType == CREATURETYPE_SUMMON_OWN)
         {
             // TODO: Implement player summon specific features
             msg->getU32(); // master id
         }
-        else if (creatureType == Proto::CreatureTypeHidden)
+        else if (creatureType == CREATURETYPE_UNKNOWN)
         {
             // TODO: Implement hidden creature type specific features
         }
-        else if (creatureType == Proto::CreatureTypePlayer)
+        else if (creatureType == CREATURETYPE_PLAYER)
         {
             int8 vocationId = msg->getU8();
         }
@@ -2373,7 +2373,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr &msg, int type)
             if (creature == m_localPlayer && !m_localPlayer->isKnown())
                 m_localPlayer->setKnown(true);
         }
-    } else if(type == Proto::Creature) {
+    } else if(type == CanaryLib::Creature) {
         const uint id = msg->getU32();
         creature = g_map.getCreatureById(id);
 

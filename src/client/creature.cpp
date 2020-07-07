@@ -57,7 +57,7 @@ Creature::Creature() : Thing()
     m_skull = Otc::SkullNone;
     m_shield = Otc::ShieldNone;
     m_emblem = Otc::EmblemNone;
-    m_type = Proto::CreatureTypeUnknown;
+    m_type = CREATURETYPE_UNKNOWN;
     m_icon = Otc::NpcIconNone;
     m_lastStepDirection = Otc::InvalidDirection;
     m_nameCache.setFont(g_fonts.getFont("verdana-11px-rounded"));
@@ -308,7 +308,7 @@ void Creature::drawInformation(const Point& point, bool useGray, const Rect& par
         const Rect emblemRect = Rect(backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 16, m_emblemTexture->getSize());
         g_painter->drawTexturedRect(emblemRect, m_emblemTexture);
     }
-    if(m_type != Proto::CreatureTypeUnknown && m_typeTexture) {
+    if(m_type != CREATURETYPE_UNKNOWN && m_typeTexture) {
         g_painter->setColor(Color::white);
         const Rect typeRect = Rect(backgroundRect.x() + 13.5 + 12 + 12, backgroundRect.y() + 16, m_typeTexture->getSize());
         g_painter->drawTexturedRect(typeRect, m_typeTexture);

@@ -23,28 +23,7 @@
 #ifndef PCH_H
 #define PCH_H
 
-// common C headers
-#include <cstdio>
-#include <cstdlib>
-#include <cstddef>
-#include <cstring>
-#include <cassert>
-#include <cmath>
-
-// common STL headers
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <vector>
-#include <list>
-#include <deque>
-#include <map>
-#include <algorithm>
-#include <functional>
-#include <array>
-#include <unordered_map>
-#include <tuple>
-#include <iomanip>
-#include <typeinfo>
+// Canary Lib
+#include "lib/include.hpp"
 
 #endif

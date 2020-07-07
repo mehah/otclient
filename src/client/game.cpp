@@ -789,7 +789,7 @@ void Game::move(const ThingPtr& thing, const Position& toPos, int count)
     uint id = thing->getId();
     if(thing->isCreature()) {
         CreaturePtr creature = thing->static_self_cast<Creature>();
-        id = Proto::Creature;
+        id = CanaryLib::Creature;
     }
 
     m_protocolGame->sendMove(thing->getPosition(), id, thing->getStackPos(), toPos, count);
