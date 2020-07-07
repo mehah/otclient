@@ -31,8 +31,8 @@ InputMessage::InputMessage()
 void InputMessage::reset()
 {
     m_messageSize = 0;
-    m_readPos = MAX_HEADER_SIZE;
-    m_headerPos = MAX_HEADER_SIZE;
+    m_readPos = CanaryLib::MAX_HEADER_SIZE;
+    m_headerPos = CanaryLib::MAX_HEADER_SIZE;
 }
 
 void InputMessage::setBuffer(const std::string& buffer)
@@ -109,8 +109,8 @@ void InputMessage::fillBuffer(uint8 *buffer, uint16 size)
 
 void InputMessage::setHeaderSize(uint16 size)
 {
-    assert(MAX_HEADER_SIZE - size >= 0);
-    m_headerPos = MAX_HEADER_SIZE - size;
+    assert(CanaryLib::MAX_HEADER_SIZE - size >= 0);
+    m_headerPos = CanaryLib::MAX_HEADER_SIZE - size;
     m_readPos = m_headerPos;
 }
 
@@ -123,7 +123,7 @@ bool InputMessage::readChecksum()
 
 bool InputMessage::canRead(int bytes)
 {
-    if((m_readPos - m_headerPos + bytes > m_messageSize) || (m_readPos + bytes > BUFFER_MAXSIZE))
+    if((m_readPos - m_headerPos + bytes > m_messageSize) || (m_readPos + bytes > CanaryLib::NETWORKMESSAGE_MAXSIZE))
         return false;
     return true;
 }
@@ -135,6 +135,6 @@ void InputMessage::checkRead(int bytes)
 
 void InputMessage::checkWrite(int bytes)
 {
-    if(bytes > BUFFER_MAXSIZE)
+    if(bytes > CanaryLib::NETWORKMESSAGE_MAXSIZE)
         throw stdext::exception("InputMessage max buffer size reached");
 }

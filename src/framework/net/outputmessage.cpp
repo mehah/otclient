@@ -30,8 +30,8 @@ OutputMessage::OutputMessage()
 
 void OutputMessage::reset()
 {
-    m_writePos = MAX_HEADER_SIZE;
-    m_headerPos = MAX_HEADER_SIZE;
+    m_writePos = CanaryLib::MAX_HEADER_SIZE;
+    m_headerPos = CanaryLib::MAX_HEADER_SIZE;
     m_messageSize = 0;
 }
 
@@ -80,8 +80,8 @@ void OutputMessage::addU64(uint64 value)
 void OutputMessage::addString(const std::string& buffer)
 {
     int len = buffer.length();
-    if(len > MAX_STRING_LENGTH)
-        throw stdext::exception(stdext::format("string length > %d", MAX_STRING_LENGTH));
+    if(len > CanaryLib::MAX_STRING_LENGTH)
+        throw stdext::exception(stdext::format("string length > %d", CanaryLib::NETWORKMESSAGE_MAXSIZE));
     checkWrite(len + 2);
     addU16(len);
     memcpy((char*)(m_buffer + m_writePos), buffer.c_str(), len);
@@ -128,7 +128,7 @@ void OutputMessage::writeMessageSize()
 
 bool OutputMessage::canWrite(int bytes)
 {
-    if(m_writePos + bytes > BUFFER_MAXSIZE)
+    if(m_writePos + bytes > CanaryLib::NETWORKMESSAGE_MAXSIZE)
         return false;
     return true;
 }

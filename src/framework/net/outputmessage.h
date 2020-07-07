@@ -30,12 +30,6 @@
 class OutputMessage : public LuaObject
 {
 public:
-    enum {
-        BUFFER_MAXSIZE = 65536,
-        MAX_STRING_LENGTH = 65536,
-        MAX_HEADER_SIZE = 8
-    };
-
     OutputMessage();
 
     void reset();
@@ -61,7 +55,7 @@ public:
 protected:
     uint8* getWriteBuffer() { return m_buffer + m_writePos; }
     uint8* getHeaderBuffer() { return m_buffer + m_headerPos; }
-    uint8* getDataBuffer() { return m_buffer + MAX_HEADER_SIZE; }
+    uint8* getDataBuffer() { return m_buffer + CanaryLib::MAX_HEADER_SIZE; }
 
     void writeChecksum();
     void writeMessageSize();
@@ -75,7 +69,7 @@ private:
     uint16 m_headerPos;
     uint16 m_writePos;
     uint16 m_messageSize;
-    uint8 m_buffer[BUFFER_MAXSIZE];
+    uint8 m_buffer[CanaryLib::NETWORKMESSAGE_MAXSIZE];
 };
 
 #endif

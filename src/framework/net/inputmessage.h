@@ -30,11 +30,6 @@
 class InputMessage : public LuaObject
 {
 public:
-    enum {
-        BUFFER_MAXSIZE = 65536,
-        MAX_HEADER_SIZE = 8
-    };
-
     InputMessage();
 
     void setBuffer(const std::string& buffer);
@@ -72,8 +67,8 @@ protected:
 
     uint8* getReadBuffer() { return m_buffer + m_readPos; }
     uint8* getHeaderBuffer() { return m_buffer + m_headerPos; }
-    uint8* getDataBuffer() { return m_buffer + MAX_HEADER_SIZE; }
-    uint16 getHeaderSize() { return (MAX_HEADER_SIZE - m_headerPos); }
+    uint8* getDataBuffer() { return m_buffer + CanaryLib::MAX_HEADER_SIZE; }
+    uint16 getHeaderSize() { return (CanaryLib::MAX_HEADER_SIZE - m_headerPos); }
 
     uint16 readSize() { return getU16(); }
     bool readChecksum();
@@ -88,7 +83,7 @@ private:
     uint16 m_headerPos;
     uint16 m_readPos;
     uint16 m_messageSize;
-    uint8 m_buffer[BUFFER_MAXSIZE];
+    uint8 m_buffer[CanaryLib::NETWORKMESSAGE_MAXSIZE];
 };
 
 #endif
