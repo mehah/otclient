@@ -33,9 +33,22 @@
 #define LUA_LIB
 
 extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
+  #include <lauxlib.h>
 }
+
+#ifdef __has_include
+
+#if __has_include(<luajit/lua.hpp>)
+#include <luajit/lua.hpp>
+#elif __has_include(<lua.hpp>)
+#include <lua.hpp>
+#else
+#error "Cannot detect lua library"
+#endif
+
+#else
+#include <lua.hpp>
+#endif
 
 /* ----- adapted from lua-5.2.0 luaconf.h: ----- */
 
