@@ -72,7 +72,7 @@ MapView::MapView()
     m_floorMin = m_floorMax = 0;
 
     for(int dir = Otc::North; dir < Otc::InvalidDirection; ++dir) {
-        const ViewportControl viewport(static_cast<Otc::Direction>(dir));
+        const MapViewControl viewport(static_cast<Otc::Direction>(dir));
         m_viewportControl[dir] = viewport;
     }
 }
@@ -294,19 +294,10 @@ void MapView::updateVisibleTilesCache()
 
     const LocalPlayerPtr player = g_game.getLocalPlayer();
 
-    int distanceToUpdate = 2;
-    switch(player->getDirection()) {
-    case Otc::SouthEast:
-    case Otc::South:
-    case Otc::East:
-        distanceToUpdate = 3;
-        break;
-    }
-
     if(m_cachedFirstVisibleFloor == cachedFirstVisibleFloor &&
        m_cachedLastVisibleFloor == cachedLastVisibleFloor &&
        cameraPosition.z == m_lastCameraPosition.z &&
-       cameraPosition.distance(m_lastCameraPosition) < distanceToUpdate
+       cameraPosition.distance(m_lastCameraPosition) < 2
        ) return;
 
     m_lastCameraPosition = cameraPosition;
@@ -318,8 +309,6 @@ void MapView::updateVisibleTilesCache()
 
     if(m_cachedLastVisibleFloor < m_cachedFirstVisibleFloor)
         m_cachedLastVisibleFloor = m_cachedFirstVisibleFloor;
-
-    m_cachedFloorVisibleCreatures.clear();
 
     // clear current visible tiles cache
     do {
@@ -373,9 +362,6 @@ void MapView::updateVisibleTilesCache()
             }
         }
     }
-
-    if(m_viewMode <= NEAR_VIEW)
-        m_cachedFloorVisibleCreatures = g_map.getSightSpectators(cameraPosition, false);
 
     m_mustUpdateVisibleTilesCache = false;
 }
@@ -448,6 +434,9 @@ void MapView::updateGeometry(const Size& visibleDimension, const Size& optimized
 
 void MapView::onTileUpdate(const Position&)
 {
+    m_cachedFloorVisibleCreatures.clear();
+    if(m_viewMode <= NEAR_VIEW)
+        m_cachedFloorVisibleCreatures = g_map.getSightSpectators(getCameraPosition(), false);
 }
 
 void MapView::onMapCenterChange(const Position&)
