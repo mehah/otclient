@@ -27,9 +27,7 @@
 #include <framework/graphics/declarations.h>
 #include <framework/graphics/paintershaderprogram.h>
 #include <framework/luaengine/luaobject.h>
-#include "declarations.h"
 #include "lightview.h"
-#include "mapviewcontrol.h"
 
  // @bindclass
 class MapView : public LuaObject
@@ -52,49 +50,48 @@ private:
     void requestVisibleTilesCacheUpdate() { m_mustUpdateVisibleTilesCache = true; }
 
 protected:
-    void onTileUpdate(const Position& pos);
+    void onTileUpdate(const Position& pos, const ThingPtr& thing);
     void onMapCenterChange(const Position& pos);
 
     friend class Map;
 
 public:
     // floor visibility related
+    int getLockedFirstVisibleFloor() { return m_lockedFirstVisibleFloor; }
     void lockFirstVisibleFloor(int firstVisibleFloor);
     void unlockFirstVisibleFloor();
-    int getLockedFirstVisibleFloor() { return m_lockedFirstVisibleFloor; }
 
-    void setMultifloor(bool enable) { m_multifloor = enable; requestVisibleTilesCacheUpdate(); }
     bool isMultifloor() { return m_multifloor; }
+    void setMultifloor(bool enable) { m_multifloor = enable; requestVisibleTilesCacheUpdate(); }
 
     // map dimension related
-    void setVisibleDimension(const Size& visibleDimension);
-    Size getVisibleDimension() { return m_visibleDimension; }
-    int getTileSize() { return m_tileSize; }
     Point getVisibleCenterOffset() { return m_visibleCenterOffset; }
+    Size getVisibleDimension() { return m_visibleDimension; }
+    void setVisibleDimension(const Size& visibleDimension);
+    int getTileSize() { return m_tileSize; }
     int getCachedFirstVisibleFloor() { return m_cachedFirstVisibleFloor; }
     int getCachedLastVisibleFloor() { return m_cachedLastVisibleFloor; }
 
     // view mode related
-    void setViewMode(ViewMode viewMode);
     ViewMode getViewMode() { return m_viewMode; }
+    void setViewMode(ViewMode viewMode);
     void optimizeForSize(const Size& visibleSize);
 
     void setAutoViewMode(bool enable);
     bool isAutoViewModeEnabled() { return m_autoViewMode; }
 
     // camera related
-    void followCreature(const CreaturePtr& creature);
     CreaturePtr getFollowingCreature() { return m_followingCreature; }
+    void followCreature(const CreaturePtr& creature);
     bool isFollowingCreature() { return m_followingCreature && m_follow; }
 
-    void setCameraPosition(const Position& pos);
     Position getCameraPosition();
+    void setCameraPosition(const Position& pos);
 
     void setMinimumAmbientLight(float intensity) { m_minimumAmbientLight = intensity; }
     float getMinimumAmbientLight() { return m_minimumAmbientLight; }
 
     // drawing related
-
     void setDrawTexts(bool enable) { m_drawTexts = enable; }
     bool isDrawingTexts() { return m_drawTexts; }
 
@@ -121,28 +118,43 @@ public:
 
     MapViewPtr asMapView() { return static_self_cast<MapView>(); }
 
-    void requestDrawing(const Otc::ReDrawFlags reDrawFlags, const bool force = false)
-    {
-        if(reDrawFlags & Otc::ReDrawTile && (force || m_minTimeRender.ticksElapsed() > 10)) m_redrawFlag = reDrawFlags;
-        if(reDrawFlags & Otc::ReDrawLight && m_lightView) m_lightView->requestDrawing(force);
-    }
+    void requestDrawing(const Otc::RequestDrawFlags reDrawFlags, const bool force = false, const bool isLocalPlayer = false);
+    void resetLastCamera() { m_lastCameraPosition = Position(); }
 
 private:
+    struct ViewPort {
+        int top, right, bottom, left;
+    };
+
+    struct FrameCache {
+        FrameBufferPtr tile, staticText,
+            creatureInformation;
+    };
 
     int calcFirstVisibleFloor();
     int calcLastVisibleFloor();
 
+    void initViewPortDirection();
+
+    void drawCreatureInformation(const Rect& rect, Point drawOffset, const float horizontalStretchFactor, const float verticalStretchFactor);
+    void drawText(const Rect& rect, Point drawOffset, const float horizontalStretchFactor, const float verticalStretchFactor);
+
     Rect calcFramebufferSource(const Size& destSize);
+
     Point transformPositionTo2D(const Position& position, const Position& relativePosition)
     {
         return Point((m_virtualCenterOffset.x + (position.x - relativePosition.x) - (relativePosition.z - position.z)) * m_tileSize,
                      (m_virtualCenterOffset.y + (position.y - relativePosition.y) - (relativePosition.z - position.z)) * m_tileSize);
     }
 
+    bool canRenderTile(const TilePtr& tile, const ViewPort& viewPort, LightView* lightView);
+
     int m_lockedFirstVisibleFloor;
     int m_cachedFirstVisibleFloor;
     int m_cachedLastVisibleFloor;
     int m_tileSize;
+
+    Rect m_rectDimension;
 
     Size m_drawDimension;
     Size m_visibleDimension;
@@ -154,30 +166,32 @@ private:
 
     Position m_customCameraPosition;
 
+    std::array<ViewPort, Otc::InvalidDirection + 1> m_viewPortDirection;
+
     stdext::boolean<true> m_mustUpdateVisibleTilesCache;
     stdext::boolean<true> m_mustCleanFramebuffer;
-    stdext::boolean<true> m_multifloor;
+    stdext::boolean<true> m_shaderSwitchDone;
+    stdext::boolean<true> m_drawHealthBars;
     stdext::boolean<true> m_autoViewMode;
+    stdext::boolean<true> m_drawManaBar;
+    stdext::boolean<true> m_multifloor;
     stdext::boolean<true> m_drawTexts;
     stdext::boolean<true> m_drawNames;
-    stdext::boolean<true> m_drawHealthBars;
-    stdext::boolean<false> m_drawLights;
-    stdext::boolean<true> m_drawManaBar;
     stdext::boolean<true> m_smooth;
     stdext::boolean<true> m_follow;
-    stdext::boolean<true> m_shaderSwitchDone;
 
-    std::vector<CreaturePtr> m_cachedFloorVisibleCreatures;
+    stdext::boolean<false> m_drawLights;
 
-    std::array<MapViewControl, Otc::InvalidDirection + 1> m_viewportControl;
+    std::vector<CreaturePtr> m_visibleCreatures;
+
     std::array<std::vector<TilePtr>, Otc::MAX_Z + 1> m_cachedVisibleTiles;
 
     PainterShaderProgramPtr m_shader;
     PainterShaderProgramPtr m_nextShader;
 
     CreaturePtr m_followingCreature;
-    FrameBufferPtr m_framebuffer;
-    FrameBufferPtr m_nameFramebuffer;
+
+    FrameCache m_frameCache;
 
     ViewMode m_viewMode;
     LightViewPtr m_lightView;
@@ -185,10 +199,11 @@ private:
     float m_minimumAmbientLight;
     float m_fadeInTime;
     float m_fadeOutTime;
+    float m_scaleFactor;
 
     uint32 m_redrawFlag;
-    Timer m_minTimeRender;
 
+    Timer m_minTimeRender;
     Timer m_fadeTimer;
 
     uint_fast8_t m_floorMin, m_floorMax;

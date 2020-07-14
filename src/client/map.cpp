@@ -59,22 +59,32 @@ void Map::removeMapView(const MapViewPtr& mapView)
         m_mapViews.erase(it);
 }
 
-void Map::notificateTileUpdate(const Position& pos)
+void Map::resetAwareRange()
+{
+    AwareRange range;
+    range.left = 8;
+    range.top = 6;
+    range.bottom = range.top + 1;
+    range.right = range.left + 1;
+    setAwareRange(range);
+}
+
+void Map::notificateTileUpdate(const Position& pos, const ThingPtr& thing)
 {
     if(!pos.isMapPosition())
         return;
 
     for(const MapViewPtr& mapView : m_mapViews) {
-        mapView->onTileUpdate(pos);
+        mapView->onTileUpdate(pos, thing);
     }
 
     g_minimap.updateTile(pos, getTile(pos));
 }
 
-void Map::requestDrawing(const Otc::ReDrawFlags reDrawFlags, const bool force)
+void Map::requestDrawing(const Otc::RequestDrawFlags reDrawFlags, const bool force, const bool isLocalPlayer)
 {
     for(const MapViewPtr& mapView : m_mapViews)
-        mapView->requestDrawing(reDrawFlags, force);
+        mapView->requestDrawing(reDrawFlags, force, isLocalPlayer);
 }
 
 void Map::clean()
@@ -154,6 +164,8 @@ void Map::addThing(const ThingPtr& thing, const Position& pos, int stackPos)
                 m_animatedTexts.push_back(animatedText);
             }
         } else if(thing->isStaticText()) {
+            thing->requestDrawing(true);
+
             const StaticTextPtr staticText = thing->static_self_cast<StaticText>();
             for(const auto& other : m_staticTexts) {
                 // try to combine messages
@@ -169,7 +181,7 @@ void Map::addThing(const ThingPtr& thing, const Position& pos, int stackPos)
         thing->onAppear();
     }
 
-    notificateTileUpdate(pos);
+    notificateTileUpdate(pos, thing);
 }
 
 ThingPtr Map::getThing(const Position& pos, int stackPos)
@@ -186,15 +198,7 @@ bool Map::removeThing(const ThingPtr& thing)
         return false;
 
     bool ret = false;
-    if(thing->isMissile()) {
-        MissilePtr missile = thing->static_self_cast<Missile>();
-        const int z = missile->getPosition().z;
-        const auto it = std::find(m_floorMissiles[z].begin(), m_floorMissiles[z].end(), missile);
-        if(it != m_floorMissiles[z].end()) {
-            m_floorMissiles[z].erase(it);
-            ret = true;
-        }
-    } else if(thing->isAnimatedText()) {
+    if(thing->isAnimatedText()) {
         const AnimatedTextPtr animatedText = thing->static_self_cast<AnimatedText>();
         const auto it = std::find(m_animatedTexts.begin(), m_animatedTexts.end(), animatedText);
         if(it != m_animatedTexts.end()) {
@@ -207,17 +211,33 @@ bool Map::removeThing(const ThingPtr& thing)
         if(it != m_staticTexts.end()) {
             m_staticTexts.erase(it);
             ret = true;
-        }
-    } else if(const TilePtr& tile = thing->getTile())
-        ret = tile->removeThing(thing);
 
-    if(!thing->cancelListenerPainter()) {
-        uint32_t redrawFlag = thing->hasLight() ? Otc::ReDrawTile_Light : Otc::ReDrawTile;
-        if(thing->isCreature()) redrawFlag |= Otc::ReDrawInformation;
-        requestDrawing(static_cast<Otc::ReDrawFlags>(redrawFlag), true);
+            requestDrawing(Otc::ReDrawStaticText, true);
+        }
+    } else {
+        if(thing->isMissile()) {
+            MissilePtr missile = thing->static_self_cast<Missile>();
+            const int z = missile->getPosition().z;
+            const auto it = std::find(m_floorMissiles[z].begin(), m_floorMissiles[z].end(), missile);
+            if(it != m_floorMissiles[z].end()) {
+                m_floorMissiles[z].erase(it);
+                ret = true;
+            }
+        } else if(const TilePtr& tile = thing->getTile()) {
+            ret = tile->removeThing(thing);
+        }
+
+        if(!thing->cancelListenerPainter()) {
+            uint32_t redrawFlag = Otc::ReDrawThing;
+            if(thing->hasLight()) redrawFlag |= Otc::ReDrawLight;
+            if(thing->isCreature()) redrawFlag |= Otc::ReDrawCreatureInformation;
+
+            requestDrawing(static_cast<Otc::RequestDrawFlags>(redrawFlag), true);
+        }
     }
 
-    notificateTileUpdate(thing->getPosition());
+    notificateTileUpdate(thing->getPosition(), thing);
+
     return ret;
 }
 
@@ -706,6 +726,7 @@ bool Map::isAwareOfPosition(const Position& pos)
             groundedPos.coveredDown();
         }
     }
+
     return m_centralPosition.isInRange(groundedPos, m_awareRange.left,
                                        m_awareRange.right,
                                        m_awareRange.top,
@@ -716,16 +737,6 @@ void Map::setAwareRange(const AwareRange& range)
 {
     m_awareRange = range;
     removeUnawareThings();
-}
-
-void Map::resetAwareRange()
-{
-    AwareRange range;
-    range.left = MapViewControl::maxViewportX;
-    range.top = MapViewControl::maxViewportY;
-    range.bottom = range.top + 1;
-    range.right = range.left + 1;
-    setAwareRange(range);
 }
 
 int Map::getFirstAwareFloor()
@@ -914,4 +925,10 @@ std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::findPath(const
         delete it.second;
 
     return ret;
+}
+
+void  Map::resetLastCamera()
+{
+    for(const MapViewPtr& mapView : m_mapViews)
+        mapView->resetLastCamera();
 }
