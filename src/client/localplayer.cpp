@@ -65,7 +65,7 @@ void LocalPlayer::lockWalk(int millis)
 bool LocalPlayer::canWalk(Otc::Direction)
 {
     // paralyzed
-    if(m_speed == 0)
+    if(isParalyzed())
         return false;
 
     // cannot walk while locked
@@ -408,6 +408,9 @@ void LocalPlayer::setMana(double mana, double maxMana)
         m_maxMana = maxMana;
 
         callLuaField("onManaChange", mana, maxMana, oldMana, oldMaxMana);
+
+        g_map.requestDrawing(Otc::ReDrawDynamicInformation, true);
+        m_updateDynamicInformation = true;
     }
 }
 

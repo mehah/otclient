@@ -213,13 +213,13 @@ void Creature::drawOutfit(const Rect& destRect, bool resize)
         outfitBuffer->bind();
         g_painter->setAlphaWriting(true);
         g_painter->clear(Color::alpha);
-        internalDrawOutfit(Point(frameSize - Otc::TILE_PIXELS, frameSize - Otc::TILE_PIXELS) + getDisplacement(), 1, false, Otc::South);
+        internalDrawOutfit(Point(frameSize - Otc::TILE_PIXELS, frameSize - Otc::TILE_PIXELS) + getDisplacement(), 1, true, Otc::South);
         outfitBuffer->release();
         outfitBuffer->draw(destRect, Rect(0, 0, frameSize, frameSize));
     } else {
         const float scaleFactor = destRect.width() / static_cast<float>(frameSize);
         const Point dest = destRect.bottomRight() - (Point(Otc::TILE_PIXELS, Otc::TILE_PIXELS) - getDisplacement()) * scaleFactor;
-        internalDrawOutfit(dest, scaleFactor, false, Otc::South);
+        internalDrawOutfit(dest, scaleFactor, true, Otc::South);
     }
 }
 
@@ -235,11 +235,9 @@ void Creature::drawInformation(const Point& point, bool useGray, const Rect& par
 
     // calculate main rects
     Rect backgroundRect = Rect(point.x - (13.5), point.y, 27, 4);
-    // backgroundRect.bind(parentRect);
 
     const Size nameSize = m_nameCache.getTextSize();
     Rect textRect = Rect(point.x - nameSize.width() / 2.0, point.y - 12, nameSize);
-    // textRect.bind(parentRect);
 
     // distance them
     uint32 offset = 12;
@@ -576,20 +574,19 @@ void Creature::nextWalkUpdate()
         self->nextWalkUpdate();
 
         self->requestDrawing();
-    }, std::max<int>(m_stepCache.getDuration(m_lastStepDirection) / Otc::TILE_PIXELS, 15));
+    }, std::max<int>(m_stepCache.duration / Otc::TILE_PIXELS, 15));
 }
 
 void Creature::updateWalk(const bool isPreWalking)
 {
-    // Generate step cache for no-localPlayer
-    if(!isLocalPlayer()) getStepDuration(true);
+    int stepDuration = getStepDuration(true);
+    stepDuration += (12 - stepDuration * .01);
+
+    const float walkTicksPerPixel = stepDuration / Otc::TILE_PIXELS;
+    const int totalPixelsWalked = std::min<int>(m_walkTimer.ticksElapsed() / walkTicksPerPixel, Otc::TILE_PIXELS);
 
     // update walk animation
     updateWalkAnimation();
-
-    int stepDuration = m_stepCache.duration + (12 - m_stepCache.duration * .01);
-    const float walkTicksPerPixel = stepDuration / Otc::TILE_PIXELS;
-    const int totalPixelsWalked = std::min<int>(m_walkTimer.ticksElapsed() / walkTicksPerPixel, Otc::TILE_PIXELS);
 
     // needed for paralyze effect
     m_walkedPixels = std::max<int>(m_walkedPixels, totalPixelsWalked);
@@ -664,6 +661,9 @@ void Creature::setHealthPercent(uint8 healthPercent)
 
     if(healthPercent <= 0)
         onDeath();
+
+    m_updateDynamicInformation = true;
+    g_map.requestDrawing(Otc::ReDrawDynamicInformation, true);
 }
 
 void Creature::setDirection(Otc::Direction direction)
@@ -691,6 +691,8 @@ void Creature::setOutfit(const Outfit& outfit)
     m_walkAnimationPhase = 0; // might happen when player is walking and outfit is changed.
 
     callLuaField("onOutfitChange", m_outfit, oldOutfit);
+
+    g_map.requestDrawing(Otc::ReDrawThing);
 }
 
 void Creature::setOutfitColor(const Color& color, int duration)
@@ -761,12 +763,16 @@ void Creature::setSkull(uint8 skull)
 {
     m_skull = skull;
     callLuaField("onSkullChange", m_skull);
+
+    g_map.requestDrawing(Otc::ReDrawStaticCreatureInformation, true);
 }
 
 void Creature::setShield(uint8 shield)
 {
     m_shield = shield;
     callLuaField("onShieldChange", m_shield);
+
+    g_map.requestDrawing(Otc::ReDrawStaticCreatureInformation, true);
 }
 
 void Creature::setEmblem(uint8 emblem)
@@ -845,6 +851,8 @@ void Creature::updateShield()
         }, SHIELD_BLINK_TICKS);
     } else if(!m_shieldBlink)
         m_showShieldTexture = true;
+
+    g_map.requestDrawing(Otc::ReDrawStaticCreatureInformation, true);
 }
 
 Point Creature::getDrawOffset()
@@ -859,13 +867,13 @@ Point Creature::getDrawOffset()
         if(tile)
             drawOffset -= Point(1, 1) * tile->getDrawElevation();
     }
+
     return drawOffset;
 }
 
 int Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
 {
-    int stepSpeed = m_speed;
-    if(stepSpeed < 1)
+    if(isParalyzed())
         return 0;
 
     Position tilePos;
@@ -886,14 +894,14 @@ int Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
             groundSpeed = 150;
     } else groundSpeed = 150;
 
-    if(stepSpeed != m_stepCache.speed || groundSpeed != m_stepCache.groundSpeed) {
+    if(m_speed != m_stepCache.speed || groundSpeed != m_stepCache.groundSpeed) {
         m_stepCache.speed = m_speed;
         m_stepCache.groundSpeed = groundSpeed;
 
         double stepDuration = 1000. * groundSpeed;
         if(g_game.getFeature(Otc::GameNewSpeedLaw)) {
             stepDuration = std::floor(stepDuration / m_calculatedStepSpeed);
-        } else stepDuration /= stepSpeed;
+        } else stepDuration /= m_speed;
 
         if(g_game.getClientVersion() >= 900) {
             const auto serverBeat = g_game.getServerBeat();

@@ -1152,7 +1152,6 @@ void ProtocolGame::parseWorldLight(const InputMessagePtr &msg)
     light.color = msg->getU8();
 
     g_map.setLight(light);
-    g_map.requestDrawing(Otc::ReDrawLight, true);
 }
 
 void ProtocolGame::parseMagicEffect(const InputMessagePtr &msg)
@@ -1242,10 +1241,7 @@ void ProtocolGame::parseCreatureHealth(const InputMessagePtr &msg)
     const int healthPercent = msg->getU8();
 
     CreaturePtr creature = g_map.getCreatureById(id);
-    if(creature) {
-        creature->setHealthPercent(healthPercent);
-        g_map.requestDrawing(Otc::ReDrawDynamicInformation, true);
-    }
+    if(creature) creature->setHealthPercent(healthPercent);
 }
 
 void ProtocolGame::parseCreatureLight(const InputMessagePtr &msg)
@@ -1278,7 +1274,6 @@ void ProtocolGame::parseCreatureOutfit(const InputMessagePtr &msg)
     }
 
     creature->setOutfit(outfit);
-    g_map.requestDrawing(Otc::ReDrawThing);
 }
 
 void ProtocolGame::parseCreatureSpeed(const InputMessagePtr &msg)
@@ -1311,7 +1306,6 @@ void ProtocolGame::parseCreatureSkulls(const InputMessagePtr &msg)
     }
 
     creature->setSkull(skull);
-    g_map.requestDrawing(Otc::ReDrawStaticCreatureInformation, true);
 }
 
 void ProtocolGame::parseCreatureShields(const InputMessagePtr &msg)
@@ -1326,7 +1320,6 @@ void ProtocolGame::parseCreatureShields(const InputMessagePtr &msg)
     }
 
     creature->setShield(shield);
-    g_map.requestDrawing(Otc::ReDrawStaticCreatureInformation, true);
 }
 
 void ProtocolGame::parseCreatureUnpass(const InputMessagePtr &msg)

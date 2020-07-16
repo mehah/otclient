@@ -128,6 +128,10 @@ public:
     bool isDead() { return m_healthPercent <= 0; }
     bool canBeSeen() { return !isInvisible() || isPlayer(); }
     bool isCreature() override { return true; }
+    bool isParalyzed() const { return m_speed < 10; }
+
+    void updateDynamicInformation(bool update) { m_updateDynamicInformation = update; }
+    bool updateDynamicInformation() const { return m_updateDynamicInformation; }
 
     const ThingTypePtr& getThingType() override;
     ThingType* rawGetThingType() override;
@@ -195,6 +199,7 @@ protected:
     TilePtr m_walkingTile;
     stdext::boolean<false> m_walking;
     stdext::boolean<false> m_allowAppearWalk;
+    stdext::boolean<false> m_updateDynamicInformation;
     ScheduledEventPtr m_walkUpdateEvent;
     ScheduledEventPtr m_walkFinishAnimEvent;
     EventPtr m_disappearEvent;
