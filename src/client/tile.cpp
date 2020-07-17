@@ -521,10 +521,8 @@ ThingPtr Tile::getTopMultiUseThing()
         if(thing->isMultiUse()) return thing;
     }
 
-    if(!m_ground.empty()) {
-        const ItemPtr& ground = m_ground.front();
-        if(ground->isMultiUse()) return ground;
-    }
+    if(!m_ground.empty())
+        return m_ground.front();
 
     return nullptr;
 }
@@ -572,8 +570,7 @@ bool Tile::isLookPossible()
 
 bool Tile::isClickable()
 {
-
-    return !m_ground.empty() || !m_commonItems.empty() || !m_bottomItems.empty();
+    return getTopLookThing() && (!m_ground.empty() || !m_bottomItems.empty());
 }
 
 bool Tile::isEmpty()
