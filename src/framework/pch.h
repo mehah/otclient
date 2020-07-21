@@ -24,6 +24,6 @@
 #define PCH_H
 
 // Canary Lib
-#include "lib/include.hpp"
+#include "../canary-lib/include/include.hpp"
 
 #endif
