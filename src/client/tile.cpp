@@ -244,11 +244,11 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
     if(m_things.size() > MAX_THINGS)
         removeThing(m_things[MAX_THINGS]);
 
-    if(thing->isTranslucent())
-        checkTranslucentLight();
-
     thing->setPosition(m_position);
     thing->onAppear();
+
+    if(thing->isTranslucent())
+        checkTranslucentLight();
 }
 
 // TODO: Need refactoring
@@ -305,10 +305,10 @@ bool Tile::removeThing(const ThingPtr& thing)
 
     m_things.erase(it);
 
+    thing->onDisappear();
+
     if(thing->isTranslucent())
         checkTranslucentLight();
-
-    thing->onDisappear();
 
     return true;
 }
@@ -513,18 +513,18 @@ ThingPtr Tile::getTopMultiUseThing()
         return topCreature;
 
     for(const ThingPtr& thing : m_commonItems) {
-        if(thing->isMultiUse()) return thing;
+        if(thing->isForceUse()) return thing;
     }
 
     for(auto it = m_bottomItems.rbegin(); it != m_bottomItems.rend(); ++it) {
         const ItemPtr& thing = *it;
-        if(thing->isMultiUse()) return thing;
+        if(thing->isForceUse()) return thing;
     }
 
-    if(!m_ground.empty())
-        return m_ground.front();
+    if(!m_commonItems.empty()) return m_commonItems.front();
+    if(!m_bottomItems.empty()) return m_bottomItems.back();
 
-    return nullptr;
+    return m_ground.front();
 }
 
 bool Tile::isWalkable(bool ignoreCreatures)
