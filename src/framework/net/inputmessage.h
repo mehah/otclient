@@ -27,63 +27,44 @@
 #include <framework/luaengine/luaobject.h>
 
 // @bindclass
-class InputMessage : public LuaObject
+class InputMessage : public LuaObject, public CanaryLib::NetworkMessage
 {
 public:
-    InputMessage();
+    InputMessage() { reset(); }
 
-    void setBuffer(const std::string& buffer);
-    std::string getBuffer() { return std::string((char*)m_buffer + m_headerPos, m_messageSize); }
+    void skipBytes(uint16 bytes) { skip(bytes); }
+    void setReadPos(uint16 readPos) { setBufferPosition(readPos); }
+    uint8 getU8() { return readByte(); }
+    uint16 getU16() { return read<uint16_t>(); }
+    uint32 getU32() { return read<uint32_t>(); }
+    uint64 getU64() { return read<uint64_t>(); }
+    std::string getString() { return readString(); }
 
-    void skipBytes(uint16 bytes) { m_readPos += bytes; }
-    void setReadPos(uint16 readPos) { m_readPos = readPos; }
-    uint8 getU8();
-    uint16 getU16();
-    uint32 getU32();
-    uint64 getU64();
-    std::string getString();
+    uint8 peekU8() { return readByte(CanaryLib::MESSAGE_OPERATION_PEEK); }
+    uint16 peekU16() { return read<uint16>(CanaryLib::MESSAGE_OPERATION_PEEK); }
+    uint32 peekU32() { return read<uint32>(CanaryLib::MESSAGE_OPERATION_PEEK); }
+    uint64 peekU64() { return read<uint64>(CanaryLib::MESSAGE_OPERATION_PEEK); }
+
+    int getReadPos() { return getBufferPosition(); }
+    uint16 getMessageSize() { return getLength(); }
+
+    int getReadSize() { return m_info.m_bufferPos - m_info.m_headerPos; }
+    int getUnreadSize() { return m_info.m_messageSize - (m_info.m_bufferPos - m_info.m_headerPos); }
+
     double getDouble();
-
-    uint8 peekU8() { uint8 v = getU8(); m_readPos-=1; return v; }
-    uint16 peekU16() { uint16 v = getU16(); m_readPos-=2; return v; }
-    uint32 peekU32() { uint32 v = getU32(); m_readPos-=4; return v; }
-    uint64 peekU64() { uint64 v = getU64(); m_readPos-=8; return v; }
-
     bool decryptRsa(int size);
-
-    int getReadSize() { return m_readPos - m_headerPos; }
-    int getReadPos() { return m_readPos; }
-    int getUnreadSize() { return m_messageSize - (m_readPos - m_headerPos); }
-    uint16 getMessageSize() { return m_messageSize; }
-
-    bool eof() { return (m_readPos - m_headerPos) >= m_messageSize; }
+    bool eof() { return (m_info.m_bufferPos - m_info.m_headerPos) >= m_info.m_messageSize; }
 
 protected:
-    void reset();
-    void fillBuffer(uint8 *buffer, uint16 size);
+    void fillBuffer(uint8 *buffer, uint16 size) { write(buffer, size, CanaryLib::MESSAGE_OPERATION_PEEK); }
 
     void setHeaderSize(uint16 size);
-    void setMessageSize(uint16 size) { m_messageSize = size; }
-
-    uint8* getReadBuffer() { return m_buffer + m_readPos; }
-    uint8* getHeaderBuffer() { return m_buffer + m_headerPos; }
-    uint8* getDataBuffer() { return m_buffer + CanaryLib::MAX_HEADER_SIZE; }
-    uint16 getHeaderSize() { return (CanaryLib::MAX_HEADER_SIZE - m_headerPos); }
+    void setMessageSize(uint16 size) { setLength(size); }
 
     uint16 readSize() { return getU16(); }
     bool readChecksum();
 
     friend class Protocol;
-
-private:
-    bool canRead(int bytes);
-    void checkRead(int bytes);
-    void checkWrite(int bytes);
-
-    uint16 m_headerPos;
-    uint16 m_readPos;
-    uint16 m_messageSize;
-    uint8 m_buffer[CanaryLib::NETWORKMESSAGE_MAXSIZE];
 };
 
 #endif

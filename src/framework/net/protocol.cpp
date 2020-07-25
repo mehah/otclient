@@ -177,7 +177,7 @@ bool Protocol::xteaDecrypt(const InputMessagePtr& inputMessage)
         return false;
     }
 
-    uint32 *buffer = (uint32*)(inputMessage->getReadBuffer());
+    uint32 *buffer = (uint32*)(inputMessage->getCurrentBuffer());
     int readPos = 0;
 
     while(readPos < encryptedSize/4) {

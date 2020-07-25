@@ -27,49 +27,33 @@
 #include <framework/luaengine/luaobject.h>
 
 // @bindclass
-class OutputMessage : public LuaObject
+class OutputMessage : public LuaObject, CanaryLib::NetworkMessage
 {
 public:
-    OutputMessage();
+    OutputMessage() {
+      reset(); 
+    }
 
-    void reset();
-
-    void setBuffer(const std::string& buffer);
-    std::string getBuffer() { return std::string((char*)m_buffer + m_headerPos, m_messageSize); }
-
-    void addU8(uint8 value);
-    void addU16(uint16 value);
-    void addU32(uint32 value);
-    void addU64(uint64 value);
-    void addString(const std::string& buffer);
-    void addPaddingBytes(int bytes, uint8 byte = 0);
+    void addU8(uint8 value) { writeByte(value); }
+    void addU16(uint16 value) { write<uint16>(value); }
+    void addU32(uint32 value) { write<uint32>(value); }
+    void addU64(uint64 value) { write<uint64>(value); }
+    void addString(const std::string& buffer) { writeString(buffer); }
+    void addPaddingBytes(int bytes) { writePaddingBytes(bytes); };
 
     void encryptRsa();
 
-    uint16 getWritePos() { return m_writePos; }
-    uint16 getMessageSize() { return m_messageSize; }
+    uint16 getWritePos() { return getBufferPosition(); }
+    uint16 getMessageSize() { return getLength(); }
 
-    void setWritePos(uint16 writePos) { m_writePos = writePos; }
-    void setMessageSize(uint16 messageSize) { m_messageSize = messageSize; }
+    void setWritePos(uint16 writePos) { setBufferPosition(writePos); }
+    void setMessageSize(uint16 messageSize) { setLength(messageSize); }
 
 protected:
-    uint8* getWriteBuffer() { return m_buffer + m_writePos; }
-    uint8* getHeaderBuffer() { return m_buffer + m_headerPos; }
-    uint8* getDataBuffer() { return m_buffer + CanaryLib::MAX_HEADER_SIZE; }
-
     void writeChecksum();
     void writeMessageSize();
 
     friend class Protocol;
-
-private:
-    bool canWrite(int bytes);
-    void checkWrite(int bytes);
-
-    uint16 m_headerPos;
-    uint16 m_writePos;
-    uint16 m_messageSize;
-    uint8 m_buffer[CanaryLib::NETWORKMESSAGE_MAXSIZE];
 };
 
 #endif

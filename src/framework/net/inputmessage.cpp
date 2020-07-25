@@ -23,69 +23,6 @@
 #include "inputmessage.h"
 #include <framework/util/crypt.h>
 
-InputMessage::InputMessage()
-{
-    reset();
-}
-
-void InputMessage::reset()
-{
-    m_messageSize = 0;
-    m_readPos = CanaryLib::MAX_HEADER_SIZE;
-    m_headerPos = CanaryLib::MAX_HEADER_SIZE;
-}
-
-void InputMessage::setBuffer(const std::string& buffer)
-{
-    int len = buffer.size();
-    reset();
-    checkWrite(len);
-    memcpy((char*)(m_buffer + m_readPos), buffer.c_str(), len);
-    m_readPos += len;
-    m_messageSize += len;
-}
-
-uint8 InputMessage::getU8()
-{
-    checkRead(1);
-    uint8 v = m_buffer[m_readPos];
-    m_readPos += 1;
-    return v;
-}
-
-uint16 InputMessage::getU16()
-{
-    checkRead(2);
-    uint16 v = stdext::readULE16(m_buffer + m_readPos);
-    m_readPos += 2;
-    return v;
-}
-
-uint32 InputMessage::getU32()
-{
-    checkRead(4);
-    uint32 v = stdext::readULE32(m_buffer + m_readPos);
-    m_readPos += 4;
-    return v;
-}
-
-uint64 InputMessage::getU64()
-{
-    checkRead(8);
-    uint64 v = stdext::readULE64(m_buffer + m_readPos);
-    m_readPos += 8;
-    return v;
-}
-
-std::string InputMessage::getString()
-{
-    uint16 stringLength = getU16();
-    checkRead(stringLength);
-    char* v = (char*)(m_buffer + m_readPos);
-    m_readPos += stringLength;
-    return std::string(v, stringLength);
-}
-
 double InputMessage::getDouble()
 {
     uint8 precision = getU8();
@@ -95,46 +32,21 @@ double InputMessage::getDouble()
 
 bool InputMessage::decryptRsa(int size)
 {
-    checkRead(size);
-    g_crypt.rsaDecrypt(static_cast<unsigned char*>(m_buffer) + m_readPos, size);
-    return (getU8() == 0x00);
-}
-
-void InputMessage::fillBuffer(uint8 *buffer, uint16 size)
-{
-    checkWrite(m_readPos + size);
-    memcpy(m_buffer + m_readPos, buffer, size);
-    m_messageSize += size;
+    if (canRead(size)) {
+      g_crypt.rsaDecrypt(static_cast<unsigned char*>(m_buffer) + m_info.m_bufferPos, size);
+      return (getU8() == 0x00);
+    }
+    return false;
 }
 
 void InputMessage::setHeaderSize(uint16 size)
 {
     assert(CanaryLib::MAX_HEADER_SIZE - size >= 0);
-    m_headerPos = CanaryLib::MAX_HEADER_SIZE - size;
-    m_readPos = m_headerPos;
+    m_info.m_headerPos = CanaryLib::MAX_HEADER_SIZE - size;
+    m_info.m_bufferPos = m_info.m_headerPos;
 }
 
 bool InputMessage::readChecksum()
 {
-    uint32 receivedCheck = getU32();
-    uint32 checksum = stdext::adler32(m_buffer + m_readPos, getUnreadSize());
-    return receivedCheck == checksum;
-}
-
-bool InputMessage::canRead(int bytes)
-{
-    if((m_readPos - m_headerPos + bytes > m_messageSize) || (m_readPos + bytes > CanaryLib::NETWORKMESSAGE_MAXSIZE))
-        return false;
-    return true;
-}
-void InputMessage::checkRead(int bytes)
-{
-    if(!canRead(bytes))
-        throw stdext::exception("InputMessage eof reached");
-}
-
-void InputMessage::checkWrite(int bytes)
-{
-    if(bytes > CanaryLib::NETWORKMESSAGE_MAXSIZE)
-        throw stdext::exception("InputMessage max buffer size reached");
+  return getU32() == getChecksum(m_buffer + m_info.m_bufferPos, getUnreadSize());
 }
