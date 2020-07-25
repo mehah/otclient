@@ -32,21 +32,3 @@ void OutputMessage::encryptRsa()
     if(!g_crypt.rsaEncrypt(static_cast<unsigned char*>(m_buffer) + m_info.m_bufferPos - size, size))
         throw stdext::exception("rsa encryption failed");
 }
-
-void OutputMessage::writeChecksum()
-{
-    assert(m_info.m_headerPos - 4 >= 0);
-    uint32 checksum = getChecksum(m_buffer + m_info.m_headerPos, m_info.m_messageSize);
-    m_info.m_headerPos -= 4;
-    m_info.m_messageSize += 4;
-
-    stdext::writeULE32(m_buffer + m_info.m_headerPos, checksum);
-}
-
-void OutputMessage::writeMessageSize()
-{
-    assert(m_info.m_headerPos - 2 >= 0);
-    m_info.m_headerPos -= 2;
-    stdext::writeULE16(m_buffer + m_info.m_headerPos, m_info.m_messageSize);
-    m_info.m_messageSize += 2;
-}

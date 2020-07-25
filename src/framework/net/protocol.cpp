@@ -77,14 +77,11 @@ void Protocol::send(const OutputMessagePtr& outputMessage)
 
     // write checksum
     if(m_checksumEnabled)
-        outputMessage->writeChecksum();
-
-    // write message size
-    outputMessage->writeMessageSize();
+        outputMessage->addCryptoHeader();
 
     // send
     if(m_connection)
-        m_connection->write(outputMessage->getHeaderBuffer(), outputMessage->getMessageSize());
+        m_connection->write(outputMessage->getOutputBuffer(), outputMessage->getMessageSize());
 
     // reset message to allow reuse
     outputMessage->reset();
@@ -207,7 +204,7 @@ bool Protocol::xteaDecrypt(const InputMessagePtr& inputMessage)
 
 void Protocol::xteaEncrypt(const OutputMessagePtr& outputMessage)
 {
-    outputMessage->writeMessageSize();
+    outputMessage->writeMessageLength();
     uint16 encryptedSize = outputMessage->getMessageSize();
 
     //add bytes until reach 8 multiple

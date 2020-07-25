@@ -50,9 +50,6 @@ public:
     void setMessageSize(uint16 messageSize) { setLength(messageSize); }
 
 protected:
-    void writeChecksum();
-    void writeMessageSize();
-
     friend class Protocol;
 };
 
