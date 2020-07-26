@@ -64,11 +64,11 @@ protected:
     virtual void onRecv(const InputMessagePtr& inputMessage);
     virtual void onError(const boost::system::error_code& err);
 
-    uint32 m_xteaKey[4];
-
 private:
     void internalRecvHeader(uint8* buffer, uint16 size);
     void internalRecvData(uint8* buffer, uint16 size);
+
+    bool xteaDecrypt(const InputMessagePtr& inputMessage);
 
     bool m_checksumEnabled;
     bool m_xteaEncryptionEnabled;

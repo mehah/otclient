@@ -133,7 +133,7 @@ void Protocol::internalRecvData(uint8* buffer, uint16 size)
     }
 
     if(m_xteaEncryptionEnabled) {
-        if(!m_inputMessage->decryptXTEA(CanaryLib::CHECKSUM_METHOD_SEQUENCE)) {
+        if(!xteaDecrypt(m_inputMessage)) {
             g_logger.traceError("failed to decrypt message");
             return;
         }
@@ -159,6 +159,27 @@ std::vector<uint32> Protocol::getXteaKey()
   for(int i = 0; i < 4; ++i)
     xteaKey[i] = CanaryLib::XTEA().getKey()[i];
   return xteaKey;
+}
+
+bool Protocol::xteaDecrypt(const InputMessagePtr& inputMessage)
+{
+    uint16 encryptedSize = inputMessage->getUnreadSize();
+    if(encryptedSize % 8 != 0) {
+        g_logger.traceError("invalid encrypted network message");
+        return false;
+    }
+
+    CanaryLib::XTEA().decrypt(encryptedSize, (inputMessage->getCurrentBuffer()));
+
+    uint16 decryptedSize = inputMessage->getU16() + 2;
+    int sizeDelta = decryptedSize - encryptedSize;
+    if(sizeDelta > 0 || -sizeDelta > encryptedSize) {
+        g_logger.traceError("invalid decrypted network message");
+        return false;
+    }
+
+    inputMessage->setMessageSize(inputMessage->getMessageSize() + sizeDelta);
+    return true;
 }
 
 void Protocol::onConnect()
