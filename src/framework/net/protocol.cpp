@@ -163,23 +163,9 @@ std::vector<uint32> Protocol::getXteaKey()
 
 bool Protocol::xteaDecrypt(const InputMessagePtr& inputMessage)
 {
-    uint16 encryptedSize = inputMessage->getUnreadSize();
-    if(encryptedSize % 8 != 0) {
-        g_logger.traceError("invalid encrypted network message");
-        return false;
-    }
-
-    CanaryLib::XTEA().decrypt(encryptedSize, (inputMessage->getCurrentBuffer()));
-
-    uint16 decryptedSize = inputMessage->getU16() + 2;
-    int sizeDelta = decryptedSize - encryptedSize;
-    if(sizeDelta > 0 || -sizeDelta > encryptedSize) {
-        g_logger.traceError("invalid decrypted network message");
-        return false;
-    }
-
-    inputMessage->setMessageSize(inputMessage->getMessageSize() + sizeDelta);
-    return true;
+  bool decrypted = inputMessage->decryptXTEA(m_checksumEnabled ? CanaryLib::CHECKSUM_METHOD_SEQUENCE : CanaryLib::CHECKSUM_METHOD_NONE);
+  inputMessage->setLength(inputMessage->getLength() + (m_checksumEnabled ? 2 : 0));
+  return decrypted;
 }
 
 void Protocol::onConnect()

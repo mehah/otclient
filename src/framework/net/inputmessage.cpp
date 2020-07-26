@@ -45,8 +45,3 @@ void InputMessage::setHeaderSize(uint16 size)
     m_info.m_headerPos = CanaryLib::MAX_HEADER_SIZE - size;
     m_info.m_bufferPos = m_info.m_headerPos;
 }
-
-bool InputMessage::readChecksum()
-{
-  return getU32() == getChecksum(m_buffer + m_info.m_bufferPos, getUnreadSize());
-}

@@ -49,7 +49,7 @@ public:
     uint16 getMessageSize() { return getLength(); }
 
     int getReadSize() { return m_info.m_bufferPos - m_info.m_headerPos; }
-    int getUnreadSize() { return m_info.m_messageSize - (m_info.m_bufferPos - m_info.m_headerPos); }
+    int getUnreadSize() { return getLength() - getReadSize(); }
 
     double getDouble();
     bool decryptRsa(int size);
@@ -62,7 +62,6 @@ protected:
     void setMessageSize(uint16 size) { setLength(size); }
 
     uint16 readSize() { return getU16(); }
-    bool readChecksum();
 
     friend class Protocol;
 };
