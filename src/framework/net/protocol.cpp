@@ -72,8 +72,10 @@ bool Protocol::isConnecting()
 void Protocol::send(const OutputMessagePtr& outputMessage)
 {
     // encrypt
-    if(m_xteaEncryptionEnabled)
-        xteaEncrypt(outputMessage);
+    if(m_xteaEncryptionEnabled) {
+      outputMessage->writeMessageLength();
+      outputMessage->encryptXTEA();
+    }
 
     // write checksum
     if(m_checksumEnabled)
@@ -131,7 +133,7 @@ void Protocol::internalRecvData(uint8* buffer, uint16 size)
     }
 
     if(m_xteaEncryptionEnabled) {
-        if(!xteaDecrypt(m_inputMessage)) {
+        if(!m_inputMessage->decryptXTEA(CanaryLib::CHECKSUM_METHOD_SEQUENCE)) {
             g_logger.traceError("failed to decrypt message");
             return;
         }
@@ -141,94 +143,22 @@ void Protocol::internalRecvData(uint8* buffer, uint16 size)
 
 void Protocol::generateXteaKey()
 {
-    std::mt19937 eng(std::time(nullptr));
-    std::uniform_int_distribution<uint32> unif(0, 0xFFFFFFFF);
-    m_xteaKey[0] = unif(eng);
-    m_xteaKey[1] = unif(eng);
-    m_xteaKey[2] = unif(eng);
-    m_xteaKey[3] = unif(eng);
+  CanaryLib::XTEA().generateKey();
 }
 
 void Protocol::setXteaKey(uint32 a, uint32 b, uint32 c, uint32 d)
 {
-    m_xteaKey[0] = a;
-    m_xteaKey[1] = b;
-    m_xteaKey[2] = c;
-    m_xteaKey[3] = d;
+  uint32_t key[4] = { a, b, c, d };
+  CanaryLib::XTEA().setKey(key);
 }
 
 std::vector<uint32> Protocol::getXteaKey()
 {
-    std::vector<uint32> xteaKey;
-    xteaKey.resize(4);
-    for(int i = 0; i < 4; ++i)
-        xteaKey[i] = m_xteaKey[i];
-    return xteaKey;
-}
-
-bool Protocol::xteaDecrypt(const InputMessagePtr& inputMessage)
-{
-    uint16 encryptedSize = inputMessage->getUnreadSize();
-    if(encryptedSize % 8 != 0) {
-        g_logger.traceError("invalid encrypted network message");
-        return false;
-    }
-
-    uint32 *buffer = (uint32*)(inputMessage->getCurrentBuffer());
-    int readPos = 0;
-
-    while(readPos < encryptedSize/4) {
-        uint32 v0 = buffer[readPos], v1 = buffer[readPos + 1];
-        uint32 delta = 0x61C88647;
-        uint32 sum = 0xC6EF3720;
-
-        for(int32 i = 0; i < 32; i++) {
-            v1 -= ((v0 << 4 ^ v0 >> 5) + v0) ^ (sum + m_xteaKey[sum>>11 & 3]);
-            sum += delta;
-            v0 -= ((v1 << 4 ^ v1 >> 5) + v1) ^ (sum + m_xteaKey[sum & 3]);
-        }
-        buffer[readPos] = v0; buffer[readPos + 1] = v1;
-        readPos = readPos + 2;
-    }
-
-    uint16 decryptedSize = inputMessage->getU16() + 2;
-    int sizeDelta = decryptedSize - encryptedSize;
-    if(sizeDelta > 0 || -sizeDelta > encryptedSize) {
-        g_logger.traceError("invalid decrypted network message");
-        return false;
-    }
-
-    inputMessage->setMessageSize(inputMessage->getMessageSize() + sizeDelta);
-    return true;
-}
-
-void Protocol::xteaEncrypt(const OutputMessagePtr& outputMessage)
-{
-    outputMessage->writeMessageLength();
-    uint16 encryptedSize = outputMessage->getMessageSize();
-
-    //add bytes until reach 8 multiple
-    if((encryptedSize % 8) != 0) {
-        uint16 n = 8 - (encryptedSize % 8);
-        outputMessage->addPaddingBytes(n);
-        encryptedSize += n;
-    }
-
-    int readPos = 0;
-    uint32 *buffer = (uint32*)(outputMessage->getDataBuffer() - 2);
-    while(readPos < encryptedSize / 4) {
-        uint32 v0 = buffer[readPos], v1 = buffer[readPos + 1];
-        uint32 delta = 0x61C88647;
-        uint32 sum = 0;
-
-        for(int32 i = 0; i < 32; i++) {
-            v0 += ((v1 << 4 ^ v1 >> 5) + v1) ^ (sum + m_xteaKey[sum & 3]);
-            sum -= delta;
-            v1 += ((v0 << 4 ^ v0 >> 5) + v0) ^ (sum + m_xteaKey[sum>>11 & 3]);
-        }
-        buffer[readPos] = v0; buffer[readPos + 1] = v1;
-        readPos = readPos + 2;
-    }
+  std::vector<uint32> xteaKey;
+  xteaKey.resize(4);
+  for(int i = 0; i < 4; ++i)
+    xteaKey[i] = CanaryLib::XTEA().getKey()[i];
+  return xteaKey;
 }
 
 void Protocol::onConnect()

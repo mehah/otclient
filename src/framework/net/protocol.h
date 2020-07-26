@@ -70,9 +70,6 @@ private:
     void internalRecvHeader(uint8* buffer, uint16 size);
     void internalRecvData(uint8* buffer, uint16 size);
 
-    bool xteaDecrypt(const InputMessagePtr& inputMessage);
-    void xteaEncrypt(const OutputMessagePtr& outputMessage);
-
     bool m_checksumEnabled;
     bool m_xteaEncryptionEnabled;
     ConnectionPtr m_connection;
