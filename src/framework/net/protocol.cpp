@@ -74,12 +74,14 @@ void Protocol::send(const OutputMessagePtr& outputMessage)
     // encrypt
     if(m_xteaEncryptionEnabled) {
       outputMessage->writeMessageLength();
-      outputMessage->encryptXTEA();
+      outputMessage->encryptXTEA(xtea);
     }
 
     // write checksum
-    if(m_checksumEnabled)
-        outputMessage->addCryptoHeader();
+    if(m_checksumEnabled){
+      outputMessage->writeChecksum();
+      outputMessage->writeMessageLength();
+    }
 
     // send
     if(m_connection)
@@ -143,13 +145,13 @@ void Protocol::internalRecvData(uint8* buffer, uint16 size)
 
 void Protocol::generateXteaKey()
 {
-  CanaryLib::XTEA().generateKey();
+  xtea.generateKey();
 }
 
 void Protocol::setXteaKey(uint32 a, uint32 b, uint32 c, uint32 d)
 {
   uint32_t key[4] = { a, b, c, d };
-  CanaryLib::XTEA().setKey(key);
+  xtea.setKey(key);
 }
 
 std::vector<uint32> Protocol::getXteaKey()
@@ -157,13 +159,13 @@ std::vector<uint32> Protocol::getXteaKey()
   std::vector<uint32> xteaKey;
   xteaKey.resize(4);
   for(int i = 0; i < 4; ++i)
-    xteaKey[i] = CanaryLib::XTEA().getKey()[i];
+    xteaKey[i] = xtea.getKey()[i];
   return xteaKey;
 }
 
 bool Protocol::xteaDecrypt(const InputMessagePtr& inputMessage)
 {
-  bool decrypted = inputMessage->decryptXTEA(m_checksumEnabled ? CanaryLib::CHECKSUM_METHOD_SEQUENCE : CanaryLib::CHECKSUM_METHOD_NONE);
+  bool decrypted = inputMessage->decryptXTEA(xtea, m_checksumEnabled ? CanaryLib::CHECKSUM_METHOD_SEQUENCE : CanaryLib::CHECKSUM_METHOD_NONE);
   inputMessage->setLength(inputMessage->getLength() + (m_checksumEnabled ? 2 : 0));
   return decrypted;
 }

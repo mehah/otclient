@@ -70,6 +70,8 @@ private:
 
     bool xteaDecrypt(const InputMessagePtr& inputMessage);
 
+    CanaryLib::XTEA xtea;
+
     bool m_checksumEnabled;
     bool m_xteaEncryptionEnabled;
     ConnectionPtr m_connection;
