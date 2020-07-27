@@ -188,21 +188,6 @@ void Connection::read_until(const std::string& what, const RecvCallback& callbac
     m_readTimer.async_wait(std::bind(&Connection::onTimeout, asConnection(), std::placeholders::_1));
 }
 
-void Connection::read_some(const RecvCallback& callback)
-{
-    if (!m_connected)
-        return;
-
-    m_recvCallback = callback;
-
-    m_socket.async_read_some(asio::buffer(m_inputStream.prepare(RECV_BUFFER_SIZE)),
-        std::bind(&Connection::onRecv, asConnection(), std::placeholders::_1, std::placeholders::_2));
-
-    m_readTimer.cancel();
-    m_readTimer.expires_from_now(boost::posix_time::seconds(static_cast<uint32>(READ_TIMEOUT)));
-    m_readTimer.async_wait(std::bind(&Connection::onTimeout, asConnection(), std::placeholders::_1));
-}
-
 void Connection::onResolve(const boost::system::error_code& error, asio::ip::basic_resolver<asio::ip::tcp>::iterator endpointIterator)
 {
     m_readTimer.cancel();

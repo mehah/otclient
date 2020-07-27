@@ -53,7 +53,6 @@ public:
     void write(uint8* buffer, size_t size);
     void read(uint16 bytes, const RecvCallback& callback);
     void read_until(const std::string& what, const RecvCallback& callback);
-    void read_some(const RecvCallback& callback);
 
     void setErrorCallback(const ErrorCallback& errorCallback) { m_errorCallback = errorCallback; }
 
