@@ -26,6 +26,9 @@
  // Define 1, to draw separately. (Ground first => remainder after)
 #define DRAW_SEPARATELY 0
 
+ // Define 1, to draw creature information after light.
+#define DRAW_CREATURE_INFORMATION_AFTER_LIGHT 0
+
 #include <framework/core/declarations.h>
 #include <framework/graphics/declarations.h>
 #include <framework/graphics/paintershaderprogram.h>
@@ -98,16 +101,16 @@ public:
     void setDrawTexts(bool enable) { m_drawTexts = enable; }
     bool isDrawingTexts() { return m_drawTexts; }
 
-    void setDrawNames(bool enable) { m_drawNames = enable; requestDrawing(Otc::ReDrawStaticCreatureInformation, true); }
+    void setDrawNames(bool enable) { m_drawNames = enable; requestDrawing(Otc::ReDrawAllInformation, true); }
     bool isDrawingNames() { return m_drawNames; }
 
-    void setDrawHealthBars(bool enable) { m_drawHealthBars = enable; requestDrawing(Otc::ReDrawDynamicInformation, true); }
+    void setDrawHealthBars(bool enable) { m_drawHealthBars = enable; requestDrawing(Otc::ReDrawAllInformation, true); }
     bool isDrawingHealthBars() { return m_drawHealthBars; }
 
     void setDrawLights(bool enable);
     bool isDrawingLights() { return m_drawLights; }
 
-    void setDrawManaBar(bool enable) { m_drawManaBar = enable; requestDrawing(Otc::ReDrawDynamicInformation, true); }
+    void setDrawManaBar(bool enable) { m_drawManaBar = enable; requestDrawing(Otc::ReDrawAllInformation, true); }
     bool isDrawingManaBar() { return m_drawManaBar; }
 
     void move(int x, int y);
