@@ -79,7 +79,6 @@ void Protocol::internalSendData(const Wrapper_ptr& inputWrapper)
 
 void Protocol::send(const OutputMessagePtr& outputMessage, bool _skipXtea)
 {
-    spdlog::critical("{} {} {}", skipXtea, _skipXtea, m_xteaEncryptionEnabled);
     skipXtea = _skipXtea;
     // send
     if(m_connection)
@@ -165,7 +164,7 @@ void Protocol::onRecv(const InputMessagePtr& inputMessage)
 
 void Protocol::onError(const boost::system::error_code& err)
 {
-    spdlog::critical("{}", err.message());
+    spdlog::error("{}", err.message());
     callLuaField("onError", err.message(), err.value());
     disconnect();
 }

@@ -135,12 +135,10 @@ void Connection::internal_write()
     if (!m_connected)
         return;
 
-    spdlog::critical("b {} {}", wrapper->size(), wrapper->outputSize());
     if (m_sendCallback) {
       m_sendCallback(wrapper);
     }
 
-    spdlog::critical("a {} {}", wrapper->size(), wrapper->outputSize());
     asio::async_write(m_socket,
         boost::asio::buffer(wrapper->buffer(), wrapper->outputSize()),
         std::bind(&Connection::onWrite, asConnection(), std::placeholders::_1, std::placeholders::_2));
