@@ -27,7 +27,7 @@
 #include <framework/luaengine/luaobject.h>
 
 // @bindclass
-class OutputMessage : public LuaObject, CanaryLib::NetworkMessage
+class OutputMessage : public LuaObject, public CanaryLib::NetworkMessage
 {
 public:
     OutputMessage() {

@@ -32,7 +32,7 @@ class ProtocolGame : public Protocol
 {
 public:
     void login(const std::string& accountName, const std::string& accountPassword, const std::string& host, uint16 port, const std::string& characterName, const std::string& authenticatorToken, const std::string& sessionKey);
-    void send(const OutputMessagePtr& outputMessage) override;
+    void send(const OutputMessagePtr& outputMessage, bool skipXtea = false) override;
 
     void sendExtendedOpcode(uint8 opcode, const std::string& buffer);
     void sendLoginPacket(uint challengeTimestamp, uint8 challengeRandom);

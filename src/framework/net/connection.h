@@ -28,10 +28,14 @@
 #include <framework/core/timer.h>
 #include <framework/core/declarations.h>
 
+using Wrapper = CanaryLib::FlatbuffersWrapper;
+using Wrapper_ptr = std::shared_ptr<Wrapper>;
+
 class Connection : public LuaObject
 {
     typedef std::function<void(const boost::system::error_code&)> ErrorCallback;
     typedef std::function<void(uint8*, uint16)> RecvCallback;
+    typedef std::function<void(const Wrapper_ptr& wrapper)> SendCallback;
 
     enum {
         READ_TIMEOUT = 30,
@@ -50,7 +54,7 @@ public:
     void connect(const std::string& host, uint16 port, const std::function<void()>& connectCallback);
     void close();
 
-    void write(uint8* buffer, size_t size);
+    void write(uint8* buffer, size_t size, const SendCallback& callback);
     void read(uint16 bytes, const RecvCallback& callback);
     void read_until(const std::string& what, const RecvCallback& callback);
 
@@ -70,7 +74,7 @@ protected:
     void onResolve(const boost::system::error_code& error, asio::ip::tcp::resolver::iterator endpointIterator);
     void onConnect(const boost::system::error_code& error);
     void onCanWrite(const boost::system::error_code& error);
-    void onWrite(const boost::system::error_code& error, size_t writeSize, std::shared_ptr<asio::streambuf> outputStream);
+    void onWrite(const boost::system::error_code& error, size_t writeSize);
     void onRecv(const boost::system::error_code& error, size_t recvSize);
     void onTimeout(const boost::system::error_code& error);
     void handleError(const boost::system::error_code& error);
@@ -78,6 +82,7 @@ protected:
     std::function<void()> m_connectCallback;
     ErrorCallback m_errorCallback;
     RecvCallback m_recvCallback;
+    SendCallback m_sendCallback;
 
     asio::deadline_timer m_readTimer;
     asio::deadline_timer m_writeTimer;
@@ -85,8 +90,7 @@ protected:
     asio::ip::tcp::resolver m_resolver;
     asio::ip::tcp::socket m_socket;
 
-    static std::list<std::shared_ptr<asio::streambuf>> m_outputStreams;
-    std::shared_ptr<asio::streambuf> m_outputStream;
+    Wrapper_ptr wrapper;
     asio::streambuf m_inputStream;
     bool m_connected;
     bool m_connecting;

@@ -27,8 +27,6 @@
 
 Protocol::Protocol()
 {
-    m_xteaEncryptionEnabled = false;
-    m_checksumEnabled = false;
     m_inputMessage = InputMessagePtr(new InputMessage);
 }
 
@@ -69,23 +67,23 @@ bool Protocol::isConnecting()
     return false;
 }
 
-void Protocol::send(const OutputMessagePtr& outputMessage)
+void Protocol::internalSendData(const Wrapper_ptr& inputWrapper)
 {
-    // encrypt
-    if(m_xteaEncryptionEnabled) {
-      outputMessage->writeMessageLength();
-      outputMessage->encryptXTEA(xtea);
+    if(!skipXtea) {
+      inputWrapper->encryptXTEA(xtea);
+    } else {
+      m_xteaEncryptionEnabled = true;
     }
+    inputWrapper->serialize();
+}
 
-    // write checksum
-    if(m_checksumEnabled){
-      outputMessage->writeChecksum();
-      outputMessage->writeMessageLength();
-    }
-
+void Protocol::send(const OutputMessagePtr& outputMessage, bool _skipXtea)
+{
+    spdlog::critical("{} {} {}", skipXtea, _skipXtea, m_xteaEncryptionEnabled);
+    skipXtea = _skipXtea;
     // send
     if(m_connection)
-        m_connection->write(outputMessage->getOutputBuffer(), outputMessage->getMessageSize());
+        m_connection->write(outputMessage->getDataBuffer(), outputMessage->getMessageSize(), std::bind(&Protocol::internalSendData, asProtocol(), std::placeholders::_1));
 
     // reset message to allow reuse
     outputMessage->reset();
@@ -93,16 +91,7 @@ void Protocol::send(const OutputMessagePtr& outputMessage)
 
 void Protocol::recv()
 {
-    m_inputMessage->reset();
-
-    // first update message header size
-    int headerSize = 2; // 2 bytes for message size
-    if(m_checksumEnabled)
-        headerSize += 4; // 4 bytes for checksum
-    if(m_xteaEncryptionEnabled)
-        headerSize += 2; // 2 bytes for XTEA encrypted message size
-    m_inputMessage->setHeaderSize(headerSize);
-
+    wrapper.reset();
     // read the first 2 bytes which contain the message size
     if(m_connection)
         m_connection->read(2, std::bind(&Protocol::internalRecvHeader, asProtocol(), std::placeholders::_1,  std::placeholders::_2));
@@ -110,13 +99,11 @@ void Protocol::recv()
 
 void Protocol::internalRecvHeader(uint8* buffer, uint16 size)
 {
-    // read message size
-    m_inputMessage->fillBuffer(buffer, size);
-    uint16 remainingSize = m_inputMessage->readSize();
+    wrapper.copy(buffer, true);
 
     // read remaining message data
     if(m_connection)
-        m_connection->read(remainingSize, std::bind(&Protocol::internalRecvData, asProtocol(), std::placeholders::_1,  std::placeholders::_2));
+        m_connection->read(wrapper.size(), std::bind(&Protocol::internalRecvData, asProtocol(), std::placeholders::_1,  std::placeholders::_2));
 }
 
 void Protocol::internalRecvData(uint8* buffer, uint16 size)
@@ -127,19 +114,22 @@ void Protocol::internalRecvData(uint8* buffer, uint16 size)
         return;
     }
 
-    m_inputMessage->fillBuffer(buffer, size);
+    wrapper.write(buffer, size);
 
-    if(m_checksumEnabled && !m_inputMessage->readChecksum()) {
-        g_logger.traceError("got a network message with invalid checksum");
-        return;
+    if(!wrapper.readChecksum()) {
+      g_logger.traceError("got a network message with invalid checksum");
+      return;
     }
+
+    wrapper.deserialize();
 
     if(m_xteaEncryptionEnabled) {
-        if(!xteaDecrypt(m_inputMessage)) {
-            g_logger.traceError("failed to decrypt message");
-            return;
-        }
+      wrapper.decryptXTEA(xtea);
     }
+
+    m_inputMessage->reset();
+    m_inputMessage->write(wrapper.body(), wrapper.msgSize(), CanaryLib::MESSAGE_OPERATION_PEEK);
+    
     onRecv(m_inputMessage);
 }
 
@@ -163,13 +153,6 @@ std::vector<uint32> Protocol::getXteaKey()
   return xteaKey;
 }
 
-bool Protocol::xteaDecrypt(const InputMessagePtr& inputMessage)
-{
-  bool decrypted = inputMessage->decryptXTEA(xtea, m_checksumEnabled ? CanaryLib::CHECKSUM_METHOD_SEQUENCE : CanaryLib::CHECKSUM_METHOD_NONE);
-  inputMessage->setLength(inputMessage->getLength() + (m_checksumEnabled ? 2 : 0));
-  return decrypted;
-}
-
 void Protocol::onConnect()
 {
     callLuaField("onConnect");
@@ -182,6 +165,7 @@ void Protocol::onRecv(const InputMessagePtr& inputMessage)
 
 void Protocol::onError(const boost::system::error_code& err)
 {
+    spdlog::critical("{}", err.message());
     callLuaField("onError", err.message(), err.value());
     disconnect();
 }

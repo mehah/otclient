@@ -37,26 +37,6 @@ end
 function ProtocolLogin:sendLoginPacket()
   local msg = OutputMessage.create()
   msg:addU8(ClientOpcodes.ClientEnterAccount)
-  msg:addU16(g_game.getOs())
-
-  msg:addU16(g_game.getProtocolVersion())
-
-  if g_game.getFeature(GameClientVersion) then
-    msg:addU32(g_game.getClientVersion())
-  end
-
-  if g_game.getFeature(GameContentRevision) then
-    msg:addU16(g_things.getContentRevision())
-    msg:addU16(0)
-  else
-    msg:addU32(g_things.getDatSignature())
-  end
-  msg:addU32(g_sprites.getSprSignature())
-  msg:addU32(PIC_SIGNATURE)
-
-  if g_game.getFeature(GamePreviewState) then
-    msg:addU8(0)
-  end
 
   local offset = msg:getMessageSize()
   if g_game.getFeature(GameLoginPacketEncryption) then
@@ -80,11 +60,6 @@ function ProtocolLogin:sendLoginPacket()
 
   msg:addString(self.accountPassword)
 
-  if self.getLoginExtendedData then
-    local data = self:getLoginExtendedData()
-    msg:addString(data)
-  end
-
   local paddingBytes = g_crypt.rsaGetSize() - (msg:getMessageSize() - offset)
   assert(paddingBytes >= 0)
   for i = 1, paddingBytes do
@@ -95,21 +70,9 @@ function ProtocolLogin:sendLoginPacket()
     msg:encryptRsa()
   end
 
-  if g_game.getFeature(GameOGLInformation) then
-    msg:addU8(1) --unknown
-    msg:addU8(1) --unknown
-
-    if g_game.getClientVersion() >= 1072 then
-      msg:addString(string.format('%s %s', g_graphics.getVendor(), g_graphics.getRenderer()))
-    else
-      msg:addString(g_graphics.getRenderer())
-    end
-    msg:addString(g_graphics.getVersion())
-  end
-
+  offset = msg:getMessageSize()
   -- add RSA encrypted auth token
   if g_game.getFeature(GameAuthenticator) then
-    offset = msg:getMessageSize()
 
     -- first RSA byte must be 0
     msg:addU8(0)
@@ -128,14 +91,8 @@ function ProtocolLogin:sendLoginPacket()
     msg:encryptRsa()
   end
 
-  if g_game.getFeature(GameProtocolChecksum) then
-    self:enableChecksum()
-  end
-
-  self:send(msg)
-  if g_game.getFeature(GameLoginPacketEncryption) then
-    self:enableXteaEncryption()
-  end
+  self:send(msg, true)
+  
   self:recv()
 end
 

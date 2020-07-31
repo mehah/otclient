@@ -29,7 +29,6 @@
 #include <memory>
 
 asio::io_service g_ioService;
-std::list<std::shared_ptr<asio::streambuf>> Connection::m_outputStreams;
 
 Connection::Connection() :
     m_readTimer(g_ioService),
@@ -60,7 +59,6 @@ void Connection::poll()
 void Connection::terminate()
 {
     g_ioService.stop();
-    m_outputStreams.clear();
 }
 
 void Connection::close()
@@ -69,7 +67,7 @@ void Connection::close()
         return;
 
     // flush send data before disconnecting on clean connections
-    if (m_connected && !m_error && m_outputStream)
+    if (m_connected && !m_error && wrapper)
         internal_write();
 
     m_connecting = false;
@@ -114,28 +112,22 @@ void Connection::internal_connect(asio::ip::basic_resolver<asio::ip::tcp>::itera
     m_readTimer.async_wait(std::bind(&Connection::onTimeout, asConnection(), std::placeholders::_1));
 }
 
-void Connection::write(uint8* buffer, size_t size)
+void Connection::write(uint8* buffer, size_t size, const SendCallback& callback)
 {
     if (!m_connected)
         return;
 
     // we can't send the data right away, otherwise we could create tcp congestion
-    if (!m_outputStream) {
-        if (!m_outputStreams.empty()) {
-            m_outputStream = m_outputStreams.front();
-            m_outputStreams.pop_front();
-        }
-        else
-            m_outputStream = std::make_shared<asio::streambuf>();
+    if (!wrapper) {
+        wrapper = std::make_shared<Wrapper>();
 
         m_delayedWriteTimer.cancel();
         m_delayedWriteTimer.expires_from_now(boost::posix_time::milliseconds(0));
         m_delayedWriteTimer.async_wait(std::bind(&Connection::onCanWrite, asConnection(), std::placeholders::_1));
     }
-
-    std::ostream os(m_outputStream.get());
-    os.write((const char*)buffer, size);
-    os.flush();
+    
+    m_sendCallback = callback;
+    wrapper->write(buffer, size, true);
 }
 
 void Connection::internal_write()
@@ -143,12 +135,15 @@ void Connection::internal_write()
     if (!m_connected)
         return;
 
-    std::shared_ptr<asio::streambuf> outputStream = m_outputStream;
-    m_outputStream = nullptr;
+    spdlog::critical("b {} {}", wrapper->size(), wrapper->outputSize());
+    if (m_sendCallback) {
+      m_sendCallback(wrapper);
+    }
 
+    spdlog::critical("a {} {}", wrapper->size(), wrapper->outputSize());
     asio::async_write(m_socket,
-        *outputStream,
-        std::bind(&Connection::onWrite, asConnection(), std::placeholders::_1, std::placeholders::_2, outputStream));
+        boost::asio::buffer(wrapper->buffer(), wrapper->outputSize()),
+        std::bind(&Connection::onWrite, asConnection(), std::placeholders::_1, std::placeholders::_2));
 
     m_writeTimer.cancel();
     m_writeTimer.expires_from_now(boost::posix_time::seconds(static_cast<uint32>(WRITE_TIMEOUT)));
@@ -161,7 +156,6 @@ void Connection::read(uint16 bytes, const RecvCallback& callback)
         return;
 
     m_recvCallback = callback;
-
     asio::async_read(m_socket,
         asio::buffer(m_inputStream.prepare(bytes)),
         std::bind(&Connection::onRecv, asConnection(), std::placeholders::_1, std::placeholders::_2));
@@ -236,16 +230,16 @@ void Connection::onCanWrite(const boost::system::error_code& error)
         internal_write();
 }
 
-void Connection::onWrite(const boost::system::error_code& error, size_t, std::shared_ptr<asio::streambuf> outputStream)
+void Connection::onWrite(const boost::system::error_code& error, size_t)
 {
     m_writeTimer.cancel();
 
     if (error == asio::error::operation_aborted)
         return;
 
-    // free output stream and store for using it again later
-    outputStream->consume(outputStream->size());
-    m_outputStreams.push_back(outputStream);
+    uint16_t resetSize = 0;
+    wrapper->reset();
+    wrapper = nullptr;
 
     if (m_connected && error)
         handleError(error);

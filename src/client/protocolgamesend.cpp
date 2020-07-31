@@ -27,12 +27,12 @@
 #include "game.h"
 #include "protocolgame.h"
 
-void ProtocolGame::send(const OutputMessagePtr& outputMessage)
+void ProtocolGame::send(const OutputMessagePtr& outputMessage, bool skipXtea)
 {
     // avoid usage of automated sends (bot modules)
     if(!g_game.checkBotProtection())
         return;
-    Protocol::send(outputMessage);
+    Protocol::send(outputMessage, skipXtea);
 }
 
 void ProtocolGame::sendExtendedOpcode(uint8 opcode, const std::string& buffer)
@@ -54,16 +54,6 @@ void ProtocolGame::sendLoginPacket(uint challengeTimestamp, uint8 challengeRando
 
     msg->addU8(CanaryLib::ClientPendingGame);
     msg->addU16(g_game.getOs());
-    msg->addU16(g_game.getProtocolVersion());
-
-    if(g_game.getFeature(Otc::GameClientVersion))
-        msg->addU32(g_game.getClientVersion());
-
-    if(g_game.getFeature(Otc::GameContentRevision))
-        msg->addU16(g_things.getContentRevision());
-
-    if(g_game.getFeature(Otc::GamePreviewState))
-        msg->addU8(0);
 
     const int offset = msg->getMessageSize();
     // first RSA byte must be 0
@@ -77,33 +67,13 @@ void ProtocolGame::sendLoginPacket(uint challengeTimestamp, uint8 challengeRando
         msg->addU32(key[1]);
         msg->addU32(key[2]);
         msg->addU32(key[3]);
-        msg->addU8(0); // is gm set?
     }
 
-    if(g_game.getFeature(Otc::GameSessionKey)) {
-        msg->addString(m_sessionKey);
-        msg->addString(m_characterName);
-    } else {
-        if(g_game.getFeature(Otc::GameAccountNames))
-            msg->addString(m_accountName);
-        else
-            msg->addU32(stdext::from_string<uint32>(m_accountName));
+    msg->addString(m_sessionKey);
+    msg->addString(m_characterName);
 
-        msg->addString(m_characterName);
-        msg->addString(m_accountPassword);
-
-        if(g_game.getFeature(Otc::GameAuthenticator))
-            msg->addString(m_authenticatorToken);
-    }
-
-    if(g_game.getFeature(Otc::GameChallengeOnLogin)) {
-        msg->addU32(challengeTimestamp);
-        msg->addU8(challengeRandom);
-    }
-
-    const std::string extended = callLuaField<std::string>("getLoginExtendedData");
-    if(!extended.empty())
-        msg->addString(extended);
+    msg->addU32(challengeTimestamp);
+    msg->addU8(challengeRandom);
 
     // complete the bytes for rsa encryption with zeros
     const int paddingBytes = g_crypt.rsaGetSize() - (msg->getMessageSize() - offset);
@@ -111,16 +81,9 @@ void ProtocolGame::sendLoginPacket(uint challengeTimestamp, uint8 challengeRando
     msg->addPaddingBytes(paddingBytes);
 
     // encrypt with RSA
-    if(g_game.getFeature(Otc::GameLoginPacketEncryption))
-        msg->encryptRsa();
+    msg->encryptRsa();
 
-    if(g_game.getFeature(Otc::GameProtocolChecksum))
-        enableChecksum();
-
-    send(msg);
-
-    if(g_game.getFeature(Otc::GameLoginPacketEncryption))
-        enableXteaEncryption();
+    send(msg, true);
 }
 
 void ProtocolGame::sendEnterGame()

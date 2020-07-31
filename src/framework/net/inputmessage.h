@@ -53,7 +53,7 @@ public:
 
     double getDouble();
     bool decryptRsa(int size);
-    bool eof() { return (m_info.m_bufferPos - m_info.m_headerPos) >= m_info.m_messageSize; }
+    bool eof() { return m_info.m_bufferPos >= m_info.m_messageSize + CanaryLib::MAX_HEADER_SIZE; }
 
 protected:
     void fillBuffer(uint8 *buffer, uint16 size) { write(buffer, size, CanaryLib::MESSAGE_OPERATION_PEEK); }

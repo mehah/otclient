@@ -50,11 +50,8 @@ public:
     void generateXteaKey();
     void setXteaKey(uint32 a, uint32 b, uint32 c, uint32 d);
     std::vector<uint32> getXteaKey();
-    void enableXteaEncryption() { m_xteaEncryptionEnabled = true; }
 
-    void enableChecksum() { m_checksumEnabled = true; }
-
-    virtual void send(const OutputMessagePtr& outputMessage);
+    virtual void send(const OutputMessagePtr& outputMessage, bool skipXtea = false);
     virtual void recv();
 
     ProtocolPtr asProtocol() { return static_self_cast<Protocol>(); }
@@ -67,15 +64,17 @@ protected:
 private:
     void internalRecvHeader(uint8* buffer, uint16 size);
     void internalRecvData(uint8* buffer, uint16 size);
-
-    bool xteaDecrypt(const InputMessagePtr& inputMessage);
+    
+    void internalSendData(const Wrapper_ptr& wrapper);
 
     CanaryLib::XTEA xtea;
+    bool skipXtea = false;
+    bool m_xteaEncryptionEnabled = false;
 
-    bool m_checksumEnabled;
-    bool m_xteaEncryptionEnabled;
     ConnectionPtr m_connection;
     InputMessagePtr m_inputMessage;
+
+    CanaryLib::FlatbuffersWrapper wrapper;
 };
 
 #endif
