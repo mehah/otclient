@@ -88,6 +88,8 @@ set(client_SOURCES ${client_SOURCES}
     ${CMAKE_CURRENT_LIST_DIR}/protocols/protocolgame.h
     ${CMAKE_CURRENT_LIST_DIR}/protocols/protocolgameparse.cpp
     ${CMAKE_CURRENT_LIST_DIR}/protocols/protocolgamesend.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/protocols/protocollogin.h
+    ${CMAKE_CURRENT_LIST_DIR}/protocols/protocollogin.cpp
 
     # ui
     ${CMAKE_CURRENT_LIST_DIR}/uicreature.cpp

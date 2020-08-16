@@ -1,19 +1,5 @@
 -- @docclass
-ProtocolLogin = extends(Protocol, "ProtocolLogin")
-
-LoginServerError = 10
-LoginServerTokenSuccess = 12
-LoginServerTokenError = 13
-LoginServerUpdate = 17
-LoginServerMotd = 20
-LoginServerUpdateNeeded = 30
-LoginServerSessionKey = 40
-LoginServerCharacterList = 100
-LoginServerExtendedCharacterList = 101
-
--- Since 10.76
-LoginServerRetry = 10
-LoginServerErrorNew = 11
+ProtocolLogin = extends(ProtocolLogin, "ProtocolLogin")
 
 function ProtocolLogin:login(host, port, accountName, accountPassword, authenticatorToken, stayLogged)
   if string.len(host) == 0 or port == nil or port == 0 then
@@ -102,46 +88,11 @@ function ProtocolLogin:onConnect()
   self.connectCallback = nil
 end
 
-function ProtocolLogin:onRecv(msg)
-  while not msg:eof() do
-    local opcode = msg:getU8()
-    if opcode == LoginServerErrorNew then
-      self:parseError(msg)
-    elseif opcode == LoginServerError then
-      self:parseError(msg)
-    elseif opcode == LoginServerMotd then
-      self:parseMotd(msg)
-    elseif opcode == LoginServerUpdateNeeded then
-      signalcall(self.onLoginError, self, tr("Client needs update."))
-    elseif opcode == LoginServerTokenSuccess then
-      local unknown = msg:getU8()
-    elseif opcode == LoginServerTokenError then
-      -- TODO: prompt for token here
-      local unknown = msg:getU8()
-      signalcall(self.onLoginError, self, tr("Invalid authentification token."))
-    elseif opcode == LoginServerCharacterList then
-      self:parseCharacterList(msg)
-    elseif opcode == LoginServerExtendedCharacterList then
-      self:parseExtendedCharacterList(msg)
-    elseif opcode == LoginServerUpdate then
-      local signature = msg:getString()
-      signalcall(self.onUpdateNeeded, self, signature)
-    elseif opcode == LoginServerSessionKey then
-      self:parseSessionKey(msg)
-    else
-      self:parseOpcode(opcode, msg)
-    end
-  end
-  self:disconnect()
-end
-
-function ProtocolLogin:parseError(msg)
-  local errorMessage = msg:getString()
+function ProtocolLogin:parseError(errorMessage)
   signalcall(self.onLoginError, self, errorMessage)
 end
 
-function ProtocolLogin:parseMotd(msg)
-  local motd = msg:getString()
+function ProtocolLogin:parseMotd(motd)
   signalcall(self.onMotd, self, motd)
 end
 
@@ -153,62 +104,38 @@ end
 function ProtocolLogin:parseCharacterList(msg)
   local characters = {}
 
-  if g_game.getClientVersion() > 1010 then
-    local worlds = {}
+  local worlds = {}
 
-    local worldsCount = msg:getU8()
-    for i=1, worldsCount do
-      local world = {}
-      local worldId = msg:getU8()
-      world.worldName = msg:getString()
-      world.worldIp = msg:getString()
-      world.worldPort = msg:getU16()
-      world.previewState = msg:getU8()
-      worlds[worldId] = world
-    end
+  local worldsCount = msg:getU8()
+  for i=1, worldsCount do
+    local world = {}
+    local worldId = msg:getU8()
+    world.worldName = msg:getString()
+    world.worldIp = msg:getString()
+    world.worldPort = msg:getU16()
+    world.previewState = msg:getU8()
+    worlds[worldId] = world
+  end
 
-    local charactersCount = msg:getU8()
-    for i=1, charactersCount do
-      local character = {}
-      local worldId = msg:getU8()
-      character.name = msg:getString()
-      character.worldName = worlds[worldId].worldName
-      character.worldIp = worlds[worldId].worldIp
-      character.worldPort = worlds[worldId].worldPort
-      character.previewState = worlds[worldId].previewState
-      characters[i] = character
-    end
-
-  else
-    local charactersCount = msg:getU8()
-    for i=1,charactersCount do
-      local character = {}
-      character.name = msg:getString()
-      character.worldName = msg:getString()
-      character.worldIp = iptostring(msg:getU32())
-      character.worldPort = msg:getU16()
-
-      if g_game.getFeature(GamePreviewState) then
-        character.previewState = msg:getU8()
-      end
-
-      characters[i] = character
-    end
+  local charactersCount = msg:getU8()
+  for i=1, charactersCount do
+    local character = {}
+    local worldId = msg:getU8()
+    character.name = msg:getString()
+    character.worldName = worlds[worldId].worldName
+    character.worldIp = worlds[worldId].worldIp
+    character.worldPort = worlds[worldId].worldPort
+    character.previewState = worlds[worldId].previewState
+    characters[i] = character
   end
 
   local account = {}
-  if g_game.getProtocolVersion() > 1077 then
-    account.status = msg:getU8()
-    account.subStatus = msg:getU8()
+  account.status = msg:getU8()
+  account.subStatus = msg:getU8()
 
-    account.premDays = msg:getU32()
-    if account.premDays ~= 0 and account.premDays ~= 65535 then
-      account.premDays = math.floor((account.premDays - os.time()) / 86400)
-    end
-  else
-    account.status = AccountStatus.Ok
-    account.premDays = msg:getU16()
-    account.subStatus = account.premDays > 0 and SubscriptionStatus.Premium or SubscriptionStatus.Free
+  account.premDays = msg:getU32()
+  if account.premDays ~= 0 and account.premDays ~= 65535 then
+    account.premDays = math.floor((account.premDays - os.time()) / 86400)
   end
 
   signalcall(self.onCharacterList, self, characters, account)

@@ -36,6 +36,7 @@
 #include "outfit.h"
 #include "player.h"
 #include "protocols/protocolgame.h"
+#include "protocols/protocollogin.h"
 #include "shadermanager.h"
 #include "spritemanager.h"
 #include "statictext.h"
@@ -334,6 +335,9 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ProtocolGame>("getCreature", &ProtocolGame::getCreature);
     g_lua.bindClassMemberFunction<ProtocolGame>("getItem", &ProtocolGame::getItem);
     g_lua.bindClassMemberFunction<ProtocolGame>("getPosition", &ProtocolGame::getPosition);
+
+    g_lua.registerClass<ProtocolLogin, Protocol>();
+    g_lua.bindClassStaticFunction<ProtocolLogin>("create", [] { return ProtocolLoginPtr(new ProtocolLogin); });
 
     g_lua.registerClass<Container>();
     g_lua.bindClassMemberFunction<Container>("getItem", &Container::getItem);
