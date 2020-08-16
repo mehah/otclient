@@ -35,7 +35,7 @@
 #include "missile.h"
 #include "outfit.h"
 #include "player.h"
-#include "protocolgame.h"
+#include "protocols/protocolgame.h"
 #include "shadermanager.h"
 #include "spritemanager.h"
 #include "statictext.h"

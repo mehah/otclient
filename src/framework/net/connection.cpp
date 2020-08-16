@@ -67,8 +67,8 @@ void Connection::close()
         return;
 
     // flush send data before disconnecting on clean connections
-    if (m_connected && !m_error && wrapper)
-        internal_write();
+    if (!m_error)
+      internalSend();
 
     m_connecting = false;
     m_connected = false;
@@ -112,35 +112,49 @@ void Connection::internal_connect(asio::ip::basic_resolver<asio::ip::tcp>::itera
     m_readTimer.async_wait(std::bind(&Connection::onTimeout, asConnection(), std::placeholders::_1));
 }
 
-void Connection::write(uint8* buffer, size_t size, const SendCallback& callback)
+void Connection::write(uint8* buffer, size_t size, bool skipXtea)
 {
     if (!m_connected)
         return;
 
+    Wrapper_ptr wrapper;
+    if (!wrapperList.empty()) {
+      wrapper = wrapperList.front();
+    }
+
     // we can't send the data right away, otherwise we could create tcp congestion
-    if (!wrapper) {
+    if (!wrapper || wrapper->isWriteLocked()) {
         wrapper = std::make_shared<Wrapper>();
+        wrapperList.emplace_back(wrapper);
 
         m_delayedWriteTimer.cancel();
         m_delayedWriteTimer.expires_from_now(boost::posix_time::milliseconds(0));
         m_delayedWriteTimer.async_wait(std::bind(&Connection::onCanWrite, asConnection(), std::placeholders::_1));
     }
-    
-    m_sendCallback = callback;
-    wrapper->write(buffer, size, true);
-}
 
-void Connection::internal_write()
-{
-    if (!m_connected)
-        return;
-
-    if (m_sendCallback) {
-      m_sendCallback(wrapper);
+    if (skipXtea) {
+      wrapper->disableEncryption();
     }
 
+    flatbuffers::FlatBufferBuilder &fbb = wrapper->Builder();
+    auto fbuffer = fbb.CreateVector(buffer, size);
+    auto raw_data = CanaryLib::CreateRawData(fbb, fbuffer, size);
+    fbb.Finish(raw_data);
+    
+    wrapper->add(raw_data.Union(), CanaryLib::DataType_RawData);
+}
+
+void Connection::internalSend()
+{
+    if (!m_connected || wrapperList.empty())
+        return;
+
+    Wrapper_ptr wrapper = wrapperList.front();
+    
+    wrapper->Finish(xtea);
+
     asio::async_write(m_socket,
-        boost::asio::buffer(wrapper->buffer(), wrapper->outputSize()),
+        boost::asio::buffer(wrapper->Buffer(), wrapper->Size() + CanaryLib::WRAPPER_HEADER_SIZE),
         std::bind(&Connection::onWrite, asConnection(), std::placeholders::_1, std::placeholders::_2));
 
     m_writeTimer.cancel();
@@ -153,7 +167,7 @@ void Connection::read(uint16 bytes, const RecvCallback& callback)
     if (!m_connected)
         return;
 
-    m_recvCallback = callback;
+    m_recvCallback = callback; 
     asio::async_read(m_socket,
         asio::buffer(m_inputStream.prepare(bytes)),
         std::bind(&Connection::onRecv, asConnection(), std::placeholders::_1, std::placeholders::_2));
@@ -225,7 +239,7 @@ void Connection::onCanWrite(const boost::system::error_code& error)
         return;
 
     if (m_connected)
-        internal_write();
+        internalSend();
 }
 
 void Connection::onWrite(const boost::system::error_code& error, size_t)
@@ -235,9 +249,9 @@ void Connection::onWrite(const boost::system::error_code& error, size_t)
     if (error == asio::error::operation_aborted)
         return;
 
-    uint16_t resetSize = 0;
-    wrapper->reset();
-    wrapper = nullptr;
+    if (!wrapperList.empty()) {
+      wrapperList.pop_front();
+    }
 
     if (m_connected && error)
         handleError(error);

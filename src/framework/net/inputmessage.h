@@ -33,7 +33,6 @@ public:
     InputMessage() { reset(); }
 
     void skipBytes(uint16 bytes) { skip(bytes); }
-    void setReadPos(uint16 readPos) { setBufferPosition(readPos); }
     uint8 getU8() { return readByte(); }
     uint16 getU16() { return read<uint16_t>(); }
     uint32 getU32() { return read<uint32_t>(); }
@@ -45,24 +44,12 @@ public:
     uint32 peekU32() { return read<uint32>(CanaryLib::MESSAGE_OPERATION_PEEK); }
     uint64 peekU64() { return read<uint64>(CanaryLib::MESSAGE_OPERATION_PEEK); }
 
-    int getReadPos() { return getBufferPosition(); }
     uint16 getMessageSize() { return getLength(); }
 
-    int getReadSize() { return m_info.m_bufferPos - m_info.m_headerPos; }
-    int getUnreadSize() { return getLength() - getReadSize(); }
-
     double getDouble();
-    bool decryptRsa(int size);
-    bool eof() { return m_info.m_bufferPos >= m_info.m_messageSize + CanaryLib::MAX_HEADER_SIZE; }
+    bool eof() { return CanaryLib::NetworkMessage::eof(); }
 
 protected:
-    void fillBuffer(uint8 *buffer, uint16 size) { write(buffer, size, CanaryLib::MESSAGE_OPERATION_PEEK); }
-
-    void setHeaderSize(uint16 size);
-    void setMessageSize(uint16 size) { setLength(size); }
-
-    uint16 readSize() { return getU16(); }
-
     friend class Protocol;
 };
 

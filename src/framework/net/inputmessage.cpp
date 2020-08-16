@@ -29,19 +29,3 @@ double InputMessage::getDouble()
     int32 v = getU32() - INT_MAX;
     return (v / std::pow(static_cast<float>(10), precision));
 }
-
-bool InputMessage::decryptRsa(int size)
-{
-    if (canRead(size)) {
-      g_crypt.rsaDecrypt(static_cast<unsigned char*>(m_buffer) + m_info.m_bufferPos, size);
-      return (getU8() == 0x00);
-    }
-    return false;
-}
-
-void InputMessage::setHeaderSize(uint16 size)
-{
-    assert(CanaryLib::MAX_HEADER_SIZE - size >= 0);
-    m_info.m_headerPos = CanaryLib::MAX_HEADER_SIZE - size;
-    m_info.m_bufferPos = m_info.m_headerPos;
-}

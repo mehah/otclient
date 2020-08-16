@@ -32,7 +32,7 @@
 #include "item.h"
 #include "localplayer.h"
 #include "outfit.h"
-#include "protocolgame.h"
+#include "protocols/protocolgame.h"
 
 #include <bitset>
 

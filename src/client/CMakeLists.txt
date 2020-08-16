@@ -82,12 +82,12 @@ set(client_SOURCES ${client_SOURCES}
     ${CMAKE_CURRENT_LIST_DIR}/luavaluecasts.h
 
     # net
-    ${CMAKE_CURRENT_LIST_DIR}/protocolcodes.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/protocolcodes.h
-    ${CMAKE_CURRENT_LIST_DIR}/protocolgame.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/protocolgame.h
-    ${CMAKE_CURRENT_LIST_DIR}/protocolgameparse.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/protocolgamesend.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/protocols/protocolcodes.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/protocols/protocolcodes.h
+    ${CMAKE_CURRENT_LIST_DIR}/protocols/protocolgame.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/protocols/protocolgame.h
+    ${CMAKE_CURRENT_LIST_DIR}/protocols/protocolgameparse.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/protocols/protocolgamesend.cpp
 
     # ui
     ${CMAKE_CURRENT_LIST_DIR}/uicreature.cpp

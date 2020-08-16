@@ -20,44 +20,24 @@
  * THE SOFTWARE.
  */
 
-#include "protocolgame.h"
-#include "game.h"
-#include "item.h"
-#include "localplayer.h"
-#include "player.h"
+#ifndef PROTOCOLCODES_H
+#define PROTOCOLCODES_H
 
-void ProtocolGame::login(const std::string& accountName, const std::string& accountPassword, const std::string& host, uint16 port, const std::string& characterName, const std::string& authenticatorToken, const std::string& sessionKey)
-{
-    m_accountName = accountName;
-    m_accountPassword = accountPassword;
-    m_authenticatorToken = authenticatorToken;
-    m_sessionKey = sessionKey;
-    m_characterName = characterName;
+#include "../global.h"
 
-    connect(host, port);
+namespace Proto {
+    enum CreaturesIdRange {
+        PlayerStartId = 0x10000000,
+        PlayerEndId = 0x40000000,
+        MonsterStartId = 0x40000000,
+        MonsterEndId = 0x80000000,
+        NpcStartId = 0x80000000,
+        NpcEndId = 0xffffffff
+    };
+
+    void buildMessageModesMap(int version);
+    Otc::MessageMode translateMessageModeFromServer(uint8 mode);
+    uint8 translateMessageModeToServer(Otc::MessageMode mode);
 }
 
-void ProtocolGame::onConnect()
-{
-    m_firstRecv = true;
-    Protocol::onConnect();
-
-    m_localPlayer = g_game.getLocalPlayer();
-
-    if(!g_game.getFeature(Otc::GameChallengeOnLogin))
-        sendLoginPacket(0, 0);
-
-    recv();
-}
-
-void ProtocolGame::onRecv(const InputMessagePtr& inputMessage)
-{
-    parseMessage(inputMessage);
-    recv();
-}
-
-void ProtocolGame::onError(const boost::system::error_code& error)
-{
-    g_game.processConnectionError(error);
-    disconnect();
-}
+#endif

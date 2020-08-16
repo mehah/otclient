@@ -64,16 +64,11 @@ protected:
 private:
     void internalRecvHeader(uint8* buffer, uint16 size);
     void internalRecvData(uint8* buffer, uint16 size);
-    
-    void internalSendData(const Wrapper_ptr& wrapper);
-
-    CanaryLib::XTEA xtea;
-    bool skipXtea = false;
-    bool m_xteaEncryptionEnabled = false;
 
     ConnectionPtr m_connection;
     InputMessagePtr m_inputMessage;
 
+    CanaryLib::XTEA xtea;
     CanaryLib::FlatbuffersWrapper wrapper;
 };
 

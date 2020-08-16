@@ -24,8 +24,8 @@
 #define PROTOCOLGAME_H
 
 #include <framework/net/protocol.h>
-#include "creature.h"
-#include "declarations.h"
+#include "../creature.h"
+#include "../declarations.h"
 #include "protocolcodes.h"
 
 class ProtocolGame : public Protocol
@@ -287,7 +287,6 @@ private:
     stdext::boolean<false> m_enableSendExtendedOpcode;
     stdext::boolean<false> m_gameInitialized;
     stdext::boolean<false> m_mapKnown;
-    stdext::boolean<true> m_firstRecv;
     std::string m_accountName;
     std::string m_accountPassword;
     std::string m_authenticatorToken;

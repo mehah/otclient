@@ -465,16 +465,16 @@
     <ClCompile Include="..\src\client\player.cpp">
       <Filter>Source Files\client</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\client\protocolcodes.cpp">
+    <ClCompile Include="..\src\client\protocols\protocolcodes.cpp">
       <Filter>Source Files\client</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\client\protocolgame.cpp">
+    <ClCompile Include="..\src\client\protocols\protocolgame.cpp">
       <Filter>Source Files\client</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\client\protocolgameparse.cpp">
+    <ClCompile Include="..\src\client\protocols\protocolgameparse.cpp">
       <Filter>Source Files\client</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\client\protocolgamesend.cpp">
+    <ClCompile Include="..\src\client\protocols\protocolgamesend.cpp">
       <Filter>Source Files\client</Filter>
     </ClCompile>
     <ClCompile Include="..\src\client\shadermanager.cpp">

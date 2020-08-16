@@ -34,8 +34,6 @@ public:
     bool isOpen() { return m_isOpen; }
     void close();
 
-    void acceptNext();
-
 private:
     stdext::boolean<true> m_isOpen;
     asio::ip::tcp::acceptor m_acceptor;

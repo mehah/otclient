@@ -166,10 +166,10 @@
     <ClCompile Include="..\src\client\missile.cpp" />
     <ClCompile Include="..\src\client\outfit.cpp" />
     <ClCompile Include="..\src\client\player.cpp" />
-    <ClCompile Include="..\src\client\protocolcodes.cpp" />
-    <ClCompile Include="..\src\client\protocolgame.cpp" />
-    <ClCompile Include="..\src\client\protocolgameparse.cpp" />
-    <ClCompile Include="..\src\client\protocolgamesend.cpp" />
+    <ClCompile Include="..\src\client\protocols\protocolcodes.cpp" />
+    <ClCompile Include="..\src\client\protocols\protocolgame.cpp" />
+    <ClCompile Include="..\src\client\protocols\protocolgameparse.cpp" />
+    <ClCompile Include="..\src\client\protocols\protocolgamesend.cpp" />
     <ClCompile Include="..\src\client\shadermanager.cpp" />
     <ClCompile Include="..\src\client\spritemanager.cpp" />
     <ClCompile Include="..\src\client\statictext.cpp" />

@@ -28,7 +28,7 @@
 #include "lightview.h"
 #include "localplayer.h"
 #include "map.h"
-#include "protocolgame.h"
+#include "protocols/protocolgame.h"
 #include "thingtypemanager.h"
 
  // Define 1 to render behind the first creature added.

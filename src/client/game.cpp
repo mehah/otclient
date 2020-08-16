@@ -29,8 +29,8 @@
 #include "localplayer.h"
 #include "luavaluecasts.h"
 #include "map.h"
-#include "protocolcodes.h"
-#include "protocolgame.h"
+#include "protocols/protocolcodes.h"
+#include "protocols/protocolgame.h"
 #include "statictext.h"
 #include "tile.h"
 
