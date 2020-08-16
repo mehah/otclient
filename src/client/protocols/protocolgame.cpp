@@ -52,7 +52,6 @@ void ProtocolGame::onConnect()
 void ProtocolGame::onRecv(const InputMessagePtr& inputMessage)
 {
     parseMessage(inputMessage);
-    recv();
 }
 
 void ProtocolGame::onError(const boost::system::error_code& error)

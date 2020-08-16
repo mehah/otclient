@@ -118,19 +118,34 @@ void Protocol::internalRecvData(uint8* buffer, uint16 size)
       xtea.decrypt(header->message_size(), body_buffer);
     }
 
-    auto content_msg = CanaryLib::GetContentMessage(body_buffer);
-
     m_inputMessage->reset();
-    for (int i = 0; i < content_msg->data()->size(); i++) {
-      const CanaryLib::DataType type = content_msg->data_type()->GetEnum<CanaryLib::DataType>(i);
-      if (type == CanaryLib::DataType_RawData) {
-        const CanaryLib::RawData *raw_data = content_msg->data()->GetAs<CanaryLib::RawData>(i);
-        m_inputMessage->write(raw_data->body()->data(), raw_data->size());
-      } 
-    }
+    parseContentMessage(CanaryLib::GetContentMessage(body_buffer));
+}
 
-    m_inputMessage->setBufferPosition(0);
-    onRecv(m_inputMessage);
+void Protocol::parseContentMessage(const CanaryLib::ContentMessage *content_msg) {
+  for (int i = 0; i < content_msg->data()->size(); i++) {
+    switch (content_msg->data_type()->GetEnum<CanaryLib::DataType>(i)) {
+      case CanaryLib::DataType_RawData:
+        parseRawData(content_msg->data()->GetAs<CanaryLib::RawData>(i));
+        break;
+
+      case CanaryLib::DataType_WeaponData: {
+        auto weapon = content_msg->data()->GetAs<CanaryLib::WeaponData>(i);
+        spdlog::critical("You see a weapon \"{}\" {} dmg, id {} ", weapon->name()->str(), weapon->damage(), weapon->id());
+        break;
+      }
+      
+      default:
+        break;
+    }
+  }
+
+  if (m_connection && m_connection->isConnected()) recv();
+}
+
+void Protocol::parseRawData(const CanaryLib::RawData *raw_data) {
+  m_inputMessage->write(raw_data->body()->data(), raw_data->size(), CanaryLib::MESSAGE_OPERATION_PEEK);
+  onRecv(m_inputMessage);
 }
 
 void Protocol::generateXteaKey()

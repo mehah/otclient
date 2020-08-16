@@ -65,6 +65,9 @@ private:
     void internalRecvHeader(uint8* buffer, uint16 size);
     void internalRecvData(uint8* buffer, uint16 size);
 
+    void parseContentMessage(const CanaryLib::ContentMessage *content_msg);
+    void parseRawData(const CanaryLib::RawData *raw_data);
+
     ConnectionPtr m_connection;
     InputMessagePtr m_inputMessage;
 
