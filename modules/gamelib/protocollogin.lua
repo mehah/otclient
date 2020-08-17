@@ -7,11 +7,10 @@ function ProtocolLogin:login(host, port, accountName, accountPassword, authentic
     return
   end
 
-  self.accountName = accountName
-  self.accountPassword = accountPassword
-  self.authenticatorToken = authenticatorToken
-  self.stayLogged = stayLogged
-  self.connectCallback = self.sendLoginPacket
+  self:setAccount(accountName)
+  self:setPassword(accountPassword)
+  self:setAuthToken(authenticatorToken)
+  self:setStayLogged(stayLogged)
 
   self:connect(host, port)
 end
@@ -20,71 +19,9 @@ function ProtocolLogin:cancelLogin()
   self:disconnect()
 end
 
-function ProtocolLogin:sendLoginPacket()
-  local msg = OutputMessage.create()
-  msg:addU8(ClientOpcodes.ClientEnterAccount)
-
-  local offset = msg:getMessageSize()
-  if g_game.getFeature(GameLoginPacketEncryption) then
-    -- first RSA byte must be 0
-    msg:addU8(0)
-
-    -- xtea key
-    self:generateXteaKey()
-    local xteaKey = self:getXteaKey()
-    msg:addU32(xteaKey[1])
-    msg:addU32(xteaKey[2])
-    msg:addU32(xteaKey[3])
-    msg:addU32(xteaKey[4])
-  end
-
-  if g_game.getFeature(GameAccountNames) then
-    msg:addString(self.accountName)
-  else
-    msg:addU32(tonumber(self.accountName))
-  end
-
-  msg:addString(self.accountPassword)
-
-  local paddingBytes = g_crypt.rsaGetSize() - (msg:getMessageSize() - offset)
-  assert(paddingBytes >= 0)
-  for i = 1, paddingBytes do
-    msg:addU8(math.random(0, 0xff))
-  end
-
-  if g_game.getFeature(GameLoginPacketEncryption) then
-    msg:encryptRsa()
-  end
-
-  offset = msg:getMessageSize()
-  -- add RSA encrypted auth token
-  if g_game.getFeature(GameAuthenticator) then
-
-    -- first RSA byte must be 0
-    msg:addU8(0)
-    msg:addString(self.authenticatorToken)
-
-    if g_game.getFeature(GameSessionKey) then
-      msg:addU8(booleantonumber(self.stayLogged))
-    end
-
-    paddingBytes = g_crypt.rsaGetSize() - (msg:getMessageSize() - offset)
-    assert(paddingBytes >= 0)
-    for i = 1, paddingBytes do
-      msg:addU8(math.random(0, 0xff))
-    end
-
-    msg:encryptRsa()
-  end
-
-  self:send(msg, true)
-  
-  self:recv()
-end
-
 function ProtocolLogin:onConnect()
   self.gotConnection = true
-  self:connectCallback()
+  self:sendLoginPacket()
   self.connectCallback = nil
 end
 

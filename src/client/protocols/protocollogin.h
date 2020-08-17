@@ -26,8 +26,26 @@
 class ProtocolLogin : public Protocol
 {
   public:
-    void test();
+    void setAccount(const std::string& accountName) {
+      account = accountName;
+    }
+    void setPassword(const std::string& pass) {
+      password = pass;
+    }
+    void setAuthToken(const std::string& token) {
+      authToken = token;
+    }
+    void setStayLogged(bool logged) {
+      stayLogged = logged;
+    }
+    void sendLoginPacket();
     void onRecv(const InputMessagePtr& inputMessage) override;
+    
+  private:
+    std::string account;
+    std::string password;
+    std::string authToken;
+    bool stayLogged;
 };
 
 #endif

@@ -61,8 +61,7 @@ void ProtocolGame::sendLoginPacket(uint challengeTimestamp, uint8 challengeRando
 
     if(g_game.getFeature(Otc::GameLoginPacketEncryption)) {
         // xtea key
-        generateXteaKey();
-        std::vector<uint32_t> key = getXteaKey();
+        std::vector<uint32_t> key = generateXteaKey();
         msg->addU32(key[0]);
         msg->addU32(key[1]);
         msg->addU32(key[2]);

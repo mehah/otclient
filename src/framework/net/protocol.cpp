@@ -148,9 +148,10 @@ void Protocol::parseRawData(const CanaryLib::RawData *raw_data) {
   onRecv(m_inputMessage);
 }
 
-void Protocol::generateXteaKey()
+std::vector<uint32> Protocol::generateXteaKey()
 {
   xtea.generateKey();
+  return getXteaKey();
 }
 
 void Protocol::setXteaKey(uint32 a, uint32 b, uint32 c, uint32 d)

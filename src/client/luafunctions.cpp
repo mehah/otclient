@@ -338,6 +338,11 @@ void Client::registerLuaFunctions()
 
     g_lua.registerClass<ProtocolLogin, Protocol>();
     g_lua.bindClassStaticFunction<ProtocolLogin>("create", [] { return ProtocolLoginPtr(new ProtocolLogin); });
+    g_lua.bindClassMemberFunction<ProtocolLogin>("setAccount", &ProtocolLogin::setAccount);
+    g_lua.bindClassMemberFunction<ProtocolLogin>("setPassword", &ProtocolLogin::setPassword);
+    g_lua.bindClassMemberFunction<ProtocolLogin>("setAuthToken", &ProtocolLogin::setAuthToken);
+    g_lua.bindClassMemberFunction<ProtocolLogin>("setStayLogged", &ProtocolLogin::setStayLogged);
+    g_lua.bindClassMemberFunction<ProtocolLogin>("sendLoginPacket", &ProtocolLogin::sendLoginPacket);
 
     g_lua.registerClass<Container>();
     g_lua.bindClassMemberFunction<Container>("getItem", &Container::getItem);

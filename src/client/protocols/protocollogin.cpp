@@ -21,9 +21,45 @@
  */
 
 #include "protocollogin.h"
+#include <framework/net/outputmessage.h>
+#include <framework/util/crypt.h>
 
-void ProtocolLogin::test() {
-  callLuaField("test", std::string("ProtocolLogin::test"));
+void ProtocolLogin::sendLoginPacket() {
+  OutputMessagePtr msg = OutputMessagePtr(new OutputMessage);
+  msg->writeByte(CanaryLib::ClientEnterAccount);
+
+  // first RSA byte must be 0
+  int offset = msg->getLength();
+  msg->writeByte(0);
+
+  std::vector<uint32_t> key = generateXteaKey();
+  msg->write<uint32_t>(key[0]);
+  msg->write<uint32_t>(key[1]);
+  msg->write<uint32_t>(key[2]);
+  msg->write<uint32_t>(key[3]);
+
+  msg->writeString(account);
+  msg->writeString(password);
+
+  int paddingBytes = g_crypt.rsaGetSize() - (msg->getLength() - offset);
+  msg->writePaddingBytes(paddingBytes);
+
+  msg->encryptRsa();
+
+  // first RSA byte must be 0
+  offset = msg->getLength();
+  msg->writeByte(0);
+  msg->writeString(authToken);
+
+  msg->writeByte(stayLogged);
+
+  paddingBytes = g_crypt.rsaGetSize() - (msg->getLength() - offset);
+  msg->writePaddingBytes(paddingBytes);
+
+  msg->encryptRsa();
+
+  send(msg, true);
+  recv();
 }
 
 void ProtocolLogin::onRecv(const InputMessagePtr& msg)

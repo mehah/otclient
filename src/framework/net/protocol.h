@@ -47,7 +47,7 @@ public:
     ConnectionPtr getConnection() { return m_connection; }
     void setConnection(const ConnectionPtr& connection) { m_connection = connection; }
 
-    void generateXteaKey();
+    std::vector<uint32> generateXteaKey();
     void setXteaKey(uint32 a, uint32 b, uint32 c, uint32 d);
     std::vector<uint32> getXteaKey();
 
