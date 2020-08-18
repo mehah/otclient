@@ -66,9 +66,6 @@ void ProtocolLogin::onRecv(const InputMessagePtr& msg)
 {
   while (!msg->eof()) {
     switch(uint8_t opcode = msg->readByte()) {
-      case CanaryLib::LoginServerErrorNew:
-        callLuaField("onLoginError", msg->readString());
-        break;
       case CanaryLib::LoginServerMotd:
         callLuaField("parseMotd", msg->readString());
         break;
@@ -84,4 +81,9 @@ void ProtocolLogin::onRecv(const InputMessagePtr& msg)
     }
   }
   disconnect();
+}
+
+void ProtocolLogin::onMessageError(const CanaryLib::ErrorData *err) {
+  callLuaField("onLoginError", err->message()->str());
+  Protocol::onMessageError(err);
 }
