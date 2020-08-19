@@ -83,7 +83,7 @@ void ProtocolLogin::onRecv(const InputMessagePtr& msg)
   disconnect();
 }
 
-void ProtocolLogin::onMessageError(const CanaryLib::ErrorData *err) {
+void ProtocolLogin::parseMessageError(const CanaryLib::ErrorData *err) {
   callLuaField("onLoginError", err->message()->str());
-  Protocol::onMessageError(err);
+  Protocol::parseMessageError(err);
 }

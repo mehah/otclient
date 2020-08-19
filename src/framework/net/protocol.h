@@ -57,14 +57,16 @@ protected:
     virtual void onConnect();
     virtual void onRecv(const InputMessagePtr& inputMessage);
     virtual void onError(const boost::system::error_code& err);
-    virtual void onMessageError(const CanaryLib::ErrorData *err);
+
+    // Parsers
+    void parseContentMessage(const CanaryLib::ContentMessage *content_msg);
+    void parseRawData(const CanaryLib::RawData *raw_data);
+
+    virtual void parseMessageError(const CanaryLib::ErrorData *err);
 
 private:
     void internalRecvHeader(uint8* buffer, uint16 size);
     void internalRecvData(uint8* buffer, uint16 size);
-
-    void parseContentMessage(const CanaryLib::ContentMessage *content_msg);
-    void parseRawData(const CanaryLib::RawData *raw_data);
 
     ConnectionPtr m_connection;
     InputMessagePtr m_inputMessage;
