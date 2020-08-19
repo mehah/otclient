@@ -97,3 +97,9 @@ void ProtocolLogin::parseError(const CanaryLib::ErrorData *err) {
   callLuaField("onLoginError", err->message()->str());
   Protocol::parseError(err);
 }
+
+void ProtocolLogin::onConnect()
+{
+  Protocol::onConnect();
+  sendLoginPacket();
+}

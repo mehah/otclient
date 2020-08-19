@@ -19,12 +19,6 @@ function ProtocolLogin:cancelLogin()
   self:disconnect()
 end
 
-function ProtocolLogin:onConnect()
-  self.gotConnection = true
-  self:sendLoginPacket()
-  self.connectCallback = nil
-end
-
 function ProtocolLogin:onError(msg, code)
   local text = translateNetworkError(code, self:isConnecting(), msg)
   signalcall(self.onLoginError, self, text)

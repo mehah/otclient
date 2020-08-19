@@ -59,6 +59,7 @@ void ProtocolGame::onError(const boost::system::error_code& error)
     g_game.processConnectionError(error);
     disconnect();
 }
+
 void ProtocolGame::parseError(const CanaryLib::ErrorData *err) {
   Protocol::parseError(err);
 };

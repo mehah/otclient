@@ -39,6 +39,7 @@ class ProtocolLogin : public Protocol
       stayLogged = logged;
     }
     void sendLoginPacket();
+    void onConnect() override;
     void onRecv(const InputMessagePtr& inputMessage) override;
     
     virtual void parseCharacterList(const CanaryLib::CharactersListData *characters) override;
