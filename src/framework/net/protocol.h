@@ -62,7 +62,8 @@ protected:
     void parseContentMessage(const CanaryLib::ContentMessage *content_msg);
     void parseRawData(const CanaryLib::RawData *raw_data);
 
-    virtual void parseMessageError(const CanaryLib::ErrorData *err);
+    virtual void parseCharacterList(const CanaryLib::CharactersListData *characters);
+    virtual void parseError(const CanaryLib::ErrorData *err);
 
 private:
     void internalRecvHeader(uint8* buffer, uint16 size);

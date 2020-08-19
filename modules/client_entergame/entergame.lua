@@ -43,7 +43,7 @@ local function onSessionKey(protocol, sessionKey)
   G.sessionKey = sessionKey
 end
 
-local function onCharacterList(protocol, characters, account, otui)
+local function onCharacterList(protocol, characters, world, account, otui)
   -- Try add server to the server list
   ServerList.add(G.host, G.port, g_game.getClientVersion())
 
@@ -72,13 +72,7 @@ local function onCharacterList(protocol, characters, account, otui)
   loadBox:destroy()
   loadBox = nil
 
-  for _, characterInfo in pairs(characters) do
-    if characterInfo.previewState and characterInfo.previewState ~= PreviewState.Default then
-      characterInfo.worldName = characterInfo.worldName .. ', Preview'
-    end
-  end
-
-  CharacterList.create(characters, account, otui)
+  CharacterList.create(characters, world, account, otui)
   CharacterList.show()
 
   if motdEnabled then

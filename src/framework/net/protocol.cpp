@@ -157,6 +157,10 @@ void Protocol::onError(const boost::system::error_code& err)
     disconnect();
 }
 
-void Protocol::parseMessageError(const CanaryLib::ErrorData *err) {
+void Protocol::parseCharacterList(const CanaryLib::CharactersListData *characters) {
+    spdlog::debug("Calling Protocol::parseCharacterList");
+}
+
+void Protocol::parseError(const CanaryLib::ErrorData *err) {
     spdlog::error("{}", err->message()->str());
 }

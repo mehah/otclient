@@ -150,7 +150,7 @@ function CharacterList.init()
   connect(g_game, { onGameEnd = CharacterList.showAgain })
 
   if G.characters then
-    CharacterList.create(G.characters, G.characterAccount)
+    CharacterList.create(G.characters, G.world, G.characterAccount)
   end
 end
 
@@ -198,7 +198,7 @@ function CharacterList.terminate()
   CharacterList = nil
 end
 
-function CharacterList.create(characters, account, otui)
+function CharacterList.create(characters, world, account, otui)
   if not otui then otui = 'characterlist' end
 
   if charactersWindow then
@@ -211,6 +211,7 @@ function CharacterList.create(characters, account, otui)
   -- characters
   G.characters = characters
   G.characterAccount = account
+  G.world = world
 
   characterList:destroyChildren()
   local accountStatusLabel = charactersWindow:getChildById('accountStatusLabel')
@@ -237,9 +238,9 @@ function CharacterList.create(characters, account, otui)
 
     -- these are used by login
     widget.characterName = characterInfo.name
-    widget.worldName = characterInfo.worldName
-    widget.worldHost = characterInfo.worldIp
-    widget.worldPort = characterInfo.worldPort
+    widget.worldName = world.name
+    widget.worldHost = world.ip
+    widget.worldPort = world.port
 
     connect(widget, { onDoubleClick = function () CharacterList.doLogin() return true end } )
 
@@ -255,26 +256,12 @@ function CharacterList.create(characters, account, otui)
 
   -- account
   local status = ''
-  if account.status == AccountStatus.Frozen then
-    status = tr(' (Frozen)')
-  elseif account.status == AccountStatus.Suspended then
-    status = tr(' (Suspended)')
-  end
-
-  if account.subStatus == SubscriptionStatus.Free then
-    accountStatusLabel:setText(('%s%s'):format(tr('Free Account'), status))
-  elseif account.subStatus == SubscriptionStatus.Premium then
-    if account.premDays == 0 or account.premDays == 65535 then
-      accountStatusLabel:setText(('%s%s'):format(tr('Gratis Premium Account'), status))
-    else
-      accountStatusLabel:setText(('%s%s'):format(tr('Premium Account (%s) days left', account.premDays), status))
-    end
-  end
-
-  if account.premDays > 0 and account.premDays <= 7 then
-    accountStatusLabel:setOn(true)
+  if account.free_premium then
+    accountStatusLabel:setText(('%s'):format(tr('Gratis Premium Account')))
+  elseif account.premium_days > 0 then
+    accountStatusLabel:setText(('%s%s'):format(tr('Premium Account (%s) days left', account.premium_days), status))
   else
-    accountStatusLabel:setOn(false)
+    accountStatusLabel:setText(('%s'):format(tr('Free Account')))
   end
 end
 

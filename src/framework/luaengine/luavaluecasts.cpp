@@ -333,3 +333,38 @@ bool luavalue_cast(int index, LuaObjectPtr& obj) {
     }
     return false;
 }
+
+// Flatbuffers
+int push_luavalue(const CanaryLib::AccountInfo *acc)
+{
+    g_lua.createTable(0, 2);
+    g_lua.pushBoolean(acc->free_premium() > 0);
+    g_lua.setField("free_premium");
+    g_lua.pushInteger(acc->premium_days());
+    g_lua.setField("premium_days");
+    return 1;
+}
+
+int push_luavalue(const CanaryLib::CharacterInfo *charInfo)
+{
+    g_lua.createTable(0, 2);
+    g_lua.pushString(charInfo->name()->str());
+    g_lua.setField("name");
+    g_lua.pushInteger(charInfo->world_id());
+    g_lua.setField("worldId");
+    return 1;
+}
+
+int push_luavalue(const CanaryLib::WorldInfo *world)
+{
+    g_lua.createTable(0, 4);
+    g_lua.pushInteger(world->id());
+    g_lua.setField("id");
+    g_lua.pushInteger(world->port());
+    g_lua.setField("port");
+    g_lua.pushString(world->ip()->str());
+    g_lua.setField("ip");
+    g_lua.pushString(world->name()->str());
+    g_lua.setField("name");
+    return 1;
+}

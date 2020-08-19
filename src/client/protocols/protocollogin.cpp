@@ -83,7 +83,34 @@ void ProtocolLogin::onRecv(const InputMessagePtr& msg)
   disconnect();
 }
 
-void ProtocolLogin::parseMessageError(const CanaryLib::ErrorData *err) {
+struct World_t {
+  uint8_t id;
+  uint16_t port;
+	std::string ip;
+	std::string name;
+};
+
+struct Character_t {
+	std::string name;
+  World_t world;
+};
+
+void ProtocolLogin::parseCharacterList(const CanaryLib::CharactersListData *characters) {
+  Protocol::parseCharacterList(characters);
+  callLuaField("parseMotd", characters->motd()->str());
+
+  auto account = characters->account();
+  callLuaField("onSessionKey", account->session_key()->str());
+
+  std::vector<const CanaryLib::CharacterInfo *> charList;
+  for (int i = 0; i < characters->characters()->size(); i++) {
+    charList.emplace_back(characters->characters()->Get(i));
+    auto c = characters->characters()->Get(i);
+  }
+  callLuaField("parseCharacterList", charList, characters->world(), account);
+}
+
+void ProtocolLogin::parseError(const CanaryLib::ErrorData *err) {
   callLuaField("onLoginError", err->message()->str());
-  Protocol::parseMessageError(err);
+  Protocol::parseError(err);
 }

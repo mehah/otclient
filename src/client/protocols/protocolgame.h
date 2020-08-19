@@ -127,7 +127,8 @@ protected:
     void onConnect() override;
     void onRecv(const InputMessagePtr& inputMessage) override;
     void onError(const boost::system::error_code& error) override;
-    void parseMessageError(const CanaryLib::ErrorData *err) override;
+    
+    void parseError(const CanaryLib::ErrorData *err) override;
 
     friend class Game;
 

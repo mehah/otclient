@@ -97,6 +97,11 @@ bool luavalue_cast(int index, Size& size);
 int push_luavalue(const OTMLNodePtr& node);
 bool luavalue_cast(int index, OTMLNodePtr& node);
 
+// Flatbuffers
+int push_luavalue(const CanaryLib::AccountInfo *acc);
+int push_luavalue(const CanaryLib::CharacterInfo *charInfo);
+int push_luavalue(const CanaryLib::WorldInfo *world);
+
 // enum
 template<class T>
 typename std::enable_if<std::is_enum<T>::value, int>::type
