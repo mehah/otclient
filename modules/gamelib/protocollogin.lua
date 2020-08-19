@@ -25,23 +25,6 @@ function ProtocolLogin:onConnect()
   self.connectCallback = nil
 end
 
-function ProtocolLogin:parseCharacterList(characters, world, account)
-  signalcall(self.onCharacterList, self, characters, world, account, otui)
-end
-
-function ProtocolLogin:parseMotd(motd)
-  signalcall(self.onMotd, self, motd)
-end
-
-function ProtocolLogin:parseSessionKey(msg)
-  local sessionKey = msg:getString()
-  signalcall(self.onSessionKey, self, sessionKey)
-end
-
-function ProtocolLogin:parseOpcode(opcode, msg)
-  signalcall(self.onOpcode, self, opcode, msg)
-end
-
 function ProtocolLogin:onError(msg, code)
   local text = translateNetworkError(code, self:isConnecting(), msg)
   signalcall(self.onLoginError, self, text)

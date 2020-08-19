@@ -255,11 +255,10 @@ function CharacterList.create(characters, world, account, otui)
   end
 
   -- account
-  local status = ''
   if account.free_premium then
     accountStatusLabel:setText(('%s'):format(tr('Gratis Premium Account')))
   elseif account.premium_days > 0 then
-    accountStatusLabel:setText(('%s%s'):format(tr('Premium Account (%s) days left', account.premium_days), status))
+    accountStatusLabel:setText(('%s'):format(tr('Premium Account (%s) days left', account.premium_days)))
   else
     accountStatusLabel:setText(('%s'):format(tr('Free Account')))
   end

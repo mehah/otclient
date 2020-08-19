@@ -338,7 +338,7 @@ bool luavalue_cast(int index, LuaObjectPtr& obj) {
 int push_luavalue(const CanaryLib::AccountInfo *acc)
 {
     g_lua.createTable(0, 2);
-    g_lua.pushBoolean(acc->free_premium() > 0);
+    g_lua.pushBoolean(acc->free_premium());
     g_lua.setField("free_premium");
     g_lua.pushInteger(acc->premium_days());
     g_lua.setField("premium_days");

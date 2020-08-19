@@ -62,26 +62,7 @@ void ProtocolLogin::sendLoginPacket() {
   recv();
 }
 
-void ProtocolLogin::onRecv(const InputMessagePtr& msg)
-{
-  while (!msg->eof()) {
-    switch(uint8_t opcode = msg->readByte()) {
-      case CanaryLib::LoginServerMotd:
-        callLuaField("parseMotd", msg->readString());
-        break;
-      case CanaryLib::LoginServerSessionKey:
-        callLuaField("onSessionKey", msg->getString());
-        break;
-      case CanaryLib::LoginServerCharacterList:
-        callLuaField("parseCharacterList", msg);
-        break;
-      default:
-        spdlog::warn("[ProtocolLogin::onRecv] Unexpected opcode: {}", opcode);
-        break;
-    }
-  }
-  disconnect();
-}
+void ProtocolLogin::onRecv(const InputMessagePtr& msg) {}
 
 struct World_t {
   uint8_t id;
@@ -97,7 +78,7 @@ struct Character_t {
 
 void ProtocolLogin::parseCharacterList(const CanaryLib::CharactersListData *characters) {
   Protocol::parseCharacterList(characters);
-  callLuaField("parseMotd", characters->motd()->str());
+  callLuaField("onMotd", characters->motd()->str());
 
   auto account = characters->account();
   callLuaField("onSessionKey", account->session_key()->str());
@@ -107,7 +88,9 @@ void ProtocolLogin::parseCharacterList(const CanaryLib::CharactersListData *char
     charList.emplace_back(characters->characters()->Get(i));
     auto c = characters->characters()->Get(i);
   }
-  callLuaField("parseCharacterList", charList, characters->world(), account);
+  callLuaField("onCharacterList", charList, characters->world(), account);
+
+  disconnect();
 }
 
 void ProtocolLogin::parseError(const CanaryLib::ErrorData *err) {
