@@ -67,12 +67,22 @@ bool Protocol::isConnecting()
 
 void Protocol::send(const OutputMessagePtr& outputMessage, bool skipXtea)
 {
-    // send
-    if(m_connection)
-        m_connection->write(outputMessage->getBuffer(), outputMessage->getMessageSize(), skipXtea);
+  if(Wrapper_ptr wrapper = m_connection->getOutputWrapper()) {
+    if (skipXtea) {
+      wrapper->disableEncryption();
+    }
 
-    // reset message to allow reuse
-    outputMessage->reset();
+    flatbuffers::FlatBufferBuilder &fbb = wrapper->Builder();
+    auto fbuffer = fbb.CreateVector(outputMessage->getBuffer(), outputMessage->getMessageSize());
+    auto raw_data = CanaryLib::CreateRawData(fbb, fbuffer, outputMessage->getMessageSize());
+    wrapper->add(raw_data.Union(), CanaryLib::DataType_RawData);
+
+    // send
+    m_connection->onCanWrite();
+  }
+
+  // reset message to allow reuse
+  outputMessage->reset();
 }
 
 void Protocol::recv()

@@ -65,7 +65,7 @@ void Connection::close()
 
     // flush send data before disconnecting on clean connections
     if (!m_error)
-      internalSend();
+      internalSend(boost::system::error_code());
 
     m_connecting = false;
     m_connected = false;
@@ -109,40 +109,29 @@ void Connection::internal_connect(asio::ip::basic_resolver<asio::ip::tcp>::itera
     m_readTimer.async_wait(std::bind(&Connection::onTimeout, asConnection(), std::placeholders::_1));
 }
 
-void Connection::write(uint8* buffer, size_t size, bool skipXtea)
-{
-    if (!m_connected)
-        return;
+Wrapper_ptr Connection::getOutputWrapper() {
+  if (!m_connected) return nullptr;
 
-    Wrapper_ptr wrapper;
-    if (!wrapperList.empty()) {
-      wrapper = wrapperList.front();
-    }
+  Wrapper_ptr wrapper;
+  if (!wrapperList.empty()) {
+    wrapper = wrapperList.front();
+  }
 
-    // we can't send the data right away, otherwise we could create tcp congestion
-    if (!wrapper || wrapper->isWriteLocked()) {
-        wrapper = std::make_shared<Wrapper>();
-        wrapperList.emplace_back(wrapper);
+  // we can't send the data right away, otherwise we could create tcp congestion
+  if (!wrapper || wrapper->isWriteLocked()) {
+      wrapper = std::make_shared<Wrapper>();
+      wrapperList.emplace_back(wrapper);
+  }
 
-        m_delayedWriteTimer.cancel();
-        m_delayedWriteTimer.expires_from_now(boost::posix_time::milliseconds(0));
-        m_delayedWriteTimer.async_wait(std::bind(&Connection::onCanWrite, asConnection(), std::placeholders::_1));
-    }
-
-    if (skipXtea) {
-      wrapper->disableEncryption();
-    }
-
-    flatbuffers::FlatBufferBuilder &fbb = wrapper->Builder();
-    auto fbuffer = fbb.CreateVector(buffer, size);
-    auto raw_data = CanaryLib::CreateRawData(fbb, fbuffer, size);
-    wrapper->add(raw_data.Union(), CanaryLib::DataType_RawData);
+  return wrapper;
 }
 
-void Connection::internalSend()
+void Connection::internalSend(const boost::system::error_code& error)
 {
-    if (!m_connected || wrapperList.empty())
-        return;
+    m_delayedWriteTimer.cancel();
+
+    if (error == asio::error::operation_aborted || !m_connected || wrapperList.empty())
+      return;
 
     Wrapper_ptr wrapper = wrapperList.front();
     
@@ -226,15 +215,12 @@ void Connection::onConnect(const boost::system::error_code& error)
     m_connecting = false;
 }
 
-void Connection::onCanWrite(const boost::system::error_code& error)
+void Connection::onCanWrite()
 {
-    m_delayedWriteTimer.cancel();
-
-    if (error == asio::error::operation_aborted)
-        return;
-
-    if (m_connected)
-        internalSend();
+  if (!m_connected) return;
+  m_delayedWriteTimer.cancel();
+  m_delayedWriteTimer.expires_from_now(boost::posix_time::milliseconds(0));
+  m_delayedWriteTimer.async_wait(std::bind(&Connection::internalSend, asConnection(), std::placeholders::_1));
 }
 
 void Connection::onWrite(const boost::system::error_code& error, size_t)

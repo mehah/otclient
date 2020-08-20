@@ -43,38 +43,14 @@ void ProtocolLogin::sendLoginPacket() {
 
   int paddingBytes = g_crypt.rsaGetSize() - (msg->getLength() - offset);
   msg->writePaddingBytes(paddingBytes);
-
   msg->encryptRsa();
 
-  // first RSA byte must be 0
-  offset = msg->getLength();
-  msg->writeByte(0);
-  msg->writeString(authToken);
-
-  msg->writeByte(stayLogged);
-
-  paddingBytes = g_crypt.rsaGetSize() - (msg->getLength() - offset);
-  msg->writePaddingBytes(paddingBytes);
-
-  msg->encryptRsa();
-
+spdlog::critical("{}", msg->getLength());
   send(msg, true);
   recv();
 }
 
 void ProtocolLogin::onRecv(const InputMessagePtr& msg) {}
-
-struct World_t {
-  uint8_t id;
-  uint16_t port;
-	std::string ip;
-	std::string name;
-};
-
-struct Character_t {
-	std::string name;
-  World_t world;
-};
 
 void ProtocolLogin::parseCharacterList(const CanaryLib::CharactersListData *characters) {
   Protocol::parseCharacterList(characters);

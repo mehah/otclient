@@ -46,7 +46,9 @@ public:
     void connect(const std::string& host, uint16 port, const std::function<void()>& connectCallback);
     void close();
 
-    void write(uint8* buffer, size_t size, bool skipXtea);
+    Wrapper_ptr getOutputWrapper();
+    
+    void onCanWrite();
     void read(uint16 bytes, const RecvCallback& callback);
     void read_until(const std::string& what, const RecvCallback& callback);
 
@@ -63,10 +65,9 @@ public:
 
 protected:
     void internal_connect(asio::ip::basic_resolver<asio::ip::tcp>::iterator endpointIterator);
-    void internalSend();
+    void internalSend(const boost::system::error_code& error);
     void onResolve(const boost::system::error_code& error, asio::ip::tcp::resolver::iterator endpointIterator);
     void onConnect(const boost::system::error_code& error);
-    void onCanWrite(const boost::system::error_code& error);
     void onWrite(const boost::system::error_code& error, size_t writeSize);
     void onRecv(const boost::system::error_code& error, size_t recvSize);
     void onTimeout(const boost::system::error_code& error);
