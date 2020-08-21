@@ -25,32 +25,44 @@
 #include <framework/util/crypt.h>
 
 void ProtocolLogin::sendLoginPacket() {
-  OutputMessagePtr msg = OutputMessagePtr(new OutputMessage);
-  msg->writeByte(CanaryLib::ClientEnterAccount);
+  if(Wrapper_ptr wrapper = getConnection()->getOutputWrapper()) {
+    // Login packet has no XTEA Encryption
+    wrapper->disableEncryption();
 
-  // first RSA byte must be 0
-  int offset = msg->getLength();
-  msg->writeByte(0);
+    flatbuffers::FlatBufferBuilder &fbb = wrapper->Builder();
+    auto account_name = fbb.CreateString(account);
+    auto auth_token = fbb.CreateString(authToken);
+    auto pass = fbb.CreateString(password);
+    auto xta_key = fbb.CreateVector(generateXteaKey());
+    auto login_info = CanaryLib::CreateLoginInfo(fbb, account_name, auth_token, pass, xta_key);
+    fbb.Finish(login_info);
 
-  std::vector<uint32_t> key = generateXteaKey();
-  msg->write<uint32_t>(key[0]);
-  msg->write<uint32_t>(key[1]);
-  msg->write<uint32_t>(key[2]);
-  msg->write<uint32_t>(key[3]);
+    auto releasedMsg = fbb.Release();
+    auto content_size = releasedMsg.size() + sizeof(uint8_t);
 
-  msg->writeString(account);
-  msg->writeString(password);
+    uint8_t buffer[g_crypt.rsaGetSize()];
+    uint8_t padding = g_crypt.rsaGetSize() - content_size;
 
-  int paddingBytes = g_crypt.rsaGetSize() - (msg->getLength() - offset);
-  msg->writePaddingBytes(paddingBytes);
-  msg->encryptRsa();
+    uint8_t byte = 0x00;
+    memcpy(buffer, &byte, 1);
+    memcpy(buffer + sizeof(uint8_t), releasedMsg.data(), releasedMsg.size());
+    memcpy(buffer + content_size, &byte, padding);
 
-spdlog::critical("{}", msg->getLength());
-  send(msg, true);
+    uint8_t final_size = content_size + padding;
+    assert(final_size == g_crypt.rsaGetSize());
+    g_crypt.rsaEncrypt(buffer, final_size);
+
+    auto enc_buffer = fbb.CreateVector(buffer, final_size);
+
+    auto login_data = CanaryLib::CreateLoginData(fbb, enc_buffer);
+    fbb.Finish(login_data);
+
+    wrapper->add(login_data.Union(), CanaryLib::DataType_LoginData);
+
+    getConnection()->onCanWrite();
+  }
   recv();
 }
-
-void ProtocolLogin::onRecv(const InputMessagePtr& msg) {}
 
 void ProtocolLogin::parseCharacterList(const CanaryLib::CharactersListData *characters) {
   Protocol::parseCharacterList(characters);

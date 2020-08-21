@@ -40,10 +40,9 @@ class ProtocolLogin : public Protocol
     }
     void sendLoginPacket();
     void onConnect() override;
-    void onRecv(const InputMessagePtr& inputMessage) override;
     
-    virtual void parseCharacterList(const CanaryLib::CharactersListData *characters) override;
-    virtual void parseError(const CanaryLib::ErrorData *err) override;
+    void parseCharacterList(const CanaryLib::CharactersListData *characters) override;
+    void parseError(const CanaryLib::ErrorData *err) override;
     
   private:
     std::string account;
