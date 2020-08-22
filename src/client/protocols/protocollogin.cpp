@@ -28,14 +28,20 @@ void ProtocolLogin::sendLoginPacket() {
   if(Wrapper_ptr wrapper = getConnection()->getOutputWrapper()) {
     // Login packet has no XTEA Encryption
     wrapper->disableEncryption();
+    wrapper->setProtocolType(protocolType);
 
     flatbuffers::FlatBufferBuilder &fbb = wrapper->Builder();
     auto account_name = fbb.CreateString(account);
     auto auth_token = fbb.CreateString(authToken);
     auto pass = fbb.CreateString(password);
-    auto xta_key = fbb.CreateVector(generateXteaKey());
-    auto login_info = CanaryLib::CreateLoginInfo(fbb, account_name, auth_token, pass, xta_key);
-    fbb.Finish(login_info);
+    auto xtea_key = fbb.CreateVector(generateXteaKey());
+
+    CanaryLib::LoginInfoBuilder login_info_builder(fbb);
+    login_info_builder.add_account(account_name);
+    login_info_builder.add_auth_token(auth_token);
+    login_info_builder.add_password(pass);
+    login_info_builder.add_xtea_key(xtea_key);
+    fbb.Finish(login_info_builder.Finish());
 
     auto releasedMsg = fbb.Release();
     auto content_size = releasedMsg.size() + sizeof(uint8_t);
@@ -54,7 +60,7 @@ void ProtocolLogin::sendLoginPacket() {
 
     auto enc_buffer = fbb.CreateVector(buffer, final_size);
 
-    auto login_data = CanaryLib::CreateLoginData(fbb, enc_buffer);
+    auto login_data = CanaryLib::CreateLoginData(fbb, enc_buffer, CanaryLib::Client_t_CANARY);
     fbb.Finish(login_data);
 
     wrapper->add(login_data.Union(), CanaryLib::DataType_LoginData);

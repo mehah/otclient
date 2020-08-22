@@ -295,6 +295,8 @@ private:
     std::string m_sessionKey;
     std::string m_characterName;
     LocalPlayerPtr m_localPlayer;
+
+    CanaryLib::Protocol_t protocolType = CanaryLib::Protocol_t_PROTOCOL_GAME;
 };
 
 #endif

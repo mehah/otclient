@@ -49,6 +49,8 @@ class ProtocolLogin : public Protocol
     std::string password;
     std::string authToken;
     bool stayLogged;
+
+    CanaryLib::Protocol_t protocolType = CanaryLib::Protocol_t_PROTOCOL_LOGIN;
 };
 
 #endif

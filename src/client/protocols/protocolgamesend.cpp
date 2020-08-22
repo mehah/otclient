@@ -50,39 +50,46 @@ void ProtocolGame::sendExtendedOpcode(uint8 opcode, const std::string& buffer)
 
 void ProtocolGame::sendLoginPacket(uint challengeTimestamp, uint8 challengeRandom)
 {
-    OutputMessagePtr msg(new OutputMessage);
+  if(Wrapper_ptr wrapper = getConnection()->getOutputWrapper()) {
+    // Login packet has no XTEA Encryption
+    wrapper->disableEncryption();
+    wrapper->setProtocolType(protocolType);
 
-    msg->addU8(CanaryLib::ClientPendingGame);
-    msg->addU16(g_game.getOs());
+    flatbuffers::FlatBufferBuilder &fbb = wrapper->Builder();
+    auto char_name = fbb.CreateString(m_characterName);
+    auto session_key = fbb.CreateString(m_sessionKey);
+    auto game_login_info = CanaryLib::CreateGameLoginInfo(fbb, session_key, char_name);
+    auto xtea_key = fbb.CreateVector(generateXteaKey());
+    CanaryLib::LoginInfoBuilder login_info_builder(fbb);
 
-    const int offset = msg->getMessageSize();
-    // first RSA byte must be 0
-    msg->addU8(0);
+    login_info_builder.add_game_login_info(game_login_info);
+    login_info_builder.add_xtea_key(xtea_key);
+    fbb.Finish(login_info_builder.Finish());
 
-    if(g_game.getFeature(Otc::GameLoginPacketEncryption)) {
-        // xtea key
-        std::vector<uint32_t> key = generateXteaKey();
-        msg->addU32(key[0]);
-        msg->addU32(key[1]);
-        msg->addU32(key[2]);
-        msg->addU32(key[3]);
-    }
+    auto releasedMsg = fbb.Release();
+    auto content_size = releasedMsg.size() + sizeof(uint8_t);
 
-    msg->addString(m_sessionKey);
-    msg->addString(m_characterName);
+    uint8_t buffer[g_crypt.rsaGetSize()];
+    uint8_t padding = g_crypt.rsaGetSize() - content_size;
 
-    msg->addU32(challengeTimestamp);
-    msg->addU8(challengeRandom);
+    uint8_t byte = 0x00;
+    memcpy(buffer, &byte, 1);
+    memcpy(buffer + sizeof(uint8_t), releasedMsg.data(), releasedMsg.size());
+    memcpy(buffer + content_size, &byte, padding);
 
-    // complete the bytes for rsa encryption with zeros
-    const int paddingBytes = g_crypt.rsaGetSize() - (msg->getMessageSize() - offset);
-    assert(paddingBytes >= 0);
-    msg->addPaddingBytes(paddingBytes);
+    uint8_t final_size = content_size + padding;
+    assert(final_size == g_crypt.rsaGetSize());
+    g_crypt.rsaEncrypt(buffer, final_size);
 
-    // encrypt with RSA
-    msg->encryptRsa();
+    auto enc_buffer = fbb.CreateVector(buffer, final_size);
+    auto challenge = CanaryLib::CreateChallenge(fbb, challengeTimestamp, challengeRandom);
+    auto login_data = CanaryLib::CreateLoginData(fbb, enc_buffer, CanaryLib::Client_t_CANARY, challenge);
+    fbb.Finish(login_data);
 
-    send(msg, true);
+    wrapper->add(login_data.Union(), CanaryLib::DataType_LoginData);
+
+    getConnection()->onCanWrite();
+  }
 }
 
 void ProtocolGame::sendEnterGame()
