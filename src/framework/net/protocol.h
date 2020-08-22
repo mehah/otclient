@@ -20,6 +20,8 @@
 #ifndef PROTOCOL_H
 #define PROTOCOL_H
 
+#include "../pch.h"
+
 #include "declarations.h"
 #include "inputmessage.h"
 #include "outputmessage.h"
@@ -28,7 +30,7 @@
 #include <framework/luaengine/luaobject.h>
 
 // @bindclass
-class Protocol : public LuaObject
+class Protocol : public LuaObject, public CanaryLib::FlatbuffersParser
 {
 public:
     Protocol();
@@ -45,7 +47,6 @@ public:
     void setConnection(const ConnectionPtr& connection) { m_connection = connection; }
 
     std::vector<uint32> generateXteaKey();
-    void setXteaKey(uint32 a, uint32 b, uint32 c, uint32 d);
     std::vector<uint32> getXteaKey();
 
     virtual void send(const OutputMessagePtr& outputMessage, bool skipXtea = false);
@@ -58,12 +59,10 @@ protected:
     virtual void onRecv(const InputMessagePtr& inputMessage);
     virtual void onError(const boost::system::error_code& err);
 
-    // Parsers
-    void parseContentMessage(const CanaryLib::ContentMessage *content_msg);
-    void parseRawData(const CanaryLib::RawData *raw_data);
-
-    virtual void parseCharacterList(const CanaryLib::CharactersListData *characters);
-    virtual void parseError(const CanaryLib::ErrorData *err);
+    // Flatbuffer Parsers Override
+    void parseCharacterList(const CanaryLib::CharactersListData *characters) override;
+    void parseError(const CanaryLib::ErrorData *err) override;
+    void parseRawData(const CanaryLib::RawData *raw_data) override;
 
 private:
     void internalRecvHeader(uint8* buffer, uint16 size);

@@ -17,6 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#include "../pch.h"
 #include "protocol.h"
 #include "connection.h"
 #include <framework/core/application.h>
@@ -111,7 +112,6 @@ void Protocol::internalRecvData(uint8* buffer, uint16 size)
     }
 
     wrapper.copy(buffer, size);
-
     if(!wrapper.readChecksum()) {
       g_logger.traceError("got a network message with invalid checksum");
       return;
@@ -127,18 +127,14 @@ void Protocol::internalRecvData(uint8* buffer, uint16 size)
 
     m_inputMessage->reset();
     parseContentMessage(CanaryLib::GetContentMessage(body_buffer));
+
+    if (m_connection && m_connection->isConnected()) recv();
 }
 
 std::vector<uint32> Protocol::generateXteaKey()
 {
   xtea.generateKey();
   return getXteaKey();
-}
-
-void Protocol::setXteaKey(uint32 a, uint32 b, uint32 c, uint32 d)
-{
-  uint32_t key[4] = { a, b, c, d };
-  xtea.setKey(key);
 }
 
 std::vector<uint32> Protocol::getXteaKey()
@@ -165,12 +161,4 @@ void Protocol::onError(const boost::system::error_code& err)
     spdlog::error("{}", err.message());
     callLuaField("onError", err.message(), err.value());
     disconnect();
-}
-
-void Protocol::parseCharacterList(const CanaryLib::CharactersListData *characters) {
-    spdlog::debug("Calling Protocol::parseCharacterList");
-}
-
-void Protocol::parseError(const CanaryLib::ErrorData *err) {
-    spdlog::error("{}", err->message()->str());
 }

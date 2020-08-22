@@ -771,8 +771,6 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Protocol>("setConnection", &Protocol::setConnection);
     g_lua.bindClassMemberFunction<Protocol>("send", &Protocol::send);
     g_lua.bindClassMemberFunction<Protocol>("recv", &Protocol::recv);
-    g_lua.bindClassMemberFunction<Protocol>("setXteaKey", &Protocol::setXteaKey);
-    g_lua.bindClassMemberFunction<Protocol>("getXteaKey", &Protocol::getXteaKey);
 
     // ProtocolHttp
     g_lua.registerClass<ProtocolHttp>();
