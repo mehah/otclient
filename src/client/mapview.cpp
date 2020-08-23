@@ -118,7 +118,14 @@ void MapView::draw(const Rect& rect)
         g_painter->setColor(Color::white);
 
         const auto& lightView = (m_lightView && m_lightView->isDark()) ? m_lightView.get() : nullptr;
-        const auto& viewPort = isFollowingCreature() && m_followingCreature->isWalking() ? m_viewPortDirection[m_followingCreature->getDirection()] : m_viewPortDirection[Otc::InvalidDirection];
+        auto& viewPort = isFollowingCreature() && m_followingCreature->isWalking() ? m_viewPortDirection[m_followingCreature->getDirection()] : m_viewPortDirection[Otc::InvalidDirection];
+
+        // add one tile to viewport, so we don't crop out non visible tiles with objects that are technically still seeable
+        viewPort.bottom += 1;
+        viewPort.top += 1;
+        viewPort.left += 1;
+        viewPort.right += 1;
+
         for(int_fast8_t z = m_floorMax; z >= m_floorMin; --z) {
 #if DRAW_SEPARATELY == 1
             drawSeparately(z, viewPort, lightView);
