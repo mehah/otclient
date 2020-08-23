@@ -72,22 +72,29 @@ void ProtocolLogin::sendLoginPacket() {
 
 void ProtocolLogin::parseCharacterList(const CanaryLib::CharactersListData *characters) {
   Protocol::parseCharacterList(characters);
-  callLuaField("onMotd", characters->motd()->str());
+  if (!characters) return;
+  
+  if (characters->motd())
+    callLuaField("onMotd", characters->motd()->str());
 
   auto account = characters->account();
-  callLuaField("onSessionKey", account->session_key()->str());
+  if (account)
+    callLuaField("onSessionKey", account->session_key()->str());
 
   std::vector<const CanaryLib::CharacterInfo *> charList;
-  for (int i = 0; i < characters->characters()->size(); i++) {
-    charList.emplace_back(characters->characters()->Get(i));
-    auto c = characters->characters()->Get(i);
+  if (characters->characters()) {
+    for (int i = 0; i < characters->characters()->size(); i++) {
+      charList.emplace_back(characters->characters()->Get(i));
+      auto c = characters->characters()->Get(i);
+    }
+    callLuaField("onCharacterList", charList, characters->world(), account);
   }
-  callLuaField("onCharacterList", charList, characters->world(), account);
 
   disconnect();
 }
 
 void ProtocolLogin::parseError(const CanaryLib::ErrorData *err) {
+  if (!error || !error->message()) return;
   callLuaField("onLoginError", err->message()->str());
   Protocol::parseError(err);
 }

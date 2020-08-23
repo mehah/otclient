@@ -21,6 +21,7 @@
 #include "connection.h"
 
 void Protocol::parseRawData(const CanaryLib::RawData *raw_data) {
+  if (!raw_data || !raw_data->body()) return;
   m_inputMessage->write(raw_data->body()->data(), raw_data->size(), CanaryLib::MESSAGE_OPERATION_PEEK);
   onRecv(m_inputMessage);
 }
