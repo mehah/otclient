@@ -25,11 +25,3 @@ void Protocol::parseRawData(const CanaryLib::RawData *raw_data) {
   onRecv(m_inputMessage);
 }
 
-void Protocol::parseCharacterList(const CanaryLib::CharactersListData *characters) {
-    spdlog::debug("Calling Protocol::parseCharacterList");
-}
-
-void Protocol::parseError(const CanaryLib::ErrorData *err) {
-    spdlog::error("{}", err->message()->str());
-}
-

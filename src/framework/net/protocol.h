@@ -60,8 +60,6 @@ protected:
     virtual void onError(const boost::system::error_code& err);
 
     // Flatbuffer Parsers Override
-    void parseCharacterList(const CanaryLib::CharactersListData *characters) override;
-    void parseError(const CanaryLib::ErrorData *err) override;
     void parseRawData(const CanaryLib::RawData *raw_data) override;
 
 private:
