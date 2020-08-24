@@ -94,7 +94,7 @@ void ProtocolLogin::parseCharacterList(const CanaryLib::CharactersListData *char
 }
 
 void ProtocolLogin::parseError(const CanaryLib::ErrorData *err) {
-  if (!error || !error->message()) return;
+  if (!err || !err->message()) return;
   callLuaField("onLoginError", err->message()->str());
   Protocol::parseError(err);
 }
