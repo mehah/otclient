@@ -255,6 +255,8 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
 bool Tile::removeThing(const ThingPtr& thing)
 {
     if(!thing) return false;
+  
+    ThingPtr temporaryReference = thing;
 
     if(thing->isEffect()) {
         const EffectPtr& effect = thing->static_self_cast<Effect>();
@@ -310,6 +312,7 @@ bool Tile::removeThing(const ThingPtr& thing)
     if(thing->isTranslucent())
         checkTranslucentLight();
 
+    temporaryReference = nullptr;
     return true;
 }
 
