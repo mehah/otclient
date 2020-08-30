@@ -165,7 +165,16 @@ end
 
 function whenManaChange()
   if g_game.isOnline() then
-    local maxMana = math.max(1, g_game.getLocalPlayer():getMaxMana())
+    local maxMana = g_game.getLocalPlayer():getMaxMana()
+    if maxMana <= 0 then 
+        manaCircle:setVisible(false)
+        manaCircleFront:setVisible(false)
+        return
+    elseif isManaCircle then
+        manaCircle:setVisible(true)
+        manaCircleFront:setVisible(true)
+    end
+
     local manaPercent = math.floor(maxMana - (maxMana - g_game.getLocalPlayer():getMana())) * 100 / maxMana
     local Ymppc = math.floor(208 * (1 - (manaPercent / 100)))
     local rect = { x = 0, y = Ymppc, width = 63, height = 208 }
