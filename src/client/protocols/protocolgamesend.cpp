@@ -23,9 +23,10 @@
 #include <framework/core/application.h>
 #include <framework/platform/platform.h>
 #include <framework/util/crypt.h>
+#include "protocolgame.h"
+
 #include "../client.h"
 #include "../game.h"
-#include "protocolgame.h"
 
 void ProtocolGame::send(const OutputMessagePtr& outputMessage, bool skipXtea)
 {
@@ -69,7 +70,9 @@ void ProtocolGame::sendLoginPacket(uint challengeTimestamp, uint8 challengeRando
     auto releasedMsg = fbb.Release();
     auto content_size = releasedMsg.size() + sizeof(uint8_t);
 
-    uint8_t buffer[g_crypt.rsaGetSize()];
+    assert(RSA_SIZE == g_crypt.rsaGetSize());
+    
+    uint8_t buffer[RSA_SIZE];
     uint8_t padding = g_crypt.rsaGetSize() - content_size;
 
     uint8_t byte = 0x00;

@@ -157,10 +157,12 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
 
-include(FindCXX11)
-
 # gcc compile flags
-set(WARNS_FLAGS "-Wall -Wextra -Wno-unused -Wno-unused-parameter -Wno-unused-result")
+  if(CMAKE_COMPILER_IS_GNUCXX)
+    set(WARNS_FLAGS "-Wall -Wextra -Wno-unused -Wno-unused-parameter -Wno-unused-result")
+  else()
+    set(WARNS_FLAGS "-Wall")
+  endif()
 set(CMAKE_CXX_FLAGS                   "${CMAKE_CXX_FLAGS} ${WARNS_FLAGS} ${ARCH_FLAGS} ${CPP2011_FLAGS} -pipe")
 set(CMAKE_CXX_FLAGS_COMPILESPEED      "-O0")
 set(CMAKE_CXX_FLAGS_DEBUG             "-O0 -g")

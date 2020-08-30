@@ -259,40 +259,6 @@ void Crypt::rsaSetPublicKey(const std::string& n, const std::string& e)
 #endif
 }
 
-void Crypt::rsaSetPrivateKey(const std::string& p, const std::string& q, const std::string& d)
-{
-#ifdef USE_GMP
-    mpz_set_str(m_p, p.c_str(), 10);
-    mpz_set_str(m_q, q.c_str(), 10);
-    mpz_set_str(m_d, d.c_str(), 10);
-
-    // n = p * q
-    mpz_mul(n, p, q);
-#else
-#if OPENSSL_VERSION_NUMBER < 0x10100005L
-    BN_dec2bn(&m_rsa->p, p.c_str());
-    BN_dec2bn(&m_rsa->q, q.c_str());
-    BN_dec2bn(&m_rsa->d, d.c_str());
-    // clear rsa cache
-    if(m_rsa->_method_mod_p) {
-        BN_MONT_CTX_free(m_rsa->_method_mod_p);
-        m_rsa->_method_mod_p = nullptr;
-    }
-    if(m_rsa->_method_mod_q) {
-        BN_MONT_CTX_free(m_rsa->_method_mod_q);
-        m_rsa->_method_mod_q = nullptr;
-    }
-#else
-    BIGNUM *bp = nullptr, *bq = nullptr, *bd = nullptr;
-    BN_dec2bn(&bp, p.c_str());
-    BN_dec2bn(&bq, q.c_str());
-    BN_dec2bn(&bd, d.c_str());
-    RSA_set0_key(m_rsa, nullptr, nullptr, bd);
-    RSA_set0_factors(m_rsa, bp, bq);
-#endif
-#endif
-}
-
 bool Crypt::rsaEncrypt(unsigned char *msg, int size)
 {
     if(size != rsaGetSize())

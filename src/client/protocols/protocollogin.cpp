@@ -46,7 +46,9 @@ void ProtocolLogin::sendLoginPacket() {
     auto releasedMsg = fbb.Release();
     auto content_size = releasedMsg.size() + sizeof(uint8_t);
 
-    uint8_t buffer[g_crypt.rsaGetSize()];
+    assert(RSA_SIZE == g_crypt.rsaGetSize());
+    
+    uint8_t buffer[RSA_SIZE];
     uint8_t padding = g_crypt.rsaGetSize() - content_size;
 
     uint8_t byte = 0x00;

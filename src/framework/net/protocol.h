@@ -29,6 +29,8 @@
 
 #include <framework/luaengine/luaobject.h>
 
+constexpr int RSA_SIZE = 128;
+
 // @bindclass
 class Protocol : public LuaObject, public CanaryLib::FlatbuffersParser
 {
