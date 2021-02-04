@@ -115,17 +115,8 @@ void Tile::drawEnd(const MapViewPtr& /*mapView*/)
 
 void Tile::drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor, bool animate, int frameFlag, LightView* lightView)
 {
-    if(lightView) {
-        if(lightView->getVersion() >= 2) {
-            if(m_completelyCovered) {
-                frameFlag = Otc::FUpdateLight;
-            }
-        } else if(isCovered()) {
-            if(thing->isCreature() && !isWalkable(true)) {
-                const auto& tile = thing->getTile();
-                if(!tile || tile->isCovered()) lightView = nullptr;
-            } else lightView = nullptr;
-        }
+    if(lightView && m_completelyCovered) {
+        frameFlag = Otc::FUpdateLight;
     }
 
     const auto putShadowColor = g_painter->getColor() == m_borderShadowColor && (!thing->isGroundBorder() && !thing->isTall());
@@ -180,7 +171,7 @@ void Tile::drawBottom(const Point& dest, float scaleFactor, int frameFlags, Ligh
         const auto& creature = *it;
         if(creature->isWalking()) continue;
         drawThing(creature, dest - m_drawElevation * scaleFactor, scaleFactor, true, frameFlags, lightView);
-}
+    }
 #else
     for(const auto& creature : m_creatures) {
         if(creature->isWalking()) continue;

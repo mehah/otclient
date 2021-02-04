@@ -47,8 +47,9 @@ struct PositionLight : Position {
 };
 
 struct DimensionConfig {
-    std::vector<PositionLight> positions;
-    std::vector<PositionLight> edges;
+    std::vector<PositionLight>
+        positions,
+        edges;
 
     bool isEdge(const Position pos) const
     {
@@ -57,25 +58,24 @@ struct DimensionConfig {
 };
 
 struct LightSource {
-    LightSource() : radius(0) {}
-    LightSource(int radius) : radius(radius) {}
+    LightSource() : radius(0) { reset(); }
+    LightSource(int radius) : radius(radius) { reset(); }
 
     int8_t radius;
 
-    Color color = Color::alpha;
+    Color color;
     Point center;
+    Position pos, centralPos;
     std::pair<Point, Point> extraOffset;
 
-    bool canMove = true,
-        reverter = false,
-        isEdge = false;
+    bool isCovered, isEdge;
 
     // Comparison Var
-    uint8 color8bit = 215;
-    float brightness = 0;
+    uint8 color8bit;
+    float brightness;
 
-    void reset() { color = Color::alpha; canMove = true; reverter = false; }
-    bool hasLight() const { return color != Color::alpha; }
+    void reset() { color = Color::black, isCovered = isEdge = false, color8bit = brightness = 0; }
+    bool hasLight() const { return color != Color::black; }
     bool isValid() const { return radius > -1; }
     bool isMoving() const { return extraOffset.first != extraOffset.second; }
 };
@@ -83,48 +83,39 @@ struct LightSource {
 class LightView : public LuaObject
 {
 public:
-    LightView(const MapViewPtr& mapView, const uint8 version);
+    LightView(const MapViewPtr& mapView);
 
     const Light& getGlobalLight() { return m_globalLight; }
 
-    void reset();
-    void setGlobalLight(const Light& light);
-    void addLightSource(const Position& pos, const Point& center, float scaleFactor, const Light& light, const ThingPtr& thing = nullptr);
     void resize();
+    void reset() { m_lightMap.clear(); }
     void draw(const Rect& dest, const Rect& src);
+    void addLightSource(const Position& pos, const Point& center, float scaleFactor, const Light& light, const ThingPtr& thing = nullptr);
 
-    void setBlendEquation(Painter::BlendEquation blendEquation) { m_blendEquation = blendEquation; }
-    void schedulePainting(const uint16_t delay = FrameBuffer::MIN_TIME_UPDATE) { if(isDark()) m_lightbuffer->schedulePainting(delay); }
+    void setGlobalLight(const Light& light) { m_globalLight = light; }
+    void schedulePainting(const uint16_t delay = FrameBuffer::MIN_TIME_UPDATE) const { if(isDark()) m_lightbuffer->schedulePainting(delay); }
+
     bool canUpdate() const { return isDark() && m_lightbuffer->canUpdate(); }
-
     bool isDark() const { return m_globalLight.intensity < 250; }
 
-    uint8 getVersion() const { return m_version; }
 private:
-    void addLightSourceV1(const Point& center, float scaleFactor, const Light& light);
-    void addLightSourceV2(const Position& pos, const Point& center, float scaleFactor, const Light& light, const ThingPtr& thing);
-    void drawGlobalLight(const Light& light);
-    void drawLightSource(const LightSource& light);
-    bool canDraw(const Position& pos, float& brightness);
-
     const DimensionConfig& getDimensionConfig(const uint8 intensity);
+    const TexturePtr generateLightBubble();
 
+    void drawGlobalLight() const;
+    void drawLightSource(const LightSource& light);
+
+    bool canDraw(const Position& pos, float& brightness);
+    LightSource& getLightSource(const Position& pos);
+
+    TexturePtr m_lightTexture;
     Light m_globalLight;
 
-    TexturePtr generateLightBubble();
-    TexturePtr m_lightTexture;
-
-    Painter::BlendEquation m_blendEquation;
-
     FrameBufferPtr m_lightbuffer;
+    MapViewPtr m_mapView;
 
     std::vector<LightSource> m_lightMap;
     std::array<DimensionConfig, MAX_LIGHT_INTENSITY> m_dimensionCache;
-    MapViewPtr m_mapView;
-
-    LightSource& getLightSource(const Position& pos);
-
-    uint8 m_version;
 };
 
 #endif

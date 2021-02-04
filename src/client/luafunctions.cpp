@@ -759,7 +759,6 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIMap>("setMapShader", &UIMap::setMapShader);
     g_lua.bindClassMemberFunction<UIMap>("setMinimumAmbientLight", &UIMap::setMinimumAmbientLight);
     g_lua.bindClassMemberFunction<UIMap>("setLimitVisibleRange", &UIMap::setLimitVisibleRange);
-    g_lua.bindClassMemberFunction<UIMap>("setAddLightMethod", &UIMap::setAddLightMethod);
     g_lua.bindClassMemberFunction<UIMap>("isMultifloor", &UIMap::isMultifloor);
     g_lua.bindClassMemberFunction<UIMap>("isAutoViewModeEnabled", &UIMap::isAutoViewModeEnabled);
     g_lua.bindClassMemberFunction<UIMap>("isDrawingTexts", &UIMap::isDrawingTexts);
@@ -787,8 +786,6 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIMap>("getSpectators", &UIMap::getSpectators);
     g_lua.bindClassMemberFunction<UIMap>("setCrosshairTexture", &UIMap::setCrosshairTexture);
     g_lua.bindClassMemberFunction<UIMap>("setDrawHighlightTarget", &UIMap::setDrawHighlightTarget);
-    g_lua.bindClassMemberFunction<UIMap>("setLightVersion", &UIMap::setLightVersion);
-    g_lua.bindClassMemberFunction<UIMap>("getLightVersion", &UIMap::getLightVersion);
 
     g_lua.registerClass<UIMinimap, UIWidget>();
     g_lua.bindClassStaticFunction<UIMinimap>("create", [] { return UIMinimapPtr(new UIMinimap); });
