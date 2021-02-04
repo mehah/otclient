@@ -211,6 +211,21 @@ void LightView::drawGlobalLight() const
     g_painter->drawFilledRect(Rect(0, 0, m_lightbuffer->getSize()));
 }
 
+void LightView::drawLights()
+{
+    g_painter->setBlendEquation(Painter::BlendEquation_Add);
+    g_painter->setCompositionMode(Painter::CompositionMode_Add);
+
+    for(LightSource& source : m_lightMap) {
+        if(!source.hasLight()) continue;
+
+        source.center += source.extraOffset.second;
+
+        drawLightSource(source);
+        source.reset();
+    }
+}
+
 void LightView::drawLightSource(const LightSource& light)
 {
     const Rect dest = Rect(light.center - Point(light.radius, light.radius), Size(light.radius * 2, light.radius * 2));
@@ -234,18 +249,7 @@ void LightView::draw(const Rect& dest, const Rect& src)
         m_lightbuffer->bind();
 
         drawGlobalLight();
-
-        g_painter->setBlendEquation(Painter::BlendEquation_Add);
-        g_painter->setCompositionMode(Painter::CompositionMode_Add);
-
-        for(LightSource& source : m_lightMap) {
-            if(!source.hasLight()) continue;
-
-            source.center += source.extraOffset.second;
-
-            drawLightSource(source);
-            source.reset();
-        }
+        drawLights();
 
         m_lightbuffer->release();
     }

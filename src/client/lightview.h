@@ -58,23 +58,22 @@ struct DimensionConfig {
 };
 
 struct LightSource {
-    LightSource() : radius(0) { reset(); }
-    LightSource(int radius) : radius(radius) { reset(); }
+    LightSource(const bool invalid = false) : radius(0) { if(invalid) radius = -1; else reset(); }
 
     int8_t radius;
-
     Color color;
     Point center;
     Position pos, centralPos;
     std::pair<Point, Point> extraOffset;
 
-    bool isCovered, isEdge;
-
     // Comparison Var
     uint8 color8bit;
     float brightness;
 
+    bool isCovered, isEdge;
+
     void reset() { color = Color::black, isCovered = isEdge = false, color8bit = brightness = 0; }
+
     bool hasLight() const { return color != Color::black; }
     bool isValid() const { return radius > -1; }
     bool isMoving() const { return extraOffset.first != extraOffset.second; }
@@ -102,6 +101,7 @@ private:
     const DimensionConfig& getDimensionConfig(const uint8 intensity);
     const TexturePtr generateLightBubble();
 
+    void drawLights();
     void drawGlobalLight() const;
     void drawLightSource(const LightSource& light);
 
