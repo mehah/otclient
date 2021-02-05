@@ -84,7 +84,7 @@ void LightView::addLightSource(const Position& pos, const Point& center, float s
 
     // (pos.isValid() == false) is a Missile
     bool isMoving = !pos.isValid();
-    Otc::Direction dir;
+    Otc::Direction dir = Otc::InvalidDirection;
     if(thing && thing->isCreature()) {
         const CreaturePtr& creature = thing->static_self_cast<Creature>();
         extraOffset.first = Point(16, 16) * scaleFactor;
@@ -112,8 +112,8 @@ void LightView::addLightSource(const Position& pos, const Point& center, float s
                     continue;
                 }
 
-                if(staticLight.color == light.color && staticLight.brightness > position.brightness) {
-                    staticLight.brightness = position.brightness;
+                if(staticLight.color == light.color && brightness > staticLight.brightness) {
+                    staticLight.brightness = brightness;
                     continue;
                 }
             }
@@ -123,7 +123,7 @@ void LightView::addLightSource(const Position& pos, const Point& center, float s
         lightSource.pos = lightPos;
         lightSource.color = light.color;
         lightSource.radius = radius;
-        lightSource.center = center + ((position.point * Otc::TILE_PIXELS) * scaleFactor);
+        lightSource.center = center + ((position.point * (Otc::TILE_PIXELS * 1)) * scaleFactor);
         lightSource.centralPos = centralPos;
         lightSource.extraOffset = extraOffset;
         lightSource.brightness = brightness;
@@ -256,13 +256,29 @@ void LightView::drawLights()
             }
 
             for(auto& light : lightPoint.dynamicLights) {
-                g_painter->setBlendEquation(Painter::BlendEquation_Add);
+                if(lightPoint.hasStaticLight()) {
+                    auto& staticLight = lightPoint.staticLight;
+                    if(staticLight.pos.z == light.pos.z) {
+                        if(staticLight.color > light.color) {
+                            staticLight.color = light.color;
+                        }
+
+                        if(staticLight.color == light.color && light.brightness < staticLight.brightness) {
+                            light.brightness = staticLight.brightness;
+                        }
+                    }
+
+                    if(!staticLight.isEdge)
+                        continue;
+                }
+
+                light.center += light.extraOffset.second;
 
                 const bool canDrawLight = canDraw(light.pos, light.brightness) && !lightPoint.hasStaticLight();
 
                 const auto originalOffset = light.center;
 
-                light.center += light.extraOffset.second;
+
 
 
                 /*if(!canDrawLight) {
@@ -282,12 +298,15 @@ void LightView::drawLights()
                     light.center += light.extraOffset.second;
                 }*/
 
+                g_painter->setBlendEquation(Painter::BlendEquation_Add);
                 drawLightSource(light);
 
                 if(!canDrawLight) {
+                    light.center = (originalOffset)+light.extraOffset.first;
+                    //light.radius *= 1.12;
+                    //light.radius *= 1.07;
+
                     g_painter->setBlendEquation(Painter::BlendEquation_Rever_Subtract);
-                    light.center = originalOffset + light.extraOffset.first;
-                    light.radius *= 1.02;
                     drawLightSource(light);
                 }
             }
