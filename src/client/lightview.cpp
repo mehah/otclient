@@ -256,14 +256,34 @@ void LightView::drawLights()
                 g_painter->setBlendEquation(Painter::BlendEquation_Add);
 
                 const bool canDrawLight = canDraw(light.pos, light.brightness) && !lightPoint.hasStaticLight();
+
                 const auto originalOffset = light.center;
 
                 light.center += light.extraOffset.second;
+
+                /*if(!canDrawLight) {
+                    bool hasLight = false;
+                    for(const auto& posAround : light.pos.getPositionsAround()) {
+                        if(getLightPoint(posAround).hasStaticLight()) {
+                            hasLight = true;
+                            break;
+                        }
+                    }
+                    if(hasLight) {
+                        light.center += light.extraOffset.second;
+                    } else {
+                        light.center += light.extraOffset.first;
+                    }
+                } else {
+                    light.center += light.extraOffset.second;
+                }*/
+
                 drawLightSource(light);
 
                 if(!canDrawLight) {
                     g_painter->setBlendEquation(Painter::BlendEquation_Rever_Subtract);
                     light.center = originalOffset + light.extraOffset.first;
+                    light.radius *= 1.02;
 
                     drawLightSource(light);
                 }
