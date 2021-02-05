@@ -47,7 +47,6 @@ const TexturePtr LightView::generateLightBubble()
     const float centerFactor = .0f;
 
     const uint16 bubbleRadius = 256,
-        centerRadius = bubbleRadius * centerFactor,
         bubbleDiameter = bubbleRadius * 2;
 
     ImagePtr lightImage = ImagePtr(new Image(Size(bubbleDiameter, bubbleDiameter)));
@@ -55,7 +54,7 @@ const TexturePtr LightView::generateLightBubble()
     for(int_fast16_t x = -1; ++x < bubbleDiameter;) {
         for(int_fast16_t y = -1; ++y < bubbleDiameter;) {
             const float radius = std::sqrt((bubbleRadius - x) * (bubbleRadius - x) + (bubbleRadius - y) * (bubbleRadius - y));
-            float intensity = stdext::clamp<float>((bubbleRadius - radius) / static_cast<float>(bubbleRadius - centerRadius), .0f, 1.0f);
+            float intensity = stdext::clamp<float>((bubbleRadius - radius) / static_cast<float>(bubbleRadius), .0f, 1.0f);
 
             // light intensity varies inversely with the square of the distance
             intensity = std::min<float>(intensity * intensity, 0.4);
@@ -85,11 +84,13 @@ void LightView::addLightSource(const Position& pos, const Point& center, float s
 
     // (pos.isValid() == false) is a Missile
     bool isMoving = !pos.isValid();
+    Otc::Direction dir;
     if(thing && thing->isCreature()) {
         const CreaturePtr& creature = thing->static_self_cast<Creature>();
         extraOffset.first = Point(16, 16) * scaleFactor;
         extraOffset.second = (creature->getWalkOffset() + Point(16, 16)) * scaleFactor;
         isMoving = extraOffset.first != extraOffset.second;
+        dir = creature->getDirection();
     }
 
     const uint16 radius = (Otc::TILE_PIXELS * scaleFactor) * extraRadius;
@@ -126,6 +127,7 @@ void LightView::addLightSource(const Position& pos, const Point& center, float s
         lightSource.centralPos = centralPos;
         lightSource.extraOffset = extraOffset;
         lightSource.brightness = brightness;
+        lightSource.dir = dir;
 
         if(isMoving) {
             lightPoint.dynamicLights.push_back(lightSource);
@@ -240,6 +242,7 @@ void LightView::drawGlobalLight() const
     g_painter->drawFilledRect(Rect(0, 0, m_lightbuffer->getSize()));
 }
 
+const static auto& POSITION_TRANSLATED_FNCS = { &Position::translatedToDirection, &Position::translatedToReverseDirection };
 void LightView::drawLights()
 {
     g_painter->setCompositionMode(Painter::CompositionMode_Add);

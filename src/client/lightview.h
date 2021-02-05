@@ -64,6 +64,7 @@ struct LightSource {
     Point center;
     Position pos, centralPos;
     std::pair<Point, Point> extraOffset;
+    Otc::Direction dir;
 
     // Comparison Var
     uint8 color;
