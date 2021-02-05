@@ -61,22 +61,40 @@ struct LightSource {
     LightSource(const bool invalid = false) : radius(0) { if(invalid) radius = -1; else reset(); }
 
     int8_t radius;
-    Color color;
     Point center;
     Position pos, centralPos;
     std::pair<Point, Point> extraOffset;
 
     // Comparison Var
-    uint8 color8bit;
+    uint8 color;
     float brightness;
 
     bool isCovered, isEdge;
 
-    void reset() { color = Color::black, isCovered = isEdge = false, color8bit = brightness = 0; }
+    void reset()
+    {
+        isCovered = isEdge = false;
+        radius = color = brightness = 0;
+        pos = centralPos = Position();
+        center = Point();
+        extraOffset = std::make_pair(center, center);
+    }
 
-    bool hasLight() const { return color != Color::black; }
+    bool hasLight() const { return color > 0; }
     bool isValid() const { return radius > -1; }
     bool isMoving() const { return extraOffset.first != extraOffset.second; }
+};
+
+struct LightPoint {
+    LightPoint(const bool invalid = false) : staticLight(LightSource(invalid)) {}
+
+    LightSource staticLight;
+    std::vector<LightSource> dynamicLights;
+
+    bool hasLight() const { return hasStaticLight() || hasDynamicLights(); }
+    bool hasStaticLight() const { return staticLight.hasLight(); }
+    bool hasDynamicLights() const { return !dynamicLights.empty(); }
+    bool isValid() const { return staticLight.isValid(); }
 };
 
 class LightView : public LuaObject
@@ -106,7 +124,7 @@ private:
     void drawLightSource(const LightSource& light);
 
     bool canDraw(const Position& pos, float& brightness);
-    LightSource& getLightSource(const Position& pos);
+    LightPoint& getLightPoint(const Position& pos);
 
     TexturePtr m_lightTexture;
     Light m_globalLight;
@@ -114,7 +132,7 @@ private:
     FrameBufferPtr m_lightbuffer;
     MapViewPtr m_mapView;
 
-    std::vector<LightSource> m_lightMap;
+    std::vector<LightPoint> m_lightMap;
     std::array<DimensionConfig, MAX_LIGHT_INTENSITY> m_dimensionCache;
 };
 
