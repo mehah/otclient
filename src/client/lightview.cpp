@@ -261,6 +261,7 @@ void LightView::drawLights()
 
                 light.center += light.extraOffset.second;
 
+
                 /*if(!canDrawLight) {
                     bool hasLight = false;
                     for(const auto& posAround : light.pos.getPositionsAround()) {
@@ -284,7 +285,6 @@ void LightView::drawLights()
                     g_painter->setBlendEquation(Painter::BlendEquation_Rever_Subtract);
                     light.center = originalOffset + light.extraOffset.first;
                     light.radius *= 1.02;
-
                     drawLightSource(light);
                 }
             }
@@ -295,6 +295,7 @@ void LightView::drawLights()
             auto& light = lightPoint.staticLight;
             g_painter->setBlendEquation(Painter::BlendEquation_Add);
             drawLightSource(light);
+
             light.reset();
         }
     }
@@ -303,8 +304,9 @@ void LightView::drawLights()
 void LightView::drawLightSource(const LightSource& light)
 {
     const Rect dest = Rect(light.center - Point(light.radius, light.radius), Size(light.radius * 2, light.radius * 2));
+    const auto brightness = light.brightness - ((m_globalLight.intensity / static_cast<float>(MAX_AMBIENT_LIGHT_INTENSITY) / 4));
 
-    g_painter->setColor(Color::from8bit(light.color, light.brightness));
+    g_painter->setColor(Color::from8bit(light.color, brightness));
     g_painter->drawTexturedRect(dest, m_lightTexture);
 }
 
