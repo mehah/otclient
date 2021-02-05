@@ -78,11 +78,13 @@ void LightView::addLightSource(const Position& pos, const Point& center, float s
 #if DEBUG_BUBBLE == 1
     const float extraRadius = 1;
 #else
-    const float extraRadius = intensity > 1 ? 1.8 + std::min<float>(intensity, MAX_LIGHT_INTENSITY) / 10 : 1.1;
+    const float extraRadius = intensity > 1 ? 2.5 : 1.1;
 #endif
 
     std::pair<Point, Point> extraOffset;
-    bool isMoving = false;
+
+    // (pos.isValid() == false) is a Missile
+    bool isMoving = !pos.isValid();
     if(thing && thing->isCreature()) {
         const CreaturePtr& creature = thing->static_self_cast<Creature>();
         extraOffset.first = Point(16, 16) * scaleFactor;
@@ -91,7 +93,7 @@ void LightView::addLightSource(const Position& pos, const Point& center, float s
     }
 
     const uint16 radius = (Otc::TILE_PIXELS * scaleFactor) * extraRadius;
-    const Position centralPos = pos.isValid() ? pos : m_mapView->getPosition(center, m_mapView->m_srcRect.size());
+    const auto& centralPos = pos.isValid() ? pos : m_mapView->getPosition(center, m_mapView->m_srcRect.size());
     const auto& dimension = getDimensionConfig(intensity);
     for(const auto& position : dimension.positions)
     {
@@ -99,15 +101,20 @@ void LightView::addLightSource(const Position& pos, const Point& center, float s
         auto& lightPoint = getLightPoint(lightPos);
         if(!lightPoint.isValid()) continue;
 
-        LightSource& staticLight = lightPoint.staticLight;
-        if(!isMoving && staticLight.hasLight()) {
-            if(staticLight.color < light.color) {
-                continue;
-            }
+        auto& staticLight = lightPoint.staticLight;
+        float brightness = position.brightness;
+        if(!isMoving) {
+            if(!canDraw(lightPos, brightness)) continue;
 
-            if(staticLight.color == light.color && staticLight.brightness > position.brightness) {
-                staticLight.brightness = position.brightness;
-                continue;
+            if(staticLight.hasLight()) {
+                if(staticLight.color < light.color) {
+                    continue;
+                }
+
+                if(staticLight.color == light.color && staticLight.brightness > position.brightness) {
+                    staticLight.brightness = position.brightness;
+                    continue;
+                }
             }
         }
 
@@ -118,7 +125,7 @@ void LightView::addLightSource(const Position& pos, const Point& center, float s
         lightSource.center = center + ((position.point * Otc::TILE_PIXELS) * scaleFactor);
         lightSource.centralPos = centralPos;
         lightSource.extraOffset = extraOffset;
-        lightSource.brightness = position.brightness;
+        lightSource.brightness = brightness;
 
         if(isMoving) {
             lightPoint.dynamicLights.push_back(lightSource);
@@ -236,12 +243,19 @@ void LightView::drawGlobalLight() const
 void LightView::drawLights()
 {
     g_painter->setCompositionMode(Painter::CompositionMode_Add);
-    for(LightPoint& adapter : m_lightMap) {
-        if(adapter.hasDynamicLights()) {
-            for(auto& light : adapter.dynamicLights) {
+
+    const auto& compareLights = [](const LightSource& a, const LightSource& b) -> bool const { return a.color < b.color; };
+
+    for(LightPoint& lightPoint : m_lightMap) {
+        if(lightPoint.hasDynamicLights()) {
+            if(lightPoint.dynamicLights.size() > 1) {
+                std::sort(lightPoint.dynamicLights.begin(), lightPoint.dynamicLights.end(), compareLights);
+            }
+
+            for(auto& light : lightPoint.dynamicLights) {
                 g_painter->setBlendEquation(Painter::BlendEquation_Add);
 
-                const bool canDrawLight = canDraw(light.pos, light.brightness);
+                const bool canDrawLight = canDraw(light.pos, light.brightness) && !lightPoint.hasStaticLight();
                 const auto originalOffset = light.center;
 
                 light.center += light.extraOffset.second;
@@ -250,16 +264,15 @@ void LightView::drawLights()
                 if(!canDrawLight) {
                     g_painter->setBlendEquation(Painter::BlendEquation_Rever_Subtract);
                     light.center = originalOffset + light.extraOffset.first;
+
                     drawLightSource(light);
                 }
             }
-            adapter.dynamicLights.clear();
+            lightPoint.dynamicLights.clear();
         }
 
-        if(adapter.hasStaticLight()) {
-            auto& light = adapter.staticLight;
-            if(!canDraw(light.pos, light.brightness)) continue;
-
+        if(lightPoint.hasStaticLight()) {
+            auto& light = lightPoint.staticLight;
             g_painter->setBlendEquation(Painter::BlendEquation_Add);
             drawLightSource(light);
             light.reset();
@@ -269,16 +282,9 @@ void LightView::drawLights()
 
 void LightView::drawLightSource(const LightSource& light)
 {
-    float brightness = light.brightness;
-    if(!canDraw(light.pos, brightness)) return;
-
-    Color color = Color::from8bit(light.color);
-    color.setRed(color.rF() * brightness);
-    color.setBlue(color.bF() * brightness);
-    color.setGreen(color.gF() * brightness);
-
     const Rect dest = Rect(light.center - Point(light.radius, light.radius), Size(light.radius * 2, light.radius * 2));
-    g_painter->setColor(color);
+
+    g_painter->setColor(Color::from8bit(light.color, light.brightness));
     g_painter->drawTexturedRect(dest, m_lightTexture);
 }
 

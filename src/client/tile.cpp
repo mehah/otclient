@@ -115,8 +115,10 @@ void Tile::drawEnd(const MapViewPtr& /*mapView*/)
 
 void Tile::drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor, bool animate, int frameFlag, LightView* lightView)
 {
-    if(lightView && m_completelyCovered) {
-        frameFlag = Otc::FUpdateLight;
+    if(m_completelyCovered) {
+        frameFlag = 0;
+        if(lightView && hasLight())
+            frameFlag = Otc::FUpdateLight;
     }
 
     const auto putShadowColor = g_painter->getColor() == m_borderShadowColor && (!thing->isGroundBorder() && !thing->isTall());
