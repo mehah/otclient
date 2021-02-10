@@ -104,17 +104,20 @@ void LightView::addLightSource(const Position& pos, const Point& center, float s
 
         auto& staticLight = lightPoint.staticLight;
         float brightness = position.brightness;
-        if(!isMoving) {
-            if(!canDraw(lightPos, brightness)) continue;
 
-            if(staticLight.hasLight()) {
-                if(staticLight.color < light.color) {
-                    continue;
+        // is static light
+        if(!isMoving) {
+            //if(!canDraw(lightPos, brightness)) continue;
+
+            if(staticLight.hasLight() && staticLight.pos.z == lightPos.z) {
+                if(staticLight.color == light.color) {
+                    if(brightness > staticLight.brightness)
+                        staticLight.brightness = brightness;
+                    //continue;
                 }
 
-                if(staticLight.color == light.color && brightness > staticLight.brightness) {
-                    staticLight.brightness = brightness;
-                    continue;
+                if(staticLight.brightness > brightness) {
+                    //continue;
                 }
             }
         }
@@ -259,17 +262,16 @@ void LightView::drawLights()
                 if(lightPoint.hasStaticLight()) {
                     auto& staticLight = lightPoint.staticLight;
                     if(staticLight.pos.z == light.pos.z) {
-                        if(staticLight.color > light.color) {
-                            staticLight.color = light.color;
+                        if(staticLight.color == light.color) {
+                            if(light.brightness > staticLight.brightness)
+                                staticLight.brightness = light.brightness;
+                            //continue;
                         }
 
-                        if(staticLight.color == light.color && light.brightness < staticLight.brightness) {
-                            light.brightness = staticLight.brightness;
+                        if(staticLight.brightness > light.brightness) {
+                            //continue;
                         }
                     }
-
-                    if(!staticLight.isEdge)
-                        continue;
                 }
 
                 light.center += light.extraOffset.second;
@@ -277,9 +279,6 @@ void LightView::drawLights()
                 const bool canDrawLight = canDraw(light.pos, light.brightness) && !lightPoint.hasStaticLight();
 
                 const auto originalOffset = light.center;
-
-
-
 
                 /*if(!canDrawLight) {
                     bool hasLight = false;
@@ -307,7 +306,7 @@ void LightView::drawLights()
                     //light.radius *= 1.07;
 
                     g_painter->setBlendEquation(Painter::BlendEquation_Rever_Subtract);
-                    drawLightSource(light);
+                    //drawLightSource(light);
                 }
             }
             lightPoint.dynamicLights.clear();
