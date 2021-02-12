@@ -87,15 +87,13 @@ struct LightSource {
 };
 
 struct LightPoint {
-    LightPoint(const bool invalid = false) : staticLight(LightSource(invalid)) {}
+    LightPoint(const bool valid = true) : isValid(valid) {}
 
-    LightSource staticLight;
-    std::vector<LightSource> dynamicLights;
+    bool isValid;
+    std::vector<LightSource> lights;
+    Point center;
 
-    bool hasLight() const { return hasStaticLight() || hasDynamicLights(); }
-    bool hasStaticLight() const { return staticLight.hasLight(); }
-    bool hasDynamicLights() const { return !dynamicLights.empty(); }
-    bool isValid() const { return staticLight.isValid(); }
+    bool hasLight() const { return !lights.empty(); }
 };
 
 class LightView : public LuaObject
