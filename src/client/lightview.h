@@ -58,26 +58,21 @@ struct DimensionConfig {
 };
 
 struct LightSource {
-    LightSource(const bool invalid = false) : radius(0) { if(invalid) radius = -1; else reset(); }
-
     int8_t radius;
     Point center;
     Position pos, centralPos;
     std::pair<Point, Point> extraOffset;
     Otc::Direction dir;
+    bool isEdge;
 
     // Comparison Var
     uint8 color;
     float brightness;
 
-    bool isCovered, isEdge;
-
     void reset()
     {
-        isCovered = isEdge = false;
         radius = color = brightness = 0;
         pos = centralPos = Position();
-        center = Point();
         extraOffset = std::make_pair(center, center);
     }
 
@@ -87,13 +82,14 @@ struct LightSource {
 };
 
 struct LightPoint {
-    LightPoint(const bool valid = true) : isValid(valid) {}
+    LightPoint(const bool valid = true) : isValid(valid), canMove(valid) {}
 
-    bool isValid;
+    bool isValid, canMove;
     std::vector<LightSource> lights;
     Point center;
 
     bool hasLight() const { return !lights.empty(); }
+    void reset() { canMove = true; lights.clear(); center = Point(); }
 };
 
 class LightView : public LuaObject

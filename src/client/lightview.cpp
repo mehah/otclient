@@ -43,10 +43,11 @@ LightView::LightView(const MapViewPtr& mapView)
 
 const TexturePtr LightView::generateLightBubble()
 {
-    const uint8 intensityVariant = 0xff;
+    const uint8 intensityVariant = 0xB4;
     const float centerFactor = .0f;
 
     const uint16 bubbleRadius = 256,
+        centerRadius = bubbleRadius * centerFactor,
         bubbleDiameter = bubbleRadius * 2;
 
     ImagePtr lightImage = ImagePtr(new Image(Size(bubbleDiameter, bubbleDiameter)));
@@ -54,13 +55,12 @@ const TexturePtr LightView::generateLightBubble()
     for(int_fast16_t x = -1; ++x < bubbleDiameter;) {
         for(int_fast16_t y = -1; ++y < bubbleDiameter;) {
             const float radius = std::sqrt((bubbleRadius - x) * (bubbleRadius - x) + (bubbleRadius - y) * (bubbleRadius - y));
-            float intensity = stdext::clamp<float>((bubbleRadius - radius) / static_cast<float>(bubbleRadius), .0f, 1.0f);
+            const float intensity = stdext::clamp<float>((bubbleRadius - radius) / static_cast<float>(bubbleRadius - centerRadius), .0f, 1.0f);
 
             // light intensity varies inversely with the square of the distance
-            intensity = std::min<float>(intensity * intensity, 0.4);
-            const uint8_t colorByte = intensity * intensityVariant;
+            const uint8_t colorByte = std::min<float>(intensity * intensity, .5) * intensityVariant;
 
-            uint8_t pixel[4] = { colorByte, colorByte, colorByte, 0x55 };
+            uint8_t pixel[4] = { colorByte, colorByte, colorByte, 0xff };
             lightImage->setPixel(x, y, pixel);
         }
     }
@@ -70,6 +70,7 @@ const TexturePtr LightView::generateLightBubble()
     return tex;
 }
 
+const static auto& POSITION_TRANSLATED_FNCS = { &Position::translatedToDirection, &Position::translatedToReverseDirection };
 void LightView::addLightSource(const Position& pos, const Point& center, float scaleFactor, const Light& light, const ThingPtr& thing)
 {
     const uint8 intensity = std::min<uint8>(light.intensity, MAX_LIGHT_INTENSITY);
@@ -83,13 +84,14 @@ void LightView::addLightSource(const Position& pos, const Point& center, float s
     std::pair<Point, Point> extraOffset;
 
     // (pos.isValid() == false) is a Missile
-    bool isMoving = !pos.isValid();
     Otc::Direction dir = Otc::InvalidDirection;
+    bool isStaticThing = !thing || !thing->isCreature();
     if(thing && thing->isCreature()) {
         const CreaturePtr& creature = thing->static_self_cast<Creature>();
-        extraOffset.first = Point(16, 16) * scaleFactor;
-        extraOffset.second = (creature->getWalkOffset() + Point(16, 16)) * scaleFactor;
-        isMoving = extraOffset.first != extraOffset.second;
+        const Point& centerPoint = Point(1, 1) * (Otc::TILE_PIXELS / 2);
+
+        extraOffset.first = centerPoint;
+        extraOffset.second = creature->getWalkOffset() + centerPoint;
         dir = creature->getDirection();
     }
 
@@ -103,7 +105,7 @@ void LightView::addLightSource(const Position& pos, const Point& center, float s
         if(!lightPoint.isValid) continue;
 
         float brightness = position.brightness;
-        if(!lightPoint.hasLight() && !canDraw(lightPos, brightness)) {
+        if(!canDraw(lightPos, brightness)) {
             continue;
         }
 
@@ -114,23 +116,30 @@ void LightView::addLightSource(const Position& pos, const Point& center, float s
                     prevLight.brightness = position.brightness;
                 }
 
-                _continue = true;
-                break;
+                if(isStaticThing) {
+                    _continue = true;
+                    break;
+                }
             }
         }
+
         if(_continue) continue;
 
         LightSource lightSource;
         lightSource.pos = lightPos;
         lightSource.color = light.color;
         lightSource.radius = radius;
-        lightSource.center = center + ((position.point * Otc::TILE_PIXELS) * scaleFactor) + extraOffset.second;;
         lightSource.centralPos = centralPos;
         lightSource.extraOffset = extraOffset;
         lightSource.brightness = brightness;
         lightSource.dir = dir;
+        lightSource.isEdge = position.isEdge;
 
         lightPoint.lights.push_back(lightSource);
+
+        if(lightPoint.center.isNull()) {
+            lightPoint.center = center + (position.point * Otc::TILE_PIXELS);
+        }
     }
 }
 
@@ -139,7 +148,7 @@ const DimensionConfig& LightView::getDimensionConfig(const uint8 intensity)
 #if DEBUG_BUBBLE == 1
     const float startBrightness = 3;
 #else
-    const float startBrightness = intensity == 1 ? .15 : .35;
+    const float startBrightness = intensity == 1 ? .15 : .75;
 #endif
 
     auto& dimension = m_dimensionCache[intensity - 1];
@@ -149,10 +158,10 @@ const DimensionConfig& LightView::getDimensionConfig(const uint8 intensity)
         const int8 start = size * -1;
 
         // TODO: REFATORATION REQUIRED
-        // Ugly algorithm
+                // Ugly algorithm
         {
             auto pushLight = [&](const int8 x, const int8 y) -> void {
-                const float brightness = startBrightness - ((std::max<float>(std::abs(x), std::abs(y)) * 1.5) / 50);
+                const float brightness = startBrightness - ((std::max<float>(std::abs(x), std::abs(y))) / 10);
                 dimension.positions.push_back(PositionLight(x, y, brightness));
             };
 
@@ -186,7 +195,7 @@ const DimensionConfig& LightView::getDimensionConfig(const uint8 intensity)
                 }
             }
         }
-}
+    }
 
     return dimension;
 }
@@ -238,22 +247,53 @@ void LightView::drawGlobalLight() const
     g_painter->drawFilledRect(Rect(0, 0, m_lightbuffer->getSize()));
 }
 
-const static auto& POSITION_TRANSLATED_FNCS = { &Position::translatedToDirection, &Position::translatedToReverseDirection };
 void LightView::drawLights()
 {
     g_painter->setCompositionMode(Painter::CompositionMode_Add);
+    g_painter->setBlendEquation(Painter::BlendEquation_Add);
 
-    const auto& compareLights = [](const LightSource& a, const LightSource& b) -> bool const { return a.color > b.color; };
+    const auto& compareLights = [](const LightSource& a, const LightSource& b) -> bool const { return a.color < b.color; };
+    float bright;
 
     for(LightPoint& lightPoint : m_lightMap) {
+        if(!lightPoint.isValid || !lightPoint.hasLight()) continue;
+
         if(lightPoint.lights.size() > 1) {
             std::sort(lightPoint.lights.begin(), lightPoint.lights.end(), compareLights);
         }
+
         for(auto& lightSource : lightPoint.lights) {
-            g_painter->setBlendEquation(Painter::BlendEquation_Max);
+
+            bool canMove = true;
+            const bool isMoving = lightSource.extraOffset.first != lightSource.extraOffset.second;
+            if(isMoving) {
+                const auto& prevPos = lightSource.pos.translatedToReverseDirection(lightSource.dir);
+                const auto& prevLightPoint = getLightPoint(prevPos);
+                if(!prevLightPoint.hasLight() && !canDraw(prevPos, bright)) {
+                    //lightSource.brightness *= 0.9;
+                    canMove = false;
+                }
+            }
+
+            g_painter->setBlendEquation(Painter::BlendEquation_Add);
+            lightSource.center = lightPoint.center + (canMove ? lightSource.extraOffset.second : lightSource.extraOffset.first) * m_mapView->m_scaleFactor;
             drawLightSource(lightSource);
+
+            if(isMoving) {
+                const auto& nextPos = lightSource.pos.translatedToDirection(lightSource.dir);
+                const auto& nextLightPoint = getLightPoint(nextPos);
+                if(!canDraw(nextPos, bright)) {
+                    lightSource.center = lightPoint.center + lightSource.extraOffset.first * m_mapView->m_scaleFactor;
+                    g_painter->setBlendEquation(Painter::BlendEquation_Rever_Subtract);
+                    drawLightSource(lightSource);
+
+                    g_painter->setBlendEquation(Painter::BlendEquation_Add);
+                    drawLightSource(lightSource);
+                }
+            }
         }
-        lightPoint.lights.clear();
+
+        lightPoint.reset();
     }
 }
 
