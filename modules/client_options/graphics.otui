@@ -91,23 +91,6 @@ Panel
     mouse-scroll: false
 
   Label
-    id: lightVersionLabel
-    !text: tr('Light Version')..':'
-    phantom: false
-    anchors.left: floorShadowingLabel.left
-    anchors.top: floorShadowingLabel.bottom
-    margin-top: 13
-
-  ComboBox
-    id: lightVersion
-    width: 120
-    anchors.left: prev.right
-    anchors.top: prev.top
-    margin-top: -4
-    margin-left: 5
-    mouse-scroll: false
-
-  Label
     id: ambientLightLabel
     anchors.left: parent.left
     anchors.right: parent.right
