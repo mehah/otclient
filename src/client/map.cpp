@@ -778,7 +778,13 @@ uint8 Map::getLastAwareFloor()
     return Otc::SEA_FLOOR;
 }
 
+
 std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::findPath(const Position& startPos, const Position& goalPos, uint16 maxComplexity, uint32 flags)
+{
+    return continuousFindPath(startPos, goalPos, maxComplexity, flags);
+}
+
+std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::continuousFindPath(const Position& startPos, const Position& goalPos, uint16 maxComplexity, uint32 flags, std::unordered_set<Position, Position::Hasher>* unwalkables)
 {
     // pathfinding using A* search algorithm
     // as described in http://en.wikipedia.org/wiki/A*_search_algorithm
@@ -869,15 +875,22 @@ std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::findPath(const
                         hasCreature = tile->hasCreature();
                         isNotWalkable = !tile->isWalkable(flags & Otc::PathFindAllowCreatures);
                         isNotPathable = !tile->isPathable();
+
                         speed = tile->getGroundSpeed();
                     }
+                    if (isNotWalkable && unwalkables)
+                        unwalkables->emplace(neighborPos);
+
                 } else {
                     const MinimapTile& mtile = g_minimap.getTile(neighborPos);
                     wasSeen = mtile.hasFlag(MinimapTileWasSeen);
                     isNotWalkable = mtile.hasFlag(MinimapTileNotWalkable);
                     isNotPathable = mtile.hasFlag(MinimapTileNotPathable);
+                    if (!isNotWalkable && unwalkables && unwalkables->find(neighborPos) != unwalkables->end())
+                        isNotWalkable = true;
                     if(isNotWalkable || isNotPathable)
                         wasSeen = true;
+
                     speed = mtile.getSpeed();
                 }
 

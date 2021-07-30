@@ -158,6 +158,8 @@ private:
     double m_stamina;
     double m_regenerationTime;
     double m_offlineTrainingTime;
+
+    std::unordered_set<Position, Position::Hasher> m_pathFindUnwalkables;
 };
 
 #endif
