@@ -239,7 +239,6 @@ public:
     std::vector<StaticTextPtr> getStaticTexts() { return m_staticTexts; }
 
     std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> findPath(const Position& start, const Position& goal, uint16 maxComplexity, uint32 flags = 0);
-    std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> continuousFindPath(const Position& start, const Position& goal, uint16 maxComplexity, uint32 flags = 0, std::unordered_set<Position, Position::Hasher>* unwalkables = nullptr);
 
     void setFloatingEffect(bool enable) { m_floatingEffect = enable; }
     bool isDrawingFloatingEffects() { return m_floatingEffect; }
