@@ -156,6 +156,14 @@ void UIWidget::addChild(const UIWidgetPtr& child)
 
     m_children.push_back(child);
     child->setParent(static_self_cast<UIWidget>());
+    
+    // allows to access widget children by widget.childrenId
+    std::string widgetId = child->getId();
+    if (!widgetId.empty()) {
+        if (!hasLuaField(widgetId)) {
+            setLuaField(widgetId, child);
+        }
+    }
 
     // create default layout
     if(!m_layout)
