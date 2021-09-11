@@ -83,6 +83,7 @@ violationReportTab = nil
 ignoredChannels = {}
 filters = {}
 temporarily = false
+useAutoHideChat = false
 
 floatingMode = false
 local communicationSettings = {
@@ -156,7 +157,29 @@ function init()
 
   -- toggle WASD
   consoleToggleChat = consolePanel:getChildById('toggleChat')
+  local switchChatOnCall = function()
+    if not g_game.isOnline() and modules.game_hotkeys.areHotkeysDisabled() then return end
+    if (isChatEnabled() and useAutoHideChat) or (not consoleTextEdit:isVisible()) then
+      if temporarily then
+        temporarily = false
+      else
+        temporarily = true
+      end
+      
+      consoleTextEdit:setChecked(not temporarily)
+      switchChat(temporarily)
+    end
+  end
+  local disableChatOnCall = function()
+    if not g_game.isOnline() and modules.game_hotkeys.areHotkeysDisabled() then return end
 
+    if useAutoHideChat then
+      temporarily = false
+      switchChat(false)
+    end
+  end
+  g_keyboard.bindKeyDown("Enter", switchChatOnCall)
+  g_keyboard.bindKeyDown("Escape", disableChatOnCall)
   load()
 
   if g_game.isOnline() then
@@ -186,36 +209,10 @@ function selectAll(consoleBuffer)
 end
 
 function toggleChat()
-  if consoleToggleChat:isChecked() then
-    disableChat()
-  else
-    enableChat()
-  end
+  useAutoHideChat = consoleToggleChat:isChecked()
 end
 
-function enableChat()
-  if consoleToggleChat:isChecked() then
-    return consoleToggleChat:setChecked(false)
-  end
-
-  consoleTextEdit:setVisible(true)
-  consoleTextEdit:setText("")
-  consoleTextEdit:focus()
-
-  -- g_keyboard.unbindKeyDown("Enter")
-
-  if temporarily then
-    local quickFunc = function()
-      if not g_game.isOnline() then return end
-      g_keyboard.unbindKeyDown("Enter", gameRootPanel)
-      g_keyboard.unbindKeyDown("Escape", gameRootPanel)
-      disableChat(temporarily)
-    end
-    g_keyboard.bindKeyDown("Enter", quickFunc, gameRootPanel)
-    g_keyboard.bindKeyDown("Escape", quickFunc, gameRootPanel)  
-  end
-
-
+local function UnbindMovingKeys() 
   local gameInterface = modules.game_interface
   gameInterface.unbindWalkKey("W")
   gameInterface.unbindWalkKey("D")
@@ -231,28 +228,9 @@ function enableChat()
   gameInterface.unbindTurnKey("Ctrl+D")
   gameInterface.unbindTurnKey("Ctrl+S")
   gameInterface.unbindTurnKey("Ctrl+A")
-
-  consoleToggleChat:setTooltip(tr("Disable chat mode, allow to walk using WASD"))
 end
-
-function disableChat()
+local function BindMovingKeys() 
   local gameInterface = modules.game_interface
-  if not consoleToggleChat:isChecked() then
-    return consoleToggleChat:setChecked(true)
-  end
-  consoleTextEdit:setVisible(false)
-  consoleTextEdit:setText("")
-  
-  local enableChatOnCall = function()
-    temporarily = not temporarily
-    if not g_game.isOnline() and modules.game_hotkeys.areHotkeysDisabled() then return end
-    if consoleToggleChat:isChecked() then
-      consoleToggleChat:setChecked(not temporarily)
-    end
-    enableChat(temporarily)
-  end
-  g_keyboard.bindKeyDown("Enter", enableChatOnCall)
-
   gameInterface.bindWalkKey("W", North)
   gameInterface.bindWalkKey("D", East)
   gameInterface.bindWalkKey("S", South)
@@ -267,8 +245,21 @@ function disableChat()
   gameInterface.bindTurnKey("Ctrl+D", East)
   gameInterface.bindTurnKey("Ctrl+S", South)
   gameInterface.bindTurnKey("Ctrl+A", West)
+end
 
-  consoleToggleChat:setTooltip(tr("Enable chat mode"))
+function switchChat(enabled)
+-- enabled should be true if we enabling the chat and false if disabling it
+  -- consoleToggleChat:setChecked(not consoleToggleChat:isChecked())
+  consoleTextEdit:setVisible(enabled)
+  consoleTextEdit:setText("")
+
+  if enabled then
+    UnbindMovingKeys()
+    consoleToggleChat:setTooltip(tr("Disable chat mode, allow to walk using WASD"))
+  else
+    BindMovingKeys()
+    consoleToggleChat:setTooltip(tr("Enable chat mode"))
+  end
 end
 
 function isChatEnabled()
