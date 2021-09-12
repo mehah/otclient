@@ -208,8 +208,14 @@ function selectAll(consoleBuffer)
   end
 end
 
-function toggleChat()
+-- id of object first and then action
+function toggleChat_onCheckChange()
   useAutoHideChat = consoleToggleChat:isChecked()
+  if not useAutoHideChat then
+    switchChat(true)
+  else
+    switchChat(false)
+  end
 end
 
 local function UnbindMovingKeys() 
@@ -229,6 +235,7 @@ local function UnbindMovingKeys()
   gameInterface.unbindTurnKey("Ctrl+S")
   gameInterface.unbindTurnKey("Ctrl+A")
 end
+
 local function BindMovingKeys() 
   local gameInterface = modules.game_interface
   gameInterface.bindWalkKey("W", North)
@@ -404,22 +411,6 @@ function switchMode(newView)
   --consolePanel:setDraggable(floating)
   --consoleTabBar:setDraggable(floating)
   --floatingMode = floating
-end
-
-function onDragEnter(widget, pos)
-  return floatingMode
-end
-
-function onDragMove(widget, pos, moved)
-  if not floatingMode then
-    return
-  end
-  -- update margin
-  return true
-end
-
-function onDragLeave(widget, pos)
-  return floatingMode
 end
 function clearChannel(consoleTabBar)
   consoleTabBar:getCurrentTab().tabPanel:getChildById('consoleBuffer'):destroyChildren()
