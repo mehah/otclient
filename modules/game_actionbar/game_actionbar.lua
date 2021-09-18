@@ -105,7 +105,7 @@ function createMenu(slotId)
     local menu = g_ui.createWidget("PopupMenu")
     slotToEdit = slotId
     menu:addOption("Assign Spell", function() openSpellAssignWindow() end)
-    --menu:addOption("Assign Object", function() startChooseItem() openObjectAssignWindow() end)
+    menu:addOption("Assign Object", function() startChooseItem() openObjectAssignWindow() end)
     menu:addOption("Assign Text", function() openTextAssignWindow() end)
     menu:addOption("Edit Hotkey", function() openEditHotkeyWindow() end)
     local actionSlot = actionBarPanel:recursiveGetChildById(slotToEdit)
@@ -145,7 +145,7 @@ function initializeSpelllist()
             
 
             if not table.find(info.vocations, getVocationForFilter()) then
-                tmpLabel:setVisible(false)
+                --tmpLabel:setVisible(false)
             end
 
             tmpLabel:setHeight(SpelllistSettings[SpelllistProfile].iconSize.height + 4)
