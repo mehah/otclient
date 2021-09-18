@@ -350,14 +350,6 @@ function Spells.getSpellByWords(words)
   return nil
 end
 
-function Spells.getSpellNameByWords(words)
-  local spell, profile, name = Spells.getSpellByWords(words)
-  if spell then
-    return name
-  end
-  return nil
-end
-
 function Spells.getSpellByIcon(iconId)
   for profile,data in pairs(SpellInfo) do
     for k,spell in pairs(data) do
