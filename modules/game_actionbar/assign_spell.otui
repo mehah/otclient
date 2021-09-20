@@ -55,14 +55,28 @@ MainWindow
     anchors.top: previewSpell.bottom
     margin-top: 10
     height: 2
+
+  Label
+    id: filterLabel
+    text: Filter
+    anchors.left: parent.left
+    anchors.top: splitter.bottom
+    margin-top: 8
+  TextEdit
+    id: filterTextEdit
+    anchors.top: splitter.bottom
+    anchors.right: parent.right
+    anchors.left: prev.right
+    margin-left: 5
+    margin-top: 5
+    @onTextChange: modules.game_actionbar.filterSpells(self:getText())
+
   TextList
     id: spellsPanel
     layout:
       type: verticalBox
-      align-bottom: true
     vertical-scrollbar: spellsPanelScrollbar
-    inverted-scroll: true
-    anchors.top: splitter.bottom
+    anchors.top: filterTextEdit.bottom
     anchors.bottom: parameterTextEdit.top
     anchors.left: parent.left
     anchors.right: parent.right
@@ -76,19 +90,21 @@ MainWindow
     step: 48
     pixels-scroll: true
     margin-bottom: 5
+
   Label
     id: parameterLabel
-    text: Parameter:
+    text: Parameter
     anchors.left: parent.left
     anchors.bottom: applyButton.top
     margin-bottom: 8
   TextEdit
     id: parameterTextEdit
-    anchors.left: parameterLabel.right
     anchors.bottom: applyButton.top
     anchors.right: parent.right
+    anchors.left: prev.right
     margin-left: 5
     margin-bottom: 5
+
   Button
     id: applyButton
     anchors.bottom: parent.bottom

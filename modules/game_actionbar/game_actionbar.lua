@@ -135,6 +135,7 @@ function openSpellAssignWindow()
     addEvent(function() initializeSpelllist() end)
     spellAssignWindow:raise()
     spellAssignWindow:focus()
+    spellAssignWindow:getChildById('filterTextEdit'):focus()
 end
 
 function initializeSpelllist()
@@ -148,18 +149,13 @@ function initializeSpelllist()
             tmpLabel:setId(spell)
             tmpLabel:setText(spell .. '\n\'' .. info.words .. '\'')
             tmpLabel:setPhantom(false)
+            tmpLabel.defaultHeight = tmpLabel:getHeight()
+            tmpLabel.words = info.words:lower()
+            tmpLabel.name = spell:lower()
 
             local iconId = tonumber(info.icon)
             if not iconId and SpellIcons[info.icon] then
                 iconId = SpellIcons[info.icon][1]
-            end
-
-            local vocationId = g_game.getLocalPlayer():getVocation()
-            local getVocationForFilter = function() if info.id > 160 then return vocationId end if vocationId == 3 then return 1 elseif vocationId == 4 then return 2 elseif vocationId == 2 then return 3 elseif vocationId == 1 then return 4 end end
-            
-
-            if not table.find(info.vocations, getVocationForFilter()) then
-                --tmpLabel:setVisible(false)
             end
 
             tmpLabel:setHeight(SpelllistSettings[SpelllistProfile].iconSize.height + 4)
@@ -759,5 +755,39 @@ function onSpellGroupCooldown(groupId, duration)
                 end
             end
         end
+    end
+end
+
+function filterSpells(text)
+    if #text > 0 then
+        text = text:lower()
+
+        for index, spellListLabel in pairs(spellsPanel:getChildren()) do
+            if string.find(spellListLabel.name:lower(), text) or string.find(spellListLabel.words:lower(), text) then
+                showSpell(spellListLabel)
+            else
+                hideSpell(spellListLabel)
+            end
+        end
+
+    else
+        for index, spellListLabel in pairs(spellsPanel:getChildren()) do
+            showSpell(spellListLabel)
+        end
+    end
+end
+
+
+function hideSpell(spellListLabel)
+    if spellListLabel:isVisible() then
+        spellListLabel:hide()
+        spellListLabel:setHeight(0)
+    end
+end
+
+function showSpell(spellListLabel)
+    if not spellListLabel:isVisible() then
+        spellListLabel:setHeight(spellListLabel.defaultHeight)
+        spellListLabel:show()
     end
 end
