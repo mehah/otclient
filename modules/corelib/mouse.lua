@@ -38,15 +38,3 @@ function g_mouse.bindPress(widget, callback, button)
     })
 end
 
-
-function g_mouse.bindRelease(widget, callback, button)
-    connect(widget, {
-        onMouseRelease = function(widget, mousePos, mouseButton)
-            if not button or button == mouseButton then
-                callback(mousePos, mouseButton)
-                return true
-            end
-            return false
-        end
-    })
-end

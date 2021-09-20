@@ -26,7 +26,7 @@ SpellListLabel < Label
 
 MainWindow
   text: Assign Spell
-  size: 280 300
+  size: 280 480
   @onEscape: self:hide()
   @onEnter: modules.game_actionbar.spellAssignAccept()
   PreviewSpell

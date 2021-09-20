@@ -31,6 +31,12 @@ function init()
     mouseGrabberWidget:setVisible(false)
     mouseGrabberWidget:setFocusable(false)
     mouseGrabberWidget.onMouseRelease = onChooseItemMouseRelease
+
+    local console = modules.game_console.consolePanel
+    if console then
+        console:addAnchor(AnchorTop, actionBar:getId(), AnchorBottom)
+    end
+
     if g_game.isOnline() then
         addEvent(function() setupActionBar() loadActionBar() end)
     end
@@ -46,6 +52,7 @@ end
 
 function terminate()
     actionBar:destroy()
+    mouseGrabberWidget:destroy()
     disconnect(g_game, {
         onGameStart = online,
         onGameEnd = offline,
@@ -72,6 +79,12 @@ function terminate()
             end 
         })
     end
+
+    local console = modules.game_console.consolePanel
+    if console then
+        console:removeAnchor(AnchorTop)
+        console:fill('parent')
+    end
 end
 
 function online()
@@ -91,13 +104,14 @@ function setupActionBar()
         slot = g_ui.createWidget('ActionSlot', actionBarPanel)
         slot:setId("slot" .. i)
         slot:setVisible(true)
-        g_mouse.bindRelease(slot, function() createMenu("slot" .. i) end, MouseRightButton)
+        slot.itemId = nil
+        slot.words = nil
+        slot.text = nil
+        slot.useType = nil
+        g_mouse.bindPress(slot, function() createMenu("slot" .. i) end, MouseRightButton)
         if i == 1 then
             slot:addAnchor(AnchorLeft, "parent", AnchorLeft)
         end
-        --[[if i <= 12 then
-            slot:getChildById('key'):setText("F"..i)
-        end]]--
     end
 end
 
@@ -109,8 +123,8 @@ function createMenu(slotId)
     menu:addOption("Assign Text", function() openTextAssignWindow() end)
     menu:addOption("Edit Hotkey", function() openEditHotkeyWindow() end)
     local actionSlot = actionBarPanel:recursiveGetChildById(slotToEdit)
-    if actionSlot.itemId or actionSlot.words or actionSlot.text or actionSlot.useType then
-        menu:addOption("Clear Slot", function() clearSlot() end)
+    if actionSlot.itemId or actionSlot.words or actionSlot.text or actionSlot.useType or actionSlot.hotkey then
+        menu:addOption("Clear Slot", function() clearSlot() clearHotkey() end)
     end
     menu:display()
 end
@@ -218,6 +232,12 @@ function clearSlot()
     slot.useType = nil
     slot:getChildById('text'):setText("")
     slot:setTooltip("")
+end
+
+function clearHotkey()
+    local slot = actionBarPanel:getChildById(slotToEdit)
+    slot.hotkey = nil
+    slot:getChildById('key'):setText('')
 end
 
 function openTextAssignWindow()
@@ -373,7 +393,7 @@ end
 function setupHotkeys()
     unbindHotkeys()
     for v, slot in pairs(actionBarPanel:getChildren()) do
-        g_mouse.bindRelease(slot, 
+        g_mouse.bindPress(slot,
         function()
             if g_clock.millis() - lastHotkeyTime < modules.client_options.getOption('hotkeyDelay') then
                 return
