@@ -504,7 +504,7 @@ function hotkeyClear(assignWindow)
     comboPreview:setText(tr('Current hotkey to change: none'))
     comboPreview.keyCombo = ''
     comboPreview:resizeToText()
-    assignWindow:getChildById('applyButton'):disable()
+    assignWindow:getChildById('applyButton'):enable()
 end
 
 function hotkeyCaptureOk(assignWindow, keyCombo)
