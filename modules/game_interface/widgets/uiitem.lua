@@ -21,7 +21,6 @@ end
 
 function UIItem:onDrop(widget, mousePos)
     self:setBorderWidth(0)
-
     if not self:canAcceptDrop(widget, mousePos) then return false end
 
     local item = widget.currentDragThing
