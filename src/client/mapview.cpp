@@ -181,20 +181,17 @@ void MapView::drawFloor()
 
             const auto& map = m_cachedVisibleTiles[z];
 
-            g_drawPool.startPosition();
-            {
-                for(const auto& tile : map.grounds)
-                    tile->drawGround(transformPositionTo2D(tile->getPosition(), cameraPosition), m_scaleFactor, Otc::FUpdateAll, lightView);
+            g_drawPool.forceGrouping(true);
+            for(const auto& tile : map.grounds)
+                tile->drawGround(transformPositionTo2D(tile->getPosition(), cameraPosition), m_scaleFactor, Otc::FUpdateAll, lightView);
 
-                for(const auto& tile : map.surfaces)
-                    tile->drawSurface(transformPositionTo2D(tile->getPosition(), cameraPosition), m_scaleFactor, Otc::FUpdateAll, lightView);
-            }
+            g_drawPool.forceGrouping(false);
+            for(const auto& tile : map.surfaces)
+                tile->drawSurface(transformPositionTo2D(tile->getPosition(), cameraPosition), m_scaleFactor, Otc::FUpdateAll, lightView);
 
-            g_drawPool.startPosition();
-            {
-                for(const MissilePtr& missile : g_map.getFloorMissiles(z))
-                    missile->draw(transformPositionTo2D(missile->getPosition(), cameraPosition), m_scaleFactor, Otc::FUpdateAll, lightView);
-            }
+            g_drawPool.forceGrouping(true);
+            for(const MissilePtr& missile : g_map.getFloorMissiles(z))
+                missile->draw(transformPositionTo2D(missile->getPosition(), cameraPosition), m_scaleFactor, Otc::FUpdateAll, lightView);
 
             if(m_shadowFloorIntensity > 0 && z == cameraPosition.z + 1) {
                 g_drawPool.addFilledRect(m_rectDimension, Color::black);
@@ -215,6 +212,8 @@ void MapView::drawCreatureInformation()
     if(!m_drawNames && !m_drawHealthBars && !m_drawManaBar) return;
 
     g_drawPool.use(m_pools.creatureInformation);
+    g_drawPool.forceGrouping(true);
+
     const Position cameraPosition = getCameraPosition();
 
     uint32_t flags = 0;
@@ -235,6 +234,8 @@ void MapView::drawText()
     if(!m_drawTexts || (g_map.getStaticTexts().empty() && g_map.getAnimatedTexts().empty())) return;
 
     g_drawPool.use(m_pools.text);
+    g_drawPool.forceGrouping(true);
+
     const Position cameraPosition = getCameraPosition();
     for(const StaticTextPtr& staticText : g_map.getStaticTexts()) {
         if(staticText->getMessageMode() == Otc::MessageNone) continue;

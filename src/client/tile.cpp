@@ -22,6 +22,7 @@
 
 #include "tile.h"
 #include <framework/graphics/fontmanager.h>
+#include <framework/graphics/drawpool.h>
 #include "effect.h"
 #include "game.h"
 #include "item.h"
@@ -81,15 +82,27 @@ void Tile::drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor
         frameFlag = lightView && hasLight() ? (int)Otc::FUpdateLight : 0;
     }
 
+    const bool lastForceGroupState = g_drawPool.isForcingGrouping();
+
+    if(g_app.canOptimize() && (thing->isEffect() || thing->isCreature()))
+        g_drawPool.forceGrouping(true, false);
+
     if(thing->isEffect()) {
         thing->static_self_cast<Effect>()->drawEffect(dest, scaleFactor, frameFlag, lightView);
     } else {
+        if(thing->isGroundBorder())
+            g_drawPool.forceGrouping(false);
+
         thing->draw(dest, scaleFactor, animate, m_highlight, TextureType::NONE, Color::white, frameFlag, lightView);
+
+        g_drawPool.forceGrouping(lastForceGroupState, false);
 
         m_drawElevation += thing->getElevation();
         if(m_drawElevation > MAX_ELEVATION)
             m_drawElevation = MAX_ELEVATION;
     }
+
+    g_drawPool.forceGrouping(lastForceGroupState, false);
 }
 
 void Tile::drawGround(const Point& dest, float scaleFactor, int frameFlags, LightView* lightView)
@@ -97,8 +110,9 @@ void Tile::drawGround(const Point& dest, float scaleFactor, int frameFlags, Ligh
     m_drawElevation = 0;
 
     for(const auto& ground : m_things) {
-        if(ground->isSingleGround() || ground->isSingleGroundBorder())
+        if(ground->isSingleGround() || ground->isSingleGroundBorder()) {
             drawThing(ground, dest - m_drawElevation * scaleFactor, scaleFactor, true, frameFlags, lightView);
+        }
     }
 }
 

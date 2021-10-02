@@ -22,6 +22,7 @@
 
 #include "effect.h"
 #include <framework/core/eventdispatcher.h>
+#include <framework/core/graphicalapplication.h>
 #include "game.h"
 #include "map.h"
 
@@ -79,7 +80,9 @@ void Effect::onAppear()
 
 void Effect::waitFor(const EffectPtr& firstEffect)
 {
-    m_timeToStartDrawing = (firstEffect->m_duration * .6) - firstEffect->m_animationTimer.ticksElapsed();
+    const float duration = g_app.canOptimize() ? .9 : .6;
+
+    m_timeToStartDrawing = (firstEffect->m_duration * duration) - firstEffect->m_animationTimer.ticksElapsed();
 }
 
 void Effect::setId(uint32 id)
