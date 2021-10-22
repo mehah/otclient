@@ -197,6 +197,8 @@ void MapView::drawFloor()
                 g_drawPool.addFilledRect(m_rectDimension, Color::black);
                 g_drawPool.setOpacity(m_shadowFloorIntensity, g_drawPool.size());
             }
+
+            g_drawPool.resetGroups();
         }
 
         if(m_crosshairTexture && m_mousePosition.isValid()) {

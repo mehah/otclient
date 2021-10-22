@@ -78,6 +78,10 @@ public:
 
     size_t size() { return m_currentPool->m_objects.size(); }
 
+    void resetGroups() { m_currentPool->m_objects.resetGroups(); }
+
+    void setGroupType(const ThingCategory type) { m_currentGroupType = type; }
+
 private:
     void draw();
     void init();
@@ -85,7 +89,6 @@ private:
     void drawObject(Pool::DrawObject& obj);
     void updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method);
     void add(const Painter::PainterState& state, const Pool::DrawMethod& method, const Painter::DrawMode drawMode = Painter::DrawMode::Triangles);
-    void addRepeated(const Painter::PainterState& state, const Pool::DrawMethod& method, const Painter::DrawMode drawMode = Painter::DrawMode::Triangles);
 
     PoolFramedPtr poolFramed() { return std::dynamic_pointer_cast<FramedPool>(m_currentPool); }
 
@@ -97,6 +100,9 @@ private:
     PoolPtr m_currentPool, n_unknowPool;
 
     bool m_multiThread, m_forceGrouping;
+
+    ThingCategory m_currentGroupType{ ThingCategoryItem };
+
     friend class GraphicalApplication;
 };
 
