@@ -63,24 +63,21 @@ void DrawPool::add(const Painter::PainterState& state, const Pool::DrawMethod& m
 {
     updateHash(state, method);
 
-    auto& list = m_currentPool->m_objects.getByGroup(ThingCategoryItem);
+    auto& list = m_currentPool->m_objects;
 
     if(m_forceGrouping) {
-        auto& groupList = m_currentPool->m_objects.getByGroup(m_currentGroupType);
+        auto& groupList = m_currentPool->m_objects;
 
-        const auto itFind = std::find_if(groupList.rbegin(), groupList.rend(), [state]
-        (const std::shared_ptr<Pool::DrawObject>& action) { return action->state == state; });
+        const uint16 startIndex = m_currentPool->m_indexToStartSearching ? m_currentPool->m_indexToStartSearching - 1 : 0;
 
-        if(itFind != groupList.rend()) {
-            (*itFind)->drawMethods.push_back(method);
+        const auto itFind = std::find_if(m_currentPool->m_objects.begin() + startIndex, m_currentPool->m_objects.end(), [state]
+        (const Pool::DrawObject& action) { return action.state == state; });
+
+        if(itFind != groupList.end()) {
+            (*itFind).drawMethods.push_back(method);
         } else {
-            const auto& obj = std::shared_ptr<Pool::DrawObject>(new Pool::DrawObject{ state, Painter::DrawMode::Triangles, {method} });
-            list.push_back(obj);
-            if(m_currentGroupType != ThingCategoryItem)
-                groupList.push_back(obj);
+            list.push_back(Pool::DrawObject{ state, Painter::DrawMode::Triangles, {method} });
         }
-
-        m_currentGroupType = ThingCategoryItem;
 
         return;
     }
@@ -88,28 +85,28 @@ void DrawPool::add(const Painter::PainterState& state, const Pool::DrawMethod& m
     if(!list.empty()) {
         auto& prevObj = list.back();
 
-        const bool sameState = prevObj->state == state;
+        const bool sameState = prevObj.state == state;
         if(!method.dest.isNull()) {
             // Look for identical or opaque textures that are greater than or
             // equal to the size of the previous texture, if so, remove it from the list so they don't get drawn.
-            for(auto itm = prevObj->drawMethods.begin(); itm != prevObj->drawMethods.end(); ++itm) {
+            for(auto itm = prevObj.drawMethods.begin(); itm != prevObj.drawMethods.end(); ++itm) {
                 auto& prevMtd = *itm;
                 if(prevMtd.dest == method.dest &&
-                   ((sameState && prevMtd.rects.second == method.rects.second) || (state.texture->isOpaque() && prevObj->state.texture->canSuperimposed()))) {
-                    prevObj->drawMethods.erase(itm);
+                   ((sameState && prevMtd.rects.second == method.rects.second) || (state.texture->isOpaque() && prevObj.state.texture->canSuperimposed()))) {
+                    prevObj.drawMethods.erase(itm);
                     break;
                 }
             }
         }
 
         if(sameState) {
-            prevObj->drawMode = Painter::DrawMode::Triangles;
-            prevObj->drawMethods.push_back(method);
+            prevObj.drawMode = Painter::DrawMode::Triangles;
+            prevObj.drawMethods.push_back(method);
             return;
         }
     }
 
-    list.push_back(std::shared_ptr<Pool::DrawObject>(new Pool::DrawObject{ state, drawMode, {method} }));
+    list.push_back(Pool::DrawObject{ state, drawMode, {method} });
 }
 
 void DrawPool::draw()
@@ -119,10 +116,10 @@ void DrawPool::draw()
         if(!pool->isEnabled() || !pool->hasFrameBuffer()) continue;
 
         const auto& pf = pool->toFramedPool();
-        if(pf->hasModification(true) && !pool->m_objects.getByGroup(ThingCategoryItem).empty()) {
+        if(pf->hasModification(true) && !pool->m_objects.empty()) {
             pf->m_framebuffer->bind();
-            for(auto& obj : pool->m_objects.getByGroup(ThingCategoryItem))
-                drawObject(*obj);
+            for(auto& obj : pool->m_objects)
+                drawObject(obj);
             pf->m_framebuffer->release();
         }
     }
@@ -138,8 +135,8 @@ void DrawPool::draw()
             pf->m_framebuffer->draw(pf->m_dest, pf->m_src);
             if(pf->m_afterDraw) pf->m_afterDraw();
             g_painter->restoreSavedState();
-        } else for(auto& obj : pool->m_objects.getByGroup(ThingCategoryItem))
-            drawObject(*obj);
+        } else for(auto& obj : pool->m_objects)
+            drawObject(obj);
 
         pool->m_objects.clear();
     }
@@ -283,7 +280,7 @@ void DrawPool::addBoundingRect(const Rect& dest, const Color color, int innerLin
 
 void DrawPool::addAction(std::function<void()> action)
 {
-    m_currentPool->m_objects.getByGroup(ThingCategoryItem).push_back(std::shared_ptr<Pool::DrawObject>(new Pool::DrawObject{ {}, Painter::DrawMode::None, {}, action }));
+    m_currentPool->m_objects.push_back(Pool::DrawObject{ {}, Painter::DrawMode::None, {}, action });
 }
 
 Painter::PainterState DrawPool::generateState()

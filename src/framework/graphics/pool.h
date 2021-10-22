@@ -27,7 +27,6 @@
 #include "framebuffer.h"
 #include "texture.h"
 #include "framebuffermanager.h"
-#include <client/thingtype.h>
 
 class Pool
 {
@@ -73,33 +72,6 @@ private:
         PainterShaderProgram* shaderProgram;
     };
 
-    struct Drawings {
-        std::vector<std::shared_ptr<DrawObject>>& getByGroup(const ThingCategory type)
-        {
-            if(type == ThingCategoryCreature)
-                return creatures;
-
-            if(type == ThingCategoryEffect)
-                return effects;
-
-            if(type == ThingCategoryMissile)
-                return missiles;
-
-            return all;
-        }
-
-        std::vector<std::shared_ptr<DrawObject>>& get() { return all; }
-        void clear() { all.clear(); }
-        void resetGroups() { creatures.clear(); effects.clear(); missiles.clear(); }
-        bool empty() { return all.empty(); }
-        size_t size() { return all.size(); }
-
-    private:
-        std::vector<std::shared_ptr<DrawObject>> all,
-            creatures,
-            effects, missiles;
-    };
-
     void setCompositionMode(const Painter::CompositionMode mode, const int pos = -1);
     void setClipRect(const Rect& clipRect, const int pos = -1);
     void setOpacity(const float opacity, const int pos = -1);
@@ -115,7 +87,7 @@ private:
     virtual bool hasFrameBuffer() const { return false; };
     virtual FramedPool* toFramedPool() { return nullptr; }
 
-    Drawings m_objects;
+    std::vector<DrawObject> m_objects;
 
     bool m_enabled{ true };
     State m_state;

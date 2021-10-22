@@ -470,10 +470,6 @@ void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPatte
         if(useOpacity)
             color = Color(1.0f, 1.0f, 1.0f, m_opacity);
 
-        if(m_category == ThingCategoryCreature) g_drawPool.setGroupType(m_category);
-        else if(m_category == ThingCategoryEffect) g_drawPool.setGroupType(m_category);
-        else if(m_category == ThingCategoryMissile) g_drawPool.setGroupType(m_category);
-
         g_drawPool.addTexturedRect(screenRect, texture, textureRect, color, dest);
     }
 
