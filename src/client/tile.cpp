@@ -82,27 +82,15 @@ void Tile::drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor
         frameFlag = lightView && hasLight() ? (int)Otc::FUpdateLight : 0;
     }
 
-    const bool lastForceGroupState = g_drawPool.isForcingGrouping();
-
-    if(g_app.canOptimize() && (thing->isEffect() || thing->isCreature()))
-        g_drawPool.forceGrouping(true, false);
-
     if(thing->isEffect()) {
         thing->static_self_cast<Effect>()->drawEffect(dest, scaleFactor, frameFlag, lightView);
     } else {
-        if(thing->isGroundBorder())
-            g_drawPool.forceGrouping(false);
-
         thing->draw(dest, scaleFactor, animate, m_highlight, TextureType::NONE, Color::white, frameFlag, lightView);
-
-        g_drawPool.forceGrouping(lastForceGroupState, false);
 
         m_drawElevation += thing->getElevation();
         if(m_drawElevation > MAX_ELEVATION)
             m_drawElevation = MAX_ELEVATION;
     }
-
-    g_drawPool.forceGrouping(lastForceGroupState, false);
 }
 
 void Tile::drawGround(const Point& dest, float scaleFactor, int frameFlags, LightView* lightView)
@@ -260,10 +248,11 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
         const EffectPtr& effect = thing->static_self_cast<Effect>();
 
         // find the first effect equal and wait for it to finish.
-        for(const EffectPtr& firstEffect : m_effects) {
-            if(effect->getId() == firstEffect->getId()) {
-                effect->waitFor(firstEffect);
-            }
+        const auto& itFind = std::find_if(m_effects.begin(), m_effects.end(), [&effect]
+        (const EffectPtr& currentEffect) { return effect->getId() == currentEffect->getId() || g_app.canOptimize() && effect->getSize() <= currentEffect->getSize(); });
+
+        if(itFind != m_effects.end()) {
+            effect->waitFor(*itFind);
         }
 
         if(effect->isTopEffect())

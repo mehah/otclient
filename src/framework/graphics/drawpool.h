@@ -73,8 +73,10 @@ public:
     void resetState() { m_currentPool->resetState(); }
     void resetShaderProgram() { m_currentPool->resetShaderProgram(); }
 
-    void forceGrouping(const bool force, const bool startPos = true) { m_forceGrouping = force; if(force && startPos) m_currentPool->startPosition(); }
+    void forceGrouping(const bool force) { m_forceGrouping = force; }
     bool isForcingGrouping() const { return m_forceGrouping; }
+
+    void startPosition() { m_currentPool->startPosition(); }
 
     size_t size() { return m_currentPool->m_objects.size(); }
 

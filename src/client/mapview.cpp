@@ -181,17 +181,20 @@ void MapView::drawFloor()
 
             const auto& map = m_cachedVisibleTiles[z];
 
-            g_drawPool.forceGrouping(true);
-            for(const auto& tile : map.grounds)
-                tile->drawGround(transformPositionTo2D(tile->getPosition(), cameraPosition), m_scaleFactor, Otc::FUpdateAll, lightView);
+            g_drawPool.startPosition();
+            {
+                for(const auto& tile : map.grounds)
+                    tile->drawGround(transformPositionTo2D(tile->getPosition(), cameraPosition), m_scaleFactor, Otc::FUpdateAll, lightView);
+            }
 
-            g_drawPool.forceGrouping(false);
             for(const auto& tile : map.surfaces)
                 tile->drawSurface(transformPositionTo2D(tile->getPosition(), cameraPosition), m_scaleFactor, Otc::FUpdateAll, lightView);
 
-            g_drawPool.forceGrouping(true);
-            for(const MissilePtr& missile : g_map.getFloorMissiles(z))
-                missile->draw(transformPositionTo2D(missile->getPosition(), cameraPosition), m_scaleFactor, Otc::FUpdateAll, lightView);
+            g_drawPool.startPosition();
+            {
+                for(const MissilePtr& missile : g_map.getFloorMissiles(z))
+                    missile->draw(transformPositionTo2D(missile->getPosition(), cameraPosition), m_scaleFactor, Otc::FUpdateAll, lightView);
+            }
 
             if(m_shadowFloorIntensity > 0 && z == cameraPosition.z + 1) {
                 g_drawPool.addFilledRect(m_rectDimension, Color::black);

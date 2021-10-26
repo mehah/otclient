@@ -139,22 +139,26 @@ void LightView::draw(const Rect& dest, const Rect& src)
     g_drawPool.addFilledRect(m_mapView->m_rectDimension, m_globalLightColor);
     const auto& shadeBase = std::make_pair<Point, Size>(Point(m_mapView->getTileSize() / 2.8), Size(m_mapView->getTileSize() * 1.6));
     for(int_fast8_t z = m_mapView->m_floorMax; z >= m_mapView->m_floorMin; --z) {
-        g_drawPool.forceGrouping(true);
         if(z < m_mapView->m_floorMax) {
-            for(auto& shade : m_shades) {
-                if(shade.floor != z) continue;
-                shade.floor = -1;
+            g_drawPool.startPosition();
+            {
+                g_drawPool.forceGrouping(true);
+                for(auto& shade : m_shades) {
+                    if(shade.floor != z) continue;
+                    shade.floor = -1;
 
-                auto newPos = shade.pos;
+                    auto newPos = shade.pos;
 
-                for(auto dir : shade.dirs) {
-                    if(dir == Otc::South)
-                        newPos.y -= SPRITE_SIZE / 1.6;
-                    else if(dir == Otc::East)
-                        newPos.x -= SPRITE_SIZE / 1.6;
+                    for(auto dir : shade.dirs) {
+                        if(dir == Otc::South)
+                            newPos.y -= SPRITE_SIZE / 1.6;
+                        else if(dir == Otc::East)
+                            newPos.x -= SPRITE_SIZE / 1.6;
+                    }
+
+                    g_drawPool.addTexturedRect(Rect(newPos - shadeBase.first, shadeBase.second), m_shadeTexture, m_globalLightColor);
                 }
-
-                g_drawPool.addTexturedRect(Rect(newPos - shadeBase.first, shadeBase.second), m_shadeTexture, m_globalLightColor);
+                g_drawPool.forceGrouping(false);
             }
         }
 
