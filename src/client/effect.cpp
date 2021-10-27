@@ -33,7 +33,8 @@ void Effect::drawEffect(const Point& dest, float scaleFactor, int frameFlag, Lig
     if(m_id == 0) return;
 
     // It only starts to draw when the first effect as it is about to end.
-    if(m_animationTimer.ticksElapsed() < m_timeToStartDrawing) return;
+    if(m_animationTimer.ticksElapsed() < m_timeToStartDrawing)
+        return;
 
     int animationPhase;
 
@@ -78,11 +79,11 @@ void Effect::onAppear()
     g_dispatcher.scheduleEvent([self]() { g_map.removeThing(self); }, m_duration);
 }
 
-void Effect::waitFor(const EffectPtr& firstEffect)
+void Effect::waitFor(const EffectPtr& effect)
 {
-    const float duration = g_app.canOptimize() ? .9 : .6;
+    const float duration = g_app.canOptimize() ? .3 : .6;
 
-    m_timeToStartDrawing = (firstEffect->m_duration * duration) - firstEffect->m_animationTimer.ticksElapsed();
+    m_timeToStartDrawing = effect->m_animationTimer.ticksElapsed() - (effect->m_duration * duration);
 }
 
 void Effect::setId(uint32 id)
