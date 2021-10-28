@@ -584,9 +584,10 @@ void Creature::nextWalkUpdate()
 
 void Creature::updateWalk(const bool isPreWalking)
 {
-    // 16.66 ms = 60hz
-    const float extraSpeed = isLocalPlayer() && !hasSpeedFormula() ? 16.66f : 0.f,
-        walkTicksPerPixel = (getStepDuration(true) + extraSpeed) / SPRITE_SIZE;
+    const uint stepDuration = getStepDuration(true);
+
+    const float extraSpeed = isLocalPlayer() && !hasSpeedFormula() ? 800.f / static_cast<float>(stepDuration) : 0.f,
+        walkTicksPerPixel = (stepDuration + extraSpeed) / SPRITE_SIZE;
 
     const int totalPixelsWalked = std::min<int>((m_walkTimer.ticksElapsed() / walkTicksPerPixel), SPRITE_SIZE);
 
@@ -746,7 +747,7 @@ void Creature::setSpeed(uint16 speed)
     m_speed = speed;
 
     // Cache for stepSpeed Law
-    if(g_game.getFeature(Otc::GameNewSpeedLaw) && hasSpeedFormula()) {
+    if(hasSpeedFormula()) {
         speed *= 2;
 
         if(speed > -speedB) {
@@ -896,10 +897,8 @@ uint64 Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
         m_stepCache.speed = m_speed;
         m_stepCache.groundSpeed = groundSpeed;
 
-        const bool hasGameNewSpeedLaw = g_game.getFeature(Otc::GameNewSpeedLaw) && hasSpeedFormula();
-
         double stepDuration = 1000. * groundSpeed;
-        if(hasGameNewSpeedLaw) {
+        if(hasSpeedFormula()) {
             stepDuration = std::floor(stepDuration / m_calculatedStepSpeed);
         } else stepDuration /= m_speed;
 
