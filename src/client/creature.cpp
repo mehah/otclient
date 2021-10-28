@@ -195,7 +195,7 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
         }
 
         if(animationPhases > 1) {
-            animationPhase = (g_clock.millis() % (animateTicks * animationPhases)) / animateTicks;
+            animationPhase = (g_clock.millis() % (static_cast<long long>(animateTicks) * animationPhases)) / animateTicks;
         }
 
         if(m_outfit.getCategory() == ThingCategoryEffect)
@@ -404,7 +404,7 @@ void Creature::updateJump()
         g_map.notificateCameraMove(m_walkOffset);
     }
 
-    int nextT, diff = 0, i = 1;
+    int nextT = 0, diff = 0, i = 1;
     if(m_jumpTimer.ticksElapsed() < halfJumpDuration)
         diff = 1;
     else if(m_jumpTimer.ticksElapsed() > halfJumpDuration)
@@ -750,7 +750,7 @@ void Creature::setSpeed(uint16 speed)
         speed *= 2;
 
         if(speed > -speedB) {
-            m_calculatedStepSpeed = floor((Creature::speedA * log((speed / 2) + Creature::speedB) + Creature::speedC) + 0.5);
+            m_calculatedStepSpeed = floor((Creature::speedA * log((speed / static_cast<double>(2)) + Creature::speedB) + Creature::speedC) + 0.5);
             if(m_calculatedStepSpeed == 0) m_calculatedStepSpeed = 1;
         } else m_calculatedStepSpeed = 1;
     }
@@ -984,7 +984,7 @@ int Creature::getCurrentAnimationPhase(const bool mount)
 
     if(thingType->isAnimateAlways()) {
         const int ticksPerFrame = std::round(1000 / thingType->getAnimationPhases());
-        return (g_clock.millis() % (ticksPerFrame * thingType->getAnimationPhases())) / ticksPerFrame;
+        return (g_clock.millis() % (static_cast<long long>(ticksPerFrame) * thingType->getAnimationPhases())) / ticksPerFrame;
     }
 
     return m_walkAnimationPhase;
