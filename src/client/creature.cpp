@@ -584,9 +584,7 @@ void Creature::nextWalkUpdate()
 
 void Creature::updateWalk(const bool isPreWalking)
 {
-    const float extraSpeed = isLocalPlayer() ? 10.f : 0,
-        walkTicksPerPixel = (getStepDuration(true) + extraSpeed) / SPRITE_SIZE;
-
+    const float walkTicksPerPixel = static_cast<float>(getStepDuration(true)) / SPRITE_SIZE;
     const int totalPixelsWalked = std::min<int>((m_walkTimer.ticksElapsed() / walkTicksPerPixel), SPRITE_SIZE);
 
     // needed for paralyze effect
@@ -738,6 +736,9 @@ void Creature::updateOutfitColor(Color color, Color finalColor, Color delta, int
 
 void Creature::setSpeed(uint16 speed)
 {
+    if(speed == m_speed)
+        return;
+
     const uint16 oldSpeed = m_speed;
     m_speed = speed;
 

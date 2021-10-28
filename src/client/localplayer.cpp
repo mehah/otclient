@@ -90,22 +90,15 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 {
     m_autoWalkRetries = 0;
 
-    // a prewalk was going on
     if(m_preWalking) {
-        // switch to normal walking
         m_preWalking = false;
-        // if is to the last prewalk destination, updates the walk preserving the animation
         if(newPos == m_lastPrewalkDestination) {
             updateWalk();
-            // was to another direction, replace the walk
-        } else {
-            Creature::walk(oldPos, newPos);
+            return;
         }
     }
-    // no prewalk was going on, this must be an server side automated walk
-    else {
-        Creature::walk(oldPos, newPos);
-    }
+
+    Creature::walk(oldPos, newPos);
 }
 
 void LocalPlayer::preWalk(Otc::Direction direction)
@@ -116,9 +109,6 @@ void LocalPlayer::preWalk(Otc::Direction direction)
     }
 
     m_preWalking = true;
-
-    if(m_serverWalkEndEvent)
-        m_serverWalkEndEvent->cancel();
 
     // start walking to direction
     const Position newPos = m_position.translatedToDirection(direction);

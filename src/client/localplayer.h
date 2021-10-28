@@ -118,10 +118,10 @@ private:
     bool retryAutoWalk();
 
     // walk related
-    Position m_lastPrewalkDestination;
-    Position m_autoWalkDestination;
-    Position m_lastAutoWalkPosition;
-    ScheduledEventPtr m_serverWalkEndEvent;
+    Position m_lastPrewalkDestination,
+        m_lastAutoWalkPosition,
+        m_autoWalkDestination;
+
     ScheduledEventPtr m_autoWalkContinueEvent;
     ticks_t m_walkLockExpiration;
     stdext::boolean<false> m_preWalking;
