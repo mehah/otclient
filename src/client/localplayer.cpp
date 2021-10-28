@@ -73,7 +73,8 @@ bool LocalPlayer::canWalk(Otc::Direction)
         return false;
 
     if(!isAutoWalking()) {
-        if(isPreWalking() && g_game.getClientVersion() >= 860) return false;
+        if(isPreWalking() && g_game.getClientVersion() >= 860)
+            return false;
 
         if(m_forceWalk) m_forceWalk = false;
         else {
