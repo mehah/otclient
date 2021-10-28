@@ -698,7 +698,7 @@ void Game::autoWalk(std::vector<Otc::Direction> dirs)
         return;
 
     TilePtr toTile = g_map.getTile(m_localPlayer->getPosition().translatedToDirection(direction));
-    if(toTile && toTile->isWalkable() && !m_localPlayer->isServerWalking()) {
+    if(toTile && toTile->isWalkable() && !m_localPlayer->isWalking()) {
         m_localPlayer->preWalk(direction);
 
         if(getFeature(Otc::GameForceFirstAutoWalkStep)) {

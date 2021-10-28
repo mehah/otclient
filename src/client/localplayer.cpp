@@ -104,10 +104,6 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
     }
     // no prewalk was going on, this must be an server side automated walk
     else {
-        m_serverWalking = true;
-        if(m_serverWalkEndEvent)
-            m_serverWalkEndEvent->cancel();
-
         Creature::walk(oldPos, newPos);
     }
 }
@@ -272,18 +268,7 @@ void LocalPlayer::updateWalkOffset(int totalPixelsWalked)
 void LocalPlayer::terminateWalk()
 {
     Creature::terminateWalk();
-
     m_preWalking = false;
-
-    if(m_serverWalking) {
-        if(m_serverWalkEndEvent)
-            m_serverWalkEndEvent->cancel();
-
-        const auto self = asLocalPlayer();
-        m_serverWalkEndEvent = g_dispatcher.scheduleEvent([self] {
-            self->m_serverWalking = false;
-        }, 100);
-    }
 }
 
 void LocalPlayer::onPositionChange(const Position& newPos, const Position& oldPos)
