@@ -584,7 +584,8 @@ void Creature::nextWalkUpdate()
 
 void Creature::updateWalk(const bool isPreWalking)
 {
-    const float extraSpeed = isLocalPlayer() && !hasSpeedFormula() ? 10.f : 0.f,
+    // 16.66 ms = 60hz
+    const float extraSpeed = isLocalPlayer() && !hasSpeedFormula() ? 16.66f : 0.f,
         walkTicksPerPixel = (getStepDuration(true) + extraSpeed) / SPRITE_SIZE;
 
     const int totalPixelsWalked = std::min<int>((m_walkTimer.ticksElapsed() / walkTicksPerPixel), SPRITE_SIZE);
