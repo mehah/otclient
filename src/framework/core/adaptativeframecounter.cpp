@@ -21,7 +21,6 @@
  */
 
 #include "adaptativeframecounter.h"
-#include "clock.h"
 
 bool AdaptativeFrameCounter::canRefresh()
 {
