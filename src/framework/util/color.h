@@ -41,7 +41,7 @@ public:
 
     Color(const uint8 byteColor, const uint8 intensity, const float formule = 0.5f)
     {
-        const float brightness = formule + (intensity / static_cast<float>(8)) * formule;
+        const float brightness = formule + (intensity / 8.f) * formule;
         const Color colorMap = from8bit(byteColor);
         m_a = colorMap.aF();
         m_b = colorMap.bF() * brightness;
@@ -110,9 +110,11 @@ public:
         if(color >= 216 || color <= 0)
             return Color(0, 0, 0);
 
-        const int r = (color / 36 % 6 * 51) * brightness;
-        const int g = (color / 6 % 6 * 51) * brightness;
-        const int b = (color % 6 * 51) * brightness;
+        const int
+            r = (color / 36 % 6 * 51) * brightness,
+            g = (color / 6 % 6 * 51) * brightness,
+            b = (color % 6 * 51) * brightness;
+
         return Color(r, g, b);
     }
 
@@ -146,12 +148,12 @@ private:
 inline std::ostream& operator<<(std::ostream& out, const Color& color)
 {
     return out << '#'
-           << std::hex << std::setfill('0')
-           << std::setw(2) << (int)color.r()
-           << std::setw(2) << (int)color.g()
-           << std::setw(2) << (int)color.b()
-           << std::setw(2) << (int)color.a()
-           << std::dec << std::setfill(' ');
+        << std::hex << std::setfill('0')
+        << std::setw(2) << (int)color.r()
+        << std::setw(2) << (int)color.g()
+        << std::setw(2) << (int)color.b()
+        << std::setw(2) << (int)color.a()
+        << std::dec << std::setfill(' ');
 }
 
 inline std::istream& operator>>(std::istream& in, Color& color)
@@ -170,7 +172,7 @@ inline std::istream& operator>>(std::istream& in, Color& color)
             else
                 color.setAlpha(255);
         } else {
-            in.seekg(-tmp.length()-1, std::ios_base::cur);
+            in.seekg(-tmp.length() - 1, std::ios_base::cur);
         }
     } else {
         in >> tmp;
