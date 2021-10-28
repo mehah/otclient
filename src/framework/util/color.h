@@ -33,16 +33,17 @@ class Color
 {
 public:
     Color() = default;
+    Color(const std::string& coltext);
     Color(const uint32 rgba) { setRGBA(rgba); }
-    Color(const uint8 r, const uint8 g, const uint8 b, const uint8 a = 0xFF) : m_r(r / 255.0f), m_g(g / 255.0f), m_b(b / 255.0f), m_a(a / 255.0f) {}
     Color(const int r, const int g, const int b, const int a = 0xFF) : m_r(r / 255.0f), m_g(g / 255.0f), m_b(b / 255.0f), m_a(a / 255.0f) {}
     Color(const float r, const float g, const float b, const float a = 1.0f) : m_r(r), m_g(g), m_b(b), m_a(a) {}
-    Color(const std::string& coltext);
+    Color(const uint8 r, const uint8 g, const uint8 b, const uint8 a = 0xFF) : m_r(r / 255.0f), m_g(g / 255.0f), m_b(b / 255.0f), m_a(a / 255.0f) {}
 
     Color(const uint8 byteColor, const uint8 intensity, const float formule = 0.5f)
     {
         const float brightness = formule + (intensity / 8.f) * formule;
         const Color colorMap = from8bit(byteColor);
+
         m_a = colorMap.aF();
         m_b = colorMap.bF() * brightness;
         m_g = colorMap.gF() * brightness;
@@ -102,6 +103,7 @@ public:
         c += (color.r() / 51) * 36;
         c += (color.g() / 51) * 6;
         c += (color.b() / 51);
+
         return c;
     }
 
@@ -118,31 +120,18 @@ public:
         return Color(r, g, b);
     }
 
-    static const Color alpha;
-    static const Color white;
-    static const Color black;
-    static const Color red;
-    static const Color darkRed;
-    static const Color green;
-    static const Color darkGreen;
-    static const Color blue;
-    static const Color darkBlue;
-    static const Color pink;
-    static const Color darkPink;
-    static const Color yellow;
-    static const Color darkYellow;
-    static const Color teal;
-    static const Color darkTeal;
-    static const Color gray;
-    static const Color darkGray;
-    static const Color lightGray;
-    static const Color orange;
+    static const Color
+        alpha, white, black, red, darkRed,
+        green, darkGreen, blue, darkBlue,
+        pink, darkPink, yellow, darkYellow,
+        teal, darkTeal, gray, darkGray,
+        lightGray, orange;
 
 private:
-    float m_r{ 1.0f };
-    float m_g{ 1.0f };
-    float m_b{ 1.0f };
-    float m_a{ 1.0f };
+    float m_r{ 1.f },
+        m_g{ 1.f },
+        m_b{ 1.f },
+        m_a{ 1.f };
 };
 
 inline std::ostream& operator<<(std::ostream& out, const Color& color)
@@ -219,6 +208,7 @@ inline std::istream& operator>>(std::istream& in, Color& color)
             in.seekg(-tmp.length(), std::ios_base::cur);
         }
     }
+
     return in;
 }
 
