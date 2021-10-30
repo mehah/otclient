@@ -19,6 +19,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#define WITH_ENCRYPTION
+
 
 #ifndef RESOURCES_H
 #define RESOURCES_H
@@ -79,6 +81,13 @@ public:
     std::string guessFilePath(const std::string& filename, const std::string& type);
     bool isFileType(const std::string& filename, const std::string& type);
     ticks_t getFileTime(const std::string& filename);
+
+    std::string encryptionPassword = "PASSWORD_GOES_HERE_LIKE_ASFKSDGHKSFH";
+    std::string encrypt(std::string data, std::string& password);
+    std::string decrypt(std::string& data, std::string& password);
+    static uint8_t* decrypt(uint8_t* data, int32_t size, std::string& password);
+    void runEncryption(std::string password);
+    void save_string_into_file(std::string contents, std::string name);
 
 protected:
     std::vector<std::string> discoverPath(const fs::path& path, bool filenameOnly, bool recursive);

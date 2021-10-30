@@ -194,6 +194,10 @@ std::string ResourceManager::readFileContents(const std::string& fileName)
     PHYSFS_readBytes(file, static_cast<void*>(&buffer[0]), fileSize);
     PHYSFS_close(file);
 
+#ifdef WITH_ENCRYPTION
+    buffer = decrypt(buffer, encryptionPassword);
+#endif
+
     return buffer;
 }
 
@@ -225,7 +229,11 @@ bool ResourceManager::writeFileStream(const std::string& fileName, std::iostream
 
 bool ResourceManager::writeFileContents(const std::string& fileName, const std::string& data)
 {
+#ifdef WITH_ENCRYPTION
+    return writeFileBuffer(fileName, (const uchar*)encrypt(data, encryptionPassword).c_str(), data.size());
+#else
     return writeFileBuffer(fileName, (const uchar*)data.c_str(), data.size());
+#endif
 }
 
 FileStreamPtr ResourceManager::openFile(const std::string& fileName)
@@ -365,4 +373,104 @@ bool ResourceManager::isFileType(const std::string& filename, const std::string&
 ticks_t ResourceManager::getFileTime(const std::string& filename)
 {
     return g_platform.getFileModificationTime(getRealPath(filename));
+}
+
+std::string ResourceManager::encrypt(std::string data, std::string& password)
+{
+    std::ostringstream ss;
+    int len = data.length();
+    int plen = password.length();
+
+    int j = 0;
+    for (int i = 0; i < len; i++)
+    {
+        int ct = data[i];
+        if (i % 2) {
+            ct = ct - password[j] + i;
+        }
+        else {
+            ct = ct + password[j] - i;
+        }
+        ss << (char)(ct);
+        j++;
+
+        if (j >= plen)
+            j = 0;
+    }
+
+    return ss.str();
+}
+std::string ResourceManager::decrypt(std::string& data, std::string& password)
+{
+    std::ostringstream ss;
+    int len = data.length();
+    int plen = password.length();
+
+    int j = 0;
+    for (int i = 0; i < len; i++)
+    {
+        int ct = data[i];
+        if (i % 2) {
+            ct = ct + password[j] - i;
+        }
+        else {
+            ct = ct - password[j] + i;
+        }
+        ss << (char)(ct);
+        j++;
+
+        if (j >= plen)
+            j = 0;
+    }
+
+    return ss.str();
+}
+
+uint8_t* ResourceManager::decrypt(uint8_t* data, int32_t size, std::string& password)
+{
+    uint8_t* new_Data = new uint8_t[size];
+    int plen = password.length();
+
+    int j = 0;
+    for (int i = 0; i < size; i++)
+    {
+        int ct = data[i];
+        if (i % 2) {
+            new_Data[i] = ct + password[j] - i;
+        }
+        else {
+            new_Data[i] = ct - password[j] + i;
+        }
+        data[i] = new_Data[i];
+        j++;
+
+        if (j >= plen)
+            j = 0;
+    }
+
+    return nullptr;
+}
+
+void ResourceManager::runEncryption(std::string password)
+{
+    std::vector<std::string> excludedExtensions = { ".rar",".ogg",".xml",".dll",".exe", ".log",".otb" };
+    for (const auto& entry : boost::filesystem::recursive_directory_iterator("./")) {
+        std::string ext = boost::filesystem::extension(entry.path().string());
+        if (std::find(excludedExtensions.begin(), excludedExtensions.end(), ext) != excludedExtensions.end())
+            continue;
+
+        boost::filesystem::ifstream ifs(entry.path().string(), std::ios_base::binary);
+        std::string data((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+        ifs.close();
+        data = encrypt(data, password);
+        save_string_into_file(data, entry.path().string());
+    }
+}
+
+void ResourceManager::save_string_into_file(std::string contents, std::string name)
+{
+    std::ofstream datFile;
+    datFile.open(name.c_str(), std::ofstream::binary | std::ofstream::trunc | std::ofstream::out);
+    datFile.write(contents.c_str(), contents.size());
+    datFile.close();
 }

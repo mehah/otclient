@@ -24,6 +24,7 @@
 #define FILESTREAM_H
 
 #include "declarations.h"
+#include <framework/core/resourcemanager.h>
 #include <framework/luaengine/luaobject.h>
 #include <framework/util/databuffer.h>
 #include <framework/util/point.h>
@@ -77,6 +78,10 @@ public:
 
     FileStreamPtr asFileStream() { return static_self_cast<FileStream>(); }
 
+#ifdef WITH_ENCRYPTION
+    DataBuffer<uint8_t> m_data;
+#endif
+
 private:
     void checkWrite();
     void throwError(const std::string& message, bool physfsError = false);
@@ -87,7 +92,9 @@ private:
     bool m_writeable;
     bool m_caching;
 
+#ifndef WITH_ENCRYPTION
     DataBuffer<uint8_t> m_data;
+#endif   
 };
 
 #endif

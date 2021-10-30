@@ -38,7 +38,11 @@ Logger g_logger;
 namespace
 {
     const std::string s_logPrefixes[] = { "", "", "WARNING: ", "ERROR: ", "FATAL ERROR: " };
+#ifdef WITH_ENCRYPTION
+    bool s_ignoreLogs = true;
+#else
     bool s_ignoreLogs = false;
+#endif
 }
 
 void Logger::log(Fw::LogLevel level, const std::string& message)
