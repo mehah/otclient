@@ -318,7 +318,7 @@ std::vector<std::string> ResourceManager::discoverPath(const fs::path& path, boo
 std::string ResourceManager::resolvePath(const std::string& path)
 {
     std::string fullPath;
-    if(stdext::starts_with(path, "/"))
+    if(path.starts_with("/"))
         fullPath = path;
     else {
         std::string scriptPath = "/" + g_lua.getCurrentSourcePath();

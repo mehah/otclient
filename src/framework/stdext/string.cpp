@@ -212,31 +212,17 @@ namespace stdext {
 
     void tolower(std::string& str)
     {
-        std::transform(str.begin(), str.end(), str.begin(), lochar);
+        std::transform(str.begin(), str.end(), str.begin(), ::tolower);
     }
 
     void toupper(std::string& str)
     {
-        std::transform(str.begin(), str.end(), str.begin(), upchar);
+        std::transform(str.begin(), str.end(), str.begin(), ::toupper);
     }
 
     void trim(std::string& str)
     {
         boost::trim(str);
-    }
-
-    char upchar(char c)
-    {
-        if((c >= 97 && c <= 122) || static_cast<uchar>(c) >= 224)
-            c -= 32;
-        return c;
-    }
-
-    char lochar(char c)
-    {
-        if((c >= 65 && c <= 90) || (static_cast<uchar>(c) >= 192 && static_cast<uchar>(c) <= 223))
-            c += 32;
-        return c;
     }
 
     void ucwords(std::string& str)
@@ -245,21 +231,11 @@ namespace stdext {
         if(strLen == 0)
             return;
 
-        str[0] = upchar(str[0]);
+        str[0] = std::toupper(str[0]);
         for(uint32 i = 1; i < strLen; ++i) {
             if(str[i - 1] == ' ')
-                str[i] = upchar(str[i]);
+                str[i] = std::toupper(str[i]);
         }
-    }
-
-    bool ends_with(const std::string& str, const std::string& test)
-    {
-        return boost::ends_with(str, test);
-    }
-
-    bool starts_with(const std::string& str, const std::string& test)
-    {
-        return boost::starts_with(str, test);
     }
 
     void replace_all(std::string& str, const std::string& search, const std::string& replacement)

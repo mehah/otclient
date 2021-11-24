@@ -199,13 +199,11 @@ private:
                      (m_virtualCenterOffset.y + (position.y - relativePosition.y) - (relativePosition.z - position.z)) * m_tileSize);
     }
 
-    bool canRenderTile(const TilePtr& tile, LightView* lightView);
-
     uint8 m_lockedFirstVisibleFloor{ UINT8_MAX },
         m_cachedFirstVisibleFloor{ SEA_FLOOR },
         m_cachedLastVisibleFloor{ SEA_FLOOR },
         m_renderScale{ 100 },
-        m_tileSize,
+        m_tileSize{ SPRITE_SIZE },
         m_floorMin{ 0 },
         m_floorMax{ 0 };
 
@@ -213,7 +211,7 @@ private:
         m_fadeInTime{ 0 },
         m_fadeOutTime{ 0 },
         m_shadowFloorIntensity{ 0 },
-        m_scaleFactor;
+        m_scaleFactor{ 1.f };
 
     Rect m_rectDimension;
 
