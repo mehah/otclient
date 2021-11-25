@@ -212,12 +212,12 @@ namespace stdext {
 
     void tolower(std::string& str)
     {
-        std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+        std::transform(str.begin(), str.end(), str.begin(), [](int c) -> char { return static_cast<char>(::tolower(c)); });
     }
 
     void toupper(std::string& str)
     {
-        std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+        std::transform(str.begin(), str.end(), str.begin(), [](int c) -> char { return static_cast<char>(::toupper(c)); });
     }
 
     void trim(std::string& str)
@@ -231,10 +231,10 @@ namespace stdext {
         if(strLen == 0)
             return;
 
-        str[0] = std::toupper(str[0]);
+        str[0] = static_cast<char>(std::toupper(str[0]));
         for(uint32 i = 1; i < strLen; ++i) {
             if(str[i - 1] == ' ')
-                str[i] = std::toupper(str[i]);
+                str[i] = static_cast<char>(std::toupper(str[i]));
         }
     }
 
