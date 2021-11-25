@@ -44,7 +44,7 @@ public:
 
     static bool hasSpeedFormula() { return speedA != 0 && speedB != 0 && speedC != 0; }
 
-    void draw(const Point& dest, float scaleFactor, bool animate, const Highlight& highLight, TextureType textureType, Color color, int frameFlags, LightView* lightView = nullptr) override;
+    void draw(const Point& dest, float scaleFactor, bool animate, const Highlight& highLight, TextureType textureType, Color color, LightView* lightView = nullptr) override;
 
     void internalDrawOutfit(Point dest, float scaleFactor, bool animateWalk, TextureType textureType, Otc::Direction direction, Color color);
 
@@ -104,7 +104,7 @@ public:
     Position getLastStepFromPosition() { return m_lastStepFromPosition; }
     Position getLastStepToPosition() { return m_lastStepToPosition; }
     float getStepProgress() { return m_walkTimer.ticksElapsed() / m_stepCache.duration; }
-    float getStepTicksLeft() { return static_cast<float>(m_stepCache.duration) - m_walkTimer.ticksElapsed(); }
+    float getStepTicksLeft() { return static_cast<float>(m_stepCache.getDuration(m_lastStepDirection)) - m_walkTimer.ticksElapsed(); }
     ticks_t getWalkTicksElapsed() { return m_walkTimer.ticksElapsed(); }
     std::array<double, Otc::LastSpeedFormula> getSpeedFormulaArray() { return m_speedFormula; }
     Point getDisplacement() override;

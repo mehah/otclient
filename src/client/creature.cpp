@@ -71,28 +71,26 @@ Creature::Creature() : Thing()
     m_mountShader = g_shaders.getDefaultMountShader();
 }
 
-void Creature::draw(const Point& dest, float scaleFactor, bool animate, const Highlight& highLight, TextureType textureType, Color color, int frameFlags, LightView* lightView)
+void Creature::draw(const Point& dest, float scaleFactor, bool animate, const Highlight& highLight, TextureType textureType, Color color, LightView* lightView)
 {
     if(!canBeSeen())
         return;
 
-    if(frameFlags & Otc::FUpdateThing) {
-        if(m_showTimedSquare) {
-            g_drawPool.addBoundingRect(Rect(dest + (m_walkOffset - getDisplacement() + 2) * scaleFactor, Size(28 * scaleFactor)), m_timedSquareColor, std::max<int>(static_cast<int>(2 * scaleFactor), 1));
-        }
-
-        if(m_showStaticSquare) {
-            g_drawPool.addBoundingRect(Rect(dest + (m_walkOffset - getDisplacement()) * scaleFactor, Size(SPRITE_SIZE * scaleFactor)), m_staticSquareColor, std::max<int>(static_cast<int>(2 * scaleFactor), 1));
-        }
-
-        internalDrawOutfit(dest + m_walkOffset * scaleFactor, scaleFactor, animate, textureType, m_direction, color);
-
-        if(highLight.enabled && this == highLight.thing) {
-            internalDrawOutfit(dest + m_walkOffset * scaleFactor, scaleFactor, animate, TextureType::ALL_BLANK, m_direction, highLight.rgbColor);
-        }
+    if(m_showTimedSquare) {
+        g_drawPool.addBoundingRect(Rect(dest + (m_walkOffset - getDisplacement() + 2) * scaleFactor, Size(28 * scaleFactor)), m_timedSquareColor, std::max<int>(static_cast<int>(2 * scaleFactor), 1));
     }
 
-    if(lightView && frameFlags & Otc::FUpdateLight) {
+    if(m_showStaticSquare) {
+        g_drawPool.addBoundingRect(Rect(dest + (m_walkOffset - getDisplacement()) * scaleFactor, Size(SPRITE_SIZE * scaleFactor)), m_staticSquareColor, std::max<int>(static_cast<int>(2 * scaleFactor), 1));
+    }
+
+    internalDrawOutfit(dest + m_walkOffset * scaleFactor, scaleFactor, animate, textureType, m_direction, color);
+
+    if(highLight.enabled && this == highLight.thing) {
+        internalDrawOutfit(dest + m_walkOffset * scaleFactor, scaleFactor, animate, TextureType::ALL_BLANK, m_direction, highLight.rgbColor);
+    }
+
+    if(lightView) {
         auto light = getLight();
 
         if(isLocalPlayer() && (g_map.getLight().intensity < 64 || m_position.z > SEA_FLOOR)) {
@@ -252,11 +250,15 @@ void Creature::drawInformation(const Rect& parentRect, const Point& dest, float 
     }
 
     // calculate main rects
-    auto backgroundRect = Rect(p.x - (13.5), p.y, 27, 4);
-    backgroundRect.bind(parentRect);
 
     const Size nameSize = m_nameCache.getTextSize();
-    auto textRect = Rect(p.x - nameSize.width() / 2.0, p.y - 12, nameSize);
+    const int cropSizeText = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? m_drawCache.exactSize : 12,
+        cropSizeBackGround = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? cropSizeText - nameSize.height() : 0;
+
+    auto backgroundRect = Rect(p.x - (13.5), p.y - cropSizeBackGround, 27, 4);
+    backgroundRect.bind(parentRect);
+
+    auto textRect = Rect(p.x - nameSize.width() / 2.0, p.y - cropSizeText, nameSize);
     textRect.bind(parentRect);
 
     // distance them
