@@ -288,22 +288,22 @@ std::list<std::string> ResourceManager::listDirectoryFiles(const std::string& di
 
 std::vector<std::string> ResourceManager::getDirectoryFiles(const std::string& path, bool filenameOnly, bool recursive)
 {
-    if(!fs::exists(path))
+    if(!std::filesystem::exists(path))
         return std::vector<std::string>();
 
-    fs::path p(path);
+    std::filesystem::path p(path);
     return discoverPath(p, filenameOnly, recursive);
 }
 
-std::vector<std::string> ResourceManager::discoverPath(const fs::path& path, bool filenameOnly, bool recursive)
+std::vector<std::string> ResourceManager::discoverPath(const std::filesystem::path& path, bool filenameOnly, bool recursive)
 {
     std::vector<std::string> files;
 
     /* Before doing anything, we have to add this directory to search path,
      * this is needed so it works correctly when one wants to open a file.  */
     addSearchPath(path.generic_string(), true);
-    for(fs::directory_iterator it(path), end; it != end; ++it) {
-        if(fs::is_directory(it->path().generic_string()) && recursive) {
+    for(std::filesystem::directory_iterator it(path), end; it != end; ++it) {
+        if(std::filesystem::is_directory(it->path().generic_string()) && recursive) {
             std::vector<std::string> subfiles = discoverPath(it->path(), filenameOnly, recursive);
             files.insert(files.end(), subfiles.begin(), subfiles.end());
         } else {
@@ -330,6 +330,7 @@ std::string ResourceManager::resolvePath(const std::string& path)
     }
     if(!(fullPath.starts_with("/")))
         g_logger.traceWarning(stdext::format("the following file path is not fully resolved: %s", path));
+
     stdext::replace_all(fullPath, "//", "/");
     return fullPath;
 }

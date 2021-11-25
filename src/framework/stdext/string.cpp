@@ -240,7 +240,11 @@ namespace stdext {
 
     void replace_all(std::string& str, const std::string& search, const std::string& replacement)
     {
-        return boost::replace_all(str, search, replacement);
+        size_t pos = 0;
+        while((pos = str.find(search, pos)) != std::string::npos) {
+            str.replace(pos, search.length(), replacement);
+            pos += replacement.length();
+        }
     }
 
     std::vector<std::string> split(const std::string& str, const std::string& separators)
