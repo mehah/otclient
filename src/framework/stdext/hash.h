@@ -20,25 +20,18 @@
  * THE SOFTWARE.
  */
 
-#ifndef STDEXT_H
-#define STDEXT_H
+#ifndef STDEXT_HASH_H
+#define STDEXT_HASH_H
 
-#include "any.h"
-#include "boolean.h"
-#include "cast.h"
-#include "compiler.h"
-#include "demangle.h"
-#include "dumper.h"
-#include "dynamic_storage.h"
-#include "exception.h"
-#include "format.h"
-#include "math.h"
-#include "packed_any.h"
-#include "packed_storage.h"
-#include "shared_object.h"
-#include "string.h"
-#include "time.h"
-#include "types.h"
-#include "hash.h"
+#include <string>
+
+namespace stdext {
+    template <class T>
+    inline void hash_combine(std::size_t& seed, const T& v)
+    {
+        std::hash<T> hasher;
+        seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    }
+}
 
 #endif

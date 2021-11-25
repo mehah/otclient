@@ -1067,6 +1067,9 @@
     <ClInclude Include="..\src\gitinfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\framework\stdext\hash.h">
+      <Filter>Header Files\framework\stdext</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\src\otcicon.rc">
