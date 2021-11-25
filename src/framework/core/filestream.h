@@ -92,9 +92,9 @@ private:
     bool m_writeable;
     bool m_caching;
 
-#ifndef ENABLE_ENCRYPTION
+#if ENABLE_ENCRYPTION == 0
     DataBuffer<uint8_t> m_data;
-#endif   
+#endif
 };
 
 #endif

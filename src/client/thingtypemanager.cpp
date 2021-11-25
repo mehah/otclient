@@ -108,7 +108,7 @@ bool ThingTypeManager::loadDat(std::string file)
 
 #if ENABLE_ENCRYPTION == 1
         fin->cache();
-        ResourceManager::decrypt(fin->m_data.data(), fin->m_data.size(), g_resources.encryptionPassword);
+        ResourceManager::decrypt(fin->m_data.data(), fin->m_data.size());
 #endif
 
         m_datSignature = fin->getU32();

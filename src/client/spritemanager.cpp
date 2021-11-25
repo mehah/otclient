@@ -52,7 +52,7 @@ bool SpriteManager::loadSpr(std::string file)
         m_spritesFile->cache();
 
 #if ENABLE_ENCRYPTION == 1
-        ResourceManager::decrypt(m_spritesFile->m_data.data(), m_spritesFile->m_data.size(), g_resources.encryptionPassword);
+        ResourceManager::decrypt(m_spritesFile->m_data.data(), m_spritesFile->m_data.size());
 #endif
 
         m_signature = m_spritesFile->getU32();

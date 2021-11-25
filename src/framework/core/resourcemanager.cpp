@@ -195,7 +195,7 @@ std::string ResourceManager::readFileContents(const std::string& fileName)
     PHYSFS_close(file);
 
 #if ENABLE_ENCRYPTION == 1
-    buffer = decrypt(buffer, encryptionPassword);
+    buffer = decrypt(buffer);
 #endif
 
     return buffer;
@@ -230,7 +230,7 @@ bool ResourceManager::writeFileStream(const std::string& fileName, std::iostream
 bool ResourceManager::writeFileContents(const std::string& fileName, const std::string& data)
 {
 #if ENABLE_ENCRYPTION == 1
-    return writeFileBuffer(fileName, (const uchar*)encrypt(data, encryptionPassword).c_str(), data.size());
+    return writeFileBuffer(fileName, (const uchar*)encrypt(data, std::string(ENCRYPTION_PASSWORD)).c_str(), data.size());
 #else
     return writeFileBuffer(fileName, (const uchar*)data.c_str(), data.size());
 #endif
@@ -375,14 +375,14 @@ ticks_t ResourceManager::getFileTime(const std::string& filename)
     return g_platform.getFileModificationTime(getRealPath(filename));
 }
 
-std::string ResourceManager::encrypt(std::string data, std::string& password)
+std::string ResourceManager::encrypt(const std::string& data, const std::string& password)
 {
-    std::ostringstream ss;
-    int len = data.length();
-    int plen = password.length();
+    const size_t len = data.length(),
+        plen = password.length();
 
+    std::ostringstream ss;
     int j = 0;
-    for(int i = 0; i < len; i++)
+    for(int i = -1; ++i < len;)
     {
         int ct = data[i];
         if(i % 2) {
@@ -399,14 +399,16 @@ std::string ResourceManager::encrypt(std::string data, std::string& password)
 
     return ss.str();
 }
-std::string ResourceManager::decrypt(std::string& data, std::string& password)
+std::string ResourceManager::decrypt(const std::string& data)
 {
-    std::ostringstream ss;
-    int len = data.length();
-    int plen = password.length();
+    const std::string& password = std::string(ENCRYPTION_PASSWORD);
 
+    const size_t len = data.length(),
+        plen = password.length();
+
+    std::ostringstream ss;
     int j = 0;
-    for(int i = 0; i < len; i++)
+    for(int i = -1; ++i < len;)
     {
         int ct = data[i];
         if(i % 2) {
@@ -415,7 +417,7 @@ std::string ResourceManager::decrypt(std::string& data, std::string& password)
             ct = ct - password[j] + i;
         }
         ss << (char)(ct);
-        j++;
+        ++j;
 
         if(j >= plen)
             j = 0;
@@ -424,13 +426,15 @@ std::string ResourceManager::decrypt(std::string& data, std::string& password)
     return ss.str();
 }
 
-uint8_t* ResourceManager::decrypt(uint8_t* data, int32_t size, std::string& password)
+uint8_t* ResourceManager::decrypt(uint8_t* data, int32_t size)
 {
+    const std::string& password = std::string(ENCRYPTION_PASSWORD);
+    const size_t plen = password.length();
+
     uint8_t* new_Data = new uint8_t[size];
-    int plen = password.length();
 
     int j = 0;
-    for(int i = 0; i < size; i++)
+    for(int i = -1; ++i < size;)
     {
         int ct = data[i];
         if(i % 2) {
@@ -439,7 +443,7 @@ uint8_t* ResourceManager::decrypt(uint8_t* data, int32_t size, std::string& pass
             new_Data[i] = ct - password[j] + i;
         }
         data[i] = new_Data[i];
-        j++;
+        ++j;
 
         if(j >= plen)
             j = 0;
@@ -448,7 +452,7 @@ uint8_t* ResourceManager::decrypt(uint8_t* data, int32_t size, std::string& pass
     return nullptr;
 }
 
-void ResourceManager::runEncryption(std::string password)
+void ResourceManager::runEncryption(const std::string& password)
 {
     std::vector<std::string> excludedExtensions = { ".rar",".ogg",".xml",".dll",".exe", ".log",".otb" };
     for(const auto& entry : boost::filesystem::recursive_directory_iterator("./")) {
@@ -464,7 +468,7 @@ void ResourceManager::runEncryption(std::string password)
     }
 }
 
-void ResourceManager::save_string_into_file(std::string contents, std::string name)
+void ResourceManager::save_string_into_file(const std::string& contents, const std::string& name)
 {
     std::ofstream datFile;
     datFile.open(name.c_str(), std::ofstream::binary | std::ofstream::trunc | std::ofstream::out);
