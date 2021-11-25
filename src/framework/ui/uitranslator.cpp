@@ -27,44 +27,61 @@
 Fw::AlignmentFlag Fw::translateAlignment(std::string aligment)
 {
     stdext::tolower(aligment);
-    boost::erase_all(aligment, " ");
+    stdext::eraseWhiteSpace(aligment);
+
     if(aligment == "topleft")
         return AlignTopLeft;
+
     if(aligment == "topright")
         return AlignTopRight;
+
     if(aligment == "bottomleft")
         return AlignBottomLeft;
+
     if(aligment == "bottomright")
         return AlignBottomRight;
+
     if(aligment == "left")
         return AlignLeftCenter;
+
     if(aligment == "right")
         return AlignRightCenter;
+
     if(aligment == "top")
         return AlignTopCenter;
+
     if(aligment == "bottom")
         return AlignBottomCenter;
+
     if(aligment == "center")
         return AlignCenter;
+
     return AlignNone;
 }
 
 Fw::AnchorEdge Fw::translateAnchorEdge(std::string anchorEdge)
 {
     stdext::tolower(anchorEdge);
-    boost::erase_all(anchorEdge, " ");
+    stdext::eraseWhiteSpace(anchorEdge);
+
     if(anchorEdge == "left")
         return AnchorLeft;
+
     if(anchorEdge == "right")
         return AnchorRight;
+
     if(anchorEdge == "top")
         return AnchorTop;
+
     if(anchorEdge == "bottom")
         return AnchorBottom;
+
     if(anchorEdge == "horizontalcenter")
         return AnchorHorizontalCenter;
+
     if(anchorEdge == "verticalcenter")
         return AnchorVerticalCenter;
+
     return AnchorNone;
 }
 
