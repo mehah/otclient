@@ -33,9 +33,9 @@
 namespace stdext {
     std::string resolve_path(const std::string& filePath, std::string sourcePath)
     {
-        if(stdext::starts_with(filePath, "/"))
+        if(filePath.starts_with("/"))
             return filePath;
-        if(!stdext::ends_with(sourcePath, "/")) {
+        if(!sourcePath.ends_with("/")) {
             std::size_t slashPos = sourcePath.find_last_of("/");
             if(slashPos == std::string::npos)
                 throw_exception(format("invalid source path '%s', for file '%s'", sourcePath, filePath));
