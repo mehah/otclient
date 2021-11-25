@@ -106,7 +106,7 @@ bool ThingTypeManager::loadDat(std::string file)
 
         FileStreamPtr fin = g_resources.openFile(file);
 
-#ifdef WITH_ENCRYPTION
+#if ENABLE_ENCRYPTION == 1
         fin->cache();
         ResourceManager::decrypt(fin->m_data.data(), fin->m_data.size(), g_resources.encryptionPassword);
 #endif

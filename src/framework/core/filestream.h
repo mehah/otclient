@@ -78,7 +78,7 @@ public:
 
     FileStreamPtr asFileStream() { return static_self_cast<FileStream>(); }
 
-#ifdef WITH_ENCRYPTION
+#if ENABLE_ENCRYPTION == 1
     DataBuffer<uint8_t> m_data;
 #endif
 
@@ -92,7 +92,7 @@ private:
     bool m_writeable;
     bool m_caching;
 
-#ifndef WITH_ENCRYPTION
+#ifndef ENABLE_ENCRYPTION
     DataBuffer<uint8_t> m_data;
 #endif   
 };

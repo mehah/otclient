@@ -51,7 +51,7 @@ bool SpriteManager::loadSpr(std::string file)
         // cache file buffer to avoid lags from hard drive
         m_spritesFile->cache();
 
-#ifdef WITH_ENCRYPTION
+#if ENABLE_ENCRYPTION == 1
         ResourceManager::decrypt(m_spritesFile->m_data.data(), m_spritesFile->m_data.size(), g_resources.encryptionPassword);
 #endif
 

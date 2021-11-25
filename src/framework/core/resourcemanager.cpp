@@ -194,7 +194,7 @@ std::string ResourceManager::readFileContents(const std::string& fileName)
     PHYSFS_readBytes(file, static_cast<void*>(&buffer[0]), fileSize);
     PHYSFS_close(file);
 
-#ifdef WITH_ENCRYPTION
+#if ENABLE_ENCRYPTION == 1
     buffer = decrypt(buffer, encryptionPassword);
 #endif
 
@@ -229,7 +229,7 @@ bool ResourceManager::writeFileStream(const std::string& fileName, std::iostream
 
 bool ResourceManager::writeFileContents(const std::string& fileName, const std::string& data)
 {
-#ifdef WITH_ENCRYPTION
+#if ENABLE_ENCRYPTION == 1
     return writeFileBuffer(fileName, (const uchar*)encrypt(data, encryptionPassword).c_str(), data.size());
 #else
     return writeFileBuffer(fileName, (const uchar*)data.c_str(), data.size());
@@ -382,19 +382,18 @@ std::string ResourceManager::encrypt(std::string data, std::string& password)
     int plen = password.length();
 
     int j = 0;
-    for (int i = 0; i < len; i++)
+    for(int i = 0; i < len; i++)
     {
         int ct = data[i];
-        if (i % 2) {
+        if(i % 2) {
             ct = ct - password[j] + i;
-        }
-        else {
+        } else {
             ct = ct + password[j] - i;
         }
         ss << (char)(ct);
         j++;
 
-        if (j >= plen)
+        if(j >= plen)
             j = 0;
     }
 
@@ -407,19 +406,18 @@ std::string ResourceManager::decrypt(std::string& data, std::string& password)
     int plen = password.length();
 
     int j = 0;
-    for (int i = 0; i < len; i++)
+    for(int i = 0; i < len; i++)
     {
         int ct = data[i];
-        if (i % 2) {
+        if(i % 2) {
             ct = ct + password[j] - i;
-        }
-        else {
+        } else {
             ct = ct - password[j] + i;
         }
         ss << (char)(ct);
         j++;
 
-        if (j >= plen)
+        if(j >= plen)
             j = 0;
     }
 
@@ -432,19 +430,18 @@ uint8_t* ResourceManager::decrypt(uint8_t* data, int32_t size, std::string& pass
     int plen = password.length();
 
     int j = 0;
-    for (int i = 0; i < size; i++)
+    for(int i = 0; i < size; i++)
     {
         int ct = data[i];
-        if (i % 2) {
+        if(i % 2) {
             new_Data[i] = ct + password[j] - i;
-        }
-        else {
+        } else {
             new_Data[i] = ct - password[j] + i;
         }
         data[i] = new_Data[i];
         j++;
 
-        if (j >= plen)
+        if(j >= plen)
             j = 0;
     }
 
@@ -454,9 +451,9 @@ uint8_t* ResourceManager::decrypt(uint8_t* data, int32_t size, std::string& pass
 void ResourceManager::runEncryption(std::string password)
 {
     std::vector<std::string> excludedExtensions = { ".rar",".ogg",".xml",".dll",".exe", ".log",".otb" };
-    for (const auto& entry : boost::filesystem::recursive_directory_iterator("./")) {
+    for(const auto& entry : boost::filesystem::recursive_directory_iterator("./")) {
         std::string ext = boost::filesystem::extension(entry.path().string());
-        if (std::find(excludedExtensions.begin(), excludedExtensions.end(), ext) != excludedExtensions.end())
+        if(std::find(excludedExtensions.begin(), excludedExtensions.end(), ext) != excludedExtensions.end())
             continue;
 
         boost::filesystem::ifstream ifs(entry.path().string(), std::ios_base::binary);

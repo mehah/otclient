@@ -19,14 +19,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#define WITH_ENCRYPTION
-
 
 #ifndef RESOURCES_H
 #define RESOURCES_H
 
 #include "declarations.h"
-
 #include <boost/filesystem.hpp>
 
 namespace fs = boost::filesystem;
@@ -82,7 +79,7 @@ public:
     bool isFileType(const std::string& filename, const std::string& type);
     ticks_t getFileTime(const std::string& filename);
 
-    std::string encryptionPassword = "PASSWORD_GOES_HERE_LIKE_ASFKSDGHKSFH";
+    std::string encryptionPassword = std::string(ENCRYPTION_PASSWORD).c_str();
     std::string encrypt(std::string data, std::string& password);
     std::string decrypt(std::string& data, std::string& password);
     static uint8_t* decrypt(uint8_t* data, int32_t size, std::string& password);
