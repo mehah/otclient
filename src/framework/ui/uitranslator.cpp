@@ -26,7 +26,7 @@
 
 Fw::AlignmentFlag Fw::translateAlignment(std::string aligment)
 {
-    boost::to_lower(aligment);
+    stdext::tolower(aligment);
     boost::erase_all(aligment, " ");
     if(aligment == "topleft")
         return AlignTopLeft;
@@ -51,7 +51,7 @@ Fw::AlignmentFlag Fw::translateAlignment(std::string aligment)
 
 Fw::AnchorEdge Fw::translateAnchorEdge(std::string anchorEdge)
 {
-    boost::to_lower(anchorEdge);
+    stdext::tolower(anchorEdge);
     boost::erase_all(anchorEdge, " ");
     if(anchorEdge == "left")
         return AnchorLeft;
@@ -70,8 +70,8 @@ Fw::AnchorEdge Fw::translateAnchorEdge(std::string anchorEdge)
 
 Fw::WidgetState Fw::translateState(std::string state)
 {
-    boost::to_lower(state);
-    boost::trim(state);
+    stdext::tolower(state);
+    stdext::trim(state);
     if(state == "active")
         return ActiveState;
     if(state == "focus")
@@ -103,8 +103,8 @@ Fw::WidgetState Fw::translateState(std::string state)
 
 Fw::AutoFocusPolicy Fw::translateAutoFocusPolicy(std::string policy)
 {
-    boost::to_lower(policy);
-    boost::trim(policy);
+    stdext::tolower(policy);
+    stdext::trim(policy);
     if(policy == "first")
         return AutoFocusFirst;
     if(policy == "last")
