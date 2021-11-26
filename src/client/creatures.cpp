@@ -124,7 +124,7 @@ void Spawn::addCreature(const Position& placePos, const CreatureTypePtr& cType)
     const int m_radius = getRadius();
     if(!isInZone(placePos, centerPos, m_radius)) {
         g_logger.warning(stdext::format("cannot place creature at %s (spawn's center position: %s, spawn radius: %d) (increment radius)",
-                                        stdext::to_string(placePos), stdext::to_string(centerPos),
+                                        std::to_string(placePos), std::to_string(centerPos),
                                         m_radius
         ));
         return;
