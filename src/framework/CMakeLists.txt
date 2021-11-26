@@ -29,7 +29,6 @@ set(framework_SOURCES ${framework_SOURCES}
 
     # stdext
     ${CMAKE_CURRENT_LIST_DIR}/stdext/any.h
-    ${CMAKE_CURRENT_LIST_DIR}/stdext/boolean.h
     ${CMAKE_CURRENT_LIST_DIR}/stdext/cast.h
     ${CMAKE_CURRENT_LIST_DIR}/stdext/compiler.h
     ${CMAKE_CURRENT_LIST_DIR}/stdext/demangle.cpp
