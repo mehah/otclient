@@ -40,11 +40,12 @@ struct AwareRange
 class MapView : public LuaObject
 {
 public:
-    enum ViewMode {
-        NEAR_VIEW,
-        MID_VIEW,
-        FAR_VIEW,
-        HUGE_VIEW
+    enum FloorViewMode {
+        NORMAL,
+        FADE,
+        LOCKED,
+        ALWAYS,
+        ALWAYS_WITH_TRANSPARENCY
     };
 
     enum AntialiasingMode :uint8 {
@@ -67,20 +68,13 @@ public:
     void lockFirstVisibleFloor(uint8 firstVisibleFloor);
     void unlockFirstVisibleFloor();
 
-    bool isMultifloor() { return m_multifloor; }
-    void setMultifloor(bool enable) { m_multifloor = enable; requestVisibleTilesCacheUpdate(); }
-
     // map dimension related
-    Point getVisibleCenterOffset() { return m_visibleCenterOffset; }
     Size getVisibleDimension() { return m_visibleDimension; }
     void setVisibleDimension(const Size& visibleDimension);
 
     // view mode related
-    ViewMode getViewMode() { return m_viewMode; }
-    void setViewMode(ViewMode viewMode);
-
-    void setAutoViewMode(bool enable);
-    bool isAutoViewModeEnabled() { return m_autoViewMode; }
+    FloorViewMode getFloorViewMode() { return m_floorViewMode; }
+    void setFloorViewMode(FloorViewMode viewMode);
 
     // camera related
     CreaturePtr getFollowingCreature() { return m_followingCreature; }
@@ -202,8 +196,9 @@ private:
         };
     }
 
-    uint8 m_lockedFirstVisibleFloor{ UINT8_MAX },
-        m_cachedFirstVisibleFloor{ SEA_FLOOR },
+    int8 m_lockedFirstVisibleFloor{ -1 };
+
+    uint8 m_cachedFirstVisibleFloor{ SEA_FLOOR },
         m_cachedLastVisibleFloor{ SEA_FLOOR },
         m_tileSize{ SPRITE_SIZE },
         m_floorMin{ 0 },
@@ -218,12 +213,9 @@ private:
 
     Rect m_rectDimension;
 
-    Size m_drawDimension,
-        m_visibleDimension;
+    Size m_drawDimension, m_visibleDimension;
 
-    Point m_virtualCenterOffset,
-        m_visibleCenterOffset,
-        m_moveOffset;
+    Point m_virtualCenterOffset, m_moveOffset;
 
     Position m_customCameraPosition,
         m_lastCameraPosition,
@@ -238,7 +230,6 @@ private:
         m_shaderSwitchDone{ true },
         m_drawHealthBars{ true },
         m_drawManaBar{ true },
-        m_multifloor{ true },
         m_drawTexts{ true },
         m_drawNames{ true },
         m_smooth{ true },
@@ -260,7 +251,7 @@ private:
     Pools m_pools;
 
     RectCache m_rectCache;
-    ViewMode m_viewMode{ NEAR_VIEW };
+    FloorViewMode m_floorViewMode{ NORMAL };
 
     Timer m_fadeTimer;
 

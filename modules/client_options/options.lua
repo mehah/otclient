@@ -40,7 +40,8 @@ local defaultOptions = {
     shadowFloorIntensity = 30,
     optimizeFps = true,
     forceEffectOptimization = true,
-    drawEffectOnTop = false
+    drawEffectOnTop = false,
+    floorViewMode = 0
 }
 
 local optionsWindow
@@ -56,6 +57,7 @@ local audioButton
 
 local crosshairCombobox
 local antialiasingModeCombobox
+local floorViewModeCombobox
 
 local function setupGraphicsEngines()
     local enginesRadioGroup = UIRadioGroup.create()
@@ -172,6 +174,19 @@ function setupComboBox()
     antialiasingModeCombobox.onOptionChange =
         function(comboBox, option)
             setOption('antialiasingMode', comboBox:getCurrentOption().data)
+        end
+
+    floorViewModeCombobox = graphicsPanel:recursiveGetChildById('floorViewMode')
+
+    floorViewModeCombobox:addOption('Normal', 0)
+    floorViewModeCombobox:addOption('Fade', 1)
+    floorViewModeCombobox:addOption('Locked', 2)
+    floorViewModeCombobox:addOption('Always', 3)
+    floorViewModeCombobox:addOption('Always with transparency', 4)
+
+    floorViewModeCombobox.onOptionChange =
+        function(comboBox, option)
+            setOption('floorViewMode', comboBox:getCurrentOption().data)
         end
 end
 
@@ -333,6 +348,8 @@ function setOption(key, value, force)
     elseif key == 'antialiasingMode' then
         gameMapPanel:setAntiAliasingMode(value)
         antialiasingModeCombobox:setCurrentOptionByData(value, true)
+    elseif key == 'floorViewMode' then
+        gameMapPanel:setFloorViewMode(value)
     end
 
     -- change value for keybind updates

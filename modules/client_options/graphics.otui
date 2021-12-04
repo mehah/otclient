@@ -68,10 +68,27 @@ Panel
     !text: tr('Don\'t stretch/shrink Game Window')
 
   Label
+    id: floorViewModeLabel
+    !text: tr('Floor View Mode')..':'
+    phantom: false
+    anchors.left: prev.left
+    anchors.top: prev.bottom
+    margin-top: 13
+
+  ComboBox
+    id: floorViewMode
+    width: 120
+    anchors.left: prev.right
+    anchors.top: prev.top
+    margin-top: -4
+    margin-left: 5
+    mouse-scroll: false
+
+  Label
     id: antialiasingModeLabel
     !text: tr('Antialiasing Mode')..':'
     phantom: false
-    anchors.left: prev.left
+    anchors.left: floorViewModeLabel.left
     anchors.top: prev.bottom
     margin-top: 13
 
