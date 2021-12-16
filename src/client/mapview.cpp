@@ -169,10 +169,8 @@ void MapView::drawFloor()
 
             const auto& map = m_cachedVisibleTiles[z];
 
-            const bool alwaysTransparent = m_floorViewMode == FloorViewMode::ALWAYS_WITH_TRANSPARENCY;
-
-            if(alwaysTransparent && z < m_cachedFirstVisibleFloor)
-                g_drawPool.setOpacity(.25);
+            Position _camera = cameraPosition;
+            const bool alwaysTransparent = m_floorViewMode == FloorViewMode::ALWAYS_WITH_TRANSPARENCY && z < m_cachedFirstVisibleFloor&& _camera.coveredUp();
 
             g_drawPool.startPosition();
             {
@@ -180,7 +178,13 @@ void MapView::drawFloor()
                     if(!tile->canRender(m_drawViewportEdge, cameraPosition, m_viewport, lightView))
                         continue;
 
+                    if(alwaysTransparent && tile->getPosition().isInRange(_camera, 2, 2, true))
+                        g_drawPool.setOpacity(.25);
+
                     tile->drawGround(transformPositionTo2D(tile->getPosition(), cameraPosition), m_scaleFactor, lightView);
+
+                    if(alwaysTransparent)
+                        g_drawPool.resetOpacity();
                 }
             }
 
@@ -188,7 +192,13 @@ void MapView::drawFloor()
                 if(!tile->canRender(m_drawViewportEdge, cameraPosition, m_viewport, lightView))
                     continue;
 
+                if(alwaysTransparent && tile->getPosition().isInRange(cameraPosition, 2, 2, true))
+                    g_drawPool.setOpacity(.25);
+
                 tile->drawSurface(transformPositionTo2D(tile->getPosition(), cameraPosition), m_scaleFactor, lightView);
+
+                if(alwaysTransparent)
+                    g_drawPool.resetOpacity();
             }
 
             for(const auto& tile : map.effects) {
@@ -202,9 +212,6 @@ void MapView::drawFloor()
                 for(const MissilePtr& missile : g_map.getFloorMissiles(z))
                     missile->draw(transformPositionTo2D(missile->getPosition(), cameraPosition), m_scaleFactor, lightView);
             }
-
-            if(alwaysTransparent)
-                g_drawPool.resetOpacity();
 
             if(m_shadowFloorIntensity > 0 && z == cameraPosition.z + 1) {
                 g_drawPool.addFilledRect(m_rectDimension, Color::black);
