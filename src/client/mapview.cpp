@@ -136,20 +136,17 @@ void MapView::drawFloor()
 
         g_drawPool.addFilledRect(m_rectDimension, Color::black);
         for(int_fast8_t z = m_floorMax; z >= m_floorMin; --z) {
-            if(m_floorViewMode == FloorViewMode::FADE) {
-                if(m_floorFading > 0) {
-                    float fading = std::clamp<float>(static_cast<float>(m_fadingFloorTimers[z].elapsed_millis()) / static_cast<float>(m_floorFading), 0.f, 1.f);
-                    if(z < m_cachedFirstVisibleFloor)
-                        fading = 1.0 - fading;
-
-                    if(fading < 0.99)
-                        g_drawPool.setOpacity(fading);
-                }
+            if(m_floorViewMode == FloorViewMode::FADE && m_floorFading) {
+                float fading = getFadeLevel(z);
+                if(fading == 0) break;
+                if(fading < 0.99)
+                    g_drawPool.setOpacity(fading);
             }
 
             if(isDrawingLights()) {
                 const int8 nextFloor = z - 1;
-                if(nextFloor >= m_floorMin) {
+
+                if(nextFloor >= m_floorMin && (m_floorViewMode != FloorViewMode::FADE || getFadeLevel(nextFloor) > 0.4)) {
                     Position _camera = cameraPosition;
                     const bool alwaysTransparent = m_floorViewMode == FloorViewMode::ALWAYS_WITH_TRANSPARENCY && nextFloor < cameraPosition.z&& _camera.coveredUp(cameraPosition.z - nextFloor);
 
@@ -370,7 +367,7 @@ void MapView::updateVisibleTilesCache()
     }
 
     uint8 cachedFirstVisibleFloor = m_cachedFirstVisibleFloor;
-    if(m_floorViewMode == FloorViewMode::ALWAYS_WITH_TRANSPARENCY || m_floorViewMode == FloorViewMode::FADE) {
+    if(m_floorViewMode == FloorViewMode::ALWAYS_WITH_TRANSPARENCY || m_floorViewMode == FloorViewMode::FADE && m_floorFading) {
         cachedFirstVisibleFloor = calcFirstVisibleFloor(false);
     }
 

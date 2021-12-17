@@ -186,6 +186,14 @@ private:
     void drawCreatureInformation();
     void drawText();
 
+    float getFadeLevel(uint8 z)
+    {
+        float fading = std::clamp<float>(static_cast<float>(m_fadingFloorTimers[z].elapsed_millis()) / static_cast<float>(m_floorFading), 0.f, 1.f);
+        if(z < m_cachedFirstVisibleFloor)
+            fading = 1.0 - fading;
+        return fading;
+    }
+
     Rect calcFramebufferSource(const Size& destSize);
 
     Point transformPositionTo2D(const Position& position, const Position& relativePosition)
