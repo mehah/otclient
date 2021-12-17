@@ -41,7 +41,8 @@ local defaultOptions = {
     optimizeFps = true,
     forceEffectOptimization = true,
     drawEffectOnTop = false,
-    floorViewMode = 0
+    floorViewMode = 1,
+    floorFading = 500
 }
 
 local optionsWindow
@@ -307,6 +308,11 @@ function setOption(key, value, force)
                                                                             'Shadow floor Intensity: %s%%',
                                                                             value))
         gameMapPanel:setShadowFloorIntensity(1 - (value / 100))
+    elseif key == 'floorFading' then
+        graphicsPanel:getChildById('floorFadingLabel'):setText(tr(
+                                                                   'Floor Fading: %s ms',
+                                                                   value))
+        gameMapPanel:setFloorFading(tonumber(value))
     elseif key == 'drawViewportEdge' then
         gameMapPanel:setDrawViewportEdge(value)
     elseif key == 'floatingEffect' then
@@ -351,6 +357,10 @@ function setOption(key, value, force)
     elseif key == 'floorViewMode' then
         gameMapPanel:setFloorViewMode(value)
         floorViewModeCombobox:setCurrentOptionByData(value, true)
+
+        local fadeMode = value == 1
+        graphicsPanel:getChildById('floorFading'):setEnabled(fadeMode)
+        graphicsPanel:getChildById('floorFadingLabel'):setEnabled(fadeMode)
     end
 
     -- change value for keybind updates

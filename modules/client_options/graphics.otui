@@ -140,6 +140,25 @@ Panel
     maximum: 100
 
   Label
+    id: floorFadingLabel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 12
+    @onSetup: |
+      local value = modules.client_options.getOption('floorFading')
+      self:setText(tr('Floor Fading: %s ms', value))
+
+  OptionScrollbar
+    id: floorFading
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 3
+    minimum: 0
+    maximum: 1000
+
+  Label
     id: backgroundFrameRateLabel
     !text: tr('Game framerate limit: %s', 'max')
     anchors.left: parent.left

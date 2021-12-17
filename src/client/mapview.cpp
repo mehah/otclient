@@ -136,7 +136,7 @@ void MapView::drawFloor()
 
         g_drawPool.addFilledRect(m_rectDimension, Color::black);
         for(int_fast8_t z = m_floorMax; z >= m_floorMin; --z) {
-            if(m_floorViewMode == FloorViewMode::FADE && m_floorFading) {
+            if(canFloorFade()) {
                 float fading = getFadeLevel(z);
                 if(fading == 0) break;
                 if(fading < 0.99)
@@ -231,7 +231,7 @@ void MapView::drawFloor()
                 g_drawPool.setOpacity(m_shadowFloorIntensity, g_drawPool.size());
             }
 
-            if(m_floorViewMode == FloorViewMode::FADE)
+            if(canFloorFade())
                 g_drawPool.resetOpacity();
         }
 
@@ -367,11 +367,11 @@ void MapView::updateVisibleTilesCache()
     }
 
     uint8 cachedFirstVisibleFloor = m_cachedFirstVisibleFloor;
-    if(m_floorViewMode == FloorViewMode::ALWAYS_WITH_TRANSPARENCY || m_floorViewMode == FloorViewMode::FADE && m_floorFading) {
+    if(m_floorViewMode == FloorViewMode::ALWAYS_WITH_TRANSPARENCY || canFloorFade()) {
         cachedFirstVisibleFloor = calcFirstVisibleFloor(false);
     }
 
-    // fading
+    // Fading System by Kondra https://github.com/OTCv8/otclientv8
     if(!m_lastCameraPosition.isValid() || m_lastCameraPosition.z != cameraPosition.z || m_lastCameraPosition.distance(cameraPosition) >= 3) {
         for(int iz = m_cachedLastVisibleFloor; iz >= cachedFirstVisibleFloor; --iz) {
             m_fadingFloorTimers[iz].restart(m_floorFading * 1000);
@@ -418,7 +418,7 @@ void MapView::updateVisibleTilesCache()
                         }
                     }
 
-                    if(m_floorViewMode != FloorViewMode::FADE) {
+                    if(!canFloorFade()) {
                         // skip tiles that are completely behind another tile
                         if(tile->isCompletelyCovered(cachedFirstVisibleFloor)) {
                             if(m_floorViewMode != FloorViewMode::ALWAYS_WITH_TRANSPARENCY || tilePos.z < cameraPosition.z && tile->isCovered()) {
@@ -896,4 +896,9 @@ bool MapView::isInRange(const Position& pos, const bool ignoreZ)
 void MapView::setCrosshairTexture(const std::string& texturePath)
 {
     m_crosshairTexture = texturePath.empty() ? nullptr : g_textures.getTexture(texturePath);
+}
+
+bool MapView::canFloorFade()
+{
+    return m_floorViewMode == FloorViewMode::FADE && m_floorFading && !g_app.canOptimize();
 }

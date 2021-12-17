@@ -139,6 +139,8 @@ public:
 
     void setDrawHighlightTarget(const bool enable) { m_drawHighlightTarget = enable; }
 
+    void setFloorFading(uint16 value) { m_floorFading = value; }
+
 protected:
     void onGlobalLightChange(const Light& light);
     void onFloorChange(uint8 floor, uint8 previousFloor);
@@ -186,6 +188,8 @@ private:
     void drawCreatureInformation();
     void drawText();
 
+    bool canFloorFade();
+
     float getFadeLevel(uint8 z)
     {
         float fading = std::clamp<float>(static_cast<float>(m_fadingFloorTimers[z].elapsed_millis()) / static_cast<float>(m_floorFading), 0.f, 1.f);
@@ -212,6 +216,8 @@ private:
         m_floorMin{ 0 },
         m_floorMax{ 0 },
         m_antiAliasingMode;
+
+    uint16 m_floorFading = 500;
 
     float m_minimumAmbientLight{ 0 },
         m_fadeInTime{ 0 },
@@ -253,6 +259,8 @@ private:
 
     std::array<MapList, MAX_Z + 1> m_cachedVisibleTiles;
 
+    stdext::timer m_fadingFloorTimers[MAX_Z + 1];
+
     PainterShaderProgramPtr m_shader, m_nextShader;
     LightViewPtr m_lightView;
     CreaturePtr m_followingCreature;
@@ -268,9 +276,6 @@ private:
     TilePtr m_lastHighlightTile;
     TexturePtr m_crosshairTexture;
     EffectPtr m_crosshairEffect;
-
-    int m_floorFading = 500;
-    stdext::timer m_fadingFloorTimers[MAX_Z + 1];
 };
 
 #endif
