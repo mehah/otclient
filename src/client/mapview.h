@@ -177,7 +177,7 @@ private:
     void updateVisibleTilesCache();
     void requestVisibleTilesCacheUpdate() { m_mustUpdateVisibleTilesCache = true; }
 
-    uint8 calcFirstVisibleFloor();
+    uint8 calcFirstVisibleFloor(bool checkLimitsFloorsView);
     uint8 calcLastVisibleFloor();
 
     void updateLight();
