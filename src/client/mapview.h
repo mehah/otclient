@@ -260,6 +260,9 @@ private:
     TilePtr m_lastHighlightTile;
     TexturePtr m_crosshairTexture;
     EffectPtr m_crosshairEffect;
+
+    int m_floorFading = 500;
+    stdext::timer m_fadingFloorTimers[MAX_Z + 1];
 };
 
 #endif
