@@ -170,7 +170,7 @@ void MapView::drawFloor()
             const auto& map = m_cachedVisibleTiles[z];
 
             Position _camera = cameraPosition;
-            const bool alwaysTransparent = m_floorViewMode == FloorViewMode::ALWAYS_WITH_TRANSPARENCY && z < m_cachedFirstVisibleFloor&& _camera.coveredUp();
+            const bool alwaysTransparent = m_floorViewMode == FloorViewMode::ALWAYS_WITH_TRANSPARENCY && z < m_cachedFirstVisibleFloor&& _camera.coveredUp(cameraPosition.z - z);
 
             g_drawPool.startPosition();
             {
@@ -178,8 +178,8 @@ void MapView::drawFloor()
                     if(!tile->canRender(m_drawViewportEdge, cameraPosition, m_viewport, lightView))
                         continue;
 
-                    if(alwaysTransparent && tile->getPosition().isInRange(_camera, 2, 2, true))
-                        g_drawPool.setOpacity(.25);
+                    if(alwaysTransparent)
+                        g_drawPool.setOpacity(tile->getPosition().isInRange(_camera, 2, 2, true) ? .15 : .7);
 
                     tile->drawGround(transformPositionTo2D(tile->getPosition(), cameraPosition), m_scaleFactor, lightView);
 
@@ -192,8 +192,8 @@ void MapView::drawFloor()
                 if(!tile->canRender(m_drawViewportEdge, cameraPosition, m_viewport, lightView))
                     continue;
 
-                if(alwaysTransparent && tile->getPosition().isInRange(cameraPosition, 2, 2, true))
-                    g_drawPool.setOpacity(.25);
+                if(alwaysTransparent)
+                    g_drawPool.setOpacity(tile->getPosition().isInRange(_camera, 2, 2, true) ? .15 : .7);
 
                 tile->drawSurface(transformPositionTo2D(tile->getPosition(), cameraPosition), m_scaleFactor, lightView);
 
@@ -242,9 +242,18 @@ void MapView::drawCreatureInformation()
     if(m_drawManaBar) { flags |= Otc::DrawManaBar; }
 
     for(const auto& creature : m_visibleCreatures) {
+        if(creature->isDead() || !creature->canBeSeen())
+            continue;
+
+        const auto& tile = creature->getTile();
+        if(!tile) continue;
+
+        bool useGray = m_floorViewMode != FloorViewMode::ALWAYS_WITH_TRANSPARENCY ?
+            tile->isCovered() : !tile->getPosition().isInRange(cameraPosition, 2, 2, true);
+
         creature->drawInformation(m_rectCache.rect,
                                   transformPositionTo2D(creature->getPosition(), cameraPosition),
-                                  m_scaleFactor, m_rectCache.drawOffset,
+                                  m_scaleFactor, m_rectCache.drawOffset, useGray,
                                   m_rectCache.horizontalStretchFactor, m_rectCache.verticalStretchFactor, flags);
     }
 }
@@ -375,8 +384,8 @@ void MapView::updateVisibleTilesCache()
                     }
 
                     // skip tiles that are completely behind another tile
-                    if(tile->isCompletelyCovered(m_cachedFirstVisibleFloor)) {
-                        if(m_floorViewMode != FloorViewMode::ALWAYS_WITH_TRANSPARENCY || iz < cameraPosition.z && tile->isCovered()) {
+                    if(tile->isCompletelyCovered(cachedFirstVisibleFloor)) {
+                        if(m_floorViewMode != FloorViewMode::ALWAYS_WITH_TRANSPARENCY || tilePos.z < cameraPosition.z && tile->isCovered()) {
                             continue;
                         }
                     }
@@ -731,16 +740,20 @@ TilePtr MapView::getTopTile(Position tilePos)
 {
     // we must check every floor, from top to bottom to check for a clickable tile
     TilePtr tile;
-    tilePos.coveredUp(tilePos.z - m_floorMin);
-    for(uint8 i = m_floorMin; i <= m_floorMax; ++i) {
-        tile = g_map.getTile(tilePos);
-        if(tile && tile->isClickable())
-            break;
-        tilePos.coveredDown();
-    }
 
-    if(!tile || !tile->isClickable())
-        return nullptr;
+    if(m_floorViewMode == FloorViewMode::ALWAYS_WITH_TRANSPARENCY && tilePos.isInRange(m_lastCameraPosition, 2, 2))
+        tile = g_map.getTile(tilePos);
+    else {
+        tilePos.coveredUp(tilePos.z - m_floorMin);
+        for(uint8 i = m_floorMin; i <= m_floorMax; ++i) {
+            tile = g_map.getTile(tilePos);
+            if(tile && tile->isClickable())
+                break;
+
+            tilePos.coveredDown();
+            tile = nullptr;
+        }
+    }
 
     return tile;
 }
