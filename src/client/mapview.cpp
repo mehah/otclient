@@ -154,7 +154,7 @@ void MapView::drawFloor()
                     for(const auto& tile : m_cachedVisibleTiles[nextFloor].shades) {
                         const auto& ground = tile->getGround();
                         if(ground && !ground->isTranslucent()) {
-                            if(alwaysTransparent && tile->getPosition().isInRange(_camera, 2, 2, true))
+                            if(alwaysTransparent && tile->getPosition().isInRange(_camera, TRANSPARENT_FLOOR_VIEW_RANGE, TRANSPARENT_FLOOR_VIEW_RANGE, true))
                                 continue;
 
                             auto pos2D = transformPositionTo2D(tile->getPosition(), cameraPosition);
@@ -192,7 +192,7 @@ void MapView::drawFloor()
                         continue;
 
                     if(alwaysTransparent)
-                        g_drawPool.setOpacity(tile->getPosition().isInRange(_camera, 2, 2, true) ? .15 : .7);
+                        g_drawPool.setOpacity(tile->getPosition().isInRange(_camera, TRANSPARENT_FLOOR_VIEW_RANGE, TRANSPARENT_FLOOR_VIEW_RANGE, true) ? .2 : .7);
 
                     tile->drawGround(transformPositionTo2D(tile->getPosition(), cameraPosition), m_scaleFactor, lightView);
 
@@ -206,7 +206,7 @@ void MapView::drawFloor()
                     continue;
 
                 if(alwaysTransparent)
-                    g_drawPool.setOpacity(tile->getPosition().isInRange(_camera, 2, 2, true) ? .15 : .7);
+                    g_drawPool.setOpacity(tile->getPosition().isInRange(_camera, TRANSPARENT_FLOOR_VIEW_RANGE, TRANSPARENT_FLOOR_VIEW_RANGE, true) ? .2 : .7);
 
                 tile->drawSurface(transformPositionTo2D(tile->getPosition(), cameraPosition), m_scaleFactor, lightView);
 
@@ -265,7 +265,7 @@ void MapView::drawCreatureInformation()
         if(!tile) continue;
 
         bool useGray = m_floorViewMode != FloorViewMode::ALWAYS_WITH_TRANSPARENCY ?
-            tile->isCovered() : !tile->getPosition().isInRange(cameraPosition, 2, 2, true);
+            tile->isCovered() : !tile->getPosition().isInRange(cameraPosition, TRANSPARENT_FLOOR_VIEW_RANGE, TRANSPARENT_FLOOR_VIEW_RANGE, true);
 
         creature->drawInformation(m_rectCache.rect,
                                   transformPositionTo2D(creature->getPosition(), cameraPosition),
@@ -777,7 +777,7 @@ TilePtr MapView::getTopTile(Position tilePos)
     // we must check every floor, from top to bottom to check for a clickable tile
     TilePtr tile;
 
-    if(m_floorViewMode == FloorViewMode::ALWAYS_WITH_TRANSPARENCY && tilePos.isInRange(m_lastCameraPosition, 2, 2))
+    if(m_floorViewMode == FloorViewMode::ALWAYS_WITH_TRANSPARENCY && tilePos.isInRange(m_lastCameraPosition, TRANSPARENT_FLOOR_VIEW_RANGE, TRANSPARENT_FLOOR_VIEW_RANGE))
         tile = g_map.getTile(tilePos);
     else {
         tilePos.coveredUp(tilePos.z - m_floorMin);
