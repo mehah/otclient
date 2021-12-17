@@ -562,6 +562,7 @@ void MapView::setFloorViewMode(FloorViewMode floorViewMode)
 {
     m_floorViewMode = floorViewMode;
 
+    resetLastCamera();
     requestVisibleTilesCacheUpdate();
 }
 

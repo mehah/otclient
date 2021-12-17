@@ -77,7 +77,7 @@ Panel
 
   ComboBox
     id: floorViewMode
-    width: 120
+    width: 180
     anchors.left: prev.right
     anchors.top: prev.top
     margin-top: -4

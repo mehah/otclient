@@ -350,6 +350,7 @@ function setOption(key, value, force)
         antialiasingModeCombobox:setCurrentOptionByData(value, true)
     elseif key == 'floorViewMode' then
         gameMapPanel:setFloorViewMode(value)
+        floorViewModeCombobox:setCurrentOptionByData(value, true)
     end
 
     -- change value for keybind updates
