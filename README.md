@@ -16,6 +16,7 @@
 - Highlight Mouse Target (press shift to select any object)
 - Crosshair
 - Floor Shadowing
+- Floor View Mode (Normal, Fade, Locked, Always, Always with transparency)
 - Anti-Aliasing Mode Options (Note: Smooth Retro will consume a little more GPU)
 - Floating Effects Option
 - Adjusted Path Finding
