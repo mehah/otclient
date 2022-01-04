@@ -323,7 +323,7 @@ function EnterGame.doLogin()
         -- http login server
         protocolHttp = ProtocolHttp.create()
         protocolHttp.onConnect = function(protocol)
-            local body = "{\"email\": \"" .. G.account .. "\", \"password\": \"" .. G.password .. "\"}"
+            local body = json.encode({email = G.account, password = G.password})
             local message = ''
             message = message .. "POST /login HTTP/1.1\r\n"
             message = message .. "Host: " .. G.host .. "\r\n"
