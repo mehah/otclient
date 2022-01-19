@@ -25,6 +25,7 @@
 
 #include <framework/const.h>
 #include <framework/stdext/types.h>
+#include <framework/stdext/string.h>
 #include <framework/util/point.h>
 #include "config.h"
 #include "const.h"
@@ -288,6 +289,11 @@ public:
         }
 
         return false;
+    }
+
+    std::string toString()
+    {
+        return std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z);
     }
 
     int32_t x{ UINT16_MAX };
