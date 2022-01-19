@@ -25,7 +25,6 @@
 
 #include <framework/const.h>
 #include <framework/stdext/types.h>
-#include <framework/stdext/string.h>
 #include <framework/util/point.h>
 #include "config.h"
 #include "const.h"
@@ -35,6 +34,7 @@
 #include <math.h>
 #include <ostream>
 #include <vector>
+#include <string>
 
 class Position
 {
@@ -326,4 +326,5 @@ inline std::istream& operator>>(std::istream& in, Position& pos)
     pos.z = z;
     return in;
 }
+
 #endif

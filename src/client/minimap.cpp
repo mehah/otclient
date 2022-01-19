@@ -218,13 +218,14 @@ const MinimapTile& Minimap::getTile(const Position& pos)
     return nulltile;
 }
 
-std::pair<MinimapBlock_ptr, MinimapTile> Minimap::threadGetTile(const Position& pos) {
+std::pair<MinimapBlock_ptr, MinimapTile> Minimap::threadGetTile(const Position& pos)
+{
     std::lock_guard<std::mutex> lock(m_lock);
     static MinimapTile nulltile;
 
-    if (pos.z <= MAX_Z && hasBlock(pos)) {
+    if(pos.z <= MAX_Z && hasBlock(pos)) {
         MinimapBlock_ptr block = m_tileBlocks[pos.z][getBlockIndex(pos)];
-        if (block) {
+        if(block) {
             Point offsetPos = getBlockOffset(Point(pos.x, pos.y));
             return std::make_pair(block, block->getTile(pos.x - offsetPos.x, pos.y - offsetPos.y));
         }

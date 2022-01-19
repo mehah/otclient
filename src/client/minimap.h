@@ -101,10 +101,11 @@ public:
 private:
     Rect calcMapRect(const Rect& screenRect, const Position& mapCenter, float scale);
     bool hasBlock(const Position& pos) { return m_tileBlocks[pos.z].find(getBlockIndex(pos)) != m_tileBlocks[pos.z].end(); }
-    MinimapBlock& getBlock(const Position& pos) {
+    MinimapBlock& getBlock(const Position& pos)
+    {
         std::lock_guard<std::mutex> lock(m_lock);
         auto& ptr = m_tileBlocks[pos.z][getBlockIndex(pos)];
-        if (!ptr)
+        if(!ptr)
             ptr = std::make_shared<MinimapBlock>();
         return *ptr;
     }

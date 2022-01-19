@@ -656,20 +656,20 @@ bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
 
 void Game::autoWalk(std::vector<Otc::Direction> dirs, Position startPos)
 {
-    if (!canPerformGameAction())
+    if(!canPerformGameAction())
         return;
 
-    if (dirs.size() == 0)
+    if(dirs.size() == 0)
         return;
 
     // protocol limits walk path
-    if (dirs.size() > 127) {
+    if(dirs.size() > 127) {
         g_logger.error("Auto walk path too great");
         return;
     }
 
     // must cancel follow before any new walk
-    if (isFollowing()) {
+    if(isFollowing()) {
         cancelFollow();
     }
 
@@ -679,7 +679,7 @@ void Game::autoWalk(std::vector<Otc::Direction> dirs, Position startPos)
     uint8_t flags = 0x04; // auto walk flag
 
     TilePtr toTile = g_map.getTile(startPos.translatedToDirection(direction));
-    if (startPos == m_localPlayer->m_position && toTile && toTile->isWalkable() && !m_localPlayer->isWalking() && m_localPlayer->canWalk(direction)) {
+    if(startPos == m_localPlayer->m_position && toTile && toTile->isWalkable() && !m_localPlayer->isWalking() && m_localPlayer->canWalk(direction)) {
         m_localPlayer->preWalk(direction);
 
         forceWalk(direction);
