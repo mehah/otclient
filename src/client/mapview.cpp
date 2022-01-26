@@ -237,11 +237,14 @@ void MapView::drawFloor()
                 g_drawPool.resetOpacity();
         }
 
-        if (m_crosshairTexture && m_mousePosition.isValid() && m_rectCache.rect.contains(g_window.getMousePosition())) {
-            const Point& point = transformPositionTo2D(m_mousePosition, cameraPosition);
-            const auto crosshairRect = Rect(point, m_tileSize, m_tileSize);
-            g_drawPool.addTexturedRect(crosshairRect, m_crosshairTexture);
-        } else if (m_lastHighlightTile) {
+        if(m_rectCache.rect.contains(g_window.getMousePosition())) {
+            if(m_crosshairTexture) {
+                const Point& point = transformPositionTo2D(m_mousePosition, cameraPosition);
+                const auto crosshairRect = Rect(point, m_tileSize, m_tileSize);
+                g_drawPool.addTexturedRect(crosshairRect, m_crosshairTexture);
+            }
+        } else if(m_lastHighlightTile) {
+            m_mousePosition = {}; // Invalidate mousePosition
             m_lastHighlightTile->unselect();
             m_lastHighlightTile = nullptr;
         }
