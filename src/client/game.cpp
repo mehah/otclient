@@ -1669,7 +1669,7 @@ void Game::setClientVersion(int version)
         enableFeature(Otc::GameAdditionalSkills);
     }
 
-    if (version >= 1281) {
+    if(version >= 1281) {
         disableFeature(Otc::GameEnvironmentEffect);
         disableFeature(Otc::GameItemAnimationPhase);
     }

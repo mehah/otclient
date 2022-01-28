@@ -133,9 +133,9 @@ void Map::addThing(const ThingPtr& thing, const Position& pos, int16 stackPos)
     if(!thing)
         return;
 
-    if (thing->isItem()) {
+    if(thing->isItem()) {
         const ItemPtr& item = thing->static_self_cast<Item>();
-        if (item && item->getClientId() == 0) {
+        if(item && item->getClientId() == 0) {
             return;
         }
     }
