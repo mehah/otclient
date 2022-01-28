@@ -442,7 +442,7 @@ void ProtocolGame::parseLogin(const InputMessagePtr& msg)
         msg->getU16();
     }
 
-    if (g_game.getClientVersion() >= 1281) {
+    if(g_game.getClientVersion() >= 1281) {
         msg->getU8(); // exiva button enabled (bool)
         msg->getU8(); // Tournament button (bool)
     }
@@ -747,7 +747,7 @@ void ProtocolGame::parseDeath(const InputMessagePtr& msg)
     if(g_game.getFeature(Otc::GamePenalityOnDeath) && deathType == Otc::DeathRegular)
         penality = msg->getU8();
 
-    if (g_game.getClientVersion() >= 1281) {
+    if(g_game.getClientVersion() >= 1281) {
         msg->getU8(); // can use death redemption (bool)
     }
 
@@ -916,7 +916,7 @@ void ProtocolGame::parseOpenContainer(const InputMessagePtr& msg)
     int containerSize = 0;
     int firstIndex = 0;
 
-    if (g_game.getClientVersion() >= 1281) {
+    if(g_game.getClientVersion() >= 1281) {
         msg->getU8(); // show search icon (boolean)
     }
 
@@ -1003,7 +1003,7 @@ void ProtocolGame::parseOpenNpcTrade(const InputMessagePtr& msg)
     if(g_game.getFeature(Otc::GameNameOnNpcTrade))
         std::string npcName = msg->getString();
 
-    if (g_game.getClientVersion() >= 1281) {
+    if(g_game.getClientVersion() >= 1281) {
         msg->getU16(); // currency
         msg->getString(); // currency name
     }
@@ -1107,7 +1107,7 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
 
     Otc::MagicEffectsType_t type = Otc::MAGIC_EFFECTS_CREATE_EFFECT;
 
-    if (g_game.getClientVersion() >= 1281) {
+    if(g_game.getClientVersion() >= 1281) {
         type = static_cast<Otc::MagicEffectsType_t>(msg->getU8()); // type
     }
 
@@ -1124,7 +1124,7 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
 
     // TODO support missiles
 
-    if (g_game.getClientVersion() >= 1281) {
+    if(g_game.getClientVersion() >= 1281) {
         msg->getU8(); // end loop
     }
 
@@ -1166,18 +1166,18 @@ void ProtocolGame::parseItemClasses(const InputMessagePtr& msg)
 {
     int classSize = msg->getU8();
     int tiersSize = 0;
-    for (uint8_t i = 0; i < classSize; i++) {
+    for(uint8_t i = 0; i < classSize; i++) {
         msg->getU8(); // class id
 
         // tiers
         tiersSize = msg->getU8();
-        for (uint8_t j = 0; j < tiersSize; j++) {
+        for(uint8_t j = 0; j < tiersSize; j++) {
             msg->getU8(); // tier id
             msg->getU64(); // upgrade cost
         }
     }
 
-    for (uint8_t i = 0; i < tiersSize + 1; i++) {
+    for(uint8_t i = 0; i < tiersSize + 1; i++) {
         msg->getU8(); // ??
     }
 }
@@ -1316,7 +1316,7 @@ void ProtocolGame::parseEditText(const InputMessagePtr& msg)
 
     const std::string writer = msg->getString();
 
-    if (g_game.getClientVersion() >= 1281) {
+    if(g_game.getClientVersion() >= 1281) {
         msg->getU8(); // suffix
     }
 
@@ -1357,7 +1357,7 @@ void ProtocolGame::parsePlayerInfo(const InputMessagePtr& msg)
         msg->getU32(); // premium expiration used for premium advertisement
     const int vocation = msg->getU8(); // vocation
 
-    if (g_game.getClientVersion() >= 1281) {
+    if(g_game.getClientVersion() >= 1281) {
         msg->getU8(); // prey enabled
     }
 
@@ -1366,7 +1366,7 @@ void ProtocolGame::parsePlayerInfo(const InputMessagePtr& msg)
     for(int i = 0; i < spellCount; ++i)
         spells.push_back(msg->getU8()); // spell id
 
-    if (g_game.getClientVersion() >= 1281) {
+    if(g_game.getClientVersion() >= 1281) {
         msg->getU8(); // is magic shield active (bool)
     }
 
@@ -1390,14 +1390,14 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg)
 
     double freeCapacity = 0;
     double totalCapacity = 0;
- 
+
     if(g_game.getFeature(Otc::GameDoubleFreeCapacity))
         freeCapacity = msg->getU32() / 100.0;
     else
         freeCapacity = msg->getU16() / 100.0;
 
-    if (g_game.getClientVersion() < 1281) {
-        if (g_game.getFeature(Otc::GameTotalCapacity))
+    if(g_game.getClientVersion() < 1281) {
+        if(g_game.getFeature(Otc::GameTotalCapacity))
             totalCapacity = msg->getU32() / 100.0;
     }
 
@@ -1415,7 +1415,7 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg)
             msg->getDouble(); // experienceBonus
         } else {
             msg->getU16(); // baseXpGain
-            if (g_game.getClientVersion() < 1281) {
+            if(g_game.getClientVersion() < 1281) {
                 msg->getU16(); // voucherAddend
             }
             msg->getU16(); // grindingAddend
@@ -1439,10 +1439,10 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg)
     double baseMagicLevel = 0;
     double magicLevelPercent = 0;
 
-    if (g_game.getClientVersion() < 1281) {
+    if(g_game.getClientVersion() < 1281) {
         magicLevel = msg->getU8();
 
-        if (g_game.getFeature(Otc::GameSkillsBase))
+        if(g_game.getFeature(Otc::GameSkillsBase))
             baseMagicLevel = msg->getU8();
         else
             baseMagicLevel = magicLevel;
@@ -1468,12 +1468,12 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg)
         training = msg->getU16();
     }
 
-    if (g_game.getClientVersion() >= 1097) {
+    if(g_game.getClientVersion() >= 1097) {
         msg->getU16(); // xp boost time (seconds)
         msg->getU8(); // enables exp boost in the store
     }
 
-    if (g_game.getClientVersion() >= 1281) {
+    if(g_game.getClientVersion() >= 1281) {
         msg->getU16();  // remaining mana shield
         msg->getU16();  // total mana shield
     }
@@ -1495,7 +1495,7 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg)
 
 void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg)
 {
-    if (g_game.getClientVersion() >= 1281) {
+    if(g_game.getClientVersion() >= 1281) {
         // magic level
         int magicLevel = msg->getU16();
         int baseMagicLevel = msg->getU16();
@@ -1506,17 +1506,17 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg)
         m_localPlayer->setBaseMagicLevel(baseMagicLevel);
     }
 
-    for (int skill = Otc::Fist; skill <= Otc::Fishing; ++skill) {
+    for(int skill = Otc::Fist; skill <= Otc::Fishing; ++skill) {
         int level;
 
-        if (g_game.getFeature(Otc::GameDoubleSkills))
+        if(g_game.getFeature(Otc::GameDoubleSkills))
             level = msg->getU16();
         else
             level = msg->getU8();
 
         int baseLevel;
-        if (g_game.getFeature(Otc::GameSkillsBase))
-            if (g_game.getFeature(Otc::GameBaseSkillU16))
+        if(g_game.getFeature(Otc::GameSkillsBase))
+            if(g_game.getFeature(Otc::GameBaseSkillU16))
                 baseLevel = msg->getU16();
             else
                 baseLevel = msg->getU8();
@@ -1525,7 +1525,7 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg)
 
         int levelPercent = 0;
 
-        if (g_game.getClientVersion() >= 1281) {
+        if(g_game.getClientVersion() >= 1281) {
             msg->getU16(); // base + loyalty bonus(?)
             levelPercent = msg->getU16();
         } else {
@@ -1536,9 +1536,11 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg)
         m_localPlayer->setBaseSkill(static_cast<Otc::Skill>(skill), baseLevel);
     }
 
-    if (g_game.getFeature(Otc::GameAdditionalSkills)) {
+    if(g_game.getFeature(Otc::GameAdditionalSkills)) {
         // Critical, Life Leech, Mana Leech, Dodge, Fatal, Momentum have no level percent, nor loyalty bonus
-        for (int skill = Otc::CriticalChance; skill < Otc::LastSkill; ++skill) {
+
+        const uint8_t lastSkill = g_game.getClientVersion() >= 1281 ? Otc::LastSkill : Otc::ManaLeechAmount + 1;
+        for(int skill = Otc::CriticalChance; skill < lastSkill; ++skill) {
             int level = msg->getU16();
             int baseLevel = msg->getU16();
             m_localPlayer->setSkill(static_cast<Otc::Skill>(skill), level, 0);
@@ -1546,7 +1548,7 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg)
         }
     }
 
-    if (g_game.getClientVersion() >= 1281) {
+    if(g_game.getClientVersion() >= 1281) {
         // bonus cap
         int capacity = msg->getU32(); // base + bonus capacity
         int baseCapacity = msg->getU32(); // base capacity
@@ -1560,10 +1562,10 @@ void ProtocolGame::parsePlayerState(const InputMessagePtr& msg)
 {
     int states;
 
-    if (g_game.getClientVersion() >= 1281) {
+    if(g_game.getClientVersion() >= 1281) {
         states = msg->getU32();
-    }  else {
-        if (g_game.getFeature(Otc::GamePlayerStateU16))
+    } else {
+        if(g_game.getFeature(Otc::GamePlayerStateU16))
             states = msg->getU16();
         else
             states = msg->getU8();
@@ -1624,7 +1626,7 @@ void ProtocolGame::parseTalk(const InputMessagePtr& msg)
 
     const std::string name = g_game.formatCreatureName(msg->getString());
 
-    if (g_game.getClientVersion() >= 1281) {
+    if(g_game.getClientVersion() >= 1281) {
         msg->getU8(); // suffix
     }
 
@@ -1891,7 +1893,7 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg)
     const Outfit currentOutfit = getOutfit(msg);
 
     // mount color bytes are required here regardless of having one
-    if (g_game.getClientVersion() >= 1281 && currentOutfit.getMount() == 0) {
+    if(g_game.getClientVersion() >= 1281 && currentOutfit.getMount() == 0) {
         msg->getU8(); //head
         msg->getU8(); //body
         msg->getU8(); //legs
@@ -1908,7 +1910,7 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg)
             std::string outfitName = msg->getString();
             int outfitAddons = msg->getU8();
 
-            if (g_game.getClientVersion() >= 1281) {
+            if(g_game.getClientVersion() >= 1281) {
                 msg->getU8(); // mode: 0x00 - available, 0x01 store (requires U32 store offerId), 0x02 golden outfit tooltip (hardcoded)
             }
 
@@ -1935,7 +1937,7 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg)
             int mountId = msg->getU16(); // mount type
             std::string mountName = msg->getString(); // mount name
 
-            if (g_game.getClientVersion() >= 1281) {
+            if(g_game.getClientVersion() >= 1281) {
                 msg->getU8(); // mode: 0x00 - available, 0x01 store (requires U32 store offerId)
             }
 
@@ -1943,7 +1945,7 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg)
         }
     }
 
-    if (g_game.getClientVersion() >= 1281) {
+    if(g_game.getClientVersion() >= 1281) {
         msg->getU16(); // familiars.size()
         // size > 0
         // U16 looktype
@@ -1972,7 +1974,7 @@ void ProtocolGame::parseVipAdd(const InputMessagePtr& msg)
     }
     const uint status = msg->getU8();
 
-    if (g_game.getClientVersion() >= 1281) {
+    if(g_game.getClientVersion() >= 1281) {
         msg->getU8(); // vip groups
     }
 
@@ -2293,7 +2295,7 @@ Outfit ProtocolGame::getOutfit(const InputMessagePtr& msg)
 
     if(g_game.getFeature(Otc::GamePlayerMounts)) {
         const int mount = msg->getU16();
-        if (g_game.getClientVersion() >= 1281 && mount != 0) {
+        if(g_game.getClientVersion() >= 1281 && mount != 0) {
             msg->getU8(); //head
             msg->getU8(); //body
             msg->getU8(); //legs
@@ -2311,11 +2313,11 @@ ThingPtr ProtocolGame::getThing(const InputMessagePtr& msg)
 
     const int id = msg->getU16();
 
-    if (id == 0)
+    if(id == 0)
         stdext::throw_exception("invalid thing id");
-    else if (id == Proto::UnknownCreature || id == Proto::OutdatedCreature || id == Proto::Creature)
+    else if(id == Proto::UnknownCreature || id == Proto::OutdatedCreature || id == Proto::Creature)
         thing = getCreature(msg, id);
-    else if (id == Proto::StaticText) // otclient only
+    else if(id == Proto::StaticText) // otclient only
         thing = getStaticText(msg, id);
     else // item
         thing = getItem(msg, id);
@@ -2368,7 +2370,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type)
             const uint removeId = msg->getU32();
             const uint id = msg->getU32();
 
-            if (id == removeId) {
+            if(id == removeId) {
                 creature = g_map.getCreatureById(id);
             } else {
                 g_map.removeCreatureById(removeId);
@@ -2386,13 +2388,13 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type)
                     creatureType = Proto::CreatureTypeNpc;
             }
 
-            if (g_game.getClientVersion() >= 1281 && creatureType == Proto::CreatureTypeSummonOwn) {
+            if(g_game.getClientVersion() >= 1281 && creatureType == Proto::CreatureTypeSummonOwn) {
                 msg->getU32(); // master id
             }
 
             const std::string name = g_game.formatCreatureName(msg->getString());
 
-            if (creature) {
+            if(creature) {
                 creature->setName(name);
             } else {
                 if(id == m_localPlayer->getId())
@@ -2429,7 +2431,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type)
 
         const int speed = msg->getU16();
 
-        if (g_game.getClientVersion() >= 1281) {
+        if(g_game.getClientVersion() >= 1281) {
             msg->getU8(); // creature debuffs
         }
 
@@ -2449,10 +2451,10 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type)
             creatureType = msg->getU8();
         }
 
-        if (g_game.getClientVersion() >= 1281) {
-            if (creatureType == Proto::CreatureTypeSummonOwn) {
+        if(g_game.getClientVersion() >= 1281) {
+            if(creatureType == Proto::CreatureTypeSummonOwn) {
                 msg->getU32(); // master id
-            } else if (creatureType == Proto::CreatureTypePlayer) {
+            } else if(creatureType == Proto::CreatureTypePlayer) {
                 msg->getU8(); // voc id
             }
         }
@@ -2464,7 +2466,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type)
         if(g_game.getFeature(Otc::GameThingMarks)) {
             const uint8 mark = msg->getU8(); // mark
 
-            if (g_game.getClientVersion() < 1281) {
+            if(g_game.getClientVersion() < 1281) {
                 msg->getU16(); // helpers
             }
 
@@ -2476,7 +2478,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type)
             }
         }
 
-        if (g_game.getClientVersion() >= 1281) {
+        if(g_game.getClientVersion() >= 1281) {
             msg->getU8(); // inspection type
         }
 
@@ -2542,21 +2544,21 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
     if(g_game.getClientVersion() < 1281 && g_game.getFeature(Otc::GameThingMarks)) {
         msg->getU8(); // mark
     }
-    
-    if (item->isStackable() || item->isFluidContainer() || item->isSplash() || item->isChargeable()) {
+
+    if(item->isStackable() || item->isFluidContainer() || item->isSplash() || item->isChargeable()) {
         item->setCountOrSubType(msg->getU8());
-    } else if (g_game.getClientVersion() >= 1281 && item->isContainer()) {
+    } else if(g_game.getClientVersion() >= 1281 && item->isContainer()) {
         uint8 hasQuickLootFlags = msg->getU8();
-        if (hasQuickLootFlags) {
+        if(hasQuickLootFlags) {
             msg->getU32(); // quick loot flags
         }
 
         uint8 hasQuiverAmmoCount = msg->getU8();
-        if (hasQuiverAmmoCount) {
+        if(hasQuiverAmmoCount) {
             msg->getU32(); // ammoTotal
         }
     }
- 
+
     if(g_game.getFeature(Otc::GameItemAnimationPhase)) {
         if(item->getAnimationPhases() > 1) {
             // 0x00 => automatic phase
@@ -2567,19 +2569,19 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
         }
     }
 
-    if (g_game.getClientVersion() >= 1281) {
-        if (id == 35973 || id == 35974) {
+    if(g_game.getClientVersion() >= 1281) {
+        if(id == 35973 || id == 35974) {
             int looktype = msg->getU16();
-            if (looktype != 0) {
+            if(looktype != 0) {
                 msg->getU8(); // lookHead
                 msg->getU8(); // lookBody
                 msg->getU8(); // lookLegs
                 msg->getU8(); // lookFeet
                 msg->getU8(); // lookAddons
             }
-		   
+
             int lookmount = msg->getU16();
-            if (lookmount != 0) {
+            if(lookmount != 0) {
                 msg->getU8(); // lookHead
                 msg->getU8(); // lookBody
                 msg->getU8(); // lookLegs
