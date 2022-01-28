@@ -730,10 +730,12 @@ void ProtocolGame::sendChangeOutfit(const Outfit& outfit)
 
     if(g_game.getFeature(Otc::GamePlayerMounts)) {
         msg->addU16(outfit.getMount());
-        msg->addU8(0x00);
-        msg->addU8(0x00);
-        msg->addU8(0x00);
-        msg->addU8(0x00);
+        if(g_game.getClientVersion() >= 1281) {
+            msg->addU8(0x00);
+            msg->addU8(0x00);
+            msg->addU8(0x00);
+            msg->addU8(0x00);
+        }
     }
 
     if(g_game.getClientVersion() >= 1281) {
