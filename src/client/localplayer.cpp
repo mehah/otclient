@@ -140,6 +140,9 @@ bool LocalPlayer::autoWalk(const Position& destination, const bool retry)
     if (destination == m_position)
         return true;
 
+    if (m_position.isInRange(destination, 1, 1))
+        return g_game.walk(m_position.getDirectionFromPosition(destination));
+    
     std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> result;
     std::vector<Otc::Direction> limitedPath;
 
