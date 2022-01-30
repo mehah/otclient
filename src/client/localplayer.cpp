@@ -38,14 +38,14 @@ void LocalPlayer::lockWalk(int millis)
     m_walkLockExpiration = std::max<ticks_t>(m_walkLockExpiration, g_clock.millis() + millis);
 }
 
-bool LocalPlayer::canWalk(Otc::Direction)
+bool LocalPlayer::canWalk(Otc::Direction direction, bool ignoreLock)
 {
     // paralyzed
     if(isParalyzed())
         return false;
 
     // cannot walk while locked
-    if(m_walkLockExpiration != 0 && g_clock.millis() < m_walkLockExpiration)
+    if ((m_walkLockExpiration != 0 && g_clock.millis() < m_walkLockExpiration) && !ignoreLock)
         return false;
 
     if(isAutoWalking())
