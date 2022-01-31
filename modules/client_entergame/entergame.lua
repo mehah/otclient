@@ -350,11 +350,9 @@ function EnterGame.doLogin()
                 return
             end
 
-            local body = message:sub(bodyStart, bodyEnd)
-
             protocol:disconnect()
 
-            local response = json.decode(body)
+            local response = json.decode(message:sub(bodyStart, bodyEnd))
             if response.errorMessage then
                 onError(nil, response.errorMessage, response.errorCode)
                 return
