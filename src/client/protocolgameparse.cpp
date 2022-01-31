@@ -180,7 +180,10 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 parseDistanceMissile(msg);
                 break;
             case Proto::GameServerItemClasses:
-                parseItemClasses(msg);
+                if(g_game.getClientVersion() >= 1281)
+                    parseItemClasses(msg);
+                else
+                    parseCreatureMark(msg);
                 break;
             case Proto::GameServerTrappers:
                 parseTrappers(msg);
@@ -1182,6 +1185,18 @@ void ProtocolGame::parseItemClasses(const InputMessagePtr& msg)
     }
 }
 
+void ProtocolGame::parseCreatureMark(const InputMessagePtr& msg)
+{
+    const uint id = msg->getU32();
+    const int color = msg->getU8();
+
+    const CreaturePtr creature = g_map.getCreatureById(id);
+    if(creature)
+        creature->addTimedSquare(color);
+    else
+        g_logger.traceError("could not get creature");
+}
+
 void ProtocolGame::parseTrappers(const InputMessagePtr& msg)
 {
     const int numTrappers = msg->getU8();
@@ -1551,7 +1566,7 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg)
     if(g_game.getClientVersion() >= 1281) {
         // bonus cap
         int capacity = msg->getU32(); // base + bonus capacity
-        int baseCapacity = msg->getU32(); // base capacity
+        msg->getU32(); // base capacity
 
         //m_localPlayer->setFreeCapacity(freeCapacity);
         m_localPlayer->setTotalCapacity(capacity);
