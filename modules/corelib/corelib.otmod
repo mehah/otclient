@@ -12,6 +12,7 @@ Module
     dofile 'bitwise'
     dofile 'struct'
 
+    dofile 'dump'
     dofile 'const'
     dofile 'util'
     dofile 'globals'
