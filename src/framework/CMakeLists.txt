@@ -126,6 +126,12 @@ set(framework_SOURCES ${framework_SOURCES}
     ${CMAKE_CURRENT_LIST_DIR}/platform/unixplatform.cpp
     ${CMAKE_CURRENT_LIST_DIR}/platform/platform.cpp
     ${CMAKE_CURRENT_LIST_DIR}/platform/platform.h
+
+    # protobuf
+    ${CMAKE_CURRENT_LIST_DIR}/protobuf/appearances.pb.cc
+    ${CMAKE_CURRENT_LIST_DIR}/protobuf/appearances.pb.h
+    ${CMAKE_CURRENT_LIST_DIR}/protobuf/shared.pb.cc
+    ${CMAKE_CURRENT_LIST_DIR}/protobuf/shared.pb.h
 )
 
 if(NOT MSVC)
