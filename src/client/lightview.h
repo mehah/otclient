@@ -30,9 +30,9 @@
 
 struct LightSource {
     Point pos;
-    uint8 color;
+    uint8 color{ 0 };
     uint16 radius{ 0 };
-    float brightness;
+    float brightness{ 0.f };
 };
 
 class LightView : public LuaObject
@@ -45,7 +45,7 @@ public:
     void addLightSource(const Point& mainCenter, const Light& light);
 
     void setGlobalLight(const Light& light) { m_globalLight = light; m_globalLightColor = Color::from8bit(m_globalLight.color, m_globalLight.intensity / static_cast<float>(UINT8_MAX)); }
-    void setShade(const Point& point) { m_lights.push_back(LightSource{ point , 0, 0 }); }
+    void setShade(const Point& point) { m_lights.push_back(LightSource{ point }); m_lastPos = m_lights.size(); }
 
     void endFloor();
 

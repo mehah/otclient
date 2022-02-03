@@ -52,10 +52,7 @@ void LightView::resize()
 
 void LightView::endFloor()
 {
-    if(m_lastPos) m_lastPos -= 1;
     std::sort(m_lights.begin() + m_lastPos, m_lights.end(), orderLightComparator);
-
-    m_lastPos = m_lights.size();
 }
 
 void LightView::draw(const Rect& dest, const Rect& src)
@@ -67,7 +64,6 @@ void LightView::draw(const Rect& dest, const Rect& src)
     const float intensity = m_globalLight.intensity / static_cast<float>(UINT8_MAX);
 
     g_drawPool.use(m_pool, dest, src);
-    g_drawPool.addFilledRect(m_mapView->m_rectDimension, m_globalLightColor);
     const auto& shadeBase = std::make_pair<Point, Size>(Point(m_mapView->getTileSize() / 2.8), Size(m_mapView->getTileSize() * 1.6));
 
     for(auto& light : m_lights) {
@@ -75,7 +71,7 @@ void LightView::draw(const Rect& dest, const Rect& src)
             g_drawPool.setOpacity(m_mapView->getFadeLevel(z));
         }*/
 
-        if(light.radius == 0 && light.color == 0) {
+        if(light.radius == 0) {
             g_drawPool.addTexturedRect(Rect(light.pos - shadeBase.first, shadeBase.second), g_sprites.getShadeTexture(), m_globalLightColor);
         } else {
             if(light.brightness < 1.f) light.brightness = std::min<float>(light.brightness + intensity, 1.f);
