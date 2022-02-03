@@ -28,11 +28,6 @@
 
 LightView::LightView(const MapViewPtr& mapView) : m_pool(g_drawPool.createPoolF(LIGHT)), m_mapView(mapView) { resize(); }
 void LightView::resize() { m_pool->resize(m_mapView->m_rectDimension.size()); }
-void LightView::setShade(const Point& point, const float opacity)
-{
-    m_lights.push_back(LightSource{ point, 0, 0, 0, opacity });
-    m_lastPos = m_lights.size();
-}
 
 void LightView::addLightSource(const Point& pos, const Light& light)
 {
@@ -54,11 +49,6 @@ void LightView::addLightSource(const Point& pos, const Light& light)
     m_lights.push_back(LightSource{ pos , light.color, radius, brightness, g_drawPool.getOpacity() });
 }
 
-void LightView::endFloor()
-{
-    std::sort(m_lights.begin() + m_lastPos, m_lights.end(), orderLightComparator);
-}
-
 void LightView::draw(const Rect& dest, const Rect& src)
 {
     // draw light, only if there is darkness
@@ -71,13 +61,14 @@ void LightView::draw(const Rect& dest, const Rect& src)
 
     for(auto& light : m_lights) {
         g_drawPool.setOpacity(light.opacity);
-        if(light.radius == 0) {
-            g_drawPool.addTexturedRect(Rect(light.pos - shadeBase.first, shadeBase.second), g_sprites.getShadeTexture(), m_globalLightColor);
-        } else {
+        if(light.radius && light.color) {
             g_drawPool.addTexturedRect(Rect(light.pos - Point(light.radius), Size(light.radius * 2)), g_sprites.getLightTexture(), Color::from8bit(light.color, light.brightness));
+        } else {
+            g_drawPool.addTexturedRect(Rect(light.pos - shadeBase.first, shadeBase.second), g_sprites.getShadeTexture(), m_globalLightColor);
         }
-        g_drawPool.resetOpacity();
     }
     m_lights.clear();
     m_lastPos = 0;
+
+    g_drawPool.resetOpacity();
 }
