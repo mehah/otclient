@@ -27,6 +27,12 @@
 #include "spritemanager.h"
 
 LightView::LightView(const MapViewPtr& mapView) : m_pool(g_drawPool.createPoolF(LIGHT)), m_mapView(mapView) { resize(); }
+void LightView::resize() { m_pool->resize(m_mapView->m_rectDimension.size()); }
+void LightView::setShade(const Point& point, const float opacity)
+{
+    m_lights.push_back(LightSource{ point, 0, 0, 0, opacity });
+    m_lastPos = m_lights.size();
+}
 
 void LightView::addLightSource(const Point& pos, const Light& light)
 {
@@ -42,12 +48,10 @@ void LightView::addLightSource(const Point& pos, const Light& light)
         }
     }
 
-    m_lights.push_back(LightSource{ pos , light.color, radius, std::min<float>(light.intensity / 5.f, 1.f) });
-}
+    const float intensity = m_globalLight.intensity / static_cast<float>(UINT8_MAX),
+        brightness = std::min<float>((light.intensity / 5.f) + intensity, 1.f);
 
-void LightView::resize()
-{
-    m_pool->resize(m_mapView->m_rectDimension.size());
+    m_lights.push_back(LightSource{ pos , light.color, radius, brightness, g_drawPool.getOpacity() });
 }
 
 void LightView::endFloor()
@@ -61,23 +65,18 @@ void LightView::draw(const Rect& dest, const Rect& src)
     m_pool->setEnable(isDark());
     if(!isDark()) return;
 
-    const float intensity = m_globalLight.intensity / static_cast<float>(UINT8_MAX);
-
     g_drawPool.use(m_pool, dest, src);
+    g_drawPool.addFilledRect(m_mapView->m_rectDimension, m_globalLightColor);
     const auto& shadeBase = std::make_pair<Point, Size>(Point(m_mapView->getTileSize() / 2.8), Size(m_mapView->getTileSize() * 1.6));
 
     for(auto& light : m_lights) {
-        /*if(m_mapView->canFloorFade()) {
-            g_drawPool.setOpacity(m_mapView->getFadeLevel(z));
-        }*/
-
+        g_drawPool.setOpacity(light.opacity);
         if(light.radius == 0) {
             g_drawPool.addTexturedRect(Rect(light.pos - shadeBase.first, shadeBase.second), g_sprites.getShadeTexture(), m_globalLightColor);
         } else {
-            if(light.brightness < 1.f) light.brightness = std::min<float>(light.brightness + intensity, 1.f);
             g_drawPool.addTexturedRect(Rect(light.pos - Point(light.radius), Size(light.radius * 2)), g_sprites.getLightTexture(), Color::from8bit(light.color, light.brightness));
         }
-        //g_drawPool.resetOpacity();
+        g_drawPool.resetOpacity();
     }
     m_lights.clear();
     m_lastPos = 0;
