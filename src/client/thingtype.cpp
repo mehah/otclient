@@ -784,7 +784,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
 
                     if (!useCustomImage) {
                         if(protobufSupported) {
-                            const uint spriteIndex = getSpriteIndex(0, 0, spriteMask ? 1 : l, x, y, z, animationPhase);
+                            const uint spriteIndex = getSpriteIndex(-1, -1, spriteMask ? 1 : l, x, y, z, animationPhase);
                             ImagePtr spriteImage = g_sprites.getSpriteImage(m_spritesIndex[spriteIndex]);
                             if(!spriteImage) {
                                 return nullptr;
@@ -897,15 +897,20 @@ Size ThingType::getBestTextureDimension(int w, int h, int count)
 
 uint ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int a)
 {
-    uint index =
-        ((((a % m_animationPhases)
-             * m_numPatternZ + z)
+    uint index = ((((((a % m_animationPhases)
+            * m_numPatternZ + z)
             * m_numPatternY + y)
-           * m_numPatternX + x)
-          * m_layers + l;
+            * m_numPatternX + x)
+            * m_layers + l)
+            * m_size.height() + h)
+            * m_size.width() + w;
 
-    if (w != 0 && h != 0) { // protobuf does not use width and height, because sprite image is the exact sprite size, not split by 32x32
-        index *= (m_size.height() + h) * m_size.width() + w;
+    if (w == -1 && h == -1) { // protobuf does not use width and height, because sprite image is the exact sprite size, not split by 32x32, so -1 is passed instead
+        index = ((((a % m_animationPhases)
+            * m_numPatternZ + z)
+            * m_numPatternY + y)
+            * m_numPatternX + x)
+            * m_layers + l;
     }
             
     assert(index < m_spritesIndex.size());
