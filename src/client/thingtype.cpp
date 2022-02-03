@@ -189,7 +189,8 @@ void ThingType::unserializeAppearance(uint16 clientId, ThingCategory category, c
         m_attribs.set(ThingAttrNotPathable, flags.avoid());
     }
 
-    //m_attribs.set(ThingAttrAnimateAlways, flags.no_movement_animation());
+    // no_movement_animation (?)
+
     if (flags.has_take()) {
         m_attribs.set(ThingAttrPickupable, flags.take());
     }
@@ -272,7 +273,11 @@ void ThingType::unserializeAppearance(uint16 clientId, ThingCategory category, c
         market.tradeAs = flags.market().trade_as_object_id();
         market.showAs = flags.market().show_as_object_id();
         market.name = flags.market().name();
-        //market.restrictVocation = flags.market().restrict_to_profession(); REPEATABLE
+
+        for (const int32_t voc : flags.market().restrict_to_profession()) {
+            market.restrictVocation |= voc;
+        }
+
         market.requiredLevel = flags.market().minimum_level();
         m_attribs.set(ThingAttrMarket, market);
     }
@@ -300,11 +305,9 @@ void ThingType::unserializeAppearance(uint16 clientId, ThingCategory category, c
 
     if (flags.has_upgradeclassification()) {
         m_attribs.set<uint16_t>(ThingAttrUpgradeClassification, flags.upgradeclassification().upgrade_classification());
-
-        std::cout << m_id  << " " << flags.upgradeclassification().upgrade_classification() << std::endl;
     }
 
-    // sprites
+    // now lets parse sprite data
     m_animationPhases = 0;
     int totalSpritesCount = 0;
 
