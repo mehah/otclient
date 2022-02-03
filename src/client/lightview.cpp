@@ -34,32 +34,28 @@ void LightView::addLightSource(const Point& pos, const Light& light)
 
     const uint16 radius = (light.intensity * SPRITE_SIZE * m_mapView->m_scaleFactor);
 
-    auto& lights = m_lights[m_currentFloor];
-    if(!lights.empty()) {
-        auto& prevLight = lights.back();
+    if(!m_lights.empty()) {
+        auto& prevLight = m_lights.back();
         if(prevLight.pos == pos && prevLight.color == light.color) {
             prevLight.radius = std::max<uint16>(prevLight.radius, radius);
             return;
         }
     }
 
-    lights.push_back(LightSource{ pos , light.color, radius, std::min<float>(light.intensity / 5.f, 1.f) });
-}
-
-void LightView::setShade(const Point& point, const std::vector<Otc::Direction>& dirs)
-{
-    const size_t index = (m_mapView->m_drawDimension.width() * (point.y / m_mapView->m_tileSize)) + (point.x / m_mapView->m_tileSize);
-    if(index >= m_shades.size()) return;
-    auto& shade = m_shades[index];
-    shade.floor = m_currentFloor;
-    shade.pos = point;
-    shade.dirs = dirs;
+    m_lights.push_back(LightSource{ pos , light.color, radius, std::min<float>(light.intensity / 5.f, 1.f) });
 }
 
 void LightView::resize()
 {
     m_pool->resize(m_mapView->m_rectDimension.size());
-    m_shades.resize(m_mapView->m_drawDimension.area());
+}
+
+void LightView::endFloor()
+{
+    if(m_lastPos) m_lastPos -= 1;
+    std::sort(m_lights.begin() + m_lastPos, m_lights.end(), orderLightComparator);
+
+    m_lastPos = m_lights.size();
 }
 
 void LightView::draw(const Rect& dest, const Rect& src)
@@ -69,41 +65,24 @@ void LightView::draw(const Rect& dest, const Rect& src)
     if(!isDark()) return;
 
     const float intensity = m_globalLight.intensity / static_cast<float>(UINT8_MAX);
-    auto globalight = Color::from8bit(m_globalLight.color, intensity);
 
     g_drawPool.use(m_pool, dest, src);
-    g_drawPool.addFilledRect(m_mapView->m_rectDimension, globalight);
+    g_drawPool.addFilledRect(m_mapView->m_rectDimension, m_globalLightColor);
     const auto& shadeBase = std::make_pair<Point, Size>(Point(m_mapView->getTileSize() / 2.8), Size(m_mapView->getTileSize() * 1.6));
-    for(int_fast8_t z = m_mapView->m_floorMax; z >= m_mapView->m_floorMin; --z) {
-        if(z < m_mapView->m_floorMax) {
-            if(m_mapView->canFloorFade()) {
-                const float fadeLevel = m_mapView->getFadeLevel(z);
-                if(fadeLevel == 0) break;
-                globalight = Color::from8bit(m_globalLight.color, std::clamp<float>(1.f - fadeLevel, intensity, 1.f));
-            }
 
-            for(auto& shade : m_shades) {
-                if(shade.floor != z) continue;
-                shade.floor = -1;
+    for(auto& light : m_lights) {
+        /*if(m_mapView->canFloorFade()) {
+            g_drawPool.setOpacity(m_mapView->getFadeLevel(z));
+        }*/
 
-                auto newPos = shade.pos;
-                for(const auto dir : shade.dirs) {
-                    if(dir == Otc::South)
-                        newPos.y -= SPRITE_SIZE / 1.6;
-                    else if(dir == Otc::East)
-                        newPos.x -= SPRITE_SIZE / 1.6;
-                }
-
-                g_drawPool.addTexturedRect(Rect(newPos - shadeBase.first, shadeBase.second), g_sprites.getShadeTexture(), globalight);
-            }
-        }
-
-        auto& lights = m_lights[z];
-        std::sort(lights.begin(), lights.end(), orderLightComparator);
-        for(LightSource& light : lights) {
+        if(light.radius == 0 && light.color == 0) {
+            g_drawPool.addTexturedRect(Rect(light.pos - shadeBase.first, shadeBase.second), g_sprites.getShadeTexture(), m_globalLightColor);
+        } else {
             if(light.brightness < 1.f) light.brightness = std::min<float>(light.brightness + intensity, 1.f);
             g_drawPool.addTexturedRect(Rect(light.pos - Point(light.radius), Size(light.radius * 2)), g_sprites.getLightTexture(), Color::from8bit(light.color, light.brightness));
         }
-        lights.clear();
+        //g_drawPool.resetOpacity();
     }
+    m_lights.clear();
+    m_lastPos = 0;
 }

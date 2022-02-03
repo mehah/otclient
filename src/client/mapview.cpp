@@ -147,12 +147,11 @@ void MapView::drawFloor()
 
             if(isDrawingLights()) {
                 const int8 nextFloor = z - 1;
-
-                if(nextFloor >= m_cachedFirstVisibleFloor) {
+                if(nextFloor >= m_floorMin && (!canFloorFade() || getFadeLevel(nextFloor) > 0))
+                {
                     Position _camera = cameraPosition;
                     const bool alwaysTransparent = m_floorViewMode == FloorViewMode::ALWAYS_WITH_TRANSPARENCY && nextFloor < cameraPosition.z&& _camera.coveredUp(cameraPosition.z - nextFloor);
 
-                    lightView->setFloor(nextFloor);
                     for(const auto& tile : m_cachedVisibleTiles[nextFloor].shades) {
                         const auto& ground = tile->getGround();
                         if(ground && !ground->isTranslucent()) {
@@ -175,13 +174,11 @@ void MapView::drawFloor()
                                 continue;
                             }
 
-                            lightView->setShade(pos2D, std::vector<Otc::Direction>() /*tile->hasTallItems() || tile->hasWideItems() ? tile->getBorderDirections() : std::vector<Otc::Direction>()*/);
+                            lightView->setShade(pos2D);
                         }
                     }
                 }
             }
-
-            if(lightView) lightView->setFloor(z);
 
             Position _camera = cameraPosition;
             const bool alwaysTransparent = m_floorViewMode == FloorViewMode::ALWAYS_WITH_TRANSPARENCY && z < m_cachedFirstVisibleFloor&& _camera.coveredUp(cameraPosition.z - z);
@@ -235,6 +232,10 @@ void MapView::drawFloor()
 
             if(canFloorFade())
                 g_drawPool.resetOpacity();
+
+            if(isDrawingLights()) {
+                m_lightView->endFloor();
+            }
         }
 
         if(m_rectCache.rect.contains(g_window.getMousePosition())) {
