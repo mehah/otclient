@@ -223,12 +223,16 @@ message(STATUS "LuaJIT: " ${LUAJIT})
 
 find_package(PhysFS REQUIRED)
 find_package(ZLIB REQUIRED)
+find_package(Protobuf REQUIRED)
+find_package(LibLZMA REQUIRED)
 
 set(framework_LIBRARIES ${framework_LIBRARIES}
     ${Boost_LIBRARIES}
     ${LUA_LIBRARY}
     ${PHYSFS_LIBRARY}
     ${ZLIB_LIBRARY}
+    ${PROTOBUF_LIBRARY}
+    ${LIBLZMA_LIBRARY}
 )
 
 set(framework_INCLUDE_DIRS ${framework_INCLUDE_DIRS}
@@ -236,6 +240,8 @@ set(framework_INCLUDE_DIRS ${framework_INCLUDE_DIRS}
     ${LUA_INCLUDE_DIR}
     ${PHYSFS_INCLUDE_DIR}
     ${framework_INCLUDE_DIRS}
+    ${PROTOBUF_INCLUDE_DIRS}
+    ${LIBLZMA_INCLUDE_DIRS}
 )
 
 find_package(OpenSSL QUIET)
