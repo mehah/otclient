@@ -141,15 +141,17 @@ function EnterGame.init()
     enterGame:getChildById('stayLoggedBox'):setChecked(stayLogged)
 
     local installedClients = {}
+    local installed_qty = 0
     for _, dirItem in ipairs(g_resources.listDirectoryFiles('/data/things/')) do
         if tonumber(dirItem) ~= nil then
             installedClients[dirItem] = true
+            installed_qty = installed_qty + 1
         end
     end
     clientBox = enterGame:getChildById('clientComboBox')
     for _, proto in pairs(g_game.getSupportedClients()) do
         local proto_str = tostring(proto)
-        if installedClients[proto_str] then
+        if installedClients[proto_str] or installed_qty == 0 then
             installedClients[proto_str] = nil
             clientBox:addOption(proto)
         end
