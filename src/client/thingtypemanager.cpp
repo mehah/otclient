@@ -311,7 +311,7 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
 
         appearances::Appearances appearancesLib = appearances::Appearances();
         if (!appearancesLib.ParseFromIstream(&fin)) {
-            throw std::exception("Couldn't parse appearances lib.");
+            throw stdext::exception("Couldn't parse appearances lib.");
         }
 
         for (int category = ThingCategoryItem; category < ThingLastCategory; ++category) {
