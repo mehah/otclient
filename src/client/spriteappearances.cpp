@@ -26,12 +26,10 @@
 #include <framework/graphics/image.h>
 #include "game.h"
 
-#include "7zip/C/LzmaLib.h"
-
 #include <nlohmann/json.hpp>
 #include <framework/core/asyncdispatcher.h>
 
-#include <algorithm>
+#include "lzma.h"
 
  // warnings related to protobuf
  // https://android.googlesource.com/platform/external/protobuf/+/brillo-m9-dev/vsprojects/readme.txt
@@ -78,14 +76,47 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet)
         fin->skip(4);
         while ((fin->getU8() & 0x80) == 0x80);
 
-        uint8_t* lzmaBuffer = &fin->m_data.data()[fin->tell()];
-        size_t inSize = fin->size() - LZMA_HEADER_SIZE;
-        size_t outSize = LZMA_UNCOMPRESSED_SIZE;
+        uint8_t lclppb = fin->getU8();
 
-        int result = LzmaUncompress(decompressed.get(), &outSize, lzmaBuffer + LZMA_HEADER_SIZE, &inSize, lzmaBuffer, LZMA_PROPS_SIZE);
-        if (result != SZ_OK) {
-            throw stdext::exception(stdext::format("fail to decompress lzma sprite result: %d", result));
+        lzma_options_lzma options{};
+        options.lc = lclppb % 9;
+
+        int remainder = lclppb / 9;
+        options.lp = remainder % 5;
+        options.pb = remainder / 5;
+
+        uint32_t dictionarySize = 0;
+        for (uint8_t i = 0; i < 4; ++i) {
+            dictionarySize += fin->getU8() << (i * 8);
         }
+
+        options.dict_size = dictionarySize;
+
+        fin->skip(8); // cip compressed size
+
+        lzma_stream stream = LZMA_STREAM_INIT;
+        
+        lzma_filter filters[2] = {
+            lzma_filter{LZMA_FILTER_LZMA1, &options},
+            lzma_filter{LZMA_VLI_UNKNOWN, NULL}
+        };
+        
+        lzma_ret ret = lzma_raw_decoder(&stream, filters);
+        if (ret != LZMA_OK) {
+            throw stdext::exception(stdext::format("failed to initialize lzma raw decoder result: %d", ret));
+        }
+        
+        stream.next_in = &fin->m_data.data()[fin->tell()];
+        stream.next_out = decompressed.get();
+        stream.avail_in = fin->size();
+        stream.avail_out = LZMA_UNCOMPRESSED_SIZE;
+
+        ret = lzma_code(&stream, LZMA_RUN);
+        if (ret != LZMA_STREAM_END) {
+            throw stdext::exception(stdext::format("failed to decode lzma buffer result: %d", ret));
+        }
+
+        lzma_end(&stream); // free memory
 
         // pixel data start (bmp header end offset)
         uint32_t data;
