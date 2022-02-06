@@ -247,15 +247,6 @@ set(framework_INCLUDE_DIRS ${framework_INCLUDE_DIRS}
     ${NLOHMANN_JSON_INCLUDE_DIR}
 )
 
-# protobuf proto compiler
-if(NOT WIN32)
-    set(proto_FILES appearances.proto shared.proto)
-    execute_process(
-        COMMAND protoc --cpp_out=../ ${proto_FILES}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/protobuf/proto/
-    )
-endif()
-
 find_package(OpenSSL QUIET)
 
 if(NOT OPENSSL_FOUND)
