@@ -140,9 +140,26 @@ function EnterGame.init()
     enterGame:getChildById('autoLoginBox'):setChecked(autologin)
     enterGame:getChildById('stayLoggedBox'):setChecked(stayLogged)
 
+    local installedClients = {}
+    local installed_qty = 0
+    for _, dirItem in ipairs(g_resources.listDirectoryFiles('/data/things/')) do
+        if tonumber(dirItem) ~= nil then
+            installedClients[dirItem] = true
+            installed_qty = installed_qty + 1
+        end
+    end
     clientBox = enterGame:getChildById('clientComboBox')
     for _, proto in pairs(g_game.getSupportedClients()) do
-        clientBox:addOption(proto)
+        local proto_str = tostring(proto)
+        if installedClients[proto_str] or installed_qty == 0 then
+            installedClients[proto_str] = nil
+            clientBox:addOption(proto)
+        end
+    end
+    for proto_str, status in pairs(installedClients) do
+        if status == true then
+            print(string.format("Warning: %s recognized as an installed client, but not supported.", proto_str))
+        end
     end
     clientBox:setCurrentOption(clientVersion)
 
@@ -345,7 +362,7 @@ function EnterGame.doLogin()
 
             local _, bodyStart = message:find("{")
             local _, bodyEnd = message:find(".*}")
-            if bodyStart == -1 or bodyEnd == -1 then
+            if not bodyStart or not bodyEnd then
                 onError(nil, "Bad Request.", 400)
                 return
             end
@@ -380,10 +397,12 @@ function EnterGame.doLogin()
                 }
             end
 
+            local premiumUntil = tonumber(response.session.premiumuntil)
+
             local account = {
                 status = "",
-                premDays = math.floor((tonumber(response.session.premiumuntil) - os.time()) / 86400),
-                subStatus = tonumber(response.session.premiumuntil) > os.time() and SubscriptionStatus.Premium or SubscriptionStatus.Free,
+                premDays = math.floor((premiumUntil - os.time()) / 86400),
+                subStatus = premiumUntil > os.time() and SubscriptionStatus.Premium or SubscriptionStatus.Free,
             }
 
             -- set session key
