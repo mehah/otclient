@@ -1165,16 +1165,20 @@ void ProtocolGame::parseAnimatedText(const InputMessagePtr& msg)
 
 void ProtocolGame::parseDistanceMissile(const InputMessagePtr& msg)
 {
-    const Position fromPos = getPosition(msg);
-    const Position toPos = getPosition(msg);
-    const int shotId = msg->getU8();
+    Position fromPos = getPosition(msg);
+    Position toPos = getPosition(msg);
+    int shotId;
+    if (g_game.getFeature(Otc::GameDistanceEffectU16))
+        shotId = msg->getU16();
+    else
+        shotId = msg->getU8();
 
     if(!g_things.isValidDatId(shotId, ThingCategoryMissile)) {
         g_logger.traceError(stdext::format("invalid missile id %d", shotId));
         return;
     }
 
-    const auto missile = MissilePtr(new Missile());
+    MissilePtr missile = MissilePtr(new Missile());
     missile->setId(shotId);
     missile->setPath(fromPos, toPos);
     g_map.addThing(missile, fromPos);
