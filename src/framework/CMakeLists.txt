@@ -126,13 +126,8 @@ set(framework_SOURCES ${framework_SOURCES}
     ${CMAKE_CURRENT_LIST_DIR}/platform/unixplatform.cpp
     ${CMAKE_CURRENT_LIST_DIR}/platform/platform.cpp
     ${CMAKE_CURRENT_LIST_DIR}/platform/platform.h
-
-    # protobuf
-    ${CMAKE_CURRENT_LIST_DIR}/protobuf/appearances.pb.cc
-    ${CMAKE_CURRENT_LIST_DIR}/protobuf/appearances.pb.h
-    ${CMAKE_CURRENT_LIST_DIR}/protobuf/shared.pb.cc
-    ${CMAKE_CURRENT_LIST_DIR}/protobuf/shared.pb.h
 )
+
 
 if(NOT MSVC)
     set_source_files_properties(${CMAKE_CURRENT_LIST_DIR}/luafunctions.cpp
@@ -247,12 +242,27 @@ set(framework_INCLUDE_DIRS ${framework_INCLUDE_DIRS}
     ${NLOHMANN_JSON_INCLUDE_DIR}
 )
 
-# protobuf proto compiler
+# protobuf
+set(protobuf_SOURCES
+    ${CMAKE_CURRENT_LIST_DIR}/protobuf/appearances.pb.cc
+    ${CMAKE_CURRENT_LIST_DIR}/protobuf/appearances.pb.h
+    ${CMAKE_CURRENT_LIST_DIR}/protobuf/shared.pb.cc
+    ${CMAKE_CURRENT_LIST_DIR}/protobuf/shared.pb.h
+)
+set(framework_SOURCES ${framework_SOURCES} ${protobuf_SOURCES})
+
 if(NOT WIN32)
-    set(proto_FILES appearances.proto shared.proto)
-    execute_process(
-        COMMAND protoc --cpp_out=../ ${proto_FILES}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/protobuf/proto/
+    set(protobuf_PATH ${CMAKE_CURRENT_LIST_DIR}/protobuf/proto)
+    set(protobuf_FILES
+        ${protobuf_PATH}/appearances.proto
+        ${protobuf_PATH}/shared.proto
+    )
+
+    add_custom_command(
+        OUTPUT ${protobuf_SOURCES}
+        DEPENDS ${protobuf_FILES}
+        COMMAND protoc -I ${protobuf_PATH} --cpp_out=${protobuf_PATH}/../ ${protobuf_FILES}
+        WORKING_DIRECTORY ${PROTO_PATH}
     )
 endif()
 
