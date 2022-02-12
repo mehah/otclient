@@ -242,22 +242,22 @@ set(framework_INCLUDE_DIRS ${framework_INCLUDE_DIRS}
 )
 
 # protobuf
-if(NOT WIN32)
-    set(protobuf_PATH ${CMAKE_CURRENT_LIST_DIR}/protobuf/proto)
-    set(protobuf_MODULES
-        appearances
-        shared
+set(protobuf_PATH ${CMAKE_CURRENT_LIST_DIR}/protobuf/proto)
+set(protobuf_MODULES
+    appearances
+    shared
+)
+
+foreach(protobuf_FILENAME ${protobuf_MODULES})
+
+    set(protobuf_SOURCES
+        ${CMAKE_CURRENT_LIST_DIR}/protobuf/${protobuf_FILENAME}.pb.cc
+        ${CMAKE_CURRENT_LIST_DIR}/protobuf/${protobuf_FILENAME}.pb.h
     )
 
-    foreach(protobuf_FILENAME ${protobuf_MODULES})
+    set(framework_SOURCES ${framework_SOURCES} ${protobuf_SOURCES})
 
-        set(protobuf_SOURCES
-            ${CMAKE_CURRENT_LIST_DIR}/protobuf/${protobuf_FILENAME}.pb.cc
-            ${CMAKE_CURRENT_LIST_DIR}/protobuf/${protobuf_FILENAME}.pb.h
-        )
-
-        set(framework_SOURCES ${framework_SOURCES} ${protobuf_SOURCES})
-
+    if(NOT WIN32)
         add_custom_command(
             OUTPUT ${protobuf_SOURCES}
             DEPENDS ${protobuf_PATH}/${protobuf_FILENAME}.proto
@@ -265,9 +265,9 @@ if(NOT WIN32)
             WORKING_DIRECTORY ${protobuf_PATH}
             COMMENT "Compiling ${protobuf_FILENAME}.proto"
         )
+    endif()
 
-    endforeach()
-endif()
+endforeach()
 
 find_package(OpenSSL QUIET)
 
