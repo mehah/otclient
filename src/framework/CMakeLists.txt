@@ -128,7 +128,6 @@ set(framework_SOURCES ${framework_SOURCES}
     ${CMAKE_CURRENT_LIST_DIR}/platform/platform.h
 )
 
-
 if(NOT MSVC)
     set_source_files_properties(${CMAKE_CURRENT_LIST_DIR}/luafunctions.cpp
                                 PROPERTIES LANGUAGE CXX COMPILE_FLAGS "-g0 -Os")
@@ -243,27 +242,31 @@ set(framework_INCLUDE_DIRS ${framework_INCLUDE_DIRS}
 )
 
 # protobuf
-set(protobuf_SOURCES
-    ${CMAKE_CURRENT_LIST_DIR}/protobuf/appearances.pb.cc
-    ${CMAKE_CURRENT_LIST_DIR}/protobuf/appearances.pb.h
-    ${CMAKE_CURRENT_LIST_DIR}/protobuf/shared.pb.cc
-    ${CMAKE_CURRENT_LIST_DIR}/protobuf/shared.pb.h
-)
-set(framework_SOURCES ${framework_SOURCES} ${protobuf_SOURCES})
-
 if(NOT WIN32)
     set(protobuf_PATH ${CMAKE_CURRENT_LIST_DIR}/protobuf/proto)
-    set(protobuf_FILES
-        ${protobuf_PATH}/appearances.proto
-        ${protobuf_PATH}/shared.proto
+    set(protobuf_MODULES
+        appearances
+        shared
     )
 
-    add_custom_command(
-        OUTPUT ${protobuf_SOURCES}
-        DEPENDS ${protobuf_FILES}
-        COMMAND protoc -I ${protobuf_PATH} --cpp_out=${protobuf_PATH}/../ ${protobuf_FILES}
-        WORKING_DIRECTORY ${PROTO_PATH}
-    )
+    foreach(protobuf_FILENAME ${protobuf_MODULES})
+
+        set(protobuf_SOURCES
+            ${CMAKE_CURRENT_LIST_DIR}/protobuf/${protobuf_FILENAME}.pb.cc
+            ${CMAKE_CURRENT_LIST_DIR}/protobuf/${protobuf_FILENAME}.pb.h
+        )
+
+        set(framework_SOURCES ${framework_SOURCES} ${protobuf_SOURCES})
+
+        add_custom_command(
+            OUTPUT ${protobuf_SOURCES}
+            DEPENDS ${protobuf_PATH}/${protobuf_FILENAME}.proto
+            COMMAND protoc --cpp_out=../ ${protobuf_FILENAME}.proto
+            WORKING_DIRECTORY ${protobuf_PATH}
+            COMMENT "Compiling ${protobuf_FILENAME}.proto"
+        )
+
+    endforeach()
 endif()
 
 find_package(OpenSSL QUIET)
