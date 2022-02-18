@@ -30,39 +30,7 @@
 #include "map.h"
 #include "protocolgame.h"
 
-Tile::Tile(const Position& position) : m_position(position), m_positionsAround(position.getPositionsAround())
-{
-    for(auto dir : { Otc::South, Otc::SouthEast, Otc::East }) {
-        Position pos = position;
-        m_positionsBorder.emplace_back(dir, pos.translatedToDirection(dir));
-    }
-}
-
-void Tile::onAddVisibleTileList(const MapViewPtr& /*mapView*/)
-{
-    m_borderDirections.clear();
-    for(const auto& pos : m_positionsBorder) {
-        const TilePtr& tile = g_map.getTile(pos.second);
-        if(!tile || (!tile->isFullyOpaque() && tile->isWalkable(true))) {
-            m_borderDirections.push_back(pos.first);
-        }
-    }
-}
-
-bool Tile::isCompletelyCovered(int8 firstFloor)
-{
-    if(m_ignoreCompletelyCoveredCheck || hasLight())
-        return false;
-
-    if(firstFloor > -1) {
-        m_completelyCovered = g_map.isCompletelyCovered(m_position, firstFloor);
-        if((m_covered = m_completelyCovered) == false) {
-            m_covered = g_map.isCovered(m_position, firstFloor);
-        }
-    }
-
-    return m_completelyCovered;
-}
+Tile::Tile(const Position& position) : m_position(position), m_positionsAround(m_position.getPositionsAround()) {}
 
 void Tile::drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor, bool animate, LightView* lightView)
 {
@@ -494,8 +462,8 @@ CreaturePtr Tile::getTopCreature(const bool checkAround)
 
     // check for walking creatures in tiles around
     if(checkAround) {
-        for(const auto& position : m_positionsAround) {
-            const TilePtr& tile = g_map.getTile(position);
+        for(const auto& pos : m_positionsAround) {
+            const TilePtr& tile = g_map.getTile(pos);
             if(!tile) continue;
 
             for(const CreaturePtr& c : tile->getCreatures()) {
@@ -582,29 +550,19 @@ bool Tile::isWalkable(bool ignoreCreatures)
     return true;
 }
 
-bool Tile::isPathable()
+bool Tile::isCompletelyCovered(int8 firstFloor)
 {
-    return m_countFlag.notPathable == 0;
-}
+    if(m_ignoreCompletelyCoveredCheck || hasLight())
+        return false;
 
-bool Tile::isFullGround()
-{
-    return m_countFlag.fullGround > 0;
-}
+    if(firstFloor > -1) {
+        m_completelyCovered = g_map.isCompletelyCovered(m_position, firstFloor);
+        if((m_covered = m_completelyCovered) == false) {
+            m_covered = g_map.isCovered(m_position, firstFloor);
+        }
+    }
 
-bool Tile::isFullyOpaque()
-{
-    return m_countFlag.opaque > 0;
-}
-
-bool Tile::isSingleDimension()
-{
-    return m_countFlag.notSingleDimension == 0 && m_walkingCreatures.empty();
-}
-
-bool Tile::isLookPossible()
-{
-    return m_countFlag.blockProjectile == 0;
+    return m_completelyCovered;
 }
 
 bool Tile::isClickable()
@@ -628,34 +586,17 @@ bool Tile::isClickable()
     return false;
 }
 
-bool Tile::isEmpty()
+bool Tile::canShade(const MapViewPtr& mapView)
 {
-    return m_things.empty();
-}
+    for(auto dir : { Otc::North, Otc::NorthWest, Otc::West }) {
+        const auto& pos = m_position.translatedToDirection(dir);
+        const auto& tile = g_map.getTile(pos);
 
-bool Tile::canErase()
-{
-    return m_walkingCreatures.empty() && m_effects.empty() && isEmpty() && m_flags == 0 && m_minimapColor == 0;
-}
+        if(!tile && mapView->isInRangeEx(pos, true) || tile && !tile->isFullyOpaque() && !tile->isFullGround() && !tile->hasTopGround(true))
+            return false;
+    }
 
-bool Tile::isDrawable()
-{
-    return !isEmpty() || !m_walkingCreatures.empty() || !m_effects.empty();
-}
-
-bool Tile::mustHookEast()
-{
-    return m_countFlag.hasHookEast > 0;
-}
-
-bool Tile::mustHookSouth()
-{
-    return m_countFlag.hasHookSouth > 0;
-}
-
-bool Tile::hasCreature()
-{
-    return m_countFlag.hasCreature > 0;
+    return isFullyOpaque() || hasTopGround(true) || isFullGround();
 }
 
 bool Tile::hasBlockingCreature()
@@ -671,21 +612,6 @@ bool Tile::limitsFloorsView(bool isFreeView)
     // ground and walls limits the view
     const ThingPtr& firstThing = getThing(0);
     return firstThing && (firstThing->isGround() || (isFreeView ? firstThing->isOnBottom() && firstThing->blockProjectile() : firstThing->isOnBottom()));
-}
-
-int Tile::getElevation() const
-{
-    return m_countFlag.elevation;
-}
-
-bool Tile::hasElevation(int elevation)
-{
-    return m_countFlag.elevation >= elevation;
-}
-
-bool Tile::hasLight()
-{
-    return m_countFlag.hasLight > 0;
 }
 
 void Tile::checkTranslucentLight()
@@ -841,8 +767,9 @@ void Tile::analyzeThing(const ThingPtr& thing, bool add)
     if(thing->hasElevation())
         m_countFlag.elevation += value;
 
-    if(thing->isOpaque())
-        m_countFlag.opaque += value;
+    if(thing->isOpaque()) {
+        m_countFlag.opaque = std::max<int>(m_countFlag.opaque + value, 0);
+    }
 
     if(thing->isGroundBorder() && thing->isNotWalkable())
         m_countFlag.hasNoWalkableEdge += value;
