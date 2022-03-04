@@ -13,6 +13,7 @@
         FW_NET;
         FW_SOUND;
         FW_XML;
+        USE_PROTOBUF;
         BUILD_TYPE="RelWithDebInfo";
         BUILD_COMMIT="devel";
         BUILD_REVISION="0";
@@ -79,10 +80,6 @@
     </ResourceCompile> -->
   </ItemDefinitionGroup>
   <ItemGroup>
-    <BuildMacro Include="USE_PROTOBUF">
-      <Value>TRUE</Value>
-      <EnvironmentVariable>true</EnvironmentVariable>
-    </BuildMacro>
     <BuildMacro Include="PREPROCESSOR_DEFS">
       <Value>$(PREPROCESSOR_DEFS)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
