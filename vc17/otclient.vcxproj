@@ -31,6 +31,7 @@
     <ProjectGuid>{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}</ProjectGuid>
     <RootNamespace>otclient</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <DefineConstants Condition="'$(USE_PROTOBUF)'=='TRUE'">ENABLE_PROTOBUF</DefineCnstants>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -253,7 +254,7 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
   <ItemGroup>
     <ClCompile Include="..\src\client\animatedtext.cpp" />
     <ClCompile Include="..\src\client\animator.cpp" />
-    <ClCompile Include="..\src\client\spriteappearances.cpp" />
+    <ClCompile Condition="'$(USE_PROTOBUF)'=='TRUE'" Include="..\src\client\spriteappearances.cpp" />
     <ClCompile Include="..\src\client\client.cpp" />
     <ClCompile Include="..\src\client\container.cpp" />
     <ClCompile Include="..\src\client\creature.cpp" />
@@ -402,14 +403,14 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
     <ClCompile Include="..\src\framework\xml\tinyxml.cpp" />
     <ClCompile Include="..\src\framework\xml\tinyxmlerror.cpp" />
     <ClCompile Include="..\src\framework\xml\tinyxmlparser.cpp" />
-    <ClCompile Include="..\src\framework\protobuf\appearances.pb.cc" />
-    <ClCompile Include="..\src\framework\protobuf\shared.pb.cc" />
+    <ClCompile Condition="'$(USE_PROTOBUF)'=='TRUE'" Include="..\src\framework\protobuf\appearances.pb.cc" />
+    <ClCompile Condition="'$(USE_PROTOBUF)'=='TRUE'" Include="..\src\framework\protobuf\shared.pb.cc" />
     <ClCompile Include="..\src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\client\animatedtext.h" />
     <ClInclude Include="..\src\client\animator.h" />
-    <ClInclude Include="..\src\client\spriteappearances.h" />
+    <ClInclude Condition="'$(USE_PROTOBUF)'=='TRUE'" Include="..\src\client\spriteappearances.h" />
     <ClInclude Include="..\src\client\client.h" />
     <ClInclude Include="..\src\client\const.h" />
     <ClInclude Include="..\src\client\container.h" />
@@ -582,8 +583,8 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
     <ClInclude Include="..\src\framework\util\size.h" />
     <ClInclude Include="..\src\framework\xml\tinystr.h" />
     <ClInclude Include="..\src\framework\xml\tinyxml.h" />
-    <ClInclude Include="..\src\framework\protobuf\appearances.pb.h" />
-    <ClInclude Include="..\src\framework\protobuf\shared.pb.h" />
+    <ClInclude Condition="'$(USE_PROTOBUF)'=='TRUE'" Include="..\src\framework\protobuf\appearances.pb.h" />
+    <ClInclude Condition="'$(USE_PROTOBUF)'=='TRUE'" Include="..\src\framework\protobuf\shared.pb.h" />
     <ClInclude Include="..\src\gitinfo.h" />
   </ItemGroup>
   <ItemGroup>

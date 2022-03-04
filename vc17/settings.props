@@ -79,6 +79,10 @@
     </ResourceCompile> -->
   </ItemDefinitionGroup>
   <ItemGroup>
+    <BuildMacro Include="USE_PROTOBUF">
+      <Value>TRUE</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
     <BuildMacro Include="PREPROCESSOR_DEFS">
       <Value>$(PREPROCESSOR_DEFS)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
