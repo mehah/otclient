@@ -231,6 +231,7 @@ set(framework_INCLUDE_DIRS ${framework_INCLUDE_DIRS}
     ${PHYSFS_INCLUDE_DIR}
 )
 
+option(USE_PROTOBUF "Use Protobuf for 12.70 support" ON)
 if(USE_PROTOBUF)
     find_package(Protobuf REQUIRED)
     find_package(LibLZMA REQUIRED)
