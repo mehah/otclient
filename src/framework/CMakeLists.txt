@@ -275,7 +275,7 @@ if(USE_PROTOBUF)
         endif()
 
     endforeach()
-    set(framework_DEFINITIONS ${framework_DEFINITIONS} -DENABLE_PROTOBUF)
+    set(framework_DEFINITIONS ${framework_DEFINITIONS} -DUSE_PROTOBUF)
 endif()
 message(STATUS "Use Protobuf for 12.70 support: " ${USE_PROTOBUF})
 
