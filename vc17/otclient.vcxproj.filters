@@ -540,11 +540,11 @@
     <ClCompile Include="..\src\framework\graphics\pool.cpp">
       <Filter>Source Files\framework\graphics</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\framework\protobuf\appearances.pb.cc">
-      <Filter>Source Files\framework\protobuf</Filter>
+    <ClCompile Include="..\src\client\protobuf\appearances.pb.cc">
+      <Filter>Source Files\client\protobuf</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\framework\protobuf\shared.pb.cc">
-      <Filter>Source Files\framework\protobuf</Filter>
+    <ClCompile Include="..\src\client\protobuf\shared.pb.cc">
+      <Filter>Source Files\client\protobuf</Filter>
     </ClCompile>
     <ClCompile Include="..\src\client\spriteappearances.cpp">
       <Filter>Source Files\client</Filter>
@@ -1076,11 +1076,11 @@
     <ClInclude Include="..\src\framework\stdext\hash.h">
       <Filter>Header Files\framework\stdext</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\framework\protobuf\shared.pb.h">
-      <Filter>Header Files\framework\protobuf</Filter>
+    <ClInclude Include="..\src\client\protobuf\shared.pb.h">
+      <Filter>Header Files\client\protobuf</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\framework\protobuf\appearances.pb.h">
-      <Filter>Header Files\framework\protobuf</Filter>
+    <ClInclude Include="..\src\client\protobuf\appearances.pb.h">
+      <Filter>Header Files\client\protobuf</Filter>
     </ClInclude>
     <ClInclude Include="..\src\client\spriteappearances.h">
       <Filter>Header Files\client</Filter>

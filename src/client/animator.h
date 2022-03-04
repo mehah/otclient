@@ -29,7 +29,7 @@
 #include <framework/core/timer.h>
 
 #ifdef USE_PROTOBUF
-#include <framework/protobuf/appearances.pb.h>
+#include "protobuf/appearances.pb.h"
 
 using namespace tibia::protobuf;
 #endif

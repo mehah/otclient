@@ -36,7 +36,7 @@
 #ifdef USE_PROTOBUF
 #include <client/spriteappearances.h>
 #include <client/spritemanager.h>
-#include "framework/protobuf/appearances.pb.h"
+#include "protobuf/appearances.pb.h"
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
