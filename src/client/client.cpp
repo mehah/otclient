@@ -28,7 +28,7 @@
 #include "shadermanager.h"
 #include "spritemanager.h"
 
-#ifdef ENABLE_FRAMEWORK_1270
+#ifdef ENABLE_PROTOBUF
 #include "spriteappearances.h"
 #endif
 
@@ -44,7 +44,7 @@ void Client::init(std::vector<std::string>& /*args*/)
     g_game.init();
     g_shaders.init();
     g_sprites.init();
-#ifdef ENABLE_FRAMEWORK_1270
+#ifdef ENABLE_PROTOBUF
     g_spriteAppearances.init();
 #endif
     g_things.init();
@@ -94,7 +94,7 @@ void Client::terminate()
     g_minimap.terminate();
     g_things.terminate();
     g_sprites.terminate();
-#ifdef ENABLE_FRAMEWORK_1270
+#ifdef ENABLE_PROTOBUF
     g_spriteAppearances.terminate();
 #endif
     g_shaders.terminate();

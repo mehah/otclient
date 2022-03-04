@@ -35,7 +35,7 @@ class FrameBuffer;
 class FrameBufferManager;
 class Shader;
 class ShaderProgram;
-#ifdef ENABLE_FRAMEWORK_1270
+#ifdef ENABLE_PROTOBUF
 class SpriteSheet;
 #endif
 class PainterShaderProgram;
@@ -67,7 +67,7 @@ using ParticleSystemPtr = stdext::shared_object_ptr<ParticleSystem>;
 using ParticleEffectPtr = stdext::shared_object_ptr<ParticleEffect>;
 using ParticleEffectTypePtr = stdext::shared_object_ptr<ParticleEffectType>;
 using ShaderList = std::vector<ShaderPtr>;
-#ifdef ENABLE_FRAMEWORK_1270
+#ifdef ENABLE_PROTOBUF
 using SpriteSheetPtr = stdext::shared_object_ptr<SpriteSheet>;
 #endif
 

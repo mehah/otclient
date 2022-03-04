@@ -60,7 +60,7 @@ if(APPLE AND USE_STATIC_LIBS)
 endif()
 
 if (USE_PROTOBUF)
-    target_compile_definitions(tfs PRIVATE ENABLE_FRAMEWORK_1270)
+    target_compile_definitions(tfs PRIVATE ENABLE_PROTOBUF)
 endif()
 message(STATUS "Use Protobuf for 12.70 support: " ${USE_PROTOBUF})
 
