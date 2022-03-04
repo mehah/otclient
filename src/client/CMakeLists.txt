@@ -22,8 +22,17 @@ set(client_SOURCES ${client_SOURCES}
     ${CMAKE_CURRENT_LIST_DIR}/animatedtext.h
     ${CMAKE_CURRENT_LIST_DIR}/animator.h
     ${CMAKE_CURRENT_LIST_DIR}/animator.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/spriteappearances.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/spriteappearances.h
+)
+
+if(USE_PROTOBUF)
+    set(client_SOURCES ${client_SOURCES}
+        # 12.70
+        ${CMAKE_CURRENT_LIST_DIR}/spriteappearances.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/spriteappearances.h
+    )
+endif()
+
+set(client_SOURCES ${client_SOURCES}
     ${CMAKE_CURRENT_LIST_DIR}/container.cpp
     ${CMAKE_CURRENT_LIST_DIR}/container.h
     ${CMAKE_CURRENT_LIST_DIR}/creature.cpp

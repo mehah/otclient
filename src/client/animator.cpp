@@ -26,6 +26,7 @@
 #include <framework/core/clock.h>
 #include <framework/core/filestream.h>
 
+#ifdef ENABLE_FRAMEWORK_1270
 void Animator::unserializeAppearance(const appearances::SpriteAnimation& animation)
 {
     m_animationPhases = animation.sprite_phase_size();
@@ -42,6 +43,7 @@ void Animator::unserializeAppearance(const appearances::SpriteAnimation& animati
     assert(m_animationPhases == static_cast<int>(m_phaseDurations.size()));
     assert(m_startPhase >= -1 && m_startPhase < m_animationPhases);
 }
+#endif
 
 void Animator::unserialize(int animationPhases, const FileStreamPtr& fin)
 {

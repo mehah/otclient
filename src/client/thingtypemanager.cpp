@@ -33,15 +33,15 @@
 #include <framework/otml/otml.h>
 #include <framework/xml/tinyxml.h>
 
+#ifdef ENABLE_FRAMEWORK_1270
 #include <client/spriteappearances.h>
 #include <client/spritemanager.h>
-
 #include "framework/protobuf/appearances.pb.h"
-
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 using namespace tibia::protobuf;
+#endif
 
 ThingTypeManager g_things;
 
@@ -285,6 +285,7 @@ void ThingTypeManager::loadXml(const std::string& file)
     }
 }
 
+#ifdef ENABLE_FRAMEWORK_1270
 bool ThingTypeManager::loadAppearances(const std::string& file)
 {
     try {
@@ -338,7 +339,7 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
                 m_thingTypes[category][id] = type;
             }
         }
-;
+
         m_datLoaded = true;
         return true;
     } catch (std::exception& e) {
@@ -346,6 +347,7 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
         return false;
     }
 }
+#endif
 
 void ThingTypeManager::parseItemType(uint16 serverId, TiXmlElement* elem)
 {

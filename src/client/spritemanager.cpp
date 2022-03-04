@@ -21,7 +21,9 @@
  */
 
 #include "spritemanager.h"
+#ifdef ENABLE_FRAMEWORK_1270
 #include "spriteappearances.h"
+#endif
 #include <framework/core/filestream.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/image.h>
@@ -128,9 +130,11 @@ void SpriteManager::unload()
 
 ImagePtr SpriteManager::getSpriteImage(int id)
 {
+#ifdef ENABLE_FRAMEWORK_1270
     if(g_game.getClientVersion() >= 1281) {
         return g_spriteAppearances.getSpriteImage(id);
     }
+#endif
 
     try {
         if(id == 0 || !m_spritesFile)

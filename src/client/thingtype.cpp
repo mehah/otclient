@@ -25,7 +25,9 @@
 #include "lightview.h"
 #include "map.h"
 #include "spritemanager.h"
+#ifdef ENABLE_FRAMEWORK_1270
 #include "spriteappearances.h"
+#endif
 
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/filestream.h>
@@ -121,6 +123,8 @@ void ThingType::serialize(const FileStreamPtr& fin)
     }
 }
 
+
+#ifdef ENABLE_FRAMEWORK_1270
 void ThingType::unserializeAppearance(uint16 clientId, ThingCategory category, const appearances::Appearance& appearance)
 {
     m_null = false;
@@ -401,6 +405,7 @@ void ThingType::unserializeAppearance(uint16 clientId, ThingCategory category, c
     m_texturesFramesOriginRects.resize(m_animationPhases);
     m_texturesFramesOffsets.resize(m_animationPhases);
 }
+#endif
 
 void ThingType::unserialize(uint16 clientId, ThingCategory category, const FileStreamPtr& fin)
 {
@@ -772,7 +777,6 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
     m_texturesFramesOffsets[animationPhase].resize(indexSize);
 
     bool protobufSupported = g_game.getProtocolVersion() >= 1281;
-
     static Color maskColors[] = { Color::red, Color::green, Color::blue, Color::yellow };
 
     for(int z = 0; z < m_numPatternZ; ++z) {
@@ -908,13 +912,18 @@ uint ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int a)
                   * m_size.height() + h)
         * m_size.width() + w;
 
-    if(w == -1 && h == -1) { // protobuf does not use width and height, because sprite image is the exact sprite size, not split by 32x32, so -1 is passed instead
+#ifdef ENABLE_FRAMEWORK_1270
+    // protobuf does not use width and height,
+    // because sprite image is the exact sprite size,
+    // not split by 32x32, so -1 is passed instead
+    if(w == -1 && h == -1) {
         index = ((((a % m_animationPhases)
                    * m_numPatternZ + z)
                   * m_numPatternY + y)
                  * m_numPatternX + x)
             * m_layers + l;
     }
+#endif
 
     assert(index < m_spritesIndex.size());
     return index;

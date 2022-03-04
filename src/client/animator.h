@@ -28,9 +28,11 @@
 #include <framework/core/declarations.h>
 #include <framework/core/timer.h>
 
+#ifdef ENABLE_FRAMEWORK_1270
 #include <framework/protobuf/appearances.pb.h>
 
 using namespace tibia::protobuf;
+#endif
 
 enum AnimationPhase : int16
 {
@@ -48,7 +50,9 @@ enum AnimationDirection : uint8
 class Animator : public stdext::shared_object
 {
 public:
+#ifdef ENABLE_FRAMEWORK_1270
     void unserializeAppearance(const appearances::SpriteAnimation& phases);
+#endif
     void unserialize(int animationPhases, const FileStreamPtr& fin);
     void serialize(const FileStreamPtr& fin);
     void setPhase(int phase);

@@ -27,7 +27,10 @@
 #include "minimap.h"
 #include "shadermanager.h"
 #include "spritemanager.h"
+
+#ifdef ENABLE_FRAMEWORK_1270
 #include "spriteappearances.h"
+#endif
 
 Client g_client;
 
@@ -41,7 +44,9 @@ void Client::init(std::vector<std::string>& /*args*/)
     g_game.init();
     g_shaders.init();
     g_sprites.init();
+#ifdef ENABLE_FRAMEWORK_1270
     g_spriteAppearances.init();
+#endif
     g_things.init();
 
     //TODO: restore options
@@ -89,6 +94,8 @@ void Client::terminate()
     g_minimap.terminate();
     g_things.terminate();
     g_sprites.terminate();
+#ifdef ENABLE_FRAMEWORK_1270
     g_spriteAppearances.terminate();
+#endif
     g_shaders.terminate();
 }

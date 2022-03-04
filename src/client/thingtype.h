@@ -32,8 +32,10 @@
 #include <framework/net/server.h>
 #include <framework/otml/declarations.h>
 
+#ifdef ENABLE_FRAMEWORK_1270
 using namespace tibia::protobuf;
 using namespace tibia::protobuf::shared;
+#endif
 
 enum class TextureType {
     NONE,
@@ -136,7 +138,9 @@ struct Light {
 class ThingType : public LuaObject
 {
 public:
+#ifdef ENABLE_FRAMEWORK_1270
     void unserializeAppearance(uint16 clientId, ThingCategory category, const appearances::Appearance& appearance);
+#endif
     void unserialize(uint16 clientId, ThingCategory category, const FileStreamPtr& fin);
     void unserializeOtml(const OTMLNodePtr& node);
 

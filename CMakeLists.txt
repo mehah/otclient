@@ -18,6 +18,7 @@ if(NOT APPLE)
 endif()
 
 option(USE_PCH "Use precompiled header (speed up compile)" OFF)
+option(USE_PROTOBUF "Use Protobuf for 12.70 support" OFF)
 
 set(executable_SOURCES
     src/main.cpp
@@ -57,6 +58,11 @@ target_link_libraries(${PROJECT_NAME} ${framework_LIBRARIES})
 if(APPLE AND USE_STATIC_LIBS)
     target_link_libraries(${PROJECT_NAME} "-framework Foundation" "-framework IOKit")
 endif()
+
+if (USE_PROTOBUF)
+    target_compile_definitions(tfs PRIVATE ENABLE_FRAMEWORK_1270)
+endif()
+message(STATUS "Use Protobuf for 12.70 support: " ${USE_PROTOBUF})
 
 if(USE_PCH)
     include(cotire)

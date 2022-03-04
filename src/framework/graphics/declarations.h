@@ -35,6 +35,9 @@ class FrameBuffer;
 class FrameBufferManager;
 class Shader;
 class ShaderProgram;
+#ifdef ENABLE_FRAMEWORK_1270
+class SpriteSheet;
+#endif
 class PainterShaderProgram;
 class Particle;
 class ParticleType;
@@ -43,7 +46,6 @@ class ParticleAffector;
 class ParticleSystem;
 class ParticleEffect;
 class ParticleEffectType;
-class SpriteSheet;
 class Pool;
 class FramedPool;
 class DrawPool;
@@ -64,8 +66,10 @@ using ParticleAffectorPtr = stdext::shared_object_ptr<ParticleAffector>;
 using ParticleSystemPtr = stdext::shared_object_ptr<ParticleSystem>;
 using ParticleEffectPtr = stdext::shared_object_ptr<ParticleEffect>;
 using ParticleEffectTypePtr = stdext::shared_object_ptr<ParticleEffectType>;
-using SpriteSheetPtr = stdext::shared_object_ptr<SpriteSheet>;
 using ShaderList = std::vector<ShaderPtr>;
+#ifdef ENABLE_FRAMEWORK_1270
+using SpriteSheetPtr = stdext::shared_object_ptr<SpriteSheet>;
+#endif
 
 using PoolPtr = std::shared_ptr<Pool>;
 using PoolFramedPtr = std::shared_ptr<FramedPool>;
