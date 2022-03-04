@@ -59,11 +59,6 @@ if(APPLE AND USE_STATIC_LIBS)
     target_link_libraries(${PROJECT_NAME} "-framework Foundation" "-framework IOKit")
 endif()
 
-if (USE_PROTOBUF)
-    target_compile_definitions(tfs PRIVATE ENABLE_PROTOBUF)
-endif()
-message(STATUS "Use Protobuf for 12.70 support: " ${USE_PROTOBUF})
-
 if(USE_PCH)
     include(cotire)
     cotire(${PROJECT_NAME})
