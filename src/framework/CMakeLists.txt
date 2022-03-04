@@ -277,7 +277,7 @@ if(USE_PROTOBUF)
     endforeach()
     set(framework_DEFINITIONS ${framework_DEFINITIONS} -DUSE_PROTOBUF)
 endif()
-message(STATUS "Use Protobuf for 12.70 support: " ${USE_PROTOBUF})
+message(STATUS "Use Protobuf for protocol 12+: " ${USE_PROTOBUF})
 
 find_package(OpenSSL QUIET)
 

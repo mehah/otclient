@@ -20,6 +20,8 @@
  * THE SOFTWARE.
  */
 
+#ifdef USE_PROTOBUF
+
 #ifndef SPRITEAPPEARANCES_H
 #define SPRITEAPPEARANCES_H
 
@@ -94,5 +96,7 @@ class SpriteAppearances
 };
 
 extern SpriteAppearances g_spriteAppearances;
+
+#endif
 
 #endif

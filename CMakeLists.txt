@@ -18,7 +18,7 @@ if(NOT APPLE)
 endif()
 
 option(USE_PCH "Use precompiled header (speed up compile)" OFF)
-option(USE_PROTOBUF "Use Protobuf for 12.70 support" ON)
+option(USE_PROTOBUF "Use Protobuf for protocol 12+" ON)
 
 set(executable_SOURCES
     src/main.cpp

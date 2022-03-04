@@ -20,6 +20,8 @@
  * THE SOFTWARE.
  */
 
+#ifdef USE_PROTOBUF
+
 #include "spriteappearances.h"
 #include <framework/core/filestream.h>
 #include <framework/core/resourcemanager.h>
@@ -260,3 +262,5 @@ void SpriteAppearances::saveSheetToFile(const SpriteSheetPtr& sheet, const std::
     Image image(Size(384, 384), 4, sheet->data.get());
     image.savePNG(file);
 }
+
+#endif
