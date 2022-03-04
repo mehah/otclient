@@ -25,7 +25,7 @@
 #include "lightview.h"
 #include "map.h"
 #include "spritemanager.h"
-#ifdef ENABLE_PROTOBUF
+#ifdef USE_PROTOBUF
 #include "spriteappearances.h"
 #endif
 
@@ -124,7 +124,7 @@ void ThingType::serialize(const FileStreamPtr& fin)
 }
 
 
-#ifdef ENABLE_PROTOBUF
+#ifdef USE_PROTOBUF
 void ThingType::unserializeAppearance(uint16 clientId, ThingCategory category, const appearances::Appearance& appearance)
 {
     m_null = false;
@@ -912,7 +912,7 @@ uint ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int a)
                   * m_size.height() + h)
         * m_size.width() + w;
 
-#ifdef ENABLE_PROTOBUF
+#ifdef USE_PROTOBUF
     // protobuf does not use width and height,
     // because sprite image is the exact sprite size,
     // not split by 32x32, so -1 is passed instead

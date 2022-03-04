@@ -32,7 +32,7 @@
 #include <framework/net/server.h>
 #include <framework/otml/declarations.h>
 
-#ifdef ENABLE_PROTOBUF
+#ifdef USE_PROTOBUF
 using namespace tibia::protobuf;
 using namespace tibia::protobuf::shared;
 #endif
@@ -138,7 +138,7 @@ struct Light {
 class ThingType : public LuaObject
 {
 public:
-#ifdef ENABLE_PROTOBUF
+#ifdef USE_PROTOBUF
     void unserializeAppearance(uint16 clientId, ThingCategory category, const appearances::Appearance& appearance);
 #endif
     void unserialize(uint16 clientId, ThingCategory category, const FileStreamPtr& fin);

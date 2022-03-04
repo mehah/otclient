@@ -28,7 +28,7 @@
 #include <framework/core/declarations.h>
 #include <framework/core/timer.h>
 
-#ifdef ENABLE_PROTOBUF
+#ifdef USE_PROTOBUF
 #include <framework/protobuf/appearances.pb.h>
 
 using namespace tibia::protobuf;
@@ -50,7 +50,7 @@ enum AnimationDirection : uint8
 class Animator : public stdext::shared_object
 {
 public:
-#ifdef ENABLE_PROTOBUF
+#ifdef USE_PROTOBUF
     void unserializeAppearance(const appearances::SpriteAnimation& phases);
 #endif
     void unserialize(int animationPhases, const FileStreamPtr& fin);

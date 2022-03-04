@@ -26,7 +26,7 @@
 #include <framework/core/clock.h>
 #include <framework/core/filestream.h>
 
-#ifdef ENABLE_PROTOBUF
+#ifdef USE_PROTOBUF
 void Animator::unserializeAppearance(const appearances::SpriteAnimation& animation)
 {
     m_animationPhases = animation.sprite_phase_size();

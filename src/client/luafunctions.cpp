@@ -49,7 +49,7 @@
 #include "uiminimap.h"
 #include "uiprogressrect.h"
 #include "uisprite.h"
-#ifdef ENABLE_PROTOBUF
+#ifdef USE_PROTOBUF
 #include "spriteappearances.h"
 #endif
 
@@ -58,7 +58,7 @@
 void Client::registerLuaFunctions()
 {
     g_lua.registerSingletonClass("g_things");
-#ifdef ENABLE_PROTOBUF
+#ifdef USE_PROTOBUF
     g_lua.bindSingletonFunction("g_things", "loadAppearances", &ThingTypeManager::loadAppearances, &g_things);
 #endif
     g_lua.bindSingletonFunction("g_things", "loadDat", &ThingTypeManager::loadDat, &g_things);
@@ -108,7 +108,7 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_sprites", "getSprSignature", &SpriteManager::getSignature, &g_sprites);
     g_lua.bindSingletonFunction("g_sprites", "getSpritesCount", &SpriteManager::getSpritesCount, &g_sprites);
 
-#ifdef ENABLE_PROTOBUF
+#ifdef USE_PROTOBUF
     g_lua.registerSingletonClass("g_spriteAppearances");
     g_lua.bindSingletonFunction("g_spriteAppearances", "saveSpriteToFile", &SpriteAppearances::saveSpriteToFile, &g_spriteAppearances);
     g_lua.bindSingletonFunction("g_spriteAppearances", "saveSheetToFileBySprite", &SpriteAppearances::saveSheetToFileBySprite, &g_spriteAppearances);

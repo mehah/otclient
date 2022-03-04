@@ -21,7 +21,7 @@
  */
 
 #include "spritemanager.h"
-#ifdef ENABLE_PROTOBUF
+#ifdef USE_PROTOBUF
 #include "spriteappearances.h"
 #endif
 #include <framework/core/filestream.h>
@@ -130,7 +130,7 @@ void SpriteManager::unload()
 
 ImagePtr SpriteManager::getSpriteImage(int id)
 {
-#ifdef ENABLE_PROTOBUF
+#ifdef USE_PROTOBUF
     if(g_game.getClientVersion() >= 1281) {
         return g_spriteAppearances.getSpriteImage(id);
     }

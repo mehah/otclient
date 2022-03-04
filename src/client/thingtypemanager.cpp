@@ -33,7 +33,7 @@
 #include <framework/otml/otml.h>
 #include <framework/xml/tinyxml.h>
 
-#ifdef ENABLE_PROTOBUF
+#ifdef USE_PROTOBUF
 #include <client/spriteappearances.h>
 #include <client/spritemanager.h>
 #include "framework/protobuf/appearances.pb.h"
@@ -285,7 +285,7 @@ void ThingTypeManager::loadXml(const std::string& file)
     }
 }
 
-#ifdef ENABLE_PROTOBUF
+#ifdef USE_PROTOBUF
 bool ThingTypeManager::loadAppearances(const std::string& file)
 {
     try {
