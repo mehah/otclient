@@ -31,7 +31,7 @@
     <ProjectGuid>{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}</ProjectGuid>
     <RootNamespace>otclient</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <DefineConstants Condition="'$(USE_PROTOBUF)'=='TRUE'">USE_PROTOBUF</DefineCnstants>
+    <DefineConstants Condition="'$(USE_PROTOBUF)'=='TRUE'">USE_PROTOBUF</DefineConstants>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
