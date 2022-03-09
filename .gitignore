@@ -51,6 +51,8 @@ cmake-build-*/
 *.scc
 *.dll
 *.exe
+*.exp
+*.lib
 
 # Visual C++ cache files
 ipch/
