@@ -1,8 +1,13 @@
+set(client_LIBRARIES "")
+set(client_DEFINITIONS "")
+set(client_INCLUDE_DIRS "")
+
 # client options
-add_definitions(-DCLIENT)
+set(client_DEFINITIONS ${client_DEFINITIONS} -DCLIENT)
+
 option(BOT_PROTECTION "Enable bot protection" ON)
 if(BOT_PROTECTION)
-    add_definitions(-DBOT_PROTECTION)
+    set(client_DEFINITIONS ${client_DEFINITIONS} -DBOT_PROTECTION)
     message(STATUS "Bot protection: ON")
 else(BOT_PROTECTION)
     message(STATUS "Bot protection: OFF")
@@ -23,14 +28,59 @@ set(client_SOURCES ${client_SOURCES}
     ${CMAKE_CURRENT_LIST_DIR}/animator.h
     ${CMAKE_CURRENT_LIST_DIR}/animator.cpp
 )
-
 if(USE_PROTOBUF)
+    find_package(Protobuf REQUIRED)
+    find_package(LibLZMA REQUIRED)
+    find_package(nlohmann_json REQUIRED)
+
+    set(clie ${client_LIBRARIES}
+        ${PROTOBUF_LIBRARY}
+        ${LIBLZMA_LIBRARIES}
+        ${NLOHMANN_JSON_LIBRARY}
+    )
+
+    set(client_INCLUDE_DIRS ${client_INCLUDE_DIRS}
+        ${PROTOBUF_INCLUDE_DIRS}
+        ${LIBLZMA_INCLUDE_DIRS}
+        ${NLOHMANN_JSON_INCLUDE_DIR}
+    )
+
+    # protobuf
+    set(protobuf_PATH ${CMAKE_CURRENT_LIST_DIR}/protobuf/proto)
+    set(protobuf_MODULES
+        appearances
+        shared
+    )
+
+    foreach(protobuf_FILENAME ${protobuf_MODULES})
+
+        set(protobuf_SOURCES
+            ${CMAKE_CURRENT_LIST_DIR}/protobuf/${protobuf_FILENAME}.pb.cc
+            ${CMAKE_CURRENT_LIST_DIR}/protobuf/${protobuf_FILENAME}.pb.h
+        )
+
+        set(framework_SOURCES ${framework_SOURCES} ${protobuf_SOURCES})
+
+        if(NOT WIN32)
+            add_custom_command(
+                OUTPUT ${protobuf_SOURCES}
+                DEPENDS ${protobuf_PATH}/${protobuf_FILENAME}.proto
+                COMMAND protoc --cpp_out=../ ${protobuf_FILENAME}.proto
+                WORKING_DIRECTORY ${protobuf_PATH}
+                COMMENT "Compiling ${protobuf_FILENAME}.proto"
+            )
+        endif()
+
+    endforeach()
+    set(client_DEFINITIONS ${client_DEFINITIONS} -DUSE_PROTOBUF)
+
     set(client_SOURCES ${client_SOURCES}
         # 12.70
         ${CMAKE_CURRENT_LIST_DIR}/spriteappearances.cpp
         ${CMAKE_CURRENT_LIST_DIR}/spriteappearances.h
     )
 endif()
+message(STATUS "Use Protobuf for protocol 12+: " ${USE_PROTOBUF})
 
 set(client_SOURCES ${client_SOURCES}
     ${CMAKE_CURRENT_LIST_DIR}/container.cpp
@@ -120,3 +170,6 @@ if(NOT MSVC)
     set_source_files_properties(${CMAKE_CURRENT_LIST_DIR}/luafunctions.cpp
                                 PROPERTIES LANGUAGE CXX COMPILE_FLAGS "-g0 -Os")
 endif()
+
+include_directories(${client_INCLUDE_DIRS})
+add_definitions(${client_DEFINITIONS})

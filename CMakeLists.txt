@@ -53,7 +53,7 @@ add_executable(${PROJECT_NAME} ${framework_SOURCES} ${client_SOURCES} ${executab
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 20)
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD_REQUIRED ON)
 
-target_link_libraries(${PROJECT_NAME} ${framework_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${framework_LIBRARIES} ${client_LIBRARIES})
 
 if(APPLE AND USE_STATIC_LIBS)
     target_link_libraries(${PROJECT_NAME} "-framework Foundation" "-framework IOKit")

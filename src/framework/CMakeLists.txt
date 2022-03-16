@@ -231,54 +231,6 @@ set(framework_INCLUDE_DIRS ${framework_INCLUDE_DIRS}
     ${PHYSFS_INCLUDE_DIR}
 )
 
-if(USE_PROTOBUF)
-    find_package(Protobuf REQUIRED)
-    find_package(LibLZMA REQUIRED)
-    find_package(nlohmann_json REQUIRED)
-
-    set(framework_LIBRARIES ${framework_LIBRARIES}
-        ${PROTOBUF_LIBRARY}
-        ${LIBLZMA_LIBRARIES}
-        ${NLOHMANN_JSON_LIBRARY}
-    )
-
-    set(framework_INCLUDE_DIRS ${framework_INCLUDE_DIRS}
-        ${PROTOBUF_INCLUDE_DIRS}
-        ${LIBLZMA_INCLUDE_DIRS}
-        ${NLOHMANN_JSON_INCLUDE_DIR}
-    )
-
-    # protobuf
-    set(protobuf_PATH ${CMAKE_CURRENT_LIST_DIR}/protobuf/proto)
-    set(protobuf_MODULES
-        appearances
-        shared
-    )
-
-    foreach(protobuf_FILENAME ${protobuf_MODULES})
-
-        set(protobuf_SOURCES
-            ${CMAKE_CURRENT_LIST_DIR}/protobuf/${protobuf_FILENAME}.pb.cc
-            ${CMAKE_CURRENT_LIST_DIR}/protobuf/${protobuf_FILENAME}.pb.h
-        )
-
-        set(framework_SOURCES ${framework_SOURCES} ${protobuf_SOURCES})
-
-        if(NOT WIN32)
-            add_custom_command(
-                OUTPUT ${protobuf_SOURCES}
-                DEPENDS ${protobuf_PATH}/${protobuf_FILENAME}.proto
-                COMMAND protoc --cpp_out=../ ${protobuf_FILENAME}.proto
-                WORKING_DIRECTORY ${protobuf_PATH}
-                COMMENT "Compiling ${protobuf_FILENAME}.proto"
-            )
-        endif()
-
-    endforeach()
-    set(framework_DEFINITIONS ${framework_DEFINITIONS} -DUSE_PROTOBUF)
-endif()
-message(STATUS "Use Protobuf for protocol 12+: " ${USE_PROTOBUF})
-
 find_package(OpenSSL QUIET)
 
 if(NOT OPENSSL_FOUND)
