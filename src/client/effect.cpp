@@ -21,8 +21,8 @@
  */
 
 #include "effect.h"
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/graphicalapplication.h>
+#include "framework/core/eventdispatcher.h"
+#include "framework/core/graphicalapplication.h"
 #include "game.h"
 #include "map.h"
 

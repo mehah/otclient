@@ -28,7 +28,7 @@
 #include "inputmessage.h"
 #include "outputmessage.h"
 
-#include <framework/luaengine/luaobject.h>
+#include "framework/luaengine/luaobject.h"
 
  // @bindclass
 class Protocol : public LuaObject

@@ -23,7 +23,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <framework/core/timer.h>
+#include "framework/core/timer.h"
 #include "animatedtext.h"
 #include "container.h"
 #include "creature.h"

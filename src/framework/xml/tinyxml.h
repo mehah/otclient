@@ -38,7 +38,7 @@ distribution.
 #include <cstdio>
 #include <cstring>
 
-#include <framework/stdext/string.h>
+#include "framework/stdext/string.h"
 
 // Help out windows:
 #if defined( _DEBUG ) && !defined( DEBUG )

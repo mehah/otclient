@@ -25,7 +25,7 @@
 
 #include "declarations.h"
 
-#include <framework/util/databuffer.h>
+#include "framework/util/databuffer.h"
 
 class SoundBuffer : public stdext::shared_object
 {

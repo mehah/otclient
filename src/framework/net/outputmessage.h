@@ -23,7 +23,7 @@
 #ifndef OUTPUTMESSAGE_H
 #define OUTPUTMESSAGE_H
 
-#include <framework/luaengine/luaobject.h>
+#include "framework/luaengine/luaobject.h"
 #include "declarations.h"
 
  // @bindclass

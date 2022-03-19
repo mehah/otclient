@@ -23,7 +23,7 @@
 #ifndef PAINTEROGL_H
 #define PAINTEROGL_H
 
-#include <framework/graphics/painter.h>
+#include "framework/graphics/painter.h"
 
 class PainterOGL : public Painter
 {

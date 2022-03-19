@@ -23,7 +23,7 @@
 #include "config.h"
 #include "resourcemanager.h"
 
-#include <framework/otml/otml.h>
+#include "framework/otml/otml.h"
 
 Config::Config()
 {

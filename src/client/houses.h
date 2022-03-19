@@ -26,7 +26,7 @@
 #include "declarations.h"
 #include "tile.h"
 
-#include <framework/luaengine/luaobject.h>
+#include "framework/luaengine/luaobject.h"
 
 enum HouseAttr : uint8
 {

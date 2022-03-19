@@ -27,12 +27,12 @@
 WIN32Window window;
 #else
 #include "x11window.h"
-#include <framework/core/clock.h>
+#include "framework/core/clock.h"
 X11Window window;
 #endif
 
-#include <framework/core/clock.h>
-#include <framework/graphics/image.h>
+#include "framework/core/clock.h"
+#include "framework/graphics/image.h"
 
 PlatformWindow& g_window = window;
 

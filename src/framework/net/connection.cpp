@@ -22,8 +22,8 @@
 
 #include "connection.h"
 
-#include <framework/core/application.h>
-#include <framework/core/eventdispatcher.h>
+#include "framework/core/application.h"
+#include "framework/core/eventdispatcher.h"
 
 #include <utility>
 #include <boost/asio.hpp>

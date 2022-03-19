@@ -31,7 +31,7 @@
 #include "tile.h"
 
 #include <framework/core/asyncdispatcher.h>
-#include <framework/core/eventdispatcher.h>
+#include "framework/core/eventdispatcher.h"
 
 #include "houses.h"
 #include "towns.h"

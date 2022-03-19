@@ -23,7 +23,7 @@
 #ifndef FRAMEWORK_SQL_DECLARATIONS_H
 #define FRAMEWORK_SQL_DECLARATIONS_H
 
-#include <framework/global.h>
+#include "framework/global.h"
 
 class Database;
 class DBResult;

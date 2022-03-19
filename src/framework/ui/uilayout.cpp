@@ -23,7 +23,7 @@
 #include "uilayout.h"
 #include "uiwidget.h"
 
-#include <framework/core/eventdispatcher.h>
+#include "framework/core/eventdispatcher.h"
 
 void UILayout::update()
 {

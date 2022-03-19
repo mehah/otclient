@@ -20,9 +20,9 @@
  * THE SOFTWARE.
  */
 
-#include <framework/graphics/painter.h>
-#include <framework/graphics/texture.h>
-#include <framework/graphics/texturemanager.h>
+#include "framework/graphics/painter.h"
+#include "framework/graphics/texture.h"
+#include "framework/graphics/texturemanager.h"
 #include "uiwidget.h"
 #include "framework/graphics/drawpool.h"
 

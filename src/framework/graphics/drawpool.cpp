@@ -21,7 +21,7 @@
  */
 
 #include "drawpool.h"
-#include <framework/graphics/framebuffermanager.h>
+#include "framework/graphics/framebuffermanager.h"
 #include "declarations.h"
 
 #include <utility>

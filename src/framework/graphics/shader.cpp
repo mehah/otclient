@@ -23,8 +23,8 @@
 #include "shader.h"
 #include "graphics.h"
 
-#include <framework/core/application.h>
-#include <framework/core/resourcemanager.h>
+#include "framework/core/application.h"
+#include "framework/core/resourcemanager.h"
 
 Shader::Shader(ShaderType shaderType)
 {

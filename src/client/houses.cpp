@@ -24,7 +24,8 @@
 
 #include "map.h"
 
-#include <framework/core/resourcemanager.h>
+#include "framework/core/resourcemanager.h"
+#include "framework/core/logger.h"
 
 HouseManager g_houses;
 

@@ -23,7 +23,7 @@
 #ifndef INPUTMESSAGE_H
 #define INPUTMESSAGE_H
 
-#include <framework/luaengine/luaobject.h>
+#include "framework/luaengine/luaobject.h"
 #include "declarations.h"
 
  // @bindclass

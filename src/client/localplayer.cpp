@@ -21,7 +21,7 @@
  */
 
 #include "localplayer.h"
-#include <framework/core/eventdispatcher.h>
+#include "framework/core/eventdispatcher.h"
 #include "game.h"
 #include "map.h"
 #include "tile.h"

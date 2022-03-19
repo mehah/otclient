@@ -24,8 +24,8 @@
 #include "modulemanager.h"
 #include "resourcemanager.h"
 
-#include <framework/luaengine/luainterface.h>
-#include <framework/otml/otml.h>
+#include "framework/luaengine/luainterface.h"
+#include "framework/otml/otml.h"
 
 Module::Module(const std::string& name)
 {

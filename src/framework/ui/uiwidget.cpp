@@ -25,11 +25,11 @@
 #include "uimanager.h"
 #include "uitranslator.h"
 
-#include <framework/core/application.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/luaengine/luainterface.h>
-#include <framework/otml/otmlnode.h>
-#include <framework/platform/platformwindow.h>
+#include "framework/core/application.h"
+#include "framework/core/eventdispatcher.h"
+#include "framework/luaengine/luainterface.h"
+#include "framework/otml/otmlnode.h"
+#include "framework/platform/platformwindow.h"
 
 #include "framework/graphics/drawpool.h"
 

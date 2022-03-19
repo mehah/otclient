@@ -23,8 +23,8 @@
 #ifndef SPRITEMANAGER_H
 #define SPRITEMANAGER_H
 
-#include <framework/core/declarations.h>
-#include <framework/graphics/declarations.h>
+#include "framework/core/declarations.h"
+#include "framework/graphics/declarations.h"
 
  //@bindsingleton g_sprites
 class SpriteManager

@@ -21,20 +21,20 @@
  */
 
 #include "graphicalapplication.h"
-#include <framework/core/clock.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/graphics/drawpool.h>
-#include <framework/graphics/graphics.h>
-#include <framework/graphics/particlemanager.h>
-#include <framework/graphics/texturemanager.h>
-#include <framework/input/mouse.h>
-#include <framework/platform/platformwindow.h>
-#include <framework/ui/uimanager.h>
+#include "framework/core/clock.h"
+#include "framework/core/eventdispatcher.h"
+#include "framework/graphics/drawpool.h"
+#include "framework/graphics/graphics.h"
+#include "framework/graphics/particlemanager.h"
+#include "framework/graphics/texturemanager.h"
+#include "framework/input/mouse.h"
+#include "framework/platform/platformwindow.h"
+#include "framework/ui/uimanager.h"
 
 #include "framework/stdext/time.h"
 
-#ifdef FW_SOUND
-#include <framework/sound/soundmanager.h>
+#ifdef FRAMEWORK_SOUND
+#include "framework/sound/soundmanager.h"
 #endif
 
 GraphicalApplication g_app;
@@ -64,7 +64,7 @@ void GraphicalApplication::init(std::vector<std::string>& args)
     // fire first resize event
     resize(g_window.getSize());
 
-#ifdef FW_SOUND
+#ifdef FRAMEWORK_SOUND
     // initialize sound
     g_sounds.init();
 #endif
@@ -89,7 +89,7 @@ void GraphicalApplication::terminate()
     Application::terminate();
     m_terminated = false;
 
-#ifdef FW_SOUND
+#ifdef FRAMEWORK_SOUND
     // terminate sound
     g_sounds.terminate();
 #endif
@@ -172,7 +172,7 @@ void GraphicalApplication::run()
 
 void GraphicalApplication::poll()
 {
-#ifdef FW_SOUND
+#ifdef FRAMEWORK_SOUND
     g_sounds.poll();
 #endif
 

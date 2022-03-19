@@ -23,7 +23,7 @@
 #ifndef CLIENT_GLOBAL_H
 #define CLIENT_GLOBAL_H
 
-#include <framework/global.h>
+#include "framework/global.h"
 
  // widely used headers
 #include "const.h"

@@ -23,11 +23,12 @@
 #ifndef LUABINDER_H
 #define LUABINDER_H
 
- // this file is and must be included only from luainterface.h
+// this file is and must be included only from luainterface.h
 #include "luaexception.h"
 
 #include <tuple>
-#include <framework/stdext/traits.h>
+#include "framework/stdext/traits.h"
+#include "framework/luaengine/luainterface.h"
 
 /// This namespace contains some dirty metaprogamming that uses a lot of C++0x features
 /// The purpose here is to create templates that can bind any function from C++

@@ -21,10 +21,11 @@
  */
 
 #include "shadermanager.h"
-#include <framework/core/resourcemanager.h>
-#include <framework/graphics/graphics.h>
-#include <framework/graphics/paintershaderprogram.h>
-#include <framework/graphics/ogl/painterogl2_shadersources.h>
+#include "framework/core/resourcemanager.h"
+#include "framework/graphics/graphics.h"
+#include "framework/graphics/paintershaderprogram.h"
+#include "framework/graphics/ogl/painterogl2_shadersources.h"
+#include "framework/core/logger.h"
 
 ShaderManager g_shaders;
 

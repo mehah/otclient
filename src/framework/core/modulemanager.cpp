@@ -23,8 +23,8 @@
 #include "modulemanager.h"
 #include "resourcemanager.h"
 
-#include <framework/core/application.h>
-#include <framework/otml/otml.h>
+#include "framework/core/application.h"
+#include "framework/otml/otml.h"
 
 ModuleManager g_modules;
 

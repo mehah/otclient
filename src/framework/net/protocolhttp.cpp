@@ -21,7 +21,7 @@
  */
 
 #include "protocolhttp.h"
-#include <framework/core/application.h>
+#include "framework/core/application.h"
 #include "connection.h"
 
 ProtocolHttp::ProtocolHttp()

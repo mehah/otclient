@@ -23,7 +23,7 @@
 #ifndef CREATURES_H
 #define CREATURES_H
 
-#include <framework/luaengine/luaobject.h>
+#include "framework/luaengine/luaobject.h"
 #include <framework/xml/tinyxml.h>
 
 #include "declarations.h"

@@ -25,7 +25,7 @@
 
 #include "declarations.h"
 
-#include <framework/luaengine/luaobject.h>
+#include "framework/luaengine/luaobject.h"
 
  // @bindclass
 class ProtocolHttp : public LuaObject

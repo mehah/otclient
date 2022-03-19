@@ -22,7 +22,7 @@
 
 #include "protocolgame.h"
 
-#include <framework/core/eventdispatcher.h>
+#include "framework/core/eventdispatcher.h"
 #include "effect.h"
 #include "game.h"
 #include "item.h"

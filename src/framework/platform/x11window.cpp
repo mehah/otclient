@@ -23,8 +23,8 @@
 #ifndef WIN32
 
 #include "x11window.h"
-#include <framework/core/resourcemanager.h>
-#include <framework/graphics/image.h>
+#include "framework/core/resourcemanager.h"
+#include "framework/graphics/image.h"
 #include <unistd.h>
 
 #define LSB_BIT_SET(p, n) (p[(n)/8] |= (1 <<((n)%8)))

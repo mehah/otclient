@@ -23,7 +23,7 @@
 #include "animatedtexture.h"
 #include "graphics.h"
 
-#include <framework/core/eventdispatcher.h>
+#include "framework/core/eventdispatcher.h"
 
 #include <utility>
 

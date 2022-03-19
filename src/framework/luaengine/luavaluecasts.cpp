@@ -21,7 +21,7 @@
  */
 
 #include "luavaluecasts.h"
-#include <framework/otml/otmlnode.h>
+#include "framework/otml/otmlnode.h"
 #include "luainterface.h"
 
  // bool

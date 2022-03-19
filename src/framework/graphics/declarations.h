@@ -23,7 +23,7 @@
 #ifndef FRAMEWORK_GRAPHICS_DECLARATIONS_H
 #define FRAMEWORK_GRAPHICS_DECLARATIONS_H
 
-#include <framework/global.h>
+#include "framework/global.h"
 
 class Texture;
 class TextureManager;

@@ -24,8 +24,8 @@
 #include "creature.h"
 #include "map.h"
 
-#include <framework/core/resourcemanager.h>
-#include <framework/xml/tinyxml.h>
+#include "framework/core/resourcemanager.h"
+#include "framework/xml/tinyxml.h"
 
 CreatureManager g_creatures;
 

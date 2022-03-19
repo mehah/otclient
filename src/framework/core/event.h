@@ -23,7 +23,7 @@
 #ifndef EVENT_H
 #define EVENT_H
 
-#include <framework/luaengine/luaobject.h>
+#include "framework/luaengine/luaobject.h"
 
  // @bindclass
 class Event : public LuaObject

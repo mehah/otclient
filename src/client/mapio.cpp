@@ -26,9 +26,9 @@
 
 #include <framework/core/application.h>
 #include <framework/core/binarytree.h>
-#include <framework/core/eventdispatcher.h>
+#include "framework/core/eventdispatcher.h"
 #include <framework/core/filestream.h>
-#include <framework/core/resourcemanager.h>
+#include "framework/core/resourcemanager.h"
 #include <framework/ui/uiwidget.h>
 #include <framework/xml/tinyxml.h>
 

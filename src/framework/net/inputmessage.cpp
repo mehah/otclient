@@ -21,7 +21,7 @@
  */
 
 #include "inputmessage.h"
-#include <framework/util/crypt.h>
+#include "framework/util/crypt.h"
 
 InputMessage::InputMessage()
 {

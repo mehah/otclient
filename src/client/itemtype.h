@@ -23,8 +23,8 @@
 #ifndef ITEMTYPE_H
 #define ITEMTYPE_H
 
-#include <framework/core/declarations.h>
-#include <framework/luaengine/luaobject.h>
+#include "framework/core/declarations.h"
+#include "framework/luaengine/luaobject.h"
 
 enum ItemCategory : uint8
 {

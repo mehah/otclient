@@ -25,7 +25,7 @@
 #include "image.h"
 #include "texturemanager.h"
 
-#include <framework/otml/otml.h>
+#include "framework/otml/otml.h"
 
 #include "drawpool.h"
 

@@ -22,14 +22,14 @@
 
 #ifndef WIN32
 
-#include "platform.h"
 #include <cstring>
 #include <fstream>
 #include <unistd.h>
-#include <framework/stdext/stdext.h>
-
 #include <sys/stat.h>
 #include <execinfo.h>
+
+#include "platform.h"
+#include "framework/stdext/stdext.h"
 
 void Platform::processArgs(std::vector<std::string>& args)
 {

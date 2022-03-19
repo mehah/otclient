@@ -20,16 +20,18 @@
  * THE SOFTWARE.
  */
 
+#include <nlohmann/json.hpp>
+
 #include "spriteappearances.h"
-#include <framework/core/filestream.h>
-#include <framework/core/resourcemanager.h>
-#include <framework/graphics/image.h>
+#include "framework/core/filestream.h"
+#include "framework/core/resourcemanager.h"
+#include "framework/graphics/image.h"
 #include "game.h"
 
-#include <nlohmann/json.hpp>
-#include <framework/core/asyncdispatcher.h>
+#include "framework/core/asyncdispatcher.h"
 
 #include "lzma.h"
+#include "framework/core/logger.h"
 
  // warnings related to protobuf
  // https://android.googlesource.com/platform/external/protobuf/+/brillo-m9-dev/vsprojects/readme.txt

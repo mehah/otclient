@@ -23,7 +23,7 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
-#include <framework/luaengine/luaobject.h>
+#include "framework/luaengine/luaobject.h"
 #include "declarations.h"
 
 class Connection : public LuaObject

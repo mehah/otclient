@@ -23,7 +23,7 @@
 #ifndef FRAMEWORK_UI_DECLARATIONS_H
 #define FRAMEWORK_UI_DECLARATIONS_H
 
-#include <framework/global.h>
+#include "framework/global.h"
 
 class UIManager;
 class UIWidget;

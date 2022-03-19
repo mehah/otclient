@@ -29,13 +29,13 @@
 #include "thingtypemanager.h"
 #include "tile.h"
 
-#include <framework/core/clock.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/graphics/drawpool.h>
-#include <framework/graphics/graphics.h>
+#include "framework/core/clock.h"
+#include "framework/core/eventdispatcher.h"
+#include "framework/graphics/drawpool.h"
+#include "framework/graphics/graphics.h"
 
-#include <framework/graphics/paintershaderprogram.h>
-#include <framework/graphics/texturemanager.h>
+#include "framework/graphics/paintershaderprogram.h"
+#include "framework/graphics/texturemanager.h"
 #include "shadermanager.h"
 
 double Creature::speedA = 0;

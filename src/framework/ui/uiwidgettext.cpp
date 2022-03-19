@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include <framework/graphics/drawpool.h>
-#include <framework/graphics/fontmanager.h>
+#include "framework/graphics/drawpool.h"
+#include "framework/graphics/fontmanager.h"
 #include "uitranslator.h"
 #include "uiwidget.h"
 

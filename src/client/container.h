@@ -26,7 +26,7 @@
 #include "declarations.h"
 #include "item.h"
 
-#include <framework/luaengine/luaobject.h>
+#include "framework/luaengine/luaobject.h"
 
  // @bindclass
 class Container : public LuaObject

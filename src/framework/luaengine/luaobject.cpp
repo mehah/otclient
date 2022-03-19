@@ -24,7 +24,7 @@
 #include "luainterface.h"
 
 #include <typeinfo>
-#include <framework/core/application.h>
+#include "framework/core/application.h"
 
 LuaObject::LuaObject() :
     m_fieldsTableRef(-1)

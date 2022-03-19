@@ -23,7 +23,7 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#include "global.h"
+#include "framework/global.h"
 
 class Client
 {

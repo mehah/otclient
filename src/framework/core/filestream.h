@@ -23,10 +23,10 @@
 #ifndef FILESTREAM_H
 #define FILESTREAM_H
 
-#include <framework/core/resourcemanager.h>
-#include <framework/luaengine/luaobject.h>
-#include <framework/util/databuffer.h>
-#include <framework/util/point.h>
+#include "framework/core/resourcemanager.h"
+#include "framework/luaengine/luaobject.h"
+#include "framework/util/databuffer.h"
+#include "framework/util/point.h"
 #include "declarations.h"
 
 struct PHYSFS_File;

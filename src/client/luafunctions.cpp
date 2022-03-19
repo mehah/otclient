@@ -51,7 +51,7 @@
 #include "uisprite.h"
 #include "spriteappearances.h"
 
-#include <framework/luaengine/luainterface.h>
+#include "framework/luaengine/luainterface.h"
 
 void Client::registerLuaFunctions()
 {

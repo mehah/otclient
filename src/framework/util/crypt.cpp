@@ -21,14 +21,15 @@
  */
 
 #include "crypt.h"
-#include <framework/core/logger.h>
-#include <framework/core/resourcemanager.h>
-#include <framework/platform/platform.h>
-#include <framework/stdext/math.h>
+#include "framework/core/logger.h"
+#include "framework/core/resourcemanager.h"
+#include "framework/platform/platform.h"
+#include "framework/stdext/math.h"
 
 #include <boost/functional/hash.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <boost/functional/hash.hpp>
 
 #include "framework/core/graphicalapplication.h"
 
@@ -209,7 +210,7 @@ std::string Crypt::getCryptKey(bool useMachineUUID)
     const boost::uuids::uuid u = namegen(g_app.getCompactName() + g_platform.getCPUName() + g_platform.getOSName() + g_resources.getUserDir());
     const std::size_t hash = uuid_hasher(u);
     std::string key;
-    key.assign((const char*)&hash, sizeof(hash));
+    key.assign((const char *)&hash, sizeof(hash));
     return key;
 }
 

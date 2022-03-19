@@ -23,7 +23,7 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
-#include <framework/global.h>
+#include "framework/global.h"
 
  //@bindsingleton g_app
 class Application
@@ -72,10 +72,6 @@ protected:
         m_terminated{ false };
 };
 
-#ifdef FW_GRAPHICS
 #include "graphicalapplication.h"
-#else
-#include "consoleapplication.h"
-#endif
 
 #endif
