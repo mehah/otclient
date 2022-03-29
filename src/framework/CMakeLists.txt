@@ -53,6 +53,8 @@ set(framework_SOURCES ${framework_SOURCES}
     ${CMAKE_CURRENT_LIST_DIR}/stdext/time.h
     ${CMAKE_CURRENT_LIST_DIR}/stdext/traits.h
     ${CMAKE_CURRENT_LIST_DIR}/stdext/types.h
+    ${CMAKE_CURRENT_LIST_DIR}/stdext/uri.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/stdext/uri.h
 
     # core
     ${CMAKE_CURRENT_LIST_DIR}/core/application.cpp

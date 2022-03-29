@@ -25,6 +25,10 @@
 #include <framework/core/resourcemanager.h>
 #include <framework/luaengine/luainterface.h>
 
+#ifdef FW_NET
+    #include <framework/net/protocolhttp.h>
+#endif
+
 int main(int argc, const char* argv[])
 {
     std::vector<std::string> args(argv, argv + argc);
@@ -49,6 +53,9 @@ int main(int argc, const char* argv[])
     // initialize application framework and otclient
     g_app.init(args);
     g_client.init(args);
+    #ifdef FW_NET
+        g_http.init();
+    #endif
 
     // find script init.lua and run it
     if(!g_resources.discoverWorkDir("init.lua"))
@@ -66,5 +73,8 @@ int main(int argc, const char* argv[])
     // terminate everything and free memory
     g_client.terminate();
     g_app.terminate();
+    #ifdef FW_NET
+        g_http.terminate();
+    #endif    
     return 0;
 }

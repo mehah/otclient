@@ -151,6 +151,16 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_logger", "error", &Logger::error, &g_logger);
     g_lua.bindSingletonFunction("g_logger", "fatal", &Logger::fatal, &g_logger);
 
+    g_lua.registerSingletonClass("g_http");
+    g_lua.bindSingletonFunction("g_http", "setUserAgent", &Http::setUserAgent, &g_http);
+    g_lua.bindSingletonFunction("g_http", "get", &Http::get, &g_http);
+    g_lua.bindSingletonFunction("g_http", "post", &Http::post, &g_http);
+    g_lua.bindSingletonFunction("g_http", "download", &Http::download, &g_http);
+    g_lua.bindSingletonFunction("g_http", "ws", &Http::ws, &g_http);
+    g_lua.bindSingletonFunction("g_http", "wsSend", &Http::wsSend, &g_http);
+    g_lua.bindSingletonFunction("g_http", "wsClose", &Http::wsClose, &g_http);    
+    g_lua.bindSingletonFunction("g_http", "cancel", &Http::cancel, &g_http);
+
     // ModuleManager
     g_lua.registerSingletonClass("g_modules");
     g_lua.bindSingletonFunction("g_modules", "discoverModules", &ModuleManager::discoverModules, &g_modules);
@@ -779,14 +789,6 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Protocol>("generateXteaKey", &Protocol::generateXteaKey);
     g_lua.bindClassMemberFunction<Protocol>("enableXteaEncryption", &Protocol::enableXteaEncryption);
     g_lua.bindClassMemberFunction<Protocol>("enableChecksum", &Protocol::enableChecksum);
-
-    // ProtocolHttp
-    g_lua.registerClass<ProtocolHttp>();
-    g_lua.bindClassStaticFunction<ProtocolHttp>("create", [] { return ProtocolHttpPtr(new ProtocolHttp); });
-    g_lua.bindClassMemberFunction<ProtocolHttp>("connect", &ProtocolHttp::connect);
-    g_lua.bindClassMemberFunction<ProtocolHttp>("disconnect", &ProtocolHttp::disconnect);
-    g_lua.bindClassMemberFunction<ProtocolHttp>("send", &ProtocolHttp::send);
-    g_lua.bindClassMemberFunction<ProtocolHttp>("recv", &ProtocolHttp::recv);
 
     // InputMessage
     g_lua.registerClass<InputMessage>();

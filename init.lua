@@ -1,6 +1,16 @@
 -- this is the first file executed when the application starts
 -- we have to load the first modules form here
 
+-- If you don't use updater or other service, set it to updater = ""
+Services = {
+  website = "http://localhost:8000", -- currently not used
+  updater = "http://localhost:8000/api/updater.php",
+  stats = "",
+  crash = "http://localhost:8000/api/crash.php",
+  feedback = "http://localhost:8000/api/feedback.php",
+  status = "http://localhost:8000/api/status.php"
+}
+
 -- setup logger
 g_logger.setLogFile(g_resources.getWorkDir() .. g_app.getCompactName() .. ".log")
 g_logger.info(os.date("== application started at %b %d %Y %X"))

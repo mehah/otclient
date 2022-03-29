@@ -345,6 +345,9 @@
     <ClCompile Include="..\src\framework\stdext\time.cpp">
       <Filter>Source Files\framework\stdext</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\framework\stdext\uri.cpp">
+      <Filter>Source Files\framework\stdext</Filter>
+    </ClCompile>    
     <ClCompile Include="..\src\framework\ui\uianchorlayout.cpp">
       <Filter>Source Files\framework\ui</Filter>
     </ClCompile>
