@@ -83,7 +83,7 @@ function HTTP.cancel(operationId)
 end
 
 function HTTP.onGet(operationId, url, err, data)
-  print("HTTP.onGet")
+  -- print("HTTP.onGet")
   local operation = HTTP.operations[operationId]
   if operation == nil then
     return
@@ -110,7 +110,7 @@ function HTTP.onGet(operationId, url, err, data)
 end
 
 function HTTP.onGetProgress(operationId, url, progress)
-  print("HTTP.onGetProgress")
+  -- print("HTTP.onGetProgress")
   local operation = HTTP.operations[operationId]
   if operation == nil then
     return

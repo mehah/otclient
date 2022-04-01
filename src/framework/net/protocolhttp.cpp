@@ -51,7 +51,7 @@ int Http::get(const std::string& url, int timeout) {
                     g_lua.callGlobalField("g_http", "onGetProgress", result->operationId, result->url, result->progress);
                     return;
                 }
-                g_lua.callGlobalField("g_http", "onGet", result->operationId, result->url, result->error, std::string(result->response.begin(), result->response.end()));
+                g_lua.callGlobalField("g_http", "onGet", result->operationId, result->url, result->error, result->_response);
             });
             if (finished) {
                 m_operations.erase(operationId);
@@ -213,15 +213,15 @@ void HttpSession::start() {
     m_domain = instance_uri.domain;
     boost::asio::ip::tcp::resolver::query query_resolver(instance_uri.domain, instance_uri.port);
 
-    std::unique_lock<std::mutex>
-        cancel_lock(m_cancel_mux);
+    // std::unique_lock<std::mutex>
+    //     cancel_lock(m_cancel_mux);
 
-    if (m_was_cancelled) {
-        cancel_lock.unlock();
-        on_finish(boost::system::error_code(
-            boost::asio::error::operation_aborted));
-        return;
-    }
+    // if (m_was_cancelled) {
+    //     cancel_lock.unlock();
+    //     on_finish(boost::system::error_code(
+    //         boost::asio::error::operation_aborted));
+    //     return;
+    // }
 
 	m_resolver.async_resolve(
 		query_resolver,
@@ -320,12 +320,12 @@ void HttpSession::handle_read_headers(const boost::system::error_code& ec){
     std::istream response_stream(&m_response);
     std::string header;
     while (std::getline(response_stream, header) && header != "\r")
-    std::cout << header << "\n";
-    std::cout << "\n";
+    // std::cout << header << "\n";
+    // std::cout << "\n";
 
     // Write whatever content we already have to output.
     if (m_response.size() > 0)
-    std::cout << &m_response;
+    // std::cout << &m_response;
 
     // Start reading remaining data until EOF.
     boost::asio::async_read(m_socket, m_response,
@@ -338,14 +338,16 @@ void HttpSession::handle_read_headers(const boost::system::error_code& ec){
 void HttpSession::on_read(const boost::system::error_code& ec) {
 
     if (!ec) {
-    // if(ec == boost::asio::error::eof) {
-    //     m_callback(m_result);
-    //     std::cout << m_result->_response;
-    // } else {
         // Write all of the data that has been read so far.
         // std::cout << &m_response;
-        m_result->_response.append(boost::beast::buffers_to_string(m_response.data()));
+        // m_result->_response = boost::beast::buffers_to_string(m_response.data()).c_str();
 
+		// std::string response;
+		// std::istream input(&m_response);
+		// std::getline(input, m_result->_response);
+
+        m_result->finished = false;
+        m_callback(m_result);
         // Continue reading remaining data until EOF.
         boost::asio::async_read(m_socket, m_response,
             boost::asio::transfer_at_least(1),
@@ -358,7 +360,11 @@ void HttpSession::on_read(const boost::system::error_code& ec) {
         return;
     }
     else if (ec == boost::asio::error::eof) {
-        std::cout << m_result->_response;
+        // m_callback();
+        // std::cout << m_result->_response;
+        m_result->_response = boost::beast::buffers_to_string(m_response.data()).c_str();
+        m_result->finished = true;
+        m_callback(m_result);
     }    
 }
 
