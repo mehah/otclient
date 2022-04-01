@@ -2,6 +2,8 @@
 #define HTTP_H
 
 #include <framework/global.h>
+#include <framework/stdext/uri.h>
+
 #include <vector>
 #include <iostream>
 #include <string>
@@ -10,6 +12,7 @@
 #include <future>
 #include <queue>
 
+#include <boost/asio.hpp>
 #include <boost/beast.hpp>
 #include <boost/beast/ssl/ssl_stream.hpp>
 #include <boost/asio/io_service.hpp>
@@ -40,6 +43,7 @@ struct HttpResult {
     std::vector<uint8_t> response;
     std::string error;
     std::weak_ptr<HttpSession> session;
+    std::string _response;
 };
 
 
@@ -76,23 +80,32 @@ private:
     HttpResult_ptr m_result;
     boost::asio::steady_timer m_timer;
     int m_timeout;
+    ParsedURI instance_uri;
 
     std::string m_domain;
     std::shared_ptr<boost::asio::ssl::stream<boost::asio::ip::tcp::socket&>> m_ssl;
     std::shared_ptr<boost::asio::ssl::context> m_context;
 
-    boost::beast::flat_buffer m_streambuf{ 512 * 1024 * 1024 }; // limited to 512MB
-    boost::beast::http::request<boost::beast::http::string_body> m_request;
-    boost::beast::http::response_parser<boost::beast::http::dynamic_body> m_response;
+    boost::asio::streambuf m_streambuf;
+    boost::asio::streambuf m_request;
+    boost::asio::streambuf m_response;
+
+	bool m_was_cancelled;
+	std::mutex m_cancel_mux;    
+    // boost::beast::flat_buffer m_streambuf{ 512 * 1024 * 1024 }; // limited to 512MB
+    // boost::beast::http::request<boost::beast::http::string_body> m_request;
+    // boost::beast::http::response_parser<boost::beast::http::dynamic_body> m_response;
 
     void on_resolve(const boost::system::error_code& ec, boost::asio::ip::tcp::resolver::iterator iterator);
     void on_connect(const boost::system::error_code& ec);
     void on_request_sent(const boost::system::error_code& ec);
-    void on_read_header(const boost::system::error_code & ec, size_t bytes_transferred);
-    void on_read(const boost::system::error_code& ec, size_t bytes_transferred);
+    void on_read_header(const boost::system::error_code& ec);
+    void handle_read_headers(const boost::system::error_code& ec);
+    void on_read(const boost::system::error_code& ec);
     void close();
     void onTimeout(const boost::system::error_code& error);
     void onError(const std::string& error, const std::string& details = "");
+    void on_finish(const boost::system::error_code& ec);
 };
 
 //  web socket

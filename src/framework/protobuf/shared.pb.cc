@@ -40,7 +40,7 @@ static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_shared_2eproto[1];
 static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_shared_2eproto[5];
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_shared_2eproto = nullptr;
 
-const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_shared_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+const uint32_t TableStruct_shared_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   PROTOBUF_FIELD_OFFSET(::tibia::protobuf::shared::Coordinate, _has_bits_),
   PROTOBUF_FIELD_OFFSET(::tibia::protobuf::shared::Coordinate, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -251,7 +251,7 @@ Coordinate::Coordinate(const Coordinate& from)
   // @@protoc_insertion_point(copy_constructor:tibia.protobuf.shared.Coordinate)
 }
 
-void Coordinate::SharedCtor() {
+inline void Coordinate::SharedCtor() {
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&x_) - reinterpret_cast<char*>(this)),
     0, static_cast<size_t>(reinterpret_cast<char*>(&z_) -
@@ -281,7 +281,7 @@ void Coordinate::SetCachedSize(int size) const {
 
 void Coordinate::Clear() {
 // @@protoc_insertion_point(message_clear_start:tibia.protobuf.shared.Coordinate)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -299,12 +299,12 @@ const char* Coordinate::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional uint32 x = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           _Internal::set_has_x(&has_bits);
           x_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -313,7 +313,7 @@ const char* Coordinate::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
         continue;
       // optional uint32 y = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
           _Internal::set_has_y(&has_bits);
           y_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -322,7 +322,7 @@ const char* Coordinate::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
         continue;
       // optional uint32 z = 3;
       case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
           _Internal::set_has_z(&has_bits);
           z_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -353,10 +353,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* Coordinate::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* Coordinate::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:tibia.protobuf.shared.Coordinate)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -390,7 +390,7 @@ size_t Coordinate::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:tibia.protobuf.shared.Coordinate)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -431,7 +431,7 @@ void Coordinate::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void Coordinate::MergeFrom(const Coordinate& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:tibia.protobuf.shared.Coordinate)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = from._has_bits_[0];
