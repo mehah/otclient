@@ -26,7 +26,8 @@
 #include <string>
 #include <typeinfo>
 
-namespace stdext {
+namespace stdext
+{
     /// Demangle names for GNU g++ compiler
     const char* demangle_name(const char* name);
 

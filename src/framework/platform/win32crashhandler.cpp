@@ -44,7 +44,7 @@
 
 const char* getExceptionName(DWORD exceptionCode)
 {
-    switch(exceptionCode) {
+    switch (exceptionCode) {
     case EXCEPTION_ACCESS_VIOLATION:         return "Access violation";
     case EXCEPTION_DATATYPE_MISALIGNMENT:    return "Datatype misalignment";
     case EXCEPTION_BREAKPOINT:               return "Breakpoint";
@@ -104,13 +104,13 @@ void Stacktrace(LPEXCEPTION_POINTERS e, std::stringstream& ss)
     process = GetCurrentProcess();
     thread = GetCurrentThread();
 
-    while(true) {
+    while (true) {
         more = StackWalk(machineType, process, thread, &sf, e->ContextRecord, nullptr, SymFunctionTableAccess, SymGetModuleBase, nullptr);
-        if(!more || sf.AddrFrame.Offset == 0)
+        if (!more || sf.AddrFrame.Offset == 0)
             break;
 
         dwModBase = SymGetModuleBase(process, sf.AddrPC.Offset);
-        if(dwModBase)
+        if (dwModBase)
             GetModuleFileName((HINSTANCE)dwModBase, modname, MAX_PATH);
         else
             strcpy(modname, "Unknown");
@@ -119,7 +119,7 @@ void Stacktrace(LPEXCEPTION_POINTERS e, std::stringstream& ss)
         pSym->SizeOfStruct = sizeof(symBuffer);
         pSym->MaxNameLength = 254;
 
-        if(SymGetSymFromAddr(process, sf.AddrPC.Offset, &Disp, pSym))
+        if (SymGetSymFromAddr(process, sf.AddrPC.Offset, &Disp, pSym))
             ss << stdext::format("    %d: %s(%s+%#0lx) [0x%016lX]\n", count, modname, pSym->Name, Disp, sf.AddrPC.Offset);
         else
             ss << stdext::format("    %d: %s [0x%016lX]\n", count, modname, sf.AddrPC.Offset);
@@ -156,7 +156,7 @@ LONG CALLBACK ExceptionHandler(LPEXCEPTION_POINTERS e)
     GetCurrentDirectory(sizeof(dir) - 1, dir);
     const std::string fileName = stdext::format("%s\\crashreport.log", dir);
     std::ofstream fout(fileName.c_str(), std::ios::out | std::ios::app);
-    if(fout.is_open() && fout.good()) {
+    if (fout.is_open() && fout.good()) {
         fout << ss.str();
         fout.close();
         g_logger.info(stdext::format("Crash report saved to file %s", fileName));

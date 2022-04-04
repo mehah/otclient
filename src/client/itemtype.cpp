@@ -35,31 +35,31 @@ void ItemType::unserialize(const BinaryTreePtr& node)
     node->getU32(); // flags
 
     static uint16 lastId = 99;
-    while(node->canRead()) {
+    while (node->canRead()) {
         const uint8 attr = node->getU8();
-        if(attr == 0 || attr == 0xFF)
+        if (attr == 0 || attr == 0xFF)
             break;
 
         const uint16 len = node->getU16();
-        switch(attr) {
+        switch (attr) {
         case ItemTypeAttrServerId:
         {
             uint16 serverId = node->getU16();
-            if(g_game.getClientVersion() < 960) {
-                if(serverId > 20000 && serverId < 20100) {
+            if (g_game.getClientVersion() < 960) {
+                if (serverId > 20000 && serverId < 20100) {
                     serverId -= 20000;
-                } else if(lastId > 99 && lastId != serverId - 1) {
-                    while(lastId != serverId - 1) {
+                } else if (lastId > 99 && lastId != serverId - 1) {
+                    while (lastId != serverId - 1) {
                         ItemTypePtr tmp(new ItemType);
                         tmp->setServerId(++lastId);
                         g_things.addItemType(tmp);
                     }
                 }
             } else {
-                if(serverId > 30000 && serverId < 30100) {
+                if (serverId > 30000 && serverId < 30100) {
                     serverId -= 30000;
-                } else if(lastId > 99 && lastId != serverId - 1) {
-                    while(lastId != serverId - 1) {
+                } else if (lastId > 99 && lastId != serverId - 1) {
+                    while (lastId != serverId - 1) {
                         ItemTypePtr tmp(new ItemType);
                         tmp->setServerId(++lastId);
                         g_things.addItemType(tmp);
@@ -71,20 +71,20 @@ void ItemType::unserialize(const BinaryTreePtr& node)
             break;
         }
         case ItemTypeAttrClientId:
-            setClientId(node->getU16());
-            break;
+        setClientId(node->getU16());
+        break;
 
         case ItemTypeAttrName:
-            setName(node->getString(len));
-            break;
+        setName(node->getString(len));
+        break;
 
         case ItemTypeAttrWritable:
-            m_attribs.set(ItemTypeAttrWritable, true);
-            break;
+        m_attribs.set(ItemTypeAttrWritable, true);
+        break;
 
         default:
-            node->skip(len); // skip attribute
-            break;
+        node->skip(len); // skip attribute
+        break;
         }
     }
 }
