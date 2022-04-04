@@ -99,10 +99,10 @@ void ParticleEmitter::update(float elapsedTime, const ParticleSystemPtr& system)
             PointF pAcceleration(pAccelerationAbs * std::cos(pAccelerationAngle), pAccelerationAbs * std::sin(pAccelerationAngle));
 
             ParticlePtr particle(new Particle(pPosition, type->pStartSize, type->pFinalSize,
-                pVelocity, pAcceleration,
-                pDuration, type->pIgnorePhysicsAfter,
-                type->pColors, type->pColorsStops,
-                type->pCompositionMode, type->pTexture));
+                                              pVelocity, pAcceleration,
+                                              pDuration, type->pIgnorePhysicsAfter,
+                                              type->pColors, type->pColorsStops,
+                                              type->pCompositionMode, type->pTexture));
             system->addParticle(particle);
         }
     }

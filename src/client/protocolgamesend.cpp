@@ -166,33 +166,33 @@ void ProtocolGame::sendAutoWalk(const std::vector<Otc::Direction>& path)
     for (const Otc::Direction dir : path) {
         uint8 byte;
         switch (dir) {
-        case Otc::East:
-        byte = 1;
-        break;
-        case Otc::NorthEast:
-        byte = 2;
-        break;
-        case Otc::North:
-        byte = 3;
-        break;
-        case Otc::NorthWest:
-        byte = 4;
-        break;
-        case Otc::West:
-        byte = 5;
-        break;
-        case Otc::SouthWest:
-        byte = 6;
-        break;
-        case Otc::South:
-        byte = 7;
-        break;
-        case Otc::SouthEast:
-        byte = 8;
-        break;
-        default:
-        byte = 0;
-        break;
+            case Otc::East:
+                byte = 1;
+                break;
+            case Otc::NorthEast:
+                byte = 2;
+                break;
+            case Otc::North:
+                byte = 3;
+                break;
+            case Otc::NorthWest:
+                byte = 4;
+                break;
+            case Otc::West:
+                byte = 5;
+                break;
+            case Otc::SouthWest:
+                byte = 6;
+                break;
+            case Otc::South:
+                byte = 7;
+                break;
+            case Otc::SouthEast:
+                byte = 8;
+                break;
+            default:
+                byte = 0;
+                break;
         }
         msg->addU8(byte);
     }
@@ -500,19 +500,19 @@ void ProtocolGame::sendTalk(Otc::MessageMode mode, int channelId, const std::str
     msg->addU8(Proto::translateMessageModeToServer(mode));
 
     switch (mode) {
-    case Otc::MessagePrivateTo:
-    case Otc::MessageGamemasterPrivateTo:
-    case Otc::MessageRVRAnswer:
-    msg->addString(receiver);
-    break;
-    case Otc::MessageChannel:
-    case Otc::MessageChannelHighlight:
-    case Otc::MessageChannelManagement:
-    case Otc::MessageGamemasterChannel:
-    msg->addU16(channelId);
-    break;
-    default:
-    break;
+        case Otc::MessagePrivateTo:
+        case Otc::MessageGamemasterPrivateTo:
+        case Otc::MessageRVRAnswer:
+            msg->addString(receiver);
+            break;
+        case Otc::MessageChannel:
+        case Otc::MessageChannelHighlight:
+        case Otc::MessageChannelManagement:
+        case Otc::MessageGamemasterChannel:
+            msg->addU16(channelId);
+            break;
+        default:
+            break;
     }
 
     msg->addString(message);

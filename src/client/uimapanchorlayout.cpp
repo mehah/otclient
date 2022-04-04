@@ -32,28 +32,28 @@ int UIPositionAnchor::getHookedPoint(const UIWidgetPtr& hookedWidget, const UIWi
     int point = 0;
     if (hookedRect.isValid()) {
         switch (m_hookedEdge) {
-        case Fw::AnchorLeft:
-        point = hookedRect.left();
-        break;
-        case Fw::AnchorRight:
-        point = hookedRect.right();
-        break;
-        case Fw::AnchorTop:
-        point = hookedRect.top();
-        break;
-        case Fw::AnchorBottom:
-        point = hookedRect.bottom();
-        break;
-        case Fw::AnchorHorizontalCenter:
-        point = hookedRect.horizontalCenter();
-        break;
-        case Fw::AnchorVerticalCenter:
-        point = hookedRect.verticalCenter();
-        break;
-        default:
-        // must never happens
-        assert(false);
-        break;
+            case Fw::AnchorLeft:
+                point = hookedRect.left();
+                break;
+            case Fw::AnchorRight:
+                point = hookedRect.right();
+                break;
+            case Fw::AnchorTop:
+                point = hookedRect.top();
+                break;
+            case Fw::AnchorBottom:
+                point = hookedRect.bottom();
+                break;
+            case Fw::AnchorHorizontalCenter:
+                point = hookedRect.horizontalCenter();
+                break;
+            case Fw::AnchorVerticalCenter:
+                point = hookedRect.verticalCenter();
+                break;
+            default:
+                // must never happens
+                assert(false);
+                break;
         }
     }
     return point;

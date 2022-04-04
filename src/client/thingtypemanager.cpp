@@ -115,9 +115,9 @@ bool ThingTypeManager::loadDat(std::string file)
         const FileStreamPtr fin = g_resources.openFile(file);
         fin->cache();
 
-#if ENABLE_ENCRYPTION == 1
+    #if ENABLE_ENCRYPTION == 1
         ResourceManager::decrypt(fin->m_data.data(), fin->m_data.size());
-#endif
+    #endif
 
         m_datSignature = fin->getU32();
         m_contentRevision = static_cast<uint16_t>(m_datSignature);
@@ -318,11 +318,11 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
             const google::protobuf::RepeatedPtrField<appearances::Appearance>* appearances = nullptr;
 
             switch (category) {
-            case ThingCategoryItem: appearances = &appearancesLib.object(); break;
-            case ThingCategoryCreature: appearances = &appearancesLib.outfit(); break;
-            case ThingCategoryEffect: appearances = &appearancesLib.effect(); break;
-            case ThingCategoryMissile: appearances = &appearancesLib.missile(); break;
-            default: return false;
+                case ThingCategoryItem: appearances = &appearancesLib.object(); break;
+                case ThingCategoryCreature: appearances = &appearancesLib.outfit(); break;
+                case ThingCategoryEffect: appearances = &appearancesLib.effect(); break;
+                case ThingCategoryMissile: appearances = &appearancesLib.missile(); break;
+                default: return false;
             }
 
             const auto& lastAppearance = appearances->Get(appearances->size() - 1);

@@ -30,12 +30,12 @@ Shader::Shader(ShaderType shaderType)
 {
     m_shaderType = shaderType;
     switch (shaderType) {
-    case Vertex:
-    m_shaderId = glCreateShader(GL_VERTEX_SHADER);
-    break;
-    case Fragment:
-    m_shaderId = glCreateShader(GL_FRAGMENT_SHADER);
-    break;
+        case Vertex:
+            m_shaderId = glCreateShader(GL_VERTEX_SHADER);
+            break;
+        case Fragment:
+            m_shaderId = glCreateShader(GL_FRAGMENT_SHADER);
+            break;
     }
 
     if (!m_shaderId)

@@ -55,42 +55,42 @@ void ThingType::serialize(const FileStreamPtr& fin)
 
         fin->addU8(attr);
         switch (attr) {
-        case ThingAttrDisplacement:
-        {
-            fin->addU16(m_displacement.x);
-            fin->addU16(m_displacement.y);
-            break;
-        }
-        case ThingAttrLight:
-        {
-            const Light light = m_attribs.get<Light>(attr);
-            fin->addU16(light.intensity);
-            fin->addU16(light.color);
-            break;
-        }
-        case ThingAttrMarket:
-        {
-            auto market = m_attribs.get<MarketData>(attr);
-            fin->addU16(market.category);
-            fin->addU16(market.tradeAs);
-            fin->addU16(market.showAs);
-            fin->addString(market.name);
-            fin->addU16(market.restrictVocation);
-            fin->addU16(market.requiredLevel);
-            break;
-        }
-        case ThingAttrUsable:
-        case ThingAttrElevation:
-        case ThingAttrGround:
-        case ThingAttrWritable:
-        case ThingAttrWritableOnce:
-        case ThingAttrMinimapColor:
-        case ThingAttrCloth:
-        case ThingAttrLensHelp:
-        fin->addU16(m_attribs.get<uint16>(attr));
-        break;
-        default:
-        break;
+            case ThingAttrDisplacement:
+            {
+                fin->addU16(m_displacement.x);
+                fin->addU16(m_displacement.y);
+                break;
+            }
+            case ThingAttrLight:
+            {
+                const Light light = m_attribs.get<Light>(attr);
+                fin->addU16(light.intensity);
+                fin->addU16(light.color);
+                break;
+            }
+            case ThingAttrMarket:
+            {
+                auto market = m_attribs.get<MarketData>(attr);
+                fin->addU16(market.category);
+                fin->addU16(market.tradeAs);
+                fin->addU16(market.showAs);
+                fin->addString(market.name);
+                fin->addU16(market.restrictVocation);
+                fin->addU16(market.requiredLevel);
+                break;
+            }
+            case ThingAttrUsable:
+            case ThingAttrElevation:
+            case ThingAttrGround:
+            case ThingAttrWritable:
+            case ThingAttrWritableOnce:
+            case ThingAttrMinimapColor:
+            case ThingAttrCloth:
+            case ThingAttrLensHelp:
+                fin->addU16(m_attribs.get<uint16>(attr));
+                break;
+            default:
+                break;
         }
     }
     fin->addU8(ThingLastAttr);
@@ -493,61 +493,61 @@ void ThingType::unserialize(uint16 clientId, ThingCategory category, const FileS
         }
 
         switch (attr) {
-        case ThingAttrDisplacement:
-        {
-            if (g_game.getClientVersion() >= 755) {
-                m_displacement.x = fin->getU16();
-                m_displacement.y = fin->getU16();
-            } else {
-                m_displacement.x = 8;
-                m_displacement.y = 8;
+            case ThingAttrDisplacement:
+            {
+                if (g_game.getClientVersion() >= 755) {
+                    m_displacement.x = fin->getU16();
+                    m_displacement.y = fin->getU16();
+                } else {
+                    m_displacement.x = 8;
+                    m_displacement.y = 8;
+                }
+                m_attribs.set(attr, true);
+                break;
             }
-            m_attribs.set(attr, true);
-            break;
-        }
-        case ThingAttrLight:
-        {
-            Light light;
-            light.intensity = fin->getU16();
-            light.color = fin->getU16();
-            m_attribs.set(attr, light);
-            break;
-        }
-        case ThingAttrMarket:
-        {
-            MarketData market;
-            market.category = fin->getU16();
-            market.tradeAs = fin->getU16();
-            market.showAs = fin->getU16();
-            market.name = fin->getString();
-            market.restrictVocation = fin->getU16();
-            market.requiredLevel = fin->getU16();
-            m_attribs.set(attr, market);
-            break;
-        }
-        case ThingAttrElevation:
-        {
-            m_attribs.set<uint16_t>(attr, fin->getU16());
-            break;
-        }
-        case ThingAttrUsable:
-        case ThingAttrGround:
-        case ThingAttrWritable:
-        case ThingAttrWritableOnce:
-        case ThingAttrMinimapColor:
-        case ThingAttrCloth:
-        case ThingAttrLensHelp:
-        m_attribs.set(attr, fin->getU16());
-        break;
-        default:
-        m_attribs.set(attr, true);
-        break;
+            case ThingAttrLight:
+            {
+                Light light;
+                light.intensity = fin->getU16();
+                light.color = fin->getU16();
+                m_attribs.set(attr, light);
+                break;
+            }
+            case ThingAttrMarket:
+            {
+                MarketData market;
+                market.category = fin->getU16();
+                market.tradeAs = fin->getU16();
+                market.showAs = fin->getU16();
+                market.name = fin->getString();
+                market.restrictVocation = fin->getU16();
+                market.requiredLevel = fin->getU16();
+                m_attribs.set(attr, market);
+                break;
+            }
+            case ThingAttrElevation:
+            {
+                m_attribs.set<uint16_t>(attr, fin->getU16());
+                break;
+            }
+            case ThingAttrUsable:
+            case ThingAttrGround:
+            case ThingAttrWritable:
+            case ThingAttrWritableOnce:
+            case ThingAttrMinimapColor:
+            case ThingAttrCloth:
+            case ThingAttrLensHelp:
+                m_attribs.set(attr, fin->getU16());
+                break;
+            default:
+                m_attribs.set(attr, true);
+                break;
         }
     }
 
     if (!done)
         stdext::throw_exception(stdext::format("corrupt data (id: %d, category: %d, count: %d, lastAttr: %d)",
-            m_id, m_category, count, attr));
+                                               m_id, m_category, count, attr));
 
     const bool hasFrameGroups = category == ThingCategoryCreature && g_game.getFeature(Otc::GameIdleAnimations);
     const uint8 groupCount = hasFrameGroups ? fin->getU8() : 1;
@@ -667,7 +667,7 @@ void ThingType::exportImage(const std::string& fileName)
                         for (int w = 0; w < m_size.width(); ++w) {
                             for (int h = 0; h < m_size.height(); ++h) {
                                 image->blit(Point(SPRITE_SIZE * (m_size.width() - w - 1 + m_size.width() * x + m_size.width() * m_numPatternX * l),
-                                    SPRITE_SIZE * (m_size.height() - h - 1 + m_size.height() * y + m_size.height() * m_numPatternY * a + m_size.height() * m_numPatternY * m_animationPhases * z)),
+                                                  SPRITE_SIZE * (m_size.height() - h - 1 + m_size.height() * y + m_size.height() * m_numPatternY * a + m_size.height() * m_numPatternY * m_animationPhases * z)),
                                             g_sprites.getSpriteImage(m_spritesIndex[getSpriteIndex(w, h, l, x, y, z, a)]));
                             }
                         }
@@ -900,17 +900,17 @@ Size ThingType::getBestTextureDimension(int w, int h, int count)
 uint ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int a)
 {
     uint index = ((((((a % m_animationPhases)
-        * m_numPatternZ + z)
-        * m_numPatternY + y)
-        * m_numPatternX + x)
-        * m_layers + l)
+                      * m_numPatternZ + z)
+                     * m_numPatternY + y)
+                    * m_numPatternX + x)
+                   * m_layers + l)
                   * m_size.height() + h)
         * m_size.width() + w;
 
     if (w == -1 && h == -1) { // protobuf does not use width and height, because sprite image is the exact sprite size, not split by 32x32, so -1 is passed instead
         index = ((((a % m_animationPhases)
-            * m_numPatternZ + z)
-            * m_numPatternY + y)
+                   * m_numPatternZ + z)
+                  * m_numPatternY + y)
                  * m_numPatternX + x)
             * m_layers + l;
     }

@@ -46,13 +46,13 @@ void exitSignalHandler(int sig)
 {
     static bool signaled = false;
     switch (sig) {
-    case SIGTERM:
-    case SIGINT:
-    if (!signaled && !g_app.isStopping() && !g_app.isTerminated()) {
-        signaled = true;
-        g_dispatcher.addEvent([ObjectPtr = &g_app] { ObjectPtr->close(); });
-    }
-    break;
+        case SIGTERM:
+        case SIGINT:
+            if (!signaled && !g_app.isStopping() && !g_app.isTerminated()) {
+                signaled = true;
+                g_dispatcher.addEvent([ObjectPtr = &g_app] { ObjectPtr->close(); });
+            }
+            break;
     }
 }
 

@@ -268,27 +268,27 @@ void PainterOGL::updateGlTexture()
 void PainterOGL::updateGlCompositionMode()
 {
     switch (m_compositionMode) {
-    case CompositionMode_Normal:
-    if (g_graphics.canUseBlendFuncSeparate())
-        glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
-    else
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    break;
-    case CompositionMode_Multiply:
-    glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
-    break;
-    case CompositionMode_Add:
-    glBlendFunc(GL_ONE_MINUS_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);
-    break;
-    case CompositionMode_Replace:
-    glBlendFunc(GL_ONE, GL_ZERO);
-    break;
-    case CompositionMode_DestBlending:
-    glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA);
-    break;
-    case CompositionMode_Light:
-    glBlendFunc(GL_ZERO, GL_SRC_COLOR);
-    break;
+        case CompositionMode_Normal:
+            if (g_graphics.canUseBlendFuncSeparate())
+                glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
+            else
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            break;
+        case CompositionMode_Multiply:
+            glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
+            break;
+        case CompositionMode_Add:
+            glBlendFunc(GL_ONE_MINUS_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);
+            break;
+        case CompositionMode_Replace:
+            glBlendFunc(GL_ONE, GL_ZERO);
+            break;
+        case CompositionMode_DestBlending:
+            glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA);
+            break;
+        case CompositionMode_Light:
+            glBlendFunc(GL_ZERO, GL_SRC_COLOR);
+            break;
     }
 }
 

@@ -81,15 +81,15 @@ namespace stdext
         bool expired() { return refs == 0; }
 
     private:
-#ifdef THREAD_SAFE
+    #ifdef THREAD_SAFE
         std::atomic<refcount_t> refs;
         std::atomic<refcount_t> weaks;
         std::atomic<T*> px;
-#else
+    #else
         refcount_t refs;
         refcount_t weaks;
         T* px;
-#endif
+    #endif
     };
 
     template<class T>

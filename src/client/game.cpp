@@ -694,32 +694,32 @@ void Game::forceWalk(Otc::Direction direction)
         return;
 
     switch (direction) {
-    case Otc::North:
-    m_protocolGame->sendWalkNorth();
-    break;
-    case Otc::East:
-    m_protocolGame->sendWalkEast();
-    break;
-    case Otc::South:
-    m_protocolGame->sendWalkSouth();
-    break;
-    case Otc::West:
-    m_protocolGame->sendWalkWest();
-    break;
-    case Otc::NorthEast:
-    m_protocolGame->sendWalkNorthEast();
-    break;
-    case Otc::SouthEast:
-    m_protocolGame->sendWalkSouthEast();
-    break;
-    case Otc::SouthWest:
-    m_protocolGame->sendWalkSouthWest();
-    break;
-    case Otc::NorthWest:
-    m_protocolGame->sendWalkNorthWest();
-    break;
-    default:
-    break;
+        case Otc::North:
+            m_protocolGame->sendWalkNorth();
+            break;
+        case Otc::East:
+            m_protocolGame->sendWalkEast();
+            break;
+        case Otc::South:
+            m_protocolGame->sendWalkSouth();
+            break;
+        case Otc::West:
+            m_protocolGame->sendWalkWest();
+            break;
+        case Otc::NorthEast:
+            m_protocolGame->sendWalkNorthEast();
+            break;
+        case Otc::SouthEast:
+            m_protocolGame->sendWalkSouthEast();
+            break;
+        case Otc::SouthWest:
+            m_protocolGame->sendWalkSouthWest();
+            break;
+        case Otc::NorthWest:
+            m_protocolGame->sendWalkNorthWest();
+            break;
+        default:
+            break;
     }
 
     g_lua.callGlobalField("g_game", "onForceWalk", direction);
@@ -731,20 +731,20 @@ void Game::turn(Otc::Direction direction)
         return;
 
     switch (direction) {
-    case Otc::North:
-    m_protocolGame->sendTurnNorth();
-    break;
-    case Otc::East:
-    m_protocolGame->sendTurnEast();
-    break;
-    case Otc::South:
-    m_protocolGame->sendTurnSouth();
-    break;
-    case Otc::West:
-    m_protocolGame->sendTurnWest();
-    break;
-    default:
-    break;
+        case Otc::North:
+            m_protocolGame->sendTurnNorth();
+            break;
+        case Otc::East:
+            m_protocolGame->sendTurnEast();
+            break;
+        case Otc::South:
+            m_protocolGame->sendTurnSouth();
+            break;
+        case Otc::West:
+            m_protocolGame->sendTurnWest();
+            break;
+        default:
+            break;
     }
 }
 

@@ -225,7 +225,7 @@ SoundSourcePtr SoundManager::createSoundSource(const std::string& filename)
             source = SoundSourcePtr(new SoundSource);
             source->setBuffer(it->second);
         } else {
-#if defined __linux && !defined OPENGL_ES
+        #if defined __linux && !defined OPENGL_ES
             // due to OpenAL implementation bug, stereo buffers are always downmixed to mono on linux systems
             // this is hack to work around the issue
             // solution taken from http://opensource.creative.com/pipermail/openal/2007-April/010355.html
@@ -262,7 +262,7 @@ SoundSourcePtr SoundManager::createSoundSource(const std::string& filename)
             });
 
             source = combinedSource;
-#else
+        #else
             const StreamSoundSourcePtr streamSource(new StreamSoundSource);
             m_streamFiles[streamSource] = g_asyncDispatcher.schedule([=]() -> SoundFilePtr {
                 try {
@@ -273,7 +273,7 @@ SoundSourcePtr SoundManager::createSoundSource(const std::string& filename)
                 }
             });
             source = streamSource;
-#endif
+        #endif
         }
     } catch (std::exception& e) {
         g_logger.error(stdext::format("failed to load sound source: '%s'", e.what()));

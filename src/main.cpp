@@ -39,9 +39,9 @@ int main(int argc, const char* argv[])
         g_resources.init(args[0].c_str());
         g_resources.runEncryption(args.size() >= 3 ? args[2] : "");
         std::cout << "Encryption complete" << std::endl;
-#ifdef WIN32
+    #ifdef WIN32
         MessageBoxA(NULL, "Encryption complete", "Success", 0);
-#endif
+    #endif
         return 0;
     }
 #endif

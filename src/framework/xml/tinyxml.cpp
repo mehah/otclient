@@ -96,11 +96,11 @@ void TiXmlBase::EncodeString(const TIXML_STRING& str, TIXML_STRING* outString)
             // Below 32 is symbolic.
             char buf[32];
 
-#if defined(TIXML_SNPRINTF)
+        #if defined(TIXML_SNPRINTF)
             TIXML_SNPRINTF(buf, sizeof(buf), "&#x%02X;", static_cast<unsigned>(c & 0xff));
-#else
+        #else
             sprintf(buf, "&#x%02X;", (unsigned)(c & 0xff));
-#endif
+        #endif
 
             //*ME:    warning C4267: convert 'size_t' to 'int'
             //*ME:    Int-Cast to make compiler happy ...

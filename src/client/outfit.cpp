@@ -34,34 +34,34 @@ Color Outfit::getColor(int color)
         loc3 = 1;
 
         switch (static_cast<int>(color / HSI_H_STEPS)) {
-        case 0:
-        loc2 = 0.25;
-        loc3 = 1.00;
-        break;
-        case 1:
-        loc2 = 0.25;
-        loc3 = 0.75;
-        break;
-        case 2:
-        loc2 = 0.50;
-        loc3 = 0.75;
-        break;
-        case 3:
-        loc2 = 0.667;
-        loc3 = 0.75;
-        break;
-        case 4:
-        loc2 = 1.00;
-        loc3 = 1.00;
-        break;
-        case 5:
-        loc2 = 1.00;
-        loc3 = 0.75;
-        break;
-        case 6:
-        loc2 = 1.00;
-        loc3 = 0.50;
-        break;
+            case 0:
+                loc2 = 0.25;
+                loc3 = 1.00;
+                break;
+            case 1:
+                loc2 = 0.25;
+                loc3 = 0.75;
+                break;
+            case 2:
+                loc2 = 0.50;
+                loc3 = 0.75;
+                break;
+            case 3:
+                loc2 = 0.667;
+                loc3 = 0.75;
+                break;
+            case 4:
+                loc2 = 1.00;
+                loc3 = 1.00;
+                break;
+            case 5:
+                loc2 = 1.00;
+                loc3 = 0.75;
+                break;
+            case 6:
+                loc2 = 1.00;
+                loc3 = 0.50;
+                break;
         }
     } else {
         loc1 = 0;

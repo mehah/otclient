@@ -133,14 +133,14 @@ namespace tibia
             bool PLAYER_ACTION_IsValid(int value)
             {
                 switch (value) {
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                return true;
-                default:
-                return false;
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                        return true;
+                    default:
+                        return false;
                 }
             }
 
@@ -152,33 +152,33 @@ namespace tibia
             bool ITEM_CATEGORY_IsValid(int value)
             {
                 switch (value) {
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                return true;
-                default:
-                return false;
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                    case 8:
+                    case 9:
+                    case 10:
+                    case 11:
+                    case 12:
+                    case 13:
+                    case 14:
+                    case 15:
+                    case 16:
+                    case 17:
+                    case 18:
+                    case 19:
+                    case 20:
+                    case 21:
+                    case 22:
+                    case 23:
+                    case 24:
+                        return true;
+                    default:
+                        return false;
                 }
             }
 
@@ -190,16 +190,16 @@ namespace tibia
             bool PLAYER_PROFESSION_IsValid(int value)
             {
                 switch (value) {
-                case -1:
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 10:
-                return true;
-                default:
-                return false;
+                    case -1:
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 10:
+                        return true;
+                    default:
+                        return false;
                 }
             }
 
@@ -211,12 +211,12 @@ namespace tibia
             bool ANIMATION_LOOP_TYPE_IsValid(int value)
             {
                 switch (value) {
-                case -1:
-                case 0:
-                case 1:
-                return true;
-                default:
-                return false;
+                    case -1:
+                    case 0:
+                    case 1:
+                        return true;
+                    default:
+                        return false;
                 }
             }
 
@@ -228,11 +228,11 @@ namespace tibia
             bool HOOK_TYPE_IsValid(int value)
             {
                 switch (value) {
-                case 1:
-                case 2:
-                return true;
-                default:
-                return false;
+                    case 1:
+                    case 2:
+                        return true;
+                    default:
+                        return false;
                 }
             }
 
@@ -273,7 +273,7 @@ namespace tibia
                 _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
                 ::memcpy(&x_, &from.x_,
                   static_cast<size_t>(reinterpret_cast<char*>(&z_) -
-                      reinterpret_cast<char*>(&x_)) + sizeof(z_));
+                                      reinterpret_cast<char*>(&x_)) + sizeof(z_));
                 // @@protoc_insertion_point(copy_constructor:tibia.protobuf.shared.Coordinate)
             }
 
@@ -282,7 +282,7 @@ namespace tibia
                 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
                     reinterpret_cast<char*>(&x_) - reinterpret_cast<char*>(this)),
                     0, static_cast<size_t>(reinterpret_cast<char*>(&z_) -
-                        reinterpret_cast<char*>(&x_)) + sizeof(z_));
+                                           reinterpret_cast<char*>(&x_)) + sizeof(z_));
             }
 
             Coordinate::~Coordinate()
@@ -329,43 +329,43 @@ namespace tibia
 
             const char* Coordinate::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional uint32 x = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-                        _Internal::set_has_x(&has_bits);
-                        x_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 y = 2;
-                    case 2:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
-                        _Internal::set_has_y(&has_bits);
-                        y_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 z = 3;
-                    case 3:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
-                        _Internal::set_has_z(&has_bits);
-                        z_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+                                _Internal::set_has_x(&has_bits);
+                                x_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 y = 2;
+                        case 2:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+                                _Internal::set_has_y(&has_bits);
+                                y_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 z = 3;
+                        case 3:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+                                _Internal::set_has_z(&has_bits);
+                                z_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -377,13 +377,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* Coordinate::_InternalSerialize(

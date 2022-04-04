@@ -1113,12 +1113,12 @@ namespace tibia
             bool FIXED_FRAME_GROUP_IsValid(int value)
             {
                 switch (value) {
-                case 0:
-                case 1:
-                case 2:
-                return true;
-                default:
-                return false;
+                    case 0:
+                    case 1:
+                    case 2:
+                        return true;
+                    default:
+                        return false;
                 }
             }
 
@@ -1224,76 +1224,76 @@ namespace tibia
 
             const char* Appearances::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // repeated .tibia.protobuf.appearances.Appearance object = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
-                        ptr -= 1;
-                        do {
-                            ptr += 1;
-                            ptr = ctx->ParseMessage(_internal_add_object(), ptr);
-                            CHK_(ptr);
-                            if (!ctx->DataAvailable(ptr)) break;
-                        } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // repeated .tibia.protobuf.appearances.Appearance outfit = 2;
-                    case 2:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
-                        ptr -= 1;
-                        do {
-                            ptr += 1;
-                            ptr = ctx->ParseMessage(_internal_add_outfit(), ptr);
-                            CHK_(ptr);
-                            if (!ctx->DataAvailable(ptr)) break;
-                        } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<18>(ptr));
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // repeated .tibia.protobuf.appearances.Appearance effect = 3;
-                    case 3:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
-                        ptr -= 1;
-                        do {
-                            ptr += 1;
-                            ptr = ctx->ParseMessage(_internal_add_effect(), ptr);
-                            CHK_(ptr);
-                            if (!ctx->DataAvailable(ptr)) break;
-                        } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<26>(ptr));
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // repeated .tibia.protobuf.appearances.Appearance missile = 4;
-                    case 4:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
-                        ptr -= 1;
-                        do {
-                            ptr += 1;
-                            ptr = ctx->ParseMessage(_internal_add_missile(), ptr);
-                            CHK_(ptr);
-                            if (!ctx->DataAvailable(ptr)) break;
-                        } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<34>(ptr));
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional .tibia.protobuf.appearances.SpecialMeaningAppearanceIds special_meaning_appearance_ids = 5;
-                    case 5:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
-                        ptr = ctx->ParseMessage(_internal_mutable_special_meaning_appearance_ids(), ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+                                ptr -= 1;
+                                do {
+                                    ptr += 1;
+                                    ptr = ctx->ParseMessage(_internal_add_object(), ptr);
+                                    CHK_(ptr);
+                                    if (!ctx->DataAvailable(ptr)) break;
+                                } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // repeated .tibia.protobuf.appearances.Appearance outfit = 2;
+                        case 2:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+                                ptr -= 1;
+                                do {
+                                    ptr += 1;
+                                    ptr = ctx->ParseMessage(_internal_add_outfit(), ptr);
+                                    CHK_(ptr);
+                                    if (!ctx->DataAvailable(ptr)) break;
+                                } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<18>(ptr));
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // repeated .tibia.protobuf.appearances.Appearance effect = 3;
+                        case 3:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+                                ptr -= 1;
+                                do {
+                                    ptr += 1;
+                                    ptr = ctx->ParseMessage(_internal_add_effect(), ptr);
+                                    CHK_(ptr);
+                                    if (!ctx->DataAvailable(ptr)) break;
+                                } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<26>(ptr));
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // repeated .tibia.protobuf.appearances.Appearance missile = 4;
+                        case 4:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+                                ptr -= 1;
+                                do {
+                                    ptr += 1;
+                                    ptr = ctx->ParseMessage(_internal_add_missile(), ptr);
+                                    CHK_(ptr);
+                                    if (!ctx->DataAvailable(ptr)) break;
+                                } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<34>(ptr));
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional .tibia.protobuf.appearances.SpecialMeaningAppearanceIds special_meaning_appearance_ids = 5;
+                        case 5:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
+                                ptr = ctx->ParseMessage(_internal_mutable_special_meaning_appearance_ids(), ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -1305,13 +1305,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* Appearances::_InternalSerialize(
@@ -1513,7 +1513,7 @@ namespace tibia
                 _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
                 ::memcpy(&duration_min_, &from.duration_min_,
                   static_cast<size_t>(reinterpret_cast<char*>(&duration_max_) -
-                      reinterpret_cast<char*>(&duration_min_)) + sizeof(duration_max_));
+                                      reinterpret_cast<char*>(&duration_min_)) + sizeof(duration_max_));
                 // @@protoc_insertion_point(copy_constructor:tibia.protobuf.appearances.SpritePhase)
             }
 
@@ -1522,7 +1522,7 @@ namespace tibia
                 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
                     reinterpret_cast<char*>(&duration_min_) - reinterpret_cast<char*>(this)),
                     0, static_cast<size_t>(reinterpret_cast<char*>(&duration_max_) -
-                        reinterpret_cast<char*>(&duration_min_)) + sizeof(duration_max_));
+                                           reinterpret_cast<char*>(&duration_min_)) + sizeof(duration_max_));
             }
 
             SpritePhase::~SpritePhase()
@@ -1569,34 +1569,34 @@ namespace tibia
 
             const char* SpritePhase::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional uint32 duration_min = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-                        _Internal::set_has_duration_min(&has_bits);
-                        duration_min_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 duration_max = 2;
-                    case 2:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
-                        _Internal::set_has_duration_max(&has_bits);
-                        duration_max_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+                                _Internal::set_has_duration_min(&has_bits);
+                                duration_min_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 duration_max = 2;
+                        case 2:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+                                _Internal::set_has_duration_max(&has_bits);
+                                duration_max_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -1608,13 +1608,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* SpritePhase::_InternalSerialize(
@@ -1782,7 +1782,7 @@ namespace tibia
                 _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
                 ::memcpy(&default_start_phase_, &from.default_start_phase_,
                   static_cast<size_t>(reinterpret_cast<char*>(&loop_type_) -
-                      reinterpret_cast<char*>(&default_start_phase_)) + sizeof(loop_type_));
+                                      reinterpret_cast<char*>(&default_start_phase_)) + sizeof(loop_type_));
                 // @@protoc_insertion_point(copy_constructor:tibia.protobuf.appearances.SpriteAnimation)
             }
 
@@ -1791,7 +1791,7 @@ namespace tibia
                 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
                     reinterpret_cast<char*>(&default_start_phase_) - reinterpret_cast<char*>(this)),
                     0, static_cast<size_t>(reinterpret_cast<char*>(&loop_count_) -
-                        reinterpret_cast<char*>(&default_start_phase_)) + sizeof(loop_count_));
+                                           reinterpret_cast<char*>(&default_start_phase_)) + sizeof(loop_count_));
                 loop_type_ = -1;
             }
 
@@ -1841,78 +1841,78 @@ namespace tibia
 
             const char* SpriteAnimation::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional uint32 default_start_phase = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-                        _Internal::set_has_default_start_phase(&has_bits);
-                        default_start_phase_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool synchronized = 2;
-                    case 2:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
-                        _Internal::set_has_synchronized(&has_bits);
-                        synchronized_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool random_start_phase = 3;
-                    case 3:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
-                        _Internal::set_has_random_start_phase(&has_bits);
-                        random_start_phase_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional .tibia.protobuf.shared.ANIMATION_LOOP_TYPE loop_type = 4;
-                    case 4:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
-                        ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                        if (PROTOBUF_PREDICT_TRUE(::tibia::protobuf::shared::ANIMATION_LOOP_TYPE_IsValid(val))) {
-                            _internal_set_loop_type(static_cast<::tibia::protobuf::shared::ANIMATION_LOOP_TYPE>(val));
-                        } else {
-                            ::PROTOBUF_NAMESPACE_ID::internal::WriteVarint(4, val, mutable_unknown_fields());
-                        }
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 loop_count = 5;
-                    case 5:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
-                        _Internal::set_has_loop_count(&has_bits);
-                        loop_count_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // repeated .tibia.protobuf.appearances.SpritePhase sprite_phase = 6;
-                    case 6:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
-                        ptr -= 1;
-                        do {
-                            ptr += 1;
-                            ptr = ctx->ParseMessage(_internal_add_sprite_phase(), ptr);
-                            CHK_(ptr);
-                            if (!ctx->DataAvailable(ptr)) break;
-                        } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<50>(ptr));
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+                                _Internal::set_has_default_start_phase(&has_bits);
+                                default_start_phase_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool synchronized = 2;
+                        case 2:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+                                _Internal::set_has_synchronized(&has_bits);
+                                synchronized_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool random_start_phase = 3;
+                        case 3:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+                                _Internal::set_has_random_start_phase(&has_bits);
+                                random_start_phase_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional .tibia.protobuf.shared.ANIMATION_LOOP_TYPE loop_type = 4;
+                        case 4:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
+                                ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                                if (PROTOBUF_PREDICT_TRUE(::tibia::protobuf::shared::ANIMATION_LOOP_TYPE_IsValid(val))) {
+                                    _internal_set_loop_type(static_cast<::tibia::protobuf::shared::ANIMATION_LOOP_TYPE>(val));
+                                } else {
+                                    ::PROTOBUF_NAMESPACE_ID::internal::WriteVarint(4, val, mutable_unknown_fields());
+                                }
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 loop_count = 5;
+                        case 5:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
+                                _Internal::set_has_loop_count(&has_bits);
+                                loop_count_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // repeated .tibia.protobuf.appearances.SpritePhase sprite_phase = 6;
+                        case 6:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
+                                ptr -= 1;
+                                do {
+                                    ptr += 1;
+                                    ptr = ctx->ParseMessage(_internal_add_sprite_phase(), ptr);
+                                    CHK_(ptr);
+                                    if (!ctx->DataAvailable(ptr)) break;
+                                } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<50>(ptr));
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -1924,13 +1924,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* SpriteAnimation::_InternalSerialize(
@@ -2154,7 +2154,7 @@ namespace tibia
                 _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
                 ::memcpy(&x_, &from.x_,
                   static_cast<size_t>(reinterpret_cast<char*>(&height_) -
-                      reinterpret_cast<char*>(&x_)) + sizeof(height_));
+                                      reinterpret_cast<char*>(&x_)) + sizeof(height_));
                 // @@protoc_insertion_point(copy_constructor:tibia.protobuf.appearances.Box)
             }
 
@@ -2163,7 +2163,7 @@ namespace tibia
                 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
                     reinterpret_cast<char*>(&x_) - reinterpret_cast<char*>(this)),
                     0, static_cast<size_t>(reinterpret_cast<char*>(&height_) -
-                        reinterpret_cast<char*>(&x_)) + sizeof(height_));
+                                           reinterpret_cast<char*>(&x_)) + sizeof(height_));
             }
 
             Box::~Box()
@@ -2210,52 +2210,52 @@ namespace tibia
 
             const char* Box::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional uint32 x = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-                        _Internal::set_has_x(&has_bits);
-                        x_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 y = 2;
-                    case 2:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
-                        _Internal::set_has_y(&has_bits);
-                        y_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 width = 3;
-                    case 3:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
-                        _Internal::set_has_width(&has_bits);
-                        width_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 height = 4;
-                    case 4:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
-                        _Internal::set_has_height(&has_bits);
-                        height_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+                                _Internal::set_has_x(&has_bits);
+                                x_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 y = 2;
+                        case 2:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+                                _Internal::set_has_y(&has_bits);
+                                y_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 width = 3;
+                        case 3:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+                                _Internal::set_has_width(&has_bits);
+                                width_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 height = 4;
+                        case 4:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
+                                _Internal::set_has_height(&has_bits);
+                                height_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -2267,13 +2267,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* Box::_InternalSerialize(
@@ -2490,7 +2490,7 @@ namespace tibia
                 }
                 ::memcpy(&pattern_width_, &from.pattern_width_,
                   static_cast<size_t>(reinterpret_cast<char*>(&is_opaque_) -
-                      reinterpret_cast<char*>(&pattern_width_)) + sizeof(is_opaque_));
+                                      reinterpret_cast<char*>(&pattern_width_)) + sizeof(is_opaque_));
                 // @@protoc_insertion_point(copy_constructor:tibia.protobuf.appearances.SpriteInfo)
             }
 
@@ -2499,7 +2499,7 @@ namespace tibia
                 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
                     reinterpret_cast<char*>(&animation_) - reinterpret_cast<char*>(this)),
                     0, static_cast<size_t>(reinterpret_cast<char*>(&is_opaque_) -
-                        reinterpret_cast<char*>(&animation_)) + sizeof(is_opaque_));
+                                           reinterpret_cast<char*>(&animation_)) + sizeof(is_opaque_));
             }
 
             SpriteInfo::~SpriteInfo()
@@ -2553,107 +2553,107 @@ namespace tibia
 
             const char* SpriteInfo::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional uint32 pattern_width = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-                        _Internal::set_has_pattern_width(&has_bits);
-                        pattern_width_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 pattern_height = 2;
-                    case 2:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
-                        _Internal::set_has_pattern_height(&has_bits);
-                        pattern_height_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 pattern_depth = 3;
-                    case 3:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
-                        _Internal::set_has_pattern_depth(&has_bits);
-                        pattern_depth_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 layers = 4;
-                    case 4:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
-                        _Internal::set_has_layers(&has_bits);
-                        layers_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // repeated uint32 sprite_id = 5;
-                    case 5:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
-                        ptr -= 1;
-                        do {
-                            ptr += 1;
-                            _internal_add_sprite_id(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr));
-                            CHK_(ptr);
-                            if (!ctx->DataAvailable(ptr)) break;
-                        } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<40>(ptr));
-                    } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42) {
-                        ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedUInt32Parser(_internal_mutable_sprite_id(), ptr, ctx);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional .tibia.protobuf.appearances.SpriteAnimation animation = 6;
-                    case 6:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
-                        ptr = ctx->ParseMessage(_internal_mutable_animation(), ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 bounding_square = 7;
-                    case 7:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 56)) {
-                        _Internal::set_has_bounding_square(&has_bits);
-                        bounding_square_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool is_opaque = 8;
-                    case 8:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 64)) {
-                        _Internal::set_has_is_opaque(&has_bits);
-                        is_opaque_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // repeated .tibia.protobuf.appearances.Box bounding_box_per_direction = 9;
-                    case 9:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 74)) {
-                        ptr -= 1;
-                        do {
-                            ptr += 1;
-                            ptr = ctx->ParseMessage(_internal_add_bounding_box_per_direction(), ptr);
-                            CHK_(ptr);
-                            if (!ctx->DataAvailable(ptr)) break;
-                        } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<74>(ptr));
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+                                _Internal::set_has_pattern_width(&has_bits);
+                                pattern_width_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 pattern_height = 2;
+                        case 2:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+                                _Internal::set_has_pattern_height(&has_bits);
+                                pattern_height_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 pattern_depth = 3;
+                        case 3:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+                                _Internal::set_has_pattern_depth(&has_bits);
+                                pattern_depth_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 layers = 4;
+                        case 4:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
+                                _Internal::set_has_layers(&has_bits);
+                                layers_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // repeated uint32 sprite_id = 5;
+                        case 5:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
+                                ptr -= 1;
+                                do {
+                                    ptr += 1;
+                                    _internal_add_sprite_id(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr));
+                                    CHK_(ptr);
+                                    if (!ctx->DataAvailable(ptr)) break;
+                                } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<40>(ptr));
+                            } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42) {
+                                ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedUInt32Parser(_internal_mutable_sprite_id(), ptr, ctx);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional .tibia.protobuf.appearances.SpriteAnimation animation = 6;
+                        case 6:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
+                                ptr = ctx->ParseMessage(_internal_mutable_animation(), ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 bounding_square = 7;
+                        case 7:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 56)) {
+                                _Internal::set_has_bounding_square(&has_bits);
+                                bounding_square_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool is_opaque = 8;
+                        case 8:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 64)) {
+                                _Internal::set_has_is_opaque(&has_bits);
+                                is_opaque_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // repeated .tibia.protobuf.appearances.Box bounding_box_per_direction = 9;
+                        case 9:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 74)) {
+                                ptr -= 1;
+                                do {
+                                    ptr += 1;
+                                    ptr = ctx->ParseMessage(_internal_add_bounding_box_per_direction(), ptr);
+                                    CHK_(ptr);
+                                    if (!ctx->DataAvailable(ptr)) break;
+                                } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<74>(ptr));
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -2665,13 +2665,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* SpriteInfo::_InternalSerialize(
@@ -2948,7 +2948,7 @@ namespace tibia
                 }
                 ::memcpy(&fixed_frame_group_, &from.fixed_frame_group_,
                   static_cast<size_t>(reinterpret_cast<char*>(&id_) -
-                      reinterpret_cast<char*>(&fixed_frame_group_)) + sizeof(id_));
+                                      reinterpret_cast<char*>(&fixed_frame_group_)) + sizeof(id_));
                 // @@protoc_insertion_point(copy_constructor:tibia.protobuf.appearances.FrameGroup)
             }
 
@@ -2957,7 +2957,7 @@ namespace tibia
                 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
                     reinterpret_cast<char*>(&sprite_info_) - reinterpret_cast<char*>(this)),
                     0, static_cast<size_t>(reinterpret_cast<char*>(&id_) -
-                        reinterpret_cast<char*>(&sprite_info_)) + sizeof(id_));
+                                           reinterpret_cast<char*>(&sprite_info_)) + sizeof(id_));
             }
 
             FrameGroup::~FrameGroup()
@@ -3009,46 +3009,46 @@ namespace tibia
 
             const char* FrameGroup::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional .tibia.protobuf.appearances.FIXED_FRAME_GROUP fixed_frame_group = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-                        ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                        if (PROTOBUF_PREDICT_TRUE(::tibia::protobuf::appearances::FIXED_FRAME_GROUP_IsValid(val))) {
-                            _internal_set_fixed_frame_group(static_cast<::tibia::protobuf::appearances::FIXED_FRAME_GROUP>(val));
-                        } else {
-                            ::PROTOBUF_NAMESPACE_ID::internal::WriteVarint(1, val, mutable_unknown_fields());
-                        }
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 id = 2;
-                    case 2:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
-                        _Internal::set_has_id(&has_bits);
-                        id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional .tibia.protobuf.appearances.SpriteInfo sprite_info = 3;
-                    case 3:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
-                        ptr = ctx->ParseMessage(_internal_mutable_sprite_info(), ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+                                ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                                if (PROTOBUF_PREDICT_TRUE(::tibia::protobuf::appearances::FIXED_FRAME_GROUP_IsValid(val))) {
+                                    _internal_set_fixed_frame_group(static_cast<::tibia::protobuf::appearances::FIXED_FRAME_GROUP>(val));
+                                } else {
+                                    ::PROTOBUF_NAMESPACE_ID::internal::WriteVarint(1, val, mutable_unknown_fields());
+                                }
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 id = 2;
+                        case 2:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+                                _Internal::set_has_id(&has_bits);
+                                id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional .tibia.protobuf.appearances.SpriteInfo sprite_info = 3;
+                        case 3:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+                                ptr = ctx->ParseMessage(_internal_mutable_sprite_info(), ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -3060,13 +3060,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* FrameGroup::_InternalSerialize(
@@ -3280,7 +3280,7 @@ namespace tibia
                 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
                     reinterpret_cast<char*>(&flags_) - reinterpret_cast<char*>(this)),
                     0, static_cast<size_t>(reinterpret_cast<char*>(&id_) -
-                        reinterpret_cast<char*>(&flags_)) + sizeof(id_));
+                                           reinterpret_cast<char*>(&flags_)) + sizeof(id_));
             }
 
             Appearance::~Appearance()
@@ -3339,67 +3339,67 @@ namespace tibia
 
             const char* Appearance::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional uint32 id = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-                        _Internal::set_has_id(&has_bits);
-                        id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // repeated .tibia.protobuf.appearances.FrameGroup frame_group = 2;
-                    case 2:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
-                        ptr -= 1;
-                        do {
-                            ptr += 1;
-                            ptr = ctx->ParseMessage(_internal_add_frame_group(), ptr);
-                            CHK_(ptr);
-                            if (!ctx->DataAvailable(ptr)) break;
-                        } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<18>(ptr));
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional .tibia.protobuf.appearances.AppearanceFlags flags = 3;
-                    case 3:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
-                        ptr = ctx->ParseMessage(_internal_mutable_flags(), ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional string name = 4;
-                    case 4:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
-                        auto str = _internal_mutable_name();
-                        ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-#ifndef NDEBUG
-                        ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "tibia.protobuf.appearances.Appearance.name");
-#endif  // !NDEBUG
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bytes description = 5;
-                    case 5:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
-                        auto str = _internal_mutable_description();
-                        ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+                                _Internal::set_has_id(&has_bits);
+                                id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // repeated .tibia.protobuf.appearances.FrameGroup frame_group = 2;
+                        case 2:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+                                ptr -= 1;
+                                do {
+                                    ptr += 1;
+                                    ptr = ctx->ParseMessage(_internal_add_frame_group(), ptr);
+                                    CHK_(ptr);
+                                    if (!ctx->DataAvailable(ptr)) break;
+                                } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<18>(ptr));
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional .tibia.protobuf.appearances.AppearanceFlags flags = 3;
+                        case 3:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+                                ptr = ctx->ParseMessage(_internal_mutable_flags(), ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional string name = 4;
+                        case 4:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+                                auto str = _internal_mutable_name();
+                                ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+                            #ifndef NDEBUG
+                                ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "tibia.protobuf.appearances.Appearance.name");
+                            #endif  // !NDEBUG
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bytes description = 5;
+                        case 5:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
+                                auto str = _internal_mutable_description();
+                                ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -3411,13 +3411,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* Appearance::_InternalSerialize(
@@ -3987,7 +3987,7 @@ namespace tibia
                 }
                 ::memcpy(&clip_, &from.clip_,
                   static_cast<size_t>(reinterpret_cast<char*>(&reportable_) -
-                      reinterpret_cast<char*>(&clip_)) + sizeof(reportable_));
+                                      reinterpret_cast<char*>(&clip_)) + sizeof(reportable_));
                 // @@protoc_insertion_point(copy_constructor:tibia.protobuf.appearances.AppearanceFlags)
             }
 
@@ -3996,7 +3996,7 @@ namespace tibia
                 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
                     reinterpret_cast<char*>(&bank_) - reinterpret_cast<char*>(this)),
                     0, static_cast<size_t>(reinterpret_cast<char*>(&reportable_) -
-                        reinterpret_cast<char*>(&bank_)) + sizeof(reportable_));
+                                           reinterpret_cast<char*>(&bank_)) + sizeof(reportable_));
             }
 
             AppearanceFlags::~AppearanceFlags()
@@ -4140,436 +4140,436 @@ namespace tibia
 
             const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional .tibia.protobuf.appearances.AppearanceFlagBank bank = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
-                        ptr = ctx->ParseMessage(_internal_mutable_bank(), ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool clip = 2;
-                    case 2:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
-                        _Internal::set_has_clip(&_has_bits_);
-                        clip_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool bottom = 3;
-                    case 3:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
-                        _Internal::set_has_bottom(&_has_bits_);
-                        bottom_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool top = 4;
-                    case 4:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
-                        _Internal::set_has_top(&_has_bits_);
-                        top_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool container = 5;
-                    case 5:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
-                        _Internal::set_has_container(&_has_bits_);
-                        container_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool cumulative = 6;
-                    case 6:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 48)) {
-                        _Internal::set_has_cumulative(&_has_bits_);
-                        cumulative_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool usable = 7;
-                    case 7:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 56)) {
-                        _Internal::set_has_usable(&_has_bits_);
-                        usable_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool forceuse = 8;
-                    case 8:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 64)) {
-                        _Internal::set_has_forceuse(&_has_bits_);
-                        forceuse_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool multiuse = 9;
-                    case 9:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 72)) {
-                        _Internal::set_has_multiuse(&_has_bits_);
-                        multiuse_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional .tibia.protobuf.appearances.AppearanceFlagWrite write = 10;
-                    case 10:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 82)) {
-                        ptr = ctx->ParseMessage(_internal_mutable_write(), ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional .tibia.protobuf.appearances.AppearanceFlagWriteOnce write_once = 11;
-                    case 11:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 90)) {
-                        ptr = ctx->ParseMessage(_internal_mutable_write_once(), ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool liquidpool = 12;
-                    case 12:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 96)) {
-                        _Internal::set_has_liquidpool(&_has_bits_);
-                        liquidpool_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool unpass = 13;
-                    case 13:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 104)) {
-                        _Internal::set_has_unpass(&_has_bits_);
-                        unpass_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool unmove = 14;
-                    case 14:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 112)) {
-                        _Internal::set_has_unmove(&_has_bits_);
-                        unmove_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool unsight = 15;
-                    case 15:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 120)) {
-                        _Internal::set_has_unsight(&_has_bits_);
-                        unsight_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool avoid = 16;
-                    case 16:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 128)) {
-                        _Internal::set_has_avoid(&_has_bits_);
-                        avoid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool no_movement_animation = 17;
-                    case 17:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 136)) {
-                        _Internal::set_has_no_movement_animation(&_has_bits_);
-                        no_movement_animation_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool take = 18;
-                    case 18:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 144)) {
-                        _Internal::set_has_take(&_has_bits_);
-                        take_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool liquidcontainer = 19;
-                    case 19:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 152)) {
-                        _Internal::set_has_liquidcontainer(&_has_bits_);
-                        liquidcontainer_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool hang = 20;
-                    case 20:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 160)) {
-                        _Internal::set_has_hang(&_has_bits_);
-                        hang_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional .tibia.protobuf.appearances.AppearanceFlagHook hook = 21;
-                    case 21:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 170)) {
-                        ptr = ctx->ParseMessage(_internal_mutable_hook(), ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool rotate = 22;
-                    case 22:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 176)) {
-                        _Internal::set_has_rotate(&_has_bits_);
-                        rotate_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional .tibia.protobuf.appearances.AppearanceFlagLight light = 23;
-                    case 23:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 186)) {
-                        ptr = ctx->ParseMessage(_internal_mutable_light(), ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool dont_hide = 24;
-                    case 24:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 192)) {
-                        _Internal::set_has_dont_hide(&_has_bits_);
-                        dont_hide_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool translucent = 25;
-                    case 25:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 200)) {
-                        _Internal::set_has_translucent(&_has_bits_);
-                        translucent_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional .tibia.protobuf.appearances.AppearanceFlagShift shift = 26;
-                    case 26:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 210)) {
-                        ptr = ctx->ParseMessage(_internal_mutable_shift(), ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional .tibia.protobuf.appearances.AppearanceFlagHeight height = 27;
-                    case 27:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 218)) {
-                        ptr = ctx->ParseMessage(_internal_mutable_height(), ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool lying_object = 28;
-                    case 28:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 224)) {
-                        _Internal::set_has_lying_object(&_has_bits_);
-                        lying_object_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool animate_always = 29;
-                    case 29:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 232)) {
-                        _Internal::set_has_animate_always(&_has_bits_);
-                        animate_always_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional .tibia.protobuf.appearances.AppearanceFlagAutomap automap = 30;
-                    case 30:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 242)) {
-                        ptr = ctx->ParseMessage(_internal_mutable_automap(), ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional .tibia.protobuf.appearances.AppearanceFlagLenshelp lenshelp = 31;
-                    case 31:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 250)) {
-                        ptr = ctx->ParseMessage(_internal_mutable_lenshelp(), ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool fullbank = 32;
-                    case 32:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 0)) {
-                        _Internal::set_has_fullbank(&_has_bits_);
-                        fullbank_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool ignore_look = 33;
-                    case 33:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-                        _Internal::set_has_ignore_look(&_has_bits_);
-                        ignore_look_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional .tibia.protobuf.appearances.AppearanceFlagClothes clothes = 34;
-                    case 34:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
-                        ptr = ctx->ParseMessage(_internal_mutable_clothes(), ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional .tibia.protobuf.appearances.AppearanceFlagDefaultAction default_action = 35;
-                    case 35:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
-                        ptr = ctx->ParseMessage(_internal_mutable_default_action(), ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional .tibia.protobuf.appearances.AppearanceFlagMarket market = 36;
-                    case 36:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
-                        ptr = ctx->ParseMessage(_internal_mutable_market(), ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool wrap = 37;
-                    case 37:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
-                        _Internal::set_has_wrap(&_has_bits_);
-                        wrap_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool unwrap = 38;
-                    case 38:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 48)) {
-                        _Internal::set_has_unwrap(&_has_bits_);
-                        unwrap_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool topeffect = 39;
-                    case 39:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 56)) {
-                        _Internal::set_has_topeffect(&_has_bits_);
-                        topeffect_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // repeated .tibia.protobuf.appearances.AppearanceFlagNPC npcsaledata = 40;
-                    case 40:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 66)) {
-                        ptr -= 2;
-                        do {
-                            ptr += 2;
-                            ptr = ctx->ParseMessage(_internal_add_npcsaledata(), ptr);
-                            CHK_(ptr);
-                            if (!ctx->DataAvailable(ptr)) break;
-                        } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<322>(ptr));
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional .tibia.protobuf.appearances.AppearanceFlagChangedToExpire changedtoexpire = 41;
-                    case 41:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 74)) {
-                        ptr = ctx->ParseMessage(_internal_mutable_changedtoexpire(), ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool corpse = 42;
-                    case 42:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 80)) {
-                        _Internal::set_has_corpse(&_has_bits_);
-                        corpse_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool player_corpse = 43;
-                    case 43:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 88)) {
-                        _Internal::set_has_player_corpse(&_has_bits_);
-                        player_corpse_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional .tibia.protobuf.appearances.AppearanceFlagCyclopedia cyclopediaitem = 44;
-                    case 44:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 98)) {
-                        ptr = ctx->ParseMessage(_internal_mutable_cyclopediaitem(), ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool ammo = 45;
-                    case 45:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 104)) {
-                        _Internal::set_has_ammo(&_has_bits_);
-                        ammo_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool show_off_socket = 46;
-                    case 46:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 112)) {
-                        _Internal::set_has_show_off_socket(&_has_bits_);
-                        show_off_socket_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional bool reportable = 47;
-                    case 47:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 120)) {
-                        _Internal::set_has_reportable(&_has_bits_);
-                        reportable_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional .tibia.protobuf.appearances.AppearanceFlagUpgradeClassification upgradeclassification = 48;
-                    case 48:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 130)) {
-                        ptr = ctx->ParseMessage(_internal_mutable_upgradeclassification(), ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+                                ptr = ctx->ParseMessage(_internal_mutable_bank(), ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool clip = 2;
+                        case 2:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+                                _Internal::set_has_clip(&_has_bits_);
+                                clip_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool bottom = 3;
+                        case 3:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+                                _Internal::set_has_bottom(&_has_bits_);
+                                bottom_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool top = 4;
+                        case 4:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
+                                _Internal::set_has_top(&_has_bits_);
+                                top_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool container = 5;
+                        case 5:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
+                                _Internal::set_has_container(&_has_bits_);
+                                container_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool cumulative = 6;
+                        case 6:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 48)) {
+                                _Internal::set_has_cumulative(&_has_bits_);
+                                cumulative_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool usable = 7;
+                        case 7:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 56)) {
+                                _Internal::set_has_usable(&_has_bits_);
+                                usable_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool forceuse = 8;
+                        case 8:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 64)) {
+                                _Internal::set_has_forceuse(&_has_bits_);
+                                forceuse_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool multiuse = 9;
+                        case 9:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 72)) {
+                                _Internal::set_has_multiuse(&_has_bits_);
+                                multiuse_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional .tibia.protobuf.appearances.AppearanceFlagWrite write = 10;
+                        case 10:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 82)) {
+                                ptr = ctx->ParseMessage(_internal_mutable_write(), ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional .tibia.protobuf.appearances.AppearanceFlagWriteOnce write_once = 11;
+                        case 11:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 90)) {
+                                ptr = ctx->ParseMessage(_internal_mutable_write_once(), ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool liquidpool = 12;
+                        case 12:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 96)) {
+                                _Internal::set_has_liquidpool(&_has_bits_);
+                                liquidpool_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool unpass = 13;
+                        case 13:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 104)) {
+                                _Internal::set_has_unpass(&_has_bits_);
+                                unpass_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool unmove = 14;
+                        case 14:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 112)) {
+                                _Internal::set_has_unmove(&_has_bits_);
+                                unmove_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool unsight = 15;
+                        case 15:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 120)) {
+                                _Internal::set_has_unsight(&_has_bits_);
+                                unsight_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool avoid = 16;
+                        case 16:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 128)) {
+                                _Internal::set_has_avoid(&_has_bits_);
+                                avoid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool no_movement_animation = 17;
+                        case 17:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 136)) {
+                                _Internal::set_has_no_movement_animation(&_has_bits_);
+                                no_movement_animation_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool take = 18;
+                        case 18:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 144)) {
+                                _Internal::set_has_take(&_has_bits_);
+                                take_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool liquidcontainer = 19;
+                        case 19:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 152)) {
+                                _Internal::set_has_liquidcontainer(&_has_bits_);
+                                liquidcontainer_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool hang = 20;
+                        case 20:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 160)) {
+                                _Internal::set_has_hang(&_has_bits_);
+                                hang_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional .tibia.protobuf.appearances.AppearanceFlagHook hook = 21;
+                        case 21:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 170)) {
+                                ptr = ctx->ParseMessage(_internal_mutable_hook(), ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool rotate = 22;
+                        case 22:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 176)) {
+                                _Internal::set_has_rotate(&_has_bits_);
+                                rotate_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional .tibia.protobuf.appearances.AppearanceFlagLight light = 23;
+                        case 23:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 186)) {
+                                ptr = ctx->ParseMessage(_internal_mutable_light(), ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool dont_hide = 24;
+                        case 24:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 192)) {
+                                _Internal::set_has_dont_hide(&_has_bits_);
+                                dont_hide_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool translucent = 25;
+                        case 25:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 200)) {
+                                _Internal::set_has_translucent(&_has_bits_);
+                                translucent_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional .tibia.protobuf.appearances.AppearanceFlagShift shift = 26;
+                        case 26:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 210)) {
+                                ptr = ctx->ParseMessage(_internal_mutable_shift(), ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional .tibia.protobuf.appearances.AppearanceFlagHeight height = 27;
+                        case 27:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 218)) {
+                                ptr = ctx->ParseMessage(_internal_mutable_height(), ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool lying_object = 28;
+                        case 28:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 224)) {
+                                _Internal::set_has_lying_object(&_has_bits_);
+                                lying_object_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool animate_always = 29;
+                        case 29:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 232)) {
+                                _Internal::set_has_animate_always(&_has_bits_);
+                                animate_always_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional .tibia.protobuf.appearances.AppearanceFlagAutomap automap = 30;
+                        case 30:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 242)) {
+                                ptr = ctx->ParseMessage(_internal_mutable_automap(), ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional .tibia.protobuf.appearances.AppearanceFlagLenshelp lenshelp = 31;
+                        case 31:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 250)) {
+                                ptr = ctx->ParseMessage(_internal_mutable_lenshelp(), ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool fullbank = 32;
+                        case 32:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 0)) {
+                                _Internal::set_has_fullbank(&_has_bits_);
+                                fullbank_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool ignore_look = 33;
+                        case 33:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+                                _Internal::set_has_ignore_look(&_has_bits_);
+                                ignore_look_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional .tibia.protobuf.appearances.AppearanceFlagClothes clothes = 34;
+                        case 34:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+                                ptr = ctx->ParseMessage(_internal_mutable_clothes(), ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional .tibia.protobuf.appearances.AppearanceFlagDefaultAction default_action = 35;
+                        case 35:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+                                ptr = ctx->ParseMessage(_internal_mutable_default_action(), ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional .tibia.protobuf.appearances.AppearanceFlagMarket market = 36;
+                        case 36:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+                                ptr = ctx->ParseMessage(_internal_mutable_market(), ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool wrap = 37;
+                        case 37:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
+                                _Internal::set_has_wrap(&_has_bits_);
+                                wrap_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool unwrap = 38;
+                        case 38:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 48)) {
+                                _Internal::set_has_unwrap(&_has_bits_);
+                                unwrap_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool topeffect = 39;
+                        case 39:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 56)) {
+                                _Internal::set_has_topeffect(&_has_bits_);
+                                topeffect_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // repeated .tibia.protobuf.appearances.AppearanceFlagNPC npcsaledata = 40;
+                        case 40:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 66)) {
+                                ptr -= 2;
+                                do {
+                                    ptr += 2;
+                                    ptr = ctx->ParseMessage(_internal_add_npcsaledata(), ptr);
+                                    CHK_(ptr);
+                                    if (!ctx->DataAvailable(ptr)) break;
+                                } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<322>(ptr));
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional .tibia.protobuf.appearances.AppearanceFlagChangedToExpire changedtoexpire = 41;
+                        case 41:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 74)) {
+                                ptr = ctx->ParseMessage(_internal_mutable_changedtoexpire(), ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool corpse = 42;
+                        case 42:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 80)) {
+                                _Internal::set_has_corpse(&_has_bits_);
+                                corpse_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool player_corpse = 43;
+                        case 43:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 88)) {
+                                _Internal::set_has_player_corpse(&_has_bits_);
+                                player_corpse_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional .tibia.protobuf.appearances.AppearanceFlagCyclopedia cyclopediaitem = 44;
+                        case 44:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 98)) {
+                                ptr = ctx->ParseMessage(_internal_mutable_cyclopediaitem(), ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool ammo = 45;
+                        case 45:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 104)) {
+                                _Internal::set_has_ammo(&_has_bits_);
+                                ammo_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool show_off_socket = 46;
+                        case 46:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 112)) {
+                                _Internal::set_has_show_off_socket(&_has_bits_);
+                                show_off_socket_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional bool reportable = 47;
+                        case 47:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 120)) {
+                                _Internal::set_has_reportable(&_has_bits_);
+                                reportable_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional .tibia.protobuf.appearances.AppearanceFlagUpgradeClassification upgradeclassification = 48;
+                        case 48:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 130)) {
+                                ptr = ctx->ParseMessage(_internal_mutable_upgradeclassification(), ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -4581,12 +4581,12 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlags::_InternalSerialize(
@@ -5525,25 +5525,25 @@ namespace tibia
 
             const char* AppearanceFlagBank::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional uint32 waypoints = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-                        _Internal::set_has_waypoints(&has_bits);
-                        waypoints_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+                                _Internal::set_has_waypoints(&has_bits);
+                                waypoints_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -5555,13 +5555,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagBank::_InternalSerialize(
@@ -5733,25 +5733,25 @@ namespace tibia
 
             const char* AppearanceFlagWrite::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional uint32 max_text_length = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-                        _Internal::set_has_max_text_length(&has_bits);
-                        max_text_length_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+                                _Internal::set_has_max_text_length(&has_bits);
+                                max_text_length_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -5763,13 +5763,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagWrite::_InternalSerialize(
@@ -5941,25 +5941,25 @@ namespace tibia
 
             const char* AppearanceFlagWriteOnce::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional uint32 max_text_length_once = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-                        _Internal::set_has_max_text_length_once(&has_bits);
-                        max_text_length_once_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+                                _Internal::set_has_max_text_length_once(&has_bits);
+                                max_text_length_once_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -5971,13 +5971,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagWriteOnce::_InternalSerialize(
@@ -6107,7 +6107,7 @@ namespace tibia
                 _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
                 ::memcpy(&brightness_, &from.brightness_,
                   static_cast<size_t>(reinterpret_cast<char*>(&color_) -
-                      reinterpret_cast<char*>(&brightness_)) + sizeof(color_));
+                                      reinterpret_cast<char*>(&brightness_)) + sizeof(color_));
                 // @@protoc_insertion_point(copy_constructor:tibia.protobuf.appearances.AppearanceFlagLight)
             }
 
@@ -6116,7 +6116,7 @@ namespace tibia
                 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
                     reinterpret_cast<char*>(&brightness_) - reinterpret_cast<char*>(this)),
                     0, static_cast<size_t>(reinterpret_cast<char*>(&color_) -
-                        reinterpret_cast<char*>(&brightness_)) + sizeof(color_));
+                                           reinterpret_cast<char*>(&brightness_)) + sizeof(color_));
             }
 
             AppearanceFlagLight::~AppearanceFlagLight()
@@ -6163,34 +6163,34 @@ namespace tibia
 
             const char* AppearanceFlagLight::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional uint32 brightness = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-                        _Internal::set_has_brightness(&has_bits);
-                        brightness_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 color = 2;
-                    case 2:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
-                        _Internal::set_has_color(&has_bits);
-                        color_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+                                _Internal::set_has_brightness(&has_bits);
+                                brightness_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 color = 2;
+                        case 2:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+                                _Internal::set_has_color(&has_bits);
+                                color_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -6202,13 +6202,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagLight::_InternalSerialize(
@@ -6404,25 +6404,25 @@ namespace tibia
 
             const char* AppearanceFlagHeight::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional uint32 elevation = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-                        _Internal::set_has_elevation(&has_bits);
-                        elevation_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+                                _Internal::set_has_elevation(&has_bits);
+                                elevation_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -6434,13 +6434,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagHeight::_InternalSerialize(
@@ -6570,7 +6570,7 @@ namespace tibia
                 _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
                 ::memcpy(&x_, &from.x_,
                   static_cast<size_t>(reinterpret_cast<char*>(&y_) -
-                      reinterpret_cast<char*>(&x_)) + sizeof(y_));
+                                      reinterpret_cast<char*>(&x_)) + sizeof(y_));
                 // @@protoc_insertion_point(copy_constructor:tibia.protobuf.appearances.AppearanceFlagShift)
             }
 
@@ -6579,7 +6579,7 @@ namespace tibia
                 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
                     reinterpret_cast<char*>(&x_) - reinterpret_cast<char*>(this)),
                     0, static_cast<size_t>(reinterpret_cast<char*>(&y_) -
-                        reinterpret_cast<char*>(&x_)) + sizeof(y_));
+                                           reinterpret_cast<char*>(&x_)) + sizeof(y_));
             }
 
             AppearanceFlagShift::~AppearanceFlagShift()
@@ -6626,34 +6626,34 @@ namespace tibia
 
             const char* AppearanceFlagShift::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional uint32 x = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-                        _Internal::set_has_x(&has_bits);
-                        x_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 y = 2;
-                    case 2:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
-                        _Internal::set_has_y(&has_bits);
-                        y_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+                                _Internal::set_has_x(&has_bits);
+                                x_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 y = 2;
+                        case 2:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+                                _Internal::set_has_y(&has_bits);
+                                y_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -6665,13 +6665,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagShift::_InternalSerialize(
@@ -6867,25 +6867,25 @@ namespace tibia
 
             const char* AppearanceFlagClothes::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional uint32 slot = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-                        _Internal::set_has_slot(&has_bits);
-                        slot_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+                                _Internal::set_has_slot(&has_bits);
+                                slot_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -6897,13 +6897,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagClothes::_InternalSerialize(
@@ -7075,29 +7075,29 @@ namespace tibia
 
             const char* AppearanceFlagDefaultAction::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional .tibia.protobuf.shared.PLAYER_ACTION action = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-                        ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                        if (PROTOBUF_PREDICT_TRUE(::tibia::protobuf::shared::PLAYER_ACTION_IsValid(val))) {
-                            _internal_set_action(static_cast<::tibia::protobuf::shared::PLAYER_ACTION>(val));
-                        } else {
-                            ::PROTOBUF_NAMESPACE_ID::internal::WriteVarint(1, val, mutable_unknown_fields());
-                        }
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+                                ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                                if (PROTOBUF_PREDICT_TRUE(::tibia::protobuf::shared::PLAYER_ACTION_IsValid(val))) {
+                                    _internal_set_action(static_cast<::tibia::protobuf::shared::PLAYER_ACTION>(val));
+                                } else {
+                                    ::PROTOBUF_NAMESPACE_ID::internal::WriteVarint(1, val, mutable_unknown_fields());
+                                }
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -7109,13 +7109,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagDefaultAction::_InternalSerialize(
@@ -7266,7 +7266,7 @@ namespace tibia
                 }
                 ::memcpy(&trade_as_object_id_, &from.trade_as_object_id_,
                   static_cast<size_t>(reinterpret_cast<char*>(&category_) -
-                      reinterpret_cast<char*>(&trade_as_object_id_)) + sizeof(category_));
+                                      reinterpret_cast<char*>(&trade_as_object_id_)) + sizeof(category_));
                 // @@protoc_insertion_point(copy_constructor:tibia.protobuf.appearances.AppearanceFlagMarket)
             }
 
@@ -7276,7 +7276,7 @@ namespace tibia
                 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
                     reinterpret_cast<char*>(&trade_as_object_id_) - reinterpret_cast<char*>(this)),
                     0, static_cast<size_t>(reinterpret_cast<char*>(&minimum_level_) -
-                        reinterpret_cast<char*>(&trade_as_object_id_)) + sizeof(minimum_level_));
+                                           reinterpret_cast<char*>(&trade_as_object_id_)) + sizeof(minimum_level_));
                 category_ = 1;
             }
 
@@ -7330,89 +7330,89 @@ namespace tibia
 
             const char* AppearanceFlagMarket::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional .tibia.protobuf.shared.ITEM_CATEGORY category = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-                        ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                        if (PROTOBUF_PREDICT_TRUE(::tibia::protobuf::shared::ITEM_CATEGORY_IsValid(val))) {
-                            _internal_set_category(static_cast<::tibia::protobuf::shared::ITEM_CATEGORY>(val));
-                        } else {
-                            ::PROTOBUF_NAMESPACE_ID::internal::WriteVarint(1, val, mutable_unknown_fields());
-                        }
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 trade_as_object_id = 2;
-                    case 2:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
-                        _Internal::set_has_trade_as_object_id(&has_bits);
-                        trade_as_object_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 show_as_object_id = 3;
-                    case 3:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
-                        _Internal::set_has_show_as_object_id(&has_bits);
-                        show_as_object_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional string name = 4;
-                    case 4:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
-                        auto str = _internal_mutable_name();
-                        ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-#ifndef NDEBUG
-                        ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "tibia.protobuf.appearances.AppearanceFlagMarket.name");
-#endif  // !NDEBUG
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // repeated .tibia.protobuf.shared.PLAYER_PROFESSION restrict_to_profession = 5;
-                    case 5:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
-                        ptr -= 1;
-                        do {
-                            ptr += 1;
-                            ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                            CHK_(ptr);
-                            if (PROTOBUF_PREDICT_TRUE(::tibia::protobuf::shared::PLAYER_PROFESSION_IsValid(val))) {
-                                _internal_add_restrict_to_profession(static_cast<::tibia::protobuf::shared::PLAYER_PROFESSION>(val));
-                            } else {
-                                ::PROTOBUF_NAMESPACE_ID::internal::WriteVarint(5, val, mutable_unknown_fields());
-                            }
-                            if (!ctx->DataAvailable(ptr)) break;
-                        } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<40>(ptr));
-                    } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42) {
-                        ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedEnumParser<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(_internal_mutable_restrict_to_profession(), ptr, ctx, ::tibia::protobuf::shared::PLAYER_PROFESSION_IsValid, &_internal_metadata_, 5);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 minimum_level = 6;
-                    case 6:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 48)) {
-                        _Internal::set_has_minimum_level(&has_bits);
-                        minimum_level_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+                                ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                                if (PROTOBUF_PREDICT_TRUE(::tibia::protobuf::shared::ITEM_CATEGORY_IsValid(val))) {
+                                    _internal_set_category(static_cast<::tibia::protobuf::shared::ITEM_CATEGORY>(val));
+                                } else {
+                                    ::PROTOBUF_NAMESPACE_ID::internal::WriteVarint(1, val, mutable_unknown_fields());
+                                }
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 trade_as_object_id = 2;
+                        case 2:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+                                _Internal::set_has_trade_as_object_id(&has_bits);
+                                trade_as_object_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 show_as_object_id = 3;
+                        case 3:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+                                _Internal::set_has_show_as_object_id(&has_bits);
+                                show_as_object_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional string name = 4;
+                        case 4:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+                                auto str = _internal_mutable_name();
+                                ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+                            #ifndef NDEBUG
+                                ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "tibia.protobuf.appearances.AppearanceFlagMarket.name");
+                            #endif  // !NDEBUG
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // repeated .tibia.protobuf.shared.PLAYER_PROFESSION restrict_to_profession = 5;
+                        case 5:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
+                                ptr -= 1;
+                                do {
+                                    ptr += 1;
+                                    ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                    CHK_(ptr);
+                                    if (PROTOBUF_PREDICT_TRUE(::tibia::protobuf::shared::PLAYER_PROFESSION_IsValid(val))) {
+                                        _internal_add_restrict_to_profession(static_cast<::tibia::protobuf::shared::PLAYER_PROFESSION>(val));
+                                    } else {
+                                        ::PROTOBUF_NAMESPACE_ID::internal::WriteVarint(5, val, mutable_unknown_fields());
+                                    }
+                                    if (!ctx->DataAvailable(ptr)) break;
+                                } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<40>(ptr));
+                            } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42) {
+                                ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedEnumParser<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(_internal_mutable_restrict_to_profession(), ptr, ctx, ::tibia::protobuf::shared::PLAYER_PROFESSION_IsValid, &_internal_metadata_, 5);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 minimum_level = 6;
+                        case 6:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 48)) {
+                                _Internal::set_has_minimum_level(&has_bits);
+                                minimum_level_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -7424,13 +7424,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagMarket::_InternalSerialize(
@@ -7692,7 +7692,7 @@ namespace tibia
                 }
                 ::memcpy(&sale_price_, &from.sale_price_,
                   static_cast<size_t>(reinterpret_cast<char*>(&currency_object_type_id_) -
-                      reinterpret_cast<char*>(&sale_price_)) + sizeof(currency_object_type_id_));
+                                      reinterpret_cast<char*>(&sale_price_)) + sizeof(currency_object_type_id_));
                 // @@protoc_insertion_point(copy_constructor:tibia.protobuf.appearances.AppearanceFlagNPC)
             }
 
@@ -7704,7 +7704,7 @@ namespace tibia
                 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
                     reinterpret_cast<char*>(&sale_price_) - reinterpret_cast<char*>(this)),
                     0, static_cast<size_t>(reinterpret_cast<char*>(&currency_object_type_id_) -
-                        reinterpret_cast<char*>(&sale_price_)) + sizeof(currency_object_type_id_));
+                                           reinterpret_cast<char*>(&sale_price_)) + sizeof(currency_object_type_id_));
             }
 
             AppearanceFlagNPC::~AppearanceFlagNPC()
@@ -7765,79 +7765,79 @@ namespace tibia
 
             const char* AppearanceFlagNPC::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional string name = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
-                        auto str = _internal_mutable_name();
-                        ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-#ifndef NDEBUG
-                        ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "tibia.protobuf.appearances.AppearanceFlagNPC.name");
-#endif  // !NDEBUG
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional string location = 2;
-                    case 2:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
-                        auto str = _internal_mutable_location();
-                        ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-#ifndef NDEBUG
-                        ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "tibia.protobuf.appearances.AppearanceFlagNPC.location");
-#endif  // !NDEBUG
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 sale_price = 3;
-                    case 3:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
-                        _Internal::set_has_sale_price(&has_bits);
-                        sale_price_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 buy_price = 4;
-                    case 4:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
-                        _Internal::set_has_buy_price(&has_bits);
-                        buy_price_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 currency_object_type_id = 5;
-                    case 5:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
-                        _Internal::set_has_currency_object_type_id(&has_bits);
-                        currency_object_type_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional string currency_quest_flag_display_name = 6;
-                    case 6:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
-                        auto str = _internal_mutable_currency_quest_flag_display_name();
-                        ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-#ifndef NDEBUG
-                        ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "tibia.protobuf.appearances.AppearanceFlagNPC.currency_quest_flag_display_name");
-#endif  // !NDEBUG
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+                                auto str = _internal_mutable_name();
+                                ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+                            #ifndef NDEBUG
+                                ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "tibia.protobuf.appearances.AppearanceFlagNPC.name");
+                            #endif  // !NDEBUG
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional string location = 2;
+                        case 2:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+                                auto str = _internal_mutable_location();
+                                ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+                            #ifndef NDEBUG
+                                ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "tibia.protobuf.appearances.AppearanceFlagNPC.location");
+                            #endif  // !NDEBUG
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 sale_price = 3;
+                        case 3:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+                                _Internal::set_has_sale_price(&has_bits);
+                                sale_price_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 buy_price = 4;
+                        case 4:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
+                                _Internal::set_has_buy_price(&has_bits);
+                                buy_price_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 currency_object_type_id = 5;
+                        case 5:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
+                                _Internal::set_has_currency_object_type_id(&has_bits);
+                                currency_object_type_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional string currency_quest_flag_display_name = 6;
+                        case 6:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
+                                auto str = _internal_mutable_currency_quest_flag_display_name();
+                                ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+                            #ifndef NDEBUG
+                                ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "tibia.protobuf.appearances.AppearanceFlagNPC.currency_quest_flag_display_name");
+                            #endif  // !NDEBUG
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -7849,13 +7849,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagNPC::_InternalSerialize(
@@ -8142,25 +8142,25 @@ namespace tibia
 
             const char* AppearanceFlagAutomap::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional uint32 color = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-                        _Internal::set_has_color(&has_bits);
-                        color_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+                                _Internal::set_has_color(&has_bits);
+                                color_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -8172,13 +8172,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagAutomap::_InternalSerialize(
@@ -8350,29 +8350,29 @@ namespace tibia
 
             const char* AppearanceFlagHook::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional .tibia.protobuf.shared.HOOK_TYPE direction = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-                        ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-                        CHK_(ptr);
-                        if (PROTOBUF_PREDICT_TRUE(::tibia::protobuf::shared::HOOK_TYPE_IsValid(val))) {
-                            _internal_set_direction(static_cast<::tibia::protobuf::shared::HOOK_TYPE>(val));
-                        } else {
-                            ::PROTOBUF_NAMESPACE_ID::internal::WriteVarint(1, val, mutable_unknown_fields());
-                        }
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+                                ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+                                CHK_(ptr);
+                                if (PROTOBUF_PREDICT_TRUE(::tibia::protobuf::shared::HOOK_TYPE_IsValid(val))) {
+                                    _internal_set_direction(static_cast<::tibia::protobuf::shared::HOOK_TYPE>(val));
+                                } else {
+                                    ::PROTOBUF_NAMESPACE_ID::internal::WriteVarint(1, val, mutable_unknown_fields());
+                                }
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -8384,13 +8384,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagHook::_InternalSerialize(
@@ -8564,25 +8564,25 @@ namespace tibia
 
             const char* AppearanceFlagLenshelp::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional uint32 id = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-                        _Internal::set_has_id(&has_bits);
-                        id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+                                _Internal::set_has_id(&has_bits);
+                                id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -8594,13 +8594,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagLenshelp::_InternalSerialize(
@@ -8772,25 +8772,25 @@ namespace tibia
 
             const char* AppearanceFlagUpgradeClassification::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional uint32 upgrade_classification = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-                        _Internal::set_has_upgrade_classification(&has_bits);
-                        upgrade_classification_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+                                _Internal::set_has_upgrade_classification(&has_bits);
+                                upgrade_classification_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -8802,13 +8802,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagUpgradeClassification::_InternalSerialize(
@@ -8980,25 +8980,25 @@ namespace tibia
 
             const char* AppearanceFlagChangedToExpire::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional uint32 former_object_typeid = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-                        _Internal::set_has_former_object_typeid(&has_bits);
-                        former_object_typeid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+                                _Internal::set_has_former_object_typeid(&has_bits);
+                                former_object_typeid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -9010,13 +9010,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagChangedToExpire::_InternalSerialize(
@@ -9188,25 +9188,25 @@ namespace tibia
 
             const char* AppearanceFlagCyclopedia::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional uint32 cyclopedia_type = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-                        _Internal::set_has_cyclopedia_type(&has_bits);
-                        cyclopedia_type_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+                                _Internal::set_has_cyclopedia_type(&has_bits);
+                                cyclopedia_type_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -9218,13 +9218,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagCyclopedia::_InternalSerialize(
@@ -9370,7 +9370,7 @@ namespace tibia
                 _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
                 ::memcpy(&gold_coin_id_, &from.gold_coin_id_,
                   static_cast<size_t>(reinterpret_cast<char*>(&supply_stash_id_) -
-                      reinterpret_cast<char*>(&gold_coin_id_)) + sizeof(supply_stash_id_));
+                                      reinterpret_cast<char*>(&gold_coin_id_)) + sizeof(supply_stash_id_));
                 // @@protoc_insertion_point(copy_constructor:tibia.protobuf.appearances.SpecialMeaningAppearanceIds)
             }
 
@@ -9379,7 +9379,7 @@ namespace tibia
                 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
                     reinterpret_cast<char*>(&gold_coin_id_) - reinterpret_cast<char*>(this)),
                     0, static_cast<size_t>(reinterpret_cast<char*>(&supply_stash_id_) -
-                        reinterpret_cast<char*>(&gold_coin_id_)) + sizeof(supply_stash_id_));
+                                           reinterpret_cast<char*>(&gold_coin_id_)) + sizeof(supply_stash_id_));
             }
 
             SpecialMeaningAppearanceIds::~SpecialMeaningAppearanceIds()
@@ -9426,70 +9426,70 @@ namespace tibia
 
             const char* SpecialMeaningAppearanceIds::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx)
             {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+            #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
                 _Internal::HasBits has_bits{};
                 while (!ctx->Done(&ptr)) {
                     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
                     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
                     switch (tag >> 3) {
                         // optional uint32 gold_coin_id = 1;
-                    case 1:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-                        _Internal::set_has_gold_coin_id(&has_bits);
-                        gold_coin_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 platinum_coin_id = 2;
-                    case 2:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
-                        _Internal::set_has_platinum_coin_id(&has_bits);
-                        platinum_coin_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 crystal_coin_id = 3;
-                    case 3:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
-                        _Internal::set_has_crystal_coin_id(&has_bits);
-                        crystal_coin_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 tibia_coin_id = 4;
-                    case 4:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
-                        _Internal::set_has_tibia_coin_id(&has_bits);
-                        tibia_coin_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 stamped_letter_id = 5;
-                    case 5:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
-                        _Internal::set_has_stamped_letter_id(&has_bits);
-                        stamped_letter_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    // optional uint32 supply_stash_id = 6;
-                    case 6:
-                    if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 48)) {
-                        _Internal::set_has_supply_stash_id(&has_bits);
-                        supply_stash_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-                        CHK_(ptr);
-                    } else
-                        goto handle_unusual;
-                    continue;
-                    default:
-                    goto handle_unusual;
+                        case 1:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+                                _Internal::set_has_gold_coin_id(&has_bits);
+                                gold_coin_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 platinum_coin_id = 2;
+                        case 2:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+                                _Internal::set_has_platinum_coin_id(&has_bits);
+                                platinum_coin_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 crystal_coin_id = 3;
+                        case 3:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+                                _Internal::set_has_crystal_coin_id(&has_bits);
+                                crystal_coin_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 tibia_coin_id = 4;
+                        case 4:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
+                                _Internal::set_has_tibia_coin_id(&has_bits);
+                                tibia_coin_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 stamped_letter_id = 5;
+                        case 5:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
+                                _Internal::set_has_stamped_letter_id(&has_bits);
+                                stamped_letter_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                            // optional uint32 supply_stash_id = 6;
+                        case 6:
+                            if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 48)) {
+                                _Internal::set_has_supply_stash_id(&has_bits);
+                                supply_stash_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+                                CHK_(ptr);
+                            } else
+                                goto handle_unusual;
+                            continue;
+                        default:
+                            goto handle_unusual;
                     }  // switch
-                handle_unusual:
+                    handle_unusual:
                     if ((tag == 0) || ((tag & 7) == 4)) {
                         CHK_(ptr);
                         ctx->SetLastTag(tag);
@@ -9501,13 +9501,13 @@ namespace tibia
                         ptr, ctx);
                     CHK_(ptr != nullptr);
                 }  // while
-            message_done:
+                message_done:
                 _has_bits_.Or(has_bits);
                 return ptr;
-            failure:
+                failure:
                 ptr = nullptr;
                 goto message_done;
-#undef CHK_
+            #undef CHK_
             }
 
             ::PROTOBUF_NAMESPACE_ID::uint8* SpecialMeaningAppearanceIds::_InternalSerialize(

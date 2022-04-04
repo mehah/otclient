@@ -535,26 +535,26 @@ Fw::Key WIN32Window::retranslateVirtualKey(WPARAM wParam, LPARAM lParam)
         const bool numlockOn = GetKeyState(VK_NUMLOCK);
         // retranslate numpad keys
         switch (wParam) {
-        case VK_INSERT:
-        return numlockOn ? Fw::KeyUnknown : Fw::KeyNumpad0;
-        case VK_END:
-        return numlockOn ? Fw::KeyUnknown : Fw::KeyNumpad1;
-        case VK_DOWN:
-        return numlockOn ? Fw::KeyUnknown : Fw::KeyNumpad2;
-        case VK_NEXT:
-        return numlockOn ? Fw::KeyUnknown : Fw::KeyNumpad3;
-        case VK_LEFT:
-        return numlockOn ? Fw::KeyUnknown : Fw::KeyNumpad4;
-        case VK_CLEAR:
-        return numlockOn ? Fw::KeyUnknown : Fw::KeyNumpad5;
-        case VK_RIGHT:
-        return numlockOn ? Fw::KeyUnknown : Fw::KeyNumpad6;
-        case VK_HOME:
-        return numlockOn ? Fw::KeyUnknown : Fw::KeyNumpad7;
-        case VK_UP:
-        return numlockOn ? Fw::KeyUnknown : Fw::KeyNumpad8;
-        case VK_PRIOR:
-        return numlockOn ? Fw::KeyUnknown : Fw::KeyNumpad9;
+            case VK_INSERT:
+                return numlockOn ? Fw::KeyUnknown : Fw::KeyNumpad0;
+            case VK_END:
+                return numlockOn ? Fw::KeyUnknown : Fw::KeyNumpad1;
+            case VK_DOWN:
+                return numlockOn ? Fw::KeyUnknown : Fw::KeyNumpad2;
+            case VK_NEXT:
+                return numlockOn ? Fw::KeyUnknown : Fw::KeyNumpad3;
+            case VK_LEFT:
+                return numlockOn ? Fw::KeyUnknown : Fw::KeyNumpad4;
+            case VK_CLEAR:
+                return numlockOn ? Fw::KeyUnknown : Fw::KeyNumpad5;
+            case VK_RIGHT:
+                return numlockOn ? Fw::KeyUnknown : Fw::KeyNumpad6;
+            case VK_HOME:
+                return numlockOn ? Fw::KeyUnknown : Fw::KeyNumpad7;
+            case VK_UP:
+                return numlockOn ? Fw::KeyUnknown : Fw::KeyNumpad8;
+            case VK_PRIOR:
+                return numlockOn ? Fw::KeyUnknown : Fw::KeyNumpad9;
         }
     }
 
@@ -593,207 +593,207 @@ LRESULT WIN32Window::windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
     bool notificateMapKeyEvent = false;
     switch (uMsg) {
-    case WM_SETCURSOR:
-    {
-        if (m_cursor)
-            SetCursor(m_cursor);
-        else
-            return DefWindowProc(hWnd, uMsg, wParam, lParam);
-        break;
-    }
-    case WM_ACTIVATE:
-    {
-        m_focused = !(wParam == WA_INACTIVE);
-        releaseAllKeys();
-        break;
-    }
-    case WM_SETFOCUS:
-    case WM_KILLFOCUS:
-    {
-        releaseAllKeys();
-        break;
-    }
-    case WM_CHAR:
-    {
-        if (wParam >= 32 && wParam <= 255) {
-            m_inputEvent.reset(Fw::KeyTextInputEvent);
-            m_inputEvent.keyText = wParam;
+        case WM_SETCURSOR:
+        {
+            if (m_cursor)
+                SetCursor(m_cursor);
+            else
+                return DefWindowProc(hWnd, uMsg, wParam, lParam);
+            break;
+        }
+        case WM_ACTIVATE:
+        {
+            m_focused = !(wParam == WA_INACTIVE);
+            releaseAllKeys();
+            break;
+        }
+        case WM_SETFOCUS:
+        case WM_KILLFOCUS:
+        {
+            releaseAllKeys();
+            break;
+        }
+        case WM_CHAR:
+        {
+            if (wParam >= 32 && wParam <= 255) {
+                m_inputEvent.reset(Fw::KeyTextInputEvent);
+                m_inputEvent.keyText = wParam;
+                if (m_onInputEvent)
+                    m_onInputEvent(m_inputEvent);
+            }
+            break;
+        }
+        case WM_CLOSE:
+        {
+            m_onClose();
+            break;
+        }
+        case WM_KEYDOWN:
+        {
+            notificateMapKeyEvent = true;
+            processKeyDown(retranslateVirtualKey(wParam, lParam));
+            break;
+        }
+        case WM_KEYUP:
+        {
+            notificateMapKeyEvent = true;
+            processKeyUp(retranslateVirtualKey(wParam, lParam));
+            break;
+        }
+        case WM_SYSKEYUP:
+        {
+            notificateMapKeyEvent = true;
+            processKeyUp(retranslateVirtualKey(wParam, lParam));
+            break;
+        }
+        case WM_SYSKEYDOWN:
+        {
+            if (wParam == VK_F4 && m_inputEvent.keyboardModifiers & Fw::KeyboardAltModifier)
+                return DefWindowProc(hWnd, uMsg, wParam, lParam);
+
+            notificateMapKeyEvent = true;
+            processKeyDown(retranslateVirtualKey(wParam, lParam));
+            break;
+        }
+        case WM_LBUTTONDOWN:
+        {
+            SetCapture(m_window);
+            m_inputEvent.reset(Fw::MousePressInputEvent);
+            m_inputEvent.mouseButton = Fw::MouseLeftButton;
+            m_mouseButtonStates[Fw::MouseLeftButton] = true;
             if (m_onInputEvent)
                 m_onInputEvent(m_inputEvent);
+            break;
         }
-        break;
-    }
-    case WM_CLOSE:
-    {
-        m_onClose();
-        break;
-    }
-    case WM_KEYDOWN:
-    {
-        notificateMapKeyEvent = true;
-        processKeyDown(retranslateVirtualKey(wParam, lParam));
-        break;
-    }
-    case WM_KEYUP:
-    {
-        notificateMapKeyEvent = true;
-        processKeyUp(retranslateVirtualKey(wParam, lParam));
-        break;
-    }
-    case WM_SYSKEYUP:
-    {
-        notificateMapKeyEvent = true;
-        processKeyUp(retranslateVirtualKey(wParam, lParam));
-        break;
-    }
-    case WM_SYSKEYDOWN:
-    {
-        if (wParam == VK_F4 && m_inputEvent.keyboardModifiers & Fw::KeyboardAltModifier)
+        case WM_LBUTTONUP:
+        {
+            SetCapture(nullptr);
+            m_inputEvent.reset(Fw::MouseReleaseInputEvent);
+            m_inputEvent.mouseButton = Fw::MouseLeftButton;
+            m_mouseButtonStates[Fw::MouseLeftButton] = false;
+            if (m_onInputEvent)
+                m_onInputEvent(m_inputEvent);
+            break;
+        }
+        case WM_MBUTTONDOWN:
+        {
+            SetCapture(m_window);
+            m_inputEvent.reset(Fw::MousePressInputEvent);
+            m_inputEvent.mouseButton = Fw::MouseMidButton;
+            m_mouseButtonStates[Fw::MouseMidButton] = true;
+            if (m_onInputEvent)
+                m_onInputEvent(m_inputEvent);
+            break;
+        }
+        case WM_MBUTTONUP:
+        {
+            SetCapture(nullptr);
+            m_inputEvent.reset(Fw::MouseReleaseInputEvent);
+            m_inputEvent.mouseButton = Fw::MouseMidButton;
+            m_mouseButtonStates[Fw::MouseMidButton] = false;
+            if (m_onInputEvent)
+                m_onInputEvent(m_inputEvent);
+            break;
+        }
+        case WM_RBUTTONDOWN:
+        {
+            SetCapture(m_window);
+            m_inputEvent.reset(Fw::MousePressInputEvent);
+            m_inputEvent.mouseButton = Fw::MouseRightButton;
+            m_mouseButtonStates[Fw::MouseRightButton] = true;
+            if (m_onInputEvent)
+                m_onInputEvent(m_inputEvent);
+            break;
+        }
+        case WM_RBUTTONUP:
+        {
+            SetCapture(nullptr);
+            m_inputEvent.reset(Fw::MouseReleaseInputEvent);
+            m_inputEvent.mouseButton = Fw::MouseRightButton;
+            m_mouseButtonStates[Fw::MouseRightButton] = false;
+            if (m_onInputEvent)
+                m_onInputEvent(m_inputEvent);
+            break;
+        }
+        case WM_MOUSEMOVE:
+        {
+            m_inputEvent.reset(Fw::MouseMoveInputEvent);
+
+            Point newMousePos(LOWORD(lParam), HIWORD(lParam));
+            if (newMousePos.x >= 32767)
+                newMousePos.x = 0;
+            else
+                newMousePos.x = std::min<int32>(newMousePos.x, m_size.width());
+
+            if (newMousePos.y >= 32767)
+                newMousePos.y = 0;
+            else
+                newMousePos.y = std::min<int32>(newMousePos.y, m_size.height());
+
+            m_inputEvent.mouseMoved = newMousePos - m_inputEvent.mousePos;
+            m_inputEvent.mousePos = newMousePos;
+            if (m_onInputEvent)
+                m_onInputEvent(m_inputEvent);
+            break;
+        }
+        case WM_MOUSEWHEEL:
+        {
+            m_inputEvent.reset(Fw::MouseWheelInputEvent);
+            m_inputEvent.mouseButton = Fw::MouseMidButton;
+            m_inputEvent.wheelDirection = static_cast<short>(HIWORD(wParam)) > 0 ? Fw::MouseWheelUp : Fw::MouseWheelDown;
+            if (m_onInputEvent)
+                m_onInputEvent(m_inputEvent);
+            break;
+        }
+        case WM_MOVE:
+        {
+            m_position.x = static_cast<short>(LOWORD(lParam));
+            m_position.y = static_cast<short>(HIWORD(lParam));
+            break;
+        }
+        case WM_GETMINMAXINFO:
+        {
+            const auto pMMI = (LPMINMAXINFO)lParam;
+            const Rect adjustedRect = adjustWindowRect(Rect(0, 0, m_minimumSize));
+            pMMI->ptMinTrackSize.x = adjustedRect.width();
+            pMMI->ptMinTrackSize.y = adjustedRect.height();
+            break;
+        }
+        case WM_SIZE:
+        {
+            bool forceResize = false;
+            switch (wParam) {
+                case SIZE_MAXIMIZED:
+                    m_maximized = true;
+                    m_visible = true;
+                    forceResize = true;
+                    break;
+                case SIZE_RESTORED:
+                    m_maximized = false;
+                    m_visible = true;
+                    forceResize = true;
+                    break;
+                case SIZE_MINIMIZED:
+                    m_visible = false;
+                    break;
+            }
+
+            if (m_visible && m_deviceContext)
+                internalRestoreGLContext();
+
+            auto size = Size(LOWORD(lParam), HIWORD(lParam));
+            size.setWidth(std::max<int32>(std::min<int32>(size.width(), 7680), 32));
+            size.setHeight(std::max<int32>(std::min<int32>(size.height(), 4320), 32));
+
+            if (m_visible && (forceResize || m_size != size)) {
+                m_size = size;
+                m_onResize(m_size);
+            }
+
+            break;
+        }
+        default:
             return DefWindowProc(hWnd, uMsg, wParam, lParam);
-
-        notificateMapKeyEvent = true;
-        processKeyDown(retranslateVirtualKey(wParam, lParam));
-        break;
-    }
-    case WM_LBUTTONDOWN:
-    {
-        SetCapture(m_window);
-        m_inputEvent.reset(Fw::MousePressInputEvent);
-        m_inputEvent.mouseButton = Fw::MouseLeftButton;
-        m_mouseButtonStates[Fw::MouseLeftButton] = true;
-        if (m_onInputEvent)
-            m_onInputEvent(m_inputEvent);
-        break;
-    }
-    case WM_LBUTTONUP:
-    {
-        SetCapture(nullptr);
-        m_inputEvent.reset(Fw::MouseReleaseInputEvent);
-        m_inputEvent.mouseButton = Fw::MouseLeftButton;
-        m_mouseButtonStates[Fw::MouseLeftButton] = false;
-        if (m_onInputEvent)
-            m_onInputEvent(m_inputEvent);
-        break;
-    }
-    case WM_MBUTTONDOWN:
-    {
-        SetCapture(m_window);
-        m_inputEvent.reset(Fw::MousePressInputEvent);
-        m_inputEvent.mouseButton = Fw::MouseMidButton;
-        m_mouseButtonStates[Fw::MouseMidButton] = true;
-        if (m_onInputEvent)
-            m_onInputEvent(m_inputEvent);
-        break;
-    }
-    case WM_MBUTTONUP:
-    {
-        SetCapture(nullptr);
-        m_inputEvent.reset(Fw::MouseReleaseInputEvent);
-        m_inputEvent.mouseButton = Fw::MouseMidButton;
-        m_mouseButtonStates[Fw::MouseMidButton] = false;
-        if (m_onInputEvent)
-            m_onInputEvent(m_inputEvent);
-        break;
-    }
-    case WM_RBUTTONDOWN:
-    {
-        SetCapture(m_window);
-        m_inputEvent.reset(Fw::MousePressInputEvent);
-        m_inputEvent.mouseButton = Fw::MouseRightButton;
-        m_mouseButtonStates[Fw::MouseRightButton] = true;
-        if (m_onInputEvent)
-            m_onInputEvent(m_inputEvent);
-        break;
-    }
-    case WM_RBUTTONUP:
-    {
-        SetCapture(nullptr);
-        m_inputEvent.reset(Fw::MouseReleaseInputEvent);
-        m_inputEvent.mouseButton = Fw::MouseRightButton;
-        m_mouseButtonStates[Fw::MouseRightButton] = false;
-        if (m_onInputEvent)
-            m_onInputEvent(m_inputEvent);
-        break;
-    }
-    case WM_MOUSEMOVE:
-    {
-        m_inputEvent.reset(Fw::MouseMoveInputEvent);
-
-        Point newMousePos(LOWORD(lParam), HIWORD(lParam));
-        if (newMousePos.x >= 32767)
-            newMousePos.x = 0;
-        else
-            newMousePos.x = std::min<int32>(newMousePos.x, m_size.width());
-
-        if (newMousePos.y >= 32767)
-            newMousePos.y = 0;
-        else
-            newMousePos.y = std::min<int32>(newMousePos.y, m_size.height());
-
-        m_inputEvent.mouseMoved = newMousePos - m_inputEvent.mousePos;
-        m_inputEvent.mousePos = newMousePos;
-        if (m_onInputEvent)
-            m_onInputEvent(m_inputEvent);
-        break;
-    }
-    case WM_MOUSEWHEEL:
-    {
-        m_inputEvent.reset(Fw::MouseWheelInputEvent);
-        m_inputEvent.mouseButton = Fw::MouseMidButton;
-        m_inputEvent.wheelDirection = static_cast<short>(HIWORD(wParam)) > 0 ? Fw::MouseWheelUp : Fw::MouseWheelDown;
-        if (m_onInputEvent)
-            m_onInputEvent(m_inputEvent);
-        break;
-    }
-    case WM_MOVE:
-    {
-        m_position.x = static_cast<short>(LOWORD(lParam));
-        m_position.y = static_cast<short>(HIWORD(lParam));
-        break;
-    }
-    case WM_GETMINMAXINFO:
-    {
-        const auto pMMI = (LPMINMAXINFO)lParam;
-        const Rect adjustedRect = adjustWindowRect(Rect(0, 0, m_minimumSize));
-        pMMI->ptMinTrackSize.x = adjustedRect.width();
-        pMMI->ptMinTrackSize.y = adjustedRect.height();
-        break;
-    }
-    case WM_SIZE:
-    {
-        bool forceResize = false;
-        switch (wParam) {
-        case SIZE_MAXIMIZED:
-        m_maximized = true;
-        m_visible = true;
-        forceResize = true;
-        break;
-        case SIZE_RESTORED:
-        m_maximized = false;
-        m_visible = true;
-        forceResize = true;
-        break;
-        case SIZE_MINIMIZED:
-        m_visible = false;
-        break;
-        }
-
-        if (m_visible && m_deviceContext)
-            internalRestoreGLContext();
-
-        auto size = Size(LOWORD(lParam), HIWORD(lParam));
-        size.setWidth(std::max<int32>(std::min<int32>(size.width(), 7680), 32));
-        size.setHeight(std::max<int32>(std::min<int32>(size.height(), 4320), 32));
-
-        if (m_visible && (forceResize || m_size != size)) {
-            m_size = size;
-            m_onResize(m_size);
-        }
-
-        break;
-    }
-    default:
-    return DefWindowProc(hWnd, uMsg, wParam, lParam);
     }
 
     if (m_inputEvent.keyboardModifiers || notificateMapKeyEvent) {

@@ -68,7 +68,7 @@ void LuaInterface::init()
         const LuaObjectPtr obj = g_lua.popObject();
         obj->luaGetFieldsTable();
         return 1;
-        }));
+    }));
 }
 
 void LuaInterface::terminate()

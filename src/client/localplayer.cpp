@@ -179,7 +179,7 @@ bool LocalPlayer::autoWalk(const Position& destination, const bool retry)
         }
 
         g_game.autoWalk(result->path, result->start);
-        });
+    });
 
     if (!retry)
         lockWalk();

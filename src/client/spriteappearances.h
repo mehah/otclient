@@ -45,11 +45,11 @@ public:
         Size size(SPRITE_SIZE, SPRITE_SIZE);
 
         switch (spriteLayout) {
-        case SpriteLayout::ONE_BY_ONE: break;
-        case SpriteLayout::ONE_BY_TWO: size.setHeight(64); break;
-        case SpriteLayout::TWO_BY_ONE: size.setWidth(64); break;
-        case SpriteLayout::TWO_BY_TWO: size.resize(64, 64); break;
-        default: break;
+            case SpriteLayout::ONE_BY_ONE: break;
+            case SpriteLayout::ONE_BY_TWO: size.setHeight(64); break;
+            case SpriteLayout::TWO_BY_ONE: size.setWidth(64); break;
+            case SpriteLayout::TWO_BY_TWO: size.resize(64, 64); break;
+            default: break;
         }
 
         return size;

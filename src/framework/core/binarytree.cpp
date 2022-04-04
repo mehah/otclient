@@ -37,18 +37,18 @@ void BinaryTree::skipNodes()
     while (true) {
         const uint8 byte = m_fin->getU8();
         switch (byte) {
-        case BINARYTREE_NODE_START:
-        {
-            skipNodes();
-            break;
-        }
-        case BINARYTREE_NODE_END:
-        return;
-        case BINARYTREE_ESCAPE_CHAR:
-        m_fin->getU8();
-        break;
-        default:
-        break;
+            case BINARYTREE_NODE_START:
+            {
+                skipNodes();
+                break;
+            }
+            case BINARYTREE_NODE_END:
+                return;
+            case BINARYTREE_ESCAPE_CHAR:
+                m_fin->getU8();
+                break;
+            default:
+                break;
         }
     }
 }
@@ -63,19 +63,19 @@ void BinaryTree::unserialize()
     while (true) {
         uint8 byte = m_fin->getU8();
         switch (byte) {
-        case BINARYTREE_NODE_START:
-        {
-            skipNodes();
-            break;
-        }
-        case BINARYTREE_NODE_END:
-        return;
-        case BINARYTREE_ESCAPE_CHAR:
-        m_buffer.add(m_fin->getU8());
-        break;
-        default:
-        m_buffer.add(byte);
-        break;
+            case BINARYTREE_NODE_START:
+            {
+                skipNodes();
+                break;
+            }
+            case BINARYTREE_NODE_END:
+                return;
+            case BINARYTREE_ESCAPE_CHAR:
+                m_buffer.add(m_fin->getU8());
+                break;
+            default:
+                m_buffer.add(byte);
+                break;
         }
     }
 }
@@ -87,20 +87,20 @@ BinaryTreeVec BinaryTree::getChildren()
     while (true) {
         const uint8 byte = m_fin->getU8();
         switch (byte) {
-        case BINARYTREE_NODE_START:
-        {
-            BinaryTreePtr node(new BinaryTree(m_fin));
-            children.push_back(node);
-            node->skipNodes();
-            break;
-        }
-        case BINARYTREE_NODE_END:
-        return children;
-        case BINARYTREE_ESCAPE_CHAR:
-        m_fin->getU8();
-        break;
-        default:
-        break;
+            case BINARYTREE_NODE_START:
+            {
+                BinaryTreePtr node(new BinaryTree(m_fin));
+                children.push_back(node);
+                node->skipNodes();
+                break;
+            }
+            case BINARYTREE_NODE_END:
+                return children;
+            case BINARYTREE_ESCAPE_CHAR:
+                m_fin->getU8();
+                break;
+            default:
+                break;
         }
     }
 }

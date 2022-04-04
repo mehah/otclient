@@ -47,36 +47,36 @@ public:
     {
         Position pos = *this;
         switch (direction) {
-        case Otc::North:
-        --pos.y;
-        break;
-        case Otc::East:
-        ++pos.x;
-        break;
-        case Otc::South:
-        ++pos.y;
-        break;
-        case Otc::West:
-        --pos.x;
-        break;
-        case Otc::NorthEast:
-        ++pos.x;
-        --pos.y;
-        break;
-        case Otc::SouthEast:
-        ++pos.x;
-        ++pos.y;
-        break;
-        case Otc::SouthWest:
-        --pos.x;
-        ++pos.y;
-        break;
-        case Otc::NorthWest:
-        --pos.x;
-        --pos.y;
-        break;
-        default:
-        break;
+            case Otc::North:
+                --pos.y;
+                break;
+            case Otc::East:
+                ++pos.x;
+                break;
+            case Otc::South:
+                ++pos.y;
+                break;
+            case Otc::West:
+                --pos.x;
+                break;
+            case Otc::NorthEast:
+                ++pos.x;
+                --pos.y;
+                break;
+            case Otc::SouthEast:
+                ++pos.x;
+                ++pos.y;
+                break;
+            case Otc::SouthWest:
+                --pos.x;
+                ++pos.y;
+                break;
+            case Otc::NorthWest:
+                --pos.x;
+                --pos.y;
+                break;
+            default:
+                break;
         }
         return pos;
     }
@@ -85,36 +85,36 @@ public:
     {
         Position pos = *this;
         switch (direction) {
-        case Otc::North:
-        ++pos.y;
-        break;
-        case Otc::East:
-        --pos.x;
-        break;
-        case Otc::South:
-        --pos.y;
-        break;
-        case Otc::West:
-        ++pos.x;
-        break;
-        case Otc::NorthEast:
-        --pos.x;
-        ++pos.y;
-        break;
-        case Otc::SouthEast:
-        --pos.x;
-        --pos.y;
-        break;
-        case Otc::SouthWest:
-        ++pos.x;
-        --pos.y;
-        break;
-        case Otc::NorthWest:
-        ++pos.x;
-        ++pos.y;
-        break;
-        default:
-        break;
+            case Otc::North:
+                ++pos.y;
+                break;
+            case Otc::East:
+                --pos.x;
+                break;
+            case Otc::South:
+                --pos.y;
+                break;
+            case Otc::West:
+                ++pos.x;
+                break;
+            case Otc::NorthEast:
+                --pos.x;
+                ++pos.y;
+                break;
+            case Otc::SouthEast:
+                --pos.x;
+                --pos.y;
+                break;
+            case Otc::SouthWest:
+                ++pos.x;
+                --pos.y;
+                break;
+            case Otc::NorthWest:
+                ++pos.x;
+                ++pos.y;
+                break;
+            default:
+                break;
         }
         return pos;
     }

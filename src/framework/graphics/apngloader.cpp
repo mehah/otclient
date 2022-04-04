@@ -171,11 +171,11 @@ void unpack(z_stream& zstream, unsigned char* dst, unsigned int dst_size, unsign
 
     for (unsigned int j = 0; j < h; j++) {
         switch (*row++) {
-        case 0: break;
-        case 1: read_sub_row(row, rowbytes, bpp); break;
-        case 2: read_up_row(row, prev_row, rowbytes, bpp); break;
-        case 3: read_average_row(row, prev_row, rowbytes, bpp); break;
-        case 4: read_paeth_row(row, prev_row, rowbytes, bpp); break;
+            case 0: break;
+            case 1: read_sub_row(row, rowbytes, bpp); break;
+            case 2: read_up_row(row, prev_row, rowbytes, bpp); break;
+            case 3: read_average_row(row, prev_row, rowbytes, bpp); break;
+            case 4: read_paeth_row(row, prev_row, rowbytes, bpp); break;
         }
         prev_row = row;
         row += rowbytes;
@@ -193,20 +193,20 @@ void compose0(unsigned char* dst1, unsigned int dstbytes1, unsigned char* dst2, 
 
         if (bop == PNG_BLEND_OP_SOURCE) {
             switch (depth) {
-            case 16: for (i = 0; i < w; i++) { a = 0xFF; if (hasTRNS && readshort(sp) == trns1) a = 0; *dp1++ = *sp; *dp2++ = (a << 24) + (*sp << 16) + (*sp << 8) + *sp; sp += 2; }  break;
-            case 8:  for (i = 0; i < w; i++) { a = 0xFF; if (hasTRNS && *sp == trns1)           a = 0; *dp1++ = *sp; *dp2++ = (a << 24) + (*sp << 16) + (*sp << 8) + *sp; sp++; }  break;
-            case 4:  for (i = 0; i < w; i++) { g = (sp[i >> 1] & mask4[i & 1]) >> shift4[i & 1]; a = 0xFF; if (hasTRNS && g == trns1) a = 0; *dp1++ = g * 0x11; *dp2++ = (a << 24) + g * 0x111111; } break;
-            case 2:  for (i = 0; i < w; i++) { g = (sp[i >> 2] & mask2[i & 3]) >> shift2[i & 3]; a = 0xFF; if (hasTRNS && g == trns1) a = 0; *dp1++ = g * 0x55; *dp2++ = (a << 24) + g * 0x555555; } break;
-            case 1:  for (i = 0; i < w; i++) { g = (sp[i >> 3] & mask1[i & 7]) >> shift1[i & 7]; a = 0xFF; if (hasTRNS && g == trns1) a = 0; *dp1++ = g * 0xFF; *dp2++ = (a << 24) + g * 0xFFFFFF; } break;
+                case 16: for (i = 0; i < w; i++) { a = 0xFF; if (hasTRNS && readshort(sp) == trns1) a = 0; *dp1++ = *sp; *dp2++ = (a << 24) + (*sp << 16) + (*sp << 8) + *sp; sp += 2; }  break;
+                case 8:  for (i = 0; i < w; i++) { a = 0xFF; if (hasTRNS && *sp == trns1)           a = 0; *dp1++ = *sp; *dp2++ = (a << 24) + (*sp << 16) + (*sp << 8) + *sp; sp++; }  break;
+                case 4:  for (i = 0; i < w; i++) { g = (sp[i >> 1] & mask4[i & 1]) >> shift4[i & 1]; a = 0xFF; if (hasTRNS && g == trns1) a = 0; *dp1++ = g * 0x11; *dp2++ = (a << 24) + g * 0x111111; } break;
+                case 2:  for (i = 0; i < w; i++) { g = (sp[i >> 2] & mask2[i & 3]) >> shift2[i & 3]; a = 0xFF; if (hasTRNS && g == trns1) a = 0; *dp1++ = g * 0x55; *dp2++ = (a << 24) + g * 0x555555; } break;
+                case 1:  for (i = 0; i < w; i++) { g = (sp[i >> 3] & mask1[i & 7]) >> shift1[i & 7]; a = 0xFF; if (hasTRNS && g == trns1) a = 0; *dp1++ = g * 0xFF; *dp2++ = (a << 24) + g * 0xFFFFFF; } break;
             }
         } else /* PNG_BLEND_OP_OVER */
         {
             switch (depth) {
-            case 16: for (i = 0; i < w; i++, dp1++, dp2++) { if (readshort(sp) != trns1) { *dp1 = *sp; *dp2 = 0xFF000000 + (*sp << 16) + (*sp << 8) + *sp; } sp += 2; } break;
-            case 8:  for (i = 0; i < w; i++, dp1++, dp2++) { if (*sp != trns1) { *dp1 = *sp; *dp2 = 0xFF000000 + (*sp << 16) + (*sp << 8) + *sp; } sp++; } break;
-            case 4:  for (i = 0; i < w; i++, dp1++, dp2++) { g = (sp[i >> 1] & mask4[i & 1]) >> shift4[i & 1]; if (g != trns1) { *dp1 = g * 0x11; *dp2 = 0xFF000000 + g * 0x111111; } } break;
-            case 2:  for (i = 0; i < w; i++, dp1++, dp2++) { g = (sp[i >> 2] & mask2[i & 3]) >> shift2[i & 3]; if (g != trns1) { *dp1 = g * 0x55; *dp2 = 0xFF000000 + g * 0x555555; } } break;
-            case 1:  for (i = 0; i < w; i++, dp1++, dp2++) { g = (sp[i >> 3] & mask1[i & 7]) >> shift1[i & 7]; if (g != trns1) { *dp1 = g * 0xFF; *dp2 = 0xFF000000 + g * 0xFFFFFF; } } break;
+                case 16: for (i = 0; i < w; i++, dp1++, dp2++) { if (readshort(sp) != trns1) { *dp1 = *sp; *dp2 = 0xFF000000 + (*sp << 16) + (*sp << 8) + *sp; } sp += 2; } break;
+                case 8:  for (i = 0; i < w; i++, dp1++, dp2++) { if (*sp != trns1) { *dp1 = *sp; *dp2 = 0xFF000000 + (*sp << 16) + (*sp << 8) + *sp; } sp++; } break;
+                case 4:  for (i = 0; i < w; i++, dp1++, dp2++) { g = (sp[i >> 1] & mask4[i & 1]) >> shift4[i & 1]; if (g != trns1) { *dp1 = g * 0x11; *dp2 = 0xFF000000 + g * 0x111111; } } break;
+                case 2:  for (i = 0; i < w; i++, dp1++, dp2++) { g = (sp[i >> 2] & mask2[i & 3]) >> shift2[i & 3]; if (g != trns1) { *dp1 = g * 0x55; *dp2 = 0xFF000000 + g * 0x555555; } } break;
+                case 1:  for (i = 0; i < w; i++, dp1++, dp2++) { g = (sp[i >> 3] & mask1[i & 7]) >> shift1[i & 7]; if (g != trns1) { *dp1 = g * 0xFF; *dp2 = 0xFF000000 + g * 0xFFFFFF; } } break;
             }
         }
 
@@ -284,10 +284,10 @@ void compose3(unsigned char* dst1, unsigned int dstbytes1, unsigned char* dst2, 
 
         for (unsigned int i = 0; i < w; i++) {
             switch (depth) {
-            case 8: col = sp[i]; break;
-            case 4: col = (sp[i >> 1] & mask4[i & 1]) >> shift4[i & 1]; break;
-            case 2: col = (sp[i >> 2] & mask2[i & 3]) >> shift2[i & 3]; break;
-            case 1: col = (sp[i >> 3] & mask1[i & 7]) >> shift1[i & 7]; break;
+                case 8: col = sp[i]; break;
+                case 4: col = (sp[i >> 1] & mask4[i & 1]) >> shift4[i & 1]; break;
+                case 2: col = (sp[i >> 2] & mask2[i & 3]) >> shift2[i & 3]; break;
+                case 1: col = (sp[i >> 3] & mask1[i & 7]) >> shift1[i & 7]; break;
             }
 
             unsigned int b = pal[col][0];
@@ -617,11 +617,11 @@ int load_apng(std::stringstream& file, struct apng_data* apng)
                         pDst2 = pImg2 + y0 * outrow2 + x0 * 4;
                         unpack(zstream, pTemp, imagesize, pData, zsize, h0, rowbytes, bpp);
                         switch (coltype) {
-                        case 0: compose0(pDst1, outrow1, pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
-                        case 2: compose2(pDst1, outrow1, pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
-                        case 3: compose3(pDst1, outrow1, pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
-                        case 4: compose4(pDst1, outrow1, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
-                        case 6: compose6(pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
+                            case 0: compose0(pDst1, outrow1, pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
+                            case 2: compose2(pDst1, outrow1, pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
+                            case 3: compose3(pDst1, outrow1, pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
+                            case 4: compose4(pDst1, outrow1, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
+                            case 6: compose6(pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
                         }
                         zsize = 0;
 
@@ -637,11 +637,11 @@ int load_apng(std::stringstream& file, struct apng_data* apng)
 
                                 for (j = 0; j < h0; j++) {
                                     switch (coltype) {
-                                    case 0:  memset(pDst2, 0, w0 * 4); if (hasTRNS) memset(pDst1, trns[1], w0); else keep_original = 0; break;
-                                    case 2:  memset(pDst2, 0, w0 * 4); if (hasTRNS) for (i = 0; i < w0; i++) { pDst1[i * 3] = trns[1]; pDst1[i * 3 + 1] = trns[3]; pDst1[i * 3 + 2] = trns[5]; } else keep_original = 0; break;
-                                    case 3:  memset(pDst2, 0, w0 * 4); if (trns_idx >= 0) memset(pDst1, trns_idx, w0); else keep_original = 0; break;
-                                    case 4:  memset(pDst1, 0, w0 * 2); break;
-                                    case 6:  memset(pDst2, 0, w0 * 4); break;
+                                        case 0:  memset(pDst2, 0, w0 * 4); if (hasTRNS) memset(pDst1, trns[1], w0); else keep_original = 0; break;
+                                        case 2:  memset(pDst2, 0, w0 * 4); if (hasTRNS) for (i = 0; i < w0; i++) { pDst1[i * 3] = trns[1]; pDst1[i * 3 + 1] = trns[3]; pDst1[i * 3 + 2] = trns[5]; } else keep_original = 0; break;
+                                        case 3:  memset(pDst2, 0, w0 * 4); if (trns_idx >= 0) memset(pDst1, trns_idx, w0); else keep_original = 0; break;
+                                        case 4:  memset(pDst1, 0, w0 * 2); break;
+                                        case 6:  memset(pDst2, 0, w0 * 4); break;
                                     }
                                     pDst1 += outrow1;
                                     pDst2 += outrow2;
@@ -696,11 +696,11 @@ int load_apng(std::stringstream& file, struct apng_data* apng)
                     pDst2 = pImg2 + y0 * outrow2 + x0 * 4;
                     unpack(zstream, pTemp, imagesize, pData, zsize, h0, rowbytes, bpp);
                     switch (coltype) {
-                    case 0: compose0(pDst1, outrow1, pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
-                    case 2: compose2(pDst1, outrow1, pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
-                    case 3: compose3(pDst1, outrow1, pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
-                    case 4: compose4(pDst1, outrow1, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
-                    case 6: compose6(pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
+                        case 0: compose0(pDst1, outrow1, pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
+                        case 2: compose2(pDst1, outrow1, pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
+                        case 3: compose3(pDst1, outrow1, pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
+                        case 4: compose4(pDst1, outrow1, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
+                        case 6: compose6(pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
                     }
                     break;
                 } else {
@@ -721,9 +721,9 @@ int load_apng(std::stringstream& file, struct apng_data* apng)
 
             if (coltype == 0) {
                 switch (depth) {
-                case 4: trns[1] *= 0x11; break;
-                case 2: trns[1] *= 0x55; break;
-                case 1: trns[1] *= 0xFF; break;
+                    case 4: trns[1] *= 0x11; break;
+                    case 2: trns[1] *= 0x55; break;
+                    case 1: trns[1] *= 0xFF; break;
                 }
             }
 

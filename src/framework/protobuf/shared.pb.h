@@ -445,13 +445,13 @@ namespace tibia
 
             // ===================================================================
 
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
-#endif  // __GNUC__
-// Coordinate
+        #ifdef __GNUC__
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wstrict-aliasing"
+        #endif  // __GNUC__
+        // Coordinate
 
-// optional uint32 x = 1;
+        // optional uint32 x = 1;
             inline bool Coordinate::_internal_has_x() const
             {
                 bool value = (_has_bits_[0] & 0x00000001u) != 0;
@@ -556,9 +556,9 @@ namespace tibia
                 // @@protoc_insertion_point(field_set:tibia.protobuf.shared.Coordinate.z)
             }
 
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif  // __GNUC__
+        #ifdef __GNUC__
+        #pragma GCC diagnostic pop
+        #endif  // __GNUC__
 
             // @@protoc_insertion_point(namespace_scope)
         }  // namespace shared

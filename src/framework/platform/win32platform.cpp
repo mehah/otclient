@@ -279,60 +279,60 @@ std::string Platform::getOSName()
             pGPI(osvi.dwMajorVersion, osvi.dwMinorVersion, 0, 0, &dwType);
 
             switch (dwType) {
-            case PRODUCT_ULTIMATE:
-            ret += "Ultimate Edition";
-            break;
-            case PRODUCT_PROFESSIONAL:
-            ret += "Professional";
-            break;
-            case PRODUCT_HOME_PREMIUM:
-            ret += "Home Premium Edition";
-            break;
-            case PRODUCT_HOME_BASIC:
-            ret += "Home Basic Edition";
-            break;
-            case PRODUCT_ENTERPRISE:
-            ret += "Enterprise Edition";
-            break;
-            case PRODUCT_BUSINESS:
-            ret += "Business Edition";
-            break;
-            case PRODUCT_STARTER:
-            ret += "Starter Edition";
-            break;
-            case PRODUCT_CLUSTER_SERVER:
-            ret += "Cluster Server Edition";
-            break;
-            case PRODUCT_DATACENTER_SERVER:
-            ret += "Datacenter Edition";
-            break;
-            case PRODUCT_DATACENTER_SERVER_CORE:
-            ret += "Datacenter Edition (core installation)";
-            break;
-            case PRODUCT_ENTERPRISE_SERVER:
-            ret += "Enterprise Edition";
-            break;
-            case PRODUCT_ENTERPRISE_SERVER_CORE:
-            ret += "Enterprise Edition (core installation)";
-            break;
-            case PRODUCT_ENTERPRISE_SERVER_IA64:
-            ret += "Enterprise Edition for Itanium-based Systems";
-            break;
-            case PRODUCT_SMALLBUSINESS_SERVER:
-            ret += "Small Business Server";
-            break;
-            case PRODUCT_SMALLBUSINESS_SERVER_PREMIUM:
-            ret += "Small Business Server Premium Edition";
-            break;
-            case PRODUCT_STANDARD_SERVER:
-            ret += "Standard Edition";
-            break;
-            case PRODUCT_STANDARD_SERVER_CORE:
-            ret += "Standard Edition (core installation)";
-            break;
-            case PRODUCT_WEB_SERVER:
-            ret += "Web Server Edition";
-            break;
+                case PRODUCT_ULTIMATE:
+                    ret += "Ultimate Edition";
+                    break;
+                case PRODUCT_PROFESSIONAL:
+                    ret += "Professional";
+                    break;
+                case PRODUCT_HOME_PREMIUM:
+                    ret += "Home Premium Edition";
+                    break;
+                case PRODUCT_HOME_BASIC:
+                    ret += "Home Basic Edition";
+                    break;
+                case PRODUCT_ENTERPRISE:
+                    ret += "Enterprise Edition";
+                    break;
+                case PRODUCT_BUSINESS:
+                    ret += "Business Edition";
+                    break;
+                case PRODUCT_STARTER:
+                    ret += "Starter Edition";
+                    break;
+                case PRODUCT_CLUSTER_SERVER:
+                    ret += "Cluster Server Edition";
+                    break;
+                case PRODUCT_DATACENTER_SERVER:
+                    ret += "Datacenter Edition";
+                    break;
+                case PRODUCT_DATACENTER_SERVER_CORE:
+                    ret += "Datacenter Edition (core installation)";
+                    break;
+                case PRODUCT_ENTERPRISE_SERVER:
+                    ret += "Enterprise Edition";
+                    break;
+                case PRODUCT_ENTERPRISE_SERVER_CORE:
+                    ret += "Enterprise Edition (core installation)";
+                    break;
+                case PRODUCT_ENTERPRISE_SERVER_IA64:
+                    ret += "Enterprise Edition for Itanium-based Systems";
+                    break;
+                case PRODUCT_SMALLBUSINESS_SERVER:
+                    ret += "Small Business Server";
+                    break;
+                case PRODUCT_SMALLBUSINESS_SERVER_PREMIUM:
+                    ret += "Small Business Server Premium Edition";
+                    break;
+                case PRODUCT_STANDARD_SERVER:
+                    ret += "Standard Edition";
+                    break;
+                case PRODUCT_STANDARD_SERVER_CORE:
+                    ret += "Standard Edition (core installation)";
+                    break;
+                case PRODUCT_WEB_SERVER:
+                    ret += "Web Server Edition";
+                    break;
             }
         }
 

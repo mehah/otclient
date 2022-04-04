@@ -79,9 +79,9 @@ void Logger::log(Fw::LogLevel level, const std::string& message)
     }
 
     if (level == Fw::LogFatal) {
-#ifdef FW_GRAPHICS
+    #ifdef FW_GRAPHICS
         g_window.displayFatalError(message);
-#endif
+    #endif
         s_ignoreLogs = true;
 
         // NOTE: Threads must finish before the process can exit.

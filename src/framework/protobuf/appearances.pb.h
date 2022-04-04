@@ -6073,13 +6073,13 @@ namespace tibia
 
             // ===================================================================
 
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
-#endif  // __GNUC__
-// Appearances
+        #ifdef __GNUC__
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wstrict-aliasing"
+        #endif  // __GNUC__
+        // Appearances
 
-// repeated .tibia.protobuf.appearances.Appearance object = 1;
+        // repeated .tibia.protobuf.appearances.Appearance object = 1;
             inline int Appearances::_internal_object_size() const
             {
                 return object_.size();
@@ -6325,15 +6325,15 @@ namespace tibia
                 _has_bits_[0] &= ~0x00000001u;
                 ::tibia::protobuf::appearances::SpecialMeaningAppearanceIds* temp = special_meaning_appearance_ids_;
                 special_meaning_appearance_ids_ = nullptr;
-#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+            #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
                 auto* old = reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
                 temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 if (GetArenaForAllocation() == nullptr) { delete old; }
-#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+            #else  // PROTOBUF_FORCE_COPY_IN_RELEASE
                 if (GetArenaForAllocation() != nullptr) {
                     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 }
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+            #endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
                 return temp;
             }
             inline ::tibia::protobuf::appearances::SpecialMeaningAppearanceIds* Appearances::unsafe_arena_release_special_meaning_appearance_ids()
@@ -7112,15 +7112,15 @@ namespace tibia
                 _has_bits_[0] &= ~0x00000001u;
                 ::tibia::protobuf::appearances::SpriteAnimation* temp = animation_;
                 animation_ = nullptr;
-#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+            #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
                 auto* old = reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
                 temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 if (GetArenaForAllocation() == nullptr) { delete old; }
-#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+            #else  // PROTOBUF_FORCE_COPY_IN_RELEASE
                 if (GetArenaForAllocation() != nullptr) {
                     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 }
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+            #endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
                 return temp;
             }
             inline ::tibia::protobuf::appearances::SpriteAnimation* SpriteInfo::unsafe_arena_release_animation()
@@ -7373,15 +7373,15 @@ namespace tibia
                 _has_bits_[0] &= ~0x00000001u;
                 ::tibia::protobuf::appearances::SpriteInfo* temp = sprite_info_;
                 sprite_info_ = nullptr;
-#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+            #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
                 auto* old = reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
                 temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 if (GetArenaForAllocation() == nullptr) { delete old; }
-#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+            #else  // PROTOBUF_FORCE_COPY_IN_RELEASE
                 if (GetArenaForAllocation() != nullptr) {
                     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 }
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+            #endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
                 return temp;
             }
             inline ::tibia::protobuf::appearances::SpriteInfo* FrameGroup::unsafe_arena_release_sprite_info()
@@ -7563,15 +7563,15 @@ namespace tibia
                 _has_bits_[0] &= ~0x00000004u;
                 ::tibia::protobuf::appearances::AppearanceFlags* temp = flags_;
                 flags_ = nullptr;
-#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+            #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
                 auto* old = reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
                 temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 if (GetArenaForAllocation() == nullptr) { delete old; }
-#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+            #else  // PROTOBUF_FORCE_COPY_IN_RELEASE
                 if (GetArenaForAllocation() != nullptr) {
                     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 }
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+            #endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
                 return temp;
             }
             inline ::tibia::protobuf::appearances::AppearanceFlags* Appearance::unsafe_arena_release_flags()
@@ -7806,15 +7806,15 @@ namespace tibia
                 _has_bits_[0] &= ~0x00000001u;
                 ::tibia::protobuf::appearances::AppearanceFlagBank* temp = bank_;
                 bank_ = nullptr;
-#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+            #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
                 auto* old = reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
                 temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 if (GetArenaForAllocation() == nullptr) { delete old; }
-#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+            #else  // PROTOBUF_FORCE_COPY_IN_RELEASE
                 if (GetArenaForAllocation() != nullptr) {
                     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 }
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+            #endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
                 return temp;
             }
             inline ::tibia::protobuf::appearances::AppearanceFlagBank* AppearanceFlags::unsafe_arena_release_bank()
@@ -8187,15 +8187,15 @@ namespace tibia
                 _has_bits_[0] &= ~0x00000002u;
                 ::tibia::protobuf::appearances::AppearanceFlagWrite* temp = write_;
                 write_ = nullptr;
-#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+            #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
                 auto* old = reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
                 temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 if (GetArenaForAllocation() == nullptr) { delete old; }
-#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+            #else  // PROTOBUF_FORCE_COPY_IN_RELEASE
                 if (GetArenaForAllocation() != nullptr) {
                     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 }
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+            #endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
                 return temp;
             }
             inline ::tibia::protobuf::appearances::AppearanceFlagWrite* AppearanceFlags::unsafe_arena_release_write()
@@ -8288,15 +8288,15 @@ namespace tibia
                 _has_bits_[0] &= ~0x00000004u;
                 ::tibia::protobuf::appearances::AppearanceFlagWriteOnce* temp = write_once_;
                 write_once_ = nullptr;
-#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+            #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
                 auto* old = reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
                 temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 if (GetArenaForAllocation() == nullptr) { delete old; }
-#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+            #else  // PROTOBUF_FORCE_COPY_IN_RELEASE
                 if (GetArenaForAllocation() != nullptr) {
                     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 }
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+            #endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
                 return temp;
             }
             inline ::tibia::protobuf::appearances::AppearanceFlagWriteOnce* AppearanceFlags::unsafe_arena_release_write_once()
@@ -8704,15 +8704,15 @@ namespace tibia
                 _has_bits_[0] &= ~0x00000008u;
                 ::tibia::protobuf::appearances::AppearanceFlagHook* temp = hook_;
                 hook_ = nullptr;
-#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+            #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
                 auto* old = reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
                 temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 if (GetArenaForAllocation() == nullptr) { delete old; }
-#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+            #else  // PROTOBUF_FORCE_COPY_IN_RELEASE
                 if (GetArenaForAllocation() != nullptr) {
                     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 }
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+            #endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
                 return temp;
             }
             inline ::tibia::protobuf::appearances::AppearanceFlagHook* AppearanceFlags::unsafe_arena_release_hook()
@@ -8840,15 +8840,15 @@ namespace tibia
                 _has_bits_[0] &= ~0x00000010u;
                 ::tibia::protobuf::appearances::AppearanceFlagLight* temp = light_;
                 light_ = nullptr;
-#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+            #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
                 auto* old = reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
                 temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 if (GetArenaForAllocation() == nullptr) { delete old; }
-#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+            #else  // PROTOBUF_FORCE_COPY_IN_RELEASE
                 if (GetArenaForAllocation() != nullptr) {
                     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 }
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+            #endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
                 return temp;
             }
             inline ::tibia::protobuf::appearances::AppearanceFlagLight* AppearanceFlags::unsafe_arena_release_light()
@@ -9011,15 +9011,15 @@ namespace tibia
                 _has_bits_[0] &= ~0x00000020u;
                 ::tibia::protobuf::appearances::AppearanceFlagShift* temp = shift_;
                 shift_ = nullptr;
-#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+            #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
                 auto* old = reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
                 temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 if (GetArenaForAllocation() == nullptr) { delete old; }
-#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+            #else  // PROTOBUF_FORCE_COPY_IN_RELEASE
                 if (GetArenaForAllocation() != nullptr) {
                     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 }
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+            #endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
                 return temp;
             }
             inline ::tibia::protobuf::appearances::AppearanceFlagShift* AppearanceFlags::unsafe_arena_release_shift()
@@ -9112,15 +9112,15 @@ namespace tibia
                 _has_bits_[0] &= ~0x00000040u;
                 ::tibia::protobuf::appearances::AppearanceFlagHeight* temp = height_;
                 height_ = nullptr;
-#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+            #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
                 auto* old = reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
                 temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 if (GetArenaForAllocation() == nullptr) { delete old; }
-#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+            #else  // PROTOBUF_FORCE_COPY_IN_RELEASE
                 if (GetArenaForAllocation() != nullptr) {
                     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 }
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+            #endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
                 return temp;
             }
             inline ::tibia::protobuf::appearances::AppearanceFlagHeight* AppearanceFlags::unsafe_arena_release_height()
@@ -9283,15 +9283,15 @@ namespace tibia
                 _has_bits_[0] &= ~0x00000080u;
                 ::tibia::protobuf::appearances::AppearanceFlagAutomap* temp = automap_;
                 automap_ = nullptr;
-#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+            #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
                 auto* old = reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
                 temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 if (GetArenaForAllocation() == nullptr) { delete old; }
-#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+            #else  // PROTOBUF_FORCE_COPY_IN_RELEASE
                 if (GetArenaForAllocation() != nullptr) {
                     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 }
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+            #endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
                 return temp;
             }
             inline ::tibia::protobuf::appearances::AppearanceFlagAutomap* AppearanceFlags::unsafe_arena_release_automap()
@@ -9384,15 +9384,15 @@ namespace tibia
                 _has_bits_[0] &= ~0x00000100u;
                 ::tibia::protobuf::appearances::AppearanceFlagLenshelp* temp = lenshelp_;
                 lenshelp_ = nullptr;
-#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+            #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
                 auto* old = reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
                 temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 if (GetArenaForAllocation() == nullptr) { delete old; }
-#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+            #else  // PROTOBUF_FORCE_COPY_IN_RELEASE
                 if (GetArenaForAllocation() != nullptr) {
                     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 }
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+            #endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
                 return temp;
             }
             inline ::tibia::protobuf::appearances::AppearanceFlagLenshelp* AppearanceFlags::unsafe_arena_release_lenshelp()
@@ -9555,15 +9555,15 @@ namespace tibia
                 _has_bits_[0] &= ~0x00000200u;
                 ::tibia::protobuf::appearances::AppearanceFlagClothes* temp = clothes_;
                 clothes_ = nullptr;
-#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+            #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
                 auto* old = reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
                 temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 if (GetArenaForAllocation() == nullptr) { delete old; }
-#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+            #else  // PROTOBUF_FORCE_COPY_IN_RELEASE
                 if (GetArenaForAllocation() != nullptr) {
                     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 }
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+            #endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
                 return temp;
             }
             inline ::tibia::protobuf::appearances::AppearanceFlagClothes* AppearanceFlags::unsafe_arena_release_clothes()
@@ -9656,15 +9656,15 @@ namespace tibia
                 _has_bits_[0] &= ~0x00000400u;
                 ::tibia::protobuf::appearances::AppearanceFlagDefaultAction* temp = default_action_;
                 default_action_ = nullptr;
-#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+            #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
                 auto* old = reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
                 temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 if (GetArenaForAllocation() == nullptr) { delete old; }
-#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+            #else  // PROTOBUF_FORCE_COPY_IN_RELEASE
                 if (GetArenaForAllocation() != nullptr) {
                     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 }
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+            #endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
                 return temp;
             }
             inline ::tibia::protobuf::appearances::AppearanceFlagDefaultAction* AppearanceFlags::unsafe_arena_release_default_action()
@@ -9757,15 +9757,15 @@ namespace tibia
                 _has_bits_[0] &= ~0x00000800u;
                 ::tibia::protobuf::appearances::AppearanceFlagMarket* temp = market_;
                 market_ = nullptr;
-#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+            #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
                 auto* old = reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
                 temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 if (GetArenaForAllocation() == nullptr) { delete old; }
-#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+            #else  // PROTOBUF_FORCE_COPY_IN_RELEASE
                 if (GetArenaForAllocation() != nullptr) {
                     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 }
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+            #endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
                 return temp;
             }
             inline ::tibia::protobuf::appearances::AppearanceFlagMarket* AppearanceFlags::unsafe_arena_release_market()
@@ -10013,15 +10013,15 @@ namespace tibia
                 _has_bits_[0] &= ~0x00001000u;
                 ::tibia::protobuf::appearances::AppearanceFlagChangedToExpire* temp = changedtoexpire_;
                 changedtoexpire_ = nullptr;
-#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+            #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
                 auto* old = reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
                 temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 if (GetArenaForAllocation() == nullptr) { delete old; }
-#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+            #else  // PROTOBUF_FORCE_COPY_IN_RELEASE
                 if (GetArenaForAllocation() != nullptr) {
                     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 }
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+            #endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
                 return temp;
             }
             inline ::tibia::protobuf::appearances::AppearanceFlagChangedToExpire* AppearanceFlags::unsafe_arena_release_changedtoexpire()
@@ -10184,15 +10184,15 @@ namespace tibia
                 _has_bits_[0] &= ~0x00002000u;
                 ::tibia::protobuf::appearances::AppearanceFlagCyclopedia* temp = cyclopediaitem_;
                 cyclopediaitem_ = nullptr;
-#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+            #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
                 auto* old = reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
                 temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 if (GetArenaForAllocation() == nullptr) { delete old; }
-#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+            #else  // PROTOBUF_FORCE_COPY_IN_RELEASE
                 if (GetArenaForAllocation() != nullptr) {
                     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 }
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+            #endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
                 return temp;
             }
             inline ::tibia::protobuf::appearances::AppearanceFlagCyclopedia* AppearanceFlags::unsafe_arena_release_cyclopediaitem()
@@ -10390,15 +10390,15 @@ namespace tibia
                 _has_bits_[0] &= ~0x00004000u;
                 ::tibia::protobuf::appearances::AppearanceFlagUpgradeClassification* temp = upgradeclassification_;
                 upgradeclassification_ = nullptr;
-#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+            #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
                 auto* old = reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
                 temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 if (GetArenaForAllocation() == nullptr) { delete old; }
-#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+            #else  // PROTOBUF_FORCE_COPY_IN_RELEASE
                 if (GetArenaForAllocation() != nullptr) {
                     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
                 }
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+            #endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
                 return temp;
             }
             inline ::tibia::protobuf::appearances::AppearanceFlagUpgradeClassification* AppearanceFlags::unsafe_arena_release_upgradeclassification()
@@ -11863,9 +11863,9 @@ namespace tibia
                 // @@protoc_insertion_point(field_set:tibia.protobuf.appearances.SpecialMeaningAppearanceIds.supply_stash_id)
             }
 
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif  // __GNUC__
+        #ifdef __GNUC__
+        #pragma GCC diagnostic pop
+        #endif  // __GNUC__
             // -------------------------------------------------------------------
 
             // -------------------------------------------------------------------

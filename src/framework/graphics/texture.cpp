@@ -192,9 +192,9 @@ bool Texture::setupSize(const Size& size, bool forcePowerOfTwo)
     // checks texture max size
     if (std::max<int>(glSize.width(), glSize.height()) > g_graphics.getMaxTextureSize()) {
         g_logger.error(stdext::format("loading texture with size %dx%d failed, "
-            "the maximum size allowed by the graphics card is %dx%d,"
-            "to prevent crashes the texture will be displayed as a blank texture",
-            size.width(), size.height(), g_graphics.getMaxTextureSize(), g_graphics.getMaxTextureSize()));
+                                      "the maximum size allowed by the graphics card is %dx%d,"
+                                      "to prevent crashes the texture will be displayed as a blank texture",
+                                      size.width(), size.height(), g_graphics.getMaxTextureSize(), g_graphics.getMaxTextureSize()));
         return false;
     }
 
@@ -248,18 +248,18 @@ void Texture::setupPixels(int level, const Size& size, uchar* pixels, int channe
 {
     GLenum format = 0;
     switch (channels) {
-    case 4:
-    format = GL_RGBA;
-    break;
-    case 3:
-    format = GL_RGB;
-    break;
-    case 2:
-    format = GL_LUMINANCE_ALPHA;
-    break;
-    case 1:
-    format = GL_LUMINANCE;
-    break;
+        case 4:
+            format = GL_RGBA;
+            break;
+        case 3:
+            format = GL_RGB;
+            break;
+        case 2:
+            format = GL_LUMINANCE_ALPHA;
+            break;
+        case 1:
+            format = GL_LUMINANCE;
+            break;
     }
 
     GLenum internalFormat = GL_RGBA;

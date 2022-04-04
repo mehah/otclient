@@ -329,13 +329,13 @@ bool Minimap::loadOtmm(const std::string& fileName)
         fin->getU32(); // flags
 
         switch (version) {
-        case 1:
-        {
-            fin->getString(); // description
-            break;
-        }
-        default:
-        stdext::throw_exception("OTMM version not supported");
+            case 1:
+            {
+                fin->getString(); // description
+                break;
+            }
+            default:
+                stdext::throw_exception("OTMM version not supported");
         }
 
         fin->seek(start);

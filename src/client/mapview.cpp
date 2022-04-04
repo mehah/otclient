@@ -850,35 +850,35 @@ void MapView::updateViewportDirectionCache()
         vp.left = vp.right;
 
         switch (dir) {
-        case Otc::North:
-        case Otc::South:
-        vp.top += 1;
-        vp.bottom += 1;
-        break;
+            case Otc::North:
+            case Otc::South:
+                vp.top += 1;
+                vp.bottom += 1;
+                break;
 
-        case Otc::West:
-        case Otc::East:
-        vp.right += 1;
-        vp.left += 1;
-        break;
+            case Otc::West:
+            case Otc::East:
+                vp.right += 1;
+                vp.left += 1;
+                break;
 
-        case Otc::NorthEast:
-        case Otc::SouthEast:
-        case Otc::NorthWest:
-        case Otc::SouthWest:
-        vp.left += 1;
-        vp.bottom += 1;
-        vp.top += 1;
-        vp.right += 1;
-        break;
+            case Otc::NorthEast:
+            case Otc::SouthEast:
+            case Otc::NorthWest:
+            case Otc::SouthWest:
+                vp.left += 1;
+                vp.bottom += 1;
+                vp.top += 1;
+                vp.right += 1;
+                break;
 
-        case Otc::InvalidDirection:
-        vp.left -= 1;
-        vp.right -= 1;
-        break;
+            case Otc::InvalidDirection:
+                vp.left -= 1;
+                vp.right -= 1;
+                break;
 
-        default:
-        break;
+            default:
+                break;
         }
     }
 }

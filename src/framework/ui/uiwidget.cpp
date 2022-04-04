@@ -567,7 +567,7 @@ void UIWidget::applyStyle(const OTMLNodePtr& styleNode)
             UIWidgetPtr parent = getParent();
             if (isFocusable() && isExplicitlyVisible() && isExplicitlyEnabled() &&
                parent && ((!parent->getFocusedChild() && parent->getAutoFocusPolicy() == Fw::AutoFocusFirst) ||
-                   parent->getAutoFocusPolicy() == Fw::AutoFocusLast)) {
+                          parent->getAutoFocusPolicy() == Fw::AutoFocusLast)) {
                 focus();
             }
         }
@@ -1310,92 +1310,92 @@ void UIWidget::updateState(Fw::WidgetState state)
     bool updateChildren = false;
 
     switch (state) {
-    case Fw::ActiveState:
-    {
-        UIWidgetPtr widget = static_self_cast<UIWidget>();
-        UIWidgetPtr parent;
-        do {
-            parent = widget->getParent();
-            if (!widget->isExplicitlyEnabled() ||
-               ((parent && parent->getFocusedChild() != widget))) {
-                newStatus = false;
-                break;
-            }
-        } while ((widget = parent));
+        case Fw::ActiveState:
+        {
+            UIWidgetPtr widget = static_self_cast<UIWidget>();
+            UIWidgetPtr parent;
+            do {
+                parent = widget->getParent();
+                if (!widget->isExplicitlyEnabled() ||
+                   ((parent && parent->getFocusedChild() != widget))) {
+                    newStatus = false;
+                    break;
+                }
+            } while ((widget = parent));
 
-        updateChildren = newStatus != oldStatus;
-        break;
-    }
-    case Fw::FocusState:
-    {
-        newStatus = (getParent() && getParent()->getFocusedChild() == static_self_cast<UIWidget>());
-        break;
-    }
-    case Fw::HoverState:
-    {
-        newStatus = (g_ui.getHoveredWidget() == static_self_cast<UIWidget>() && isEnabled());
-        break;
-    }
-    case Fw::PressedState:
-    {
-        newStatus = (g_ui.getPressedWidget() == static_self_cast<UIWidget>());
-        break;
-    }
-    case Fw::DraggingState:
-    {
-        newStatus = (g_ui.getDraggingWidget() == static_self_cast<UIWidget>());
-        break;
-    }
-    case Fw::DisabledState:
-    {
-        bool enabled = true;
-        UIWidgetPtr widget = static_self_cast<UIWidget>();
-        do {
-            if (!widget->isExplicitlyEnabled()) {
-                enabled = false;
-                break;
-            }
-        } while ((widget = widget->getParent()));
-        newStatus = !enabled;
-        updateChildren = newStatus != oldStatus;
-        break;
-    }
-    case Fw::FirstState:
-    {
-        newStatus = (getParent() && getParent()->getFirstChild() == static_self_cast<UIWidget>());
-        break;
-    }
-    case Fw::MiddleState:
-    {
-        newStatus = (getParent() && getParent()->getFirstChild() != static_self_cast<UIWidget>() && getParent()->getLastChild() != static_self_cast<UIWidget>());
-        break;
-    }
-    case Fw::LastState:
-    {
-        newStatus = (getParent() && getParent()->getLastChild() == static_self_cast<UIWidget>());
-        break;
-    }
-    case Fw::AlternateState:
-    {
-        newStatus = (getParent() && (getParent()->getChildIndex(static_self_cast<UIWidget>()) % 2) == 1);
-        break;
-    }
-    case Fw::HiddenState:
-    {
-        bool visible = true;
-        UIWidgetPtr widget = static_self_cast<UIWidget>();
-        do {
-            if (!widget->isExplicitlyVisible()) {
-                visible = false;
-                break;
-            }
-        } while ((widget = widget->getParent()));
-        newStatus = !visible;
-        updateChildren = newStatus != oldStatus;
-        break;
-    }
-    default:
-    return;
+            updateChildren = newStatus != oldStatus;
+            break;
+        }
+        case Fw::FocusState:
+        {
+            newStatus = (getParent() && getParent()->getFocusedChild() == static_self_cast<UIWidget>());
+            break;
+        }
+        case Fw::HoverState:
+        {
+            newStatus = (g_ui.getHoveredWidget() == static_self_cast<UIWidget>() && isEnabled());
+            break;
+        }
+        case Fw::PressedState:
+        {
+            newStatus = (g_ui.getPressedWidget() == static_self_cast<UIWidget>());
+            break;
+        }
+        case Fw::DraggingState:
+        {
+            newStatus = (g_ui.getDraggingWidget() == static_self_cast<UIWidget>());
+            break;
+        }
+        case Fw::DisabledState:
+        {
+            bool enabled = true;
+            UIWidgetPtr widget = static_self_cast<UIWidget>();
+            do {
+                if (!widget->isExplicitlyEnabled()) {
+                    enabled = false;
+                    break;
+                }
+            } while ((widget = widget->getParent()));
+            newStatus = !enabled;
+            updateChildren = newStatus != oldStatus;
+            break;
+        }
+        case Fw::FirstState:
+        {
+            newStatus = (getParent() && getParent()->getFirstChild() == static_self_cast<UIWidget>());
+            break;
+        }
+        case Fw::MiddleState:
+        {
+            newStatus = (getParent() && getParent()->getFirstChild() != static_self_cast<UIWidget>() && getParent()->getLastChild() != static_self_cast<UIWidget>());
+            break;
+        }
+        case Fw::LastState:
+        {
+            newStatus = (getParent() && getParent()->getLastChild() == static_self_cast<UIWidget>());
+            break;
+        }
+        case Fw::AlternateState:
+        {
+            newStatus = (getParent() && (getParent()->getChildIndex(static_self_cast<UIWidget>()) % 2) == 1);
+            break;
+        }
+        case Fw::HiddenState:
+        {
+            bool visible = true;
+            UIWidgetPtr widget = static_self_cast<UIWidget>();
+            do {
+                if (!widget->isExplicitlyVisible()) {
+                    visible = false;
+                    break;
+                }
+            } while ((widget = widget->getParent()));
+            newStatus = !visible;
+            updateChildren = newStatus != oldStatus;
+            break;
+        }
+        default:
+            return;
     }
 
     if (updateChildren) {
