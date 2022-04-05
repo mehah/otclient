@@ -24,7 +24,6 @@
 #define ASYNCDISPATCHER_H
 
 #include <future>
-#include <framework/stdext/thread.h>
 
 class AsyncDispatcher
 {
