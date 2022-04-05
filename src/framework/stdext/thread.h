@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef THREAD_H
-#define THREAD_H
+#pragma once
 
 #include <boost/thread/future.hpp>
 
@@ -49,7 +48,5 @@ namespace std
 #include <condition_variable>
 #include <mutex>
 #include <thread>
-
-#endif
 
 #endif

@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef INPUTMESSAGE_H
-#define INPUTMESSAGE_H
+#pragma once
 
 #include <framework/luaengine/luaobject.h>
 #include "declarations.h"
@@ -103,5 +102,3 @@ private:
     uint16 m_messageSize;
     uint8 m_buffer[BUFFER_MAXSIZE];
 };
-
-#endif

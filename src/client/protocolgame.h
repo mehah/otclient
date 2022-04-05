@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef PROTOCOLGAME_H
-#define PROTOCOLGAME_H
+#pragma once
 
 #include <framework/net/protocol.h>
 #include "creature.h"
@@ -273,5 +272,3 @@ private:
     std::string m_characterName;
     LocalPlayerPtr m_localPlayer;
 };
-
-#endif

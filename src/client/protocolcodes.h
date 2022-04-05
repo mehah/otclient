@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef PROTOCOLCODES_H
-#define PROTOCOLCODES_H
+#pragma once
 
 #include "global.h"
 
@@ -304,5 +303,3 @@ namespace Proto
     Otc::MessageMode translateMessageModeFromServer(uint8 mode);
     uint8 translateMessageModeToServer(Otc::MessageMode mode);
 }
-
-#endif

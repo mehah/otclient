@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef POINT_H
-#define POINT_H
+#pragma once
 
 #include <array>
 #include <cmath>
@@ -123,5 +122,3 @@ std::istream& operator>>(std::istream& in, TPoint<T>& point)
     in >> point.y;
     return in;
 }
-
-#endif

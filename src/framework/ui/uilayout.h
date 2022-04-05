@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef UILAYOUT_H
-#define UILAYOUT_H
+#pragma once
 
 #include <framework/luaengine/luaobject.h>
 #include <framework/otml/otml.h>
@@ -64,5 +63,3 @@ protected:
         m_updateScheduled{ false };
     UIWidgetPtr m_parentWidget;
 };
-
-#endif

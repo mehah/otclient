@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef GRAPHICS_H
-#define GRAPHICS_H
+#pragma once
 
 #include <GL/glew.h>
 #include "declarations.h"
@@ -100,5 +99,3 @@ private:
 };
 
 extern Graphics g_graphics;
-
-#endif

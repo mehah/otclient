@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef PAINTERSHADERPROGRAM_H
-#define PAINTERSHADERPROGRAM_H
+#pragma once
 
 #include <client/position.h>
 #include "shaderprogram.h"
@@ -83,5 +82,3 @@ private:
 
     Position m_startPos;
 };
-
-#endif

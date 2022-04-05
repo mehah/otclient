@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef FILESTREAM_H
-#define FILESTREAM_H
+#pragma once
 
 #include <framework/core/resourcemanager.h>
 #include <framework/luaengine/luaobject.h>
@@ -90,5 +89,3 @@ private:
     bool m_writeable;
     bool m_caching;
 };
-
-#endif

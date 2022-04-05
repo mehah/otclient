@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef ANIMATEDTEXT_H
-#define ANIMATEDTEXT_H
+#pragma once
 
 #include <framework/core/timer.h>
 #include <framework/graphics/cachedtext.h>
@@ -59,5 +58,3 @@ private:
     CachedText m_cachedText;
     Point m_offset;
 };
-
-#endif

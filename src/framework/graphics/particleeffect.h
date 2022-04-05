@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef PARTICLEEFFECT_H
-#define PARTICLEEFFECT_H
+#pragma once
 
 #include <framework/luaengine/luaobject.h>
 #include <framework/otml/otml.h>
@@ -57,5 +56,3 @@ public:
 private:
     std::vector<ParticleSystemPtr> m_systems;
 };
-
-#endif

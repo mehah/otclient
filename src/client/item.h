@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef ITEM_H
-#define ITEM_H
+#pragma once
 
 #include <framework/global.h>
 #include "effect.h"
@@ -162,5 +161,3 @@ private:
 };
 
 #pragma pack(pop)
-
-#endif

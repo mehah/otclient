@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef UIITEM_H
-#define UIITEM_H
+#pragma once
 
 #include <framework/ui/uiwidget.h>
 #include "declarations.h"
@@ -56,5 +55,3 @@ protected:
         m_showId{ false },
         m_itemVisible{ true };
 };
-
-#endif

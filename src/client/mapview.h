@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef MAPVIEW_H
-#define MAPVIEW_H
+#pragma once
 
 #include <framework/core/inputevent.h>
 #include <framework/graphics/declarations.h>
@@ -286,5 +285,3 @@ private:
     TexturePtr m_crosshairTexture;
     EffectPtr m_crosshairEffect;
 };
-
-#endif

@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef CREATURE_H
-#define CREATURE_H
+#pragma once
 
 #include <framework/core/declarations.h>
 #include <framework/core/timer.h>
@@ -253,5 +252,3 @@ class Monster : public Creature
 public:
     bool isMonster() override { return true; }
 };
-
-#endif

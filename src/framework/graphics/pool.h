@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef POOL_H
-#define POOL_H
+#pragma once
 
 #include <utility>
 
@@ -137,5 +136,3 @@ private:
 };
 
 extern DrawPool g_drawPool;
-
-#endif

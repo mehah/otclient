@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef THING_H
-#define THING_H
+#pragma once
 
 #include <framework/luaengine/luaobject.h>
 #include "declarations.h"
@@ -165,5 +164,3 @@ private:
     bool m_canDraw{ true };
 };
 #pragma pack(pop)
-
-#endif

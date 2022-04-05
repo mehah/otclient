@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef TRANSLATOR_H
-#define TRANSLATOR_H
+#pragma once
 
 #include <string>
 #include "../const.h"
@@ -33,5 +32,3 @@ namespace Fw
     WidgetState translateState(std::string state);
     AutoFocusPolicy translateAutoFocusPolicy(std::string policy);
 };
-
-#endif

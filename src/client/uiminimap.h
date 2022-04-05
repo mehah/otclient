@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef UIMINIMAP_H
-#define UIMINIMAP_H
+#pragma once
 
 #include <framework/ui/uiwidget.h>
 #include "declarations.h"
@@ -72,5 +71,3 @@ private:
     int m_minZoom;
     int m_maxZoom;
 };
-
-#endif

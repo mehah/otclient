@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef UISPRITE_H
-#define UISPRITE_H
+#pragma once
 
 #include <framework/ui/uiwidget.h>
 #include "declarations.h"
@@ -51,5 +50,3 @@ protected:
 
     bool m_spriteVisible{ true };
 };
-
-#endif

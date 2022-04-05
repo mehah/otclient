@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef PLATFORM_H
-#define PLATFORM_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -49,5 +48,3 @@ public:
 };
 
 extern Platform g_platform;
-
-#endif

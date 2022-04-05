@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef POSITION_H
-#define POSITION_H
+#pragma once
 
 #include <framework/const.h>
 #include <framework/stdext/types.h>
@@ -336,5 +335,3 @@ inline std::istream& operator>>(std::istream& in, Position& pos)
     pos.z = z;
     return in;
 }
-
-#endif

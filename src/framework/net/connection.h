@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef CONNECTION_H
-#define CONNECTION_H
+#pragma once
 
 #include <framework/luaengine/luaobject.h>
 #include "declarations.h"
@@ -96,5 +95,3 @@ protected:
 
     friend class Server;
 };
-
-#endif

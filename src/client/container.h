@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef CONTAINER_H
-#define CONTAINER_H
+#pragma once
 
 #include "declarations.h"
 #include "item.h"
@@ -76,5 +75,3 @@ private:
     int m_firstIndex;
     std::deque<ItemPtr> m_items;
 };
-
-#endif

@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef LIGHTVIEW_H
-#define LIGHTVIEW_H
+#pragma once
 
 #include <framework/graphics/declarations.h>
 #include <framework/graphics/framebuffer.h>
@@ -63,5 +62,3 @@ private:
 
     std::vector<Source> m_sources;
 };
-
-#endif
