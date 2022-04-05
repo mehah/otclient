@@ -4,9 +4,6 @@
 
 #include <zlib.h>
 
-#include <boost/asio.hpp>
-#include <boost/bind.hpp>
-
 Http g_http;
 
 void Http::init() {
@@ -85,7 +82,7 @@ int Http::post(const std::string& url, const std::string& data, int timeout) {
                     g_lua.callGlobalField("g_http", "onPostProgress", result->operationId, result->url, result->progress);
                     return;
                 }
-                g_lua.callGlobalField("g_http", "onPost", result->operationId, result->url, result->error, std::string(result->response.begin(), result->response.end()));
+                g_lua.callGlobalField("g_http", "onPost", result->operationId, result->url, result->error, result->_response);
             });
             if (finished) {
                 m_operations.erase(operationId);
@@ -210,188 +207,103 @@ void HttpSession::start() {
     
     instance_uri = parseURI(m_url);
     m_port = stoi(instance_uri.port);
-    m_domain = instance_uri.domain;
     boost::asio::ip::tcp::resolver::query query_resolver(instance_uri.domain, instance_uri.port);
 
-    // std::unique_lock<std::mutex>
-    //     cancel_lock(m_cancel_mux);
-
-    // if (m_was_cancelled) {
-    //     cancel_lock.unlock();
-    //     on_finish(boost::system::error_code(
-    //         boost::asio::error::operation_aborted));
-    //     return;
-    // }
+    m_response.body_limit((std::numeric_limits<std::uint64_t>::max)());
 
 	m_resolver.async_resolve(
 		query_resolver,
-		boost::bind(&HttpSession::on_resolve,
-			shared_from_this(),
-			boost::asio::placeholders::error,
-            boost::asio::placeholders::iterator));
+		boost::beast::bind_front_handler(&HttpSession::on_resolve,
+			shared_from_this()));
 }
 
-void HttpSession::on_resolve(const boost::system::error_code& ec, boost::asio::ip::tcp::resolver::iterator iterator){
+void HttpSession::on_resolve(const boost::system::error_code& ec, boost::asio::ip::tcp::resolver::results_type results){
     if (ec) {
         std::cout << "Unable to resolve " << m_url << ": "
             << ec.message() << std::endl;
         return;
     }
 
-    std::ostream request_stream(&m_request);
-    request_stream << "GET " << instance_uri.query << " HTTP/1.0\r\n";
-    request_stream << "Host: " << iterator->endpoint().address().to_string()  << "\r\n";
-    request_stream << "Accept: */*\r\n";
-    request_stream << "Connection: close\r\n\r\n";
-        
-      // Attempt a connection to each endpoint in the list until we
-      // successfully establish a connection.
-      boost::asio::async_connect(m_socket, iterator,
-          boost::bind(&HttpSession::on_connect, 
-            shared_from_this(),
-            boost::asio::placeholders::error));
+    // Set a timeout on the operation
+    m_socket.expires_after(std::chrono::seconds(30));
+
+    m_socket.async_connect(results,
+        boost::beast::bind_front_handler(&HttpSession::on_connect, 
+        shared_from_this()));
 }
 
-void HttpSession::on_connect(const boost::system::error_code& ec){
+void HttpSession::on_connect(const boost::system::error_code& ec, boost::asio::ip::tcp::resolver::results_type::endpoint_type){
     if (ec) {
-        std::cout << "Unable to resolve " << m_url << ": "
+        std::cout << "Unable to connect " << m_url << ": "
             << ec.message() << std::endl;
         return;
     } 
-    
+
+    m_request.version(11);
+    m_request.target(instance_uri.query);
+    m_request.set(boost::beast::http::field::host, instance_uri.domain);
+    m_request.set(boost::beast::http::field::user_agent, m_agent);    
+    if(m_result->postData == "") {
+        m_request.method(boost::beast::http::verb::get);
+    } else {
+        m_request.method(boost::beast::http::verb::post);
+        m_request.set(boost::beast::http::field::accept, "*/*");
+        m_request.set(boost::beast::http::field::content_type, "application/json");
+        m_request.set(boost::beast::http::field::content_length, std::to_string(m_result->postData.size()));
+        m_request.body() = m_result->postData;
+    }
+
+    m_socket.expires_after(std::chrono::seconds(30));
+
     // The connection was successful. Send the request.
-    boost::asio::async_write(m_socket, m_request,
-        boost::bind(&HttpSession::on_request_sent,
-        shared_from_this(),
-        boost::asio::placeholders::error));    
+    boost::beast::http::async_write(m_socket, m_request,
+        boost::beast::bind_front_handler(&HttpSession::on_write,
+        shared_from_this()));    
 }
 
-void HttpSession::on_request_sent(const boost::system::error_code& ec)
-{
+void HttpSession::on_write(const boost::system::error_code& ec, size_t bytes_transferred){
     if (ec) {
-        std::cout << "on_request_sent " << ec.message() << std::endl;
+        std::cout << "Unable to on_write " << m_url << ": "
+            << ec.message() << std::endl;
         return;
     }
+    boost::ignore_unused(bytes_transferred);
 
-    boost::asio::async_read_until(m_socket, m_response, "\r\n",
-        boost::bind(&HttpSession::on_read_header, 
-        shared_from_this(),
-        boost::asio::placeholders::error));
+    // Receive the HTTP response
+    boost::beast::http::async_read(m_socket, m_streambuf, m_response,
+        boost::beast::bind_front_handler(
+            &HttpSession::on_read,
+            shared_from_this()));
 }
 
-void HttpSession::on_read_header(const boost::system::error_code& ec) {
+void HttpSession::on_read(const boost::system::error_code& ec, size_t bytes_transferred) {
+
     if (ec) {
-        std::cout << "on_read_header " << ec.message() << std::endl;
-        return;
-    }
-    // Check that response is OK.
-    std::istream response_stream(&m_response);
-    std::string http_version;
-    response_stream >> http_version;
-    unsigned int status_code;
-    response_stream >> status_code;
-    std::string status_message;
-    std::getline(response_stream, status_message);
-    if (!response_stream || http_version.substr(0, 5) != "HTTP/")
-    {
-        std::cout << "Invalid response\n";
-        return;
-    }
-    if (status_code != 200)
-    {
-        std::cout << "Response returned with status code ";
-        std::cout << status_code << "\n";
+        std::cout << "Unable to on_read " << m_url << ": "
+            << ec.message() << std::endl;
         return;
     }
 
-    // Read the response headers, which are terminated by a blank line.
-    boost::asio::async_read_until(m_socket, m_response, "\r\n\r\n",
-        boost::bind(&HttpSession::handle_read_headers, 
-        shared_from_this(),
-        boost::asio::placeholders::error));
-}
-void HttpSession::handle_read_headers(const boost::system::error_code& ec){
-    if (ec) {
-        std::cout << "handle_read_headers " << ec.message() << std::endl;
+    boost::ignore_unused(bytes_transferred);
+
+    m_result->_response = boost::beast::buffers_to_string(m_response.get().body().data());
+
+    // not_connected happens sometimes so don't bother reporting it.
+    if(ec && ec != boost::beast::errc::not_connected){
+        std::cout << "shutdown " << m_url << ": "
+            << ec.message() << std::endl;    
         return;
     }
 
-    // Process the response headers.
-    std::istream response_stream(&m_response);
-    std::string header;
-    while (std::getline(response_stream, header) && header != "\r")
-    // std::cout << header << "\n";
-    // std::cout << "\n";
-
-    // Write whatever content we already have to output.
-    if (m_response.size() > 0)
-    // std::cout << &m_response;
-
-    // Start reading remaining data until EOF.
-    boost::asio::async_read(m_socket, m_response,
-        boost::asio::transfer_at_least(1),
-        boost::bind(&HttpSession::on_read,
-        shared_from_this(),
-        boost::asio::placeholders::error));
+    m_result->finished = true;
+    m_callback(m_result);
 }
 
-void HttpSession::on_read(const boost::system::error_code& ec) {
-
-    if (!ec) {
-        // Write all of the data that has been read so far.
-        // std::cout << &m_response;
-        // m_result->_response = boost::beast::buffers_to_string(m_response.data()).c_str();
-
-		// std::string response;
-		// std::istream input(&m_response);
-		// std::getline(input, m_result->_response);
-
-        m_result->finished = false;
-        m_callback(m_result);
-        // Continue reading remaining data until EOF.
-        boost::asio::async_read(m_socket, m_response,
-            boost::asio::transfer_at_least(1),
-            boost::bind(&HttpSession::on_read,
-            shared_from_this(),
-            boost::asio::placeholders::error));
-    }
-    else if (ec != boost::asio::error::eof) {
-        std::cout << "on_read " << ec.message() << std::endl;
-        return;
-    }
-    else if (ec == boost::asio::error::eof) {
-        // m_callback();
-        // std::cout << m_result->_response;
-        m_result->_response = boost::beast::buffers_to_string(m_response.data()).c_str();
-        m_result->finished = true;
-        m_callback(m_result);
-    }    
-}
-
-void HttpSession::onTimeout(const boost::system::error_code& error){
-  if (error != boost::asio::error::operation_aborted)
-  {
-    std::cout << "Timeout, url: " << m_url << std::endl;
-  }    
-}
 
 void HttpSession::onError(const std::string& error, const std::string& details) {
     g_logger.error(stdext::format("HttpSession error %s", error));
 }
 
-void HttpSession::on_finish(const boost::system::error_code& ec)
-{
-    if (ec) {
-        std::cout << "Error occured! Error code = "
-            << ec.value()
-            << ". Message: " << ec.message();
-    }
-
-    // m_callback(*this, m_response, ec);
-
-    return;
-}
-    
 void WebsocketSession::start(){
     std::cout << "WebsocketSession::start\n";
 }
