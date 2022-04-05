@@ -24,8 +24,6 @@
 
 #include <framework/global.h>
 
-#include <memory>
-
 class LuaInterface;
 class LuaObject;
 

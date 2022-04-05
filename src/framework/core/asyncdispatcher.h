@@ -23,7 +23,7 @@
 #pragma once
 
 #include <future>
-#include <framework/stdext/thread.h>
+#include <list>
 
 class AsyncDispatcher
 {

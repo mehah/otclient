@@ -45,3 +45,4 @@
 #include <typeinfo>
 #include <unordered_map>
 #include <vector>
+#include <memory>
