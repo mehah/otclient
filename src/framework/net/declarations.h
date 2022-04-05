@@ -24,7 +24,7 @@
 #define FRAMEWORK_NET_DECLARATIONS_H
 
 #include <framework/global.h>
-#include <asio.hpp>
+#include <asio/ip/tcp.hpp>
 
 class InputMessage;
 class OutputMessage;
