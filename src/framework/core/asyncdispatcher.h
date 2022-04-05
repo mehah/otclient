@@ -24,6 +24,7 @@
 #define ASYNCDISPATCHER_H
 
 #include <future>
+#include <list>
 
 class AsyncDispatcher
 {
