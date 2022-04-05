@@ -19,7 +19,7 @@ void Http::terminate() {
     m_working = false;
     for (auto& ws : m_websockets) {
         ws.second->close();
-    }    
+    }
     for (auto& op : m_operations) {
         op.second->canceled = true;
     }
@@ -41,7 +41,7 @@ int Http::get(const std::string& url, int timeout) {
         result->url = url;
         result->operationId = operationId;
         m_operations[operationId] = result;
-        auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, timeout, result, [&](HttpResult_ptr result) {
+        auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_custom_header, timeout, result, [&](HttpResult_ptr result) {
             bool finished = result->finished;
             g_dispatcher.addEvent([result, finished] {
                 if (!finished) {
@@ -75,7 +75,7 @@ int Http::post(const std::string& url, const std::string& data, int timeout) {
         result->operationId = operationId;
         result->postData = data;
         m_operations[operationId] = result;
-        auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, timeout, result, [&](HttpResult_ptr result) {
+        auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_custom_header, timeout, result, [&](HttpResult_ptr result) {
             bool finished = result->finished;
             g_dispatcher.addEvent([result, finished] {
                 if (!finished) {
@@ -103,7 +103,7 @@ int Http::download(const std::string& url, std::string path, int timeout) {
         result->url = url;
         result->operationId = operationId;
         m_operations[operationId] = result;
-        auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, timeout, result, [&, path](HttpResult_ptr result) {
+        auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_custom_header, timeout, result, [&, path](HttpResult_ptr result) {
             m_speed = ((result->size) * 10) / (1 + stdext::micros() - m_lastSpeedUpdate);
             m_lastSpeedUpdate = stdext::micros();
 
@@ -225,7 +225,7 @@ void HttpSession::on_resolve(const boost::system::error_code& ec, boost::asio::i
     }
 
     // Set a timeout on the operation
-    m_socket.expires_after(std::chrono::seconds(30));
+    m_socket.expires_after(std::chrono::seconds(m_timeout));
 
     m_socket.async_connect(results,
         boost::beast::bind_front_handler(&HttpSession::on_connect, 
@@ -253,7 +253,11 @@ void HttpSession::on_connect(const boost::system::error_code& ec, boost::asio::i
         m_request.body() = m_result->postData;
     }
 
-    m_socket.expires_after(std::chrono::seconds(30));
+    for (auto& ch : m_custom_header) {
+        m_request.insert(ch.first, ch.second);
+    }
+
+    m_socket.expires_after(std::chrono::seconds(m_timeout));
 
     // The connection was successful. Send the request.
     boost::beast::http::async_write(m_socket, m_request,

@@ -58,8 +58,9 @@ class HttpSession : public std::enable_shared_from_this<HttpSession>
 public:
 
     HttpSession(boost::asio::io_service& service, const std::string& url, const std::string& agent, 
+                const std::map<std::string, std::string>& custom_header,
                 int timeout, HttpResult_ptr result, HttpResult_cb callback) :
-        m_service(service), m_url(url), m_agent(agent), m_socket(service), m_resolver(service), 
+        m_service(service), m_url(url), m_agent(agent), m_custom_header(custom_header), m_socket(service), m_resolver(service),
         m_callback(callback), m_result(result), m_timer(service), m_timeout(timeout)
     {
         // VALIDATE(m_callback);
@@ -81,6 +82,7 @@ private:
     boost::asio::steady_timer m_timer;
     int m_timeout;
     ParsedURI instance_uri;
+    std::map<std::string, std::string> m_custom_header;
 
     std::shared_ptr<boost::asio::ssl::stream<boost::asio::ip::tcp::socket&>> m_ssl;
     std::shared_ptr<boost::asio::ssl::context> m_context;
@@ -191,6 +193,10 @@ public:
         m_userAgent = userAgent;
     }
 
+    void addCustomHeader(std::string name, std::string value) {
+        m_custom_header[name] = value;
+    }
+
 private:
     bool m_working = false;
     int m_operationId = 1;
@@ -203,6 +209,7 @@ private:
     std::map<int, std::shared_ptr<WebsocketSession>> m_websockets;
     std::map<std::string, HttpResult_ptr> m_downloads;
     std::string m_userAgent = "Mozilla/5.0";
+    std::map<std::string, std::string> m_custom_header;
 };
 
 extern Http g_http;

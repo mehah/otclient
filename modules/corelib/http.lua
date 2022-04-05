@@ -181,6 +181,12 @@ function HTTP.onDownloadProgress(operationId, url, progress, speed)
   end
 end
 
+function HTTP.addCustomHeader(headerTable)
+  for name, value in pairs(headerTable) do
+    g_http.addCustomHeader(name, value)
+  end
+end
+
 connect(g_http, 
   {
     onGet = HTTP.onGet,
