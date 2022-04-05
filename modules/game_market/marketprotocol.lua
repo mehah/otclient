@@ -15,12 +15,23 @@ local function readMarketOffer(msg, action, var)
     local itemId = 0
     if var == MarketRequest.MyOffers or var == MarketRequest.MyHistory then
         itemId = msg:getU16()
+        if g_game.getClientVersion() >= 1281 then
+            local item = Item.create(itemId)
+            if item and item:getUpgradeClassification() > 0 then
+                msg:getU8()
+            end
+        end
     else
         itemId = var
     end
 
     local amount = msg:getU16()
-    local price = msg:getU32()
+    local price = 0
+    if g_game.getClientVersion() >= 1281 then
+        price = msg:getU64()
+    else
+        price = msg:getU32()
+    end
     local playerName
     local state = MarketOfferState.Active
     if var == MarketRequest.MyHistory then
@@ -36,29 +47,24 @@ end
 
 -- parsing protocols
 local function parseMarketEnter(protocol, msg)
-    local balance
-    if g_game.getClientVersion() >= 981 then
-        balance = msg:getU64()
-    else
-        balance = msg:getU32()
-    end
-
-    local vocation = -1
-    if g_game.getClientVersion() < 950 then
-        vocation = msg:getU8() -- get vocation id
-    end
-    local offers = msg:getU8()
+    local offerCount = msg:getU8()
 
     local depotItems = {}
     local depotCount = msg:getU16()
     for i = 1, depotCount do
-        local itemId = msg:getU16() -- item id
+        local itemId = msg:getU16();
+        if g_game.getClientVersion() >= 1281 then
+            local item = Item.create(itemId)
+            if item and item:getUpgradeClassification() > 0 then
+                msg:getU8()
+            end
+        end
         local itemCount = msg:getU16() -- item count
 
         depotItems[itemId] = itemCount
     end
 
-    signalcall(Market.onMarketEnter, depotItems, offers, balance, vocation)
+    signalcall(Market.onMarketEnter, depotItems, offerCount)
     return true
 end
 
@@ -68,10 +74,20 @@ local function parseMarketLeave(protocol, msg)
 end
 
 local function parseMarketDetail(protocol, msg)
-    local itemId = msg:getU16()
+    local itemId = msg:getU16();
+    if g_game.getClientVersion() >= 1281 then
+        local item = Item.create(itemId)
+        if item and item:getUpgradeClassification() > 0 then
+            msg:getU8()
+        end
+    end
 
     local descriptions = {}
-    for i = MarketItemDescription.First, MarketItemDescription.Last do
+    local lastAttribute = MarketItemDescription.ImbuingSlots
+    if g_game.getClientVersion() >= 1281 then
+        lastAttribute = MarketItemDescription.Last
+    end
+    for i = MarketItemDescription.First, lastAttribute do
         if msg:peekU16() ~= 0x00 then
             table.insert(descriptions, {i, msg:getString()}) -- item descriptions
         else
@@ -84,9 +100,18 @@ local function parseMarketDetail(protocol, msg)
     local count = msg:getU8()
     for i = 1, count do
         local transactions = msg:getU32() -- transaction count
-        local totalPrice = msg:getU32() -- total price
-        local highestPrice = msg:getU32() -- highest price
-        local lowestPrice = msg:getU32() -- lowest price
+        local totalPrice = 0
+        local highestPrice = 0
+        local lowestPrice = 0
+        if g_game.getClientVersion() >= 1281 then
+            totalPrice = msg:getU64() -- total price
+            highestPrice = msg:getU64() -- highest price
+            lowestPrice = msg:getU64() -- lowest price
+        else
+            totalPrice = msg:getU32() -- total price
+            highestPrice = msg:getU32() -- highest price
+            lowestPrice = msg:getU32() -- lowest price
+        end
 
         local tmp = time - statistics.SECONDS_PER_DAY
         table.insert(purchaseStats,
@@ -98,9 +123,18 @@ local function parseMarketDetail(protocol, msg)
     count = msg:getU8()
     for i = 1, count do
         local transactions = msg:getU32() -- transaction count
-        local totalPrice = msg:getU32() -- total price
-        local highestPrice = msg:getU32() -- highest price
-        local lowestPrice = msg:getU32() -- lowest price
+        local totalPrice = 0
+        local highestPrice = 0
+        local lowestPrice = 0
+        if g_game.getClientVersion() >= 1281 then
+            totalPrice = msg:getU64() -- total price
+            highestPrice = msg:getU64() -- highest price
+            lowestPrice = msg:getU64() -- lowest price
+        else
+            totalPrice = msg:getU32() -- total price
+            highestPrice = msg:getU32() -- highest price
+            lowestPrice = msg:getU32() -- lowest price
+        end
 
         local tmp = time - statistics.SECONDS_PER_DAY
         table.insert(saleStats,
@@ -114,7 +148,16 @@ local function parseMarketDetail(protocol, msg)
 end
 
 local function parseMarketBrowse(protocol, msg)
-    local var = msg:getU16()
+    local var = msg:getU8()
+    if var == 3 then --- Item browse
+        var = msg:getU16()
+        if g_game.getClientVersion() >= 1281 then
+            local item = Item.create(var)
+            if item and item:getUpgradeClassification() > 0 then
+                msg:getU8()
+            end
+        end
+    end
     local offers = {}
 
     local buyOfferCount = msg:getU32()
@@ -128,7 +171,25 @@ local function parseMarketBrowse(protocol, msg)
     end
 
     signalcall(Market.onMarketBrowse, offers)
+
     return true
+end
+
+local function parseMarketResourcesBalance(protocol, msg)
+    local resourceType = msg:getU8() -- type
+    local value = msg:getU64() -- value
+  
+    signalcall(Market.onMarketResourceBalance, resourceType, value)
+    return true
+end
+
+local function parseStoreBalance(protocol, msg)
+	msg:getU8() -- 0x01
+	msg:getU32() -- store coins (transferable + non-t)
+	msg:getU32() -- transferable coints
+	msg:getU32() -- reserved store coins
+	msg:getU32() -- tournament coins
+	return true
 end
 
 -- public functions
@@ -167,6 +228,11 @@ function MarketProtocol.registerProtocol()
                                     parseMarketDetail)
         ProtocolGame.registerOpcode(GameServerOpcodes.GameServerMarketBrowse,
                                     parseMarketBrowse)
+        ProtocolGame.registerOpcode(GameServerOpcodes.GameServerResourceBalance,
+                                    parseMarketResourcesBalance)
+        -- to do: move to store module
+        ProtocolGame.registerOpcode(GameServerOpcodes.GameServerCoinBalance,
+                                    parseStoreBalance)
     end
     MarketProtocol.updateProtocol(g_game.getProtocolGame())
 end
@@ -181,6 +247,10 @@ function MarketProtocol.unregisterProtocol()
                                       parseMarketDetail)
         ProtocolGame.unregisterOpcode(GameServerOpcodes.GameServerMarketBrowse,
                                       parseMarketBrowse)
+        ProtocolGame.unregisterOpcode(GameServerOpcodes.GameServerResourceBalance,
+                                      parseMarketResourcesBalance)
+        ProtocolGame.unregisterOpcode(GameServerOpcodes.GameServerCoinBalance,
+                                      parseStoreBalance)
     end
     MarketProtocol.updateProtocol(nil)
 end

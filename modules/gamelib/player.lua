@@ -1,5 +1,5 @@
 -- @docclass Player
-PlayerStates = {
+PlayerIcons = {
     None = 0,
     Poison = 1,
     Burn = 2,
@@ -120,15 +120,19 @@ function Player:getItemsCount(itemId)
     return count
 end
 
-function Player:hasState(state, states)
-    if not states then states = self:getStates() end
+function Player:hasIcon(icon, icons)
+    if not icons then
+      icons = self:getIcons() 
+    end
 
     for i = 1, 32 do
         local pow = math.pow(2, i - 1)
-        if pow > states then break end
+        if pow > icons then break end
 
-        local states = bit32.band(states, pow)
-        if states == state then return true end
+        local icons = bit32.band(icons, pow)
+        if icons == icon then
+            return true 
+        end
     end
     return false
 end

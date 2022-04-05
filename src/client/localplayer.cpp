@@ -244,13 +244,13 @@ void LocalPlayer::onPositionChange(const Position& newPos, const Position& oldPo
     }
 }
 
-void LocalPlayer::setStates(int states)
+void LocalPlayer::setIcons(int icons)
 {
-    if (m_states != states) {
-        const int oldStates = m_states;
-        m_states = states;
+    if(m_icons != icons) {
+        const int oldIcons = m_icons;
+        m_icons = icons;
 
-        callLuaField("onStatesChange", states, oldStates);
+        callLuaField("onIconsChange", icons, oldIcons);
     }
 }
 

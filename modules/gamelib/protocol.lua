@@ -91,6 +91,7 @@ GameServerOpcodes = {
     GameServerCoinBalance = 223, -- 1080
     GameServerStoreError = 224, -- 1080
     GameServerRequestPurchaseData = 225, -- 1080
+    GameServerResourceBalance = 238, -- 1264
     GameServerQuestLog = 240,
     GameServerQuestLine = 241,
     GameServerCoinBalanceUpdating = 242, -- 1080

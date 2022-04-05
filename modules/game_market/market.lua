@@ -25,6 +25,7 @@ displaysTabBar = nil
 offersTabBar = nil
 selectionTabBar = nil
 
+nameLabel = nil
 marketOffersPanel = nil
 browsePanel = nil
 overviewPanel = nil
@@ -38,7 +39,6 @@ itemsPanel = nil
 selectedOffer = {}
 selectedMyOffer = {}
 
-nameLabel = nil
 feeLabel = nil
 balanceLabel = nil
 totalPriceEdit = nil
@@ -76,6 +76,8 @@ currentItems = {}
 lastCreatedOffer = 0
 fee = 0
 averagePrice = 0
+bankBalance = 0
+goldEquipped = 0
 
 loaded = false
 
@@ -431,6 +433,7 @@ local function updateSelectedItem(widget)
     if Market.isItemSelected() then
         selectedItem:setItem(selectedItem.item.displayItem)
         nameLabel:setText(selectedItem.item.marketData.name)
+        Market:hideOffersTableInstructions()
         clearOffers()
 
         Market.enableCreateOffer(true) -- update offer types
@@ -440,14 +443,10 @@ local function updateSelectedItem(widget)
     end
 end
 
-local function updateBalance(balance)
-    local balance = tonumber(balance)
-    if not balance then return end
+local function updateBalance()
+    information.balance = bankBalance + goldEquipped
 
-    if balance < 0 then balance = 0 end
-    information.balance = balance
-
-    balanceLabel:setText('Balance: ' .. balance .. ' gold')
+    balanceLabel:setText('Balance: ' .. information.balance .. ' gold')
     balanceLabel:resizeToText()
 end
 
@@ -698,8 +697,10 @@ local function initMarketItems()
                 }
 
                 -- add new market item
+                if marketItems[marketData.category] ~= nil then
                 table.insert(marketItems[marketData.category], marketItem)
                 itemSet[marketData.tradeAs] = true
+                end
             end
         end
     end
@@ -713,7 +714,11 @@ local function initInterface()
 
     -- setup 'Market Offer' section tabs
     marketOffersPanel = g_ui.loadUI('ui/marketoffers')
-    mainTabBar:addTab(tr('Market Offers'), marketOffersPanel)
+    local mopTab = mainTabBar:addTab(tr('Market Offers'), marketOffersPanel)
+        mopTab.onClick = function()
+        mainTabBar:selectTab(mopTab)
+        Market.refreshOffers()
+    end
 
     selectionTabBar = marketOffersPanel:getChildById('leftTabBar')
     selectionTabBar:setContentWidget(marketOffersPanel:getChildById(
@@ -743,7 +748,11 @@ local function initInterface()
 
     -- setup 'My Offer' section tabs
     myOffersPanel = g_ui.loadUI('ui/myoffers')
-    mainTabBar:addTab(tr('My Offers'), myOffersPanel)
+    local moTab = mainTabBar:addTab(tr('My Offers'), myOffersPanel)
+        moTab.onClick = function()
+        mainTabBar:selectTab(moTab)
+        Market.refreshMyOffers()
+    end
 
     offersTabBar = myOffersPanel:getChildById('offersTabBar')
     offersTabBar:setContentWidget(myOffersPanel:getChildById('offersTabContent'))
@@ -897,10 +906,37 @@ function terminate()
     Market = nil
 end
 
+function Market.showMyOffersTableInstructions()
+    local instruction = tr('Press %s button to update', tr('Refresh Offers'))
+    if sellMyOfferTable then sellMyOfferTable:setText(instruction) end
+    if buyMyOfferTable then buyMyOfferTable:setText(instruction) end
+  end
+  
+  function Market.hideMyOffersTableInstructions()
+    if sellMyOfferTable then sellMyOfferTable:setText('') end
+    if buyMyOfferTable then buyMyOfferTable:setText('') end
+  end
+  
+  function Market.showOffersTableInstructions()
+    local instruction = tr('Select an item to view the offers')
+    if sellOfferTable then sellOfferTable:setText(instruction) end
+    if buyOfferTable then buyOfferTable:setText(instruction) end
+  end
+  
+  function Market.hideOffersTableInstructions()
+    if sellOfferTable then sellOfferTable:setText('') end
+    if buyOfferTable then buyOfferTable:setText('') end
+  end
+
 function Market.reset()
     balanceLabel:setColor('#bbbbbb')
     categoryList:setCurrentOption(getMarketCategoryName(MarketCategory.First))
     searchEdit:setText('')
+
+    -- When uses closes market at this screen we need to show this instruction again when it gets opened,
+    -- since we cannot load offers for the user ourselves due to the bot protection.
+    Market:showMyOffersTableInstructions()
+
     clearFilters()
     clearMyOffers()
     if not table.empty(information) then Market.updateCurrentItems() end
@@ -922,7 +958,7 @@ function Market.clearSelectedItem()
 
         clearOffers()
         radioItemSet:selectWidget(nil)
-        nameLabel:setText('No item selected.')
+        Market:showOffersTableInstructions()
         selectedItem:setItem(nil)
         selectedItem.item = nil
         selectedItem.ref:setChecked(false)
@@ -1050,12 +1086,18 @@ function Market.refreshOffers()
 end
 
 function Market.refreshMyOffers()
+    Market:hideMyOffersTableInstructions()
     clearMyOffers()
     MarketProtocol.sendMarketBrowseMyOffers()
 end
 
 function Market.loadMarketItems(category)
     clearItems()
+
+    if not loaded then
+        initMarketItems()
+        loaded = true
+    end
 
     -- check search filter
     local searchFilter = searchEdit:getText()
@@ -1172,24 +1214,19 @@ end
 
 -- protocol callback functions
 
-function Market.onMarketEnter(depotItems, offers, balance, vocation)
+function Market.onMarketEnter(depotItems, offers)
     if not loaded then
         initMarketItems()
         loaded = true
     end
 
-    updateBalance(balance)
+    updateBalance()
     averagePrice = 0
 
     information.totalOffers = offers
     local player = g_game.getLocalPlayer()
     if player then information.player = player end
-    if vocation == -1 then
-        if player then information.vocation = player:getVocation() end
-    else
-        -- vocation must be compatible with < 950
-        information.vocation = vocation
-    end
+    information.vocation = player:getVocation()
 
     -- set list of depot items
     information.depotItems = depotItems
@@ -1221,3 +1258,13 @@ function Market.onMarketDetail(itemId, descriptions, purchaseStats, saleStats)
 end
 
 function Market.onMarketBrowse(offers) updateOffers(offers) end
+
+function Market.onMarketResourceBalance(resourceType, value)
+	if resourceType == 0x00 then
+		bankBalance = value
+	elseif resourceType == 0x01 then
+		goldEquipped = value
+	end
+
+	updateBalance()
+end

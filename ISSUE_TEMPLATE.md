@@ -2,7 +2,7 @@
 
 ### Before creating an issue, please ensure:
 - [ ] This is a bug in the software that resides in this repository, and not a
-      support matter (use https://otland.net/forums/otclient.494/ for support)
+      support matter (use https://discordapp.com/invite/3NxYnyV for support)
 - [ ] This issue is reproducible without changes to the code in this repository
 
 ### Steps to reproduce (include any configuration/script required to reproduce)
@@ -17,6 +17,6 @@
 <!-- Tell us what happens instead -->
 
 ### Environment
-<!-- Please tell which client version are you using (E.g 10.98 OTClient 0.6.6)
+<!-- Please tell which client version are you using (E.g 12.85)
 If the issue is environment specific (e.g. compiling errors), include
      name and version of the operating system and compiler you are using. -->
