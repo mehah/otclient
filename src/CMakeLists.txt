@@ -9,19 +9,17 @@ option(FRAMEWORK_XML "Use XML " ON)
 option(FRAMEWORK_NET "Use NET " ON)
 option(FRAMEWORK_SQL "Use SQL" OFF)
 option(TOOGLE_DIRECTX "Use DX9 support" OFF)
+option(USE_STATIC_LIBS "Use shared libraries (dlls)" ON)
+option(BOT_PROTECTION "Use bot protection" ON)
+option(USE_PRE_COMPILED_HEADER "Use precompiled header (speed up compile)" OFF)
 
 # *****************************************************************************
 # Cmake Features
 # *****************************************************************************
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-# Global gives error when building spdlog
-# Avoid changes by cmake/make on the source tree
-# https://gitlab.kitware.com/cmake/cmake/issues/18403
-set(CMAKE_DISABLE_SOURCE_CHANGES ON)
-set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
 # Make will print more details
 set(CMAKE_VERBOSE_MAKEFILE OFF)
@@ -43,6 +41,32 @@ if (FRAMEWORK_NET)
 	set(FRAMEWORK_DEFINITIONS ${FRAMEWORK_DEFINITIONS} -DFRAMEWORK_NET)
 endif()
 
+# Set USE_STATIC_LIBS
+# CMAKE_SIZEOF_VOID_P EQUAL 4 = x86 build
+if(CMAKE_SIZEOF_VOID_P EQUAL 4 AND USE_STATIC_LIBS AND NOT APPLE)
+	set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -static-libgcc -static-libstdc++")
+	message(STATUS "Link to static libraries: ON")
+else()
+	message(STATUS "Link to static libraries: OFF")
+endif()
+
+if(BOT_PROTECTION)
+	message(STATUS "Bot protection: ON")
+else(BOT_PROTECTION)
+	message(STATUS "Bot protection: OFF")
+endif(BOT_PROTECTION)
+
+# Set for use precompiled header
+if(USE_PRE_COMPILED_HEADER)
+	include(cotire)
+	cotire(${PROJECT_NAME})
+	message(STATUS "Use precompiled header: ON")
+else()
+	message(STATUS "Use precompiled header: OFF")
+endif(USE_PRE_COMPILED_HEADER)
+
+set(VERSION "1.0.0")
+
 # *****************************************************************************
 # Client
 # *****************************************************************************
@@ -52,31 +76,42 @@ else()
 	add_executable(${PROJECT_NAME} "")
 endif()
 
+# Client options
+add_definitions(-DCLIENT)
+# Set bot protection
+if(BOT_PROTECTION)
+	add_definitions(-DBOT_PROTECTION)
+endif(BOT_PROTECTION)
 add_definitions(-D_WIN32_WINNT=0x0501)
 add_definitions(${FRAMEWORK_DEFINITIONS})
+add_definitions(-D"VERSION=\\"${VERSION}\\"")
 
 # *****************************************************************************
 # Packages / Libs
 # *****************************************************************************
 find_package(Boost 1.53.0 COMPONENTS system thread filesystem REQUIRED)
 find_package(OpenSSL QUIET)
-find_package(spdlog CONFIG REQUIRED)
-find_package(Protobuf REQUIRED)
 find_package(PhysFS REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(LibLZMA REQUIRED)
 find_package(nlohmann_json REQUIRED)
-find_package(DbgHelp REQUIRED)
 # OpenGL/GLEW = Graphics
-find_package(OpenGL REQUIRED)
+if(APPLE)
+	include_directories(/usr/X11R6/include/)
+	link_directories(/usr/X11R6/lib/)
+else()
+	find_package(OpenGL REQUIRED)
+endif()
 find_package(GLEW REQUIRED)
-if (WIN32)
-	find_package(LuaJIT REQUIRED)
-endif(WIN32)
 if (UNIX)
 	find_package(Lua REQUIRED)
-endif(UNIX)
+	find_package(X11 REQUIRED)
+endif()
+if (WIN32)
+	find_package(LuaJIT REQUIRED)
+	find_package(DbgHelp REQUIRED)
+endif(WIN32)
 if(NOT OPENSSL_FOUND)
 	find_package(GMP REQUIRED)
 endif()
@@ -205,9 +240,12 @@ target_sources(${PROJECT_NAME}
 	framework/otml//otmlparser.cpp
 	framework/platform/platform.cpp
 	framework/platform/platformwindow.cpp
+	framework/platform/unixcrashhandler.cpp
+	framework/platform/unixplatform.cpp
 	framework/platform/win32crashhandler.cpp
 	framework/platform/win32platform.cpp
 	framework/platform/win32window.cpp
+	framework/platform/x11window.cpp
 	framework/sound/combinedsoundsource.cpp
 	framework/sound/oggsoundfile.cpp
 	framework/sound/soundbuffer.cpp
@@ -248,14 +286,13 @@ target_sources(${PROJECT_NAME}
 # *****************************************************************************
 # Includes and librarys
 # *****************************************************************************
-if (MSVC)
+if(MSVC)
 	target_include_directories(${PROJECT_NAME}
 		PRIVATE
 		${CMAKE_SOURCE_DIR}/src
 		${MYSQL_INCLUDE_DIR}
 		${LUAJIT_INCLUDE_DIR}
 		${Boost_INCLUDE_DIRS}
-		${PUGIXML_INCLUDE_DIR}
 		${Protobuf_INCLUDE_DIRS}
 		${OPENAL_INCLUDE_DIR}
 		${VORBISFILE_INCLUDE_DIR}
@@ -272,47 +309,7 @@ if (MSVC)
 		${LUAJIT_LIBRARY}
 		${Boost_LIBRARY_DIRS}
 		${Boost_LIBRARIES}
-		${PUGIXML_LIBRARIES}
 		${CMAKE_THREAD_LIBS_INIT}
-		${PHYSFS_LIBRARY}
-		${ZLIB_LIBRARY}
-		${PROTOBUF_LIBRARY}
-		${LIBLZMA_LIBRARIES}
-		${NLOHMANN_JSON_LIBRARY}
-		${GLEW_LIBRARY}
-		${OPENGL_LIBRARIES}
-		${DirectX_LIBRARY}
-		${DirectX_LIBRARIES}
-		${OPENAL_LIBRARY}
-		${VORBISFILE_LIBRARY}
-		${VORBIS_LIBRARY}
-		${OGG_LIBRARY}
-		${MYSQL_LIBRARY}
-		${GMP_LIBRARY}
-		${OPENSSL_LIBRARIES}
-		${DBGHELP_LIBRARY}
-
-		spdlog::spdlog
-	)
-	
-else()
-	target_include_directories(${PROJECT_NAME}
-		PRIVATE
-		${CMAKE_SOURCE_DIR}/src
-		${LUAJIT_INCLUDE_DIR}
-		${Protobuf_INCLUDE_DIRS}
-		${OPENAL_INCLUDE_DIR}
-		${VORBISFILE_INCLUDE_DIR}
-		${MYSQL_INCLUDE_DIR}
-		${GMP_INCLUDE_DIR}
-		${OPENSSL_INCLUDE_DIR}
-		${PHYSFS_INCLUDE_DIR}
-		${LIBLZMA_INCLUDE_DIRS}
-		${NLOHMANN_JSON_INCLUDE_DIR}
-	)
-	target_link_libraries(${PROJECT_NAME}
-		PRIVATE
-		${LUAJIT_LIBRARY}
 		${PHYSFS_LIBRARY}
 		${ZLIB_LIBRARY}
 		${PROTOBUF_LIBRARY}
@@ -335,11 +332,53 @@ else()
 		Boost::filesystem
 		Boost::system
 		Threads::Threads
-		unofficial::libmariadb unofficial::mariadbclient
-		pugixml::pugixml
-		spdlog::spdlog
+		GLEW::GLEW
 	)
-endif (MSVC)
+	
+else()
+	target_include_directories(${PROJECT_NAME}
+		PRIVATE
+		${CMAKE_SOURCE_DIR}/src
+		${LUA_INCLUDE_DIR}
+		${Protobuf_INCLUDE_DIRS}
+		${OPENAL_INCLUDE_DIR}
+		${VORBISFILE_INCLUDE_DIR}
+		${MYSQL_INCLUDE_DIR}
+		${GMP_INCLUDE_DIR}
+		${OPENSSL_INCLUDE_DIR}
+		${OPENGL_INCLUDE_DIR}
+		${PHYSFS_INCLUDE_DIR}
+		${LIBLZMA_INCLUDE_DIRS}
+		${NLOHMANN_JSON_INCLUDE_DIR}
+		${X11_INCLUDE_DIR}
+	)
+	target_link_libraries(${PROJECT_NAME}
+		PRIVATE
+		${LUA_LIBRARY}
+		${PHYSFS_LIBRARY}
+		${ZLIB_LIBRARY}
+		${PROTOBUF_LIBRARY}
+		${LIBLZMA_LIBRARIES}
+		${NLOHMANN_JSON_LIBRARY}
+		${GLEW_LIBRARY}
+		${OPENGL_LIBRARIES}
+		${DirectX_LIBRARY}
+		${DirectX_LIBRARIES}
+		${OPENAL_LIBRARY}
+		${VORBISFILE_LIBRARY}
+		${VORBIS_LIBRARY}
+		${OGG_LIBRARY}
+		${MYSQL_LIBRARY}
+		${GMP_LIBRARY}
+		${OPENSSL_LIBRARIES}
+		${X11_LIBRARIES}
+
+		Boost::boost
+		Boost::filesystem
+		Boost::system
+		Threads::Threads
+	)
+endif()
 
 # *****************************************************************************
 # Enable otclient console only for debug build

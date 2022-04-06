@@ -23,7 +23,7 @@
 #ifndef FILESTREAM_H
 #define FILESTREAM_H
 
-#include "framework/core/resourcemanager.h"
+#include "resourcemanager.h"
 #include "framework/luaengine/luaobject.h"
 #include "framework/util/databuffer.h"
 #include "framework/util/point.h"

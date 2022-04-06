@@ -1,0 +1,74 @@
+---
+name: Analysis - CodeQL
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+env:
+  VCPKG_BUILD_TYPE: release
+  CMAKE_BUILD_PARALLEL_LEVEL: 2
+  MAKEFLAGS: '-j 2'
+  NODE_OPTIONS: ' --max-old-space-size=8192 '
+
+jobs:
+  codeql:
+    name: CodeQL
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['cpp', 'python']
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v3.0.0
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v1
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Install Linux Dependencies
+        if: ${{ matrix.language == 'cpp' }}
+        run: >
+          sudo apt-get update && sudo apt-get install ccache libglew-dev libx11-dev liblua5.1-dev
+  
+      - name: CCache
+        id: ccache
+        uses: actions/cache@v3.0.0
+        with:
+          path: /home/runner/.ccache
+          key: ccache-${{ runner.os }}-RelWithDebInfo-${{ hashFiles('**/src') }}
+          restore-keys: |
+            ccache-${{ runner.os }}-RelWithDebInfo-
+            ccache-${{ runner.os }}-
+      - name: Restore artifacts, or setup vcpkg (do not install any package)
+        if: ${{ matrix.language == 'cpp' }}
+        uses: lukka/run-vcpkg@v7
+        with:
+          setupOnly: true
+          vcpkgDirectory: ${{ github.workspace }}/vcpkg
+          appendedCacheKey: ${{ hashFiles( '**/vcpkg.json' ) }}
+          vcpkgTriplet: x64-linux
+          additionalCachedPaths: ${{ github.workspace }}/build/vcpkg_installed
+          vcpkgGitCommitId: af2287382b1991dbdcb7e5112d236f3323b9dd7a
+
+      - name: Get latest CMake and ninja
+        uses: lukka/get-cmake@latest
+
+      - name: Run CMake
+        if: ${{ matrix.language == 'cpp' }}
+        uses: lukka/run-cmake@v3
+        with:
+          cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
+          useVcpkgToolchainFile: true
+          buildDirectory: ${{ github.workspace }}/build/
+          cmakeBuildType: RelWithDebInfo
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v1
