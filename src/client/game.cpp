@@ -658,7 +658,7 @@ void Game::autoWalk(std::vector<Otc::Direction> dirs, Position startPos)
     if (!canPerformGameAction())
         return;
 
-    if (dirs.size() == 0)
+    if (dirs.empty())
         return;
 
     // protocol limits walk path

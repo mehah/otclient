@@ -117,7 +117,7 @@ protected:
 
     friend class Game;
 
-protected:
+
     void updateWalkOffset(int totalPixelsWalked) override;
     void terminateWalk() override;
 

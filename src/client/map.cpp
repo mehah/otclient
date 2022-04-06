@@ -1083,8 +1083,7 @@ PathFindResult_ptr Map::newFindPath(const Position& start, const Position& goal,
     ret->complexity = 50000 - limit;
 
     for (auto& node : nodes) {
-        if (node.second)
-            delete node.second;
+        delete node.second;
     }
 
     return ret;
@@ -1093,7 +1092,7 @@ PathFindResult_ptr Map::newFindPath(const Position& start, const Position& goal,
 void Map::findPathAsync(const Position& start, const Position& goal, std::function<void(PathFindResult_ptr)> callback)
 {
     const auto visibleNodes = std::make_shared<std::list<Node*>>();
-    for (auto& tile : getTiles(start.z)) {
+    for (const auto& tile : getTiles(start.z)) {
         if (tile->getPosition() == start)
             continue;
         const bool isNotWalkable = !tile->isWalkable(false);
@@ -1125,21 +1124,21 @@ std::map<std::string, std::tuple<int, int, int, std::string>> Map::findEveryPath
 
     std::map<std::string, std::string>::const_iterator it;
     it = params.find("ignoreLastCreature");
-    bool ignoreLastCreature = it != params.end() && it->second != "0" && it->second != "";
+    bool ignoreLastCreature = it != params.end() && it->second != "0" && !it->second.empty();
     it = params.find("ignoreCreatures");
-    bool ignoreCreatures = it != params.end() && it->second != "0" && it->second != "";
+    bool ignoreCreatures = it != params.end() && it->second != "0" && !it->second.empty();
     it = params.find("ignoreNonPathable");
-    bool ignoreNonPathable = it != params.end() && it->second != "0" && it->second != "";
+    bool ignoreNonPathable = it != params.end() && it->second != "0" && !it->second.empty();
     it = params.find("ignoreNonWalkable");
-    bool ignoreNonWalkable = it != params.end() && it->second != "0" && it->second != "";
+    bool ignoreNonWalkable = it != params.end() && it->second != "0" && !it->second.empty();
     it = params.find("ignoreStairs");
-    bool ignoreStairs = it != params.end() && it->second != "0" && it->second != "";
+    bool ignoreStairs = it != params.end() && it->second != "0" && !it->second.empty();
     it = params.find("ignoreCost");
-    bool ignoreCost = it != params.end() && it->second != "0" && it->second != "";
+    bool ignoreCost = it != params.end() && it->second != "0" && !it->second.empty();
     it = params.find("allowUnseen");
-    bool allowUnseen = it != params.end() && it->second != "0" && it->second != "";
+    bool allowUnseen = it != params.end() && it->second != "0" && !it->second.empty();
     it = params.find("allowOnlyVisibleTiles");
-    bool allowOnlyVisibleTiles = it != params.end() && it->second != "0" && it->second != "";
+    bool allowOnlyVisibleTiles = it != params.end() && it->second != "0" && !it->second.empty();
     it = params.find("marginMin");
     bool hasMargin = it != params.end();
     it = params.find("marginMax");
@@ -1260,8 +1259,7 @@ std::map<std::string, std::tuple<int, int, int, std::string>> Map::findEveryPath
     }
 
     for (auto& node : nodes) {
-        if (node.second)
-            delete node.second;
+        delete node.second;
     }
 
     return ret;

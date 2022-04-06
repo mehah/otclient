@@ -579,7 +579,7 @@ int LuaInterface::lua_dofile(lua_State*)
 
 int LuaInterface::lua_dofiles(lua_State*)
 {
-    std::string contains = "";
+    std::string contains;
     if (g_lua.getTop() > 2) {
         contains = g_lua.popString();
     }

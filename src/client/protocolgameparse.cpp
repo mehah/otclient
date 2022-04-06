@@ -460,7 +460,7 @@ void ProtocolGame::parseLogin(const InputMessagePtr& msg)
     g_game.setServerBeat(serverBeat);
     g_game.setCanReportBugs(canReportBugs);
 
-    g_game.processLogin();
+    Game::processLogin();
 }
 
 void ProtocolGame::parsePendingGame(const InputMessagePtr&)
@@ -677,7 +677,7 @@ void ProtocolGame::parsePlayerHelpers(const InputMessagePtr& msg)
 
     const CreaturePtr creature = g_map.getCreatureById(id);
     if (creature)
-        g_game.processPlayerHelpers(helpers);
+        Game::processPlayerHelpers(helpers);
     else
         g_logger.traceError(stdext::format("could not get creature with id %d", id));
 }
@@ -703,21 +703,21 @@ void ProtocolGame::parseGMActions(const InputMessagePtr& msg)
 void ProtocolGame::parseUpdateNeeded(const InputMessagePtr& msg)
 {
     const std::string signature = msg->getString();
-    g_game.processUpdateNeeded(signature);
+    Game::processUpdateNeeded(signature);
 }
 
 void ProtocolGame::parseLoginError(const InputMessagePtr& msg)
 {
     const std::string error = msg->getString();
 
-    g_game.processLoginError(error);
+    Game::processLoginError(error);
 }
 
 void ProtocolGame::parseLoginAdvice(const InputMessagePtr& msg)
 {
     const std::string message = msg->getString();
 
-    g_game.processLoginAdvice(message);
+    Game::processLoginAdvice(message);
 }
 
 void ProtocolGame::parseLoginWait(const InputMessagePtr& msg)
@@ -725,13 +725,13 @@ void ProtocolGame::parseLoginWait(const InputMessagePtr& msg)
     const std::string message = msg->getString();
     const int time = msg->getU8();
 
-    g_game.processLoginWait(message, time);
+    Game::processLoginWait(message, time);
 }
 
 void ProtocolGame::parseSessionEnd(const InputMessagePtr& msg)
 {
     const int reason = msg->getU8();
-    g_game.processSessionEnd(reason);
+    Game::processSessionEnd(reason);
 }
 
 void ProtocolGame::parsePing(const InputMessagePtr&)
@@ -1045,7 +1045,7 @@ void ProtocolGame::parseOpenNpcTrade(const InputMessagePtr& msg)
         items.emplace_back(item, name, weight, buyPrice, sellPrice);
     }
 
-    g_game.processOpenNpcTrade(items);
+    Game::processOpenNpcTrade(items);
 }
 
 void ProtocolGame::parsePlayerGoods(const InputMessagePtr& msg)
@@ -1076,12 +1076,12 @@ void ProtocolGame::parsePlayerGoods(const InputMessagePtr& msg)
         goods.emplace_back(Item::create(itemId), amount);
     }
 
-    g_game.processPlayerGoods(money, goods);
+    Game::processPlayerGoods(money, goods);
 }
 
 void ProtocolGame::parseCloseNpcTrade(const InputMessagePtr&)
 {
-    g_game.processCloseNpcTrade();
+    Game::processCloseNpcTrade();
 }
 
 void ProtocolGame::parseOwnTrade(const InputMessagePtr& msg)
@@ -1093,7 +1093,7 @@ void ProtocolGame::parseOwnTrade(const InputMessagePtr& msg)
     for (int i = 0; i < count; ++i)
         items[i] = getItem(msg);
 
-    g_game.processOwnTrade(name, items);
+    Game::processOwnTrade(name, items);
 }
 
 void ProtocolGame::parseCounterTrade(const InputMessagePtr& msg)
@@ -1105,12 +1105,12 @@ void ProtocolGame::parseCounterTrade(const InputMessagePtr& msg)
     for (int i = 0; i < count; ++i)
         items[i] = getItem(msg);
 
-    g_game.processCounterTrade(name, items);
+    Game::processCounterTrade(name, items);
 }
 
 void ProtocolGame::parseCloseTrade(const InputMessagePtr&)
 {
-    g_game.processCloseTrade();
+    Game::processCloseTrade();
 }
 
 void ProtocolGame::parseWorldLight(const InputMessagePtr& msg)
@@ -1370,11 +1370,11 @@ void ProtocolGame::parseEditText(const InputMessagePtr& msg)
         msg->getU8(); // suffix
     }
 
-    std::string date = "";
+    std::string date;
     if (g_game.getFeature(Otc::GameWritableDate))
         date = msg->getString();
 
-    g_game.processEditText(id, itemId, maxLength, text, writer, date);
+    Game::processEditText(id, itemId, maxLength, text, writer, date);
 }
 
 void ProtocolGame::parseEditList(const InputMessagePtr& msg)
@@ -1383,7 +1383,7 @@ void ProtocolGame::parseEditList(const InputMessagePtr& msg)
     const uint id = msg->getU32();
     const std::string& text = msg->getString();
 
-    g_game.processEditList(id, doorId, text);
+    Game::processEditList(id, doorId, text);
 }
 
 void ProtocolGame::parsePremiumTrigger(const InputMessagePtr& msg)
@@ -1722,7 +1722,7 @@ void ProtocolGame::parseTalk(const InputMessagePtr& msg)
 
     const std::string text = msg->getString();
 
-    g_game.processTalk(name, level, mode, text, channelId, pos);
+    Game::processTalk(name, level, mode, text, channelId, pos);
 }
 
 void ProtocolGame::parseChannelList(const InputMessagePtr& msg)
@@ -1735,7 +1735,7 @@ void ProtocolGame::parseChannelList(const InputMessagePtr& msg)
         channelList.emplace_back(id, name);
     }
 
-    g_game.processChannelList(channelList);
+    Game::processChannelList(channelList);
 }
 
 void ProtocolGame::parseOpenChannel(const InputMessagePtr& msg)
@@ -1752,14 +1752,14 @@ void ProtocolGame::parseOpenChannel(const InputMessagePtr& msg)
             g_game.formatCreatureName(msg->getString()); // player name
     }
 
-    g_game.processOpenChannel(channelId, name);
+    Game::processOpenChannel(channelId, name);
 }
 
 void ProtocolGame::parseOpenPrivateChannel(const InputMessagePtr& msg)
 {
     const std::string name = g_game.formatCreatureName(msg->getString());
 
-    g_game.processOpenPrivateChannel(name);
+    Game::processOpenPrivateChannel(name);
 }
 
 void ProtocolGame::parseOpenOwnPrivateChannel(const InputMessagePtr& msg)
@@ -1767,39 +1767,39 @@ void ProtocolGame::parseOpenOwnPrivateChannel(const InputMessagePtr& msg)
     const int channelId = msg->getU16();
     const std::string name = msg->getString();
 
-    g_game.processOpenOwnPrivateChannel(channelId, name);
+    Game::processOpenOwnPrivateChannel(channelId, name);
 }
 
 void ProtocolGame::parseCloseChannel(const InputMessagePtr& msg)
 {
     const int channelId = msg->getU16();
 
-    g_game.processCloseChannel(channelId);
+    Game::processCloseChannel(channelId);
 }
 
 void ProtocolGame::parseRuleViolationChannel(const InputMessagePtr& msg)
 {
     const int channelId = msg->getU16();
 
-    g_game.processRuleViolationChannel(channelId);
+    Game::processRuleViolationChannel(channelId);
 }
 
 void ProtocolGame::parseRuleViolationRemove(const InputMessagePtr& msg)
 {
     const std::string name = msg->getString();
 
-    g_game.processRuleViolationRemove(name);
+    Game::processRuleViolationRemove(name);
 }
 
 void ProtocolGame::parseRuleViolationCancel(const InputMessagePtr& msg)
 {
     const std::string name = msg->getString();
-    g_game.processRuleViolationCancel(name);
+    Game::processRuleViolationCancel(name);
 }
 
 void ProtocolGame::parseRuleViolationLock(const InputMessagePtr&)
 {
-    g_game.processRuleViolationLock();
+    Game::processRuleViolationLock();
 }
 
 void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
@@ -1875,7 +1875,7 @@ void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
             break;
     }
 
-    g_game.processTextMessage(mode, text);
+    Game::processTextMessage(mode, text);
 }
 
 void ProtocolGame::parseCancelWalk(const InputMessagePtr& msg)
@@ -2026,7 +2026,7 @@ void ProtocolGame::parseKillTracker(const InputMessagePtr& msg)
 void ProtocolGame::parseVipAdd(const InputMessagePtr& msg)
 {
     uint iconId = 0;
-    std::string desc = "";
+    std::string desc;
     bool notifyLogin = false;
 
     const uint id = msg->getU32();
@@ -2065,7 +2065,7 @@ void ProtocolGame::parseVipLogout(const InputMessagePtr& msg)
 void ProtocolGame::parseTutorialHint(const InputMessagePtr& msg)
 {
     const int id = msg->getU8();
-    g_game.processTutorialHint(id);
+    Game::processTutorialHint(id);
 }
 
 void ProtocolGame::parseAutomapFlag(const InputMessagePtr& msg)
@@ -2079,9 +2079,9 @@ void ProtocolGame::parseAutomapFlag(const InputMessagePtr& msg)
         remove = msg->getU8() != 0;
 
     if (!remove)
-        g_game.processAddAutomapFlag(pos, icon, description);
+        Game::processAddAutomapFlag(pos, icon, description);
     else
-        g_game.processRemoveAutomapFlag(pos, icon, description);
+        Game::processRemoveAutomapFlag(pos, icon, description);
 }
 
 void ProtocolGame::parseQuestLog(const InputMessagePtr& msg)
@@ -2095,7 +2095,7 @@ void ProtocolGame::parseQuestLog(const InputMessagePtr& msg)
         questList.emplace_back(id, name, completed);
     }
 
-    g_game.processQuestLog(questList);
+    Game::processQuestLog(questList);
 }
 
 void ProtocolGame::parseQuestLine(const InputMessagePtr& msg)
@@ -2109,7 +2109,7 @@ void ProtocolGame::parseQuestLine(const InputMessagePtr& msg)
         questMissions.emplace_back(missionName, missionDescrition);
     }
 
-    g_game.processQuestLine(questId, questMissions);
+    Game::processQuestLine(questId, questMissions);
 }
 
 void ProtocolGame::parseChannelEvent(const InputMessagePtr& msg)
@@ -2180,7 +2180,7 @@ void ProtocolGame::parseModalDialog(const InputMessagePtr& msg)
 
     const bool priority = msg->getU8() == 0x01;
 
-    g_game.processModalDialog(windowId, title, message, buttonList, enterButton, escapeButton, choiceList, priority);
+    Game::processModalDialog(windowId, title, message, buttonList, enterButton, escapeButton, choiceList, priority);
 }
 
 void ProtocolGame::parseExtendedOpcode(const InputMessagePtr& msg)
