@@ -130,7 +130,7 @@ TiXmlNode::~TiXmlNode()
     TiXmlNode* node = firstChild;
 
     while (node) {
-        TiXmlNode* temp = node;
+        const TiXmlNode* temp = node;
         node = node->next;
         delete temp;
     }
@@ -148,7 +148,7 @@ void TiXmlNode::Clear()
     TiXmlNode* node = firstChild;
 
     while (node) {
-        TiXmlNode* temp = node;
+        const TiXmlNode* temp = node;
         node = node->next;
         delete temp;
     }

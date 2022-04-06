@@ -51,7 +51,7 @@ void SpriteAppearances::terminate()
 
 bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet)
 {
-    std::lock_guard<std::mutex> lock(sheet->mutex);
+    std::lock_guard lock(sheet->mutex);
 
     if (sheet->loaded) {
         return true;
@@ -98,7 +98,7 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet)
 
         const lzma_filter filters[2] = {
             lzma_filter{LZMA_FILTER_LZMA1, &options},
-            lzma_filter{LZMA_VLI_UNKNOWN, NULL}
+            lzma_filter{LZMA_VLI_UNKNOWN, nullptr}
         };
 
         lzma_ret ret = lzma_raw_decoder(&stream, filters);

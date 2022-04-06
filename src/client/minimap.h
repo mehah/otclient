@@ -104,7 +104,7 @@ private:
     bool hasBlock(const Position& pos) { return m_tileBlocks[pos.z].contains(getBlockIndex(pos)); }
     MinimapBlock& getBlock(const Position& pos)
     {
-        std::lock_guard<std::mutex> lock(m_lock);
+        std::lock_guard lock(m_lock);
         auto& ptr = m_tileBlocks[pos.z][getBlockIndex(pos)];
         if (!ptr)
             ptr = std::make_shared<MinimapBlock>();

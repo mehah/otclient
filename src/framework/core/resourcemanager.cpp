@@ -462,7 +462,7 @@ void ResourceManager::runEncryption(const std::string& password)
             continue;
 
         std::ifstream ifs(entry.path().string(), std::ios_base::binary);
-        std::string data((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+        std::string data((std::istreambuf_iterator(ifs)), std::istreambuf_iterator<char>());
         ifs.close();
         data = encrypt(data, password);
         save_string_into_file(data, entry.path().string());

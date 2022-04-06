@@ -121,7 +121,7 @@ void DrawPool::draw()
     for (const auto& pool : m_pools) {
         if (!pool->isEnabled()) continue;
         if (pool->hasFrameBuffer()) {
-            auto* const pf = pool->toFramedPool();
+            const auto* const pf = pool->toFramedPool();
 
             g_painter->saveAndResetState();
             if (pf->m_beforeDraw) pf->m_beforeDraw();

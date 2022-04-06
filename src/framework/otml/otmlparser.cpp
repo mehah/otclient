@@ -112,8 +112,8 @@ void OTMLParser::parseNode(const std::string& data)
 {
     std::string tag;
     std::string value;
-    std::size_t dotsPos = data.find_first_of(':');
-    int nodeLine = currentLine;
+    const std::size_t dotsPos = data.find_first_of(':');
+    const int nodeLine = currentLine;
 
     // node that has no tag and may have a value
     if (!data.empty() && data[0] == '-') {
@@ -137,9 +137,9 @@ void OTMLParser::parseNode(const std::string& data)
         // reads next lines until we can a value below the same depth
         std::string multiLineData;
         do {
-            size_t lastPos = in.tellg();
+            const size_t lastPos = in.tellg();
             std::string line = getNextLine();
-            int depth = getLineDepth(line, true);
+            const int depth = getLineDepth(line, true);
 
             // depth above current depth, add the text to the multiline
             if (depth > currentDepth) {
@@ -177,7 +177,7 @@ void OTMLParser::parseNode(const std::string& data)
     }
 
     // create the node
-    OTMLNodePtr node = OTMLNode::create(tag);
+    const OTMLNodePtr node = OTMLNode::create(tag);
 
     node->setUnique(dotsPos != std::string::npos);
     node->setTag(tag);

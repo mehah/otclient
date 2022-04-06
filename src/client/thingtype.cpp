@@ -205,9 +205,9 @@ void ThingType::unserializeAppearance(uint16 clientId, ThingCategory category, c
 
     if (flags.has_hook()) {
         const auto hookDirection = flags.hook().direction();
-        if (hookDirection == HOOK_TYPE::HOOK_TYPE_EAST) {
+        if (hookDirection == HOOK_TYPE_EAST) {
             m_attribs.set(ThingAttrHookEast, true);
-        } else if (hookDirection == HOOK_TYPE::HOOK_TYPE_SOUTH) {
+        } else if (hookDirection == HOOK_TYPE_SOUTH) {
             m_attribs.set(ThingAttrHookSouth, true);
         }
     }
@@ -367,7 +367,7 @@ void ThingType::unserializeAppearance(uint16 clientId, ThingCategory category, c
         }
         const size_t expectedSize = m_size.area() * m_layers * m_numPatternX * m_numPatternY * m_numPatternZ * m_animationPhases;
         if (expectedSize != m_spritesIndex.size()) {
-            const std::vector<int> sprites(std::move(m_spritesIndex));
+            const std::vector sprites(std::move(m_spritesIndex));
             m_spritesIndex.clear();
             m_spritesIndex.reserve(expectedSize);
             for (size_t i = 0, idx = 0; i < sizes.size(); ++i) {
@@ -615,7 +615,7 @@ void ThingType::unserialize(uint16 clientId, ThingCategory category, const FileS
         }
         size_t expectedSize = m_size.area() * m_layers * m_numPatternX * m_numPatternY * m_numPatternZ * m_animationPhases;
         if (expectedSize != m_spritesIndex.size()) {
-            std::vector<int> sprites(std::move(m_spritesIndex));
+            std::vector sprites(std::move(m_spritesIndex));
             m_spritesIndex.clear();
             m_spritesIndex.reserve(expectedSize);
             for (size_t i = 0, idx = 0; i < sizes.size(); ++i) {
