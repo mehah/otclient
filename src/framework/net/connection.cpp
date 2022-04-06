@@ -23,9 +23,10 @@
 #include "connection.h"
 
 #include <framework/core/application.h>
-#include <framework/core/eventdispatcher.h>
 
 #include <utility>
+#include <asio/read.hpp>
+#include <asio/read_until.hpp>
 
 asio::io_service g_ioService;
 std::list<std::shared_ptr<asio::streambuf>> Connection::m_outputStreams;

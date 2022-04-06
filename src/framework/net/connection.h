@@ -23,6 +23,8 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
+#include <asio/streambuf.hpp>
+
 #include "declarations.h"
 #include <framework/luaengine/luaobject.h>
 
