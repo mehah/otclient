@@ -31,7 +31,7 @@ UIParticles::UIParticles()
     m_referencePos = PointF(-1, -1);
 }
 
-void UIParticles::drawSelf(Fw::DrawPane drawPane)
+void UIParticles::drawSelf(Fw::DrawPane /*drawPane*/)
 {
     UIWidget::drawSelf(Fw::ForegroundPane);
 
