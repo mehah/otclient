@@ -1021,7 +1021,7 @@ const char* TiXmlElement::Parse(const char* p, TiXmlParsingData* data, TiXmlEnco
             return nullptr;
         }
         // Try to read an attribute:
-        const auto attrib = new TiXmlAttribute();
+        auto attrib = new TiXmlAttribute();
         if (!attrib) {
             return nullptr;
         }
@@ -1064,7 +1064,7 @@ const char* TiXmlElement::ReadValue(const char* p, TiXmlParsingData* data, TiXml
     while (p && *p) {
         if (*p != '<') {
             // Take what we have, make a text element.
-            const auto textNode = new TiXmlText("");
+            auto textNode = new TiXmlText("");
 
             if (!textNode) {
                 return nullptr;

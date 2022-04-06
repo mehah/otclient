@@ -954,7 +954,7 @@ std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::findPath(const
         result = Otc::PathFindResultOk;
     }
 
-    for (const auto it : nodes)
+    for (auto it : nodes)
         delete it.second;
 
     return ret;
@@ -1082,7 +1082,7 @@ PathFindResult_ptr Map::newFindPath(const Position& start, const Position& goal,
     }
     ret->complexity = 50000 - limit;
 
-    for (const auto& node : nodes) {
+    for (auto& node : nodes) {
         if (node.second)
             delete node.second;
     }
