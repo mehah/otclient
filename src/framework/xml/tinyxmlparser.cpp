@@ -480,7 +480,7 @@ const char* TiXmlBase::GetEntity(const char* p, char* value, int* length, TiXmlE
     }
 
     // Now try to match it.
-    for (auto& i : entity) {
+    for (const auto& i : entity) {
         if (strncmp(i.str, p, i.strLength) == 0) {
             assert(strlen(i.str) == i.strLength);
             *value = i.chr;
@@ -1441,7 +1441,7 @@ const char* TiXmlDeclaration::Parse(const char* p, TiXmlParsingData* data, TiXml
 
 bool TiXmlText::Blank() const
 {
-    for (char i : value)
+    for (const char i : value)
         if (!IsWhiteSpace(i))
             return false;
     return true;

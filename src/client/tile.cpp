@@ -588,7 +588,7 @@ bool Tile::isClickable()
 
 bool Tile::canShade(const MapViewPtr& mapView)
 {
-    for (auto dir : { Otc::North, Otc::NorthWest, Otc::West }) {
+    for (const auto dir : { Otc::North, Otc::NorthWest, Otc::West }) {
         const auto& pos = m_position.translatedToDirection(dir);
         const auto& tile = g_map.getTile(pos);
 

@@ -138,7 +138,7 @@ void MapView::drawFloor()
 
         for (int_fast8_t z = m_floorMax; z >= m_floorMin; --z) {
             if (canFloorFade()) {
-                float fading = getFadeLevel(z);
+                const float fading = getFadeLevel(z);
                 if (fading == 0) break;
                 if (fading < 0.99)
                     g_drawPool.setOpacity(fading);
@@ -327,7 +327,7 @@ void MapView::updateVisibleTilesCache()
         m_lockedFirstVisibleFloor = -1;
     }
 
-    uint8 prevFirstVisibleFloor = m_cachedFirstVisibleFloor;
+    const uint8 prevFirstVisibleFloor = m_cachedFirstVisibleFloor;
     if (m_lastCameraPosition != cameraPosition) {
         if (m_mousePosition.isValid()) {
             const Otc::Direction direction = m_lastCameraPosition.getDirectionFromPosition(cameraPosition);
@@ -373,12 +373,12 @@ void MapView::updateVisibleTilesCache()
         }
     } else if (prevFirstVisibleFloor < m_cachedFirstVisibleFloor) { // showing new floor
         for (int iz = prevFirstVisibleFloor; iz < m_cachedFirstVisibleFloor; ++iz) {
-            int shift = std::max<int>(0, m_floorFading - m_fadingFloorTimers[iz].elapsed_millis());
+            const int shift = std::max<int>(0, m_floorFading - m_fadingFloorTimers[iz].elapsed_millis());
             m_fadingFloorTimers[iz].restart(shift * 1000);
         }
     } else if (prevFirstVisibleFloor > m_cachedFirstVisibleFloor) { // hiding floor
         for (int iz = m_cachedFirstVisibleFloor; iz < prevFirstVisibleFloor; ++iz) {
-            int shift = std::max<int>(0, m_floorFading - m_fadingFloorTimers[iz].elapsed_millis());
+            const int shift = std::max<int>(0, m_floorFading - m_fadingFloorTimers[iz].elapsed_millis());
             m_fadingFloorTimers[iz].restart(shift * 1000);
         }
     }
@@ -642,7 +642,7 @@ Position MapView::getPosition(const Point& point, const Size& mapSize)
     if (tilePos2D.x + cameraPosition.x < 0 && tilePos2D.y + cameraPosition.y < 0)
         return {};
 
-    Position position = Position(tilePos2D.x, tilePos2D.y, 0) + cameraPosition;
+    const Position position = Position(tilePos2D.x, tilePos2D.y, 0) + cameraPosition;
 
     if (!position.isValid())
         return {};

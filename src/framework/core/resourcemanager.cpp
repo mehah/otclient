@@ -433,7 +433,7 @@ uint8_t* ResourceManager::decrypt(uint8_t* data, int32_t size)
     const auto& password = std::string(ENCRYPTION_PASSWORD);
     const int plen = password.length();
 
-    auto new_Data = new uint8_t[size];
+    const auto new_Data = new uint8_t[size];
 
     int j = 0;
     for (int i = -1; ++i < size;) {

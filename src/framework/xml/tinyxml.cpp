@@ -1009,7 +1009,7 @@ bool TiXmlText::Accept(TiXmlVisitor* visitor) const
 
 TiXmlNode* TiXmlText::Clone() const
 {
-    auto clone = new TiXmlText("");
+    const auto clone = new TiXmlText("");
 
     if (!clone)
         return nullptr;

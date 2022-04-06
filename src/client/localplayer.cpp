@@ -94,7 +94,7 @@ bool LocalPlayer::retryAutoWalk()
 {
     if (m_autoWalkDestination.isValid()) {
         g_game.stop();
-        auto self = asLocalPlayer();
+        const auto self = asLocalPlayer();
 
         if (m_autoWalkRetries <= 3) {
             if (m_autoWalkContinueEvent)
@@ -173,7 +173,7 @@ bool LocalPlayer::autoWalk(const Position& destination, const bool retry)
             return;
         }
 
-        auto finalAutowalkPos = self->m_position.translatedToDirections(result->path).back();
+        const auto finalAutowalkPos = self->m_position.translatedToDirections(result->path).back();
         if (self->m_autoWalkDestination != finalAutowalkPos) {
             self->m_lastAutoWalkPosition = finalAutowalkPos;
         }
@@ -478,7 +478,7 @@ void LocalPlayer::setBlessings(int blessings)
 
 void LocalPlayer::setResourceBalance(Otc::ResourceTypes_t type, uint64_t value)
 {
-    uint64_t oldBalance = getResourceBalance(type);
+    const uint64_t oldBalance = getResourceBalance(type);
     if (value != oldBalance) {
         m_resourcesBalance[type] = value;
         callLuaField("onResourcesBalanceChange", value, oldBalance);

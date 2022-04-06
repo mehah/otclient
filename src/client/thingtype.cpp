@@ -315,7 +315,7 @@ void ThingType::unserializeAppearance(uint16 clientId, ThingCategory category, c
     std::vector<int> total_sprites;
 
     for (const auto& framegroup : appearance.frame_group()) {
-        int frameGroupType = framegroup.fixed_frame_group();
+        const int frameGroupType = framegroup.fixed_frame_group();
         const auto& spriteInfo = framegroup.sprite_info();
         const auto& animation = spriteInfo.animation();
         const auto& sprites = spriteInfo.sprite_id();
@@ -336,7 +336,7 @@ void ThingType::unserializeAppearance(uint16 clientId, ThingCategory category, c
 
         // animations
         if (spritesPhases.size() > 1) {
-            auto animator = AnimatorPtr(new Animator);
+            const auto animator = AnimatorPtr(new Animator);
             animator->unserializeAppearance(animation);
 
             if (frameGroupType == FrameGroupMoving)
@@ -365,20 +365,20 @@ void ThingType::unserializeAppearance(uint16 clientId, ThingCategory category, c
             m_size.setWidth(std::max<int>(m_size.width(), s.width()));
             m_size.setHeight(std::max<int>(m_size.height(), s.height()));
         }
-        size_t expectedSize = m_size.area() * m_layers * m_numPatternX * m_numPatternY * m_numPatternZ * m_animationPhases;
+        const size_t expectedSize = m_size.area() * m_layers * m_numPatternX * m_numPatternY * m_numPatternZ * m_animationPhases;
         if (expectedSize != m_spritesIndex.size()) {
-            std::vector<int> sprites(std::move(m_spritesIndex));
+            const std::vector<int> sprites(std::move(m_spritesIndex));
             m_spritesIndex.clear();
             m_spritesIndex.reserve(expectedSize);
             for (size_t i = 0, idx = 0; i < sizes.size(); ++i) {
-                int totalSprites = total_sprites[i];
+                const int totalSprites = total_sprites[i];
                 if (m_size == sizes[i]) {
                     for (int j = 0; j < totalSprites; ++j) {
                         m_spritesIndex.push_back(sprites[idx++]);
                     }
                     continue;
                 }
-                size_t patterns = (totalSprites / sizes[i].area());
+                const size_t patterns = (totalSprites / sizes[i].area());
                 for (size_t p = 0; p < patterns; ++p) {
                     for (int x = 0; x < m_size.width(); ++x) {
                         for (int y = 0; y < m_size.height(); ++y) {
@@ -770,7 +770,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
     m_texturesFramesOriginRects[animationPhase].resize(indexSize);
     m_texturesFramesOffsets[animationPhase].resize(indexSize);
 
-    bool protobufSupported = g_game.getProtocolVersion() >= 1281;
+    const bool protobufSupported = g_game.getProtocolVersion() >= 1281;
 
     static Color maskColors[] = { Color::red, Color::green, Color::blue, Color::yellow };
 

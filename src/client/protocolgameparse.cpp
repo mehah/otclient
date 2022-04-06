@@ -510,8 +510,8 @@ void ProtocolGame::parseRequestPurchaseData(const InputMessagePtr& msg)
 
 void ProtocolGame::parseResourceBalance(const InputMessagePtr& msg)
 {
-    Otc::ResourceTypes_t type = static_cast<Otc::ResourceTypes_t>(msg->getU8());
-    uint64_t value = msg->getU64();
+    const Otc::ResourceTypes_t type = static_cast<Otc::ResourceTypes_t>(msg->getU8());
+    const uint64_t value = msg->getU64();
     m_localPlayer->setResourceBalance(type, value);
 }
 
@@ -1146,8 +1146,8 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
 
     if (g_game.getClientVersion() >= 1281) {
         if (type == Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT) {
-            int8_t x = msg->getU8();
-            int8_t y = msg->getU8();
+            const int8_t x = msg->getU8();
+            const int8_t y = msg->getU8();
             toPos = Position(pos.x + x, pos.y + y, pos.z);
         }
 
@@ -1202,7 +1202,7 @@ void ProtocolGame::parseDistanceMissile(const InputMessagePtr& msg)
 
 void ProtocolGame::parseItemClasses(const InputMessagePtr& msg)
 {
-    int classSize = msg->getU8();
+    const int classSize = msg->getU8();
     int tiersSize = 0;
     for (uint8_t i = 0; i < classSize; i++) {
         msg->getU8(); // class id
@@ -1486,7 +1486,7 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg)
     }
 
     if (g_game.getClientVersion() < 1281) {
-        double magicLevel = msg->getU8();
+        const double magicLevel = msg->getU8();
 
         double baseMagicLevel = 0;
         if (g_game.getFeature(Otc::GameSkillsBase))
@@ -1494,7 +1494,7 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg)
         else
             baseMagicLevel = magicLevel;
 
-        double magicLevelPercent = msg->getU8();
+        const double magicLevelPercent = msg->getU8();
 
         m_localPlayer->setMagicLevel(magicLevel, magicLevelPercent);
         m_localPlayer->setBaseMagicLevel(baseMagicLevel);
@@ -1545,10 +1545,10 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg)
 {
     if (g_game.getClientVersion() >= 1281) {
         // magic level
-        int magicLevel = msg->getU16();
-        int baseMagicLevel = msg->getU16();
+        const int magicLevel = msg->getU16();
+        const int baseMagicLevel = msg->getU16();
         msg->getU16(); // base + loyalty bonus(?)
-        int percent = msg->getU16() / 100; // perfect opportunity to use float :)
+        const int percent = msg->getU16() / 100; // perfect opportunity to use float :)
 
         m_localPlayer->setMagicLevel(magicLevel, percent);
         m_localPlayer->setBaseMagicLevel(baseMagicLevel);
@@ -1589,8 +1589,8 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg)
 
         const uint8_t lastSkill = g_game.getClientVersion() >= 1281 ? Otc::LastSkill : Otc::ManaLeechAmount + 1;
         for (int skill = Otc::CriticalChance; skill < lastSkill; ++skill) {
-            int level = msg->getU16();
-            int baseLevel = msg->getU16();
+            const int level = msg->getU16();
+            const int baseLevel = msg->getU16();
             m_localPlayer->setSkill(static_cast<Otc::Skill>(skill), level, 0);
             m_localPlayer->setBaseSkill(static_cast<Otc::Skill>(skill), baseLevel);
         }
@@ -1598,7 +1598,7 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg)
 
     if (g_game.getClientVersion() >= 1281) {
         // bonus cap
-        int capacity = msg->getU32(); // base + bonus capacity
+        const int capacity = msg->getU32(); // base + bonus capacity
         msg->getU32(); // base capacity
 
         //m_localPlayer->setFreeCapacity(freeCapacity);
@@ -2613,12 +2613,12 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
         item->setCountOrSubType(msg->getU8());
     } else if (g_game.getClientVersion() >= 1281) {
         if (item->isContainer()) {
-            uint8 hasQuickLootFlags = msg->getU8();
+            const uint8 hasQuickLootFlags = msg->getU8();
             if (hasQuickLootFlags) {
                 msg->getU32(); // quick loot flags
             }
 
-            uint8 hasQuiverAmmoCount = msg->getU8();
+            const uint8 hasQuiverAmmoCount = msg->getU8();
             if (hasQuiverAmmoCount) {
                 msg->getU32(); // ammoTotal
             }
@@ -2639,7 +2639,7 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
 
     if (g_game.getClientVersion() >= 1281) {
         if (id == 35973 || id == 35974) {
-            int looktype = msg->getU16();
+            const int looktype = msg->getU16();
             if (looktype != 0) {
                 msg->getU8(); // lookHead
                 msg->getU8(); // lookBody
@@ -2648,7 +2648,7 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
                 msg->getU8(); // lookAddons
             }
 
-            int lookmount = msg->getU16();
+            const int lookmount = msg->getU16();
             if (lookmount != 0) {
                 msg->getU8(); // lookHead
                 msg->getU8(); // lookBody

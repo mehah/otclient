@@ -267,7 +267,7 @@ struct WindowProcProxy
 {
     static LRESULT CALLBACK call(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
-        auto window = static_cast<WIN32Window*>(&g_window);
+        const auto window = static_cast<WIN32Window*>(&g_window);
         return window->windowProc(hWnd, uMsg, wParam, lParam);
     }
 };
@@ -390,7 +390,7 @@ void WIN32Window::internalCreateGLContext()
                                          0,                          // Reserved
                                          0, 0, 0 };                  // Layer Masks Ignored
 
-    uint pixelFormat = ChoosePixelFormat(m_deviceContext, &pfd);
+    const uint pixelFormat = ChoosePixelFormat(m_deviceContext, &pfd);
     if (!pixelFormat)
         g_logger.fatal("Could not find a suitable pixel format");
 
@@ -559,7 +559,7 @@ Fw::Key WIN32Window::retranslateVirtualKey(WPARAM wParam, LPARAM lParam)
     }
 
     Fw::Key key = Fw::KeyUnknown;
-    if (m_keyMap.find(wParam) != m_keyMap.end())
+    if (m_keyMap.contains(wParam))
         key = m_keyMap[wParam];
 
     // actually ignore alt/ctrl/shift keys, they is states are already stored in m_inputEvent.keyboardModifiers
@@ -946,7 +946,7 @@ void WIN32Window::setIcon(const std::string& file)
     const int n = image->getWidth() * image->getHeight();
     std::vector<uint32> iconData(n);
     for (int i = 0; i < n; ++i) {
-        auto pixel = (uint8*)&iconData[i];
+        const auto pixel = (uint8*)&iconData[i];
         pixel[2] = *(image->getPixelData() + (i * 4) + 0);
         pixel[1] = *(image->getPixelData() + (i * 4) + 1);
         pixel[0] = *(image->getPixelData() + (i * 4) + 2);

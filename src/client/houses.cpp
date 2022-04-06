@@ -165,14 +165,14 @@ void HouseManager::save(const std::string & fileName)
         TiXmlDocument doc;
         doc.SetTabSize(2);
 
-        auto decl = new TiXmlDeclaration("1.0", "UTF-8", "");
+        const auto decl = new TiXmlDeclaration("1.0", "UTF-8", "");
         doc.LinkEndChild(decl);
 
-        auto root = new TiXmlElement("houses");
+        const auto root = new TiXmlElement("houses");
         doc.LinkEndChild(root);
 
         for (const auto& house : m_houses) {
-            auto elem = new TiXmlElement("house");
+            const auto elem = new TiXmlElement("house");
             house->save(elem);
             root->LinkEndChild(elem);
         }

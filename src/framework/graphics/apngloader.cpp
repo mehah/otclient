@@ -143,10 +143,10 @@ void read_paeth_row(unsigned char* row, unsigned char* prev_row, unsigned int ro
             int a = row[i - bpp];
             int b = prev_row[i];
             int c = prev_row[i - bpp];
-            int p = b - c;
+            const int p = b - c;
             int pc = a - c;
-            int pa = abs(p);
-            int pb = abs(pc);
+            const int pa = abs(p);
+            const int pb = abs(pc);
             pc = abs(p + pc);
             row[i] += ((pa <= pb && pa <= pc) ? a : (pb <= pc) ? b : c);
         }
@@ -306,12 +306,12 @@ void compose3(unsigned char* dst1, unsigned int dstbytes1, unsigned char* dst2, 
                     if (a != 0) {
                         if ((a2 = (*dp2) >> 24) != 0) {
                             keep_original = 0;
-                            int u = a * 255;
-                            int v = (255 - a) * a2;
-                            int al = 255 * 255 - (255 - a) * (255 - a2);
-                            unsigned int b2 = ((*dp2) & 255);
-                            unsigned int g2 = (((*dp2) >> 8) & 255);
-                            unsigned int r2 = (((*dp2) >> 16) & 255);
+                            const int u = a * 255;
+                            const int v = (255 - a) * a2;
+                            const int al = 255 * 255 - (255 - a) * (255 - a2);
+                            const unsigned int b2 = ((*dp2) & 255);
+                            const unsigned int g2 = (((*dp2) >> 8) & 255);
+                            const unsigned int r2 = (((*dp2) >> 16) & 255);
                             b = (b * u + b2 * v) / al;
                             g = (g * u + g2 * v) / al;
                             r = (r * u + r2 * v) / al;
@@ -336,7 +336,7 @@ void compose4(unsigned char* dst, unsigned int dstbytes, unsigned char* src, uns
     unsigned int    i;
     unsigned int    g, a, a2;
 
-    unsigned int step = (depth + 7) / 8;
+    const unsigned int step = (depth + 7) / 8;
 
     for (unsigned int j = 0; j < h; j++) {
         unsigned char* sp = src + 1;
@@ -360,10 +360,10 @@ void compose4(unsigned char* dst, unsigned int dstbytes, unsigned char* src, uns
                 } else
                     if (a != 0) {
                         if ((a2 = *(dp + 1)) != 0) {
-                            int u = a * 255;
-                            int v = (255 - a) * a2;
-                            int al = 255 * 255 - (255 - a) * (255 - a2);
-                            unsigned int g2 = ((*dp) & 255);
+                            const int u = a * 255;
+                            const int v = (255 - a) * a2;
+                            const int al = 255 * 255 - (255 - a) * (255 - a2);
+                            const unsigned int g2 = ((*dp) & 255);
                             g = (g * u + g2 * v) / al;
                             a = al / 255;
                         }
@@ -384,7 +384,7 @@ void compose6(unsigned char* dst, unsigned int dstbytes, unsigned char* src, uns
     unsigned int    r, g, b, a;
     unsigned int a2;
 
-    unsigned int step = (depth + 7) / 8;
+    const unsigned int step = (depth + 7) / 8;
 
     for (unsigned int j = 0; j < h; j++) {
         unsigned char* sp = src + 1;
@@ -410,12 +410,12 @@ void compose6(unsigned char* dst, unsigned int dstbytes, unsigned char* src, uns
                 else
                     if (a != 0) {
                         if ((a2 = (*dp) >> 24) != 0) {
-                            int u = a * 255;
-                            int v = (255 - a) * a2;
-                            int al = 255 * 255 - (255 - a) * (255 - a2);
-                            unsigned int b2 = ((*dp) & 255);
-                            unsigned int g2 = (((*dp) >> 8) & 255);
-                            unsigned int r2 = (((*dp) >> 16) & 255);
+                            const int u = a * 255;
+                            const int v = (255 - a) * a2;
+                            const int al = 255 * 255 - (255 - a) * (255 - a2);
+                            const unsigned int b2 = ((*dp) & 255);
+                            const unsigned int g2 = (((*dp) >> 8) & 255);
+                            const unsigned int r2 = (((*dp) >> 16) & 255);
                             b = (b * u + b2 * v) / al;
                             g = (g * u + g2 * v) / al;
                             r = (r * u + r2 * v) / al;

@@ -315,7 +315,7 @@ void Connection::onRecv(const std::error_code& error, size_t recvSize)
     if (m_connected) {
         if (!error) {
             if (m_recvCallback) {
-                auto header = asio::buffer_cast<const char*>(m_inputStream.data());
+                const auto header = asio::buffer_cast<const char*>(m_inputStream.data());
                 m_recvCallback((uint8*)header, recvSize);
             }
         } else

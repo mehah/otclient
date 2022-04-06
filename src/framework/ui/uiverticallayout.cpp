@@ -38,7 +38,7 @@ bool UIVerticalLayout::internalUpdate()
 {
     bool changed = false;
 
-    UIWidgetPtr parentWidget = getParentWidget();
+    const UIWidgetPtr parentWidget = getParentWidget();
     if (!parentWidget)
         return false;
 

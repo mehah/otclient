@@ -127,7 +127,7 @@ void UITextEdit::update(bool focusCursor)
     if (!m_updatesEnabled)
         return;
 
-    std::string text = getDisplayedText();
+    const std::string text = getDisplayedText();
     m_drawText = text;
     const int textLength = text.length();
 
@@ -699,7 +699,7 @@ bool UITextEdit::onKeyPress(uchar keyCode, int keyboardModifiers, int autoRepeat
             }
         } else if (keyCode == Fw::KeyTab && !m_shiftNavigation) {
             clearSelection();
-            if (UIWidgetPtr parent = getParent())
+            if (const UIWidgetPtr parent = getParent())
                 parent->focusNextChild(Fw::KeyboardFocusReason, true);
             return true;
         } else if (keyCode == Fw::KeyEnter && m_multiline && m_editable) {
@@ -735,7 +735,7 @@ bool UITextEdit::onKeyPress(uchar keyCode, int keyboardModifiers, int autoRepeat
         }
     } else if (keyboardModifiers == Fw::KeyboardShiftModifier) {
         if (keyCode == Fw::KeyTab && !m_shiftNavigation) {
-            if (UIWidgetPtr parent = getParent())
+            if (const UIWidgetPtr parent = getParent())
                 parent->focusPreviousChild(Fw::KeyboardFocusReason, true);
             return true;
         }
