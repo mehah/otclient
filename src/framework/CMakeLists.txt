@@ -26,6 +26,7 @@ set(framework_SOURCES ${framework_SOURCES}
     ${CMAKE_CURRENT_LIST_DIR}/util/point.h
     ${CMAKE_CURRENT_LIST_DIR}/util/rect.h
     ${CMAKE_CURRENT_LIST_DIR}/util/size.h
+    ${CMAKE_CURRENT_LIST_DIR}/util/uuid.h
 
     # stdext
     ${CMAKE_CURRENT_LIST_DIR}/stdext/cast.h
