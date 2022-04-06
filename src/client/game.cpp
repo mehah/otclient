@@ -21,8 +21,6 @@
  */
 
 #include "game.h"
-#include <framework/core/application.h>
-#include <framework/core/eventdispatcher.h>
 #include "container.h"
 #include "creature.h"
 #include "localplayer.h"
@@ -30,9 +28,11 @@
 #include "map.h"
 #include "protocolcodes.h"
 #include "protocolgame.h"
+#include <framework/core/application.h>
+#include <framework/core/eventdispatcher.h>
 
-#include "tile.h"
 #include "framework/core/graphicalapplication.h"
+#include "tile.h"
 
 Game g_game;
 

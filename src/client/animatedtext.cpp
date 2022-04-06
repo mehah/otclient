@@ -21,10 +21,10 @@
  */
 
 #include "animatedtext.h"
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/graphicalapplication.h>
 #include "game.h"
 #include "map.h"
+#include <framework/core/eventdispatcher.h>
+#include <framework/core/graphicalapplication.h>
 
 AnimatedText::AnimatedText()
 {
