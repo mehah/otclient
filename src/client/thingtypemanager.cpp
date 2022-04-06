@@ -338,7 +338,6 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
                 m_thingTypes[category][id] = type;
             }
         }
-        ;
         m_datLoaded = true;
         return true;
     } catch (std::exception& e) {
