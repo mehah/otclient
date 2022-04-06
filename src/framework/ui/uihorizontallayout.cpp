@@ -21,8 +21,8 @@
  */
 
 #include "uihorizontallayout.h"
-#include <framework/core/eventdispatcher.h>
 #include "uiwidget.h"
+#include <framework/core/eventdispatcher.h>
 
 void UIHorizontalLayout::applyStyle(const OTMLNodePtr& styleNode)
 {

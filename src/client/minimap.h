@@ -23,8 +23,8 @@
 #ifndef MINIMAP_H
 #define MINIMAP_H
 
-#include <framework/graphics/declarations.h>
 #include "declarations.h"
+#include <framework/graphics/declarations.h>
 
 constexpr uint8 MMBLOCK_SIZE = 64;
 constexpr uint8 OTMM_VERSION = 1;

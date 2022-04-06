@@ -21,13 +21,13 @@
  */
 
 #include "spriteappearances.h"
+#include "game.h"
 #include <framework/core/filestream.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/image.h>
-#include "game.h"
 
-#include <nlohmann/json.hpp>
 #include <framework/core/asyncdispatcher.h>
+#include <nlohmann/json.hpp>
 
 #include "lzma.h"
 

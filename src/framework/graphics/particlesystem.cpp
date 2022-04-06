@@ -21,9 +21,9 @@
  */
 
 #include "particlesystem.h"
-#include <framework/core/clock.h>
 #include "particle.h"
 #include "particleaffector.h"
+#include <framework/core/clock.h>
 
 ParticleSystem::ParticleSystem()
 {

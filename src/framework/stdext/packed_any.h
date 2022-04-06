@@ -25,8 +25,8 @@
 
 #include <algorithm>
 #include <cassert>
-#include <typeinfo>
 #include <type_traits>
+#include <typeinfo>
 
 namespace stdext
 {

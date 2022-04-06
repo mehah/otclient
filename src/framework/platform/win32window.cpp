@@ -267,7 +267,7 @@ struct WindowProcProxy
 {
     static LRESULT CALLBACK call(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
-        const auto window = static_cast<WIN32Window*>(&g_window);
+        auto* const window = static_cast<WIN32Window*>(&g_window);
         return window->windowProc(hWnd, uMsg, wParam, lParam);
     }
 };
@@ -753,7 +753,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
         }
         case WM_GETMINMAXINFO:
         {
-            const auto pMMI = (LPMINMAXINFO)lParam;
+            auto* const pMMI = (LPMINMAXINFO)lParam;
             const Rect adjustedRect = adjustWindowRect(Rect(0, 0, m_minimumSize));
             pMMI->ptMinTrackSize.x = adjustedRect.width();
             pMMI->ptMinTrackSize.y = adjustedRect.height();
@@ -946,7 +946,7 @@ void WIN32Window::setIcon(const std::string& file)
     const int n = image->getWidth() * image->getHeight();
     std::vector<uint32> iconData(n);
     for (int i = 0; i < n; ++i) {
-        const auto pixel = (uint8*)&iconData[i];
+        auto* const pixel = (uint8*)&iconData[i];
         pixel[2] = *(image->getPixelData() + (i * 4) + 0);
         pixel[1] = *(image->getPixelData() + (i * 4) + 1);
         pixel[0] = *(image->getPixelData() + (i * 4) + 2);
@@ -982,7 +982,7 @@ void WIN32Window::setClipboardText(const std::string& text)
 
     std::wstring wtext = stdext::latin1_to_utf16(text);
 
-    const auto lpwstr = static_cast<LPWSTR>(GlobalLock(hglb));
+    auto* const lpwstr = static_cast<LPWSTR>(GlobalLock(hglb));
     memcpy(lpwstr, (char*)&wtext[0], wtext.length() * sizeof(WCHAR));
     lpwstr[text.length()] = static_cast<WCHAR>(0);
     GlobalUnlock(hglb);
@@ -1006,7 +1006,7 @@ std::string WIN32Window::getClipboardText()
 
     const HGLOBAL hglb = GetClipboardData(CF_UNICODETEXT);
     if (hglb) {
-        const auto lpwstr = static_cast<LPWSTR>(GlobalLock(hglb));
+        auto* const lpwstr = static_cast<LPWSTR>(GlobalLock(hglb));
         if (lpwstr) {
             text = stdext::utf16_to_latin1(lpwstr);
             GlobalUnlock(hglb);

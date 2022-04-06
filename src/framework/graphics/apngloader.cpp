@@ -841,13 +841,13 @@ void save_png(std::stringstream& f, unsigned int width, unsigned int height, int
     unsigned int idat_size = (rowbytes + 1) * height;
     unsigned int zbuf_size = idat_size + ((idat_size + 7) >> 3) + ((idat_size + 63) >> 6) + 11;
 
-    auto row_buf = static_cast<unsigned char*>(malloc(rowbytes + 1));
-    auto sub_row = static_cast<unsigned char*>(malloc(rowbytes + 1));
-    auto up_row = static_cast<unsigned char*>(malloc(rowbytes + 1));
-    auto avg_row = static_cast<unsigned char*>(malloc(rowbytes + 1));
-    auto paeth_row = static_cast<unsigned char*>(malloc(rowbytes + 1));
-    auto zbuf1 = static_cast<unsigned char*>(malloc(zbuf_size));
-    auto zbuf2 = static_cast<unsigned char*>(malloc(zbuf_size));
+    auto* row_buf = static_cast<unsigned char*>(malloc(rowbytes + 1));
+    auto* sub_row = static_cast<unsigned char*>(malloc(rowbytes + 1));
+    auto* up_row = static_cast<unsigned char*>(malloc(rowbytes + 1));
+    auto* avg_row = static_cast<unsigned char*>(malloc(rowbytes + 1));
+    auto* paeth_row = static_cast<unsigned char*>(malloc(rowbytes + 1));
+    auto* zbuf1 = static_cast<unsigned char*>(malloc(zbuf_size));
+    auto* zbuf2 = static_cast<unsigned char*>(malloc(zbuf_size));
 
     if (!row_buf || !sub_row || !up_row || !avg_row || !paeth_row || !zbuf1 || !zbuf2) {
         free(row_buf);

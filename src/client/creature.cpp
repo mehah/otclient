@@ -34,9 +34,9 @@
 #include <framework/graphics/drawpool.h>
 #include <framework/graphics/graphics.h>
 
+#include "shadermanager.h"
 #include <framework/graphics/paintershaderprogram.h>
 #include <framework/graphics/texturemanager.h>
-#include "shadermanager.h"
 
 double Creature::speedA = 0;
 double Creature::speedB = 0;

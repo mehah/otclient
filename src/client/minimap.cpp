@@ -23,12 +23,12 @@
 #include "minimap.h"
 #include "tile.h"
 
-#include <zlib.h>
 #include <framework/core/filestream.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/drawpool.h>
 #include <framework/graphics/image.h>
 #include <framework/graphics/texture.h>
+#include <zlib.h>
 
 Minimap g_minimap;
 

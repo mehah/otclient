@@ -72,7 +72,7 @@ namespace stdext
 
     bool is_valid_utf8(const std::string& src)
     {
-        auto bytes = (const unsigned char*)src.c_str();
+        const auto* bytes = (const unsigned char*)src.c_str();
         while (*bytes) {
             if ((// ASCII
                  // use bytes[0] <= 0x7F to allow ASCII control characters
@@ -182,6 +182,7 @@ namespace stdext
 #ifdef WIN32
 #include <winsock2.h>
 #include <windows.h>
+
     std::wstring utf8_to_utf16(const std::string& src)
     {
         std::wstring res;

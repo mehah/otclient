@@ -21,10 +21,10 @@
  */
 
 #include "localplayer.h"
-#include <framework/core/eventdispatcher.h>
 #include "game.h"
 #include "map.h"
 #include "tile.h"
+#include <framework/core/eventdispatcher.h>
 
 LocalPlayer::LocalPlayer()
 {
@@ -94,18 +94,20 @@ bool LocalPlayer::retryAutoWalk()
 {
     if (m_autoWalkDestination.isValid()) {
         g_game.stop();
-        const auto self = asLocalPlayer();
 
         if (m_autoWalkRetries <= 3) {
             if (m_autoWalkContinueEvent)
                 m_autoWalkContinueEvent->cancel();
+
             m_autoWalkContinueEvent = g_dispatcher.scheduleEvent(std::bind(&LocalPlayer::autoWalk, asLocalPlayer(), m_autoWalkDestination, true), 200);
-            self->m_autoWalkRetries += 1;
+            m_autoWalkRetries += 1;
+
             return true;
-        } else {
-            self->m_autoWalkDestination = Position();
         }
+
+        m_autoWalkDestination = {};
     }
+
     return false;
 }
 
