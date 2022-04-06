@@ -116,8 +116,7 @@ int Http::download(const std::string& url, std::string path, int timeout) {
             }
 
             unsigned long  crc = crc32(0L, Z_NULL, 0);
-            std::string str_result = std::string(result->response.begin(), result->response.end());
-            unsigned long checksum = crc32(crc, (const unsigned char*)str_result.c_str(), str_result.size());
+            unsigned long checksum = crc32(crc, (const unsigned char*)result->_response.c_str(), result->_response.size());
 
             g_dispatcher.addEvent([&, result, path, checksum] {
                 if (result->error.empty()) {
