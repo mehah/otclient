@@ -220,6 +220,16 @@ find_package(Protobuf REQUIRED)
 find_package(LibLZMA REQUIRED)
 find_package(nlohmann_json REQUIRED)
 
+find_path(ASIO_INCLUDE_PATH asio.hpp HINTS 
+    "/usr/include"
+    "/usr/local/include"
+    "/opt/local/include"
+)
+
+if(ASIO_INCLUDE_PATH)
+    message(STATUS "Found existing ASIO install")
+endif(ASIO_INCLUDE_PATH)
+
 set(framework_LIBRARIES ${framework_LIBRARIES}
     ${Boost_LIBRARIES}
     ${LUA_LIBRARY}
