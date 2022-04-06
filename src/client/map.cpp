@@ -845,7 +845,7 @@ std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::findPath(const
     nodes[startPos] = currentNode;
     SNode* foundNode = nullptr;
     while (currentNode) {
-        if ((int)nodes.size() > maxComplexity) {
+        if (static_cast<int>(nodes.size()) > maxComplexity) {
             result = Otc::PathFindResultTooFar;
             break;
         }
@@ -954,13 +954,13 @@ std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::findPath(const
         result = Otc::PathFindResultOk;
     }
 
-    for (auto it : nodes)
+    for (auto& it : nodes)
         delete it.second;
 
     return ret;
 }
 
-void  Map::resetLastCamera()
+void Map::resetLastCamera()
 {
     for (const MapViewPtr& mapView : m_mapViews)
         mapView->resetLastCamera();
@@ -1234,7 +1234,7 @@ std::map<std::string, std::tuple<int, int, int, std::string>> Map::findEveryPath
                                                                        node->pos.toString());
                         }
                     } else {
-                        it2 = nodes.emplace(neighbor, new Node{ (float)speed, 10000000.0f, neighbor, node, node->distance + 1, wasSeen ? 0 : 1 }).first;
+                        it2 = nodes.emplace(neighbor, new Node{ static_cast<float>(speed), 10000000.0f, neighbor, node, node->distance + 1, wasSeen ? 0 : 1 }).first;
                     }
                 }
 
