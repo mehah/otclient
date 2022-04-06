@@ -104,7 +104,7 @@ void ProtocolGame::sendLoginPacket(uint challengeTimestamp, uint8 challengeRando
         msg->addU8(challengeRandom);
     }
 
-    const std::string extended = callLuaField<std::string>("getLoginExtendedData");
+    const auto extended = callLuaField<std::string>("getLoginExtendedData");
     if (!extended.empty())
         msg->addString(extended);
 

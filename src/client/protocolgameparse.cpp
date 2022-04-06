@@ -510,7 +510,7 @@ void ProtocolGame::parseRequestPurchaseData(const InputMessagePtr& msg)
 
 void ProtocolGame::parseResourceBalance(const InputMessagePtr& msg)
 {
-    const Otc::ResourceTypes_t type = static_cast<Otc::ResourceTypes_t>(msg->getU8());
+    const auto type = static_cast<Otc::ResourceTypes_t>(msg->getU8());
     const uint64_t value = msg->getU64();
     m_localPlayer->setResourceBalance(type, value);
 }

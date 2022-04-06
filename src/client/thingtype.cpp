@@ -63,7 +63,7 @@ void ThingType::serialize(const FileStreamPtr& fin)
             }
             case ThingAttrLight:
             {
-                const Light light = m_attribs.get<Light>(attr);
+                const auto light = m_attribs.get<Light>(attr);
                 fin->addU16(light.intensity);
                 fin->addU16(light.color);
                 break;

@@ -54,7 +54,7 @@ void TiXmlBase::EncodeString(const TIXML_STRING& str, TIXML_STRING* outString)
     int i = 0;
 
     while (i < static_cast<int>(str.length())) {
-        unsigned char c = static_cast<unsigned char>(str[i]);
+        auto c = static_cast<unsigned char>(str[i]);
 
         if (c == '&'
            && i < (static_cast<int>(str.length()) - 2)

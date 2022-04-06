@@ -188,7 +188,7 @@ void compose0(unsigned char* dst1, unsigned int dstbytes1, unsigned char* dst2, 
     for (unsigned int j = 0; j < h; j++) {
         unsigned char* sp = src + 1;
         unsigned char* dp1 = dst1;
-        unsigned int* dp2 = (unsigned int*)dst2;
+        auto* dp2 = (unsigned int*)dst2;
 
         if (bop == PNG_BLEND_OP_SOURCE) {
             switch (depth) {
@@ -223,7 +223,7 @@ void compose2(unsigned char* dst1, unsigned int dstbytes1, unsigned char* dst2, 
     for (unsigned int j = 0; j < h; j++) {
         unsigned char* sp = src + 1;
         unsigned char* dp1 = dst1;
-        unsigned int* dp2 = (unsigned int*)dst2;
+        auto* dp2 = (unsigned int*)dst2;
 
         if (bop == PNG_BLEND_OP_SOURCE) {
             if (depth == 8) {
@@ -279,7 +279,7 @@ void compose3(unsigned char* dst1, unsigned int dstbytes1, unsigned char* dst2, 
     for (unsigned int j = 0; j < h; j++) {
         unsigned char* sp = src + 1;
         unsigned char* dp1 = dst1;
-        unsigned int* dp2 = (unsigned int*)dst2;
+        auto* dp2 = (unsigned int*)dst2;
 
         for (unsigned int i = 0; i < w; i++) {
             switch (depth) {
@@ -388,7 +388,7 @@ void compose6(unsigned char* dst, unsigned int dstbytes, unsigned char* src, uns
 
     for (unsigned int j = 0; j < h; j++) {
         unsigned char* sp = src + 1;
-        unsigned int* dp = (unsigned int*)dst;
+        auto* dp = (unsigned int*)dst;
 
         if (bop == PNG_BLEND_OP_SOURCE) {
             for (i = 0; i < w; i++) {

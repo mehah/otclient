@@ -168,7 +168,7 @@ bool ThingTypeManager::loadOtml(std::string file)
             }
 
             for (const OTMLNodePtr& node2 : node->children()) {
-                const uint16 id = stdext::safe_cast<uint16>(node2->tag());
+                const auto id = stdext::safe_cast<uint16>(node2->tag());
                 ThingTypePtr type = getThingType(id, category);
                 if (!type)
                     throw OTMLException(node2, "thing not found");
@@ -253,7 +253,7 @@ void ThingTypeManager::loadXml(const std::string& file)
             if (unlikely(element->ValueTStr() != "item"))
                 continue;
 
-            const uint16 id = element->readType<uint16>("id");
+            const auto id = element->readType<uint16>("id");
             if (id != 0) {
                 std::vector<std::string> s_ids = stdext::split(element->Attribute("id"), ";");
                 for (const std::string& s : s_ids) {

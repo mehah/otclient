@@ -72,7 +72,7 @@ void Spawn::load(TiXmlElement* node)
 
         cType->setSpawnTime(cNode->readType<int>("spawntime"));
         Otc::Direction dir = Otc::North;
-        int16 dir_ = cNode->readType<int16>("direction");
+        auto dir_ = cNode->readType<int16>("direction");
         if (dir_ >= Otc::East && dir_ <= Otc::West)
             dir = static_cast<Otc::Direction>(dir_);
         cType->setDirection(dir);
@@ -318,7 +318,7 @@ void CreatureManager::internalLoadCreatureBuffer(TiXmlElement* attrib, const Cre
 
     Outfit out;
 
-    const int32 type = attrib->readType<int32>("type");
+    const auto type = attrib->readType<int32>("type");
     if (type > 0) {
         out.setCategory(ThingCategoryCreature);
         out.setId(type);

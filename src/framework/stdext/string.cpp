@@ -276,12 +276,12 @@ namespace stdext
         size_t startIndex = 0;
 
         while (found != std::string::npos) {
-            result.push_back(std::string(str.begin() + startIndex, str.begin() + found));
+            result.emplace_back(str.begin() + startIndex, str.begin() + found);
             startIndex = found + separators.size();
             found = str.find(separators, startIndex);
         }
         if (startIndex != str.size())
-            result.push_back(std::string(str.begin() + startIndex, str.end()));
+            result.emplace_back(str.begin() + startIndex, str.end());
 
         return result;
     }

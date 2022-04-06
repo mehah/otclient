@@ -146,7 +146,7 @@ void HouseManager::load(const std::string & fileName)
             if (elem->ValueTStr() != "house")
                 stdext::throw_exception("invalid house tag.");
 
-            const uint32 houseId = elem->readType<uint32>("houseid");
+            const auto houseId = elem->readType<uint32>("houseid");
             HousePtr house = getHouse(houseId);
             if (!house)
                 house = HousePtr(new House(houseId)), addHouse(house);
