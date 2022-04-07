@@ -23,8 +23,8 @@
 #ifndef UILAYOUT_H
 #define UILAYOUT_H
 
-#include <framework/luaengine/luaobject.h>
-#include <framework/otml/otml.h>
+#include "framework/luaengine/luaobject.h"
+#include "framework/otml/otml.h"
 #include "declarations.h"
 
 #include <utility>

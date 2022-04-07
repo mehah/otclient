@@ -23,7 +23,7 @@
 #include "luainterface.h"
 #include "luaobject.h"
 
-#include <framework/core/resourcemanager.h>
+#include "framework/core/resourcemanager.h"
 #if __has_include("luajit/lua.hpp")
 #include <luajit/lua.hpp>
 #else
@@ -41,6 +41,7 @@ LuaInterface::LuaInterface()
     m_weakTableRef = 0;
     m_totalObjRefs = 0;
     m_totalFuncRefs = 0;
+    m_globalEnv = 0;
 }
 
 LuaInterface::~LuaInterface()

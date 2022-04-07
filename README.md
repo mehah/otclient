@@ -1,11 +1,20 @@
-# OTCLient - Redemption
-[![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/tterb/atomic-design-ui/blob/master/LICENSEs)
-[![Discord Shield](https://discordapp.com/api/guilds/888062548082061433/widget.png?style=shield)](https://discord.gg/HZN8yJJSyC)
+# OpenTibiaBR - OTClient
 
-#### :heart:  If you are interested in supporting the project, go to this [link](https://www.paypal.com/donate/?business=CV9D5JF8E46LY&no_recurring=0&item_name=Thank+you+very+much+for+your+donation.&currency_code=BRL), any value is great help, thank you.
+[![Discord Channel](https://img.shields.io/discord/528117503952551936.svg?style=flat-square&logo=discord)](https://discord.gg/3NxYnyV)
+[![GitHub issues](https://img.shields.io/github/issues/opentibiabr/otclient)](https://github.com/opentibiabr/otclient/issues)
+[![GitHub pull request](https://img.shields.io/github/issues-pr/opentibiabr/otclient)](https://github.com/opentibiabr/otclient/pulls)
+[![Contributors](https://img.shields.io/github/contributors/opentibiabr/otclient.svg?style=flat-square)](https://github.com/opentibiabr/otclient/graphs/contributors)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/opentibiabr/otclient/blob/develop/LICENSE)
 
-### Based on [edubart/otclient](https://github.com/edubart/otclient) Rev: [2.758](https://github.com/edubart/otclient/commit/45afb65b90284ce70f328733715043860186bf50)
+![GitHub repo size](https://img.shields.io/github/repo-size/opentibiabr/otclient)
 
+## Builds
+
+[![Build - MacOS](https://github.com/opentibiabr/otclient/actions/workflows/build-macos.yml/badge.svg)](https://github.com/opentibiabr/otclient/actions/workflows/build-macos.yml)
+[![Build - Ubuntu](https://github.com/opentibiabr/otclient/actions/workflows/build-ubuntu.yml/badge.svg)](https://github.com/opentibiabr/otclient/actions/workflows/build-ubuntu.yml)
+[![Build - Windows](https://github.com/opentibiabr/otclient/actions/workflows/build-windows.yml/badge.svg)](https://github.com/opentibiabr/otclient/actions/workflows/build-windows.yml)
+
+### Based on [mehah/otclient](https://github.com/mehah/otclient) Rev: [3.490](https://github.com/mehah/otclient/commit/c4433f3dba1e2790038495ab056848e3344190ac)
 
 ### Features
 
@@ -22,9 +31,9 @@
 - Adjusted Path Finding
 - Optimized Terminal
 - Refactored Walk System
-- Module Controller System ([Code example](https://github.com/mehah/otclient/blob/cache-for-all/modules/game_minimap/minimap.lua))
+- Module Controller System [Code example](https://github.com/mehah/otclient/blob/main/modules/game_minimap/minimap.lua)
 - Some bugs fixed contained in [edubart/otclient](https://github.com/edubart/otclient)
-- Client Config in [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h)
+- Client Config in [config.h](https://github.com/mehah/otclient/blob/main/src/client/config.h)
 
 ##### Community (Features)
 - Support Tibia 12.85/protobuf by [@Nekiro](https://github.com/nekiro)
@@ -36,22 +45,9 @@
 - Health&Mana Circle by [@EgzoT](https://github.com/EgzoT), [@GustavoBlaze](https://github.com/GustavoBlaze), [@Tekadon58](https://github.com/Tekadon58) ([GITHUB Project](https://github.com/EgzoT/-OTClient-Mod-health_and_mana_circle))
 - Tibia Theme 1.2 by Zews ([Forum Thread](https://otland.net/threads/otc-tibia-theme-v1-2.230988/))
 - Add option ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE in [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h) by [@SkullzOTS](https://github.com/SkullzOTS)
-- Encryption System by [@Mrpox](https://github.com/Mrpox)
-  - To enable just go to [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h), set 1 in ENABLE_ENCRYPTION and change password on ENCRYPTION_PASSWORD
-  - To generate an encryption, just run the client with flag "--encrypt SET_YOUR_PASSWORD_HERE" and don't forget to change the password.
 
-##### [Active Developers]
+##### [Credits]
 [@mehah](https://github.com/mehah) [@scopz](https://github.com/scopz)
-
-<h2>
-
-```diff
-- Want to help? Just open a PR.
-```
-
-   </h2>
-
-[![Build Status](https://github.com/edubart/otclient/actions/workflows/build-vcpkg.yml/badge.svg)](https://github.com/edubart/otclient/actions/workflows/build-vcpkg.yml) [![Join the chat at https://gitter.im/edubart/otclient](https://img.shields.io/badge/GITTER-join%20chat-green.svg)](https://gitter.im/edubart/otclient?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Open Source Helpers](https://www.codetriage.com/edubart/otclient/badges/users.svg)](https://www.codetriage.com/edubart/otclient)
 
 ### What is otclient?
 
@@ -62,41 +58,30 @@ that each functionality is a separated module, giving the possibility to users m
 anything easily. Users can also create new mods and extend game interface for their own purposes.
 Otclient is written in C++20 and heavily scripted in lua.
 
-For a server to connect to, you can build your own with the [forgottenserver](https://github.com/otland/forgottenserver)
-or connect to one listed on [otservlist](https://otservlist.org/).#
-
 ### Where do I download?
 
-Compiled for Windows can be found here (but can be outdated):
+Compiled for MacOS, Ubuntu and Windows can be found here:
+* [MacOS](https://github.com/opentibiabr/otclient/actions/workflows/build-macos.yml)
+* [Ubuntu](https://github.com/opentibiabr/otclient/actions/workflows/build-ubuntu.yml)
+* [Windows](https://github.com/opentibiabr/otclient/actions/workflows/build-windows.yml)
 
-- [Windows Builds](https://github.com/mehah/otclient/releases)
+Compatible assets with [otservbr-global](https://github.com/opentibiabr/otservbr-global) and [canary](https://github.com/opentibiabr/canary):
+* [Client 12.85](https://github.com/dudantas/tibia-client/archive/refs/heads/12.85.11525.zip)
 
-**NOTE:** You will need to download spr/dat files on your own and place them in `data/things/VERSION/` (i.e: `data/things/1098/Tibia.spr`)
-
-### Features
-
-Beyond of it's flexibility with scripts, otclient comes with tons of other features that make possible
-the creation of new client side stuff in otserv that was not possible before. These include,
-sound system, graphics effects with shaders, modules/addons system, animated textures,
-styleable user interface, transparency, multi language, in game lua terminal, an OpenGL 1.1/2.0 ES engine that make possible
-to port to mobile platforms. Otclient is also flexible enough to
-create tibia tools like map editors just using scripts, because it wasn't designed to be just a
-client, instead otclient was designed to be a combination of a framework and tibia APIs.
+**NOTE:** You will need to download all assets files on your own and place them in `data/things/1285/`.
 
 ### Compiling
 
 In short, if you need to compile OTClient, follow these tutorials:
-
-- [Compiling on Windows](https://github.com/mehah/otclient/wiki/Compiling-on-Windows)
-- [Compiling on Linux](https://github.com/edubart/otclient/wiki/Compiling-on-Linux)
-- [Compiling on OS X](https://github.com/edubart/otclient/wiki/Compiling-on-Mac-OS-X)
+* [Compiling on Debian/Ubuntu](https://github.com/opentibiabr/otclient/wiki/Compiling-on-Debian-or-Ubuntu)
+* [Compiling on Windows](https://github.com/opentibiabr/otclient/wiki/Compiling-on-Windows)
 
 ### Build and run with Docker
 
 To build the image:
 
 ```sh
-docker build -t edubart/otclient .
+docker build -t opentibiabr/otclient .
 ```
 
 To run the built image:
@@ -110,7 +95,7 @@ docker run -it --rm \
   --env DISPLAY \
   --volume /tmp/.X11-unix:/tmp/.X11-unix \
   --device /dev/dri \
-  --device /dev/snd edubart/otclient /bin/bash
+  --device /dev/snd opentibiabr/otclient /bin/bash
 
 # Enable access control for the X server.
 xhost -
@@ -118,20 +103,19 @@ xhost -
 
 ### Need help?
 
-Try to ask questions in [otland](http://otland.net/f494/), now we have a board for the project there,
-or talk with us at the gitter chat.
+Try to ask questions in our [discord](https://discord.gg/3NxYnyV)
 
 ### Bugs
 
-Have found a bug? Please create an issue in our [bug tracker](https://github.com/edubart/otclient/issues)
+Have found a bug? Please create an issue in our [bug tracker](https://github.com/opentibiabr/otclient/issues)
 
 ### Contributing
 
-We encourage you to contribute to otclient! You can make pull requests of any improvement in our github page, alternatively, see [Contributing Wiki Page](https://github.com/edubart/otclient/wiki/Contributing).
+We encourage you to contribute to otclient! You can make pull requests of any improvement in [pull requests](https://github.com/opentibiabr/otclient/pulls)
 
 ### Contact
 
-Talk directly with us at the gitter chat [![Join the chat at https://gitter.im/edubart/otclient](https://img.shields.io/badge/GITTER-join%20chat-green.svg)](https://gitter.im/edubart/otclient?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge).
+[![Discord Channel](https://img.shields.io/discord/528117503952551936.svg?label=discord)](https://discord.gg/3NxYnyV)
 
 ### License
 

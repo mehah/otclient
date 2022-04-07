@@ -24,7 +24,7 @@
 #include "soundbuffer.h"
 #include "soundfile.h"
 
-#include <framework/util/databuffer.h>
+#include "framework/util/databuffer.h"
 
 StreamSoundSource::StreamSoundSource()
 {

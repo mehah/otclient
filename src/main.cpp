@@ -20,10 +20,10 @@
  * THE SOFTWARE.
  */
 
-#include <client/client.h>
-#include <framework/core/application.h>
-#include <framework/core/resourcemanager.h>
-#include <framework/luaengine/luainterface.h>
+#include "client/client.h"
+#include "framework/core/application.h"
+#include "framework/core/resourcemanager.h"
+#include "framework/luaengine/luainterface.h"
 
 int main(int argc, const char* argv[])
 {
@@ -51,8 +51,8 @@ int main(int argc, const char* argv[])
     g_client.init(args);
 
     // find script init.lua and run it
-    if (!g_resources.discoverWorkDir("init.lua"))
-        g_logger.fatal("Unable to find work directory, the application cannot be initialized.");
+    if(!g_resources.discoverWorkDir("init.lua"))
+        g_logger.fatal("Unable to find work directory, cannot find init.lua, the application cannot be initialized.");
 
     if (!g_lua.safeRunScript("init.lua"))
         g_logger.fatal("Unable to run script init.lua!");

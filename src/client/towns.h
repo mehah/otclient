@@ -23,7 +23,7 @@
 #ifndef TOWNS_H
 #define TOWNS_H
 
-#include <framework/luaengine/luaobject.h>
+#include "framework/luaengine/luaobject.h"
 #include "declarations.h"
 
 class Town : public LuaObject

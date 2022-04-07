@@ -23,7 +23,7 @@
 #include "shaderprogram.h"
 #include "graphics.h"
 
-#include <framework/core/application.h>
+#include "framework/core/application.h"
 
 uint ShaderProgram::m_currentProgram = 0;
 

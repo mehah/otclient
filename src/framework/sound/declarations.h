@@ -23,7 +23,7 @@
 #ifndef FRAMEWORK_SOUND_DECLARATIONS_H
 #define FRAMEWORK_SOUND_DECLARATIONS_H
 
-#include <framework/global.h>
+#include "framework/global.h"
 
 #define AL_LIBTYPE_STATIC
 

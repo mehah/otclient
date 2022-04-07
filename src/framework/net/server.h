@@ -23,7 +23,7 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#include <framework/luaengine/luaobject.h>
+#include "framework/luaengine/luaobject.h"
 #include "declarations.h"
 
 class Server : public LuaObject

@@ -1,5 +1,5 @@
 EnterGameWindow < MainWindow
-  !text: tr('Enter Game')
+  !text: tr('Journey Onwards')
   size: 236 298
 
 EnterGameButton < Button
@@ -28,13 +28,13 @@ EnterGameWindow
   @onEnter: EnterGame.doLogin()
 
   MenuLabel
-    !text: tr('Account name')
+    !text: tr('Email')
     anchors.left: parent.left
     anchors.top: parent.top
     text-auto-resize: true
 
-  PasswordTextEdit
-    id: accountNameTextEdit
+  TextEdit
+    id: accountEmailTextEdit
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
@@ -165,7 +165,7 @@ EnterGameWindow
   CheckBox
     id: rememberPasswordBox
     !text: tr('Remember password')
-    !tooltip: tr('Remember account and password when starts client')
+    !tooltip: tr('Remember email and password when starts client')
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
@@ -189,7 +189,7 @@ EnterGameWindow
     margin-top: 6
 
   EnterGameButton
-    !text: tr('Ok')
+    !text: tr('Login')
     anchors.right: parent.right
     anchors.top: prev.bottom
     margin-top: 4

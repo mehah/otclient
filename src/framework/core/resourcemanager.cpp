@@ -25,9 +25,9 @@
 #include "resourcemanager.h"
 #include "filestream.h"
 
-#include <framework/core/application.h>
-#include <framework/luaengine/luainterface.h>
-#include <framework/platform/platform.h>
+#include "framework/core/application.h"
+#include "framework/luaengine/luainterface.h"
+#include "framework/platform/platform.h"
 
 #include <physfs.h>
 

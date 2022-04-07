@@ -21,7 +21,7 @@
  */
 
 #include "luavaluecasts.h"
-#include <framework/luaengine/luainterface.h>
+#include "framework/luaengine/luainterface.h"
 
 int push_luavalue(const Outfit& outfit)
 {

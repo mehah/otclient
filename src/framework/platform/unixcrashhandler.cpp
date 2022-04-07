@@ -20,11 +20,12 @@
  * THE SOFTWARE.
  */
 
-#if !defined(WIN32) && defined(CRASH_HANDLER)
+#ifndef WIN32
+#if defined(CRASH_HANDLER)
 
 #include "crashhandler.h"
-#include <framework/global.h>
-#include <framework/core/application.h>
+#include "global.h"
+#include "framework/core/application.h"
 
 #ifndef __USE_GNU
 #define __USE_GNU
@@ -135,4 +136,5 @@ void installCrashHandler()
     sigaction(SIGABRT, &sa, nullptr);  // process aborted (asserts)
 }
 
+#endif
 #endif

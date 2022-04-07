@@ -25,7 +25,7 @@
 
 #include "database.h"
 
-#include <framework/global.h>
+#include "framework/global.h"
 
 #ifdef WINDOWS
     #include <winsock2.h>

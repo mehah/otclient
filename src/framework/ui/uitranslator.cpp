@@ -21,7 +21,7 @@
  */
 
 #include "uitranslator.h"
-#include <framework/stdext/string.h>
+#include "framework/stdext/string.h"
 
 Fw::AlignmentFlag Fw::translateAlignment(std::string aligment)
 {

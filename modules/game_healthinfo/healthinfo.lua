@@ -1,85 +1,85 @@
 Icons = {}
-Icons[PlayerStates.Poison] = {
+Icons[PlayerIcons.Poison] = {
     tooltip = tr('You are poisoned'),
     path = '/images/game/states/poisoned',
     id = 'condition_poisoned'
 }
-Icons[PlayerStates.Burn] = {
+Icons[PlayerIcons.Burn] = {
     tooltip = tr('You are burning'),
     path = '/images/game/states/burning',
     id = 'condition_burning'
 }
-Icons[PlayerStates.Energy] = {
+Icons[PlayerIcons.Energy] = {
     tooltip = tr('You are electrified'),
     path = '/images/game/states/electrified',
     id = 'condition_electrified'
 }
-Icons[PlayerStates.Drunk] = {
+Icons[PlayerIcons.Drunk] = {
     tooltip = tr('You are drunk'),
     path = '/images/game/states/drunk',
     id = 'condition_drunk'
 }
-Icons[PlayerStates.ManaShield] = {
+Icons[PlayerIcons.ManaShield] = {
     tooltip = tr('You are protected by a magic shield'),
     path = '/images/game/states/magic_shield',
     id = 'condition_magic_shield'
 }
-Icons[PlayerStates.Paralyze] = {
+Icons[PlayerIcons.Paralyze] = {
     tooltip = tr('You are paralysed'),
     path = '/images/game/states/slowed',
     id = 'condition_slowed'
 }
-Icons[PlayerStates.Haste] = {
+Icons[PlayerIcons.Haste] = {
     tooltip = tr('You are hasted'),
     path = '/images/game/states/haste',
     id = 'condition_haste'
 }
-Icons[PlayerStates.Swords] = {
+Icons[PlayerIcons.Swords] = {
     tooltip = tr('You may not logout during a fight'),
     path = '/images/game/states/logout_block',
     id = 'condition_logout_block'
 }
-Icons[PlayerStates.Drowning] = {
+Icons[PlayerIcons.Drowning] = {
     tooltip = tr('You are drowning'),
     path = '/images/game/states/drowning',
     id = 'condition_drowning'
 }
-Icons[PlayerStates.Freezing] = {
+Icons[PlayerIcons.Freezing] = {
     tooltip = tr('You are freezing'),
     path = '/images/game/states/freezing',
     id = 'condition_freezing'
 }
-Icons[PlayerStates.Dazzled] = {
+Icons[PlayerIcons.Dazzled] = {
     tooltip = tr('You are dazzled'),
     path = '/images/game/states/dazzled',
     id = 'condition_dazzled'
 }
-Icons[PlayerStates.Cursed] = {
+Icons[PlayerIcons.Cursed] = {
     tooltip = tr('You are cursed'),
     path = '/images/game/states/cursed',
     id = 'condition_cursed'
 }
-Icons[PlayerStates.PartyBuff] = {
+Icons[PlayerIcons.PartyBuff] = {
     tooltip = tr('You are strengthened'),
     path = '/images/game/states/strengthened',
     id = 'condition_strengthened'
 }
-Icons[PlayerStates.PzBlock] = {
+Icons[PlayerIcons.PzBlock] = {
     tooltip = tr('You may not logout or enter a protection zone'),
     path = '/images/game/states/protection_zone_block',
     id = 'condition_protection_zone_block'
 }
-Icons[PlayerStates.Pz] = {
+Icons[PlayerIcons.Pz] = {
     tooltip = tr('You are within a protection zone'),
     path = '/images/game/states/protection_zone',
     id = 'condition_protection_zone'
 }
-Icons[PlayerStates.Bleeding] = {
+Icons[PlayerIcons.Bleeding] = {
     tooltip = tr('You are bleeding'),
     path = '/images/game/states/bleeding',
     id = 'condition_bleeding'
 }
-Icons[PlayerStates.Hungry] = {
+Icons[PlayerIcons.Hungry] = {
     tooltip = tr('You are hungry'),
     path = '/images/game/states/hungry',
     id = 'condition_hungry'
@@ -100,7 +100,7 @@ function init()
         onHealthChange = onHealthChange,
         onManaChange = onManaChange,
         onLevelChange = onLevelChange,
-        onStatesChange = onStatesChange,
+        onIconsChange = onIconsChange,
         onSoulChange = onSoulChange,
         onFreeCapacityChange = onFreeCapacityChange
     })
@@ -134,7 +134,7 @@ function init()
                      localPlayer:getMaxMana())
         onLevelChange(localPlayer, localPlayer:getLevel(),
                       localPlayer:getLevelPercent())
-        onStatesChange(localPlayer, localPlayer:getStates(), 0)
+        onIconsChange(localPlayer, localPlayer:getIcons(), 0)
         onSoulChange(localPlayer, localPlayer:getSoul())
         onFreeCapacityChange(localPlayer, localPlayer:getFreeCapacity())
     end
@@ -150,7 +150,7 @@ function terminate()
         onHealthChange = onHealthChange,
         onManaChange = onManaChange,
         onLevelChange = onLevelChange,
-        onStatesChange = onStatesChange,
+        onIconsChange = onIconsChange,
         onSoulChange = onSoulChange,
         onFreeCapacityChange = onFreeCapacityChange
     })
@@ -239,7 +239,7 @@ function onFreeCapacityChange(player, freeCapacity)
     capLabel:setText(tr('Cap') .. ': ' .. freeCapacity)
 end
 
-function onStatesChange(localPlayer, now, old)
+function onIconsChange(localPlayer, now, old)
     if now == old then return end
 
     local bitsChanged = bit32.bxor(now, old)

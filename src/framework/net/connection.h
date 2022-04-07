@@ -23,13 +23,12 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
-#include <framework/luaengine/luaobject.h>
+#include "framework/luaengine/luaobject.h"
 #include "declarations.h"
-#include <asio.hpp>
 
 class Connection : public LuaObject
 {
-    using ErrorCallback = std::function<void(const std::error_code&)>;
+    using ErrorCallback = std::function<void(const boost::system::error_code&)>;
     using RecvCallback = std::function<void(uint8*, uint16)>;
 
     enum
@@ -58,7 +57,7 @@ public:
     void setErrorCallback(const ErrorCallback& errorCallback) { m_errorCallback = errorCallback; }
 
     int getIp();
-    std::error_code getError() { return m_error; }
+    boost::system::error_code getError() { return m_error; }
     bool isConnecting() { return m_connecting; }
     bool isConnected() { return m_connected; }
     ticks_t getElapsedTicksSinceLastRead() { return m_connected ? m_activityTimer.elapsed_millis() : -1; }
@@ -68,22 +67,22 @@ public:
 protected:
     void internal_connect(const asio::ip::basic_resolver<asio::ip::tcp>::iterator& endpointIterator);
     void internal_write();
-    void onResolve(const std::error_code& error, asio::ip::tcp::resolver::iterator endpointIterator);
-    void onConnect(const std::error_code& error);
-    void onCanWrite(const std::error_code& error);
-    void onWrite(const std::error_code& error, size_t writeSize, const std::shared_ptr<asio::streambuf>&
+    void onResolve(const boost::system::error_code& error, asio::ip::tcp::resolver::iterator endpointIterator);
+    void onConnect(const boost::system::error_code& error);
+    void onCanWrite(const boost::system::error_code& error);
+    void onWrite(const boost::system::error_code& error, size_t writeSize, const std::shared_ptr<asio::streambuf>&
                  outputStream);
-    void onRecv(const std::error_code& error, size_t recvSize);
-    void onTimeout(const std::error_code& error);
-    void handleError(const std::error_code& error);
+    void onRecv(const boost::system::error_code& error, size_t recvSize);
+    void onTimeout(const boost::system::error_code& error);
+    void handleError(const boost::system::error_code& error);
 
     std::function<void()> m_connectCallback;
     ErrorCallback m_errorCallback;
     RecvCallback m_recvCallback;
 
-    asio::basic_waitable_timer<std::chrono::high_resolution_clock> m_readTimer;
-    asio::basic_waitable_timer<std::chrono::high_resolution_clock> m_writeTimer;
-    asio::basic_waitable_timer<std::chrono::high_resolution_clock> m_delayedWriteTimer;
+    asio::deadline_timer m_readTimer;
+    asio::deadline_timer m_writeTimer;
+    asio::deadline_timer m_delayedWriteTimer;
     asio::ip::tcp::resolver m_resolver;
     asio::ip::tcp::socket m_socket;
 
@@ -92,7 +91,7 @@ protected:
     asio::streambuf m_inputStream;
     bool m_connected;
     bool m_connecting;
-    std::error_code m_error;
+    boost::system::error_code m_error;
     stdext::timer m_activityTimer;
 
     friend class Server;

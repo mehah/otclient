@@ -23,7 +23,7 @@
 #ifndef FRAMEWORK_OTML_DECLARATIONS_H
 #define FRAMEWORK_OTML_DECLARATIONS_H
 
-#include <framework/global.h>
+#include "framework/global.h"
 
 class OTMLNode;
 class OTMLDocument;

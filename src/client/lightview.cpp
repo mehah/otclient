@@ -21,7 +21,7 @@
  */
 
 #include "lightview.h"
-#include <framework/graphics/drawpool.h>
+#include "framework/graphics/drawpool.h"
 #include "map.h"
 #include "mapview.h"
 #include "spritemanager.h"

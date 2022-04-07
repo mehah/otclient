@@ -23,9 +23,9 @@
 #ifndef ANIMATEDTEXT_H
 #define ANIMATEDTEXT_H
 
-#include <framework/core/timer.h>
-#include <framework/graphics/cachedtext.h>
-#include <framework/graphics/fontmanager.h>
+#include "framework/core/timer.h"
+#include "framework/graphics/cachedtext.h"
+#include "framework/graphics/fontmanager.h"
 #include "thing.h"
 
  // @bindclass

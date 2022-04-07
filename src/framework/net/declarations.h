@@ -23,8 +23,10 @@
 #ifndef FRAMEWORK_NET_DECLARATIONS_H
 #define FRAMEWORK_NET_DECLARATIONS_H
 
-#include <framework/global.h>
-#include <asio/ip/tcp.hpp>
+#include <boost/asio.hpp>
+#include "framework/global.h"
+
+namespace asio = boost::asio;
 
 class InputMessage;
 class OutputMessage;

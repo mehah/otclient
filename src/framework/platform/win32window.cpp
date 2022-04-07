@@ -23,10 +23,10 @@
 #ifdef WIN32
 
 #include "win32window.h"
-#include <client/map.h>
-#include <framework/core/application.h>
-#include <framework/core/resourcemanager.h>
-#include <framework/graphics/image.h>
+#include "client/map.h"
+#include "framework/core/application.h"
+#include "framework/core/resourcemanager.h"
+#include "framework/graphics/image.h"
 
 #define HSB_BIT_SET(p, n) (p[(n)/8] |= (128 >>((n)%8)))
 

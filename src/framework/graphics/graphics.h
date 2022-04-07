@@ -24,6 +24,7 @@
 #define GRAPHICS_H
 
 #include <GL/glew.h>
+
 #include "declarations.h"
 
  // @bindsingleton g_graphics

@@ -29,19 +29,19 @@
 
 #include <framework/core/binarytree.h>
 #include <framework/core/filestream.h>
-#include <framework/core/resourcemanager.h>
-#include <framework/otml/otml.h>
+#include "framework/core/resourcemanager.h"
+#include <framework/otml//otml.h>
 #include <framework/xml/tinyxml.h>
 
 #include <client/spriteappearances.h>
 #include <client/spritemanager.h>
 
-#include "framework/protobuf/appearances.pb.h"
+#include "protobuf/appearances.pb.h"
 
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
-using namespace tibia::protobuf;
+using namespace otclient::protobuf;
 
 ThingTypeManager g_things;
 

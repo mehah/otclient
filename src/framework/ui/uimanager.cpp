@@ -23,11 +23,11 @@
 #include "uimanager.h"
 #include "ui.h"
 
-#include <framework/core/application.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/resourcemanager.h>
-#include <framework/otml/otml.h>
-#include <framework/platform/platformwindow.h>
+#include "framework/core/application.h"
+#include "framework/core/eventdispatcher.h"
+#include "framework/core/resourcemanager.h"
+#include "framework/otml/otml.h"
+#include "framework/platform/platformwindow.h"
 
 UIManager g_ui;
 

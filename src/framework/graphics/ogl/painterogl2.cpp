@@ -21,7 +21,7 @@
  */
 
 #include "painterogl2.h"
-#include <framework/platform/platformwindow.h>
+#include "framework/platform/platformwindow.h"
 #include "painterogl2_shadersources.h"
 #include "framework/graphics/texture.h"
 

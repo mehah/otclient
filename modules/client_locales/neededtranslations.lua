@@ -9,7 +9,7 @@ neededTranslations = {
     "3e) Multi-Clienting", "3f) Account Trading or Sharing",
     "4a) Threatening Gamemaster",
     "4b) Pretending to Have Influence on Rule Enforcement",
-    "4c) False Report to Gamemaster", "Accept", "Account name",
+    "4c) False Report to Gamemaster", "Accept", "Email",
     "Account Status", "Action", "Activate ignorelist", "Activate whitelist",
     "Add", "Add new server", "Add new VIP", "Addon 1", "Addon 2", "Addon 3",
     "Add to VIP list", "Adjust volume", "All",

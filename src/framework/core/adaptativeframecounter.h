@@ -23,7 +23,7 @@
 #ifndef ADAPTATIVEFRAMECOUNTER_H
 #define ADAPTATIVEFRAMECOUNTER_H
 
-#include <framework/global.h>
+#include "framework/global.h"
 
  /**
   * Class that help counting and limiting frames per second in a application,
@@ -38,11 +38,14 @@ public:
 
     uint getFps() const { return m_fps; }
     uint getMaxFps() const { return m_maxFps; }
+    int getLastFps() { return m_lastFps; }
 
     void setMaxFps(const uint max) { m_maxFps = max; }
 
 private:
     double getMaxPeriod() { return 1.0 / m_maxFps; }
+
+    int m_lastFps;
 
     uint m_fps{ 0 },
         m_maxFps{ 0 },

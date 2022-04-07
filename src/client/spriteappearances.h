@@ -23,9 +23,9 @@
 #ifndef SPRITEAPPEARANCES_H
 #define SPRITEAPPEARANCES_H
 
-#include <framework/core/declarations.h>
-#include <framework/graphics/declarations.h>
-#include <framework/luaengine/luaobject.h>
+#include "framework/core/declarations.h"
+#include "framework/graphics/declarations.h"
+#include "framework/luaengine/luaobject.h"
 
 enum class SpriteLayout
 {

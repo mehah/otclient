@@ -25,7 +25,7 @@
 
 #include "declarations.h"
 
-#include <framework/luaengine/luaobject.h>
+#include "framework/luaengine/luaobject.h"
 
  // @bindclass
 class ProtocolHttp : public LuaObject
@@ -45,7 +45,7 @@ public:
 protected:
     void onConnect();
     void onRecv(uint8* buffer, uint16 size);
-    void onError(const std::error_code& err);
+    void onError(const boost::system::error_code& err);
 
 private:
     ConnectionPtr m_connection;

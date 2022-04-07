@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include <framework/net/outputmessage.h>
-#include <framework/util/crypt.h>
+#include "framework/net/outputmessage.h"
+#include "framework/util/crypt.h"
 
 OutputMessage::OutputMessage()
 {

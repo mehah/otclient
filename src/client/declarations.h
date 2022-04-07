@@ -23,8 +23,8 @@
 #ifndef CLIENT_DECLARATIONS_H
 #define CLIENT_DECLARATIONS_H
 
-#include <framework/net/declarations.h>
-#include <framework/ui/declarations.h>
+#include "framework/net/declarations.h"
+#include "framework/ui/declarations.h"
 #include "global.h"
 
  // core

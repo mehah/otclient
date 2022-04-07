@@ -23,11 +23,11 @@
 #ifndef FRAMEWORK_GLOBAL_H
 #define FRAMEWORK_GLOBAL_H
 
-#include <client/config.h>
+#include "client/config.h"
 
 #include "stdext/compiler.h"
 
- // common C/C++ headers
+// common C/C++ headers
 #include "pch.h"
 
 // global constants

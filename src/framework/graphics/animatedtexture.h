@@ -23,7 +23,7 @@
 #ifndef ANIMATEDTEXTURE_H
 #define ANIMATEDTEXTURE_H
 
-#include <framework/core/timer.h>
+#include "framework/core/timer.h"
 #include "texture.h"
 
 class AnimatedTexture : public Texture

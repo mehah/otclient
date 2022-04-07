@@ -25,8 +25,7 @@
 
 #include <string>
 
-#include "uuid.h"
-
+#include <boost/uuid/uuid.hpp>
 #ifdef USE_GMP
 #include <gmp.h>
 #else
@@ -58,9 +57,7 @@ private:
     std::string _encrypt(const std::string& decrypted_string, bool useMachineUUID);
     std::string _decrypt(const std::string& encrypted_string, bool useMachineUUID);
     std::string getCryptKey(bool useMachineUUID);
-
-    uuids::uuid m_machineUUID;
-
+    boost::uuids::uuid m_machineUUID;
 #ifdef USE_GMP
     mpz_t m_p, m_q, m_n, m_e, m_d;
 #else

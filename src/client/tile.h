@@ -23,7 +23,7 @@
 #ifndef TILE_H
 #define TILE_H
 
-#include <framework/luaengine/luaobject.h>
+#include "framework/luaengine/luaobject.h"
 #include "declarations.h"
 #include "effect.h"
 #include "item.h"

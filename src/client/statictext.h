@@ -23,7 +23,7 @@
 #ifndef STATICTEXT_H
 #define STATICTEXT_H
 
-#include <framework/graphics/cachedtext.h>
+#include "framework/graphics/cachedtext.h"
 #include "thing.h"
 
  // @bindclass

@@ -23,8 +23,8 @@
 #ifndef EFFECT_H
 #define EFFECT_H
 
-#include <framework/global.h>
-#include <framework/core/timer.h>
+#include "framework/global.h"
+#include "framework/core/timer.h"
 #include "thing.h"
 
  // @bindclass

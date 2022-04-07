@@ -24,7 +24,7 @@
 #define X11WINDOW_H
 
 #include "platformwindow.h"
-#include <framework/graphics/glutil.h>
+#include "framework/graphics/glutil.h"
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>

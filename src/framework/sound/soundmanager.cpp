@@ -27,10 +27,10 @@
 #include "soundsource.h"
 #include "streamsoundsource.h"
 
-#include <framework/core/asyncdispatcher.h>
-#include <framework/core/clock.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/resourcemanager.h>
+#include "framework/core/asyncdispatcher.h"
+#include "framework/core/clock.h"
+#include "framework/core/eventdispatcher.h"
+#include "framework/core/resourcemanager.h"
 
 SoundManager g_sounds;
 

@@ -23,11 +23,11 @@
 #ifndef DRAWPOOL_H
 #define DRAWPOOL_H
 
-#include <framework/core/graphicalapplication.h>
-#include <framework/graphics/declarations.h>
-#include <framework/graphics/framebuffer.h>
-#include <framework/graphics/graphics.h>
-#include <framework/graphics/pool.h>
+#include "framework/core/graphicalapplication.h"
+#include "framework/graphics/declarations.h"
+#include "framework/graphics/framebuffer.h"
+#include "framework/graphics/graphics.h"
+#include "framework/graphics/pool.h"
 
 enum  PoolType : uint8
 {

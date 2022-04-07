@@ -21,7 +21,7 @@
  */
 
 #include "filestream.h"
-#include <framework/core/application.h>
+#include "framework/core/application.h"
 #include "binarytree.h"
 
 #include <physfs.h>
@@ -315,7 +315,7 @@ std::string FileStream::getString()
         } else {
             if (m_pos + len > m_data.size()) {
                 throwError("read failed");
-                return nullptr;
+                return "Read failed";
             }
 
             str = std::string((char*)&m_data[m_pos], len);

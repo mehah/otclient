@@ -26,14 +26,13 @@
 #include "animator.h"
 #include "declarations.h"
 
-#include <framework/core/declarations.h>
-#include <framework/graphics/texture.h>
-#include <framework/luaengine/luaobject.h>
-#include <framework/net/server.h>
-#include <framework/otml/declarations.h>
+#include "framework/core/declarations.h"
+#include "framework/graphics/texture.h"
+#include "framework/luaengine/luaobject.h"
+#include "framework/net/server.h"
+#include "framework/otml//declarations.h"
 
-using namespace tibia::protobuf;
-using namespace tibia::protobuf::shared;
+using namespace otclient::protobuf;
 
 enum class TextureType
 {
@@ -173,7 +172,7 @@ public:
     Point getDisplacement() { return m_displacement; }
     int getDisplacementX() { return getDisplacement().x; }
     int getDisplacementY() { return getDisplacement().y; }
-    int getElevation() { return m_attribs.get<uint16>(ThingAttrElevation); }
+    int getElevation() { return m_elevation; }
 
     int getGroundSpeed() { return m_attribs.get<uint16>(ThingAttrGround); }
     int getMaxTextLength() { return m_attribs.has(ThingAttrWritableOnce) ? m_attribs.get<uint16>(ThingAttrWritableOnce) : m_attribs.get<uint16>(ThingAttrWritable); }
@@ -264,6 +263,7 @@ private:
     int m_realSize{ 0 };
     int m_numPatternX{ 0 }, m_numPatternY{ 0 }, m_numPatternZ{ 0 };
     int m_layers{ 0 };
+    int m_elevation{ 0 };
     int m_exactHeight{ 0 };
     float m_opacity{ 1.f };
     std::string m_customImage;

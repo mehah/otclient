@@ -21,7 +21,7 @@
  */
 
 #include "particletype.h"
-#include <framework/graphics/texturemanager.h>
+#include "framework/graphics/texturemanager.h"
 
 ParticleType::ParticleType()
 {

@@ -21,7 +21,7 @@
  */
 
 #include "cachedtext.h"
-#include <framework/graphics/drawpool.h>
+#include "framework/graphics/drawpool.h"
 #include "bitmapfont.h"
 #include "fontmanager.h"
 

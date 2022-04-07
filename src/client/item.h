@@ -23,7 +23,7 @@
 #ifndef ITEM_H
 #define ITEM_H
 
-#include <framework/global.h>
+#include "framework/global.h"
 #include "effect.h"
 #include "thing.h"
 

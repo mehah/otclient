@@ -23,7 +23,7 @@
 #ifndef THINGTYPEMANAGER_H
 #define THINGTYPEMANAGER_H
 
-#include <framework/global.h>
+#include "framework/global.h"
 
 #include "itemtype.h"
 #include "thingtype.h"

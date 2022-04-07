@@ -24,9 +24,9 @@
 #define COLOR_H
 
 #include <iomanip>
-#include "../stdext/cast.h"
-#include "../stdext/string.h"
-#include "../stdext/types.h"
+#include "framework/stdext/cast.h"
+#include "framework/stdext/string.h"
+#include "framework/stdext/types.h"
 
 class Color
 {

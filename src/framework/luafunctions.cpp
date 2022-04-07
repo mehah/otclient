@@ -20,46 +20,44 @@
  * THE SOFTWARE.
  */
 
-#include <framework/core/application.h>
-#include <framework/core/config.h>
-#include <framework/core/configmanager.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/module.h>
-#include <framework/core/modulemanager.h>
-#include <framework/core/resourcemanager.h>
-#include <framework/graphics/texturemanager.h>
-#include <framework/luaengine/luainterface.h>
-#include <framework/platform/platform.h>
-#include <framework/stdext/net.h>
-#include <framework/util/crypt.h>
+#include "core/application.h"
+#include "core/config.h"
+#include "core/configmanager.h"
+#include "core/eventdispatcher.h"
+#include "core/module.h"
+#include "core/modulemanager.h"
+#include "core/resourcemanager.h"
+#include "graphics/texturemanager.h"
+#include "luaengine/luainterface.h"
+#include "platform/platform.h"
+#include "stdext/net.h"
+#include "util/crypt.h"
 
 #include "graphics/particleeffect.h"
 
-#ifdef FW_SOUND
-#include <framework/sound/combinedsoundsource.h>
-#include <framework/sound/soundchannel.h>
-#include <framework/sound/soundmanager.h>
-#include <framework/sound/soundsource.h>
-#include <framework/sound/streamsoundsource.h>
+#ifdef FRAMEWORK_SOUND
+#include "sound/combinedsoundsource.h"
+#include "sound/soundchannel.h"
+#include "sound/soundmanager.h"
+#include "sound/soundsource.h"
+#include "sound/streamsoundsource.h"
 #endif
 
-#ifdef FW_GRAPHICS
-#include <framework/graphics/fontmanager.h>
-#include <framework/graphics/graphics.h>
-#include <framework/graphics/particlemanager.h>
-#include <framework/input/mouse.h>
-#include <framework/platform/platformwindow.h>
-#include <framework/ui/ui.h>
-#endif
+#include "graphics/fontmanager.h"
+#include "graphics/graphics.h"
+#include "graphics/particlemanager.h"
+#include "input/mouse.h"
+#include "platform/platformwindow.h"
+#include "ui/ui.h"
 
-#ifdef FW_NET
-#include <framework/net/protocol.h>
-#include <framework/net/protocolhttp.h>
-#include <framework/net/server.h>
-#endif
+#ifdef FRAMEWORK_NET
+#include "net/protocol.h"
+#include "net/protocolhttp.h"
+#include "net/server.h"
+#endif  // FRAMEWORK_NET
 
 #ifdef FW_SQL
-#include <framework/sql/mysql.h>
+#include "sql/mysql.h"
 #endif
 
 void Application::registerLuaFunctions()
@@ -243,7 +241,6 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ScheduledEvent>("cyclesExecuted", &ScheduledEvent::cyclesExecuted);
     g_lua.bindClassMemberFunction<ScheduledEvent>("maxCycles", &ScheduledEvent::maxCycles);
 
-#ifdef FW_GRAPHICS
     // GraphicalApplication
     g_lua.bindSingletonFunction("g_app", "isOnInputEvent", &GraphicalApplication::isOnInputEvent, &g_app);
 
@@ -749,9 +746,8 @@ void Application::registerLuaFunctions()
     g_lua.registerClass<UIParticles, UIWidget>();
     g_lua.bindClassStaticFunction<UIParticles>("create", [] { return UIParticlesPtr(new UIParticles); });
     g_lua.bindClassMemberFunction<UIParticles>("addEffect", &UIParticles::addEffect);
-#endif
 
-#ifdef FW_NET
+#ifdef FRAMEWORK_NET
     // Server
     g_lua.registerClass<Server>();
     g_lua.bindClassStaticFunction<Server>("create", &Server::create);
@@ -826,9 +822,9 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<OutputMessage>("setMessageSize", &OutputMessage::setMessageSize);
     g_lua.bindClassMemberFunction<OutputMessage>("getWritePos", &OutputMessage::getWritePos);
     g_lua.bindClassMemberFunction<OutputMessage>("setWritePos", &OutputMessage::setWritePos);
-#endif
+#endif  // FRAMEWORK_NET
 
-#ifdef FW_SOUND
+#ifdef FRAMEWORK_SOUND
     // SoundManager
     g_lua.registerSingletonClass("g_sounds");
     g_lua.bindSingletonFunction("g_sounds", "preload", &SoundManager::preload, &g_sounds);

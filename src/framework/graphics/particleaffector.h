@@ -23,7 +23,7 @@
 #ifndef PARTICLEAFFECTOR_H
 #define PARTICLEAFFECTOR_H
 
-#include <framework/otml/otml.h>
+#include "framework/otml/otml.h"
 #include "declarations.h"
 
 class ParticleAffector : public stdext::shared_object

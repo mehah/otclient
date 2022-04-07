@@ -24,7 +24,7 @@
 
 #include <mysql/errmsg.h>
 
-#include <framework/core/logger.h>
+#include "framework/core/logger.h"
 
 DatabaseMySQL::DatabaseMySQL()
 {

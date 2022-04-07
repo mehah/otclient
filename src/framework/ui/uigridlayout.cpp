@@ -23,7 +23,7 @@
 #include "uigridlayout.h"
 #include "uiwidget.h"
 
-#include <framework/core/eventdispatcher.h>
+#include "framework/core/eventdispatcher.h"
 
 #include <utility>
 
