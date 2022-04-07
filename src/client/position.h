@@ -31,7 +31,7 @@
 
 #include <array>
 #include <istream>
-#include <math.h>
+#include <cmath>
 #include <ostream>
 #include <string>
 #include <vector>
