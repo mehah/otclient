@@ -289,8 +289,8 @@ void WIN32Window::internalCreateWindow()
 
     if (!RegisterClassA(&wc))
         g_logger.fatal("Failed to register the window class.");
-    const DWORD dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
-    const DWORD dwStyle = WS_OVERLAPPEDWINDOW;
+    constexpr DWORD dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE,
+        dwStyle = WS_OVERLAPPEDWINDOW;
 
     // initialize in the center of the screen
     m_position = ((getDisplaySize() - m_size) / 2).toPoint();

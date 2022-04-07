@@ -34,8 +34,8 @@ AnimatedText::AnimatedText()
 
 void AnimatedText::drawText(const Point& dest, const Rect& visibleRect)
 {
-    const static float tf = ANIMATED_TEXT_DURATION;
-    const static float tftf = ANIMATED_TEXT_DURATION * ANIMATED_TEXT_DURATION;
+    constexpr static float tf = ANIMATED_TEXT_DURATION,
+        tftf = ANIMATED_TEXT_DURATION * ANIMATED_TEXT_DURATION;
 
     Point p = dest;
     const Size textSize = m_cachedText.getTextSize();

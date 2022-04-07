@@ -223,9 +223,9 @@ ImagePtr SpriteManager::getSpriteImage(int id)
 
 void SpriteManager::generateLightTexture()
 {
-    const float brightnessIntensity = 1.5f;
+    constexpr float brightnessIntensity = 1.5f;
 
-    const int bubbleRadius = 6,
+    constexpr int bubbleRadius = 6,
         bubbleDiameter = bubbleRadius * 2.3;
 
     const auto lightImage = ImagePtr(new Image(Size(bubbleDiameter, bubbleDiameter)));
@@ -248,7 +248,7 @@ void SpriteManager::generateLightTexture()
 
 void SpriteManager::generateShadeTexture()
 {
-    const uint16 diameter = 4;
+    constexpr uint16 diameter = 4;
 
     const auto image = ImagePtr(new Image(Size(diameter, diameter)));
     for (int_fast16_t x = -1; ++x < diameter;) {

@@ -101,8 +101,8 @@ void UITextEdit::drawSelf(Fw::DrawPane drawPane)
     if (isExplicitlyEnabled() && m_cursorVisible && m_cursorInRange && isActive() && m_cursorPos >= 0) {
         assert(m_cursorPos <= textLength);
         // draw every 333ms
-        const int delay = 333;
-        const int elapsed = g_clock.millis() - m_cursorTicks;
+        constexpr int delay = 333;
+        const ticks_t elapsed = g_clock.millis() - m_cursorTicks;
         if (elapsed <= delay) {
             Rect cursorRect;
             // when cursor is at 0

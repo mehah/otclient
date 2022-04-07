@@ -340,7 +340,7 @@ bool Minimap::loadOtmm(const std::string& fileName)
 
         fin->seek(start);
 
-        const uint blockSize = MMBLOCK_SIZE * MMBLOCK_SIZE * sizeof(MinimapTile);
+        constexpr uint blockSize = MMBLOCK_SIZE * MMBLOCK_SIZE * sizeof(MinimapTile);
         std::vector<uchar> compressBuffer(compressBound(blockSize));
         std::vector<uchar> decompressBuffer(blockSize);
 
@@ -401,9 +401,9 @@ void Minimap::saveOtmm(const std::string& fileName)
         fin->addU16(start);
         fin->seek(start);
 
-        const uint blockSize = MMBLOCK_SIZE * MMBLOCK_SIZE * sizeof(MinimapTile);
+        constexpr uint blockSize = MMBLOCK_SIZE * MMBLOCK_SIZE * sizeof(MinimapTile),
+            COMPRESS_LEVEL = 3;
         std::vector<uchar> compressBuffer(compressBound(blockSize));
-        const int COMPRESS_LEVEL = 3;
 
         for (uint8_t z = 0; z <= MAX_Z; ++z) {
             for (auto& it : m_tileBlocks[z]) {

@@ -34,7 +34,7 @@ OggSoundFile::~OggSoundFile()
 
 bool OggSoundFile::prepareOgg()
 {
-    const ov_callbacks callbacks = { cb_read, cb_seek, cb_close, cb_tell };
+    constexpr ov_callbacks callbacks = { cb_read, cb_seek, cb_close, cb_tell };
     ov_open_callbacks(m_file.get(), &m_vorbisFile, nullptr, 0, callbacks);
 
     vorbis_info* vi = ov_info(&m_vorbisFile, -1);

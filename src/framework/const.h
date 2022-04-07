@@ -50,8 +50,8 @@
 
 namespace Fw
 {
-    static const float pi = 3.14159265f;
-    static const float MIN_ALPHA = 0.003f;
+    static constexpr float pi = 3.14159265f,
+        MIN_ALPHA = 0.003f;
 
     enum Key : unsigned char
     {

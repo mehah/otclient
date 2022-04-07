@@ -59,9 +59,9 @@ TiXmlBase::Entity TiXmlBase::entity[NUM_ENTITY] =
 //                ef bf be
 //                ef bf bf
 
-const unsigned char TIXML_UTF_LEAD_0 = 0xefU;
-const unsigned char TIXML_UTF_LEAD_1 = 0xbbU;
-const unsigned char TIXML_UTF_LEAD_2 = 0xbfU;
+constexpr unsigned char TIXML_UTF_LEAD_0 = 0xefU,
+TIXML_UTF_LEAD_1 = 0xbbU,
+TIXML_UTF_LEAD_2 = 0xbfU;
 
 const int TiXmlBase::utf8ByteTable[256] =
 {
@@ -86,9 +86,9 @@ const int TiXmlBase::utf8ByteTable[256] =
 
 void TiXmlBase::ConvertUTF32ToUTF8(unsigned long input, char* output, int* length)
 {
-    const unsigned long BYTE_MASK = 0xBF;
-    const unsigned long BYTE_MARK = 0x80;
-    const unsigned long FIRST_BYTE_MARK[7] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC };
+    constexpr unsigned long BYTE_MASK = 0xBF,
+        BYTE_MARK = 0x80,
+        FIRST_BYTE_MARK[7] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC };
 
     if (input < 0x80)
         *length = 1;
@@ -1263,8 +1263,8 @@ const char* TiXmlAttribute::Parse(const char* p, TiXmlParsingData* data, TiXmlEn
     }
 
     const char* end;
-    const char SINGLE_QUOTE = '\'';
-    const char DOUBLE_QUOTE = '\"';
+    constexpr char SINGLE_QUOTE = '\'',
+        DOUBLE_QUOTE = '\"';
 
     if (*p == SINGLE_QUOTE) {
         ++p;
@@ -1361,7 +1361,8 @@ const char* TiXmlText::Parse(const char* p, TiXmlParsingData* data, TiXmlEncodin
         p = ReadText(p, &dummy, false, endTag, false, encoding);
         return p;
     }
-    const bool ignoreWhite = true;
+
+    constexpr bool ignoreWhite = true;
 
     const auto* const end = "<";
     p = ReadText(p, &value, ignoreWhite, end, false, encoding);

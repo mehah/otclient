@@ -367,7 +367,7 @@ static int b_replace(lua_State* L)
     return 1;
 }
 
-static const luaL_Reg bitlib[] = {
+static constexpr luaL_Reg bitlib[] = {
   {"arshift", b_arshift},
   {"band", b_and},
   {"bnot", b_not},
