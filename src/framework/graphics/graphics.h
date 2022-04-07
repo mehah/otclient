@@ -23,11 +23,10 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
+#include "declarations.h"
 #include <GL/glew.h>
 
-#include "declarations.h"
-
- // @bindsingleton g_graphics
+// @bindsingleton g_graphics
 class Graphics
 {
 public:

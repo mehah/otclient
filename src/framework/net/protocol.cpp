@@ -21,9 +21,9 @@
  */
 
 #include "protocol.h"
-#include <random>
-#include "framework/core/application.h"
 #include "connection.h"
+#include <framework/core/application.h>
+#include <random>
 
 Protocol::Protocol()
 {
@@ -156,7 +156,7 @@ void Protocol::internalRecvData(uint8* buffer, uint16 size)
 void Protocol::generateXteaKey()
 {
     std::random_device rd;
-    std::uniform_int_distribution<uint32> unif;
+    const std::uniform_int_distribution<uint32> unif;
     std::generate(m_xteaKey.begin(), m_xteaKey.end(), [&]() { return unif(rd); });
 }
 
@@ -241,7 +241,7 @@ void Protocol::onRecv(const InputMessagePtr& inputMessage)
     callLuaField("onRecv", inputMessage);
 }
 
-void Protocol::onError(const boost::system::error_code& err)
+void Protocol::onError(const std::error_code& err)
 {
     callLuaField("onError", err.message(), err.value());
     disconnect();

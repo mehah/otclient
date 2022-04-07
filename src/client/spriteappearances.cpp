@@ -20,18 +20,16 @@
  * THE SOFTWARE.
  */
 
+#include "spriteappearances.h"
+#include "game.h"
+#include <framework/core/filestream.h>
+#include <framework/core/resourcemanager.h>
+#include <framework/graphics/image.h>
+
+#include <framework/core/asyncdispatcher.h>
 #include <nlohmann/json.hpp>
 
-#include "spriteappearances.h"
-#include "framework/core/filestream.h"
-#include "framework/core/resourcemanager.h"
-#include "framework/graphics/image.h"
-#include "game.h"
-
-#include "framework/core/asyncdispatcher.h"
-
 #include "lzma.h"
-#include "framework/core/logger.h"
 
  // warnings related to protobuf
  // https://android.googlesource.com/platform/external/protobuf/+/brillo-m9-dev/vsprojects/readme.txt
@@ -53,7 +51,7 @@ void SpriteAppearances::terminate()
 
 bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet)
 {
-    std::lock_guard<std::mutex> lock(sheet->mutex);
+    std::lock_guard lock(sheet->mutex);
 
     if (sheet->loaded) {
         return true;
@@ -63,7 +61,7 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet)
         const FileStreamPtr& fin = g_resources.openFile(stdext::format("/things/%d/%s", g_game.getClientVersion(), sheet->file));
         fin->cache();
 
-        std::unique_ptr<uint8_t[]> decompressed = std::make_unique<uint8_t[]>(LZMA_UNCOMPRESSED_SIZE); // uncompressed size, bmp file + 122 bytes header
+        const auto decompressed = std::make_unique<uint8_t[]>(LZMA_UNCOMPRESSED_SIZE); // uncompressed size, bmp file + 122 bytes header
 
          /*
             CIP's header, always 32 (0x20) bytes.
@@ -78,12 +76,12 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet)
         fin->skip(4);
         while ((fin->getU8() & 0x80) == 0x80);
 
-        uint8_t lclppb = fin->getU8();
+        const uint8_t lclppb = fin->getU8();
 
         lzma_options_lzma options{};
         options.lc = lclppb % 9;
 
-        int remainder = lclppb / 9;
+        const int remainder = lclppb / 9;
         options.lp = remainder % 5;
         options.pb = remainder / 5;
 
@@ -98,9 +96,9 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet)
 
         lzma_stream stream = LZMA_STREAM_INIT;
 
-        lzma_filter filters[2] = {
+        const lzma_filter filters[2] = {
             lzma_filter{LZMA_FILTER_LZMA1, &options},
-            lzma_filter{LZMA_VLI_UNKNOWN, NULL}
+            lzma_filter{LZMA_VLI_UNKNOWN, nullptr}
         };
 
         lzma_ret ret = lzma_raw_decoder(&stream, filters);
@@ -174,7 +172,7 @@ SpriteSheetPtr SpriteAppearances::getSheetBySpriteId(int id, bool load /* = true
     }
 
     // find sheet
-    auto sheetIt = std::find_if(m_sheets.begin(), m_sheets.end(), [=](const SpriteSheetPtr& sheet) {
+    const auto sheetIt = std::find_if(m_sheets.begin(), m_sheets.end(), [=](const SpriteSheetPtr& sheet) {
         return id >= sheet->firstId && id <= sheet->lastId;
     });
 
@@ -201,7 +199,7 @@ SpriteSheetPtr SpriteAppearances::getSheetBySpriteId(int id, bool load /* = true
 ImagePtr SpriteAppearances::getSpriteImage(int id)
 {
     try {
-        SpriteSheetPtr sheet = getSheetBySpriteId(id);
+        const SpriteSheetPtr sheet = getSheetBySpriteId(id);
         if (!sheet) {
             return nullptr;
         }
@@ -211,12 +209,12 @@ ImagePtr SpriteAppearances::getSpriteImage(int id)
         ImagePtr image(new Image(size));
         uint8* pixelData = image->getPixelData();
 
-        int spriteOffset = id - sheet->firstId;
-        int allColumns = size.width() == 32 ? 12 : 6; // 64 pixel width == 6 columns each 64x or 32 pixels, 12 columns
-        int spriteRow = std::floor(static_cast<float>(spriteOffset) / static_cast<float>(allColumns));
-        int spriteColumn = spriteOffset % allColumns;
+        const int spriteOffset = id - sheet->firstId;
+        const int allColumns = size.width() == 32 ? 12 : 6; // 64 pixel width == 6 columns each 64x or 32 pixels, 12 columns
+        const int spriteRow = std::floor(static_cast<float>(spriteOffset) / static_cast<float>(allColumns));
+        const int spriteColumn = spriteOffset % allColumns;
 
-        int spriteWidthBytes = size.width() * 4;
+        const int spriteWidthBytes = size.width() * 4;
 
         for (int height = size.height() * spriteRow, offset = 0; height < size.height() + (spriteRow * size.height()); height++, offset++) {
             std::memcpy(&pixelData[offset * spriteWidthBytes], &sheet->data[(height * SPRITE_SHEET_WIDTH_BYTES) + (spriteColumn * spriteWidthBytes)], spriteWidthBytes);
@@ -242,7 +240,7 @@ ImagePtr SpriteAppearances::getSpriteImage(int id)
 
 void SpriteAppearances::saveSpriteToFile(int id, const std::string& file)
 {
-    ImagePtr sprite = getSpriteImage(id);
+    const ImagePtr sprite = getSpriteImage(id);
     if (sprite) {
         sprite->savePNG(file);
     }
@@ -250,7 +248,7 @@ void SpriteAppearances::saveSpriteToFile(int id, const std::string& file)
 
 void SpriteAppearances::saveSheetToFileBySprite(int id, const std::string& file)
 {
-    SpriteSheetPtr sheet = getSheetBySpriteId(id);
+    const SpriteSheetPtr sheet = getSheetBySpriteId(id);
     if (sheet) {
         Image image(Size(384, 384), 4, sheet->data.get());
         image.savePNG(file);

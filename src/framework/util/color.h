@@ -23,10 +23,10 @@
 #ifndef COLOR_H
 #define COLOR_H
 
+#include "../stdext/cast.h"
+#include "../stdext/string.h"
+#include "../stdext/types.h"
 #include <iomanip>
-#include "framework/stdext/cast.h"
-#include "framework/stdext/string.h"
-#include "framework/stdext/types.h"
 
 class Color
 {

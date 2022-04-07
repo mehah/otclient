@@ -23,12 +23,12 @@
 #ifndef ANIMATEDTEXT_H
 #define ANIMATEDTEXT_H
 
-#include "framework/core/timer.h"
-#include "framework/graphics/cachedtext.h"
-#include "framework/graphics/fontmanager.h"
 #include "thing.h"
+#include <framework/core/timer.h>
+#include <framework/graphics/cachedtext.h>
+#include <framework/graphics/fontmanager.h>
 
- // @bindclass
+// @bindclass
 class AnimatedText : public Thing
 {
 public:

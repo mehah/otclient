@@ -25,9 +25,8 @@
 
  // this file is and must be included only from luainterface.h
 
-#include "framework/otml//declarations.h"
 #include "declarations.h"
-#include "luaobject.h"
+#include <framework/otml/declarations.h>
 
 template<typename T>
 int push_internal_luavalue(T v);

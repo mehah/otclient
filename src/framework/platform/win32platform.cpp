@@ -22,8 +22,8 @@
 
 #ifdef WIN32
 
+#include <framework/stdext/stdext.h>
 #include <tchar.h>
-#include "framework/stdext/stdext.h"
 
 #include "platform.h"
 

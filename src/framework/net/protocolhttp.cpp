@@ -21,8 +21,8 @@
  */
 
 #include "protocolhttp.h"
-#include "framework/core/application.h"
 #include "connection.h"
+#include <framework/core/application.h>
 
 ProtocolHttp::ProtocolHttp()
 = default;
@@ -79,7 +79,7 @@ void ProtocolHttp::onRecv(uint8* buffer, uint16 size)
     callLuaField("onRecv", string);
 }
 
-void ProtocolHttp::onError(const boost::system::error_code& err)
+void ProtocolHttp::onError(const std::error_code& err)
 {
     callLuaField("onError", err.message(), err.value());
     disconnect();

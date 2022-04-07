@@ -20,44 +20,42 @@
  * THE SOFTWARE.
  */
 
-#include "core/application.h"
-#include "core/config.h"
-#include "core/configmanager.h"
-#include "core/eventdispatcher.h"
-#include "core/module.h"
-#include "core/modulemanager.h"
-#include "core/resourcemanager.h"
-#include "graphics/texturemanager.h"
-#include "luaengine/luainterface.h"
-#include "platform/platform.h"
-#include "stdext/net.h"
-#include "util/crypt.h"
+#include <framework/core/application.h>
+#include <framework/core/config.h>
+#include <framework/core/configmanager.h>
+#include <framework/core/eventdispatcher.h>
+#include <framework/core/module.h>
+#include <framework/core/modulemanager.h>
+#include <framework/core/resourcemanager.h>
+#include <framework/graphics/texturemanager.h>
+#include <framework/luaengine/luainterface.h>
+#include <framework/platform/platform.h>
+#include <framework/stdext/net.h>
+#include <framework/util/crypt.h>
 
 #include "graphics/particleeffect.h"
 
-#ifdef FRAMEWORK_SOUND
-#include "sound/combinedsoundsource.h"
-#include "sound/soundchannel.h"
-#include "sound/soundmanager.h"
-#include "sound/soundsource.h"
-#include "sound/streamsoundsource.h"
+#ifdef FW_SOUND
+#include <framework/sound/combinedsoundsource.h>
+#include <framework/sound/soundchannel.h>
+#include <framework/sound/soundmanager.h>
+#include <framework/sound/soundsource.h>
+#include <framework/sound/streamsoundsource.h>
 #endif
 
-#include "graphics/fontmanager.h"
-#include "graphics/graphics.h"
-#include "graphics/particlemanager.h"
-#include "input/mouse.h"
-#include "platform/platformwindow.h"
-#include "ui/ui.h"
+#ifdef FW_GRAPHICS
+#include <framework/graphics/fontmanager.h>
+#include <framework/graphics/graphics.h>
+#include <framework/graphics/particlemanager.h>
+#include <framework/input/mouse.h>
+#include <framework/platform/platformwindow.h>
+#include <framework/ui/ui.h>
+#endif
 
-#ifdef FRAMEWORK_NET
-#include "net/protocol.h"
-#include "net/protocolhttp.h"
-#include "net/server.h"
-#endif  // FRAMEWORK_NET
-
-#ifdef FW_SQL
-#include "sql/mysql.h"
+#ifdef FW_NET
+#include <framework/net/protocol.h>
+#include <framework/net/protocolhttp.h>
+#include <framework/net/server.h>
 #endif
 
 void Application::registerLuaFunctions()
@@ -241,6 +239,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ScheduledEvent>("cyclesExecuted", &ScheduledEvent::cyclesExecuted);
     g_lua.bindClassMemberFunction<ScheduledEvent>("maxCycles", &ScheduledEvent::maxCycles);
 
+#ifdef FW_GRAPHICS
     // GraphicalApplication
     g_lua.bindSingletonFunction("g_app", "isOnInputEvent", &GraphicalApplication::isOnInputEvent, &g_app);
 
@@ -746,8 +745,9 @@ void Application::registerLuaFunctions()
     g_lua.registerClass<UIParticles, UIWidget>();
     g_lua.bindClassStaticFunction<UIParticles>("create", [] { return UIParticlesPtr(new UIParticles); });
     g_lua.bindClassMemberFunction<UIParticles>("addEffect", &UIParticles::addEffect);
+#endif
 
-#ifdef FRAMEWORK_NET
+#ifdef FW_NET
     // Server
     g_lua.registerClass<Server>();
     g_lua.bindClassStaticFunction<Server>("create", &Server::create);
@@ -822,9 +822,9 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<OutputMessage>("setMessageSize", &OutputMessage::setMessageSize);
     g_lua.bindClassMemberFunction<OutputMessage>("getWritePos", &OutputMessage::getWritePos);
     g_lua.bindClassMemberFunction<OutputMessage>("setWritePos", &OutputMessage::setWritePos);
-#endif  // FRAMEWORK_NET
+#endif
 
-#ifdef FRAMEWORK_SOUND
+#ifdef FW_SOUND
     // SoundManager
     g_lua.registerSingletonClass("g_sounds");
     g_lua.bindSingletonFunction("g_sounds", "preload", &SoundManager::preload, &g_sounds);
@@ -851,55 +851,5 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<SoundChannel>("setEnabled", &SoundChannel::setEnabled);
     g_lua.bindClassMemberFunction<SoundChannel>("isEnabled", &SoundChannel::isEnabled);
     g_lua.bindClassMemberFunction<SoundChannel>("getId", &SoundChannel::getId);
-#endif
-
-#ifdef FW_SQL
-    // Database
-    g_lua.registerClass<Database>();
-    g_lua.bindClassMemberFunction<Database>("getDatabaseEngine", &Database::getDatabaseEngine);
-    g_lua.bindClassMemberFunction<Database>("isConnected", &Database::isConnected);
-    g_lua.bindClassMemberFunction<Database>("getStringComparer", &Database::getStringComparer);
-    g_lua.bindClassMemberFunction<Database>("getUpdateLimiter", &Database::getUpdateLimiter);
-    g_lua.bindClassMemberFunction<Database>("getLastInsertedRowID", &Database::getLastInsertedRowID);
-    g_lua.bindClassMemberFunction<Database>("escapeString", &Database::escapeString);
-    //g_lua.bindClassMemberFunction<Database>("escapeBlob", &Database::escapeBlob); // need to write a cast for this type to work (if needed)
-
-    // DBQuery
-    /* (not sure if this class will work as a luafunction)
-    g_lua.registerClass<DBQuery>();
-    g_lua.bindClassStaticFunction<DBQuery>("create", []{ return DBQuery(); });
-    g_lua.bindClassMemberFunction<DBQuery>("append", &DBQuery::append);
-    g_lua.bindClassMemberFunction<DBQuery>("set", &DBQuery::set);
-    */
-
-    // DBResult
-    g_lua.registerClass<DBResult>();
-    g_lua.bindClassMemberFunction<DBResult>("getDataInt", &DBResult::getDataInt);
-    g_lua.bindClassMemberFunction<DBResult>("getDataLong", &DBResult::getDataLong);
-    g_lua.bindClassMemberFunction<DBResult>("getDataString", &DBResult::getDataString);
-    //g_lua.bindClassMemberFunction<DBResult>("getDataStream", &DBResult::getDataStream); // need to write a cast for this type to work (if needed)
-    g_lua.bindClassMemberFunction<DBResult>("getRowCount", &DBResult::getRowCount);
-    g_lua.bindClassMemberFunction<DBResult>("free", &DBResult::free);
-    g_lua.bindClassMemberFunction<DBResult>("next", &DBResult::next);
-
-    // MySQL
-    g_lua.registerClass<DatabaseMySQL, Database>();
-    g_lua.bindClassStaticFunction<DatabaseMySQL>("create", [] { return DatabaseMySQLPtr(new DatabaseMySQL); });
-    g_lua.bindClassMemberFunction<DatabaseMySQL>("connect", &DatabaseMySQL::connect);
-    g_lua.bindClassMemberFunction<DatabaseMySQL>("beginTransaction", &DatabaseMySQL::beginTransaction);
-    g_lua.bindClassMemberFunction<DatabaseMySQL>("rollback", &DatabaseMySQL::rollback);
-    g_lua.bindClassMemberFunction<DatabaseMySQL>("commit", &DatabaseMySQL::commit);
-    g_lua.bindClassMemberFunction<DatabaseMySQL>("executeQuery", &DatabaseMySQL::executeQuery);
-    g_lua.bindClassMemberFunction<DatabaseMySQL>("storeQuery", &DatabaseMySQL::storeQuery);
-
-    // MySQLResult
-    g_lua.registerClass<MySQLResult>();
-    g_lua.bindClassMemberFunction<MySQLResult>("getDataInt", &MySQLResult::getDataInt);
-    g_lua.bindClassMemberFunction<MySQLResult>("getDataLong", &MySQLResult::getDataLong);
-    g_lua.bindClassMemberFunction<MySQLResult>("getDataString", &MySQLResult::getDataString);
-    //g_lua.bindClassMemberFunction<MySQLResult>("getDataStream", &MySQLResult::getDataStream); // need to write a cast for this type to work (if needed)
-    g_lua.bindClassMemberFunction<MySQLResult>("getRowCount", &MySQLResult::getRowCount);
-    g_lua.bindClassMemberFunction<MySQLResult>("free", &MySQLResult::free);
-    g_lua.bindClassMemberFunction<MySQLResult>("next", &MySQLResult::next);
 #endif
 }
