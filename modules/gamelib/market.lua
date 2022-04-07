@@ -120,17 +120,13 @@ MarketItemDescription = {
     Charges = 13,
     WeaponName = 14,
     Weight = 15,
-    MagicShieldCapacity = 16,
-    Cleave = 17,
-    DamageReflection = 18,
-    PerfectShot = 19,
-    ImbuingSlots = 20,
-    MagicShield = 21,
-    Cleave = 22,
-    Reflection = 23,
-    Perfect = 24,
-    UpgradeClassification = 25,
-    CurrentTier = 26
+    ImbuingSlots = 16,
+    MagicShield = 17,
+    Cleave = 18,
+    Reflection = 19,
+    Perfect = 20,
+    UpgradeClassification = 21,
+    CurrentTier = 22
 }
 
 MarketItemDescription.First = MarketItemDescription.Armor
@@ -152,17 +148,13 @@ MarketItemDescriptionStrings = {
     [13] = 'Charges',
     [14] = 'Weapon Type',
     [15] = 'Weight',
-    [16] = 'Magic Shield Capacity',
-    [17] = 'Cleave',
-    [18] = 'Damage Reflection',
-    [19] = 'Perfect Shot',
-    [20] = 'Imbuing Slots',
-    [21] = 'Magic Shield',
-    [22] = 'Cleave',
-    [23] = 'Reflection',
-    [24] = 'Perfect',
-    [25] = 'Upgrade Classification',
-    [26] = 'Tier'
+    [16] = 'Imbuing Slots',
+    [17] = 'Magic Shield',
+    [18] = 'Cleave',
+    [19] = 'Reflection',
+    [20] = 'Perfect Show',
+    [21] = 'Upgrade Classification',
+    [22] = 'Tier'
 }
 
 function getMarketDescriptionName(id)

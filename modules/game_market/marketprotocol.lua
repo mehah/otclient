@@ -159,16 +159,20 @@ local function parseMarketDetail(protocol, msg)
 end
 
 local function parseMarketBrowse(protocol, msg)
-    local var = msg:getU8()
-    if var == 3 then --- Item browse
-        var = msg:getU16()
-        if g_game.getClientVersion() >= 1281 then
+    local var = 0
+    if g_game.getClientVersion() >= 1281 then
+        var = msg:getU8()
+        if var == 3 then --- Item browse
+            var = msg:getU16()
             local item = Item.create(var) -- item id
             if item and item:getUpgradeClassification() > 0 then
                 msg:getU8()
             end
         end
+    else
+        var = msg:getU16()
     end
+
     local offers = {}
 
     local buyOfferCount = msg:getU32()
