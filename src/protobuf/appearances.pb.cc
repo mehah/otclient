@@ -438,7 +438,7 @@ static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_appearances_2eproto
 static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_appearances_2eproto[6];
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_appearances_2eproto = nullptr;
 
-const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_appearances_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+const uint32_t TableStruct_appearances_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Coordinate, _has_bits_),
   PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Coordinate, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -1217,7 +1217,7 @@ Coordinate::Coordinate(const Coordinate& from)
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.Coordinate)
 }
 
-void Coordinate::SharedCtor() {
+inline void Coordinate::SharedCtor() {
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&x_) - reinterpret_cast<char*>(this)),
     0, static_cast<size_t>(reinterpret_cast<char*>(&z_) -
@@ -1247,7 +1247,7 @@ void Coordinate::SetCachedSize(int size) const {
 
 void Coordinate::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.Coordinate)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1265,12 +1265,12 @@ const char* Coordinate::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional uint32 x = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           _Internal::set_has_x(&has_bits);
           x_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -1279,7 +1279,7 @@ const char* Coordinate::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
         continue;
       // optional uint32 y = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
           _Internal::set_has_y(&has_bits);
           y_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -1288,7 +1288,7 @@ const char* Coordinate::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
         continue;
       // optional uint32 z = 3;
       case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
           _Internal::set_has_z(&has_bits);
           z_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -1319,10 +1319,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* Coordinate::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* Coordinate::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.Coordinate)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -1356,7 +1356,7 @@ size_t Coordinate::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.Coordinate)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1397,7 +1397,7 @@ void Coordinate::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void Coordinate::MergeFrom(const Coordinate& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.Coordinate)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = from._has_bits_[0];
@@ -1489,7 +1489,7 @@ Appearances::Appearances(const Appearances& from)
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.Appearances)
 }
 
-void Appearances::SharedCtor() {
+inline void Appearances::SharedCtor() {
 special_meaning_appearance_ids_ = nullptr;
 }
 
@@ -1517,7 +1517,7 @@ void Appearances::SetCachedSize(int size) const {
 
 void Appearances::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.Appearances)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1538,12 +1538,12 @@ const char* Appearances::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // repeated .otclient.protobuf.appearances.Appearance object = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           ptr -= 1;
           do {
             ptr += 1;
@@ -1556,7 +1556,7 @@ const char* Appearances::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID
         continue;
       // repeated .otclient.protobuf.appearances.Appearance outfit = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
           ptr -= 1;
           do {
             ptr += 1;
@@ -1569,7 +1569,7 @@ const char* Appearances::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID
         continue;
       // repeated .otclient.protobuf.appearances.Appearance effect = 3;
       case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
           ptr -= 1;
           do {
             ptr += 1;
@@ -1582,7 +1582,7 @@ const char* Appearances::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID
         continue;
       // repeated .otclient.protobuf.appearances.Appearance missile = 4;
       case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
           ptr -= 1;
           do {
             ptr += 1;
@@ -1595,7 +1595,7 @@ const char* Appearances::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID
         continue;
       // optional .otclient.protobuf.appearances.SpecialMeaningAppearanceIds special_meaning_appearance_ids = 5;
       case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 42)) {
           ptr = ctx->ParseMessage(_internal_mutable_special_meaning_appearance_ids(), ptr);
           CHK_(ptr);
         } else
@@ -1625,10 +1625,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* Appearances::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* Appearances::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.Appearances)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // repeated .otclient.protobuf.appearances.Appearance object = 1;
@@ -1684,7 +1684,7 @@ size_t Appearances::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.Appearances)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1743,7 +1743,7 @@ void Appearances::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void Appearances::MergeFrom(const Appearances& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.Appearances)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   object_.MergeFrom(from.object_);
@@ -1816,7 +1816,7 @@ SpritePhase::SpritePhase(const SpritePhase& from)
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.SpritePhase)
 }
 
-void SpritePhase::SharedCtor() {
+inline void SpritePhase::SharedCtor() {
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&duration_min_) - reinterpret_cast<char*>(this)),
     0, static_cast<size_t>(reinterpret_cast<char*>(&duration_max_) -
@@ -1846,7 +1846,7 @@ void SpritePhase::SetCachedSize(int size) const {
 
 void SpritePhase::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.SpritePhase)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1864,12 +1864,12 @@ const char* SpritePhase::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional uint32 duration_min = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           _Internal::set_has_duration_min(&has_bits);
           duration_min_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -1878,7 +1878,7 @@ const char* SpritePhase::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID
         continue;
       // optional uint32 duration_max = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
           _Internal::set_has_duration_max(&has_bits);
           duration_max_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -1909,10 +1909,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* SpritePhase::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* SpritePhase::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.SpritePhase)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -1940,7 +1940,7 @@ size_t SpritePhase::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.SpritePhase)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1976,7 +1976,7 @@ void SpritePhase::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void SpritePhase::MergeFrom(const SpritePhase& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.SpritePhase)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = from._has_bits_[0];
@@ -2064,7 +2064,7 @@ SpriteAnimation::SpriteAnimation(const SpriteAnimation& from)
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.SpriteAnimation)
 }
 
-void SpriteAnimation::SharedCtor() {
+inline void SpriteAnimation::SharedCtor() {
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&default_start_phase_) - reinterpret_cast<char*>(this)),
     0, static_cast<size_t>(reinterpret_cast<char*>(&loop_count_) -
@@ -2095,7 +2095,7 @@ void SpriteAnimation::SetCachedSize(int size) const {
 
 void SpriteAnimation::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.SpriteAnimation)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -2115,12 +2115,12 @@ const char* SpriteAnimation::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional uint32 default_start_phase = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           _Internal::set_has_default_start_phase(&has_bits);
           default_start_phase_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -2129,7 +2129,7 @@ const char* SpriteAnimation::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool synchronized = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
           _Internal::set_has_synchronized(&has_bits);
           synchronized_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -2138,7 +2138,7 @@ const char* SpriteAnimation::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool random_start_phase = 3;
       case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
           _Internal::set_has_random_start_phase(&has_bits);
           random_start_phase_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -2147,8 +2147,8 @@ const char* SpriteAnimation::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional .otclient.protobuf.appearances.ANIMATION_LOOP_TYPE loop_type = 4;
       case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
-          ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
+          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
           if (PROTOBUF_PREDICT_TRUE(::otclient::protobuf::appearances::ANIMATION_LOOP_TYPE_IsValid(val))) {
             _internal_set_loop_type(static_cast<::otclient::protobuf::appearances::ANIMATION_LOOP_TYPE>(val));
@@ -2160,7 +2160,7 @@ const char* SpriteAnimation::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional uint32 loop_count = 5;
       case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
           _Internal::set_has_loop_count(&has_bits);
           loop_count_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -2169,7 +2169,7 @@ const char* SpriteAnimation::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // repeated .otclient.protobuf.appearances.SpritePhase sprite_phase = 6;
       case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 50)) {
           ptr -= 1;
           do {
             ptr += 1;
@@ -2204,10 +2204,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* SpriteAnimation::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* SpriteAnimation::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.SpriteAnimation)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -2262,7 +2262,7 @@ size_t SpriteAnimation::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.SpriteAnimation)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -2321,7 +2321,7 @@ void SpriteAnimation::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void SpriteAnimation::MergeFrom(const SpriteAnimation& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.SpriteAnimation)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   sprite_phase_.MergeFrom(from.sprite_phase_);
@@ -2416,7 +2416,7 @@ Box::Box(const Box& from)
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.Box)
 }
 
-void Box::SharedCtor() {
+inline void Box::SharedCtor() {
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&x_) - reinterpret_cast<char*>(this)),
     0, static_cast<size_t>(reinterpret_cast<char*>(&height_) -
@@ -2446,7 +2446,7 @@ void Box::SetCachedSize(int size) const {
 
 void Box::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.Box)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -2464,12 +2464,12 @@ const char* Box::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::intern
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional uint32 x = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           _Internal::set_has_x(&has_bits);
           x_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -2478,7 +2478,7 @@ const char* Box::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::intern
         continue;
       // optional uint32 y = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
           _Internal::set_has_y(&has_bits);
           y_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -2487,7 +2487,7 @@ const char* Box::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::intern
         continue;
       // optional uint32 width = 3;
       case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
           _Internal::set_has_width(&has_bits);
           width_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -2496,7 +2496,7 @@ const char* Box::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::intern
         continue;
       // optional uint32 height = 4;
       case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
           _Internal::set_has_height(&has_bits);
           height_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -2527,10 +2527,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* Box::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* Box::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.Box)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -2570,7 +2570,7 @@ size_t Box::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.Box)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -2616,7 +2616,7 @@ void Box::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void Box::MergeFrom(const Box& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.Box)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = from._has_bits_[0];
@@ -2728,7 +2728,7 @@ SpriteInfo::SpriteInfo(const SpriteInfo& from)
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.SpriteInfo)
 }
 
-void SpriteInfo::SharedCtor() {
+inline void SpriteInfo::SharedCtor() {
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&animation_) - reinterpret_cast<char*>(this)),
     0, static_cast<size_t>(reinterpret_cast<char*>(&is_opaque_) -
@@ -2759,7 +2759,7 @@ void SpriteInfo::SetCachedSize(int size) const {
 
 void SpriteInfo::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.SpriteInfo)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -2783,12 +2783,12 @@ const char* SpriteInfo::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional uint32 pattern_width = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           _Internal::set_has_pattern_width(&has_bits);
           pattern_width_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -2797,7 +2797,7 @@ const char* SpriteInfo::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
         continue;
       // optional uint32 pattern_height = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
           _Internal::set_has_pattern_height(&has_bits);
           pattern_height_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -2806,7 +2806,7 @@ const char* SpriteInfo::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
         continue;
       // optional uint32 pattern_depth = 3;
       case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
           _Internal::set_has_pattern_depth(&has_bits);
           pattern_depth_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -2815,7 +2815,7 @@ const char* SpriteInfo::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
         continue;
       // optional uint32 layers = 4;
       case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
           _Internal::set_has_layers(&has_bits);
           layers_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -2824,7 +2824,7 @@ const char* SpriteInfo::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
         continue;
       // repeated uint32 sprite_id = 5;
       case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
           ptr -= 1;
           do {
             ptr += 1;
@@ -2832,7 +2832,7 @@ const char* SpriteInfo::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<40>(ptr));
-        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42) {
+        } else if (static_cast<uint8_t>(tag) == 42) {
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedUInt32Parser(_internal_mutable_sprite_id(), ptr, ctx);
           CHK_(ptr);
         } else
@@ -2840,7 +2840,7 @@ const char* SpriteInfo::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
         continue;
       // optional .otclient.protobuf.appearances.SpriteAnimation animation = 6;
       case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 50)) {
           ptr = ctx->ParseMessage(_internal_mutable_animation(), ptr);
           CHK_(ptr);
         } else
@@ -2848,7 +2848,7 @@ const char* SpriteInfo::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
         continue;
       // optional uint32 bounding_square = 7;
       case 7:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 56)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 56)) {
           _Internal::set_has_bounding_square(&has_bits);
           bounding_square_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -2857,7 +2857,7 @@ const char* SpriteInfo::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
         continue;
       // optional bool is_opaque = 8;
       case 8:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 64)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 64)) {
           _Internal::set_has_is_opaque(&has_bits);
           is_opaque_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -2866,7 +2866,7 @@ const char* SpriteInfo::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
         continue;
       // repeated .otclient.protobuf.appearances.Box bounding_box_per_direction = 9;
       case 9:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 74)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 74)) {
           ptr -= 1;
           do {
             ptr += 1;
@@ -2901,10 +2901,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* SpriteInfo::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* SpriteInfo::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.SpriteInfo)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -2978,7 +2978,7 @@ size_t SpriteInfo::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.SpriteInfo)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -3057,7 +3057,7 @@ void SpriteInfo::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void SpriteInfo::MergeFrom(const SpriteInfo& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.SpriteInfo)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   sprite_id_.MergeFrom(from.sprite_id_);
@@ -3166,7 +3166,7 @@ FrameGroup::FrameGroup(const FrameGroup& from)
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.FrameGroup)
 }
 
-void FrameGroup::SharedCtor() {
+inline void FrameGroup::SharedCtor() {
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&sprite_info_) - reinterpret_cast<char*>(this)),
     0, static_cast<size_t>(reinterpret_cast<char*>(&id_) -
@@ -3197,7 +3197,7 @@ void FrameGroup::SetCachedSize(int size) const {
 
 void FrameGroup::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.FrameGroup)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -3219,13 +3219,13 @@ const char* FrameGroup::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional .otclient.protobuf.appearances.FIXED_FRAME_GROUP fixed_frame_group = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-          ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
+          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
           if (PROTOBUF_PREDICT_TRUE(::otclient::protobuf::appearances::FIXED_FRAME_GROUP_IsValid(val))) {
             _internal_set_fixed_frame_group(static_cast<::otclient::protobuf::appearances::FIXED_FRAME_GROUP>(val));
@@ -3237,7 +3237,7 @@ const char* FrameGroup::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
         continue;
       // optional uint32 id = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
           _Internal::set_has_id(&has_bits);
           id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -3246,7 +3246,7 @@ const char* FrameGroup::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
         continue;
       // optional .otclient.protobuf.appearances.SpriteInfo sprite_info = 3;
       case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
           ptr = ctx->ParseMessage(_internal_mutable_sprite_info(), ptr);
           CHK_(ptr);
         } else
@@ -3276,10 +3276,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* FrameGroup::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* FrameGroup::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.FrameGroup)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -3316,7 +3316,7 @@ size_t FrameGroup::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.FrameGroup)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -3360,7 +3360,7 @@ void FrameGroup::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void FrameGroup::MergeFrom(const FrameGroup& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.FrameGroup)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = from._has_bits_[0];
@@ -3448,11 +3448,17 @@ Appearance::Appearance(const Appearance& from)
       frame_group_(from.frame_group_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (from._internal_has_name()) {
     name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_name(), 
       GetArenaForAllocation());
   }
   description_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    description_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (from._internal_has_description()) {
     description_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_description(), 
       GetArenaForAllocation());
@@ -3466,9 +3472,15 @@ Appearance::Appearance(const Appearance& from)
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.Appearance)
 }
 
-void Appearance::SharedCtor() {
+inline void Appearance::SharedCtor() {
 name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 description_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  description_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&flags_) - reinterpret_cast<char*>(this)),
     0, static_cast<size_t>(reinterpret_cast<char*>(&id_) -
@@ -3501,7 +3513,7 @@ void Appearance::SetCachedSize(int size) const {
 
 void Appearance::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.Appearance)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -3528,12 +3540,12 @@ const char* Appearance::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional uint32 id = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           _Internal::set_has_id(&has_bits);
           id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -3542,7 +3554,7 @@ const char* Appearance::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
         continue;
       // repeated .otclient.protobuf.appearances.FrameGroup frame_group = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
           ptr -= 1;
           do {
             ptr += 1;
@@ -3555,7 +3567,7 @@ const char* Appearance::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
         continue;
       // optional .otclient.protobuf.appearances.AppearanceFlags flags = 3;
       case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
           ptr = ctx->ParseMessage(_internal_mutable_flags(), ptr);
           CHK_(ptr);
         } else
@@ -3563,7 +3575,7 @@ const char* Appearance::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
         continue;
       // optional string name = 4;
       case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
           auto str = _internal_mutable_name();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           #ifndef NDEBUG
@@ -3575,7 +3587,7 @@ const char* Appearance::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
         continue;
       // optional string description = 5;
       case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 42)) {
           auto str = _internal_mutable_description();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           #ifndef NDEBUG
@@ -3609,10 +3621,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* Appearance::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* Appearance::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.Appearance)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -3670,7 +3682,7 @@ size_t Appearance::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.Appearance)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -3729,7 +3741,7 @@ void Appearance::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void Appearance::MergeFrom(const Appearance& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.Appearance)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   frame_group_.MergeFrom(from.frame_group_);
@@ -4113,7 +4125,7 @@ AppearanceFlags::AppearanceFlags(const AppearanceFlags& from)
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlags)
 }
 
-void AppearanceFlags::SharedCtor() {
+inline void AppearanceFlags::SharedCtor() {
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&bank_) - reinterpret_cast<char*>(this)),
     0, static_cast<size_t>(reinterpret_cast<char*>(&reportable_) -
@@ -4158,7 +4170,7 @@ void AppearanceFlags::SetCachedSize(int size) const {
 
 void AppearanceFlags::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlags)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -4257,12 +4269,12 @@ void AppearanceFlags::Clear() {
 const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional .otclient.protobuf.appearances.AppearanceFlagBank bank = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           ptr = ctx->ParseMessage(_internal_mutable_bank(), ptr);
           CHK_(ptr);
         } else
@@ -4270,7 +4282,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool clip = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
           _Internal::set_has_clip(&_has_bits_);
           clip_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4279,7 +4291,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool bottom = 3;
       case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
           _Internal::set_has_bottom(&_has_bits_);
           bottom_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4288,7 +4300,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool top = 4;
       case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
           _Internal::set_has_top(&_has_bits_);
           top_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4297,7 +4309,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool container = 5;
       case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
           _Internal::set_has_container(&_has_bits_);
           container_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4306,7 +4318,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool cumulative = 6;
       case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 48)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 48)) {
           _Internal::set_has_cumulative(&_has_bits_);
           cumulative_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4315,7 +4327,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool usable = 7;
       case 7:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 56)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 56)) {
           _Internal::set_has_usable(&_has_bits_);
           usable_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4324,7 +4336,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool forceuse = 8;
       case 8:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 64)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 64)) {
           _Internal::set_has_forceuse(&_has_bits_);
           forceuse_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4333,7 +4345,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool multiuse = 9;
       case 9:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 72)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 72)) {
           _Internal::set_has_multiuse(&_has_bits_);
           multiuse_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4342,7 +4354,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional .otclient.protobuf.appearances.AppearanceFlagWrite write = 10;
       case 10:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 82)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 82)) {
           ptr = ctx->ParseMessage(_internal_mutable_write(), ptr);
           CHK_(ptr);
         } else
@@ -4350,7 +4362,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional .otclient.protobuf.appearances.AppearanceFlagWriteOnce write_once = 11;
       case 11:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 90)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 90)) {
           ptr = ctx->ParseMessage(_internal_mutable_write_once(), ptr);
           CHK_(ptr);
         } else
@@ -4358,7 +4370,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool liquidpool = 12;
       case 12:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 96)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 96)) {
           _Internal::set_has_liquidpool(&_has_bits_);
           liquidpool_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4367,7 +4379,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool unpass = 13;
       case 13:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 104)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 104)) {
           _Internal::set_has_unpass(&_has_bits_);
           unpass_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4376,7 +4388,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool unmove = 14;
       case 14:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 112)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 112)) {
           _Internal::set_has_unmove(&_has_bits_);
           unmove_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4385,7 +4397,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool unsight = 15;
       case 15:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 120)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 120)) {
           _Internal::set_has_unsight(&_has_bits_);
           unsight_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4394,7 +4406,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool avoid = 16;
       case 16:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 128)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 128)) {
           _Internal::set_has_avoid(&_has_bits_);
           avoid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4403,7 +4415,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool no_movement_animation = 17;
       case 17:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 136)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 136)) {
           _Internal::set_has_no_movement_animation(&_has_bits_);
           no_movement_animation_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4412,7 +4424,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool take = 18;
       case 18:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 144)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 144)) {
           _Internal::set_has_take(&_has_bits_);
           take_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4421,7 +4433,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool liquidcontainer = 19;
       case 19:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 152)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 152)) {
           _Internal::set_has_liquidcontainer(&_has_bits_);
           liquidcontainer_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4430,7 +4442,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool hang = 20;
       case 20:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 160)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 160)) {
           _Internal::set_has_hang(&_has_bits_);
           hang_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4439,7 +4451,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional .otclient.protobuf.appearances.AppearanceFlagHook hook = 21;
       case 21:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 170)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 170)) {
           ptr = ctx->ParseMessage(_internal_mutable_hook(), ptr);
           CHK_(ptr);
         } else
@@ -4447,7 +4459,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool rotate = 22;
       case 22:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 176)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 176)) {
           _Internal::set_has_rotate(&_has_bits_);
           rotate_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4456,7 +4468,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional .otclient.protobuf.appearances.AppearanceFlagLight light = 23;
       case 23:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 186)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 186)) {
           ptr = ctx->ParseMessage(_internal_mutable_light(), ptr);
           CHK_(ptr);
         } else
@@ -4464,7 +4476,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool dont_hide = 24;
       case 24:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 192)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 192)) {
           _Internal::set_has_dont_hide(&_has_bits_);
           dont_hide_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4473,7 +4485,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool translucent = 25;
       case 25:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 200)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 200)) {
           _Internal::set_has_translucent(&_has_bits_);
           translucent_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4482,7 +4494,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional .otclient.protobuf.appearances.AppearanceFlagShift shift = 26;
       case 26:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 210)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 210)) {
           ptr = ctx->ParseMessage(_internal_mutable_shift(), ptr);
           CHK_(ptr);
         } else
@@ -4490,7 +4502,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional .otclient.protobuf.appearances.AppearanceFlagHeight height = 27;
       case 27:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 218)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 218)) {
           ptr = ctx->ParseMessage(_internal_mutable_height(), ptr);
           CHK_(ptr);
         } else
@@ -4498,7 +4510,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool lying_object = 28;
       case 28:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 224)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 224)) {
           _Internal::set_has_lying_object(&_has_bits_);
           lying_object_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4507,7 +4519,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool animate_always = 29;
       case 29:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 232)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 232)) {
           _Internal::set_has_animate_always(&_has_bits_);
           animate_always_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4516,7 +4528,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional .otclient.protobuf.appearances.AppearanceFlagAutomap automap = 30;
       case 30:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 242)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 242)) {
           ptr = ctx->ParseMessage(_internal_mutable_automap(), ptr);
           CHK_(ptr);
         } else
@@ -4524,7 +4536,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional .otclient.protobuf.appearances.AppearanceFlagLenshelp lenshelp = 31;
       case 31:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 250)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 250)) {
           ptr = ctx->ParseMessage(_internal_mutable_lenshelp(), ptr);
           CHK_(ptr);
         } else
@@ -4532,7 +4544,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool fullbank = 32;
       case 32:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 0)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 0)) {
           _Internal::set_has_fullbank(&_has_bits_);
           fullbank_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4541,7 +4553,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool ignore_look = 33;
       case 33:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           _Internal::set_has_ignore_look(&_has_bits_);
           ignore_look_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4550,7 +4562,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional .otclient.protobuf.appearances.AppearanceFlagClothes clothes = 34;
       case 34:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
           ptr = ctx->ParseMessage(_internal_mutable_clothes(), ptr);
           CHK_(ptr);
         } else
@@ -4558,7 +4570,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional .otclient.protobuf.appearances.AppearanceFlagDefaultAction default_action = 35;
       case 35:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
           ptr = ctx->ParseMessage(_internal_mutable_default_action(), ptr);
           CHK_(ptr);
         } else
@@ -4566,7 +4578,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional .otclient.protobuf.appearances.AppearanceFlagMarket market = 36;
       case 36:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
           ptr = ctx->ParseMessage(_internal_mutable_market(), ptr);
           CHK_(ptr);
         } else
@@ -4574,7 +4586,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool wrap = 37;
       case 37:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
           _Internal::set_has_wrap(&_has_bits_);
           wrap_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4583,7 +4595,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool unwrap = 38;
       case 38:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 48)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 48)) {
           _Internal::set_has_unwrap(&_has_bits_);
           unwrap_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4592,7 +4604,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool topeffect = 39;
       case 39:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 56)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 56)) {
           _Internal::set_has_topeffect(&_has_bits_);
           topeffect_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4601,7 +4613,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // repeated .otclient.protobuf.appearances.AppearanceFlagNPC npcsaledata = 40;
       case 40:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 66)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 66)) {
           ptr -= 2;
           do {
             ptr += 2;
@@ -4614,7 +4626,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional .otclient.protobuf.appearances.AppearanceFlagChangedToExpire changedtoexpire = 41;
       case 41:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 74)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 74)) {
           ptr = ctx->ParseMessage(_internal_mutable_changedtoexpire(), ptr);
           CHK_(ptr);
         } else
@@ -4622,7 +4634,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool corpse = 42;
       case 42:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 80)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 80)) {
           _Internal::set_has_corpse(&_has_bits_);
           corpse_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4631,7 +4643,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool player_corpse = 43;
       case 43:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 88)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 88)) {
           _Internal::set_has_player_corpse(&_has_bits_);
           player_corpse_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4640,7 +4652,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional .otclient.protobuf.appearances.AppearanceFlagCyclopedia cyclopediaitem = 44;
       case 44:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 98)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 98)) {
           ptr = ctx->ParseMessage(_internal_mutable_cyclopediaitem(), ptr);
           CHK_(ptr);
         } else
@@ -4648,7 +4660,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool ammo = 45;
       case 45:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 104)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 104)) {
           _Internal::set_has_ammo(&_has_bits_);
           ammo_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4657,7 +4669,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool show_off_socket = 46;
       case 46:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 112)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 112)) {
           _Internal::set_has_show_off_socket(&_has_bits_);
           show_off_socket_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4666,7 +4678,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional bool reportable = 47;
       case 47:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 120)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 120)) {
           _Internal::set_has_reportable(&_has_bits_);
           reportable_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
@@ -4675,7 +4687,7 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         continue;
       // optional .otclient.protobuf.appearances.AppearanceFlagUpgradeClassification upgradeclassification = 48;
       case 48:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 130)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 130)) {
           ptr = ctx->ParseMessage(_internal_mutable_upgradeclassification(), ptr);
           CHK_(ptr);
         } else
@@ -4704,10 +4716,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlags::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* AppearanceFlags::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlags)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -5057,7 +5069,7 @@ size_t AppearanceFlags::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlags)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -5366,7 +5378,7 @@ void AppearanceFlags::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void AppearanceFlags::MergeFrom(const AppearanceFlags& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlags)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   npcsaledata_.MergeFrom(from.npcsaledata_);
@@ -5591,7 +5603,7 @@ AppearanceFlagUpgradeClassification::AppearanceFlagUpgradeClassification(const A
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagUpgradeClassification)
 }
 
-void AppearanceFlagUpgradeClassification::SharedCtor() {
+inline void AppearanceFlagUpgradeClassification::SharedCtor() {
 upgrade_classification_ = 0u;
 }
 
@@ -5618,7 +5630,7 @@ void AppearanceFlagUpgradeClassification::SetCachedSize(int size) const {
 
 void AppearanceFlagUpgradeClassification::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagUpgradeClassification)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -5631,12 +5643,12 @@ const char* AppearanceFlagUpgradeClassification::_InternalParse(const char* ptr,
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional uint32 upgrade_classification = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           _Internal::set_has_upgrade_classification(&has_bits);
           upgrade_classification_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -5667,10 +5679,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagUpgradeClassification::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* AppearanceFlagUpgradeClassification::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagUpgradeClassification)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -5692,7 +5704,7 @@ size_t AppearanceFlagUpgradeClassification::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagUpgradeClassification)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -5721,7 +5733,7 @@ void AppearanceFlagUpgradeClassification::MergeImpl(::PROTOBUF_NAMESPACE_ID::Mes
 void AppearanceFlagUpgradeClassification::MergeFrom(const AppearanceFlagUpgradeClassification& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagUpgradeClassification)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (from._internal_has_upgrade_classification()) {
@@ -5781,7 +5793,7 @@ AppearanceFlagBank::AppearanceFlagBank(const AppearanceFlagBank& from)
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagBank)
 }
 
-void AppearanceFlagBank::SharedCtor() {
+inline void AppearanceFlagBank::SharedCtor() {
 waypoints_ = 0u;
 }
 
@@ -5808,7 +5820,7 @@ void AppearanceFlagBank::SetCachedSize(int size) const {
 
 void AppearanceFlagBank::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagBank)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -5821,12 +5833,12 @@ const char* AppearanceFlagBank::_InternalParse(const char* ptr, ::PROTOBUF_NAMES
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional uint32 waypoints = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           _Internal::set_has_waypoints(&has_bits);
           waypoints_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -5857,10 +5869,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagBank::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* AppearanceFlagBank::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagBank)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -5882,7 +5894,7 @@ size_t AppearanceFlagBank::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagBank)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -5911,7 +5923,7 @@ void AppearanceFlagBank::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void AppearanceFlagBank::MergeFrom(const AppearanceFlagBank& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagBank)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (from._internal_has_waypoints()) {
@@ -5971,7 +5983,7 @@ AppearanceFlagWrite::AppearanceFlagWrite(const AppearanceFlagWrite& from)
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagWrite)
 }
 
-void AppearanceFlagWrite::SharedCtor() {
+inline void AppearanceFlagWrite::SharedCtor() {
 max_text_length_ = 0u;
 }
 
@@ -5998,7 +6010,7 @@ void AppearanceFlagWrite::SetCachedSize(int size) const {
 
 void AppearanceFlagWrite::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagWrite)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -6011,12 +6023,12 @@ const char* AppearanceFlagWrite::_InternalParse(const char* ptr, ::PROTOBUF_NAME
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional uint32 max_text_length = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           _Internal::set_has_max_text_length(&has_bits);
           max_text_length_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -6047,10 +6059,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagWrite::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* AppearanceFlagWrite::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagWrite)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -6072,7 +6084,7 @@ size_t AppearanceFlagWrite::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagWrite)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -6101,7 +6113,7 @@ void AppearanceFlagWrite::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void AppearanceFlagWrite::MergeFrom(const AppearanceFlagWrite& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagWrite)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (from._internal_has_max_text_length()) {
@@ -6161,7 +6173,7 @@ AppearanceFlagWriteOnce::AppearanceFlagWriteOnce(const AppearanceFlagWriteOnce& 
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagWriteOnce)
 }
 
-void AppearanceFlagWriteOnce::SharedCtor() {
+inline void AppearanceFlagWriteOnce::SharedCtor() {
 max_text_length_once_ = 0u;
 }
 
@@ -6188,7 +6200,7 @@ void AppearanceFlagWriteOnce::SetCachedSize(int size) const {
 
 void AppearanceFlagWriteOnce::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagWriteOnce)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -6201,12 +6213,12 @@ const char* AppearanceFlagWriteOnce::_InternalParse(const char* ptr, ::PROTOBUF_
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional uint32 max_text_length_once = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           _Internal::set_has_max_text_length_once(&has_bits);
           max_text_length_once_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -6237,10 +6249,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagWriteOnce::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* AppearanceFlagWriteOnce::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagWriteOnce)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -6262,7 +6274,7 @@ size_t AppearanceFlagWriteOnce::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagWriteOnce)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -6291,7 +6303,7 @@ void AppearanceFlagWriteOnce::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void AppearanceFlagWriteOnce::MergeFrom(const AppearanceFlagWriteOnce& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagWriteOnce)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (from._internal_has_max_text_length_once()) {
@@ -6356,7 +6368,7 @@ AppearanceFlagLight::AppearanceFlagLight(const AppearanceFlagLight& from)
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagLight)
 }
 
-void AppearanceFlagLight::SharedCtor() {
+inline void AppearanceFlagLight::SharedCtor() {
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&brightness_) - reinterpret_cast<char*>(this)),
     0, static_cast<size_t>(reinterpret_cast<char*>(&color_) -
@@ -6386,7 +6398,7 @@ void AppearanceFlagLight::SetCachedSize(int size) const {
 
 void AppearanceFlagLight::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagLight)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -6404,12 +6416,12 @@ const char* AppearanceFlagLight::_InternalParse(const char* ptr, ::PROTOBUF_NAME
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional uint32 brightness = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           _Internal::set_has_brightness(&has_bits);
           brightness_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -6418,7 +6430,7 @@ const char* AppearanceFlagLight::_InternalParse(const char* ptr, ::PROTOBUF_NAME
         continue;
       // optional uint32 color = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
           _Internal::set_has_color(&has_bits);
           color_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -6449,10 +6461,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagLight::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* AppearanceFlagLight::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagLight)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -6480,7 +6492,7 @@ size_t AppearanceFlagLight::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagLight)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -6516,7 +6528,7 @@ void AppearanceFlagLight::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void AppearanceFlagLight::MergeFrom(const AppearanceFlagLight& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagLight)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = from._has_bits_[0];
@@ -6588,7 +6600,7 @@ AppearanceFlagHeight::AppearanceFlagHeight(const AppearanceFlagHeight& from)
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagHeight)
 }
 
-void AppearanceFlagHeight::SharedCtor() {
+inline void AppearanceFlagHeight::SharedCtor() {
 elevation_ = 0u;
 }
 
@@ -6615,7 +6627,7 @@ void AppearanceFlagHeight::SetCachedSize(int size) const {
 
 void AppearanceFlagHeight::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagHeight)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -6628,12 +6640,12 @@ const char* AppearanceFlagHeight::_InternalParse(const char* ptr, ::PROTOBUF_NAM
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional uint32 elevation = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           _Internal::set_has_elevation(&has_bits);
           elevation_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -6664,10 +6676,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagHeight::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* AppearanceFlagHeight::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagHeight)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -6689,7 +6701,7 @@ size_t AppearanceFlagHeight::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagHeight)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -6718,7 +6730,7 @@ void AppearanceFlagHeight::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void AppearanceFlagHeight::MergeFrom(const AppearanceFlagHeight& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagHeight)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (from._internal_has_elevation()) {
@@ -6783,7 +6795,7 @@ AppearanceFlagShift::AppearanceFlagShift(const AppearanceFlagShift& from)
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagShift)
 }
 
-void AppearanceFlagShift::SharedCtor() {
+inline void AppearanceFlagShift::SharedCtor() {
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&x_) - reinterpret_cast<char*>(this)),
     0, static_cast<size_t>(reinterpret_cast<char*>(&y_) -
@@ -6813,7 +6825,7 @@ void AppearanceFlagShift::SetCachedSize(int size) const {
 
 void AppearanceFlagShift::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagShift)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -6831,12 +6843,12 @@ const char* AppearanceFlagShift::_InternalParse(const char* ptr, ::PROTOBUF_NAME
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional uint32 x = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           _Internal::set_has_x(&has_bits);
           x_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -6845,7 +6857,7 @@ const char* AppearanceFlagShift::_InternalParse(const char* ptr, ::PROTOBUF_NAME
         continue;
       // optional uint32 y = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
           _Internal::set_has_y(&has_bits);
           y_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -6876,10 +6888,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagShift::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* AppearanceFlagShift::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagShift)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -6907,7 +6919,7 @@ size_t AppearanceFlagShift::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagShift)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -6943,7 +6955,7 @@ void AppearanceFlagShift::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void AppearanceFlagShift::MergeFrom(const AppearanceFlagShift& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagShift)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = from._has_bits_[0];
@@ -7015,7 +7027,7 @@ AppearanceFlagClothes::AppearanceFlagClothes(const AppearanceFlagClothes& from)
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagClothes)
 }
 
-void AppearanceFlagClothes::SharedCtor() {
+inline void AppearanceFlagClothes::SharedCtor() {
 slot_ = 0u;
 }
 
@@ -7042,7 +7054,7 @@ void AppearanceFlagClothes::SetCachedSize(int size) const {
 
 void AppearanceFlagClothes::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagClothes)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -7055,12 +7067,12 @@ const char* AppearanceFlagClothes::_InternalParse(const char* ptr, ::PROTOBUF_NA
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional uint32 slot = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           _Internal::set_has_slot(&has_bits);
           slot_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -7091,10 +7103,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagClothes::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* AppearanceFlagClothes::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagClothes)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -7116,7 +7128,7 @@ size_t AppearanceFlagClothes::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagClothes)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -7145,7 +7157,7 @@ void AppearanceFlagClothes::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void AppearanceFlagClothes::MergeFrom(const AppearanceFlagClothes& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagClothes)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (from._internal_has_slot()) {
@@ -7205,7 +7217,7 @@ AppearanceFlagDefaultAction::AppearanceFlagDefaultAction(const AppearanceFlagDef
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagDefaultAction)
 }
 
-void AppearanceFlagDefaultAction::SharedCtor() {
+inline void AppearanceFlagDefaultAction::SharedCtor() {
 action_ = 0;
 }
 
@@ -7232,7 +7244,7 @@ void AppearanceFlagDefaultAction::SetCachedSize(int size) const {
 
 void AppearanceFlagDefaultAction::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagDefaultAction)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -7245,13 +7257,13 @@ const char* AppearanceFlagDefaultAction::_InternalParse(const char* ptr, ::PROTO
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional .otclient.protobuf.appearances.PLAYER_ACTION action = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-          ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
+          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
           if (PROTOBUF_PREDICT_TRUE(::otclient::protobuf::appearances::PLAYER_ACTION_IsValid(val))) {
             _internal_set_action(static_cast<::otclient::protobuf::appearances::PLAYER_ACTION>(val));
@@ -7285,10 +7297,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagDefaultAction::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* AppearanceFlagDefaultAction::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagDefaultAction)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -7311,7 +7323,7 @@ size_t AppearanceFlagDefaultAction::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagDefaultAction)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -7341,7 +7353,7 @@ void AppearanceFlagDefaultAction::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to
 void AppearanceFlagDefaultAction::MergeFrom(const AppearanceFlagDefaultAction& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagDefaultAction)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (from._internal_has_action()) {
@@ -7412,6 +7424,9 @@ AppearanceFlagMarket::AppearanceFlagMarket(const AppearanceFlagMarket& from)
       restrict_to_profession_(from.restrict_to_profession_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (from._internal_has_name()) {
     name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_name(), 
       GetArenaForAllocation());
@@ -7422,8 +7437,11 @@ AppearanceFlagMarket::AppearanceFlagMarket(const AppearanceFlagMarket& from)
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagMarket)
 }
 
-void AppearanceFlagMarket::SharedCtor() {
+inline void AppearanceFlagMarket::SharedCtor() {
 name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&trade_as_object_id_) - reinterpret_cast<char*>(this)),
     0, static_cast<size_t>(reinterpret_cast<char*>(&minimum_level_) -
@@ -7455,7 +7473,7 @@ void AppearanceFlagMarket::SetCachedSize(int size) const {
 
 void AppearanceFlagMarket::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagMarket)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -7478,13 +7496,13 @@ const char* AppearanceFlagMarket::_InternalParse(const char* ptr, ::PROTOBUF_NAM
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional .otclient.protobuf.appearances.ITEM_CATEGORY category = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-          ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
+          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
           if (PROTOBUF_PREDICT_TRUE(::otclient::protobuf::appearances::ITEM_CATEGORY_IsValid(val))) {
             _internal_set_category(static_cast<::otclient::protobuf::appearances::ITEM_CATEGORY>(val));
@@ -7496,7 +7514,7 @@ const char* AppearanceFlagMarket::_InternalParse(const char* ptr, ::PROTOBUF_NAM
         continue;
       // optional uint32 trade_as_object_id = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
           _Internal::set_has_trade_as_object_id(&has_bits);
           trade_as_object_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -7505,7 +7523,7 @@ const char* AppearanceFlagMarket::_InternalParse(const char* ptr, ::PROTOBUF_NAM
         continue;
       // optional uint32 show_as_object_id = 3;
       case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
           _Internal::set_has_show_as_object_id(&has_bits);
           show_as_object_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -7514,7 +7532,7 @@ const char* AppearanceFlagMarket::_InternalParse(const char* ptr, ::PROTOBUF_NAM
         continue;
       // optional string name = 4;
       case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
           auto str = _internal_mutable_name();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           #ifndef NDEBUG
@@ -7526,11 +7544,11 @@ const char* AppearanceFlagMarket::_InternalParse(const char* ptr, ::PROTOBUF_NAM
         continue;
       // repeated .otclient.protobuf.appearances.PLAYER_PROFESSION restrict_to_profession = 5;
       case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
           ptr -= 1;
           do {
             ptr += 1;
-            ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+            uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
             CHK_(ptr);
             if (PROTOBUF_PREDICT_TRUE(::otclient::protobuf::appearances::PLAYER_PROFESSION_IsValid(val))) {
               _internal_add_restrict_to_profession(static_cast<::otclient::protobuf::appearances::PLAYER_PROFESSION>(val));
@@ -7539,7 +7557,7 @@ const char* AppearanceFlagMarket::_InternalParse(const char* ptr, ::PROTOBUF_NAM
             }
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<40>(ptr));
-        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42) {
+        } else if (static_cast<uint8_t>(tag) == 42) {
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedEnumParser<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(_internal_mutable_restrict_to_profession(), ptr, ctx, ::otclient::protobuf::appearances::PLAYER_PROFESSION_IsValid, &_internal_metadata_, 5);
           CHK_(ptr);
         } else
@@ -7547,7 +7565,7 @@ const char* AppearanceFlagMarket::_InternalParse(const char* ptr, ::PROTOBUF_NAM
         continue;
       // optional uint32 minimum_level = 6;
       case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 48)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 48)) {
           _Internal::set_has_minimum_level(&has_bits);
           minimum_level_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -7578,10 +7596,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagMarket::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* AppearanceFlagMarket::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagMarket)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -7639,7 +7657,7 @@ size_t AppearanceFlagMarket::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagMarket)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -7703,7 +7721,7 @@ void AppearanceFlagMarket::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void AppearanceFlagMarket::MergeFrom(const AppearanceFlagMarket& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagMarket)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   restrict_to_profession_.MergeFrom(from.restrict_to_profession_);
@@ -7806,16 +7824,25 @@ AppearanceFlagNPC::AppearanceFlagNPC(const AppearanceFlagNPC& from)
       _has_bits_(from._has_bits_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (from._internal_has_name()) {
     name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_name(), 
       GetArenaForAllocation());
   }
   location_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    location_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (from._internal_has_location()) {
     location_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_location(), 
       GetArenaForAllocation());
   }
   currency_quest_flag_display_name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    currency_quest_flag_display_name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (from._internal_has_currency_quest_flag_display_name()) {
     currency_quest_flag_display_name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_currency_quest_flag_display_name(), 
       GetArenaForAllocation());
@@ -7826,10 +7853,19 @@ AppearanceFlagNPC::AppearanceFlagNPC(const AppearanceFlagNPC& from)
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagNPC)
 }
 
-void AppearanceFlagNPC::SharedCtor() {
+inline void AppearanceFlagNPC::SharedCtor() {
 name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 location_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  location_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 currency_quest_flag_display_name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  currency_quest_flag_display_name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&sale_price_) - reinterpret_cast<char*>(this)),
     0, static_cast<size_t>(reinterpret_cast<char*>(&currency_object_type_id_) -
@@ -7862,7 +7898,7 @@ void AppearanceFlagNPC::SetCachedSize(int size) const {
 
 void AppearanceFlagNPC::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagNPC)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -7891,12 +7927,12 @@ const char* AppearanceFlagNPC::_InternalParse(const char* ptr, ::PROTOBUF_NAMESP
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional string name = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           auto str = _internal_mutable_name();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           #ifndef NDEBUG
@@ -7908,7 +7944,7 @@ const char* AppearanceFlagNPC::_InternalParse(const char* ptr, ::PROTOBUF_NAMESP
         continue;
       // optional string location = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
           auto str = _internal_mutable_location();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           #ifndef NDEBUG
@@ -7920,7 +7956,7 @@ const char* AppearanceFlagNPC::_InternalParse(const char* ptr, ::PROTOBUF_NAMESP
         continue;
       // optional uint32 sale_price = 3;
       case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
           _Internal::set_has_sale_price(&has_bits);
           sale_price_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -7929,7 +7965,7 @@ const char* AppearanceFlagNPC::_InternalParse(const char* ptr, ::PROTOBUF_NAMESP
         continue;
       // optional uint32 buy_price = 4;
       case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
           _Internal::set_has_buy_price(&has_bits);
           buy_price_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -7938,7 +7974,7 @@ const char* AppearanceFlagNPC::_InternalParse(const char* ptr, ::PROTOBUF_NAMESP
         continue;
       // optional uint32 currency_object_type_id = 5;
       case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
           _Internal::set_has_currency_object_type_id(&has_bits);
           currency_object_type_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -7947,7 +7983,7 @@ const char* AppearanceFlagNPC::_InternalParse(const char* ptr, ::PROTOBUF_NAMESP
         continue;
       // optional string currency_quest_flag_display_name = 6;
       case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 50)) {
           auto str = _internal_mutable_currency_quest_flag_display_name();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           #ifndef NDEBUG
@@ -7981,10 +8017,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagNPC::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* AppearanceFlagNPC::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagNPC)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -8048,7 +8084,7 @@ size_t AppearanceFlagNPC::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagNPC)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -8110,7 +8146,7 @@ void AppearanceFlagNPC::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void AppearanceFlagNPC::MergeFrom(const AppearanceFlagNPC& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagNPC)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = from._has_bits_[0];
@@ -8211,7 +8247,7 @@ AppearanceFlagAutomap::AppearanceFlagAutomap(const AppearanceFlagAutomap& from)
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagAutomap)
 }
 
-void AppearanceFlagAutomap::SharedCtor() {
+inline void AppearanceFlagAutomap::SharedCtor() {
 color_ = 0u;
 }
 
@@ -8238,7 +8274,7 @@ void AppearanceFlagAutomap::SetCachedSize(int size) const {
 
 void AppearanceFlagAutomap::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagAutomap)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -8251,12 +8287,12 @@ const char* AppearanceFlagAutomap::_InternalParse(const char* ptr, ::PROTOBUF_NA
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional uint32 color = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           _Internal::set_has_color(&has_bits);
           color_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -8287,10 +8323,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagAutomap::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* AppearanceFlagAutomap::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagAutomap)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -8312,7 +8348,7 @@ size_t AppearanceFlagAutomap::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagAutomap)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -8341,7 +8377,7 @@ void AppearanceFlagAutomap::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void AppearanceFlagAutomap::MergeFrom(const AppearanceFlagAutomap& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagAutomap)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (from._internal_has_color()) {
@@ -8406,7 +8442,7 @@ AppearanceFlagHook::AppearanceFlagHook(const AppearanceFlagHook& from)
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagHook)
 }
 
-void AppearanceFlagHook::SharedCtor() {
+inline void AppearanceFlagHook::SharedCtor() {
 south_ = 1;
 east_ = 1;
 }
@@ -8434,7 +8470,7 @@ void AppearanceFlagHook::SetCachedSize(int size) const {
 
 void AppearanceFlagHook::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagHook)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -8451,13 +8487,13 @@ const char* AppearanceFlagHook::_InternalParse(const char* ptr, ::PROTOBUF_NAMES
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional .otclient.protobuf.appearances.HOOK_TYPE south = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-          ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
+          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
           if (PROTOBUF_PREDICT_TRUE(::otclient::protobuf::appearances::HOOK_TYPE_IsValid(val))) {
             _internal_set_south(static_cast<::otclient::protobuf::appearances::HOOK_TYPE>(val));
@@ -8469,8 +8505,8 @@ const char* AppearanceFlagHook::_InternalParse(const char* ptr, ::PROTOBUF_NAMES
         continue;
       // optional .otclient.protobuf.appearances.HOOK_TYPE east = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
-          ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
+          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
           if (PROTOBUF_PREDICT_TRUE(::otclient::protobuf::appearances::HOOK_TYPE_IsValid(val))) {
             _internal_set_east(static_cast<::otclient::protobuf::appearances::HOOK_TYPE>(val));
@@ -8504,10 +8540,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagHook::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* AppearanceFlagHook::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagHook)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -8537,7 +8573,7 @@ size_t AppearanceFlagHook::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagHook)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -8575,7 +8611,7 @@ void AppearanceFlagHook::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void AppearanceFlagHook::MergeFrom(const AppearanceFlagHook& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagHook)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = from._has_bits_[0];
@@ -8643,7 +8679,7 @@ AppearanceFlagLenshelp::AppearanceFlagLenshelp(const AppearanceFlagLenshelp& fro
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagLenshelp)
 }
 
-void AppearanceFlagLenshelp::SharedCtor() {
+inline void AppearanceFlagLenshelp::SharedCtor() {
 id_ = 0u;
 }
 
@@ -8670,7 +8706,7 @@ void AppearanceFlagLenshelp::SetCachedSize(int size) const {
 
 void AppearanceFlagLenshelp::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagLenshelp)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -8683,12 +8719,12 @@ const char* AppearanceFlagLenshelp::_InternalParse(const char* ptr, ::PROTOBUF_N
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional uint32 id = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           _Internal::set_has_id(&has_bits);
           id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -8719,10 +8755,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagLenshelp::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* AppearanceFlagLenshelp::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagLenshelp)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -8744,7 +8780,7 @@ size_t AppearanceFlagLenshelp::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagLenshelp)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -8773,7 +8809,7 @@ void AppearanceFlagLenshelp::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void AppearanceFlagLenshelp::MergeFrom(const AppearanceFlagLenshelp& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagLenshelp)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (from._internal_has_id()) {
@@ -8833,7 +8869,7 @@ AppearanceFlagChangedToExpire::AppearanceFlagChangedToExpire(const AppearanceFla
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagChangedToExpire)
 }
 
-void AppearanceFlagChangedToExpire::SharedCtor() {
+inline void AppearanceFlagChangedToExpire::SharedCtor() {
 former_object_typeid_ = 0u;
 }
 
@@ -8860,7 +8896,7 @@ void AppearanceFlagChangedToExpire::SetCachedSize(int size) const {
 
 void AppearanceFlagChangedToExpire::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagChangedToExpire)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -8873,12 +8909,12 @@ const char* AppearanceFlagChangedToExpire::_InternalParse(const char* ptr, ::PRO
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional uint32 former_object_typeid = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           _Internal::set_has_former_object_typeid(&has_bits);
           former_object_typeid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -8909,10 +8945,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagChangedToExpire::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* AppearanceFlagChangedToExpire::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagChangedToExpire)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -8934,7 +8970,7 @@ size_t AppearanceFlagChangedToExpire::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagChangedToExpire)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -8963,7 +8999,7 @@ void AppearanceFlagChangedToExpire::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* 
 void AppearanceFlagChangedToExpire::MergeFrom(const AppearanceFlagChangedToExpire& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagChangedToExpire)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (from._internal_has_former_object_typeid()) {
@@ -9023,7 +9059,7 @@ AppearanceFlagCyclopedia::AppearanceFlagCyclopedia(const AppearanceFlagCyclopedi
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagCyclopedia)
 }
 
-void AppearanceFlagCyclopedia::SharedCtor() {
+inline void AppearanceFlagCyclopedia::SharedCtor() {
 cyclopedia_type_ = 0u;
 }
 
@@ -9050,7 +9086,7 @@ void AppearanceFlagCyclopedia::SetCachedSize(int size) const {
 
 void AppearanceFlagCyclopedia::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagCyclopedia)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -9063,12 +9099,12 @@ const char* AppearanceFlagCyclopedia::_InternalParse(const char* ptr, ::PROTOBUF
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional uint32 cyclopedia_type = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           _Internal::set_has_cyclopedia_type(&has_bits);
           cyclopedia_type_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -9099,10 +9135,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* AppearanceFlagCyclopedia::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* AppearanceFlagCyclopedia::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagCyclopedia)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -9124,7 +9160,7 @@ size_t AppearanceFlagCyclopedia::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagCyclopedia)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -9153,7 +9189,7 @@ void AppearanceFlagCyclopedia::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void AppearanceFlagCyclopedia::MergeFrom(const AppearanceFlagCyclopedia& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagCyclopedia)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (from._internal_has_cyclopedia_type()) {
@@ -9230,7 +9266,7 @@ SpecialMeaningAppearanceIds::SpecialMeaningAppearanceIds(const SpecialMeaningApp
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.SpecialMeaningAppearanceIds)
 }
 
-void SpecialMeaningAppearanceIds::SharedCtor() {
+inline void SpecialMeaningAppearanceIds::SharedCtor() {
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&gold_coin_id_) - reinterpret_cast<char*>(this)),
     0, static_cast<size_t>(reinterpret_cast<char*>(&supply_stash_id_) -
@@ -9260,7 +9296,7 @@ void SpecialMeaningAppearanceIds::SetCachedSize(int size) const {
 
 void SpecialMeaningAppearanceIds::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.SpecialMeaningAppearanceIds)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -9278,12 +9314,12 @@ const char* SpecialMeaningAppearanceIds::_InternalParse(const char* ptr, ::PROTO
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional uint32 gold_coin_id = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           _Internal::set_has_gold_coin_id(&has_bits);
           gold_coin_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -9292,7 +9328,7 @@ const char* SpecialMeaningAppearanceIds::_InternalParse(const char* ptr, ::PROTO
         continue;
       // optional uint32 platinum_coin_id = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
           _Internal::set_has_platinum_coin_id(&has_bits);
           platinum_coin_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -9301,7 +9337,7 @@ const char* SpecialMeaningAppearanceIds::_InternalParse(const char* ptr, ::PROTO
         continue;
       // optional uint32 crystal_coin_id = 3;
       case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
           _Internal::set_has_crystal_coin_id(&has_bits);
           crystal_coin_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -9310,7 +9346,7 @@ const char* SpecialMeaningAppearanceIds::_InternalParse(const char* ptr, ::PROTO
         continue;
       // optional uint32 tibia_coin_id = 4;
       case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
           _Internal::set_has_tibia_coin_id(&has_bits);
           tibia_coin_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -9319,7 +9355,7 @@ const char* SpecialMeaningAppearanceIds::_InternalParse(const char* ptr, ::PROTO
         continue;
       // optional uint32 stamped_letter_id = 5;
       case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
           _Internal::set_has_stamped_letter_id(&has_bits);
           stamped_letter_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -9328,7 +9364,7 @@ const char* SpecialMeaningAppearanceIds::_InternalParse(const char* ptr, ::PROTO
         continue;
       // optional uint32 supply_stash_id = 6;
       case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 48)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 48)) {
           _Internal::set_has_supply_stash_id(&has_bits);
           supply_stash_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
@@ -9359,10 +9395,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* SpecialMeaningAppearanceIds::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* SpecialMeaningAppearanceIds::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.SpecialMeaningAppearanceIds)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
@@ -9414,7 +9450,7 @@ size_t SpecialMeaningAppearanceIds::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.SpecialMeaningAppearanceIds)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -9470,7 +9506,7 @@ void SpecialMeaningAppearanceIds::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to
 void SpecialMeaningAppearanceIds::MergeFrom(const SpecialMeaningAppearanceIds& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.SpecialMeaningAppearanceIds)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = from._has_bits_[0];

@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 
 # VCPKG
 # cmake -DCMAKE_TOOLCHAIN_FILE=/opt/workspace/vcpkg/scripts/buildsystems/vcpkg.cmake ..
-# .\vcpkg --triplet x64-windows install boost-asio boost-filesystem boost-iostreams boost-lockfree boost-system boost-variant boost-uuid glew libogg libvorbis luajit openal-soft opengl openssl physfs zlib nlohmann-json protobuf
+# .\vcpkg --triplet x64-windows asio luajit glew physfs openal-soft libogg libvorbis zlib opengl nlohmann-json protobuf liblzma openssl
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
 	set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
