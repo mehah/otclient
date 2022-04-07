@@ -954,7 +954,7 @@ std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::findPath(const
         result = Otc::PathFindResultOk;
     }
 
-    for (auto& it : nodes)
+    for (const auto& it : nodes)
         delete it.second;
 
     return ret;
@@ -966,7 +966,8 @@ void Map::resetLastCamera()
         mapView->resetLastCamera();
 }
 
-PathFindResult_ptr Map::newFindPath(const Position& start, const Position& goal, std::shared_ptr<std::list<Node*>> visibleNodes)
+PathFindResult_ptr Map::newFindPath(const Position& start, const Position& goal, const std::shared_ptr<std::list<Node*>>
+                                    & visibleNodes)
 {
     auto ret = std::make_shared<PathFindResult>();
     ret->start = start;
@@ -1009,7 +1010,7 @@ PathFindResult_ptr Map::newFindPath(const Position& start, const Position& goal,
             nodes.emplace(node->pos, node);
     }
 
-    Node* initNode = new Node{ 1, 0, start, nullptr, 0, 0 };
+    auto initNode = new Node{ 1, 0, start, nullptr, 0, 0 };
     nodes[start] = initNode;
     searchList.push(initNode);
 
@@ -1082,14 +1083,15 @@ PathFindResult_ptr Map::newFindPath(const Position& start, const Position& goal,
     }
     ret->complexity = 50000 - limit;
 
-    for (auto& node : nodes) {
+    for (const auto& node : nodes) {
         delete node.second;
     }
 
     return ret;
 }
 
-void Map::findPathAsync(const Position& start, const Position& goal, std::function<void(PathFindResult_ptr)> callback)
+void Map::findPathAsync(const Position& start, const Position& goal, const std::function<void(PathFindResult_ptr)>&
+                        callback)
 {
     const auto visibleNodes = std::make_shared<std::list<Node*>>();
     for (const auto& tile : getTiles(start.z)) {
@@ -1168,7 +1170,7 @@ std::map<std::string, std::tuple<int, int, int, std::string>> Map::findEveryPath
     std::unordered_map<Position, Node*, Position::Hasher> nodes;
     std::priority_queue<Node*, std::vector<Node*>, LessNode> searchList;
 
-    Node* initNode = new Node{ 1, 0, start, nullptr, 0, 0 };
+    auto initNode = new Node{ 1, 0, start, nullptr, 0, 0 };
     nodes[start] = initNode;
     searchList.push(initNode);
 

@@ -309,7 +309,7 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
         std::stringstream fin;
         g_resources.readFileStream(g_resources.resolvePath(stdext::format("/things/%d/%s", g_game.getClientVersion(), appearancesFile)), fin);
 
-        appearances::Appearances appearancesLib = appearances::Appearances();
+        auto appearancesLib = appearances::Appearances();
         if (!appearancesLib.ParseFromIstream(&fin)) {
             throw stdext::exception("Couldn't parse appearances lib.");
         }

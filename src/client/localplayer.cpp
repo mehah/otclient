@@ -152,7 +152,7 @@ bool LocalPlayer::autoWalk(const Position& destination, const bool retry)
 
     m_autoWalkDestination = destination;
     auto self(asLocalPlayer());
-    g_map.findPathAsync(m_position, destination, [self](PathFindResult_ptr result) {
+    g_map.findPathAsync(m_position, destination, [self](const PathFindResult_ptr& result) {
         if (self->m_autoWalkDestination != result->destination)
             return;
 

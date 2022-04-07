@@ -69,7 +69,7 @@ public:
 protected:
     void internal_connect(const asio::ip::basic_resolver<asio::ip::tcp>::iterator& endpointIterator);
     void internal_write();
-    void onResolve(const std::error_code& error, asio::ip::tcp::resolver::iterator endpointIterator);
+    void onResolve(const std::error_code& error, const asio::ip::tcp::resolver::iterator& endpointIterator);
     void onConnect(const std::error_code& error);
     void onCanWrite(const std::error_code& error);
     void onWrite(const std::error_code& error, size_t writeSize, const std::shared_ptr<asio::streambuf>&

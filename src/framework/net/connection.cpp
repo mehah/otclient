@@ -242,7 +242,8 @@ void Connection::read_some(const RecvCallback& callback)
     });
 }
 
-void Connection::onResolve(const std::error_code& error, asio::ip::basic_resolver<asio::ip::tcp>::iterator endpointIterator)
+void Connection::onResolve(const std::error_code& error, const asio::ip::basic_resolver<asio::ip::tcp>::iterator&
+                           endpointIterator)
 {
     m_readTimer.cancel();
 
@@ -250,7 +251,7 @@ void Connection::onResolve(const std::error_code& error, asio::ip::basic_resolve
         return;
 
     if (!error)
-        internal_connect(std::move(endpointIterator));
+        internal_connect(endpointIterator);
     else
         handleError(error);
 }
