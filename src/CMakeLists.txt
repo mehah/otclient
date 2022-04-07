@@ -7,7 +7,6 @@ project(otclient)
 option(FRAMEWORK_SOUND "Use SOUND " ON)
 option(FRAMEWORK_XML "Use XML " ON)
 option(FRAMEWORK_NET "Use NET " ON)
-option(FRAMEWORK_SQL "Use SQL" OFF)
 option(TOOGLE_DIRECTX "Use DX9 support" OFF)
 option(USE_STATIC_LIBS "Use shared libraries (dlls)" ON)
 option(BOT_PROTECTION "Use bot protection" ON)
@@ -129,9 +128,16 @@ if(FRAMEWORK_SOUND)
 	find_package(Vorbis REQUIRED)
 	find_package(Ogg REQUIRED)
 endif()
-if(FRAMEWORK_SQL)
-	find_package(MySQL REQUIRED)
-endif()
+
+find_path(ASIO_INCLUDE_PATH asio.hpp HINTS 
+	"/usr/include"
+	"/usr/local/include"
+	"/opt/local/include"
+)
+
+if(ASIO_INCLUDE_PATH)
+	message(STATUS "Found existing ASIO install")
+endif(ASIO_INCLUDE_PATH)
 
 # *****************************************************************************
 # OTClient source files configuration
@@ -393,5 +399,5 @@ endif(WIN32)
 # *****************************************************************************
 set_target_properties(${PROJECT_NAME}
 PROPERTIES
-	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
 )

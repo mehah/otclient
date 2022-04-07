@@ -29,8 +29,6 @@
 #include "spritemanager.h"
 #include <framework/core/resourcemanager.h>
 
-Client g_client;
-
 void Client::init(std::vector<std::string>& /*args*/)
 {
     // register needed lua functions

@@ -12,6 +12,7 @@
         "physfs",
         "protobuf",
         "zlib",
-        "luajit"
+        "luajit",
+        "asio"
     ]
 }

@@ -60,7 +60,6 @@ public:
     ~MapView() override;
     void draw(const Rect& rect);
 
-
     // floor visibility related
     uint8 getLockedFirstVisibleFloor() { return m_lockedFirstVisibleFloor; }
     uint8 getCachedFirstVisibleFloor() { return m_cachedFirstVisibleFloor; }

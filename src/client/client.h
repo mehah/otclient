@@ -33,6 +33,4 @@ public:
     static void registerLuaFunctions();
 };
 
-extern Client g_client;
-
 #endif
