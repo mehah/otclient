@@ -134,7 +134,7 @@ function init()
                      localPlayer:getMaxMana())
         onLevelChange(localPlayer, localPlayer:getLevel(),
                       localPlayer:getLevelPercent())
-        onIconsChange(localPlayer, localPlayer:getIcons(), 0)
+        onIconsChange(localPlayer, localPlayer:getStates(), 0)
         onSoulChange(localPlayer, localPlayer:getSoul())
         onFreeCapacityChange(localPlayer, localPlayer:getFreeCapacity())
     end

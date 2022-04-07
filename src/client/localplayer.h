@@ -42,7 +42,7 @@ public:
     bool autoWalk(const Position& destination, bool retry = false);
     bool canWalk(bool ignoreLock = false);
 
-    void setIcons(int icons);
+    void setStates(int states);
     void setSkill(Otc::Skill skill, int level, int levelPercent);
     void setBaseSkill(Otc::Skill skill, int baseLevel);
     void setHealth(double health, double maxHealth);
@@ -66,7 +66,7 @@ public:
     void setBlessings(int blessings);
     void setResourceBalance(Otc::ResourceTypes_t type, uint64_t value);
 
-    int getIcons() { return m_icons; }
+    int getStates() { return m_states; }
     int getSkillLevel(Otc::Skill skill) { return m_skillsLevel[skill]; }
     int getSkillBaseLevel(Otc::Skill skill) { return m_skillsBaseLevel[skill]; }
     int getSkillLevelPercent(Otc::Skill skill) { return m_skillsLevelPercent[skill]; }
@@ -148,7 +148,7 @@ private:
 
     uint8 m_autoWalkRetries{ 0 };
 
-    int m_icons{ 0 };
+    int m_states{ 0 };
     int m_vocation{ 0 };
     int m_blessings{ Otc::BlessingNone };
 

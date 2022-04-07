@@ -21,7 +21,7 @@
  */
 
 #include "inputmessage.h"
-#include "framework/util/crypt.h"
+#include <framework/util/crypt.h>
 
 InputMessage::InputMessage()
 {
@@ -73,14 +73,6 @@ uint64 InputMessage::getU64()
 {
     checkRead(8);
     const uint64 v = stdext::readULE64(m_buffer + m_readPos);
-    m_readPos += 8;
-    return v;
-}
-
-int64 InputMessage::get64()
-{
-    checkRead(8);
-    const int64 v = stdext::readSLE64(m_buffer + m_readPos);
     m_readPos += 8;
     return v;
 }

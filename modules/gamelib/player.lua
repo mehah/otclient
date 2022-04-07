@@ -122,7 +122,7 @@ end
 
 function Player:hasIcon(icon, icons)
     if not icons then
-      icons = self:getIcons() 
+      icons = self:getStates() 
     end
 
     for i = 1, 32 do
