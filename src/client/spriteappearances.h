@@ -38,8 +38,7 @@ enum class SpriteLayout
 class SpriteSheet : public LuaObject
 {
 public:
-    SpriteSheet(int firstId, int lastId, SpriteLayout spriteLayout, std::string file) : firstId(firstId), lastId(lastId), spriteLayout(spriteLayout), file(
-        std::move(file)) {}
+    SpriteSheet(int firstId, int lastId, SpriteLayout spriteLayout, const std::string& file) : firstId(firstId), lastId(lastId), spriteLayout(spriteLayout), file(file) {}
 
     Size getSpriteSize()
     {
