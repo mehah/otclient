@@ -27,8 +27,6 @@ set(CMAKE_VERBOSE_MAKEFILE OFF)
 # Generate compile_commands.json
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(Boost_USE_MULTITHREADED ON)
-
 # Define Framework Options for use in compilation
 set(FRAMEWORK_DEFINITIONS "")
 if (FRAMEWORK_SOUND)
@@ -98,7 +96,6 @@ add_definitions(-D"VERSION=\\"${VERSION}\\"")
 # *****************************************************************************
 # Packages / Libs
 # *****************************************************************************
-find_package(Boost 1.53.0 COMPONENTS system thread filesystem REQUIRED)
 find_package(OpenSSL QUIET)
 find_package(PhysFS REQUIRED)
 find_package(ZLIB REQUIRED)
@@ -114,11 +111,10 @@ else()
 endif()
 find_package(GLEW REQUIRED)
 if (UNIX)
-	find_package(Lua REQUIRED)
 	find_package(X11 REQUIRED)
 endif()
+find_package(LuaJIT REQUIRED)
 if (WIN32)
-	find_package(LuaJIT REQUIRED)
 	find_package(DbgHelp REQUIRED)
 endif(WIN32)
 if(NOT OPENSSL_FOUND)
@@ -230,7 +226,6 @@ target_sources(${PROJECT_NAME}
 	framework/graphics/texture.cpp
 	framework/graphics/texturemanager.cpp
 	framework/input/mouse.cpp
-	framework/luaengine/lbitlib.cpp
 	framework/luaengine/luaexception.cpp
 	framework/luaengine/luainterface.cpp
 	framework/luaengine/luaobject.cpp
@@ -301,7 +296,6 @@ if(MSVC)
 		${CMAKE_SOURCE_DIR}/src
 		${MYSQL_INCLUDE_DIR}
 		${LUAJIT_INCLUDE_DIR}
-		${Boost_INCLUDE_DIRS}
 		${Protobuf_INCLUDE_DIRS}
 		${OPENAL_INCLUDE_DIR}
 		${VORBISFILE_INCLUDE_DIR}
@@ -316,8 +310,6 @@ if(MSVC)
 		PRIVATE
 		${MYSQL_CLIENT_LIBS}
 		${LUAJIT_LIBRARY}
-		${Boost_LIBRARY_DIRS}
-		${Boost_LIBRARIES}
 		${CMAKE_THREAD_LIBS_INIT}
 		${PHYSFS_LIBRARY}
 		${ZLIB_LIBRARY}
@@ -337,9 +329,6 @@ if(MSVC)
 		${OPENSSL_LIBRARIES}
 		${DBGHELP_LIBRARY}
 
-		Boost::boost
-		Boost::filesystem
-		Boost::system
 		Threads::Threads
 		GLEW::GLEW
 	)
@@ -382,9 +371,6 @@ else()
 		${OPENSSL_LIBRARIES}
 		${X11_LIBRARIES}
 
-		Boost::boost
-		Boost::filesystem
-		Boost::system
 		Threads::Threads
 	)
 endif()

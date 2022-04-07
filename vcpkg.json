@@ -2,14 +2,6 @@
   "name": "otclient",
   "version-string": "1.0.0",
     "dependencies": [
-        "boost-asio",
-        "boost-filesystem",
-        "boost-iostreams",
-        "boost-lockfree",
-        "boost-system",
-        "boost-thread",
-        "boost-uuid",
-        "boost-variant",
         "opengl",
         "glew",
         "libogg",
@@ -20,9 +12,6 @@
         "physfs",
         "protobuf",
         "zlib",
-        {
-            "name": "luajit",
-            "platform": "windows"
-        }
+        "luajit"
     ]
 }
