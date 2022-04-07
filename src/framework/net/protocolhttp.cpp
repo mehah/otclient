@@ -3,6 +3,7 @@
 #include "protocolhttp.h"
 
 #include <zlib.h>
+#include <boost/asio/ssl.hpp>
 
 Http g_http;
 
@@ -205,38 +206,9 @@ bool Http::cancel(int id) {
 void HttpSession::start() {
     
     instance_uri = parseURI(m_url);
-    m_port = stoi(instance_uri.port);
     boost::asio::ip::tcp::resolver::query query_resolver(instance_uri.domain, instance_uri.port);
 
     m_response.body_limit((std::numeric_limits<std::uint64_t>::max)());
-
-	m_resolver.async_resolve(
-		query_resolver,
-		boost::beast::bind_front_handler(&HttpSession::on_resolve,
-			shared_from_this()));
-}
-
-void HttpSession::on_resolve(const boost::system::error_code& ec, boost::asio::ip::tcp::resolver::results_type results){
-    if (ec) {
-        std::cout << "Unable to resolve " << m_url << ": "
-            << ec.message() << std::endl;
-        return;
-    }
-
-    // Set a timeout on the operation
-    m_socket.expires_after(std::chrono::seconds(m_timeout));
-
-    m_socket.async_connect(results,
-        boost::beast::bind_front_handler(&HttpSession::on_connect, 
-        shared_from_this()));
-}
-
-void HttpSession::on_connect(const boost::system::error_code& ec, boost::asio::ip::tcp::resolver::results_type::endpoint_type){
-    if (ec) {
-        std::cout << "Unable to connect " << m_url << ": "
-            << ec.message() << std::endl;
-        return;
-    } 
 
     m_request.version(11);
     m_request.target(instance_uri.query);
@@ -256,12 +228,79 @@ void HttpSession::on_connect(const boost::system::error_code& ec, boost::asio::i
         m_request.insert(ch.first, ch.second);
     }
 
-    m_socket.expires_after(std::chrono::seconds(m_timeout));
+	m_resolver.async_resolve(
+		query_resolver,
+		boost::beast::bind_front_handler(&HttpSession::on_resolve,
+			shared_from_this()));
+}
 
-    // The connection was successful. Send the request.
-    boost::beast::http::async_write(m_socket, m_request,
-        boost::beast::bind_front_handler(&HttpSession::on_write,
-        shared_from_this()));    
+void HttpSession::on_resolve(const boost::system::error_code& ec, boost::asio::ip::tcp::resolver::results_type results){
+    if (ec) {
+        std::cout << "Unable to resolve " << m_url << ": "
+            << ec.message() << std::endl;
+        return;
+    }
+
+    if(instance_uri.port == "443") {
+        // Set a timeout on the operation
+        boost::beast::get_lowest_layer(m_ssl).expires_after(std::chrono::seconds(m_timeout));
+
+        // Make the connection on the IP address we get from a lookup
+        boost::beast::get_lowest_layer(m_ssl).async_connect(
+            results,
+            boost::beast::bind_front_handler(
+                &HttpSession::on_connect,
+                shared_from_this()));
+    } else {
+        // Set a timeout on the operation
+        m_socket.expires_after(std::chrono::seconds(m_timeout));
+
+        m_socket.async_connect(results,
+            boost::beast::bind_front_handler(&HttpSession::on_connect, 
+            shared_from_this()));
+    }
+}
+
+void HttpSession::on_connect(const boost::system::error_code& ec, boost::asio::ip::tcp::resolver::results_type::endpoint_type){
+    if (ec) {
+        std::cout << "Unable to connect " << m_url << ": "
+            << ec.message() << std::endl;
+        return;
+    } 
+
+    if(instance_uri.port == "443") {
+        // Perform the SSL handshake
+        m_ssl.async_handshake(
+            boost::asio::ssl::stream_base::client,
+            boost::beast::bind_front_handler(
+                &HttpSession::on_handshake,
+                shared_from_this()));        
+    } else {
+        m_socket.expires_after(std::chrono::seconds(m_timeout));
+
+        // The connection was successful. Send the request.
+        boost::beast::http::async_write(m_socket, m_request,
+            boost::beast::bind_front_handler(&HttpSession::on_write,
+            shared_from_this()));
+    }
+}
+
+void HttpSession::on_handshake(const boost::system::error_code& ec)
+{
+    if (ec) {
+        std::cout << "Unable to handshake " << m_url << ": "
+            << ec.message() << std::endl;
+        return;
+    }
+
+    // Set a timeout on the operation
+    boost::beast::get_lowest_layer(m_ssl).expires_after(std::chrono::seconds(m_timeout));
+
+    // Send the HTTP request to the remote host
+    boost::beast::http::async_write(m_ssl, m_request,
+        boost::beast::bind_front_handler(
+            &HttpSession::on_write,
+            shared_from_this()));
 }
 
 void HttpSession::on_write(const boost::system::error_code& ec, size_t bytes_transferred){
@@ -272,11 +311,19 @@ void HttpSession::on_write(const boost::system::error_code& ec, size_t bytes_tra
     }
     boost::ignore_unused(bytes_transferred);
 
-    // Receive the HTTP response
-    boost::beast::http::async_read(m_socket, m_streambuf, m_response,
-        boost::beast::bind_front_handler(
-            &HttpSession::on_read,
-            shared_from_this()));
+    if(instance_uri.port == "443") {
+        // Receive the HTTP response
+        boost::beast::http::async_read(m_ssl, m_streambuf, m_response,
+            boost::beast::bind_front_handler(
+                &HttpSession::on_read,
+                shared_from_this()));        
+    } else {
+        // Receive the HTTP response
+        boost::beast::http::async_read(m_socket, m_streambuf, m_response,
+            boost::beast::bind_front_handler(
+                &HttpSession::on_read,
+                shared_from_this()));
+    }
 }
 
 void HttpSession::on_read(const boost::system::error_code& ec, size_t bytes_transferred) {

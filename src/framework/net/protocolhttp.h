@@ -65,6 +65,7 @@ public:
     {
         // VALIDATE(m_callback);
         // VALIDATE(m_result);
+        m_ssl.set_verify_mode(boost::asio::ssl::verify_none);
     };
 
     void start();
@@ -74,9 +75,6 @@ private:
     boost::asio::io_service& m_service;
     std::string m_url;
     std::string m_agent;
-    int m_port;
-    // boost::asio::ip::tcp::socket m_socket;
-    // boost::asio::ip::tcp::resolver m_resolver;
     HttpResult_cb m_callback;
     HttpResult_ptr m_result;
     boost::asio::steady_timer m_timer;
@@ -84,8 +82,8 @@ private:
     ParsedURI instance_uri;
     std::map<std::string, std::string> m_custom_header;
 
-    std::shared_ptr<boost::asio::ssl::stream<boost::asio::ip::tcp::socket&>> m_ssl;
-    std::shared_ptr<boost::asio::ssl::context> m_context;
+    boost::asio::ssl::context m_context{ boost::asio::ssl::context::sslv23_client };
+    boost::asio::ssl::stream<boost::beast::tcp_stream> m_ssl{ m_service, m_context };
 
     boost::asio::ip::tcp::resolver m_resolver;
     boost::beast::tcp_stream m_socket;
@@ -95,6 +93,8 @@ private:
 
     void on_resolve(const boost::system::error_code& ec, boost::asio::ip::tcp::resolver::results_type iterator);
     void on_connect(const boost::system::error_code& ec, boost::asio::ip::tcp::resolver::results_type::endpoint_type);
+
+    void on_handshake(const boost::system::error_code& ec);
 
     void on_write(const boost::system::error_code& ec, size_t bytes_transferred);
     void on_read(const boost::system::error_code& ec, size_t bytes_transferred);
@@ -139,7 +139,6 @@ private:
     int m_timeout;
     bool m_closed;
     std::string m_domain;
-    int m_port;
 
     std::shared_ptr<boost::beast::websocket::stream<boost::beast::tcp_stream>> m_socket;
     std::shared_ptr<boost::beast::websocket::stream<boost::beast::ssl_stream<boost::beast::tcp_stream>>> m_ssl;
