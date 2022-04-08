@@ -4,6 +4,7 @@
 
 #include <zlib.h>
 #include <boost/asio/ssl.hpp>
+#include <boost/beast/websocket.hpp>
 
 Http g_http;
 
@@ -236,8 +237,7 @@ void HttpSession::start() {
 
 void HttpSession::on_resolve(const boost::system::error_code& ec, boost::asio::ip::tcp::resolver::results_type results){
     if (ec) {
-        std::cout << "Unable to resolve " << m_url << ": "
-            << ec.message() << std::endl;
+        onError("HttpSession unable to resolve " + m_url + ": " + ec.message());
         return;
     }
 
@@ -263,8 +263,7 @@ void HttpSession::on_resolve(const boost::system::error_code& ec, boost::asio::i
 
 void HttpSession::on_connect(const boost::system::error_code& ec, boost::asio::ip::tcp::resolver::results_type::endpoint_type){
     if (ec) {
-        std::cout << "Unable to connect " << m_url << ": "
-            << ec.message() << std::endl;
+        onError("HttpSession unable to connect " + m_url + ": " + ec.message());
         return;
     } 
 
@@ -288,8 +287,7 @@ void HttpSession::on_connect(const boost::system::error_code& ec, boost::asio::i
 void HttpSession::on_handshake(const boost::system::error_code& ec)
 {
     if (ec) {
-        std::cout << "Unable to handshake " << m_url << ": "
-            << ec.message() << std::endl;
+        onError("HttpSession unable to handshake " + m_url + ": " + ec.message());
         return;
     }
 
@@ -305,10 +303,10 @@ void HttpSession::on_handshake(const boost::system::error_code& ec)
 
 void HttpSession::on_write(const boost::system::error_code& ec, size_t bytes_transferred){
     if (ec) {
-        std::cout << "Unable to on_write " << m_url << ": "
-            << ec.message() << std::endl;
+        onError("HttpSession unable to on_write " + m_url + ": " + ec.message());
         return;
     }
+
     boost::ignore_unused(bytes_transferred);
 
     if(instance_uri.port == "443") {
@@ -329,8 +327,7 @@ void HttpSession::on_write(const boost::system::error_code& ec, size_t bytes_tra
 void HttpSession::on_read(const boost::system::error_code& ec, size_t bytes_transferred) {
 
     if (ec) {
-        std::cout << "Unable to on_read " << m_url << ": "
-            << ec.message() << std::endl;
+        onError("HttpSession unable to on_read " + m_url + ": " + ec.message());
         return;
     }
 
@@ -349,19 +346,160 @@ void HttpSession::on_read(const boost::system::error_code& ec, size_t bytes_tran
     m_callback(m_result);
 }
 
-
 void HttpSession::onError(const std::string& error, const std::string& details) {
-    g_logger.error(stdext::format("HttpSession error %s", error));
+    g_logger.error(stdext::format("%s", error));
 }
 
 void WebsocketSession::start(){
-    std::cout << "WebsocketSession::start\n";
+    instance_uri = parseURI(m_url);
+    boost::asio::ip::tcp::resolver::query query_resolver(instance_uri.domain, instance_uri.port);
+
+	m_resolver.async_resolve(
+		query_resolver,
+		boost::beast::bind_front_handler(&WebsocketSession::on_resolve,
+			shared_from_this()));
+}
+
+void WebsocketSession::on_resolve(const boost::system::error_code& ec, boost::asio::ip::tcp::resolver::results_type results) {
+    if (ec) {
+        onError("WebsocketSession unable to resolve " + m_url + ": " + ec.message());
+        return;
+    }
+
+    // Set the timeout for the operation
+    boost::beast::get_lowest_layer(m_socket).expires_after(std::chrono::seconds(30));
+
+    // Make the connection on the IP address we get from a lookup
+    boost::beast::get_lowest_layer(m_socket).async_connect(
+        results,
+        boost::beast::bind_front_handler(
+            &WebsocketSession::on_connect,
+            shared_from_this()));
+}
+
+void WebsocketSession::on_connect(const boost::system::error_code& ec, boost::asio::ip::tcp::resolver::results_type::endpoint_type) {
+    if (ec) {
+        onError("WebsocketSession unable to on_connect " + m_url + ": " + ec.message());
+        return;
+    }
+
+    // Turn off the timeout on the tcp_stream, because
+    // the websocket stream has its own timeout system.
+    boost::beast::get_lowest_layer(m_socket).expires_never();
+
+    // Set suggested timeout settings for the websocket
+    m_socket.set_option(
+        boost::beast::websocket::stream_base::timeout::suggested(
+            boost::beast::role_type::client));
+
+    // Set a decorator to change the User-Agent of the handshake
+    m_socket.set_option(boost::beast::websocket::stream_base::decorator(
+        [](boost::beast::websocket::request_type& req)
+        {
+            req.set(boost::beast::http::field::user_agent,
+                std::string(BOOST_BEAST_VERSION_STRING) +
+                    " websocket-client-otclient");
+        }));
+
+    // Update the host_ string. This will provide the value of the
+    // Host HTTP header during the WebSocket handshake.
+    // See https://tools.ietf.org/html/rfc7230#section-5.4
+    std::string host_ = instance_uri.domain + ':' + instance_uri.port;
+
+    // Perform the websocket handshake
+    m_socket.async_handshake(host_, "/",
+        boost::beast::bind_front_handler(
+            &WebsocketSession::on_handshake,
+            shared_from_this()));
+}
+
+void WebsocketSession::on_handshake(const boost::system::error_code& ec)
+{
+    if (ec) {
+        onError("WebsocketSession unable to handshake " + m_url + ": " + ec.message());
+        return;
+    }
+
+    m_closed = false;
+    m_callback(WEBSOCKET_OPEN, "open::normal");
+
+    // Send the message
+    m_socket.async_write(
+        boost::asio::buffer(m_sendQueue.front()),
+        boost::beast::bind_front_handler(
+            &WebsocketSession::on_write,
+            shared_from_this()));
+}
+
+void WebsocketSession::on_write(const boost::system::error_code& ec, size_t bytes_transferred){
+    if (ec) {
+        onError("WebsocketSession unable to on_write " + m_url + ": " + ec.message());
+        return;
+    }
+
+    boost::ignore_unused(bytes_transferred);
+
+    if(m_sendQueue.size() > 0 ) {
+        m_sendQueue.pop();
+    }
+
+    // Read a message into our buffer
+    m_socket.async_read(
+        m_streambuf,
+        boost::beast::bind_front_handler(
+            &WebsocketSession::on_read,
+            shared_from_this()));
+}
+
+void WebsocketSession::on_read(const boost::system::error_code& ec, size_t bytes_transferred) {
+    if (ec) {
+        onError("WebsocketSession unable to on_read " + m_url + ": " + ec.message());
+        return;
+    }
+
+    boost::ignore_unused(bytes_transferred);
+    m_callback(WEBSOCKET_MESSAGE, boost::beast::buffers_to_string(m_streambuf.data())); 
+    m_streambuf.consume(m_streambuf.size());
+
+    m_socket.async_read(
+        m_streambuf,
+        boost::beast::bind_front_handler(
+            &WebsocketSession::on_read,
+            shared_from_this()));
+}
+
+void WebsocketSession::on_close(const boost::system::error_code& ec) {
+    if (ec) {
+        onError("WebsocketSession unable to on_close " + m_url + ": " + ec.message());
+        return;
+    }
+    m_closed = true;
+    m_callback(WEBSOCKET_CLOSE, "close_code::normal");
+}
+
+void WebsocketSession::onError(const std::string& error, const std::string& details) {
+    g_logger.error(stdext::format("WebsocketSession error %s", error));
+    m_closed = true;
+    m_callback(WEBSOCKET_ERROR, "close_code::error " + error);
 }
 
 void WebsocketSession::send(std::string data){
-    std::cout << "WebsocketSession::send\n";
+    if(m_socket.is_open()) {
+        m_sendQueue.push(data);
+        m_socket.write(boost::asio::buffer(m_sendQueue.front()));
+        m_sendQueue.pop();
+    } else {
+        //  connect again
+        start();
+    }
 }
 
 void WebsocketSession::close(){
-    std::cout << "WebsocketSession::close\n";
+    // Close the WebSocket connection
+    if(m_socket.is_open()) {
+        m_socket.async_close(boost::beast::websocket::close_code::normal,
+            boost::beast::bind_front_handler(
+                &WebsocketSession::on_close,
+                shared_from_this()));
+    }
 }

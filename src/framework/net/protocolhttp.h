@@ -118,7 +118,7 @@ class WebsocketSession : public std::enable_shared_from_this<WebsocketSession>
 public:
 
     WebsocketSession(boost::asio::io_service& service, const std::string& url, const std::string& agent, int timeout, HttpResult_ptr result, WebsocketSession_cb callback) :
-        m_service(service), m_url(url), m_agent(agent), m_resolver(service), m_callback(callback), m_result(result), m_timer(service), m_timeout(timeout)
+        m_service(service), m_socket(service), m_url(url), m_agent(agent), m_resolver(service), m_callback(callback), m_result(result), m_timer(service), m_timeout(timeout)
     {
         // VALIDATE(m_callback);
         // VALIDATE(m_result);
@@ -138,20 +138,24 @@ private:
     boost::asio::steady_timer m_timer;
     int m_timeout;
     bool m_closed;
+    ParsedURI instance_uri;
     std::string m_domain;
 
-    std::shared_ptr<boost::beast::websocket::stream<boost::beast::tcp_stream>> m_socket;
+    boost::beast::websocket::stream<boost::beast::tcp_stream> m_socket;
     std::shared_ptr<boost::beast::websocket::stream<boost::beast::ssl_stream<boost::beast::tcp_stream>>> m_ssl;
     std::shared_ptr<boost::asio::ssl::context> m_context;
 
     boost::beast::flat_buffer m_streambuf{ 16 * 1024 * 1024 }; // limited to 16MB
     std::queue<std::string> m_sendQueue;
 
-    void on_resolve(const boost::system::error_code& ec, boost::asio::ip::tcp::resolver::iterator iterator);
-    void on_connect(const boost::system::error_code& ec);
+    void on_resolve(const boost::system::error_code& ec, boost::asio::ip::tcp::resolver::results_type results);
+    void on_connect(const boost::system::error_code& ec, boost::asio::ip::tcp::resolver::results_type::endpoint_type);
     void on_handshake(const boost::system::error_code& ec);
-    void on_send(const boost::system::error_code& ec);
+
+    void on_write(const boost::system::error_code& ec, size_t bytes_transferred);
     void on_read(const boost::system::error_code& ec, size_t bytes_transferred);
+
+    void on_close(const boost::system::error_code& ec);
     void onTimeout(const boost::system::error_code& error);
     void onError(const std::string& error, const std::string& details = "");
 };

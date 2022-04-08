@@ -1,5 +1,6 @@
 HTTP = {
   timeout=5,
+  websocketTimeout=15,
   agent="Mozilla/5.0",
   imageId=1000,
   images={},
@@ -74,6 +75,36 @@ function HTTP.downloadImage(url, callback)
   return operation
 end
 
+function HTTP.webSocket(url, callbacks, timeout, jsonWebsocket)
+  if not g_http or not g_http.ws then
+    return error("WebSocket is not supported")
+  end
+  if not timeout or timeout < 1 then
+    timeout = HTTP.websocketTimeout
+  end
+  local operation = g_http.ws(url, timeout)
+  HTTP.operations[operation] = {type="ws", json=jsonWebsocket, url=url, callbacks=callbacks}  
+  return {
+    id = operation,
+    url = url,
+    close = function() 
+      g_http.wsClose(operation)
+    end,
+    send = function(message)
+      if type(message) == "table" then
+        message = json.encode(message)
+      end
+      g_http.wsSend(operation, message)
+    end
+  }
+end
+HTTP.WebSocket = HTTP.webSocket
+
+function HTTP.webSocketJSON(url, callbacks, timeout)
+  return HTTP.webSocket(url, callbacks, timeout, true)
+end
+HTTP.WebSocketJSON = HTTP.webSocketJSON
+
 function HTTP.cancel(operationId)
   if not g_http or not g_http.cancel then
     return
@@ -83,7 +114,6 @@ function HTTP.cancel(operationId)
 end
 
 function HTTP.onGet(operationId, url, err, data)
-  -- print("HTTP.onGet")
   local operation = HTTP.operations[operationId]
   if operation == nil then
     return
@@ -110,7 +140,6 @@ function HTTP.onGet(operationId, url, err, data)
 end
 
 function HTTP.onGetProgress(operationId, url, progress)
-  -- print("HTTP.onGetProgress")
   local operation = HTTP.operations[operationId]
   if operation == nil then
     return
@@ -181,6 +210,67 @@ function HTTP.onDownloadProgress(operationId, url, progress, speed)
   end
 end
 
+function HTTP.onWsOpen(operationId, message)
+  local operation = HTTP.operations[operationId]
+  if operation == nil then
+    return
+  end
+  if operation.callbacks.onOpen then
+    operation.callbacks.onOpen(message, operationId)
+  end
+end
+
+function HTTP.onWsMessage(operationId, message)
+  local operation = HTTP.operations[operationId]
+  if operation == nil then
+    return
+  end
+  if operation.callbacks.onMessage then
+    if operation.json then
+      if message:len() == 0 then
+        message = "null"
+      end
+      local status, result = pcall(function() return json.decode(message) end)
+      local err = nil
+      if not status then
+        err = "JSON ERROR: " .. result
+        if message and message:len() > 0 then
+          err = err .. " (" .. message:sub(1, 100) .. ")"
+        end
+      end
+      if err then
+        if operation.callbacks.onError then
+          operation.callbacks.onError(err, operationId)
+        end        
+      else
+        operation.callbacks.onMessage(result, operationId)    
+      end
+    else
+      operation.callbacks.onMessage(message, operationId)
+    end
+  end
+end
+
+function HTTP.onWsClose(operationId, message)
+  local operation = HTTP.operations[operationId]
+  if operation == nil then
+    return
+  end
+  if operation.callbacks.onClose then
+    operation.callbacks.onClose(message, operationId)
+  end
+end
+
+function HTTP.onWsError(operationId, message)
+  local operation = HTTP.operations[operationId]
+  if operation == nil then
+    return
+  end
+  if operation.callbacks.onError then
+    operation.callbacks.onError(message, operationId)
+  end
+end
+
 function HTTP.addCustomHeader(headerTable)
   for name, value in pairs(headerTable) do
     g_http.addCustomHeader(name, value)
@@ -194,7 +284,11 @@ connect(g_http,
     onPost = HTTP.onPost,
     onPostProgress = HTTP.onPostProgress,
     onDownload = HTTP.onDownload,
-    onDownloadProgress = HTTP.onDownloadProgress
+    onDownloadProgress = HTTP.onDownloadProgress,
+    onWsOpen = HTTP.onWsOpen,
+    onWsMessage = HTTP.onWsMessage,
+    onWsClose = HTTP.onWsClose,
+    onWsError = HTTP.onWsError,
   })
 
 g_http.setUserAgent(HTTP.agent)
