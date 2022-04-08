@@ -94,7 +94,7 @@ local function parseMarketDetail(protocol, msg)
     end
 
     local descriptions = {}
-    local lastAttribute = MarketItemDescription.ImbuingSlots
+    local lastAttribute = MarketItemDescription.Weight
     if g_game.getClientVersion() >= 1281 then
         lastAttribute = MarketItemDescription.Last
     end
