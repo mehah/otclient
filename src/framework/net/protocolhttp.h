@@ -18,14 +18,6 @@
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ssl.hpp>
 
-// error handling
-// #if defined(NDEBUG)
-// #define VALIDATE(expression) ((void)0)
-// #else
-// extern void fatalError(const char* error, const char* file, int line);
-// #define VALIDATE(expression) { if(!(expression)) fatalError(#expression, __FILE__, __LINE__); };
-// #endif
-
 //  result
 class HttpSession;
 
@@ -63,8 +55,8 @@ public:
         m_service(service), m_url(url), m_agent(agent), m_custom_header(custom_header), m_socket(service), m_resolver(service),
         m_callback(callback), m_result(result), m_timer(service), m_timeout(timeout)
     {
-        // VALIDATE(m_callback);
-        // VALIDATE(m_result);
+        assert(m_callback != nullptr);
+        assert(m_result != nullptr);
         m_ssl.set_verify_mode(boost::asio::ssl::verify_none);
     };
 
@@ -120,8 +112,8 @@ public:
     WebsocketSession(boost::asio::io_service& service, const std::string& url, const std::string& agent, int timeout, HttpResult_ptr result, WebsocketSession_cb callback) :
         m_service(service), m_socket(service), m_url(url), m_agent(agent), m_resolver(service), m_callback(callback), m_result(result), m_timer(service), m_timeout(timeout)
     {
-        // VALIDATE(m_callback);
-        // VALIDATE(m_result);
+        assert(m_callback != nullptr);
+        assert(m_result != nullptr);
     };
 
     void start();
@@ -142,14 +134,15 @@ private:
     std::string m_domain;
 
     boost::beast::websocket::stream<boost::beast::tcp_stream> m_socket;
-    std::shared_ptr<boost::beast::websocket::stream<boost::beast::ssl_stream<boost::beast::tcp_stream>>> m_ssl;
-    std::shared_ptr<boost::asio::ssl::context> m_context;
+    boost::asio::ssl::context m_context{ boost::asio::ssl::context::sslv23_client };
+    boost::beast::websocket::stream<boost::beast::ssl_stream<boost::beast::tcp_stream>> m_ssl{ m_service, m_context };
 
     boost::beast::flat_buffer m_streambuf{ 16 * 1024 * 1024 }; // limited to 16MB
     std::queue<std::string> m_sendQueue;
 
     void on_resolve(const boost::system::error_code& ec, boost::asio::ip::tcp::resolver::results_type results);
     void on_connect(const boost::system::error_code& ec, boost::asio::ip::tcp::resolver::results_type::endpoint_type);
+    void on_ssl_handshake(const boost::system::error_code& ec);
     void on_handshake(const boost::system::error_code& ec);
 
     void on_write(const boost::system::error_code& ec, size_t bytes_transferred);

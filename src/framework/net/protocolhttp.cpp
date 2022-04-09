@@ -353,6 +353,7 @@ void HttpSession::onError(const std::string& error, const std::string& details) 
 void WebsocketSession::start(){
     instance_uri = parseURI(m_url);
     boost::asio::ip::tcp::resolver::query query_resolver(instance_uri.domain, instance_uri.port);
+    m_domain = instance_uri.domain;
 
 	m_resolver.async_resolve(
 		query_resolver,
@@ -366,15 +367,27 @@ void WebsocketSession::on_resolve(const boost::system::error_code& ec, boost::as
         return;
     }
 
-    // Set the timeout for the operation
-    boost::beast::get_lowest_layer(m_socket).expires_after(std::chrono::seconds(30));
+    if(instance_uri.port == "443") {
+        // Set a timeout on the operation
+        boost::beast::get_lowest_layer(m_ssl).expires_after(std::chrono::seconds(m_timeout));
 
-    // Make the connection on the IP address we get from a lookup
-    boost::beast::get_lowest_layer(m_socket).async_connect(
-        results,
-        boost::beast::bind_front_handler(
-            &WebsocketSession::on_connect,
-            shared_from_this()));
+        // Make the connection on the IP address we get from a lookup
+        boost::beast::get_lowest_layer(m_ssl).async_connect(
+            results,
+            boost::beast::bind_front_handler(
+                &WebsocketSession::on_connect,
+                shared_from_this()));        
+    } else {
+        // Set the timeout for the operation
+        boost::beast::get_lowest_layer(m_socket).expires_after(std::chrono::seconds(m_timeout));
+
+        // Make the connection on the IP address we get from a lookup
+        boost::beast::get_lowest_layer(m_socket).async_connect(
+            results,
+            boost::beast::bind_front_handler(
+                &WebsocketSession::on_connect,
+                shared_from_this()));
+    }
 }
 
 void WebsocketSession::on_connect(const boost::system::error_code& ec, boost::asio::ip::tcp::resolver::results_type::endpoint_type) {
@@ -383,31 +396,90 @@ void WebsocketSession::on_connect(const boost::system::error_code& ec, boost::as
         return;
     }
 
+    if(instance_uri.port == "443") {
+        // Set a timeout on the operation
+        boost::beast::get_lowest_layer(m_ssl).expires_after(std::chrono::seconds(m_timeout));
+
+        // Set SNI Hostname (many hosts need this to handshake successfully)
+        if(! SSL_set_tlsext_host_name(
+                m_ssl.next_layer().native_handle(),
+                m_domain.c_str()))
+        {
+            auto _ec = boost::beast::error_code(static_cast<int>(::ERR_get_error()),
+                boost::asio::error::get_ssl_category());
+             onError("WebsocketSession unable to ssl connect" + _ec.message());
+             return;
+        }
+
+        // Update the host_ string. This will provide the value of the
+        // Host HTTP header during the WebSocket handshake.
+        // See https://tools.ietf.org/html/rfc7230#section-5.4
+        m_domain += ':' + instance_uri.port;
+        
+        // Perform the SSL handshake
+        m_ssl.next_layer().async_handshake(
+            boost::asio::ssl::stream_base::client,
+            boost::beast::bind_front_handler(
+                &WebsocketSession::on_ssl_handshake,
+                shared_from_this()));        
+    } else {
+        // Turn off the timeout on the tcp_stream, because
+        // the websocket stream has its own timeout system.
+        boost::beast::get_lowest_layer(m_socket).expires_never();
+
+        // Set suggested timeout settings for the websocket
+        m_socket.set_option(
+            boost::beast::websocket::stream_base::timeout::suggested(
+                boost::beast::role_type::client));
+
+        // Set a decorator to change the User-Agent of the handshake
+        m_socket.set_option(boost::beast::websocket::stream_base::decorator(
+            [](boost::beast::websocket::request_type& req)
+            {
+                req.set(boost::beast::http::field::user_agent,
+                    std::string(BOOST_BEAST_VERSION_STRING) +
+                        " websocket-client-otclient");
+            }));
+
+        // Update the host_ string. This will provide the value of the
+        // Host HTTP header during the WebSocket handshake.
+        // See https://tools.ietf.org/html/rfc7230#section-5.4
+        m_domain += ':' + instance_uri.port;
+
+        // Perform the websocket handshake
+        m_socket.async_handshake(m_domain, instance_uri.query,
+            boost::beast::bind_front_handler(
+                &WebsocketSession::on_handshake,
+                shared_from_this()));
+    }
+}
+
+void WebsocketSession::on_ssl_handshake(const boost::system::error_code& ec) {
+    if (ec) {
+        onError("WebsocketSession unable to ssl_handshake " + m_url + ": " + ec.message());
+        return;
+    }
+
     // Turn off the timeout on the tcp_stream, because
     // the websocket stream has its own timeout system.
-    boost::beast::get_lowest_layer(m_socket).expires_never();
+    boost::beast::get_lowest_layer(m_ssl).expires_never();
 
     // Set suggested timeout settings for the websocket
-    m_socket.set_option(
+    m_ssl.set_option(
         boost::beast::websocket::stream_base::timeout::suggested(
             boost::beast::role_type::client));
 
     // Set a decorator to change the User-Agent of the handshake
-    m_socket.set_option(boost::beast::websocket::stream_base::decorator(
+    m_ssl.set_option(boost::beast::websocket::stream_base::decorator(
         [](boost::beast::websocket::request_type& req)
         {
             req.set(boost::beast::http::field::user_agent,
                 std::string(BOOST_BEAST_VERSION_STRING) +
-                    " websocket-client-otclient");
+                    " websocket-client-otclient-async-ssl");
         }));
 
-    // Update the host_ string. This will provide the value of the
-    // Host HTTP header during the WebSocket handshake.
-    // See https://tools.ietf.org/html/rfc7230#section-5.4
-    std::string host_ = instance_uri.domain + ':' + instance_uri.port;
-
     // Perform the websocket handshake
-    m_socket.async_handshake(host_, "/",
+    m_ssl.async_handshake(m_domain, instance_uri.query,
         boost::beast::bind_front_handler(
             &WebsocketSession::on_handshake,
             shared_from_this()));
@@ -423,12 +495,21 @@ void WebsocketSession::on_handshake(const boost::system::error_code& ec)
     m_closed = false;
     m_callback(WEBSOCKET_OPEN, "open::normal");
 
-    // Send the message
-    m_socket.async_write(
-        boost::asio::buffer(m_sendQueue.front()),
-        boost::beast::bind_front_handler(
-            &WebsocketSession::on_write,
-            shared_from_this()));
+    if(instance_uri.port == "443") {
+        // Send the message
+        m_ssl.async_write(
+            boost::asio::buffer(m_sendQueue.front()),
+            boost::beast::bind_front_handler(
+                &WebsocketSession::on_write,
+                shared_from_this()));     
+    } else {
+        // Send the message
+        m_socket.async_write(
+            boost::asio::buffer(m_sendQueue.front()),
+            boost::beast::bind_front_handler(
+                &WebsocketSession::on_write,
+                shared_from_this()));
+    }
 }
 
 void WebsocketSession::on_write(const boost::system::error_code& ec, size_t bytes_transferred){
@@ -443,12 +524,21 @@ void WebsocketSession::on_write(const boost::system::error_code& ec, size_t byte
         m_sendQueue.pop();
     }
 
-    // Read a message into our buffer
-    m_socket.async_read(
-        m_streambuf,
-        boost::beast::bind_front_handler(
-            &WebsocketSession::on_read,
-            shared_from_this()));
+    if(instance_uri.port == "443") {
+        // Read a message into our buffer
+        m_ssl.async_read(
+            m_streambuf,
+            boost::beast::bind_front_handler(
+                &WebsocketSession::on_read,
+                shared_from_this()));
+    } else {
+        // Read a message into our buffer
+        m_socket.async_read(
+            m_streambuf,
+            boost::beast::bind_front_handler(
+                &WebsocketSession::on_read,
+                shared_from_this()));
+    }
 }
 
 void WebsocketSession::on_read(const boost::system::error_code& ec, size_t bytes_transferred) {
@@ -459,13 +549,23 @@ void WebsocketSession::on_read(const boost::system::error_code& ec, size_t bytes
 
     boost::ignore_unused(bytes_transferred);
     m_callback(WEBSOCKET_MESSAGE, boost::beast::buffers_to_string(m_streambuf.data())); 
-    m_streambuf.consume(m_streambuf.size());
+    // m_streambuf.consume(m_streambuf.size());
+    m_streambuf.clear();
 
-    m_socket.async_read(
-        m_streambuf,
-        boost::beast::bind_front_handler(
-            &WebsocketSession::on_read,
-            shared_from_this()));
+    stdext::millisleep(100);
+    if(instance_uri.port == "443") {
+        m_ssl.async_read(
+            m_streambuf,
+            boost::beast::bind_front_handler(
+                &WebsocketSession::on_read,
+                shared_from_this()));        
+    } else {
+        m_socket.async_read(
+            m_streambuf,
+            boost::beast::bind_front_handler(
+                &WebsocketSession::on_read,
+                shared_from_this()));
+    }
 }
 
 void WebsocketSession::on_close(const boost::system::error_code& ec) {
@@ -484,22 +584,43 @@ void WebsocketSession::onError(const std::string& error, const std::string& deta
 }
 
 void WebsocketSession::send(std::string data){
-    if(m_socket.is_open()) {
-        m_sendQueue.push(data);
-        m_socket.write(boost::asio::buffer(m_sendQueue.front()));
-        m_sendQueue.pop();
+    if(instance_uri.port == "443") {
+        if(m_ssl.is_open() && !m_closed) {
+            m_sendQueue.push(data);
+            m_ssl.write(boost::asio::buffer(m_sendQueue.front()));
+            m_sendQueue.pop();
+        } else {
+            //  connect again
+            start();
+        }        
     } else {
-        //  connect again
-        start();
+        if(m_socket.is_open() && !m_closed) {
+            m_sendQueue.push(data);
+            m_socket.write(boost::asio::buffer(m_sendQueue.front()));
+            m_sendQueue.pop();
+        } else {
+            //  connect again
+            start();
+        }
     }
 }
 
 void WebsocketSession::close(){
-    // Close the WebSocket connection
-    if(m_socket.is_open()) {
-        m_socket.async_close(boost::beast::websocket::close_code::normal,
-            boost::beast::bind_front_handler(
-                &WebsocketSession::on_close,
-                shared_from_this()));
+    if(instance_uri.port == "443") {
+        // Close the WebSocket connection
+        if(m_ssl.is_open()) {
+            m_ssl.async_close(boost::beast::websocket::close_code::normal,
+                boost::beast::bind_front_handler(
+                    &WebsocketSession::on_close,
+                    shared_from_this()));
+        }
+    } else {
+        // Close the WebSocket connection
+        if(m_socket.is_open()) {
+            m_socket.async_close(boost::beast::websocket::close_code::normal,
+                boost::beast::bind_front_handler(
+                    &WebsocketSession::on_close,
+                    shared_from_this()));
+        }
     }
 }
