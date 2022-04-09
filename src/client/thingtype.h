@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,8 @@
  * THE SOFTWARE.
  */
 
-#pragma once
+#ifndef THINGTYPE_H
+#define THINGTYPE_H
 
 #include "animator.h"
 #include "declarations.h"
@@ -31,8 +32,7 @@
 #include <framework/net/server.h>
 #include <framework/otml/declarations.h>
 
-using namespace tibia::protobuf;
-using namespace shared;
+using namespace otclient::protobuf;
 
 enum class TextureType
 {
@@ -147,7 +147,7 @@ public:
     void unserializeOtml(const OTMLNodePtr& node);
 
     void serialize(const FileStreamPtr& fin);
-    void exportImage(const std::string_view fileName);
+    void exportImage(const std::string& fileName);
 
     void draw(const Point& dest, float scaleFactor, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, TextureType textureType, Color color = Color::white, LightView* lightView = nullptr);
 
@@ -277,3 +277,5 @@ private:
     std::vector<std::vector<Rect>> m_texturesFramesOriginRects;
     std::vector<std::vector<Point>> m_texturesFramesOffsets;
 };
+
+#endif

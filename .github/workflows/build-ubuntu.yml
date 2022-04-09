@@ -1,0 +1,80 @@
+---
+name: Build - Ubuntu
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+env:
+  VCPKG_BUILD_TYPE: release
+  CMAKE_BUILD_PARALLEL_LEVEL: 2
+  MAKEFLAGS: '-j 2'
+
+jobs:
+  job:
+    name: ${{ matrix.os }}-${{ matrix.buildtype }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-20.04]
+        buildtype: [Debug, RelWithDebInfo]
+        include:
+          - os: ubuntu-20.04
+            triplet: x64-linux
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Ubuntu - install packages
+        run: sudo apt-get update && sudo apt-get install libglew-dev libx11-dev libluajit-5.1-dev linux-headers-$(uname -r)
+
+      - name: Switch to gcc-11
+        run: |
+          sudo apt install gcc-11 g++-11
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 100 --slave /usr/bin/g++ g++ /usr/bin/g++-11 --slave /usr/bin/gcov gcov /usr/bin/gcov-11
+          sudo update-alternatives --set gcc /usr/bin/gcc-11
+
+      - name: CCache
+        id: ccache
+        uses: actions/cache@v2
+        with:
+          path: /home/runner/.ccache
+          key: ccache-${{ matrix.os }}-${{ matrix.buildtype }}-${{ hashFiles('**/src') }}
+          restore-keys: |
+            ccache-${{ matrix.os }}-${{ matrix.buildtype }}-
+            ccache-${{ matrix.os }}-
+      - name: Restore artifacts, or setup vcpkg (do not install any package)
+        uses: lukka/run-vcpkg@v7
+        with:
+          setupOnly: true
+          vcpkgDirectory: ${{ github.workspace }}/vcpkg
+          appendedCacheKey: ${{ hashFiles( '**/vcpkg.json' ) }}
+          vcpkgTriplet: ${{ matrix.triplet }}
+          additionalCachedPaths: ${{ github.workspace }}/build/vcpkg_installed
+          vcpkgGitCommitId: d72783cb3aeddfd667861caef1060e54ca6fa7a9
+
+      - name: Get latest CMake and ninja
+        uses: lukka/get-cmake@latest
+
+      - name: Build with CMake
+        uses: lukka/run-cmake@v3
+        with:
+          cmakeListsTxtPath: ${{ github.workspace }}/CMakeLists.txt
+          useVcpkgToolchainFile: true
+          buildDirectory: ${{ github.workspace }}/build
+          cmakeBuildType: ${{ matrix.buildtype }}
+
+      - name: dir
+        run: find $RUNNER_WORKSPACE
+        shell: bash
+
+      - name: Upload artifact binary (exe)
+        uses: actions/upload-artifact@v3.0.0
+        with:
+          name: otclient-${{ matrix.name }}-${{ matrix.buildtype }}-${{ github.sha }}
+          path: ${{ github.workspace }}/build/bin/otclient
+

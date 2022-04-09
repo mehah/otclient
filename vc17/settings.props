@@ -9,7 +9,6 @@
         BOT_PROTECTION;
         OTCLIENT;
         CRASH_HANDLER;
-        FW_GRAPHICS;
         FW_NET;
         FW_SOUND;
         FW_XML;

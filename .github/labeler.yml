@@ -1,0 +1,6 @@
+---
+source:
+  - any: ['src/**/*']
+
+data:
+  - any: ['data/**/*']

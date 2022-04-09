@@ -420,13 +420,6 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
     <ClCompile Include="..\src\framework\core\config.cpp" />
     <ClCompile Include="..\src\framework\core\configmanager.cpp" />
     <ClCompile Include="..\src\framework\core\event.cpp">
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">FW_GRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='static|Win32'">FW_GRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release - GIT Version|Win32'">FW_GRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">FW_GRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='static|x64'">FW_GRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release - GIT Version|x64'">FW_GRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
     <ClCompile Include="..\src\framework\core\eventdispatcher.cpp" />
     <ClCompile Include="..\src\framework\core\filestream.cpp" />
     <ClCompile Include="..\src\framework\core\graphicalapplication.cpp" />
@@ -465,7 +458,6 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
     <ClCompile Include="..\src\framework\graphics\texture.cpp" />
     <ClCompile Include="..\src\framework\graphics\texturemanager.cpp" />
     <ClCompile Include="..\src\framework\input\mouse.cpp" />
-    <ClCompile Include="..\src\framework\luaengine\lbitlib.cpp" />
     <ClCompile Include="..\src\framework\luaengine\luaexception.cpp" />
     <ClCompile Include="..\src\framework\luaengine\luainterface.cpp" />
     <ClCompile Include="..\src\framework\luaengine\luaobject.cpp" />
@@ -626,7 +618,6 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
     <ClInclude Include="..\src\framework\graphics\vertexarray.h" />
     <ClInclude Include="..\src\framework\input\mouse.h" />
     <ClInclude Include="..\src\framework\luaengine\declarations.h" />
-    <ClInclude Include="..\src\framework\luaengine\lbitlib.h" />
     <ClInclude Include="..\src\framework\luaengine\luabinder.h" />
     <ClInclude Include="..\src\framework\luaengine\luaexception.h" />
     <ClInclude Include="..\src\framework\luaengine\luainterface.h" />

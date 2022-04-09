@@ -1,0 +1,22 @@
+{
+  "name": "otclient",
+  "version-string": "1.0.0",
+    "dependencies": [
+        "asio",
+        "opengl",
+        "glew",
+        "libogg",
+        "libvorbis",
+        "nlohmann-json",
+        "openal-soft",
+        "openssl",
+        "physfs",
+        "protobuf",
+        "zlib",
+        "liblzma",
+        {
+          "name": "luajit",
+          "platform": "windows"
+        }
+    ]
+}
