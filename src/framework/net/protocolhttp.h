@@ -1,5 +1,5 @@
-#ifndef  HTTP_H
-#define HTTP_H
+#ifndef  PROTOCOLHTTP_H
+#define PROTOCOLHTTP_H
 
 #include <framework/global.h>
 #include <framework/stdext/uri.h>
@@ -50,16 +50,23 @@ class HttpSession : public std::enable_shared_from_this<HttpSession>
 public:
 
     HttpSession(boost::asio::io_service& service, const std::string& url, const std::string& agent, 
-                const std::map<std::string, std::string>& custom_header,
-                int timeout, HttpResult_ptr result, HttpResult_cb callback) :
-        m_service(service), m_url(url), m_agent(agent), m_custom_header(custom_header), m_socket(service), m_resolver(service),
-        m_callback(callback), m_result(result), m_timer(service), m_timeout(timeout)
+            const std::map<std::string, std::string>& custom_header,
+            int timeout, HttpResult_ptr result, HttpResult_cb callback) :
+                m_service(service),
+                m_url(url),
+                m_agent(agent),
+                m_custom_header(custom_header),
+                m_timeout(timeout),
+                m_result(result),
+                m_callback(callback),
+                m_socket(service),
+                m_resolver(service),
+                m_timer(service)
     {
         assert(m_callback != nullptr);
         assert(m_result != nullptr);
         m_ssl.set_verify_mode(boost::asio::ssl::verify_none);
     };
-
     void start();
     void cancel() { onError("canceled"); }
     
@@ -67,18 +74,18 @@ private:
     boost::asio::io_service& m_service;
     std::string m_url;
     std::string m_agent;
-    HttpResult_cb m_callback;
-    HttpResult_ptr m_result;
-    boost::asio::steady_timer m_timer;
-    int m_timeout;
-    ParsedURI instance_uri;
     std::map<std::string, std::string> m_custom_header;
+    int m_timeout;
+    HttpResult_ptr m_result;
+    HttpResult_cb m_callback;
+    boost::beast::tcp_stream m_socket;    
+    boost::asio::ip::tcp::resolver m_resolver;
+    boost::asio::steady_timer m_timer;
+    ParsedURI instance_uri;
 
     boost::asio::ssl::context m_context{ boost::asio::ssl::context::sslv23_client };
     boost::asio::ssl::stream<boost::beast::tcp_stream> m_ssl{ m_service, m_context };
 
-    boost::asio::ip::tcp::resolver m_resolver;
-    boost::beast::tcp_stream m_socket;
     boost::beast::flat_buffer m_streambuf{ 512 * 1024 * 1024 }; // (Must persist between reads)
     boost::beast::http::request<boost::beast::http::string_body> m_request;
     boost::beast::http::response_parser<boost::beast::http::dynamic_body> m_response;
@@ -110,7 +117,14 @@ class WebsocketSession : public std::enable_shared_from_this<WebsocketSession>
 public:
 
     WebsocketSession(boost::asio::io_service& service, const std::string& url, const std::string& agent, int timeout, HttpResult_ptr result, WebsocketSession_cb callback) :
-        m_service(service), m_socket(service), m_url(url), m_agent(agent), m_resolver(service), m_callback(callback), m_result(result), m_timer(service), m_timeout(timeout)
+            m_service(service),
+            m_url(url),
+            m_agent(agent),
+            m_timeout(timeout),
+            m_result(result),
+            m_callback(callback),
+            m_timer(service),
+            m_resolver(service)
     {
         assert(m_callback != nullptr);
         assert(m_result != nullptr);
@@ -124,16 +138,16 @@ private:
     boost::asio::io_service& m_service;
     std::string m_url;
     std::string m_agent;
-    boost::asio::ip::tcp::resolver m_resolver;
-    WebsocketSession_cb m_callback;
-    HttpResult_ptr m_result;
-    boost::asio::steady_timer m_timer;
     int m_timeout;
+    HttpResult_ptr m_result;
+    WebsocketSession_cb m_callback;
+    boost::asio::steady_timer m_timer;
+    boost::asio::ip::tcp::resolver m_resolver;
     bool m_closed;
     ParsedURI instance_uri;
     std::string m_domain;
 
-    boost::beast::websocket::stream<boost::beast::tcp_stream> m_socket;
+    boost::beast::websocket::stream<boost::beast::tcp_stream> m_socket{m_service};
     boost::asio::ssl::context m_context{ boost::asio::ssl::context::sslv23_client };
     boost::beast::websocket::stream<boost::beast::ssl_stream<boost::beast::tcp_stream>> m_ssl{ m_service, m_context };
 
@@ -210,4 +224,4 @@ private:
 
 extern Http g_http;
 
-#endif // ! HTTP_H
+#endif // ! PROTOCOLHTTP_H

@@ -496,19 +496,23 @@ void WebsocketSession::on_handshake(const boost::system::error_code& ec)
     m_callback(WEBSOCKET_OPEN, "open::normal");
 
     if(instance_uri.port == "443") {
-        // Send the message
-        m_ssl.async_write(
-            boost::asio::buffer(m_sendQueue.front()),
-            boost::beast::bind_front_handler(
-                &WebsocketSession::on_write,
-                shared_from_this()));     
+        // Read a message
+        m_ssl.async_read(
+            m_streambuf,
+            [sp = shared_from_this()](
+                const boost::system::error_code& ec, std::size_t bytes)
+            {
+                sp->on_read(ec, bytes);
+            });         
     } else {
-        // Send the message
-        m_socket.async_write(
-            boost::asio::buffer(m_sendQueue.front()),
-            boost::beast::bind_front_handler(
-                &WebsocketSession::on_write,
-                shared_from_this()));
+        // Read a message
+        m_socket.async_read(
+            m_streambuf,
+            [sp = shared_from_this()](
+                const boost::system::error_code& ec, std::size_t bytes)
+            {
+                sp->on_read(ec, bytes);
+            });        
     }
 }
 
@@ -525,19 +529,25 @@ void WebsocketSession::on_write(const boost::system::error_code& ec, size_t byte
     }
 
     if(instance_uri.port == "443") {
-        // Read a message into our buffer
-        m_ssl.async_read(
-            m_streambuf,
-            boost::beast::bind_front_handler(
-                &WebsocketSession::on_read,
-                shared_from_this()));
+        // Send the next message if any
+        if(! m_sendQueue.empty())
+            m_ssl.async_write(
+                boost::asio::buffer(m_sendQueue.front()),
+                [sp = shared_from_this()](
+                    const boost::system::error_code& ec, std::size_t bytes)
+                {
+                    sp->on_write(ec, bytes);
+                });
     } else {
-        // Read a message into our buffer
-        m_socket.async_read(
-            m_streambuf,
-            boost::beast::bind_front_handler(
-                &WebsocketSession::on_read,
-                shared_from_this()));
+        // Send the next message if any
+        if(! m_sendQueue.empty())
+            m_socket.async_write(
+                boost::asio::buffer(m_sendQueue.front()),
+                [sp = shared_from_this()](
+                    const boost::system::error_code& ec, std::size_t bytes)
+                {
+                    sp->on_write(ec, bytes);
+                });
     }
 }
 
@@ -548,8 +558,7 @@ void WebsocketSession::on_read(const boost::system::error_code& ec, size_t bytes
     }
 
     boost::ignore_unused(bytes_transferred);
-    m_callback(WEBSOCKET_MESSAGE, boost::beast::buffers_to_string(m_streambuf.data())); 
-    // m_streambuf.consume(m_streambuf.size());
+    m_callback(WEBSOCKET_MESSAGE, boost::beast::buffers_to_string(m_streambuf.data()));
     m_streambuf.clear();
 
     stdext::millisleep(100);
@@ -583,24 +592,54 @@ void WebsocketSession::onError(const std::string& error, const std::string& deta
     m_callback(WEBSOCKET_ERROR, "close_code::error " + error);
 }
 
+void WebsocketSession::onTimeout(const boost::system::error_code& error){
+    // m_timer.expires_after(std::chrono::seconds(m_timeout));
+    // m_timer.async_wait(boost::beast::bind_front_handler(&WebsocketSession::onTimeout, shared_from_this()));
+    g_logger.error(stdext::format("WebsocketSession ontimeout %s", error.message()));
+    m_closed = true;
+    m_callback(WEBSOCKET_ERROR, "close_code::ontimeout " + error.message());    
+}
+
 void WebsocketSession::send(std::string data){
     if(instance_uri.port == "443") {
         if(m_ssl.is_open() && !m_closed) {
+            //  no async
             m_sendQueue.push(data);
-            m_ssl.write(boost::asio::buffer(m_sendQueue.front()));
-            m_sendQueue.pop();
-        } else {
+            // Are we already writing?
+            if(m_sendQueue.size() > 1)
+                return;
+
+            m_ssl.async_write(
+                boost::asio::buffer(m_sendQueue.front()),
+                [sp = shared_from_this()](
+                    const boost::system::error_code& ec, std::size_t bytes)
+                {
+                    sp->on_write(ec, bytes);
+                });            
+        } else if(!m_ssl.is_open() && m_closed) {
             //  connect again
             start();
+            m_closed = false;
         }        
     } else {
         if(m_socket.is_open() && !m_closed) {
+            //  no async
             m_sendQueue.push(data);
-            m_socket.write(boost::asio::buffer(m_sendQueue.front()));
-            m_sendQueue.pop();
-        } else {
-            //  connect again
+            // Are we already writing?
+            if(m_sendQueue.size() > 1)
+                return;
+
+            m_socket.async_write(
+                boost::asio::buffer(m_sendQueue.front()),
+                [sp = shared_from_this()](
+                    const boost::system::error_code& ec, std::size_t bytes)
+                {
+                    sp->on_write(ec, bytes);
+                });            
+        } else if(!m_socket.is_open() && m_closed) {
+        //  connect again
             start();
+            m_closed = false;
         }
     }
 }
