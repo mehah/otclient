@@ -14,10 +14,12 @@
 
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
+
 #include <boost/beast/ssl/ssl_stream.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ssl.hpp>
 
+#include <zlib.h>
 //  result
 class HttpSession;
 
@@ -90,15 +92,16 @@ private:
     boost::beast::http::request<boost::beast::http::string_body> m_request;
     boost::beast::http::response_parser<boost::beast::http::dynamic_body> m_response;
 
-    void on_resolve(const boost::system::error_code& ec, boost::asio::ip::tcp::resolver::results_type iterator);
-    void on_connect(const boost::system::error_code& ec, boost::asio::ip::tcp::resolver::results_type::endpoint_type);
+    void on_resolve(const std::error_code& ec, boost::asio::ip::tcp::resolver::results_type iterator);
+    void on_connect(const std::error_code& ec, boost::asio::ip::tcp::resolver::results_type::endpoint_type);
 
-    void on_handshake(const boost::system::error_code& ec);
+    void on_handshake(const std::error_code& ec);
 
-    void on_write(const boost::system::error_code& ec, size_t bytes_transferred);
-    void on_read(const boost::system::error_code& ec, size_t bytes_transferred);
+    void on_write(const std::error_code& ec, size_t bytes_transferred);
+    void on_read(const std::error_code& ec, size_t bytes_transferred);
 
     void close();
+    void onTimeout(const std::error_code& error);
     void onError(const std::string& error, const std::string& details = "");
 };
 
@@ -154,16 +157,16 @@ private:
     boost::beast::flat_buffer m_streambuf{ 16 * 1024 * 1024 }; // limited to 16MB
     std::queue<std::string> m_sendQueue;
 
-    void on_resolve(const boost::system::error_code& ec, boost::asio::ip::tcp::resolver::results_type results);
-    void on_connect(const boost::system::error_code& ec, boost::asio::ip::tcp::resolver::results_type::endpoint_type);
-    void on_ssl_handshake(const boost::system::error_code& ec);
-    void on_handshake(const boost::system::error_code& ec);
+    void on_resolve(const std::error_code& ec, boost::asio::ip::tcp::resolver::results_type results);
+    void on_connect(const std::error_code& ec, boost::asio::ip::tcp::resolver::results_type::endpoint_type);
+    void on_ssl_handshake(const std::error_code& ec);
+    void on_handshake(const std::error_code& ec);
 
-    void on_write(const boost::system::error_code& ec, size_t bytes_transferred);
-    void on_read(const boost::system::error_code& ec, size_t bytes_transferred);
+    void on_write(const std::error_code& ec, size_t bytes_transferred);
+    void on_read(const std::error_code& ec, size_t bytes_transferred);
 
-    void on_close(const boost::system::error_code& ec);
-    void onTimeout(const boost::system::error_code& error);
+    void on_close(const std::error_code& ec);
+    void onTimeout(const std::error_code& error);
     void onError(const std::string& error, const std::string& details = "");
 };
 
