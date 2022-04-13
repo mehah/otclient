@@ -71,6 +71,7 @@ public:
     };
     void start();
     void cancel() { onError("canceled"); }
+    void close();
     
 private:
     boost::asio::io_service& m_service;
@@ -100,7 +101,6 @@ private:
     void on_write(const std::error_code& ec, size_t bytes_transferred);
     void on_read(const std::error_code& ec, size_t bytes_transferred);
 
-    void close();
     void onTimeout(const std::error_code& error);
     void onError(const std::string& error, const std::string& details = "");
 };

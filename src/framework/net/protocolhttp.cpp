@@ -21,7 +21,9 @@ void Http::terminate()
         ws.second->close();
     }
     for (auto& op : m_operations) {
-        op.second->canceled = true;
+        auto session = op.second->session.lock();
+        if(session)
+            session->close();
     }
     m_guard.reset();
     if (!m_thread.joinable()) {
@@ -55,6 +57,7 @@ int Http::get(const std::string& url, int timeout)
                 m_operations.erase(operationId);
             }
         });
+        result->session = session;
         session->start();
     });
 
@@ -90,6 +93,7 @@ int Http::post(const std::string& url, const std::string& data, int timeout)
                 m_operations.erase(operationId);
             }
         });
+        result->session = session;
         session->start();
     });
     return operationId;
@@ -132,6 +136,7 @@ int Http::download(const std::string& url, std::string path, int timeout)
             });
             m_operations.erase(operationId);
         });
+        result->session = session;
         session->start();
     });
     return operationId;
@@ -201,7 +206,9 @@ bool Http::cancel(int id)
             return;
         if (it->second->canceled)
             return;
-        it->second->canceled = true;
+        auto session = it->second->session.lock();
+        if(session)
+            session->close();
     });
     return true;
 }
@@ -315,7 +322,6 @@ void HttpSession::on_handshake(const std::error_code& ec)
     boost::beast::get_lowest_layer(m_ssl).expires_after(std::chrono::seconds(m_timeout));
 
     // Send the HTTP request to the remote host
-    auto self = shared_from_this();
     boost::beast::http::async_write(
         m_ssl, m_request,
             [sft = shared_from_this()](
@@ -368,8 +374,7 @@ void HttpSession::on_read(const std::error_code& ec, size_t bytes_transferred)
 
     // not_connected happens sometimes so don't bother reporting it.
     if(ec && ec != make_error_code(boost::beast::errc::not_connected)){
-        std::cout << "shutdown " << m_url << ": "
-            << ec.message() << std::endl;    
+        std::cout << "shutdown " << m_url << ": " << ec.message() << std::endl;
         return;
     }
 
@@ -379,7 +384,34 @@ void HttpSession::on_read(const std::error_code& ec, size_t bytes_transferred)
 
 void HttpSession::close()
 {
+    m_result->canceled = true;
     g_logger.error(stdext::format("HttpSession close"));
+    if(instance_uri.port == "443") {
+        // Close the http connection        
+        m_ssl.async_shutdown(
+            [sft = shared_from_this()](
+                boost::beast::error_code ec)
+            {
+                if(ec ==  boost::asio::error::eof){
+                    ec = {};
+                }
+
+                if(ec){
+                    sft->onError("shutdown " + sft->m_url + ": " + ec.message());
+                    return;
+                }
+            });
+    } else {
+        // Close the http connection
+        boost::beast::error_code ec;
+        m_socket.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+
+        // not_connected happens sometimes so don't bother reporting it.
+        if(ec && ec != boost::beast::errc::not_connected){
+            onError("shutdown " + m_url + ": " + ec.message());
+            return;
+        }
+    }
 }
 
 void HttpSession::onTimeout(const std::error_code& error)
