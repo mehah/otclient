@@ -110,7 +110,7 @@ TexturePtr TextureManager::getTexture(const std::string& fileName)
             std::string _filePath = filePath;            
             const auto fileDownload = g_http.getFile(_filePath.erase(0, 11));
             if(fileDownload) {
-                std::stringstream fin(fileDownload->_response);
+                std::stringstream fin(fileDownload->response);
                 texture = loadTexture(fin);
             }
         }

@@ -5,6 +5,7 @@ HTTP = {
   imageId=1000,
   images={},
   operations={},
+  enableTimeOut=false, -- only work in read/write
 }
 
 function HTTP.get(url, callback)
@@ -292,3 +293,4 @@ connect(g_http,
   })
 
 g_http.setUserAgent(HTTP.agent)
+g_http.setEnableTimeOutOnReadWrite(HTTP.enableTimeOut)

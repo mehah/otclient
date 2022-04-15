@@ -44,14 +44,14 @@ int Http::get(const std::string& url, int timeout)
         result->url = url;
         result->operationId = operationId;
         m_operations[operationId] = result;
-        auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_custom_header, timeout, result, [&](HttpResult_ptr result) {
+        auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout, result, [&](HttpResult_ptr result) {
             bool finished = result->finished;
             g_dispatcher.addEvent([result, finished] {
                 if (!finished) {
                     g_lua.callGlobalField("g_http", "onGetProgress", result->operationId, result->url, result->progress);
                     return;
                 }
-                g_lua.callGlobalField("g_http", "onGet", result->operationId, result->url, result->error, result->_response);
+                g_lua.callGlobalField("g_http", "onGet", result->operationId, result->url, result->error, result->response);
             });
             if (finished) {
                 m_operations.erase(operationId);
@@ -80,14 +80,14 @@ int Http::post(const std::string& url, const std::string& data, int timeout)
         result->operationId = operationId;
         result->postData = data;
         m_operations[operationId] = result;
-        auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_custom_header, timeout, result, [&](HttpResult_ptr result) {
+        auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout, result, [&](HttpResult_ptr result) {
             bool finished = result->finished;
             g_dispatcher.addEvent([result, finished] {
                 if (!finished) {
                     g_lua.callGlobalField("g_http", "onPostProgress", result->operationId, result->url, result->progress);
                     return;
                 }
-                g_lua.callGlobalField("g_http", "onPost", result->operationId, result->url, result->error, result->_response);
+                g_lua.callGlobalField("g_http", "onPost", result->operationId, result->url, result->error, result->response);
             });
             if (finished) {
                 m_operations.erase(operationId);
@@ -110,7 +110,7 @@ int Http::download(const std::string& url, std::string path, int timeout)
         result->url = url;
         result->operationId = operationId;
         m_operations[operationId] = result;
-        auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_custom_header, timeout, result, [&, path](HttpResult_ptr result) {
+        auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout, result, [&, path](HttpResult_ptr result) {
             m_speed = ((result->size) * 10) / (1 + stdext::micros() - m_lastSpeedUpdate);
             m_lastSpeedUpdate = stdext::micros();
 
@@ -123,7 +123,7 @@ int Http::download(const std::string& url, std::string path, int timeout)
             }
 
             unsigned long  crc = crc32(0L, Z_NULL, 0);
-            unsigned long checksum = crc32(crc, (const unsigned char*)result->_response.c_str(), result->_response.size());
+            unsigned long checksum = crc32(crc, (const unsigned char*)result->response.c_str(), result->response.size());
 
             g_dispatcher.addEvent([&, result, path, checksum] {
                 if (result->error.empty()) {
@@ -153,7 +153,7 @@ int Http::ws(const std::string& url, int timeout)
         result->url = url;
         result->operationId = operationId;
         m_operations[operationId] = result;
-        auto session = std::make_shared<WebsocketSession>(m_ios, url, m_userAgent, timeout, result, [&, result](WebsocketCallbackType type, std::string message) {
+        auto session = std::make_shared<WebsocketSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, timeout, result, [&, result](WebsocketCallbackType type, std::string message) {
             g_dispatcher.addEvent([result, type, message]() {
                 if (type == WEBSOCKET_OPEN) {
                     g_lua.callGlobalField("g_http", "onWsOpen", result->operationId, message);
@@ -255,11 +255,11 @@ void HttpSession::on_resolve(const std::error_code& ec, boost::asio::ip::tcp::re
         return;
     }
 
-    if(instance_uri.port == "443") {
-        // Set a timeout on the operation
-        boost::beast::get_lowest_layer(m_ssl).expires_after(std::chrono::seconds(m_timeout));
+    m_timer.expires_after(std::chrono::seconds(m_timeout));
+    m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec){sft->onTimeout(ec);});
 
-        // Make the connection on the IP address we get from a lookup
+    // Make the connection on the IP address we get from a lookup
+    if(instance_uri.port == "443") {
         boost::beast::get_lowest_layer(m_ssl).async_connect(
             results,
                 [sft = shared_from_this()](
@@ -268,9 +268,6 @@ void HttpSession::on_resolve(const std::error_code& ec, boost::asio::ip::tcp::re
                     sft->on_connect(ec, et);
                 });
     } else {
-        // Set a timeout on the operation
-        m_socket.expires_after(std::chrono::seconds(m_timeout));
-
         m_socket.async_connect(
             results,
                 [sft = shared_from_this()](
@@ -288,8 +285,10 @@ void HttpSession::on_connect(const std::error_code& ec, boost::asio::ip::tcp::re
         return;
     } 
 
+    m_timer.expires_after(std::chrono::seconds(m_timeout));
+    m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec){sft->onTimeout(ec);});
+
     if(instance_uri.port == "443") {
-        // Perform the SSL handshake
         m_ssl.async_handshake(
             boost::asio::ssl::stream_base::client,
                 [sft = shared_from_this()](
@@ -298,9 +297,6 @@ void HttpSession::on_connect(const std::error_code& ec, boost::asio::ip::tcp::re
                     sft->on_handshake(ec);
                 });
     } else {
-        m_socket.expires_after(std::chrono::seconds(m_timeout));
-
-        // The connection was successful. Send the request.
         boost::beast::http::async_write(
             m_socket, m_request,
                 [sft = shared_from_this()](
@@ -318,8 +314,8 @@ void HttpSession::on_handshake(const std::error_code& ec)
         return;
     }
 
-    // Set a timeout on the operation
-    boost::beast::get_lowest_layer(m_ssl).expires_after(std::chrono::seconds(m_timeout));
+    m_timer.expires_after(std::chrono::seconds(m_timeout));
+    m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec){sft->onTimeout(ec);});
 
     // Send the HTTP request to the remote host
     boost::beast::http::async_write(
@@ -338,10 +334,17 @@ void HttpSession::on_write(const std::error_code& ec, size_t bytes_transferred)
         return;
     }
 
+    if(m_enable_time_out_on_read_write){
+        m_timer.expires_after(std::chrono::seconds(m_timeout));
+        m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec){sft->onTimeout(ec);});
+    } else {
+        m_timer.cancel();
+    }
+
     boost::ignore_unused(bytes_transferred);
 
-    if(instance_uri.port == "443") {
         // Receive the HTTP response
+    if(instance_uri.port == "443") {
         boost::beast::http::async_read(
             m_ssl, m_streambuf, m_response,
                 [sft = shared_from_this()](
@@ -350,7 +353,6 @@ void HttpSession::on_write(const std::error_code& ec, size_t bytes_transferred)
                     sft->on_read(ec, bytes);
                 });
     } else {
-        // Receive the HTTP response
         boost::beast::http::async_read(
             m_socket, m_streambuf, m_response,
                 [sft = shared_from_this()](
@@ -368,9 +370,16 @@ void HttpSession::on_read(const std::error_code& ec, size_t bytes_transferred)
         return;
     }
 
+    if(m_enable_time_out_on_read_write){
+        m_timer.expires_after(std::chrono::seconds(m_timeout));
+        m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec){sft->onTimeout(ec);});
+    } else {
+        m_timer.cancel();
+    }
+
     boost::ignore_unused(bytes_transferred);
 
-    m_result->_response = boost::beast::buffers_to_string(m_response.get().body().data());
+    m_result->response = boost::beast::buffers_to_string(m_response.get().body().data());
 
     // not_connected happens sometimes so don't bother reporting it.
     if(ec && ec != make_error_code(boost::beast::errc::not_connected)){
@@ -386,8 +395,7 @@ void HttpSession::close()
 {
     m_result->canceled = true;
     g_logger.error(stdext::format("HttpSession close"));
-    if(instance_uri.port == "443") {
-        // Close the http connection        
+    if(instance_uri.port == "443") {    
         m_ssl.async_shutdown(
             [sft = shared_from_this()](
                 boost::beast::error_code ec)
@@ -402,7 +410,6 @@ void HttpSession::close()
                 }
             });
     } else {
-        // Close the http connection
         boost::beast::error_code ec;
         m_socket.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
 
@@ -414,14 +421,16 @@ void HttpSession::close()
     }
 }
 
-void HttpSession::onTimeout(const std::error_code& error)
+void HttpSession::onTimeout(const std::error_code& ec)
 {
-    g_logger.error(stdext::format("HttpSession ontimeout %s", error.message()));
+    if (!ec){
+        g_logger.error(stdext::format("HttpSession ontimeout %s", ec.message()));
+    }
 }
 
-void HttpSession::onError(const std::string& error, const std::string& details)
+void HttpSession::onError(const std::string& ec, const std::string& details)
 {
-    g_logger.error(stdext::format("%s", error));
+    g_logger.error(stdext::format("%s", ec));
 }
 
 void WebsocketSession::start()
@@ -446,11 +455,11 @@ void WebsocketSession::on_resolve(const std::error_code& ec, boost::asio::ip::tc
         return;
     }
 
-    if(instance_uri.port == "443") {
-        // Set a timeout on the operation
-        boost::beast::get_lowest_layer(m_ssl).expires_after(std::chrono::seconds(m_timeout));
+    m_timer.expires_after(std::chrono::seconds(m_timeout));
+    m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec){sft->onTimeout(ec);});
 
-        // Make the connection on the IP address we get from a lookup
+    // Make the connection on the IP address we get from a lookup
+    if(instance_uri.port == "443") {
         boost::beast::get_lowest_layer(m_ssl).async_connect(
             results,
                 [sft = shared_from_this()](
@@ -459,10 +468,6 @@ void WebsocketSession::on_resolve(const std::error_code& ec, boost::asio::ip::tc
                     sft->on_connect(ec, et);
                 });     
     } else {
-        // Set the timeout for the operation
-        boost::beast::get_lowest_layer(m_socket).expires_after(std::chrono::seconds(m_timeout));
-
-        // Make the connection on the IP address we get from a lookup
         boost::beast::get_lowest_layer(m_socket).async_connect(
             results,
                 [sft = shared_from_this()](
@@ -480,10 +485,10 @@ void WebsocketSession::on_connect(const std::error_code& ec, boost::asio::ip::tc
         return;
     }
 
-    if(instance_uri.port == "443") {
-        // Set a timeout on the operation
-        boost::beast::get_lowest_layer(m_ssl).expires_after(std::chrono::seconds(m_timeout));
+    m_timer.expires_after(std::chrono::seconds(m_timeout));
+    m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec){sft->onTimeout(ec);});
 
+    if(instance_uri.port == "443") {
         // Set SNI Hostname (many hosts need this to handshake successfully)
         if(! SSL_set_tlsext_host_name(
                 m_ssl.next_layer().native_handle(),
@@ -509,10 +514,6 @@ void WebsocketSession::on_connect(const std::error_code& ec, boost::asio::ip::tc
                     sft->on_ssl_handshake(ec);
                 }); 
     } else {
-        // Turn off the timeout on the tcp_stream, because
-        // the websocket stream has its own timeout system.
-        boost::beast::get_lowest_layer(m_socket).expires_never();
-
         // Set suggested timeout settings for the websocket
         m_socket.set_option(
             boost::beast::websocket::stream_base::timeout::suggested(
@@ -527,12 +528,8 @@ void WebsocketSession::on_connect(const std::error_code& ec, boost::asio::ip::tc
                         " websocket-client-otclient");
             }));
 
-        // Update the host_ string. This will provide the value of the
-        // Host HTTP header during the WebSocket handshake.
-        // See https://tools.ietf.org/html/rfc7230#section-5.4
         m_domain += ':' + instance_uri.port;
 
-        // Perform the websocket handshake
         m_socket.async_handshake(
             m_domain, instance_uri.query,
                 [sft = shared_from_this()](
@@ -550,9 +547,8 @@ void WebsocketSession::on_ssl_handshake(const std::error_code& ec)
         return;
     }
 
-    // Turn off the timeout on the tcp_stream, because
-    // the websocket stream has its own timeout system.
-    boost::beast::get_lowest_layer(m_ssl).expires_never();
+    m_timer.expires_after(std::chrono::seconds(m_timeout));
+    m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec){sft->onTimeout(ec);});
 
     // Set suggested timeout settings for the websocket
     m_ssl.set_option(
@@ -583,6 +579,13 @@ void WebsocketSession::on_handshake(const std::error_code& ec)
     if (ec) {
         onError("WebsocketSession unable to handshake " + m_url + ": " + ec.message());
         return;
+    }
+
+    if(m_enable_time_out_on_read_write){
+        m_timer.expires_after(std::chrono::seconds(m_timeout));
+        m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec){sft->onTimeout(ec);});
+    } else {
+        m_timer.cancel();
     }
 
     m_closed = false;
@@ -616,14 +619,21 @@ void WebsocketSession::on_write(const std::error_code& ec, size_t bytes_transfer
         return;
     }
 
+    if(m_enable_time_out_on_read_write){
+        m_timer.expires_after(std::chrono::seconds(m_timeout));
+        m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec){sft->onTimeout(ec);});
+    } else {
+        m_timer.cancel();
+    }
+
     boost::ignore_unused(bytes_transferred);
 
     if(m_sendQueue.size() > 0 ) {
         m_sendQueue.pop();
     }
 
+    // Send the next message if any
     if(instance_uri.port == "443") {
-        // Send the next message if any
         if(! m_sendQueue.empty())
             m_ssl.async_write(
                 boost::asio::buffer(m_sendQueue.front()),
@@ -633,7 +643,6 @@ void WebsocketSession::on_write(const std::error_code& ec, size_t bytes_transfer
                         sft->on_write(ec, bytes);
                     });
     } else {
-        // Send the next message if any
         if(! m_sendQueue.empty())
             m_socket.async_write(
                 boost::asio::buffer(m_sendQueue.front()),
@@ -652,13 +661,20 @@ void WebsocketSession::on_read(const std::error_code& ec, size_t bytes_transferr
         return;
     }
 
+    if(m_enable_time_out_on_read_write){
+        m_timer.expires_after(std::chrono::seconds(m_timeout));
+        m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec){sft->onTimeout(ec);});
+    } else {
+        m_timer.cancel();
+    }
+
     boost::ignore_unused(bytes_transferred);
     m_callback(WEBSOCKET_MESSAGE, boost::beast::buffers_to_string(m_streambuf.data()));
     m_streambuf.consume(m_streambuf.size());
-    // m_streambuf.clear();
+
     stdext::millisleep(100);
+    // Read a message
     if(instance_uri.port == "443") {
-        // Read a message
         m_ssl.async_read(
             m_streambuf,
                 [sft = shared_from_this()](
@@ -667,7 +683,6 @@ void WebsocketSession::on_read(const std::error_code& ec, size_t bytes_transferr
                     sft->on_read(ec, bytes);
                 });         
     } else {
-        // Read a message
         m_socket.async_read(
             m_streambuf,
                 [sft = shared_from_this()](
@@ -688,29 +703,28 @@ void WebsocketSession::on_close(const std::error_code& ec)
     m_callback(WEBSOCKET_CLOSE, "close_code::normal");
 }
 
-void WebsocketSession::onError(const std::string& error, const std::string& details)
+void WebsocketSession::onError(const std::string& ec, const std::string& details)
 {
-    g_logger.error(stdext::format("WebsocketSession error %s", error));
+    g_logger.error(stdext::format("WebsocketSession error %s", ec));
     m_closed = true;
-    m_callback(WEBSOCKET_ERROR, "close_code::error " + error);
+    m_callback(WEBSOCKET_ERROR, "close_code::error " + ec);
 }
 
-void WebsocketSession::onTimeout(const std::error_code& error)
+void WebsocketSession::onTimeout(const std::error_code& ec)
 {
-    // m_timer.expires_after(std::chrono::seconds(m_timeout));
-    // m_timer.async_wait(boost::beast::bind_front_handler(&WebsocketSession::onTimeout, shared_from_this()));
-    g_logger.error(stdext::format("WebsocketSession ontimeout %s", error.message()));
-    m_closed = true;
-    m_callback(WEBSOCKET_ERROR, "close_code::ontimeout " + error.message());    
+    if (!ec){
+        g_logger.error(stdext::format("WebsocketSession ontimeout %s", ec.message()));
+        m_closed = true;
+        m_callback(WEBSOCKET_ERROR, "close_code::ontimeout " + ec.message());  
+        close();
+    }    
 }
 
 void WebsocketSession::send(std::string data)
 {
     if(instance_uri.port == "443") {
         if(m_ssl.is_open() && !m_closed) {
-            //  no async
             m_sendQueue.push(data);
-            // Are we already writing?
             if(m_sendQueue.size() > 1)
                 return;
 
@@ -722,15 +736,12 @@ void WebsocketSession::send(std::string data)
                         sft->on_write(ec, bytes);
                     });
         } else if(!m_ssl.is_open() && m_closed) {
-            //  connect again
             start();
             m_closed = false;
         }        
     } else {
         if(m_socket.is_open() && !m_closed) {
-            //  no async
             m_sendQueue.push(data);
-            // Are we already writing?
             if(m_sendQueue.size() > 1)
                 return;
 
@@ -742,7 +753,6 @@ void WebsocketSession::send(std::string data)
                         sft->on_write(ec, bytes);
                     });
         } else if(!m_socket.is_open() && m_closed) {
-        //  connect again
             start();
             m_closed = false;
         }
@@ -752,7 +762,6 @@ void WebsocketSession::send(std::string data)
 void WebsocketSession::close()
 {
     if(instance_uri.port == "443") {
-        // Close the WebSocket connection
         if(m_ssl.is_open()) {
             m_ssl.async_close(
                 boost::beast::websocket::close_code::normal,
@@ -763,7 +772,6 @@ void WebsocketSession::close()
                     });
         }
     } else {
-        // Close the WebSocket connection
         if(m_socket.is_open()) {
             m_socket.async_close(
                 boost::beast::websocket::close_code::normal,

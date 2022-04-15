@@ -20,6 +20,7 @@
 #include <boost/asio/ssl.hpp>
 
 #include <zlib.h>
+
 //  result
 class HttpSession;
 
@@ -34,16 +35,13 @@ struct HttpResult {
     bool finished = false;
     bool canceled = false;
     std::string postData;
-    std::vector<uint8_t> response;
+    std::string response;
     std::string error;
     std::weak_ptr<HttpSession> session;
-    std::string _response;
 };
-
 
 using HttpResult_ptr = std::shared_ptr<HttpResult>;
 using HttpResult_cb = std::function<void(HttpResult_ptr)>;
-
 
 //  session
 
@@ -52,11 +50,13 @@ class HttpSession : public std::enable_shared_from_this<HttpSession>
 public:
 
     HttpSession(boost::asio::io_service& service, const std::string& url, const std::string& agent, 
+            const bool& enable_time_out_on_read_write,
             const std::map<std::string, std::string>& custom_header,
             int timeout, HttpResult_ptr result, HttpResult_cb callback) :
                 m_service(service),
                 m_url(url),
                 m_agent(agent),
+                m_enable_time_out_on_read_write(enable_time_out_on_read_write),
                 m_custom_header(custom_header),
                 m_timeout(timeout),
                 m_result(result),
@@ -77,6 +77,7 @@ private:
     boost::asio::io_service& m_service;
     std::string m_url;
     std::string m_agent;
+    bool m_enable_time_out_on_read_write;
     std::map<std::string, std::string> m_custom_header;
     int m_timeout;
     HttpResult_ptr m_result;
@@ -101,8 +102,8 @@ private:
     void on_write(const std::error_code& ec, size_t bytes_transferred);
     void on_read(const std::error_code& ec, size_t bytes_transferred);
 
-    void onTimeout(const std::error_code& error);
-    void onError(const std::string& error, const std::string& details = "");
+    void onTimeout(const std::error_code& ec);
+    void onError(const std::string& ec, const std::string& details = "");
 };
 
 //  web socket
@@ -119,10 +120,12 @@ class WebsocketSession : public std::enable_shared_from_this<WebsocketSession>
 {
 public:
 
-    WebsocketSession(boost::asio::io_service& service, const std::string& url, const std::string& agent, int timeout, HttpResult_ptr result, WebsocketSession_cb callback) :
+    WebsocketSession(boost::asio::io_service& service, const std::string& url, const std::string& agent, 
+                    const bool& enable_time_out_on_read_write, int timeout, HttpResult_ptr result, WebsocketSession_cb callback) :
             m_service(service),
             m_url(url),
             m_agent(agent),
+            m_enable_time_out_on_read_write(enable_time_out_on_read_write),
             m_timeout(timeout),
             m_result(result),
             m_callback(callback),
@@ -141,6 +144,7 @@ private:
     boost::asio::io_service& m_service;
     std::string m_url;
     std::string m_agent;
+    bool m_enable_time_out_on_read_write;
     int m_timeout;
     HttpResult_ptr m_result;
     WebsocketSession_cb m_callback;
@@ -166,8 +170,8 @@ private:
     void on_read(const std::error_code& ec, size_t bytes_transferred);
 
     void on_close(const std::error_code& ec);
-    void onTimeout(const std::error_code& error);
-    void onError(const std::string& error, const std::string& details = "");
+    void onTimeout(const std::error_code& ec);
+    void onError(const std::string& ec, const std::string& details = "");
 };
 
 class Http {
@@ -210,8 +214,13 @@ public:
         m_custom_header[name] = value;
     }
 
+    void setEnableTimeOutOnReadWrite(bool enable_time_out_on_read_write){
+        m_enable_time_out_on_read_write = enable_time_out_on_read_write;
+    }
+
 private:
     bool m_working = false;
+    bool m_enable_time_out_on_read_write = false;
     int m_operationId = 1;
     int m_speed = 0;
     size_t m_lastSpeedUpdate = 0;
