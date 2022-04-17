@@ -22,7 +22,7 @@
 
 #pragma once
 
- // common C headers
+// common C headers
 #include <cassert>
 #include <cmath>
 #include <cstddef>
@@ -39,10 +39,10 @@
 #include <iostream>
 #include <list>
 #include <map>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <tuple>
 #include <typeinfo>
 #include <unordered_map>
 #include <vector>
-#include <memory>

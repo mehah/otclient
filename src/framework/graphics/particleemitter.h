@@ -22,9 +22,9 @@
 
 #pragma once
 
+#include "declarations.h"
 #include <framework/global.h>
 #include <framework/otml/otml.h>
-#include "declarations.h"
 
 class ParticleEmitter : public stdext::shared_object
 {

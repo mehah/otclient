@@ -49,8 +49,8 @@
 
 namespace Fw
 {
-    static const float pi = 3.14159265f;
-    static const float MIN_ALPHA = 0.003f;
+    static constexpr float pi = 3.14159265f,
+        MIN_ALPHA = 0.003f;
 
     enum Key : unsigned char
     {
@@ -298,12 +298,4 @@ namespace Fw
         BackgroundPane = 2,
         BothPanes = 3
     };
-
-#ifdef FW_SQL
-    enum DatabaseEngine
-    {
-        DatabaseNone = 0,
-        DatabaseMySQL
-    };
-#endif
 }

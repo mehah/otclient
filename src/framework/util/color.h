@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include <iomanip>
 #include "../stdext/cast.h"
 #include "../stdext/string.h"
 #include "../stdext/types.h"
+#include <iomanip>
 
 class Color
 {

@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include <framework/global.h>
 #include "effect.h"
 #include "thing.h"
+#include <framework/global.h>
 
 enum ItemAttr : uint8
 {

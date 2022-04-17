@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include <framework/luaengine/luaobject.h>
 #include "declarations.h"
+#include <framework/luaengine/luaobject.h>
 
 class SoundSource : public LuaObject
 {

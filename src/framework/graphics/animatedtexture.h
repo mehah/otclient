@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include <framework/core/timer.h>
 #include "texture.h"
+#include <framework/core/timer.h>
 
 class AnimatedTexture : public Texture
 {

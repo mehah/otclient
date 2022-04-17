@@ -22,9 +22,9 @@
 
 #pragma once
 
+#include "declarations.h"
 #include <framework/luaengine/luaobject.h>
 #include <framework/otml/otml.h>
-#include "declarations.h"
 
 #include <utility>
 

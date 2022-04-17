@@ -21,8 +21,6 @@
  */
 
 #include "game.h"
-#include <framework/core/application.h>
-#include <framework/core/eventdispatcher.h>
 #include "container.h"
 #include "creature.h"
 #include "localplayer.h"
@@ -30,9 +28,11 @@
 #include "map.h"
 #include "protocolcodes.h"
 #include "protocolgame.h"
+#include <framework/core/application.h>
+#include <framework/core/eventdispatcher.h>
 
-#include "tile.h"
 #include "framework/core/graphicalapplication.h"
+#include "tile.h"
 
 Game g_game;
 
@@ -95,7 +95,7 @@ void Game::resetGameStates()
     g_map.resetAwareRange();
 }
 
-void Game::processConnectionError(const boost::system::error_code& ec)
+void Game::processConnectionError(const std::error_code& ec)
 {
     // connection errors only have meaning if we still have a protocol
     if (m_protocolGame) {
@@ -658,7 +658,7 @@ void Game::autoWalk(std::vector<Otc::Direction> dirs, Position startPos)
     if (!canPerformGameAction())
         return;
 
-    if (dirs.size() == 0)
+    if (dirs.empty())
         return;
 
     // protocol limits walk path
@@ -672,10 +672,10 @@ void Game::autoWalk(std::vector<Otc::Direction> dirs, Position startPos)
         cancelFollow();
     }
 
-    auto it = dirs.begin();
-    Otc::Direction direction = *it;
+    const auto it = dirs.begin();
+    const Otc::Direction direction = *it;
 
-    TilePtr toTile = g_map.getTile(startPos.translatedToDirection(direction));
+    const TilePtr toTile = g_map.getTile(startPos.translatedToDirection(direction));
     if (startPos == m_localPlayer->m_position && toTile && toTile->isWalkable() && !m_localPlayer->isWalking() && m_localPlayer->canWalk(true)) {
         m_localPlayer->preWalk(direction);
 
@@ -1477,7 +1477,7 @@ void Game::setProtocolVersion(int version)
     if (isOnline())
         stdext::throw_exception("Unable to change protocol version while online");
 
-    if (version != 0 && (version < 740 || version > 1285))
+    if (version != 0 && (version < 740 || version > 1286))
         stdext::throw_exception(stdext::format("Protocol version %d not supported", version));
 
     m_protocolVersion = version;
@@ -1495,7 +1495,7 @@ void Game::setClientVersion(int version)
     if (isOnline())
         stdext::throw_exception("Unable to change client version while online");
 
-    if (version != 0 && (version < 740 || version > 1285))
+    if (version != 0 && (version < 740 || version > 1286))
         stdext::throw_exception(stdext::format("Client version %d not supported", version));
 
     m_features.reset();

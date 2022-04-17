@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include <framework/luaengine/luaobject.h>
 #include "declarations.h"
 #include "thingtype.h"
 #include "thingtypemanager.h"
+#include <framework/luaengine/luaobject.h>
 
 struct Highlight
 {

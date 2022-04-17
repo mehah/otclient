@@ -22,11 +22,11 @@
 
 #pragma once
 
+#include "lightview.h"
 #include <framework/core/inputevent.h>
 #include <framework/graphics/declarations.h>
 #include <framework/graphics/paintershaderprogram.h>
 #include <framework/luaengine/luaobject.h>
-#include "lightview.h"
 
 struct AwareRange
 {
@@ -59,7 +59,6 @@ public:
     ~MapView() override;
     void draw(const Rect& rect);
 
-public:
     // floor visibility related
     uint8 getLockedFirstVisibleFloor() { return m_lockedFirstVisibleFloor; }
     uint8 getCachedFirstVisibleFloor() { return m_cachedFirstVisibleFloor; }
@@ -161,12 +160,6 @@ private:
         void clear() { shades.clear(); grounds.clear(); surfaces.clear(); effects.clear(); }
     };
 
-    struct Pools
-    {
-        PoolFramedPtr map;
-        PoolPtr creatureInformation, text;
-    };
-
     struct Crosshair
     {
         bool positionChanged = false;
@@ -196,7 +189,7 @@ private:
 
     void updateViewport(const Otc::Direction dir = Otc::InvalidDirection) { m_viewport = m_viewPortDirection[dir]; }
 
-    bool canFloorFade() { return m_floorViewMode == FloorViewMode::FADE && m_floorFading; }
+    bool canFloorFade() { return m_floorViewMode == FADE && m_floorFading; }
 
     float getFadeLevel(uint8 z)
     {
@@ -272,7 +265,6 @@ private:
     PainterShaderProgramPtr m_shader, m_nextShader;
     LightViewPtr m_lightView;
     CreaturePtr m_followingCreature;
-    Pools m_pools;
 
     RectCache m_rectCache;
     FloorViewMode m_floorViewMode{ NORMAL };

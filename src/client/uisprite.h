@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include <framework/ui/uiwidget.h>
 #include "declarations.h"
+#include <framework/ui/uiwidget.h>
 
 class UISprite : public UIWidget
 {

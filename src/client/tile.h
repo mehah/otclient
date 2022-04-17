@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include <framework/luaengine/luaobject.h>
 #include "declarations.h"
 #include "effect.h"
 #include "item.h"
 #include "mapview.h"
+#include <framework/luaengine/luaobject.h>
 
 enum tileflags_t : uint32
 {

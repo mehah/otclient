@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include <framework/luaengine/luaobject.h>
 #include <GL/glew.h>
+#include <framework/luaengine/luaobject.h>
 
 #include "shader.h"
 

@@ -65,7 +65,7 @@ protected:
 
     friend class FrameBufferManager;
     friend class Pool;
-    friend class FramedPool;
+    friend class PoolFramed;
 
 private:
     void internalCreate();

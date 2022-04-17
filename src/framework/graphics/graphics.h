@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include <GL/glew.h>
 #include "declarations.h"
+#include <GL/glew.h>
 
- // @bindsingleton g_graphics
+// @bindsingleton g_graphics
 class Graphics
 {
 public:

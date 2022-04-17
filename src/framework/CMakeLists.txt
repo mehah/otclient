@@ -3,7 +3,6 @@
 # FRAMEWORK_GRAPHICS
 # FRAMEWORK_NET
 # FRAMEWORK_XML
-# FRAMEWORK_SQL
 
 # add framework cmake modules
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake;${CMAKE_MODULE_PATH}")
@@ -26,6 +25,7 @@ set(framework_SOURCES ${framework_SOURCES}
     ${CMAKE_CURRENT_LIST_DIR}/util/point.h
     ${CMAKE_CURRENT_LIST_DIR}/util/rect.h
     ${CMAKE_CURRENT_LIST_DIR}/util/size.h
+    ${CMAKE_CURRENT_LIST_DIR}/util/uuid.h
 
     # stdext
     ${CMAKE_CURRENT_LIST_DIR}/stdext/cast.h
@@ -189,16 +189,6 @@ add_definitions(-D"BUILD_COMMIT=\\\"${BUILD_COMMIT}\\\"")
 message(STATUS "Build revision: ${BUILD_REVISION}")
 add_definitions(-D"BUILD_REVISION=\\\"${BUILD_REVISION}\\\"")
 
-# find boost
-set(REQUIRED_BOOST_COMPONENTS system thread filesystem)
-if(WIN32)
-    set(Boost_THREADAPI win32)
-    set(framework_DEFINITIONS ${framework_DEFINITIONS} -DBOOST_THREAD_USE_LIB) # fix boost thread linkage
-endif()
-set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_LIBS ${USE_STATIC_LIBS})
-find_package(Boost 1.48.0 COMPONENTS ${REQUIRED_BOOST_COMPONENTS} REQUIRED)
-
 #find lua
 if(LUAJIT)
     find_package(LuaJIT REQUIRED)
@@ -219,8 +209,17 @@ find_package(Protobuf REQUIRED)
 find_package(LibLZMA REQUIRED)
 find_package(nlohmann_json REQUIRED)
 
+find_path(ASIO_INCLUDE_PATH asio.hpp HINTS 
+    "/usr/include"
+    "/usr/local/include"
+    "/opt/local/include"
+)
+
+if(ASIO_INCLUDE_PATH)
+    message(STATUS "Found existing ASIO install")
+endif(ASIO_INCLUDE_PATH)
+
 set(framework_LIBRARIES ${framework_LIBRARIES}
-    ${Boost_LIBRARIES}
     ${LUA_LIBRARY}
     ${PHYSFS_LIBRARY}
     ${ZLIB_LIBRARY}
@@ -230,7 +229,6 @@ set(framework_LIBRARIES ${framework_LIBRARIES}
 )
 
 set(framework_INCLUDE_DIRS ${framework_INCLUDE_DIRS}
-    ${Boost_INCLUDE_DIRS}
     ${LUA_INCLUDE_DIR}
     ${PHYSFS_INCLUDE_DIR}
     ${framework_INCLUDE_DIRS}
@@ -573,22 +571,6 @@ if(FRAMEWORK_XML)
         ${CMAKE_CURRENT_LIST_DIR}/xml/tinyxmlparser.cpp
     )
     set(framework_DEFINITIONS ${framework_DEFINITIONS} -DFW_XML)
-endif()
-
-if(FRAMEWORK_SQL)
-    find_package(MySQL REQUIRED)
-
-    set(framework_INCLUDE_DIRS ${framework_INCLUDE_DIRS} ${MYSQL_INCLUDE_DIR})
-    set(framework_LIBRARIES ${MYSQL_LIBRARY} ${framework_LIBRARIES})
-
-    set(framework_SOURCES ${framework_SOURCES}
-        ${CMAKE_CURRENT_LIST_DIR}/sql/declarations.h
-        ${CMAKE_CURRENT_LIST_DIR}/sql/database.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/sql/database.h
-        ${CMAKE_CURRENT_LIST_DIR}/sql/mysql.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/sql/mysql.h
-    )
-    set(framework_DEFINITIONS ${framework_DEFINITIONS} -DFW_SQL)
 endif()
 
 if(EXTRA_LIBS)

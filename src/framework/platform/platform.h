@@ -22,9 +22,9 @@
 
 #pragma once
 
+#include <framework/stdext/types.h>
 #include <string>
 #include <vector>
-#include <framework/stdext/types.h>
 
 class Platform
 {

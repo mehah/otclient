@@ -77,11 +77,19 @@ uint64 InputMessage::getU64()
     return v;
 }
 
+int64 InputMessage::get64()
+{
+    checkRead(8);
+    const int64 v = stdext::readSLE64(m_buffer + m_readPos);
+    m_readPos += 8;
+    return v;
+}
+
 std::string InputMessage::getString()
 {
     const uint16 stringLength = getU16();
     checkRead(stringLength);
-    const auto v = (char*)(m_buffer + m_readPos);
+    const auto* const v = (char*)(m_buffer + m_readPos);
     m_readPos += stringLength;
     return std::string(v, stringLength);
 }
