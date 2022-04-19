@@ -1227,7 +1227,7 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
     else
         effectId = msg->getU8();
 
-    if (g_game.getClientVersion() <= 740)
+    if (g_game.getClientVersion() <= 750)
         effectId += 1; //hack to fix effects in earlier clients
 
     if (!g_things.isValidDatId(effectId, ThingCategoryEffect)) {
