@@ -1503,6 +1503,8 @@ void Game::setClientVersion(int version)
 
     if (version >= 770) {
         enableFeature(Otc::GameLooktypeU16);
+        enableFeature(Otc::GameLevelU16);
+        enableFeature(Otc::GameSoulStat);
         enableFeature(Otc::GameMessageStatements);
         enableFeature(Otc::GameLoginPacketEncryption);
     }

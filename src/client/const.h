@@ -437,6 +437,8 @@ namespace Otc
         GameIngameStoreServiceType = 75,
         GameAdditionalSkills = 76,
         GameDistanceEffectU16 = 77,
+        GameLevelU16 = 78,
+        GameSoulStat = 79,
 
         LastGameFeature = 101
     };
