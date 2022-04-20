@@ -111,13 +111,10 @@ int Http::download(const std::string& url, std::string path, int timeout)
         result->operationId = operationId;
         m_operations[operationId] = result;
         auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout, result, [&, path](HttpResult_ptr result) {
-            m_speed = ((result->size) * 10) / (1 + stdext::micros() - m_lastSpeedUpdate);
-            m_lastSpeedUpdate = stdext::micros();
 
             if (!result->finished) {
-                int speed = m_speed;
-                g_dispatcher.addEvent([result, speed] {
-                    g_lua.callGlobalField("g_http", "onDownloadProgress", result->operationId, result->url, result->progress, speed);
+                g_dispatcher.addEvent([result] {
+                    g_lua.callGlobalField("g_http", "onDownloadProgress", result->operationId, result->url, result->progress, result->speed);
                 });
                 return;
             }
@@ -196,20 +193,20 @@ bool Http::wsClose(int operationId)
 
 bool Http::cancel(int id) 
 {
-    boost::asio::post(m_ios, [&, id] {
+    // boost::asio::post(m_ios, [&, id] {
         auto wit = m_websockets.find(id);
         if (wit != m_websockets.end()) {
             wit->second->close();
         }        
         auto it = m_operations.find(id);
         if (it == m_operations.end())
-            return;
+            return false;
         if (it->second->canceled)
-            return;
+            return false;
         auto session = it->second->session.lock();
         if(session)
             session->close();
-    });
+    // });
     return true;
 }
 
@@ -342,10 +339,10 @@ void HttpSession::on_write(const std::error_code& ec, size_t bytes_transferred)
     }
 
     boost::ignore_unused(bytes_transferred);
-
-        // Receive the HTTP response
+    
+    // Receive the HTTP response
     if(instance_uri.port == "443") {
-        boost::beast::http::async_read(
+        boost::beast::http::async_read_some(
             m_ssl, m_streambuf, m_response,
                 [sft = shared_from_this()](
                     const std::error_code& ec, size_t bytes)
@@ -353,7 +350,7 @@ void HttpSession::on_write(const std::error_code& ec, size_t bytes_transferred)
                     sft->on_read(ec, bytes);
                 });
     } else {
-        boost::beast::http::async_read(
+        boost::beast::http::async_read_some(
             m_socket, m_streambuf, m_response,
                 [sft = shared_from_this()](
                     const std::error_code& ec, size_t bytes)
@@ -370,11 +367,76 @@ void HttpSession::on_read(const std::error_code& ec, size_t bytes_transferred)
         return;
     }
 
-    if(m_enable_time_out_on_read_write){
-        m_timer.expires_after(std::chrono::seconds(m_timeout));
-        m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec){sft->onTimeout(ec);});
-    } else {
-        m_timer.cancel();
+    // Declare our chunk header callback  This is invoked
+    // after each chunk header and also after the last chunk.
+    auto header_cb =
+    [&](std::uint64_t size,                         // Size of the chunk, or zero for the last chunk
+        boost::beast::string_view extensions,       // The raw chunk-extensions string. Already validated.
+        std::error_code& ev)                        // We can set this to indicate an error
+    {
+        if(ev)
+            return;
+
+        // See if the chunk is too big
+        if(size > (std::numeric_limits<std::size_t>::max)())
+        {
+            ev = make_error_code(boost::beast::http::error::body_limit);
+            return;
+        }
+
+        //  call on start -> while(!m_response.is_done())
+        if(size > 0){
+            //  if has more chunk
+            m_result->size = m_result->size + size;
+        }
+    };
+
+    // Set the callback. The function requires a non-const reference so we
+    // use a local variable, since temporaries can only bind to const refs.
+    m_response.on_chunk_header(header_cb);
+    
+    if(m_response.get().has_content_length()){
+        m_result->size = m_response.content_length().value();
+    }
+
+    for (auto& h : m_response.get().base()) {
+        std::cout << "Field: " << h.name() << " /text: " << h.name_string() << ", Value: " << h.value() << "\n";
+    }
+
+    int sum_bytes_response = 0;
+    int sum_bytes_speed_response = 0;
+    ticks_t m_last_progress_update = stdext::millis();
+
+    while(!m_response.is_done()) {
+        int bytes = 0;
+        if(instance_uri.port == "443") {
+            bytes = boost::beast::http::read_some(m_ssl, m_streambuf, m_response);
+        } else {
+            bytes = boost::beast::http::read_some(m_socket, m_streambuf, m_response);
+        }
+
+        sum_bytes_response += bytes;
+        sum_bytes_speed_response += bytes;
+
+        if(stdext::millis() > m_last_progress_update) {
+            m_result->speed = (sum_bytes_speed_response) / ((stdext::millis() - (m_last_progress_update - 100)));
+
+            m_result->progress = ((double)sum_bytes_response/m_result->size) * 100;            
+            m_last_progress_update = stdext::millis() + 100;
+            sum_bytes_speed_response = 0;
+            m_callback(m_result);
+        }
+
+        if(m_result->canceled) {
+            break;
+        }
+
+        if(m_enable_time_out_on_read_write) {
+            m_timer.expires_after(std::chrono::seconds(m_timeout));
+            m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec){sft->onTimeout(ec);});
+        } else {
+            m_timer.cancel();
+        }
     }
 
     boost::ignore_unused(bytes_transferred);
@@ -382,7 +444,7 @@ void HttpSession::on_read(const std::error_code& ec, size_t bytes_transferred)
     m_result->response = boost::beast::buffers_to_string(m_response.get().body().data());
 
     // not_connected happens sometimes so don't bother reporting it.
-    if(ec && ec != make_error_code(boost::beast::errc::not_connected)){
+    if(ec && ec != make_error_code(boost::beast::errc::not_connected)) {
         std::cout << "shutdown " << m_url << ": " << ec.message() << std::endl;
         return;
     }

@@ -30,6 +30,7 @@ struct HttpResult {
     int status = 0;
     int size = 0;
     int progress = 0; // from 0 to 100
+    int speed = 0;
     int redirects = 0; // redirect
     bool connected = false;
     bool finished = false;
@@ -93,6 +94,8 @@ private:
     boost::beast::flat_buffer m_streambuf{ 512 * 1024 * 1024 }; // (Must persist between reads)
     boost::beast::http::request<boost::beast::http::string_body> m_request;
     boost::beast::http::response_parser<boost::beast::http::dynamic_body> m_response;
+
+    std::string _m_response;
 
     void on_resolve(const std::error_code& ec, boost::asio::ip::tcp::resolver::results_type iterator);
     void on_connect(const std::error_code& ec, boost::asio::ip::tcp::resolver::results_type::endpoint_type);
@@ -222,8 +225,6 @@ private:
     bool m_working = false;
     bool m_enable_time_out_on_read_write = false;
     int m_operationId = 1;
-    int m_speed = 0;
-    size_t m_lastSpeedUpdate = 0;
     std::thread m_thread;
     boost::asio::io_context m_ios;
     boost::asio::executor_work_guard<boost::asio::io_context::executor_type> m_guard;
