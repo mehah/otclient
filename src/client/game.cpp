@@ -1502,7 +1502,7 @@ void Game::setClientVersion(int version)
     enableFeature(Otc::GameFormatCreatureName);
 
     if (version >= 750) {
-        enableFeature(Otc::GameSoulStat);
+        enableFeature(Otc::GameSoul);
     }
 
     if (version >= 760) {
