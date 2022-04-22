@@ -22,8 +22,8 @@
 
 #include "uiboxlayout.h"
 
-#include <utility>
 #include "uiwidget.h"
+#include <utility>
 
 UIBoxLayout::UIBoxLayout(UIWidgetPtr parentWidget) : UILayout(std::move(parentWidget))
 {
@@ -34,10 +34,10 @@ void UIBoxLayout::applyStyle(const OTMLNodePtr& styleNode)
 {
     UILayout::applyStyle(styleNode);
 
-    for(const OTMLNodePtr& node : styleNode->children()) {
-        if(node->tag() == "spacing")
+    for (const OTMLNodePtr& node : styleNode->children()) {
+        if (node->tag() == "spacing")
             setSpacing(node->value<int>());
-        else if(node->tag() == "fit-children")
+        else if (node->tag() == "fit-children")
             setFitChildren(node->value<bool>());
     }
 }

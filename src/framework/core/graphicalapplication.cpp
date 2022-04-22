@@ -59,8 +59,6 @@ void GraphicalApplication::init(std::vector<std::string>& args)
     g_graphics.init();
     g_drawPool.init();
 
-    m_foregroundFramed = g_drawPool.createPoolF(FOREGROUND);
-
     // fire first resize event
     resize(g_window.getSize());
 
@@ -125,26 +123,26 @@ void GraphicalApplication::run()
 
     g_lua.callGlobalField("g_app", "onRun");
 
-    while(!m_stopping) {
+    while (!m_stopping) {
         // poll all events before rendering
         poll();
 
-        if(!g_window.isVisible()) {
+        if (!g_window.isVisible()) {
             // sleeps until next poll to avoid massive cpu usage
             stdext::millisleep(POLL_CYCLE_DELAY + 1);
             g_clock.update();
             continue;
         }
 
-        if(!m_frameCounter.canRefresh()) {
+        if (!m_frameCounter.canRefresh()) {
             continue;
         }
 
         // the screen consists of two panes
         {
             // foreground pane - steady pane with few animated stuff (UI)
-            if(foregroundCanUpdate()) {
-                g_drawPool.use(m_foregroundFramed);
+            if (foregroundCanUpdate()) {
+                g_drawPool.use(PoolType::FOREGROUND);
                 g_ui.render(Fw::ForegroundPane);
             }
 
@@ -161,7 +159,7 @@ void GraphicalApplication::run()
         // only update the current time once per frame to gain performance
         g_clock.update();
 
-        if(m_frameCounter.update()) {
+        if (m_frameCounter.update()) {
             g_lua.callGlobalField("g_app", "onFps", m_frameCounter.getFps());
         }
     }
@@ -198,7 +196,8 @@ void GraphicalApplication::resize(const Size& size)
     g_ui.resize(size);
     m_onInputEvent = false;
 
-    m_foregroundFramed->resize(size);
+    g_drawPool.get<PoolFramed>(PoolType::FOREGROUND)
+        ->resize(size);
 
     m_mustRepaint = true;
 }

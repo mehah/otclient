@@ -32,8 +32,10 @@
 
 class GraphicalApplication : public Application
 {
-    enum {
-        POLL_CYCLE_DELAY = 10
+    enum
+    {
+        POLL_CYCLE_DELAY = 10,
+        FOREGROUND_REFRESH_TIME = 1000 / 20 // 20 FPS (50ms)
     };
 
 public:
@@ -68,8 +70,9 @@ protected:
 private:
     bool foregroundCanUpdate()
     {
-        if (m_mustRepaint && m_foregroundRefreshTime.ticksElapsed() >= 16) {
+        if (m_mustRepaint || m_foregroundRefreshTime.ticksElapsed() >= FOREGROUND_REFRESH_TIME) {
             m_foregroundRefreshTime.restart();
+            m_mustRepaint = false;
             return true;
         }
 

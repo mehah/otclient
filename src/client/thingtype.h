@@ -35,20 +35,23 @@
 using namespace tibia::protobuf;
 using namespace tibia::protobuf::shared;
 
-enum class TextureType {
+enum class TextureType
+{
     NONE,
     SMOOTH,
     ALL_BLANK
 };
 
-enum FrameGroupType : uint8 {
+enum FrameGroupType : uint8
+{
     FrameGroupDefault = 0,
     FrameGroupIdle = FrameGroupDefault,
     FrameGroupMoving,
     FrameGroupInitial
 };
 
-enum ThingCategory : uint8 {
+enum ThingCategory : uint8
+{
     ThingCategoryItem = 0,
     ThingCategoryCreature,
     ThingCategoryEffect,
@@ -57,7 +60,8 @@ enum ThingCategory : uint8 {
     ThingLastCategory = ThingInvalidCategory
 };
 
-enum ThingAttr : uint8 {
+enum ThingAttr : uint8
+{
     ThingAttrGround = 0,
     ThingAttrGroundBorder = 1,
     ThingAttrOnBottom = 2,
@@ -110,14 +114,16 @@ enum ThingAttr : uint8 {
     ThingLastAttr = 255
 };
 
-enum SpriteMask {
+enum SpriteMask
+{
     SpriteMaskRed = 1,
     SpriteMaskGreen,
     SpriteMaskBlue,
     SpriteMaskYellow
 };
 
-struct MarketData {
+struct MarketData
+{
     std::string name;
     int category;
     uint16 requiredLevel;
@@ -126,8 +132,9 @@ struct MarketData {
     uint16 tradeAs;
 };
 
-struct Light {
-    Light() {}
+struct Light
+{
+    Light() = default;
     Light(uint8_t intensity, uint8_t color) : intensity(intensity), color(color) {}
     uint8 intensity = 0;
     uint8 color = 215;
@@ -166,7 +173,7 @@ public:
     Point getDisplacement() { return m_displacement; }
     int getDisplacementX() { return getDisplacement().x; }
     int getDisplacementY() { return getDisplacement().y; }
-    int getElevation() { return m_elevation; }
+    int getElevation() { return m_attribs.get<uint16>(ThingAttrElevation); }
 
     int getGroundSpeed() { return m_attribs.get<uint16>(ThingAttrGround); }
     int getMaxTextLength() { return m_attribs.has(ThingAttrWritableOnce) ? m_attribs.get<uint16>(ThingAttrWritableOnce) : m_attribs.get<uint16>(ThingAttrWritable); }
@@ -246,7 +253,7 @@ private:
     bool m_null{ true },
         m_opaque{ false };
 
-    stdext::dynamic_storage<uint8> m_attribs;
+    dynamic_storage<uint8> m_attribs;
 
     Size m_size;
     Point m_displacement;
@@ -257,7 +264,6 @@ private:
     int m_realSize{ 0 };
     int m_numPatternX{ 0 }, m_numPatternY{ 0 }, m_numPatternZ{ 0 };
     int m_layers{ 0 };
-    int m_elevation{ 0 };
     int m_exactHeight{ 0 };
     float m_opacity{ 1.f };
     std::string m_customImage;

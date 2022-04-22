@@ -23,11 +23,11 @@
 #ifndef TILE_H
 #define TILE_H
 
-#include <framework/luaengine/luaobject.h>
 #include "declarations.h"
 #include "effect.h"
 #include "item.h"
 #include "mapview.h"
+#include <framework/luaengine/luaobject.h>
 
 enum tileflags_t : uint32
 {
@@ -156,7 +156,8 @@ public:
     void analyzeThing(const ThingPtr& thing, bool add);
 
 private:
-    struct CountFlag {
+    struct CountFlag
+    {
         int fullGround{ 0 },
             translucent{ 0 },
             notWalkable{ 0 },

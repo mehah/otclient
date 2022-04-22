@@ -37,6 +37,7 @@
 #include "player.h"
 #include "protocolgame.h"
 #include "shadermanager.h"
+#include "spriteappearances.h"
 #include "spritemanager.h"
 #include "statictext.h"
 #include "thingtypemanager.h"
@@ -49,7 +50,6 @@
 #include "uiminimap.h"
 #include "uiprogressrect.h"
 #include "uisprite.h"
-#include "spriteappearances.h"
 
 #include <framework/luaengine/luainterface.h>
 
@@ -575,6 +575,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ThingType>("getSprites", &ThingType::getSprites);
     g_lua.bindClassMemberFunction<ThingType>("hasAttribute", &ThingType::hasAttr);
     g_lua.bindClassMemberFunction<ThingType>("exportImage", &ThingType::exportImage);
+    g_lua.bindClassMemberFunction<ThingType>("getUpgradeClassification", &ThingType::getClassification);
 
     g_lua.registerClass<Item, Thing>();
     g_lua.bindClassStaticFunction<Item>("create", &Item::create);
@@ -608,6 +609,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Item>("isFluidContainer", &Item::isFluidContainer);
     g_lua.bindClassMemberFunction<Item>("getMarketData", &Item::getMarketData);
     g_lua.bindClassMemberFunction<Item>("getClothSlot", &Item::getClothSlot);
+    g_lua.bindClassMemberFunction<Item>("getUpgradeClassification", &Item::getClassification);
 
     g_lua.registerClass<Effect, Thing>();
     g_lua.bindClassStaticFunction<Effect>("create", [] { return EffectPtr(new Effect); });

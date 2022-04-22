@@ -23,13 +23,14 @@
 #ifndef PAINTERSHADERPROGRAM_H
 #define PAINTERSHADERPROGRAM_H
 
-#include <client/position.h>
 #include "shaderprogram.h"
+#include <client/position.h>
 
 class PainterShaderProgram : public ShaderProgram
 {
 protected:
-    enum {
+    enum
+    {
         VERTEX_ATTR = 0,
         TEXCOORD_ATTR = 1,
         PROJECTION_MATRIX_UNIFORM = 0,

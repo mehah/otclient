@@ -23,16 +23,17 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
-#include <GL/glew.h>
 #include "declarations.h"
+#include <GL/glew.h>
 
- // @bindsingleton g_graphics
+// @bindsingleton g_graphics
 class Graphics
 {
 public:
     Graphics();
 
-    enum PainterEngine {
+    enum PainterEngine
+    {
         Painter_Any = 0,
         Painter_OpenGL1,
         Painter_OpenGL2,

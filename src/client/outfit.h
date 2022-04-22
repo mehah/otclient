@@ -23,12 +23,13 @@
 #ifndef OUTFIT_H
 #define OUTFIT_H
 
-#include <framework/util/color.h>
 #include "thingtypemanager.h"
+#include <framework/util/color.h>
 
 class Outfit
 {
-    enum {
+    enum
+    {
         HSI_SI_VALUES = 7,
         HSI_H_STEPS = 19
     };

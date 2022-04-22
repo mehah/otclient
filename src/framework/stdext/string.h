@@ -29,7 +29,8 @@
 #include "cast.h"
 #include "types.h"
 
-namespace stdext {
+namespace stdext
+{
     template<typename T> std::string to_string(const T& t) { return unsafe_cast<std::string, T>(t); }
     template<typename T> T from_string(const std::string& str, T def = T()) { return unsafe_cast<T, std::string>(str, def); }
 
@@ -42,7 +43,9 @@ namespace stdext {
     uint64_t hex_to_dec(const std::string& str);
     void tolower(std::string& str);
     void toupper(std::string& str);
-    void trim(std::string& str);
+    void ltrim(std::string& s);
+    void rtrim(std::string& s);
+    void trim(std::string& s);
     void ucwords(std::string& str);
     void eraseWhiteSpace(std::string& str);
     void replace_all(std::string& str, const std::string& search, const std::string& replacement);
@@ -64,7 +67,7 @@ namespace stdext {
     {
         const std::vector<std::string> splitted = split(str, separators);
         std::vector<T> results(splitted.size());
-        for(uint i = 0; i < splitted.size(); ++i)
+        for (uint i = 0; i < splitted.size(); ++i)
             results[i] = safe_cast<T>(splitted[i]);
         return results;
     }

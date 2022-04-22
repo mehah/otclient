@@ -78,21 +78,25 @@ enum OTBM_NodeTypes_t
     OTBM_WAYPOINT = 16
 };
 
-enum {
+enum
+{
     OTCM_SIGNATURE = 0x4D43544F,
     OTCM_VERSION = 1
 };
 
-enum {
+enum
+{
     BLOCK_SIZE = 32
 };
 
-enum : uint8 {
+enum : uint8
+{
     Animation_Force,
     Animation_Show
 };
 
-class TileBlock {
+class TileBlock
+{
 public:
     TileBlock() { m_tiles.fill(nullptr); }
 
@@ -105,7 +109,7 @@ public:
     const TilePtr& getOrCreate(const Position& pos)
     {
         TilePtr& tile = m_tiles[getTileIndex(pos)];
-        if(!tile)
+        if (!tile)
             tile = TilePtr(new Tile(pos));
         return tile;
     }
@@ -130,7 +134,8 @@ struct PathFindResult
 };
 using PathFindResult_ptr = std::shared_ptr<PathFindResult>;
 
-struct Node {
+struct Node
+{
     float cost;
     float totalCost;
     Position pos;
@@ -252,8 +257,10 @@ public:
     std::vector<StaticTextPtr> getStaticTexts() { return m_staticTexts; }
 
     std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> findPath(const Position& start, const Position& goal, int maxComplexity, int flags = 0);
-    PathFindResult_ptr newFindPath(const Position& start, const Position& goal, std::shared_ptr<std::list<Node*>> visibleNodes);
-    void findPathAsync(const Position& start, const Position& goal, std::function<void(PathFindResult_ptr)> callback);
+    PathFindResult_ptr newFindPath(const Position& start, const Position& goal, const std::shared_ptr<std::list<Node*>>&
+                                   visibleNodes);
+    void findPathAsync(const Position& start, const Position& goal, const std::function<void(PathFindResult_ptr)>&
+                       callback);
     std::map<std::string, std::tuple<int, int, int, std::string>> findEveryPath(const Position& start, int maxDistance, const std::map<std::string, std::string>& params);
 
     void setFloatingEffect(bool enable) { m_floatingEffect = enable; }

@@ -34,11 +34,11 @@ OggSoundFile::~OggSoundFile()
 
 bool OggSoundFile::prepareOgg()
 {
-    const ov_callbacks callbacks = { cb_read, cb_seek, cb_close, cb_tell };
+    constexpr ov_callbacks callbacks = { cb_read, cb_seek, cb_close, cb_tell };
     ov_open_callbacks(m_file.get(), &m_vorbisFile, nullptr, 0, callbacks);
 
     vorbis_info* vi = ov_info(&m_vorbisFile, -1);
-    if(!vi) {
+    if (!vi) {
         g_logger.error(stdext::format("ogg file not supported: %s", m_file->name()));
         return false;
     }
@@ -53,14 +53,14 @@ bool OggSoundFile::prepareOgg()
 
 int OggSoundFile::read(void* buffer, int bufferSize)
 {
-    auto bytesBuffer = reinterpret_cast<char*>(buffer);
+    auto* bytesBuffer = reinterpret_cast<char*>(buffer);
     int    section = 0;
     size_t totalBytesRead = 0;
 
-    while(bufferSize > 0) {
+    while (bufferSize > 0) {
         const size_t bytesToRead = bufferSize;
         const long bytesRead = ov_read(&m_vorbisFile, bytesBuffer, bytesToRead, 0, 2, 1, &section);
-        if(bytesRead == 0)
+        if (bytesRead == 0)
             break;
 
         bufferSize -= bytesRead;
@@ -78,36 +78,36 @@ void OggSoundFile::reset()
 
 size_t OggSoundFile::cb_read(void* ptr, size_t size, size_t nmemb, void* source)
 {
-    const auto file = static_cast<FileStream*>(source);
+    auto* const file = static_cast<FileStream*>(source);
     return file->read(ptr, size, nmemb);
 }
 
 int OggSoundFile::cb_seek(void* source, ogg_int64_t offset, int whence)
 {
-    const auto file = static_cast<FileStream*>(source);
-    switch(whence) {
-    case SEEK_SET:
-        file->seek(offset);
-        return 0;
-    case SEEK_CUR:
-        file->seek(file->tell() + offset);
-        return 0;
-    case SEEK_END:
-        file->seek(file->size() + offset);
-        return 0;
+    auto* const file = static_cast<FileStream*>(source);
+    switch (whence) {
+        case SEEK_SET:
+            file->seek(offset);
+            return 0;
+        case SEEK_CUR:
+            file->seek(file->tell() + offset);
+            return 0;
+        case SEEK_END:
+            file->seek(file->size() + offset);
+            return 0;
     }
     return -1;
 }
 
 int OggSoundFile::cb_close(void* source)
 {
-    const auto file = static_cast<FileStream*>(source);
+    auto* const file = static_cast<FileStream*>(source);
     file->close();
     return 0;
 }
 
 long OggSoundFile::cb_tell(void* source)
 {
-    const auto file = static_cast<FileStream*>(source);
+    auto* const file = static_cast<FileStream*>(source);
     return file->tell();
 }

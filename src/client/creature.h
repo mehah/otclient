@@ -23,12 +23,12 @@
 #ifndef CREATURE_H
 #define CREATURE_H
 
-#include <framework/core/declarations.h>
-#include <framework/core/timer.h>
-#include <framework/graphics/cachedtext.h>
 #include "mapview.h"
 #include "outfit.h"
 #include "thing.h"
+#include <framework/core/declarations.h>
+#include <framework/core/timer.h>
+#include <framework/graphics/cachedtext.h>
 
  // @bindclass
 class Creature : public Thing
@@ -218,11 +218,13 @@ protected:
     Timer m_jumpTimer;
 
 private:
-    struct DrawCache {
+    struct DrawCache
+    {
         int exactSize, frameSizeNotResized;
     };
 
-    struct StepCache {
+    struct StepCache
+    {
         uint16 speed = 0;
         uint16 groundSpeed = 0;
         uint64 duration = 0;
@@ -235,7 +237,11 @@ private:
     DrawCache m_drawCache;
 
     bool m_drawOutfitColor{ true };
-    PainterShaderProgramPtr m_outfitShader, m_mountShader;
+    PainterShaderProgramPtr m_outfitShader,
+        m_mountShader;
+
+    std::function<void()> m_outfitShaderAction{ nullptr },
+        m_mountShaderAction{ nullptr };
 };
 
 // @bindclass

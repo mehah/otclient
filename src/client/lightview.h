@@ -23,10 +23,10 @@
 #ifndef LIGHTVIEW_H
 #define LIGHTVIEW_H
 
-#include <framework/graphics/declarations.h>
-#include <framework/graphics/framebuffer.h>
 #include "declarations.h"
 #include "thingtype.h"
+#include <framework/graphics/declarations.h>
+#include <framework/graphics/framebuffer.h>
 
 class LightView : public LuaObject
 {
@@ -46,7 +46,8 @@ public:
     bool isDark() const { return m_globalLight.intensity < 250; }
 
 private:
-    struct Source {
+    struct Source
+    {
         Point pos;
         uint8 color{ 0 };
         uint16 intensity{ 0 };

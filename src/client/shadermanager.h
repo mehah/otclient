@@ -23,14 +23,15 @@
 #ifndef SHADERMANAGER_H
 #define SHADERMANAGER_H
 
-#include <framework/graphics/paintershaderprogram.h>
 #include "declarations.h"
+#include <framework/graphics/paintershaderprogram.h>
 
- //@bindsingleton g_shaders
+//@bindsingleton g_shaders
 class ShaderManager
 {
 public:
-    enum {
+    enum
+    {
         ITEM_ID_UNIFORM = 10,
         OUTFIT_ID_UNIFORM = 11,
         MOUNT_ID_UNIFORM = 12,

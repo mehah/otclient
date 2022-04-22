@@ -39,7 +39,7 @@ int Http::get(const std::string& url, int timeout)
         timeout = 5;
     int operationId = m_operationId++;
 
-    boost::asio::post(m_ios, [&, url, timeout, operationId] {
+    asio::post(m_ios, [&, url, timeout, operationId] {
         auto result = std::make_shared<HttpResult>();
         result->url = url;
         result->operationId = operationId;
@@ -75,7 +75,7 @@ int Http::post(const std::string& url, const std::string& data, int timeout, boo
     }
 
     int operationId = m_operationId++;
-    boost::asio::post(m_ios, [&, url, data, timeout, isJson, operationId] {
+    asio::post(m_ios, [&, url, data, timeout, isJson, operationId] {
         auto result = std::make_shared<HttpResult>();
         result->url = url;
         result->operationId = operationId;
@@ -107,7 +107,7 @@ int Http::download(const std::string& url, std::string path, int timeout)
         timeout = 5;
 
     int operationId = m_operationId++;
-    boost::asio::post(m_ios, [&, url, path, timeout, operationId] {
+    asio::post(m_ios, [&, url, path, timeout, operationId] {
         auto result = std::make_shared<HttpResult>();
         result->url = url;
         result->operationId = operationId;
@@ -148,7 +148,7 @@ int Http::ws(const std::string& url, int timeout)
         timeout = 5;
     int operationId = m_operationId++;
 
-    boost::asio::post(m_ios, [&, url, timeout, operationId] {
+    asio::post(m_ios, [&, url, timeout, operationId] {
         auto result = std::make_shared<HttpResult>();
         result->url = url;
         result->operationId = operationId;
@@ -178,7 +178,7 @@ int Http::ws(const std::string& url, int timeout)
 
 bool Http::wsSend(int operationId, std::string message)
 {
-    boost::asio::post(m_ios, [&, operationId, message] {
+    asio::post(m_ios, [&, operationId, message] {
         auto wit = m_websockets.find(operationId);
         if (wit == m_websockets.end()) {
             return;
@@ -196,7 +196,7 @@ bool Http::wsClose(int operationId)
 
 bool Http::cancel(int id) 
 {
-    // boost::asio::post(m_ios, [&, id] {
+    // asio::post(m_ios, [&, id] {
         auto wit = m_websockets.find(id);
         if (wit != m_websockets.end()) {
             wit->second->close();
@@ -217,25 +217,25 @@ void HttpSession::start()
 {
     
     instance_uri = parseURI(m_url);
-    boost::asio::ip::tcp::resolver::query query_resolver(instance_uri.domain, instance_uri.port);
+    asio::ip::tcp::resolver::query query_resolver(instance_uri.domain, instance_uri.port);
 
     m_response.body_limit((std::numeric_limits<std::uint64_t>::max)());
 
     m_request.version(11);
     m_request.target(instance_uri.query);
-    m_request.set(boost::beast::http::field::host, instance_uri.domain);
-    m_request.set(boost::beast::http::field::user_agent, m_agent);    
+    m_request.set(beast::http::field::host, instance_uri.domain);
+    m_request.set(beast::http::field::user_agent, m_agent);    
     if(m_result->postData == "") {
-        m_request.method(boost::beast::http::verb::get);
+        m_request.method(beast::http::verb::get);
     } else {
-        m_request.method(boost::beast::http::verb::post);
-        m_request.set(boost::beast::http::field::accept, "*/*");
+        m_request.method(beast::http::verb::post);
+        m_request.set(beast::http::field::accept, "*/*");
         if(m_isJson){
-            m_request.set(boost::beast::http::field::content_type, "application/json");
+            m_request.set(beast::http::field::content_type, "application/json");
         } else {
-            m_request.set(boost::beast::http::field::content_type, "application/x-www-form-urlencoded");
+            m_request.set(beast::http::field::content_type, "application/x-www-form-urlencoded");
         }
-        m_request.set(boost::beast::http::field::content_length, std::to_string(m_result->postData.size()));
+        m_request.set(beast::http::field::content_length, std::to_string(m_result->postData.size()));
         m_request.body() = m_result->postData;
     }
 
@@ -246,13 +246,13 @@ void HttpSession::start()
 	m_resolver.async_resolve(
 		query_resolver,
             [sft = shared_from_this()](
-                const std::error_code& ec, boost::asio::ip::tcp::resolver::results_type results)
+                const std::error_code& ec, asio::ip::tcp::resolver::results_type results)
             {
                 sft->on_resolve(ec, results);
             });
 }
 
-void HttpSession::on_resolve(const std::error_code& ec, boost::asio::ip::tcp::resolver::results_type results)
+void HttpSession::on_resolve(const std::error_code& ec, asio::ip::tcp::resolver::results_type results)
 {
     if (ec) {
         onError("HttpSession unable to resolve " + m_url + ": " + ec.message());
@@ -264,10 +264,10 @@ void HttpSession::on_resolve(const std::error_code& ec, boost::asio::ip::tcp::re
 
     // Make the connection on the IP address we get from a lookup
     if(instance_uri.port == "443") {
-        boost::beast::get_lowest_layer(m_ssl).async_connect(
+        beast::get_lowest_layer(m_ssl).async_connect(
             results,
                 [sft = shared_from_this()](
-                    const std::error_code& ec, boost::asio::ip::tcp::resolver::results_type::endpoint_type et)
+                    const std::error_code& ec, asio::ip::tcp::resolver::results_type::endpoint_type et)
                 {
                     sft->on_connect(ec, et);
                 });
@@ -275,14 +275,14 @@ void HttpSession::on_resolve(const std::error_code& ec, boost::asio::ip::tcp::re
         m_socket.async_connect(
             results,
                 [sft = shared_from_this()](
-                    const std::error_code& ec, boost::asio::ip::tcp::resolver::results_type::endpoint_type et)
+                    const std::error_code& ec, asio::ip::tcp::resolver::results_type::endpoint_type et)
                 {
                     sft->on_connect(ec, et);
                 });
     }
 }
 
-void HttpSession::on_connect(const std::error_code& ec, boost::asio::ip::tcp::resolver::results_type::endpoint_type)
+void HttpSession::on_connect(const std::error_code& ec, asio::ip::tcp::resolver::results_type::endpoint_type)
 {
     if (ec) {
         onError("HttpSession unable to connect " + m_url + ": " + ec.message());
@@ -294,14 +294,14 @@ void HttpSession::on_connect(const std::error_code& ec, boost::asio::ip::tcp::re
 
     if(instance_uri.port == "443") {
         m_ssl.async_handshake(
-            boost::asio::ssl::stream_base::client,
+            asio::ssl::stream_base::client,
                 [sft = shared_from_this()](
                     const std::error_code& ec)
                 {
                     sft->on_handshake(ec);
                 });
     } else {
-        boost::beast::http::async_write(
+        beast::http::async_write(
             m_socket, m_request,
                 [sft = shared_from_this()](
                     const std::error_code& ec, size_t bytes)
@@ -322,7 +322,7 @@ void HttpSession::on_handshake(const std::error_code& ec)
     m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec){sft->onTimeout(ec);});
 
     // Send the HTTP request to the remote host
-    boost::beast::http::async_write(
+    beast::http::async_write(
         m_ssl, m_request,
             [sft = shared_from_this()](
                 const std::error_code& ec, size_t bytes)
@@ -349,7 +349,7 @@ void HttpSession::on_write(const std::error_code& ec, size_t bytes_transferred)
     
     // Receive the HTTP response
     if(instance_uri.port == "443") {
-        boost::beast::http::async_read_some(
+        beast::http::async_read_some(
             m_ssl, m_streambuf, m_response,
                 [sft = shared_from_this()](
                     const std::error_code& ec, size_t bytes)
@@ -357,7 +357,7 @@ void HttpSession::on_write(const std::error_code& ec, size_t bytes_transferred)
                     sft->on_read(ec, bytes);
                 });
     } else {
-        boost::beast::http::async_read_some(
+        beast::http::async_read_some(
             m_socket, m_streambuf, m_response,
                 [sft = shared_from_this()](
                     const std::error_code& ec, size_t bytes)
@@ -378,7 +378,7 @@ void HttpSession::on_read(const std::error_code& ec, size_t bytes_transferred)
     // after each chunk header and also after the last chunk.
     auto header_cb =
     [&](std::uint64_t size,                         // Size of the chunk, or zero for the last chunk
-        boost::beast::string_view extensions,       // The raw chunk-extensions string. Already validated.
+        beast::string_view extensions,       // The raw chunk-extensions string. Already validated.
         std::error_code& ev)                        // We can set this to indicate an error
     {
         if(ev)
@@ -387,7 +387,7 @@ void HttpSession::on_read(const std::error_code& ec, size_t bytes_transferred)
         // See if the chunk is too big
         if(size > (std::numeric_limits<std::size_t>::max)())
         {
-            ev = make_error_code(boost::beast::http::error::body_limit);
+            ev = make_error_code(beast::http::error::body_limit);
             return;
         }
 
@@ -413,9 +413,9 @@ void HttpSession::on_read(const std::error_code& ec, size_t bytes_transferred)
     while(!m_response.is_done()) {
         int bytes = 0;
         if(instance_uri.port == "443") {
-            bytes = boost::beast::http::read_some(m_ssl, m_streambuf, m_response);
+            bytes = beast::http::read_some(m_ssl, m_streambuf, m_response);
         } else {
-            bytes = boost::beast::http::read_some(m_socket, m_streambuf, m_response);
+            bytes = beast::http::read_some(m_socket, m_streambuf, m_response);
         }
 
         sum_bytes_response += bytes;
@@ -444,10 +444,10 @@ void HttpSession::on_read(const std::error_code& ec, size_t bytes_transferred)
 
     boost::ignore_unused(bytes_transferred);
 
-    m_result->response = boost::beast::buffers_to_string(m_response.get().body().data());
+    m_result->response = beast::buffers_to_string(m_response.get().body().data());
 
     // not_connected happens sometimes so don't bother reporting it.
-    if(ec && ec != make_error_code(boost::beast::errc::not_connected)) {
+    if(ec && ec != make_error_code(beast::errc::not_connected)) {
         std::cout << "shutdown " << m_url << ": " << ec.message() << std::endl;
         return;
     }
@@ -463,9 +463,9 @@ void HttpSession::close()
     if(instance_uri.port == "443") {    
         m_ssl.async_shutdown(
             [sft = shared_from_this()](
-                boost::beast::error_code ec)
+                beast::error_code ec)
             {
-                if(ec ==  boost::asio::error::eof){
+                if(ec ==  asio::error::eof){
                     ec = {};
                 }
 
@@ -475,11 +475,11 @@ void HttpSession::close()
                 }
             });
     } else {
-        boost::beast::error_code ec;
-        m_socket.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+        beast::error_code ec;
+        m_socket.socket().shutdown(asio::ip::tcp::socket::shutdown_both, ec);
 
         // not_connected happens sometimes so don't bother reporting it.
-        if(ec && ec != boost::beast::errc::not_connected){
+        if(ec && ec != beast::errc::not_connected){
             onError("shutdown " + m_url + ": " + ec.message());
             return;
         }
@@ -501,19 +501,19 @@ void HttpSession::onError(const std::string& ec, const std::string& details)
 void WebsocketSession::start()
 {
     instance_uri = parseURI(m_url);
-    boost::asio::ip::tcp::resolver::query query_resolver(instance_uri.domain, instance_uri.port);
+    asio::ip::tcp::resolver::query query_resolver(instance_uri.domain, instance_uri.port);
     m_domain = instance_uri.domain;
 
 	m_resolver.async_resolve(
 		query_resolver,
             [sft = shared_from_this()](
-                const std::error_code& ec, boost::asio::ip::tcp::resolver::results_type results)
+                const std::error_code& ec, asio::ip::tcp::resolver::results_type results)
             {
                 sft->on_resolve(ec, results);
             });
 }
 
-void WebsocketSession::on_resolve(const std::error_code& ec, boost::asio::ip::tcp::resolver::results_type results)
+void WebsocketSession::on_resolve(const std::error_code& ec, asio::ip::tcp::resolver::results_type results)
 {
     if (ec) {
         onError("WebsocketSession unable to resolve " + m_url + ": " + ec.message());
@@ -525,25 +525,25 @@ void WebsocketSession::on_resolve(const std::error_code& ec, boost::asio::ip::tc
 
     // Make the connection on the IP address we get from a lookup
     if(instance_uri.port == "443") {
-        boost::beast::get_lowest_layer(m_ssl).async_connect(
+        beast::get_lowest_layer(m_ssl).async_connect(
             results,
                 [sft = shared_from_this()](
-                    const std::error_code& ec, boost::asio::ip::tcp::resolver::results_type::endpoint_type et)
+                    const std::error_code& ec, asio::ip::tcp::resolver::results_type::endpoint_type et)
                 {
                     sft->on_connect(ec, et);
                 });     
     } else {
-        boost::beast::get_lowest_layer(m_socket).async_connect(
+        beast::get_lowest_layer(m_socket).async_connect(
             results,
                 [sft = shared_from_this()](
-                    const std::error_code& ec, boost::asio::ip::tcp::resolver::results_type::endpoint_type et)
+                    const std::error_code& ec, asio::ip::tcp::resolver::results_type::endpoint_type et)
                 {
                     sft->on_connect(ec, et);
                 });
     }
 }
 
-void WebsocketSession::on_connect(const std::error_code& ec, boost::asio::ip::tcp::resolver::results_type::endpoint_type)
+void WebsocketSession::on_connect(const std::error_code& ec, asio::ip::tcp::resolver::results_type::endpoint_type)
 {
     if (ec) {
         onError("WebsocketSession unable to on_connect " + m_url + ": " + ec.message());
@@ -559,8 +559,8 @@ void WebsocketSession::on_connect(const std::error_code& ec, boost::asio::ip::tc
                 m_ssl.next_layer().native_handle(),
                 m_domain.c_str()))
         {
-            auto _ec = boost::beast::error_code(static_cast<int>(::ERR_get_error()),
-                boost::asio::error::get_ssl_category());
+            auto _ec = beast::error_code(static_cast<int>(::ERR_get_error()),
+                asio::error::get_ssl_category());
              onError("WebsocketSession unable to ssl connect" + _ec.message());
              return;
         }
@@ -572,7 +572,7 @@ void WebsocketSession::on_connect(const std::error_code& ec, boost::asio::ip::tc
         
         // Perform the SSL handshake
         m_ssl.next_layer().async_handshake(
-            boost::asio::ssl::stream_base::client,
+            asio::ssl::stream_base::client,
                 [sft = shared_from_this()](
                     const std::error_code& ec)
                 {
@@ -581,14 +581,14 @@ void WebsocketSession::on_connect(const std::error_code& ec, boost::asio::ip::tc
     } else {
         // Set suggested timeout settings for the websocket
         m_socket.set_option(
-            boost::beast::websocket::stream_base::timeout::suggested(
-                boost::beast::role_type::client));
+            beast::websocket::stream_base::timeout::suggested(
+                beast::role_type::client));
 
         // Set a decorator to change the User-Agent of the handshake
-        m_socket.set_option(boost::beast::websocket::stream_base::decorator(
-            [](boost::beast::websocket::request_type& req)
+        m_socket.set_option(beast::websocket::stream_base::decorator(
+            [](beast::websocket::request_type& req)
             {
-                req.set(boost::beast::http::field::user_agent,
+                req.set(beast::http::field::user_agent,
                     std::string(BOOST_BEAST_VERSION_STRING) +
                         " websocket-client-otclient");
             }));
@@ -617,14 +617,14 @@ void WebsocketSession::on_ssl_handshake(const std::error_code& ec)
 
     // Set suggested timeout settings for the websocket
     m_ssl.set_option(
-        boost::beast::websocket::stream_base::timeout::suggested(
-            boost::beast::role_type::client));
+        beast::websocket::stream_base::timeout::suggested(
+            beast::role_type::client));
 
     // Set a decorator to change the User-Agent of the handshake
-    m_ssl.set_option(boost::beast::websocket::stream_base::decorator(
-        [](boost::beast::websocket::request_type& req)
+    m_ssl.set_option(beast::websocket::stream_base::decorator(
+        [](beast::websocket::request_type& req)
         {
-            req.set(boost::beast::http::field::user_agent,
+            req.set(beast::http::field::user_agent,
                 std::string(BOOST_BEAST_VERSION_STRING) +
                     " websocket-client-otclient-async-ssl");
         }));
@@ -701,7 +701,7 @@ void WebsocketSession::on_write(const std::error_code& ec, size_t bytes_transfer
     if(instance_uri.port == "443") {
         if(! m_sendQueue.empty())
             m_ssl.async_write(
-                boost::asio::buffer(m_sendQueue.front()),
+                asio::buffer(m_sendQueue.front()),
                     [sft = shared_from_this()](
                         const std::error_code& ec, size_t bytes)
                     {
@@ -710,7 +710,7 @@ void WebsocketSession::on_write(const std::error_code& ec, size_t bytes_transfer
     } else {
         if(! m_sendQueue.empty())
             m_socket.async_write(
-                boost::asio::buffer(m_sendQueue.front()),
+                asio::buffer(m_sendQueue.front()),
                     [sft = shared_from_this()](
                         const std::error_code& ec, size_t bytes)
                     {
@@ -734,7 +734,7 @@ void WebsocketSession::on_read(const std::error_code& ec, size_t bytes_transferr
     }
 
     boost::ignore_unused(bytes_transferred);
-    m_callback(WEBSOCKET_MESSAGE, boost::beast::buffers_to_string(m_streambuf.data()));
+    m_callback(WEBSOCKET_MESSAGE, beast::buffers_to_string(m_streambuf.data()));
     m_streambuf.consume(m_streambuf.size());
 
     stdext::millisleep(100);
@@ -794,7 +794,7 @@ void WebsocketSession::send(std::string data)
                 return;
 
             m_ssl.async_write(
-                boost::asio::buffer(m_sendQueue.front()),
+                asio::buffer(m_sendQueue.front()),
                     [sft = shared_from_this()](
                         const std::error_code& ec, size_t bytes)
                     {
@@ -811,7 +811,7 @@ void WebsocketSession::send(std::string data)
                 return;
 
             m_socket.async_write(
-                boost::asio::buffer(m_sendQueue.front()),
+                asio::buffer(m_sendQueue.front()),
                     [sft = shared_from_this()](
                         const std::error_code& ec, size_t bytes)
                     {
@@ -829,7 +829,7 @@ void WebsocketSession::close()
     if(instance_uri.port == "443") {
         if(m_ssl.is_open()) {
             m_ssl.async_close(
-                boost::beast::websocket::close_code::normal,
+                beast::websocket::close_code::normal,
                     [sft = shared_from_this()](
                         const std::error_code& ec)
                     {
@@ -839,7 +839,7 @@ void WebsocketSession::close()
     } else {
         if(m_socket.is_open()) {
             m_socket.async_close(
-                boost::beast::websocket::close_code::normal,
+                beast::websocket::close_code::normal,
                     [sft = shared_from_this()](
                         const std::error_code& ec)
                     {

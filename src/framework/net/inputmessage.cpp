@@ -77,11 +77,19 @@ uint64 InputMessage::getU64()
     return v;
 }
 
+int64 InputMessage::get64()
+{
+    checkRead(8);
+    const int64 v = stdext::readSLE64(m_buffer + m_readPos);
+    m_readPos += 8;
+    return v;
+}
+
 std::string InputMessage::getString()
 {
     const uint16 stringLength = getU16();
     checkRead(stringLength);
-    const auto v = (char*)(m_buffer + m_readPos);
+    const auto* const v = (char*)(m_buffer + m_readPos);
     m_readPos += stringLength;
     return std::string(v, stringLength);
 }
@@ -123,18 +131,18 @@ bool InputMessage::readChecksum()
 
 bool InputMessage::canRead(int bytes)
 {
-    if((m_readPos - m_headerPos + bytes > m_messageSize) || (m_readPos + bytes > BUFFER_MAXSIZE))
+    if ((m_readPos - m_headerPos + bytes > m_messageSize) || (m_readPos + bytes > BUFFER_MAXSIZE))
         return false;
     return true;
 }
 void InputMessage::checkRead(int bytes)
 {
-    if(!canRead(bytes))
+    if (!canRead(bytes))
         throw stdext::exception("InputMessage eof reached");
 }
 
 void InputMessage::checkWrite(int bytes)
 {
-    if(bytes > BUFFER_MAXSIZE)
+    if (bytes > BUFFER_MAXSIZE)
         throw stdext::exception("InputMessage max buffer size reached");
 }

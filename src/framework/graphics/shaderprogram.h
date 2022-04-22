@@ -23,15 +23,16 @@
 #ifndef SHADERPROGRAM_H
 #define SHADERPROGRAM_H
 
-#include <framework/luaengine/luaobject.h>
 #include <GL/glew.h>
+#include <framework/luaengine/luaobject.h>
 
 #include "shader.h"
 
  // @bindclass
 class ShaderProgram : public LuaObject
 {
-    enum {
+    enum
+    {
         MAX_UNIFORM_LOCATIONS = 30
     };
 

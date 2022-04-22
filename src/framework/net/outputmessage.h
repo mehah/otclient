@@ -23,14 +23,15 @@
 #ifndef OUTPUTMESSAGE_H
 #define OUTPUTMESSAGE_H
 
-#include <framework/luaengine/luaobject.h>
 #include "declarations.h"
+#include <framework/luaengine/luaobject.h>
 
- // @bindclass
+// @bindclass
 class OutputMessage : public LuaObject
 {
 public:
-    enum {
+    enum
+    {
         BUFFER_MAXSIZE = 65536,
         MAX_STRING_LENGTH = 65536,
         MAX_HEADER_SIZE = 8

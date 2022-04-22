@@ -23,9 +23,9 @@
 #ifndef UIITEM_H
 #define UIITEM_H
 
-#include <framework/ui/uiwidget.h>
 #include "declarations.h"
 #include "item.h"
+#include <framework/ui/uiwidget.h>
 
 class UIItem : public UIWidget
 {
@@ -34,8 +34,8 @@ public:
     void drawSelf(Fw::DrawPane drawPane) override;
 
     void setItemId(int id);
-    void setItemCount(int count) { if(m_item) m_item->setCount(count); }
-    void setItemSubType(int subType) { if(m_item) m_item->setSubType(subType); }
+    void setItemCount(int count) { if (m_item) m_item->setCount(count); }
+    void setItemSubType(int subType) { if (m_item) m_item->setSubType(subType); }
     void setItemVisible(bool visible) { m_itemVisible = visible; }
     void setItem(const ItemPtr& item) { m_item = item; }
     void setVirtual(bool virt) { m_virtual = virt; }

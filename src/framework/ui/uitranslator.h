@@ -23,10 +23,11 @@
 #ifndef TRANSLATOR_H
 #define TRANSLATOR_H
 
-#include <string>
 #include "../const.h"
+#include <string>
 
-namespace Fw {
+namespace Fw
+{
     AlignmentFlag translateAlignment(std::string aligment);
     AnchorEdge translateAnchorEdge(std::string anchorEdge);
     WidgetState translateState(std::string state);

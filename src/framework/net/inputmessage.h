@@ -23,14 +23,15 @@
 #ifndef INPUTMESSAGE_H
 #define INPUTMESSAGE_H
 
-#include <framework/luaengine/luaobject.h>
 #include "declarations.h"
+#include <framework/luaengine/luaobject.h>
 
- // @bindclass
+// @bindclass
 class InputMessage : public LuaObject
 {
 public:
-    enum {
+    enum
+    {
         BUFFER_MAXSIZE = 65536,
         MAX_HEADER_SIZE = 8
     };
@@ -46,6 +47,7 @@ public:
     uint16 getU16();
     uint32 getU32();
     uint64 getU64();
+    int64 get64();
     std::string getString();
     double getDouble();
 

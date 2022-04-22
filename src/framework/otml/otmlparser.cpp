@@ -21,7 +21,6 @@
  */
 
 #include "otmlparser.h"
-#include <boost/tokenizer.hpp>
 #include "otmldocument.h"
 #include "otmlexception.h"
 
@@ -29,15 +28,14 @@ OTMLParser::OTMLParser(const OTMLDocumentPtr& doc, std::istream& in) :
     currentDepth(0), currentLine(0),
     doc(doc), currentParent(doc), previousNode(nullptr),
     in(in)
-{
-}
+{}
 
 void OTMLParser::parse()
 {
-    if(!in.good())
+    if (!in.good())
         throw OTMLException(doc, "cannot read from input stream");
 
-    while(!in.eof())
+    while (!in.eof())
         parseLine(getNextLine());
 }
 
@@ -53,19 +51,19 @@ int OTMLParser::getLineDepth(const std::string& line, bool multilining)
 {
     // count number of spaces at the line beginning
     std::size_t spaces = 0;
-    while(line[spaces] == ' ')
+    while (line[spaces] == ' ')
         spaces++;
 
     // pre calculate depth
     const int depth = spaces / 2;
 
-    if(!multilining || depth <= currentDepth) {
+    if (!multilining || depth <= currentDepth) {
         // check the next character is a tab
-        if(line[spaces] == '\t')
+        if (line[spaces] == '\t')
             throw OTMLException(doc, "indentation with tabs are not allowed", currentLine);
 
         // must indent every 2 spaces
-        if(spaces % 2 != 0)
+        if (spaces % 2 != 0)
             throw OTMLException(doc, "must indent every 2 spaces", currentLine);
     }
 
@@ -76,29 +74,29 @@ void OTMLParser::parseLine(std::string line)
 {
     const int depth = getLineDepth(line);
 
-    if(depth == -1)
+    if (depth == -1)
         return;
 
     // remove line sides spaces
     stdext::trim(line);
 
     // skip empty lines
-    if(line.empty())
+    if (line.empty())
         return;
 
     // skip comments
-    if(line.starts_with("//"))
+    if (line.starts_with("//"))
         return;
 
     // a depth above, change current parent to the previous added node
-    if(depth == currentDepth + 1) {
+    if (depth == currentDepth + 1) {
         currentParent = previousNode;
         // a depth below, change parent to previous parent
-    } else if(depth < currentDepth) {
-        for(int i = 0; i < currentDepth - depth; ++i)
+    } else if (depth < currentDepth) {
+        for (int i = 0; i < currentDepth - depth; ++i)
             currentParent = parentMap[currentParent];
         // if it isn't the current depth, it's a syntax error
-    } else if(depth != currentDepth)
+    } else if (depth != currentDepth)
         throw OTMLException(doc, "invalid indentation depth, are you indenting correctly?", currentLine);
 
     // sets current depth
@@ -113,17 +111,17 @@ void OTMLParser::parseNode(const std::string& data)
 {
     std::string tag;
     std::string value;
-    std::size_t dotsPos = data.find_first_of(':');
-    int nodeLine = currentLine;
+    const std::size_t dotsPos = data.find_first_of(':');
+    const int nodeLine = currentLine;
 
     // node that has no tag and may have a value
-    if(!data.empty() && data[0] == '-') {
+    if (!data.empty() && data[0] == '-') {
         value = data.substr(1);
         stdext::trim(value);
         // node that has tag and possible a value
-    } else if(dotsPos != std::string::npos) {
+    } else if (dotsPos != std::string::npos) {
         tag = data.substr(0, dotsPos);
-        if(data.size() > dotsPos + 1)
+        if (data.size() > dotsPos + 1)
             value = data.substr(dotsPos + 1);
         // node that has only a tag
     } else {
@@ -134,22 +132,22 @@ void OTMLParser::parseNode(const std::string& data)
     stdext::trim(value);
 
     // process multitine values
-    if(value == "|" || value == "|-" || value == "|+") {
+    if (value == "|" || value == "|-" || value == "|+") {
         // reads next lines until we can a value below the same depth
         std::string multiLineData;
         do {
-            size_t lastPos = in.tellg();
+            const size_t lastPos = in.tellg();
             std::string line = getNextLine();
-            int depth = getLineDepth(line, true);
+            const int depth = getLineDepth(line, true);
 
             // depth above current depth, add the text to the multiline
-            if(depth > currentDepth) {
+            if (depth > currentDepth) {
                 multiLineData += line.substr((currentDepth + 1) * 2);
                 // it has contents below the current depth
             } else {
                 // if not empty, its a node
                 stdext::trim(line);
-                if(!line.empty()) {
+                if (!line.empty()) {
                     // rewind and break
                     in.seekg(lastPos, std::ios::beg);
                     currentLine--;
@@ -157,20 +155,20 @@ void OTMLParser::parseNode(const std::string& data)
                 }
             }
             multiLineData += "\n";
-        } while(!in.eof());
+        } while (!in.eof());
 
         /* determine how to treat new lines at the end
          * | strip all new lines at the end and add just a new one
          * |- strip all new lines at the end
          * |+ keep all the new lines at the end (the new lines until next node)
          */
-        if(value == "|" || value == "|-") {
+        if (value == "|" || value == "|-") {
             // remove all new lines at the end
             int lastPos = multiLineData.length();
-            while(multiLineData[--lastPos] == '\n')
+            while (multiLineData[--lastPos] == '\n')
                 multiLineData.erase(lastPos, 1);
 
-            if(value == "|")
+            if (value == "|")
                 multiLineData.append("\n");
         } // else it's |+
 
@@ -178,20 +176,20 @@ void OTMLParser::parseNode(const std::string& data)
     }
 
     // create the node
-    OTMLNodePtr node = OTMLNode::create(tag);
+    const OTMLNodePtr node = OTMLNode::create(tag);
 
     node->setUnique(dotsPos != std::string::npos);
     node->setTag(tag);
     node->setSource(doc->source() + ":" + stdext::unsafe_cast<std::string>(nodeLine));
 
     // ~ is considered the null value
-    if(value == "~")
+    if (value == "~")
         node->setNull(true);
     else {
-        if(value.starts_with("[") && value.ends_with("]")) {
-            std::string tmp = value.substr(1, value.length() - 2);
-            boost::tokenizer<boost::escaped_list_separator<char>> tokens(tmp);
-            for(std::string v : tokens) {
+        if (value.starts_with("[") && value.ends_with("]")) {
+            const std::string tmp = value.substr(1, value.length() - 2);
+            const std::vector tokens = stdext::split(tmp, ",");
+            for (std::string v : tokens) {
                 stdext::trim(v);
                 node->writeIn(v);
             }

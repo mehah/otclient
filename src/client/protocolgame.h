@@ -23,10 +23,10 @@
 #ifndef PROTOCOLGAME_H
 #define PROTOCOLGAME_H
 
-#include <framework/net/protocol.h>
 #include "creature.h"
 #include "declarations.h"
 #include "protocolcodes.h"
+#include <framework/net/protocol.h>
 
 class ProtocolGame : public Protocol
 {
@@ -126,7 +126,7 @@ public:
 protected:
     void onConnect() override;
     void onRecv(const InputMessagePtr& inputMessage) override;
-    void onError(const boost::system::error_code& error) override;
+    void onError(const std::error_code& error) override;
 
     friend class Game;
 
@@ -142,6 +142,7 @@ private:
     void parseStoreOffers(const InputMessagePtr& msg);
     void parseCompleteStorePurchase(const InputMessagePtr& msg);
     void parseRequestPurchaseData(const InputMessagePtr& msg);
+    void parseResourceBalance(const InputMessagePtr& msg);
     void parseWorldTime(const InputMessagePtr& msg);
     void parseCoinBalance(const InputMessagePtr& msg);
     void parseCoinBalanceUpdating(const InputMessagePtr& msg);
@@ -245,6 +246,39 @@ private:
     void parseExtendedOpcode(const InputMessagePtr& msg);
     void parseChangeMapAwareRange(const InputMessagePtr& msg);
     void parseCreaturesMark(const InputMessagePtr& msg);
+
+    // 12x
+    void parseShowDescription(const InputMessagePtr& msg);
+    void parseBestiaryTracker(const InputMessagePtr& msg);
+    void parseTaskHuntingBasicData(const InputMessagePtr& msg);
+    void parseTaskHuntingData(const InputMessagePtr& msg);
+    void parseExperienceTracker(const InputMessagePtr& msg);
+    void parseLootContainers(const InputMessagePtr& msg);
+    void parseSupplyStash(const InputMessagePtr& msg);
+    void parseSpecialContainer(const InputMessagePtr& msg);
+    void parsePartyAnalyzer(const InputMessagePtr& msg);
+    void parseClientCheck(const InputMessagePtr& msg);
+    void parseGameNews(const InputMessagePtr& msg);
+    void parseBlessDialog(const InputMessagePtr& msg);
+    void parseRestingAreaState(const InputMessagePtr& msg);
+    void parseUpdateImpactTracker(const InputMessagePtr& msg);
+    void parseItemsPrice(const InputMessagePtr& msg);
+    void parseUpdateSupplyTracker(const InputMessagePtr& msg);
+    void parseUpdateLootTracker(const InputMessagePtr& msg);
+    void parseBestiaryEntryChanged(const InputMessagePtr& msg);
+    void parseDailyRewardCollectionState(const InputMessagePtr& msg);
+    void parseOpenRewardWall(const InputMessagePtr& msg);
+    void parseDailyReward(const InputMessagePtr& msg);
+    void parseRewardHistory(const InputMessagePtr& msg);
+    void parsePreyTimeLeft(const InputMessagePtr& msg);
+    void getPreyMonster(const InputMessagePtr& msg);
+    void getPreyMonsters(const InputMessagePtr& msg);
+    void parsePreyData(const InputMessagePtr& msg);
+    void parsePreyRerollPrice(const InputMessagePtr& msg);
+    void getImbuementInfo(const InputMessagePtr& msg);
+    void parseImbuementWindow(const InputMessagePtr& msg);
+    void parseCloseImbuementWindow(const InputMessagePtr& msg);
+    void parseError(const InputMessagePtr& msg);
 
 public:
     void setMapDescription(const InputMessagePtr& msg, int x, int y, int z, int width, int height);

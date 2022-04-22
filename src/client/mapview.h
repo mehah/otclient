@@ -23,11 +23,11 @@
 #ifndef MAPVIEW_H
 #define MAPVIEW_H
 
+#include "lightview.h"
 #include <framework/core/inputevent.h>
 #include <framework/graphics/declarations.h>
 #include <framework/graphics/paintershaderprogram.h>
 #include <framework/luaengine/luaobject.h>
-#include "lightview.h"
 
 struct AwareRange
 {
@@ -40,7 +40,8 @@ struct AwareRange
 class MapView : public LuaObject
 {
 public:
-    enum FloorViewMode {
+    enum FloorViewMode
+    {
         NORMAL,
         FADE,
         LOCKED,
@@ -48,7 +49,8 @@ public:
         ALWAYS_WITH_TRANSPARENCY
     };
 
-    enum AntialiasingMode :uint8 {
+    enum AntialiasingMode :uint8
+    {
         ANTIALIASING_DISABLED,
         ANTIALIASING_ENABLED,
         ANTIALIASING_SMOOTH_RETRO
@@ -58,7 +60,6 @@ public:
     ~MapView() override;
     void draw(const Rect& rect);
 
-public:
     // floor visibility related
     uint8 getLockedFirstVisibleFloor() { return m_lockedFirstVisibleFloor; }
     uint8 getCachedFirstVisibleFloor() { return m_cachedFirstVisibleFloor; }
@@ -154,23 +155,21 @@ protected:
     friend class LightView;
 
 private:
-    struct MapList {
+    struct MapList
+    {
         std::vector<TilePtr> shades, grounds, surfaces, effects;
         void clear() { shades.clear(); grounds.clear(); surfaces.clear(); effects.clear(); }
     };
 
-    struct Pools {
-        PoolFramedPtr map;
-        PoolPtr creatureInformation, text;
-    };
-
-    struct Crosshair {
+    struct Crosshair
+    {
         bool positionChanged = false;
         Position position;
         TexturePtr texture;
     };
 
-    struct RectCache {
+    struct RectCache
+    {
         Rect rect, srcRect;
         Point drawOffset;
         float horizontalStretchFactor, verticalStretchFactor;
@@ -191,12 +190,12 @@ private:
 
     void updateViewport(const Otc::Direction dir = Otc::InvalidDirection) { m_viewport = m_viewPortDirection[dir]; }
 
-    bool canFloorFade() { return m_floorViewMode == FloorViewMode::FADE && m_floorFading; }
+    bool canFloorFade() { return m_floorViewMode == FADE && m_floorFading; }
 
     float getFadeLevel(uint8 z)
     {
         float fading = std::clamp<float>(static_cast<float>(m_fadingFloorTimers[z].elapsed_millis()) / static_cast<float>(m_floorFading), 0.f, 1.f);
-        if(z < m_cachedFirstVisibleFloor)
+        if (z < m_cachedFirstVisibleFloor)
             fading = 1.0 - fading;
         return fading;
     }
@@ -267,7 +266,6 @@ private:
     PainterShaderProgramPtr m_shader, m_nextShader;
     LightViewPtr m_lightView;
     CreaturePtr m_followingCreature;
-    Pools m_pools;
 
     RectCache m_rectCache;
     FloorViewMode m_floorViewMode{ NORMAL };

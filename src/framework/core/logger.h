@@ -26,7 +26,7 @@
 #include "../global.h"
 
 #include <fstream>
-#include <framework/stdext/thread.h>
+#include <mutex>
 
 struct LogMessage
 {
@@ -39,7 +39,8 @@ struct LogMessage
 // @bindsingleton g_logger
 class Logger
 {
-    enum {
+    enum
+    {
         MAX_LOG_HISTORY = 1000
     };
 

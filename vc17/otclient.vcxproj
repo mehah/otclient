@@ -177,7 +177,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$(ProjectDir)../src/framework/protobuf/ --proto_path=$(ProjectDir)../src/framework/protobuf/proto/ appearances.proto shared.proto"</Command>
+      <Command>if NOT EXIST "$(ProjectDir)../src/framework/protobuf/appearances.pb.cc" (
+cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$(ProjectDir)../src/framework/protobuf/ --proto_path=$(ProjectDir)../src/framework/protobuf/proto/ appearances.proto shared.proto"
+)</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -193,7 +195,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$(ProjectDir)../src/framework/protobuf/ --proto_path=$(ProjectDir)../src/framework/protobuf/proto/ appearances.proto shared.proto"</Command>
+      <Command>if NOT EXIST "$(ProjectDir)../src/framework/protobuf/appearances.pb.cc" (
+cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$(ProjectDir)../src/framework/protobuf/ --proto_path=$(ProjectDir)../src/framework/protobuf/proto/ appearances.proto shared.proto"
+)</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -216,7 +220,9 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PreBuildEvent>
-      <Command>cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$(ProjectDir)../src/framework/protobuf/ --proto_path=$(ProjectDir)../src/framework/protobuf/proto/ appearances.proto shared.proto"</Command>
+      <Command>if NOT EXIST "$(ProjectDir)../src/framework/protobuf/appearances.pb.cc" (
+cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$(ProjectDir)../src/framework/protobuf/ --proto_path=$(ProjectDir)../src/framework/protobuf/proto/ appearances.proto shared.proto"
+)</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='static|Win32'">
@@ -240,7 +246,9 @@
       <AdditionalDependencies>glew32.lib;zlib.lib;physfs-static.lib;openal32.lib;lua51.lib;ogg.lib;vorbisfile.lib;vorbis.lib;opengl32.lib;dbghelp.lib;kernel32.lib;user32.lib;shell32.lib;gdi32.lib;advapi32.lib;ole32.lib;crypt32.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$(ProjectDir)../src/framework/protobuf/ --proto_path=$(ProjectDir)../src/framework/protobuf/proto/ appearances.proto shared.proto"</Command>
+      <Command>if NOT EXIST "$(ProjectDir)../src/framework/protobuf/appearances.pb.cc" (
+cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$(ProjectDir)../src/framework/protobuf/ --proto_path=$(ProjectDir)../src/framework/protobuf/proto/ appearances.proto shared.proto"
+)</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release - GIT Version|Win32'">
@@ -264,7 +272,9 @@
       <AdditionalDependencies>glew32.lib;zlib.lib;physfs-static.lib;openal32.lib;lua51.lib;ogg.lib;vorbisfile.lib;vorbis.lib;opengl32.lib;dbghelp.lib;kernel32.lib;user32.lib;shell32.lib;gdi32.lib;advapi32.lib;ole32.lib;crypt32.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$(ProjectDir)../src/framework/protobuf/ --proto_path=$(ProjectDir)../src/framework/protobuf/proto/ appearances.proto shared.proto"
+      <Command>if NOT EXIST "$(ProjectDir)../src/framework/protobuf/appearances.pb.cc" (
+cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$(ProjectDir)../src/framework/protobuf/ --proto_path=$(ProjectDir)../src/framework/protobuf/proto/ appearances.proto shared.proto"
+)
 
 echo | set /p dummyName=#define GIT_BRANCH &gt;  ../src/gitinfo.h
 git rev-parse --abbrev-ref HEAD &gt;&gt;  ../src/gitinfo.h
@@ -298,7 +308,9 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PreBuildEvent>
-      <Command>cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$(ProjectDir)../src/framework/protobuf/ --proto_path=$(ProjectDir)../src/framework/protobuf/proto/ appearances.proto shared.proto"</Command>
+      <Command>if NOT EXIST "$(ProjectDir)../src/framework/protobuf/appearances.pb.cc" (
+cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$(ProjectDir)../src/framework/protobuf/ --proto_path=$(ProjectDir)../src/framework/protobuf/proto/ appearances.proto shared.proto"
+)</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='static|x64'">
@@ -342,7 +354,9 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PreBuildEvent>
-      <Command>cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$(ProjectDir)../src/framework/protobuf/ --proto_path=$(ProjectDir)../src/framework/protobuf/proto/ appearances.proto shared.proto"
+      <Command>if NOT EXIST "$(ProjectDir)../src/framework/protobuf/appearances.pb.cc" (
+cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$(ProjectDir)../src/framework/protobuf/ --proto_path=$(ProjectDir)../src/framework/protobuf/proto/ appearances.proto shared.proto"
+)
 
 echo | set /p dummyName=#define GIT_BRANCH &gt;  ../src/gitinfo.h
 git rev-parse --abbrev-ref HEAD &gt;&gt;  ../src/gitinfo.h
@@ -647,12 +661,10 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
     <ClInclude Include="..\src\framework\sound\soundmanager.h" />
     <ClInclude Include="..\src\framework\sound\soundsource.h" />
     <ClInclude Include="..\src\framework\sound\streamsoundsource.h" />
-    <ClInclude Include="..\src\framework\stdext\any.h" />
     <ClInclude Include="..\src\framework\stdext\cast.h" />
     <ClInclude Include="..\src\framework\stdext\compiler.h" />
     <ClInclude Include="..\src\framework\stdext\demangle.h" />
     <ClInclude Include="..\src\framework\stdext\dumper.h" />
-    <ClInclude Include="..\src\framework\stdext\dynamic_storage.h" />
     <ClInclude Include="..\src\framework\stdext\exception.h" />
     <ClInclude Include="..\src\framework\stdext\format.h" />
     <ClInclude Include="..\src\framework\stdext\hash.h" />
@@ -664,7 +676,6 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
     <ClInclude Include="..\src\framework\stdext\shared_ptr.h" />
     <ClInclude Include="..\src\framework\stdext\stdext.h" />
     <ClInclude Include="..\src\framework\stdext\string.h" />
-    <ClInclude Include="..\src\framework\stdext\thread.h" />
     <ClInclude Include="..\src\framework\stdext\time.h" />
     <ClInclude Include="..\src\framework\stdext\traits.h" />
     <ClInclude Include="..\src\framework\stdext\types.h" />
@@ -688,6 +699,7 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
     <ClInclude Include="..\src\framework\util\point.h" />
     <ClInclude Include="..\src\framework\util\rect.h" />
     <ClInclude Include="..\src\framework\util\size.h" />
+    <ClInclude Include="..\src\framework\util\uuid.h" />
     <ClInclude Include="..\src\framework\xml\tinystr.h" />
     <ClInclude Include="..\src\framework\xml\tinyxml.h" />
     <ClInclude Include="..\src\framework\protobuf\appearances.pb.h" />
