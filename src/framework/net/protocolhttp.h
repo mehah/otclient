@@ -53,13 +53,14 @@ public:
     HttpSession(boost::asio::io_service& service, const std::string& url, const std::string& agent, 
             const bool& enable_time_out_on_read_write,
             const std::map<std::string, std::string>& custom_header,
-            int timeout, HttpResult_ptr result, HttpResult_cb callback) :
+            int timeout, bool isJson, HttpResult_ptr result, HttpResult_cb callback) :
                 m_service(service),
                 m_url(url),
                 m_agent(agent),
                 m_enable_time_out_on_read_write(enable_time_out_on_read_write),
                 m_custom_header(custom_header),
                 m_timeout(timeout),
+                m_isJson(isJson),
                 m_result(result),
                 m_callback(callback),
                 m_socket(service),
@@ -81,6 +82,7 @@ private:
     bool m_enable_time_out_on_read_write;
     std::map<std::string, std::string> m_custom_header;
     int m_timeout;
+    bool m_isJson;
     HttpResult_ptr m_result;
     HttpResult_cb m_callback;
     boost::beast::tcp_stream m_socket;    
@@ -94,8 +96,6 @@ private:
     boost::beast::flat_buffer m_streambuf{ 512 * 1024 * 1024 }; // (Must persist between reads)
     boost::beast::http::request<boost::beast::http::string_body> m_request;
     boost::beast::http::response_parser<boost::beast::http::dynamic_body> m_response;
-
-    std::string _m_response;
 
     void on_resolve(const std::error_code& ec, boost::asio::ip::tcp::resolver::results_type iterator);
     void on_connect(const std::error_code& ec, boost::asio::ip::tcp::resolver::results_type::endpoint_type);
@@ -185,7 +185,7 @@ public:
     void terminate();
 
     int get(const std::string& url, int timeout = 5);
-    int post(const std::string& url, const std::string& data, int timeout = 5);
+    int post(const std::string& url, const std::string& data, int timeout = 5, bool isJson = false);
     int download(const std::string& url, std::string path, int timeout = 5);
     int ws(const std::string& url, int timeout = 5);
     bool wsSend(int operationId, std::string message);

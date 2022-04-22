@@ -44,7 +44,8 @@ int Http::get(const std::string& url, int timeout)
         result->url = url;
         result->operationId = operationId;
         m_operations[operationId] = result;
-        auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout, result, [&](HttpResult_ptr result) {
+        auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
+                                                    false, result, [&](HttpResult_ptr result) {
             bool finished = result->finished;
             g_dispatcher.addEvent([result, finished] {
                 if (!finished) {
@@ -64,7 +65,7 @@ int Http::get(const std::string& url, int timeout)
     return operationId;
 }
 
-int Http::post(const std::string& url, const std::string& data, int timeout) 
+int Http::post(const std::string& url, const std::string& data, int timeout, bool isJson) 
 {
     if (!timeout) // lua is not working with default values
         timeout = 5;
@@ -74,13 +75,14 @@ int Http::post(const std::string& url, const std::string& data, int timeout)
     }
 
     int operationId = m_operationId++;
-    boost::asio::post(m_ios, [&, url, data, timeout, operationId] {
+    boost::asio::post(m_ios, [&, url, data, timeout, isJson, operationId] {
         auto result = std::make_shared<HttpResult>();
         result->url = url;
         result->operationId = operationId;
         result->postData = data;
         m_operations[operationId] = result;
-        auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout, result, [&](HttpResult_ptr result) {
+        auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
+                                                    isJson, result, [&](HttpResult_ptr result) {
             bool finished = result->finished;
             g_dispatcher.addEvent([result, finished] {
                 if (!finished) {
@@ -110,7 +112,8 @@ int Http::download(const std::string& url, std::string path, int timeout)
         result->url = url;
         result->operationId = operationId;
         m_operations[operationId] = result;
-        auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout, result, [&, path](HttpResult_ptr result) {
+        auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
+                                                    false, result, [&, path](HttpResult_ptr result) {
 
             if (!result->finished) {
                 g_dispatcher.addEvent([result] {
@@ -227,7 +230,11 @@ void HttpSession::start()
     } else {
         m_request.method(boost::beast::http::verb::post);
         m_request.set(boost::beast::http::field::accept, "*/*");
-        m_request.set(boost::beast::http::field::content_type, "application/json");
+        if(m_isJson){
+            m_request.set(boost::beast::http::field::content_type, "application/json");
+        } else {
+            m_request.set(boost::beast::http::field::content_type, "application/x-www-form-urlencoded");
+        }
         m_request.set(boost::beast::http::field::content_length, std::to_string(m_result->postData.size()));
         m_request.body() = m_result->postData;
     }
@@ -397,10 +404,6 @@ void HttpSession::on_read(const std::error_code& ec, size_t bytes_transferred)
     
     if(m_response.get().has_content_length()){
         m_result->size = m_response.content_length().value();
-    }
-
-    for (auto& h : m_response.get().base()) {
-        std::cout << "Field: " << h.name() << " /text: " << h.name_string() << ", Value: " << h.value() << "\n";
     }
 
     int sum_bytes_response = 0;
