@@ -1596,7 +1596,7 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg)
     }
 
     double soul = 0;
-    if (g_game.getFeature(Otc::GameSoulStat))
+    if (g_game.getFeature(Otc::GameSoul))
         soul = msg->getU8();
 
     double stamina = 0;
