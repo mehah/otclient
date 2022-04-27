@@ -1,19 +1,41 @@
+/*
+ * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 #ifndef  PROTOCOLHTTP_H
 #define PROTOCOLHTTP_H
 
 #include <framework/global.h>
 #include <framework/stdext/uri.h>
 
-#include <vector>
-#include <iostream>
-#include <string>
-#include <memory>
-#include <functional>
-#include <future>
 #include <queue>
 
 #include <asio.hpp>
-#include <beast.hpp>
+#include <asio/ssl.hpp>
+
+#ifdef FW_WEBSOCKET
+    #include <boost/beast.hpp>
+    #include <boost/beast/ssl/ssl_stream.hpp>
+    namespace beast = boost::beast;
+#endif
 
 #include <zlib.h>
 
@@ -81,30 +103,33 @@ private:
     bool m_isJson;
     HttpResult_ptr m_result;
     HttpResult_cb m_callback;
-    beast::tcp_stream m_socket;    
+    asio::ip::tcp::socket m_socket;    
     asio::ip::tcp::resolver m_resolver;
     asio::steady_timer m_timer;
     ParsedURI instance_uri;
 
     asio::ssl::context m_context{ asio::ssl::context::sslv23_client };
-    asio::ssl::stream<beast::tcp_stream> m_ssl{ m_service, m_context };
+    asio::ssl::stream<asio::ip::tcp::socket> m_ssl{ m_service, m_context };
 
-    beast::flat_buffer m_streambuf{ 512 * 1024 * 1024 }; // (Must persist between reads)
-    beast::http::request<beast::http::string_body> m_request;
-    beast::http::response_parser<beast::http::dynamic_body> m_response;
+    std::string m_request;
+    asio::streambuf m_response;
+    int sum_bytes_response = 0;
+    int sum_bytes_speed_response = 0;
+    ticks_t m_last_progress_update = stdext::millis();    
 
-    void on_resolve(const std::error_code& ec, asio::ip::tcp::resolver::results_type iterator);
-    void on_connect(const std::error_code& ec, asio::ip::tcp::resolver::results_type::endpoint_type);
+    void on_resolve(const std::error_code& ec, const asio::ip::tcp::resolver::results_type& iterator);
+    void on_connect(const std::error_code& ec);
 
-    void on_handshake(const std::error_code& ec);
+    void on_request_sent(const std::error_code& ec, size_t bytes_transferred);
 
-    void on_write(const std::error_code& ec, size_t bytes_transferred);
+    void on_write();
     void on_read(const std::error_code& ec, size_t bytes_transferred);
 
     void onTimeout(const std::error_code& ec);
     void onError(const std::string& ec, const std::string& details = "");
 };
 
+#ifdef FW_WEBSOCKET
 //  web socket
 enum WebsocketCallbackType {
     WEBSOCKET_OPEN,
@@ -172,6 +197,7 @@ private:
     void onTimeout(const std::error_code& ec);
     void onError(const std::string& ec, const std::string& details = "");
 };
+#endif
 
 class Http {
 public:
@@ -183,10 +209,11 @@ public:
     int get(const std::string& url, int timeout = 5);
     int post(const std::string& url, const std::string& data, int timeout = 5, bool isJson = false);
     int download(const std::string& url, std::string path, int timeout = 5);
+    #ifdef FW_WEBSOCKET
     int ws(const std::string& url, int timeout = 5);
     bool wsSend(int operationId, std::string message);
     bool wsClose(int operationId);
-
+    #endif
     bool cancel(int id);
 
     const std::map<std::string, HttpResult_ptr>& downloads() {
@@ -225,7 +252,9 @@ private:
     asio::io_context m_ios;
     asio::executor_work_guard<asio::io_context::executor_type> m_guard;
     std::map<int, HttpResult_ptr> m_operations;
+    #ifdef FW_WEBSOCKET
     std::map<int, std::shared_ptr<WebsocketSession>> m_websockets;
+    #endif
     std::map<std::string, HttpResult_ptr> m_downloads;
     std::string m_userAgent = "Mozilla/5.0";
     std::map<std::string, std::string> m_custom_header;
