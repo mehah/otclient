@@ -154,11 +154,9 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_http", "get", &Http::get, &g_http);
     g_lua.bindSingletonFunction("g_http", "post", &Http::post, &g_http);
     g_lua.bindSingletonFunction("g_http", "download", &Http::download, &g_http);
-    #ifdef FW_WEBSOCKET
     g_lua.bindSingletonFunction("g_http", "ws", &Http::ws, &g_http);
     g_lua.bindSingletonFunction("g_http", "wsSend", &Http::wsSend, &g_http);
     g_lua.bindSingletonFunction("g_http", "wsClose", &Http::wsClose, &g_http);  
-    #endif  
     g_lua.bindSingletonFunction("g_http", "cancel", &Http::cancel, &g_http);
 
     // ModuleManager

@@ -31,13 +31,8 @@
 #include <asio.hpp>
 #include <asio/ssl.hpp>
 
-#ifdef FW_WEBSOCKET
-    #include <boost/beast.hpp>
-    #include <boost/beast/ssl/ssl_stream.hpp>
-    namespace beast = boost::beast;
-#endif
-
 #include <zlib.h>
+#include <random>
 
 //  result
 class HttpSession;
@@ -87,7 +82,6 @@ public:
     {
         assert(m_callback != nullptr);
         assert(m_result != nullptr);
-        m_ssl.set_verify_mode(asio::ssl::verify_none);
     };
     void start();
     void cancel() { onError("canceled"); }
@@ -103,7 +97,7 @@ private:
     bool m_isJson;
     HttpResult_ptr m_result;
     HttpResult_cb m_callback;
-    asio::ip::tcp::socket m_socket;    
+    asio::ip::tcp::socket m_socket;
     asio::ip::tcp::resolver m_resolver;
     asio::steady_timer m_timer;
     ParsedURI instance_uri;
@@ -115,9 +109,9 @@ private:
     asio::streambuf m_response;
     int sum_bytes_response = 0;
     int sum_bytes_speed_response = 0;
-    ticks_t m_last_progress_update = stdext::millis();    
+    ticks_t m_last_progress_update = stdext::millis();
 
-    void on_resolve(const std::error_code& ec, const asio::ip::tcp::resolver::results_type& iterator);
+    void on_resolve(const std::error_code& ec, asio::ip::tcp::resolver::iterator iterator);
     void on_connect(const std::error_code& ec);
 
     void on_request_sent(const std::error_code& ec, size_t bytes_transferred);
@@ -129,7 +123,6 @@ private:
     void onError(const std::string& ec, const std::string& details = "");
 };
 
-#ifdef FW_WEBSOCKET
 //  web socket
 enum WebsocketCallbackType {
     WEBSOCKET_OPEN,
@@ -154,6 +147,7 @@ public:
             m_result(result),
             m_callback(callback),
             m_timer(service),
+            m_socket(service),
             m_resolver(service)
     {
         assert(m_callback != nullptr);
@@ -161,7 +155,7 @@ public:
     };
 
     void start();
-    void send(std::string data);
+    void send(std::string data, uint8 ws_opcode = 0);
     void close();
 
 private:
@@ -173,22 +167,25 @@ private:
     HttpResult_ptr m_result;
     WebsocketSession_cb m_callback;
     asio::steady_timer m_timer;
+    asio::ip::tcp::socket m_socket;
     asio::ip::tcp::resolver m_resolver;
     bool m_closed;
     ParsedURI instance_uri;
-    std::string m_domain;
 
-    beast::websocket::stream<beast::tcp_stream> m_socket{m_service};
     asio::ssl::context m_context{ asio::ssl::context::sslv23_client };
-    beast::websocket::stream<beast::ssl_stream<beast::tcp_stream>> m_ssl{ m_service, m_context };
+    asio::ssl::stream<asio::ip::tcp::socket> m_ssl{ m_service, m_context };
 
-    beast::flat_buffer m_streambuf{ 16 * 1024 * 1024 }; // limited to 16MB
     std::queue<std::string> m_sendQueue;
 
-    void on_resolve(const std::error_code& ec, asio::ip::tcp::resolver::results_type results);
-    void on_connect(const std::error_code& ec, asio::ip::tcp::resolver::results_type::endpoint_type);
-    void on_ssl_handshake(const std::error_code& ec);
-    void on_handshake(const std::error_code& ec);
+    std::string m_request;
+    asio::streambuf m_response;
+    int sum_bytes_response = 0;
+    int sum_bytes_speed_response = 0;
+    ticks_t m_last_progress_update = stdext::millis();    
+
+    void on_resolve(const std::error_code& ec, asio::ip::tcp::resolver::iterator iterator);
+    void on_connect(const std::error_code& ec);
+    void on_request_sent(const std::error_code& ec, size_t bytes_transferred);
 
     void on_write(const std::error_code& ec, size_t bytes_transferred);
     void on_read(const std::error_code& ec, size_t bytes_transferred);
@@ -197,7 +194,6 @@ private:
     void onTimeout(const std::error_code& ec);
     void onError(const std::string& ec, const std::string& details = "");
 };
-#endif
 
 class Http {
 public:
@@ -209,11 +205,9 @@ public:
     int get(const std::string& url, int timeout = 5);
     int post(const std::string& url, const std::string& data, int timeout = 5, bool isJson = false);
     int download(const std::string& url, std::string path, int timeout = 5);
-    #ifdef FW_WEBSOCKET
     int ws(const std::string& url, int timeout = 5);
     bool wsSend(int operationId, std::string message);
     bool wsClose(int operationId);
-    #endif
     bool cancel(int id);
 
     const std::map<std::string, HttpResult_ptr>& downloads() {
@@ -252,9 +246,7 @@ private:
     asio::io_context m_ios;
     asio::executor_work_guard<asio::io_context::executor_type> m_guard;
     std::map<int, HttpResult_ptr> m_operations;
-    #ifdef FW_WEBSOCKET
     std::map<int, std::shared_ptr<WebsocketSession>> m_websockets;
-    #endif
     std::map<std::string, HttpResult_ptr> m_downloads;
     std::string m_userAgent = "Mozilla/5.0";
     std::map<std::string, std::string> m_custom_header;

@@ -205,19 +205,6 @@ else()
 endif()
 message(STATUS "LuaJIT: " ${LUAJIT})
 
-#find boost beast
-if(FRAMEWORK_WEBSOCKET)
-    find_package(Boost REQUIRED)
-    set(framework_LIBRARIES ${framework_LIBRARIES}
-    ${Boost_LIBRARIES})
-
-    set(framework_INCLUDE_DIRS ${framework_INCLUDE_DIRS}
-    ${Boost_INCLUDE_DIRS})
-
-    set(framework_DEFINITIONS ${framework_DEFINITIONS} -DFW_WEBSOCKET)
-    message(STATUS "Websocket: ON ")
-endif()
-
 find_package(PhysFS REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(Protobuf REQUIRED)
