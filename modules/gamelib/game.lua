@@ -5,8 +5,7 @@ function g_game.findPlayerItem(itemId, subType)
     if localPlayer then
         for slot = InventorySlotFirst, InventorySlotLast do
             local item = localPlayer:getInventoryItem(slot)
-            if item and item:getId() == itemId and
-                (subType == -1 or item:getSubType() == subType) then
+            if item and item:getId() == itemId and (subType == -1 or item:getSubType() == subType) then
                 return item
             end
         end
