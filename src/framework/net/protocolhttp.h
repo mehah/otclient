@@ -179,9 +179,6 @@ private:
 
     std::string m_request;
     asio::streambuf m_response;
-    int sum_bytes_response = 0;
-    int sum_bytes_speed_response = 0;
-    ticks_t m_last_progress_update = stdext::millis();    
 
     void on_resolve(const std::error_code& ec, asio::ip::tcp::resolver::iterator iterator);
     void on_connect(const std::error_code& ec);
