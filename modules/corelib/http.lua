@@ -35,7 +35,6 @@ function HTTP.post(url, data, callback)
     data = json.encode(data)
     is_json = true
   end
-  print("http is_json: ", is_json)
   local operation = g_http.post(url, data, HTTP.timeout, is_json)
   HTTP.operations[operation] = {type="post", url=url, callback=callback}
   return operation

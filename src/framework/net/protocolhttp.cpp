@@ -531,13 +531,16 @@ void HttpSession::close()
 void HttpSession::onTimeout(const std::error_code& ec)
 {
     if (!ec){
-        g_logger.error(stdext::format("HttpSession ontimeout %s", ec.message()));
+        onError(stdext::format("HttpSession ontimeout %s", ec.message()));
     }
 }
 
 void HttpSession::onError(const std::string& ec, const std::string& details)
 {
     g_logger.error(stdext::format("%s", ec));
+    m_result->error = stdext::format("%s", ec);
+    m_result->finished = true;
+    m_callback(m_result);    
 }
 
 void WebsocketSession::start()
