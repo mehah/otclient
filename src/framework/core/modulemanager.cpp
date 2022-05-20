@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,7 @@ void ModuleManager::discoverModules()
             if (g_resources.isFileType(moduleFile, "otmod")) {
                 ModulePtr module = discoverModule("/" + moduleDir + "/" + moduleFile);
                 if (module && module->isAutoLoad())
-                    m_autoLoadModules.insert(std::make_pair(module->getAutoLoadPriority(), module));
+                    m_autoLoadModules.emplace(module->getAutoLoadPriority(), module);
             }
         }
     }

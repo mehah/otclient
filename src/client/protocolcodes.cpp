@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -194,7 +194,7 @@ namespace Proto
             messageModesMap[Otc::MessageLook] = 25;
             messageModesMap[Otc::MessageFailure] = 26;
             messageModesMap[Otc::MessageBlue] = 27;
-        } else if (version >= 760) {
+        } else if (version >= 740) {
             messageModesMap[Otc::MessageNone] = 0;
             messageModesMap[Otc::MessageSay] = 1;
             messageModesMap[Otc::MessageWhisper] = 2;

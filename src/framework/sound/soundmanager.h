@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@
 #include "soundchannel.h"
 #include <future>
 
-//@bindsingleton g_sounds
+ //@bindsingleton g_sounds
 class SoundManager
 {
     enum
@@ -46,7 +46,7 @@ public:
     void stopAll();
 
     void preload(std::string filename);
-    SoundSourcePtr play(std::string filename, float fadetime = 0, float gain = 0);
+    SoundSourcePtr play(std::string filename, float fadetime = 0, float gain = 1.0f, float pitch = 1.0f);
     SoundChannelPtr getChannel(int channel);
 
     std::string resolveSoundFile(std::string file);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -131,15 +131,9 @@ void UIMinimap::centerInPosition(const UIWidgetPtr& anchoredWidget, const Positi
     layout->centerInPosition(anchoredWidget, hookedPosition);
 }
 
-void UIMinimap::onZoomChange(int zoom, int oldZoom)
-{
-    callLuaField("onZoomChange", zoom, oldZoom);
-}
+void UIMinimap::onZoomChange(int zoom, int oldZoom) { callLuaField("onZoomChange", zoom, oldZoom); }
 
-void UIMinimap::onCameraPositionChange(const Position& position, const Position& oldPosition)
-{
-    callLuaField("onCameraPositionChange", position, oldPosition);
-}
+void UIMinimap::onCameraPositionChange(const Position& position, const Position& oldPosition) { callLuaField("onCameraPositionChange", position, oldPosition); }
 
 void UIMinimap::onStyleApply(const std::string& styleName, const OTMLNodePtr& styleNode)
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -565,7 +565,7 @@ void ThingType::unserialize(uint16 clientId, ThingCategory category, const FileS
 
         const uint8 width = fin->getU8();
         const uint8 height = fin->getU8();
-        m_size = Size(width, height);
+        m_size = { width, height };
         sizes.push_back(m_size);
         if (width > 1 || height > 1) {
             m_realSize = fin->getU8();
@@ -585,7 +585,7 @@ void ThingType::unserialize(uint16 clientId, ThingCategory category, const FileS
         m_animationPhases += groupAnimationsPhases;
 
         if (groupAnimationsPhases > 1 && g_game.getFeature(Otc::GameEnhancedAnimations)) {
-            auto animator = AnimatorPtr(new Animator);
+            const auto animator = AnimatorPtr(new Animator);
             animator->unserialize(groupAnimationsPhases, fin);
 
             if (frameGroupType == FrameGroupMoving)
@@ -613,20 +613,20 @@ void ThingType::unserialize(uint16 clientId, ThingCategory category, const FileS
             m_size.setWidth(std::max<int>(m_size.width(), s.width()));
             m_size.setHeight(std::max<int>(m_size.height(), s.height()));
         }
-        size_t expectedSize = m_size.area() * m_layers * m_numPatternX * m_numPatternY * m_numPatternZ * m_animationPhases;
+        const size_t expectedSize = m_size.area() * m_layers * m_numPatternX * m_numPatternY * m_numPatternZ * m_animationPhases;
         if (expectedSize != m_spritesIndex.size()) {
-            std::vector sprites(std::move(m_spritesIndex));
+            const std::vector sprites(std::move(m_spritesIndex));
             m_spritesIndex.clear();
             m_spritesIndex.reserve(expectedSize);
             for (size_t i = 0, idx = 0; i < sizes.size(); ++i) {
-                int totalSprites = total_sprites[i];
+                const int totalSprites = total_sprites[i];
                 if (m_size == sizes[i]) {
                     for (int j = 0; j < totalSprites; ++j) {
                         m_spritesIndex.push_back(sprites[idx++]);
                     }
                     continue;
                 }
-                size_t patterns = (totalSprites / sizes[i].area());
+                const size_t patterns = (totalSprites / sizes[i].area());
                 for (size_t p = 0; p < patterns; ++p) {
                     for (int x = 0; x < m_size.width(); ++x) {
                         for (int y = 0; y < m_size.height(); ++y) {
@@ -658,7 +658,7 @@ void ThingType::exportImage(const std::string& fileName)
     if (m_spritesIndex.empty())
         stdext::throw_exception("cannot export thingtype without sprites");
 
-    const ImagePtr image(new Image(Size(32 * m_size.width() * m_layers * m_numPatternX, SPRITE_SIZE * m_size.height() * m_animationPhases * m_numPatternY * m_numPatternZ)));
+    const ImagePtr image(new Image({ 32 * m_size.width() * m_layers * m_numPatternX, SPRITE_SIZE * m_size.height() * m_animationPhases * m_numPatternY * m_numPatternZ }));
     for (int z = 0; z < m_numPatternZ; ++z) {
         for (int y = 0; y < m_numPatternY; ++y) {
             for (int x = 0; x < m_numPatternX; ++x) {
@@ -882,10 +882,10 @@ Size ThingType::getBestTextureDimension(int w, int h, int count)
     assert(w <= SPRITE_SIZE);
     assert(h <= SPRITE_SIZE);
 
-    auto bestDimension = Size(SPRITE_SIZE);
+    Size bestDimension = { SPRITE_SIZE };
     for (int i = w; i <= SPRITE_SIZE; i <<= 1) {
         for (int j = h; j <= SPRITE_SIZE; j <<= 1) {
-            auto candidateDimension = Size(i, j);
+            Size candidateDimension = { i, j };
             if (candidateDimension.area() < numSprites)
                 continue;
             if ((candidateDimension.area() < bestDimension.area()) ||

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ void Effect::drawEffect(const Point& dest, float scaleFactor, LightView* lightVi
             return;
 
         // This requires a separate getPhaseAt method as using getPhase would make all magic effects use the same phase regardless of their appearance time
-        animationPhase = rawGetThingType()->getIdleAnimator()->getPhaseAt(m_animationTimer);
+        animationPhase = animator->getPhaseAt(m_animationTimer);
     } else {
         // hack to fix some animation phases duration, currently there is no better solution
         int ticks = EFFECT_TICKS_PER_FRAME;
@@ -81,7 +81,7 @@ void Effect::onAppear()
 
     // schedule removal
     const auto self = asEffect();
-    g_dispatcher.scheduleEvent([self]() { g_map.removeThing(self); }, m_duration);
+    g_dispatcher.scheduleEvent([self] { g_map.removeThing(self); }, m_duration);
 }
 
 void Effect::waitFor(const EffectPtr& effect)

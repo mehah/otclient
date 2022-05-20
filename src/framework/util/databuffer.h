@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,10 +27,7 @@ class DataBuffer
 {
 public:
     DataBuffer(unsigned int res = 64) : m_capacity(res), m_buffer(new T[m_capacity]) {}
-    ~DataBuffer()
-    {
-        delete[] m_buffer;
-    }
+    ~DataBuffer() { delete[] m_buffer; }
 
     void reset() { m_size = 0; }
 

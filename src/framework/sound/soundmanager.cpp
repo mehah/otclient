@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -164,7 +164,7 @@ void SoundManager::preload(std::string filename)
         m_buffers[filename] = buffer;
 }
 
-SoundSourcePtr SoundManager::play(std::string filename, float fadetime, float gain)
+SoundSourcePtr SoundManager::play(std::string filename, float fadetime, float gain, float pitch)
 {
     if (!m_audioEnabled)
         return nullptr;
@@ -173,6 +173,9 @@ SoundSourcePtr SoundManager::play(std::string filename, float fadetime, float ga
 
     if (gain == 0)
         gain = 1.0f;
+
+    if (pitch == 0)
+        pitch = 1.0f;
 
     filename = resolveSoundFile(filename);
     SoundSourcePtr soundSource = createSoundSource(filename);
@@ -184,6 +187,7 @@ SoundSourcePtr SoundManager::play(std::string filename, float fadetime, float ga
     soundSource->setName(filename);
     soundSource->setRelative(true);
     soundSource->setGain(gain);
+    soundSource->setPitch(pitch);
 
     if (fadetime > 0)
         soundSource->setFading(StreamSoundSource::FadingOn, fadetime);

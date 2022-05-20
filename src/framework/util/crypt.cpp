@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -172,7 +172,7 @@ std::string Crypt::genUUID()
     std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
     std::mt19937 generator(seq);
 
-    return uuids::to_string(uuids::uuid_random_generator{ generator }());
+    return to_string(uuids::uuid_random_generator{ generator }());
 }
 
 bool Crypt::setMachineUUID(std::string uuidstr)
@@ -201,7 +201,7 @@ std::string Crypt::getMachineUUID()
 
         m_machineUUID = uuids::uuid_random_generator{ generator }();
     }
-    return _encrypt(uuids::to_string(m_machineUUID), false);
+    return _encrypt(to_string(m_machineUUID), false);
 }
 
 std::string Crypt::getCryptKey(bool useMachineUUID)
@@ -274,7 +274,7 @@ void Crypt::rsaSetPrivateKey(const std::string& p, const std::string& q, const s
     mpz_set_str(m_d, d.c_str(), 10);
 
     // n = p * q
-    mpz_mul(n, p, q);
+    mpz_mul(m_n, m_p, m_q);
 #else
 #if OPENSSL_VERSION_NUMBER < 0x10100005L
     BN_dec2bn(&m_rsa->p, p.c_str());

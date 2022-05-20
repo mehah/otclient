@@ -4,7 +4,7 @@
 
 #### :heart:  If you are interested in supporting the project, go to this [link](https://www.paypal.com/donate/?business=CV9D5JF8E46LY&no_recurring=0&item_name=Thank+you+very+much+for+your+donation.&currency_code=BRL), any value is great help, thank you.
 
-### Based on [edubart/otclient](https://github.com/edubart/otclient) Rev: [2.758](https://github.com/edubart/otclient/commit/45afb65b90284ce70f328733715043860186bf50)
+### Based on [edubart/otclient](https://github.com/edubart/otclient) Rev: [2.760](https://github.com/edubart/otclient/commit/f0d79638839f20ef41dbc5820a29d8389b9b2bd7)
 
 
 ### Features
@@ -41,7 +41,7 @@
   - To generate an encryption, just run the client with flag "--encrypt SET_YOUR_PASSWORD_HERE" and don't forget to change the password.
 
 ##### [Active Developers]
-[@mehah](https://github.com/mehah) [@scopz](https://github.com/scopz)
+[@mehah](https://github.com/mehah) [@scopz](https://github.com/scopz) [@nekiro](https://github.com/nekiro)
 
 <h2>
 
@@ -85,11 +85,7 @@ client, instead otclient was designed to be a combination of a framework and tib
 
 ### Compiling
 
-In short, if you need to compile OTClient, follow these tutorials:
-
-- [Compiling on Windows](https://github.com/mehah/otclient/wiki/Compiling-on-Windows)
-- [Compiling on Linux](https://github.com/edubart/otclient/wiki/Compiling-on-Linux)
-- [Compiling on OS X](https://github.com/edubart/otclient/wiki/Compiling-on-Mac-OS-X)
+[If you are interested in compiling this project, just go to the wiki.](https://github.com/mehah/otclient/wiki)
 
 ### Build and run with Docker
 

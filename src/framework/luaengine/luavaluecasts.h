@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -130,22 +130,22 @@ bool luavalue_cast(int index, OTMLNodePtr& node);
 
 // enum
 template<class T>
-typename std::enable_if<std::is_enum<T>::value, int>::type
+std::enable_if_t<std::is_enum_v<T>, int>
 push_luavalue(T e) { return push_luavalue(static_cast<int>(e)); }
 
 template<class T>
-typename std::enable_if<std::is_enum<T>::value, bool>::type
+std::enable_if_t<std::is_enum_v<T>, bool>
 luavalue_cast(int index, T& myenum);
 
 // LuaObject pointers
 template<class T>
-typename std::enable_if<std::is_base_of<LuaObject, typename T::element_type>::value, int>::type
+std::enable_if_t<std::is_base_of_v<LuaObject, typename T::element_type>, int>
 push_luavalue(const T& obj);
 
 bool luavalue_cast(int index, LuaObjectPtr& obj);
 
 template<class T>
-typename std::enable_if<std::is_base_of<LuaObject, T>::value, bool>::type
+std::enable_if_t<std::is_base_of_v<LuaObject, T>, bool>
 luavalue_cast(int index, stdext::shared_object_ptr<T>& ptr);
 
 // std::function
@@ -156,7 +156,7 @@ template<typename... Args>
 bool luavalue_cast(int index, std::function<void(Args...)>& func);
 
 template<typename Ret, typename... Args>
-typename std::enable_if<!std::is_void<Ret>::value, bool>::type
+std::enable_if_t<!std::is_void_v<Ret>, bool>
 luavalue_cast(int index, std::function<Ret(Args...)>& func);
 
 // list
@@ -207,7 +207,7 @@ int push_internal_luavalue(T v)
 }
 
 template<class T>
-typename std::enable_if<std::is_enum<T>::value, bool>::type
+std::enable_if_t<std::is_enum_v<T>, bool>
 luavalue_cast(int index, T& myenum)
 {
     int i;
@@ -219,7 +219,7 @@ luavalue_cast(int index, T& myenum)
 }
 
 template<class T>
-typename std::enable_if<std::is_base_of<LuaObject, typename T::element_type>::value, int>::type
+std::enable_if_t<std::is_base_of_v<LuaObject, typename T::element_type>, int>
 push_luavalue(const T& obj)
 {
     if (obj)
@@ -230,7 +230,7 @@ push_luavalue(const T& obj)
 }
 
 template<class T>
-typename std::enable_if<std::is_base_of<LuaObject, T>::value, bool>::type
+std::enable_if_t<std::is_base_of_v<LuaObject, T>, bool>
 luavalue_cast(int index, stdext::shared_object_ptr<T>& ptr)
 {
     LuaObjectPtr obj;
@@ -289,7 +289,7 @@ bool luavalue_cast(int index, std::function<void(Args...)>& func)
 }
 
 template<typename Ret, typename... Args>
-typename std::enable_if<!std::is_void<Ret>::value, bool>::type
+std::enable_if_t<!std::is_void_v<Ret>, bool>
 luavalue_cast(int index, std::function<Ret(Args...)>& func)
 {
     if (g_lua.isFunction(index)) {
@@ -473,7 +473,7 @@ struct push_tuple_luavalue
     template<typename Tuple>
     static void call(const Tuple& tuple)
     {
-        push_internal_luavalue(std::get<std::tuple_size<Tuple>::value - N>(tuple));
+        push_internal_luavalue(std::get<std::tuple_size_v<Tuple> - N>(tuple));
         push_tuple_luavalue<N - 1>::call(tuple);
     }
 };

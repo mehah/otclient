@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,8 +44,8 @@ void DrawPool::add(const Painter::PainterState& state, const Pool::DrawMethod& m
 
     auto& list = m_currentPool->m_objects;
 
-    if (m_forceGrouping) {
-        const auto itFind = std::find_if(list.begin() + m_currentPool->m_indexToStartSearching, list.end(), [state]
+    if (m_currentPool->m_forceGrouping) {
+        const auto itFind = std::find_if(list.begin() + m_currentPool->m_indexToStartSearching, list.end(), [&state]
         (const Pool::DrawObject& action) { return action.state == state; });
 
         if (itFind != list.end()) {
@@ -168,10 +168,9 @@ void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, cons
         return;
 
     const Pool::DrawMethod method{
-        Pool::DrawMethodType::RECT,
-        std::make_pair(dest, src),
-        {},
-        originalDest
+        .type = Pool::DrawMethodType::RECT,
+        .rects = std::make_pair(dest, src),
+        .dest = originalDest
     };
 
     add(generateState(color, texture), method, Painter::DrawMode::TriangleStrip);
@@ -212,7 +211,7 @@ void DrawPool::addFilledTriangle(const Point& a, const Point& b, const Point& c,
     if (a == b || a == c || b == c)
         return;
 
-    const Pool::DrawMethod method{ Pool::DrawMethodType::TRIANGLE, {}, std::make_tuple(a, b, c) };
+    const Pool::DrawMethod method{ .type = Pool::DrawMethodType::TRIANGLE, .points = std::make_tuple(a, b, c) };
 
     add(generateState(color), method);
 }
@@ -223,10 +222,9 @@ void DrawPool::addBoundingRect(const Rect& dest, const Color color, int innerLin
         return;
 
     const Pool::DrawMethod method{
-        Pool::DrawMethodType::BOUNDING_RECT,
-        std::make_pair(dest, Rect()),
-        {},{},
-        static_cast<uint16>(innerLineWidth)
+        .type = Pool::DrawMethodType::BOUNDING_RECT,
+        .rects = std::make_pair(dest, Rect()),
+        .intValue = static_cast<uint16>(innerLineWidth)
     };
 
     add(generateState(color), method);
@@ -234,7 +232,7 @@ void DrawPool::addBoundingRect(const Rect& dest, const Color color, int innerLin
 
 void DrawPool::addAction(std::function<void()> action)
 {
-    m_currentPool->m_objects.push_back(Pool::DrawObject{ {}, Painter::DrawMode::None, {}, std::move(action) });
+    m_currentPool->m_objects.push_back(Pool::DrawObject{ .action = std::move(action) });
 }
 
 Painter::PainterState DrawPool::generateState(const Color& color, const TexturePtr& texture)
@@ -245,6 +243,7 @@ Painter::PainterState DrawPool::generateState(const Color& color, const TextureP
     state.opacity = m_currentPool->m_state.opacity;
     state.alphaWriting = m_currentPool->m_state.alphaWriting;
     state.shaderProgram = m_currentPool->m_state.shaderProgram;
+    state.action = m_currentPool->m_state.action;
     state.color = color;
     state.texture = texture;
 
@@ -259,13 +258,14 @@ void DrawPool::createPools()
         if (type == PoolType::MAP || type == PoolType::LIGHT || type == PoolType::FOREGROUND) {
             pool = std::make_shared<PoolFramed>();
 
-            auto& frameBuffer = pool->toPoolFramed()->m_framebuffer
+            const auto& frameBuffer = pool->toPoolFramed()->m_framebuffer
                 = g_framebuffers.createFrameBuffer(true);
 
             if (type == PoolType::MAP) frameBuffer->disableBlend();
             else if (type == PoolType::LIGHT) frameBuffer->setCompositionMode(Painter::CompositionMode_Light);
         } else {
             pool = std::make_shared<Pool>();
+            pool->m_forceGrouping = true; // CREATURE_INFORMATION & TEXT
         }
 
         pool->m_type = type;
@@ -273,23 +273,8 @@ void DrawPool::createPools()
     }
 }
 
-void DrawPool::setConfig(const PoolType& state)
-{
-    switch (state) {
-        case PoolType::CREATURE_INFORMATION:
-        case PoolType::TEXT:
-            m_forceGrouping = true;
-            break;
-
-        default:
-            m_forceGrouping = false;
-    }
-}
-
 void DrawPool::use(const PoolType type)
 {
-    setConfig(type);
-
     m_currentPool = get<Pool>(type);
     m_currentPool->resetState();
     if (m_currentPool->hasFrameBuffer()) {
@@ -303,7 +288,7 @@ void DrawPool::use(const PoolType type, const Rect& dest, const Rect& src, const
     if (!m_currentPool->hasFrameBuffer())
         return;
 
-    auto pool = m_currentPool->toPoolFramed();
+    const auto pool = m_currentPool->toPoolFramed();
 
     pool->m_dest = dest;
     pool->m_src = src;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,6 +40,6 @@ namespace stdext
     };
     template<typename T> struct remove_const_ref
     {
-        using type = typename std::remove_const<typename std::remove_reference<T>::type>::type;
+        using type = std::remove_const_t<std::remove_reference_t<T>>;
     };
 };

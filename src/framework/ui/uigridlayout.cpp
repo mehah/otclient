@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@
 
 UIGridLayout::UIGridLayout(UIWidgetPtr parentWidget) : UILayout(std::move(parentWidget))
 {
-    m_cellSize = Size(16, 16);
+    m_cellSize = { 16 };
     m_cellSpacing = 0;
     m_numColumns = 1;
     m_numLines = 0;
@@ -61,15 +61,8 @@ void UIGridLayout::applyStyle(const OTMLNodePtr& styleNode)
     }
 }
 
-void UIGridLayout::removeWidget(const UIWidgetPtr&)
-{
-    update();
-}
-
-void UIGridLayout::addWidget(const UIWidgetPtr&)
-{
-    update();
-}
+void UIGridLayout::removeWidget(const UIWidgetPtr&) { update(); }
+void UIGridLayout::addWidget(const UIWidgetPtr&) { update(); }
 
 bool UIGridLayout::internalUpdate()
 {

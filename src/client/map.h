@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -213,8 +213,9 @@ public:
     bool showZone(tileflags_t zone) { return (m_zoneFlags & zone) == zone; }
 
     void setForceShowAnimations(bool force);
-    bool isForcingAnimations();
-    bool isShowingAnimations();
+    bool isShowingAnimations() { return (m_animationFlags & Animation_Show) == Animation_Show; }
+    bool isForcingAnimations() { return (m_animationFlags & Animation_Force) == Animation_Force; }
+
     void setShowAnimations(bool show);
 
     void beginGhostMode(float opacity);

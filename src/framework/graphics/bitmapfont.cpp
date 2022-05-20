@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ void BitmapFont::load(const OTMLNodePtr& fontNode)
     m_glyphHeight = fontNode->valueAt<int>("height");
     m_yOffset = fontNode->valueAt("y-offset", 0);
     m_firstGlyph = fontNode->valueAt("first-glyph", 32);
-    m_glyphSpacing = fontNode->valueAt("spacing", Size(0, 0));
+    m_glyphSpacing = fontNode->valueAt("spacing", Size(0));
     const int spaceWidth = fontNode->valueAt("space-width", glyphSize.width());
 
     // load font texture
@@ -65,7 +65,7 @@ void BitmapFont::load(const OTMLNodePtr& fontNode)
     m_glyphsSize[127].setWidth(1);
 
     // new line actually has a size that will be useful in multiline algorithm
-    m_glyphsSize[static_cast<uchar>('\n')] = Size(1, m_glyphHeight);
+    m_glyphsSize[static_cast<uchar>('\n')] = { 1, m_glyphHeight };
 
     // read custom widths
     /*

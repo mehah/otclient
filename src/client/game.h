@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -314,8 +314,8 @@ public:
     void setClientVersion(int version);
     int getClientVersion() { return m_clientVersion; }
 
-    void setCustomOs(int os) { m_clientCustomOs = os; }
-    int getOs();
+    void setCustomOs(Otc::OperatingSystem_t os) { m_clientCustomOs = os; }
+    Otc::OperatingSystem_t getOs();
 
     bool canPerformGameAction();
     bool checkBotProtection();
@@ -398,7 +398,7 @@ private:
     int m_protocolVersion{ 0 };
     int m_clientVersion{ 0 };
     std::string m_clientSignature;
-    int m_clientCustomOs{ -1 };
+    Otc::OperatingSystem_t m_clientCustomOs{ Otc::CLIENTOS_NONE };
 };
 
 extern Game g_game;

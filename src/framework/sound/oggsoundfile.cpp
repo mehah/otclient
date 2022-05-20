@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ bool OggSoundFile::prepareOgg()
     constexpr ov_callbacks callbacks = { cb_read, cb_seek, cb_close, cb_tell };
     ov_open_callbacks(m_file.get(), &m_vorbisFile, nullptr, 0, callbacks);
 
-    vorbis_info* vi = ov_info(&m_vorbisFile, -1);
+    const vorbis_info* vi = ov_info(&m_vorbisFile, -1);
     if (!vi) {
         g_logger.error(stdext::format("ogg file not supported: %s", m_file->name()));
         return false;

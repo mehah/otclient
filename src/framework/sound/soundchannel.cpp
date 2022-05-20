@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@
 #include "streamsoundsource.h"
 #include <random>
 
-SoundSourcePtr SoundChannel::play(const std::string& filename, float fadetime, float gain)
+SoundSourcePtr SoundChannel::play(const std::string& filename, float fadetime, float gain, float pitch)
 {
     if (!g_sounds.isAudioEnabled() || !m_enabled)
         return nullptr;
@@ -33,7 +33,7 @@ SoundSourcePtr SoundChannel::play(const std::string& filename, float fadetime, f
     if (m_currentSource)
         m_currentSource->stop();
 
-    m_currentSource = g_sounds.play(filename, fadetime, m_gain * gain);
+    m_currentSource = g_sounds.play(filename, fadetime, m_gain * gain, pitch);
     return m_currentSource;
 }
 
@@ -51,11 +51,11 @@ void SoundChannel::stop(float fadetime)
     }
 }
 
-void SoundChannel::enqueue(const std::string& filename, float fadetime, float gain)
+void SoundChannel::enqueue(const std::string& filename, float fadetime, float gain, float pitch)
 {
     if (gain == 0)
         gain = 1.0f;
-    m_queue.push_back(QueueEntry{ g_sounds.resolveSoundFile(filename), fadetime, gain });
+    m_queue.push_back(QueueEntry{ g_sounds.resolveSoundFile(filename), fadetime, gain, pitch });
 
     std::shuffle(m_queue.begin(), m_queue.end(), std::mt19937(std::random_device()()));
     //update();
@@ -70,7 +70,7 @@ void SoundChannel::update()
         const QueueEntry entry = m_queue.front();
         m_queue.pop_front();
         m_queue.push_back(entry);
-        play(entry.filename, entry.fadetime, entry.gain);
+        play(entry.filename, entry.fadetime, entry.gain, entry.pitch);
     }
 }
 

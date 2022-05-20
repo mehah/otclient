@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -254,12 +254,15 @@ void Game::processPingBack()
 {
     ++m_pingReceived;
 
-    if (m_pingReceived == m_pingSent)
-        m_ping = m_pingTimer.elapsed_millis();
-    else
-        g_logger.error("got an invalid ping from server");
+    if (m_pingReceived == m_pingSent) {
+        const ticks_t oldPing = m_ping;
 
-    g_lua.callGlobalField("g_game", "onPingBack", m_ping);
+        m_ping = m_pingTimer.elapsed_millis();
+
+        if (oldPing != m_ping)
+            g_lua.callGlobalField("g_game", "onPingBack", m_ping);
+    } else
+        g_logger.error("got an invalid ping from server");
 
     m_pingEvent = g_dispatcher.scheduleEvent([this] {
         g_game.ping();
@@ -294,43 +297,28 @@ void Game::processOpenContainer(int containerId, const ItemPtr& containerItem, c
 
 void Game::processCloseContainer(int containerId)
 {
-    const ContainerPtr container = getContainer(containerId);
-    if (!container) {
-        return;
+    if (const ContainerPtr container = getContainer(containerId)) {
+        m_containers[containerId] = nullptr;
+        container->onClose();
     }
-
-    m_containers[containerId] = nullptr;
-    container->onClose();
 }
 
 void Game::processContainerAddItem(int containerId, const ItemPtr& item, int slot)
 {
-    const ContainerPtr container = getContainer(containerId);
-    if (!container) {
-        return;
-    }
-
-    container->onAddItem(item, slot);
+    if (const ContainerPtr container = getContainer(containerId))
+        container->onAddItem(item, slot);
 }
 
 void Game::processContainerUpdateItem(int containerId, int slot, const ItemPtr& item)
 {
-    const ContainerPtr container = getContainer(containerId);
-    if (!container) {
-        return;
-    }
-
-    container->onUpdateItem(slot, item);
+    if (const ContainerPtr container = getContainer(containerId))
+        container->onUpdateItem(slot, item);
 }
 
 void Game::processContainerRemoveItem(int containerId, int slot, const ItemPtr& lastItem)
 {
-    const ContainerPtr container = getContainer(containerId);
-    if (!container) {
-        return;
-    }
-
-    container->onRemoveItem(slot, lastItem);
+    if (const ContainerPtr container = getContainer(containerId))
+        container->onRemoveItem(slot, lastItem);
 }
 
 void Game::processInventoryChange(int slot, const ItemPtr& item)
@@ -867,6 +855,7 @@ ItemPtr Game::findItemInContainers(uint itemId, int subType)
                 return item;
         }
     }
+
     return nullptr;
 }
 
@@ -877,6 +866,7 @@ int Game::open(const ItemPtr& item, const ContainerPtr& previousContainer)
 
     const int id = previousContainer ? previousContainer->getId() : findEmptyContainerId();
     m_protocolGame->sendUseItem(item->getPosition(), item->getId(), item->getStackPos(), id);
+
     return id;
 }
 
@@ -900,6 +890,7 @@ void Game::refreshContainer(const ContainerPtr& container)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendRefreshContainer(container->getId());
 }
 
@@ -958,6 +949,7 @@ void Game::cancelAttackAndFollow()
 
     if (isFollowing())
         setFollowingCreature(nullptr);
+
     if (isAttacking())
         setAttackingCreature(nullptr);
 
@@ -965,6 +957,7 @@ void Game::cancelAttackAndFollow()
         m_walkEvent->cancel();
         m_walkEvent = nullptr;
     }
+
     m_nextScheduledDir = Otc::InvalidDirection;
 
     m_localPlayer->stopAutoWalk();
@@ -978,6 +971,7 @@ void Game::talk(const std::string& message)
 {
     if (!canPerformGameAction() || message.empty())
         return;
+
     talkChannel(Otc::MessageSay, 0, message);
 }
 
@@ -985,6 +979,7 @@ void Game::talkChannel(Otc::MessageMode mode, int channelId, const std::string& 
 {
     if (!canPerformGameAction() || message.empty())
         return;
+
     m_protocolGame->sendTalk(mode, channelId, "", message);
 }
 
@@ -992,6 +987,7 @@ void Game::talkPrivate(Otc::MessageMode mode, const std::string& receiver, const
 {
     if (!canPerformGameAction() || receiver.empty() || message.empty())
         return;
+
     m_protocolGame->sendTalk(mode, 0, receiver, message);
 }
 
@@ -999,6 +995,7 @@ void Game::openPrivateChannel(const std::string& receiver)
 {
     if (!canPerformGameAction() || receiver.empty())
         return;
+
     m_protocolGame->sendOpenPrivateChannel(receiver);
 }
 
@@ -1006,6 +1003,7 @@ void Game::requestChannels()
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendRequestChannels();
 }
 
@@ -1013,6 +1011,7 @@ void Game::joinChannel(int channelId)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendJoinChannel(channelId);
 }
 
@@ -1020,6 +1019,7 @@ void Game::leaveChannel(int channelId)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendLeaveChannel(channelId);
 }
 
@@ -1027,6 +1027,7 @@ void Game::closeNpcChannel()
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendCloseNpcChannel();
 }
 
@@ -1034,6 +1035,7 @@ void Game::openOwnChannel()
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendOpenOwnChannel();
 }
 
@@ -1041,6 +1043,7 @@ void Game::inviteToOwnChannel(const std::string& name)
 {
     if (!canPerformGameAction() || name.empty())
         return;
+
     m_protocolGame->sendInviteToOwnChannel(name);
 }
 
@@ -1048,6 +1051,7 @@ void Game::excludeFromOwnChannel(const std::string& name)
 {
     if (!canPerformGameAction() || name.empty())
         return;
+
     m_protocolGame->sendExcludeFromOwnChannel(name);
 }
 
@@ -1055,6 +1059,7 @@ void Game::partyInvite(int creatureId)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendInviteToParty(creatureId);
 }
 
@@ -1062,6 +1067,7 @@ void Game::partyJoin(int creatureId)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendJoinParty(creatureId);
 }
 
@@ -1069,6 +1075,7 @@ void Game::partyRevokeInvitation(int creatureId)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendRevokeInvitation(creatureId);
 }
 
@@ -1076,6 +1083,7 @@ void Game::partyPassLeadership(int creatureId)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendPassLeadership(creatureId);
 }
 
@@ -1083,6 +1091,7 @@ void Game::partyLeave()
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendLeaveParty();
 }
 
@@ -1090,6 +1099,7 @@ void Game::partyShareExperience(bool active)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendShareExperience(active);
 }
 
@@ -1097,6 +1107,7 @@ void Game::requestOutfit()
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendRequestOutfit();
 }
 
@@ -1104,6 +1115,7 @@ void Game::changeOutfit(const Outfit& outfit)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendChangeOutfit(outfit);
 }
 
@@ -1111,6 +1123,7 @@ void Game::addVip(const std::string& name)
 {
     if (!canPerformGameAction() || name.empty())
         return;
+
     m_protocolGame->sendAddVip(name);
 }
 
@@ -1122,6 +1135,7 @@ void Game::removeVip(int playerId)
     const auto it = m_vips.find(playerId);
     if (it == m_vips.end())
         return;
+
     m_vips.erase(it);
     m_protocolGame->sendRemoveVip(playerId);
 }
@@ -1147,8 +1161,10 @@ void Game::setChaseMode(Otc::ChaseModes chaseMode)
 {
     if (!canPerformGameAction())
         return;
+
     if (m_chaseMode == chaseMode)
         return;
+
     m_chaseMode = chaseMode;
     m_protocolGame->sendChangeFightModes(m_fightMode, m_chaseMode, m_safeFight, m_pvpMode);
     g_lua.callGlobalField("g_game", "onChaseModeChange", chaseMode);
@@ -1158,8 +1174,10 @@ void Game::setFightMode(Otc::FightModes fightMode)
 {
     if (!canPerformGameAction())
         return;
+
     if (m_fightMode == fightMode)
         return;
+
     m_fightMode = fightMode;
     m_protocolGame->sendChangeFightModes(m_fightMode, m_chaseMode, m_safeFight, m_pvpMode);
     g_lua.callGlobalField("g_game", "onFightModeChange", fightMode);
@@ -1169,8 +1187,10 @@ void Game::setSafeFight(bool on)
 {
     if (!canPerformGameAction())
         return;
+
     if (m_safeFight == on)
         return;
+
     m_safeFight = on;
     m_protocolGame->sendChangeFightModes(m_fightMode, m_chaseMode, m_safeFight, m_pvpMode);
     g_lua.callGlobalField("g_game", "onSafeFightChange", on);
@@ -1180,10 +1200,13 @@ void Game::setPVPMode(Otc::PVPModes pvpMode)
 {
     if (!canPerformGameAction())
         return;
+
     if (!getFeature(Otc::GamePVPMode))
         return;
+
     if (m_pvpMode == pvpMode)
         return;
+
     m_pvpMode = pvpMode;
     m_protocolGame->sendChangeFightModes(m_fightMode, m_chaseMode, m_safeFight, m_pvpMode);
     g_lua.callGlobalField("g_game", "onPVPModeChange", pvpMode);
@@ -1193,8 +1216,10 @@ void Game::setUnjustifiedPoints(UnjustifiedPoints unjustifiedPoints)
 {
     if (!canPerformGameAction())
         return;
+
     if (!getFeature(Otc::GameUnjustifiedPoints))
         return;
+
     if (m_unjustifiedPoints == unjustifiedPoints)
         return;
 
@@ -1206,6 +1231,7 @@ void Game::setOpenPvpSituations(int openPvpSituations)
 {
     if (!canPerformGameAction())
         return;
+
     if (m_openPvpSituations == openPvpSituations)
         return;
 
@@ -1217,6 +1243,7 @@ void Game::inspectNpcTrade(const ItemPtr& item)
 {
     if (!canPerformGameAction() || !item)
         return;
+
     m_protocolGame->sendInspectNpcTrade(item->getId(), item->getCount());
 }
 
@@ -1224,6 +1251,7 @@ void Game::buyItem(const ItemPtr& item, int amount, bool ignoreCapacity, bool bu
 {
     if (!canPerformGameAction() || !item)
         return;
+
     m_protocolGame->sendBuyItem(item->getId(), item->getCountOrSubType(), amount, ignoreCapacity, buyWithBackpack);
 }
 
@@ -1231,6 +1259,7 @@ void Game::sellItem(const ItemPtr& item, int amount, bool ignoreEquipped)
 {
     if (!canPerformGameAction() || !item)
         return;
+
     m_protocolGame->sendSellItem(item->getId(), item->getSubType(), amount, ignoreEquipped);
 }
 
@@ -1238,6 +1267,7 @@ void Game::closeNpcTrade()
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendCloseNpcTrade();
 }
 
@@ -1245,6 +1275,7 @@ void Game::requestTrade(const ItemPtr& item, const CreaturePtr& creature)
 {
     if (!canPerformGameAction() || !item || !creature)
         return;
+
     m_protocolGame->sendRequestTrade(item->getPosition(), item->getId(), item->getStackPos(), creature->getId());
 }
 
@@ -1252,6 +1283,7 @@ void Game::inspectTrade(bool counterOffer, int index)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendInspectTrade(counterOffer, index);
 }
 
@@ -1259,6 +1291,7 @@ void Game::acceptTrade()
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendAcceptTrade();
 }
 
@@ -1266,6 +1299,7 @@ void Game::rejectTrade()
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendRejectTrade();
 }
 
@@ -1273,6 +1307,7 @@ void Game::editText(uint id, const std::string& text)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendEditText(id, text);
 }
 
@@ -1280,6 +1315,7 @@ void Game::editList(uint id, int doorId, const std::string& text)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendEditList(id, doorId, text);
 }
 
@@ -1287,6 +1323,7 @@ void Game::openRuleViolation(const std::string& reporter)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendOpenRuleViolation(reporter);
 }
 
@@ -1294,6 +1331,7 @@ void Game::closeRuleViolation(const std::string& reporter)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendCloseRuleViolation(reporter);
 }
 
@@ -1301,6 +1339,7 @@ void Game::cancelRuleViolation()
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendCancelRuleViolation();
 }
 
@@ -1308,6 +1347,7 @@ void Game::reportBug(const std::string& comment)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendBugReport(comment);
 }
 
@@ -1315,6 +1355,7 @@ void Game::reportRuleViolation(const std::string& target, int reason, int action
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendRuleViolation(target, reason, action, comment, statement, statementId, ipBanishment);
 }
 
@@ -1327,6 +1368,7 @@ void Game::requestQuestLog()
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendRequestQuestLog();
 }
 
@@ -1334,6 +1376,7 @@ void Game::requestQuestLine(int questId)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendRequestQuestLine(questId);
 }
 
@@ -1341,6 +1384,7 @@ void Game::equipItem(const ItemPtr& item)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendEquipItem(item->getId(), item->getCountOrSubType());
 }
 
@@ -1348,6 +1392,7 @@ void Game::mount(bool mount)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendMountStatus(mount);
 }
 
@@ -1355,6 +1400,7 @@ void Game::requestItemInfo(const ItemPtr& item, int index)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendRequestItemInfo(item->getId(), item->getSubType(), index);
 }
 
@@ -1362,6 +1408,7 @@ void Game::answerModalDialog(uint32 dialog, int button, int choice)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendAnswerModalDialog(dialog, button, choice);
 }
 
@@ -1369,6 +1416,7 @@ void Game::browseField(const Position& position)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendBrowseField(position);
 }
 
@@ -1376,6 +1424,7 @@ void Game::seekInContainer(int cid, int index)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendSeekInContainer(cid, index);
 }
 
@@ -1383,6 +1432,7 @@ void Game::buyStoreOffer(int offerId, int productType, const std::string& name)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendBuyStoreOffer(offerId, productType, name);
 }
 
@@ -1390,6 +1440,7 @@ void Game::requestTransactionHistory(int page, int entriesPerPage)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendRequestTransactionHistory(page, entriesPerPage);
 }
 
@@ -1397,6 +1448,7 @@ void Game::requestStoreOffers(const std::string& categoryName, int serviceType)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendRequestStoreOffers(categoryName, serviceType);
 }
 
@@ -1404,6 +1456,7 @@ void Game::openStore(int serviceType, const std::string& category)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendOpenStore(serviceType, category);
 }
 
@@ -1411,6 +1464,7 @@ void Game::transferCoins(const std::string& recipient, int amount)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendTransferCoins(recipient, amount);
 }
 
@@ -1418,6 +1472,7 @@ void Game::openTransactionHistory(int entriesPerPage)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendOpenTransactionHistory(entriesPerPage);
 }
 
@@ -1500,6 +1555,14 @@ void Game::setClientVersion(int version)
 
     m_features.reset();
     enableFeature(Otc::GameFormatCreatureName);
+
+    if (version >= 750) {
+        enableFeature(Otc::GameSoul);
+    }
+
+    if (version >= 760) {
+        enableFeature(Otc::GameLevelU16);
+    }
 
     if (version >= 770) {
         enableFeature(Otc::GameLooktypeU16);
@@ -1675,12 +1738,13 @@ void Game::setClientVersion(int version)
 
 void Game::setAttackingCreature(const CreaturePtr& creature)
 {
-    if (creature != m_attackingCreature) {
-        const CreaturePtr oldCreature = m_attackingCreature;
-        m_attackingCreature = creature;
+    if (creature == m_attackingCreature)
+        return;
 
-        g_lua.callGlobalField("g_game", "onAttackingCreatureChange", creature, oldCreature);
-    }
+    const CreaturePtr oldCreature = m_attackingCreature;
+    m_attackingCreature = creature;
+
+    g_lua.callGlobalField("g_game", "onAttackingCreatureChange", creature, oldCreature);
 }
 
 void Game::setFollowingCreature(const CreaturePtr& creature)
@@ -1718,17 +1782,16 @@ int Game::findEmptyContainerId()
     return id;
 }
 
-int Game::getOs()
+Otc::OperatingSystem_t Game::getOs()
 {
-    if (m_clientCustomOs >= 0)
+    if (m_clientCustomOs > Otc::CLIENTOS_NONE)
         return m_clientCustomOs;
 
     if (g_app.getOs() == "windows")
-        return 10;
+        return Otc::CLIENTOS_OTCLIENT_WINDOWS;
 
     if (g_app.getOs() == "mac")
-        return 12;
+        return Otc::CLIENTOS_OTCLIENT_MAC;
 
-    // linux
-    return 11;
+    return Otc::CLIENTOS_OTCLIENT_LINUX;
 }

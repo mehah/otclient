@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -81,21 +81,26 @@ protected:
 private:
     struct State
     {
+        ~State() { shaderProgram = nullptr; action = nullptr; }
+
         Painter::CompositionMode compositionMode;
+        Painter::BlendEquation blendEquation;
         Rect clipRect;
         float opacity;
         bool alphaWriting{ true };
         PainterShaderProgram* shaderProgram;
+        std::function<void()> action{ nullptr };
     };
 
     void setCompositionMode(Painter::CompositionMode mode, int pos = -1);
+    void setBlendEquation(Painter::BlendEquation equation, int pos = -1);
     void setClipRect(const Rect& clipRect, int pos = -1);
     void setOpacity(float opacity, int pos = -1);
-    void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, int pos = -1);
+    void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, int pos = -1, const std::function<void()>& action = nullptr);
 
     float getOpacity(const int pos = -1) { return pos == -1 ? m_state.opacity : m_objects[pos - 1].state.opacity; }
 
-    void resetClipRect() { m_state.clipRect = Rect(); }
+    void resetClipRect() { m_state.clipRect = {}; }
     void resetCompositionMode() { m_state.compositionMode = Painter::CompositionMode_Normal; }
     void resetOpacity() { m_state.opacity = 1.f; }
     void resetShaderProgram() { m_state.shaderProgram = nullptr; }
@@ -107,7 +112,7 @@ private:
 
     std::vector<DrawObject> m_objects;
 
-    bool m_enabled{ true };
+    bool m_enabled{ true }, m_forceGrouping{ false };
     State m_state;
 
     uint16_t m_indexToStartSearching{ 0 };
@@ -138,7 +143,7 @@ private:
     bool hasModification(bool autoUpdateStatus = false);
     bool hasFrameBuffer() const override { return m_framebuffer != nullptr; }
 
-    PoolFramed* toPoolFramed() override { return static_cast<PoolFramed*>(this); }
+    PoolFramed* toPoolFramed() override { return this; }
 
     FrameBufferPtr m_framebuffer;
     Rect m_dest, m_src;

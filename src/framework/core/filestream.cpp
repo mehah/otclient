@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -227,7 +227,7 @@ uint64 FileStream::getU64()
 {
     uint64 v = 0;
     if (!m_caching) {
-        if (PHYSFS_readULE64(m_fileHandle, (PHYSFS_uint64*)&v) == 0)
+        if (PHYSFS_readULE64(m_fileHandle, &v) == 0)
             throwError("read failed", true);
     } else {
         if (m_pos + 8 > m_data.size())
@@ -290,7 +290,7 @@ int64 FileStream::get64()
 {
     int64 v = 0;
     if (!m_caching) {
-        if (PHYSFS_readSLE64(m_fileHandle, (PHYSFS_sint64*)&v) == 0)
+        if (PHYSFS_readSLE64(m_fileHandle, &v) == 0)
             throwError("read failed", true);
     } else {
         if (m_pos + 8 > m_data.size())

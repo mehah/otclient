@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -53,9 +53,9 @@ void UIMap::drawSelf(Fw::DrawPane drawPane)
 
     if (drawPane & Fw::ForegroundPane) {
         g_drawPool.addBoundingRect(m_mapRect.expanded(1), Color::black);
-        g_drawPool.addAction([]() {glDisable(GL_BLEND); });
+        g_drawPool.addAction([] {glDisable(GL_BLEND); });
         g_drawPool.addFilledRect(m_mapRect, Color::alpha);
-        g_drawPool.addAction([]() {glEnable(GL_BLEND); });
+        g_drawPool.addAction([] {glEnable(GL_BLEND); });
     }
 
     if (drawPane & Fw::BackgroundPane) {
@@ -168,10 +168,14 @@ void UIMap::onGeometryChange(const Rect& oldRect, const Rect& newRect)
 bool UIMap::onMouseMove(const Point& mousePos, const Point& mouseMoved)
 {
     const Position& pos = getPosition(mousePos);
-    if (pos.isValid() && m_mapView->getLastMousePosition() != pos) {
+    if (!pos.isValid())
+        return false;
+
+    if (m_mapView->getLastMousePosition() != pos) {
         m_mapView->onMouseMove(pos);
         m_mapView->setLastMousePosition(pos);
     }
+
     return UIWidget::onMouseMove(mousePos, mouseMoved);
 }
 
@@ -201,7 +205,7 @@ void UIMap::updateMapSize()
     Size mapSize;
     if (m_keepAspectRatio) {
         const Rect mapRect = clippingRect.expanded(-1);
-        mapSize = Size(m_aspectRatio * m_zoom, m_zoom);
+        mapSize = { static_cast<int>(m_aspectRatio * m_zoom), m_zoom };
         mapSize.scale(mapRect.size(), Fw::KeepAspectRatio);
     } else {
         mapSize = clippingRect.expanded(-1).size();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -118,7 +118,7 @@ public:
 
     MapViewPtr asMapView() { return static_self_cast<MapView>(); }
 
-    void resetLastCamera() { m_lastCameraPosition = Position(); }
+    void resetLastCamera() { m_lastCameraPosition = {}; }
 
     std::vector<CreaturePtr>& getVisibleCreatures() { return m_visibleCreatures; }
     std::vector<CreaturePtr> getSpectators(const Position& centerPos, bool multiFloor);

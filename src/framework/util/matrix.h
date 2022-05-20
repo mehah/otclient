@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ public:
     void fill(T value);
 
     Matrix<M, N, T> transposed() const;
-    typename std::enable_if<N == M>::type transpose() { *this = transposed(); }
+    std::enable_if_t<N == M> transpose() { *this = transposed(); }
 
     T* data() { return m[0]; }
     const T* data() const { return m[0]; }

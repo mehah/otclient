@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -47,6 +47,20 @@ Creature::Creature() :m_type(Proto::CreatureTypeUnknown)
     m_nameCache.setFont(g_fonts.getFont("verdana-11px-rounded"));
     m_nameCache.setAlign(Fw::AlignTopCenter);
     m_speedFormula.fill(-1);
+
+    // Example of how to send a UniformValue to shader
+    /*
+        m_outfitShaderAction = [=]()-> void {
+            const int id = m_outfit.getCategory() == ThingCategoryCreature ? m_outfit.getId() : m_outfit.getAuxId();
+            m_outfitShader->bind();
+            m_outfitShader->setUniformValue(ShaderManager::OUTFIT_ID_UNIFORM, id);
+        };
+
+        m_mountShaderAction = [=]()-> void {
+            m_mountShader->bind();
+            m_mountShader->setUniformValue(ShaderManager::MOUNT_ID_UNIFORM, m_outfit.getMount());
+        };
+    */
 }
 
 void Creature::draw(const Point& dest, float scaleFactor, bool animate, const Highlight& highLight, TextureType textureType, Color color, LightView* lightView)
@@ -119,9 +133,7 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
             zPattern = std::min<int>(1, getNumPatternZ() - 1);
 
             if (canDrawShader && m_mountShader) {
-                m_mountShader->bind();
-                m_mountShader->setUniformValue(ShaderManager::MOUNT_ID_UNIFORM, m_outfit.getMount());
-                g_drawPool.setShaderProgram(m_mountShader, g_drawPool.size());
+                g_drawPool.setShaderProgram(m_mountShader, g_drawPool.size(), m_mountShaderAction);
             }
         }
 
@@ -140,9 +152,7 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
 
             datType->draw(dest, scaleFactor, 0, xPattern, yPattern, zPattern, animationPhase, textureType, color);
             if (canDrawShader && m_outfitShader) {
-                m_outfitShader->bind();
-                m_outfitShader->setUniformValue(ShaderManager::OUTFIT_ID_UNIFORM, m_outfit.getId());
-                g_drawPool.setShaderProgram(m_outfitShader, g_drawPool.size());
+                g_drawPool.setShaderProgram(m_outfitShader, g_drawPool.size(), m_outfitShaderAction);
             }
 
             if (m_drawOutfitColor && isNotBlank && getLayers() > 1) {
@@ -179,9 +189,7 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
         type->draw(dest - (getDisplacement() * scaleFactor), scaleFactor, 0, 0, 0, 0, animationPhase, textureType, color);
 
         if (canDrawShader && m_outfitShader) {
-            m_outfitShader->bind();
-            m_outfitShader->setUniformValue(ShaderManager::OUTFIT_ID_UNIFORM, m_outfit.getAuxId());
-            g_drawPool.setShaderProgram(m_outfitShader, g_drawPool.size());
+            g_drawPool.setShaderProgram(m_outfitShader, g_drawPool.size(), m_outfitShaderAction);
         }
     }
 }
@@ -222,8 +230,8 @@ void Creature::drawInformation(const Rect& parentRect, const Point& dest, float 
     // calculate main rects
 
     const Size nameSize = m_nameCache.getTextSize();
-    constexpr int cropSizeText = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? m_drawCache.exactSize : 12,
-        cropSizeBackGround = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? cropSizeText - nameSize.height() : 0;
+    const int cropSizeText = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? m_drawCache.exactSize : 12,
+              cropSizeBackGround = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? cropSizeText - nameSize.height() : 0;
 
     auto backgroundRect = Rect(p.x - (13.5), p.y - cropSizeBackGround, 27, 4);
     backgroundRect.bind(parentRect);
@@ -454,7 +462,7 @@ void Creature::onDisappear()
         if (!self->isLocalPlayer())
             self->setPosition(Position());
 
-        self->m_oldPosition = Position();
+        self->m_oldPosition = {};
         self->m_disappearEvent = nullptr;
     });
 }
@@ -495,7 +503,7 @@ void Creature::updateWalkAnimation()
 
 void Creature::updateWalkOffset(int totalPixelsWalked)
 {
-    m_walkOffset = Point();
+    m_walkOffset = {};
     if (m_direction == Otc::North || m_direction == Otc::NorthEast || m_direction == Otc::NorthWest)
         m_walkOffset.y = SPRITE_SIZE - totalPixelsWalked;
     else if (m_direction == Otc::South || m_direction == Otc::SouthEast || m_direction == Otc::SouthWest)
@@ -603,7 +611,7 @@ void Creature::terminateWalk()
     }
 
     m_walkedPixels = 0;
-    m_walkOffset = Point();
+    m_walkOffset = {};
     m_walking = false;
 
     const auto self = static_self_cast<Creature>();
@@ -753,40 +761,16 @@ void Creature::setBaseSpeed(double baseSpeed)
     }
 }
 
-void Creature::setSkull(uint8 skull)
-{
-    m_skull = skull;
-    callLuaField("onSkullChange", m_skull);
-}
+void Creature::setType(uint8 type) { callLuaField("onTypeChange", m_type = type); }
+void Creature::setIcon(uint8 icon) { callLuaField("onIconChange", m_icon = icon); }
+void Creature::setSkull(uint8 skull) { callLuaField("onSkullChange", m_skull = skull); }
+void Creature::setShield(uint8 shield) { callLuaField("onShieldChange", m_shield = shield); }
+void Creature::setEmblem(uint8 emblem) { callLuaField("onEmblemChange", m_emblem = emblem); }
 
-void Creature::setShield(uint8 shield)
-{
-    m_shield = shield;
-    callLuaField("onShieldChange", m_shield);
-}
-
-void Creature::setEmblem(uint8 emblem)
-{
-    m_emblem = emblem;
-    callLuaField("onEmblemChange", m_emblem);
-}
-
-void Creature::setType(uint8 type)
-{
-    m_type = type;
-    callLuaField("onTypeChange", m_type);
-}
-
-void Creature::setIcon(uint8 icon)
-{
-    m_icon = icon;
-    callLuaField("onIconChange", m_icon);
-}
-
-void Creature::setSkullTexture(const std::string& filename)
-{
-    m_skullTexture = g_textures.getTexture(filename);
-}
+void Creature::setTypeTexture(const std::string& filename) { m_typeTexture = g_textures.getTexture(filename); }
+void Creature::setIconTexture(const std::string& filename) { m_iconTexture = g_textures.getTexture(filename); }
+void Creature::setSkullTexture(const std::string& filename) { m_skullTexture = g_textures.getTexture(filename); }
+void Creature::setEmblemTexture(const std::string& filename) { m_emblemTexture = g_textures.getTexture(filename); }
 
 void Creature::setShieldTexture(const std::string& filename, bool blink)
 {
@@ -795,27 +779,13 @@ void Creature::setShieldTexture(const std::string& filename, bool blink)
 
     if (blink && !m_shieldBlink) {
         auto self = static_self_cast<Creature>();
-        g_dispatcher.scheduleEvent([self]() {
+        g_dispatcher.scheduleEvent([self]
+        {
             self->updateShield();
         }, SHIELD_BLINK_TICKS);
     }
 
     m_shieldBlink = blink;
-}
-
-void Creature::setEmblemTexture(const std::string& filename)
-{
-    m_emblemTexture = g_textures.getTexture(filename);
-}
-
-void Creature::setTypeTexture(const std::string& filename)
-{
-    m_typeTexture = g_textures.getTexture(filename);
-}
-
-void Creature::setIconTexture(const std::string& filename)
-{
-    m_iconTexture = g_textures.getTexture(filename);
 }
 
 void Creature::addTimedSquare(uint8 color)
@@ -825,7 +795,8 @@ void Creature::addTimedSquare(uint8 color)
 
     // schedule removal
     const auto self = static_self_cast<Creature>();
-    g_dispatcher.scheduleEvent([self]() {
+    g_dispatcher.scheduleEvent([self]
+    {
         self->removeTimedSquare();
     }, VOLATILE_SQUARE_DURATION);
 }
@@ -836,7 +807,8 @@ void Creature::updateShield()
 
     if (m_shield != Otc::ShieldNone && m_shieldBlink) {
         auto self = static_self_cast<Creature>();
-        g_dispatcher.scheduleEvent([self]() {
+        g_dispatcher.scheduleEvent([self]
+        {
             self->updateShield();
         }, SHIELD_BLINK_TICKS);
     } else if (!m_shieldBlink)
@@ -950,7 +922,8 @@ Light Creature::getLight()
 
 int Creature::getTotalAnimationPhase()
 {
-    if (!m_outfit.hasMount()) return getAnimationPhases();
+    if (!m_outfit.hasMount())
+        return getAnimationPhases();
 
     return rawGetMountThingType()->getAnimationPhases();
 }

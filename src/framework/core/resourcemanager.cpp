@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,7 @@
  */
 
 #include <filesystem>
+#include <ranges>
 
 #include "resourcemanager.h"
 #include "filestream.h"
@@ -146,9 +147,7 @@ bool ResourceManager::removeSearchPath(const std::string& path)
 void ResourceManager::searchAndAddPackages(const std::string& packagesDir, const std::string& packageExt)
 {
     auto files = listDirectoryFiles(packagesDir);
-    for (auto it = files.rbegin(); it != files.rend(); ++it) {
-        const std::string& file = *it;
-
+    for (const auto& file : files | std::views::reverse) {
         if (!file.ends_with(packageExt))
             continue;
         std::string package = getRealDir(packagesDir) + "/" + file;
@@ -194,7 +193,7 @@ std::string ResourceManager::readFileContents(const std::string& fileName)
 
     const int fileSize = PHYSFS_fileLength(file);
     std::string buffer(fileSize, 0);
-    PHYSFS_readBytes(file, static_cast<void*>(&buffer[0]), fileSize);
+    PHYSFS_readBytes(file, &buffer[0], fileSize);
     PHYSFS_close(file);
 
 #if ENABLE_ENCRYPTION == 1
@@ -212,7 +211,7 @@ bool ResourceManager::writeFileBuffer(const std::string& fileName, const uchar* 
         return false;
     }
 
-    PHYSFS_writeBytes(file, (void*)data, size);
+    PHYSFS_writeBytes(file, data, size);
     PHYSFS_close(file);
     return true;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -78,7 +78,7 @@ void UIProgressRect::drawSelf(Fw::DrawPane drawPane)
 
 void UIProgressRect::setPercent(float percent)
 {
-    m_percent = std::clamp<float>(static_cast<double>(percent), 0.0, 100.0);
+    m_percent = std::clamp<float>(percent, 0.0, 100.0);
 }
 
 void UIProgressRect::onStyleApply(const std::string& styleName, const OTMLNodePtr& styleNode)

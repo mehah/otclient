@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -91,7 +91,7 @@ template<typename F>
 void connect(const LuaObjectPtr& obj, const std::string& field, const std::function<F>& f, bool pushFront = false);
 
 template<typename Lambda>
-typename std::enable_if<std::is_constructible<decltype(&Lambda::operator())>::value, void>::type
+std::enable_if_t<std::is_constructible_v<decltype(&Lambda::operator())>, void>
 connect(const LuaObjectPtr& obj, const std::string& field, const Lambda& f, bool pushFront = false);
 
 #include "luainterface.h"
@@ -145,7 +145,7 @@ namespace luabinder
 
 // connect for lambdas
 template<typename Lambda>
-typename std::enable_if<std::is_constructible<decltype(&Lambda::operator())>::value, void>::type
+std::enable_if_t<std::is_constructible_v<decltype(&Lambda::operator())>, void>
 connect(const LuaObjectPtr& obj, const std::string& field, const Lambda& f, bool pushFront)
 {
     using F = decltype(&Lambda::operator());

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ class House : public LuaObject
 {
 public:
     House() = default;
-    House(uint32 hId, const std::string& name = "", const Position& pos = Position());
+    House(uint32 hId, const std::string& name = "", const Position& pos = {});
     ~House() override { m_tiles.clear(); }
 
     void setTile(const TilePtr& tile);

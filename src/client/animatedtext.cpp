@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -56,7 +56,7 @@ void AnimatedText::drawText(const Point& dest, const Rect& visibleRect)
 
         Color color = m_color;
         if (t > t0) {
-            color.setAlpha(static_cast<float>(1 - (t - t0) / (tf - t0)));
+            color.setAlpha(1 - (t - t0) / (tf - t0));
         }
 
         m_cachedText.draw(rect, color);
@@ -73,17 +73,7 @@ void AnimatedText::onAppear()
 
     // schedule removal
     auto self = asAnimatedText();
-    g_dispatcher.scheduleEvent([self]() { g_map.removeThing(self); }, textDuration);
-}
-
-void AnimatedText::setColor(int color)
-{
-    m_color = Color::from8bit(color);
-}
-
-void AnimatedText::setText(const std::string& text)
-{
-    m_cachedText.setText(text);
+    g_dispatcher.scheduleEvent([self] { g_map.removeThing(self); }, textDuration);
 }
 
 bool AnimatedText::merge(const AnimatedTextPtr& other)

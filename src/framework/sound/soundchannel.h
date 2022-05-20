@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,9 +30,9 @@ class SoundChannel : public LuaObject
 public:
     SoundChannel(int id) : m_id(id), m_gain(1) {}
 
-    SoundSourcePtr play(const std::string& filename, float fadetime = 0, float gain = 1.0f);
+    SoundSourcePtr play(const std::string& filename, float fadetime = 0, float gain = 1.0f, float pitch = 1.0f);
     void stop(float fadetime = 0);
-    void enqueue(const std::string& filename, float fadetime = 0, float gain = 1.0f);
+    void enqueue(const std::string& filename, float fadetime = 0, float gain = 1.0f, float pitch = 1.0f);
     void enable() { setEnabled(true); }
     void disable() { setEnabled(false); }
 
@@ -54,6 +54,7 @@ private:
         std::string filename;
         float fadetime;
         float gain;
+        float pitch;
     };
     std::deque<QueueEntry> m_queue;
     SoundSourcePtr m_currentSource;

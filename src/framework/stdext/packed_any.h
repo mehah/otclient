@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ namespace stdext
 
     template<typename T>
     struct can_pack_in_any : std::integral_constant<bool,
-        (sizeof(T) <= sizeof(void*) && std::is_trivial<T>::value)>
+        (sizeof(T) <= sizeof(void*) && std::is_trivial_v<T>)>
     {};
 
     // improved to use less memory
@@ -68,11 +68,11 @@ namespace stdext
             scalar(other.scalar)
         {}
         template<typename T>
-        packed_any(const T& value, typename std::enable_if<(can_pack_in_any<T>::value)>::type* = nullptr) :
+        packed_any(const T& value, std::enable_if_t<(can_pack_in_any<T>::value)>* = nullptr) :
             content(reinterpret_cast<placeholder*>(static_cast<std::size_t>(value))), scalar(true)
         {}
         template<typename T>
-        packed_any(const T& value, typename std::enable_if<!(can_pack_in_any<T>::value)>::type* = nullptr) :
+        packed_any(const T& value, std::enable_if_t<!(can_pack_in_any<T>::value)>* = nullptr) :
             content(new holder<T>(value))
         {}
         ~packed_any()
@@ -96,7 +96,7 @@ namespace stdext
     };
 
     template<typename T>
-    typename std::enable_if<can_pack_in_any<T>::value, T>::type
+    std::enable_if_t<can_pack_in_any<T>::value, T>
         packed_any_cast(const packed_any& operand)
     {
         assert(operand.scalar);
@@ -110,7 +110,7 @@ namespace stdext
     }
 
     template<typename T>
-    typename std::enable_if<!can_pack_in_any<T>::value, T>::type
+    std::enable_if_t<!can_pack_in_any<T>::value, T>
         packed_any_cast(const packed_any& operand)
     {
         assert(operand.type() == typeid(T));

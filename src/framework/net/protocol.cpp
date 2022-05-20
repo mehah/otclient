@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -157,7 +157,7 @@ void Protocol::generateXteaKey()
 {
     std::random_device rd;
     std::uniform_int_distribution<uint32> unif;
-    std::generate(m_xteaKey.begin(), m_xteaKey.end(), [&unif, &rd]() { return unif(rd); });
+    std::generate(m_xteaKey.begin(), m_xteaKey.end(), [&unif, &rd] { return unif(rd); });
 }
 
 namespace

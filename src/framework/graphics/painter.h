@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -56,6 +56,8 @@ public:
 
     struct PainterState
     {
+        ~PainterState() { shaderProgram = nullptr; action = nullptr; }
+
         Size resolution;
         Matrix3 transformMatrix;
         Matrix3 projectionMatrix;
@@ -68,6 +70,7 @@ public:
         TexturePtr texture;
         PainterShaderProgram* shaderProgram;
         bool alphaWriting;
+        std::function<void()> action{ nullptr };
 
         bool operator==(const PainterState& s2) const
         {

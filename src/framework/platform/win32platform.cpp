@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -108,7 +108,7 @@ bool Platform::fileExists(std::string file)
 {
     stdext::replace_all(file, "/", "\\");
     const std::wstring wfile = stdext::utf8_to_utf16(file);
-    DWORD dwAttrib = GetFileAttributesW(wfile.c_str());
+    const DWORD dwAttrib = GetFileAttributesW(wfile.c_str());
     return (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 }
 
@@ -157,7 +157,7 @@ std::string Platform::getCPUName()
     HKEY hKey;
     if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, R"(HARDWARE\DESCRIPTION\System\CentralProcessor\0)", 0, KEY_READ, &hKey) != ERROR_SUCCESS)
         return "";
-    RegQueryValueExA(hKey, "ProcessorNameString", nullptr, nullptr, (LPBYTE)buf, static_cast<LPDWORD>(&bufSize));
+    RegQueryValueExA(hKey, "ProcessorNameString", nullptr, nullptr, (LPBYTE)buf, &bufSize);
     return buf;
 }
 

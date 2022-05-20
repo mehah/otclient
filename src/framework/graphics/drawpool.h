@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,11 +34,11 @@ public:
     template <class T>
     std::shared_ptr<T> get(const PoolType type) { return std::static_pointer_cast<T>(m_pools[static_cast<uint8>(type)]); }
 
-    void use(const PoolType type);
-    void use(const PoolType type, const Rect& dest, const Rect& src, const Color colorClear = Color::alpha);
+    void use(PoolType type);
+    void use(PoolType type, const Rect& dest, const Rect& src, Color colorClear = Color::alpha);
 
     void addTexturedRect(const Rect& dest, const TexturePtr& texture, Color color = Color::white);
-    void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, Color color = Color::white, const Point& originalDest = Point());
+    void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, Color color = Color::white, const Point& originalDest = {});
     void addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, Color color = Color::white);
     void addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, Color color = Color::white);
     void addFilledRect(const Rect& dest, Color color = Color::white);
@@ -49,9 +49,10 @@ public:
     void drawTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src);
 
     void setCompositionMode(const Painter::CompositionMode mode, const int pos = -1) { m_currentPool->setCompositionMode(mode, pos); }
+    void setBlendEquation(Painter::BlendEquation equation, const int pos = -1) { m_currentPool->setBlendEquation(equation, pos); }
     void setClipRect(const Rect& clipRect, const int pos = -1) { m_currentPool->setClipRect(clipRect, pos); }
     void setOpacity(const float opacity, const int pos = -1) { m_currentPool->setOpacity(opacity, pos); }
-    void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, const int pos = -1) { m_currentPool->setShaderProgram(shaderProgram, pos); }
+    void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, const int pos = -1, const std::function<void()>& action = nullptr) { m_currentPool->setShaderProgram(shaderProgram, pos, action); }
 
     float getOpacity(const int pos = -1) { return m_currentPool->getOpacity(pos); }
 
@@ -61,8 +62,8 @@ public:
     void resetState() { m_currentPool->resetState(); }
     void resetShaderProgram() { m_currentPool->resetShaderProgram(); }
 
-    void forceGrouping(const bool force) { m_forceGrouping = force; }
-    bool isForcingGrouping() const { return m_forceGrouping; }
+    void forceGrouping(const bool force) { m_currentPool->m_forceGrouping = force; }
+    bool isForcingGrouping() const { return m_currentPool->m_forceGrouping; }
 
     void startPosition() { m_currentPool->startPosition(); }
 
@@ -76,7 +77,6 @@ private:
     void drawObject(Pool::DrawObject& obj);
     void updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method);
     void add(const Painter::PainterState& state, const Pool::DrawMethod& method, Painter::DrawMode drawMode = Painter::DrawMode::Triangles);
-    void setConfig(const PoolType& state);
 
     PoolFramedPtr poolFramed() { return std::dynamic_pointer_cast<PoolFramed>(m_currentPool); }
 
@@ -86,8 +86,6 @@ private:
     std::array<PoolPtr, static_cast<uint8>(PoolType::UNKNOW) + 1> m_pools;
 
     PoolPtr m_currentPool, n_unknowPool;
-
-    bool m_forceGrouping{ false };
 
     friend class GraphicalApplication;
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,8 @@
 #include <framework/luaengine/luainterface.h>
 #include <framework/otml/otmlnode.h>
 #include <framework/platform/platformwindow.h>
+
+#include <ranges>
 
 #include "framework/graphics/drawpool.h"
 
@@ -906,10 +908,10 @@ bool UIWidget::setRect(const Rect& rect)
     }
     */
     // only update if the rect really changed
-    Rect oldRect = m_rect;
-    if (rect == oldRect)
+    if (rect == m_rect)
         return false;
 
+    Rect oldRect = m_rect;
     m_rect = rect;
 
     // updates own layout
@@ -918,7 +920,8 @@ bool UIWidget::setRect(const Rect& rect)
     // avoid massive update events
     if (!m_updateEventScheduled) {
         UIWidgetPtr self = static_self_cast<UIWidget>();
-        g_dispatcher.addEvent([self, oldRect]() {
+        g_dispatcher.addEvent([self, oldRect]
+        {
             self->m_updateEventScheduled = false;
             if (oldRect != self->getRect())
                 self->onGeometryChange(oldRect, self->getRect());
@@ -955,37 +958,39 @@ void UIWidget::setStyleFromNode(const OTMLNodePtr& styleNode)
 
 void UIWidget::setEnabled(bool enabled)
 {
-    if (enabled != m_enabled) {
-        m_enabled = enabled;
+    if (enabled == m_enabled)
+        return;
 
-        updateState(Fw::DisabledState);
-        updateState(Fw::ActiveState);
-    }
+    m_enabled = enabled;
+
+    updateState(Fw::DisabledState);
+    updateState(Fw::ActiveState);
 }
 
 void UIWidget::setVisible(bool visible)
 {
-    if (m_visible != visible) {
-        m_visible = visible;
+    if (m_visible == visible)
+        return;
 
-        // hiding a widget make it lose focus
-        if (!visible && isFocused()) {
-            if (const UIWidgetPtr parent = getParent())
-                parent->focusPreviousChild(Fw::ActiveFocusReason, true);
-        }
+    m_visible = visible;
 
-        // visibility can change change parent layout
-        updateParentLayout();
-
-        updateState(Fw::ActiveState);
-        updateState(Fw::HiddenState);
-
-        // visibility can change the current hovered widget
-        if (visible)
-            g_ui.onWidgetAppear(static_self_cast<UIWidget>());
-        else
-            g_ui.onWidgetDisappear(static_self_cast<UIWidget>());
+    // hiding a widget make it lose focus
+    if (!visible && isFocused()) {
+        if (const UIWidgetPtr parent = getParent())
+            parent->focusPreviousChild(Fw::ActiveFocusReason, true);
     }
+
+    // visibility can change change parent layout
+    updateParentLayout();
+
+    updateState(Fw::ActiveState);
+    updateState(Fw::HiddenState);
+
+    // visibility can change the current hovered widget
+    if (visible)
+        g_ui.onWidgetAppear(static_self_cast<UIWidget>());
+    else
+        g_ui.onWidgetDisappear(static_self_cast<UIWidget>());
 }
 
 void UIWidget::setOn(bool on)
@@ -1001,16 +1006,17 @@ void UIWidget::setChecked(bool checked)
 
 void UIWidget::setFocusable(bool focusable)
 {
-    if (m_focusable != focusable) {
-        m_focusable = focusable;
+    if (m_focusable == focusable)
+        return;
 
-        // make parent focus another child
-        if (const UIWidgetPtr parent = getParent()) {
-            if (!focusable && isFocused()) {
-                parent->focusPreviousChild(Fw::ActiveFocusReason, true);
-            } else if (focusable && !parent->getFocusedChild() && parent->getAutoFocusPolicy() != Fw::AutoFocusNone) {
-                focus();
-            }
+    m_focusable = focusable;
+
+    // make parent focus another child
+    if (const UIWidgetPtr parent = getParent()) {
+        if (!focusable && isFocused()) {
+            parent->focusPreviousChild(Fw::ActiveFocusReason, true);
+        } else if (focusable && !parent->getFocusedChild() && parent->getAutoFocusPolicy() != Fw::AutoFocusNone) {
+            focus();
         }
     }
 }
@@ -1053,6 +1059,7 @@ bool UIWidget::isAnchored()
     if (const UIWidgetPtr parent = getParent())
         if (const UIAnchorLayoutPtr anchorLayout = parent->getAnchoredLayout())
             return anchorLayout->hasAnchors(static_self_cast<UIWidget>());
+
     return false;
 }
 
@@ -1067,6 +1074,7 @@ bool UIWidget::hasChild(const UIWidgetPtr& child)
     const auto it = std::find(m_children.begin(), m_children.end(), child);
     if (it != m_children.end())
         return true;
+
     return false;
 }
 
@@ -1078,6 +1086,7 @@ int UIWidget::getChildIndex(const UIWidgetPtr& child)
             return index;
         ++index;
     }
+
     return -1;
 }
 
@@ -1117,6 +1126,7 @@ Rect UIWidget::getChildrenRect()
         if (childrenRect.height() < myClippingRect.height())
             childrenRect.setHeight(myClippingRect.height());
     }
+
     return childrenRect;
 }
 
@@ -1129,6 +1139,7 @@ UIAnchorLayoutPtr UIWidget::getAnchoredLayout()
     const UILayoutPtr layout = parent->getLayout();
     if (layout->isUIAnchorLayout())
         return layout->static_self_cast<UIAnchorLayout>();
+
     return nullptr;
 }
 
@@ -1136,6 +1147,7 @@ UIWidgetPtr UIWidget::getRootParent()
 {
     if (const UIWidgetPtr parent = getParent())
         return parent->getRootParent();
+
     return static_self_cast<UIWidget>();
 }
 
@@ -1144,6 +1156,7 @@ UIWidgetPtr UIWidget::getChildAfter(const UIWidgetPtr& relativeChild)
     auto it = std::find(m_children.begin(), m_children.end(), relativeChild);
     if (it != m_children.end() && ++it != m_children.end())
         return *it;
+
     return nullptr;
 }
 
@@ -1152,6 +1165,7 @@ UIWidgetPtr UIWidget::getChildBefore(const UIWidgetPtr& relativeChild)
     auto it = std::find(m_children.rbegin(), m_children.rend(), relativeChild);
     if (it != m_children.rend() && ++it != m_children.rend())
         return *it;
+
     return nullptr;
 }
 
@@ -1169,8 +1183,7 @@ UIWidgetPtr UIWidget::getChildByPos(const Point& childPos)
     if (!containsPaddingPoint(childPos))
         return nullptr;
 
-    for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
-        const UIWidgetPtr& child = (*it);
+    for (const auto& child : m_children | std::views::reverse) {
         if (child->isExplicitlyVisible() && child->containsPoint(childPos))
             return child;
     }
@@ -1183,6 +1196,7 @@ UIWidgetPtr UIWidget::getChildByIndex(int index)
     index = index <= 0 ? (m_children.size() + index) : index - 1;
     if (index >= 0 && static_cast<uint>(index) < m_children.size())
         return m_children.at(index);
+
     return nullptr;
 }
 
@@ -1204,8 +1218,7 @@ UIWidgetPtr UIWidget::recursiveGetChildByPos(const Point& childPos, bool wantsPh
     if (!containsPaddingPoint(childPos))
         return nullptr;
 
-    for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
-        const UIWidgetPtr& child = (*it);
+    for (const auto& child : m_children | std::views::reverse) {
         if (child->isExplicitlyVisible() && child->containsPoint(childPos)) {
             UIWidgetPtr subChild = child->recursiveGetChildByPos(childPos, wantsPhantom);
             if (subChild)
@@ -1235,8 +1248,7 @@ UIWidgetList UIWidget::recursiveGetChildrenByPos(const Point& childPos)
     if (!containsPaddingPoint(childPos))
         return children;
 
-    for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
-        const UIWidgetPtr& child = (*it);
+    for (const auto& child : m_children | std::views::reverse) {
         if (child->isExplicitlyVisible() && child->containsPoint(childPos)) {
             UIWidgetList subChildren = child->recursiveGetChildrenByPos(childPos);
             if (!subChildren.empty())
@@ -1253,8 +1265,7 @@ UIWidgetList UIWidget::recursiveGetChildrenByMarginPos(const Point& childPos)
     if (!containsPaddingPoint(childPos))
         return children;
 
-    for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
-        const UIWidgetPtr& child = (*it);
+    for (const auto& child : m_children | std::views::reverse) {
         if (child->isExplicitlyVisible() && child->containsMarginPoint(childPos)) {
             UIWidgetList subChildren = child->recursiveGetChildrenByMarginPos(childPos);
             if (!subChildren.empty())
@@ -1286,17 +1297,18 @@ bool UIWidget::setState(Fw::WidgetState state, bool on)
     else
         m_states &= ~state;
 
-    if (oldStates != m_states) {
-        updateStyle();
-        return true;
-    }
-    return false;
+    if (oldStates == m_states)
+        return false;
+
+    updateStyle();
+    return true;
 }
 
 bool UIWidget::hasState(Fw::WidgetState state)
 {
     if (state == Fw::InvalidState)
         return false;
+
     return (m_states & state);
 }
 
@@ -1731,8 +1743,7 @@ bool UIWidget::propagateOnMouseEvent(const Point& mousePos, UIWidgetList& widget
 {
     bool ret = false;
     if (containsPaddingPoint(mousePos)) {
-        for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
-            const UIWidgetPtr& child = *it;
+        for (const auto& child : m_children | std::views::reverse) {
             if (child->isExplicitlyEnabled() && child->isExplicitlyVisible() && child->containsPoint(mousePos)) {
                 if (child->propagateOnMouseEvent(mousePos, widgetList)) {
                     ret = true;

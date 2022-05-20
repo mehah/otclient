@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,14 @@
 
 namespace Otc
 {
+    enum OperatingSystem_t : uint16_t
+    {
+        CLIENTOS_NONE = 0,
+        CLIENTOS_OTCLIENT_LINUX = 10,
+        CLIENTOS_OTCLIENT_WINDOWS = 11,
+        CLIENTOS_OTCLIENT_MAC = 12,
+    };
+
     enum Operation : uint8_t
     {
         OPERATION_ADD, OPERATION_REMOVE, OPERATION_CLEAN
@@ -436,6 +444,8 @@ namespace Otc
         GameIngameStoreServiceType = 75,
         GameAdditionalSkills = 76,
         GameDistanceEffectU16 = 77,
+        GameLevelU16 = 78,
+        GameSoul = 79,
 
         LastGameFeature = 101
     };

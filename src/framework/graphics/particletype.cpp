@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,8 +30,8 @@ ParticleType::ParticleType()
     pMaxPositionRadius = 3;
     pMinPositionAngle = 0;
     pMaxPositionAngle = 360;
-    pStartSize = Size(32);
-    pFinalSize = Size(32);
+    pStartSize = { 32 };
+    pFinalSize = { 32 };
     pMinDuration = 0;
     pMaxDuration = 10;
     pIgnorePhysicsAfter = -1;

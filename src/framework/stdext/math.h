@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,6 @@ namespace stdext
     inline void writeSLE64(uchar* addr, int64_t value) { writeSLE32(addr + 4, value >> 32); writeSLE32(addr, static_cast<int32_t>(value)); }
 
     uint32_t adler32(const uint8_t* buffer, size_t size);
-
-    long random_range(long min, long max);
+    int random_range(int min, int max);
     float random_range(float min, float max);
 }

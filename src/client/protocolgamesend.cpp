@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -70,18 +70,19 @@ void ProtocolGame::sendLoginPacket(uint challengeTimestamp, uint8 challengeRando
         msg->addU8(0);
 
     const int offset = msg->getMessageSize();
-    // first RSA byte must be 0
-    msg->addU8(0);
 
     if (g_game.getFeature(Otc::GameLoginPacketEncryption)) {
+        // first RSA byte must be 0
+        msg->addU8(0);
         // xtea key
         generateXteaKey();
         msg->addU32(m_xteaKey[0]);
         msg->addU32(m_xteaKey[1]);
         msg->addU32(m_xteaKey[2]);
         msg->addU32(m_xteaKey[3]);
-        msg->addU8(0); // is gm set?
     }
+
+    msg->addU8(0); // is gm set?
 
     if (g_game.getFeature(Otc::GameSessionKey)) {
         msg->addString(m_sessionKey);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -62,12 +62,9 @@ void LightView::draw(const Rect& dest, const Rect& src)
             const Color color = Color::from8bit(light.color, std::min<float>(light.opacity, light.intensity / 6.f));
             const uint16 radius = light.intensity * m_tileSize;
 
-            g_painter->setBlendEquation(Painter::BlendEquation_Max);
-
             g_drawPool.addTexturedRect(Rect(light.pos - radius, Size(radius * 2)), g_sprites.getLightTexture(), color);
+            g_drawPool.setBlendEquation(Painter::BlendEquation_Max, g_drawPool.size());
         } else {
-            g_painter->setBlendEquation(Painter::BlendEquation_Add);
-
             g_drawPool.setOpacity(light.opacity);
             g_drawPool.addTexturedRect(Rect(light.pos - m_tileSize * 1.8, size, size), g_sprites.getShadeTexture(), m_globalLightColor);
             g_drawPool.resetOpacity();
@@ -75,6 +72,4 @@ void LightView::draw(const Rect& dest, const Rect& src)
     }
 
     m_sources.clear();
-
-    g_painter->setBlendEquation(Painter::BlendEquation_Add);
 }

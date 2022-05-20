@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,7 @@ void InputMessage::setBuffer(const std::string& buffer)
     const int len = buffer.size();
     reset();
     checkWrite(len);
-    memcpy((char*)(m_buffer + m_readPos), buffer.c_str(), len);
+    memcpy(m_buffer + m_readPos, buffer.c_str(), len);
     m_readPos += len;
     m_messageSize += len;
 }

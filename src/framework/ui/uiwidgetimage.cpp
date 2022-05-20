@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -173,10 +173,7 @@ void UIWidget::drawImage(const Rect& screenCoords)
 
 void UIWidget::setImageSource(const std::string& source)
 {
-    if (source.empty())
-        m_imageTexture = nullptr;
-    else
-        m_imageTexture = g_textures.getTexture(source);
+    m_imageTexture = source.empty() ? nullptr : g_textures.getTexture(source);
 
     if (m_imageTexture && (!m_rect.isValid() || m_imageAutoResize)) {
         Size size = getSize();

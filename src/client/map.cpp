@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -370,7 +370,8 @@ const TilePtr& Map::getTile(const Position& pos)
 const TileList Map::getTiles(int8 floor/* = -1*/)
 {
     TileList tiles;
-    if (floor > MAX_Z) return tiles;
+    if (floor > MAX_Z)
+        return tiles;
 
     if (floor < 0) {
         // Search all floors
@@ -466,16 +467,6 @@ void Map::setForceShowAnimations(bool force)
         m_animationFlags |= Animation_Force;
 }
 
-bool Map::isForcingAnimations()
-{
-    return (m_animationFlags & Animation_Force) == Animation_Force;
-}
-
-bool Map::isShowingAnimations()
-{
-    return (m_animationFlags & Animation_Show) == Animation_Show;
-}
-
 void Map::setShowAnimations(bool show)
 {
     if (show) {
@@ -485,15 +476,8 @@ void Map::setShowAnimations(bool show)
         m_animationFlags &= ~Animation_Show;
 }
 
-void Map::beginGhostMode(float opacity)
-{
-    g_painter->setOpacity(opacity);
-}
-
-void Map::endGhostMode()
-{
-    g_painter->resetOpacity();
-}
+void Map::beginGhostMode(float opacity) { g_painter->setOpacity(opacity); }
+void Map::endGhostMode() { g_painter->resetOpacity(); }
 
 std::map<Position, ItemPtr> Map::findItemsById(uint16 clientId, uint32 max)
 {
@@ -507,7 +491,7 @@ std::map<Position, ItemPtr> Map::findItemsById(uint16 clientId, uint32 max)
                     continue;
                 for (const ItemPtr& item : tile->getItems()) {
                     if (item->getId() == clientId) {
-                        ret.insert(std::make_pair(tile->getPosition(), item));
+                        ret.emplace(tile->getPosition(), item);
                         if (++count >= max)
                             break;
                     }
@@ -630,14 +614,14 @@ void Map::setLight(const Light& light)
         mapView->onGlobalLightChange(m_light);
 }
 
-std::vector<CreaturePtr> Map::getSightSpectators(const Position& centerPos, bool multiFloor)
-{
-    return getSpectatorsInRangeEx(centerPos, multiFloor, m_awareRange.left - 1, m_awareRange.right - 2, m_awareRange.top - 1, m_awareRange.bottom - 2);
-}
-
 std::vector<CreaturePtr> Map::getSpectators(const Position& centerPos, bool multiFloor)
 {
     return getSpectatorsInRangeEx(centerPos, multiFloor, m_awareRange.left, m_awareRange.right, m_awareRange.top, m_awareRange.bottom);
+}
+
+std::vector<CreaturePtr> Map::getSightSpectators(const Position& centerPos, bool multiFloor)
+{
+    return getSpectatorsInRangeEx(centerPos, multiFloor, m_awareRange.left - 1, m_awareRange.right - 2, m_awareRange.top - 1, m_awareRange.bottom - 2);
 }
 
 std::vector<CreaturePtr> Map::getSpectatorsInRange(const Position& centerPos, bool multiFloor, int32 xRange, int32 yRange)
@@ -691,6 +675,7 @@ bool Map::isCovered(const Position& pos, uint8 firstFloor)
         if (tile && tile->isTopGround())
             return true;
     }
+
     return false;
 }
 
@@ -772,18 +757,18 @@ void Map::setAwareRange(const AwareRange& range)
 
 uint8 Map::getFirstAwareFloor()
 {
-    if (m_centralPosition.z > SEA_FLOOR)
-        return m_centralPosition.z - AWARE_UNDEGROUND_FLOOR_RANGE;
+    if (m_centralPosition.z <= SEA_FLOOR)
+        return 0;
 
-    return 0;
+    return m_centralPosition.z - AWARE_UNDEGROUND_FLOOR_RANGE;
 }
 
 uint8 Map::getLastAwareFloor()
 {
-    if (m_centralPosition.z > SEA_FLOOR)
-        return std::min<uint8>(m_centralPosition.z + AWARE_UNDEGROUND_FLOOR_RANGE, MAX_Z);
+    if (m_centralPosition.z <= SEA_FLOOR)
+        return SEA_FLOOR;
 
-    return SEA_FLOOR;
+    return std::min<uint8>(m_centralPosition.z + AWARE_UNDEGROUND_FLOOR_RANGE, MAX_Z);
 }
 
 std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::findPath(const Position& startPos, const Position& goalPos, int maxComplexity, int flags)
@@ -1124,23 +1109,22 @@ std::map<std::string, std::tuple<int, int, int, std::string>> Map::findEveryPath
         }
     };
 
-    std::map<std::string, std::string>::const_iterator it;
-    it = params.find("ignoreLastCreature");
-    bool ignoreLastCreature = it != params.end() && it->second != "0" && !it->second.empty();
+    auto it = params.find("ignoreLastCreature");
+    const bool ignoreLastCreature = it != params.end() && it->second != "0" && !it->second.empty();
     it = params.find("ignoreCreatures");
-    bool ignoreCreatures = it != params.end() && it->second != "0" && !it->second.empty();
+    const bool ignoreCreatures = it != params.end() && it->second != "0" && !it->second.empty();
     it = params.find("ignoreNonPathable");
-    bool ignoreNonPathable = it != params.end() && it->second != "0" && !it->second.empty();
+    const bool ignoreNonPathable = it != params.end() && it->second != "0" && !it->second.empty();
     it = params.find("ignoreNonWalkable");
-    bool ignoreNonWalkable = it != params.end() && it->second != "0" && !it->second.empty();
+    const bool ignoreNonWalkable = it != params.end() && it->second != "0" && !it->second.empty();
     it = params.find("ignoreStairs");
-    bool ignoreStairs = it != params.end() && it->second != "0" && !it->second.empty();
+    const bool ignoreStairs = it != params.end() && it->second != "0" && !it->second.empty();
     it = params.find("ignoreCost");
-    bool ignoreCost = it != params.end() && it->second != "0" && !it->second.empty();
+    const bool ignoreCost = it != params.end() && it->second != "0" && !it->second.empty();
     it = params.find("allowUnseen");
-    bool allowUnseen = it != params.end() && it->second != "0" && !it->second.empty();
+    const bool allowUnseen = it != params.end() && it->second != "0" && !it->second.empty();
     it = params.find("allowOnlyVisibleTiles");
-    bool allowOnlyVisibleTiles = it != params.end() && it->second != "0" && !it->second.empty();
+    const bool allowOnlyVisibleTiles = it != params.end() && it->second != "0" && !it->second.empty();
     it = params.find("marginMin");
     bool hasMargin = it != params.end();
     it = params.find("marginMax");
@@ -1222,7 +1206,7 @@ std::map<std::string, std::tuple<int, int, int, std::string>> Map::findEveryPath
                             wasSeen = true;
                         speed = mtile.getSpeed();
                     }
-                    bool hasStairs = isNotPathable && mapColor >= 210 && mapColor <= 213;
+                    const bool hasStairs = isNotPathable && mapColor >= 210 && mapColor <= 213;
                     bool hasReachedMaxDistance = maxDistanceFrom && maxDistanceFromPos.isValid() && maxDistanceFromPos.distance(neighbor) > maxDistanceFrom;
                     if ((!wasSeen && !allowUnseen) || (hasStairs && !ignoreStairs && neighbor != destPos) ||
                        (isNotPathable && !ignoreNonPathable && neighbor != destPos) || (isNotWalkable && !ignoreNonWalkable) ||

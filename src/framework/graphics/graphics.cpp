@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -94,7 +94,7 @@ void Graphics::init()
     if (m_maxTextureSize == -1 || m_maxTextureSize > maxTextureSize)
         m_maxTextureSize = maxTextureSize;
 
-    if (Size(m_maxTextureSize, m_maxTextureSize) < g_window.getDisplaySize())
+    if (Size(m_maxTextureSize) < g_window.getDisplaySize())
         m_cacheBackbuffer = false;
 
     m_alphaBits = 0;

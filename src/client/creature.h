@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@
 #include <framework/core/timer.h>
 #include <framework/graphics/cachedtext.h>
 
-// @bindclass
+ // @bindclass
 class Creature : public Thing
 {
 public:
@@ -236,7 +236,11 @@ private:
     DrawCache m_drawCache;
 
     bool m_drawOutfitColor{ true };
-    PainterShaderProgramPtr m_outfitShader, m_mountShader;
+    PainterShaderProgramPtr m_outfitShader,
+        m_mountShader;
+
+    std::function<void()> m_outfitShaderAction{ nullptr },
+        m_mountShaderAction{ nullptr };
 };
 
 // @bindclass

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,9 +44,10 @@
 
 MapView::MapView()
 {
-    auto mapPool = g_drawPool.get<PoolFramed>(PoolType::MAP);
+    const auto mapPool = g_drawPool.get<PoolFramed>(PoolType::MAP);
 
-    mapPool->onBeforeDraw([&]() {
+    mapPool->onBeforeDraw([&]
+    {
         const Position cameraPosition = getCameraPosition();
 
         float fadeOpacity = 1.0f;
@@ -84,7 +85,8 @@ MapView::MapView()
         g_painter->setOpacity(fadeOpacity);
     });
 
-    mapPool->onAfterDraw([&]() {
+    mapPool->onAfterDraw([&]
+    {
         g_painter->resetShaderProgram();
         g_painter->resetOpacity();
     });
@@ -456,7 +458,7 @@ void MapView::updateVisibleTilesCache()
 void MapView::updateGeometry(const Size& visibleDimension)
 {
     const uint8 tileSize = SPRITE_SIZE * m_scaleFactor;
-    const Size drawDimension = visibleDimension + Size(3),
+    const Size drawDimension = visibleDimension + 3,
         bufferSize = drawDimension * tileSize;
 
     if (bufferSize.width() > g_graphics.getMaxTextureSize() || bufferSize.height() > g_graphics.getMaxTextureSize()) {
@@ -490,7 +492,7 @@ void MapView::updateGeometry(const Size& visibleDimension)
 
 void MapView::onCameraMove(const Point& /*offset*/)
 {
-    m_rectCache.rect = Rect();
+    m_rectCache.rect = {};
 
     if (isFollowingCreature()) {
         updateViewport(m_followingCreature->isWalking() ? m_followingCreature->getDirection() : Otc::InvalidDirection);
@@ -613,7 +615,7 @@ void MapView::followCreature(const CreaturePtr& creature)
 {
     m_follow = true;
     m_followingCreature = creature;
-    m_lastCameraPosition = Position();
+    m_lastCameraPosition = {};
 
     requestVisibleTilesCacheUpdate();
 }
@@ -672,7 +674,7 @@ void MapView::move(int32 x, int32 y)
         requestTilesUpdate = true;
     }
 
-    m_rectCache.rect = Rect();
+    m_rectCache.rect = {};
 
     if (requestTilesUpdate)
         requestVisibleTilesCacheUpdate();
@@ -750,7 +752,7 @@ uint8 MapView::calcFirstVisibleFloor(bool checkLimitsFloorsView)
     }
 
     // just ensure the that the floor is in the valid range
-    z = std::clamp<int>(z, 0, static_cast<int>(MAX_Z));
+    z = std::clamp<int>(z, 0, MAX_Z);
     return z;
 }
 
@@ -772,7 +774,7 @@ uint8 MapView::calcLastVisibleFloor()
         z = std::max<int>(m_lockedFirstVisibleFloor, z);
 
     // just ensure the that the floor is in the valid range
-    z = std::clamp<int>(z, 0, static_cast<int>(MAX_Z));
+    z = std::clamp<int>(z, 0, MAX_Z);
     return z;
 }
 

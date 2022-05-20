@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,7 @@
 
 #include <cmath>
 #include <random>
+#include <climits>
 
 #ifdef _MSC_VER
 #pragma warning(disable:4267) // '?' : conversion from 'A' to 'B', possible loss of data
@@ -46,11 +47,11 @@ namespace stdext
         return (b << 16) | a;
     }
 
-    long random_range(long min, long max)
+    int random_range(int min, int max)
     {
         static std::random_device rd;
         static std::mt19937 gen(rd());
-        static std::uniform_int_distribution<long> dis(0, 2147483647);
+        static std::uniform_int_distribution dis(0, INT_MAX);
         return min + (dis(gen) % (max - min + 1));
     }
 
