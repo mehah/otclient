@@ -31,7 +31,7 @@ HouseManager g_houses;
 House::House(uint32 hId, const std::string& name, const Position& pos)
 {
     setId(hId);
-    setName(name);
+    setName(name.data());
     if (pos.isValid())
         setEntry(pos);
 }
@@ -134,7 +134,7 @@ void HouseManager::load(const std::string& fileName)
 {
     try {
         TiXmlDocument doc;
-        doc.Parse(g_resources.readFileContents(fileName).c_str());
+        doc.Parse(g_resources.readFileContents(fileName.data()).data());
         if (doc.Error())
             stdext::throw_exception(stdext::format("failed to load '%s': %s (House XML)", fileName, doc.ErrorDesc()));
 
@@ -177,7 +177,7 @@ void HouseManager::save(const std::string& fileName)
             root->LinkEndChild(elem);
         }
 
-        if (!doc.SaveFile("data" + fileName))
+        if (!doc.SaveFile("data"s + fileName.data()))
             stdext::throw_exception(stdext::format("failed to save houses XML %s: %s", fileName, doc.ErrorDesc()));
     } catch (std::exception& e) {
         g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));

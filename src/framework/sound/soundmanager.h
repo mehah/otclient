@@ -49,7 +49,7 @@ public:
     SoundSourcePtr play(std::string filename, float fadetime = 0, float gain = 1.0f, float pitch = 1.0f);
     SoundChannelPtr getChannel(int channel);
 
-    std::string resolveSoundFile(std::string file);
+    std::string resolveSoundFile(std::string_view file);
     void ensureContext();
 
 private:
@@ -59,7 +59,7 @@ private:
     ALCcontext* m_context;
 
     std::map<StreamSoundSourcePtr, std::shared_future<SoundFilePtr>> m_streamFiles;
-    std::unordered_map<std::string, SoundBufferPtr> m_buffers;
+    std::unordered_map<std::string_view, SoundBufferPtr> m_buffers;
     std::vector<SoundSourcePtr> m_sources;
     bool m_audioEnabled{ true };
     std::unordered_map<int, SoundChannelPtr> m_channels;

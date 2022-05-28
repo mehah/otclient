@@ -81,7 +81,7 @@ class CreatureType : public LuaObject
 {
 public:
     CreatureType() = default;
-    CreatureType(const std::string& name) { setName(name); }
+    CreatureType(const std::string_view name) { setName(name.data()); }
 
     void setSpawnTime(int32 spawnTime) { m_attribs.set(CreatureAttrSpawnTime, spawnTime); }
     int32 getSpawnTime() { return m_attribs.get<int32>(CreatureAttrSpawnTime); }

@@ -36,7 +36,7 @@ public:
     void liveReload();
 
     void preload(const std::string& fileName) { getTexture(fileName); }
-    TexturePtr getTexture(const std::string& fileName);
+    TexturePtr getTexture(const std::string_view fileName);
     const TexturePtr& getEmptyTexture() { return m_emptyTexture; }
 
 private:

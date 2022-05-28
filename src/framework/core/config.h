@@ -33,7 +33,7 @@ class Config : public LuaObject
 public:
     Config();
 
-    bool load(const std::string& file);
+    bool load(const std::string_view file);
     bool unload();
     bool save();
     void clear();

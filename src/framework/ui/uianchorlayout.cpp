@@ -106,7 +106,7 @@ void UIAnchorGroup::addAnchor(const UIAnchorPtr& anchor)
 }
 
 void UIAnchorLayout::addAnchor(const UIWidgetPtr& anchoredWidget, Fw::AnchorEdge anchoredEdge,
-                               const std::string& hookedWidgetId, Fw::AnchorEdge hookedEdge)
+                               const std::string_view hookedWidgetId, Fw::AnchorEdge hookedEdge)
 {
     if (!anchoredWidget)
         return;

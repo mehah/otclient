@@ -22,11 +22,15 @@
 
 #pragma once
 
+#include <string_view>
+
+using namespace std::literals;
+
 #include <client/config.h>
 
 #include "stdext/compiler.h"
 
- // common C/C++ headers
+// common C/C++ headers
 #include "pch.h"
 
 // global constants

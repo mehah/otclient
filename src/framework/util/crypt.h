@@ -38,9 +38,9 @@ public:
     Crypt();
     ~Crypt();
 
-    std::string base64Encode(const std::string& decoded_string);
-    std::string base64Decode(const std::string& encoded_string);
-    std::string xorCrypt(const std::string& buffer, const std::string& key);
+    std::string base64Encode(const std::string_view decoded_string);
+    std::string base64Decode(const std::string_view encoded_string);
+    std::string xorCrypt(const std::string_view buffer, const std::string_view key);
     std::string encrypt(const std::string& decrypted_string) { return _encrypt(decrypted_string, true); }
     std::string decrypt(const std::string& encrypted_string) { return _decrypt(encrypted_string, true); }
     std::string genUUID();
@@ -54,8 +54,8 @@ public:
     int rsaGetSize();
 
 private:
-    std::string _encrypt(const std::string& decrypted_string, bool useMachineUUID);
-    std::string _decrypt(const std::string& encrypted_string, bool useMachineUUID);
+    std::string _encrypt(const std::string_view decrypted_string, bool useMachineUUID);
+    std::string _decrypt(const std::string_view encrypted_string, bool useMachineUUID);
     std::string getCryptKey(bool useMachineUUID);
 
     uuids::uuid m_machineUUID;

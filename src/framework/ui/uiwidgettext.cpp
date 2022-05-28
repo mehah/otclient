@@ -106,13 +106,13 @@ void UIWidget::drawText(const Rect& screenCoords)
         g_drawPool.addTexturedRect(fontRect.first, m_font->getTexture(), fontRect.second, m_color);
 }
 
-void UIWidget::onTextChange(const std::string& text, const std::string& oldText)
+void UIWidget::onTextChange(const std::string_view text, const std::string_view oldText)
 {
     g_app.repaint();
     callLuaField("onTextChange", text, oldText);
 }
 
-void UIWidget::onFontChange(const std::string& font)
+void UIWidget::onFontChange(const std::string_view font)
 {
     callLuaField("onFontChange", font);
 }

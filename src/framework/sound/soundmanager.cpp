@@ -287,11 +287,11 @@ SoundSourcePtr SoundManager::createSoundSource(const std::string& filename)
     return source;
 }
 
-std::string SoundManager::resolveSoundFile(std::string file)
+std::string SoundManager::resolveSoundFile(std::string_view file)
 {
-    file = g_resources.guessFilePath(file, "ogg");
-    file = g_resources.resolvePath(file);
-    return file;
+    std::string _file = g_resources.guessFilePath(file.data(), "ogg");
+    _file = g_resources.resolvePath(_file);
+    return _file;
 }
 
 void SoundManager::ensureContext()

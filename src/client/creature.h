@@ -48,7 +48,7 @@ public:
     void drawInformation(const Rect& parentRect, const Point& dest, float scaleFactor, const Point& drawOffset, bool useGray, float horizontalStretchFactor, float verticalStretchFactor, int drawFlags);
 
     void setId(uint32 id) override { m_id = id; }
-    void setName(const std::string& name);
+    void setName(const std::string_view name);
     void setHealthPercent(uint8 healthPercent);
     void setDirection(Otc::Direction direction);
     void setOutfit(const Outfit& outfit);

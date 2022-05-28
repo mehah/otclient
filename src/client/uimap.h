@@ -95,7 +95,7 @@ public:
     void setFloorFading(const uint16 v) { m_mapView->setFloorFading(v); }
 
 protected:
-    void onStyleApply(const std::string& styleName, const OTMLNodePtr& styleNode) override;
+    void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
     void onGeometryChange(const Rect& oldRect, const Rect& newRect) override;
     bool onMouseMove(const Point& mousePos, const Point& mouseMoved) override;
 

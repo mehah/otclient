@@ -241,7 +241,7 @@ void ThingTypeManager::loadXml(const std::string& file)
             stdext::throw_exception("OTB must be loaded before XML");
 
         TiXmlDocument doc;
-        doc.Parse(g_resources.readFileContents(file).c_str());
+        doc.Parse(g_resources.readFileContents(file).data());
         if (doc.Error())
             stdext::throw_exception(stdext::format("failed to parse '%s': '%s'", file, doc.ErrorDesc()));
 
@@ -263,7 +263,7 @@ void ThingTypeManager::loadXml(const std::string& file)
                         while (i <= ids[1])
                             parseItemType(++i, element);
                     } else
-                        parseItemType(atoi(s.c_str()), element);
+                        parseItemType(atoi(s.data()), element);
                 }
             } else {
                 std::vector<int32> begin = stdext::split<int32>(element->Attribute("fromid"), ";");

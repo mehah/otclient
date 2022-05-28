@@ -66,14 +66,14 @@ int Platform::getProcessId()
 
 bool Platform::isProcessRunning(const std::string& name)
 {
-    if (FindWindowA(name.c_str(), nullptr) != nullptr)
+    if (FindWindowA(name.data(), nullptr) != nullptr)
         return true;
     return false;
 }
 
 bool Platform::killProcess(const std::string& name)
 {
-    const HWND window = FindWindowA(name.c_str(), nullptr);
+    const HWND window = FindWindowA(name.data(), nullptr);
     if (window == nullptr)
         return false;
     const DWORD pid = GetProcessId(window);
@@ -411,7 +411,7 @@ std::string Platform::getOSName()
     return ret;
 }
 
-std::string Platform::traceback(const std::string& where, int, int)
+std::string Platform::traceback(const std::string_view where, int, int)
 {
     std::stringstream ss;
     ss << "\nat:";

@@ -54,9 +54,9 @@ public:
     // @dontbind
     bool writeFileStream(const std::string& fileName, std::iostream& in);
 
-    FileStreamPtr openFile(const std::string& fileName);
-    FileStreamPtr appendFile(const std::string& fileName);
-    FileStreamPtr createFile(const std::string& fileName);
+    FileStreamPtr openFile(const std::string_view fileName);
+    FileStreamPtr appendFile(const std::string_view fileName);
+    FileStreamPtr createFile(const std::string_view fileName);
     bool deleteFile(const std::string& fileName);
 
     bool makeDir(const std::string& directory);

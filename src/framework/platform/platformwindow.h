@@ -51,9 +51,9 @@ public:
     virtual void swapBuffers() = 0;
     virtual void showMouse() = 0;
     virtual void hideMouse() = 0;
-    virtual void displayFatalError(const std::string& /*message*/) {}
+    virtual void displayFatalError(const std::string_view /*message*/) {}
 
-    int loadMouseCursor(const std::string& file, const Point& hotSpot);
+    int loadMouseCursor(const std::string_view file, const Point& hotSpot);
     virtual void setMouseCursor(int cursorId) = 0;
     virtual void restoreMouseCursor() = 0;
 

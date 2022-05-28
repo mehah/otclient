@@ -839,7 +839,7 @@ void UIWidget::setId(const std::string& id)
 
     if (m_parent) {
         m_parent->setLuaField(m_id, nullptr);
-        m_parent->setLuaField(id, static_self_cast<UIWidget>());
+        m_parent->setLuaField(id.data(), static_self_cast<UIWidget>());
     }
 
     m_id = id;
@@ -920,8 +920,7 @@ bool UIWidget::setRect(const Rect& rect)
     // avoid massive update events
     if (!m_updateEventScheduled) {
         UIWidgetPtr self = static_self_cast<UIWidget>();
-        g_dispatcher.addEvent([self, oldRect]
-        {
+        g_dispatcher.addEvent([self, oldRect] {
             self->m_updateEventScheduled = false;
             if (oldRect != self->getRect())
                 self->onGeometryChange(oldRect, self->getRect());
@@ -1510,7 +1509,7 @@ void UIWidget::updateStyle()
     m_stateStyle = newStateStyle;
 }
 
-void UIWidget::onStyleApply(const std::string&, const OTMLNodePtr& styleNode)
+void UIWidget::onStyleApply(const std::string_view, const OTMLNodePtr& styleNode)
 {
     if (m_destroyed)
         return;
@@ -1589,7 +1588,7 @@ bool UIWidget::onDrop(UIWidgetPtr draggedWidget, const Point& mousePos)
     return callLuaField<bool>("onDrop", draggedWidget, mousePos);
 }
 
-bool UIWidget::onKeyText(const std::string& keyText)
+bool UIWidget::onKeyText(const std::string_view keyText)
 {
     return callLuaField<bool>("onKeyText", keyText);
 }
@@ -1649,7 +1648,7 @@ bool UIWidget::onDoubleClick(const Point& mousePos)
     return callLuaField<bool>("onDoubleClick", mousePos);
 }
 
-bool UIWidget::propagateOnKeyText(const std::string& keyText)
+bool UIWidget::propagateOnKeyText(const std::string_view keyText)
 {
     // do a backup of children list, because it may change while looping it
     UIWidgetList children;

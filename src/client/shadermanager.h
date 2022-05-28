@@ -51,7 +51,7 @@ public:
     void setupMountShader(const PainterShaderProgramPtr& shader);
 
     PainterShaderProgramPtr createShader(const std::string& name);
-    PainterShaderProgramPtr createFragmentShader(const std::string& name, std::string file);
+    PainterShaderProgramPtr createFragmentShader(const std::string& name, const std::string& file);
     PainterShaderProgramPtr createFragmentShaderFromCode(const std::string& name, const std::string& code);
 
     PainterShaderProgramPtr createItemShader(const std::string& name, const std::string& file);

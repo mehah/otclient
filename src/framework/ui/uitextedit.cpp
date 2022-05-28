@@ -379,35 +379,38 @@ void UITextEdit::setTextVirtualOffset(const Point& offset)
     update();
 }
 
-void UITextEdit::appendText(std::string text)
+void UITextEdit::appendText(const std::string& text)
 {
     if (hasSelection())
         del();
 
     if (m_cursorPos >= 0) {
         // replace characters that are now allowed
-        if (!m_multiline)
-            stdext::replace_all(text, "\n", " ");
-        stdext::replace_all(text, "\r", "");
-        stdext::replace_all(text, "\t", "    ");
 
-        if (text.length() > 0) {
+        std::string _text{ text };
+
+        if (!m_multiline)
+            stdext::replace_all(_text, "\n", " ");
+        stdext::replace_all(_text, "\r", "");
+        stdext::replace_all(_text, "\t", "    ");
+
+        if (_text.length() > 0) {
             // only add text if textedit can add it
-            if (m_maxLength > 0 && m_text.length() + text.length() > m_maxLength)
+            if (m_maxLength > 0 && m_text.length() + _text.length() > m_maxLength)
                 return;
 
             // only ignore text append if it contains invalid characters
             if (!m_validCharacters.empty()) {
-                for (const char i : text) {
+                for (const char i : _text) {
                     if (m_validCharacters.find(i) == std::string::npos)
                         return;
                 }
             }
 
             std::string tmp = m_text;
-            tmp.insert(m_cursorPos, text);
-            m_cursorPos += text.length();
-            setText(tmp);
+            tmp.insert(m_cursorPos, _text);
+            m_cursorPos += _text.length();
+            setText(_text);
         }
     }
 }
@@ -609,7 +612,7 @@ void UITextEdit::onHoverChange(bool hovered)
     }
 }
 
-void UITextEdit::onStyleApply(const std::string& styleName, const OTMLNodePtr& styleNode)
+void UITextEdit::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
 {
     UIWidget::onStyleApply(styleName, styleNode);
 
@@ -777,10 +780,10 @@ bool UITextEdit::onKeyPress(uchar keyCode, int keyboardModifiers, int autoRepeat
     return false;
 }
 
-bool UITextEdit::onKeyText(const std::string& keyText)
+bool UITextEdit::onKeyText(const std::string_view keyText)
 {
     if (m_editable) {
-        appendText(keyText);
+        appendText(keyText.data());
         return true;
     }
     return false;

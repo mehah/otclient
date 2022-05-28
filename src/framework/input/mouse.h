@@ -30,7 +30,7 @@ public:
     void init();
     void terminate();
 
-    void loadCursors(std::string filename);
+    void loadCursors(const std::string& filename);
     void addCursor(const std::string& name, const std::string& file, const Point& hotSpot);
     bool pushCursor(const std::string& name);
     void popCursor(const std::string& name);

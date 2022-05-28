@@ -56,7 +56,7 @@ void ProtocolHttp::disconnect()
 void ProtocolHttp::send(const std::string& message)
 {
     if (m_connection)
-        m_connection->write((uint8*)message.c_str(), message.length());
+        m_connection->write((uint8*)message.data(), message.length());
 }
 
 void ProtocolHttp::recv()

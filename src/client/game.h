@@ -72,10 +72,10 @@ protected:
     void processPing();
     void processPingBack();
 
-    static void processUpdateNeeded(const std::string& signature);
-    static void processLoginError(const std::string& error);
-    static void processLoginAdvice(const std::string& message);
-    static void processLoginWait(const std::string& message, int time);
+    static void processUpdateNeeded(const std::string_view signature);
+    static void processLoginError(const std::string_view error);
+    static void processLoginAdvice(const std::string_view message);
+    static void processLoginWait(const std::string_view message, int time);
     static void processSessionEnd(int reason);
     static void processLogin();
     void processPendingGame();
@@ -94,11 +94,11 @@ protected:
     void processPlayerModes(Otc::FightModes fightMode, Otc::ChaseModes chaseMode, bool safeMode, Otc::PVPModes pvpMode);
 
     // message related
-    static void processTextMessage(Otc::MessageMode mode, const std::string& text);
-    static void processTalk(const std::string& name, int level, Otc::MessageMode mode, const std::string& text, int channelId, const Position& pos);
+    static void processTextMessage(Otc::MessageMode mode, const std::string_view text);
+    static void processTalk(const std::string_view name, int level, Otc::MessageMode mode, const std::string_view text, int channelId, const Position& pos);
 
     // container related
-    void processOpenContainer(int containerId, const ItemPtr& containerItem, const std::string& name, int capacity, bool hasParent, const std::vector<ItemPtr>& items, bool isUnlocked, bool hasPages, int containerSize, int firstIndex);
+    void processOpenContainer(int containerId, const ItemPtr& containerItem, const std::string_view name, int capacity, bool hasParent, const std::vector<ItemPtr>& items, bool isUnlocked, bool hasPages, int containerSize, int firstIndex);
     void processCloseContainer(int containerId);
     void processContainerAddItem(int containerId, const ItemPtr& item, int slot);
     void processContainerUpdateItem(int containerId, int slot, const ItemPtr& item);
@@ -106,25 +106,25 @@ protected:
 
     // channel related
     static void processChannelList(const std::vector<std::tuple<int, std::string> >& channelList);
-    static void processOpenChannel(int channelId, const std::string& name);
-    static void processOpenPrivateChannel(const std::string& name);
-    static void processOpenOwnPrivateChannel(int channelId, const std::string& name);
+    static void processOpenChannel(int channelId, const std::string_view name);
+    static void processOpenPrivateChannel(const std::string_view name);
+    static void processOpenOwnPrivateChannel(int channelId, const std::string_view name);
     static void processCloseChannel(int channelId);
 
     // rule violations
     static void processRuleViolationChannel(int channelId);
-    static void processRuleViolationRemove(const std::string& name);
-    static void processRuleViolationCancel(const std::string& name);
+    static void processRuleViolationRemove(const std::string_view name);
+    static void processRuleViolationCancel(const std::string_view name);
     static void processRuleViolationLock();
 
     // vip related
-    void processVipAdd(uint id, const std::string& name, uint status, const std::string& description, int iconId, bool notifyLogin);
+    void processVipAdd(uint id, const std::string_view name, uint status, const std::string_view description, int iconId, bool notifyLogin);
     void processVipStateChange(uint id, uint status);
 
     // tutorial hint
     static void processTutorialHint(int id);
-    static void processAddAutomapFlag(const Position& pos, int icon, const std::string& message);
-    static void processRemoveAutomapFlag(const Position& pos, int icon, const std::string& message);
+    static void processAddAutomapFlag(const Position& pos, int icon, const std::string_view message);
+    static void processRemoveAutomapFlag(const Position& pos, int icon, const std::string_view message);
 
     // outfit
     void processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<int, std::string, int> >& outfitList,
@@ -136,20 +136,20 @@ protected:
     static void processCloseNpcTrade();
 
     // player trade
-    static void processOwnTrade(const std::string& name, const std::vector<ItemPtr>& items);
-    static void processCounterTrade(const std::string& name, const std::vector<ItemPtr>& items);
+    static void processOwnTrade(const std::string_view name, const std::vector<ItemPtr>& items);
+    static void processCounterTrade(const std::string_view name, const std::vector<ItemPtr>& items);
     static void processCloseTrade();
 
     // edit text/list
-    static void processEditText(uint id, int itemId, int maxLength, const std::string& text, const std::string& writer, const std::string& date);
-    static void processEditList(uint id, int doorId, const std::string& text);
+    static void processEditText(uint id, int itemId, int maxLength, const std::string_view text, const std::string_view writer, const std::string_view date);
+    static void processEditList(uint id, int doorId, const std::string_view text);
 
     // questlog
     static void processQuestLog(const std::vector<std::tuple<int, std::string, bool> >& questList);
     static void processQuestLine(int questId, const std::vector<std::tuple<std::string, std::string> >& questMissions);
 
     // modal dialogs >= 970
-    static void processModalDialog(uint32 id, const std::string& title, const std::string& message, const std::vector<std::tuple<int, std::string> >
+    static void processModalDialog(uint32 id, const std::string_view title, const std::string_view message, const std::vector<std::tuple<int, std::string> >
                                    & buttonList, int enterButton, int escapeButton, const std::vector<std::tuple<int, std::string> >
                                    & choiceList, bool priority);
 
@@ -347,7 +347,7 @@ public:
     bool isGM() { return !m_gmActions.empty(); }
     Otc::Direction getLastWalkDir() { return m_lastWalkDir; }
 
-    std::string formatCreatureName(const std::string& name);
+    std::string formatCreatureName(const std::string_view name);
     int findEmptyContainerId();
 
 protected:

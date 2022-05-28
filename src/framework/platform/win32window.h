@@ -66,7 +66,7 @@ public:
     void swapBuffers() override;
     void showMouse() override;
     void hideMouse() override;
-    void displayFatalError(const std::string& message) override;
+    void displayFatalError(const std::string_view message) override;
 
     void setMouseCursor(int cursorId) override;
     void restoreMouseCursor() override;

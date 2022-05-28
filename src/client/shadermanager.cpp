@@ -68,22 +68,22 @@ PainterShaderProgramPtr ShaderManager::createShader(const std::string& name)
     return shader;
 }
 
-PainterShaderProgramPtr ShaderManager::createFragmentShader(const std::string& name, std::string file)
+PainterShaderProgramPtr ShaderManager::createFragmentShader(const std::string& name, const std::string& file)
 {
     PainterShaderProgramPtr shader = createShader(name);
     if (!shader)
         return nullptr;
 
-    file = g_resources.guessFilePath(file, "frag");
+    const auto& path = g_resources.guessFilePath(file, "frag");
 
     shader->addShaderFromSourceCode(Shader::Vertex, glslMainWithTexCoordsVertexShader + glslPositionOnlyVertexShader);
-    if (!shader->addShaderFromSourceFile(Shader::Fragment, file)) {
-        g_logger.error(stdext::format("unable to load fragment shader '%s' from source file '%s'", name, file));
+    if (!shader->addShaderFromSourceFile(Shader::Fragment, path)) {
+        g_logger.error(stdext::format("unable to load fragment shader '%s' from source file '%s'", name, path));
         return nullptr;
     }
 
     if (!shader->link()) {
-        g_logger.error(stdext::format("unable to link shader '%s' from file '%s'", name, file));
+        g_logger.error(stdext::format("unable to link shader '%s' from file '%s'", name, path));
         return nullptr;
     }
 

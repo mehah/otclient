@@ -255,7 +255,7 @@ void SpriteAppearances::saveSheetToFileBySprite(int id, const std::string& file)
     }
 }
 
-void SpriteAppearances::saveSheetToFile(const SpriteSheetPtr& sheet, const std::string& file)
+void SpriteAppearances::saveSheetToFile(const SpriteSheetPtr& sheet, const std::string_view file)
 {
     Image image({ 384 }, 4, sheet->data.get());
     image.savePNG(file);

@@ -41,10 +41,10 @@ void ModuleManager::discoverModules()
 
     const auto moduleDirs = g_resources.listDirectoryFiles("/");
     for (const std::string& moduleDir : moduleDirs) {
-        auto moduleFiles = g_resources.listDirectoryFiles("/" + moduleDir);
+        auto moduleFiles = g_resources.listDirectoryFiles("/"s + moduleDir.data());
         for (const std::string& moduleFile : moduleFiles) {
             if (g_resources.isFileType(moduleFile, "otmod")) {
-                ModulePtr module = discoverModule("/" + moduleDir + "/" + moduleFile);
+                ModulePtr module = discoverModule("/"s + moduleDir.data() + "/" + moduleFile.data());
                 if (module && module->isAutoLoad())
                     m_autoLoadModules.emplace(module->getAutoLoadPriority(), module);
             }

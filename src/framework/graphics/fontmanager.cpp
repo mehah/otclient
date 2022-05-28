@@ -45,12 +45,11 @@ void FontManager::clearFonts()
     m_defaultFont = BitmapFontPtr(new BitmapFont("emptyfont"));
 }
 
-bool FontManager::importFont(std::string file)
+bool FontManager::importFont(const std::string& file)
 {
+    const auto& path = g_resources.guessFilePath(file, "otfont");
     try {
-        file = g_resources.guessFilePath(file, "otfont");
-
-        const OTMLDocumentPtr doc = OTMLDocument::parse(file);
+        const OTMLDocumentPtr doc = OTMLDocument::parse(path);
         const OTMLNodePtr fontNode = doc->at("Font");
 
         const std::string name = fontNode->valueAt("name");
@@ -73,7 +72,7 @@ bool FontManager::importFont(std::string file)
 
         return true;
     } catch (stdext::exception& e) {
-        g_logger.error(stdext::format("Unable to load font from file '%s': %s", file, e.what()));
+        g_logger.error(stdext::format("Unable to load font from file '%s': %s", path, e.what()));
         return false;
     }
 }

@@ -79,7 +79,7 @@ void UIItem::setItemId(int id)
     }
 }
 
-void UIItem::onStyleApply(const std::string& styleName, const OTMLNodePtr& styleNode)
+void UIItem::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
 {
     UIWidget::onStyleApply(styleName, styleNode);
 

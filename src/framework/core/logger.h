@@ -29,7 +29,7 @@
 
 struct LogMessage
 {
-    LogMessage(Fw::LogLevel level, std::string message, std::size_t when) : level(level), message(std::move(message)), when(when) {}
+    LogMessage(Fw::LogLevel level, std::string_view message, std::size_t when) : level(level), message(std::move(message)), when(when) {}
     Fw::LogLevel level;
     std::string message;
     std::size_t when;
@@ -43,11 +43,11 @@ class Logger
         MAX_LOG_HISTORY = 1000
     };
 
-    using OnLogCallback = std::function<void(Fw::LogLevel, const std::string&, int64)>;
+    using OnLogCallback = std::function<void(Fw::LogLevel, const std::string_view, int64)>;
 
 public:
     void log(Fw::LogLevel level, const std::string& message);
-    void logFunc(Fw::LogLevel level, const std::string& message, std::string prettyFunction);
+    void logFunc(Fw::LogLevel level, const std::string_view message, const std::string_view prettyFunction);
 
     void debug(const std::string& what) { log(Fw::LogDebug, what); }
     void info(const std::string& what) { log(Fw::LogInfo, what); }

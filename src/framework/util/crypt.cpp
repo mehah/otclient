@@ -65,7 +65,7 @@ Crypt::~Crypt()
 #endif
 }
 
-std::string Crypt::base64Encode(const std::string& decoded_string)
+std::string Crypt::base64Encode(const std::string_view decoded_string)
 {
     std::string ret;
     int i = 0;
@@ -108,7 +108,7 @@ std::string Crypt::base64Encode(const std::string& decoded_string)
     return ret;
 }
 
-std::string Crypt::base64Decode(const std::string& encoded_string)
+std::string Crypt::base64Decode(const std::string_view encoded_string)
 {
     int len = encoded_string.size();
     int i = 0;
@@ -151,7 +151,7 @@ std::string Crypt::base64Decode(const std::string& encoded_string)
     return ret;
 }
 
-std::string Crypt::xorCrypt(const std::string& buffer, const std::string& key)
+std::string Crypt::xorCrypt(const std::string_view buffer, const std::string_view key)
 {
     std::string out;
     out.resize(buffer.size());
@@ -217,18 +217,18 @@ std::string Crypt::getCryptKey(bool useMachineUUID)
     return key;
 }
 
-std::string Crypt::_encrypt(const std::string& decrypted_string, bool useMachineUUID)
+std::string Crypt::_encrypt(const std::string_view decrypted_string, bool useMachineUUID)
 {
-    const uint32 sum = stdext::adler32((const uint8*)decrypted_string.c_str(), decrypted_string.size());
+    const uint32 sum = stdext::adler32((const uint8*)decrypted_string.data(), decrypted_string.size());
 
-    std::string tmp = "0000" + decrypted_string;
+    std::string tmp = "0000"s + decrypted_string.data();
 
     stdext::writeULE32((uint8*)&tmp[0], sum);
     std::string encrypted = base64Encode(xorCrypt(tmp, getCryptKey(useMachineUUID)));
     return encrypted;
 }
 
-std::string Crypt::_decrypt(const std::string& encrypted_string, bool useMachineUUID)
+std::string Crypt::_decrypt(const std::string_view encrypted_string, bool useMachineUUID)
 {
     const std::string decoded = base64Decode(encrypted_string);
     const std::string tmp = xorCrypt(decoded, getCryptKey(useMachineUUID));
@@ -259,8 +259,8 @@ void Crypt::rsaSetPublicKey(const std::string& n, const std::string& e)
     }
 #else
     BIGNUM* bn = nullptr, * be = nullptr;
-    BN_dec2bn(&bn, n.c_str());
-    BN_dec2bn(&be, e.c_str());
+    BN_dec2bn(&bn, n.data());
+    BN_dec2bn(&be, e.data());
     RSA_set0_key(m_rsa, bn, be, nullptr);
 #endif
 #endif
@@ -291,9 +291,9 @@ void Crypt::rsaSetPrivateKey(const std::string& p, const std::string& q, const s
     }
 #else
     BIGNUM* bp = nullptr, * bq = nullptr, * bd = nullptr;
-    BN_dec2bn(&bp, p.c_str());
-    BN_dec2bn(&bq, q.c_str());
-    BN_dec2bn(&bd, d.c_str());
+    BN_dec2bn(&bp, p.data());
+    BN_dec2bn(&bq, q.data());
+    BN_dec2bn(&bd, d.data());
     RSA_set0_key(m_rsa, nullptr, nullptr, bd);
     RSA_set0_factors(m_rsa, bp, bq);
 #endif

@@ -54,7 +54,7 @@ public:
 
     void moveCursorHorizontally(bool right);
     void moveCursorVertically(bool up);
-    void appendText(std::string text);
+    void appendText(const std::string& text);
     void appendCharacter(char c);
     void removeCharacter(bool right);
     void blinkCursor();
@@ -93,10 +93,10 @@ protected:
     void updateText() override;
 
     void onHoverChange(bool hovered) override;
-    void onStyleApply(const std::string& styleName, const OTMLNodePtr& styleNode) override;
+    void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
     void onGeometryChange(const Rect& oldRect, const Rect& newRect) override;
     void onFocusChange(bool focused, Fw::FocusReason reason) override;
-    bool onKeyText(const std::string& keyText) override;
+    bool onKeyText(const std::string_view keyText) override;
     bool onKeyPress(uchar keyCode, int keyboardModifiers, int autoRepeatTicks) override;
     bool onMousePress(const Point& mousePos, Fw::MouseButton button) override;
     bool onMouseRelease(const Point& mousePos, Fw::MouseButton button) override;

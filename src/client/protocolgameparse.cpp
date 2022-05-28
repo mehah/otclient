@@ -1011,7 +1011,7 @@ void ProtocolGame::parseOpenContainer(const InputMessagePtr& msg)
 {
     const int containerId = msg->getU8();
     const ItemPtr containerItem = getItem(msg);
-    const std::string& name = msg->getString();
+    const std::string name = msg->getString();
     const int capacity = msg->getU8();
     const bool hasParent = msg->getU8() != 0;
 
@@ -1261,7 +1261,7 @@ void ProtocolGame::parseAnimatedText(const InputMessagePtr& msg)
 {
     const Position& position = getPosition(msg);
     const int color = msg->getU8();
-    const std::string& text = msg->getString();
+    const std::string text = msg->getString();
 
     const auto animatedText = AnimatedTextPtr(new AnimatedText);
     animatedText->setColor(color);
@@ -1471,7 +1471,7 @@ void ProtocolGame::parseEditList(const InputMessagePtr& msg)
 {
     const int doorId = msg->getU8();
     const uint id = msg->getU32();
-    const std::string& text = msg->getString();
+    const std::string text = msg->getString();
 
     Game::processEditList(id, doorId, text);
 }

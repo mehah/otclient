@@ -822,7 +822,7 @@ void WIN32Window::hideMouse()
     ShowCursor(false);
 }
 
-void WIN32Window::displayFatalError(const std::string& message)
+void WIN32Window::displayFatalError(const std::string_view message)
 {
     MessageBoxW(m_window, stdext::latin1_to_utf16(message).c_str(), L"FATAL ERROR", MB_OK | MB_ICONERROR);
 }

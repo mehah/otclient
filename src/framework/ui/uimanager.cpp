@@ -399,12 +399,12 @@ std::string UIManager::getStyleClass(const std::string& styleName)
     return "";
 }
 
-UIWidgetPtr UIManager::loadUI(std::string file, const UIWidgetPtr& parent)
+UIWidgetPtr UIManager::loadUI(const std::string& file, const UIWidgetPtr& parent)
 {
     try {
-        file = g_resources.guessFilePath(file, "otui");
+        const auto& pathfile = g_resources.guessFilePath(file, "otui");
 
-        const OTMLDocumentPtr doc = OTMLDocument::parse(file);
+        const OTMLDocumentPtr doc = OTMLDocument::parse(pathfile);
         UIWidgetPtr widget;
         for (const OTMLNodePtr& node : doc->children()) {
             std::string tag = node->tag();

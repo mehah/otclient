@@ -40,7 +40,7 @@ void OutputMessage::setBuffer(const std::string& buffer)
     const int len = buffer.size();
     reset();
     checkWrite(len);
-    memcpy(m_buffer + m_writePos, buffer.c_str(), len);
+    memcpy(m_buffer + m_writePos, buffer.data(), len);
     m_writePos += len;
     m_messageSize += len;
 }
@@ -84,7 +84,7 @@ void OutputMessage::addString(const std::string& buffer)
         throw stdext::exception(stdext::format("string length > %d", MAX_STRING_LENGTH));
     checkWrite(len + 2);
     addU16(len);
-    memcpy(m_buffer + m_writePos, buffer.c_str(), len);
+    memcpy(m_buffer + m_writePos, buffer.data(), len);
     m_writePos += len;
     m_messageSize += len;
 }

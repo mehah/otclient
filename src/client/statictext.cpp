@@ -103,8 +103,7 @@ void StaticText::scheduleUpdate()
     const int delay = std::max<int>(m_messages.front().second - g_clock.millis(), 0);
 
     auto self = asStaticText();
-    m_updateEvent = g_dispatcher.scheduleEvent([self]
-    {
+    m_updateEvent = g_dispatcher.scheduleEvent([self] {
         self->m_updateEvent = nullptr;
         self->update();
     }, delay);

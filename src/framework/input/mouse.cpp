@@ -35,11 +35,11 @@ void Mouse::terminate()
     m_cursors.clear();
 }
 
-void Mouse::loadCursors(std::string filename)
+void Mouse::loadCursors(const std::string& filename)
 {
-    filename = g_resources.guessFilePath(filename, "otml");
+    const auto& path = g_resources.guessFilePath(filename, "otml");
     try {
-        const OTMLDocumentPtr doc = OTMLDocument::parse(filename);
+        const OTMLDocumentPtr doc = OTMLDocument::parse(path);
         const OTMLNodePtr cursorsNode = doc->at("Cursors");
 
         for (const OTMLNodePtr& cursorNode : cursorsNode->children())

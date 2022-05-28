@@ -31,11 +31,11 @@ Config::Config()
     m_fileName = "";
 }
 
-bool Config::load(const std::string& file)
+bool Config::load(const std::string_view file)
 {
     m_fileName = file;
 
-    if (!g_resources.fileExists(file))
+    if (!g_resources.fileExists(file.data()))
         return false;
 
     try {

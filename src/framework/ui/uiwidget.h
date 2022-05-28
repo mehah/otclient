@@ -181,7 +181,7 @@ private:
 
     // event processing
 protected:
-    virtual void onStyleApply(const std::string& styleName, const OTMLNodePtr& styleNode);
+    virtual void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode);
     virtual void onGeometryChange(const Rect& oldRect, const Rect& newRect);
     virtual void onLayoutUpdate();
     virtual void onFocusChange(bool focused, Fw::FocusReason reason);
@@ -192,7 +192,7 @@ protected:
     virtual bool onDragLeave(UIWidgetPtr droppedWidget, const Point& mousePos);
     virtual bool onDragMove(const Point& mousePos, const Point& mouseMoved);
     virtual bool onDrop(UIWidgetPtr draggedWidget, const Point& mousePos);
-    virtual bool onKeyText(const std::string& keyText);
+    virtual bool onKeyText(const std::string_view keyText);
     virtual bool onKeyDown(uchar keyCode, int keyboardModifiers);
     virtual bool onKeyPress(uchar keyCode, int keyboardModifiers, int autoRepeatTicks);
     virtual bool onKeyUp(uchar keyCode, int keyboardModifiers);
@@ -205,7 +205,7 @@ protected:
 
     friend class UILayout;
 
-    bool propagateOnKeyText(const std::string& keyText);
+    bool propagateOnKeyText(const std::string_view keyText);
     bool propagateOnKeyDown(uchar keyCode, int keyboardModifiers);
     bool propagateOnKeyPress(uchar keyCode, int keyboardModifiers, int autoRepeatTicks);
     bool propagateOnKeyUp(uchar keyCode, int keyboardModifiers);
@@ -474,8 +474,8 @@ protected:
     virtual void updateText();
     void drawText(const Rect& screenCoords);
 
-    virtual void onTextChange(const std::string& text, const std::string& oldText);
-    virtual void onFontChange(const std::string& font);
+    virtual void onTextChange(const std::string_view text, const std::string_view oldText);
+    virtual void onFontChange(const std::string_view font);
 
     std::string m_text;
     std::string m_drawText;
