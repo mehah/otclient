@@ -117,22 +117,21 @@ void UIWidget::onFontChange(const std::string_view font)
     callLuaField("onFontChange", font);
 }
 
-void UIWidget::setText(std::string text, bool dontFireLuaCall)
+void UIWidget::setText(const std::string_view text, bool dontFireLuaCall)
 {
+    std::string _text{ text.data() };
     if (m_textOnlyUpperCase)
-        stdext::toupper(text);
+        stdext::toupper(_text);
 
-    if (m_text == text)
+    if (m_text == _text)
         return;
 
     const std::string oldText = m_text;
-    m_text = text;
+    m_text = _text;
     updateText();
 
-    text = m_text;
-
     if (!dontFireLuaCall) {
-        onTextChange(text, oldText);
+        onTextChange(_text, oldText);
     }
 }
 

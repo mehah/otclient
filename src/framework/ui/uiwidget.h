@@ -491,7 +491,7 @@ public:
     void resizeToText();
     void clearText() { setText(""); }
 
-    void setText(std::string text, bool dontFireLuaCall = false);
+    void setText(const std::string_view text, bool dontFireLuaCall = false);
     void setTextAlign(Fw::AlignmentFlag align) { m_textAlign = align; updateText(); }
     void setTextOffset(const Point& offset) { m_textOffset = offset; updateText(); }
     void setTextWrap(bool textWrap) { m_textWrap = textWrap; updateText(); }

@@ -442,7 +442,10 @@ template<class T>
 T LuaInterface::castValue(int index)
 {
     T o;
-    if (!luavalue_cast(index, o))
+
+    if constexpr (std::is_same_v<T, std::string_view>) {
+        o = g_lua.toCString(index);
+    } else if (!luavalue_cast(index, o))
         throw LuaBadValueCastException(typeName(index), stdext::demangle_type<T>());
     return o;
 }
