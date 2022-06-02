@@ -659,7 +659,7 @@ void ProtocolGame::parseCompleteStorePurchase(const InputMessagePtr& msg)
     // not used
     msg->getU8();
 
-    const std::string message = msg->getString();
+    const std::string& message = msg->getString();
     const int coins = msg->getU32();
     const int transferableCoins = msg->getU32();
 
@@ -733,7 +733,7 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
 void ProtocolGame::parseStoreError(const InputMessagePtr& msg)
 {
     const int errorType = msg->getU8();
-    const std::string message = msg->getString();
+    const std::string& message = msg->getString();
     g_logger.error(stdext::format("Store Error: %s [%i]", message, errorType));
 }
 
@@ -790,27 +790,27 @@ void ProtocolGame::parseGMActions(const InputMessagePtr& msg)
 
 void ProtocolGame::parseUpdateNeeded(const InputMessagePtr& msg)
 {
-    const std::string signature = msg->getString();
+    const std::string& signature = msg->getString();
     Game::processUpdateNeeded(signature);
 }
 
 void ProtocolGame::parseLoginError(const InputMessagePtr& msg)
 {
-    const std::string error = msg->getString();
+    const std::string& error = msg->getString();
 
     Game::processLoginError(error);
 }
 
 void ProtocolGame::parseLoginAdvice(const InputMessagePtr& msg)
 {
-    const std::string message = msg->getString();
+    const std::string& message = msg->getString();
 
     Game::processLoginAdvice(message);
 }
 
 void ProtocolGame::parseLoginWait(const InputMessagePtr& msg)
 {
-    const std::string message = msg->getString();
+    const std::string& message = msg->getString();
     const int time = msg->getU8();
 
     Game::processLoginWait(message, time);
@@ -1011,7 +1011,7 @@ void ProtocolGame::parseOpenContainer(const InputMessagePtr& msg)
 {
     const int containerId = msg->getU8();
     const ItemPtr containerItem = getItem(msg);
-    const std::string name = msg->getString();
+    const std::string& name = msg->getString();
     const int capacity = msg->getU8();
     const bool hasParent = msg->getU8() != 0;
 
@@ -1174,7 +1174,7 @@ void ProtocolGame::parseCloseNpcTrade(const InputMessagePtr&)
 
 void ProtocolGame::parseOwnTrade(const InputMessagePtr& msg)
 {
-    const std::string name = g_game.formatCreatureName(msg->getString());
+    const std::string& name = g_game.formatCreatureName(msg->getString());
     const int count = msg->getU8();
 
     std::vector<ItemPtr> items(count);
@@ -1186,7 +1186,7 @@ void ProtocolGame::parseOwnTrade(const InputMessagePtr& msg)
 
 void ProtocolGame::parseCounterTrade(const InputMessagePtr& msg)
 {
-    const std::string name = g_game.formatCreatureName(msg->getString());
+    const std::string& name = g_game.formatCreatureName(msg->getString());
     const int count = msg->getU8();
 
     std::vector<ItemPtr> items(count);
@@ -1261,7 +1261,7 @@ void ProtocolGame::parseAnimatedText(const InputMessagePtr& msg)
 {
     const Position& position = getPosition(msg);
     const int color = msg->getU8();
-    const std::string text = msg->getString();
+    const std::string& text = msg->getString();
 
     const auto animatedText = AnimatedTextPtr(new AnimatedText);
     animatedText->setColor(color);
@@ -1452,9 +1452,9 @@ void ProtocolGame::parseEditText(const InputMessagePtr& msg)
         itemId = msg->getU16();
 
     const int maxLength = msg->getU16();
-    const std::string text = msg->getString();
+    const std::string& text = msg->getString();
 
-    const std::string writer = msg->getString();
+    const std::string& writer = msg->getString();
 
     if (g_game.getClientVersion() >= 1281) {
         msg->getU8(); // suffix
@@ -1471,7 +1471,7 @@ void ProtocolGame::parseEditList(const InputMessagePtr& msg)
 {
     const int doorId = msg->getU8();
     const uint id = msg->getU32();
-    const std::string text = msg->getString();
+    const std::string& text = msg->getString();
 
     Game::processEditList(id, doorId, text);
 }
@@ -1770,7 +1770,7 @@ void ProtocolGame::parseTalk(const InputMessagePtr& msg)
     if (g_game.getFeature(Otc::GameMessageStatements))
         msg->getU32(); // channel statement guid
 
-    const std::string name = g_game.formatCreatureName(msg->getString());
+    const std::string& name = g_game.formatCreatureName(msg->getString());
 
     if (g_game.getClientVersion() >= 1281) {
         msg->getU8(); // suffix
@@ -1818,7 +1818,7 @@ void ProtocolGame::parseTalk(const InputMessagePtr& msg)
             break;
     }
 
-    const std::string text = msg->getString();
+    const std::string& text = msg->getString();
 
     Game::processTalk(name, level, mode, text, channelId, pos);
 }
@@ -1839,7 +1839,7 @@ void ProtocolGame::parseChannelList(const InputMessagePtr& msg)
 void ProtocolGame::parseOpenChannel(const InputMessagePtr& msg)
 {
     const int channelId = msg->getU16();
-    const std::string name = msg->getString();
+    const std::string& name = msg->getString();
 
     if (g_game.getFeature(Otc::GameChannelPlayerList)) {
         const int joinedPlayers = msg->getU16();
@@ -1855,7 +1855,7 @@ void ProtocolGame::parseOpenChannel(const InputMessagePtr& msg)
 
 void ProtocolGame::parseOpenPrivateChannel(const InputMessagePtr& msg)
 {
-    const std::string name = g_game.formatCreatureName(msg->getString());
+    const std::string& name = g_game.formatCreatureName(msg->getString());
 
     Game::processOpenPrivateChannel(name);
 }
@@ -1863,7 +1863,7 @@ void ProtocolGame::parseOpenPrivateChannel(const InputMessagePtr& msg)
 void ProtocolGame::parseOpenOwnPrivateChannel(const InputMessagePtr& msg)
 {
     const int channelId = msg->getU16();
-    const std::string name = msg->getString();
+    const std::string& name = msg->getString();
 
     Game::processOpenOwnPrivateChannel(channelId, name);
 }
@@ -1884,14 +1884,14 @@ void ProtocolGame::parseRuleViolationChannel(const InputMessagePtr& msg)
 
 void ProtocolGame::parseRuleViolationRemove(const InputMessagePtr& msg)
 {
-    const std::string name = msg->getString();
+    const std::string& name = msg->getString();
 
     Game::processRuleViolationRemove(name);
 }
 
 void ProtocolGame::parseRuleViolationCancel(const InputMessagePtr& msg)
 {
-    const std::string name = msg->getString();
+    const std::string& name = msg->getString();
     Game::processRuleViolationCancel(name);
 }
 
@@ -2128,7 +2128,7 @@ void ProtocolGame::parseVipAdd(const InputMessagePtr& msg)
     bool notifyLogin = false;
 
     const uint id = msg->getU32();
-    const std::string name = g_game.formatCreatureName(msg->getString());
+    const std::string& name = g_game.formatCreatureName(msg->getString());
     if (g_game.getFeature(Otc::GameAdditionalVipInfo)) {
         desc = msg->getString();
         iconId = msg->getU32();
@@ -2170,7 +2170,7 @@ void ProtocolGame::parseAutomapFlag(const InputMessagePtr& msg)
 {
     const Position pos = getPosition(msg);
     const int icon = msg->getU8();
-    const std::string description = msg->getString();
+    const std::string& description = msg->getString();
 
     bool remove = false;
     if (g_game.getFeature(Otc::GameMinimapRemove))
@@ -2213,7 +2213,7 @@ void ProtocolGame::parseQuestLine(const InputMessagePtr& msg)
 void ProtocolGame::parseChannelEvent(const InputMessagePtr& msg)
 {
     const uint16 channelId = msg->getU16();
-    const std::string name = g_game.formatCreatureName(msg->getString());
+    const std::string& name = g_game.formatCreatureName(msg->getString());
     const uint8 type = msg->getU8();
 
     g_lua.callGlobalField("g_game", "onChannelEvent", channelId, name, type);
@@ -2248,8 +2248,8 @@ void ProtocolGame::parsePlayerInventory(const InputMessagePtr& msg)
 void ProtocolGame::parseModalDialog(const InputMessagePtr& msg)
 {
     const uint32 windowId = msg->getU32();
-    const std::string title = msg->getString();
-    const std::string message = msg->getString();
+    const std::string& title = msg->getString();
+    const std::string& message = msg->getString();
 
     const int sizeButtons = msg->getU8();
     std::vector<std::tuple<int, std::string> > buttonList;
@@ -2284,7 +2284,7 @@ void ProtocolGame::parseModalDialog(const InputMessagePtr& msg)
 void ProtocolGame::parseExtendedOpcode(const InputMessagePtr& msg)
 {
     const int opcode = msg->getU8();
-    const std::string buffer = msg->getString();
+    const std::string& buffer = msg->getString();
 
     if (opcode == 0)
         m_enableSendExtendedOpcode = true;
@@ -2554,7 +2554,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type)
                 msg->getU32(); // master id
             }
 
-            const std::string name = g_game.formatCreatureName(msg->getString());
+            const std::string& name = g_game.formatCreatureName(msg->getString());
 
             if (!creature) {
                 if ((id == m_localPlayer->getId()) ||
@@ -2778,8 +2778,8 @@ StaticTextPtr ProtocolGame::getStaticText(const InputMessagePtr& msg, int)
 {
     const int colorByte = msg->getU8();
     const Color color = Color::from8bit(colorByte);
-    const std::string fontName = msg->getString();
-    const std::string text = msg->getString();
+    const std::string& fontName = msg->getString();
+    const std::string& text = msg->getString();
     auto staticText = StaticTextPtr(new StaticText);
     staticText->setText(text);
     staticText->setFont(fontName);

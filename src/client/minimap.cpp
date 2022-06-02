@@ -371,7 +371,7 @@ void Minimap::saveOtmm(const std::string& fileName)
     try {
         stdext::timer saveTimer;
 
-        const FileStreamPtr fin = g_resources.createFile(fileName.data());
+        const FileStreamPtr fin = g_resources.createFile(fileName);
         fin->cache();
 
         //TODO: compression flag with zlib

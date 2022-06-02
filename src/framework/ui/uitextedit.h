@@ -54,7 +54,7 @@ public:
 
     void moveCursorHorizontally(bool right);
     void moveCursorVertically(bool up);
-    void appendText(const std::string& text);
+    void appendText(std::string text);
     void appendCharacter(char c);
     void removeCharacter(bool right);
     void blinkCursor();

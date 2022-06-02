@@ -56,7 +56,7 @@ void Logger::log(Fw::LogLevel level, const std::string& message)
     if (s_ignoreLogs)
         return;
 
-    std::string outmsg = s_logPrefixes[level] + message.data();
+    std::string outmsg = s_logPrefixes[level] + message;
 
     std::cout << outmsg << std::endl;
 

@@ -82,7 +82,6 @@ void Map::loadOtbm(const std::string& fileName)
         if (node->getU8() != OTBM_MAP_DATA)
             stdext::throw_exception("Could not read root data node");
 
-        const std::string _fileName{ fileName };
         while (node->canRead()) {
             const uint8 attribute = node->getU8();
             std::string tmp = node->getString();
@@ -91,10 +90,10 @@ void Map::loadOtbm(const std::string& fileName)
                     setDescription(tmp);
                     break;
                 case OTBM_ATTR_SPAWN_FILE:
-                    setSpawnFile(_fileName.substr(0, _fileName.rfind('/') + 1) + tmp.data());
+                    setSpawnFile(fileName.substr(0, fileName.rfind('/') + 1) + tmp.data());
                     break;
                 case OTBM_ATTR_HOUSE_FILE:
-                    setHouseFile(_fileName.substr(0, _fileName.rfind('/') + 1) + tmp.data());
+                    setHouseFile(fileName.substr(0, fileName.rfind('/') + 1) + tmp.data());
                     break;
                 default:
                     stdext::throw_exception(stdext::format("Invalid attribute '%d'", static_cast<int>(attribute)));

@@ -114,7 +114,7 @@ bool ResourceManager::addSearchPath(const std::string& path, bool pushFront)
     if (!PHYSFS_mount(path.data(), nullptr, pushFront ? 0 : 1)) {
         bool found = false;
         for (const std::string& searchPath : m_searchPaths) {
-            std::string newPath = std::string(searchPath) + path.data();
+            std::string newPath = searchPath + path;
             if (PHYSFS_mount(newPath.data(), nullptr, pushFront ? 0 : 1)) {
                 savePath = newPath;
                 found = true;
@@ -147,10 +147,10 @@ bool ResourceManager::removeSearchPath(const std::string& path)
 void ResourceManager::searchAndAddPackages(const std::string& packagesDir, const std::string& packageExt)
 {
     auto files = listDirectoryFiles(packagesDir);
-    for (const auto file : files | std::views::reverse) {
+    for (const auto& file : files | std::views::reverse) {
         if (!file.ends_with(packageExt))
             continue;
-        std::string package = getRealDir(packagesDir) + "/" + file.data();
+        std::string package = getRealDir(packagesDir) + "/" + file;
         if (!addSearchPath(package, true))
             g_logger.error(stdext::format("Unable to read package '%s': %s", package, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
     }
@@ -362,13 +362,13 @@ std::string ResourceManager::getUserDir()
 std::string ResourceManager::guessFilePath(const std::string& filename, const std::string& type)
 {
     if (isFileType(filename, type))
-        return filename.data();
-    return filename.data() + "."s + type.data();
+        return filename;
+    return filename + "."s + type;
 }
 
 bool ResourceManager::isFileType(const std::string& filename, const std::string& type)
 {
-    if (filename.ends_with("."s + type.data()))
+    if (filename.ends_with("." + type))
         return true;
     return false;
 }
