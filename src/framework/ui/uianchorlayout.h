@@ -70,8 +70,8 @@ public:
                    const std::string_view hookedWidgetId, Fw::AnchorEdge hookedEdge);
     void removeAnchors(const UIWidgetPtr& anchoredWidget);
     bool hasAnchors(const UIWidgetPtr& anchoredWidget);
-    void centerIn(const UIWidgetPtr& anchoredWidget, const std::string& hookedWidgetId);
-    void fill(const UIWidgetPtr& anchoredWidget, const std::string& hookedWidgetId);
+    void centerIn(const UIWidgetPtr& anchoredWidget, const std::string_view hookedWidgetId);
+    void fill(const UIWidgetPtr& anchoredWidget, const std::string_view hookedWidgetId);
 
     void addWidget(const UIWidgetPtr& widget) override;
     void removeWidget(const UIWidgetPtr& widget) override;

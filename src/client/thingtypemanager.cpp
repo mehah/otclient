@@ -71,7 +71,7 @@ void ThingTypeManager::terminate()
     m_nullItemType = nullptr;
 }
 
-void ThingTypeManager::saveDat(const std::string& fileName)
+void ThingTypeManager::saveDat(const std::string_view fileName)
 {
     if (!m_datLoaded)
         stdext::throw_exception("failed to save, dat is not loaded");
@@ -182,7 +182,7 @@ bool ThingTypeManager::loadOtml(std::string file)
     }
 }
 
-void ThingTypeManager::loadOtb(const std::string& file)
+void ThingTypeManager::loadOtb(const std::string_view file)
 {
     try {
         const FileStreamPtr fin = g_resources.openFile(file);
@@ -234,7 +234,7 @@ void ThingTypeManager::loadOtb(const std::string& file)
     }
 }
 
-void ThingTypeManager::loadXml(const std::string& file)
+void ThingTypeManager::loadXml(const std::string_view file)
 {
     try {
         if (!isOtbLoaded())
@@ -285,7 +285,7 @@ void ThingTypeManager::loadXml(const std::string& file)
     }
 }
 
-bool ThingTypeManager::loadAppearances(const std::string& file)
+bool ThingTypeManager::loadAppearances(const std::string_view file)
 {
     try {
         int spritesCount = 0;
@@ -420,7 +420,7 @@ const ItemTypePtr& ThingTypeManager::findItemTypeByClientId(uint16 id)
     return m_nullItemType;
 }
 
-const ItemTypePtr& ThingTypeManager::findItemTypeByName(const std::string& name)
+const ItemTypePtr& ThingTypeManager::findItemTypeByName(const std::string_view name)
 {
     for (const ItemTypePtr& it : m_itemTypes)
         if (it->getName() == name)
@@ -428,7 +428,7 @@ const ItemTypePtr& ThingTypeManager::findItemTypeByName(const std::string& name)
     return m_nullItemType;
 }
 
-ItemTypeList ThingTypeManager::findItemTypesByName(const std::string& name)
+ItemTypeList ThingTypeManager::findItemTypesByName(const std::string_view name)
 {
     ItemTypeList ret;
     for (const ItemTypePtr& it : m_itemTypes)
@@ -437,7 +437,7 @@ ItemTypeList ThingTypeManager::findItemTypesByName(const std::string& name)
     return ret;
 }
 
-ItemTypeList ThingTypeManager::findItemTypesByString(const std::string& name)
+ItemTypeList ThingTypeManager::findItemTypesByString(const std::string_view name)
 {
     ItemTypeList ret;
     for (const ItemTypePtr& it : m_itemTypes)

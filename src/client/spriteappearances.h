@@ -78,7 +78,7 @@ public:
     int getSpritesCount() const { return m_spritesCount; }
 
     bool loadSpriteSheet(const SpriteSheetPtr& sheet);
-    void saveSheetToFileBySprite(int id, const std::string& file);
+    void saveSheetToFileBySprite(int id, const std::string_view file);
     void saveSheetToFile(const SpriteSheetPtr& sheet, const std::string_view file);
     SpriteSheetPtr getSheetBySpriteId(int id, bool load = true);
 
@@ -88,7 +88,7 @@ public:
     }
 
     ImagePtr getSpriteImage(int id);
-    void saveSpriteToFile(int id, const std::string& file);
+    void saveSpriteToFile(int id, const std::string_view file);
 
 private:
     int m_spritesCount{ 0 };

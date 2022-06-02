@@ -97,7 +97,7 @@ void Application::init(std::vector<std::string>& args)
     g_configs.init();
 
     // initialize resources
-    g_resources.init(args[0].c_str());
+    g_resources.init(args[0].data());
 
     // initialize lua
     g_lua.init();

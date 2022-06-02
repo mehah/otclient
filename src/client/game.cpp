@@ -499,7 +499,7 @@ void Game::processWalkCancel(Otc::Direction direction)
     m_localPlayer->cancelWalk(direction);
 }
 
-void Game::loginWorld(const std::string& account, const std::string& password, const std::string& worldName, const std::string& worldHost, int worldPort, const std::string& characterName, const std::string& authenticatorToken, const std::string& sessionKey)
+void Game::loginWorld(const std::string_view account, const std::string_view password, const std::string_view worldName, const std::string_view worldHost, int worldPort, const std::string_view characterName, const std::string_view authenticatorToken, const std::string_view sessionKey)
 {
     if (m_protocolGame || isOnline())
         stdext::throw_exception("Unable to login into a world while already online or logging.");
@@ -967,7 +967,7 @@ void Game::cancelAttackAndFollow()
     g_lua.callGlobalField("g_game", "onCancelAttackAndFollow");
 }
 
-void Game::talk(const std::string& message)
+void Game::talk(const std::string_view message)
 {
     if (!canPerformGameAction() || message.empty())
         return;
@@ -975,7 +975,7 @@ void Game::talk(const std::string& message)
     talkChannel(Otc::MessageSay, 0, message);
 }
 
-void Game::talkChannel(Otc::MessageMode mode, int channelId, const std::string& message)
+void Game::talkChannel(Otc::MessageMode mode, int channelId, const std::string_view message)
 {
     if (!canPerformGameAction() || message.empty())
         return;
@@ -983,7 +983,7 @@ void Game::talkChannel(Otc::MessageMode mode, int channelId, const std::string& 
     m_protocolGame->sendTalk(mode, channelId, "", message);
 }
 
-void Game::talkPrivate(Otc::MessageMode mode, const std::string& receiver, const std::string& message)
+void Game::talkPrivate(Otc::MessageMode mode, const std::string_view receiver, const std::string_view message)
 {
     if (!canPerformGameAction() || receiver.empty() || message.empty())
         return;
@@ -991,7 +991,7 @@ void Game::talkPrivate(Otc::MessageMode mode, const std::string& receiver, const
     m_protocolGame->sendTalk(mode, 0, receiver, message);
 }
 
-void Game::openPrivateChannel(const std::string& receiver)
+void Game::openPrivateChannel(const std::string_view receiver)
 {
     if (!canPerformGameAction() || receiver.empty())
         return;
@@ -1039,7 +1039,7 @@ void Game::openOwnChannel()
     m_protocolGame->sendOpenOwnChannel();
 }
 
-void Game::inviteToOwnChannel(const std::string& name)
+void Game::inviteToOwnChannel(const std::string_view name)
 {
     if (!canPerformGameAction() || name.empty())
         return;
@@ -1047,7 +1047,7 @@ void Game::inviteToOwnChannel(const std::string& name)
     m_protocolGame->sendInviteToOwnChannel(name);
 }
 
-void Game::excludeFromOwnChannel(const std::string& name)
+void Game::excludeFromOwnChannel(const std::string_view name)
 {
     if (!canPerformGameAction() || name.empty())
         return;
@@ -1119,7 +1119,7 @@ void Game::changeOutfit(const Outfit& outfit)
     m_protocolGame->sendChangeOutfit(outfit);
 }
 
-void Game::addVip(const std::string& name)
+void Game::addVip(const std::string_view name)
 {
     if (!canPerformGameAction() || name.empty())
         return;
@@ -1140,7 +1140,7 @@ void Game::removeVip(int playerId)
     m_protocolGame->sendRemoveVip(playerId);
 }
 
-void Game::editVip(int playerId, const std::string& description, int iconId, bool notifyLogin)
+void Game::editVip(int playerId, const std::string_view description, int iconId, bool notifyLogin)
 {
     if (!canPerformGameAction())
         return;
@@ -1303,7 +1303,7 @@ void Game::rejectTrade()
     m_protocolGame->sendRejectTrade();
 }
 
-void Game::editText(uint id, const std::string& text)
+void Game::editText(uint id, const std::string_view text)
 {
     if (!canPerformGameAction())
         return;
@@ -1311,7 +1311,7 @@ void Game::editText(uint id, const std::string& text)
     m_protocolGame->sendEditText(id, text);
 }
 
-void Game::editList(uint id, int doorId, const std::string& text)
+void Game::editList(uint id, int doorId, const std::string_view text)
 {
     if (!canPerformGameAction())
         return;
@@ -1319,7 +1319,7 @@ void Game::editList(uint id, int doorId, const std::string& text)
     m_protocolGame->sendEditList(id, doorId, text);
 }
 
-void Game::openRuleViolation(const std::string& reporter)
+void Game::openRuleViolation(const std::string_view reporter)
 {
     if (!canPerformGameAction())
         return;
@@ -1327,7 +1327,7 @@ void Game::openRuleViolation(const std::string& reporter)
     m_protocolGame->sendOpenRuleViolation(reporter);
 }
 
-void Game::closeRuleViolation(const std::string& reporter)
+void Game::closeRuleViolation(const std::string_view reporter)
 {
     if (!canPerformGameAction())
         return;
@@ -1343,7 +1343,7 @@ void Game::cancelRuleViolation()
     m_protocolGame->sendCancelRuleViolation();
 }
 
-void Game::reportBug(const std::string& comment)
+void Game::reportBug(const std::string_view comment)
 {
     if (!canPerformGameAction())
         return;
@@ -1351,7 +1351,7 @@ void Game::reportBug(const std::string& comment)
     m_protocolGame->sendBugReport(comment);
 }
 
-void Game::reportRuleViolation(const std::string& target, int reason, int action, const std::string& comment, const std::string& statement, int statementId, bool ipBanishment)
+void Game::reportRuleViolation(const std::string_view target, int reason, int action, const std::string_view comment, const std::string_view statement, int statementId, bool ipBanishment)
 {
     if (!canPerformGameAction())
         return;
@@ -1359,7 +1359,7 @@ void Game::reportRuleViolation(const std::string& target, int reason, int action
     m_protocolGame->sendRuleViolation(target, reason, action, comment, statement, statementId, ipBanishment);
 }
 
-void Game::debugReport(const std::string& a, const std::string& b, const std::string& c, const std::string& d)
+void Game::debugReport(const std::string_view a, const std::string_view b, const std::string_view c, const std::string_view d)
 {
     m_protocolGame->sendDebugReport(a, b, c, d);
 }
@@ -1428,7 +1428,7 @@ void Game::seekInContainer(int cid, int index)
     m_protocolGame->sendSeekInContainer(cid, index);
 }
 
-void Game::buyStoreOffer(int offerId, int productType, const std::string& name)
+void Game::buyStoreOffer(int offerId, int productType, const std::string_view name)
 {
     if (!canPerformGameAction())
         return;
@@ -1444,7 +1444,7 @@ void Game::requestTransactionHistory(int page, int entriesPerPage)
     m_protocolGame->sendRequestTransactionHistory(page, entriesPerPage);
 }
 
-void Game::requestStoreOffers(const std::string& categoryName, int serviceType)
+void Game::requestStoreOffers(const std::string_view categoryName, int serviceType)
 {
     if (!canPerformGameAction())
         return;
@@ -1452,7 +1452,7 @@ void Game::requestStoreOffers(const std::string& categoryName, int serviceType)
     m_protocolGame->sendRequestStoreOffers(categoryName, serviceType);
 }
 
-void Game::openStore(int serviceType, const std::string& category)
+void Game::openStore(int serviceType, const std::string_view category)
 {
     if (!canPerformGameAction())
         return;
@@ -1460,7 +1460,7 @@ void Game::openStore(int serviceType, const std::string& category)
     m_protocolGame->sendOpenStore(serviceType, category);
 }
 
-void Game::transferCoins(const std::string& recipient, int amount)
+void Game::transferCoins(const std::string_view recipient, int amount)
 {
     if (!canPerformGameAction())
         return;

@@ -200,7 +200,7 @@ namespace stdext
     {
         std::string res;
         char out[4096];
-        if (WideCharToMultiByte(CP_UTF8, 0, src.c_str(), -1, out, 4096, nullptr, nullptr))
+        if (WideCharToMultiByte(CP_UTF8, 0, src.data(), -1, out, 4096, nullptr, nullptr))
             res = out;
         return res;
     }

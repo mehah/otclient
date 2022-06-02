@@ -35,7 +35,7 @@
 #include "houses.h"
 #include "towns.h"
 
-void Map::loadOtbm(const std::string& fileName)
+void Map::loadOtbm(const std::string_view fileName)
 {
     try {
         if (!g_things.isOtbLoaded())
@@ -90,10 +90,10 @@ void Map::loadOtbm(const std::string& fileName)
                     setDescription(tmp);
                     break;
                 case OTBM_ATTR_SPAWN_FILE:
-                    setSpawnFile(fileName.substr(0, fileName.rfind('/') + 1) + tmp.data());
+                    setSpawnFile(fileName.substr(0, fileName.rfind('/') + 1).data() + tmp);
                     break;
                 case OTBM_ATTR_HOUSE_FILE:
-                    setHouseFile(fileName.substr(0, fileName.rfind('/') + 1) + tmp.data());
+                    setHouseFile(fileName.substr(0, fileName.rfind('/') + 1).data() + tmp);
                     break;
                 default:
                     stdext::throw_exception(stdext::format("Invalid attribute '%d'", static_cast<int>(attribute)));
@@ -235,7 +235,7 @@ void Map::loadOtbm(const std::string& fileName)
     }
 }
 
-void Map::saveOtbm(const std::string& fileName)
+void Map::saveOtbm(const std::string_view fileName)
 {
     try {
         const FileStreamPtr fin = g_resources.createFile(fileName);
@@ -401,7 +401,7 @@ void Map::saveOtbm(const std::string& fileName)
     }
 }
 
-bool Map::loadOtcm(const std::string& fileName)
+bool Map::loadOtcm(const std::string_view fileName)
 {
     try {
         const FileStreamPtr fin = g_resources.openFile(fileName);
@@ -479,7 +479,7 @@ bool Map::loadOtcm(const std::string& fileName)
     }
 }
 
-void Map::saveOtcm(const std::string& fileName)
+void Map::saveOtcm(const std::string_view fileName)
 {
     try {
         stdext::timer saveTimer;

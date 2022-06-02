@@ -63,7 +63,7 @@ void ModuleManager::autoLoadModules(int maxPriority)
     }
 }
 
-ModulePtr ModuleManager::discoverModule(const std::string& moduleFile)
+ModulePtr ModuleManager::discoverModule(const std::string_view moduleFile)
 {
     ModulePtr module;
     try {
@@ -89,7 +89,7 @@ ModulePtr ModuleManager::discoverModule(const std::string& moduleFile)
     return module;
 }
 
-void ModuleManager::ensureModuleLoaded(const std::string& moduleName)
+void ModuleManager::ensureModuleLoaded(const std::string_view moduleName)
 {
     const ModulePtr module = g_modules.getModule(moduleName);
     if (!module || !module->load())
@@ -122,7 +122,7 @@ void ModuleManager::reloadModules()
         module->load();
 }
 
-ModulePtr ModuleManager::getModule(const std::string& moduleName)
+ModulePtr ModuleManager::getModule(const std::string_view moduleName)
 {
     for (const ModulePtr& module : m_modules)
         if (module->getName() == moduleName)

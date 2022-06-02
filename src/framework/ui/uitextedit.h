@@ -41,7 +41,7 @@ public:
     void setCursorVisible(bool enable) { m_cursorVisible = enable; }
     void setChangeCursorImage(bool enable) { m_changeCursorImage = enable; }
     void setTextHidden(bool hidden);
-    void setValidCharacters(const std::string& validCharacters) { m_validCharacters = validCharacters; }
+    void setValidCharacters(const std::string_view validCharacters) { m_validCharacters = validCharacters; }
     void setShiftNavigation(bool enable) { m_shiftNavigation = enable; }
     void setMultiline(bool enable) { m_multiline = enable; }
     void setMaxLength(uint maxLength) { m_maxLength = maxLength; }
@@ -54,13 +54,13 @@ public:
 
     void moveCursorHorizontally(bool right);
     void moveCursorVertically(bool up);
-    void appendText(std::string text);
+    void appendText(const std::string_view text);
     void appendCharacter(char c);
     void removeCharacter(bool right);
     void blinkCursor();
 
     void del(bool right = false);
-    void paste(const std::string& text);
+    void paste(const std::string_view text);
     std::string copy();
     std::string cut();
     void selectAll() { setSelection(0, m_text.length()); }

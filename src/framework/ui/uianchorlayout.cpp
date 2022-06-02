@@ -135,13 +135,13 @@ bool UIAnchorLayout::hasAnchors(const UIWidgetPtr& anchoredWidget)
     return m_anchorsGroups.contains(anchoredWidget);
 }
 
-void UIAnchorLayout::centerIn(const UIWidgetPtr& anchoredWidget, const std::string& hookedWidgetId)
+void UIAnchorLayout::centerIn(const UIWidgetPtr& anchoredWidget, const std::string_view hookedWidgetId)
 {
     addAnchor(anchoredWidget, Fw::AnchorHorizontalCenter, hookedWidgetId, Fw::AnchorHorizontalCenter);
     addAnchor(anchoredWidget, Fw::AnchorVerticalCenter, hookedWidgetId, Fw::AnchorVerticalCenter);
 }
 
-void UIAnchorLayout::fill(const UIWidgetPtr& anchoredWidget, const std::string& hookedWidgetId)
+void UIAnchorLayout::fill(const UIWidgetPtr& anchoredWidget, const std::string_view hookedWidgetId)
 {
     addAnchor(anchoredWidget, Fw::AnchorLeft, hookedWidgetId, Fw::AnchorLeft);
     addAnchor(anchoredWidget, Fw::AnchorRight, hookedWidgetId, Fw::AnchorRight);

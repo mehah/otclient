@@ -45,7 +45,7 @@ void FontManager::clearFonts()
     m_defaultFont = BitmapFontPtr(new BitmapFont("emptyfont"));
 }
 
-bool FontManager::importFont(const std::string& file)
+bool FontManager::importFont(const std::string_view file)
 {
     const auto& path = g_resources.guessFilePath(file, "otfont");
     try {
@@ -77,7 +77,7 @@ bool FontManager::importFont(const std::string& file)
     }
 }
 
-bool FontManager::fontExists(const std::string& fontName)
+bool FontManager::fontExists(const std::string_view fontName)
 {
     for (const BitmapFontPtr& font : m_fonts) {
         if (font->getName() == fontName)
@@ -86,7 +86,7 @@ bool FontManager::fontExists(const std::string& fontName)
     return false;
 }
 
-BitmapFontPtr FontManager::getFont(const std::string& fontName)
+BitmapFontPtr FontManager::getFont(const std::string_view fontName)
 {
     // find font by name
     for (const BitmapFontPtr& font : m_fonts) {

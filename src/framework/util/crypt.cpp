@@ -234,24 +234,24 @@ std::string Crypt::_decrypt(const std::string_view encrypted_string, bool useMac
     const std::string tmp = xorCrypt(decoded, getCryptKey(useMachineUUID));
 
     if (tmp.length() >= 4) {
-        const uint32 readsum = stdext::readULE32((const uint8*)tmp.c_str());
+        const uint32 readsum = stdext::readULE32((const uint8*)tmp.data());
         std::string decrypted_string = tmp.substr(4);
-        const uint32 sum = stdext::adler32((const uint8*)decrypted_string.c_str(), decrypted_string.size());
+        const uint32 sum = stdext::adler32((const uint8*)decrypted_string.data(), decrypted_string.size());
         if (readsum == sum)
             return decrypted_string;
     }
     return {};
 }
 
-void Crypt::rsaSetPublicKey(const std::string& n, const std::string& e)
+void Crypt::rsaSetPublicKey(const std::string_view n, const std::string_view e)
 {
 #ifdef USE_GMP
-    mpz_set_str(m_n, n.c_str(), 10);
-    mpz_set_str(m_e, e.c_str(), 10);
+    mpz_set_str(m_n, n.data(), 10);
+    mpz_set_str(m_e, e.data(), 10);
 #else
 #if OPENSSL_VERSION_NUMBER < 0x10100005L
-    BN_dec2bn(&m_rsa->n, n.c_str());
-    BN_dec2bn(&m_rsa->e, e.c_str());
+    BN_dec2bn(&m_rsa->n, n.data());
+    BN_dec2bn(&m_rsa->e, e.data());
     // clear rsa cache
     if (m_rsa->_method_mod_n) {
         BN_MONT_CTX_free(m_rsa->_method_mod_n);
@@ -266,20 +266,20 @@ void Crypt::rsaSetPublicKey(const std::string& n, const std::string& e)
 #endif
 }
 
-void Crypt::rsaSetPrivateKey(const std::string& p, const std::string& q, const std::string& d)
+void Crypt::rsaSetPrivateKey(const std::string_view p, const std::string_view q, const std::string_view d)
 {
 #ifdef USE_GMP
-    mpz_set_str(m_p, p.c_str(), 10);
-    mpz_set_str(m_q, q.c_str(), 10);
-    mpz_set_str(m_d, d.c_str(), 10);
+    mpz_set_str(m_p, p.data(), 10);
+    mpz_set_str(m_q, q.data(), 10);
+    mpz_set_str(m_d, d.data(), 10);
 
     // n = p * q
     mpz_mul(m_n, m_p, m_q);
 #else
 #if OPENSSL_VERSION_NUMBER < 0x10100005L
-    BN_dec2bn(&m_rsa->p, p.c_str());
-    BN_dec2bn(&m_rsa->q, q.c_str());
-    BN_dec2bn(&m_rsa->d, d.c_str());
+    BN_dec2bn(&m_rsa->p, p.data());
+    BN_dec2bn(&m_rsa->q, q.data());
+    BN_dec2bn(&m_rsa->d, d.data());
     // clear rsa cache
     if (m_rsa->_method_mod_p) {
         BN_MONT_CTX_free(m_rsa->_method_mod_p);

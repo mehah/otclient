@@ -71,12 +71,12 @@ public:
     void setMouseCursor(int cursorId) override;
     void restoreMouseCursor() override;
 
-    void setTitle(const std::string& title) override;
+    void setTitle(const std::string_view title) override;
     void setMinimumSize(const Size& minimumSize) override;
     void setFullscreen(bool fullscreen) override;
     void setVerticalSync(bool enable) override;
-    void setIcon(const std::string& file) override;
-    void setClipboardText(const std::string& text) override;
+    void setIcon(const std::string_view file) override;
+    void setClipboardText(const std::string_view text) override;
 
     Size getDisplaySize() override;
     std::string getClipboardText() override;

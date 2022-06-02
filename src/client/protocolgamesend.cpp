@@ -35,7 +35,7 @@ void ProtocolGame::send(const OutputMessagePtr& outputMessage)
     Protocol::send(outputMessage);
 }
 
-void ProtocolGame::sendExtendedOpcode(uint8 opcode, const std::string& buffer)
+void ProtocolGame::sendExtendedOpcode(uint8 opcode, const std::string_view buffer)
 {
     if (m_enableSendExtendedOpcode) {
         const OutputMessagePtr msg(new OutputMessage);

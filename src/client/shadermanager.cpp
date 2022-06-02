@@ -56,7 +56,7 @@ void ShaderManager::terminate()
     m_shaders.clear();
 }
 
-PainterShaderProgramPtr ShaderManager::createShader(const std::string& name)
+PainterShaderProgramPtr ShaderManager::createShader(const std::string_view name)
 {
     if (!g_graphics.canUseShaders()) {
         g_logger.error(stdext::format("unable to create shader '%s', shaders are not supported", name));
@@ -64,11 +64,11 @@ PainterShaderProgramPtr ShaderManager::createShader(const std::string& name)
     }
 
     PainterShaderProgramPtr shader(new PainterShaderProgram);
-    m_shaders[name] = shader;
+    m_shaders[name.data()] = shader;
     return shader;
 }
 
-PainterShaderProgramPtr ShaderManager::createFragmentShader(const std::string& name, const std::string& file)
+PainterShaderProgramPtr ShaderManager::createFragmentShader(const std::string_view name, const std::string_view file)
 {
     PainterShaderProgramPtr shader = createShader(name);
     if (!shader)
@@ -91,7 +91,7 @@ PainterShaderProgramPtr ShaderManager::createFragmentShader(const std::string& n
     return shader;
 }
 
-PainterShaderProgramPtr ShaderManager::createFragmentShaderFromCode(const std::string& name, const std::string& code)
+PainterShaderProgramPtr ShaderManager::createFragmentShaderFromCode(const std::string_view name, const std::string_view code)
 {
     PainterShaderProgramPtr shader = createShader(name);
     if (!shader)
@@ -108,11 +108,11 @@ PainterShaderProgramPtr ShaderManager::createFragmentShaderFromCode(const std::s
         return nullptr;
     }
 
-    m_shaders[name] = shader;
+    m_shaders[name.data()] = shader;
     return shader;
 }
 
-PainterShaderProgramPtr ShaderManager::createItemShader(const std::string& name, const std::string& file)
+PainterShaderProgramPtr ShaderManager::createItemShader(const std::string_view name, const std::string_view file)
 {
     PainterShaderProgramPtr shader = createFragmentShader(name, file);
     if (shader)
@@ -121,7 +121,7 @@ PainterShaderProgramPtr ShaderManager::createItemShader(const std::string& name,
     return shader;
 }
 
-PainterShaderProgramPtr ShaderManager::createOutfitShader(const std::string& name, const std::string& file)
+PainterShaderProgramPtr ShaderManager::createOutfitShader(const std::string_view name, const std::string_view file)
 {
     PainterShaderProgramPtr shader = createFragmentShader(name, file);
     if (shader)
@@ -130,7 +130,7 @@ PainterShaderProgramPtr ShaderManager::createOutfitShader(const std::string& nam
     return shader;
 }
 
-PainterShaderProgramPtr ShaderManager::createMountShader(const std::string& name, const std::string& file)
+PainterShaderProgramPtr ShaderManager::createMountShader(const std::string_view name, const std::string_view file)
 {
     PainterShaderProgramPtr shader = createFragmentShader(name, file);
     if (shader)
@@ -139,7 +139,7 @@ PainterShaderProgramPtr ShaderManager::createMountShader(const std::string& name
     return shader;
 }
 
-PainterShaderProgramPtr ShaderManager::createMapShader(const std::string& name, const std::string& file)
+PainterShaderProgramPtr ShaderManager::createMapShader(const std::string_view name, const std::string_view file)
 {
     PainterShaderProgramPtr shader = createFragmentShader(name, file);
     if (shader)
@@ -183,14 +183,14 @@ void ShaderManager::setupMapShader(const PainterShaderProgramPtr& shader)
     shader->bindUniformLocation(MAP_ZOOM, "u_MapZoom");
 }
 
-void ShaderManager::registerShader(const std::string& name, const PainterShaderProgramPtr& shader)
+void ShaderManager::registerShader(const std::string_view name, const PainterShaderProgramPtr& shader)
 {
-    m_shaders[name] = shader;
+    m_shaders[name.data()] = shader;
 }
 
-PainterShaderProgramPtr ShaderManager::getShader(const std::string& name)
+PainterShaderProgramPtr ShaderManager::getShader(const std::string_view name)
 {
-    const auto it = m_shaders.find(name);
+    const auto it = m_shaders.find(name.data());
     if (it != m_shaders.end())
         return it->second;
 

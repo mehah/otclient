@@ -32,8 +32,8 @@ public:
     void processArgs(std::vector<std::string>& args);
     bool spawnProcess(std::string process, const std::vector<std::string>& args);
     int getProcessId();
-    bool isProcessRunning(const std::string& name);
-    bool killProcess(const std::string& name);
+    bool isProcessRunning(const std::string_view name);
+    bool killProcess(const std::string_view name);
     std::string getTempPath();
     std::string getCurrentDir();
     bool copyFile(std::string from, std::string to);

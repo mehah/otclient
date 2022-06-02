@@ -44,7 +44,7 @@ namespace
 #endif
 }
 
-void Logger::log(Fw::LogLevel level, const std::string& message)
+void Logger::log(Fw::LogLevel level, const std::string_view message)
 {
     std::lock_guard lock(m_mutex);
 
@@ -56,7 +56,7 @@ void Logger::log(Fw::LogLevel level, const std::string& message)
     if (s_ignoreLogs)
         return;
 
-    std::string outmsg = s_logPrefixes[level] + message;
+    std::string outmsg = s_logPrefixes[level] + message.data();
 
     std::cout << outmsg << std::endl;
 
@@ -122,11 +122,11 @@ void Logger::fireOldMessages()
     }
 }
 
-void Logger::setLogFile(const std::string& file)
+void Logger::setLogFile(const std::string_view file)
 {
     std::lock_guard lock(m_mutex);
 
-    m_outFile.open(stdext::utf8_to_latin1(file).c_str(), std::ios::out | std::ios::app);
+    m_outFile.open(stdext::utf8_to_latin1(file).data(), std::ios::out | std::ios::app);
     if (!m_outFile.is_open() || !m_outFile.good()) {
         g_logger.error(stdext::format("Unable to save log to '%s'", file));
         return;

@@ -581,7 +581,7 @@ void UIWidget::applyStyle(const OTMLNodePtr& styleNode)
     m_loadingStyle = false;
 }
 
-void UIWidget::addAnchor(Fw::AnchorEdge anchoredEdge, const std::string& hookedWidgetId, Fw::AnchorEdge hookedEdge)
+void UIWidget::addAnchor(Fw::AnchorEdge anchoredEdge, const std::string_view hookedWidgetId, Fw::AnchorEdge hookedEdge)
 {
     if (m_destroyed)
         return;
@@ -597,7 +597,7 @@ void UIWidget::removeAnchor(Fw::AnchorEdge anchoredEdge)
     addAnchor(anchoredEdge, "none", Fw::AnchorNone);
 }
 
-void UIWidget::centerIn(const std::string& hookedWidgetId)
+void UIWidget::centerIn(const std::string_view hookedWidgetId)
 {
     if (m_destroyed)
         return;
@@ -609,7 +609,7 @@ void UIWidget::centerIn(const std::string& hookedWidgetId)
         g_logger.traceError(stdext::format("cannot add anchors to widget '%s': the parent doesn't use anchors layout", m_id));
 }
 
-void UIWidget::fill(const std::string& hookedWidgetId)
+void UIWidget::fill(const std::string_view hookedWidgetId)
 {
     if (m_destroyed)
         return;
@@ -830,7 +830,7 @@ void UIWidget::destroyChildren()
         layout->enableUpdates();
 }
 
-void UIWidget::setId(const std::string& id)
+void UIWidget::setId(const std::string_view id)
 {
     if (id == m_id)
         return;
@@ -935,7 +935,7 @@ bool UIWidget::setRect(const Rect& rect)
     return true;
 }
 
-void UIWidget::setStyle(const std::string& styleName)
+void UIWidget::setStyle(const std::string_view styleName)
 {
     OTMLNodePtr styleNode = g_ui.getStyle(styleName);
     if (!styleNode) {
@@ -1168,7 +1168,7 @@ UIWidgetPtr UIWidget::getChildBefore(const UIWidgetPtr& relativeChild)
     return nullptr;
 }
 
-UIWidgetPtr UIWidget::getChildById(const std::string& childId)
+UIWidgetPtr UIWidget::getChildById(const std::string_view childId)
 {
     for (const UIWidgetPtr& child : m_children) {
         if (child->getId() == childId)
@@ -1199,7 +1199,7 @@ UIWidgetPtr UIWidget::getChildByIndex(int index)
     return nullptr;
 }
 
-UIWidgetPtr UIWidget::recursiveGetChildById(const std::string& id)
+UIWidgetPtr UIWidget::recursiveGetChildById(const std::string_view id)
 {
     UIWidgetPtr widget = getChildById(id);
     if (!widget) {
@@ -1275,7 +1275,7 @@ UIWidgetList UIWidget::recursiveGetChildrenByMarginPos(const Point& childPos)
     return children;
 }
 
-UIWidgetPtr UIWidget::backwardsGetWidgetById(const std::string& id)
+UIWidgetPtr UIWidget::backwardsGetWidgetById(const std::string_view id)
 {
     UIWidgetPtr widget = getChildById(id);
     if (!widget) {

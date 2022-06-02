@@ -33,7 +33,7 @@ namespace stdext
         exception() = default;
         exception(std::string_view what) : m_what(std::move(what)) {}
         ~exception() noexcept override = default;;
-        const char* what() const noexcept override { return m_what.c_str(); }
+        const char* what() const noexcept override { return m_what.data(); }
     protected:
         std::string m_what;
     };

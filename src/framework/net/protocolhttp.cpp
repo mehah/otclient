@@ -35,7 +35,7 @@ ProtocolHttp::~ProtocolHttp()
     disconnect();
 }
 
-void ProtocolHttp::connect(const std::string& host, uint16 port)
+void ProtocolHttp::connect(const std::string_view host, uint16 port)
 {
     m_connection = ConnectionPtr(new Connection);
     m_connection->setErrorCallback([capture0 = asProtocolHttp()](auto&& PH1)
@@ -53,7 +53,7 @@ void ProtocolHttp::disconnect()
     }
 }
 
-void ProtocolHttp::send(const std::string& message)
+void ProtocolHttp::send(const std::string_view message)
 {
     if (m_connection)
         m_connection->write((uint8*)message.data(), message.length());

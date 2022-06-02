@@ -31,7 +31,7 @@ public:
 
     void drawSelf(Fw::DrawPane drawPane) override;
 
-    void addEffect(const std::string& name);
+    void addEffect(const std::string_view name);
 
     void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
 

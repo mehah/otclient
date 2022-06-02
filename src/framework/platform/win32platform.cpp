@@ -54,7 +54,7 @@ bool Platform::spawnProcess(std::string process, const std::vector<std::string>&
     const std::wstring wfile = stdext::utf8_to_utf16(process);
     const std::wstring wcommandLine = stdext::utf8_to_utf16(commandLine);
 
-    if ((size_t)ShellExecuteW(nullptr, L"open", wfile.c_str(), wcommandLine.c_str(), nullptr, SW_SHOWNORMAL) > 32)
+    if ((size_t)ShellExecuteW(nullptr, L"open", wfile.data(), wcommandLine.data(), nullptr, SW_SHOWNORMAL) > 32)
         return true;
     return false;
 }
@@ -64,14 +64,14 @@ int Platform::getProcessId()
     return GetCurrentProcessId();
 }
 
-bool Platform::isProcessRunning(const std::string& name)
+bool Platform::isProcessRunning(const std::string_view name)
 {
     if (FindWindowA(name.data(), nullptr) != nullptr)
         return true;
     return false;
 }
 
-bool Platform::killProcess(const std::string& name)
+bool Platform::killProcess(const std::string_view name)
 {
     const HWND window = FindWindowA(name.data(), nullptr);
     if (window == nullptr)
@@ -108,7 +108,7 @@ bool Platform::fileExists(std::string file)
 {
     stdext::replace_all(file, "/", "\\");
     const std::wstring wfile = stdext::utf8_to_utf16(file);
-    const DWORD dwAttrib = GetFileAttributesW(wfile.c_str());
+    const DWORD dwAttrib = GetFileAttributesW(wfile.data());
     return (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 }
 
@@ -116,7 +116,7 @@ bool Platform::copyFile(std::string from, std::string to)
 {
     stdext::replace_all(from, "/", "\\");
     stdext::replace_all(to, "/", "\\");
-    if (CopyFileW(stdext::utf8_to_utf16(from).c_str(), stdext::utf8_to_utf16(to).c_str(), FALSE) == 0)
+    if (CopyFileW(stdext::utf8_to_utf16(from).data(), stdext::utf8_to_utf16(to).data(), FALSE) == 0)
         return false;
     return true;
 }
@@ -124,7 +124,7 @@ bool Platform::copyFile(std::string from, std::string to)
 bool Platform::removeFile(std::string file)
 {
     stdext::replace_all(file, "/", "\\");
-    if (DeleteFileW(stdext::utf8_to_utf16(file).c_str()) == 0)
+    if (DeleteFileW(stdext::utf8_to_utf16(file).data()) == 0)
         return false;
     return true;
 }
@@ -135,7 +135,7 @@ ticks_t Platform::getFileModificationTime(std::string file)
     const std::wstring wfile = stdext::utf8_to_utf16(file);
     WIN32_FILE_ATTRIBUTE_DATA fileAttrData;
     memset(&fileAttrData, 0, sizeof(fileAttrData));
-    GetFileAttributesExW(wfile.c_str(), GetFileExInfoStandard, &fileAttrData);
+    GetFileAttributesExW(wfile.data(), GetFileExInfoStandard, &fileAttrData);
     ULARGE_INTEGER uli;
     uli.LowPart = fileAttrData.ftLastWriteTime.dwLowDateTime;
     uli.HighPart = fileAttrData.ftLastWriteTime.dwHighDateTime;
@@ -146,7 +146,7 @@ void Platform::openUrl(std::string url)
 {
     if (url.find("http://") == std::string::npos && url.find("https://") == std::string::npos)
         url.insert(0, "http://");
-    ShellExecuteW(nullptr, L"open", stdext::utf8_to_utf16(url).c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+    ShellExecuteW(nullptr, L"open", stdext::utf8_to_utf16(url).data(), nullptr, nullptr, SW_SHOWNORMAL);
 }
 
 std::string Platform::getCPUName()

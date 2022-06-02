@@ -158,7 +158,7 @@ protected:
 
 public:
     // login related
-    void loginWorld(const std::string& account, const std::string& password, const std::string& worldName, const std::string& worldHost, int worldPort, const std::string& characterName, const std::string& authenticatorToken, const std::string& sessionKey);
+    void loginWorld(const std::string_view account, const std::string_view password, const std::string_view worldName, const std::string_view worldHost, int worldPort, const std::string_view characterName, const std::string_view authenticatorToken, const std::string_view sessionKey);
     void cancelLogin();
     void forceLogout();
     void safeLogout();
@@ -196,19 +196,19 @@ public:
     void cancelAttackAndFollow();
 
     // talk related
-    void talk(const std::string& message);
-    void talkChannel(Otc::MessageMode mode, int channelId, const std::string& message);
-    void talkPrivate(Otc::MessageMode mode, const std::string& receiver, const std::string& message);
+    void talk(const std::string_view message);
+    void talkChannel(Otc::MessageMode mode, int channelId, const std::string_view message);
+    void talkPrivate(Otc::MessageMode mode, const std::string_view receiver, const std::string_view message);
 
     // channel related
-    void openPrivateChannel(const std::string& receiver);
+    void openPrivateChannel(const std::string_view receiver);
     void requestChannels();
     void joinChannel(int channelId);
     void leaveChannel(int channelId);
     void closeNpcChannel();
     void openOwnChannel();
-    void inviteToOwnChannel(const std::string& name);
-    void excludeFromOwnChannel(const std::string& name);
+    void inviteToOwnChannel(const std::string_view name);
+    void excludeFromOwnChannel(const std::string_view name);
 
     // party related
     void partyInvite(int creatureId);
@@ -223,9 +223,9 @@ public:
     void changeOutfit(const Outfit& outfit);
 
     // vip related
-    void addVip(const std::string& name);
+    void addVip(const std::string_view name);
     void removeVip(int playerId);
-    void editVip(int playerId, const std::string& description, int iconId, bool notifyLogin);
+    void editVip(int playerId, const std::string_view description, int iconId, bool notifyLogin);
 
     // fight modes related
     void setChaseMode(Otc::ChaseModes chaseMode);
@@ -256,18 +256,18 @@ public:
     void rejectTrade();
 
     // house window and editable items related
-    void editText(uint id, const std::string& text);
-    void editList(uint id, int doorId, const std::string& text);
+    void editText(uint id, const std::string_view text);
+    void editList(uint id, int doorId, const std::string_view text);
 
     // rule violations (only gms)
-    void openRuleViolation(const std::string& reporter);
-    void closeRuleViolation(const std::string& reporter);
+    void openRuleViolation(const std::string_view reporter);
+    void closeRuleViolation(const std::string_view reporter);
     void cancelRuleViolation();
 
     // reports
-    void reportBug(const std::string& comment);
-    void reportRuleViolation(const std::string& target, int reason, int action, const std::string& comment, const std::string& statement, int statementId, bool ipBanishment);
-    void debugReport(const std::string& a, const std::string& b, const std::string& c, const std::string& d);
+    void reportBug(const std::string_view comment);
+    void reportRuleViolation(const std::string_view target, int reason, int action, const std::string_view comment, const std::string_view statement, int statementId, bool ipBanishment);
+    void debugReport(const std::string_view a, const std::string_view b, const std::string_view c, const std::string_view d);
 
     // questlog related
     void requestQuestLog();
@@ -288,11 +288,11 @@ public:
     void seekInContainer(int cid, int index);
 
     // >= 1080 ingame store
-    void buyStoreOffer(int offerId, int productType, const std::string& name = "");
+    void buyStoreOffer(int offerId, int productType, const std::string_view name = "");
     void requestTransactionHistory(int page, int entriesPerPage);
-    void requestStoreOffers(const std::string& categoryName, int serviceType = 0);
-    void openStore(int serviceType = 0, const std::string& category = "");
-    void transferCoins(const std::string& recipient, int amount);
+    void requestStoreOffers(const std::string_view categoryName, int serviceType = 0);
+    void openStore(int serviceType = 0, const std::string_view category = "");
+    void transferCoins(const std::string_view recipient, int amount);
     void openTransactionHistory(int entriesPerPage);
 
     //void reportRuleViolation2();

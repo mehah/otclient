@@ -135,7 +135,7 @@ void UIWidget::setText(const std::string_view text, bool dontFireLuaCall)
     }
 }
 
-void UIWidget::setFont(const std::string& fontName)
+void UIWidget::setFont(const std::string_view fontName)
 {
     m_font = g_fonts.getFont(fontName);
     updateText();

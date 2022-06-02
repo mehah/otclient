@@ -30,10 +30,10 @@
 class ProtocolGame : public Protocol
 {
 public:
-    void login(const std::string& accountName, const std::string& accountPassword, const std::string& host, uint16 port, const std::string& characterName, const std::string& authenticatorToken, const std::string& sessionKey);
+    void login(const std::string_view accountName, const std::string_view accountPassword, const std::string_view host, uint16 port, const std::string_view characterName, const std::string_view authenticatorToken, const std::string_view sessionKey);
     void send(const OutputMessagePtr& outputMessage) override;
 
-    void sendExtendedOpcode(uint8 opcode, const std::string& buffer);
+    void sendExtendedOpcode(uint8 opcode, const std::string_view buffer);
     void sendLoginPacket(uint challengeTimestamp, uint8 challengeRandom);
     void sendEnterGame();
     void sendLogout();

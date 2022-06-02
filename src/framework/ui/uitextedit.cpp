@@ -379,8 +379,10 @@ void UITextEdit::setTextVirtualOffset(const Point& offset)
     update();
 }
 
-void UITextEdit::appendText(std::string text)
+void UITextEdit::appendText(const std::string_view txt)
 {
+    std::string text{ txt.data() };
+
     if (hasSelection())
         del();
 
@@ -471,10 +473,11 @@ void UITextEdit::del(bool right)
         removeCharacter(right);
 }
 
-void UITextEdit::paste(const std::string& text)
+void UITextEdit::paste(const std::string_view text)
 {
     if (hasSelection())
         del();
+
     appendText(text);
 }
 
