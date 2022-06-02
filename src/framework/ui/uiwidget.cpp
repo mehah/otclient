@@ -839,7 +839,7 @@ void UIWidget::setId(const std::string& id)
 
     if (m_parent) {
         m_parent->clearLuaField(m_id);
-        m_parent->setLuaField(id.data(), static_self_cast<UIWidget>());
+        m_parent->setLuaField(id, static_self_cast<UIWidget>());
     }
 
     m_id = id;
