@@ -73,7 +73,7 @@ void TextureManager::liveReload()
         return;
     m_liveReloadEvent = g_dispatcher.cycleEvent([this] {
         for (auto& it : m_textures) {
-            const std::string& path = g_resources.guessFilePath(it.first, "png");
+            const auto& path = g_resources.guessFilePath(it.first, "png");
             const TexturePtr& tex = it.second;
             if (tex->getTime() >= g_resources.getFileTime(path))
                 continue;

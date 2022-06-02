@@ -84,7 +84,7 @@ void Application::init(std::vector<std::string>& args)
 
     std::string startupOptions;
     for (uint i = 1; i < args.size(); ++i) {
-        const std::string& arg = args[i];
+        const auto& arg = args[i];
         startupOptions += " ";
         startupOptions += arg;
     }
