@@ -880,18 +880,18 @@ void LuaInterface::getMetatable(int index)
     lua_getmetatable(L, index);
 }
 
-void LuaInterface::getField(const char* key, int index)
+void LuaInterface::getField(const std::string_view key, int index)
 {
     assert(hasIndex(index));
     assert(isUserdata(index) || isTable(index));
-    lua_getfield(L, index, key);
+    lua_getfield(L, index, key.data());
 }
 
-void LuaInterface::setField(const char* key, int index)
+void LuaInterface::setField(const std::string_view key, int index)
 {
     assert(hasIndex(index));
     assert(isUserdata(index) || isTable(index));
-    lua_setfield(L, index, key);
+    lua_setfield(L, index, key.data());
 }
 
 void LuaInterface::getEnv(int index)

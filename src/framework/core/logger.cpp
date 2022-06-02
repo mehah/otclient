@@ -126,7 +126,7 @@ void Logger::setLogFile(const std::string_view file)
 {
     std::lock_guard lock(m_mutex);
 
-    m_outFile.open(stdext::utf8_to_latin1(file).data(), std::ios::out | std::ios::app);
+    m_outFile.open(stdext::utf8_to_latin1(file), std::ios::out | std::ios::app);
     if (!m_outFile.is_open() || !m_outFile.good()) {
         g_logger.error(stdext::format("Unable to save log to '%s'", file));
         return;

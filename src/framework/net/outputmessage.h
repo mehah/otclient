@@ -48,7 +48,6 @@ public:
     void addU32(uint32 value);
     void addU64(uint64 value);
     void addString(const std::string_view buffer);
-    void addStringView(std::string_view buffer) { addString(buffer.data()); }
     void addPaddingBytes(int bytes, uint8 byte = 0);
 
     void encryptRsa();

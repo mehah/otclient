@@ -51,8 +51,8 @@ bool Platform::spawnProcess(std::string process, const std::vector<std::string>&
     if (!process.ends_with(".exe"))
         process += ".exe";
 
-    const std::wstring wfile = stdext::utf8_to_utf16(process);
-    const std::wstring wcommandLine = stdext::utf8_to_utf16(commandLine);
+    const auto& wfile = stdext::utf8_to_utf16(process);
+    const auto& wcommandLine = stdext::utf8_to_utf16(commandLine);
 
     if ((size_t)ShellExecuteW(nullptr, L"open", wfile.data(), wcommandLine.data(), nullptr, SW_SHOWNORMAL) > 32)
         return true;
@@ -107,7 +107,7 @@ std::string Platform::getCurrentDir()
 bool Platform::fileExists(std::string file)
 {
     stdext::replace_all(file, "/", "\\");
-    const std::wstring wfile = stdext::utf8_to_utf16(file);
+    const auto& wfile = stdext::utf8_to_utf16(file);
     const DWORD dwAttrib = GetFileAttributesW(wfile.data());
     return (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 }
@@ -132,7 +132,7 @@ bool Platform::removeFile(std::string file)
 ticks_t Platform::getFileModificationTime(std::string file)
 {
     stdext::replace_all(file, "/", "\\");
-    const std::wstring wfile = stdext::utf8_to_utf16(file);
+    const auto& wfile = stdext::utf8_to_utf16(file);
     WIN32_FILE_ATTRIBUTE_DATA fileAttrData;
     memset(&fileAttrData, 0, sizeof(fileAttrData));
     GetFileAttributesExW(wfile.data(), GetFileExInfoStandard, &fileAttrData);

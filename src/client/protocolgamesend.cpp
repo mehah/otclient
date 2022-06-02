@@ -41,7 +41,7 @@ void ProtocolGame::sendExtendedOpcode(uint8 opcode, const std::string_view buffe
         const OutputMessagePtr msg(new OutputMessage);
         msg->addU8(Proto::ClientExtendedOpcode);
         msg->addU8(opcode);
-        msg->addStringView(buffer);
+        msg->addString(buffer);
         send(msg);
     } else {
         g_logger.error(stdext::format("Unable to send extended opcode %d, extended opcodes are not enabled", opcode));
@@ -60,7 +60,7 @@ void ProtocolGame::sendLoginPacket(uint challengeTimestamp, uint8 challengeRando
         msg->addU32(g_game.getClientVersion());
 
     if (g_game.getClientVersion() >= 1281) {
-        msg->addStringView(std::to_string(g_game.getClientVersion()));
+        msg->addString(std::to_string(g_game.getClientVersion()));
     }
 
     if (g_game.getFeature(Otc::GameContentRevision))
@@ -85,19 +85,19 @@ void ProtocolGame::sendLoginPacket(uint challengeTimestamp, uint8 challengeRando
     msg->addU8(0); // is gm set?
 
     if (g_game.getFeature(Otc::GameSessionKey)) {
-        msg->addStringView(m_sessionKey);
-        msg->addStringView(m_characterName);
+        msg->addString(m_sessionKey);
+        msg->addString(m_characterName);
     } else {
         if (g_game.getFeature(Otc::GameAccountNames))
-            msg->addStringView(m_accountName);
+            msg->addString(m_accountName);
         else
             msg->addU32(stdext::from_string<uint32>(m_accountName));
 
-        msg->addStringView(m_characterName);
-        msg->addStringView(m_accountPassword);
+        msg->addString(m_characterName);
+        msg->addString(m_accountPassword);
 
         if (g_game.getFeature(Otc::GameAuthenticator))
-            msg->addStringView(m_authenticatorToken);
+            msg->addString(m_authenticatorToken);
     }
 
     if (g_game.getFeature(Otc::GameChallengeOnLogin)) {
@@ -107,7 +107,7 @@ void ProtocolGame::sendLoginPacket(uint challengeTimestamp, uint8 challengeRando
 
     const auto extended = callLuaField<std::string>("getLoginExtendedData");
     if (!extended.empty())
-        msg->addStringView(extended);
+        msg->addString(extended);
 
     // complete the bytes for rsa encryption with zeros
     const int paddingBytes = g_crypt.rsaGetSize() - (msg->getMessageSize() - offset);
@@ -454,7 +454,7 @@ void ProtocolGame::sendEditText(uint id, const std::string_view text)
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientEditText);
     msg->addU32(id);
-    msg->addStringView(text);
+    msg->addString(text);
     send(msg);
 }
 
@@ -464,7 +464,7 @@ void ProtocolGame::sendEditList(uint id, int doorId, const std::string_view text
     msg->addU8(Proto::ClientEditList);
     msg->addU8(doorId);
     msg->addU32(id);
-    msg->addStringView(text);
+    msg->addString(text);
     send(msg);
 }
 
@@ -504,7 +504,7 @@ void ProtocolGame::sendTalk(Otc::MessageMode mode, int channelId, const std::str
         case Otc::MessagePrivateTo:
         case Otc::MessageGamemasterPrivateTo:
         case Otc::MessageRVRAnswer:
-            msg->addStringView(receiver);
+            msg->addString(receiver);
             break;
         case Otc::MessageChannel:
         case Otc::MessageChannelHighlight:
@@ -516,7 +516,7 @@ void ProtocolGame::sendTalk(Otc::MessageMode mode, int channelId, const std::str
             break;
     }
 
-    msg->addStringView(message);
+    msg->addString(message);
     send(msg);
 }
 
@@ -547,7 +547,7 @@ void ProtocolGame::sendOpenPrivateChannel(const std::string_view receiver)
 {
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientOpenPrivateChannel);
-    msg->addStringView(receiver);
+    msg->addString(receiver);
     send(msg);
 }
 
@@ -555,7 +555,7 @@ void ProtocolGame::sendOpenRuleViolation(const std::string_view reporter)
 {
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientOpenRuleViolation);
-    msg->addStringView(reporter);
+    msg->addString(reporter);
     send(msg);
 }
 
@@ -563,7 +563,7 @@ void ProtocolGame::sendCloseRuleViolation(const std::string_view reporter)
 {
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientCloseRuleViolation);
-    msg->addStringView(reporter);
+    msg->addString(reporter);
     send(msg);
 }
 
@@ -673,7 +673,7 @@ void ProtocolGame::sendInviteToOwnChannel(const std::string_view name)
 {
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientInviteToOwnChannel);
-    msg->addStringView(name);
+    msg->addString(name);
     send(msg);
 }
 
@@ -681,7 +681,7 @@ void ProtocolGame::sendExcludeFromOwnChannel(const std::string_view name)
 {
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientExcludeFromOwnChannel);
-    msg->addStringView(name);
+    msg->addString(name);
     send(msg);
 }
 
@@ -762,7 +762,7 @@ void ProtocolGame::sendAddVip(const std::string_view name)
 {
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientAddVip);
-    msg->addStringView(name);
+    msg->addString(name);
     send(msg);
 }
 
@@ -779,7 +779,7 @@ void ProtocolGame::sendEditVip(uint playerId, const std::string_view description
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientEditVip);
     msg->addU32(playerId);
-    msg->addStringView(description);
+    msg->addString(description);
     msg->addU32(iconId);
     msg->addU8(notifyLogin);
     send(msg);
@@ -789,7 +789,7 @@ void ProtocolGame::sendBugReport(const std::string_view comment)
 {
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientBugReport);
-    msg->addStringView(comment);
+    msg->addString(comment);
     send(msg);
 }
 
@@ -797,11 +797,11 @@ void ProtocolGame::sendRuleViolation(const std::string_view target, int reason, 
 {
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientRuleViolation);
-    msg->addStringView(target);
+    msg->addString(target);
     msg->addU8(reason);
     msg->addU8(action);
-    msg->addStringView(comment);
-    msg->addStringView(statement);
+    msg->addString(comment);
+    msg->addString(statement);
     msg->addU16(statementId);
     msg->addU8(ipBanishment);
     send(msg);
@@ -811,10 +811,10 @@ void ProtocolGame::sendDebugReport(const std::string_view a, const std::string_v
 {
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientDebugReport);
-    msg->addStringView(a);
-    msg->addStringView(b);
-    msg->addStringView(c);
-    msg->addStringView(d);
+    msg->addString(a);
+    msg->addString(b);
+    msg->addString(c);
+    msg->addString(d);
     send(msg);
 }
 
@@ -839,9 +839,9 @@ void ProtocolGame::sendNewNewRuleViolation(int reason, int action, const std::st
     msg->addU8(Proto::ClientNewRuleViolation);
     msg->addU8(reason);
     msg->addU8(action);
-    msg->addStringView(characterName);
-    msg->addStringView(comment);
-    msg->addStringView(translation);
+    msg->addString(characterName);
+    msg->addString(comment);
+    msg->addString(translation);
     send(msg);
 }
 
@@ -896,7 +896,7 @@ void ProtocolGame::sendBuyStoreOffer(int offerId, int productType, const std::st
     msg->addU8(productType);
 
     if (productType == Otc::ProductTypeNameChange)
-        msg->addStringView(name);
+        msg->addString(name);
 
     send(msg);
 }
@@ -924,7 +924,7 @@ void ProtocolGame::sendRequestStoreOffers(const std::string_view categoryName, i
     if (g_game.getFeature(Otc::GameIngameStoreServiceType)) {
         msg->addU8(serviceType);
     }
-    msg->addStringView(categoryName);
+    msg->addString(categoryName);
 
     send(msg);
 }
@@ -936,7 +936,7 @@ void ProtocolGame::sendOpenStore(int serviceType, const std::string_view categor
 
     if (g_game.getFeature(Otc::GameIngameStoreServiceType)) {
         msg->addU8(serviceType);
-        msg->addStringView(category);
+        msg->addString(category);
     }
 
     send(msg);
@@ -946,7 +946,7 @@ void ProtocolGame::sendTransferCoins(const std::string_view recipient, int amoun
 {
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientTransferCoins);
-    msg->addStringView(recipient);
+    msg->addString(recipient);
     msg->addU16(amount);
     send(msg);
 }

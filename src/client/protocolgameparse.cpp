@@ -624,8 +624,7 @@ void ProtocolGame::parseStore(const InputMessagePtr& msg)
         std::vector<std::string> icons;
         const int iconCount = msg->getU8();
         for (int j = 0; j < iconCount; ++j) {
-            const auto icon = msg->getString().data();
-            icons.push_back(icon);
+            icons.push_back(msg->getString());
         }
 
         // If this is a valid category name then
@@ -712,8 +711,7 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
         std::vector<std::string> icons;
         const int iconCount = msg->getU8();
         for (int j = 0; j < iconCount; ++j) {
-            const auto icon = msg->getString();
-            icons.push_back(icon.data());
+            icons.push_back(msg->getString());
         }
 
         const int subOffers = msg->getU16();
@@ -2778,11 +2776,12 @@ StaticTextPtr ProtocolGame::getStaticText(const InputMessagePtr& msg, int)
 {
     const int colorByte = msg->getU8();
     const Color color = Color::from8bit(colorByte);
-    const auto fontName = msg->getString();
-    const auto text = msg->getString();
+    const auto& fontName = msg->getString();
+    const auto& text = msg->getString();
+
     auto staticText = StaticTextPtr(new StaticText);
-    staticText->setText(text.data());
-    staticText->setFont(fontName.data());
+    staticText->setText(text);
+    staticText->setFont(fontName);
     staticText->setColor(color);
     return staticText;
 }

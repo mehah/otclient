@@ -42,7 +42,7 @@ public:
     void updateHoveredWidget(bool now = false);
 
     void clearStyles();
-    bool importStyle(std::string file);
+    bool importStyle(const std::string_view file);
     void importStyleFromOTML(const OTMLNodePtr& styleNode);
     OTMLNodePtr getStyle(const std::string_view styleName);
     std::string getStyleClass(const std::string_view styleName);

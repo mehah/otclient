@@ -33,12 +33,12 @@ Config::Config()
 
 bool Config::load(const std::string_view file)
 {
-    m_fileName = file;
-
-    if (!g_resources.fileExists(file.data()))
+    if (!g_resources.fileExists(file))
         return false;
 
     try {
+        m_fileName = file;
+
         const OTMLDocumentPtr confsDoc = OTMLDocument::parse(file);
         if (confsDoc)
             m_confsDoc = confsDoc;

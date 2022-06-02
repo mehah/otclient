@@ -76,7 +76,7 @@ namespace stdext
 
     bool is_valid_utf8(const std::string_view src)
     {
-        const auto* bytes = (const unsigned char*)src.data();
+        const auto* bytes = src.data();
         while (*bytes) {
             if ((// ASCII
                  // use bytes[0] <= 0x7F to allow ASCII control characters
@@ -196,7 +196,7 @@ namespace stdext
         return res;
     }
 
-    std::string utf16_to_utf8(const std::wstring& src)
+    std::string utf16_to_utf8(const std::wstring_view src)
     {
         std::string res;
         char out[4096];
@@ -210,7 +210,7 @@ namespace stdext
         return utf8_to_utf16(latin1_to_utf8(src));
     }
 
-    std::string utf16_to_latin1(const std::wstring& src)
+    std::string utf16_to_latin1(const std::wstring_view src)
     {
         return utf8_to_latin1(utf16_to_utf8(src));
     }

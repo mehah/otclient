@@ -255,10 +255,8 @@ public:
     void setMetatable(int index = -2);
     void getMetatable(int index = -1);
 
-    void getField(const char* key, int index = -1);
-    void getField(const std::string_view key, int index = -1) { return getField(key.data(), index); }
-    void setField(const char* key, int index = -2);
-    void setField(const std::string_view key, int index = -2) { return setField(key.data(), index); }
+    void getField(const std::string_view key, int index = -1);
+    void setField(const std::string_view key, int index = -2);
 
     void getTable(int index = -2);
     void setTable(int index = -3);

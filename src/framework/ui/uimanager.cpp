@@ -314,15 +314,15 @@ void UIManager::clearStyles()
     m_styles.clear();
 }
 
-bool UIManager::importStyle(std::string file)
+bool UIManager::importStyle(const std::string_view fl)
 {
+    const std::string file{ g_resources.guessFilePath(fl, "otui") };
     try {
-        file = g_resources.guessFilePath(file, "otui");
-
         const OTMLDocumentPtr doc = OTMLDocument::parse(file);
 
         for (const OTMLNodePtr& styleNode : doc->children())
             importStyleFromOTML(styleNode);
+
         return true;
     } catch (stdext::exception& e) {
         g_logger.error(stdext::format("Failed to import UI styles from '%s': %s", file, e.what()));
