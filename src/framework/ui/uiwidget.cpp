@@ -249,7 +249,7 @@ void UIWidget::removeChild(const UIWidgetPtr& child)
         if (child->m_customId) {
             const std::string widgetId = child->getId();
             if (hasLuaField(widgetId)) {
-                setLuaField(widgetId, nullptr);
+                clearLuaField(widgetId);
             }
         }
 
@@ -821,7 +821,7 @@ void UIWidget::destroyChildren()
         if (child->m_customId) {
             std::string widgetId = child->getId();
             if (hasLuaField(widgetId)) {
-                setLuaField(widgetId, nullptr);
+                clearLuaField(widgetId);
             }
         }
     }
@@ -838,7 +838,7 @@ void UIWidget::setId(const std::string& id)
     m_customId = true;
 
     if (m_parent) {
-        m_parent->setLuaField(m_id, nullptr);
+        m_parent->clearLuaField(m_id);
         m_parent->setLuaField(id.data(), static_self_cast<UIWidget>());
     }
 

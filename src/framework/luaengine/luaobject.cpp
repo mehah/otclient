@@ -58,6 +58,12 @@ void LuaObject::releaseLuaFieldsTable()
     }
 }
 
+void LuaObject::clearLuaField(const std::string& key)
+{
+    g_lua.pushNil();
+    luaSetField(key);
+}
+
 void LuaObject::luaSetField(const std::string& key)
 {
     // create fields table on the fly

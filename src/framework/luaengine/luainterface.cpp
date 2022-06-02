@@ -1083,16 +1083,9 @@ void LuaInterface::pushBoolean(bool v)
     checkStack();
 }
 
-void LuaInterface::pushCString(const char* v)
+void LuaInterface::pushString(const std::string_view v)
 {
-    assert(v);
-    lua_pushstring(L, v);
-    checkStack();
-}
-
-void LuaInterface::pushString(const std::string& v)
-{
-    lua_pushlstring(L, v.c_str(), v.length());
+    lua_pushstring(L, v.data());
     checkStack();
 }
 

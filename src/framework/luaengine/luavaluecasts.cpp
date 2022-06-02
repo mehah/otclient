@@ -68,13 +68,7 @@ bool luavalue_cast(int index, double& d)
 }
 
 // string
-int push_luavalue(const char* cstr)
-{
-    g_lua.pushCString(cstr);
-    return 1;
-}
-
-int push_luavalue(const std::string& str)
+int push_luavalue(const std::string_view str)
 {
     g_lua.pushString(str);
     return 1;

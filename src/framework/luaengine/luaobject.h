@@ -53,6 +53,8 @@ public:
     template<typename T>
     void setLuaField(const std::string& key, const T& value);
 
+    void clearLuaField(const std::string& key);
+
     /// Gets a field from this lua object
     template<typename T>
     T getLuaField(const std::string& key);
@@ -196,11 +198,7 @@ void LuaObject::callLuaField(const std::string& field, const T&... args)
 template<typename T>
 void LuaObject::setLuaField(const std::string& key, const T& value)
 {
-    if (value == nullptr) {
-        g_lua.pushNil();
-    } else {
-        g_lua.polymorphicPush(value);
-    }
+    g_lua.polymorphicPush(value);
     luaSetField(key);
 }
 

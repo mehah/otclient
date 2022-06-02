@@ -293,8 +293,7 @@ public:
     void pushInteger(long v);
     void pushNumber(double v);
     void pushBoolean(bool v);
-    void pushCString(const char* v);
-    void pushString(const std::string& v);
+    void pushString(const std::string_view v);
     void pushLightUserdata(void* p);
     void pushThread();
     void pushValue(int index = -1);
