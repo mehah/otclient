@@ -109,12 +109,12 @@ void UIWidget::drawText(const Rect& screenCoords)
 void UIWidget::onTextChange(const std::string_view text, const std::string_view oldText)
 {
     g_app.repaint();
-    callLuaField("onTextChange", text, oldText);
+    callLuaField("onTextChange", text.data(), oldText.data());
 }
 
 void UIWidget::onFontChange(const std::string_view font)
 {
-    callLuaField("onFontChange", font);
+    callLuaField("onFontChange", font.data());
 }
 
 void UIWidget::setText(std::string text, bool dontFireLuaCall)

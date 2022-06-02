@@ -120,22 +120,22 @@ void Game::processDisconnect()
 
 void Game::processUpdateNeeded(const std::string_view signature)
 {
-    g_lua.callGlobalField("g_game", "onUpdateNeeded", signature);
+    g_lua.callGlobalField("g_game", "onUpdateNeeded", signature.data());
 }
 
 void Game::processLoginError(const std::string_view error)
 {
-    g_lua.callGlobalField("g_game", "onLoginError", error);
+    g_lua.callGlobalField("g_game", "onLoginError", error.data());
 }
 
 void Game::processLoginAdvice(const std::string_view message)
 {
-    g_lua.callGlobalField("g_game", "onLoginAdvice", message);
+    g_lua.callGlobalField("g_game", "onLoginAdvice", message.data());
 }
 
 void Game::processLoginWait(const std::string_view message, int time)
 {
-    g_lua.callGlobalField("g_game", "onLoginWait", message, time);
+    g_lua.callGlobalField("g_game", "onLoginWait", message.data(), time);
 }
 
 void Game::processSessionEnd(int reason)
@@ -271,18 +271,18 @@ void Game::processPingBack()
 
 void Game::processTextMessage(Otc::MessageMode mode, const std::string_view text)
 {
-    g_lua.callGlobalField("g_game", "onTextMessage", mode, text);
+    g_lua.callGlobalField("g_game", "onTextMessage", mode, text.data());
 }
 
 void Game::processTalk(const std::string_view name, int level, Otc::MessageMode mode, const std::string_view text, int channelId, const Position& pos)
 {
-    g_lua.callGlobalField("g_game", "onTalk", name, level, mode, text, channelId, pos);
+    g_lua.callGlobalField("g_game", "onTalk", name.data(), level, mode, text.data(), channelId, pos);
 }
 
 void Game::processOpenContainer(int containerId, const ItemPtr& containerItem, const std::string_view name, int capacity, bool hasParent, const std::vector<ItemPtr>& items, bool isUnlocked, bool hasPages, int containerSize, int firstIndex)
 {
     const ContainerPtr previousContainer = getContainer(containerId);
-    const auto container = ContainerPtr(new Container(containerId, capacity, name, containerItem, hasParent, isUnlocked, hasPages, containerSize, firstIndex));
+    const auto container = ContainerPtr(new Container(containerId, capacity, name.data(), containerItem, hasParent, isUnlocked, hasPages, containerSize, firstIndex));
     m_containers[containerId] = container;
     container->onAddItems(items);
 
@@ -336,17 +336,17 @@ void Game::processChannelList(const std::vector<std::tuple<int, std::string> >& 
 
 void Game::processOpenChannel(int channelId, const std::string_view name)
 {
-    g_lua.callGlobalField("g_game", "onOpenChannel", channelId, name);
+    g_lua.callGlobalField("g_game", "onOpenChannel", channelId, name.data());
 }
 
 void Game::processOpenPrivateChannel(const std::string_view name)
 {
-    g_lua.callGlobalField("g_game", "onOpenPrivateChannel", name);
+    g_lua.callGlobalField("g_game", "onOpenPrivateChannel", name.data());
 }
 
 void Game::processOpenOwnPrivateChannel(int channelId, const std::string_view name)
 {
-    g_lua.callGlobalField("g_game", "onOpenOwnPrivateChannel", channelId, name);
+    g_lua.callGlobalField("g_game", "onOpenOwnPrivateChannel", channelId, name.data());
 }
 
 void Game::processCloseChannel(int channelId)
@@ -361,12 +361,12 @@ void Game::processRuleViolationChannel(int channelId)
 
 void Game::processRuleViolationRemove(const std::string_view name)
 {
-    g_lua.callGlobalField("g_game", "onRuleViolationRemove", name);
+    g_lua.callGlobalField("g_game", "onRuleViolationRemove", name.data());
 }
 
 void Game::processRuleViolationCancel(const std::string_view name)
 {
-    g_lua.callGlobalField("g_game", "onRuleViolationCancel", name);
+    g_lua.callGlobalField("g_game", "onRuleViolationCancel", name.data());
 }
 
 void Game::processRuleViolationLock()
@@ -376,8 +376,8 @@ void Game::processRuleViolationLock()
 
 void Game::processVipAdd(uint id, const std::string_view name, uint status, const std::string_view description, int iconId, bool notifyLogin)
 {
-    m_vips[id] = Vip(name, status, description, iconId, notifyLogin);
-    g_lua.callGlobalField("g_game", "onAddVip", id, name, status, description, iconId, notifyLogin);
+    m_vips[id] = Vip(name.data(), status, description, iconId, notifyLogin);
+    g_lua.callGlobalField("g_game", "onAddVip", id, name.data(), status, description, iconId, notifyLogin);
 }
 
 void Game::processVipStateChange(uint id, uint status)
@@ -393,12 +393,12 @@ void Game::processTutorialHint(int id)
 
 void Game::processAddAutomapFlag(const Position& pos, int icon, const std::string_view message)
 {
-    g_lua.callGlobalField("g_game", "onAddAutomapFlag", pos, icon, message);
+    g_lua.callGlobalField("g_game", "onAddAutomapFlag", pos, icon, message.data());
 }
 
 void Game::processRemoveAutomapFlag(const Position& pos, int icon, const std::string_view message)
 {
-    g_lua.callGlobalField("g_game", "onRemoveAutomapFlag", pos, icon, message);
+    g_lua.callGlobalField("g_game", "onRemoveAutomapFlag", pos, icon, message.data());
 }
 
 void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<int, std::string, int> >& outfitList,
@@ -448,12 +448,12 @@ void Game::processCloseNpcTrade()
 
 void Game::processOwnTrade(const std::string_view name, const std::vector<ItemPtr>& items)
 {
-    g_lua.callGlobalField("g_game", "onOwnTrade", name, items);
+    g_lua.callGlobalField("g_game", "onOwnTrade", name.data(), items);
 }
 
 void Game::processCounterTrade(const std::string_view name, const std::vector<ItemPtr>& items)
 {
-    g_lua.callGlobalField("g_game", "onCounterTrade", name, items);
+    g_lua.callGlobalField("g_game", "onCounterTrade", name.data(), items);
 }
 
 void Game::processCloseTrade()
@@ -463,12 +463,12 @@ void Game::processCloseTrade()
 
 void Game::processEditText(uint id, int itemId, int maxLength, const std::string_view text, const std::string_view writer, const std::string_view date)
 {
-    g_lua.callGlobalField("g_game", "onEditText", id, itemId, maxLength, text, writer, date);
+    g_lua.callGlobalField("g_game", "onEditText", id, itemId, maxLength, text.data(), writer.data(), date.data());
 }
 
 void Game::processEditList(uint id, int doorId, const std::string_view text)
 {
-    g_lua.callGlobalField("g_game", "onEditList", id, doorId, text);
+    g_lua.callGlobalField("g_game", "onEditList", id, doorId, text.data());
 }
 
 void Game::processQuestLog(const std::vector<std::tuple<int, std::string, bool> >& questList)
@@ -485,7 +485,7 @@ void Game::processModalDialog(uint32 id, const std::string_view title, const std
                               & buttonList, int enterButton, int escapeButton, const std::vector<std::tuple<int, std::string> >
                               & choiceList, bool priority)
 {
-    g_lua.callGlobalField("g_game", "onModalDialog", id, title, message, buttonList, enterButton, escapeButton, choiceList, priority);
+    g_lua.callGlobalField("g_game", "onModalDialog", id, title.data(), message.data(), buttonList, enterButton, escapeButton, choiceList, priority);
 }
 
 void Game::processAttackCancel(uint seq)
