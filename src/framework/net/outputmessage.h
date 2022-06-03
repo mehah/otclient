@@ -41,7 +41,7 @@ public:
     void reset();
 
     void setBuffer(const std::string_view buffer);
-    std::string getBuffer() { return std::string{ (char*)m_buffer + m_headerPos, m_messageSize }; }
+    std::string_view getBuffer() { return std::string_view{ (char*)m_buffer + m_headerPos, m_messageSize }; }
 
     void addU8(uint8 value);
     void addU16(uint16 value);

@@ -209,7 +209,7 @@ void CreatureManager::loadSingleCreature(const std::string_view file)
 
 void CreatureManager::loadNpcs(const std::string_view folder)
 {
-    std::string tmp{ folder.data() };
+    std::string tmp{ folder };
     if (!tmp.ends_with("/"))
         tmp += "/";
 

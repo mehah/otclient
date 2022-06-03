@@ -624,7 +624,7 @@ void ProtocolGame::parseStore(const InputMessagePtr& msg)
         std::vector<std::string> icons;
         const int iconCount = msg->getU8();
         for (int j = 0; j < iconCount; ++j) {
-            icons.push_back(msg->getString());
+            icons.push_back(msg->getString().data());
         }
 
         // If this is a valid category name then
@@ -711,7 +711,7 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
         std::vector<std::string> icons;
         const int iconCount = msg->getU8();
         for (int j = 0; j < iconCount; ++j) {
-            icons.push_back(msg->getString());
+            icons.push_back(msg->getString().data());
         }
 
         const int subOffers = msg->getU16();
@@ -1902,7 +1902,7 @@ void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
 {
     const int code = msg->getU8();
     const Otc::MessageMode mode = Proto::translateMessageModeFromServer(code);
-    std::string text;
+    std::string_view text;
 
     switch (mode) {
         case Otc::MessageChannelManagement:
@@ -2776,8 +2776,8 @@ StaticTextPtr ProtocolGame::getStaticText(const InputMessagePtr& msg, int)
 {
     const int colorByte = msg->getU8();
     const Color color = Color::from8bit(colorByte);
-    const auto& fontName = msg->getString();
-    const auto& text = msg->getString();
+    const auto fontName = msg->getString();
+    const auto text = msg->getString();
 
     auto staticText = StaticTextPtr(new StaticText);
     staticText->setText(text);

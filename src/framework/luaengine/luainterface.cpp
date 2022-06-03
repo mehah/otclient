@@ -1087,7 +1087,7 @@ void LuaInterface::pushBoolean(bool v)
 
 void LuaInterface::pushString(const std::string_view v)
 {
-    lua_pushstring(L, v.data());
+    lua_pushlstring(L, v.data(), v.length());
     checkStack();
 }
 

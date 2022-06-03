@@ -1757,7 +1757,7 @@ void Game::setFollowingCreature(const CreaturePtr& creature)
 
 std::string Game::formatCreatureName(const std::string_view name)
 {
-    std::string formatedName{ name.data() };
+    std::string formatedName{ name };
     if (getFeature(Otc::GameFormatCreatureName) && name.length() > 0) {
         bool upnext = true;
         for (char& i : formatedName) {
