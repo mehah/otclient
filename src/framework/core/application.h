@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef APPLICATION_H
-#define APPLICATION_H
+#pragma once
 
 #include <framework/global.h>
 
@@ -40,8 +39,8 @@ public:
     virtual void exit();
     virtual void close();
 
-    void setName(const std::string& name) { m_appName = name; }
-    void setCompactName(const std::string& compactName) { m_appCompactName = compactName; }
+    void setName(const std::string_view name) { m_appName = name; }
+    void setCompactName(const std::string_view compactName) { m_appCompactName = compactName; }
 
     bool isRunning() { return m_running; }
     bool isStopping() { return m_stopping; }
@@ -52,7 +51,7 @@ public:
 
     std::string getCharset() { return m_charset; }
     std::string getBuildCompiler() { return BUILD_COMPILER; }
-    std::string getBuildDate() { return std::string(__DATE__); }
+    std::string getBuildDate() { return std::string{__DATE__}; }
     std::string getBuildType() { return BUILD_TYPE; }
     std::string getBuildArch() { return BUILD_ARCH; }
     std::string getBuildRevision();
@@ -73,5 +72,3 @@ protected:
 };
 
 #include "graphicalapplication.h"
-
-#endif

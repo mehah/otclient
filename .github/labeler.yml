@@ -1,6 +1,6 @@
 ---
-source:
+"Area: Source":
   - any: ['src/**/*']
 
-data:
+"Area: Datapack":
   - any: ['data/**/*']

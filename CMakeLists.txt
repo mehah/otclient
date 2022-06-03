@@ -38,7 +38,8 @@ include(LoggingHelper)
 # *****************************************************************************
 # Options
 # *****************************************************************************
-option(OPTIONS_ENABLE_CCACHE "Enable ccache" ON)
+option(OPTIONS_ENABLE_CCACHE "Enable ccache" OFF)
+option(OPTIONS_ENABLE_SCCACHE "Use sccache to speed up compilation process" OFF)
 option(OPTIONS_ENABLE_IPO "Check and Enable interprocedural optimization (IPO/LTO)" ON)
 
 # *****************************************************************************
@@ -56,6 +57,20 @@ if(OPTIONS_ENABLE_CCACHE)
 	endif()
 endif()
 
+
+# === SCCACHE ===
+if(OPTIONS_ENABLE_SCCACHE)
+  find_program(SCCACHE_PATH sccache)
+  if(SCCACHE_PATH)
+    log_option_enabled("sccache")
+    set(CMAKE_C_COMPILER_LAUNCHER ${SCCACHE_PATH})
+    set(CMAKE_CXX_COMPILER_LAUNCHER ${SCCACHE_PATH})
+  else()
+    log_option_disabled("sccache")
+  endif()
+endif()
+
+
 # === IPO ===
 option(OPTIONS_ENABLE_IPO "Check and Enable interprocedural optimization (IPO/LTO)" ON)
 if(OPTIONS_ENABLE_IPO)
@@ -71,6 +86,7 @@ if(OPTIONS_ENABLE_IPO)
 else()
 	log_option_disabled("ipo")
 endif()
+
 
 # *****************************************************************************
 # Add project

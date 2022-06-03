@@ -9,8 +9,8 @@
         BOT_PROTECTION;
         OTCLIENT;
         CRASH_HANDLER;
-        FW_NET;
-        FW_SOUND;
+        FRAMEWORK_NET;
+        FRAMEWORK_SOUND;
         FW_XML;
         BUILD_TYPE="RelWithDebInfo";
         BUILD_COMMIT="devel";

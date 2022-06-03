@@ -8,17 +8,21 @@ option(TOGGLE_FRAMEWORK_SOUND "Use SOUND " ON)
 option(TOGGLE_FRAMEWORK_XML "Use XML " ON)
 option(TOGGLE_FRAMEWORK_NET "Use NET " ON)
 option(TOGGLE_DIRECTX "Use DX9 support" OFF)
-option(TOGGLE_STATIC_LIBS "Use shared libraries (dlls)" ON)
+option(TOGGLE_BIN_FOLDER "Use build/bin folder for generate compilation files" OFF)
 option(TOGGLE_BOT_PROTECTION "Use bot protection" ON)
 option(TOGGLE_PRE_COMPILED_HEADER "Use precompiled header (speed up compile)" OFF)
+option(DEBUG_LOG "Enable Debug Log" OFF)
+option(ASAN_ENABLED "Build this target with AddressSanitizer" OFF)
 
 # *****************************************************************************
 # Cmake Features
 # *****************************************************************************
+set(GNUCXX_MINIMUM_VERSION 9)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 
 # Make will print more details
 set(CMAKE_VERBOSE_MAKEFILE OFF)
@@ -42,21 +46,13 @@ if (TOGGLE_FRAMEWORK_NET)
 	set(FRAMEWORK_DEFINITIONS ${FRAMEWORK_DEFINITIONS} -DFRAMEWORK_NET)
 endif()
 
-# Set for use static libs if is x86 build
-# CMAKE_SIZEOF_VOID_P EQUAL 4 = x86 build
-if(CMAKE_SIZEOF_VOID_P EQUAL 4 AND TOGGLE_STATIC_LIBS AND NOT APPLE)
-	set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -static-libgcc -static-libstdc++")
-	message(STATUS "Link to static libraries: ON")
-else()
-	message(STATUS "Link to static libraries: OFF")
-endif()
-
 # Set for use bot protection
 if(TOGGLE_BOT_PROTECTION)
 	message(STATUS "Bot protection: ON")
 else(TOGGLE_BOT_PROTECTION)
 	message(STATUS "Bot protection: OFF")
 endif(TOGGLE_BOT_PROTECTION)
+
 
 # Set for use precompiled header
 if(TOGGLE_PRE_COMPILED_HEADER)
@@ -66,6 +62,7 @@ if(TOGGLE_PRE_COMPILED_HEADER)
 else()
 	message(STATUS "Use precompiled header: OFF")
 endif(TOGGLE_PRE_COMPILED_HEADER)
+
 
 set(VERSION "1.0.0")
 
@@ -79,8 +76,58 @@ else()
 endif()
 
 # *****************************************************************************
+# Build flags
+# *****************************************************************************
+if (NOT MSVC)
+	if (CMAKE_COMPILER_IS_GNUCXX)
+		target_compile_options(${PROJECT_NAME}  PRIVATE  -Wno-deprecated-declarations)
+	endif()
+endif()
+
+if(THREADS_HAVE_PTHREAD_ARG)
+	target_compile_options(${PROJECT_NAME} PUBLIC "-pthread")
+endif()
+
+# *****************************************************************************
 # Definitions code
 # *****************************************************************************
+
+
+# === ASAN ===
+if(ASAN_ENABLED)
+  log_option_enabled("asan")
+
+  if(MSVC)
+	target_compile_options(${PROJECT_NAME} PUBLIC /fsanitize=address)
+  else()
+	target_compile_options(${PROJECT_NAME} PUBLIC -fsanitize=address)
+	target_link_options(${PROJECT_NAME} PUBLIC -fsanitize=address)
+  endif()
+else()
+  log_option_disabled("asan")
+endif()
+
+
+# === DEBUG LOG ===
+# cmake -DDEBUG_LOG=ON ..
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE -DDEBUG_LOG=ON )
+  log_option_enabled("DEBUG LOG")
+  else()
+  log_option_disabled("DEBUG LOG")
+endif(CMAKE_BUILD_TYPE MATCHES Debug)
+
+# *****************************************************************************
+# Sanity Check
+# *****************************************************************************
+
+# === GCC Minimum Version ===
+if (CMAKE_COMPILER_IS_GNUCXX)
+	if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS GNUCXX_MINIMUM_VERSION)
+		message(FATAL_ERROR "GCC version must be at least ${GNUCXX_MINIMUM_VERSION}!")
+	endif()
+endif()
+
 
 # Multiprocessor compiller
 if(CMake_MSVC_PARALLEL)
@@ -90,6 +137,7 @@ if(CMake_MSVC_PARALLEL)
 		add_definitions(/MP)
 	endif()
 endif()
+
 
 # Client options
 add_definitions(-DCLIENT)
@@ -101,6 +149,14 @@ add_definitions(-D_WIN32_WINNT=0x0501)
 add_definitions(${FRAMEWORK_DEFINITIONS})
 add_definitions(-D"VERSION=${VERSION}")
 
+# === Build options ===
+message(STATUS "Build type: " ${CMAKE_BUILD_TYPE})
+add_definitions(-D"BUILD_TYPE=\\\"${CMAKE_BUILD_TYPE}\\\"")
+message(STATUS "Build commit: ${BUILD_COMMIT}")
+add_definitions(-D"BUILD_COMMIT=\\\"${BUILD_COMMIT}\\\"")
+message(STATUS "Build revision: ${BUILD_REVISION}")
+add_definitions(-D"BUILD_REVISION=\\\"${BUILD_REVISION}\\\"")
+
 # *****************************************************************************
 # Packages / Libs
 # *****************************************************************************
@@ -110,6 +166,8 @@ find_package(ZLIB REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(LibLZMA REQUIRED)
 find_package(nlohmann_json REQUIRED)
+find_package(asio REQUIRED)
+find_package(Threads REQUIRED)
 # OpenGL/GLEW = Graphics
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
@@ -127,21 +185,11 @@ if(TOGGLE_DIRECTX)
 	find_package(DirectX REQUIRED)
 endif()
 if(TOGGLE_FRAMEWORK_SOUND)
-	find_package(OpenAL REQUIRED)
+	find_package(OpenAL CONFIG REQUIRED)
 	find_package(VorbisFile REQUIRED)
-	find_package(Vorbis REQUIRED)
-	find_package(Ogg REQUIRED)
+	find_package(Vorbis CONFIG REQUIRED)
+	find_package(Ogg CONFIG REQUIRED)
 endif()
-
-find_path(ASIO_INCLUDE_PATH asio.hpp HINTS 
-	"/usr/include"
-	"/usr/local/include"
-	"/opt/local/include"
-)
-
-if(ASIO_INCLUDE_PATH)
-	message(STATUS "Found existing ASIO install")
-endif(ASIO_INCLUDE_PATH)
 
 # *****************************************************************************
 # OTClient source files configuration
@@ -301,19 +349,31 @@ target_sources(${PROJECT_NAME}
 # Includes and librarys
 # *****************************************************************************
 if(MSVC)
+
+	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+		string(REPLACE "/Zi" "/Z7" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+		string(REPLACE "/Zi" "/Z7" CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}")
+	elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+		string(REPLACE "/Zi" "/Z7" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+		string(REPLACE "/Zi" "/Z7" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
+	elseif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+		string(REPLACE "/Zi" "/Z7" CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+		string(REPLACE "/Zi" "/Z7" CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO}")
+	endif()
+
+	target_compile_options(${PROJECT_NAME} PUBLIC /MP /FS /Zf )
+
 	target_include_directories(${PROJECT_NAME}
 		PRIVATE
 		${CMAKE_SOURCE_DIR}/src
 		${MYSQL_INCLUDE_DIR}
 		${LUAJIT_INCLUDE_DIR}
 		${Protobuf_INCLUDE_DIRS}
-		${OPENAL_INCLUDE_DIR}
 		${VORBISFILE_INCLUDE_DIR}
 		${MYSQL_INCLUDE_DIR}
 		${GMP_INCLUDE_DIR}
 		${OPENSSL_INCLUDE_DIR}
 		${PHYSFS_INCLUDE_DIR}
-		${LIBLZMA_INCLUDE_DIRS}
 		${NLOHMANN_JSON_INCLUDE_DIR}
 	)
 	target_link_libraries(${PROJECT_NAME}
@@ -324,13 +384,10 @@ if(MSVC)
 		${PHYSFS_LIBRARY}
 		${ZLIB_LIBRARY}
 		${PROTOBUF_LIBRARY}
-		${LIBLZMA_LIBRARIES}
 		${NLOHMANN_JSON_LIBRARY}
-		${GLEW_LIBRARY}
 		${OPENGL_LIBRARIES}
 		${DirectX_LIBRARY}
 		${DirectX_LIBRARIES}
-		${OPENAL_LIBRARY}
 		${VORBISFILE_LIBRARY}
 		${VORBIS_LIBRARY}
 		${OGG_LIBRARY}
@@ -341,24 +398,23 @@ if(MSVC)
 
 		Threads::Threads
 		GLEW::GLEW
+		asio::asio
+		OpenAL::OpenAL
+		LibLZMA::LibLZMA
 	)
-	
 else()
 	target_include_directories(${PROJECT_NAME}
 		PRIVATE
 		${CMAKE_SOURCE_DIR}/src
 		${LUAJIT_INCLUDE_DIR}
+		${CMAKE_THREAD_LIBS_INIT}
 		${Protobuf_INCLUDE_DIRS}
-		${OPENAL_INCLUDE_DIR}
-		${VORBISFILE_INCLUDE_DIR}
 		${MYSQL_INCLUDE_DIR}
 		${GMP_INCLUDE_DIR}
 		${OPENSSL_INCLUDE_DIR}
-		${OPENGL_INCLUDE_DIR}
 		${PHYSFS_INCLUDE_DIR}
-		${LIBLZMA_INCLUDE_DIRS}
+		${GLEW_INCLUDE_DIR}
 		${NLOHMANN_JSON_INCLUDE_DIR}
-		${X11_INCLUDE_DIR}
 	)
 	target_link_libraries(${PROJECT_NAME}
 		PRIVATE
@@ -366,23 +422,23 @@ else()
 		${PHYSFS_LIBRARY}
 		${ZLIB_LIBRARY}
 		${PROTOBUF_LIBRARY}
-		${LIBLZMA_LIBRARIES}
 		${NLOHMANN_JSON_LIBRARY}
 		${GLEW_LIBRARY}
 		${OPENGL_LIBRARIES}
 		${DirectX_LIBRARY}
 		${DirectX_LIBRARIES}
-		${OPENAL_LIBRARY}
-		${VORBISFILE_LIBRARY}
-		${VORBIS_LIBRARY}
 		${OGG_LIBRARY}
 		${MYSQL_LIBRARY}
 		${GMP_LIBRARY}
 		${OPENSSL_LIBRARIES}
-		${X11_LIBRARIES}
 
 		Threads::Threads
 		X11::X11
+		asio::asio
+		OpenAL::OpenAL
+		Vorbis::vorbis
+		Vorbis::vorbisfile
+		LibLZMA::LibLZMA
 	)
 endif()
 
@@ -400,9 +456,18 @@ if(WIN32)
 endif(WIN32)
 
 # *****************************************************************************
-# Link compilation files to the "build/release/bin" folder
+# Link compilation files folder
 # *****************************************************************************
-set_target_properties(${PROJECT_NAME}
-PROPERTIES
-	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
-)
+
+## Link compilation files to build/bin folder, else link to the main dir
+if (TOGGLE_BIN_FOLDER)
+	set_target_properties(${PROJECT_NAME}
+		PROPERTIES
+		RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+	)
+else()
+	set_target_properties(${PROJECT_NAME}
+	PROPERTIES
+		RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/"
+	)
+endif()
