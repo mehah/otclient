@@ -311,14 +311,14 @@ std::string FileStream::getString()
             if (PHYSFS_readBytes(m_fileHandle, buffer, len) == 0)
                 throwError("read failed", true);
             else
-                str = std::string(buffer, len);
+                str = { buffer, len };
         } else {
             if (m_pos + len > m_data.size()) {
                 throwError("[FileStream::getString] - Read failed");
-                return std::string();
+                return {};
             }
 
-            str = std::string((char*)&m_data[m_pos], len);
+            str = { (char*)&m_data[m_pos], len };
             m_pos += len;
         }
     } else if (len != 0)
@@ -450,6 +450,6 @@ void FileStream::throwError(const std::string_view message, bool physfsError)
 {
     std::string completeMessage = stdext::format("in file '%s': %s", m_name, message);
     if (physfsError)
-        completeMessage += std::string(": ") + PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        completeMessage += ": "s + PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
     stdext::throw_exception(completeMessage);
 }

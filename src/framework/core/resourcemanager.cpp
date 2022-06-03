@@ -232,7 +232,7 @@ bool ResourceManager::writeFileStream(const std::string_view fileName, std::iost
 bool ResourceManager::writeFileContents(const std::string_view fileName, const std::string_view data)
 {
 #if ENABLE_ENCRYPTION == 1
-    return writeFileBuffer(fileName, (const uchar*)encrypt(data, std::string(ENCRYPTION_PASSWORD)).data(), data.size());
+    return writeFileBuffer(fileName, (const uchar*)encrypt(data, std::string_view{ ENCRYPTION_PASSWORD }).data(), data.size());
 #else
     return writeFileBuffer(fileName, (const uchar*)data.data(), data.size());
 #endif
@@ -405,7 +405,7 @@ std::string ResourceManager::encrypt(const std::string_view data, const std::str
 }
 std::string ResourceManager::decrypt(const std::string_view data)
 {
-    const auto& password = std::string(ENCRYPTION_PASSWORD);
+    const auto password = std::string_view{ ENCRYPTION_PASSWORD };
 
     const int len = data.length(),
         plen = password.length();
@@ -431,7 +431,7 @@ std::string ResourceManager::decrypt(const std::string_view data)
 
 uint8_t* ResourceManager::decrypt(uint8_t* data, int32_t size)
 {
-    const auto& password = std::string(ENCRYPTION_PASSWORD);
+    const auto password = std::string_view{ ENCRYPTION_PASSWORD };
     const int plen = password.length();
 
     auto* const new_Data = new uint8_t[size];

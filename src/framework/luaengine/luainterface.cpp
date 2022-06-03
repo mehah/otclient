@@ -559,7 +559,7 @@ int LuaInterface::luaScriptLoader(lua_State*)
         g_lua.loadScript(fileName);
         return 1;
     } catch (stdext::exception& e) {
-        g_lua.pushString(std::string("\n\t") + e.what());
+        g_lua.pushString("\n\t"s + e.what());
         return 1;
     }
 }

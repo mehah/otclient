@@ -91,7 +91,7 @@ std::string InputMessage::getString()
     checkRead(stringLength);
     const auto* const v = (char*)(m_buffer + m_readPos);
     m_readPos += stringLength;
-    return std::string(v, stringLength);
+    return std::string{ v, stringLength };
 }
 
 double InputMessage::getDouble()
