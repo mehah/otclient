@@ -29,7 +29,7 @@
 
 struct LogMessage
 {
-    LogMessage(Fw::LogLevel level, std::string_view message, std::size_t when) : level(level), message(std::move(message)), when(when) {}
+    LogMessage(Fw::LogLevel level, std::string_view message, std::size_t when) : level(level), message(message), when(when) {}
     Fw::LogLevel level;
     std::string message;
     std::size_t when;

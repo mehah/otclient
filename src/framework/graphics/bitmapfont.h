@@ -31,7 +31,7 @@
 class BitmapFont : public stdext::shared_object
 {
 public:
-    BitmapFont(std::string name) : m_name(std::move(name)) {}
+    BitmapFont(std::string_view name) : m_name(name) {}
 
     /// Load font from otml node
     void load(const OTMLNodePtr& fontNode);
