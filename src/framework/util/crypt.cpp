@@ -34,7 +34,7 @@
 #include <openssl/rsa.h>
 #endif
 
-static const std::string base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+static constexpr std::string_view base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static inline bool is_base64(unsigned char c) { return (isalnum(c) || (c == '+') || (c == '/')); }
 
 Crypt g_crypt;
@@ -230,8 +230,8 @@ std::string Crypt::_encrypt(const std::string_view decrypted_string, bool useMac
 
 std::string Crypt::_decrypt(const std::string_view encrypted_string, bool useMachineUUID)
 {
-    const std::string decoded = base64Decode(encrypted_string);
-    const std::string tmp = xorCrypt(decoded, getCryptKey(useMachineUUID));
+    const auto& decoded = base64Decode(encrypted_string);
+    const auto& tmp = xorCrypt(decoded, getCryptKey(useMachineUUID));
 
     if (tmp.length() >= 4) {
         const uint32 readsum = stdext::readULE32((const uint8*)tmp.data());

@@ -92,7 +92,7 @@ TexturePtr TextureManager::getTexture(const std::string_view fileName)
     TexturePtr texture;
 
     // before must resolve filename to full path
-    const std::string& filePath = g_resources.resolvePath(fileName);
+    const auto& filePath = g_resources.resolvePath(fileName);
 
     // check if the texture is already loaded
     const auto it = m_textures.find(filePath);
@@ -103,7 +103,7 @@ TexturePtr TextureManager::getTexture(const std::string_view fileName)
     // texture not found, load it
     if (!texture) {
         try {
-            const std::string filePathEx = g_resources.guessFilePath(filePath, "png");
+            const auto& filePathEx = g_resources.guessFilePath(filePath, "png");
 
             // load texture file data
             std::stringstream fin;

@@ -70,7 +70,7 @@ ModulePtr ModuleManager::discoverModule(const std::string_view moduleFile)
         const OTMLDocumentPtr doc = OTMLDocument::parse(moduleFile);
         const OTMLNodePtr moduleNode = doc->at("Module");
 
-        const std::string name = moduleNode->valueAt("name");
+        const auto& name = moduleNode->valueAt("name");
 
         bool push = false;
         module = getModule(name);

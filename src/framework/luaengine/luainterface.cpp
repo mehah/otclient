@@ -199,7 +199,7 @@ int LuaInterface::luaObjectGetEvent(LuaInterface* lua)
 {
     // stack: obj, key
     const LuaObjectPtr obj = lua->toObject(-2);
-    const std::string key = lua->toString(-1);
+    const auto& key = lua->toString(-1);
     assert(obj);
 
     lua->remove(-1); // removes key
@@ -242,7 +242,7 @@ int LuaInterface::luaObjectSetEvent(LuaInterface* lua)
 {
     // stack: obj, key, value
     const LuaObjectPtr obj = lua->toObject(-3);
-    const std::string key = lua->toString(-2);
+    const auto& key = lua->toString(-2);
     assert(obj);
 
     lua->remove(-2); // removes key
@@ -333,8 +333,8 @@ void LuaInterface::loadScript(const std::string_view fileName)
 
     filePath = g_resources.guessFilePath(filePath, "lua");
 
-    const std::string buffer = g_resources.readFileContents(filePath);
-    const std::string source = "@" + filePath;
+    const auto& buffer = g_resources.readFileContents(filePath);
+    const auto& source = "@" + filePath;
     loadBuffer(buffer, source);
 }
 
@@ -366,7 +366,7 @@ void LuaInterface::evaluateExpression(const std::string_view expression, const s
 {
     // evaluates the expression
     if (!expression.empty()) {
-        const std::string buffer = stdext::format("__exp = (%s)", expression);
+        const auto& buffer = stdext::format("__exp = (%s)", expression);
         loadBuffer(buffer, source);
         safeCall();
 
@@ -553,7 +553,7 @@ int LuaInterface::newSandboxEnv()
 int LuaInterface::luaScriptLoader(lua_State*)
 {
     // loads the script as a function
-    const std::string fileName = g_lua.popString();
+    const auto& fileName = g_lua.popString();
 
     try {
         g_lua.loadScript(fileName);
@@ -566,7 +566,7 @@ int LuaInterface::luaScriptLoader(lua_State*)
 
 int LuaInterface::lua_dofile(lua_State*)
 {
-    const std::string file = g_lua.popString();
+    const auto& file = g_lua.popString();
 
     try {
         g_lua.loadScript(file);
@@ -591,7 +591,7 @@ int LuaInterface::lua_dofiles(lua_State*)
         recursive = g_lua.popBoolean();
     }
 
-    const std::string directory = g_lua.popString();
+    const auto& directory = g_lua.popString();
     g_lua.loadFiles(directory, recursive, contains);
 
     return 0;
@@ -599,7 +599,7 @@ int LuaInterface::lua_dofiles(lua_State*)
 
 int LuaInterface::lua_loadfile(lua_State*)
 {
-    const std::string fileName = g_lua.popString();
+    const auto& fileName = g_lua.popString();
 
     try {
         g_lua.loadScript(fileName);

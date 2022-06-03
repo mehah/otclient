@@ -53,7 +53,7 @@ void UIItem::drawSelf(Fw::DrawPane drawPane)
         m_item->draw(dest, scaleFactor, true, Highlight(), TextureType::SMOOTH, m_color);
 
         if (m_font && (m_item->isStackable() || m_item->isChargeable()) && m_item->getCountOrSubType() > 1) {
-            const std::string count = std::to_string(m_item->getCountOrSubType());
+            const auto& count = std::to_string(m_item->getCountOrSubType());
             m_font->drawText(count, Rect(m_rect.topLeft(), m_rect.bottomRight() - Point(3, 0)), Color(231, 231, 231), Fw::AlignBottomRight);
         }
 

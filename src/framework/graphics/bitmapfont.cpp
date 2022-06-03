@@ -38,7 +38,7 @@ namespace
 void BitmapFont::load(const OTMLNodePtr& fontNode)
 {
     const OTMLNodePtr textureNode = fontNode->at("texture");
-    const std::string textureFile = stdext::resolve_path(textureNode->value(), textureNode->source());
+    const auto& textureFile = stdext::resolve_path(textureNode->value(), textureNode->source());
     const auto glyphSize = fontNode->valueAt<Size>("glyph-size");
     m_glyphHeight = fontNode->valueAt<int>("height");
     m_yOffset = fontNode->valueAt("y-offset", 0);

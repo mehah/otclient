@@ -72,14 +72,14 @@ bool ResourceManager::discoverWorkDir(const std::string_view existentFile)
 
 bool ResourceManager::setupUserWriteDir(const std::string_view appWriteDirName)
 {
-    const std::string userDir = getUserDir();
+    const auto& userDir = getUserDir();
     std::string dirName;
 #ifndef WIN32
     dirName = stdext::format(".%s", appWriteDirName);
 #else
     dirName = appWriteDirName;
 #endif
-    const std::string writeDir = userDir + dirName;
+    const auto& writeDir = userDir + dirName;
 
     if (!PHYSFS_setWriteDir(writeDir.data())) {
         if (!PHYSFS_setWriteDir(userDir.data()) || !PHYSFS_mkdir(dirName.data())) {
@@ -173,7 +173,7 @@ bool ResourceManager::directoryExists(const std::string_view directoryName)
 
 void ResourceManager::readFileStream(const std::string_view fileName, std::iostream& out)
 {
-    const std::string buffer = readFileContents(fileName);
+    const auto& buffer = readFileContents(fileName);
     if (buffer.length() == 0) {
         out.clear(std::ios::eofbit);
         return;
@@ -185,7 +185,7 @@ void ResourceManager::readFileStream(const std::string_view fileName, std::iostr
 
 std::string ResourceManager::readFileContents(const std::string_view fileName)
 {
-    const std::string fullPath = resolvePath(fileName);
+    const auto& fullPath = resolvePath(fileName);
 
     PHYSFS_File* file = PHYSFS_openRead(fullPath.data());
     if (!file)
@@ -240,7 +240,7 @@ bool ResourceManager::writeFileContents(const std::string_view fileName, const s
 
 FileStreamPtr ResourceManager::openFile(const std::string_view fileName)
 {
-    const std::string fullPath = resolvePath(fileName.data());
+    const auto& fullPath = resolvePath(fileName.data());
 
     PHYSFS_File* file = PHYSFS_openRead(fullPath.data());
     if (!file)
@@ -323,7 +323,7 @@ std::string ResourceManager::resolvePath(const std::string_view path)
     if (path.starts_with("/"))
         fullPath = path;
     else {
-        const std::string scriptPath = "/" + g_lua.getCurrentSourcePath();
+        const auto& scriptPath = "/" + g_lua.getCurrentSourcePath();
         if (!scriptPath.empty())
             fullPath += scriptPath + "/";
         fullPath += path;

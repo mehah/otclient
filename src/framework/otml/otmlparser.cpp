@@ -190,7 +190,7 @@ void OTMLParser::parseNode(const std::string_view data)
         node->setNull(true);
     else {
         if (value.starts_with("[") && value.ends_with("]")) {
-            const std::string tmp = value.substr(1, value.length() - 2);
+            const auto& tmp = value.substr(1, value.length() - 2);
             const std::vector tokens = stdext::split(tmp, ",");
             for (std::string v : tokens) {
                 stdext::trim(v);

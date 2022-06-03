@@ -52,7 +52,7 @@ bool FontManager::importFont(const std::string_view file)
         const OTMLDocumentPtr doc = OTMLDocument::parse(path);
         const OTMLNodePtr fontNode = doc->at("Font");
 
-        const std::string name = fontNode->valueAt("name");
+        const auto& name = fontNode->valueAt("name");
 
         // remove any font with the same name
         for (auto it = m_fonts.begin(); it != m_fonts.end(); ++it) {

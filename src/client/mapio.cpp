@@ -199,7 +199,7 @@ void Map::loadOtbm(const std::string_view fileName)
                         stdext::throw_exception("invalid town node.");
 
                     const uint32 townId = nodeTown->getU32();
-                    const std::string townName = nodeTown->getString();
+                    const auto& townName = nodeTown->getString();
 
                     Position townCoords;
                     townCoords.x = nodeTown->getU16();
