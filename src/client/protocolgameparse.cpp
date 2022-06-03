@@ -621,10 +621,10 @@ void ProtocolGame::parseStore(const InputMessagePtr& msg)
         if (g_game.getFeature(Otc::GameIngameStoreHighlights))
             msg->getU8(); // highlightState
 
-        std::vector<std::string> icons;
+        std::vector<std::string_view> icons;
         const int iconCount = msg->getU8();
         for (int j = 0; j < iconCount; ++j) {
-            icons.push_back(msg->getString().data());
+            icons.push_back(msg->getString());
         }
 
         // If this is a valid category name then
@@ -708,10 +708,10 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
             msg->getString(); // disabledReason
         }
 
-        std::vector<std::string> icons;
+        std::vector<std::string_view> icons;
         const int iconCount = msg->getU8();
         for (int j = 0; j < iconCount; ++j) {
-            icons.push_back(msg->getString().data());
+            icons.push_back(msg->getString());
         }
 
         const int subOffers = msg->getU16();
