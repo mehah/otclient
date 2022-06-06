@@ -126,6 +126,8 @@ private:
 class PoolFramed : public Pool
 {
 public:
+    PoolFramed(const FrameBufferPtr& fb) : m_framebuffer(fb) {};
+
     void onBeforeDraw(std::function<void()> f) { m_beforeDraw = std::move(f); }
     void onAfterDraw(std::function<void()> f) { m_afterDraw = std::move(f); }
     void resize(const Size& size) { m_framebuffer->resize(size); }
@@ -142,7 +144,7 @@ private:
     void updateStatus() { m_status.first = m_status.second; m_refreshTime.restart(); }
     void resetCurrentStatus() { m_status.second = 0; }
     bool hasModification(bool autoUpdateStatus = false);
-    bool hasFrameBuffer() const override { return m_framebuffer != nullptr; }
+    bool hasFrameBuffer() const override { return true; }
 
     PoolFramed* toPoolFramed() override { return this; }
 

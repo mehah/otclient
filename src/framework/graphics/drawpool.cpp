@@ -249,13 +249,12 @@ void DrawPool::createPools()
         const auto type = static_cast<PoolType>(i);
         Pool* pool;
         if (type == PoolType::MAP || type == PoolType::LIGHT || type == PoolType::FOREGROUND) {
-            pool = new PoolFramed;
-
-            const auto& frameBuffer = pool->toPoolFramed()->m_framebuffer
-                = g_framebuffers.createFrameBuffer(true);
+            const auto& frameBuffer = g_framebuffers.createFrameBuffer(true);
 
             if (type == PoolType::MAP) frameBuffer->disableBlend();
             else if (type == PoolType::LIGHT) frameBuffer->setCompositionMode(Painter::CompositionMode_Light);
+
+            pool = new PoolFramed{ frameBuffer };
         } else {
             pool = new Pool;
             pool->m_forceGrouping = true; // CREATURE_INFORMATION & TEXT
