@@ -44,7 +44,7 @@
 
 MapView::MapView()
 {
-    const auto mapPool = g_drawPool.get<PoolFramed>(PoolType::MAP);
+    auto* mapPool = g_drawPool.get<PoolFramed>(PoolType::MAP);
 
     mapPool->onBeforeDraw([&] {
         const Position cameraPosition = getCameraPosition();
@@ -99,6 +99,7 @@ MapView::~MapView()
 #ifndef NDEBUG
     assert(!g_app.isTerminated());
 #endif
+    m_lightView = nullptr;
 }
 
 void MapView::draw(const Rect& rect)
@@ -828,7 +829,7 @@ void MapView::setShader(const PainterShaderProgramPtr& shader, float fadein, flo
 
 void MapView::setDrawLights(bool enable)
 {
-    const auto& pool = g_drawPool.get<PoolFramed>(PoolType::LIGHT);
+    auto* pool = g_drawPool.get<PoolFramed>(PoolType::LIGHT);
     if (pool) pool->setEnable(enable);
 
     if (enable == m_drawLights) return;

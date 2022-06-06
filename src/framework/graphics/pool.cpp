@@ -103,6 +103,8 @@ void Pool::resetState()
     resetCompositionMode();
     resetOpacity();
     resetShaderProgram();
+    resetBlendEquation();
+
     m_indexToStartSearching = 0;
 
     if (hasFrameBuffer()) {

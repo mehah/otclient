@@ -86,7 +86,8 @@ void FrameBuffer::resize(const Size& size)
 
 void FrameBuffer::bind()
 {
-    g_painter->saveAndResetState();
+    m_bckResolution = g_painter->getResolution();
+
     internalBind();
     g_painter->setResolution(m_texture->getSize());
     g_painter->setAlphaWriting(m_useAlphaWriting);
@@ -95,7 +96,8 @@ void FrameBuffer::bind()
 void FrameBuffer::release()
 {
     internalRelease();
-    g_painter->restoreSavedState();
+
+    g_painter->setResolution(m_bckResolution);
 }
 
 void FrameBuffer::draw(const Rect& dest, const Rect& src)
@@ -113,6 +115,9 @@ void FrameBuffer::draw(const Rect& dest, const Rect& src)
     }
 
     if (m_disableBlend) glDisable(GL_BLEND);
+
+    g_painter->resetColor();
+
     g_painter->setCompositionMode(m_compositeMode);
     g_painter->setTexture(m_texture.get());
     g_painter->drawCoords(m_coordsBuffer, Painter::DrawMode::TriangleStrip);

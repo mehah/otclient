@@ -102,6 +102,7 @@ private:
 
     void resetClipRect() { m_state.clipRect = {}; }
     void resetCompositionMode() { m_state.compositionMode = Painter::CompositionMode_Normal; }
+    void resetBlendEquation() { m_state.blendEquation = Painter::BlendEquation_Add; }
     void resetOpacity() { m_state.opacity = 1.f; }
     void resetShaderProgram() { m_state.shaderProgram = nullptr; }
     void resetState();

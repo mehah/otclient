@@ -71,9 +71,9 @@ public:
     void pushTransformMatrix() override;
     void popTransformMatrix() override;
 
-    Matrix3 getTransformMatrix() { return m_transformMatrix; }
-    Matrix3 getProjectionMatrix() { return m_projectionMatrix; }
-    Matrix3 getTextureMatrix() { return m_textureMatrix; }
+    Matrix3 getTransformMatrix() override { return m_transformMatrix; }
+    Matrix3 getProjectionMatrix() override { return m_projectionMatrix; }
+    Matrix3 getTextureMatrix() override { return m_textureMatrix; }
     BlendEquation getBlendEquation() { return m_blendEquation; }
     PainterShaderProgram* getShaderProgram() { return m_shaderProgram; }
     bool getAlphaWriting() { return m_alphaWriting; }

@@ -76,7 +76,7 @@ private:
 
     TexturePtr m_texture, m_screenBackup;
 
-    Size m_oldViewportSize;
+    Size m_bckResolution;
 
     uint32 m_fbo, m_prevBoundFbo;
 

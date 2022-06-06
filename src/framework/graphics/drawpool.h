@@ -32,7 +32,7 @@ class DrawPool
 {
 public:
     template <class T>
-    std::shared_ptr<T> get(const PoolType type) { return std::static_pointer_cast<T>(m_pools[static_cast<uint8>(type)]); }
+    T* get(const PoolType type) { return static_cast<T*>(m_pools[static_cast<uint8>(type)]); }
 
     void use(PoolType type);
     void use(PoolType type, const Rect& dest, const Rect& src, Color colorClear = Color::alpha);
@@ -78,14 +78,14 @@ private:
     void updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method);
     void add(const Painter::PainterState& state, const Pool::DrawMethod& method, Painter::DrawMode drawMode = Painter::DrawMode::Triangles);
 
-    PoolFramedPtr poolFramed() { return std::dynamic_pointer_cast<PoolFramed>(m_currentPool); }
+    PoolFramed* poolFramed() { return static_cast<PoolFramed*>(m_currentPool); }
 
     Painter::PainterState generateState(const Color& color, const TexturePtr& texture = nullptr);
 
     CoordsBuffer m_coordsBuffer;
-    std::array<PoolPtr, static_cast<uint8>(PoolType::UNKNOW) + 1> m_pools;
+    std::array<Pool*, static_cast<uint8>(PoolType::UNKNOW) + 1> m_pools;
 
-    PoolPtr m_currentPool, n_unknowPool;
+    Pool* m_currentPool;
 
     friend class GraphicalApplication;
 };

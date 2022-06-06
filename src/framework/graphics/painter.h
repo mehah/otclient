@@ -129,6 +129,10 @@ public:
     Rect getClipRect() { return m_clipRect; }
     CompositionMode getCompositionMode() { return m_compositionMode; }
 
+    virtual Matrix3 getTransformMatrix() = 0;
+    virtual Matrix3 getProjectionMatrix() = 0;
+    virtual Matrix3 getTextureMatrix() = 0;
+
     virtual void setCompositionMode(CompositionMode compositionMode) = 0;
 
     virtual void pushTransformMatrix() = 0;
