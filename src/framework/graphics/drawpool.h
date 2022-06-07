@@ -72,11 +72,11 @@ private:
     void init();
     void terminate();
     void createPools();
-    void drawObject(Pool::DrawObject& obj);
+    void drawObject(const Pool* pool, Pool::DrawObject& obj);
     void updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method);
     void add(const Painter::PainterState& state, const Pool::DrawMethod& method, Painter::DrawMode drawMode = Painter::DrawMode::Triangles);
 
-    PoolFramed* poolFramed() { return static_cast<PoolFramed*>(m_currentPool); }
+    PoolFramed* poolFramed() { return m_currentPool->toPoolFramed(); }
 
     Painter::PainterState generateState(const Color& color, const TexturePtr& texture = nullptr);
 

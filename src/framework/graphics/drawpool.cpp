@@ -52,12 +52,7 @@ void DrawPool::add(const Painter::PainterState& state, const Pool::DrawMethod& m
         if (itFind != list.end()) {
             (*itFind).drawMethods.push_back(method);
         } else {
-            std::shared_ptr<CoordsBuffer> buffer;
-
-            if (!m_currentPool->hasFrameBuffer())
-                buffer = std::make_shared<CoordsBuffer>();
-
-            list.push_back(Pool::DrawObject{ state, Painter::DrawMode::Triangles, {method}, buffer });
+            list.push_back(Pool::DrawObject{ state, Painter::DrawMode::Triangles, {method} });
         }
 
         return;
@@ -100,7 +95,7 @@ void DrawPool::draw()
         if (pool->hasModification(true) && !pool->m_objects.empty()) {
             pf->m_framebuffer->bind();
             for (auto& obj : pool->m_objects)
-                drawObject(obj);
+                drawObject(pool, obj);
             pf->m_framebuffer->release();
         }
     }
@@ -119,7 +114,7 @@ void DrawPool::draw()
                 pool->m_cachedObjects = pool->m_objects;
 
             for (auto& obj : pool->m_cachedObjects) {
-                drawObject(obj);
+                drawObject(pool, obj);
             }
         }
 
@@ -127,7 +122,7 @@ void DrawPool::draw()
     }
 }
 
-void DrawPool::drawObject(Pool::DrawObject& obj)
+void DrawPool::drawObject(const Pool* pool, Pool::DrawObject& obj)
 {
     if (obj.action) {
         obj.action();
@@ -143,8 +138,11 @@ void DrawPool::drawObject(Pool::DrawObject& obj)
         g_painter->setTexture(obj.state.texture.get());
     }
 
-    const bool isGlobalCoord = obj.coordsBuffer == nullptr;
+    if (!pool->hasFrameBuffer() && obj.coordsBuffer == nullptr) {
+        obj.coordsBuffer = std::make_shared<CoordsBuffer>();
+    }
 
+    const bool isGlobalCoord = obj.coordsBuffer == nullptr;
     auto& buffer = isGlobalCoord ? m_coordsBuffer : *obj.coordsBuffer;
 
     if (buffer.getVertexCount() == 0) {
