@@ -87,15 +87,15 @@ void Pool::setShaderProgram(const PainterShaderProgramPtr& shaderProgram, const 
 
 void Pool::resetState()
 {
-    resetClipRect();
-    resetCompositionMode();
     resetOpacity();
+    resetClipRect();
     resetShaderProgram();
     resetBlendEquation();
+    resetCompositionMode();
 
-    m_indexToStartSearching = 0;
     m_autoUpdate = false;
     m_status.second = 0;
+    m_indexToStartSearching = 0;
 }
 
 bool Pool::hasModification(const bool autoUpdateStatus)

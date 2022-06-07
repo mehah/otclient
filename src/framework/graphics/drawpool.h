@@ -46,19 +46,19 @@ public:
     void addBoundingRect(const Rect& dest, Color color = Color::white, int innerLineWidth = 1);
     void addAction(std::function<void()> action);
 
-    void setCompositionMode(const Painter::CompositionMode mode, const int pos = -1) { m_currentPool->setCompositionMode(mode, pos); }
-    void setBlendEquation(Painter::BlendEquation equation, const int pos = -1) { m_currentPool->setBlendEquation(equation, pos); }
-    void setClipRect(const Rect& clipRect, const int pos = -1) { m_currentPool->setClipRect(clipRect, pos); }
     void setOpacity(const float opacity, const int pos = -1) { m_currentPool->setOpacity(opacity, pos); }
+    void setClipRect(const Rect& clipRect, const int pos = -1) { m_currentPool->setClipRect(clipRect, pos); }
+    void setBlendEquation(Painter::BlendEquation equation, const int pos = -1) { m_currentPool->setBlendEquation(equation, pos); }
+    void setCompositionMode(const Painter::CompositionMode mode, const int pos = -1) { m_currentPool->setCompositionMode(mode, pos); }
     void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, const int pos = -1, const std::function<void()>& action = nullptr) { m_currentPool->setShaderProgram(shaderProgram, pos, action); }
 
     float getOpacity(const int pos = -1) { return m_currentPool->getOpacity(pos); }
 
-    void resetClipRect() { m_currentPool->resetClipRect(); }
-    void resetCompositionMode() { m_currentPool->resetCompositionMode(); }
-    void resetOpacity() { m_currentPool->resetOpacity(); }
     void resetState() { m_currentPool->resetState(); }
+    void resetOpacity() { m_currentPool->resetOpacity(); }
+    void resetClipRect() { m_currentPool->resetClipRect(); }
     void resetShaderProgram() { m_currentPool->resetShaderProgram(); }
+    void resetCompositionMode() { m_currentPool->resetCompositionMode(); }
 
     void forceGrouping(const bool force) { m_currentPool->m_forceGrouping = force; }
     bool isForcingGrouping() const { return m_currentPool->m_forceGrouping; }
