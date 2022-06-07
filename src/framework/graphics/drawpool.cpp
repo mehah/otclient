@@ -301,21 +301,7 @@ void DrawPool::use(const PoolType type, const Rect& dest, const Rect& src, const
     pool->m_dest = dest;
     pool->m_src = src;
     pool->m_state.alphaWriting = false;
-
-    if (colorClear != Color::alpha)
-        g_drawPool.addFilledRect(Rect(0, 0, pool->getSize()), colorClear);
-}
-
-void DrawPool::drawTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src)
-{
-    if (dest.isEmpty() || src.isEmpty() || texture->isEmpty())
-        return;
-
-    g_painter->setTexture(texture.get());
-
-    m_coordsBuffer.addQuad(dest, src);
-    g_painter->drawCoords(m_coordsBuffer, Painter::DrawMode::TriangleStrip);
-    m_coordsBuffer.clear();
+    pool->m_framebuffer->m_colorClear = colorClear;
 }
 
 void DrawPool::updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method)

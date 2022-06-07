@@ -46,8 +46,6 @@ public:
     void addBoundingRect(const Rect& dest, Color color = Color::white, int innerLineWidth = 1);
     void addAction(std::function<void()> action);
 
-    void drawTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src);
-
     void setCompositionMode(const Painter::CompositionMode mode, const int pos = -1) { m_currentPool->setCompositionMode(mode, pos); }
     void setBlendEquation(Painter::BlendEquation equation, const int pos = -1) { m_currentPool->setBlendEquation(equation, pos); }
     void setClipRect(const Rect& clipRect, const int pos = -1) { m_currentPool->setClipRect(clipRect, pos); }

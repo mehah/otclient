@@ -115,10 +115,14 @@ void FrameBuffer::draw(const Rect& dest, const Rect& src)
     }
 
     if (m_disableBlend) glDisable(GL_BLEND);
+    g_painter->setCompositionMode(m_compositeMode);
+
+    if (m_colorClear != Color::alpha) {
+        g_painter->setColor(m_colorClear);
+        g_painter->drawCoords(m_coordsBuffer, Painter::DrawMode::TriangleStrip);
+    }
 
     g_painter->resetColor();
-
-    g_painter->setCompositionMode(m_compositeMode);
     g_painter->setTexture(m_texture.get());
     g_painter->drawCoords(m_coordsBuffer, Painter::DrawMode::TriangleStrip);
     g_painter->resetCompositionMode();
@@ -154,7 +158,8 @@ void FrameBuffer::internalRelease()
         if (m_backuping) {
             glDisable(GL_BLEND);
             g_painter->resetColor();
-            g_drawPool.drawTexturedRect(screenRect, m_screenBackup, screenRect);
+            g_painter->setTexture(m_screenBackup.get());
+            g_painter->drawCoords(m_coordsBuffer, Painter::DrawMode::TriangleStrip);
             glEnable(GL_BLEND);
         }
     }

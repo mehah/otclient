@@ -63,9 +63,10 @@ public:
 protected:
     FrameBuffer(bool useAlphaWriting);
 
+    Color m_colorClear{ Color::alpha };
+
     friend class FrameBufferManager;
-    friend class Pool;
-    friend class PoolFramed;
+    friend class DrawPool;
 
 private:
     void internalCreate();
