@@ -93,7 +93,7 @@ void DrawPool::draw()
 
         const auto& pf = pool->toPoolFramed();
         if (pool->hasModification(true) && !pool->m_objects.empty()) {
-            pf->m_framebuffer->bind();
+            pf->m_framebuffer->bind(pf->m_dest, pf->m_src);
             for (auto& obj : pool->m_objects)
                 drawObject(pool, obj);
             pf->m_framebuffer->release();
@@ -107,7 +107,7 @@ void DrawPool::draw()
             const auto* const pf = pool->toPoolFramed();
 
             if (pf->m_beforeDraw) pf->m_beforeDraw();
-            pf->m_framebuffer->draw(pf->m_dest, pf->m_src);
+            pf->m_framebuffer->draw();
             if (pf->m_afterDraw) pf->m_afterDraw();
         } else {
             if (pool->hasModification(true))

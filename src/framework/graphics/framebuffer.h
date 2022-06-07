@@ -45,8 +45,8 @@ public:
 
     void release();
     void resize(const Size& size);
-    void bind();
-    void draw(const Rect& dest, const Rect& src);
+    void bind(const Rect& dest, const Rect& src);
+    void draw();
 
     void setSmooth(bool enabled) { m_smooth = enabled; m_texture = nullptr; }
     void setBackuping(bool enabled) { m_backuping = enabled; }
@@ -89,5 +89,5 @@ private:
         m_disableBlend{ false };
 
     Rect m_dest, m_src;
-    CoordsBuffer m_coordsBuffer;
+    CoordsBuffer m_coordsBuffer, m_screenCoordsBuffer;
 };
