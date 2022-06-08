@@ -110,7 +110,9 @@ void DrawPool::draw()
             pf->m_framebuffer->draw();
             if (pf->m_afterDraw) pf->m_afterDraw();
         } else {
-            if (pool->hasModification(true))
+            if (pool->m_objects.empty())
+                pool->m_cachedObjects.clear();
+            else if (pool->hasModification(true))
                 pool->m_cachedObjects = pool->m_objects;
 
             for (auto& obj : pool->m_cachedObjects) {
