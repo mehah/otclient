@@ -308,7 +308,7 @@ void DrawPool::updateHash(const Painter::PainterState& state, const Pool::DrawMe
 
     if (state.texture) {
         // TODO: use uniqueID id when applying multithreading, not forgetting that in the APNG texture, the id changes every frame.
-        stdext::hash_combine(hash, state.texture->getId());
+        stdext::hash_combine(hash, state.texture->getId() || state.texture->getUniqueId());
     }
 
     if (state.opacity < 1.f)
