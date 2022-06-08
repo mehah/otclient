@@ -176,9 +176,7 @@ std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::stri
     return list;
 }
 
-const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string_view text,
-                                                               Fw::AlignmentFlag align,
-                                                               Size* textBoxSize)
+const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string_view text, Fw::AlignmentFlag align, Size* textBoxSize)
 {
     const int textLength = text.length();
     int maxLineWidth = 0;

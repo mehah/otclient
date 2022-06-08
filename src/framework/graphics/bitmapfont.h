@@ -71,9 +71,9 @@ private:
     void calculateGlyphsWidthsAutomatically(const ImagePtr& image, const Size& glyphSize);
 
     std::string m_name;
-    int m_glyphHeight;
-    int m_firstGlyph;
-    int m_yOffset;
+    int m_glyphHeight{ 0 };
+    int m_firstGlyph{ 0 };
+    int m_yOffset{ 0 };
     Size m_glyphSpacing;
     TexturePtr m_texture;
     Rect m_glyphsTextureCoords[256];

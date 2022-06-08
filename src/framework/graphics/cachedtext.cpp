@@ -21,7 +21,6 @@
  */
 
 #include "cachedtext.h"
-#include "bitmapfont.h"
 #include "fontmanager.h"
 #include <framework/graphics/drawpool.h>
 
@@ -62,4 +61,29 @@ void CachedText::wrapText(int maxWidth)
         m_text = m_font->wrapText(m_text, maxWidth);
         update();
     }
+}
+
+void CachedText::setFont(const BitmapFontPtr& font)
+{
+    if (m_font == font)
+        return;
+
+    m_font = font;
+    update();
+}
+void CachedText::setText(const std::string_view text)
+{
+    if (m_text == text)
+        return;
+
+    m_text = text;
+    update();
+}
+void CachedText::setAlign(const Fw::AlignmentFlag align)
+{
+    if (m_align == align)
+        return;
+
+    m_align = align;
+    update();
 }

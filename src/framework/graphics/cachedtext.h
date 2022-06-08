@@ -32,9 +32,9 @@ public:
     void draw(const Rect& rect, Color color);
 
     void wrapText(int maxWidth);
-    void setFont(const BitmapFontPtr& font) { m_font = font; update(); }
-    void setText(const std::string_view text) { m_text = text; update(); }
-    void setAlign(const Fw::AlignmentFlag align) { m_align = align; update(); }
+    void setFont(const BitmapFontPtr& font);
+    void setText(const std::string_view text);
+    void setAlign(const Fw::AlignmentFlag align);
 
     Size getTextSize() { return m_textSize; }
     std::string getText() const { return m_text; }
