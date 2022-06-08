@@ -39,8 +39,14 @@ void DrawPool::terminate()
     }
 }
 
-void DrawPool::add(const Painter::PainterState& state, const Pool::DrawMethod& method, const Painter::DrawMode drawMode)
+void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, const Painter::DrawMode drawMode)
 {
+    const auto& state = Painter::PainterState{
+       g_painter->getResolution() , g_painter->getTransformMatrix(), g_painter->getProjectionMatrix(), g_painter->getTextureMatrix(),
+        color, m_currentPool->m_state.opacity, m_currentPool->m_state.compositionMode, m_currentPool->m_state.blendEquation,
+        m_currentPool->m_state.clipRect,        texture, m_currentPool->m_state.shaderProgram, m_currentPool->m_state.alphaWriting
+    };
+
     updateHash(state, method);
 
     auto& list = m_currentPool->m_objects;
@@ -52,7 +58,7 @@ void DrawPool::add(const Painter::PainterState& state, const Pool::DrawMethod& m
         if (itFind != list.end()) {
             (*itFind).drawMethods.push_back(method);
         } else {
-            list.push_back(Pool::DrawObject{ state, Painter::DrawMode::Triangles, {method} });
+            list.push_back({ state, Painter::DrawMode::Triangles, {method} });
         }
 
         return;
@@ -82,7 +88,7 @@ void DrawPool::add(const Painter::PainterState& state, const Pool::DrawMethod& m
         }
     }
 
-    list.push_back(Pool::DrawObject{ state, drawMode, {method} });
+    list.push_back({ state, drawMode, {method} });
 }
 
 void DrawPool::draw()
@@ -191,7 +197,7 @@ void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, cons
         .dest = originalDest
     };
 
-    add(generateState(color, texture), method, Painter::DrawMode::TriangleStrip);
+    add(color, texture, method, Painter::DrawMode::TriangleStrip);
 }
 
 void DrawPool::addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color color)
@@ -201,7 +207,7 @@ void DrawPool::addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& tex
 
     const Pool::DrawMethod method{ Pool::DrawMethodType::UPSIDEDOWN_RECT, std::make_pair(dest, src) };
 
-    add(generateState(color, texture), method, Painter::DrawMode::TriangleStrip);
+    add(color, texture, method, Painter::DrawMode::TriangleStrip);
 }
 
 void DrawPool::addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color color)
@@ -211,7 +217,7 @@ void DrawPool::addTexturedRepeatedRect(const Rect& dest, const TexturePtr& textu
 
     const Pool::DrawMethod method{ Pool::DrawMethodType::REPEATED_RECT,std::make_pair(dest, src) };
 
-    add(generateState(color, texture), method);
+    add(color, texture, method);
 }
 
 void DrawPool::addFilledRect(const Rect& dest, const Color color)
@@ -221,7 +227,7 @@ void DrawPool::addFilledRect(const Rect& dest, const Color color)
 
     const Pool::DrawMethod method{ Pool::DrawMethodType::RECT,std::make_pair(dest, Rect()) };
 
-    add(generateState(color), method);
+    add(color, nullptr, method);
 }
 
 void DrawPool::addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color color)
@@ -231,7 +237,7 @@ void DrawPool::addFilledTriangle(const Point& a, const Point& b, const Point& c,
 
     const Pool::DrawMethod method{ .type = Pool::DrawMethodType::TRIANGLE, .points = std::make_tuple(a, b, c) };
 
-    add(generateState(color), method);
+    add(color, nullptr, method);
 }
 
 void DrawPool::addBoundingRect(const Rect& dest, const Color color, int innerLineWidth)
@@ -245,21 +251,12 @@ void DrawPool::addBoundingRect(const Rect& dest, const Color color, int innerLin
         .intValue = static_cast<uint16>(innerLineWidth)
     };
 
-    add(generateState(color), method);
+    add(color, nullptr, method);
 }
 
 void DrawPool::addAction(std::function<void()> action)
 {
     m_currentPool->m_objects.push_back(Pool::DrawObject{ .action = std::move(action) });
-}
-
-Painter::PainterState DrawPool::generateState(const Color& color, const TexturePtr& texture)
-{
-    return Painter::PainterState{
-       g_painter->getResolution() , g_painter->getTransformMatrix(), g_painter->getProjectionMatrix(), g_painter->getTextureMatrix(),
-        color, m_currentPool->m_state.opacity, m_currentPool->m_state.compositionMode, m_currentPool->m_state.blendEquation, m_currentPool->m_state.clipRect,
-        texture, m_currentPool->m_state.shaderProgram, m_currentPool->m_state.alphaWriting
-    };
 }
 
 void DrawPool::createPools()

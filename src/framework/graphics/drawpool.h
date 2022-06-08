@@ -74,11 +74,9 @@ private:
     void createPools();
     void drawObject(const Pool* pool, Pool::DrawObject& obj);
     void updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method);
-    void add(const Painter::PainterState& state, const Pool::DrawMethod& method, Painter::DrawMode drawMode = Painter::DrawMode::Triangles);
+    void add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, Painter::DrawMode drawMode = Painter::DrawMode::Triangles);
 
     PoolFramed* poolFramed() { return m_currentPool->toPoolFramed(); }
-
-    Painter::PainterState generateState(const Color& color, const TexturePtr& texture = nullptr);
 
     CoordsBuffer m_coordsBuffer;
     std::array<Pool*, static_cast<uint8>(PoolType::UNKNOW) + 1> m_pools;
