@@ -36,24 +36,24 @@ void CachedText::draw(const Rect& rect, const Color color)
     if (!m_font)
         return;
 
-    if (m_textMustRecache || m_textCachedScreenCoords != rect) {
-        m_textMustRecache = false;
-        m_textCachedScreenCoords = rect;
+    if (m_textScreenCoords != rect) {
+        m_textScreenCoords = rect;
 
-        m_textCoordsCache.clear();
-        m_textCoordsCache = m_font->getDrawTextCoords(m_text, rect, m_align);
+        m_TextureCoords.clear();
+        m_TextureCoords = m_font->getDrawTextCoords(m_text, m_textSize, m_align, rect, m_glyphsPositions);
     }
 
-    for (const auto& fontRect : m_textCoordsCache)
-        g_drawPool.addTexturedRect(fontRect.first, m_font->getTexture(), fontRect.second, color);
+    for (const auto& [screenCoords, textureCoords] : m_TextureCoords)
+        g_drawPool.addTexturedRect(screenCoords, m_font->getTexture(), textureCoords, color);
 }
 
 void CachedText::update()
 {
-    if (m_font)
-        m_textSize = m_font->calculateTextRectSize(m_text);
+    if (m_font) {
+        m_glyphsPositions = m_font->calculateGlyphsPositions(m_text, Fw::AlignTopLeft, &m_textSize);
+    }
 
-    m_textMustRecache = true;
+    m_textScreenCoords = {};
 }
 
 void CachedText::wrapText(int maxWidth)

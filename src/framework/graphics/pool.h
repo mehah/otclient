@@ -64,7 +64,6 @@ protected:
         Point dest;
 
         uint16 intValue{ 0 };
-        size_t hash{ 0 };
     };
 
     struct DrawObject

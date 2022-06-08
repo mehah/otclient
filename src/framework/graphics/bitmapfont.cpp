@@ -94,12 +94,14 @@ void BitmapFont::drawText(const std::string_view text, const Point& startPos, co
 
 void BitmapFont::drawText(const std::string_view text, const Rect& screenCoords, const Color color, Fw::AlignmentFlag align)
 {
-    for (const auto& rects : getDrawTextCoords(text, screenCoords, align)) {
+    Size textBoxSize;
+    const auto& glyphsPositions = calculateGlyphsPositions(text, align, &textBoxSize);
+    for (const auto& rects : getDrawTextCoords(text, textBoxSize, align, screenCoords, glyphsPositions)) {
         g_drawPool.addTexturedRect(rects.first, m_texture, rects.second, color);
     }
 }
 
-std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::string_view text, const Rect& screenCoords, Fw::AlignmentFlag align)
+std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::string_view text, const Size& textBoxSize, Fw::AlignmentFlag align, const Rect& screenCoords, const std::vector<Point>& glyphsPositions)
 {
     std::vector<std::pair<Rect, Rect>> list;
     // prevent glitches from invalid rects
@@ -107,10 +109,6 @@ std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::stri
         return list;
 
     const int textLenght = text.length();
-
-    // map glyphs positions
-    Size textBoxSize;
-    const auto& glyphsPositions = calculateGlyphsPositions(text, align, &textBoxSize);
 
     for (int i = 0; i < textLenght; ++i) {
         const int glyph = static_cast<uchar>(text[i]);

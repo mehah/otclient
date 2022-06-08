@@ -336,7 +336,6 @@ void DrawPool::updateHash(const Painter::PainterState& state, const Pool::DrawMe
     if (!c.isNull()) stdext::hash_combine(hash, c.hash());
 
     if (method.intValue) stdext::hash_combine(hash, method.intValue);
-    if (method.hash) stdext::hash_combine(hash, method.hash);
 
     stdext::hash_combine(m_currentPool->m_status.second, hash);
 }

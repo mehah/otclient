@@ -44,13 +44,12 @@ public:
 private:
     void update();
 
+    std::vector<std::pair<Rect, Rect>> m_TextureCoords;
+    std::vector<Point> m_glyphsPositions;
+
     std::string m_text;
     Size m_textSize;
-    Rect m_textCachedScreenCoords;
+    Rect m_textScreenCoords;
     BitmapFontPtr m_font;
     Fw::AlignmentFlag m_align;
-
-    bool m_textMustRecache{ true };
-
-    std::vector<std::pair<Rect, Rect>> m_textCoordsCache;
 };
