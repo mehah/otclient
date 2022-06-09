@@ -42,9 +42,9 @@ void DrawPool::terminate()
 void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, const Painter::DrawMode drawMode)
 {
     const auto& state = Painter::PainterState{
-       g_painter->getTransformMatrix(),
-        color, m_currentPool->m_state.opacity, m_currentPool->m_state.compositionMode, m_currentPool->m_state.blendEquation,
-        m_currentPool->m_state.clipRect,        texture, m_currentPool->m_state.shaderProgram
+       g_painter->getTransformMatrix(), color, m_currentPool->m_state.opacity,
+       m_currentPool->m_state.compositionMode, m_currentPool->m_state.blendEquation,
+        m_currentPool->m_state.clipRect, texture, m_currentPool->m_state.shaderProgram
     };
 
     updateHash(state, method);
