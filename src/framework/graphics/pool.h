@@ -87,7 +87,6 @@ private:
         Painter::BlendEquation blendEquation{ Painter::BlendEquation_Add };
         Rect clipRect;
         float opacity{ 1.f };
-        bool alphaWriting{ true };
         PainterShaderProgram* shaderProgram{ nullptr };
         std::function<void()> action{ nullptr };
     };

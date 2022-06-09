@@ -38,13 +38,8 @@ public:
     void resetBlendEquation() { setBlendEquation(BlendEquation_Add); }
     void resetTexture() { setTexture(nullptr); }
     void resetAlphaWriting() { setAlphaWriting(false); }
-    void resetTransformMatrix() { setTransformMatrix(Matrix3()); }
+    void resetTransformMatrix() { setTransformMatrix({}); }
 
-    void resetState() override;
-    void saveState() override;
-    void saveAndResetState() override;
-    void restoreSavedState() override;
-    PainterState getCurrentState() override;
     void executeState(const PainterState& state) override;
 
     void bind() override { refreshState(); }
@@ -93,12 +88,8 @@ protected:
     Matrix3 m_projectionMatrix;
     Matrix3 m_textureMatrix;
 
-    BlendEquation m_blendEquation;
-    Texture* m_texture;
-    bool m_alphaWriting;
-
-    PainterState m_olderStates[10];
-    int m_oldStateIndex;
-
-    uint m_glTextureId;
+    BlendEquation m_blendEquation{ BlendEquation_Add };
+    Texture* m_texture{ nullptr };
+    bool m_alphaWriting{ false };
+    uint m_glTextureId{ 0 };
 };

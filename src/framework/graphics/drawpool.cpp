@@ -42,9 +42,9 @@ void DrawPool::terminate()
 void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, const Painter::DrawMode drawMode)
 {
     const auto& state = Painter::PainterState{
-       g_painter->getResolution() , g_painter->getTransformMatrix(), g_painter->getProjectionMatrix(), g_painter->getTextureMatrix(),
+       g_painter->getTransformMatrix(),
         color, m_currentPool->m_state.opacity, m_currentPool->m_state.compositionMode, m_currentPool->m_state.blendEquation,
-        m_currentPool->m_state.clipRect,        texture, m_currentPool->m_state.shaderProgram, m_currentPool->m_state.alphaWriting
+        m_currentPool->m_state.clipRect,        texture, m_currentPool->m_state.shaderProgram
     };
 
     updateHash(state, method);
@@ -297,7 +297,6 @@ void DrawPool::use(const PoolType type, const Rect& dest, const Rect& src, const
 
     pool->m_dest = dest;
     pool->m_src = src;
-    pool->m_state.alphaWriting = false;
     pool->m_framebuffer->m_colorClear = colorClear;
 }
 
