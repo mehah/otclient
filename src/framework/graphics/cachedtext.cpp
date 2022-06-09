@@ -24,11 +24,7 @@
 #include "fontmanager.h"
 #include <framework/graphics/drawpool.h>
 
-CachedText::CachedText()
-{
-    m_font = g_fonts.getDefaultFont();
-    m_align = Fw::AlignCenter;
-}
+CachedText::CachedText() : m_font(g_fonts.getDefaultFont()), m_align(Fw::AlignCenter) {}
 
 void CachedText::draw(const Rect& rect, const Color color)
 {
@@ -57,10 +53,11 @@ void CachedText::update()
 
 void CachedText::wrapText(int maxWidth)
 {
-    if (m_font) {
-        m_text = m_font->wrapText(m_text, maxWidth);
-        update();
-    }
+    if (!m_font)
+        return;
+
+    m_text = m_font->wrapText(m_text, maxWidth);
+    update();
 }
 
 void CachedText::setFont(const BitmapFontPtr& font)

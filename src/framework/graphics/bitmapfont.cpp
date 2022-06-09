@@ -40,11 +40,12 @@ void BitmapFont::load(const OTMLNodePtr& fontNode)
     const OTMLNodePtr textureNode = fontNode->at("texture");
     const auto& textureFile = stdext::resolve_path(textureNode->value(), textureNode->source());
     const auto glyphSize = fontNode->valueAt<Size>("glyph-size");
+    const int spaceWidth = fontNode->valueAt("space-width", glyphSize.width());
+
     m_glyphHeight = fontNode->valueAt<int>("height");
     m_yOffset = fontNode->valueAt("y-offset", 0);
     m_firstGlyph = fontNode->valueAt("first-glyph", 32);
     m_glyphSpacing = fontNode->valueAt("spacing", Size(0));
-    const int spaceWidth = fontNode->valueAt("space-width", glyphSize.width());
 
     // load font texture
     m_texture = g_textures.getTexture(textureFile);

@@ -69,8 +69,8 @@ protected:
 
     const uint m_uniqueId;
 
-    uint m_id;
-    ticks_t m_time;
+    uint m_id{ 0 };
+    ticks_t m_time{ 0 };
     Size m_size, m_glSize;
 
     Matrix3 m_transformMatrix;

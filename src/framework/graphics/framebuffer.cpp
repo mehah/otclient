@@ -31,10 +31,9 @@
 
 uint FrameBuffer::boundFbo = 0;
 
-FrameBuffer::FrameBuffer(const bool useAlphaWriting)
+FrameBuffer::FrameBuffer(const bool useAlphaWriting) :m_useAlphaWriting(useAlphaWriting)
 {
     internalCreate();
-    m_useAlphaWriting = useAlphaWriting;
 }
 
 void FrameBuffer::internalCreate()
@@ -75,12 +74,11 @@ void FrameBuffer::resize(const Size& size)
         const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if (status != GL_FRAMEBUFFER_COMPLETE)
             g_logger.fatal("Unable to setup framebuffer object");
+
         internalRelease();
-    } else {
-        if (m_backuping) {
-            m_screenBackup = TexturePtr(new Texture(size));
-            m_screenBackup->setUpsideDown(true);
-        }
+    } else if (m_backuping) {
+        m_screenBackup = TexturePtr(new Texture(size));
+        m_screenBackup->setUpsideDown(true);
     }
 }
 
