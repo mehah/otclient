@@ -42,7 +42,7 @@ void DrawPool::terminate()
 void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, const Painter::DrawMode drawMode)
 {
     const auto& state = Painter::PainterState{
-       g_painter->getTransformMatrix(), color, m_currentPool->m_state.opacity,
+       g_painter->getTransformMatrixRef(), color, m_currentPool->m_state.opacity,
        m_currentPool->m_state.compositionMode, m_currentPool->m_state.blendEquation,
         m_currentPool->m_state.clipRect, texture, m_currentPool->m_state.shaderProgram
     };
@@ -256,7 +256,7 @@ void DrawPool::addBoundingRect(const Rect& dest, const Color color, int innerLin
 
 void DrawPool::addAction(std::function<void()> action)
 {
-    m_currentPool->m_objects.push_back(Pool::DrawObject{ .action = std::move(action) });
+    m_currentPool->m_objects.push_back(Pool::DrawObject{ .state = NULL_STATE,.action = std::move(action) });
 }
 
 void DrawPool::createPools()

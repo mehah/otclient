@@ -74,6 +74,8 @@ public:
     bool getAlphaWriting() { return m_alphaWriting; }
 
 protected:
+    Matrix3& getTransformMatrixRef() override { return m_transformMatrix; }
+
     void updateGlTexture();
     void updateGlCompositionMode();
     void updateGlBlendEquation();

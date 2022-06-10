@@ -83,6 +83,8 @@ private:
 
     Pool* m_currentPool;
 
+    Painter::PainterState NULL_STATE;
+
     friend class GraphicalApplication;
 };
 

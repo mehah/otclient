@@ -120,7 +120,7 @@ private:
 
     State m_state;
 
-    PoolType m_type;
+    PoolType m_type{ PoolType::UNKNOW };
 
     Timer m_refreshTime;
 

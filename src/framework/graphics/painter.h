@@ -137,6 +137,8 @@ public:
     virtual bool hasShaders() = 0;
 
 protected:
+    virtual Matrix3& getTransformMatrixRef() = 0;
+
     float m_opacity{ 1.f };
 
     PainterShaderProgram* m_shaderProgram{ nullptr };
@@ -144,6 +146,8 @@ protected:
     Color m_color{ Color::white };
     Size m_resolution;
     Rect m_clipRect;
+
+    friend class DrawPool;
 };
 
 extern Painter* g_painter;
