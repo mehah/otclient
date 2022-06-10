@@ -148,20 +148,17 @@ void MapView::drawFloor()
 
             const auto& map = m_cachedVisibleTiles[z];
 
-            g_drawPool.startPosition();
-            {
-                for (const auto& tile : map.grounds) {
-                    if (!tile->canRender(m_drawViewportEdge, cameraPosition, m_viewport, lightView))
-                        continue;
+            for (const auto& tile : map.grounds) {
+                if (!tile->canRender(m_drawViewportEdge, cameraPosition, m_viewport, lightView))
+                    continue;
 
-                    if (alwaysTransparent)
-                        g_drawPool.setOpacity(tile->getPosition().isInRange(_camera, TRANSPARENT_FLOOR_VIEW_RANGE, TRANSPARENT_FLOOR_VIEW_RANGE, true) ? .16 : .7);
+                if (alwaysTransparent)
+                    g_drawPool.setOpacity(tile->getPosition().isInRange(_camera, TRANSPARENT_FLOOR_VIEW_RANGE, TRANSPARENT_FLOOR_VIEW_RANGE, true) ? .16 : .7);
 
-                    tile->drawGround(transformPositionTo2D(tile->getPosition(), cameraPosition), m_scaleFactor, lightView);
+                tile->drawGround(transformPositionTo2D(tile->getPosition(), cameraPosition), m_scaleFactor, lightView);
 
-                    if (alwaysTransparent)
-                        g_drawPool.resetOpacity();
-                }
+                if (alwaysTransparent)
+                    g_drawPool.resetOpacity();
             }
 
             for (const auto& tile : map.surfaces) {
@@ -177,20 +174,13 @@ void MapView::drawFloor()
                     g_drawPool.resetOpacity();
             }
 
-            g_drawPool.startPosition();
-            {
-                for (const auto& tile : map.effects) {
-                    for (const auto& effect : tile->getEffects()) {
-                        effect->drawEffect(transformPositionTo2D(effect->getPosition(), cameraPosition), m_scaleFactor, lightView);
-                    }
+            for (const auto& tile : map.effects) {
+                for (const auto& effect : tile->getEffects()) {
+                    effect->drawEffect(transformPositionTo2D(effect->getPosition(), cameraPosition), m_scaleFactor, lightView);
                 }
             }
-
-            g_drawPool.startPosition();
-            {
-                for (const MissilePtr& missile : g_map.getFloorMissiles(z))
-                    missile->drawMissile(transformPositionTo2D(missile->getPosition(), cameraPosition), m_scaleFactor, lightView);
-            }
+            for (const MissilePtr& missile : g_map.getFloorMissiles(z))
+                missile->drawMissile(transformPositionTo2D(missile->getPosition(), cameraPosition), m_scaleFactor, lightView);
 
             if (m_shadowFloorIntensity > 0 && z == cameraPosition.z + 1) {
                 g_drawPool.addFilledRect(m_rectDimension, Color::black);
@@ -219,6 +209,8 @@ void MapView::drawFloor()
 
             if (canFloorFade())
                 g_drawPool.resetOpacity();
+
+            g_drawPool.next();
         }
 
         if (m_rectCache.rect.contains(g_window.getMousePosition())) {

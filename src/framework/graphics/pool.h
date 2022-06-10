@@ -106,7 +106,7 @@ private:
     void resetCompositionMode() { m_state.compositionMode = Painter::CompositionMode_Normal; }
     void resetBlendEquation() { m_state.blendEquation = Painter::BlendEquation_Add; }
 
-    void startPosition() { m_indexToStartSearching = m_objects.size(); }
+    void next() { m_drawingPointer.clear(); }
 
     virtual bool hasFrameBuffer() const { return false; };
     virtual PoolFramed* toPoolFramed() { return nullptr; }
@@ -124,11 +124,11 @@ private:
 
     Timer m_refreshTime;
 
-    uint16_t m_indexToStartSearching{ 0 };
-
     std::pair<size_t, size_t> m_status{ 0,0 };
 
     std::vector<DrawObject> m_objects, m_cachedObjects;
+
+    std::unordered_map<uint16, size_t> m_drawingPointer;
 
     friend class DrawPool;
 };

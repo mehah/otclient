@@ -95,7 +95,7 @@ void Pool::resetState()
 
     m_autoUpdate = false;
     m_status.second = 0;
-    m_indexToStartSearching = 0;
+    m_drawingPointer.clear();
 }
 
 bool Pool::hasModification(const bool autoUpdateStatus)

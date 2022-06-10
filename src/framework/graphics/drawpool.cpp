@@ -47,15 +47,18 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::Dr
         m_currentPool->m_state.clipRect, texture, m_currentPool->m_state.shaderProgram
     };
 
-    updateHash(state, method);
+    size_t stateHash = 0;
+
+    updateHash(state, method, stateHash);
 
     auto& list = m_currentPool->m_objects;
 
     if (m_currentPool->m_forceGrouping) {
-        if (const auto it = std::find_if(list.begin() + m_currentPool->m_indexToStartSearching, list.end(), [&state]
-        (const Pool::DrawObject& action) { return action.state == state; }); it != list.end()) {
-            (*it).drawMethods.push_back(method);
+        auto it = m_currentPool->m_drawingPointer.find(stateHash);
+        if (it != m_currentPool->m_drawingPointer.end()) {
+            list[it->second].drawMethods.push_back(method);
         } else {
+            m_currentPool->m_drawingPointer[stateHash] = list.size();
             list.push_back({ state, Painter::DrawMode::Triangles, {method} });
         }
 
@@ -298,40 +301,53 @@ void DrawPool::use(const PoolType type, const Rect& dest, const Rect& src, const
     pool->m_framebuffer->m_colorClear = colorClear;
 }
 
-void DrawPool::updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method)
+void DrawPool::updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method, size_t& stateHash)
 {
-    size_t hash = 0;
+    { // State Hash
+        if (state.blendEquation != Painter::BlendEquation_Add)
+            stdext::hash_combine(stateHash, state.blendEquation);
 
-    if (state.texture) {
-        // TODO: use uniqueID id when applying multithreading, not forgetting that in the APNG texture, the id changes every frame.
-        stdext::hash_combine(hash, !state.texture->isEmpty() ? state.texture->getId() : state.texture->getUniqueId());
+        if (state.clipRect.isValid()) stdext::hash_combine(stateHash, state.clipRect.hash());
+        if (state.color != Color::white)
+            stdext::hash_combine(stateHash, state.color.rgba());
+
+        if (state.compositionMode != Painter::CompositionMode_Normal)
+            stdext::hash_combine(stateHash, state.compositionMode);
+
+        if (state.opacity < 1.f)
+            stdext::hash_combine(stateHash, state.opacity);
+
+        if (state.shaderProgram) {
+            m_currentPool->m_autoUpdate = true;
+            stdext::hash_combine(stateHash, state.shaderProgram->getProgramId());
+        }
+
+        if (state.texture) {
+            // TODO: use uniqueID id when applying multithreading, not forgetting that in the APNG texture, the id changes every frame.
+            stdext::hash_combine(stateHash, !state.texture->isEmpty() ? state.texture->getId() : state.texture->getUniqueId());
+        }
+
+        if (state.transformMatrix != DEFAULT_MATRIX_3)
+            stdext::hash_combine(stateHash, state.transformMatrix.hash());
+
+        stdext::hash_combine(m_currentPool->m_status.second, stateHash);
     }
 
-    if (state.opacity < 1.f)
-        stdext::hash_combine(hash, state.opacity);
+    { // Method Hash
+        size_t methodhash = 0;
+        if (method.rects.first.isValid()) stdext::hash_combine(methodhash, method.rects.first.hash());
+        if (method.rects.second.isValid()) stdext::hash_combine(methodhash, method.rects.second.hash());
 
-    if (state.color != Color::white)
-        stdext::hash_combine(hash, state.color.rgba());
+        const auto& a = std::get<0>(method.points),
+            b = std::get<1>(method.points),
+            c = std::get<2>(method.points);
 
-    if (state.compositionMode != Painter::CompositionMode_Normal)
-        stdext::hash_combine(hash, state.compositionMode);
+        if (!a.isNull()) stdext::hash_combine(methodhash, a.hash());
+        if (!b.isNull()) stdext::hash_combine(methodhash, b.hash());
+        if (!c.isNull()) stdext::hash_combine(methodhash, c.hash());
 
-    if (state.shaderProgram)
-        m_currentPool->m_autoUpdate = true;
+        if (method.intValue) stdext::hash_combine(methodhash, method.intValue);
 
-    if (state.clipRect.isValid()) stdext::hash_combine(hash, state.clipRect.hash());
-    if (method.rects.first.isValid()) stdext::hash_combine(hash, method.rects.first.hash());
-    if (method.rects.second.isValid()) stdext::hash_combine(hash, method.rects.second.hash());
-
-    const auto& a = std::get<0>(method.points),
-        b = std::get<1>(method.points),
-        c = std::get<2>(method.points);
-
-    if (!a.isNull()) stdext::hash_combine(hash, a.hash());
-    if (!b.isNull()) stdext::hash_combine(hash, b.hash());
-    if (!c.isNull()) stdext::hash_combine(hash, c.hash());
-
-    if (method.intValue) stdext::hash_combine(hash, method.intValue);
-
-    stdext::hash_combine(m_currentPool->m_status.second, hash);
+        stdext::hash_combine(m_currentPool->m_status.second, methodhash);
+    }
 }
