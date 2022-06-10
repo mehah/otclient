@@ -72,7 +72,7 @@ private:
     void init();
     void terminate();
     void createPools();
-    void drawObject(const Pool* pool, Pool::DrawObject& obj);
+    void drawObject(Pool::DrawObject& obj);
     void updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method, size_t& stateHash);
     void add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, Painter::DrawMode drawMode = Painter::DrawMode::Triangles);
 

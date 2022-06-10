@@ -59,7 +59,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::Dr
             list[it->second].drawMethods.push_back(method);
         } else {
             m_currentPool->m_drawingPointer[stateHash] = list.size();
-            list.push_back({ state, Painter::DrawMode::Triangles, {method} });
+            list.push_back({ state, Painter::DrawMode::Triangles, {method}, true });
         }
 
         return;
@@ -102,7 +102,7 @@ void DrawPool::draw()
         if (pool->hasModification(true) && !pool->m_objects.empty()) {
             pf->m_framebuffer->bind(pf->m_dest, pf->m_src);
             for (auto& obj : pool->m_objects)
-                drawObject(pool, obj);
+                drawObject(obj);
             pf->m_framebuffer->release();
         }
     }
@@ -123,7 +123,7 @@ void DrawPool::draw()
                 pool->m_cachedObjects = pool->m_objects;
 
             for (auto& obj : pool->m_cachedObjects) {
-                drawObject(pool, obj);
+                drawObject(obj);
             }
         }
 
@@ -131,7 +131,7 @@ void DrawPool::draw()
     }
 }
 
-void DrawPool::drawObject(const Pool* pool, Pool::DrawObject& obj)
+void DrawPool::drawObject(Pool::DrawObject& obj)
 {
     if (obj.action) {
         obj.action();
@@ -147,7 +147,7 @@ void DrawPool::drawObject(const Pool* pool, Pool::DrawObject& obj)
         g_painter->setTexture(obj.state.texture.get());
     }
 
-    if (!pool->hasFrameBuffer() && obj.coordsBuffer == nullptr) {
+    if (obj.isGroupable && obj.coordsBuffer == nullptr) {
         obj.coordsBuffer = std::make_shared<CoordsBuffer>();
     }
 

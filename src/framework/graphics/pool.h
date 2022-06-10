@@ -73,6 +73,7 @@ protected:
         Painter::PainterState state;
         Painter::DrawMode drawMode;
         std::vector<DrawMethod> drawMethods;
+        bool isGroupable{ false };
 
         std::shared_ptr<CoordsBuffer> coordsBuffer;
         std::function<void()> action{ nullptr };
