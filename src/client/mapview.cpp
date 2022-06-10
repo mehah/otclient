@@ -410,9 +410,9 @@ void MapView::updateVisibleTilesCache()
                     if (!tile->isDrawable())
                         continue;
 
-                    if (m_mustUpdateVisibleCreaturesCache) {
+                    if (m_mustUpdateVisibleCreaturesCache && isInRange(tilePos)) {
                         const auto& tileCreatures = tile->getCreatures();
-                        if (isInRange(tilePos) && !tileCreatures.empty()) {
+                        if (!tileCreatures.empty()) {
                             m_visibleCreatures.insert(m_visibleCreatures.end(), tileCreatures.rbegin(), tileCreatures.rend());
                         }
                     }
