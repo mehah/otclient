@@ -177,9 +177,12 @@ void MapView::drawFloor()
                     g_drawPool.resetOpacity();
             }
 
-            for (const auto& tile : map.effects) {
-                for (const auto& effect : tile->getEffects()) {
-                    effect->drawEffect(transformPositionTo2D(effect->getPosition(), cameraPosition), m_scaleFactor, lightView);
+            g_drawPool.startPosition();
+            {
+                for (const auto& tile : map.effects) {
+                    for (const auto& effect : tile->getEffects()) {
+                        effect->drawEffect(transformPositionTo2D(effect->getPosition(), cameraPosition), m_scaleFactor, lightView);
+                    }
                 }
             }
 
