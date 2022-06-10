@@ -52,11 +52,9 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::Dr
     auto& list = m_currentPool->m_objects;
 
     if (m_currentPool->m_forceGrouping) {
-        const auto itFind = std::find_if(list.begin() + m_currentPool->m_indexToStartSearching, list.end(), [&state]
-        (const Pool::DrawObject& action) { return action.state == state; });
-
-        if (itFind != list.end()) {
-            (*itFind).drawMethods.push_back(method);
+        if (const auto it = std::find_if(list.begin() + m_currentPool->m_indexToStartSearching, list.end(), [&state]
+        (const Pool::DrawObject& action) { return action.state == state; }); it != list.end()) {
+            (*it).drawMethods.push_back(method);
         } else {
             list.push_back({ state, Painter::DrawMode::Triangles, {method} });
         }
