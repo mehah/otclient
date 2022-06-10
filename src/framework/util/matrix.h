@@ -249,3 +249,7 @@ using Matrix2x2 = Matrix<2, 2>;
 using Matrix4 = Matrix4x4;
 using Matrix3 = Matrix3x3;
 using Matrix2 = Matrix2x2;
+
+const static Matrix4 DEFAULT_MATRIX_4;
+const static Matrix3 DEFAULT_MATRIX_3;
+const static Matrix2 DEFAULT_MATRIX_2;

@@ -75,9 +75,9 @@ private:
 
     Color m_color{ Color::white };
 
-    Matrix3 m_transformMatrix,
-        m_projectionMatrix,
-        m_textureMatrix;
+    Matrix3 m_transformMatrix = DEFAULT_MATRIX_3,
+        m_projectionMatrix = DEFAULT_MATRIX_3,
+        m_textureMatrix = DEFAULT_MATRIX_3;
 
     Size m_resolution;
 
