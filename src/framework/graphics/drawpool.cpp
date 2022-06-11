@@ -59,7 +59,9 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::Dr
             list[it->second].drawMethods.push_back(method);
         } else {
             m_currentPool->m_drawingPointer[stateHash] = list.size();
-            list.push_back({ state, Painter::DrawMode::Triangles, {method}, true });
+
+            //TODO: For now isGroupable will be false for drawings using framebuffer.
+            list.push_back({ state, Painter::DrawMode::Triangles, {method}, !m_currentPool->hasFrameBuffer() });
         }
 
         return;
