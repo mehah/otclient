@@ -38,11 +38,7 @@
 
 UIWidget::UIWidget()
 {
-    m_lastFocusReason = Fw::ActiveFocusReason;
-    m_states = Fw::DefaultState;
-    m_autoFocusPolicy = Fw::AutoFocusLast;
     m_clickTimer.stop();
-    m_autoRepeatDelay = 500;
 
     initBaseStyle();
     initText();

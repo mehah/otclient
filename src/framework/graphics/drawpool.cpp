@@ -44,7 +44,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::Dr
     const auto& state = Painter::PainterState{
        g_painter->getTransformMatrixRef(), color, m_currentPool->m_state.opacity,
        m_currentPool->m_state.compositionMode, m_currentPool->m_state.blendEquation,
-        m_currentPool->m_state.clipRect, texture, m_currentPool->m_state.shaderProgram
+       m_currentPool->m_state.clipRect, texture, m_currentPool->m_state.shaderProgram
     };
 
     size_t stateHash = 0;
