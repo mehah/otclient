@@ -142,13 +142,6 @@ void DrawPool::drawObject(Pool::DrawObject& obj)
 
     if (obj.drawMethods.empty()) return;
 
-    g_painter->executeState(obj.state);
-
-    if (obj.state.texture) {
-        obj.state.texture->create();
-        g_painter->setTexture(obj.state.texture.get());
-    }
-
     if (obj.isGroupable && obj.coordsBuffer == nullptr) {
         obj.coordsBuffer = std::make_shared<CoordsBuffer>();
     }
@@ -178,6 +171,11 @@ void DrawPool::drawObject(Pool::DrawObject& obj)
         }
     }
 
+    if (obj.state.texture) {
+        obj.state.texture->create();
+        g_painter->setTexture(obj.state.texture.get());
+    }
+    g_painter->executeState(obj.state);
     g_painter->drawCoords(buffer, obj.drawMode);
 
     if (useGlobalCoord)
