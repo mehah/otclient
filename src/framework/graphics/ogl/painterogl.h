@@ -30,7 +30,6 @@ public:
     PainterOGL();
     ~PainterOGL() override = default;
 
-    virtual void refreshState();
     virtual void setTransformMatrix(const Matrix3& transformMatrix) { m_transformMatrix = transformMatrix; }
     virtual void setProjectionMatrix(const Matrix3& projectionMatrix) { m_projectionMatrix = projectionMatrix; }
     virtual void setTextureMatrix(const Matrix3& textureMatrix) { m_textureMatrix = textureMatrix; }
@@ -74,6 +73,8 @@ public:
     bool getAlphaWriting() { return m_alphaWriting; }
 
 protected:
+    virtual void refreshState();
+
     Matrix3& getTransformMatrixRef() override { return m_transformMatrix; }
 
     void updateGlTexture();

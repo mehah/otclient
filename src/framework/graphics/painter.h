@@ -55,42 +55,11 @@ enum class DrawMode
 class Painter
 {
 public:
-
-    struct PainterState
-    {
-        ~PainterState() { shaderProgram = nullptr; action = nullptr; }
-
-        Matrix3 transformMatrix;
-        Color color;
-        float opacity;
-        CompositionMode compositionMode;
-        BlendEquation blendEquation;
-        Rect clipRect;
-        TexturePtr texture;
-        PainterShaderProgram* shaderProgram;
-        std::function<void()> action{ nullptr };
-
-        bool operator==(const PainterState& s2) const
-        {
-            return
-                transformMatrix == s2.transformMatrix &&
-                color == s2.color &&
-                opacity == s2.opacity &&
-                compositionMode == s2.compositionMode &&
-                blendEquation == s2.blendEquation &&
-                clipRect == s2.clipRect &&
-                texture == s2.texture &&
-                shaderProgram == s2.shaderProgram;
-        }
-    };
-
     Painter();
     virtual ~Painter() = default;
 
     virtual void bind() {}
     virtual void unbind() {}
-
-    virtual void executeState(const PainterState& state) = 0;
 
     virtual void clear(const Color& color) = 0;
 
@@ -139,6 +108,36 @@ public:
     virtual bool hasShaders() = 0;
 
 protected:
+    struct PainterState
+    {
+        ~PainterState() { shaderProgram = nullptr; action = nullptr; }
+
+        Matrix3 transformMatrix;
+        Color color;
+        float opacity;
+        CompositionMode compositionMode;
+        BlendEquation blendEquation;
+        Rect clipRect;
+        TexturePtr texture;
+        PainterShaderProgram* shaderProgram;
+        std::function<void()> action{ nullptr };
+
+        bool operator==(const PainterState& s2) const
+        {
+            return
+                transformMatrix == s2.transformMatrix &&
+                color == s2.color &&
+                opacity == s2.opacity &&
+                compositionMode == s2.compositionMode &&
+                blendEquation == s2.blendEquation &&
+                clipRect == s2.clipRect &&
+                texture == s2.texture &&
+                shaderProgram == s2.shaderProgram;
+        }
+    };
+
+    virtual void executeState(const PainterState& state) = 0;
+
     virtual Matrix3& getTransformMatrixRef() = 0;
 
     float m_opacity{ 1.f };
@@ -150,6 +149,7 @@ protected:
     Rect m_clipRect;
 
     friend class DrawPool;
+    friend class Pool;
 };
 
 extern Painter* g_painter;

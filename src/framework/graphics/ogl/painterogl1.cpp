@@ -177,7 +177,7 @@ void PainterOGL1::updateGlTransformMatrix()
             m_transformMatrix(3,1), m_transformMatrix(3,2),                    0.0f, m_transformMatrix(3,3),
     };
 
-    setMatrixMode(MatrixMode::MatrixTransform);
+    setMatrixMode(MatrixMode::TRANSFORM);
     glLoadMatrixf(glTransformMatrix);
 }
 
@@ -190,7 +190,7 @@ void PainterOGL1::updateGlProjectionMatrix()
             m_projectionMatrix(3,1), m_projectionMatrix(3,2),                    0.0f, m_projectionMatrix(3,3),
     };
 
-    setMatrixMode(MatrixMode::MatrixProjection);
+    setMatrixMode(MatrixMode::PROJECTION);
     glLoadMatrixf(glProjectionMatrix);
 }
 
@@ -203,7 +203,7 @@ void PainterOGL1::updateGlTextureMatrix()
             m_textureMatrix(3,1), m_textureMatrix(3,2),             0.0f, m_textureMatrix(3,3),
     };
 
-    setMatrixMode(MatrixMode::MatrixTexture);
+    setMatrixMode(MatrixMode::TEXTURE);
     glLoadMatrixf(glTextureMatrix);
 }
 
