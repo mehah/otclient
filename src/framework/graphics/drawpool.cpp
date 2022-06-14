@@ -39,7 +39,7 @@ void DrawPool::terminate()
     }
 }
 
-void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, const Painter::DrawMode drawMode)
+void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, const DrawMode drawMode)
 {
     const auto& state = Painter::PainterState{
        g_painter->getTransformMatrixRef(), color, m_currentPool->m_state.opacity,
@@ -61,7 +61,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::Dr
             m_currentPool->m_drawingPointer[stateHash] = list.size();
 
             //TODO: For now isGroupable will be false for drawings using framebuffer.
-            list.push_back({ state, Painter::DrawMode::Triangles, {method}, !m_currentPool->hasFrameBuffer() });
+            list.push_back({ state, DrawMode::TRIANGLES, {method}, !m_currentPool->hasFrameBuffer() });
         }
 
         return;
@@ -85,7 +85,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::Dr
         }
 
         if (sameState) {
-            prevObj.drawMode = Painter::DrawMode::Triangles;
+            prevObj.drawMode = DrawMode::TRIANGLES;
             prevObj.drawMethods.push_back(method);
             return;
         }
@@ -161,14 +161,14 @@ void DrawPool::drawObject(Pool::DrawObject& obj)
             if (method.type == Pool::DrawMethodType::BOUNDING_RECT) {
                 buffer.addBoudingRect(method.rects.first, method.intValue);
             } else if (method.type == Pool::DrawMethodType::RECT) {
-                if (obj.drawMode == Painter::DrawMode::Triangles)
+                if (obj.drawMode == DrawMode::TRIANGLES)
                     buffer.addRect(method.rects.first, method.rects.second);
                 else
                     buffer.addQuad(method.rects.first, method.rects.second);
             } else if (method.type == Pool::DrawMethodType::TRIANGLE) {
                 buffer.addTriangle(std::get<0>(method.points), std::get<1>(method.points), std::get<2>(method.points));
             } else if (method.type == Pool::DrawMethodType::UPSIDEDOWN_RECT) {
-                if (obj.drawMode == Painter::DrawMode::Triangles)
+                if (obj.drawMode == DrawMode::TRIANGLES)
                     buffer.addUpsideDownRect(method.rects.first, method.rects.second);
                 else
                     buffer.addUpsideDownQuad(method.rects.first, method.rects.second);
@@ -200,7 +200,7 @@ void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, cons
         .dest = originalDest
     };
 
-    add(color, texture, method, Painter::DrawMode::TriangleStrip);
+    add(color, texture, method, DrawMode::TRIANGLE_STRIP);
 }
 
 void DrawPool::addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color color)
@@ -210,7 +210,7 @@ void DrawPool::addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& tex
 
     const Pool::DrawMethod method{ Pool::DrawMethodType::UPSIDEDOWN_RECT, std::make_pair(dest, src) };
 
-    add(color, texture, method, Painter::DrawMode::TriangleStrip);
+    add(color, texture, method, DrawMode::TRIANGLE_STRIP);
 }
 
 void DrawPool::addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color color)
@@ -275,7 +275,7 @@ void DrawPool::createPools()
             if (type == PoolType::MAP) frameBuffer->disableBlend();
             else if (type == PoolType::LIGHT) {
                 pool->m_forceGrouping = true;
-                frameBuffer->setCompositionMode(Painter::CompositionMode_Light);
+                frameBuffer->setCompositionMode(CompositionMode::LIGHT);
             }
         } else {
             pool = new Pool;
@@ -309,14 +309,14 @@ void DrawPool::use(const PoolType type, const Rect& dest, const Rect& src, const
 void DrawPool::updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method, size_t& stateHash)
 {
     { // State Hash
-        if (state.blendEquation != Painter::BlendEquation_Add)
+        if (state.blendEquation != BlendEquation::ADD)
             stdext::hash_combine(stateHash, state.blendEquation);
 
         if (state.clipRect.isValid()) stdext::hash_combine(stateHash, state.clipRect.hash());
         if (state.color != Color::white)
             stdext::hash_combine(stateHash, state.color.rgba());
 
-        if (state.compositionMode != Painter::CompositionMode_Normal)
+        if (state.compositionMode != CompositionMode::NORMAL)
             stdext::hash_combine(stateHash, state.compositionMode);
 
         if (state.opacity < 1.f)

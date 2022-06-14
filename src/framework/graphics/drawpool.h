@@ -48,11 +48,12 @@ public:
 
     void setOpacity(const float opacity, const int pos = -1) { m_currentPool->setOpacity(opacity, pos); }
     void setClipRect(const Rect& clipRect, const int pos = -1) { m_currentPool->setClipRect(clipRect, pos); }
-    void setBlendEquation(Painter::BlendEquation equation, const int pos = -1) { m_currentPool->setBlendEquation(equation, pos); }
-    void setCompositionMode(const Painter::CompositionMode mode, const int pos = -1) { m_currentPool->setCompositionMode(mode, pos); }
+    void setBlendEquation(BlendEquation equation, const int pos = -1) { m_currentPool->setBlendEquation(equation, pos); }
+    void setCompositionMode(const CompositionMode mode, const int pos = -1) { m_currentPool->setCompositionMode(mode, pos); }
     void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, const int pos = -1, const std::function<void()>& action = nullptr) { m_currentPool->setShaderProgram(shaderProgram, pos, action); }
 
     float getOpacity(const int pos = -1) { return m_currentPool->getOpacity(pos); }
+    Rect getClipRect(const int pos = -1) { return m_currentPool->getClipRect(pos); }
 
     void resetState() { m_currentPool->resetState(); }
     void resetOpacity() { m_currentPool->resetOpacity(); }
@@ -74,7 +75,7 @@ private:
     void createPools();
     void drawObject(Pool::DrawObject& obj);
     void updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method, size_t& stateHash);
-    void add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, Painter::DrawMode drawMode = Painter::DrawMode::Triangles);
+    void add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, DrawMode drawMode = DrawMode::TRIANGLES);
 
     PoolFramed* poolFramed() { return m_currentPool->toPoolFramed(); }
 

@@ -26,33 +26,35 @@
 #include <framework/graphics/declarations.h>
 #include <framework/graphics/paintershaderprogram.h>
 
+enum class BlendEquation
+{
+    ADD,
+    MAX,
+    MIN,
+    SUBTRACT,
+    REVER_SUBTRACT,
+};
+
+enum class CompositionMode
+{
+    NORMAL,
+    MULTIPLY,
+    ADD,
+    REPLACE,
+    DESTINATION_BLENDING,
+    LIGHT
+};
+
+enum class DrawMode
+{
+    NONE = GL_NONE,
+    TRIANGLES = GL_TRIANGLES,
+    TRIANGLE_STRIP = GL_TRIANGLE_STRIP
+};
+
 class Painter
 {
 public:
-    enum BlendEquation
-    {
-        BlendEquation_Add,
-        BlendEquation_Max,
-        BlendEquation_Min,
-        BlendEquation_Subtract,
-        BlendEquation_Rever_Subtract,
-    };
-    enum CompositionMode
-    {
-        CompositionMode_Normal,
-        CompositionMode_Multiply,
-        CompositionMode_Add,
-        CompositionMode_Replace,
-        CompositionMode_DestBlending,
-        CompositionMode_Light
-    };
-
-    enum class DrawMode
-    {
-        None = GL_NONE,
-        Triangles = GL_TRIANGLES,
-        TriangleStrip = GL_TRIANGLE_STRIP
-    };
 
     struct PainterState
     {
@@ -92,7 +94,7 @@ public:
 
     virtual void clear(const Color& color) = 0;
 
-    virtual void drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode = DrawMode::Triangles) = 0;
+    virtual void drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode = DrawMode::TRIANGLES) = 0;
 
     virtual void setTexture(Texture* texture) = 0;
     virtual void setClipRect(const Rect& clipRect) = 0;
@@ -130,7 +132,7 @@ public:
 
     void resetClipRect() { setClipRect({}); }
     void resetOpacity() { setOpacity(1.0f); }
-    void resetCompositionMode() { setCompositionMode(CompositionMode_Normal); }
+    void resetCompositionMode() { setCompositionMode(CompositionMode::NORMAL); }
     void resetColor() { setColor(Color::white); }
     void resetShaderProgram() { setShaderProgram(nullptr); }
 
@@ -142,7 +144,7 @@ protected:
     float m_opacity{ 1.f };
 
     PainterShaderProgram* m_shaderProgram{ nullptr };
-    CompositionMode m_compositionMode{ CompositionMode_Normal };
+    CompositionMode m_compositionMode{ CompositionMode::NORMAL };
     Color m_color{ Color::white };
     Size m_resolution;
     Rect m_clipRect;

@@ -47,7 +47,7 @@ public:
 
     void refreshState() override;
 
-    void drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode = DrawMode::Triangles) override;
+    void drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode = DrawMode::TRIANGLES) override;
 
     void setMatrixMode(MatrixMode matrixMode);
     void setTransformMatrix(const Matrix3& transformMatrix) override;

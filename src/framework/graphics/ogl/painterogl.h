@@ -35,7 +35,7 @@ public:
     virtual void setProjectionMatrix(const Matrix3& projectionMatrix) { m_projectionMatrix = projectionMatrix; }
     virtual void setTextureMatrix(const Matrix3& textureMatrix) { m_textureMatrix = textureMatrix; }
 
-    void resetBlendEquation() { setBlendEquation(BlendEquation_Add); }
+    void resetBlendEquation() { setBlendEquation(BlendEquation::ADD); }
     void resetTexture() { setTexture(nullptr); }
     void resetAlphaWriting() { setAlphaWriting(false); }
     void resetTransformMatrix() { setTransformMatrix({}); }
@@ -90,7 +90,7 @@ protected:
     Matrix3 m_projectionMatrix = DEFAULT_MATRIX_3;
     Matrix3 m_textureMatrix = DEFAULT_MATRIX_3;
 
-    BlendEquation m_blendEquation{ BlendEquation_Add };
+    BlendEquation m_blendEquation{ BlendEquation::ADD };
     Texture* m_texture{ nullptr };
     bool m_alphaWriting{ false };
     uint m_glTextureId{ 0 };
