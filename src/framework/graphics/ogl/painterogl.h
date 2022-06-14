@@ -37,7 +37,7 @@ public:
     void resetBlendEquation() { setBlendEquation(BlendEquation::ADD); }
     void resetTexture() { setTexture(nullptr); }
     void resetAlphaWriting() { setAlphaWriting(false); }
-    void resetTransformMatrix() { setTransformMatrix({}); }
+    void resetTransformMatrix() { setTransformMatrix(DEFAULT_MATRIX_3); }
 
     void executeState(const PainterState& state) override;
 

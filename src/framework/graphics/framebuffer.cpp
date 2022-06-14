@@ -108,7 +108,6 @@ void FrameBuffer::bind(const Rect& dest, const Rect& src)
         g_painter->setTexture(nullptr);
         g_painter->setColor(m_colorClear);
         g_painter->drawCoords(m_screenCoordsBuffer, DrawMode::TRIANGLE_STRIP);
-        g_painter->resetColor();
     }
 }
 
