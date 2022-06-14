@@ -153,8 +153,8 @@ void DrawPool::drawObject(Pool::DrawObject& obj)
         obj.coordsBuffer = std::make_shared<CoordsBuffer>();
     }
 
-    const bool isGlobalCoord = obj.coordsBuffer == nullptr;
-    auto& buffer = isGlobalCoord ? m_coordsBuffer : *obj.coordsBuffer;
+    const bool useGlobalCoord = obj.coordsBuffer == nullptr;
+    auto& buffer = useGlobalCoord ? m_coordsBuffer : *obj.coordsBuffer;
 
     if (buffer.getVertexCount() == 0) {
         for (const auto& method : obj.drawMethods) {
@@ -180,7 +180,7 @@ void DrawPool::drawObject(Pool::DrawObject& obj)
 
     g_painter->drawCoords(buffer, obj.drawMode);
 
-    if (isGlobalCoord)
+    if (useGlobalCoord)
         m_coordsBuffer.clear();
 }
 
