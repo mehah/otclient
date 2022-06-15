@@ -60,7 +60,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::Dr
 
             if (draw.queue) {
                 auto& hashList = draw.queue->hashs;
-                if (hashList.find(methodHash) == hashList.end()) {
+                if (!hashList.contains(methodHash)) {
                     hashList.insert(methodHash);
                     addCoords(method, *draw.queue->coords, DrawMode::TRIANGLES);
                 }
@@ -77,8 +77,12 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::Dr
                         drawQueue->coords->clear();
                     else
                         drawQueue->coords = std::make_shared<CoordsBuffer>();
+
+                    drawQueue->hashs.insert(methodHash);
+
                     addCoords(method, *drawQueue->coords, DrawMode::TRIANGLES);
                 }
+                //drawQueue->index = 0;
             } else {
                 methods.push_back(method);
             }

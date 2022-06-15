@@ -50,7 +50,7 @@ public:
     struct DrawQueue
     {
         Point lastDest;
-        std::unordered_set<size_t> hashs;
+        robin_hood::unordered_flat_set<size_t> hashs;
         std::shared_ptr<CoordsBuffer> coords;
     };
 

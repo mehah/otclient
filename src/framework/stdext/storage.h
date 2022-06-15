@@ -26,6 +26,16 @@
 
 namespace stdext
 {
+#ifdef ROBIN_HOOD_HASHING
+    template <typename Key, typename T, typename Hash = robin_hood::hash<Key>,
+        typename KeyEqual = std::equal_to<Key>, size_t MaxLoadFactor100 = 80>
+    using unordered_map = robin_hood::unordered_map< Key, T, Hash, KeyEqual, MaxLoadFactor100>;
+#else
+    template <class _Kty, class _Ty, class _Hasher = std::hash<_Kty>, class _Keyeq = std::equal_to<_Kty>,
+        class _Alloc = std::allocator<std::pair<const _Kty, _Ty>>>
+    using unordered_map = std::unordered_map<_Kty, _Ty, _Hasher, _Keyeq, _Alloc>;
+#endif
+
     template<typename T>
     concept OnlyEnum = std::is_enum<T>::value;
 

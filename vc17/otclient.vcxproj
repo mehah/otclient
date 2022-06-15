@@ -686,6 +686,7 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
     <ClInclude Include="..\src\framework\util\matrix.h" />
     <ClInclude Include="..\src\framework\util\point.h" />
     <ClInclude Include="..\src\framework\util\rect.h" />
+    <ClInclude Include="..\src\framework\util\robin_hood.h" />
     <ClInclude Include="..\src\framework\util\size.h" />
     <ClInclude Include="..\src\framework\util\uuid.h" />
     <ClInclude Include="..\src\framework\xml\tinystr.h" />

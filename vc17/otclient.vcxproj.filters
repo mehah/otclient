@@ -1064,6 +1064,9 @@
     <ClInclude Include="..\src\protobuf\appearances.pb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\framework\util\robin_hood.h">
+      <Filter>Header Files\framework\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\src\otcicon.rc">
