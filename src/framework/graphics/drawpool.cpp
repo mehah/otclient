@@ -39,7 +39,7 @@ void DrawPool::terminate()
     }
 }
 
-void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, const DrawMode drawMode)
+void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, const DrawMode drawMode, const std::shared_ptr<Pool::DrawQueue> drawQueue)
 {
     const auto& state = Painter::PainterState{
        g_painter->getTransformMatrixRef(), color, m_currentPool->m_state.opacity,
@@ -49,19 +49,35 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::Dr
 
     size_t stateHash = 0;
 
-    updateHash(state, method, stateHash);
+    auto hash = updateHash(state, method, stateHash);
 
     auto& list = m_currentPool->m_objects;
 
     if (m_currentPool->m_forceGrouping) {
         auto it = m_currentPool->m_drawingPointer.find(stateHash);
         if (it != m_currentPool->m_drawingPointer.end()) {
-            list[it->second].drawMethods.push_back(method);
+            auto& draw = list[it->second];
+
+            if (!std::any_of(draw.queue->hashs.begin(), draw.queue->hashs.end(), [hash = hash](const size_t h) { return h == hash; })) {
+                if (draw.queue->coords.getTextureCoordCount() > 0) {
+                    draw.queue->lastDest = {};
+                } else {
+                    draw.queue->hashs.push_back(hash);
+                    draw.drawMethods.push_back(method);
+                }
+            }
         } else {
             m_currentPool->m_drawingPointer[stateHash] = list.size();
 
+            std::vector<Pool::DrawMethod> mList;
+            std::shared_ptr<Pool::DrawQueue> queue = drawQueue ? drawQueue : std::make_shared<Pool::DrawQueue>();
+            if (queue->hashs.empty()) {
+                queue->hashs.push_back(hash);
+                mList.push_back(method);
+            }
+
             //TODO: For now isGroupable will be false for drawings using framebuffer.
-            list.push_back({ state, DrawMode::TRIANGLES, {method}, !m_currentPool->hasFrameBuffer() });
+            list.push_back({ state, DrawMode::TRIANGLES, mList, !m_currentPool->hasFrameBuffer(), queue });
         }
 
         return;
@@ -140,14 +156,8 @@ void DrawPool::drawObject(Pool::DrawObject& obj)
         return;
     }
 
-    if (obj.drawMethods.empty()) return;
-
-    if (obj.isGroupable && obj.coordsBuffer == nullptr) {
-        obj.coordsBuffer = std::make_shared<CoordsBuffer>();
-    }
-
-    const bool useGlobalCoord = obj.coordsBuffer == nullptr;
-    auto& buffer = useGlobalCoord ? m_coordsBuffer : *obj.coordsBuffer;
+    const bool useGlobalCoord = obj.queue == nullptr;
+    auto& buffer = useGlobalCoord ? m_coordsBuffer : obj.queue->coords;
 
     if (buffer.getVertexCount() == 0) {
         for (const auto& method : obj.drawMethods) {
@@ -180,6 +190,8 @@ void DrawPool::drawObject(Pool::DrawObject& obj)
 
     if (useGlobalCoord)
         m_coordsBuffer.clear();
+    else
+        obj.queue->drawn = true;
 }
 
 void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Color& color)
@@ -187,7 +199,7 @@ void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, cons
     addTexturedRect(dest, texture, Rect(Point(), texture->getSize()), color);
 }
 
-void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const Point& originalDest)
+void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const Point& originalDest, std::shared_ptr<Pool::DrawQueue> drawQueue)
 {
     if (dest.isEmpty() || src.isEmpty())
         return;
@@ -198,7 +210,7 @@ void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, cons
         .dest = originalDest
     };
 
-    add(color, texture, method, DrawMode::TRIANGLE_STRIP);
+    add(color, texture, method, DrawMode::TRIANGLE_STRIP, drawQueue);
 }
 
 void DrawPool::addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color)
@@ -304,7 +316,7 @@ void DrawPool::use(const PoolType type, const Rect& dest, const Rect& src, const
     pool->m_framebuffer->m_colorClear = colorClear;
 }
 
-void DrawPool::updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method, size_t& stateHash)
+size_t DrawPool::updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method, size_t& stateHash)
 {
     { // State Hash
         if (state.blendEquation != BlendEquation::ADD)
@@ -333,7 +345,7 @@ void DrawPool::updateHash(const Painter::PainterState& state, const Pool::DrawMe
         if (state.transformMatrix != DEFAULT_MATRIX_3)
             stdext::hash_combine(stateHash, state.transformMatrix.hash());
 
-        stdext::hash_combine(m_currentPool->m_status.second, stateHash);
+        //stdext::hash_combine(m_currentPool->m_status.second, stateHash);
     }
 
     { // Method Hash
@@ -351,6 +363,9 @@ void DrawPool::updateHash(const Painter::PainterState& state, const Pool::DrawMe
 
         if (method.intValue) stdext::hash_combine(methodhash, method.intValue);
 
+        stdext::hash_combine(methodhash, stateHash);
         stdext::hash_combine(m_currentPool->m_status.second, methodhash);
+
+        return methodhash;
     }
 }

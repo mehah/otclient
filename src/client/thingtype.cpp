@@ -701,7 +701,7 @@ void ThingType::unserializeOtml(const OTMLNodePtr& node)
     }
 }
 
-void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, TextureType textureType, Color color, LightView* lightView)
+void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, TextureType textureType, Color color, LightView* lightView, std::shared_ptr<Pool::DrawQueue> drawQueue)
 {
     if (m_null)
         return;
@@ -728,7 +728,7 @@ void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPatte
     g_drawPool.forceGrouping(getCategory() == ThingCategoryMissile || isSingleGround() ||
                              g_app.isDrawingEffectsOnTop() && getCategory() == ThingCategoryEffect);
 
-    g_drawPool.addTexturedRect(screenRect, texture, textureRect, color, dest);
+    g_drawPool.addTexturedRect(screenRect, texture, textureRect, color, dest, drawQueue);
     g_drawPool.forceGrouping(false);
 
     if (lightView && hasLight()) {

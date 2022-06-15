@@ -46,6 +46,14 @@ public:
     bool isEnabled() const { return m_enabled; }
     PoolType getType() const { return m_type; }
 
+    struct DrawQueue
+    {
+        Point lastDest;
+        std::vector<size_t> hashs;
+        bool drawn{ false };
+        CoordsBuffer coords;
+    };
+
 protected:
     enum class DrawMethodType
     {
@@ -75,7 +83,7 @@ protected:
         std::vector<DrawMethod> drawMethods;
         bool isGroupable{ false };
 
-        std::shared_ptr<CoordsBuffer> coordsBuffer;
+        std::shared_ptr<DrawQueue> queue;
         std::function<void()> action{ nullptr };
     };
 
