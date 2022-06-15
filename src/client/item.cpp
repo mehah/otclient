@@ -50,6 +50,11 @@ ItemPtr Item::createFromOtb(int id)
 {
     ItemPtr item(new Item);
     item->setOtbId(id);
+
+    if (item->isSingleGround()) {
+        item->m_drawQueue = std::make_shared<Pool::DrawQueue>();
+    }
+
     return item;
 }
 
@@ -99,12 +104,14 @@ void Item::setOtbId(uint16_t id)
 {
     if (!g_things.isValidOtbId(id))
         id = 0;
+
     const auto itemType = g_things.getItemType(id);
     m_serverId = id;
 
     id = itemType->getClientId();
     if (!g_things.isValidDatId(id, ThingCategoryItem))
         id = 0;
+
     m_clientId = id;
     m_thingType = nullptr;
 }
