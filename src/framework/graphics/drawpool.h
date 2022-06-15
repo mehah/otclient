@@ -35,15 +35,15 @@ public:
     T* get(const PoolType type) { return static_cast<T*>(m_pools[static_cast<uint8_t>(type)]); }
 
     void use(PoolType type);
-    void use(PoolType type, const Rect& dest, const Rect& src, Color colorClear = Color::alpha);
+    void use(PoolType type, const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha);
 
-    void addTexturedRect(const Rect& dest, const TexturePtr& texture, Color color = Color::white);
-    void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, Color color = Color::white, const Point& originalDest = {});
-    void addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, Color color = Color::white);
-    void addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, Color color = Color::white);
-    void addFilledRect(const Rect& dest, Color color = Color::white);
-    void addFilledTriangle(const Point& a, const Point& b, const Point& c, Color color = Color::white);
-    void addBoundingRect(const Rect& dest, Color color = Color::white, int innerLineWidth = 1);
+    void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Color& color = Color::white);
+    void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white, const Point& originalDest = {});
+    void addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white);
+    void addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white);
+    void addFilledRect(const Rect& dest, const Color& color = Color::white);
+    void addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color = Color::white);
+    void addBoundingRect(const Rect& dest, const Color& color = Color::white, int innerLineWidth = 1);
     void addAction(std::function<void()> action);
 
     void setOpacity(const float opacity, const int pos = -1) { m_currentPool->setOpacity(opacity, pos); }
