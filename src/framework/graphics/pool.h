@@ -47,9 +47,9 @@ public:
     bool isEnabled() const { return m_enabled; }
     PoolType getType() const { return m_type; }
 
-    struct DrawQueue
+    struct DrawBuffer
     {
-        Point lastDest;
+        Point dest;
         robin_hood::unordered_flat_set<size_t> hashs;
         std::shared_ptr<CoordsBuffer> coords;
     };
@@ -81,7 +81,7 @@ protected:
         Painter::PainterState state;
         DrawMode drawMode;
         std::vector<DrawMethod> drawMethods;
-        std::shared_ptr<DrawQueue> queue;
+        std::shared_ptr<DrawBuffer> queue;
         std::function<void()> action{ nullptr };
     };
 

@@ -40,7 +40,7 @@ ItemPtr Item::create(int id)
     item->setId(id);
 
     if (item->isSingleGround()) {
-        item->m_drawQueue = std::make_shared<Pool::DrawQueue>();
+        item->m_drawBuffer = std::make_shared<Pool::DrawBuffer>();
     }
 
     return item;
@@ -52,7 +52,7 @@ ItemPtr Item::createFromOtb(int id)
     item->setOtbId(id);
 
     if (item->isSingleGround()) {
-        item->m_drawQueue = std::make_shared<Pool::DrawQueue>();
+        item->m_drawBuffer = std::make_shared<Pool::DrawBuffer>();
     }
 
     return item;
@@ -78,12 +78,12 @@ void Item::draw(const Point& dest, float scaleFactor, bool animate, const Highli
     if (m_color != Color::alpha)
         color = m_color;
 
-    if (m_drawQueue && m_drawQueue->lastDest != dest) {
-        m_drawQueue->lastDest = dest;
-        m_drawQueue->hashs.clear();
+    if (m_drawBuffer && m_drawBuffer->dest != dest) {
+        m_drawBuffer->dest = dest;
+        m_drawBuffer->hashs.clear();
     }
 
-    getThingType()->draw(dest, scaleFactor, 0, xPattern, yPattern, zPattern, animationPhase, textureType, color, lightView, m_drawQueue);
+    getThingType()->draw(dest, scaleFactor, 0, xPattern, yPattern, zPattern, animationPhase, textureType, color, lightView, m_drawBuffer);
 
     if (highLight.enabled && this == highLight.thing) {
         getThingType()->draw(dest, scaleFactor, 0, xPattern, yPattern, zPattern, animationPhase, TextureType::ALL_BLANK, highLight.rgbColor);

@@ -55,12 +55,12 @@ void Effect::drawEffect(const Point& dest, float scaleFactor, LightView* lightVi
     const int xPattern = m_position.x % getNumPatternX();
     const int yPattern = m_position.y % getNumPatternY();
 
-    if (m_drawQueue && m_drawQueue->lastDest != dest) {
-        m_drawQueue->lastDest = dest;
-        m_drawQueue->hashs.clear();
+    if (m_drawBuffer && m_drawBuffer->dest != dest) {
+        m_drawBuffer->dest = dest;
+        m_drawBuffer->hashs.clear();
     }
 
-    getThingType()->draw(dest, scaleFactor, 0, xPattern, yPattern, 0, animationPhase, TextureType::NONE, Color::white, lightView, m_drawQueue);
+    getThingType()->draw(dest, scaleFactor, 0, xPattern, yPattern, 0, animationPhase, TextureType::NONE, Color::white, lightView, m_drawBuffer);
 }
 
 void Effect::onAppear()
@@ -85,7 +85,7 @@ void Effect::onAppear()
     m_animationTimer.restart();
 
     if (g_app.isDrawingEffectsOnTop())
-        m_drawQueue = std::make_shared<Pool::DrawQueue>();
+        m_drawBuffer = std::make_shared<Pool::DrawBuffer>();
 
     // schedule removal
     const auto self = asEffect();

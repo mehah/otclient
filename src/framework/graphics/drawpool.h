@@ -38,7 +38,7 @@ public:
     void use(PoolType type, const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha);
 
     void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Color& color = Color::white);
-    void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white, const Point& originalDest = {}, const std::shared_ptr<Pool::DrawQueue> drawQueue = nullptr);
+    void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white, const Point& originalDest = {}, const std::shared_ptr<Pool::DrawBuffer> drawQueue = nullptr);
     void addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white);
     void addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white);
     void addFilledRect(const Rect& dest, const Color& color = Color::white);
@@ -76,7 +76,7 @@ private:
     void drawObject(Pool::DrawObject& obj);
     void addCoords(const Pool::DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode);
     size_t updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method, size_t& stateHash);
-    void add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, DrawMode drawMode = DrawMode::TRIANGLES, std::shared_ptr<Pool::DrawQueue> drawQueue = nullptr);
+    void add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, DrawMode drawMode = DrawMode::TRIANGLES, std::shared_ptr<Pool::DrawBuffer> drawQueue = nullptr);
 
     PoolFramed* poolFramed() { return m_currentPool->toPoolFramed(); }
 

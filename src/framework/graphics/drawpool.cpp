@@ -39,7 +39,7 @@ void DrawPool::terminate()
     }
 }
 
-void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, const DrawMode drawMode, std::shared_ptr<Pool::DrawQueue> drawQueue)
+void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, const DrawMode drawMode, std::shared_ptr<Pool::DrawBuffer> drawQueue)
 {
     const auto& state = Painter::PainterState{
        g_painter->getTransformMatrixRef(), color, m_currentPool->m_state.opacity,
@@ -66,7 +66,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::Dr
             m_currentPool->m_drawingPointer[stateHash] = list.size();
 
             if (!drawQueue)
-                drawQueue = std::make_shared<Pool::DrawQueue>();
+                drawQueue = std::make_shared<Pool::DrawBuffer>();
 
             if (drawQueue->hashs.empty()) {
                 if (drawQueue->coords)
@@ -200,7 +200,7 @@ void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, cons
     addTexturedRect(dest, texture, Rect(Point(), texture->getSize()), color);
 }
 
-void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const Point& originalDest, std::shared_ptr<Pool::DrawQueue> drawQueue)
+void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const Point& originalDest, std::shared_ptr<Pool::DrawBuffer> drawQueue)
 {
     if (dest.isEmpty() || src.isEmpty())
         return;

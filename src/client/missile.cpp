@@ -64,12 +64,12 @@ void Missile::drawMissile(const Point& dest, float scaleFactor, LightView* light
     const float fraction = m_animationTimer.ticksElapsed() / m_duration;
     const auto& _dest = dest + m_delta * fraction;
 
-    if (m_drawQueue && m_drawQueue->lastDest != _dest) {
-        m_drawQueue->lastDest = _dest;
-        m_drawQueue->hashs.clear();
+    if (m_drawBuffer && m_drawBuffer->dest != _dest) {
+        m_drawBuffer->dest = _dest;
+        m_drawBuffer->hashs.clear();
     }
 
-    getThingType()->draw(_dest * scaleFactor, scaleFactor, 0, xPattern, yPattern, 0, 0, TextureType::NONE, Color::white, lightView, m_drawQueue);
+    getThingType()->draw(_dest * scaleFactor, scaleFactor, 0, xPattern, yPattern, 0, 0, TextureType::NONE, Color::white, lightView, m_drawBuffer);
 }
 
 void Missile::setPath(const Position& fromPosition, const Position& toPosition)
@@ -90,7 +90,7 @@ void Missile::setPath(const Position& fromPosition, const Position& toPosition)
     m_animationTimer.restart();
     m_distance = fromPosition.distance(toPosition);
 
-    m_drawQueue = std::make_shared<Pool::DrawQueue>();
+    m_drawBuffer = std::make_shared<Pool::DrawBuffer>();
 
     // schedule removal
     const auto self = asMissile();
