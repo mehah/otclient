@@ -60,12 +60,12 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::Dr
 
             if (draw.queue) {
                 auto& hashList = draw.queue->hashs;
-                if (!draw.queue->hashs.contains(methodHash)) {
+                if (hashList.find(methodHash) == hashList.end()) {
                     hashList.insert(methodHash);
                     addCoords(method, *draw.queue->coords, DrawMode::TRIANGLES);
                 }
             } else {
-                list[it->second].drawMethods.push_back(method);
+                draw.drawMethods.push_back(method);
             }
         } else {
             m_currentPool->m_drawingPointer[stateHash] = list.size();
@@ -167,7 +167,7 @@ void DrawPool::drawObject(Pool::DrawObject& obj)
         obj.queue = std::make_shared<Pool::DrawQueue>();
     }
 
-    const bool useGlobalCoord = obj.queue == nullptr;
+    const bool useGlobalCoord = !obj.queue || !obj.queue->coords;
     auto& buffer = useGlobalCoord ? m_coordsBuffer : *obj.queue->coords;
 
     if (buffer.getVertexCount() == 0) {
