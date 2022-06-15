@@ -64,15 +64,9 @@ void Missile::drawMissile(const Point& dest, float scaleFactor, LightView* light
     const float fraction = m_animationTimer.ticksElapsed() / m_duration;
     const auto& _dest = dest + m_delta * fraction;
 
-    if (!m_drawQueue && isSingleGround()) {
-        m_drawQueue = std::make_shared<Pool::DrawQueue>();
-    }
-
-    if (m_drawQueue) {
-        if (m_drawQueue->lastDest != _dest) {
-            m_drawQueue->lastDest = _dest;
-            m_drawQueue->hashs.clear();
-        }
+    if (m_drawQueue && m_drawQueue->lastDest != _dest) {
+        m_drawQueue->lastDest = _dest;
+        m_drawQueue->hashs.clear();
     }
 
     getThingType()->draw(_dest * scaleFactor, scaleFactor, 0, xPattern, yPattern, 0, 0, TextureType::NONE, Color::white, lightView, m_drawQueue);
@@ -95,6 +89,8 @@ void Missile::setPath(const Position& fromPosition, const Position& toPosition)
     m_delta *= SPRITE_SIZE;
     m_animationTimer.restart();
     m_distance = fromPosition.distance(toPosition);
+
+    m_drawQueue = std::make_shared<Pool::DrawQueue>();
 
     // schedule removal
     const auto self = asMissile();

@@ -39,7 +39,7 @@ void DrawPool::terminate()
     }
 }
 
-void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, const DrawMode drawMode, const std::shared_ptr<Pool::DrawQueue> drawQueue)
+void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, const DrawMode drawMode, std::shared_ptr<Pool::DrawQueue> drawQueue)
 {
     const auto& state = Painter::PainterState{
        g_painter->getTransformMatrixRef(), color, m_currentPool->m_state.opacity,
@@ -57,38 +57,29 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::Dr
         auto it = m_currentPool->m_drawingPointer.find(stateHash);
         if (it != m_currentPool->m_drawingPointer.end()) {
             auto& draw = list[it->second];
-
-            if (draw.queue) {
-                auto& hashList = draw.queue->hashs;
-                if (!hashList.contains(methodHash)) {
-                    hashList.insert(methodHash);
-                    addCoords(method, *draw.queue->coords, DrawMode::TRIANGLES);
-                }
-            } else {
-                draw.drawMethods.push_back(method);
+            auto& hashList = draw.queue->hashs;
+            if (!hashList.contains(methodHash)) {
+                hashList.insert(methodHash);
+                addCoords(method, *draw.queue->coords, DrawMode::TRIANGLES);
             }
         } else {
             m_currentPool->m_drawingPointer[stateHash] = list.size();
 
-            std::vector<Pool::DrawMethod> methods;
-            if (drawQueue) {
-                if (drawQueue->hashs.empty()) {
-                    if (drawQueue->coords)
-                        drawQueue->coords->clear();
-                    else
-                        drawQueue->coords = std::make_shared<CoordsBuffer>();
+            if (!drawQueue)
+                drawQueue = std::make_shared<Pool::DrawQueue>();
 
-                    drawQueue->hashs.insert(methodHash);
+            if (drawQueue->hashs.empty()) {
+                if (drawQueue->coords)
+                    drawQueue->coords->clear();
+                else
+                    drawQueue->coords = std::make_shared<CoordsBuffer>();
 
-                    addCoords(method, *drawQueue->coords, DrawMode::TRIANGLES);
-                }
-                //drawQueue->index = 0;
-            } else {
-                methods.push_back(method);
+                drawQueue->hashs.insert(methodHash);
+
+                addCoords(method, *drawQueue->coords, DrawMode::TRIANGLES);
             }
 
-            //TODO: For now isGroupable will be false for drawings using framebuffer.
-            list.push_back({ state, DrawMode::TRIANGLES, methods, !m_currentPool->hasFrameBuffer(), drawQueue });
+            list.push_back({ state, DrawMode::TRIANGLES, {}, drawQueue });
         }
 
         return;
@@ -146,12 +137,7 @@ void DrawPool::draw()
             pf->m_framebuffer->draw();
             if (pf->m_afterDraw) pf->m_afterDraw();
         } else {
-            if (pool->m_objects.empty())
-                pool->m_cachedObjects.clear();
-            else if (pool->hasModification(true))
-                pool->m_cachedObjects = pool->m_objects;
-
-            for (auto& obj : pool->m_cachedObjects) {
+            for (auto& obj : pool->m_objects) {
                 drawObject(obj);
             }
         }
@@ -167,14 +153,10 @@ void DrawPool::drawObject(Pool::DrawObject& obj)
         return;
     }
 
-    if (obj.isGroupable && obj.queue == nullptr) {
-        obj.queue = std::make_shared<Pool::DrawQueue>();
-    }
-
-    const bool useGlobalCoord = !obj.queue || !obj.queue->coords;
+    const bool useGlobalCoord = !obj.queue;
     auto& buffer = useGlobalCoord ? m_coordsBuffer : *obj.queue->coords;
 
-    if (buffer.getVertexCount() == 0) {
+    if (useGlobalCoord) {
         if (obj.drawMethods.empty()) return;
         for (const auto& method : obj.drawMethods) {
             addCoords(method, buffer, obj.drawMode);

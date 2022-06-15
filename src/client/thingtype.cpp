@@ -725,10 +725,7 @@ void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPatte
     if (m_opacity < 1.0f)
         color = Color(1.0f, 1.0f, 1.0f, m_opacity);
 
-    g_drawPool.forceGrouping(getCategory() == ThingCategoryMissile || g_app.isDrawingEffectsOnTop() && getCategory() == ThingCategoryEffect);
-
     g_drawPool.addTexturedRect(screenRect, texture, textureRect, color, dest, drawQueue);
-    g_drawPool.forceGrouping(false);
 
     if (lightView && hasLight()) {
         const Light light = getLight();

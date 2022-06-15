@@ -39,6 +39,10 @@ ItemPtr Item::create(int id)
     ItemPtr item(new Item);
     item->setId(id);
 
+    if (item->isSingleGround()) {
+        item->m_drawQueue = std::make_shared<Pool::DrawQueue>();
+    }
+
     return item;
 }
 
@@ -69,16 +73,9 @@ void Item::draw(const Point& dest, float scaleFactor, bool animate, const Highli
     if (m_color != Color::alpha)
         color = m_color;
 
-
-    if (!m_drawQueue && isSingleGround()) {
-        m_drawQueue = std::make_shared<Pool::DrawQueue>();
-    }
-
-    if (m_drawQueue) {
-        if (m_drawQueue->lastDest != dest) {
-            m_drawQueue->lastDest = dest;
-            m_drawQueue->hashs.clear();
-        }
+    if (m_drawQueue && m_drawQueue->lastDest != dest) {
+        m_drawQueue->lastDest = dest;
+        m_drawQueue->hashs.clear();
     }
 
     getThingType()->draw(dest, scaleFactor, 0, xPattern, yPattern, zPattern, animationPhase, textureType, color, lightView, m_drawQueue);

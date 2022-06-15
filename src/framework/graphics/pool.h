@@ -81,8 +81,6 @@ protected:
         Painter::PainterState state;
         DrawMode drawMode;
         std::vector<DrawMethod> drawMethods;
-        bool isGroupable{ false };
-
         std::shared_ptr<DrawQueue> queue;
         std::function<void()> action{ nullptr };
     };
@@ -136,9 +134,9 @@ private:
 
     std::pair<size_t, size_t> m_status{ 0,0 };
 
-    std::vector<DrawObject> m_objects, m_cachedObjects;
+    std::vector<DrawObject> m_objects;
 
-    std::unordered_map<uint16_t, size_t> m_drawingPointer;
+    robin_hood::unordered_map<uint16_t, size_t> m_drawingPointer;
 
     friend class DrawPool;
 };
