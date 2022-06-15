@@ -62,7 +62,9 @@ void Missile::drawMissile(const Point& dest, float scaleFactor, LightView* light
     }
 
     const float fraction = m_animationTimer.ticksElapsed() / m_duration;
-    getThingType()->draw(dest + m_delta * fraction * scaleFactor, scaleFactor, 0, xPattern, yPattern, 0, 0, TextureType::NONE, Color::white, lightView);
+    const auto& _dest = dest + m_delta * fraction;
+
+    getThingType()->draw(_dest * scaleFactor, scaleFactor, 0, xPattern, yPattern, 0, 0, TextureType::NONE, Color::white, lightView);
 }
 
 void Missile::setPath(const Position& fromPosition, const Position& toPosition)

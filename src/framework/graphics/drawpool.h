@@ -74,6 +74,7 @@ private:
     void terminate();
     void createPools();
     void drawObject(Pool::DrawObject& obj);
+    void addCoords(const Pool::DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode);
     size_t updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method, size_t& stateHash);
     void add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, DrawMode drawMode = DrawMode::TRIANGLES, std::shared_ptr<Pool::DrawQueue> drawQueue = nullptr);
 

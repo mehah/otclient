@@ -116,7 +116,13 @@ public:
 
     TRect<T> expanded(T add) const { return TRect<T>(TPoint<T>(x1 - add, y1 - add), TPoint<T>(x2 + add, y2 + add)); }
 
-    std::size_t hash() const { return (7 * 15 + x1) * 15 + y1; }
+    std::size_t hash() const
+    {
+        size_t h = 37;
+        h = (h * 54059) ^ (x1 * 76963);
+        h = (h * 54059) ^ (y1 * 76963);
+        return h;
+    }
 
     void moveCenter(const TPoint<T>& p)
     {

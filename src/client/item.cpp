@@ -76,9 +76,7 @@ void Item::draw(const Point& dest, float scaleFactor, bool animate, const Highli
     if (m_drawQueue) {
         if (m_drawQueue->lastDest != dest) {
             m_drawQueue->lastDest = dest;
-            m_drawQueue->drawn = false;
             m_drawQueue->hashs.clear();
-            m_drawQueue->coords.clear();
         }
     }
 

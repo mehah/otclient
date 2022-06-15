@@ -28,6 +28,7 @@
 #include "framebuffer.h"
 #include "framework/core/timer.h"
 #include "texture.h"
+#include <unordered_set>
 
 enum class PoolType : uint8_t
 {
@@ -49,9 +50,8 @@ public:
     struct DrawQueue
     {
         Point lastDest;
-        std::vector<size_t> hashs;
-        bool drawn{ false };
-        CoordsBuffer coords;
+        std::unordered_set<size_t> hashs;
+        std::shared_ptr<CoordsBuffer> coords;
     };
 
 protected:

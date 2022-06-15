@@ -49,35 +49,42 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::Dr
 
     size_t stateHash = 0;
 
-    auto hash = updateHash(state, method, stateHash);
+    auto methodHash = updateHash(state, method, stateHash);
 
     auto& list = m_currentPool->m_objects;
 
-    if (m_currentPool->m_forceGrouping) {
+    if (m_currentPool->m_forceGrouping || drawQueue) {
         auto it = m_currentPool->m_drawingPointer.find(stateHash);
         if (it != m_currentPool->m_drawingPointer.end()) {
             auto& draw = list[it->second];
 
-            if (!std::any_of(draw.queue->hashs.begin(), draw.queue->hashs.end(), [hash = hash](const size_t h) { return h == hash; })) {
-                if (draw.queue->coords.getTextureCoordCount() > 0) {
-                    draw.queue->lastDest = {};
-                } else {
-                    draw.queue->hashs.push_back(hash);
-                    draw.drawMethods.push_back(method);
+            if (draw.queue) {
+                auto& hashList = draw.queue->hashs;
+                if (!draw.queue->hashs.contains(methodHash)) {
+                    hashList.insert(methodHash);
+                    addCoords(method, *draw.queue->coords, DrawMode::TRIANGLES);
                 }
+            } else {
+                list[it->second].drawMethods.push_back(method);
             }
         } else {
             m_currentPool->m_drawingPointer[stateHash] = list.size();
 
-            std::vector<Pool::DrawMethod> mList;
-            std::shared_ptr<Pool::DrawQueue> queue = drawQueue ? drawQueue : std::make_shared<Pool::DrawQueue>();
-            if (queue->hashs.empty()) {
-                queue->hashs.push_back(hash);
-                mList.push_back(method);
+            std::vector<Pool::DrawMethod> methods;
+            if (drawQueue) {
+                if (drawQueue->hashs.empty()) {
+                    if (drawQueue->coords)
+                        drawQueue->coords->clear();
+                    else
+                        drawQueue->coords = std::make_shared<CoordsBuffer>();
+                    addCoords(method, *drawQueue->coords, DrawMode::TRIANGLES);
+                }
+            } else {
+                methods.push_back(method);
             }
 
             //TODO: For now isGroupable will be false for drawings using framebuffer.
-            list.push_back({ state, DrawMode::TRIANGLES, mList, !m_currentPool->hasFrameBuffer(), queue });
+            list.push_back({ state, DrawMode::TRIANGLES, methods, !m_currentPool->hasFrameBuffer(), drawQueue });
         }
 
         return;
@@ -156,28 +163,17 @@ void DrawPool::drawObject(Pool::DrawObject& obj)
         return;
     }
 
+    if (obj.isGroupable && obj.queue == nullptr) {
+        obj.queue = std::make_shared<Pool::DrawQueue>();
+    }
+
     const bool useGlobalCoord = obj.queue == nullptr;
-    auto& buffer = useGlobalCoord ? m_coordsBuffer : obj.queue->coords;
+    auto& buffer = useGlobalCoord ? m_coordsBuffer : *obj.queue->coords;
 
     if (buffer.getVertexCount() == 0) {
+        if (obj.drawMethods.empty()) return;
         for (const auto& method : obj.drawMethods) {
-            if (method.type == Pool::DrawMethodType::BOUNDING_RECT) {
-                buffer.addBoudingRect(method.rects.first, method.intValue);
-            } else if (method.type == Pool::DrawMethodType::RECT) {
-                if (obj.drawMode == DrawMode::TRIANGLES)
-                    buffer.addRect(method.rects.first, method.rects.second);
-                else
-                    buffer.addQuad(method.rects.first, method.rects.second);
-            } else if (method.type == Pool::DrawMethodType::TRIANGLE) {
-                buffer.addTriangle(std::get<0>(method.points), std::get<1>(method.points), std::get<2>(method.points));
-            } else if (method.type == Pool::DrawMethodType::UPSIDEDOWN_RECT) {
-                if (obj.drawMode == DrawMode::TRIANGLES)
-                    buffer.addUpsideDownRect(method.rects.first, method.rects.second);
-                else
-                    buffer.addUpsideDownQuad(method.rects.first, method.rects.second);
-            } else if (method.type == Pool::DrawMethodType::REPEATED_RECT) {
-                buffer.addRepeatedRects(method.rects.first, method.rects.second);
-            }
+            addCoords(method, buffer, obj.drawMode);
         }
     }
 
@@ -190,8 +186,27 @@ void DrawPool::drawObject(Pool::DrawObject& obj)
 
     if (useGlobalCoord)
         m_coordsBuffer.clear();
-    else
-        obj.queue->drawn = true;
+}
+
+void DrawPool::addCoords(const Pool::DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode)
+{
+    if (method.type == Pool::DrawMethodType::BOUNDING_RECT) {
+        buffer.addBoudingRect(method.rects.first, method.intValue);
+    } else if (method.type == Pool::DrawMethodType::RECT) {
+        if (drawMode == DrawMode::TRIANGLES)
+            buffer.addRect(method.rects.first, method.rects.second);
+        else
+            buffer.addQuad(method.rects.first, method.rects.second);
+    } else if (method.type == Pool::DrawMethodType::TRIANGLE) {
+        buffer.addTriangle(std::get<0>(method.points), std::get<1>(method.points), std::get<2>(method.points));
+    } else if (method.type == Pool::DrawMethodType::UPSIDEDOWN_RECT) {
+        if (drawMode == DrawMode::TRIANGLES)
+            buffer.addUpsideDownRect(method.rects.first, method.rects.second);
+        else
+            buffer.addUpsideDownQuad(method.rects.first, method.rects.second);
+    } else if (method.type == Pool::DrawMethodType::REPEATED_RECT) {
+        buffer.addRepeatedRects(method.rects.first, method.rects.second);
+    }
 }
 
 void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Color& color)
@@ -363,7 +378,7 @@ size_t DrawPool::updateHash(const Painter::PainterState& state, const Pool::Draw
 
         if (method.intValue) stdext::hash_combine(methodhash, method.intValue);
 
-        stdext::hash_combine(methodhash, stateHash);
+        //stdext::hash_combine(methodhash, stateHash);
         stdext::hash_combine(m_currentPool->m_status.second, methodhash);
 
         return methodhash;
