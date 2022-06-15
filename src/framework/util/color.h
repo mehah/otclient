@@ -134,7 +134,7 @@ private:
         m_b{ 1.f },
         m_a{ 1.f };
 
-    uint32_t m_rgba{ 0 };
+    uint32_t m_rgba{ UINT32_MAX };
 };
 
 std::ostream& operator<<(std::ostream& out, const Color& color);
