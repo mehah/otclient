@@ -76,6 +76,7 @@ public:
     void cache();
 
     bool isCached() { return m_vertexArray.isCached() || m_textureCoordArray.isCached(); }
+    void enableCache() { m_canCache = true; }
 
     HardwareBuffer* getHardwareVertexCache() { return m_vertexArray.getHardwareCache(); }
     HardwareBuffer* getHardwareTextureCoordCache() { return m_textureCoordArray.getHardwareCache(); }
