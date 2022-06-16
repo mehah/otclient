@@ -25,16 +25,6 @@
 #include <any>
 #include <cstddef>
 #include <cstdint>
-#include <unordered_map>
-#include <string_view>
-
-#define ROBIN_HOOD_HASHING
-
-#ifdef ROBIN_HOOD_HASHING
-#include "../util/robin_hood.h"
-#endif
-
-using namespace std::literals;
 
 using uchar = unsigned char;
 using ushort = unsigned short;

@@ -22,18 +22,25 @@
 
 #pragma once
 
-#include "types.h"
+#include "../pch.h"
 
 namespace stdext
 {
-#ifdef ROBIN_HOOD_HASHING
-    template <typename Key, typename T, typename Hash = robin_hood::hash<Key>,
-        typename KeyEqual = std::equal_to<Key>, size_t MaxLoadFactor100 = 80>
-    using unordered_map = robin_hood::unordered_map< Key, T, Hash, KeyEqual, MaxLoadFactor100>;
-#else
-    template <class _Kty, class _Ty, class _Hasher = std::hash<_Kty>, class _Keyeq = std::equal_to<_Kty>,
+#ifdef USE_STD_HASHING
+    template <class _Kty, class _Ty, class _Hasher = stdext::hash<_Kty>, class _Keyeq = std::equal_to<_Kty>,
         class _Alloc = std::allocator<std::pair<const _Kty, _Ty>>>
     using unordered_map = std::unordered_map<_Kty, _Ty, _Hasher, _Keyeq, _Alloc>;
+
+    template <class _Kty, class _Hasher = stdext::hash<_Kty>, class _Keyeq = std::equal_to<_Kty>, class _Alloc = std::allocator<_Kty>>
+    using unordered_set = std::unordered_set<_Kty, _Hasher, _Keyeq, _Alloc>;
+#else
+    template <typename Key, typename T, typename Hash = robin_hood::hash<Key>,
+        typename KeyEqual = std::equal_to<Key>, size_t MaxLoadFactor100 = 80>
+    using unordered_map = robin_hood::unordered_flat_map< Key, T, Hash, KeyEqual, MaxLoadFactor100>;
+
+    template <typename Key, typename Hash = robin_hood::hash<Key>, typename KeyEqual = std::equal_to<Key>,
+        size_t MaxLoadFactor100 = 80>
+    using unordered_set = robin_hood::unordered_flat_set<Key, Hash, KeyEqual, MaxLoadFactor100>;
 #endif
 
     template<typename T>
@@ -89,6 +96,6 @@ namespace stdext
         void clear() { m_data.clear(); }
 
     private:
-        std::unordered_map<Key, std::any> m_data;
+        stdext::unordered_map<Key, std::any> m_data;
     };
 }

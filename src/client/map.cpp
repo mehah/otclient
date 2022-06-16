@@ -551,7 +551,7 @@ void Map::removeUnawareThings()
     if (!g_game.getFeature(Otc::GameKeepUnawareTiles)) {
         // remove tiles that we are not aware anymore
         for (int_fast8_t z = -1; ++z <= MAX_Z;) {
-            std::unordered_map<uint, TileBlock>& tileBlocks = m_tileBlocks[z];
+            stdext::unordered_map<uint, TileBlock>& tileBlocks = m_tileBlocks[z];
             for (auto it = tileBlocks.begin(); it != tileBlocks.end();) {
                 TileBlock& block = (*it).second;
                 bool blockEmpty = true;
@@ -826,7 +826,7 @@ std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::findPath(const
         }
     }
 
-    std::unordered_map<Position, SNode*, Position::Hasher> nodes;
+    stdext::unordered_map<Position, SNode*, Position::Hasher> nodes;
     std::priority_queue<std::pair<SNode*, float>, std::vector<std::pair<SNode*, float>>, LessNode> searchList;
 
     auto* currentNode = new SNode(startPos);
@@ -991,7 +991,7 @@ PathFindResult_ptr Map::newFindPath(const Position& start, const Position& goal,
         }
     };
 
-    std::unordered_map<Position, Node*, Position::Hasher> nodes;
+    stdext::unordered_map<Position, Node*, Position::Hasher> nodes;
     std::priority_queue<Node*, std::vector<Node*>, LessNode> searchList;
 
     if (visibleNodes) {
@@ -1155,7 +1155,7 @@ std::map<std::string, std::tuple<int, int, int, std::string>> Map::findEveryPath
     }
 
     std::map<std::string, std::tuple<int, int, int, std::string>> ret;
-    std::unordered_map<Position, Node*, Position::Hasher> nodes;
+    stdext::unordered_map<Position, Node*, Position::Hasher> nodes;
     std::priority_queue<Node*, std::vector<Node*>, LessNode> searchList;
 
     auto initNode = new Node{ 1, 0, start, nullptr, 0, 0 };

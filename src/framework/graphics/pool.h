@@ -28,7 +28,8 @@
 #include "framebuffer.h"
 #include "framework/core/timer.h"
 #include "texture.h"
-#include <unordered_set>
+
+#include "../stdext/storage.h"
 
 enum class PoolType : uint8_t
 {
@@ -50,7 +51,7 @@ public:
     struct DrawBuffer
     {
         Point dest;
-        robin_hood::unordered_flat_set<size_t> hashs;
+        stdext::unordered_set<size_t> hashs;
         std::shared_ptr<CoordsBuffer> coords;
     };
 
@@ -136,7 +137,7 @@ private:
 
     std::vector<DrawObject> m_objects;
 
-    robin_hood::unordered_map<uint16_t, size_t> m_drawingPointer;
+    stdext::unordered_map<uint16_t, size_t> m_drawingPointer;
 
     friend class DrawPool;
 };

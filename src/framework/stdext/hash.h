@@ -22,12 +22,22 @@
 
 #pragma once
 
+#include "../pch.h"
+
 namespace stdext
 {
+#ifdef USE_STD_HASHING
+    template <class _Kty>
+    using hash = std::hash<_Kty>;
+#else
+    template <class _Kty>
+    using hash = robin_hood::hash<_Kty>;
+#endif
+
     template <class T>
     void hash_combine(std::size_t& seed, const T& v)
     {
-        std::hash<T> hasher;
+        stdext::hash<T> hasher;
         seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
     }
 }

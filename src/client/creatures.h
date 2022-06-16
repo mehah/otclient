@@ -75,7 +75,7 @@ protected:
 
 private:
     stdext::dynamic_storage8<SpawnAttr, SpawnAttrLast> m_attribs;
-    std::unordered_map<Position, CreatureTypePtr, Position::Hasher> m_creatures;
+    stdext::unordered_map<Position, CreatureTypePtr, Position::Hasher> m_creatures;
     friend class CreatureManager;
 };
 
@@ -140,7 +140,7 @@ protected:
 
 private:
     std::vector<CreatureTypePtr> m_creatures;
-    std::unordered_map<Position, SpawnPtr, Position::Hasher> m_spawns;
+    stdext::unordered_map<Position, SpawnPtr, Position::Hasher> m_spawns;
     bool m_loaded{ false }, m_spawnLoaded{ false };
     CreatureTypePtr m_nullCreature;
 };

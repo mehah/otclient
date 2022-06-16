@@ -91,7 +91,7 @@ void LuaObject::luaGetField(const std::string_view key)
 
 void LuaObject::luaGetMetatable()
 {
-    static std::unordered_map<const std::type_info*, int> metatableMap;
+    static stdext::unordered_map<const std::type_info*, int> metatableMap;
     const auto& tinfo = typeid(*this);
     const auto it = metatableMap.find(&tinfo);
 
