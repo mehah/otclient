@@ -32,6 +32,7 @@
 #include <framework/graphics/texture.h>
 #include <framework/graphics/texturemanager.h>
 
+#include <atomic>
 
 void UIWidget::initBaseStyle()
 {
