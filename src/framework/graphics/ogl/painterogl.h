@@ -34,6 +34,7 @@ public:
     virtual void setProjectionMatrix(const Matrix3& projectionMatrix) { m_projectionMatrix = projectionMatrix; }
     virtual void setTextureMatrix(const Matrix3& textureMatrix) { m_textureMatrix = textureMatrix; }
 
+    void resetState() override;
     void resetBlendEquation() { setBlendEquation(BlendEquation::ADD); }
     void resetTexture() { setTexture(nullptr); }
     void resetAlphaWriting() { setAlphaWriting(false); }

@@ -31,6 +31,18 @@ PainterOGL::PainterOGL()
     setResolution(g_window.getSize());
 }
 
+void PainterOGL::resetState()
+{
+    resetColor();
+    resetOpacity();
+    resetCompositionMode();
+    resetBlendEquation();
+    resetClipRect();
+    resetShaderProgram();
+    resetAlphaWriting();
+    resetTransformMatrix();
+}
+
 void PainterOGL::refreshState()
 {
     updateGlViewport();
