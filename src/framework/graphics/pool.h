@@ -51,8 +51,12 @@ public:
     struct DrawBuffer
     {
         Point dest;
-        stdext::unordered_set<size_t> hashs;
+        std::vector<size_t> hashs;
         std::shared_ptr<CoordsBuffer> coords;
+        int i{ 0 };
+
+        void invalidate() { i = -1; dest = {}; }
+        bool isValid() { return i > -1; }
     };
 
 protected:
@@ -137,7 +141,7 @@ private:
 
     std::vector<DrawObject> m_objects;
 
-    stdext::unordered_map<uint16_t, size_t> m_drawingPointer;
+    stdext::unordered_map<size_t, size_t> m_drawingPointer;
 
     friend class DrawPool;
 };

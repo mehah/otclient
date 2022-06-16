@@ -57,10 +57,15 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::Dr
         auto it = m_currentPool->m_drawingPointer.find(stateHash);
         if (it != m_currentPool->m_drawingPointer.end()) {
             auto& draw = list[it->second];
+            if (!draw.queue->isValid())
+                return;
+
             auto& hashList = draw.queue->hashs;
-            if (!hashList.contains(methodHash)) {
-                hashList.insert(methodHash);
+            if (++draw.queue->i == hashList.size()) {
+                hashList.push_back(methodHash);
                 addCoords(method, *draw.queue->coords, DrawMode::TRIANGLES);
+            } else if (hashList[draw.queue->i] != methodHash) {
+                draw.queue->invalidate();
             }
         } else {
             m_currentPool->m_drawingPointer[stateHash] = list.size();
@@ -74,10 +79,10 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::Dr
                 else
                     drawQueue->coords = std::make_shared<CoordsBuffer>();
 
-                drawQueue->hashs.insert(methodHash);
-
+                drawQueue->hashs.push_back(methodHash);
                 addCoords(method, *drawQueue->coords, DrawMode::TRIANGLES);
             }
+            drawQueue->i = 0;
 
             list.push_back({ state, DrawMode::TRIANGLES, {}, drawQueue });
         }
@@ -130,6 +135,7 @@ void DrawPool::draw()
     // Draw
     for (const auto& pool : m_pools) {
         if (!pool->isEnabled()) continue;
+
         if (pool->hasFrameBuffer()) {
             const auto* const pf = pool->toPoolFramed();
 
