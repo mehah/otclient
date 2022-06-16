@@ -56,6 +56,7 @@ class Painter
 {
 public:
     Painter();
+
     virtual ~Painter() = default;
 
     virtual void bind() {}
@@ -84,12 +85,6 @@ public:
     virtual void setOpacity(float opacity) { m_opacity = opacity; }
     virtual void setResolution(const Size& resolution) { m_resolution = resolution; }
 
-    Size getResolution() { return m_resolution; }
-    Color getColor() { return m_color; }
-    float getOpacity() { return m_opacity; }
-    Rect getClipRect() { return m_clipRect; }
-    CompositionMode getCompositionMode() { return m_compositionMode; }
-
     virtual Matrix3 getTransformMatrix() = 0;
     virtual Matrix3 getProjectionMatrix() = 0;
     virtual Matrix3 getTextureMatrix() = 0;
@@ -99,14 +94,20 @@ public:
     virtual void pushTransformMatrix() = 0;
     virtual void popTransformMatrix() = 0;
 
+    virtual void resetState() = 0;
+    virtual bool hasShaders() = 0;
+
+    Color getColor() { return m_color; }
+    float getOpacity() { return m_opacity; }
+    Rect getClipRect() { return m_clipRect; }
+    Size getResolution() { return m_resolution; }
+    CompositionMode getCompositionMode() { return m_compositionMode; }
+
     void resetClipRect() { setClipRect({}); }
     void resetOpacity() { setOpacity(1.f); }
     void resetCompositionMode() { setCompositionMode(CompositionMode::NORMAL); }
     void resetColor() { setColor(Color::white); }
     void resetShaderProgram() { setShaderProgram(nullptr); }
-    virtual void resetState() = 0;
-
-    virtual bool hasShaders() = 0;
 
 protected:
     struct PainterState
