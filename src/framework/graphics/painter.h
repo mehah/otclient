@@ -100,10 +100,11 @@ public:
     virtual void popTransformMatrix() = 0;
 
     void resetClipRect() { setClipRect({}); }
-    void resetOpacity() { setOpacity(1.0f); }
+    void resetOpacity() { setOpacity(1.f); }
     void resetCompositionMode() { setCompositionMode(CompositionMode::NORMAL); }
     void resetColor() { setColor(Color::white); }
     void resetShaderProgram() { setShaderProgram(nullptr); }
+    virtual void resetState() = 0;
 
     virtual bool hasShaders() = 0;
 

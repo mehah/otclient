@@ -32,10 +32,11 @@
 #include <framework/graphics/texture.h>
 #include <framework/graphics/texturemanager.h>
 
-static std::atomic<ulong> UID(0);
+#include <atomic>
 
 void UIWidget::initBaseStyle()
 {
+    static std::atomic<uint32_t> UID(0);
     m_borderColor.set(Color::black);
 
     // generate an unique id, this is need because anchored layouts find widgets by id
