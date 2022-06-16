@@ -23,6 +23,7 @@
 #pragma once
 
 #include <framework/global.h>
+#include "glutil.h"
 
 class Texture;
 class TextureManager;
