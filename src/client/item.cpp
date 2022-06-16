@@ -80,7 +80,7 @@ void Item::draw(const Point& dest, float scaleFactor, bool animate, const Highli
 
     if (m_drawBuffer && m_drawBuffer->dest != dest) {
         m_drawBuffer->dest = dest;
-        m_drawBuffer->hashs.clear();
+        m_drawBuffer->invalidate();
     }
 
     getThingType()->draw(dest, scaleFactor, 0, xPattern, yPattern, zPattern, animationPhase, textureType, color, lightView, m_drawBuffer);

@@ -54,8 +54,8 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::Dr
     auto& list = m_currentPool->m_objects;
 
     if (m_currentPool->m_forceGrouping || drawQueue) {
-        auto it = m_currentPool->m_drawingPointer.find(stateHash);
-        if (it != m_currentPool->m_drawingPointer.end()) {
+        auto it = m_currentPool->m_drawObjectPointer.find(stateHash);
+        if (it != m_currentPool->m_drawObjectPointer.end()) {
             auto& draw = list[it->second];
             if (!draw.queue->isValid())
                 return;
@@ -67,25 +67,34 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::Dr
             } else if (hashList[draw.queue->i] != methodHash) {
                 draw.queue->invalidate();
             }
-        } else {
-            m_currentPool->m_drawingPointer[stateHash] = list.size();
 
-            if (!drawQueue)
-                drawQueue = std::make_shared<Pool::DrawBuffer>();
-
-            if (drawQueue->hashs.empty()) {
-                if (drawQueue->coords)
-                    drawQueue->coords->clear();
-                else
-                    drawQueue->coords = std::make_shared<CoordsBuffer>();
-
-                drawQueue->hashs.push_back(methodHash);
-                addCoords(method, *drawQueue->coords, DrawMode::TRIANGLES);
-            }
-            drawQueue->i = 0;
-
-            list.push_back({ state, DrawMode::TRIANGLES, {}, drawQueue });
+            return;
         }
+
+        m_currentPool->m_drawObjectPointer[stateHash] = list.size();
+
+        if (!drawQueue) {
+            auto& bufferCache = m_currentPool->m_bufferCache;
+            auto it = bufferCache.find(stateHash);
+            if (it == bufferCache.end()) {
+                bufferCache[stateHash] = drawQueue = std::make_shared<Pool::DrawBuffer>();
+            } else {
+                drawQueue = it->second;
+            }
+        }
+
+        if (drawQueue->hashs.empty()) {
+            if (drawQueue->coords)
+                drawQueue->coords->clear();
+            else
+                drawQueue->coords = std::make_shared<CoordsBuffer>();
+
+            drawQueue->hashs.push_back(methodHash);
+            addCoords(method, *drawQueue->coords, DrawMode::TRIANGLES);
+        }
+        drawQueue->i = 0;
+
+        list.push_back({ state, DrawMode::TRIANGLES, {}, drawQueue });
 
         return;
     }

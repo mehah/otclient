@@ -57,7 +57,7 @@ void Effect::drawEffect(const Point& dest, float scaleFactor, LightView* lightVi
 
     if (m_drawBuffer && m_drawBuffer->dest != dest) {
         m_drawBuffer->dest = dest;
-        m_drawBuffer->hashs.clear();
+        m_drawBuffer->invalidate();
     }
 
     getThingType()->draw(dest, scaleFactor, 0, xPattern, yPattern, 0, animationPhase, TextureType::NONE, Color::white, lightView, m_drawBuffer);

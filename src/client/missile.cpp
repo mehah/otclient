@@ -66,7 +66,7 @@ void Missile::drawMissile(const Point& dest, float scaleFactor, LightView* light
 
     if (m_drawBuffer && m_drawBuffer->dest != _dest) {
         m_drawBuffer->dest = _dest;
-        m_drawBuffer->hashs.clear();
+        m_drawBuffer->invalidate();
     }
 
     getThingType()->draw(_dest * scaleFactor, scaleFactor, 0, xPattern, yPattern, 0, 0, TextureType::NONE, Color::white, lightView, m_drawBuffer);

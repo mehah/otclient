@@ -55,7 +55,7 @@ public:
         std::shared_ptr<CoordsBuffer> coords;
         int i{ 0 };
 
-        void invalidate() { i = -1; dest = {}; }
+        void invalidate() { i = -1; hashs.clear(); }
         bool isValid() { return i > -1; }
     };
 
@@ -119,7 +119,7 @@ private:
     void resetCompositionMode() { m_state.compositionMode = CompositionMode::NORMAL; }
     void resetBlendEquation() { m_state.blendEquation = BlendEquation::ADD; }
 
-    void next() { m_drawingPointer.clear(); }
+    void next() { m_drawObjectPointer.clear(); }
 
     virtual bool hasFrameBuffer() const { return false; };
     virtual PoolFramed* toPoolFramed() { return nullptr; }
@@ -141,7 +141,8 @@ private:
 
     std::vector<DrawObject> m_objects;
 
-    stdext::unordered_map<size_t, size_t> m_drawingPointer;
+    stdext::unordered_map<size_t, size_t> m_drawObjectPointer;
+    stdext::unordered_map<size_t, std::shared_ptr<DrawBuffer>> m_bufferCache;
 
     friend class DrawPool;
 };
