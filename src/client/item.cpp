@@ -39,7 +39,7 @@ ItemPtr Item::create(int id)
     ItemPtr item(new Item);
     item->setId(id);
 
-    if (item->isSingleGround()) {
+    if (item->isSingleGround() || item->isOnBottom() && item->isSingleDimension() && !item->hasDisplacement()) {
         item->m_drawBuffer = std::make_shared<Pool::DrawBuffer>();
     }
 
