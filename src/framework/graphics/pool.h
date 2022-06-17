@@ -47,7 +47,6 @@ public:
     static const std::shared_ptr<DrawBuffer> create() { return std::make_shared<DrawBuffer>(); }
 
     bool isValid() { return m_i > -1; }
-    void invalidate() { m_i = -1; m_hashs.clear(); }
     bool validate(const Point& p)
     {
         if (m_ref != p) { m_ref = p; invalidate(); }
@@ -55,6 +54,7 @@ public:
     }
 
 private:
+    void invalidate() { m_i = -1; m_hashs.clear(); }
     int m_i{ 0 };
     Point m_ref;
 
