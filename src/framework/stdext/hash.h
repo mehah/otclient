@@ -34,10 +34,15 @@ namespace stdext
     using hash = robin_hood::hash<_Kty>;
 #endif
 
+    inline void hash_union(size_t& seed, const size_t h)
+    {
+        seed ^= h + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    }
+
     template <class T>
-    void hash_combine(std::size_t& seed, const T& v)
+    void hash_combine(size_t& seed, const T& v)
     {
         stdext::hash<T> hasher;
-        seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        hash_union(seed, hasher(v));
     }
 }

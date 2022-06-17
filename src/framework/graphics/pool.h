@@ -119,7 +119,8 @@ private:
     void resetCompositionMode() { m_state.compositionMode = CompositionMode::NORMAL; }
     void resetBlendEquation() { m_state.blendEquation = BlendEquation::ADD; }
 
-    void next() { m_drawObjectPointer.clear(); }
+    void flush() { m_drawObjectPointer.clear(); }
+    void clearBuffer() { m_bufferCache.clear(); }
 
     virtual bool hasFrameBuffer() const { return false; };
     virtual PoolFramed* toPoolFramed() { return nullptr; }

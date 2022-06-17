@@ -47,9 +47,8 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::Dr
        m_currentPool->m_state.clipRect, texture, m_currentPool->m_state.shaderProgram
     };
 
-    size_t stateHash = 0;
-
-    auto methodHash = updateHash(state, method, stateHash);
+    size_t stateHash = 0, methodHash = 0;
+    updateHash(state, method, stateHash, methodHash);
 
     auto& list = m_currentPool->m_objects;
 
@@ -332,7 +331,8 @@ void DrawPool::use(const PoolType type, const Rect& dest, const Rect& src, const
     pool->m_framebuffer->m_colorClear = colorClear;
 }
 
-size_t DrawPool::updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method, size_t& stateHash)
+void DrawPool::updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method,
+                            size_t& stateHash, size_t& methodhash)
 {
     { // State Hash
         if (state.blendEquation != BlendEquation::ADD)
@@ -361,11 +361,10 @@ size_t DrawPool::updateHash(const Painter::PainterState& state, const Pool::Draw
         if (state.transformMatrix != DEFAULT_MATRIX_3)
             stdext::hash_combine(stateHash, state.transformMatrix.hash());
 
-        //stdext::hash_combine(m_currentPool->m_status.second, stateHash);
+        stdext::hash_union(m_currentPool->m_status.second, stateHash);
     }
 
     { // Method Hash
-        size_t methodhash = 0;
         if (method.rects.first.isValid()) stdext::hash_combine(methodhash, method.rects.first.hash());
         if (method.rects.second.isValid()) stdext::hash_combine(methodhash, method.rects.second.hash());
 
@@ -379,9 +378,6 @@ size_t DrawPool::updateHash(const Painter::PainterState& state, const Pool::Draw
 
         if (method.intValue) stdext::hash_combine(methodhash, method.intValue);
 
-        //stdext::hash_combine(methodhash, stateHash);
-        stdext::hash_combine(m_currentPool->m_status.second, methodhash);
-
-        return methodhash;
+        stdext::hash_union(m_currentPool->m_status.second, methodhash);
     }
 }

@@ -64,7 +64,8 @@ public:
     void forceGrouping(const bool force) { m_currentPool->m_forceGrouping = force; }
     bool isForcingGrouping() const { return m_currentPool->m_forceGrouping; }
 
-    void next() { m_currentPool->next(); }
+    void flush() { if (m_currentPool) m_currentPool->flush(); }
+    void clearBuffer() { for (auto& pool : m_pools) pool->clearBuffer(); }
 
     size_t size() { return m_currentPool->m_objects.size(); }
 
@@ -75,7 +76,7 @@ private:
     void createPools();
     void drawObject(Pool::DrawObject& obj);
     void addCoords(const Pool::DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode);
-    size_t updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method, size_t& stateHash);
+    void updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method, size_t& stateHash, size_t& methodHash);
     void add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, DrawMode drawMode = DrawMode::TRIANGLES, std::shared_ptr<Pool::DrawBuffer> drawQueue = nullptr);
 
     PoolFramed* poolFramed() { return m_currentPool->toPoolFramed(); }

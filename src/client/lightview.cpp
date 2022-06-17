@@ -57,7 +57,6 @@ void LightView::draw(const Rect& dest, const Rect& src)
 
     const float size = m_tileSize * 3.3;
 
-    // Clear the lighting references
     bool _clr = true;
     for (auto& light : m_sources) {
         if (light.color) {
@@ -67,7 +66,8 @@ void LightView::draw(const Rect& dest, const Rect& src)
             g_drawPool.setBlendEquation(BlendEquation::MAX, g_drawPool.size());
             _clr = true;
         } else {
-            if (_clr) { g_drawPool.next(); _clr = false; }
+            // Empty the lightings references
+            if (_clr) { g_drawPool.flush(); _clr = false; }
 
             g_drawPool.setOpacity(light.opacity);
             g_drawPool.addTexturedRect(Rect(light.pos - m_tileSize * 1.8, size, size), g_sprites.getShadeTexture(), m_globalLightColor);
