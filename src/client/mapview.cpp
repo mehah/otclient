@@ -183,8 +183,9 @@ void MapView::drawFloor()
             }
 
             for (const auto& tile : map.effects) {
+                const auto& dest = transformPositionTo2D(tile->getPosition(), cameraPosition);
                 for (const auto& effect : tile->getEffects()) {
-                    effect->drawEffect(transformPositionTo2D(effect->getPosition(), cameraPosition), m_scaleFactor, lightView);
+                    effect->drawEffect(dest, m_scaleFactor, lightView);
                 }
             }
             for (const MissilePtr& missile : g_map.getFloorMissiles(z))
