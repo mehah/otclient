@@ -45,7 +45,7 @@ Pool* Pool::create(const PoolType type)
     return pool;
 }
 
-void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& method, const DrawMode drawMode, std::shared_ptr<DrawBuffer> drawQueue)
+void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& method, const DrawMode drawMode, std::shared_ptr<DrawBuffer> drawBuffer)
 {
     const auto& state = Painter::PainterState{
        g_painter->getTransformMatrixRef(), color, m_state.opacity,
@@ -58,7 +58,7 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
 
     auto& list = m_objects;
 
-    if (m_forceGrouping || drawQueue) {
+    if (m_forceGrouping || drawBuffer) {
         auto& pointer = m_drawObjectPointer;
         if (auto it = pointer.find(stateHash); it != pointer.end()) {
             auto& draw = list[it->second];
@@ -78,22 +78,22 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
 
         pointer[stateHash] = list.size();
 
-        if (!drawQueue) {
-            drawQueue = std::make_shared<DrawBuffer>();
+        if (!drawBuffer) {
+            drawBuffer = std::make_shared<DrawBuffer>();
         }
 
-        if (drawQueue->hashs.empty()) {
-            if (drawQueue->coords)
-                drawQueue->coords->clear();
+        if (drawBuffer->hashs.empty()) {
+            if (drawBuffer->coords)
+                drawBuffer->coords->clear();
             else
-                drawQueue->coords = std::make_shared<CoordsBuffer>();
+                drawBuffer->coords = std::make_shared<CoordsBuffer>();
 
-            drawQueue->hashs.push_back(methodHash);
-            addCoords(method, *drawQueue->coords, DrawMode::TRIANGLES);
+            drawBuffer->hashs.push_back(methodHash);
+            addCoords(method, *drawBuffer->coords, DrawMode::TRIANGLES);
         }
-        drawQueue->i = 0;
+        drawBuffer->i = 0;
 
-        list.push_back({ state, DrawMode::TRIANGLES, {}, drawQueue });
+        list.push_back({ state, DrawMode::TRIANGLES, {}, drawBuffer });
 
         return;
     }

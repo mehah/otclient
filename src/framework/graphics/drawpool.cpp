@@ -37,6 +37,7 @@ void DrawPool::init()
 
 void DrawPool::terminate()
 {
+    // Destroy Pools
     m_currentPool = nullptr;
     for (int_fast8_t i = -1; ++i <= static_cast<uint8_t>(PoolType::UNKNOW);) {
         delete m_pools[i];

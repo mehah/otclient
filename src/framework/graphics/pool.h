@@ -105,7 +105,7 @@ protected:
 private:
     static Pool* create(const PoolType type);
 
-    void add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, DrawMode drawMode = DrawMode::TRIANGLES, std::shared_ptr<Pool::DrawBuffer> drawQueue = nullptr);
+    void add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, DrawMode drawMode = DrawMode::TRIANGLES, std::shared_ptr<Pool::DrawBuffer> drawBuffer = nullptr);
     void addCoords(const Pool::DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode);
     void updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method, size_t& stateHash, size_t& methodHash);
 
