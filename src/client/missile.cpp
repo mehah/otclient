@@ -28,7 +28,7 @@
 
 void Missile::drawMissile(const Point& dest, float scaleFactor, LightView* lightView)
 {
-    if (m_id == 0)
+    if (m_id == 0 || !m_drawBuffer)
         return;
 
     int xPattern = 0, yPattern = 0;
