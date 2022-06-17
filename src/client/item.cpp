@@ -40,7 +40,7 @@ ItemPtr Item::create(int id)
     item->setId(id);
 
     if (item->isSingleGround() || item->isOnBottom() && item->isSingleDimension() && !item->hasDisplacement()) {
-        item->m_drawBuffer = std::make_shared<Pool::DrawBuffer>();
+        item->m_drawBuffer = std::make_shared<DrawBuffer>();
     }
 
     return item;
@@ -52,7 +52,7 @@ ItemPtr Item::createFromOtb(int id)
     item->setOtbId(id);
 
     if (item->isSingleGround()) {
-        item->m_drawBuffer = std::make_shared<Pool::DrawBuffer>();
+        item->m_drawBuffer = std::make_shared<DrawBuffer>();
     }
 
     return item;

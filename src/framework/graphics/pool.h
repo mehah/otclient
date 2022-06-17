@@ -41,23 +41,26 @@ enum class PoolType : uint8_t
     UNKNOW
 };
 
+struct DrawBuffer
+{
+    Point dest;
+    void invalidate() { i = -1; hashs.clear(); }
+    bool isValid() { return i > -1; }
+
+private:
+    int i{ 0 };
+    std::vector<size_t> hashs;
+    std::shared_ptr<CoordsBuffer> coords;
+    friend class Pool;
+    friend class DrawPool;
+};
+
 class Pool
 {
 public:
     void setEnable(const bool v) { m_enabled = v; }
     bool isEnabled() const { return m_enabled; }
     PoolType getType() const { return m_type; }
-
-    struct DrawBuffer
-    {
-        Point dest;
-        std::vector<size_t> hashs;
-        std::shared_ptr<CoordsBuffer> coords;
-        int i{ 0 };
-
-        void invalidate() { i = -1; hashs.clear(); }
-        bool isValid() { return i > -1; }
-    };
 
 protected:
     enum class DrawMethodType
@@ -105,7 +108,7 @@ protected:
 private:
     static Pool* create(const PoolType type);
 
-    void add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, DrawMode drawMode = DrawMode::TRIANGLES, std::shared_ptr<Pool::DrawBuffer> drawBuffer = nullptr);
+    void add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, DrawMode drawMode = DrawMode::TRIANGLES, std::shared_ptr<DrawBuffer> drawBuffer = nullptr);
     void addCoords(const Pool::DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode);
     void updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method, size_t& stateHash, size_t& methodHash);
 

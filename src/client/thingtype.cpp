@@ -701,7 +701,7 @@ void ThingType::unserializeOtml(const OTMLNodePtr& node)
     }
 }
 
-void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, TextureType textureType, Color color, LightView* lightView, std::shared_ptr<Pool::DrawBuffer> drawQueue)
+void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, TextureType textureType, Color color, LightView* lightView, std::shared_ptr<DrawBuffer> drawQueue)
 {
     if (m_null)
         return;
