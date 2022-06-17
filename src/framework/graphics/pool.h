@@ -120,7 +120,6 @@ private:
     void resetBlendEquation() { m_state.blendEquation = BlendEquation::ADD; }
 
     void flush() { m_drawObjectPointer.clear(); }
-    void clearBuffer() { m_bufferCache.clear(); }
 
     virtual bool hasFrameBuffer() const { return false; };
     virtual PoolFramed* toPoolFramed() { return nullptr; }
@@ -143,7 +142,6 @@ private:
     std::vector<DrawObject> m_objects;
 
     stdext::unordered_map<size_t, size_t> m_drawObjectPointer;
-    stdext::unordered_map<size_t, std::shared_ptr<DrawBuffer>> m_bufferCache;
 
     friend class DrawPool;
 };

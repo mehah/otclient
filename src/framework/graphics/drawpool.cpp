@@ -73,12 +73,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::Dr
         pointer[stateHash] = list.size();
 
         if (!drawQueue) {
-            auto& bufferCache = m_currentPool->m_bufferCache;
-            if (auto it = bufferCache.find(stateHash); it == bufferCache.end()) {
-                bufferCache[stateHash] = drawQueue = std::make_shared<Pool::DrawBuffer>();
-            } else {
-                drawQueue = it->second;
-            }
+            drawQueue = std::make_shared<Pool::DrawBuffer>();
         }
 
         if (drawQueue->hashs.empty()) {

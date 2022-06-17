@@ -114,7 +114,6 @@ void MapView::draw(const Rect& rect)
         m_rectCache.drawOffset = m_rectCache.srcRect.topLeft();
         m_rectCache.horizontalStretchFactor = rect.width() / static_cast<float>(m_rectCache.srcRect.width());
         m_rectCache.verticalStretchFactor = rect.height() / static_cast<float>(m_rectCache.srcRect.height());
-        g_drawPool.clearBuffer();
     }
 
     drawFloor();
@@ -314,7 +313,6 @@ void MapView::updateVisibleTilesCache()
 
     if (m_mustUpdateVisibleCreaturesCache) {
         m_visibleCreatures.clear();
-        g_drawPool.clearBuffer();
     }
 
     if (m_floorViewMode == LOCKED) {

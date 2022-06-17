@@ -65,7 +65,6 @@ public:
     bool isForcingGrouping() const { return m_currentPool->m_forceGrouping; }
 
     void flush() { if (m_currentPool) m_currentPool->flush(); }
-    void clearBuffer() { for (auto& pool : m_pools) pool->clearBuffer(); }
 
     size_t size() { return m_currentPool->m_objects.size(); }
 
