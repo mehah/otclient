@@ -53,8 +53,8 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::Dr
     auto& list = m_currentPool->m_objects;
 
     if (m_currentPool->m_forceGrouping || drawQueue) {
-        auto it = m_currentPool->m_drawObjectPointer.find(stateHash);
-        if (it != m_currentPool->m_drawObjectPointer.end()) {
+        auto& pointer = m_currentPool->m_drawObjectPointer;
+        if (auto it = pointer.find(stateHash); it != pointer.end()) {
             auto& draw = list[it->second];
             if (!draw.queue->isValid())
                 return;
@@ -70,12 +70,11 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const Pool::Dr
             return;
         }
 
-        m_currentPool->m_drawObjectPointer[stateHash] = list.size();
+        pointer[stateHash] = list.size();
 
         if (!drawQueue) {
             auto& bufferCache = m_currentPool->m_bufferCache;
-            auto it = bufferCache.find(stateHash);
-            if (it == bufferCache.end()) {
+            if (auto it = bufferCache.find(stateHash); it == bufferCache.end()) {
                 bufferCache[stateHash] = drawQueue = std::make_shared<Pool::DrawBuffer>();
             } else {
                 drawQueue = it->second;
