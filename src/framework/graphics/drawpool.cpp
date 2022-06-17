@@ -86,8 +86,8 @@ void DrawPool::drawObject(Pool::DrawObject& obj)
         return;
     }
 
-    const bool useGlobalCoord = !obj.queue;
-    auto& buffer = useGlobalCoord ? m_coordsBuffer : *obj.queue->m_coords;
+    const bool useGlobalCoord = !obj.buffer;
+    auto& buffer = useGlobalCoord ? m_coordsBuffer : *obj.buffer->m_coords;
 
     if (useGlobalCoord) {
         if (obj.drawMethods.empty()) return;
@@ -125,7 +125,7 @@ void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, cons
     addTexturedRect(dest, texture, Rect(Point(), texture->getSize()), color);
 }
 
-void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const Point& originalDest, std::shared_ptr<DrawBuffer> drawQueue)
+void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const Point& originalDest, DrawBufferPtr drawQueue)
 {
     if (dest.isEmpty() || src.isEmpty())
         return;

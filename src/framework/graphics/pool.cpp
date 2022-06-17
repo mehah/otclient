@@ -45,7 +45,7 @@ Pool* Pool::create(const PoolType type)
     return pool;
 }
 
-void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& method, const DrawMode drawMode, std::shared_ptr<DrawBuffer> drawBuffer)
+void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& method, const DrawMode drawMode, DrawBufferPtr drawBuffer)
 {
     const auto& state = Painter::PainterState{
        g_painter->getTransformMatrixRef(), color, m_state.opacity,
@@ -61,16 +61,16 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
     if (m_forceGrouping || drawBuffer) {
         auto& pointer = m_drawObjectPointer;
         if (auto it = pointer.find(stateHash); it != pointer.end()) {
-            auto& draw = list[it->second];
-            if (!draw.queue->isValid())
+            auto& buffer = list[it->second].buffer;
+            if (!buffer->isValid())
                 return;
 
-            auto& hashList = draw.queue->m_hashs;
-            if (++draw.queue->m_i == hashList.size()) {
+            auto& hashList = buffer->m_hashs;
+            if (++buffer->m_i == hashList.size()) {
                 hashList.push_back(methodHash);
-                addCoords(method, *draw.queue->m_coords, DrawMode::TRIANGLES);
-            } else if (hashList[draw.queue->m_i] != methodHash) {
-                draw.queue->invalidate();
+                addCoords(method, *buffer->m_coords, DrawMode::TRIANGLES);
+            } else if (hashList[buffer->m_i] != methodHash) {
+                buffer->invalidate();
             }
 
             return;

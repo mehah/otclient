@@ -83,7 +83,7 @@ void Effect::onAppear()
     m_animationTimer.restart();
 
     if (g_app.isDrawingEffectsOnTop())
-        m_drawBuffer = DrawBuffer::create();
+        m_drawBuffer = std::make_shared<DrawBuffer>();
 
     // schedule removal
     const auto self = asEffect();

@@ -88,7 +88,7 @@ void Missile::setPath(const Position& fromPosition, const Position& toPosition)
     m_animationTimer.restart();
     m_distance = fromPosition.distance(toPosition);
 
-    m_drawBuffer = DrawBuffer::create();
+    m_drawBuffer = std::make_shared<DrawBuffer>();
 
     // schedule removal
     const auto self = asMissile();

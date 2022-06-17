@@ -44,7 +44,7 @@ enum class PoolType : uint8_t
 class DrawBuffer
 {
 public:
-    static const std::shared_ptr<DrawBuffer> create() { return std::make_shared<DrawBuffer>(); }
+    static const DrawBufferPtr create() { return std::make_shared<DrawBuffer>(); }
 
     bool isValid() { return m_i > -1; }
     bool validate(const Point& p)
@@ -111,14 +111,14 @@ protected:
         Painter::PainterState state;
         DrawMode drawMode;
         std::vector<DrawMethod> drawMethods;
-        std::shared_ptr<DrawBuffer> queue;
+        DrawBufferPtr buffer;
         std::function<void()> action{ nullptr };
     };
 
 private:
     static Pool* create(const PoolType type);
 
-    void add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, DrawMode drawMode = DrawMode::TRIANGLES, std::shared_ptr<DrawBuffer> drawBuffer = nullptr);
+    void add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, DrawMode drawMode = DrawMode::TRIANGLES, DrawBufferPtr drawBuffer = nullptr);
     void addCoords(const Pool::DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode);
     void updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method, size_t& stateHash, size_t& methodHash);
 

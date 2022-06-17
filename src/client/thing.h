@@ -160,7 +160,7 @@ protected:
     Position m_position;
     uint16_t m_datId{ 0 };
     ThingTypePtr m_thingType;
-    std::shared_ptr<DrawBuffer> m_drawBuffer;
+    DrawBufferPtr m_drawBuffer;
 
 private:
     bool m_canDraw{ true };
