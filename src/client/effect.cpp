@@ -55,10 +55,8 @@ void Effect::drawEffect(const Point& dest, float scaleFactor, LightView* lightVi
     const int xPattern = m_position.x % getNumPatternX();
     const int yPattern = m_position.y % getNumPatternY();
 
-    if (m_drawBuffer && m_drawBuffer->dest != dest) {
-        m_drawBuffer->dest = dest;
-        m_drawBuffer->invalidate();
-    }
+    if (m_drawBuffer)
+        m_drawBuffer->validate(dest);
 
     getThingType()->draw(dest, scaleFactor, 0, xPattern, yPattern, 0, animationPhase, TextureType::NONE, Color::white, lightView, m_drawBuffer);
 }
@@ -85,7 +83,7 @@ void Effect::onAppear()
     m_animationTimer.restart();
 
     if (g_app.isDrawingEffectsOnTop())
-        m_drawBuffer = std::make_shared<DrawBuffer>();
+        m_drawBuffer = DrawBuffer::create();
 
     // schedule removal
     const auto self = asEffect();

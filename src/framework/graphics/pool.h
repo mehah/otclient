@@ -41,16 +41,27 @@ enum class PoolType : uint8_t
     UNKNOW
 };
 
-struct DrawBuffer
+class DrawBuffer
 {
-    Point dest;
-    void invalidate() { i = -1; hashs.clear(); }
-    bool isValid() { return i > -1; }
+public:
+    static const std::shared_ptr<DrawBuffer> create() { return std::make_shared<DrawBuffer>(); }
+
+    void setRef(const Point& p) { m_ref = p; }
+    bool isValid() { return m_i > -1; }
+    bool validate(const Point& p)
+    {
+        if (m_ref != p) { m_ref = p; invalidate(); }
+        return isValid();
+    }
 
 private:
-    int i{ 0 };
-    std::vector<size_t> hashs;
-    std::shared_ptr<CoordsBuffer> coords;
+    void invalidate() { m_i = -1; m_hashs.clear(); }
+    int m_i{ 0 };
+    Point m_ref;
+
+    std::vector<size_t> m_hashs;
+    std::shared_ptr<CoordsBuffer> m_coords;
+
     friend class Pool;
     friend class DrawPool;
 };

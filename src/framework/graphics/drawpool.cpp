@@ -87,7 +87,7 @@ void DrawPool::drawObject(Pool::DrawObject& obj)
     }
 
     const bool useGlobalCoord = !obj.queue;
-    auto& buffer = useGlobalCoord ? m_coordsBuffer : *obj.queue->coords;
+    auto& buffer = useGlobalCoord ? m_coordsBuffer : *obj.queue->m_coords;
 
     if (useGlobalCoord) {
         if (obj.drawMethods.empty()) return;

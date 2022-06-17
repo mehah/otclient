@@ -39,8 +39,9 @@ ItemPtr Item::create(int id)
     ItemPtr item(new Item);
     item->setId(id);
 
-    if (item->isSingleGround() || item->isOnBottom() && item->isSingleDimension() && !item->hasDisplacement()) {
-        item->m_drawBuffer = std::make_shared<DrawBuffer>();
+    if (item->isSingleGround() || item->isOnBottom() &&
+        item->isSingleDimension() && !item->hasDisplacement()) {
+        item->m_drawBuffer = DrawBuffer::create();
     }
 
     return item;
@@ -52,7 +53,7 @@ ItemPtr Item::createFromOtb(int id)
     item->setOtbId(id);
 
     if (item->isSingleGround()) {
-        item->m_drawBuffer = std::make_shared<DrawBuffer>();
+        item->m_drawBuffer = DrawBuffer::create();
     }
 
     return item;
@@ -78,10 +79,8 @@ void Item::draw(const Point& dest, float scaleFactor, bool animate, const Highli
     if (m_color != Color::alpha)
         color = m_color;
 
-    if (m_drawBuffer && m_drawBuffer->dest != dest) {
-        m_drawBuffer->dest = dest;
-        m_drawBuffer->invalidate();
-    }
+    if (m_drawBuffer)
+        m_drawBuffer->validate(dest);
 
     getThingType()->draw(dest, scaleFactor, 0, xPattern, yPattern, zPattern, animationPhase, textureType, color, lightView, m_drawBuffer);
 
