@@ -338,7 +338,7 @@ void DrawPool::updateHash(const Painter::PainterState& state, const Pool::DrawMe
         if (state.blendEquation != BlendEquation::ADD)
             stdext::hash_combine(stateHash, state.blendEquation);
 
-        if (state.clipRect.isValid()) stdext::hash_combine(stateHash, state.clipRect.hash());
+        if (state.clipRect.isValid()) stdext::hash_union(stateHash, state.clipRect.hash());
         if (state.color != Color::white)
             stdext::hash_combine(stateHash, state.color.rgba());
 
@@ -359,22 +359,22 @@ void DrawPool::updateHash(const Painter::PainterState& state, const Pool::DrawMe
         }
 
         if (state.transformMatrix != DEFAULT_MATRIX_3)
-            stdext::hash_combine(stateHash, state.transformMatrix.hash());
+            stdext::hash_union(stateHash, state.transformMatrix.hash());
 
         stdext::hash_union(m_currentPool->m_status.second, stateHash);
     }
 
     { // Method Hash
-        if (method.rects.first.isValid()) stdext::hash_combine(methodhash, method.rects.first.hash());
-        if (method.rects.second.isValid()) stdext::hash_combine(methodhash, method.rects.second.hash());
+        if (method.rects.first.isValid()) stdext::hash_union(methodhash, method.rects.first.hash());
+        if (method.rects.second.isValid()) stdext::hash_union(methodhash, method.rects.second.hash());
 
         const auto& a = std::get<0>(method.points),
             b = std::get<1>(method.points),
             c = std::get<2>(method.points);
 
-        if (!a.isNull()) stdext::hash_combine(methodhash, a.hash());
-        if (!b.isNull()) stdext::hash_combine(methodhash, b.hash());
-        if (!c.isNull()) stdext::hash_combine(methodhash, c.hash());
+        if (!a.isNull()) stdext::hash_union(methodhash, a.hash());
+        if (!b.isNull()) stdext::hash_union(methodhash, b.hash());
+        if (!c.isNull()) stdext::hash_union(methodhash, c.hash());
 
         if (method.intValue) stdext::hash_combine(methodhash, method.intValue);
 
