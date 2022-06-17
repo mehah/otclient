@@ -71,7 +71,10 @@ public:
     virtual void setColor(const Color& color) { m_color = color; }
     virtual void setAlphaWriting(bool enable) = 0;
     virtual void setBlendEquation(BlendEquation blendEquation) = 0;
+    virtual void setCompositionMode(CompositionMode compositionMode) = 0;
+    virtual void setTransformMatrix(const Matrix3& transformMatrix) = 0;
     virtual void setShaderProgram(PainterShaderProgram* shaderProgram) { m_shaderProgram = shaderProgram; }
+
     void setShaderProgram(const PainterShaderProgramPtr& shaderProgram) { setShaderProgram(shaderProgram.get()); }
 
     virtual void scale(float x, float y) = 0;
@@ -88,8 +91,6 @@ public:
     virtual Matrix3 getTransformMatrix() = 0;
     virtual Matrix3 getProjectionMatrix() = 0;
     virtual Matrix3 getTextureMatrix() = 0;
-
-    virtual void setCompositionMode(CompositionMode compositionMode) = 0;
 
     virtual void pushTransformMatrix() = 0;
     virtual void popTransformMatrix() = 0;
@@ -137,8 +138,6 @@ protected:
                 shaderProgram == s2.shaderProgram;
         }
     };
-
-    virtual void executeState(const PainterState& state) = 0;
 
     virtual Matrix3& getTransformMatrixRef() = 0;
 

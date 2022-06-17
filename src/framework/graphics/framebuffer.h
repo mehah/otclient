@@ -26,18 +26,6 @@
 #include "painter.h"
 #include "texture.h"
 
-enum class DrawMethodType
-{
-    DRAW_FILL_COORDS,
-    DRAW_TEXTURE_COORDS,
-    DRAW_TEXTURED_RECT,
-    DRAW_UPSIDEDOWN_TEXTURED_RECT,
-    DRAW_REPEATED_TEXTURED_RECT,
-    DRAW_FILLED_RECT,
-    DRAW_FILLED_TRIANGLE,
-    DRAW_BOUNDING_RECT
-};
-
 class FrameBuffer : public stdext::shared_object
 {
 public:

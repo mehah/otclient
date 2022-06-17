@@ -40,8 +40,6 @@ public:
     void resetAlphaWriting() { setAlphaWriting(false); }
     void resetTransformMatrix() { setTransformMatrix(DEFAULT_MATRIX_3); }
 
-    void executeState(const PainterState& state) override;
-
     void bind() override { refreshState(); }
     void unbind() override {}
 

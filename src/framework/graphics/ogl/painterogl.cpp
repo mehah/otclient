@@ -53,18 +53,6 @@ void PainterOGL::refreshState()
     updateGlAlphaWriting();
 }
 
-void PainterOGL::executeState(const PainterState& state)
-{
-    setColor(state.color);
-    setOpacity(state.opacity);
-    setCompositionMode(state.compositionMode);
-    setBlendEquation(state.blendEquation);
-    setClipRect(state.clipRect);
-    setShaderProgram(state.shaderProgram);
-    setTransformMatrix(state.transformMatrix);
-    if (state.action) state.action();
-}
-
 void PainterOGL::clear(const Color& color)
 {
     glClearColor(color.rF(), color.gF(), color.bF(), color.aF());

@@ -69,6 +69,18 @@ protected:
         UPSIDEDOWN_RECT,
     };
 
+    struct State
+    {
+        ~State() { shaderProgram = nullptr; action = nullptr; }
+
+        CompositionMode compositionMode{ CompositionMode::NORMAL };
+        BlendEquation blendEquation{ BlendEquation::ADD };
+        Rect clipRect;
+        float opacity{ 1.f };
+        PainterShaderProgram* shaderProgram{ nullptr };
+        std::function<void()> action{ nullptr };
+    };
+
     struct DrawMethod
     {
         DrawMethodType type;
@@ -91,17 +103,11 @@ protected:
     };
 
 private:
-    struct State
-    {
-        ~State() { shaderProgram = nullptr; action = nullptr; }
+    static Pool* create(const PoolType type);
 
-        CompositionMode compositionMode{ CompositionMode::NORMAL };
-        BlendEquation blendEquation{ BlendEquation::ADD };
-        Rect clipRect;
-        float opacity{ 1.f };
-        PainterShaderProgram* shaderProgram{ nullptr };
-        std::function<void()> action{ nullptr };
-    };
+    void add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, DrawMode drawMode = DrawMode::TRIANGLES, std::shared_ptr<Pool::DrawBuffer> drawQueue = nullptr);
+    void addCoords(const Pool::DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode);
+    void updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method, size_t& stateHash, size_t& methodHash);
 
     float getOpacity(const int pos = -1) { return pos == -1 ? m_state.opacity : m_objects[pos - 1].state.opacity; }
     Rect getClipRect(const int pos = -1) { return pos == -1 ? m_state.clipRect : m_objects[pos - 1].state.clipRect; }
@@ -159,6 +165,7 @@ protected:
     PoolFramed(const FrameBufferPtr& fb) : m_framebuffer(fb) {};
 
     friend class DrawPool;
+    friend class Pool;
 
 private:
     bool hasFrameBuffer() const override { return true; }
