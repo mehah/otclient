@@ -73,6 +73,32 @@ public:
     PoolType getType() const { return m_type; }
 
 protected:
+    struct PoolState
+    {
+        Matrix3 transformMatrix;
+        Color color;
+        float opacity;
+        CompositionMode compositionMode;
+        BlendEquation blendEquation;
+        Rect clipRect;
+        TexturePtr texture;
+        PainterShaderProgram* shaderProgram;
+        std::function<void()> action{ nullptr };
+
+        bool operator==(const PoolState& s2) const
+        {
+            return
+                transformMatrix == s2.transformMatrix &&
+                color == s2.color &&
+                opacity == s2.opacity &&
+                compositionMode == s2.compositionMode &&
+                blendEquation == s2.blendEquation &&
+                clipRect == s2.clipRect &&
+                texture == s2.texture &&
+                shaderProgram == s2.shaderProgram;
+        }
+    };
+
     enum class DrawMethodType
     {
         RECT,
@@ -80,18 +106,6 @@ protected:
         REPEATED_RECT,
         BOUNDING_RECT,
         UPSIDEDOWN_RECT,
-    };
-
-    struct State
-    {
-        ~State() { shaderProgram = nullptr; action = nullptr; }
-
-        CompositionMode compositionMode{ CompositionMode::NORMAL };
-        BlendEquation blendEquation{ BlendEquation::ADD };
-        Rect clipRect;
-        float opacity{ 1.f };
-        PainterShaderProgram* shaderProgram{ nullptr };
-        std::function<void()> action{ nullptr };
     };
 
     struct DrawMethod
@@ -106,12 +120,20 @@ protected:
 
     struct DrawObject
     {
-        ~DrawObject() { drawMethods.clear(); state.texture = nullptr; action = nullptr; }
-
-        Painter::PainterState state;
+        std::optional<PoolState> state;
         DrawMode drawMode;
         std::vector<DrawMethod> drawMethods;
         DrawBufferPtr buffer;
+        std::function<void()> action{ nullptr };
+    };
+
+    struct DrawObjectState
+    {
+        CompositionMode compositionMode{ CompositionMode::NORMAL };
+        BlendEquation blendEquation{ BlendEquation::ADD };
+        Rect clipRect;
+        float opacity{ 1.f };
+        PainterShaderProgram* shaderProgram{ nullptr };
         std::function<void()> action{ nullptr };
     };
 
@@ -120,10 +142,10 @@ private:
 
     void add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, DrawMode drawMode = DrawMode::TRIANGLES, DrawBufferPtr drawBuffer = nullptr);
     void addCoords(const Pool::DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode);
-    void updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method, size_t& stateHash, size_t& methodHash);
+    void updateHash(const PoolState& state, const Pool::DrawMethod& method, size_t& stateHash, size_t& methodHash);
 
-    float getOpacity(const int pos = -1) { return pos == -1 ? m_state.opacity : m_objects[pos - 1].state.opacity; }
-    Rect getClipRect(const int pos = -1) { return pos == -1 ? m_state.clipRect : m_objects[pos - 1].state.clipRect; }
+    float getOpacity(const int pos = -1) { return pos == -1 ? m_state.opacity : m_objects[pos - 1].state->opacity; }
+    Rect getClipRect(const int pos = -1) { return pos == -1 ? m_state.clipRect : m_objects[pos - 1].state->clipRect; }
 
     void setCompositionMode(CompositionMode mode, int pos = -1);
     void setBlendEquation(BlendEquation equation, int pos = -1);

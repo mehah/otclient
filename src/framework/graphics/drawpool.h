@@ -44,7 +44,7 @@ public:
     void addFilledRect(const Rect& dest, const Color& color = Color::white);
     void addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color = Color::white);
     void addBoundingRect(const Rect& dest, const Color& color = Color::white, int innerLineWidth = 1);
-    void addAction(std::function<void()> action);
+    void addAction(const std::function<void()> action);
 
     void setOpacity(const float opacity, const int pos = -1) { m_currentPool->setOpacity(opacity, pos); }
     void setClipRect(const Rect& clipRect, const int pos = -1) { m_currentPool->setClipRect(clipRect, pos); }
@@ -69,14 +69,12 @@ private:
     void draw();
     void init();
     void terminate();
-    void drawObject(Pool::DrawObject& obj);
+    void drawObject(const Pool::DrawObject& obj);
 
     CoordsBuffer m_coordsBuffer;
     std::array<Pool*, static_cast<uint8_t>(PoolType::UNKNOW) + 1> m_pools{};
 
     Pool* m_currentPool{ nullptr };
-
-    Painter::PainterState NULL_STATE;
 
     friend class GraphicalApplication;
 };

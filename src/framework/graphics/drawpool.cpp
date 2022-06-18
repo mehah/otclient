@@ -79,7 +79,7 @@ void DrawPool::draw()
     }
 }
 
-void DrawPool::drawObject(Pool::DrawObject& obj)
+void DrawPool::drawObject(const Pool::DrawObject& obj)
 {
     if (obj.action) {
         obj.action();
@@ -99,19 +99,19 @@ void DrawPool::drawObject(Pool::DrawObject& obj)
     { // Set DrawState
         const auto& state = obj.state;
 
-        if (state.texture) {
-            state.texture->create();
-            g_painter->setTexture(state.texture.get());
+        if (state->texture) {
+            state->texture->create();
+            g_painter->setTexture(state->texture.get());
         }
 
-        g_painter->setColor(state.color);
-        g_painter->setOpacity(state.opacity);
-        g_painter->setCompositionMode(state.compositionMode);
-        g_painter->setBlendEquation(state.blendEquation);
-        g_painter->setClipRect(state.clipRect);
-        g_painter->setShaderProgram(state.shaderProgram);
-        g_painter->setTransformMatrix(state.transformMatrix);
-        if (state.action) state.action();
+        g_painter->setColor(state->color);
+        g_painter->setOpacity(state->opacity);
+        g_painter->setCompositionMode(state->compositionMode);
+        g_painter->setBlendEquation(state->blendEquation);
+        g_painter->setClipRect(state->clipRect);
+        g_painter->setShaderProgram(state->shaderProgram);
+        g_painter->setTransformMatrix(state->transformMatrix);
+        if (state->action) state->action();
     }
 
     g_painter->drawCoords(buffer, obj.drawMode);
@@ -193,9 +193,9 @@ void DrawPool::addBoundingRect(const Rect& dest, const Color& color, int innerLi
     m_currentPool->add(color, nullptr, method);
 }
 
-void DrawPool::addAction(std::function<void()> action)
+void DrawPool::addAction(const std::function<void()> action)
 {
-    m_currentPool->m_objects.push_back(Pool::DrawObject{ .state = NULL_STATE,.action = std::move(action) });
+    m_currentPool->m_objects.push_back(Pool::DrawObject{ .action = std::move(action) });
 }
 
 void DrawPool::use(const PoolType type)

@@ -47,7 +47,7 @@ Pool* Pool::create(const PoolType type)
 
 void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& method, const DrawMode drawMode, DrawBufferPtr drawBuffer)
 {
-    const auto& state = Painter::PainterState{
+    const auto& state = PoolState{
        g_painter->getTransformMatrixRef(), color, m_state.opacity,
        m_state.compositionMode, m_state.blendEquation,
        m_state.clipRect, texture, m_state.shaderProgram
@@ -108,7 +108,7 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
             for (auto itm = prevObj.drawMethods.begin(); itm != prevObj.drawMethods.end(); ++itm) {
                 auto& prevMtd = *itm;
                 if (prevMtd.dest == method.dest &&
-                   ((sameState && prevMtd.rects.second == method.rects.second) || (state.texture->isOpaque() && prevObj.state.texture->canSuperimposed()))) {
+                   ((sameState && prevMtd.rects.second == method.rects.second) || (state.texture->isOpaque() && prevObj.state->texture->canSuperimposed()))) {
                     prevObj.drawMethods.erase(itm);
                     break;
                 }
@@ -146,7 +146,7 @@ void Pool::addCoords(const DrawMethod& method, CoordsBuffer& buffer, DrawMode dr
     }
 }
 
-void Pool::updateHash(const Painter::PainterState& state, const DrawMethod& method,
+void Pool::updateHash(const PoolState& state, const DrawMethod& method,
                             size_t& stateHash, size_t& methodhash)
 {
     { // State Hash
@@ -204,7 +204,7 @@ void Pool::setCompositionMode(const CompositionMode mode, const int pos)
         return;
     }
 
-    m_objects[pos - 1].state.compositionMode = mode;
+    m_objects[pos - 1].state->compositionMode = mode;
     stdext::hash_combine(m_status.second, mode);
 }
 
@@ -215,7 +215,7 @@ void Pool::setBlendEquation(BlendEquation equation, const int pos)
         return;
     }
 
-    m_objects[pos - 1].state.blendEquation = equation;
+    m_objects[pos - 1].state->blendEquation = equation;
     stdext::hash_combine(m_status.second, equation);
 }
 
@@ -226,7 +226,7 @@ void Pool::setClipRect(const Rect& clipRect, const int pos)
         return;
     }
 
-    m_objects[pos - 1].state.clipRect = clipRect;
+    m_objects[pos - 1].state->clipRect = clipRect;
     stdext::hash_combine(m_status.second, clipRect.hash());
 }
 
@@ -237,7 +237,7 @@ void Pool::setOpacity(const float opacity, const int pos)
         return;
     }
 
-    m_objects[pos - 1].state.opacity = opacity;
+    m_objects[pos - 1].state->opacity = opacity;
     stdext::hash_combine(m_status.second, opacity);
 }
 
@@ -256,8 +256,8 @@ void Pool::setShaderProgram(const PainterShaderProgramPtr& shaderProgram, const 
     }
 
     auto& o = m_objects[pos - 1];
-    o.state.shaderProgram = shader;
-    o.state.action = action;
+    o.state->shaderProgram = shader;
+    o.state->action = action;
 }
 
 void Pool::resetState()

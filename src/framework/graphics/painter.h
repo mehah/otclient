@@ -111,34 +111,6 @@ public:
     void resetShaderProgram() { setShaderProgram(nullptr); }
 
 protected:
-    struct PainterState
-    {
-        ~PainterState() { shaderProgram = nullptr; action = nullptr; }
-
-        Matrix3 transformMatrix;
-        Color color;
-        float opacity;
-        CompositionMode compositionMode;
-        BlendEquation blendEquation;
-        Rect clipRect;
-        TexturePtr texture;
-        PainterShaderProgram* shaderProgram;
-        std::function<void()> action{ nullptr };
-
-        bool operator==(const PainterState& s2) const
-        {
-            return
-                transformMatrix == s2.transformMatrix &&
-                color == s2.color &&
-                opacity == s2.opacity &&
-                compositionMode == s2.compositionMode &&
-                blendEquation == s2.blendEquation &&
-                clipRect == s2.clipRect &&
-                texture == s2.texture &&
-                shaderProgram == s2.shaderProgram;
-        }
-    };
-
     virtual Matrix3& getTransformMatrixRef() = 0;
 
     float m_opacity{ 1.f };
