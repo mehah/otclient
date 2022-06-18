@@ -90,8 +90,8 @@ void DrawPool::drawObject(const Pool::DrawObject& obj)
     auto& buffer = useGlobalCoord ? m_coordsBuffer : *obj.buffer->m_coords;
 
     if (useGlobalCoord) {
-        if (obj.drawMethods.empty()) return;
-        for (const auto& method : obj.drawMethods) {
+        if (obj.drawMethods->empty()) return;
+        for (const auto& method : *obj.drawMethods) {
             m_currentPool->addCoords(method, buffer, obj.drawMode);
         }
     }
@@ -133,7 +133,7 @@ void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, cons
     const Pool::DrawMethod method{
         .type = Pool::DrawMethodType::RECT,
         .rects = std::make_pair(dest, src),
-        .dest = originalDest
+        .dest = originalDest.isNull() ? std::optional<Point>{} : originalDest
     };
 
     m_currentPool->add(color, texture, method, DrawMode::TRIANGLE_STRIP, drawQueue);
@@ -154,7 +154,7 @@ void DrawPool::addTexturedRepeatedRect(const Rect& dest, const TexturePtr& textu
     if (dest.isEmpty() || src.isEmpty())
         return;
 
-    const Pool::DrawMethod method{ Pool::DrawMethodType::REPEATED_RECT,std::make_pair(dest, src) };
+    const Pool::DrawMethod method{ Pool::DrawMethodType::REPEATED_RECT, std::make_pair(dest, src) };
 
     m_currentPool->add(color, texture, method);
 }
@@ -164,7 +164,7 @@ void DrawPool::addFilledRect(const Rect& dest, const Color& color)
     if (dest.isEmpty())
         return;
 
-    const Pool::DrawMethod method{ Pool::DrawMethodType::RECT,std::make_pair(dest, Rect()) };
+    const Pool::DrawMethod method{ Pool::DrawMethodType::RECT, std::make_pair(dest, Rect()) };
 
     m_currentPool->add(color, nullptr, method);
 }

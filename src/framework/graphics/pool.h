@@ -111,18 +111,17 @@ protected:
     struct DrawMethod
     {
         DrawMethodType type;
-        std::pair<Rect, Rect> rects;
-        std::tuple<Point, Point, Point> points;
-        Point dest;
-
+        std::optional<std::pair<Rect, Rect>> rects;
+        std::optional<std::tuple<Point, Point, Point>> points;
+        std::optional<Point> dest;
         uint16_t intValue{ 0 };
     };
 
     struct DrawObject
     {
-        std::optional<PoolState> state;
         DrawMode drawMode;
-        std::vector<DrawMethod> drawMethods;
+        std::optional<PoolState> state;
+        std::optional<std::vector<DrawMethod>> drawMethods;
         DrawBufferPtr buffer;
         std::function<void()> action{ nullptr };
     };
@@ -172,7 +171,7 @@ private:
         m_forceGrouping{ false },
         m_autoUpdate{ false };
 
-    State m_state;
+    PoolState m_state;
 
     PoolType m_type{ PoolType::UNKNOW };
 
