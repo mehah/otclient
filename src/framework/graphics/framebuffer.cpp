@@ -164,7 +164,7 @@ Size FrameBuffer::getSize()
     return m_texture->getSize();
 }
 
-void FrameBuffer::update(const Rect& dest, const Rect& src, const Color& colorClear)
+void FrameBuffer::prepare(const Rect& dest, const Rect& src, const Color& colorClear)
 {
     m_colorClear = colorClear;
     Rect _dest(0, 0, getSize()), _src = _dest;

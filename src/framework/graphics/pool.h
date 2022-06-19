@@ -169,7 +169,7 @@ private:
     void updateStatus() { m_status.first = m_status.second; m_refreshTime.restart(); }
 
     bool m_enabled{ true },
-        m_forceGrouping{ false },
+        m_alwaysGroupDrawings{ false },
         m_autoUpdate{ false };
 
     PoolState m_state;

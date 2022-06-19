@@ -69,10 +69,8 @@ void DrawPool::draw()
             if (pf->m_beforeDraw) pf->m_beforeDraw();
             pf->m_framebuffer->draw();
             if (pf->m_afterDraw) pf->m_afterDraw();
-        } else {
-            for (auto& obj : pool->m_objects) {
-                drawObject(obj);
-            }
+        } else for (auto& obj : pool->m_objects) {
+            drawObject(obj);
         }
 
         pool->m_objects.clear();
@@ -193,7 +191,7 @@ void DrawPool::addBoundingRect(const Rect& dest, const Color& color, int innerLi
     m_currentPool->add(color, nullptr, method);
 }
 
-void DrawPool::addAction(const std::function<void()> action)
+void DrawPool::addAction(std::function<void()> action)
 {
     m_currentPool->m_objects.push_back(Pool::DrawObject{ .action = std::move(action) });
 }
@@ -206,6 +204,6 @@ void DrawPool::use(const PoolType type, const Rect& dest, const Rect& src, const
 
     if (m_currentPool->hasFrameBuffer()) {
         m_currentPool->toPoolFramed()
-            ->m_framebuffer->update(dest, src, colorClear);
+            ->m_framebuffer->prepare(dest, src, colorClear);
     }
 }

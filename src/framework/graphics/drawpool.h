@@ -44,7 +44,7 @@ public:
     void addFilledRect(const Rect& dest, const Color& color = Color::white);
     void addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color = Color::white);
     void addBoundingRect(const Rect& dest, const Color& color = Color::white, int innerLineWidth = 1);
-    void addAction(const std::function<void()> action);
+    void addAction(std::function<void()> action);
 
     void setOpacity(const float opacity, const int pos = -1) { m_currentPool->setOpacity(opacity, pos); }
     void setClipRect(const Rect& clipRect, const int pos = -1) { m_currentPool->setClipRect(clipRect, pos); }

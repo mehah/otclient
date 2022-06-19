@@ -60,7 +60,7 @@ private:
     void internalCreate();
     void internalBind();
     void internalRelease();
-    void update(const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha);
+    void prepare(const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha);
 
     static uint boundFbo;
 

@@ -33,12 +33,12 @@ Pool* Pool::create(const PoolType type)
 
         if (type == PoolType::MAP) frameBuffer->disableBlend();
         else if (type == PoolType::LIGHT) {
-            pool->m_forceGrouping = true;
+            pool->m_alwaysGroupDrawings = true;
             frameBuffer->setCompositionMode(CompositionMode::LIGHT);
         }
     } else {
         pool = new Pool;
-        pool->m_forceGrouping = true; // CREATURE_INFORMATION & TEXT
+        pool->m_alwaysGroupDrawings = true; // CREATURE_INFORMATION & TEXT
     }
 
     pool->m_type = type;
@@ -58,7 +58,7 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
 
     auto& list = m_objects;
 
-    if (m_forceGrouping || drawBuffer) {
+    if (m_alwaysGroupDrawings || drawBuffer) {
         auto& pointer = m_drawObjectPointer;
         if (auto it = pointer.find(stateHash); it != pointer.end()) {
             auto& buffer = list[it->second].buffer;
