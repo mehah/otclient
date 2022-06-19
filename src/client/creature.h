@@ -152,25 +152,26 @@ protected:
 
     uint32_t m_id{ 0 };
     std::string m_name;
-    Otc::Direction m_direction{ Otc::South };
     Outfit m_outfit;
     Light m_light;
 
-    int m_speed{ 0 };
-    int m_calculatedStepSpeed{ 0 };
+    int m_calculatedStepSpeed{ 0 },
+        m_speed{ 0 };
 
-    double m_baseSpeed;
-    uint8_t m_healthPercent{ 101 };
-    uint8_t m_skull{ Otc::SkullNone };
-    uint8_t m_shield{ Otc::ShieldNone };
-    uint8_t m_emblem{ Otc::EmblemNone };
-    uint8_t m_type;
-    uint8_t m_icon{ Otc::NpcIconNone };
-    TexturePtr m_skullTexture;
-    TexturePtr m_shieldTexture;
-    TexturePtr m_emblemTexture;
-    TexturePtr m_typeTexture;
-    TexturePtr m_iconTexture;
+    double m_baseSpeed{ 0 };
+
+    uint8_t m_type,
+        m_healthPercent{ 101 },
+        m_skull{ Otc::SkullNone },
+        m_icon{ Otc::NpcIconNone },
+        m_shield{ Otc::ShieldNone },
+        m_emblem{ Otc::EmblemNone };
+
+    TexturePtr m_skullTexture,
+        m_shieldTexture,
+        m_emblemTexture,
+        m_typeTexture,
+        m_iconTexture;
 
     bool m_showShieldTexture{ true },
         m_shieldBlink{ false },
@@ -180,59 +181,62 @@ protected:
         m_forceWalk{ false },
         m_removed{ true };
 
-    Color m_timedSquareColor;
-    Color m_staticSquareColor;
-    Color m_informationColor;
-    Color m_outfitColor{ Color::white };
+    Color m_timedSquareColor,
+        m_staticSquareColor,
+        m_informationColor,
+        m_outfitColor{ Color::white };
+
     CachedText m_nameCache;
-    ScheduledEventPtr m_outfitColorUpdateEvent;
-    Timer m_outfitColorTimer;
 
     std::array<double, Otc::LastSpeedFormula> m_speedFormula;
 
     // walk related
-    int m_walkAnimationPhase{ 0 };
-    int m_walkedPixels{ 0 };
+    int m_walkAnimationPhase{ 0 },
+        m_walkedPixels{ 0 };
+
     uint m_footStep{ 0 };
-    Timer m_walkTimer;
-    Timer m_footTimer;
+    Timer m_walkTimer, m_footTimer, m_outfitColorTimer;
     TilePtr m_walkingTile;
+
     bool m_walking{ false },
         m_allowAppearWalk{ false };
-    ScheduledEventPtr m_walkUpdateEvent;
-    ScheduledEventPtr m_walkFinishAnimEvent;
+
+    ScheduledEventPtr m_walkUpdateEvent,
+        m_walkFinishAnimEvent,
+        m_outfitColorUpdateEvent;
+
     EventPtr m_disappearEvent;
+
     Point m_walkOffset;
-    Otc::Direction m_walkTurnDirection{ Otc::InvalidDirection };
-    Otc::Direction m_lastStepDirection{ Otc::InvalidDirection };
-    Position m_lastStepFromPosition;
-    Position m_lastStepToPosition;
-    Position m_oldPosition;
+
+    Otc::Direction m_direction{ Otc::South },
+        m_walkTurnDirection{ Otc::InvalidDirection },
+        m_lastStepDirection{ Otc::InvalidDirection };
+
+    Position m_lastStepFromPosition,
+        m_lastStepToPosition, m_oldPosition;
 
     // jump related
-    float m_jumpHeight;
-    float m_jumpDuration;
+    float m_jumpHeight{ 0 }, m_jumpDuration{ 0 };
     PointF m_jumpOffset;
     Timer m_jumpTimer;
 
 private:
-    struct DrawCache
-    {
-        int exactSize, frameSizeNotResized;
-    };
-
+    struct SizeCache { int exactSize, frameSizeNotResized; };
     struct StepCache
     {
-        uint16_t speed = 0;
-        uint16_t groundSpeed = 0;
-        uint64_t duration = 0;
-        uint64_t diagonalDuration = 0;
+        uint16_t speed{ 0 },
+            groundSpeed{ 0 };
+
+        uint64_t duration{ 0 },
+            walkDuration{ 0 },
+            diagonalDuration{ 0 };
 
         uint64_t getDuration(Otc::Direction dir) { return Position::isDiagonal(dir) ? diagonalDuration : duration; }
     };
 
     StepCache m_stepCache;
-    DrawCache m_drawCache;
+    SizeCache m_sizeCache;
 
     ThingTypePtr m_mountType;
 
