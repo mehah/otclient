@@ -23,6 +23,7 @@
 #pragma once
 
 #include <utility>
+#include <optional>
 
 #include "declarations.h"
 #include "framebuffer.h"
