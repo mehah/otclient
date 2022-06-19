@@ -33,7 +33,7 @@ public:
 
     void release();
     void resize(const Size& size);
-    void bind(const Rect& dest, const Rect& src);
+    void bind();
     void draw();
 
     void setSmooth(bool enabled) { m_smooth = enabled; m_texture = nullptr; }
@@ -60,6 +60,7 @@ private:
     void internalCreate();
     void internalBind();
     void internalRelease();
+    void update(const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha);
 
     static uint boundFbo;
 

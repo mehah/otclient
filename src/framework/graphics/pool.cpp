@@ -235,7 +235,7 @@ void Pool::setClipRect(const Rect& clipRect, const int pos)
     }
 
     m_objects[pos - 1].state->clipRect = clipRect;
-    stdext::hash_combine(m_status.second, clipRect.hash());
+    stdext::hash_union(m_status.second, clipRect.hash());
 }
 
 void Pool::setOpacity(const float opacity, const int pos)

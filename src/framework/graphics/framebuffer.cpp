@@ -82,23 +82,8 @@ void FrameBuffer::resize(const Size& size)
     }
 }
 
-void FrameBuffer::bind(const Rect& dest, const Rect& src)
+void FrameBuffer::bind()
 {
-    Rect _dest(0, 0, getSize()), _src = _dest;
-    if (dest.isValid()) _dest = dest;
-    if (src.isValid()) _src = src;
-
-    if (_src != m_src || _dest != m_dest) {
-        m_src = _src;
-        m_dest = _dest;
-
-        m_coordsBuffer.clear();
-        m_coordsBuffer.addQuad(m_dest, m_src);
-
-        m_screenCoordsBuffer.clear();
-        m_screenCoordsBuffer.addRect(Rect{ 0, 0, getSize() });
-    }
-
     m_bckResolution = g_painter->getResolution();
     internalBind();
 
@@ -177,4 +162,23 @@ Size FrameBuffer::getSize()
     }
 
     return m_texture->getSize();
+}
+
+void FrameBuffer::update(const Rect& dest, const Rect& src, const Color& colorClear)
+{
+    m_colorClear = colorClear;
+    Rect _dest(0, 0, getSize()), _src = _dest;
+    if (dest.isValid()) _dest = dest;
+    if (src.isValid()) _src = src;
+
+    if (_src != m_src || _dest != m_dest) {
+        m_src = _src;
+        m_dest = _dest;
+
+        m_coordsBuffer.clear();
+        m_coordsBuffer.addQuad(m_dest, m_src);
+
+        m_screenCoordsBuffer.clear();
+        m_screenCoordsBuffer.addRect(Rect{ 0, 0, getSize() });
+    }
 }

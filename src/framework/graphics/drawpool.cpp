@@ -52,7 +52,7 @@ void DrawPool::draw()
 
         const auto& pf = pool->toPoolFramed();
         if (pool->hasModification(true) && !pool->m_objects.empty()) {
-            pf->m_framebuffer->bind(pf->m_dest, pf->m_src);
+            pf->m_framebuffer->bind();
             for (auto& obj : pool->m_objects)
                 drawObject(obj);
             pf->m_framebuffer->release();
@@ -198,21 +198,14 @@ void DrawPool::addAction(const std::function<void()> action)
     m_currentPool->m_objects.push_back(Pool::DrawObject{ .action = std::move(action) });
 }
 
-void DrawPool::use(const PoolType type)
+void DrawPool::use(const PoolType type) { use(type, {}, {}); }
+void DrawPool::use(const PoolType type, const Rect& dest, const Rect& src, const Color& colorClear)
 {
     m_currentPool = get<Pool>(type);
     m_currentPool->resetState();
-}
 
-void DrawPool::use(const PoolType type, const Rect& dest, const Rect& src, const Color& colorClear)
-{
-    use(type);
-
-    if (!m_currentPool->hasFrameBuffer())
-        return;
-
-    const auto& pool = m_currentPool->toPoolFramed();
-    pool->m_dest = dest;
-    pool->m_src = src;
-    pool->m_framebuffer->m_colorClear = colorClear;
+    if (m_currentPool->hasFrameBuffer()) {
+        m_currentPool->toPoolFramed()
+            ->m_framebuffer->update(dest, src, colorClear);
+    }
 }

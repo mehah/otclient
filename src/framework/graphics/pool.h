@@ -183,7 +183,7 @@ private:
 
     stdext::unordered_map<size_t, size_t> m_drawObjectPointer;
 
-    friend class DrawPool;
+    friend DrawPool;
 };
 
 class PoolFramed : public Pool
@@ -198,15 +198,14 @@ public:
 protected:
     PoolFramed(const FrameBufferPtr& fb) : m_framebuffer(fb) {};
 
-    friend class DrawPool;
-    friend class Pool;
+    friend DrawPool;
+    friend Pool;
 
 private:
     bool hasFrameBuffer() const override { return true; }
     PoolFramed* toPoolFramed() override { return this; }
 
     FrameBufferPtr m_framebuffer;
-    Rect m_dest, m_src;
 
     std::function<void()> m_beforeDraw, m_afterDraw;
 };
