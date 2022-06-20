@@ -562,12 +562,17 @@ void Creature::nextWalkUpdate()
 
     if (!m_walking) return;
 
+    const uint64_t walkDuration = std::max<uint64_t>(
+        m_stepCache.walkDuration,
+        (isLocalPlayer() ? std::max((1000 / g_app.getFps() - 1), 3) : 16)
+    );
+
     // schedules next update
     auto self = static_self_cast<Creature>();
     m_walkUpdateEvent = g_dispatcher.scheduleEvent([self] {
         self->m_walkUpdateEvent = nullptr;
         self->nextWalkUpdate();
-    }, m_stepCache.walkDuration);
+    }, walkDuration);
 }
 
 void Creature::updateWalk(const bool isPreWalking)
@@ -864,7 +869,7 @@ uint64_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
             stepDuration += 8.f;
 
         m_stepCache.duration = stepDuration;
-        m_stepCache.walkDuration = std::max<uint64_t>(m_stepCache.duration / SPRITE_SIZE, (isLocalPlayer() ? 3 : 16));
+        m_stepCache.walkDuration = m_stepCache.duration / SPRITE_SIZE;
         m_stepCache.diagonalDuration = stepDuration * (g_game.getClientVersion() > 810 || FORCE_NEW_WALKING_FORMULA ? 3 : 2);
     }
 
