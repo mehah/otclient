@@ -775,12 +775,12 @@ void Creature::setSkull(uint8_t skull) { callLuaField("onSkullChange", m_skull =
 void Creature::setShield(uint8_t shield) { callLuaField("onShieldChange", m_shield = shield); }
 void Creature::setEmblem(uint8_t emblem) { callLuaField("onEmblemChange", m_emblem = emblem); }
 
-void Creature::setTypeTexture(const std::string_view filename) { m_typeTexture = g_textures.getTexture(filename); }
-void Creature::setIconTexture(const std::string_view filename) { m_iconTexture = g_textures.getTexture(filename); }
-void Creature::setSkullTexture(const std::string_view filename) { m_skullTexture = g_textures.getTexture(filename); }
-void Creature::setEmblemTexture(const std::string_view filename) { m_emblemTexture = g_textures.getTexture(filename); }
+void Creature::setTypeTexture(const std::string& filename) { m_typeTexture = g_textures.getTexture(filename); }
+void Creature::setIconTexture(const std::string& filename) { m_iconTexture = g_textures.getTexture(filename); }
+void Creature::setSkullTexture(const std::string& filename) { m_skullTexture = g_textures.getTexture(filename); }
+void Creature::setEmblemTexture(const std::string& filename) { m_emblemTexture = g_textures.getTexture(filename); }
 
-void Creature::setShieldTexture(const std::string_view filename, bool blink)
+void Creature::setShieldTexture(const std::string& filename, bool blink)
 {
     m_shieldTexture = g_textures.getTexture(filename);
     m_showShieldTexture = true;

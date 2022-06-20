@@ -32,7 +32,7 @@ public:
 
     void discoverModules();
     void autoLoadModules(int maxPriority);
-    ModulePtr discoverModule(const std::string_view moduleFile);
+    ModulePtr discoverModule(const std::string& moduleFile);
     void ensureModuleLoaded(const std::string_view moduleName);
     void unloadModules();
     void reloadModules();

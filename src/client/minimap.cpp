@@ -227,7 +227,7 @@ std::pair<MinimapBlock_ptr, MinimapTile> Minimap::threadGetTile(const Position& 
     return std::make_pair(nullptr, nulltile);
 }
 
-bool Minimap::loadImage(const std::string_view fileName, const Position& topLeft, float colorFactor)
+bool Minimap::loadImage(const std::string& fileName, const Position& topLeft, float colorFactor)
 {
     // non pathable colors
     static Color nonPathableColors[] = {
@@ -303,12 +303,12 @@ bool Minimap::loadImage(const std::string_view fileName, const Position& topLeft
     }
 }
 
-void Minimap::saveImage(const std::string_view, const Rect&)
+void Minimap::saveImage(const std::string&, const Rect&)
 {
     //TODO
 }
 
-bool Minimap::loadOtmm(const std::string_view fileName)
+bool Minimap::loadOtmm(const std::string& fileName)
 {
     try {
         const FileStreamPtr fin = g_resources.openFile(fileName);
@@ -372,7 +372,7 @@ bool Minimap::loadOtmm(const std::string_view fileName)
     }
 }
 
-void Minimap::saveOtmm(const std::string_view fileName)
+void Minimap::saveOtmm(const std::string& fileName)
 {
     try {
         stdext::timer saveTimer;

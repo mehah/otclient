@@ -87,7 +87,7 @@ void TextureManager::liveReload()
     }, 1000);
 }
 
-TexturePtr TextureManager::getTexture(const std::string_view fileName)
+TexturePtr TextureManager::getTexture(const std::string& fileName)
 {
     TexturePtr texture;
 

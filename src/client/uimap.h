@@ -89,7 +89,7 @@ public:
 
     float getMinimumAmbientLight() { return m_mapView->getMinimumAmbientLight(); }
 
-    void setCrosshairTexture(const std::string_view texturePath) { m_mapView->setCrosshairTexture(texturePath); }
+    void setCrosshairTexture(const std::string& texturePath) { m_mapView->setCrosshairTexture(texturePath); }
     void setDrawHighlightTarget(const bool enable) { m_mapView->setDrawHighlightTarget(enable); }
     void setAntiAliasingMode(const MapView::AntialiasingMode mode) { m_mapView->setAntiAliasingMode(mode); }
     void setFloorFading(const uint16_t v) { m_mapView->setFloorFading(v); }

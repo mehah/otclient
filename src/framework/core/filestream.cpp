@@ -26,16 +26,16 @@
 
 #include <physfs.h>
 
-FileStream::FileStream(std::string_view name, PHYSFS_File* fileHandle, bool writeable) :
-    m_name(name),
+FileStream::FileStream(std::string name, PHYSFS_File* fileHandle, bool writeable) :
+    m_name(std::move(name)),
     m_fileHandle(fileHandle),
     m_pos(0),
     m_writeable(writeable),
     m_caching(false)
 {}
 
-FileStream::FileStream(std::string_view name, const std::string_view buffer) :
-    m_name(name),
+FileStream::FileStream(std::string name, const std::string_view buffer) :
+    m_name(std::move(name)),
     m_fileHandle(nullptr),
     m_pos(0),
     m_writeable(false),

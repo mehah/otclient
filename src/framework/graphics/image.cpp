@@ -35,9 +35,9 @@ Image::Image(const Size& size, int bpp, uint8_t* pixels) : m_size(size), m_bpp(b
         memcpy(&m_pixels[0], pixels, m_pixels.size());
 }
 
-ImagePtr Image::load(std::string_view file)
+ImagePtr Image::load(std::string file)
 {
-    const auto& path = g_resources.guessFilePath(file.data(), "png");
+    const auto& path = g_resources.guessFilePath(file, "png");
 
     ImagePtr image;
     try {
@@ -50,10 +50,10 @@ ImagePtr Image::load(std::string_view file)
     return image;
 }
 
-ImagePtr Image::loadPNG(const std::string_view file)
+ImagePtr Image::loadPNG(const std::string& file)
 {
     std::stringstream fin;
-    g_resources.readFileStream(file.data(), fin);
+    g_resources.readFileStream(file, fin);
     ImagePtr image;
     apng_data apng;
     if (load_apng(fin, &apng) == 0) {
@@ -72,7 +72,7 @@ ImagePtr Image::loadPNG(const std::string_view file)
     return image;
 }
 
-void Image::savePNG(const std::string_view fileName)
+void Image::savePNG(const std::string& fileName)
 {
     const FileStreamPtr fin = g_resources.createFile(fileName);
     if (!fin)
@@ -81,7 +81,7 @@ void Image::savePNG(const std::string_view fileName)
     fin->cache();
     std::stringstream data;
     save_png(data, m_size.width(), m_size.height(), 4, getPixelData());
-    fin->write(data.str().data(), data.str().length());
+    fin->write(data.str().c_str(), data.str().length());
     fin->flush();
     fin->close();
 }

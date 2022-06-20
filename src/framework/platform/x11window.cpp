@@ -989,7 +989,7 @@ void X11Window::setVerticalSync(bool enable)
 #endif
 }
 
-void X11Window::setIcon(const std::string_view file)
+void X11Window::setIcon(const std::string& file)
 {
     ImagePtr image = Image::load(file);
 

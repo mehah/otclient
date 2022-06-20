@@ -74,7 +74,7 @@ PainterShaderProgramPtr ShaderManager::createFragmentShader(const std::string_vi
     if (!shader)
         return nullptr;
 
-    const auto& path = g_resources.guessFilePath(file, "frag");
+    const auto& path = g_resources.guessFilePath(file.data(), "frag");
 
     shader->addShaderFromSourceCode(ShaderType::VERTEX, std::string{ glslMainWithTexCoordsVertexShader } + glslPositionOnlyVertexShader.data());
     if (!shader->addShaderFromSourceFile(ShaderType::FRAGMENT, path)) {

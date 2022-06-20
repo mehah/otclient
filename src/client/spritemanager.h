@@ -35,7 +35,7 @@ public:
     bool loadSpr(std::string file);
     void unload();
 
-    void saveSpr(const std::string_view fileName);
+    void saveSpr(const std::string& fileName);
 
     uint32_t getSignature() { return m_signature; }
     int getSpritesCount() { return m_spritesCount; }

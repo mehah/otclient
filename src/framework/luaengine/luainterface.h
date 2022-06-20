@@ -160,11 +160,11 @@ private:
 
 public:
     /// Loads and runs a script, any errors are printed to stdout and returns false
-    bool safeRunScript(const std::string_view fileName);
+    bool safeRunScript(const std::string& fileName);
 
     /// Loads and runs a script
     /// @exception LuaException is thrown on any lua error
-    void runScript(const std::string_view fileName);
+    void runScript(const std::string& fileName);
 
     /// Loads and runs the script from buffer
     /// @exception LuaException is thrown on any lua error
@@ -172,7 +172,7 @@ public:
 
     /// Loads a script file and pushes it's main function onto stack,
     /// @exception LuaException is thrown on any lua error
-    void loadScript(const std::string_view fileName);
+    void loadScript(const std::string& fileName);
 
     /// Loads a function from buffer and pushes it onto stack,
     /// @exception LuaException is thrown on any lua error
@@ -359,7 +359,7 @@ public:
     void clearStack() { pop(stackSize()); }
     bool hasIndex(int index) { return (stackSize() >= (index < 0 ? -index : index) && index != 0); }
 
-    void loadFiles(const std::string_view directory, bool recursive = false, const std::string_view contains = "");
+    void loadFiles(const std::string& directory, bool recursive = false, const std::string& contains = "");
 
     /// Pushes any type onto the stack
     template<typename T, typename... Args>

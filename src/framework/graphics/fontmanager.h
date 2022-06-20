@@ -33,7 +33,7 @@ public:
     void terminate();
     void clearFonts();
 
-    bool importFont(const std::string_view file);
+    bool importFont(const std::string& file);
 
     bool fontExists(const std::string_view fontName);
     BitmapFontPtr getFont(const std::string_view fontName);

@@ -912,7 +912,7 @@ bool MapView::isInRangeEx(const Position& pos, const bool ignoreZ)
     return getCameraPosition().isInRange(pos, m_awareRange.left, m_awareRange.right, m_awareRange.top, m_awareRange.bottom, ignoreZ);
 }
 
-void MapView::setCrosshairTexture(const std::string_view texturePath)
+void MapView::setCrosshairTexture(const std::string& texturePath)
 {
     m_crosshairTexture = texturePath.empty() ? nullptr : g_textures.getTexture(texturePath);
 }

@@ -73,7 +73,7 @@ public:
     void setMinimumSize(const Size& minimumSize);
     void setFullscreen(bool fullscreen);
     void setVerticalSync(bool enable);
-    void setIcon(const std::string_view file);
+    void setIcon(const std::string& file);
     void setClipboardText(const std::string_view text);
 
     Size getDisplaySize();

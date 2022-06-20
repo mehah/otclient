@@ -929,7 +929,7 @@ void WIN32Window::setVerticalSync(bool enable)
 #endif
 }
 
-void WIN32Window::setIcon(const std::string_view file)
+void WIN32Window::setIcon(const std::string& file)
 {
     const ImagePtr image = Image::load(file);
 

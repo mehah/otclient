@@ -75,7 +75,7 @@ public:
     void setMinimumSize(const Size& minimumSize) override;
     void setFullscreen(bool fullscreen) override;
     void setVerticalSync(bool enable) override;
-    void setIcon(const std::string_view file) override;
+    void setIcon(const std::string& file) override;
     void setClipboardText(const std::string_view text) override;
 
     Size getDisplaySize() override;

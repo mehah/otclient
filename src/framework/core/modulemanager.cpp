@@ -44,7 +44,7 @@ void ModuleManager::discoverModules()
         auto moduleFiles = g_resources.listDirectoryFiles("/" + moduleDir);
         for (const std::string& moduleFile : moduleFiles) {
             if (g_resources.isFileType(moduleFile, "otmod")) {
-                ModulePtr module = discoverModule("/" + moduleDir + "/" + moduleFile.data());
+                ModulePtr module = discoverModule("/" + moduleDir + "/" + moduleFile);
                 if (module && module->isAutoLoad())
                     m_autoLoadModules.emplace(module->getAutoLoadPriority(), module);
             }
@@ -63,7 +63,7 @@ void ModuleManager::autoLoadModules(int maxPriority)
     }
 }
 
-ModulePtr ModuleManager::discoverModule(const std::string_view moduleFile)
+ModulePtr ModuleManager::discoverModule(const std::string& moduleFile)
 {
     ModulePtr module;
     try {

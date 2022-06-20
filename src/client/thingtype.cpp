@@ -653,7 +653,7 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
     m_texturesFramesOffsets.resize(m_animationPhases);
 }
 
-void ThingType::exportImage(const std::string_view fileName)
+void ThingType::exportImage(const std::string& fileName)
 {
     if (m_null)
         stdext::throw_exception("cannot export null thingtype");

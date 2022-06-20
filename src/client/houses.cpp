@@ -130,11 +130,11 @@ HousePtr HouseManager::getHouseByName(const std::string_view name)
     return it != m_houses.end() ? *it : nullptr;
 }
 
-void HouseManager::load(const std::string_view fileName)
+void HouseManager::load(const std::string& fileName)
 {
     try {
         TiXmlDocument doc;
-        doc.Parse(g_resources.readFileContents(fileName).data());
+        doc.Parse(g_resources.readFileContents(fileName).c_str());
         if (doc.Error())
             stdext::throw_exception(stdext::format("failed to load '%s': %s (House XML)", fileName, doc.ErrorDesc()));
 
@@ -159,7 +159,7 @@ void HouseManager::load(const std::string_view fileName)
     sort();
 }
 
-void HouseManager::save(const std::string_view fileName)
+void HouseManager::save(const std::string& fileName)
 {
     try {
         TiXmlDocument doc;
@@ -177,7 +177,7 @@ void HouseManager::save(const std::string_view fileName)
             root->LinkEndChild(elem);
         }
 
-        if (!doc.SaveFile("data"s + fileName.data()))
+        if (!doc.SaveFile("data" + fileName))
             stdext::throw_exception(stdext::format("failed to save houses XML %s: %s", fileName, doc.ErrorDesc()));
     } catch (std::exception& e) {
         g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));

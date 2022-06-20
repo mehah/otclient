@@ -129,7 +129,7 @@ public:
 
     TilePtr getTopTile(Position tilePos);
 
-    void setCrosshairTexture(const std::string_view texturePath);
+    void setCrosshairTexture(const std::string& texturePath);
     void setAntiAliasingMode(AntialiasingMode mode);
 
     void onMouseMove(const Position& mousePos, bool isVirtualMove = false);

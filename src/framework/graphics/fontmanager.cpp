@@ -42,7 +42,7 @@ void FontManager::clearFonts()
     m_defaultFont = BitmapFontPtr(new BitmapFont("emptyfont"));
 }
 
-bool FontManager::importFont(const std::string_view file)
+bool FontManager::importFont(const std::string& file)
 {
     const auto& path = g_resources.guessFilePath(file, "otfont");
     try {

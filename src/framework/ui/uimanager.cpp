@@ -314,7 +314,7 @@ void UIManager::clearStyles()
     m_styles.clear();
 }
 
-bool UIManager::importStyle(const std::string_view fl)
+bool UIManager::importStyle(const std::string& fl)
 {
     const std::string file{ g_resources.guessFilePath(fl, "otui") };
     try {
@@ -400,12 +400,10 @@ std::string UIManager::getStyleClass(const std::string_view styleName)
     return "";
 }
 
-UIWidgetPtr UIManager::loadUI(const std::string_view file, const UIWidgetPtr& parent)
+UIWidgetPtr UIManager::loadUI(const std::string& file, const UIWidgetPtr& parent)
 {
     try {
-        const auto& pathfile = g_resources.guessFilePath(file, "otui");
-
-        const OTMLDocumentPtr doc = OTMLDocument::parse(pathfile);
+        const OTMLDocumentPtr doc = OTMLDocument::parse(g_resources.guessFilePath(file, "otui"));
         UIWidgetPtr widget;
         for (const OTMLNodePtr& node : doc->children()) {
             std::string tag = node->tag();

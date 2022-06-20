@@ -310,7 +310,7 @@ public:
     void setBackgroundHeight(int height) { m_backgroundRect.setHeight(height); }
     void setBackgroundSize(const Size& size) { m_backgroundRect.resize(size); }
     void setBackgroundRect(const Rect& rect) { m_backgroundRect = rect; }
-    void setIcon(const std::string_view iconFile);
+    void setIcon(const std::string& iconFile);
     void setIconColor(const Color& color) { m_iconColor = color; }
     void setIconOffsetX(int x) { m_iconOffset.x = x; }
     void setIconOffsetY(int y) { m_iconOffset.y = y; }

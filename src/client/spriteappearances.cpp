@@ -238,7 +238,7 @@ ImagePtr SpriteAppearances::getSpriteImage(int id)
     }
 }
 
-void SpriteAppearances::saveSpriteToFile(int id, const std::string_view file)
+void SpriteAppearances::saveSpriteToFile(int id, const std::string& file)
 {
     const ImagePtr sprite = getSpriteImage(id);
     if (sprite) {
@@ -246,7 +246,7 @@ void SpriteAppearances::saveSpriteToFile(int id, const std::string_view file)
     }
 }
 
-void SpriteAppearances::saveSheetToFileBySprite(int id, const std::string_view file)
+void SpriteAppearances::saveSheetToFileBySprite(int id, const std::string& file)
 {
     const SpriteSheetPtr sheet = getSheetBySpriteId(id);
     if (sheet) {
@@ -255,7 +255,7 @@ void SpriteAppearances::saveSheetToFileBySprite(int id, const std::string_view f
     }
 }
 
-void SpriteAppearances::saveSheetToFile(const SpriteSheetPtr& sheet, const std::string_view file)
+void SpriteAppearances::saveSheetToFile(const SpriteSheetPtr& sheet, const std::string& file)
 {
     Image image({ 384 }, 4, sheet->data.get());
     image.savePNG(file);

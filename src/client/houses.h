@@ -94,8 +94,8 @@ public:
     HousePtr getHouse(uint32_t houseId);
     HousePtr getHouseByName(const std::string_view name);
 
-    void load(const std::string_view fileName);
-    void save(const std::string_view fileName);
+    void load(const std::string& fileName);
+    void save(const std::string& fileName);
 
     void sort();
     void clear() { m_houses.clear(); }

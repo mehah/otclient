@@ -294,7 +294,7 @@ int LuaInterface::luaObjectCollectEvent(LuaInterface* lua)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool LuaInterface::safeRunScript(const std::string_view fileName)
+bool LuaInterface::safeRunScript(const std::string& fileName)
 {
     try {
         runScript(fileName);
@@ -305,7 +305,7 @@ bool LuaInterface::safeRunScript(const std::string_view fileName)
     }
 }
 
-void LuaInterface::runScript(const std::string_view fileName)
+void LuaInterface::runScript(const std::string& fileName)
 {
     loadScript(fileName);
     safeCall(0, 0);
@@ -317,7 +317,7 @@ void LuaInterface::runBuffer(const std::string_view buffer, const std::string_vi
     safeCall(0, 0);
 }
 
-void LuaInterface::loadScript(const std::string_view fileName)
+void LuaInterface::loadScript(const std::string& fileName)
 {
     // resolve file full path
     std::string filePath{ fileName.data() };
@@ -1335,7 +1335,7 @@ int LuaInterface::getTop()
     return lua_gettop(L);
 }
 
-void LuaInterface::loadFiles(const std::string_view directory, bool recursive, const std::string_view contains)
+void LuaInterface::loadFiles(const std::string& directory, bool recursive, const std::string& contains)
 {
     for (const std::string& fileName : g_resources.listDirectoryFiles(directory)) {
         std::string fullPath = directory.data() + "/"s + fileName;

@@ -53,7 +53,7 @@ public:
     virtual void hideMouse() = 0;
     virtual void displayFatalError(const std::string_view /*message*/) {}
 
-    int loadMouseCursor(const std::string_view file, const Point& hotSpot);
+    int loadMouseCursor(const std::string& file, const Point& hotSpot);
     virtual void setMouseCursor(int cursorId) = 0;
     virtual void restoreMouseCursor() = 0;
 
@@ -61,7 +61,7 @@ public:
     virtual void setMinimumSize(const Size& minimumSize) = 0;
     virtual void setFullscreen(bool fullscreen) = 0;
     virtual void setVerticalSync(bool enable) = 0;
-    virtual void setIcon(const std::string_view iconFile) = 0;
+    virtual void setIcon(const std::string& iconFile) = 0;
     virtual void setClipboardText(const std::string_view text) = 0;
 
     virtual Size getDisplaySize() = 0;

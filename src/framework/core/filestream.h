@@ -34,8 +34,8 @@ struct PHYSFS_File;
 class FileStream : public LuaObject
 {
 public:
-    FileStream(std::string_view name, PHYSFS_File* fileHandle, bool writeable);
-    FileStream(std::string_view name, const std::string_view buffer);
+    FileStream(std::string name, PHYSFS_File* fileHandle, bool writeable);
+    FileStream(std::string name, const std::string_view buffer);
     ~FileStream() override;
 
     void cache();
