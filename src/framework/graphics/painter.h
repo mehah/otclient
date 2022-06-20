@@ -111,8 +111,6 @@ public:
     void resetShaderProgram() { setShaderProgram(nullptr); }
 
 protected:
-    virtual Matrix3& getTransformMatrixRef() = 0;
-
     float m_opacity{ 1.f };
 
     PainterShaderProgram* m_shaderProgram{ nullptr };

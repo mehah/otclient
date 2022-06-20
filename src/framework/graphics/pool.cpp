@@ -48,7 +48,7 @@ Pool* Pool::create(const PoolType type)
 void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& method, const DrawMode drawMode, DrawBufferPtr drawBuffer)
 {
     const auto& state = PoolState{
-       g_painter->getTransformMatrixRef(), color, m_state.opacity,
+       g_painter->getTransformMatrix(), color, m_state.opacity,
        m_state.compositionMode, m_state.blendEquation,
        m_state.clipRect, texture, m_state.shaderProgram
     };

@@ -73,9 +73,6 @@ public:
 
 protected:
     virtual void refreshState();
-
-    Matrix3& getTransformMatrixRef() override { return m_transformMatrix; }
-
     void updateGlTexture();
     void updateGlCompositionMode();
     void updateGlBlendEquation();
