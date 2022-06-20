@@ -70,6 +70,7 @@ protected:
         for (int i = -1; ++i < N;)
             for (int j = -1; ++j < M;)
                 stdext::hash_combine(m_hash, m[i][j]);
+
         return *this;
     }
 
@@ -250,6 +251,4 @@ using Matrix4 = Matrix4x4;
 using Matrix3 = Matrix3x3;
 using Matrix2 = Matrix2x2;
 
-const static Matrix4 DEFAULT_MATRIX_4;
-const static Matrix3 DEFAULT_MATRIX_3;
-const static Matrix2 DEFAULT_MATRIX_2;
+const static Matrix3 DEFAULT_MATRIX3;

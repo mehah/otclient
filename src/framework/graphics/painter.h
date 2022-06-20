@@ -86,8 +86,9 @@ public:
     void rotate(const Point& p, float angle) { rotate(p.x, p.y, angle); }
 
     virtual void setOpacity(float opacity) { m_opacity = opacity; }
-    virtual void setResolution(const Size& resolution) { m_resolution = resolution; }
+    virtual void setResolution(const Size& resolution, const Matrix3& matrix = {}) { m_resolution = resolution; }
 
+    virtual Matrix3 getTransformMatrix(const Size& size) = 0;
     virtual Matrix3 getTransformMatrix() = 0;
     virtual Matrix3 getProjectionMatrix() = 0;
     virtual Matrix3 getTextureMatrix() = 0;

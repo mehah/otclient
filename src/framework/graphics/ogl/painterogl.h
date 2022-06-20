@@ -38,7 +38,7 @@ public:
     void resetBlendEquation() { setBlendEquation(BlendEquation::ADD); }
     void resetTexture() { setTexture(nullptr); }
     void resetAlphaWriting() { setAlphaWriting(false); }
-    void resetTransformMatrix() { setTransformMatrix(DEFAULT_MATRIX_3); }
+    void resetTransformMatrix() { setTransformMatrix(DEFAULT_MATRIX3); }
 
     void bind() override { refreshState(); }
     void unbind() override {}
@@ -54,7 +54,7 @@ public:
     void setAlphaWriting(bool enable) override;
 
     void setTexture(const TexturePtr& texture) { setTexture(texture.get()); }
-    void setResolution(const Size& resolution) override;
+    void setResolution(const Size& resolution, const Matrix3& matrix = {}) override;
 
     void scale(float x, float y) override;
     void translate(float x, float y) override;
@@ -64,6 +64,7 @@ public:
     void pushTransformMatrix() override;
     void popTransformMatrix() override;
 
+    Matrix3 getTransformMatrix(const Size& size) override;
     Matrix3 getTransformMatrix() override { return m_transformMatrix; }
     Matrix3 getProjectionMatrix() override { return m_projectionMatrix; }
     Matrix3 getTextureMatrix() override { return m_textureMatrix; }
@@ -83,9 +84,9 @@ protected:
     CoordsBuffer m_coordsBuffer;
 
     std::vector<Matrix3> m_transformMatrixStack;
-    Matrix3 m_transformMatrix = DEFAULT_MATRIX_3;
-    Matrix3 m_projectionMatrix = DEFAULT_MATRIX_3;
-    Matrix3 m_textureMatrix = DEFAULT_MATRIX_3;
+    Matrix3 m_transformMatrix,
+        m_projectionMatrix,
+        m_textureMatrix;
 
     BlendEquation m_blendEquation{ BlendEquation::ADD };
     Texture* m_texture{ nullptr };

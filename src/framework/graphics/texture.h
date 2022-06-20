@@ -33,6 +33,7 @@ public:
     ~Texture() override;
 
     void uploadPixels(const ImagePtr& image, bool buildMipmaps = false, bool compress = false);
+    void updateImage(const ImagePtr& image) { m_image = image; }
     void bind();
     void copyFromScreen(const Rect& screenRect);
     virtual bool buildHardwareMipmaps();
@@ -73,7 +74,7 @@ protected:
     ticks_t m_time{ 0 };
     Size m_size, m_glSize;
 
-    Matrix3 m_transformMatrix = DEFAULT_MATRIX_3;
+    Matrix3 m_transformMatrix;
 
     ImagePtr m_image;
 

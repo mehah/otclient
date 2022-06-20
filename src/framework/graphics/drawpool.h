@@ -76,6 +76,9 @@ private:
 
     Pool* m_currentPool{ nullptr };
 
+    Size m_size;
+    Matrix3 m_transformMatrix;
+
     friend class GraphicalApplication;
 };
 

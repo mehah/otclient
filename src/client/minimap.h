@@ -65,6 +65,9 @@ public:
     bool wasSeen() { return m_wasSeen; }
 private:
     TexturePtr m_texture;
+    ImagePtr m_image;
+
+    Size m_size{ MMBLOCK_SIZE, MMBLOCK_SIZE };
 
     std::array<MinimapTile, MMBLOCK_SIZE* MMBLOCK_SIZE> m_tiles;
 

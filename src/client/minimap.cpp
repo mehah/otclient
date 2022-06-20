@@ -44,7 +44,10 @@ void MinimapBlock::update()
     if (!m_mustUpdate)
         return;
 
-    const ImagePtr image(new Image(Size(MMBLOCK_SIZE, MMBLOCK_SIZE)));
+    if (m_image)
+        m_image->resize(m_size);
+    else
+        m_image = new Image(m_size);
 
     bool shouldDraw = false;
     for (uint_fast8_t x = 0; x < MMBLOCK_SIZE; ++x) {
@@ -56,12 +59,15 @@ void MinimapBlock::update()
                 col = Color::from8bit(c).rgba();
                 shouldDraw = true;
             }
-            image->setPixel(x, y, col);
+            m_image->setPixel(x, y, col);
         }
     }
 
     if (shouldDraw)
-        m_texture = TexturePtr(new Texture(image, true));
+        if (m_texture)
+            m_texture->updateImage(m_image);
+        else
+            m_texture = TexturePtr(new Texture(m_image, true));
     else
         m_texture.reset();
 

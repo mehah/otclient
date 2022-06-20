@@ -66,6 +66,7 @@ void FrameBuffer::resize(const Size& size)
     m_texture = TexturePtr(new Texture(size));
     m_texture->setSmooth(m_smooth);
     m_texture->setUpsideDown(true);
+    m_textureMatrix = g_painter->getTransformMatrix(size);
 
     if (m_fbo) {
         internalBind();
@@ -84,10 +85,9 @@ void FrameBuffer::resize(const Size& size)
 
 void FrameBuffer::bind()
 {
-    m_bckResolution = g_painter->getResolution();
     internalBind();
 
-    g_painter->setResolution(getSize());
+    g_painter->setResolution(getSize(), m_textureMatrix);
     g_painter->setAlphaWriting(m_useAlphaWriting);
 
     if (m_colorClear != Color::alpha) {
@@ -100,7 +100,6 @@ void FrameBuffer::bind()
 void FrameBuffer::release()
 {
     internalRelease();
-    g_painter->setResolution(m_bckResolution);
 }
 
 void FrameBuffer::draw()

@@ -46,6 +46,11 @@ void DrawPool::terminate()
 
 void DrawPool::draw()
 {
+    if (m_size != g_painter->getResolution()) {
+        m_size = g_painter->getResolution();
+        m_transformMatrix = g_painter->getTransformMatrix(m_size);
+    }
+
     // Pre Draw
     for (const auto& pool : m_pools) {
         if (!pool->isEnabled() || !pool->hasFrameBuffer()) continue;
@@ -58,6 +63,8 @@ void DrawPool::draw()
             pf->m_framebuffer->release();
         }
     }
+
+    g_painter->setResolution(m_size, m_transformMatrix);
 
     // Draw
     for (const auto& pool : m_pools) {

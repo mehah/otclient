@@ -64,9 +64,8 @@ private:
 
     static uint boundFbo;
 
+    Matrix3 m_textureMatrix;
     TexturePtr m_texture, m_screenBackup;
-
-    Size m_bckResolution;
 
     uint32_t m_fbo, m_prevBoundFbo;
 
