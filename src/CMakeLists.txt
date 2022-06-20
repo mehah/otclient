@@ -265,6 +265,7 @@ target_sources(${PROJECT_NAME}
 	framework/graphics/framebuffer.cpp
 	framework/graphics/framebuffermanager.cpp
 	framework/graphics/graphics.cpp
+	framework/graphics/hardwarebuffer.cpp
 	framework/graphics/image.cpp
 	framework/graphics/ogl/painterogl.cpp
 	framework/graphics/ogl/painterogl1.cpp

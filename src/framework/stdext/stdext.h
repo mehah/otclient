@@ -27,6 +27,8 @@
 #include <ctime>
 #include <ctime>
 
+#include "types.h"
+
 #include "cast.h"
 #include "compiler.h"
 #include "demangle.h"
@@ -38,4 +40,3 @@
 #include "shared_object.h"
 #include "string.h"
 #include "time.h"
-#include "types.h"

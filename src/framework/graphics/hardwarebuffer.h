@@ -22,17 +22,32 @@
 
 #pragma once
 
-#include <any>
-#include <cstddef>
-#include <cstdint>
+#include "declarations.h"
 
-using uchar = unsigned char;
-using ushort = unsigned short;
-using uint = unsigned int;
-using ulong = unsigned long;
+class HardwareBuffer
+{
+public:
+    enum class Type
+    {
+        VERTEX_BUFFER = GL_ARRAY_BUFFER,
+        INDEX_BUFFER = GL_ELEMENT_ARRAY_BUFFER
+    };
 
-using ticks_t = int64_t;
-using refcount_t = uint_fast32_t;
+    enum class UsagePattern
+    {
+        STREAM_DRAW = GL_STREAM_DRAW,
+        STATIC_DRAW = GL_STATIC_DRAW,
+        DYNAMIC_DRAW = GL_DYNAMIC_DRAW
+    };
 
-using std::size_t;
-using std::ptrdiff_t;
+    HardwareBuffer(Type type);
+    ~HardwareBuffer();
+
+    void bind() { glBindBuffer(static_cast<GLenum>(m_type), m_id); }
+    static void unbind(Type type) { glBindBuffer(static_cast<GLenum>(type), 0); }
+    void write(void* data, int count, UsagePattern usage) { glBufferData(static_cast<GLenum>(m_type), count, data, static_cast<GLenum>(usage)); }
+
+private:
+    Type m_type;
+    uint m_id;
+};

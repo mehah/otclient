@@ -23,11 +23,14 @@
 #pragma once
 
 #include <utility>
+#include <optional>
 
 #include "declarations.h"
 #include "framebuffer.h"
 #include "framework/core/timer.h"
 #include "texture.h"
+
+#include "../stdext/storage.h"
 
 enum class PoolType : uint8_t
 {
@@ -39,6 +42,30 @@ enum class PoolType : uint8_t
     UNKNOW
 };
 
+class DrawBuffer
+{
+public:
+    static const DrawBufferPtr create() { return std::make_shared<DrawBuffer>(); }
+
+    bool isValid() { return m_i > -1; }
+    bool validate(const Point& p)
+    {
+        if (m_ref != p) { m_ref = p; invalidate(); }
+        return isValid();
+    }
+
+private:
+    void invalidate() { m_i = -1; m_hashs.clear(); }
+    int m_i{ 0 };
+    Point m_ref;
+
+    std::vector<size_t> m_hashs;
+    std::shared_ptr<CoordsBuffer> m_coords;
+
+    friend class Pool;
+    friend class DrawPool;
+};
+
 class Pool
 {
 public:
@@ -47,6 +74,32 @@ public:
     PoolType getType() const { return m_type; }
 
 protected:
+    struct PoolState
+    {
+        Matrix3 transformMatrix;
+        Color color;
+        float opacity;
+        CompositionMode compositionMode;
+        BlendEquation blendEquation;
+        Rect clipRect;
+        TexturePtr texture;
+        PainterShaderProgram* shaderProgram;
+        std::function<void()> action{ nullptr };
+
+        bool operator==(const PoolState& s2) const
+        {
+            return
+                transformMatrix == s2.transformMatrix &&
+                color == s2.color &&
+                opacity == s2.opacity &&
+                compositionMode == s2.compositionMode &&
+                blendEquation == s2.blendEquation &&
+                clipRect == s2.clipRect &&
+                texture == s2.texture &&
+                shaderProgram == s2.shaderProgram;
+        }
+    };
+
     enum class DrawMethodType
     {
         RECT,
@@ -59,31 +112,23 @@ protected:
     struct DrawMethod
     {
         DrawMethodType type;
-        std::pair<Rect, Rect> rects;
-        std::tuple<Point, Point, Point> points;
-        Point dest;
-
+        std::optional<std::pair<Rect, Rect>> rects;
+        std::optional<std::tuple<Point, Point, Point>> points;
+        std::optional<Point> dest;
         uint16_t intValue{ 0 };
     };
 
     struct DrawObject
     {
-        ~DrawObject() { drawMethods.clear(); state.texture = nullptr; action = nullptr; }
-
-        Painter::PainterState state;
         DrawMode drawMode;
-        std::vector<DrawMethod> drawMethods;
-        bool isGroupable{ false };
-
-        std::shared_ptr<CoordsBuffer> coordsBuffer;
+        std::optional<PoolState> state;
+        std::optional<std::vector<DrawMethod>> drawMethods;
+        DrawBufferPtr buffer;
         std::function<void()> action{ nullptr };
     };
 
-private:
-    struct State
+    struct DrawObjectState
     {
-        ~State() { shaderProgram = nullptr; action = nullptr; }
-
         CompositionMode compositionMode{ CompositionMode::NORMAL };
         BlendEquation blendEquation{ BlendEquation::ADD };
         Rect clipRect;
@@ -92,8 +137,15 @@ private:
         std::function<void()> action{ nullptr };
     };
 
-    float getOpacity(const int pos = -1) { return pos == -1 ? m_state.opacity : m_objects[pos - 1].state.opacity; }
-    Rect getClipRect(const int pos = -1) { return pos == -1 ? m_state.clipRect : m_objects[pos - 1].state.clipRect; }
+private:
+    static Pool* create(const PoolType type);
+
+    void add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, DrawMode drawMode = DrawMode::TRIANGLES, DrawBufferPtr drawBuffer = nullptr);
+    void addCoords(const Pool::DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode);
+    void updateHash(const PoolState& state, const Pool::DrawMethod& method, size_t& stateHash, size_t& methodHash);
+
+    float getOpacity(const int pos = -1) { return pos == -1 ? m_state.opacity : m_objects[pos - 1].state->opacity; }
+    Rect getClipRect(const int pos = -1) { return pos == -1 ? m_state.clipRect : m_objects[pos - 1].state->clipRect; }
 
     void setCompositionMode(CompositionMode mode, int pos = -1);
     void setBlendEquation(BlendEquation equation, int pos = -1);
@@ -108,7 +160,7 @@ private:
     void resetCompositionMode() { m_state.compositionMode = CompositionMode::NORMAL; }
     void resetBlendEquation() { m_state.blendEquation = BlendEquation::ADD; }
 
-    void next() { m_drawingPointer.clear(); }
+    void flush() { m_drawObjectPointer.clear(); }
 
     virtual bool hasFrameBuffer() const { return false; };
     virtual PoolFramed* toPoolFramed() { return nullptr; }
@@ -117,10 +169,10 @@ private:
     void updateStatus() { m_status.first = m_status.second; m_refreshTime.restart(); }
 
     bool m_enabled{ true },
-        m_forceGrouping{ false },
+        m_alwaysGroupDrawings{ false },
         m_autoUpdate{ false };
 
-    State m_state;
+    PoolState m_state;
 
     PoolType m_type{ PoolType::UNKNOW };
 
@@ -128,11 +180,11 @@ private:
 
     std::pair<size_t, size_t> m_status{ 0,0 };
 
-    std::vector<DrawObject> m_objects, m_cachedObjects;
+    std::vector<DrawObject> m_objects;
 
-    std::unordered_map<uint16_t, size_t> m_drawingPointer;
+    stdext::unordered_map<size_t, size_t> m_drawObjectPointer;
 
-    friend class DrawPool;
+    friend DrawPool;
 };
 
 class PoolFramed : public Pool
@@ -147,14 +199,14 @@ public:
 protected:
     PoolFramed(const FrameBufferPtr& fb) : m_framebuffer(fb) {};
 
-    friend class DrawPool;
+    friend DrawPool;
+    friend Pool;
 
 private:
     bool hasFrameBuffer() const override { return true; }
     PoolFramed* toPoolFramed() override { return this; }
 
     FrameBufferPtr m_framebuffer;
-    Rect m_dest, m_src;
 
     std::function<void()> m_beforeDraw, m_afterDraw;
 };

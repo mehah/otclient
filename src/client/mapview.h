@@ -148,6 +148,7 @@ protected:
     void onTileUpdate(const Position& pos, const ThingPtr& thing, Otc::Operation operation);
     void onMapCenterChange(const Position& newPos, const Position& oldPos);
     void onCameraMove(const Point& offset);
+    void onFadeInFinished();
 
     friend class Map;
     friend class Tile;
@@ -224,7 +225,8 @@ private:
         m_fadeInTime{ 0 },
         m_fadeOutTime{ 0 },
         m_shadowFloorIntensity{ 0 },
-        m_scaleFactor{ 1.f };
+        m_scaleFactor{ 1.f },
+        m_lastFadeLevel{ 1.f };
 
     Rect m_rectDimension;
 

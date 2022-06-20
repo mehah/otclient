@@ -38,7 +38,7 @@ public:
     void use(PoolType type, const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha);
 
     void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Color& color = Color::white);
-    void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white, const Point& originalDest = {});
+    void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white, const Point& originalDest = {}, const DrawBufferPtr drawQueue = nullptr);
     void addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white);
     void addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white);
     void addFilledRect(const Rect& dest, const Color& color = Color::white);
@@ -61,10 +61,7 @@ public:
     void resetShaderProgram() { m_currentPool->resetShaderProgram(); }
     void resetCompositionMode() { m_currentPool->resetCompositionMode(); }
 
-    void forceGrouping(const bool force) { m_currentPool->m_forceGrouping = force; }
-    bool isForcingGrouping() const { return m_currentPool->m_forceGrouping; }
-
-    void next() { m_currentPool->next(); }
+    void flush() { if (m_currentPool) m_currentPool->flush(); }
 
     size_t size() { return m_currentPool->m_objects.size(); }
 
@@ -72,19 +69,15 @@ private:
     void draw();
     void init();
     void terminate();
-    void createPools();
-    void drawObject(Pool::DrawObject& obj);
-    void updateHash(const Painter::PainterState& state, const Pool::DrawMethod& method, size_t& stateHash);
-    void add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, DrawMode drawMode = DrawMode::TRIANGLES);
-
-    PoolFramed* poolFramed() { return m_currentPool->toPoolFramed(); }
+    void drawObject(const Pool::DrawObject& obj);
 
     CoordsBuffer m_coordsBuffer;
     std::array<Pool*, static_cast<uint8_t>(PoolType::UNKNOW) + 1> m_pools{};
 
     Pool* m_currentPool{ nullptr };
 
-    Painter::PainterState NULL_STATE;
+    Size m_size;
+    Matrix3 m_transformMatrix;
 
     friend class GraphicalApplication;
 };

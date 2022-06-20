@@ -302,6 +302,21 @@ bool Graphics::canUseBilinearFiltering()
     return m_useBilinearFiltering;
 }
 
+bool Graphics::canUseHardwareBuffers()
+{
+#if OPENGL_ES==2
+    return true;
+#elif OPENGL_ES==1
+    // OpenGL ES 1.1 supports it but OpenGL ES 1.0 not
+    return false;
+#else
+    // vertex buffer objects is supported by OpenGL 1.5
+    if (!GLEW_ARB_vertex_buffer_object)
+        return false;
+#endif
+    return true;
+}
+
 bool Graphics::canUseNonPowerOfTwoTextures()
 {
 #if OPENGL_ES==2

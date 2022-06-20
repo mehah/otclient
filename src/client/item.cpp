@@ -39,6 +39,11 @@ ItemPtr Item::create(int id)
     ItemPtr item(new Item);
     item->setId(id);
 
+    if (item->isSingleGround() || item->isOnBottom() &&
+        item->isSingleDimension() && !item->hasDisplacement()) {
+        item->m_drawBuffer = std::make_shared<DrawBuffer>();
+    }
+
     return item;
 }
 
@@ -46,6 +51,11 @@ ItemPtr Item::createFromOtb(int id)
 {
     ItemPtr item(new Item);
     item->setOtbId(id);
+
+    if (item->isSingleGround()) {
+        item->m_drawBuffer = std::make_shared<DrawBuffer>();
+    }
+
     return item;
 }
 
@@ -69,7 +79,10 @@ void Item::draw(const Point& dest, float scaleFactor, bool animate, const Highli
     if (m_color != Color::alpha)
         color = m_color;
 
-    getThingType()->draw(dest, scaleFactor, 0, xPattern, yPattern, zPattern, animationPhase, textureType, color, lightView);
+    if (m_drawBuffer)
+        m_drawBuffer->validate(dest);
+
+    getThingType()->draw(dest, scaleFactor, 0, xPattern, yPattern, zPattern, animationPhase, textureType, color, lightView, m_drawBuffer);
 
     if (highLight.enabled && this == highLight.thing) {
         getThingType()->draw(dest, scaleFactor, 0, xPattern, yPattern, zPattern, animationPhase, TextureType::ALL_BLANK, highLight.rgbColor);
@@ -90,12 +103,14 @@ void Item::setOtbId(uint16_t id)
 {
     if (!g_things.isValidOtbId(id))
         id = 0;
+
     const auto itemType = g_things.getItemType(id);
     m_serverId = id;
 
     id = itemType->getClientId();
     if (!g_things.isValidDatId(id, ThingCategoryItem))
         id = 0;
+
     m_clientId = id;
     m_thingType = nullptr;
 }

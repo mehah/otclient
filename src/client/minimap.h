@@ -65,6 +65,9 @@ public:
     bool wasSeen() { return m_wasSeen; }
 private:
     TexturePtr m_texture;
+    ImagePtr m_image;
+
+    Size m_size{ MMBLOCK_SIZE, MMBLOCK_SIZE };
 
     std::array<MinimapTile, MMBLOCK_SIZE* MMBLOCK_SIZE> m_tiles;
 
@@ -124,7 +127,7 @@ private:
         };
     }
     uint getBlockIndex(const Position& pos) { return ((pos.y / MMBLOCK_SIZE) * (65536 / MMBLOCK_SIZE)) + (pos.x / MMBLOCK_SIZE); }
-    std::unordered_map<uint, MinimapBlock_ptr> m_tileBlocks[MAX_Z + 1];
+    stdext::unordered_map<uint, MinimapBlock_ptr> m_tileBlocks[MAX_Z + 1];
     std::mutex m_lock;
 };
 

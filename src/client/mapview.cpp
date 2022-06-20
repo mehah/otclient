@@ -116,6 +116,14 @@ void MapView::draw(const Rect& rect)
         m_rectCache.verticalStretchFactor = rect.height() / static_cast<float>(m_rectCache.srcRect.height());
     }
 
+    if (canFloorFade()) {
+        const float fadeLevel = getFadeLevel(m_cachedFirstVisibleFloor);
+        if (m_lastFadeLevel != fadeLevel && fadeLevel == 1.f) {
+            onFadeInFinished();
+            m_lastFadeLevel = fadeLevel;
+        }
+    }
+
     drawFloor();
 
     // this could happen if the player position is not known yet
@@ -175,8 +183,9 @@ void MapView::drawFloor()
             }
 
             for (const auto& tile : map.effects) {
+                const auto& dest = transformPositionTo2D(tile->getPosition(), cameraPosition);
                 for (const auto& effect : tile->getEffects()) {
-                    effect->drawEffect(transformPositionTo2D(effect->getPosition(), cameraPosition), m_scaleFactor, lightView);
+                    effect->drawEffect(dest, m_scaleFactor, lightView);
                 }
             }
             for (const MissilePtr& missile : g_map.getFloorMissiles(z))
@@ -210,7 +219,7 @@ void MapView::drawFloor()
             if (canFloorFade())
                 g_drawPool.resetOpacity();
 
-            g_drawPool.next();
+            g_drawPool.flush();
         }
 
         if (m_rectCache.rect.contains(g_window.getMousePosition())) {
@@ -246,13 +255,9 @@ void MapView::drawCreatureInformation()
         const auto& tile = creature->getTile();
         if (!tile) continue;
 
-        bool useGray = false;
-        if (m_floorViewMode == ALWAYS_WITH_TRANSPARENCY) {
-            useGray = tile->isCovered() && !tile->getPosition().isInRange(cameraPosition, TRANSPARENT_FLOOR_VIEW_RANGE, TRANSPARENT_FLOOR_VIEW_RANGE, true);
-        } else if (canFloorFade()) {
-            useGray = g_map.isCovered(tile->getPosition(), m_cachedFirstVisibleFloor);
-        } else {
-            useGray = tile->isCovered();
+        bool useGray = tile->isCovered();
+        if (useGray && m_floorViewMode == ALWAYS_WITH_TRANSPARENCY) {
+            useGray = !tile->getPosition().isInRange(cameraPosition, TRANSPARENT_FLOOR_VIEW_RANGE, TRANSPARENT_FLOOR_VIEW_RANGE, true);
         }
 
         creature->drawInformation(m_rectCache.rect,
@@ -365,12 +370,13 @@ void MapView::updateVisibleTilesCache()
         for (int iz = m_cachedLastVisibleFloor; iz >= cachedFirstVisibleFloor; --iz) {
             m_fadingFloorTimers[iz].restart(m_floorFading * 1000);
         }
-    } else if (prevFirstVisibleFloor < m_cachedFirstVisibleFloor) { // showing new floor
+    } else if (prevFirstVisibleFloor < m_cachedFirstVisibleFloor) { // hiding new floor
         for (int iz = prevFirstVisibleFloor; iz < m_cachedFirstVisibleFloor; ++iz) {
             const int shift = std::max<int>(0, m_floorFading - m_fadingFloorTimers[iz].elapsed_millis());
             m_fadingFloorTimers[iz].restart(shift * 1000);
         }
-    } else if (prevFirstVisibleFloor > m_cachedFirstVisibleFloor) { // hiding floor
+    } else if (prevFirstVisibleFloor > m_cachedFirstVisibleFloor) { // showing floor
+        m_lastFadeLevel = 0.f;
         for (int iz = m_cachedFirstVisibleFloor; iz < prevFirstVisibleFloor; ++iz) {
             const int shift = std::max<int>(0, m_floorFading - m_fadingFloorTimers[iz].elapsed_millis());
             m_fadingFloorTimers[iz].restart(shift * 1000);
@@ -521,6 +527,11 @@ void MapView::onTileUpdate(const Position&, const ThingPtr& thing, const Otc::Op
     if (thing && thing->isCreature())
         m_mustUpdateVisibleCreaturesCache = true;
 
+    requestVisibleTilesCacheUpdate();
+}
+
+void MapView::onFadeInFinished()
+{
     requestVisibleTilesCacheUpdate();
 }
 

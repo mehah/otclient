@@ -23,11 +23,24 @@
 #pragma once
 
 #include "declarations.h"
+#include "hardwarebuffer.h"
+
 #include <framework/util/databuffer.h>
 
 class VertexArray
 {
 public:
+    enum
+    {
+        CACHE_MIN_VERTICES_COUNT = 42
+    };
+
+    ~VertexArray()
+    {
+        if (m_hardwareBuffer)
+            delete m_hardwareBuffer;
+    }
+
     void addVertex(float x, float y)
     {
         m_buffer << x << y;
@@ -96,11 +109,36 @@ public:
         addVertex(right, top);
     }
 
-    void clear() { m_buffer.reset(); }
+    void clear()
+    {
+        m_buffer.reset();
+        m_cached = false;
+    }
+
     float* vertices() const { return m_buffer.data(); }
     int vertexCount() const { return m_buffer.size() / 2; }
     int size() const { return m_buffer.size(); }
 
+    // cache
+    void cache()
+    {
+        if (m_cached || m_buffer.size() < CACHE_MIN_VERTICES_COUNT) return;
+
+        if (!m_hardwareBuffer)
+            m_hardwareBuffer = new HardwareBuffer(HardwareBuffer::Type::VERTEX_BUFFER);
+
+        m_hardwareBuffer->bind();
+        m_hardwareBuffer->write(vertices(), size() * sizeof(float), HardwareBuffer::UsagePattern::DYNAMIC_DRAW);
+
+        m_cached = true;
+    }
+
+    bool isCached() { return m_cached; }
+
+    HardwareBuffer* getHardwareCache() { return m_hardwareBuffer; }
+
 private:
+    bool m_cached{ false };
     DataBuffer<float> m_buffer;
+    HardwareBuffer* m_hardwareBuffer = nullptr;
 };

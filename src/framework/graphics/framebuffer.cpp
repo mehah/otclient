@@ -66,6 +66,7 @@ void FrameBuffer::resize(const Size& size)
     m_texture = TexturePtr(new Texture(size));
     m_texture->setSmooth(m_smooth);
     m_texture->setUpsideDown(true);
+    m_textureMatrix = g_painter->getTransformMatrix(size);
 
     if (m_fbo) {
         internalBind();
@@ -82,27 +83,11 @@ void FrameBuffer::resize(const Size& size)
     }
 }
 
-void FrameBuffer::bind(const Rect& dest, const Rect& src)
+void FrameBuffer::bind()
 {
-    Rect _dest(0, 0, getSize()), _src = _dest;
-    if (dest.isValid()) _dest = dest;
-    if (src.isValid()) _src = src;
-
-    if (_src != m_src || _dest != m_dest) {
-        m_src = _src;
-        m_dest = _dest;
-
-        m_coordsBuffer.clear();
-        m_coordsBuffer.addQuad(m_dest, m_src);
-
-        m_screenCoordsBuffer.clear();
-        m_screenCoordsBuffer.addRect(Rect{ 0, 0, getSize() });
-    }
-
-    m_bckResolution = g_painter->getResolution();
     internalBind();
 
-    g_painter->setResolution(getSize());
+    g_painter->setResolution(getSize(), m_textureMatrix);
     g_painter->setAlphaWriting(m_useAlphaWriting);
 
     if (m_colorClear != Color::alpha) {
@@ -115,7 +100,6 @@ void FrameBuffer::bind(const Rect& dest, const Rect& src)
 void FrameBuffer::release()
 {
     internalRelease();
-    g_painter->setResolution(m_bckResolution);
 }
 
 void FrameBuffer::draw()
@@ -177,4 +161,23 @@ Size FrameBuffer::getSize()
     }
 
     return m_texture->getSize();
+}
+
+void FrameBuffer::prepare(const Rect& dest, const Rect& src, const Color& colorClear)
+{
+    m_colorClear = colorClear;
+    Rect _dest(0, 0, getSize()), _src = _dest;
+    if (dest.isValid()) _dest = dest;
+    if (src.isValid()) _src = src;
+
+    if (_src != m_src || _dest != m_dest) {
+        m_src = _src;
+        m_dest = _dest;
+
+        m_coordsBuffer.clear();
+        m_coordsBuffer.addQuad(m_dest, m_src);
+
+        m_screenCoordsBuffer.clear();
+        m_screenCoordsBuffer.addRect(Rect{ 0, 0, getSize() });
+    }
 }

@@ -26,6 +26,7 @@
 #include "thingtype.h"
 #include "thingtypemanager.h"
 #include <framework/luaengine/luaobject.h>
+#include <framework/graphics/pool.h>
 
 struct Highlight
 {
@@ -159,6 +160,7 @@ protected:
     Position m_position;
     uint16_t m_datId{ 0 };
     ThingTypePtr m_thingType;
+    DrawBufferPtr m_drawBuffer;
 
 private:
     bool m_canDraw{ true };

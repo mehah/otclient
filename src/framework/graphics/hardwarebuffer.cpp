@@ -20,19 +20,24 @@
  * THE SOFTWARE.
  */
 
-#pragma once
+#include "hardwarebuffer.h"
+#include "graphics.h"
 
-#include <any>
-#include <cstddef>
-#include <cstdint>
+#include <framework/core/application.h>
+#include <framework/core/logger.h>
 
-using uchar = unsigned char;
-using ushort = unsigned short;
-using uint = unsigned int;
-using ulong = unsigned long;
+HardwareBuffer::HardwareBuffer(Type type) :m_type(type)
+{
+    glGenBuffers(1, &m_id);
+    if (!m_id)
+        g_logger.fatal("Unable to create hardware buffer.");
+}
 
-using ticks_t = int64_t;
-using refcount_t = uint_fast32_t;
-
-using std::size_t;
-using std::ptrdiff_t;
+HardwareBuffer::~HardwareBuffer()
+{
+#ifndef NDEBUG
+    assert(!g_app.isTerminated());
+#endif
+    if (g_graphics.ok())
+        glDeleteBuffers(1, &m_id);
+}

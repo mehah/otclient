@@ -23,6 +23,7 @@
 #pragma once
 
 #include <framework/global.h>
+#include "glutil.h"
 
 class Texture;
 class TextureManager;
@@ -46,6 +47,7 @@ class SpriteSheet;
 class Pool;
 class PoolFramed;
 class DrawPool;
+class DrawBuffer;
 
 using ImagePtr = stdext::shared_object_ptr<Image>;
 using TexturePtr = stdext::shared_object_ptr<Texture>;
@@ -65,3 +67,5 @@ using ParticleEffectPtr = stdext::shared_object_ptr<ParticleEffect>;
 using ParticleEffectTypePtr = stdext::shared_object_ptr<ParticleEffectType>;
 using SpriteSheetPtr = stdext::shared_object_ptr<SpriteSheet>;
 using ShaderList = std::vector<ShaderPtr>;
+
+using DrawBufferPtr = std::shared_ptr<DrawBuffer>;

@@ -53,18 +53,6 @@ void PainterOGL::refreshState()
     updateGlAlphaWriting();
 }
 
-void PainterOGL::executeState(const PainterState& state)
-{
-    setColor(state.color);
-    setOpacity(state.opacity);
-    setCompositionMode(state.compositionMode);
-    setBlendEquation(state.blendEquation);
-    setClipRect(state.clipRect);
-    setShaderProgram(state.shaderProgram);
-    setTransformMatrix(state.transformMatrix);
-    if (state.action) state.action();
-}
-
 void PainterOGL::clear(const Color& color)
 {
     glClearColor(color.rF(), color.gF(), color.bF(), color.aF());
@@ -133,11 +121,20 @@ void PainterOGL::setAlphaWriting(bool enable)
     updateGlAlphaWriting();
 }
 
-void PainterOGL::setResolution(const Size& resolution)
+void PainterOGL::setResolution(const Size& resolution, const Matrix3& projectionMatrix)
 {
     if (resolution == m_resolution)
         return;
 
+    setProjectionMatrix(projectionMatrix == DEFAULT_MATRIX3 ? getTransformMatrix(resolution) : projectionMatrix);
+
+    m_resolution = resolution;
+    if (g_painter == this)
+        updateGlViewport();
+}
+
+Matrix3 PainterOGL::getTransformMatrix(const Size& resolution)
+{
     // The projection matrix converts from Painter's coordinate system to GL's coordinate system
     //    * GL's viewport is 2x2, Painter's is width x height
     //    * GL has +y -> -y going from bottom -> top, Painter is the other way round
@@ -151,21 +148,15 @@ void PainterOGL::setResolution(const Size& resolution)
     //   |  x  y  1  |  *  |     0.0      | -2.0 / height |      0.0      |  =  |  x'  y'  1  |
     //   -------------     |    -1.0      |      1.0      |      1.0      |     ---------------
 
-    const Matrix3 projectionMatrix = { 2.0f / resolution.width(),  0.0f,                      0.0f,
-                                                             0.0f,                    -2.0f / resolution.height(),  0.0f,
-                                                            -1.0f,                     1.0f,                      1.0f };
-
-    m_resolution = resolution;
-
-    setProjectionMatrix(projectionMatrix);
-    if (g_painter == this)
-        updateGlViewport();
+    return { 2.0f / resolution.width(),  0.0f,                       0.0f,
+                                  0.0f, -2.0f / resolution.height(), 0.0f,
+                                 -1.0f,  1.0f,                       1.0f };
 }
 
 void PainterOGL::scale(float x, float y)
 {
     const Matrix3 scaleMatrix = {
-                 x,  0.0f,  0.0f,
+              x,   0.0f,  0.0f,
             0.0f,     y,  0.0f,
             0.0f,  0.0f,  1.0f
     };

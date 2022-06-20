@@ -42,7 +42,16 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <tuple>
 #include <typeinfo>
-#include <unordered_map>
 #include <vector>
+
+#ifdef USE_STD_HASHING
+#include <unordered_map>
+#include <unordered_set>
+#else
+#include "util/robin_hood.h"
+#endif
+
+using namespace std::literals;

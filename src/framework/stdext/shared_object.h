@@ -136,7 +136,7 @@ namespace stdext
 namespace std
 {
     // hash, for unordered_map support
-    template<typename T> struct hash<stdext::shared_object_ptr<T>> { size_t operator()(const stdext::shared_object_ptr<T>& p) const { return std::hash<T*>()(p.get()); } };
+    template<typename T> struct hash<stdext::shared_object_ptr<T>> { size_t operator()(const stdext::shared_object_ptr<T>& p) const { return stdext::hash<T*>()(p.get()); } };
 
     // swap support
     template<class T> void swap(stdext::shared_object_ptr<T>& lhs, stdext::shared_object_ptr<T>& rhs) { lhs.swap(rhs); }

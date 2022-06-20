@@ -65,6 +65,7 @@ public:
     bool canUseShaders();
     bool canUseFBO();
     bool canUseBilinearFiltering();
+    bool canUseHardwareBuffers();
     bool canUseNonPowerOfTwoTextures();
     bool canUseMipmaps();
     bool canUseHardwareMipmaps();

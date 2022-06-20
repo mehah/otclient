@@ -78,13 +78,27 @@ void PainterOGL1::drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode)
 
     // use vertex arrays if possible, much faster
     if (g_graphics.canUseDrawArrays()) {
+        coordsBuffer.cache(); // Try to cache
+
         // only set texture coords arrays when needed
-        if (textured) {
-            glTexCoordPointer(2, GL_FLOAT, 0, coordsBuffer.getTextureCoordArray());
+        {
+            if (textured) {
+                auto* hardwareBuffer = coordsBuffer.getHardwareTextureCoordCache();
+                if (hardwareBuffer)
+                    hardwareBuffer->bind();
+
+                glTexCoordPointer(2, GL_FLOAT, 0, hardwareBuffer ? nullptr : coordsBuffer.getTextureCoordArray());
+            }
         }
 
         // set vertex array
-        glVertexPointer(2, GL_FLOAT, 0, coordsBuffer.getVertexArray());
+        {
+            auto* hardwareBuffer = coordsBuffer.getHardwareVertexCache();
+            if (hardwareBuffer)
+                hardwareBuffer->bind();
+
+            glVertexPointer(2, GL_FLOAT, 0, hardwareBuffer ? nullptr : coordsBuffer.getVertexArray());
+        }
 
         // draw the element in coords buffers
         glDrawArrays(static_cast<GLenum>(drawMode), 0, vertexCount);
