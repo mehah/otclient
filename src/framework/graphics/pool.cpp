@@ -176,7 +176,7 @@ void Pool::updateHash(const PoolState& state, const DrawMethod& method,
             stdext::hash_combine(stateHash, !state.texture->isEmpty() ? state.texture->getId() : state.texture->getUniqueId());
         }
 
-        if (state.transformMatrix != DEFAULT_MATRIX_3)
+        if (state.transformMatrix != DEFAULT_MATRIX3)
             stdext::hash_union(stateHash, state.transformMatrix.hash());
 
         stdext::hash_union(m_status.second, stateHash);
