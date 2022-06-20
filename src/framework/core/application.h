@@ -28,7 +28,6 @@
 class Application
 {
 public:
-    Application();
     virtual ~Application() = default;
 
     virtual void init(std::vector<std::string>& args);
@@ -40,13 +39,15 @@ public:
     virtual void close();
 
     void setName(const std::string_view name) { m_appName = name; }
-    void setCompactName(const std::string_view compactName) { m_appCompactName = compactName; }
+    void setCompactName(const std::string_view name) { m_appCompactName = name; }
+    void setOrganizationName(const std::string_view name) { m_organizationName = name; }
 
     bool isRunning() { return m_running; }
     bool isStopping() { return m_stopping; }
     bool isTerminated() { return m_terminated; }
     const std::string& getName() { return m_appName; }
     const std::string& getCompactName() { return m_appCompactName; }
+    const std::string& getOrganizationName() { return m_organizationName; }
     std::string getVersion();
 
     std::string getCharset() { return m_charset; }
@@ -62,10 +63,12 @@ public:
 protected:
     void registerLuaFunctions();
 
-    std::string m_charset;
-    std::string m_appName;
-    std::string m_appCompactName;
-    std::string m_startupOptions;
+    std::string m_charset{ "cp1252" },
+        m_organizationName{ "org" },
+        m_appName{ "application" },
+        m_appCompactName{ "app" },
+        m_startupOptions;
+
     bool m_running{ false },
         m_stopping{ false },
         m_terminated{ false };

@@ -56,14 +56,6 @@ void exitSignalHandler(int sig)
     }
 }
 
-Application::Application()
-{
-    m_appName = "application";
-    m_appCompactName = "app";
-    m_charset = "cp1252";
-    m_stopping = false;
-}
-
 void Application::init(std::vector<std::string>& args)
 {
     // capture exit signals
