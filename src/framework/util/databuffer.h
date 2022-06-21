@@ -94,14 +94,9 @@ public:
 
     void append(const DataBuffer<T>* v)
     {
-        /*const uint32_t oldSize = m_size;
-        grow(m_size + v->m_size);
-        for (uint_fast32_t i = 0; i < v->m_size; ++i)
-            m_buffer[oldSize + i] = v->m_buffer[i];*/
-
         const uint32_t sumSize = m_size + v->m_size;
         if (sumSize > m_capacity) {
-            m_capacity = sumSize * 4;
+            m_capacity = sumSize * 2;
             T* buffer = new T[m_capacity];
 
             std::copy(v->m_buffer, v->m_buffer + v->m_size,

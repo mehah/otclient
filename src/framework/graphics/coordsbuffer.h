@@ -68,7 +68,7 @@ public:
     void addBoudingRect(const Rect& dest, int innerLineWidth);
     void addRepeatedRects(const Rect& dest, const Rect& src);
 
-    void append(CoordsBuffer* buffer)
+    void append(const CoordsBuffer* buffer)
     {
         m_vertexArray.append(&buffer->m_vertexArray);
         m_textureCoordArray.append(&buffer->m_textureCoordArray);

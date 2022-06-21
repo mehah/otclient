@@ -45,7 +45,7 @@ Pool* Pool::create(const PoolType type)
     return pool;
 }
 
-void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& method, const DrawMode drawMode, DrawBufferPtr drawBuffer)
+void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& method, const DrawMode drawMode, const DrawBufferPtr& drawBuffer)
 {
     const auto& state = PoolState{
        g_painter->getTransformMatrix(), color, m_state.opacity,
@@ -81,8 +81,11 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
 
         pointer[stateHash] = list.size();
 
+        const bool hasBuffer = method.type == DrawMethodType::BUFFER;
+
         if (method.type == DrawMethodType::BUFFER) {
             auto _drawBuffer = std::make_shared<DrawBuffer>();
+
             _drawBuffer->getCoords()->append(drawBuffer->getCoords());
             _drawBuffer->m_hashs.push_back(methodHash);
             _drawBuffer->m_i = 0;
@@ -90,20 +93,25 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
             return;
         }
 
-        if (!drawBuffer) {
-            drawBuffer = std::make_shared<DrawBuffer>();
-        }
+        const bool typeBuffer = method.type == DrawMethodType::BUFFER;
 
-        if (drawBuffer->m_hashs.empty()) {
-            auto* coords = drawBuffer->getCoords();
+        const DrawBufferPtr buffer = !drawBuffer || typeBuffer ?
+            std::make_shared<DrawBuffer>() : drawBuffer;
+
+        if (buffer->m_hashs.empty()) {
+            auto* coords = buffer->getCoords();
             coords->clear();
 
-            drawBuffer->m_hashs.push_back(methodHash);
-            addCoords(method, *coords, DrawMode::TRIANGLES);
-        }
-        drawBuffer->m_i = 0;
+            buffer->m_hashs.push_back(methodHash);
 
-        list.push_back({ .drawMode = DrawMode::TRIANGLES, .state = state, .buffer = drawBuffer });
+            if (typeBuffer)
+                coords->append(drawBuffer->getCoords());
+            else
+                addCoords(method, *coords, DrawMode::TRIANGLES);
+        }
+        buffer->m_i = 0;
+
+        list.push_back({ .drawMode = DrawMode::TRIANGLES, .state = state, .buffer = buffer });
 
         return;
     }

@@ -34,9 +34,6 @@ void CachedText::draw(const Rect& rect, const Color color)
     if (m_textScreenCoords != rect) {
         m_textScreenCoords = rect;
 
-        //m_TextureCoords.clear();
-        //m_TextureCoords = m_font->getDrawTextCoords(m_text, m_textSize, m_align, rect, m_glyphsPositions);
-
         m_buffer->getCoords()->clear();
         for (const auto& [screenCoords, textureCoords] : m_font->getDrawTextCoords(m_text, m_textSize, m_align, rect, m_glyphsPositions)) {
             m_buffer->getCoords()->addRect(screenCoords, textureCoords);

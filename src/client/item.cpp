@@ -52,7 +52,8 @@ ItemPtr Item::createFromOtb(int id)
     ItemPtr item(new Item);
     item->setOtbId(id);
 
-    if (item->isSingleGround()) {
+    if (item->isSingleGround() || item->isOnBottom() &&
+        item->isSingleDimension() && !item->hasDisplacement()) {
         item->m_drawBuffer = std::make_shared<DrawBuffer>();
     }
 
@@ -115,10 +116,7 @@ void Item::setOtbId(uint16_t id)
     m_thingType = nullptr;
 }
 
-bool Item::isValid()
-{
-    return g_things.isValidDatId(m_clientId, ThingCategoryItem) && !g_things.getThingType(m_clientId, ThingCategoryItem)->isNull();
-}
+bool Item::isValid() { return g_things.isValidDatId(m_clientId, ThingCategoryItem); }
 
 void Item::unserializeItem(const BinaryTreePtr& in)
 {
