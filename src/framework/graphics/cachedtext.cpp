@@ -24,7 +24,7 @@
 #include "fontmanager.h"
 #include <framework/graphics/drawpool.h>
 
-CachedText::CachedText() : m_font(g_fonts.getDefaultFont()), m_align(Fw::AlignCenter) {}
+CachedText::CachedText() : m_font(g_fonts.getDefaultFont()), m_align(Fw::AlignCenter), m_buffer(std::make_shared<DrawBuffer>()) {}
 
 void CachedText::draw(const Rect& rect, const Color color)
 {
@@ -34,12 +34,16 @@ void CachedText::draw(const Rect& rect, const Color color)
     if (m_textScreenCoords != rect) {
         m_textScreenCoords = rect;
 
-        m_TextureCoords.clear();
-        m_TextureCoords = m_font->getDrawTextCoords(m_text, m_textSize, m_align, rect, m_glyphsPositions);
+        //m_TextureCoords.clear();
+        //m_TextureCoords = m_font->getDrawTextCoords(m_text, m_textSize, m_align, rect, m_glyphsPositions);
+
+        m_buffer->getCoords()->clear();
+        for (const auto& [screenCoords, textureCoords] : m_font->getDrawTextCoords(m_text, m_textSize, m_align, rect, m_glyphsPositions)) {
+            m_buffer->getCoords()->addRect(screenCoords, textureCoords);
+        }
     }
 
-    for (const auto& [screenCoords, textureCoords] : m_TextureCoords)
-        g_drawPool.addTexturedRect(screenCoords, m_font->getTexture(), textureCoords, color);
+    g_drawPool.addTexturedBuffer(m_font->getTexture(), m_buffer, color);
 }
 
 void CachedText::update()

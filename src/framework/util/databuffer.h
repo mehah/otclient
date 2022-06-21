@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <algorithm>
+
 template<class T>
 class DataBuffer
 {
@@ -53,8 +55,8 @@ public:
     {
         if (n > m_capacity) {
             T* buffer = new T[n];
-            for (unsigned int i = 0; i < m_size; ++i)
-                buffer[i] = m_buffer[i];
+
+            std::copy(m_buffer, m_buffer + m_size, buffer);
 
             delete[] m_buffer;
             m_buffer = buffer;
@@ -90,10 +92,33 @@ public:
         m_buffer[m_size - 1] = v;
     }
 
+    void append(const DataBuffer<T>* v)
+    {
+        /*const uint32_t oldSize = m_size;
+        grow(m_size + v->m_size);
+        for (uint_fast32_t i = 0; i < v->m_size; ++i)
+            m_buffer[oldSize + i] = v->m_buffer[i];*/
+
+        const uint32_t sumSize = m_size + v->m_size;
+        if (sumSize > m_capacity) {
+            m_capacity = sumSize * 4;
+            T* buffer = new T[m_capacity];
+
+            std::copy(v->m_buffer, v->m_buffer + v->m_size,
+                  std::copy(m_buffer, m_buffer + m_size, buffer));
+
+            delete[] m_buffer;
+            m_buffer = buffer;
+        } else {
+            std::copy(v->m_buffer, v->m_buffer + v->m_size, m_buffer + m_size);
+        }
+        m_size = sumSize;
+    }
+
     DataBuffer& operator<<(const T& t) { add(t); return *this; }
 
 private:
-    unsigned int m_size{ 0 };
-    unsigned int m_capacity;
+    uint32_t m_size{ 0 };
+    uint32_t m_capacity;
     T* m_buffer;
 };

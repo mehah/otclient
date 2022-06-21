@@ -109,6 +109,11 @@ public:
         addVertex(right, top);
     }
 
+    void append(const VertexArray* buffer)
+    {
+        m_buffer.append(&buffer->m_buffer);
+    }
+
     void clear()
     {
         m_buffer.reset();

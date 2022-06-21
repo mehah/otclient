@@ -54,6 +54,11 @@ public:
         return isValid();
     }
 
+    CoordsBuffer* getCoords()
+    {
+        return (m_coords ? m_coords : m_coords = std::make_shared<CoordsBuffer>()).get();
+    }
+
 private:
     void invalidate() { m_i = -1; m_hashs.clear(); }
     int m_i{ 0 };
@@ -103,6 +108,7 @@ protected:
     enum class DrawMethodType
     {
         RECT,
+        BUFFER,
         TRIANGLE,
         REPEATED_RECT,
         BOUNDING_RECT,

@@ -68,7 +68,10 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
             auto& hashList = buffer->m_hashs;
             if (++buffer->m_i == hashList.size()) {
                 hashList.push_back(methodHash);
-                addCoords(method, *buffer->m_coords, DrawMode::TRIANGLES);
+                if (method.type == DrawMethodType::BUFFER)
+                    buffer->getCoords()->append(drawBuffer->getCoords());
+                else
+                    addCoords(method, *buffer->m_coords, DrawMode::TRIANGLES);
             } else if (hashList[buffer->m_i] != methodHash) {
                 buffer->invalidate();
             }
@@ -78,18 +81,25 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
 
         pointer[stateHash] = list.size();
 
+        if (method.type == DrawMethodType::BUFFER) {
+            auto _drawBuffer = std::make_shared<DrawBuffer>();
+            _drawBuffer->getCoords()->append(drawBuffer->getCoords());
+            _drawBuffer->m_hashs.push_back(methodHash);
+            _drawBuffer->m_i = 0;
+            list.push_back({ .drawMode = DrawMode::TRIANGLES, .state = state, .buffer = _drawBuffer });
+            return;
+        }
+
         if (!drawBuffer) {
             drawBuffer = std::make_shared<DrawBuffer>();
         }
 
         if (drawBuffer->m_hashs.empty()) {
-            if (drawBuffer->m_coords)
-                drawBuffer->m_coords->clear();
-            else
-                drawBuffer->m_coords = std::make_shared<CoordsBuffer>();
+            auto* coords = drawBuffer->getCoords();
+            coords->clear();
 
             drawBuffer->m_hashs.push_back(methodHash);
-            addCoords(method, *drawBuffer->m_coords, DrawMode::TRIANGLES);
+            addCoords(method, *coords, DrawMode::TRIANGLES);
         }
         drawBuffer->m_i = 0;
 
