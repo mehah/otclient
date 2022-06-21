@@ -176,7 +176,7 @@ private:
     };
 
     void updateGeometry(const Size& visibleDimension);
-    void updateVisibleThings();
+    void updateVisibleTiles();
     void refreshVisibleTiles() { m_refreshVisibleTiles = true; }
     void refreshVisibleCreatures() { m_refreshVisibleCreatures = true; }
 

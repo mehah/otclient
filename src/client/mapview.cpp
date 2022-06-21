@@ -106,7 +106,7 @@ void MapView::draw(const Rect& rect)
 {
     // update visible tiles cache when needed
     if (m_refreshVisibleTiles)
-        updateVisibleThings();
+        updateVisibleTiles();
 
     if (m_rectCache.rect != rect) {
         m_rectCache.rect = rect;
@@ -304,7 +304,7 @@ void MapView::drawText()
     }
 }
 
-void MapView::updateVisibleThings()
+void MapView::updateVisibleTiles()
 {
     // there is no tile to render on invalid positions
     const Position cameraPosition = getCameraPosition();
@@ -411,28 +411,22 @@ void MapView::updateVisibleThings()
                         }
                     }
 
-                    bool addTile = true;
-
                     if (isDrawingLights() && tile->canShade(this))
                         floor.shades.push_back(tile);
 
-                    if (addTile) {
-                        if (tile->hasGround())
-                            floor.grounds.push_back(tile);
+                    if (tile->hasGround())
+                        floor.grounds.push_back(tile);
 
-                        if (tile->hasSurface())
-                            floor.surfaces.push_back(tile);
+                    if (tile->hasSurface())
+                        floor.surfaces.push_back(tile);
 
-                        if (g_app.isDrawingEffectsOnTop() && tile->hasEffect())
-                            floor.effects.push_back(tile);
-                    }
+                    if (g_app.isDrawingEffectsOnTop() && tile->hasEffect())
+                        floor.effects.push_back(tile);
 
-                    if (addTile || !floor.shades.empty()) {
-                        if (iz < m_floorMin)
-                            m_floorMin = iz;
-                        else if (iz > m_floorMax)
-                            m_floorMax = iz;
-                    }
+                    if (iz < m_floorMin)
+                        m_floorMin = iz;
+                    else if (iz > m_floorMax)
+                        m_floorMax = iz;
                 }
             }
         }
