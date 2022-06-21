@@ -98,6 +98,9 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerDeath:
                     parseDeath(msg);
                     break;
+                case Proto::GameServerFloorDescription:
+                    parseFloorDescription(msg);
+                    break;
                 case Proto::GameServerFullMap:
                     parseMapDescription(msg);
                     break;
@@ -854,6 +857,29 @@ void ProtocolGame::parseDeath(const InputMessagePtr& msg)
     }
 
     g_game.processDeath(deathType, penality);
+}
+
+void ProtocolGame::parseFloorDescription(const InputMessagePtr& msg)
+{
+    Position pos = getPosition(msg);
+    Position oldPos = m_localPlayer->getPosition();
+    int floor = msg->getU8();
+
+    if (pos.z == floor) {
+        if (!m_mapKnown)
+            m_localPlayer->setPosition(pos);
+        g_map.setCentralPosition(pos);
+        if (!m_mapKnown) {
+            g_dispatcher.addEvent([] { g_lua.callGlobalField("g_game", "onMapKnown"); });
+            m_mapKnown = true;
+        }
+
+        g_dispatcher.addEvent([] { g_lua.callGlobalField("g_game", "onMapDescription"); });
+        g_lua.callGlobalField("g_game", "onTeleport", m_localPlayer, pos, oldPos);
+    }
+
+    AwareRange range = g_map.getAwareRange();
+    setFloorDescription(msg, pos.x - range.left, pos.y - range.top, floor, range.horizontal(), range.vertical(), pos.z - floor, 0);
 }
 
 void ProtocolGame::parseMapDescription(const InputMessagePtr& msg)

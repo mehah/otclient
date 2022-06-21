@@ -165,6 +165,7 @@ private:
     void parsePingBack(const InputMessagePtr& msg);
     void parseChallenge(const InputMessagePtr& msg);
     void parseDeath(const InputMessagePtr& msg);
+    void parseFloorDescription(const InputMessagePtr& msg);
     void parseMapDescription(const InputMessagePtr& msg);
     void parseMapMoveNorth(const InputMessagePtr& msg);
     void parseMapMoveEast(const InputMessagePtr& msg);
@@ -245,7 +246,6 @@ private:
     void parseExtendedOpcode(const InputMessagePtr& msg);
     void parseChangeMapAwareRange(const InputMessagePtr& msg);
     void parseCreaturesMark(const InputMessagePtr& msg);
-
     // 12x
     void parseShowDescription(const InputMessagePtr& msg);
     void parseBestiaryTracker(const InputMessagePtr& msg);

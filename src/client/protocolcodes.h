@@ -71,6 +71,7 @@ namespace Proto
         // NOTE: add any custom opcodes in this range
         // 51 - 99
         GameServerChangeMapAwareRange = 51,
+        GameServerFloorDescription = 75,
 
         // original tibia ONLY
         GameServerSendClientCheck = 99,
