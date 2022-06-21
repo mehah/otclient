@@ -93,7 +93,6 @@ public:
 
     bool isWalkable(bool ignoreCreatures = false);
     bool isClickable();
-    bool isCompletelyCovered(int8_t firstFloor = -1);
 
     bool isPathable() { return m_countFlag.notPathable == 0; }
     bool isFullGround() { return m_countFlag.fullGround > 0; }
@@ -105,7 +104,7 @@ public:
     bool isDrawable() { return !isEmpty() || !m_walkingCreatures.empty() || !m_effects.empty(); }
     bool hasCreature() { return m_countFlag.hasCreature > 0; }
     bool isTopGround() const { return m_ground && m_ground->isTopGround(); }
-    bool isCovered() { return m_covered; };
+    bool isCovered(int8_t firstFloor);
 
     bool hasBlockingCreature();
 
@@ -195,7 +194,10 @@ private:
 
     Position m_position;
 
-    uint8_t m_drawElevation{ 0 }, m_minimapColor{ 0 };
+    uint8_t m_drawElevation{ 0 },
+        m_minimapColor{ 0 },
+        m_lastFloorMin{ 0 };
+
     uint32_t m_flags{ 0 }, m_houseId{ 0 };
 
     std::array<Position, 8> m_positionsAround;
@@ -209,7 +211,5 @@ private:
     Highlight m_highlight;
 
     bool m_highlightWithoutFilter{ false },
-        m_covered{ false },
-        m_completelyCovered{ false },
-        m_ignoreCompletelyCoveredCheck{ false };
+        m_covered{ false };
 };

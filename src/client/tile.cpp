@@ -175,7 +175,6 @@ void Tile::clean()
 void Tile::addWalkingCreature(const CreaturePtr& creature)
 {
     m_walkingCreatures.push_back(creature);
-    m_ignoreCompletelyCoveredCheck = true;
     analyzeThing(creature, true);
 }
 
@@ -185,7 +184,6 @@ void Tile::removeWalkingCreature(const CreaturePtr& creature)
     if (it != m_walkingCreatures.end()) {
         analyzeThing(creature, false);
         m_walkingCreatures.erase(it);
-        m_ignoreCompletelyCoveredCheck = false;
         checkForDetachableThing();
     }
 }
@@ -546,19 +544,10 @@ bool Tile::isWalkable(bool ignoreCreatures)
     return true;
 }
 
-bool Tile::isCompletelyCovered(int8_t firstFloor)
+bool Tile::isCovered(int8_t firstFloor)
 {
-    if (m_ignoreCompletelyCoveredCheck || hasLight())
-        return false;
-
-    if (firstFloor > -1) {
-        m_completelyCovered = g_map.isCompletelyCovered(m_position, firstFloor);
-        if ((m_covered = m_completelyCovered) == false) {
-            m_covered = g_map.isCovered(m_position, firstFloor);
-        }
-    }
-
-    return m_completelyCovered;
+    return firstFloor == m_lastFloorMin ? m_covered :
+        m_covered = g_map.isCovered(m_position, m_lastFloorMin = firstFloor);
 }
 
 bool Tile::isClickable()

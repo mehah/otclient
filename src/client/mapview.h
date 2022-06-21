@@ -176,8 +176,9 @@ private:
     };
 
     void updateGeometry(const Size& visibleDimension);
-    void updateVisibleTilesCache();
-    void requestVisibleTilesCacheUpdate() { m_mustUpdateVisibleTilesCache = true; }
+    void updateVisibleThings();
+    void refreshVisibleTiles() { m_refreshVisibleTiles = true; }
+    void refreshVisibleCreatures() { m_refreshVisibleCreatures = true; }
 
     uint8_t calcFirstVisibleFloor(bool checkLimitsFloorsView);
     uint8_t calcLastVisibleFloor();
@@ -242,8 +243,8 @@ private:
     AwareRange m_viewport;
 
     bool
-        m_mustUpdateVisibleTilesCache{ true },
-        m_mustUpdateVisibleCreaturesCache{ true },
+        m_refreshVisibleTiles{ true },
+        m_refreshVisibleCreatures{ true },
         m_shaderSwitchDone{ true },
         m_drawHealthBars{ true },
         m_drawManaBar{ true },
