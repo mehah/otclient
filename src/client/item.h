@@ -114,8 +114,8 @@ public:
 
     std::string getText() { return m_attribs.get<std::string>(ATTR_TEXT); }
     std::string getDescription() { return m_attribs.get<std::string>(ATTR_DESC); }
-    void setDescription(const std::string_view desc) { m_attribs.set(ATTR_DESC, desc); }
-    void setText(const std::string_view txt) { m_attribs.set(ATTR_TEXT, txt); }
+    void setDescription(const std::string& desc) { m_attribs.set(ATTR_DESC, desc); }
+    void setText(const std::string& txt) { m_attribs.set(ATTR_TEXT, txt); }
 
     Position getTeleportDestination() { return m_attribs.get<Position>(ATTR_TELE_DEST); }
     void setTeleportDestination(const Position& pos) { m_attribs.set(ATTR_TELE_DEST, pos); }
@@ -151,7 +151,7 @@ private:
     uint8_t m_countOrSubType{ 1 };
     Color m_color{ Color::alpha };
 
-    stdext::dynamic_storage8<ItemAttr, ATTR_LAST> m_attribs;
+    stdext::small_dynamic_storage<ItemAttr, ATTR_LAST> m_attribs;
     ItemVector m_containerItems;
 
     uint8_t m_phase{ 0 };
