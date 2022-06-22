@@ -252,7 +252,7 @@ private:
     bool m_null{ true },
         m_opaque{ false };
 
-    stdext::dynamic_storage8<ThingAttr, ThingLastAttr> m_attribs;
+    stdext::small_dynamic_storage<ThingAttr, ThingLastAttr> m_attribs;
 
     Size m_size;
     Point m_displacement;

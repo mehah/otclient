@@ -42,7 +42,7 @@ namespace stdext
     concept OnlyEnum = std::is_enum<T>::value;
 
     template<OnlyEnum Key, uint8_t _Size = UINT8_MAX>
-    class dynamic_storage8
+    class small_dynamic_storage
     {
     public:
         template<typename T>
