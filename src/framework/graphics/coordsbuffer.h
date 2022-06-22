@@ -74,8 +74,8 @@ public:
         m_textureCoordArray.append(&buffer->m_textureCoordArray);
     }
 
-    float* getVertexArray() { return m_vertexArray.vertices(); }
-    float* getTextureCoordArray() { return m_textureCoordArray.vertices(); }
+    const float* getVertexArray() const { return m_vertexArray.vertices(); }
+    const float* getTextureCoordArray() const { return m_textureCoordArray.vertices(); }
     int getVertexCount() const { return m_vertexArray.vertexCount(); }
     int getTextureCoordCount() const { return m_textureCoordArray.vertexCount(); }
 

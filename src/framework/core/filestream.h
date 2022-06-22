@@ -41,10 +41,10 @@ public:
     void cache();
     void close();
     void flush();
-    void write(const void* buffer, uint count);
-    int read(void* buffer, uint size, uint nmemb = 1);
-    void seek(uint pos);
-    void skip(uint len);
+    void write(const void* buffer, uint32_t count);
+    int read(void* buffer, uint32_t size, uint32_t nmemb = 1);
+    void seek(uint32_t pos);
+    void skip(uint32_t len);
     uint size();
     uint tell();
     bool eof();
@@ -80,7 +80,6 @@ public:
     DataBuffer<uint8_t> m_data;
 
 private:
-    void checkWrite();
     void throwError(const std::string_view message, bool physfsError = false);
 
     std::string m_name;
