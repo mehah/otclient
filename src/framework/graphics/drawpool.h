@@ -39,7 +39,7 @@ public:
 
     void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Color& color = Color::white);
     void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white, const Point& originalDest = {}, const DrawBufferPtr buffer = nullptr);
-    void addTexturedBuffer(const TexturePtr& texture, const DrawBufferPtr& buffer, const Color& color = Color::white);
+    void addTexturedCoordsBuffer(const TexturePtr& texture, const CoordsBufferPtr& coords, const Color& color = Color::white);
     void addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white);
     void addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white);
     void addFilledRect(const Rect& dest, const Color& color = Color::white);

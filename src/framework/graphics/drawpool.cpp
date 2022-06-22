@@ -125,13 +125,9 @@ void DrawPool::drawObject(const Pool::DrawObject& obj)
         m_coordsBuffer.clear();
 }
 
-void DrawPool::addTexturedBuffer(const TexturePtr& texture, const DrawBufferPtr& buffer, const Color& color)
+void DrawPool::addTexturedCoordsBuffer(const TexturePtr& texture, const CoordsBufferPtr& coords, const Color& color)
 {
-    const Pool::DrawMethod method{
-        .type = Pool::DrawMethodType::BUFFER,
-    };
-
-    m_currentPool->add(color, texture, method, DrawMode::TRIANGLE_STRIP, buffer);
+    m_currentPool->add(color, texture, {}, DrawMode::TRIANGLE_STRIP, nullptr, coords);
 }
 
 void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Color& color)

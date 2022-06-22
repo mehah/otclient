@@ -53,5 +53,5 @@ private:
     BitmapFontPtr m_font;
     Fw::AlignmentFlag m_align;
 
-    DrawBufferPtr m_buffer{};
+    CoordsBufferPtr m_coordsBuffer;
 };

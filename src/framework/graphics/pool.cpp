@@ -45,7 +45,7 @@ Pool* Pool::create(const PoolType type)
     return pool;
 }
 
-void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& method, const DrawMode drawMode, const DrawBufferPtr& drawBuffer)
+void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& method, const DrawMode drawMode, const DrawBufferPtr& drawBuffer, const CoordsBufferPtr& coordsBuffer)
 {
     const auto& state = PoolState{
        g_painter->getTransformMatrix(), color, m_state.opacity,
@@ -68,10 +68,10 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
             auto& hashList = buffer->m_hashs;
             if (++buffer->m_i == hashList.size()) {
                 hashList.push_back(methodHash);
-                if (method.type == DrawMethodType::BUFFER)
-                    buffer->getCoords()->append(drawBuffer->getCoords());
+                if (coordsBuffer)
+                    buffer->getCoords()->append(coordsBuffer.get());
                 else
-                    addCoords(method, *buffer->m_coords, DrawMode::TRIANGLES);
+                    addCoords(method, *buffer->m_coords.get(), DrawMode::TRIANGLES);
             } else if (hashList[buffer->m_i] != methodHash) {
                 buffer->invalidate();
             }
@@ -81,31 +81,15 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
 
         pointer[stateHash] = list.size();
 
-        const bool hasBuffer = method.type == DrawMethodType::BUFFER;
-
-        if (method.type == DrawMethodType::BUFFER) {
-            auto _drawBuffer = std::make_shared<DrawBuffer>();
-
-            _drawBuffer->getCoords()->append(drawBuffer->getCoords());
-            _drawBuffer->m_hashs.push_back(methodHash);
-            _drawBuffer->m_i = 0;
-            list.push_back({ .drawMode = DrawMode::TRIANGLES, .state = state, .buffer = _drawBuffer });
-            return;
-        }
-
-        const bool typeBuffer = method.type == DrawMethodType::BUFFER;
-
-        const DrawBufferPtr buffer = !drawBuffer || typeBuffer ?
-            std::make_shared<DrawBuffer>() : drawBuffer;
-
+        const DrawBufferPtr buffer = drawBuffer ? drawBuffer : std::make_shared<DrawBuffer>();
         if (buffer->m_hashs.empty()) {
             auto* coords = buffer->getCoords();
             coords->clear();
 
             buffer->m_hashs.push_back(methodHash);
 
-            if (typeBuffer)
-                coords->append(drawBuffer->getCoords());
+            if (coordsBuffer)
+                coords->append(coordsBuffer.get());
             else
                 addCoords(method, *coords, DrawMode::TRIANGLES);
         }

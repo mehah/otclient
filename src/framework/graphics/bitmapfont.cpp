@@ -177,6 +177,82 @@ std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::stri
     return list;
 }
 
+void BitmapFont::fillTextCoords(const CoordsBufferPtr& coords, const std::string_view text,
+                                const Size& textBoxSize, Fw::AlignmentFlag align, const Rect& screenCoords,
+                                const std::vector<Point>& glyphsPositions)
+{
+    coords->clear();
+
+    // prevent glitches from invalid rects
+    if (!screenCoords.isValid() || !m_texture)
+        return;
+
+    const int textLenght = text.length();
+
+    for (int i = 0; i < textLenght; ++i) {
+        const int glyph = static_cast<uchar>(text[i]);
+
+        // skip invalid glyphs
+        if (glyph < 32)
+            continue;
+
+        // calculate initial glyph rect and texture coords
+        Rect glyphScreenCoords(glyphsPositions[i], m_glyphsSize[glyph]);
+        Rect glyphTextureCoords = m_glyphsTextureCoords[glyph];
+
+        // first translate to align position
+        if (align & Fw::AlignBottom) {
+            glyphScreenCoords.translate(0, screenCoords.height() - textBoxSize.height());
+        } else if (align & Fw::AlignVerticalCenter) {
+            glyphScreenCoords.translate(0, (screenCoords.height() - textBoxSize.height()) / 2);
+        } else { // AlignTop
+                // nothing to do
+        }
+
+        if (align & Fw::AlignRight) {
+            glyphScreenCoords.translate(screenCoords.width() - textBoxSize.width(), 0);
+        } else if (align & Fw::AlignHorizontalCenter) {
+            glyphScreenCoords.translate((screenCoords.width() - textBoxSize.width()) / 2, 0);
+        } else { // AlignLeft
+                // nothing to do
+        }
+
+        // only render glyphs that are after 0, 0
+        if (glyphScreenCoords.bottom() < 0 || glyphScreenCoords.right() < 0)
+            continue;
+
+        // bound glyph topLeft to 0,0 if needed
+        if (glyphScreenCoords.top() < 0) {
+            glyphTextureCoords.setTop(glyphTextureCoords.top() - glyphScreenCoords.top());
+            glyphScreenCoords.setTop(0);
+        }
+        if (glyphScreenCoords.left() < 0) {
+            glyphTextureCoords.setLeft(glyphTextureCoords.left() - glyphScreenCoords.left());
+            glyphScreenCoords.setLeft(0);
+        }
+
+        // translate rect to screen coords
+        glyphScreenCoords.translate(screenCoords.topLeft());
+
+        // only render if glyph rect is visible on screenCoords
+        if (!screenCoords.intersects(glyphScreenCoords))
+            continue;
+
+        // bound glyph bottomRight to screenCoords bottomRight
+        if (glyphScreenCoords.bottom() > screenCoords.bottom()) {
+            glyphTextureCoords.setBottom(glyphTextureCoords.bottom() + (screenCoords.bottom() - glyphScreenCoords.bottom()));
+            glyphScreenCoords.setBottom(screenCoords.bottom());
+        }
+        if (glyphScreenCoords.right() > screenCoords.right()) {
+            glyphTextureCoords.setRight(glyphTextureCoords.right() + (screenCoords.right() - glyphScreenCoords.right()));
+            glyphScreenCoords.setRight(screenCoords.right());
+        }
+
+        // add glyph
+        coords->addRect(glyphScreenCoords, glyphTextureCoords);
+    }
+}
+
 const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string_view text, Fw::AlignmentFlag align, Size* textBoxSize)
 {
     const int textLength = text.length();

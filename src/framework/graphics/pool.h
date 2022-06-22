@@ -65,7 +65,7 @@ private:
     Point m_ref;
 
     std::vector<size_t> m_hashs;
-    std::shared_ptr<CoordsBuffer> m_coords;
+    CoordsBufferPtr m_coords;
 
     friend class Pool;
     friend class DrawPool;
@@ -108,7 +108,6 @@ protected:
     enum class DrawMethodType
     {
         RECT,
-        BUFFER,
         TRIANGLE,
         REPEATED_RECT,
         BOUNDING_RECT,
@@ -146,7 +145,10 @@ protected:
 private:
     static Pool* create(const PoolType type);
 
-    void add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method, DrawMode drawMode = DrawMode::TRIANGLES, const DrawBufferPtr& drawBuffer = nullptr);
+    void add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method,
+             DrawMode drawMode = DrawMode::TRIANGLES, const DrawBufferPtr& drawBuffer = nullptr,
+             const CoordsBufferPtr& coordsBuffer = nullptr);
+
     void addCoords(const Pool::DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode);
     void updateHash(const PoolState& state, const Pool::DrawMethod& method, size_t& stateHash, size_t& methodHash);
 
