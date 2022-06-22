@@ -56,8 +56,7 @@ class Tile : public LuaObject
 public:
     Tile(const Position& position);
 
-    void drawSurface(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
-    void drawGround(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
+    void draw(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
 
     void clean();
 
@@ -185,6 +184,7 @@ private:
     };
 
     void drawTop(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
+    void drawGround(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
     void drawBottom(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
     void drawCreature(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
     void drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor, bool animate, LightView* lightView);

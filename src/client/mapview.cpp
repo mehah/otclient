@@ -144,39 +144,37 @@ void MapView::drawFloor()
         const auto& lightView = m_drawLights ? m_lightView.get() : nullptr;
 
         for (int_fast8_t z = m_floorMax; z >= m_floorMin; --z) {
-            if (canFloorFade()) {
-                const float fading = getFadeLevel(z);
-                if (fading == 0) break;
-                if (fading < 0.99)
-                    g_drawPool.setOpacity(fading);
-            }
+            float fadeLevel = getFadeLevel(z);
+            if (fadeLevel == 0.f) break;
+            if (fadeLevel < .99f)
+                g_drawPool.setOpacity(fadeLevel);
 
             Position _camera = cameraPosition;
             bool alwaysTransparent = m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && z < m_cachedFirstVisibleFloor&& _camera.coveredUp(cameraPosition.z - z);
 
             const auto& map = m_cachedVisibleTiles[z];
 
-            for (const auto& tile : map.grounds) {
-                if (!tile->canRender(m_drawViewportEdge, cameraPosition, m_viewport, lightView))
+            if (isDrawingLights() && z < m_floorMax) {
+                if (fadeLevel == 0.f)
                     continue;
 
-                if (alwaysTransparent)
-                    g_drawPool.setOpacity(tile->getPosition().isInRange(_camera, TRANSPARENT_FLOOR_VIEW_RANGE, TRANSPARENT_FLOOR_VIEW_RANGE, true) ? .16 : .7);
+                for (const auto& tile : map.shades) {
+                    if (alwaysTransparent && tile->getPosition().isInRange(_camera, TRANSPARENT_FLOOR_VIEW_RANGE, TRANSPARENT_FLOOR_VIEW_RANGE, true))
+                        continue;
 
-                tile->drawGround(transformPositionTo2D(tile->getPosition(), cameraPosition), m_scaleFactor, lightView);
-
-                if (alwaysTransparent)
-                    g_drawPool.resetOpacity();
+                    auto pos2D = transformPositionTo2D(tile->getPosition(), cameraPosition);
+                    lightView->addShade(pos2D, fadeLevel);
+                }
             }
 
-            for (const auto& tile : map.surfaces) {
+            for (const auto& tile : map.tiles) {
                 if (!tile->canRender(m_drawViewportEdge, cameraPosition, m_viewport, lightView))
                     continue;
 
                 if (alwaysTransparent)
                     g_drawPool.setOpacity(tile->getPosition().isInRange(_camera, TRANSPARENT_FLOOR_VIEW_RANGE, TRANSPARENT_FLOOR_VIEW_RANGE, true) ? .16 : .7);
 
-                tile->drawSurface(transformPositionTo2D(tile->getPosition(), cameraPosition), m_scaleFactor, lightView);
+                tile->draw(transformPositionTo2D(tile->getPosition(), cameraPosition), m_scaleFactor, lightView);
 
                 if (alwaysTransparent)
                     g_drawPool.resetOpacity();
@@ -188,32 +186,13 @@ void MapView::drawFloor()
                     effect->drawEffect(dest, m_scaleFactor, lightView);
                 }
             }
+
             for (const MissilePtr& missile : g_map.getFloorMissiles(z))
                 missile->drawMissile(transformPositionTo2D(missile->getPosition(), cameraPosition), m_scaleFactor, lightView);
 
             if (m_shadowFloorIntensity > 0 && z == cameraPosition.z + 1) {
                 g_drawPool.addFilledRect(m_rectDimension, Color::black);
                 g_drawPool.setOpacity(m_shadowFloorIntensity, g_drawPool.size());
-            }
-
-            if (isDrawingLights()) {
-                const int8_t nextFloor = z - 1;
-                if (nextFloor >= m_floorMin) {
-                    const float fadeLevel = canFloorFade() ? getFadeLevel(nextFloor) : 1.f;
-                    if (fadeLevel == 0.f)
-                        continue;
-
-                    _camera = cameraPosition;
-                    alwaysTransparent = m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && nextFloor < cameraPosition.z&& _camera.coveredUp(cameraPosition.z - nextFloor);
-
-                    for (const auto& tile : m_cachedVisibleTiles[nextFloor].shades) {
-                        if (alwaysTransparent && tile->getPosition().isInRange(_camera, TRANSPARENT_FLOOR_VIEW_RANGE, TRANSPARENT_FLOOR_VIEW_RANGE, true))
-                            continue;
-
-                        auto pos2D = transformPositionTo2D(tile->getPosition(), cameraPosition);
-                        lightView->addShade(pos2D, fadeLevel);
-                    }
-                }
             }
 
             if (canFloorFade())
@@ -411,14 +390,10 @@ void MapView::updateVisibleTiles()
                         }
                     }
 
+                    floor.tiles.push_back(tile);
+
                     if (isDrawingLights() && tile->canShade(this))
                         floor.shades.push_back(tile);
-
-                    if (tile->hasGround())
-                        floor.grounds.push_back(tile);
-
-                    if (tile->hasSurface())
-                        floor.surfaces.push_back(tile);
 
                     if (g_app.isDrawingEffectsOnTop() && tile->hasEffect())
                         floor.effects.push_back(tile);

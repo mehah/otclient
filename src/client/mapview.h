@@ -155,10 +155,10 @@ protected:
     friend class LightView;
 
 private:
-    struct MapList
+    struct MapObject
     {
-        std::vector<TilePtr> shades, grounds, surfaces, effects;
-        void clear() { shades.clear(); grounds.clear(); surfaces.clear(); effects.clear(); }
+        std::vector<TilePtr> shades, tiles, effects;
+        void clear() { shades.clear(); tiles.clear(); effects.clear(); }
     };
 
     struct Crosshair
@@ -195,6 +195,8 @@ private:
 
     float getFadeLevel(uint8_t z)
     {
+        if (!canFloorFade()) return 1.f;
+
         float fading = std::clamp<float>(static_cast<float>(m_fadingFloorTimers[z].elapsed_millis()) / static_cast<float>(m_floorFading), 0.f, 1.f);
         if (z < m_cachedFirstVisibleFloor)
             fading = 1.0 - fading;
@@ -261,7 +263,7 @@ private:
 
     std::vector<CreaturePtr> m_visibleCreatures;
 
-    std::array<MapList, MAX_Z + 1> m_cachedVisibleTiles;
+    std::array<MapObject, MAX_Z + 1> m_cachedVisibleTiles;
 
     stdext::timer m_fadingFloorTimers[MAX_Z + 1];
 

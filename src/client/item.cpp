@@ -39,11 +39,6 @@ ItemPtr Item::create(int id)
     ItemPtr item(new Item);
     item->setId(id);
 
-    if (item->isSingleGround() || item->isOnBottom() &&
-        item->isSingleDimension() && !item->hasDisplacement()) {
-        item->m_drawBuffer = std::make_shared<DrawBuffer>();
-    }
-
     return item;
 }
 
@@ -51,11 +46,6 @@ ItemPtr Item::createFromOtb(int id)
 {
     ItemPtr item(new Item);
     item->setOtbId(id);
-
-    if (item->isSingleGround() || item->isOnBottom() &&
-        item->isSingleDimension() && !item->hasDisplacement()) {
-        item->m_drawBuffer = std::make_shared<DrawBuffer>();
-    }
 
     return item;
 }
@@ -98,6 +88,7 @@ void Item::setId(uint32_t id)
     m_serverId = g_things.findItemTypeByClientId(id)->getServerId();
     m_clientId = id;
     m_thingType = nullptr;
+    m_drawBuffer = isSingleGround() ? std::make_shared<DrawBuffer>() : nullptr;
 }
 
 void Item::setOtbId(uint16_t id)
@@ -114,6 +105,7 @@ void Item::setOtbId(uint16_t id)
 
     m_clientId = id;
     m_thingType = nullptr;
+    m_drawBuffer = isSingleGround() ? std::make_shared<DrawBuffer>() : nullptr;
 }
 
 bool Item::isValid() { return g_things.isValidDatId(m_clientId, ThingCategoryItem); }

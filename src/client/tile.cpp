@@ -43,6 +43,13 @@ void Tile::drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor
         m_drawElevation = MAX_ELEVATION;
 }
 
+void Tile::draw(const Point& dest, float scaleFactor, LightView* lightView)
+{
+    drawGround(dest, scaleFactor, lightView);
+    drawBottom(dest, scaleFactor, lightView);
+    drawTop(dest, scaleFactor, lightView);
+}
+
 void Tile::drawGround(const Point& dest, float scaleFactor, LightView* lightView)
 {
     m_drawElevation = 0;
@@ -54,31 +61,8 @@ void Tile::drawGround(const Point& dest, float scaleFactor, LightView* lightView
     }
 }
 
-void Tile::drawSurface(const Point& dest, float scaleFactor, LightView* lightView)
-{
-    drawBottom(dest, scaleFactor, lightView);
-    drawTop(dest, scaleFactor, lightView);
-}
-
 void Tile::drawCreature(const Point& dest, float scaleFactor, LightView* lightView)
 {
-#if RENDER_WALKING_CREATURES_BEHIND == 1
-    for (const auto& creature : m_walkingCreatures) {
-        drawThing(creature, Point(
-            dest.x + ((creature->getPosition().x - m_position.x) * SPRITE_SIZE - m_drawElevation) * scaleFactor,
-            dest.y + ((creature->getPosition().y - m_position.y) * SPRITE_SIZE - m_drawElevation) * scaleFactor
-        ), scaleFactor, true, lightView);
-    }
-
-    if (hasCreature()) {
-        for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
-            const auto& thing = *it;
-            if (!thing->isCreature() || thing->static_self_cast<Creature>()->isWalking()) continue;
-
-            drawThing(thing, dest - m_drawElevation * scaleFactor, scaleFactor, true, lightView);
-        }
-    }
-#else
     if (hasCreature()) {
         for (const auto& thing : m_things) {
             if (!thing->isCreature() || thing->static_self_cast<Creature>()->isWalking()) continue;
@@ -93,7 +77,6 @@ void Tile::drawCreature(const Point& dest, float scaleFactor, LightView* lightVi
             dest.y + ((creature->getPosition().y - m_position.y) * SPRITE_SIZE - m_drawElevation) * scaleFactor
         ), scaleFactor, true, lightView);
     }
-#endif
 }
 
 void Tile::drawBottom(const Point& dest, float scaleFactor, LightView* lightView)
