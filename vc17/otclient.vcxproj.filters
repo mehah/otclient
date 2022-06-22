@@ -908,9 +908,6 @@
     <ClInclude Include="..\src\framework\util\rect.h">
       <Filter>Header Files\framework\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\framework\util\size.h">
-      <Filter>Header Files\framework\util</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\framework\xml\tinystr.h">
       <Filter>Header Files\framework\xml</Filter>
     </ClInclude>
@@ -1067,11 +1064,11 @@
     <ClInclude Include="..\src\protobuf\appearances.pb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\framework\util\robin_hood.h">
-      <Filter>Header Files\framework\util</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\framework\graphics\hardwarebuffer.h">
       <Filter>Header Files\framework\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\util\size.h">
+      <Filter>Header Files\framework\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

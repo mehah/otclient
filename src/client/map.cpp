@@ -551,7 +551,7 @@ void Map::removeUnawareThings()
     if (!g_game.getFeature(Otc::GameKeepUnawareTiles)) {
         // remove tiles that we are not aware anymore
         for (int_fast8_t z = -1; ++z <= MAX_Z;) {
-            stdext::unordered_map<uint, TileBlock>& tileBlocks = m_tileBlocks[z];
+            auto& tileBlocks = m_tileBlocks[z];
             for (auto it = tileBlocks.begin(); it != tileBlocks.end();) {
                 TileBlock& block = (*it).second;
                 bool blockEmpty = true;

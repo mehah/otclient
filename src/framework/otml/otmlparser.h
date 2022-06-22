@@ -46,8 +46,10 @@ private:
     int currentDepth;
     int currentLine;
     OTMLDocumentPtr doc;
-    OTMLNodePtr currentParent;
-    stdext::unordered_map<OTMLNodePtr, OTMLNodePtr> parentMap;
-    OTMLNodePtr previousNode;
+    OTMLNodePtr currentParent,
+        previousNode;
+
+    std::unordered_map<OTMLNodePtr, OTMLNodePtr> parentMap;
+
     std::istream& in;
 };
