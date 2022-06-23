@@ -278,7 +278,7 @@ private:
     std::vector<StaticTextPtr> m_staticTexts;
     std::vector<MapViewPtr> m_mapViews;
 
-    stdext::unordered_map<uint, TileBlock> m_tileBlocks[MAX_Z + 1];
+    stdext::unordered_map<uint32_t, TileBlock> m_tileBlocks[MAX_Z + 1];
     stdext::unordered_map<uint32_t, CreaturePtr> m_knownCreatures;
     stdext::unordered_map<Position, std::string, Position::Hasher> m_waypoints;
 

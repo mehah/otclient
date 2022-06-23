@@ -217,7 +217,9 @@ protected:
         m_lastStepToPosition, m_oldPosition;
 
     // jump related
-    float m_jumpHeight{ 0 }, m_jumpDuration{ 0 };
+    float m_jumpHeight{ 0 },
+        m_jumpDuration{ 0 };
+
     PointF m_jumpOffset;
     Timer m_jumpTimer;
 
