@@ -108,7 +108,6 @@ void Map::clean()
     g_towns.clear();
     g_houses.clear();
     g_creatures.clearSpawns();
-    m_tilesRect = Rect(65534, 65534, 0, 0);
 }
 
 void Map::cleanDynamicThings()
@@ -306,18 +305,6 @@ const TilePtr& Map::createTile(const Position& pos)
     if (!pos.isMapPosition())
         return m_nulltile;
 
-    if (pos.x < m_tilesRect.left())
-        m_tilesRect.setLeft(pos.x);
-
-    if (pos.y < m_tilesRect.top())
-        m_tilesRect.setTop(pos.y);
-
-    if (pos.x > m_tilesRect.right())
-        m_tilesRect.setRight(pos.x);
-
-    if (pos.y > m_tilesRect.bottom())
-        m_tilesRect.setBottom(pos.y);
-
     TileBlock& block = m_tileBlocks[pos.z][getBlockIndex(pos)];
     return block.create(pos);
 }
@@ -340,18 +327,6 @@ const TilePtr& Map::getOrCreateTile(const Position& pos)
 {
     if (!pos.isMapPosition())
         return m_nulltile;
-
-    if (pos.x < m_tilesRect.left())
-        m_tilesRect.setLeft(pos.x);
-
-    if (pos.y < m_tilesRect.top())
-        m_tilesRect.setTop(pos.y);
-
-    if (pos.x > m_tilesRect.right())
-        m_tilesRect.setRight(pos.x);
-
-    if (pos.y > m_tilesRect.bottom())
-        m_tilesRect.setBottom(pos.y);
 
     TileBlock& block = m_tileBlocks[pos.z][getBlockIndex(pos)];
     return block.getOrCreate(pos);

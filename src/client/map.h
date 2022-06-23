@@ -292,7 +292,6 @@ private:
 
     Light m_light;
     Position m_centralPosition;
-    Rect m_tilesRect;
 
     AwareRange m_awareRange;
     static TilePtr m_nulltile;
