@@ -95,7 +95,7 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
         }
         buffer->m_i = 0;
 
-        list.push_back({ .drawMode = DrawMode::TRIANGLES, .state = state, .buffer = buffer });
+        list.emplace_back(state, buffer);
 
         return;
     }
@@ -121,12 +121,12 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
 
         if (sameState) {
             prevObj.drawMode = DrawMode::TRIANGLES;
-            prevObj.drawMethods->push_back(method);
+            prevObj.drawMethods->emplace_back(method);
             return;
         }
     }
 
-    list.push_back({ drawMode, state, std::vector{method} });
+    list.emplace_back(drawMode, state, method);
 }
 
 void Pool::addCoords(const DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode)

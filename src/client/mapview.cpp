@@ -390,13 +390,13 @@ void MapView::updateVisibleTiles()
                         }
                     }
 
-                    floor.tiles.push_back(tile);
+                    floor.tiles.emplace_back(tile);
 
                     if (isDrawingLights() && tile->canShade(this))
-                        floor.shades.push_back(tile);
+                        floor.shades.emplace_back(tile);
 
                     if (g_app.isDrawingEffectsOnTop() && tile->hasEffect())
-                        floor.effects.push_back(tile);
+                        floor.effects.emplace_back(tile);
 
                     if (iz < m_floorMin)
                         m_floorMin = iz;

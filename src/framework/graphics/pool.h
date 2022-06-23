@@ -125,7 +125,13 @@ protected:
 
     struct DrawObject
     {
-        DrawMode drawMode;
+        DrawObject(std::function<void()> action) : action(std::move(action)) {}
+        DrawObject(const PoolState& state, const DrawBufferPtr& buffer) : state(state), buffer(buffer) {}
+        DrawObject(const DrawMode drawMode, const PoolState& state, const DrawMethod& method) :
+            drawMode(drawMode), state(state), drawMethods({ method })
+        {}
+
+        DrawMode drawMode{ DrawMode::TRIANGLES };
         std::optional<PoolState> state;
         std::optional<std::vector<DrawMethod>> drawMethods;
         DrawBufferPtr buffer;

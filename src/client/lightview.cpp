@@ -44,7 +44,7 @@ void LightView::addLightSource(const Point& pos, const Light& light)
         }
     }
 
-    m_sources.push_back(Source{ pos , light.color, light.intensity, g_drawPool.getOpacity() });
+    m_sources.emplace_back(pos, light.color, light.intensity, g_drawPool.getOpacity());
 }
 
 void LightView::draw(const Rect& dest, const Rect& src)
