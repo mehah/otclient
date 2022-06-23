@@ -38,9 +38,11 @@ void Tile::drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor
 {
     thing->draw(dest, scaleFactor, animate, m_highlight, TextureType::NONE, Color::white, lightView);
 
-    m_drawElevation += thing->getElevation();
-    if (m_drawElevation > MAX_ELEVATION)
-        m_drawElevation = MAX_ELEVATION;
+    if (thing->isItem()) {
+        m_drawElevation += thing->getElevation();
+        if (m_drawElevation > MAX_ELEVATION)
+            m_drawElevation = MAX_ELEVATION;
+    }
 }
 
 void Tile::draw(const Point& dest, float scaleFactor, LightView* lightView)
