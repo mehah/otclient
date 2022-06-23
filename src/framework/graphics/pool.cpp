@@ -105,10 +105,10 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
 
         const bool sameState = prevObj.state == state;
 
-        if (method.dest.has_value() && prevObj.drawMethods.has_value()) {
+        if (method.dest.has_value() && prevObj.methods.has_value()) {
             // Look for identical or opaque textures that are greater than or
             // equal to the size of the previous texture, if so, remove it from the list so they don't get drawn.
-            auto& drawMethods = *prevObj.drawMethods;
+            auto& drawMethods = *prevObj.methods;
             for (auto itm = drawMethods.begin(); itm != drawMethods.end(); ++itm) {
                 auto& prevMtd = *itm;
                 if (prevMtd.dest == method.dest &&
@@ -120,8 +120,7 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
         }
 
         if (sameState) {
-            prevObj.drawMode = DrawMode::TRIANGLES;
-            prevObj.drawMethods->emplace_back(method);
+            prevObj.addMethod(method);
             return;
         }
     }

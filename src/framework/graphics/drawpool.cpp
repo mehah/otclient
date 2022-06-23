@@ -95,8 +95,11 @@ void DrawPool::drawObject(const Pool::DrawObject& obj)
     auto& buffer = useGlobalCoord ? m_coordsBuffer : *obj.buffer->m_coords;
 
     if (useGlobalCoord) {
-        if (obj.drawMethods->empty()) return;
-        for (const auto& method : *obj.drawMethods) {
+        m_coordsBuffer.clear();
+
+        if (!obj.methods.has_value()) {
+            m_currentPool->addCoords(*obj.method, buffer, obj.drawMode);
+        } else for (const auto& method : *obj.methods) {
             m_currentPool->addCoords(method, buffer, obj.drawMode);
         }
     }
@@ -120,9 +123,6 @@ void DrawPool::drawObject(const Pool::DrawObject& obj)
     }
 
     g_painter->drawCoords(buffer, obj.drawMode);
-
-    if (useGlobalCoord)
-        m_coordsBuffer.clear();
 }
 
 void DrawPool::addTexturedCoordsBuffer(const TexturePtr& texture, const CoordsBufferPtr& coords, const Color& color)

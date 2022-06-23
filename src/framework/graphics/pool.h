@@ -128,13 +128,24 @@ protected:
         DrawObject(std::function<void()> action) : action(std::move(action)) {}
         DrawObject(const PoolState& state, const DrawBufferPtr& buffer) : state(state), buffer(buffer) {}
         DrawObject(const DrawMode drawMode, const PoolState& state, const DrawMethod& method) :
-            drawMode(drawMode), state(state), drawMethods({ method })
+            drawMode(drawMode), state(state), method(method)
         {}
 
+        void addMethod(const DrawMethod& method)
+        {
+            if (!methods.has_value()) {
+                methods = std::vector<DrawMethod>();
+                methods->emplace_back(*this->method);
+            }
+            drawMode = DrawMode::TRIANGLES;
+            methods->emplace_back(method);
+        }
+
         DrawMode drawMode{ DrawMode::TRIANGLES };
-        std::optional<PoolState> state;
-        std::optional<std::vector<DrawMethod>> drawMethods;
         DrawBufferPtr buffer;
+        std::optional<PoolState> state;
+        std::optional<DrawMethod> method;
+        std::optional<std::vector<DrawMethod>> methods;
         std::function<void()> action{ nullptr };
     };
 

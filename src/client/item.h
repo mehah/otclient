@@ -84,9 +84,9 @@ public:
 
     void setId(uint32_t id) override;
     void setOtbId(uint16_t id);
-    void setCountOrSubType(int value) { m_countOrSubType = value; }
-    void setCount(int count) { m_countOrSubType = count; }
-    void setSubType(int subType) { m_countOrSubType = subType; }
+    void setCountOrSubType(int value) { m_countOrSubType = value; updatePatterns(); }
+    void setCount(int count) { m_countOrSubType = count; updatePatterns(); }
+    void setSubType(int subType) { m_countOrSubType = subType; updatePatterns(); }
     void setColor(const Color& c) { m_color = c; }
 
     int getCountOrSubType() { return m_countOrSubType; }
@@ -139,16 +139,23 @@ public:
     void removeContainerItem(int slot) { m_containerItems[slot] = nullptr; }
     void clearContainerItems() { m_containerItems.clear(); }
 
-    void calculatePatterns(int& xPattern, int& yPattern, int& zPattern);
+    void updatePatterns();
     int calculateAnimationPhase(bool animate);
     int getExactSize(int layer = 0, int xPattern = 0, int yPattern = 0, int zPattern = 0, int animationPhase = 0) override;
 
     const ThingTypePtr& getThingType() override;
 
+    void onPositionChange(const Position& /*newPos*/, const Position& /*oldPos*/) override { updatePatterns(); }
+
 private:
-    uint16_t m_clientId{ 0 };
-    uint16_t m_serverId{ 0 };
-    uint8_t m_countOrSubType{ 1 };
+    uint16_t m_clientId{ 0 },
+        m_serverId{ 0 };
+
+    uint8_t m_countOrSubType,
+        m_numPatternX{ 0 },
+        m_numPatternY{ 0 },
+        m_numPatternZ{ 0 };
+
     Color m_color{ Color::alpha };
 
     stdext::small_dynamic_storage<ItemAttr, ATTR_LAST> m_attribs;

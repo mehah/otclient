@@ -37,7 +37,7 @@
 #include "towns.h"
 
 static constexpr uint8_t
-MAX_VIEWPORT_X = 45, MAX_VIEWPORT_Y = 24;
+MAX_VIEWPORT_X = 55, MAX_VIEWPORT_Y = 28;
 
 Map g_map;
 TilePtr Map::m_nulltile;
