@@ -40,7 +40,7 @@ public:
 private:
     void checkStackSize();
 
-    std::map<std::string, int> m_cursors;
+    stdext::map<std::string, int> m_cursors;
     std::deque<int> m_cursorStack;
 };
 

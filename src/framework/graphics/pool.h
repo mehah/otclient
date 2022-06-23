@@ -196,7 +196,7 @@ private:
 
     std::vector<DrawObject> m_objects;
 
-    stdext::unordered_map<size_t, size_t> m_drawObjectPointer;
+    stdext::map<size_t, size_t> m_drawObjectPointer;
 
     friend DrawPool;
 };

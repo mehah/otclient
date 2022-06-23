@@ -24,7 +24,7 @@
 
 namespace Proto
 {
-    std::map<uint8_t, uint8_t > messageModesMap;
+    stdext::map<uint8_t, uint8_t > messageModesMap;
 
     void buildMessageModesMap(int version)
     {

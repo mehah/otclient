@@ -30,13 +30,13 @@ namespace stdext
         class Hash = phmap::priv::hash_default_hash<K>,
         class Eq = phmap::priv::hash_default_eq<K>,
         class Alloc = phmap::priv::Allocator<phmap::priv::Pair<const K, V>>>
-    using unordered_map = phmap::flat_hash_map< K, V, Hash, Eq, Alloc>;
+    using map = phmap::flat_hash_map< K, V, Hash, Eq, Alloc>;
 
     template <class T,
         class Hash = phmap::priv::hash_default_hash<T>,
         class Eq = phmap::priv::hash_default_eq<T>,
         class Alloc = phmap::priv::Allocator<T>>
-        using unordered_set = phmap::flat_hash_set<T, Hash, Eq, Alloc>;
+        using set = phmap::flat_hash_set<T, Hash, Eq, Alloc>;
 
     template<typename T>
     concept OnlyEnum = std::is_enum<T>::value;
@@ -91,6 +91,6 @@ namespace stdext
         void clear() { m_data.clear(); }
 
     private:
-        stdext::unordered_map<Key, std::any> m_data;
+        stdext::map<Key, std::any> m_data;
     };
 }

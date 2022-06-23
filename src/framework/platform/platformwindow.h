@@ -104,10 +104,10 @@ protected:
     void releaseAllKeys();
     void fireKeysPress();
 
-    std::map<int, Fw::Key> m_keyMap;
-    std::map<Fw::Key, bool> m_keysState;
-    std::map<Fw::Key, ticks_t> m_firstKeysPress;
-    std::map<Fw::Key, ticks_t> m_lastKeysPress;
+    stdext::map<int, Fw::Key> m_keyMap;
+    stdext::map<Fw::Key, bool> m_keysState;
+    stdext::map<Fw::Key, ticks_t> m_firstKeysPress;
+    stdext::map<Fw::Key, ticks_t> m_lastKeysPress;
     Timer m_keyPressTimer;
 
     Size m_size;

@@ -69,7 +69,7 @@ public:
 private:
 
     PainterShaderProgramPtr m_defaultItemShader, m_defaultOutfitShader, m_defaultMountShader, m_defaultMapShader;
-    stdext::unordered_map<std::string, PainterShaderProgramPtr> m_shaders;
+    stdext::map<std::string, PainterShaderProgramPtr> m_shaders;
 };
 
 extern ShaderManager g_shaders;

@@ -127,7 +127,7 @@ private:
         };
     }
     uint getBlockIndex(const Position& pos) { return ((pos.y / MMBLOCK_SIZE) * (65536 / MMBLOCK_SIZE)) + (pos.x / MMBLOCK_SIZE); }
-    stdext::unordered_map<uint, MinimapBlock_ptr> m_tileBlocks[MAX_Z + 1];
+    stdext::map<uint, MinimapBlock_ptr> m_tileBlocks[MAX_Z + 1];
     std::mutex m_lock;
 };
 
