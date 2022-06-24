@@ -185,7 +185,7 @@ private:
     void resetCompositionMode() { m_state.compositionMode = CompositionMode::NORMAL; }
     void resetBlendEquation() { m_state.blendEquation = BlendEquation::ADD; }
 
-    void flush() { m_drawObjectPointer.clear(); }
+    void flush() { m_objectsByhash.clear(); }
 
     virtual bool hasFrameBuffer() const { return false; };
     virtual PoolFramed* toPoolFramed() { return nullptr; }
@@ -206,8 +206,7 @@ private:
     std::pair<size_t, size_t> m_status{ 0,0 };
 
     std::vector<DrawObject> m_objects;
-
-    stdext::map<size_t, size_t> m_drawObjectPointer;
+    stdext::map<size_t, DrawObject> m_objectsByhash;
 
     friend DrawPool;
 };

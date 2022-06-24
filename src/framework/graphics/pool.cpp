@@ -56,12 +56,9 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
     size_t stateHash = 0, methodHash = 0;
     updateHash(state, method, stateHash, methodHash);
 
-    auto& list = m_objects;
-
     if (m_alwaysGroupDrawings || drawBuffer) {
-        auto& pointer = m_drawObjectPointer;
-        if (auto it = pointer.find(stateHash); it != pointer.end()) {
-            auto& buffer = list[it->second].buffer;
+        if (auto it = m_objectsByhash.find(stateHash); it != m_objectsByhash.end()) {
+            const auto& buffer = it->second.buffer;
             if (!buffer->isValid())
                 return;
 
@@ -79,14 +76,12 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
             return;
         }
 
-        pointer[stateHash] = list.size();
-
-        const DrawBufferPtr buffer = drawBuffer ? drawBuffer : std::make_shared<DrawBuffer>();
+        const DrawBufferPtr& buffer = drawBuffer ? drawBuffer : std::make_shared<DrawBuffer>();
         if (buffer->m_hashs.empty()) {
+            buffer->m_hashs.push_back(methodHash);
+
             auto* coords = buffer->getCoords();
             coords->clear();
-
-            buffer->m_hashs.push_back(methodHash);
 
             if (coordsBuffer)
                 coords->append(coordsBuffer.get());
@@ -95,16 +90,16 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
         }
         buffer->m_i = 0;
 
-        list.emplace_back(state, buffer);
+        m_objectsByhash.emplace(stateHash,
+              m_objects.emplace_back(state, buffer));
 
         return;
     }
 
-    if (!list.empty()) {
-        auto& prevObj = list.back();
+    if (!m_objects.empty()) {
+        auto& prevObj = m_objects.back();
 
         const bool sameState = prevObj.state == state;
-
         if (method.dest.has_value() && prevObj.methods.has_value()) {
             // Look for identical or opaque textures that are greater than or
             // equal to the size of the previous texture, if so, remove it from the list so they don't get drawn.
@@ -125,7 +120,7 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
         }
     }
 
-    list.emplace_back(drawMode, state, method);
+    m_objects.emplace_back(drawMode, state, method);
 }
 
 void Pool::addCoords(const DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode)
@@ -279,7 +274,7 @@ void Pool::resetState()
 
     m_autoUpdate = false;
     m_status.second = 0;
-    m_drawObjectPointer.clear();
+    m_objectsByhash.clear();
 }
 
 bool Pool::hasModification(const bool autoUpdateStatus)
