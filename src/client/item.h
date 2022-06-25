@@ -151,7 +151,7 @@ private:
     uint16_t m_clientId{ 0 },
         m_serverId{ 0 };
 
-    uint8_t m_countOrSubType,
+    uint8_t m_countOrSubType{ 0 },
         m_numPatternX{ 0 },
         m_numPatternY{ 0 },
         m_numPatternZ{ 0 };
