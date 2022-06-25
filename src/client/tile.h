@@ -200,8 +200,6 @@ private:
 
     uint32_t m_flags{ 0 }, m_houseId{ 0 };
 
-    std::array<Position, 8> m_positionsAround;
-
     std::vector<CreaturePtr> m_walkingCreatures;
     std::vector<ThingPtr> m_things;
     std::vector<EffectPtr> m_effects;

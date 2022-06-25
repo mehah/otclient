@@ -32,7 +32,7 @@
 
 #include <ranges>
 
-Tile::Tile(const Position& position) : m_position(position), m_positionsAround(m_position.getPositionsAround()) {}
+Tile::Tile(const Position& position) : m_position(position) {}
 
 void Tile::drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor, bool animate, LightView* lightView)
 {
@@ -56,42 +56,16 @@ void Tile::drawGround(const Point& dest, float scaleFactor, LightView* lightView
 {
     m_drawElevation = 0;
 
-    for (const auto& ground : m_things) {
-        if (ground->isSingleGround() || ground->isSingleGroundBorder()) {
-            drawThing(ground, dest - m_drawElevation * scaleFactor, scaleFactor, true, lightView);
-        }
-    }
-}
+    for (const auto& thing : m_things) {
+        if (!thing->isGround() && !thing->isGroundBorder())
+            break;
 
-void Tile::drawCreature(const Point& dest, float scaleFactor, LightView* lightView)
-{
-    if (hasCreature()) {
-        for (const auto& thing : m_things) {
-            if (!thing->isCreature() || thing->static_self_cast<Creature>()->isWalking()) continue;
-
-            drawThing(thing, dest - m_drawElevation * scaleFactor, scaleFactor, true, lightView);
-        }
-    }
-
-    for (const auto& creature : m_walkingCreatures) {
-        drawThing(creature, Point(
-            dest.x + ((creature->getPosition().x - m_position.x) * SPRITE_SIZE - m_drawElevation) * scaleFactor,
-            dest.y + ((creature->getPosition().y - m_position.y) * SPRITE_SIZE - m_drawElevation) * scaleFactor
-        ), scaleFactor, true, lightView);
+        drawThing(thing, dest - m_drawElevation * scaleFactor, scaleFactor, true, lightView);
     }
 }
 
 void Tile::drawBottom(const Point& dest, float scaleFactor, LightView* lightView)
 {
-    if (!hasGround()) m_drawElevation = 0;
-
-    if (hasTopGround()) {
-        for (const auto& ground : m_things) {
-            if (ground->isTopGround() || ground->isTopGroundBorder())
-                drawThing(ground, dest - m_drawElevation * scaleFactor, scaleFactor, true, lightView);
-        }
-    }
-
     if (m_countFlag.hasBottomItem) {
         for (const auto& item : m_things) {
             if (!item->isOnBottom()) continue;
@@ -132,6 +106,24 @@ void Tile::drawBottom(const Point& dest, float scaleFactor, LightView* lightView
     }
 
     drawCreature(dest, scaleFactor, lightView);
+}
+
+void Tile::drawCreature(const Point& dest, float scaleFactor, LightView* lightView)
+{
+    if (hasCreature()) {
+        for (const auto& thing : m_things) {
+            if (!thing->isCreature() || thing->static_self_cast<Creature>()->isWalking()) continue;
+
+            drawThing(thing, dest - m_drawElevation * scaleFactor, scaleFactor, true, lightView);
+        }
+    }
+
+    for (const auto& creature : m_walkingCreatures) {
+        drawThing(creature, Point(
+            dest.x + ((creature->getPosition().x - m_position.x) * SPRITE_SIZE - m_drawElevation) * scaleFactor,
+            dest.y + ((creature->getPosition().y - m_position.y) * SPRITE_SIZE - m_drawElevation) * scaleFactor
+        ), scaleFactor, true, lightView);
+    }
 }
 
 void Tile::drawTop(const Point& dest, float scaleFactor, LightView* lightView)
@@ -441,7 +433,7 @@ CreaturePtr Tile::getTopCreature(const bool checkAround)
 
     // check for walking creatures in tiles around
     if (checkAround) {
-        for (const auto& pos : m_positionsAround) {
+        for (const auto& pos : m_position.getPositionsAround()) {
             const TilePtr& tile = g_map.getTile(pos);
             if (!tile) continue;
 
