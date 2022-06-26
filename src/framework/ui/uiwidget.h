@@ -84,7 +84,7 @@ protected:
 
 public:
     void addChild(const UIWidgetPtr& child);
-    void insertChild(int index, const UIWidgetPtr& child);
+    void insertChild(size_t index, const UIWidgetPtr& child);
     void removeChild(const UIWidgetPtr& child);
     void focusChild(const UIWidgetPtr& child, Fw::FocusReason reason);
     void focusNextChild(Fw::FocusReason reason, bool rotate = false);

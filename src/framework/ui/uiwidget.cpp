@@ -181,7 +181,7 @@ void UIWidget::addChild(const UIWidgetPtr& child)
     g_ui.onWidgetAppear(child);
 }
 
-void UIWidget::insertChild(int index, const UIWidgetPtr& child)
+void UIWidget::insertChild(size_t index, const UIWidgetPtr& child)
 {
     if (!child) {
         g_logger.traceWarning("attempt to insert a null child into a UIWidget");

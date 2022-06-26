@@ -65,8 +65,8 @@ void UITextEdit::drawSelf(Fw::DrawPane drawPane)
     drawImage(m_rect);
     drawIcon(m_rect);
 
-    const int textLength = m_text.length();
-    const TexturePtr& texture = m_font->getTexture();
+    const size_t textLength = m_text.length();
+    const auto& texture = m_font->getTexture();
     if (!texture)
         return;
 
@@ -77,7 +77,7 @@ void UITextEdit::drawSelf(Fw::DrawPane drawPane)
     if (m_color != Color::alpha) {
         if (glyphsMustRecache) {
             m_glyphsTextRectCache.clear();
-            for (int i = 0; i < textLength; ++i)
+            for (size_t i = 0; i < textLength; ++i)
                 m_glyphsTextRectCache.emplace_back(m_glyphsCoords[i], m_glyphsTexCoords[i]);
         }
         for (const auto& rect : m_glyphsTextRectCache)
@@ -87,7 +87,7 @@ void UITextEdit::drawSelf(Fw::DrawPane drawPane)
     if (hasSelection()) {
         if (glyphsMustRecache) {
             m_glyphsSelectRectCache.clear();
-            for (int i = m_selectionStart; i < m_selectionEnd; ++i)
+            for (size_t i = m_selectionStart; i < m_selectionEnd; ++i)
                 m_glyphsSelectRectCache.emplace_back(m_glyphsCoords[i], m_glyphsTexCoords[i]);
         }
         for (const auto& rect : m_glyphsSelectRectCache)
@@ -132,7 +132,7 @@ void UITextEdit::update(bool focusCursor)
         text += " ";
 
     m_drawText = text;
-    const int textLength = text.length();
+    const size_t textLength = text.length();
 
     // prevent glitches
     if (m_rect.isEmpty())
@@ -178,7 +178,7 @@ void UITextEdit::update(bool focusCursor)
         if (m_cursorPos > 0 && textLength > 0) {
             assert(m_cursorPos <= textLength);
             const Rect virtualRect(m_textVirtualOffset, m_rect.size() - Size(m_padding.left + m_padding.right, 0)); // previous rendered virtual rect
-            int pos = m_cursorPos - 1; // element before cursor
+            size_t pos = m_cursorPos - 1; // element before cursor
             glyph = static_cast<uint8_t>(text[pos]); // glyph of the element before cursor
             Rect glyphRect(glyphsPositions[pos], glyphsSize[glyph]);
 
@@ -261,7 +261,7 @@ void UITextEdit::update(bool focusCursor)
     } else { // AlignLeft
     }
 
-    for (int i = 0; i < textLength; ++i) {
+    for (size_t i = 0; i < textLength; ++i) {
         glyph = static_cast<uint8_t>(text[i]);
         m_glyphsCoords[i].clear();
 
@@ -745,7 +745,7 @@ bool UITextEdit::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepe
             return true;
         }
         if (keyCode == Fw::KeyRight || keyCode == Fw::KeyLeft) {
-            const int oldCursorPos = m_cursorPos;
+            const size_t oldCursorPos = m_cursorPos;
 
             if (keyCode == Fw::KeyRight) // move cursor right
                 moveCursorHorizontally(true);

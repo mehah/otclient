@@ -128,9 +128,9 @@ private:
     bool m_autoScroll;
 
     bool m_selectable;
-    int m_selectionReference;
-    int m_selectionStart;
-    int m_selectionEnd;
+    size_t m_selectionReference,
+        m_selectionStart,
+        m_selectionEnd;
 
     Color m_selectionColor;
     Color m_selectionBackgroundColor;
