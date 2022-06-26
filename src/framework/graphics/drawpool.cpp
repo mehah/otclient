@@ -58,10 +58,11 @@ void DrawPool::draw()
         const auto& pf = pool->toPoolFramed();
         if (pool->hasModification(true) && !pool->m_empty) {
             pf->m_framebuffer->bind();
-            for (auto& floor : pool->m_objects)
-                for (auto& order : floor)
+            for (int_fast8_t z = -1; ++z <= pool->m_currentFloor;) {
+                for (auto& order : pool->m_objects[z])
                     for (auto& obj : order)
                         drawObject(obj);
+            }
 
             pf->m_framebuffer->release();
         }
