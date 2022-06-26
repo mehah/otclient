@@ -180,19 +180,12 @@ void MapView::drawFloor()
                     g_drawPool.resetOpacity();
             }
 
-            for (const auto& tile : map.effects) {
-                const auto& dest = transformPositionTo2D(tile->getPosition(), cameraPosition);
-                for (const auto& effect : tile->getEffects()) {
-                    effect->drawEffect(dest, m_scaleFactor, lightView);
-                }
-            }
-
             for (const MissilePtr& missile : g_map.getFloorMissiles(z))
                 missile->drawMissile(transformPositionTo2D(missile->getPosition(), cameraPosition), m_scaleFactor, lightView);
 
             if (m_shadowFloorIntensity > 0 && z == cameraPosition.z + 1) {
                 g_drawPool.addFilledRect(m_rectDimension, Color::black);
-                g_drawPool.setOpacity(m_shadowFloorIntensity, g_drawPool.size());
+                g_drawPool.setOpacity(m_shadowFloorIntensity, true);
             }
 
             if (canFloorFade())
@@ -394,9 +387,6 @@ void MapView::updateVisibleTiles()
 
                     if (isDrawingLights() && tile->canShade(this))
                         floor.shades.emplace_back(tile);
-
-                    if (g_app.isDrawingEffectsOnTop() && tile->hasEffect())
-                        floor.effects.emplace_back(tile);
 
                     if (iz < m_floorMin)
                         m_floorMin = iz;

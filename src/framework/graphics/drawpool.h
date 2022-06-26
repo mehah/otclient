@@ -47,14 +47,14 @@ public:
     void addBoundingRect(const Rect& dest, const Color& color = Color::white, int innerLineWidth = 1);
     void addAction(std::function<void()> action);
 
-    void setOpacity(const float opacity, const int pos = -1) { m_currentPool->setOpacity(opacity, pos); }
-    void setClipRect(const Rect& clipRect, const int pos = -1) { m_currentPool->setClipRect(clipRect, pos); }
-    void setBlendEquation(BlendEquation equation, const int pos = -1) { m_currentPool->setBlendEquation(equation, pos); }
-    void setCompositionMode(const CompositionMode mode, const int pos = -1) { m_currentPool->setCompositionMode(mode, pos); }
-    void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, const int pos = -1, const std::function<void()>& action = nullptr) { m_currentPool->setShaderProgram(shaderProgram, pos, action); }
+    void setOpacity(const float opacity, bool onLastDrawing = false) { m_currentPool->setOpacity(opacity, onLastDrawing); }
+    void setClipRect(const Rect& clipRect, bool onLastDrawing = false) { m_currentPool->setClipRect(clipRect, onLastDrawing); }
+    void setBlendEquation(BlendEquation equation, bool onLastDrawing = false) { m_currentPool->setBlendEquation(equation, onLastDrawing); }
+    void setCompositionMode(const CompositionMode mode, bool onLastDrawing = false) { m_currentPool->setCompositionMode(mode, onLastDrawing); }
+    void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onLastDrawing = false, const std::function<void()>& action = nullptr) { m_currentPool->setShaderProgram(shaderProgram, onLastDrawing, action); }
 
-    float getOpacity(const int pos = -1) { return m_currentPool->getOpacity(pos); }
-    Rect getClipRect(const int pos = -1) { return m_currentPool->getClipRect(pos); }
+    float getOpacity(bool onLastDrawing = false) { return m_currentPool->getOpacity(onLastDrawing); }
+    Rect getClipRect(bool onLastDrawing = false) { return m_currentPool->getClipRect(onLastDrawing); }
 
     void resetState() { m_currentPool->resetState(); }
     void resetOpacity() { m_currentPool->resetOpacity(); }
@@ -63,9 +63,6 @@ public:
     void resetCompositionMode() { m_currentPool->resetCompositionMode(); }
 
     void flush() { if (m_currentPool) m_currentPool->flush(); }
-
-    size_t size() { return m_currentPool->m_objects.size(); }
-
 private:
     void draw();
     void init();

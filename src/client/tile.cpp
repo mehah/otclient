@@ -128,10 +128,8 @@ void Tile::drawCreature(const Point& dest, float scaleFactor, LightView* lightVi
 
 void Tile::drawTop(const Point& dest, float scaleFactor, LightView* lightView)
 {
-    if (!g_app.isDrawingEffectsOnTop()) {
-        for (const auto& effect : m_effects) {
-            effect->drawEffect(dest - m_drawElevation * scaleFactor, scaleFactor, lightView);
-        }
+    for (const auto& effect : m_effects) {
+        effect->drawEffect(dest - m_drawElevation * scaleFactor, scaleFactor, lightView);
     }
 
     if (m_countFlag.hasTopItem) {

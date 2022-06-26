@@ -40,7 +40,7 @@ void Particle::render()
     }
 
     g_drawPool.addTexturedRect(m_rect, m_texture, m_color);
-    g_drawPool.setCompositionMode(m_compositionMode, g_drawPool.size());
+    g_drawPool.setCompositionMode(m_compositionMode, true);
 }
 
 void Particle::update(float elapsedTime)

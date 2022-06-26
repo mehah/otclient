@@ -88,11 +88,11 @@ void Missile::setPath(const Position& fromPosition, const Position& toPosition)
     m_animationTimer.restart();
     m_distance = fromPosition.distance(toPosition);
 
-    m_drawBuffer = std::make_shared<DrawBuffer>();
-
     // schedule removal
     const auto self = asMissile();
     g_dispatcher.scheduleEvent([self] { g_map.removeThing(self); }, m_duration);
+
+    generateBuffer();
 }
 
 void Missile::setId(uint32_t  id)

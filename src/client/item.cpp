@@ -84,7 +84,7 @@ void Item::setId(uint32_t  id)
     m_serverId = g_things.findItemTypeByClientId(id)->getServerId();
     m_clientId = id;
     m_thingType = nullptr;
-    m_drawBuffer = isSingleGround() ? std::make_shared<DrawBuffer>() : nullptr;
+    generateBuffer();
 }
 
 void Item::setOtbId(uint16_t id)
@@ -100,8 +100,7 @@ void Item::setOtbId(uint16_t id)
         id = 0;
 
     m_clientId = id;
-    m_thingType = nullptr;
-    m_drawBuffer = isSingleGround() ? std::make_shared<DrawBuffer>() : nullptr;
+    generateBuffer();
 }
 
 bool Item::isValid() { return getThingType() != nullptr; }

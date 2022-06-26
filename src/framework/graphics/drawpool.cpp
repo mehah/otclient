@@ -56,10 +56,13 @@ void DrawPool::draw()
         if (!pool->isEnabled() || !pool->hasFrameBuffer()) continue;
 
         const auto& pf = pool->toPoolFramed();
-        if (pool->hasModification(true) && !pool->m_objects.empty()) {
+        if (pool->hasModification(true) && !pool->m_empty) {
             pf->m_framebuffer->bind();
-            for (auto& obj : pool->m_objects)
-                drawObject(obj);
+            for (auto& floor : pool->m_objects)
+                for (auto& order : floor)
+                    for (auto& obj : order)
+                        drawObject(obj);
+
             pf->m_framebuffer->release();
         }
     }
@@ -76,11 +79,9 @@ void DrawPool::draw()
             if (pf->m_beforeDraw) pf->m_beforeDraw();
             pf->m_framebuffer->draw();
             if (pf->m_afterDraw) pf->m_afterDraw();
-        } else for (auto& obj : pool->m_objects) {
+        } else for (auto& obj : pool->m_objects[0][static_cast<int>(Pool::DrawOrder::FIRST)]) {
             drawObject(obj);
         }
-
-        pool->m_objects.clear();
     }
 }
 
@@ -205,7 +206,7 @@ void DrawPool::addBoundingRect(const Rect& dest, const Color& color, int innerLi
 
 void DrawPool::addAction(std::function<void()> action)
 {
-    m_currentPool->m_objects.emplace_back(action);
+    m_currentPool->m_objects[0][static_cast<uint8_t>(Pool::DrawOrder::FOURTH)].emplace_back(action);
 }
 
 void DrawPool::use(const PoolType type) { use(type, {}, {}); }

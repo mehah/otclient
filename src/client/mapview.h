@@ -157,8 +157,8 @@ protected:
 private:
     struct MapObject
     {
-        std::vector<TilePtr> shades, tiles, effects;
-        void clear() { shades.clear(); tiles.clear(); effects.clear(); }
+        std::vector<TilePtr> shades, tiles;
+        void clear() { shades.clear(); tiles.clear(); }
     };
 
     struct Crosshair

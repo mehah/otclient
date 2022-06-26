@@ -133,7 +133,7 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
             zPattern = std::min<int>(1, getNumPatternZ() - 1);
 
             if (canDrawShader && m_mountShader) {
-                g_drawPool.setShaderProgram(m_mountShader, g_drawPool.size(), m_mountShaderAction);
+                g_drawPool.setShaderProgram(m_mountShader, true, m_mountShaderAction);
             }
         }
 
@@ -152,7 +152,7 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
 
             datType->draw(dest, scaleFactor, 0, xPattern, yPattern, zPattern, animationPhase, textureType, color);
             if (canDrawShader && m_outfitShader) {
-                g_drawPool.setShaderProgram(m_outfitShader, g_drawPool.size(), m_outfitShaderAction);
+                g_drawPool.setShaderProgram(m_outfitShader, true, m_outfitShaderAction);
             }
 
             if (m_drawOutfitColor && isNotBlank && getLayers() > 1) {
@@ -189,7 +189,7 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
         type->draw(dest - (getDisplacement() * scaleFactor), scaleFactor, 0, 0, 0, 0, animationPhase, textureType, color);
 
         if (canDrawShader && m_outfitShader) {
-            g_drawPool.setShaderProgram(m_outfitShader, g_drawPool.size(), m_outfitShaderAction);
+            g_drawPool.setShaderProgram(m_outfitShader, true, m_outfitShaderAction);
         }
     }
 }

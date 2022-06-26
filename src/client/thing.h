@@ -157,6 +157,8 @@ public:
     virtual void onDisappear() {}
 
 protected:
+    void generateBuffer();
+
     Position m_position;
     uint16_t m_datId{ 0 };
     ThingTypePtr m_thingType;

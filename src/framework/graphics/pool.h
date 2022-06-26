@@ -42,38 +42,20 @@ enum class PoolType : uint8_t
     UNKNOW
 };
 
-class DrawBuffer
-{
-public:
-    static const DrawBufferPtr create() { return std::make_shared<DrawBuffer>(); }
-
-    bool isValid() { return m_i > -1; }
-    bool validate(const Point& p)
-    {
-        if (m_ref != p) { m_ref = p; invalidate(); }
-        return isValid();
-    }
-
-    CoordsBuffer* getCoords()
-    {
-        return (m_coords ? m_coords : m_coords = std::make_shared<CoordsBuffer>()).get();
-    }
-
-private:
-    void invalidate() { m_i = -1; m_hashs.clear(); }
-    int m_i{ 0 };
-    Point m_ref;
-
-    std::vector<size_t> m_hashs;
-    CoordsBufferPtr m_coords;
-
-    friend class Pool;
-    friend class DrawPool;
-};
-
 class Pool
 {
 public:
+    enum class DrawOrder
+    {
+        NONE = -1,
+        FIRST,
+        SECOND,
+        THIRD,
+        FOURTH,
+        FIFTH,
+        LAST
+    };
+
     void setEnable(const bool v) { m_enabled = v; }
     bool isEnabled() const { return m_enabled; }
     PoolType getType() const { return m_type; }
@@ -160,7 +142,14 @@ protected:
     };
 
 private:
+    static constexpr uint8_t ARR_MAX_Z = (MAX_Z / 2) + 1;
     static Pool* create(const PoolType type);
+
+    DrawObject& getLastDrawObject()
+    {
+        auto& list = m_objects[m_currentFloor][m_currentOrder];
+        return list[list.size() - 1];
+    }
 
     void add(const Color& color, const TexturePtr& texture, const Pool::DrawMethod& method,
              DrawMode drawMode = DrawMode::TRIANGLES, const DrawBufferPtr& drawBuffer = nullptr,
@@ -169,14 +158,14 @@ private:
     void addCoords(const Pool::DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode);
     void updateHash(const PoolState& state, const Pool::DrawMethod& method, size_t& stateHash, size_t& methodHash);
 
-    float getOpacity(const int pos = -1) { return pos == -1 ? m_state.opacity : m_objects[pos - 1].state->opacity; }
-    Rect getClipRect(const int pos = -1) { return pos == -1 ? m_state.clipRect : m_objects[pos - 1].state->clipRect; }
+    float getOpacity(bool lastDrawing = false) { return !lastDrawing ? m_state.opacity : getLastDrawObject().state->opacity; }
+    Rect getClipRect(bool lastDrawing = false) { return !lastDrawing ? m_state.clipRect : getLastDrawObject().state->clipRect; }
 
-    void setCompositionMode(CompositionMode mode, int pos = -1);
-    void setBlendEquation(BlendEquation equation, int pos = -1);
-    void setClipRect(const Rect& clipRect, int pos = -1);
-    void setOpacity(float opacity, int pos = -1);
-    void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, int pos = -1, const std::function<void()>& action = nullptr);
+    void setCompositionMode(CompositionMode mode, bool onLastDrawing = false);
+    void setBlendEquation(BlendEquation equation, bool onLastDrawing = false);
+    void setClipRect(const Rect& clipRect, bool onLastDrawing = false);
+    void setOpacity(float opacity, bool onLastDrawing = false);
+    void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onLastDrawing = false, const std::function<void()>& action = nullptr);
 
     void resetState();
     void resetOpacity() { m_state.opacity = 1.f; }
@@ -185,7 +174,7 @@ private:
     void resetCompositionMode() { m_state.compositionMode = CompositionMode::NORMAL; }
     void resetBlendEquation() { m_state.blendEquation = BlendEquation::ADD; }
 
-    void flush() { m_objectsByhash.clear(); }
+    void flush() { m_objectsByhash.clear(); ++m_currentFloor; }
 
     virtual bool hasFrameBuffer() const { return false; };
     virtual PoolFramed* toPoolFramed() { return nullptr; }
@@ -197,6 +186,8 @@ private:
         m_alwaysGroupDrawings{ false },
         m_autoUpdate{ false };
 
+    uint8_t m_currentOrder{ 0 }, m_currentFloor{ 0 };
+
     PoolState m_state;
 
     PoolType m_type{ PoolType::UNKNOW };
@@ -205,8 +196,10 @@ private:
 
     std::pair<size_t, size_t> m_status{ 0,0 };
 
-    std::vector<DrawObject> m_objects;
+    std::vector<DrawObject> m_objects[ARR_MAX_Z][static_cast<uint8_t>(DrawOrder::LAST)];
     stdext::map<size_t, DrawObject> m_objectsByhash;
+
+    bool m_empty = true;
 
     friend DrawPool;
 };
@@ -236,3 +229,34 @@ private:
 };
 
 extern DrawPool g_drawPool;
+
+class DrawBuffer
+{
+public:
+    DrawBuffer(Pool::DrawOrder order, bool agroup = true) : m_order(order), m_agroup(agroup) {}
+
+    bool isValid() { return m_i > -1; }
+    bool validate(const Point& p)
+    {
+        if (m_ref != p) { m_ref = p; invalidate(); }
+        return isValid();
+    }
+
+    CoordsBuffer* getCoords()
+    {
+        return (m_coords ? m_coords : m_coords = std::make_shared<CoordsBuffer>()).get();
+    }
+
+private:
+    void invalidate() { m_i = -1; m_hashs.clear(); }
+    int m_i{ 0 };
+    bool m_agroup{ true };
+    Pool::DrawOrder m_order{ Pool::DrawOrder::FIRST };
+    Point m_ref;
+
+    std::vector<size_t> m_hashs;
+    CoordsBufferPtr m_coords;
+
+    friend class Pool;
+    friend class DrawPool;
+};

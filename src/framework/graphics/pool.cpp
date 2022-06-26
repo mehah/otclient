@@ -56,7 +56,7 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
     size_t stateHash = 0, methodHash = 0;
     updateHash(state, method, stateHash, methodHash);
 
-    if (m_alwaysGroupDrawings || drawBuffer) {
+    if (m_alwaysGroupDrawings || drawBuffer && drawBuffer->m_agroup) {
         if (auto it = m_objectsByhash.find(stateHash); it != m_objectsByhash.end()) {
             const auto& buffer = it->second.buffer;
             if (!buffer->isValid())
@@ -76,7 +76,7 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
             return;
         }
 
-        const DrawBufferPtr& buffer = drawBuffer ? drawBuffer : std::make_shared<DrawBuffer>();
+        const DrawBufferPtr& buffer = drawBuffer ? drawBuffer : std::make_shared<DrawBuffer>(Pool::DrawOrder::FIRST);
         if (buffer->m_hashs.empty()) {
             buffer->m_hashs.push_back(methodHash);
 
@@ -91,13 +91,18 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
         buffer->m_i = 0;
 
         m_objectsByhash.emplace(stateHash,
-              m_objects.emplace_back(state, buffer));
+              m_objects[m_currentFloor][m_currentOrder = static_cast<uint8_t>(buffer->m_order)]
+                       .emplace_back(state, buffer));
 
+        m_empty = false;
         return;
     }
 
-    if (!m_objects.empty()) {
-        auto& prevObj = m_objects.back();
+    m_currentOrder = static_cast<uint8_t>(drawBuffer ? drawBuffer->m_order : Pool::DrawOrder::FOURTH);
+
+    auto& list = m_objects[m_currentFloor][m_currentOrder];
+    if (!list.empty()) {
+        auto& prevObj = list.back();
 
         const bool sameState = prevObj.state == state;
         if (method.dest.has_value() && prevObj.methods.has_value()) {
@@ -120,7 +125,8 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
         }
     }
 
-    m_objects.emplace_back(drawMode, state, method);
+    list.emplace_back(drawMode, state, method);
+    m_empty = false;
 }
 
 void Pool::addCoords(const DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode)
@@ -201,55 +207,55 @@ void Pool::updateHash(const PoolState& state, const DrawMethod& method,
     }
 }
 
-void Pool::setCompositionMode(const CompositionMode mode, const int pos)
+void Pool::setCompositionMode(const CompositionMode mode, bool onLastDrawing)
 {
-    if (pos == -1) {
+    if (!onLastDrawing) {
         m_state.compositionMode = mode;
         return;
     }
 
-    m_objects[pos - 1].state->compositionMode = mode;
+    getLastDrawObject().state->compositionMode = mode;
     stdext::hash_combine(m_status.second, mode);
 }
 
-void Pool::setBlendEquation(BlendEquation equation, const int pos)
+void Pool::setBlendEquation(BlendEquation equation, bool onLastDrawing)
 {
-    if (pos == -1) {
+    if (!onLastDrawing) {
         m_state.blendEquation = equation;
         return;
     }
 
-    m_objects[pos - 1].state->blendEquation = equation;
+    getLastDrawObject().state->blendEquation = equation;
     stdext::hash_combine(m_status.second, equation);
 }
 
-void Pool::setClipRect(const Rect& clipRect, const int pos)
+void Pool::setClipRect(const Rect& clipRect, bool onLastDrawing)
 {
-    if (pos == -1) {
+    if (!onLastDrawing) {
         m_state.clipRect = clipRect;
         return;
     }
 
-    m_objects[pos - 1].state->clipRect = clipRect;
+    getLastDrawObject().state->clipRect = clipRect;
     stdext::hash_union(m_status.second, clipRect.hash());
 }
 
-void Pool::setOpacity(const float opacity, const int pos)
+void Pool::setOpacity(const float opacity, bool onLastDrawing)
 {
-    if (pos == -1) {
+    if (!onLastDrawing) {
         m_state.opacity = opacity;
         return;
     }
 
-    m_objects[pos - 1].state->opacity = opacity;
+    getLastDrawObject().state->opacity = opacity;
     stdext::hash_combine(m_status.second, opacity);
 }
 
-void Pool::setShaderProgram(const PainterShaderProgramPtr& shaderProgram, const int pos, const std::function<void()>& action)
+void Pool::setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onLastDrawing, const std::function<void()>& action)
 {
     const auto& shader = shaderProgram ? shaderProgram.get() : nullptr;
 
-    if (pos == -1) {
+    if (!onLastDrawing) {
         m_state.shaderProgram = shader;
         m_state.action = action;
         return;
@@ -259,7 +265,7 @@ void Pool::setShaderProgram(const PainterShaderProgramPtr& shaderProgram, const 
         m_autoUpdate = true;
     }
 
-    auto& o = m_objects[pos - 1];
+    auto& o = getLastDrawObject();
     o.state->shaderProgram = shader;
     o.state->action = action;
 }
@@ -272,9 +278,15 @@ void Pool::resetState()
     resetBlendEquation();
     resetCompositionMode();
 
-    m_autoUpdate = false;
+    m_currentFloor = 0;
     m_status.second = 0;
+
+    m_empty = true;
+    m_autoUpdate = false;
     m_objectsByhash.clear();
+    for (auto& floor : m_objects)
+        for (auto& order : floor)
+            order.clear();
 }
 
 bool Pool::hasModification(const bool autoUpdateStatus)

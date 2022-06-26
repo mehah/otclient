@@ -82,12 +82,11 @@ void Effect::onAppear()
 
     m_animationTimer.restart();
 
-    if (g_app.isDrawingEffectsOnTop())
-        m_drawBuffer = std::make_shared<DrawBuffer>();
-
     // schedule removal
     const auto self = asEffect();
     g_dispatcher.scheduleEvent([self] { g_map.removeThing(self); }, m_duration);
+
+    generateBuffer();
 }
 
 void Effect::waitFor(const EffectPtr& effect)
