@@ -63,7 +63,7 @@ MapView::MapView()
         if (m_shaderSwitchDone && m_shader && m_fadeInTime > 0)
             fadeOpacity = std::min<float>(m_fadeTimer.timeElapsed() / m_fadeInTime, 1.f);
 
-        if (m_shader && g_painter->hasShaders() && g_graphics.shouldUseShaders()) {
+        if (m_shader) {
             auto framebufferRect = Rect(0, 0, m_drawDimension * m_tileSize);
             const Point center = m_rectCache.srcRect.center();
             const Point globalCoord = Point(cameraPosition.x - m_drawDimension.width() / 2, -(cameraPosition.y - m_drawDimension.height() / 2)) * m_tileSize;

@@ -40,7 +40,7 @@ public:
     void setBackuping(bool enabled) { m_backuping = enabled; }
 
     TexturePtr getTexture() { return m_texture; }
-    Size getSize();
+    Size getSize() { return m_texture->getSize(); }
 
     bool isBackuping() { return m_backuping; }
     bool isSmooth() { return m_smooth; }

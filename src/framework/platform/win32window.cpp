@@ -332,11 +332,7 @@ void WIN32Window::internalCreateGLContext()
         g_logger.fatal("Unable to initialize EGL");
 
     static int configList[] = {
-#if OPENGL_ES==2
         EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-#else
-        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
-#endif
         EGL_RED_SIZE, 4,
         EGL_GREEN_SIZE, 4,
         EGL_BLUE_SIZE, 4,
@@ -356,11 +352,7 @@ void WIN32Window::internalCreateGLContext()
         g_logger.warning("Didn't got the exact EGL config");
 
     EGLint contextAtrrList[] = {
-#if OPENGL_ES==2
         EGL_CONTEXT_CLIENT_VERSION, 2,
-#else
-        EGL_CONTEXT_CLIENT_VERSION, 1,
-#endif
         EGL_NONE
     };
 
@@ -388,7 +380,8 @@ void WIN32Window::internalCreateGLContext()
                                          0,                          // No Auxiliary Buffer
                                          PFD_MAIN_PLANE,             // Main Drawing Layer
                                          0,                          // Reserved
-                                         0, 0, 0 };                  // Layer Masks Ignored
+                                         0, 0, 0
+};                  // Layer Masks Ignored
 
     const uint pixelFormat = ChoosePixelFormat(m_deviceContext, &pfd);
     if (!pixelFormat)

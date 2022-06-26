@@ -85,7 +85,7 @@ void Texture::create()
 
 void Texture::uploadPixels(const ImagePtr& image, bool buildMipmaps, bool compress)
 {
-    if (!setupSize(image->getSize(), buildMipmaps))
+    if (!setupSize(image->getSize()))
         return;
 
     ImagePtr glImage = image;
@@ -127,9 +127,6 @@ void Texture::copyFromScreen(const Rect& screenRect)
 
 bool Texture::buildHardwareMipmaps()
 {
-    if (!g_graphics.canUseHardwareMipmaps())
-        return false;
-
     bind();
 
     if (!m_hasMipmaps) {
@@ -143,9 +140,6 @@ bool Texture::buildHardwareMipmaps()
 
 void Texture::setSmooth(bool smooth)
 {
-    if (smooth && !g_graphics.canUseBilinearFiltering())
-        return;
-
     if (smooth == m_smooth)
         return;
 
@@ -181,13 +175,10 @@ void Texture::createTexture()
     assert(m_id != 0);
 }
 
-bool Texture::setupSize(const Size& size, bool forcePowerOfTwo)
+bool Texture::setupSize(const Size& size)
 {
     Size glSize;
-    if (!g_graphics.canUseNonPowerOfTwoTextures() || forcePowerOfTwo)
-        glSize.resize(stdext::to_power_of_two(size.width()), stdext::to_power_of_two(size.height()));
-    else
-        glSize = size;
+    glSize.resize(stdext::to_power_of_two(size.width()), stdext::to_power_of_two(size.height()));
 
     // checks texture max size
     if (std::max<int>(glSize.width(), glSize.height()) > g_graphics.getMaxTextureSize()) {
@@ -208,9 +199,7 @@ bool Texture::setupSize(const Size& size, bool forcePowerOfTwo)
 
 void Texture::setupWrap()
 {
-    const int texParam = !m_repeat && g_graphics.canUseClampToEdge()
-        ? GL_CLAMP_TO_EDGE : GL_REPEAT;
-
+    const GLint texParam = m_repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE;
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texParam);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texParam);
 }

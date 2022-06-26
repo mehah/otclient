@@ -267,9 +267,6 @@ target_sources(${PROJECT_NAME}
 	framework/graphics/graphics.cpp
 	framework/graphics/hardwarebuffer.cpp
 	framework/graphics/image.cpp
-	framework/graphics/ogl/painterogl.cpp
-	framework/graphics/ogl/painterogl1.cpp
-	framework/graphics/ogl/painterogl2.cpp
 	framework/graphics/painter.cpp
 	framework/graphics/paintershaderprogram.cpp
 	framework/graphics/particle.cpp

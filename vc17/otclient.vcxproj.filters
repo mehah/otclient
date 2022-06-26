@@ -31,9 +31,6 @@
     <Filter Include="Source Files\framework\graphics">
       <UniqueIdentifier>{18bfca39-a00b-49f3-b749-94db8eee6b2f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\framework\graphics\ogl">
-      <UniqueIdentifier>{2de19ef3-85cf-4081-b79d-82800bdb057b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\framework\input">
       <UniqueIdentifier>{1f73f301-1d35-408a-b566-0d52b6820292}</UniqueIdentifier>
     </Filter>
@@ -100,14 +97,14 @@
     <Filter Include="Header Files\framework\otml">
       <UniqueIdentifier>{6e8f2aa5-569b-4c44-87b2-d9ff1bf2b350}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\framework\graphics\ogl">
-      <UniqueIdentifier>{8b96ee09-99f1-4c70-90c1-d99505de6264}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\framework\protobuf">
       <UniqueIdentifier>{4e135b84-c0bb-4aaa-97fc-f36be2a62505}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\framework\protobuf">
       <UniqueIdentifier>{8616aecc-d171-4390-b004-38517b68a5a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\framework\graphics\shader">
+      <UniqueIdentifier>{8b96ee09-99f1-4c70-90c1-d99505de6264}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -230,15 +227,6 @@
     </ClCompile>
     <ClCompile Include="..\src\framework\graphics\texturemanager.cpp">
       <Filter>Source Files\framework\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\framework\graphics\ogl\painterogl.cpp">
-      <Filter>Source Files\framework\graphics\ogl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\framework\graphics\ogl\painterogl1.cpp">
-      <Filter>Source Files\framework\graphics\ogl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\framework\graphics\ogl\painterogl2.cpp">
-      <Filter>Source Files\framework\graphics\ogl</Filter>
     </ClCompile>
     <ClCompile Include="..\src\framework\input\mouse.cpp">
       <Filter>Source Files\framework\input</Filter>
@@ -689,18 +677,6 @@
     <ClInclude Include="..\src\framework\graphics\vertexarray.h">
       <Filter>Header Files\framework\graphics</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\framework\graphics\ogl\painterogl.h">
-      <Filter>Header Files\framework\graphics\ogl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\framework\graphics\ogl\painterogl1.h">
-      <Filter>Header Files\framework\graphics\ogl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\framework\graphics\ogl\painterogl2.h">
-      <Filter>Header Files\framework\graphics\ogl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\framework\graphics\ogl\painterogl2_shadersources.h">
-      <Filter>Header Files\framework\graphics\ogl</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\framework\input\mouse.h">
       <Filter>Header Files\framework\input</Filter>
     </ClInclude>
@@ -1069,6 +1045,9 @@
     </ClInclude>
     <ClInclude Include="..\src\framework\util\size.h">
       <Filter>Header Files\framework\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\graphics\shader\shadersources.h">
+      <Filter>Header Files\framework\graphics\shader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

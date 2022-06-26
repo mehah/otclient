@@ -29,24 +29,10 @@
 class Graphics
 {
 public:
-    enum PainterEngine
-    {
-        Painter_Any = 0,
-        Painter_OpenGL1,
-        Painter_OpenGL2,
-        Painter_DirectX9
-    };
-
     // @dontbind
     void init();
     // @dontbind
     void terminate();
-
-    bool parseOption(const std::string_view option);
-
-    bool isPainterEngineAvailable(PainterEngine painterEngine);
-    bool selectPainterEngine(PainterEngine painterEngine);
-    PainterEngine getPainterEngine() { return m_selectedPainterEngine; }
 
     void resize(const Size& size);
 
@@ -58,43 +44,15 @@ public:
     std::string getVersion() { return (const char*)glGetString(GL_VERSION); }
     std::string getExtensions() { return (const char*)glGetString(GL_EXTENSIONS); }
 
-    void setShouldUseShaders(bool enable) { m_shouldUseShaders = enable; }
-
     bool ok() { return m_ok; }
-    bool canUseDrawArrays();
-    bool canUseShaders();
-    bool canUseFBO();
-    bool canUseBilinearFiltering();
-    bool canUseHardwareBuffers();
-    bool canUseNonPowerOfTwoTextures();
-    bool canUseMipmaps();
-    bool canUseHardwareMipmaps();
-    bool canUseClampToEdge();
-    bool canUseBlendFuncSeparate();
-    bool canUseBlendEquation();
-    bool canCacheBackbuffer();
-    bool shouldUseShaders() { return m_shouldUseShaders; }
-    bool hasScissorBug();
 
 private:
-    Size m_viewportSize;
+    bool m_ok{ false };
 
     int m_maxTextureSize{ -1 },
         m_alphaBits{ 0 };
 
-    bool m_ok{ false },
-        m_useDrawArrays{ true },
-        m_useFBO{ true },
-        m_useBilinearFiltering{ true },
-        m_useNonPowerOfTwoTextures{ true },
-        m_useMipmaps{ true },
-        m_useHardwareMipmaps{ true },
-        m_useClampToEdge{ true },
-        m_shouldUseShaders{ true },
-        m_cacheBackbuffer{ true };
-
-    PainterEngine m_prefferedPainterEngine;
-    PainterEngine m_selectedPainterEngine{ Painter_Any };
+    Size m_viewportSize;
 };
 
 extern Graphics g_graphics;

@@ -62,7 +62,7 @@ public:
 
 protected:
     void createTexture();
-    bool setupSize(const Size& size, bool forcePowerOfTwo = false);
+    bool setupSize(const Size& size);
     void setupWrap();
     void setupFilters();
     void setupTranformMatrix();

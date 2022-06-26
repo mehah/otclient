@@ -441,9 +441,6 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
     <ClCompile Include="..\src\framework\graphics\graphics.cpp" />
     <ClCompile Include="..\src\framework\graphics\hardwarebuffer.cpp" />
     <ClCompile Include="..\src\framework\graphics\image.cpp" />
-    <ClCompile Include="..\src\framework\graphics\ogl\painterogl.cpp" />
-    <ClCompile Include="..\src\framework\graphics\ogl\painterogl1.cpp" />
-    <ClCompile Include="..\src\framework\graphics\ogl\painterogl2.cpp" />
     <ClCompile Include="..\src\framework\graphics\painter.cpp" />
     <ClCompile Include="..\src\framework\graphics\paintershaderprogram.cpp" />
     <ClCompile Include="..\src\framework\graphics\particle.cpp" />
@@ -598,10 +595,7 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
     <ClInclude Include="..\src\framework\graphics\graphics.h" />
     <ClInclude Include="..\src\framework\graphics\hardwarebuffer.h" />
     <ClInclude Include="..\src\framework\graphics\image.h" />
-    <ClInclude Include="..\src\framework\graphics\ogl\painterogl.h" />
-    <ClInclude Include="..\src\framework\graphics\ogl\painterogl1.h" />
-    <ClInclude Include="..\src\framework\graphics\ogl\painterogl2.h" />
-    <ClInclude Include="..\src\framework\graphics\ogl\painterogl2_shadersources.h" />
+    <ClInclude Include="..\src\framework\graphics\shader\shadersources.h" />
     <ClInclude Include="..\src\framework\graphics\painter.h" />
     <ClInclude Include="..\src\framework\graphics\paintershaderprogram.h" />
     <ClInclude Include="..\src\framework\graphics\particle.h" />
