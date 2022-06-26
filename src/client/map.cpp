@@ -407,9 +407,9 @@ void Map::cleanTile(const Position& pos)
 void Map::setShowZone(tileflags_t zone, bool show)
 {
     if (show)
-        m_zoneFlags |= static_cast<uint32_t>(zone);
+        m_zoneFlags |= static_cast<uint32_t >(zone);
     else
-        m_zoneFlags &= ~static_cast<uint32_t>(zone);
+        m_zoneFlags &= ~static_cast<uint32_t >(zone);
 }
 
 void Map::setShowZones(bool show)
@@ -458,10 +458,10 @@ void Map::setShowAnimations(bool show)
 void Map::beginGhostMode(float opacity) { g_painter->setOpacity(opacity); }
 void Map::endGhostMode() { g_painter->resetOpacity(); }
 
-std::map<Position, ItemPtr> Map::findItemsById(uint16_t clientId, uint32_t max)
+std::map<Position, ItemPtr> Map::findItemsById(uint16_t clientId, uint32_t  max)
 {
     std::map<Position, ItemPtr> ret;
-    uint32_t count = 0;
+    uint32_t  count = 0;
     for (uint8_t z = 0; z <= MAX_Z; ++z) {
         for (const auto& pair : m_tileBlocks[z]) {
             const TileBlock& block = pair.second;
@@ -487,7 +487,7 @@ void Map::addCreature(const CreaturePtr& creature)
     m_knownCreatures[creature->getId()] = creature;
 }
 
-CreaturePtr Map::getCreatureById(uint32_t id)
+CreaturePtr Map::getCreatureById(uint32_t  id)
 {
     const auto it = m_knownCreatures.find(id);
     if (it == m_knownCreatures.end())
@@ -495,7 +495,7 @@ CreaturePtr Map::getCreatureById(uint32_t id)
     return it->second;
 }
 
-void Map::removeCreatureById(uint32_t id)
+void Map::removeCreatureById(uint32_t  id)
 {
     if (id == 0)
         return;

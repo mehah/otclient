@@ -82,7 +82,7 @@ public:
 
     void draw(const Point& dest, float scaleFactor, bool animate, const Highlight& highLight, TextureType textureType = TextureType::NONE, Color color = Color::white, LightView* lightView = nullptr) override;
 
-    void setId(uint32_t id) override;
+    void setId(uint32_t  id) override;
     void setOtbId(uint16_t id);
     void setCountOrSubType(int value) { m_countOrSubType = value; updatePatterns(); }
     void setCount(int count) { m_countOrSubType = count; updatePatterns(); }
@@ -92,7 +92,7 @@ public:
     int getCountOrSubType() { return m_countOrSubType; }
     int getSubType();
     int getCount();
-    uint32_t getId() override { return m_clientId; }
+    uint32_t  getId() override { return m_clientId; }
     uint16_t getClientId() { return m_clientId; }
     uint16_t getServerId() { return m_serverId; }
     std::string getName();

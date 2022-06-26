@@ -81,7 +81,7 @@ void Mouse::popCursor(const std::string& name)
     else {
         const int cursorId = m_cursors[name];
         int index = -1;
-        for (uint i = 0; i < m_cursorStack.size(); ++i) {
+        for (uint32_t i = 0; i < m_cursorStack.size(); ++i) {
             if (m_cursorStack[i] == cursorId)
                 index = i;
         }

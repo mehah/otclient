@@ -35,15 +35,15 @@ public:
     bool update();
     bool canRefresh();
 
-    uint getFps() const { return m_fps; }
-    uint getMaxFps() const { return m_maxFps; }
+    uint32_t getFps() const { return m_fps; }
+    uint32_t getMaxFps() const { return m_maxFps; }
 
-    void setMaxFps(const uint max) { m_maxFps = max; }
+    void setMaxFps(const uint32_t max) { m_maxFps = max; }
 
 private:
     double getMaxPeriod() { return 1.0 / m_maxFps; }
 
-    uint m_fps{ 0 },
+    uint32_t m_fps{ 0 },
         m_maxFps{ 0 },
         m_fpsCount{ 0 },
         m_interval{ 0 };

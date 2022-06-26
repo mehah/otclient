@@ -30,7 +30,7 @@
 
 #include "framework/stdext/math.h"
 
-static std::atomic<ulong> UID(0);
+static std::atomic<uint32_t > UID(0);
 
 Texture::Texture() : m_uniqueId(++UID) {}
 
@@ -232,7 +232,7 @@ void Texture::setupTranformMatrix()
     }
 }
 
-void Texture::setupPixels(int level, const Size& size, uchar* pixels, int channels, bool compress)
+void Texture::setupPixels(int level, const Size& size, uint8_t* pixels, int channels, bool compress)
 {
     GLenum format = 0;
     switch (channels) {

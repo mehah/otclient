@@ -27,7 +27,7 @@
 
 constexpr uint8_t MMBLOCK_SIZE = 64;
 constexpr uint8_t OTMM_VERSION = 1;
-constexpr uint32_t OTMM_SIGNATURE = 0x4D4d544F;
+constexpr uint32_t  OTMM_SIGNATURE = 0x4D4d544F;
 
 enum MinimapTileFlags
 {
@@ -57,7 +57,7 @@ public:
     void updateTile(int x, int y, const MinimapTile& tile);
     MinimapTile& getTile(int x, int y) { return m_tiles[getTileIndex(x, y)]; }
     void resetTile(int x, int y) { m_tiles[getTileIndex(x, y)] = MinimapTile(); }
-    uint getTileIndex(int x, int y) { return ((y % MMBLOCK_SIZE) * MMBLOCK_SIZE) + (x % MMBLOCK_SIZE); }
+    uint32_t getTileIndex(int x, int y) { return ((y % MMBLOCK_SIZE) * MMBLOCK_SIZE) + (x % MMBLOCK_SIZE); }
     const TexturePtr& getTexture() { return m_texture; }
     std::array<MinimapTile, MMBLOCK_SIZE* MMBLOCK_SIZE>& getTiles() { return m_tiles; }
     void mustUpdate() { m_mustUpdate = true; }
@@ -126,8 +126,8 @@ private:
                         (index / (65536 / MMBLOCK_SIZE)) * MMBLOCK_SIZE, static_cast<uint8_t>(z)
         };
     }
-    uint getBlockIndex(const Position& pos) { return ((pos.y / MMBLOCK_SIZE) * (65536 / MMBLOCK_SIZE)) + (pos.x / MMBLOCK_SIZE); }
-    stdext::map<uint, MinimapBlock_ptr> m_tileBlocks[MAX_Z + 1];
+    uint32_t getBlockIndex(const Position& pos) { return ((pos.y / MMBLOCK_SIZE) * (65536 / MMBLOCK_SIZE)) + (pos.x / MMBLOCK_SIZE); }
+    stdext::map<uint32_t, MinimapBlock_ptr> m_tileBlocks[MAX_Z + 1];
     std::mutex m_lock;
 };
 

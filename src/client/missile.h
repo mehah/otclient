@@ -32,10 +32,10 @@ class Missile : public Thing
 public:
     void drawMissile(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
 
-    void setId(uint32_t id) override;
+    void setId(uint32_t  id) override;
     void setPath(const Position& fromPosition, const Position& toPosition);
 
-    uint32_t getId() override { return m_id; }
+    uint32_t  getId() override { return m_id; }
 
     MissilePtr asMissile() { return static_self_cast<Missile>(); }
     bool isMissile() override { return true; }

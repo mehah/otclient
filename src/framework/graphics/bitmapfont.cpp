@@ -66,7 +66,7 @@ void BitmapFont::load(const OTMLNodePtr& fontNode)
     m_glyphsSize[127].setWidth(1);
 
     // new line actually has a size that will be useful in multiline algorithm
-    m_glyphsSize[static_cast<uchar>('\n')] = { 1, m_glyphHeight };
+    m_glyphsSize[static_cast<uint8_t>('\n')] = { 1, m_glyphHeight };
 
     // read custom widths
     /*
@@ -112,7 +112,7 @@ std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::stri
     const int textLenght = text.length();
 
     for (int i = 0; i < textLenght; ++i) {
-        const int glyph = static_cast<uchar>(text[i]);
+        const int glyph = static_cast<uint8_t>(text[i]);
 
         // skip invalid glyphs
         if (glyph < 32)
@@ -190,7 +190,7 @@ void BitmapFont::fillTextCoords(const CoordsBufferPtr& coords, const std::string
     const int textLenght = text.length();
 
     for (int i = 0; i < textLenght; ++i) {
-        const int glyph = static_cast<uchar>(text[i]);
+        const int glyph = static_cast<uint8_t>(text[i]);
 
         // skip invalid glyphs
         if (glyph < 32)
@@ -275,9 +275,9 @@ const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string
     if ((align & Fw::AlignRight || align & Fw::AlignHorizontalCenter) || textBoxSize) {
         s_lineWidths[0] = 0;
         for (int i = 0; i < textLength; ++i) {
-            glyph = static_cast<uchar>(text[i]);
+            glyph = static_cast<uint8_t>(text[i]);
 
-            if (glyph == static_cast<uchar>('\n')) {
+            if (glyph == static_cast<uint8_t>('\n')) {
                 ++lines;
                 // resize s_lineWidths vector when needed
                 if (lines + 1 > static_cast<int>(s_lineWidths.size()))
@@ -296,11 +296,11 @@ const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string
     Point virtualPos(0, m_yOffset);
     lines = 0;
     for (int i = 0; i < textLength; ++i) {
-        glyph = static_cast<uchar>(text[i]);
+        glyph = static_cast<uint8_t>(text[i]);
 
         // new line or first glyph
-        if (glyph == static_cast<uchar>('\n') || i == 0) {
-            if (glyph == static_cast<uchar>('\n')) {
+        if (glyph == static_cast<uint8_t>('\n') || i == 0) {
+            if (glyph == static_cast<uint8_t>('\n')) {
                 virtualPos.y += m_glyphHeight + m_glyphSpacing.height();
                 ++lines;
             }
@@ -319,7 +319,7 @@ const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string
         s_glyphsPositions[i] = virtualPos;
 
         // render only if the glyph is valid
-        if (glyph >= 32 && glyph != static_cast<uchar>('\n')) {
+        if (glyph >= 32 && glyph != static_cast<uint8_t>('\n')) {
             virtualPos.x += m_glyphsSize[glyph].width() + m_glyphSpacing.width();
         }
     }
@@ -384,7 +384,7 @@ std::string BitmapFont::wrapText(const std::string_view text, int maxWidth)
         const int wordWidth = calculateTextRectSize(word).width();
         if (wordWidth > maxWidth) {
             std::string newWord;
-            for (uint j = 0; j < word.length(); ++j) {
+            for (uint32_t j = 0; j < word.length(); ++j) {
                 std::string candidate = newWord + word[j];
                 if (j != word.length() - 1)
                     candidate += '-';
@@ -407,11 +407,11 @@ std::string BitmapFont::wrapText(const std::string_view text, int maxWidth)
 
     // compose lines
     std::string line(words[0]);
-    for (ulong i = 1; i < words.size(); ++i) {
+    for (size_t i = 1; i < words.size(); ++i) {
         const auto& word = words[i];
 
         line.push_back(' ');
-        const ulong lineSize = line.size();
+        const size_t lineSize = line.size();
         line.append(word);
 
         if (calculateTextRectSize(line).width() > maxWidth) {

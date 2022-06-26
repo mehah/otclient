@@ -85,7 +85,7 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet)
         options.lp = remainder % 5;
         options.pb = remainder / 5;
 
-        uint32_t dictionarySize = 0;
+        uint32_t  dictionarySize = 0;
         for (uint8_t i = 0; i < 4; ++i) {
             dictionarySize += fin->getU8() << (i * 8);
         }
@@ -119,8 +119,8 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet)
         lzma_end(&stream); // free memory
 
         // pixel data start (bmp header end offset)
-        uint32_t data;
-        std::memcpy(&data, decompressed.get() + 10, sizeof(uint32_t));
+        uint32_t  data;
+        std::memcpy(&data, decompressed.get() + 10, sizeof(uint32_t ));
 
         uint8_t* bufferStart = decompressed.get() + data;
 

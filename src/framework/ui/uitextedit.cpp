@@ -179,7 +179,7 @@ void UITextEdit::update(bool focusCursor)
             assert(m_cursorPos <= textLength);
             const Rect virtualRect(m_textVirtualOffset, m_rect.size() - Size(m_padding.left + m_padding.right, 0)); // previous rendered virtual rect
             int pos = m_cursorPos - 1; // element before cursor
-            glyph = static_cast<uchar>(text[pos]); // glyph of the element before cursor
+            glyph = static_cast<uint8_t>(text[pos]); // glyph of the element before cursor
             Rect glyphRect(glyphsPositions[pos], glyphsSize[glyph]);
 
             // if the cursor is not on the previous rendered virtual rect we need to update it
@@ -191,7 +191,7 @@ void UITextEdit::update(bool focusCursor)
 
                 // find that glyph
                 for (pos = 0; pos < textLength; ++pos) {
-                    glyph = static_cast<uchar>(text[pos]);
+                    glyph = static_cast<uint8_t>(text[pos]);
                     glyphRect = Rect(glyphsPositions[pos], glyphsSize[glyph]);
                     glyphRect.setTop(std::max<int>(glyphRect.top() - m_font->getYOffset() - m_font->getGlyphSpacing().height(), 0));
                     glyphRect.setLeft(std::max<int>(glyphRect.left() - m_font->getGlyphSpacing().width(), 0));
@@ -212,7 +212,7 @@ void UITextEdit::update(bool focusCursor)
         if (m_cursorPos > 0 && textLength > 0) {
             const Rect virtualRect(m_textVirtualOffset, m_rect.size() - Size(2 * m_padding.left + m_padding.right, 0)); // previous rendered virtual rect
             const int pos = m_cursorPos - 1; // element before cursor
-            glyph = static_cast<uchar>(text[pos]); // glyph of the element before cursor
+            glyph = static_cast<uint8_t>(text[pos]); // glyph of the element before cursor
             const Rect glyphRect(glyphsPositions[pos], glyphsSize[glyph]);
             if (virtualRect.contains(glyphRect.topLeft()) && virtualRect.contains(glyphRect.bottomRight()))
                 m_cursorInRange = true;
@@ -262,11 +262,11 @@ void UITextEdit::update(bool focusCursor)
     }
 
     for (int i = 0; i < textLength; ++i) {
-        glyph = static_cast<uchar>(text[i]);
+        glyph = static_cast<uint8_t>(text[i]);
         m_glyphsCoords[i].clear();
 
         // skip invalid glyphs
-        if (glyph < 32 && glyph != static_cast<uchar>('\n'))
+        if (glyph < 32 && glyph != static_cast<uint8_t>('\n'))
             continue;
 
         // calculate initial glyph rect and texture coords
@@ -340,15 +340,17 @@ void UITextEdit::setCursorPos(int pos)
     if (pos < 0)
         pos = m_text.length();
 
-    if (pos != m_cursorPos) {
-        if (pos < 0)
-            m_cursorPos = 0;
-        else if (static_cast<uint>(pos) >= m_text.length())
-            m_cursorPos = m_text.length();
-        else
-            m_cursorPos = pos;
-        update(true);
-    }
+    if (pos == m_cursorPos)
+        return;
+
+    if (pos < 0)
+        m_cursorPos = 0;
+    else if (static_cast<size_t>(pos) >= m_text.length())
+        m_cursorPos = m_text.length();
+    else
+        m_cursorPos = pos;
+
+    update(true);
 }
 
 void UITextEdit::setSelection(int start, int end)
@@ -422,34 +424,33 @@ void UITextEdit::appendCharacter(char c)
     if (hasSelection())
         del();
 
-    if (m_cursorPos >= 0) {
-        if (m_maxLength > 0 && m_text.length() + 1 > m_maxLength)
-            return;
+    if (m_cursorPos == 0)
+        return;
 
-        if (!m_validCharacters.empty() && m_validCharacters.find(c) == std::string::npos)
-            return;
+    if (m_maxLength > 0 && m_text.length() + 1 > m_maxLength)
+        return;
 
-        std::string tmp;
-        tmp = c;
-        std::string tmp2 = m_text;
-        tmp2.insert(m_cursorPos, tmp);
-        ++m_cursorPos;
-        setText(tmp2);
-    }
+    if (!m_validCharacters.empty() && m_validCharacters.find(c) == std::string::npos)
+        return;
+
+    std::string tmp;
+    tmp = c;
+    std::string tmp2 = m_text;
+    tmp2.insert(m_cursorPos, tmp);
+    ++m_cursorPos;
+    setText(tmp2);
 }
 
 void UITextEdit::removeCharacter(bool right)
 {
     std::string tmp = m_text;
     if (m_cursorPos >= 0 && tmp.length() > 0) {
-        if (static_cast<uint>(m_cursorPos) >= tmp.length()) {
+        if (m_cursorPos >= tmp.length()) {
             tmp.erase(tmp.begin() + (--m_cursorPos));
-        } else {
-            if (right)
-                tmp.erase(tmp.begin() + m_cursorPos);
-            else if (m_cursorPos > 0)
-                tmp.erase(tmp.begin() + --m_cursorPos);
-        }
+        } else if (right)
+            tmp.erase(tmp.begin() + m_cursorPos);
+        else if (m_cursorPos > 0)
+            tmp.erase(tmp.begin() + --m_cursorPos);
         setText(tmp);
     }
 }
@@ -506,16 +507,14 @@ void UITextEdit::wrapText()
 void UITextEdit::moveCursorHorizontally(bool right)
 {
     if (right) {
-        if (static_cast<uint>(m_cursorPos) + 1 <= m_text.length())
+        if (m_cursorPos + 1 <= m_text.length())
             ++m_cursorPos;
         else
             m_cursorPos = 0;
-    } else {
-        if (m_cursorPos - 1 >= 0)
-            --m_cursorPos;
-        else
-            m_cursorPos = m_text.length();
-    }
+    } else if (m_cursorPos - 1 >= 0)
+        --m_cursorPos;
+    else
+        m_cursorPos = m_text.length();
 
     blinkCursor();
     update(true);
@@ -667,7 +666,7 @@ void UITextEdit::onFocusChange(bool focused, Fw::FocusReason reason)
     UIWidget::onFocusChange(focused, reason);
 }
 
-bool UITextEdit::onKeyPress(uchar keyCode, int keyboardModifiers, int autoRepeatTicks)
+bool UITextEdit::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepeatTicks)
 {
     if (UIWidget::onKeyPress(keyCode, keyboardModifiers, autoRepeatTicks))
         return true;

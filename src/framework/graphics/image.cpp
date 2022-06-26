@@ -232,7 +232,7 @@ bool Image::nextMipmap()
 
 void Image::flipVertically()
 {
-    const uint rowIncrement = m_size.height() * m_bpp;
+    const uint32_t rowIncrement = m_size.height() * m_bpp;
     uint8_t* pixelData = m_pixels.data();
 
     for (int y = 0; y < (getHeight() / 2); ++y) {

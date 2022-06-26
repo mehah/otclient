@@ -29,7 +29,7 @@
 #include <framework/graphics/drawpool.h>
 #include <framework/platform/platformwindow.h>
 
-uint FrameBuffer::boundFbo = 0;
+uint32_t FrameBuffer::boundFbo = 0;
 
 FrameBuffer::FrameBuffer(const bool useAlphaWriting) :m_useAlphaWriting(useAlphaWriting)
 {

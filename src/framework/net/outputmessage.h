@@ -43,7 +43,7 @@ public:
 
     void addU8(uint8_t value);
     void addU16(uint16_t value);
-    void addU32(uint32_t value);
+    void addU32(uint32_t  value);
     void addU64(uint64_t value);
     void addString(const std::string_view buffer);
     void addPaddingBytes(int bytes, uint8_t byte = 0);

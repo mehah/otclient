@@ -47,11 +47,11 @@ class Thing : public LuaObject
 public:
     ~Thing() override = default;
     virtual void draw(const Point& /*dest*/, float /*scaleFactor*/, bool /*animate*/, const Highlight& /*highLight*/, TextureType /*textureType*/ = TextureType::NONE, Color /* color */ = Color::white, LightView* /*lightView*/ = nullptr) {}
-    virtual void setId(uint32_t /*id*/) {}
+    virtual void setId(uint32_t  /*id*/) {}
 
     void setPosition(const Position& position);
 
-    virtual uint32_t getId() { return 0; }
+    virtual uint32_t  getId() { return 0; }
     Position getPosition() { return m_position; }
     int getStackPriority();
     const TilePtr& getTile();

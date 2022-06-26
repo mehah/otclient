@@ -39,7 +39,7 @@ namespace Otc
         OPERATION_ADD, OPERATION_REMOVE, OPERATION_CLEAN
     };
 
-    enum DrawFlags : uint32_t
+    enum DrawFlags : uint32_t 
     {
         DrawBars = 1 << 0,
         DrawNames = 1 << 1,
@@ -257,7 +257,7 @@ namespace Otc
         NpcIconTradeQuest
     };
 
-    enum PlayerStates : uint32_t
+    enum PlayerStates : uint32_t 
     {
         IconNone = 0,
         IconPoison = 1,
@@ -517,7 +517,7 @@ namespace Otc
         LastSpeedFormula
     };
 
-    enum Blessings : uint32_t
+    enum Blessings : uint32_t 
     {
         BlessingNone = 0,
         BlessingAdventurer = 1,

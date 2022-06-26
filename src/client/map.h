@@ -116,7 +116,7 @@ public:
     const TilePtr& get(const Position& pos) { return m_tiles[getTileIndex(pos)]; }
     void remove(const Position& pos) { m_tiles[getTileIndex(pos)] = nullptr; }
 
-    uint getTileIndex(const Position& pos) { return ((pos.y % BLOCK_SIZE) * BLOCK_SIZE) + (pos.x % BLOCK_SIZE); }
+    uint32_t getTileIndex(const Position& pos) { return ((pos.y % BLOCK_SIZE) * BLOCK_SIZE) + (pos.x % BLOCK_SIZE); }
 
     const std::array<TilePtr, BLOCK_SIZE* BLOCK_SIZE>& getTiles() const { return m_tiles; }
 
@@ -222,12 +222,12 @@ public:
     void beginGhostMode(float opacity);
     void endGhostMode();
 
-    std::map<Position, ItemPtr> findItemsById(uint16_t clientId, uint32_t max);
+    std::map<Position, ItemPtr> findItemsById(uint16_t clientId, uint32_t  max);
 
     // known creature related
     void addCreature(const CreaturePtr& creature);
-    CreaturePtr getCreatureById(uint32_t id);
-    void removeCreatureById(uint32_t id);
+    CreaturePtr getCreatureById(uint32_t  id);
+    void removeCreatureById(uint32_t  id);
     std::vector<CreaturePtr> getSightSpectators(const Position& centerPos, bool multiFloor);
     std::vector<CreaturePtr> getSpectators(const Position& centerPos, bool multiFloor);
     std::vector<CreaturePtr> getSpectatorsInRange(const Position& centerPos, bool multiFloor, int32_t xRange, int32_t yRange);
@@ -277,16 +277,16 @@ private:
     std::vector<StaticTextPtr> m_staticTexts;
     std::vector<MapViewPtr> m_mapViews;
 
-    stdext::map<uint32_t, TileBlock> m_tileBlocks[MAX_Z + 1];
-    stdext::map<uint32_t, CreaturePtr> m_knownCreatures;
+    stdext::map<uint32_t , TileBlock> m_tileBlocks[MAX_Z + 1];
+    stdext::map<uint32_t , CreaturePtr> m_knownCreatures;
     stdext::map<Position, std::string, Position::Hasher> m_waypoints;
 
-    stdext::map<uint32_t, Color> m_zoneColors;
+    stdext::map<uint32_t , Color> m_zoneColors;
 
     stdext::small_dynamic_storage<OTBM_ItemAttr, OTBM_ATTR_LAST> m_attribs;
 
     uint8_t m_animationFlags;
-    uint32_t m_zoneFlags;
+    uint32_t  m_zoneFlags;
 
     float m_zoneOpacity;
 

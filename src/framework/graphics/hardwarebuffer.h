@@ -49,5 +49,5 @@ public:
 
 private:
     Type m_type;
-    uint m_id;
+    uint32_t m_id;
 };

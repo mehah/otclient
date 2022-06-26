@@ -137,7 +137,7 @@ void StaticText::compose()
         g_logger.warning(stdext::format("Unknown speak type: %d", m_mode));
     }
 
-    for (uint i = 0; i < m_messages.size(); ++i) {
+    for (uint32_t i = 0; i < m_messages.size(); ++i) {
         text += m_messages[i].first;
 
         if (i < m_messages.size() - 1)

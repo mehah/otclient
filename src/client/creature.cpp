@@ -577,7 +577,7 @@ void Creature::nextWalkUpdate()
 
 void Creature::updateWalk(const bool isPreWalking)
 {
-    const uint stepDuration = getStepDuration(true);
+    const uint32_t stepDuration = getStepDuration(true);
 
     const float extraSpeed = isLocalPlayer() && !hasSpeedFormula() ? 800.f / static_cast<float>(stepDuration) : 0.f,
         walkTicksPerPixel = (stepDuration + extraSpeed) / SPRITE_SIZE;

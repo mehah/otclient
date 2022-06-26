@@ -243,8 +243,8 @@ private:
     bool hasTexture() const { return !m_textures.empty(); }
 
     static Size getBestTextureDimension(int w, int h, int count);
-    uint getSpriteIndex(int w, int h, int l, int x, int y, int z, int a);
-    uint getTextureIndex(int l, int x, int y, int z);
+    uint32_t getSpriteIndex(int w, int h, int l, int x, int y, int z, int a);
+    uint32_t getTextureIndex(int l, int x, int y, int z);
 
     ThingCategory m_category{ ThingInvalidCategory };
     uint16_t m_id{ 0 };

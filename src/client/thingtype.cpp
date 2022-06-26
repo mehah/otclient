@@ -713,7 +713,7 @@ void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPatte
     if (!texture)
         return;
 
-    const uint frameIndex = getTextureIndex(layer, xPattern, yPattern, zPattern);
+    const uint32_t frameIndex = getTextureIndex(layer, xPattern, yPattern, zPattern);
     if (frameIndex >= m_texturesFramesRects[animationPhase].size())
         return;
 
@@ -784,7 +784,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
 
                     if (!useCustomImage) {
                         if (protobufSupported) {
-                            const uint spriteIndex = getSpriteIndex(-1, -1, spriteMask ? 1 : l, x, y, z, animationPhase);
+                            const uint32_t spriteIndex = getSpriteIndex(-1, -1, spriteMask ? 1 : l, x, y, z, animationPhase);
                             ImagePtr spriteImage = g_sprites.getSpriteImage(m_spritesIndex[spriteIndex]);
                             if (!spriteImage) {
                                 return nullptr;
@@ -805,7 +805,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
                         } else {
                             for (int h = 0; h < m_size.height(); ++h) {
                                 for (int w = 0; w < m_size.width(); ++w) {
-                                    const uint spriteIndex = getSpriteIndex(w, h, spriteMask ? 1 : l, x, y, z, animationPhase);
+                                    const uint32_t spriteIndex = getSpriteIndex(w, h, spriteMask ? 1 : l, x, y, z, animationPhase);
                                     ImagePtr spriteImage = g_sprites.getSpriteImage(m_spritesIndex[spriteIndex]);
 
                                     // verifies that the first block in the lower right corner is transparent.
@@ -895,9 +895,9 @@ Size ThingType::getBestTextureDimension(int w, int h, int count)
     return bestDimension;
 }
 
-uint ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int a)
+uint32_t ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int a)
 {
-    uint index = ((((((a % m_animationPhases)
+    uint32_t index = ((((((a % m_animationPhases)
                       * m_numPatternZ + z)
                      * m_numPatternY + y)
                     * m_numPatternX + x)
@@ -917,7 +917,7 @@ uint ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int a)
     return index;
 }
 
-uint ThingType::getTextureIndex(int l, int x, int y, int z)
+uint32_t ThingType::getTextureIndex(int l, int x, int y, int z)
 {
     return ((l * m_numPatternZ + z)
             * m_numPatternY + y)

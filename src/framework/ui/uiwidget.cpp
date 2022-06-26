@@ -195,7 +195,7 @@ void UIWidget::insertChild(int index, const UIWidgetPtr& child)
 
     index = index <= 0 ? (m_children.size() + index) : index - 1;
 
-    if (!(index >= 0 && static_cast<uint>(index) <= m_children.size())) {
+    if (!(index >= 0 && index <= m_children.size())) {
         //g_logger.traceWarning("attempt to insert a child UIWidget into an invalid index, using nearest index...");
         index = std::clamp<int>(index, 0, static_cast<int>(m_children.size()));
     }
@@ -430,7 +430,7 @@ void UIWidget::moveChildToIndex(const UIWidgetPtr& child, int index)
     if (!child)
         return;
 
-    if (static_cast<uint>(index) - 1 >= m_children.size()) {
+    if (static_cast<size_t>(index) - 1 >= m_children.size()) {
         g_logger.traceError(stdext::format("moving %s to index %d on %s", child->getId(), index, m_id));
         return;
     }
@@ -1190,7 +1190,7 @@ UIWidgetPtr UIWidget::getChildByPos(const Point& childPos)
 UIWidgetPtr UIWidget::getChildByIndex(int index)
 {
     index = index <= 0 ? (m_children.size() + index) : index - 1;
-    if (index >= 0 && static_cast<uint>(index) < m_children.size())
+    if (index >= 0 && static_cast<size_t>(index) < m_children.size())
         return m_children.at(index);
 
     return nullptr;
@@ -1590,17 +1590,17 @@ bool UIWidget::onKeyText(const std::string_view keyText)
     return callLuaField<bool>("onKeyText", keyText);
 }
 
-bool UIWidget::onKeyDown(uchar keyCode, int keyboardModifiers)
+bool UIWidget::onKeyDown(uint8_t keyCode, int keyboardModifiers)
 {
     return callLuaField<bool>("onKeyDown", keyCode, keyboardModifiers);
 }
 
-bool UIWidget::onKeyPress(uchar keyCode, int keyboardModifiers, int autoRepeatTicks)
+bool UIWidget::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepeatTicks)
 {
     return callLuaField<bool>("onKeyPress", keyCode, keyboardModifiers, autoRepeatTicks);
 }
 
-bool UIWidget::onKeyUp(uchar keyCode, int keyboardModifiers)
+bool UIWidget::onKeyUp(uint8_t keyCode, int keyboardModifiers)
 {
     return callLuaField<bool>("onKeyUp", keyCode, keyboardModifiers);
 }
@@ -1667,7 +1667,7 @@ bool UIWidget::propagateOnKeyText(const std::string_view keyText)
     return onKeyText(keyText);
 }
 
-bool UIWidget::propagateOnKeyDown(uchar keyCode, int keyboardModifiers)
+bool UIWidget::propagateOnKeyDown(uint8_t keyCode, int keyboardModifiers)
 {
     // do a backup of children list, because it may change while looping it
     UIWidgetList children;
@@ -1689,7 +1689,7 @@ bool UIWidget::propagateOnKeyDown(uchar keyCode, int keyboardModifiers)
     return onKeyDown(keyCode, keyboardModifiers);
 }
 
-bool UIWidget::propagateOnKeyPress(uchar keyCode, int keyboardModifiers, int autoRepeatTicks)
+bool UIWidget::propagateOnKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepeatTicks)
 {
     // do a backup of children list, because it may change while looping it
     UIWidgetList children;
@@ -1713,7 +1713,7 @@ bool UIWidget::propagateOnKeyPress(uchar keyCode, int keyboardModifiers, int aut
     return false;
 }
 
-bool UIWidget::propagateOnKeyUp(uchar keyCode, int keyboardModifiers)
+bool UIWidget::propagateOnKeyUp(uint8_t keyCode, int keyboardModifiers)
 {
     // do a backup of children list, because it may change while looping it
     UIWidgetList children;

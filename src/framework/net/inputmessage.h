@@ -42,7 +42,7 @@ public:
     void setReadPos(uint16_t readPos) { m_readPos = readPos; }
     uint8_t getU8();
     uint16_t getU16();
-    uint32_t getU32();
+    uint32_t  getU32();
     uint64_t getU64();
     int64_t get64();
     std::string_view getString();
@@ -56,9 +56,9 @@ public:
     {
         const uint16_t v = getU16(); m_readPos -= 2; return v;
     }
-    uint32_t peekU32()
+    uint32_t  peekU32()
     {
-        const uint32_t v = getU32(); m_readPos -= 4; return v;
+        const uint32_t  v = getU32(); m_readPos -= 4; return v;
     }
     uint64_t peekU64()
     {

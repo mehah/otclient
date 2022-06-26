@@ -317,7 +317,7 @@ bool Minimap::loadOtmm(const std::string& fileName)
 
         fin->cache();
 
-        const uint32_t signature = fin->getU32();
+        const uint32_t  signature = fin->getU32();
         if (signature != OTMM_SIGNATURE)
             stdext::throw_exception("invalid OTMM file");
 
@@ -337,9 +337,9 @@ bool Minimap::loadOtmm(const std::string& fileName)
 
         fin->seek(start);
 
-        constexpr uint blockSize = MMBLOCK_SIZE * MMBLOCK_SIZE * sizeof(MinimapTile);
-        std::vector<uchar> compressBuffer(compressBound(blockSize));
-        std::vector<uchar> decompressBuffer(blockSize);
+        constexpr uint32_t blockSize = MMBLOCK_SIZE * MMBLOCK_SIZE * sizeof(MinimapTile);
+        std::vector<uint8_t> compressBuffer(compressBound(blockSize));
+        std::vector<uint8_t> decompressBuffer(blockSize);
 
         while (true) {
             Position pos;
@@ -352,14 +352,16 @@ bool Minimap::loadOtmm(const std::string& fileName)
                 break;
 
             MinimapBlock& block = getBlock(pos);
-            const ulong len = fin->getU16();
-            ulong destLen = blockSize;
+            const uint16_t len = fin->getU16();
             fin->read(compressBuffer.data(), len);
+
+            unsigned long destLen = blockSize;
             const int ret = uncompress(decompressBuffer.data(), &destLen, compressBuffer.data(), len);
+
             if (ret != Z_OK || destLen != blockSize)
                 break;
 
-            memcpy(reinterpret_cast<uchar*>(&block.getTiles()), decompressBuffer.data(), blockSize);
+            memcpy(reinterpret_cast<uint8_t*>(&block.getTiles()), decompressBuffer.data(), blockSize);
             block.mustUpdate();
             block.justSaw();
         }
@@ -381,7 +383,7 @@ void Minimap::saveOtmm(const std::string& fileName)
         fin->cache();
 
         //TODO: compression flag with zlib
-        const uint32_t flags = 0;
+        const uint32_t  flags = 0;
 
         // header
         fin->addU32(OTMM_SIGNATURE);
@@ -393,14 +395,14 @@ void Minimap::saveOtmm(const std::string& fileName)
         fin->addString("OTMM 1.0"); // description
 
         // go back and rewrite where the map data starts
-        const uint32_t start = fin->tell();
+        const uint32_t  start = fin->tell();
         fin->seek(4);
         fin->addU16(start);
         fin->seek(start);
 
-        constexpr uint blockSize = MMBLOCK_SIZE * MMBLOCK_SIZE * sizeof(MinimapTile),
+        constexpr uint32_t blockSize = MMBLOCK_SIZE * MMBLOCK_SIZE * sizeof(MinimapTile),
             COMPRESS_LEVEL = 3;
-        std::vector<uchar> compressBuffer(compressBound(blockSize));
+        std::vector<uint8_t> compressBuffer(compressBound(blockSize));
 
         for (uint_fast8_t z = 0; z <= MAX_Z; ++z) {
             for (auto& it : m_tileBlocks[z]) {
@@ -414,8 +416,8 @@ void Minimap::saveOtmm(const std::string& fileName)
                 fin->addU16(pos.y);
                 fin->addU8(pos.z);
 
-                ulong len = blockSize;
-                const int ret = compress2(compressBuffer.data(), &len, (uchar*)&block.getTiles(), blockSize, COMPRESS_LEVEL);
+                unsigned long len = blockSize;
+                const int ret = compress2(compressBuffer.data(), &len, (uint8_t*)&block.getTiles(), blockSize, COMPRESS_LEVEL);
                 assert(ret == Z_OK);
                 fin->addU16(len);
                 fin->write(compressBuffer.data(), len);

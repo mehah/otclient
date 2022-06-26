@@ -44,7 +44,7 @@ public:
     void setValidCharacters(const std::string_view validCharacters) { m_validCharacters = validCharacters; }
     void setShiftNavigation(bool enable) { m_shiftNavigation = enable; }
     void setMultiline(bool enable) { m_multiline = enable; }
-    void setMaxLength(uint maxLength) { m_maxLength = maxLength; }
+    void setMaxLength(uint32_t maxLength) { m_maxLength = maxLength; }
     void setTextVirtualOffset(const Point& offset);
     void setEditable(bool editable) { m_editable = editable; }
     void setSelectable(bool selectable) { m_selectable = selectable; }
@@ -74,7 +74,7 @@ public:
     Point getTextVirtualOffset() { return m_textVirtualOffset; }
     Size getTextVirtualSize() { return m_textVirtualSize; }
     Size getTextTotalSize() { return m_textTotalSize; }
-    uint getMaxLength() { return m_maxLength; }
+    uint32_t getMaxLength() { return m_maxLength; }
     int getSelectionStart() { return m_selectionStart; }
     int getSelectionEnd() { return m_selectionEnd; }
     Color getSelectionColor() { return m_selectionColor; }
@@ -97,7 +97,7 @@ protected:
     void onGeometryChange(const Rect& oldRect, const Rect& newRect) override;
     void onFocusChange(bool focused, Fw::FocusReason reason) override;
     bool onKeyText(const std::string_view keyText) override;
-    bool onKeyPress(uchar keyCode, int keyboardModifiers, int autoRepeatTicks) override;
+    bool onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepeatTicks) override;
     bool onMousePress(const Point& mousePos, Fw::MouseButton button) override;
     bool onMouseRelease(const Point& mousePos, Fw::MouseButton button) override;
     bool onMouseMove(const Point& mousePos, const Point& mouseMoved) override;
@@ -110,7 +110,7 @@ private:
     void recacheGlyphs() { m_glyphsMustRecache = true; }
 
     Rect m_drawArea;
-    int m_cursorPos;
+    size_t m_cursorPos;
     Point m_textVirtualOffset;
     Size m_textVirtualSize;
     Size m_textTotalSize;
@@ -123,7 +123,7 @@ private:
     bool m_editable;
     bool m_changeCursorImage;
     std::string m_validCharacters;
-    uint m_maxLength;
+    uint32_t m_maxLength;
     bool m_updatesEnabled;
     bool m_autoScroll;
 

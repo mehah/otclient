@@ -374,13 +374,13 @@ void Game::processRuleViolationLock()
     g_lua.callGlobalField("g_game", "onRuleViolationLock");
 }
 
-void Game::processVipAdd(uint id, const std::string_view name, uint status, const std::string_view description, int iconId, bool notifyLogin)
+void Game::processVipAdd(uint32_t id, const std::string_view name, uint32_t status, const std::string_view description, int iconId, bool notifyLogin)
 {
     m_vips[id] = Vip(name, status, description, iconId, notifyLogin);
     g_lua.callGlobalField("g_game", "onAddVip", id, name, status, description, iconId, notifyLogin);
 }
 
-void Game::processVipStateChange(uint id, uint status)
+void Game::processVipStateChange(uint32_t id, uint32_t status)
 {
     std::get<1>(m_vips[id]) = status;
     g_lua.callGlobalField("g_game", "onVipStateChange", id, status);
@@ -461,12 +461,12 @@ void Game::processCloseTrade()
     g_lua.callGlobalField("g_game", "onCloseTrade");
 }
 
-void Game::processEditText(uint id, int itemId, int maxLength, const std::string_view text, const std::string_view writer, const std::string_view date)
+void Game::processEditText(uint32_t id, int itemId, int maxLength, const std::string_view text, const std::string_view writer, const std::string_view date)
 {
     g_lua.callGlobalField("g_game", "onEditText", id, itemId, maxLength, text, writer, date);
 }
 
-void Game::processEditList(uint id, int doorId, const std::string_view text)
+void Game::processEditList(uint32_t id, int doorId, const std::string_view text)
 {
     g_lua.callGlobalField("g_game", "onEditList", id, doorId, text);
 }
@@ -481,14 +481,14 @@ void Game::processQuestLine(int questId, const std::vector<std::tuple<std::strin
     g_lua.callGlobalField("g_game", "onQuestLine", questId, questMissions);
 }
 
-void Game::processModalDialog(uint32_t id, const std::string_view title, const std::string_view message, const std::vector<std::tuple<int, std::string> >
+void Game::processModalDialog(uint32_t  id, const std::string_view title, const std::string_view message, const std::vector<std::tuple<int, std::string> >
                               & buttonList, int enterButton, int escapeButton, const std::vector<std::tuple<int, std::string> >
                               & choiceList, bool priority)
 {
     g_lua.callGlobalField("g_game", "onModalDialog", id, title, message, buttonList, enterButton, escapeButton, choiceList, priority);
 }
 
-void Game::processAttackCancel(uint seq)
+void Game::processAttackCancel(uint32_t seq)
 {
     if (isAttacking() && (seq == 0 || m_seq == seq))
         cancelAttack();
@@ -766,7 +766,7 @@ void Game::move(const ThingPtr& thing, const Position& toPos, int count)
     if (!canPerformGameAction() || !thing || thing->getPosition() == toPos)
         return;
 
-    uint id = thing->getId();
+    uint32_t id = thing->getId();
     if (thing->isCreature()) {
         CreaturePtr creature = thing->static_self_cast<Creature>();
         id = Proto::Creature;
@@ -844,7 +844,7 @@ void Game::useInventoryItemWith(int itemId, const ThingPtr& toThing)
         m_protocolGame->sendUseItemWith(pos, itemId, 0, toThing->getPosition(), toThing->getId(), toThing->getStackPos());
 }
 
-ItemPtr Game::findItemInContainers(uint itemId, int subType)
+ItemPtr Game::findItemInContainers(uint32_t itemId, int subType)
 {
     for (auto& it : m_containers) {
         const ContainerPtr& container = it.second;
@@ -1303,7 +1303,7 @@ void Game::rejectTrade()
     m_protocolGame->sendRejectTrade();
 }
 
-void Game::editText(uint id, const std::string_view text)
+void Game::editText(uint32_t id, const std::string_view text)
 {
     if (!canPerformGameAction())
         return;
@@ -1311,7 +1311,7 @@ void Game::editText(uint id, const std::string_view text)
     m_protocolGame->sendEditText(id, text);
 }
 
-void Game::editList(uint id, int doorId, const std::string_view text)
+void Game::editList(uint32_t id, int doorId, const std::string_view text)
 {
     if (!canPerformGameAction())
         return;
@@ -1404,7 +1404,7 @@ void Game::requestItemInfo(const ItemPtr& item, int index)
     m_protocolGame->sendRequestItemInfo(item->getId(), item->getSubType(), index);
 }
 
-void Game::answerModalDialog(uint32_t dialog, int button, int choice)
+void Game::answerModalDialog(uint32_t  dialog, int button, int choice)
 {
     if (!canPerformGameAction())
         return;

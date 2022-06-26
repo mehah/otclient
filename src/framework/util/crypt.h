@@ -49,8 +49,8 @@ public:
 
     void rsaSetPublicKey(const std::string& n, const std::string& e);
     void rsaSetPrivateKey(const std::string& p, const std::string& q, const std::string& d);
-    bool rsaEncrypt(unsigned char* msg, int size);
-    bool rsaDecrypt(unsigned char* msg, int size);
+    bool rsaEncrypt(uint8_t* msg, int size);
+    bool rsaDecrypt(uint8_t* msg, int size);
     int rsaGetSize();
 
 private:

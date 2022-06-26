@@ -35,7 +35,7 @@
 #endif
 
 static constexpr std::string_view base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-static inline bool is_base64(unsigned char c) { return (isalnum(c) || (c == '+') || (c == '/')); }
+static inline bool is_base64(uint8_t c) { return (isalnum(c) || (c == '+') || (c == '/')); }
 
 Crypt g_crypt;
 
@@ -219,7 +219,7 @@ std::string Crypt::getCryptKey(bool useMachineUUID)
 
 std::string Crypt::_encrypt(const std::string& decrypted_string, bool useMachineUUID)
 {
-    const uint32_t sum = stdext::adler32((const uint8_t*)decrypted_string.c_str(), decrypted_string.size());
+    const uint32_t  sum = stdext::adler32((const uint8_t*)decrypted_string.c_str(), decrypted_string.size());
 
     std::string tmp = "0000" + decrypted_string;
 
@@ -234,9 +234,9 @@ std::string Crypt::_decrypt(const std::string& encrypted_string, bool useMachine
     const auto& tmp = xorCrypt(decoded, getCryptKey(useMachineUUID));
 
     if (tmp.length() >= 4) {
-        const uint32_t readsum = stdext::readULE32((const uint8_t*)tmp.c_str());
+        const uint32_t  readsum = stdext::readULE32((const uint8_t*)tmp.c_str());
         std::string decrypted_string = tmp.substr(4);
-        const uint32_t sum = stdext::adler32((const uint8_t*)decrypted_string.c_str(), decrypted_string.size());
+        const uint32_t  sum = stdext::adler32((const uint8_t*)decrypted_string.c_str(), decrypted_string.size());
         if (readsum == sum)
             return decrypted_string;
     }
@@ -300,7 +300,7 @@ void Crypt::rsaSetPrivateKey(const std::string& p, const std::string& q, const s
 #endif
 }
 
-bool Crypt::rsaEncrypt(unsigned char* msg, int size)
+bool Crypt::rsaEncrypt(uint8_t* msg, int size)
 {
     if (size != rsaGetSize())
         return false;
@@ -327,7 +327,7 @@ bool Crypt::rsaEncrypt(unsigned char* msg, int size)
 #endif
 }
 
-bool Crypt::rsaDecrypt(unsigned char* msg, int size)
+bool Crypt::rsaDecrypt(uint8_t* msg, int size)
 {
     if (size != rsaGetSize())
         return false;

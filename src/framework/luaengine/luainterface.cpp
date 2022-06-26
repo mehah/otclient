@@ -688,9 +688,9 @@ int LuaInterface::luaBitNot(lua_State* L)
 int LuaInterface::luaBitAnd(lua_State* L)
 {
     int n = lua_gettop(L); \
-        uint32_t number = static_cast<uint32_t>(lua_tonumber(L, -1));
+        uint32_t  number = static_cast<uint32_t >(lua_tonumber(L, -1));
     for (int i = 1; i < n; ++i)
-        number &= static_cast<uint32_t>(lua_tonumber(L, i));
+        number &= static_cast<uint32_t >(lua_tonumber(L, i));
     lua_pushnumber(L, number);
     return 1;
 }
@@ -698,9 +698,9 @@ int LuaInterface::luaBitAnd(lua_State* L)
 int LuaInterface::luaBitOr(lua_State* L)
 {
     int n = lua_gettop(L); \
-        uint32_t number = static_cast<uint32_t>(lua_tonumber(L, -1));
+        uint32_t  number = static_cast<uint32_t >(lua_tonumber(L, -1));
     for (int i = 1; i < n; ++i)
-        number |= static_cast<uint32_t>(lua_tonumber(L, i));
+        number |= static_cast<uint32_t >(lua_tonumber(L, i));
     lua_pushnumber(L, number);
     return 1;
 }
@@ -708,25 +708,25 @@ int LuaInterface::luaBitOr(lua_State* L)
 int LuaInterface::luaBitXor(lua_State* L)
 {
     int n = lua_gettop(L); \
-        uint32_t number = static_cast<uint32_t>(lua_tonumber(L, -1));
+        uint32_t  number = static_cast<uint32_t >(lua_tonumber(L, -1));
     for (int i = 1; i < n; ++i)
-        number ^= static_cast<uint32_t>(lua_tonumber(L, i));
+        number ^= static_cast<uint32_t >(lua_tonumber(L, i));
     lua_pushnumber(L, number);
     return 1;
 }
 
 int LuaInterface::luaBitLeftShift(lua_State* L)
 {
-    uint32_t n1 = static_cast<uint32_t>(lua_tonumber(L, 1));
-    uint32_t n2 = static_cast<uint32_t>(lua_tonumber(L, 2));
+    uint32_t  n1 = static_cast<uint32_t >(lua_tonumber(L, 1));
+    uint32_t  n2 = static_cast<uint32_t >(lua_tonumber(L, 2));
     lua_pushnumber(L, (n1 << n2));
     return 1;
 }
 
 int LuaInterface::luaBitRightShift(lua_State* L)
 {
-    uint32_t n1 = static_cast<uint32_t>(lua_tonumber(L, 1));
-    uint32_t n2 = static_cast<uint32_t>(lua_tonumber(L, 2));
+    uint32_t  n1 = static_cast<uint32_t >(lua_tonumber(L, 1));
+    uint32_t  n2 = static_cast<uint32_t >(lua_tonumber(L, 2));
     lua_pushnumber(L, (n1 >> n2));
     return 1;
 }

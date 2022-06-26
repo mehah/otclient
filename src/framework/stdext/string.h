@@ -66,7 +66,7 @@ namespace stdext
     {
         const std::vector<std::string> splitted = split(str, separators);
         std::vector<T> results(splitted.size());
-        for (uint i = 0; i < splitted.size(); ++i)
+        for (uint32_t i = 0; i < splitted.size(); ++i)
             results[i] = safe_cast<T>(splitted[i]);
         return results;
     }

@@ -138,7 +138,7 @@ protected:
     BlendEquation m_blendEquation{ BlendEquation::ADD };
     Texture* m_texture{ nullptr };
     bool m_alphaWriting{ false };
-    uint m_glTextureId{ 0 };
+    uint32_t m_glTextureId{ 0 };
 
     float m_opacity{ 1.f };
 

@@ -83,14 +83,14 @@ void SpriteManager::saveSpr(const std::string& fileName)
         else
             fin->addU16(m_spritesCount);
 
-        const uint32_t offset = fin->tell();
-        uint32_t spriteAddress = offset + 4 * m_spritesCount;
+        const uint32_t  offset = fin->tell();
+        uint32_t  spriteAddress = offset + 4 * m_spritesCount;
         for (int i = 1; i <= m_spritesCount; ++i)
             fin->addU32(0);
 
         for (int i = 1; i <= m_spritesCount; ++i) {
             m_spritesFile->seek((i - 1) * 4 + m_spritesOffset);
-            const uint32_t fromAdress = m_spritesFile->getU32();
+            const uint32_t  fromAdress = m_spritesFile->getU32();
             if (fromAdress != 0) {
                 fin->seek(offset + (i - 1) * 4);
                 fin->addU32(spriteAddress);
@@ -138,7 +138,7 @@ ImagePtr SpriteManager::getSpriteImage(int id)
 
         m_spritesFile->seek(((id - 1) * 4) + m_spritesOffset);
 
-        const uint32_t spriteAddress = m_spritesFile->getU32();
+        const uint32_t  spriteAddress = m_spritesFile->getU32();
 
         // no sprite? return an empty texture
         if (spriteAddress == 0)

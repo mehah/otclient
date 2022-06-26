@@ -31,7 +31,7 @@ class Color
 public:
     Color() = default;
     Color(const std::string_view coltext);
-    Color(const uint32_t rgba) { setRGBA(rgba); }
+    Color(const uint32_t  rgba) { setRGBA(rgba); }
     Color(const int r, const int g, const int b, const int a = 0xFF) : m_r(r / 255.f), m_g(g / 255.f), m_b(b / 255.f), m_a(a / 255.f) { update(); }
     Color(const float r, const float g, const float b, const float a = 1.0f) : m_r(r), m_g(g), m_b(b), m_a(a) { update(); }
     Color(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a = 0xFF) : m_r(r / 255.f), m_g(g / 255.f), m_b(b / 255.f), m_a(a / 255.f) { update(); }
@@ -60,7 +60,7 @@ public:
     float gF() const { return m_g; }
     float rF() const { return m_r; }
 
-    uint32_t rgba() const { return m_rgba; }
+    uint32_t  rgba() const { return m_rgba; }
 
     void setRed(const int r) { m_r = static_cast<uint8_t>(r) / 255.f; update(); }
     void setGreen(const int g) { m_g = static_cast<uint8_t>(g) / 255.f; update(); }
@@ -73,7 +73,7 @@ public:
     void setAlpha(const float a) { m_a = a; update(); }
 
     void setRGBA(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a = 0xFF) { m_r = r / 255.f; m_g = g / 255.f; m_b = b / 255.f; m_a = a / 255.f; update(); }
-    void setRGBA(const uint32_t rgba) { setRGBA((rgba >> 0) & 0xff, (rgba >> 8) & 0xff, (rgba >> 16) & 0xff, (rgba >> 24) & 0xff); }
+    void setRGBA(const uint32_t  rgba) { setRGBA((rgba >> 0) & 0xff, (rgba >> 8) & 0xff, (rgba >> 16) & 0xff, (rgba >> 24) & 0xff); }
 
     Color operator+(const Color& other) const { return Color(m_r + other.m_r, m_g + other.m_g, m_b + other.m_b, m_a + other.m_a); }
     Color operator-(const Color& other) const { return Color(m_r - other.m_r, m_g - other.m_g, m_b - other.m_b, m_a - other.m_a); }
@@ -81,8 +81,8 @@ public:
     Color operator*(const float v) const { return Color(m_r * v, m_g * v, m_b * v, m_a * v); }
     Color operator/(const float v) const { return Color(m_r / v, m_g / v, m_b / v, m_a / v); }
 
-    Color& operator=(uint32_t rgba) { setRGBA(rgba); return *this; }
-    bool operator==(uint32_t rgba) const { return this->rgba() == rgba; }
+    Color& operator=(uint32_t  rgba) { setRGBA(rgba); return *this; }
+    bool operator==(uint32_t  rgba) const { return this->rgba() == rgba; }
 
     Color& operator=(const Color& other) = default;
     bool operator==(const Color& other) const { return other.rgba() == rgba(); }
@@ -134,7 +134,7 @@ private:
         m_b{ 1.f },
         m_a{ 1.f };
 
-    uint32_t m_rgba{ UINT32_MAX };
+    uint32_t  m_rgba{ UINT32_MAX };
 };
 
 std::ostream& operator<<(std::ostream& out, const Color& color);

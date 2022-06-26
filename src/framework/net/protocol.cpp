@@ -135,19 +135,19 @@ void Protocol::internalRecvData(uint8_t* buffer, uint16_t size)
 void Protocol::generateXteaKey()
 {
     std::random_device rd;
-    std::uniform_int_distribution<uint32_t> unif;
+    std::uniform_int_distribution<uint32_t > unif;
     std::generate(m_xteaKey.begin(), m_xteaKey.end(), [&unif, &rd] { return unif(rd); });
 }
 
 namespace
 {
-    constexpr uint32_t delta = 0x9E3779B9;
+    constexpr uint32_t  delta = 0x9E3779B9;
 
     template<typename Round>
     void apply_rounds(uint8_t* data, size_t length, Round round)
     {
         for (auto j = 0u; j < length; j += 8) {
-            uint32_t left = data[j + 0] | data[j + 1] << 8u | data[j + 2] << 16u | data[j + 3] << 24u,
+            uint32_t  left = data[j + 0] | data[j + 1] << 8u | data[j + 2] << 16u | data[j + 3] << 24u,
                 right = data[j + 4] | data[j + 5] << 8u | data[j + 6] << 16u | data[j + 7] << 24u;
 
             round(left, right);
@@ -172,8 +172,8 @@ bool Protocol::xteaDecrypt(const InputMessagePtr& inputMessage)
         return false;
     }
 
-    for (uint32_t i = 0, sum = delta << 5, next_sum = sum - delta; i < 32; ++i, sum = next_sum, next_sum -= delta) {
-        apply_rounds(inputMessage->getReadBuffer(), encryptedSize, [&](uint32_t& left, uint32_t& right) {
+    for (uint32_t  i = 0, sum = delta << 5, next_sum = sum - delta; i < 32; ++i, sum = next_sum, next_sum -= delta) {
+        apply_rounds(inputMessage->getReadBuffer(), encryptedSize, [&](uint32_t & left, uint32_t & right) {
             right -= ((left << 4 ^ left >> 5) + left) ^ (sum + m_xteaKey[(sum >> 11) & 3]);
             left -= ((right << 4 ^ right >> 5) + right) ^ (next_sum + m_xteaKey[next_sum & 3]);
         });
@@ -202,8 +202,8 @@ void Protocol::xteaEncrypt(const OutputMessagePtr& outputMessage)
         encryptedSize += n;
     }
 
-    for (uint32_t i = 0, sum = 0, next_sum = sum + delta; i < 32; ++i, sum = next_sum, next_sum += delta) {
-        apply_rounds(outputMessage->getDataBuffer() - 2, encryptedSize, [&](uint32_t& left, uint32_t& right) {
+    for (uint32_t  i = 0, sum = 0, next_sum = sum + delta; i < 32; ++i, sum = next_sum, next_sum += delta) {
+        apply_rounds(outputMessage->getDataBuffer() - 2, encryptedSize, [&](uint32_t & left, uint32_t & right) {
             left += ((right << 4 ^ right >> 5) + right) ^ (sum + m_xteaKey[sum & 3]);
             right += ((left << 4 ^ left >> 5) + left) ^ (next_sum + m_xteaKey[(next_sum >> 11) & 3]);
         });

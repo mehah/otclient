@@ -62,12 +62,12 @@ private:
     void internalRelease();
     void prepare(const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha);
 
-    static uint boundFbo;
+    static uint32_t boundFbo;
 
     Matrix3 m_textureMatrix;
     TexturePtr m_texture, m_screenBackup;
 
-    uint32_t m_fbo, m_prevBoundFbo;
+    uint32_t  m_fbo, m_prevBoundFbo;
 
     CompositionMode m_compositeMode{ CompositionMode::NORMAL };
 
