@@ -69,8 +69,9 @@ void LightView::draw(const Rect& dest, const Rect& src)
             // Empty the lightings references
             if (_clr) { g_drawPool.flush(); _clr = false; }
 
+            g_drawPool.setOpacity(light.opacity);
             g_drawPool.addTexturedRect(Rect(light.pos - m_tileSize * 1.8, size, size), g_sprites.getShadeTexture(), m_globalLightColor);
-            g_drawPool.setOpacity(light.opacity, g_drawPool.size());
+            g_drawPool.resetOpacity();
         }
     }
 
