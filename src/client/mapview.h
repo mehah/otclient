@@ -247,6 +247,7 @@ private:
     bool
         m_refreshVisibleTiles{ true },
         m_refreshVisibleCreatures{ true },
+        m_resetCoveredCache{ true },
         m_shaderSwitchDone{ true },
         m_drawHealthBars{ true },
         m_drawManaBar{ true },

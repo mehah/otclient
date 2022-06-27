@@ -374,7 +374,7 @@ void MapView::updateVisibleTiles()
 
                     if (!_canFloorFade || fadeFinished) {
                         // skip tiles that are completely behind another tile
-                        if (tile->isCompletelyCovered(m_cachedFirstVisibleFloor)) {
+                        if (tile->isCompletelyCovered(m_cachedFirstVisibleFloor, m_resetCoveredCache)) {
                             if (m_floorViewMode != ALWAYS_WITH_TRANSPARENCY || (tilePos.z < cameraPosition.z && tile->isCovered(m_cachedFirstVisibleFloor))) {
                                 addTile = false;
                             }
@@ -400,6 +400,7 @@ void MapView::updateVisibleTiles()
 
     m_refreshVisibleCreatures = false;
     m_refreshVisibleTiles = false;
+    m_resetCoveredCache = false;
 }
 
 void MapView::updateGeometry(const Size& visibleDimension)
@@ -471,10 +472,15 @@ void MapView::onFloorChange(const uint8_t /*floor*/, const uint8_t /*previousFlo
     updateLight();
 }
 
-void MapView::onTileUpdate(const Position&, const ThingPtr& thing, const Otc::Operation)
+void MapView::onTileUpdate(const Position&, const ThingPtr& thing, const Otc::Operation op)
 {
-    if (thing && thing->isCreature())
-        refreshVisibleCreatures();
+    if (thing) {
+        if (thing->isOpaque() && op == Otc::OPERATION_REMOVE)
+            m_resetCoveredCache = true;
+
+        if (thing->isCreature())
+            refreshVisibleCreatures();
+    }
 
     refreshVisibleTiles();
 }

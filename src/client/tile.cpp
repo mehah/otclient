@@ -518,8 +518,11 @@ bool Tile::isWalkable(bool ignoreCreatures)
     return true;
 }
 
-bool Tile::isCompletelyCovered(uint8_t firstFloor)
+bool Tile::isCompletelyCovered(uint8_t firstFloor, bool resetCache)
 {
+    if (resetCache)
+        m_completelyCoveredCache.fill(-1);
+
     if (hasCreature() || !m_walkingCreatures.empty() || hasLight())
         return false;
 

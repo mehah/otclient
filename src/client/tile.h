@@ -104,7 +104,7 @@ public:
     bool hasCreature() { return m_countFlag.hasCreature > 0; }
     bool isTopGround() const { return m_ground && m_ground->isTopGround(); }
     bool isCovered(int8_t firstFloor);
-    bool isCompletelyCovered(uint8_t firstFloor = -1);
+    bool isCompletelyCovered(uint8_t firstFloor, bool resetCache);
 
     bool hasBlockingCreature();
 
