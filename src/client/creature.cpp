@@ -208,18 +208,19 @@ void Creature::drawOutfit(const Rect& destRect, bool resize, const Color color)
     internalDrawOutfit(dest, scaleFactor, true, TextureType::SMOOTH, Otc::South, color);
 }
 
-void Creature::drawInformation(const Rect& parentRect, const Point& dest, float scaleFactor, const Point& drawOffset, bool useGray, const float horizontalStretchFactor, const float verticalStretchFactor, int drawFlags)
+void Creature::drawInformation(const MapRect& mapRect, const Point& dest, float scaleFactor, bool useGray, int drawFlags)
 {
-    if (isDead() || !canBeSeen())
+    if (isDead() || !canBeSeen() || drawFlags == 0)
         return;
 
-    const PointF jumpOffset = getJumpOffset() * scaleFactor;
-    const auto creatureOffset = Point(16 - getDisplacementX(), -getDisplacementY() - 2);
+    const PointF& jumpOffset = getJumpOffset() * scaleFactor;
+    const auto& creatureOffset = Point(16 - getDisplacementX(), -getDisplacementY() - 2);
+    const auto& parentRect = mapRect.rect;
 
-    Point p = dest - drawOffset;
+    Point p = dest - mapRect.drawOffset;
     p += (getDrawOffset() + creatureOffset) * scaleFactor - Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
-    p.x *= horizontalStretchFactor;
-    p.y *= verticalStretchFactor;
+    p.x *= mapRect.horizontalStretchFactor;
+    p.y *= mapRect.verticalStretchFactor;
     p += parentRect.topLeft();
 
     auto fillColor = Color(96, 96, 96);

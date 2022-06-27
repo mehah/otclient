@@ -108,11 +108,7 @@ void Tile::drawCreature(const Point& dest, const MapRect& mapRect, float scaleFa
             const Point& cDest = dest - m_drawElevation * scaleFactor;
 
             thing->draw(cDest, scaleFactor, true, m_highlight, TextureType::NONE, Color::white, lightView);
-
-            if (flags > 0) {
-                thing->static_self_cast<Creature>()->drawInformation(mapRect.rect, cDest, scaleFactor, mapRect.drawOffset, isCovered,
-                                     mapRect.horizontalStretchFactor, mapRect.verticalStretchFactor, flags);
-            }
+            thing->static_self_cast<Creature>()->drawInformation(mapRect, cDest, scaleFactor, isCovered, flags);
         }
     }
 
@@ -122,12 +118,7 @@ void Tile::drawCreature(const Point& dest, const MapRect& mapRect, float scaleFa
             dest.y + ((creature->getPosition().y - m_position.y) * SPRITE_SIZE - m_drawElevation) * scaleFactor
         );
         drawThing(creature, cDest, scaleFactor, true, lightView);
-
-        if (flags > 0) {
-            creature->drawInformation(mapRect.rect, cDest,
-                                     scaleFactor, mapRect.drawOffset, false,
-                                     mapRect.horizontalStretchFactor, mapRect.verticalStretchFactor, flags);
-        }
+        creature->drawInformation(mapRect, cDest, scaleFactor, isCovered, flags);
     }
 }
 
