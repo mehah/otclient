@@ -272,20 +272,13 @@ void Pool::setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool o
 
 void Pool::resetState()
 {
+    clear();
     resetOpacity();
     resetClipRect();
     resetShaderProgram();
     resetBlendEquation();
     resetCompositionMode();
 
-    // clean only processed floors
-    for (int_fast8_t z = -1; ++z <= m_currentFloor;) {
-        for (auto& order : m_objects[z])
-            order.clear();
-    }
-    m_objectsByhash.clear();
-
-    m_currentFloor = 0;
     m_status.second = 0;
 
     m_empty = true;
@@ -300,4 +293,15 @@ bool Pool::hasModification(const bool autoUpdateStatus)
         updateStatus();
 
     return hasModification;
+}
+
+void Pool::clear()
+{
+    // clean only processed floors
+    for (int_fast8_t z = -1; ++z <= m_currentFloor;) {
+        for (auto& order : m_objects[z])
+            order.clear();
+    }
+    m_objectsByhash.clear();
+    m_currentFloor = 0;
 }

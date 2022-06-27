@@ -45,14 +45,7 @@ void Tile::drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor
     }
 }
 
-void Tile::draw(const Point& dest, float scaleFactor, LightView* lightView)
-{
-    drawGround(dest, scaleFactor, lightView);
-    drawBottom(dest, scaleFactor, lightView);
-    drawTop(dest, scaleFactor, lightView);
-}
-
-void Tile::drawGround(const Point& dest, float scaleFactor, LightView* lightView)
+void Tile::draw(const Point& dest, const MapRect& mapRect, float scaleFactor, int flags, LightView* lightView)
 {
     m_drawElevation = 0;
 
@@ -62,10 +55,7 @@ void Tile::drawGround(const Point& dest, float scaleFactor, LightView* lightView
 
         drawThing(thing, dest - m_drawElevation * scaleFactor, scaleFactor, true, lightView);
     }
-}
 
-void Tile::drawBottom(const Point& dest, float scaleFactor, LightView* lightView)
-{
     if (m_countFlag.hasBottomItem) {
         for (const auto& item : m_things) {
             if (!item->isOnBottom()) continue;
@@ -98,31 +88,46 @@ void Tile::drawBottom(const Point& dest, float scaleFactor, LightView* lightView
                 const TilePtr& tile = g_map.getTile(m_position.translated(x, y));
                 if (tile) {
                     const auto& newDest = dest + (Point(x, y) * SPRITE_SIZE) * scaleFactor;
-                    tile->drawCreature(newDest, scaleFactor);
+                    tile->drawCreature(newDest, mapRect, scaleFactor, flags);
                     tile->drawTop(newDest, scaleFactor);
                 }
             }
         }
     }
 
-    drawCreature(dest, scaleFactor, lightView);
+    drawCreature(dest, mapRect, scaleFactor, flags, lightView);
+    drawTop(dest, scaleFactor, lightView);
 }
 
-void Tile::drawCreature(const Point& dest, float scaleFactor, LightView* lightView)
+void Tile::drawCreature(const Point& dest, const MapRect& mapRect, float scaleFactor, int flags, LightView* lightView)
 {
     if (hasCreature()) {
         for (const auto& thing : m_things) {
             if (!thing->isCreature() || thing->static_self_cast<Creature>()->isWalking()) continue;
 
-            drawThing(thing, dest - m_drawElevation * scaleFactor, scaleFactor, true, lightView);
+            const Point& cDest = dest - m_drawElevation * scaleFactor;
+
+            thing->draw(cDest, scaleFactor, true, m_highlight, TextureType::NONE, Color::white, lightView);
+
+            if (flags > 0) {
+                thing->static_self_cast<Creature>()->drawInformation(mapRect.rect, cDest, scaleFactor, mapRect.drawOffset, false,
+                                     mapRect.horizontalStretchFactor, mapRect.verticalStretchFactor, flags);
+            }
         }
     }
 
     for (const auto& creature : m_walkingCreatures) {
-        drawThing(creature, Point(
+        const auto& cDest = Point(
             dest.x + ((creature->getPosition().x - m_position.x) * SPRITE_SIZE - m_drawElevation) * scaleFactor,
             dest.y + ((creature->getPosition().y - m_position.y) * SPRITE_SIZE - m_drawElevation) * scaleFactor
-        ), scaleFactor, true, lightView);
+        );
+        drawThing(creature, cDest, scaleFactor, true, lightView);
+
+        if (flags > 0) {
+            creature->drawInformation(mapRect.rect, cDest,
+                                     scaleFactor, mapRect.drawOffset, false,
+                                     mapRect.horizontalStretchFactor, mapRect.verticalStretchFactor, flags);
+        }
     }
 }
 

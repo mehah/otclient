@@ -28,7 +28,7 @@
 #include "mapview.h"
 #include <framework/luaengine/luaobject.h>
 
-enum tileflags_t : uint32_t 
+enum tileflags_t : uint32_t
 {
     TILESTATE_NONE = 0,
     TILESTATE_PROTECTIONZONE = 1 << 0,
@@ -56,7 +56,7 @@ class Tile : public LuaObject
 public:
     Tile(const Position& position);
 
-    void draw(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
+    void draw(const Point& dest, const MapRect& mapRect, float scaleFactor, int flags, LightView* lightView = nullptr);
 
     void clean();
 
@@ -184,9 +184,7 @@ private:
     };
 
     void drawTop(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
-    void drawGround(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
-    void drawBottom(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
-    void drawCreature(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
+    void drawCreature(const Point& dest, const MapRect& mapRect, float scaleFactor, int flags, LightView* lightView = nullptr);
     void drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor, bool animate, LightView* lightView);
 
     void checkTranslucentLight();

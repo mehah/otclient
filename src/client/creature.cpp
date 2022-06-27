@@ -210,6 +210,9 @@ void Creature::drawOutfit(const Rect& destRect, bool resize, const Color color)
 
 void Creature::drawInformation(const Rect& parentRect, const Point& dest, float scaleFactor, const Point& drawOffset, bool useGray, const float horizontalStretchFactor, const float verticalStretchFactor, int drawFlags)
 {
+    if (isDead() || !canBeSeen())
+        return;
+
     const PointF jumpOffset = getJumpOffset() * scaleFactor;
     const auto creatureOffset = Point(16 - getDisplacementX(), -getDisplacementY() - 2);
 
@@ -254,50 +257,55 @@ void Creature::drawInformation(const Rect& parentRect, const Point& dest, float 
     Rect healthRect = backgroundRect.expanded(-1);
     healthRect.setWidth((m_healthPercent / 100.0) * 25);
 
-    if (drawFlags & Otc::DrawBars) {
-        g_drawPool.addFilledRect(backgroundRect, Color::black);
-        g_drawPool.addFilledRect(healthRect, fillColor);
+    g_drawPool.select(PoolType::CREATURE_INFORMATION);
+    {
+        if (drawFlags & Otc::DrawBars) {
+            g_drawPool.addFilledRect(backgroundRect, Color::black);
+            g_drawPool.addFilledRect(healthRect, fillColor);
 
-        if (drawFlags & Otc::DrawManaBar && isLocalPlayer()) {
-            const LocalPlayerPtr player = g_game.getLocalPlayer();
-            if (player) {
-                backgroundRect.moveTop(backgroundRect.bottom());
+            if (drawFlags & Otc::DrawManaBar && isLocalPlayer()) {
+                const LocalPlayerPtr player = g_game.getLocalPlayer();
+                if (player) {
+                    backgroundRect.moveTop(backgroundRect.bottom());
 
-                g_drawPool.addFilledRect(backgroundRect, Color::black);
+                    g_drawPool.addFilledRect(backgroundRect, Color::black);
 
-                Rect manaRect = backgroundRect.expanded(-1);
-                const double maxMana = player->getMaxMana();
-                manaRect.setWidth((maxMana ? player->getMana() / maxMana : 1) * 25);
+                    Rect manaRect = backgroundRect.expanded(-1);
+                    const double maxMana = player->getMaxMana();
+                    manaRect.setWidth((maxMana ? player->getMana() / maxMana : 1) * 25);
 
-                g_drawPool.addFilledRect(manaRect, Color::blue);
+                    g_drawPool.addFilledRect(manaRect, Color::blue);
+                }
             }
         }
-    }
 
-    if (drawFlags & Otc::DrawNames) {
-        m_nameCache.draw(textRect, fillColor);
-    }
+        if (drawFlags & Otc::DrawNames) {
+            m_nameCache.draw(textRect, fillColor);
+        }
 
-    if (m_skull != Otc::SkullNone && m_skullTexture) {
-        const auto skullRect = Rect(backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5, m_skullTexture->getSize());
-        g_drawPool.addTexturedRect(skullRect, m_skullTexture);
+        if (m_skull != Otc::SkullNone && m_skullTexture) {
+            const auto skullRect = Rect(backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5, m_skullTexture->getSize());
+            g_drawPool.addTexturedRect(skullRect, m_skullTexture);
+        }
+        if (m_shield != Otc::ShieldNone && m_shieldTexture && m_showShieldTexture) {
+            const auto shieldRect = Rect(backgroundRect.x() + 13.5, backgroundRect.y() + 5, m_shieldTexture->getSize());
+            g_drawPool.addTexturedRect(shieldRect, m_shieldTexture);
+        }
+        if (m_emblem != Otc::EmblemNone && m_emblemTexture) {
+            const auto emblemRect = Rect(backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 16, m_emblemTexture->getSize());
+            g_drawPool.addTexturedRect(emblemRect, m_emblemTexture);
+        }
+        if (m_type != Proto::CreatureTypeUnknown && m_typeTexture) {
+            const auto typeRect = Rect(backgroundRect.x() + 13.5 + 12 + 12, backgroundRect.y() + 16, m_typeTexture->getSize());
+            g_drawPool.addTexturedRect(typeRect, m_typeTexture);
+        }
+        if (m_icon != Otc::NpcIconNone && m_iconTexture) {
+            const auto iconRect = Rect(backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5, m_iconTexture->getSize());
+            g_drawPool.addTexturedRect(iconRect, m_iconTexture);
+        }
     }
-    if (m_shield != Otc::ShieldNone && m_shieldTexture && m_showShieldTexture) {
-        const auto shieldRect = Rect(backgroundRect.x() + 13.5, backgroundRect.y() + 5, m_shieldTexture->getSize());
-        g_drawPool.addTexturedRect(shieldRect, m_shieldTexture);
-    }
-    if (m_emblem != Otc::EmblemNone && m_emblemTexture) {
-        const auto emblemRect = Rect(backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 16, m_emblemTexture->getSize());
-        g_drawPool.addTexturedRect(emblemRect, m_emblemTexture);
-    }
-    if (m_type != Proto::CreatureTypeUnknown && m_typeTexture) {
-        const auto typeRect = Rect(backgroundRect.x() + 13.5 + 12 + 12, backgroundRect.y() + 16, m_typeTexture->getSize());
-        g_drawPool.addTexturedRect(typeRect, m_typeTexture);
-    }
-    if (m_icon != Otc::NpcIconNone && m_iconTexture) {
-        const auto iconRect = Rect(backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5, m_iconTexture->getSize());
-        g_drawPool.addTexturedRect(iconRect, m_iconTexture);
-    }
+    // Go back to use map pool
+    g_drawPool.select(PoolType::MAP);
 }
 
 void Creature::turn(Otc::Direction direction)

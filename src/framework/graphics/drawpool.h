@@ -34,6 +34,7 @@ public:
     template <class T>
     T* get(const PoolType type) { return static_cast<T*>(m_pools[static_cast<uint8_t>(type)]); }
 
+    void select(PoolType type) { m_currentPool = get<Pool>(type); }
     void use(PoolType type);
     void use(PoolType type, const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha);
 

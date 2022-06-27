@@ -35,6 +35,13 @@ struct AwareRange
     uint8_t vertical() { return top + bottom + 1; }
 };
 
+struct MapRect
+{
+    Rect rect, srcRect;
+    Point drawOffset;
+    float horizontalStretchFactor, verticalStretchFactor;
+};
+
 // @bindclass
 class MapView : public LuaObject
 {
@@ -168,13 +175,6 @@ private:
         TexturePtr texture;
     };
 
-    struct RectCache
-    {
-        Rect rect, srcRect;
-        Point drawOffset;
-        float horizontalStretchFactor, verticalStretchFactor;
-    };
-
     void updateGeometry(const Size& visibleDimension);
     void updateVisibleTiles();
     void refreshVisibleTiles() { m_refreshVisibleTiles = true; }
@@ -271,7 +271,7 @@ private:
     LightViewPtr m_lightView;
     CreaturePtr m_followingCreature;
 
-    RectCache m_rectCache;
+    MapRect m_rectCache;
     FloorViewMode m_floorViewMode{ NORMAL };
 
     Timer m_fadeTimer;

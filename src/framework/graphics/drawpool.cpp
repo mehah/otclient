@@ -83,6 +83,8 @@ void DrawPool::draw()
         } else for (auto& obj : pool->m_objects[0][static_cast<int>(Pool::DrawOrder::FIRST)]) {
             drawObject(obj);
         }
+
+        pool->clear();
     }
 }
 
@@ -219,5 +221,10 @@ void DrawPool::use(const PoolType type, const Rect& dest, const Rect& src, const
     if (m_currentPool->hasFrameBuffer()) {
         m_currentPool->toPoolFramed()
             ->m_framebuffer->prepare(dest, src, colorClear);
+    }
+
+    // when the selected pool is MAP, reset the creature information state.
+    if (type == PoolType::MAP) {
+        get<Pool>(PoolType::CREATURE_INFORMATION)->resetState();
     }
 }

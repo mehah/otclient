@@ -174,7 +174,13 @@ private:
     void resetCompositionMode() { m_state.compositionMode = CompositionMode::NORMAL; }
     void resetBlendEquation() { m_state.blendEquation = BlendEquation::ADD; }
 
-    void flush() { m_objectsByhash.clear(); ++m_currentFloor; }
+    void clear();
+    void flush()
+    {
+        m_objectsByhash.clear();
+        if (m_currentFloor < ARR_MAX_Z - 1)
+            ++m_currentFloor;
+    }
 
     virtual bool hasFrameBuffer() const { return false; };
     virtual PoolFramed* toPoolFramed() { return nullptr; }
