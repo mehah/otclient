@@ -127,7 +127,7 @@ public:
 
     void resetLastCamera() { m_lastCameraPosition = {}; }
 
-    std::vector<CreaturePtr>& getVisibleCreatures() { return m_visibleCreatures; }
+    std::vector<CreaturePtr> getVisibleCreatures();
     std::vector<CreaturePtr> getSpectators(const Position& centerPos, bool multiFloor);
     std::vector<CreaturePtr> getSightSpectators(const Position& centerPos, bool multiFloor);
 
@@ -178,7 +178,6 @@ private:
     void updateGeometry(const Size& visibleDimension);
     void updateVisibleTiles();
     void refreshVisibleTiles() { m_refreshVisibleTiles = true; }
-    void refreshVisibleCreatures() { m_refreshVisibleCreatures = true; }
 
     uint8_t calcFirstVisibleFloor(bool checkLimitsFloorsView);
     uint8_t calcLastVisibleFloor();
@@ -186,7 +185,6 @@ private:
     void updateLight();
     void updateViewportDirectionCache();
     void drawFloor();
-    void drawCreatureInformation();
     void drawText();
 
     void updateViewport(const Otc::Direction dir = Otc::InvalidDirection) { m_viewport = m_viewPortDirection[dir]; }
@@ -246,7 +244,6 @@ private:
 
     bool
         m_refreshVisibleTiles{ true },
-        m_refreshVisibleCreatures{ true },
         m_resetCoveredCache{ true },
         m_shaderSwitchDone{ true },
         m_drawHealthBars{ true },
@@ -261,8 +258,6 @@ private:
         m_drawViewportEdge{ false },
         m_drawHighlightTarget{ false },
         m_shiftPressed{ false };
-
-    std::vector<CreaturePtr> m_visibleCreatures;
 
     std::array<MapObject, MAX_Z + 1> m_cachedVisibleTiles;
 

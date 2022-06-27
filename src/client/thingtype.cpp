@@ -713,12 +713,14 @@ void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPatte
     if (!texture)
         return;
 
+    const auto& textureRectList = m_texturesFramesRects[animationPhase];
+
     const uint32_t frameIndex = getTextureIndex(layer, xPattern, yPattern, zPattern);
-    if (frameIndex >= m_texturesFramesRects[animationPhase].size())
+    if (frameIndex >= textureRectList.size())
         return;
 
-    const Point textureOffset = m_texturesFramesOffsets[animationPhase][frameIndex];
-    const Rect textureRect = m_texturesFramesRects[animationPhase][frameIndex];
+    const Point& textureOffset = m_texturesFramesOffsets[animationPhase][frameIndex];
+    const Rect& textureRect = textureRectList[frameIndex];
 
     const Rect screenRect(dest + (textureOffset - m_displacement - (m_size.toPoint() - Point(1)) * SPRITE_SIZE) * scaleFactor, textureRect.size() * scaleFactor);
 
@@ -898,10 +900,10 @@ Size ThingType::getBestTextureDimension(int w, int h, int count)
 uint32_t ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int a)
 {
     uint32_t index = ((((((a % m_animationPhases)
-                      * m_numPatternZ + z)
-                     * m_numPatternY + y)
-                    * m_numPatternX + x)
-                   * m_layers + l)
+                          * m_numPatternZ + z)
+                         * m_numPatternY + y)
+                        * m_numPatternX + x)
+                       * m_layers + l)
                   * m_size.height() + h)
         * m_size.width() + w;
 

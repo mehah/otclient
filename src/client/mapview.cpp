@@ -272,10 +272,6 @@ void MapView::updateVisibleTiles()
         m_cachedVisibleTiles[m_floorMin].clear();
     } while (++m_floorMin <= m_floorMax);
 
-    if (m_refreshVisibleCreatures) {
-        m_visibleCreatures.clear();
-    }
-
     if (m_floorViewMode == LOCKED) {
         m_lockedFirstVisibleFloor = cameraPosition.z;
     } else {
@@ -363,13 +359,6 @@ void MapView::updateVisibleTiles()
                     if (!tile->isDrawable())
                         continue;
 
-                    if (m_refreshVisibleCreatures && isInRange(tilePos)) {
-                        const auto& tileCreatures = tile->getCreatures();
-                        if (!tileCreatures.empty()) {
-                            m_visibleCreatures.insert(m_visibleCreatures.end(), tileCreatures.rbegin(), tileCreatures.rend());
-                        }
-                    }
-
                     bool addTile = true;
 
                     if (!_canFloorFade || fadeFinished) {
@@ -398,7 +387,6 @@ void MapView::updateVisibleTiles()
         }
     }
 
-    m_refreshVisibleCreatures = false;
     m_refreshVisibleTiles = false;
     m_resetCoveredCache = false;
 }
@@ -437,7 +425,6 @@ void MapView::updateGeometry(const Size& visibleDimension)
     updateViewport();
 
     refreshVisibleTiles();
-    refreshVisibleCreatures();
 }
 
 void MapView::onCameraMove(const Point& /*offset*/)
@@ -468,7 +455,6 @@ void MapView::updateLight()
 
 void MapView::onFloorChange(const uint8_t /*floor*/, const uint8_t /*previousFloor*/)
 {
-    refreshVisibleCreatures();
     updateLight();
 }
 
@@ -477,9 +463,6 @@ void MapView::onTileUpdate(const Position&, const ThingPtr& thing, const Otc::Op
     if (thing) {
         if (thing->isOpaque() && op == Otc::OPERATION_REMOVE)
             m_resetCoveredCache = true;
-
-        if (thing->isCreature())
-            refreshVisibleCreatures();
     }
 
     refreshVisibleTiles();
@@ -845,6 +828,20 @@ void MapView::updateViewportDirectionCache()
                 break;
         }
     }
+}
+
+std::vector<CreaturePtr> MapView::getVisibleCreatures()
+{
+    std::vector<CreaturePtr> list;
+
+    for (const auto& tile : m_cachedVisibleTiles[getCameraPosition().z].tiles) {
+        const auto& tileCreatures = tile->getCreatures();
+        if (!tileCreatures.empty()) {
+            list.insert(list.end(), tileCreatures.rbegin(), tileCreatures.rend());
+        }
+    }
+
+    return list;
 }
 
 std::vector<CreaturePtr> MapView::getSightSpectators(const Position& centerPos, bool multiFloor)
