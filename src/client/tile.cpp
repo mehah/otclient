@@ -45,7 +45,7 @@ void Tile::drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor
     }
 }
 
-void Tile::draw(const Point& dest, const MapRect& mapRect, float scaleFactor, int flags, LightView* lightView)
+void Tile::draw(const Point& dest, const MapRect& mapRect, float scaleFactor, int flags, bool isCovered, LightView* lightView)
 {
     m_drawElevation = 0;
 
@@ -88,18 +88,18 @@ void Tile::draw(const Point& dest, const MapRect& mapRect, float scaleFactor, in
                 const TilePtr& tile = g_map.getTile(m_position.translated(x, y));
                 if (tile) {
                     const auto& newDest = dest + (Point(x, y) * SPRITE_SIZE) * scaleFactor;
-                    tile->drawCreature(newDest, mapRect, scaleFactor, flags);
+                    tile->drawCreature(newDest, mapRect, scaleFactor, isCovered, 0);
                     tile->drawTop(newDest, scaleFactor);
                 }
             }
         }
     }
 
-    drawCreature(dest, mapRect, scaleFactor, flags, lightView);
+    drawCreature(dest, mapRect, scaleFactor, flags, isCovered, lightView);
     drawTop(dest, scaleFactor, lightView);
 }
 
-void Tile::drawCreature(const Point& dest, const MapRect& mapRect, float scaleFactor, int flags, LightView* lightView)
+void Tile::drawCreature(const Point& dest, const MapRect& mapRect, float scaleFactor, int flags, bool isCovered, LightView* lightView)
 {
     if (hasCreature()) {
         for (const auto& thing : m_things) {
@@ -110,7 +110,7 @@ void Tile::drawCreature(const Point& dest, const MapRect& mapRect, float scaleFa
             thing->draw(cDest, scaleFactor, true, m_highlight, TextureType::NONE, Color::white, lightView);
 
             if (flags > 0) {
-                thing->static_self_cast<Creature>()->drawInformation(mapRect.rect, cDest, scaleFactor, mapRect.drawOffset, false,
+                thing->static_self_cast<Creature>()->drawInformation(mapRect.rect, cDest, scaleFactor, mapRect.drawOffset, isCovered,
                                      mapRect.horizontalStretchFactor, mapRect.verticalStretchFactor, flags);
             }
         }

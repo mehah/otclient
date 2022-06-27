@@ -56,7 +56,7 @@ class Tile : public LuaObject
 public:
     Tile(const Position& position);
 
-    void draw(const Point& dest, const MapRect& mapRect, float scaleFactor, int flags, LightView* lightView = nullptr);
+    void draw(const Point& dest, const MapRect& mapRect, float scaleFactor, int flags, bool isCovered, LightView* lightView = nullptr);
 
     void clean();
 
@@ -184,7 +184,7 @@ private:
     };
 
     void drawTop(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
-    void drawCreature(const Point& dest, const MapRect& mapRect, float scaleFactor, int flags, LightView* lightView = nullptr);
+    void drawCreature(const Point& dest, const MapRect& mapRect, float scaleFactor, int flags, bool isCovered, LightView* lightView = nullptr);
     void drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor, bool animate, LightView* lightView);
 
     void checkTranslucentLight();

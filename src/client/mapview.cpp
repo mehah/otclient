@@ -187,7 +187,7 @@ void MapView::drawFloor()
                     g_drawPool.setOpacity(inRange ? .16 : .7);
                 }
 
-                tile->draw(transformPositionTo2D(tile->getPosition(), cameraPosition), m_rectCache, m_scaleFactor, flags, lightView);
+                tile->draw(transformPositionTo2D(tile->getPosition(), cameraPosition), m_rectCache, m_scaleFactor, flags, isCovered, lightView);
 
                 if (alwaysTransparent)
                     g_drawPool.resetOpacity();
