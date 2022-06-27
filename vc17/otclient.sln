@@ -7,32 +7,32 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "otclient", "otclient.vcxpro
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Win32 = Debug|Win32
 		Debug|x64 = Debug|x64
-		Release - GIT Version|Win32 = Release - GIT Version|Win32
+		Debug|x86 = Debug|x86
 		Release - GIT Version|x64 = Release - GIT Version|x64
-		Release - Static|Win32 = Release - Static|Win32
+		Release - GIT Version|x86 = Release - GIT Version|x86
 		Release - Static|x64 = Release - Static|x64
-		Release|Win32 = Release|Win32
+		Release - Static|x86 = Release - Static|x86
 		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Debug|Win32.ActiveCfg = Debug|Win32
-		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Debug|Win32.Build.0 = Debug|Win32
 		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Debug|x64.ActiveCfg = Debug|x64
 		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Debug|x64.Build.0 = Debug|x64
-		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Release - GIT Version|Win32.ActiveCfg = Release - GIT Version|Win32
-		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Release - GIT Version|Win32.Build.0 = Release - GIT Version|Win32
+		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Debug|x86.ActiveCfg = Debug|x64
+		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Debug|x86.Build.0 = Debug|x64
 		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Release - GIT Version|x64.ActiveCfg = Release - GIT Version|x64
 		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Release - GIT Version|x64.Build.0 = Release - GIT Version|x64
-		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Release - Static|Win32.ActiveCfg = Static|Win32
-		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Release - Static|Win32.Build.0 = Static|Win32
+		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Release - GIT Version|x86.ActiveCfg = Release - GIT Version|Win32
+		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Release - GIT Version|x86.Build.0 = Release - GIT Version|Win32
 		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Release - Static|x64.ActiveCfg = Debug|x64
 		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Release - Static|x64.Build.0 = Debug|x64
-		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Release|Win32.ActiveCfg = Release|Win32
-		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Release|Win32.Build.0 = Release|Win32
+		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Release - Static|x86.ActiveCfg = Static|Win32
+		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Release - Static|x86.Build.0 = Static|Win32
 		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Release|x64.ActiveCfg = Release|x64
 		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Release|x64.Build.0 = Release|x64
+		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Release|x86.ActiveCfg = Release|Win32
+		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

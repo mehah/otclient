@@ -35,11 +35,12 @@ struct AwareRange
     uint8_t vertical() { return top + bottom + 1; }
 };
 
-struct MapRect
+struct MapPosInfo
 {
     Rect rect, srcRect;
     Point drawOffset;
-    float horizontalStretchFactor, verticalStretchFactor;
+    float horizontalStretchFactor,
+        verticalStretchFactor;
 };
 
 // @bindclass
@@ -177,7 +178,8 @@ private:
 
     void updateGeometry(const Size& visibleDimension);
     void updateVisibleTiles();
-    void refreshVisibleTiles() { m_refreshVisibleTiles = true; }
+    void requestUpdateVisibleTiles() { m_updateVisibleTiles = true; }
+    void requestUpdateMapPosInfo() { m_posInfo.rect = {}; }
 
     uint8_t calcFirstVisibleFloor(bool checkLimitsFloorsView);
     uint8_t calcLastVisibleFloor();
@@ -243,7 +245,7 @@ private:
     AwareRange m_viewport;
 
     bool
-        m_refreshVisibleTiles{ true },
+        m_updateVisibleTiles{ true },
         m_resetCoveredCache{ true },
         m_shaderSwitchDone{ true },
         m_drawHealthBars{ true },
@@ -267,7 +269,7 @@ private:
     LightViewPtr m_lightView;
     CreaturePtr m_followingCreature;
 
-    MapRect m_rectCache;
+    MapPosInfo m_posInfo;
     FloorViewMode m_floorViewMode{ NORMAL };
 
     Timer m_fadeTimer;

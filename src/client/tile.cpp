@@ -48,7 +48,7 @@ void Tile::drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor
     }
 }
 
-void Tile::draw(const Point& dest, const MapRect& mapRect, float scaleFactor, int flags, bool isCovered, LightView* lightView)
+void Tile::draw(const Point& dest, const MapPosInfo& mapRect, float scaleFactor, int flags, bool isCovered, LightView* lightView)
 {
     m_drawElevation = 0;
 
@@ -102,7 +102,7 @@ void Tile::draw(const Point& dest, const MapRect& mapRect, float scaleFactor, in
     drawTop(dest, scaleFactor, lightView);
 }
 
-void Tile::drawCreature(const Point& dest, const MapRect& mapRect, float scaleFactor, int flags, bool isCovered, LightView* lightView)
+void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, float scaleFactor, int flags, bool isCovered, LightView* lightView)
 {
     if (hasCreature()) {
         for (const auto& thing : m_things) {

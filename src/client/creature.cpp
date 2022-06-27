@@ -208,7 +208,7 @@ void Creature::drawOutfit(const Rect& destRect, bool resize, const Color color)
     internalDrawOutfit(dest, scaleFactor, true, TextureType::SMOOTH, Otc::South, color);
 }
 
-void Creature::drawInformation(const MapRect& mapRect, const Point& dest, float scaleFactor, bool useGray, int drawFlags)
+void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, float scaleFactor, bool useGray, int drawFlags)
 {
     if (isDead() || !canBeSeen() || drawFlags == 0)
         return;
