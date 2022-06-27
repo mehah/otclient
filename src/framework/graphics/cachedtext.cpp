@@ -43,7 +43,7 @@ void CachedText::draw(const Rect& rect, const Color color)
 void CachedText::update()
 {
     if (m_font) {
-        m_glyphsPositions = m_font->calculateGlyphsPositions(m_text, Fw::AlignTopLeft, &m_textSize);
+        m_glyphsPositions = m_font->calculateGlyphsPositions(m_text, m_align, &m_textSize);
     }
 
     m_textScreenCoords = {};
