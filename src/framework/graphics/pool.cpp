@@ -98,7 +98,7 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
         return;
     }
 
-    m_currentOrder = static_cast<uint8_t>(drawBuffer ? drawBuffer->m_order : Pool::DrawOrder::FOURTH);
+    m_currentOrder = static_cast<uint8_t>(drawBuffer ? drawBuffer->m_order : Pool::DrawOrder::THIRD);
 
     auto& list = m_objects[m_currentFloor][m_currentOrder];
     if (!list.empty()) {

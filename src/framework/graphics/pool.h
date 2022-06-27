@@ -48,11 +48,11 @@ public:
     enum class DrawOrder
     {
         NONE = -1,
-        FIRST,
-        SECOND,
-        THIRD,
-        FOURTH,
-        FIFTH,
+        FIRST,  // GROUND
+        SECOND, // BORDER
+        THIRD,  // BOTTOM & TOP
+        FOURTH, // TOP ~ TOP
+        FIFTH,  // ABOVE ALL - MISSILE
         LAST
     };
 
