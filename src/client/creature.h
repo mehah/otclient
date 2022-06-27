@@ -94,7 +94,6 @@ public:
     uint8_t getIcon() { return m_icon; }
     bool isPassable() { return m_passable; }
     uint64_t getStepDuration(bool ignoreDiagonal = false, Otc::Direction dir = Otc::InvalidDirection);
-    Point getDrawOffset();
     Point getWalkOffset() { return m_walkOffset; }
     PointF getJumpOffset() { return m_jumpOffset; }
     Position getLastStepFromPosition() { return m_lastStepFromPosition; }

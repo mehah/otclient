@@ -214,11 +214,14 @@ void Creature::drawInformation(const MapRect& mapRect, const Point& dest, float 
         return;
 
     const PointF& jumpOffset = getJumpOffset() * scaleFactor;
-    const auto& creatureOffset = Point(16 - getDisplacementX(), -getDisplacementY() - 2);
     const auto& parentRect = mapRect.rect;
+    auto creatureOffset = Point(16 - getDisplacementX(), -getDisplacementY() - 2);
+    if (m_walking)
+        creatureOffset += m_walkOffset;
 
     Point p = dest - mapRect.drawOffset;
-    p += (getDrawOffset() + creatureOffset) * scaleFactor - Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
+
+    p += creatureOffset * scaleFactor - Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
     p.x *= mapRect.horizontalStretchFactor;
     p.y *= mapRect.verticalStretchFactor;
     p += parentRect.topLeft();
@@ -827,19 +830,6 @@ void Creature::updateShield()
         }, SHIELD_BLINK_TICKS);
     } else if (!m_shieldBlink)
         m_showShieldTexture = true;
-}
-
-Point Creature::getDrawOffset()
-{
-    Point drawOffset;
-    if (m_walking) {
-        if (m_walkingTile)
-            drawOffset -= Point(m_walkingTile->getDrawElevation());
-        drawOffset += m_walkOffset;
-    } else if (const TilePtr& tile = getTile())
-        drawOffset -= Point(tile->getDrawElevation());
-
-    return drawOffset;
 }
 
 uint64_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)

@@ -32,7 +32,10 @@
 
 #include <ranges>
 
-Tile::Tile(const Position& position) : m_position(position) {}
+Tile::Tile(const Position& position) : m_position(position)
+{
+    m_completelyCoveredCache.fill(-1);
+}
 
 void Tile::drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor, bool animate, LightView* lightView)
 {
@@ -515,6 +518,19 @@ bool Tile::isWalkable(bool ignoreCreatures)
     return true;
 }
 
+bool Tile::isCompletelyCovered(uint8_t firstFloor)
+{
+    if (hasCreature() || !m_walkingCreatures.empty() || hasLight())
+        return false;
+
+    auto& is = m_completelyCoveredCache[firstFloor];
+    if (is == -1) {
+        is = g_map.isCompletelyCovered(m_position, firstFloor);
+    }
+
+    return is == 1;
+}
+
 bool Tile::isCovered(int8_t firstFloor)
 {
     return firstFloor == m_lastFloorMin ? m_covered :
@@ -712,7 +728,7 @@ void Tile::analyzeThing(const ThingPtr& thing, bool add)
     if (thing->blockProjectile())
         m_countFlag.blockProjectile += value;
 
-    m_countFlag.totalElevation += thing->getElevation() * value;
+    m_totalElevation += thing->getElevation() * value;
 
     if (thing->isFullGround())
         m_countFlag.fullGround += value;

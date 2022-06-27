@@ -104,6 +104,7 @@ public:
     bool hasCreature() { return m_countFlag.hasCreature > 0; }
     bool isTopGround() const { return m_ground && m_ground->isTopGround(); }
     bool isCovered(int8_t firstFloor);
+    bool isCompletelyCovered(uint8_t firstFloor = -1);
 
     bool hasBlockingCreature();
 
@@ -130,7 +131,6 @@ public:
     bool canRender(bool drawViewportEdge, const Position& cameraPosition, AwareRange viewPort, LightView* lightView);
     bool canErase() { return m_walkingCreatures.empty() && m_effects.empty() && isEmpty() && m_flags == 0 && m_minimapColor == 0; }
 
-    int getElevation() const { return m_countFlag.elevation; }
     bool hasElevation(int elevation = 1) { return m_countFlag.elevation >= elevation; }
     void overwriteMinimapColor(uint8_t color) { m_minimapColor = color; }
 
@@ -161,7 +161,6 @@ private:
             notPathable{ 0 },
             notSingleDimension{ 0 },
             blockProjectile{ 0 },
-            totalElevation{ 0 },
             hasDisplacement{ 0 },
             isNotPathable{ 0 },
             elevation{ 0 },
@@ -194,7 +193,11 @@ private:
 
     uint8_t m_drawElevation{ 0 },
         m_minimapColor{ 0 },
-        m_lastFloorMin{ 0 };
+        m_totalElevation{ 0 };
+
+    int8_t m_lastFloorMin{ -1 };
+
+    std::array<int8_t, MAX_Z + 1> m_completelyCoveredCache;
 
     uint32_t  m_flags{ 0 }, m_houseId{ 0 };
 

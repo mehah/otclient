@@ -339,6 +339,9 @@ void MapView::updateVisibleTiles()
 
     m_lastCameraPosition = cameraPosition;
 
+    const bool _canFloorFade = canFloorFade();
+    const bool fadeFinished = getFadeLevel(m_cachedFirstVisibleFloor) == 1.f;
+
     // cache visible tiles in draw order
     // draw from last floor (the lower) to first floor (the higher)
     const uint32_t  numDiagonals = m_drawDimension.width() + m_drawDimension.height() - 1;
@@ -367,15 +370,29 @@ void MapView::updateVisibleTiles()
                         }
                     }
 
-                    floor.tiles.emplace_back(tile);
+                    bool addTile = true;
+
+                    if (!_canFloorFade || fadeFinished) {
+                        // skip tiles that are completely behind another tile
+                        if (tile->isCompletelyCovered(m_cachedFirstVisibleFloor)) {
+                            if (m_floorViewMode != ALWAYS_WITH_TRANSPARENCY || (tilePos.z < cameraPosition.z && tile->isCovered(m_cachedFirstVisibleFloor))) {
+                                addTile = false;
+                            }
+                        }
+                    }
+
+                    if (addTile)
+                        floor.tiles.emplace_back(tile);
 
                     if (isDrawingLights() && tile->canShade(this))
                         floor.shades.emplace_back(tile);
 
-                    if (iz < m_floorMin)
-                        m_floorMin = iz;
-                    else if (iz > m_floorMax)
-                        m_floorMax = iz;
+                    if (addTile || !floor.shades.empty()) {
+                        if (iz < m_floorMin)
+                            m_floorMin = iz;
+                        else if (iz > m_floorMax)
+                            m_floorMax = iz;
+                    }
                 }
             }
         }
