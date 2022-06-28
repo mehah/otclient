@@ -110,7 +110,7 @@ private:
     void recacheGlyphs() { m_glyphsMustRecache = true; }
 
     Rect m_drawArea;
-    size_t m_cursorPos;
+    size_t m_cursorPos{ 0 };
     Point m_textVirtualOffset;
     Size m_textVirtualSize;
     Size m_textTotalSize;

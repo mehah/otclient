@@ -53,54 +53,76 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
        m_state.clipRect, texture, m_state.shaderProgram
     };
 
+    m_empty = false;
+
     size_t stateHash = 0, methodHash = 0;
     updateHash(state, method, stateHash, methodHash);
 
     if (m_alwaysGroupDrawings || drawBuffer && drawBuffer->m_agroup) {
         if (auto it = m_objectsByhash.find(stateHash); it != m_objectsByhash.end()) {
             const auto& buffer = it->second.buffer;
-            if (!buffer->isValid())
-                return;
 
-            auto& hashList = buffer->m_hashs;
-            if (++buffer->m_i == hashList.size()) {
-                hashList.push_back(methodHash);
-                if (coordsBuffer)
-                    buffer->getCoords()->append(coordsBuffer.get());
-                else
-                    addCoords(method, *buffer->m_coords.get(), DrawMode::TRIANGLES);
-            } else if (hashList[buffer->m_i] != methodHash) {
-                buffer->invalidate();
+            if (!buffer->isTemporary()) {
+                if (!buffer->isValid())
+                    return;
+
+                auto& hashList = buffer->m_hashs;
+
+                // condition to check if the buffer has been reset, if so, add the vertex again.
+                if (++buffer->m_i == hashList.size()) {
+                    hashList.push_back(methodHash);
+                } else {
+                    // checks if the vertex to be added is in the same position,
+                    // otherwise the buffer will be invalidated to recreate the cache.
+                    if (hashList[buffer->m_i] != methodHash)
+                        buffer->invalidate();
+                    return;
+                }
             }
+
+            if (coordsBuffer)
+                buffer->getCoords()->append(coordsBuffer.get());
+            else
+                addCoords(method, *buffer->m_coords.get(), DrawMode::TRIANGLES);
 
             return;
         }
 
+        bool addCoord = false;
+
         const DrawBufferPtr& buffer = drawBuffer ? drawBuffer : std::make_shared<DrawBuffer>(Pool::DrawOrder::FIRST);
-        if (buffer->m_hashs.empty()) {
-            buffer->m_hashs.push_back(methodHash);
+        if (drawBuffer) {
+            if (!drawBuffer->isValid()) {
+                drawBuffer->getCoords()->clear();
+                drawBuffer->m_hashs.clear();
+                drawBuffer->m_hashs.push_back(methodHash);
+                addCoord = true;
+            }
+            drawBuffer->m_i = 0; // reset identifier to say it is valid.
+        } else {
+            buffer->m_i = -2; // identifier to say it is a temporary buffer.
+            addCoord = true;
+        }
 
+        if (addCoord) {
             auto* coords = buffer->getCoords();
-            coords->clear();
-
             if (coordsBuffer)
                 coords->append(coordsBuffer.get());
             else
                 addCoords(method, *coords, DrawMode::TRIANGLES);
         }
-        buffer->m_i = 0;
 
         m_objectsByhash.emplace(stateHash,
               m_objects[m_currentFloor][m_currentOrder = static_cast<uint8_t>(buffer->m_order)]
                        .emplace_back(state, buffer));
 
-        m_empty = false;
         return;
     }
 
     m_currentOrder = static_cast<uint8_t>(drawBuffer ? drawBuffer->m_order : Pool::DrawOrder::THIRD);
 
     auto& list = m_objects[m_currentFloor][m_currentOrder];
+
     if (!list.empty()) {
         auto& prevObj = list.back();
 
@@ -120,13 +142,20 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
         }
 
         if (sameState) {
-            prevObj.addMethod(method);
+            if (prevObj.buffer) {
+                prevObj.buffer->getCoords()->append(coordsBuffer.get());
+            } else
+                prevObj.addMethod(method);
             return;
         }
     }
 
-    list.emplace_back(drawMode, state, method);
-    m_empty = false;
+    if (coordsBuffer) {
+        const DrawBufferPtr& buffer = std::make_shared<DrawBuffer>(Pool::DrawOrder::FIRST);
+        buffer->getCoords()->append(coordsBuffer.get());
+        list.emplace_back(state, buffer);
+    } else
+        list.emplace_back(drawMode, state, method);
 }
 
 void Pool::addCoords(const DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode)

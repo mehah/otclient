@@ -466,8 +466,8 @@ private:
     void parseTextStyle(const OTMLNodePtr& styleNode);
 
     Rect m_textCachedScreenCoords;
-    std::vector<std::pair<Rect, Rect>> m_textCoordsCache;
     std::vector<Point> m_glyphsPositionsCache;
+    CoordsBufferPtr m_coordsBuffer;
     Size m_textSize;
 
 protected:

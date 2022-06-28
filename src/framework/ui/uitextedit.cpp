@@ -80,8 +80,8 @@ void UITextEdit::drawSelf(Fw::DrawPane drawPane)
             for (size_t i = 0; i < textLength; ++i)
                 m_glyphsTextRectCache.emplace_back(m_glyphsCoords[i], m_glyphsTexCoords[i]);
         }
-        for (const auto& rect : m_glyphsTextRectCache)
-            g_drawPool.addTexturedRect(rect.first, texture, rect.second, m_color);
+        for (const auto& [dest, src] : m_glyphsTextRectCache)
+            g_drawPool.addTexturedRect(dest, texture, src, m_color);
     }
 
     if (hasSelection()) {

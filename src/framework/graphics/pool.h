@@ -240,22 +240,23 @@ class DrawBuffer
 {
 public:
     DrawBuffer(Pool::DrawOrder order, bool agroup = true) : m_order(order), m_agroup(agroup) {}
+private:
+    inline bool isValid() { return m_i > -1; }
+    inline bool isTemporary() { return m_i == -2; }
 
-    bool isValid() { return m_i > -1; }
     bool validate(const Point& p)
     {
         if (m_ref != p) { m_ref = p; invalidate(); }
         return isValid();
     }
 
-    CoordsBuffer* getCoords()
+    inline CoordsBuffer* getCoords()
     {
         return (m_coords ? m_coords : m_coords = std::make_shared<CoordsBuffer>()).get();
     }
 
-private:
-    void invalidate() { m_i = -1; m_hashs.clear(); }
-    int m_i{ 0 };
+    void invalidate() { m_i = -1; }
+    int m_i{ -1 };
     bool m_agroup{ true };
     Pool::DrawOrder m_order{ Pool::DrawOrder::FIRST };
     Point m_ref;

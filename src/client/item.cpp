@@ -66,9 +66,6 @@ void Item::draw(const Point& dest, float scaleFactor, bool animate, const Highli
     if (m_color != Color::alpha)
         color = m_color;
 
-    if (m_drawBuffer)
-        m_drawBuffer->validate(dest);
-
     getThingType()->draw(dest, scaleFactor, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, textureType, color, lightView, m_drawBuffer);
 
     if (highLight.enabled && this == highLight.thing) {
