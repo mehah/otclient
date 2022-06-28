@@ -151,7 +151,7 @@ void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, cons
     };
 
     if (buffer)
-        buffer->validate(dest.topLeft());
+        buffer->validate(originalDest);
 
     m_currentPool->add(color, texture, method, DrawMode::TRIANGLE_STRIP, buffer);
 }
