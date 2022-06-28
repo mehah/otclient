@@ -39,7 +39,7 @@ void UIWidget::updateText()
         m_drawText = m_text;
 
     if (m_font)
-        m_glyphsPositionsCache = m_font->calculateGlyphsPositions(m_drawText, Fw::AlignTopLeft, &m_textSize);
+        m_glyphsPositionsCache = m_font->calculateGlyphsPositions(m_drawText, m_textAlign, &m_textSize);
 
     // update rect size
     if (!m_rect.isValid() || m_textHorizontalAutoResize || m_textVerticalAutoResize) {
