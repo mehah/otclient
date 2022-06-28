@@ -105,7 +105,7 @@ MapView::~MapView()
 void MapView::draw(const Rect& rect)
 {
     // update visible tiles cache when needed
-    if (m_refreshVisibleTiles)
+    if (m_updateVisibleTiles)
         updateVisibleTiles();
 
     if (m_posInfo.rect != rect) {

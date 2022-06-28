@@ -49,7 +49,7 @@ public:
     virtual void draw(const Point& /*dest*/, float /*scaleFactor*/, bool /*animate*/, const Highlight& /*highLight*/, TextureType /*textureType*/ = TextureType::NONE, Color /* color */ = Color::white, LightView* /*lightView*/ = nullptr) {}
     virtual void setId(uint32_t  /*id*/) {}
 
-    void setPosition(const Position& position);
+    virtual void setPosition(const Position& position);
 
     virtual uint32_t  getId() { return 0; }
     Position getPosition() { return m_position; }
@@ -159,8 +159,14 @@ public:
 protected:
     void generateBuffer();
 
-    Position m_position;
+    uint8_t
+        m_numPatternX{ 0 },
+        m_numPatternY{ 0 },
+        m_numPatternZ{ 0 };
+
     uint16_t m_datId{ 0 };
+
+    Position m_position;
     ThingTypePtr m_thingType;
     DrawBufferPtr m_drawBuffer;
 

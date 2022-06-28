@@ -111,26 +111,14 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
 
     // outfit is a real creature
     if (m_outfit.getCategory() == ThingCategoryCreature) {
-        // xPattern => creature direction
-        int xPattern;
-        if (direction == Otc::NorthEast || direction == Otc::SouthEast)
-            xPattern = Otc::East;
-        else if (direction == Otc::NorthWest || direction == Otc::SouthWest)
-            xPattern = Otc::West;
-        else
-            xPattern = direction;
-
-        int zPattern = 0;
         if (m_outfit.hasMount()) {
             if (animateWalk) animationPhase = getCurrentAnimationPhase(true);
 
             const auto& datType = getMountThingType();
 
             dest -= datType->getDisplacement() * scaleFactor;
-            datType->draw(dest, scaleFactor, 0, xPattern, 0, 0, animationPhase, textureType, color);
+            datType->draw(dest, scaleFactor, 0, m_numPatternX, 0, 0, animationPhase, textureType, color);
             dest += getDisplacement() * scaleFactor;
-
-            zPattern = std::min<int>(1, getNumPatternZ() - 1);
 
             if (canDrawShader && m_mountShader) {
                 g_drawPool.setShaderProgram(m_mountShader, true, m_mountShaderAction);
@@ -139,8 +127,10 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
 
         if (animateWalk) animationPhase = getCurrentAnimationPhase();
 
-        const PointF jumpOffset = m_jumpOffset * scaleFactor;
-        dest -= Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
+        if (!m_jumpOffset.isNull()) {
+            const PointF jumpOffset = m_jumpOffset * scaleFactor;
+            dest -= Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
+        }
 
         const auto& datType = getThingType();
 
@@ -150,17 +140,17 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
             if (yPattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
                 continue;
 
-            datType->draw(dest, scaleFactor, 0, xPattern, yPattern, zPattern, animationPhase, textureType, color);
+            datType->draw(dest, scaleFactor, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, textureType, color);
             if (canDrawShader && m_outfitShader) {
                 g_drawPool.setShaderProgram(m_outfitShader, true, m_outfitShaderAction);
             }
 
             if (m_drawOutfitColor && isNotBlank && getLayers() > 1) {
                 g_drawPool.setCompositionMode(CompositionMode::MULTIPLY);
-                datType->draw(dest, scaleFactor, SpriteMaskYellow, xPattern, yPattern, zPattern, animationPhase, textureType, m_outfit.getHeadColor());
-                datType->draw(dest, scaleFactor, SpriteMaskRed, xPattern, yPattern, zPattern, animationPhase, textureType, m_outfit.getBodyColor());
-                datType->draw(dest, scaleFactor, SpriteMaskGreen, xPattern, yPattern, zPattern, animationPhase, textureType, m_outfit.getLegsColor());
-                datType->draw(dest, scaleFactor, SpriteMaskBlue, xPattern, yPattern, zPattern, animationPhase, textureType, m_outfit.getFeetColor());
+                datType->draw(dest, scaleFactor, SpriteMaskYellow, m_numPatternX, yPattern, m_numPatternZ, animationPhase, textureType, m_outfit.getHeadColor());
+                datType->draw(dest, scaleFactor, SpriteMaskRed, m_numPatternX, yPattern, m_numPatternZ, animationPhase, textureType, m_outfit.getBodyColor());
+                datType->draw(dest, scaleFactor, SpriteMaskGreen, m_numPatternX, yPattern, m_numPatternZ, animationPhase, textureType, m_outfit.getLegsColor());
+                datType->draw(dest, scaleFactor, SpriteMaskBlue, m_numPatternX, yPattern, m_numPatternZ, animationPhase, textureType, m_outfit.getFeetColor());
                 g_drawPool.resetCompositionMode();
             }
         }
@@ -213,14 +203,11 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, flo
     if (isDead() || !canBeSeen() || drawFlags == 0)
         return;
 
-    const PointF& jumpOffset = getJumpOffset() * scaleFactor;
+    const PointF& jumpOffset = m_jumpOffset * scaleFactor;
     const auto& parentRect = mapRect.rect;
-    auto creatureOffset = Point(16 - getDisplacementX(), -getDisplacementY() - 2);
-    if (m_walking)
-        creatureOffset += m_walkOffset;
+    const auto& creatureOffset = Point(16 - getDisplacementX(), -getDisplacementY() - 2) + m_walkOffset;
 
     Point p = dest - mapRect.drawOffset;
-
     p += creatureOffset * scaleFactor - Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
     p.x *= mapRect.horizontalStretchFactor;
     p.y *= mapRect.verticalStretchFactor;
@@ -674,6 +661,14 @@ void Creature::setDirection(Otc::Direction direction)
 {
     assert(direction != Otc::InvalidDirection);
     m_direction = direction;
+
+    // xPattern => creature direction
+    if (direction == Otc::NorthEast || direction == Otc::SouthEast)
+        m_numPatternX = Otc::East;
+    else if (direction == Otc::NorthWest || direction == Otc::SouthWest)
+        m_numPatternX = Otc::West;
+    else
+        m_numPatternX = direction;
 }
 
 void Creature::setOutfit(const Outfit& outfit)
@@ -699,6 +694,8 @@ void Creature::setOutfit(const Outfit& outfit)
     m_mountType = nullptr;
 
     m_walkAnimationPhase = 0; // might happen when player is walking and outfit is changed.
+
+    m_numPatternZ = outfit.hasMount() ? std::min<int>(1, getNumPatternZ() - 1) : 0;
 
     callLuaField("onOutfitChange", m_outfit, oldOutfit);
 

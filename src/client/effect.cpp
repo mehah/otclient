@@ -52,13 +52,7 @@ void Effect::drawEffect(const Point& dest, float scaleFactor, LightView* lightVi
         animationPhase = std::min<int>(static_cast<int>(m_animationTimer.ticksElapsed() / ticks), getAnimationPhases() - 1);
     }
 
-    const int xPattern = m_position.x % getNumPatternX();
-    const int yPattern = m_position.y % getNumPatternY();
-
-    if (m_drawBuffer)
-        m_drawBuffer->validate(dest);
-
-    getThingType()->draw(dest, scaleFactor, 0, xPattern, yPattern, 0, animationPhase, TextureType::NONE, Color::white, lightView, m_drawBuffer);
+    getThingType()->draw(dest, scaleFactor, 0, m_numPatternX, m_numPatternY, 0, animationPhase, TextureType::NONE, Color::white, lightView, m_drawBuffer);
 }
 
 void Effect::onAppear()
@@ -101,6 +95,14 @@ void Effect::setId(uint32_t  id)
 
     m_id = id;
     m_thingType = nullptr;
+}
+
+void Effect::setPosition(const Position& position)
+{
+    Thing::setPosition(position);
+
+    m_numPatternX = m_position.x % getNumPatternX();
+    m_numPatternY = m_position.y % getNumPatternY();
 }
 
 const ThingTypePtr& Effect::getThingType()

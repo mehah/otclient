@@ -31,43 +31,8 @@ void Missile::drawMissile(const Point& dest, float scaleFactor, LightView* light
     if (m_id == 0 || !m_drawBuffer)
         return;
 
-    int xPattern = 0, yPattern = 0;
-    if (m_direction == Otc::NorthWest) {
-        xPattern = 0;
-        yPattern = 0;
-    } else if (m_direction == Otc::North) {
-        xPattern = 1;
-        yPattern = 0;
-    } else if (m_direction == Otc::NorthEast) {
-        xPattern = 2;
-        yPattern = 0;
-    } else if (m_direction == Otc::East) {
-        xPattern = 2;
-        yPattern = 1;
-    } else if (m_direction == Otc::SouthEast) {
-        xPattern = 2;
-        yPattern = 2;
-    } else if (m_direction == Otc::South) {
-        xPattern = 1;
-        yPattern = 2;
-    } else if (m_direction == Otc::SouthWest) {
-        xPattern = 0;
-        yPattern = 2;
-    } else if (m_direction == Otc::West) {
-        xPattern = 0;
-        yPattern = 1;
-    } else {
-        xPattern = 1;
-        yPattern = 1;
-    }
-
     const float fraction = m_animationTimer.ticksElapsed() / m_duration;
-    const auto& _dest = dest + m_delta * fraction;
-
-    if (m_drawBuffer)
-        m_drawBuffer->validate(dest);
-
-    getThingType()->draw(_dest * scaleFactor, scaleFactor, 0, xPattern, yPattern, 0, 0, TextureType::NONE, Color::white, lightView, m_drawBuffer);
+    getThingType()->draw(dest + m_delta * fraction * scaleFactor, scaleFactor, 0, m_numPatternX, m_numPatternY, 0, 0, TextureType::NONE, Color::white, lightView, m_drawBuffer);
 }
 
 void Missile::setPath(const Position& fromPosition, const Position& toPosition)
@@ -87,6 +52,37 @@ void Missile::setPath(const Position& fromPosition, const Position& toPosition)
     m_delta *= SPRITE_SIZE;
     m_animationTimer.restart();
     m_distance = fromPosition.distance(toPosition);
+
+    { // Update Pattern
+        if (m_direction == Otc::NorthWest) {
+            m_numPatternX = 0;
+            m_numPatternY = 0;
+        } else if (m_direction == Otc::North) {
+            m_numPatternX = 1;
+            m_numPatternY = 0;
+        } else if (m_direction == Otc::NorthEast) {
+            m_numPatternX = 2;
+            m_numPatternY = 0;
+        } else if (m_direction == Otc::East) {
+            m_numPatternX = 2;
+            m_numPatternY = 1;
+        } else if (m_direction == Otc::SouthEast) {
+            m_numPatternX = 2;
+            m_numPatternY = 2;
+        } else if (m_direction == Otc::South) {
+            m_numPatternX = 1;
+            m_numPatternY = 2;
+        } else if (m_direction == Otc::SouthWest) {
+            m_numPatternX = 0;
+            m_numPatternY = 2;
+        } else if (m_direction == Otc::West) {
+            m_numPatternX = 0;
+            m_numPatternY = 1;
+        } else {
+            m_numPatternX = 1;
+            m_numPatternY = 1;
+        }
+    }
 
     // schedule removal
     const auto self = asMissile();

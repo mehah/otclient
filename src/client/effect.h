@@ -32,8 +32,10 @@ class Effect : public Thing
 public:
     void drawEffect(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
 
-    void setId(uint32_t  id) override;
     uint32_t  getId() override { return m_id; }
+
+    void setId(uint32_t  id) override;
+    void setPosition(const Position& position) override;
 
     EffectPtr asEffect() { return static_self_cast<Effect>(); }
     bool isEffect() override { return true; }
