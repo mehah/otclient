@@ -49,7 +49,7 @@ public:
     virtual void draw(const Point& /*dest*/, float /*scaleFactor*/, bool /*animate*/, const Highlight& /*highLight*/, TextureType /*textureType*/ = TextureType::NONE, Color /* color */ = Color::white, LightView* /*lightView*/ = nullptr) {}
     virtual void setId(uint32_t  /*id*/) {}
 
-    virtual void setPosition(const Position& position);
+    virtual void setPosition(const Position& position, uint8_t stackPos = 0);
 
     virtual uint32_t  getId() { return 0; }
     Position getPosition() { return m_position; }
@@ -162,7 +162,8 @@ protected:
     uint8_t
         m_numPatternX{ 0 },
         m_numPatternY{ 0 },
-        m_numPatternZ{ 0 };
+        m_numPatternZ{ 0 },
+        m_stackPos{ 0 };
 
     uint16_t m_datId{ 0 };
 

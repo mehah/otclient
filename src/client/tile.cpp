@@ -243,7 +243,7 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
     if (size > MAX_THINGS)
         removeThing(m_things[MAX_THINGS]);
 
-    thing->setPosition(m_position);
+    thing->setPosition(m_position, stackPos);
     thing->onAppear();
 
     if (thing->isTranslucent())

@@ -240,6 +240,8 @@ class DrawBuffer
 {
 public:
     DrawBuffer(Pool::DrawOrder order, bool agroup = true) : m_order(order), m_agroup(agroup) {}
+    void agroup(bool v) { m_agroup = v; }
+
 private:
     inline bool isValid() { return m_i > -1; }
     inline bool isTemporary() { return m_i == -2; }

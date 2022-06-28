@@ -35,7 +35,7 @@ public:
     uint32_t  getId() override { return m_id; }
 
     void setId(uint32_t  id) override;
-    void setPosition(const Position& position) override;
+    void setPosition(const Position& position, uint8_t stackPos = 0) override;
 
     EffectPtr asEffect() { return static_self_cast<Effect>(); }
     bool isEffect() override { return true; }

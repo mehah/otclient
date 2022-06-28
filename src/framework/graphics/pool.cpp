@@ -143,7 +143,10 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
 
         if (sameState) {
             if (prevObj.buffer) {
-                prevObj.buffer->getCoords()->append(coordsBuffer.get());
+                if (coordsBuffer)
+                    prevObj.buffer->getCoords()->append(coordsBuffer.get());
+                else
+                    addCoords(method, *prevObj.buffer->getCoords(), DrawMode::TRIANGLES);
             } else
                 prevObj.addMethod(method);
             return;

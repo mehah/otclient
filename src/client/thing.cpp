@@ -28,8 +28,13 @@
 
 #include <framework/core/graphicalapplication.h>
 
-void Thing::setPosition(const Position& position)
+void Thing::setPosition(const Position& position, uint8_t stackPos)
 {
+    m_stackPos = stackPos;
+    if (m_drawBuffer && isSingleGroundBorder()) {
+        m_drawBuffer->agroup(stackPos <= 1);
+    }
+
     if (m_position == position)
         return;
 
