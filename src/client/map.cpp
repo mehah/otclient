@@ -37,7 +37,7 @@
 #include "towns.h"
 
 static constexpr uint8_t
-MAX_VIEWPORT_X = 55, MAX_VIEWPORT_Y = 28;
+MAX_VIEWPORT_X = 60, MAX_VIEWPORT_Y = 32;
 
 Map g_map;
 TilePtr Map::m_nulltile;
@@ -407,9 +407,9 @@ void Map::cleanTile(const Position& pos)
 void Map::setShowZone(tileflags_t zone, bool show)
 {
     if (show)
-        m_zoneFlags |= static_cast<uint32_t >(zone);
+        m_zoneFlags |= static_cast<uint32_t>(zone);
     else
-        m_zoneFlags &= ~static_cast<uint32_t >(zone);
+        m_zoneFlags &= ~static_cast<uint32_t>(zone);
 }
 
 void Map::setShowZones(bool show)

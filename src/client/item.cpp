@@ -81,7 +81,6 @@ void Item::setId(uint32_t  id)
     m_serverId = g_things.findItemTypeByClientId(id)->getServerId();
     m_clientId = id;
     m_thingType = nullptr;
-    generateBuffer();
 }
 
 void Item::setOtbId(uint16_t id)
@@ -97,10 +96,17 @@ void Item::setOtbId(uint16_t id)
         id = 0;
 
     m_clientId = id;
-    generateBuffer();
 }
 
-bool Item::isValid() { return getThingType() != nullptr; }
+void Item::setPosition(const Position& position, uint8_t stackPos)
+{
+    Thing::setPosition(position, stackPos);
+
+    generateBuffer();
+    if (m_drawBuffer && isSingleDimension()) {
+        m_drawBuffer->agroup(stackPos <= 1);
+    }
+}
 
 void Item::unserializeItem(const BinaryTreePtr& in)
 {

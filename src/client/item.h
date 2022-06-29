@@ -88,6 +88,7 @@ public:
     void setCount(int count) { m_countOrSubType = count; updatePatterns(); }
     void setSubType(int subType) { m_countOrSubType = subType; updatePatterns(); }
     void setColor(const Color& c) { m_color = c; }
+    void setPosition(const Position& position, uint8_t stackPos = 0) override;
 
     int getCountOrSubType() { return m_countOrSubType; }
     int getSubType();
@@ -96,7 +97,7 @@ public:
     uint16_t getClientId() { return m_clientId; }
     uint16_t getServerId() { return m_serverId; }
     std::string getName();
-    bool isValid();
+    bool isValid() { return getThingType() != nullptr; }
 
     void unserializeItem(const BinaryTreePtr& in);
     void serializeItem(const OutputBinaryTreePtr& out);

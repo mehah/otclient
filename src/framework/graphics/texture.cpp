@@ -30,7 +30,8 @@
 
 #include "framework/stdext/math.h"
 
-static std::atomic<uint32_t > UID(0);
+ // UINT16_MAX = just to avoid conflicts with GL generated ID.
+static std::atomic<uint32_t > UID(UINT16_MAX);
 
 Texture::Texture() : m_uniqueId(++UID) {}
 

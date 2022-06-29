@@ -30,11 +30,6 @@
 
 void Thing::setPosition(const Position& position, uint8_t stackPos)
 {
-    m_stackPos = stackPos;
-    if (m_drawBuffer && isSingleGroundBorder()) {
-        m_drawBuffer->agroup(stackPos <= 1);
-    }
-
     if (m_position == position)
         return;
 
@@ -102,7 +97,10 @@ void Thing::generateBuffer()
     else if (isSingleGroundBorder()) {
         order = Pool::DrawOrder::SECOND;
         agroup = false;
-    } else if (isOnBottom() && isSingleDimension() && !hasDisplacement() && isNotWalkable())
+    } else if (isCommon() && isSingleDimension()) {
+        order = Pool::DrawOrder::THIRD;
+        agroup = false;
+    } else if (isOnBottom() && isSingleDimension() && !hasDisplacement() && isNotWalkable() || g_app.canOptimize() && isCreature())
         order = Pool::DrawOrder::THIRD;
     else if (isTopGround() || isTopGroundBorder() || g_app.isDrawingEffectsOnTop() && isEffect())
         order = Pool::DrawOrder::FOURTH;

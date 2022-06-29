@@ -162,8 +162,7 @@ protected:
     uint8_t
         m_numPatternX{ 0 },
         m_numPatternY{ 0 },
-        m_numPatternZ{ 0 },
-        m_stackPos{ 0 };
+        m_numPatternZ{ 0 };
 
     uint16_t m_datId{ 0 };
 
