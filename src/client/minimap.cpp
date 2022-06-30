@@ -97,17 +97,18 @@ void Minimap::draw(const Rect& screenRect, const Position& mapCenter, float scal
     if (screenRect.isEmpty())
         return;
 
-    const Rect mapRect = calcMapRect(screenRect, mapCenter, scale);
+    const Rect& mapRect = calcMapRect(screenRect, mapCenter, scale);
     g_drawPool.addFilledRect(screenRect, color);
 
     if (MMBLOCK_SIZE * scale <= 1 || !mapCenter.isMapPosition()) {
         return;
     }
 
-    const Point blockOff = getBlockOffset(mapRect.topLeft());
-    const Point off = Point((mapRect.size() * scale).toPoint() - screenRect.size().toPoint()) / 2;
-    const Point start = screenRect.topLeft() - (mapRect.topLeft() - blockOff) * scale - off;
+    const Point& blockOff = getBlockOffset(mapRect.topLeft());
+    const Point& off = Point((mapRect.size() * scale).toPoint() - screenRect.size().toPoint()) / 2;
+    const Point& start = screenRect.topLeft() - (mapRect.topLeft() - blockOff) * scale - off;
 
+    const auto& oldClipRect = g_drawPool.getClipRect();
     g_drawPool.setClipRect(screenRect);
     for (int_fast32_t y = blockOff.y, ys = start.y; ys < screenRect.bottom(); y += MMBLOCK_SIZE, ys += MMBLOCK_SIZE * scale) {
         if (y < 0 || y >= 65536)
@@ -134,7 +135,7 @@ void Minimap::draw(const Rect& screenRect, const Position& mapCenter, float scal
             }
         }
     }
-    g_drawPool.resetClipRect();
+    g_drawPool.setClipRect(oldClipRect);
 }
 
 Point Minimap::getTilePoint(const Position& pos, const Rect& screenRect, const Position& mapCenter, float scale)

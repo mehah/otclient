@@ -30,6 +30,7 @@ void UIParticles::drawSelf(Fw::DrawPane /*drawPane*/)
 {
     UIWidget::drawSelf(Fw::ForegroundPane);
 
+    const auto& oldClipRect = g_drawPool.getClipRect();
     g_drawPool.setClipRect(getPaddingRect());
     g_painter->pushTransformMatrix();
 
@@ -42,7 +43,7 @@ void UIParticles::drawSelf(Fw::DrawPane /*drawPane*/)
         effect->render();
 
     g_painter->popTransformMatrix();
-    g_drawPool.resetClipRect();
+    g_drawPool.setClipRect(oldClipRect);
 }
 
 void UIParticles::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
