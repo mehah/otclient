@@ -76,11 +76,15 @@ void DrawPool::draw()
         if (!pool->isEnabled()) continue;
 
         if (pool->hasFrameBuffer()) {
-            const auto* const pf = pool->toPoolFramed();
+            // Reset before events as there may be paint controls such as shaders.
+            g_painter->resetState();
 
-            if (pf->m_beforeDraw) pf->m_beforeDraw();
-            pf->m_framebuffer->draw();
-            if (pf->m_afterDraw) pf->m_afterDraw();
+            const auto* const pf = pool->toPoolFramed();
+            {
+                if (pf->m_beforeDraw) pf->m_beforeDraw();
+                pf->m_framebuffer->draw();
+                if (pf->m_afterDraw) pf->m_afterDraw();
+            }
         } else for (auto& obj : pool->m_objects[0][static_cast<int>(Pool::DrawOrder::FIRST)]) {
             drawObject(obj);
         }

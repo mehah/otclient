@@ -97,8 +97,6 @@ void FrameBuffer::release()
 
 void FrameBuffer::draw()
 {
-    g_painter->resetState();
-
     if (m_disableBlend) glDisable(GL_BLEND);
     g_painter->setCompositionMode(m_compositeMode);
     g_painter->setTexture(m_texture.get());
