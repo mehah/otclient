@@ -59,6 +59,7 @@ public:
     void setEnable(const bool v) { m_enabled = v; }
     bool isEnabled() const { return m_enabled; }
     PoolType getType() const { return m_type; }
+    bool canRepaint() { return canRepaint(false); }
 
 protected:
     struct PoolState
@@ -142,6 +143,11 @@ protected:
     };
 
 private:
+    enum
+    {
+        REFRESH_TIME = 1000 / 20 // 20 FPS (50ms)
+    };
+
     static constexpr uint8_t ARR_MAX_Z = (MAX_Z / 2) + 1;
     static Pool* create(const PoolType type);
 
@@ -160,6 +166,8 @@ private:
 
     float getOpacity(bool lastDrawing = false) { return !lastDrawing ? m_state.opacity : getLastDrawObject().state->opacity; }
     Rect getClipRect(bool lastDrawing = false) { return !lastDrawing ? m_state.clipRect : getLastDrawObject().state->clipRect; }
+
+    void repaint() { m_status.first = 0; }
 
     void setCompositionMode(CompositionMode mode, bool onLastDrawing = false);
     void setBlendEquation(BlendEquation equation, bool onLastDrawing = false);
@@ -185,8 +193,8 @@ private:
     virtual bool hasFrameBuffer() const { return false; };
     virtual PoolFramed* toPoolFramed() { return nullptr; }
 
-    bool hasModification(bool autoUpdateStatus = false);
-    void updateStatus() { m_status.first = m_status.second; m_refreshTime.restart(); }
+    bool canRepaint(bool autoUpdateStatus);
+    void updateStatus() { m_status.first = m_status.second; m_refreshTimer.restart(); }
 
     bool m_enabled{ true },
         m_alwaysGroupDrawings{ false },
@@ -194,18 +202,18 @@ private:
 
     uint8_t m_currentOrder{ 0 }, m_currentFloor{ 0 };
 
+    uint16_t m_refreshTimeMS{ 0 };
+
     PoolState m_state;
 
     PoolType m_type{ PoolType::UNKNOW };
 
-    Timer m_refreshTime;
+    Timer m_refreshTimer;
 
     std::pair<size_t, size_t> m_status{ 0,0 };
 
     std::vector<DrawObject> m_objects[ARR_MAX_Z][static_cast<uint8_t>(DrawOrder::LAST)];
     stdext::map<size_t, DrawObject> m_objectsByhash;
-
-    bool m_empty = true;
 
     friend DrawPool;
 };

@@ -55,6 +55,7 @@ void UIWidget::updateText()
     }
 
     m_textCachedScreenCoords = {};
+    g_drawPool.repaint();
 }
 
 void UIWidget::resizeToText()
@@ -107,7 +108,6 @@ void UIWidget::drawText(const Rect& screenCoords)
 
 void UIWidget::onTextChange(const std::string_view text, const std::string_view oldText)
 {
-    g_app.repaint();
     callLuaField("onTextChange", text, oldText);
 }
 

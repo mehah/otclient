@@ -56,7 +56,8 @@ void DrawPool::draw()
         if (!pool->isEnabled() || !pool->hasFrameBuffer()) continue;
 
         const auto& pf = pool->toPoolFramed();
-        if (pool->hasModification(true) && !pool->m_empty) {
+
+        if (pool->canRepaint(true)) {
             pf->m_framebuffer->bind();
             for (int_fast8_t z = -1; ++z <= pool->m_currentFloor;) {
                 for (auto& order : pool->m_objects[z])

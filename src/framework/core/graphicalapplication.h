@@ -34,7 +34,6 @@ class GraphicalApplication : public Application
     enum
     {
         POLL_CYCLE_DELAY = 10,
-        FOREGROUND_REFRESH_TIME = 1000 / 20 // 20 FPS (50ms)
     };
 
 public:
@@ -44,8 +43,6 @@ public:
     void run() override;
     void poll() override;
     void close() override;
-
-    void repaint() { m_mustRepaint = true; }
 
     void setMaxFps(int maxFps) { m_frameCounter.setMaxFps(maxFps); }
 
@@ -67,19 +64,7 @@ protected:
     void inputEvent(const InputEvent& event);
 
 private:
-    bool foregroundCanUpdate()
-    {
-        if (m_mustRepaint || m_foregroundRefreshTime.ticksElapsed() >= FOREGROUND_REFRESH_TIME) {
-            m_foregroundRefreshTime.restart();
-            m_mustRepaint = false;
-            return true;
-        }
-
-        return false;
-    }
-
     bool m_onInputEvent{ false },
-        m_mustRepaint{ false },
         m_optimize{ true },
         m_forceEffectOptimization{ false },
         m_drawEffectOnTop{ false };

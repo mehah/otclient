@@ -140,7 +140,7 @@ void GraphicalApplication::run()
         // the screen consists of two panes
         {
             // foreground pane - steady pane with few animated stuff (UI)
-            if (foregroundCanUpdate()) {
+            if (g_drawPool.get<Pool>(PoolType::FOREGROUND)->canRepaint()) {
                 g_drawPool.use(PoolType::FOREGROUND);
                 g_ui.render(Fw::ForegroundPane);
             }
@@ -197,8 +197,6 @@ void GraphicalApplication::resize(const Size& size)
 
     g_drawPool.get<PoolFramed>(PoolType::FOREGROUND)
         ->resize(size);
-
-    m_mustRepaint = true;
 }
 
 void GraphicalApplication::inputEvent(const InputEvent& event)
