@@ -34,7 +34,7 @@ Pool* Pool::create(const PoolType type)
         if (type == PoolType::MAP) frameBuffer->disableBlend();
         else if (type == PoolType::FOREGROUND) {
             pool->m_autoUpdate = true;
-            pool->m_refreshTimeMS = FOREGROUND_REFRESH_TIME;
+            pool->m_refreshTimeMS = REFRESH_TIME;
         } else if (type == PoolType::LIGHT) {
             pool->m_alwaysGroupDrawings = true;
             frameBuffer->setCompositionMode(CompositionMode::LIGHT);
@@ -203,7 +203,7 @@ void Pool::updateHash(const PoolState& state, const DrawMethod& method,
             stdext::hash_combine(stateHash, state.opacity);
 
         if (state.shaderProgram) {
-            m_refreshTimeMS = SHADER_REFRESH_TIME;
+            m_refreshTimeMS = REFRESH_TIME;
             stdext::hash_combine(stateHash, state.shaderProgram->getProgramId());
         }
 
@@ -296,7 +296,7 @@ void Pool::setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool o
     }
 
     if (shader) {
-        m_autoUpdate = true;
+        m_refreshTimeMS = REFRESH_TIME;
     }
 
     auto& o = getLastDrawObject();
@@ -314,7 +314,6 @@ void Pool::resetState()
     resetCompositionMode();
 
     m_status.second = 0;
-
     if (!m_autoUpdate)
         m_refreshTimeMS = 0;
 }
@@ -323,8 +322,10 @@ bool Pool::canRepaint(const bool autoUpdateStatus)
 {
     const bool canRepaint = m_status.first != m_status.second || (m_refreshTimeMS > 0 && m_refreshTimer.ticksElapsed() > m_refreshTimeMS);
 
-    if (canRepaint && autoUpdateStatus)
-        updateStatus();
+    if (canRepaint && autoUpdateStatus) {
+        m_refreshTimer.restart();
+        m_status.first = m_status.second;
+    }
 
     return canRepaint;
 }

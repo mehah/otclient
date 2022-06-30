@@ -145,8 +145,7 @@ protected:
 private:
     enum
     {
-        FOREGROUND_REFRESH_TIME = 1000 / 35, // 35 FPS (28ms)
-        SHADER_REFRESH_TIME = 1000 / 20 // 20 FPS (50ms)
+        REFRESH_TIME = 1000 / 20 // 20 FPS (50ms)
     };
 
     static constexpr uint8_t ARR_MAX_Z = (MAX_Z / 2) + 1;
@@ -195,7 +194,6 @@ private:
     virtual PoolFramed* toPoolFramed() { return nullptr; }
 
     bool canRepaint(bool autoUpdateStatus);
-    void updateStatus() { m_status.first = m_status.second; m_refreshTimer.restart(); }
 
     bool m_enabled{ true },
         m_alwaysGroupDrawings{ false },
