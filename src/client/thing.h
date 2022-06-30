@@ -49,7 +49,7 @@ public:
     virtual void draw(const Point& /*dest*/, float /*scaleFactor*/, bool /*animate*/, const Highlight& /*highLight*/, TextureType /*textureType*/ = TextureType::NONE, Color /* color */ = Color::white, LightView* /*lightView*/ = nullptr) {}
     virtual void setId(uint32_t  /*id*/) {}
 
-    virtual void setPosition(const Position& position, uint8_t stackPos = 0);
+    virtual void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false);
 
     virtual uint32_t  getId() { return 0; }
     Position getPosition() { return m_position; }

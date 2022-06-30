@@ -251,6 +251,13 @@ public:
     void agroup(bool v) { m_agroup = v; }
 
 private:
+    static DrawBufferPtr createTemporaryBuffer(Pool::DrawOrder order)
+    {
+        auto buffer = std::make_shared<DrawBuffer>(order);
+        buffer->m_i = -2; // identifier to say it is a temporary buffer.
+        return buffer;
+    }
+
     inline bool isValid() { return m_i > -1; }
     inline bool isTemporary() { return m_i == -2; }
 

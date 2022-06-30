@@ -97,9 +97,9 @@ void Effect::setId(uint32_t  id)
     m_thingType = nullptr;
 }
 
-void Effect::setPosition(const Position& position, uint8_t stackPos)
+void Effect::setPosition(const Position& position, uint8_t stackPos, bool hasElevation)
 {
-    Thing::setPosition(position, stackPos);
+    Thing::setPosition(position, stackPos, hasElevation);
 
     m_numPatternX = m_position.x % getNumPatternX();
     m_numPatternY = m_position.y % getNumPatternY();

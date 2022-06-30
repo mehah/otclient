@@ -68,17 +68,15 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
                     return;
 
                 auto& hashList = buffer->m_hashs;
-
-                // condition to check if the buffer has been reset, if so, add the vertex again.
-                if (++buffer->m_i == hashList.size()) {
-                    hashList.push_back(methodHash);
-                } else {
+                if (++buffer->m_i != hashList.size()) {
                     // checks if the vertex to be added is in the same position,
                     // otherwise the buffer will be invalidated to recreate the cache.
                     if (hashList[buffer->m_i] != methodHash)
                         buffer->invalidate();
                     return;
                 }
+
+                hashList.push_back(methodHash);
             }
 
             if (coordsBuffer)
@@ -91,18 +89,17 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
 
         bool addCoord = false;
 
-        const DrawBufferPtr& buffer = drawBuffer ? drawBuffer : std::make_shared<DrawBuffer>(Pool::DrawOrder::FIRST);
-        if (drawBuffer) {
-            if (!drawBuffer->isValid()) {
-                drawBuffer->getCoords()->clear();
-                drawBuffer->m_hashs.clear();
-                drawBuffer->m_hashs.push_back(methodHash);
+        const DrawBufferPtr& buffer = drawBuffer ? drawBuffer : DrawBuffer::createTemporaryBuffer(Pool::DrawOrder::FIRST);
+        if (buffer->isTemporary()) {
+            addCoord = true;
+        } else {
+            if (!buffer->isValid()) {
+                buffer->getCoords()->clear();
+                buffer->m_hashs.clear();
+                buffer->m_hashs.push_back(methodHash);
                 addCoord = true;
             }
-            drawBuffer->m_i = 0; // reset identifier to say it is valid.
-        } else {
-            buffer->m_i = -2; // identifier to say it is a temporary buffer.
-            addCoord = true;
+            buffer->m_i = 0; // reset identifier to say it is valid.
         }
 
         if (addCoord) {
@@ -143,19 +140,23 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
         }
 
         if (sameState) {
-            if (prevObj.buffer) {
-                if (coordsBuffer)
-                    prevObj.buffer->getCoords()->append(coordsBuffer.get());
-                else
-                    addCoords(method, *prevObj.buffer->getCoords(), DrawMode::TRIANGLES);
-            } else
+            if (!prevObj.buffer) {
                 prevObj.addMethod(method);
-            return;
+                return;
+            }
+
+            if (prevObj.buffer->isTemporary()) {
+                if (coordsBuffer) {
+                    prevObj.buffer->getCoords()->append(coordsBuffer.get());
+                } else {
+                    addCoords(method, *prevObj.buffer->getCoords(), DrawMode::TRIANGLES);
+                }
+            }
         }
     }
 
     if (coordsBuffer) {
-        const DrawBufferPtr& buffer = std::make_shared<DrawBuffer>(Pool::DrawOrder::FIRST);
+        const DrawBufferPtr& buffer = DrawBuffer::createTemporaryBuffer(Pool::DrawOrder::FIRST);
         buffer->getCoords()->append(coordsBuffer.get());
         list.emplace_back(state, buffer);
     } else

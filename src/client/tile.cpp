@@ -235,6 +235,9 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
 
     if (thing->isGround()) m_ground = thing->static_self_cast<Item>();
 
+    // get the elevation status before analyze the new item.
+    const bool hasElev = hasElevation();
+
     analyzeThing(thing, true);
     if (checkForDetachableThing() && m_highlight.enabled) {
         select();
@@ -243,7 +246,7 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
     if (size > MAX_THINGS)
         removeThing(m_things[MAX_THINGS]);
 
-    thing->setPosition(m_position, stackPos);
+    thing->setPosition(m_position, stackPos, hasElev);
     thing->onAppear();
 
     if (thing->isTranslucent())

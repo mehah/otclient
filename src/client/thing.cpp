@@ -28,7 +28,7 @@
 
 #include <framework/core/graphicalapplication.h>
 
-void Thing::setPosition(const Position& position, uint8_t stackPos)
+void Thing::setPosition(const Position& position, uint8_t stackPos, bool hasElevation)
 {
     if (m_position == position)
         return;
