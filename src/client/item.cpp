@@ -55,7 +55,7 @@ std::string Item::getName()
     return g_things.findItemTypeByClientId(m_clientId)->getName();
 }
 
-void Item::draw(const Point& dest, float scaleFactor, bool animate, const Highlight& highLight, TextureType textureType, Color color, LightView* lightView)
+void Item::draw(const Point& dest, float scaleFactor, bool animate, uint32_t flags, const Highlight& highLight, TextureType textureType, Color color, LightView* lightView)
 {
     if (m_clientId == 0 || !canDraw())
         return;
@@ -66,10 +66,10 @@ void Item::draw(const Point& dest, float scaleFactor, bool animate, const Highli
     if (m_color != Color::alpha)
         color = m_color;
 
-    getThingType()->draw(dest, scaleFactor, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, textureType, color, lightView, m_drawBuffer);
+    getThingType()->draw(dest, scaleFactor, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, textureType, color, lightView, m_drawBuffer);
 
     if (highLight.enabled && this == highLight.thing) {
-        getThingType()->draw(dest, scaleFactor, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, TextureType::ALL_BLANK, highLight.rgbColor);
+        getThingType()->draw(dest, scaleFactor, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, TextureType::ALL_BLANK, highLight.rgbColor);
     }
 }
 

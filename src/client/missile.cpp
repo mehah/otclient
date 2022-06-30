@@ -32,7 +32,8 @@ void Missile::drawMissile(const Point& dest, float scaleFactor, LightView* light
         return;
 
     const float fraction = m_animationTimer.ticksElapsed() / m_duration;
-    getThingType()->draw(dest + m_delta * fraction * scaleFactor, scaleFactor, 0, m_numPatternX, m_numPatternY, 0, 0, TextureType::NONE, Color::white, lightView, m_drawBuffer);
+    getThingType()->draw(dest + m_delta * fraction * scaleFactor, scaleFactor, 0, m_numPatternX, m_numPatternY, 0, 0,
+                         Otc::DrawThings | Otc::DrawLights, TextureType::NONE, Color::white, lightView, m_drawBuffer);
 }
 
 void Missile::setPath(const Position& fromPosition, const Position& toPosition)

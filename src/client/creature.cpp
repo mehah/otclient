@@ -63,26 +63,28 @@ Creature::Creature() :m_type(Proto::CreatureTypeUnknown)
     */
 }
 
-void Creature::draw(const Point& dest, float scaleFactor, bool animate, const Highlight& highLight, TextureType textureType, Color color, LightView* lightView)
+void Creature::draw(const Point& dest, float scaleFactor, bool animate, uint32_t flags, const Highlight& highLight, TextureType textureType, Color color, LightView* lightView)
 {
     if (!canBeSeen())
         return;
 
-    if (m_showTimedSquare) {
-        g_drawPool.addBoundingRect(Rect(dest + (m_walkOffset - getDisplacement() + 2) * scaleFactor, Size(28 * scaleFactor)), m_timedSquareColor, std::max<int>(static_cast<int>(2 * scaleFactor), 1));
+    if (flags & Otc::DrawThings) {
+        if (m_showTimedSquare) {
+            g_drawPool.addBoundingRect(Rect(dest + (m_walkOffset - getDisplacement() + 2) * scaleFactor, Size(28 * scaleFactor)), m_timedSquareColor, std::max<int>(static_cast<int>(2 * scaleFactor), 1));
+        }
+
+        if (m_showStaticSquare) {
+            g_drawPool.addBoundingRect(Rect(dest + (m_walkOffset - getDisplacement()) * scaleFactor, Size(SPRITE_SIZE * scaleFactor)), m_staticSquareColor, std::max<int>(static_cast<int>(2 * scaleFactor), 1));
+        }
+
+        internalDrawOutfit(dest + m_walkOffset * scaleFactor, scaleFactor, animate, textureType, m_direction, color);
+
+        if (highLight.enabled && this == highLight.thing) {
+            internalDrawOutfit(dest + m_walkOffset * scaleFactor, scaleFactor, animate, TextureType::ALL_BLANK, m_direction, highLight.rgbColor);
+        }
     }
 
-    if (m_showStaticSquare) {
-        g_drawPool.addBoundingRect(Rect(dest + (m_walkOffset - getDisplacement()) * scaleFactor, Size(SPRITE_SIZE * scaleFactor)), m_staticSquareColor, std::max<int>(static_cast<int>(2 * scaleFactor), 1));
-    }
-
-    internalDrawOutfit(dest + m_walkOffset * scaleFactor, scaleFactor, animate, textureType, m_direction, color);
-
-    if (highLight.enabled && this == highLight.thing) {
-        internalDrawOutfit(dest + m_walkOffset * scaleFactor, scaleFactor, animate, TextureType::ALL_BLANK, m_direction, highLight.rgbColor);
-    }
-
-    if (lightView) {
+    if (lightView && flags & Otc::DrawLights) {
         auto light = getLight();
 
         if (isLocalPlayer() && (g_map.getLight().intensity < 64 || m_position.z > SEA_FLOOR)) {
@@ -117,7 +119,7 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
             const auto& datType = getMountThingType();
 
             dest -= datType->getDisplacement() * scaleFactor;
-            datType->draw(dest, scaleFactor, 0, m_numPatternX, 0, 0, animationPhase, textureType, color);
+            datType->draw(dest, scaleFactor, 0, m_numPatternX, 0, 0, animationPhase, Otc::DrawThingsAndLights, textureType, color);
             dest += getDisplacement() * scaleFactor;
 
             if (canDrawShader && m_mountShader) {
@@ -140,17 +142,17 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
             if (yPattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
                 continue;
 
-            datType->draw(dest, scaleFactor, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, textureType, color);
+            datType->draw(dest, scaleFactor, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, textureType, color);
             if (canDrawShader && m_outfitShader) {
                 g_drawPool.setShaderProgram(m_outfitShader, true, m_outfitShaderAction);
             }
 
             if (m_drawOutfitColor && isNotBlank && getLayers() > 1) {
                 g_drawPool.setCompositionMode(CompositionMode::MULTIPLY);
-                datType->draw(dest, scaleFactor, SpriteMaskYellow, m_numPatternX, yPattern, m_numPatternZ, animationPhase, textureType, m_outfit.getHeadColor());
-                datType->draw(dest, scaleFactor, SpriteMaskRed, m_numPatternX, yPattern, m_numPatternZ, animationPhase, textureType, m_outfit.getBodyColor());
-                datType->draw(dest, scaleFactor, SpriteMaskGreen, m_numPatternX, yPattern, m_numPatternZ, animationPhase, textureType, m_outfit.getLegsColor());
-                datType->draw(dest, scaleFactor, SpriteMaskBlue, m_numPatternX, yPattern, m_numPatternZ, animationPhase, textureType, m_outfit.getFeetColor());
+                datType->draw(dest, scaleFactor, SpriteMaskYellow, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, textureType, m_outfit.getHeadColor());
+                datType->draw(dest, scaleFactor, SpriteMaskRed, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, textureType, m_outfit.getBodyColor());
+                datType->draw(dest, scaleFactor, SpriteMaskGreen, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, textureType, m_outfit.getLegsColor());
+                datType->draw(dest, scaleFactor, SpriteMaskBlue, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, textureType, m_outfit.getFeetColor());
                 g_drawPool.resetCompositionMode();
             }
         }
@@ -176,7 +178,7 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
         if (m_outfit.getCategory() == ThingCategoryEffect)
             animationPhase = std::min<int>(animationPhase + 1, animationPhases);
 
-        type->draw(dest - (getDisplacement() * scaleFactor), scaleFactor, 0, 0, 0, 0, animationPhase, textureType, color);
+        type->draw(dest - (getDisplacement() * scaleFactor), scaleFactor, 0, 0, 0, 0, animationPhase, Otc::DrawThingsAndLights, textureType, color);
 
         if (canDrawShader && m_outfitShader) {
             g_drawPool.setShaderProgram(m_outfitShader, true, m_outfitShaderAction);
@@ -200,7 +202,7 @@ void Creature::drawOutfit(const Rect& destRect, bool resize, const Color color)
 
 void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, float scaleFactor, bool useGray, int drawFlags)
 {
-    if (isDead() || !canBeSeen() || drawFlags == 0)
+    if (isDead() || !canBeSeen() || !(drawFlags & Otc::DrawCreatureInfo) || !mapRect.isInRange(m_position))
         return;
 
     const PointF& jumpOffset = m_jumpOffset * scaleFactor;

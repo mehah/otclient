@@ -128,7 +128,7 @@ public:
     bool limitsFloorsView(bool isFreeView = false);
 
     bool canShade(const MapViewPtr& mapView);
-    bool canRender(bool drawViewportEdge, const Position& cameraPosition, AwareRange viewPort, LightView* lightView);
+    bool canRender(uint32_t& flags, const Position& cameraPosition, AwareRange viewPort, LightView* lightView);
     bool canErase() { return m_walkingCreatures.empty() && m_effects.empty() && isEmpty() && m_flags == 0 && m_minimapColor == 0; }
 
     bool hasElevation(int elevation = 1) { return m_countFlag.elevation >= elevation; }
@@ -182,9 +182,9 @@ private:
             hasTopGroundBorder{ 0 };
     };
 
-    void drawTop(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
+    void drawTop(const Point& dest, float scaleFactor, int flags, LightView* lightView = nullptr);
     void drawCreature(const Point& dest, const MapPosInfo& mapRect, float scaleFactor, int flags, bool isCovered, LightView* lightView = nullptr);
-    void drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor, bool animate, LightView* lightView);
+    void drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor, bool animate, int flags, LightView* lightView);
 
     void checkTranslucentLight();
     bool checkForDetachableThing();

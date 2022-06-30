@@ -142,8 +142,10 @@ void MapView::drawFloor()
         const Position cameraPosition = getCameraPosition();
         const auto& lightView = m_drawLights ? m_lightView.get() : nullptr;
 
-        uint32_t  flags = 0;
-        if (m_drawNames) { flags = Otc::DrawNames; }
+        uint32_t flags = Otc::DrawThings;
+
+        if (lightView && lightView->isDark()) flags |= Otc::DrawLights;
+        if (m_drawNames) { flags |= Otc::DrawNames; }
         if (m_drawHealthBars) { flags |= Otc::DrawBars; }
         if (m_drawManaBar) { flags |= Otc::DrawManaBar; }
 
@@ -172,7 +174,9 @@ void MapView::drawFloor()
             }
 
             for (const auto& tile : map.tiles) {
-                if (!tile->canRender(m_drawViewportEdge, cameraPosition, m_viewport, lightView))
+                uint32_t tileFlags = flags;
+
+                if (!m_drawViewportEdge && !tile->canRender(tileFlags, cameraPosition, m_viewport, lightView))
                     continue;
 
                 bool isCovered = false;
@@ -187,7 +191,7 @@ void MapView::drawFloor()
                     g_drawPool.setOpacity(inRange ? .16 : .7);
                 }
 
-                tile->draw(transformPositionTo2D(tile->getPosition(), cameraPosition), m_posInfo, m_scaleFactor, flags, isCovered, lightView);
+                tile->draw(transformPositionTo2D(tile->getPosition(), cameraPosition), m_posInfo, m_scaleFactor, tileFlags, isCovered, lightView);
 
                 if (alwaysTransparent)
                     g_drawPool.resetOpacity();
@@ -280,6 +284,9 @@ void MapView::updateVisibleTiles()
 
     const uint8_t prevFirstVisibleFloor = m_cachedFirstVisibleFloor;
     if (m_lastCameraPosition != cameraPosition) {
+        m_posInfo.camera = getCameraPosition();
+        m_posInfo.awareRange = m_awareRange;
+
         if (m_mousePosition.isValid()) {
             const Otc::Direction direction = m_lastCameraPosition.getDirectionFromPosition(cameraPosition);
             m_mousePosition = m_mousePosition.translatedToDirection(direction);
@@ -851,16 +858,6 @@ std::vector<CreaturePtr> MapView::getSightSpectators(const Position& centerPos, 
 std::vector<CreaturePtr> MapView::getSpectators(const Position& centerPos, bool multiFloor)
 {
     return g_map.getSpectatorsInRangeEx(centerPos, multiFloor, m_awareRange.left, m_awareRange.right, m_awareRange.top, m_awareRange.bottom);
-}
-
-bool MapView::isInRange(const Position& pos, const bool ignoreZ)
-{
-    return getCameraPosition().isInRange(pos, m_awareRange.left - 1, m_awareRange.right - 2, m_awareRange.top - 1, m_awareRange.bottom - 2, ignoreZ);
-}
-
-bool MapView::isInRangeEx(const Position& pos, const bool ignoreZ)
-{
-    return getCameraPosition().isInRange(pos, m_awareRange.left, m_awareRange.right, m_awareRange.top, m_awareRange.bottom, ignoreZ);
 }
 
 void MapView::setCrosshairTexture(const std::string& texturePath)

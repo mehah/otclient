@@ -30,7 +30,7 @@
 class Effect : public Thing
 {
 public:
-    void drawEffect(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
+    void drawEffect(const Point& dest, float scaleFactor, uint32_t flags, LightView* lightView = nullptr);
 
     uint32_t  getId() override { return m_id; }
 

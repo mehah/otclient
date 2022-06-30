@@ -149,7 +149,7 @@ public:
     void serialize(const FileStreamPtr& fin);
     void exportImage(const std::string& fileName);
 
-    void draw(const Point& dest, float scaleFactor, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, TextureType textureType, Color color = Color::white, LightView* lightView = nullptr, const DrawBufferPtr& drawBuffer = nullptr);
+    void draw(const Point& dest, float scaleFactor, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, uint32_t flags, TextureType textureType, Color color = Color::white, LightView* lightView = nullptr, const DrawBufferPtr& drawBuffer = nullptr);
 
     uint16_t getId() { return m_id; }
     ThingCategory getCategory() { return m_category; }

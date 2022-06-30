@@ -26,7 +26,7 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
 
-void Effect::drawEffect(const Point& dest, float scaleFactor, LightView* lightView)
+void Effect::drawEffect(const Point& dest, float scaleFactor, uint32_t flags, LightView* lightView)
 {
     if (m_id == 0 || !canDraw()) return;
 
@@ -52,7 +52,7 @@ void Effect::drawEffect(const Point& dest, float scaleFactor, LightView* lightVi
         animationPhase = std::min<int>(static_cast<int>(m_animationTimer.ticksElapsed() / ticks), getAnimationPhases() - 1);
     }
 
-    getThingType()->draw(dest, scaleFactor, 0, m_numPatternX, m_numPatternY, 0, animationPhase, TextureType::NONE, Color::white, lightView, m_drawBuffer);
+    getThingType()->draw(dest, scaleFactor, 0, m_numPatternX, m_numPatternY, 0, animationPhase, flags, TextureType::NONE, Color::white, lightView, m_drawBuffer);
 }
 
 void Effect::onAppear()

@@ -701,7 +701,7 @@ void ThingType::unserializeOtml(const OTMLNodePtr& node)
     }
 }
 
-void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, TextureType textureType, Color color, LightView* lightView, const DrawBufferPtr& drawBuffer)
+void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, uint32_t flags, TextureType textureType, Color color, LightView* lightView, const DrawBufferPtr& drawBuffer)
 {
     if (m_null)
         return;
@@ -724,12 +724,14 @@ void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPatte
 
     const Rect screenRect(dest + (textureOffset - m_displacement - (m_size.toPoint() - Point(1)) * SPRITE_SIZE) * scaleFactor, textureRect.size() * scaleFactor);
 
-    if (m_opacity < 1.0f)
-        color = Color(1.0f, 1.0f, 1.0f, m_opacity);
+    if (flags & Otc::DrawThings) {
+        if (m_opacity < 1.0f)
+            color = Color(1.0f, 1.0f, 1.0f, m_opacity);
 
-    g_drawPool.addTexturedRect(screenRect, texture, textureRect, color, dest, drawBuffer);
+        g_drawPool.addTexturedRect(screenRect, texture, textureRect, color, dest, drawBuffer);
+    }
 
-    if (lightView && hasLight()) {
+    if (lightView && hasLight() && flags & Otc::DrawLights) {
         const Light light = getLight();
         if (light.intensity > 0) {
             lightView->addLightSource(screenRect.center(), light);

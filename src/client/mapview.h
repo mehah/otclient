@@ -41,6 +41,21 @@ struct MapPosInfo
     Point drawOffset;
     float horizontalStretchFactor,
         verticalStretchFactor;
+
+    bool isInRange(const Position& pos, bool ignoreZ = false) const
+    {
+        return camera.isInRange(pos, awareRange.left - 1, awareRange.right - 2, awareRange.top - 1, awareRange.bottom - 2, ignoreZ);
+    }
+    bool isInRangeEx(const Position& pos, bool ignoreZ = false)  const
+    {
+        return camera.isInRange(pos, awareRange.left, awareRange.right, awareRange.top, awareRange.bottom, ignoreZ);
+    }
+
+private:
+    Position camera;
+    AwareRange awareRange;
+
+    friend class MapView;
 };
 
 // @bindclass
@@ -131,9 +146,8 @@ public:
     std::vector<CreaturePtr> getVisibleCreatures();
     std::vector<CreaturePtr> getSpectators(const Position& centerPos, bool multiFloor);
     std::vector<CreaturePtr> getSightSpectators(const Position& centerPos, bool multiFloor);
-
-    bool isInRange(const Position& pos, bool ignoreZ = false);
-    bool isInRangeEx(const Position& pos, bool ignoreZ = false);
+    bool isInRange(const Position& pos, bool ignoreZ = false) { return m_posInfo.isInRange(pos, ignoreZ); }
+    bool isInRangeEx(const Position& pos, bool ignoreZ = false) { return m_posInfo.isInRangeEx(pos, ignoreZ); }
 
     TilePtr getTopTile(Position tilePos);
 
