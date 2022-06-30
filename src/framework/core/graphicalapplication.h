@@ -31,11 +31,6 @@
 
 class GraphicalApplication : public Application
 {
-    enum
-    {
-        POLL_CYCLE_DELAY = 10,
-    };
-
 public:
     void init(std::vector<std::string>& args) override;
     void deinit() override;

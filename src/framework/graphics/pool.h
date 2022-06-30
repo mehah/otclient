@@ -145,7 +145,8 @@ protected:
 private:
     enum
     {
-        REFRESH_TIME = 1000 / 20 // 20 FPS (50ms)
+        FOREGROUND_REFRESH_TIME = 1000 / 35, // 35 FPS (28ms)
+        SHADER_REFRESH_TIME = 1000 / 20 // 20 FPS (50ms)
     };
 
     static constexpr uint8_t ARR_MAX_Z = (MAX_Z / 2) + 1;

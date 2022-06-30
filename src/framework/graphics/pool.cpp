@@ -34,7 +34,7 @@ Pool* Pool::create(const PoolType type)
         if (type == PoolType::MAP) frameBuffer->disableBlend();
         else if (type == PoolType::FOREGROUND) {
             pool->m_autoUpdate = true;
-            pool->m_refreshTimeMS = REFRESH_TIME;
+            pool->m_refreshTimeMS = FOREGROUND_REFRESH_TIME;
         } else if (type == PoolType::LIGHT) {
             pool->m_alwaysGroupDrawings = true;
             frameBuffer->setCompositionMode(CompositionMode::LIGHT);
@@ -203,7 +203,7 @@ void Pool::updateHash(const PoolState& state, const DrawMethod& method,
             stdext::hash_combine(stateHash, state.opacity);
 
         if (state.shaderProgram) {
-            m_refreshTimeMS = REFRESH_TIME;
+            m_refreshTimeMS = SHADER_REFRESH_TIME;
             stdext::hash_combine(stateHash, state.shaderProgram->getProgramId());
         }
 
