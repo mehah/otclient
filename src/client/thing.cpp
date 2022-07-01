@@ -100,7 +100,7 @@ void Thing::generateBuffer()
     } else if (isCommon() && isSingleDimension()) {
         order = Pool::DrawOrder::THIRD;
         agroup = false;
-    } else if (isOnBottom() && isSingleDimension() && !hasDisplacement() && isNotWalkable() || g_app.canOptimize() && isCreature())
+    } else if (isOnBottom() && isSingleDimension() && !hasDisplacement() && isNotWalkable())
         order = Pool::DrawOrder::THIRD;
     else if (isTopGround() || isTopGroundBorder() || g_app.isDrawingEffectsOnTop() && isEffect())
         order = Pool::DrawOrder::FOURTH;
