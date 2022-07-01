@@ -450,6 +450,7 @@ namespace Otc
         GameDistanceEffectU16 = 77,
         GameLevelU16 = 78,
         GameSoul = 79,
+        GameMapOldEffectRendering = 80,
 
         LastGameFeature = 101
     };
