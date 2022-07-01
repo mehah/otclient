@@ -75,7 +75,7 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, float scaleFactor,
 
             drawThing(item, dest - m_drawElevation * scaleFactor, scaleFactor, true, flags, lightView);
 
-            if (item->isLyingCorpse()) {
+            if (item->isLyingCorpse() && !g_game.getFeature(Otc::GameMapDontCorrectCorpse)) {
                 redrawPreviousTopW = std::max<int>(item->getWidth(), redrawPreviousTopW);
                 redrawPreviousTopH = std::max<int>(item->getHeight(), redrawPreviousTopH);
             }
@@ -126,16 +126,18 @@ void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, float scal
 
 void Tile::drawTop(const Point& dest, float scaleFactor, int flags, LightView* lightView)
 {
-    int offsetX = 0,
-        offsetY = 0;
+    if (hasEffect()) {
+        int offsetX = 0,
+            offsetY = 0;
 
-    if (g_game.getFeature(Otc::GameMapOldEffectRendering)) {
-        offsetX = m_position.x - g_map.getCentralPosition().x;
-        offsetX = m_position.y - g_map.getCentralPosition().y;
-    }
+        if (g_game.getFeature(Otc::GameMapOldEffectRendering)) {
+            offsetX = m_position.x - g_map.getCentralPosition().x;
+            offsetX = m_position.y - g_map.getCentralPosition().y;
+        }
 
-    for (const auto& effect : m_effects) {
-        effect->drawEffect(dest - m_drawElevation * scaleFactor, scaleFactor, flags, offsetX, offsetY, lightView);
+        for (const auto& effect : m_effects) {
+            effect->drawEffect(dest - m_drawElevation * scaleFactor, scaleFactor, flags, offsetX, offsetY, lightView);
+        }
     }
 
     if (m_countFlag.hasTopItem) {

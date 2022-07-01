@@ -451,6 +451,7 @@ namespace Otc
         GameLevelU16 = 78,
         GameSoul = 79,
         GameMapOldEffectRendering = 80,
+        GameMapDontCorrectCorpse = 81,
 
         LastGameFeature = 101
     };
