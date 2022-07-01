@@ -732,7 +732,7 @@ void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPatte
     }
 
     if (lightView && hasLight() && flags & Otc::DrawLights) {
-        const Light light = getLight();
+        const Light& light = getLight();
         if (light.intensity > 0) {
             lightView->addLightSource(screenRect.center(), light);
         }
