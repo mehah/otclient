@@ -726,7 +726,7 @@ void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPatte
 
     if (flags & Otc::DrawThings) {
         if (m_opacity < 1.0f)
-            color = Color(1.0f, 1.0f, 1.0f, m_opacity);
+            color.setAlpha(m_opacity);
 
         g_drawPool.addTexturedRect(screenRect, texture, textureRect, color, dest, drawBuffer);
     }
