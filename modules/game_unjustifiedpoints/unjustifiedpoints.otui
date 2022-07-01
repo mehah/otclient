@@ -16,6 +16,7 @@ MiniWindow
   !text: tr('Unjustified Points')
   height: 114
   icon: /images/topbuttons/unjustifiedpoints
+  @onOpen: modules.game_unjustifiedpoints.onMiniWindowOpen()
   @onClose: modules.game_unjustifiedpoints.onMiniWindowClose()
   &save: true
 
