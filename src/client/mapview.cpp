@@ -285,7 +285,6 @@ void MapView::updateVisibleTiles()
     const uint8_t prevFirstVisibleFloor = m_cachedFirstVisibleFloor;
     if (m_lastCameraPosition != cameraPosition) {
         m_posInfo.camera = getCameraPosition();
-        m_posInfo.awareRange = m_awareRange;
 
         if (m_mousePosition.isValid()) {
             const Otc::Direction direction = m_lastCameraPosition.getDirectionFromPosition(cameraPosition);
@@ -426,6 +425,8 @@ void MapView::updateGeometry(const Size& visibleDimension)
     m_awareRange.top = std::min<uint16_t>(g_map.getAwareRange().top, (m_drawDimension.height() / 2) - 1);
     m_awareRange.bottom = m_awareRange.top + 1;
     m_awareRange.right = m_awareRange.left + 1;
+
+    m_posInfo.awareRange = m_awareRange;
 
     updateViewportDirectionCache();
     updateViewport();
