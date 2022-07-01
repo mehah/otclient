@@ -421,12 +421,12 @@ void MapView::updateGeometry(const Size& visibleDimension)
 
     if (m_drawLights) m_lightView->resize(drawDimension, tileSize);
 
-    m_awareRange.left = std::min<uint16_t>(g_map.getAwareRange().left, (m_drawDimension.width() / 2) - 1);
-    m_awareRange.top = std::min<uint16_t>(g_map.getAwareRange().top, (m_drawDimension.height() / 2) - 1);
-    m_awareRange.bottom = m_awareRange.top + 1;
-    m_awareRange.right = m_awareRange.left + 1;
+    const uint8_t left = std::min<uint8_t>(g_map.getAwareRange().left, (m_drawDimension.width() / 2) - 1),
+        top = std::min<uint8_t>(g_map.getAwareRange().top, (m_drawDimension.height() / 2) - 1),
+        right = static_cast<uint8_t>(left + 1),
+        bottom = static_cast<uint8_t>(top + 1);
 
-    m_posInfo.awareRange = m_awareRange;
+    m_posInfo.awareRange = { left, top, right, bottom };
 
     updateViewportDirectionCache();
     updateViewport();
@@ -807,8 +807,8 @@ void MapView::updateViewportDirectionCache()
 {
     for (uint8_t dir = Otc::North; dir <= Otc::InvalidDirection; ++dir) {
         AwareRange& vp = m_viewPortDirection[dir];
-        vp.top = m_awareRange.top;
-        vp.right = m_awareRange.right;
+        vp.top = m_posInfo.awareRange.top;
+        vp.right = m_posInfo.awareRange.right;
         vp.bottom = vp.top;
         vp.left = vp.right;
 
@@ -862,12 +862,12 @@ std::vector<CreaturePtr> MapView::getVisibleCreatures()
 
 std::vector<CreaturePtr> MapView::getSightSpectators(const Position& centerPos, bool multiFloor)
 {
-    return g_map.getSpectatorsInRangeEx(centerPos, multiFloor, m_awareRange.left - 1, m_awareRange.right - 2, m_awareRange.top - 1, m_awareRange.bottom - 2);
+    return g_map.getSpectatorsInRangeEx(centerPos, multiFloor, m_posInfo.awareRange.left - 1, m_posInfo.awareRange.right - 2, m_posInfo.awareRange.top - 1, m_posInfo.awareRange.bottom - 2);
 }
 
 std::vector<CreaturePtr> MapView::getSpectators(const Position& centerPos, bool multiFloor)
 {
-    return g_map.getSpectatorsInRangeEx(centerPos, multiFloor, m_awareRange.left, m_awareRange.right, m_awareRange.top, m_awareRange.bottom);
+    return g_map.getSpectatorsInRangeEx(centerPos, multiFloor, m_posInfo.awareRange.left, m_posInfo.awareRange.right, m_posInfo.awareRange.top, m_posInfo.awareRange.bottom);
 }
 
 void MapView::setCrosshairTexture(const std::string& texturePath)
