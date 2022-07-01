@@ -539,12 +539,11 @@ void MapView::setVisibleDimension(const Size& visibleDimension)
 
     const Size& awareRangeSize = Size(g_map.getAwareRange().left * 2, g_map.getAwareRange().top * 2);
 
-    m_drawViewportEdge = true;
-    if (m_limitVisibleDimension) {
-        if (visibleDimension.width() > awareRangeSize.width() || visibleDimension.height() > awareRangeSize.height()) {
-            m_drawViewportEdge = false;
+    m_drawViewportEdge = false;
+    if (visibleDimension.width() > awareRangeSize.width() || visibleDimension.height() > awareRangeSize.height()) {
+        if (m_limitVisibleDimension)
             return;
-        }
+        m_drawViewportEdge = true;
     }
 
     updateGeometry(visibleDimension);
