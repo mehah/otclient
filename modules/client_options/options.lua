@@ -23,7 +23,7 @@ local defaultOptions = {
     enableMusicSound = true,
     musicSoundVolume = 100,
     enableLights = true,
-    drawViewportEdge = false,
+    limitVisibleDimension = false,
     floatingEffect = false,
     ambientLight = 0,
     displayNames = true,
@@ -263,8 +263,8 @@ function setOption(key, value, force)
     elseif key == 'floorFading' then
         graphicsPanel:getChildById('floorFadingLabel'):setText(tr('Floor Fading: %s ms', value))
         gameMapPanel:setFloorFading(tonumber(value))
-    elseif key == 'drawViewportEdge' then
-        gameMapPanel:setDrawViewportEdge(value)
+    elseif key == 'limitVisibleDimension' then
+        gameMapPanel:setLimitVisibleDimension(value)
     elseif key == 'floatingEffect' then
         g_map.setFloatingEffect(value)
     elseif key == 'displayNames' then

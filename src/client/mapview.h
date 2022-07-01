@@ -126,8 +126,8 @@ public:
     void setDrawLights(bool enable);
     bool isDrawingLights() { return m_drawLights && m_lightView->isDark(); }
 
-    void setDrawViewportEdge(bool enable) { m_drawViewportEdge = enable; }
-    bool isDrawingViewportEdge() { return m_drawViewportEdge; }
+    void setLimitVisibleDimension(bool v) { m_limitVisibleDimension = v; }
+    bool isLimitedVisibleDimension() { return m_limitVisibleDimension; }
 
     void setDrawManaBar(bool enable) { m_drawManaBar = enable; }
     bool isDrawingManaBar() { return m_drawManaBar; }
@@ -259,6 +259,7 @@ private:
     AwareRange m_viewport;
 
     bool
+        m_limitVisibleDimension{ true },
         m_updateVisibleTiles{ true },
         m_resetCoveredCache{ true },
         m_shaderSwitchDone{ true },

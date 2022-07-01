@@ -28,8 +28,9 @@ Panel
     !tooltip: tr('Draw effect after drawing the entire floor.')
 
   OptionCheckBox
-    id: drawViewportEdge
-    !text: tr('Draw Viewport Edge')
+    id: limitVisibleDimension
+    !text: tr('Limit Visible Dimension')
+    !tooltip: tr('The limit is based on your maximum range.')
 
   OptionCheckBox
     id: floatingEffect
