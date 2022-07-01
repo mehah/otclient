@@ -1034,9 +1034,6 @@
     <ClInclude Include="..\src\client\spriteappearances.h">
       <Filter>Header Files\client</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\framework\util\uuid.h">
-      <Filter>Header Files\framework\util</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\protobuf\appearances.pb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
