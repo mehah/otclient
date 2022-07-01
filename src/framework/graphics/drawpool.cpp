@@ -144,7 +144,7 @@ void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, cons
     addTexturedRect(dest, texture, Rect(Point(), texture->getSize()), color);
 }
 
-void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const Point& originalDest, DrawBufferPtr buffer)
+void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const Point& originalDest, const DrawBufferPtr& buffer)
 {
     if (dest.isEmpty() || src.isEmpty())
         return;
