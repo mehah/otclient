@@ -171,6 +171,7 @@ find_package(Threads REQUIRED)
 # OpenGL/GLEW = Graphics
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
+find_package(STDUUID CONFIG REQUIRED)
 if(UNIX)
 	find_package(X11 REQUIRED)
 endif()
@@ -372,6 +373,7 @@ if(MSVC)
 		${GMP_INCLUDE_DIR}
 		${OPENSSL_INCLUDE_DIR}
 		${PHYSFS_INCLUDE_DIR}
+		${PARALLEL_HASHMAP_INCLUDE_DIRS}
 		${NLOHMANN_JSON_INCLUDE_DIR}
 	)
 	target_link_libraries(${PROJECT_NAME}
@@ -393,6 +395,7 @@ if(MSVC)
 		${GMP_LIBRARY}
 		${OPENSSL_LIBRARIES}
 		${DBGHELP_LIBRARY}
+		${STDUUID}
 
 		Threads::Threads
 		GLEW::GLEW
@@ -412,6 +415,7 @@ else()
 		${OPENSSL_INCLUDE_DIR}
 		${PHYSFS_INCLUDE_DIR}
 		${GLEW_INCLUDE_DIR}
+		${PARALLEL_HASHMAP_INCLUDE_DIRS}
 		${NLOHMANN_JSON_INCLUDE_DIR}
 	)
 	target_link_libraries(${PROJECT_NAME}
@@ -429,6 +433,7 @@ else()
 		${MYSQL_LIBRARY}
 		${GMP_LIBRARY}
 		${OPENSSL_LIBRARIES}
+		${STDUUID}
 
 		Threads::Threads
 		X11::X11
