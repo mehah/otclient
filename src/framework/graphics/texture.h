@@ -43,8 +43,8 @@ public:
     void setUpsideDown(bool upsideDown);
     void setTime(ticks_t time) { m_time = time; }
 
-    uint getId() { return m_id; }
-    uint getUniqueId() const { return m_uniqueId; }
+    uint32_t getId() { return m_id; }
+    uint32_t getUniqueId() const { return m_uniqueId; }
     ticks_t getTime() { return m_time; }
     int getWidth() { return m_size.width(); }
     int getHeight() { return m_size.height(); }
@@ -62,15 +62,15 @@ public:
 
 protected:
     void createTexture();
-    bool setupSize(const Size& size, bool forcePowerOfTwo = false);
+    bool setupSize(const Size& size);
     void setupWrap();
     void setupFilters();
     void setupTranformMatrix();
-    void setupPixels(int level, const Size& size, uchar* pixels, int channels = 4, bool compress = false);
+    void setupPixels(int level, const Size& size, uint8_t* pixels, int channels = 4, bool compress = false);
 
-    const uint m_uniqueId;
+    const uint32_t m_uniqueId;
 
-    uint m_id{ 0 };
+    uint32_t m_id{ 0 };
     ticks_t m_time{ 0 };
     Size m_size, m_glSize;
 

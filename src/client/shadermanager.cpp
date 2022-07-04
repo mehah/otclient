@@ -23,16 +23,13 @@
 #include "shadermanager.h"
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/graphics.h>
-#include <framework/graphics/ogl/painterogl2_shadersources.h>
+#include <framework/graphics/shader/shadersources.h>
 #include <framework/graphics/paintershaderprogram.h>
 
 ShaderManager g_shaders;
 
 void ShaderManager::init()
 {
-    if (!g_graphics.canUseShaders())
-        return;
-
     m_defaultItemShader = createFragmentShaderFromCode("Item", std::string{ glslMainFragmentShader } + glslTextureSrcFragmentShader.data());
     setupItemShader(m_defaultItemShader);
 
@@ -58,11 +55,6 @@ void ShaderManager::terminate()
 
 PainterShaderProgramPtr ShaderManager::createShader(const std::string_view name)
 {
-    if (!g_graphics.canUseShaders()) {
-        g_logger.error(stdext::format("unable to create shader '%s', shaders are not supported", name));
-        return nullptr;
-    }
-
     PainterShaderProgramPtr shader(new PainterShaderProgram);
     m_shaders[name.data()] = shader;
     return shader;

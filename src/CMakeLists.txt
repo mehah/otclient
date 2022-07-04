@@ -171,6 +171,7 @@ find_package(Threads REQUIRED)
 # OpenGL/GLEW = Graphics
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
+find_package(STDUUID CONFIG REQUIRED)
 if(UNIX)
 	find_package(X11 REQUIRED)
 endif()
@@ -267,9 +268,6 @@ target_sources(${PROJECT_NAME}
 	framework/graphics/graphics.cpp
 	framework/graphics/hardwarebuffer.cpp
 	framework/graphics/image.cpp
-	framework/graphics/ogl/painterogl.cpp
-	framework/graphics/ogl/painterogl1.cpp
-	framework/graphics/ogl/painterogl2.cpp
 	framework/graphics/painter.cpp
 	framework/graphics/paintershaderprogram.cpp
 	framework/graphics/particle.cpp
@@ -375,6 +373,7 @@ if(MSVC)
 		${GMP_INCLUDE_DIR}
 		${OPENSSL_INCLUDE_DIR}
 		${PHYSFS_INCLUDE_DIR}
+		${PARALLEL_HASHMAP_INCLUDE_DIRS}
 		${NLOHMANN_JSON_INCLUDE_DIR}
 	)
 	target_link_libraries(${PROJECT_NAME}
@@ -396,6 +395,7 @@ if(MSVC)
 		${GMP_LIBRARY}
 		${OPENSSL_LIBRARIES}
 		${DBGHELP_LIBRARY}
+		${STDUUID}
 
 		Threads::Threads
 		GLEW::GLEW
@@ -415,6 +415,7 @@ else()
 		${OPENSSL_INCLUDE_DIR}
 		${PHYSFS_INCLUDE_DIR}
 		${GLEW_INCLUDE_DIR}
+		${PARALLEL_HASHMAP_INCLUDE_DIRS}
 		${NLOHMANN_JSON_INCLUDE_DIR}
 	)
 	target_link_libraries(${PROJECT_NAME}
@@ -432,6 +433,7 @@ else()
 		${MYSQL_LIBRARY}
 		${GMP_LIBRARY}
 		${OPENSSL_LIBRARIES}
+		${STDUUID}
 
 		Threads::Threads
 		X11::X11

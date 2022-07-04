@@ -511,7 +511,7 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
 
 void ProtocolGame::parseLogin(const InputMessagePtr& msg)
 {
-    const uint playerId = msg->getU32();
+    const uint32_t playerId = msg->getU32();
     const int serverBeat = msg->getU16();
 
     if (g_game.getFeature(Otc::GameNewSpeedLaw)) {
@@ -761,7 +761,7 @@ void ProtocolGame::parsePvpSituations(const InputMessagePtr& msg)
 
 void ProtocolGame::parsePlayerHelpers(const InputMessagePtr& msg)
 {
-    const uint id = msg->getU32();
+    const uint32_t id = msg->getU32();
     const int helpers = msg->getU16();
 
     const CreaturePtr creature = g_map.getCreatureById(id);
@@ -835,7 +835,7 @@ void ProtocolGame::parsePingBack(const InputMessagePtr&)
 
 void ProtocolGame::parseChallenge(const InputMessagePtr& msg)
 {
-    const uint timestamp = msg->getU32();
+    const uint32_t timestamp = msg->getU32();
     const uint8_t random = msg->getU8();
 
     sendLoginPacket(timestamp, random);
@@ -1336,7 +1336,7 @@ void ProtocolGame::parseItemClasses(const InputMessagePtr& msg)
 
 void ProtocolGame::parseCreatureMark(const InputMessagePtr& msg)
 {
-    const uint id = msg->getU32();
+    const uint32_t id = msg->getU32();
     const int color = msg->getU8();
 
     const CreaturePtr creature = g_map.getCreatureById(id);
@@ -1354,7 +1354,7 @@ void ProtocolGame::parseTrappers(const InputMessagePtr& msg)
         g_logger.traceError("too many trappers");
 
     for (int i = 0; i < numTrappers; ++i) {
-        const uint id = msg->getU32();
+        const uint32_t id = msg->getU32();
         CreaturePtr creature = g_map.getCreatureById(id);
         if (creature) {
             //TODO: set creature as trapper
@@ -1365,7 +1365,7 @@ void ProtocolGame::parseTrappers(const InputMessagePtr& msg)
 
 void ProtocolGame::parseCreatureHealth(const InputMessagePtr& msg)
 {
-    const uint id = msg->getU32();
+    const uint32_t id = msg->getU32();
     const int healthPercent = msg->getU8();
 
     const CreaturePtr creature = g_map.getCreatureById(id);
@@ -1374,7 +1374,7 @@ void ProtocolGame::parseCreatureHealth(const InputMessagePtr& msg)
 
 void ProtocolGame::parseCreatureLight(const InputMessagePtr& msg)
 {
-    const uint id = msg->getU32();
+    const uint32_t id = msg->getU32();
 
     Light light;
     light.intensity = msg->getU8();
@@ -1391,7 +1391,7 @@ void ProtocolGame::parseCreatureLight(const InputMessagePtr& msg)
 
 void ProtocolGame::parseCreatureOutfit(const InputMessagePtr& msg)
 {
-    const uint id = msg->getU32();
+    const uint32_t id = msg->getU32();
     const Outfit outfit = getOutfit(msg);
 
     const CreaturePtr creature = g_map.getCreatureById(id);
@@ -1405,7 +1405,7 @@ void ProtocolGame::parseCreatureOutfit(const InputMessagePtr& msg)
 
 void ProtocolGame::parseCreatureSpeed(const InputMessagePtr& msg)
 {
-    const uint id = msg->getU32();
+    const uint32_t id = msg->getU32();
 
     int baseSpeed = -1;
     if (g_game.getClientVersion() >= 1059)
@@ -1423,7 +1423,7 @@ void ProtocolGame::parseCreatureSpeed(const InputMessagePtr& msg)
 
 void ProtocolGame::parseCreatureSkulls(const InputMessagePtr& msg)
 {
-    const uint id = msg->getU32();
+    const uint32_t id = msg->getU32();
     const int skull = msg->getU8();
 
     const CreaturePtr creature = g_map.getCreatureById(id);
@@ -1437,7 +1437,7 @@ void ProtocolGame::parseCreatureSkulls(const InputMessagePtr& msg)
 
 void ProtocolGame::parseCreatureShields(const InputMessagePtr& msg)
 {
-    const uint id = msg->getU32();
+    const uint32_t id = msg->getU32();
     const int shield = msg->getU8();
 
     const CreaturePtr creature = g_map.getCreatureById(id);
@@ -1451,7 +1451,7 @@ void ProtocolGame::parseCreatureShields(const InputMessagePtr& msg)
 
 void ProtocolGame::parseCreatureUnpass(const InputMessagePtr& msg)
 {
-    const uint id = msg->getU32();
+    const uint32_t id = msg->getU32();
     const bool unpass = msg->getU8();
 
     const CreaturePtr creature = g_map.getCreatureById(id);
@@ -1465,7 +1465,7 @@ void ProtocolGame::parseCreatureUnpass(const InputMessagePtr& msg)
 
 void ProtocolGame::parseEditText(const InputMessagePtr& msg)
 {
-    const uint id = msg->getU32();
+    const uint32_t id = msg->getU32();
 
     int itemId;
     if (g_game.getClientVersion() >= 1010) {
@@ -1494,7 +1494,7 @@ void ProtocolGame::parseEditText(const InputMessagePtr& msg)
 void ProtocolGame::parseEditList(const InputMessagePtr& msg)
 {
     const int doorId = msg->getU8();
-    const uint id = msg->getU32();
+    const uint32_t id = msg->getU32();
     const auto text = msg->getString();
 
     Game::processEditList(id, doorId, text);
@@ -1746,7 +1746,7 @@ void ProtocolGame::parsePlayerState(const InputMessagePtr& msg)
 
 void ProtocolGame::parsePlayerCancelAttack(const InputMessagePtr& msg)
 {
-    uint seq = 0;
+    uint32_t seq = 0;
     if (g_game.getFeature(Otc::GameAttackSeq))
         seq = msg->getU32();
 
@@ -1950,7 +1950,7 @@ void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
         case Otc::MessageDamageOthers:
         {
             const Position pos = getPosition(msg);
-            uint value[2];
+            uint32_t value[2];
             int color[2];
 
             // physical damage
@@ -1979,7 +1979,7 @@ void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
         case Otc::MessageExpOthers:
         {
             const Position pos = getPosition(msg);
-            const uint value = msg->getU32();
+            const uint32_t value = msg->getU32();
             const int color = msg->getU8();
             text = msg->getString();
 
@@ -2147,18 +2147,18 @@ void ProtocolGame::parseKillTracker(const InputMessagePtr& msg)
 
 void ProtocolGame::parseVipAdd(const InputMessagePtr& msg)
 {
-    uint iconId = 0;
+    uint32_t iconId = 0;
     std::string desc;
     bool notifyLogin = false;
 
-    const uint id = msg->getU32();
+    const uint32_t id = msg->getU32();
     const auto name = g_game.formatCreatureName(msg->getString());
     if (g_game.getFeature(Otc::GameAdditionalVipInfo)) {
         desc = msg->getString();
         iconId = msg->getU32();
         notifyLogin = msg->getU8();
     }
-    const uint status = msg->getU8();
+    const uint32_t status = msg->getU8();
 
     if (g_game.getClientVersion() >= 1281) {
         msg->getU8(); // vip groups
@@ -2169,9 +2169,9 @@ void ProtocolGame::parseVipAdd(const InputMessagePtr& msg)
 
 void ProtocolGame::parseVipState(const InputMessagePtr& msg)
 {
-    const uint id = msg->getU32();
+    const uint32_t id = msg->getU32();
     if (g_game.getFeature(Otc::GameLoginPending)) {
-        const uint status = msg->getU8();
+        const uint32_t status = msg->getU8();
         g_game.processVipStateChange(id, status);
     } else {
         g_game.processVipStateChange(id, 1);
@@ -2180,7 +2180,7 @@ void ProtocolGame::parseVipState(const InputMessagePtr& msg)
 
 void ProtocolGame::parseVipLogout(const InputMessagePtr& msg)
 {
-    const uint id = msg->getU32();
+    const uint32_t id = msg->getU32();
     g_game.processVipStateChange(id, 0);
 }
 
@@ -2545,7 +2545,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type)
     const bool known = type != Proto::UnknownCreature;
     if (type == Proto::OutdatedCreature || type == Proto::UnknownCreature) {
         if (known) {
-            const uint id = msg->getU32();
+            const uint32_t id = msg->getU32();
             creature = g_map.getCreatureById(id);
             if (!creature)
                 g_logger.traceError("server said that a creature is known, but it's not");
@@ -2553,8 +2553,8 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type)
             // Is necessary reset camera?
             // if(creature->isLocalPlayer()) g_map.resetLastCamera();
         } else {
-            const uint removeId = msg->getU32();
-            const uint id = msg->getU32();
+            const uint32_t removeId = msg->getU32();
+            const uint32_t id = msg->getU32();
 
             if (id == removeId) {
                 creature = g_map.getCreatureById(id);
@@ -2707,7 +2707,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type)
         }
     } else if (type == Proto::Creature) {
         // this is send creature turn
-        const uint id = msg->getU32();
+        const uint32_t id = msg->getU32();
         creature = g_map.getCreatureById(id);
 
         if (!creature)

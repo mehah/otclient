@@ -149,11 +149,11 @@ namespace stdext
     {
         std::string out;
         for (int i = -1, s = src.length(); ++i < s;) {
-            const uchar c = src[i];
+            const uint8_t c = src[i];
             if ((c >= 32 && c < 128) || c == 0x0d || c == 0x0a || c == 0x09)
                 out += c;
             else if (c == 0xc2 || c == 0xc3) {
-                const uchar c2 = src[++i];
+                const uint8_t c2 = src[++i];
                 if (c == 0xc2) {
                     if (c2 > 0xa1 && c2 < 0xbb)
                         out += c2;
@@ -172,7 +172,7 @@ namespace stdext
     std::string latin1_to_utf8(const std::string_view src)
     {
         std::string out;
-        for (const uchar c : src) {
+        for (const uint8_t c : src) {
             if ((c >= 32 && c < 128) || c == 0x0d || c == 0x0a || c == 0x09)
                 out += c;
             else {
@@ -228,14 +228,14 @@ namespace stdext
 
     void ltrim(std::string& s)
     {
-        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](uint8_t ch) {
             return !std::isspace(ch);
         }));
     }
 
     void rtrim(std::string& s)
     {
-        s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+        s.erase(std::find_if(s.rbegin(), s.rend(), [](uint8_t ch) {
             return !std::isspace(ch);
         }).base(), s.end());
     }

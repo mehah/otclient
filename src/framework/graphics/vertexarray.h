@@ -25,8 +25,6 @@
 #include "declarations.h"
 #include "hardwarebuffer.h"
 
-#include <framework/util/databuffer.h>
-
 class VertexArray
 {
 public:
@@ -43,7 +41,8 @@ public:
 
     void addVertex(float x, float y)
     {
-        m_buffer << x << y;
+        m_buffer.push_back(x);
+        m_buffer.push_back(y);
     }
 
     void addTriangle(const Point& a, const Point& b, const Point& c)
@@ -109,13 +108,18 @@ public:
         addVertex(right, top);
     }
 
+    void append(const VertexArray* buffer)
+    {
+        m_buffer.insert(m_buffer.end(), buffer->m_buffer.begin(), buffer->m_buffer.end());
+    }
+
     void clear()
     {
-        m_buffer.reset();
+        m_buffer.clear();
         m_cached = false;
     }
 
-    float* vertices() const { return m_buffer.data(); }
+    const float* vertices() const { return m_buffer.data(); }
     int vertexCount() const { return m_buffer.size() / 2; }
     int size() const { return m_buffer.size(); }
 
@@ -128,7 +132,7 @@ public:
             m_hardwareBuffer = new HardwareBuffer(HardwareBuffer::Type::VERTEX_BUFFER);
 
         m_hardwareBuffer->bind();
-        m_hardwareBuffer->write(vertices(), size() * sizeof(float), HardwareBuffer::UsagePattern::DYNAMIC_DRAW);
+        m_hardwareBuffer->write(m_buffer.data(), m_buffer.size() * sizeof(float), HardwareBuffer::UsagePattern::DYNAMIC_DRAW);
 
         m_cached = true;
     }
@@ -139,6 +143,6 @@ public:
 
 private:
     bool m_cached{ false };
-    DataBuffer<float> m_buffer;
+    std::vector<float> m_buffer;
     HardwareBuffer* m_hardwareBuffer = nullptr;
 };

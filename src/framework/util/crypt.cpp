@@ -35,7 +35,7 @@
 #endif
 
 static constexpr std::string_view base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-static inline bool is_base64(unsigned char c) { return (isalnum(c) || (c == '+') || (c == '/')); }
+static inline bool is_base64(uint8_t c) { return (isalnum(c) || (c == '+') || (c == '/')); }
 
 Crypt g_crypt;
 
@@ -300,7 +300,7 @@ void Crypt::rsaSetPrivateKey(const std::string& p, const std::string& q, const s
 #endif
 }
 
-bool Crypt::rsaEncrypt(unsigned char* msg, int size)
+bool Crypt::rsaEncrypt(uint8_t* msg, int size)
 {
     if (size != rsaGetSize())
         return false;
@@ -327,7 +327,7 @@ bool Crypt::rsaEncrypt(unsigned char* msg, int size)
 #endif
 }
 
-bool Crypt::rsaDecrypt(unsigned char* msg, int size)
+bool Crypt::rsaDecrypt(uint8_t* msg, int size)
 {
     if (size != rsaGetSize())
         return false;

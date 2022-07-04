@@ -73,9 +73,9 @@ void House::load(const TiXmlElement* elem)
         name = stdext::format("Unnamed house #%lu", getId());
 
     setName(name);
-    setRent(elem->readType<uint32_t>("rent"));
-    setSize(elem->readType<uint32_t>("size"));
-    setTownId(elem->readType<uint32_t>("townid"));
+    setRent(elem->readType<uint32_t >("rent"));
+    setSize(elem->readType<uint32_t >("size"));
+    setTownId(elem->readType<uint32_t >("townid"));
     m_isGuildHall = elem->readType<bool>("guildhall");
 
     Position entryPos;
@@ -146,7 +146,7 @@ void HouseManager::load(const std::string& fileName)
             if (elem->ValueTStr() != "house")
                 stdext::throw_exception("invalid house tag.");
 
-            const auto houseId = elem->readType<uint32_t>("houseid");
+            const auto houseId = elem->readType<uint32_t >("houseid");
             HousePtr house = getHouse(houseId);
             if (!house)
                 house = HousePtr(new House(houseId)), addHouse(house);

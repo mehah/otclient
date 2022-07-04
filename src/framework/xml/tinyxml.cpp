@@ -54,7 +54,7 @@ void TiXmlBase::EncodeString(const TIXML_STRING& str, TIXML_STRING* outString)
     int i = 0;
 
     while (i < static_cast<int>(str.length())) {
-        auto c = static_cast<unsigned char>(str[i]);
+        auto c = static_cast<uint8_t>(str[i]);
 
         if (c == '&'
            && i < (static_cast<int>(str.length()) - 2)
@@ -770,7 +770,7 @@ bool TiXmlDocument::SaveFile(const char* filename) const
 bool TiXmlDocument::SaveFile(FILE* fp) const
 {
     if (useMicrosoftBOM) {
-        constexpr unsigned char TIXML_UTF_LEAD_0 = 0xefU,
+        constexpr uint8_t TIXML_UTF_LEAD_0 = 0xefU,
             TIXML_UTF_LEAD_1 = 0xbbU,
             TIXML_UTF_LEAD_2 = 0xbfU;
 

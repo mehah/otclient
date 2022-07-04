@@ -37,6 +37,7 @@ MiniWindow
   &save: true
   &simpleControlsHeight: 49
   &extendedControlsHeight: 72
+  @onOpen: modules.game_combatcontrols.onMiniWindowOpen()
   @onClose: modules.game_combatcontrols.onMiniWindowClose()
 
   MiniWindowContents

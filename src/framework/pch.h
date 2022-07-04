@@ -46,12 +46,6 @@
 #include <tuple>
 #include <typeinfo>
 #include <vector>
-
-#ifdef USE_STD_HASHING
-#include <unordered_map>
-#include <unordered_set>
-#else
-#include "util/robin_hood.h"
-#endif
+#include <parallel_hashmap/phmap.h>
 
 using namespace std::literals;

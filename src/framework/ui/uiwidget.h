@@ -84,7 +84,7 @@ protected:
 
 public:
     void addChild(const UIWidgetPtr& child);
-    void insertChild(int index, const UIWidgetPtr& child);
+    void insertChild(size_t index, const UIWidgetPtr& child);
     void removeChild(const UIWidgetPtr& child);
     void focusChild(const UIWidgetPtr& child, Fw::FocusReason reason);
     void focusNextChild(Fw::FocusReason reason, bool rotate = false);
@@ -193,9 +193,9 @@ protected:
     virtual bool onDragMove(const Point& mousePos, const Point& mouseMoved);
     virtual bool onDrop(UIWidgetPtr draggedWidget, const Point& mousePos);
     virtual bool onKeyText(const std::string_view keyText);
-    virtual bool onKeyDown(uchar keyCode, int keyboardModifiers);
-    virtual bool onKeyPress(uchar keyCode, int keyboardModifiers, int autoRepeatTicks);
-    virtual bool onKeyUp(uchar keyCode, int keyboardModifiers);
+    virtual bool onKeyDown(uint8_t keyCode, int keyboardModifiers);
+    virtual bool onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepeatTicks);
+    virtual bool onKeyUp(uint8_t keyCode, int keyboardModifiers);
     virtual bool onMousePress(const Point& mousePos, Fw::MouseButton button);
     virtual bool onMouseRelease(const Point& mousePos, Fw::MouseButton button);
     virtual bool onMouseMove(const Point& mousePos, const Point& mouseMoved);
@@ -206,9 +206,9 @@ protected:
     friend class UILayout;
 
     bool propagateOnKeyText(const std::string_view keyText);
-    bool propagateOnKeyDown(uchar keyCode, int keyboardModifiers);
-    bool propagateOnKeyPress(uchar keyCode, int keyboardModifiers, int autoRepeatTicks);
-    bool propagateOnKeyUp(uchar keyCode, int keyboardModifiers);
+    bool propagateOnKeyDown(uint8_t keyCode, int keyboardModifiers);
+    bool propagateOnKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepeatTicks);
+    bool propagateOnKeyUp(uint8_t keyCode, int keyboardModifiers);
     bool propagateOnMouseEvent(const Point& mousePos, UIWidgetList& widgetList);
     bool propagateOnMouseMove(const Point& mousePos, const Point& mouseMoved, UIWidgetList& widgetList);
 
@@ -466,8 +466,8 @@ private:
     void parseTextStyle(const OTMLNodePtr& styleNode);
 
     Rect m_textCachedScreenCoords;
-    std::vector<std::pair<Rect, Rect>> m_textCoordsCache;
     std::vector<Point> m_glyphsPositionsCache;
+    CoordsBufferPtr m_coordsBuffer;
     Size m_textSize;
 
 protected:

@@ -26,14 +26,19 @@
 
 namespace stdext
 {
-#ifdef USE_STD_HASHING
     template <class _Kty>
-    using hash = std::hash<_Kty>;
-#else
-    template <class _Kty>
-    using hash = robin_hood::hash<_Kty>;
-#endif
+    using hash = phmap::Hash<_Kty>;
 
+    // Robin Hood lib
+    inline size_t hash_int(uint64_t x) noexcept
+    {
+        x ^= x >> 33U;
+        x *= UINT64_C(0xff51afd7ed558ccd);
+        x ^= x >> 33U;
+        return static_cast<size_t>(x);
+    }
+
+    // Boost Lib
     inline void hash_union(size_t& seed, const size_t h)
     {
         seed ^= h + 0x9e3779b9 + (seed << 6) + (seed >> 2);

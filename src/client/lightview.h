@@ -36,7 +36,7 @@ public:
     void draw(const Rect& dest, const Rect& src);
 
     void addLightSource(const Point& pos, const Light& light);
-    void addShade(const Point& pos, const float opacity) { m_sources.push_back(Source{ pos, 0, 0, opacity }); }
+    void addShade(const Point& pos, const float opacity) { m_sources.emplace_back(pos, 0, 0, opacity); }
 
     void setGlobalLight(const Light& light) { m_globalLight = light; m_globalLightColor = Color::from8bit(m_globalLight.color, m_globalLight.intensity / static_cast<float>(UINT8_MAX)); }
     void setSmooth(bool enabled);

@@ -56,10 +56,15 @@ void DrawPool::draw()
         if (!pool->isEnabled() || !pool->hasFrameBuffer()) continue;
 
         const auto& pf = pool->toPoolFramed();
-        if (pool->hasModification(true) && !pool->m_objects.empty()) {
+
+        if (pool->canRepaint(true)) {
             pf->m_framebuffer->bind();
-            for (auto& obj : pool->m_objects)
-                drawObject(obj);
+            for (int_fast8_t z = -1; ++z <= pool->m_currentFloor;) {
+                for (auto& order : pool->m_objects[z])
+                    for (auto& obj : order)
+                        drawObject(obj);
+            }
+
             pf->m_framebuffer->release();
         }
     }
@@ -71,16 +76,20 @@ void DrawPool::draw()
         if (!pool->isEnabled()) continue;
 
         if (pool->hasFrameBuffer()) {
-            const auto* const pf = pool->toPoolFramed();
+            // Reset before events as there may be paint controls such as shaders.
+            g_painter->resetState();
 
-            if (pf->m_beforeDraw) pf->m_beforeDraw();
-            pf->m_framebuffer->draw();
-            if (pf->m_afterDraw) pf->m_afterDraw();
-        } else for (auto& obj : pool->m_objects) {
+            const auto* const pf = pool->toPoolFramed();
+            {
+                if (pf->m_beforeDraw) pf->m_beforeDraw();
+                pf->m_framebuffer->draw();
+                if (pf->m_afterDraw) pf->m_afterDraw();
+            }
+        } else for (auto& obj : pool->m_objects[0][static_cast<int>(Pool::DrawOrder::FIRST)]) {
             drawObject(obj);
         }
 
-        pool->m_objects.clear();
+        pool->clear();
     }
 }
 
@@ -95,8 +104,11 @@ void DrawPool::drawObject(const Pool::DrawObject& obj)
     auto& buffer = useGlobalCoord ? m_coordsBuffer : *obj.buffer->m_coords;
 
     if (useGlobalCoord) {
-        if (obj.drawMethods->empty()) return;
-        for (const auto& method : *obj.drawMethods) {
+        m_coordsBuffer.clear();
+
+        if (!obj.methods.has_value()) {
+            m_currentPool->addCoords(*obj.method, buffer, obj.drawMode);
+        } else for (const auto& method : *obj.methods) {
             m_currentPool->addCoords(method, buffer, obj.drawMode);
         }
     }
@@ -120,9 +132,11 @@ void DrawPool::drawObject(const Pool::DrawObject& obj)
     }
 
     g_painter->drawCoords(buffer, obj.drawMode);
+}
 
-    if (useGlobalCoord)
-        m_coordsBuffer.clear();
+void DrawPool::addTexturedCoordsBuffer(const TexturePtr& texture, const CoordsBufferPtr& coords, const Color& color)
+{
+    m_currentPool->add(color, texture, {}, DrawMode::TRIANGLE_STRIP, nullptr, coords);
 }
 
 void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Color& color)
@@ -130,7 +144,7 @@ void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, cons
     addTexturedRect(dest, texture, Rect(Point(), texture->getSize()), color);
 }
 
-void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const Point& originalDest, DrawBufferPtr drawQueue)
+void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const Point& originalDest, const DrawBufferPtr& buffer)
 {
     if (dest.isEmpty() || src.isEmpty())
         return;
@@ -141,7 +155,10 @@ void DrawPool::addTexturedRect(const Rect& dest, const TexturePtr& texture, cons
         .dest = originalDest.isNull() ? std::optional<Point>{} : originalDest
     };
 
-    m_currentPool->add(color, texture, method, DrawMode::TRIANGLE_STRIP, drawQueue);
+    if (buffer)
+        buffer->validate(originalDest);
+
+    m_currentPool->add(color, texture, method, DrawMode::TRIANGLE_STRIP, buffer);
 }
 
 void DrawPool::addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color)
@@ -200,7 +217,7 @@ void DrawPool::addBoundingRect(const Rect& dest, const Color& color, int innerLi
 
 void DrawPool::addAction(std::function<void()> action)
 {
-    m_currentPool->m_objects.push_back(Pool::DrawObject{ .action = std::move(action) });
+    m_currentPool->m_objects[0][static_cast<uint8_t>(Pool::DrawOrder::THIRD)].emplace_back(action);
 }
 
 void DrawPool::use(const PoolType type) { use(type, {}, {}); }
@@ -212,5 +229,10 @@ void DrawPool::use(const PoolType type, const Rect& dest, const Rect& src, const
     if (m_currentPool->hasFrameBuffer()) {
         m_currentPool->toPoolFramed()
             ->m_framebuffer->prepare(dest, src, colorClear);
+    }
+
+    // when the selected pool is MAP, reset the creature information state.
+    if (type == PoolType::MAP) {
+        get<Pool>(PoolType::CREATURE_INFORMATION)->resetState();
     }
 }

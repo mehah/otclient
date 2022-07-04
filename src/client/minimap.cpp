@@ -97,17 +97,18 @@ void Minimap::draw(const Rect& screenRect, const Position& mapCenter, float scal
     if (screenRect.isEmpty())
         return;
 
-    const Rect mapRect = calcMapRect(screenRect, mapCenter, scale);
+    const Rect& mapRect = calcMapRect(screenRect, mapCenter, scale);
     g_drawPool.addFilledRect(screenRect, color);
 
     if (MMBLOCK_SIZE * scale <= 1 || !mapCenter.isMapPosition()) {
         return;
     }
 
-    const Point blockOff = getBlockOffset(mapRect.topLeft());
-    const Point off = Point((mapRect.size() * scale).toPoint() - screenRect.size().toPoint()) / 2;
-    const Point start = screenRect.topLeft() - (mapRect.topLeft() - blockOff) * scale - off;
+    const Point& blockOff = getBlockOffset(mapRect.topLeft());
+    const Point& off = Point((mapRect.size() * scale).toPoint() - screenRect.size().toPoint()) / 2;
+    const Point& start = screenRect.topLeft() - (mapRect.topLeft() - blockOff) * scale - off;
 
+    const auto& oldClipRect = g_drawPool.getClipRect();
     g_drawPool.setClipRect(screenRect);
     for (int_fast32_t y = blockOff.y, ys = start.y; ys < screenRect.bottom(); y += MMBLOCK_SIZE, ys += MMBLOCK_SIZE * scale) {
         if (y < 0 || y >= 65536)
@@ -134,7 +135,7 @@ void Minimap::draw(const Rect& screenRect, const Position& mapCenter, float scal
             }
         }
     }
-    g_drawPool.resetClipRect();
+    g_drawPool.setClipRect(oldClipRect);
 }
 
 Point Minimap::getTilePoint(const Position& pos, const Rect& screenRect, const Position& mapCenter, float scale)
@@ -337,9 +338,9 @@ bool Minimap::loadOtmm(const std::string& fileName)
 
         fin->seek(start);
 
-        constexpr uint blockSize = MMBLOCK_SIZE * MMBLOCK_SIZE * sizeof(MinimapTile);
-        std::vector<uchar> compressBuffer(compressBound(blockSize));
-        std::vector<uchar> decompressBuffer(blockSize);
+        constexpr uint32_t blockSize = MMBLOCK_SIZE * MMBLOCK_SIZE * sizeof(MinimapTile);
+        std::vector<uint8_t> compressBuffer(compressBound(blockSize));
+        std::vector<uint8_t> decompressBuffer(blockSize);
 
         while (true) {
             Position pos;
@@ -352,14 +353,16 @@ bool Minimap::loadOtmm(const std::string& fileName)
                 break;
 
             MinimapBlock& block = getBlock(pos);
-            const ulong len = fin->getU16();
-            ulong destLen = blockSize;
+            const uint16_t len = fin->getU16();
             fin->read(compressBuffer.data(), len);
+
+            unsigned long destLen = blockSize;
             const int ret = uncompress(decompressBuffer.data(), &destLen, compressBuffer.data(), len);
+
             if (ret != Z_OK || destLen != blockSize)
                 break;
 
-            memcpy(reinterpret_cast<uchar*>(&block.getTiles()), decompressBuffer.data(), blockSize);
+            memcpy(reinterpret_cast<uint8_t*>(&block.getTiles()), decompressBuffer.data(), blockSize);
             block.mustUpdate();
             block.justSaw();
         }
@@ -398,9 +401,9 @@ void Minimap::saveOtmm(const std::string& fileName)
         fin->addU16(start);
         fin->seek(start);
 
-        constexpr uint blockSize = MMBLOCK_SIZE * MMBLOCK_SIZE * sizeof(MinimapTile),
+        constexpr uint32_t blockSize = MMBLOCK_SIZE * MMBLOCK_SIZE * sizeof(MinimapTile),
             COMPRESS_LEVEL = 3;
-        std::vector<uchar> compressBuffer(compressBound(blockSize));
+        std::vector<uint8_t> compressBuffer(compressBound(blockSize));
 
         for (uint_fast8_t z = 0; z <= MAX_Z; ++z) {
             for (auto& it : m_tileBlocks[z]) {
@@ -414,8 +417,8 @@ void Minimap::saveOtmm(const std::string& fileName)
                 fin->addU16(pos.y);
                 fin->addU8(pos.z);
 
-                ulong len = blockSize;
-                const int ret = compress2(compressBuffer.data(), &len, (uchar*)&block.getTiles(), blockSize, COMPRESS_LEVEL);
+                unsigned long len = blockSize;
+                const int ret = compress2(compressBuffer.data(), &len, (uint8_t*)&block.getTiles(), blockSize, COMPRESS_LEVEL);
                 assert(ret == Z_OK);
                 fin->addU16(len);
                 fin->write(compressBuffer.data(), len);

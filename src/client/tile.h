@@ -56,8 +56,7 @@ class Tile : public LuaObject
 public:
     Tile(const Position& position);
 
-    void drawSurface(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
-    void drawGround(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
+    void draw(const Point& dest, const MapPosInfo& mapRect, float scaleFactor, int flags, bool isCovered, LightView* lightView = nullptr);
 
     void clean();
 
@@ -105,6 +104,7 @@ public:
     bool hasCreature() { return m_countFlag.hasCreature > 0; }
     bool isTopGround() const { return m_ground && m_ground->isTopGround(); }
     bool isCovered(int8_t firstFloor);
+    bool isCompletelyCovered(uint8_t firstFloor, bool resetCache);
 
     bool hasBlockingCreature();
 
@@ -128,10 +128,9 @@ public:
     bool limitsFloorsView(bool isFreeView = false);
 
     bool canShade(const MapViewPtr& mapView);
-    bool canRender(bool drawViewportEdge, const Position& cameraPosition, AwareRange viewPort, LightView* lightView);
+    bool canRender(uint32_t& flags, const Position& cameraPosition, AwareRange viewPort, LightView* lightView);
     bool canErase() { return m_walkingCreatures.empty() && m_effects.empty() && isEmpty() && m_flags == 0 && m_minimapColor == 0; }
 
-    int getElevation() const { return m_countFlag.elevation; }
     bool hasElevation(int elevation = 1) { return m_countFlag.elevation >= elevation; }
     void overwriteMinimapColor(uint8_t color) { m_minimapColor = color; }
 
@@ -162,7 +161,6 @@ private:
             notPathable{ 0 },
             notSingleDimension{ 0 },
             blockProjectile{ 0 },
-            totalElevation{ 0 },
             hasDisplacement{ 0 },
             isNotPathable{ 0 },
             elevation{ 0 },
@@ -184,10 +182,9 @@ private:
             hasTopGroundBorder{ 0 };
     };
 
-    void drawTop(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
-    void drawBottom(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
-    void drawCreature(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
-    void drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor, bool animate, LightView* lightView);
+    void drawTop(const Point& dest, float scaleFactor, int flags, LightView* lightView = nullptr);
+    void drawCreature(const Point& dest, const MapPosInfo& mapRect, float scaleFactor, int flags, bool isCovered, LightView* lightView = nullptr);
+    void drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor, bool animate, int flags, LightView* lightView);
 
     void checkTranslucentLight();
     bool checkForDetachableThing();
@@ -196,11 +193,13 @@ private:
 
     uint8_t m_drawElevation{ 0 },
         m_minimapColor{ 0 },
-        m_lastFloorMin{ 0 };
+        m_totalElevation{ 0 };
+
+    int8_t m_lastFloorMin{ -1 };
+
+    std::array<int8_t, MAX_Z + 1> m_completelyCoveredCache;
 
     uint32_t m_flags{ 0 }, m_houseId{ 0 };
-
-    std::array<Position, 8> m_positionsAround;
 
     std::vector<CreaturePtr> m_walkingCreatures;
     std::vector<ThingPtr> m_things;

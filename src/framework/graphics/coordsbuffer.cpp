@@ -69,7 +69,7 @@ void CoordsBuffer::addRepeatedRects(const Rect& dest, const Rect& src)
 
 void CoordsBuffer::cache()
 {
-    if (!m_canCache || !g_graphics.canUseHardwareBuffers())
+    if (!m_canCache)
         return;
 
     m_vertexArray.cache();

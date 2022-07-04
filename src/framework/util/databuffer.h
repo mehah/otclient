@@ -22,11 +22,13 @@
 
 #pragma once
 
+#include <algorithm>
+
 template<class T>
 class DataBuffer
 {
 public:
-    DataBuffer(unsigned int res = 64) : m_capacity(res), m_buffer(new T[m_capacity]) {}
+    DataBuffer(uint32_t res = 64) : m_capacity(res), m_buffer(new T[m_capacity]) {}
     ~DataBuffer() { delete[] m_buffer; }
 
     void reset() { m_size = 0; }
@@ -40,21 +42,21 @@ public:
     }
 
     bool empty() const { return m_size == 0; }
-    unsigned int size() const { return m_size; }
+    uint32_t size() const { return m_size; }
     T* data() const { return m_buffer; }
 
-    const T& at(unsigned int i) const { return m_buffer[i]; }
+    const T& at(uint32_t i) const { return m_buffer[i]; }
     const T& last() const { return m_buffer[m_size - 1]; }
     const T& first() const { return m_buffer[0]; }
-    const T& operator[](unsigned int i) const { return m_buffer[i]; }
-    T& operator[](unsigned int i) { return m_buffer[i]; }
+    const T& operator[](uint32_t i) const { return m_buffer[i]; }
+    T& operator[](uint32_t i) { return m_buffer[i]; }
 
-    void reserve(unsigned int n)
+    void reserve(uint32_t n)
     {
         if (n > m_capacity) {
             T* buffer = new T[n];
-            for (unsigned int i = 0; i < m_size; ++i)
-                buffer[i] = m_buffer[i];
+
+            std::copy(m_buffer, m_buffer + m_size, buffer);
 
             delete[] m_buffer;
             m_buffer = buffer;
@@ -62,22 +64,22 @@ public:
         }
     }
 
-    void resize(unsigned int n, T def = T())
+    void resize(uint32_t n, T def = T())
     {
         if (n == m_size)
             return;
         reserve(n);
-        for (unsigned int i = m_size; i < n; ++i)
+        for (uint32_t i = m_size; i < n; ++i)
             m_buffer[i] = def;
         m_size = n;
     }
 
-    void grow(unsigned int n)
+    void grow(uint32_t n)
     {
         if (n <= m_size)
             return;
         if (n > m_capacity) {
-            unsigned int newcapacity = m_capacity;
+            uint32_t newcapacity = m_capacity;
             do { newcapacity *= 2; } while (newcapacity < n);
             reserve(newcapacity);
         }
@@ -90,10 +92,28 @@ public:
         m_buffer[m_size - 1] = v;
     }
 
+    void append(const DataBuffer<T>* v)
+    {
+        const uint32_t sumSize = m_size + v->m_size;
+        if (sumSize > m_capacity) {
+            m_capacity = sumSize * 2;
+            T* buffer = new T[m_capacity];
+
+            std::copy(v->m_buffer, v->m_buffer + v->m_size,
+                  std::copy(m_buffer, m_buffer + m_size, buffer));
+
+            delete[] m_buffer;
+            m_buffer = buffer;
+        } else {
+            std::copy(v->m_buffer, v->m_buffer + v->m_size, m_buffer + m_size);
+        }
+        m_size = sumSize;
+    }
+
     DataBuffer& operator<<(const T& t) { add(t); return *this; }
 
 private:
-    unsigned int m_size{ 0 };
-    unsigned int m_capacity;
+    uint32_t m_size{ 0 };
+    uint32_t m_capacity;
     T* m_buffer;
 };

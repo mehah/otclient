@@ -195,7 +195,7 @@ int Animator::getPhaseDuration(int phase)
 {
     assert(phase < static_cast<int>(m_phaseDurations.size()));
 
-    const auto& data = m_phaseDurations.at(phase);
+    const auto& data = m_phaseDurations[phase];
     if (data.first == data.second) return data.first;
 
     return stdext::random_range(data.first, data.second);

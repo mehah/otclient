@@ -52,4 +52,6 @@ private:
     Rect m_textScreenCoords;
     BitmapFontPtr m_font;
     Fw::AlignmentFlag m_align;
+
+    CoordsBufferPtr m_coordsBuffer;
 };

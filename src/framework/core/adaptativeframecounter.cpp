@@ -36,7 +36,7 @@ bool AdaptativeFrameCounter::update()
 
     m_lastTime = m_currentTime;
 
-    const uint tickCount = stdext::millis();
+    const uint32_t tickCount = stdext::millis();
     if (tickCount - m_interval <= 1000)
         return false;
 

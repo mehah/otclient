@@ -26,7 +26,9 @@
 #include "thingtypemanager.h"
 #include "tile.h"
 
-void Thing::setPosition(const Position& position)
+#include <framework/core/graphicalapplication.h>
+
+void Thing::setPosition(const Position& position, uint8_t stackPos, bool hasElevation)
 {
     if (m_position == position)
         return;
@@ -82,6 +84,32 @@ int Thing::getStackPos()
 
     g_logger.traceError("got a thing with invalid stackpos");
     return -1;
+}
+
+void Thing::generateBuffer()
+{
+    m_drawBuffer = nullptr;
+
+    Pool::DrawOrder order = Pool::DrawOrder::NONE;
+    bool agroup = true;
+    if (isSingleGround())
+        order = Pool::DrawOrder::FIRST;
+    else if (isSingleGroundBorder()) {
+        order = Pool::DrawOrder::SECOND;
+        agroup = false;
+    } else if (isCommon() && isSingleDimension()) {
+        order = Pool::DrawOrder::THIRD;
+        agroup = false;
+    } else if (isOnBottom() && isSingleDimension() && !hasDisplacement() && isNotWalkable())
+        order = Pool::DrawOrder::THIRD;
+    else if (isTopGround() || isTopGroundBorder() || g_app.isDrawingEffectsOnTop() && isEffect())
+        order = Pool::DrawOrder::FOURTH;
+    else if (isMissile())
+        order = Pool::DrawOrder::FIFTH;
+
+    if (order != Pool::DrawOrder::NONE) {
+        m_drawBuffer = std::make_shared<DrawBuffer>(order, agroup);
+    }
 }
 
 const ThingTypePtr& Thing::getThingType()

@@ -44,7 +44,7 @@ void LightView::addLightSource(const Point& pos, const Light& light)
         }
     }
 
-    m_sources.push_back(Source{ pos , light.color, light.intensity, g_drawPool.getOpacity() });
+    m_sources.emplace_back(pos, light.color, light.intensity, g_drawPool.getOpacity());
 }
 
 void LightView::draw(const Rect& dest, const Rect& src)
@@ -63,7 +63,7 @@ void LightView::draw(const Rect& dest, const Rect& src)
             const Color color = Color::from8bit(light.color, std::min<float>(light.opacity, light.intensity / 6.f));
             const uint16_t radius = light.intensity * m_tileSize;
             g_drawPool.addTexturedRect(Rect(light.pos - radius, Size(radius * 2)), g_sprites.getLightTexture(), color);
-            g_drawPool.setBlendEquation(BlendEquation::MAX, g_drawPool.size());
+            g_drawPool.setBlendEquation(BlendEquation::MAX, true);
             _clr = true;
         } else {
             // Empty the lightings references

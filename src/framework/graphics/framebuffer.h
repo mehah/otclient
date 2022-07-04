@@ -40,7 +40,7 @@ public:
     void setBackuping(bool enabled) { m_backuping = enabled; }
 
     TexturePtr getTexture() { return m_texture; }
-    Size getSize();
+    Size getSize() { return m_texture->getSize(); }
 
     bool isBackuping() { return m_backuping; }
     bool isSmooth() { return m_smooth; }
@@ -62,7 +62,7 @@ private:
     void internalRelease();
     void prepare(const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha);
 
-    static uint boundFbo;
+    static uint32_t boundFbo;
 
     Matrix3 m_textureMatrix;
     TexturePtr m_texture, m_screenBackup;

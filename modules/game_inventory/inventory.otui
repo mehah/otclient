@@ -85,6 +85,7 @@ MiniWindow
   !text: tr('Inventory')
   icon: /images/topbuttons/inventory
   height: 175
+  @onOpen: modules.game_inventory.onMiniWindowOpen()
   @onClose: modules.game_inventory.onMiniWindowClose()
   &save: true
 

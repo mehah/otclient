@@ -143,7 +143,7 @@ private:
     std::array<int, Otc::LastSkill> m_skillsLevelPercent;
     std::vector<int> m_spells;
 
-    std::map<Otc::ResourceTypes_t, uint64_t> m_resourcesBalance;
+    stdext::map<Otc::ResourceTypes_t, uint64_t> m_resourcesBalance;
 
     uint8_t m_autoWalkRetries{ 0 };
 

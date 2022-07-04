@@ -288,7 +288,7 @@ protected:
 
     static bool IsWhiteSpace(char c)
     {
-        return (isspace(static_cast<unsigned char>(c)) || c == '\n' || c == '\r');
+        return (isspace(static_cast<uint8_t>(c)) || c == '\n' || c == '\r');
     }
 
     static bool IsWhiteSpace(int c)
@@ -328,7 +328,7 @@ protected:
     {
         assert(p);
         if (encoding == TIXML_ENCODING_UTF8) {
-            *length = utf8ByteTable[*((const unsigned char*)p)];
+            *length = utf8ByteTable[*((const uint8_t*)p)];
             assert(*length >= 0 && *length < 5);
         } else {
             *length = 1;
@@ -369,8 +369,8 @@ protected:
 
     // None of these methods are reliable for any language except English.
     // Good for approximation, not great for accuracy.
-    static int IsAlpha(unsigned char anyByte, TiXmlEncoding encoding);
-    static int IsAlphaNum(unsigned char anyByte, TiXmlEncoding encoding);
+    static int IsAlpha(uint8_t anyByte, TiXmlEncoding encoding);
+    static int IsAlphaNum(uint8_t anyByte, TiXmlEncoding encoding);
 
     static int ToLower(int v, TiXmlEncoding encoding)
     {
@@ -380,13 +380,13 @@ protected:
         }
         return tolower(v);
     }
-    static void ConvertUTF32ToUTF8(unsigned long input, char* output, int* length);
+    static void ConvertUTF32ToUTF8(uint64_t input, char* output, int* length);
 
 private:
     struct Entity
     {
         const char* str;
-        unsigned int    strLength;
+        uint32_t    strLength;
         char            chr;
     };
     enum

@@ -29,6 +29,7 @@ void UIWidget::initText()
 {
     m_font = g_fonts.getDefaultFont();
     m_textAlign = Fw::AlignCenter;
+    m_coordsBuffer = std::make_shared<CoordsBuffer>();
 }
 
 void UIWidget::updateText()
@@ -54,6 +55,7 @@ void UIWidget::updateText()
     }
 
     m_textCachedScreenCoords = {};
+    g_drawPool.repaint();
 }
 
 void UIWidget::resizeToText()
@@ -97,20 +99,15 @@ void UIWidget::drawText(const Rect& screenCoords)
     if (screenCoords != m_textCachedScreenCoords) {
         auto coords = Rect(screenCoords.topLeft(), screenCoords.bottomRight());
         coords.translate(m_textOffset);
-
         m_textCachedScreenCoords = coords;
-
-        m_textCoordsCache.clear();
-        m_textCoordsCache = m_font->getDrawTextCoords(m_drawText, m_textSize, m_textAlign, coords, m_glyphsPositionsCache);
+        m_font->fillTextCoords(m_coordsBuffer, m_text, m_textSize, m_textAlign, coords, m_glyphsPositionsCache);
     }
 
-    for (const auto& fontRect : m_textCoordsCache)
-        g_drawPool.addTexturedRect(fontRect.first, m_font->getTexture(), fontRect.second, m_color);
+    g_drawPool.addTexturedCoordsBuffer(m_font->getTexture(), m_coordsBuffer, m_color);
 }
 
 void UIWidget::onTextChange(const std::string_view text, const std::string_view oldText)
 {
-    g_app.repaint();
     callLuaField("onTextChange", text, oldText);
 }
 

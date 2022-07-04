@@ -40,12 +40,12 @@ public:
 
     static bool hasSpeedFormula() { return speedA != 0 && speedB != 0 && speedC != 0; }
 
-    void draw(const Point& dest, float scaleFactor, bool animate, const Highlight& highLight, TextureType textureType, Color color, LightView* lightView = nullptr) override;
+    void draw(const Point& dest, float scaleFactor, bool animate, uint32_t flags, const Highlight& highLight, TextureType textureType, Color color, LightView* lightView = nullptr) override;
 
     void internalDrawOutfit(Point dest, float scaleFactor, bool animateWalk, TextureType textureType, Otc::Direction direction, Color color);
 
     void drawOutfit(const Rect& destRect, bool resize, Color color = Color::white);
-    void drawInformation(const Rect& parentRect, const Point& dest, float scaleFactor, const Point& drawOffset, bool useGray, float horizontalStretchFactor, float verticalStretchFactor, int drawFlags);
+    void drawInformation(const MapPosInfo& mapRect, const Point& dest, float scaleFactor, bool useGray, int drawFlags);
 
     void setId(uint32_t id) override { m_id = id; }
     void setName(const std::string_view name);
@@ -94,7 +94,6 @@ public:
     uint8_t getIcon() { return m_icon; }
     bool isPassable() { return m_passable; }
     uint64_t getStepDuration(bool ignoreDiagonal = false, Otc::Direction dir = Otc::InvalidDirection);
-    Point getDrawOffset();
     Point getWalkOffset() { return m_walkOffset; }
     PointF getJumpOffset() { return m_jumpOffset; }
     Position getLastStepFromPosition() { return m_lastStepFromPosition; }
@@ -194,7 +193,7 @@ protected:
     int m_walkAnimationPhase{ 0 },
         m_walkedPixels{ 0 };
 
-    uint m_footStep{ 0 };
+    uint32_t m_footStep{ 0 };
     Timer m_walkTimer, m_footTimer, m_outfitColorTimer;
     TilePtr m_walkingTile;
 
@@ -217,7 +216,9 @@ protected:
         m_lastStepToPosition, m_oldPosition;
 
     // jump related
-    float m_jumpHeight{ 0 }, m_jumpDuration{ 0 };
+    float m_jumpHeight{ 0 },
+        m_jumpDuration{ 0 };
+
     PointF m_jumpOffset;
     Timer m_jumpTimer;
 

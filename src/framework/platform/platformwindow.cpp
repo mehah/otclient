@@ -135,7 +135,7 @@ void PlatformWindow::processKeyUp(Fw::Key keyCode)
         return;
     }
     if (keyCode == Fw::KeyNumLock) {
-        for (uchar k = Fw::KeyNumpad0; k <= Fw::KeyNumpad9; ++k) {
+        for (uint8_t k = Fw::KeyNumpad0; k <= Fw::KeyNumpad9; ++k) {
             if (m_keysState[static_cast<Fw::Key>(k)])
                 processKeyUp(static_cast<Fw::Key>(k));
         }

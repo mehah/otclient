@@ -39,11 +39,6 @@ ItemPtr Item::create(int id)
     ItemPtr item(new Item);
     item->setId(id);
 
-    if (item->isSingleGround() || item->isOnBottom() &&
-        item->isSingleDimension() && !item->hasDisplacement()) {
-        item->m_drawBuffer = std::make_shared<DrawBuffer>();
-    }
-
     return item;
 }
 
@@ -51,10 +46,6 @@ ItemPtr Item::createFromOtb(int id)
 {
     ItemPtr item(new Item);
     item->setOtbId(id);
-
-    if (item->isSingleGround()) {
-        item->m_drawBuffer = std::make_shared<DrawBuffer>();
-    }
 
     return item;
 }
@@ -64,7 +55,7 @@ std::string Item::getName()
     return g_things.findItemTypeByClientId(m_clientId)->getName();
 }
 
-void Item::draw(const Point& dest, float scaleFactor, bool animate, const Highlight& highLight, TextureType textureType, Color color, LightView* lightView)
+void Item::draw(const Point& dest, float scaleFactor, bool animate, uint32_t flags, const Highlight& highLight, TextureType textureType, Color color, LightView* lightView)
 {
     if (m_clientId == 0 || !canDraw())
         return;
@@ -72,20 +63,13 @@ void Item::draw(const Point& dest, float scaleFactor, bool animate, const Highli
     // determine animation phase
     const int animationPhase = calculateAnimationPhase(animate);
 
-    // determine x,y,z patterns
-    int xPattern = 0, yPattern = 0, zPattern = 0;
-    calculatePatterns(xPattern, yPattern, zPattern);
-
     if (m_color != Color::alpha)
         color = m_color;
 
-    if (m_drawBuffer)
-        m_drawBuffer->validate(dest);
-
-    getThingType()->draw(dest, scaleFactor, 0, xPattern, yPattern, zPattern, animationPhase, textureType, color, lightView, m_drawBuffer);
+    getThingType()->draw(dest, scaleFactor, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, textureType, color, lightView, m_drawBuffer);
 
     if (highLight.enabled && this == highLight.thing) {
-        getThingType()->draw(dest, scaleFactor, 0, xPattern, yPattern, zPattern, animationPhase, TextureType::ALL_BLANK, highLight.rgbColor);
+        getThingType()->draw(dest, scaleFactor, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, TextureType::ALL_BLANK, highLight.rgbColor);
     }
 }
 
@@ -97,6 +81,7 @@ void Item::setId(uint32_t id)
     m_serverId = g_things.findItemTypeByClientId(id)->getServerId();
     m_clientId = id;
     m_thingType = nullptr;
+    generateBuffer();
 }
 
 void Item::setOtbId(uint16_t id)
@@ -113,11 +98,17 @@ void Item::setOtbId(uint16_t id)
 
     m_clientId = id;
     m_thingType = nullptr;
+    generateBuffer();
 }
 
-bool Item::isValid()
+void Item::setPosition(const Position& position, uint8_t stackPos, bool hasElevation)
 {
-    return g_things.isValidDatId(m_clientId, ThingCategoryItem) && !g_things.getThingType(m_clientId, ThingCategoryItem)->isNull();
+    Thing::setPosition(position, stackPos);
+
+    if (hasElevation && isSingleGroundBorder())
+        m_drawBuffer = nullptr;
+    else if (m_drawBuffer && isSingleDimension())
+        m_drawBuffer->agroup(stackPos <= 1);
 }
 
 void Item::unserializeItem(const BinaryTreePtr& in)
@@ -265,8 +256,11 @@ ItemPtr Item::clone()
     return item;
 }
 
-void Item::calculatePatterns(int& xPattern, int& yPattern, int& zPattern)
+void Item::updatePatterns()
 {
+    m_numPatternX = m_numPatternY =
+        m_numPatternZ = 0;
+
     // Avoid crashes with invalid items
     if (!isValid())
         return;
@@ -276,31 +270,31 @@ void Item::calculatePatterns(int& xPattern, int& yPattern, int& zPattern)
 
     if (isStackable() && numPatternX == 4 && numPatternY == 2) {
         if (m_countOrSubType <= 0) {
-            xPattern = 0;
-            yPattern = 0;
+            m_numPatternX = 0;
+            m_numPatternY = 0;
         } else if (m_countOrSubType < 5) {
-            xPattern = m_countOrSubType - 1;
-            yPattern = 0;
+            m_numPatternX = m_countOrSubType - 1;
+            m_numPatternY = 0;
         } else if (m_countOrSubType < 10) {
-            xPattern = 0;
-            yPattern = 1;
+            m_numPatternX = 0;
+            m_numPatternY = 1;
         } else if (m_countOrSubType < 25) {
-            xPattern = 1;
-            yPattern = 1;
+            m_numPatternX = 1;
+            m_numPatternY = 1;
         } else if (m_countOrSubType < 50) {
-            xPattern = 2;
-            yPattern = 1;
+            m_numPatternX = 2;
+            m_numPatternY = 1;
         } else {
-            xPattern = 3;
-            yPattern = 1;
+            m_numPatternX = 3;
+            m_numPatternY = 1;
         }
     } else if (isHangable()) {
         const TilePtr& tile = getTile();
         if (tile) {
             if (tile->mustHookSouth())
-                xPattern = numPatternX >= 2 ? 1 : 0;
+                m_numPatternX = numPatternX >= 2 ? 1 : 0;
             else if (tile->mustHookEast())
-                xPattern = numPatternX >= 3 ? 2 : 0;
+                m_numPatternX = numPatternX >= 3 ? 2 : 0;
         }
     } else if (isSplash() || isFluidContainer()) {
         int color = Otc::FluidTransparent;
@@ -367,12 +361,12 @@ void Item::calculatePatterns(int& xPattern, int& yPattern, int& zPattern)
         } else
             color = m_countOrSubType;
 
-        xPattern = (color % 4) % numPatternX;
-        yPattern = (color / 4) % numPatternY;
+        m_numPatternX = (color % 4) % numPatternX;
+        m_numPatternY = (color / 4) % numPatternY;
     } else {
-        xPattern = m_position.x % numPatternX;
-        yPattern = m_position.y % numPatternY;
-        zPattern = m_position.z % getNumPatternZ();
+        m_numPatternX = m_position.x % numPatternX;
+        m_numPatternY = m_position.y % numPatternY;
+        m_numPatternZ = m_position.z % getNumPatternZ();
     }
 }
 
@@ -398,9 +392,8 @@ int Item::calculateAnimationPhase(bool animate)
 
 int Item::getExactSize(int layer, int xPattern, int yPattern, int zPattern, int animationPhase)
 {
-    calculatePatterns(xPattern, yPattern, zPattern);
     animationPhase = calculateAnimationPhase(true);
-    return Thing::getExactSize(layer, xPattern, yPattern, zPattern, animationPhase);
+    return Thing::getExactSize(layer, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase);
 }
 
 const ThingTypePtr& Item::getThingType()

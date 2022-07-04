@@ -54,7 +54,7 @@ struct UnjustifiedPoints
     uint8_t skullTime;
 };
 
-using Vip = std::tuple<std::string, uint, std::string, int, bool>;
+using Vip = std::tuple<std::string, uint32_t, std::string, int, bool>;
 
 //@bindsingleton g_game
 class Game
@@ -87,7 +87,7 @@ protected:
 
     void processGMActions(const std::vector<uint8_t >& actions);
     void processInventoryChange(int slot, const ItemPtr& item);
-    void processAttackCancel(uint seq);
+    void processAttackCancel(uint32_t seq);
     void processWalkCancel(Otc::Direction direction);
 
     static void processPlayerHelpers(int helpers);
@@ -118,8 +118,8 @@ protected:
     static void processRuleViolationLock();
 
     // vip related
-    void processVipAdd(uint id, const std::string_view name, uint status, const std::string_view description, int iconId, bool notifyLogin);
-    void processVipStateChange(uint id, uint status);
+    void processVipAdd(uint32_t id, const std::string_view name, uint32_t status, const std::string_view description, int iconId, bool notifyLogin);
+    void processVipStateChange(uint32_t id, uint32_t status);
 
     // tutorial hint
     static void processTutorialHint(int id);
@@ -141,8 +141,8 @@ protected:
     static void processCloseTrade();
 
     // edit text/list
-    static void processEditText(uint id, int itemId, int maxLength, const std::string_view text, const std::string_view writer, const std::string_view date);
-    static void processEditList(uint id, int doorId, const std::string_view text);
+    static void processEditText(uint32_t id, int itemId, int maxLength, const std::string_view text, const std::string_view writer, const std::string_view date);
+    static void processEditList(uint32_t id, int doorId, const std::string_view text);
 
     // questlog
     static void processQuestLog(const std::vector<std::tuple<int, std::string, bool> >& questList);
@@ -180,7 +180,7 @@ public:
     void useWith(const ItemPtr& item, const ThingPtr& toThing);
     void useInventoryItem(int itemId);
     void useInventoryItemWith(int itemId, const ThingPtr& toThing);
-    ItemPtr findItemInContainers(uint itemId, int subType);
+    ItemPtr findItemInContainers(uint32_t itemId, int subType);
 
     // container related
     int open(const ItemPtr& item, const ContainerPtr& previousContainer);
@@ -256,8 +256,8 @@ public:
     void rejectTrade();
 
     // house window and editable items related
-    void editText(uint id, const std::string_view text);
-    void editList(uint id, int doorId, const std::string_view text);
+    void editText(uint32_t id, const std::string_view text);
+    void editList(uint32_t id, int doorId, const std::string_view text);
 
     // rule violations (only gms)
     void openRuleViolation(const std::string_view reporter);
@@ -380,11 +380,11 @@ private:
     bool m_expertPvpMode;
     int m_serverBeat{ 50 };
     ticks_t m_ping{ -1 };
-    uint m_pingSent;
-    uint m_pingReceived;
+    uint32_t m_pingSent;
+    uint32_t m_pingReceived;
     stdext::timer m_pingTimer;
     Timer m_dashTimer;
-    uint m_seq{ 0 };
+    uint32_t m_seq{ 0 };
     int m_pingDelay{ 1000 };
     Otc::FightModes m_fightMode{ Otc::FightBalanced };
     Otc::ChaseModes m_chaseMode{ Otc::DontChase };

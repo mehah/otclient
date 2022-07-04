@@ -26,7 +26,7 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
 
-void Effect::drawEffect(const Point& dest, float scaleFactor, LightView* lightView)
+void Effect::drawEffect(const Point& dest, float scaleFactor, uint32_t flags, int offsetX, int offsetY, LightView* lightView)
 {
     if (m_id == 0 || !canDraw()) return;
 
@@ -52,13 +52,19 @@ void Effect::drawEffect(const Point& dest, float scaleFactor, LightView* lightVi
         animationPhase = std::min<int>(static_cast<int>(m_animationTimer.ticksElapsed() / ticks), getAnimationPhases() - 1);
     }
 
-    const int xPattern = m_position.x % getNumPatternX();
-    const int yPattern = m_position.y % getNumPatternY();
+    int xPattern = m_numPatternX;
+    int yPattern = m_numPatternY;
+    if (g_game.getFeature(Otc::GameMapOldEffectRendering)) {
+        xPattern = offsetX % getNumPatternX();
+        if (xPattern < 0)
+            xPattern += getNumPatternX();
 
-    if (m_drawBuffer)
-        m_drawBuffer->validate(dest);
+        yPattern = offsetY % getNumPatternY();
+        if (yPattern < 0)
+            yPattern += getNumPatternY();
+    }
 
-    getThingType()->draw(dest, scaleFactor, 0, xPattern, yPattern, 0, animationPhase, TextureType::NONE, Color::white, lightView, m_drawBuffer);
+    getThingType()->draw(dest, scaleFactor, 0, xPattern, yPattern, 0, animationPhase, flags, TextureType::NONE, Color::white, lightView, m_drawBuffer);
 }
 
 void Effect::onAppear()
@@ -82,12 +88,11 @@ void Effect::onAppear()
 
     m_animationTimer.restart();
 
-    if (g_app.isDrawingEffectsOnTop())
-        m_drawBuffer = std::make_shared<DrawBuffer>();
-
     // schedule removal
     const auto self = asEffect();
     g_dispatcher.scheduleEvent([self] { g_map.removeThing(self); }, m_duration);
+
+    generateBuffer();
 }
 
 void Effect::waitFor(const EffectPtr& effect)
@@ -102,6 +107,14 @@ void Effect::setId(uint32_t id)
 
     m_id = id;
     m_thingType = nullptr;
+}
+
+void Effect::setPosition(const Position& position, uint8_t stackPos, bool hasElevation)
+{
+    Thing::setPosition(position, stackPos, hasElevation);
+
+    m_numPatternX = m_position.x % getNumPatternX();
+    m_numPatternY = m_position.y % getNumPatternY();
 }
 
 const ThingTypePtr& Effect::getThingType()

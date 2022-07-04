@@ -102,7 +102,7 @@ public:
         return positions;
     }
 
-    T x, y;;
+    T x, y;
 };
 
 using Point = TPoint<int>;

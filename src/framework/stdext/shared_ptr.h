@@ -229,7 +229,7 @@ namespace stdext
 
 namespace std
 {
-    // hash, for unordered_map support
+    // hash, for map support
     template<typename T> struct hash<stdext::shared_ptr<T>> { size_t operator()(const stdext::shared_ptr<T>& p) const { return stdext::hash<T*>()(p.get()); } };
     template<typename T> struct hash<stdext::weak_ptr<T>> { size_t operator()(const stdext::weak_ptr<T>& p) const { return stdext::hash<T*>()(p.get()); } };
 

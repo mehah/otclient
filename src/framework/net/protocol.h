@@ -48,7 +48,7 @@ public:
 
     void generateXteaKey();
     void setXteaKey(uint32_t a, uint32_t b, uint32_t c, uint32_t d) { m_xteaKey = { a, b, c, d }; }
-    std::vector<uint32_t> getXteaKey() { return { m_xteaKey.begin(), m_xteaKey.end() }; }
+    std::vector<uint32_t > getXteaKey() { return { m_xteaKey.begin(), m_xteaKey.end() }; }
     void enableXteaEncryption() { m_xteaEncryptionEnabled = true; }
 
     void enableChecksum() { m_checksumEnabled = true; }
@@ -63,7 +63,7 @@ protected:
     virtual void onRecv(const InputMessagePtr& inputMessage);
     virtual void onError(const std::error_code& err);
 
-    std::array<uint32_t, 4> m_xteaKey;
+    std::array<uint32_t , 4> m_xteaKey;
 
 private:
     void internalRecvHeader(uint8_t* buffer, uint16_t size);

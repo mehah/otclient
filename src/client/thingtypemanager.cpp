@@ -188,7 +188,7 @@ void ThingTypeManager::loadOtb(const std::string& file)
         const FileStreamPtr fin = g_resources.openFile(file);
         fin->cache();
 
-        uint signature = fin->getU32();
+        uint32_t signature = fin->getU32();
         if (signature != 0)
             stdext::throw_exception("invalid otb file");
 

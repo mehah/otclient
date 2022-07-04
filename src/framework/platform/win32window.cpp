@@ -265,7 +265,7 @@ void WIN32Window::terminate()
 
 struct WindowProcProxy
 {
-    static LRESULT CALLBACK call(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+    static LRESULT CALLBACK call(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
     {
         auto* const window = static_cast<WIN32Window*>(&g_window);
         return window->windowProc(hWnd, uMsg, wParam, lParam);
@@ -332,11 +332,7 @@ void WIN32Window::internalCreateGLContext()
         g_logger.fatal("Unable to initialize EGL");
 
     static int configList[] = {
-#if OPENGL_ES==2
         EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-#else
-        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
-#endif
         EGL_RED_SIZE, 4,
         EGL_GREEN_SIZE, 4,
         EGL_BLUE_SIZE, 4,
@@ -356,11 +352,7 @@ void WIN32Window::internalCreateGLContext()
         g_logger.warning("Didn't got the exact EGL config");
 
     EGLint contextAtrrList[] = {
-#if OPENGL_ES==2
         EGL_CONTEXT_CLIENT_VERSION, 2,
-#else
-        EGL_CONTEXT_CLIENT_VERSION, 1,
-#endif
         EGL_NONE
     };
 
@@ -388,9 +380,10 @@ void WIN32Window::internalCreateGLContext()
                                          0,                          // No Auxiliary Buffer
                                          PFD_MAIN_PLANE,             // Main Drawing Layer
                                          0,                          // Reserved
-                                         0, 0, 0 };                  // Layer Masks Ignored
+                                         0, 0, 0
+};                  // Layer Masks Ignored
 
-    const uint pixelFormat = ChoosePixelFormat(m_deviceContext, &pfd);
+    const uint32_t pixelFormat = ChoosePixelFormat(m_deviceContext, &pfd);
     if (!pixelFormat)
         g_logger.fatal("Could not find a suitable pixel format");
 
@@ -576,7 +569,7 @@ Fw::Key WIN32Window::retranslateVirtualKey(WPARAM wParam, LPARAM lParam)
 
 #define IsKeyDown(a) (GetKeyState(a) & 0x80)
 
-LRESULT WIN32Window::windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
 {
     m_inputEvent.keyboardModifiers = 0;
     if (IsKeyDown(VK_CONTROL))
@@ -834,8 +827,8 @@ int WIN32Window::internalLoadMouseCursor(const ImagePtr& image, const Point& hot
     const int numbits = width * height;
     const int numbytes = (width * height) / 8;
 
-    std::vector<uchar> andMask(numbytes, 0);
-    std::vector<uchar> xorMask(numbytes, 0);
+    std::vector<uint8_t> andMask(numbytes, 0);
+    std::vector<uint8_t> xorMask(numbytes, 0);
 
     for (int i = 0; i < numbits; ++i) {
         const uint32_t rgba = stdext::readULE32(image->getPixelData() + i * 4);
@@ -896,10 +889,10 @@ void WIN32Window::setFullscreen(bool fullscreen)
         const HMONITOR m = MonitorFromWindow(m_window, MONITOR_DEFAULTTONEAREST);
         mi.cbSize = sizeof(mi);
         GetMonitorInfoW(m, &mi);
-        const uint x = mi.rcMonitor.left;
-        const uint y = mi.rcMonitor.top;
-        const uint width = mi.rcMonitor.right - mi.rcMonitor.left;
-        const uint height = mi.rcMonitor.bottom - mi.rcMonitor.top;
+        const uint32_t x = mi.rcMonitor.left;
+        const uint32_t y = mi.rcMonitor.top;
+        const uint32_t width = mi.rcMonitor.right - mi.rcMonitor.left;
+        const uint32_t height = mi.rcMonitor.bottom - mi.rcMonitor.top;
 
         GetWindowPlacement(m_window, &wpPrev);
 
@@ -944,7 +937,7 @@ void WIN32Window::setIcon(const std::string& file)
     }
 
     const int n = image->getWidth() * image->getHeight();
-    std::vector<uint32_t> iconData(n);
+    std::vector<uint32_t > iconData(n);
     for (int i = 0; i < n; ++i) {
         auto* const pixel = (uint8_t*)&iconData[i];
         pixel[2] = *(image->getPixelData() + (i * 4) + 0);

@@ -48,6 +48,7 @@ class Pool;
 class PoolFramed;
 class DrawPool;
 class DrawBuffer;
+class CoordsBuffer;
 
 using ImagePtr = stdext::shared_object_ptr<Image>;
 using TexturePtr = stdext::shared_object_ptr<Texture>;
@@ -69,3 +70,4 @@ using SpriteSheetPtr = stdext::shared_object_ptr<SpriteSheet>;
 using ShaderList = std::vector<ShaderPtr>;
 
 using DrawBufferPtr = std::shared_ptr<DrawBuffer>;
+using CoordsBufferPtr = std::shared_ptr<CoordsBuffer>;

@@ -116,7 +116,7 @@ public:
     const TilePtr& get(const Position& pos) { return m_tiles[getTileIndex(pos)]; }
     void remove(const Position& pos) { m_tiles[getTileIndex(pos)] = nullptr; }
 
-    uint getTileIndex(const Position& pos) { return ((pos.y % BLOCK_SIZE) * BLOCK_SIZE) + (pos.x % BLOCK_SIZE); }
+    uint32_t getTileIndex(const Position& pos) { return ((pos.y % BLOCK_SIZE) * BLOCK_SIZE) + (pos.x % BLOCK_SIZE); }
 
     const std::array<TilePtr, BLOCK_SIZE* BLOCK_SIZE>& getTiles() const { return m_tiles; }
 
@@ -257,12 +257,11 @@ public:
     std::vector<AnimatedTextPtr> getAnimatedTexts() { return m_animatedTexts; }
     std::vector<StaticTextPtr> getStaticTexts() { return m_staticTexts; }
 
-    std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> findPath(const Position& start, const Position& goal, int maxComplexity, int flags = 0);
-    PathFindResult_ptr newFindPath(const Position& start, const Position& goal, const std::shared_ptr<std::list<Node*>>&
-                                   visibleNodes);
-    void findPathAsync(const Position& start, const Position& goal, const std::function<void(PathFindResult_ptr)>&
-                       callback);
-    std::map<std::string, std::tuple<int, int, int, std::string>> findEveryPath(const Position& start, int maxDistance, const std::map<std::string, std::string>& params);
+    std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> findPath(const Position& start, const Position& goal,
+                                                                          int maxComplexity, int flags = 0);
+    PathFindResult_ptr newFindPath(const Position& start, const Position& goal, const std::shared_ptr<std::list<Node*>>& visibleNodes);
+    void findPathAsync(const Position& start, const Position& goal,
+                       const std::function<void(PathFindResult_ptr)>& callback);
 
     void setFloatingEffect(bool enable) { m_floatingEffect = enable; }
     bool isDrawingFloatingEffects() { return m_floatingEffect; }
@@ -278,11 +277,11 @@ private:
     std::vector<StaticTextPtr> m_staticTexts;
     std::vector<MapViewPtr> m_mapViews;
 
-    stdext::unordered_map<uint, TileBlock> m_tileBlocks[MAX_Z + 1];
-    stdext::unordered_map<uint32_t, CreaturePtr> m_knownCreatures;
-    stdext::unordered_map<Position, std::string, Position::Hasher> m_waypoints;
+    stdext::map<uint32_t , TileBlock> m_tileBlocks[MAX_Z + 1];
+    stdext::map<uint32_t , CreaturePtr> m_knownCreatures;
+    stdext::map<Position, std::string, Position::Hasher> m_waypoints;
 
-    std::map<uint32_t, Color> m_zoneColors;
+    stdext::map<uint32_t , Color> m_zoneColors;
 
     stdext::small_dynamic_storage<OTBM_ItemAttr, OTBM_ATTR_LAST> m_attribs;
 
@@ -293,7 +292,6 @@ private:
 
     Light m_light;
     Position m_centralPosition;
-    Rect m_tilesRect;
 
     AwareRange m_awareRange;
     static TilePtr m_nulltile;

@@ -48,7 +48,7 @@ void ProtocolGame::sendExtendedOpcode(uint8_t opcode, const std::string_view buf
     }
 }
 
-void ProtocolGame::sendLoginPacket(uint challengeTimestamp, uint8_t challengeRandom)
+void ProtocolGame::sendLoginPacket(uint32_t challengeTimestamp, uint8_t challengeRandom)
 {
     const OutputMessagePtr msg(new OutputMessage);
 
@@ -91,7 +91,7 @@ void ProtocolGame::sendLoginPacket(uint challengeTimestamp, uint8_t challengeRan
         if (g_game.getFeature(Otc::GameAccountNames))
             msg->addString(m_accountName);
         else
-            msg->addU32(stdext::from_string<uint32_t>(m_accountName));
+            msg->addU32(stdext::from_string<uint32_t >(m_accountName));
 
         msg->addString(m_characterName);
         msg->addString(m_accountPassword);
@@ -354,7 +354,7 @@ void ProtocolGame::sendCloseNpcTrade()
     send(msg);
 }
 
-void ProtocolGame::sendRequestTrade(const Position& pos, int thingId, int stackpos, uint creatureId)
+void ProtocolGame::sendRequestTrade(const Position& pos, int thingId, int stackpos, uint32_t creatureId)
 {
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientRequestTrade);
@@ -412,7 +412,7 @@ void ProtocolGame::sendUseItemWith(const Position& fromPos, int itemId, int from
     send(msg);
 }
 
-void ProtocolGame::sendUseOnCreature(const Position& pos, int thingId, int stackpos, uint creatureId)
+void ProtocolGame::sendUseOnCreature(const Position& pos, int thingId, int stackpos, uint32_t creatureId)
 {
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientUseOnCreature);
@@ -449,7 +449,7 @@ void ProtocolGame::sendUpContainer(int containerId)
     send(msg);
 }
 
-void ProtocolGame::sendEditText(uint id, const std::string_view text)
+void ProtocolGame::sendEditText(uint32_t id, const std::string_view text)
 {
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientEditText);
@@ -458,7 +458,7 @@ void ProtocolGame::sendEditText(uint id, const std::string_view text)
     send(msg);
 }
 
-void ProtocolGame::sendEditList(uint id, int doorId, const std::string_view text)
+void ProtocolGame::sendEditList(uint32_t id, int doorId, const std::string_view text)
 {
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientEditList);
@@ -478,7 +478,7 @@ void ProtocolGame::sendLook(const Position& position, int thingId, int stackpos)
     send(msg);
 }
 
-void ProtocolGame::sendLookCreature(uint creatureId)
+void ProtocolGame::sendLookCreature(uint32_t creatureId)
 {
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientLookCreature);
@@ -593,7 +593,7 @@ void ProtocolGame::sendChangeFightModes(Otc::FightModes fightMode, Otc::ChaseMod
     send(msg);
 }
 
-void ProtocolGame::sendAttack(uint creatureId, uint seq)
+void ProtocolGame::sendAttack(uint32_t creatureId, uint32_t seq)
 {
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientAttack);
@@ -603,7 +603,7 @@ void ProtocolGame::sendAttack(uint creatureId, uint seq)
     send(msg);
 }
 
-void ProtocolGame::sendFollow(uint creatureId, uint seq)
+void ProtocolGame::sendFollow(uint32_t creatureId, uint32_t seq)
 {
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientFollow);
@@ -613,7 +613,7 @@ void ProtocolGame::sendFollow(uint creatureId, uint seq)
     send(msg);
 }
 
-void ProtocolGame::sendInviteToParty(uint creatureId)
+void ProtocolGame::sendInviteToParty(uint32_t creatureId)
 {
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientInviteToParty);
@@ -621,7 +621,7 @@ void ProtocolGame::sendInviteToParty(uint creatureId)
     send(msg);
 }
 
-void ProtocolGame::sendJoinParty(uint creatureId)
+void ProtocolGame::sendJoinParty(uint32_t creatureId)
 {
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientJoinParty);
@@ -629,7 +629,7 @@ void ProtocolGame::sendJoinParty(uint creatureId)
     send(msg);
 }
 
-void ProtocolGame::sendRevokeInvitation(uint creatureId)
+void ProtocolGame::sendRevokeInvitation(uint32_t creatureId)
 {
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientRevokeInvitation);
@@ -637,7 +637,7 @@ void ProtocolGame::sendRevokeInvitation(uint creatureId)
     send(msg);
 }
 
-void ProtocolGame::sendPassLeadership(uint creatureId)
+void ProtocolGame::sendPassLeadership(uint32_t creatureId)
 {
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientPassLeadership);
@@ -766,7 +766,7 @@ void ProtocolGame::sendAddVip(const std::string_view name)
     send(msg);
 }
 
-void ProtocolGame::sendRemoveVip(uint playerId)
+void ProtocolGame::sendRemoveVip(uint32_t playerId)
 {
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientRemoveVip);
@@ -774,7 +774,7 @@ void ProtocolGame::sendRemoveVip(uint playerId)
     send(msg);
 }
 
-void ProtocolGame::sendEditVip(uint playerId, const std::string_view description, int iconId, bool notifyLogin)
+void ProtocolGame::sendEditVip(uint32_t playerId, const std::string_view description, int iconId, bool notifyLogin)
 {
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientEditVip);

@@ -52,16 +52,16 @@ public:
     std::string getName() { return m_attribs.get<std::string>(HouseAttrName); }
 
     void setId(uint32_t hId) { m_attribs.set(HouseAttrId, hId); }
-    uint32_t getId() { return m_attribs.get<uint32_t>(HouseAttrId); }
+    uint32_t getId() { return m_attribs.get<uint32_t >(HouseAttrId); }
 
     void setTownId(uint32_t tid) { m_attribs.set(HouseAttrTown, tid); }
-    uint32_t getTownId() { return m_attribs.get<uint32_t>(HouseAttrTown); }
+    uint32_t getTownId() { return m_attribs.get<uint32_t >(HouseAttrTown); }
 
     void setSize(uint32_t s) { m_attribs.set(HouseAttrSize, s); }
-    uint32_t getSize() { return m_attribs.get<uint32_t>(HouseAttrSize); }
+    uint32_t getSize() { return m_attribs.get<uint32_t >(HouseAttrSize); }
 
     void setRent(uint32_t r) { m_attribs.set(HouseAttrRent, r); }
-    uint32_t getRent() { return m_attribs.get<uint32_t>(HouseAttrRent); }
+    uint32_t getRent() { return m_attribs.get<uint32_t >(HouseAttrRent); }
 
     void setEntry(const Position& p) { m_attribs.set(HouseAttrEntry, p); }
     Position getEntry() { return m_attribs.get<Position>(HouseAttrEntry); }

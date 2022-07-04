@@ -701,7 +701,7 @@ void ThingType::unserializeOtml(const OTMLNodePtr& node)
     }
 }
 
-void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, TextureType textureType, Color color, LightView* lightView, DrawBufferPtr drawQueue)
+void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, uint32_t flags, TextureType textureType, Color color, LightView* lightView, const DrawBufferPtr& drawBuffer)
 {
     if (m_null)
         return;
@@ -713,22 +713,26 @@ void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPatte
     if (!texture)
         return;
 
-    const uint frameIndex = getTextureIndex(layer, xPattern, yPattern, zPattern);
-    if (frameIndex >= m_texturesFramesRects[animationPhase].size())
+    const auto& textureRectList = m_texturesFramesRects[animationPhase];
+
+    const uint32_t frameIndex = getTextureIndex(layer, xPattern, yPattern, zPattern);
+    if (frameIndex >= textureRectList.size())
         return;
 
-    const Point textureOffset = m_texturesFramesOffsets[animationPhase][frameIndex];
-    const Rect textureRect = m_texturesFramesRects[animationPhase][frameIndex];
+    const Point& textureOffset = m_texturesFramesOffsets[animationPhase][frameIndex];
+    const Rect& textureRect = textureRectList[frameIndex];
 
     const Rect screenRect(dest + (textureOffset - m_displacement - (m_size.toPoint() - Point(1)) * SPRITE_SIZE) * scaleFactor, textureRect.size() * scaleFactor);
 
-    if (m_opacity < 1.0f)
-        color = Color(1.0f, 1.0f, 1.0f, m_opacity);
+    if (flags & Otc::DrawThings) {
+        if (m_opacity < 1.0f)
+            color.setAlpha(m_opacity);
 
-    g_drawPool.addTexturedRect(screenRect, texture, textureRect, color, dest, drawQueue);
+        g_drawPool.addTexturedRect(screenRect, texture, textureRect, color, dest, drawBuffer);
+    }
 
-    if (lightView && hasLight()) {
-        const Light light = getLight();
+    if (lightView && hasLight() && flags & Otc::DrawLights) {
+        const Light& light = getLight();
         if (light.intensity > 0) {
             lightView->addLightSource(screenRect.center(), light);
         }
@@ -784,7 +788,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
 
                     if (!useCustomImage) {
                         if (protobufSupported) {
-                            const uint spriteIndex = getSpriteIndex(-1, -1, spriteMask ? 1 : l, x, y, z, animationPhase);
+                            const uint32_t spriteIndex = getSpriteIndex(-1, -1, spriteMask ? 1 : l, x, y, z, animationPhase);
                             ImagePtr spriteImage = g_sprites.getSpriteImage(m_spritesIndex[spriteIndex]);
                             if (!spriteImage) {
                                 return nullptr;
@@ -805,7 +809,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
                         } else {
                             for (int h = 0; h < m_size.height(); ++h) {
                                 for (int w = 0; w < m_size.width(); ++w) {
-                                    const uint spriteIndex = getSpriteIndex(w, h, spriteMask ? 1 : l, x, y, z, animationPhase);
+                                    const uint32_t spriteIndex = getSpriteIndex(w, h, spriteMask ? 1 : l, x, y, z, animationPhase);
                                     ImagePtr spriteImage = g_sprites.getSpriteImage(m_spritesIndex[spriteIndex]);
 
                                     // verifies that the first block in the lower right corner is transparent.
@@ -895,13 +899,13 @@ Size ThingType::getBestTextureDimension(int w, int h, int count)
     return bestDimension;
 }
 
-uint ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int a)
+uint32_t ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int a)
 {
-    uint index = ((((((a % m_animationPhases)
-                      * m_numPatternZ + z)
-                     * m_numPatternY + y)
-                    * m_numPatternX + x)
-                   * m_layers + l)
+    uint32_t index = ((((((a % m_animationPhases)
+                          * m_numPatternZ + z)
+                         * m_numPatternY + y)
+                        * m_numPatternX + x)
+                       * m_layers + l)
                   * m_size.height() + h)
         * m_size.width() + w;
 
@@ -917,7 +921,7 @@ uint ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int a)
     return index;
 }
 
-uint ThingType::getTextureIndex(int l, int x, int y, int z)
+uint32_t ThingType::getTextureIndex(int l, int x, int y, int z)
 {
     return ((l * m_numPatternZ + z)
             * m_numPatternY + y)

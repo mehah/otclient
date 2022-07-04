@@ -105,7 +105,7 @@ BinaryTreeVec BinaryTree::getChildren()
     }
 }
 
-void BinaryTree::seek(uint pos)
+void BinaryTree::seek(uint32_t pos)
 {
     unserialize();
     if (pos > m_buffer.size())
@@ -113,7 +113,7 @@ void BinaryTree::seek(uint pos)
     m_pos = pos;
 }
 
-void BinaryTree::skip(uint len)
+void BinaryTree::skip(uint32_t len)
 {
     unserialize();
     seek(tell() + len);

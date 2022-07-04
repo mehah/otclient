@@ -52,17 +52,17 @@ Shader::~Shader()
 
 bool Shader::compileSourceCode(const std::string_view sourceCode)
 {
-#ifndef OPENGL_ES
-    static constexpr std::string_view qualifierDefines =
-        "#define lowp\n"
-        "#define mediump\n"
-        "#define highp\n";
-#else
+#ifdef OPENGL_ES
     static constexpr std::string_view =
         "#ifndef GL_FRAGMENT_PRECISION_HIGH\n"
         "#define highp mediump\n"
         "#endif\n"
         "precision highp float;\n";
+#else
+    static constexpr std::string_view qualifierDefines =
+        "#define lowp\n"
+        "#define mediump\n"
+        "#define highp\n";
 #endif
 
     std::string code = std::string{ qualifierDefines };

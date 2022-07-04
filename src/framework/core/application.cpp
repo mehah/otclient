@@ -75,7 +75,7 @@ void Application::init(std::vector<std::string>& args)
     g_asyncDispatcher.init();
 
     std::string startupOptions;
-    for (uint i = 1; i < args.size(); ++i) {
+    for (uint32_t i = 1; i < args.size(); ++i) {
         const auto& arg = args[i];
         startupOptions += " ";
         startupOptions += arg;

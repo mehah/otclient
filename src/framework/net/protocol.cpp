@@ -135,7 +135,7 @@ void Protocol::internalRecvData(uint8_t* buffer, uint16_t size)
 void Protocol::generateXteaKey()
 {
     std::random_device rd;
-    std::uniform_int_distribution<uint32_t> unif;
+    std::uniform_int_distribution<uint32_t > unif;
     std::generate(m_xteaKey.begin(), m_xteaKey.end(), [&unif, &rd] { return unif(rd); });
 }
 
@@ -173,7 +173,7 @@ bool Protocol::xteaDecrypt(const InputMessagePtr& inputMessage)
     }
 
     for (uint32_t i = 0, sum = delta << 5, next_sum = sum - delta; i < 32; ++i, sum = next_sum, next_sum -= delta) {
-        apply_rounds(inputMessage->getReadBuffer(), encryptedSize, [&](uint32_t& left, uint32_t& right) {
+        apply_rounds(inputMessage->getReadBuffer(), encryptedSize, [&](uint32_t & left, uint32_t & right) {
             right -= ((left << 4 ^ left >> 5) + left) ^ (sum + m_xteaKey[(sum >> 11) & 3]);
             left -= ((right << 4 ^ right >> 5) + right) ^ (next_sum + m_xteaKey[next_sum & 3]);
         });
@@ -203,7 +203,7 @@ void Protocol::xteaEncrypt(const OutputMessagePtr& outputMessage)
     }
 
     for (uint32_t i = 0, sum = 0, next_sum = sum + delta; i < 32; ++i, sum = next_sum, next_sum += delta) {
-        apply_rounds(outputMessage->getDataBuffer() - 2, encryptedSize, [&](uint32_t& left, uint32_t& right) {
+        apply_rounds(outputMessage->getDataBuffer() - 2, encryptedSize, [&](uint32_t & left, uint32_t & right) {
             left += ((right << 4 ^ right >> 5) + right) ^ (sum + m_xteaKey[sum & 3]);
             right += ((left << 4 ^ left >> 5) + left) ^ (next_sum + m_xteaKey[(next_sum >> 11) & 3]);
         });

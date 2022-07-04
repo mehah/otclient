@@ -83,9 +83,11 @@ using HouseList = std::list<HousePtr>;
 using TownList = std::list<TownPtr>;
 using TileList = std::list<TilePtr>;
 using ItemVector = std::vector<ItemPtr>;
-using TileMap = stdext::unordered_map<Position, TilePtr, Position::Hasher>;
-using CreatureMap = stdext::unordered_map<Position, CreatureTypePtr, Position::Hasher>;
-using SpawnMap = stdext::unordered_map<Position, SpawnPtr, Position::Hasher>;
+
+using ItemMap = stdext::map<Position, ItemPtr, Position::Hasher>;
+using TileMap = stdext::map<Position, TilePtr, Position::Hasher>;
+using CreatureMap = stdext::map<Position, CreatureTypePtr, Position::Hasher>;
+using SpawnMap = stdext::map<Position, SpawnPtr, Position::Hasher>;
 
 // net
 class ProtocolLogin;

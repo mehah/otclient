@@ -35,6 +35,29 @@ struct AwareRange
     uint8_t vertical() { return top + bottom + 1; }
 };
 
+struct MapPosInfo
+{
+    Rect rect, srcRect;
+    Point drawOffset;
+    float horizontalStretchFactor,
+        verticalStretchFactor;
+
+    bool isInRange(const Position& pos, bool ignoreZ = false) const
+    {
+        return camera.isInRange(pos, awareRange.left - 1, awareRange.right - 2, awareRange.top - 1, awareRange.bottom - 2, ignoreZ);
+    }
+    bool isInRangeEx(const Position& pos, bool ignoreZ = false)  const
+    {
+        return camera.isInRange(pos, awareRange.left, awareRange.right, awareRange.top, awareRange.bottom, ignoreZ);
+    }
+
+private:
+    Position camera;
+    AwareRange awareRange;
+
+    friend class MapView;
+};
+
 // @bindclass
 class MapView : public LuaObject
 {
@@ -103,8 +126,8 @@ public:
     void setDrawLights(bool enable);
     bool isDrawingLights() { return m_drawLights && m_lightView->isDark(); }
 
-    void setDrawViewportEdge(bool enable) { m_drawViewportEdge = enable; }
-    bool isDrawingViewportEdge() { return m_drawViewportEdge; }
+    void setLimitVisibleDimension(bool v) { m_limitVisibleDimension = v; }
+    bool isLimitedVisibleDimension() { return m_limitVisibleDimension; }
 
     void setDrawManaBar(bool enable) { m_drawManaBar = enable; }
     bool isDrawingManaBar() { return m_drawManaBar; }
@@ -120,12 +143,11 @@ public:
 
     void resetLastCamera() { m_lastCameraPosition = {}; }
 
-    std::vector<CreaturePtr>& getVisibleCreatures() { return m_visibleCreatures; }
+    std::vector<CreaturePtr> getVisibleCreatures();
     std::vector<CreaturePtr> getSpectators(const Position& centerPos, bool multiFloor);
     std::vector<CreaturePtr> getSightSpectators(const Position& centerPos, bool multiFloor);
-
-    bool isInRange(const Position& pos, bool ignoreZ = false);
-    bool isInRangeEx(const Position& pos, bool ignoreZ = false);
+    bool isInRange(const Position& pos, bool ignoreZ = false) { return m_posInfo.isInRange(pos, ignoreZ); }
+    bool isInRangeEx(const Position& pos, bool ignoreZ = false) { return m_posInfo.isInRangeEx(pos, ignoreZ); }
 
     TilePtr getTopTile(Position tilePos);
 
@@ -155,10 +177,10 @@ protected:
     friend class LightView;
 
 private:
-    struct MapList
+    struct MapObject
     {
-        std::vector<TilePtr> shades, grounds, surfaces, effects;
-        void clear() { shades.clear(); grounds.clear(); surfaces.clear(); effects.clear(); }
+        std::vector<TilePtr> shades, tiles;
+        void clear() { shades.clear(); tiles.clear(); }
     };
 
     struct Crosshair
@@ -168,17 +190,10 @@ private:
         TexturePtr texture;
     };
 
-    struct RectCache
-    {
-        Rect rect, srcRect;
-        Point drawOffset;
-        float horizontalStretchFactor, verticalStretchFactor;
-    };
-
     void updateGeometry(const Size& visibleDimension);
     void updateVisibleTiles();
-    void refreshVisibleTiles() { m_refreshVisibleTiles = true; }
-    void refreshVisibleCreatures() { m_refreshVisibleCreatures = true; }
+    void requestUpdateVisibleTiles() { m_updateVisibleTiles = true; }
+    void requestUpdateMapPosInfo() { m_posInfo.rect = {}; }
 
     uint8_t calcFirstVisibleFloor(bool checkLimitsFloorsView);
     uint8_t calcLastVisibleFloor();
@@ -186,7 +201,6 @@ private:
     void updateLight();
     void updateViewportDirectionCache();
     void drawFloor();
-    void drawCreatureInformation();
     void drawText();
 
     void updateViewport(const Otc::Direction dir = Otc::InvalidDirection) { m_viewport = m_viewPortDirection[dir]; }
@@ -195,6 +209,8 @@ private:
 
     float getFadeLevel(uint8_t z)
     {
+        if (!canFloorFade()) return 1.f;
+
         float fading = std::clamp<float>(static_cast<float>(m_fadingFloorTimers[z].elapsed_millis()) / static_cast<float>(m_floorFading), 0.f, 1.f);
         if (z < m_cachedFirstVisibleFloor)
             fading = 1.0 - fading;
@@ -243,8 +259,9 @@ private:
     AwareRange m_viewport;
 
     bool
-        m_refreshVisibleTiles{ true },
-        m_refreshVisibleCreatures{ true },
+        m_limitVisibleDimension{ true },
+        m_updateVisibleTiles{ true },
+        m_resetCoveredCache{ true },
         m_shaderSwitchDone{ true },
         m_drawHealthBars{ true },
         m_drawManaBar{ true },
@@ -259,9 +276,7 @@ private:
         m_drawHighlightTarget{ false },
         m_shiftPressed{ false };
 
-    std::vector<CreaturePtr> m_visibleCreatures;
-
-    std::array<MapList, MAX_Z + 1> m_cachedVisibleTiles;
+    std::array<MapObject, MAX_Z + 1> m_cachedVisibleTiles;
 
     stdext::timer m_fadingFloorTimers[MAX_Z + 1];
 
@@ -269,12 +284,10 @@ private:
     LightViewPtr m_lightView;
     CreaturePtr m_followingCreature;
 
-    RectCache m_rectCache;
+    MapPosInfo m_posInfo;
     FloorViewMode m_floorViewMode{ NORMAL };
 
     Timer m_fadeTimer;
-
-    AwareRange m_awareRange;
 
     TilePtr m_lastHighlightTile;
     TexturePtr m_crosshairTexture;

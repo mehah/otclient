@@ -25,7 +25,7 @@
 
 #include <framework/core/application.h>
 
-uint ShaderProgram::m_currentProgram = 0;
+uint32_t ShaderProgram::m_currentProgram = 0;
 
 ShaderProgram::ShaderProgram() :m_programId(glCreateProgram())
 {

@@ -253,7 +253,7 @@ public:
 
         return _pos.x >= x - minXRange && _pos.x <= x + maxXRange && _pos.y >= y - minYRange && _pos.y <= y + maxYRange;
     }
-    // operator less than for std::map
+    // operator less than for stdext::map
     bool operator<(const Position& other) const { return x < other.x || y < other.y || z < other.z; }
 
     bool up(int8_t n = 1)

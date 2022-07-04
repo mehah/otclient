@@ -203,7 +203,7 @@ std::string ResourceManager::readFileContents(const std::string& fileName)
     return buffer;
 }
 
-bool ResourceManager::writeFileBuffer(const std::string& fileName, const uchar* data, uint size)
+bool ResourceManager::writeFileBuffer(const std::string& fileName, const uint8_t* data, uint32_t size)
 {
     PHYSFS_file* file = PHYSFS_openWrite(fileName.c_str());
     if (!file) {
@@ -224,7 +224,7 @@ bool ResourceManager::writeFileStream(const std::string& fileName, std::iostream
     in.seekg(0, std::ios::beg);
     std::vector<char> buffer(size);
     in.read(&buffer[0], size);
-    const bool ret = writeFileBuffer(fileName, (const uchar*)&buffer[0], size);
+    const bool ret = writeFileBuffer(fileName, (const uint8_t*)&buffer[0], size);
     in.seekg(oldPos, std::ios::beg);
     return ret;
 }
@@ -232,9 +232,9 @@ bool ResourceManager::writeFileStream(const std::string& fileName, std::iostream
 bool ResourceManager::writeFileContents(const std::string& fileName, const std::string& data)
 {
 #if ENABLE_ENCRYPTION == 1
-    return writeFileBuffer(fileName, (const uchar*)encrypt(data, std::string(ENCRYPTION_PASSWORD)).c_str(), data.size());
+    return writeFileBuffer(fileName, (const uint8_t*)encrypt(data, std::string(ENCRYPTION_PASSWORD)).c_str(), data.size());
 #else
-    return writeFileBuffer(fileName, (const uchar*)data.c_str(), data.size());
+    return writeFileBuffer(fileName, (const uint8_t*)data.c_str(), data.size());
 #endif
 }
 

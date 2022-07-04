@@ -34,7 +34,7 @@ namespace stdext
     {
         using type = const T*;
     };
-    template<class T, unsigned long N> struct replace_extent<T[N]>
+    template<class T, uint64_t N> struct replace_extent<T[N]>
     {
         using type = const T*;
     };

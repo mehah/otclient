@@ -68,8 +68,14 @@ public:
     void addBoudingRect(const Rect& dest, int innerLineWidth);
     void addRepeatedRects(const Rect& dest, const Rect& src);
 
-    float* getVertexArray() { return m_vertexArray.vertices(); }
-    float* getTextureCoordArray() { return m_textureCoordArray.vertices(); }
+    void append(const CoordsBuffer* buffer)
+    {
+        m_vertexArray.append(&buffer->m_vertexArray);
+        m_textureCoordArray.append(&buffer->m_textureCoordArray);
+    }
+
+    const float* getVertexArray() const { return m_vertexArray.vertices(); }
+    const float* getTextureCoordArray() const { return m_textureCoordArray.vertices(); }
     int getVertexCount() const { return m_vertexArray.vertexCount(); }
     int getTextureCoordCount() const { return m_textureCoordArray.vertexCount(); }
 

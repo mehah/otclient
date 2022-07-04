@@ -149,7 +149,7 @@ public:
     void serialize(const FileStreamPtr& fin);
     void exportImage(const std::string& fileName);
 
-    void draw(const Point& dest, float scaleFactor, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, TextureType textureType, Color color = Color::white, LightView* lightView = nullptr, DrawBufferPtr drawQueue = nullptr);
+    void draw(const Point& dest, float scaleFactor, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, uint32_t flags, TextureType textureType, Color color = Color::white, LightView* lightView = nullptr, const DrawBufferPtr& drawBuffer = nullptr);
 
     uint16_t getId() { return m_id; }
     ThingCategory getCategory() { return m_category; }
@@ -243,8 +243,8 @@ private:
     bool hasTexture() const { return !m_textures.empty(); }
 
     static Size getBestTextureDimension(int w, int h, int count);
-    uint getSpriteIndex(int w, int h, int l, int x, int y, int z, int a);
-    uint getTextureIndex(int l, int x, int y, int z);
+    uint32_t getSpriteIndex(int w, int h, int l, int x, int y, int z, int a);
+    uint32_t getTextureIndex(int l, int x, int y, int z);
 
     ThingCategory m_category{ ThingInvalidCategory };
     uint16_t m_id{ 0 };
@@ -261,7 +261,9 @@ private:
     int m_animationPhases;
     int m_exactSize{ 0 };
     int m_realSize{ 0 };
-    int m_numPatternX{ 0 }, m_numPatternY{ 0 }, m_numPatternZ{ 0 };
+    int m_numPatternX{ 0 },
+        m_numPatternY{ 0 },
+        m_numPatternZ{ 0 };
     int m_layers{ 0 };
     int m_exactHeight{ 0 };
     float m_opacity{ 1.f };

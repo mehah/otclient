@@ -26,22 +26,17 @@
 
 namespace stdext
 {
-#ifdef USE_STD_HASHING
-    template <class _Kty, class _Ty, class _Hasher = stdext::hash<_Kty>, class _Keyeq = std::equal_to<_Kty>,
-        class _Alloc = std::allocator<std::pair<const _Kty, _Ty>>>
-    using unordered_map = std::unordered_map<_Kty, _Ty, _Hasher, _Keyeq, _Alloc>;
+    template <class K, class V,
+        class Hash = phmap::priv::hash_default_hash<K>,
+        class Eq = phmap::priv::hash_default_eq<K>,
+        class Alloc = phmap::priv::Allocator<phmap::priv::Pair<const K, V>>>
+    using map = phmap::flat_hash_map< K, V, Hash, Eq, Alloc>;
 
-    template <class _Kty, class _Hasher = stdext::hash<_Kty>, class _Keyeq = std::equal_to<_Kty>, class _Alloc = std::allocator<_Kty>>
-    using unordered_set = std::unordered_set<_Kty, _Hasher, _Keyeq, _Alloc>;
-#else
-    template <typename Key, typename T, typename Hash = robin_hood::hash<Key>,
-        typename KeyEqual = std::equal_to<Key>, size_t MaxLoadFactor100 = 80>
-    using unordered_map = robin_hood::unordered_flat_map< Key, T, Hash, KeyEqual, MaxLoadFactor100>;
-
-    template <typename Key, typename Hash = robin_hood::hash<Key>, typename KeyEqual = std::equal_to<Key>,
-        size_t MaxLoadFactor100 = 80>
-    using unordered_set = robin_hood::unordered_flat_set<Key, Hash, KeyEqual, MaxLoadFactor100>;
-#endif
+    template <class T,
+        class Hash = phmap::priv::hash_default_hash<T>,
+        class Eq = phmap::priv::hash_default_eq<T>,
+        class Alloc = phmap::priv::Allocator<T>>
+        using set = phmap::flat_hash_set<T, Hash, Eq, Alloc>;
 
     template<typename T>
     concept OnlyEnum = std::is_enum<T>::value;
@@ -96,6 +91,6 @@ namespace stdext
         void clear() { m_data.clear(); }
 
     private:
-        stdext::unordered_map<Key, std::any> m_data;
+        stdext::map<Key, std::any> m_data;
     };
 }

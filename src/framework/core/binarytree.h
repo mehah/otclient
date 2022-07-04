@@ -38,10 +38,10 @@ public:
     BinaryTree(const FileStreamPtr& fin);
     ~BinaryTree() override;
 
-    void seek(uint pos);
-    void skip(uint len);
-    uint tell() { return m_pos; }
-    uint size() { unserialize(); return m_buffer.size(); }
+    void seek(uint32_t pos);
+    void skip(uint32_t len);
+    uint32_t tell() { return m_pos; }
+    uint32_t size() { unserialize(); return m_buffer.size(); }
 
     uint8_t getU8();
     uint16_t getU16();
@@ -59,8 +59,8 @@ private:
 
     FileStreamPtr m_fin;
     DataBuffer<uint8_t > m_buffer;
-    uint m_pos;
-    uint m_startPos;
+    uint32_t m_pos;
+    uint32_t m_startPos;
 };
 
 class OutputBinaryTree : public stdext::shared_object

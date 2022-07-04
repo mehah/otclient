@@ -120,7 +120,7 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet)
 
         // pixel data start (bmp header end offset)
         uint32_t data;
-        std::memcpy(&data, decompressed.get() + 10, sizeof(uint32_t));
+        std::memcpy(&data, decompressed.get() + 10, sizeof(uint32_t ));
 
         uint8_t* bufferStart = decompressed.get() + data;
 

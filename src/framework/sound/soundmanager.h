@@ -59,10 +59,11 @@ private:
     ALCcontext* m_context;
 
     std::map<StreamSoundSourcePtr, std::shared_future<SoundFilePtr>> m_streamFiles;
-    stdext::unordered_map<std::string, SoundBufferPtr> m_buffers;
+    stdext::map<std::string, SoundBufferPtr> m_buffers;
+    stdext::map<int, SoundChannelPtr> m_channels;
+
     std::vector<SoundSourcePtr> m_sources;
     bool m_audioEnabled{ true };
-    stdext::unordered_map<int, SoundChannelPtr> m_channels;
 };
 
 extern SoundManager g_sounds;

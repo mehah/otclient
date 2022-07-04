@@ -126,10 +126,11 @@ void GraphicalApplication::run()
         // poll all events before rendering
         poll();
 
+        g_clock.update();
+
         if (!g_window.isVisible()) {
             // sleeps until next poll to avoid massive cpu usage
-            stdext::millisleep(POLL_CYCLE_DELAY + 1);
-            g_clock.update();
+            stdext::millisleep(10);
             continue;
         }
 
@@ -140,7 +141,7 @@ void GraphicalApplication::run()
         // the screen consists of two panes
         {
             // foreground pane - steady pane with few animated stuff (UI)
-            if (foregroundCanUpdate()) {
+            if (g_drawPool.get<Pool>(PoolType::FOREGROUND)->canRepaint()) {
                 g_drawPool.use(PoolType::FOREGROUND);
                 g_ui.render(Fw::ForegroundPane);
             }
@@ -154,9 +155,6 @@ void GraphicalApplication::run()
 
         // update screen pixels
         g_window.swapBuffers();
-
-        // only update the current time once per frame to gain performance
-        g_clock.update();
 
         if (m_frameCounter.update()) {
             g_lua.callGlobalField("g_app", "onFps", m_frameCounter.getFps());
@@ -197,8 +195,6 @@ void GraphicalApplication::resize(const Size& size)
 
     g_drawPool.get<PoolFramed>(PoolType::FOREGROUND)
         ->resize(size);
-
-    m_mustRepaint = true;
 }
 
 void GraphicalApplication::inputEvent(const InputEvent& event)
