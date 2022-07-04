@@ -2271,7 +2271,7 @@ void ProtocolGame::parsePlayerInventory(const InputMessagePtr& msg)
 
 void ProtocolGame::parseModalDialog(const InputMessagePtr& msg)
 {
-    const uint32_t  windowId = msg->getU32();
+    const uint32_t windowId = msg->getU32();
     const auto title = msg->getString();
     const auto message = msg->getString();
 
@@ -2343,7 +2343,7 @@ void ProtocolGame::parseCreaturesMark(const InputMessagePtr& msg)
     }
 
     for (int i = 0; i < len; ++i) {
-        const uint32_t  id = msg->getU32();
+        const uint32_t id = msg->getU32();
         const bool isPermanent = msg->getU8() != 1;
         const uint8_t markType = msg->getU8();
 
@@ -2363,7 +2363,7 @@ void ProtocolGame::parseCreaturesMark(const InputMessagePtr& msg)
 
 void ProtocolGame::parseCreatureType(const InputMessagePtr& msg)
 {
-    const uint32_t  id = msg->getU32();
+    const uint32_t id = msg->getU32();
     const uint8_t type = msg->getU8();
 
     const CreaturePtr creature = g_map.getCreatureById(id);
@@ -2527,7 +2527,7 @@ ThingPtr ProtocolGame::getMappedThing(const InputMessagePtr& msg)
         if (!thing)
             g_logger.traceError(stdext::format("no thing at pos:%s, stackpos:%d", stdext::to_string(pos), stackpos));
     } else {
-        const uint32_t  id = msg->getU32();
+        const uint32_t id = msg->getU32();
         thing = g_map.getCreatureById(id);
         if (!thing)
             g_logger.traceError(stdext::format("no creature with id %u", id));
@@ -3330,8 +3330,8 @@ void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
         getImbuementInfo(msg);
     }
 
-    const uint32_t  neededItemsSize = msg->getU32(); // needed items size
-    for (uint32_t  i = 0; i < neededItemsSize; i++) {
+    const uint32_t neededItemsSize = msg->getU32(); // needed items size
+    for (uint32_t i = 0; i < neededItemsSize; i++) {
         msg->getU16(); // item client id
         msg->getU16(); // item count
     }

@@ -222,12 +222,12 @@ public:
     void beginGhostMode(float opacity);
     void endGhostMode();
 
-    std::map<Position, ItemPtr> findItemsById(uint16_t clientId, uint32_t  max);
+    std::map<Position, ItemPtr> findItemsById(uint16_t clientId, uint32_t max);
 
     // known creature related
     void addCreature(const CreaturePtr& creature);
-    CreaturePtr getCreatureById(uint32_t  id);
-    void removeCreatureById(uint32_t  id);
+    CreaturePtr getCreatureById(uint32_t id);
+    void removeCreatureById(uint32_t id);
     std::vector<CreaturePtr> getSightSpectators(const Position& centerPos, bool multiFloor);
     std::vector<CreaturePtr> getSpectators(const Position& centerPos, bool multiFloor);
     std::vector<CreaturePtr> getSpectatorsInRange(const Position& centerPos, bool multiFloor, int32_t xRange, int32_t yRange);
@@ -286,7 +286,7 @@ private:
     stdext::small_dynamic_storage<OTBM_ItemAttr, OTBM_ATTR_LAST> m_attribs;
 
     uint8_t m_animationFlags;
-    uint32_t  m_zoneFlags;
+    uint32_t m_zoneFlags;
 
     float m_zoneOpacity;
 

@@ -41,10 +41,10 @@ public:
     void cache();
     void close();
     void flush();
-    void write(const void* buffer, uint32_t  count);
-    int read(void* buffer, uint32_t  size, uint32_t  nmemb = 1);
-    void seek(uint32_t  pos);
-    void skip(uint32_t  len);
+    void write(const void* buffer, uint32_t count);
+    int read(void* buffer, uint32_t size, uint32_t nmemb = 1);
+    void seek(uint32_t pos);
+    void skip(uint32_t len);
     uint32_t size();
     uint32_t tell();
     bool eof();
@@ -52,7 +52,7 @@ public:
 
     uint8_t getU8();
     uint16_t getU16();
-    uint32_t  getU32();
+    uint32_t getU32();
     uint64_t getU64();
     int8_t get8();
     int16_t get16();
@@ -65,7 +65,7 @@ public:
     void endNode();
     void addU8(uint8_t v);
     void addU16(uint16_t v);
-    void addU32(uint32_t  v);
+    void addU32(uint32_t v);
     void addU64(uint64_t v);
     void add8(int8_t v);
     void add16(int16_t v);

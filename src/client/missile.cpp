@@ -92,7 +92,7 @@ void Missile::setPath(const Position& fromPosition, const Position& toPosition)
     generateBuffer();
 }
 
-void Missile::setId(uint32_t  id)
+void Missile::setId(uint32_t id)
 {
     if (!g_things.isValidDatId(id, ThingCategoryMissile))
         id = 0;

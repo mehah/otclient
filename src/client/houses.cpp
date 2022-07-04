@@ -28,7 +28,7 @@
 
 HouseManager g_houses;
 
-House::House(uint32_t  hId, const std::string_view name, const Position& pos)
+House::House(uint32_t hId, const std::string_view name, const Position& pos)
 {
     setId(hId);
     setName(name);
@@ -58,7 +58,7 @@ void House::addDoor(const ItemPtr& door)
     m_doors[++m_lastDoorId] = door;
 }
 
-void House::removeDoorById(uint32_t  doorId)
+void House::removeDoorById(uint32_t doorId)
 {
     if (doorId >= m_lastDoorId)
         stdext::throw_exception(stdext::format("Failed to remove door of id %d (would overflow), max id: %d",
@@ -110,14 +110,14 @@ void HouseManager::addHouse(const HousePtr& house)
         m_houses.push_back(house);
 }
 
-void HouseManager::removeHouse(uint32_t  houseId)
+void HouseManager::removeHouse(uint32_t houseId)
 {
     const auto it = findHouse(houseId);
     if (it != m_houses.end())
         m_houses.erase(it);
 }
 
-HousePtr HouseManager::getHouse(uint32_t  houseId)
+HousePtr HouseManager::getHouse(uint32_t houseId)
 {
     const auto it = findHouse(houseId);
     return it != m_houses.end() ? *it : nullptr;
@@ -184,7 +184,7 @@ void HouseManager::save(const std::string& fileName)
     }
 }
 
-HouseList HouseManager::filterHouses(uint32_t  townId)
+HouseList HouseManager::filterHouses(uint32_t townId)
 {
     HouseList ret;
     for (const HousePtr& house : m_houses)
@@ -193,7 +193,7 @@ HouseList HouseManager::filterHouses(uint32_t  townId)
     return ret;
 }
 
-HouseList::iterator HouseManager::findHouse(uint32_t  houseId)
+HouseList::iterator HouseManager::findHouse(uint32_t houseId)
 {
     return std::find_if(m_houses.begin(), m_houses.end(),
                         [=](const HousePtr& house) -> bool { return house->getId() == houseId; });

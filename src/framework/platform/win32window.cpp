@@ -831,7 +831,7 @@ int WIN32Window::internalLoadMouseCursor(const ImagePtr& image, const Point& hot
     std::vector<uint8_t> xorMask(numbytes, 0);
 
     for (int i = 0; i < numbits; ++i) {
-        const uint32_t  rgba = stdext::readULE32(image->getPixelData() + i * 4);
+        const uint32_t rgba = stdext::readULE32(image->getPixelData() + i * 4);
         if (rgba == 0xffffffff) { //white
             HSB_BIT_SET(xorMask, i);
         } else if (rgba == 0x00000000) { //alpha

@@ -45,7 +45,7 @@ public:
 
     uint8_t getU8();
     uint16_t getU16();
-    uint32_t  getU32();
+    uint32_t getU32();
     uint64_t getU64();
     std::string getString(uint16_t len = 0);
     Point getPoint();
@@ -70,7 +70,7 @@ public:
 
     void addU8(uint8_t v);
     void addU16(uint16_t v);
-    void addU32(uint32_t  v);
+    void addU32(uint32_t v);
     void addString(const std::string_view v);
     void addPos(uint16_t x, uint16_t y, uint8_t z);
     void addPoint(const Point& point);

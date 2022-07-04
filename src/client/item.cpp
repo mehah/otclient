@@ -73,7 +73,7 @@ void Item::draw(const Point& dest, float scaleFactor, bool animate, uint32_t fla
     }
 }
 
-void Item::setId(uint32_t  id)
+void Item::setId(uint32_t id)
 {
     if (!g_things.isValidDatId(id, ThingCategoryItem))
         id = 0;

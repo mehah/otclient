@@ -105,7 +105,7 @@ void FileStream::flush()
     }
 }
 
-int FileStream::read(void* buffer, uint32_t  size, uint32_t  nmemb)
+int FileStream::read(void* buffer, uint32_t size, uint32_t nmemb)
 {
     if (!m_caching) {
         const int res = PHYSFS_readBytes(m_fileHandle, buffer, size * nmemb);
@@ -125,7 +125,7 @@ int FileStream::read(void* buffer, uint32_t  size, uint32_t  nmemb)
     return nmemb;
 }
 
-void FileStream::write(const void* buffer, uint32_t  count)
+void FileStream::write(const void* buffer, uint32_t count)
 {
     if (!m_caching) {
         if (PHYSFS_writeBytes(m_fileHandle, buffer, count) != count)
@@ -137,7 +137,7 @@ void FileStream::write(const void* buffer, uint32_t  count)
     }
 }
 
-void FileStream::seek(uint32_t  pos)
+void FileStream::seek(uint32_t pos)
 {
     if (!m_caching) {
         if (!PHYSFS_seek(m_fileHandle, pos))
@@ -207,9 +207,9 @@ uint16_t FileStream::getU16()
     return v;
 }
 
-uint32_t  FileStream::getU32()
+uint32_t FileStream::getU32()
 {
-    uint32_t  v = 0;
+    uint32_t v = 0;
     if (!m_caching) {
         if (PHYSFS_readULE32(m_fileHandle, &v) == 0)
             throwError("read failed", true);
@@ -369,7 +369,7 @@ void FileStream::addU16(uint16_t v)
     }
 }
 
-void FileStream::addU32(uint32_t  v)
+void FileStream::addU32(uint32_t v)
 {
     if (!m_caching) {
         if (PHYSFS_writeULE32(m_fileHandle, v) == 0)

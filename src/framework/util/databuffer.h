@@ -28,7 +28,7 @@ template<class T>
 class DataBuffer
 {
 public:
-    DataBuffer(uint32_t  res = 64) : m_capacity(res), m_buffer(new T[m_capacity]) {}
+    DataBuffer(uint32_t res = 64) : m_capacity(res), m_buffer(new T[m_capacity]) {}
     ~DataBuffer() { delete[] m_buffer; }
 
     void reset() { m_size = 0; }
@@ -42,16 +42,16 @@ public:
     }
 
     bool empty() const { return m_size == 0; }
-    uint32_t  size() const { return m_size; }
+    uint32_t size() const { return m_size; }
     T* data() const { return m_buffer; }
 
-    const T& at(uint32_t  i) const { return m_buffer[i]; }
+    const T& at(uint32_t i) const { return m_buffer[i]; }
     const T& last() const { return m_buffer[m_size - 1]; }
     const T& first() const { return m_buffer[0]; }
-    const T& operator[](uint32_t  i) const { return m_buffer[i]; }
-    T& operator[](uint32_t  i) { return m_buffer[i]; }
+    const T& operator[](uint32_t i) const { return m_buffer[i]; }
+    T& operator[](uint32_t i) { return m_buffer[i]; }
 
-    void reserve(uint32_t  n)
+    void reserve(uint32_t n)
     {
         if (n > m_capacity) {
             T* buffer = new T[n];
@@ -64,22 +64,22 @@ public:
         }
     }
 
-    void resize(uint32_t  n, T def = T())
+    void resize(uint32_t n, T def = T())
     {
         if (n == m_size)
             return;
         reserve(n);
-        for (uint32_t  i = m_size; i < n; ++i)
+        for (uint32_t i = m_size; i < n; ++i)
             m_buffer[i] = def;
         m_size = n;
     }
 
-    void grow(uint32_t  n)
+    void grow(uint32_t n)
     {
         if (n <= m_size)
             return;
         if (n > m_capacity) {
-            uint32_t  newcapacity = m_capacity;
+            uint32_t newcapacity = m_capacity;
             do { newcapacity *= 2; } while (newcapacity < n);
             reserve(newcapacity);
         }
@@ -94,7 +94,7 @@ public:
 
     void append(const DataBuffer<T>* v)
     {
-        const uint32_t  sumSize = m_size + v->m_size;
+        const uint32_t sumSize = m_size + v->m_size;
         if (sumSize > m_capacity) {
             m_capacity = sumSize * 2;
             T* buffer = new T[m_capacity];
@@ -113,7 +113,7 @@ public:
     DataBuffer& operator<<(const T& t) { add(t); return *this; }
 
 private:
-    uint32_t  m_size{ 0 };
-    uint32_t  m_capacity;
+    uint32_t m_size{ 0 };
+    uint32_t m_capacity;
     T* m_buffer;
 };

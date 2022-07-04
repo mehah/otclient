@@ -134,14 +134,14 @@ public:
     bool hasElevation(int elevation = 1) { return m_countFlag.elevation >= elevation; }
     void overwriteMinimapColor(uint8_t color) { m_minimapColor = color; }
 
-    void remFlag(uint32_t  flag) { m_flags &= ~flag; }
-    void setFlag(uint32_t  flag) { m_flags |= flag; }
-    void setFlags(uint32_t  flags) { m_flags = flags; }
-    bool hasFlag(uint32_t  flag) { return (m_flags & flag) == flag; }
-    uint32_t  getFlags() { return m_flags; }
+    void remFlag(uint32_t flag) { m_flags &= ~flag; }
+    void setFlag(uint32_t flag) { m_flags |= flag; }
+    void setFlags(uint32_t flags) { m_flags = flags; }
+    bool hasFlag(uint32_t flag) { return (m_flags & flag) == flag; }
+    uint32_t getFlags() { return m_flags; }
 
-    void setHouseId(uint32_t  hid) { m_houseId = hid; }
-    uint32_t  getHouseId() { return m_houseId; }
+    void setHouseId(uint32_t hid) { m_houseId = hid; }
+    uint32_t getHouseId() { return m_houseId; }
     bool isHouseTile() { return m_houseId != 0 && (m_flags & TILESTATE_HOUSE) == TILESTATE_HOUSE; }
 
     void select(bool noFilter = false);
@@ -199,7 +199,7 @@ private:
 
     std::array<int8_t, MAX_Z + 1> m_completelyCoveredCache;
 
-    uint32_t  m_flags{ 0 }, m_houseId{ 0 };
+    uint32_t m_flags{ 0 }, m_houseId{ 0 };
 
     std::vector<CreaturePtr> m_walkingCreatures;
     std::vector<ThingPtr> m_things;

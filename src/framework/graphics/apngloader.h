@@ -27,18 +27,18 @@
 struct apng_data
 {
     uint8_t* pdata;
-    uint32_t  width;
-    uint32_t  height;
-    uint32_t  first_frame;
-    uint32_t  last_frame;
+    uint32_t width;
+    uint32_t height;
+    uint32_t first_frame;
+    uint32_t last_frame;
     uint8_t bpp;
     uint8_t coltype;
-    uint32_t  num_frames;
-    uint32_t  num_plays;
+    uint32_t num_frames;
+    uint32_t num_plays;
     unsigned short* frames_delay; // each frame delay in ms
 };
 
 // returns -1 on error, 0 on success
 int load_apng(std::stringstream& file, apng_data* apng);
-void save_png(std::stringstream& file, uint32_t  width, uint32_t  height, int channels, uint8_t* pixels);
+void save_png(std::stringstream& file, uint32_t width, uint32_t height, int channels, uint8_t* pixels);
 void free_apng(apng_data* apng);

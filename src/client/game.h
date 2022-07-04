@@ -149,7 +149,7 @@ protected:
     static void processQuestLine(int questId, const std::vector<std::tuple<std::string, std::string> >& questMissions);
 
     // modal dialogs >= 970
-    static void processModalDialog(uint32_t  id, const std::string_view title, const std::string_view message, const std::vector<std::tuple<int, std::string> >
+    static void processModalDialog(uint32_t id, const std::string_view title, const std::string_view message, const std::vector<std::tuple<int, std::string> >
                                    & buttonList, int enterButton, int escapeButton, const std::vector<std::tuple<int, std::string> >
                                    & choiceList, bool priority);
 
@@ -281,7 +281,7 @@ public:
     void requestItemInfo(const ItemPtr& item, int index);
 
     // >= 970 modal dialog
-    void answerModalDialog(uint32_t  dialog, int button, int choice);
+    void answerModalDialog(uint32_t dialog, int button, int choice);
 
     // >= 984 browse field
     void browseField(const Position& position);

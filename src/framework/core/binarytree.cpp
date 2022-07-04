@@ -139,12 +139,12 @@ uint16_t BinaryTree::getU16()
     return v;
 }
 
-uint32_t  BinaryTree::getU32()
+uint32_t BinaryTree::getU32()
 {
     unserialize();
     if (m_pos + 4 > m_buffer.size())
         stdext::throw_exception("BinaryTree: getU32 failed");
-    const uint32_t  v = stdext::readULE32(&m_buffer[m_pos]);
+    const uint32_t v = stdext::readULE32(&m_buffer[m_pos]);
     m_pos += 4;
     return v;
 }
@@ -199,7 +199,7 @@ void OutputBinaryTree::addU16(uint16_t v)
     write(data, 2);
 }
 
-void OutputBinaryTree::addU32(uint32_t  v)
+void OutputBinaryTree::addU32(uint32_t v)
 {
     uint8_t data[4];
     stdext::writeULE32(data, v);

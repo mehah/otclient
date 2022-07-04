@@ -30,11 +30,11 @@ namespace stdext
     inline size_t to_power_of_two(size_t v) { if (v == 0) return 0; size_t r = 1; while (r < v && r != 0xffffffff) r <<= 1; return r; }
 
     inline uint16_t readULE16(const uint8_t* addr) { return static_cast<uint16_t>(addr[1]) << 8 | addr[0]; }
-    inline uint32_t  readULE32(const uint8_t* addr) { return static_cast<uint32_t >(readULE16(addr + 2)) << 16 | readULE16(addr); }
+    inline uint32_t readULE32(const uint8_t* addr) { return static_cast<uint32_t >(readULE16(addr + 2)) << 16 | readULE16(addr); }
     inline uint64_t readULE64(const uint8_t* addr) { return static_cast<uint64_t>(readULE32(addr + 4)) << 32 | readULE32(addr); }
 
     inline void writeULE16(uint8_t* addr, uint16_t value) { addr[1] = value >> 8; addr[0] = static_cast<uint8_t>(value); }
-    inline void writeULE32(uint8_t* addr, uint32_t  value) { writeULE16(addr + 2, value >> 16); writeULE16(addr, static_cast<uint16_t>(value)); }
+    inline void writeULE32(uint8_t* addr, uint32_t value) { writeULE16(addr + 2, value >> 16); writeULE16(addr, static_cast<uint16_t>(value)); }
     inline void writeULE64(uint8_t* addr, uint64_t value) { writeULE32(addr + 4, value >> 32); writeULE32(addr, static_cast<uint32_t >(value)); }
 
     inline int16_t readSLE16(const uint8_t* addr) { return static_cast<int16_t>(addr[1]) << 8 | addr[0]; }
@@ -45,7 +45,7 @@ namespace stdext
     inline void writeSLE32(uint8_t* addr, int32_t value) { writeSLE16(addr + 2, value >> 16); writeSLE16(addr, static_cast<int16_t>(value)); }
     inline void writeSLE64(uint8_t* addr, int64_t value) { writeSLE32(addr + 4, value >> 32); writeSLE32(addr, static_cast<int32_t>(value)); }
 
-    uint32_t  adler32(const uint8_t* buffer, size_t size);
+    uint32_t adler32(const uint8_t* buffer, size_t size);
     int random_range(int min, int max);
     float random_range(float min, float max);
 }

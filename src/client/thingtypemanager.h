@@ -61,9 +61,9 @@ public:
     const ThingTypeList& getThingTypes(ThingCategory category);
     const ItemTypeList& getItemTypes() { return m_itemTypes; }
 
-    uint32_t  getDatSignature() { return m_datSignature; }
-    uint32_t  getOtbMajorVersion() { return m_otbMajorVersion; }
-    uint32_t  getOtbMinorVersion() { return m_otbMinorVersion; }
+    uint32_t getDatSignature() { return m_datSignature; }
+    uint32_t getOtbMajorVersion() { return m_otbMajorVersion; }
+    uint32_t getOtbMinorVersion() { return m_otbMinorVersion; }
     uint16_t getContentRevision() { return m_contentRevision; }
 
     bool isDatLoaded() { return m_datLoaded; }
@@ -85,9 +85,9 @@ private:
     bool m_xmlLoaded;
     bool m_otbLoaded;
 
-    uint32_t  m_otbMinorVersion;
-    uint32_t  m_otbMajorVersion;
-    uint32_t  m_datSignature;
+    uint32_t m_otbMinorVersion;
+    uint32_t m_otbMajorVersion;
+    uint32_t m_datSignature;
     uint16_t m_contentRevision;
 };
 

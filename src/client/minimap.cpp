@@ -318,7 +318,7 @@ bool Minimap::loadOtmm(const std::string& fileName)
 
         fin->cache();
 
-        const uint32_t  signature = fin->getU32();
+        const uint32_t signature = fin->getU32();
         if (signature != OTMM_SIGNATURE)
             stdext::throw_exception("invalid OTMM file");
 
@@ -384,7 +384,7 @@ void Minimap::saveOtmm(const std::string& fileName)
         fin->cache();
 
         //TODO: compression flag with zlib
-        const uint32_t  flags = 0;
+        const uint32_t flags = 0;
 
         // header
         fin->addU32(OTMM_SIGNATURE);
@@ -396,7 +396,7 @@ void Minimap::saveOtmm(const std::string& fileName)
         fin->addString("OTMM 1.0"); // description
 
         // go back and rewrite where the map data starts
-        const uint32_t  start = fin->tell();
+        const uint32_t start = fin->tell();
         fin->seek(4);
         fin->addU16(start);
         fin->seek(start);

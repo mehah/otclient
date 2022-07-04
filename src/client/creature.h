@@ -47,7 +47,7 @@ public:
     void drawOutfit(const Rect& destRect, bool resize, Color color = Color::white);
     void drawInformation(const MapPosInfo& mapRect, const Point& dest, float scaleFactor, bool useGray, int drawFlags);
 
-    void setId(uint32_t  id) override { m_id = id; }
+    void setId(uint32_t id) override { m_id = id; }
     void setName(const std::string_view name);
     void setHealthPercent(uint8_t healthPercent);
     void setDirection(Otc::Direction direction);
@@ -78,7 +78,7 @@ public:
     bool isDrawingOutfitColor() { return m_drawOutfitColor; }
     void setDrawOutfitColor(const bool draw) { m_drawOutfitColor = draw; }
 
-    uint32_t  getId() override { return m_id; }
+    uint32_t getId() override { return m_id; }
     std::string getName() { return m_name; }
     uint8_t getHealthPercent() { return m_healthPercent; }
     Otc::Direction getDirection() { return m_direction; }
@@ -149,7 +149,7 @@ protected:
     void updateOutfitColor(Color color, Color finalColor, Color delta, int duration);
     void updateJump();
 
-    uint32_t  m_id{ 0 };
+    uint32_t m_id{ 0 };
     std::string m_name;
     Outfit m_outfit;
     Light m_light;

@@ -28,7 +28,7 @@
 
 namespace stdext
 {
-    std::string ip_to_string(uint32_t  ip);
-    uint32_t  string_to_ip(const std::string_view string);
-    std::vector<uint32_t > listSubnetAddresses(uint32_t  address, uint8_t mask);
+    std::string ip_to_string(uint32_t ip);
+    uint32_t string_to_ip(const std::string_view string);
+    std::vector<uint32_t > listSubnetAddresses(uint32_t address, uint8_t mask);
 }

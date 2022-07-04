@@ -56,7 +56,7 @@ void OutputMessage::addU16(uint16_t value)
     m_messageSize += 2;
 }
 
-void OutputMessage::addU32(uint32_t  value)
+void OutputMessage::addU32(uint32_t value)
 {
     checkWrite(4);
     stdext::writeULE32(m_buffer + m_writePos, value);
@@ -106,7 +106,7 @@ void OutputMessage::encryptRsa()
 
 void OutputMessage::writeChecksum()
 {
-    const uint32_t  checksum = stdext::adler32(m_buffer + m_headerPos, m_messageSize);
+    const uint32_t checksum = stdext::adler32(m_buffer + m_headerPos, m_messageSize);
     assert(m_headerPos - 4 >= 0);
     m_headerPos -= 4;
     stdext::writeULE32(m_buffer + m_headerPos, checksum);

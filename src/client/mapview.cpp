@@ -346,14 +346,14 @@ void MapView::updateVisibleTiles()
 
     // cache visible tiles in draw order
     // draw from last floor (the lower) to first floor (the higher)
-    const uint32_t  numDiagonals = m_drawDimension.width() + m_drawDimension.height() - 1;
+    const uint32_t numDiagonals = m_drawDimension.width() + m_drawDimension.height() - 1;
     for (int_fast32_t iz = m_cachedLastVisibleFloor; iz >= cachedFirstVisibleFloor; --iz) {
         auto& floor = m_cachedVisibleTiles[iz];
 
         // loop through / diagonals beginning at top left and going to top right
         for (uint_fast32_t diagonal = 0; diagonal < numDiagonals; ++diagonal) {
             // loop current diagonal tiles
-            const uint32_t  advance = std::max<uint32_t >(diagonal - m_drawDimension.height(), 0);
+            const uint32_t advance = std::max<uint32_t >(diagonal - m_drawDimension.height(), 0);
             for (int iy = diagonal - advance, ix = advance; iy >= 0 && ix < m_drawDimension.width(); --iy, ++ix) {
                 // position on current floor
                 //TODO: check position limits

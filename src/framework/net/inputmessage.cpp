@@ -56,10 +56,10 @@ uint16_t InputMessage::getU16()
     return v;
 }
 
-uint32_t  InputMessage::getU32()
+uint32_t InputMessage::getU32()
 {
     checkRead(4);
-    const uint32_t  v = stdext::readULE32(m_buffer + m_readPos);
+    const uint32_t v = stdext::readULE32(m_buffer + m_readPos);
     m_readPos += 4;
     return v;
 }
@@ -119,8 +119,8 @@ void InputMessage::setHeaderSize(uint16_t size)
 
 bool InputMessage::readChecksum()
 {
-    const uint32_t  receivedCheck = getU32();
-    const uint32_t  checksum = stdext::adler32(m_buffer + m_readPos, getUnreadSize());
+    const uint32_t receivedCheck = getU32();
+    const uint32_t checksum = stdext::adler32(m_buffer + m_readPos, getUnreadSize());
     return receivedCheck == checksum;
 }
 

@@ -481,7 +481,7 @@ void Game::processQuestLine(int questId, const std::vector<std::tuple<std::strin
     g_lua.callGlobalField("g_game", "onQuestLine", questId, questMissions);
 }
 
-void Game::processModalDialog(uint32_t  id, const std::string_view title, const std::string_view message, const std::vector<std::tuple<int, std::string> >
+void Game::processModalDialog(uint32_t id, const std::string_view title, const std::string_view message, const std::vector<std::tuple<int, std::string> >
                               & buttonList, int enterButton, int escapeButton, const std::vector<std::tuple<int, std::string> >
                               & choiceList, bool priority)
 {
@@ -1404,7 +1404,7 @@ void Game::requestItemInfo(const ItemPtr& item, int index)
     m_protocolGame->sendRequestItemInfo(item->getId(), item->getSubType(), index);
 }
 
-void Game::answerModalDialog(uint32_t  dialog, int button, int choice)
+void Game::answerModalDialog(uint32_t dialog, int button, int choice)
 {
     if (!canPerformGameAction())
         return;

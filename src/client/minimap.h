@@ -27,7 +27,7 @@
 
 constexpr uint8_t MMBLOCK_SIZE = 64;
 constexpr uint8_t OTMM_VERSION = 1;
-constexpr uint32_t  OTMM_SIGNATURE = 0x4D4d544F;
+constexpr uint32_t OTMM_SIGNATURE = 0x4D4d544F;
 
 enum MinimapTileFlags
 {
