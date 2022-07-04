@@ -1172,7 +1172,6 @@ function setupViewMode(mode)
             height = 11
         })
     elseif mode == 1 then
-        print(123)
         gameMapPanel:setKeepAspectRatio(false)
         gameMapPanel:setLimitVisibleRange(true)
         gameMapPanel:setZoom(11)
