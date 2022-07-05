@@ -59,7 +59,7 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
     size_t stateHash = 0, methodHash = 0;
     updateHash(state, method, stateHash, methodHash);
 
-    if (m_alwaysGroupDrawings || drawBuffer && drawBuffer->m_agroup) {
+    if (m_type != PoolType::FOREGROUND && (m_alwaysGroupDrawings || drawBuffer && drawBuffer->m_agroup)) {
         if (auto it = m_objectsByhash.find(stateHash); it != m_objectsByhash.end()) {
             const auto& buffer = it->second.buffer;
 
@@ -117,7 +117,8 @@ void Pool::add(const Color& color, const TexturePtr& texture, const DrawMethod& 
         return;
     }
 
-    m_currentOrder = static_cast<uint8_t>(drawBuffer ? drawBuffer->m_order : Pool::DrawOrder::THIRD);
+    m_currentOrder = static_cast<uint8_t>(m_type == PoolType::FOREGROUND ? Pool::DrawOrder::FIRST :
+                                          drawBuffer ? drawBuffer->m_order : Pool::DrawOrder::THIRD);
 
     auto& list = m_objects[m_currentFloor][m_currentOrder];
 

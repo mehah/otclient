@@ -217,7 +217,7 @@ void DrawPool::addBoundingRect(const Rect& dest, const Color& color, int innerLi
 
 void DrawPool::addAction(std::function<void()> action)
 {
-    m_currentPool->m_objects[0][static_cast<uint8_t>(Pool::DrawOrder::THIRD)].emplace_back(action);
+    m_currentPool->m_objects[0][static_cast<uint8_t>(Pool::DrawOrder::FIRST)].emplace_back(action);
 }
 
 void DrawPool::use(const PoolType type) { use(type, {}, {}); }
