@@ -59,7 +59,9 @@ public:
     void setEnable(const bool v) { m_enabled = v; }
     bool isEnabled() const { return m_enabled; }
     PoolType getType() const { return m_type; }
+
     bool canRepaint() { return canRepaint(false); }
+    void repaint() { m_status.first = 0; }
 
 protected:
     struct PoolState
@@ -166,8 +168,6 @@ private:
 
     float getOpacity(bool lastDrawing = false) { return !lastDrawing ? m_state.opacity : getLastDrawObject().state->opacity; }
     Rect getClipRect(bool lastDrawing = false) { return !lastDrawing ? m_state.clipRect : getLastDrawObject().state->clipRect; }
-
-    void repaint() { m_status.first = 0; }
 
     void setCompositionMode(CompositionMode mode, bool onLastDrawing = false);
     void setBlendEquation(BlendEquation equation, bool onLastDrawing = false);
