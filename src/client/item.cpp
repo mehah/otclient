@@ -364,9 +364,9 @@ void Item::updatePatterns()
         m_numPatternX = (color % 4) % numPatternX;
         m_numPatternY = (color / 4) % numPatternY;
     } else {
-        m_numPatternX = m_position.x % numPatternX;
-        m_numPatternY = m_position.y % numPatternY;
-        m_numPatternZ = m_position.z % getNumPatternZ();
+        m_numPatternX = m_position.x % std::max<int>(1, numPatternX);
+        m_numPatternY = m_position.y % std::max<int>(1, numPatternY);
+        m_numPatternZ = m_position.z % std::max<int>(1, getNumPatternZ());
     }
 }
 
