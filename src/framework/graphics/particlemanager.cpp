@@ -56,7 +56,7 @@ ParticleEffectPtr ParticleManager::createEffect(const std::string_view name)
 {
     try {
         auto particleEffect = ParticleEffectPtr(new ParticleEffect);
-        particleEffect->load(m_effectsTypes[name]);
+        particleEffect->load(m_effectsTypes[std::string(name)]);
         m_effects.push_back(particleEffect);
         return particleEffect;
     } catch (stdext::exception& e) {
