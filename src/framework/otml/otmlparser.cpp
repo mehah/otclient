@@ -54,8 +54,11 @@ int OTMLParser::getLineDepth(const std::string_view line, bool multilining)
 
     // count number of spaces at the line beginning
     std::size_t spaces = 0;
-    while (line[spaces] == ' ')
-        ++spaces;
+    while (line[spaces] == ' ') {
+        if (++spaces == line.length()) {
+            --spaces; break;
+        }
+    }
 
     // pre calculate depth
     const int depth = spaces / 2;
