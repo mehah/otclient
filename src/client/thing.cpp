@@ -94,15 +94,15 @@ void Thing::generateBuffer()
     bool agroup = true;
     if (isSingleGround())
         order = Pool::DrawOrder::FIRST;
-    else if (isSingleGroundBorder()) {
+    else if (isGroundBorder()) {
         order = Pool::DrawOrder::SECOND;
-        agroup = false;
+        agroup = !isSingleDimension();
     } else if (isCommon() && isSingleDimension()) {
         order = Pool::DrawOrder::THIRD;
         agroup = false;
     } else if (isOnBottom() && isSingleDimension() && !hasDisplacement() && isNotWalkable())
         order = Pool::DrawOrder::THIRD;
-    else if (isTopGround() || isTopGroundBorder() || g_app.isDrawingEffectsOnTop() && isEffect())
+    else if (isTopGround() || g_app.isDrawingEffectsOnTop() && isEffect())
         order = Pool::DrawOrder::FOURTH;
     else if (isMissile())
         order = Pool::DrawOrder::FIFTH;
