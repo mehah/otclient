@@ -109,12 +109,15 @@ private:
     void enableUpdates() { m_updatesEnabled = true; }
     void recacheGlyphs() { m_glyphsMustRecache = true; }
 
+    std::string m_validCharacters;
+    uint32_t m_maxLength;
+
     Rect m_drawArea;
-    size_t m_cursorPos{ 0 };
     Point m_textVirtualOffset;
     Size m_textVirtualSize;
     Size m_textTotalSize;
     ticks_t m_cursorTicks;
+
     bool m_textHidden;
     bool m_shiftNavigation;
     bool m_multiline;
@@ -122,15 +125,15 @@ private:
     bool m_cursorVisible;
     bool m_editable;
     bool m_changeCursorImage;
-    std::string m_validCharacters;
-    uint32_t m_maxLength;
     bool m_updatesEnabled;
     bool m_autoScroll;
 
     bool m_selectable;
-    size_t m_selectionReference,
+
+    int m_selectionReference,
         m_selectionStart,
-        m_selectionEnd;
+        m_selectionEnd,
+        m_cursorPos{ 0 };
 
     Color m_selectionColor;
     Color m_selectionBackgroundColor;

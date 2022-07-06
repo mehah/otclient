@@ -65,7 +65,7 @@ void UITextEdit::drawSelf(Fw::DrawPane drawPane)
     drawImage(m_rect);
     drawIcon(m_rect);
 
-    const size_t textLength = m_text.length();
+    const int textLength = m_text.length();
     const auto& texture = m_font->getTexture();
     if (!texture)
         return;
@@ -77,7 +77,7 @@ void UITextEdit::drawSelf(Fw::DrawPane drawPane)
     if (m_color != Color::alpha) {
         if (glyphsMustRecache) {
             m_glyphsTextRectCache.clear();
-            for (size_t i = 0; i < textLength; ++i)
+            for (int i = 0; i < textLength; ++i)
                 m_glyphsTextRectCache.emplace_back(m_glyphsCoords[i], m_glyphsTexCoords[i]);
         }
         for (const auto& [dest, src] : m_glyphsTextRectCache)
@@ -87,7 +87,7 @@ void UITextEdit::drawSelf(Fw::DrawPane drawPane)
     if (hasSelection()) {
         if (glyphsMustRecache) {
             m_glyphsSelectRectCache.clear();
-            for (size_t i = m_selectionStart; i < m_selectionEnd; ++i)
+            for (int i = m_selectionStart; i < m_selectionEnd; ++i)
                 m_glyphsSelectRectCache.emplace_back(m_glyphsCoords[i], m_glyphsTexCoords[i]);
         }
         for (const auto& rect : m_glyphsSelectRectCache)
@@ -132,7 +132,7 @@ void UITextEdit::update(bool focusCursor)
         text += " ";
 
     m_drawText = text;
-    const size_t textLength = text.length();
+    const int textLength = text.length();
 
     // prevent glitches
     if (m_rect.isEmpty())
@@ -178,7 +178,7 @@ void UITextEdit::update(bool focusCursor)
         if (m_cursorPos > 0 && textLength > 0) {
             assert(m_cursorPos <= textLength);
             const Rect virtualRect(m_textVirtualOffset, m_rect.size() - Size(m_padding.left + m_padding.right, 0)); // previous rendered virtual rect
-            size_t pos = m_cursorPos - 1; // element before cursor
+            int pos = m_cursorPos - 1; // element before cursor
             glyph = static_cast<uint8_t>(text[pos]); // glyph of the element before cursor
             Rect glyphRect(glyphsPositions[pos], glyphsSize[glyph]);
 
@@ -261,7 +261,7 @@ void UITextEdit::update(bool focusCursor)
     } else { // AlignLeft
     }
 
-    for (size_t i = 0; i < textLength; ++i) {
+    for (int i = 0; i < textLength; ++i) {
         glyph = static_cast<uint8_t>(text[i]);
         m_glyphsCoords[i].clear();
 
@@ -444,8 +444,8 @@ void UITextEdit::appendCharacter(char c)
 void UITextEdit::removeCharacter(bool right)
 {
     std::string tmp = m_text;
-    if (m_cursorPos >= 0 && tmp.length() > 0) {
-        if (m_cursorPos >= tmp.length()) {
+    if (static_cast<size_t>(m_cursorPos) >= 0 && tmp.length() > 0) {
+        if (static_cast<size_t>(m_cursorPos) >= tmp.length()) {
             tmp.erase(tmp.begin() + (--m_cursorPos));
         } else if (right)
             tmp.erase(tmp.begin() + m_cursorPos);
@@ -507,7 +507,7 @@ void UITextEdit::wrapText()
 void UITextEdit::moveCursorHorizontally(bool right)
 {
     if (right) {
-        if (m_cursorPos + 1 <= m_text.length())
+        if (static_cast<size_t>(m_cursorPos) + 1 <= m_text.length())
             ++m_cursorPos;
         else
             m_cursorPos = 0;
