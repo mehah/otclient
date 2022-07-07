@@ -161,9 +161,6 @@ void MapView::drawFloor()
             const auto& map = m_cachedVisibleTiles[z];
 
             if (isDrawingLights() && z < m_floorMax) {
-                if (fadeLevel == 0.f)
-                    continue;
-
                 for (const auto& tile : map.shades) {
                     if (alwaysTransparent && tile->getPosition().isInRange(_camera, TRANSPARENT_FLOOR_VIEW_RANGE, TRANSPARENT_FLOOR_VIEW_RANGE, true))
                         continue;
@@ -341,8 +338,7 @@ void MapView::updateVisibleTiles()
 
     m_lastCameraPosition = cameraPosition;
 
-    const bool _canFloorFade = canFloorFade(),
-        fadeFinished = getFadeLevel(m_cachedFirstVisibleFloor) == 1.f;
+    const bool fadeFinished = getFadeLevel(m_cachedFirstVisibleFloor) == 1.f;
 
     // cache visible tiles in draw order
     // draw from last floor (the lower) to first floor (the higher)
@@ -367,7 +363,7 @@ void MapView::updateVisibleTiles()
 
                     bool addTile = true;
 
-                    if (!_canFloorFade || fadeFinished) {
+                    if (fadeFinished) {
                         // skip tiles that are completely behind another tile
                         if (tile->isCompletelyCovered(m_cachedFirstVisibleFloor, m_resetCoveredCache)) {
                             if (m_floorViewMode != ALWAYS_WITH_TRANSPARENCY || (tilePos.z < cameraPosition.z && tile->isCovered(m_cachedFirstVisibleFloor))) {
