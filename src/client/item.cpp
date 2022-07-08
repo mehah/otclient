@@ -108,7 +108,7 @@ void Item::setPosition(const Position& position, uint8_t stackPos, bool hasEleva
     if (hasElevation && isSingleGroundBorder())
         m_drawBuffer = nullptr;
     else if (m_drawBuffer && isSingleDimension())
-        m_drawBuffer->agroup(stackPos <= 1);
+        m_drawBuffer->agroup(stackPos == 0);
 }
 
 void Item::unserializeItem(const BinaryTreePtr& in)

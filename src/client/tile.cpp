@@ -242,8 +242,6 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
 
     m_things.insert(m_things.begin() + stackPos, thing);
 
-    if (thing->isGround()) m_ground = thing->static_self_cast<Item>();
-
     // get the elevation status before analyze the new item.
     const bool hasElev = hasElevation();
 
@@ -254,6 +252,11 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
 
     if (size > MAX_THINGS)
         removeThing(m_things[MAX_THINGS]);
+
+    if (m_ground)
+        --stackPos;
+    else if (thing->isGround())
+        m_ground = thing->static_self_cast<Item>();
 
     thing->setPosition(m_position, stackPos, hasElev);
     thing->onAppear();
