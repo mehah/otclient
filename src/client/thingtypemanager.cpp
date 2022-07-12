@@ -299,7 +299,7 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
             } else if (type == "sprite") {
                 int lastSpriteId = obj["lastspriteid"].get<int>();
                 g_spriteAppearances.addSpriteSheet(SpriteSheetPtr(new SpriteSheet(obj["firstspriteid"].get<int>(), lastSpriteId, static_cast<SpriteLayout>(obj["spritetype"].get<int>()), obj["file"].get<std::string>())));
-                spritesCount = std::max(spritesCount, lastSpriteId);
+                spritesCount = std::max<int>(spritesCount, lastSpriteId);
             }
         }
 
