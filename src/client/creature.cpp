@@ -565,7 +565,7 @@ void Creature::nextWalkUpdate()
 
     const uint64_t walkDuration = std::max<uint64_t>(
         m_stepCache.walkDuration,
-        (isLocalPlayer() ? std::max<uint64_t>((1000 / g_app.getFps() - 1), 3) : 16)
+        (isLocalPlayer() ? std::max<int>((1000 / g_app.getFps() - 1), 3) : 16)
     );
 
     // schedules next update
