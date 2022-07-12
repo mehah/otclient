@@ -44,7 +44,7 @@ struct MapPosInfo
 
     bool isInRange(const Position& pos, bool ignoreZ = false) const
     {
-        return camera.isInRange(pos, awareRange.left - 1, awareRange.right - 2, awareRange.top - 1, awareRange.bottom - 2, ignoreZ);
+        return camera.isInRange(pos, awareRange.left - 1, awareRange.right - 1, awareRange.top - 1, awareRange.bottom - 1, ignoreZ);
     }
     bool isInRangeEx(const Position& pos, bool ignoreZ = false)  const
     {
