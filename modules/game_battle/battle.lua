@@ -455,7 +455,6 @@ function doCreatureFitFilters(creature) -- Check if creature fit current applied
 end
 
 local function canBeSeen(creature)
-    print(modules.game_interface.getMapPanel():isInRange(creature:getPosition()))
     return creature and creature:canBeSeen() and creature:getPosition() and
                modules.game_interface.getMapPanel():isInRange(creature:getPosition())
 end
