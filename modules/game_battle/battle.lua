@@ -770,9 +770,7 @@ function onCreaturePositionChange(creature, newPos, oldPos) -- Update battleButt
     -- If it's the local player moving
     if creature:isLocalPlayer() then
         if oldPos and newPos and newPos.z ~= oldPos.z then
-            if not eventOnCheckCreature then
-                eventOnCheckCreature = scheduleEvent(checkCreatures, 100)
-            end
+            checkCreatures()
         elseif oldPos and newPos and (newPos.x ~= oldPos.x or newPos.y ~= oldPos.y) then
             -- Distance will change when moving, recalculate and move to correct index
             if #binaryTree > 0 and sortType == 'distance' then
