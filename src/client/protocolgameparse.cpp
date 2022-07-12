@@ -3227,7 +3227,7 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
         {
             const uint8_t listSize = msg->getU8();
             for (uint8_t i = 0; i < listSize; i++) {
-                getPreyMonsters(msg);
+                getPreyMonster(msg);
             }
             break;
         }
@@ -3238,7 +3238,7 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
             msg->getU8(); // bonus grade
             const uint8_t listSize = msg->getU8();
             for (uint8_t i = 0; i < listSize; i++) {
-                getPreyMonsters(msg);
+                getPreyMonster(msg);
             }
             break;
         }
