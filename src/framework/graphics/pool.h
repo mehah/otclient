@@ -61,7 +61,7 @@ public:
     PoolType getType() const { return m_type; }
 
     bool canRepaint() { return canRepaint(false); }
-    void repaint() { m_status.first = 0; }
+    void repaint() { m_status.first = 1; }
 
 protected:
     struct PoolState
@@ -204,7 +204,7 @@ private:
 
     Timer m_refreshTimer;
 
-    std::pair<size_t, size_t> m_status{ 0,0 };
+    std::pair<size_t, size_t> m_status{ 1, 0 };
 
     std::vector<DrawObject> m_objects[ARR_MAX_Z][static_cast<uint8_t>(DrawOrder::LAST)];
     stdext::map<size_t, DrawObject> m_objectsByhash;

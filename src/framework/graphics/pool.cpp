@@ -23,7 +23,7 @@
 #include "pool.h"
 #include <framework/graphics/framebuffermanager.h>
 
-static constexpr int REFRESH_TIME = 1000 / 30; // 30 FPS (33ms)
+static constexpr int REFRESH_TIME = 1000 / 20; // 20 FPS (50ms)
 
 Pool* Pool::create(const PoolType type)
 {
@@ -34,10 +34,7 @@ Pool* Pool::create(const PoolType type)
         pool = new PoolFramed{ frameBuffer };
 
         if (type == PoolType::MAP) frameBuffer->disableBlend();
-        else if (type == PoolType::FOREGROUND) {
-            pool->m_autoUpdate = true;
-            pool->m_refreshTimeMS = REFRESH_TIME;
-        } else if (type == PoolType::LIGHT) {
+        else if (type == PoolType::LIGHT) {
             pool->m_alwaysGroupDrawings = true;
             frameBuffer->setCompositionMode(CompositionMode::LIGHT);
         }

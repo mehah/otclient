@@ -55,7 +55,7 @@ void UIWidget::updateText()
     }
 
     m_textCachedScreenCoords = {};
-    g_drawPool.repaint();
+    g_app.repaint();
 }
 
 void UIWidget::resizeToText()

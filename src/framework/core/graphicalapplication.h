@@ -54,6 +54,8 @@ public:
     void setDrawEffectOnTop(const bool draw) { m_drawEffectOnTop = draw; }
     bool isDrawingEffectsOnTop() { return m_drawEffectOnTop || canOptimize(); }
 
+    void repaint();
+
 protected:
     void resize(const Size& size);
     void inputEvent(const InputEvent& event);
@@ -62,7 +64,8 @@ private:
     bool m_onInputEvent{ false },
         m_optimize{ true },
         m_forceEffectOptimization{ false },
-        m_drawEffectOnTop{ false };
+        m_drawEffectOnTop{ false },
+        m_repaint{ true };
 
     Timer m_foregroundRefreshTime;
 

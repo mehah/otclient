@@ -1519,7 +1519,7 @@ void UIWidget::onStyleApply(const std::string_view, const OTMLNodePtr& styleNode
     parseImageStyle(styleNode);
     parseTextStyle(styleNode);
 
-    g_drawPool.repaint();
+    g_app.repaint();
 }
 
 void UIWidget::onGeometryChange(const Rect& oldRect, const Rect& newRect)
@@ -1535,7 +1535,7 @@ void UIWidget::onGeometryChange(const Rect& oldRect, const Rect& newRect)
 
     callLuaField("onGeometryChange", oldRect, newRect);
 
-    g_drawPool.repaint();
+    g_app.repaint();
 }
 
 void UIWidget::onLayoutUpdate()

@@ -57,9 +57,6 @@ public:
     float getOpacity(bool onLastDrawing = false) { return m_currentPool->getOpacity(onLastDrawing); }
     Rect getClipRect(bool onLastDrawing = false) { return m_currentPool->getClipRect(onLastDrawing); }
 
-    void repaint() { if (m_currentPool)m_currentPool->repaint(); }
-    bool canRepaint() { return m_currentPool && m_currentPool->canRepaint(); }
-
     void resetState() { m_currentPool->resetState(); }
     void resetOpacity() { m_currentPool->resetOpacity(); }
     void resetClipRect() { m_currentPool->resetClipRect(); }
