@@ -23,6 +23,8 @@
 #include "pool.h"
 #include <framework/graphics/framebuffermanager.h>
 
+static constexpr int REFRESH_TIME = 1000 / 30; // 30 FPS (33ms)
+
 Pool* Pool::create(const PoolType type)
 {
     Pool* pool;

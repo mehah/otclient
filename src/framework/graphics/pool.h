@@ -145,11 +145,6 @@ protected:
     };
 
 private:
-    enum
-    {
-        REFRESH_TIME = 1000 / 30 // 30 FPS (33ms)
-    };
-
     static constexpr uint8_t ARR_MAX_Z = (MAX_Z / 2) + 1;
     static Pool* create(const PoolType type);
 
