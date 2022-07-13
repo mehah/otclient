@@ -253,10 +253,15 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
     if (size > MAX_THINGS)
         removeThing(m_things[MAX_THINGS]);
 
-    if (m_ground)
-        --stackPos;
-    else if (thing->isGround())
-        m_ground = thing->static_self_cast<Item>();
+    // Do not change if you do not understand what is being done.
+    {
+        if (m_ground) {
+            --stackPos;
+            if (m_ground->isTopGround())
+                m_ground->setDrawOrder(Pool::DrawOrder::FIRST);
+        } else if (thing->isGround())
+            m_ground = thing->static_self_cast<Item>();
+    }
 
     thing->setPosition(m_position, stackPos, hasElev);
     thing->onAppear();

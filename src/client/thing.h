@@ -150,6 +150,8 @@ public:
     void canDraw(bool canDraw) { m_canDraw = canDraw; }
     bool canDraw()  const { return m_canDraw; }
 
+    void setDrawOrder(Pool::DrawOrder order) { if (m_drawBuffer) m_drawBuffer->setOrder(order); }
+
     MarketData getMarketData() { return getThingType()->getMarketData(); }
 
     virtual void onPositionChange(const Position& /*newPos*/, const Position& /*oldPos*/) {}

@@ -248,6 +248,7 @@ class DrawBuffer
 public:
     DrawBuffer(Pool::DrawOrder order, bool agroup = true) : m_order(order), m_agroup(agroup) {}
     void agroup(bool v) { m_agroup = v; }
+    void setOrder(Pool::DrawOrder order) { m_order = order; }
 
 private:
     static DrawBufferPtr createTemporaryBuffer(Pool::DrawOrder order)
