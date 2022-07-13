@@ -70,9 +70,8 @@ public:
 
     void setShadowFloorIntensity(float intensity) { m_mapView->setShadowFloorIntensity(intensity); }
 
-    std::vector<CreaturePtr> getVisibleCreatures() { return m_mapView->getVisibleCreatures(); }
-    std::vector<CreaturePtr> getSpectators(const Position& centerPos, bool multiFloor) { return m_mapView->getSpectators(centerPos, multiFloor); }
-    std::vector<CreaturePtr> getSightSpectators(const Position& centerPos, bool multiFloor) { return m_mapView->getSightSpectators(centerPos, multiFloor); }
+    std::vector<CreaturePtr> getSpectators(bool multiFloor = false) { return m_mapView->getSpectators(multiFloor); }
+    std::vector<CreaturePtr> getSightSpectators(bool multiFloor = false) { return m_mapView->getSightSpectators(multiFloor); }
     bool isInRange(const Position& pos) { return m_mapView->isInRange(pos); }
 
     PainterShaderProgramPtr getMapShader() { return m_mapView->getShader(); }

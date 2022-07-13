@@ -86,20 +86,18 @@ int Thing::getStackPos()
     return -1;
 }
 
+// Do not change if you do not understand what is being done.
 void Thing::generateBuffer()
 {
     m_drawBuffer = nullptr;
 
     Pool::DrawOrder order = Pool::DrawOrder::NONE;
-    bool agroup = true;
     if (isSingleGround())
         order = Pool::DrawOrder::FIRST;
     else if (isGroundBorder()) {
         order = Pool::DrawOrder::SECOND;
-        agroup = !isSingleDimension();
     } else if (isCommon() && isSingleDimension() && isNotMoveable()) {
         order = Pool::DrawOrder::THIRD;
-        agroup = false;
     } else if (isOnBottom() && isSingleDimension() && !hasDisplacement() && isNotMoveable())
         order = Pool::DrawOrder::THIRD;
     else if (isTopGround() || g_app.isDrawingEffectsOnTop() && isEffect())
@@ -108,7 +106,7 @@ void Thing::generateBuffer()
         order = Pool::DrawOrder::FIFTH;
 
     if (order != Pool::DrawOrder::NONE) {
-        m_drawBuffer = std::make_shared<DrawBuffer>(order, agroup);
+        m_drawBuffer = std::make_shared<DrawBuffer>(order);
     }
 }
 

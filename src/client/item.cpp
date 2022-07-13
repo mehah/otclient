@@ -105,9 +105,9 @@ void Item::setPosition(const Position& position, uint8_t stackPos, bool hasEleva
 {
     Thing::setPosition(position, stackPos);
 
-    if (hasElevation && isSingleGroundBorder())
+    if (hasElevation)
         m_drawBuffer = nullptr;
-    else if (m_drawBuffer && isSingleDimension())
+    else if (m_drawBuffer)
         m_drawBuffer->agroup(stackPos == 0);
 }
 

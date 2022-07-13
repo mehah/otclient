@@ -44,8 +44,9 @@ struct MapPosInfo
 
     bool isInRange(const Position& pos, bool ignoreZ = false) const
     {
-        return camera.isInRange(pos, awareRange.left - 1, awareRange.right - 1, awareRange.top - 1, awareRange.bottom - 1, ignoreZ);
+        return camera.isInRange(pos, awareRange.left - 1, awareRange.right - 2, awareRange.top - 1, awareRange.bottom - 2, ignoreZ);
     }
+
     bool isInRangeEx(const Position& pos, bool ignoreZ = false)  const
     {
         return camera.isInRange(pos, awareRange.left, awareRange.right, awareRange.top, awareRange.bottom, ignoreZ);
@@ -143,11 +144,18 @@ public:
 
     void resetLastCamera() { m_lastCameraPosition = {}; }
 
-    std::vector<CreaturePtr> getVisibleCreatures();
-    std::vector<CreaturePtr> getSpectators(const Position& centerPos, bool multiFloor);
-    std::vector<CreaturePtr> getSightSpectators(const Position& centerPos, bool multiFloor);
-    bool isInRange(const Position& pos, bool ignoreZ = false) { return m_posInfo.isInRange(pos, ignoreZ); }
-    bool isInRangeEx(const Position& pos, bool ignoreZ = false) { return m_posInfo.isInRangeEx(pos, ignoreZ); }
+    std::vector<CreaturePtr> getSpectators(bool multiFloor = false);
+    std::vector<CreaturePtr> getSightSpectators(bool multiFloor = false);
+
+    bool isInRange(const Position& pos, bool ignoreZ = false)
+    {
+        return getCameraPosition().isInRange(pos, m_posInfo.awareRange.left - 1, m_posInfo.awareRange.right - 2, m_posInfo.awareRange.top - 1, m_posInfo.awareRange.bottom - 2, ignoreZ);
+    }
+
+    bool isInRangeEx(const Position& pos, bool ignoreZ = false)
+    {
+        return getCameraPosition().isInRange(pos, m_posInfo.awareRange.left, m_posInfo.awareRange.right, m_posInfo.awareRange.top, m_posInfo.awareRange.bottom, ignoreZ);
+    }
 
     TilePtr getTopTile(Position tilePos);
 

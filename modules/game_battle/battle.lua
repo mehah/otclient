@@ -9,6 +9,8 @@ local lastBattleButtonSwitched, lastCreatureSelected
 -- Hide Buttons ("hidePlayers", "hideNPCs", "hideMonsters", "hideSkulls", "hideParty")
 local hideButtons = {}
 
+local eventOnCheckCreature = nil
+
 local function connecting(gameEvent)
     -- TODO: Just connect when you will be using
     if gameEvent then
@@ -346,10 +348,9 @@ function setSortType(state, oldSortType) -- Setting the current sort type (dista
     reSort(oldSortType, state, order, order)
 end
 
-local eventOnZoomChange = nil
 function onZoomChange()
-    removeEvent(eventOnZoomChange)
-    eventOnZoomChange = scheduleEvent(checkCreatures, 200)
+    removeEvent(eventOnCheckCreature)
+    eventOnCheckCreature = scheduleEvent(checkCreatures, 200)
 end
 
 function onChangeSortType(comboBox, option) -- Callback when change the sort type (distance, age, name, health)
@@ -397,6 +398,8 @@ end
 
 -- Initially checking creatures
 function checkCreatures() -- Function that initially populates our tree once the module is initialized
+    eventOnCheckCreature = nil
+
     if not battlePanel or not g_game.isOnline() then
         return false
     end
@@ -413,7 +416,7 @@ function checkCreatures() -- Function that initially populates our tree once the
 
     removeAllCreatures() -- Remove all cache if there's any
 
-    local spectators = modules.game_interface.getMapPanel():getVisibleCreatures()
+    local spectators = modules.game_interface.getMapPanel():getSpectators()
     local sortType = getSortType()
 
     for _, creature in ipairs(spectators) do
@@ -767,7 +770,7 @@ function onCreaturePositionChange(creature, newPos, oldPos) -- Update battleButt
     -- If it's the local player moving
     if creature:isLocalPlayer() then
         if oldPos and newPos and newPos.z ~= oldPos.z then
-            checkCreatures() -- Changing the z makes easier to just recalculate everything
+            checkCreatures()
         elseif oldPos and newPos and (newPos.x ~= oldPos.x or newPos.y ~= oldPos.y) then
             -- Distance will change when moving, recalculate and move to correct index
             if #binaryTree > 0 and sortType == 'distance' then

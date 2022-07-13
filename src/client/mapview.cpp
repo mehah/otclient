@@ -47,7 +47,7 @@ MapView::MapView()
     auto* mapPool = g_drawPool.get<PoolFramed>(PoolType::MAP);
 
     mapPool->onBeforeDraw([&] {
-        const Position cameraPosition = getCameraPosition();
+        const auto&  cameraPosition = getCameraPosition();
 
         float fadeOpacity = 1.f;
         if (!m_shaderSwitchDone && m_fadeOutTime > 0) {
@@ -104,6 +104,8 @@ MapView::~MapView()
 
 void MapView::draw(const Rect& rect)
 {
+    m_posInfo.camera = getCameraPosition();
+
     // update visible tiles cache when needed
     if (m_updateVisibleTiles)
         updateVisibleTiles();
@@ -127,7 +129,7 @@ void MapView::draw(const Rect& rect)
     drawFloor();
 
     // this could happen if the player position is not known yet
-    if (!getCameraPosition().isValid()) {
+    if (!m_posInfo.camera.isValid()) {
         return;
     }
 
@@ -139,7 +141,7 @@ void MapView::drawFloor()
 {
     g_drawPool.use(PoolType::MAP, m_posInfo.rect, m_posInfo.srcRect, Color::black);
     {
-        const Position cameraPosition = getCameraPosition();
+        const auto&  cameraPosition = m_posInfo.camera;
         const auto& lightView = m_drawLights ? m_lightView.get() : nullptr;
 
         uint32_t flags = Otc::DrawThings;
@@ -228,14 +230,14 @@ void MapView::drawText()
         return;
     }
 
-    const Position cameraPosition = getCameraPosition();
+    const auto&  cameraPosition = getCameraPosition();
 
     g_drawPool.use(PoolType::TEXT);
     for (const StaticTextPtr& staticText : g_map.getStaticTexts()) {
         if (staticText->getMessageMode() == Otc::MessageNone)
             continue;
 
-        const Position& pos = staticText->getPosition();
+        const auto&  pos = staticText->getPosition();
         if (pos.z != cameraPosition.z)
             continue;
 
@@ -247,7 +249,7 @@ void MapView::drawText()
     }
 
     for (const AnimatedTextPtr& animatedText : g_map.getAnimatedTexts()) {
-        const Position pos = animatedText->getPosition();
+        const auto&  pos = animatedText->getPosition();
 
         if (pos.z != cameraPosition.z)
             continue;
@@ -264,7 +266,7 @@ void MapView::drawText()
 void MapView::updateVisibleTiles()
 {
     // there is no tile to render on invalid positions
-    const Position cameraPosition = getCameraPosition();
+    const auto&  cameraPosition = getCameraPosition();
     if (!cameraPosition.isValid())
         return;
 
@@ -281,8 +283,6 @@ void MapView::updateVisibleTiles()
 
     const uint8_t prevFirstVisibleFloor = m_cachedFirstVisibleFloor;
     if (m_lastCameraPosition != cameraPosition) {
-        m_posInfo.camera = getCameraPosition();
-
         if (m_mousePosition.isValid()) {
             const Otc::Direction direction = m_lastCameraPosition.getDirectionFromPosition(cameraPosition);
             m_mousePosition = m_mousePosition.translatedToDirection(direction);
@@ -448,7 +448,7 @@ void MapView::updateLight()
 {
     if (!m_drawLights) return;
 
-    const auto cameraPosition = getCameraPosition();
+    const auto& cameraPosition = getCameraPosition();
 
     Light ambientLight = cameraPosition.z > SEA_FLOOR ? Light() : g_map.getLight();
     ambientLight.intensity = std::max<uint8_t >(m_minimumAmbientLight * 255, ambientLight.intensity);
@@ -584,7 +584,7 @@ void MapView::setCameraPosition(const Position& pos)
 
 Position MapView::getPosition(const Point& point, const Size& mapSize)
 {
-    const Position cameraPosition = getCameraPosition();
+    const auto&  cameraPosition = getCameraPosition();
 
     // if we have no camera, its impossible to get the tile
     if (!cameraPosition.isValid())
@@ -601,7 +601,7 @@ Position MapView::getPosition(const Point& point, const Size& mapSize)
     if (tilePos2D.x + cameraPosition.x < 0 && tilePos2D.y + cameraPosition.y < 0)
         return {};
 
-    const Position position = Position(tilePos2D.x, tilePos2D.y, 0) + cameraPosition;
+    const auto&  position = Position(tilePos2D.x, tilePos2D.y, 0) + cameraPosition;
 
     if (!position.isValid())
         return {};
@@ -661,7 +661,7 @@ uint8_t MapView::calcFirstVisibleFloor(bool checkLimitsFloorsView)
     if (m_lockedFirstVisibleFloor != -1) {
         z = m_lockedFirstVisibleFloor;
     } else {
-        const Position cameraPosition = getCameraPosition();
+        const auto&  cameraPosition = getCameraPosition();
 
         // this could happens if the player is not known yet
         if (cameraPosition.isValid()) {
@@ -675,7 +675,7 @@ uint8_t MapView::calcFirstVisibleFloor(bool checkLimitsFloorsView)
             // loop in 3x3 tiles around the camera
             for (int_fast32_t ix = -1; checkLimitsFloorsView && ix <= 1 && firstFloor < cameraPosition.z; ++ix) {
                 for (int_fast32_t iy = -1; iy <= 1 && firstFloor < cameraPosition.z; ++iy) {
-                    const Position pos = cameraPosition.translated(ix, iy);
+                    const auto&  pos = cameraPosition.translated(ix, iy);
 
                     // process tiles that we can look through, e.g. windows, doors
                     if ((ix == 0 && iy == 0) || ((std::abs(ix) != std::abs(iy)) && g_map.isLookPossible(pos))) {
@@ -715,7 +715,7 @@ uint8_t MapView::calcLastVisibleFloor()
 {
     uint8_t z = SEA_FLOOR;
 
-    const Position cameraPosition = getCameraPosition();
+    const auto&  cameraPosition = getCameraPosition();
     // this could happens if the player is not known yet
     if (cameraPosition.isValid()) {
         // view only underground floors when below sea level
@@ -842,28 +842,14 @@ void MapView::updateViewportDirectionCache()
     }
 }
 
-std::vector<CreaturePtr> MapView::getVisibleCreatures()
+std::vector<CreaturePtr> MapView::getSightSpectators(bool multiFloor)
 {
-    std::vector<CreaturePtr> list;
-
-    for (const auto& tile : m_cachedVisibleTiles[getCameraPosition().z].tiles) {
-        const auto& tileCreatures = tile->getCreatures();
-        if (!tileCreatures.empty()) {
-            list.insert(list.end(), tileCreatures.rbegin(), tileCreatures.rend());
-        }
-    }
-
-    return list;
+    return g_map.getSpectatorsInRangeEx(getCameraPosition(), multiFloor, m_posInfo.awareRange.left - 1, m_posInfo.awareRange.right - 2, m_posInfo.awareRange.top - 1, m_posInfo.awareRange.bottom - 2);
 }
 
-std::vector<CreaturePtr> MapView::getSightSpectators(const Position& centerPos, bool multiFloor)
+std::vector<CreaturePtr> MapView::getSpectators(bool multiFloor)
 {
-    return g_map.getSpectatorsInRangeEx(centerPos, multiFloor, m_posInfo.awareRange.left - 1, m_posInfo.awareRange.right - 2, m_posInfo.awareRange.top - 1, m_posInfo.awareRange.bottom - 2);
-}
-
-std::vector<CreaturePtr> MapView::getSpectators(const Position& centerPos, bool multiFloor)
-{
-    return g_map.getSpectatorsInRangeEx(centerPos, multiFloor, m_posInfo.awareRange.left, m_posInfo.awareRange.right, m_posInfo.awareRange.top, m_posInfo.awareRange.bottom);
+    return g_map.getSpectatorsInRangeEx(getCameraPosition(), multiFloor, m_posInfo.awareRange.left, m_posInfo.awareRange.right, m_posInfo.awareRange.top, m_posInfo.awareRange.bottom);
 }
 
 void MapView::setCrosshairTexture(const std::string& texturePath)

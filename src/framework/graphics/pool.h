@@ -145,11 +145,6 @@ protected:
     };
 
 private:
-    enum
-    {
-        REFRESH_TIME = 1000 / 30 // 30 FPS (33ms)
-    };
-
     static constexpr uint8_t ARR_MAX_Z = (MAX_Z / 2) + 1;
     static Pool* create(const PoolType type);
 
@@ -248,6 +243,7 @@ class DrawBuffer
 public:
     DrawBuffer(Pool::DrawOrder order, bool agroup = true) : m_order(order), m_agroup(agroup) {}
     void agroup(bool v) { m_agroup = v; }
+    void setOrder(Pool::DrawOrder order) { m_order = order; }
 
 private:
     static DrawBufferPtr createTemporaryBuffer(Pool::DrawOrder order)
