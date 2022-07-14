@@ -24,7 +24,7 @@
 #include "particle.h"
 #include "particleaffector.h"
 #include <framework/core/clock.h>
-#include "drawpool.h"
+#include <framework/core/graphicalapplication.h>
 
 ParticleSystem::ParticleSystem() :m_lastUpdateTime(g_clock.seconds()) {}
 
@@ -119,5 +119,5 @@ void ParticleSystem::update()
         }
     }
 
-    g_drawPool.get<Pool>(PoolType::FOREGROUND)->repaint();
+    g_app.repaint();
 }

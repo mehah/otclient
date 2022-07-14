@@ -257,8 +257,10 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
     {
         if (m_ground) {
             --stackPos;
-            if (m_ground->isTopGround())
-                m_ground->setDrawOrder(Pool::DrawOrder::FIRST);
+            if (m_ground->isTopGround()) {
+                m_ground->destroyBuffer();
+                thing->destroyBuffer();
+            }
         } else if (thing->isGround())
             m_ground = thing->static_self_cast<Item>();
     }

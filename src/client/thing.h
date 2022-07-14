@@ -150,7 +150,7 @@ public:
     void canDraw(bool canDraw) { m_canDraw = canDraw; }
     bool canDraw()  const { return m_canDraw; }
 
-    void setDrawOrder(Pool::DrawOrder order) { if (m_drawBuffer) m_drawBuffer->setOrder(order); }
+    void destroyBuffer() { m_drawBuffer = nullptr; }
 
     MarketData getMarketData() { return getThingType()->getMarketData(); }
 

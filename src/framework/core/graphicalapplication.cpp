@@ -122,6 +122,8 @@ void GraphicalApplication::run()
 
     g_lua.callGlobalField("g_app", "onRun");
 
+    const auto& foreground = g_drawPool.get<Pool>(PoolType::FOREGROUND);
+
     while (!m_stopping) {
         // poll all events before rendering
         poll();
@@ -141,7 +143,7 @@ void GraphicalApplication::run()
         // the screen consists of two panes
         {
             // foreground pane - steady pane with few animated stuff (UI)
-            if (g_drawPool.get<Pool>(PoolType::FOREGROUND)->canRepaint()) {
+            if (foreground->canRepaint()) {
                 g_drawPool.use(PoolType::FOREGROUND);
                 g_ui.render(Fw::ForegroundPane);
             }
@@ -203,3 +205,5 @@ void GraphicalApplication::inputEvent(const InputEvent& event)
     g_ui.inputEvent(event);
     m_onInputEvent = false;
 }
+
+void GraphicalApplication::repaint() { g_drawPool.get<Pool>(PoolType::FOREGROUND)->repaint(); }
