@@ -105,9 +105,9 @@ protected:
     void fireKeysPress();
 
     stdext::map<int, Fw::Key> m_keyMap;
-    stdext::map<Fw::Key, bool> m_keysState;
-    stdext::map<Fw::Key, ticks_t> m_firstKeysPress;
-    stdext::map<Fw::Key, ticks_t> m_lastKeysPress;
+    std::array<bool, Fw::KeyLast> m_keysState;
+    std::array<ticks_t, Fw::KeyLast> m_firstKeysPress;
+    std::array<ticks_t, Fw::KeyLast> m_lastKeysPress;
     Timer m_keyPressTimer;
 
     Size m_size;

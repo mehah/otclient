@@ -162,7 +162,8 @@ namespace Fw
         KeyNumpad6 = 147,
         KeyNumpad7 = 148,
         KeyNumpad8 = 149,
-        KeyNumpad9 = 150
+        KeyNumpad9 = 150,
+        KeyLast
     };
 
     enum LogLevel
