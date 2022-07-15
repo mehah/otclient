@@ -145,7 +145,7 @@ protected:
     };
 
 private:
-    static constexpr uint8_t ARR_MAX_Z = (MAX_Z / 2) + 1;
+    static constexpr uint8_t ARR_MAX_Z = MAX_Z + 1;
     static Pool* create(const PoolType type);
 
     DrawObject& getLastDrawObject()
