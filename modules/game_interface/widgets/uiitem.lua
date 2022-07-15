@@ -29,9 +29,11 @@ function UIItem:onDrop(widget, mousePos)
 
     local itemPos = item:getPosition()
     local itemTile = item:getTile()
+	if not itemPos then modules.game_actionbar.onDragReassign(widget, item) return false end
     if itemPos.x ~= 65535 and not itemTile then return false end
 
     local toPos = self.position
+	if not toPos then modules.game_actionbar.onChooseItemByDrag(self, mousePos, item) return false end
     if itemPos.x == toPos.x and itemPos.y == toPos.y and itemPos.z == toPos.z then return false end
 
     if item:getCount() > 1 then

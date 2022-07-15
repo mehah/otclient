@@ -511,7 +511,6 @@ void Client::registerLuaFunctions()
     g_lua.registerClass<ThingType>();
     g_lua.bindClassStaticFunction<ThingType>("create", [] { return ThingTypePtr(new ThingType); });
     g_lua.bindClassMemberFunction<ThingType>("getId", &ThingType::getId);
-    g_lua.bindClassMemberFunction<ThingType>("getClothSlot", &ThingType::getClothSlot);
     g_lua.bindClassMemberFunction<ThingType>("getCategory", &ThingType::getCategory);
     g_lua.bindClassMemberFunction<ThingType>("getSize", &ThingType::getSize);
     g_lua.bindClassMemberFunction<ThingType>("getWidth", &ThingType::getWidth);
@@ -531,7 +530,6 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ThingType>("getLight", &ThingType::getLight);
     g_lua.bindClassMemberFunction<ThingType>("getMinimapColor", &ThingType::getMinimapColor);
     g_lua.bindClassMemberFunction<ThingType>("getLensHelp", &ThingType::getLensHelp);
-    g_lua.bindClassMemberFunction<ThingType>("getClothSlot", &ThingType::getClothSlot);
     g_lua.bindClassMemberFunction<ThingType>("getElevation", &ThingType::getElevation);
     g_lua.bindClassMemberFunction<ThingType>("isGround", &ThingType::isGround);
     g_lua.bindClassMemberFunction<ThingType>("isGroundBorder", &ThingType::isGroundBorder);
