@@ -3,6 +3,8 @@ HOTKEY_USEONSELF = 1
 HOTKEY_USEONTARGET = 2
 HOTKEY_USEWITH = 3
 
+
+local maxSlots = 60
 actionBar = nil
 actionBarPanel = nil
 bottomPanel = nil
@@ -96,99 +98,54 @@ function offline()
     unbindHotkeys()
 end
 
+function copySlot(fromSlotId, toSlotId, visible)
+	local fromSlot = actionBarPanel:getChildById(fromSlotId)
+	local tmpslot = actionBarPanel:getChildById(toSlotId)
+	if not tmpslot then
+		tmpslot = g_ui.createWidget('ActionSlot', actionBarPanel)
+		tmpslot:setId(toSlotId)
+	end
+	tmpslot:setVisible(visible)
+	local tmptext = not fromSlot.text
+	local tmpid = not fromSlot.itemId
+	local tmpwords = not fromSlot.words
+	local imageSource = fromSlot:getImageSource()
+	local imageClip = fromSlot:getImageClip()
+	local imgsrcbool = not imageSource
+	local imgclipbool = not imageClip
+	imageSource = (imgsrcbool or (tmptext and tmpid and tmpwords)) and '/images/game/actionbar/slot-actionbar' or imageSource
+	imageClip = imgclipbool and '0 0 0 0' or imageClip
+	tmpslot:setImageSource(imageSource)
+	tmpslot:setImageClip(imageClip)
+	local tmpItem = fromSlot:getItem()
+	if tmpItem then
+		tmpslot:setItem(tmpItem)
+	else
+		tmpslot:setItem(nil)
+	end
+	tmpslot:setText(fromSlot:getText())
+	tmpslot.autoSend = fromSlot.autoSend
+	tmpslot.itemId = fromSlot.itemId
+	tmpslot.subType = fromSlot.subType
+	tmpslot.words = fromSlot.words
+	tmpslot.text = fromSlot.text
+	tmpslot.parameter = fromSlot.parameter
+	tmpslot.useType = fromSlot.useType
+	tmpslot:getChildById('text'):setText(fromSlot:getChildById('text'):getText())
+	tmpslot:setTooltip(fromSlot:getTooltip())
+end
+
 function onDropFunc(slotId)
 	if slotReassign then
-		local maxSlots = 60
 		local fromSlotId = slotToEdit
 		local toSlotId = slotId
 		local fromSlot = actionBarPanel:getChildById(fromSlotId)
 		local toSlot = actionBarPanel:getChildById(toSlotId)
-		local tmpslot = g_ui.createWidget('ActionSlot', actionBarPanel)
-		local tmpslotid = 'slot' .. maxSlots + 1
-		tmpslot:setId(tmpslotid)
-		tmpslot:setVisible(false)
-		local tmptext = not toSlot.text
-		local tmpid = not toSlot.itemId
-		local tmpwords = not toSlot.words
-		local imageSource = toSlot:getImageSource()
-		local imageClip = toSlot:getImageClip()
-		local imgsrcbool = not imageSource
-		local imgclipbool = not imageClip
-		imageSource = (imgsrcbool or (tmptext and tmpid and tmpwords)) and '/images/game/actionbar/slot-actionbar' or imageSource
-		imageClip = imgclipbool and '0 0 0 0' or imageClip
-		tmpslot:setImageSource(imageSource)
-		tmpslot:setImageClip(imageClip)
-		local tmpItem = toSlot:getItem()
-		if tmpItem then
-			tmpslot:setItem(tmpItem)
-		else
-			tmpslot:setItem(nil)
-		end
-		tmpslot:setText(toSlot:getText())
-		tmpslot.autoSend = toSlot.autoSend
-		tmpslot.itemId = toSlot.itemId
-		tmpslot.subType = toSlot.subType
-		tmpslot.words = toSlot.words
-		tmpslot.text = toSlot.text
-		tmpslot.parameter = toSlot.parameter
-		tmpslot.useType = toSlot.useType
-		tmpslot:getChildById('text'):setText(toSlot:getChildById('text'):getText())
-		tmpslot:setTooltip(toSlot:getTooltip())
 		if fromSlot and toSlot then
-			local tmptext1 = not fromSlot.text
-			local tmpid1 = not fromSlot.itemId
-			local tmpwords1 = not fromSlot.words
-			local imageSource1 = fromSlot:getImageSource()
-			local imageClip1 = fromSlot:getImageClip()
-			local imgsrcbool1 = not imageSource1
-			local imgclipbool = not imageClip1
-			imageSource1 = (imgsrcbool1 or (tmptext1 and tmpid1 and tmpwords1)) and '/images/game/actionbar/slot-actionbar' or imageSource1
-			imageClip1 = imgclipbool1 and '0 0 0 0' or imageClip1
-			toSlot:setImageSource(imageSource1)
-			toSlot:setImageClip(imageClip1)
-			local tmpItem1 = fromSlot:getItem()
-			if tmpItem1 then
-				toSlot:setItem(tmpItem1)
-			else
-				toSlot:setItem(nil)
-			end
-			toSlot.autoSend = fromSlot.autoSend
-			toSlot:setText(fromSlot:getText())
-			toSlot.itemId = fromSlot.itemId
-			toSlot.subType = fromSlot.subType
-			toSlot.words = fromSlot.words
-			toSlot.text = fromSlot.text
-			toSlot.parameter = fromSlot.parameter
-			toSlot.useType = fromSlot.useType
-			toSlot:getChildById('text'):setText(fromSlot:getChildById('text'):getText())
-			toSlot:setTooltip(fromSlot:getTooltip())
-			local tmptext2 = not tmpslot.text
-			local tmpid2 = not tmpslot.itemId
-			local tmpwords2 = not tmpslot.words
-			local imageSource2 = tmpslot:getImageSource()
-			local imageClip2 = tmpslot:getImageClip()
-			local imgsrcbool2 = not imageSource2
-			local imgclipbool2 = not imageClip2
-			imageSource2 = (imgsrcbool2 or (tmptext2 and tmpid2 and tmpwords2)) and '/images/game/actionbar/slot-actionbar' or imageSource2
-			imageClip2 = imgclipbool2 and '0 0 0 0' or imageClip2
-			fromSlot:setImageSource(imageSource2)
-			fromSlot:setImageClip(imageClip2)
-			local tmpItem2 = tmpslot:getItem()
-			if tmpItem2 then
-				fromSlot:setItem(tmpItem2)
-			else
-				fromSlot:setItem(nil)
-			end
-			fromSlot.autoSend = tmpslot.autoSend
-			fromSlot:setText(tmpslot:getText())
-			fromSlot.itemId = tmpslot.itemId
-			fromSlot.subType = tmpslot.subType
-			fromSlot.words = tmpslot.words
-			fromSlot.text = tmpslot.text
-			fromSlot.parameter = tmpslot.parameter
-			fromSlot.useType = tmpslot.useType
-			fromSlot:getChildById('text'):setText(tmpslot:getChildById('text'):getText())
-			fromSlot:setTooltip(tmpslot:getTooltip())
+			local tmpslotid = 'slot' .. maxSlots + 1
+			copySlot(fromSlotId, tmpslotid, false)
+			copySlot(toSlotId, fromSlotId, true)
+			copySlot(tmpslotid, toSlotId, true)
 			clearSlotById(tmpslotid)
 		end
 		slotReassign = nil
@@ -210,7 +167,6 @@ function onDropFunc(slotId)
 end
 
 function setupActionBar()
-    local maxSlots = 60
     local slotsToDisplay = math.floor((actionBarPanel:getWidth()) / 34)
     for i = 1, maxSlots do
         slot = g_ui.createWidget('ActionSlot', actionBarPanel)
