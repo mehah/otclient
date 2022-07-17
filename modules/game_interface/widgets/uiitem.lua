@@ -38,7 +38,7 @@ function UIItem:onDrop(widget, mousePos)
 			local mousePosWidget = g_ui.getRootWidget():recursiveGetChildByPos(mousePos, false)
 			if parentWidget and mousePosWidget then
 				local mousePosWidgetParent = mousePosWidget:getParent()
-				if mousePosWidgetParent:getId() == "actionBarPanel" and mousePosWidgetParent then
+				if mousePosWidgetParent and mousePosWidgetParent:getId() == "actionBarPanel" then
 					if not itemPos and parentWidget:getId() == "actionBarPanel" then
 						modules.game_actionbar.onDragReassign(widget, item)
 					elseif not toPos and parentWidget:getId() == "contentsPanel" then
