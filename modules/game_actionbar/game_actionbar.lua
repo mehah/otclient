@@ -162,7 +162,6 @@ function onDropFunc(slotId)
 		itemDragRetry = nil
 		missedSlotToEdit = nil
 	end
-	saveActionBar()
     setupHotkeys()
 end
 
