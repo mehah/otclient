@@ -26,14 +26,42 @@ function UIItem:onDrop(widget, mousePos)
 
     local item = widget.currentDragThing
     if not item:isItem() then return false end
-
+	
     local itemPos = item:getPosition()
     local itemTile = item:getTile()
-	if not itemPos then modules.game_actionbar.onDragReassign(widget, item) return false end
+	if not itemPos then
+		local pressedWidget = g_ui.getPressedWidget()
+		local rootWidget = g_ui.getRootWidget()
+		if pressedWidget and rootWidget then
+			local parentWidget = pressedWidget:getParent()
+			local mousePosWidget = g_ui.getRootWidget():recursiveGetChildByPos(mousePos, false)
+			if parentWidget and parentWidget:getId() == "actionBarPanel" and mousePosWidget then
+				local mousePosWidgetParent = mousePosWidget:getParent()
+				if mousePosWidgetParent and mousePosWidgetParent:getId() == "actionBarPanel" then
+					modules.game_actionbar.onDragReassign(widget, item)
+				end
+			end
+		end
+		return false 
+	end
     if itemPos.x ~= 65535 and not itemTile then return false end
 
     local toPos = self.position
-	if not toPos then modules.game_actionbar.onChooseItemByDrag(self, mousePos, item) return false end
+	if not toPos then
+		local pressedWidget = g_ui.getPressedWidget()
+		local rootWidget = g_ui.getRootWidget()
+		if pressedWidget and rootWidget then
+			local parentWidget = pressedWidget:getParent()
+			local mousePosWidget = g_ui.getRootWidget():recursiveGetChildByPos(mousePos, false)
+			if parentWidget and parentWidget:getId() == "contentsPanel" and mousePosWidget then
+				local mousePosWidgetParent = mousePosWidget:getParent()
+				if mousePosWidgetParent and mousePosWidgetParent:getId() == "actionBarPanel" then
+					modules.game_actionbar.onChooseItemByDrag(self, mousePos, item)
+				end
+			end
+		end
+		return false 
+	end
     if itemPos.x == toPos.x and itemPos.y == toPos.y and itemPos.z == toPos.z then return false end
 
     if item:getCount() > 1 then
