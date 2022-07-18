@@ -26,7 +26,7 @@ function UIItem:onDrop(widget, mousePos)
 
     local item = widget.currentDragThing
     if not item:isItem() then return false end
-	
+
     local itemPos = item:getPosition()
     local itemTile = item:getTile()
     local toPos = self.position
