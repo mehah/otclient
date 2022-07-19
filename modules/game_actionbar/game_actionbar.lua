@@ -152,7 +152,7 @@ function onDropFunc(slotId)
 		slotToEdit = nil
 	end
 	slotToEdit = slotId
-	if itemDragRetry then -- first drag doesn't register slotToEdit
+	if itemDragRetry and missedSlotToEdit then -- first drag doesn't register slotToEdit
 		local widget1 = missedSlotToEdit[1]
 		local mousePos1 = missedSlotToEdit[2]
 		local item1 = missedSlotToEdit[3]
