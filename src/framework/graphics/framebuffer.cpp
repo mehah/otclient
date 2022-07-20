@@ -80,11 +80,11 @@ void FrameBuffer::bind()
 {
     internalBind();
 
+    g_painter->resetState();
     g_painter->setResolution(getSize(), m_textureMatrix);
     g_painter->setAlphaWriting(m_useAlphaWriting);
 
     if (m_colorClear != Color::alpha) {
-        g_painter->resetState();
         g_painter->setTexture(nullptr);
         g_painter->setColor(m_colorClear);
         g_painter->drawCoords(m_screenCoordsBuffer, DrawMode::TRIANGLE_STRIP);
