@@ -1769,3 +1769,5 @@ bool UIWidget::propagateOnMouseMove(const Point& mousePos, const Point& mouseMov
 
     return true;
 }
+
+void UIWidget::repaint() { g_app.repaint(); }

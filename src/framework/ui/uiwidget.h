@@ -159,6 +159,7 @@ public:
     UIWidgetPtr backwardsGetWidgetById(const std::string_view id);
 
 private:
+    void repaint();
     bool m_updateEventScheduled{ false },
         m_loadingStyle{ false };
 
@@ -345,8 +346,8 @@ public:
     void setPaddingRight(int padding) { m_padding.right = padding; updateLayout(); }
     void setPaddingBottom(int padding) { m_padding.bottom = padding; updateLayout(); }
     void setPaddingLeft(int padding) { m_padding.left = padding; updateLayout(); }
-    void setOpacity(float opacity) { m_opacity = std::clamp<float>(opacity, 0.0f, 1.0f); }
-    void setRotation(float degrees) { m_rotation = degrees; }
+    void setOpacity(float opacity) { m_opacity = std::clamp<float>(opacity, 0.0f, 1.0f); repaint(); }
+    void setRotation(float degrees) { m_rotation = degrees; repaint(); }
 
     int getX() { return m_rect.x(); }
     int getY() { return m_rect.y(); }
