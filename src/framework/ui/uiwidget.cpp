@@ -152,6 +152,8 @@ void UIWidget::addChild(const UIWidgetPtr& child)
     const UIWidgetPtr oldLastChild = getLastChild();
 
     m_children.push_back(child);
+    // cache index
+    child->m_childIndex = m_children.size();
     child->setParent(static_self_cast<UIWidget>());
 
     // create default layout
@@ -193,16 +195,29 @@ void UIWidget::insertChild(size_t index, const UIWidgetPtr& child)
         return;
     }
 
-    index = index <= 0 ? (m_children.size() + index) : index - 1;
+    const size_t childrenSize = m_children.size();
 
-    if (!(index >= 0 && index <= m_children.size())) {
+    index = index <= 0 ? (childrenSize + index) : index - 1;
+
+    if (!(index >= 0 && index <= childrenSize)) {
         //g_logger.traceWarning("attempt to insert a child UIWidget into an invalid index, using nearest index...");
-        index = std::clamp<int>(index, 0, static_cast<int>(m_children.size()));
+        index = std::clamp<int>(index, 0, static_cast<int>(childrenSize));
     }
+
+    // there was no change of index
+    if (child->m_childIndex == index + 1)
+        return;
 
     // retrieve child by index
     const auto it = m_children.begin() + index;
     m_children.insert(it, child);
+
+    { // cache index
+        child->m_childIndex = index + 1;
+        for (size_t i = index; ++i < childrenSize;)
+            m_children[i]->m_childIndex += 1;
+    }
+
     child->setParent(static_self_cast<UIWidget>());
 
     // create default layout if needed
@@ -235,6 +250,9 @@ void UIWidget::removeChild(const UIWidgetPtr& child)
 
         const auto it = std::find(m_children.begin(), m_children.end(), child);
         m_children.erase(it);
+
+        // cache index
+        child->m_childIndex = -1;
 
         // reset child parent
         assert(child->getParent() == static_self_cast<UIWidget>());
@@ -400,6 +418,12 @@ void UIWidget::lowerChild(const UIWidgetPtr& child)
 
     m_children.erase(it);
     m_children.push_front(child);
+
+    { // cache index
+        for (int i = (child->m_childIndex = 1), s = m_children.size(); ++i < s;)
+            m_children[i]->m_childIndex += 1;
+    }
+
     updateChildrenIndexStates();
 }
 
@@ -417,8 +441,17 @@ void UIWidget::raiseChild(const UIWidgetPtr& child)
         g_logger.traceError("cannot find child");
         return;
     }
+
     m_children.erase(it);
     m_children.push_back(child);
+
+    { // cache index
+        for (int i = child->m_childIndex - 1, s = m_children.size(); ++i < s;)
+            m_children[i]->m_childIndex += 1;
+
+        child->m_childIndex = m_children.size();
+    }
+
     updateChildrenIndexStates();
 }
 
@@ -430,7 +463,13 @@ void UIWidget::moveChildToIndex(const UIWidgetPtr& child, int index)
     if (!child)
         return;
 
-    if (static_cast<size_t>(index) - 1 >= m_children.size()) {
+    // there was no change of index
+    if (child->m_childIndex == index)
+        return;
+
+    const size_t childrenSize = m_children.size();
+
+    if (static_cast<size_t>(index) - 1 >= childrenSize) {
         g_logger.traceError(stdext::format("moving %s to index %d on %s", child->getId(), index, m_id));
         return;
     }
@@ -443,6 +482,13 @@ void UIWidget::moveChildToIndex(const UIWidgetPtr& child, int index)
     }
     m_children.erase(it);
     m_children.insert(m_children.begin() + (index - 1), child);
+
+    { // cache index
+        child->m_childIndex = index;
+        for (size_t i = index; ++i < childrenSize;)
+            m_children[i]->m_childIndex += 1;
+    }
+
     updateChildrenIndexStates();
     updateLayout();
 }
@@ -814,6 +860,8 @@ void UIWidget::destroyChildren()
         m_layout->removeWidget(child);
         child->destroy();
 
+        child->m_childIndex = -1;
+
         // remove access to child via widget.childId
         if (child->m_customId) {
             std::string widgetId = child->getId();
@@ -1072,18 +1120,6 @@ bool UIWidget::hasChild(const UIWidgetPtr& child)
         return true;
 
     return false;
-}
-
-int UIWidget::getChildIndex(const UIWidgetPtr& child)
-{
-    int index = 1;
-    for (auto& it : m_children) {
-        if (it == child)
-            return index;
-        ++index;
-    }
-
-    return -1;
 }
 
 Rect UIWidget::getPaddingRect()
