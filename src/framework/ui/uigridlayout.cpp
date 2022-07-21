@@ -71,7 +71,7 @@ bool UIGridLayout::internalUpdate()
     if (!parentWidget)
         return false;
 
-    const UIWidgetList widgets = parentWidget->getChildren();
+    const UIWidgetList& widgets = parentWidget->m_children;
 
     const Rect clippingRect = parentWidget->getPaddingRect();
     const Point topLeft = clippingRect.topLeft();

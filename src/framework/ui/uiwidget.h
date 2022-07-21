@@ -82,6 +82,10 @@ protected:
     Fw::FocusReason m_lastFocusReason{ Fw::ActiveFocusReason };
     Fw::AutoFocusPolicy m_autoFocusPolicy{ Fw::AutoFocusLast };
 
+    friend class UIGridLayout;
+    friend class UIHorizontalLayout;
+    friend class UIVerticalLayout;
+
 public:
     void addChild(const UIWidgetPtr& child);
     void insertChild(size_t index, const UIWidgetPtr& child);
