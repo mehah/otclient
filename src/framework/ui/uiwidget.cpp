@@ -1227,7 +1227,7 @@ UIWidgetPtr UIWidget::getChildByIndex(int index)
 {
     index = index <= 0 ? (m_children.size() + index) : index - 1;
     if (index >= 0 && static_cast<size_t>(index) < m_children.size())
-        return m_children.at(index);
+        return m_children[index];
 
     return nullptr;
 }
