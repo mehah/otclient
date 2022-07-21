@@ -15,7 +15,7 @@
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": {
           "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-           "type": "FILEPATH"
+          "type": "FILEPATH"
         },
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
         "OPTIONS_ENABLE_SCCACHE": "ON"
@@ -44,7 +44,7 @@
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": {
           "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-           "type": "FILEPATH"
+          "type": "FILEPATH"
         },
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
         "OPTIONS_ENABLE_CCACHE": "ON"
@@ -53,6 +53,21 @@
         "type": "equals",
         "lhs": "${hostSystemName}",
         "rhs": "Linux"
+      }
+    },
+    {
+      "name": "windows-release-static-library",
+      "inherits": "windows-release",
+      "displayName": "Windows - Release + Static library",
+      "description": "Release Mode static library",
+      "cacheVariables": {
+        "BUILD_STATIC_LIBRARY": "ON",
+        "BUILD_SHARED_LIBS": "NO",
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static"
+      },
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
       }
     },
     {
@@ -65,16 +80,6 @@
       },
       "architecture": {
         "value": "x64",
-        "strategy": "external"
-      }
-    },
-    {
-      "name": "windows-release-static-lib",
-      "inherits": "windows-release",
-      "displayName": "Windows - Release + Static-lib",
-      "description": "Release Mode with Static-lib",
-      "architecture": {
-        "value": "x86",
         "strategy": "external"
       }
     },
@@ -119,12 +124,12 @@
       "configurePreset": "windows-release"
     },
     {
-      "name": "windows-release-asan",
-      "configurePreset": "windows-release-asan"
+      "name": "windows-release-static-library",
+      "configurePreset": "windows-release-static-library"
     },
     {
-      "name": "windows-release-static-lib",
-      "configurePreset": "windows-release-static-lib"
+      "name": "windows-release-asan",
+      "configurePreset": "windows-release-asan"
     },
     {
       "name": "windows-debug",
