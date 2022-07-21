@@ -363,15 +363,14 @@ if(MSVC)
 	endif()
 
 	if(BUILD_STATIC_LIBRARY)
-    log_option_enabled("STATIC_LIBRARY")
-    set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib")
-	#find_package(VorbisFile REQUIRED)
-	find_package(Vorbis REQUIRED)
-    set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-  else()
-    log_option_disabled("STATIC_LIBRARY")
-    target_compile_options(${PROJECT_NAME} PUBLIC /MP /FS /Zf /EHsc )
-  endif()
+		log_option_enabled("STATIC_LIBRARY")
+		set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib")
+		find_package(Vorbis REQUIRED)
+		set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+	else()
+		log_option_disabled("STATIC_LIBRARY")
+		target_compile_options(${PROJECT_NAME} PUBLIC /MP /FS /Zf /EHsc )
+	endif()
 
 	target_include_directories(${PROJECT_NAME}
 		PRIVATE
