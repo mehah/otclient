@@ -29,11 +29,8 @@
 
 #include "drawpool.h"
 
-namespace
-{
-    std::vector<Point> s_glyphsPositions(1);
-    std::vector<int> s_lineWidths(1);
-}
+static std::vector<Point> s_glyphsPositions(1);
+static std::vector<int> s_lineWidths(1);
 
 void BitmapFont::load(const OTMLNodePtr& fontNode)
 {

@@ -565,7 +565,7 @@ int UITextEdit::getTextPos(const Point& pos)
     return candidatePos;
 }
 
-std::string UITextEdit::getDisplayedText()
+void UITextEdit::updateDisplayedText()
 {
     std::string text;
     if (m_textHidden)
@@ -576,7 +576,7 @@ std::string UITextEdit::getDisplayedText()
     if (m_textWrap && m_rect.isValid())
         text = m_font->wrapText(text, getPaddingRect().width() - m_textOffset.x);
 
-    return text;
+    m_displayedText = text;
 }
 
 std::string UITextEdit::getSelection()
@@ -598,6 +598,8 @@ void UITextEdit::updateText()
     }
 
     blinkCursor();
+
+    updateDisplayedText();
     update(true);
 }
 
