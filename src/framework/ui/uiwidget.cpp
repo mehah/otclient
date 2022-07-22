@@ -1185,20 +1185,13 @@ UIWidgetPtr UIWidget::getRootParent()
 
 UIWidgetPtr UIWidget::getChildAfter(const UIWidgetPtr& relativeChild)
 {
-    auto it = std::find(m_children.begin(), m_children.end(), relativeChild);
-    if (it != m_children.end() && ++it != m_children.end())
-        return *it;
-
-    return nullptr;
+    return relativeChild->m_childIndex == m_children.size() ?
+        nullptr : m_children[relativeChild->m_childIndex];
 }
 
 UIWidgetPtr UIWidget::getChildBefore(const UIWidgetPtr& relativeChild)
 {
-    auto it = std::find(m_children.rbegin(), m_children.rend(), relativeChild);
-    if (it != m_children.rend() && ++it != m_children.rend())
-        return *it;
-
-    return nullptr;
+    return relativeChild->m_childIndex <= 1 ? nullptr : m_children[relativeChild->m_childIndex - 2];
 }
 
 UIWidgetPtr UIWidget::getChildById(const std::string_view childId)
@@ -1234,15 +1227,16 @@ UIWidgetPtr UIWidget::getChildByIndex(int index)
 
 UIWidgetPtr UIWidget::recursiveGetChildById(const std::string_view id)
 {
-    UIWidgetPtr widget = getChildById(id);
-    if (!widget) {
-        for (const UIWidgetPtr& child : m_children) {
-            widget = child->recursiveGetChildById(id);
-            if (widget)
-                break;
-        }
+    const auto& widget = getChildById(id);
+    if (widget)
+        return widget;
+
+    for (const auto& child : m_children) {
+        if (const auto& widget = child->recursiveGetChildById(id))
+            return widget;
     }
-    return widget;
+
+    return nullptr;
 }
 
 UIWidgetPtr UIWidget::recursiveGetChildByPos(const Point& childPos, bool wantsPhantom)
@@ -1252,9 +1246,9 @@ UIWidgetPtr UIWidget::recursiveGetChildByPos(const Point& childPos, bool wantsPh
 
     for (const auto& child : m_children | std::views::reverse) {
         if (child->isExplicitlyVisible() && child->containsPoint(childPos)) {
-            UIWidgetPtr subChild = child->recursiveGetChildByPos(childPos, wantsPhantom);
-            if (subChild)
+            if (const UIWidgetPtr& subChild = child->recursiveGetChildByPos(childPos, wantsPhantom))
                 return subChild;
+
             if (wantsPhantom || !child->isPhantom())
                 return child;
         }
@@ -1266,28 +1260,30 @@ UIWidgetList UIWidget::recursiveGetChildren()
 {
     UIWidgetList children;
     for (const UIWidgetPtr& child : m_children) {
-        UIWidgetList subChildren = child->recursiveGetChildren();
-        if (!subChildren.empty())
+        if (const UIWidgetList& subChildren = child->recursiveGetChildren(); !subChildren.empty())
             children.insert(children.end(), subChildren.begin(), subChildren.end());
+
         children.push_back(child);
     }
+
     return children;
 }
 
 UIWidgetList UIWidget::recursiveGetChildrenByPos(const Point& childPos)
 {
-    UIWidgetList children;
     if (!containsPaddingPoint(childPos))
-        return children;
+        return {};
 
+    UIWidgetList children;
     for (const auto& child : m_children | std::views::reverse) {
         if (child->isExplicitlyVisible() && child->containsPoint(childPos)) {
-            UIWidgetList subChildren = child->recursiveGetChildrenByPos(childPos);
-            if (!subChildren.empty())
+            if (const UIWidgetList& subChildren = child->recursiveGetChildrenByPos(childPos); !subChildren.empty())
                 children.insert(children.end(), subChildren.begin(), subChildren.end());
+
             children.push_back(child);
         }
     }
+
     return children;
 }
 
