@@ -78,6 +78,9 @@ protected:
     UIWidgetList m_lockedChildren;
     UIWidgetPtr m_focusedChild;
     OTMLNodePtr m_style;
+
+    stdext::map<std::string, UIWidgetPtr> m_childrenById;
+
     Timer m_clickTimer;
     Fw::FocusReason m_lastFocusReason{ Fw::ActiveFocusReason };
     Fw::AutoFocusPolicy m_autoFocusPolicy{ Fw::AutoFocusLast };

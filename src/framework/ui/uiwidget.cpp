@@ -152,6 +152,8 @@ void UIWidget::addChild(const UIWidgetPtr& child)
     const UIWidgetPtr oldLastChild = getLastChild();
 
     m_children.push_back(child);
+    m_childrenById[child->getId()] = child;
+
     // cache index
     child->m_childIndex = m_children.size();
     child->setParent(static_self_cast<UIWidget>());
@@ -211,6 +213,7 @@ void UIWidget::insertChild(size_t index, const UIWidgetPtr& child)
     // retrieve child by index
     const auto it = m_children.begin() + index;
     m_children.insert(it, child);
+    m_childrenById[child->getId()] = child;
 
     { // cache index
         child->m_childIndex = index + 1;
@@ -250,6 +253,7 @@ void UIWidget::removeChild(const UIWidgetPtr& child)
 
         const auto it = std::find(m_children.begin(), m_children.end(), child);
         m_children.erase(it);
+        m_childrenById.erase(child->getId());
 
         // cache index
         child->m_childIndex = -1;
@@ -817,6 +821,7 @@ void UIWidget::internalDestroy()
     }
     m_parent = nullptr;
     m_lockedChildren.clear();
+    m_childrenById.clear();
 
     for (const UIWidgetPtr& child : m_children)
         child->internalDestroy();
@@ -852,6 +857,8 @@ void UIWidget::destroyChildren()
 
     m_focusedChild = nullptr;
     m_lockedChildren.clear();
+    m_childrenById.clear();
+
     while (!m_children.empty()) {
         UIWidgetPtr child = m_children.front();
         m_children.pop_front();
@@ -885,6 +892,8 @@ void UIWidget::setId(const std::string_view id)
     if (m_parent) {
         m_parent->clearLuaField(m_id);
         m_parent->setLuaField(id, static_self_cast<UIWidget>());
+        m_parent->m_childrenById.erase(m_id);
+        m_parent->m_childrenById[id] = static_self_cast<UIWidget>();
     }
 
     m_id = id;
@@ -1196,10 +1205,9 @@ UIWidgetPtr UIWidget::getChildBefore(const UIWidgetPtr& relativeChild)
 
 UIWidgetPtr UIWidget::getChildById(const std::string_view childId)
 {
-    for (const UIWidgetPtr& child : m_children) {
-        if (child->getId() == childId)
-            return child;
-    }
+    if (auto it = m_childrenById.find(childId); it != m_childrenById.end())
+        return it->second;
+
     return nullptr;
 }
 
