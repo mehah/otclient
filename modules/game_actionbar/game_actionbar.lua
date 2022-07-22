@@ -771,32 +771,34 @@ function loadActionBar()
     if hotkeys then
         for slot, setting in pairs(hotkeys) do
             slot = actionBarPanel:getChildById(slot)
-            slot.itemId = setting.itemId
-			slot:setItemId(setting.itemId)
-            slot.subType = setting.subType
-            slot.words = setting.words
-            slot.text = setting.text
-            slot.hotkey = setting.hotkey
-            slot.useType = setting.useType
-            slot.autoSend = setting.autoSend
-            slot.parameter = setting.parameter
-            if slot.hotkey then
-                local text = slot.hotkey
-                if type(text) == 'string' then
-                    text = text:gsub('Shift', 'S')
-                    text = text:gsub('Alt', 'A')
-                    text = text:gsub('Ctrl', 'C')
-                    text = text:gsub('+', '')
-                end
-                slot:getChildById('key'):setText(text)
-            end
-            if slot.words then
-                loadSpell(slot)
-            elseif slot.text then
-                loadText(slot)
-            elseif slot.itemId and slot.itemId > 0 then
-                loadObject(slot)
-            end
+			if slot then
+				slot.itemId = setting.itemId
+				slot:setItemId(setting.itemId)
+				slot.subType = setting.subType
+				slot.words = setting.words
+				slot.text = setting.text
+				slot.hotkey = setting.hotkey
+				slot.useType = setting.useType
+				slot.autoSend = setting.autoSend
+				slot.parameter = setting.parameter
+				if slot.hotkey then
+					local text = slot.hotkey
+					if type(text) == 'string' then
+						text = text:gsub('Shift', 'S')
+						text = text:gsub('Alt', 'A')
+						text = text:gsub('Ctrl', 'C')
+						text = text:gsub('+', '')
+					end
+					slot:getChildById('key'):setText(text)
+				end
+				if slot.words then
+					loadSpell(slot)
+				elseif slot.text then
+					loadText(slot)
+				elseif slot.itemId and slot.itemId > 0 then
+					loadObject(slot)
+				end
+			end
         end
     end
     setupHotkeys()
