@@ -149,7 +149,7 @@ void UIWidget::addChild(const UIWidgetPtr& child)
         return;
     }
 
-    const UIWidgetPtr oldLastChild = getLastChild();
+    const UIWidgetPtr& oldLastChild = getLastChild();
 
     m_children.push_back(child);
     m_childrenById[child->getId()] = child;
@@ -1358,6 +1358,14 @@ void UIWidget::updateState(Fw::WidgetState state)
     bool updateChildren = false;
 
     switch (state) {
+        case Fw::FirstState: { newStatus = isFirstChild(); break; }
+        case Fw::MiddleState: { newStatus = isMiddleChild(); break; }
+        case Fw::LastState: { newStatus = isLastChild(); break; }
+        case Fw::AlternateState: { newStatus = (getParent() && (getChildIndex() % 2) == 1); break; }
+        case Fw::FocusState: { newStatus = (getParent() && getParent()->getFocusedChild() == static_self_cast<UIWidget>()); break; }
+        case Fw::HoverState: { newStatus = (g_ui.getHoveredWidget() == static_self_cast<UIWidget>() && isEnabled()); break; }
+        case Fw::PressedState: { newStatus = (g_ui.getPressedWidget() == static_self_cast<UIWidget>()); break; }
+        case Fw::DraggingState: { newStatus = (g_ui.getDraggingWidget() == static_self_cast<UIWidget>()); break; }
         case Fw::ActiveState:
         {
             UIWidgetPtr widget = static_self_cast<UIWidget>();
@@ -1374,26 +1382,6 @@ void UIWidget::updateState(Fw::WidgetState state)
             updateChildren = newStatus != oldStatus;
             break;
         }
-        case Fw::FocusState:
-        {
-            newStatus = (getParent() && getParent()->getFocusedChild() == static_self_cast<UIWidget>());
-            break;
-        }
-        case Fw::HoverState:
-        {
-            newStatus = (g_ui.getHoveredWidget() == static_self_cast<UIWidget>() && isEnabled());
-            break;
-        }
-        case Fw::PressedState:
-        {
-            newStatus = (g_ui.getPressedWidget() == static_self_cast<UIWidget>());
-            break;
-        }
-        case Fw::DraggingState:
-        {
-            newStatus = (g_ui.getDraggingWidget() == static_self_cast<UIWidget>());
-            break;
-        }
         case Fw::DisabledState:
         {
             bool enabled = true;
@@ -1406,26 +1394,6 @@ void UIWidget::updateState(Fw::WidgetState state)
             } while ((widget = widget->getParent()));
             newStatus = !enabled;
             updateChildren = newStatus != oldStatus;
-            break;
-        }
-        case Fw::FirstState:
-        {
-            newStatus = (getParent() && getParent()->getFirstChild() == static_self_cast<UIWidget>());
-            break;
-        }
-        case Fw::MiddleState:
-        {
-            newStatus = (getParent() && getParent()->getFirstChild() != static_self_cast<UIWidget>() && getParent()->getLastChild() != static_self_cast<UIWidget>());
-            break;
-        }
-        case Fw::LastState:
-        {
-            newStatus = (getParent() && getParent()->getLastChild() == static_self_cast<UIWidget>());
-            break;
-        }
-        case Fw::AlternateState:
-        {
-            newStatus = (getParent() && (getParent()->getChildIndex(static_self_cast<UIWidget>()) % 2) == 1);
             break;
         }
         case Fw::HiddenState:
@@ -1442,13 +1410,14 @@ void UIWidget::updateState(Fw::WidgetState state)
             updateChildren = newStatus != oldStatus;
             break;
         }
+
         default:
             return;
     }
 
     if (updateChildren) {
         // do a backup of children list, because it may change while looping it
-        const UIWidgetList children = m_children;
+        const UIWidgetList& children = m_children;
         for (const UIWidgetPtr& child : children)
             child->updateState(state);
     }

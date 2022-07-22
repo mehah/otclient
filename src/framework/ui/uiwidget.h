@@ -147,7 +147,7 @@ public:
     bool isAnchored();
     bool isChildLocked(const UIWidgetPtr& child);
     bool hasChild(const UIWidgetPtr& child);
-    int getChildIndex(const UIWidgetPtr& child) { return m_childIndex; }
+    int getChildIndex() { return m_childIndex; }
     Rect getPaddingRect();
     Rect getMarginRect();
     Rect getChildrenRect();
@@ -253,6 +253,10 @@ public:
     bool isFixedSize() { return m_fixedSize; }
     bool isClipping() { return m_clipping; }
     bool isDestroyed() { return m_destroyed; }
+
+    bool isFirstChild() { return m_parent && m_childIndex == 1; }
+    bool isLastChild() { return m_parent && m_childIndex == m_parent->m_children.size(); }
+    bool isMiddleChild() { return !isFirstChild() && !isLastChild(); }
 
     bool hasChildren() { return !m_children.empty(); }
     bool containsMarginPoint(const Point& point) { return getMarginRect().contains(point); }
