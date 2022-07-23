@@ -176,7 +176,7 @@ function setupActionBar()
         slot.words = nil
         slot.text = nil
         slot.useType = nil
-		g_mouse.bindPress(slot, function(fromMousePos) slotToEdit = 'slot' .. i .. '' 
+		g_mouse.bindPress(slot, function() slotToEdit = 'slot' .. i .. '' 
 		end, MouseLeftButton)
         g_mouse.bindPress(slot, function() createMenu('slot' .. i) end, MouseRightButton)
         g_mouse.bindOnDrop(slot, function()
@@ -480,12 +480,19 @@ function onChooseItemMouseRelease(self, mousePosition, mouseButton)
         objectAssignWindow:getChildById('useWithCrosshairCheckbox'):setEnabled(false)
         if item:getClothSlot() > 0 then
             objectAssignWindow:getChildById('equipCheckbox'):setEnabled(true)
-            objectAssignWindow:getChildById('useCheckbox'):setEnabled(true)
+			if item:isMultiUse() then
+				objectAssignWindow:getChildById('useOnYourselfCheckbox'):setEnabled(true)
+				objectAssignWindow:getChildById('useOnTargetCheckbox'):setEnabled(true)
+				objectAssignWindow:getChildById('useWithCrosshairCheckbox'):setEnabled(true)
+			else
+				objectAssignWindow:getChildById('useCheckbox'):setEnabled(true)
+			end
             actionRadioGroup:selectWidget(objectAssignWindow:getChildById('equipCheckbox'))
         elseif item:isMultiUse() then
             objectAssignWindow:getChildById('useOnYourselfCheckbox'):setEnabled(true)
             objectAssignWindow:getChildById('useOnTargetCheckbox'):setEnabled(true)
             objectAssignWindow:getChildById('useWithCrosshairCheckbox'):setEnabled(true)
+            objectAssignWindow:getChildById('equipCheckbox'):setEnabled(true)
             actionRadioGroup:selectWidget(objectAssignWindow:getChildById('useOnYourselfCheckbox'))
         else
             objectAssignWindow:getChildById('useCheckbox'):setEnabled(true)
@@ -512,12 +519,19 @@ function onChooseItemByDrag(self, mousePosition, item)
         objectAssignWindow:getChildById('useWithCrosshairCheckbox'):setEnabled(false)
         if item:getClothSlot() > 0 then
             objectAssignWindow:getChildById('equipCheckbox'):setEnabled(true)
-            objectAssignWindow:getChildById('useCheckbox'):setEnabled(true)
+			if item:isMultiUse() then
+				objectAssignWindow:getChildById('useOnYourselfCheckbox'):setEnabled(true)
+				objectAssignWindow:getChildById('useOnTargetCheckbox'):setEnabled(true)
+				objectAssignWindow:getChildById('useWithCrosshairCheckbox'):setEnabled(true)
+			else
+				objectAssignWindow:getChildById('useCheckbox'):setEnabled(true)
+			end
             actionRadioGroup:selectWidget(objectAssignWindow:getChildById('equipCheckbox'))
         elseif item:isMultiUse() then
             objectAssignWindow:getChildById('useOnYourselfCheckbox'):setEnabled(true)
             objectAssignWindow:getChildById('useOnTargetCheckbox'):setEnabled(true)
             objectAssignWindow:getChildById('useWithCrosshairCheckbox'):setEnabled(true)
+            objectAssignWindow:getChildById('equipCheckbox'):setEnabled(true)
             actionRadioGroup:selectWidget(objectAssignWindow:getChildById('useOnYourselfCheckbox'))
         else
             objectAssignWindow:getChildById('useCheckbox'):setEnabled(true)
