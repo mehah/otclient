@@ -411,13 +411,13 @@ private:
     void initImage();
     void parseImageStyle(const OTMLNodePtr& styleNode);
 
-    void updateImageCache() { m_imageMustRecache = true; }
+    void updateImageCache() { if (!m_imageCachedScreenCoords.isNull()) m_imageCachedScreenCoords = {}; }
     void configureBorderImage() { m_imageBordered = true; updateImageCache(); }
 
     std::vector<std::pair<Rect, Rect>> m_imageCoordsCache;
+
     Rect m_imageCachedScreenCoords;
-    bool m_imageMustRecache{ true },
-        m_imageBordered{ false };
+    bool m_imageBordered{ false };
 
 protected:
     void drawImage(const Rect& screenCoords);

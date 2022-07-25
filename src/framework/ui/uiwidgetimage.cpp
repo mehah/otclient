@@ -78,10 +78,9 @@ void UIWidget::drawImage(const Rect& screenCoords)
         return;
 
     // cache vertex buffers
-    if (m_imageCachedScreenCoords != screenCoords || m_imageMustRecache) {
-        m_imageCoordsCache.clear();
+    if (m_imageCachedScreenCoords != screenCoords) {
         m_imageCachedScreenCoords = screenCoords;
-        m_imageMustRecache = false;
+        m_imageCoordsCache.clear();
 
         Rect drawRect = screenCoords;
         drawRect.translate(m_imageRect.topLeft());
@@ -173,7 +172,8 @@ void UIWidget::drawImage(const Rect& screenCoords)
 
 void UIWidget::setImageSource(const std::string_view source)
 {
-    m_imageMustRecache = true;
+    updateImageCache();
+
     if (source.empty()) {
         m_imageTexture = nullptr;
         m_imageSource = {};
