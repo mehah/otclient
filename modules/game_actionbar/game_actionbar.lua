@@ -3,6 +3,8 @@ HOTKEY_USEONSELF = 1
 HOTKEY_USEONTARGET = 2
 HOTKEY_USEWITH = 3
 
+
+local maxSlots = 60
 actionBar = nil
 actionBarPanel = nil
 bottomPanel = nil
@@ -14,6 +16,9 @@ objectAssignWindow = nil
 mouseGrabberWidget = nil
 actionRadioGroup = nil
 editHotkeyWindow = nil
+missedSlotToEdit = nil
+itemDragRetry = nil
+slotReassign = nil
 lastHotkeyTime = 0
 cooldown = {}
 groupCooldown = {}
@@ -93,8 +98,74 @@ function offline()
     unbindHotkeys()
 end
 
+function copySlot(fromSlotId, toSlotId, visible)
+	local fromSlot = actionBarPanel:getChildById(fromSlotId)
+	local tmpslot = actionBarPanel:getChildById(toSlotId)
+	if not tmpslot then
+		tmpslot = g_ui.createWidget('ActionSlot', actionBarPanel)
+		tmpslot:setId(toSlotId)
+	end
+	tmpslot:setVisible(visible)
+	local tmptext = not fromSlot.text
+	local tmpid = not fromSlot.itemId
+	local tmpwords = not fromSlot.words
+	local imageSource = fromSlot:getImageSource()
+	local imageClip = fromSlot:getImageClip()
+	local imgsrcbool = not imageSource
+	local imgclipbool = not imageClip
+	imageSource = (imgsrcbool or (tmptext and tmpid and tmpwords)) and '/images/game/actionbar/slot-actionbar' or imageSource
+	imageClip = imgclipbool and '0 0 0 0' or imageClip
+	tmpslot:setImageSource(imageSource)
+	tmpslot:setImageClip(imageClip)
+	local tmpItem = fromSlot:getItem()
+	if tmpItem then
+		tmpslot:setItem(tmpItem)
+	else
+		tmpslot:setItem(nil)
+	end
+	tmpslot:setText(fromSlot:getText())
+	tmpslot.autoSend = fromSlot.autoSend
+	tmpslot.itemId = fromSlot.itemId
+	tmpslot.subType = fromSlot.subType
+	tmpslot.words = fromSlot.words
+	tmpslot.text = fromSlot.text
+	tmpslot.parameter = fromSlot.parameter
+	tmpslot.useType = fromSlot.useType
+	tmpslot:getChildById('text'):setText(fromSlot:getChildById('text'):getText())
+	tmpslot:setTooltip(fromSlot:getTooltip())
+end
+
+function onDropFunc(slotId)
+	if slotReassign then
+		local fromSlotId = slotToEdit
+		local toSlotId = slotId
+		local fromSlot = actionBarPanel:getChildById(fromSlotId)
+		local toSlot = actionBarPanel:getChildById(toSlotId)
+		if fromSlot and toSlot then
+			local tmpslotid = 'slot' .. maxSlots + 1
+			copySlot(fromSlotId, tmpslotid, false)
+			copySlot(toSlotId, fromSlotId, true)
+			copySlot(tmpslotid, toSlotId, true)
+			clearSlotById(tmpslotid)
+		end
+		slotReassign = nil
+		slotToEdit = nil
+	end
+	slotToEdit = slotId
+	if itemDragRetry and missedSlotToEdit then -- first drag doesn't register slotToEdit
+		local widget1 = missedSlotToEdit[1]
+		local mousePos1 = missedSlotToEdit[2]
+		local item1 = missedSlotToEdit[3]
+		if widget1 and mousePos1 and item1 then
+			onChooseItemByDrag(widget1, mousePos1, item1)
+		end
+		itemDragRetry = nil
+		missedSlotToEdit = nil
+	end
+    setupHotkeys()
+end
+
 function setupActionBar()
-    local maxSlots = 60
     local slotsToDisplay = math.floor((actionBarPanel:getWidth()) / 34)
     for i = 1, maxSlots do
         slot = g_ui.createWidget('ActionSlot', actionBarPanel)
@@ -105,7 +176,15 @@ function setupActionBar()
         slot.words = nil
         slot.text = nil
         slot.useType = nil
+		g_mouse.bindPress(slot, function() slotToEdit = 'slot' .. i .. '' 
+		end, MouseLeftButton)
         g_mouse.bindPress(slot, function() createMenu('slot' .. i) end, MouseRightButton)
+        g_mouse.bindOnDrop(slot, function()
+			if slotToEdit == 'slot' .. i then
+				slotReassign = 'slot' .. i
+			end
+			onDropFunc('slot' .. i)
+			end)
         if i == 1 then slot:addAnchor(AnchorLeft, 'parent', AnchorLeft) end
     end
 end
@@ -223,6 +302,8 @@ function spellAssignAccept()
     slot:setImageSource(Spells.getIconFileByProfile(profile))
     slot:setImageClip(Spells.getImageClip(iconId, profile))
     slot.words = spell.words
+	slot.itemId = 469
+	slot:setItemId(469)
     if spell.parameter then
         slot.parameter = spellAssignWindow:getChildById('parameterTextEdit'):getText():gsub('"', '')
     else
@@ -234,6 +315,21 @@ end
 
 function clearSlot()
     local slot = actionBarPanel:getChildById(slotToEdit)
+    slot:setImageSource('/images/game/actionbar/slot-actionbar')
+    slot:setImageClip('0 0 0 0')
+    slot:clearItem()
+    slot:setText('')
+    slot.itemId = nil
+    slot.subType = nil
+    slot.words = nil
+    slot.text = nil
+    slot.useType = nil
+    slot:getChildById('text'):setText('')
+    slot:setTooltip('')
+end
+
+function clearSlotById(slotId)
+    local slot = actionBarPanel:getChildById(slotId)
     slot:setImageSource('/images/game/actionbar/slot-actionbar')
     slot:setImageClip('0 0 0 0')
     slot:clearItem()
@@ -287,6 +383,8 @@ function textAssignAccept()
         slot:setImageSource(Spells.getIconFileByProfile(profile))
         slot:setImageClip(Spells.getImageClip(iconId, profile))
         slot.words = spell.words
+		slot.itemId = 469
+		slot:setItemId(469)
         if parameter and spell.parameter then
             slot.parameter = parameter
         else
@@ -302,6 +400,8 @@ function textAssignAccept()
         end
         slot:setImageSource('/images/game/actionbar/item-background')
         slot.text = text
+		slot.itemId = 469
+		slot:setItemId(469)
         slot.autoSend = textAssignWindow:recursiveGetChildById('sendAutomaticallyCheckBox'):isChecked()
         slot:setTooltip(slot.text)
         setupHotkeys()
@@ -380,12 +480,19 @@ function onChooseItemMouseRelease(self, mousePosition, mouseButton)
         objectAssignWindow:getChildById('useWithCrosshairCheckbox'):setEnabled(false)
         if item:getClothSlot() > 0 then
             objectAssignWindow:getChildById('equipCheckbox'):setEnabled(true)
-            objectAssignWindow:getChildById('useCheckbox'):setEnabled(true)
+			if item:isMultiUse() then
+				objectAssignWindow:getChildById('useOnYourselfCheckbox'):setEnabled(true)
+				objectAssignWindow:getChildById('useOnTargetCheckbox'):setEnabled(true)
+				objectAssignWindow:getChildById('useWithCrosshairCheckbox'):setEnabled(true)
+			else
+				objectAssignWindow:getChildById('useCheckbox'):setEnabled(true)
+			end
             actionRadioGroup:selectWidget(objectAssignWindow:getChildById('equipCheckbox'))
         elseif item:isMultiUse() then
             objectAssignWindow:getChildById('useOnYourselfCheckbox'):setEnabled(true)
             objectAssignWindow:getChildById('useOnTargetCheckbox'):setEnabled(true)
             objectAssignWindow:getChildById('useWithCrosshairCheckbox'):setEnabled(true)
+            objectAssignWindow:getChildById('equipCheckbox'):setEnabled(true)
             actionRadioGroup:selectWidget(objectAssignWindow:getChildById('useOnYourselfCheckbox'))
         else
             objectAssignWindow:getChildById('useCheckbox'):setEnabled(true)
@@ -398,6 +505,49 @@ function onChooseItemMouseRelease(self, mousePosition, mouseButton)
     g_mouse.popCursor('target')
     self:ungrabMouse()
     return true
+end
+
+function onChooseItemByDrag(self, mousePosition, item)
+    if item and item:getPosition().x == 65535 and slotToEdit then
+		openObjectAssignWindow()
+        objectAssignWindow:getChildById('previewItem'):setItemId(item:getId())
+        objectAssignWindow:getChildById('previewItem'):setItemCount(1)
+        objectAssignWindow:getChildById('equipCheckbox'):setEnabled(false)
+        objectAssignWindow:getChildById('useCheckbox'):setEnabled(false)
+        objectAssignWindow:getChildById('useOnYourselfCheckbox'):setEnabled(false)
+        objectAssignWindow:getChildById('useOnTargetCheckbox'):setEnabled(false)
+        objectAssignWindow:getChildById('useWithCrosshairCheckbox'):setEnabled(false)
+        if item:getClothSlot() > 0 then
+            objectAssignWindow:getChildById('equipCheckbox'):setEnabled(true)
+			if item:isMultiUse() then
+				objectAssignWindow:getChildById('useOnYourselfCheckbox'):setEnabled(true)
+				objectAssignWindow:getChildById('useOnTargetCheckbox'):setEnabled(true)
+				objectAssignWindow:getChildById('useWithCrosshairCheckbox'):setEnabled(true)
+			else
+				objectAssignWindow:getChildById('useCheckbox'):setEnabled(true)
+			end
+            actionRadioGroup:selectWidget(objectAssignWindow:getChildById('equipCheckbox'))
+        elseif item:isMultiUse() then
+            objectAssignWindow:getChildById('useOnYourselfCheckbox'):setEnabled(true)
+            objectAssignWindow:getChildById('useOnTargetCheckbox'):setEnabled(true)
+            objectAssignWindow:getChildById('useWithCrosshairCheckbox'):setEnabled(true)
+            objectAssignWindow:getChildById('equipCheckbox'):setEnabled(true)
+            actionRadioGroup:selectWidget(objectAssignWindow:getChildById('useOnYourselfCheckbox'))
+        else
+            objectAssignWindow:getChildById('useCheckbox'):setEnabled(true)
+            actionRadioGroup:selectWidget(objectAssignWindow:getChildById('useCheckbox'))
+        end
+        if not objectAssignWindow:isVisible() then objectAssignWindow:show() end
+        objectAssignWindow:raise()
+        objectAssignWindow:focus()
+	elseif not slotToEdit then
+		itemDragRetry = true
+		missedSlotToEdit = {self, mousePosition, item}
+    end
+end
+
+function onDragReassign(self, item)
+	slotReassign = self
 end
 
 function openEditHotkeyWindow()
@@ -601,7 +751,6 @@ function loadSpell(slot)
     slot:setImageClip(Spells.getImageClip(iconId, profile))
     slot:getChildById('text'):setText('')
     slot:setBorderWidth(0)
-    slot:clearItem()
     setupHotkeys()
 end
 
@@ -623,7 +772,6 @@ function loadText(slot)
     end
     slot:setImageSource('/images/game/actionbar/item-background')
     slot:setImageClip('0 0 0 0')
-    slot:clearItem()
     setupHotkeys()
 end
 
@@ -637,31 +785,34 @@ function loadActionBar()
     if hotkeys then
         for slot, setting in pairs(hotkeys) do
             slot = actionBarPanel:getChildById(slot)
-            slot.itemId = setting.itemId
-            slot.subType = setting.subType
-            slot.words = setting.words
-            slot.text = setting.text
-            slot.hotkey = setting.hotkey
-            slot.useType = setting.useType
-            slot.autoSend = setting.autoSend
-            slot.parameter = setting.parameter
-            if slot.hotkey then
-                local text = slot.hotkey
-                if type(text) == 'string' then
-                    text = text:gsub('Shift', 'S')
-                    text = text:gsub('Alt', 'A')
-                    text = text:gsub('Ctrl', 'C')
-                    text = text:gsub('+', '')
-                end
-                slot:getChildById('key'):setText(text)
-            end
-            if slot.words then
-                loadSpell(slot)
-            elseif slot.itemId and slot.itemId > 0 then
-                loadObject(slot)
-            elseif slot.text then
-                loadText(slot)
-            end
+			if slot then
+				slot.itemId = setting.itemId
+				slot:setItemId(setting.itemId)
+				slot.subType = setting.subType
+				slot.words = setting.words
+				slot.text = setting.text
+				slot.hotkey = setting.hotkey
+				slot.useType = setting.useType
+				slot.autoSend = setting.autoSend
+				slot.parameter = setting.parameter
+				if slot.hotkey then
+					local text = slot.hotkey
+					if type(text) == 'string' then
+						text = text:gsub('Shift', 'S')
+						text = text:gsub('Alt', 'A')
+						text = text:gsub('Ctrl', 'C')
+						text = text:gsub('+', '')
+					end
+					slot:getChildById('key'):setText(text)
+				end
+				if slot.words then
+					loadSpell(slot)
+				elseif slot.text then
+					loadText(slot)
+				elseif slot.itemId and slot.itemId > 0 then
+					loadObject(slot)
+				end
+			end
         end
     end
     setupHotkeys()

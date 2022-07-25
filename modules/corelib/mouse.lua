@@ -45,3 +45,13 @@ function g_mouse.bindPress(widget, callback, button)
         end
     })
 end
+
+function g_mouse.bindOnDrop(widget, callback)
+    connect(widget, {
+        onDrop = function(widget, mousePos)
+            callback(mousePos, mouseButton)
+            return true
+        end
+    })
+end
+
