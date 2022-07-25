@@ -571,5 +571,77 @@ namespace Otc
         RESOURCE_PREY_WILDCARDS = 10,
         RESOURCE_DAILYREWARD_STREAK = 20,
         RESOURCE_DAILYREWARD_JOKERS = 21,
+        RESOURCE_TASK_HUNTING = 50,
+        RESOURE_COIN_NORMAL = 90,
+        RESOURE_COIN_TRANSFERRABLE = 91,
+        RESOURE_COIN_AUCTION = 92,
+        RESOURE_COIN_TOURNAMENT = 93,
+    };
+
+    enum MarketItemDescription : uint8_t
+    {
+        ITEM_DESC_ARMOR = 1,
+        ITEM_DESC_ATTACK = 2,
+        ITEM_DESC_CONTAINTER = 3,
+        ITEM_DESC_DEFENSE = 4,
+        ITEM_DESC_GENERAL = 5,
+        ITEM_DESC_DECAY_TIME = 6,
+        ITEM_DESC_COMBAT = 7,
+        ITEM_DESC_MINLEVEL = 8,
+        ITEM_DESC_MINMAGICLEVEL = 9,
+        ITEM_DESC_VOCATION = 10,
+        ITEM_DESC_RUNE = 11,
+        ITEM_DESC_ABILITY = 12,
+        ITEM_DESC_CHARGES = 13,
+        ITEM_DESC_WEAPONTYPE = 14,
+        ITEM_DESC_WEIGHT = 15,
+        ITEM_DESC_IMBUINGSLOTS = 16,
+        ITEM_DESC_MAGICSHIELD = 17,
+        ITEM_DESC_CLEAVE = 18,
+        ITEM_DESC_REFLECTION = 19,
+        ITEM_DESC_PERFECT = 20,
+        ITEM_DESC_UPGRADECLASS = 21,
+        ITEM_DESC_CURRENTTIER = 22,
+
+        ITEM_DESC_FIRST = ITEM_DESC_ARMOR,
+        ITEM_DESC_LAST = ITEM_DESC_CURRENTTIER,
+    };
+
+    enum MarketAction : uint8_t
+    {
+        MARKETACTION_BUY = 0,
+        MARKETACTION_SELL = 1
+    };
+
+    enum MarketRequest : uint16_t
+    {
+        MARKETREQUEST_OWN_HISTORY = 1,
+        MARKETREQUEST_OWN_OFFERS = 2,
+        MARKETREQUEST_ITEM_BROWSE = 3,
+        OLD_MARKETREQUEST_MY_OFFERS = 0xFFFE,
+        OLD_MARKETREQUEST_MY_HISTORY = 0xFFFF,
+    };
+
+
+    enum MarketOfferState : uint8_t
+    {
+        OFFER_STATE_ACTIVE = 0,
+        OFFER_STATE_CANCELLED = 1,
+        OFFER_STATE_EXPIRED = 2,
+        OFFER_STATE_ACCEPTED = 3,
+        OFFER_STATE_ACCEPTEDEX = 255
+    };
+
+    struct MarketOffer {
+    public:
+        uint32_t timestamp = 0;
+        uint16_t counter = 0;
+        uint8_t action = 0;
+        uint16_t itemId = 0;
+        uint16_t amount = 0;
+        uint64_t price = 0;
+        std::string playerName;
+        uint8_t state = 0;
+        uint16_t var = 0;
     };
 }

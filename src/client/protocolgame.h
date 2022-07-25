@@ -278,6 +278,11 @@ private:
     void parseImbuementWindow(const InputMessagePtr& msg);
     void parseCloseImbuementWindow(const InputMessagePtr& msg);
     void parseError(const InputMessagePtr& msg);
+    void parseMarketEnter(const InputMessagePtr& msg);
+    void parseMarketEnterOld(const InputMessagePtr& msg);
+    void parseMarketDetail(const InputMessagePtr& msg);
+    void parseMarketBrowse(const InputMessagePtr& msg);
+    Otc::MarketOffer readMarketOffer(const InputMessagePtr& msg, int action, int var);
 
 public:
     void setMapDescription(const InputMessagePtr& msg, int x, int y, int z, int width, int height);

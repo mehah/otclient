@@ -306,7 +306,6 @@ local function updateOffers(offers)
 
     buyCancelButton:setEnabled(false)
     sellCancelButton:setEnabled(false)
-
     for _, offer in pairs(offers) do mergeOffer(offer) end
     for type, offers in pairs(marketOffers) do for i = 1, #offers do addOffer(offers[i], type) end end
 end
@@ -317,12 +316,12 @@ local function updateDetails(itemId, descriptions, purchaseStats, saleStats)
     -- update item details
     detailsTable:clearData()
     for k, desc in pairs(descriptions) do
-        local columns = {{
-            text = getMarketDescriptionName(desc[1]) .. ':'
-        }, {
-            text = desc[2]
-        }}
-        detailsTable:addRow(columns)
+		local columns = {{
+			text = getMarketDescriptionName(k) .. ':'
+		}, {
+			text = desc
+		}}
+		detailsTable:addRow(columns)
     end
 
     -- update sale item statistics
@@ -453,7 +452,7 @@ local function updateSelectedItem(widget)
         clearOffers()
 
         Market.enableCreateOffer(true) -- update offer types
-        MarketProtocol.sendMarketBrowse(selectedItem.item.marketData.tradeAs) -- send browsed msg
+        MarketProtocol.sendMarketBrowse(selectedItem.item.marketData.tradeAs, 0) -- send browsed msg
     else
         Market.clearSelectedItem()
     end
@@ -706,6 +705,8 @@ local function initMarketItems()
                 }
 
                 -- add new market item
+				if not marketItems[marketData.category] then marketItems[marketData.category] = {} end
+				
                 table.insert(marketItems[marketData.category], marketItem)
                 itemSet[marketData.tradeAs] = true
             end
@@ -872,7 +873,11 @@ function init()
 
     protocol.initProtocol()
     connect(g_game, {
-        onGameEnd = Market.reset
+        onGameEnd = Market.reset,
+		onMarketEnter = Market.onMarketEnter,
+		onMarketBrowse = Market.onMarketBrowse,
+		onMarketDetail = Market.onMarketDetail,
+		onMarketReadOffer = Market.onMarketReadOffer
     })
     connect(g_game, {
         onGameEnd = Market.close
@@ -890,7 +895,11 @@ function terminate()
 
     protocol.terminateProtocol()
     disconnect(g_game, {
-        onGameEnd = Market.reset
+        onGameEnd = Market.reset,
+		onMarketEnter = Market.onMarketEnter,
+		onMarketBrowse = Market.onMarketBrowse,
+		onMarketDetail = Market.onMarketDetail,
+		onMarketReadOffer = Market.onMarketReadOffer
     })
     disconnect(g_game, {
         onGameEnd = Market.close
@@ -945,7 +954,7 @@ function Market.isItemSelected() return selectedItem and selectedItem.item end
 
 function Market.isOfferSelected(type) return selectedOffer[type] and not selectedOffer[type]:isNull() end
 
-function Market.getDepotCount(itemId) return information.depotItems[itemId] or 0 end
+function Market.getDepotCount(itemId) return information.depotItems[itemId] and information.depotItems[itemId].itemCount or 0 end
 
 function Market.enableCreateOffer(enable)
     offerTypeList:setEnabled(enable)
@@ -1171,9 +1180,20 @@ function Market.onMarketEnter(depotItems, offers, balance, vocation)
         -- vocation must be compatible with < 950
         information.vocation = vocation
     end
+	local depotItemsLua = {}
+	if type(depotItems) == "table" and #depotItems >= 1 then
+		for i = 1, #depotItems do
+			local itemId = depotItems[i][1]
+			local count = depotItems[i][2]
+			local itClass = depotItems[i][3]
+			if itemId and count and tonumber(itClass) >= 0 then
+				depotItemsLua[itemId] = {itemCount = count, itemClass = itClass}
+			end
+		end
+	end
 
     -- set list of depot items
-    information.depotItems = depotItems
+    information.depotItems = depotItemsLua
 
     -- update the items widget to match depot items
     if Market.isItemSelected() then
@@ -1199,4 +1219,13 @@ function Market.onMarketDetail(itemId, descriptions, purchaseStats, saleStats)
     updateDetails(itemId, descriptions, purchaseStats, saleStats)
 end
 
-function Market.onMarketBrowse(offers) updateOffers(offers) end
+MarketOffers = {}
+
+function Market.onMarketBrowse(intOffers, nameOffers)
+local tmpOffers = MarketOffers 
+MarketOffers = {}
+updateOffers(tmpOffers) end
+
+function Market.onMarketReadOffer(action, amount, counter, itemId, playerName, price, state, timestamp, var)
+	table.insert(MarketOffers, MarketOffer.new({timestamp, counter}, action, Item.create(itemId), amount, price, playerName, state, var))
+end

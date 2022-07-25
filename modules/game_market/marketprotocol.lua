@@ -70,7 +70,6 @@ local function parseMarketEnter(protocol, msg)
         depotItems[itemId] = itemCount
     end
 
-    signalcall(Market.onMarketEnter, depotItems, offers, balance, vocation)
     return true
 end
 
@@ -199,20 +198,14 @@ function MarketProtocol.updateProtocol(_protocol) protocol = _protocol end
 
 function MarketProtocol.registerProtocol()
     if g_game.getFeature(GamePlayerMarket) then
-        ProtocolGame.registerOpcode(GameServerOpcodes.GameServerMarketEnter, parseMarketEnter)
         ProtocolGame.registerOpcode(GameServerOpcodes.GameServerMarketLeave, parseMarketLeave)
-        ProtocolGame.registerOpcode(GameServerOpcodes.GameServerMarketDetail, parseMarketDetail)
-        ProtocolGame.registerOpcode(GameServerOpcodes.GameServerMarketBrowse, parseMarketBrowse)
     end
     MarketProtocol.updateProtocol(g_game.getProtocolGame())
 end
 
 function MarketProtocol.unregisterProtocol()
     if g_game.getFeature(GamePlayerMarket) then
-        ProtocolGame.unregisterOpcode(GameServerOpcodes.GameServerMarketEnter, parseMarketEnter)
         ProtocolGame.unregisterOpcode(GameServerOpcodes.GameServerMarketLeave, parseMarketLeave)
-        ProtocolGame.unregisterOpcode(GameServerOpcodes.GameServerMarketDetail, parseMarketDetail)
-        ProtocolGame.unregisterOpcode(GameServerOpcodes.GameServerMarketBrowse, parseMarketBrowse)
     end
     MarketProtocol.updateProtocol(nil)
 end
@@ -231,18 +224,21 @@ function MarketProtocol.sendMarketLeave()
     end
 end
 
-function MarketProtocol.sendMarketBrowse(browseId)
+function MarketProtocol.sendMarketBrowse(browseId, browseType)
     if g_game.getFeature(GamePlayerMarket) then
         local msg = OutputMessage.create()
         msg:addU8(ClientOpcodes.ClientMarketBrowse)
-        msg:addU16(browseId)
+		msg:addU8(browseType)
+		if browseType == 0 then
+			msg:addU16(browseId)
+		end
         send(msg)
     else
         g_logger.error('MarketProtocol.sendMarketBrowse does not support the current protocol.')
     end
 end
 
-function MarketProtocol.sendMarketBrowseMyOffers() MarketProtocol.sendMarketBrowse(MarketRequest.MyOffers) end
+function MarketProtocol.sendMarketBrowseMyOffers() MarketProtocol.sendMarketBrowse(MarketRequest.MyOffers, 2) end
 
 function MarketProtocol.sendMarketCreateOffer(type, spriteId, amount, price, anonymous)
     if g_game.getFeature(GamePlayerMarket) then
