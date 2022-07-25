@@ -421,8 +421,8 @@ private:
 
 protected:
     void drawImage(const Rect& screenCoords);
-    std::string_view imageSource;
-    std::string imageClip;
+    std::string m_imageSource;
+
     TexturePtr m_imageTexture;
     Rect m_imageClipRect;
     Rect m_imageRect;
@@ -455,7 +455,7 @@ public:
     void setImageBorderLeft(int border) { m_imageBorder.left = border; configureBorderImage(); }
     void setImageBorder(int border) { m_imageBorder.set(border); configureBorderImage(); }
 
-    std::string_view getImageSource() { return imageSource; }
+    std::string getImageSource() { return m_imageSource; }
     Rect getImageClip() { return m_imageClipRect; }
     int getImageOffsetX() { return m_imageRect.x(); }
     int getImageOffsetY() { return m_imageRect.y(); }
