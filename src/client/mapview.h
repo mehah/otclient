@@ -125,7 +125,7 @@ public:
     bool isDrawingHealthBars() { return m_drawHealthBars; }
 
     void setDrawLights(bool enable);
-    bool isDrawingLights() { return m_drawLights && m_lightView->isDark(); }
+    bool isDrawingLights() { return m_lightView && m_lightView->isDark(); }
 
     void setLimitVisibleDimension(bool v) { m_limitVisibleDimension = v; }
     bool isLimitedVisibleDimension() { return m_limitVisibleDimension; }
@@ -278,7 +278,7 @@ private:
         m_smooth{ true },
         m_follow{ true };
 
-    bool m_drawLights{ false },
+    bool
         m_autoViewMode{ false },
         m_drawViewportEdge{ false },
         m_drawHighlightTarget{ false },

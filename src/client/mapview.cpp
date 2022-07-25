@@ -47,7 +47,7 @@ MapView::MapView()
     auto* mapPool = g_drawPool.get<PoolFramed>(PoolType::MAP);
 
     mapPool->onBeforeDraw([&] {
-        const auto&  cameraPosition = getCameraPosition();
+        const auto& cameraPosition = getCameraPosition();
 
         float fadeOpacity = 1.f;
         if (!m_shaderSwitchDone && m_fadeOutTime > 0) {
@@ -133,7 +133,7 @@ void MapView::draw(const Rect& rect)
         return;
     }
 
-    if (m_drawLights) m_lightView->draw(rect, m_posInfo.srcRect);
+    if (m_lightView) m_lightView->draw(rect, m_posInfo.srcRect);
     drawText();
 }
 
@@ -141,12 +141,11 @@ void MapView::drawFloor()
 {
     g_drawPool.use(PoolType::MAP, m_posInfo.rect, m_posInfo.srcRect, Color::black);
     {
-        const auto&  cameraPosition = m_posInfo.camera;
-        const auto& lightView = m_drawLights ? m_lightView.get() : nullptr;
+        const auto& cameraPosition = m_posInfo.camera;
+        const auto& lightView = isDrawingLights() ? m_lightView.get() : nullptr;
 
         uint32_t flags = Otc::DrawThings;
-
-        if (lightView && lightView->isDark()) flags |= Otc::DrawLights;
+        if (lightView) flags |= Otc::DrawLights;
         if (m_drawNames) { flags |= Otc::DrawNames; }
         if (m_drawHealthBars) { flags |= Otc::DrawBars; }
         if (m_drawManaBar) { flags |= Otc::DrawManaBar; }
@@ -230,14 +229,14 @@ void MapView::drawText()
         return;
     }
 
-    const auto&  cameraPosition = getCameraPosition();
+    const auto& cameraPosition = getCameraPosition();
 
     g_drawPool.use(PoolType::TEXT);
     for (const StaticTextPtr& staticText : g_map.getStaticTexts()) {
         if (staticText->getMessageMode() == Otc::MessageNone)
             continue;
 
-        const auto&  pos = staticText->getPosition();
+        const auto& pos = staticText->getPosition();
         if (pos.z != cameraPosition.z)
             continue;
 
@@ -249,7 +248,7 @@ void MapView::drawText()
     }
 
     for (const AnimatedTextPtr& animatedText : g_map.getAnimatedTexts()) {
-        const auto&  pos = animatedText->getPosition();
+        const auto& pos = animatedText->getPosition();
 
         if (pos.z != cameraPosition.z)
             continue;
@@ -266,7 +265,7 @@ void MapView::drawText()
 void MapView::updateVisibleTiles()
 {
     // there is no tile to render on invalid positions
-    const auto&  cameraPosition = getCameraPosition();
+    const auto& cameraPosition = getCameraPosition();
     if (!cameraPosition.isValid())
         return;
 
@@ -415,7 +414,7 @@ void MapView::updateGeometry(const Size& visibleDimension)
     g_drawPool.get<PoolFramed>(PoolType::MAP)
         ->resize(bufferSize);
 
-    if (m_drawLights) m_lightView->resize(drawDimension, tileSize);
+    if (m_lightView) m_lightView->resize(drawDimension, tileSize);
 
     const uint8_t left = std::min<uint8_t>(g_map.getAwareRange().left, (m_drawDimension.width() / 2) - 1),
         top = std::min<uint8_t>(g_map.getAwareRange().top, (m_drawDimension.height() / 2) - 1),
@@ -446,13 +445,12 @@ void MapView::onGlobalLightChange(const Light&)
 
 void MapView::updateLight()
 {
-    if (!m_drawLights) return;
+    if (!m_lightView) return;
 
     const auto& cameraPosition = getCameraPosition();
 
     Light ambientLight = cameraPosition.z > SEA_FLOOR ? Light() : g_map.getLight();
     ambientLight.intensity = std::max<uint8_t >(m_minimumAmbientLight * 255, ambientLight.intensity);
-
     m_lightView->setGlobalLight(ambientLight);
 }
 
@@ -561,7 +559,7 @@ void MapView::setAntiAliasingMode(const AntialiasingMode mode)
 
     m_scaleFactor = mode == ANTIALIASING_SMOOTH_RETRO ? 2.f : 1.f;
 
-    if (m_drawLights) m_lightView->setSmooth(mode != ANTIALIASING_DISABLED);
+    if (m_lightView) m_lightView->setSmooth(mode != ANTIALIASING_DISABLED);
 
     updateGeometry(m_visibleDimension);
 }
@@ -584,7 +582,7 @@ void MapView::setCameraPosition(const Position& pos)
 
 Position MapView::getPosition(const Point& point, const Size& mapSize)
 {
-    const auto&  cameraPosition = getCameraPosition();
+    const auto& cameraPosition = getCameraPosition();
 
     // if we have no camera, its impossible to get the tile
     if (!cameraPosition.isValid())
@@ -601,7 +599,7 @@ Position MapView::getPosition(const Point& point, const Size& mapSize)
     if (tilePos2D.x + cameraPosition.x < 0 && tilePos2D.y + cameraPosition.y < 0)
         return {};
 
-    const auto&  position = Position(tilePos2D.x, tilePos2D.y, 0) + cameraPosition;
+    const auto& position = Position(tilePos2D.x, tilePos2D.y, 0) + cameraPosition;
 
     if (!position.isValid())
         return {};
@@ -661,7 +659,7 @@ uint8_t MapView::calcFirstVisibleFloor(bool checkLimitsFloorsView)
     if (m_lockedFirstVisibleFloor != -1) {
         z = m_lockedFirstVisibleFloor;
     } else {
-        const auto&  cameraPosition = getCameraPosition();
+        const auto& cameraPosition = getCameraPosition();
 
         // this could happens if the player is not known yet
         if (cameraPosition.isValid()) {
@@ -675,7 +673,7 @@ uint8_t MapView::calcFirstVisibleFloor(bool checkLimitsFloorsView)
             // loop in 3x3 tiles around the camera
             for (int_fast32_t ix = -1; checkLimitsFloorsView && ix <= 1 && firstFloor < cameraPosition.z; ++ix) {
                 for (int_fast32_t iy = -1; iy <= 1 && firstFloor < cameraPosition.z; ++iy) {
-                    const auto&  pos = cameraPosition.translated(ix, iy);
+                    const auto& pos = cameraPosition.translated(ix, iy);
 
                     // process tiles that we can look through, e.g. windows, doors
                     if ((ix == 0 && iy == 0) || ((std::abs(ix) != std::abs(iy)) && g_map.isLookPossible(pos))) {
@@ -715,7 +713,7 @@ uint8_t MapView::calcLastVisibleFloor()
 {
     uint8_t z = SEA_FLOOR;
 
-    const auto&  cameraPosition = getCameraPosition();
+    const auto& cameraPosition = getCameraPosition();
     // this could happens if the player is not known yet
     if (cameraPosition.isValid()) {
         // view only underground floors when below sea level
@@ -788,13 +786,13 @@ void MapView::setDrawLights(bool enable)
     auto* pool = g_drawPool.get<PoolFramed>(PoolType::LIGHT);
     if (pool) pool->setEnable(enable);
 
-    if (enable == m_drawLights) return;
-
     if (enable) {
+        if (m_lightView)
+            return;
+
         m_lightView = LightViewPtr(new LightView);
         m_lightView->resize(m_drawDimension, m_tileSize);
-    }
-    m_drawLights = enable;
+    } else m_lightView = nullptr;
 
     updateLight();
 }
