@@ -41,7 +41,7 @@ void LocalPlayer::lockWalk(int millis)
 bool LocalPlayer::canWalk(bool ignoreLock)
 {
     // paralyzed
-    if (isParalyzed())
+    if (isParalyzed() || isDead())
         return false;
 
     // cannot walk while locked
