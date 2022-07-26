@@ -54,7 +54,7 @@ protected:
     Color m_colorClear{ Color::alpha };
 
     friend class FrameBufferManager;
-    friend class DrawPool;
+    friend class DrawPoolManager;
 
 private:
     void internalCreate();

@@ -24,9 +24,9 @@
 #include "map.h"
 #include "mapview.h"
 #include "spritemanager.h"
-#include <framework/graphics/drawpool.h>
+#include <framework/graphics/drawpoolmanager.h>
 
-LightView::LightView() : m_pool(g_drawPool.get<PoolFramed>(PoolType::LIGHT)) {}
+LightView::LightView() : m_pool(g_drawPool.get<DrawPoolFramed>(DrawPoolType::LIGHT)) {}
 
 void LightView::setSmooth(bool enabled) { m_pool->setSmooth(enabled); }
 

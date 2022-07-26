@@ -27,7 +27,7 @@
 #include "uiverticallayout.h"
 #include "uiwidget.h"
 
-#include <framework/graphics/drawpool.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/painter.h>
 #include <framework/graphics/texture.h>
 #include <framework/graphics/texturemanager.h>

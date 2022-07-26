@@ -519,10 +519,10 @@
     <ClCompile Include="..\src\client\animator.cpp">
       <Filter>Source Files\client</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\framework\graphics\drawpool.cpp">
+    <ClCompile Include="..\src\framework\graphics\drawpoolmanager.cpp">
       <Filter>Source Files\framework\graphics</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\framework\graphics\pool.cpp">
+    <ClCompile Include="..\src\framework\graphics\drawpool.cpp">
       <Filter>Source Files\framework\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\src\client\spriteappearances.cpp">
@@ -1019,10 +1019,10 @@
     <ClInclude Include="..\src\client\config.h">
       <Filter>Header Files\client</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\framework\graphics\drawpool.h">
+    <ClInclude Include="..\src\framework\graphics\drawpoolmanager.h">
       <Filter>Header Files\framework\graphics</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\framework\graphics\pool.h">
+    <ClInclude Include="..\src\framework\graphics\drawpool.h">
       <Filter>Header Files\framework\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\src\gitinfo.h">

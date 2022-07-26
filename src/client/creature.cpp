@@ -32,7 +32,7 @@
 
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>
-#include <framework/graphics/drawpool.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
 #include <framework/graphics/texturemanager.h>
 
@@ -248,7 +248,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, flo
     Rect healthRect = backgroundRect.expanded(-1);
     healthRect.setWidth((m_healthPercent / 100.0) * 25);
 
-    g_drawPool.select(PoolType::CREATURE_INFORMATION);
+    g_drawPool.select(DrawPoolType::CREATURE_INFORMATION);
     {
         if (drawFlags & Otc::DrawBars) {
             g_drawPool.addFilledRect(backgroundRect, Color::black);
@@ -296,7 +296,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, flo
         }
     }
     // Go back to use map pool
-    g_drawPool.select(PoolType::MAP);
+    g_drawPool.select(DrawPoolType::MAP);
 }
 
 void Creature::turn(Otc::Direction direction)

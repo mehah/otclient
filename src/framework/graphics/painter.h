@@ -149,8 +149,8 @@ protected:
     Rect m_clipRect;
 
     friend class FrameBuffer;
+    friend class DrawPoolManager;
     friend class DrawPool;
-    friend class Pool;
 
     PainterShaderProgram* m_drawProgram{ nullptr };
     PainterShaderProgramPtr m_drawTexturedProgram;

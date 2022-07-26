@@ -35,7 +35,7 @@
 #include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/resourcemanager.h>
-#include <framework/graphics/drawpool.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
 
 #include "framework/graphics/texturemanager.h"
@@ -44,7 +44,7 @@
 
 MapView::MapView()
 {
-    auto* mapPool = g_drawPool.get<PoolFramed>(PoolType::MAP);
+    auto* mapPool = g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP);
 
     mapPool->onBeforeDraw([&] {
         const auto& cameraPosition = getCameraPosition();
@@ -139,7 +139,7 @@ void MapView::draw(const Rect& rect)
 
 void MapView::drawFloor()
 {
-    g_drawPool.use(PoolType::MAP, m_posInfo.rect, m_posInfo.srcRect, Color::black);
+    g_drawPool.use(DrawPoolType::MAP, m_posInfo.rect, m_posInfo.srcRect, Color::black);
     {
         const auto& cameraPosition = m_posInfo.camera;
         const auto& lightView = isDrawingLights() ? m_lightView.get() : nullptr;
@@ -231,7 +231,7 @@ void MapView::drawText()
 
     const auto& cameraPosition = getCameraPosition();
 
-    g_drawPool.use(PoolType::TEXT);
+    g_drawPool.use(DrawPoolType::TEXT);
     for (const StaticTextPtr& staticText : g_map.getStaticTexts()) {
         if (staticText->getMessageMode() == Otc::MessageNone)
             continue;
@@ -413,7 +413,7 @@ void MapView::updateGeometry(const Size& visibleDimension)
 
     m_rectDimension = { 0, 0, bufferSize };
 
-    g_drawPool.get<PoolFramed>(PoolType::MAP)
+    g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP)
         ->resize(bufferSize);
 
     if (m_lightView) m_lightView->resize(drawDimension, tileSize);
@@ -556,7 +556,7 @@ void MapView::setFloorViewMode(FloorViewMode floorViewMode)
 
 void MapView::setAntiAliasingMode(const AntialiasingMode mode)
 {
-    g_drawPool.get<PoolFramed>(PoolType::MAP)
+    g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP)
         ->setSmooth(mode != ANTIALIASING_DISABLED);
 
     m_scaleFactor = mode == ANTIALIASING_SMOOTH_RETRO ? 2.f : 1.f;
@@ -785,7 +785,7 @@ void MapView::setShader(const PainterShaderProgramPtr& shader, float fadein, flo
 
 void MapView::setDrawLights(bool enable)
 {
-    auto* pool = g_drawPool.get<PoolFramed>(PoolType::LIGHT);
+    auto* pool = g_drawPool.get<DrawPoolFramed>(DrawPoolType::LIGHT);
     if (pool) pool->setEnable(enable);
 
     if (enable) {

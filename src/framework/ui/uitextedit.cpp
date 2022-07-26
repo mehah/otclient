@@ -29,7 +29,7 @@
 #include <framework/otml/otmlnode.h>
 #include <framework/platform/platformwindow.h>
 
-#include "framework/graphics/drawpool.h"
+#include "framework/graphics/drawpoolmanager.h"
 
 UITextEdit::UITextEdit()
 {

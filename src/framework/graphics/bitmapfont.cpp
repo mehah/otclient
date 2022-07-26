@@ -27,7 +27,7 @@
 
 #include <framework/otml/otml.h>
 
-#include "drawpool.h"
+#include "drawpoolmanager.h"
 
 static std::vector<Point> s_glyphsPositions(1);
 static std::vector<int> s_lineWidths(1);

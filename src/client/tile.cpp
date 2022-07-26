@@ -28,7 +28,7 @@
 #include "map.h"
 #include "protocolgame.h"
 #include <framework/core/eventdispatcher.h>
-#include <framework/graphics/drawpool.h>
+#include <framework/graphics/drawpoolmanager.h>
 
 #include <ranges>
 

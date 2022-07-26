@@ -34,7 +34,7 @@
 #include <ranges>
 #include <numbers>
 
-#include "framework/graphics/drawpool.h"
+#include "framework/graphics/drawpoolmanager.h"
 
 UIWidget::UIWidget()
 {

@@ -26,7 +26,7 @@
 #include "thingtype.h"
 #include "thingtypemanager.h"
 #include <framework/luaengine/luaobject.h>
-#include <framework/graphics/pool.h>
+#include <framework/graphics/drawpool.h>
 
 struct Highlight
 {

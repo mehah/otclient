@@ -26,7 +26,7 @@
 
 #include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>
-#include <framework/graphics/drawpool.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include <framework/platform/platformwindow.h>
 
 uint32_t FrameBuffer::boundFbo = 0;

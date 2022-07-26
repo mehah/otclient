@@ -22,7 +22,7 @@
 
 #include "particle.h"
 
-#include "drawpool.h"
+#include "drawpoolmanager.h"
 
 Particle::Particle(const Point& pos, const Size& startSize, const Size& finalSize, const PointF& velocity,
                    const PointF& acceleration, float duration, float ignorePhysicsAfter, const std::vector<Color>& colors,
