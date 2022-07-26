@@ -24,6 +24,7 @@
 #include "graphics.h"
 
 #include <framework/core/eventdispatcher.h>
+#include <framework/core/graphicalapplication.h>
 
 #include <utility>
 
@@ -79,4 +80,6 @@ void AnimatedTexture::updateAnimation()
     if (m_currentFrame >= m_frames.size())
         m_currentFrame = 0;
     m_id = m_frames[m_currentFrame]->getId();
+
+    g_app.repaint();
 }
