@@ -123,7 +123,7 @@ function attachShaders()
     map:setMapShader(g_shaders.getShader('Default'))
 
     local player = g_game.getLocalPlayer()
-    player:setOutfitShader(g_shaders.getShader('Default'))
+    player:setShader(g_shaders.getShader('Default'))
     player:setMountShader(g_shaders.getShader('Default'))
 
     connect(g_game.getLocalPlayer(), {
@@ -153,7 +153,7 @@ function init()
     outfitComboBox.onOptionChange = function(combobox, option)
         local player = g_game.getLocalPlayer()
         if player then
-            player:setOutfitShader(g_shaders.getShader(option))
+            player:setShader(g_shaders.getShader(option))
             local data = combobox:getCurrentOption().data
             player:setDrawOutfitColor(data.drawColor ~= false)
         end

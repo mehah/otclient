@@ -373,13 +373,16 @@ void Client::registerLuaFunctions()
 
     g_lua.registerClass<Thing>();
     g_lua.bindClassMemberFunction<Thing>("setId", &Thing::setId);
+    g_lua.bindClassMemberFunction<Thing>("setShader", &Creature::setShader);
     g_lua.bindClassMemberFunction<Thing>("setPosition", &Thing::setPosition);
     g_lua.bindClassMemberFunction<Thing>("getId", &Thing::getId);
-    g_lua.bindClassMemberFunction<Thing>("getPosition", &Thing::getPosition);
-    g_lua.bindClassMemberFunction<Thing>("getStackPriority", &Thing::getStackPriority);
-    g_lua.bindClassMemberFunction<Thing>("getStackPos", &Thing::getStackPos);
-    g_lua.bindClassMemberFunction<Thing>("getAnimationPhases", &Thing::getAnimationPhases);
     g_lua.bindClassMemberFunction<Thing>("getTile", &Thing::getTile);
+    g_lua.bindClassMemberFunction<Thing>("getPosition", &Thing::getPosition);
+    g_lua.bindClassMemberFunction<Thing>("getStackPos", &Thing::getStackPos);
+    g_lua.bindClassMemberFunction<Thing>("getMarketData", &Thing::getMarketData);
+    g_lua.bindClassMemberFunction<Thing>("getStackPriority", &Thing::getStackPriority);
+    g_lua.bindClassMemberFunction<Thing>("getAnimationPhases", &Thing::getAnimationPhases);
+    g_lua.bindClassMemberFunction<Thing>("getParentContainer", &Thing::getParentContainer);
     g_lua.bindClassMemberFunction<Thing>("isItem", &Thing::isItem);
     g_lua.bindClassMemberFunction<Thing>("isMonster", &Thing::isMonster);
     g_lua.bindClassMemberFunction<Thing>("isNpc", &Thing::isNpc);
@@ -406,13 +409,11 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Thing>("isTranslucent", &Thing::isTranslucent);
     g_lua.bindClassMemberFunction<Thing>("isFullGround", &Thing::isFullGround);
     g_lua.bindClassMemberFunction<Thing>("isMarketable", &Thing::isMarketable);
-    g_lua.bindClassMemberFunction<Thing>("getMarketData", &Thing::getMarketData);
     g_lua.bindClassMemberFunction<Thing>("isUsable", &Thing::isUsable);
     g_lua.bindClassMemberFunction<Thing>("isWrapable", &Thing::isWrapable);
     g_lua.bindClassMemberFunction<Thing>("isUnwrapable", &Thing::isUnwrapable);
     g_lua.bindClassMemberFunction<Thing>("isTopEffect", &Thing::isTopEffect);
     g_lua.bindClassMemberFunction<Thing>("isLyingCorpse", &Thing::isLyingCorpse);
-    g_lua.bindClassMemberFunction<Thing>("getParentContainer", &Thing::getParentContainer);
 
     g_lua.registerClass<House>();
     g_lua.bindClassStaticFunction<House>("create", [] { return HousePtr(new House); });
@@ -499,7 +500,6 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Creature>("isRemoved", &Creature::isRemoved);
     g_lua.bindClassMemberFunction<Creature>("canBeSeen", &Creature::canBeSeen);
     g_lua.bindClassMemberFunction<Creature>("jump", &Creature::jump);
-    g_lua.bindClassMemberFunction<Creature>("setOutfitShader", &Creature::setOutfitShader);
     g_lua.bindClassMemberFunction<Creature>("setMountShader", &Creature::setMountShader);
     g_lua.bindClassMemberFunction<Creature>("setDrawOutfitColor", &Creature::setDrawOutfitColor);
 

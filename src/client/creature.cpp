@@ -28,14 +28,12 @@
 #include "map.h"
 #include "thingtypemanager.h"
 #include "tile.h"
+#include "shadermanager.h"
 
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/graphics/drawpool.h>
 #include <framework/graphics/graphics.h>
-
-#include "shadermanager.h"
-#include <framework/graphics/paintershaderprogram.h>
 #include <framework/graphics/texturemanager.h>
 
 double Creature::speedA = 0;
@@ -50,16 +48,16 @@ Creature::Creature() :m_type(Proto::CreatureTypeUnknown)
 
     // Example of how to send a UniformValue to shader
     /*
-        m_outfitShaderAction = [=]()-> void {
-            const int id = m_outfit.getCategory() == ThingCategoryCreature ? m_outfit.getId() : m_outfit.getAuxId();
-            m_outfitShader->bind();
-            m_outfitShader->setUniformValue(ShaderManager::OUTFIT_ID_UNIFORM, id);
-        };
+    m_shaderAction = [=]()-> void {
+        const int id = m_outfit.getCategory() == ThingCategoryCreature ? m_outfit.getId() : m_outfit.getAuxId();
+        m_shader->bind();
+        m_shader->setUniformValue(ShaderManager::OUTFIT_ID_UNIFORM, id);
+    };
 
-        m_mountShaderAction = [=]()-> void {
-            m_mountShader->bind();
-            m_mountShader->setUniformValue(ShaderManager::MOUNT_ID_UNIFORM, m_outfit.getMount());
-        };
+    m_mountShaderAction = [=]()-> void {
+        m_mountShader->bind();
+        m_mountShader->setUniformValue(ShaderManager::MOUNT_ID_UNIFORM, m_outfit.getMount());
+    };
     */
 }
 
@@ -143,8 +141,8 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
                 continue;
 
             datType->draw(dest, scaleFactor, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, textureType, color);
-            if (canDrawShader && m_outfitShader) {
-                g_drawPool.setShaderProgram(m_outfitShader, true, m_outfitShaderAction);
+            if (canDrawShader && m_shader) {
+                g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
             }
 
             if (m_drawOutfitColor && isNotBlank && getLayers() > 1) {
@@ -180,8 +178,8 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
 
         type->draw(dest - (getDisplacement() * scaleFactor), scaleFactor, 0, 0, 0, 0, animationPhase, Otc::DrawThingsAndLights, textureType, color);
 
-        if (canDrawShader && m_outfitShader) {
-            g_drawPool.setShaderProgram(m_outfitShader, true, m_outfitShaderAction);
+        if (canDrawShader && m_shader) {
+            g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
         }
     }
 }

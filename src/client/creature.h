@@ -67,7 +67,6 @@ public:
     void setTypeTexture(const std::string& filename);
     void setIconTexture(const std::string& filename);
     void setPassable(bool passable) { m_passable = passable; }
-    void setOutfitShader(const PainterShaderProgramPtr& shader) { m_outfitShader = shader; }
     void setMountShader(const PainterShaderProgramPtr& shader) { m_mountShader = shader; }
 
     void addTimedSquare(uint8_t color);
@@ -242,11 +241,10 @@ private:
     ThingTypePtr m_mountType;
 
     bool m_drawOutfitColor{ true };
-    PainterShaderProgramPtr m_outfitShader,
-        m_mountShader;
 
-    std::function<void()> m_outfitShaderAction{ nullptr },
-        m_mountShaderAction{ nullptr };
+    // Mount Shader
+    PainterShaderProgramPtr m_mountShader;
+    std::function<void()> m_mountShaderAction{ nullptr };
 };
 
 // @bindclass

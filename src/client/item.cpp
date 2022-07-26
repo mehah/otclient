@@ -34,6 +34,8 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/filestream.h>
 
+#include "shadermanager.h"
+
 ItemPtr Item::create(int id)
 {
     ItemPtr item(new Item);
@@ -67,6 +69,9 @@ void Item::draw(const Point& dest, float scaleFactor, bool animate, uint32_t fla
         color = m_color;
 
     getThingType()->draw(dest, scaleFactor, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, textureType, color, lightView, m_drawBuffer);
+    if (textureType != TextureType::ALL_BLANK && m_shader) {
+        g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
+    }
 
     if (highLight.enabled && this == highLight.thing) {
         getThingType()->draw(dest, scaleFactor, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, TextureType::ALL_BLANK, highLight.rgbColor);
@@ -82,6 +87,19 @@ void Item::setId(uint32_t id)
     m_clientId = id;
     m_thingType = nullptr;
     generateBuffer();
+
+    // Shader example on only items that can be marketed.
+    /*
+    if (isMarketable()) {
+        m_shader = g_shaders.getShader("Outfit - Rainbow");
+
+        // Example of how to send a UniformValue to shader
+        m_shaderAction = [=]()-> void {
+            m_shader->bind();
+            m_shader->setUniformValue(ShaderManager::ITEM_ID_UNIFORM, static_cast<int>(id));
+        };
+    }
+    */
 }
 
 void Item::setOtbId(uint16_t id)

@@ -154,6 +154,8 @@ public:
 
     MarketData getMarketData() { return getThingType()->getMarketData(); }
 
+    void setShader(const PainterShaderProgramPtr& shader) { m_shader = shader; }
+
     virtual void onPositionChange(const Position& /*newPos*/, const Position& /*oldPos*/) {}
     virtual void onAppear() {}
     virtual void onDisappear() {}
@@ -171,6 +173,10 @@ protected:
     Position m_position;
     ThingTypePtr m_thingType;
     DrawBufferPtr m_drawBuffer;
+
+    // Shader
+    PainterShaderProgramPtr m_shader;
+    std::function<void()> m_shaderAction{ nullptr };
 
 private:
     bool m_canDraw{ true };
