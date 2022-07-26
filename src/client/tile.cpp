@@ -80,8 +80,8 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, float scaleFactor,
         tile->drawTop(tile->m_lastDrawDest, scaleFactor, flags, true);
     }
 
-    drawCreature(dest, mapRect, scaleFactor, flags, isCovered, lightView);
-    drawTop(dest, scaleFactor, flags, lightView);
+    drawCreature(dest, mapRect, scaleFactor, flags, isCovered, false, lightView);
+    drawTop(dest, scaleFactor, flags, false, lightView);
 }
 
 void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, float scaleFactor, int flags, bool isCovered, bool forceDraw, LightView* lightView)

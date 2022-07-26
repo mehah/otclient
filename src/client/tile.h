@@ -185,8 +185,8 @@ private:
             correctCorpse{ 0 };
     };
 
-    void drawTop(const Point& dest, float scaleFactor, int flags, bool forceDraw = false, LightView* lightView = nullptr);
-    void drawCreature(const Point& dest, const MapPosInfo& mapRect, float scaleFactor, int flags, bool isCovered, bool forceDraw = false, LightView* lightView = nullptr);
+    void drawTop(const Point& dest, float scaleFactor, int flags, bool forceDraw, LightView* lightView = nullptr);
+    void drawCreature(const Point& dest, const MapPosInfo& mapRect, float scaleFactor, int flags, bool isCovered, bool forceDraw, LightView* lightView = nullptr);
     void drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor, bool animate, int flags, LightView* lightView);
 
     void checkTranslucentLight();
