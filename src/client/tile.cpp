@@ -51,6 +51,7 @@ void Tile::drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor
 void Tile::draw(const Point& dest, const MapPosInfo& mapRect, float scaleFactor, int flags, bool isCovered, LightView* lightView)
 {
     m_drawElevation = 0;
+    m_lastDrawDest = dest;
 
     for (const auto& thing : m_things) {
         if (!thing->isGround() && !thing->isGroundBorder())
@@ -66,44 +67,28 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, float scaleFactor,
         }
     }
 
-    uint8_t redrawPreviousTopW = 0,
-        redrawPreviousTopH = 0;
-
     if (m_countFlag.hasCommonItem) {
         for (const auto& item : m_things | std::views::reverse) {
             if (!item->isCommon()) continue;
-
             drawThing(item, dest - m_drawElevation * scaleFactor, scaleFactor, true, flags, lightView);
-
-            if (item->isLyingCorpse() && !g_game.getFeature(Otc::GameMapDontCorrectCorpse)) {
-                redrawPreviousTopW = std::max<int>(item->getWidth(), redrawPreviousTopW);
-                redrawPreviousTopH = std::max<int>(item->getHeight(), redrawPreviousTopH);
-            }
         }
     }
 
     // after we render 2x2 lying corpses, we must redraw previous creatures/ontop above them
-    if (redrawPreviousTopH > 0 || redrawPreviousTopW > 0) {
-        for (int x = -redrawPreviousTopW; x <= 0; ++x) {
-            for (int y = -redrawPreviousTopH; y <= 0; ++y) {
-                if (x == 0 && y == 0)
-                    continue;
-                const TilePtr& tile = g_map.getTile(m_position.translated(x, y));
-                if (tile) {
-                    const auto& newDest = dest + (Point(x, y) * SPRITE_SIZE) * scaleFactor;
-                    tile->drawCreature(newDest, mapRect, scaleFactor, flags, isCovered, 0);
-                    tile->drawTop(newDest, scaleFactor, flags);
-                }
-            }
-        }
+    for (const auto& tile : m_tilesRedraw) {
+        tile->drawCreature(tile->m_lastDrawDest, mapRect, scaleFactor, flags, isCovered, true);
+        tile->drawTop(tile->m_lastDrawDest, scaleFactor, flags, true);
     }
 
     drawCreature(dest, mapRect, scaleFactor, flags, isCovered, lightView);
     drawTop(dest, scaleFactor, flags, lightView);
 }
 
-void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, float scaleFactor, int flags, bool isCovered, LightView* lightView)
+void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, float scaleFactor, int flags, bool isCovered, bool forceDraw, LightView* lightView)
 {
+    if (!forceDraw && !m_drawTopAndCreature)
+        return;
+
     if (hasCreature()) {
         for (const auto& thing : m_things) {
             if (!thing->isCreature() || thing->static_self_cast<Creature>()->isWalking()) continue;
@@ -124,8 +109,11 @@ void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, float scal
     }
 }
 
-void Tile::drawTop(const Point& dest, float scaleFactor, int flags, LightView* lightView)
+void Tile::drawTop(const Point& dest, float scaleFactor, int flags, bool forceDraw, LightView* lightView)
 {
+    if (!forceDraw && !m_drawTopAndCreature)
+        return;
+
     if (hasEffect()) {
         int offsetX = 0,
             offsetY = 0;
@@ -153,6 +141,7 @@ void Tile::clean()
     m_countFlag.opaque = 0;
     while (!m_things.empty())
         removeThing(m_things.front());
+    m_tilesRedraw.clear();
 }
 
 void Tile::addWalkingCreature(const CreaturePtr& creature)
@@ -583,6 +572,37 @@ bool Tile::isClickable()
     return false;
 }
 
+void Tile::onAddInMapView()
+{
+    m_drawTopAndCreature = true;
+    m_tilesRedraw.clear();
+
+    if (m_countFlag.correctCorpse) {
+        uint8_t redrawPreviousTopW = 0,
+            redrawPreviousTopH = 0;
+
+        for (const auto& item : m_things) {
+            if (!item->isLyingCorpse()) continue;
+
+            redrawPreviousTopW = std::max<int>(item->getWidth() - 1, redrawPreviousTopW);
+            redrawPreviousTopH = std::max<int>(item->getHeight() - 1, redrawPreviousTopH);
+        }
+
+        for (int x = -redrawPreviousTopW; x <= 0; ++x) {
+            for (int y = -redrawPreviousTopH; y <= 0; ++y) {
+                if (x == 0 && y == 0)
+                    continue;
+
+                const TilePtr& tile = g_map.getTile(m_position.translated(x, y));
+                if (tile && (tile->hasCreature() || tile->hasEffect() || tile->hasTopItem())) {
+                    tile->m_drawTopAndCreature = false;
+                    m_tilesRedraw.push_back(tile);
+                }
+            }
+        }
+    }
+}
+
 bool Tile::canShade(const MapViewPtr& mapView)
 {
     for (const auto dir : { Otc::North, Otc::NorthWest, Otc::West }) {
@@ -709,6 +729,9 @@ void Tile::analyzeThing(const ThingPtr& thing, bool add)
 
     if (thing->isTopGroundBorder())
         m_countFlag.hasTopGroundBorder += value;
+
+    if (thing->isLyingCorpse() && !g_game.getFeature(Otc::GameMapDontCorrectCorpse))
+        m_countFlag.correctCorpse += value;
 
     // Creatures and items
     if (thing->isOnBottom()) {

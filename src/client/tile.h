@@ -56,6 +56,7 @@ class Tile : public LuaObject
 public:
     Tile(const Position& position);
 
+    void onAddInMapView();
     void draw(const Point& dest, const MapPosInfo& mapRect, float scaleFactor, int flags, bool isCovered, LightView* lightView = nullptr);
 
     void clean();
@@ -112,6 +113,7 @@ public:
     bool hasGround() { return (m_ground && m_ground->isSingleGround()) || m_countFlag.hasGroundBorder; };
     bool hasTopGround(bool ignoreBorder = false) { return (m_ground && m_ground->isTopGround()) || (!ignoreBorder && m_countFlag.hasTopGroundBorder); }
     bool hasSurface() { return m_countFlag.hasTopItem || !m_effects.empty() || m_countFlag.hasBottomItem || m_countFlag.hasCommonItem || m_countFlag.hasCreature || !m_walkingCreatures.empty() || hasTopGround(); }
+    bool hasTopItem() { return m_countFlag.hasTopItem; }
 
     bool hasDisplacement() { return m_countFlag.hasDisplacement > 0; }
     bool hasLight() { return m_countFlag.hasLight > 0; }
@@ -179,17 +181,19 @@ private:
             hasTopItem{ 0 },
             hasBottomItem{ 0 },
             hasGroundBorder{ 0 },
-            hasTopGroundBorder{ 0 };
+            hasTopGroundBorder{ 0 },
+            correctCorpse{ 0 };
     };
 
-    void drawTop(const Point& dest, float scaleFactor, int flags, LightView* lightView = nullptr);
-    void drawCreature(const Point& dest, const MapPosInfo& mapRect, float scaleFactor, int flags, bool isCovered, LightView* lightView = nullptr);
+    void drawTop(const Point& dest, float scaleFactor, int flags, bool forceDraw = false, LightView* lightView = nullptr);
+    void drawCreature(const Point& dest, const MapPosInfo& mapRect, float scaleFactor, int flags, bool isCovered, bool forceDraw = false, LightView* lightView = nullptr);
     void drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor, bool animate, int flags, LightView* lightView);
 
     void checkTranslucentLight();
     bool checkForDetachableThing();
 
     Position m_position;
+    Point m_lastDrawDest;
 
     uint8_t m_drawElevation{ 0 },
         m_minimapColor{ 0 },
@@ -204,11 +208,14 @@ private:
     std::vector<CreaturePtr> m_walkingCreatures;
     std::vector<ThingPtr> m_things;
     std::vector<EffectPtr> m_effects;
+    std::vector<TilePtr> m_tilesRedraw;
+
     ItemPtr m_ground;
 
     CountFlag m_countFlag;
     Highlight m_highlight;
 
     bool m_highlightWithoutFilter{ false },
-        m_covered{ false };
+        m_covered{ false },
+        m_drawTopAndCreature{ true };
 };
