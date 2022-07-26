@@ -367,6 +367,8 @@ void UITextEdit::setSelection(int start, int end)
     m_selectionStart = std::clamp<int>(start, 0, static_cast<int>(m_text.length()));
     m_selectionEnd = std::clamp<int>(end, 0, static_cast<int>(m_text.length()));
     recacheGlyphs();
+
+    g_app.repaint();
 }
 
 void UITextEdit::setTextHidden(bool hidden)
