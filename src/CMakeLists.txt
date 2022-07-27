@@ -199,7 +199,6 @@ target_sources(${PROJECT_NAME}
 	PRIVATE
 	client/animatedtext.cpp
 	client/animator.cpp
-	client/spriteappearances.cpp
 	client/client.cpp
 	client/container.cpp
 	client/creature.cpp
@@ -225,6 +224,7 @@ target_sources(${PROJECT_NAME}
 	client/protocolgameparse.cpp
 	client/protocolgamesend.cpp
 	client/shadermanager.cpp
+	client/spriteappearances.cpp
 	client/spritemanager.cpp
 	client/statictext.cpp
 	client/thing.cpp
@@ -262,6 +262,7 @@ target_sources(${PROJECT_NAME}
 	framework/graphics/cachedtext.cpp
 	framework/graphics/coordsbuffer.cpp
 	framework/graphics/drawpool.cpp
+	framework/graphics/drawpoolmanager.cpp
 	framework/graphics/fontmanager.cpp
 	framework/graphics/framebuffer.cpp
 	framework/graphics/framebuffermanager.cpp
@@ -277,7 +278,6 @@ target_sources(${PROJECT_NAME}
 	framework/graphics/particlemanager.cpp
 	framework/graphics/particlesystem.cpp
 	framework/graphics/particletype.cpp
-	framework/graphics/drawpoolmanager.cpp
 	framework/graphics/shader.cpp
 	framework/graphics/shaderprogram.cpp
 	framework/graphics/texture.cpp
