@@ -277,7 +277,7 @@ target_sources(${PROJECT_NAME}
 	framework/graphics/particlemanager.cpp
 	framework/graphics/particlesystem.cpp
 	framework/graphics/particletype.cpp
-	framework/graphics/pool.cpp
+	framework/graphics/drawpoolmanager.cpp
 	framework/graphics/shader.cpp
 	framework/graphics/shaderprogram.cpp
 	framework/graphics/texture.cpp
