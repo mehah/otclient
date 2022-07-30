@@ -123,12 +123,11 @@ void GraphicalApplication::run()
     g_lua.callGlobalField("g_app", "onRun");
 
     const auto& foreground = g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND);
+    Timer foregroundRefresh;
 
     while (!m_stopping) {
         // poll all events before rendering
         poll();
-
-        g_clock.update();
 
         if (!g_window.isVisible()) {
             // sleeps until next poll to avoid massive cpu usage
@@ -142,6 +141,11 @@ void GraphicalApplication::run()
 
         // the screen consists of two panes
         {
+            if (foregroundRefresh.ticksElapsed() >= 100) { // 10 FPS (1000 / 10)
+                foreground->repaint();
+                foregroundRefresh.restart();
+            }
+
             // foreground pane - steady pane with few animated stuff (UI)
             if (foreground->canRepaint()) {
                 g_drawPool.use(DrawPoolType::FOREGROUND);
@@ -157,6 +161,9 @@ void GraphicalApplication::run()
 
         // update screen pixels
         g_window.swapBuffers();
+
+        // only update the current time once per frame to gain performance
+        g_clock.update();
 
         if (m_frameCounter.update()) {
             g_lua.callGlobalField("g_app", "onFps", m_frameCounter.getFps());
