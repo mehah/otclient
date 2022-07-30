@@ -561,17 +561,12 @@ void Creature::nextWalkUpdate()
 
     if (!m_walking) return;
 
-    const uint64_t walkDuration = std::max<uint64_t>(
-        m_stepCache.walkDuration,
-        (isLocalPlayer() ? std::max<int>((1000 / g_app.getFps() - 1), 3) : 16)
-    );
-
     // schedules next update
     auto self = static_self_cast<Creature>();
     m_walkUpdateEvent = g_dispatcher.scheduleEvent([self] {
         self->m_walkUpdateEvent = nullptr;
         self->nextWalkUpdate();
-    }, walkDuration);
+    }, m_stepCache.walkDuration);
 }
 
 void Creature::updateWalk(const bool isPreWalking)
