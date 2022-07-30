@@ -832,7 +832,9 @@ function onCreaturePositionChange(creature, newPos, oldPos) -- Update battleButt
         local fit = doCreatureFitFilters(creature)
 
         if battleButton == nil then
-            addCreature(creature, sortType)
+            if fit then
+                addCreature(creature, sortType)
+            end
         else
             if not fit and newPos then -- if there's no newPos the creature is dead, let onCreatureDisappear handles that.
                 removeCreature(creature)
