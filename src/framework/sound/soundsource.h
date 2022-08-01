@@ -64,13 +64,17 @@ protected:
     friend class SoundManager;
     friend class CombinedSoundSource;
 
-    uint32_t m_sourceId;
-    uint8_t m_channel;
+    float m_fadeStartTime{ 0 },
+        m_fadeTime{ 0 },
+        m_fadeGain{ 0 },
+        m_gain{ 1.f };
+
+    FadeState m_fadeState{ NoFading };
+
+    uint32_t m_sourceId{ 0 };
+    uint8_t m_channel{ 0 };
+
     std::string m_name;
+
     SoundBufferPtr m_buffer;
-    FadeState m_fadeState;
-    float m_fadeStartTime;
-    float m_fadeTime;
-    float m_fadeGain;
-    float m_gain;
 };

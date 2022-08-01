@@ -277,18 +277,18 @@ private:
     std::vector<StaticTextPtr> m_staticTexts;
     std::vector<MapViewPtr> m_mapViews;
 
-    stdext::map<uint32_t , TileBlock> m_tileBlocks[MAX_Z + 1];
-    stdext::map<uint32_t , CreaturePtr> m_knownCreatures;
+    stdext::map<uint32_t, TileBlock> m_tileBlocks[MAX_Z + 1];
+    stdext::map<uint32_t, CreaturePtr> m_knownCreatures;
     stdext::map<Position, std::string, Position::Hasher> m_waypoints;
 
-    stdext::map<uint32_t , Color> m_zoneColors;
+    stdext::map<uint32_t, Color> m_zoneColors;
 
     stdext::small_dynamic_storage<OTBM_ItemAttr, OTBM_ATTR_LAST> m_attribs;
 
-    uint8_t m_animationFlags;
-    uint32_t m_zoneFlags;
+    uint8_t m_animationFlags{ 0 };
+    uint32_t m_zoneFlags{ 0 };
 
-    float m_zoneOpacity;
+    float m_zoneOpacity{ 1.f };
 
     Light m_light;
     Position m_centralPosition;

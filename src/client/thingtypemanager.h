@@ -81,14 +81,14 @@ private:
     ThingTypePtr m_nullThingType;
     ItemTypePtr m_nullItemType;
 
-    bool m_datLoaded;
-    bool m_xmlLoaded;
-    bool m_otbLoaded;
+    bool m_datLoaded{ false };
+    bool m_xmlLoaded{ false };
+    bool m_otbLoaded{ false };
 
-    uint32_t m_otbMinorVersion;
-    uint32_t m_otbMajorVersion;
-    uint32_t m_datSignature;
-    uint16_t m_contentRevision;
+    uint32_t m_otbMinorVersion{ 0 };
+    uint32_t m_otbMajorVersion{ 0 };
+    uint32_t m_datSignature{ 0 };
+    uint16_t m_contentRevision{ 0 };
 };
 
 extern ThingTypeManager g_things;

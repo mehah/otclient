@@ -380,11 +380,12 @@ private:
     bool m_expertPvpMode;
     int m_serverBeat{ 50 };
     ticks_t m_ping{ -1 };
-    uint32_t m_pingSent;
-    uint32_t m_pingReceived;
+    uint32_t m_pingSent{ 0 },
+        m_pingReceived{ 0 },
+        m_seq{ 0 };
+
     stdext::timer m_pingTimer;
     Timer m_dashTimer;
-    uint32_t m_seq{ 0 };
     int m_pingDelay{ 1000 };
     Otc::FightModes m_fightMode{ Otc::FightBalanced };
     Otc::ChaseModes m_chaseMode{ Otc::DontChase };
@@ -393,7 +394,6 @@ private:
     Otc::Direction m_nextScheduledDir;
     bool m_scheduleLastWalk{ false };
     UnjustifiedPoints m_unjustifiedPoints;
-    int m_openPvpSituations;
     bool m_safeFight{ true };
     bool m_canReportBugs{ false };
     std::vector<uint8_t > m_gmActions;
@@ -404,9 +404,10 @@ private:
     ScheduledEventPtr m_walkEvent;
     ScheduledEventPtr m_checkConnectionEvent;
     bool m_connectionFailWarned;
-    int m_protocolVersion{ 0 };
-    int m_clientVersion{ 0 };
-    int m_lastSupportedVersion{ 1287 };
+    int m_protocolVersion{ 0 },
+        m_clientVersion{ 0 },
+        m_lastSupportedVersion{ 1287 },
+        m_openPvpSituations{ 0 };
     std::string m_clientSignature;
     Otc::OperatingSystem_t m_clientCustomOs{ Otc::CLIENTOS_NONE };
 };

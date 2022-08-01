@@ -258,7 +258,7 @@ private:
     Point m_displacement;
     AnimatorPtr m_animator;
     AnimatorPtr m_idleAnimator;
-    int m_animationPhases;
+    int m_animationPhases{ 0 };
     int m_exactSize{ 0 };
     int m_realSize{ 0 };
     int m_numPatternX{ 0 },

@@ -291,10 +291,12 @@ void CreatureManager::loadCreatureBuffer(const std::string& buffer)
         stdext::throw_exception(stdext::format("cannot load creature buffer: %s", doc.ErrorDesc()));
 
     TiXmlElement* root = doc.FirstChildElement();
+
     if (!root || (root->ValueStr() != "monster" && root->ValueStr() != "npc"))
         stdext::throw_exception("invalid root tag name");
 
     std::string cName = root->Attribute("name");
+
     stdext::tolower(cName);
     stdext::trim(cName);
     stdext::ucwords(cName);

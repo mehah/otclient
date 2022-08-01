@@ -22,8 +22,7 @@
 
 #include "combinedsoundsource.h"
 
-CombinedSoundSource::CombinedSoundSource() : SoundSource(0)
-{}
+CombinedSoundSource::CombinedSoundSource() : SoundSource(0) {}
 
 void CombinedSoundSource::addSource(const SoundSourcePtr& source)
 {

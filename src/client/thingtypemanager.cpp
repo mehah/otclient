@@ -484,10 +484,10 @@ ItemTypeList ThingTypeManager::findItemTypeByCategory(ItemCategory category)
 
 const ThingTypeList& ThingTypeManager::getThingTypes(ThingCategory category)
 {
-    ThingTypeList ret;
-    if (category >= ThingLastCategory)
-        stdext::throw_exception(stdext::format("invalid thing type category %d", category));
-    return m_thingTypes[category];
+    if (category < ThingLastCategory)
+        return m_thingTypes[category];
+
+    stdext::throw_exception(stdext::format("invalid thing type category %d", category));
 }
 
 /* vim: set ts=4 sw=4 et: */

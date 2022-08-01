@@ -68,12 +68,12 @@ protected:
     {
         Matrix3 transformMatrix;
         Color color;
-        float opacity;
-        CompositionMode compositionMode;
-        BlendEquation blendEquation;
+        float opacity{ 1.f };
+        CompositionMode compositionMode{ CompositionMode::NORMAL };
+        BlendEquation blendEquation{ BlendEquation::ADD };
         Rect clipRect;
         TexturePtr texture;
-        PainterShaderProgram* shaderProgram;
+        PainterShaderProgram* shaderProgram{ nullptr };
         std::function<void()> action{ nullptr };
 
         bool operator==(const PoolState& s2) const

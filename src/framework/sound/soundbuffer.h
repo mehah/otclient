@@ -38,5 +38,5 @@ public:
     uint32_t getBufferId() { return m_bufferId; }
 
 private:
-    uint32_t m_bufferId;
+    uint32_t m_bufferId{ 0 };
 };

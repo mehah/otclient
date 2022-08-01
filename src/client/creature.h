@@ -222,7 +222,7 @@ protected:
     Timer m_jumpTimer;
 
 private:
-    struct SizeCache { int exactSize, frameSizeNotResized; };
+    struct SizeCache { int exactSize{ 0 }, frameSizeNotResized{ 0 }; };
     struct StepCache
     {
         uint16_t speed{ 0 },

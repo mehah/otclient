@@ -222,9 +222,9 @@ void Animator::calculateSynchronous()
     m_lastPhaseTicks = ticks;
 }
 
-ticks_t Animator::getTotalDuration()
+uint16_t Animator::getTotalDuration()
 {
-    ticks_t time = 0;
+    uint16_t time = 0;
     for (const auto& pair : m_phaseDurations) {
         time += pair.first + (pair.second - pair.first);
     }

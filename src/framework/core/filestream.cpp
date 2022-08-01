@@ -108,7 +108,7 @@ void FileStream::flush()
 int FileStream::read(void* buffer, uint32_t size, uint32_t nmemb)
 {
     if (!m_caching) {
-        const int res = PHYSFS_readBytes(m_fileHandle, buffer, size * nmemb);
+        const int res = PHYSFS_readBytes(m_fileHandle, buffer, static_cast<PHYSFS_uint64>(size) * nmemb);
         if (res == -1)
             throwError("read failed", true);
         return res;

@@ -206,7 +206,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
     }
 
     if (flags.has_hook()) {
-        const auto hookDirection = flags.hook();
+        const auto& hookDirection = flags.hook();
         if (hookDirection.east()) {
             m_attribs.set(ThingAttrHookEast, true);
         } else if (hookDirection.south()) {
@@ -802,7 +802,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
                             if (allBlank) {
                                 spriteImage->overwrite(Color::white);
                             } else if (spriteMask) {
-                                spriteImage->overwriteMask(maskColors[l - 1]);
+                                spriteImage->overwriteMask(maskColors[(l - 1)]);
                             }
 
                             fullImage->blit(framePos, spriteImage);
@@ -821,7 +821,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
                                         if (allBlank) {
                                             spriteImage->overwrite(Color::white);
                                         } else if (spriteMask) {
-                                            spriteImage->overwriteMask(maskColors[l - 1]);
+                                            spriteImage->overwriteMask(maskColors[(l - 1)]);
                                         }
 
                                         Point spritePos = Point(m_size.width() - w - 1,

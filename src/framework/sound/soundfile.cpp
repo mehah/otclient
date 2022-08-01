@@ -26,14 +26,10 @@
 
 #include "framework/stdext/time.h"
 
-SoundFile::SoundFile(const FileStreamPtr& fileStream)
-{
-    m_file = fileStream;
-}
+SoundFile::SoundFile(const FileStreamPtr& fileStream) : m_file(fileStream) { m_file = fileStream; }
 
 SoundFilePtr SoundFile::loadSoundFile(const std::string& filename)
 {
-    stdext::timer t;
     const FileStreamPtr file = g_resources.openFile(filename);
     if (!file)
         stdext::throw_exception(stdext::format("unable to open %s", filename));
@@ -41,7 +37,7 @@ SoundFilePtr SoundFile::loadSoundFile(const std::string& filename)
     // cache file buffer to avoid lags from hard drive
     file->cache();
 
-    char magic[4];
+    char magic[4]{ 0 };
     file->read(magic, 4);
     file->seek(0);
 

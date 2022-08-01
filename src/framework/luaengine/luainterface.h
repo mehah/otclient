@@ -55,14 +55,11 @@ using LuaCFunction = int(*) (lua_State* L);
 class LuaInterface
 {
 public:
-    LuaInterface();
-    ~LuaInterface();
+    LuaInterface() = default;
+    ~LuaInterface() = default;
 
     void init();
     void terminate();
-
-    /// Register core script functions
-    void registerFunctions();
 
     // functions that will register all script stuff in lua global environment
     void registerSingletonClass(const std::string_view className);
@@ -376,12 +373,12 @@ public:
     T polymorphicPop() { T v = castValue<T>(); pop(1); return v; }
 
 private:
-    lua_State* L;
-    int m_weakTableRef;
-    int m_cppCallbackDepth;
-    int m_totalObjRefs;
-    int m_totalFuncRefs;
-    int m_globalEnv;
+    lua_State* L{ nullptr };
+    int m_weakTableRef{ 0 },
+        m_cppCallbackDepth{ 0 },
+        m_totalObjRefs{ 0 },
+        m_totalFuncRefs{ 0 },
+        m_globalEnv{ 0 };
 };
 
 extern LuaInterface g_lua;

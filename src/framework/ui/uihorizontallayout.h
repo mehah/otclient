@@ -40,6 +40,6 @@ public:
 protected:
     bool internalUpdate() override;
 
-    Fw::AlignmentFlag m_alignChidren;
+    Fw::AlignmentFlag m_alignChidren{ Fw::AlignCenter };
     bool m_alignRight{ false };
 };

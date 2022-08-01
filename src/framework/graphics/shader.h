@@ -45,6 +45,6 @@ public:
     ShaderType getShaderType() { return m_shaderType; }
 
 private:
-    uint32_t m_shaderId;
+    uint32_t m_shaderId{ 0 };
     ShaderType m_shaderType;
 };
