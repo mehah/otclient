@@ -79,7 +79,7 @@ void ThingTypeManager::saveDat(const std::string& fileName)
     try {
         const FileStreamPtr fin = g_resources.createFile(fileName);
         if (!fin)
-            throw Exception(stdext::format("failed to open file '%s' for write", fileName));
+            throw Exception("failed to open file '%s' for write", fileName);
 
         fin->cache();
 
@@ -243,7 +243,7 @@ void ThingTypeManager::loadXml(const std::string& file)
         TiXmlDocument doc;
         doc.Parse(g_resources.readFileContents(file).c_str());
         if (doc.Error())
-            throw Exception(stdext::format("failed to parse '%s': '%s'", file, doc.ErrorDesc()));
+            throw Exception("failed to parse '%s': '%s'", file, doc.ErrorDesc());
 
         TiXmlElement* root = doc.FirstChildElement();
         if (!root || root->ValueTStr() != "items")
@@ -487,7 +487,7 @@ const ThingTypeList& ThingTypeManager::getThingTypes(ThingCategory category)
     if (category < ThingLastCategory)
         return m_thingTypes[category];
 
-    throw Exception(stdext::format("invalid thing type category %d", category));
+    throw Exception("invalid thing type category %d", category);
 }
 
 /* vim: set ts=4 sw=4 et: */

@@ -24,6 +24,7 @@
 
 #include <exception>
 #include <string>
+#include "format.h"
 
 namespace stdext
 {
@@ -31,7 +32,12 @@ namespace stdext
     {
     public:
         exception() = default;
-        exception(std::string_view what) : m_what(std::move(what)) {}
+
+        exception(std::string_view what) : m_what(std::string(what)) {}
+
+        template<typename... Args>
+        exception(std::string_view what, const Args&... args) : m_what(stdext::format({ what }, args...)) {}
+
         ~exception() noexcept override = default;;
         const char* what() const noexcept override { return m_what.data(); }
     protected:

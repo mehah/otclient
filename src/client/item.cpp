@@ -188,7 +188,7 @@ void Item::unserializeItem(const BinaryTreePtr& in)
                     m_attribs.set(attrib, in->getString());
                     break;
                 default:
-                    throw Exception(stdext::format("invalid item attribute %d", attrib));
+                    throw Exception("invalid item attribute %d", attrib);
             }
         }
     } catch (stdext::exception& e) {

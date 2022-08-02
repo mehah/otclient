@@ -73,7 +73,7 @@ void SpriteManager::saveSpr(const std::string& fileName)
     try {
         const FileStreamPtr fin = g_resources.createFile(fileName);
         if (!fin)
-            throw Exception(stdext::format("failed to open file '%s' for write", fileName));
+            throw Exception("failed to open file '%s' for write", fileName);
 
         fin->cache();
 

@@ -43,7 +43,7 @@ void Map::loadOtbm(const std::string& fileName)
 
         const FileStreamPtr fin = g_resources.openFile(fileName);
         if (!fin)
-            throw Exception(stdext::format("Unable to load map '%s'", fileName));
+            throw Exception("Unable to load map '%s'", fileName);
 
         fin->cache();
 
@@ -52,7 +52,7 @@ void Map::loadOtbm(const std::string& fileName)
             throw Exception("Could not read file identifier");
 
         if (memcmp(identifier, "OTBM", 4) != 0 && memcmp(identifier, "\0\0\0\0", 4) != 0)
-            throw Exception(stdext::format("Invalid file identifier detected: %s", identifier));
+            throw Exception("Invalid file identifier detected: %s", identifier);
 
         const BinaryTreePtr root = fin->getBinaryTree();
         if (root->getU8())
@@ -60,15 +60,15 @@ void Map::loadOtbm(const std::string& fileName)
 
         const uint32_t headerVersion = root->getU32();
         if (headerVersion > 3)
-            throw Exception(stdext::format("Unknown OTBM version detected: %u.", headerVersion));
+            throw Exception("Unknown OTBM version detected: %u.", headerVersion);
 
         setWidth(root->getU16());
         setHeight(root->getU16());
 
         const uint32_t headerMajorItems = root->getU8();
         if (headerMajorItems > g_things.getOtbMajorVersion()) {
-            throw Exception(stdext::format("This map was saved with different OTB version. read %d what it's supposed to be: %d",
-                                                   headerMajorItems, g_things.getOtbMajorVersion()));
+            throw Exception("This map was saved with different OTB version. read %d what it's supposed to be: %d",
+                                                   headerMajorItems, g_things.getOtbMajorVersion());
         }
 
         root->skip(3);
@@ -96,7 +96,7 @@ void Map::loadOtbm(const std::string& fileName)
                     setHouseFile(fileName.substr(0, fileName.rfind('/') + 1).c_str() + tmp);
                     break;
                 default:
-                    throw Exception(stdext::format("Invalid attribute '%d'", static_cast<int>(attribute)));
+                    throw Exception("Invalid attribute '%d'", static_cast<int>(attribute));
             }
         }
 
@@ -111,7 +111,7 @@ void Map::loadOtbm(const std::string& fileName)
                 for (const BinaryTreePtr& nodeTile : nodeMapData->getChildren()) {
                     const uint8_t type = nodeTile->getU8();
                     if (unlikely(type != OTBM_TILE && type != OTBM_HOUSETILE))
-                        throw Exception(stdext::format("invalid node tile type %d", static_cast<int>(type)));
+                        throw Exception("invalid node tile type %d", static_cast<int>(type));
 
                     HousePtr house = nullptr;
                     uint32_t flags = TILESTATE_NONE;
@@ -154,8 +154,8 @@ void Map::loadOtbm(const std::string& fileName)
                             }
                             default:
                             {
-                                throw Exception(stdext::format("invalid tile attribute %d at pos %s",
-                                                                       static_cast<int>(tileAttr), stdext::to_string(pos)));
+                                throw Exception("invalid tile attribute %d at pos %s",
+                                                                       static_cast<int>(tileAttr), stdext::to_string(pos));
                             }
                         }
                     }
@@ -226,7 +226,7 @@ void Map::loadOtbm(const std::string& fileName)
                         m_waypoints.emplace(waypointPos, name);
                 }
             } else
-                throw Exception(stdext::format("Unknown map data node %d", static_cast<int>(mapDataType)));
+                throw Exception("Unknown map data node %d", static_cast<int>(mapDataType));
         }
 
         fin->close();
@@ -240,7 +240,7 @@ void Map::saveOtbm(const std::string& fileName)
     try {
         const FileStreamPtr fin = g_resources.createFile(fileName);
         if (!fin)
-            throw Exception(stdext::format("failed to open file '%s' for write", fileName));
+            throw Exception("failed to open file '%s' for write", fileName);
 
         fin->cache();
         std::string dir;

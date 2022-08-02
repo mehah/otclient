@@ -51,13 +51,13 @@ bool Module::load()
 
             ModulePtr dep = g_modules.getModule(depName);
             if (!dep)
-                throw Exception(stdext::format("dependency '%s' was not found", depName));
+                throw Exception("dependency '%s' was not found", depName);
 
             if (dep->hasDependency(m_name, true))
-                throw Exception(stdext::format("dependency '%s' is recursively depending on itself", depName));
+                throw Exception("dependency '%s' is recursively depending on itself", depName);
 
             if (!dep->isLoaded() && !dep->load())
-                throw Exception(stdext::format("dependency '%s' has failed to load", depName));
+                throw Exception("dependency '%s' has failed to load", depName);
         }
 
         if (m_sandboxed)

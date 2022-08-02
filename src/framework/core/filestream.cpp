@@ -330,7 +330,7 @@ BinaryTreePtr FileStream::getBinaryTree()
 {
     const uint8_t byte = getU8();
     if (byte != BINARYTREE_NODE_START)
-        throw Exception(stdext::format("failed to read node start (getBinaryTree): %d", byte));
+        throw Exception("failed to read node start (getBinaryTree): %d", byte);
 
     return { new BinaryTree(asFileStream()) };
 }

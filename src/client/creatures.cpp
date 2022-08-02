@@ -60,7 +60,7 @@ void Spawn::load(TiXmlElement* node)
     CreatureTypePtr cType(nullptr);
     for (TiXmlElement* cNode = node->FirstChildElement(); cNode; cNode = cNode->NextSiblingElement()) {
         if (cNode->ValueStr() != "monster" && cNode->ValueStr() != "npc")
-            throw Exception(stdext::format("invalid spawn-subnode %s", cNode->ValueStr()));
+            throw Exception("invalid spawn-subnode %s", cNode->ValueStr());
 
         std::string cName = cNode->Attribute("name");
         stdext::tolower(cName);
@@ -184,7 +184,7 @@ void CreatureManager::loadMonsters(const std::string& file)
     TiXmlDocument doc;
     doc.Parse(g_resources.readFileContents(file).c_str());
     if (doc.Error())
-        throw Exception(stdext::format("cannot open monsters file '%s': '%s'", file, doc.ErrorDesc()));
+        throw Exception("cannot open monsters file '%s': '%s'", file, doc.ErrorDesc());
 
     TiXmlElement* root = doc.FirstChildElement();
     if (!root || root->ValueStr() != "monsters")
@@ -214,7 +214,7 @@ void CreatureManager::loadNpcs(const std::string& folder)
         tmp += "/";
 
     if (!g_resources.directoryExists(tmp))
-        throw Exception(stdext::format("NPCs folder '%s' was not found.", folder));
+        throw Exception("NPCs folder '%s' was not found.", folder);
 
     const auto& fileList = g_resources.listDirectoryFiles(tmp);
     for (const std::string& file : fileList)
@@ -237,7 +237,7 @@ void CreatureManager::loadSpawns(const std::string& fileName)
         TiXmlDocument doc;
         doc.Parse(g_resources.readFileContents(fileName).c_str());
         if (doc.Error())
-            throw Exception(stdext::format("cannot load spawns xml file '%s: '%s'", fileName, doc.ErrorDesc()));
+            throw Exception("cannot load spawns xml file '%s: '%s'", fileName, doc.ErrorDesc());
 
         TiXmlElement* root = doc.FirstChildElement();
         if (!root || root->ValueStr() != "spawns")
@@ -277,7 +277,7 @@ void CreatureManager::saveSpawns(const std::string& fileName)
         }
 
         if (!doc.SaveFile("data" + fileName))
-            throw Exception(stdext::format("failed to save spawns XML %s: %s", fileName, doc.ErrorDesc()));
+            throw Exception("failed to save spawns XML %s: %s", fileName, doc.ErrorDesc());
     } catch (std::exception& e) {
         g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
     }
@@ -288,7 +288,7 @@ void CreatureManager::loadCreatureBuffer(const std::string& buffer)
     TiXmlDocument doc;
     doc.Parse(buffer.c_str());
     if (doc.Error())
-        throw Exception(stdext::format("cannot load creature buffer: %s", doc.ErrorDesc()));
+        throw Exception("cannot load creature buffer: %s", doc.ErrorDesc());
 
     TiXmlElement* root = doc.FirstChildElement();
 

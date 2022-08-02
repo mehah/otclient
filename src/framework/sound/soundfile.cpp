@@ -32,7 +32,7 @@ SoundFilePtr SoundFile::loadSoundFile(const std::string& filename)
 {
     const FileStreamPtr file = g_resources.openFile(filename);
     if (!file)
-        throw Exception(stdext::format("unable to open %s", filename));
+        throw Exception("unable to open %s", filename);
 
     // cache file buffer to avoid lags from hard drive
     file->cache();
@@ -47,7 +47,7 @@ SoundFilePtr SoundFile::loadSoundFile(const std::string& filename)
         if (oggSoundFile->prepareOgg())
             soundFile = oggSoundFile;
     } else
-        throw Exception(stdext::format("unknown sound file format %s", filename));
+        throw Exception("unknown sound file format %s", filename);
 
     return soundFile;
 }

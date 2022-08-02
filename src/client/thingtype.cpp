@@ -549,8 +549,8 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
     }
 
     if (!done)
-        throw Exception(stdext::format("corrupt data (id: %d, category: %d, count: %d, lastAttr: %d)",
-                                               m_id, m_category, count, attr));
+        throw Exception("corrupt data (id: %d, category: %d, count: %d, lastAttr: %d)",
+                                               m_id, m_category, count, attr);
 
     const bool hasFrameGroups = category == ThingCategoryCreature && g_game.getFeature(Otc::GameIdleAnimations);
     const uint8_t groupCount = hasFrameGroups ? fin->getU8() : 1;
