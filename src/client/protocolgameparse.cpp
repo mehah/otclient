@@ -98,6 +98,9 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerDeath:
                     parseDeath(msg);
                     break;
+                case Proto::GameServerFloorDescription:
+                    parseFloorDescription(msg);
+                    break;
                 case Proto::GameServerFullMap:
                     parseMapDescription(msg);
                     break;
