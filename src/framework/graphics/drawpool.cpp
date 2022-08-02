@@ -227,8 +227,8 @@ void DrawPool::updateHash(const PoolState& state, const DrawMethod& method,
         if (method.points.has_value()) {
             const auto& points = *method.points;
             const auto& a = std::get<0>(points),
-                b = std::get<1>(points),
-                c = std::get<2>(points);
+                & b = std::get<1>(points),
+                & c = std::get<2>(points);
 
             if (!a.isNull()) stdext::hash_union(methodhash, a.hash());
             if (!b.isNull()) stdext::hash_union(methodhash, b.hash());
