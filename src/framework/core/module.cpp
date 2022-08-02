@@ -47,17 +47,17 @@ bool Module::load()
 
         for (const std::string& depName : m_dependencies) {
             if (depName == m_name)
-                stdext::throw_exception("cannot depend on itself");
+                throw Exception("cannot depend on itself");
 
             ModulePtr dep = g_modules.getModule(depName);
             if (!dep)
-                stdext::throw_exception(stdext::format("dependency '%s' was not found", depName));
+                throw Exception(stdext::format("dependency '%s' was not found", depName));
 
             if (dep->hasDependency(m_name, true))
-                stdext::throw_exception(stdext::format("dependency '%s' is recursively depending on itself", depName));
+                throw Exception(stdext::format("dependency '%s' is recursively depending on itself", depName));
 
             if (!dep->isLoaded() && !dep->load())
-                stdext::throw_exception(stdext::format("dependency '%s' has failed to load", depName));
+                throw Exception(stdext::format("dependency '%s' has failed to load", depName));
         }
 
         if (m_sandboxed)

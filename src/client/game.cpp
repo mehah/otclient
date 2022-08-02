@@ -502,10 +502,10 @@ void Game::processWalkCancel(Otc::Direction direction)
 void Game::loginWorld(const std::string_view account, const std::string_view password, const std::string_view worldName, const std::string_view worldHost, int worldPort, const std::string_view characterName, const std::string_view authenticatorToken, const std::string_view sessionKey)
 {
     if (m_protocolGame || isOnline())
-        stdext::throw_exception("Unable to login into a world while already online or logging.");
+        throw Exception("Unable to login into a world while already online or logging.");
 
     if (m_protocolVersion == 0)
-        stdext::throw_exception("Must set a valid game protocol version before logging.");
+        throw Exception("Must set a valid game protocol version before logging.");
 
     // reset the new game state
     resetGameStates();
@@ -1530,10 +1530,10 @@ void Game::setProtocolVersion(int version)
         return;
 
     if (isOnline())
-        stdext::throw_exception("Unable to change protocol version while online");
+        throw Exception("Unable to change protocol version while online");
 
     if (version != 0 && (version < 740 || version > m_lastSupportedVersion))
-        stdext::throw_exception(stdext::format("Protocol version %d not supported", version));
+        throw Exception(stdext::format("Protocol version %d not supported", version));
 
     m_protocolVersion = version;
 
@@ -1548,10 +1548,10 @@ void Game::setClientVersion(int version)
         return;
 
     if (isOnline())
-        stdext::throw_exception("Unable to change client version while online");
+        throw Exception("Unable to change client version while online");
 
     if (version != 0 && (version < 740 || version > m_lastSupportedVersion))
-        stdext::throw_exception(stdext::format("Client version %d not supported", version));
+        throw Exception(stdext::format("Client version %d not supported", version));
 
     m_features.reset();
     enableFeature(Otc::GameFormatCreatureName);

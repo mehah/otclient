@@ -330,7 +330,7 @@ BinaryTreePtr FileStream::getBinaryTree()
 {
     const uint8_t byte = getU8();
     if (byte != BINARYTREE_NODE_START)
-        stdext::throw_exception(stdext::format("failed to read node start (getBinaryTree): %d", byte));
+        throw Exception(stdext::format("failed to read node start (getBinaryTree): %d", byte));
 
     return { new BinaryTree(asFileStream()) };
 }
@@ -451,5 +451,5 @@ void FileStream::throwError(const std::string_view message, bool physfsError)
     std::string completeMessage = stdext::format("in file '%s': %s", m_name, message);
     if (physfsError)
         completeMessage += ": "s + PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
-    stdext::throw_exception(completeMessage);
+    throw Exception(completeMessage);
 }

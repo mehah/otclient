@@ -351,7 +351,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
         total_sprites.push_back(totalSprites);
 
         if (totalSpritesCount + totalSprites > 4096)
-            stdext::throw_exception("a thing type has more than 4096 sprites");
+            throw Exception("a thing type has more than 4096 sprites");
 
         m_spritesIndex.resize(totalSpritesCount + totalSprites);
         for (int j = totalSpritesCount, spriteId = 0; j < (totalSpritesCount + totalSprites); ++j, ++spriteId) {
@@ -549,7 +549,7 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
     }
 
     if (!done)
-        stdext::throw_exception(stdext::format("corrupt data (id: %d, category: %d, count: %d, lastAttr: %d)",
+        throw Exception(stdext::format("corrupt data (id: %d, category: %d, count: %d, lastAttr: %d)",
                                                m_id, m_category, count, attr));
 
     const bool hasFrameGroups = category == ThingCategoryCreature && g_game.getFeature(Otc::GameIdleAnimations);
@@ -601,7 +601,7 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
         total_sprites.push_back(totalSprites);
 
         if (totalSpritesCount + totalSprites > 4096)
-            stdext::throw_exception("a thing type has more than 4096 sprites");
+            throw Exception("a thing type has more than 4096 sprites");
 
         m_spritesIndex.resize(totalSpritesCount + totalSprites);
         for (int j = totalSpritesCount; j < (totalSpritesCount + totalSprites); ++j)
@@ -656,10 +656,10 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
 void ThingType::exportImage(const std::string& fileName)
 {
     if (m_null)
-        stdext::throw_exception("cannot export null thingtype");
+        throw Exception("cannot export null thingtype");
 
     if (m_spritesIndex.empty())
-        stdext::throw_exception("cannot export thingtype without sprites");
+        throw Exception("cannot export thingtype without sprites");
 
     const ImagePtr image(new Image(Size(SPRITE_SIZE * m_size.width() * m_layers * m_numPatternX, SPRITE_SIZE * m_size.height() * m_animationPhases * m_numPatternY * m_numPatternZ)));
     for (int z = 0; z < m_numPatternZ; ++z) {

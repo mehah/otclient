@@ -61,7 +61,7 @@ void House::addDoor(const ItemPtr& door)
 void House::removeDoorById(uint32_t doorId)
 {
     if (doorId >= m_lastDoorId)
-        stdext::throw_exception(stdext::format("Failed to remove door of id %d (would overflow), max id: %d",
+        throw Exception(stdext::format("Failed to remove door of id %d (would overflow), max id: %d",
                                                doorId, m_lastDoorId));
     m_doors[doorId] = nullptr;
 }
@@ -136,15 +136,15 @@ void HouseManager::load(const std::string& fileName)
         TiXmlDocument doc;
         doc.Parse(g_resources.readFileContents(fileName).c_str());
         if (doc.Error())
-            stdext::throw_exception(stdext::format("failed to load '%s': %s (House XML)", fileName, doc.ErrorDesc()));
+            throw Exception(stdext::format("failed to load '%s': %s (House XML)", fileName, doc.ErrorDesc()));
 
         TiXmlElement* root = doc.FirstChildElement();
         if (!root || root->ValueTStr() != "houses")
-            stdext::throw_exception("invalid root tag name");
+            throw Exception("invalid root tag name");
 
         for (TiXmlElement* elem = root->FirstChildElement(); elem; elem = elem->NextSiblingElement()) {
             if (elem->ValueTStr() != "house")
-                stdext::throw_exception("invalid house tag.");
+                throw Exception("invalid house tag.");
 
             const auto houseId = elem->readType<uint32_t >("houseid");
             HousePtr house = getHouse(houseId);
@@ -178,7 +178,7 @@ void HouseManager::save(const std::string& fileName)
         }
 
         if (!doc.SaveFile("data" + fileName))
-            stdext::throw_exception(stdext::format("failed to save houses XML %s: %s", fileName, doc.ErrorDesc()));
+            throw Exception(stdext::format("failed to save houses XML %s: %s", fileName, doc.ErrorDesc()));
     } catch (std::exception& e) {
         g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
     }

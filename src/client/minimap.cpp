@@ -314,13 +314,13 @@ bool Minimap::loadOtmm(const std::string& fileName)
     try {
         const FileStreamPtr fin = g_resources.openFile(fileName);
         if (!fin)
-            stdext::throw_exception("unable to open file");
+            throw Exception("unable to open file");
 
         fin->cache();
 
         const uint32_t signature = fin->getU32();
         if (signature != OTMM_SIGNATURE)
-            stdext::throw_exception("invalid OTMM file");
+            throw Exception("invalid OTMM file");
 
         const uint16_t start = fin->getU16();
         const uint16_t version = fin->getU16();
@@ -333,7 +333,7 @@ bool Minimap::loadOtmm(const std::string& fileName)
                 break;
             }
             default:
-                stdext::throw_exception("OTMM version not supported");
+                throw Exception("OTMM version not supported");
         }
 
         fin->seek(start);

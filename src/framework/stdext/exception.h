@@ -37,7 +37,6 @@ namespace stdext
     protected:
         std::string m_what;
     };
-
-    /// Throws a generic exception
-    inline void throw_exception(const std::string_view what) { throw exception(what); }
 }
+
+using Exception = stdext::exception;

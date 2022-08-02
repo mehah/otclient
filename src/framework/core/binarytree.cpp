@@ -109,7 +109,7 @@ void BinaryTree::seek(uint32_t pos)
 {
     unserialize();
     if (pos > m_buffer.size())
-        stdext::throw_exception("BinaryTree: seek failed");
+        throw Exception("BinaryTree: seek failed");
     m_pos = pos;
 }
 
@@ -123,7 +123,7 @@ uint8_t BinaryTree::getU8()
 {
     unserialize();
     if (m_pos + 1 > m_buffer.size())
-        stdext::throw_exception("BinaryTree: getU8 failed");
+        throw Exception("BinaryTree: getU8 failed");
     const uint8_t v = m_buffer[m_pos];
     m_pos += 1;
     return v;
@@ -133,7 +133,7 @@ uint16_t BinaryTree::getU16()
 {
     unserialize();
     if (m_pos + 2 > m_buffer.size())
-        stdext::throw_exception("BinaryTree: getU16 failed");
+        throw Exception("BinaryTree: getU16 failed");
     const uint16_t v = stdext::readULE16(&m_buffer[m_pos]);
     m_pos += 2;
     return v;
@@ -143,7 +143,7 @@ uint32_t BinaryTree::getU32()
 {
     unserialize();
     if (m_pos + 4 > m_buffer.size())
-        stdext::throw_exception("BinaryTree: getU32 failed");
+        throw Exception("BinaryTree: getU32 failed");
     const uint32_t v = stdext::readULE32(&m_buffer[m_pos]);
     m_pos += 4;
     return v;
@@ -153,7 +153,7 @@ uint64_t BinaryTree::getU64()
 {
     unserialize();
     if (m_pos + 8 > m_buffer.size())
-        stdext::throw_exception("BinaryTree: getU64 failed");
+        throw Exception("BinaryTree: getU64 failed");
     const uint64_t v = stdext::readULE64(&m_buffer[m_pos]);
     m_pos += 8;
     return v;
@@ -166,7 +166,7 @@ std::string BinaryTree::getString(uint16_t len)
         len = getU16();
 
     if (m_pos + len > m_buffer.size())
-        stdext::throw_exception("BinaryTree: getString failed: string length exceeded buffer size.");
+        throw Exception("BinaryTree: getString failed: string length exceeded buffer size.");
 
     std::string ret((char*)&m_buffer[m_pos], len);
     m_pos += len;
@@ -209,7 +209,7 @@ void OutputBinaryTree::addU32(uint32_t v)
 void OutputBinaryTree::addString(const std::string_view v)
 {
     if (v.size() > 0xFFFF)
-        stdext::throw_exception("too long string");
+        throw Exception("too long string");
 
     addU16(v.length());
     write((const uint8_t*)v.data(), v.length());

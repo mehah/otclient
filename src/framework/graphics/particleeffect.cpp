@@ -40,7 +40,7 @@ void ParticleEffectType::load(const OTMLNodePtr& node)
 void ParticleEffect::load(const ParticleEffectTypePtr& effectType)
 {
     if (!effectType)
-        stdext::throw_exception("effect type not found");
+        throw Exception("effect type not found");
 
     for (const OTMLNodePtr& childNode : effectType->getNode()->children()) {
         if (childNode->tag() == "System") {
