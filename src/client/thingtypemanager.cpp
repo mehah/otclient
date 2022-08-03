@@ -74,12 +74,12 @@ void ThingTypeManager::terminate()
 void ThingTypeManager::saveDat(const std::string& fileName)
 {
     if (!m_datLoaded)
-        stdext::throw_exception("failed to save, dat is not loaded");
+        throw Exception("failed to save, dat is not loaded");
 
     try {
         const FileStreamPtr fin = g_resources.createFile(fileName);
         if (!fin)
-            stdext::throw_exception(stdext::format("failed to open file '%s' for write", fileName));
+            throw Exception("failed to open file '%s' for write", fileName);
 
         fin->cache();
 
@@ -190,20 +190,20 @@ void ThingTypeManager::loadOtb(const std::string& file)
 
         uint32_t signature = fin->getU32();
         if (signature != 0)
-            stdext::throw_exception("invalid otb file");
+            throw Exception("invalid otb file");
 
         const BinaryTreePtr root = fin->getBinaryTree();
         root->skip(1); // otb first byte is always 0
 
         signature = root->getU32();
         if (signature != 0)
-            stdext::throw_exception("invalid otb file");
+            throw Exception("invalid otb file");
 
         const uint8_t rootAttr = root->getU8();
         if (rootAttr == 0x01) { // OTB_ROOT_ATTR_VERSION
             const uint16_t size = root->getU16();
             if (size != 4 + 4 + 4 + 128)
-                stdext::throw_exception("invalid otb root attr version size");
+                throw Exception("invalid otb root attr version size");
 
             m_otbMajorVersion = root->getU32();
             m_otbMinorVersion = root->getU32();
@@ -238,16 +238,16 @@ void ThingTypeManager::loadXml(const std::string& file)
 {
     try {
         if (!isOtbLoaded())
-            stdext::throw_exception("OTB must be loaded before XML");
+            throw Exception("OTB must be loaded before XML");
 
         TiXmlDocument doc;
         doc.Parse(g_resources.readFileContents(file).c_str());
         if (doc.Error())
-            stdext::throw_exception(stdext::format("failed to parse '%s': '%s'", file, doc.ErrorDesc()));
+            throw Exception("failed to parse '%s': '%s'", file, doc.ErrorDesc());
 
         TiXmlElement* root = doc.FirstChildElement();
         if (!root || root->ValueTStr() != "items")
-            stdext::throw_exception("invalid root tag name");
+            throw Exception("invalid root tag name");
 
         for (TiXmlElement* element = root->FirstChildElement(); element; element = element->NextSiblingElement()) {
             if (unlikely(element->ValueTStr() != "item"))
@@ -487,7 +487,7 @@ const ThingTypeList& ThingTypeManager::getThingTypes(ThingCategory category)
     if (category < ThingLastCategory)
         return m_thingTypes[category];
 
-    stdext::throw_exception(stdext::format("invalid thing type category %d", category));
+    throw Exception("invalid thing type category %d", category);
 }
 
 /* vim: set ts=4 sw=4 et: */

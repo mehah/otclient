@@ -43,7 +43,7 @@ namespace stdext
         if (!sourcePath.ends_with("/")) {
             const std::size_t slashPos = sourcePath.find_last_of('/');
             if (slashPos == std::string::npos)
-                throw_exception(format("invalid source path '%s', for file '%s'", sourcePath, filePath));
+                throw Exception("invalid source path '%s', for file '%s'", sourcePath, filePath);
             _sourcePath = sourcePath.substr(0, slashPos + 1);
         }
         return _sourcePath + _filePath;

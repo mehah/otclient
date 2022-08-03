@@ -189,7 +189,7 @@ std::string ResourceManager::readFileContents(const std::string& fileName)
 
     PHYSFS_File* file = PHYSFS_openRead(fullPath.c_str());
     if (!file)
-        stdext::throw_exception(stdext::format("unable to open file '%s': %s", fullPath, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+        throw Exception("unable to open file '%s': %s", fullPath, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
 
     const int fileSize = PHYSFS_fileLength(file);
     std::string buffer(fileSize, 0);
@@ -244,7 +244,7 @@ FileStreamPtr ResourceManager::openFile(const std::string& fileName)
 
     PHYSFS_File* file = PHYSFS_openRead(fullPath.c_str());
     if (!file)
-        stdext::throw_exception(stdext::format("unable to open file '%s': %s", fullPath, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+        throw Exception("unable to open file '%s': %s", fullPath, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
     return { new FileStream(fullPath, file, false) };
 }
 
@@ -252,7 +252,7 @@ FileStreamPtr ResourceManager::appendFile(const std::string& fileName)
 {
     PHYSFS_File* file = PHYSFS_openAppend(fileName.c_str());
     if (!file)
-        stdext::throw_exception(stdext::format("failed to append file '%s': %s", fileName, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+        throw Exception("failed to append file '%s': %s", fileName, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
     return { new FileStream(fileName, file, true) };
 }
 
@@ -260,7 +260,7 @@ FileStreamPtr ResourceManager::createFile(const std::string& fileName)
 {
     PHYSFS_File* file = PHYSFS_openWrite(fileName.c_str());
     if (!file)
-        stdext::throw_exception(stdext::format("failed to create file '%s': %s", fileName, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+        throw Exception("failed to create file '%s': %s", fileName, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
     return { new FileStream(fileName, file, true) };
 }
 

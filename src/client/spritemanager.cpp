@@ -68,12 +68,12 @@ bool SpriteManager::loadSpr(std::string file)
 void SpriteManager::saveSpr(const std::string& fileName)
 {
     if (!m_loaded)
-        stdext::throw_exception("failed to save, spr is not loaded");
+        throw Exception("failed to save, spr is not loaded");
 
     try {
         const FileStreamPtr fin = g_resources.createFile(fileName);
         if (!fin)
-            stdext::throw_exception(stdext::format("failed to open file '%s' for write", fileName));
+            throw Exception("failed to open file '%s' for write", fileName);
 
         fin->cache();
 

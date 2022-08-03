@@ -929,7 +929,7 @@ void UIWidget::setParent(const UIWidgetPtr& parent)
 void UIWidget::setLayout(const UILayoutPtr& layout)
 {
     if (!layout)
-        stdext::throw_exception("attempt to set a nil layout to a widget");
+        throw Exception("attempt to set a nil layout to a widget");
 
     if (m_layout)
         m_layout->disableUpdates();

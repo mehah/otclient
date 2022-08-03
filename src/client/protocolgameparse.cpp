@@ -498,7 +498,7 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                     parseError(msg);
                     break;
                 default:
-                    stdext::throw_exception(stdext::format("unhandled opcode %d", opcode));
+                    throw Exception("unhandled opcode %d", opcode);
                     break;
             }
             prevOpcode = opcode;
@@ -1838,7 +1838,7 @@ void ProtocolGame::parseTalk(const InputMessagePtr& msg)
             msg->getU32();
             break;
         default:
-            stdext::throw_exception(stdext::format("unknown message mode %d", mode));
+            throw Exception("unknown message mode %d", mode);
             break;
     }
 
@@ -1990,7 +1990,7 @@ void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
             break;
         }
         case Otc::MessageInvalid:
-            stdext::throw_exception(stdext::format("unknown message mode %d", mode));
+            throw Exception("unknown message mode %d", mode);
             break;
         default:
             text = msg->getString();
@@ -2500,7 +2500,7 @@ ThingPtr ProtocolGame::getThing(const InputMessagePtr& msg)
     const int id = msg->getU16();
 
     if (id == 0)
-        stdext::throw_exception("invalid thing id");
+        throw Exception("invalid thing id");
     else if (id == Proto::UnknownCreature || id == Proto::OutdatedCreature || id == Proto::Creature)
         thing = getCreature(msg, id);
     else if (id == Proto::StaticText) // otclient only
@@ -2724,7 +2724,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type)
                 creature->setPassable(!unpass);
         }
     } else {
-        stdext::throw_exception("invalid creature opcode");
+        throw Exception("invalid creature opcode");
     }
 
     return creature;
@@ -2737,7 +2737,7 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
 
     ItemPtr item = Item::create(id);
     if (item->getId() == 0)
-        stdext::throw_exception(stdext::format("unable to create item with invalid id %d", id));
+        throw Exception("unable to create item with invalid id %d", id);
 
     if (g_game.getClientVersion() < 1281 && g_game.getFeature(Otc::GameThingMarks)) {
         msg->getU8(); // mark
@@ -3050,7 +3050,7 @@ void ProtocolGame::parseItemsPrice(const InputMessagePtr& msg)
         if (g_game.getClientVersion() >= 1281) {
             const ItemPtr item = Item::create(itemId);
             if (item->getId() == 0)
-                stdext::throw_exception(stdext::format("unable to create item with invalid id %d", itemId));
+                throw Exception("unable to create item with invalid id %d", itemId);
 
             if (item->getClassification() > 0) {
                 msg->getU8();
@@ -3303,7 +3303,7 @@ void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
     uint16_t itemId = msg->getU16(); // item client ID
     const ItemPtr item = Item::create(itemId);
     if (item->getId() == 0)
-        stdext::throw_exception(stdext::format("unable to create item with invalid id %d", itemId));
+        throw Exception("unable to create item with invalid id %d", itemId);
 
     if (item->getClassification() > 0) {
         msg->getU8();
