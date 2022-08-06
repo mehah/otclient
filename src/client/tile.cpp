@@ -503,7 +503,7 @@ ThingPtr Tile::getTopMultiUseThing()
     }
 
     for (const auto& thing : m_things) {
-        if (!thing->isGround() && !thing->isOnTop())
+        if (!thing->isGround() && !thing->isGroundBorder() && !thing->isOnTop())
             return thing;
     }
 
