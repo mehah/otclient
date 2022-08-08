@@ -68,8 +68,9 @@ MainWindow
   Button
     id: reloadAllModulesButton
     anchors.top: moduleList.bottom
-    anchors.right: moduleListScrollBar.right
+    anchors.left: refreshModulesButton.right
     margin-top: 8
+    margin-left: 5
     !text: tr('Reload All')
     text-auto-resize: true
     @onClick: modules.client_modulemanager.reloadAllModules()
