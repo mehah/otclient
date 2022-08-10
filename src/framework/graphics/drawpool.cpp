@@ -86,14 +86,12 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const DrawMeth
             return;
         }
 
-        bool addCoord = false;
-
         const DrawBufferPtr& buffer = drawBuffer ? drawBuffer : DrawBuffer::createTemporaryBuffer(DrawPool::DrawOrder::FIRST);
-        if (buffer->isTemporary()) {
-            addCoord = true;
-        } else {
-            if (!buffer->isValid()) {
+        bool addCoord = buffer->isTemporary();
+        if (!addCoord) { // is not temp buffer
+            if (buffer->m_stateHash != stateHash || !buffer->isValid()) {
                 buffer->getCoords()->clear();
+                buffer->m_stateHash = stateHash;
                 buffer->m_hashs.clear();
                 buffer->m_hashs.push_back(methodHash);
                 addCoord = true;

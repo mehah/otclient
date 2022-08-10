@@ -272,6 +272,7 @@ private:
     bool m_agroup{ true };
     DrawPool::DrawOrder m_order{ DrawPool::DrawOrder::FIRST };
     Point m_ref;
+    size_t m_stateHash{ 0 };
 
     std::vector<size_t> m_hashs;
     CoordsBufferPtr m_coords;
