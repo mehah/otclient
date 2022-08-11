@@ -126,12 +126,14 @@ void GraphicalApplication::run()
     Timer foregroundRefresh;
 
     while (!m_stopping) {
+        g_clock.update();
+
         // poll all events before rendering
         poll();
 
         if (!g_window.isVisible()) {
             // sleeps until next poll to avoid massive cpu usage
-            stdext::millisleep(10);
+            stdext::millisleep(1);
             continue;
         }
 
@@ -161,9 +163,6 @@ void GraphicalApplication::run()
 
         // update screen pixels
         g_window.swapBuffers();
-
-        // only update the current time once per frame to gain performance
-        g_clock.update();
 
         if (m_frameCounter.update()) {
             g_lua.callGlobalField("g_app", "onFps", m_frameCounter.getFps());
