@@ -51,7 +51,6 @@ function MarketProtocol.sendMarketBrowse(browseId, browseType)
         local msg = OutputMessage.create()
         msg:addU8(ClientOpcodes.ClientMarketBrowse)
 		msg:addU8(browseId)
-		g_logger.debug("" .. tostring(browseId))
 		if browseType > 0 then
 			msg:addU16(browseType)
 		end

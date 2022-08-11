@@ -194,7 +194,6 @@ local function addOffer(offer, offerType)
                 sortvalue = timestamp
             }})
         elseif offer.var == MarketRequest.MyHistory then
-			g_logger.debug("" .. action)
             row = buyMyHistoryTable:addRow({{
                 text = itemName
             }, {
@@ -244,7 +243,6 @@ local function addOffer(offer, offerType)
                 sortvalue = timestamp
             }})
         elseif offer.var == MarketRequest.MyHistory then
-			g_logger.debug("" .. action)
             row = sellMyHistoryTable:addRow({{
                 text = itemName
             }, {
@@ -1340,7 +1338,6 @@ function Market.onMarketBrowse(intOffers, nameOffers)
 end
 
 function Market.onMarketReadOffer(action, amount, counter, itemId, playerName, price, state, timestamp, var)
-	g_logger.debug(tostring(itemId))
 	table.insert(MarketOffers2, MarketOffer.new({timestamp, counter}, action, Item.create(itemId), amount, price, playerName, state, var))
 end
 
