@@ -990,8 +990,13 @@ void ProtocolGame::sendMarketBrowse(uint8_t browseId, uint16_t browseType)
 {
     const OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientMarketBrowse);
-    msg->addU8(browseId);
-    if (browseType > 0) {
+    if (g_game.getClientVersion() >= 1251) {
+        msg->addU8(browseId);
+        if (browseType > 0) {
+            msg->addU16(browseType);
+        }
+    }
+    else {
         msg->addU16(browseType);
     }
     send(msg);

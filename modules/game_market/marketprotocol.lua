@@ -49,9 +49,13 @@ function MarketProtocol.silent(mode) silent = mode end
 function MarketProtocol.sendMarketBrowse(browseId, browseType)
     if g_game.getFeature(GamePlayerMarket) then
         local msg = OutputMessage.create()
-        msg:addU8(ClientOpcodes.ClientMarketBrowse)
-		msg:addU8(browseId)
-		if browseType > 0 then
+		if g_game.getClientVersion() >= 1251 then
+			msg:addU8(ClientOpcodes.ClientMarketBrowse)
+			msg:addU8(browseId)
+			if browseType > 0 then
+				msg:addU16(browseType)
+			end
+		else
 			msg:addU16(browseType)
 		end
         send(msg)
