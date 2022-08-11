@@ -60,5 +60,5 @@ function MarketProtocol.sendMarketBrowse(browseId, browseType)
     end
 end
 
-function MarketProtocol.sendMarketBrowseMyOffers() MarketProtocol.sendMarketBrowse(MarketRequest.MyOffers, 2) end
-function MarketProtocol.sendMarketBrowseOfferHistory() MarketProtocol.sendMarketBrowse(MarketRequest.MyHistory, 1) end
+function MarketProtocol.sendMarketBrowseMyOffers() MarketProtocol.sendMarketBrowse(MarketRequest.MyOffers, 0) end
+function MarketProtocol.sendMarketBrowseOfferHistory() MarketProtocol.sendMarketBrowse(MarketRequest.MyHistory, 0) end
