@@ -3390,7 +3390,7 @@ void ProtocolGame::parseMarketEnter(const InputMessagePtr& msg)
         depotItems.push_back({ itemId, count, itemClass });
     }
     
-    g_lua.callGlobalField("g_game", "onMarketEnter", depotItems, offers, 1000, 1);
+    g_lua.callGlobalField("g_game", "onMarketEnter", depotItems, offers, -1, -1);
 }
 
 void ProtocolGame::parseMarketEnterOld(const InputMessagePtr& msg)

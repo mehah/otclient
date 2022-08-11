@@ -9,8 +9,11 @@ MarketAction = {
 }
 
 MarketRequest = {
-    MyOffers = 0xFFFE,
-    MyHistory = 0xFFFF
+	MyHistory = 1,
+	MyOffers = 2,
+	BrowseItem = 3,
+    OldMyOffers = 0xFFFE,
+    OldMyHistory = 0xFFFF
 }
 
 MarketOfferState = {
@@ -19,6 +22,14 @@ MarketOfferState = {
     Expired = 2,
     Accepted = 3,
     AcceptedEx = 255
+}
+
+MarketOfferStateString = {
+    [0] = "active",
+    [1] = "cancelled",
+    [2] = "expired",
+    [3] = "accepted",
+    [255] = "acceptedEx"
 }
 
 MarketCategory = {

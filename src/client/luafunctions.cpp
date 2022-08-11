@@ -317,6 +317,11 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "openTransactionHistory", &Game::openTransactionHistory, &g_game);
     g_lua.bindSingletonFunction("g_game", "setLastSupportedVersion", &Game::setLastSupportedVersion, &g_game);
     g_lua.bindSingletonFunction("g_game", "getLastSupportedVersion", &Game::getLastSupportedVersion, &g_game);
+    g_lua.bindSingletonFunction("g_game", "leaveMarket", &Game::leaveMarket, &g_game);
+    g_lua.bindSingletonFunction("g_game", "browseMarket", &Game::browseMarket, &g_game);
+    g_lua.bindSingletonFunction("g_game", "createMarketOffer", &Game::createMarketOffer, &g_game);
+    g_lua.bindSingletonFunction("g_game", "cancelMarketOffer", &Game::cancelMarketOffer, &g_game);
+    g_lua.bindSingletonFunction("g_game", "acceptMarketOffer", &Game::acceptMarketOffer, &g_game);
 
     g_lua.registerSingletonClass("g_shaders");
     g_lua.bindSingletonFunction("g_shaders", "createShader", &ShaderManager::createShader, &g_shaders);
@@ -682,6 +687,9 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<LocalPlayer>("isAutoWalking", &LocalPlayer::isAutoWalking);
     g_lua.bindClassMemberFunction<LocalPlayer>("stopAutoWalk", &LocalPlayer::stopAutoWalk);
     g_lua.bindClassMemberFunction<LocalPlayer>("autoWalk", &LocalPlayer::autoWalk);
+    g_lua.bindClassMemberFunction<LocalPlayer>("getResourceBalance", &LocalPlayer::getResourceBalance);
+    g_lua.bindClassMemberFunction<LocalPlayer>("setResourceBalance", &LocalPlayer::setResourceBalance);
+    g_lua.bindClassMemberFunction<LocalPlayer>("getTotalMoney", &LocalPlayer::getTotalMoney);
 
     g_lua.registerClass<Tile>();
     g_lua.bindClassMemberFunction<Tile>("clean", &Tile::clean);

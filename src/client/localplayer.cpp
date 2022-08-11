@@ -487,7 +487,7 @@ void LocalPlayer::setResourceBalance(Otc::ResourceTypes_t type, uint64_t value)
     const uint64_t oldBalance = getResourceBalance(type);
     if (value != oldBalance) {
         m_resourcesBalance[type] = value;
-        callLuaField("onResourcesBalanceChange", value, oldBalance);
+        callLuaField("onResourcesBalanceChange", value, oldBalance, type);
     }
 }
 

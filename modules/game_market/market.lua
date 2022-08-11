@@ -68,6 +68,11 @@ sellCancelButton = nil
 buyMyOfferTable = nil
 sellMyOfferTable = nil
 
+buyMyHistoryTable = nil
+sellMyHistoryTable = nil
+
+refreshTimeout = 0
+updateEvent = nil
 offerExhaust = {}
 marketOffers = {}
 marketItems = {}
@@ -125,6 +130,12 @@ local function clearMyOffers()
     sellMyOfferTable:clearData()
 end
 
+local function clearMyHistory()
+    marketOffers[MarketAction.Buy] = {}
+    marketOffers[MarketAction.Sell] = {}
+    buyMyHistoryTable:clearData()
+    sellMyHistoryTable:clearData()
+end
 local function clearFilters()
     for _, filter in pairs(filterButtons) do
         if filter and filter:isChecked() ~= filter.default then filter:setChecked(filter.default) end
@@ -153,12 +164,16 @@ local function addOffer(offer, offerType)
     local price = offer:getPrice()
     local timestamp = offer:getTimeStamp()
     local itemName = offer:getItem():getMarketData().name
-
+	local action = offer:getState()
+	
     buyOfferTable:toggleSorting(false)
     sellOfferTable:toggleSorting(false)
 
     buyMyOfferTable:toggleSorting(false)
     sellMyOfferTable:toggleSorting(false)
+	
+    buyMyHistoryTable:toggleSorting(false)
+    sellMyHistoryTable:toggleSorting(false)
 
     if amount < 1 then return false end
     if offerType == MarketAction.Buy then
@@ -176,6 +191,20 @@ local function addOffer(offer, offerType)
                 text = amount
             }, {
                 text = string.gsub(os.date('%c', timestamp), ' ', '  '),
+                sortvalue = timestamp
+            }})
+        elseif offer.var == MarketRequest.MyHistory then
+			g_logger.debug("" .. action)
+            row = buyMyHistoryTable:addRow({{
+                text = itemName
+            }, {
+                text = price * amount
+            }, {
+                text = price
+            }, {
+                text = amount
+            }, {
+                text = MarketOfferStateString[action],
                 sortvalue = timestamp
             }})
         else
@@ -214,6 +243,20 @@ local function addOffer(offer, offerType)
                 text = string.gsub(os.date('%c', timestamp), ' ', '  '),
                 sortvalue = timestamp
             }})
+        elseif offer.var == MarketRequest.MyHistory then
+			g_logger.debug("" .. action)
+            row = sellMyHistoryTable:addRow({{
+                text = itemName
+            }, {
+                text = price * amount
+            }, {
+                text = price
+            }, {
+                text = amount
+            }, {
+                text = MarketOfferStateString[action],
+                sortvalue = timestamp
+            }})
         else
             row = sellOfferTable:addRow({{
                 text = player
@@ -245,6 +288,11 @@ local function addOffer(offer, offerType)
     sellMyOfferTable:toggleSorting(false)
     buyMyOfferTable:sort()
     sellMyOfferTable:sort()
+	
+    buyMyHistoryTable:toggleSorting(false)
+    sellMyHistoryTable:toggleSorting(false)
+    buyMyHistoryTable:sort()
+    sellMyHistoryTable:sort()
 
     return true
 end
@@ -452,7 +500,7 @@ local function updateSelectedItem(widget)
         clearOffers()
 
         Market.enableCreateOffer(true) -- update offer types
-        MarketProtocol.sendMarketBrowse(selectedItem.item.marketData.tradeAs, 0) -- send browsed msg
+        MarketProtocol.sendMarketBrowse(MarketRequest.BrowseItem, selectedItem.item.marketData.tradeAs) -- send browsed msg
     else
         Market.clearSelectedItem()
     end
@@ -489,7 +537,7 @@ end
 
 local function cancelMyOffer(actionType)
     local offer = selectedMyOffer[actionType]
-    MarketProtocol.sendMarketCancelOffer(offer:getTimeStamp(), offer:getCounter())
+    g_game.cancelMarketOffer(offer:getTimeStamp(), offer:getCounter())
     Market.refreshMyOffers()
 end
 
@@ -750,16 +798,58 @@ local function initInterface()
 
     -- setup 'My Offer' section tabs
     myOffersPanel = g_ui.loadUI('ui/myoffers')
-    mainTabBar:addTab(tr('My Offers'), myOffersPanel)
-
+	g_mouse.bindPress(mainTabBar:addTab(tr('My Offers'), myOffersPanel), function()
+		if os.time() > refreshTimeout + 1 then
+			refreshTimeout = os.time()
+			Market.refreshMyOffers()
+		else
+			if updateEvent then
+				removeEvent(updateEvent)
+				updateEvent = nil
+			end
+			updateEvent = scheduleEvent(function()
+				Market.refreshMyOffers()
+				refreshTimeout = os.time()
+			end, 500)
+		end
+	end, MouseLeftButton)
+    
     offersTabBar = myOffersPanel:getChildById('offersTabBar')
     offersTabBar:setContentWidget(myOffersPanel:getChildById('offersTabContent'))
 
     currentOffersPanel = g_ui.loadUI('ui/myoffers/currentoffers')
-    offersTabBar:addTab(tr('Current Offers'), currentOffersPanel)
+	g_mouse.bindPress(offersTabBar:addTab(tr('Current Offers'), currentOffersPanel), function()
+		if os.time() > refreshTimeout + 1 then
+			refreshTimeout = os.time()
+			Market.refreshMyOffers()
+		else
+			if updateEvent then
+				removeEvent(updateEvent)
+				updateEvent = nil
+			end
+			updateEvent = scheduleEvent(function()
+				Market.refreshMyOffers()
+				refreshTimeout = os.time()
+			end, 500)
+		end
+	end, MouseLeftButton)
 
     offerHistoryPanel = g_ui.loadUI('ui/myoffers/offerhistory')
-    offersTabBar:addTab(tr('Offer History'), offerHistoryPanel)
+	g_mouse.bindPress(offersTabBar:addTab(tr('Offer History'), offerHistoryPanel), function()
+		if os.time() > refreshTimeout + 1 then
+			refreshTimeout = os.time()
+			Market.refreshMyOffers()
+		else
+			if updateEvent then
+				removeEvent(updateEvent)
+				updateEvent = nil
+			end
+			updateEvent = scheduleEvent(function()
+				Market.refreshOfferHistory()
+				refreshTimeout = os.time()
+			end, 500)
+		end
+	end, MouseLeftButton)
 
     balanceLabel = marketWindow:getChildById('balanceLabel')
 
@@ -857,6 +947,13 @@ local function initInterface()
 
     buyMyOfferTable:setSorting(3, TABLE_SORTING_DESC)
     sellMyOfferTable:setSorting(3, TABLE_SORTING_DESC)
+	
+	-- setup my history
+    buyMyHistoryTable = offerHistoryPanel:recursiveGetChildById('myHistoryBuyingTable')
+    sellMyHistoryTable = offerHistoryPanel:recursiveGetChildById('myHistorySellingTable')
+
+    buyMyHistoryTable:setSorting(3, TABLE_SORTING_DESC)
+    sellMyHistoryTable:setSorting(3, TABLE_SORTING_DESC)
 end
 
 function init()
@@ -877,7 +974,9 @@ function init()
 		onMarketEnter = Market.onMarketEnter,
 		onMarketBrowse = Market.onMarketBrowse,
 		onMarketDetail = Market.onMarketDetail,
-		onMarketReadOffer = Market.onMarketReadOffer
+		onMarketReadOffer = Market.onMarketReadOffer,
+		onMarketLeave = Market.onMarketLeave,
+		onResourcesBalanceChange = Market.onResourceBalanceChange
     })
     connect(g_game, {
         onGameEnd = Market.close
@@ -899,7 +998,9 @@ function terminate()
 		onMarketEnter = Market.onMarketEnter,
 		onMarketBrowse = Market.onMarketBrowse,
 		onMarketDetail = Market.onMarketDetail,
-		onMarketReadOffer = Market.onMarketReadOffer
+		onMarketReadOffer = Market.onMarketReadOffer,
+		onMarketLeave = Market.onMarketLeave,
+		onResourceBalancesChange = Market.onResourceBalanceChange
     })
     disconnect(g_game, {
         onGameEnd = Market.close
@@ -979,7 +1080,7 @@ function Market.close(notify)
         modules.game_interface.getRootPanel():focus()
         Market.clearSelectedItem()
         Market.reset()
-        if notify then MarketProtocol.sendMarketLeave() end
+        if notify then g_game.leaveMarket() end
     end
 end
 
@@ -1058,8 +1159,13 @@ function Market.refreshOffers()
 end
 
 function Market.refreshMyOffers()
-    clearMyOffers()
-    MarketProtocol.sendMarketBrowseMyOffers()
+	clearMyOffers()
+	MarketProtocol.sendMarketBrowseMyOffers()
+end
+
+function Market.refreshOfferHistory()
+	clearMyHistory()
+	MarketProtocol.sendMarketBrowseOfferHistory()
 end
 
 function Market.loadMarketItems(category)
@@ -1146,14 +1252,14 @@ function Market.createNewOffer()
         return
     end
 
-    MarketProtocol.sendMarketCreateOffer(type, spriteId, amount, piecePrice, anonymous)
+    g_game.createMarketOffer(type, spriteId, amount, piecePrice, anonymous)
     lastCreatedOffer = os.time()
     Market.resetCreateOffer()
 end
 
 function Market.acceptMarketOffer(amount, timestamp, counter)
     if timestamp > 0 and amount > 0 then
-        MarketProtocol.sendMarketAcceptOffer(timestamp, counter, amount)
+        g_game.acceptMarketOffer(timestamp, counter, amount)
         Market.refreshOffers()
     end
 end
@@ -1167,8 +1273,14 @@ function Market.onMarketEnter(depotItems, offers, balance, vocation)
         initMarketItems()
         loaded = true
     end
-
-    updateBalance(balance)
+    if balance == -1 then  
+		local player = g_game.getLocalPlayer()
+		if player then
+			updateBalance(player:getTotalMoney())
+		end
+    else
+        updateBalance(balance)
+    end
     averagePrice = 0
 
     information.totalOffers = offers
@@ -1219,13 +1331,24 @@ function Market.onMarketDetail(itemId, descriptions, purchaseStats, saleStats)
     updateDetails(itemId, descriptions, purchaseStats, saleStats)
 end
 
-MarketOffers = {}
+MarketOffers2 = {}
 
 function Market.onMarketBrowse(intOffers, nameOffers)
-local tmpOffers = MarketOffers 
-MarketOffers = {}
-updateOffers(tmpOffers) end
+	local tmpOffers = MarketOffers2
+	MarketOffers2 = {}
+	updateOffers(tmpOffers)
+end
 
 function Market.onMarketReadOffer(action, amount, counter, itemId, playerName, price, state, timestamp, var)
-	table.insert(MarketOffers, MarketOffer.new({timestamp, counter}, action, Item.create(itemId), amount, price, playerName, state, var))
+	g_logger.debug(tostring(itemId))
+	table.insert(MarketOffers2, MarketOffer.new({timestamp, counter}, action, Item.create(itemId), amount, price, playerName, state, var))
+end
+
+function Market.onResourcesBalanceChange(value, oldBalance, resourceType)
+	if resourceType <= 1 then
+		local player = g_game.getLocalPlayer()
+		if player then
+			updateBalance(player:getTotalMoney())
+		end
+	end
 end
