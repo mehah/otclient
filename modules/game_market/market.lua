@@ -37,6 +37,8 @@ offerHistoryPanel = nil
 itemsPanel = nil
 selectedOffer = {}
 selectedMyOffer = {}
+lastKnownTab = nil
+lastOfferTab = nil
 
 nameLabel = nil
 feeLabel = nil
@@ -768,7 +770,22 @@ local function initInterface()
 
     -- setup 'Market Offer' section tabs
     marketOffersPanel = g_ui.loadUI('ui/marketoffers')
-    mainTabBar:addTab(tr('Market Offers'), marketOffersPanel)
+	g_mouse.bindPress(mainTabBar:addTab(tr('Market Offers'), marketOffersPanel), function()
+		lastKnownTab = "market offers"
+		if os.time() > refreshTimeout + 1 then
+			refreshTimeout = os.time()
+			Market.refreshOffers()
+		else
+			if updateEvent then
+				removeEvent(updateEvent)
+				updateEvent = nil
+			end
+			updateEvent = scheduleEvent(function()
+				Market.refreshMyOffers()
+				refreshTimeout = os.time()
+			end, 500)
+		end
+	end, MouseLeftButton)
 
     selectionTabBar = marketOffersPanel:getChildById('leftTabBar')
     selectionTabBar:setContentWidget(marketOffersPanel:getChildById('leftTabContent'))
@@ -797,6 +814,7 @@ local function initInterface()
     -- setup 'My Offer' section tabs
     myOffersPanel = g_ui.loadUI('ui/myoffers')
 	g_mouse.bindPress(mainTabBar:addTab(tr('My Offers'), myOffersPanel), function()
+		lastKnownTab = lastOfferTab ~= nil and lastOfferTab or "current offers"
 		if os.time() > refreshTimeout + 1 then
 			refreshTimeout = os.time()
 			Market.refreshMyOffers()
@@ -817,6 +835,7 @@ local function initInterface()
 
     currentOffersPanel = g_ui.loadUI('ui/myoffers/currentoffers')
 	g_mouse.bindPress(offersTabBar:addTab(tr('Current Offers'), currentOffersPanel), function()
+		lastKnownTab, lastOfferTab = "current offers"
 		if os.time() > refreshTimeout + 1 then
 			refreshTimeout = os.time()
 			Market.refreshMyOffers()
@@ -834,6 +853,7 @@ local function initInterface()
 
     offerHistoryPanel = g_ui.loadUI('ui/myoffers/offerhistory')
 	g_mouse.bindPress(offersTabBar:addTab(tr('Offer History'), offerHistoryPanel), function()
+		lastKnownTab, lastOfferTab = "offer history"
 		if os.time() > refreshTimeout + 1 then
 			refreshTimeout = os.time()
 			Market.refreshMyOffers()
@@ -1149,10 +1169,12 @@ function Market.refreshItemsWidget(selectItem)
 end
 
 function Market.refreshOffers()
-    if Market.isItemSelected() then
+    if (not lastKnownTab or lastKnownTab == "market offers") and Market.isItemSelected() then
         Market.onItemBoxChecked(selectedItem.ref)
-    else
+    elseif lastKnownTab == "current offers" then
         Market.refreshMyOffers()
+	elseif lastKnownTab == "offer history" then
+		Market.refreshOfferHistory()
     end
 end
 
