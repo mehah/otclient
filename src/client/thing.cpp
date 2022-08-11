@@ -94,20 +94,17 @@ void Thing::generateBuffer()
     DrawPool::DrawOrder order = DrawPool::DrawOrder::NONE;
     if (isSingleGround())
         order = DrawPool::DrawOrder::FIRST;
-    else if (isGroundBorder()) {
+    else if (isGroundBorder())
         order = DrawPool::DrawOrder::SECOND;
-    } else if (isCommon() && isSingleDimension() && isNotMoveable()) {
-        order = DrawPool::DrawOrder::THIRD;
-    } else if (isOnBottom() && isSingleDimension() && !hasDisplacement() && isNotMoveable())
+    else if ((isCommon() || isOnBottom()) && isSingleDimension() && !hasDisplacement() && isNotMoveable())
         order = DrawPool::DrawOrder::THIRD;
     else if (isTopGround() || g_app.isDrawingEffectsOnTop() && isEffect())
         order = DrawPool::DrawOrder::FOURTH;
     else if (isMissile())
         order = DrawPool::DrawOrder::FIFTH;
 
-    if (order != DrawPool::DrawOrder::NONE) {
+    if (order != DrawPool::DrawOrder::NONE)
         m_drawBuffer = std::make_shared<DrawBuffer>(order);
-    }
 }
 
 const ThingTypePtr& Thing::getThingType()
