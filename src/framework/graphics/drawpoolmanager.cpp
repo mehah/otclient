@@ -181,14 +181,14 @@ void DrawPoolManager::addTexturedRepeatedRect(const Rect& dest, const TexturePtr
     m_currentPool->add(color, texture, method);
 }
 
-void DrawPoolManager::addFilledRect(const Rect& dest, const Color& color)
+void DrawPoolManager::addFilledRect(const Rect& dest, const Color& color, const DrawBufferPtr& buffer)
 {
     if (dest.isEmpty())
         return;
 
     const DrawPool::DrawMethod method{ DrawPool::DrawMethodType::RECT, std::make_pair(dest, Rect()) };
 
-    m_currentPool->add(color, nullptr, method);
+    m_currentPool->add(color, nullptr, method, DrawMode::TRIANGLES, buffer);
 }
 
 void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color)

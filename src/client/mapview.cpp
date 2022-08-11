@@ -89,6 +89,7 @@ MapView::MapView()
         g_painter->resetOpacity();
     });
 
+    m_shadowBuffer = std::make_shared<DrawBuffer>(DrawPool::DrawOrder::FIFTH);
     m_shader = g_shaders.getDefaultMapShader();
 
     setVisibleDimension(Size(15, 11));
@@ -199,7 +200,7 @@ void MapView::drawFloor()
                 missile->drawMissile(transformPositionTo2D(missile->getPosition(), cameraPosition), m_scaleFactor, lightView);
 
             if (m_shadowFloorIntensity > 0 && z == cameraPosition.z + 1) {
-                g_drawPool.addFilledRect(m_rectDimension, Color::black);
+                g_drawPool.addFilledRect(m_rectDimension, Color::black, m_shadowBuffer);
                 g_drawPool.setOpacity(m_shadowFloorIntensity, true);
             }
 
