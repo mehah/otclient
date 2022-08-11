@@ -9,7 +9,7 @@ Panel
     margin-left: 10
 
   Label
-    !text: tr('Sell Offers')
+    !text: tr('Sell History')
     font: verdana-11px-rounded
     text-offset: 0 2
     anchors.top: parent.top
@@ -72,7 +72,7 @@ Panel
     pixels-scroll: true
 
   Label
-    !text: tr('Buy Offers')
+    !text: tr('Buy History')
     font: verdana-11px-rounded
     text-offset: 0 2
     anchors.top: myHistorySellingTable.bottom
