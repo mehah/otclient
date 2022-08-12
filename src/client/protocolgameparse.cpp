@@ -479,6 +479,9 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerSendRewardHistory:
                     parseRewardHistory(msg);
                     break;
+                case Proto::GameServerSendPreyFreeRerolls:
+                    parsePreyFreeRerolls(msg);
+                    break;
                 case Proto::GameServerSendPreyTimeLeft:
                     parsePreyTimeLeft(msg);
                     break;
@@ -3172,33 +3175,39 @@ void ProtocolGame::parseRewardHistory(const InputMessagePtr& msg)
 
     // TODO: implement reward history usage
 }
+
+void ProtocolGame::parsePreyFreeRerolls(const InputMessagePtr& msg)
+{
+    int slot = msg->getU8();
+    int timeLeft = msg->getU16();
+
+    g_lua.callGlobalField("g_game", "onPreyFreeRerolls", slot, timeLeft);
+}
+
 void ProtocolGame::parsePreyTimeLeft(const InputMessagePtr& msg)
 {
-    msg->getU8(); // Slot
-    msg->getU16(); // Time left
-    // TODO: implement protocol parse
+    int slot = msg->getU8();
+    int timeLeft = msg->getU16();
+
+    g_lua.callGlobalField("g_game", "onPreyTimeLeft", slot, timeLeft);
 }
 
-void ProtocolGame::getPreyMonster(const InputMessagePtr& msg)
+ProtocolGame::PreyMonster ProtocolGame::getPreyMonster(const InputMessagePtr& msg)
 {
-    msg->getString(); // mosnter name
-    const uint16_t lookType = msg->getU16(); // looktype
-    if (lookType == 0) {
-        msg->getU16(); // LookTypeEx
-        return;
-    }
-    msg->getU8(); // head
-    msg->getU8(); // body
-    msg->getU8(); // legs
-    msg->getU8(); // feet
-    msg->getU8(); // addons
+    PreyMonster monster;
+    monster.name = msg->getString(); // monster name
+    monster.outfit = getOutfit(msg, false);
+    return monster;
 }
 
-void ProtocolGame::getPreyMonsters(const InputMessagePtr& msg)
+std::vector<ProtocolGame::PreyMonster> ProtocolGame::getPreyMonsters(const InputMessagePtr& msg)
 {
+    std::vector<PreyMonster> monsters;
     const uint8_t monstersSize = msg->getU8(); // monster list size
     for (uint8_t i = 0; i < monstersSize; i++)
-        getPreyMonster(msg);
+        monsters.push_back(getPreyMonster(msg));
+    
+    return monsters;
 }
 
 void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
@@ -3209,69 +3218,103 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
     switch (state) {
         case Otc::PREY_STATE_LOCKED:
         {
-            msg->getU8(); // prey slot unlocked
-            break;
+            Otc::PreyUnlockState_t unlockState = (Otc::PreyUnlockState_t)msg->getU8(); // prey slot unlocked
+            int nextFreeReroll = msg->getU32(); // next free roll
+            int wildcards = msg->getU8(); // wildcards
+            return g_lua.callGlobalField("g_game", "onPreyLocked", slot, unlockState, nextFreeReroll, wildcards);
         }
         case Otc::PREY_STATE_INACTIVE:
-            break;
+        {
+            int nextFreeReroll = msg->getU32(); // next free roll
+            int wildcards = msg->getU8(); // wildcards
+            return g_lua.callGlobalField("g_game", "onPreyInactive", slot, nextFreeReroll, wildcards);
+        }
         case Otc::PREY_STATE_ACTIVE:
         {
-            getPreyMonster(msg);
-            msg->getU8(); // bonus type
-            msg->getU16(); // bonus value
-            msg->getU8(); // bonus grade
-            msg->getU16(); // time left
-            break;
+            PreyMonster monster = getPreyMonster(msg);
+            int bonusType = msg->getU8(); // bonus type
+            int bonusValue = msg->getU16(); // bonus value
+            int bonusGrade = msg->getU8(); // bonus grade
+            int timeLeft = msg->getU16(); // time left
+            int nextFreeReroll = msg->getU32(); // next free roll
+            int wildcards = msg->getU8(); // wildcards
+            return g_lua.callGlobalField("g_game", "onPreyActive", slot, monster.name, monster.outfit, bonusType, bonusValue, bonusGrade, timeLeft, nextFreeReroll, wildcards);
         }
         case Otc::PREY_STATE_SELECTION:
         {
-            getPreyMonsters(msg);
-            break;
+            std::vector<PreyMonster> monsters = getPreyMonsters(msg);
+            std::vector<std::string_view> names;
+            std::vector<Outfit> outfits;
+            for (int i = 0; i < monsters.size(); ++i) {
+                const auto it = monsters.at(i);
+                std::string_view monsterName = it.name;
+                Outfit monsterOutfit = it.outfit;
+                names.push_back(monsterName);
+                outfits.push_back(monsterOutfit);
+            }
+            int nextFreeReroll = msg->getU32(); // next free roll
+            int wildcards = msg->getU8(); // wildcards
+            return g_lua.callGlobalField("g_game", "onPreySelection", slot, names, outfits, nextFreeReroll, wildcards);
         }
         case Otc::PREY_STATE_SELECTION_CHANGE_MONSTER:
         {
-            msg->getU8(); // bonus type
-            msg->getU16(); // bonus value
-            msg->getU8(); // bonus grade
-            getPreyMonsters(msg);
-            break;
+            int bonusType = msg->getU8(); // bonus type
+            int bonusValue = msg->getU16(); // bonus value
+            int bonusGrade = msg->getU8(); // bonus grade
+            std::vector<PreyMonster> monsters = getPreyMonsters(msg);
+            std::vector<std::string_view> names;
+            std::vector<Outfit> outfits;
+            for (int i = 0; i < monsters.size(); ++i) {
+                const auto it = monsters.at(i);
+                std::string_view monsterName = it.name;
+                Outfit monsterOutfit = it.outfit;
+                names.push_back(monsterName);
+                outfits.push_back(monsterOutfit);
+            }
+            int nextFreeReroll = msg->getU32(); // next free roll
+            int wildcards = msg->getU8(); // wildcards
+            return g_lua.callGlobalField("g_game", "onPreySelectionChangeMonster", slot, names, outfits, bonusType, bonusValue, bonusGrade, nextFreeReroll, wildcards);
         }
         case Otc::PREY_STATE_LIST_SELECTION:
         {
+            std::vector<int> races;
             const uint16_t creatures = msg->getU16();
             for (uint16_t i = 0; i < creatures; i++) {
-                msg->getU16(); // RaceID
+                races.push_back(msg->getU16()); // RaceID
             }
-            break;
+            int nextFreeReroll = msg->getU32(); // next free roll
+            int wildcards = msg->getU8(); // wildcards
+            return g_lua.callGlobalField("g_game", "onPreyListSelection", slot, races, nextFreeReroll, wildcards);
         }
         case Otc::PREY_STATE_WILDCARD_SELECTION:
         {
-            msg->getU8(); // bonus type
-            msg->getU16(); // bonus value
-            msg->getU8(); // bonus grade
+            int bonusType = msg->getU8(); // bonus type
+            int bonusValue = msg->getU16(); // bonus value
+            int bonusGrade = msg->getU8(); // bonus grade
+            std::vector<int> races;
             const uint16_t creatures = msg->getU16();
             for (uint16_t i = 0; i < creatures; i++) {
-                msg->getU16(); // RaceID
+                races.push_back(msg->getU16()); // RaceID
             }
-            break;
+            int nextFreeReroll = msg->getU32(); // next free roll
+            int wildcards = msg->getU8(); // wildcards
+            return g_lua.callGlobalField("g_game", "onPreyWildcardSelection", slot, races, nextFreeReroll, wildcards);
         }
     }
-
-    msg->getU32(); // next free roll
-    msg->getU8(); // wildcards
 }
 
 void ProtocolGame::parsePreyRerollPrice(const InputMessagePtr& msg)
 {
-    msg->getU32(); // reroll price
-    msg->getU8(); // wildcard
-    msg->getU8(); // selectCreatureDirectly price (5 in tibia)
-
-    // Prey Task
-    msg->getU32();
-    msg->getU32();
-    msg->getU8();
-    msg->getU8();
+    int price = msg->getU32(); //reroll price
+    int wildcard = msg->getU8(); // wildcard
+    int directly = msg->getU8(); // selectCreatureDirectly price (5 in tibia)
+    if (g_game.getProtocolVersion() >= 1230) { // prey task
+        msg->getU32();
+        msg->getU32();
+        msg->getU8();
+        msg->getU8();
+    }
+    g_lua.callGlobalField("g_game", "onPreyRerollPrice", price, wildcard, directly);
 }
 
 void ProtocolGame::getImbuementInfo(const InputMessagePtr& msg)

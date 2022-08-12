@@ -153,6 +153,7 @@ GameIngameStoreHighlights = 74
 GameIngameStoreServiceType = 75
 GameAdditionalSkills = 76
 GameDistanceEffectU16 = 77
+GamePrey = 82
 
 TextColors = {
     red = '#f55e5e', -- '#c83200'

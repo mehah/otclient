@@ -350,6 +350,13 @@ namespace Otc
         MessageInvalid = 255
     };
 
+    enum PreySlotNum_t : uint8_t {
+        PREY_SLOTNUM_FIRST = 0,
+        PREY_SLOTNUM_SECOND = 1,
+        PREY_SLOTNUM_THIRD = 2,
+        PREY_SLOTNUM_LAST = PREY_SLOTNUM_THIRD
+    };
+
     enum PreyState_t : uint8_t
     {
         PREY_STATE_LOCKED = 0,
@@ -369,6 +376,50 @@ namespace Otc
         PREY_TASK_STATE_LIST_SELECTION = 3,
         PREY_TASK_STATE_ACTIVE = 4,
         PREY_TASK_STATE_COMPLETED = 5
+    };
+
+    enum PreyMessageDialog_t : uint8_t {
+        //PREY_MESSAGEDIALOG_IMBUEMENT_SUCCESS = 0,
+        //PREY_MESSAGEDIALOG_IMBUEMENT_ERROR = 1,
+        //PREY_MESSAGEDIALOG_IMBUEMENT_ROLL_FAILED = 2,
+        //PREY_MESSAGEDIALOG_IMBUEMENT_STATION_NOT_FOUND = 3,
+        //PREY_MESSAGEDIALOG_IMBUEMENT_CHARM_SUCCESS = 10,
+        //PREY_MESSAGEDIALOG_IMBUEMENT_CHARM_ERROR = 11,
+        PREY_MESSAGEDIALOG_PREY_MESSAGE = 20,
+        PREY_MESSAGEDIALOG_PREY_ERROR = 21,
+    };
+    enum PreyResourceType_t : uint8_t {
+        PREY_RESOURCETYPE_BANK_GOLD = 0,
+        PREY_RESOURCETYPE_INVENTORY_GOLD = 1,
+        PREY_RESOURCETYPE_PREY_BONUS_REROLLS = 10
+    };
+    enum PreyBonusType_t : uint8_t {
+        PREY_BONUS_DAMAGE_BOOST = 0,
+        PREY_BONUS_DAMAGE_REDUCTION = 1,
+        PREY_BONUS_XP_BONUS = 2,
+        PREY_BONUS_IMPROVED_LOOT = 3,
+        PREY_BONUS_NONE = 4, // internal usage but still added to client;
+        PREY_BONUS_FIRST = PREY_BONUS_DAMAGE_BOOST,
+        PREY_BONUS_LAST = PREY_BONUS_IMPROVED_LOOT,
+    };
+    enum PreyAction_t : uint8_t {
+        PREY_ACTION_LISTREROLL = 0,
+        PREY_ACTION_BONUSREROLL = 1,
+        PREY_ACTION_MONSTERSELECTION = 2,
+        PREY_ACTION_REQUEST_ALL_MONSTERS = 3,
+        PREY_ACTION_CHANGE_FROM_ALL = 4,
+        PREY_ACTION_LOCK_PREY = 5,
+
+    };
+    enum PreyConfigState {
+        PREY_CONFIG_STATE_FREE,
+        PREY_CONFIG_STATE_PREMIUM,
+        PREY_CONFIG_STATE_TIBIACOINS
+    };
+    enum PreyUnlockState_t : uint8_t {
+        PREY_UNLOCK_STORE_AND_PREMIUM = 0,
+        PREY_UNLOCK_STORE = 1,
+        PREY_UNLOCK_NONE = 2,
     };
 
     enum GameFeature : uint8_t
@@ -452,6 +503,7 @@ namespace Otc
         GameSoul = 79,
         GameMapOldEffectRendering = 80,
         GameMapDontCorrectCorpse = 81,
+        GamePrey = 82,
 
         LastGameFeature = 101
     };

@@ -1725,6 +1725,10 @@ void Game::setClientVersion(int version)
     if (version >= 1094) {
         enableFeature(Otc::GameAdditionalSkills);
     }
+	
+    if (version >= 	1200) {
+        enableFeature(Otc::GamePrey);
+    }
 
     if (version >= 1281) {
         disableFeature(Otc::GameEnvironmentEffect);
@@ -1794,4 +1798,20 @@ Otc::OperatingSystem_t Game::getOs()
         return Otc::CLIENTOS_OTCLIENT_MAC;
 
     return Otc::CLIENTOS_OTCLIENT_LINUX;
+}
+
+void Game::preyAction(int slot, int actionType, int index)
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendPreyAction(slot, actionType, index);
+}
+
+void Game::preyRequest()
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendPreyRequest();
 }

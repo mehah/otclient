@@ -6,6 +6,7 @@ Module
   sandboxed: true
   scripts: [ widgets/uigamemap, widgets/uiitem, gameinterface ]
   load-later:
+    - game_prey
     - game_hotkeys
     - game_questlog
     - game_textmessage

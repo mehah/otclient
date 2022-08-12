@@ -978,3 +978,25 @@ void ProtocolGame::addPosition(const OutputMessagePtr& msg, const Position& posi
     msg->addU16(position.y);
     msg->addU8(position.z);
 }
+
+void ProtocolGame::sendPreyAction(int slot, int actionType, int index)
+{
+    OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientPreyAction);
+    msg->addU8(slot);
+    msg->addU8(actionType);
+    if (actionType == 2 || actionType == 5) {
+        msg->addU8(index);
+    }
+    else if (actionType == 4) {
+        msg->addU16(index); // raceid
+    }
+    send(msg);
+}
+
+void ProtocolGame::sendPreyRequest()
+{
+    OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientPreyRequest);
+    send(msg);
+}

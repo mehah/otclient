@@ -359,6 +359,10 @@ public:
         return m_lastSupportedVersion;
     }
 
+    // prey related
+    void preyAction(int slot, int actionType, int index);
+    void preyRequest();
+
 protected:
     void enableBotCall() { m_denyBotCall = false; }
     void disableBotCall() { m_denyBotCall = true; }

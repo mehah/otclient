@@ -118,6 +118,8 @@ public:
     void sendOpenStore(int serviceType, const std::string_view category);
     void sendTransferCoins(const std::string_view recipient, int amount);
     void sendOpenTransactionHistory(int entriesPerPage);
+    void sendPreyAction(int slot, int actionType, int index);
+    void sendPreyRequest();
 
     // otclient only
     void sendChangeMapAwareRange(int xrange, int yrange);
@@ -269,15 +271,30 @@ private:
     void parseOpenRewardWall(const InputMessagePtr& msg);
     void parseDailyReward(const InputMessagePtr& msg);
     void parseRewardHistory(const InputMessagePtr& msg);
+    void parsePreyFreeRerolls(const InputMessagePtr& msg);
     void parsePreyTimeLeft(const InputMessagePtr& msg);
-    void getPreyMonster(const InputMessagePtr& msg);
-    void getPreyMonsters(const InputMessagePtr& msg);
     void parsePreyData(const InputMessagePtr& msg);
     void parsePreyRerollPrice(const InputMessagePtr& msg);
     void getImbuementInfo(const InputMessagePtr& msg);
     void parseImbuementWindow(const InputMessagePtr& msg);
     void parseCloseImbuementWindow(const InputMessagePtr& msg);
     void parseError(const InputMessagePtr& msg);
+<<<<<<< HEAD
+=======
+    void parseMarketEnter(const InputMessagePtr& msg);
+    void parseMarketEnterOld(const InputMessagePtr& msg);
+    void parseMarketDetail(const InputMessagePtr& msg);
+    void parseMarketBrowse(const InputMessagePtr& msg);
+    Otc::MarketOffer readMarketOffer(const InputMessagePtr& msg, int action, int var);
+    
+    struct PreyMonster {
+    public:
+        std::string_view name;
+        Outfit outfit;
+    };
+    PreyMonster getPreyMonster(const InputMessagePtr& msg);
+    std::vector<PreyMonster> getPreyMonsters(const InputMessagePtr& msg);
+>>>>>>> cd09bd63 (game_prey draft)
 
 public:
     void setMapDescription(const InputMessagePtr& msg, int x, int y, int z, int width, int height);
