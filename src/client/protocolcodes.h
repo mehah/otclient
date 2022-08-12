@@ -282,6 +282,9 @@ namespace Proto
         ClientRequestOutfit = 210,
         ClientChangeOutfit = 211,
         ClientMount = 212, // 870
+        ClientApplyImbuement = 213,
+        ClientClearImbuement = 214,
+        ClientCloseImbuingWindow = 215,
         ClientAddVip = 220,
         ClientRemoveVip = 221,
         ClientEditVip = 222,

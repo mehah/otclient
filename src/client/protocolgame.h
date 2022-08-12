@@ -118,6 +118,9 @@ public:
     void sendOpenStore(int serviceType, const std::string_view category);
     void sendTransferCoins(const std::string_view recipient, int amount);
     void sendOpenTransactionHistory(int entriesPerPage);
+    void sendApplyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm);
+    void sendClearImbuement(uint8_t slot);
+    void sendCloseImbuingWindow();
 
     // otclient only
     void sendChangeMapAwareRange(int xrange, int yrange);
@@ -274,7 +277,7 @@ private:
     void getPreyMonsters(const InputMessagePtr& msg);
     void parsePreyData(const InputMessagePtr& msg);
     void parsePreyRerollPrice(const InputMessagePtr& msg);
-    void getImbuementInfo(const InputMessagePtr& msg);
+    Imbuement getImbuementInfo(const InputMessagePtr& msg);
     void parseImbuementWindow(const InputMessagePtr& msg);
     void parseCloseImbuementWindow(const InputMessagePtr& msg);
     void parseError(const InputMessagePtr& msg);

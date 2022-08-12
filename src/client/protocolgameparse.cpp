@@ -3274,68 +3274,81 @@ void ProtocolGame::parsePreyRerollPrice(const InputMessagePtr& msg)
     msg->getU8();
 }
 
-void ProtocolGame::getImbuementInfo(const InputMessagePtr& msg)
+Imbuement ProtocolGame::getImbuementInfo(const InputMessagePtr& msg)
 {
-    msg->getU32(); // imbuid
-    msg->getString(); // name
-    msg->getString(); // description
-    msg->getString(); // subgroup
+    Imbuement imbuement;
+    imbuement.id = msg->getU32(); // imbuid
+    imbuement.name = msg->getString(); // name
+    imbuement.description = msg->getString(); // description
+    imbuement.group = msg->getString(); // subgroup
 
-    msg->getU16(); // iconId
-    msg->getU32(); // duration
+    imbuement.imageId = msg->getU16(); // iconId
+    imbuement.duration =  msg->getU32(); // duration
 
-    msg->getU8(); // is premium
+    imbuement.premiumOnly = msg->getU8(); // is premium
 
     const uint8_t itemsSize = msg->getU8(); // items size
     for (uint8_t i = 0; i < itemsSize; i++) {
-        msg->getU16(); // item client ID
-        msg->getString(); // item name
-        msg->getU16(); // count
+        int id = msg->getU16(); // item client ID
+        std::string_view description = msg->getString(); // item name
+        int count = msg->getU16(); // count
+        ItemPtr item = Item::create(id);
+        item->setCount(count);
+        imbuement.sources.push_back(std::make_pair(item, description));
     }
 
-    msg->getU32(); // base price
-    msg->getU8(); // base percent
-    msg->getU32(); // base protection
+    imbuement.cost = msg->getU32(); // base price
+    imbuement.successRate = msg->getU8(); // base percent
+    imbuement.protectionCost = msg->getU32(); // base protection
+    return imbuement;
 }
 
 void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
 {
     uint16_t itemId = msg->getU16(); // item client ID
     const ItemPtr item = Item::create(itemId);
+    uint8_t upgradeClass = 0;
     if (item->getId() == 0)
         throw Exception("unable to create item with invalid id %d", itemId);
 
     if (item->getClassification() > 0) {
-        msg->getU8();
+        upgradeClass = msg->getU8();
     }
 
     const uint8_t slot = msg->getU8(); // slot id
+    std::map<int, std::tuple<Imbuement, int, int>> activeSlots;
     for (uint8_t i = 0; i < slot; i++) {
         const uint8_t firstByte = msg->getU8();
         if (firstByte == 0x01) {
-            getImbuementInfo(msg);
-            msg->getU32(); // info >> 8
-            msg->getU32(); // removecust
+            Imbuement imbuement = getImbuementInfo(msg);
+            int duration = msg->getU32(); // duration
+            int removalCost = msg->getU32(); // removecost
+            activeSlots[i] = std::make_tuple(imbuement, duration, removalCost);
         }
     }
 
     const uint16_t imbSize = msg->getU16(); // imbuement size
+    std::vector<Imbuement> imbuements;
     for (uint16_t i = 0; i < imbSize; i++) {
-        getImbuementInfo(msg);
+        imbuements.push_back(getImbuementInfo(msg));
     }
 
     const uint32_t neededItemsSize = msg->getU32(); // needed items size
+    std::vector<ItemPtr> needItems;
     for (uint32_t i = 0; i < neededItemsSize; i++) {
-        msg->getU16(); // item client id
-        msg->getU16(); // item count
+        int needItemId = msg->getU16();
+        int count = msg->getU16();
+        ItemPtr item = Item::create(needItemId);
+        item->setCount(count);
+        needItems.push_back(item);
     }
 
-    // TODO: implement imbuement window usage
+    g_lua.callGlobalField("g_game", "onImbuementWindow", itemId, slot, activeSlots, imbuements, needItems);
 }
 
 void ProtocolGame::parseCloseImbuementWindow(const InputMessagePtr& /*msg*/)
 {
-    // TODO: implement close imbuement window usage
+    g_lua.callGlobalField("g_game", "onCloseImbuementWindow");
 }
 
 void ProtocolGame::parseError(const InputMessagePtr& msg)

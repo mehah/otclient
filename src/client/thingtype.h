@@ -113,6 +113,20 @@ enum ThingAttr : uint8_t
     ThingLastAttr = 255
 };
 
+struct Imbuement {
+    int id;
+    std::string_view name;
+    std::string_view description;
+    std::string_view group;
+    int imageId;
+    int duration;
+    bool premiumOnly;
+    std::vector<std::pair<ItemPtr, std::string_view>> sources;
+    int cost;
+    int successRate;
+    int protectionCost;
+};
+
 enum SpriteMask
 {
     SpriteMaskRed = 1,

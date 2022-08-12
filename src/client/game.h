@@ -359,6 +359,11 @@ public:
         return m_lastSupportedVersion;
     }
 
+    // imbuing related
+    void applyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm);
+    void clearImbuement(uint8_t slot);
+    void closeImbuingWindow();
+
 protected:
     void enableBotCall() { m_denyBotCall = false; }
     void disableBotCall() { m_denyBotCall = true; }
