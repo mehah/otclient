@@ -364,6 +364,10 @@ public:
     void cancelMarketOffer(uint32_t timestamp, uint16_t counter);
     void acceptMarketOffer(uint32_t timestamp, uint16_t counter, uint16_t amount);
 
+    // prey related
+    void preyAction(int slot, int actionType, int index);
+    void preyRequest();
+
 protected:
     void enableBotCall() { m_denyBotCall = false; }
     void disableBotCall() { m_denyBotCall = true; }

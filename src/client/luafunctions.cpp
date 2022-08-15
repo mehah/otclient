@@ -322,6 +322,8 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "createMarketOffer", &Game::createMarketOffer, &g_game);
     g_lua.bindSingletonFunction("g_game", "cancelMarketOffer", &Game::cancelMarketOffer, &g_game);
     g_lua.bindSingletonFunction("g_game", "acceptMarketOffer", &Game::acceptMarketOffer, &g_game);
+    g_lua.bindSingletonFunction("g_game", "preyAction", &Game::preyAction, &g_game);
+    g_lua.bindSingletonFunction("g_game", "preyRequest", &Game::preyRequest, &g_game);
 
     g_lua.registerSingletonClass("g_shaders");
     g_lua.bindSingletonFunction("g_shaders", "createShader", &ShaderManager::createShader, &g_shaders);

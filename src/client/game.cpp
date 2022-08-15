@@ -1725,6 +1725,10 @@ void Game::setClientVersion(int version)
     if (version >= 1094) {
         enableFeature(Otc::GameAdditionalSkills);
     }
+	
+    if (version >= 	1200) {
+        enableFeature(Otc::GamePrey);
+    }
 
     if (version >= 1281) {
         disableFeature(Otc::GameEnvironmentEffect);
@@ -1820,4 +1824,20 @@ void Game::cancelMarketOffer(uint32_t timestamp, uint16_t counter)
 void Game::acceptMarketOffer(uint32_t timestamp, uint16_t counter, uint16_t amount)
 {
     m_protocolGame->sendMarketAcceptOffer(timestamp, counter, amount);
+}
+
+void Game::preyAction(uint8_t slot, uint8_t actionType, uint16_t index)
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendPreyAction(slot, actionType, index);
+}
+
+void Game::preyRequest()
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendPreyRequest();
 }

@@ -1036,3 +1036,24 @@ void ProtocolGame::sendMarketAcceptOffer(uint32_t timestamp, uint16_t counter, u
     msg->addU16(amount);
     send(msg);
 }
+
+void ProtocolGame::sendPreyAction(uint8_t slot, uint8_t actionType, uint16_t index)
+{
+    OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientPreyAction);
+    msg->addU8(slot);
+    msg->addU8(actionType);
+    if (actionType == 2 || actionType == 5) {
+        msg->addU8(index);
+    }
+    else if (actionType == 4) {
+        msg->addU16(index); // raceid
+    send(msg);
+}
+
+void ProtocolGame::sendPreyRequest()
+{
+    OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientPreyRequest);
+    send(msg);
+}
