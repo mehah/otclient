@@ -147,7 +147,7 @@ public:
     bool isAnchored();
     bool isChildLocked(const UIWidgetPtr& child);
     bool hasChild(const UIWidgetPtr& child);
-    int getChildIndex() { return m_childIndex; }
+    int getChildIndex(const UIWidgetPtr& child) { return child && child->getParent() == this ? m_childIndex + 1 : -1; }
     Rect getPaddingRect();
     Rect getMarginRect();
     Rect getChildrenRect();
