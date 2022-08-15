@@ -622,7 +622,6 @@ namespace Otc
         OLD_MARKETREQUEST_MY_HISTORY = 0xFFFF,
     };
 
-
     enum MarketOfferState : uint8_t
     {
         OFFER_STATE_ACTIVE = 0,
@@ -630,18 +629,5 @@ namespace Otc
         OFFER_STATE_EXPIRED = 2,
         OFFER_STATE_ACCEPTED = 3,
         OFFER_STATE_ACCEPTEDEX = 255
-    };
-
-    struct MarketOffer {
-    public:
-        uint32_t timestamp = 0;
-        uint16_t counter = 0;
-        uint8_t action = 0;
-        uint16_t itemId = 0;
-        uint16_t amount = 0;
-        uint64_t price = 0;
-        std::string playerName;
-        uint8_t state = 0;
-        uint16_t var = 0;
     };
 }

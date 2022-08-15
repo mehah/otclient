@@ -30,7 +30,6 @@
 #include "outfit.h"
 #include "protocolgame.h"
 #include <framework/core/timer.h>
-
 #include <bitset>
 
 struct UnjustifiedPoints

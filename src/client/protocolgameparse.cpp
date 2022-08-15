@@ -24,7 +24,7 @@
 
 #include "effect.h"
 #include "framework/net/inputmessage.h"
-#include "game.h"
+
 #include "item.h"
 #include "localplayer.h"
 #include "luavaluecasts.h"
@@ -501,7 +501,7 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerMarketEnter:
                     if (g_game.getClientVersion() >= 1281)
                         parseMarketEnter(msg);
-                     else
+                    else
                         parseMarketEnterOld(msg);
                     break;
                 case Proto::GameServerMarketDetail:
@@ -662,7 +662,7 @@ void ProtocolGame::parseCoinBalance(const InputMessagePtr& msg)
         // or be transfered to another player
         uint32_t transferrableCoins = msg->getU32(); // transferableCoins
         m_localPlayer->setResourceBalance(Otc::RESOURE_COIN_TRANSFERRABLE, transferrableCoins);
-        
+
         if (g_game.getClientVersion() >= 1281) {
             uint32_t auctionCoins = msg->getU32();
             m_localPlayer->setResourceBalance(Otc::RESOURE_COIN_AUCTION, auctionCoins);
@@ -3370,63 +3370,60 @@ void ProtocolGame::parseError(const InputMessagePtr& msg)
 
 void ProtocolGame::parseMarketEnter(const InputMessagePtr& msg)
 {
-    uint8_t offers = msg->getU8();
-    uint16_t depotLocker = msg->peekU16();
-    if (depotLocker == 0x00)
-    {
+    const uint8_t offers = msg->getU8();
+    const uint16_t depotLocker = msg->peekU16();
+    if (depotLocker == 0x00) {
         return;
     }
+
     std::vector<std::vector<uint16_t>> depotItems;
-    uint16_t itemsSent = msg->getU16();
+    const uint16_t itemsSent = msg->getU16();
     for (int i = 0; i < itemsSent; i++) {
-        uint16_t itemId = msg->getU16();
+        const uint16_t itemId = msg->getU16();
+        const ItemPtr& item = Item::create(itemId);
+        const uint16_t classification = item->getClassification();
+
         uint8_t itemClass = 0;
-        ItemPtr item = Item::create(itemId);
-        uint16_t classification = item->getClassification();
         if (classification > 0) {
             itemClass = msg->getU8();
         }
-        uint16_t count = msg->getU16();
+
+        const uint16_t count = msg->getU16();
         depotItems.push_back({ itemId, count, itemClass });
     }
-    
+
     g_lua.callGlobalField("g_game", "onMarketEnter", depotItems, offers, -1, -1);
 }
 
 void ProtocolGame::parseMarketEnterOld(const InputMessagePtr& msg)
 {
-    uint64_t balance = 0;
-    if (g_game.getClientVersion() >= 981)
-        balance = msg->getU64();
-    else
-        balance = msg->getU32();
-    uint8_t vocation = 0;
-    if (g_game.getClientVersion() < 950)
-        vocation = msg->getU8(); //get vocation id
-    else
-        vocation = g_game.getLocalPlayer()->getVocation();
-    uint8_t offers = msg->getU8();
+    const uint64_t balance = g_game.getClientVersion() >= 981 ? msg->getU64() : msg->getU32();
+    const uint8_t vocation = g_game.getClientVersion() < 950 ? msg->getU8() : g_game.getLocalPlayer()->getVocation();
+
+    const uint8_t offers = msg->getU8();
+    const uint16_t itemsSent = msg->getU16();
+
     std::map<uint16_t, uint16_t> depotItems;
-    uint16_t itemsSent = msg->getU16();
     for (int i = 0; i < itemsSent; i++) {
-        uint16_t itemId = msg->getU16();
-        uint16_t count = msg->getU16();
+        const uint16_t itemId = msg->getU16();
+        const uint16_t count = msg->getU16();
         depotItems.emplace(itemId, count);
     }
+
     g_lua.callGlobalField("g_game", "onMarketEnter", depotItems, offers, balance, vocation);
 }
 
 void ProtocolGame::parseMarketDetail(const InputMessagePtr& msg)
 {
-    uint16_t itemId = msg->getU16();
+    const uint16_t itemId = msg->getU16();
     if (g_game.getClientVersion() >= 1281) {
-        ItemPtr item = Item::create(itemId);
+        const ItemPtr& item = Item::create(itemId);
         if (item and item->getClassification() > 0) {
-            msg->getU8();
+            msg->getU8();  // ?
         }
     }
 
-    std::map<int, std::string_view> descriptions = {};
+    std::map<int, std::string_view> descriptions;
     Otc::MarketItemDescription lastAttribute = Otc::ITEM_DESC_WEIGHT;
     if (g_game.getClientVersion() >= 1200)
         lastAttribute = Otc::ITEM_DESC_IMBUINGSLOTS;
@@ -3434,19 +3431,20 @@ void ProtocolGame::parseMarketDetail(const InputMessagePtr& msg)
         lastAttribute = Otc::ITEM_DESC_UPGRADECLASS;
     if (g_game.getClientVersion() >= 1282)
         lastAttribute = Otc::ITEM_DESC_LAST;
+
     for (int i = Otc::ITEM_DESC_FIRST; i <= lastAttribute; i++) {
         if (msg->peekU16() != 0x00) {
-            std::string_view sentString = msg->getString();
+            const auto sentString = msg->getString();
             descriptions.emplace(i, sentString);
-        }
-        else {
+        } else {
             msg->getU16();
         }
     }
-    uint32_t timeThing = (time(NULL) / 1000) * 86400;
 
-    std::vector<std::vector<uint64_t>> purchaseStats = {};
-    uint8_t count = msg->getU8();
+    const uint32_t timeThing = (time(NULL) / 1000) * 86400;
+
+    std::vector<std::vector<uint64_t>> purchaseStats;
+    const uint8_t count = msg->getU8();
     if (count >= 1) {
         for (int i = 0; i < count; i++) {
             uint32_t transactions = msg->getU32();
@@ -3457,20 +3455,20 @@ void ProtocolGame::parseMarketDetail(const InputMessagePtr& msg)
                 totalPrice = msg->getU64();
                 highestPrice = msg->getU64();
                 lowestPrice = msg->getU64();
-            }
-            else {
+            } else {
                 totalPrice = msg->getU32();
                 highestPrice = msg->getU32();
                 lowestPrice = msg->getU32();
             }
 
-            uint32_t tmp = timeThing - 86400;
+            const uint32_t tmp = timeThing - 86400;
             purchaseStats.push_back({ tmp, Otc::MARKETACTION_BUY, transactions, totalPrice, highestPrice, lowestPrice });
         }
     }
 
-    std::vector<std::vector<uint64_t>> saleStats = {};
-    uint8_t count2 = msg->getU8();
+    std::vector<std::vector<uint64_t>> saleStats;
+
+    const uint8_t count2 = msg->getU8();
     if (count2 >= 1) {
         for (int i = 1; count2; i++) {
             uint32_t transactions = msg->getU32();
@@ -3481,14 +3479,13 @@ void ProtocolGame::parseMarketDetail(const InputMessagePtr& msg)
                 totalPrice = msg->getU64();
                 highestPrice = msg->getU64();
                 lowestPrice = msg->getU64();
-            }
-            else {
+            } else {
                 totalPrice = msg->getU32();
                 highestPrice = msg->getU32();
                 lowestPrice = msg->getU32();
             }
 
-            uint32_t tmp = timeThing - 86400;
+            const uint32_t tmp = timeThing - 86400;
             saleStats.push_back({ tmp, Otc::MARKETACTION_SELL, transactions, totalPrice, highestPrice, lowestPrice });
         }
     }
@@ -3496,52 +3493,37 @@ void ProtocolGame::parseMarketDetail(const InputMessagePtr& msg)
     g_lua.callGlobalField("g_game", "onMarketDetail", itemId, descriptions, purchaseStats, saleStats);
 }
 
-Otc::MarketOffer ProtocolGame::readMarketOffer(const InputMessagePtr& msg, int action, int var)
+MarketOffer ProtocolGame::readMarketOffer(const InputMessagePtr& msg, uint8_t action, uint16_t var)
 {
-    uint32_t timestamp = msg->getU32();
-    uint16_t counter = msg->getU16();
+    const uint32_t timestamp = msg->getU32();
+    const uint16_t counter = msg->getU16();
     uint16_t itemId = 0;
     if (var == Otc::OLD_MARKETREQUEST_MY_OFFERS || var == Otc::MARKETREQUEST_OWN_OFFERS || var == Otc::OLD_MARKETREQUEST_MY_HISTORY || var == Otc::MARKETREQUEST_OWN_HISTORY) {
         itemId = msg->getU16();
         if (g_game.getClientVersion() >= 1281) {
-            ItemPtr item = Item::create(itemId);
+            const ItemPtr& item = Item::create(itemId);
             if (item && item->getClassification() > 0) {
                 msg->getU8();
             }
         }
-    }
-    else {
+    } else {
         itemId = var;
     }
-    uint16_t amount = msg->getU16();
-    uint64_t price = 0;
-    if (g_game.getClientVersion() >= 1281) {
-        price = msg->getU64();
-    }
-    else {
-        price = msg->getU32();
-    }
+
+    const uint16_t amount = msg->getU16();
+    const uint64_t price = g_game.getClientVersion() >= 1281 ? msg->getU64() : msg->getU32();
+
     std::string playerName = "";
     uint8_t state = Otc::OFFER_STATE_ACTIVE;
     if (var == Otc::OLD_MARKETREQUEST_MY_HISTORY || var == Otc::MARKETREQUEST_OWN_HISTORY) {
         state = msg->getU8();
+    } else if (var == Otc::OLD_MARKETREQUEST_MY_OFFERS || var == Otc::MARKETREQUEST_OWN_OFFERS) {} else {
+        playerName = std::string{ msg->getString() };
     }
-    else if (var == Otc::OLD_MARKETREQUEST_MY_OFFERS || var == Otc::MARKETREQUEST_OWN_OFFERS) {}
-    else {
-        playerName = msg->getString();
-    }
-    Otc::MarketOffer offer;
-    offer.action = action;
-    offer.amount = amount;
-    offer.counter = counter;
-    offer.itemId = itemId;
-    offer.playerName = playerName;
-    offer.price = price;
-    offer.state = state;
-    offer.timestamp = timestamp;
-    offer.var = var;
 
+    const MarketOffer offer{ timestamp, counter, action, itemId, amount, price, playerName, state, var };
     g_lua.callGlobalField("g_game", "onMarketReadOffer", action, amount, counter, itemId, playerName, price, state, timestamp, var);
+
     return offer;
 }
 
@@ -3552,31 +3534,30 @@ void ProtocolGame::parseMarketBrowse(const InputMessagePtr& msg)
         var = msg->getU8();
         if (var == 3) {
             var = msg->getU16();
-            ItemPtr item = Item::create(var);
+            const ItemPtr& item = Item::create(var);
             if (item && item->getClassification() > 0) {
                 msg->getU8();
             }
         }
-    }
-    else {
+    } else {
         var = msg->getU16();
     }
 
-    std::vector<Otc::MarketOffer> offers = {};
-
-    uint32_t buyOfferCount = msg->getU32();
+    std::vector<MarketOffer> offers;
+    const uint32_t buyOfferCount = msg->getU32();
     for (uint32_t i = 0; i < buyOfferCount; i++) {
         offers.push_back(readMarketOffer(msg, Otc::MARKETACTION_BUY, var));
     }
 
-    uint32_t sellOfferCount = msg->getU32();
+    const uint32_t sellOfferCount = msg->getU32();
     for (uint32_t i = 0; i < sellOfferCount; i++) {
         offers.push_back(readMarketOffer(msg, Otc::MARKETACTION_SELL, var));
     }
-    std::vector<std::vector<uint64_t>> intOffers = {};
-    std::vector<std::string> nameOffers = {};
-    for (int i = 0; i < offers.size(); i++) {
-        Otc::MarketOffer offer = offers.at(i);
+    std::vector<std::vector<uint64_t>> intOffers;
+    std::vector<std::string> nameOffers;
+
+    for (size_t i = 0; i < offers.size(); i++) {
+        const MarketOffer offer = offers[i];
         std::vector<uint64_t> intOffer = { offer.action, offer.amount, offer.counter, offer.itemId, offer.price, offer.state, offer.timestamp, offer.var };
         std::string playerName = offer.playerName;
         intOffers.push_back(intOffer);
