@@ -62,15 +62,14 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const DrawMeth
         if (auto it = m_objectsByhash.find(stateHash); it != m_objectsByhash.end()) {
             const auto& buffer = it->second.buffer;
 
-            if (!buffer->isValid()) return;
-            if (!buffer->isTemporary()) {
+            if (!buffer->isTemporary() && buffer->isValid()) {
                 auto& hashList = buffer->m_hashs;
                 if (++buffer->m_i != hashList.size()) {
                     // checks if the vertex to be added is in the same position,
                     // otherwise the buffer will be invalidated to recreate the cache.
                     if (hashList[buffer->m_i] != methodHash)
                         buffer->invalidate();
-                    return;
+                    else return;
                 }
                 hashList.push_back(methodHash);
             }

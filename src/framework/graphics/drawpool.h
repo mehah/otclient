@@ -245,8 +245,6 @@ public:
     void agroup(bool v) { m_agroup = v; }
     void setOrder(DrawPool::DrawOrder order) { m_order = order; }
 
-    void invalidate() { m_i = -1; }
-
 private:
     static DrawBufferPtr createTemporaryBuffer(DrawPool::DrawOrder order)
     {
@@ -254,6 +252,8 @@ private:
         buffer->m_i = -2; // identifier to say it is a temporary buffer.
         return buffer;
     }
+
+    void invalidate() { m_i = -1; }
 
     inline bool isValid() { return m_i != -1; }
     inline bool isTemporary() { return m_i == -2; }
@@ -264,10 +264,7 @@ private:
         return isValid();
     }
 
-    inline CoordsBuffer* getCoords()
-    {
-        return (m_coords ? m_coords : m_coords = std::make_shared<CoordsBuffer>()).get();
-    }
+    inline CoordsBuffer* getCoords() { return (m_coords ? m_coords : m_coords = std::make_shared<CoordsBuffer>()).get(); }
 
     int m_i{ -1 };
     bool m_agroup{ true };
