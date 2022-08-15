@@ -979,7 +979,65 @@ void ProtocolGame::addPosition(const OutputMessagePtr& msg, const Position& posi
     msg->addU8(position.z);
 }
 
-void ProtocolGame::sendPreyAction(int slot, int actionType, int index)
+void ProtocolGame::sendMarketLeave()
+{
+    const OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientMarketLeave);
+    send(msg);
+}
+
+void ProtocolGame::sendMarketBrowse(uint8_t browseId, uint16_t browseType)
+{
+    const OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientMarketBrowse);
+    if (g_game.getClientVersion() >= 1251) {
+        msg->addU8(browseId);
+        if (browseType > 0) {
+            msg->addU16(browseType);
+        }
+    }
+    else {
+        msg->addU16(browseType);
+    }
+    send(msg);
+}
+
+void ProtocolGame::sendMarketCreateOffer(uint8_t type, uint16_t itemId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous)
+{
+    const OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientMarketCreate);
+    msg->addU8(type);
+    msg->addU16(itemId);
+    ItemPtr item = Item::create(itemId);
+    if (item && item->getClassification() > 0) {
+        msg->addU8(itemTier);
+    }
+    msg->addU16(amount);
+    msg->addU64(price);
+    msg->addU8(anonymous);
+    send(msg);
+}
+
+void ProtocolGame::sendMarketCancelOffer(uint32_t timestamp, uint16_t counter)
+{
+    const OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientMarketCancel);
+    msg->addU32(timestamp);
+    msg->addU16(counter);
+    send(msg);
+}
+
+void ProtocolGame::sendMarketAcceptOffer(uint32_t timestamp, uint16_t counter, uint16_t amount)
+{
+    const OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientMarketAccept);
+    msg->addU32(timestamp);
+    msg->addU16(counter);
+    msg->addU16(amount);
+    send(msg);
+}
+
+void ProtocolGame::sendPreyAction(uint8_t slot, uint8_t actionType, uint16_t index)
 {
     OutputMessagePtr msg(new OutputMessage);
     msg->addU8(Proto::ClientPreyAction);
@@ -990,7 +1048,6 @@ void ProtocolGame::sendPreyAction(int slot, int actionType, int index)
     }
     else if (actionType == 4) {
         msg->addU16(index); // raceid
-    }
     send(msg);
 }
 

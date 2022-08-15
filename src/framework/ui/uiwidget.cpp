@@ -1361,7 +1361,7 @@ void UIWidget::updateState(Fw::WidgetState state)
         case Fw::FirstState: { newStatus = isFirstChild(); break; }
         case Fw::MiddleState: { newStatus = isMiddleChild(); break; }
         case Fw::LastState: { newStatus = isLastChild(); break; }
-        case Fw::AlternateState: { newStatus = (getParent() && (getChildIndex() % 2) == 1); break; }
+        case Fw::AlternateState: { newStatus = (getParent() && (getParent()->getChildIndex(static_self_cast<UIWidget>()) % 2) == 1); break; }
         case Fw::FocusState: { newStatus = (getParent() && getParent()->getFocusedChild() == static_self_cast<UIWidget>()); break; }
         case Fw::HoverState: { newStatus = (g_ui.getHoveredWidget() == static_self_cast<UIWidget>() && isEnabled()); break; }
         case Fw::PressedState: { newStatus = (g_ui.getPressedWidget() == static_self_cast<UIWidget>()); break; }
