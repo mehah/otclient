@@ -145,6 +145,19 @@ struct MarketData
     uint16_t tradeAs;
 };
 
+struct MarketOffer
+{
+    uint32_t timestamp = 0;
+    uint16_t counter = 0;
+    uint8_t action = 0;
+    uint16_t itemId = 0;
+    uint16_t amount = 0;
+    uint64_t price = 0;
+    std::string playerName;
+    uint8_t state = 0;
+    uint16_t var = 0;
+};
+
 struct Light
 {
     Light() = default;

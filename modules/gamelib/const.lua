@@ -153,6 +153,7 @@ GameIngameStoreHighlights = 74
 GameIngameStoreServiceType = 75
 GameAdditionalSkills = 76
 GameDistanceEffectU16 = 77
+GamePrey = 82
 
 TextColors = {
     red = '#f55e5e', -- '#c83200'
@@ -347,5 +348,18 @@ ChannelEvent = {
     Invite = 2,
     Exclude = 3
 }
+
+ResourceTypes = {
+	BANK_BALANCE = 0,
+	GOLD_EQUIPPED = 1,
+	PREY_WILDCARDS = 10,
+	DAILYREWARD_STREAK = 20,
+	DAILYREWARD_JOKERS = 21,
+	TASK_HUNTING = 50,
+	COIN_NORMAL = 90,
+	COIN_TRANSFERRABLE = 91,
+	COIN_AUCTION = 92,
+	COIN_TOURNAMENT = 93,
+};
 
 -- @}

@@ -172,6 +172,7 @@ namespace Proto
         GameServerSendOpenRewardWall = 226,
         GameServerSendDailyReward = 228,
         GameServerSendRewardHistory = 229,
+        GameServerSendPreyFreeRerolls = 230,
         GameServerSendPreyTimeLeft = 231,
         GameServerSendPreyData = 232,
         GameServerSendPreyRerollPrice = 233,
@@ -291,6 +292,8 @@ namespace Proto
         ClientBugReport = 230,
         ClientRuleViolation = 231,
         ClientDebugReport = 232,
+        ClientPreyAction = 235,
+        ClientPreyRequest = 237,
         ClientTransferCoins = 239, // 1080
         ClientRequestQuestLog = 240,
         ClientRequestQuestLine = 241,

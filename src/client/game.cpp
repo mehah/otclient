@@ -1725,6 +1725,10 @@ void Game::setClientVersion(int version)
     if (version >= 1094) {
         enableFeature(Otc::GameAdditionalSkills);
     }
+	
+    if (version >= 	1200) {
+        enableFeature(Otc::GamePrey);
+    }
 
     if (version >= 1281) {
         disableFeature(Otc::GameEnvironmentEffect);
@@ -1794,6 +1798,48 @@ Otc::OperatingSystem_t Game::getOs()
         return Otc::CLIENTOS_OTCLIENT_MAC;
 
     return Otc::CLIENTOS_OTCLIENT_LINUX;
+}
+
+void Game::leaveMarket()
+{
+    m_protocolGame->sendMarketLeave();
+    g_lua.callGlobalField("g_game", "onMarketLeave");
+}
+
+void Game::browseMarket(uint8_t browseId, uint16_t browseType)
+{
+    m_protocolGame->sendMarketBrowse(browseId, browseType);
+}
+
+void Game::createMarketOffer(uint8_t type, uint16_t itemId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous)
+{
+    m_protocolGame->sendMarketCreateOffer(type, itemId, itemTier, amount, price, anonymous);
+}
+
+void Game::cancelMarketOffer(uint32_t timestamp, uint16_t counter)
+{
+    m_protocolGame->sendMarketCancelOffer(timestamp, counter);
+}
+
+void Game::acceptMarketOffer(uint32_t timestamp, uint16_t counter, uint16_t amount)
+{
+    m_protocolGame->sendMarketAcceptOffer(timestamp, counter, amount);
+}
+
+void Game::preyAction(uint8_t slot, uint8_t actionType, uint16_t index)
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendPreyAction(slot, actionType, index);
+}
+
+void Game::preyRequest()
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendPreyRequest();
 }
 
 void Game::applyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm)

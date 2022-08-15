@@ -253,7 +253,9 @@ private:
         return buffer;
     }
 
-    inline bool isValid() { return m_i > -1; }
+    void invalidate() { m_i = -1; }
+
+    inline bool isValid() { return m_i != -1; }
     inline bool isTemporary() { return m_i == -2; }
 
     bool validate(const Point& p)
@@ -262,12 +264,8 @@ private:
         return isValid();
     }
 
-    inline CoordsBuffer* getCoords()
-    {
-        return (m_coords ? m_coords : m_coords = std::make_shared<CoordsBuffer>()).get();
-    }
+    inline CoordsBuffer* getCoords() { return (m_coords ? m_coords : m_coords = std::make_shared<CoordsBuffer>()).get(); }
 
-    void invalidate() { m_i = -1; }
     int m_i{ -1 };
     bool m_agroup{ true };
     DrawPool::DrawOrder m_order{ DrawPool::DrawOrder::FIRST };

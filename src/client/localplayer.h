@@ -95,6 +95,13 @@ public:
         return it != m_resourcesBalance.end() ? it->second : 0;
     }
 
+    uint64_t getTotalMoney()
+    {
+        uint64_t bankBalance = getResourceBalance(Otc::RESOURCE_BANK_BALANCE);
+        uint64_t equippedBalance = getResourceBalance(Otc::RESOURCE_GOLD_EQUIPPED);
+        return bankBalance + equippedBalance;
+    }
+
     bool hasSight(const Position& pos);
     bool isKnown() { return m_known; }
     bool isPreWalking() { return m_preWalking; }
