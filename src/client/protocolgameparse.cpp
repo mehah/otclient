@@ -3354,11 +3354,11 @@ Imbuement ProtocolGame::getImbuementInfo(const InputMessagePtr& msg)
     const uint8_t itemsSize = msg->getU8(); // items size
     for (uint8_t i = 0; i < itemsSize; i++) {
         const uint16_t id = msg->getU16(); // item client ID
-        const auto description = msg->getString(); // item name
+        const auto& description = std::string{ msg->getString() }; // item name
         const uint16_t count = msg->getU16(); // count
         const ItemPtr& item = Item::create(id);
         item->setCount(count);
-        imbuement.sources.push_back(std::make_pair(item, description));
+        imbuement.sources.emplace_back(item, description);
     }
 
     imbuement.cost = msg->getU32(); // base price
