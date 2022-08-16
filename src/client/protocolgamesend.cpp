@@ -1057,3 +1057,28 @@ void ProtocolGame::sendPreyRequest()
     msg->addU8(Proto::ClientPreyRequest);
     send(msg);
 }
+
+void ProtocolGame::sendApplyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm)
+{
+    OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientApplyImbuement);
+    msg->addU8(slot);
+    msg->addU32(imbuementId);
+    msg->addU8(protectionCharm ? 1 : 0);
+    send(msg);
+}
+
+void ProtocolGame::sendClearImbuement(uint8_t slot)
+{
+    OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientClearImbuement);
+    msg->addU8(slot);
+    send(msg);
+}
+
+void ProtocolGame::sendCloseImbuingWindow()
+{
+    OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientCloseImbuingWindow);
+    send(msg);
+}

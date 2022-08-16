@@ -1841,3 +1841,24 @@ void Game::preyRequest()
 
     m_protocolGame->sendPreyRequest();
 }
+
+void Game::applyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm)
+{
+    if (!canPerformGameAction())
+        return;
+    m_protocolGame->sendApplyImbuement(slot, imbuementId, protectionCharm);
+}
+
+void Game::clearImbuement(uint8_t slot)
+{
+    if (!canPerformGameAction())
+        return;
+    m_protocolGame->sendClearImbuement(slot);
+}
+
+void Game::closeImbuingWindow()
+{
+    if (!canPerformGameAction())
+        return;
+    m_protocolGame->sendCloseImbuingWindow();
+}

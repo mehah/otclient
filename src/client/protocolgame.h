@@ -118,16 +118,16 @@ public:
     void sendOpenStore(int serviceType, const std::string_view category);
     void sendTransferCoins(const std::string_view recipient, int amount);
     void sendOpenTransactionHistory(int entriesPerPage);
-<<<<<<< HEAD
-    void sendPreyAction(int slot, int actionType, int index);
-    void sendPreyRequest();
-=======
     void sendMarketLeave();
     void sendMarketBrowse(uint8_t browseId, uint16_t browseType);
     void sendMarketCreateOffer(uint8_t type, uint16_t itemId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous);
     void sendMarketCancelOffer(uint32_t timestamp, uint16_t counter);
     void sendMarketAcceptOffer(uint32_t timestamp, uint16_t counter, uint16_t amount);
->>>>>>> f9c7df001a9fc8d1179d98d548b54d5aafeedac0
+    void sendPreyAction(int slot, int actionType, int index);
+    void sendPreyRequest();
+    void sendApplyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm);
+    void sendClearImbuement(uint8_t slot);
+    void sendCloseImbuingWindow();
 
     // otclient only
     void sendChangeMapAwareRange(int xrange, int yrange);
@@ -283,7 +283,7 @@ private:
     void parsePreyTimeLeft(const InputMessagePtr& msg);
     void parsePreyData(const InputMessagePtr& msg);
     void parsePreyRerollPrice(const InputMessagePtr& msg);
-    void getImbuementInfo(const InputMessagePtr& msg);
+    Imbuement getImbuementInfo(const InputMessagePtr& msg);
     void parseImbuementWindow(const InputMessagePtr& msg);
     void parseCloseImbuementWindow(const InputMessagePtr& msg);
     void parseError(const InputMessagePtr& msg);
