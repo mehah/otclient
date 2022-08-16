@@ -217,8 +217,8 @@ void UIWidget::insertChild(size_t index, const UIWidgetPtr& child)
 
     { // cache index
         child->m_childIndex = index + 1;
-        for (size_t i = index; ++i < childrenSize;)
-            m_children[i]->m_childIndex += 1;
+        for (size_t i = child->m_childIndex; i < childrenSize; ++i)
+            m_children[i]->m_childIndex = i + 1;
     }
 
     child->setParent(static_self_cast<UIWidget>());
@@ -255,8 +255,12 @@ void UIWidget::removeChild(const UIWidgetPtr& child)
         m_children.erase(it);
         m_childrenById.erase(child->getId());
 
-        // cache index
-        child->m_childIndex = -1;
+        { // cache index
+            for (size_t i = child->m_childIndex - 1, s = m_children.size(); i < s; ++i)
+                m_children[i]->m_childIndex = i + 1;
+
+            child->m_childIndex = -1;
+        }
 
         // reset child parent
         assert(child->getParent() == static_self_cast<UIWidget>());
@@ -424,8 +428,8 @@ void UIWidget::lowerChild(const UIWidgetPtr& child)
     m_children.push_front(child);
 
     { // cache index
-        for (int i = (child->m_childIndex = 1), s = m_children.size(); ++i < s;)
-            m_children[i]->m_childIndex += 1;
+        for (int i = (child->m_childIndex = 1), s = m_children.size(); i < s; ++i)
+            m_children[i]->m_childIndex = i + 1;
     }
 
     updateChildrenIndexStates();
@@ -450,10 +454,8 @@ void UIWidget::raiseChild(const UIWidgetPtr& child)
     m_children.push_back(child);
 
     { // cache index
-        for (int i = child->m_childIndex - 1, s = m_children.size(); ++i < s;)
-            m_children[i]->m_childIndex += 1;
-
-        child->m_childIndex = m_children.size();
+        for (int i = child->m_childIndex - 1, s = m_children.size(); i < s; ++i)
+            m_children[i]->m_childIndex = i + 1;
     }
 
     updateChildrenIndexStates();
@@ -489,8 +491,8 @@ void UIWidget::moveChildToIndex(const UIWidgetPtr& child, int index)
 
     { // cache index
         child->m_childIndex = index;
-        for (size_t i = index; ++i < childrenSize;)
-            m_children[i]->m_childIndex += 1;
+        for (size_t i = index; i < childrenSize; ++i)
+            m_children[i]->m_childIndex = i + 1;
     }
 
     updateChildrenIndexStates();

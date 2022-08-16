@@ -60,6 +60,8 @@ protected:
     friend class UIManager;
 
     std::string m_id;
+    int m_childIndex{ -1 };
+
     Rect m_rect;
     Point m_virtualOffset;
     bool m_enabled{ true },
@@ -147,7 +149,7 @@ public:
     bool isAnchored();
     bool isChildLocked(const UIWidgetPtr& child);
     bool hasChild(const UIWidgetPtr& child);
-    int getChildIndex(const UIWidgetPtr& child) { return child && child->getParent() == this ? m_childIndex + 1 : -1; }
+    int getChildIndex(const UIWidgetPtr& child) { return child && child->getParent() == this ? child->m_childIndex : -1; }
     Rect getPaddingRect();
     Rect getMarginRect();
     Rect getChildrenRect();
@@ -305,7 +307,6 @@ protected:
     float m_rotation{ 0.f };
     int m_autoRepeatDelay{ 500 };
     Point m_lastClickPosition;
-    int m_childIndex{ -1 };
 
 public:
     void setX(int x) { move(x, getY()); }
