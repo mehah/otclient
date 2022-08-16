@@ -279,7 +279,7 @@ void UITextEdit::update(bool focusCursor)
         } else if (m_textAlign & Fw::AlignVerticalCenter) {
             glyphScreenCoords.translate(0, (textScreenCoords.height() - textBoxSize.height()) / 2);
         } else { // AlignTop
-         // nothing to do
+            // nothing to do
         }
 
         if (m_textAlign & Fw::AlignRight) {
@@ -287,7 +287,7 @@ void UITextEdit::update(bool focusCursor)
         } else if (m_textAlign & Fw::AlignHorizontalCenter) {
             glyphScreenCoords.translate((textScreenCoords.width() - textBoxSize.width()) / 2, 0);
         } else { // AlignLeft
-         // nothing to do
+            // nothing to do
         }
 
         // only render glyphs that are after startRenderPosition

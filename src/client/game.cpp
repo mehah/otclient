@@ -1725,8 +1725,8 @@ void Game::setClientVersion(int version)
     if (version >= 1094) {
         enableFeature(Otc::GameAdditionalSkills);
     }
-	
-    if (version >= 	1200) {
+
+    if (version >= 1200) {
         enableFeature(Otc::GamePrey);
     }
 

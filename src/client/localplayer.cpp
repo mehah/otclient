@@ -99,8 +99,7 @@ bool LocalPlayer::retryAutoWalk()
             if (m_autoWalkContinueEvent)
                 m_autoWalkContinueEvent->cancel();
 
-            m_autoWalkContinueEvent = g_dispatcher.scheduleEvent([capture0 = asLocalPlayer(), this]
-            {
+            m_autoWalkContinueEvent = g_dispatcher.scheduleEvent([capture0 = asLocalPlayer(), this] {
                 capture0->autoWalk(m_autoWalkDestination, true);
             }, 200);
             m_autoWalkRetries += 1;
@@ -162,7 +161,7 @@ bool LocalPlayer::autoWalk(const Position& destination, const bool retry)
                     self->m_autoWalkContinueEvent->cancel();
 
                 self->m_autoWalkContinueEvent = g_dispatcher.scheduleEvent(
-                    [self, capture0 = result->destination]{ self->autoWalk(capture0, true); }, 200 + self->m_autoWalkRetries * 100);
+                    [self, capture0 = result->destination] { self->autoWalk(capture0, true); }, 200 + self->m_autoWalkRetries * 100);
                 return;
             }
             self->m_autoWalkDestination = {};

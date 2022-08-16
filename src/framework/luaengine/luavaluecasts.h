@@ -80,7 +80,7 @@ inline bool luavalue_cast(int index, uint16_t& v)
 }
 // uint32
 inline int push_luavalue(uint32_t v) { push_luavalue(static_cast<double>(v)); return 1; }
-inline bool luavalue_cast(int index, uint32_t & v)
+inline bool luavalue_cast(int index, uint32_t& v)
 {
     double d;
     const bool r = luavalue_cast(index, d); v = d; return r;

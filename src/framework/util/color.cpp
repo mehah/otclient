@@ -53,7 +53,7 @@ Color::Color(const std::string_view coltext)
 
 void Color::update()
 {
-    m_rgba = static_cast<uint32_t >(a() | b() << 8 | g() << 16 | r() << 24);
+    m_rgba = static_cast<uint32_t>(a() | b() << 8 | g() << 16 | r() << 24);
 }
 
 std::ostream& operator<<(std::ostream& out, const Color& color)

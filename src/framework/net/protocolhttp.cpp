@@ -38,11 +38,10 @@ ProtocolHttp::~ProtocolHttp()
 void ProtocolHttp::connect(const std::string_view host, uint16_t port)
 {
     m_connection = ConnectionPtr(new Connection);
-    m_connection->setErrorCallback([capture0 = asProtocolHttp()](auto&& PH1)
-    {
+    m_connection->setErrorCallback([capture0 = asProtocolHttp()](auto&& PH1) {
         capture0->onError(std::forward<decltype(PH1)>(PH1));
     });
-    m_connection->connect(host, port, [capture0 = asProtocolHttp()]{ capture0->onConnect(); });
+    m_connection->connect(host, port, [capture0 = asProtocolHttp()] { capture0->onConnect(); });
 }
 
 void ProtocolHttp::disconnect()

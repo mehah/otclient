@@ -319,7 +319,7 @@ protected:
                                 bool ignoreCase,            // whether to ignore case in the end tag
                                 TiXmlEncoding encoding);    // the current encoding
 
-// If an entity has been found, transform it into a character.
+    // If an entity has been found, transform it into a character.
     static const char* GetEntity(const char* in, char* value, int* length, TiXmlEncoding encoding);
 
     // Get a character, while interpreting entities.
@@ -532,22 +532,22 @@ public:
     TiXmlNode* LastChild(const std::string_view _value) { return LastChild(_value.data()); }    ///< STL std::string form.
 #endif
 
-/** An alternate way to walk the children of a node.
-    One way to iterate over nodes is:
-    @verbatim
-        for( child = parent->FirstChild(); child; child = child->NextSibling() )
-    @endverbatim
+    /** An alternate way to walk the children of a node.
+        One way to iterate over nodes is:
+        @verbatim
+            for( child = parent->FirstChild(); child; child = child->NextSibling() )
+        @endverbatim
 
-    IterateChildren does the same thing with the syntax:
-    @verbatim
-        child = 0;
-        while( child = parent->IterateChildren( child ) )
-    @endverbatim
+        IterateChildren does the same thing with the syntax:
+        @verbatim
+            child = 0;
+            while( child = parent->IterateChildren( child ) )
+        @endverbatim
 
-    IterateChildren takes the previous child as input and finds
-    the next one. If the previous child is null, it returns the
-    first. IterateChildren will return null when done.
-*/
+        IterateChildren takes the previous child as input and finds
+        the next one. If the previous child is null, it returns the
+        first. IterateChildren will return null when done.
+    */
     const TiXmlNode* IterateChildren(const TiXmlNode* previous) const;
     TiXmlNode* IterateChildren(const TiXmlNode* previous)
     {
@@ -566,9 +566,9 @@ public:
     TiXmlNode* IterateChildren(const std::string_view _value, const TiXmlNode* previous) { return IterateChildren(_value.data(), previous); }    ///< STL std::string form.
 #endif
 
-/** Add a new node related to this. Adds a child past the LastChild.
-    Returns a pointer to the new object or NULL if an error occured.
-*/
+    /** Add a new node related to this. Adds a child past the LastChild.
+        Returns a pointer to the new object or NULL if an error occured.
+    */
     TiXmlNode* InsertEndChild(const TiXmlNode& addThis);
 
     /** Add a new node related to this. Adds a child past the LastChild.
@@ -618,7 +618,7 @@ public:
     TiXmlNode* NextSibling(const std::string_view _value) { return NextSibling(_value.data()); }    ///< STL std::string form.
 #endif
 
-/// Navigate to a sibling node.
+    /// Navigate to a sibling node.
     const TiXmlNode* NextSibling() const { return next; }
     TiXmlNode* NextSibling() { return next; }
 
@@ -654,7 +654,7 @@ public:
     TiXmlElement* NextSiblingElement(const std::string_view _value) { return NextSiblingElement(_value.data()); }    ///< STL std::string form.
 #endif
 
-/// Convenience function to get through elements.
+    /// Convenience function to get through elements.
     const TiXmlElement* FirstChildElement()    const;
     TiXmlElement* FirstChildElement()
     {
@@ -673,10 +673,10 @@ public:
     TiXmlElement* FirstChildElement(const std::string_view _value) { return FirstChildElement(_value.data()); }    ///< STL std::string form.
 #endif
 
-/** Query the type (as an enumerated value, above) of this node.
-    The possible types are: TINYXML_DOCUMENT, TINYXML_ELEMENT, TINYXML_COMMENT,
-                            TINYXML_UNKNOWN, TINYXML_TEXT, and TINYXML_DECLARATION.
-*/
+    /** Query the type (as an enumerated value, above) of this node.
+        The possible types are: TINYXML_DOCUMENT, TINYXML_ELEMENT, TINYXML_COMMENT,
+                                TINYXML_UNKNOWN, TINYXML_TEXT, and TINYXML_DECLARATION.
+    */
     int Type() const { return type; }
 
     /** Return a pointer to the Document this node lives in.
@@ -831,7 +831,7 @@ public:
     void SetDoubleValue(double _value);                                ///< Set the value from a double.
 
 #ifdef TIXML_USE_STL
-/// STL std::string form.
+    /// STL std::string form.
     void SetName(const std::string_view _name) { name = _name; }
     /// STL std::string form.
     void SetValue(const std::string_view _value) { value = _value; }
