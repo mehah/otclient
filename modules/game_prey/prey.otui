@@ -28,7 +28,6 @@ LockedPreyPanel < Panel
 
       $pressed:
         image-clip: 0 67 204 67
-        
 
   UIButton
     id: temp
@@ -69,7 +68,7 @@ NoCreaturePanel < Panel
     anchors.top: parent.top
     anchors.left: parent.left
     image-source: /images/ui/panel_flat
-    image-border: 1  
+    image-border: 1
 
     UIWidget
       phantom: true
@@ -125,7 +124,7 @@ NoCreaturePanel < Panel
 
       NoStar
         id: noBonusIcon
-        @onHoverChange: modules.game_prey.onHover(self)      
+        @onHoverChange: modules.game_prey.onHover(self)
 
       NoStar
         id: noBonusIcon
@@ -162,7 +161,7 @@ NoCreaturePanel < Panel
     anchors.right: parent.right
     height: 20
     background-color: #262626
-    border: 1 black 
+    border: 1 black
     id: noBonusIcon
     @onHoverChange: modules.game_prey.onHover(self)
 
@@ -173,13 +172,13 @@ ActivePreyPanel < Panel
     id: creatureAndBonus
     anchors.left: parent.left
     anchors.top: parent.top
-    margin-top: 20 
+    margin-top: 20
 
   BonusReroll
     id: choose
     anchors.right: parent.right
     anchors.top: prev.bottom
-  
+
   SelectPreyCreature
     id: select
     anchors.verticalCenter: prev.verticalCenter
@@ -197,7 +196,7 @@ ActivePreyPanel < Panel
     size: 160 20
     anchors.top: prev.bottom
     margin-top: 5
-    anchors.left: parent.left 
+    anchors.left: parent.left
 
     CheckBox
       id: autoRerollCheck
@@ -303,7 +302,7 @@ CreatureAndBonus < Panel
     anchors.left: parent.left
     anchors.right: parent.right
     height: 20
-    background-color: #C28400   
+    background-color: #C28400
 
 BonusReroll < FlatPanel
   padding: 2
@@ -337,7 +336,7 @@ InactivePreyPanel < Panel
     id: choose
     anchors.right: parent.right
     anchors.bottom: parent.bottom
-  
+
   SelectPreyCreature
     id: select
     anchors.bottom: parent.bottom
@@ -349,7 +348,6 @@ InactivePreyPanel < Panel
     anchors.bottom: parent.bottom
     anchors.right: prev.left
     margin-right: 2
-
 
   FlatPanel
     id: list
@@ -377,7 +375,7 @@ ChoosePrey < FlatPanel
     margin-left: 3
     image-source: /images/game/prey/prey_choose
     image-clip: 1 0 44 35
-    @onHoverChange: modules.game_prey.onHover(self)    
+    @onHoverChange: modules.game_prey.onHover(self)
 
     $pressed:
       image-clip: 0 35 45 37
@@ -405,7 +403,7 @@ SelectPreyCreature < FlatPanel
 RerollButton < FlatPanel
   padding: 2
   size: 70 92
-  
+
   FlatPanel
     id: button
     size: 66 66
@@ -442,7 +440,7 @@ RerollButton < FlatPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.bottom: parent.bottom
-  
+
 CardLabel < FlatPanel
   padding: 5
 
@@ -463,7 +461,7 @@ CardLabel < FlatPanel
 
 GoldLabel < FlatPanel
   padding: 5
-  
+
   UIWidget
     id: gold
     anchors.right: parent.right
@@ -519,7 +517,7 @@ SlotPanel < Panel
     text-align: center
 
   InactivePreyPanel
-    id: inactive  
+    id: inactive
     anchors.top: parent.top
     anchors.horizontalCenter: parent.horizontalCenter
 
@@ -575,7 +573,7 @@ MainWindow
   HorizontalSeparator
     id: bottomSep
     anchors.left: parent.left
-    anchors.right: parent.right 
+    anchors.right: parent.right
     anchors.bottom: closeButton.top
     margin-bottom: 10
 
@@ -652,7 +650,7 @@ PreyCreature < Panel
     anchors.right: parent.right
     text: Inactive
     font: verdana-11px-rounded
-    text-align: left     
+    text-align: left
 
   ProgressBar
     id: time
@@ -662,7 +660,7 @@ PreyCreature < Panel
     margin-bottom: 2
     height: 6
     background-color: #C28400
-    phantom: false    
+    phantom: false
 
 PreyTracker < MiniWindow
   id: preyTracker
@@ -678,7 +676,7 @@ PreyTracker < MiniWindow
 
     Label
       !text: tr('Prey Creatures')
-      font: verdana-11px-rounded   
+      font: verdana-11px-rounded
 
     HorizontalSeparator
       margin-top: 1
