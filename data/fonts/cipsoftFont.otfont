@@ -1,0 +1,6 @@
+Font
+  name: cipsoftFont
+  texture: cipsoftFont
+  height: 8
+  glyph-size: 8 8
+  space-width: 2
