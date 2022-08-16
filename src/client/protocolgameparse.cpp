@@ -3214,21 +3214,20 @@ void ProtocolGame::parsePreyTimeLeft(const InputMessagePtr& msg)
     g_lua.callGlobalField("g_game", "onPreyTimeLeft", slot, timeLeft);
 }
 
-ProtocolGame::PreyMonster ProtocolGame::getPreyMonster(const InputMessagePtr& msg)
+PreyMonster ProtocolGame::getPreyMonster(const InputMessagePtr& msg)
 {
-    PreyMonster monster;
-    monster.name = msg->getString(); // monster name
-    monster.outfit = getOutfit(msg, false);
-    return monster;
+    const auto& name = std::string{ msg->getString() };
+    const auto& outfit = getOutfit(msg, false);
+    return { name , outfit };
 }
 
-std::vector<ProtocolGame::PreyMonster> ProtocolGame::getPreyMonsters(const InputMessagePtr& msg)
+std::vector<PreyMonster> ProtocolGame::getPreyMonsters(const InputMessagePtr& msg)
 {
     std::vector<PreyMonster> monsters;
     const uint8_t monstersSize = msg->getU8(); // monster list size
     for (uint8_t i = 0; i < monstersSize; i++)
         monsters.push_back(getPreyMonster(msg));
-    
+
     return monsters;
 }
 
@@ -3348,7 +3347,7 @@ Imbuement ProtocolGame::getImbuementInfo(const InputMessagePtr& msg)
     imbuement.group = msg->getString(); // subgroup
 
     imbuement.imageId = msg->getU16(); // iconId
-    imbuement.duration =  msg->getU32(); // duration
+    imbuement.duration = msg->getU32(); // duration
 
     imbuement.premiumOnly = msg->getU8(); // is premium
 
@@ -3357,7 +3356,7 @@ Imbuement ProtocolGame::getImbuementInfo(const InputMessagePtr& msg)
         const uint16_t id = msg->getU16(); // item client ID
         const auto description = msg->getString(); // item name
         const uint16_t count = msg->getU16(); // count
-        ItemPtr& item = Item::create(id);
+        const ItemPtr& item = Item::create(id);
         item->setCount(count);
         imbuement.sources.push_back(std::make_pair(item, description));
     }
@@ -3403,7 +3402,7 @@ void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
     for (uint32_t i = 0; i < neededItemsSize; i++) {
         const uint16_t needItemId = msg->getU16();
         const uint16_t count = msg->getU16();
-        ItemPtr& item = Item::create(needItemId);
+        const ItemPtr& item = Item::create(needItemId);
         item->setCount(count);
         needItems.push_back(item);
     }

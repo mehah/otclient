@@ -29,7 +29,14 @@
 #include <framework/core/timer.h>
 #include <framework/graphics/cachedtext.h>
 
- // @bindclass
+struct PreyMonster
+{
+public:
+    std::string name;
+    Outfit outfit;
+};
+
+// @bindclass
 class Creature : public Thing
 {
 public:

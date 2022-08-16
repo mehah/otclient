@@ -995,8 +995,7 @@ void ProtocolGame::sendMarketBrowse(uint8_t browseId, uint16_t browseType)
         if (browseType > 0) {
             msg->addU16(browseType);
         }
-    }
-    else {
+    } else {
         msg->addU16(browseType);
     }
     send(msg);
@@ -1045,10 +1044,10 @@ void ProtocolGame::sendPreyAction(uint8_t slot, uint8_t actionType, uint16_t ind
     msg->addU8(actionType);
     if (actionType == 2 || actionType == 5) {
         msg->addU8(index);
-    }
-    else if (actionType == 4) {
+    } else if (actionType == 4) {
         msg->addU16(index); // raceid
-    send(msg);
+        send(msg);
+    }
 }
 
 void ProtocolGame::sendPreyRequest()

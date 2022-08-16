@@ -123,7 +123,7 @@ public:
     void sendMarketCreateOffer(uint8_t type, uint16_t itemId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous);
     void sendMarketCancelOffer(uint32_t timestamp, uint16_t counter);
     void sendMarketAcceptOffer(uint32_t timestamp, uint16_t counter, uint16_t amount);
-    void sendPreyAction(int slot, int actionType, int index);
+    void sendPreyAction(uint8_t slot, uint8_t actionType, uint16_t index);
     void sendPreyRequest();
     void sendApplyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm);
     void sendClearImbuement(uint8_t slot);
@@ -293,12 +293,7 @@ private:
     void parseMarketBrowse(const InputMessagePtr& msg);
 
     MarketOffer readMarketOffer(const InputMessagePtr& msg, uint8_t action, uint16_t var);
-    
-    struct PreyMonster {
-    public:
-        std::string_view name;
-        Outfit outfit;
-    };
+
     PreyMonster getPreyMonster(const InputMessagePtr& msg);
     std::vector<PreyMonster> getPreyMonsters(const InputMessagePtr& msg);
 

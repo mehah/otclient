@@ -365,7 +365,7 @@ public:
     void acceptMarketOffer(uint32_t timestamp, uint16_t counter, uint16_t amount);
 
     // prey related
-    void preyAction(int slot, int actionType, int index);
+    void preyAction(uint8_t slot, uint8_t actionType, uint16_t index);
     void preyRequest();
 
     // imbuing related
