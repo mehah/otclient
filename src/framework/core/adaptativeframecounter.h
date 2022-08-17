@@ -41,12 +41,12 @@ public:
     void setMaxFps(const uint32_t max) { m_maxFps = max; }
 
 private:
-    uint32_t getMaxPeriod() const { return 1000000 / m_maxFps; }
+    int getMaxPeriod() const { return 1000000 / m_maxFps; }
 
     uint32_t m_fps{ 0 },
         m_maxFps{ 0 },
         m_fpsCount{ 0 },
         m_interval{ 0 };
 
-    ticks_t m_currentTime{ 0 }, m_lastTime{ 0 };
+    ticks_t m_startTime{ 0 };
 };
