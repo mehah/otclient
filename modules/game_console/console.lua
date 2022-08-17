@@ -88,6 +88,7 @@ SpeakTypes = {
     [MessageModes.Whisper] = SpeakTypesSettings.whisper,
     [MessageModes.Yell] = SpeakTypesSettings.yell,
     [MessageModes.GamemasterBroadcast] = SpeakTypesSettings.broadcast,
+    [MessageModes.PrivateTo] = SpeakTypesSettings.private,
     [MessageModes.PrivateFrom] = SpeakTypesSettings.private,
     [MessageModes.GamemasterPrivateFrom] = SpeakTypesSettings.privateRed,
     [MessageModes.NpcTo] = SpeakTypesSettings.privatePlayerToNpc,

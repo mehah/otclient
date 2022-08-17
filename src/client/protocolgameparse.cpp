@@ -1853,6 +1853,7 @@ void ProtocolGame::parseTalk(const InputMessagePtr& msg)
             channelId = msg->getU16();
             break;
         case Otc::MessageNpcFrom:
+        case Otc::MessagePrivateTo:
         case Otc::MessagePrivateFrom:
         case Otc::MessageGamemasterBroadcast:
         case Otc::MessageGamemasterPrivateFrom:
