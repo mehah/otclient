@@ -77,17 +77,13 @@ function init()
         onOutfitChange = onOutfitChange
     })
 
-    if g_game.isOnline() then
-        online()
-    end
+    if g_game.isOnline() then online() end
 
     combatControlsWindow:setup()
 end
 
 function terminate()
-    if g_game.isOnline() then
-        offline()
-    end
+    if g_game.isOnline() then offline() end
 
     fightModeRadioGroup:destroy()
     pvpModeRadioGroup:destroy()
@@ -145,17 +141,13 @@ function update()
     if g_game.getFeature(GamePVPMode) then
         local pvpMode = g_game.getPVPMode()
         local pvpWidget = getPVPBoxByMode(pvpMode)
-        if pvpWidget then
-            pvpModeRadioGroup:selectWidget(pvpWidget)
-        end
+        if pvpWidget then pvpModeRadioGroup:selectWidget(pvpWidget) end
     end
 end
 
 function check()
     if modules.client_options.getOption('autoChaseOverride') then
-        if g_game.isAttacking() and g_game.getChaseMode() == ChaseOpponent then
-            g_game.setChaseMode(DontChase)
-        end
+        if g_game.isAttacking() and g_game.getChaseMode() == ChaseOpponent then g_game.setChaseMode(DontChase) end
     end
 end
 
@@ -200,9 +192,7 @@ end
 function offline()
     combatControlsWindow:setParent(nil, true)
     local lastCombatControls = g_settings.getNode('LastCombatControls')
-    if not lastCombatControls then
-        lastCombatControls = {}
-    end
+    if not lastCombatControls then lastCombatControls = {} end
 
     local player = g_game.getLocalPlayer()
     if player then
@@ -213,9 +203,7 @@ function offline()
             safeFight = g_game.isSafeFight()
         }
 
-        if g_game.getFeature(GamePVPMode) then
-            lastCombatControls[char].pvpMode = g_game.getPVPMode()
-        end
+        if g_game.getFeature(GamePVPMode) then lastCombatControls[char].pvpMode = g_game.getPVPMode() end
 
         -- save last combat control settings
         g_settings.setNode('LastCombatControls', lastCombatControls)
@@ -233,9 +221,7 @@ function toggle()
 end
 
 function onSetFightMode(self, selectedFightButton)
-    if selectedFightButton == nil then
-        return
-    end
+    if selectedFightButton == nil then return end
     local buttonId = selectedFightButton:getId()
     local fightMode
     if buttonId == 'fightOffensiveBox' then
@@ -248,9 +234,7 @@ function onSetFightMode(self, selectedFightButton)
     g_game.setFightMode(fightMode)
 end
 
-function toggleChaseMode()
-    chaseModeButton:setChecked(not chaseModeButton:isChecked())
-end
+function toggleChaseMode() chaseModeButton:setChecked(not chaseModeButton:isChecked()) end
 
 function onSetChaseMode(self, checked)
     local chaseMode
@@ -262,14 +246,10 @@ function onSetChaseMode(self, checked)
     g_game.setChaseMode(chaseMode)
 end
 
-function onSetSafeFight(self, checked)
-    g_game.setSafeFight(not checked)
-end
+function onSetSafeFight(self, checked) g_game.setSafeFight(not checked) end
 
 function onSetPVPMode(self, selectedPVPButton)
-    if selectedPVPButton == nil then
-        return
-    end
+    if selectedPVPButton == nil then return end
 
     local buttonId = selectedPVPButton:getId()
     local pvpMode = PVPWhiteDove
@@ -286,25 +266,17 @@ function onSetPVPMode(self, selectedPVPButton)
     g_game.setPVPMode(pvpMode)
 end
 
-function onMiniWindowOpen()
-    combatControlsButton:setOn(true)
-end
+function onMiniWindowOpen() combatControlsButton:setOn(true) end
 
-function onMiniWindowClose()
-    combatControlsButton:setOn(false)
-end
+function onMiniWindowClose() combatControlsButton:setOn(false) end
 
 function onMountButtonClick(self, mousePos)
     local player = g_game.getLocalPlayer()
-    if player then
-        player:toggleMount()
-    end
+    if player then player:toggleMount() end
 end
 
 function onOutfitChange(localPlayer, outfit, oldOutfit)
-    if outfit.mount == oldOutfit.mount then
-        return
-    end
+    if outfit.mount == oldOutfit.mount then return end
 
     mountButton:setChecked(outfit.mount ~= nil and outfit.mount > 0)
 end

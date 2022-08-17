@@ -34,13 +34,9 @@ end
 
 function MarketProtocol.updateProtocol(_protocol) protocol = _protocol end
 
-function MarketProtocol.registerProtocol()
-    MarketProtocol.updateProtocol(g_game.getProtocolGame())
-end
+function MarketProtocol.registerProtocol() MarketProtocol.updateProtocol(g_game.getProtocolGame()) end
 
-function MarketProtocol.unregisterProtocol()
-    MarketProtocol.updateProtocol(nil)
-end
+function MarketProtocol.unregisterProtocol() MarketProtocol.updateProtocol(nil) end
 
 function MarketProtocol.silent(mode) silent = mode end
 
@@ -49,15 +45,13 @@ function MarketProtocol.silent(mode) silent = mode end
 function MarketProtocol.sendMarketBrowse(browseId, browseType)
     if g_game.getFeature(GamePlayerMarket) then
         local msg = OutputMessage.create()
-		if g_game.getClientVersion() >= 1251 then
-			msg:addU8(ClientOpcodes.ClientMarketBrowse)
-			msg:addU8(browseId)
-			if browseType > 0 then
-				msg:addU16(browseType)
-			end
-		else
-			msg:addU16(browseType)
-		end
+        if g_game.getClientVersion() >= 1251 then
+            msg:addU8(ClientOpcodes.ClientMarketBrowse)
+            msg:addU8(browseId)
+            if browseType > 0 then msg:addU16(browseType) end
+        else
+            msg:addU16(browseType)
+        end
         send(msg)
     else
         g_logger.error('MarketProtocol.sendMarketBrowse does not support the current protocol.')

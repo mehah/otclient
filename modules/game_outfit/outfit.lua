@@ -35,9 +35,7 @@ localPlayerEvent = EventController:new(LocalPlayer, {
         selectedAddons = outfit.addons
         availableAddons = selectedOutfit[3]
 
-        if table.empty(outfits) or not outfit then
-            return
-        end
+        if table.empty(outfits) or not outfit then return end
 
         local nameWidget = outfitWindow:getChildById('outfitName')
         nameWidget:setText(selectedOutfit[2])
@@ -58,9 +56,7 @@ localPlayerEvent = EventController:new(LocalPlayer, {
         outfit.type = selectedOutfit[1]
         outfitCreature:setOutfit(outfit)
 
-        if table.empty(mounts) or not mount then
-            return
-        end
+        if table.empty(mounts) or not mount then return end
 
         local nameMountWidget = outfitWindow:getChildById('mountName')
         nameMountWidget:setText(mounts[currentMount][2])
@@ -72,16 +68,12 @@ localPlayerEvent = EventController:new(LocalPlayer, {
 
 controller = Controller:new()
 
-controller:onGameEnd(function()
-    destroy()
-end)
+controller:onGameEnd(function() destroy() end)
 
 controller:gameEvent('onOpenOutfitWindow',
                      function(creatureOutfit, outfitList, creatureMount, mountList, creatureFamiliar, familiarList)
 
-    if outfitWindow and not outfitWindow:isHidden() then
-        return
-    end
+    if outfitWindow and not outfitWindow:isHidden() then return end
 
     localPlayerEvent:connect()
 
@@ -129,9 +121,7 @@ controller:gameEvent('onOpenOutfitWindow',
     }
 
     for _, addon in pairs(addons) do
-        addon.widget.onCheckChange = function(self)
-            onAddonCheckChange(self, addon.value)
-        end
+        addon.widget.onCheckChange = function(self) onAddonCheckChange(self, addon.value) end
     end
 
     -- hook outfit sections
@@ -185,9 +175,7 @@ controller:gameEvent('onOpenOutfitWindow',
 end)
 
 function destroy()
-    if not outfitWindow then
-        return
-    end
+    if not outfitWindow then return end
 
     outfitWindow:destroy()
 
@@ -214,60 +202,42 @@ function randomize()
 end
 
 function accept()
-    if mount then
-        outfit.mount = mount.type
-    end
+    if mount then outfit.mount = mount.type end
     g_game.changeOutfit(outfit)
     destroy()
 end
 
 function nextOutfitType()
-    if not outfits then
-        return
-    end
+    if not outfits then return end
 
     currentOutfit = currentOutfit + 1
-    if currentOutfit > #outfits then
-        currentOutfit = 1
-    end
+    if currentOutfit > #outfits then currentOutfit = 1 end
 
     localPlayerEvent:execute('onOutfitChange')
 end
 
 function previousOutfitType()
-    if not outfits then
-        return
-    end
+    if not outfits then return end
 
     currentOutfit = currentOutfit - 1
-    if currentOutfit <= 0 then
-        currentOutfit = #outfits
-    end
+    if currentOutfit <= 0 then currentOutfit = #outfits end
 
     localPlayerEvent:execute('onOutfitChange')
 end
 
 function nextMountType()
-    if not mounts then
-        return
-    end
+    if not mounts then return end
 
     currentMount = currentMount + 1
-    if currentMount > #mounts then
-        currentMount = 1
-    end
+    if currentMount > #mounts then currentMount = 1 end
     localPlayerEvent:execute('onOutfitChange')
 end
 
 function previousMountType()
-    if not mounts then
-        return
-    end
+    if not mounts then return end
 
     currentMount = currentMount - 1
-    if currentMount <= 0 then
-        currentMount = #mounts
-    end
+    if currentMount <= 0 then currentMount = #mounts end
 
     localPlayerEvent:execute('onOutfitChange')
 end

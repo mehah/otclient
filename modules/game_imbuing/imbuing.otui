@@ -33,7 +33,7 @@ ItemInformation < Panel
   Label
     id: title
     anchors.top: parent.top
-    anchors.left: parent.left 
+    anchors.left: parent.left
     anchors.right: parent.right
     text-align: center
     !text: tr("Item Information")
@@ -92,7 +92,7 @@ EmptyImbue < Panel
   Label
     id: title
     anchors.top: parent.top
-    anchors.left: parent.left 
+    anchors.left: parent.left
     anchors.right: parent.right
     text-align: center
     !text: tr("Imbue Empty Slot")
@@ -223,7 +223,7 @@ ClearImbue < Panel
   Label
     id: title
     anchors.top: parent.top
-    anchors.left: parent.left 
+    anchors.left: parent.left
     anchors.right: parent.right
     text-align: center
     !text: tr("Clear Imbuement")

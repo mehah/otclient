@@ -37,9 +37,7 @@ function init()
     mouseGrabberWidget.onMouseRelease = onChooseItemMouseRelease
 
     local console = modules.game_console.consolePanel
-    if console then
-        console:addAnchor(AnchorTop, actionBar:getId(), AnchorBottom)
-    end
+    if console then console:addAnchor(AnchorTop, actionBar:getId(), AnchorBottom) end
 
     if g_game.isOnline() then
         addEvent(function()
@@ -66,24 +64,14 @@ function terminate()
         onSpellGroupCooldown = onSpellGroupCooldown,
         onSpellCooldown = onSpellCooldown
     })
-    if spellAssignWindow then
-        closeSpellAssignWindow()
-    end
-    if objectAssignWindow then
-        closeObjectAssignWindow()
-    end
-    if textAssignWindow then
-        closeTextAssignWindow()
-    end
-    if editHotkeyWindow then
-        closeEditHotkeyWindow()
-    end
+    if spellAssignWindow then closeSpellAssignWindow() end
+    if objectAssignWindow then closeObjectAssignWindow() end
+    if textAssignWindow then closeTextAssignWindow() end
+    if editHotkeyWindow then closeEditHotkeyWindow() end
     if spellsPanel then
         disconnect(spellsPanel, {
             onChildFocusChange = function(self, focusedChild)
-                if focusedChild == nil then
-                    return
-                end
+                if focusedChild == nil then return end
                 updatePreviewSpell(focusedChild)
             end
         })
@@ -168,9 +156,7 @@ function onDropFunc(slotId)
         local widget1 = missedSlotToEdit[1]
         local mousePos1 = missedSlotToEdit[2]
         local item1 = missedSlotToEdit[3]
-        if widget1 and mousePos1 and item1 then
-            onChooseItemByDrag(widget1, mousePos1, item1)
-        end
+        if widget1 and mousePos1 and item1 then onChooseItemByDrag(widget1, mousePos1, item1) end
         itemDragRetry = nil
         missedSlotToEdit = nil
     end
@@ -188,40 +174,26 @@ function setupActionBar()
         slot.words = nil
         slot.text = nil
         slot.useType = nil
-        g_mouse.bindPress(slot, function()
-            slotToEdit = 'slot' .. i .. ''
-        end, MouseLeftButton)
-        g_mouse.bindPress(slot, function()
-            createMenu('slot' .. i)
-        end, MouseRightButton)
+        g_mouse.bindPress(slot, function() slotToEdit = 'slot' .. i .. '' end, MouseLeftButton)
+        g_mouse.bindPress(slot, function() createMenu('slot' .. i) end, MouseRightButton)
         g_mouse.bindOnDrop(slot, function()
-            if slotToEdit == 'slot' .. i then
-                slotReassign = 'slot' .. i
-            end
+            if slotToEdit == 'slot' .. i then slotReassign = 'slot' .. i end
             onDropFunc('slot' .. i)
         end)
-        if i == 1 then
-            slot:addAnchor(AnchorLeft, 'parent', AnchorLeft)
-        end
+        if i == 1 then slot:addAnchor(AnchorLeft, 'parent', AnchorLeft) end
     end
 end
 
 function createMenu(slotId)
     local menu = g_ui.createWidget('PopupMenu')
     slotToEdit = slotId
-    menu:addOption('Assign Spell', function()
-        openSpellAssignWindow()
-    end)
+    menu:addOption('Assign Spell', function() openSpellAssignWindow() end)
     menu:addOption('Assign Object', function()
         startChooseItem()
         openObjectAssignWindow()
     end)
-    menu:addOption('Assign Text', function()
-        openTextAssignWindow()
-    end)
-    menu:addOption('Edit Hotkey', function()
-        openEditHotkeyWindow()
-    end)
+    menu:addOption('Assign Text', function() openTextAssignWindow() end)
+    menu:addOption('Edit Hotkey', function() openEditHotkeyWindow() end)
     local actionSlot = actionBarPanel:recursiveGetChildById(slotToEdit)
     if actionSlot.itemId or actionSlot.words or actionSlot.text or actionSlot.useType or actionSlot.hotkey then
         menu:addOption('Clear Slot', function()
@@ -235,9 +207,7 @@ end
 function openSpellAssignWindow()
     spellAssignWindow = g_ui.loadUI('assign_spell', g_ui.getRootWidget())
     spellsPanel = spellAssignWindow:getChildById('spellsPanel')
-    addEvent(function()
-        initializeSpelllist()
-    end)
+    addEvent(function() initializeSpelllist() end)
     spellAssignWindow:raise()
     spellAssignWindow:focus()
     spellAssignWindow:getChildById('filterTextEdit'):focus()
@@ -252,12 +222,10 @@ function closeSpellAssignWindow()
 end
 
 function initializeSpelllist()
-    g_keyboard.bindKeyPress('Down', function()
-        spellsPanel:focusNextChild(KeyboardFocusReason)
-    end, spellsPanel:getParent())
-    g_keyboard.bindKeyPress('Up', function()
-        spellsPanel:focusPreviousChild(KeyboardFocusReason)
-    end, spellsPanel:getParent())
+    g_keyboard.bindKeyPress('Down', function() spellsPanel:focusNextChild(KeyboardFocusReason) end,
+                            spellsPanel:getParent())
+    g_keyboard.bindKeyPress('Up', function() spellsPanel:focusPreviousChild(KeyboardFocusReason) end,
+                            spellsPanel:getParent())
 
     for spellProfile, _ in pairs(SpelllistSettings) do
         for i = 1, #SpelllistSettings[spellProfile].spellOrder do
@@ -273,9 +241,7 @@ function initializeSpelllist()
                 tmpLabel.name = spell:lower()
 
                 local iconId = tonumber(info.icon)
-                if not iconId and SpellIcons[info.icon] then
-                    iconId = SpellIcons[info.icon][1]
-                end
+                if not iconId and SpellIcons[info.icon] then iconId = SpellIcons[info.icon][1] end
 
                 tmpLabel:setHeight(SpelllistSettings[spellProfile].iconSize.height + 4)
                 tmpLabel:setTextOffset(topoint((SpelllistSettings[spellProfile].iconSize.width + 10) .. ' ' ..
@@ -297,9 +263,7 @@ function initializeSpelllist()
     end
     connect(spellsPanel, {
         onChildFocusChange = function(self, focusedChild)
-            if focusedChild == nil then
-                return
-            end
+            if focusedChild == nil then return end
             updatePreviewSpell(focusedChild)
         end
     })
@@ -324,9 +288,7 @@ end
 function spellAssignAccept()
     clearSlot()
     local focusedChild = spellsPanel:getFocusedChild()
-    if not focusedChild then
-        return
-    end
+    if not focusedChild then return end
     local spellName = focusedChild:getId()
     iconId = tonumber(Spells.getClientId(spellName))
     local spell = Spells.getSpellByName(spellName)
@@ -397,9 +359,7 @@ end
 
 function textAssignAccept()
     local text = textAssignWindow:getChildById('textToSendTextEdit'):getText()
-    if text == '' then
-        return
-    end
+    if text == '' then return end
     local checkForParameter = text:split(' "')
     local name, parameter = nil, nil
     if #checkForParameter == 2 then
@@ -445,9 +405,7 @@ function textAssignAccept()
 end
 
 function openObjectAssignWindow()
-    if objectAssignWindow ~= nil then
-        objectAssignWindow:destroy()
-    end
+    if objectAssignWindow ~= nil then objectAssignWindow:destroy() end
     objectAssignWindow = g_ui.loadUI('assign_object', g_ui.getRootWidget())
     actionRadioGroup = UIRadioGroup.create()
     actionRadioGroup:addWidget(objectAssignWindow:getChildById('useOnYourselfCheckbox'))
@@ -466,9 +424,7 @@ function closeObjectAssignWindow()
 end
 
 function startChooseItem()
-    if g_ui.isMouseGrabbed() then
-        return
-    end
+    if g_ui.isMouseGrabbed() then return end
     mouseGrabberWidget:grabMouse()
     g_mouse.pushCursor('target')
 end
@@ -476,17 +432,13 @@ end
 function objectAssignAccept()
     clearSlot()
     local item = objectAssignWindow:getChildById('previewItem'):getItem()
-    if not item then
-        return
-    end
+    if not item then return end
     local slot = actionBarPanel:getChildById(slotToEdit)
     slot:setItem(item)
     slot:setImageSource('/images/game/actionbar/item-background')
     slot:setBorderWidth(0)
     slot.itemId = item:getId()
-    if item:isFluidContainer() then
-        slot.subType = item:getSubType()
-    end
+    if item:isFluidContainer() then slot.subType = item:getSubType() end
     if objectAssignWindow:getChildById('equipCheckbox'):isChecked() then
         slot.useType = 'equip'
     elseif objectAssignWindow:getChildById('useCheckbox'):isChecked() then
@@ -541,9 +493,7 @@ function onChooseItemMouseRelease(self, mousePosition, mouseButton)
             objectAssignWindow:getChildById('useCheckbox'):setEnabled(true)
             actionRadioGroup:selectWidget(objectAssignWindow:getChildById('useCheckbox'))
         end
-        if not objectAssignWindow:isVisible() then
-            objectAssignWindow:show()
-        end
+        if not objectAssignWindow:isVisible() then objectAssignWindow:show() end
         objectAssignWindow:raise()
         objectAssignWindow:focus()
     end
@@ -582,9 +532,7 @@ function onChooseItemByDrag(self, mousePosition, item)
             objectAssignWindow:getChildById('useCheckbox'):setEnabled(true)
             actionRadioGroup:selectWidget(objectAssignWindow:getChildById('useCheckbox'))
         end
-        if not objectAssignWindow:isVisible() then
-            objectAssignWindow:show()
-        end
+        if not objectAssignWindow:isVisible() then objectAssignWindow:show() end
         objectAssignWindow:raise()
         objectAssignWindow:focus()
     elseif not slotToEdit then
@@ -593,9 +541,7 @@ function onChooseItemByDrag(self, mousePosition, item)
     end
 end
 
-function onDragReassign(self, item)
-    slotReassign = self
-end
+function onDragReassign(self, item) slotReassign = self end
 
 function openEditHotkeyWindow()
     editHotkeyWindow = g_ui.loadUI('edit_hotkey', g_ui.getRootWidget())
@@ -617,9 +563,7 @@ end
 
 function unbindHotkeys()
     for v, slot in pairs(actionBarPanel:getChildren()) do
-        if slot.hotkey and slot.hotkey ~= '' then
-            g_keyboard.unbindKeyPress(slot.hotkey)
-        end
+        if slot.hotkey and slot.hotkey ~= '' then g_keyboard.unbindKeyPress(slot.hotkey) end
     end
 end
 
@@ -643,9 +587,7 @@ function setupHotkeys()
                     modules.game_hotkeys.executeHotkeyItem(HOTKEY_USEONSELF, slot.itemId, slot.subType)
                 elseif slot.useType == 'equip' then
                     local item = g_game.findPlayerItem(slot.itemId, -1)
-                    if item then
-                        g_game.equipItem(item)
-                    end
+                    if item then g_game.equipItem(item) end
                 end
             elseif slot.words then
                 if slot.parameter and slot.parameter ~= '' then
@@ -667,9 +609,7 @@ function setupHotkeys()
 
         if slot.hotkey and slot.hotkey ~= '' then
             g_keyboard.bindKeyPress(slot.hotkey, function()
-                if not modules.game_hotkeys.canPerformKeyCombo(slot.hotkey) then
-                    return
-                end
+                if not modules.game_hotkeys.canPerformKeyCombo(slot.hotkey) then return end
                 if g_clock.millis() - lastHotkeyTime < modules.client_options.getOption('hotkeyDelay') then
                     return
                 end
@@ -686,9 +626,7 @@ function setupHotkeys()
                         modules.game_hotkeys.executeHotkeyItem(HOTKEY_USEONSELF, slot.itemId, slot.subType)
                     elseif slot.useType == 'equip' then
                         local item = g_game.findPlayerItem(slot.itemId, -1)
-                        if item then
-                            g_game.equipItem(item)
-                        end
+                        if item then g_game.equipItem(item) end
                     end
                 elseif slot.words then
                     if slot.parameter and slot.parameter ~= '' then
@@ -714,11 +652,7 @@ function setupHotkeys()
 end
 
 function checkHotkey(hotkey)
-    for v, k in pairs(actionBarPanel:getChildren()) do
-        if k.hotkey == hotkey then
-            return true
-        end
-    end
+    for v, k in pairs(actionBarPanel:getChildren()) do if k.hotkey == hotkey then return true end end
 end
 
 function hotkeyCapture(assignWindow, keyCode, keyboardModifiers)
@@ -781,9 +715,7 @@ function saveActionBar()
     local hotkeys = hotkeySettings
 
     local char = g_game.getCharacterName()
-    if not hotkeys[char] then
-        hotkeys[char] = {}
-    end
+    if not hotkeys[char] then hotkeys[char] = {} end
     hotkeys = hotkeys[char]
 
     table.clear(hotkeys)
@@ -841,12 +773,8 @@ function loadActionBar()
     local hotkeySettings = g_settings.getNode('game_actionbar')
     local hotkeys = {}
 
-    if not table.empty(hotkeySettings) then
-        hotkeys = hotkeySettings
-    end
-    if not table.empty(hotkeys) then
-        hotkeys = hotkeys[g_game.getCharacterName()]
-    end
+    if not table.empty(hotkeySettings) then hotkeys = hotkeySettings end
+    if not table.empty(hotkeys) then hotkeys = hotkeys[g_game.getCharacterName()] end
     if hotkeys then
         for slot, setting in pairs(hotkeys) do
             slot = actionBarPanel:getChildById(slot)
@@ -883,23 +811,18 @@ function loadActionBar()
     setupHotkeys()
 end
 
-function round(n)
-    return n % 1 >= 0.5 and math.ceil(n) or math.floor(n)
-end
+function round(n) return n % 1 >= 0.5 and math.ceil(n) or math.floor(n) end
 
 function updateCooldown(progressRect, duration, spellId, count)
     progressRect:setPercent(progressRect:getPercent() + 10000 / duration)
     local cd = round(duration - (progressRect:getPercent() * duration / 100)) / 1000
-    if cd > 0 then
-        progressRect:setText(cd .. 's')
-    end
+    if cd > 0 then progressRect:setText(cd .. 's') end
 
     if progressRect:getPercent() < 100 then
         removeEvent(progressRect.event)
         cooldown[spellId] = duration - count * 100
-        progressRect.event = scheduleEvent(function()
-            updateCooldown(progressRect, duration, spellId, count + 1)
-        end, 100)
+        progressRect.event = scheduleEvent(function() updateCooldown(progressRect, duration, spellId, count + 1) end,
+                                           100)
     else
         cooldown[spellId] = nil
         progressRect:destroy()
@@ -909,15 +832,11 @@ end
 function updateGroupCooldown(progressRect, duration, groupId)
     progressRect:setPercent(progressRect:getPercent() + 10000 / duration)
     local cd = round(duration - (progressRect:getPercent() * duration / 100)) / 1000
-    if cd > 0 then
-        progressRect:setText(cd .. 's')
-    end
+    if cd > 0 then progressRect:setText(cd .. 's') end
 
     if progressRect:getPercent() < 100 then
         removeEvent(progressRect.event)
-        progressRect.event = scheduleEvent(function()
-            updateGroupCooldown(progressRect, duration, groupId)
-        end, 100)
+        progressRect.event = scheduleEvent(function() updateGroupCooldown(progressRect, duration, groupId) end, 100)
     else
         groupCooldown[groupId] = nil
         progressRect:destroy()
@@ -941,9 +860,7 @@ function onSpellCooldown(spellId, duration)
                 progressRect:setPercent(0)
             end
 
-            local updateFunc = function()
-                updateCooldown(progressRect, duration, spell.id, 0)
-            end
+            local updateFunc = function() updateCooldown(progressRect, duration, spell.id, 0) end
             local finishFunc = function()
                 cooldown[spell.id] = nil
                 progressRect:hide()
@@ -963,9 +880,7 @@ function onSpellGroupCooldown(groupId, duration)
         if k.words then
             spell, profile, spellName = Spells.getSpellByWords(k.words)
         else
-            if k.itemId and k.itemId > 0 then
-                spell, profile, spellName = Spells.getSpellByClientId(k.itemId)
-            end
+            if k.itemId and k.itemId > 0 then spell, profile, spellName = Spells.getSpellByClientId(k.itemId) end
         end
         if spell then
             if table.contains(spell.group, groupId) then
@@ -1022,9 +937,7 @@ function filterSpells(text)
         end
 
     else
-        for index, spellListLabel in pairs(spellsPanel:getChildren()) do
-            showSpell(spellListLabel)
-        end
+        for index, spellListLabel in pairs(spellsPanel:getChildren()) do showSpell(spellListLabel) end
     end
 end
 

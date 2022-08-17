@@ -162,9 +162,7 @@ function init()
     local mountComboBox = shadersPanel:getChildById('mountComboBox')
     mountComboBox.onOptionChange = function(combobox, option)
         local player = g_game.getLocalPlayer()
-        if player then
-            player:setMountShader(g_shaders.getShader(option))
-        end
+        if player then player:setMountShader(g_shaders.getShader(option)) end
     end
 
     local registerShader = function(opts, method)
@@ -175,12 +173,8 @@ function init()
             --  local shader = g_shaders.createShader()
             local shader = g_shaders.createFragmentShader(opts.name, opts.frag)
 
-            if opts.tex1 then
-                shader:addMultiTexture(opts.tex1)
-            end
-            if opts.tex2 then
-                shader:addMultiTexture(opts.tex2)
-            end
+            if opts.tex1 then shader:addMultiTexture(opts.tex1) end
+            if opts.tex2 then shader:addMultiTexture(opts.tex2) end
 
             -- Setup proper uniforms
             g_shaders[method](shader)
@@ -220,6 +214,4 @@ function terminate()
     shadersPanel = nil
 end
 
-function toggle()
-    shadersPanel:setVisible(not shadersPanel:isVisible())
-end
+function toggle() shadersPanel:setVisible(not shadersPanel:isVisible()) end

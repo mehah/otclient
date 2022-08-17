@@ -223,7 +223,7 @@ ActivePreyPanel < Panel
     size: 160 20
     anchors.top: prev.bottom
     margin-top: 5
-    anchors.left: parent.left 
+    anchors.left: parent.left
 
     CheckBox
       id: lockPreyCheck

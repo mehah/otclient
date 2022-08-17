@@ -123,9 +123,7 @@ function init()
     capLabel = healthInfoWindow:recursiveGetChildById('capLabel')
 
     -- load condition icons
-    for k, v in pairs(Icons) do
-        g_textures.preload(v.path)
-    end
+    for k, v in pairs(Icons) do g_textures.preload(v.path) end
 
     if g_game.isOnline() then
         local localPlayer = g_game.getLocalPlayer()
@@ -138,9 +136,7 @@ function init()
     end
 
     healthInfoWindow:setup()
-    if g_game.isOnline() then
-        healthInfoWindow:setupOnStart()
-    end
+    if g_game.isOnline() then healthInfoWindow:setupOnStart() end
 end
 
 function terminate()
@@ -209,13 +205,9 @@ function offline()
 end
 
 -- hooked events
-function onMiniWindowOpen()
-    healthInfoButton:setOn(true)
-end
+function onMiniWindowOpen() healthInfoButton:setOn(true) end
 
-function onMiniWindowClose()
-    healthInfoButton:setOn(false)
-end
+function onMiniWindowClose() healthInfoButton:setOn(false) end
 
 function onHealthChange(localPlayer, health, maxHealth)
     healthBar:setText(health .. ' / ' .. maxHealth)
@@ -235,29 +227,19 @@ function onLevelChange(localPlayer, value, percent)
     experienceBar:setPercent(percent)
 end
 
-function onSoulChange(localPlayer, soul)
-    soulLabel:setText(tr('Soul') .. ': ' .. soul)
-end
+function onSoulChange(localPlayer, soul) soulLabel:setText(tr('Soul') .. ': ' .. soul) end
 
-function onFreeCapacityChange(player, freeCapacity)
-    capLabel:setText(tr('Cap') .. ': ' .. freeCapacity)
-end
+function onFreeCapacityChange(player, freeCapacity) capLabel:setText(tr('Cap') .. ': ' .. freeCapacity) end
 
 function onStatesChange(localPlayer, now, old)
-    if now == old then
-        return
-    end
+    if now == old then return end
 
     local bitsChanged = bit.bxor(now, old)
     for i = 1, 32 do
         local pow = math.pow(2, i - 1)
-        if pow > bitsChanged then
-            break
-        end
+        if pow > bitsChanged then break end
         local bitChanged = bit.band(bitsChanged, pow)
-        if bitChanged ~= 0 then
-            toggleIcon(bitChanged)
-        end
+        if bitChanged ~= 0 then toggleIcon(bitChanged) end
     end
 end
 
@@ -279,18 +261,14 @@ function setHealthTooltip(tooltip)
     healthTooltip = tooltip
 
     local localPlayer = g_game.getLocalPlayer()
-    if localPlayer then
-        healthBar:setTooltip(tr(healthTooltip, localPlayer:getHealth(), localPlayer:getMaxHealth()))
-    end
+    if localPlayer then healthBar:setTooltip(tr(healthTooltip, localPlayer:getHealth(), localPlayer:getMaxHealth())) end
 end
 
 function setManaTooltip(tooltip)
     manaTooltip = tooltip
 
     local localPlayer = g_game.getLocalPlayer()
-    if localPlayer then
-        manaBar:setTooltip(tr(manaTooltip, localPlayer:getMana(), localPlayer:getMaxMana()))
-    end
+    if localPlayer then manaBar:setTooltip(tr(manaTooltip, localPlayer:getMana(), localPlayer:getMaxMana())) end
 end
 
 function setExperienceTooltip(tooltip)

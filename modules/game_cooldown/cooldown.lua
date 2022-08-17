@@ -33,13 +33,9 @@ function init()
     cooldownPanel = contentsPanel:getChildById('cooldownPanel')
 
     -- preload cooldown images
-    for k, v in pairs(SpelllistSettings) do
-        g_textures.preload(v.iconFile)
-    end
+    for k, v in pairs(SpelllistSettings) do g_textures.preload(v.iconFile) end
 
-    if g_game.isOnline() then
-        online()
-    end
+    if g_game.isOnline() then online() end
 end
 
 function terminate()
@@ -56,17 +52,11 @@ end
 
 function loadIcon(iconId)
     local spell, profile, spellName = Spells.getSpellByIcon(iconId)
-    if not spellName then
-        return
-    end
-    if not profile then
-        return
-    end
+    if not spellName then return end
+    if not profile then return end
 
     clientIconId = Spells.getClientId(spellName)
-    if not clientIconId then
-        return
-    end
+    if not clientIconId then return end
 
     local icon = cooldownPanel:getChildById(iconId)
     if not icon then
@@ -84,13 +74,9 @@ function loadIcon(iconId)
     return icon
 end
 
-function onMiniWindowOpen()
-    cooldownButton:setOn(true)
-end
+function onMiniWindowOpen() cooldownButton:setOn(true) end
 
-function onMiniWindowClose()
-    cooldownButton:setOn(false)
-end
+function onMiniWindowClose() cooldownButton:setOn(false) end
 
 function toggle()
     if cooldownButton:isOn() then
@@ -117,15 +103,9 @@ function online()
     end
 end
 
-function offline()
-    if g_game.getFeature(GameSpellList) then
-        cooldownWindow:setParent(nil, true)
-    end
-end
+function offline() if g_game.getFeature(GameSpellList) then cooldownWindow:setParent(nil, true) end end
 
-function refresh()
-    cooldownPanel:destroyChildren()
-end
+function refresh() cooldownPanel:destroyChildren() end
 
 function removeCooldown(progressRect)
     removeEvent(progressRect.event)
@@ -167,27 +147,19 @@ function updateCooldown(progressRect, duration)
     if progressRect:getPercent() < 100 then
         removeEvent(progressRect.event)
 
-        progressRect.event = scheduleEvent(function()
-            progressRect.callback[ProgressCallback.update]()
-        end, 100)
+        progressRect.event = scheduleEvent(function() progressRect.callback[ProgressCallback.update]() end, 100)
     else
         progressRect.callback[ProgressCallback.finish]()
     end
 end
 
-function isGroupCooldownIconActive(groupId)
-    return groupCooldown[groupId]
-end
+function isGroupCooldownIconActive(groupId) return groupCooldown[groupId] end
 
-function isCooldownIconActive(iconId)
-    return cooldown[iconId]
-end
+function isCooldownIconActive(iconId) return cooldown[iconId] end
 
 function onSpellCooldown(iconId, duration)
     local icon = loadIcon(iconId)
-    if not icon then
-        return
-    end
+    if not icon then return end
     icon:setParent(cooldownPanel)
 
     local progressRect = icon:getChildById(iconId)
@@ -201,9 +173,7 @@ function onSpellCooldown(iconId, duration)
     end
     progressRect:setTooltip(spellName)
 
-    local updateFunc = function()
-        updateCooldown(progressRect, duration)
-    end
+    local updateFunc = function() updateCooldown(progressRect, duration) end
     local finishFunc = function()
         removeCooldown(progressRect)
         cooldown[iconId] = false
@@ -213,9 +183,7 @@ function onSpellCooldown(iconId, duration)
 end
 
 function onSpellGroupCooldown(groupId, duration)
-    if not SpellGroups[groupId] then
-        return
-    end
+    if not SpellGroups[groupId] then return end
 
     local icon = contentsPanel:getChildById('groupIcon' .. SpellGroups[groupId])
     local progressRect = contentsPanel:getChildById('progressRect' .. SpellGroups[groupId])
@@ -227,9 +195,7 @@ function onSpellGroupCooldown(groupId, duration)
     progressRect.icon = icon
     if progressRect then
         removeEvent(progressRect.event)
-        local updateFunc = function()
-            updateCooldown(progressRect, duration)
-        end
+        local updateFunc = function() updateCooldown(progressRect, duration) end
         local finishFunc = function()
             turnOffCooldown(progressRect)
             groupCooldown[groupId] = false
