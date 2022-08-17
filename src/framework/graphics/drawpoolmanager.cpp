@@ -44,7 +44,7 @@ void DrawPoolManager::terminate()
     }
 }
 
-void DrawPoolManager::draw(bool forceUpdate)
+void DrawPoolManager::draw()
 {
     if (m_size != g_painter->getResolution()) {
         m_size = g_painter->getResolution();
@@ -57,7 +57,7 @@ void DrawPoolManager::draw(bool forceUpdate)
 
         const auto& pf = pool->toPoolFramed();
 
-        if (forceUpdate && !pool->isType(DrawPoolType::FOREGROUND) || pool->canRepaint(true)) {
+        if (pool->canRepaint(true)) {
             pf->m_framebuffer->bind();
             for (int_fast8_t z = -1; ++z <= pool->m_currentFloor;) {
                 for (const auto& order : pool->m_objects[z])

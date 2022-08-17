@@ -123,6 +123,8 @@ void GraphicalApplication::run()
     g_lua.callGlobalField("g_app", "onRun");
 
     const auto& foreground = g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND);
+    const auto& map = g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND);
+
     Timer foregroundRefresh;
 
     while (!m_stopping) {
@@ -154,10 +156,15 @@ void GraphicalApplication::run()
 
             // background pane - high updated and animated pane (where the game are stuff happens)
             g_ui.render(Fw::BackgroundPane);
+
+            // force map repaint if vsync is enabled or maxFPS set.
+            if (g_window.vsyncEnabled() || getMaxFps() > 0) {
+                map->repaint();
+            }
         }
 
         // Draw All Pools
-        g_drawPool.draw(g_window.vsyncEnabled() || getMaxFps() > 0);
+        g_drawPool.draw();
 
         // update screen pixels
         g_window.swapBuffers();
