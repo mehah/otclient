@@ -52,13 +52,21 @@ function UICreatureButton.create()
     return button
 end
 
-function UICreatureButton.getCreatureButtonColors() return CreatureButtonColors end
+function UICreatureButton.getCreatureButtonColors()
+    return CreatureButtonColors
+end
 
-function UICreatureButton:setCreature(creature) self.creature = creature end
+function UICreatureButton:setCreature(creature)
+    self.creature = creature
+end
 
-function UICreatureButton:getCreature() return self.creature end
+function UICreatureButton:getCreature()
+    return self.creature
+end
 
-function UICreatureButton:getCreatureId() return self.creature:getId() end
+function UICreatureButton:getCreatureId()
+    return self.creature:getId()
+end
 
 function UICreatureButton:setup(creature)
     self.creature = creature
@@ -99,7 +107,9 @@ function UICreatureButton:update()
 end
 
 function UICreatureButton:updateSkull(skullId)
-    if not self.creature then return end
+    if not self.creature then
+        return
+    end
     local skullId = skullId or self.creature:getSkull()
     local skullWidget = self:getChildById('skull')
     local labelWidget = self:getChildById('label')
@@ -111,12 +121,16 @@ function UICreatureButton:updateSkull(skullId)
         labelWidget:setMarginLeft(5)
     else
         skullWidget:setWidth(0)
-        if self.creature:getEmblem() == EmblemNone then labelWidget:setMarginLeft(2) end
+        if self.creature:getEmblem() == EmblemNone then
+            labelWidget:setMarginLeft(2)
+        end
     end
 end
 
 function UICreatureButton:updateEmblem(emblemId)
-    if not self.creature then return end
+    if not self.creature then
+        return
+    end
     local emblemId = emblemId or self.creature:getEmblem()
     local emblemWidget = self:getChildById('emblem')
     local labelWidget = self:getChildById('label')
@@ -130,7 +144,9 @@ function UICreatureButton:updateEmblem(emblemId)
     else
         emblemWidget:setWidth(0)
         emblemWidget:setMarginLeft(0)
-        if self.creature:getSkull() == SkullNone then labelWidget:setMarginLeft(2) end
+        if self.creature:getSkull() == SkullNone then
+            labelWidget:setMarginLeft(2)
+        end
     end
 end
 

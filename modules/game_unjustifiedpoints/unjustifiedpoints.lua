@@ -49,7 +49,9 @@ function init()
     weekSkullWidget = contentsPanel:getChildById('weekSkullWidget')
     monthSkullWidget = contentsPanel:getChildById('monthSkullWidget')
 
-    if g_game.isOnline() then online() end
+    if g_game.isOnline() then
+        online()
+    end
 end
 
 function terminate()
@@ -67,9 +69,13 @@ function terminate()
     unjustifiedPointsButton:destroy()
 end
 
-function onMiniWindowOpen() unjustifiedPointsButton:setOn(true) end
+function onMiniWindowOpen()
+    unjustifiedPointsButton:setOn(true)
+end
 
-function onMiniWindowClose() unjustifiedPointsButton:setOn(false) end
+function onMiniWindowClose()
+    unjustifiedPointsButton:setOn(false)
+end
 
 function toggle()
     if unjustifiedPointsButton:isOn() then
@@ -93,7 +99,11 @@ function online()
     refresh()
 end
 
-function offline() if g_game.getFeature(GameUnjustifiedPoints) then unjustifiedPointsWindow:setParent(nil, true) end end
+function offline()
+    if g_game.getFeature(GameUnjustifiedPoints) then
+        unjustifiedPointsWindow:setParent(nil, true)
+    end
+end
 
 function refresh()
     local localPlayer = g_game.getLocalPlayer()
@@ -106,7 +116,9 @@ function refresh()
 end
 
 function onSkullChange(localPlayer, skull)
-    if not localPlayer:isLocalPlayer() then return end
+    if not localPlayer:isLocalPlayer() then
+        return
+    end
 
     if skull == SkullRed or skull == SkullBlack then
         currentSkullWidget:setIcon(getSkullImagePath(skull))
@@ -121,7 +133,9 @@ function onSkullChange(localPlayer, skull)
     monthSkullWidget:setIcon(getSkullImagePath(getNextSkullId(skull)))
 end
 
-function onOpenPvpSituationsChange(amount) openPvpSituationsLabel:setText(amount) end
+function onOpenPvpSituationsChange(amount)
+    openPvpSituationsLabel:setText(amount)
+end
 
 local function getColorByKills(kills)
     if kills < 2 then

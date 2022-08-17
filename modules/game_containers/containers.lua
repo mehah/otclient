@@ -28,10 +28,16 @@ end
 
 function reloadContainers()
     clean()
-    for _, container in pairs(g_game.getContainers()) do onContainerOpen(container) end
+    for _, container in pairs(g_game.getContainers()) do
+        onContainerOpen(container)
+    end
 end
 
-function clean() for containerid, container in pairs(g_game.getContainers()) do destroy(container) end end
+function clean()
+    for containerid, container in pairs(g_game.getContainers()) do
+        destroy(container)
+    end
+end
 
 function destroy(container)
     if container.window then
@@ -47,7 +53,9 @@ function refreshContainerItems(container)
         itemWidget:setItem(container:getItem(slot))
     end
 
-    if container:hasPages() then refreshContainerPages(container) end
+    if container:hasPages() then
+        refreshContainerPages(container)
+    end
 end
 
 function toggleContainerPages(containerWindow, pages)
@@ -106,7 +114,9 @@ function onContainerOpen(container, previousContainer)
     })
 
     local upButton = containerWindow:getChildById('upButton')
-    upButton.onClick = function() g_game.openParent(container) end
+    upButton.onClick = function()
+        g_game.openParent(container)
+    end
     upButton:setVisible(container:hasParent())
 
     local name = container:getName()
@@ -124,7 +134,9 @@ function onContainerOpen(container, previousContainer)
         itemWidget:setMargin(0)
         itemWidget.position = container:getSlotPosition(slot)
 
-        if not container:isUnlocked() then itemWidget:setBorderColor('red') end
+        if not container:isUnlocked() then
+            itemWidget:setBorderColor('red')
+        end
     end
 
     container.window = containerWindow
@@ -153,15 +165,21 @@ function onContainerOpen(container, previousContainer)
     containerWindow:setup()
 end
 
-function onContainerClose(container) destroy(container) end
+function onContainerClose(container)
+    destroy(container)
+end
 
 function onContainerChangeSize(container, size)
-    if not container.window then return end
+    if not container.window then
+        return
+    end
     refreshContainerItems(container)
 end
 
 function onContainerUpdateItem(container, slot, item, oldItem)
-    if not container.window then return end
+    if not container.window then
+        return
+    end
     local itemWidget = container.itemsPanel:getChildById('item' .. slot)
     itemWidget:setItem(item)
 end

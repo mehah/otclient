@@ -1,4 +1,6 @@
-if not UIWindow then dofile 'uiwindow' end
+if not UIWindow then
+    dofile 'uiwindow'
+end
 
 -- @docclass
 UIMessageBox = extends(UIWindow, 'UIMessageBox')
@@ -20,7 +22,9 @@ function UIMessageBox.display(title, message, buttons, onEnterCallback, onEscape
     local buttonsHeight = 0
 
     local anchor = AnchorRight
-    if buttons.anchor then anchor = buttons.anchor end
+    if buttons.anchor then
+        anchor = buttons.anchor
+    end
 
     local buttonHolder = g_ui.createWidget('MessageBoxButtonHolder', messageBox)
     buttonHolder:addAnchor(anchor, 'parent', anchor)
@@ -62,7 +66,9 @@ end
 
 function displayInfoBox(title, message)
     local messageBox
-    local defaultCallback = function() messageBox:ok() end
+    local defaultCallback = function()
+        messageBox:ok()
+    end
     messageBox = UIMessageBox.display(title, message, {{
         text = 'Ok',
         callback = defaultCallback
@@ -72,7 +78,9 @@ end
 
 function displayErrorBox(title, message)
     local messageBox
-    local defaultCallback = function() messageBox:ok() end
+    local defaultCallback = function()
+        messageBox:ok()
+    end
     messageBox = UIMessageBox.display(title, message, {{
         text = 'Ok',
         callback = defaultCallback
@@ -82,7 +90,9 @@ end
 
 function displayCancelBox(title, message)
     local messageBox
-    local defaultCallback = function() messageBox:cancel() end
+    local defaultCallback = function()
+        messageBox:cancel()
+    end
     messageBox = UIMessageBox.display(title, message, {{
         text = 'Cancel',
         callback = defaultCallback

@@ -71,7 +71,9 @@ function init()
     optionsTabBar = optionsWindow:getChildById('optionsTabBar')
     optionsTabBar:setContentWidget(optionsWindow:getChildById('optionsTabContent'))
 
-    g_keyboard.bindKeyDown('Ctrl+Shift+F', function() toggleOption('fullscreen') end)
+    g_keyboard.bindKeyDown('Ctrl+Shift+F', function()
+        toggleOption('fullscreen')
+    end)
     g_keyboard.bindKeyDown('Ctrl+N', toggleDisplays)
 
     generalPanel = g_ui.loadUI('general')
@@ -92,9 +94,13 @@ function init()
     optionsButton = modules.client_topmenu.addLeftButton('optionsButton', tr('Options'), '/images/topbuttons/options',
                                                          toggle)
     audioButton = modules.client_topmenu.addLeftButton('audioButton', tr('Audio'), '/images/topbuttons/audio',
-                                                       function() toggleOption('enableAudio') end)
+                                                       function()
+        toggleOption('enableAudio')
+    end)
 
-    addEvent(function() setup() end)
+    addEvent(function()
+        setup()
+    end)
 end
 
 function terminate()
@@ -168,7 +174,9 @@ function show()
     optionsWindow:focus()
 end
 
-function hide() optionsWindow:hide() end
+function hide()
+    optionsWindow:hide()
+end
 
 function toggleDisplays()
     if options['displayNames'] and options['displayHealth'] and options['displayMana'] then
@@ -186,10 +194,14 @@ function toggleDisplays()
     end
 end
 
-function toggleOption(key) setOption(key, not getOption(key)) end
+function toggleOption(key)
+    setOption(key, not getOption(key))
+end
 
 function setOption(key, value, force)
-    if not force and options[key] == value then return end
+    if not force and options[key] == value then
+        return
+    end
 
     local gameMapPanel = modules.game_interface.getMapPanel()
 
@@ -208,16 +220,22 @@ function setOption(key, value, force)
     elseif key == 'fullscreen' then
         g_window.setFullscreen(value)
     elseif key == 'enableAudio' then
-        if g_sounds then g_sounds.setAudioEnabled(value) end
+        if g_sounds then
+            g_sounds.setAudioEnabled(value)
+        end
         if value then
             audioButton:setIcon('/images/topbuttons/audio')
         else
             audioButton:setIcon('/images/topbuttons/audio_mute')
         end
     elseif key == 'enableMusicSound' then
-        if g_sounds then g_sounds.getChannel(SoundChannels.Music):setEnabled(value) end
+        if g_sounds then
+            g_sounds.getChannel(SoundChannels.Music):setEnabled(value)
+        end
     elseif key == 'musicSoundVolume' then
-        if g_sounds then g_sounds.getChannel(SoundChannels.Music):setGain(value / 100) end
+        if g_sounds then
+            g_sounds.getChannel(SoundChannels.Music):setGain(value / 100)
+        end
         soundPanel:getChildById('musicSoundVolumeLabel'):setText(tr('Music volume: %d', value))
     elseif key == 'showLeftPanel' then
         modules.game_interface.getLeftPanel():setOn(value)
@@ -258,7 +276,9 @@ function setOption(key, value, force)
     elseif key == 'displayText' then
         gameMapPanel:setDrawTexts(value)
     elseif key == 'dontStretchShrink' then
-        addEvent(function() modules.game_interface.updateStretchShrink() end)
+        addEvent(function()
+            modules.game_interface.updateStretchShrink()
+        end)
     elseif key == 'preciseControl' then
         g_game.setScheduleLastWalk(not value)
     elseif key == 'turnDelay' then
@@ -268,7 +288,9 @@ function setOption(key, value, force)
     elseif key == 'crosshair' then
         local crossPath = '/images/game/crosshair/'
         local newValue = value
-        if newValue == 'disabled' then newValue = nil end
+        if newValue == 'disabled' then
+            newValue = nil
+        end
         gameMapPanel:setCrosshairTexture(newValue and crossPath .. newValue or nil)
         crosshairCombobox:setCurrentOptionByData(newValue, true)
     elseif key == 'enableHighlightMouseTarget' then
@@ -305,14 +327,22 @@ function setOption(key, value, force)
     options[key] = value
 end
 
-function getOption(key) return options[key] end
+function getOption(key)
+    return options[key]
+end
 
-function addTab(name, panel, icon) optionsTabBar:addTab(name, panel, icon) end
+function addTab(name, panel, icon)
+    optionsTabBar:addTab(name, panel, icon)
+end
 
 function removeTab(v)
-    if type(v) == 'string' then v = optionsTabBar:getTab(v) end
+    if type(v) == 'string' then
+        v = optionsTabBar:getTab(v)
+    end
 
     optionsTabBar:removeTab(v)
 end
 
-function addButton(name, func, icon) optionsTabBar:addButton(name, func, icon) end
+function addButton(name, func, icon)
+    optionsTabBar:addButton(name, func, icon)
+end

@@ -112,7 +112,9 @@ function init()
         end
     end
 
-    protectionBtn.onClick = function() setProtection(not protection) end
+    protectionBtn.onClick = function()
+        setProtection(not protection)
+    end
 end
 
 function setProtection(value)
@@ -266,25 +268,35 @@ function selectSlot(widget, slotId, activeSlot)
 end
 
 function Imbuing.onImbuementWindow(itemId, slots, activeSlots, imbuements, needItems)
-    if not itemId then return end
+    if not itemId then
+        return
+    end
     resetSlots()
     imbueItems = table.copy(needItems)
     imbuingWindow.itemInfo.item:setItemId(itemId)
 
     for i = 1, slots do
         local slot = imbuingWindow.itemInfo.slots:getChildByIndex(i)
-        slot.onClick = function(widget) selectSlot(widget, i - 1) end
+        slot.onClick = function(widget)
+            selectSlot(widget, i - 1)
+        end
         slot:setTooltip(
             'Use this slot to imbue your item. Depending on the item you can have up to three different imbuements.')
         slot:setEnabled(true)
 
-        if slot:getId() == 'slot0' then selectSlot(slot, i - 1) end
+        if slot:getId() == 'slot0' then
+            selectSlot(slot, i - 1)
+        end
     end
 
     for i, slot in pairs(activeSlots) do
         local activeSlotBtn = imbuingWindow.itemInfo.slots:getChildById('slot' .. i)
-        activeSlotBtn.onClick = function(widget) selectSlot(widget, i, slot) end
-        if activeSlotBtn:getId() == 'slot0' then selectSlot(activeSlotBtn, i, slot) end
+        activeSlotBtn.onClick = function(widget)
+            selectSlot(widget, i, slot)
+        end
+        if activeSlotBtn:getId() == 'slot0' then
+            selectSlot(activeSlotBtn, i, slot)
+        end
     end
 
     if imbuements ~= nil then
@@ -292,7 +304,9 @@ function Imbuing.onImbuementWindow(itemId, slots, activeSlots, imbuements, needI
         imbueLevelsCombo:clearOptions()
         itemImbuements = table.copy(imbuements)
         for _, imbuement in ipairs(itemImbuements) do
-            if not groupsCombo:isOption(imbuement['group']) then groupsCombo:addOption(imbuement['group']) end
+            if not groupsCombo:isOption(imbuement['group']) then
+                groupsCombo:addOption(imbuement['group'])
+            end
         end
     end
     show()
@@ -312,7 +326,9 @@ function Imbuing.onResourcesBalanceChange(balance, oldBalance, type)
     end
 end
 
-function Imbuing.onCloseImbuementWindow() resetSlots() end
+function Imbuing.onCloseImbuementWindow()
+    resetSlots()
+end
 
 function hide()
     g_game.closeImbuingWindow()
@@ -326,6 +342,8 @@ function show()
 end
 
 function toggle()
-    if imbuingWindow:isVisible() then return hide() end
+    if imbuingWindow:isVisible() then
+        return hide()
+    end
     show()
 end

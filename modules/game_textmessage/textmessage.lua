@@ -98,14 +98,18 @@ MessageTypes = {
 messagesPanel = nil
 
 function init()
-    for messageMode, _ in pairs(MessageTypes) do registerMessageMode(messageMode, displayMessage) end
+    for messageMode, _ in pairs(MessageTypes) do
+        registerMessageMode(messageMode, displayMessage)
+    end
 
     connect(g_game, 'onGameEnd', clearMessages)
     messagesPanel = g_ui.loadUI('textmessage', modules.game_interface.getRootPanel())
 end
 
 function terminate()
-    for messageMode, _ in pairs(MessageTypes) do unregisterMessageMode(messageMode, displayMessage) end
+    for messageMode, _ in pairs(MessageTypes) do
+        unregisterMessageMode(messageMode, displayMessage)
+    end
 
     disconnect(g_game, 'onGameEnd', clearMessages)
     clearMessages()
@@ -113,15 +117,23 @@ function terminate()
     messagesPanel = nil
 end
 
-function calculateVisibleTime(text) return math.max(#text * 100, 4000) end
+function calculateVisibleTime(text)
+    return math.max(#text * 100, 4000)
+end
 
 function displayMessage(mode, text)
-    if not g_game.isOnline() then return end
+    if not g_game.isOnline() then
+        return
+    end
 
     local msgtype = MessageTypes[mode]
-    if not msgtype then return end
+    if not msgtype then
+        return
+    end
 
-    if msgtype == MessageSettings.none then return end
+    if msgtype == MessageSettings.none then
+        return
+    end
 
     if msgtype.consoleTab ~= nil and
         (msgtype.consoleOption == nil or modules.client_options.getOption(msgtype.consoleOption)) then
@@ -135,19 +147,31 @@ function displayMessage(mode, text)
         label:setColor(msgtype.color)
         label:setVisible(true)
         removeEvent(label.hideEvent)
-        label.hideEvent = scheduleEvent(function() label:setVisible(false) end, calculateVisibleTime(text))
+        label.hideEvent = scheduleEvent(function()
+            label:setVisible(false)
+        end, calculateVisibleTime(text))
     end
 end
 
-function displayPrivateMessage(text) displayMessage(254, text) end
+function displayPrivateMessage(text)
+    displayMessage(254, text)
+end
 
-function displayStatusMessage(text) displayMessage(MessageModes.Status, text) end
+function displayStatusMessage(text)
+    displayMessage(MessageModes.Status, text)
+end
 
-function displayFailureMessage(text) displayMessage(MessageModes.Failure, text) end
+function displayFailureMessage(text)
+    displayMessage(MessageModes.Failure, text)
+end
 
-function displayGameMessage(text) displayMessage(MessageModes.Game, text) end
+function displayGameMessage(text)
+    displayMessage(MessageModes.Game, text)
+end
 
-function displayBroadcastMessage(text) displayMessage(MessageModes.Warning, text) end
+function displayBroadcastMessage(text)
+    displayMessage(MessageModes.Warning, text)
+end
 
 function clearMessages()
     for _i, child in pairs(messagesPanel:recursiveGetChildren()) do
@@ -158,4 +182,6 @@ function clearMessages()
     end
 end
 
-function LocalPlayer:onAutoWalkFail(player) modules.game_textmessage.displayFailureMessage(tr('There is no way.')) end
+function LocalPlayer:onAutoWalkFail(player)
+    modules.game_textmessage.displayFailureMessage(tr('There is no way.'))
+end

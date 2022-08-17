@@ -112,11 +112,17 @@ MarketCategoryStrings = {
     [255] = 'Weapons'
 }
 
-function getMarketCategoryName(id) if table.haskey(MarketCategoryStrings, id) then return MarketCategoryStrings[id] end end
+function getMarketCategoryName(id)
+    if table.haskey(MarketCategoryStrings, id) then
+        return MarketCategoryStrings[id]
+    end
+end
 
 function getMarketCategoryId(name)
     local id = table.find(MarketCategoryStrings, name)
-    if id then return id end
+    if id then
+        return id
+    end
 end
 
 MarketItemDescription = {
@@ -173,12 +179,16 @@ MarketItemDescriptionStrings = {
 }
 
 function getMarketDescriptionName(id)
-    if table.haskey(MarketItemDescriptionStrings, id) then return MarketItemDescriptionStrings[id] end
+    if table.haskey(MarketItemDescriptionStrings, id) then
+        return MarketItemDescriptionStrings[id]
+    end
 end
 
 function getMarketDescriptionId(name)
     local id = table.find(MarketItemDescriptionStrings, name)
-    if id then return id end
+    if id then
+        return id
+    end
 end
 
 MarketSlotFilters = {
@@ -199,7 +209,13 @@ MarketFilters.Last = MarketFilters.Depot
 
 function getMarketSlotFilterId(name)
     local id = table.find(MarketSlotFilters, name)
-    if id then return id end
+    if id then
+        return id
+    end
 end
 
-function getMarketSlotFilterName(id) if table.haskey(MarketSlotFilters, id) then return MarketSlotFilters[id] end end
+function getMarketSlotFilterName(id)
+    if table.haskey(MarketSlotFilters, id) then
+        return MarketSlotFilters[id]
+    end
+end

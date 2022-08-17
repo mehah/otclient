@@ -21,7 +21,9 @@ function terminate()
 end
 
 function destroyWindows()
-    for _, window in pairs(windows) do window:destroy() end
+    for _, window in pairs(windows) do
+        window:destroy()
+    end
     windows = {}
 end
 
@@ -37,7 +39,9 @@ function onGameEditText(id, itemId, maxLength, text, writer, time)
 
     local textScroll = textWindow:getChildById('textScroll')
 
-    if textItem:isHidden() then textItem:show() end
+    if textItem:isHidden() then
+        textItem:show()
+    end
 
     textItem:setItemId(itemId)
     textEdit:setMaxLength(maxLength)
@@ -48,7 +52,9 @@ function onGameEditText(id, itemId, maxLength, text, writer, time)
     local desc = ''
     if #writer > 0 then
         desc = tr('You read the following, written by \n%s\n', writer)
-        if #time > 0 then desc = desc .. tr('on %s.\n', time) end
+        if #time > 0 then
+            desc = desc .. tr('on %s.\n', time)
+        end
     elseif #time > 0 then
         desc = tr('You read the following, written on \n%s.\n', time)
     end
@@ -60,7 +66,9 @@ function onGameEditText(id, itemId, maxLength, text, writer, time)
     end
 
     local lines = #{string.find(desc, '\n')}
-    if lines < 2 then desc = desc .. '\n' end
+    if lines < 2 then
+        desc = desc .. '\n'
+    end
 
     description:setText(desc)
 
@@ -75,7 +83,9 @@ function onGameEditText(id, itemId, maxLength, text, writer, time)
         textEdit:setCursorPos(#text)
     end
 
-    if description:getHeight() < 64 then description:setHeight(64) end
+    if description:getHeight() < 64 then
+        description:setHeight(64)
+    end
 
     local function destroy()
         textWindow:destroy()
@@ -83,14 +93,18 @@ function onGameEditText(id, itemId, maxLength, text, writer, time)
     end
 
     local doneFunc = function()
-        if writeable then g_game.editText(id, textEdit:getText()) end
+        if writeable then
+            g_game.editText(id, textEdit:getText())
+        end
         destroy()
     end
 
     okButton.onClick = doneFunc
     cancelButton.onClick = destroy
 
-    if not writeable then textWindow.onEnter = doneFunc end
+    if not writeable then
+        textWindow.onEnter = doneFunc
+    end
 
     textWindow.onEscape = destroy
 
@@ -106,7 +120,9 @@ function onGameEditList(id, doorId, text)
     local cancelButton = textWindow:getChildById('cancelButton')
 
     local textItem = textWindow:getChildById('textItem')
-    if textItem and not textItem:isHidden() then textItem:hide() end
+    if textItem and not textItem:isHidden() then
+        textItem:hide()
+    end
 
     textEdit:setMaxLength(8192)
     textEdit:setText(text)
@@ -116,7 +132,9 @@ function onGameEditList(id, doorId, text)
     description:setText(tr('Enter one name per line.'))
     textWindow:setText(tr('Edit List'))
 
-    if description:getHeight() < 64 then description:setHeight(64) end
+    if description:getHeight() < 64 then
+        description:setHeight(64)
+    end
 
     local function destroy()
         textWindow:destroy()

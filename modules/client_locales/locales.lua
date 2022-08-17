@@ -26,7 +26,9 @@ function createWindow()
         local widget = g_ui.createWidget('LocalesButton', localesPanel)
         widget:setImageSource('/images/flags/' .. name .. '')
         widget:setText(locale.languageName)
-        widget.onClick = function() selectFirstLocale(name) end
+        widget.onClick = function()
+            selectFirstLocale(name)
+        end
         count = count + 1
     end
 
@@ -46,15 +48,21 @@ function selectFirstLocale(name)
         localesWindow:destroy()
         localesWindow = nil
     end
-    if setLocale(name) then g_modules.reloadModules() end
+    if setLocale(name) then
+        g_modules.reloadModules()
+    end
 end
 
 -- hooked functions
-function onGameStart() sendLocale(currentLocale.name) end
+function onGameStart()
+    sendLocale(currentLocale.name)
+end
 
 function onExtendedLocales(protocol, opcode, buffer)
     local locale = installedLocales[buffer]
-    if locale and setLocale(locale.name) then g_modules.reloadModules() end
+    if locale and setLocale(locale.name) then
+        g_modules.reloadModules()
+    end
 end
 
 -- public functions
@@ -113,31 +121,43 @@ function generateNewTranslationTable(localename)
 end
 
 function installLocale(locale)
-    if not locale or not locale.name then error('Unable to install locale.') end
+    if not locale or not locale.name then
+        error('Unable to install locale.')
+    end
 
-    if _G.allowedLocales and not _G.allowedLocales[locale.name] then return end
+    if _G.allowedLocales and not _G.allowedLocales[locale.name] then
+        return
+    end
 
     if locale.name ~= defaultLocaleName then
         local updatesNamesMissing = {}
         for _, k in pairs(neededTranslations) do
-            if locale.translation[k] == nil then updatesNamesMissing[#updatesNamesMissing + 1] = k end
+            if locale.translation[k] == nil then
+                updatesNamesMissing[#updatesNamesMissing + 1] = k
+            end
         end
 
         if #updatesNamesMissing > 0 then
             pdebug('Locale \'' .. locale.name .. '\' is missing ' .. #updatesNamesMissing .. ' translations.')
-            for _, name in pairs(updatesNamesMissing) do pdebug('["' .. name .. '"] = \"\",') end
+            for _, name in pairs(updatesNamesMissing) do
+                pdebug('["' .. name .. '"] = \"\",')
+            end
         end
     end
 
     local installedLocale = installedLocales[locale.name]
     if installedLocale then
-        for word, translation in pairs(locale.translation) do installedLocale.translation[word] = translation end
+        for word, translation in pairs(locale.translation) do
+            installedLocale.translation[word] = translation
+        end
     else
         installedLocales[locale.name] = locale
     end
 end
 
-function installLocales(directory) dofiles(directory) end
+function installLocales(directory)
+    dofiles(directory)
+end
 
 function setLocale(name)
     local locale = installedLocales[name]
@@ -149,16 +169,24 @@ function setLocale(name)
         pwarning('Locale ' .. name .. ' does not exist.')
         return false
     end
-    if currentLocale then sendLocale(locale.name) end
+    if currentLocale then
+        sendLocale(locale.name)
+    end
     currentLocale = locale
     g_settings.set('locale', name)
-    if onLocaleChanged then onLocaleChanged(name) end
+    if onLocaleChanged then
+        onLocaleChanged(name)
+    end
     return true
 end
 
-function getInstalledLocales() return installedLocales end
+function getInstalledLocales()
+    return installedLocales
+end
 
-function getCurrentLocale() return currentLocale end
+function getCurrentLocale()
+    return currentLocale
+end
 
 -- global function used to translate texts
 function _G.tr(text, ...)
@@ -169,10 +197,14 @@ function _G.tr(text, ...)
             local reverseNumber = number[1]:reverse()
             for i = 1, #reverseNumber do
                 out = out .. reverseNumber:sub(i, i)
-                if i % 3 == 0 and i ~= #number then out = out .. currentLocale.thousandsSeperator end
+                if i % 3 == 0 and i ~= #number then
+                    out = out .. currentLocale.thousandsSeperator
+                end
             end
 
-            if number[2] then out = number[2] .. currentLocale.decimalSeperator .. out end
+            if number[2] then
+                out = number[2] .. currentLocale.decimalSeperator .. out
+            end
             return out:reverse()
         elseif tostring(text) then
             local translation = currentLocale.translation[text]

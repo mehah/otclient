@@ -39,13 +39,17 @@ function init()
     purseButton = inventoryPanel:getChildById('purseButton')
     local function purseFunction()
         local purse = g_game.getLocalPlayer():getInventoryItem(InventorySlotPurse)
-        if purse then g_game.use(purse) end
+        if purse then
+            g_game.use(purse)
+        end
     end
     purseButton.onClick = purseFunction
 
     refresh()
     inventoryWindow:setup()
-    if g_game.isOnline() then inventoryWindow:setupOnStart() end
+    if g_game.isOnline() then
+        inventoryWindow:setupOnStart()
+    end
 end
 
 function terminate()
@@ -72,7 +76,9 @@ end
 function toggleAdventurerStyle(hasBlessing)
     for slot = InventorySlotFirst, InventorySlotLast do
         local itemWidget = inventoryPanel:getChildById('slot' .. slot)
-        if itemWidget then itemWidget:setOn(hasBlessing) end
+        if itemWidget then
+            itemWidget:setOn(hasBlessing)
+        end
     end
 end
 
@@ -81,7 +87,9 @@ function online()
     refresh()
 end
 
-function offline() inventoryWindow:setParent(nil, true) end
+function offline()
+    inventoryWindow:setParent(nil, true)
+end
 
 function refresh()
     local player = g_game.getLocalPlayer()
@@ -107,16 +115,24 @@ function toggle()
     end
 end
 
-function onMiniWindowOpen() inventoryButton:setOn(true) end
+function onMiniWindowOpen()
+    inventoryButton:setOn(true)
+end
 
-function onMiniWindowClose() inventoryButton:setOn(false) end
+function onMiniWindowClose()
+    inventoryButton:setOn(false)
+end
 
 -- hooked events
 function onInventoryChange(player, slot, item, oldItem)
-    if slot > InventorySlotPurse then return end
+    if slot > InventorySlotPurse then
+        return
+    end
 
     if slot == InventorySlotPurse then
-        if g_game.getFeature(GamePurseSlot) then purseButton:setEnabled(item and true or false) end
+        if g_game.getFeature(GamePurseSlot) then
+            purseButton:setEnabled(item and true or false)
+        end
         return
     end
 

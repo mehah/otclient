@@ -17,11 +17,17 @@ function UIResizeBorder:onSetup()
     end
 end
 
-function UIResizeBorder:onDestroy() if self.hovering then g_mouse.popCursor(self.cursortype) end end
+function UIResizeBorder:onDestroy()
+    if self.hovering then
+        g_mouse.popCursor(self.cursortype)
+    end
+end
 
 function UIResizeBorder:onHoverChange(hovered)
     if hovered then
-        if g_mouse.isCursorChanged() or g_mouse.isPressed() then return end
+        if g_mouse.isCursorChanged() or g_mouse.isPressed() then
+            return
+        end
         if self:getWidth() > self:getHeight() then
             self.vertical = true
             self.cursortype = 'vertical'
@@ -31,7 +37,9 @@ function UIResizeBorder:onHoverChange(hovered)
         end
         g_mouse.pushCursor(self.cursortype)
         self.hovering = true
-        if not self:isPressed() then g_effects.fadeIn(self) end
+        if not self:isPressed() then
+            g_effects.fadeIn(self)
+        end
     else
         if not self:isPressed() and self.hovering then
             g_mouse.popCursor(self.cursortype)
@@ -78,7 +86,11 @@ function UIResizeBorder:onStyleApply(styleName, styleNode)
     end
 end
 
-function UIResizeBorder:onVisibilityChange(visible) if visible and self.maximum == self.minimum then self:hide() end end
+function UIResizeBorder:onVisibilityChange(visible)
+    if visible and self.maximum == self.minimum then
+        self:hide()
+    end
+end
 
 function UIResizeBorder:setMaximum(maximum)
     self.maximum = maximum
@@ -90,8 +102,12 @@ function UIResizeBorder:setMinimum(minimum)
     self:checkBoundary()
 end
 
-function UIResizeBorder:getMaximum() return self.maximum end
-function UIResizeBorder:getMinimum() return self.minimum end
+function UIResizeBorder:getMaximum()
+    return self.maximum
+end
+function UIResizeBorder:getMinimum()
+    return self.minimum
+end
 
 function UIResizeBorder:setParentSize(size)
     local parent = self:getParent()

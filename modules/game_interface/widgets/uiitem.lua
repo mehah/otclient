@@ -1,8 +1,12 @@
 function UIItem:onDragEnter(mousePos)
-    if self:isVirtual() then return false end
+    if self:isVirtual() then
+        return false
+    end
 
     local item = self:getItem()
-    if not item then return false end
+    if not item then
+        return false
+    end
 
     self:setBorderWidth(1)
     self.currentDragThing = item
@@ -11,7 +15,9 @@ function UIItem:onDragEnter(mousePos)
 end
 
 function UIItem:onDragLeave(droppedWidget, mousePos)
-    if self:isVirtual() then return false end
+    if self:isVirtual() then
+        return false
+    end
     self.currentDragThing = nil
     g_mouse.popCursor('target')
     self:setBorderWidth(0)
@@ -22,10 +28,14 @@ end
 function UIItem:onDrop(widget, mousePos)
     self:setBorderWidth(0)
 
-    if not self:canAcceptDrop(widget, mousePos) then return false end
+    if not self:canAcceptDrop(widget, mousePos) then
+        return false
+    end
 
     local item = widget.currentDragThing
-    if not item:isItem() then return false end
+    if not item:isItem() then
+        return false
+    end
 
     local itemPos = item:getPosition()
     local itemTile = item:getTile()
@@ -49,9 +59,13 @@ function UIItem:onDrop(widget, mousePos)
         end
         return false
     end
-    if itemPos.x ~= 65535 and not itemTile then return false end
+    if itemPos.x ~= 65535 and not itemTile then
+        return false
+    end
 
-    if itemPos.x == toPos.x and itemPos.y == toPos.y and itemPos.z == toPos.z then return false end
+    if itemPos.x == toPos.x and itemPos.y == toPos.y and itemPos.z == toPos.z then
+        return false
+    end
 
     if item:getCount() > 1 then
         modules.game_interface.moveStackableItem(item, toPos)
@@ -63,15 +77,21 @@ function UIItem:onDrop(widget, mousePos)
 end
 
 function UIItem:onDestroy()
-    if self == g_ui.getDraggingWidget() and self.hoveredWho then self.hoveredWho:setBorderWidth(0) end
+    if self == g_ui.getDraggingWidget() and self.hoveredWho then
+        self.hoveredWho:setBorderWidth(0)
+    end
 
-    if self.hoveredWho then self.hoveredWho = nil end
+    if self.hoveredWho then
+        self.hoveredWho = nil
+    end
 end
 
 function UIItem:onHoverChange(hovered)
     UIWidget.onHoverChange(self, hovered)
 
-    if self:isVirtual() or not self:isDraggable() then return end
+    if self:isVirtual() or not self:isDraggable() then
+        return
+    end
 
     local draggingWidget = g_ui.getDraggingWidget()
     if draggingWidget and self ~= draggingWidget then
@@ -93,10 +113,14 @@ function UIItem:onMouseRelease(mousePosition, mouseButton)
         return true
     end
 
-    if self:isVirtual() then return false end
+    if self:isVirtual() then
+        return false
+    end
 
     local item = self:getItem()
-    if not item or not self:containsPoint(mousePosition) then return false end
+    if not item or not self:containsPoint(mousePosition) then
+        return false
+    end
 
     if modules.client_options.getOption('classicControl') and
         ((g_mouse.isPressed(MouseLeftButton) and mouseButton == MouseRightButton) or
@@ -111,8 +135,12 @@ function UIItem:onMouseRelease(mousePosition, mouseButton)
 end
 
 function UIItem:canAcceptDrop(widget, mousePos)
-    if self:isVirtual() or not self:isDraggable() then return false end
-    if not widget or not widget.currentDragThing then return false end
+    if self:isVirtual() or not self:isDraggable() then
+        return false
+    end
+    if not widget or not widget.currentDragThing then
+        return false
+    end
 
     local children = rootWidget:recursiveGetChildrenByPos(mousePos)
     for i = 1, #children do

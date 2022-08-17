@@ -29,7 +29,9 @@ function UIPopupScrollMenu.create()
     return menu
 end
 
-function UIPopupScrollMenu:setScrollbarStep(step) self.scrollBar:setStep(step) end
+function UIPopupScrollMenu:setScrollbarStep(step)
+    self.scrollBar:setStep(step)
+end
 
 function UIPopupScrollMenu:display(pos)
     -- don't display if not options was added
@@ -43,9 +45,13 @@ function UIPopupScrollMenu:display(pos)
         return
     end
 
-    if currentMenu then currentMenu:destroy() end
+    if currentMenu then
+        currentMenu:destroy()
+    end
 
-    if pos == nil then pos = g_window.getMousePosition() end
+    if pos == nil then
+        pos = g_window.getMousePosition()
+    end
 
     rootWidget:addChild(self)
     self:setPosition(pos)
@@ -55,16 +61,22 @@ end
 
 function UIPopupScrollMenu:onGeometryChange(oldRect, newRect)
     local parent = self:getParent()
-    if not parent then return end
+    if not parent then
+        return
+    end
     local ymax = parent:getY() + parent:getHeight()
     local xmax = parent:getX() + parent:getWidth()
     if newRect.y + newRect.height > ymax then
         local newy = newRect.y - newRect.height
-        if newy > 0 and newy + newRect.height < ymax then self:setY(newy) end
+        if newy > 0 and newy + newRect.height < ymax then
+            self:setY(newy)
+        end
     end
     if newRect.x + newRect.width > xmax then
         local newx = newRect.x - newRect.width
-        if newx > 0 and newx + newRect.width < xmax then self:setX(newx) end
+        if newx > 0 and newx + newRect.width < xmax then
+            self:setX(newx)
+        end
     end
     self:bindRectToParent()
 end
@@ -88,16 +100,22 @@ function UIPopupScrollMenu:addOption(optionName, optionCallback, shortcut)
     self:setWidth(math.max(self:getWidth(), width))
 end
 
-function UIPopupScrollMenu:addSeparator() g_ui.createWidget(self:getStyleName() .. 'Separator', self.scrollArea) end
+function UIPopupScrollMenu:addSeparator()
+    g_ui.createWidget(self:getStyleName() .. 'Separator', self.scrollArea)
+end
 
 function UIPopupScrollMenu:onDestroy()
-    if currentMenu == self then currentMenu = nil end
+    if currentMenu == self then
+        currentMenu = nil
+    end
     self:ungrabMouse()
 end
 
 function UIPopupScrollMenu:onMousePress(mousePos, mouseButton)
     -- clicks outside menu area destroys the menu
-    if not self:containsPoint(mousePos) then self:destroy() end
+    if not self:containsPoint(mousePos) then
+        self:destroy()
+    end
     return true
 end
 
@@ -110,7 +128,11 @@ function UIPopupScrollMenu:onKeyPress(keyCode, keyboardModifiers)
 end
 
 -- close all menus when the window is resized
-local function onRootGeometryUpdate() if currentMenu then currentMenu:destroy() end end
+local function onRootGeometryUpdate()
+    if currentMenu then
+        currentMenu:destroy()
+    end
+end
 connect(rootWidget, {
     onGeometryChange = onRootGeometryUpdate
 })

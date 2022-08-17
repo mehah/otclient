@@ -18,7 +18,9 @@ local function onError(protocol, message, errorCode)
         loadBox = nil
     end
 
-    if not errorCode then EnterGame.clearAccountFields() end
+    if not errorCode then
+        EnterGame.clearAccountFields()
+    end
 
     local errorBox = displayErrorBox(tr('Login Error'), message)
     connect(errorBox, {
@@ -29,10 +31,14 @@ end
 local function onMotd(protocol, motd)
     G.motdNumber = tonumber(motd:sub(0, motd:find('\n')))
     G.motdMessage = motd:sub(motd:find('\n') + 1, #motd)
-    if motdEnabled then motdButton:show() end
+    if motdEnabled then
+        motdButton:show()
+    end
 end
 
-local function onSessionKey(protocol, sessionKey) G.sessionKey = sessionKey end
+local function onSessionKey(protocol, sessionKey)
+    G.sessionKey = sessionKey
+end
 
 local function onCharacterList(protocol, characters, account, otui)
     -- Try add server to the server list
@@ -114,7 +120,9 @@ function EnterGame.init()
     motdButton:hide()
     g_keyboard.bindKeyDown('Ctrl+G', EnterGame.openWindow)
 
-    if motdEnabled and G.motdNumber then motdButton:show() end
+    if motdEnabled and G.motdNumber then
+        motdButton:show()
+    end
 
     local account = g_settings.get('account')
     local password = g_settings.get('password')
@@ -123,9 +131,13 @@ function EnterGame.init()
     local stayLogged = g_settings.getBoolean('staylogged')
     local autologin = g_settings.getBoolean('autologin')
     local clientVersion = g_settings.getInteger('client-version')
-    if clientVersion == 0 then clientVersion = 1074 end
+    if clientVersion == 0 then
+        clientVersion = 1074
+    end
 
-    if port == nil or port == 0 then port = 7171 end
+    if port == nil or port == 0 then
+        port = 7171
+    end
 
     EnterGame.setAccountName(account)
     EnterGame.setPassword(password)
@@ -166,7 +178,9 @@ function EnterGame.init()
 
     enterGame:hide()
 
-    if g_app.isRunning() and not g_game.isOnline() then enterGame:show() end
+    if g_app.isRunning() and not g_game.isOnline() then
+        enterGame:show()
+    end
 end
 
 function EnterGame.firstShow()
@@ -178,7 +192,9 @@ function EnterGame.firstShow()
     local autologin = g_settings.getBoolean('autologin')
     if #host > 0 and #password > 0 and #account > 0 and autologin then
         addEvent(function()
-            if not g_settings.getBoolean('autologin') then return end
+            if not g_settings.getBoolean('autologin') then
+                return
+            end
             EnterGame.doLogin()
         end)
     end
@@ -210,18 +226,24 @@ function EnterGame.terminate()
         protocolLogin:cancelLogin()
         protocolLogin = nil
     end
-    if protocolHttp then protocolHttp = nil end
+    if protocolHttp then
+        protocolHttp = nil
+    end
     EnterGame = nil
 end
 
 function EnterGame.show()
-    if loadBox then return end
+    if loadBox then
+        return
+    end
     enterGame:show()
     enterGame:raise()
     enterGame:focus()
 end
 
-function EnterGame.hide() enterGame:hide() end
+function EnterGame.hide()
+    enterGame:hide()
+end
 
 function EnterGame.openWindow()
     if g_game.isOnline() then
@@ -254,7 +276,9 @@ end
 
 function EnterGame.toggleAuthenticatorToken(clientVersion, init)
     local enabled = (clientVersion >= 1072)
-    if enabled == enterGame.authenticatorEnabled then return end
+    if enabled == enterGame.authenticatorEnabled then
+        return
+    end
 
     enterGame:getChildById('authenticatorTokenLabel'):setOn(enabled)
     enterGame:getChildById('authenticatorTokenTextEdit'):setOn(enabled)
@@ -281,7 +305,9 @@ end
 
 function EnterGame.toggleStayLoggedBox(clientVersion, init)
     local enabled = (clientVersion >= 1074)
-    if enabled == enterGame.stayLoggedBoxEnabled then return end
+    if enabled == enterGame.stayLoggedBoxEnabled then
+        return
+    end
 
     enterGame:getChildById('stayLoggedBox'):setOn(enabled)
 
@@ -472,7 +498,9 @@ end
 function EnterGame.displayMotd()
     if not motdWindow then
         motdWindow = displayInfoBox(tr('Message of the day'), G.motdMessage)
-        motdWindow.onOk = function() motdWindow = nil end
+        motdWindow.onOk = function()
+            motdWindow = nil
+        end
     end
 end
 
@@ -536,9 +564,13 @@ function EnterGame.setUniqueServer(host, port, protocol, windowWidth, windowHeig
     local rememberPasswordBox = enterGame:getChildById('rememberPasswordBox')
     rememberPasswordBox:setMarginTop(-8)
 
-    if not windowWidth then windowWidth = 236 end
+    if not windowWidth then
+        windowWidth = 236
+    end
     enterGame:setWidth(windowWidth)
-    if not windowHeight then windowHeight = 210 end
+    if not windowHeight then
+        windowHeight = 210
+    end
     enterGame:setHeight(windowHeight)
 end
 

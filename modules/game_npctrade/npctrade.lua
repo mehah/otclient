@@ -75,7 +75,9 @@ function init()
 
     cancelNextRelease = false
 
-    if g_game.isOnline() then playerFreeCapacity = g_game.getLocalPlayer():getFreeCapacity() end
+    if g_game.isOnline() then
+        playerFreeCapacity = g_game.getLocalPlayer():getFreeCapacity()
+    end
 
     connect(g_game, {
         onGameEnd = hide,
@@ -123,7 +125,9 @@ function show()
     end
 end
 
-function hide() npcWindow:hide() end
+function hide()
+    npcWindow:hide()
+end
 
 function onItemBoxChecked(widget)
     if widget:isChecked() then
@@ -132,7 +136,9 @@ function onItemBoxChecked(widget)
         refreshItem(item)
         tradeButton:enable()
 
-        if getCurrentTradeType() == SELL then quantityScroll:setValue(quantityScroll:getMaximum()) end
+        if getCurrentTradeType() == SELL then
+            quantityScroll:setValue(quantityScroll:getMaximum())
+        end
     end
 end
 
@@ -168,7 +174,9 @@ function onTradeClick()
     end
 end
 
-function onSearchTextChange() refreshPlayerGoods() end
+function onSearchTextChange()
+    refreshPlayerGoods()
+end
 
 function itemPopup(self, mousePosition, mouseButton)
     if cancelNextRelease then
@@ -179,7 +187,9 @@ function itemPopup(self, mousePosition, mouseButton)
     if mouseButton == MouseRightButton then
         local menu = g_ui.createWidget('PopupMenu')
         menu:setGameMenu(true)
-        menu:addOption(tr('Look'), function() return g_game.inspectNpcTrade(self:getItem()) end)
+        menu:addOption(tr('Look'), function()
+            return g_game.inspectNpcTrade(self:getItem())
+        end)
         menu:display(mousePosition)
         return true
     elseif ((g_mouse.isPressed(MouseLeftButton) and mouseButton == MouseRightButton) or
@@ -191,13 +201,23 @@ function itemPopup(self, mousePosition, mouseButton)
     return false
 end
 
-function onBuyWithBackpackChange() if selectedItem then refreshItem(selectedItem) end end
+function onBuyWithBackpackChange()
+    if selectedItem then
+        refreshItem(selectedItem)
+    end
+end
 
-function onIgnoreCapacityChange() refreshPlayerGoods() end
+function onIgnoreCapacityChange()
+    refreshPlayerGoods()
+end
 
-function onIgnoreEquippedChange() refreshPlayerGoods() end
+function onIgnoreEquippedChange()
+    refreshPlayerGoods()
+end
 
-function onShowAllItemsChange() refreshPlayerGoods() end
+function onShowAllItemsChange()
+    refreshPlayerGoods()
+end
 
 function setCurrency(currency, decimal)
     CURRENCY = currency
@@ -240,7 +260,9 @@ end
 function getItemPrice(item, single)
     local amount = 1
     local single = single or false
-    if not single then amount = quantityScroll:getValue() end
+    if not single then
+        amount = quantityScroll:getValue()
+    end
     if getCurrentTradeType() == BUY then
         if buyWithBackpack:isChecked() then
             if item.ptr:isStackable() then
@@ -254,7 +276,9 @@ function getItemPrice(item, single)
 end
 
 function getSellQuantity(item)
-    if not item or not playerItems[item:getId()] then return 0 end
+    if not item or not playerItems[item:getId()] then
+        return 0
+    end
     local removeAmount = 0
     if ignoreEquipped:isChecked() then
         local localPlayer = g_game.getLocalPlayer()
@@ -285,7 +309,9 @@ function refreshItem(item)
 
     if getCurrentTradeType() == BUY then
         local capacityMaxCount = math.floor(playerFreeCapacity / item.weight)
-        if ignoreCapacity:isChecked() then capacityMaxCount = 65535 end
+        if ignoreCapacity:isChecked() then
+            capacityMaxCount = 65535
+        end
         local priceMaxCount = math.floor(playerMoney / getItemPrice(item, true))
         local finalCount = math.max(0, math.min(getMaxAmount(), math.min(priceMaxCount, capacityMaxCount)))
         quantityScroll:setMinimum(1)
@@ -308,7 +334,9 @@ function refreshTradeItems()
     setupPanel:disable()
     itemsPanel:destroyChildren()
 
-    if radioItems then radioItems:destroy() end
+    if radioItems then
+        radioItems:destroy()
+    end
     radioItems = UIRadioGroup.create()
 
     local currentTradeItems = tradeItems[getCurrentTradeType()]
@@ -339,7 +367,9 @@ function refreshTradeItems()
 end
 
 function refreshPlayerGoods()
-    if not initialized then return end
+    if not initialized then
+        return
+    end
 
     checkSellAllTooltip()
 
@@ -370,9 +400,13 @@ function refreshPlayerGoods()
         end
     end
 
-    if not foundSelectedItem then clearSelectedItem() end
+    if not foundSelectedItem then
+        clearSelectedItem()
+    end
 
-    if selectedItem then refreshItem(selectedItem) end
+    if selectedItem then
+        refreshItem(selectedItem)
+    end
 end
 
 function onOpenNpcTrade(items)
@@ -408,7 +442,9 @@ function closeNpcTrade()
     hide()
 end
 
-function onCloseNpcTrade() hide() end
+function onCloseNpcTrade()
+    hide()
+end
 
 function onPlayerGoods(money, items)
     playerMoney = money
@@ -429,19 +465,33 @@ end
 function onFreeCapacityChange(localPlayer, freeCapacity, oldFreeCapacity)
     playerFreeCapacity = freeCapacity
 
-    if npcWindow:isVisible() then refreshPlayerGoods() end
+    if npcWindow:isVisible() then
+        refreshPlayerGoods()
+    end
 end
 
-function onInventoryChange(inventory, item, oldItem) refreshPlayerGoods() end
+function onInventoryChange(inventory, item, oldItem)
+    refreshPlayerGoods()
+end
 
 function getTradeItemData(id, type)
-    if table.empty(tradeItems[type]) then return false end
+    if table.empty(tradeItems[type]) then
+        return false
+    end
 
     if type then
-        for key, item in pairs(tradeItems[type]) do if item.ptr and item.ptr:getId() == id then return item end end
+        for key, item in pairs(tradeItems[type]) do
+            if item.ptr and item.ptr:getId() == id then
+                return item
+            end
+        end
     else
         for _, items in pairs(tradeItems) do
-            for key, item in pairs(items) do if item.ptr and item.ptr:getId() == id then return item end end
+            for key, item in pairs(items) do
+                if item.ptr and item.ptr:getId() == id then
+                    return item
+                end
+            end
         end
     end
     return false
@@ -465,7 +515,9 @@ function checkSellAllTooltip()
                                amount .. ' gold)'
 
                     total = total + (data.price * amount)
-                    if first then first = false end
+                    if first then
+                        first = false
+                    end
                 end
             end
         end
@@ -487,7 +539,9 @@ function formatCurrency(amount)
 end
 
 function getMaxAmount()
-    if getCurrentTradeType() == SELL and g_game.getFeature(GameDoubleShopSellAmount) then return 10000 end
+    if getCurrentTradeType() == SELL and g_game.getFeature(GameDoubleShopSellAmount) then
+        return 10000
+    end
     return 100
 end
 
@@ -495,6 +549,8 @@ function sellAll()
     for itemid, item in pairs(playerItems) do
         local item = Item.create(itemid)
         local amount = getSellQuantity(item)
-        if amount > 0 then g_game.sellItem(item, amount, ignoreEquipped:isChecked()) end
+        if amount > 0 then
+            g_game.sellItem(item, amount, ignoreEquipped:isChecked())
+        end
     end
 end

@@ -1,6 +1,8 @@
 local musicFilename = '/sounds/startup'
 local musicChannel = nil
-if g_sounds then musicChannel = g_sounds.getChannel(SoundChannels.Music) end
+if g_sounds then
+    musicChannel = g_sounds.getChannel(SoundChannels.Music)
+end
 
 function setMusic(filename)
     musicFilename = filename
@@ -16,7 +18,9 @@ function reloadScripts()
     g_modules.reloadModules()
 
     local script = '/' .. g_app.getCompactName() .. 'rc.lua'
-    if g_resources.fileExists(script) then dofile(script) end
+    if g_resources.fileExists(script) then
+        dofile(script)
+    end
 
     local message = tr('All modules and scripts were reloaded.')
 
@@ -29,7 +33,9 @@ function startup()
     if musicChannel then
         musicChannel:enqueue(musicFilename, 3)
         connect(g_game, {
-            onGameStart = function() musicChannel:stop(3) end
+            onGameStart = function()
+                musicChannel:stop(3)
+            end
         })
         connect(g_game, {
             onGameEnd = function()
@@ -52,7 +58,9 @@ function startup()
     -- Show entergame
     if errmsg or errtitle then
         local msgbox = displayErrorBox(errtitle, errmsg)
-        msgbox.onOk = function() EnterGame.firstShow() end
+        msgbox.onOk = function()
+            EnterGame.firstShow()
+        end
     else
         EnterGame.firstShow()
     end
@@ -68,7 +76,9 @@ function init()
         width = 600,
         height = 480
     })
-    if musicChannel then g_sounds.preload(musicFilename) end
+    if musicChannel then
+        g_sounds.preload(musicFilename)
+    end
 
     -- initialize in fullscreen mode on mobile devices
     if g_window.getPlatformType() == 'X11-EGL' then
@@ -95,7 +105,9 @@ function init()
 
         -- window maximized?
         local maximized = g_settings.getBoolean('window-maximized', false)
-        if maximized then g_window.maximize() end
+        if maximized then
+            g_window.maximize()
+        end
     end
 
     g_window.setTitle(g_app.getName())
@@ -124,4 +136,6 @@ function terminate()
     g_settings.set('window-maximized', g_window.isMaximized())
 end
 
-function exit() g_logger.info('Exiting application..') end
+function exit()
+    g_logger.info('Exiting application..')
+end

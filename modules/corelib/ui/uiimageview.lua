@@ -60,7 +60,9 @@ function UIImageView:zoomOut(x, y)
     self:setZoom(zoom, x, y)
 end
 
-function UIImageView:center() self:move(self:getImageTextureWidth() / 2, self:getImageTextureHeight() / 2) end
+function UIImageView:center()
+    self:move(self:getImageTextureWidth() / 2, self:getImageTextureHeight() / 2)
+end
 
 function UIImageView:move(x, y, centerX, centerY)
     x = math.max(math.min(x, self:getImageTextureWidth()), 0)
@@ -75,7 +77,9 @@ function UIImageView:move(x, y, centerX, centerY)
     })
 end
 
-function UIImageView:onDragEnter(pos) return true end
+function UIImageView:onDragEnter(pos)
+    return true
+end
 
 function UIImageView:onDragMove(pos, moved)
     local posX, posY = self:getImagePosition()
@@ -83,7 +87,9 @@ function UIImageView:onDragMove(pos, moved)
     return true
 end
 
-function UIImageView:onDragLeave(widget, pos) return true end
+function UIImageView:onDragLeave(widget, pos)
+    return true
+end
 
 function UIImageView:onMouseWheel(mousePos, direction)
     local x = mousePos.x - self:getX()

@@ -8,4 +8,6 @@ function UICheckBox.create()
     return checkbox
 end
 
-function UICheckBox:onClick() self:setChecked(not self:isChecked()) end
+function UICheckBox:onClick()
+    self:setChecked(not self:isChecked())
+end

@@ -7,4 +7,6 @@ function UIButton.create()
     return button
 end
 
-function UIButton:onMouseRelease(pos, button) return self:isPressed() end
+function UIButton:onMouseRelease(pos, button)
+    return self:isPressed()
+end

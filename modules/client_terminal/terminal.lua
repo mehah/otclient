@@ -32,7 +32,9 @@ local allLines = {}
 
 -- private functions
 local function navigateCommand(step)
-    if commandTextEdit:isMultiline() then return end
+    if commandTextEdit:isMultiline() then
+        return
+    end
 
     local numCommands = #commandHistory
     if numCommands > 0 then
@@ -49,7 +51,9 @@ end
 
 local function completeCommand()
     local cursorPos = commandTextEdit:getCursorPos()
-    if cursorPos == 0 then return end
+    if cursorPos == 0 then
+        return
+    end
 
     local commandBegin = commandTextEdit:getText():sub(1, cursorPos)
     local possibleCommands = {}
@@ -59,7 +63,11 @@ local function completeCommand()
     table.merge(allVars, commandEnv)
 
     -- match commands
-    for k, v in pairs(allVars) do if k:sub(1, cursorPos) == commandBegin then table.insert(possibleCommands, k) end end
+    for k, v in pairs(allVars) do
+        if k:sub(1, cursorPos) == commandBegin then
+            table.insert(possibleCommands, k)
+        end
+    end
 
     -- complete command with one match
     if #possibleCommands == 1 then
@@ -74,17 +82,25 @@ local function completeCommand()
         local done = false
         while not done do
             cursorPos = #commandBegin + 1
-            if #possibleCommands[1] < cursorPos then break end
+            if #possibleCommands[1] < cursorPos then
+                break
+            end
             expandedComplete = commandBegin .. possibleCommands[1]:sub(cursorPos, cursorPos)
             for i, v in ipairs(possibleCommands) do
-                if v:sub(1, #expandedComplete) ~= expandedComplete then done = true end
+                if v:sub(1, #expandedComplete) ~= expandedComplete then
+                    done = true
+                end
             end
-            if not done then commandBegin = expandedComplete end
+            if not done then
+                commandBegin = expandedComplete
+            end
         end
         commandTextEdit:setText(commandBegin)
         commandTextEdit:setCursorPos(-1)
 
-        for i, v in ipairs(possibleCommands) do print(v) end
+        for i, v in ipairs(possibleCommands) do
+            print(v)
+        end
     end
 end
 
@@ -96,7 +112,9 @@ local function doCommand(textWidget)
 end
 
 local function addNewline(textWidget)
-    if not textWidget:isOn() then textWidget:setOn(true) end
+    if not textWidget:isOn() then
+        textWidget:setOn(true)
+    end
     textWidget:appendText('\n')
 end
 
@@ -104,13 +122,19 @@ local function onCommandChange(textWidget, newText, oldText)
     local _, newLineCount = string.gsub(newText, '\n', '\n')
     textWidget:setHeight((newLineCount + 1) * textWidget.baseHeight)
 
-    if newLineCount == 0 and textWidget:isOn() then textWidget:setOn(false) end
+    if newLineCount == 0 and textWidget:isOn() then
+        textWidget:setOn(false)
+    end
 end
 
 local function onLog(level, message, time)
-    if disabled then return end
+    if disabled then
+        return
+    end
     -- avoid logging while reporting logs (would cause a infinite loop)
-    if logLocked then return end
+    if logLocked then
+        return
+    end
 
     logLocked = true
     addLine(message, LogColors[level])
@@ -135,10 +159,16 @@ function init()
     connect(commandTextEdit, {
         onTextChange = onCommandChange
     })
-    g_keyboard.bindKeyPress('Up', function() navigateCommand(1) end, commandTextEdit)
-    g_keyboard.bindKeyPress('Down', function() navigateCommand(-1) end, commandTextEdit)
+    g_keyboard.bindKeyPress('Up', function()
+        navigateCommand(1)
+    end, commandTextEdit)
+    g_keyboard.bindKeyPress('Down', function()
+        navigateCommand(-1)
+    end, commandTextEdit)
     g_keyboard.bindKeyPress('Ctrl+C', function()
-        if commandTextEdit:hasSelection() or not terminalSelectText:hasSelection() then return false end
+        if commandTextEdit:hasSelection() or not terminalSelectText:hasSelection() then
+            return false
+        end
         g_window.setClipboardText(terminalSelectText:getSelection())
         return true
     end, commandTextEdit)
@@ -150,15 +180,21 @@ function init()
     terminalBuffer = terminalWindow:getChildById('terminalBuffer')
     terminalSelectText = terminalWindow:getChildById('terminalSelectText')
     terminalSelectText.onDoubleClick = popWindow
-    terminalSelectText.onMouseWheel = function(a, b, c) terminalBuffer:onMouseWheel(b, c) end
-    terminalBuffer.onScrollChange = function(self, value) terminalSelectText:setTextVirtualOffset(value) end
+    terminalSelectText.onMouseWheel = function(a, b, c)
+        terminalBuffer:onMouseWheel(b, c)
+    end
+    terminalBuffer.onScrollChange = function(self, value)
+        terminalSelectText:setTextVirtualOffset(value)
+    end
 
     g_logger.setOnLog(onLog)
 
     if not g_app.isRunning() then
         g_logger.fireOldMessages()
     elseif _G.terminalLines then
-        for _, line in pairs(_G.terminalLines) do addLine(line.text, line.color) end
+        for _, line in pairs(_G.terminalLines) do
+            addLine(line.text, line.color)
+        end
     end
 end
 
@@ -189,7 +225,9 @@ function terminate()
     _G.terminalLines = allLines
 end
 
-function hideButton() terminalButton:hide() end
+function hideButton()
+    terminalButton:hide()
+end
 
 function popWindow()
     if poped then
@@ -235,9 +273,15 @@ function toggle()
         if not firstShown then
             local settings = g_settings.getNode('terminal-window')
             if settings then
-                if settings.size then oldSize = settings.size end
-                if settings.pos then oldPos = settings.pos end
-                if settings.poped then popWindow() end
+                if settings.size then
+                    oldSize = settings.size
+                end
+                if settings.pos then
+                    oldPos = settings.pos
+                end
+                if settings.poped then
+                    popWindow()
+                end
             end
             firstShown = true
         end
@@ -253,7 +297,9 @@ function show()
     flushLines()
 end
 
-function hide() terminalWindow:hide() end
+function hide()
+    terminalWindow:hide()
+end
 
 function disable()
     terminalButton:hide()
@@ -265,7 +311,9 @@ function flushLines()
     local fulltext = terminalSelectText:getText()
 
     local start = #cachedLines + 1 - MaxLogLines
-    if start < 0 then start = 1 end
+    if start < 0 then
+        start = 1
+    end
 
     for i = start, #cachedLines do
         line = cachedLines[i]
@@ -307,11 +355,15 @@ function addLine(text, color)
         color = color
     })
 
-    if terminalWindow:isVisible() and not flushEvent then flushEvent = scheduleEvent(flushLines, 10) end
+    if terminalWindow:isVisible() and not flushEvent then
+        flushEvent = scheduleEvent(flushLines, 10)
+    end
 end
 
 function executeCommand(command)
-    if command == nil or #string.gsub(command, '\n', '') == 0 then return end
+    if command == nil or #string.gsub(command, '\n', '') == 0 then
+        return
+    end
 
     -- add command line
     addLine('> ' .. command, '#ffffff')
@@ -322,7 +374,9 @@ function executeCommand(command)
     -- add new command to history
     if #commandHistory == 0 or commandHistory[#commandHistory] ~= command then
         table.insert(commandHistory, command)
-        if #commandHistory > MaxHistory then table.remove(commandHistory, 1) end
+        if #commandHistory > MaxHistory then
+            table.remove(commandHistory, 1)
+        end
     end
 
     -- detect and convert commands with simple syntax
@@ -341,7 +395,9 @@ function executeCommand(command)
         if command_name then
             local args = string.split(command:match('^[%w_]+[%s]*(.*)'), ' ')
             if commandEnv[command_name] and type(commandEnv[command_name]) == 'function' then
-                func = function() modules.client_terminal.commandEnv[command_name](unpack(args)) end
+                func = function()
+                    modules.client_terminal.commandEnv[command_name](unpack(args))
+                end
             elseif command_name == command then
                 addLine('ERROR: command not found', 'red')
                 return
@@ -362,7 +418,9 @@ function executeCommand(command)
     local ok, ret = pcall(func)
     if ok then
         -- if the command returned a value, print it
-        if ret then addLine(ret, 'white') end
+        if ret then
+            addLine(ret, 'white')
+        end
     else
         addLine('ERROR: command failed: ' .. ret, 'red')
     end

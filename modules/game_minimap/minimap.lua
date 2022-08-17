@@ -3,15 +3,23 @@ local oldPos = nil
 
 local function updateCameraPosition()
     local player = g_game.getLocalPlayer()
-    if not player then return end
+    if not player then
+        return
+    end
 
     local pos = player:getPosition()
-    if not pos then return end
+    if not pos then
+        return
+    end
 
     local minimapWidget = controller.widgets.minimapWidget
-    if minimapWidget:isDragging() then return end
+    if minimapWidget:isDragging() then
+        return
+    end
 
-    if not minimapWidget.fullMapView then minimapWidget:setCameraPosition(pos) end
+    if not minimapWidget.fullMapView then
+        minimapWidget:setCameraPosition(pos)
+    end
 
     minimapWidget:setCrossPosition(pos)
 end
@@ -71,10 +79,18 @@ function controller:onInit()
     local minimapWidget = minimapWindow:recursiveGetChildById('minimap')
 
     local gameRootPanel = modules.game_interface.getRootPanel()
-    self:bindKeyPress('Alt+Left', function() minimapWidget:move(1, 0) end, gameRootPanel)
-    self:bindKeyPress('Alt+Right', function() minimapWidget:move(-1, 0) end, gameRootPanel)
-    self:bindKeyPress('Alt+Up', function() minimapWidget:move(0, 1) end, gameRootPanel)
-    self:bindKeyPress('Alt+Down', function() minimapWidget:move(0, -1) end, gameRootPanel)
+    self:bindKeyPress('Alt+Left', function()
+        minimapWidget:move(1, 0)
+    end, gameRootPanel)
+    self:bindKeyPress('Alt+Right', function()
+        minimapWidget:move(-1, 0)
+    end, gameRootPanel)
+    self:bindKeyPress('Alt+Up', function()
+        minimapWidget:move(0, 1)
+    end, gameRootPanel)
+    self:bindKeyPress('Alt+Down', function()
+        minimapWidget:move(0, -1)
+    end, gameRootPanel)
 
     self:bindKeyDown('Ctrl+M', toggle)
     self:bindKeyDown('Ctrl+Shift+M', toggleFullMap)
@@ -104,7 +120,9 @@ controller:onGameStart(function()
         loadFnc = g_map.loadOtcm
     end
 
-    if g_resources.fileExists(minimapFile) then loadFnc(minimapFile) end
+    if g_resources.fileExists(minimapFile) then
+        loadFnc(minimapFile)
+    end
 
     local minimapWidget = controller.widgets.minimapWidget
     minimapWidget:load()

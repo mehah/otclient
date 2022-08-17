@@ -87,29 +87,49 @@ averagePrice = 0
 loaded = false
 
 local function isItemValid(item, category, searchFilter)
-    if not item or not item.marketData then return false end
+    if not item or not item.marketData then
+        return false
+    end
 
-    if not category then category = MarketCategory.All end
-    if item.marketData.category ~= category and category ~= MarketCategory.All then return false end
+    if not category then
+        category = MarketCategory.All
+    end
+    if item.marketData.category ~= category and category ~= MarketCategory.All then
+        return false
+    end
 
     -- filter item
     local slotFilter = false
-    if slotFilterList:isEnabled() then slotFilter = getMarketSlotFilterId(slotFilterList:getCurrentOption().text) end
+    if slotFilterList:isEnabled() then
+        slotFilter = getMarketSlotFilterId(slotFilterList:getCurrentOption().text)
+    end
     local marketData = item.marketData
 
     local filterVocation = filterButtons[MarketFilters.Vocation]:isChecked()
     local filterLevel = filterButtons[MarketFilters.Level]:isChecked()
     local filterDepot = filterButtons[MarketFilters.Depot]:isChecked()
 
-    if slotFilter then if slotFilter ~= 255 and item.thingType:getClothSlot() ~= slotFilter then return false end end
+    if slotFilter then
+        if slotFilter ~= 255 and item.thingType:getClothSlot() ~= slotFilter then
+            return false
+        end
+    end
     local player = g_game.getLocalPlayer()
-    if filterLevel and marketData.requiredLevel and player:getLevel() < marketData.requiredLevel then return false end
+    if filterLevel and marketData.requiredLevel and player:getLevel() < marketData.requiredLevel then
+        return false
+    end
     if filterVocation and marketData.restrictVocation > 0 then
         local voc = Bit.bit(information.vocation)
-        if not Bit.hasBit(marketData.restrictVocation, voc) then return false end
+        if not Bit.hasBit(marketData.restrictVocation, voc) then
+            return false
+        end
     end
-    if filterDepot and Market.getDepotCount(item.marketData.tradeAs) <= 0 then return false end
-    if searchFilter then return marketData.name:lower():find(searchFilter) end
+    if filterDepot and Market.getDepotCount(item.marketData.tradeAs) <= 0 then
+        return false
+    end
+    if searchFilter then
+        return marketData.name:lower():find(searchFilter)
+    end
     return true
 end
 
@@ -140,7 +160,9 @@ local function clearMyHistory()
 end
 local function clearFilters()
     for _, filter in pairs(filterButtons) do
-        if filter and filter:isChecked() ~= filter.default then filter:setChecked(filter.default) end
+        if filter and filter:isChecked() ~= filter.default then
+            filter:setChecked(filter.default)
+        end
     end
 end
 
@@ -154,12 +176,16 @@ local function refreshTypeList()
     offerTypeList:addOption('Buy')
 
     if Market.isItemSelected() then
-        if Market.getDepotCount(selectedItem.item.marketData.tradeAs) > 0 then offerTypeList:addOption('Sell') end
+        if Market.getDepotCount(selectedItem.item.marketData.tradeAs) > 0 then
+            offerTypeList:addOption('Sell')
+        end
     end
 end
 
 local function addOffer(offer, offerType)
-    if not offer then return false end
+    if not offer then
+        return false
+    end
     local id = offer:getId()
     local player = offer:getPlayer()
     local amount = offer:getAmount()
@@ -177,9 +203,13 @@ local function addOffer(offer, offerType)
     buyMyHistoryTable:toggleSorting(false)
     sellMyHistoryTable:toggleSorting(false)
 
-    if amount < 1 then return false end
+    if amount < 1 then
+        return false
+    end
     if offerType == MarketAction.Buy then
-        if offer.warn then buyOfferTable:setColumnStyle('OfferTableWarningColumn', true) end
+        if offer.warn then
+            buyOfferTable:setColumnStyle('OfferTableWarningColumn', true)
+        end
 
         local row = nil
         if offer.var == MarketRequest.MyOffers then
@@ -228,7 +258,9 @@ local function addOffer(offer, offerType)
             buyOfferTable:setColumnStyle('OfferTableColumn', true)
         end
     else
-        if offer.warn then sellOfferTable:setColumnStyle('OfferTableWarningColumn', true) end
+        if offer.warn then
+            sellOfferTable:setColumnStyle('OfferTableWarningColumn', true)
+        end
 
         local row = nil
         if offer.var == MarketRequest.MyOffers then
@@ -298,7 +330,9 @@ local function addOffer(offer, offerType)
 end
 
 local function mergeOffer(offer)
-    if not offer then return false end
+    if not offer then
+        return false
+    end
 
     local id = offer:getId()
     local offerType = offer:getType()
@@ -306,7 +340,9 @@ local function mergeOffer(offer)
     local replaced = false
 
     if offerType == MarketAction.Buy then
-        if averagePrice > 0 then offer.warn = offer:getPrice() <= averagePrice - math.floor(averagePrice / 4) end
+        if averagePrice > 0 then
+            offer.warn = offer:getPrice() <= averagePrice - math.floor(averagePrice / 4)
+        end
 
         for i = 1, #marketOffers[MarketAction.Buy] do
             local o = marketOffers[MarketAction.Buy][i]
@@ -316,9 +352,13 @@ local function mergeOffer(offer)
                 replaced = true
             end
         end
-        if not replaced then table.insert(marketOffers[MarketAction.Buy], offer) end
+        if not replaced then
+            table.insert(marketOffers[MarketAction.Buy], offer)
+        end
     else
-        if averagePrice > 0 then offer.warn = offer:getPrice() >= averagePrice + math.floor(averagePrice / 4) end
+        if averagePrice > 0 then
+            offer.warn = offer:getPrice() >= averagePrice + math.floor(averagePrice / 4)
+        end
 
         for i = 1, #marketOffers[MarketAction.Sell] do
             local o = marketOffers[MarketAction.Sell][i]
@@ -328,13 +368,17 @@ local function mergeOffer(offer)
                 replaced = true
             end
         end
-        if not replaced then table.insert(marketOffers[MarketAction.Sell], offer) end
+        if not replaced then
+            table.insert(marketOffers[MarketAction.Sell], offer)
+        end
     end
     return true
 end
 
 local function updateOffers(offers)
-    if not buyOfferTable or not sellOfferTable then return end
+    if not buyOfferTable or not sellOfferTable then
+        return
+    end
 
     balanceLabel:setColor('#bbbbbb')
     selectedOffer[MarketAction.Buy] = nil
@@ -354,12 +398,20 @@ local function updateOffers(offers)
 
     buyCancelButton:setEnabled(false)
     sellCancelButton:setEnabled(false)
-    for _, offer in pairs(offers) do mergeOffer(offer) end
-    for type, offers in pairs(marketOffers) do for i = 1, #offers do addOffer(offers[i], type) end end
+    for _, offer in pairs(offers) do
+        mergeOffer(offer)
+    end
+    for type, offers in pairs(marketOffers) do
+        for i = 1, #offers do
+            addOffer(offers[i], type)
+        end
+    end
 end
 
 local function updateDetails(itemId, descriptions, purchaseStats, saleStats)
-    if not selectedItem then return end
+    if not selectedItem then
+        return
+    end
 
     -- update item details
     detailsTable:clearData()
@@ -387,7 +439,9 @@ local function updateDetails(itemId, descriptions, purchaseStats, saleStats)
                 transactions = transactions + stat:getTransactions()
                 totalPrice = totalPrice + stat:getTotalPrice()
                 local newHigh = stat:getHighestPrice()
-                if newHigh > highestPrice then highestPrice = newHigh end
+                if newHigh > highestPrice then
+                    highestPrice = newHigh
+                end
                 local newLow = stat:getLowestPrice()
                 -- ?? getting '0xffffffff' result from lowest price in 9.60 cipsoft
                 if (lowestPrice == 0 or newLow < lowestPrice) and newLow ~= 0xffffffff then
@@ -447,7 +501,9 @@ local function updateDetails(itemId, descriptions, purchaseStats, saleStats)
                 transactions = transactions + stat:getTransactions()
                 totalPrice = totalPrice + stat:getTotalPrice()
                 local newHigh = stat:getHighestPrice()
-                if newHigh > highestPrice then highestPrice = newHigh end
+                if newHigh > highestPrice then
+                    highestPrice = newHigh
+                end
                 local newLow = stat:getLowestPrice()
                 -- ?? getting '0xffffffff' result from lowest price in 9.60 cipsoft
                 if (lowestPrice == 0 or newLow < lowestPrice) and newLow ~= 0xffffffff then
@@ -508,9 +564,13 @@ end
 
 local function updateBalance(balance)
     local balance = tonumber(balance)
-    if not balance then return end
+    if not balance then
+        return
+    end
 
-    if balance < 0 then balance = 0 end
+    if balance < 0 then
+        balance = 0
+    end
     information.balance = balance
 
     balanceLabel:setText('Balance: ' .. balance .. ' gold')
@@ -542,7 +602,9 @@ local function cancelMyOffer(actionType)
 end
 
 local function openAmountWindow(callback, actionType, actionText)
-    if not Market.isOfferSelected(actionType) then return end
+    if not Market.isOfferSelected(actionType) then
+        return
+    end
 
     amountWindow = g_ui.createWidget('AmountWindow', rootWidget)
     amountWindow:lock()
@@ -553,7 +615,9 @@ local function openAmountWindow(callback, actionType, actionText)
     local maximum = offer:getAmount()
     if actionType == MarketAction.Sell then
         local depot = Market.getDepotCount(item:getId())
-        if maximum > depot then maximum = depot end
+        if maximum > depot then
+            maximum = depot
+        end
     else
         maximum = math.min(maximum, math.floor(information.balance / offer:getPrice()))
     end
@@ -579,7 +643,9 @@ local function openAmountWindow(callback, actionType, actionText)
     scrollbar:setValue(1)
 
     local okButton = amountWindow:getChildById('buttonOk')
-    if actionText then okButton:setText(actionText) end
+    if actionText then
+        okButton:setText(actionText)
+    end
 
     local okFunc = function()
         local counter = offer:getCounter()
@@ -589,7 +655,9 @@ local function openAmountWindow(callback, actionType, actionText)
     end
 
     local cancelButton = amountWindow:getChildById('buttonCancel')
-    local cancelFunc = function() destroyAmountWindow() end
+    local cancelFunc = function()
+        destroyAmountWindow()
+    end
 
     amountWindow.onEnter = okFunc
     amountWindow.onEscape = cancelFunc
@@ -601,7 +669,9 @@ end
 local function onSelectSellOffer(table, selectedRow, previousSelectedRow)
     updateBalance()
     for _, offer in pairs(marketOffers[MarketAction.Sell]) do
-        if offer:isEqual(selectedRow.ref) then selectedOffer[MarketAction.Buy] = offer end
+        if offer:isEqual(selectedRow.ref) then
+            selectedOffer[MarketAction.Buy] = offer
+        end
     end
 
     local offer = selectedOffer[MarketAction.Buy]
@@ -679,12 +749,16 @@ local function onChangeSubCategory(combobox, option)
     local subId = getMarketCategoryId(subCategoryList:getCurrentOption().text)
     local slots = MarketCategoryWeapons[subId].slots
     for _, slot in pairs(slots) do
-        if table.haskey(MarketSlotFilters, slot) then slotFilterList:addOption(MarketSlotFilters[slot]) end
+        if table.haskey(MarketSlotFilters, slot) then
+            slotFilterList:addOption(MarketSlotFilters[slot])
+        end
     end
     slotFilterList:setEnabled(true)
 end
 
-local function onChangeSlotFilter(combobox, option) Market.updateCurrentItems() end
+local function onChangeSlotFilter(combobox, option)
+    Market.updateCurrentItems()
+end
 
 local function onChangeOfferType(combobox, option)
     local item = selectedItem.item
@@ -704,7 +778,9 @@ local function onTotalPriceChange()
     local piecePrice = math.floor(totalPrice / amount)
 
     piecePriceEdit:setValue(piecePrice, true)
-    if Market.isItemSelected() then updateFee(piecePrice, amount) end
+    if Market.isItemSelected() then
+        updateFee(piecePrice, amount)
+    end
 end
 
 local function onPiecePriceChange()
@@ -713,7 +789,9 @@ local function onPiecePriceChange()
     local piecePrice = piecePriceEdit:getValue()
 
     totalPriceEdit:setValue(piecePrice * amount, true)
-    if Market.isItemSelected() then updateFee(piecePrice, amount) end
+    if Market.isItemSelected() then
+        updateFee(piecePrice, amount)
+    end
 end
 
 local function onAmountChange()
@@ -722,13 +800,19 @@ local function onAmountChange()
     local totalPrice = piecePrice * amount
 
     totalPriceEdit:setValue(piecePrice * amount, true)
-    if Market.isItemSelected() then updateFee(piecePrice, amount) end
+    if Market.isItemSelected() then
+        updateFee(piecePrice, amount)
+    end
 end
 
-local function onMarketMessage(messageMode, message) Market.displayMessage(message) end
+local function onMarketMessage(messageMode, message)
+    Market.displayMessage(message)
+end
 
 local function initMarketItems()
-    for c = MarketCategory.First, MarketCategory.Last do marketItems[c] = {} end
+    for c = MarketCategory.First, MarketCategory.Last do
+        marketItems[c] = {}
+    end
 
     -- save a list of items which are already added
     local itemSet = {}
@@ -753,7 +837,9 @@ local function initMarketItems()
                 }
 
                 -- add new market item
-                if not marketItems[marketData.category] then marketItems[marketData.category] = {} end
+                if not marketItems[marketData.category] then
+                    marketItems[marketData.category] = {}
+                end
 
                 table.insert(marketItems[marketData.category], marketItem)
                 itemSet[marketData.tradeAs] = true
@@ -873,10 +959,14 @@ local function initInterface()
 
     -- setup offers
     buyButton = itemOffersPanel:getChildById('buyButton')
-    buyButton.onClick = function() openAmountWindow(Market.acceptMarketOffer, MarketAction.Buy, 'Buy') end
+    buyButton.onClick = function()
+        openAmountWindow(Market.acceptMarketOffer, MarketAction.Buy, 'Buy')
+    end
 
     sellButton = itemOffersPanel:getChildById('sellButton')
-    sellButton.onClick = function() openAmountWindow(Market.acceptMarketOffer, MarketAction.Sell, 'Sell') end
+    sellButton.onClick = function()
+        openAmountWindow(Market.acceptMarketOffer, MarketAction.Sell, 'Sell')
+    end
 
     -- setup selected item
     nameLabel = marketOffersPanel:getChildById('nameLabel')
@@ -909,7 +999,9 @@ local function initInterface()
     clearFilters()
 
     -- hook filters
-    for _, filter in pairs(filterButtons) do filter.onCheckChange = Market.updateCurrentItems end
+    for _, filter in pairs(filterButtons) do
+        filter.onCheckChange = Market.updateCurrentItems
+    end
 
     searchEdit = browsePanel:getChildById('searchEdit')
     categoryList = browsePanel:getChildById('categoryComboBox')
@@ -951,10 +1043,14 @@ local function initInterface()
     sellMyOfferTable.onSelectionChange = onSelectMySellOffer
 
     buyCancelButton = currentOffersPanel:getChildById('buyCancelButton')
-    buyCancelButton.onClick = function() cancelMyOffer(MarketAction.Buy) end
+    buyCancelButton.onClick = function()
+        cancelMyOffer(MarketAction.Buy)
+    end
 
     sellCancelButton = currentOffersPanel:getChildById('sellCancelButton')
-    sellCancelButton.onClick = function() cancelMyOffer(MarketAction.Sell) end
+    sellCancelButton.onClick = function()
+        cancelMyOffer(MarketAction.Sell)
+    end
 
     buyStatsTable:setColumnWidth({120, 270})
     sellStatsTable:setColumnWidth({120, 270})
@@ -1036,11 +1132,15 @@ function Market.reset()
     searchEdit:setText('')
     clearFilters()
     clearMyOffers()
-    if not table.empty(information) then Market.updateCurrentItems() end
+    if not table.empty(information) then
+        Market.updateCurrentItems()
+    end
 end
 
 function Market.displayMessage(message)
-    if marketWindow:isHidden() then return end
+    if marketWindow:isHidden() then
+        return
+    end
 
     local infoBox = displayInfoBox(tr('Market Error'), message)
     infoBox:lock()
@@ -1069,9 +1169,13 @@ function Market.clearSelectedItem()
     end
 end
 
-function Market.isItemSelected() return selectedItem and selectedItem.item end
+function Market.isItemSelected()
+    return selectedItem and selectedItem.item
+end
 
-function Market.isOfferSelected(type) return selectedOffer[type] and not selectedOffer[type]:isNull() end
+function Market.isOfferSelected(type)
+    return selectedOffer[type] and not selectedOffer[type]:isNull()
+end
 
 function Market.getDepotCount(itemId)
     return information.depotItems[itemId] and information.depotItems[itemId].itemCount or 0
@@ -1093,24 +1197,34 @@ function Market.enableCreateOffer(enable)
 end
 
 function Market.close(notify)
-    if notify == nil then notify = true end
+    if notify == nil then
+        notify = true
+    end
     if not marketWindow:isHidden() then
         marketWindow:hide()
         marketWindow:unlock()
         modules.game_interface.getRootPanel():focus()
         Market.clearSelectedItem()
         Market.reset()
-        if notify then g_game.leaveMarket() end
+        if notify then
+            g_game.leaveMarket()
+        end
     end
 end
 
-function Market.incrementAmount() amountEdit:setValue(amountEdit:getValue() + 1) end
+function Market.incrementAmount()
+    amountEdit:setValue(amountEdit:getValue() + 1)
+end
 
-function Market.decrementAmount() amountEdit:setValue(amountEdit:getValue() - 1) end
+function Market.decrementAmount()
+    amountEdit:setValue(amountEdit:getValue() - 1)
+end
 
 function Market.updateCurrentItems()
     local id = getMarketCategoryId(categoryList:getCurrentOption().text)
-    if id == MarketCategory.MetaWeapons then id = getMarketCategoryId(subCategoryList:getCurrentOption().text) end
+    if id == MarketCategory.MetaWeapons then
+        id = getMarketCategoryId(subCategoryList:getCurrentOption().text)
+    end
     Market.loadMarketItems(id)
 end
 
@@ -1137,7 +1251,9 @@ function Market.refreshItemsWidget(selectItem)
     Market.clearSelectedItem()
     itemsPanel:destroyChildren()
 
-    if radioItemSet then radioItemSet:destroy() end
+    if radioItemSet then
+        radioItemSet:destroy()
+    end
     radioItemSet = UIRadioGroup.create()
 
     local select = nil
@@ -1164,7 +1280,9 @@ function Market.refreshItemsWidget(selectItem)
         radioItemSet:addWidget(itemBox)
     end
 
-    if select then radioItemSet:selectWidget(select, false) end
+    if select then
+        radioItemSet:selectWidget(select, false)
+    end
 
     layout:enableUpdates()
     layout:update()
@@ -1196,7 +1314,9 @@ function Market.loadMarketItems(category)
     -- check search filter
     local searchFilter = searchEdit:getText()
     if searchFilter and searchFilter:len() > 2 then
-        if filterButtons[MarketFilters.SearchAll]:isChecked() then category = MarketCategory.All end
+        if filterButtons[MarketFilters.SearchAll]:isChecked() then
+            category = MarketCategory.All
+        end
     end
 
     if category == MarketCategory.All then
@@ -1204,14 +1324,18 @@ function Market.loadMarketItems(category)
         for category = MarketCategory.First, MarketCategory.Last do
             for i = 1, #marketItems[category] do
                 local item = marketItems[category][i]
-                if isItemValid(item, category, searchFilter) then table.insert(currentItems, item) end
+                if isItemValid(item, category, searchFilter) then
+                    table.insert(currentItems, item)
+                end
             end
         end
     else
         -- loop specific category
         for i = 1, #marketItems[category] do
             local item = marketItems[category][i]
-            if isItemValid(item, category, searchFilter) then table.insert(currentItems, item) end
+            if isItemValid(item, category, searchFilter) then
+                table.insert(currentItems, item)
+            end
         end
     end
 
@@ -1226,7 +1350,9 @@ function Market.createNewOffer()
         type = MarketAction.Buy
     end
 
-    if not Market.isItemSelected() then return end
+    if not Market.isItemSelected() then
+        return
+    end
 
     local spriteId = selectedItem.item.marketData.tradeAs
 
@@ -1241,7 +1367,9 @@ function Market.createNewOffer()
             errorMsg = errorMsg .. 'Not enough balance to create this offer.\n'
         end
     elseif type == MarketAction.Sell then
-        if information.balance < fee then errorMsg = errorMsg .. 'Not enough balance to create this offer.\n' end
+        if information.balance < fee then
+            errorMsg = errorMsg .. 'Not enough balance to create this offer.\n'
+        end
         if Market.getDepotCount(spriteId) < amount then
             errorMsg = errorMsg .. 'Not enough items in your depot to create this offer.\n'
         end
@@ -1259,9 +1387,13 @@ function Market.createNewOffer()
         errorMsg = errorMsg .. 'Amount is too low.\n'
     end
 
-    if amount * piecePrice > MarketMaxPrice then errorMsg = errorMsg .. 'Total price is too high.\n' end
+    if amount * piecePrice > MarketMaxPrice then
+        errorMsg = errorMsg .. 'Total price is too high.\n'
+    end
 
-    if information.totalOffers >= MarketMaxOffers then errorMsg = errorMsg .. 'You cannot create more offers.\n' end
+    if information.totalOffers >= MarketMaxOffers then
+        errorMsg = errorMsg .. 'You cannot create more offers.\n'
+    end
 
     local timeCheck = os.time() - lastCreatedOffer
     if timeCheck < offerExhaust[type] then
@@ -1286,7 +1418,11 @@ function Market.acceptMarketOffer(amount, timestamp, counter)
     end
 end
 
-function Market.onItemBoxChecked(widget) if widget:isChecked() then updateSelectedItem(widget) end end
+function Market.onItemBoxChecked(widget)
+    if widget:isChecked() then
+        updateSelectedItem(widget)
+    end
+end
 
 -- protocol callback functions
 
@@ -1297,7 +1433,9 @@ function Market.onMarketEnter(depotItems, offers, balance, vocation)
     end
     if balance == -1 then
         local player = g_game.getLocalPlayer()
-        if player then updateBalance(player:getTotalMoney()) end
+        if player then
+            updateBalance(player:getTotalMoney())
+        end
     else
         updateBalance(balance)
     end
@@ -1305,9 +1443,13 @@ function Market.onMarketEnter(depotItems, offers, balance, vocation)
 
     information.totalOffers = offers
     local player = g_game.getLocalPlayer()
-    if player then information.player = player end
+    if player then
+        information.player = player
+    end
     if vocation == -1 then
-        if player then information.vocation = player:getVocation() end
+        if player then
+            information.vocation = player:getVocation()
+        end
     else
         -- vocation must be compatible with < 950
         information.vocation = vocation
@@ -1340,7 +1482,9 @@ function Market.onMarketEnter(depotItems, offers, balance, vocation)
         Market.refreshItemsWidget()
     end
 
-    if table.empty(currentItems) then Market.loadMarketItems(MarketCategory.First) end
+    if table.empty(currentItems) then
+        Market.loadMarketItems(MarketCategory.First)
+    end
 
     if g_game.isOnline() then
         marketWindow:lock()
@@ -1348,7 +1492,9 @@ function Market.onMarketEnter(depotItems, offers, balance, vocation)
     end
 end
 
-function Market.onMarketLeave() Market.close(false) end
+function Market.onMarketLeave()
+    Market.close(false)
+end
 
 function Market.onMarketDetail(itemId, descriptions, purchaseStats, saleStats)
     updateDetails(itemId, descriptions, purchaseStats, saleStats)
@@ -1370,6 +1516,8 @@ end
 function Market.onResourcesBalanceChange(value, oldBalance, resourceType)
     if resourceType <= 1 then
         local player = g_game.getLocalPlayer()
-        if player then updateBalance(player:getTotalMoney()) end
+        if player then
+            updateBalance(player:getTotalMoney())
+        end
     end
 end

@@ -19,7 +19,9 @@ function terminate()
         onGameEnd = onGameCloseTrade
     })
 
-    if tradeWindow then tradeWindow:destroy() end
+    if tradeWindow then
+        tradeWindow:destroy()
+    end
 end
 
 function createTrade()
@@ -32,7 +34,9 @@ function createTrade()
 end
 
 function fillTrade(name, items, counter)
-    if not tradeWindow then createTrade() end
+    if not tradeWindow then
+        createTrade()
+    end
 
     local tradeItemWidget = tradeWindow:getChildById('tradeItem')
     tradeItemWidget:setItemId(items[1]:getId())
@@ -55,13 +59,19 @@ function fillTrade(name, items, counter)
         itemWidget:setItem(item)
         itemWidget:setVirtual(true)
         itemWidget:setMargin(0)
-        itemWidget.onClick = function() g_game.inspectTrade(counter, index - 1) end
+        itemWidget.onClick = function()
+            g_game.inspectTrade(counter, index - 1)
+        end
     end
 end
 
-function onGameOwnTrade(name, items) fillTrade(name, items, false) end
+function onGameOwnTrade(name, items)
+    fillTrade(name, items, false)
+end
 
-function onGameCounterTrade(name, items) fillTrade(name, items, true) end
+function onGameCounterTrade(name, items)
+    fillTrade(name, items, true)
+end
 
 function onGameCloseTrade()
     if tradeWindow then

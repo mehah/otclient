@@ -12,7 +12,9 @@ function ServerList.init()
     serverTextList = serverListWindow:getChildById('serverList')
 
     servers = g_settings.getNode('ServerList') or {}
-    if servers then ServerList.load() end
+    if servers then
+        ServerList.load()
+    end
 end
 
 function ServerList.terminate()
@@ -26,7 +28,9 @@ function ServerList.terminate()
 end
 
 function ServerList.load()
-    for host, server in pairs(servers) do ServerList.add(host, server.port, server.protocol, true) end
+    for host, server in pairs(servers) do
+        ServerList.add(host, server.port, server.protocol, true)
+    end
 end
 
 function ServerList.select()
@@ -80,7 +84,9 @@ end
 function ServerList.remove(widget)
     local host = widget:getId()
 
-    if removeWindow then return end
+    if removeWindow then
+        return
+    end
 
     local yesCallback = function()
         widget:destroy()
@@ -115,14 +121,26 @@ function ServerList.destroy()
 end
 
 function ServerList.show()
-    if g_game.isOnline() then return end
+    if g_game.isOnline() then
+        return
+    end
     serverListWindow:show()
     serverListWindow:raise()
     serverListWindow:focus()
 end
 
-function ServerList.hide() serverListWindow:hide() end
+function ServerList.hide()
+    serverListWindow:hide()
+end
 
-function ServerList.setServerAccount(host, account) if servers[host] then servers[host].account = account end end
+function ServerList.setServerAccount(host, account)
+    if servers[host] then
+        servers[host].account = account
+    end
+end
 
-function ServerList.setServerPassword(host, password) if servers[host] then servers[host].password = password end end
+function ServerList.setServerPassword(host, password)
+    if servers[host] then
+        servers[host].password = password
+    end
+end

@@ -4,7 +4,9 @@ AddServer = {}
 local addServerWindow = nil
 
 -- public functions
-function AddServer.init() addServerWindow = g_ui.displayUI('addserver') end
+function AddServer.init()
+    addServerWindow = g_ui.displayUI('addserver')
+end
 
 function AddServer.terminate()
     addServerWindow:destroy()

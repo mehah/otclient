@@ -14,11 +14,17 @@ local loginEvent
 local function tryLogin(charInfo, tries)
     tries = tries or 1
 
-    if tries > 50 then return end
+    if tries > 50 then
+        return
+    end
 
     if g_game.isOnline() then
-        if tries == 1 then g_game.safeLogout() end
-        loginEvent = scheduleEvent(function() tryLogin(charInfo, tries + 1) end, 100)
+        if tries == 1 then
+            g_game.safeLogout()
+        end
+        loginEvent = scheduleEvent(function()
+            tryLogin(charInfo, tries + 1)
+        end, 100)
         return
     end
 
@@ -54,8 +60,9 @@ local function updateWait(timeStart, timeEnd)
             local label = waitingWindow:getChildById('timeLabel')
             label:setText(tr('Trying to reconnect in %s seconds.', timeStr))
 
-            updateWaitEvent = scheduleEvent(function() updateWait(timeStart, timeEnd) end,
-                                            1000 * progressBar:getPercentPixels() / 100 * (timeEnd - timeStart))
+            updateWaitEvent = scheduleEvent(function()
+                updateWait(timeStart, timeEnd)
+            end, 1000 * progressBar:getPercentPixels() / 100 * (timeEnd - timeStart))
             return true
         end
     end
@@ -99,7 +106,9 @@ local function onLoginWait(message, time)
     local label = waitingWindow:getChildById('infoLabel')
     label:setText(message)
 
-    updateWaitEvent = scheduleEvent(function() updateWait(g_clock.seconds(), g_clock.seconds() + time) end, 0)
+    updateWaitEvent = scheduleEvent(function()
+        updateWait(g_clock.seconds(), g_clock.seconds() + time)
+    end, 0)
     resendWaitEvent = scheduleEvent(resendWait, time * 1000)
 end
 
@@ -161,7 +170,9 @@ function CharacterList.init()
         onGameEnd = CharacterList.showAgain
     })
 
-    if G.characters then CharacterList.create(G.characters, G.characterAccount) end
+    if G.characters then
+        CharacterList.create(G.characters, G.characterAccount)
+    end
 end
 
 function CharacterList.terminate()
@@ -223,9 +234,13 @@ function CharacterList.terminate()
 end
 
 function CharacterList.create(characters, account, otui)
-    if not otui then otui = 'characterlist' end
+    if not otui then
+        otui = 'characterlist'
+    end
 
-    if charactersWindow then charactersWindow:destroy() end
+    if charactersWindow then
+        charactersWindow:destroy()
+    end
 
     charactersWindow = g_ui.displayUI(otui)
     characterList = charactersWindow:getChildById('characters')
@@ -272,12 +287,16 @@ function CharacterList.create(characters, account, otui)
 
         if i == 1 or
             (g_settings.get('last-used-character') == widget.characterName and g_settings.get('last-used-world') ==
-                widget.worldName) then focusLabel = widget end
+                widget.worldName) then
+            focusLabel = widget
+        end
     end
 
     if focusLabel then
         characterList:focusChild(focusLabel, KeyboardFocusReason)
-        addEvent(function() characterList:ensureChildVisible(focusLabel) end)
+        addEvent(function()
+            characterList:ensureChildVisible(focusLabel)
+        end)
     end
 
     -- account
@@ -316,7 +335,9 @@ function CharacterList.destroy()
 end
 
 function CharacterList.show()
-    if loadBox or errorBox or not charactersWindow then return end
+    if loadBox or errorBox or not charactersWindow then
+        return
+    end
     charactersWindow:show()
     charactersWindow:raise()
     charactersWindow:focus()
@@ -326,13 +347,21 @@ function CharacterList.hide(showLogin)
     showLogin = showLogin or false
     charactersWindow:hide()
 
-    if showLogin and EnterGame and not g_game.isOnline() then EnterGame.show() end
+    if showLogin and EnterGame and not g_game.isOnline() then
+        EnterGame.show()
+    end
 end
 
-function CharacterList.showAgain() if characterList and characterList:hasChildren() then CharacterList.show() end end
+function CharacterList.showAgain()
+    if characterList and characterList:hasChildren() then
+        CharacterList.show()
+    end
+end
 
 function CharacterList.isVisible()
-    if charactersWindow and charactersWindow:isVisible() then return true end
+    if charactersWindow and charactersWindow:isVisible() then
+        return true
+    end
     return false
 end
 

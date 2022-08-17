@@ -7,7 +7,9 @@ local currentHoveredWidget
 
 -- private functions
 local function moveToolTip(first)
-    if not first and (not toolTipLabel:isVisible() or toolTipLabel:getOpacity() < 0.1) then return end
+    if not first and (not toolTipLabel:isVisible() or toolTipLabel:getOpacity() < 0.1) then
+        return
+    end
 
     local pos = g_window.getMousePosition()
     local windowSize = g_window.getSize()
@@ -46,7 +48,9 @@ local function onWidgetHoverChange(widget, hovered)
 end
 
 local function onWidgetStyleApply(widget, styleName, styleNode)
-    if styleNode.tooltip then widget.tooltip = styleNode.tooltip end
+    if styleNode.tooltip then
+        widget.tooltip = styleNode.tooltip
+    end
 end
 
 -- public functions
@@ -79,8 +83,12 @@ function g_tooltip.terminate()
 end
 
 function g_tooltip.display(text)
-    if text == nil or text:len() == 0 then return end
-    if not toolTipLabel then return end
+    if text == nil or text:len() == 0 then
+        return
+    end
+    if not toolTipLabel then
+        return
+    end
 
     toolTipLabel:setText(text)
     toolTipLabel:resizeToText()
@@ -107,11 +115,17 @@ end
 -- @docclass UIWidget @{
 
 -- UIWidget extensions
-function UIWidget:setTooltip(text) self.tooltip = text end
+function UIWidget:setTooltip(text)
+    self.tooltip = text
+end
 
-function UIWidget:removeTooltip() self.tooltip = nil end
+function UIWidget:removeTooltip()
+    self.tooltip = nil
+end
 
-function UIWidget:getTooltip() return self.tooltip end
+function UIWidget:getTooltip()
+    return self.tooltip
+end
 
 -- @}
 
