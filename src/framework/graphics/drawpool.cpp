@@ -326,11 +326,11 @@ bool DrawPool::canRepaint(const bool autoUpdateStatus)
 
 void DrawPool::clear()
 {
-    // clean only processed floors
-    for (int_fast8_t z = -1; ++z <= m_currentFloor;) {
-        for (auto& order : m_objects[z])
+    for (auto& objs : m_objects) {
+        for (auto& order : objs)
             order.clear();
     }
+
     m_objectsByhash.clear();
     m_currentFloor = 0;
 }

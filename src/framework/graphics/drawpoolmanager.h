@@ -65,7 +65,7 @@ public:
 
     void flush() { if (m_currentPool) m_currentPool->flush(); }
 private:
-    void draw();
+    void draw(bool forceUpdate);
     void init();
     void terminate();
     void drawObject(const DrawPool::DrawObject& obj);

@@ -59,6 +59,7 @@ public:
     void setEnable(const bool v) { m_enabled = v; }
     bool isEnabled() const { return m_enabled; }
     DrawPoolType getType() const { return m_type; }
+    bool isType(DrawPoolType type) const { return m_type == type; }
 
     bool canRepaint() { return canRepaint(false); }
     void repaint() { m_status.first = 1; }

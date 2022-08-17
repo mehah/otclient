@@ -907,8 +907,9 @@ void WIN32Window::setFullscreen(bool fullscreen)
 
 void WIN32Window::setVerticalSync(bool enable)
 {
+    m_vsync = enable;
 #ifdef OPENGL_ES
-    eglSwapInterval(m_eglDisplay, enable ? 1 : 0);
+    eglSwapInterval(m_eglDisplay, enable);
 #else
     if (!isExtensionSupported("WGL_EXT_swap_control"))
         return;
@@ -918,7 +919,7 @@ void WIN32Window::setVerticalSync(bool enable)
     if (!wglSwapInterval)
         return;
 
-    wglSwapInterval(enable ? 1 : 0);
+    wglSwapInterval(enable);
 #endif
 }
 

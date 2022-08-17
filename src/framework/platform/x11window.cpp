@@ -973,6 +973,7 @@ void X11Window::setFullscreen(bool fullscreen)
 
 void X11Window::setVerticalSync(bool enable)
 {
+	m_vsync = enable;
 #ifdef OPENGL_ES
     //TODO
 #else
