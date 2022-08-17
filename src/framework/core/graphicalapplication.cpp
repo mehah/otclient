@@ -159,7 +159,7 @@ void GraphicalApplication::run()
         }
 
         // Draw All Pools
-        g_drawPool.draw(false);
+        g_drawPool.draw(g_window.vsyncEnabled());
 
         // update screen pixels
         g_window.swapBuffers();
