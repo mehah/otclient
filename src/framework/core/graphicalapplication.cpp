@@ -137,9 +137,7 @@ void GraphicalApplication::run()
             continue;
         }
 
-        if (!m_frameCounter.canRefresh()) {
-            continue;
-        }
+        m_frameCounter.start();
 
         // the screen consists of two panes
         {
@@ -159,7 +157,7 @@ void GraphicalApplication::run()
         }
 
         // Draw All Pools
-        g_drawPool.draw(g_window.vsyncEnabled());
+        g_drawPool.draw(g_window.vsyncEnabled() || getMaxFps() > 0);
 
         // update screen pixels
         g_window.swapBuffers();

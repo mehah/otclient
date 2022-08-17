@@ -33,7 +33,7 @@ public:
     AdaptativeFrameCounter() : m_interval(stdext::millis()) {}
 
     bool update();
-    bool canRefresh();
+    void start();
 
     uint32_t getFps() const { return m_fps; }
     uint32_t getMaxFps() const { return m_maxFps; }
@@ -41,7 +41,7 @@ public:
     void setMaxFps(const uint32_t max) { m_maxFps = max; }
 
 private:
-    double getMaxPeriod() { return 1.0 / m_maxFps; }
+    uint32_t getMaxPeriod() const { return 1000000 / m_maxFps; }
 
     uint32_t m_fps{ 0 },
         m_maxFps{ 0 },

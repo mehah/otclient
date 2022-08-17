@@ -21,18 +21,22 @@
  */
 
 #include "adaptativeframecounter.h"
+#include <framework/platform/platformwindow.h>
 
-bool AdaptativeFrameCounter::canRefresh()
-{
-    if (m_maxFps == 0) return true;
-
-    m_currentTime = stdext::micros();
-    return m_currentTime - m_lastTime >= 1000000 / m_maxFps;
-}
+void AdaptativeFrameCounter::start() { if (m_maxFps > 0) m_currentTime = stdext::micros(); }
 
 bool AdaptativeFrameCounter::update()
 {
     ++m_fpsCount;
+
+    bool adjustFps = false;
+    if (m_maxFps > 0) {
+        const ticks_t diff = stdext::micros() - std::max<ticks_t>(m_lastTime, m_currentTime);
+        if (diff < getMaxPeriod()) {
+            stdext::microsleep(diff);
+            adjustFps = !g_window.vsyncEnabled() || m_fpsCount > m_maxFps;
+        }
+    }
 
     m_lastTime = m_currentTime;
 
@@ -42,6 +46,9 @@ bool AdaptativeFrameCounter::update()
 
     const bool fpsChanged = m_fps != m_fpsCount;
     if (fpsChanged) {
+        if (adjustFps)
+            m_fpsCount = m_maxFps + (stdext::random_range(0, 2) - 1);
+
         m_fps = m_fpsCount;
         m_fpsCount = 0;
         m_interval = tickCount;
