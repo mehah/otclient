@@ -50,6 +50,4 @@ public:
                            const Position& hookedPosition, Fw::AnchorEdge hookedEdge);
     void centerInPosition(const UIWidgetPtr& anchoredWidget, const Position& hookedPosition);
     void fillPosition(const UIWidgetPtr& anchoredWidget, const Position& hookedPosition);
-
-protected:
 };

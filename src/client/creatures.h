@@ -136,7 +136,7 @@ public:
     const std::vector<CreatureTypePtr>& getCreatures() { return m_creatures; }
 
 protected:
-    void internalLoadCreatureBuffer(TiXmlElement* attrib, const CreatureTypePtr& m);
+    void internalLoadCreatureBuffer(const TiXmlElement* attrib, const CreatureTypePtr& m);
 
 private:
     std::vector<CreatureTypePtr> m_creatures;

@@ -325,7 +325,8 @@ inline std::ostream& operator<<(std::ostream& out, const Position& pos)
 
 inline std::istream& operator>>(std::istream& in, Position& pos)
 {
-    int32_t x, y;
+    int32_t x;
+    int32_t y;
     uint8_t z;
     in >> x >> y >> z;
     pos.x = x;

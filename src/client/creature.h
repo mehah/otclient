@@ -248,7 +248,7 @@ private:
         uint64_t walkDuration{ 0 };
         uint64_t diagonalDuration{ 0 };
 
-        uint64_t getDuration(Otc::Direction dir) { return Position::isDiagonal(dir) ? diagonalDuration : duration; }
+        uint64_t getDuration(Otc::Direction dir) const { return Position::isDiagonal(dir) ? diagonalDuration : duration; }
     };
 
     StepCache m_stepCache;

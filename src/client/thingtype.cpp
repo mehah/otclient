@@ -320,7 +320,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
         const int frameGroupType = framegroup.fixed_frame_group();
         const auto& spriteInfo = framegroup.sprite_info();
         const auto& animation = spriteInfo.animation();
-        const auto& sprites = spriteInfo.sprite_id();
+        spriteInfo.sprite_id(); // sprites
         const auto& spritesPhases = animation.sprite_phase();
 
         m_numPatternX = spriteInfo.pattern_width();
@@ -330,8 +330,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
 
         m_animationPhases += std::max<int>(1, spritesPhases.size());
 
-        SpriteSheetPtr sheet = g_spriteAppearances.getSheetBySpriteId(spriteInfo.sprite_id(0), false);
-        if (sheet) {
+        if (SpriteSheetPtr sheet = g_spriteAppearances.getSheetBySpriteId(spriteInfo.sprite_id(0), false); sheet) {
             m_size = sheet->getSpriteSize() / SPRITE_SIZE;
             sizes.push_back(m_size);
         }
@@ -363,7 +362,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
 
     if (sizes.size() > 1) {
         // correction for some sprites
-        for (auto& s : sizes) {
+        for (const auto& s : sizes) {
             m_size.setWidth(std::max<int>(m_size.width(), s.width()));
             m_size.setHeight(std::max<int>(m_size.height(), s.height()));
         }
@@ -410,7 +409,8 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
     m_id = clientId;
     m_category = category;
 
-    int count = 0, attr = -1;
+    int count = 0;
+    int attr = -1;
     bool done = false;
     for (int i = 0; i < ThingLastAttr; ++i) {
         ++count;
@@ -612,7 +612,7 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
 
     if (sizes.size() > 1) {
         // correction for some sprites
-        for (auto& s : sizes) {
+        for (const auto& s : sizes) {
             m_size.setWidth(std::max<int>(m_size.width(), s.width()));
             m_size.setHeight(std::max<int>(m_size.height(), s.height()));
         }
@@ -745,8 +745,8 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
         return nullptr;
     }
 
-    const bool allBlank = txtType == TextureType::ALL_BLANK,
-        smooth = txtType == TextureType::SMOOTH;
+    const bool allBlank = txtType == TextureType::ALL_BLANK;
+    const bool smooth = txtType == TextureType::SMOOTH;
 
     TexturePtr& animationPhaseTexture = (
         allBlank ? m_blankTextures :

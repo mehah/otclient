@@ -85,7 +85,7 @@ void ThingTypeManager::saveDat(const std::string& fileName)
 
         fin->addU32(m_datSignature);
 
-        for (auto& m_thingType : m_thingTypes)
+        for (const auto& m_thingType : m_thingTypes)
             fin->addU16(m_thingType.size() - 1);
 
         for (int category = 0; category < ThingLastCategory; ++category) {
@@ -99,7 +99,7 @@ void ThingTypeManager::saveDat(const std::string& fileName)
 
         fin->flush();
         fin->close();
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
     }
 }
@@ -141,7 +141,7 @@ bool ThingTypeManager::loadDat(std::string file)
         m_datLoaded = true;
         g_lua.callGlobalField("g_things", "onLoadDat", file);
         return true;
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("Failed to read dat '%s': %s'", file, e.what()));
         return false;
     }
@@ -176,7 +176,7 @@ bool ThingTypeManager::loadOtml(std::string file)
             }
         }
         return true;
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to read dat otml '%s': %s'", file, e.what()));
         return false;
     }
@@ -199,10 +199,8 @@ void ThingTypeManager::loadOtb(const std::string& file)
         if (signature != 0)
             throw Exception("invalid otb file");
 
-        const uint8_t rootAttr = root->getU8();
-        if (rootAttr == 0x01) { // OTB_ROOT_ATTR_VERSION
-            const uint16_t size = root->getU16();
-            if (size != 4 + 4 + 4 + 128)
+        if (const uint8_t rootAttr = root->getU8(); rootAttr == 0x01) { // OTB_ROOT_ATTR_VERSION
+            if (const uint16_t size = root->getU16(); size != 4 + 4 + 4 + 128)
                 throw Exception("invalid otb root attr version size");
 
             m_otbMajorVersion = root->getU32();
@@ -229,7 +227,7 @@ void ThingTypeManager::loadOtb(const std::string& file)
 
         m_otbLoaded = true;
         g_lua.callGlobalField("g_things", "onLoadOtb", file);
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to load '%s' (OTB file): %s", file, e.what()));
     }
 }
@@ -280,7 +278,7 @@ void ThingTypeManager::loadXml(const std::string& file)
         doc.Clear();
         m_xmlLoaded = true;
         g_logger.debug("items.xml read successfully.");
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to load '%s' (XML file): %s", file, e.what()));
     }
 }
@@ -340,7 +338,7 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
         }
         m_datLoaded = true;
         return true;
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to load '%s' (Appearances): %s", file, e.what()));
         return false;
     }

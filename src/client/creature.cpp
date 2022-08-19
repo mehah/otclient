@@ -159,8 +159,8 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
     } else {
         const auto& type = g_things.getThingType(m_outfit.getAuxId(), m_outfit.getCategory());
 
-        int animationPhases = type->getAnimationPhases(),
-            animateTicks = ITEM_TICKS_PER_FRAME;
+        int animationPhases = type->getAnimationPhases();
+        int animateTicks = ITEM_TICKS_PER_FRAME;
 
         // when creature is an effect we cant render the first and last animation phase,
         // instead we should loop in the phases between
@@ -224,8 +224,8 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, flo
     // calculate main rects
 
     const Size nameSize = m_nameCache.getTextSize();
-    const int cropSizeText = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? m_sizeCache.exactSize : 12,
-        cropSizeBackGround = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? cropSizeText - nameSize.height() : 0;
+    const int cropSizeText = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? m_sizeCache.exactSize : 12;
+    const int cropSizeBackGround = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? cropSizeText - nameSize.height() : 0;
 
     auto backgroundRect = Rect(p.x - (13.5), p.y - cropSizeBackGround, 27, 4);
     backgroundRect.bind(parentRect);
@@ -370,12 +370,12 @@ void Creature::updateJump()
     }
 
     const int t = m_jumpTimer.ticksElapsed();
-    const double a = -4 * m_jumpHeight / (m_jumpDuration * m_jumpDuration),
-        b = +4 * m_jumpHeight / m_jumpDuration,
-        height = a * t * t + b * t;
+    const double a = -4 * m_jumpHeight / (m_jumpDuration * m_jumpDuration);
+    const double b = +4 * m_jumpHeight / m_jumpDuration;
+    const double height = a * t * t + b * t;
 
-    const int roundHeight = std::round(height),
-        halfJumpDuration = m_jumpDuration / 2;
+    const int roundHeight = std::round(height);
+    const int halfJumpDuration = m_jumpDuration / 2;
 
     m_jumpOffset = PointF(height, height);
 
@@ -383,7 +383,9 @@ void Creature::updateJump()
         g_map.notificateCameraMove(m_walkOffset);
     }
 
-    int nextT = 0, diff = 0, i = 1;
+    int nextT = 0;
+    int diff = 0;
+    int i = 1;
     if (m_jumpTimer.ticksElapsed() < halfJumpDuration)
         diff = 1;
     else if (m_jumpTimer.ticksElapsed() > halfJumpDuration)
@@ -482,8 +484,8 @@ void Creature::updateWalkAnimation()
     if (footAnimPhases == 0)
         return;
 
-    int minFootDelay = 20,
-        footAnimDelay = footAnimPhases;
+    int minFootDelay = 20;
+    int footAnimDelay = footAnimPhases;
 
     if (hasSpeedFormula()) {
         minFootDelay += 10;
@@ -573,8 +575,8 @@ void Creature::updateWalk(const bool isPreWalking)
 {
     const uint32_t stepDuration = getStepDuration(true);
 
-    const float extraSpeed = isLocalPlayer() && !hasSpeedFormula() ? 800.f / static_cast<float>(stepDuration) : 0.f,
-        walkTicksPerPixel = (stepDuration + extraSpeed) / SPRITE_SIZE;
+    const float extraSpeed = isLocalPlayer() && !hasSpeedFormula() ? 800.f / static_cast<float>(stepDuration) : 0.f;
+    const float walkTicksPerPixel = (stepDuration + extraSpeed) / SPRITE_SIZE;
 
     const int totalPixelsWalked = std::min<int>((m_walkTimer.ticksElapsed() / walkTicksPerPixel), SPRITE_SIZE);
 
@@ -945,9 +947,9 @@ int Creature::getCurrentAnimationPhase(const bool mount)
 
 int Creature::getExactSize()
 {
-    const int numPatternY = getNumPatternY(),
-        layers = getLayers(),
-        zPattern = m_outfit.hasMount() ? 1 : 0;
+    const int numPatternY = getNumPatternY();
+    const int layers = getLayers();
+    const int zPattern = m_outfit.hasMount() ? 1 : 0;
 
     int exactSize = 0;
     for (int yPattern = 0; yPattern < numPatternY; ++yPattern) {

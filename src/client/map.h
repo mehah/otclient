@@ -198,7 +198,7 @@ public:
     const TilePtr& createTileEx(const Position& pos, const Items&... items);
     const TilePtr& getOrCreateTile(const Position& pos);
     const TilePtr& getTile(const Position& pos);
-    const TileList getTiles(int8_t floor = -1);
+    TileList getTiles(int8_t floor = -1);
     void cleanTile(const Position& pos);
 
     // tile zone related

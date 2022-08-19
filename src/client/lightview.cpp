@@ -58,7 +58,7 @@ void LightView::draw(const Rect& dest, const Rect& src)
     const float size = m_tileSize * 3.3;
 
     bool _clr = true;
-    for (auto& light : m_sources) {
+    for (const auto& light : m_sources) {
         if (light.color) {
             const Color color = Color::from8bit(light.color, std::min<float>(light.opacity, light.intensity / 6.f));
             const uint16_t radius = light.intensity * m_tileSize;

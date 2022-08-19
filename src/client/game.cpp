@@ -68,7 +68,7 @@ void Game::resetGameStates()
     m_unjustifiedPoints = UnjustifiedPoints();
     m_nextScheduledDir = Otc::InvalidDirection;
 
-    for (auto& it : m_containers) {
+    for (const auto& it : m_containers) {
         const ContainerPtr& container = it.second;
         if (container)
             container->onClose();
@@ -174,9 +174,7 @@ void Game::processGameStart()
     disableBotCall();
 
     if (g_game.getFeature(Otc::GameClientPing) || g_game.getFeature(Otc::GameExtendedClientPing)) {
-        m_pingEvent = g_dispatcher.scheduleEvent([this] {
-            g_game.ping();
-        }, m_pingDelay);
+        m_pingEvent = g_dispatcher.scheduleEvent([] { g_game.ping(); }, m_pingDelay);
     }
 
     m_checkConnectionEvent = g_dispatcher.cycleEvent([this] {
@@ -587,10 +585,9 @@ bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
     }
 
     const Position toPos = m_localPlayer->getPosition().translatedToDirection(direction);
-    const TilePtr toTile = g_map.getTile(toPos);
 
     // only do prewalks to walkable tiles (like grounds and not walls)
-    if (toTile && toTile->isWalkable()) {
+    if (const TilePtr toTile = g_map.getTile(toPos); toTile && toTile->isWalkable()) {
         m_localPlayer->preWalk(direction);
     } else {
         // check if can walk to a lower floor
@@ -600,8 +597,7 @@ bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
                 return false;
 
             // check walk to another floor (e.g: when above 3 parcels)
-            const TilePtr toTile = g_map.getTile(pos);
-            if (toTile && toTile->hasElevation(3))
+            if (const TilePtr toTile = g_map.getTile(pos); toTile && toTile->hasElevation(3))
                 return true;
 
             return false;
@@ -609,16 +605,14 @@ bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
 
         // check if can walk to a higher floor
         auto canChangeFloorUp = [&]() -> bool {
-            const TilePtr fromTile = m_localPlayer->getTile();
-            if (!fromTile || !fromTile->hasElevation(3))
+            if (const TilePtr fromTile = m_localPlayer->getTile(); !fromTile || !fromTile->hasElevation(3))
                 return false;
 
             Position pos = toPos;
             if (!pos.up())
 
                 return false;
-            const TilePtr toTile = g_map.getTile(pos);
-            if (!toTile || !toTile->isWalkable())
+            if (const TilePtr toTile = g_map.getTile(pos); !toTile || !toTile->isWalkable())
                 return false;
 
             return true;
@@ -663,8 +657,8 @@ void Game::autoWalk(std::vector<Otc::Direction> dirs, Position startPos)
     const auto it = dirs.begin();
     const Otc::Direction direction = *it;
 
-    const TilePtr toTile = g_map.getTile(startPos.translatedToDirection(direction));
-    if (startPos == m_localPlayer->m_position && toTile && toTile->isWalkable() && !m_localPlayer->isWalking() && m_localPlayer->canWalk(true)) {
+    if (const TilePtr toTile = g_map.getTile(startPos.translatedToDirection(direction));
+        startPos == m_localPlayer->m_position && toTile && toTile->isWalkable() && !m_localPlayer->isWalking() && m_localPlayer->canWalk(true)) {
         m_localPlayer->preWalk(direction);
 
         forceWalk(direction);
@@ -846,7 +840,7 @@ void Game::useInventoryItemWith(int itemId, const ThingPtr& toThing)
 
 ItemPtr Game::findItemInContainers(uint32_t itemId, int subType)
 {
-    for (auto& it : m_containers) {
+    for (const auto& it : m_containers) {
         const ContainerPtr& container = it.second;
 
         if (container) {

@@ -191,7 +191,7 @@ void Item::unserializeItem(const BinaryTreePtr& in)
                     throw Exception("invalid item attribute %d", attrib);
             }
         }
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("Failed to unserialize OTBM item: %s", e.what()));
     }
 }
@@ -207,8 +207,7 @@ void Item::serializeItem(const OutputBinaryTreePtr& out)
     out->addU8(ATTR_CHARGES);
     out->addU16(getCountOrSubType());
 
-    const auto dest = m_attribs.get<Position>(ATTR_TELE_DEST);
-    if (dest.isValid()) {
+    if (const auto dest = m_attribs.get<Position>(ATTR_TELE_DEST); dest.isValid()) {
         out->addU8(ATTR_TELE_DEST);
         out->addPos(dest.x, dest.y, dest.z);
     }
@@ -235,13 +234,11 @@ void Item::serializeItem(const OutputBinaryTreePtr& out)
         out->addU16(uid);
     }
 
-    const std::string text = getText();
-    if (g_things.getItemType(m_serverId)->isWritable() && !text.empty()) {
+    if (const std::string text = getText(); g_things.getItemType(m_serverId)->isWritable() && !text.empty()) {
         out->addU8(ATTR_TEXT);
         out->addString(text);
     }
-    const std::string desc = getDescription();
-    if (!desc.empty()) {
+    if (const std::string desc = getDescription(); !desc.empty()) {
         out->addU8(ATTR_DESC);
         out->addString(desc);
     }
@@ -283,8 +280,8 @@ void Item::updatePatterns()
     if (!isValid())
         return;
 
-    const int numPatternX = getNumPatternX(),
-        numPatternY = getNumPatternY();
+    const int numPatternX = getNumPatternX();
+    const int numPatternY = getNumPatternY();
 
     if (isStackable() && numPatternX == 4 && numPatternY == 2) {
         if (m_countOrSubType <= 0) {

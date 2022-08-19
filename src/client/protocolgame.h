@@ -283,7 +283,6 @@ private:
     void parsePreyTimeLeft(const InputMessagePtr& msg);
     void parsePreyData(const InputMessagePtr& msg);
     void parsePreyRerollPrice(const InputMessagePtr& msg);
-    Imbuement getImbuementInfo(const InputMessagePtr& msg);
     void parseImbuementWindow(const InputMessagePtr& msg);
     void parseCloseImbuementWindow(const InputMessagePtr& msg);
     void parseError(const InputMessagePtr& msg);
@@ -294,6 +293,7 @@ private:
 
     MarketOffer readMarketOffer(const InputMessagePtr& msg, uint8_t action, uint16_t var);
 
+    Imbuement getImbuementInfo(const InputMessagePtr& msg);
     PreyMonster getPreyMonster(const InputMessagePtr& msg);
     std::vector<PreyMonster> getPreyMonsters(const InputMessagePtr& msg);
 

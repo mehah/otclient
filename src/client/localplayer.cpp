@@ -178,8 +178,8 @@ bool LocalPlayer::autoWalk(const Position& destination, const bool retry)
             return;
         }
 
-        const auto finalAutowalkPos = self->m_position.translatedToDirections(result->path).back();
-        if (self->m_autoWalkDestination != finalAutowalkPos) {
+        if (const auto finalAutowalkPos = self->m_position.translatedToDirections(result->path).back();
+            self->m_autoWalkDestination != finalAutowalkPos) {
             self->m_lastAutoWalkPosition = finalAutowalkPos;
         }
 
