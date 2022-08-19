@@ -104,8 +104,8 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
     if (m_outfitColor != Color::white)
         color = m_outfitColor;
 
-    const bool isNotBlank = textureType != TextureType::ALL_BLANK,
-        canDrawShader = isNotBlank;
+    const bool isNotBlank = textureType != TextureType::ALL_BLANK;
+    const bool canDrawShader = isNotBlank;
 
     int animationPhase = 0;
 

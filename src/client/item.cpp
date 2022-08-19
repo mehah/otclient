@@ -107,7 +107,7 @@ void Item::setOtbId(uint16_t id)
     if (!g_things.isValidOtbId(id))
         id = 0;
 
-    const auto itemType = g_things.getItemType(id);
+    const auto& itemType = g_things.getItemType(id);
     m_serverId = id;
 
     id = itemType->getClientId();

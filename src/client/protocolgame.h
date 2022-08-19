@@ -311,10 +311,10 @@ public:
     Position getPosition(const InputMessagePtr& msg);
 
 private:
-    bool m_enableSendExtendedOpcode{ false },
-        m_gameInitialized{ false },
-        m_mapKnown{ false },
-        m_firstRecv{ true };
+    bool m_enableSendExtendedOpcode{ false };
+    bool m_gameInitialized{ false };
+    bool m_mapKnown{ false };
+    bool m_firstRecv{ true };
 
     std::string m_accountName;
     std::string m_accountPassword;

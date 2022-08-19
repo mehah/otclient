@@ -34,12 +34,7 @@
 
 using namespace otclient::protobuf;
 
-enum class TextureType
-{
-    NONE,
-    SMOOTH,
-    ALL_BLANK
-};
+enum class TextureType { NONE, SMOOTH, ALL_BLANK };
 
 enum FrameGroupType : uint8_t
 {
@@ -277,8 +272,8 @@ private:
     ThingCategory m_category{ ThingInvalidCategory };
     uint16_t m_id{ 0 };
 
-    bool m_null{ true },
-        m_opaque{ false };
+    bool m_null{ true };
+    bool m_opaque{ false };
 
     stdext::small_dynamic_storage<ThingAttr, ThingLastAttr> m_attribs;
 
@@ -289,9 +284,9 @@ private:
     int m_animationPhases{ 0 };
     int m_exactSize{ 0 };
     int m_realSize{ 0 };
-    int m_numPatternX{ 0 },
-        m_numPatternY{ 0 },
-        m_numPatternZ{ 0 };
+    int m_numPatternX{ 0 };
+    int m_numPatternY{ 0 };
+    int m_numPatternZ{ 0 };
     int m_layers{ 0 };
     int m_exactHeight{ 0 };
     float m_opacity{ 1.f };
@@ -299,9 +294,9 @@ private:
 
     std::vector<int> m_spritesIndex;
 
-    std::vector<TexturePtr> m_textures,
-        m_blankTextures,
-        m_smoothTextures;
+    std::vector<TexturePtr> m_textures;
+    std::vector<TexturePtr> m_blankTextures;
+    std::vector<TexturePtr> m_smoothTextures;
 
     std::vector<std::vector<Rect>> m_texturesFramesRects;
     std::vector<std::vector<Rect>> m_texturesFramesOriginRects;

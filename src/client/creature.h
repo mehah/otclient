@@ -41,7 +41,9 @@ class Creature : public Thing
 {
 public:
 
-    static double speedA, speedB, speedC;
+    static double speedA;
+    static double speedB;
+    static double speedC;
 
     Creature();
 
@@ -160,84 +162,91 @@ protected:
     Outfit m_outfit;
     Light m_light;
 
-    int m_calculatedStepSpeed{ 0 },
-        m_speed{ 0 };
+    int m_calculatedStepSpeed{ 0 };
+    int m_speed{ 0 };
 
     double m_baseSpeed{ 0 };
 
-    uint8_t m_type,
-        m_healthPercent{ 101 },
-        m_skull{ Otc::SkullNone },
-        m_icon{ Otc::NpcIconNone },
-        m_shield{ Otc::ShieldNone },
-        m_emblem{ Otc::EmblemNone };
+    uint8_t m_type;
+    uint8_t m_healthPercent{ 101 };
+    uint8_t m_skull{ Otc::SkullNone };
+    uint8_t m_icon{ Otc::NpcIconNone };
+    uint8_t m_shield{ Otc::ShieldNone };
+    uint8_t m_emblem{ Otc::EmblemNone };
 
-    TexturePtr m_skullTexture,
-        m_shieldTexture,
-        m_emblemTexture,
-        m_typeTexture,
-        m_iconTexture;
+    TexturePtr m_skullTexture;
+    TexturePtr m_shieldTexture;
+    TexturePtr m_emblemTexture;
+    TexturePtr m_typeTexture;
+    TexturePtr m_iconTexture;
 
-    bool m_showShieldTexture{ true },
-        m_shieldBlink{ false },
-        m_passable{ false },
-        m_showTimedSquare{ false },
-        m_showStaticSquare{ false },
-        m_forceWalk{ false },
-        m_removed{ true };
+    bool m_showShieldTexture{ true };
+    bool m_shieldBlink{ false };
+    bool m_passable{ false };
+    bool m_showTimedSquare{ false };
+    bool m_showStaticSquare{ false };
+    bool m_forceWalk{ false };
+    bool m_removed{ true };
 
-    Color m_timedSquareColor,
-        m_staticSquareColor,
-        m_informationColor,
-        m_outfitColor{ Color::white };
+    Color m_timedSquareColor;
+    Color m_staticSquareColor;
+    Color m_informationColor;
+    Color m_outfitColor{ Color::white };
 
     CachedText m_nameCache;
 
     std::array<double, Otc::LastSpeedFormula> m_speedFormula;
 
     // walk related
-    int m_walkAnimationPhase{ 0 },
-        m_walkedPixels{ 0 };
+    int m_walkAnimationPhase{ 0 };
+    int m_walkedPixels{ 0 };
 
     uint32_t m_footStep{ 0 };
-    Timer m_walkTimer, m_footTimer, m_outfitColorTimer;
+    Timer m_walkTimer;
+    Timer m_footTimer;
+    Timer m_outfitColorTimer;
     TilePtr m_walkingTile;
 
-    bool m_walking{ false },
-        m_allowAppearWalk{ false };
+    bool m_walking{ false };
+    bool m_allowAppearWalk{ false };
 
-    ScheduledEventPtr m_walkUpdateEvent,
-        m_walkFinishAnimEvent,
-        m_outfitColorUpdateEvent;
+    ScheduledEventPtr m_walkUpdateEvent;
+    ScheduledEventPtr m_walkFinishAnimEvent;
+    ScheduledEventPtr m_outfitColorUpdateEvent;
 
     EventPtr m_disappearEvent;
 
     Point m_walkOffset;
 
-    Otc::Direction m_direction{ Otc::South },
-        m_walkTurnDirection{ Otc::InvalidDirection },
-        m_lastStepDirection{ Otc::InvalidDirection };
+    Otc::Direction m_direction{ Otc::South };
+    Otc::Direction m_walkTurnDirection{ Otc::InvalidDirection };
+    Otc::Direction m_lastStepDirection{ Otc::InvalidDirection };
 
-    Position m_lastStepFromPosition,
-        m_lastStepToPosition, m_oldPosition;
+    Position m_lastStepFromPosition;
+    Position m_lastStepToPosition;
+    Position m_oldPosition;
 
     // jump related
-    float m_jumpHeight{ 0 },
-        m_jumpDuration{ 0 };
+    float m_jumpHeight{ 0 };
+    float m_jumpDuration{ 0 };
 
     PointF m_jumpOffset;
     Timer m_jumpTimer;
 
 private:
-    struct SizeCache { int exactSize{ 0 }, frameSizeNotResized{ 0 }; };
+    struct SizeCache
+    {
+        int exactSize{ 0 };
+        int frameSizeNotResized{ 0 };
+    };
     struct StepCache
     {
-        uint16_t speed{ 0 },
-            groundSpeed{ 0 };
+        uint16_t speed{ 0 };
+        uint16_t groundSpeed{ 0 };
 
-        uint64_t duration{ 0 },
-            walkDuration{ 0 },
-            diagonalDuration{ 0 };
+        uint64_t duration{ 0 };
+        uint64_t walkDuration{ 0 };
+        uint64_t diagonalDuration{ 0 };
 
         uint64_t getDuration(Otc::Direction dir) { return Position::isDiagonal(dir) ? diagonalDuration : duration; }
     };
