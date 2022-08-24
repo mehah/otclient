@@ -123,7 +123,7 @@ void GraphicalApplication::run()
     g_lua.callGlobalField("g_app", "onRun");
 
     const auto& foreground = g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND);
-    const auto& map = g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND);
+    const auto& map = g_drawPool.get<DrawPool>(DrawPoolType::MAP);
 
     Timer foregroundRefresh;
 
