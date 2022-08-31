@@ -25,17 +25,17 @@
 #include "declarations.h"
 #include <framework/util/databuffer.h>
 
-enum
-{
-    BINARYTREE_ESCAPE_CHAR = 0xFD,
-    BINARYTREE_NODE_START = 0xFE,
-    BINARYTREE_NODE_END = 0xFF
-};
-
 class BinaryTree : public stdext::shared_object
 {
 public:
-    BinaryTree(const FileStreamPtr& fin);
+    enum class Node
+    {
+        ESCAPE_CHAR = 0xFD,
+        START = 0xFE,
+        END = 0xFF
+    };
+
+    explicit BinaryTree(const FileStreamPtr& fin);
     ~BinaryTree() override;
 
     void seek(uint32_t pos);

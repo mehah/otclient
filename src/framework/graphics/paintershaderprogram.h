@@ -69,15 +69,15 @@ public:
     void bindMultiTextures();
 
 private:
-    float m_startTime{ 0 },
-        m_opacity{ 1.f },
-        m_time{ 0 };
+    float m_startTime{ 0 };
+    float m_opacity{ 1.f };
+    float m_time{ 0 };
 
     Color m_color{ Color::white };
 
-    Matrix3 m_transformMatrix,
-        m_projectionMatrix,
-        m_textureMatrix;
+    Matrix3 m_transformMatrix;
+    Matrix3 m_projectionMatrix;
+    Matrix3 m_textureMatrix;
 
     Size m_resolution;
 

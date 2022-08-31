@@ -84,8 +84,7 @@ namespace stdext
     {
         if (in.find_first_not_of("-0123456789") != std::string::npos)
             return false;
-        const std::size_t t = in.find_last_of('-');
-        if (t != std::string::npos && t != 0)
+        if (const std::size_t t = in.find_last_of('-'); t != std::string::npos && t != 0)
             return false;
         l = atol(in.data());
         return true;
@@ -94,8 +93,7 @@ namespace stdext
     // special cast from string to int
     inline bool cast(const std::string& in, int& i)
     {
-        long l;
-        if (cast(in, l)) {
+        if (long l; cast(in, l)) {
             i = l;
             return true;
         }
@@ -120,8 +118,7 @@ namespace stdext
     // special cast from string to float
     inline bool cast(const std::string& in, float& f)
     {
-        double d;
-        if (cast(in, d)) {
+        if (double d; cast(in, d)) {
             f = static_cast<float>(d);
             return true;
         }
@@ -173,7 +170,7 @@ namespace stdext
     {
         try {
             return safe_cast<R, T>(t);
-        } catch (cast_exception& e) {
+        } catch (const cast_exception& e) {
             std::cerr << "CAST ERROR: " << e.what() << std::endl;
             return def;
         }

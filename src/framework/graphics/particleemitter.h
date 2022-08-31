@@ -39,10 +39,14 @@ public:
 private:
     // self related
     Point m_position;
-    float m_duration{ -1 }, m_delay{ 0 },
-        m_elapsedTime{ 0 }, m_burstRate{ 1.f };
-    int m_currentBurst{ 0 }, m_burstCount{ 32 };
-    bool m_finished{ false }, m_active{ false };
+    float m_duration{ -1 };
+    float m_delay{ 0 };
+    float m_elapsedTime{ 0 };
+    float m_burstRate{ 1.f };
+    int m_currentBurst{ 0 };
+    int m_burstCount{ 32 };
+    bool m_finished{ false };
+    bool m_active{ false };
 
     ParticleTypePtr m_particleType;
 };

@@ -478,7 +478,7 @@ public:
         this is more efficient than calling Value().
         Only available in STL mode.
     */
-    const std::string ValueStr() const { return value; }
+    std::string ValueStr() const { return value; }
 #endif
 
     const TIXML_STRING& ValueTStr() const { return value; }
@@ -803,7 +803,7 @@ public:
     const char* Name()  const { return name.data(); }        ///< Return the name of this attribute.
     const char* Value() const { return value.data(); }        ///< Return the value of this attribute.
 #ifdef TIXML_USE_STL
-    const std::string ValueStr() const { return value; }                ///< Return the value of this attribute.
+    std::string ValueStr() const { return value; }                ///< Return the value of this attribute.
 #endif
     int                IntValue() const;                                    ///< Return the value of this attribute, converted to an integer.
     double            DoubleValue() const;                                ///< Return the value of this attribute, converted to a double.
@@ -942,8 +942,7 @@ public:
     T readType(const std::string_view str) const
     {
         T ret;
-        const int r = QueryValueAttribute(str, &ret);
-        if (r == TIXML_NO_ATTRIBUTE || r == TIXML_WRONG_TYPE)
+        if (const int r = QueryValueAttribute(str, &ret); r == TIXML_NO_ATTRIBUTE || r == TIXML_WRONG_TYPE)
             return T();
         return ret;
     }
@@ -1104,8 +1103,6 @@ protected:
     void StreamIn(std::istream* in, TIXML_STRING* tag) override;
 #endif
     //    virtual void StreamOut( TIXML_OSTREAM * out ) const;
-
-private:
 };
 
 /** XML text. A text node can have 2 ways to output the next. "normal" output
@@ -1682,7 +1679,7 @@ public:
 
 #ifdef TIXML_USE_STL
     /// Return the result.
-    const std::string Str() { return buffer; }
+    std::string Str() { return buffer; }
 #endif
 
 private:

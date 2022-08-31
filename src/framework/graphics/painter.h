@@ -131,9 +131,9 @@ protected:
 
     std::vector<Matrix3> m_transformMatrixStack;
 
-    Matrix3 m_transformMatrix,
-        m_projectionMatrix,
-        m_textureMatrix;
+    Matrix3 m_transformMatrix;
+    Matrix3 m_projectionMatrix;
+    Matrix3 m_textureMatrix;
 
     BlendEquation m_blendEquation{ BlendEquation::ADD };
     Texture* m_texture{ nullptr };

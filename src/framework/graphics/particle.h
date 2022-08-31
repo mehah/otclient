@@ -53,10 +53,13 @@ private:
     PointF m_position;
     PointF m_velocity;
     PointF m_acceleration;
-    Size m_size, m_startSize, m_finalSize;
+    Size m_size;
+    Size m_startSize;
+    Size m_finalSize;
     Rect m_rect;
     CompositionMode m_compositionMode;
-    float m_duration, m_ignorePhysicsAfter;
+    float m_duration;
+    float m_ignorePhysicsAfter;
     float m_elapsedTime{ 0 };
     bool m_finished{ false };
 };

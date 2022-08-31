@@ -201,7 +201,8 @@ private:
 
     struct Rep
     {
-        size_type size, capacity;
+        size_type size;
+        size_type capacity;
         char str[1];
     };
 

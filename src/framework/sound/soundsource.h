@@ -64,10 +64,10 @@ protected:
     friend class SoundManager;
     friend class CombinedSoundSource;
 
-    float m_fadeStartTime{ 0 },
-        m_fadeTime{ 0 },
-        m_fadeGain{ 0 },
-        m_gain{ 1.f };
+    float m_fadeStartTime{ 0 };
+    float m_fadeTime{ 0 };
+    float m_fadeGain{ 0 };
+    float m_gain{ 1.f };
 
     FadeState m_fadeState{ NoFading };
 

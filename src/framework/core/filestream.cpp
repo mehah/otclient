@@ -328,8 +328,7 @@ std::string FileStream::getString()
 
 BinaryTreePtr FileStream::getBinaryTree()
 {
-    const uint8_t byte = getU8();
-    if (byte != BINARYTREE_NODE_START)
+    if (const uint8_t byte = getU8(); byte != static_cast<uint8_t>(BinaryTree::Node::START))
         throw Exception("failed to read node start (getBinaryTree): %d", byte);
 
     return { new BinaryTree(asFileStream()) };
@@ -337,13 +336,13 @@ BinaryTreePtr FileStream::getBinaryTree()
 
 void FileStream::startNode(uint8_t n)
 {
-    addU8(BINARYTREE_NODE_START);
+    addU8(static_cast<uint8_t>(BinaryTree::Node::START));
     addU8(n);
 }
 
 void FileStream::endNode()
 {
-    addU8(BINARYTREE_NODE_END);
+    addU8(static_cast<uint8_t>(BinaryTree::Node::END));
 }
 
 void FileStream::addU8(uint8_t v)

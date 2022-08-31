@@ -59,7 +59,7 @@ private:
     int m_cellSpacing;
     int m_numColumns;
     int m_numLines;
-    bool m_autoSpacing{ false },
-        m_fitChildren{ false },
-        m_flow{ false };
+    bool m_autoSpacing{ false };
+    bool m_fitChildren{ false };
+    bool m_flow{ false };
 };

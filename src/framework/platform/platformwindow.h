@@ -118,13 +118,13 @@ protected:
     Size m_unmaximizedSize;
     Point m_unmaximizedPos;
     InputEvent m_inputEvent;
-    bool m_mouseButtonStates[4]{ false },
-        m_created{ false },
-        m_visible{ false },
-        m_focused{ false },
-        m_fullscreen{ false },
-        m_maximized{ false },
-        m_vsync{ false };
+    bool m_mouseButtonStates[4]{ false };
+    bool m_created{ false };
+    bool m_visible{ false };
+    bool m_focused{ false };
+    bool m_fullscreen{ false };
+    bool m_maximized{ false };
+    bool m_vsync{ false };
 
     std::function<void()> m_onClose;
     OnResizeCallback m_onResize;
