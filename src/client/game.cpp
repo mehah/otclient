@@ -641,12 +641,12 @@ bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
     return true;
 }
 
-void Game::autoWalk(std::vector<Otc::Direction> dirs, Position startPos)
+void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& startPos)
 {
     if (!canPerformGameAction())
         return;
 
-    if (dirs.empty())
+    if (dirs.size() == 0)
         return;
 
     // protocol limits walk path
@@ -660,15 +660,15 @@ void Game::autoWalk(std::vector<Otc::Direction> dirs, Position startPos)
         cancelFollow();
     }
 
-    const auto it = dirs.begin();
-    const Otc::Direction direction = *it;
+    auto it = dirs.begin();
+    Otc::Direction direction = *it;
 
-    const TilePtr toTile = g_map.getTile(startPos.translatedToDirection(direction));
-    if (startPos == m_localPlayer->m_position && toTile && toTile->isWalkable() && !m_localPlayer->isWalking() && m_localPlayer->canWalk(true)) {
+    uint8_t flags = 0x04; // auto walk flag
+
+    TilePtr toTile = g_map.getTile(startPos.translatedToDirection(direction));
+    if (startPos == m_localPlayer->m_lastPrewalkDestination && toTile && toTile->isWalkable() && !m_localPlayer->isWalking() && m_localPlayer->canWalk(true)) {
         m_localPlayer->preWalk(direction);
-
-        forceWalk(direction);
-        dirs.erase(it);
+        flags |= 0x01; // prewalk flag
     }
 
     g_lua.callGlobalField("g_game", "onAutoWalk", dirs);
