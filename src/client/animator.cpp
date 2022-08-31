@@ -98,8 +98,7 @@ void Animator::setPhase(int phase)
 
 int Animator::getPhase()
 {
-    const ticks_t ticks = g_clock.millis();
-    if (ticks != m_lastPhaseTicks && !m_isComplete) {
+    if (const ticks_t ticks = g_clock.millis(); ticks != m_lastPhaseTicks && !m_isComplete) {
         const int elapsedTicks = static_cast<int>(ticks - m_lastPhaseTicks);
         if (elapsedTicks >= m_currentDuration) {
             int phase;

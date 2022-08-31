@@ -283,7 +283,6 @@ private:
     void parsePreyTimeLeft(const InputMessagePtr& msg);
     void parsePreyData(const InputMessagePtr& msg);
     void parsePreyRerollPrice(const InputMessagePtr& msg);
-    Imbuement getImbuementInfo(const InputMessagePtr& msg);
     void parseImbuementWindow(const InputMessagePtr& msg);
     void parseCloseImbuementWindow(const InputMessagePtr& msg);
     void parseError(const InputMessagePtr& msg);
@@ -294,6 +293,7 @@ private:
 
     MarketOffer readMarketOffer(const InputMessagePtr& msg, uint8_t action, uint16_t var);
 
+    Imbuement getImbuementInfo(const InputMessagePtr& msg);
     PreyMonster getPreyMonster(const InputMessagePtr& msg);
     std::vector<PreyMonster> getPreyMonsters(const InputMessagePtr& msg);
 
@@ -311,10 +311,10 @@ public:
     Position getPosition(const InputMessagePtr& msg);
 
 private:
-    bool m_enableSendExtendedOpcode{ false },
-        m_gameInitialized{ false },
-        m_mapKnown{ false },
-        m_firstRecv{ true };
+    bool m_enableSendExtendedOpcode{ false };
+    bool m_gameInitialized{ false };
+    bool m_mapKnown{ false };
+    bool m_firstRecv{ true };
 
     std::string m_accountName;
     std::string m_accountPassword;

@@ -72,18 +72,19 @@ protected:
 
     uint32_t m_id{ 0 };
     ticks_t m_time{ 0 };
-    Size m_size, m_glSize;
+    Size m_size;
+    Size m_glSize;
 
     Matrix3 m_transformMatrix;
 
     ImagePtr m_image;
 
-    bool m_hasMipmaps{ false },
-        m_smooth{ false },
-        m_upsideDown{ false },
-        m_repeat{ false },
-        m_opaque{ false },
-        m_canSuperimposed{ false },
-        m_compress{ false },
-        m_buildMipmaps{ false };
+    bool m_hasMipmaps{ false };
+    bool m_smooth{ false };
+    bool m_upsideDown{ false };
+    bool m_repeat{ false };
+    bool m_opaque{ false };
+    bool m_canSuperimposed{ false };
+    bool m_compress{ false };
+    bool m_buildMipmaps{ false };
 };

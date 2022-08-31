@@ -304,8 +304,7 @@ int64_t FileStream::get64()
 std::string FileStream::getString()
 {
     std::string str;
-    const uint16_t len = getU16();
-    if (len > 0 && len < 8192) {
+    if (const uint16_t len = getU16(); len > 0 && len < 8192) {
         char buffer[8192];
         if (m_fileHandle) {
             if (PHYSFS_readBytes(m_fileHandle, buffer, len) == 0)
@@ -328,8 +327,7 @@ std::string FileStream::getString()
 
 BinaryTreePtr FileStream::getBinaryTree()
 {
-    const uint8_t byte = getU8();
-    if (byte != BINARYTREE_NODE_START)
+    if (const uint8_t byte = getU8(); byte != static_cast<uint8_t>(BinaryTree::Node::START))
         throw Exception("failed to read node start (getBinaryTree): %d", byte);
 
     return { new BinaryTree(asFileStream()) };
@@ -337,13 +335,13 @@ BinaryTreePtr FileStream::getBinaryTree()
 
 void FileStream::startNode(uint8_t n)
 {
-    addU8(BINARYTREE_NODE_START);
+    addU8(static_cast<uint8_t>(BinaryTree::Node::START));
     addU8(n);
 }
 
 void FileStream::endNode()
 {
-    addU8(BINARYTREE_NODE_END);
+    addU8(static_cast<uint8_t>(BinaryTree::Node::END));
 }
 
 void FileStream::addU8(uint8_t v)

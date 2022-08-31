@@ -46,8 +46,8 @@ private:
     int currentDepth;
     int currentLine;
     OTMLDocumentPtr doc;
-    OTMLNodePtr currentParent,
-        previousNode;
+    OTMLNodePtr currentParent;
+    OTMLNodePtr previousNode;
 
     std::map<OTMLNodePtr, OTMLNodePtr> parentMap;
 

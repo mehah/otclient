@@ -85,7 +85,7 @@ void DrawPoolManager::draw()
                 pf->m_framebuffer->draw();
                 if (pf->m_afterDraw) pf->m_afterDraw();
             }
-        } else for (auto& obj : pool->m_objects[0][static_cast<int>(DrawPool::DrawOrder::FIRST)]) {
+        } else for (const auto& obj : pool->m_objects[0][static_cast<int>(DrawPool::DrawOrder::FIRST)]) {
             drawObject(obj);
         }
 

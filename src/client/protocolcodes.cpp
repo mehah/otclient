@@ -236,8 +236,7 @@ namespace Proto
     {
         if (mode >= Otc::LastMessage)
             return Otc::MessageInvalid;
-        const auto it = messageModesMap.find(mode);
-        if (it != messageModesMap.end())
+        if (const auto it = messageModesMap.find(mode); it != messageModesMap.end())
             return it->second;
         return Otc::MessageInvalid;
     }

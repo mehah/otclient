@@ -253,7 +253,7 @@ void CreatureManager::loadSpawns(const std::string& fileName)
         }
         doc.Clear();
         m_spawnLoaded = true;
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to load '%s': %s", fileName, e.what()));
     }
 }
@@ -278,7 +278,7 @@ void CreatureManager::saveSpawns(const std::string& fileName)
 
         if (!doc.SaveFile("data" + fileName))
             throw Exception("failed to save spawns XML %s: %s", fileName, doc.ErrorDesc());
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
     }
 }
@@ -313,15 +313,14 @@ void CreatureManager::loadCreatureBuffer(const std::string& buffer)
     doc.Clear();
 }
 
-void CreatureManager::internalLoadCreatureBuffer(TiXmlElement* attrib, const CreatureTypePtr& m)
+void CreatureManager::internalLoadCreatureBuffer(const TiXmlElement* attrib, const CreatureTypePtr& m)
 {
     if (std::find(m_creatures.begin(), m_creatures.end(), m) != m_creatures.end())
         return;
 
     Outfit out;
 
-    const auto type = attrib->readType<int32_t>("type");
-    if (type > 0) {
+    if (const auto type = attrib->readType<int32_t>("type"); type > 0) {
         out.setCategory(ThingCategoryCreature);
         out.setId(type);
     } else {

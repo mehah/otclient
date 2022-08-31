@@ -191,11 +191,12 @@ private:
 
     bool canRepaint(bool autoUpdateStatus);
 
-    bool m_enabled{ true },
-        m_alwaysGroupDrawings{ false },
-        m_autoUpdate{ false };
+    bool m_enabled{ true };
+    bool m_alwaysGroupDrawings{ false };
+    bool m_autoUpdate{ false };
 
-    uint8_t m_currentOrder{ 0 }, m_currentFloor{ 0 };
+    uint8_t m_currentOrder{ 0 };
+    uint8_t m_currentFloor{ 0 };
 
     uint16_t m_refreshTimeMS{ 0 };
 
@@ -234,7 +235,8 @@ private:
 
     FrameBufferPtr m_framebuffer;
 
-    std::function<void()> m_beforeDraw, m_afterDraw;
+    std::function<void()> m_beforeDraw;
+    std::function<void()> m_afterDraw;
 };
 
 extern DrawPoolManager g_drawPool;
@@ -242,7 +244,7 @@ extern DrawPoolManager g_drawPool;
 class DrawBuffer
 {
 public:
-    DrawBuffer(DrawPool::DrawOrder order, bool agroup = true) : m_order(order), m_agroup(agroup) {}
+    DrawBuffer(DrawPool::DrawOrder order, bool agroup = true) : m_agroup(agroup), m_order(order) {}
     void agroup(bool v) { m_agroup = v; }
     void setOrder(DrawPool::DrawOrder order) { m_order = order; }
 

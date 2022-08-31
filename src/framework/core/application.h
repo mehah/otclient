@@ -63,15 +63,15 @@ public:
 protected:
     void registerLuaFunctions();
 
-    std::string m_charset{ "cp1252" },
-        m_organizationName{ "org" },
-        m_appName{ "application" },
-        m_appCompactName{ "app" },
-        m_startupOptions;
+    std::string m_charset{ "cp1252" };
+    std::string m_organizationName{ "org" };
+    std::string m_appName{ "application" };
+    std::string m_appCompactName{ "app" };
+    std::string m_startupOptions;
 
-    bool m_running{ false },
-        m_stopping{ false },
-        m_terminated{ false };
+    bool m_running{ false };
+    bool m_stopping{ false };
+    bool m_terminated{ false };
 };
 
 #include "graphicalapplication.h"

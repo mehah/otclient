@@ -37,18 +37,10 @@ void BinaryTree::skipNodes()
     while (true) {
         const uint8_t byte = m_fin->getU8();
         switch (byte) {
-            case BINARYTREE_NODE_START:
-            {
-                skipNodes();
-                break;
-            }
-            case BINARYTREE_NODE_END:
-                return;
-            case BINARYTREE_ESCAPE_CHAR:
-                m_fin->getU8();
-                break;
-            default:
-                break;
+            case static_cast<uint8_t>(Node::START): skipNodes(); break;
+            case static_cast<uint8_t>(Node::END): return;
+            case static_cast<uint8_t>(Node::ESCAPE_CHAR): m_fin->getU8(); break;
+            default: break;
         }
     }
 }
@@ -63,19 +55,10 @@ void BinaryTree::unserialize()
     while (true) {
         uint8_t byte = m_fin->getU8();
         switch (byte) {
-            case BINARYTREE_NODE_START:
-            {
-                skipNodes();
-                break;
-            }
-            case BINARYTREE_NODE_END:
-                return;
-            case BINARYTREE_ESCAPE_CHAR:
-                m_buffer.add(m_fin->getU8());
-                break;
-            default:
-                m_buffer.add(byte);
-                break;
+            case static_cast<uint8_t>(Node::START): skipNodes(); break;
+            case static_cast<uint8_t>(Node::END): return;
+            case static_cast<uint8_t>(Node::ESCAPE_CHAR): m_buffer.add(m_fin->getU8()); break;
+            default: m_buffer.add(byte); break;
         }
     }
 }
@@ -87,20 +70,17 @@ BinaryTreeVec BinaryTree::getChildren()
     while (true) {
         const uint8_t byte = m_fin->getU8();
         switch (byte) {
-            case BINARYTREE_NODE_START:
+            case static_cast<uint8_t>(Node::START):
             {
                 BinaryTreePtr node(new BinaryTree(m_fin));
                 children.push_back(node);
                 node->skipNodes();
                 break;
             }
-            case BINARYTREE_NODE_END:
-                return children;
-            case BINARYTREE_ESCAPE_CHAR:
-                m_fin->getU8();
-                break;
-            default:
-                break;
+
+            case static_cast<uint8_t>(Node::END): return children;
+            case static_cast<uint8_t>(Node::ESCAPE_CHAR): m_fin->getU8(); break;
+            default: break;
         }
     }
 }
@@ -230,20 +210,23 @@ void OutputBinaryTree::addPoint(const Point& point)
 
 void OutputBinaryTree::startNode(uint8_t node)
 {
-    m_fin->addU8(BINARYTREE_NODE_START);
+    m_fin->addU8(static_cast<uint8_t>(BinaryTree::Node::START));
     write(&node, 1);
 }
 
 void OutputBinaryTree::endNode()
 {
-    m_fin->addU8(BINARYTREE_NODE_END);
+    m_fin->addU8(static_cast<uint8_t>(BinaryTree::Node::END));
 }
 
 void OutputBinaryTree::write(const uint8_t* data, size_t size)
 {
     for (size_t i = 0; i < size; ++i) {
-        if (data[i] == BINARYTREE_NODE_START || data[i] == BINARYTREE_NODE_END || data[i] == BINARYTREE_ESCAPE_CHAR)
-            m_fin->addU8(BINARYTREE_ESCAPE_CHAR);
+        if (const auto v = static_cast<BinaryTree::Node>(data[i]);
+            v == BinaryTree::Node::START || v == BinaryTree::Node::END || v == BinaryTree::Node::ESCAPE_CHAR) {
+            m_fin->addU8(static_cast<uint8_t>(BinaryTree::Node::ESCAPE_CHAR));
+        }
+
         m_fin->addU8(data[i]);
     }
 }

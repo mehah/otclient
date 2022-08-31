@@ -68,7 +68,7 @@ bool FontManager::importFont(const std::string& file)
             m_defaultFont = font;
 
         return true;
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("Unable to load font from file '%s': %s", path, e.what()));
         return false;
     }

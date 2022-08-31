@@ -84,7 +84,7 @@ bool Module::load()
 
         m_loaded = true;
         g_logger.debug(stdext::format("Loaded module '%s'", m_name));
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         // remove from package.loaded
         g_lua.getGlobalField("package", "loaded");
         g_lua.pushNil();
@@ -126,7 +126,7 @@ void Module::unload()
 
             if (m_sandboxed)
                 g_lua.resetGlobalEnvironment();
-        } catch (stdext::exception& e) {
+        } catch (stdext::exception const& e) {
             if (m_sandboxed)
                 g_lua.resetGlobalEnvironment();
             g_logger.error(stdext::format("Unable to unload module '%s': %s", m_name, e.what()));

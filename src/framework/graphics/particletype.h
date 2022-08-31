@@ -50,22 +50,31 @@ protected:
 
     // particles default configuration. (make them reasonable for user detect missing properties on scripts)
     // size
-    Size pStartSize{ 32 }, pFinalSize{ 32 };
+    Size pStartSize{ 32 };
+    Size pFinalSize{ 32 };
 
     // initial position related to emitter position
-    float pMinPositionRadius{ 0 }, pMaxPositionRadius{ 3 };
-    float pMinPositionAngle{ 0 }, pMaxPositionAngle{ 360 };
+    float pMinPositionRadius{ 0 };
+    float pMaxPositionRadius{ 3 };
+    float pMinPositionAngle{ 0 };
+    float pMaxPositionAngle{ 360 };
 
     // initial velocity
-    float pMinVelocity{ 32 }, pMaxVelocity{ 64 };
-    float pMinVelocityAngle{ 0 }, pMaxVelocityAngle{ 360 };
+    float pMinVelocity{ 32 };
+    float pMaxVelocity{ 64 };
+    float pMinVelocityAngle{ 0 };
+    float pMaxVelocityAngle{ 360 };
 
     // initial acceleration
-    float pMinAcceleration{ 32 }, pMaxAcceleration{ 64 };
-    float pMinAccelerationAngle{ 0 }, pMaxAccelerationAngle{ 360 };
+    float pMinAcceleration{ 32 };
+    float pMaxAcceleration{ 64 };
+    float pMinAccelerationAngle{ 0 };
+    float pMaxAccelerationAngle{ 360 };
 
     // duration
-    float pMinDuration{ 0 }, pMaxDuration{ 10 }, pIgnorePhysicsAfter{ -1 };
+    float pMinDuration{ 0 };
+    float pMaxDuration{ 10 };
+    float pIgnorePhysicsAfter{ -1 };
 
     friend class ParticleEmitter;
 };

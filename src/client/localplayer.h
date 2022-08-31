@@ -130,18 +130,18 @@ private:
     bool retryAutoWalk();
 
     // walk related
-    Position m_lastPrewalkDestination,
-        m_lastAutoWalkPosition,
-        m_autoWalkDestination;
+    Position m_lastPrewalkDestination;
+    Position m_lastAutoWalkPosition;
+    Position m_autoWalkDestination;
 
     ScheduledEventPtr m_autoWalkContinueEvent;
     ticks_t m_walkLockExpiration{ 0 };
 
-    bool m_preWalking{ false },
-        m_knownCompletePath{ false },
-        m_premium{ false },
-        m_known{ false },
-        m_pending{ false };
+    bool m_preWalking{ false };
+    bool m_knownCompletePath{ false };
+    bool m_premium{ false };
+    bool m_known{ false };
+    bool m_pending{ false };
 
     ItemPtr m_inventoryItems[Otc::LastInventorySlot];
 

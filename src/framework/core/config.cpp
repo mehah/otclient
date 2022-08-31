@@ -39,11 +39,11 @@ bool Config::load(const std::string& file)
         return false;
 
     try {
-        const OTMLDocumentPtr confsDoc = OTMLDocument::parse(file);
-        if (confsDoc)
+        if (const OTMLDocumentPtr confsDoc = OTMLDocument::parse(file); confsDoc)
             m_confsDoc = confsDoc;
+
         return true;
-    } catch (stdext::exception& e) {
+    } catch (stdext::exception const& e) {
         g_logger.error(stdext::format("Unable to parse configuration file '%s': ", e.what()));
         return false;
     }
@@ -102,8 +102,7 @@ bool Config::exists(const std::string& key)
 
 std::string Config::getValue(const std::string& key)
 {
-    const OTMLNodePtr child = m_confsDoc->get(key);
-    if (child)
+    if (const OTMLNodePtr child = m_confsDoc->get(key); child)
         return child->value();
     return "";
 }
@@ -111,8 +110,7 @@ std::string Config::getValue(const std::string& key)
 std::vector<std::string> Config::getList(const std::string& key)
 {
     std::vector<std::string> list;
-    const OTMLNodePtr child = m_confsDoc->get(key);
-    if (child) {
+    if (const OTMLNodePtr child = m_confsDoc->get(key); child) {
         for (const OTMLNodePtr& subchild : child->children())
             list.push_back(subchild->value());
     }

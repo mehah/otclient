@@ -105,8 +105,7 @@ void ProtocolGame::sendLoginPacket(uint32_t challengeTimestamp, uint8_t challeng
         msg->addU8(challengeRandom);
     }
 
-    const auto extended = callLuaField<std::string>("getLoginExtendedData");
-    if (!extended.empty())
+    if (const auto extended = callLuaField<std::string>("getLoginExtendedData"); !extended.empty())
         msg->addString(extended);
 
     // complete the bytes for rsa encryption with zeros

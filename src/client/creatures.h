@@ -136,12 +136,13 @@ public:
     const std::vector<CreatureTypePtr>& getCreatures() { return m_creatures; }
 
 protected:
-    void internalLoadCreatureBuffer(TiXmlElement* attrib, const CreatureTypePtr& m);
+    void internalLoadCreatureBuffer(const TiXmlElement* attrib, const CreatureTypePtr& m);
 
 private:
     std::vector<CreatureTypePtr> m_creatures;
     stdext::map<Position, SpawnPtr, Position::Hasher> m_spawns;
-    bool m_loaded{ false }, m_spawnLoaded{ false };
+    bool m_loaded{ false };
+    bool m_spawnLoaded{ false };
     CreatureTypePtr m_nullCreature;
 };
 

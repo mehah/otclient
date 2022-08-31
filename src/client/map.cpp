@@ -36,8 +36,8 @@
 #include "houses.h"
 #include "towns.h"
 
-static constexpr uint8_t
-MAX_VIEWPORT_X = 8, MAX_VIEWPORT_Y = 6;
+static constexpr uint8_t MAX_VIEWPORT_X = 8;
+static constexpr uint8_t MAX_VIEWPORT_Y = 6;
 
 Map g_map;
 TilePtr Map::m_nulltile;
@@ -169,8 +169,8 @@ void Map::addThing(const ThingPtr& thing, const Position& pos, int16_t stackPos)
             if (!merged) {
                 if (prevAnimatedText) {
                     Point offset = prevAnimatedText->getOffset();
-                    const float t = prevAnimatedText->getTimer().ticksElapsed();
-                    if (t < ANIMATED_TEXT_DURATION / 4.0) { // didnt move 12 pixels
+                    if (const float t = prevAnimatedText->getTimer().ticksElapsed();
+                        t < ANIMATED_TEXT_DURATION / 4.0) { // didnt move 12 pixels
                         const int32_t y = 12 - 48 * t / static_cast<float>(ANIMATED_TEXT_DURATION);
                         offset += Point(0, y);
                     }
@@ -316,8 +316,7 @@ const TilePtr& Map::createTileEx(const Position& pos, const Items&... items)
         return m_nulltile;
 
     const TilePtr& tile = getOrCreateTile(pos);
-    auto vec = { items... };
-    for (auto it : vec)
+    for (auto vec = { items... }; auto it : vec)
         addThing(it, pos);
 
     return tile;
@@ -346,7 +345,7 @@ const TilePtr& Map::getTile(const Position& pos)
     return m_nulltile;
 }
 
-const TileList Map::getTiles(int8_t floor/* = -1*/)
+TileList Map::getTiles(int8_t floor/* = -1*/)
 {
     TileList tiles;
     if (floor > MAX_Z)
@@ -355,8 +354,7 @@ const TileList Map::getTiles(int8_t floor/* = -1*/)
     if (floor < 0) {
         // Search all floors
         for (int_fast8_t z = -1; ++z <= MAX_Z;) {
-            for (const auto& pair : m_tileBlocks[z]) {
-                const TileBlock& block = pair.second;
+            for (const auto& [key, block] : m_tileBlocks[z]) {
                 for (const TilePtr& tile : block.getTiles()) {
                     if (tile != nullptr)
                         tiles.push_back(tile);
@@ -364,8 +362,7 @@ const TileList Map::getTiles(int8_t floor/* = -1*/)
             }
         }
     } else {
-        for (const auto& pair : m_tileBlocks[floor]) {
-            const TileBlock& block = pair.second;
+        for (const auto& [key, block] : m_tileBlocks[floor]) {
             for (const TilePtr& tile : block.getTiles()) {
                 if (tile != nullptr)
                     tiles.push_back(tile);
@@ -567,8 +564,7 @@ void Map::setCentralPosition(const Position& centralPosition)
         const LocalPlayerPtr localPlayer = g_game.getLocalPlayer();
         if (!localPlayer || localPlayer->getPosition() == m_centralPosition)
             return;
-        const TilePtr tile = localPlayer->getTile();
-        if (tile && tile->hasThing(localPlayer))
+        if (const TilePtr tile = localPlayer->getTile(); tile && tile->hasThing(localPlayer))
             return;
 
         const Position oldPos = localPlayer->getPosition();
@@ -611,7 +607,8 @@ std::vector<CreaturePtr> Map::getSpectatorsInRange(const Position& centerPos, bo
 std::vector<CreaturePtr> Map::getSpectatorsInRangeEx(const Position& centerPos, bool multiFloor, int32_t minXRange, int32_t maxXRange, int32_t minYRange, int32_t maxYRange)
 {
     std::vector<CreaturePtr> creatures;
-    uint8_t minZRange = 0, maxZRange = 0;
+    uint8_t minZRange = 0;
+    uint8_t maxZRange = 0;
 
     if (multiFloor) {
         minZRange = centerPos.z - getFirstAwareFloor();
@@ -960,7 +957,7 @@ PathFindResult_ptr Map::newFindPath(const Position& start, const Position& goal,
 
     struct LessNode
     {
-        bool operator()(Node* a, Node* b) const
+        bool operator()(Node const* a, Node const* b) const
         {
             return b->totalCost < a->totalCost;
         }

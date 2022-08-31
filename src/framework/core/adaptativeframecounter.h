@@ -43,10 +43,10 @@ public:
 private:
     int getMaxPeriod() const { return 1000000 / m_maxFps; }
 
-    uint32_t m_fps{ 0 },
-        m_maxFps{ 0 },
-        m_fpsCount{ 0 },
-        m_interval{ 0 };
+    uint32_t m_fps{ 0 };
+    uint32_t m_maxFps{ 0 };
+    uint32_t m_fpsCount{ 0 };
+    uint32_t m_interval{ 0 };
 
     ticks_t m_startTime{ 0 };
 };

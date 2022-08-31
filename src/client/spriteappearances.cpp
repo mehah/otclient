@@ -153,7 +153,7 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet)
         sheet->loaded = true;
         sheet->loading = false;
         return true;
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to load single sprite sheet '%s': %s", sheet->file, e.what()));
         return false;
     }
@@ -232,7 +232,7 @@ ImagePtr SpriteAppearances::getSpriteImage(int id)
         }
 
         return image;
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("Failed to get sprite id %d: %s", id, e.what()));
         return nullptr;
     }

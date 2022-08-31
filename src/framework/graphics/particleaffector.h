@@ -35,8 +35,11 @@ public:
     bool hasFinished() { return m_finished; }
 
 protected:
-    bool m_finished{ false }, m_active{ false };
-    float m_delay{ 0 }, m_duration{ 0 }, m_elapsedTime{ 0 };
+    bool m_finished{ false };
+    bool m_active{ false };
+    float m_delay{ 0 };
+    float m_duration{ 0 };
+    float m_elapsedTime{ 0 };
 };
 
 class GravityAffector : public ParticleAffector
@@ -46,7 +49,8 @@ public:
     void updateParticle(const ParticlePtr& particle, float elapsedTime) override;
 
 private:
-    float m_angle, m_gravity;
+    float m_angle;
+    float m_gravity;
 };
 
 class AttractionAffector : public ParticleAffector
@@ -57,6 +61,7 @@ public:
 
 private:
     Point m_position;
-    float m_acceleration{ .0f }, m_reduction{ .0f };
+    float m_acceleration{ .0f };
+    float m_reduction{ .0f };
     bool m_repelish{ false };
 };

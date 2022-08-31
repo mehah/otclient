@@ -51,7 +51,7 @@ protected:
     void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
 
     ItemPtr m_item;
-    bool m_virtual{ false },
-        m_showId{ false },
-        m_itemVisible{ true };
+    bool m_virtual{ false };
+    bool m_showId{ false };
+    bool m_itemVisible{ true };
 };

@@ -62,10 +62,10 @@ protected:
     friend class ModuleManager;
 
 private:
-    bool m_loaded{ false },
-        m_autoLoad{ false },
-        m_reloadable{ false },
-        m_sandboxed{ false };
+    bool m_loaded{ false };
+    bool m_autoLoad{ false };
+    bool m_reloadable{ false };
+    bool m_sandboxed{ false };
 
     int m_autoLoadPriority;
     int m_sandboxEnv;

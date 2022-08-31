@@ -398,8 +398,8 @@ void MapView::updateVisibleTiles()
 void MapView::updateGeometry(const Size& visibleDimension)
 {
     const uint8_t tileSize = SPRITE_SIZE * m_scaleFactor;
-    const Size& drawDimension = visibleDimension + 3,
-        bufferSize = drawDimension * tileSize;
+    const Size& drawDimension = visibleDimension + 3;
+    const Size bufferSize = drawDimension * tileSize;
 
     if (bufferSize.width() > g_graphics.getMaxTextureSize() || bufferSize.height() > g_graphics.getMaxTextureSize()) {
         g_logger.traceError("reached max zoom out");
@@ -419,10 +419,10 @@ void MapView::updateGeometry(const Size& visibleDimension)
 
     if (m_lightView) m_lightView->resize(drawDimension, tileSize);
 
-    const uint8_t left = std::min<uint8_t>(g_map.getAwareRange().left, (m_drawDimension.width() / 2) - 1),
-        top = std::min<uint8_t>(g_map.getAwareRange().top, (m_drawDimension.height() / 2) - 1),
-        right = static_cast<uint8_t>(left + 1),
-        bottom = static_cast<uint8_t>(top + 1);
+    const uint8_t left = std::min<uint8_t>(g_map.getAwareRange().left, (m_drawDimension.width() / 2) - 1);
+    const uint8_t top = std::min<uint8_t>(g_map.getAwareRange().top, (m_drawDimension.height() / 2) - 1);
+    const uint8_t right = static_cast<uint8_t>(left + 1);
+    const uint8_t bottom = static_cast<uint8_t>(top + 1);
 
     m_posInfo.awareRange = { left, top, right, bottom };
 

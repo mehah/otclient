@@ -131,10 +131,10 @@ private:
 
     bool m_selectable;
 
-    int m_selectionReference,
-        m_selectionStart,
-        m_selectionEnd,
-        m_cursorPos{ 0 };
+    int m_selectionReference;
+    int m_selectionStart;
+    int m_selectionEnd;
+    int m_cursorPos{ 0 };
 
     Color m_selectionColor;
     Color m_selectionBackgroundColor;
@@ -142,8 +142,8 @@ private:
     std::vector<Rect> m_glyphsCoords;
     std::vector<Rect> m_glyphsTexCoords;
 
-    std::vector<std::pair<Rect, Rect>> m_glyphsTextRectCache,
-        m_glyphsSelectRectCache;
+    std::vector<std::pair<Rect, Rect>> m_glyphsTextRectCache;
+    std::vector<std::pair<Rect, Rect>> m_glyphsSelectRectCache;
 
     std::string m_displayedText;
 

@@ -64,15 +64,15 @@ protected:
 
     Rect m_rect;
     Point m_virtualOffset;
-    bool m_enabled{ true },
-        m_visible{ true },
-        m_focusable{ true },
-        m_fixedSize{ false },
-        m_phantom{ false },
-        m_draggable{ false },
-        m_destroyed{ false },
-        m_clipping{ false },
-        m_customId{ false };
+    bool m_enabled{ true };
+    bool m_visible{ true };
+    bool m_focusable{ true };
+    bool m_fixedSize{ false };
+    bool m_phantom{ false };
+    bool m_draggable{ false };
+    bool m_destroyed{ false };
+    bool m_clipping{ false };
+    bool m_customId{ false };
 
     UILayoutPtr m_layout;
     UIWidgetPtr m_parent;
@@ -169,8 +169,8 @@ public:
 
 private:
     void repaint();
-    bool m_updateEventScheduled{ false },
-        m_loadingStyle{ false };
+    bool m_updateEventScheduled{ false };
+    bool m_loadingStyle{ false };
 
     // state managment
 protected:
@@ -429,10 +429,10 @@ protected:
     Rect m_imageRect;
     Color m_imageColor;
     Point m_iconOffset;
-    bool m_imageFixedRatio{ false },
-        m_imageRepeated{ false },
-        m_imageSmooth{ false },
-        m_imageAutoResize{ false };
+    bool m_imageFixedRatio{ false };
+    bool m_imageRepeated{ false };
+    bool m_imageSmooth{ false };
+    bool m_imageAutoResize{ false };
     EdgeGroup<int> m_imageBorder;
 
 public:
@@ -497,10 +497,10 @@ protected:
     std::string m_drawText;
     Fw::AlignmentFlag m_textAlign;
     Point m_textOffset;
-    bool m_textWrap{ false },
-        m_textVerticalAutoResize{ false },
-        m_textHorizontalAutoResize{ false },
-        m_textOnlyUpperCase{ false };
+    bool m_textWrap{ false };
+    bool m_textVerticalAutoResize{ false };
+    bool m_textHorizontalAutoResize{ false };
+    bool m_textOnlyUpperCase{ false };
     BitmapFontPtr m_font;
 
 public:

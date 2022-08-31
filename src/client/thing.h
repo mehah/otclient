@@ -35,9 +35,9 @@ struct Highlight
     ThingPtr thing;
     ScheduledEventPtr listeningEvent;
 
-    bool enabled{ false },
-        update{ false },
-        invertedColorSelection{ false };
+    bool enabled{ false };
+    bool update{ false };
+    bool invertedColorSelection{ false };
 };
 
 // @bindclass
@@ -163,10 +163,9 @@ public:
 protected:
     void generateBuffer();
 
-    uint8_t
-        m_numPatternX{ 0 },
-        m_numPatternY{ 0 },
-        m_numPatternZ{ 0 };
+    uint8_t m_numPatternX{ 0 };
+    uint8_t m_numPatternY{ 0 };
+    uint8_t m_numPatternZ{ 0 };
 
     uint16_t m_datId{ 0 };
 
