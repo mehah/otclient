@@ -131,11 +131,11 @@ void LocalPlayer::cancelWalk(Otc::Direction direction)
     callLuaField("onCancelWalk", direction);
 }
 
-bool LocalPlayer::autoWalk(Position destination, bool retry)
+bool LocalPlayer::autoWalk(const Position& destination, bool retry)
 {
     // reset state
-    m_autoWalkDestination = Position();
-    m_lastAutoWalkPosition = Position();
+    m_autoWalkDestination = {};
+    m_lastAutoWalkPosition = {};
     if (m_autoWalkContinueEvent)
         m_autoWalkContinueEvent->cancel();
     m_autoWalkContinueEvent = nullptr;
@@ -148,16 +148,16 @@ bool LocalPlayer::autoWalk(Position destination, bool retry)
 
     m_autoWalkDestination = destination;
     auto self(asLocalPlayer());
-    g_map.findPathAsync(m_position, destination, [self](PathFindResult_ptr result) {
+    g_map.findPathAsync(m_position, destination, [self](const auto& result) {
         if (self->m_autoWalkDestination != result->destination)
             return;
 
         if (result->status != Otc::PathFindResultOk) {
             if (self->m_autoWalkRetries > 0 && self->m_autoWalkRetries <= 3) { // try again in 300, 700, 1200 ms if canceled by server
-                self->m_autoWalkContinueEvent = g_dispatcher.scheduleEvent(std::bind(&LocalPlayer::autoWalk, self, result->destination, true), 200 + self->m_autoWalkRetries * 100);
+                self->m_autoWalkContinueEvent = g_dispatcher.scheduleEvent([self, capture0 = result->destination] { self->autoWalk(capture0, true); }, 200 + self->m_autoWalkRetries * 100);
                 return;
             }
-            self->m_autoWalkDestination = Position();
+            self->m_autoWalkDestination = {};
             self->callLuaField("onAutoWalkFail", result->status);
             return;
         }
@@ -166,7 +166,7 @@ bool LocalPlayer::autoWalk(Position destination, bool retry)
             result->path.resize(127);
 
         if (result->path.empty()) {
-            self->m_autoWalkDestination = Position();
+            self->m_autoWalkDestination = {};
             self->callLuaField("onAutoWalkFail", result->status);
             return;
         }
@@ -176,7 +176,7 @@ bool LocalPlayer::autoWalk(Position destination, bool retry)
         }
 
         g_game.autoWalk(result->path, result->start);
-        });
+    });
 
     if (!retry)
         lockWalk();
