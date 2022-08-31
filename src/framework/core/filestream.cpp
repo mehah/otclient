@@ -304,8 +304,7 @@ int64_t FileStream::get64()
 std::string FileStream::getString()
 {
     std::string str;
-    const uint16_t len = getU16();
-    if (len > 0 && len < 8192) {
+    if (const uint16_t len = getU16(); len > 0 && len < 8192) {
         char buffer[8192];
         if (m_fileHandle) {
             if (PHYSFS_readBytes(m_fileHandle, buffer, len) == 0)

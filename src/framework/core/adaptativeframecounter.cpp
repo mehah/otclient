@@ -30,8 +30,8 @@ bool AdaptativeFrameCounter::update()
     ++m_fpsCount;
 
     if (m_maxFps > 0 && m_fpsCount > m_maxFps) {
-        const int sleep = getMaxPeriod() - static_cast<int>(stdext::micros() - m_startTime);
-        if (sleep > 0) stdext::microsleep(sleep);
+        if (const int sleep = getMaxPeriod() - static_cast<int>(stdext::micros() - m_startTime);
+            sleep > 0) stdext::microsleep(sleep);
 
         m_fpsCount = m_maxFps + (stdext::random_range(0, 2) - 1);
     }

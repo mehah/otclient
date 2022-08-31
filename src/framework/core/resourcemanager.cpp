@@ -323,8 +323,7 @@ std::string ResourceManager::resolvePath(const std::string& path)
     if (path.starts_with("/"))
         fullPath = path;
     else {
-        const std::string scriptPath = "/" + g_lua.getCurrentSourcePath();
-        if (!scriptPath.empty())
+        if (const std::string scriptPath = "/" + g_lua.getCurrentSourcePath(); !scriptPath.empty())
             fullPath += scriptPath + "/";
         fullPath += path;
     }
@@ -338,8 +337,7 @@ std::string ResourceManager::resolvePath(const std::string& path)
 std::string ResourceManager::getRealDir(const std::string& path)
 {
     std::string dir;
-    const char* cdir = PHYSFS_getRealDir(resolvePath(path).c_str());
-    if (cdir)
+    if (const char* cdir = PHYSFS_getRealDir(resolvePath(path).c_str()))
         dir = cdir;
     return dir;
 }
@@ -459,8 +457,8 @@ void ResourceManager::runEncryption(const std::string& password)
 {
     std::vector<std::string> excludedExtensions = { ".rar",".ogg",".xml",".dll",".exe", ".log",".otb" };
     for (const auto& entry : std::filesystem::recursive_directory_iterator("./")) {
-        std::string ext = entry.path().extension().string();
-        if (std::find(excludedExtensions.begin(), excludedExtensions.end(), ext) != excludedExtensions.end())
+        if (std::string ext = entry.path().extension().string();
+            std::find(excludedExtensions.begin(), excludedExtensions.end(), ext) != excludedExtensions.end())
             continue;
 
         std::ifstream ifs(entry.path().string(), std::ios_base::binary);

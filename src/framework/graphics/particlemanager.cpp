@@ -46,7 +46,7 @@ bool ParticleManager::importParticle(std::string file)
             }
         }
         return true;
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("could not load particles file %s: %s", file, e.what()));
         return false;
     }
@@ -59,7 +59,7 @@ ParticleEffectPtr ParticleManager::createEffect(const std::string_view name)
         particleEffect->load(m_effectsTypes[std::string(name)]);
         m_effects.push_back(particleEffect);
         return particleEffect;
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("failed to create effect '%s': %s", name, e.what()));
         return nullptr;
     }

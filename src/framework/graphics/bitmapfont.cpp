@@ -385,8 +385,8 @@ std::string BitmapFont::wrapText(const std::string_view text, int maxWidth)
                 std::string candidate = newWord + word[j];
                 if (j != word.length() - 1)
                     candidate += '-';
-                const int candidateWidth = calculateTextRectSize(candidate).width();
 
+                const int candidateWidth = calculateTextRectSize(candidate).width();
                 if (candidateWidth > maxWidth) {
                     newWord += '-';
                     words.push_back(newWord);

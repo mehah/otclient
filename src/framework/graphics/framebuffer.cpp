@@ -123,10 +123,13 @@ void FrameBuffer::internalRelease()
 
 void FrameBuffer::prepare(const Rect& dest, const Rect& src, const Color& colorClear)
 {
-    m_colorClear = colorClear;
-    Rect _dest(0, 0, getSize()), _src = _dest;
+    Rect _dest(0, 0, getSize());
+    Rect _src = _dest;
+
     if (dest.isValid()) _dest = dest;
     if (src.isValid()) _src = src;
+
+    m_colorClear = colorClear;
 
     if (_src != m_src || _dest != m_dest) {
         m_src = _src;

@@ -110,8 +110,7 @@ ConfigPtr ConfigManager::load(const std::string& file)
 
 bool ConfigManager::unload(const std::string& file)
 {
-    ConfigPtr config = get(file);
-    if (config) {
+    if (ConfigPtr config = get(file); config) {
         config->unload();
         remove(config);
         config = nullptr;

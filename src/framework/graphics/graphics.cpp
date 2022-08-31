@@ -35,8 +35,7 @@ void Graphics::init()
     g_logger.info(stdext::format("OpenGL %s", glGetString(GL_VERSION)));
 
     // init GL extensions
-    const GLenum err = glewInit();
-    if (err != GLEW_OK)
+    if (const GLenum err = glewInit(); err != GLEW_OK)
         g_logger.fatal(stdext::format("Unable to init GLEW: %s", glewGetErrorString(err)));
 
     // overwrite framebuffer API if needed

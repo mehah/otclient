@@ -78,7 +78,7 @@ BinaryTreeVec BinaryTree::getChildren()
                 break;
             }
 
-            case static_cast<uint8_t>(Node::END): return children;;
+            case static_cast<uint8_t>(Node::END): return children;
             case static_cast<uint8_t>(Node::ESCAPE_CHAR): m_fin->getU8(); break;
             default: break;
         }
