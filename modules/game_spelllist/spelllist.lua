@@ -59,10 +59,14 @@ local filters = {
     groupId = FILTER_GROUP_ANY
 }
 
-function getSpelllistProfile() return SpelllistProfile end
+function getSpelllistProfile()
+    return SpelllistProfile
+end
 
 function setSpelllistProfile(name)
-    if SpelllistProfile == name then return end
+    if SpelllistProfile == name then
+        return
+    end
 
     if SpelllistSettings[name] and SpellInfo[name] then
         local oldProfile = SpelllistProfile
@@ -88,7 +92,9 @@ function online()
     end
 end
 
-function offline() resetWindow() end
+function offline()
+    resetWindow()
+end
 
 function init()
     connect(g_game, {
@@ -157,13 +163,19 @@ function init()
 
     spellList = spelllistWindow:getChildById('spellList')
 
-    g_keyboard.bindKeyPress('Down', function() spellList:focusNextChild(KeyboardFocusReason) end, spelllistWindow)
-    g_keyboard.bindKeyPress('Up', function() spellList:focusPreviousChild(KeyboardFocusReason) end, spelllistWindow)
+    g_keyboard.bindKeyPress('Down', function()
+        spellList:focusNextChild(KeyboardFocusReason)
+    end, spelllistWindow)
+    g_keyboard.bindKeyPress('Up', function()
+        spellList:focusPreviousChild(KeyboardFocusReason)
+    end, spelllistWindow)
 
     initializeSpelllist()
     resizeWindow()
 
-    if g_game.isOnline() then online() end
+    if g_game.isOnline() then
+        online()
+    end
 end
 
 function terminate()
@@ -174,7 +186,9 @@ function terminate()
 
     disconnect(spellList, {
         onChildFocusChange = function(self, focusedChild)
-            if focusedChild == nil then return end
+            if focusedChild == nil then
+                return
+            end
             updateSpellInformation(focusedChild)
         end
     })
@@ -198,9 +212,13 @@ function initializeSpelllist()
         tmpLabel:setPhantom(false)
 
         local iconId = tonumber(info.icon)
-        if not iconId and SpellIcons[info.icon] then iconId = SpellIcons[info.icon][1] end
+        if not iconId and SpellIcons[info.icon] then
+            iconId = SpellIcons[info.icon][1]
+        end
 
-        if not (iconId) then perror('Spell icon \'' .. info.icon .. '\' not found.') end
+        if not (iconId) then
+            perror('Spell icon \'' .. info.icon .. '\' not found.')
+        end
 
         tmpLabel:setHeight(SpelllistSettings[SpelllistProfile].iconSize.height + 4)
         tmpLabel:setTextOffset(topoint((SpelllistSettings[SpelllistProfile].iconSize.width + 10) .. ' ' ..
@@ -214,7 +232,9 @@ function initializeSpelllist()
 
     connect(spellList, {
         onChildFocusChange = function(self, focusedChild)
-            if focusedChild == nil then return end
+            if focusedChild == nil then
+                return
+            end
             updateSpellInformation(focusedChild)
         end
     })

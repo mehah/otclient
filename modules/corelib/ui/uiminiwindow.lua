@@ -20,7 +20,9 @@ function UIMiniWindow:open(dontSave)
 end
 
 function UIMiniWindow:close(dontSave)
-    if not self:isExplicitlyVisible() then return end
+    if not self:isExplicitlyVisible() then
+        return
+    end
     self:setVisible(false)
 
     if not dontSave then
@@ -65,13 +67,17 @@ function UIMiniWindow:maximize(dontSave)
     end
 
     local parent = self:getParent()
-    if parent and parent:getClassName() == 'UIMiniWindowContainer' then parent:fitAll(self) end
+    if parent and parent:getClassName() == 'UIMiniWindowContainer' then
+        parent:fitAll(self)
+    end
 
     signalcall(self.onMaximize, self)
 end
 
 function UIMiniWindow:setup()
-    self:getChildById('closeButton').onClick = function() self:close() end
+    self:getChildById('closeButton').onClick = function()
+        self:close()
+    end
 
     self:getChildById('minimizeButton').onClick = function()
         if self:isOn() then
@@ -92,7 +98,9 @@ end
 
 function UIMiniWindow:setupOnStart()
     local char = g_game.getCharacterName()
-    if not char or #char == 0 then return end
+    if not char or #char == 0 then
+        return
+    end
 
     local oldParent = self:getParent()
     local newParentSet = false
@@ -161,21 +169,29 @@ function UIMiniWindow:setupOnStart()
 
     if self.save then
         if oldParent and oldParent:getClassName() == 'UIMiniWindowContainer' then
-            addEvent(function() oldParent:order() end)
+            addEvent(function()
+                oldParent:order()
+            end)
         end
         if newParent and newParent:getClassName() == 'UIMiniWindowContainer' and newParent ~= oldParent then
-            addEvent(function() newParent:order() end)
+            addEvent(function()
+                newParent:order()
+            end)
         end
     end
 
     self:fitOnParent()
 end
 
-function UIMiniWindow:onVisibilityChange(visible) self:fitOnParent() end
+function UIMiniWindow:onVisibilityChange(visible)
+    self:fitOnParent()
+end
 
 function UIMiniWindow:onDragEnter(mousePos)
     local parent = self:getParent()
-    if not parent then return false end
+    if not parent then
+        return false
+    end
 
     if parent:getClassName() == 'UIMiniWindowContainer' then
         local containerParent = parent:getParent()
@@ -227,11 +243,15 @@ function UIMiniWindow:onDragMove(mousePos, mouseMoved)
 
             if mousePos.y < childCenterY then
                 self.movedOldMargin = child:getMarginTop()
-                self.setMovedChildMargin = function(v) child:setMarginTop(v) end
+                self.setMovedChildMargin = function(v)
+                    child:setMarginTop(v)
+                end
                 self.movedIndex = 0
             else
                 self.movedOldMargin = child:getMarginBottom()
-                self.setMovedChildMargin = function(v) child:setMarginBottom(v) end
+                self.setMovedChildMargin = function(v)
+                    child:setMarginBottom(v)
+                end
                 self.movedIndex = 1
             end
 
@@ -251,7 +271,9 @@ end
 
 function UIMiniWindow:onMousePress()
     local parent = self:getParent()
-    if not parent then return false end
+    if not parent then
+        return false
+    end
     if parent:getClassName() ~= 'UIMiniWindowContainer' then
         self:raise()
         return true
@@ -259,9 +281,13 @@ function UIMiniWindow:onMousePress()
 end
 
 function UIMiniWindow:onFocusChange(focused)
-    if not focused then return end
+    if not focused then
+        return
+    end
     local parent = self:getParent()
-    if parent and parent:getClassName() ~= 'UIMiniWindowContainer' then self:raise() end
+    if parent and parent:getClassName() ~= 'UIMiniWindowContainer' then
+        self:raise()
+    end
 end
 
 function UIMiniWindow:onHeightChange(height)
@@ -274,48 +300,78 @@ function UIMiniWindow:onHeightChange(height)
 end
 
 function UIMiniWindow:getSettings(name)
-    if not self.save then return nil end
+    if not self.save then
+        return nil
+    end
     local char = g_game.getCharacterName()
-    if not char or #char == 0 then return nil end
+    if not char or #char == 0 then
+        return nil
+    end
 
     local settings = g_settings.getNode('CharMiniWindows')
     if settings then
         local selfSettings = settings[char][self:getId()]
-        if selfSettings then return selfSettings[name] end
+        if selfSettings then
+            return selfSettings[name]
+        end
     end
     return nil
 end
 
 function UIMiniWindow:setSettings(data)
-    if not self.save then return end
+    if not self.save then
+        return
+    end
     local char = g_game.getCharacterName()
-    if not char or #char == 0 then return end
+    if not char or #char == 0 then
+        return
+    end
 
     local settings = g_settings.getNode('CharMiniWindows')
-    if not settings then settings = {} end
-    if not settings[char] then settings[char] = {} end
+    if not settings then
+        settings = {}
+    end
+    if not settings[char] then
+        settings[char] = {}
+    end
 
     local id = self:getId()
-    if not settings[char][id] then settings[char][id] = {} end
+    if not settings[char][id] then
+        settings[char][id] = {}
+    end
 
-    for key, value in pairs(data) do settings[char][id][key] = value end
+    for key, value in pairs(data) do
+        settings[char][id][key] = value
+    end
 
     g_settings.setNode('CharMiniWindows', settings)
 end
 
 function UIMiniWindow:eraseSettings(data)
-    if not self.save then return end
+    if not self.save then
+        return
+    end
     local char = g_game.getCharacterName()
-    if not char or #char == 0 then return end
+    if not char or #char == 0 then
+        return
+    end
 
     local settings = g_settings.getNode('CharMiniWindows')
-    if not settings then settings = {} end
-    if not settings[char] then settings[char] = {} end
+    if not settings then
+        settings = {}
+    end
+    if not settings[char] then
+        settings[char] = {}
+    end
 
     local id = self:getId()
-    if not settings[char][id] then settings[char][id] = {} end
+    if not settings[char][id] then
+        settings[char][id] = {}
+    end
 
-    for key, value in pairs(data) do settings[char][id][key] = nil end
+    for key, value in pairs(data) do
+        settings[char][id][key] = nil
+    end
 
     g_settings.setNode('CharMiniWindows', settings)
 end
@@ -346,18 +402,26 @@ function UIMiniWindow:saveParentIndex(parentId, index)
     self.miniIndex = index
 end
 
-function UIMiniWindow:disableResize() self:getChildById('bottomResizeBorder'):disable() end
+function UIMiniWindow:disableResize()
+    self:getChildById('bottomResizeBorder'):disable()
+end
 
-function UIMiniWindow:enableResize() self:getChildById('bottomResizeBorder'):enable() end
+function UIMiniWindow:enableResize()
+    self:getChildById('bottomResizeBorder'):enable()
+end
 
 function UIMiniWindow:fitOnParent()
     local parent = self:getParent()
-    if self:isVisible() and parent and parent:getClassName() == 'UIMiniWindowContainer' then parent:fitAll(self) end
+    if self:isVisible() and parent and parent:getClassName() == 'UIMiniWindowContainer' then
+        parent:fitAll(self)
+    end
 end
 
 function UIMiniWindow:setParent(parent, dontsave)
     UIWidget.setParent(self, parent)
-    if not dontsave then self:saveParent(parent) end
+    if not dontsave then
+        self:saveParent(parent)
+    end
     self:fitOnParent()
 end
 
@@ -408,7 +472,9 @@ function UIMiniWindow:modifyMaximumHeight(height)
     local newHeight = resizeBorder:getMaximum() + height
     local curHeight = self:getHeight()
     resizeBorder:setMaximum(newHeight)
-    if newHeight < curHeight or newHeight - height == curHeight then self:setHeight(newHeight) end
+    if newHeight < curHeight or newHeight - height == curHeight then
+        self:setHeight(newHeight)
+    end
 end
 
 function UIMiniWindow:isResizeable()

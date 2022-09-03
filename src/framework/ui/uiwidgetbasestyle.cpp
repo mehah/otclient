@@ -27,7 +27,7 @@
 #include "uiverticallayout.h"
 #include "uiwidget.h"
 
-#include <framework/graphics/drawpool.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/painter.h>
 #include <framework/graphics/texture.h>
 #include <framework/graphics/texturemanager.h>
@@ -389,4 +389,5 @@ void UIWidget::setIcon(const std::string& iconFile)
     m_icon = iconFile.empty() ? nullptr : g_textures.getTexture(iconFile);
     if (m_icon && !m_iconClipRect.isValid())
         m_iconClipRect = Rect(0, 0, m_icon->getSize());
+    repaint();
 }

@@ -3,13 +3,21 @@ local function pcolored(text, color)
     modules.client_terminal.addLine(tostring(text), color)
 end
 
-function draw_debug_boxes() g_ui.setDebugBoxesDrawing(not g_ui.isDrawingDebugBoxes()) end
+function draw_debug_boxes()
+    g_ui.setDebugBoxesDrawing(not g_ui.isDrawingDebugBoxes())
+end
 
-function hide_map() modules.game_interface.getMapPanel():hide() end
+function hide_map()
+    modules.game_interface.getMapPanel():hide()
+end
 
-function show_map() modules.game_interface.getMapPanel():show() end
+function show_map()
+    modules.game_interface.getMapPanel():show()
+end
 
-function live_textures_reload() g_textures.liveReload() end
+function live_textures_reload()
+    g_textures.liveReload()
+end
 
 function live_module_reload(name)
     if not name then
@@ -58,7 +66,9 @@ function live_module_reload(name)
                 module:reload()
                 files[filepath] = newtime
 
-                if name == 'client_terminal' then modules.client_terminal.show() end
+                if name == 'client_terminal' then
+                    modules.client_terminal.show()
+                end
                 break
             end
         end
@@ -90,7 +100,9 @@ function live_sprites_reload()
                 modules.game_things.load()
                 files[filepath] = newtime
 
-                if name == 'client_terminal' then modules.client_terminal.show() end
+                if name == 'client_terminal' then
+                    modules.client_terminal.show()
+                end
                 break
             end
         end
@@ -129,7 +141,9 @@ function ping()
     pinging = not pinging
 end
 
-function clear() modules.client_terminal.clear() end
+function clear()
+    modules.client_terminal.clear()
+end
 
 function ls(path)
     path = path or '/'

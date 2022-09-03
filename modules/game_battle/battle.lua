@@ -11,16 +11,8 @@ local hideButtons = {}
 
 local eventOnCheckCreature = nil
 
-local function connecting(gameEvent)
+local function connecting()
     -- TODO: Just connect when you will be using
-    if gameEvent then
-        connect(g_game, {
-            onAttackingCreatureChange = onAttack,
-            onFollowingCreatureChange = onFollow,
-            onGameEnd = onGameEnd,
-            onGameStart = onGameStart
-        })
-    end
 
     connect(LocalPlayer, {
         onPositionChange = onCreaturePositionChange
@@ -47,14 +39,6 @@ end
 
 local function disconnecting(gameEvent)
     -- TODO: Just disconnect what you're not using
-    if gameEvent then
-        disconnect(g_game, {
-            onAttackingCreatureChange = onAttack,
-            onFollowingCreatureChange = onFollow,
-            onGameEnd = onGameEnd,
-            onGameStart = onGameStart
-        })
-    end
 
     disconnect(LocalPlayer, {
         onPositionChange = onCreaturePositionChange
@@ -133,7 +117,12 @@ function init() -- Initiating the module (load)
     mouseWidget:setFocusable(false)
     mouseWidget.cancelNextRelease = false
 
-    connecting(true)
+    connect(g_game, {
+        onAttackingCreatureChange = onAttack,
+        onFollowingCreatureChange = onFollow,
+        onGameEnd = onGameEnd,
+        onGameStart = onGameStart
+    })
 
     -- Determining Height and Setting up!
     battleWindow:setContentMinimumHeight(80)
@@ -328,6 +317,8 @@ end
 function onGameEnd()
     battleWindow:setParent(nil, true)
     removeAllCreatures()
+
+    disconnecting()
 end
 
 -- Sort Type Methods
@@ -437,6 +428,15 @@ function doCreatureFitFilters(creature) -- Check if creature fit current applied
     end
 
     local localPlayer = g_game.getLocalPlayer()
+    if not localPlayer then
+        return false
+    end
+
+    local position = localPlayer:getPosition()
+    if not position then
+        return false
+    end
+
     if pos.z ~= localPlayer:getPosition().z or not creature:canBeSeen() then
         return false
     end -- or not localPlayer:hasSight(pos)
@@ -562,6 +562,11 @@ end
 
 function removeCreature(creature, all) -- Remove a single creature or all
     if all then
+        if lastCreatureSelected then
+            lastCreatureSelected:hideStaticSquare()
+            lastCreatureSelected = nil
+        end
+
         binaryTree = {}
         lastBattleButtonSwitched = nil
         for i, v in pairs(battleButtons) do
@@ -570,6 +575,11 @@ function removeCreature(creature, all) -- Remove a single creature or all
         end
         battleButtons = {}
         return true
+    end
+
+    if lastCreatureSelected == creature then
+        lastCreatureSelected:hideStaticSquare()
+        lastCreatureSelected = nil
     end
 
     local creatureId = creature:getId()
@@ -766,6 +776,16 @@ function updateCreatureEmblem(creature, emblemId) -- Update emblem
 end
 
 function onCreaturePositionChange(creature, newPos, oldPos) -- Update battleButton once you or monsters move
+    local localPlayer = g_game.getLocalPlayer()
+    if not localPlayer then
+        return false
+    end
+
+    local position = localPlayer:getPosition()
+    if not position then
+        return false
+    end
+
     local sortType = getSortType()
     -- If it's the local player moving
     if creature:isLocalPlayer() then
@@ -795,6 +815,12 @@ function onCreaturePositionChange(creature, newPos, oldPos) -- Update battleButt
                 local mob = v.creature
                 if mob and mob:getPosition() then
                     v:setVisible(canBeSeen(mob))
+
+                    if lastCreatureSelected == mob and not v:isVisible() then
+                        lastCreatureSelected:hideStaticSquare()
+                        lastCreatureSelected = nil
+                    end
+
                 end
             end
             -- battlePanel:getLayout():update()
@@ -806,7 +832,9 @@ function onCreaturePositionChange(creature, newPos, oldPos) -- Update battleButt
         local fit = doCreatureFitFilters(creature)
 
         if battleButton == nil then
-            addCreature(creature, sortType)
+            if fit then
+                addCreature(creature, sortType)
+            end
         else
             if not fit and newPos then -- if there's no newPos the creature is dead, let onCreatureDisappear handles that.
                 removeCreature(creature)
@@ -821,6 +849,7 @@ function onCreaturePositionChange(creature, newPos, oldPos) -- Update battleButt
                             distance = oldDistance,
                             id = creatureId
                         }, BSComparatorSortType, 'distance', true)
+
                         if index ~= nil and creatureId == binaryTree[index].id then -- Safety first :)
                             binaryTree[index].distance = newDistance
                             battleButton.data.distance = newDistance
@@ -836,6 +865,12 @@ function onCreaturePositionChange(creature, newPos, oldPos) -- Update battleButt
                                 end
                             elseif newDistance < oldDistance then
                                 battleButton:setVisible(canBeSeen(creature))
+
+                                if lastCreatureSelected == creature and not battleButton:isVisible() then
+                                    lastCreatureSelected:hideStaticSquare()
+                                    lastCreatureSelected = nil
+                                end
+
                                 -- battlePanel:getLayout():update()
                                 if index > 1 then
                                     for i = index, 2, -1 do
@@ -1027,6 +1062,12 @@ function terminate() -- Terminating the Module (unload)
 
     g_keyboard.unbindKeyDown('Ctrl+B')
 
-    -- Removing the connectors
-    disconnecting(true)
+    disconnect(g_game, {
+        onAttackingCreatureChange = onAttack,
+        onFollowingCreatureChange = onFollow,
+        onGameEnd = onGameEnd,
+        onGameStart = onGameStart
+    })
+    disconnecting()
+
 end

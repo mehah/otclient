@@ -23,7 +23,7 @@
 #include "graphicalapplication.h"
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>
-#include <framework/graphics/drawpool.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
 #include <framework/graphics/particlemanager.h>
 #include <framework/graphics/texturemanager.h>
@@ -122,34 +122,45 @@ void GraphicalApplication::run()
 
     g_lua.callGlobalField("g_app", "onRun");
 
-    const auto& foreground = g_drawPool.get<Pool>(PoolType::FOREGROUND);
+    const auto& foreground = g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND);
+    const auto& map = g_drawPool.get<DrawPool>(DrawPoolType::MAP);
+
+    Timer foregroundRefresh;
 
     while (!m_stopping) {
+        g_clock.update();
+
         // poll all events before rendering
         poll();
 
-        g_clock.update();
-
         if (!g_window.isVisible()) {
             // sleeps until next poll to avoid massive cpu usage
-            stdext::millisleep(10);
+            stdext::millisleep(1);
             continue;
         }
 
-        if (!m_frameCounter.canRefresh()) {
-            continue;
-        }
+        m_frameCounter.start();
 
         // the screen consists of two panes
         {
+            if (foregroundRefresh.ticksElapsed() >= 100) { // 10 FPS (1000 / 10)
+                foreground->repaint();
+                foregroundRefresh.restart();
+            }
+
             // foreground pane - steady pane with few animated stuff (UI)
             if (foreground->canRepaint()) {
-                g_drawPool.use(PoolType::FOREGROUND);
+                g_drawPool.use(DrawPoolType::FOREGROUND);
                 g_ui.render(Fw::ForegroundPane);
             }
 
             // background pane - high updated and animated pane (where the game are stuff happens)
             g_ui.render(Fw::BackgroundPane);
+
+            // force map repaint if vsync is enabled or maxFPS set.
+            if (g_window.vsyncEnabled() || getMaxFps() > 0) {
+                map->repaint();
+            }
         }
 
         // Draw All Pools
@@ -195,7 +206,7 @@ void GraphicalApplication::resize(const Size& size)
     g_ui.resize(size);
     m_onInputEvent = false;
 
-    g_drawPool.get<PoolFramed>(PoolType::FOREGROUND)
+    g_drawPool.get<DrawPoolFramed>(DrawPoolType::FOREGROUND)
         ->resize(size);
 }
 
@@ -206,4 +217,4 @@ void GraphicalApplication::inputEvent(const InputEvent& event)
     m_onInputEvent = false;
 }
 
-void GraphicalApplication::repaint() { g_drawPool.get<Pool>(PoolType::FOREGROUND)->repaint(); }
+void GraphicalApplication::repaint() { g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND)->repaint(); }

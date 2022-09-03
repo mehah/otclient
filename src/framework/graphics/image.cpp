@@ -43,7 +43,7 @@ ImagePtr Image::load(std::string file)
     try {
         // load image file data
         image = loadPNG(path);
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("unable to load image '%s': %s", path, e.what()));
     }
 
@@ -55,8 +55,7 @@ ImagePtr Image::loadPNG(const std::string& file)
     std::stringstream fin;
     g_resources.readFileStream(file, fin);
     ImagePtr image;
-    apng_data apng;
-    if (load_apng(fin, &apng) == 0) {
+    if (apng_data apng; load_apng(fin, &apng) == 0) {
         image = ImagePtr(new Image(Size(apng.width, apng.height), apng.bpp, apng.pdata));
         free_apng(&apng);
     }
@@ -76,7 +75,7 @@ void Image::savePNG(const std::string& fileName)
 {
     const FileStreamPtr fin = g_resources.createFile(fileName);
     if (!fin)
-        stdext::throw_exception(stdext::format("failed to open file '%s' for write", fileName));
+        throw Exception("failed to open file '%s' for write", fileName);
 
     fin->cache();
     std::stringstream data;

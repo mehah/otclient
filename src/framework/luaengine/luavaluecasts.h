@@ -80,7 +80,7 @@ inline bool luavalue_cast(int index, uint16_t& v)
 }
 // uint32
 inline int push_luavalue(uint32_t v) { push_luavalue(static_cast<double>(v)); return 1; }
-inline bool luavalue_cast(int index, uint32_t & v)
+inline bool luavalue_cast(int index, uint32_t& v)
 {
     double d;
     const bool r = luavalue_cast(index, d); v = d; return r;
@@ -209,8 +209,7 @@ template<class T>
 std::enable_if_t<std::is_enum_v<T>, bool>
 luavalue_cast(int index, T& myenum)
 {
-    int i;
-    if (luavalue_cast(index, i)) {
+    if (int i; luavalue_cast(index, i)) {
         myenum = static_cast<T>(i);
         return true;
     }
@@ -274,7 +273,7 @@ bool luavalue_cast(int index, std::function<void(Args...)>& func)
                     throw LuaException("attempt to call an expired lua function from C++,"
                                        "did you forget to hold a reference for that function?", 0);
                 }
-            } catch (LuaException& e) {
+            } catch (const LuaException& e) {
                 g_logger.error(stdext::format("lua function callback failed: %s", e.what()));
             }
         };
@@ -302,14 +301,13 @@ luavalue_cast(int index, std::function<Ret(Args...)>& func)
             try {
                 g_lua.getWeakRef(funcWeakRef);
                 if (g_lua.isFunction()) {
-                    const int numArgs = g_lua.polymorphicPush(args...);
-                    if (g_lua.safeCall(numArgs) != 1)
+                    if (const int numArgs = g_lua.polymorphicPush(args...); g_lua.safeCall(numArgs) != 1)
                         throw LuaException("a function from lua didn't retrieve the expected number of results", 0);
                     return g_lua.polymorphicPop<Ret>();
                 }
                 throw LuaException("attempt to call an expired lua function from C++,"
                                    "did you forget to hold a reference for that function?", 0);
-            } catch (LuaException& e) {
+            } catch (const LuaException& e) {
                 g_logger.error(stdext::format("lua function callback failed: %s", e.what()));
             }
             return Ret();

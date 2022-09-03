@@ -13,9 +13,13 @@ function terminate()
     })
 end
 
-function setFileName(name) filename = name end
+function setFileName(name)
+    filename = name
+end
 
-function isLoaded() return loaded end
+function isLoaded()
+    return loaded
+end
 
 function load(version)
     local errorMessage = ''

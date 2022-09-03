@@ -56,6 +56,7 @@ class Tile : public LuaObject
 public:
     Tile(const Position& position);
 
+    void onAddInMapView();
     void draw(const Point& dest, const MapPosInfo& mapRect, float scaleFactor, int flags, bool isCovered, LightView* lightView = nullptr);
 
     void clean();
@@ -112,6 +113,7 @@ public:
     bool hasGround() { return (m_ground && m_ground->isSingleGround()) || m_countFlag.hasGroundBorder; };
     bool hasTopGround(bool ignoreBorder = false) { return (m_ground && m_ground->isTopGround()) || (!ignoreBorder && m_countFlag.hasTopGroundBorder); }
     bool hasSurface() { return m_countFlag.hasTopItem || !m_effects.empty() || m_countFlag.hasBottomItem || m_countFlag.hasCommonItem || m_countFlag.hasCreature || !m_walkingCreatures.empty() || hasTopGround(); }
+    bool hasTopItem() { return m_countFlag.hasTopItem; }
 
     bool hasDisplacement() { return m_countFlag.hasDisplacement > 0; }
     bool hasLight() { return m_countFlag.hasLight > 0; }
@@ -155,60 +157,66 @@ public:
 private:
     struct CountFlag
     {
-        int fullGround{ 0 },
-            translucent{ 0 },
-            notWalkable{ 0 },
-            notPathable{ 0 },
-            notSingleDimension{ 0 },
-            blockProjectile{ 0 },
-            hasDisplacement{ 0 },
-            isNotPathable{ 0 },
-            elevation{ 0 },
-            opaque{ 0 },
-            hasLight{ 0 },
-            hasTallThings{ 0 },
-            hasWideThings{ 0 },
-            hasTallItems{ 0 },
-            hasWideItems{ 0 },
-            hasWall{ 0 },
-            hasHookEast{ 0 },
-            hasHookSouth{ 0 },
-            hasNoWalkableEdge{ 0 },
-            hasCreature{ 0 },
-            hasCommonItem{ 0 },
-            hasTopItem{ 0 },
-            hasBottomItem{ 0 },
-            hasGroundBorder{ 0 },
-            hasTopGroundBorder{ 0 };
+        int fullGround{ 0 };
+        int translucent{ 0 };
+        int notWalkable{ 0 };
+        int notPathable{ 0 };
+        int notSingleDimension{ 0 };
+        int blockProjectile{ 0 };
+        int hasDisplacement{ 0 };
+        int isNotPathable{ 0 };
+        int elevation{ 0 };
+        int opaque{ 0 };
+        int hasLight{ 0 };
+        int hasTallThings{ 0 };
+        int hasWideThings{ 0 };
+        int hasTallItems{ 0 };
+        int hasWideItems{ 0 };
+        int hasWall{ 0 };
+        int hasHookEast{ 0 };
+        int hasHookSouth{ 0 };
+        int hasNoWalkableEdge{ 0 };
+        int hasCreature{ 0 };
+        int hasCommonItem{ 0 };
+        int hasTopItem{ 0 };
+        int hasBottomItem{ 0 };
+        int hasGroundBorder{ 0 };
+        int hasTopGroundBorder{ 0 };
+        int correctCorpse{ 0 };
     };
 
-    void drawTop(const Point& dest, float scaleFactor, int flags, LightView* lightView = nullptr);
-    void drawCreature(const Point& dest, const MapPosInfo& mapRect, float scaleFactor, int flags, bool isCovered, LightView* lightView = nullptr);
+    void drawTop(const Point& dest, float scaleFactor, int flags, bool forceDraw, LightView* lightView = nullptr);
+    void drawCreature(const Point& dest, const MapPosInfo& mapRect, float scaleFactor, int flags, bool isCovered, bool forceDraw, LightView* lightView = nullptr);
     void drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor, bool animate, int flags, LightView* lightView);
 
     void checkTranslucentLight();
     bool checkForDetachableThing();
 
     Position m_position;
+    Point m_lastDrawDest;
 
-    uint8_t m_drawElevation{ 0 },
-        m_minimapColor{ 0 },
-        m_totalElevation{ 0 };
+    uint8_t m_drawElevation{ 0 };
+    uint8_t m_minimapColor{ 0 };
+    uint8_t m_totalElevation{ 0 };
 
     int8_t m_lastFloorMin{ -1 };
 
     std::array<int8_t, MAX_Z + 1> m_completelyCoveredCache;
 
-    uint32_t m_flags{ 0 }, m_houseId{ 0 };
+    uint32_t m_flags{ 0 };
+    uint32_t m_houseId{ 0 };
 
     std::vector<CreaturePtr> m_walkingCreatures;
     std::vector<ThingPtr> m_things;
     std::vector<EffectPtr> m_effects;
+    std::vector<TilePtr> m_tilesRedraw;
+
     ItemPtr m_ground;
 
     CountFlag m_countFlag;
     Highlight m_highlight;
 
-    bool m_highlightWithoutFilter{ false },
-        m_covered{ false };
+    bool m_highlightWithoutFilter{ false };
+    bool m_covered{ false };
+    bool m_drawTopAndCreature{ true };
 };

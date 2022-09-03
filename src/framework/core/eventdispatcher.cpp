@@ -59,8 +59,7 @@ void EventDispatcher::poll()
     int loops = 0;
     while (m_pollEventsSize > 0) {
         if (loops > 50) {
-            static Timer reportTimer;
-            if (reportTimer.running() && reportTimer.ticksElapsed() > 100) {
+            if (static Timer reportTimer; reportTimer.running() && reportTimer.ticksElapsed() > 100) {
                 g_logger.error("ATTENTION the event list is not getting empty, this could be caused by some bad code");
                 reportTimer.restart();
             }

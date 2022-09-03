@@ -156,10 +156,7 @@ public:
         return angle;
     }
 
-    double getAngleFromPosition(const Position& position) const
-    {
-        return getAngleFromPositions(*this, position);
-    }
+    double getAngleFromPosition(const Position& position) const { return getAngleFromPositions(*this, position); }
 
     static Otc::Direction getDirectionFromPositions(const Position& fromPos, const Position& toPos)
     {
@@ -192,10 +189,7 @@ public:
         return Otc::InvalidDirection;
     }
 
-    Otc::Direction getDirectionFromPosition(const Position& position) const
-    {
-        return getDirectionFromPositions(*this, position);
-    }
+    Otc::Direction getDirectionFromPosition(const Position& position) const { return getDirectionFromPositions(*this, position); }
 
     bool isMapPosition() const { return ((x >= 0) && (y >= 0) && (x < UINT16_MAX) && (y < UINT16_MAX) && (z <= MAX_Z)); }
     bool isValid() const { return !(x == UINT16_MAX && y == UINT16_MAX && z == UINT8_MAX); }
@@ -233,6 +227,7 @@ public:
     Position& operator=(const Position& other) = default;
     bool operator==(const Position& other) const { return other.x == x && other.y == y && other.z == z; }
     bool operator!=(const Position& other) const { return other.x != x || other.y != y || other.z != z; }
+
     bool isInRange(const Position& pos, uint16_t xRange, uint16_t yRange, const bool ignoreZ = false) const
     {
         auto _pos = pos;
@@ -243,6 +238,7 @@ public:
 
         return std::abs(x - _pos.x) <= xRange && std::abs(y - _pos.y) <= yRange && z == pos.z;
     }
+
     bool isInRange(const Position& pos, uint16_t minXRange, uint16_t maxXRange, uint16_t minYRange, uint16_t maxYRange, const bool ignoreZ = false) const
     {
         auto _pos = pos;
@@ -253,6 +249,7 @@ public:
 
         return _pos.x >= x - minXRange && _pos.x <= x + maxXRange && _pos.y >= y - minYRange && _pos.y <= y + maxYRange;
     }
+
     // operator less than for stdext::map
     bool operator<(const Position& other) const { return x < other.x || y < other.y || z < other.z; }
 
@@ -328,7 +325,8 @@ inline std::ostream& operator<<(std::ostream& out, const Position& pos)
 
 inline std::istream& operator>>(std::istream& in, Position& pos)
 {
-    int32_t x, y;
+    int32_t x;
+    int32_t y;
     uint8_t z;
     in >> x >> y >> z;
     pos.x = x;

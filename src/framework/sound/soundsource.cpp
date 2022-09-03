@@ -27,14 +27,6 @@
 
 SoundSource::SoundSource()
 {
-    m_sourceId = 0;
-    m_channel = 0;
-    m_fadeState = NoFading;
-    m_fadeTime = 0;
-    m_fadeStartTime = 0;
-    m_fadeGain = 0;
-    m_gain = 1.0f;
-
     alGenSources(1, &m_sourceId);
     assert(alGetError() == AL_NO_ERROR);
     setReferenceDistance(128);

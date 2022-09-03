@@ -47,17 +47,17 @@ bool Module::load()
 
         for (const std::string& depName : m_dependencies) {
             if (depName == m_name)
-                stdext::throw_exception("cannot depend on itself");
+                throw Exception("cannot depend on itself");
 
             ModulePtr dep = g_modules.getModule(depName);
             if (!dep)
-                stdext::throw_exception(stdext::format("dependency '%s' was not found", depName));
+                throw Exception("dependency '%s' was not found", depName);
 
             if (dep->hasDependency(m_name, true))
-                stdext::throw_exception(stdext::format("dependency '%s' is recursively depending on itself", depName));
+                throw Exception("dependency '%s' is recursively depending on itself", depName);
 
             if (!dep->isLoaded() && !dep->load())
-                stdext::throw_exception(stdext::format("dependency '%s' has failed to load", depName));
+                throw Exception("dependency '%s' has failed to load", depName);
         }
 
         if (m_sandboxed)
@@ -84,7 +84,7 @@ bool Module::load()
 
         m_loaded = true;
         g_logger.debug(stdext::format("Loaded module '%s'", m_name));
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         // remove from package.loaded
         g_lua.getGlobalField("package", "loaded");
         g_lua.pushNil();
@@ -126,7 +126,7 @@ void Module::unload()
 
             if (m_sandboxed)
                 g_lua.resetGlobalEnvironment();
-        } catch (stdext::exception& e) {
+        } catch (stdext::exception const& e) {
             if (m_sandboxed)
                 g_lua.resetGlobalEnvironment();
             g_logger.error(stdext::format("Unable to unload module '%s': %s", m_name, e.what()));

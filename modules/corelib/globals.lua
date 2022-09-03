@@ -45,7 +45,9 @@ function periodicalEvent(eventFunc, conditionFunc, delay, autoRepeatDelay)
         scheduleEvent(func, delay)
     end
 
-    scheduleEvent(function() func() end, autoRepeatDelay)
+    scheduleEvent(function()
+        func()
+    end, autoRepeatDelay)
 end
 
 function removeEvent(event)

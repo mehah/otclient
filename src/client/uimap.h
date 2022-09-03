@@ -106,10 +106,10 @@ private:
     Rect m_mapRect;
     float m_aspectRatio;
 
-    bool m_keepAspectRatio,
-        m_limitVisibleRange;
+    bool m_keepAspectRatio;
+    bool m_limitVisibleRange;
 
-    int m_maxZoomIn,
-        m_maxZoomOut,
-        m_zoom;
+    int m_maxZoomIn;
+    int m_maxZoomOut;
+    int m_zoom;
 };

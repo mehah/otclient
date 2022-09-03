@@ -17,31 +17,47 @@ end
 
 function UIProgressBar:setMinimum(minimum)
     self.minimum = minimum
-    if self.value < minimum then self:setValue(minimum) end
+    if self.value < minimum then
+        self:setValue(minimum)
+    end
 end
 
 function UIProgressBar:setMaximum(maximum)
     self.maximum = maximum
-    if self.value > maximum then self:setValue(maximum) end
+    if self.value > maximum then
+        self:setValue(maximum)
+    end
 end
 
 function UIProgressBar:setValue(value, minimum, maximum)
-    if minimum then self:setMinimum(minimum) end
+    if minimum then
+        self:setMinimum(minimum)
+    end
 
-    if maximum then self:setMaximum(maximum) end
+    if maximum then
+        self:setMaximum(maximum)
+    end
 
     self.value = math.max(math.min(value, self.maximum), self.minimum)
     self:updateBackground()
 end
 
-function UIProgressBar:setPercent(percent) self:setValue(percent, 0, 100) end
+function UIProgressBar:setPercent(percent)
+    self:setValue(percent, 0, 100)
+end
 
-function UIProgressBar:getPercent() return self.value end
+function UIProgressBar:getPercent()
+    return self.value
+end
 
-function UIProgressBar:getPercentPixels() return (self.maximum - self.minimum) / self:getWidth() end
+function UIProgressBar:getPercentPixels()
+    return (self.maximum - self.minimum) / self:getWidth()
+end
 
 function UIProgressBar:getProgress()
-    if self.minimum == self.maximum then return 1 end
+    if self.minimum == self.maximum then
+        return 1
+    end
     return (self.value - self.minimum) / (self.maximum - self.minimum)
 end
 
@@ -60,7 +76,9 @@ function UIProgressBar:updateBackground()
     end
 end
 
-function UIProgressBar:onSetup() self:updateBackground() end
+function UIProgressBar:onSetup()
+    self:updateBackground()
+end
 
 function UIProgressBar:onStyleApply(name, node)
     for name, value in pairs(node) do
@@ -82,6 +100,8 @@ function UIProgressBar:onStyleApply(name, node)
 end
 
 function UIProgressBar:onGeometryChange(oldRect, newRect)
-    if not self:isOn() then self:setHeight(0) end
+    if not self:isOn() then
+        self:setHeight(0)
+    end
     self:updateBackground()
 end

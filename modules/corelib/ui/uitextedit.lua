@@ -1,9 +1,13 @@
 function UITextEdit:onStyleApply(styleName, styleNode)
     for name, value in pairs(styleNode) do
         if name == 'vertical-scrollbar' then
-            addEvent(function() self:setVerticalScrollBar(self:getParent():getChildById(value)) end)
+            addEvent(function()
+                self:setVerticalScrollBar(self:getParent():getChildById(value))
+            end)
         elseif name == 'horizontal-scrollbar' then
-            addEvent(function() self:setHorizontalScrollBar(self:getParent():getChildById(value)) end)
+            addEvent(function()
+                self:setHorizontalScrollBar(self:getParent():getChildById(value))
+            end)
         end
     end
 end
@@ -26,7 +30,9 @@ function UITextEdit:onMouseWheel(mousePos, mouseWheel)
     end
 end
 
-function UITextEdit:onTextAreaUpdate(virtualOffset, virtualSize, totalSize) self:updateScrollBars() end
+function UITextEdit:onTextAreaUpdate(virtualOffset, virtualSize, totalSize)
+    self:updateScrollBars()
+end
 
 function UITextEdit:setVerticalScrollBar(scrollbar)
     self.verticalScrollBar = scrollbar

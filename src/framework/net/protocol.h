@@ -63,7 +63,7 @@ protected:
     virtual void onRecv(const InputMessagePtr& inputMessage);
     virtual void onError(const std::error_code& err);
 
-    std::array<uint32_t , 4> m_xteaKey;
+    std::array<uint32_t, 4> m_xteaKey{};
 
 private:
     void internalRecvHeader(uint8_t* buffer, uint16_t size);

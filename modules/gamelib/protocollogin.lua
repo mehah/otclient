@@ -30,7 +30,9 @@ function ProtocolLogin:login(host, port, accountName, accountPassword, authentic
     self:connect(host, port)
 end
 
-function ProtocolLogin:cancelLogin() self:disconnect() end
+function ProtocolLogin:cancelLogin()
+    self:disconnect()
+end
 
 function ProtocolLogin:sendLoginPacket()
     local msg = OutputMessage.create()
@@ -39,7 +41,9 @@ function ProtocolLogin:sendLoginPacket()
 
     msg:addU16(g_game.getProtocolVersion())
 
-    if g_game.getFeature(GameClientVersion) then msg:addU32(g_game.getClientVersion()) end
+    if g_game.getFeature(GameClientVersion) then
+        msg:addU32(g_game.getClientVersion())
+    end
 
     if g_game.getFeature(GameContentRevision) then
         msg:addU16(g_things.getContentRevision())
@@ -50,7 +54,9 @@ function ProtocolLogin:sendLoginPacket()
     msg:addU32(g_sprites.getSprSignature())
     msg:addU32(PIC_SIGNATURE)
 
-    if g_game.getFeature(GamePreviewState) then msg:addU8(0) end
+    if g_game.getFeature(GamePreviewState) then
+        msg:addU8(0)
+    end
 
     local offset = msg:getMessageSize()
     if g_game.getFeature(GameLoginPacketEncryption) then
@@ -81,9 +87,13 @@ function ProtocolLogin:sendLoginPacket()
 
     local paddingBytes = g_crypt.rsaGetSize() - (msg:getMessageSize() - offset)
     assert(paddingBytes >= 0)
-    for i = 1, paddingBytes do msg:addU8(math.random(0, 0xff)) end
+    for i = 1, paddingBytes do
+        msg:addU8(math.random(0, 0xff))
+    end
 
-    if g_game.getFeature(GameLoginPacketEncryption) then msg:encryptRsa() end
+    if g_game.getFeature(GameLoginPacketEncryption) then
+        msg:encryptRsa()
+    end
 
     if g_game.getFeature(GameOGLInformation) then
         msg:addU8(1) -- unknown
@@ -105,19 +115,27 @@ function ProtocolLogin:sendLoginPacket()
         msg:addU8(0)
         msg:addString(self.authenticatorToken)
 
-        if g_game.getFeature(GameSessionKey) then msg:addU8(booleantonumber(self.stayLogged)) end
+        if g_game.getFeature(GameSessionKey) then
+            msg:addU8(booleantonumber(self.stayLogged))
+        end
 
         paddingBytes = g_crypt.rsaGetSize() - (msg:getMessageSize() - offset)
         assert(paddingBytes >= 0)
-        for i = 1, paddingBytes do msg:addU8(math.random(0, 0xff)) end
+        for i = 1, paddingBytes do
+            msg:addU8(math.random(0, 0xff))
+        end
 
         msg:encryptRsa()
     end
 
-    if g_game.getFeature(GameProtocolChecksum) then self:enableChecksum() end
+    if g_game.getFeature(GameProtocolChecksum) then
+        self:enableChecksum()
+    end
 
     self:send(msg)
-    if g_game.getFeature(GameLoginPacketEncryption) then self:enableXteaEncryption() end
+    if g_game.getFeature(GameLoginPacketEncryption) then
+        self:enableXteaEncryption()
+    end
     self:recv()
 end
 
@@ -213,7 +231,9 @@ function ProtocolLogin:parseCharacterList(msg)
             character.worldIp = iptostring(msg:getU32())
             character.worldPort = msg:getU16()
 
-            if g_game.getFeature(GamePreviewState) then character.previewState = msg:getU8() end
+            if g_game.getFeature(GamePreviewState) then
+                character.previewState = msg:getU8()
+            end
 
             characters[i] = character
         end
@@ -244,7 +264,9 @@ function ProtocolLogin:parseExtendedCharacterList(msg)
     signalcall(self.onCharacterList, self, characters, account, otui)
 end
 
-function ProtocolLogin:parseOpcode(opcode, msg) signalcall(self.onOpcode, self, opcode, msg) end
+function ProtocolLogin:parseOpcode(opcode, msg)
+    signalcall(self.onOpcode, self, opcode, msg)
+end
 
 function ProtocolLogin:onError(msg, code)
     local text = translateNetworkError(code, self:isConnecting(), msg)

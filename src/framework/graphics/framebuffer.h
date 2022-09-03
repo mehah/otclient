@@ -54,7 +54,7 @@ protected:
     Color m_colorClear{ Color::alpha };
 
     friend class FrameBufferManager;
-    friend class DrawPool;
+    friend class DrawPoolManager;
 
 private:
     void internalCreate();
@@ -65,17 +65,21 @@ private:
     static uint32_t boundFbo;
 
     Matrix3 m_textureMatrix;
-    TexturePtr m_texture, m_screenBackup;
+    TexturePtr m_texture;
+    TexturePtr m_screenBackup;
 
-    uint32_t m_fbo, m_prevBoundFbo;
+    uint32_t m_fbo;
+    uint32_t m_prevBoundFbo;
 
     CompositionMode m_compositeMode{ CompositionMode::NORMAL };
 
-    bool m_backuping{ true },
-        m_smooth{ true },
-        m_useAlphaWriting{ false },
-        m_disableBlend{ false };
+    bool m_backuping{ true };
+    bool m_smooth{ true };
+    bool m_useAlphaWriting{ false };
+    bool m_disableBlend{ false };
 
-    Rect m_dest, m_src;
-    CoordsBuffer m_coordsBuffer, m_screenCoordsBuffer;
+    Rect m_dest;
+    Rect m_src;
+    CoordsBuffer m_coordsBuffer;
+    CoordsBuffer m_screenCoordsBuffer;
 };

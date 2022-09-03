@@ -6,7 +6,9 @@ gameRootPanel = modules.game_interface.gameBottomPanel
 gameLeftPanel = modules.game_interface.getLeftPanel()
 gameTopMenu = modules.client_topmenu.getTopMenu()
 
-function currentViewMode() return modules.game_interface.currentViewMode end
+function currentViewMode()
+    return modules.game_interface.currentViewMode
+end
 
 healthCircle = nil
 manaCircle = nil
@@ -29,7 +31,9 @@ isSkillCircle = g_settings.getBoolean('healthcircle_skillcircle')
 skillTypes = g_settings.getNode('healthcircle_skilltypes')
 skillsLoaded = false
 
-if not skillTypes then skillTypes = {} end
+if not skillTypes then
+    skillTypes = {}
+end
 
 distanceFromCenter = g_settings.getNumber('healthcircle_distfromcenter')
 opacityCircle = g_settings.getNumber('healthcircle_opacity', 0.35)
@@ -381,7 +385,9 @@ function whenMapResizeChange()
 
         whenHealthChange()
         whenManaChange()
-        if isExpCircle or isSkillCircle then whenSkillsChange() end
+        if isExpCircle or isSkillCircle then
+            whenSkillsChange()
+        end
     end
 end
 
@@ -452,7 +458,9 @@ function setSkillCircle(value)
 end
 
 function setSkillType(skill)
-    if not skillsLoaded then return end
+    if not skillsLoaded then
+        return
+    end
 
     local char = g_game.getCharacterName()
     local skillType = skillTypes[char]
@@ -540,7 +548,9 @@ end
 
 function setPlayerValues()
     local skillType = skillTypes[g_game.getCharacterName()]
-    if not skillType then skillType = 'magic' end
+    if not skillType then
+        skillType = 'magic'
+    end
     chooseSkillComboBox:setCurrentOptionByData(skillType, true)
 end
 

@@ -62,7 +62,7 @@ public:
     bool isAsync() { return m_async; }
     bool isComplete() { return m_isComplete; }
 
-    ticks_t getTotalDuration();
+    uint16_t getTotalDuration();
 
 private:
     int getPingPongPhase();

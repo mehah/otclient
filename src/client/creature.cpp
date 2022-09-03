@@ -28,14 +28,12 @@
 #include "map.h"
 #include "thingtypemanager.h"
 #include "tile.h"
+#include "shadermanager.h"
 
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>
-#include <framework/graphics/drawpool.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
-
-#include "shadermanager.h"
-#include <framework/graphics/paintershaderprogram.h>
 #include <framework/graphics/texturemanager.h>
 
 double Creature::speedA = 0;
@@ -50,16 +48,16 @@ Creature::Creature() :m_type(Proto::CreatureTypeUnknown)
 
     // Example of how to send a UniformValue to shader
     /*
-        m_outfitShaderAction = [=]()-> void {
-            const int id = m_outfit.getCategory() == ThingCategoryCreature ? m_outfit.getId() : m_outfit.getAuxId();
-            m_outfitShader->bind();
-            m_outfitShader->setUniformValue(ShaderManager::OUTFIT_ID_UNIFORM, id);
-        };
+    m_shaderAction = [=]()-> void {
+        const int id = m_outfit.getCategory() == ThingCategoryCreature ? m_outfit.getId() : m_outfit.getAuxId();
+        m_shader->bind();
+        m_shader->setUniformValue(ShaderManager::OUTFIT_ID_UNIFORM, id);
+    };
 
-        m_mountShaderAction = [=]()-> void {
-            m_mountShader->bind();
-            m_mountShader->setUniformValue(ShaderManager::MOUNT_ID_UNIFORM, m_outfit.getMount());
-        };
+    m_mountShaderAction = [=]()-> void {
+        m_mountShader->bind();
+        m_mountShader->setUniformValue(ShaderManager::MOUNT_ID_UNIFORM, m_outfit.getMount());
+    };
     */
 }
 
@@ -106,8 +104,8 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
     if (m_outfitColor != Color::white)
         color = m_outfitColor;
 
-    const bool isNotBlank = textureType != TextureType::ALL_BLANK,
-        canDrawShader = isNotBlank;
+    const bool isNotBlank = textureType != TextureType::ALL_BLANK;
+    const bool canDrawShader = isNotBlank;
 
     int animationPhase = 0;
 
@@ -143,8 +141,8 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
                 continue;
 
             datType->draw(dest, scaleFactor, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, textureType, color);
-            if (canDrawShader && m_outfitShader) {
-                g_drawPool.setShaderProgram(m_outfitShader, true, m_outfitShaderAction);
+            if (canDrawShader && m_shader) {
+                g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
             }
 
             if (m_drawOutfitColor && isNotBlank && getLayers() > 1) {
@@ -161,8 +159,8 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
     } else {
         const auto& type = g_things.getThingType(m_outfit.getAuxId(), m_outfit.getCategory());
 
-        int animationPhases = type->getAnimationPhases(),
-            animateTicks = ITEM_TICKS_PER_FRAME;
+        int animationPhases = type->getAnimationPhases();
+        int animateTicks = ITEM_TICKS_PER_FRAME;
 
         // when creature is an effect we cant render the first and last animation phase,
         // instead we should loop in the phases between
@@ -180,8 +178,8 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
 
         type->draw(dest - (getDisplacement() * scaleFactor), scaleFactor, 0, 0, 0, 0, animationPhase, Otc::DrawThingsAndLights, textureType, color);
 
-        if (canDrawShader && m_outfitShader) {
-            g_drawPool.setShaderProgram(m_outfitShader, true, m_outfitShaderAction);
+        if (canDrawShader && m_shader) {
+            g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
         }
     }
 }
@@ -226,8 +224,8 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, flo
     // calculate main rects
 
     const Size nameSize = m_nameCache.getTextSize();
-    const int cropSizeText = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? m_sizeCache.exactSize : 12,
-        cropSizeBackGround = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? cropSizeText - nameSize.height() : 0;
+    const int cropSizeText = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? m_sizeCache.exactSize : 12;
+    const int cropSizeBackGround = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? cropSizeText - nameSize.height() : 0;
 
     auto backgroundRect = Rect(p.x - (13.5), p.y - cropSizeBackGround, 27, 4);
     backgroundRect.bind(parentRect);
@@ -250,7 +248,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, flo
     Rect healthRect = backgroundRect.expanded(-1);
     healthRect.setWidth((m_healthPercent / 100.0) * 25);
 
-    g_drawPool.select(PoolType::CREATURE_INFORMATION);
+    g_drawPool.select(DrawPoolType::CREATURE_INFORMATION);
     {
         if (drawFlags & Otc::DrawBars) {
             g_drawPool.addFilledRect(backgroundRect, Color::black);
@@ -298,7 +296,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, flo
         }
     }
     // Go back to use map pool
-    g_drawPool.select(PoolType::MAP);
+    g_drawPool.select(DrawPoolType::MAP);
 }
 
 void Creature::turn(Otc::Direction direction)
@@ -372,12 +370,12 @@ void Creature::updateJump()
     }
 
     const int t = m_jumpTimer.ticksElapsed();
-    const double a = -4 * m_jumpHeight / (m_jumpDuration * m_jumpDuration),
-        b = +4 * m_jumpHeight / m_jumpDuration,
-        height = a * t * t + b * t;
+    const double a = -4 * m_jumpHeight / (m_jumpDuration * m_jumpDuration);
+    const double b = +4 * m_jumpHeight / m_jumpDuration;
+    const double height = a * t * t + b * t;
 
-    const int roundHeight = std::round(height),
-        halfJumpDuration = m_jumpDuration / 2;
+    const int roundHeight = std::round(height);
+    const int halfJumpDuration = m_jumpDuration / 2;
 
     m_jumpOffset = PointF(height, height);
 
@@ -385,7 +383,9 @@ void Creature::updateJump()
         g_map.notificateCameraMove(m_walkOffset);
     }
 
-    int nextT = 0, diff = 0, i = 1;
+    int nextT = 0;
+    int diff = 0;
+    int i = 1;
     if (m_jumpTimer.ticksElapsed() < halfJumpDuration)
         diff = 1;
     else if (m_jumpTimer.ticksElapsed() > halfJumpDuration)
@@ -484,8 +484,8 @@ void Creature::updateWalkAnimation()
     if (footAnimPhases == 0)
         return;
 
-    int minFootDelay = 20,
-        footAnimDelay = footAnimPhases;
+    int minFootDelay = 20;
+    int footAnimDelay = footAnimPhases;
 
     if (hasSpeedFormula()) {
         minFootDelay += 10;
@@ -563,25 +563,20 @@ void Creature::nextWalkUpdate()
 
     if (!m_walking) return;
 
-    const uint64_t walkDuration = std::max<uint64_t>(
-        m_stepCache.walkDuration,
-        (isLocalPlayer() ? std::max<int>((1000 / g_app.getFps() - 1), 3) : 16)
-    );
-
     // schedules next update
     auto self = static_self_cast<Creature>();
     m_walkUpdateEvent = g_dispatcher.scheduleEvent([self] {
         self->m_walkUpdateEvent = nullptr;
         self->nextWalkUpdate();
-    }, walkDuration);
+    }, m_stepCache.walkDuration);
 }
 
 void Creature::updateWalk(const bool isPreWalking)
 {
     const uint32_t stepDuration = getStepDuration(true);
 
-    const float extraSpeed = isLocalPlayer() && !hasSpeedFormula() ? 800.f / static_cast<float>(stepDuration) : 0.f,
-        walkTicksPerPixel = (stepDuration + extraSpeed) / SPRITE_SIZE;
+    const float extraSpeed = isLocalPlayer() && !hasSpeedFormula() ? 800.f / static_cast<float>(stepDuration) : 0.f;
+    const float walkTicksPerPixel = (stepDuration + extraSpeed) / SPRITE_SIZE;
 
     const int totalPixelsWalked = std::min<int>((m_walkTimer.ticksElapsed() / walkTicksPerPixel), SPRITE_SIZE);
 
@@ -952,9 +947,9 @@ int Creature::getCurrentAnimationPhase(const bool mount)
 
 int Creature::getExactSize()
 {
-    const int numPatternY = getNumPatternY(),
-        layers = getLayers(),
-        zPattern = m_outfit.hasMount() ? 1 : 0;
+    const int numPatternY = getNumPatternY();
+    const int layers = getLayers();
+    const int zPattern = m_outfit.hasMount() ? 1 : 0;
 
     int exactSize = 0;
     for (int yPattern = 0; yPattern < numPatternY; ++yPattern) {

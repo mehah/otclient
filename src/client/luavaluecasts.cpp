@@ -194,6 +194,42 @@ int push_luavalue(const UnjustifiedPoints& unjustifiedPoints)
     return 1;
 }
 
+int push_luavalue(const Imbuement& i)
+{
+    g_lua.createTable(0, 11);
+    g_lua.pushInteger(i.id);
+    g_lua.setField("id");
+    g_lua.pushString(i.name);
+    g_lua.setField("name");
+    g_lua.pushString(i.description);
+    g_lua.setField("description");
+    g_lua.pushString(i.group);
+    g_lua.setField("group");
+    g_lua.pushInteger(i.imageId);
+    g_lua.setField("imageId");
+    g_lua.pushInteger(i.duration);
+    g_lua.setField("duration");
+    g_lua.pushBoolean(i.premiumOnly);
+    g_lua.setField("premiumOnly");
+    g_lua.createTable(i.sources.size(), 0);
+    for (size_t j = 0; j < i.sources.size(); ++j) {
+        g_lua.createTable(0, 2);
+        g_lua.pushObject(i.sources[j].first);
+        g_lua.setField("item");
+        g_lua.pushString(i.sources[j].second);
+        g_lua.setField("description");
+        g_lua.rawSeti(j + 1);
+    }
+    g_lua.setField("sources");
+    g_lua.pushInteger(i.cost);
+    g_lua.setField("cost");
+    g_lua.pushInteger(i.successRate);
+    g_lua.setField("successRate");
+    g_lua.pushInteger(i.protectionCost);
+    g_lua.setField("protectionCost");
+    return 1;
+}
+
 bool luavalue_cast(int index, UnjustifiedPoints& unjustifiedPoints)
 {
     if (!g_lua.isTable(index))

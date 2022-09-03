@@ -40,7 +40,7 @@ public:
     Position getPos() { return m_pos; }
 
 private:
-    uint32_t m_id;
+    uint32_t m_id{ 0 };
     std::string m_name;
     Position m_pos; // temple pos
 };

@@ -44,18 +44,26 @@ local escape_char_map = {
 local escape_char_map_inv = {
     ['/'] = '/'
 }
-for k, v in pairs(escape_char_map) do escape_char_map_inv[v] = k end
+for k, v in pairs(escape_char_map) do
+    escape_char_map_inv[v] = k
+end
 
-local function escape_char(c) return '\\' .. (escape_char_map[c] or string.format('u%04x', c:byte())) end
+local function escape_char(c)
+    return '\\' .. (escape_char_map[c] or string.format('u%04x', c:byte()))
+end
 
-local function encode_nil(val) return 'null' end
+local function encode_nil(val)
+    return 'null'
+end
 
 local function encode_table(val, stack)
     local res = {}
     stack = stack or {}
 
     -- Circular reference?
-    if stack[val] then error('circular reference') end
+    if stack[val] then
+        error('circular reference')
+    end
 
     stack[val] = true
 
@@ -63,19 +71,27 @@ local function encode_table(val, stack)
         -- Treat as array -- check keys are valid and it is not sparse
         local n = 0
         for k in pairs(val) do
-            if type(k) ~= 'number' then error('invalid table: mixed or invalid key types') end
+            if type(k) ~= 'number' then
+                error('invalid table: mixed or invalid key types')
+            end
             n = n + 1
         end
-        if n ~= #val then error('invalid table: sparse array') end
+        if n ~= #val then
+            error('invalid table: sparse array')
+        end
         -- Encode
-        for i, v in ipairs(val) do table.insert(res, encode(v, stack)) end
+        for i, v in ipairs(val) do
+            table.insert(res, encode(v, stack))
+        end
         stack[val] = nil
         return '[' .. table.concat(res, ',') .. ']'
 
     else
         -- Treat as an object
         for k, v in pairs(val) do
-            if type(k) ~= 'string' then error('invalid table: mixed or invalid key types') end
+            if type(k) ~= 'string' then
+                error('invalid table: mixed or invalid key types')
+            end
             table.insert(res, encode(k, stack) .. ':' .. encode(v, stack))
         end
         stack[val] = nil
@@ -83,7 +99,9 @@ local function encode_table(val, stack)
     end
 end
 
-local function encode_string(val) return '"' .. val:gsub('[%z\1-\31\\"]', escape_char) .. '"' end
+local function encode_string(val)
+    return '"' .. val:gsub('[%z\1-\31\\"]', escape_char) .. '"'
+end
 
 local function encode_number(val)
     -- Check for NaN, -inf and inf
@@ -104,11 +122,15 @@ local type_func_map = {
 encode = function(val, stack)
     local t = type(val)
     local f = type_func_map[t]
-    if f then return f(val, stack) end
+    if f then
+        return f(val, stack)
+    end
     error('unexpected type \'' .. t .. '\'')
 end
 
-function json.encode(val) return (encode(val)) end
+function json.encode(val)
+    return (encode(val))
+end
 
 -------------------------------------------------------------------------------
 -- Decode
@@ -118,7 +140,9 @@ local parse
 
 local function create_set(...)
     local res = {}
-    for i = 1, select('#', ...) do res[select(i, ...)] = true end
+    for i = 1, select('#', ...) do
+        res[select(i, ...)] = true
+    end
     return res
 end
 
@@ -134,7 +158,11 @@ local literal_map = {
 }
 
 local function next_char(str, idx, set, negate)
-    for i = idx, #str do if set[str:sub(i, i)] ~= negate then return i end end
+    for i = idx, #str do
+        if set[str:sub(i, i)] ~= negate then
+            return i
+        end
+    end
     return #str + 1
 end
 
@@ -220,14 +248,18 @@ local function parse_number(str, i)
     local x = next_char(str, i, delim_chars)
     local s = str:sub(i, x - 1)
     local n = tonumber(s)
-    if not n then decode_error(str, i, 'invalid number \'' .. s .. '\'') end
+    if not n then
+        decode_error(str, i, 'invalid number \'' .. s .. '\'')
+    end
     return n, x
 end
 
 local function parse_literal(str, i)
     local x = next_char(str, i, delim_chars)
     local word = str:sub(i, x - 1)
-    if not literals[word] then decode_error(str, i, 'invalid literal \'' .. word .. '\'') end
+    if not literals[word] then
+        decode_error(str, i, 'invalid literal \'' .. word .. '\'')
+    end
     return literal_map[word], x
 end
 
@@ -251,8 +283,12 @@ local function parse_array(str, i)
         i = next_char(str, i, space_chars, true)
         local chr = str:sub(i, i)
         i = i + 1
-        if chr == ']' then break end
-        if chr ~= ',' then decode_error(str, i, 'expected \']\' or \',\'') end
+        if chr == ']' then
+            break
+        end
+        if chr ~= ',' then
+            decode_error(str, i, 'expected \']\' or \',\'')
+        end
     end
     return res, i
 end
@@ -269,11 +305,15 @@ local function parse_object(str, i)
             break
         end
         -- Read key
-        if str:sub(i, i) ~= '"' then decode_error(str, i, 'expected string for key') end
+        if str:sub(i, i) ~= '"' then
+            decode_error(str, i, 'expected string for key')
+        end
         key, i = parse(str, i)
         -- Read ':' delimiter
         i = next_char(str, i, space_chars, true)
-        if str:sub(i, i) ~= ':' then decode_error(str, i, 'expected \':\' after key') end
+        if str:sub(i, i) ~= ':' then
+            decode_error(str, i, 'expected \':\' after key')
+        end
         i = next_char(str, i + 1, space_chars, true)
         -- Read value
         val, i = parse(str, i)
@@ -283,8 +323,12 @@ local function parse_object(str, i)
         i = next_char(str, i, space_chars, true)
         local chr = str:sub(i, i)
         i = i + 1
-        if chr == '}' then break end
-        if chr ~= ',' then decode_error(str, i, 'expected \'}\' or \',\'') end
+        if chr == '}' then
+            break
+        end
+        if chr ~= ',' then
+            decode_error(str, i, 'expected \'}\' or \',\'')
+        end
     end
     return res, i
 end
@@ -312,15 +356,21 @@ local char_func_map = {
 parse = function(str, idx)
     local chr = str:sub(idx, idx)
     local f = char_func_map[chr]
-    if f then return f(str, idx) end
+    if f then
+        return f(str, idx)
+    end
     decode_error(str, idx, 'unexpected character \'' .. chr .. '\'')
 end
 
 function json.decode(str)
-    if type(str) ~= 'string' then error('expected argument of type string, got ' .. type(str)) end
+    if type(str) ~= 'string' then
+        error('expected argument of type string, got ' .. type(str))
+    end
     local res, idx = parse(str, next_char(str, 1, space_chars, true))
     idx = next_char(str, idx, space_chars, true)
-    if idx <= #str then decode_error(str, idx, 'trailing garbage') end
+    if idx <= #str then
+        decode_error(str, idx, 'trailing garbage')
+    end
     return res
 end
 

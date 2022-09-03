@@ -21,7 +21,7 @@
  */
 
 #include "uiparticles.h"
-#include <framework/graphics/drawpool.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/particlemanager.h>
 
 #include "framework/graphics/particleeffect.h"

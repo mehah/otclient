@@ -14,7 +14,9 @@ function Struct.pack(format, ...)
             local n = opt:find('[hH]') and 2 or opt:find('[iI]') and 4 or opt:find('[lL]') and 8 or 1
             local val = tonumber(table.remove(vars, 1))
 
-            if val < 0 then val = val + 2 ^ (n * 8 - 1) end
+            if val < 0 then
+                val = val + 2 ^ (n * 8 - 1)
+            end
 
             local bytes = {}
             for j = 1, n do
@@ -78,7 +80,9 @@ function Struct.pack(format, ...)
 
             if length > 0 then
                 local str = tostring(table.remove(vars, 1))
-                if length - str:len() > 0 then str = str .. string.rep(' ', length - str:len()) end
+                if length - str:len() > 0 then
+                    str = str .. string.rep(' ', length - str:len())
+                end
                 table.insert(stream, str:sub(1, length))
             end
             i = i + n:len()
@@ -113,7 +117,9 @@ function Struct.unpack(format, stream)
                 iterator = iterator + 1
             end
 
-            if signed then val = val - 2 ^ (n * 8 - 1) end
+            if signed then
+                val = val - 2 ^ (n * 8 - 1)
+            end
 
             table.insert(vars, val)
         elseif opt:find('[fd]') then
@@ -121,13 +127,19 @@ function Struct.unpack(format, stream)
             local x = stream:sub(iterator, iterator + n - 1)
             iterator = iterator + n
 
-            if not endianness then x = string.reverse(x) end
+            if not endianness then
+                x = string.reverse(x)
+            end
 
             local sign = 1
             local mantissa = string.byte(x, (opt == 'd') and 7 or 3) % ((opt == 'd') and 16 or 128)
-            for i = n - 2, 1, -1 do mantissa = mantissa * (2 ^ 8) + string.byte(x, i) end
+            for i = n - 2, 1, -1 do
+                mantissa = mantissa * (2 ^ 8) + string.byte(x, i)
+            end
 
-            if string.byte(x, n) > 127 then sign = -1 end
+            if string.byte(x, n) > 127 then
+                sign = -1
+            end
 
             local exponent = (string.byte(x, n) % 128) * ((opt == 'd') and 16 or 2) +
                                  math.floor(string.byte(x, n - 1) / ((opt == 'd') and 16 or 128))
@@ -140,7 +152,9 @@ function Struct.unpack(format, stream)
         elseif opt == 's' then
             local bytes = {}
             for j = iterator, stream:len() do
-                if stream:sub(j, j) == string.char(0) then break end
+                if stream:sub(j, j) == string.char(0) then
+                    break
+                end
 
                 table.insert(bytes, stream:sub(j, j))
             end

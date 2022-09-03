@@ -1,4 +1,6 @@
-if not UIWindow then dofile 'uiwindow' end
+if not UIWindow then
+    dofile 'uiwindow'
+end
 
 -- @docclass
 UIInputBox = extends(UIWindow, 'UIInputBox')
@@ -10,12 +12,16 @@ function UIInputBox.create(title, okCallback, cancelCallback)
     inputBox.inputs = {}
     inputBox.onEnter = function()
         local results = {}
-        for _, func in pairs(inputBox.inputs) do table.insert(results, func()) end
+        for _, func in pairs(inputBox.inputs) do
+            table.insert(results, func())
+        end
         okCallback(unpack(results))
         inputBox:destroy()
     end
     inputBox.onEscape = function()
-        if cancelCallback then cancelCallback() end
+        if cancelCallback then
+            cancelCallback()
+        end
         inputBox:destroy()
     end
 
@@ -29,22 +35,38 @@ function UIInputBox:addLabel(text)
 end
 
 function UIInputBox:addLineEdit(labelText, defaultText, maxLength)
-    if labelText then self:addLabel(labelText) end
+    if labelText then
+        self:addLabel(labelText)
+    end
     local lineEdit = g_ui.createWidget('InputBoxLineEdit', self)
-    if defaultText then lineEdit:setText(defaultText) end
-    if maxLength then lineEdit:setMaxLength(maxLength) end
-    table.insert(self.inputs, function() return lineEdit:getText() end)
+    if defaultText then
+        lineEdit:setText(defaultText)
+    end
+    if maxLength then
+        lineEdit:setMaxLength(maxLength)
+    end
+    table.insert(self.inputs, function()
+        return lineEdit:getText()
+    end)
     return lineEdit
 end
 
 function UIInputBox:addTextEdit(labelText, defaultText, maxLength, visibleLines)
-    if labelText then self:addLabel(labelText) end
+    if labelText then
+        self:addLabel(labelText)
+    end
     local textEdit = g_ui.createWidget('InputBoxTextEdit', self)
-    if defaultText then textEdit:setText(defaultText) end
-    if maxLength then textEdit:setMaxLength(maxLength) end
+    if defaultText then
+        textEdit:setText(defaultText)
+    end
+    if maxLength then
+        textEdit:setMaxLength(maxLength)
+    end
     visibleLines = visibleLines or 1
     textEdit:setHeight(textEdit:getHeight() * visibleLines)
-    table.insert(self.inputs, function() return textEdit:getText() end)
+    table.insert(self.inputs, function()
+        return textEdit:getText()
+    end)
     return textEdit
 end
 
@@ -52,27 +74,39 @@ function UIInputBox:addCheckBox(text, checked)
     local checkBox = g_ui.createWidget('InputBoxCheckBox', self)
     checkBox:setText(text)
     checkBox:setChecked(checked)
-    table.insert(self.inputs, function() return checkBox:isChecked() end)
+    table.insert(self.inputs, function()
+        return checkBox:isChecked()
+    end)
     return checkBox
 end
 
 function UIInputBox:addComboBox(labelText, ...)
-    if labelText then self:addLabel(labelText) end
+    if labelText then
+        self:addLabel(labelText)
+    end
     local comboBox = g_ui.createWidget('InputBoxComboBox', self)
     local options = {...}
-    for i = 1, #options do comboBox:addOption(options[i]) end
-    table.insert(self.inputs, function() return comboBox:getCurrentOption() end)
+    for i = 1, #options do
+        comboBox:addOption(options[i])
+    end
+    table.insert(self.inputs, function()
+        return comboBox:getCurrentOption()
+    end)
     return comboBox
 end
 
 function UIInputBox:addSpinBox(labelText, minimum, maximum, value, step)
-    if labelText then self:addLabel(labelText) end
+    if labelText then
+        self:addLabel(labelText)
+    end
     local spinBox = g_ui.createWidget('InputBoxSpinBox', self)
     spinBox:setMinimum(minimum)
     spinBox:setMaximum(maximum)
     spinBox:setValue(value)
     spinBox:setStep(step)
-    table.insert(self.inputs, function() return spinBox:getValue() end)
+    table.insert(self.inputs, function()
+        return spinBox:getValue()
+    end)
     return spinBox
 end
 

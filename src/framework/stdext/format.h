@@ -35,7 +35,7 @@
 
 namespace stdext
 {
-    template<class T> void print_ostream(std::ostringstream& stream, const T& last) { stream << last; }
+    template<class T> void print_ostream(const std::ostringstream& stream, const T& last) { stream << last; }
     template<class T, class... Args>
     void print_ostream(std::ostringstream& stream, const T& first, const Args&... rest) { stream << "\t" << first; print_ostream(stream, rest...); }
     template<class... T>

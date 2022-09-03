@@ -690,6 +690,12 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
                 g_game.requestOutfit()
             end)
 
+            if g_game.getFeature(GamePrey) then
+                menu:addOption(tr('Prey Dialog'), function()
+                    modules.game_prey.show()
+                end)
+            end
+
             if g_game.getFeature(GamePlayerMounts) then
                 if not localPlayer:isMounted() then
                     menu:addOption(tr('Mount'), function()

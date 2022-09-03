@@ -350,6 +350,14 @@ namespace Otc
         MessageInvalid = 255
     };
 
+    enum PreySlotNum_t : uint8_t
+    {
+        PREY_SLOTNUM_FIRST = 0,
+        PREY_SLOTNUM_SECOND = 1,
+        PREY_SLOTNUM_THIRD = 2,
+        PREY_SLOTNUM_LAST = PREY_SLOTNUM_THIRD
+    };
+
     enum PreyState_t : uint8_t
     {
         PREY_STATE_LOCKED = 0,
@@ -369,6 +377,55 @@ namespace Otc
         PREY_TASK_STATE_LIST_SELECTION = 3,
         PREY_TASK_STATE_ACTIVE = 4,
         PREY_TASK_STATE_COMPLETED = 5
+    };
+
+    enum PreyMessageDialog_t : uint8_t
+    {
+        //PREY_MESSAGEDIALOG_IMBUEMENT_SUCCESS = 0,
+        //PREY_MESSAGEDIALOG_IMBUEMENT_ERROR = 1,
+        //PREY_MESSAGEDIALOG_IMBUEMENT_ROLL_FAILED = 2,
+        //PREY_MESSAGEDIALOG_IMBUEMENT_STATION_NOT_FOUND = 3,
+        //PREY_MESSAGEDIALOG_IMBUEMENT_CHARM_SUCCESS = 10,
+        //PREY_MESSAGEDIALOG_IMBUEMENT_CHARM_ERROR = 11,
+        PREY_MESSAGEDIALOG_PREY_MESSAGE = 20,
+        PREY_MESSAGEDIALOG_PREY_ERROR = 21,
+    };
+    enum PreyResourceType_t : uint8_t
+    {
+        PREY_RESOURCETYPE_BANK_GOLD = 0,
+        PREY_RESOURCETYPE_INVENTORY_GOLD = 1,
+        PREY_RESOURCETYPE_PREY_BONUS_REROLLS = 10
+    };
+    enum PreyBonusType_t : uint8_t
+    {
+        PREY_BONUS_DAMAGE_BOOST = 0,
+        PREY_BONUS_DAMAGE_REDUCTION = 1,
+        PREY_BONUS_XP_BONUS = 2,
+        PREY_BONUS_IMPROVED_LOOT = 3,
+        PREY_BONUS_NONE = 4, // internal usage but still added to client;
+        PREY_BONUS_FIRST = PREY_BONUS_DAMAGE_BOOST,
+        PREY_BONUS_LAST = PREY_BONUS_IMPROVED_LOOT,
+    };
+    enum PreyAction_t : uint8_t
+    {
+        PREY_ACTION_LISTREROLL = 0,
+        PREY_ACTION_BONUSREROLL = 1,
+        PREY_ACTION_MONSTERSELECTION = 2,
+        PREY_ACTION_REQUEST_ALL_MONSTERS = 3,
+        PREY_ACTION_CHANGE_FROM_ALL = 4,
+        PREY_ACTION_LOCK_PREY = 5,
+    };
+    enum PreyConfigState
+    {
+        PREY_CONFIG_STATE_FREE,
+        PREY_CONFIG_STATE_PREMIUM,
+        PREY_CONFIG_STATE_TIBIACOINS
+    };
+    enum PreyUnlockState_t : uint8_t
+    {
+        PREY_UNLOCK_STORE_AND_PREMIUM = 0,
+        PREY_UNLOCK_STORE = 1,
+        PREY_UNLOCK_NONE = 2,
     };
 
     enum GameFeature : uint8_t
@@ -452,14 +509,14 @@ namespace Otc
         GameSoul = 79,
         GameMapOldEffectRendering = 80,
         GameMapDontCorrectCorpse = 81,
-        GameThingQuickLoot = 82,
-        GameThingQuiver = 83,
-        GameThingPodium = 84,
-        GameThingUpgradeClassification = 85,
-        GameThingCounter = 86,
-        GameThingClock = 87,
-        GameThingPodiumItemType = 88,
-
+        GamePrey = 82,
+        GameThingQuickLoot = 83,
+        GameThingQuiver = 84,
+        GameThingPodium = 85,
+        GameThingUpgradeClassification = 86,
+        GameThingCounter = 87,
+        GameThingClock = 88,
+        GameThingPodiumItemType = 89,
         LastGameFeature = 101
     };
 
@@ -578,5 +635,63 @@ namespace Otc
         RESOURCE_PREY_WILDCARDS = 10,
         RESOURCE_DAILYREWARD_STREAK = 20,
         RESOURCE_DAILYREWARD_JOKERS = 21,
+        RESOURCE_TASK_HUNTING = 50,
+        RESOURE_COIN_NORMAL = 90,
+        RESOURE_COIN_TRANSFERRABLE = 91,
+        RESOURE_COIN_AUCTION = 92,
+        RESOURE_COIN_TOURNAMENT = 93,
+    };
+
+    enum MarketItemDescription : uint8_t
+    {
+        ITEM_DESC_ARMOR = 1,
+        ITEM_DESC_ATTACK = 2,
+        ITEM_DESC_CONTAINTER = 3,
+        ITEM_DESC_DEFENSE = 4,
+        ITEM_DESC_GENERAL = 5,
+        ITEM_DESC_DECAY_TIME = 6,
+        ITEM_DESC_COMBAT = 7,
+        ITEM_DESC_MINLEVEL = 8,
+        ITEM_DESC_MINMAGICLEVEL = 9,
+        ITEM_DESC_VOCATION = 10,
+        ITEM_DESC_RUNE = 11,
+        ITEM_DESC_ABILITY = 12,
+        ITEM_DESC_CHARGES = 13,
+        ITEM_DESC_WEAPONTYPE = 14,
+        ITEM_DESC_WEIGHT = 15,
+        ITEM_DESC_IMBUINGSLOTS = 16,
+        ITEM_DESC_MAGICSHIELD = 17,
+        ITEM_DESC_CLEAVE = 18,
+        ITEM_DESC_REFLECTION = 19,
+        ITEM_DESC_PERFECT = 20,
+        ITEM_DESC_UPGRADECLASS = 21,
+        ITEM_DESC_CURRENTTIER = 22,
+
+        ITEM_DESC_FIRST = ITEM_DESC_ARMOR,
+        ITEM_DESC_LAST = ITEM_DESC_CURRENTTIER,
+    };
+
+    enum MarketAction : uint8_t
+    {
+        MARKETACTION_BUY = 0,
+        MARKETACTION_SELL = 1
+    };
+
+    enum MarketRequest : uint16_t
+    {
+        MARKETREQUEST_OWN_HISTORY = 1,
+        MARKETREQUEST_OWN_OFFERS = 2,
+        MARKETREQUEST_ITEM_BROWSE = 3,
+        OLD_MARKETREQUEST_MY_OFFERS = 0xFFFE,
+        OLD_MARKETREQUEST_MY_HISTORY = 0xFFFF,
+    };
+
+    enum MarketOfferState : uint8_t
+    {
+        OFFER_STATE_ACTIVE = 0,
+        OFFER_STATE_CANCELLED = 1,
+        OFFER_STATE_EXPIRED = 2,
+        OFFER_STATE_ACCEPTED = 3,
+        OFFER_STATE_ACCEPTEDEX = 255
     };
 }

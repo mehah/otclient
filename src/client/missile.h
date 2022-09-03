@@ -45,8 +45,8 @@ public:
 private:
     Timer m_animationTimer;
     Point m_delta;
-    uint8_t m_distance;
-    float m_duration;
-    uint16_t m_id;
-    Otc::Direction m_direction;
+    uint8_t m_distance{ 0 };
+    uint16_t m_id{ 0 };
+    float m_duration{ 0.f };
+    Otc::Direction m_direction{ Otc::InvalidDirection };
 };

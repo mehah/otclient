@@ -45,9 +45,13 @@ function init()
     reasonsTextList = ruleViolationWindow:getChildById('reasonList')
     actionsTextList = ruleViolationWindow:getChildById('actionList')
 
-    g_keyboard.bindKeyDown('Ctrl+Y', function() show() end)
+    g_keyboard.bindKeyDown('Ctrl+Y', function()
+        show()
+    end)
 
-    if g_game.isOnline() then loadReasons() end
+    if g_game.isOnline() then
+        loadReasons()
+    end
 end
 
 function terminate()
@@ -59,7 +63,9 @@ function terminate()
     ruleViolationWindow:destroy()
 end
 
-function hasWindowAccess() return reasonsTextList:getChildCount() > 0 end
+function hasWindowAccess()
+    return reasonsTextList:getChildCount() > 0
+end
 
 function loadReasons()
     reasonsTextList:destroyChildren()
@@ -74,14 +80,20 @@ function loadReasons()
         label.actionFlags = actionFlags
     end
 
-    if not hasWindowAccess() and ruleViolationWindow:isVisible() then hide() end
+    if not hasWindowAccess() and ruleViolationWindow:isVisible() then
+        hide()
+    end
 end
 
 function show(target, statement)
     if g_game.isOnline() and hasWindowAccess() then
-        if target then ruleViolationWindow:getChildById('nameText'):setText(target) end
+        if target then
+            ruleViolationWindow:getChildById('nameText'):setText(target)
+        end
 
-        if statement then ruleViolationWindow:getChildById('statementText'):setText(statement) end
+        if statement then
+            ruleViolationWindow:getChildById('statementText'):setText(statement)
+        end
 
         ruleViolationWindow:show()
         ruleViolationWindow:raise()

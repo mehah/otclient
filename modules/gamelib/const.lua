@@ -157,13 +157,14 @@ GameLevelU16 = 78
 GameSoul = 79
 GameMapOldEffectRendering = 80
 GameMapDontCorrectCorpse = 81
-GameThingQuickLoot = 82
-GameThingQuiver = 83
-GameThingPodium = 84
-GameThingUpgradeClassification = 85
-GameThingCounter = 86
-GameThingClock = 87
-GameThingPodiumItemType = 88
+GamePrey = 82
+GameThingQuickLoot = 83
+GameThingQuiver = 84
+GameThingPodium = 85
+GameThingUpgradeClassification = 86
+GameThingCounter = 87
+GameThingClock = 88
+GameThingPodiumItemType = 89
 
 TextColors = {
     red = '#f55e5e', -- '#c83200'
@@ -358,5 +359,18 @@ ChannelEvent = {
     Invite = 2,
     Exclude = 3
 }
+
+ResourceTypes = {
+    BANK_BALANCE = 0,
+    GOLD_EQUIPPED = 1,
+    PREY_WILDCARDS = 10,
+    DAILYREWARD_STREAK = 20,
+    DAILYREWARD_JOKERS = 21,
+    TASK_HUNTING = 50,
+    COIN_NORMAL = 90,
+    COIN_TRANSFERRABLE = 91,
+    COIN_AUCTION = 92,
+    COIN_TOURNAMENT = 93
+};
 
 -- @}

@@ -95,31 +95,27 @@ void Connection::connect(const std::string_view host, uint16_t port, const std::
     m_connectCallback = connectCallback;
 
     const asio::ip::tcp::resolver::query query(host.data(), stdext::unsafe_cast<std::string>(port));
-    m_resolver.async_resolve(query, [capture0 = asConnection()](auto&& PH1, auto&& PH2)
-    {
+    m_resolver.async_resolve(query, [capture0 = asConnection()](auto&& PH1, auto&& PH2) {
         capture0->onResolve(std::forward<decltype(PH1)>(PH1),
                             std::forward<decltype(PH2)>(PH2));
     });
 
     m_readTimer.cancel();
-    m_readTimer.expires_from_now(asio::chrono::seconds(static_cast<uint32_t >(READ_TIMEOUT)));
-    m_readTimer.async_wait([capture0 = asConnection()](auto&& PH1)
-    {
+    m_readTimer.expires_from_now(asio::chrono::seconds(static_cast<uint32_t>(READ_TIMEOUT)));
+    m_readTimer.async_wait([capture0 = asConnection()](auto&& PH1) {
         capture0->onTimeout(std::forward<decltype(PH1)>(PH1));
     });
 }
 
 void Connection::internal_connect(const asio::ip::basic_resolver<asio::ip::tcp>::iterator& endpointIterator)
 {
-    m_socket.async_connect(*endpointIterator, [capture0 = asConnection()](auto&& PH1)
-    {
+    m_socket.async_connect(*endpointIterator, [capture0 = asConnection()](auto&& PH1) {
         capture0->onConnect(std::forward<decltype(PH1)>(PH1));
     });
 
     m_readTimer.cancel();
-    m_readTimer.expires_from_now(asio::chrono::seconds(static_cast<uint32_t >(READ_TIMEOUT)));
-    m_readTimer.async_wait([capture0 = asConnection()](auto&& PH1)
-    {
+    m_readTimer.expires_from_now(asio::chrono::seconds(static_cast<uint32_t>(READ_TIMEOUT)));
+    m_readTimer.async_wait([capture0 = asConnection()](auto&& PH1) {
         capture0->onTimeout(std::forward<decltype(PH1)>(PH1));
     });
 }
@@ -139,8 +135,7 @@ void Connection::write(uint8_t* buffer, size_t size)
 
         m_delayedWriteTimer.cancel();
         m_delayedWriteTimer.expires_from_now(asio::chrono::milliseconds(0));
-        m_delayedWriteTimer.async_wait([capture0 = asConnection()](auto&& PH1)
-        {
+        m_delayedWriteTimer.async_wait([capture0 = asConnection()](auto&& PH1) {
             capture0->onCanWrite(std::forward<decltype(PH1)>(PH1));
         });
     }
@@ -160,15 +155,13 @@ void Connection::internal_write()
 
     async_write(m_socket,
                 *outputStream,
-                [capture0 = asConnection(), outputStream](auto&& PH1, auto&& PH2)
-    {
+                [capture0 = asConnection(), outputStream](auto&& PH1, auto&& PH2) {
         capture0->onWrite(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2), outputStream);
     });
 
     m_writeTimer.cancel();
-    m_writeTimer.expires_from_now(asio::chrono::seconds(static_cast<uint32_t >(WRITE_TIMEOUT)));
-    m_writeTimer.async_wait([capture0 = asConnection()](auto&& PH1)
-    {
+    m_writeTimer.expires_from_now(asio::chrono::seconds(static_cast<uint32_t>(WRITE_TIMEOUT)));
+    m_writeTimer.async_wait([capture0 = asConnection()](auto&& PH1) {
         capture0->onTimeout(std::forward<decltype(PH1)>(PH1));
     });
 }
@@ -181,16 +174,14 @@ void Connection::read(uint16_t bytes, const RecvCallback& callback)
     m_recvCallback = callback;
 
     async_read(m_socket,
-               buffer(m_inputStream.prepare(bytes)),
-               [capture0 = asConnection()](auto&& PH1, auto&& PH2)
-    {
+               m_inputStream.prepare(bytes),
+               [capture0 = asConnection()](auto&& PH1, auto&& PH2) {
         capture0->onRecv(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2));
     });
 
     m_readTimer.cancel();
-    m_readTimer.expires_from_now(asio::chrono::seconds(static_cast<uint32_t >(READ_TIMEOUT)));
-    m_readTimer.async_wait([capture0 = asConnection()](auto&& PH1)
-    {
+    m_readTimer.expires_from_now(asio::chrono::seconds(static_cast<uint32_t>(READ_TIMEOUT)));
+    m_readTimer.async_wait([capture0 = asConnection()](auto&& PH1) {
         capture0->onTimeout(std::forward<decltype(PH1)>(PH1));
     });
 }
@@ -205,15 +196,13 @@ void Connection::read_until(const std::string_view what, const RecvCallback& cal
     async_read_until(m_socket,
                      m_inputStream,
                      what,
-                     [capture0 = asConnection()](auto&& PH1, auto&& PH2)
-    {
+                     [capture0 = asConnection()](auto&& PH1, auto&& PH2) {
         capture0->onRecv(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2));
     });
 
     m_readTimer.cancel();
-    m_readTimer.expires_from_now(asio::chrono::seconds(static_cast<uint32_t >(READ_TIMEOUT)));
-    m_readTimer.async_wait([capture0 = asConnection()](auto&& PH1)
-    {
+    m_readTimer.expires_from_now(asio::chrono::seconds(static_cast<uint32_t>(READ_TIMEOUT)));
+    m_readTimer.async_wait([capture0 = asConnection()](auto&& PH1) {
         capture0->onTimeout(std::forward<decltype(PH1)>(PH1));
     });
 }
@@ -225,16 +214,14 @@ void Connection::read_some(const RecvCallback& callback)
 
     m_recvCallback = callback;
 
-    m_socket.async_read_some(buffer(m_inputStream.prepare(RECV_BUFFER_SIZE)),
-                             [capture0 = asConnection()](auto&& PH1, auto&& PH2)
-    {
+    m_socket.async_read_some(m_inputStream.prepare(RECV_BUFFER_SIZE),
+                             [capture0 = asConnection()](auto&& PH1, auto&& PH2) {
         capture0->onRecv(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2));
     });
 
     m_readTimer.cancel();
-    m_readTimer.expires_from_now(asio::chrono::seconds(static_cast<uint32_t >(READ_TIMEOUT)));
-    m_readTimer.async_wait([capture0 = asConnection()](auto&& PH1)
-    {
+    m_readTimer.expires_from_now(asio::chrono::seconds(static_cast<uint32_t>(READ_TIMEOUT)));
+    m_readTimer.async_wait([capture0 = asConnection()](auto&& PH1) {
         capture0->onTimeout(std::forward<decltype(PH1)>(PH1));
     });
 }

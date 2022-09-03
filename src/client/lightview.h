@@ -38,7 +38,13 @@ public:
     void addLightSource(const Point& pos, const Light& light);
     void addShade(const Point& pos, const float opacity) { m_sources.emplace_back(pos, 0, 0, opacity); }
 
-    void setGlobalLight(const Light& light) { m_globalLight = light; m_globalLightColor = Color::from8bit(m_globalLight.color, m_globalLight.intensity / static_cast<float>(UINT8_MAX)); }
+    void setGlobalLight(const Light& light)
+    {
+        m_globalLight = light;
+        m_globalLightColor = Color::from8bit(m_globalLight.color, m_globalLight.intensity / static_cast<float>(UINT8_MAX));
+        m_pool->repaint();
+    }
+
     void setSmooth(bool enabled);
 
     const Light& getGlobalLight() const { return m_globalLight; }
@@ -58,7 +64,7 @@ private:
     Light m_globalLight;
     Color m_globalLightColor;
 
-    PoolFramed* m_pool;
+    DrawPoolFramed* m_pool;
 
     std::vector<Source> m_sources;
 };

@@ -95,6 +95,13 @@ public:
         return it != m_resourcesBalance.end() ? it->second : 0;
     }
 
+    uint64_t getTotalMoney()
+    {
+        uint64_t bankBalance = getResourceBalance(Otc::RESOURCE_BANK_BALANCE);
+        uint64_t equippedBalance = getResourceBalance(Otc::RESOURCE_GOLD_EQUIPPED);
+        return bankBalance + equippedBalance;
+    }
+
     bool hasSight(const Position& pos);
     bool isKnown() { return m_known; }
     bool isPreWalking() { return m_preWalking; }
@@ -123,18 +130,18 @@ private:
     bool retryAutoWalk();
 
     // walk related
-    Position m_lastPrewalkDestination,
-        m_lastAutoWalkPosition,
-        m_autoWalkDestination;
+    Position m_lastPrewalkDestination;
+    Position m_lastAutoWalkPosition;
+    Position m_autoWalkDestination;
 
     ScheduledEventPtr m_autoWalkContinueEvent;
     ticks_t m_walkLockExpiration{ 0 };
 
-    bool m_preWalking{ false },
-        m_knownCompletePath{ false },
-        m_premium{ false },
-        m_known{ false },
-        m_pending{ false };
+    bool m_preWalking{ false };
+    bool m_knownCompletePath{ false };
+    bool m_premium{ false };
+    bool m_known{ false };
+    bool m_pending{ false };
 
     ItemPtr m_inventoryItems[Otc::LastInventorySlot];
 

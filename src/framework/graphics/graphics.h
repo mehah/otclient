@@ -49,8 +49,8 @@ public:
 private:
     bool m_ok{ false };
 
-    int m_maxTextureSize{ -1 },
-        m_alphaBits{ 0 };
+    int m_maxTextureSize{ -1 };
+    int m_alphaBits{ 0 };
 
     Size m_viewportSize;
 };

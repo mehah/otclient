@@ -118,6 +118,16 @@ public:
     void sendOpenStore(int serviceType, const std::string_view category);
     void sendTransferCoins(const std::string_view recipient, int amount);
     void sendOpenTransactionHistory(int entriesPerPage);
+    void sendMarketLeave();
+    void sendMarketBrowse(uint8_t browseId, uint16_t browseType);
+    void sendMarketCreateOffer(uint8_t type, uint16_t itemId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous);
+    void sendMarketCancelOffer(uint32_t timestamp, uint16_t counter);
+    void sendMarketAcceptOffer(uint32_t timestamp, uint16_t counter, uint16_t amount);
+    void sendPreyAction(uint8_t slot, uint8_t actionType, uint16_t index);
+    void sendPreyRequest();
+    void sendApplyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm);
+    void sendClearImbuement(uint8_t slot);
+    void sendCloseImbuingWindow();
 
     // otclient only
     void sendChangeMapAwareRange(int xrange, int yrange);
@@ -269,15 +279,23 @@ private:
     void parseOpenRewardWall(const InputMessagePtr& msg);
     void parseDailyReward(const InputMessagePtr& msg);
     void parseRewardHistory(const InputMessagePtr& msg);
+    void parsePreyFreeRerolls(const InputMessagePtr& msg);
     void parsePreyTimeLeft(const InputMessagePtr& msg);
-    void getPreyMonster(const InputMessagePtr& msg);
-    void getPreyMonsters(const InputMessagePtr& msg);
     void parsePreyData(const InputMessagePtr& msg);
     void parsePreyRerollPrice(const InputMessagePtr& msg);
-    void getImbuementInfo(const InputMessagePtr& msg);
     void parseImbuementWindow(const InputMessagePtr& msg);
     void parseCloseImbuementWindow(const InputMessagePtr& msg);
     void parseError(const InputMessagePtr& msg);
+    void parseMarketEnter(const InputMessagePtr& msg);
+    void parseMarketEnterOld(const InputMessagePtr& msg);
+    void parseMarketDetail(const InputMessagePtr& msg);
+    void parseMarketBrowse(const InputMessagePtr& msg);
+
+    MarketOffer readMarketOffer(const InputMessagePtr& msg, uint8_t action, uint16_t var);
+
+    Imbuement getImbuementInfo(const InputMessagePtr& msg);
+    PreyMonster getPreyMonster(const InputMessagePtr& msg);
+    std::vector<PreyMonster> getPreyMonsters(const InputMessagePtr& msg);
 
 public:
     void setMapDescription(const InputMessagePtr& msg, int x, int y, int z, int width, int height);
@@ -293,10 +311,10 @@ public:
     Position getPosition(const InputMessagePtr& msg);
 
 private:
-    bool m_enableSendExtendedOpcode{ false },
-        m_gameInitialized{ false },
-        m_mapKnown{ false },
-        m_firstRecv{ true };
+    bool m_enableSendExtendedOpcode{ false };
+    bool m_gameInitialized{ false };
+    bool m_mapKnown{ false };
+    bool m_firstRecv{ true };
 
     std::string m_accountName;
     std::string m_accountPassword;

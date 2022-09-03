@@ -74,9 +74,6 @@ enum ItemAttr : uint8_t
 class Item : public Thing
 {
 public:
-    Item() = default;
-    ~Item() override = default;
-
     static ItemPtr create(int id);
     static ItemPtr createFromOtb(int id);
 
@@ -149,8 +146,8 @@ public:
     void onPositionChange(const Position& /*newPos*/, const Position& /*oldPos*/) override { updatePatterns(); }
 
 private:
-    uint16_t m_clientId{ 0 },
-        m_serverId{ 0 };
+    uint16_t m_clientId{ 0 };
+    uint16_t m_serverId{ 0 };
 
     uint8_t m_countOrSubType{ 0 };
 

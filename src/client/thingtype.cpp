@@ -29,7 +29,7 @@
 
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/filestream.h>
-#include <framework/graphics/drawpool.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/image.h>
 #include <framework/graphics/texture.h>
 #include <framework/otml/otml.h>
@@ -206,7 +206,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
     }
 
     if (flags.has_hook()) {
-        const auto hookDirection = flags.hook();
+        const auto& hookDirection = flags.hook();
         if (hookDirection.east()) {
             m_attribs.set(ThingAttrHookEast, true);
         } else if (hookDirection.south()) {
@@ -345,7 +345,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
         const int frameGroupType = framegroup.fixed_frame_group();
         const auto& spriteInfo = framegroup.sprite_info();
         const auto& animation = spriteInfo.animation();
-        const auto& sprites = spriteInfo.sprite_id();
+        spriteInfo.sprite_id(); // sprites
         const auto& spritesPhases = animation.sprite_phase();
 
         m_numPatternX = spriteInfo.pattern_width();
@@ -355,8 +355,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
 
         m_animationPhases += std::max<int>(1, spritesPhases.size());
 
-        SpriteSheetPtr sheet = g_spriteAppearances.getSheetBySpriteId(spriteInfo.sprite_id(0), false);
-        if (sheet) {
+        if (SpriteSheetPtr sheet = g_spriteAppearances.getSheetBySpriteId(spriteInfo.sprite_id(0), false); sheet) {
             m_size = sheet->getSpriteSize() / SPRITE_SIZE;
             sizes.push_back(m_size);
         }
@@ -376,7 +375,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
         total_sprites.push_back(totalSprites);
 
         if (totalSpritesCount + totalSprites > 4096)
-            stdext::throw_exception("a thing type has more than 4096 sprites");
+            throw Exception("a thing type has more than 4096 sprites");
 
         m_spritesIndex.resize(totalSpritesCount + totalSprites);
         for (int j = totalSpritesCount, spriteId = 0; j < (totalSpritesCount + totalSprites); ++j, ++spriteId) {
@@ -388,7 +387,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
 
     if (sizes.size() > 1) {
         // correction for some sprites
-        for (auto& s : sizes) {
+        for (const auto& s : sizes) {
             m_size.setWidth(std::max<int>(m_size.width(), s.width()));
             m_size.setHeight(std::max<int>(m_size.height(), s.height()));
         }
@@ -435,7 +434,8 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
     m_id = clientId;
     m_category = category;
 
-    int count = 0, attr = -1;
+    int count = 0;
+    int attr = -1;
     bool done = false;
     for (int i = 0; i < ThingLastAttr; ++i) {
         ++count;
@@ -574,8 +574,8 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
     }
 
     if (!done)
-        stdext::throw_exception(stdext::format("corrupt data (id: %d, category: %d, count: %d, lastAttr: %d)",
-                                               m_id, m_category, count, attr));
+        throw Exception("corrupt data (id: %d, category: %d, count: %d, lastAttr: %d)",
+                                               m_id, m_category, count, attr);
 
     const bool hasFrameGroups = category == ThingCategoryCreature && g_game.getFeature(Otc::GameIdleAnimations);
     const uint8_t groupCount = hasFrameGroups ? fin->getU8() : 1;
@@ -626,7 +626,7 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
         total_sprites.push_back(totalSprites);
 
         if (totalSpritesCount + totalSprites > 4096)
-            stdext::throw_exception("a thing type has more than 4096 sprites");
+            throw Exception("a thing type has more than 4096 sprites");
 
         m_spritesIndex.resize(totalSpritesCount + totalSprites);
         for (int j = totalSpritesCount; j < (totalSpritesCount + totalSprites); ++j)
@@ -637,7 +637,7 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
 
     if (sizes.size() > 1) {
         // correction for some sprites
-        for (auto& s : sizes) {
+        for (const auto& s : sizes) {
             m_size.setWidth(std::max<int>(m_size.width(), s.width()));
             m_size.setHeight(std::max<int>(m_size.height(), s.height()));
         }
@@ -681,10 +681,10 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
 void ThingType::exportImage(const std::string& fileName)
 {
     if (m_null)
-        stdext::throw_exception("cannot export null thingtype");
+        throw Exception("cannot export null thingtype");
 
     if (m_spritesIndex.empty())
-        stdext::throw_exception("cannot export thingtype without sprites");
+        throw Exception("cannot export thingtype without sprites");
 
     const ImagePtr image(new Image(Size(SPRITE_SIZE * m_size.width() * m_layers * m_numPatternX, SPRITE_SIZE * m_size.height() * m_animationPhases * m_numPatternY * m_numPatternZ)));
     for (int z = 0; z < m_numPatternZ; ++z) {
@@ -770,8 +770,8 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
         return nullptr;
     }
 
-    const bool allBlank = txtType == TextureType::ALL_BLANK,
-        smooth = txtType == TextureType::SMOOTH;
+    const bool allBlank = txtType == TextureType::ALL_BLANK;
+    const bool smooth = txtType == TextureType::SMOOTH;
 
     TexturePtr& animationPhaseTexture = (
         allBlank ? m_blankTextures :
@@ -827,7 +827,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
                             if (allBlank) {
                                 spriteImage->overwrite(Color::white);
                             } else if (spriteMask) {
-                                spriteImage->overwriteMask(maskColors[l - 1]);
+                                spriteImage->overwriteMask(maskColors[(l - 1)]);
                             }
 
                             fullImage->blit(framePos, spriteImage);
@@ -846,7 +846,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
                                         if (allBlank) {
                                             spriteImage->overwrite(Color::white);
                                         } else if (spriteMask) {
-                                            spriteImage->overwriteMask(maskColors[l - 1]);
+                                            spriteImage->overwriteMask(maskColors[(l - 1)]);
                                         }
 
                                         Point spritePos = Point(m_size.width() - w - 1,

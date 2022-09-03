@@ -88,7 +88,7 @@ uint32_t read32(std::istream& f1)
     f1.read((char*)&b, 1);
     f1.read((char*)&c, 1);
     f1.read((char*)&d, 1);
-    return (static_cast<uint32_t >(a) << 24) + (static_cast<uint32_t >(b) << 16) + (static_cast<uint32_t >(c) << 8) + static_cast<uint32_t >(d);
+    return (static_cast<uint32_t>(a) << 24) + (static_cast<uint32_t>(b) << 16) + (static_cast<uint32_t>(c) << 8) + static_cast<uint32_t>(d);
 }
 
 unsigned short read16(std::istream& f1)
@@ -110,7 +110,7 @@ void read_sub_row(uint8_t* row, uint32_t rowbytes, uint32_t bpp)
         row[i] += row[i - bpp];
 }
 
-void read_up_row(uint8_t* row, uint8_t* prev_row, uint32_t rowbytes, uint32_t )
+void read_up_row(uint8_t* row, uint8_t* prev_row, uint32_t rowbytes, uint32_t)
 {
     if (prev_row)
         for (uint32_t i = 0; i < rowbytes; i++)
@@ -188,7 +188,7 @@ void compose0(uint8_t* dst1, uint32_t dstbytes1, uint8_t* dst2, uint32_t dstbyte
     for (uint32_t j = 0; j < h; j++) {
         uint8_t* sp = src + 1;
         uint8_t* dp1 = dst1;
-        auto* dp2 = (uint32_t *)dst2;
+        auto* dp2 = (uint32_t*)dst2;
 
         if (bop == PNG_BLEND_OP_SOURCE) {
             switch (depth) {
@@ -223,7 +223,7 @@ void compose2(uint8_t* dst1, uint32_t dstbytes1, uint8_t* dst2, uint32_t dstbyte
     for (uint32_t j = 0; j < h; j++) {
         uint8_t* sp = src + 1;
         uint8_t* dp1 = dst1;
-        auto* dp2 = (uint32_t *)dst2;
+        auto* dp2 = (uint32_t*)dst2;
 
         if (bop == PNG_BLEND_OP_SOURCE) {
             if (depth == 8) {
@@ -279,7 +279,7 @@ void compose3(uint8_t* dst1, uint32_t dstbytes1, uint8_t* dst2, uint32_t dstbyte
     for (uint32_t j = 0; j < h; j++) {
         const uint8_t* sp = src + 1;
         uint8_t* dp1 = dst1;
-        auto* dp2 = (uint32_t *)dst2;
+        auto* dp2 = (uint32_t*)dst2;
 
         for (uint32_t i = 0; i < w; i++) {
             switch (depth) {
@@ -388,7 +388,7 @@ void compose6(uint8_t* dst, uint32_t dstbytes, uint8_t* src, uint32_t srcbytes, 
 
     for (uint32_t j = 0; j < h; j++) {
         uint8_t* sp = src + 1;
-        auto* dp = (uint32_t *)dst;
+        auto* dp = (uint32_t*)dst;
 
         if (bop == PNG_BLEND_OP_SOURCE) {
             for (i = 0; i < w; i++) {
@@ -904,7 +904,7 @@ void save_png(std::stringstream& f, uint32_t width, uint32_t height, int channel
         uint8_t* out;
         uint32_t    sum = 0;
         uint8_t* best_row = row_buf;
-        uint32_t    mins = static_cast<uint32_t >(-1) >> 1;
+        uint32_t    mins = static_cast<uint32_t>(-1) >> 1;
 
         out = row_buf + 1;
 

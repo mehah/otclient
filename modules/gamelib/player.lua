@@ -57,7 +57,11 @@ function Player:isPartySharedExperienceActive()
 end
 
 function Player:hasVip(creatureName)
-    for id, vip in pairs(g_game.getVips()) do if (vip[1] == creatureName) then return true end end
+    for id, vip in pairs(g_game.getVips()) do
+        if (vip[1] == creatureName) then
+            return true
+        end
+    end
     return false
 end
 
@@ -66,13 +70,27 @@ function Player:isMounted()
     return outfit.mount ~= nil and outfit.mount > 0
 end
 
-function Player:toggleMount() if g_game.getFeature(GamePlayerMounts) then g_game.mount(not self:isMounted()) end end
+function Player:toggleMount()
+    if g_game.getFeature(GamePlayerMounts) then
+        g_game.mount(not self:isMounted())
+    end
+end
 
-function Player:mount() if g_game.getFeature(GamePlayerMounts) then g_game.mount(true) end end
+function Player:mount()
+    if g_game.getFeature(GamePlayerMounts) then
+        g_game.mount(true)
+    end
+end
 
-function Player:dismount() if g_game.getFeature(GamePlayerMounts) then g_game.mount(false) end end
+function Player:dismount()
+    if g_game.getFeature(GamePlayerMounts) then
+        g_game.mount(false)
+    end
+end
 
-function Player:getItem(itemId, subType) return g_game.findPlayerItem(itemId, subType or -1) end
+function Player:getItem(itemId, subType)
+    return g_game.findPlayerItem(itemId, subType or -1)
+end
 
 function Player:getItems(itemId, subType)
     local subType = subType or -1
@@ -98,19 +116,27 @@ end
 
 function Player:getItemsCount(itemId)
     local items, count = self:getItems(itemId), 0
-    for i = 1, #items do count = count + items[i]:getCount() end
+    for i = 1, #items do
+        count = count + items[i]:getCount()
+    end
     return count
 end
 
 function Player:hasState(state, states)
-    if not states then states = self:getStates() end
+    if not states then
+        states = self:getStates()
+    end
 
     for i = 1, 32 do
         local pow = math.pow(2, i - 1)
-        if pow > states then break end
+        if pow > states then
+            break
+        end
 
         local states = bit.band(states, pow)
-        if states == state then return true end
+        if states == state then
+            return true
+        end
     end
     return false
 end

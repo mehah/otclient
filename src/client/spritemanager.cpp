@@ -59,7 +59,7 @@ bool SpriteManager::loadSpr(std::string file)
         m_loaded = true;
         g_lua.callGlobalField("g_sprites", "onLoadSpr", file);
         return true;
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("Failed to load sprites from '%s': %s", file, e.what()));
         return false;
     }
@@ -68,12 +68,12 @@ bool SpriteManager::loadSpr(std::string file)
 void SpriteManager::saveSpr(const std::string& fileName)
 {
     if (!m_loaded)
-        stdext::throw_exception("failed to save, spr is not loaded");
+        throw Exception("failed to save, spr is not loaded");
 
     try {
         const FileStreamPtr fin = g_resources.createFile(fileName);
         if (!fin)
-            stdext::throw_exception(stdext::format("failed to open file '%s' for write", fileName));
+            throw Exception("failed to open file '%s' for write", fileName);
 
         fin->cache();
 
@@ -114,7 +114,7 @@ void SpriteManager::saveSpr(const std::string& fileName)
 
         fin->flush();
         fin->close();
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
     }
 }
@@ -215,7 +215,7 @@ ImagePtr SpriteManager::getSpriteImage(int id)
         }
 
         return image;
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("Failed to get sprite id %d: %s", id, e.what()));
         return nullptr;
     }
@@ -225,8 +225,8 @@ void SpriteManager::generateLightTexture()
 {
     constexpr float brightnessIntensity = 1.5f;
 
-    constexpr int bubbleRadius = 6,
-        bubbleDiameter = bubbleRadius * 2.3;
+    constexpr int bubbleRadius = 6;
+    constexpr int bubbleDiameter = bubbleRadius * 2.3;
 
     const auto image = ImagePtr(new Image(Size(bubbleDiameter)));
     for (int_fast16_t x = -1; ++x < bubbleDiameter;) {

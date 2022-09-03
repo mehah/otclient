@@ -52,6 +52,6 @@ private:
 
     uint16_t m_id;
 
-    int m_duration;
+    int m_duration{ 0 };
     int m_timeToStartDrawing{ 0 };
 };

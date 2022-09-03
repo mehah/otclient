@@ -140,7 +140,7 @@ void ParticleType::load(const OTMLNodePtr& node)
         pColorsStops.push_back(0);
 
     if (pColors.size() != pColorsStops.size())
-        stdext::throw_exception("particle colors must be equal to colorstops-1");
+        throw Exception("particle colors must be equal to colorstops-1");
 
     pTexture->setSmooth(true);
     pTexture->buildHardwareMipmaps();

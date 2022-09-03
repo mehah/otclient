@@ -27,7 +27,9 @@ Color Outfit::getColor(int color)
     if (color >= HSI_H_STEPS * HSI_SI_VALUES)
         color = 0;
 
-    float loc1 = 0, loc2 = 0, loc3 = 0;
+    float loc1 = 0;
+    float loc2 = 0;
+    float loc3 = 0;
     if (color % HSI_H_STEPS != 0) {
         loc1 = color % HSI_H_STEPS * 1.0 / 18.0;
         loc2 = 1;
@@ -77,7 +79,9 @@ Color Outfit::getColor(int color)
         return Color(loc7, loc7, loc7);
     }
 
-    float red = 0, green = 0, blue = 0;
+    float red = 0;
+    float green = 0;
+    float blue = 0;
 
     if (loc1 < 1.0 / 6.0) {
         red = loc3;

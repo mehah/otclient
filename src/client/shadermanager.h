@@ -68,7 +68,10 @@ public:
 
 private:
 
-    PainterShaderProgramPtr m_defaultItemShader, m_defaultOutfitShader, m_defaultMountShader, m_defaultMapShader;
+    PainterShaderProgramPtr m_defaultItemShader;
+    PainterShaderProgramPtr m_defaultOutfitShader;
+    PainterShaderProgramPtr m_defaultMountShader;
+    PainterShaderProgramPtr m_defaultMapShader;
     stdext::map<std::string, PainterShaderProgramPtr> m_shaders;
 };
 

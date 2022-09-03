@@ -24,9 +24,9 @@
 #include "map.h"
 #include "mapview.h"
 #include "spritemanager.h"
-#include <framework/graphics/drawpool.h>
+#include <framework/graphics/drawpoolmanager.h>
 
-LightView::LightView() : m_pool(g_drawPool.get<PoolFramed>(PoolType::LIGHT)) {}
+LightView::LightView() : m_pool(g_drawPool.get<DrawPoolFramed>(DrawPoolType::LIGHT)) {}
 
 void LightView::setSmooth(bool enabled) { m_pool->setSmooth(enabled); }
 
@@ -58,7 +58,7 @@ void LightView::draw(const Rect& dest, const Rect& src)
     const float size = m_tileSize * 3.3;
 
     bool _clr = true;
-    for (auto& light : m_sources) {
+    for (const auto& light : m_sources) {
         if (light.color) {
             const Color color = Color::from8bit(light.color, std::min<float>(light.opacity, light.intensity / 6.f));
             const uint16_t radius = light.intensity * m_tileSize;

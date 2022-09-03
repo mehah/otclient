@@ -105,8 +105,7 @@ void ProtocolGame::sendLoginPacket(uint32_t challengeTimestamp, uint8_t challeng
         msg->addU8(challengeRandom);
     }
 
-    const auto extended = callLuaField<std::string>("getLoginExtendedData");
-    if (!extended.empty())
+    if (const auto extended = callLuaField<std::string>("getLoginExtendedData"); !extended.empty())
         msg->addString(extended);
 
     // complete the bytes for rsa encryption with zeros
@@ -980,4 +979,107 @@ void ProtocolGame::addPosition(const OutputMessagePtr& msg, const Position& posi
     msg->addU16(position.x);
     msg->addU16(position.y);
     msg->addU8(position.z);
+}
+
+void ProtocolGame::sendMarketLeave()
+{
+    const OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientMarketLeave);
+    send(msg);
+}
+
+void ProtocolGame::sendMarketBrowse(uint8_t browseId, uint16_t browseType)
+{
+    const OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientMarketBrowse);
+    if (g_game.getClientVersion() >= 1251) {
+        msg->addU8(browseId);
+        if (browseType > 0) {
+            msg->addU16(browseType);
+        }
+    } else {
+        msg->addU16(browseType);
+    }
+    send(msg);
+}
+
+void ProtocolGame::sendMarketCreateOffer(uint8_t type, uint16_t itemId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous)
+{
+    const OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientMarketCreate);
+    msg->addU8(type);
+    msg->addU16(itemId);
+    ItemPtr item = Item::create(itemId);
+    if (item && item->getClassification() > 0) {
+        msg->addU8(itemTier);
+    }
+    msg->addU16(amount);
+    msg->addU64(price);
+    msg->addU8(anonymous);
+    send(msg);
+}
+
+void ProtocolGame::sendMarketCancelOffer(uint32_t timestamp, uint16_t counter)
+{
+    const OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientMarketCancel);
+    msg->addU32(timestamp);
+    msg->addU16(counter);
+    send(msg);
+}
+
+void ProtocolGame::sendMarketAcceptOffer(uint32_t timestamp, uint16_t counter, uint16_t amount)
+{
+    const OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientMarketAccept);
+    msg->addU32(timestamp);
+    msg->addU16(counter);
+    msg->addU16(amount);
+    send(msg);
+}
+
+void ProtocolGame::sendPreyAction(uint8_t slot, uint8_t actionType, uint16_t index)
+{
+    OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientPreyAction);
+    msg->addU8(slot);
+    msg->addU8(actionType);
+    if (actionType == 2 || actionType == 5) {
+        msg->addU8(index);
+    } else if (actionType == 4) {
+        msg->addU16(index); // raceid
+        send(msg);
+    }
+}
+
+void ProtocolGame::sendPreyRequest()
+{
+    OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientPreyRequest);
+    send(msg);
+}
+
+void ProtocolGame::sendApplyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm)
+{
+    OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientApplyImbuement);
+    msg->addU8(slot);
+    msg->addU32(imbuementId);
+    msg->addU8(protectionCharm ? 1 : 0);
+    send(msg);
+}
+
+void ProtocolGame::sendClearImbuement(uint8_t slot)
+{
+    OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientClearImbuement);
+    msg->addU8(slot);
+    send(msg);
+}
+
+void ProtocolGame::sendCloseImbuingWindow()
+{
+    OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientCloseImbuingWindow);
+    send(msg);
 }

@@ -9,8 +9,11 @@ MarketAction = {
 }
 
 MarketRequest = {
-    MyOffers = 0xFFFE,
-    MyHistory = 0xFFFF
+    MyHistory = 1,
+    MyOffers = 2,
+    BrowseItem = 3,
+    OldMyOffers = 0xFFFE,
+    OldMyHistory = 0xFFFF
 }
 
 MarketOfferState = {
@@ -19,6 +22,14 @@ MarketOfferState = {
     Expired = 2,
     Accepted = 3,
     AcceptedEx = 255
+}
+
+MarketOfferStateString = {
+    [0] = 'active',
+    [1] = 'cancelled',
+    [2] = 'expired',
+    [3] = 'accepted',
+    [255] = 'acceptedEx'
 }
 
 MarketCategory = {
@@ -101,11 +112,17 @@ MarketCategoryStrings = {
     [255] = 'Weapons'
 }
 
-function getMarketCategoryName(id) if table.haskey(MarketCategoryStrings, id) then return MarketCategoryStrings[id] end end
+function getMarketCategoryName(id)
+    if table.haskey(MarketCategoryStrings, id) then
+        return MarketCategoryStrings[id]
+    end
+end
 
 function getMarketCategoryId(name)
     local id = table.find(MarketCategoryStrings, name)
-    if id then return id end
+    if id then
+        return id
+    end
 end
 
 MarketItemDescription = {
@@ -162,12 +179,16 @@ MarketItemDescriptionStrings = {
 }
 
 function getMarketDescriptionName(id)
-    if table.haskey(MarketItemDescriptionStrings, id) then return MarketItemDescriptionStrings[id] end
+    if table.haskey(MarketItemDescriptionStrings, id) then
+        return MarketItemDescriptionStrings[id]
+    end
 end
 
 function getMarketDescriptionId(name)
     local id = table.find(MarketItemDescriptionStrings, name)
-    if id then return id end
+    if id then
+        return id
+    end
 end
 
 MarketSlotFilters = {
@@ -188,7 +209,13 @@ MarketFilters.Last = MarketFilters.Depot
 
 function getMarketSlotFilterId(name)
     local id = table.find(MarketSlotFilters, name)
-    if id then return id end
+    if id then
+        return id
+    end
 end
 
-function getMarketSlotFilterName(id) if table.haskey(MarketSlotFilters, id) then return MarketSlotFilters[id] end end
+function getMarketSlotFilterName(id)
+    if table.haskey(MarketSlotFilters, id) then
+        return MarketSlotFilters[id]
+    end
+end

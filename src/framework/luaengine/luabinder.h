@@ -53,7 +53,7 @@ namespace luabinder
     struct pack_values_into_tuple<0>
     {
         template<typename Tuple>
-        static void call(Tuple& /*tuple*/, LuaInterface* /*lua*/) {}
+        static void call(const Tuple& /*tuple*/, const LuaInterface* /*lua*/) {}
     };
 
     /// C++ function caller that can push results to lua
@@ -175,7 +175,7 @@ namespace luabinder
     std::function<void(const stdext::shared_object_ptr<C>&, const Args&...)> make_mem_func(void (C::* f)(Args...))
     {
         auto mf = std::mem_fn(f);
-        return [=](const stdext::shared_object_ptr<C>& obj, const Args&... args) mutable -> void {
+        return [=](const stdext::shared_object_ptr<C>& obj, const Args&... args) mutable {
             if (!obj)
                 throw LuaException("failed to call a member function because the passed object is nil");
             mf(obj.get(), args...);
@@ -193,7 +193,7 @@ namespace luabinder
     std::function<void(const Args&...)> make_mem_func_singleton(void (C::* f)(Args...), C* instance)
     {
         auto mf = std::mem_fn(f);
-        return [=](Args... args) mutable -> void { mf(instance, args...); };
+        return [=](Args... args) mutable { mf(instance, args...); };
     }
 
     /// Bind member functions

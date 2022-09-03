@@ -319,7 +319,7 @@ protected:
                                 bool ignoreCase,            // whether to ignore case in the end tag
                                 TiXmlEncoding encoding);    // the current encoding
 
-// If an entity has been found, transform it into a character.
+    // If an entity has been found, transform it into a character.
     static const char* GetEntity(const char* in, char* value, int* length, TiXmlEncoding encoding);
 
     // Get a character, while interpreting entities.
@@ -478,7 +478,7 @@ public:
         this is more efficient than calling Value().
         Only available in STL mode.
     */
-    const std::string ValueStr() const { return value; }
+    std::string ValueStr() const { return value; }
 #endif
 
     const TIXML_STRING& ValueTStr() const { return value; }
@@ -532,22 +532,22 @@ public:
     TiXmlNode* LastChild(const std::string_view _value) { return LastChild(_value.data()); }    ///< STL std::string form.
 #endif
 
-/** An alternate way to walk the children of a node.
-    One way to iterate over nodes is:
-    @verbatim
-        for( child = parent->FirstChild(); child; child = child->NextSibling() )
-    @endverbatim
+    /** An alternate way to walk the children of a node.
+        One way to iterate over nodes is:
+        @verbatim
+            for( child = parent->FirstChild(); child; child = child->NextSibling() )
+        @endverbatim
 
-    IterateChildren does the same thing with the syntax:
-    @verbatim
-        child = 0;
-        while( child = parent->IterateChildren( child ) )
-    @endverbatim
+        IterateChildren does the same thing with the syntax:
+        @verbatim
+            child = 0;
+            while( child = parent->IterateChildren( child ) )
+        @endverbatim
 
-    IterateChildren takes the previous child as input and finds
-    the next one. If the previous child is null, it returns the
-    first. IterateChildren will return null when done.
-*/
+        IterateChildren takes the previous child as input and finds
+        the next one. If the previous child is null, it returns the
+        first. IterateChildren will return null when done.
+    */
     const TiXmlNode* IterateChildren(const TiXmlNode* previous) const;
     TiXmlNode* IterateChildren(const TiXmlNode* previous)
     {
@@ -566,9 +566,9 @@ public:
     TiXmlNode* IterateChildren(const std::string_view _value, const TiXmlNode* previous) { return IterateChildren(_value.data(), previous); }    ///< STL std::string form.
 #endif
 
-/** Add a new node related to this. Adds a child past the LastChild.
-    Returns a pointer to the new object or NULL if an error occured.
-*/
+    /** Add a new node related to this. Adds a child past the LastChild.
+        Returns a pointer to the new object or NULL if an error occured.
+    */
     TiXmlNode* InsertEndChild(const TiXmlNode& addThis);
 
     /** Add a new node related to this. Adds a child past the LastChild.
@@ -618,7 +618,7 @@ public:
     TiXmlNode* NextSibling(const std::string_view _value) { return NextSibling(_value.data()); }    ///< STL std::string form.
 #endif
 
-/// Navigate to a sibling node.
+    /// Navigate to a sibling node.
     const TiXmlNode* NextSibling() const { return next; }
     TiXmlNode* NextSibling() { return next; }
 
@@ -654,7 +654,7 @@ public:
     TiXmlElement* NextSiblingElement(const std::string_view _value) { return NextSiblingElement(_value.data()); }    ///< STL std::string form.
 #endif
 
-/// Convenience function to get through elements.
+    /// Convenience function to get through elements.
     const TiXmlElement* FirstChildElement()    const;
     TiXmlElement* FirstChildElement()
     {
@@ -673,10 +673,10 @@ public:
     TiXmlElement* FirstChildElement(const std::string_view _value) { return FirstChildElement(_value.data()); }    ///< STL std::string form.
 #endif
 
-/** Query the type (as an enumerated value, above) of this node.
-    The possible types are: TINYXML_DOCUMENT, TINYXML_ELEMENT, TINYXML_COMMENT,
-                            TINYXML_UNKNOWN, TINYXML_TEXT, and TINYXML_DECLARATION.
-*/
+    /** Query the type (as an enumerated value, above) of this node.
+        The possible types are: TINYXML_DOCUMENT, TINYXML_ELEMENT, TINYXML_COMMENT,
+                                TINYXML_UNKNOWN, TINYXML_TEXT, and TINYXML_DECLARATION.
+    */
     int Type() const { return type; }
 
     /** Return a pointer to the Document this node lives in.
@@ -803,7 +803,7 @@ public:
     const char* Name()  const { return name.data(); }        ///< Return the name of this attribute.
     const char* Value() const { return value.data(); }        ///< Return the value of this attribute.
 #ifdef TIXML_USE_STL
-    const std::string ValueStr() const { return value; }                ///< Return the value of this attribute.
+    std::string ValueStr() const { return value; }                ///< Return the value of this attribute.
 #endif
     int                IntValue() const;                                    ///< Return the value of this attribute, converted to an integer.
     double            DoubleValue() const;                                ///< Return the value of this attribute, converted to a double.
@@ -831,7 +831,7 @@ public:
     void SetDoubleValue(double _value);                                ///< Set the value from a double.
 
 #ifdef TIXML_USE_STL
-/// STL std::string form.
+    /// STL std::string form.
     void SetName(const std::string_view _name) { name = _name; }
     /// STL std::string form.
     void SetValue(const std::string_view _value) { value = _value; }
@@ -942,8 +942,7 @@ public:
     T readType(const std::string_view str) const
     {
         T ret;
-        const int r = QueryValueAttribute(str, &ret);
-        if (r == TIXML_NO_ATTRIBUTE || r == TIXML_WRONG_TYPE)
+        if (const int r = QueryValueAttribute(str, &ret); r == TIXML_NO_ATTRIBUTE || r == TIXML_WRONG_TYPE)
             return T();
         return ret;
     }
@@ -1104,8 +1103,6 @@ protected:
     void StreamIn(std::istream* in, TIXML_STRING* tag) override;
 #endif
     //    virtual void StreamOut( TIXML_OSTREAM * out ) const;
-
-private:
 };
 
 /** XML text. A text node can have 2 ways to output the next. "normal" output
@@ -1682,7 +1679,7 @@ public:
 
 #ifdef TIXML_USE_STL
     /// Return the result.
-    const std::string Str() { return buffer; }
+    std::string Str() { return buffer; }
 #endif
 
 private:

@@ -63,7 +63,6 @@ public:
     bool operator==(const Matrix<N, M, T>& other) const;
     bool operator!=(const Matrix<N, M, T>& other) const;
 
-protected:
     Matrix<N, M, T>& generateHash()
     {
         m_hash = 0;
@@ -220,15 +219,16 @@ Matrix<M, Q, T> operator*(const Matrix<M, N, T>& a, const Matrix<P, Q, T>& b)
 {
     static_assert(N == P, "N==P");
     Matrix<M, Q, T> c(1);
-    for (int i = 1; i <= M; ++i) {
-        for (int j = 1; j <= Q; ++j) {
+    for (int i = 0; ++i <= M;) {
+        for (int j = 0; ++j <= Q;) {
             T sum = 0;
-            for (int k = 1; k <= N; ++k)
+            for (int k = 0; ++k <= N;)
                 sum += a(i, k) * b(k, j);
             c(i, j) = sum;
         }
     }
-    return c;
+
+    return c.generateHash();
 }
 
 template<int M, int N, typename T>

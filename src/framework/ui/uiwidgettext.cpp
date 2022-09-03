@@ -22,7 +22,7 @@
 
 #include "uitranslator.h"
 #include "uiwidget.h"
-#include <framework/graphics/drawpool.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/fontmanager.h>
 
 void UIWidget::initText()

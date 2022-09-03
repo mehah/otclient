@@ -111,10 +111,9 @@ public:
         if (color >= 216 || color <= 0)
             return Color(0, 0, 0);
 
-        const int
-            r = static_cast<int>((color / 36 % 6 * 51) * brightness),
-            g = static_cast<int>((color / 6 % 6 * 51) * brightness),
-            b = static_cast<int>((color % 6 * 51) * brightness);
+        const int r = static_cast<int>((color / 36 % 6 * 51) * brightness);
+        const int g = static_cast<int>((color / 6 % 6 * 51) * brightness);
+        const int b = static_cast<int>((color % 6 * 51) * brightness);
 
         return Color(r, g, b);
     }
@@ -129,10 +128,10 @@ public:
 private:
     void update();
 
-    float m_r{ 1.f },
-        m_g{ 1.f },
-        m_b{ 1.f },
-        m_a{ 1.f };
+    float m_r{ 1.f };
+    float m_g{ 1.f };
+    float m_b{ 1.f };
+    float m_a{ 1.f };
 
     uint32_t m_rgba{ UINT32_MAX };
 };

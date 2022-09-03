@@ -9,7 +9,9 @@ function init()
     })
 
     local dialog = rootWidget:recursiveGetChildById('modalDialog')
-    if dialog then modalDialog = dialog end
+    if dialog then
+        modalDialog = dialog
+    end
 end
 
 function terminate()
@@ -28,7 +30,9 @@ end
 
 function onModalDialog(id, title, message, buttons, enterButton, escapeButton, choices, priority)
     -- priority parameter is unused, not sure what its use is.
-    if modalDialog then return end
+    if modalDialog then
+        return
+    end
 
     modalDialog = g_ui.createWidget('ModalDialog', rootWidget)
 
@@ -49,12 +53,18 @@ function onModalDialog(id, title, message, buttons, enterButton, escapeButton, c
         label.choiceId = choiceId
         label:setText(choiceName)
         label:setPhantom(false)
-        if not labelHeight then labelHeight = label:getHeight() end
+        if not labelHeight then
+            labelHeight = label:getHeight()
+        end
     end
     choiceList:focusChild(choiceList:getFirstChild())
 
-    g_keyboard.bindKeyPress('Down', function() choiceList:focusNextChild(KeyboardFocusReason) end, modalDialog)
-    g_keyboard.bindKeyPress('Up', function() choiceList:focusPreviousChild(KeyboardFocusReason) end, modalDialog)
+    g_keyboard.bindKeyPress('Down', function()
+        choiceList:focusNextChild(KeyboardFocusReason)
+    end, modalDialog)
+    g_keyboard.bindKeyPress('Up', function()
+        choiceList:focusPreviousChild(KeyboardFocusReason)
+    end, modalDialog)
 
     local buttonsWidth = 0
     for i = 1, #buttons do
@@ -66,7 +76,9 @@ function onModalDialog(id, title, message, buttons, enterButton, escapeButton, c
         button.onClick = function(self)
             local focusedChoice = choiceList:getFocusedChild()
             local choice = 0xFF
-            if focusedChoice then choice = focusedChoice.choiceId end
+            if focusedChoice then
+                choice = focusedChoice.choiceId
+            end
             g_game.answerModalDialog(id, buttonId, choice)
             destroyDialog()
         end
@@ -96,7 +108,9 @@ function onModalDialog(id, title, message, buttons, enterButton, escapeButton, c
     local enterFunc = function()
         local focusedChoice = choiceList:getFocusedChild()
         local choice = 0xFF
-        if focusedChoice then choice = focusedChoice.choiceId end
+        if focusedChoice then
+            choice = focusedChoice.choiceId
+        end
         g_game.answerModalDialog(id, enterButton, choice)
         destroyDialog()
     end
@@ -104,7 +118,9 @@ function onModalDialog(id, title, message, buttons, enterButton, escapeButton, c
     local escapeFunc = function()
         local focusedChoice = choiceList:getFocusedChild()
         local choice = 0xFF
-        if focusedChoice then choice = focusedChoice.choiceId end
+        if focusedChoice then
+            choice = focusedChoice.choiceId
+        end
         g_game.answerModalDialog(id, escapeButton, choice)
         destroyDialog()
     end

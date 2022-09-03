@@ -78,7 +78,7 @@ private:
     stdext::small_dynamic_storage<HouseAttr, HouseAttrLast> m_attribs;
     TileMap m_tiles;
     ItemVector m_doors;
-    uint32_t m_lastDoorId;
+    uint32_t m_lastDoorId{ 0 };
     bool m_isGuildHall{ false };
 
     friend class HouseManager;

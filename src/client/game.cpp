@@ -68,7 +68,7 @@ void Game::resetGameStates()
     m_unjustifiedPoints = UnjustifiedPoints();
     m_nextScheduledDir = Otc::InvalidDirection;
 
-    for (auto& it : m_containers) {
+    for (const auto& it : m_containers) {
         const ContainerPtr& container = it.second;
         if (container)
             container->onClose();
@@ -174,9 +174,7 @@ void Game::processGameStart()
     disableBotCall();
 
     if (g_game.getFeature(Otc::GameClientPing) || g_game.getFeature(Otc::GameExtendedClientPing)) {
-        m_pingEvent = g_dispatcher.scheduleEvent([this] {
-            g_game.ping();
-        }, m_pingDelay);
+        m_pingEvent = g_dispatcher.scheduleEvent([] { g_game.ping(); }, m_pingDelay);
     }
 
     m_checkConnectionEvent = g_dispatcher.cycleEvent([this] {
@@ -502,10 +500,10 @@ void Game::processWalkCancel(Otc::Direction direction)
 void Game::loginWorld(const std::string_view account, const std::string_view password, const std::string_view worldName, const std::string_view worldHost, int worldPort, const std::string_view characterName, const std::string_view authenticatorToken, const std::string_view sessionKey)
 {
     if (m_protocolGame || isOnline())
-        stdext::throw_exception("Unable to login into a world while already online or logging.");
+        throw Exception("Unable to login into a world while already online or logging.");
 
     if (m_protocolVersion == 0)
-        stdext::throw_exception("Must set a valid game protocol version before logging.");
+        throw Exception("Must set a valid game protocol version before logging.");
 
     // reset the new game state
     resetGameStates();
@@ -587,10 +585,9 @@ bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
     }
 
     const Position toPos = m_localPlayer->getPosition().translatedToDirection(direction);
-    const TilePtr toTile = g_map.getTile(toPos);
 
     // only do prewalks to walkable tiles (like grounds and not walls)
-    if (toTile && toTile->isWalkable()) {
+    if (const TilePtr toTile = g_map.getTile(toPos); toTile && toTile->isWalkable()) {
         m_localPlayer->preWalk(direction);
     } else {
         // check if can walk to a lower floor
@@ -600,8 +597,7 @@ bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
                 return false;
 
             // check walk to another floor (e.g: when above 3 parcels)
-            const TilePtr toTile = g_map.getTile(pos);
-            if (toTile && toTile->hasElevation(3))
+            if (const TilePtr toTile = g_map.getTile(pos); toTile && toTile->hasElevation(3))
                 return true;
 
             return false;
@@ -609,16 +605,14 @@ bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
 
         // check if can walk to a higher floor
         auto canChangeFloorUp = [&]() -> bool {
-            const TilePtr fromTile = m_localPlayer->getTile();
-            if (!fromTile || !fromTile->hasElevation(3))
+            if (const TilePtr fromTile = m_localPlayer->getTile(); !fromTile || !fromTile->hasElevation(3))
                 return false;
 
             Position pos = toPos;
             if (!pos.up())
 
                 return false;
-            const TilePtr toTile = g_map.getTile(pos);
-            if (!toTile || !toTile->isWalkable())
+            if (const TilePtr toTile = g_map.getTile(pos); !toTile || !toTile->isWalkable())
                 return false;
 
             return true;
@@ -641,12 +635,12 @@ bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
     return true;
 }
 
-void Game::autoWalk(std::vector<Otc::Direction> dirs, Position startPos)
+void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& startPos)
 {
     if (!canPerformGameAction())
         return;
 
-    if (dirs.empty())
+    if (dirs.size() == 0)
         return;
 
     // protocol limits walk path
@@ -663,13 +657,14 @@ void Game::autoWalk(std::vector<Otc::Direction> dirs, Position startPos)
     const auto it = dirs.begin();
     const Otc::Direction direction = *it;
 
-    const TilePtr toTile = g_map.getTile(startPos.translatedToDirection(direction));
-    if (startPos == m_localPlayer->m_position && toTile && toTile->isWalkable() && !m_localPlayer->isWalking() && m_localPlayer->canWalk(true)) {
-        m_localPlayer->preWalk(direction);
+    uint8_t flags = 0x04; // auto walk flag
 
-        forceWalk(direction);
-        dirs.erase(it);
+    TilePtr toTile = g_map.getTile(startPos.translatedToDirection(direction));
+    if (startPos == m_localPlayer->m_lastPrewalkDestination && toTile && toTile->isWalkable() && !m_localPlayer->isWalking() && m_localPlayer->canWalk(true)) {
+        m_localPlayer->preWalk(direction);
+        flags |= 0x01; // prewalk flag
     }
+
 
     g_lua.callGlobalField("g_game", "onAutoWalk", dirs);
 
@@ -846,7 +841,7 @@ void Game::useInventoryItemWith(int itemId, const ThingPtr& toThing)
 
 ItemPtr Game::findItemInContainers(uint32_t itemId, int subType)
 {
-    for (auto& it : m_containers) {
+    for (const auto& it : m_containers) {
         const ContainerPtr& container = it.second;
 
         if (container) {
@@ -1530,10 +1525,10 @@ void Game::setProtocolVersion(int version)
         return;
 
     if (isOnline())
-        stdext::throw_exception("Unable to change protocol version while online");
+        throw Exception("Unable to change protocol version while online");
 
     if (version != 0 && (version < 740 || version > m_lastSupportedVersion))
-        stdext::throw_exception(stdext::format("Protocol version %d not supported", version));
+        throw Exception("Protocol version %d not supported", version);
 
     m_protocolVersion = version;
 
@@ -1548,10 +1543,10 @@ void Game::setClientVersion(int version)
         return;
 
     if (isOnline())
-        stdext::throw_exception("Unable to change client version while online");
+        throw Exception("Unable to change client version while online");
 
     if (version != 0 && (version < 740 || version > m_lastSupportedVersion))
-        stdext::throw_exception(stdext::format("Client version %d not supported", version));
+        throw Exception("Client version %d not supported", version);
 
     m_features.reset();
     enableFeature(Otc::GameFormatCreatureName);
@@ -1727,6 +1722,7 @@ void Game::setClientVersion(int version)
     }
 
     if (version >= 1200) {
+        enableFeature(Otc::GamePrey);
         enableFeature(Otc::GameThingQuickLoot);
     }
 
@@ -1817,4 +1813,67 @@ Otc::OperatingSystem_t Game::getOs()
         return Otc::CLIENTOS_OTCLIENT_MAC;
 
     return Otc::CLIENTOS_OTCLIENT_LINUX;
+}
+
+void Game::leaveMarket()
+{
+    m_protocolGame->sendMarketLeave();
+    g_lua.callGlobalField("g_game", "onMarketLeave");
+}
+
+void Game::browseMarket(uint8_t browseId, uint16_t browseType)
+{
+    m_protocolGame->sendMarketBrowse(browseId, browseType);
+}
+
+void Game::createMarketOffer(uint8_t type, uint16_t itemId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous)
+{
+    m_protocolGame->sendMarketCreateOffer(type, itemId, itemTier, amount, price, anonymous);
+}
+
+void Game::cancelMarketOffer(uint32_t timestamp, uint16_t counter)
+{
+    m_protocolGame->sendMarketCancelOffer(timestamp, counter);
+}
+
+void Game::acceptMarketOffer(uint32_t timestamp, uint16_t counter, uint16_t amount)
+{
+    m_protocolGame->sendMarketAcceptOffer(timestamp, counter, amount);
+}
+
+void Game::preyAction(uint8_t slot, uint8_t actionType, uint16_t index)
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendPreyAction(slot, actionType, index);
+}
+
+void Game::preyRequest()
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendPreyRequest();
+}
+
+void Game::applyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm)
+{
+    if (!canPerformGameAction())
+        return;
+    m_protocolGame->sendApplyImbuement(slot, imbuementId, protectionCharm);
+}
+
+void Game::clearImbuement(uint8_t slot)
+{
+    if (!canPerformGameAction())
+        return;
+    m_protocolGame->sendClearImbuement(slot);
+}
+
+void Game::closeImbuingWindow()
+{
+    if (!canPerformGameAction())
+        return;
+    m_protocolGame->sendCloseImbuingWindow();
 }

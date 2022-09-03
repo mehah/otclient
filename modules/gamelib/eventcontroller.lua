@@ -15,15 +15,21 @@ function EventController:new(actor, events)
 end
 
 function EventController:connect()
-    if self.connected then return end
+    if self.connected then
+        return
+    end
     self.connected = true
     connect(self.actor, self.events)
 end
 
 function EventController:disconnect()
-    if not self.connected then return end
+    if not self.connected then
+        return
+    end
     self.connected = false
     disconnect(self.actor, self.events)
 end
 
-function EventController:execute(name, ...) self.events[name](...) end
+function EventController:execute(name, ...)
+    self.events[name](...)
+end

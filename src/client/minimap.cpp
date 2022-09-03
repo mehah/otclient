@@ -25,7 +25,7 @@
 
 #include <framework/core/filestream.h>
 #include <framework/core/resourcemanager.h>
-#include <framework/graphics/drawpool.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/image.h>
 #include <framework/graphics/texture.h>
 #include <zlib.h>
@@ -118,8 +118,7 @@ void Minimap::draw(const Rect& screenRect, const Position& mapCenter, float scal
             if (x < 0 || x >= 65536)
                 continue;
 
-            Position blockPos(x, y, mapCenter.z);
-            if (!hasBlock(blockPos))
+            if (Position blockPos(x, y, mapCenter.z); !hasBlock(blockPos))
                 continue;
 
             MinimapBlock& block = getBlock(Position(x, y, mapCenter.z));
@@ -173,7 +172,8 @@ Rect Minimap::getTileRect(const Position& pos, const Rect& screenRect, const Pos
 
 Rect Minimap::calcMapRect(const Rect& screenRect, const Position& mapCenter, float scale)
 {
-    const int w = screenRect.width() / scale, h = std::ceil(screenRect.height() / scale);
+    const int w = screenRect.width() / scale;
+    const int h = std::ceil(screenRect.height() / scale);
     Rect mapRect(0, 0, w, h);
     mapRect.moveCenter(Point(mapCenter.x, mapCenter.y));
     return mapRect;
@@ -266,7 +266,7 @@ bool Minimap::loadImage(const std::string& fileName, const Position& topLeft, fl
                 }
 
                 if (flags != 0) {
-                    for (Color& col : nonWalkableColors) {
+                    for (const Color& col : nonWalkableColors) {
                         if (col == color) {
                             flags |= MinimapTileNotWalkable;
                             break;
@@ -275,7 +275,7 @@ bool Minimap::loadImage(const std::string& fileName, const Position& topLeft, fl
                 }
 
                 if (flags != 0) {
-                    for (Color& col : nonPathableColors) {
+                    for (const Color& col : nonPathableColors) {
                         if (col == color) {
                             flags |= MinimapTileNotPathable;
                             break;
@@ -298,7 +298,7 @@ bool Minimap::loadImage(const std::string& fileName, const Position& topLeft, fl
             }
         }
         return true;
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("failed to load OTMM minimap: %s", e.what()));
         return false;
     }
@@ -314,13 +314,13 @@ bool Minimap::loadOtmm(const std::string& fileName)
     try {
         const FileStreamPtr fin = g_resources.openFile(fileName);
         if (!fin)
-            stdext::throw_exception("unable to open file");
+            throw Exception("unable to open file");
 
         fin->cache();
 
         const uint32_t signature = fin->getU32();
         if (signature != OTMM_SIGNATURE)
-            stdext::throw_exception("invalid OTMM file");
+            throw Exception("invalid OTMM file");
 
         const uint16_t start = fin->getU16();
         const uint16_t version = fin->getU16();
@@ -333,7 +333,7 @@ bool Minimap::loadOtmm(const std::string& fileName)
                 break;
             }
             default:
-                stdext::throw_exception("OTMM version not supported");
+                throw Exception("OTMM version not supported");
         }
 
         fin->seek(start);
@@ -369,7 +369,7 @@ bool Minimap::loadOtmm(const std::string& fileName)
 
         fin->close();
         return true;
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("failed to load OTMM minimap: %s", e.what()));
         return false;
     }
@@ -401,12 +401,12 @@ void Minimap::saveOtmm(const std::string& fileName)
         fin->addU16(start);
         fin->seek(start);
 
-        constexpr uint32_t blockSize = MMBLOCK_SIZE * MMBLOCK_SIZE * sizeof(MinimapTile),
-            COMPRESS_LEVEL = 3;
+        constexpr uint32_t blockSize = MMBLOCK_SIZE * MMBLOCK_SIZE * sizeof(MinimapTile);
+        constexpr uint32_t COMPRESS_LEVEL = 3;
         std::vector<uint8_t> compressBuffer(compressBound(blockSize));
 
         for (uint_fast8_t z = 0; z <= MAX_Z; ++z) {
-            for (auto& it : m_tileBlocks[z]) {
+            for (const auto& it : m_tileBlocks[z]) {
                 const int index = it.first;
                 MinimapBlock& block = *it.second;
                 if (!block.wasSeen())
@@ -434,7 +434,7 @@ void Minimap::saveOtmm(const std::string& fileName)
         fin->flush();
 
         fin->close();
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("failed to save OTMM minimap: %s", e.what()));
     }
 }

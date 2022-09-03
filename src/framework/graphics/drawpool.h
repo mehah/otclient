@@ -22,63 +22,262 @@
 
 #pragma once
 
-#include <framework/core/graphicalapplication.h>
-#include <framework/graphics/declarations.h>
-#include <framework/graphics/framebuffer.h>
-#include <framework/graphics/graphics.h>
-#include <framework/graphics/pool.h>
+#include <utility>
+#include <optional>
+
+#include "declarations.h"
+#include "framebuffer.h"
+#include "framework/core/timer.h"
+#include "texture.h"
+
+#include "../stdext/storage.h"
+
+enum class DrawPoolType : uint8_t
+{
+    MAP,
+    CREATURE_INFORMATION,
+    LIGHT,
+    TEXT,
+    FOREGROUND,
+    UNKNOW
+};
 
 class DrawPool
 {
 public:
-    template <class T>
-    T* get(const PoolType type) { return static_cast<T*>(m_pools[static_cast<uint8_t>(type)]); }
+    enum class DrawOrder
+    {
+        NONE = -1,
+        FIRST,  // GROUND
+        SECOND, // BORDER
+        THIRD,  // BOTTOM & TOP
+        FOURTH, // TOP ~ TOP
+        FIFTH,  // ABOVE ALL - MISSILE
+        LAST
+    };
 
-    void select(PoolType type) { m_currentPool = get<Pool>(type); }
-    void use(PoolType type);
-    void use(PoolType type, const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha);
+    void setEnable(const bool v) { m_enabled = v; }
+    bool isEnabled() const { return m_enabled; }
+    DrawPoolType getType() const { return m_type; }
+    bool isType(DrawPoolType type) const { return m_type == type; }
 
-    void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Color& color = Color::white);
-    void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white, const Point& originalDest = {}, const DrawBufferPtr& buffer = nullptr);
-    void addTexturedCoordsBuffer(const TexturePtr& texture, const CoordsBufferPtr& coords, const Color& color = Color::white);
-    void addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white);
-    void addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white);
-    void addFilledRect(const Rect& dest, const Color& color = Color::white);
-    void addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color = Color::white);
-    void addBoundingRect(const Rect& dest, const Color& color = Color::white, int innerLineWidth = 1);
-    void addAction(std::function<void()> action);
+    bool canRepaint() { return canRepaint(false); }
+    void repaint() { m_status.first = 1; }
 
-    void setOpacity(const float opacity, bool onLastDrawing = false) { m_currentPool->setOpacity(opacity, onLastDrawing); }
-    void setClipRect(const Rect& clipRect, bool onLastDrawing = false) { m_currentPool->setClipRect(clipRect, onLastDrawing); }
-    void setBlendEquation(BlendEquation equation, bool onLastDrawing = false) { m_currentPool->setBlendEquation(equation, onLastDrawing); }
-    void setCompositionMode(const CompositionMode mode, bool onLastDrawing = false) { m_currentPool->setCompositionMode(mode, onLastDrawing); }
-    void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onLastDrawing = false, const std::function<void()>& action = nullptr) { m_currentPool->setShaderProgram(shaderProgram, onLastDrawing, action); }
+protected:
+    struct PoolState
+    {
+        Matrix3 transformMatrix;
+        Color color;
+        float opacity{ 1.f };
+        CompositionMode compositionMode{ CompositionMode::NORMAL };
+        BlendEquation blendEquation{ BlendEquation::ADD };
+        Rect clipRect;
+        TexturePtr texture;
+        PainterShaderProgram* shaderProgram{ nullptr };
+        std::function<void()> action{ nullptr };
 
-    float getOpacity(bool onLastDrawing = false) { return m_currentPool->getOpacity(onLastDrawing); }
-    Rect getClipRect(bool onLastDrawing = false) { return m_currentPool->getClipRect(onLastDrawing); }
+        bool operator==(const PoolState& s2) const
+        {
+            return
+                transformMatrix == s2.transformMatrix &&
+                color == s2.color &&
+                opacity == s2.opacity &&
+                compositionMode == s2.compositionMode &&
+                blendEquation == s2.blendEquation &&
+                clipRect == s2.clipRect &&
+                texture == s2.texture &&
+                shaderProgram == s2.shaderProgram;
+        }
+    };
 
-    void resetState() { m_currentPool->resetState(); }
-    void resetOpacity() { m_currentPool->resetOpacity(); }
-    void resetClipRect() { m_currentPool->resetClipRect(); }
-    void resetShaderProgram() { m_currentPool->resetShaderProgram(); }
-    void resetCompositionMode() { m_currentPool->resetCompositionMode(); }
+    enum class DrawMethodType
+    {
+        RECT,
+        TRIANGLE,
+        REPEATED_RECT,
+        BOUNDING_RECT,
+        UPSIDEDOWN_RECT,
+    };
 
-    void flush() { if (m_currentPool) m_currentPool->flush(); }
+    struct DrawMethod
+    {
+        DrawMethodType type;
+        std::optional<std::pair<Rect, Rect>> rects;
+        std::optional<std::tuple<Point, Point, Point>> points;
+        std::optional<Point> dest;
+        uint16_t intValue{ 0 };
+    };
+
+    struct DrawObject
+    {
+        DrawObject(std::function<void()> action) : action(std::move(action)) {}
+        DrawObject(const PoolState& state, const DrawBufferPtr& buffer) : state(state), buffer(buffer) {}
+        DrawObject(const DrawMode drawMode, const PoolState& state, const DrawMethod& method) :
+            drawMode(drawMode), state(state), method(method)
+        {}
+
+        void addMethod(const DrawMethod& method)
+        {
+            if (!methods.has_value()) {
+                methods = std::vector<DrawMethod>();
+                methods->emplace_back(*this->method);
+            }
+            drawMode = DrawMode::TRIANGLES;
+            methods->emplace_back(method);
+        }
+
+        DrawMode drawMode{ DrawMode::TRIANGLES };
+        DrawBufferPtr buffer;
+        std::optional<PoolState> state;
+        std::optional<DrawMethod> method;
+        std::optional<std::vector<DrawMethod>> methods;
+        std::function<void()> action{ nullptr };
+    };
+
+    struct DrawObjectState
+    {
+        CompositionMode compositionMode{ CompositionMode::NORMAL };
+        BlendEquation blendEquation{ BlendEquation::ADD };
+        Rect clipRect;
+        float opacity{ 1.f };
+        PainterShaderProgram* shaderProgram{ nullptr };
+        std::function<void()> action{ nullptr };
+    };
+
 private:
-    void draw();
-    void init();
-    void terminate();
-    void drawObject(const Pool::DrawObject& obj);
+    static constexpr uint8_t ARR_MAX_Z = MAX_Z + 1;
+    static DrawPool* create(const DrawPoolType type);
 
-    CoordsBuffer m_coordsBuffer;
-    std::array<Pool*, static_cast<uint8_t>(PoolType::UNKNOW) + 1> m_pools{};
+    DrawObject& getLastDrawObject()
+    {
+        auto& list = m_objects[m_currentFloor][m_currentOrder];
+        return list[list.size() - 1];
+    }
 
-    Pool* m_currentPool{ nullptr };
+    void add(const Color& color, const TexturePtr& texture, const DrawPool::DrawMethod& method,
+             DrawMode drawMode = DrawMode::TRIANGLES, const DrawBufferPtr& drawBuffer = nullptr,
+             const CoordsBufferPtr& coordsBuffer = nullptr);
 
-    Size m_size;
-    Matrix3 m_transformMatrix;
+    void addCoords(const DrawPool::DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode);
+    void updateHash(const PoolState& state, const DrawPool::DrawMethod& method, size_t& stateHash, size_t& methodHash);
 
-    friend class GraphicalApplication;
+    float getOpacity(bool lastDrawing = false) { return !lastDrawing ? m_state.opacity : getLastDrawObject().state->opacity; }
+    Rect getClipRect(bool lastDrawing = false) { return !lastDrawing ? m_state.clipRect : getLastDrawObject().state->clipRect; }
+
+    void setCompositionMode(CompositionMode mode, bool onLastDrawing = false);
+    void setBlendEquation(BlendEquation equation, bool onLastDrawing = false);
+    void setClipRect(const Rect& clipRect, bool onLastDrawing = false);
+    void setOpacity(float opacity, bool onLastDrawing = false);
+    void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onLastDrawing = false, const std::function<void()>& action = nullptr);
+
+    void resetState();
+    void resetOpacity() { m_state.opacity = 1.f; }
+    void resetClipRect() { m_state.clipRect = {}; }
+    void resetShaderProgram() { m_state.shaderProgram = nullptr; }
+    void resetCompositionMode() { m_state.compositionMode = CompositionMode::NORMAL; }
+    void resetBlendEquation() { m_state.blendEquation = BlendEquation::ADD; }
+
+    void clear();
+    void flush()
+    {
+        m_objectsByhash.clear();
+        if (m_currentFloor < ARR_MAX_Z - 1)
+            ++m_currentFloor;
+    }
+
+    virtual bool hasFrameBuffer() const { return false; };
+    virtual DrawPoolFramed* toPoolFramed() { return nullptr; }
+
+    bool canRepaint(bool autoUpdateStatus);
+
+    bool m_enabled{ true };
+    bool m_alwaysGroupDrawings{ false };
+    bool m_autoUpdate{ false };
+
+    uint8_t m_currentOrder{ 0 };
+    uint8_t m_currentFloor{ 0 };
+
+    uint16_t m_refreshTimeMS{ 0 };
+
+    PoolState m_state;
+
+    DrawPoolType m_type{ DrawPoolType::UNKNOW };
+
+    Timer m_refreshTimer;
+
+    std::pair<size_t, size_t> m_status{ 1, 0 };
+
+    std::vector<DrawObject> m_objects[ARR_MAX_Z][static_cast<uint8_t>(DrawOrder::LAST)];
+    stdext::map<size_t, DrawObject> m_objectsByhash;
+
+    friend DrawPoolManager;
 };
 
-extern DrawPool g_drawPool;
+class DrawPoolFramed : public DrawPool
+{
+public:
+    void onBeforeDraw(std::function<void()> f) { m_beforeDraw = std::move(f); }
+    void onAfterDraw(std::function<void()> f) { m_afterDraw = std::move(f); }
+    void setSmooth(bool enabled) { m_framebuffer->setSmooth(enabled); }
+    void resize(const Size& size) { m_framebuffer->resize(size); }
+    Size getSize() { return m_framebuffer->getSize(); }
+
+protected:
+    DrawPoolFramed(const FrameBufferPtr& fb) : m_framebuffer(fb) {};
+
+    friend DrawPoolManager;
+    friend DrawPool;
+
+private:
+    bool hasFrameBuffer() const override { return true; }
+    DrawPoolFramed* toPoolFramed() override { return this; }
+
+    FrameBufferPtr m_framebuffer;
+
+    std::function<void()> m_beforeDraw;
+    std::function<void()> m_afterDraw;
+};
+
+extern DrawPoolManager g_drawPool;
+
+class DrawBuffer
+{
+public:
+    DrawBuffer(DrawPool::DrawOrder order, bool agroup = true) : m_agroup(agroup), m_order(order) {}
+    void agroup(bool v) { m_agroup = v; }
+    void setOrder(DrawPool::DrawOrder order) { m_order = order; }
+
+private:
+    static DrawBufferPtr createTemporaryBuffer(DrawPool::DrawOrder order)
+    {
+        auto buffer = std::make_shared<DrawBuffer>(order);
+        buffer->m_i = -2; // identifier to say it is a temporary buffer.
+        return buffer;
+    }
+
+    void invalidate() { m_i = -1; }
+
+    inline bool isValid() { return m_i != -1; }
+    inline bool isTemporary() { return m_i == -2; }
+
+    bool validate(const Point& p)
+    {
+        if (m_ref != p) { m_ref = p; invalidate(); }
+        return isValid();
+    }
+
+    inline CoordsBuffer* getCoords() { return (m_coords ? m_coords : m_coords = std::make_shared<CoordsBuffer>()).get(); }
+
+    int m_i{ -1 };
+    bool m_agroup{ true };
+    DrawPool::DrawOrder m_order{ DrawPool::DrawOrder::FIRST };
+    Point m_ref;
+    size_t m_stateHash{ 0 };
+
+    std::vector<size_t> m_hashs;
+    CoordsBufferPtr m_coords;
+
+    friend class DrawPool;
+    friend class DrawPoolManager;
+};

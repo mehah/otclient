@@ -15,12 +15,16 @@ function UIScrollArea:onStyleApply(styleName, styleNode)
         if name == 'vertical-scrollbar' then
             addEvent(function()
                 local parent = self:getParent()
-                if parent then self:setVerticalScrollBar(parent:getChildById(value)) end
+                if parent then
+                    self:setVerticalScrollBar(parent:getChildById(value))
+                end
             end)
         elseif name == 'horizontal-scrollbar' then
             addEvent(function()
                 local parent = self:getParent()
-                if parent then self:setHorizontalScrollBar(self:getParent():getChildById(value)) end
+                if parent then
+                    self:setHorizontalScrollBar(self:getParent():getChildById(value))
+                end
             end)
         elseif name == 'inverted-scroll' then
             self:setInverted(value)
@@ -56,8 +60,12 @@ function UIScrollArea:updateScrollBars()
         end
     end
 
-    if self.lastScrollWidth ~= scrollWidth then self:onScrollWidthChange() end
-    if self.lastScrollHeight ~= scrollHeight then self:onScrollHeightChange() end
+    if self.lastScrollWidth ~= scrollWidth then
+        self:onScrollWidthChange()
+    end
+    if self.lastScrollHeight ~= scrollHeight then
+        self:onScrollHeightChange()
+    end
 
     self.lastScrollWidth = scrollWidth
     self.lastScrollHeight = scrollHeight
@@ -85,33 +93,51 @@ function UIScrollArea:setHorizontalScrollBar(scrollbar)
     self:updateScrollBars()
 end
 
-function UIScrollArea:setInverted(inverted) self.inverted = inverted end
+function UIScrollArea:setInverted(inverted)
+    self.inverted = inverted
+end
 
-function UIScrollArea:setAlwaysScrollMaximum(value) self.alwaysScrollMaximum = value end
+function UIScrollArea:setAlwaysScrollMaximum(value)
+    self.alwaysScrollMaximum = value
+end
 
-function UIScrollArea:onLayoutUpdate() self:updateScrollBars() end
+function UIScrollArea:onLayoutUpdate()
+    self:updateScrollBars()
+end
 
 function UIScrollArea:onMouseWheel(mousePos, mouseWheel)
     if self.verticalScrollBar then
-        if not self.verticalScrollBar:isOn() then return false end
+        if not self.verticalScrollBar:isOn() then
+            return false
+        end
         if mouseWheel == MouseWheelUp then
             local minimum = self.verticalScrollBar:getMinimum()
-            if self.verticalScrollBar:getValue() <= minimum then return false end
+            if self.verticalScrollBar:getValue() <= minimum then
+                return false
+            end
             self.verticalScrollBar:decrement()
         else
             local maximum = self.verticalScrollBar:getMaximum()
-            if self.verticalScrollBar:getValue() >= maximum then return false end
+            if self.verticalScrollBar:getValue() >= maximum then
+                return false
+            end
             self.verticalScrollBar:increment()
         end
     elseif self.horizontalScrollBar then
-        if not self.horizontalScrollBar:isOn() then return false end
+        if not self.horizontalScrollBar:isOn() then
+            return false
+        end
         if mouseWheel == MouseWheelUp then
             local maximum = self.horizontalScrollBar:getMaximum()
-            if self.horizontalScrollBar:getValue() >= maximum then return false end
+            if self.horizontalScrollBar:getValue() >= maximum then
+                return false
+            end
             self.horizontalScrollBar:increment()
         else
             local minimum = self.horizontalScrollBar:getMinimum()
-            if self.horizontalScrollBar:getValue() <= minimum then return false end
+            if self.horizontalScrollBar:getValue() <= minimum then
+                return false
+            end
             self.horizontalScrollBar:decrement()
         end
     end
@@ -123,16 +149,24 @@ function UIScrollArea:ensureChildVisible(child)
         local paddingRect = self:getPaddingRect()
         if self.verticalScrollBar then
             local deltaY = paddingRect.y - child:getY()
-            if deltaY > 0 then self.verticalScrollBar:decrement(deltaY) end
+            if deltaY > 0 then
+                self.verticalScrollBar:decrement(deltaY)
+            end
 
             deltaY = (child:getY() + child:getHeight()) - (paddingRect.y + paddingRect.height)
-            if deltaY > 0 then self.verticalScrollBar:increment(deltaY) end
+            if deltaY > 0 then
+                self.verticalScrollBar:increment(deltaY)
+            end
         elseif self.horizontalScrollBar then
             local deltaX = paddingRect.x - child:getX()
-            if deltaX > 0 then self.horizontalScrollBar:decrement(deltaX) end
+            if deltaX > 0 then
+                self.horizontalScrollBar:decrement(deltaX)
+            end
 
             deltaX = (child:getX() + child:getWidth()) - (paddingRect.x + paddingRect.width)
-            if deltaX > 0 then self.horizontalScrollBar:increment(deltaX) end
+            if deltaX > 0 then
+                self.horizontalScrollBar:increment(deltaX)
+            end
         end
     end
 end

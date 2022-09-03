@@ -71,8 +71,8 @@ private:
 
     std::array<MinimapTile, MMBLOCK_SIZE* MMBLOCK_SIZE> m_tiles;
 
-    bool m_mustUpdate{ true },
-        m_wasSeen{ false };
+    bool m_mustUpdate{ true };
+    bool m_wasSeen{ false };
 };
 
 #pragma pack(pop)

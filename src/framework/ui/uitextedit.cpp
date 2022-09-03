@@ -29,7 +29,7 @@
 #include <framework/otml/otmlnode.h>
 #include <framework/platform/platformwindow.h>
 
-#include "framework/graphics/drawpool.h"
+#include "framework/graphics/drawpoolmanager.h"
 
 UITextEdit::UITextEdit()
 {
@@ -279,7 +279,7 @@ void UITextEdit::update(bool focusCursor)
         } else if (m_textAlign & Fw::AlignVerticalCenter) {
             glyphScreenCoords.translate(0, (textScreenCoords.height() - textBoxSize.height()) / 2);
         } else { // AlignTop
-         // nothing to do
+            // nothing to do
         }
 
         if (m_textAlign & Fw::AlignRight) {
@@ -287,7 +287,7 @@ void UITextEdit::update(bool focusCursor)
         } else if (m_textAlign & Fw::AlignHorizontalCenter) {
             glyphScreenCoords.translate((textScreenCoords.width() - textBoxSize.width()) / 2, 0);
         } else { // AlignLeft
-         // nothing to do
+            // nothing to do
         }
 
         // only render glyphs that are after startRenderPosition
@@ -367,6 +367,8 @@ void UITextEdit::setSelection(int start, int end)
     m_selectionStart = std::clamp<int>(start, 0, static_cast<int>(m_text.length()));
     m_selectionEnd = std::clamp<int>(end, 0, static_cast<int>(m_text.length()));
     recacheGlyphs();
+
+    g_app.repaint();
 }
 
 void UITextEdit::setTextHidden(bool hidden)
@@ -565,7 +567,7 @@ int UITextEdit::getTextPos(const Point& pos)
     return candidatePos;
 }
 
-std::string UITextEdit::getDisplayedText()
+void UITextEdit::updateDisplayedText()
 {
     std::string text;
     if (m_textHidden)
@@ -576,7 +578,7 @@ std::string UITextEdit::getDisplayedText()
     if (m_textWrap && m_rect.isValid())
         text = m_font->wrapText(text, getPaddingRect().width() - m_textOffset.x);
 
-    return text;
+    m_displayedText = text;
 }
 
 std::string UITextEdit::getSelection()
@@ -598,6 +600,8 @@ void UITextEdit::updateText()
     }
 
     blinkCursor();
+
+    updateDisplayedText();
     update(true);
 }
 

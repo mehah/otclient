@@ -27,13 +27,10 @@
 
 #include <framework/otml/otml.h>
 
-#include "drawpool.h"
+#include "drawpoolmanager.h"
 
-namespace
-{
-    std::vector<Point> s_glyphsPositions(1);
-    std::vector<int> s_lineWidths(1);
-}
+static std::vector<Point> s_glyphsPositions(1);
+static std::vector<int> s_lineWidths(1);
 
 void BitmapFont::load(const OTMLNodePtr& fontNode)
 {
@@ -128,7 +125,7 @@ std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::stri
         } else if (align & Fw::AlignVerticalCenter) {
             glyphScreenCoords.translate(0, (screenCoords.height() - textBoxSize.height()) / 2);
         } else { // AlignTop
-                // nothing to do
+            // nothing to do
         }
 
         if (align & Fw::AlignRight) {
@@ -136,7 +133,7 @@ std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::stri
         } else if (align & Fw::AlignHorizontalCenter) {
             glyphScreenCoords.translate((screenCoords.width() - textBoxSize.width()) / 2, 0);
         } else { // AlignLeft
-                // nothing to do
+            // nothing to do
         }
 
         // only render glyphs that are after 0, 0
@@ -206,7 +203,7 @@ void BitmapFont::fillTextCoords(const CoordsBufferPtr& coords, const std::string
         } else if (align & Fw::AlignVerticalCenter) {
             glyphScreenCoords.translate(0, (screenCoords.height() - textBoxSize.height()) / 2);
         } else { // AlignTop
-                // nothing to do
+            // nothing to do
         }
 
         if (align & Fw::AlignRight) {
@@ -214,7 +211,7 @@ void BitmapFont::fillTextCoords(const CoordsBufferPtr& coords, const std::string
         } else if (align & Fw::AlignHorizontalCenter) {
             glyphScreenCoords.translate((screenCoords.width() - textBoxSize.width()) / 2, 0);
         } else { // AlignLeft
-                // nothing to do
+            // nothing to do
         }
 
         // only render glyphs that are after 0, 0
@@ -388,8 +385,8 @@ std::string BitmapFont::wrapText(const std::string_view text, int maxWidth)
                 std::string candidate = newWord + word[j];
                 if (j != word.length() - 1)
                     candidate += '-';
-                const int candidateWidth = calculateTextRectSize(candidate).width();
 
+                const int candidateWidth = calculateTextRectSize(candidate).width();
                 if (candidateWidth > maxWidth) {
                     newWord += '-';
                     words.push_back(newWord);

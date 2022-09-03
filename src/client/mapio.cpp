@@ -39,36 +39,36 @@ void Map::loadOtbm(const std::string& fileName)
 {
     try {
         if (!g_things.isOtbLoaded())
-            stdext::throw_exception("OTB isn't loaded yet to load a map.");
+            throw Exception("OTB isn't loaded yet to load a map.");
 
         const FileStreamPtr fin = g_resources.openFile(fileName);
         if (!fin)
-            stdext::throw_exception(stdext::format("Unable to load map '%s'", fileName));
+            throw Exception("Unable to load map '%s'", fileName);
 
         fin->cache();
 
         char identifier[4];
         if (fin->read(identifier, 1, 4) < 4)
-            stdext::throw_exception("Could not read file identifier");
+            throw Exception("Could not read file identifier");
 
         if (memcmp(identifier, "OTBM", 4) != 0 && memcmp(identifier, "\0\0\0\0", 4) != 0)
-            stdext::throw_exception(stdext::format("Invalid file identifier detected: %s", identifier));
+            throw Exception("Invalid file identifier detected: %s", identifier);
 
         const BinaryTreePtr root = fin->getBinaryTree();
         if (root->getU8())
-            stdext::throw_exception("could not read root property!");
+            throw Exception("could not read root property!");
 
         const uint32_t headerVersion = root->getU32();
         if (headerVersion > 3)
-            stdext::throw_exception(stdext::format("Unknown OTBM version detected: %u.", headerVersion));
+            throw Exception("Unknown OTBM version detected: %u.", headerVersion);
 
         setWidth(root->getU16());
         setHeight(root->getU16());
 
         const uint32_t headerMajorItems = root->getU8();
         if (headerMajorItems > g_things.getOtbMajorVersion()) {
-            stdext::throw_exception(stdext::format("This map was saved with different OTB version. read %d what it's supposed to be: %d",
-                                                   headerMajorItems, g_things.getOtbMajorVersion()));
+            throw Exception("This map was saved with different OTB version. read %d what it's supposed to be: %d",
+                                                   headerMajorItems, g_things.getOtbMajorVersion());
         }
 
         root->skip(3);
@@ -80,7 +80,7 @@ void Map::loadOtbm(const std::string& fileName)
 
         const BinaryTreePtr node = root->getChildren()[0];
         if (node->getU8() != OTBM_MAP_DATA)
-            stdext::throw_exception("Could not read root data node");
+            throw Exception("Could not read root data node");
 
         while (node->canRead()) {
             const uint8_t attribute = node->getU8();
@@ -96,7 +96,7 @@ void Map::loadOtbm(const std::string& fileName)
                     setHouseFile(fileName.substr(0, fileName.rfind('/') + 1).c_str() + tmp);
                     break;
                 default:
-                    stdext::throw_exception(stdext::format("Invalid attribute '%d'", static_cast<int>(attribute)));
+                    throw Exception("Invalid attribute '%d'", static_cast<int>(attribute));
             }
         }
 
@@ -111,7 +111,7 @@ void Map::loadOtbm(const std::string& fileName)
                 for (const BinaryTreePtr& nodeTile : nodeMapData->getChildren()) {
                     const uint8_t type = nodeTile->getU8();
                     if (unlikely(type != OTBM_TILE && type != OTBM_HOUSETILE))
-                        stdext::throw_exception(stdext::format("invalid node tile type %d", static_cast<int>(type)));
+                        throw Exception("invalid node tile type %d", static_cast<int>(type));
 
                     HousePtr house = nullptr;
                     uint32_t flags = TILESTATE_NONE;
@@ -154,15 +154,15 @@ void Map::loadOtbm(const std::string& fileName)
                             }
                             default:
                             {
-                                stdext::throw_exception(stdext::format("invalid tile attribute %d at pos %s",
-                                                                       static_cast<int>(tileAttr), stdext::to_string(pos)));
+                                throw Exception("invalid tile attribute %d at pos %s",
+                                                                       static_cast<int>(tileAttr), stdext::to_string(pos));
                             }
                         }
                     }
 
                     for (const BinaryTreePtr& nodeItem : nodeTile->getChildren()) {
                         if (unlikely(nodeItem->getU8() != OTBM_ITEM))
-                            stdext::throw_exception("invalid item node");
+                            throw Exception("invalid item node");
 
                         ItemPtr item = Item::createFromOtb(nodeItem->getU16());
                         item->unserializeItem(nodeItem);
@@ -170,7 +170,7 @@ void Map::loadOtbm(const std::string& fileName)
                         if (item->isContainer()) {
                             for (const BinaryTreePtr& containerItem : nodeItem->getChildren()) {
                                 if (containerItem->getU8() != OTBM_ITEM)
-                                    stdext::throw_exception("invalid container item node");
+                                    throw Exception("invalid container item node");
 
                                 ItemPtr cItem = Item::createFromOtb(containerItem->getU16());
                                 cItem->unserializeItem(containerItem);
@@ -196,7 +196,7 @@ void Map::loadOtbm(const std::string& fileName)
                 TownPtr town = nullptr;
                 for (const BinaryTreePtr& nodeTown : nodeMapData->getChildren()) {
                     if (nodeTown->getU8() != OTBM_TOWN)
-                        stdext::throw_exception("invalid town node.");
+                        throw Exception("invalid town node.");
 
                     const uint32_t townId = nodeTown->getU32();
                     const auto& townName = nodeTown->getString();
@@ -213,7 +213,7 @@ void Map::loadOtbm(const std::string& fileName)
             } else if (mapDataType == OTBM_WAYPOINTS && headerVersion > 1) {
                 for (const BinaryTreePtr& nodeWaypoint : nodeMapData->getChildren()) {
                     if (nodeWaypoint->getU8() != OTBM_WAYPOINT)
-                        stdext::throw_exception("invalid waypoint node.");
+                        throw Exception("invalid waypoint node.");
 
                     std::string name = nodeWaypoint->getString();
 
@@ -226,11 +226,11 @@ void Map::loadOtbm(const std::string& fileName)
                         m_waypoints.emplace(waypointPos, name);
                 }
             } else
-                stdext::throw_exception(stdext::format("Unknown map data node %d", static_cast<int>(mapDataType)));
+                throw Exception("Unknown map data node %d", static_cast<int>(mapDataType));
         }
 
         fin->close();
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to load '%s': %s", fileName, e.what()));
     }
 }
@@ -240,7 +240,7 @@ void Map::saveOtbm(const std::string& fileName)
     try {
         const FileStreamPtr fin = g_resources.createFile(fileName);
         if (!fin)
-            stdext::throw_exception(stdext::format("failed to open file '%s' for write", fileName));
+            throw Exception("failed to open file '%s' for write", fileName);
 
         fin->cache();
         std::string dir;
@@ -301,7 +301,9 @@ void Map::saveOtbm(const std::string& fileName)
                 root->addU8(OTBM_ATTR_HOUSE_FILE);
                 root->addString(houseFile);
 
-                int px = -1, py = -1, pz = -1;
+                int px = -1;
+                int py = -1;
+                int pz = -1;
                 bool firstNode = true;
 
                 for (uint8_t z = 0; z <= MAX_Z; ++z) {
@@ -396,7 +398,7 @@ void Map::saveOtbm(const std::string& fileName)
 
         fin->flush();
         fin->close();
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
     }
 }
@@ -406,13 +408,12 @@ bool Map::loadOtcm(const std::string& fileName)
     try {
         const FileStreamPtr fin = g_resources.openFile(fileName);
         if (!fin)
-            stdext::throw_exception("unable to open file");
+            throw Exception("unable to open file");
 
         fin->cache();
 
-        const uint32_t signature = fin->getU32();
-        if (signature != OTCM_SIGNATURE)
-            stdext::throw_exception("invalid otcm file");
+        if (const uint32_t signature = fin->getU32(); signature != OTCM_SIGNATURE)
+            throw Exception("invalid otcm file");
 
         const uint16_t start = fin->getU16();
         const uint16_t version = fin->getU16();
@@ -432,7 +433,7 @@ bool Map::loadOtcm(const std::string& fileName)
                 break;
             }
             default:
-                stdext::throw_exception("otcm version not supported");
+                throw Exception("otcm version not supported");
         }
 
         fin->seek(start);
@@ -473,7 +474,7 @@ bool Map::loadOtcm(const std::string& fileName)
         fin->close();
 
         return true;
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("failed to load OTCM map: %s", e.what()));
         return false;
     }
@@ -543,7 +544,7 @@ void Map::saveOtcm(const std::string& fileName)
         fin->flush();
 
         fin->close();
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("failed to save OTCM map: %s", e.what()));
     }
 }

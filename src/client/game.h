@@ -30,7 +30,6 @@
 #include "outfit.h"
 #include "protocolgame.h"
 #include <framework/core/timer.h>
-
 #include <bitset>
 
 struct UnjustifiedPoints
@@ -165,7 +164,7 @@ public:
 
     // walk related
     bool walk(Otc::Direction direction, bool isKeyDown = false);
-    void autoWalk(std::vector<Otc::Direction> dirs, Position startPos);
+    void autoWalk(const std::vector<Otc::Direction>& dirs, const Position& startPos);
     void forceWalk(Otc::Direction direction);
     void turn(Otc::Direction direction);
     void stop();
@@ -358,6 +357,21 @@ public:
     {
         return m_lastSupportedVersion;
     }
+    // market related
+    void leaveMarket();
+    void browseMarket(uint8_t browseId, uint16_t browseType);
+    void createMarketOffer(uint8_t type, uint16_t itemId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous);
+    void cancelMarketOffer(uint32_t timestamp, uint16_t counter);
+    void acceptMarketOffer(uint32_t timestamp, uint16_t counter, uint16_t amount);
+
+    // prey related
+    void preyAction(uint8_t slot, uint8_t actionType, uint16_t index);
+    void preyRequest();
+
+    // imbuing related
+    void applyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm);
+    void clearImbuement(uint8_t slot);
+    void closeImbuingWindow();
 
 protected:
     void enableBotCall() { m_denyBotCall = false; }
@@ -380,11 +394,12 @@ private:
     bool m_expertPvpMode;
     int m_serverBeat{ 50 };
     ticks_t m_ping{ -1 };
-    uint32_t m_pingSent;
-    uint32_t m_pingReceived;
+    uint32_t m_pingSent{ 0 };
+    uint32_t m_pingReceived{ 0 };
+    uint32_t m_seq{ 0 };
+
     stdext::timer m_pingTimer;
     Timer m_dashTimer;
-    uint32_t m_seq{ 0 };
     int m_pingDelay{ 1000 };
     Otc::FightModes m_fightMode{ Otc::FightBalanced };
     Otc::ChaseModes m_chaseMode{ Otc::DontChase };
@@ -393,7 +408,6 @@ private:
     Otc::Direction m_nextScheduledDir;
     bool m_scheduleLastWalk{ false };
     UnjustifiedPoints m_unjustifiedPoints;
-    int m_openPvpSituations;
     bool m_safeFight{ true };
     bool m_canReportBugs{ false };
     std::vector<uint8_t > m_gmActions;
@@ -407,6 +421,7 @@ private:
     int m_protocolVersion{ 0 };
     int m_clientVersion{ 0 };
     int m_lastSupportedVersion{ 1287 };
+    int m_openPvpSituations{ 0 };
     std::string m_clientSignature;
     Otc::OperatingSystem_t m_clientCustomOs{ Otc::CLIENTOS_NONE };
 };

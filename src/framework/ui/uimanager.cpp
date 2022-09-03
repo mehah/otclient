@@ -366,7 +366,7 @@ void UIManager::importStyleFromOTML(const OTMLNodePtr& styleNode)
     if (!oldStyle || !oldStyle->valueAt("__unique", false) || unique) {
         const OTMLNodePtr originalStyle = getStyle(base);
         if (!originalStyle)
-            stdext::throw_exception(stdext::format("base style '%s', is not defined", base));
+            throw Exception("base style '%s', is not defined", base);
         const OTMLNodePtr style = originalStyle->clone();
         style->merge(styleNode);
         style->setTag(name);
@@ -413,7 +413,7 @@ UIWidgetPtr UIManager::loadUI(const std::string& file, const UIWidgetPtr& parent
                 importStyleFromOTML(node);
             else {
                 if (widget)
-                    stdext::throw_exception("cannot have multiple main widgets in otui files");
+                    throw Exception("cannot have multiple main widgets in otui files");
                 widget = createWidgetFromOTML(node, parent);
             }
         }
@@ -440,7 +440,7 @@ UIWidgetPtr UIManager::createWidgetFromOTML(const OTMLNodePtr& widgetNode, const
 {
     const OTMLNodePtr originalStyleNode = getStyle(widgetNode->tag());
     if (!originalStyleNode)
-        stdext::throw_exception(stdext::format("'%s' is not a defined style", widgetNode->tag()));
+        throw Exception("'%s' is not a defined style", widgetNode->tag());
 
     const OTMLNodePtr styleNode = originalStyleNode->clone();
     styleNode->merge(widgetNode);
@@ -464,7 +464,7 @@ UIWidgetPtr UIManager::createWidgetFromOTML(const OTMLNodePtr& widgetNode, const
             }
         }
     } else
-        stdext::throw_exception(stdext::format("unable to create widget of type '%s'", widgetType));
+        throw Exception("unable to create widget of type '%s'", widgetType);
 
     widget->callLuaField("onSetup");
     return widget;

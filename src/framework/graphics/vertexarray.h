@@ -28,10 +28,7 @@
 class VertexArray
 {
 public:
-    enum
-    {
-        CACHE_MIN_VERTICES_COUNT = 42
-    };
+    static constexpr int CACHE_MIN_VERTICES_COUNT = 42;
 
     ~VertexArray()
     {

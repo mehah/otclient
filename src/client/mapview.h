@@ -30,17 +30,22 @@
 
 struct AwareRange
 {
-    uint8_t left, top, right, bottom;
-    uint8_t horizontal() { return left + right + 1; }
-    uint8_t vertical() { return top + bottom + 1; }
+    uint8_t left;
+    uint8_t top;
+    uint8_t right;
+    uint8_t bottom;
+
+    uint8_t horizontal() const { return left + right + 1; }
+    uint8_t vertical() const { return top + bottom + 1; }
 };
 
 struct MapPosInfo
 {
-    Rect rect, srcRect;
+    Rect rect;
+    Rect srcRect;
     Point drawOffset;
-    float horizontalStretchFactor,
-        verticalStretchFactor;
+    float horizontalStretchFactor;
+    float verticalStretchFactor;
 
     bool isInRange(const Position& pos, bool ignoreZ = false) const
     {
@@ -125,7 +130,7 @@ public:
     bool isDrawingHealthBars() { return m_drawHealthBars; }
 
     void setDrawLights(bool enable);
-    bool isDrawingLights() { return m_drawLights && m_lightView->isDark(); }
+    bool isDrawingLights() { return m_lightView && m_lightView->isDark(); }
 
     void setLimitVisibleDimension(bool v) { m_limitVisibleDimension = v; }
     bool isLimitedVisibleDimension() { return m_limitVisibleDimension; }
@@ -187,7 +192,8 @@ protected:
 private:
     struct MapObject
     {
-        std::vector<TilePtr> shades, tiles;
+        std::vector<TilePtr> shades;
+        std::vector<TilePtr> tiles;
         void clear() { shades.clear(); tiles.clear(); }
     };
 
@@ -237,58 +243,60 @@ private:
 
     int8_t m_lockedFirstVisibleFloor{ -1 };
 
-    uint8_t m_cachedFirstVisibleFloor{ SEA_FLOOR },
-        m_cachedLastVisibleFloor{ SEA_FLOOR },
-        m_tileSize{ SPRITE_SIZE },
-        m_floorMin{ 0 },
-        m_floorMax{ 0 },
-        m_antiAliasingMode;
+    uint8_t m_cachedFirstVisibleFloor{ SEA_FLOOR };
+    uint8_t m_cachedLastVisibleFloor{ SEA_FLOOR };
+    uint8_t m_tileSize{ SPRITE_SIZE };
+    uint8_t m_floorMin{ 0 };
+    uint8_t m_floorMax{ 0 };
+    uint8_t m_antiAliasingMode;
 
     uint16_t m_floorFading = 500;
 
-    float m_minimumAmbientLight{ 0 },
-        m_fadeInTime{ 0 },
-        m_fadeOutTime{ 0 },
-        m_shadowFloorIntensity{ 0 },
-        m_scaleFactor{ 1.f },
-        m_lastFadeLevel{ 1.f };
+    float m_minimumAmbientLight{ 0 };
+    float m_fadeInTime{ 0 };
+    float m_fadeOutTime{ 0 };
+    float m_shadowFloorIntensity{ 0 };
+    float m_scaleFactor{ 1.f };
+    float m_lastFadeLevel{ 1.f };
 
     Rect m_rectDimension;
 
-    Size m_drawDimension, m_visibleDimension;
+    Size m_drawDimension;
+    Size m_visibleDimension;
 
-    Point m_virtualCenterOffset, m_moveOffset;
+    Point m_virtualCenterOffset;
+    Point m_moveOffset;
 
-    Position m_customCameraPosition,
-        m_lastCameraPosition,
-        m_mousePosition;
+    Position m_customCameraPosition;
+    Position m_lastCameraPosition;
+    Position m_mousePosition;
 
     std::array<AwareRange, Otc::InvalidDirection + 1> m_viewPortDirection;
     AwareRange m_viewport;
 
     bool
-        m_limitVisibleDimension{ true },
-        m_updateVisibleTiles{ true },
-        m_resetCoveredCache{ true },
-        m_shaderSwitchDone{ true },
-        m_drawHealthBars{ true },
-        m_drawManaBar{ true },
-        m_drawTexts{ true },
-        m_drawNames{ true },
-        m_smooth{ true },
-        m_follow{ true };
+        m_limitVisibleDimension{ true };
+    bool m_updateVisibleTiles{ true };
+    bool m_resetCoveredCache{ true };
+    bool m_shaderSwitchDone{ true };
+    bool m_drawHealthBars{ true };
+    bool m_drawManaBar{ true };
+    bool m_drawTexts{ true };
+    bool m_drawNames{ true };
+    bool m_smooth{ true };
+    bool m_follow{ true };
 
-    bool m_drawLights{ false },
-        m_autoViewMode{ false },
-        m_drawViewportEdge{ false },
-        m_drawHighlightTarget{ false },
-        m_shiftPressed{ false };
+    bool m_autoViewMode{ false };
+    bool m_drawViewportEdge{ false };
+    bool m_drawHighlightTarget{ false };
+    bool m_shiftPressed{ false };
 
     std::array<MapObject, MAX_Z + 1> m_cachedVisibleTiles;
 
     stdext::timer m_fadingFloorTimers[MAX_Z + 1];
 
-    PainterShaderProgramPtr m_shader, m_nextShader;
+    PainterShaderProgramPtr m_shader;
+    PainterShaderProgramPtr m_nextShader;
     LightViewPtr m_lightView;
     CreaturePtr m_followingCreature;
 
@@ -300,4 +308,6 @@ private:
     TilePtr m_lastHighlightTile;
     TexturePtr m_crosshairTexture;
     EffectPtr m_crosshairEffect;
+
+    DrawBufferPtr m_shadowBuffer;
 };

@@ -16,7 +16,9 @@ CreatureTypeHidden = 5
 -- @}
 
 function getNextSkullId(skullId)
-    if skullId == SkullRed or skullId == SkullBlack then return SkullBlack end
+    if skullId == SkullRed or skullId == SkullBlack then
+        return SkullBlack
+    end
     return SkullRed
 end
 
@@ -108,25 +110,35 @@ end
 
 function Creature:onSkullChange(skullId)
     local imagePath = getSkullImagePath(skullId)
-    if imagePath then self:setSkullTexture(imagePath) end
+    if imagePath then
+        self:setSkullTexture(imagePath)
+    end
 end
 
 function Creature:onShieldChange(shieldId)
     local imagePath, blink = getShieldImagePathAndBlink(shieldId)
-    if imagePath then self:setShieldTexture(imagePath, blink) end
+    if imagePath then
+        self:setShieldTexture(imagePath, blink)
+    end
 end
 
 function Creature:onEmblemChange(emblemId)
     local imagePath = getEmblemImagePath(emblemId)
-    if imagePath then self:setEmblemTexture(imagePath) end
+    if imagePath then
+        self:setEmblemTexture(imagePath)
+    end
 end
 
 function Creature:onTypeChange(typeId)
     local imagePath = getTypeImagePath(typeId)
-    if imagePath then self:setTypeTexture(imagePath) end
+    if imagePath then
+        self:setTypeTexture(imagePath)
+    end
 end
 
 function Creature:onIconChange(iconId)
     local imagePath = getIconImagePath(iconId)
-    if imagePath then self:setIconTexture(imagePath) end
+    if imagePath then
+        self:setIconTexture(imagePath)
+    end
 end

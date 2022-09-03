@@ -55,8 +55,8 @@ public:
 private:
     SoundSourcePtr createSoundSource(const std::string& filename);
 
-    ALCdevice* m_device;
-    ALCcontext* m_context;
+    ALCdevice* m_device{};
+    ALCcontext* m_context{};
 
     std::map<StreamSoundSourcePtr, std::shared_future<SoundFilePtr>> m_streamFiles;
     stdext::map<std::string, SoundBufferPtr> m_buffers;

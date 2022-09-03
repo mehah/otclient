@@ -381,7 +381,7 @@ void WIN32Window::internalCreateGLContext()
                                          PFD_MAIN_PLANE,             // Main Drawing Layer
                                          0,                          // Reserved
                                          0, 0, 0
-};                  // Layer Masks Ignored
+    };                  // Layer Masks Ignored
 
     const uint32_t pixelFormat = ChoosePixelFormat(m_deviceContext, &pfd);
     if (!pixelFormat)
@@ -907,8 +907,9 @@ void WIN32Window::setFullscreen(bool fullscreen)
 
 void WIN32Window::setVerticalSync(bool enable)
 {
+    m_vsync = enable;
 #ifdef OPENGL_ES
-    eglSwapInterval(m_eglDisplay, enable ? 1 : 0);
+    eglSwapInterval(m_eglDisplay, enable);
 #else
     if (!isExtensionSupported("WGL_EXT_swap_control"))
         return;
@@ -918,7 +919,7 @@ void WIN32Window::setVerticalSync(bool enable)
     if (!wglSwapInterval)
         return;
 
-    wglSwapInterval(enable ? 1 : 0);
+    wglSwapInterval(enable);
 #endif
 }
 
@@ -975,7 +976,7 @@ void WIN32Window::setClipboardText(const std::string_view text)
 
     const std::wstring wtext = stdext::latin1_to_utf16(text);
 
-    auto* const lpwstr = static_cast<LPWSTR>(GlobalLock(hglb));
+    auto* lpwstr = static_cast<LPWSTR>(GlobalLock(hglb));
     memcpy(lpwstr, &wtext[0], wtext.length() * sizeof(WCHAR));
     lpwstr[text.length()] = static_cast<WCHAR>(0);
     GlobalUnlock(hglb);

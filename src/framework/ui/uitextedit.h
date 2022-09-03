@@ -67,7 +67,7 @@ public:
     void clearSelection() { setSelection(0, 0); }
 
     void wrapText();
-    std::string getDisplayedText();
+    std::string getDisplayedText() { return m_displayedText; }
     std::string getSelection();
     int getTextPos(const Point& pos);
     int getCursorPos() { return m_cursorPos; }
@@ -105,6 +105,7 @@ protected:
     virtual void onTextAreaUpdate(const Point& vitualOffset, const Size& visibleSize, const Size& totalSize);
 
 private:
+    void updateDisplayedText();
     void disableUpdates() { m_updatesEnabled = false; }
     void enableUpdates() { m_updatesEnabled = true; }
     void recacheGlyphs() { m_glyphsMustRecache = true; }
@@ -130,10 +131,10 @@ private:
 
     bool m_selectable;
 
-    int m_selectionReference,
-        m_selectionStart,
-        m_selectionEnd,
-        m_cursorPos{ 0 };
+    int m_selectionReference;
+    int m_selectionStart;
+    int m_selectionEnd;
+    int m_cursorPos{ 0 };
 
     Color m_selectionColor;
     Color m_selectionBackgroundColor;
@@ -141,7 +142,10 @@ private:
     std::vector<Rect> m_glyphsCoords;
     std::vector<Rect> m_glyphsTexCoords;
 
-    std::vector<std::pair<Rect, Rect>> m_glyphsTextRectCache, m_glyphsSelectRectCache;
+    std::vector<std::pair<Rect, Rect>> m_glyphsTextRectCache;
+    std::vector<std::pair<Rect, Rect>> m_glyphsSelectRectCache;
+
+    std::string m_displayedText;
 
     bool m_glyphsMustRecache;
 };

@@ -44,7 +44,7 @@ void ParticleEmitter::load(const OTMLNodePtr& node)
     }
 
     if (!m_particleType)
-        stdext::throw_exception("emitter didn't provide a valid particle type");
+        throw Exception("emitter didn't provide a valid particle type");
 }
 
 void ParticleEmitter::update(float elapsedTime, const ParticleSystemPtr& system)

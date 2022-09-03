@@ -72,7 +72,7 @@ void TextureManager::liveReload()
     if (m_liveReloadEvent)
         return;
     m_liveReloadEvent = g_dispatcher.cycleEvent([this] {
-        for (auto& it : m_textures) {
+        for (const auto& it : m_textures) {
             const auto& path = g_resources.guessFilePath(it.first, "png");
             const TexturePtr& tex = it.second;
             if (tex->getTime() >= g_resources.getFileTime(path))
@@ -109,7 +109,7 @@ TexturePtr TextureManager::getTexture(const std::string& fileName)
             std::stringstream fin;
             g_resources.readFileStream(filePathEx, fin);
             texture = loadTexture(fin);
-        } catch (stdext::exception& e) {
+        } catch (const stdext::exception& e) {
             g_logger.error(stdext::format("Unable to load texture '%s': %s", fileName, e.what()));
             texture = g_textures.getEmptyTexture();
         }
@@ -128,8 +128,7 @@ TexturePtr TextureManager::loadTexture(std::stringstream& file)
 {
     TexturePtr texture;
 
-    apng_data apng;
-    if (load_apng(file, &apng) == 0) {
+    if (apng_data apng; load_apng(file, &apng) == 0) {
         const Size imageSize(apng.width, apng.height);
         if (apng.num_frames > 1) { // animated texture
             std::vector<ImagePtr> frames;

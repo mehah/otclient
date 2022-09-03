@@ -2237,7 +2237,9 @@ function Spells.getClientId(spellName)
     local profile = Spells.getSpellProfileByName(spellName)
 
     local id = SpellInfo[profile][spellName].icon
-    if not tonumber(id) and SpellIcons[id] then return SpellIcons[id][1] end
+    if not tonumber(id) and SpellIcons[id] then
+        return SpellIcons[id][1]
+    end
     return tonumber(id)
 end
 
@@ -2245,49 +2247,77 @@ function Spells.getServerId(spellName)
     local profile = Spells.getSpellProfileByName(spellName)
 
     local id = SpellInfo[profile][spellName].icon
-    if not tonumber(id) and SpellIcons[id] then return SpellIcons[id][2] end
+    if not tonumber(id) and SpellIcons[id] then
+        return SpellIcons[id][2]
+    end
     return tonumber(id)
 end
 
-function Spells.getSpellByName(name) return SpellInfo[Spells.getSpellProfileByName(name)][name] end
+function Spells.getSpellByName(name)
+    return SpellInfo[Spells.getSpellProfileByName(name)][name]
+end
 
 function Spells.getSpellByWords(words)
     local words = words:lower():trim()
     for profile, data in pairs(SpellInfo) do
-        for k, spell in pairs(data) do if spell.words == words then return spell, profile, k end end
+        for k, spell in pairs(data) do
+            if spell.words == words then
+                return spell, profile, k
+            end
+        end
     end
     return nil
 end
 
 function Spells.getSpellByIcon(iconId)
     for profile, data in pairs(SpellInfo) do
-        for k, spell in pairs(data) do if spell.id == iconId then return spell, profile, k end end
+        for k, spell in pairs(data) do
+            if spell.id == iconId then
+                return spell, profile, k
+            end
+        end
     end
     return nil
 end
 
 function Spells.getSpellIconIds()
     local ids = {}
-    for profile, data in pairs(SpellInfo) do for k, spell in pairs(data) do table.insert(ids, spell.id) end end
+    for profile, data in pairs(SpellInfo) do
+        for k, spell in pairs(data) do
+            table.insert(ids, spell.id)
+        end
+    end
     return ids
 end
 
 function Spells.getSpellProfileById(id)
     for profile, data in pairs(SpellInfo) do
-        for k, spell in pairs(data) do if spell.id == id then return profile end end
+        for k, spell in pairs(data) do
+            if spell.id == id then
+                return profile
+            end
+        end
     end
     return nil
 end
 
 function Spells.getSpellProfileByWords(words)
     for profile, data in pairs(SpellInfo) do
-        for k, spell in pairs(data) do if spell.words == words then return profile end end
+        for k, spell in pairs(data) do
+            if spell.words == words then
+                return profile
+            end
+        end
     end
     return nil
 end
 
 function Spells.getSpellProfileByName(spellName)
-    for profile, data in pairs(SpellInfo) do if table.findbykey(data, spellName:trim(), true) then return profile end end
+    for profile, data in pairs(SpellInfo) do
+        if table.findbykey(data, spellName:trim(), true) then
+            return profile
+        end
+    end
     return nil
 end
 
@@ -2295,7 +2325,9 @@ function Spells.getSpellsByVocationId(vocId)
     local spells = {}
     for profile, data in pairs(SpellInfo) do
         for k, spell in pairs(data) do
-            if table.contains(spell.vocations, vocId) then table.insert(spells, spell) end
+            if table.contains(spell.vocations, vocId) then
+                table.insert(spells, spell)
+            end
         end
     end
     return spells
@@ -2305,14 +2337,18 @@ function Spells.filterSpellsByGroups(spells, groups)
     local filtered = {}
     for v, spell in pairs(spells) do
         local spellGroups = Spells.getGroupIds(spell)
-        if table.equals(spellGroups, groups) then table.insert(filtered, spell) end
+        if table.equals(spellGroups, groups) then
+            table.insert(filtered, spell)
+        end
     end
     return filtered
 end
 
 function Spells.getGroupIds(spell)
     local groups = {}
-    for k, _ in pairs(spell.group) do table.insert(groups, k) end
+    for k, _ in pairs(spell.group) do
+        table.insert(groups, k)
+    end
     return groups
 end
 
@@ -2322,4 +2358,6 @@ function Spells.getImageClip(id, profile)
                SpelllistSettings[profile].iconSize.width .. ' ' .. SpelllistSettings[profile].iconSize.height
 end
 
-function Spells.getIconFileByProfile(profile) return SpelllistSettings[profile]['iconFile'] end
+function Spells.getIconFileByProfile(profile)
+    return SpelllistSettings[profile]['iconFile']
+end

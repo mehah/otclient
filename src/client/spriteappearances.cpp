@@ -63,14 +63,14 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet)
 
         const auto decompressed = std::make_unique<uint8_t[]>(LZMA_UNCOMPRESSED_SIZE); // uncompressed size, bmp file + 122 bytes header
 
-         /*
-            CIP's header, always 32 (0x20) bytes.
-            Header format:
-            [0x00, X):          A variable number of NULL (0x00) bytes. The amount of pad-bytes can vary depending on how many
-                                bytes the "7-bit integer encoded LZMA file size" take.
-            [X, X + 0x05):      The constant byte sequence [0x70 0x0A 0xFA 0x80 0x24]
-            [X + 0x05, 0x20]:   LZMA file size (Note: excluding the 32 bytes of this header) encoded as a 7-bit integer
-        */
+        /*
+           CIP's header, always 32 (0x20) bytes.
+           Header format:
+           [0x00, X):          A variable number of NULL (0x00) bytes. The amount of pad-bytes can vary depending on how many
+                               bytes the "7-bit integer encoded LZMA file size" take.
+           [X, X + 0x05):      The constant byte sequence [0x70 0x0A 0xFA 0x80 0x24]
+           [X + 0x05, 0x20]:   LZMA file size (Note: excluding the 32 bytes of this header) encoded as a 7-bit integer
+       */
 
         while (fin->getU8() == 0x00);
         fin->skip(4);
@@ -120,7 +120,7 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet)
 
         // pixel data start (bmp header end offset)
         uint32_t data;
-        std::memcpy(&data, decompressed.get() + 10, sizeof(uint32_t ));
+        std::memcpy(&data, decompressed.get() + 10, sizeof(uint32_t));
 
         uint8_t* bufferStart = decompressed.get() + data;
 
@@ -153,7 +153,7 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet)
         sheet->loaded = true;
         sheet->loading = false;
         return true;
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to load single sprite sheet '%s': %s", sheet->file, e.what()));
         return false;
     }
@@ -232,7 +232,7 @@ ImagePtr SpriteAppearances::getSpriteImage(int id)
         }
 
         return image;
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("Failed to get sprite id %d: %s", id, e.what()));
         return nullptr;
     }

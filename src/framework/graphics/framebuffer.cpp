@@ -26,7 +26,7 @@
 
 #include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>
-#include <framework/graphics/drawpool.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include <framework/platform/platformwindow.h>
 
 uint32_t FrameBuffer::boundFbo = 0;
@@ -80,11 +80,11 @@ void FrameBuffer::bind()
 {
     internalBind();
 
+    g_painter->resetState();
     g_painter->setResolution(getSize(), m_textureMatrix);
     g_painter->setAlphaWriting(m_useAlphaWriting);
 
     if (m_colorClear != Color::alpha) {
-        g_painter->resetState();
         g_painter->setTexture(nullptr);
         g_painter->setColor(m_colorClear);
         g_painter->drawCoords(m_screenCoordsBuffer, DrawMode::TRIANGLE_STRIP);
@@ -123,10 +123,13 @@ void FrameBuffer::internalRelease()
 
 void FrameBuffer::prepare(const Rect& dest, const Rect& src, const Color& colorClear)
 {
-    m_colorClear = colorClear;
-    Rect _dest(0, 0, getSize()), _src = _dest;
+    Rect _dest(0, 0, getSize());
+    Rect _src = _dest;
+
     if (dest.isValid()) _dest = dest;
     if (src.isValid()) _src = src;
+
+    m_colorClear = colorClear;
 
     if (_src != m_src || _dest != m_dest) {
         m_src = _src;

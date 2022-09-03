@@ -55,12 +55,13 @@ private:
     void generateLightTexture(),
         generateShadeTexture();
 
-    TexturePtr m_lightTexture, m_shadeTexture;
+    TexturePtr m_lightTexture;
+    TexturePtr m_shadeTexture;
 
     bool m_loaded{ false };
     uint32_t m_signature{ 0 };
     int m_spritesCount{ 0 };
-    int m_spritesOffset;
+    int m_spritesOffset{ 0 };
     FileStreamPtr m_spritesFile;
 };
 

@@ -26,7 +26,7 @@
 #include "thingtype.h"
 #include "thingtypemanager.h"
 #include <framework/luaengine/luaobject.h>
-#include <framework/graphics/pool.h>
+#include <framework/graphics/drawpool.h>
 
 struct Highlight
 {
@@ -35,9 +35,9 @@ struct Highlight
     ThingPtr thing;
     ScheduledEventPtr listeningEvent;
 
-    bool enabled{ false },
-        update{ false },
-        invertedColorSelection{ false };
+    bool enabled{ false };
+    bool update{ false };
+    bool invertedColorSelection{ false };
 };
 
 // @bindclass
@@ -159,6 +159,8 @@ public:
 
     MarketData getMarketData() { return getThingType()->getMarketData(); }
 
+    void setShader(const PainterShaderProgramPtr& shader) { m_shader = shader; }
+
     virtual void onPositionChange(const Position& /*newPos*/, const Position& /*oldPos*/) {}
     virtual void onAppear() {}
     virtual void onDisappear() {}
@@ -166,16 +168,19 @@ public:
 protected:
     void generateBuffer();
 
-    uint8_t
-        m_numPatternX{ 0 },
-        m_numPatternY{ 0 },
-        m_numPatternZ{ 0 };
+    uint8_t m_numPatternX{ 0 };
+    uint8_t m_numPatternY{ 0 };
+    uint8_t m_numPatternZ{ 0 };
 
     uint16_t m_datId{ 0 };
 
     Position m_position;
     ThingTypePtr m_thingType;
     DrawBufferPtr m_drawBuffer;
+
+    // Shader
+    PainterShaderProgramPtr m_shader;
+    std::function<void()> m_shaderAction{ nullptr };
 
 private:
     bool m_canDraw{ true };

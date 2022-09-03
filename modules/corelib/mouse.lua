@@ -3,12 +3,16 @@ function g_mouse.bindAutoPress(widget, callback, delay, button)
     local button = button or MouseLeftButton
     connect(widget, {
         onMousePress = function(widget, mousePos, mouseButton)
-            if mouseButton ~= button then return false end
+            if mouseButton ~= button then
+                return false
+            end
             local startTime = g_clock.millis()
             callback(widget, mousePos, mouseButton, 0)
             periodicalEvent(function()
                 callback(widget, g_window.getMousePosition(), mouseButton, g_clock.millis() - startTime)
-            end, function() return g_mouse.isPressed(mouseButton) end, 30, delay)
+            end, function()
+                return g_mouse.isPressed(mouseButton)
+            end, 30, delay)
             return true
         end
     })
@@ -42,6 +46,15 @@ function g_mouse.bindPress(widget, callback, button)
                 return true
             end
             return false
+        end
+    })
+end
+
+function g_mouse.bindOnDrop(widget, callback)
+    connect(widget, {
+        onDrop = function(widget, mousePos)
+            callback(mousePos, mouseButton)
+            return true
         end
     })
 end

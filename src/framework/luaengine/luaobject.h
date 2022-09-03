@@ -178,12 +178,12 @@ template<typename R, typename... T>
 R LuaObject::callLuaField(const std::string_view field, const T&... args)
 {
     R result;
-    const int rets = luaCallLuaField(field, args...);
-    if (rets > 0) {
+    if (const int rets = luaCallLuaField(field, args...); rets > 0) {
         assert(rets == 1);
         result = g_lua.polymorphicPop<R>();
     } else
         result = R();
+
     return result;
 }
 

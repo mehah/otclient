@@ -45,7 +45,7 @@ public:
 
     void bind() { glBindBuffer(static_cast<GLenum>(m_type), m_id); }
     static void unbind(Type type) { glBindBuffer(static_cast<GLenum>(type), 0); }
-    void write(void* data, int count, UsagePattern usage) { glBufferData(static_cast<GLenum>(m_type), count, data, static_cast<GLenum>(usage)); }
+    void write(void const* data, int count, UsagePattern usage) { glBufferData(static_cast<GLenum>(m_type), count, data, static_cast<GLenum>(usage)); }
 
 private:
     Type m_type;

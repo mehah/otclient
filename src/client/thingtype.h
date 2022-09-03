@@ -27,19 +27,14 @@
 
 #include <framework/core/declarations.h>
 #include <framework/graphics/texture.h>
-#include <framework/graphics/drawpool.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include <framework/luaengine/luaobject.h>
 #include <framework/net/server.h>
 #include <framework/otml/declarations.h>
 
 using namespace otclient::protobuf;
 
-enum class TextureType
-{
-    NONE,
-    SMOOTH,
-    ALL_BLANK
-};
+enum class TextureType { NONE, SMOOTH, ALL_BLANK };
 
 enum FrameGroupType : uint8_t
 {
@@ -118,6 +113,21 @@ enum ThingAttr : uint8_t
     ThingLastAttr = 255
 };
 
+struct Imbuement
+{
+    int id;
+    std::string name;
+    std::string description;
+    std::string group;
+    int imageId;
+    int duration;
+    bool premiumOnly;
+    std::vector<std::pair<ItemPtr, std::string>> sources;
+    int cost;
+    int successRate;
+    int protectionCost;
+};
+
 enum SpriteMask
 {
     SpriteMaskRed = 1,
@@ -134,6 +144,19 @@ struct MarketData
     uint16_t restrictVocation;
     uint16_t showAs;
     uint16_t tradeAs;
+};
+
+struct MarketOffer
+{
+    uint32_t timestamp = 0;
+    uint16_t counter = 0;
+    uint8_t action = 0;
+    uint16_t itemId = 0;
+    uint16_t amount = 0;
+    uint64_t price = 0;
+    std::string playerName;
+    uint8_t state = 0;
+    uint16_t var = 0;
 };
 
 struct Light
@@ -184,7 +207,7 @@ public:
     Light getLight() { return m_attribs.get<Light>(ThingAttrLight); }
     int getMinimapColor() { return m_attribs.get<uint16_t>(ThingAttrMinimapColor); }
     int getLensHelp() { return m_attribs.get<uint16_t>(ThingAttrLensHelp); }
-    int getClothSlot() { return m_attribs.get<uint16_t>(ThingAttrCloth); }
+    int getClothSlot() { return m_attribs.get<uint32_t>(ThingAttrCloth); }
     MarketData getMarketData() { return m_attribs.get<MarketData>(ThingAttrMarket); }
     bool isGround() { return m_attribs.has(ThingAttrGround); }
     bool isGroundBorder() { return m_attribs.has(ThingAttrGroundBorder); }
@@ -259,8 +282,8 @@ private:
     ThingCategory m_category{ ThingInvalidCategory };
     uint16_t m_id{ 0 };
 
-    bool m_null{ true },
-        m_opaque{ false };
+    bool m_null{ true };
+    bool m_opaque{ false };
 
     stdext::small_dynamic_storage<ThingAttr, ThingLastAttr> m_attribs;
 
@@ -268,12 +291,12 @@ private:
     Point m_displacement;
     AnimatorPtr m_animator;
     AnimatorPtr m_idleAnimator;
-    int m_animationPhases;
+    int m_animationPhases{ 0 };
     int m_exactSize{ 0 };
     int m_realSize{ 0 };
-    int m_numPatternX{ 0 },
-        m_numPatternY{ 0 },
-        m_numPatternZ{ 0 };
+    int m_numPatternX{ 0 };
+    int m_numPatternY{ 0 };
+    int m_numPatternZ{ 0 };
     int m_layers{ 0 };
     int m_exactHeight{ 0 };
     float m_opacity{ 1.f };
@@ -281,9 +304,9 @@ private:
 
     std::vector<int> m_spritesIndex;
 
-    std::vector<TexturePtr> m_textures,
-        m_blankTextures,
-        m_smoothTextures;
+    std::vector<TexturePtr> m_textures;
+    std::vector<TexturePtr> m_blankTextures;
+    std::vector<TexturePtr> m_smoothTextures;
 
     std::vector<std::vector<Rect>> m_texturesFramesRects;
     std::vector<std::vector<Rect>> m_texturesFramesOriginRects;

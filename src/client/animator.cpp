@@ -98,8 +98,7 @@ void Animator::setPhase(int phase)
 
 int Animator::getPhase()
 {
-    const ticks_t ticks = g_clock.millis();
-    if (ticks != m_lastPhaseTicks && !m_isComplete) {
+    if (const ticks_t ticks = g_clock.millis(); ticks != m_lastPhaseTicks && !m_isComplete) {
         const int elapsedTicks = static_cast<int>(ticks - m_lastPhaseTicks);
         if (elapsedTicks >= m_currentDuration) {
             int phase;
@@ -222,9 +221,9 @@ void Animator::calculateSynchronous()
     m_lastPhaseTicks = ticks;
 }
 
-ticks_t Animator::getTotalDuration()
+uint16_t Animator::getTotalDuration()
 {
-    ticks_t time = 0;
+    uint16_t time = 0;
     for (const auto& pair : m_phaseDurations) {
         time += pair.first + (pair.second - pair.first);
     }

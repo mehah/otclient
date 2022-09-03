@@ -59,7 +59,7 @@ protected:
     virtual bool internalUpdate() { return false; }
 
     int m_updateDisabled;
-    bool m_updating{ false },
-        m_updateScheduled{ false };
+    bool m_updating{ false };
+    bool m_updateScheduled{ false };
     UIWidgetPtr m_parentWidget;
 };
