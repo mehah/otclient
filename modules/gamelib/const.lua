@@ -153,6 +153,17 @@ GameIngameStoreHighlights = 74
 GameIngameStoreServiceType = 75
 GameAdditionalSkills = 76
 GameDistanceEffectU16 = 77
+GameLevelU16 = 78
+GameSoul = 79
+GameMapOldEffectRendering = 80
+GameMapDontCorrectCorpse = 81
+GameThingQuickLoot = 82
+GameThingQuiver = 83
+GameThingPodium = 84
+GameThingUpgradeClassification = 85
+GameThingCounter = 86
+GameThingClock = 87
+GameThingPodiumItemType = 88
 
 TextColors = {
     red = '#f55e5e', -- '#c83200'

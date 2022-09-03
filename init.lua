@@ -2,7 +2,7 @@
 -- we have to load the first modules form here
 
 -- set latest supported version
-g_game.setLastSupportedVersion(1287)
+g_game.setLastSupportedVersion(1291)
 
 -- setup logger
 g_logger.setLogFile(g_resources.getWorkDir() .. g_app.getCompactName() .. ".log")

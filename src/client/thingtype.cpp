@@ -302,11 +302,36 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
     // player_corpse
     // cyclopediaitem
     // ammo
-    // show_off_socket
+
+    if (flags.has_show_off_socket()) {
+        m_attribs.set(ThingAttrPodium, flags.show_off_socket());
+    }
+
     // reportable
 
     if (flags.has_upgradeclassification()) {
         m_attribs.set<uint16_t>(ThingAttrUpgradeClassification, flags.upgradeclassification().upgrade_classification());
+    }
+
+    // reverse_addons_east
+    // reverse_addons_west
+    // reverse_addons_south
+    // reverse_addons_north
+
+    if (flags.has_wearout()) {
+        m_attribs.set(ThingAttrWearOut, flags.clip());
+    }
+
+    if (flags.has_clockexpire()) {
+        m_attribs.set(ThingAttrClockExpire, flags.clip());
+    }
+
+    if (flags.has_expire()) {
+        m_attribs.set(ThingAttrExpire, flags.clip());
+    }
+
+    if (flags.has_expirestop()) {
+        m_attribs.set(ThingAttrExpireStop, flags.clip());
     }
 
     // now lets parse sprite data

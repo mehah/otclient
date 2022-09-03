@@ -15,7 +15,7 @@ local function readMarketOffer(msg, action, var)
     local itemId = 0
     if var == MarketRequest.MyOffers or var == MarketRequest.MyHistory then
         itemId = msg:getU16()
-        if g_game.getClientVersion() >= 1281 then
+        if g_game.getFeature(GameThingUpgradeClassification) then
             local item = Item.create(itemId) -- item id
             if item and item:getUpgradeClassification() > 0 then msg:getU8() end
         end
@@ -60,8 +60,8 @@ local function parseMarketEnter(protocol, msg)
     local depotItems = {}
     local depotCount = msg:getU16()
     for i = 1, depotCount do
-        local itemId = msg:getU16();
-        if g_game.getClientVersion() >= 1281 then
+        local itemId = msg:getU16()
+        if g_game.getFeature(GameThingUpgradeClassification) then
             local item = Item.create(itemId)
             if item and item:getUpgradeClassification() > 0 then msg:getU8() end
         end
@@ -80,8 +80,8 @@ local function parseMarketLeave(protocol, msg)
 end
 
 local function parseMarketDetail(protocol, msg)
-    local itemId = msg:getU16();
-    if g_game.getClientVersion() >= 1281 then
+    local itemId = msg:getU16()
+    if g_game.getFeature(GameThingUpgradeClassification) then
         local item = Item.create(itemId) -- item id
         if item and item:getUpgradeClassification() > 0 then msg:getU8() end
     end
@@ -148,7 +148,7 @@ end
 
 local function parseMarketBrowse(protocol, msg)
     local var = 0
-    if g_game.getClientVersion() >= 1281 then
+    if g_game.getFeature(GameThingUpgradeClassification) then
         var = msg:getU8()
         if var == 3 then --- Item browse
             var = msg:getU16()

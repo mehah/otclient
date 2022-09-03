@@ -142,6 +142,11 @@ public:
     bool isUnwrapable() { return getThingType()->isUnwrapable(); }
     bool isTopEffect() { return getThingType()->isTopEffect(); }
     bool hasAction() { return getThingType()->hasAction(); }
+    bool hasWearOut() { return getThingType()->hasWearOut(); }
+    bool hasClockExpire() { return getThingType()->hasClockExpire(); }
+    bool hasExpire() { return getThingType()->hasExpire(); }
+    bool hasExpireStop() { return getThingType()->hasExpireStop(); }
+    bool isPodium() { return getThingType()->isPodium(); }
     bool isOpaque() { return getThingType()->isOpaque(); }
     bool isSingleDimension() { return getThingType()->isSingleDimension(); }
     bool isTall(const bool useRealSize = false) { return getThingType()->isTall(useRealSize); }
