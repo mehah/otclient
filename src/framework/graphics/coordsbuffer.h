@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef COORDSBUFFER_H
-#define COORDSBUFFER_H
+#pragma once
 
 #include "vertexarray.h"
 
@@ -69,14 +68,28 @@ public:
     void addBoudingRect(const Rect& dest, int innerLineWidth);
     void addRepeatedRects(const Rect& dest, const Rect& src);
 
-    float* getVertexArray() { return m_vertexArray.vertices(); }
-    float* getTextureCoordArray() { return m_textureCoordArray.vertices(); }
+    void append(const CoordsBuffer* buffer)
+    {
+        m_vertexArray.append(&buffer->m_vertexArray);
+        m_textureCoordArray.append(&buffer->m_textureCoordArray);
+    }
+
+    const float* getVertexArray() const { return m_vertexArray.vertices(); }
+    const float* getTextureCoordArray() const { return m_textureCoordArray.vertices(); }
     int getVertexCount() const { return m_vertexArray.vertexCount(); }
     int getTextureCoordCount() const { return m_textureCoordArray.vertexCount(); }
+
+    void cache();
+
+    bool isCached() { return m_vertexArray.isCached() || m_textureCoordArray.isCached(); }
+    void enableCache() { m_canCache = true; }
+
+    HardwareBuffer* getHardwareVertexCache() { return m_vertexArray.getHardwareCache(); }
+    HardwareBuffer* getHardwareTextureCoordCache() { return m_textureCoordArray.getHardwareCache(); }
 
 private:
     VertexArray m_vertexArray;
     VertexArray m_textureCoordArray;
-};
 
-#endif
+    bool m_canCache{ false };
+};

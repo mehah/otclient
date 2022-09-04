@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef UIGRIDLAYOUT_H
-#define UIGRIDLAYOUT_H
+#pragma once
 
 #include "uilayout.h"
 
@@ -60,9 +59,7 @@ private:
     int m_cellSpacing;
     int m_numColumns;
     int m_numLines;
-    bool m_autoSpacing{ false },
-        m_fitChildren{ false },
-        m_flow{ false };
+    bool m_autoSpacing{ false };
+    bool m_fitChildren{ false };
+    bool m_flow{ false };
 };
-
-#endif

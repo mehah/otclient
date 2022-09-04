@@ -1,5 +1,5 @@
 -- @docclass
-UIPopupScrollMenu = extends(UIWidget, "UIPopupScrollMenu")
+UIPopupScrollMenu = extends(UIWidget, 'UIPopupScrollMenu')
 
 local currentMenu
 
@@ -29,7 +29,9 @@ function UIPopupScrollMenu.create()
     return menu
 end
 
-function UIPopupScrollMenu:setScrollbarStep(step) self.scrollBar:setStep(step) end
+function UIPopupScrollMenu:setScrollbarStep(step)
+    self.scrollBar:setStep(step)
+end
 
 function UIPopupScrollMenu:display(pos)
     -- don't display if not options was added
@@ -43,9 +45,13 @@ function UIPopupScrollMenu:display(pos)
         return
     end
 
-    if currentMenu then currentMenu:destroy() end
+    if currentMenu then
+        currentMenu:destroy()
+    end
 
-    if pos == nil then pos = g_window.getMousePosition() end
+    if pos == nil then
+        pos = g_window.getMousePosition()
+    end
 
     rootWidget:addChild(self)
     self:setPosition(pos)
@@ -55,39 +61,39 @@ end
 
 function UIPopupScrollMenu:onGeometryChange(oldRect, newRect)
     local parent = self:getParent()
-    if not parent then return end
+    if not parent then
+        return
+    end
     local ymax = parent:getY() + parent:getHeight()
     local xmax = parent:getX() + parent:getWidth()
     if newRect.y + newRect.height > ymax then
         local newy = newRect.y - newRect.height
-        if newy > 0 and newy + newRect.height < ymax then self:setY(newy) end
+        if newy > 0 and newy + newRect.height < ymax then
+            self:setY(newy)
+        end
     end
     if newRect.x + newRect.width > xmax then
         local newx = newRect.x - newRect.width
-        if newx > 0 and newx + newRect.width < xmax then self:setX(newx) end
+        if newx > 0 and newx + newRect.width < xmax then
+            self:setX(newx)
+        end
     end
     self:bindRectToParent()
 end
 
 function UIPopupScrollMenu:addOption(optionName, optionCallback, shortcut)
-    local optionWidget = g_ui.createWidget(self:getStyleName() .. 'Button',
-                                           self.scrollArea)
+    local optionWidget = g_ui.createWidget(self:getStyleName() .. 'Button', self.scrollArea)
     optionWidget.onClick = function(widget)
         self:destroy()
         optionCallback()
     end
     optionWidget:setText(optionName)
-    local width = optionWidget:getTextSize().width +
-                      optionWidget:getMarginLeft() +
-                      optionWidget:getMarginRight() + 15
+    local width = optionWidget:getTextSize().width + optionWidget:getMarginLeft() + optionWidget:getMarginRight() + 15
 
     if shortcut then
-        local shortcutLabel = g_ui.createWidget(
-                                  self:getStyleName() .. 'ShortcutLabel',
-                                  optionWidget)
+        local shortcutLabel = g_ui.createWidget(self:getStyleName() .. 'ShortcutLabel', optionWidget)
         shortcutLabel:setText(shortcut)
-        width = width + shortcutLabel:getTextSize().width +
-                    shortcutLabel:getMarginLeft() +
+        width = width + shortcutLabel:getTextSize().width + shortcutLabel:getMarginLeft() +
                     shortcutLabel:getMarginRight()
     end
 
@@ -99,13 +105,17 @@ function UIPopupScrollMenu:addSeparator()
 end
 
 function UIPopupScrollMenu:onDestroy()
-    if currentMenu == self then currentMenu = nil end
+    if currentMenu == self then
+        currentMenu = nil
+    end
     self:ungrabMouse()
 end
 
 function UIPopupScrollMenu:onMousePress(mousePos, mouseButton)
     -- clicks outside menu area destroys the menu
-    if not self:containsPoint(mousePos) then self:destroy() end
+    if not self:containsPoint(mousePos) then
+        self:destroy()
+    end
     return true
 end
 
@@ -119,6 +129,10 @@ end
 
 -- close all menus when the window is resized
 local function onRootGeometryUpdate()
-    if currentMenu then currentMenu:destroy() end
+    if currentMenu then
+        currentMenu:destroy()
+    end
 end
-connect(rootWidget, {onGeometryChange = onRootGeometryUpdate})
+connect(rootWidget, {
+    onGeometryChange = onRootGeometryUpdate
+})

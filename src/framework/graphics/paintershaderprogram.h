@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef PAINTERSHADERPROGRAM_H
-#define PAINTERSHADERPROGRAM_H
+#pragma once
 
 #include "shaderprogram.h"
 #include <client/position.h>
@@ -46,7 +45,7 @@ protected:
         TRANSFORM_MATRIX_UNIFORM = 10
     };
 
-    friend class PainterOGL2;
+    friend class Painter;
 
     virtual void setupUniforms();
 
@@ -70,18 +69,19 @@ public:
     void bindMultiTextures();
 
 private:
-    float m_startTime;
+    float m_startTime{ 0 };
+    float m_opacity{ 1.f };
+    float m_time{ 0 };
 
-    Color m_color;
-    float m_opacity;
+    Color m_color{ Color::white };
+
     Matrix3 m_transformMatrix;
     Matrix3 m_projectionMatrix;
     Matrix3 m_textureMatrix;
+
     Size m_resolution;
-    float m_time;
+
     std::vector<TexturePtr> m_multiTextures;
 
     Position m_startPos;
 };
-
-#endif

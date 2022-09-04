@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,12 +25,7 @@
 #include <framework/core/application.h>
 #include <random>
 
-Protocol::Protocol()
-{
-    m_xteaEncryptionEnabled = false;
-    m_checksumEnabled = false;
-    m_inputMessage = InputMessagePtr(new InputMessage);
-}
+Protocol::Protocol() :m_inputMessage(InputMessagePtr(new InputMessage)) {}
 
 Protocol::~Protocol()
 {
@@ -40,14 +35,11 @@ Protocol::~Protocol()
     disconnect();
 }
 
-void Protocol::connect(const std::string& host, uint16 port)
+void Protocol::connect(const std::string_view host, uint16_t port)
 {
     m_connection = ConnectionPtr(new Connection);
-    m_connection->setErrorCallback([capture0 = asProtocol()](auto&& PH1)
-    {
-        capture0->onError(std::forward<decltype(PH1)>(PH1));
-    });
-    m_connection->connect(host, port, [capture0 = asProtocol()]{ capture0->onConnect(); });
+    m_connection->setErrorCallback([capture0 = asProtocol()](auto&& PH1) { capture0->onError(std::forward<decltype(PH1)>(PH1));    });
+    m_connection->connect(host, port, [capture0 = asProtocol()] { capture0->onConnect(); });
 }
 
 void Protocol::disconnect()
@@ -56,20 +48,6 @@ void Protocol::disconnect()
         m_connection->close();
         m_connection.reset();
     }
-}
-
-bool Protocol::isConnected()
-{
-    if (m_connection && m_connection->isConnected())
-        return true;
-    return false;
-}
-
-bool Protocol::isConnecting()
-{
-    if (m_connection && m_connection->isConnecting())
-        return true;
-    return false;
 }
 
 void Protocol::send(const OutputMessagePtr& outputMessage)
@@ -107,29 +85,27 @@ void Protocol::recv()
 
     // read the first 2 bytes which contain the message size
     if (m_connection)
-        m_connection->read(2, [capture0 = asProtocol()](auto&& PH1, auto&& PH2)
-    {
+        m_connection->read(2, [capture0 = asProtocol()](auto&& PH1, auto&& PH2) {
         capture0->internalRecvHeader(std::forward<decltype(PH1)>(PH1),
                                      std::forward<decltype(PH2)>(PH2));
     });
 }
 
-void Protocol::internalRecvHeader(uint8* buffer, uint16 size)
+void Protocol::internalRecvHeader(uint8_t* buffer, uint16_t size)
 {
     // read message size
     m_inputMessage->fillBuffer(buffer, size);
-    const uint16 remainingSize = m_inputMessage->readSize();
+    const uint16_t remainingSize = m_inputMessage->readSize();
 
     // read remaining message data
     if (m_connection)
-        m_connection->read(remainingSize, [capture0 = asProtocol()](auto&& PH1, auto&& PH2)
-    {
+        m_connection->read(remainingSize, [capture0 = asProtocol()](auto&& PH1, auto&& PH2) {
         capture0->internalRecvData(std::forward<decltype(PH1)>(PH1),
                                    std::forward<decltype(PH2)>(PH2));
     });
 }
 
-void Protocol::internalRecvData(uint8* buffer, uint16 size)
+void Protocol::internalRecvData(uint8_t* buffer, uint16_t size)
 {
     // process data only if really connected
     if (!isConnected()) {
@@ -156,8 +132,8 @@ void Protocol::internalRecvData(uint8* buffer, uint16 size)
 void Protocol::generateXteaKey()
 {
     std::random_device rd;
-    std::uniform_int_distribution<uint32> unif;
-    std::generate(m_xteaKey.begin(), m_xteaKey.end(), [&unif, &rd]() { return unif(rd); });
+    std::uniform_int_distribution<uint32_t > unif;
+    std::generate(m_xteaKey.begin(), m_xteaKey.end(), [&unif, &rd] { return unif(rd); });
 }
 
 namespace
@@ -187,7 +163,7 @@ namespace
 
 bool Protocol::xteaDecrypt(const InputMessagePtr& inputMessage)
 {
-    const uint16 encryptedSize = inputMessage->getUnreadSize();
+    const uint16_t encryptedSize = inputMessage->getUnreadSize();
     if (encryptedSize % 8 != 0) {
         g_logger.traceError("invalid encrypted network message");
         return false;
@@ -200,7 +176,7 @@ bool Protocol::xteaDecrypt(const InputMessagePtr& inputMessage)
         });
     }
 
-    const uint16 decryptedSize = inputMessage->getU16() + 2;
+    const uint16_t decryptedSize = inputMessage->getU16() + 2;
     const int sizeDelta = decryptedSize - encryptedSize;
     if (sizeDelta > 0 || -sizeDelta > encryptedSize) {
         g_logger.traceError("invalid decrypted network message");
@@ -214,11 +190,11 @@ bool Protocol::xteaDecrypt(const InputMessagePtr& inputMessage)
 void Protocol::xteaEncrypt(const OutputMessagePtr& outputMessage)
 {
     outputMessage->writeMessageSize();
-    uint16 encryptedSize = outputMessage->getMessageSize();
+    uint16_t encryptedSize = outputMessage->getMessageSize();
 
     //add bytes until reach 8 multiple
     if ((encryptedSize % 8) != 0) {
-        const uint16 n = 8 - (encryptedSize % 8);
+        const uint16_t n = 8 - (encryptedSize % 8);
         outputMessage->addPaddingBytes(n);
         encryptedSize += n;
     }
@@ -231,10 +207,7 @@ void Protocol::xteaEncrypt(const OutputMessagePtr& outputMessage)
     }
 }
 
-void Protocol::onConnect()
-{
-    callLuaField("onConnect");
-}
+void Protocol::onConnect() { callLuaField("onConnect"); }
 
 void Protocol::onRecv(const InputMessagePtr& inputMessage)
 {

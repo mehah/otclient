@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,8 @@
  * THE SOFTWARE.
  */
 
+#pragma once
+
 #include <framework/global.h>
 
 class Mouse
@@ -28,7 +30,7 @@ public:
     void init();
     void terminate();
 
-    void loadCursors(std::string filename);
+    void loadCursors(const std::string& filename);
     void addCursor(const std::string& name, const std::string& file, const Point& hotSpot);
     bool pushCursor(const std::string& name);
     void popCursor(const std::string& name);
@@ -38,7 +40,7 @@ public:
 private:
     void checkStackSize();
 
-    std::map<std::string, int> m_cursors;
+    stdext::map<std::string, int> m_cursors;
     std::deque<int> m_cursorStack;
 };
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,9 @@
 #include "particle.h"
 #include "particleaffector.h"
 #include <framework/core/clock.h>
+#include <framework/core/graphicalapplication.h>
 
-ParticleSystem::ParticleSystem()
-{
-    m_finished = false;
-    m_lastUpdateTime = g_clock.seconds();
-}
+ParticleSystem::ParticleSystem() :m_lastUpdateTime(g_clock.seconds()) {}
 
 void ParticleSystem::load(const OTMLNodePtr& node)
 {
@@ -121,4 +118,6 @@ void ParticleSystem::update()
             }
         }
     }
+
+    g_app.repaint();
 }

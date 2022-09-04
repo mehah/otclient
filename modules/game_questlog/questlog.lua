@@ -5,10 +5,8 @@ function init()
     g_ui.importStyle('questlogwindow')
     g_ui.importStyle('questlinewindow')
 
-    questLogButton = modules.client_topmenu.addLeftGameButton('questLogButton',
-                                                              tr('Quest Log'),
-                                                              '/images/topbuttons/questlog',
-                                                              function()
+    questLogButton = modules.client_topmenu.addLeftGameButton('questLogButton', tr('Quest Log'),
+                                                              '/images/topbuttons/questlog', function()
         g_game.requestQuestLog()
     end)
 
@@ -31,9 +29,13 @@ function terminate()
 end
 
 function destroyWindows()
-    if questLogWindow then questLogWindow:destroy() end
+    if questLogWindow then
+        questLogWindow:destroy()
+    end
 
-    if questLineWindow then questLineWindow:destroy() end
+    if questLineWindow then
+        questLineWindow:destroy()
+    end
 end
 
 function onGameQuestLog(quests)
@@ -54,23 +56,30 @@ function onGameQuestLog(quests)
         end
     end
 
-    questLogWindow.onDestroy = function() questLogWindow = nil end
+    questLogWindow.onDestroy = function()
+        questLogWindow = nil
+    end
 
     questList:focusChild(questList:getFirstChild())
 end
 
 function onGameQuestLine(questId, questMissions)
-    if questLogWindow then questLogWindow:hide() end
-    if questLineWindow then questLineWindow:destroy() end
+    if questLogWindow then
+        questLogWindow:hide()
+    end
+    if questLineWindow then
+        questLineWindow:destroy()
+    end
 
     questLineWindow = g_ui.createWidget('QuestLineWindow', rootWidget)
     local missionList = questLineWindow:getChildById('missionList')
-    local missionDescription =
-        questLineWindow:getChildById('missionDescription')
+    local missionDescription = questLineWindow:getChildById('missionDescription')
 
     connect(missionList, {
         onChildFocusChange = function(self, focusedChild)
-            if focusedChild == nil then return end
+            if focusedChild == nil then
+                return
+            end
             missionDescription:setText(focusedChild.description)
         end
     })
@@ -85,7 +94,9 @@ function onGameQuestLine(questId, questMissions)
     end
 
     questLineWindow.onDestroy = function()
-        if questLogWindow then questLogWindow:show(true) end
+        if questLogWindow then
+            questLogWindow:show(true)
+        end
         questLineWindow = nil
     end
 

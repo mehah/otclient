@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef EVENT_H
-#define EVENT_H
+#pragma once
 
 #include <framework/luaengine/luaobject.h>
 
@@ -43,5 +42,3 @@ protected:
     bool m_canceled;
     bool m_executed;
 };
-
-#endif

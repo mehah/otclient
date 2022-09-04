@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,12 +36,12 @@ OTMLDocumentPtr OTMLDocument::create()
 OTMLDocumentPtr OTMLDocument::parse(const std::string& fileName)
 {
     std::stringstream fin;
-    const std::string source = g_resources.resolvePath(fileName);
+    const auto& source = g_resources.resolvePath(fileName);
     g_resources.readFileStream(source, fin);
     return parse(fin, source);
 }
 
-OTMLDocumentPtr OTMLDocument::parse(std::istream& in, const std::string& source)
+OTMLDocumentPtr OTMLDocument::parse(std::istream& in, const std::string_view source)
 {
     OTMLDocumentPtr doc(new OTMLDocument);
     doc->setSource(source);
@@ -55,8 +55,8 @@ std::string OTMLDocument::emit()
     return OTMLEmitter::emitNode(asOTMLNode()) + "\n";
 }
 
-bool OTMLDocument::save(const std::string& fileName)
+bool OTMLDocument::save(const std::string_view fileName)
 {
     m_source = fileName;
-    return g_resources.writeFileContents(fileName, emit());
+    return g_resources.writeFileContents(fileName.data(), emit());
 }

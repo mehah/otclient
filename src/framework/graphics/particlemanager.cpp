@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -46,20 +46,20 @@ bool ParticleManager::importParticle(std::string file)
             }
         }
         return true;
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("could not load particles file %s: %s", file, e.what()));
         return false;
     }
 }
 
-ParticleEffectPtr ParticleManager::createEffect(const std::string& name)
+ParticleEffectPtr ParticleManager::createEffect(const std::string_view name)
 {
     try {
         auto particleEffect = ParticleEffectPtr(new ParticleEffect);
-        particleEffect->load(m_effectsTypes[name]);
+        particleEffect->load(m_effectsTypes[std::string(name)]);
         m_effects.push_back(particleEffect);
         return particleEffect;
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("failed to create effect '%s': %s", name, e.what()));
         return nullptr;
     }

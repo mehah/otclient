@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef POINT_H
-#define POINT_H
+#pragma once
 
 #include "../stdext/types.h"
 #include <array>
@@ -86,9 +85,9 @@ public:
 
     std::size_t hash() const { return (7 * 15 + x) * 15 + y; }
 
-    std::array<TPoint<T>, static_cast<uint8>(8)> getPointsAround(const uint8 pixel) const
+    std::array<TPoint<T>, static_cast<uint8_t>(8)> getPointsAround(const uint8_t pixel) const
     {
-        std::array<TPoint<T>, static_cast<uint8>(8)> positions;
+        std::array<TPoint<T>, static_cast<uint8_t>(8)> positions;
         int_fast8_t i = -1;
         for (int_fast32_t xi = -1; xi <= 1; ++xi) {
             for (int_fast32_t yi = -1; yi <= 1; ++yi) {
@@ -103,7 +102,7 @@ public:
         return positions;
     }
 
-    T x, y;;
+    T x, y;
 };
 
 using Point = TPoint<int>;
@@ -123,5 +122,3 @@ std::istream& operator>>(std::istream& in, TPoint<T>& point)
     in >> point.y;
     return in;
 }
-
-#endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,13 +22,14 @@
 
 #include "uitranslator.h"
 #include "uiwidget.h"
-#include <framework/graphics/drawpool.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/fontmanager.h>
 
 void UIWidget::initText()
 {
     m_font = g_fonts.getDefaultFont();
     m_textAlign = Fw::AlignCenter;
+    m_coordsBuffer = std::make_shared<CoordsBuffer>();
 }
 
 void UIWidget::updateText()
@@ -38,9 +39,12 @@ void UIWidget::updateText()
     else
         m_drawText = m_text;
 
+    if (m_font)
+        m_glyphsPositionsCache = m_font->calculateGlyphsPositions(m_drawText, m_textAlign, &m_textSize);
+
     // update rect size
     if (!m_rect.isValid() || m_textHorizontalAutoResize || m_textVerticalAutoResize) {
-        Size textBoxSize = getTextSize();
+        Size textBoxSize = m_textSize;
         textBoxSize += Size(m_padding.left + m_padding.right, m_padding.top + m_padding.bottom) + m_textOffset.toSize();
         Size size = getSize();
         if (size.width() <= 0 || (m_textHorizontalAutoResize && !m_textWrap))
@@ -50,7 +54,8 @@ void UIWidget::updateText()
         setSize(size);
     }
 
-    m_textMustRecache = true;
+    m_textCachedScreenCoords = {};
+    g_app.repaint();
 }
 
 void UIWidget::resizeToText()
@@ -88,55 +93,48 @@ void UIWidget::parseTextStyle(const OTMLNodePtr& styleNode)
 
 void UIWidget::drawText(const Rect& screenCoords)
 {
-    if (m_drawText.length() == 0 || m_color.aF() == 0.0f)
+    if (m_drawText.length() == 0 || m_color.aF() == 0.f)
         return;
 
-    if (screenCoords != m_textCachedScreenCoords || m_textMustRecache) {
+    if (screenCoords != m_textCachedScreenCoords) {
         auto coords = Rect(screenCoords.topLeft(), screenCoords.bottomRight());
         coords.translate(m_textOffset);
-
-        m_textMustRecache = false;
         m_textCachedScreenCoords = coords;
-
-        m_textCoordsCache.clear();
-        m_textCoordsCache = m_font->getDrawTextCoords(m_drawText, coords, m_textAlign);
+        m_font->fillTextCoords(m_coordsBuffer, m_text, m_textSize, m_textAlign, coords, m_glyphsPositionsCache);
     }
 
-    for (const auto& fontRect : m_textCoordsCache)
-        g_drawPool.addTexturedRect(fontRect.first, m_font->getTexture(), fontRect.second, m_color);
+    g_drawPool.addTexturedCoordsBuffer(m_font->getTexture(), m_coordsBuffer, m_color);
 }
 
-void UIWidget::onTextChange(const std::string& text, const std::string& oldText)
+void UIWidget::onTextChange(const std::string_view text, const std::string_view oldText)
 {
-    g_app.repaint();
     callLuaField("onTextChange", text, oldText);
 }
 
-void UIWidget::onFontChange(const std::string& font)
+void UIWidget::onFontChange(const std::string_view font)
 {
     callLuaField("onFontChange", font);
 }
 
-void UIWidget::setText(std::string text, bool dontFireLuaCall)
+void UIWidget::setText(const std::string_view text, bool dontFireLuaCall)
 {
+    std::string _text{ text.data() };
     if (m_textOnlyUpperCase)
-        stdext::toupper(text);
+        stdext::toupper(_text);
 
-    if (m_text == text)
+    if (m_text == _text)
         return;
 
     const std::string oldText = m_text;
-    m_text = text;
+    m_text = _text;
     updateText();
 
-    text = m_text;
-
     if (!dontFireLuaCall) {
-        onTextChange(text, oldText);
+        onTextChange(_text, oldText);
     }
 }
 
-void UIWidget::setFont(const std::string& fontName)
+void UIWidget::setFont(const std::string_view fontName)
 {
     m_font = g_fonts.getFont(fontName);
     updateText();

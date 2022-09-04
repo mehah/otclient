@@ -1,27 +1,4 @@
 Panel
-  ButtonBox
-    id: opengl1
-    anchors.left: parent.left
-    anchors.top: parent.top
-    text: OpenGL 1
-    size: 80 20
-
-  ButtonBox
-    id: opengl2
-    anchors.left: prev.right
-    anchors.verticalCenter: prev.verticalCenter
-    text: OpenGL 2
-    size: 80 20
-    margin-left: 4
-
-  ButtonBox
-    id: directx9
-    anchors.left: prev.right
-    anchors.verticalCenter: prev.verticalCenter
-    text: DirectX 9
-    size: 80 20
-    margin-left: 4
-
   OptionCheckBox
     id: vsync
     !text: tr('Enable vertical synchronization')
@@ -51,8 +28,9 @@ Panel
     !tooltip: tr('Draw effect after drawing the entire floor.')
 
   OptionCheckBox
-    id: drawViewportEdge
-    !text: tr('Draw Viewport Edge')
+    id: limitVisibleDimension
+    !text: tr('Limit Visible Dimension')
+    !tooltip: tr('The limit is based on your maximum range.')
 
   OptionCheckBox
     id: floatingEffect

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,14 +20,13 @@
  * THE SOFTWARE.
  */
 
-#ifndef SOUNDMANAGER_H
-#define SOUNDMANAGER_H
+#pragma once
 
 #include "declarations.h"
 #include "soundchannel.h"
 #include <future>
 
-//@bindsingleton g_sounds
+ //@bindsingleton g_sounds
 class SoundManager
 {
     enum
@@ -47,25 +46,24 @@ public:
     void stopAll();
 
     void preload(std::string filename);
-    SoundSourcePtr play(std::string filename, float fadetime = 0, float gain = 0);
+    SoundSourcePtr play(const std::string& filename, float fadetime = 0, float gain = 1.0f, float pitch = 1.0f);
     SoundChannelPtr getChannel(int channel);
 
-    std::string resolveSoundFile(std::string file);
+    std::string resolveSoundFile(const std::string& file);
     void ensureContext();
 
 private:
     SoundSourcePtr createSoundSource(const std::string& filename);
 
-    ALCdevice* m_device;
-    ALCcontext* m_context;
+    ALCdevice* m_device{};
+    ALCcontext* m_context{};
 
     std::map<StreamSoundSourcePtr, std::shared_future<SoundFilePtr>> m_streamFiles;
-    std::unordered_map<std::string, SoundBufferPtr> m_buffers;
+    stdext::map<std::string, SoundBufferPtr> m_buffers;
+    stdext::map<int, SoundChannelPtr> m_channels;
+
     std::vector<SoundSourcePtr> m_sources;
     bool m_audioEnabled{ true };
-    std::unordered_map<int, SoundChannelPtr> m_channels;
 };
 
 extern SoundManager g_sounds;
-
-#endif

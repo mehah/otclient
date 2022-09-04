@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef UIBOXLAYOUT_H
-#define UIBOXLAYOUT_H
+#pragma once
 
 #include "uilayout.h"
 
@@ -42,7 +41,5 @@ public:
 
 protected:
     bool m_fitChildren{ false };
-    int m_spacing;
+    int m_spacing{ 0 };
 };
-
-#endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,8 @@
 #include <client/spritemanager.h>
 #include <framework/graphics/texturemanager.h>
 
+#include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/drawpool.h"
-#include "framework/graphics/pool.h"
 
 void UISprite::drawSelf(Fw::DrawPane drawPane)
 {
@@ -67,7 +67,7 @@ void UISprite::setSpriteId(int id)
     }
 }
 
-void UISprite::onStyleApply(const std::string& styleName, const OTMLNodePtr& styleNode)
+void UISprite::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
 {
     UIWidget::onStyleApply(styleName, styleNode);
 

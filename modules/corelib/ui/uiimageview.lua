@@ -1,5 +1,5 @@
 -- @docclass
-UIImageView = extends(UIWidget, "UIImageView")
+UIImageView = extends(UIWidget, 'UIImageView')
 
 function UIImageView.create()
     local imageView = UIImageView.internalCreate()
@@ -71,10 +71,15 @@ function UIImageView:move(x, y, centerX, centerY)
     local centerY = centerY or self:getHeight() / 2
     local offsetX = centerX - x * self.zoom
     local offsetY = centerY - y * self.zoom
-    self:setImageOffset({x = offsetX, y = offsetY})
+    self:setImageOffset({
+        x = offsetX,
+        y = offsetY
+    })
 end
 
-function UIImageView:onDragEnter(pos) return true end
+function UIImageView:onDragEnter(pos)
+    return true
+end
 
 function UIImageView:onDragMove(pos, moved)
     local posX, posY = self:getImagePosition()
@@ -82,7 +87,9 @@ function UIImageView:onDragMove(pos, moved)
     return true
 end
 
-function UIImageView:onDragLeave(widget, pos) return true end
+function UIImageView:onDragLeave(widget, pos)
+    return true
+end
 
 function UIImageView:onMouseWheel(mousePos, direction)
     local x = mousePos.x - self:getX()

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef SOUNDBUFFER_H
-#define SOUNDBUFFER_H
+#pragma once
 
 #include "declarations.h"
 
@@ -36,10 +35,8 @@ public:
     bool fillBuffer(const SoundFilePtr& soundFile);
     bool fillBuffer(ALenum sampleFormat, const DataBuffer<char>& data, int size, int rate);
 
-    uint getBufferId() { return m_bufferId; }
+    uint32_t getBufferId() { return m_bufferId; }
 
 private:
-    uint m_bufferId;
+    uint32_t m_bufferId{ 0 };
 };
-
-#endif

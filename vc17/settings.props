@@ -9,9 +9,8 @@
         BOT_PROTECTION;
         OTCLIENT;
         CRASH_HANDLER;
-        FW_GRAPHICS;
-        FW_NET;
-        FW_SOUND;
+        FRAMEWORK_NET;
+        FRAMEWORK_SOUND;
         FW_XML;
         BUILD_TYPE="RelWithDebInfo";
         BUILD_COMMIT="devel";
@@ -41,7 +40,6 @@
     <OTCLIENT_LIBDEPS_D>
         glew32d.lib;
         zlibd.lib;
-        zstd.lib;
         physfs.lib;
         openal32.lib;
         lua51.lib;

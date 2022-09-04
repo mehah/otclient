@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef MAPVIEW_H
-#define MAPVIEW_H
+#pragma once
 
 #include "lightview.h"
 #include <framework/core/inputevent.h>
@@ -31,9 +30,38 @@
 
 struct AwareRange
 {
-    uint8 left, top, right, bottom;
-    uint8 horizontal() { return left + right + 1; }
-    uint8 vertical() { return top + bottom + 1; }
+    uint8_t left;
+    uint8_t top;
+    uint8_t right;
+    uint8_t bottom;
+
+    uint8_t horizontal() const { return left + right + 1; }
+    uint8_t vertical() const { return top + bottom + 1; }
+};
+
+struct MapPosInfo
+{
+    Rect rect;
+    Rect srcRect;
+    Point drawOffset;
+    float horizontalStretchFactor;
+    float verticalStretchFactor;
+
+    bool isInRange(const Position& pos, bool ignoreZ = false) const
+    {
+        return camera.isInRange(pos, awareRange.left - 1, awareRange.right - 2, awareRange.top - 1, awareRange.bottom - 2, ignoreZ);
+    }
+
+    bool isInRangeEx(const Position& pos, bool ignoreZ = false)  const
+    {
+        return camera.isInRange(pos, awareRange.left, awareRange.right, awareRange.top, awareRange.bottom, ignoreZ);
+    }
+
+private:
+    Position camera;
+    AwareRange awareRange;
+
+    friend class MapView;
 };
 
 // @bindclass
@@ -49,7 +77,7 @@ public:
         ALWAYS_WITH_TRANSPARENCY
     };
 
-    enum AntialiasingMode :uint8
+    enum AntialiasingMode :uint8_t
     {
         ANTIALIASING_DISABLED,
         ANTIALIASING_ENABLED,
@@ -61,12 +89,12 @@ public:
     void draw(const Rect& rect);
 
     // floor visibility related
-    uint8 getLockedFirstVisibleFloor() { return m_lockedFirstVisibleFloor; }
-    uint8 getCachedFirstVisibleFloor() { return m_cachedFirstVisibleFloor; }
-    uint8 getCachedLastVisibleFloor() { return m_cachedLastVisibleFloor; }
-    uint8 getTileSize() { return m_tileSize; }
+    uint8_t getLockedFirstVisibleFloor() { return m_lockedFirstVisibleFloor; }
+    uint8_t getCachedFirstVisibleFloor() { return m_cachedFirstVisibleFloor; }
+    uint8_t getCachedLastVisibleFloor() { return m_cachedLastVisibleFloor; }
+    uint8_t getTileSize() { return m_tileSize; }
 
-    void lockFirstVisibleFloor(uint8 firstVisibleFloor);
+    void lockFirstVisibleFloor(uint8_t firstVisibleFloor);
     void unlockFirstVisibleFloor();
 
     // map dimension related
@@ -102,15 +130,15 @@ public:
     bool isDrawingHealthBars() { return m_drawHealthBars; }
 
     void setDrawLights(bool enable);
-    bool isDrawingLights() { return m_drawLights && m_lightView->isDark(); }
+    bool isDrawingLights() { return m_lightView && m_lightView->isDark(); }
 
-    void setDrawViewportEdge(bool enable) { m_drawViewportEdge = enable; }
-    bool isDrawingViewportEdge() { return m_drawViewportEdge; }
+    void setLimitVisibleDimension(bool v) { m_limitVisibleDimension = v; }
+    bool isLimitedVisibleDimension() { return m_limitVisibleDimension; }
 
     void setDrawManaBar(bool enable) { m_drawManaBar = enable; }
     bool isDrawingManaBar() { return m_drawManaBar; }
 
-    void move(int32 x, int32 y);
+    void move(int32_t x, int32_t y);
 
     void setShader(const PainterShaderProgramPtr& shader, float fadein, float fadeout);
     PainterShaderProgramPtr getShader() { return m_shader; }
@@ -119,14 +147,20 @@ public:
 
     MapViewPtr asMapView() { return static_self_cast<MapView>(); }
 
-    void resetLastCamera() { m_lastCameraPosition = Position(); }
+    void resetLastCamera() { m_lastCameraPosition = {}; }
 
-    std::vector<CreaturePtr>& getVisibleCreatures() { return m_visibleCreatures; }
-    std::vector<CreaturePtr> getSpectators(const Position& centerPos, bool multiFloor);
-    std::vector<CreaturePtr> getSightSpectators(const Position& centerPos, bool multiFloor);
+    std::vector<CreaturePtr> getSpectators(bool multiFloor = false);
+    std::vector<CreaturePtr> getSightSpectators(bool multiFloor = false);
 
-    bool isInRange(const Position& pos, bool ignoreZ = false);
-    bool isInRangeEx(const Position& pos, bool ignoreZ = false);
+    bool isInRange(const Position& pos, bool ignoreZ = false)
+    {
+        return getCameraPosition().isInRange(pos, m_posInfo.awareRange.left - 1, m_posInfo.awareRange.right - 2, m_posInfo.awareRange.top - 1, m_posInfo.awareRange.bottom - 2, ignoreZ);
+    }
+
+    bool isInRangeEx(const Position& pos, bool ignoreZ = false)
+    {
+        return getCameraPosition().isInRange(pos, m_posInfo.awareRange.left, m_posInfo.awareRange.right, m_posInfo.awareRange.top, m_posInfo.awareRange.bottom, ignoreZ);
+    }
 
     TilePtr getTopTile(Position tilePos);
 
@@ -141,24 +175,26 @@ public:
 
     void setDrawHighlightTarget(const bool enable) { m_drawHighlightTarget = enable; }
 
-    void setFloorFading(uint16 value) { m_floorFading = value; }
+    void setFloorFading(uint16_t value) { m_floorFading = value; }
 
 protected:
     void onGlobalLightChange(const Light& light);
-    void onFloorChange(uint8 floor, uint8 previousFloor);
+    void onFloorChange(uint8_t floor, uint8_t previousFloor);
     void onTileUpdate(const Position& pos, const ThingPtr& thing, Otc::Operation operation);
     void onMapCenterChange(const Position& newPos, const Position& oldPos);
     void onCameraMove(const Point& offset);
+    void onFadeInFinished();
 
     friend class Map;
     friend class Tile;
     friend class LightView;
 
 private:
-    struct MapList
+    struct MapObject
     {
-        std::vector<TilePtr> shades, grounds, surfaces, effects;
-        void clear() { shades.clear(); grounds.clear(); surfaces.clear(); effects.clear(); }
+        std::vector<TilePtr> shades;
+        std::vector<TilePtr> tiles;
+        void clear() { shades.clear(); tiles.clear(); }
     };
 
     struct Crosshair
@@ -168,32 +204,27 @@ private:
         TexturePtr texture;
     };
 
-    struct RectCache
-    {
-        Rect rect, srcRect;
-        Point drawOffset;
-        float horizontalStretchFactor, verticalStretchFactor;
-    };
-
     void updateGeometry(const Size& visibleDimension);
-    void updateVisibleTilesCache();
-    void requestVisibleTilesCacheUpdate() { m_mustUpdateVisibleTilesCache = true; }
+    void updateVisibleTiles();
+    void requestUpdateVisibleTiles() { m_updateVisibleTiles = true; }
+    void requestUpdateMapPosInfo() { m_posInfo.rect = {}; }
 
-    uint8 calcFirstVisibleFloor(bool checkLimitsFloorsView);
-    uint8 calcLastVisibleFloor();
+    uint8_t calcFirstVisibleFloor(bool checkLimitsFloorsView);
+    uint8_t calcLastVisibleFloor();
 
     void updateLight();
     void updateViewportDirectionCache();
     void drawFloor();
-    void drawCreatureInformation();
     void drawText();
 
     void updateViewport(const Otc::Direction dir = Otc::InvalidDirection) { m_viewport = m_viewPortDirection[dir]; }
 
     bool canFloorFade() { return m_floorViewMode == FADE && m_floorFading; }
 
-    float getFadeLevel(uint8 z)
+    float getFadeLevel(uint8_t z)
     {
+        if (!canFloorFade()) return 1.f;
+
         float fading = std::clamp<float>(static_cast<float>(m_fadingFloorTimers[z].elapsed_millis()) / static_cast<float>(m_floorFading), 0.f, 1.f);
         if (z < m_cachedFirstVisibleFloor)
             fading = 1.0 - fading;
@@ -210,73 +241,73 @@ private:
         };
     }
 
-    int8 m_lockedFirstVisibleFloor{ -1 };
+    int8_t m_lockedFirstVisibleFloor{ -1 };
 
-    uint8 m_cachedFirstVisibleFloor{ SEA_FLOOR },
-        m_cachedLastVisibleFloor{ SEA_FLOOR },
-        m_tileSize{ SPRITE_SIZE },
-        m_floorMin{ 0 },
-        m_floorMax{ 0 },
-        m_antiAliasingMode;
+    uint8_t m_cachedFirstVisibleFloor{ SEA_FLOOR };
+    uint8_t m_cachedLastVisibleFloor{ SEA_FLOOR };
+    uint8_t m_tileSize{ SPRITE_SIZE };
+    uint8_t m_floorMin{ 0 };
+    uint8_t m_floorMax{ 0 };
+    uint8_t m_antiAliasingMode;
 
-    uint16 m_floorFading = 500;
+    uint16_t m_floorFading = 500;
 
-    float m_minimumAmbientLight{ 0 },
-        m_fadeInTime{ 0 },
-        m_fadeOutTime{ 0 },
-        m_shadowFloorIntensity{ 0 },
-        m_scaleFactor{ 1.f };
+    float m_minimumAmbientLight{ 0 };
+    float m_fadeInTime{ 0 };
+    float m_fadeOutTime{ 0 };
+    float m_shadowFloorIntensity{ 0 };
+    float m_scaleFactor{ 1.f };
+    float m_lastFadeLevel{ 1.f };
 
     Rect m_rectDimension;
 
-    Size m_drawDimension, m_visibleDimension;
+    Size m_drawDimension;
+    Size m_visibleDimension;
 
-    Point m_virtualCenterOffset, m_moveOffset;
+    Point m_virtualCenterOffset;
+    Point m_moveOffset;
 
-    Position m_customCameraPosition,
-        m_lastCameraPosition,
-        m_mousePosition;
+    Position m_customCameraPosition;
+    Position m_lastCameraPosition;
+    Position m_mousePosition;
 
     std::array<AwareRange, Otc::InvalidDirection + 1> m_viewPortDirection;
     AwareRange m_viewport;
 
     bool
-        m_mustUpdateVisibleTilesCache{ true },
-        m_mustUpdateVisibleCreaturesCache{ true },
-        m_shaderSwitchDone{ true },
-        m_drawHealthBars{ true },
-        m_drawManaBar{ true },
-        m_drawTexts{ true },
-        m_drawNames{ true },
-        m_smooth{ true },
-        m_follow{ true };
+        m_limitVisibleDimension{ true };
+    bool m_updateVisibleTiles{ true };
+    bool m_resetCoveredCache{ true };
+    bool m_shaderSwitchDone{ true };
+    bool m_drawHealthBars{ true };
+    bool m_drawManaBar{ true };
+    bool m_drawTexts{ true };
+    bool m_drawNames{ true };
+    bool m_smooth{ true };
+    bool m_follow{ true };
 
-    bool m_drawLights{ false },
-        m_autoViewMode{ false },
-        m_drawViewportEdge{ false },
-        m_drawHighlightTarget{ false },
-        m_shiftPressed{ false };
+    bool m_autoViewMode{ false };
+    bool m_drawViewportEdge{ false };
+    bool m_drawHighlightTarget{ false };
+    bool m_shiftPressed{ false };
 
-    std::vector<CreaturePtr> m_visibleCreatures;
-
-    std::array<MapList, MAX_Z + 1> m_cachedVisibleTiles;
+    std::array<MapObject, MAX_Z + 1> m_cachedVisibleTiles;
 
     stdext::timer m_fadingFloorTimers[MAX_Z + 1];
 
-    PainterShaderProgramPtr m_shader, m_nextShader;
+    PainterShaderProgramPtr m_shader;
+    PainterShaderProgramPtr m_nextShader;
     LightViewPtr m_lightView;
     CreaturePtr m_followingCreature;
 
-    RectCache m_rectCache;
+    MapPosInfo m_posInfo;
     FloorViewMode m_floorViewMode{ NORMAL };
 
     Timer m_fadeTimer;
 
-    AwareRange m_awareRange;
-
     TilePtr m_lastHighlightTile;
     TexturePtr m_crosshairTexture;
     EffectPtr m_crosshairEffect;
-};
 
-#endif
+    DrawBufferPtr m_shadowBuffer;
+};

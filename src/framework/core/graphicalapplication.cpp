@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
 #include "graphicalapplication.h"
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>
-#include <framework/graphics/drawpool.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
 #include <framework/graphics/particlemanager.h>
 #include <framework/graphics/texturemanager.h>
@@ -33,7 +33,7 @@
 
 #include "framework/stdext/time.h"
 
-#ifdef FW_SOUND
+#ifdef FRAMEWORK_SOUND
 #include <framework/sound/soundmanager.h>
 #endif
 
@@ -62,7 +62,7 @@ void GraphicalApplication::init(std::vector<std::string>& args)
     // fire first resize event
     resize(g_window.getSize());
 
-#ifdef FW_SOUND
+#ifdef FRAMEWORK_SOUND
     // initialize sound
     g_sounds.init();
 #endif
@@ -87,7 +87,7 @@ void GraphicalApplication::terminate()
     Application::terminate();
     m_terminated = false;
 
-#ifdef FW_SOUND
+#ifdef FRAMEWORK_SOUND
     // terminate sound
     g_sounds.terminate();
 #endif
@@ -95,7 +95,6 @@ void GraphicalApplication::terminate()
     g_mouse.terminate();
 
     // terminate graphics
-    m_foregroundFramed = nullptr;
     g_drawPool.terminate();
     g_graphics.terminate();
     g_window.terminate();
@@ -123,31 +122,45 @@ void GraphicalApplication::run()
 
     g_lua.callGlobalField("g_app", "onRun");
 
+    const auto& foreground = g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND);
+    const auto& map = g_drawPool.get<DrawPool>(DrawPoolType::MAP);
+
+    Timer foregroundRefresh;
+
     while (!m_stopping) {
+        g_clock.update();
+
         // poll all events before rendering
         poll();
 
         if (!g_window.isVisible()) {
             // sleeps until next poll to avoid massive cpu usage
-            stdext::millisleep(POLL_CYCLE_DELAY + 1);
-            g_clock.update();
+            stdext::millisleep(1);
             continue;
         }
 
-        if (!m_frameCounter.canRefresh()) {
-            continue;
-        }
+        m_frameCounter.start();
 
         // the screen consists of two panes
         {
+            if (foregroundRefresh.ticksElapsed() >= 100) { // 10 FPS (1000 / 10)
+                foreground->repaint();
+                foregroundRefresh.restart();
+            }
+
             // foreground pane - steady pane with few animated stuff (UI)
-            if (foregroundCanUpdate()) {
-                g_drawPool.use(PoolType::FOREGROUND);
+            if (foreground->canRepaint()) {
+                g_drawPool.use(DrawPoolType::FOREGROUND);
                 g_ui.render(Fw::ForegroundPane);
             }
 
             // background pane - high updated and animated pane (where the game are stuff happens)
             g_ui.render(Fw::BackgroundPane);
+
+            // force map repaint if vsync is enabled or maxFPS set.
+            if (g_window.vsyncEnabled() || getMaxFps() > 0) {
+                map->repaint();
+            }
         }
 
         // Draw All Pools
@@ -155,9 +168,6 @@ void GraphicalApplication::run()
 
         // update screen pixels
         g_window.swapBuffers();
-
-        // only update the current time once per frame to gain performance
-        g_clock.update();
 
         if (m_frameCounter.update()) {
             g_lua.callGlobalField("g_app", "onFps", m_frameCounter.getFps());
@@ -170,7 +180,7 @@ void GraphicalApplication::run()
 
 void GraphicalApplication::poll()
 {
-#ifdef FW_SOUND
+#ifdef FRAMEWORK_SOUND
     g_sounds.poll();
 #endif
 
@@ -196,10 +206,8 @@ void GraphicalApplication::resize(const Size& size)
     g_ui.resize(size);
     m_onInputEvent = false;
 
-    g_drawPool.get<PoolFramed>(PoolType::FOREGROUND)
+    g_drawPool.get<DrawPoolFramed>(DrawPoolType::FOREGROUND)
         ->resize(size);
-
-    m_mustRepaint = true;
 }
 
 void GraphicalApplication::inputEvent(const InputEvent& event)
@@ -208,3 +216,5 @@ void GraphicalApplication::inputEvent(const InputEvent& event)
     g_ui.inputEvent(event);
     m_onInputEvent = false;
 }
+
+void GraphicalApplication::repaint() { g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND)->repaint(); }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,12 +26,9 @@
 #include <framework/core/clock.h>
 #include <framework/platform/platformwindow.h>
 
-PainterShaderProgram::PainterShaderProgram()
+PainterShaderProgram::PainterShaderProgram() :m_startTime(g_clock.seconds())
 {
     m_startTime = g_clock.seconds();
-    m_opacity = 1;
-    m_color = Color::white;
-    m_time = 0;
 }
 
 void PainterShaderProgram::setupUniforms()

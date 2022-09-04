@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef UIMAP_H
-#define UIMAP_H
+#pragma once
 
 #include "declarations.h"
 #include "tile.h"
@@ -50,7 +49,7 @@ public:
     void setDrawNames(bool enable) { m_mapView->setDrawNames(enable); }
     void setDrawHealthBars(bool enable) { m_mapView->setDrawHealthBars(enable); }
     void setDrawLights(bool enable) { m_mapView->setDrawLights(enable); }
-    void setDrawViewportEdge(bool enable) { m_mapView->setDrawViewportEdge(enable); }
+    void setLimitVisibleDimension(bool enable) { m_mapView->setLimitVisibleDimension(enable); updateVisibleDimension(); }
     void setDrawManaBar(bool enable) { m_mapView->setDrawManaBar(enable); }
     void setKeepAspectRatio(bool enable);
     void setMapShader(const PainterShaderProgramPtr& shader, float fadein, float fadeout) { m_mapView->setShader(shader, fadein, fadeout); }
@@ -64,16 +63,15 @@ public:
     bool isDrawingNames() { return m_mapView->isDrawingNames(); }
     bool isDrawingHealthBars() { return m_mapView->isDrawingHealthBars(); }
     bool isDrawingLights() { return m_mapView->isDrawingLights(); }
-    bool isDrawingViewportEdge() { return m_mapView->isDrawingViewportEdge(); }
+    bool isLimitedVisibleDimension() { return m_mapView->isLimitedVisibleDimension(); }
     bool isDrawingManaBar() { return m_mapView->isDrawingManaBar(); }
     bool isKeepAspectRatioEnabled() { return m_keepAspectRatio; }
     bool isLimitVisibleRangeEnabled() { return m_limitVisibleRange; }
 
     void setShadowFloorIntensity(float intensity) { m_mapView->setShadowFloorIntensity(intensity); }
 
-    std::vector<CreaturePtr> getVisibleCreatures() { return m_mapView->getVisibleCreatures(); }
-    std::vector<CreaturePtr> getSpectators(const Position& centerPos, bool multiFloor) { return m_mapView->getSpectators(centerPos, multiFloor); }
-    std::vector<CreaturePtr> getSightSpectators(const Position& centerPos, bool multiFloor) { return m_mapView->getSightSpectators(centerPos, multiFloor); }
+    std::vector<CreaturePtr> getSpectators(bool multiFloor = false) { return m_mapView->getSpectators(multiFloor); }
+    std::vector<CreaturePtr> getSightSpectators(bool multiFloor = false) { return m_mapView->getSightSpectators(multiFloor); }
     bool isInRange(const Position& pos) { return m_mapView->isInRange(pos); }
 
     PainterShaderProgramPtr getMapShader() { return m_mapView->getShader(); }
@@ -93,10 +91,10 @@ public:
     void setCrosshairTexture(const std::string& texturePath) { m_mapView->setCrosshairTexture(texturePath); }
     void setDrawHighlightTarget(const bool enable) { m_mapView->setDrawHighlightTarget(enable); }
     void setAntiAliasingMode(const MapView::AntialiasingMode mode) { m_mapView->setAntiAliasingMode(mode); }
-    void setFloorFading(const uint16 v) { m_mapView->setFloorFading(v); }
+    void setFloorFading(const uint16_t v) { m_mapView->setFloorFading(v); }
 
 protected:
-    void onStyleApply(const std::string& styleName, const OTMLNodePtr& styleNode) override;
+    void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
     void onGeometryChange(const Rect& oldRect, const Rect& newRect) override;
     bool onMouseMove(const Point& mousePos, const Point& mouseMoved) override;
 
@@ -108,12 +106,10 @@ private:
     Rect m_mapRect;
     float m_aspectRatio;
 
-    bool m_keepAspectRatio,
-        m_limitVisibleRange;
+    bool m_keepAspectRatio;
+    bool m_limitVisibleRange;
 
-    int m_maxZoomIn,
-        m_maxZoomOut,
-        m_zoom;
+    int m_maxZoomIn;
+    int m_maxZoomOut;
+    int m_zoom;
 };
-
-#endif

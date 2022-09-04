@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -55,12 +55,12 @@ void Spawn::load(TiXmlElement* node)
     centerPos.z = node->readType<int>("centerz");
 
     setCenterPos(centerPos);
-    setRadius(node->readType<int32>("radius"));
+    setRadius(node->readType<int32_t>("radius"));
 
     CreatureTypePtr cType(nullptr);
     for (TiXmlElement* cNode = node->FirstChildElement(); cNode; cNode = cNode->NextSiblingElement()) {
         if (cNode->ValueStr() != "monster" && cNode->ValueStr() != "npc")
-            stdext::throw_exception(stdext::format("invalid spawn-subnode %s", cNode->ValueStr()));
+            throw Exception("invalid spawn-subnode %s", cNode->ValueStr());
 
         std::string cName = cNode->Attribute("name");
         stdext::tolower(cName);
@@ -72,7 +72,7 @@ void Spawn::load(TiXmlElement* node)
 
         cType->setSpawnTime(cNode->readType<int>("spawntime"));
         Otc::Direction dir = Otc::North;
-        auto dir_ = cNode->readType<int16>("direction");
+        auto dir_ = cNode->readType<int16_t>("direction");
         if (dir_ >= Otc::East && dir_ <= Otc::West)
             dir = static_cast<Otc::Direction>(dir_);
         cType->setDirection(dir);
@@ -101,7 +101,7 @@ void Spawn::save(TiXmlElement* node)
         auto* const creatureNode = new TiXmlElement(creature->getRace() == CreatureRaceNpc ? "npc" : "monster");
 
         if (!creatureNode)
-            stdext::throw_exception("Spawn::save: Ran out of memory while allocating XML element!  Terminating now.");
+            throw Exception("Spawn::save: Ran out of memory while allocating XML element!  Terminating now.");
 
         creatureNode->SetAttribute("name", creature->getName());
         creatureNode->SetAttribute("spawntime", creature->getSpawnTime());
@@ -131,7 +131,7 @@ void Spawn::addCreature(const Position& placePos, const CreatureTypePtr& cType)
     }
 
     g_map.addThing(cType->cast(), placePos, 4);
-    m_creatures.insert(std::make_pair(placePos, cType));
+    m_creatures.emplace(placePos, cType);
 }
 
 void Spawn::removeCreature(const Position& pos)
@@ -184,11 +184,11 @@ void CreatureManager::loadMonsters(const std::string& file)
     TiXmlDocument doc;
     doc.Parse(g_resources.readFileContents(file).c_str());
     if (doc.Error())
-        stdext::throw_exception(stdext::format("cannot open monsters file '%s': '%s'", file, doc.ErrorDesc()));
+        throw Exception("cannot open monsters file '%s': '%s'", file, doc.ErrorDesc());
 
     TiXmlElement* root = doc.FirstChildElement();
     if (!root || root->ValueStr() != "monsters")
-        stdext::throw_exception("malformed monsters xml file");
+        throw Exception("malformed monsters xml file");
 
     for (TiXmlElement* monster = root->FirstChildElement(); monster; monster = monster->NextSiblingElement()) {
         std::string fname = file.substr(0, file.find_last_of('/')) + '/' + monster->Attribute("file");
@@ -209,12 +209,12 @@ void CreatureManager::loadSingleCreature(const std::string& file)
 
 void CreatureManager::loadNpcs(const std::string& folder)
 {
-    std::string tmp = folder;
+    std::string tmp{ folder };
     if (!tmp.ends_with("/"))
         tmp += "/";
 
     if (!g_resources.directoryExists(tmp))
-        stdext::throw_exception(stdext::format("NPCs folder '%s' was not found.", folder));
+        throw Exception("NPCs folder '%s' was not found.", folder);
 
     const auto& fileList = g_resources.listDirectoryFiles(tmp);
     for (const std::string& file : fileList)
@@ -237,23 +237,23 @@ void CreatureManager::loadSpawns(const std::string& fileName)
         TiXmlDocument doc;
         doc.Parse(g_resources.readFileContents(fileName).c_str());
         if (doc.Error())
-            stdext::throw_exception(stdext::format("cannot load spawns xml file '%s: '%s'", fileName, doc.ErrorDesc()));
+            throw Exception("cannot load spawns xml file '%s: '%s'", fileName, doc.ErrorDesc());
 
         TiXmlElement* root = doc.FirstChildElement();
         if (!root || root->ValueStr() != "spawns")
-            stdext::throw_exception("malformed spawns file");
+            throw Exception("malformed spawns file");
 
         for (TiXmlElement* node = root->FirstChildElement(); node; node = node->NextSiblingElement()) {
             if (node->ValueTStr() != "spawn")
-                stdext::throw_exception("invalid spawn node");
+                throw Exception("invalid spawn node");
 
             SpawnPtr spawn(new Spawn);
             spawn->load(node);
-            m_spawns.insert(std::make_pair(spawn->getCenterPos(), spawn));
+            m_spawns.emplace(spawn->getCenterPos(), spawn);
         }
         doc.Clear();
         m_spawnLoaded = true;
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to load '%s': %s", fileName, e.what()));
     }
 }
@@ -277,8 +277,8 @@ void CreatureManager::saveSpawns(const std::string& fileName)
         }
 
         if (!doc.SaveFile("data" + fileName))
-            stdext::throw_exception(stdext::format("failed to save spawns XML %s: %s", fileName, doc.ErrorDesc()));
-    } catch (std::exception& e) {
+            throw Exception("failed to save spawns XML %s: %s", fileName, doc.ErrorDesc());
+    } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
     }
 }
@@ -288,13 +288,15 @@ void CreatureManager::loadCreatureBuffer(const std::string& buffer)
     TiXmlDocument doc;
     doc.Parse(buffer.c_str());
     if (doc.Error())
-        stdext::throw_exception(stdext::format("cannot load creature buffer: %s", doc.ErrorDesc()));
+        throw Exception("cannot load creature buffer: %s", doc.ErrorDesc());
 
     TiXmlElement* root = doc.FirstChildElement();
+
     if (!root || (root->ValueStr() != "monster" && root->ValueStr() != "npc"))
-        stdext::throw_exception("invalid root tag name");
+        throw Exception("invalid root tag name");
 
     std::string cName = root->Attribute("name");
+
     stdext::tolower(cName);
     stdext::trim(cName);
     stdext::ucwords(cName);
@@ -311,20 +313,19 @@ void CreatureManager::loadCreatureBuffer(const std::string& buffer)
     doc.Clear();
 }
 
-void CreatureManager::internalLoadCreatureBuffer(TiXmlElement* attrib, const CreatureTypePtr& m)
+void CreatureManager::internalLoadCreatureBuffer(const TiXmlElement* attrib, const CreatureTypePtr& m)
 {
     if (std::find(m_creatures.begin(), m_creatures.end(), m) != m_creatures.end())
         return;
 
     Outfit out;
 
-    const auto type = attrib->readType<int32>("type");
-    if (type > 0) {
+    if (const auto type = attrib->readType<int32_t>("type"); type > 0) {
         out.setCategory(ThingCategoryCreature);
         out.setId(type);
     } else {
         out.setCategory(ThingCategoryItem);
-        out.setAuxId(attrib->readType<int32>("typeex"));
+        out.setAuxId(attrib->readType<int32_t>("typeex"));
     }
 
     {
@@ -402,7 +403,7 @@ SpawnPtr CreatureManager::addSpawn(const Position& centerPos, int radius)
     ret->setRadius(radius);
     ret->setCenterPos(centerPos);
 
-    m_spawns.insert(std::make_pair(centerPos, ret));
+    m_spawns.emplace(centerPos, ret);
     return ret;
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef PLATFORMWINDOW_H
-#define PLATFORMWINDOW_H
+#pragma once
 
 #include <framework/core/inputevent.h>
 #include <framework/core/timer.h>
@@ -52,18 +51,18 @@ public:
     virtual void swapBuffers() = 0;
     virtual void showMouse() = 0;
     virtual void hideMouse() = 0;
-    virtual void displayFatalError(const std::string& /*message*/) {}
+    virtual void displayFatalError(const std::string_view /*message*/) {}
 
     int loadMouseCursor(const std::string& file, const Point& hotSpot);
     virtual void setMouseCursor(int cursorId) = 0;
     virtual void restoreMouseCursor() = 0;
 
-    virtual void setTitle(const std::string& title) = 0;
+    virtual void setTitle(const std::string_view title) = 0;
     virtual void setMinimumSize(const Size& minimumSize) = 0;
     virtual void setFullscreen(bool fullscreen) = 0;
     virtual void setVerticalSync(bool enable) = 0;
     virtual void setIcon(const std::string& iconFile) = 0;
-    virtual void setClipboardText(const std::string& text) = 0;
+    virtual void setClipboardText(const std::string_view text) = 0;
 
     virtual Size getDisplaySize() = 0;
     virtual std::string getClipboardText() = 0;
@@ -91,6 +90,8 @@ public:
     bool isFullscreen() { return m_fullscreen; }
     bool hasFocus() { return m_focused; }
 
+    bool vsyncEnabled() const { return m_vsync; }
+
     void setOnClose(const std::function<void()>& onClose) { m_onClose = onClose; }
     void setOnResize(const OnResizeCallback& onResize) { m_onResize = onResize; }
     void setOnInputEvent(const OnInputEventCallback& onInputEvent) { m_onInputEvent = onInputEvent; }
@@ -105,10 +106,10 @@ protected:
     void releaseAllKeys();
     void fireKeysPress();
 
-    std::map<int, Fw::Key> m_keyMap;
-    std::map<Fw::Key, bool> m_keysState;
-    std::map<Fw::Key, ticks_t> m_firstKeysPress;
-    std::map<Fw::Key, ticks_t> m_lastKeysPress;
+    stdext::map<int, Fw::Key> m_keyMap;
+    std::array<bool, Fw::KeyLast> m_keysState;
+    std::array<ticks_t, Fw::KeyLast> m_firstKeysPress;
+    std::array<ticks_t, Fw::KeyLast> m_lastKeysPress;
     Timer m_keyPressTimer;
 
     Size m_size;
@@ -117,12 +118,13 @@ protected:
     Size m_unmaximizedSize;
     Point m_unmaximizedPos;
     InputEvent m_inputEvent;
-    bool m_mouseButtonStates[4]{ false },
-        m_created{ false },
-        m_visible{ false },
-        m_focused{ false },
-        m_fullscreen{ false },
-        m_maximized{ false };
+    bool m_mouseButtonStates[4]{ false };
+    bool m_created{ false };
+    bool m_visible{ false };
+    bool m_focused{ false };
+    bool m_fullscreen{ false };
+    bool m_maximized{ false };
+    bool m_vsync{ false };
 
     std::function<void()> m_onClose;
     OnResizeCallback m_onResize;
@@ -130,5 +132,3 @@ protected:
 };
 
 extern PlatformWindow& g_window;
-
-#endif

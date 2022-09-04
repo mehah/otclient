@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,15 +20,14 @@
  * THE SOFTWARE.
  */
 
-#ifndef ANIMATEDTEXT_H
-#define ANIMATEDTEXT_H
+#pragma once
 
 #include "thing.h"
 #include <framework/core/timer.h>
 #include <framework/graphics/cachedtext.h>
 #include <framework/graphics/fontmanager.h>
 
-// @bindclass
+ // @bindclass
 class AnimatedText : public Thing
 {
 public:
@@ -36,8 +35,8 @@ public:
 
     void drawText(const Point& dest, const Rect& visibleRect);
 
-    void setColor(int color);
-    void setText(const std::string& text);
+    void setColor(int color) { m_color = Color::from8bit(color); }
+    void setText(const std::string_view text) { m_cachedText.setText(text); }
     void setOffset(const Point& offset) { m_offset = offset; }
 
     Color getColor() { return m_color; }
@@ -59,5 +58,3 @@ private:
     CachedText m_cachedText;
     Point m_offset;
 };
-
-#endif

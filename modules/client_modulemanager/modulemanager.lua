@@ -1,6 +1,7 @@
 local moduleManagerWindow
 local moduleManagerButton
 local moduleList
+local autoReloadEvents = {}
 
 function init()
     moduleManagerWindow = g_ui.displayUI('modulemanager')
@@ -8,7 +9,9 @@ function init()
     moduleList = moduleManagerWindow:getChildById('moduleList')
     connect(moduleList, {
         onChildFocusChange = function(self, focusedChild)
-            if focusedChild == nil then return end
+            if focusedChild == nil then
+                return
+            end
             updateModuleInfo(focusedChild:getText())
         end
     })
@@ -20,9 +23,8 @@ function init()
         moduleList:focusNextChild(KeyboardFocusReason)
     end, moduleManagerWindow)
 
-    moduleManagerButton = modules.client_topmenu.addLeftButton(
-                              'moduleManagerButton', tr('Module Manager'),
-                              '/images/topbuttons/modulemanager', toggle)
+    moduleManagerButton = modules.client_topmenu.addLeftButton('moduleManagerButton', tr('Module Manager'),
+                                                               '/images/topbuttons/modulemanager', toggle)
 
     -- refresh modules only after all modules are loaded
     addEvent(listModules)
@@ -34,9 +36,13 @@ function terminate()
     moduleList = nil
 end
 
-function disable() moduleManagerButton:hide() end
+function disable()
+    moduleManagerButton:hide()
+end
 
-function hide() moduleManagerWindow:hide() end
+function hide()
+    moduleManagerWindow:hide()
+end
 
 function show()
     moduleManagerWindow:show()
@@ -58,7 +64,9 @@ function refreshModules()
 end
 
 function listModules()
-    if not moduleManagerWindow then return end
+    if not moduleManagerWindow then
+        return
+    end
 
     moduleList:destroyChildren()
 
@@ -73,7 +81,9 @@ function listModules()
 end
 
 function refreshLoadedModules()
-    if not moduleManagerWindow then return end
+    if not moduleManagerWindow then
+        return
+    end
 
     for i, child in ipairs(moduleList:getChildren()) do
         local module = g_modules.getModule(child:getText())
@@ -82,7 +92,9 @@ function refreshLoadedModules()
 end
 
 function updateModuleInfo(moduleName)
-    if not moduleManagerWindow then return end
+    if not moduleManagerWindow then
+        return
+    end
 
     local name = ''
     local description = ''
@@ -107,14 +119,12 @@ function updateModuleInfo(moduleName)
     end
 
     moduleManagerWindow:recursiveGetChildById('moduleName'):setText(name)
-    moduleManagerWindow:recursiveGetChildById('moduleDescription'):setText(
-        description)
+    moduleManagerWindow:recursiveGetChildById('moduleDescription'):setText(description)
     moduleManagerWindow:recursiveGetChildById('moduleAuthor'):setText(author)
     moduleManagerWindow:recursiveGetChildById('moduleWebsite'):setText(website)
     moduleManagerWindow:recursiveGetChildById('moduleVersion'):setText(version)
 
-    local reloadButton = moduleManagerWindow:recursiveGetChildById(
-                             'moduleReloadButton')
+    local reloadButton = moduleManagerWindow:recursiveGetChildById('moduleReloadButton')
     reloadButton:setEnabled(canReload)
     if loaded then
         reloadButton:setText('Reload')
@@ -122,8 +132,7 @@ function updateModuleInfo(moduleName)
         reloadButton:setText('Load')
     end
 
-    local unloadButton = moduleManagerWindow:recursiveGetChildById(
-                             'moduleUnloadButton')
+    local unloadButton = moduleManagerWindow:recursiveGetChildById('moduleUnloadButton')
     unloadButton:setEnabled(canUnload)
 end
 
@@ -133,10 +142,28 @@ function reloadCurrentModule()
         local module = g_modules.getModule(focusedChild:getText())
         if module then
             module:reload()
-            if modules.client_modulemanager == nil then return end
+            if modules.client_modulemanager == nil then
+                return
+            end
             updateModuleInfo(module:getName())
             refreshLoadedModules()
             show()
+        end
+    end
+end
+
+function autoReloadCurrentModule(checkbox)
+    local focusedChild = moduleList:getFocusedChild()
+    if focusedChild then
+        local childId = focusedChild:getId()
+        local eventId = autoReloadEvents[childId]
+        if eventId then
+            removeEvent(eventId)
+            checkbox:setChecked(false)
+            autoReloadEvents[childId] = nil
+        else
+            autoReloadEvents[childId] = live_module_reload(focusedChild:getText())
+            checkbox:setChecked(true)
         end
     end
 end
@@ -147,7 +174,9 @@ function unloadCurrentModule()
         local module = g_modules.getModule(focusedChild:getText())
         if module then
             module:unload()
-            if modules.client_modulemanager == nil then return end
+            if modules.client_modulemanager == nil then
+                return
+            end
             updateModuleInfo(module:getName())
             refreshLoadedModules()
         end
@@ -155,6 +184,13 @@ function unloadCurrentModule()
 end
 
 function reloadAllModules()
+    for i, child in ipairs(moduleList:getChildren()) do
+        local eventId = autoReloadEvents[child:getId()]
+        if eventId then
+            removeEvent(eventId)
+        end
+    end
+
     g_modules.reloadModules()
     refreshLoadedModules()
     show()

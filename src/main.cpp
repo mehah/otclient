@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,14 +34,15 @@ int main(int argc, const char* argv[])
     std::vector<std::string> args(argv, argv + argc);
 
     // setup application name and version
-    g_app.setName("OTClient");
+    g_app.setName("OTClient - Redemption");
     g_app.setCompactName("otclient");
+    g_app.setOrganizationName("otbr");
 
-#if ENABLE_ENCRYPTION == 1
+#if ENABLE_ENCRYPTION == 1 && ENABLE_ENCRYPTION_BUILDER == 1
     if (std::find(args.begin(), args.end(), "--encrypt") != args.end()) {
         g_lua.init();
-        g_resources.init(args[0].c_str());
-        g_resources.runEncryption(args.size() >= 3 ? args[2] : "");
+        g_resources.init(args[0].data());
+        g_resources.runEncryption(args.size() >= 3 ? args[2] : ENCRYPTION_PASSWORD);
         std::cout << "Encryption complete" << std::endl;
     #ifdef WIN32
         MessageBoxA(NULL, "Encryption complete", "Success", 0);

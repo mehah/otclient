@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,10 +20,33 @@
  * THE SOFTWARE.
  */
 
-#ifndef LUAINTERFACE_H
-#define LUAINTERFACE_H
+#pragma once
 
 #include "declarations.h"
+
+#ifdef __has_include
+
+#if __has_include("luajit/lua.hpp")
+#include <luajit/lua.hpp>
+#elif __has_include(<lua.hpp>)
+#include <lua.hpp>
+#else
+#error "Cannot detect luajit library"
+#endif
+
+#else
+#include <lua.hpp>
+#endif
+
+#if LUA_VERSION_NUM >= 502
+#ifndef LUA_COMPAT_ALL
+#ifndef LUA_COMPAT_MODULE
+#define luaL_register(L, libname, l) (luaL_newlib(L, l), lua_pushvalue(L, -1), lua_setglobal(L, libname))
+#endif
+#undef lua_equal
+#define lua_equal(L, i1, i2) lua_compare(L, (i1), (i2), LUA_OPEQ)
+#endif
+#endif
 
 struct lua_State;
 using LuaCFunction = int(*) (lua_State* L);
@@ -32,33 +55,30 @@ using LuaCFunction = int(*) (lua_State* L);
 class LuaInterface
 {
 public:
-    LuaInterface();
-    ~LuaInterface();
+    LuaInterface() = default;
+    ~LuaInterface() = default;
 
     void init();
     void terminate();
 
-    /// Register core script functions
-    void registerFunctions();
-
     // functions that will register all script stuff in lua global environment
-    void registerSingletonClass(const std::string& className);
-    void registerClass(const std::string& className, const std::string& baseClass = "LuaObject");
+    void registerSingletonClass(const std::string_view className);
+    void registerClass(const std::string_view className, const std::string_view baseClass = "LuaObject");
 
-    void registerClassStaticFunction(const std::string& className,
-                                     const std::string& functionName,
+    void registerClassStaticFunction(const std::string_view className,
+                                     const std::string_view functionName,
                                      const LuaCppFunction& function);
 
-    void registerClassMemberFunction(const std::string& className,
-                                     const std::string& functionName,
+    void registerClassMemberFunction(const std::string_view className,
+                                     const std::string_view functionName,
                                      const LuaCppFunction& function);
 
-    void registerClassMemberField(const std::string& className,
-                                  const std::string& field,
+    void registerClassMemberField(const std::string_view className,
+                                  const std::string_view field,
                                   const LuaCppFunction& getFunction,
                                   const LuaCppFunction& setFunction);
 
-    void registerGlobalFunction(const std::string& functionName,
+    void registerGlobalFunction(const std::string_view functionName,
                                 const LuaCppFunction& function);
 
     // register shortcuts using templates
@@ -69,19 +89,19 @@ public:
     }
 
     template<class C>
-    void registerClassStaticFunction(const std::string& functionName, const LuaCppFunction& function)
+    void registerClassStaticFunction(const std::string_view functionName, const LuaCppFunction& function)
     {
         registerClassStaticFunction(stdext::demangle_class<C>(), functionName, function);
     }
 
     template<class C>
-    void registerClassMemberFunction(const std::string& functionName, const LuaCppFunction& function)
+    void registerClassMemberFunction(const std::string_view functionName, const LuaCppFunction& function)
     {
         registerClassMemberFunction(stdext::demangle_class<C>(), functionName, function);
     }
 
     template<class C>
-    void registerClassMemberField(const std::string& field,
+    void registerClassMemberField(const std::string_view field,
                                   const LuaCppFunction& getFunction,
                                   const LuaCppFunction& setFunction)
     {
@@ -90,37 +110,37 @@ public:
 
     // methods for binding functions
     template<class C, typename F>
-    void bindSingletonFunction(const std::string& functionName, F C::* function, C* instance);
+    void bindSingletonFunction(const std::string_view functionName, F C::* function, C* instance);
     template<class C, typename F>
-    void bindSingletonFunction(const std::string& className, const std::string& functionName, F C::* function, C* instance);
+    void bindSingletonFunction(const std::string_view className, const std::string_view functionName, F C::* function, C* instance);
 
     template<class C, typename F>
-    void bindClassStaticFunction(const std::string& functionName, const F& function);
+    void bindClassStaticFunction(const std::string_view functionName, const F& function);
     template<typename F>
-    void bindClassStaticFunction(const std::string& className, const std::string& functionName, const F& function);
+    void bindClassStaticFunction(const std::string_view className, const std::string_view functionName, const F& function);
 
     template<class C, typename F, class FC>
-    void bindClassMemberFunction(const std::string& functionName, F FC::* function);
+    void bindClassMemberFunction(const std::string_view functionName, F FC::* function);
     template<class C, typename F, class FC>
-    void bindClassMemberFunction(const std::string& className, const std::string& functionName, F FC::* function);
+    void bindClassMemberFunction(const std::string_view className, const std::string_view functionName, F FC::* function);
 
     template<class C, typename F1, typename F2, class FC>
-    void bindClassMemberField(const std::string& fieldName, F1 FC::* getFunction, F2 FC::* setFunction);
+    void bindClassMemberField(const std::string_view fieldName, F1 FC::* getFunction, F2 FC::* setFunction);
     template<class C, typename F1, typename F2, class FC>
-    void bindClassMemberField(const std::string& className, const std::string& fieldName, F1 FC::* getFunction, F2 FC::* setFunction);
+    void bindClassMemberField(const std::string_view className, const std::string_view fieldName, F1 FC::* getFunction, F2 FC::* setFunction);
 
     template<class C, typename F, class FC>
-    void bindClassMemberGetField(const std::string& fieldName, F FC::* getFunction);
+    void bindClassMemberGetField(const std::string_view fieldName, F FC::* getFunction);
     template<class C, typename F, class FC>
-    void bindClassMemberGetField(const std::string& className, const std::string& fieldName, F FC::* getFunction);
+    void bindClassMemberGetField(const std::string_view className, const std::string_view fieldName, F FC::* getFunction);
 
     template<class C, typename F, class FC>
-    void bindClassMemberSetField(const std::string& fieldName, F FC::* setFunction);
+    void bindClassMemberSetField(const std::string_view fieldName, F FC::* setFunction);
     template<class C, typename F, class FC>
-    void bindClassMemberSetField(const std::string& className, const std::string& fieldName, F FC::* setFunction);
+    void bindClassMemberSetField(const std::string_view className, const std::string_view fieldName, F FC::* setFunction);
 
     template<typename F>
-    void bindGlobalFunction(const std::string& functionName, const F& function);
+    void bindGlobalFunction(const std::string_view functionName, const F& function);
 
 private:
     /// Metamethod that will retrieve fields values (that include functions) from the object when using '.' or ':'
@@ -145,7 +165,7 @@ public:
 
     /// Loads and runs the script from buffer
     /// @exception LuaException is thrown on any lua error
-    void runBuffer(const std::string& buffer, const std::string& source);
+    void runBuffer(const std::string_view buffer, const std::string_view source);
 
     /// Loads a script file and pushes it's main function onto stack,
     /// @exception LuaException is thrown on any lua error
@@ -153,22 +173,22 @@ public:
 
     /// Loads a function from buffer and pushes it onto stack,
     /// @exception LuaException is thrown on any lua error
-    void loadFunction(const std::string& buffer, const std::string& source = "lua function buffer");
+    void loadFunction(const std::string_view buffer, const std::string_view source = "lua function buffer");
 
     /// Evaluates a lua expression and pushes the result value onto the stack
     /// @exception LuaException is thrown on any lua error
-    void evaluateExpression(const std::string& expression, const std::string& source = "lua expression");
+    void evaluateExpression(const std::string_view expression, const std::string_view source = "lua expression");
 
     /// Generates a traceback message for the current call stack
     /// @param errorMessage is an additional error message
     /// @param level is the level of the traceback, 0 means trace from calling function
     /// @return the generated traceback message
-    std::string traceback(const std::string& errorMessage = "", int level = 0);
+    std::string traceback(const std::string_view errorMessage = "", int level = 0);
 
     /// Throw a lua error if inside a lua call or generates an C++ stdext::exception
     /// @param message is the error message wich will be displayed before the error traceback
     /// @exception stdext::exception is thrown with the error message if the error is not captured by lua
-    void throwError(const std::string& message);
+    void throwError(const std::string_view message);
 
     /// Searches for the source of the current running function
     std::string getCurrentSourcePath(int level = 0);
@@ -193,13 +213,13 @@ public:
     int newSandboxEnv();
 
     template<typename... T>
-    int luaCallGlobalField(const std::string& global, const std::string& field, const T&... args);
+    int luaCallGlobalField(const std::string_view global, const std::string_view field, const T&... args);
 
     template<typename... T>
-    void callGlobalField(const std::string& global, const std::string& field, const T&... args);
+    void callGlobalField(const std::string_view global, const std::string_view field, const T&... args);
 
     template<typename R, typename... T>
-    R callGlobalField(const std::string& global, const std::string& field, const T&... args);
+    R callGlobalField(const std::string_view global, const std::string_view field, const T&... args);
 
     bool isInCppCallback() { return m_cppCallbackDepth != 0; }
 
@@ -219,13 +239,26 @@ private:
     /// Collect bound cpp function pointers
     static int luaCollectCppFunction(lua_State* L);
 
+    // Bit functions
+#ifndef LUAJIT_VERSION
+    static int luaBitAnd(lua_State* L);
+    static int luaBitNot(lua_State* L);
+    static int luaBitOr(lua_State* L);
+    static int luaBitXor(lua_State* L);
+    static int luaBitRightShift(lua_State* L);
+    static int luaBitLeftShift(lua_State* L);
+#endif
+
 public:
+    void registerTable(lua_State* L, const std::string& tableName);
+    void registerMethod(lua_State* L, const std::string& globalName, const std::string& methodName, lua_CFunction func);
+
     void createLuaState();
     void closeLuaState();
 
     void collectGarbage();
 
-    void loadBuffer(const std::string& buffer, const std::string& source);
+    void loadBuffer(const std::string_view buffer, const std::string_view source);
 
     int pcall(int numArgs = 0, int numRets = 0, int errorFuncIndex = 0);
     void call(int numArgs = 0, int numRets = 0);
@@ -256,10 +289,8 @@ public:
     void setMetatable(int index = -2);
     void getMetatable(int index = -1);
 
-    void getField(const char* key, int index = -1);
-    void getField(const std::string& key, int index = -1) { return getField(key.c_str(), index); }
-    void setField(const char* key, int index = -2);
-    void setField(const std::string& key, int index = -2) { return setField(key.c_str(), index); }
+    void getField(const std::string_view key, int index = -1);
+    void setField(const std::string_view key, int index = -2);
 
     void getTable(int index = -2);
     void setTable(int index = -3);
@@ -268,9 +299,9 @@ public:
     void getEnv(int index = -1);
     void setEnv(int index = -2);
 
-    void getGlobal(const std::string& key);
-    void getGlobalField(const std::string& globalKey, const std::string& fieldKey);
-    void setGlobal(const std::string& key);
+    void getGlobal(const std::string_view key);
+    void getGlobalField(const std::string_view globalKey, const std::string_view fieldKey);
+    void setGlobal(const std::string_view key);
 
     void rawGet(int index = -1);
     void rawGeti(int n, int index = -1);
@@ -294,8 +325,7 @@ public:
     void pushInteger(long v);
     void pushNumber(double v);
     void pushBoolean(bool v);
-    void pushCString(const char* v);
-    void pushString(const std::string& v);
+    void pushString(const std::string_view v);
     void pushLightUserdata(void* p);
     void pushThread();
     void pushValue(int index = -1);
@@ -316,7 +346,7 @@ public:
     bool toBoolean(int index = -1);
     int toInteger(int index = -1);
     double toNumber(int index = -1);
-    const char* toCString(int index = -1);
+    std::string_view toVString(int index = -1);
     std::string toString(int index = -1);
     void* toUserdata(int index = -1);
     LuaObjectPtr toObject(int index = -1);
@@ -343,12 +373,12 @@ public:
     T polymorphicPop() { T v = castValue<T>(); pop(1); return v; }
 
 private:
-    lua_State* L;
-    int m_weakTableRef;
-    int m_cppCallbackDepth;
-    int m_totalObjRefs;
-    int m_totalFuncRefs;
-    int m_globalEnv;
+    lua_State* L{ nullptr };
+    int m_weakTableRef{ 0 };
+    int m_cppCallbackDepth{ 0 };
+    int m_totalObjRefs{ 0 };
+    int m_totalFuncRefs{ 0 };
+    int m_globalEnv{ 0 };
 };
 
 extern LuaInterface g_lua;
@@ -368,74 +398,74 @@ int LuaInterface::polymorphicPush(const T& v, const Args&... args)
 // next templates must be defined after above includes
 
 template<class C, typename F>
-void LuaInterface::bindSingletonFunction(const std::string& functionName, F C::* function, C* instance)
+void LuaInterface::bindSingletonFunction(const std::string_view functionName, F C::* function, C* instance)
 {
     registerClassStaticFunction<C>(functionName, luabinder::bind_singleton_mem_fun(function, instance));
 }
 
 template<class C, typename F>
-void LuaInterface::bindSingletonFunction(const std::string& className, const std::string& functionName, F C::* function, C* instance)
+void LuaInterface::bindSingletonFunction(const std::string_view className, const std::string_view functionName, F C::* function, C* instance)
 {
     registerClassStaticFunction(className, functionName, luabinder::bind_singleton_mem_fun(function, instance));
 }
 
 template<class C, typename F>
-void LuaInterface::bindClassStaticFunction(const std::string& functionName, const F& function)
+void LuaInterface::bindClassStaticFunction(const std::string_view functionName, const F& function)
 {
     registerClassStaticFunction<C>(functionName, luabinder::bind_fun(function));
 }
 template<typename F>
-void LuaInterface::bindClassStaticFunction(const std::string& className, const std::string& functionName, const F& function)
+void LuaInterface::bindClassStaticFunction(const std::string_view className, const std::string_view functionName, const F& function)
 {
     registerClassStaticFunction(className, functionName, luabinder::bind_fun(function));
 }
 
 template<class C, typename F, class FC>
-void LuaInterface::bindClassMemberFunction(const std::string& functionName, F FC::* function)
+void LuaInterface::bindClassMemberFunction(const std::string_view functionName, F FC::* function)
 {
     registerClassMemberFunction<C>(functionName, luabinder::bind_mem_fun<C>(function));
 }
 template<class C, typename F, class FC>
-void LuaInterface::bindClassMemberFunction(const std::string& className, const std::string& functionName, F FC::* function)
+void LuaInterface::bindClassMemberFunction(const std::string_view className, const std::string_view functionName, F FC::* function)
 {
     registerClassMemberFunction(className, functionName, luabinder::bind_mem_fun<C>(function));
 }
 
 template<class C, typename F1, typename F2, class FC>
-void LuaInterface::bindClassMemberField(const std::string& fieldName, F1 FC::* getFunction, F2 FC::* setFunction)
+void LuaInterface::bindClassMemberField(const std::string_view fieldName, F1 FC::* getFunction, F2 FC::* setFunction)
 {
     registerClassMemberField<C>(fieldName, luabinder::bind_mem_fun<C>(getFunction), luabinder::bind_mem_fun<C>(setFunction));
 }
 template<class C, typename F1, typename F2, class FC>
-void LuaInterface::bindClassMemberField(const std::string& className, const std::string& fieldName, F1 FC::* getFunction, F2 FC::* setFunction)
+void LuaInterface::bindClassMemberField(const std::string_view className, const std::string_view fieldName, F1 FC::* getFunction, F2 FC::* setFunction)
 {
     registerClassMemberField(className, fieldName, luabinder::bind_mem_fun<C>(getFunction), luabinder::bind_mem_fun<C>(setFunction));
 }
 
 template<class C, typename F, class FC>
-void LuaInterface::bindClassMemberGetField(const std::string& fieldName, F FC::* getFunction)
+void LuaInterface::bindClassMemberGetField(const std::string_view fieldName, F FC::* getFunction)
 {
     registerClassMemberField<C>(fieldName, luabinder::bind_mem_fun<C>(getFunction), LuaCppFunction());
 }
 template<class C, typename F, class FC>
-void LuaInterface::bindClassMemberGetField(const std::string& className, const std::string& fieldName, F FC::* getFunction)
+void LuaInterface::bindClassMemberGetField(const std::string_view className, const std::string_view fieldName, F FC::* getFunction)
 {
     registerClassMemberField(className, fieldName, luabinder::bind_mem_fun<C>(getFunction), LuaCppFunction());
 }
 
 template<class C, typename F, class FC>
-void LuaInterface::bindClassMemberSetField(const std::string& fieldName, F FC::* setFunction)
+void LuaInterface::bindClassMemberSetField(const std::string_view fieldName, F FC::* setFunction)
 {
     registerClassMemberField<C>(fieldName, LuaCppFunction(), luabinder::bind_mem_fun<C>(setFunction));
 }
 template<class C, typename F, class FC>
-void LuaInterface::bindClassMemberSetField(const std::string& className, const std::string& fieldName, F FC::* setFunction)
+void LuaInterface::bindClassMemberSetField(const std::string_view className, const std::string_view fieldName, F FC::* setFunction)
 {
     registerClassMemberField(className, fieldName, LuaCppFunction(), luabinder::bind_mem_fun<C>(setFunction));
 }
 
 template<typename F>
-void LuaInterface::bindGlobalFunction(const std::string& functionName, const F& function)
+void LuaInterface::bindGlobalFunction(const std::string_view functionName, const F& function)
 {
     registerGlobalFunction(functionName, luabinder::bind_fun(function));
 }
@@ -444,13 +474,15 @@ template<class T>
 T LuaInterface::castValue(int index)
 {
     T o;
-    if (!luavalue_cast(index, o))
+    if constexpr (std::is_same_v<T, std::string_view>) {
+        o = g_lua.toVString(index);
+    } else if (!luavalue_cast(index, o))
         throw LuaBadValueCastException(typeName(index), stdext::demangle_type<T>());
     return o;
 }
 
 template<typename... T>
-int LuaInterface::luaCallGlobalField(const std::string& global, const std::string& field, const T&... args)
+int LuaInterface::luaCallGlobalField(const std::string_view global, const std::string_view field, const T&... args)
 {
     g_lua.getGlobalField(global, field);
     if (!g_lua.isNil()) {
@@ -462,7 +494,7 @@ int LuaInterface::luaCallGlobalField(const std::string& global, const std::strin
 }
 
 template<typename... T>
-void LuaInterface::callGlobalField(const std::string& global, const std::string& field, const T&... args)
+void LuaInterface::callGlobalField(const std::string_view global, const std::string_view field, const T&... args)
 {
     const int rets = luaCallGlobalField(global, field, args...);
     if (rets > 0)
@@ -470,16 +502,14 @@ void LuaInterface::callGlobalField(const std::string& global, const std::string&
 }
 
 template<typename R, typename... T>
-R LuaInterface::callGlobalField(const std::string& global, const std::string& field, const T&... args)
+R LuaInterface::callGlobalField(const std::string_view global, const std::string_view field, const T&... args)
 {
     R result;
-    const int rets = luaCallGlobalField(global, field, args...);
-    if (rets > 0) {
+    if (const int rets = luaCallGlobalField(global, field, args...); rets > 0) {
         assert(rets == 1);
         result = g_lua.polymorphicPop<R>();
     } else
         result = R();
+
     return result;
 }
-
-#endif

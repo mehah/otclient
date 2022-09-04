@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef UIANCHORLAYOUT_H
-#define UIANCHORLAYOUT_H
+#pragma once
 
 #include <utility>
 
@@ -30,7 +29,7 @@
 class UIAnchor : public stdext::shared_object
 {
 public:
-    UIAnchor(Fw::AnchorEdge anchoredEdge, std::string hookedWidgetId, Fw::AnchorEdge hookedEdge) :
+    UIAnchor(Fw::AnchorEdge anchoredEdge, std::string_view hookedWidgetId, Fw::AnchorEdge hookedEdge) :
         m_anchoredEdge(anchoredEdge), m_hookedEdge(hookedEdge), m_hookedWidgetId(std::move(hookedWidgetId))
     {}
 
@@ -68,11 +67,11 @@ public:
     UIAnchorLayout(UIWidgetPtr parentWidget) : UILayout(std::move(parentWidget)) {}
 
     void addAnchor(const UIWidgetPtr& anchoredWidget, Fw::AnchorEdge anchoredEdge,
-                   const std::string& hookedWidgetId, Fw::AnchorEdge hookedEdge);
+                   const std::string_view hookedWidgetId, Fw::AnchorEdge hookedEdge);
     void removeAnchors(const UIWidgetPtr& anchoredWidget);
     bool hasAnchors(const UIWidgetPtr& anchoredWidget);
-    void centerIn(const UIWidgetPtr& anchoredWidget, const std::string& hookedWidgetId);
-    void fill(const UIWidgetPtr& anchoredWidget, const std::string& hookedWidgetId);
+    void centerIn(const UIWidgetPtr& anchoredWidget, const std::string_view hookedWidgetId);
+    void fill(const UIWidgetPtr& anchoredWidget, const std::string_view hookedWidgetId);
 
     void addWidget(const UIWidgetPtr& widget) override;
     void removeWidget(const UIWidgetPtr& widget) override;
@@ -82,7 +81,5 @@ public:
 protected:
     bool internalUpdate() override;
     virtual bool updateWidget(const UIWidgetPtr& widget, const UIAnchorGroupPtr& anchorGroup, UIWidgetPtr first = nullptr);
-    std::unordered_map<UIWidgetPtr, UIAnchorGroupPtr> m_anchorsGroups;
+    std::map<UIWidgetPtr, UIAnchorGroupPtr> m_anchorsGroups;
 };
-
-#endif

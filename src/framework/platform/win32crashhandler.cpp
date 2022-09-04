@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -136,10 +136,10 @@ LONG CALLBACK ExceptionHandler(LPEXCEPTION_POINTERS e)
     ss << "== application crashed\n";
     ss << stdext::format("app name: %s\n", g_app.getName());
     ss << stdext::format("app version: %s\n", g_app.getVersion());
-    ss << stdext::format("build compiler: %s\n", BUILD_COMPILER);
-    ss << stdext::format("build date: %s\n", __DATE__);
-    ss << stdext::format("build type: %s\n", BUILD_TYPE);
-    ss << stdext::format("build revision: %s (%s)\n", BUILD_REVISION, BUILD_COMMIT);
+    ss << stdext::format("build compiler: %s - %s\n", g_app.getBuildCompiler(), g_app.getBuildArch());
+    ss << stdext::format("build date: %s\n", g_app.getBuildDate());
+    ss << stdext::format("build type: %s\n", g_app.getBuildType());
+    ss << stdext::format("build revision: %s (%s)\n", g_app.getBuildRevision(), g_app.getBuildCommit());
     ss << stdext::format("crash date: %s\n", stdext::date_time_string());
     ss << stdext::format("exception: %s (0x%08lx)\n", getExceptionName(e->ExceptionRecord->ExceptionCode), e->ExceptionRecord->ExceptionCode);
     ss << stdext::format("exception address: 0x%08lx\n", (size_t)e->ExceptionRecord->ExceptionAddress);
@@ -155,7 +155,7 @@ LONG CALLBACK ExceptionHandler(LPEXCEPTION_POINTERS e)
     char dir[MAX_PATH];
     GetCurrentDirectory(sizeof(dir) - 1, dir);
     const std::string fileName = stdext::format("%s\\crashreport.log", dir);
-    std::ofstream fout(fileName.c_str(), std::ios::out | std::ios::app);
+    std::ofstream fout(fileName.data(), std::ios::out | std::ios::app);
     if (fout.is_open() && fout.good()) {
         fout << ss.str();
         fout.close();
@@ -167,8 +167,8 @@ LONG CALLBACK ExceptionHandler(LPEXCEPTION_POINTERS e)
     const std::string msg = stdext::format(
         "The application has crashed.\n\n"
         "A crash report has been written to:\n"
-        "%s", fileName.c_str());
-    MessageBox(nullptr, msg.c_str(), "Application crashed", 0);
+        "%s", fileName.data());
+    MessageBox(nullptr, msg.data(), "Application crashed", 0);
 
     // this seems to silently close the application
     //return EXCEPTION_EXECUTE_HANDLER;

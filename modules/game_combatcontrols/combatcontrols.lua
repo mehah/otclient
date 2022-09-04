@@ -15,19 +15,16 @@ fightModeRadioGroup = nil
 pvpModeRadioGroup = nil
 
 function init()
-    combatControlsButton = modules.client_topmenu.addRightGameToggleButton(
-                               'combatControlsButton', tr('Combat Controls'),
-                               '/images/topbuttons/combatcontrols', toggle)
+    combatControlsButton = modules.client_topmenu.addRightGameToggleButton('combatControlsButton',
+                                                                           tr('Combat Controls'),
+                                                                           '/images/topbuttons/combatcontrols', toggle)
     combatControlsButton:setOn(true)
     combatControlsWindow = g_ui.loadUI('combatcontrols')
     combatControlsWindow:disableResize()
 
-    fightOffensiveBox = combatControlsWindow:recursiveGetChildById(
-                            'fightOffensiveBox')
-    fightBalancedBox = combatControlsWindow:recursiveGetChildById(
-                           'fightBalancedBox')
-    fightDefensiveBox = combatControlsWindow:recursiveGetChildById(
-                            'fightDefensiveBox')
+    fightOffensiveBox = combatControlsWindow:recursiveGetChildById('fightOffensiveBox')
+    fightBalancedBox = combatControlsWindow:recursiveGetChildById('fightBalancedBox')
+    fightDefensiveBox = combatControlsWindow:recursiveGetChildById('fightDefensiveBox')
 
     chaseModeButton = combatControlsWindow:recursiveGetChildById('chaseModeBox')
     safeFightButton = combatControlsWindow:recursiveGetChildById('safeFightBox')
@@ -53,10 +50,18 @@ function init()
     pvpModeRadioGroup:addWidget(yellowHandBox)
     pvpModeRadioGroup:addWidget(redFistBox)
 
-    connect(fightModeRadioGroup, {onSelectionChange = onSetFightMode})
-    connect(pvpModeRadioGroup, {onSelectionChange = onSetPVPMode})
-    connect(chaseModeButton, {onCheckChange = onSetChaseMode})
-    connect(safeFightButton, {onCheckChange = onSetSafeFight})
+    connect(fightModeRadioGroup, {
+        onSelectionChange = onSetFightMode
+    })
+    connect(pvpModeRadioGroup, {
+        onSelectionChange = onSetPVPMode
+    })
+    connect(chaseModeButton, {
+        onCheckChange = onSetChaseMode
+    })
+    connect(safeFightButton, {
+        onCheckChange = onSetSafeFight
+    })
     connect(g_game, {
         onGameStart = online,
         onGameEnd = offline,
@@ -68,15 +73,21 @@ function init()
         onAutoWalk = check
     })
 
-    connect(LocalPlayer, {onOutfitChange = onOutfitChange})
+    connect(LocalPlayer, {
+        onOutfitChange = onOutfitChange
+    })
 
-    if g_game.isOnline() then online() end
+    if g_game.isOnline() then
+        online()
+    end
 
     combatControlsWindow:setup()
 end
 
 function terminate()
-    if g_game.isOnline() then offline() end
+    if g_game.isOnline() then
+        offline()
+    end
 
     fightModeRadioGroup:destroy()
     pvpModeRadioGroup:destroy()
@@ -94,7 +105,9 @@ function terminate()
         onAutoWalk = check
     })
 
-    disconnect(LocalPlayer, {onOutfitChange = onOutfitChange})
+    disconnect(LocalPlayer, {
+        onOutfitChange = onOutfitChange
+    })
 
     combatControlsButton = nil
     combatControlsWindow = nil
@@ -132,7 +145,9 @@ function update()
     if g_game.getFeature(GamePVPMode) then
         local pvpMode = g_game.getPVPMode()
         local pvpWidget = getPVPBoxByMode(pvpMode)
-        if pvpWidget then pvpModeRadioGroup:selectWidget(pvpWidget) end
+        if pvpWidget then
+            pvpModeRadioGroup:selectWidget(pvpWidget)
+        end
     end
 end
 
@@ -172,12 +187,10 @@ function online()
 
         if g_game.getFeature(GamePVPMode) then
             pvpModesPanel:setVisible(true)
-            combatControlsWindow:setHeight(
-                combatControlsWindow.extendedControlsHeight)
+            combatControlsWindow:setHeight(combatControlsWindow.extendedControlsHeight)
         else
             pvpModesPanel:setVisible(false)
-            combatControlsWindow:setHeight(
-                combatControlsWindow.simpleControlsHeight)
+            combatControlsWindow:setHeight(combatControlsWindow.simpleControlsHeight)
         end
     end
 
@@ -187,7 +200,9 @@ end
 function offline()
     combatControlsWindow:setParent(nil, true)
     local lastCombatControls = g_settings.getNode('LastCombatControls')
-    if not lastCombatControls then lastCombatControls = {} end
+    if not lastCombatControls then
+        lastCombatControls = {}
+    end
 
     local player = g_game.getLocalPlayer()
     if player then
@@ -218,7 +233,9 @@ function toggle()
 end
 
 function onSetFightMode(self, selectedFightButton)
-    if selectedFightButton == nil then return end
+    if selectedFightButton == nil then
+        return
+    end
     local buttonId = selectedFightButton:getId()
     local fightMode
     if buttonId == 'fightOffensiveBox' then
@@ -245,10 +262,14 @@ function onSetChaseMode(self, checked)
     g_game.setChaseMode(chaseMode)
 end
 
-function onSetSafeFight(self, checked) g_game.setSafeFight(not checked) end
+function onSetSafeFight(self, checked)
+    g_game.setSafeFight(not checked)
+end
 
 function onSetPVPMode(self, selectedPVPButton)
-    if selectedPVPButton == nil then return end
+    if selectedPVPButton == nil then
+        return
+    end
 
     local buttonId = selectedPVPButton:getId()
     local pvpMode = PVPWhiteDove
@@ -265,15 +286,25 @@ function onSetPVPMode(self, selectedPVPButton)
     g_game.setPVPMode(pvpMode)
 end
 
-function onMiniWindowClose() combatControlsButton:setOn(false) end
+function onMiniWindowOpen()
+    combatControlsButton:setOn(true)
+end
+
+function onMiniWindowClose()
+    combatControlsButton:setOn(false)
+end
 
 function onMountButtonClick(self, mousePos)
     local player = g_game.getLocalPlayer()
-    if player then player:toggleMount() end
+    if player then
+        player:toggleMount()
+    end
 end
 
 function onOutfitChange(localPlayer, outfit, oldOutfit)
-    if outfit.mount == oldOutfit.mount then return end
+    if outfit.mount == oldOutfit.mount then
+        return
+    end
 
     mountButton:setChecked(outfit.mount ~= nil and outfit.mount > 0)
 end

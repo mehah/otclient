@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,11 +23,6 @@
 #include <framework/net/outputmessage.h>
 #include <framework/util/crypt.h>
 
-OutputMessage::OutputMessage()
-{
-    reset();
-}
-
 void OutputMessage::reset()
 {
     m_writePos = MAX_HEADER_SIZE;
@@ -35,17 +30,17 @@ void OutputMessage::reset()
     m_messageSize = 0;
 }
 
-void OutputMessage::setBuffer(const std::string& buffer)
+void OutputMessage::setBuffer(const std::string_view buffer)
 {
     const int len = buffer.size();
     reset();
     checkWrite(len);
-    memcpy((char*)(m_buffer + m_writePos), buffer.c_str(), len);
+    memcpy(m_buffer + m_writePos, buffer.data(), len);
     m_writePos += len;
     m_messageSize += len;
 }
 
-void OutputMessage::addU8(uint8 value)
+void OutputMessage::addU8(uint8_t value)
 {
     checkWrite(1);
     m_buffer[m_writePos] = value;
@@ -53,7 +48,7 @@ void OutputMessage::addU8(uint8 value)
     m_messageSize += 1;
 }
 
-void OutputMessage::addU16(uint16 value)
+void OutputMessage::addU16(uint16_t value)
 {
     checkWrite(2);
     stdext::writeULE16(m_buffer + m_writePos, value);
@@ -61,7 +56,7 @@ void OutputMessage::addU16(uint16 value)
     m_messageSize += 2;
 }
 
-void OutputMessage::addU32(uint32 value)
+void OutputMessage::addU32(uint32_t value)
 {
     checkWrite(4);
     stdext::writeULE32(m_buffer + m_writePos, value);
@@ -69,7 +64,7 @@ void OutputMessage::addU32(uint32 value)
     m_messageSize += 4;
 }
 
-void OutputMessage::addU64(uint64 value)
+void OutputMessage::addU64(uint64_t value)
 {
     checkWrite(8);
     stdext::writeULE64(m_buffer + m_writePos, value);
@@ -77,24 +72,24 @@ void OutputMessage::addU64(uint64 value)
     m_messageSize += 8;
 }
 
-void OutputMessage::addString(const std::string& buffer)
+void OutputMessage::addString(const std::string_view buffer)
 {
     const int len = buffer.length();
     if (len > MAX_STRING_LENGTH)
         throw stdext::exception(stdext::format("string length > %d", MAX_STRING_LENGTH));
     checkWrite(len + 2);
     addU16(len);
-    memcpy((char*)(m_buffer + m_writePos), buffer.c_str(), len);
+    memcpy(m_buffer + m_writePos, buffer.data(), len);
     m_writePos += len;
     m_messageSize += len;
 }
 
-void OutputMessage::addPaddingBytes(int bytes, uint8 byte)
+void OutputMessage::addPaddingBytes(int bytes, uint8_t byte)
 {
     if (bytes <= 0)
         return;
     checkWrite(bytes);
-    memset(static_cast<void*>(&m_buffer[m_writePos]), byte, bytes);
+    memset(&m_buffer[m_writePos], byte, bytes);
     m_writePos += bytes;
     m_messageSize += bytes;
 }
@@ -105,13 +100,13 @@ void OutputMessage::encryptRsa()
     if (m_messageSize < size)
         throw stdext::exception("insufficient bytes in buffer to encrypt");
 
-    if (!g_crypt.rsaEncrypt(static_cast<unsigned char*>(m_buffer) + m_writePos - size, size))
+    if (!g_crypt.rsaEncrypt(static_cast<uint8_t*>(m_buffer) + m_writePos - size, size))
         throw stdext::exception("rsa encryption failed");
 }
 
 void OutputMessage::writeChecksum()
 {
-    const uint32 checksum = stdext::adler32(m_buffer + m_headerPos, m_messageSize);
+    const uint32_t checksum = stdext::adler32(m_buffer + m_headerPos, m_messageSize);
     assert(m_headerPos - 4 >= 0);
     m_headerPos -= 4;
     stdext::writeULE32(m_buffer + m_headerPos, checksum);
@@ -128,9 +123,7 @@ void OutputMessage::writeMessageSize()
 
 bool OutputMessage::canWrite(int bytes)
 {
-    if (m_writePos + bytes > BUFFER_MAXSIZE)
-        return false;
-    return true;
+    return m_writePos + bytes <= BUFFER_MAXSIZE;
 }
 
 void OutputMessage::checkWrite(int bytes)

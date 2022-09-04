@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,36 +20,19 @@
  * THE SOFTWARE.
  */
 
-#ifndef GRAPHICS_H
-#define GRAPHICS_H
+#pragma once
 
 #include "declarations.h"
 #include <GL/glew.h>
 
-// @bindsingleton g_graphics
+ // @bindsingleton g_graphics
 class Graphics
 {
 public:
-    Graphics();
-
-    enum PainterEngine
-    {
-        Painter_Any = 0,
-        Painter_OpenGL1,
-        Painter_OpenGL2,
-        Painter_DirectX9
-    };
-
     // @dontbind
     void init();
     // @dontbind
     void terminate();
-
-    bool parseOption(const std::string& option);
-
-    bool isPainterEngineAvailable(PainterEngine painterEngine);
-    bool selectPainterEngine(PainterEngine painterEngine);
-    PainterEngine getPainterEngine() { return m_selectedPainterEngine; }
 
     void resize(const Size& size);
 
@@ -61,44 +44,15 @@ public:
     std::string getVersion() { return (const char*)glGetString(GL_VERSION); }
     std::string getExtensions() { return (const char*)glGetString(GL_EXTENSIONS); }
 
-    void setShouldUseShaders(bool enable) { m_shouldUseShaders = enable; }
-
     bool ok() { return m_ok; }
-    bool canUseDrawArrays();
-    bool canUseShaders();
-    bool canUseFBO();
-    bool canUseBilinearFiltering();
-    bool canUseNonPowerOfTwoTextures();
-    bool canUseMipmaps();
-    bool canUseHardwareMipmaps();
-    bool canUseClampToEdge();
-    bool canUseBlendFuncSeparate();
-    bool canUseBlendEquation();
-    bool canCacheBackbuffer();
-    bool shouldUseShaders() { return m_shouldUseShaders; }
-    bool hasScissorBug();
 
 private:
+    bool m_ok{ false };
+
+    int m_maxTextureSize{ -1 };
+    int m_alphaBits{ 0 };
+
     Size m_viewportSize;
-
-    int m_maxTextureSize;
-    int m_alphaBits;
-
-    bool m_ok{ false },
-        m_useDrawArrays{ true },
-        m_useFBO{ true },
-        m_useBilinearFiltering{ true },
-        m_useNonPowerOfTwoTextures{ true },
-        m_useMipmaps{ true },
-        m_useHardwareMipmaps{ true },
-        m_useClampToEdge{ true },
-        m_shouldUseShaders{ true },
-        m_cacheBackbuffer{ true };
-
-    PainterEngine m_prefferedPainterEngine;
-    PainterEngine m_selectedPainterEngine;
 };
 
 extern Graphics g_graphics;
-
-#endif

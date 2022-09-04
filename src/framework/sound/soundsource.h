@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef SOUNDSOURCE_H
-#define SOUNDSOURCE_H
+#pragma once
 
 #include "declarations.h"
 #include <framework/luaengine/luaobject.h>
@@ -29,7 +28,7 @@
 class SoundSource : public LuaObject
 {
 protected:
-    SoundSource(uint sourceId) : m_sourceId(sourceId) {}
+    SoundSource(uint32_t sourceId) : m_sourceId(sourceId) {}
 
 public:
     enum FadeState { NoFading, FadingOn, FadingOff };
@@ -43,7 +42,7 @@ public:
     virtual bool isBuffering();
     virtual bool isPlaying() { return isBuffering(); }
 
-    void setName(const std::string& name) { m_name = name; }
+    void setName(const std::string_view name) { m_name = name; }
     virtual void setLooping(bool looping);
     virtual void setRelative(bool relative);
     virtual void setReferenceDistance(float distance);
@@ -54,26 +53,28 @@ public:
     virtual void setFading(FadeState state, float fadetime);
 
     std::string getName() { return m_name; }
-    uchar getChannel() { return m_channel; }
+    uint8_t getChannel() { return m_channel; }
     float getGain() { return m_gain; }
 
 protected:
     void setBuffer(const SoundBufferPtr& buffer);
-    void setChannel(uchar channel) { m_channel = channel; }
+    void setChannel(uint8_t channel) { m_channel = channel; }
 
     virtual void update();
     friend class SoundManager;
     friend class CombinedSoundSource;
 
-    uint m_sourceId;
-    uchar m_channel;
-    std::string m_name;
-    SoundBufferPtr m_buffer;
-    FadeState m_fadeState;
-    float m_fadeStartTime;
-    float m_fadeTime;
-    float m_fadeGain;
-    float m_gain;
-};
+    float m_fadeStartTime{ 0 };
+    float m_fadeTime{ 0 };
+    float m_fadeGain{ 0 };
+    float m_gain{ 1.f };
 
-#endif
+    FadeState m_fadeState{ NoFading };
+
+    uint32_t m_sourceId{ 0 };
+    uint8_t m_channel{ 0 };
+
+    std::string m_name;
+
+    SoundBufferPtr m_buffer;
+};

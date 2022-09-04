@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef PARTICLE_H
-#define PARTICLE_H
+#pragma once
 
 #include "declarations.h"
 #include "painter.h"
@@ -29,7 +28,7 @@
 class Particle : public stdext::shared_object
 {
 public:
-    Particle(const Point& pos, const Size& startSize, const Size& finalSize, const PointF& velocity, const PointF& acceleration, float duration, float ignorePhysicsAfter, const std::vector<Color>& colors, const std::vector<float>& colorsStops, Painter::CompositionMode compositionMode = Painter::CompositionMode_Normal, TexturePtr texture = nullptr);
+    Particle(const Point& pos, const Size& startSize, const Size& finalSize, const PointF& velocity, const PointF& acceleration, float duration, float ignorePhysicsAfter, const std::vector<Color>& colors, const std::vector<float>& colorsStops, CompositionMode compositionMode = CompositionMode::NORMAL, TexturePtr texture = nullptr);
 
     void render();
     void update(float elapsedTime);
@@ -54,12 +53,13 @@ private:
     PointF m_position;
     PointF m_velocity;
     PointF m_acceleration;
-    Size m_size, m_startSize, m_finalSize;
+    Size m_size;
+    Size m_startSize;
+    Size m_finalSize;
     Rect m_rect;
-    Painter::CompositionMode m_compositionMode;
-    float m_duration, m_ignorePhysicsAfter;
-    float m_elapsedTime;
-    bool m_finished;
+    CompositionMode m_compositionMode;
+    float m_duration;
+    float m_ignorePhysicsAfter;
+    float m_elapsedTime{ 0 };
+    bool m_finished{ false };
 };
-
-#endif

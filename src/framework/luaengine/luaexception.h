@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,20 +20,19 @@
  * THE SOFTWARE.
  */
 
-#ifndef LUAEXCEPTION_H
-#define LUAEXCEPTION_H
+#pragma once
 
 #include "declarations.h"
 
 class LuaException : public stdext::exception
 {
 public:
-    LuaException(const std::string& error, int traceLevel = -1);
+    LuaException(const std::string_view error, int traceLevel = -1);
     ~LuaException() noexcept override = default;
 
-    void generateLuaErrorMessage(const std::string& error, int traceLevel);
+    void generateLuaErrorMessage(const std::string_view error, int traceLevel);
 
-    const char* what() const noexcept override { return m_what.c_str(); }
+    const char* what() const noexcept override { return m_what.data(); }
 
 protected:
     LuaException() = default;
@@ -50,7 +49,5 @@ public:
 class LuaBadValueCastException : public LuaException
 {
 public:
-    LuaBadValueCastException(const std::string& luaTypeName, const std::string& cppTypeName);
+    LuaBadValueCastException(const std::string_view luaTypeName, const std::string_view cppTypeName);
 };
-
-#endif

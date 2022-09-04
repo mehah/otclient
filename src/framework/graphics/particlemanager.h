@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef PARTICLEMANAGER_H
-#define PARTICLEMANAGER_H
+#pragma once
 
 #include "declarations.h"
 #include "particletype.h"
@@ -30,7 +29,7 @@ class ParticleManager
 {
 public:
     bool importParticle(std::string file);
-    ParticleEffectPtr createEffect(const std::string& name);
+    ParticleEffectPtr createEffect(const std::string_view name);
     void terminate();
 
     void poll();
@@ -48,5 +47,3 @@ private:
 };
 
 extern ParticleManager g_particles;
-
-#endif

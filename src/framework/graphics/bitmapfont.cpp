@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,24 +27,22 @@
 
 #include <framework/otml/otml.h>
 
-#include "drawpool.h"
+#include "drawpoolmanager.h"
 
-namespace
-{
-    std::vector<Point> s_glyphsPositions(1);
-    std::vector<int> s_lineWidths(1);
-}
+static std::vector<Point> s_glyphsPositions(1);
+static std::vector<int> s_lineWidths(1);
 
 void BitmapFont::load(const OTMLNodePtr& fontNode)
 {
     const OTMLNodePtr textureNode = fontNode->at("texture");
-    const std::string textureFile = stdext::resolve_path(textureNode->value(), textureNode->source());
+    const auto& textureFile = stdext::resolve_path(textureNode->value(), textureNode->source());
     const auto glyphSize = fontNode->valueAt<Size>("glyph-size");
+    const int spaceWidth = fontNode->valueAt("space-width", glyphSize.width());
+
     m_glyphHeight = fontNode->valueAt<int>("height");
     m_yOffset = fontNode->valueAt("y-offset", 0);
     m_firstGlyph = fontNode->valueAt("first-glyph", 32);
-    m_glyphSpacing = fontNode->valueAt("spacing", Size(0, 0));
-    const int spaceWidth = fontNode->valueAt("space-width", glyphSize.width());
+    m_glyphSpacing = fontNode->valueAt("spacing", Size(0));
 
     // load font texture
     m_texture = g_textures.getTexture(textureFile);
@@ -65,7 +63,7 @@ void BitmapFont::load(const OTMLNodePtr& fontNode)
     m_glyphsSize[127].setWidth(1);
 
     // new line actually has a size that will be useful in multiline algorithm
-    m_glyphsSize[static_cast<uchar>('\n')] = Size(1, m_glyphHeight);
+    m_glyphsSize[static_cast<uint8_t>('\n')] = { 1, m_glyphHeight };
 
     // read custom widths
     /*
@@ -85,21 +83,23 @@ void BitmapFont::load(const OTMLNodePtr& fontNode)
     }
 }
 
-void BitmapFont::drawText(const std::string& text, const Point& startPos, const Color color)
+void BitmapFont::drawText(const std::string_view text, const Point& startPos, const Color color)
 {
     const Size boxSize = g_painter->getResolution() - startPos.toSize();
     const Rect screenCoords(startPos, boxSize);
     drawText(text, screenCoords, color, Fw::AlignTopLeft);
 }
 
-void BitmapFont::drawText(const std::string& text, const Rect& screenCoords, const Color color, Fw::AlignmentFlag align)
+void BitmapFont::drawText(const std::string_view text, const Rect& screenCoords, const Color color, Fw::AlignmentFlag align)
 {
-    for (const auto& rects : getDrawTextCoords(text, screenCoords, align)) {
+    Size textBoxSize;
+    const auto& glyphsPositions = calculateGlyphsPositions(text, align, &textBoxSize);
+    for (const auto& rects : getDrawTextCoords(text, textBoxSize, align, screenCoords, glyphsPositions)) {
         g_drawPool.addTexturedRect(rects.first, m_texture, rects.second, color);
     }
 }
 
-std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::string& text, const Rect& screenCoords, Fw::AlignmentFlag align)
+std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::string_view text, const Size& textBoxSize, Fw::AlignmentFlag align, const Rect& screenCoords, const std::vector<Point>& glyphsPositions)
 {
     std::vector<std::pair<Rect, Rect>> list;
     // prevent glitches from invalid rects
@@ -108,12 +108,8 @@ std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::stri
 
     const int textLenght = text.length();
 
-    // map glyphs positions
-    Size textBoxSize;
-    const auto& glyphsPositions = calculateGlyphsPositions(text, align, &textBoxSize);
-
     for (int i = 0; i < textLenght; ++i) {
-        const int glyph = static_cast<uchar>(text[i]);
+        const int glyph = static_cast<uint8_t>(text[i]);
 
         // skip invalid glyphs
         if (glyph < 32)
@@ -129,7 +125,7 @@ std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::stri
         } else if (align & Fw::AlignVerticalCenter) {
             glyphScreenCoords.translate(0, (screenCoords.height() - textBoxSize.height()) / 2);
         } else { // AlignTop
-                // nothing to do
+            // nothing to do
         }
 
         if (align & Fw::AlignRight) {
@@ -137,7 +133,7 @@ std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::stri
         } else if (align & Fw::AlignHorizontalCenter) {
             glyphScreenCoords.translate((screenCoords.width() - textBoxSize.width()) / 2, 0);
         } else { // AlignLeft
-                // nothing to do
+            // nothing to do
         }
 
         // only render glyphs that are after 0, 0
@@ -178,9 +174,83 @@ std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::stri
     return list;
 }
 
-const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string& text,
-                                                               Fw::AlignmentFlag align,
-                                                               Size* textBoxSize)
+void BitmapFont::fillTextCoords(const CoordsBufferPtr& coords, const std::string_view text,
+                                const Size& textBoxSize, Fw::AlignmentFlag align, const Rect& screenCoords,
+                                const std::vector<Point>& glyphsPositions)
+{
+    coords->clear();
+
+    // prevent glitches from invalid rects
+    if (!screenCoords.isValid() || !m_texture)
+        return;
+
+    const int textLenght = text.length();
+
+    for (int i = 0; i < textLenght; ++i) {
+        const int glyph = static_cast<uint8_t>(text[i]);
+
+        // skip invalid glyphs
+        if (glyph < 32)
+            continue;
+
+        // calculate initial glyph rect and texture coords
+        Rect glyphScreenCoords(glyphsPositions[i], m_glyphsSize[glyph]);
+        Rect glyphTextureCoords = m_glyphsTextureCoords[glyph];
+
+        // first translate to align position
+        if (align & Fw::AlignBottom) {
+            glyphScreenCoords.translate(0, screenCoords.height() - textBoxSize.height());
+        } else if (align & Fw::AlignVerticalCenter) {
+            glyphScreenCoords.translate(0, (screenCoords.height() - textBoxSize.height()) / 2);
+        } else { // AlignTop
+            // nothing to do
+        }
+
+        if (align & Fw::AlignRight) {
+            glyphScreenCoords.translate(screenCoords.width() - textBoxSize.width(), 0);
+        } else if (align & Fw::AlignHorizontalCenter) {
+            glyphScreenCoords.translate((screenCoords.width() - textBoxSize.width()) / 2, 0);
+        } else { // AlignLeft
+            // nothing to do
+        }
+
+        // only render glyphs that are after 0, 0
+        if (glyphScreenCoords.bottom() < 0 || glyphScreenCoords.right() < 0)
+            continue;
+
+        // bound glyph topLeft to 0,0 if needed
+        if (glyphScreenCoords.top() < 0) {
+            glyphTextureCoords.setTop(glyphTextureCoords.top() - glyphScreenCoords.top());
+            glyphScreenCoords.setTop(0);
+        }
+        if (glyphScreenCoords.left() < 0) {
+            glyphTextureCoords.setLeft(glyphTextureCoords.left() - glyphScreenCoords.left());
+            glyphScreenCoords.setLeft(0);
+        }
+
+        // translate rect to screen coords
+        glyphScreenCoords.translate(screenCoords.topLeft());
+
+        // only render if glyph rect is visible on screenCoords
+        if (!screenCoords.intersects(glyphScreenCoords))
+            continue;
+
+        // bound glyph bottomRight to screenCoords bottomRight
+        if (glyphScreenCoords.bottom() > screenCoords.bottom()) {
+            glyphTextureCoords.setBottom(glyphTextureCoords.bottom() + (screenCoords.bottom() - glyphScreenCoords.bottom()));
+            glyphScreenCoords.setBottom(screenCoords.bottom());
+        }
+        if (glyphScreenCoords.right() > screenCoords.right()) {
+            glyphTextureCoords.setRight(glyphTextureCoords.right() + (screenCoords.right() - glyphScreenCoords.right()));
+            glyphScreenCoords.setRight(screenCoords.right());
+        }
+
+        // add glyph
+        coords->addRect(glyphScreenCoords, glyphTextureCoords);
+    }
+}
+
+const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string_view text, Fw::AlignmentFlag align, Size* textBoxSize)
 {
     const int textLength = text.length();
     int maxLineWidth = 0;
@@ -202,10 +272,10 @@ const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string
     if ((align & Fw::AlignRight || align & Fw::AlignHorizontalCenter) || textBoxSize) {
         s_lineWidths[0] = 0;
         for (int i = 0; i < textLength; ++i) {
-            glyph = static_cast<uchar>(text[i]);
+            glyph = static_cast<uint8_t>(text[i]);
 
-            if (glyph == static_cast<uchar>('\n')) {
-                lines++;
+            if (glyph == static_cast<uint8_t>('\n')) {
+                ++lines;
                 // resize s_lineWidths vector when needed
                 if (lines + 1 > static_cast<int>(s_lineWidths.size()))
                     s_lineWidths.resize(lines + 1);
@@ -223,13 +293,13 @@ const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string
     Point virtualPos(0, m_yOffset);
     lines = 0;
     for (int i = 0; i < textLength; ++i) {
-        glyph = static_cast<uchar>(text[i]);
+        glyph = static_cast<uint8_t>(text[i]);
 
         // new line or first glyph
-        if (glyph == static_cast<uchar>('\n') || i == 0) {
-            if (glyph == static_cast<uchar>('\n')) {
+        if (glyph == static_cast<uint8_t>('\n') || i == 0) {
+            if (glyph == static_cast<uint8_t>('\n')) {
                 virtualPos.y += m_glyphHeight + m_glyphSpacing.height();
-                lines++;
+                ++lines;
             }
 
             // calculate start x pos
@@ -246,7 +316,7 @@ const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string
         s_glyphsPositions[i] = virtualPos;
 
         // render only if the glyph is valid
-        if (glyph >= 32 && glyph != static_cast<uchar>('\n')) {
+        if (glyph >= 32 && glyph != static_cast<uint8_t>('\n')) {
             virtualPos.x += m_glyphsSize[glyph].width() + m_glyphSpacing.width();
         }
     }
@@ -259,7 +329,7 @@ const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string
     return s_glyphsPositions;
 }
 
-Size BitmapFont::calculateTextRectSize(const std::string& text)
+Size BitmapFont::calculateTextRectSize(const std::string_view text)
 {
     Size size;
     calculateGlyphsPositions(text, Fw::AlignTopLeft, &size);
@@ -287,7 +357,7 @@ void BitmapFont::calculateGlyphsWidthsAutomatically(const ImagePtr& image, const
             // check if all vertical pixels are alpha
             for (int y = glyphCoords.top(); y <= glyphCoords.bottom(); ++y) {
                 if (texturePixels[(y * imageSize.width() * 4) + (x * 4) + 3] != 0)
-                    filledPixels++;
+                    ++filledPixels;
             }
             if (filledPixels > 0)
                 width = x - glyphCoords.left() + 1;
@@ -297,8 +367,11 @@ void BitmapFont::calculateGlyphsWidthsAutomatically(const ImagePtr& image, const
     }
 }
 
-std::string BitmapFont::wrapText(const std::string& text, int maxWidth)
+std::string BitmapFont::wrapText(const std::string_view text, int maxWidth)
 {
+    if (text.empty())
+        return "";
+
     std::string outText;
     std::vector<std::string> words;
     const std::vector<std::string> wordsSplit = stdext::split(text);
@@ -308,12 +381,12 @@ std::string BitmapFont::wrapText(const std::string& text, int maxWidth)
         const int wordWidth = calculateTextRectSize(word).width();
         if (wordWidth > maxWidth) {
             std::string newWord;
-            for (uint j = 0; j < word.length(); ++j) {
+            for (uint32_t j = 0; j < word.length(); ++j) {
                 std::string candidate = newWord + word[j];
                 if (j != word.length() - 1)
                     candidate += '-';
-                const int candidateWidth = calculateTextRectSize(candidate).width();
 
+                const int candidateWidth = calculateTextRectSize(candidate).width();
                 if (candidateWidth > maxWidth) {
                     newWord += '-';
                     words.push_back(newWord);
@@ -329,25 +402,23 @@ std::string BitmapFont::wrapText(const std::string& text, int maxWidth)
         }
     }
 
-    if (!words.empty()) {
-        // compose lines
-        std::string line(words[0]);
-        for (ulong i = 1; i < words.size(); ++i) {
-            const auto& word = words[i];
+    // compose lines
+    std::string line(words[0]);
+    for (size_t i = 1; i < words.size(); ++i) {
+        const auto& word = words[i];
 
-            line.push_back(' ');
-            const ulong lineSize = line.size();
-            line.append(word);
+        line.push_back(' ');
+        const size_t lineSize = line.size();
+        line.append(word);
 
-            if (calculateTextRectSize(line).width() > maxWidth) {
-                line.resize(lineSize);
-                line.back() = '\n';
-                outText.append(line);
-                line.assign(word);
-            }
+        if (calculateTextRectSize(line).width() > maxWidth) {
+            line.resize(lineSize);
+            line.back() = '\n';
+            outText.append(line);
+            line.assign(word);
         }
-        outText.append(line);
     }
+    outText.append(line);
 
     return outText;
 }

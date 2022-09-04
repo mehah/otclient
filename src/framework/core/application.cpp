@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@
 
 #include <locale>
 
-#ifdef FW_NET
+#ifdef FRAMEWORK_NET
 #include <framework/net/connection.h>
 #endif
 
@@ -54,14 +54,6 @@ void exitSignalHandler(int sig)
             }
             break;
     }
-}
-
-Application::Application()
-{
-    m_appName = "application";
-    m_appCompactName = "app";
-    m_charset = "cp1252";
-    m_stopping = false;
 }
 
 void Application::init(std::vector<std::string>& args)
@@ -83,8 +75,8 @@ void Application::init(std::vector<std::string>& args)
     g_asyncDispatcher.init();
 
     std::string startupOptions;
-    for (uint i = 1; i < args.size(); ++i) {
-        const std::string& arg = args[i];
+    for (uint32_t i = 1; i < args.size(); ++i) {
+        const auto& arg = args[i];
         startupOptions += " ";
         startupOptions += arg;
     }
@@ -97,7 +89,7 @@ void Application::init(std::vector<std::string>& args)
     g_configs.init();
 
     // initialize resources
-    g_resources.init(args[0].c_str());
+    g_resources.init(args[0].data());
 
     // initialize lua
     g_lua.init();
@@ -126,7 +118,7 @@ void Application::deinit()
 
 void Application::terminate()
 {
-#ifdef FW_NET
+#ifdef FRAMEWORK_NET
     // terminate network
     Connection::terminate();
 #endif
@@ -148,14 +140,14 @@ void Application::terminate()
 
 void Application::poll()
 {
-#ifdef FW_NET
+#ifdef FRAMEWORK_NET
     Connection::poll();
 #endif
 
     g_dispatcher.poll();
 
     // poll connection again to flush pending write
-#ifdef FW_NET
+#ifdef FRAMEWORK_NET
     Connection::poll();
 #endif
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,13 @@
 #include "graphics.h"
 
 #include <framework/core/eventdispatcher.h>
+#include <framework/core/graphicalapplication.h>
 
 #include <utility>
 
 AnimatedTexture::AnimatedTexture(const Size& size, const std::vector<ImagePtr>& frames, std::vector<int> framesDelay, bool buildMipmaps, bool compress)
 {
-    if (!setupSize(size, buildMipmaps))
+    if (!setupSize(size))
         return;
 
     for (const auto& frame : frames) {
@@ -48,10 +49,9 @@ AnimatedTexture::~AnimatedTexture()
 
 bool AnimatedTexture::buildHardwareMipmaps()
 {
-    if (!g_graphics.canUseHardwareMipmaps())
-        return false;
     for (const TexturePtr& frame : m_frames)
         frame->buildHardwareMipmaps();
+
     m_hasMipmaps = true;
     return true;
 }
@@ -76,8 +76,10 @@ void AnimatedTexture::updateAnimation()
         return;
 
     m_animTimer.restart();
-    m_currentFrame++;
+    ++m_currentFrame;
     if (m_currentFrame >= m_frames.size())
         m_currentFrame = 0;
     m_id = m_frames[m_currentFrame]->getId();
+
+    g_app.repaint();
 }

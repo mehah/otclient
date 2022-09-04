@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,15 +30,12 @@
 
 #include "framework/stdext/math.h"
 
-std::atomic<uint> LAST_ID(0);
+ // UINT16_MAX = just to avoid conflicts with GL generated ID.
+static std::atomic<uint32_t > UID(UINT16_MAX);
 
-Texture::Texture() : m_uniqueId(++LAST_ID)
-{
-    m_id = 0;
-    m_time = 0;
-}
+Texture::Texture() : m_uniqueId(++UID) {}
 
-Texture::Texture(const Size& size) : m_uniqueId(++LAST_ID)
+Texture::Texture(const Size& size) : m_uniqueId(++UID)
 {
     m_id = 0;
     m_time = 0;
@@ -53,7 +50,7 @@ Texture::Texture(const Size& size) : m_uniqueId(++LAST_ID)
     setupFilters();
 }
 
-Texture::Texture(const ImagePtr& image, bool buildMipmaps, bool compress, bool canSuperimposed, bool load) : m_uniqueId(++LAST_ID)
+Texture::Texture(const ImagePtr& image, bool buildMipmaps, bool compress, bool canSuperimposed, bool load) : m_uniqueId(++UID)
 {
     m_id = 0;
     m_time = 0;
@@ -89,7 +86,7 @@ void Texture::create()
 
 void Texture::uploadPixels(const ImagePtr& image, bool buildMipmaps, bool compress)
 {
-    if (!setupSize(image->getSize(), buildMipmaps))
+    if (!setupSize(image->getSize()))
         return;
 
     ImagePtr glImage = image;
@@ -131,9 +128,6 @@ void Texture::copyFromScreen(const Rect& screenRect)
 
 bool Texture::buildHardwareMipmaps()
 {
-    if (!g_graphics.canUseHardwareMipmaps())
-        return false;
-
     bind();
 
     if (!m_hasMipmaps) {
@@ -147,9 +141,6 @@ bool Texture::buildHardwareMipmaps()
 
 void Texture::setSmooth(bool smooth)
 {
-    if (smooth && !g_graphics.canUseBilinearFiltering())
-        return;
-
     if (smooth == m_smooth)
         return;
 
@@ -178,17 +169,17 @@ void Texture::setUpsideDown(bool upsideDown)
 
 void Texture::createTexture()
 {
+    if (g_graphics.ok() && m_id != 0)
+        glDeleteTextures(1, &m_id);
+
     glGenTextures(1, &m_id);
     assert(m_id != 0);
 }
 
-bool Texture::setupSize(const Size& size, bool forcePowerOfTwo)
+bool Texture::setupSize(const Size& size)
 {
     Size glSize;
-    if (!g_graphics.canUseNonPowerOfTwoTextures() || forcePowerOfTwo)
-        glSize.resize(stdext::to_power_of_two(size.width()), stdext::to_power_of_two(size.height()));
-    else
-        glSize = size;
+    glSize.resize(stdext::to_power_of_two(size.width()), stdext::to_power_of_two(size.height()));
 
     // checks texture max size
     if (std::max<int>(glSize.width(), glSize.height()) > g_graphics.getMaxTextureSize()) {
@@ -201,18 +192,15 @@ bool Texture::setupSize(const Size& size, bool forcePowerOfTwo)
 
     m_size = size;
     m_glSize = glSize;
+
     setupTranformMatrix();
+
     return true;
 }
 
 void Texture::setupWrap()
 {
-    int texParam;
-    if (!m_repeat && g_graphics.canUseClampToEdge())
-        texParam = GL_CLAMP_TO_EDGE;
-    else
-        texParam = GL_REPEAT;
-
+    const GLint texParam = m_repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE;
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texParam);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texParam);
 }
@@ -235,17 +223,17 @@ void Texture::setupFilters()
 void Texture::setupTranformMatrix()
 {
     if (m_upsideDown) {
-        m_transformMatrix = { 1.0f / m_glSize.width(),  0.0f,                                     0.0f,
-                                                    0.0f,                  -1.0f / m_glSize.height(),                   0.0f,
-                                                    0.0f,                   m_size.height() / static_cast<float>(m_glSize.height()), 1.0f };
+        m_transformMatrix = { 1.0f / m_glSize.width(), 0.0f,                                                    0.0f,
+                              0.0f,                   -1.0f / m_glSize.height(),                                0.0f,
+                              0.0f,                    m_size.height() / static_cast<float>(m_glSize.height()), 1.0f };
     } else {
-        m_transformMatrix = { 1.0f / m_glSize.width(),  0.0f,                    0.0f,
-                                                    0.0f,                   1.0f / m_glSize.height(),  0.0f,
-                                                    0.0f,                   0.0f,                    1.0f };
+        m_transformMatrix = { 1.0f / m_glSize.width(), 0.0f,                     0.0f,
+                              0.0f,                    1.0f / m_glSize.height(), 0.0f,
+                              0.0f,                    0.0f,                     1.0f };
     }
 }
 
-void Texture::setupPixels(int level, const Size& size, uchar* pixels, int channels, bool compress)
+void Texture::setupPixels(int level, const Size& size, uint8_t* pixels, int channels, bool compress)
 {
     GLenum format = 0;
     switch (channels) {

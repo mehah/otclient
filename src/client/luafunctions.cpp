@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -315,6 +315,18 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "openStore", &Game::openStore, &g_game);
     g_lua.bindSingletonFunction("g_game", "transferCoins", &Game::transferCoins, &g_game);
     g_lua.bindSingletonFunction("g_game", "openTransactionHistory", &Game::openTransactionHistory, &g_game);
+    g_lua.bindSingletonFunction("g_game", "setLastSupportedVersion", &Game::setLastSupportedVersion, &g_game);
+    g_lua.bindSingletonFunction("g_game", "getLastSupportedVersion", &Game::getLastSupportedVersion, &g_game);
+    g_lua.bindSingletonFunction("g_game", "leaveMarket", &Game::leaveMarket, &g_game);
+    g_lua.bindSingletonFunction("g_game", "browseMarket", &Game::browseMarket, &g_game);
+    g_lua.bindSingletonFunction("g_game", "createMarketOffer", &Game::createMarketOffer, &g_game);
+    g_lua.bindSingletonFunction("g_game", "cancelMarketOffer", &Game::cancelMarketOffer, &g_game);
+    g_lua.bindSingletonFunction("g_game", "acceptMarketOffer", &Game::acceptMarketOffer, &g_game);
+    g_lua.bindSingletonFunction("g_game", "preyAction", &Game::preyAction, &g_game);
+    g_lua.bindSingletonFunction("g_game", "preyRequest", &Game::preyRequest, &g_game);
+    g_lua.bindSingletonFunction("g_game", "applyImbuement", &Game::applyImbuement, &g_game);
+    g_lua.bindSingletonFunction("g_game", "clearImbuement", &Game::clearImbuement, &g_game);
+    g_lua.bindSingletonFunction("g_game", "closeImbuingWindow", &Game::closeImbuingWindow, &g_game);
 
     g_lua.registerSingletonClass("g_shaders");
     g_lua.bindSingletonFunction("g_shaders", "createShader", &ShaderManager::createShader, &g_shaders);
@@ -371,13 +383,16 @@ void Client::registerLuaFunctions()
 
     g_lua.registerClass<Thing>();
     g_lua.bindClassMemberFunction<Thing>("setId", &Thing::setId);
+    g_lua.bindClassMemberFunction<Thing>("setShader", &Thing::setShader);
     g_lua.bindClassMemberFunction<Thing>("setPosition", &Thing::setPosition);
     g_lua.bindClassMemberFunction<Thing>("getId", &Thing::getId);
-    g_lua.bindClassMemberFunction<Thing>("getPosition", &Thing::getPosition);
-    g_lua.bindClassMemberFunction<Thing>("getStackPriority", &Thing::getStackPriority);
-    g_lua.bindClassMemberFunction<Thing>("getStackPos", &Thing::getStackPos);
-    g_lua.bindClassMemberFunction<Thing>("getAnimationPhases", &Thing::getAnimationPhases);
     g_lua.bindClassMemberFunction<Thing>("getTile", &Thing::getTile);
+    g_lua.bindClassMemberFunction<Thing>("getPosition", &Thing::getPosition);
+    g_lua.bindClassMemberFunction<Thing>("getStackPos", &Thing::getStackPos);
+    g_lua.bindClassMemberFunction<Thing>("getMarketData", &Thing::getMarketData);
+    g_lua.bindClassMemberFunction<Thing>("getStackPriority", &Thing::getStackPriority);
+    g_lua.bindClassMemberFunction<Thing>("getAnimationPhases", &Thing::getAnimationPhases);
+    g_lua.bindClassMemberFunction<Thing>("getParentContainer", &Thing::getParentContainer);
     g_lua.bindClassMemberFunction<Thing>("isItem", &Thing::isItem);
     g_lua.bindClassMemberFunction<Thing>("isMonster", &Thing::isMonster);
     g_lua.bindClassMemberFunction<Thing>("isNpc", &Thing::isNpc);
@@ -404,13 +419,11 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Thing>("isTranslucent", &Thing::isTranslucent);
     g_lua.bindClassMemberFunction<Thing>("isFullGround", &Thing::isFullGround);
     g_lua.bindClassMemberFunction<Thing>("isMarketable", &Thing::isMarketable);
-    g_lua.bindClassMemberFunction<Thing>("getMarketData", &Thing::getMarketData);
     g_lua.bindClassMemberFunction<Thing>("isUsable", &Thing::isUsable);
     g_lua.bindClassMemberFunction<Thing>("isWrapable", &Thing::isWrapable);
     g_lua.bindClassMemberFunction<Thing>("isUnwrapable", &Thing::isUnwrapable);
     g_lua.bindClassMemberFunction<Thing>("isTopEffect", &Thing::isTopEffect);
     g_lua.bindClassMemberFunction<Thing>("isLyingCorpse", &Thing::isLyingCorpse);
-    g_lua.bindClassMemberFunction<Thing>("getParentContainer", &Thing::getParentContainer);
 
     g_lua.registerClass<House>();
     g_lua.bindClassStaticFunction<House>("create", [] { return HousePtr(new House); });
@@ -497,7 +510,6 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Creature>("isRemoved", &Creature::isRemoved);
     g_lua.bindClassMemberFunction<Creature>("canBeSeen", &Creature::canBeSeen);
     g_lua.bindClassMemberFunction<Creature>("jump", &Creature::jump);
-    g_lua.bindClassMemberFunction<Creature>("setOutfitShader", &Creature::setOutfitShader);
     g_lua.bindClassMemberFunction<Creature>("setMountShader", &Creature::setMountShader);
     g_lua.bindClassMemberFunction<Creature>("setDrawOutfitColor", &Creature::setDrawOutfitColor);
 
@@ -529,7 +541,6 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ThingType>("getLight", &ThingType::getLight);
     g_lua.bindClassMemberFunction<ThingType>("getMinimapColor", &ThingType::getMinimapColor);
     g_lua.bindClassMemberFunction<ThingType>("getLensHelp", &ThingType::getLensHelp);
-    g_lua.bindClassMemberFunction<ThingType>("getClothSlot", &ThingType::getClothSlot);
     g_lua.bindClassMemberFunction<ThingType>("getElevation", &ThingType::getElevation);
     g_lua.bindClassMemberFunction<ThingType>("isGround", &ThingType::isGround);
     g_lua.bindClassMemberFunction<ThingType>("isGroundBorder", &ThingType::isGroundBorder);
@@ -681,6 +692,9 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<LocalPlayer>("isAutoWalking", &LocalPlayer::isAutoWalking);
     g_lua.bindClassMemberFunction<LocalPlayer>("stopAutoWalk", &LocalPlayer::stopAutoWalk);
     g_lua.bindClassMemberFunction<LocalPlayer>("autoWalk", &LocalPlayer::autoWalk);
+    g_lua.bindClassMemberFunction<LocalPlayer>("getResourceBalance", &LocalPlayer::getResourceBalance);
+    g_lua.bindClassMemberFunction<LocalPlayer>("setResourceBalance", &LocalPlayer::setResourceBalance);
+    g_lua.bindClassMemberFunction<LocalPlayer>("getTotalMoney", &LocalPlayer::getTotalMoney);
 
     g_lua.registerClass<Tile>();
     g_lua.bindClassMemberFunction<Tile>("clean", &Tile::clean);
@@ -771,7 +785,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIMap>("setDrawNames", &UIMap::setDrawNames);
     g_lua.bindClassMemberFunction<UIMap>("setDrawHealthBars", &UIMap::setDrawHealthBars);
     g_lua.bindClassMemberFunction<UIMap>("setDrawLights", &UIMap::setDrawLights);
-    g_lua.bindClassMemberFunction<UIMap>("setDrawViewportEdge", &UIMap::setDrawViewportEdge);
+    g_lua.bindClassMemberFunction<UIMap>("setLimitVisibleDimension", &UIMap::setLimitVisibleDimension);
     g_lua.bindClassMemberFunction<UIMap>("setDrawManaBar", &UIMap::setDrawManaBar);
     g_lua.bindClassMemberFunction<UIMap>("setKeepAspectRatio", &UIMap::setKeepAspectRatio);
     g_lua.bindClassMemberFunction<UIMap>("setMapShader", &UIMap::setMapShader);
@@ -782,7 +796,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIMap>("isDrawingNames", &UIMap::isDrawingNames);
     g_lua.bindClassMemberFunction<UIMap>("isDrawingHealthBars", &UIMap::isDrawingHealthBars);
     g_lua.bindClassMemberFunction<UIMap>("isDrawingLights", &UIMap::isDrawingLights);
-    g_lua.bindClassMemberFunction<UIMap>("isDrawingViewportEdge", &UIMap::isDrawingViewportEdge);
+    g_lua.bindClassMemberFunction<UIMap>("isLimitedVisibleDimension", &UIMap::isLimitedVisibleDimension);
     g_lua.bindClassMemberFunction<UIMap>("isDrawingManaBar", &UIMap::isDrawingManaBar);
     g_lua.bindClassMemberFunction<UIMap>("isLimitVisibleRangeEnabled", &UIMap::isLimitVisibleRangeEnabled);
     g_lua.bindClassMemberFunction<UIMap>("isKeepAspectRatioEnabled", &UIMap::isKeepAspectRatioEnabled);
@@ -798,7 +812,6 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIMap>("getZoom", &UIMap::getZoom);
     g_lua.bindClassMemberFunction<UIMap>("getMapShader", &UIMap::getMapShader);
     g_lua.bindClassMemberFunction<UIMap>("getMinimumAmbientLight", &UIMap::getMinimumAmbientLight);
-    g_lua.bindClassMemberFunction<UIMap>("getVisibleCreatures", &UIMap::getVisibleCreatures);
     g_lua.bindClassMemberFunction<UIMap>("getSpectators", &UIMap::getSpectators);
     g_lua.bindClassMemberFunction<UIMap>("getSightSpectators", &UIMap::getSightSpectators);
     g_lua.bindClassMemberFunction<UIMap>("setCrosshairTexture", &UIMap::setCrosshairTexture);

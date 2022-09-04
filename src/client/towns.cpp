@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@
 
 TownManager g_towns;
 
-Town::Town(uint32 tid, std::string name, const Position& pos) : m_id(tid), m_name(std::move(name))
+Town::Town(uint32_t tid, std::string name, const Position& pos) : m_id(tid), m_name(std::move(name))
 {
     if (pos.isValid())
         m_pos = pos;
@@ -43,14 +43,14 @@ void TownManager::addTown(const TownPtr& town)
         m_towns.push_back(town);
 }
 
-void TownManager::removeTown(uint32 townId)
+void TownManager::removeTown(uint32_t townId)
 {
     const auto it = findTown(townId);
     if (it != m_towns.end())
         m_towns.erase(it);
 }
 
-const TownPtr& TownManager::getTown(uint32 townId)
+const TownPtr& TownManager::getTown(uint32_t townId)
 {
     const auto it = std::find_if(m_towns.begin(), m_towns.end(),
                                  [=](const TownPtr& town) -> bool { return town->getId() == townId; });
@@ -59,7 +59,7 @@ const TownPtr& TownManager::getTown(uint32 townId)
     return m_nullTown;
 }
 
-const TownPtr& TownManager::getTownByName(const std::string& name)
+const TownPtr& TownManager::getTownByName(const std::string_view name)
 {
     const auto it = std::find_if(m_towns.begin(), m_towns.end(),
                                  [=](const TownPtr& town) -> bool { return town->getName() == name; });
@@ -68,7 +68,7 @@ const TownPtr& TownManager::getTownByName(const std::string& name)
     return m_nullTown;
 }
 
-TownList::iterator TownManager::findTown(uint32 townId)
+TownList::iterator TownManager::findTown(uint32_t townId)
 {
     return std::find_if(m_towns.begin(), m_towns.end(),
                         [=](const TownPtr& town) -> bool { return town->getId() == townId; });

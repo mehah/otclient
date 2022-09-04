@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,11 +23,6 @@
 #include "inputmessage.h"
 #include <framework/util/crypt.h>
 
-InputMessage::InputMessage()
-{
-    reset();
-}
-
 void InputMessage::reset()
 {
     m_messageSize = 0;
@@ -35,87 +30,87 @@ void InputMessage::reset()
     m_headerPos = MAX_HEADER_SIZE;
 }
 
-void InputMessage::setBuffer(const std::string& buffer)
+void InputMessage::setBuffer(const std::string_view buffer)
 {
     const int len = buffer.size();
     reset();
     checkWrite(len);
-    memcpy((char*)(m_buffer + m_readPos), buffer.c_str(), len);
+    memcpy(m_buffer + m_readPos, buffer.data(), len);
     m_readPos += len;
     m_messageSize += len;
 }
 
-uint8 InputMessage::getU8()
+uint8_t InputMessage::getU8()
 {
     checkRead(1);
-    const uint8 v = m_buffer[m_readPos];
+    const uint8_t v = m_buffer[m_readPos];
     m_readPos += 1;
     return v;
 }
 
-uint16 InputMessage::getU16()
+uint16_t InputMessage::getU16()
 {
     checkRead(2);
-    const uint16 v = stdext::readULE16(m_buffer + m_readPos);
+    const uint16_t v = stdext::readULE16(m_buffer + m_readPos);
     m_readPos += 2;
     return v;
 }
 
-uint32 InputMessage::getU32()
+uint32_t InputMessage::getU32()
 {
     checkRead(4);
-    const uint32 v = stdext::readULE32(m_buffer + m_readPos);
+    const uint32_t v = stdext::readULE32(m_buffer + m_readPos);
     m_readPos += 4;
     return v;
 }
 
-uint64 InputMessage::getU64()
+uint64_t InputMessage::getU64()
 {
     checkRead(8);
-    const uint64 v = stdext::readULE64(m_buffer + m_readPos);
+    const uint64_t v = stdext::readULE64(m_buffer + m_readPos);
     m_readPos += 8;
     return v;
 }
 
-int64 InputMessage::get64()
+int64_t InputMessage::get64()
 {
     checkRead(8);
-    const int64 v = stdext::readSLE64(m_buffer + m_readPos);
+    const int64_t v = stdext::readSLE64(m_buffer + m_readPos);
     m_readPos += 8;
     return v;
 }
 
-std::string InputMessage::getString()
+std::string_view InputMessage::getString()
 {
-    const uint16 stringLength = getU16();
+    const uint16_t stringLength = getU16();
     checkRead(stringLength);
-    const auto* const v = (char*)(m_buffer + m_readPos);
+    const std::string_view v{ (char*)(m_buffer + m_readPos), stringLength };
     m_readPos += stringLength;
-    return std::string(v, stringLength);
+    return v;
 }
 
 double InputMessage::getDouble()
 {
-    const uint8 precision = getU8();
-    const int32 v = getU32() - INT_MAX;
+    const uint8_t precision = getU8();
+    const int32_t v = getU32() - INT_MAX;
     return (v / std::pow(10.f, precision));
 }
 
 bool InputMessage::decryptRsa(int size)
 {
     checkRead(size);
-    g_crypt.rsaDecrypt(static_cast<unsigned char*>(m_buffer) + m_readPos, size);
+    g_crypt.rsaDecrypt(static_cast<uint8_t*>(m_buffer) + m_readPos, size);
     return (getU8() == 0x00);
 }
 
-void InputMessage::fillBuffer(uint8* buffer, uint16 size)
+void InputMessage::fillBuffer(uint8_t* buffer, uint16_t size)
 {
     checkWrite(m_readPos + size);
     memcpy(m_buffer + m_readPos, buffer, size);
     m_messageSize += size;
 }
 
-void InputMessage::setHeaderSize(uint16 size)
+void InputMessage::setHeaderSize(uint16_t size)
 {
     assert(MAX_HEADER_SIZE - size >= 0);
     m_headerPos = MAX_HEADER_SIZE - size;
@@ -124,8 +119,8 @@ void InputMessage::setHeaderSize(uint16 size)
 
 bool InputMessage::readChecksum()
 {
-    const uint32 receivedCheck = getU32();
-    const uint32 checksum = stdext::adler32(m_buffer + m_readPos, getUnreadSize());
+    const uint32_t receivedCheck = getU32();
+    const uint32_t checksum = stdext::adler32(m_buffer + m_readPos, getUnreadSize());
     return receivedCheck == checksum;
 }
 

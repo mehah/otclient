@@ -11,11 +11,12 @@ function Struct.pack(format, ...)
         if opt == '>' then
             endianness = false
         elseif opt:find('[bBhHiIlL]') then
-            local n = opt:find('[hH]') and 2 or opt:find('[iI]') and 4 or
-                          opt:find('[lL]') and 8 or 1
+            local n = opt:find('[hH]') and 2 or opt:find('[iI]') and 4 or opt:find('[lL]') and 8 or 1
             local val = tonumber(table.remove(vars, 1))
 
-            if val < 0 then val = val + 2 ^ (n * 8 - 1) end
+            if val < 0 then
+                val = val + 2 ^ (n * 8 - 1)
+            end
 
             local bytes = {}
             for j = 1, n do
@@ -42,8 +43,7 @@ function Struct.pack(format, ...)
                 mantissa = 0
                 exponent = 0
             else
-                mantissa = (mantissa * 2 - 1) *
-                               math.ldexp(0.5, (opt == 'd') and 53 or 24)
+                mantissa = (mantissa * 2 - 1) * math.ldexp(0.5, (opt == 'd') and 53 or 24)
                 exponent = exponent + ((opt == 'd') and 1022 or 126)
             end
 
@@ -61,14 +61,9 @@ function Struct.pack(format, ...)
                 val = math.floor(val / (2 ^ 8))
             end
 
-            table.insert(bytes, string.char(
-                             math.floor(
-                                 exponent * ((opt == 'd') and 16 or 128) + val) %
-                                 (2 ^ 8)))
-            val = math.floor((exponent * ((opt == 'd') and 16 or 128) + val) /
-                                 (2 ^ 8))
-            table.insert(bytes,
-                         string.char(math.floor(sign * 128 + val) % (2 ^ 8)))
+            table.insert(bytes, string.char(math.floor(exponent * ((opt == 'd') and 16 or 128) + val) % (2 ^ 8)))
+            val = math.floor((exponent * ((opt == 'd') and 16 or 128) + val) / (2 ^ 8))
+            table.insert(bytes, string.char(math.floor(sign * 128 + val) % (2 ^ 8)))
             val = math.floor((sign * 128 + val) / (2 ^ 8))
 
             if not endianness then
@@ -108,8 +103,7 @@ function Struct.unpack(format, stream)
         if opt == '>' then
             endianness = false
         elseif opt:find('[bBhHiIlL]') then
-            local n = opt:find('[hH]') and 2 or opt:find('[iI]') and 4 or
-                          opt:find('[lL]') and 8 or 1
+            local n = opt:find('[hH]') and 2 or opt:find('[iI]') and 4 or opt:find('[lL]') and 8 or 1
             local signed = opt:lower() == opt
 
             local val = 0
@@ -123,7 +117,9 @@ function Struct.unpack(format, stream)
                 iterator = iterator + 1
             end
 
-            if signed then val = val - 2 ^ (n * 8 - 1) end
+            if signed then
+                val = val - 2 ^ (n * 8 - 1)
+            end
 
             table.insert(vars, val)
         elseif opt:find('[fd]') then
@@ -131,34 +127,34 @@ function Struct.unpack(format, stream)
             local x = stream:sub(iterator, iterator + n - 1)
             iterator = iterator + n
 
-            if not endianness then x = string.reverse(x) end
+            if not endianness then
+                x = string.reverse(x)
+            end
 
             local sign = 1
-            local mantissa = string.byte(x, (opt == 'd') and 7 or 3) %
-                                 ((opt == 'd') and 16 or 128)
+            local mantissa = string.byte(x, (opt == 'd') and 7 or 3) % ((opt == 'd') and 16 or 128)
             for i = n - 2, 1, -1 do
                 mantissa = mantissa * (2 ^ 8) + string.byte(x, i)
             end
 
-            if string.byte(x, n) > 127 then sign = -1 end
+            if string.byte(x, n) > 127 then
+                sign = -1
+            end
 
-            local exponent = (string.byte(x, n) % 128) *
-                                 ((opt == 'd') and 16 or 2) +
-                                 math.floor(
-                                     string.byte(x, n - 1) /
-                                         ((opt == 'd') and 16 or 128))
+            local exponent = (string.byte(x, n) % 128) * ((opt == 'd') and 16 or 2) +
+                                 math.floor(string.byte(x, n - 1) / ((opt == 'd') and 16 or 128))
             if exponent == 0 then
                 table.insert(vars, 0.0)
             else
-                mantissa = (math.ldexp(mantissa, (opt == 'd') and -52 or -23) +
-                               1) * sign
-                table.insert(vars, math.ldexp(mantissa, exponent -
-                                                  ((opt == 'd') and 1023 or 127)))
+                mantissa = (math.ldexp(mantissa, (opt == 'd') and -52 or -23) + 1) * sign
+                table.insert(vars, math.ldexp(mantissa, exponent - ((opt == 'd') and 1023 or 127)))
             end
         elseif opt == 's' then
             local bytes = {}
             for j = iterator, stream:len() do
-                if stream:sub(j, j) == string.char(0) then break end
+                if stream:sub(j, j) == string.char(0) then
+                    break
+                end
 
                 table.insert(bytes, stream:sub(j, j))
             end

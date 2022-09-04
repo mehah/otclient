@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,9 @@
 #include "thingtypemanager.h"
 #include "tile.h"
 
-void Thing::setPosition(const Position& position)
+#include <framework/core/graphicalapplication.h>
+
+void Thing::setPosition(const Position& position, uint8_t stackPos, bool hasElevation)
 {
     if (m_position == position)
         return;
@@ -84,12 +86,28 @@ int Thing::getStackPos()
     return -1;
 }
 
+// Do not change if you do not understand what is being done.
+void Thing::generateBuffer()
+{
+    m_drawBuffer = nullptr;
+
+    DrawPool::DrawOrder order = DrawPool::DrawOrder::NONE;
+    if (isSingleGround())
+        order = DrawPool::DrawOrder::FIRST;
+    else if (isGroundBorder())
+        order = DrawPool::DrawOrder::SECOND;
+    else if ((isCommon() || isOnBottom()) && isSingleDimension() && !hasDisplacement() && isNotMoveable())
+        order = DrawPool::DrawOrder::THIRD;
+    else if (isTopGround() || g_app.isDrawingEffectsOnTop() && isEffect())
+        order = DrawPool::DrawOrder::FOURTH;
+    else if (isMissile())
+        order = DrawPool::DrawOrder::FIFTH;
+
+    if (order != DrawPool::DrawOrder::NONE)
+        m_drawBuffer = std::make_shared<DrawBuffer>(order);
+}
+
 const ThingTypePtr& Thing::getThingType()
 {
     return g_things.getNullThingType();
-}
-
-ThingType* Thing::rawGetThingType()
-{
-    return g_things.getNullThingType().get();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef PARTICLEAFFECTOR_H
-#define PARTICLEAFFECTOR_H
+#pragma once
 
 #include "declarations.h"
 #include <framework/otml/otml.h>
@@ -29,8 +28,6 @@
 class ParticleAffector : public stdext::shared_object
 {
 public:
-    ParticleAffector();
-
     void update(float elapsedTime);
     virtual void load(const OTMLNodePtr& node);
     virtual void updateParticle(const ParticlePtr&, float) {}
@@ -38,9 +35,11 @@ public:
     bool hasFinished() { return m_finished; }
 
 protected:
-    bool m_finished, m_active;
-    float m_delay, m_duration;
-    float m_elapsedTime;
+    bool m_finished{ false };
+    bool m_active{ false };
+    float m_delay{ 0 };
+    float m_duration{ 0 };
+    float m_elapsedTime{ 0 };
 };
 
 class GravityAffector : public ParticleAffector
@@ -50,7 +49,8 @@ public:
     void updateParticle(const ParticlePtr& particle, float elapsedTime) override;
 
 private:
-    float m_angle, m_gravity;
+    float m_angle;
+    float m_gravity;
 };
 
 class AttractionAffector : public ParticleAffector
@@ -61,8 +61,7 @@ public:
 
 private:
     Point m_position;
-    float m_acceleration, m_reduction;
-    bool m_repelish;
+    float m_acceleration{ .0f };
+    float m_reduction{ .0f };
+    bool m_repelish{ false };
 };
-
-#endif

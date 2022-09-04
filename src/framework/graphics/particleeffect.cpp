@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,10 +24,9 @@
 
 #include "particlesystem.h"
 
-ParticleEffectType::ParticleEffectType()
-= default;
+ParticleEffectType::ParticleEffectType() = default;
 
-void ParticleEffectType::load(const OTMLNodePtr & node)
+void ParticleEffectType::load(const OTMLNodePtr& node)
 {
     m_node = node->clone();
     for (const OTMLNodePtr& childNode : node->children()) {
@@ -38,10 +37,10 @@ void ParticleEffectType::load(const OTMLNodePtr & node)
     }
 }
 
-void ParticleEffect::load(const ParticleEffectTypePtr & effectType)
+void ParticleEffect::load(const ParticleEffectTypePtr& effectType)
 {
     if (!effectType)
-        stdext::throw_exception("effect type not found");
+        throw Exception("effect type not found");
 
     for (const OTMLNodePtr& childNode : effectType->getNode()->children()) {
         if (childNode->tag() == "System") {

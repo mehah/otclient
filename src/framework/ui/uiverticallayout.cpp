@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 #include "uiverticallayout.h"
 #include "uiwidget.h"
 #include <framework/core/eventdispatcher.h>
+#include <ranges>
 
 void UIVerticalLayout::applyStyle(const OTMLNodePtr& styleNode)
 {
@@ -42,18 +43,13 @@ bool UIVerticalLayout::internalUpdate()
     if (!parentWidget)
         return false;
 
-    UIWidgetList widgets = parentWidget->getChildren();
-
-    if (m_alignBottom)
-        std::reverse(widgets.begin(), widgets.end());
-
     const Rect paddingRect = parentWidget->getPaddingRect();
     Point pos = (m_alignBottom) ? paddingRect.bottomLeft() : paddingRect.topLeft();
     int preferredHeight = 0;
 
-    for (const UIWidgetPtr& widget : widgets) {
+    const auto& action = [&](const UIWidgetPtr& widget) {
         if (!widget->isExplicitlyVisible())
-            continue;
+            return;
 
         Size size = widget->getSize();
 
@@ -85,6 +81,14 @@ bool UIVerticalLayout::internalUpdate()
         gap += m_spacing;
         pos.y += gap;
         preferredHeight += gap;
+    };
+
+    if (m_alignBottom) {
+        for (const UIWidgetPtr& widget : parentWidget->m_children | std::views::reverse)
+            action(widget);
+    } else {
+        for (const UIWidgetPtr& widget : parentWidget->m_children)
+            action(widget);
     }
 
     preferredHeight -= m_spacing;

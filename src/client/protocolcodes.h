@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef PROTOCOLCODES_H
-#define PROTOCOLCODES_H
+#pragma once
 
 #include "global.h"
 
@@ -43,7 +42,7 @@ namespace Proto
         Creature = 99
     };
 
-    enum GameServerOpcodes : uint8
+    enum GameServerOpcodes : uint8_t
     {
         GameServerLoginOrPendingState = 10,
         GameServerGMActions = 11,
@@ -72,6 +71,7 @@ namespace Proto
         // NOTE: add any custom opcodes in this range
         // 51 - 99
         GameServerChangeMapAwareRange = 51,
+        GameServerFloorDescription = 75,
 
         // original tibia ONLY
         GameServerSendClientCheck = 99,
@@ -172,6 +172,7 @@ namespace Proto
         GameServerSendOpenRewardWall = 226,
         GameServerSendDailyReward = 228,
         GameServerSendRewardHistory = 229,
+        GameServerSendPreyFreeRerolls = 230,
         GameServerSendPreyTimeLeft = 231,
         GameServerSendPreyData = 232,
         GameServerSendPreyRerollPrice = 233,
@@ -198,7 +199,7 @@ namespace Proto
         GameServerStoreCompletePurchase = 254  // 1080
     };
 
-    enum ClientOpcodes : uint8
+    enum ClientOpcodes : uint8_t
     {
         ClientEnterAccount = 1,
         ClientPendingGame = 10,
@@ -282,12 +283,17 @@ namespace Proto
         ClientRequestOutfit = 210,
         ClientChangeOutfit = 211,
         ClientMount = 212, // 870
+        ClientApplyImbuement = 213,
+        ClientClearImbuement = 214,
+        ClientCloseImbuingWindow = 215,
         ClientAddVip = 220,
         ClientRemoveVip = 221,
         ClientEditVip = 222,
         ClientBugReport = 230,
         ClientRuleViolation = 231,
         ClientDebugReport = 232,
+        ClientPreyAction = 235,
+        ClientPreyRequest = 237,
         ClientTransferCoins = 239, // 1080
         ClientRequestQuestLog = 240,
         ClientRequestQuestLine = 241,
@@ -328,8 +334,6 @@ namespace Proto
     };
 
     void buildMessageModesMap(int version);
-    Otc::MessageMode translateMessageModeFromServer(uint8 mode);
-    uint8 translateMessageModeToServer(Otc::MessageMode mode);
+    Otc::MessageMode translateMessageModeFromServer(uint8_t mode);
+    uint8_t translateMessageModeToServer(Otc::MessageMode mode);
 }
-
-#endif

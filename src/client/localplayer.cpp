@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ void LocalPlayer::lockWalk(int millis)
 bool LocalPlayer::canWalk(bool ignoreLock)
 {
     // paralyzed
-    if (isParalyzed())
+    if (isParalyzed() || isDead())
         return false;
 
     // cannot walk while locked
@@ -99,8 +99,7 @@ bool LocalPlayer::retryAutoWalk()
             if (m_autoWalkContinueEvent)
                 m_autoWalkContinueEvent->cancel();
 
-            m_autoWalkContinueEvent = g_dispatcher.scheduleEvent([capture0 = asLocalPlayer(), this]
-            {
+            m_autoWalkContinueEvent = g_dispatcher.scheduleEvent([capture0 = asLocalPlayer(), this] {
                 capture0->autoWalk(m_autoWalkDestination, true);
             }, 200);
             m_autoWalkRetries += 1;
@@ -132,11 +131,14 @@ void LocalPlayer::cancelWalk(Otc::Direction direction)
     callLuaField("onCancelWalk", direction);
 }
 
-bool LocalPlayer::autoWalk(const Position& destination, const bool retry)
+bool LocalPlayer::autoWalk(const Position& destination, bool retry)
 {
     // reset state
-    m_autoWalkDestination = Position();
-    m_lastAutoWalkPosition = Position();
+    m_autoWalkDestination = {};
+    m_lastAutoWalkPosition = {};
+    if (m_autoWalkContinueEvent)
+        m_autoWalkContinueEvent->cancel();
+    m_autoWalkContinueEvent = nullptr;
 
     if (!retry)
         m_autoWalkRetries = 0;
@@ -144,28 +146,18 @@ bool LocalPlayer::autoWalk(const Position& destination, const bool retry)
     if (destination == m_position)
         return true;
 
-    if (m_position.isInRange(destination, 1, 1))
-        return g_game.walk(m_position.getDirectionFromPosition(destination));
-
-    std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> result;
-    std::vector<Otc::Direction> limitedPath;
-
     m_autoWalkDestination = destination;
     auto self(asLocalPlayer());
-    g_map.findPathAsync(m_position, destination, [self](const PathFindResult_ptr& result) {
+    g_map.findPathAsync(m_position, destination, [self](const auto& result) {
         if (self->m_autoWalkDestination != result->destination)
             return;
 
         if (result->status != Otc::PathFindResultOk) {
             if (self->m_autoWalkRetries > 0 && self->m_autoWalkRetries <= 3) { // try again in 300, 700, 1200 ms if canceled by server
-                if (self->m_autoWalkContinueEvent)
-                    self->m_autoWalkContinueEvent->cancel();
-
-                self->m_autoWalkContinueEvent = g_dispatcher.scheduleEvent(
-                    [self, capture0 = result->destination]{ self->autoWalk(capture0, true); }, 200 + self->m_autoWalkRetries * 100);
+                self->m_autoWalkContinueEvent = g_dispatcher.scheduleEvent([self, capture0 = result->destination] { self->autoWalk(capture0, true); }, 200 + self->m_autoWalkRetries * 100);
                 return;
             }
-            self->m_autoWalkDestination = Position();
+            self->m_autoWalkDestination = {};
             self->callLuaField("onAutoWalkFail", result->status);
             return;
         }
@@ -174,14 +166,13 @@ bool LocalPlayer::autoWalk(const Position& destination, const bool retry)
             result->path.resize(127);
 
         if (result->path.empty()) {
-            self->m_autoWalkDestination = Position();
+            self->m_autoWalkDestination = {};
             self->callLuaField("onAutoWalkFail", result->status);
             return;
         }
 
-        const auto finalAutowalkPos = self->m_position.translatedToDirections(result->path).back();
-        if (self->m_autoWalkDestination != finalAutowalkPos) {
-            self->m_lastAutoWalkPosition = finalAutowalkPos;
+        if (self->m_autoWalkDestination != result->destination) {
+            self->m_lastAutoWalkPosition = result->destination;
         }
 
         g_game.autoWalk(result->path, result->start);
@@ -195,8 +186,8 @@ bool LocalPlayer::autoWalk(const Position& destination, const bool retry)
 
 void LocalPlayer::stopAutoWalk()
 {
-    m_autoWalkDestination = Position();
-    m_lastAutoWalkPosition = Position();
+    m_autoWalkDestination = {};
+    m_lastAutoWalkPosition = {};
     m_knownCompletePath = false;
 
     if (m_autoWalkContinueEvent)
@@ -207,7 +198,7 @@ void LocalPlayer::stopWalk()
 {
     Creature::stopWalk(); // will call terminateWalk
 
-    m_lastPrewalkDestination = Position();
+    m_lastPrewalkDestination = {};
 }
 
 void LocalPlayer::updateWalkOffset(int totalPixelsWalked)
@@ -218,7 +209,7 @@ void LocalPlayer::updateWalkOffset(int totalPixelsWalked)
     }
 
     // pre walks offsets are calculated in the oposite direction
-    m_walkOffset = Point();
+    m_walkOffset = {};
     if (m_direction == Otc::North || m_direction == Otc::NorthEast || m_direction == Otc::NorthWest)
         m_walkOffset.y = -totalPixelsWalked;
     else if (m_direction == Otc::South || m_direction == Otc::SouthEast || m_direction == Otc::SouthWest)
@@ -487,7 +478,7 @@ void LocalPlayer::setResourceBalance(Otc::ResourceTypes_t type, uint64_t value)
     const uint64_t oldBalance = getResourceBalance(type);
     if (value != oldBalance) {
         m_resourcesBalance[type] = value;
-        callLuaField("onResourcesBalanceChange", value, oldBalance);
+        g_lua.callGlobalField("g_game", "onResourcesBalanceChange", value, oldBalance, type);
     }
 }
 

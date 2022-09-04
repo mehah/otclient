@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef LOCALPLAYER_H
-#define LOCALPLAYER_H
+#pragma once
 
 #include "player.h"
 
@@ -96,6 +95,13 @@ public:
         return it != m_resourcesBalance.end() ? it->second : 0;
     }
 
+    uint64_t getTotalMoney()
+    {
+        uint64_t bankBalance = getResourceBalance(Otc::RESOURCE_BANK_BALANCE);
+        uint64_t equippedBalance = getResourceBalance(Otc::RESOURCE_GOLD_EQUIPPED);
+        return bankBalance + equippedBalance;
+    }
+
     bool hasSight(const Position& pos);
     bool isKnown() { return m_known; }
     bool isPreWalking() { return m_preWalking; }
@@ -117,7 +123,6 @@ protected:
 
     friend class Game;
 
-
     void updateWalkOffset(int totalPixelsWalked) override;
     void terminateWalk() override;
 
@@ -125,18 +130,18 @@ private:
     bool retryAutoWalk();
 
     // walk related
-    Position m_lastPrewalkDestination,
-        m_lastAutoWalkPosition,
-        m_autoWalkDestination;
+    Position m_lastPrewalkDestination;
+    Position m_lastAutoWalkPosition;
+    Position m_autoWalkDestination;
 
     ScheduledEventPtr m_autoWalkContinueEvent;
     ticks_t m_walkLockExpiration{ 0 };
 
-    bool m_preWalking{ false },
-        m_knownCompletePath{ false },
-        m_premium{ false },
-        m_known{ false },
-        m_pending{ false };
+    bool m_preWalking{ false };
+    bool m_knownCompletePath{ false };
+    bool m_premium{ false };
+    bool m_known{ false };
+    bool m_pending{ false };
 
     ItemPtr m_inventoryItems[Otc::LastInventorySlot];
 
@@ -145,9 +150,9 @@ private:
     std::array<int, Otc::LastSkill> m_skillsLevelPercent;
     std::vector<int> m_spells;
 
-    std::map<Otc::ResourceTypes_t, uint64_t> m_resourcesBalance;
+    stdext::map<Otc::ResourceTypes_t, uint64_t> m_resourcesBalance;
 
-    uint8 m_autoWalkRetries{ 0 };
+    uint8_t m_autoWalkRetries{ 0 };
 
     int m_states{ 0 };
     int m_vocation{ 0 };
@@ -170,5 +175,3 @@ private:
     double m_regenerationTime{ -1 };
     double m_offlineTrainingTime{ -1 };
 };
-
-#endif

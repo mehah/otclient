@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@
 #include <framework/luaengine/luainterface.h>
 #include <framework/otml/otml.h>
 
-Module::Module(const std::string& name)
+Module::Module(const std::string_view name)
 {
     m_name = name;
     m_sandboxEnv = g_lua.newSandboxEnv();
@@ -47,17 +47,17 @@ bool Module::load()
 
         for (const std::string& depName : m_dependencies) {
             if (depName == m_name)
-                stdext::throw_exception("cannot depend on itself");
+                throw Exception("cannot depend on itself");
 
             ModulePtr dep = g_modules.getModule(depName);
             if (!dep)
-                stdext::throw_exception(stdext::format("dependency '%s' was not found", depName));
+                throw Exception("dependency '%s' was not found", depName);
 
             if (dep->hasDependency(m_name, true))
-                stdext::throw_exception(stdext::format("dependency '%s' is recursively depending on itself", depName));
+                throw Exception("dependency '%s' is recursively depending on itself", depName);
 
             if (!dep->isLoaded() && !dep->load())
-                stdext::throw_exception(stdext::format("dependency '%s' has failed to load", depName));
+                throw Exception("dependency '%s' has failed to load", depName);
         }
 
         if (m_sandboxed)
@@ -68,8 +68,8 @@ bool Module::load()
             g_lua.safeCall(0, 0);
         }
 
-        const std::string& onLoadBuffer = std::get<0>(m_onLoadFunc);
-        const std::string& onLoadSource = std::get<1>(m_onLoadFunc);
+        const auto& onLoadBuffer = std::get<0>(m_onLoadFunc);
+        const auto& onLoadSource = std::get<1>(m_onLoadFunc);
         if (!onLoadBuffer.empty()) {
             g_lua.loadBuffer(onLoadBuffer, onLoadSource);
             if (m_sandboxed) {
@@ -84,7 +84,7 @@ bool Module::load()
 
         m_loaded = true;
         g_logger.debug(stdext::format("Loaded module '%s'", m_name));
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         // remove from package.loaded
         g_lua.getGlobalField("package", "loaded");
         g_lua.pushNil();
@@ -117,8 +117,8 @@ void Module::unload()
             if (m_sandboxed)
                 g_lua.setGlobalEnvironment(m_sandboxEnv);
 
-            const std::string& onUnloadBuffer = std::get<0>(m_onUnloadFunc);
-            const std::string& onUnloadSource = std::get<1>(m_onUnloadFunc);
+            const auto& onUnloadBuffer = std::get<0>(m_onUnloadFunc);
+            const auto& onUnloadSource = std::get<1>(m_onUnloadFunc);
             if (!onUnloadBuffer.empty()) {
                 g_lua.loadBuffer(onUnloadBuffer, onUnloadSource);
                 g_lua.safeCall(0, 0);
@@ -126,7 +126,7 @@ void Module::unload()
 
             if (m_sandboxed)
                 g_lua.resetGlobalEnvironment();
-        } catch (stdext::exception& e) {
+        } catch (stdext::exception const& e) {
             if (m_sandboxed)
                 g_lua.resetGlobalEnvironment();
             g_logger.error(stdext::format("Unable to unload module '%s': %s", m_name, e.what()));
@@ -164,7 +164,7 @@ bool Module::isDependent()
     return false;
 }
 
-bool Module::hasDependency(const std::string& name, bool recursive)
+bool Module::hasDependency(const std::string_view name, bool recursive)
 {
     if (std::find(m_dependencies.begin(), m_dependencies.end(), name) != m_dependencies.end())
         return true;

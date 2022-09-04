@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,14 +20,13 @@
  * THE SOFTWARE.
  */
 
-#ifndef ITEM_H
-#define ITEM_H
+#pragma once
 
 #include "effect.h"
 #include "thing.h"
 #include <framework/global.h>
 
-enum ItemAttr : uint8
+enum ItemAttr : uint8_t
 {
     ATTR_END = 0,
     //ATTR_DESCRIPTION = 1,
@@ -66,7 +65,8 @@ enum ItemAttr : uint8
     ATTR_ARTICLE = 41,
     ATTR_SCRIPTPROTECTED = 42,
     ATTR_DUALWIELD = 43,
-    ATTR_ATTRIBUTE_MAP = 128
+    ATTR_ATTRIBUTE_MAP = 128,
+    ATTR_LAST
 };
 
 // @bindclass
@@ -74,43 +74,41 @@ enum ItemAttr : uint8
 class Item : public Thing
 {
 public:
-    Item() = default;
-    ~Item() override = default;
-
     static ItemPtr create(int id);
     static ItemPtr createFromOtb(int id);
 
-    void draw(const Point& dest, float scaleFactor, bool animate, const Highlight& highLight, TextureType textureType = TextureType::NONE, Color color = Color::white, LightView* lightView = nullptr) override;
+    void draw(const Point& dest, float scaleFactor, bool animate, uint32_t flags, const Highlight& highLight, TextureType textureType = TextureType::NONE, Color color = Color::white, LightView* lightView = nullptr) override;
 
-    void setId(uint32 id) override;
-    void setOtbId(uint16 id);
-    void setCountOrSubType(int value) { m_countOrSubType = value; }
-    void setCount(int count) { m_countOrSubType = count; }
-    void setSubType(int subType) { m_countOrSubType = subType; }
+    void setId(uint32_t id) override;
+    void setOtbId(uint16_t id);
+    void setCountOrSubType(int value) { m_countOrSubType = value; updatePatterns(); }
+    void setCount(int count) { m_countOrSubType = count; updatePatterns(); }
+    void setSubType(int subType) { m_countOrSubType = subType; updatePatterns(); }
     void setColor(const Color& c) { m_color = c; }
+    void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false) override;
 
     int getCountOrSubType() { return m_countOrSubType; }
     int getSubType();
     int getCount();
-    uint32 getId() override { return m_clientId; }
-    uint16 getClientId() { return m_clientId; }
-    uint16 getServerId() { return m_serverId; }
+    uint32_t getId() override { return m_clientId; }
+    uint16_t getClientId() { return m_clientId; }
+    uint16_t getServerId() { return m_serverId; }
     std::string getName();
-    bool isValid();
+    bool isValid() { return getThingType() != nullptr; }
 
     void unserializeItem(const BinaryTreePtr& in);
     void serializeItem(const OutputBinaryTreePtr& out);
 
-    void setDepotId(uint16 depotId) { m_attribs.set(ATTR_DEPOT_ID, depotId); }
-    uint16 getDepotId() { return m_attribs.get<uint16>(ATTR_DEPOT_ID); }
+    void setDepotId(uint16_t depotId) { m_attribs.set(ATTR_DEPOT_ID, depotId); }
+    uint16_t getDepotId() { return m_attribs.get<uint16_t>(ATTR_DEPOT_ID); }
 
-    void setDoorId(uint8 doorId) { m_attribs.set(ATTR_HOUSEDOORID, doorId); }
-    uint8 getDoorId() { return m_attribs.get<uint8>(ATTR_HOUSEDOORID); }
+    void setDoorId(uint8_t doorId) { m_attribs.set(ATTR_HOUSEDOORID, doorId); }
+    uint8_t getDoorId() { return m_attribs.get<uint8_t >(ATTR_HOUSEDOORID); }
 
-    uint16 getUniqueId() { return m_attribs.get<uint16>(ATTR_ACTION_ID); }
-    uint16 getActionId() { return m_attribs.get<uint16>(ATTR_UNIQUE_ID); }
-    void setActionId(uint16 actionId) { m_attribs.set(ATTR_ACTION_ID, actionId); }
-    void setUniqueId(uint16 uniqueId) { m_attribs.set(ATTR_UNIQUE_ID, uniqueId); }
+    uint16_t getUniqueId() { return m_attribs.get<uint16_t>(ATTR_ACTION_ID); }
+    uint16_t getActionId() { return m_attribs.get<uint16_t>(ATTR_UNIQUE_ID); }
+    void setActionId(uint16_t actionId) { m_attribs.set(ATTR_ACTION_ID, actionId); }
+    void setUniqueId(uint16_t uniqueId) { m_attribs.set(ATTR_UNIQUE_ID, uniqueId); }
 
     std::string getText() { return m_attribs.get<std::string>(ATTR_TEXT); }
     std::string getDescription() { return m_attribs.get<std::string>(ATTR_DESC); }
@@ -139,28 +137,29 @@ public:
     void removeContainerItem(int slot) { m_containerItems[slot] = nullptr; }
     void clearContainerItems() { m_containerItems.clear(); }
 
-    void calculatePatterns(int& xPattern, int& yPattern, int& zPattern);
+    void updatePatterns();
     int calculateAnimationPhase(bool animate);
     int getExactSize(int layer = 0, int xPattern = 0, int yPattern = 0, int zPattern = 0, int animationPhase = 0) override;
 
     const ThingTypePtr& getThingType() override;
-    ThingType* rawGetThingType() override;
+
+    void onPositionChange(const Position& /*newPos*/, const Position& /*oldPos*/) override { updatePatterns(); }
 
 private:
-    uint16 m_clientId{ 0 };
-    uint16 m_serverId{ 0 };
-    uint8 m_countOrSubType{ 1 };
+    uint16_t m_clientId{ 0 };
+    uint16_t m_serverId{ 0 };
+
+    uint8_t m_countOrSubType{ 0 };
+
     Color m_color{ Color::alpha };
 
-    stdext::packed_storage<uint8> m_attribs;
+    stdext::small_dynamic_storage<ItemAttr, ATTR_LAST> m_attribs;
     ItemVector m_containerItems;
 
-    uint8 m_phase{ 0 };
+    uint8_t m_phase{ 0 };
     ticks_t m_lastPhase{ 0 };
 
     bool m_async{ true };
 };
 
 #pragma pack(pop)
-
-#endif

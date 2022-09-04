@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef PARTICLEEMITTER_H
-#define PARTICLEEMITTER_H
+#pragma once
 
 #include "declarations.h"
 #include <framework/global.h>
@@ -30,7 +29,6 @@
 class ParticleEmitter : public stdext::shared_object
 {
 public:
-    ParticleEmitter();
 
     void load(const OTMLNodePtr& node);
 
@@ -41,12 +39,14 @@ public:
 private:
     // self related
     Point m_position;
-    float m_duration, m_delay;
-    float m_elapsedTime;
-    bool m_finished, m_active;
-    float m_burstRate;
-    int m_currentBurst, m_burstCount;
+    float m_duration{ -1 };
+    float m_delay{ 0 };
+    float m_elapsedTime{ 0 };
+    float m_burstRate{ 1.f };
+    int m_currentBurst{ 0 };
+    int m_burstCount{ 32 };
+    bool m_finished{ false };
+    bool m_active{ false };
+
     ParticleTypePtr m_particleType;
 };
-
-#endif

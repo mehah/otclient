@@ -6,7 +6,7 @@
 ]] TABLE_SORTING_ASC = 0
 TABLE_SORTING_DESC = 1
 
-UITable = extends(UIWidget, "UITable")
+UITable = extends(UIWidget, 'UITable')
 
 -- Initialize default values
 function UITable.create()
@@ -32,7 +32,9 @@ end
 
 -- Clear table values
 function UITable:onDestroy()
-    for _, row in pairs(self.rows) do row.onClick = nil end
+    for _, row in pairs(self.rows) do
+        row.onClick = nil
+    end
     self.rows = {}
     self.columns = {}
     self.headerRow = nil
@@ -49,7 +51,9 @@ end
 -- Detect if a header is already defined
 function UITable:onSetup()
     local header = self:getChildById('header')
-    if header then self:setHeader(header) end
+    if header then
+        self:setHeader(header)
+    end
 end
 
 -- Parse table related styles
@@ -61,33 +65,47 @@ function UITable:onStyleApply(styleName, styleNode)
                     self:setTableData(self:getParent():getChildById(value))
                 end)
             elseif name == 'column-style' then
-                addEvent(function() self:setColumnStyle(value) end)
+                addEvent(function()
+                    self:setColumnStyle(value)
+                end)
             elseif name == 'row-style' then
-                addEvent(function() self:setRowStyle(value) end)
+                addEvent(function()
+                    self:setRowStyle(value)
+                end)
             elseif name == 'header-column-style' then
                 addEvent(function()
                     self:setHeaderColumnStyle(value)
                 end)
             elseif name == 'header-row-style' then
-                addEvent(function() self:setHeaderRowStyle(value) end)
+                addEvent(function()
+                    self:setHeaderRowStyle(value)
+                end)
             end
         end
     end
 end
 
 function UITable:setColumnWidth(width)
-    if self:hasHeader() then return end
+    if self:hasHeader() then
+        return
+    end
     self.columnWidth = width
 end
 
-function UITable:setDefaultColumnWidth(width) self.defaultColumnWidth = width end
+function UITable:setDefaultColumnWidth(width)
+    self.defaultColumnWidth = width
+end
 
 -- Check if the table has a header
-function UITable:hasHeader() return self.headerRow ~= nil end
+function UITable:hasHeader()
+    return self.headerRow ~= nil
+end
 
 -- Clear all rows
 function UITable:clearData()
-    if not self.dataSpace then return end
+    if not self.dataSpace then
+        return
+    end
     self.dataSpace:destroyChildren()
     self.selectedRow = nil
     self.columns = {}
@@ -99,9 +117,10 @@ function UITable:setHeader(headerWidget)
     self:removeHeader()
 
     if self.dataSpace then
-        local newHeight = self.dataSpace:getHeight() - headerRow:getHeight() -
-                              self.dataSpace:getMarginTop()
-        self.dataSpace:applyStyle({height = newHeight})
+        local newHeight = self.dataSpace:getHeight() - headerRow:getHeight() - self.dataSpace:getMarginTop()
+        self.dataSpace:applyStyle({
+            height = newHeight
+        })
     end
 
     self.headerColumns = {}
@@ -119,8 +138,7 @@ end
 -- Create and add header from table data
 function UITable:addHeader(data)
     if not data or type(data) ~= 'table' then
-        g_logger.error(
-            'UITable:addHeaderRow - table columns must be provided in a table')
+        g_logger.error('UITable:addHeaderRow - table columns must be provided in a table')
         return
     end
 
@@ -148,9 +166,10 @@ function UITable:addHeader(data)
 
     -- create a new header
     local headerRow = g_ui.createWidget(self.headerRowBaseStyle, self)
-    local newHeight = self.dataSpace:getHeight() - headerRow:getHeight() -
-                          self.dataSpace:getMarginTop()
-    self.dataSpace:applyStyle({height = newHeight})
+    local newHeight = self.dataSpace:getHeight() - headerRow:getHeight() - self.dataSpace:getMarginTop()
+    self.dataSpace:applyStyle({
+        height = newHeight
+    })
 
     headerRow:setId('header')
     self.headerColumns = {}
@@ -169,10 +188,10 @@ end
 function UITable:removeHeader()
     if self:hasHeader() then
         if self.dataSpace then
-            local newHeight = self.dataSpace:getHeight() +
-                                  self.headerRow:getHeight() +
-                                  self.dataSpace:getMarginTop()
-            self.dataSpace:applyStyle({height = newHeight})
+            local newHeight = self.dataSpace:getHeight() + self.headerRow:getHeight() + self.dataSpace:getMarginTop()
+            self.dataSpace:applyStyle({
+                height = newHeight
+            })
         end
         self.headerColumns = {}
         self.columnWidth = {}
@@ -183,19 +202,19 @@ end
 
 function UITable:addRow(data, height)
     if not self.dataSpace then
-        g_logger.error(
-            'UITable:addRow - table data space has not been set, cannot add rows.')
+        g_logger.error('UITable:addRow - table data space has not been set, cannot add rows.')
         return
     end
     if not data or type(data) ~= 'table' then
-        g_logger.error(
-            'UITable:addRow - table columns must be provided in a table.')
+        g_logger.error('UITable:addRow - table columns must be provided in a table.')
         return
     end
 
     local row = g_ui.createWidget(self.rowBaseStyle)
     row.table = self
-    if height then row:setHeight(height) end
+    if height then
+        row:setHeight(height)
+    end
 
     local rowId = #self.rows + 1
     row.rowId = rowId
@@ -210,8 +229,12 @@ function UITable:addRow(data, height)
         else
             col:setWidth(self.columnWidth[colId] or self.defaultColumnWidth)
         end
-        if column.height then col:setHeight(column.height) end
-        if column.text then col:setText(column.text) end
+        if column.height then
+            col:setHeight(column.height)
+        end
+        if column.text then
+            col:setText(column.text)
+        end
         if column.sortvalue then
             col.sortvalue = column.sortvalue
         else
@@ -223,7 +246,9 @@ function UITable:addRow(data, height)
     self.dataSpace:addChild(row)
     table.insert(self.rows, row)
 
-    if self.autoSort then self:sort() end
+    if self.autoSort then
+        self:sort()
+    end
 
     return row
 end
@@ -240,7 +265,9 @@ end
 
 -- Removes the given row widget from the table
 function UITable:removeRow(row)
-    if self.selectedRow == row then self:selectRow(nil) end
+    if self.selectedRow == row then
+        self:selectRow(nil)
+    end
     row.onClick = nil
     row.table = nil
     table.remove(self.columns, row.rowId)
@@ -249,7 +276,9 @@ function UITable:removeRow(row)
     self:updateRows()
 end
 
-function UITable:toggleSorting(enabled) self.autoSort = enabled end
+function UITable:toggleSorting(enabled)
+    self.autoSort = enabled
+end
 
 function UITable:setSorting(colId, sortType)
     self.headerColumns[colId]:focus()
@@ -269,17 +298,17 @@ function UITable:setSorting(colId, sortType)
 end
 
 function UITable:sort()
-    if self.sortColumn <= 0 then return end
+    if self.sortColumn <= 0 then
+        return
+    end
 
     if self.sortType == TABLE_SORTING_ASC then
         table.sort(self.rows, function(rowA, b)
-            return rowA:getChildByIndex(self.sortColumn).sortvalue <
-                       b:getChildByIndex(self.sortColumn).sortvalue
+            return rowA:getChildByIndex(self.sortColumn).sortvalue < b:getChildByIndex(self.sortColumn).sortvalue
         end)
     else
         table.sort(self.rows, function(rowA, b)
-            return rowA:getChildByIndex(self.sortColumn).sortvalue >
-                       b:getChildByIndex(self.sortColumn).sortvalue
+            return rowA:getChildByIndex(self.sortColumn).sortvalue > b:getChildByIndex(self.sortColumn).sortvalue
         end)
     end
 
@@ -292,7 +321,9 @@ function UITable:sort()
     self:updateRows()
     self.columns = {}
     for _, row in pairs(self.rows) do
-        if self.dataSpace then self.dataSpace:addChild(row) end
+        if self.dataSpace then
+            self.dataSpace:addChild(row)
+        end
 
         self.columns[row.rowId] = {}
         for _, column in pairs(row:getChildren()) do
@@ -302,21 +333,29 @@ function UITable:sort()
 end
 
 function UITable:selectRow(selectedRow)
-    if selectedRow == self.selectedRow then return end
+    if selectedRow == self.selectedRow then
+        return
+    end
 
     local previousSelectedRow = self.selectedRow
     self.selectedRow = selectedRow
 
-    if previousSelectedRow then previousSelectedRow:setChecked(false) end
+    if previousSelectedRow then
+        previousSelectedRow:setChecked(false)
+    end
 
-    if selectedRow then selectedRow:setChecked(true) end
+    if selectedRow then
+        selectedRow:setChecked(true)
+    end
 
     signalcall(self.onSelectionChange, self, selectedRow, previousSelectedRow)
 end
 
 function UITable:setTableData(tableData)
     local headerHeight = 0
-    if self.headerRow then headerHeight = self.headerRow:getHeight() end
+    if self.headerRow then
+        headerHeight = self.headerRow:getHeight()
+    end
 
     self.dataSpace = tableData
     self.dataSpace:applyStyle({
@@ -328,7 +367,9 @@ function UITable:setRowStyle(style, dontUpdate)
     self.rowBaseStyle = style
 
     if not dontUpdate then
-        for _, row in pairs(self.rows) do row:setStyle(style) end
+        for _, row in pairs(self.rows) do
+            row:setStyle(style)
+        end
     end
 end
 
@@ -337,25 +378,35 @@ function UITable:setColumnStyle(style, dontUpdate)
 
     if not dontUpdate then
         for _, columns in pairs(self.columns) do
-            for _, col in pairs(columns) do col:setStyle(style) end
+            for _, col in pairs(columns) do
+                col:setStyle(style)
+            end
         end
     end
 end
 
 function UITable:setHeaderRowStyle(style)
     self.headerRowBaseStyle = style
-    if self.headerRow then self.headerRow:setStyle(style) end
+    if self.headerRow then
+        self.headerRow:setStyle(style)
+    end
 end
 
 function UITable:setHeaderColumnStyle(style)
     self.headerColumnBaseStyle = style
-    for _, col in pairs(self.headerColumns) do col:setStyle(style) end
+    for _, col in pairs(self.headerColumns) do
+        col:setStyle(style)
+    end
 end
 
-UITableRow = extends(UIWidget, "UITableRow")
+UITableRow = extends(UIWidget, 'UITableRow')
 
 function UITableRow:onFocusChange(focused)
-    if focused then if self.table then self.table:selectRow(self) end end
+    if focused then
+        if self.table then
+            self.table:selectRow(self)
+        end
+    end
 end
 
 function UITableRow:onStyleApply(styleName, styleNode)
@@ -379,11 +430,13 @@ function UITableRow:updateBackgroundColor()
     end
 
     if self.backgroundColor then
-        self:mergeStyle({['background-color'] = self.backgroundColor})
+        self:mergeStyle({
+            ['background-color'] = self.backgroundColor
+        })
     end
 end
 
-UITableHeaderColumn = extends(UIButton, "UITableHeaderColumn")
+UITableHeaderColumn = extends(UIButton, 'UITableHeaderColumn')
 
 function UITableHeaderColumn:onClick()
     if self.table then

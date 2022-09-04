@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,27 +24,8 @@
 #include "luaobject.h"
 
 #include <framework/core/resourcemanager.h>
-#if __has_include("luajit/lua.hpp")
-#include <luajit/lua.hpp>
-#else
-#include <lua.hpp>
-#endif
-
-#include "lbitlib.h"
 
 LuaInterface g_lua;
-
-LuaInterface::LuaInterface()
-{
-    L = nullptr;
-    m_cppCallbackDepth = 0;
-    m_weakTableRef = 0;
-    m_totalObjRefs = 0;
-    m_totalFuncRefs = 0;
-}
-
-LuaInterface::~LuaInterface()
-= default;
 
 void LuaInterface::init()
 {
@@ -64,11 +45,11 @@ void LuaInterface::init()
     bindClassMemberFunction<LuaObject>("getUseCount", &LuaObject::getUseCount);
     bindClassMemberFunction<LuaObject>("getClassName", &LuaObject::getClassName);
 
-    registerClassMemberFunction<LuaObject>("getFieldsTable", static_cast<LuaCppFunction>([](LuaInterface*) -> int {
+    registerClassMemberFunction<LuaObject>("getFieldsTable", [](LuaInterface*) -> int {
         const LuaObjectPtr obj = g_lua.popObject();
         obj->luaGetFieldsTable();
         return 1;
-    }));
+    });
 }
 
 void LuaInterface::terminate()
@@ -79,7 +60,7 @@ void LuaInterface::terminate()
     assert(m_totalObjRefs == 0);
 }
 
-void LuaInterface::registerSingletonClass(const std::string & className)
+void LuaInterface::registerSingletonClass(const std::string_view className)
 {
     newTable();
     pushValue();
@@ -87,8 +68,10 @@ void LuaInterface::registerSingletonClass(const std::string & className)
     pop();
 }
 
-void LuaInterface::registerClass(const std::string & className, const std::string & baseClass)
+void LuaInterface::registerClass(const std::string_view className, const std::string_view baseClass)
 {
+    const auto* __className = className.data();
+
     // creates the class table (that it's also the class methods table)
     newTable();
     pushValue();
@@ -98,13 +81,13 @@ void LuaInterface::registerClass(const std::string & className, const std::strin
     // creates the class fieldmethods table
     newTable();
     pushValue();
-    setGlobal(className + "_fieldmethods");
+    setGlobal(__className + "_fieldmethods"s);
     const int klass_fieldmethods = getTop();
 
     // creates the class metatable
     newTable();
     pushValue();
-    setGlobal(className + "_mt");
+    setGlobal(__className + "_mt"s);
     const int klass_mt = getTop();
 
     // set metatable metamethods
@@ -140,7 +123,7 @@ void LuaInterface::registerClass(const std::string & className, const std::strin
         // redirect the class fieldmethods to the base fieldmethods
         pushValue(klass_fieldmethods);
         newTable();
-        getGlobal(baseClass + "_fieldmethods");
+        getGlobal(baseClass.data() + "_fieldmethods"s);
         setField("__index");
         setMetatable();
         pop();
@@ -150,16 +133,16 @@ void LuaInterface::registerClass(const std::string & className, const std::strin
     pop(3);
 }
 
-void LuaInterface::registerClassStaticFunction(const std::string & className,
-                                               const std::string & functionName,
-                                               const LuaCppFunction & function)
+void LuaInterface::registerClassStaticFunction(const std::string_view className,
+                                               const std::string_view functionName,
+                                               const LuaCppFunction& function)
 {
     registerClassMemberFunction(className, functionName, function);
 }
 
-void LuaInterface::registerClassMemberFunction(const std::string & className,
-                                               const std::string & functionName,
-                                               const LuaCppFunction & function)
+void LuaInterface::registerClassMemberFunction(const std::string_view className,
+                                               const std::string_view functionName,
+                                               const LuaCppFunction& function)
 {
     getGlobal(className);
     pushCppFunction(function);
@@ -167,12 +150,12 @@ void LuaInterface::registerClassMemberFunction(const std::string & className,
     pop();
 }
 
-void LuaInterface::registerClassMemberField(const std::string & className,
-                                            const std::string & field,
-                                            const LuaCppFunction & getFunction,
-                                            const LuaCppFunction & setFunction)
+void LuaInterface::registerClassMemberField(const std::string_view className,
+                                            const std::string_view field,
+                                            const LuaCppFunction& getFunction,
+                                            const LuaCppFunction& setFunction)
 {
-    getGlobal(className + "_fieldmethods");
+    getGlobal(className.data() + "_fieldmethods"s);
 
     if (getFunction) {
         pushCppFunction(getFunction);
@@ -187,17 +170,17 @@ void LuaInterface::registerClassMemberField(const std::string & className,
     pop();
 }
 
-void LuaInterface::registerGlobalFunction(const std::string & functionName, const LuaCppFunction & function)
+void LuaInterface::registerGlobalFunction(const std::string_view functionName, const LuaCppFunction& function)
 {
     pushCppFunction(function);
     setGlobal(functionName);
 }
 
-int LuaInterface::luaObjectGetEvent(LuaInterface * lua)
+int LuaInterface::luaObjectGetEvent(LuaInterface* lua)
 {
     // stack: obj, key
     const LuaObjectPtr obj = lua->toObject(-2);
-    const std::string key = lua->toString(-1);
+    const auto& key = lua->toString(-1);
     assert(obj);
 
     lua->remove(-1); // removes key
@@ -236,11 +219,11 @@ int LuaInterface::luaObjectGetEvent(LuaInterface * lua)
     return 1;
 }
 
-int LuaInterface::luaObjectSetEvent(LuaInterface * lua)
+int LuaInterface::luaObjectSetEvent(LuaInterface* lua)
 {
     // stack: obj, key, value
     const LuaObjectPtr obj = lua->toObject(-3);
-    const std::string key = lua->toString(-2);
+    const auto& key = lua->toString(-2);
     assert(obj);
 
     lua->remove(-2); // removes key
@@ -266,15 +249,15 @@ int LuaInterface::luaObjectSetEvent(LuaInterface * lua)
     return 0;
 }
 
-int LuaInterface::luaObjectEqualEvent(LuaInterface * lua)
+int LuaInterface::luaObjectEqualEvent(LuaInterface* lua)
 {
     // stack: obj1, obj2
     bool ret = false;
 
     // check if obj1 == obj2
     if (lua->isUserdata(-1) && lua->isUserdata(-2)) {
-        auto* const objPtr2 = static_cast<LuaObjectPtr*>(lua->popUserdata());
-        auto* const objPtr1 = static_cast<LuaObjectPtr*>(lua->popUserdata());
+        const auto* const objPtr2 = static_cast<LuaObjectPtr*>(lua->popUserdata());
+        const auto* const objPtr1 = static_cast<LuaObjectPtr*>(lua->popUserdata());
         assert(objPtr1 && objPtr2);
         if (*objPtr1 == *objPtr2)
             ret = true;
@@ -285,7 +268,7 @@ int LuaInterface::luaObjectEqualEvent(LuaInterface * lua)
     return 1;
 }
 
-int LuaInterface::luaObjectCollectEvent(LuaInterface * lua)
+int LuaInterface::luaObjectCollectEvent(LuaInterface* lua)
 {
     // gets object pointer
     auto* const objPtr = static_cast<LuaObjectPtr*>(lua->popUserdata());
@@ -293,13 +276,13 @@ int LuaInterface::luaObjectCollectEvent(LuaInterface * lua)
 
     // resets pointer to decrease object use count
     objPtr->reset();
-    g_lua.m_totalObjRefs--;
+    --g_lua.m_totalObjRefs;
     return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool LuaInterface::safeRunScript(const std::string & fileName)
+bool LuaInterface::safeRunScript(const std::string& fileName)
 {
     try {
         runScript(fileName);
@@ -310,33 +293,33 @@ bool LuaInterface::safeRunScript(const std::string & fileName)
     }
 }
 
-void LuaInterface::runScript(const std::string & fileName)
+void LuaInterface::runScript(const std::string& fileName)
 {
     loadScript(fileName);
     safeCall(0, 0);
 }
 
-void LuaInterface::runBuffer(const std::string & buffer, const std::string & source)
+void LuaInterface::runBuffer(const std::string_view buffer, const std::string_view source)
 {
     loadBuffer(buffer, source);
     safeCall(0, 0);
 }
 
-void LuaInterface::loadScript(const std::string & fileName)
+void LuaInterface::loadScript(const std::string& fileName)
 {
     // resolve file full path
-    std::string filePath = fileName;
+    std::string filePath{ fileName.data() };
     if (!fileName.starts_with("/"))
         filePath = getCurrentSourcePath() + "/" + filePath;
 
     filePath = g_resources.guessFilePath(filePath, "lua");
 
-    const std::string buffer = g_resources.readFileContents(filePath);
-    const std::string source = "@" + filePath;
+    const auto& buffer = g_resources.readFileContents(filePath);
+    const auto& source = "@" + filePath;
     loadBuffer(buffer, source);
 }
 
-void LuaInterface::loadFunction(const std::string & buffer, const std::string & source)
+void LuaInterface::loadFunction(const std::string_view buffer, const std::string_view source)
 {
     if (buffer.empty()) {
         pushNil();
@@ -360,11 +343,11 @@ void LuaInterface::loadFunction(const std::string & buffer, const std::string & 
     setGlobal("__func");
 }
 
-void LuaInterface::evaluateExpression(const std::string & expression, const std::string & source)
+void LuaInterface::evaluateExpression(const std::string_view expression, const std::string_view source)
 {
     // evaluates the expression
     if (!expression.empty()) {
-        const std::string buffer = stdext::format("__exp = (%s)", expression);
+        const auto& buffer = stdext::format("__exp = (%s)", expression);
         loadBuffer(buffer, source);
         safeCall();
 
@@ -378,7 +361,7 @@ void LuaInterface::evaluateExpression(const std::string & expression, const std:
         pushNil();
 }
 
-std::string LuaInterface::traceback(const std::string & errorMessage, int level)
+std::string LuaInterface::traceback(const std::string_view errorMessage, int level)
 {
     // gets debug.traceback
     getGlobal("debug");
@@ -394,7 +377,7 @@ std::string LuaInterface::traceback(const std::string & errorMessage, int level)
     return popString();
 }
 
-void LuaInterface::throwError(const std::string & message)
+void LuaInterface::throwError(const std::string_view message)
 {
     if (isInCppCallback()) {
         pushString(message);
@@ -425,7 +408,7 @@ std::string LuaInterface::getCurrentSourcePath(int level)
         pop();
 
         // next level
-        level++;
+        ++level;
     }
 
     return path;
@@ -448,18 +431,21 @@ int LuaInterface::safeCall(int numArgs, int numRets)
 
     remove(errorFuncIndex); // remove error func
 
-     // if there was an error throw an exception
-    if (ret != 0)
-        throw LuaException(popString());
+    // if there was an error throw an exception
+    if (ret != 0) {
+        const std::string& error = popString();
+        g_logger.error(stdext::format("Lua exception: %s", error));
+        throw LuaException(error);
+    }
 
     int rets = (stackSize() + numArgs + 1) - previousStackSize;
     while (numRets != -1 && rets != numRets) {
         if (rets < numRets) {
             pushNil();
-            rets++;
+            ++rets;
         } else {
             pop();
-            rets--;
+            --rets;
         }
     }
 
@@ -528,7 +514,7 @@ int LuaInterface::signalCall(int numArgs, int numRets)
     // pushes nil values if needed
     while (numRets != -1 && rets < numRets) {
         pushNil();
-        rets++;
+        ++rets;
     }
 
     // returns the number of results on the stack
@@ -551,20 +537,20 @@ int LuaInterface::newSandboxEnv()
 int LuaInterface::luaScriptLoader(lua_State*)
 {
     // loads the script as a function
-    const std::string fileName = g_lua.popString();
+    const auto& fileName = g_lua.popString();
 
     try {
         g_lua.loadScript(fileName);
         return 1;
     } catch (stdext::exception& e) {
-        g_lua.pushString(std::string("\n\t") + e.what());
+        g_lua.pushString("\n\t"s + e.what());
         return 1;
     }
 }
 
 int LuaInterface::lua_dofile(lua_State*)
 {
-    const std::string file = g_lua.popString();
+    const auto& file = g_lua.popString();
 
     try {
         g_lua.loadScript(file);
@@ -589,7 +575,7 @@ int LuaInterface::lua_dofiles(lua_State*)
         recursive = g_lua.popBoolean();
     }
 
-    const std::string directory = g_lua.popString();
+    const auto& directory = g_lua.popString();
     g_lua.loadFiles(directory, recursive, contains);
 
     return 0;
@@ -597,7 +583,7 @@ int LuaInterface::lua_dofiles(lua_State*)
 
 int LuaInterface::lua_loadfile(lua_State*)
 {
-    const std::string fileName = g_lua.popString();
+    const auto& fileName = g_lua.popString();
 
     try {
         g_lua.loadScript(fileName);
@@ -627,16 +613,16 @@ int LuaInterface::luaErrorHandler(lua_State*)
 int LuaInterface::luaCppFunctionCallback(lua_State*)
 {
     // retrieves function pointer from userdata
-    auto* const funcPtr = static_cast<LuaCppFunctionPtr*>(g_lua.popUpvalueUserdata());
+    const auto* const funcPtr = static_cast<LuaCppFunctionPtr*>(g_lua.popUpvalueUserdata());
     assert(funcPtr);
 
     int numRets = 0;
 
     // do the call
     try {
-        g_lua.m_cppCallbackDepth++;
+        ++g_lua.m_cppCallbackDepth;
         numRets = (*(funcPtr->get()))(&g_lua);
-        g_lua.m_cppCallbackDepth--;
+        --g_lua.m_cppCallbackDepth;
         assert(numRets == g_lua.stackSize());
     } catch (stdext::exception& e) {
         // cleanup stack
@@ -655,12 +641,84 @@ int LuaInterface::luaCollectCppFunction(lua_State*)
     auto* const funcPtr = static_cast<LuaCppFunctionPtr*>(g_lua.popUserdata());
     assert(funcPtr);
     funcPtr->reset();
-    g_lua.m_totalFuncRefs--;
+    --g_lua.m_totalFuncRefs;
     return 0;
 }
 
+void LuaInterface::registerTable(lua_State* L, const std::string& tableName)
+{
+    // _G[tableName] = {}
+    lua_newtable(L);
+    lua_setglobal(L, tableName.c_str());
+}
+
+void LuaInterface::registerMethod(lua_State* L, const std::string& globalName, const std::string& methodName, lua_CFunction func)
+{
+    // globalName.methodName = func
+    lua_getglobal(L, globalName.c_str());
+    lua_pushcfunction(L, func);
+    lua_setfield(L, -2, methodName.c_str());
+
+    // pop globalName
+    lua_pop(L, 1);
+}
+
+#ifndef LUAJIT_VERSION
 ///////////////////////////////////////////////////////////////////////////////
 // from here all next functions are interfaces for the Lua API
+int LuaInterface::luaBitNot(lua_State* L)
+{
+    int32_t number = static_cast<int64_t>(lua_tonumber(L, -1));
+    lua_pushnumber(L, ~number);
+    return 1;
+}
+
+int LuaInterface::luaBitAnd(lua_State* L)
+{
+    int n = lua_gettop(L); \
+        uint32_t number = static_cast<uint32_t>(lua_tonumber(L, -1));
+    for (int i = 1; i < n; ++i)
+        number &= static_cast<uint32_t>(lua_tonumber(L, i));
+    lua_pushnumber(L, number);
+    return 1;
+}
+
+int LuaInterface::luaBitOr(lua_State* L)
+{
+    int n = lua_gettop(L); \
+        uint32_t number = static_cast<uint32_t>(lua_tonumber(L, -1));
+    for (int i = 1; i < n; ++i)
+        number |= static_cast<uint32_t>(lua_tonumber(L, i));
+    lua_pushnumber(L, number);
+    return 1;
+}
+
+int LuaInterface::luaBitXor(lua_State* L)
+{
+    int n = lua_gettop(L); \
+        uint32_t number = static_cast<uint32_t>(lua_tonumber(L, -1));
+    for (int i = 1; i < n; ++i)
+        number ^= static_cast<uint32_t>(lua_tonumber(L, i));
+    lua_pushnumber(L, number);
+    return 1;
+}
+
+int LuaInterface::luaBitLeftShift(lua_State* L)
+{
+    uint32_t n1 = static_cast<uint32_t>(lua_tonumber(L, 1));
+    uint32_t n2 = static_cast<uint32_t>(lua_tonumber(L, 2));
+    lua_pushnumber(L, (n1 << n2));
+    return 1;
+}
+
+int LuaInterface::luaBitRightShift(lua_State* L)
+{
+    uint32_t n1 = static_cast<uint32_t>(lua_tonumber(L, 1));
+    uint32_t n2 = static_cast<uint32_t>(lua_tonumber(L, 2));
+    lua_pushnumber(L, (n1 >> n2));
+    return 1;
+}
+#endif
 
 void LuaInterface::createLuaState()
 {
@@ -672,8 +730,16 @@ void LuaInterface::createLuaState()
     // load lua standard libraries
     luaL_openlibs(L);
 
-    // load bit32 lib for bitwise operations
-    luaopen_bit32(L);
+#ifndef LUAJIT_VERSION
+    // load Bit lib for bitwise operations
+    registerTable(L, "Bit");
+    registerMethod(L, "Bit", "bnot", LuaInterface::luaBitNot);
+    registerMethod(L, "Bit", "band", LuaInterface::luaBitAnd);
+    registerMethod(L, "Bit", "bor", LuaInterface::luaBitOr);
+    registerMethod(L, "Bit", "bxor", LuaInterface::luaBitXor);
+    registerMethod(L, "Bit", "lshift", LuaInterface::luaBitLeftShift);
+    registerMethod(L, "Bit", "rshift", LuaInterface::luaBitRightShift);
+#endif
 
     // creates weak table
     newTable();
@@ -721,17 +787,17 @@ void LuaInterface::collectGarbage()
 
         // we must collect two times because __gc metamethod
         // is called on uservalues only the second time
-        for (int i = 0; i < 2; ++i)
+        for (int i = -1; ++i < 2;)
             lua_gc(L, LUA_GCCOLLECT, 0);
 
         collecting = false;
     }
 }
 
-void LuaInterface::loadBuffer(const std::string & buffer, const std::string & source)
+void LuaInterface::loadBuffer(const std::string_view buffer, const std::string_view source)
 {
     // loads lua buffer
-    const int ret = luaL_loadbuffer(L, buffer.c_str(), buffer.length(), source.c_str());
+    const int ret = luaL_loadbuffer(L, buffer.data(), buffer.length(), source.data());
     if (ret != 0)
         throw LuaException(popString(), 0);
 }
@@ -878,30 +944,39 @@ void LuaInterface::getMetatable(int index)
     lua_getmetatable(L, index);
 }
 
-void LuaInterface::getField(const char* key, int index)
+void LuaInterface::getField(const std::string_view key, int index)
 {
     assert(hasIndex(index));
     assert(isUserdata(index) || isTable(index));
-    lua_getfield(L, index, key);
+    lua_getfield(L, index, key.data());
 }
 
-void LuaInterface::setField(const char* key, int index)
+void LuaInterface::setField(const std::string_view key, int index)
 {
     assert(hasIndex(index));
     assert(isUserdata(index) || isTable(index));
-    lua_setfield(L, index, key);
+    lua_setfield(L, index, key.data());
 }
 
 void LuaInterface::getEnv(int index)
 {
     assert(hasIndex(index));
+#ifdef LUAJIT_VERSION
     lua_getfenv(L, index);
+#else
+    lua_getupvalue(L, index, 1);
+#endif
 }
 
 void LuaInterface::setEnv(int index)
 {
     assert(hasIndex(index));
+#ifdef LUAJIT_VERSION
     lua_setfenv(L, index);
+#else
+    const char* name = lua_setupvalue(L, index, 1);
+    assert(strcmp(name, "_ENV") == 0);
+#endif
 }
 
 void LuaInterface::getTable(int index)
@@ -938,12 +1013,12 @@ void LuaInterface::clearTable(int index)
     }
 }
 
-void LuaInterface::getGlobal(const std::string & key)
+void LuaInterface::getGlobal(const std::string_view key)
 {
-    lua_getglobal(L, key.c_str());
+    lua_getglobal(L, key.data());
 }
 
-void LuaInterface::getGlobalField(const std::string & globalKey, const std::string & fieldKey)
+void LuaInterface::getGlobalField(const std::string_view globalKey, const std::string_view fieldKey)
 {
     getGlobal(globalKey);
     if (!isNil()) {
@@ -953,10 +1028,10 @@ void LuaInterface::getGlobalField(const std::string & globalKey, const std::stri
     }
 }
 
-void LuaInterface::setGlobal(const std::string & key)
+void LuaInterface::setGlobal(const std::string_view key)
 {
     assert(hasIndex(-1));
-    lua_setglobal(L, key.c_str());
+    lua_setglobal(L, key.data());
 }
 
 void LuaInterface::rawGet(int index)
@@ -1083,16 +1158,9 @@ void LuaInterface::pushBoolean(bool v)
     checkStack();
 }
 
-void LuaInterface::pushCString(const char* v)
+void LuaInterface::pushString(const std::string_view v)
 {
-    assert(v);
-    lua_pushstring(L, v);
-    checkStack();
-}
-
-void LuaInterface::pushString(const std::string & v)
-{
-    lua_pushlstring(L, v.c_str(), v.length());
+    lua_pushlstring(L, v.data(), v.length());
     checkStack();
 }
 
@@ -1108,11 +1176,11 @@ void LuaInterface::pushThread()
     checkStack();
 }
 
-void LuaInterface::pushObject(const LuaObjectPtr & obj)
+void LuaInterface::pushObject(const LuaObjectPtr& obj)
 {
     // fills a new userdata with a new LuaObjectPtr pointer
     new(newUserdata(sizeof(LuaObjectPtr))) LuaObjectPtr(obj);
-    m_totalObjRefs++;
+    ++m_totalObjRefs;
 
     obj->luaGetMetatable();
     if (isNil())
@@ -1126,11 +1194,11 @@ void LuaInterface::pushCFunction(LuaCFunction func, int n)
     checkStack();
 }
 
-void LuaInterface::pushCppFunction(const LuaCppFunction & func)
+void LuaInterface::pushCppFunction(const LuaCppFunction& func)
 {
     // create a pointer to func (this pointer will hold the function existence)
     new(newUserdata(sizeof(LuaCppFunctionPtr))) LuaCppFunctionPtr(new LuaCppFunction(func));
-    m_totalFuncRefs++;
+    ++m_totalFuncRefs;
 
     // sets the userdata __gc metamethod, needed to free the function pointer when it gets collected
     newTable();
@@ -1215,10 +1283,11 @@ double LuaInterface::toNumber(int index)
     return lua_tonumber(L, index);
 }
 
-const char* LuaInterface::toCString(int index)
+std::string_view LuaInterface::toVString(int index)
 {
     assert(hasIndex(index));
-    return lua_tostring(L, index);
+    const char* value = lua_tostring(L, index);
+    return value != nullptr ? value : ""sv;
 }
 
 std::string LuaInterface::toString(int index)
@@ -1226,9 +1295,9 @@ std::string LuaInterface::toString(int index)
     assert(hasIndex(index));
     std::string str;
     size_t len;
-    const char* c_str = lua_tolstring(L, index, &len);
-    if (c_str && len > 0)
-        str.assign(c_str, len);
+    const char* data = lua_tolstring(L, index, &len);
+    if (data && len > 0)
+        str.assign(data, len);
     return str;
 }
 
@@ -1254,10 +1323,10 @@ int LuaInterface::getTop()
     return lua_gettop(L);
 }
 
-void LuaInterface::loadFiles(const std::string & directory, bool recursive, const std::string & contains)
+void LuaInterface::loadFiles(const std::string& directory, bool recursive, const std::string& contains)
 {
     for (const std::string& fileName : g_resources.listDirectoryFiles(directory)) {
-        std::string fullPath = directory + "/" + fileName;
+        std::string fullPath = directory.data() + "/"s + fileName;
 
         if (recursive && g_resources.directoryExists(fullPath)) {
             loadFiles(fullPath, true, contains);

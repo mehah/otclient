@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -257,7 +257,7 @@ void WIN32Window::terminate()
     }
 
     if (m_instance) {
-        if (!UnregisterClassA(g_app.getCompactName().c_str(), m_instance))
+        if (!UnregisterClassA(g_app.getCompactName().data(), m_instance))
             g_logger.error("UnregisterClassA failed");
         m_instance = nullptr;
     }
@@ -265,7 +265,7 @@ void WIN32Window::terminate()
 
 struct WindowProcProxy
 {
-    static LRESULT CALLBACK call(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+    static LRESULT CALLBACK call(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
     {
         auto* const window = static_cast<WIN32Window*>(&g_window);
         return window->windowProc(hWnd, uMsg, wParam, lParam);
@@ -285,7 +285,7 @@ void WIN32Window::internalCreateWindow()
     wc.hCursor = m_defaultCursor;
     wc.hbrBackground = static_cast<HBRUSH>(GetStockObject(WHITE_BRUSH));
     wc.lpszMenuName = nullptr;
-    wc.lpszClassName = g_app.getCompactName().c_str();
+    wc.lpszClassName = g_app.getCompactName().data();
 
     if (!RegisterClassA(&wc))
         g_logger.fatal("Failed to register the window class.");
@@ -299,7 +299,7 @@ void WIN32Window::internalCreateWindow()
 
     updateUnmaximizedCoords();
     m_window = CreateWindowExA(dwExStyle,
-                               g_app.getCompactName().c_str(),
+                               g_app.getCompactName().data(),
                                nullptr,
                                dwStyle,
                                screenRect.left(),
@@ -332,11 +332,7 @@ void WIN32Window::internalCreateGLContext()
         g_logger.fatal("Unable to initialize EGL");
 
     static int configList[] = {
-#if OPENGL_ES==2
         EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-#else
-        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
-#endif
         EGL_RED_SIZE, 4,
         EGL_GREEN_SIZE, 4,
         EGL_BLUE_SIZE, 4,
@@ -356,11 +352,7 @@ void WIN32Window::internalCreateGLContext()
         g_logger.warning("Didn't got the exact EGL config");
 
     EGLint contextAtrrList[] = {
-#if OPENGL_ES==2
         EGL_CONTEXT_CLIENT_VERSION, 2,
-#else
-        EGL_CONTEXT_CLIENT_VERSION, 1,
-#endif
         EGL_NONE
     };
 
@@ -388,9 +380,10 @@ void WIN32Window::internalCreateGLContext()
                                          0,                          // No Auxiliary Buffer
                                          PFD_MAIN_PLANE,             // Main Drawing Layer
                                          0,                          // Reserved
-                                         0, 0, 0 };                  // Layer Masks Ignored
+                                         0, 0, 0
+    };                  // Layer Masks Ignored
 
-    const uint pixelFormat = ChoosePixelFormat(m_deviceContext, &pfd);
+    const uint32_t pixelFormat = ChoosePixelFormat(m_deviceContext, &pfd);
     if (!pixelFormat)
         g_logger.fatal("Could not find a suitable pixel format");
 
@@ -576,7 +569,7 @@ Fw::Key WIN32Window::retranslateVirtualKey(WPARAM wParam, LPARAM lParam)
 
 #define IsKeyDown(a) (GetKeyState(a) & 0x80)
 
-LRESULT WIN32Window::windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
 {
     m_inputEvent.keyboardModifiers = 0;
     if (IsKeyDown(VK_CONTROL))
@@ -723,12 +716,12 @@ LRESULT WIN32Window::windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
             if (newMousePos.x >= 32767)
                 newMousePos.x = 0;
             else
-                newMousePos.x = std::min<int32>(newMousePos.x, m_size.width());
+                newMousePos.x = std::min<int32_t>(newMousePos.x, m_size.width());
 
             if (newMousePos.y >= 32767)
                 newMousePos.y = 0;
             else
-                newMousePos.y = std::min<int32>(newMousePos.y, m_size.height());
+                newMousePos.y = std::min<int32_t>(newMousePos.y, m_size.height());
 
             m_inputEvent.mouseMoved = newMousePos - m_inputEvent.mousePos;
             m_inputEvent.mousePos = newMousePos;
@@ -782,8 +775,8 @@ LRESULT WIN32Window::windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
                 internalRestoreGLContext();
 
             auto size = Size(LOWORD(lParam), HIWORD(lParam));
-            size.setWidth(std::max<int32>(std::min<int32>(size.width(), 7680), 32));
-            size.setHeight(std::max<int32>(std::min<int32>(size.height(), 4320), 32));
+            size.setWidth(std::max<int32_t>(std::min<int32_t>(size.width(), 7680), 32));
+            size.setHeight(std::max<int32_t>(std::min<int32_t>(size.height(), 4320), 32));
 
             if (m_visible && (forceResize || m_size != size)) {
                 m_size = size;
@@ -822,9 +815,9 @@ void WIN32Window::hideMouse()
     ShowCursor(false);
 }
 
-void WIN32Window::displayFatalError(const std::string& message)
+void WIN32Window::displayFatalError(const std::string_view message)
 {
-    MessageBoxW(m_window, stdext::latin1_to_utf16(message).c_str(), L"FATAL ERROR", MB_OK | MB_ICONERROR);
+    MessageBoxW(m_window, stdext::latin1_to_utf16(message).data(), L"FATAL ERROR", MB_OK | MB_ICONERROR);
 }
 
 int WIN32Window::internalLoadMouseCursor(const ImagePtr& image, const Point& hotSpot)
@@ -834,11 +827,11 @@ int WIN32Window::internalLoadMouseCursor(const ImagePtr& image, const Point& hot
     const int numbits = width * height;
     const int numbytes = (width * height) / 8;
 
-    std::vector<uchar> andMask(numbytes, 0);
-    std::vector<uchar> xorMask(numbytes, 0);
+    std::vector<uint8_t> andMask(numbytes, 0);
+    std::vector<uint8_t> xorMask(numbytes, 0);
 
     for (int i = 0; i < numbits; ++i) {
-        const uint32 rgba = stdext::readULE32(image->getPixelData() + i * 4);
+        const uint32_t rgba = stdext::readULE32(image->getPixelData() + i * 4);
         if (rgba == 0xffffffff) { //white
             HSB_BIT_SET(xorMask, i);
         } else if (rgba == 0x00000000) { //alpha
@@ -870,9 +863,9 @@ void WIN32Window::restoreMouseCursor()
     }
 }
 
-void WIN32Window::setTitle(const std::string& title)
+void WIN32Window::setTitle(const std::string_view title)
 {
-    SetWindowTextW(m_window, stdext::latin1_to_utf16(title).c_str());
+    SetWindowTextW(m_window, stdext::latin1_to_utf16(title).data());
 }
 
 void WIN32Window::setMinimumSize(const Size& minimumSize)
@@ -887,7 +880,7 @@ void WIN32Window::setFullscreen(bool fullscreen)
 
     m_fullscreen = fullscreen;
 
-    DWORD dwStyle = GetWindowLong(m_window, GWL_STYLE);
+    const DWORD dwStyle = GetWindowLong(m_window, GWL_STYLE);
     static WINDOWPLACEMENT wpPrev;
     wpPrev.length = sizeof(wpPrev);
 
@@ -896,10 +889,10 @@ void WIN32Window::setFullscreen(bool fullscreen)
         const HMONITOR m = MonitorFromWindow(m_window, MONITOR_DEFAULTTONEAREST);
         mi.cbSize = sizeof(mi);
         GetMonitorInfoW(m, &mi);
-        const uint x = mi.rcMonitor.left;
-        const uint y = mi.rcMonitor.top;
-        const uint width = mi.rcMonitor.right - mi.rcMonitor.left;
-        const uint height = mi.rcMonitor.bottom - mi.rcMonitor.top;
+        const uint32_t x = mi.rcMonitor.left;
+        const uint32_t y = mi.rcMonitor.top;
+        const uint32_t width = mi.rcMonitor.right - mi.rcMonitor.left;
+        const uint32_t height = mi.rcMonitor.bottom - mi.rcMonitor.top;
 
         GetWindowPlacement(m_window, &wpPrev);
 
@@ -914,8 +907,9 @@ void WIN32Window::setFullscreen(bool fullscreen)
 
 void WIN32Window::setVerticalSync(bool enable)
 {
+    m_vsync = enable;
 #ifdef OPENGL_ES
-    eglSwapInterval(m_eglDisplay, enable ? 1 : 0);
+    eglSwapInterval(m_eglDisplay, enable);
 #else
     if (!isExtensionSupported("WGL_EXT_swap_control"))
         return;
@@ -925,7 +919,7 @@ void WIN32Window::setVerticalSync(bool enable)
     if (!wglSwapInterval)
         return;
 
-    wglSwapInterval(enable ? 1 : 0);
+    wglSwapInterval(enable);
 #endif
 }
 
@@ -944,9 +938,9 @@ void WIN32Window::setIcon(const std::string& file)
     }
 
     const int n = image->getWidth() * image->getHeight();
-    std::vector<uint32> iconData(n);
+    std::vector<uint32_t > iconData(n);
     for (int i = 0; i < n; ++i) {
-        auto* const pixel = (uint8*)&iconData[i];
+        auto* const pixel = (uint8_t*)&iconData[i];
         pixel[2] = *(image->getPixelData() + (i * 4) + 0);
         pixel[1] = *(image->getPixelData() + (i * 4) + 1);
         pixel[0] = *(image->getPixelData() + (i * 4) + 2);
@@ -971,7 +965,7 @@ void WIN32Window::setIcon(const std::string& file)
     SendMessage(m_window, WM_SETICON, ICON_BIG, (LPARAM)icon);
 }
 
-void WIN32Window::setClipboardText(const std::string& text)
+void WIN32Window::setClipboardText(const std::string_view text)
 {
     if (!OpenClipboard(m_window))
         return;
@@ -980,10 +974,10 @@ void WIN32Window::setClipboardText(const std::string& text)
     if (!hglb)
         return;
 
-    std::wstring wtext = stdext::latin1_to_utf16(text);
+    const std::wstring wtext = stdext::latin1_to_utf16(text);
 
-    auto* const lpwstr = static_cast<LPWSTR>(GlobalLock(hglb));
-    memcpy(lpwstr, (char*)&wtext[0], wtext.length() * sizeof(WCHAR));
+    auto* lpwstr = static_cast<LPWSTR>(GlobalLock(hglb));
+    memcpy(lpwstr, &wtext[0], wtext.length() * sizeof(WCHAR));
     lpwstr[text.length()] = static_cast<WCHAR>(0);
     GlobalUnlock(hglb);
 
@@ -1006,7 +1000,7 @@ std::string WIN32Window::getClipboardText()
 
     const HGLOBAL hglb = GetClipboardData(CF_UNICODETEXT);
     if (hglb) {
-        auto* const lpwstr = static_cast<LPWSTR>(GlobalLock(hglb));
+        const auto* const lpwstr = static_cast<LPWSTR>(GlobalLock(hglb));
         if (lpwstr) {
             text = stdext::utf16_to_latin1(lpwstr);
             GlobalUnlock(hglb);

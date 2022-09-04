@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,26 +37,26 @@ void AnimatedText::drawText(const Point& dest, const Rect& visibleRect)
     constexpr static float tf = ANIMATED_TEXT_DURATION,
         tftf = ANIMATED_TEXT_DURATION * ANIMATED_TEXT_DURATION;
 
-    Point p = dest;
-    const Size textSize = m_cachedText.getTextSize();
+    const auto& textSize = m_cachedText.getTextSize();
     const float t = m_animationTimer.ticksElapsed();
-    p.x += (24 - textSize.width() / 2);
 
+    Point p = dest;
+    p.x += (24 - textSize.width() / 2);
     if (g_game.getFeature(Otc::GameDiagonalAnimatedText)) {
         p.x -= (4 * t / tf) + (8 * t * t / tftf);
     }
 
     p.y += 8 + (-48 * t) / tf;
     p += m_offset;
-    const Rect rect(p, textSize);
+
+    const Rect rect{ p, textSize };
 
     if (visibleRect.contains(rect)) {
-        //TODO: cache into a framebuffer
         const float t0 = tf / 1.2;
 
         Color color = m_color;
         if (t > t0) {
-            color.setAlpha(static_cast<float>(1 - (t - t0) / (tf - t0)));
+            color.setAlpha(1 - (t - t0) / (tf - t0));
         }
 
         m_cachedText.draw(rect, color);
@@ -67,23 +67,13 @@ void AnimatedText::onAppear()
 {
     m_animationTimer.restart();
 
-    uint16 textDuration = ANIMATED_TEXT_DURATION;
+    uint16_t textDuration = ANIMATED_TEXT_DURATION;
     if (g_app.canOptimize())
         textDuration /= 2;
 
     // schedule removal
     auto self = asAnimatedText();
-    g_dispatcher.scheduleEvent([self]() { g_map.removeThing(self); }, textDuration);
-}
-
-void AnimatedText::setColor(int color)
-{
-    m_color = Color::from8bit(color);
-}
-
-void AnimatedText::setText(const std::string& text)
-{
-    m_cachedText.setText(text);
+    g_dispatcher.scheduleEvent([self] { g_map.removeThing(self); }, textDuration);
 }
 
 bool AnimatedText::merge(const AnimatedTextPtr& other)

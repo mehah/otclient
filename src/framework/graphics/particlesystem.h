@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef PARTICLESYSTEM_H
-#define PARTICLESYSTEM_H
+#pragma once
 
 #include "declarations.h"
 #include "particleemitter.h"
@@ -41,11 +40,9 @@ public:
     bool hasFinished() { return m_finished; }
 
 private:
-    bool m_finished;
+    bool m_finished{ false };
     float m_lastUpdateTime;
     std::list<ParticlePtr> m_particles;
     std::list<ParticleEmitterPtr> m_emitters;
     std::list<ParticleAffectorPtr> m_affectors;
 };
-
-#endif

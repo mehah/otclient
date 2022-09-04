@@ -24,4 +24,5 @@ function init()
     g_mouse.loadCursors('/cursors/cursors')
 end
 
-function terminate() end
+function terminate()
+end

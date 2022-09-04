@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef UIMINIMAP_H
-#define UIMINIMAP_H
+#pragma once
 
 #include "declarations.h"
 #include <framework/ui/uiwidget.h>
@@ -60,7 +59,7 @@ public:
 protected:
     virtual void onZoomChange(int zoom, int oldZoom);
     virtual void onCameraPositionChange(const Position& position, const Position& oldPosition);
-    void onStyleApply(const std::string& styleName, const OTMLNodePtr& styleNode) override;
+    void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
 
 private:
     void update();
@@ -72,5 +71,3 @@ private:
     int m_minZoom;
     int m_maxZoom;
 };
-
-#endif

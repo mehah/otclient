@@ -19,12 +19,11 @@ local defaultOptions = {
     showRightExtraPanel = false,
     openMaximized = false,
     backgroundFrameRate = 201,
-    painterEngine = 0,
     enableAudio = true,
     enableMusicSound = true,
     musicSoundVolume = 100,
     enableLights = true,
-    drawViewportEdge = false,
+    limitVisibleDimension = false,
     floatingEffect = false,
     ambientLight = 0,
     displayNames = true,
@@ -60,43 +59,6 @@ local crosshairCombobox
 local antialiasingModeCombobox
 local floorViewModeCombobox
 
-local function setupGraphicsEngines()
-    local enginesRadioGroup = UIRadioGroup.create()
-    local ogl1 = graphicsPanel:getChildById('opengl1')
-    local ogl2 = graphicsPanel:getChildById('opengl2')
-    local dx9 = graphicsPanel:getChildById('directx9')
-    enginesRadioGroup:addWidget(ogl1)
-    enginesRadioGroup:addWidget(ogl2)
-    enginesRadioGroup:addWidget(dx9)
-
-    if g_window.getPlatformType() == 'WIN32-EGL' then
-        enginesRadioGroup:selectWidget(dx9)
-        ogl1:setEnabled(false)
-        ogl2:setEnabled(false)
-        dx9:setEnabled(true)
-    else
-        ogl1:setEnabled(g_graphics.isPainterEngineAvailable(1))
-        ogl2:setEnabled(g_graphics.isPainterEngineAvailable(2))
-        dx9:setEnabled(false)
-        if g_graphics.getPainterEngine() == 2 then
-            enginesRadioGroup:selectWidget(ogl2)
-        else
-            enginesRadioGroup:selectWidget(ogl1)
-        end
-
-        if g_app.getOs() ~= 'windows' then dx9:hide() end
-    end
-
-    enginesRadioGroup.onSelectionChange =
-        function(self, selected)
-            if selected == ogl1 then
-                setOption('painterEngine', 1)
-            elseif selected == ogl2 then
-                setOption('painterEngine', 2)
-            end
-        end
-end
-
 function init()
     for k, v in pairs(defaultOptions) do
         g_settings.setDefault(k, v)
@@ -107,43 +69,38 @@ function init()
     optionsWindow:hide()
 
     optionsTabBar = optionsWindow:getChildById('optionsTabBar')
-    optionsTabBar:setContentWidget(optionsWindow:getChildById(
-                                       'optionsTabContent'))
+    optionsTabBar:setContentWidget(optionsWindow:getChildById('optionsTabContent'))
 
-    g_keyboard.bindKeyDown('Ctrl+Shift+F',
-                           function() toggleOption('fullscreen') end)
+    g_keyboard.bindKeyDown('Ctrl+Shift+F', function()
+        toggleOption('fullscreen')
+    end)
     g_keyboard.bindKeyDown('Ctrl+N', toggleDisplays)
 
     generalPanel = g_ui.loadUI('general')
     optionsTabBar:addTab(tr('General'), generalPanel, '/images/optionstab/game')
 
     controlPanel = g_ui.loadUI('control')
-    optionsTabBar:addTab(tr('Control'), controlPanel,
-                         '/images/optionstab/controls')
+    optionsTabBar:addTab(tr('Control'), controlPanel, '/images/optionstab/controls')
 
     consolePanel = g_ui.loadUI('console')
-    optionsTabBar:addTab(tr('Console'), consolePanel,
-                         '/images/optionstab/console')
+    optionsTabBar:addTab(tr('Console'), consolePanel, '/images/optionstab/console')
 
     graphicsPanel = g_ui.loadUI('graphics')
-    optionsTabBar:addTab(tr('Graphics'), graphicsPanel,
-                         '/images/optionstab/graphics')
+    optionsTabBar:addTab(tr('Graphics'), graphicsPanel, '/images/optionstab/graphics')
 
     soundPanel = g_ui.loadUI('audio')
     optionsTabBar:addTab(tr('Audio'), soundPanel, '/images/optionstab/audio')
 
-    optionsButton = modules.client_topmenu.addLeftButton('optionsButton',
-                                                         tr('Options'),
-                                                         '/images/topbuttons/options',
+    optionsButton = modules.client_topmenu.addLeftButton('optionsButton', tr('Options'), '/images/topbuttons/options',
                                                          toggle)
-    audioButton = modules.client_topmenu.addLeftButton('audioButton',
-                                                       tr('Audio'),
-                                                       '/images/topbuttons/audio',
+    audioButton = modules.client_topmenu.addLeftButton('audioButton', tr('Audio'), '/images/topbuttons/audio',
                                                        function()
         toggleOption('enableAudio')
     end)
 
-    addEvent(function() setup() end)
+    addEvent(function()
+        setup()
+    end)
 end
 
 function terminate()
@@ -165,17 +122,15 @@ function setupComboBox()
         setOption('crosshair', comboBox:getCurrentOption().data)
     end
 
-    antialiasingModeCombobox = graphicsPanel:recursiveGetChildById(
-                                   'antialiasingMode')
+    antialiasingModeCombobox = graphicsPanel:recursiveGetChildById('antialiasingMode')
 
     antialiasingModeCombobox:addOption('None', 0)
     antialiasingModeCombobox:addOption('Antialiasing', 1)
     antialiasingModeCombobox:addOption('Smooth Retro', 2)
 
-    antialiasingModeCombobox.onOptionChange =
-        function(comboBox, option)
-            setOption('antialiasingMode', comboBox:getCurrentOption().data)
-        end
+    antialiasingModeCombobox.onOptionChange = function(comboBox, option)
+        setOption('antialiasingMode', comboBox:getCurrentOption().data)
+    end
 
     floorViewModeCombobox = graphicsPanel:recursiveGetChildById('floorViewMode')
 
@@ -185,15 +140,13 @@ function setupComboBox()
     floorViewModeCombobox:addOption('Always', 3)
     floorViewModeCombobox:addOption('Always with transparency', 4)
 
-    floorViewModeCombobox.onOptionChange =
-        function(comboBox, option)
-            setOption('floorViewMode', comboBox:getCurrentOption().data)
-        end
+    floorViewModeCombobox.onOptionChange = function(comboBox, option)
+        setOption('floorViewMode', comboBox:getCurrentOption().data)
+    end
 end
 
 function setup()
     setupComboBox()
-    setupGraphicsEngines()
 
     -- load options
     for k, v in pairs(defaultOptions) do
@@ -221,11 +174,12 @@ function show()
     optionsWindow:focus()
 end
 
-function hide() optionsWindow:hide() end
+function hide()
+    optionsWindow:hide()
+end
 
 function toggleDisplays()
-    if options['displayNames'] and options['displayHealth'] and
-        options['displayMana'] then
+    if options['displayNames'] and options['displayHealth'] and options['displayMana'] then
         setOption('displayNames', false)
     elseif options['displayHealth'] then
         setOption('displayHealth', false)
@@ -240,10 +194,14 @@ function toggleDisplays()
     end
 end
 
-function toggleOption(key) setOption(key, not getOption(key)) end
+function toggleOption(key)
+    setOption(key, not getOption(key))
+end
 
 function setOption(key, value, force)
-    if not force and options[key] == value then return end
+    if not force and options[key] == value then
+        return
+    end
 
     local gameMapPanel = modules.game_interface.getMapPanel()
 
@@ -262,7 +220,9 @@ function setOption(key, value, force)
     elseif key == 'fullscreen' then
         g_window.setFullscreen(value)
     elseif key == 'enableAudio' then
-        if g_sounds then g_sounds.setAudioEnabled(value) end
+        if g_sounds then
+            g_sounds.setAudioEnabled(value)
+        end
         if value then
             audioButton:setIcon('/images/topbuttons/audio')
         else
@@ -276,9 +236,7 @@ function setOption(key, value, force)
         if g_sounds then
             g_sounds.getChannel(SoundChannels.Music):setGain(value / 100)
         end
-        soundPanel:getChildById('musicSoundVolumeLabel'):setText(tr(
-                                                                     'Music volume: %d',
-                                                                     value))
+        soundPanel:getChildById('musicSoundVolumeLabel'):setText(tr('Music volume: %d', value))
     elseif key == 'showLeftPanel' then
         modules.game_interface.getLeftPanel():setOn(value)
     elseif key == 'showRightExtraPanel' then
@@ -289,36 +247,26 @@ function setOption(key, value, force)
             text = 'max'
             v = 0
         end
-        graphicsPanel:getChildById('backgroundFrameRateLabel'):setText(tr(
-                                                                           'Game framerate limit: %s',
-                                                                           text))
+        graphicsPanel:getChildById('backgroundFrameRateLabel'):setText(tr('Game framerate limit: %s', text))
         g_app.setMaxFps(v)
     elseif key == 'enableLights' then
         gameMapPanel:setDrawLights(value and options['ambientLight'] < 100)
         graphicsPanel:getChildById('ambientLight'):setEnabled(value)
         graphicsPanel:getChildById('ambientLightLabel'):setEnabled(value)
     elseif key == 'ambientLight' then
-        graphicsPanel:getChildById('ambientLightLabel'):setText(tr(
-                                                                    'Ambient light: %s%%',
-                                                                    value))
+        graphicsPanel:getChildById('ambientLightLabel'):setText(tr('Ambient light: %s%%', value))
         gameMapPanel:setMinimumAmbientLight(value / 100)
         gameMapPanel:setDrawLights(options['enableLights'])
     elseif key == 'shadowFloorIntensity' then
-        graphicsPanel:getChildById('shadowFloorIntensityLevel'):setText(tr(
-                                                                            'Shadow floor Intensity: %s%%',
-                                                                            value))
+        graphicsPanel:getChildById('shadowFloorIntensityLevel'):setText(tr('Shadow floor Intensity: %s%%', value))
         gameMapPanel:setShadowFloorIntensity(1 - (value / 100))
     elseif key == 'floorFading' then
-        graphicsPanel:getChildById('floorFadingLabel'):setText(tr(
-                                                                   'Floor Fading: %s ms',
-                                                                   value))
+        graphicsPanel:getChildById('floorFadingLabel'):setText(tr('Floor Fading: %s ms', value))
         gameMapPanel:setFloorFading(tonumber(value))
-    elseif key == 'drawViewportEdge' then
-        gameMapPanel:setDrawViewportEdge(value)
+    elseif key == 'limitVisibleDimension' then
+        gameMapPanel:setLimitVisibleDimension(value)
     elseif key == 'floatingEffect' then
         g_map.setFloatingEffect(value)
-    elseif key == 'painterEngine' then
-        g_graphics.selectPainterEngine(value)
     elseif key == 'displayNames' then
         gameMapPanel:setDrawNames(value)
     elseif key == 'displayHealth' then
@@ -328,23 +276,22 @@ function setOption(key, value, force)
     elseif key == 'displayText' then
         gameMapPanel:setDrawTexts(value)
     elseif key == 'dontStretchShrink' then
-        addEvent(function() modules.game_interface.updateStretchShrink() end)
+        addEvent(function()
+            modules.game_interface.updateStretchShrink()
+        end)
     elseif key == 'preciseControl' then
         g_game.setScheduleLastWalk(not value)
     elseif key == 'turnDelay' then
-        controlPanel:getChildById('turnDelayLabel'):setText(tr(
-                                                                'Turn delay: %sms',
-                                                                value))
+        controlPanel:getChildById('turnDelayLabel'):setText(tr('Turn delay: %sms', value))
     elseif key == 'hotkeyDelay' then
-        controlPanel:getChildById('hotkeyDelayLabel'):setText(tr(
-                                                                  'Hotkey delay: %sms',
-                                                                  value))
+        controlPanel:getChildById('hotkeyDelayLabel'):setText(tr('Hotkey delay: %sms', value))
     elseif key == 'crosshair' then
         local crossPath = '/images/game/crosshair/'
         local newValue = value
-        if newValue == 'disabled' then newValue = nil end
-        gameMapPanel:setCrosshairTexture(
-            newValue and crossPath .. newValue or nil)
+        if newValue == 'disabled' then
+            newValue = nil
+        end
+        gameMapPanel:setCrosshairTexture(newValue and crossPath .. newValue or nil)
         crosshairCombobox:setCurrentOptionByData(newValue, true)
     elseif key == 'enableHighlightMouseTarget' then
         gameMapPanel:setDrawHighlightTarget(value)
@@ -380,14 +327,22 @@ function setOption(key, value, force)
     options[key] = value
 end
 
-function getOption(key) return options[key] end
+function getOption(key)
+    return options[key]
+end
 
-function addTab(name, panel, icon) optionsTabBar:addTab(name, panel, icon) end
+function addTab(name, panel, icon)
+    optionsTabBar:addTab(name, panel, icon)
+end
 
 function removeTab(v)
-    if type(v) == "string" then v = optionsTabBar:getTab(v) end
+    if type(v) == 'string' then
+        v = optionsTabBar:getTab(v)
+    end
 
     optionsTabBar:removeTab(v)
 end
 
-function addButton(name, func, icon) optionsTabBar:addButton(name, func, icon) end
+function addButton(name, func, icon)
+    optionsTabBar:addButton(name, func, icon)
+end

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef CLIENT_LUAVALUECASTS_H
-#define CLIENT_LUAVALUECASTS_H
+#pragma once
 
 #include "game.h"
 #include "outfit.h"
@@ -46,4 +45,5 @@ bool luavalue_cast(int index, Light& light);
 int push_luavalue(const UnjustifiedPoints& unjustifiedPoints);
 bool luavalue_cast(int index, UnjustifiedPoints& unjustifiedPoints);
 
-#endif
+// imbuement
+int push_luavalue(const Imbuement& i);

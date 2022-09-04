@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef FRAMEWORK_OTML_DECLARATIONS_H
-#define FRAMEWORK_OTML_DECLARATIONS_H
+#pragma once
 
 #include <framework/global.h>
 
@@ -33,5 +32,3 @@ class OTMLEmitter;
 using OTMLNodePtr = stdext::shared_object_ptr<OTMLNode>;
 using OTMLDocumentPtr = stdext::shared_object_ptr<OTMLDocument>;
 using OTMLNodeList = std::vector<OTMLNodePtr>;
-
-#endif

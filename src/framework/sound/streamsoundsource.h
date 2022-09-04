@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef STREAMSOUNDSOURCE_H
-#define STREAMSOUNDSOURCE_H
+#pragma once
 
 #include "soundsource.h"
 
@@ -54,15 +53,13 @@ public:
 private:
     void queueBuffers();
     void unqueueBuffers();
-    bool fillBufferAndQueue(uint buffer);
+    bool fillBufferAndQueue(uint32_t buffer);
 
     SoundFilePtr m_soundFile;
     std::array<SoundBufferPtr, STREAM_FRAGMENTS> m_buffers;
     DownMix m_downMix;
-    bool m_looping{ false },
-        m_playing{ false },
-        m_eof{ false },
-        m_waitingFile{ false };
+    bool m_looping{ false };
+    bool m_playing{ false };
+    bool m_eof{ false };
+    bool m_waitingFile{ false };
 };
-
-#endif

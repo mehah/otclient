@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef LIGHTVIEW_H
-#define LIGHTVIEW_H
+#pragma once
 
 #include "declarations.h"
 #include "thingtype.h"
@@ -33,13 +32,19 @@ class LightView : public LuaObject
 public:
     LightView();
 
-    void resize(const Size& size, const uint8_t tileSize);
+    void resize(const Size& size, uint8_t tileSize);
     void draw(const Rect& dest, const Rect& src);
 
     void addLightSource(const Point& pos, const Light& light);
-    void addShade(const Point& pos, const float opacity) { m_sources.push_back(Source{ pos, 0, 0, opacity }); }
+    void addShade(const Point& pos, const float opacity) { m_sources.emplace_back(pos, 0, 0, opacity); }
 
-    void setGlobalLight(const Light& light) { m_globalLight = light; m_globalLightColor = Color::from8bit(m_globalLight.color, m_globalLight.intensity / static_cast<float>(UINT8_MAX)); }
+    void setGlobalLight(const Light& light)
+    {
+        m_globalLight = light;
+        m_globalLightColor = Color::from8bit(m_globalLight.color, m_globalLight.intensity / static_cast<float>(UINT8_MAX));
+        m_pool->repaint();
+    }
+
     void setSmooth(bool enabled);
 
     const Light& getGlobalLight() const { return m_globalLight; }
@@ -49,8 +54,8 @@ private:
     struct Source
     {
         Point pos;
-        uint8 color{ 0 };
-        uint16 intensity{ 0 };
+        uint8_t color{ 0 };
+        uint16_t intensity{ 0 };
         float opacity{ 1.f };
     };
 
@@ -59,9 +64,7 @@ private:
     Light m_globalLight;
     Color m_globalLightColor;
 
-    PoolFramedPtr m_pool;
+    DrawPoolFramed* m_pool;
 
     std::vector<Source> m_sources;
 };
-
-#endif

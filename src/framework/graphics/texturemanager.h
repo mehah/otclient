@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef TEXTUREMANAGER_H
-#define TEXTUREMANAGER_H
+#pragma once
 
 #include "texture.h"
 #include <framework/core/declarations.h>
@@ -43,12 +42,10 @@ public:
 private:
     TexturePtr loadTexture(std::stringstream& file);
 
-    std::unordered_map<std::string, TexturePtr> m_textures;
+    stdext::map<std::string, TexturePtr> m_textures;
     std::vector<AnimatedTexturePtr> m_animatedTextures;
     TexturePtr m_emptyTexture;
     ScheduledEventPtr m_liveReloadEvent;
 };
 
 extern TextureManager g_textures;
-
-#endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef STDEXT_SHARED_PTR_H
-#define STDEXT_SHARED_PTR_H
+#pragma once
 
 #include <cassert>
 #include <functional>
@@ -69,7 +68,7 @@ namespace stdext
 
         void set(T* p)
         {
-            T* tmp = px;
+            const T* tmp = px;
             px = p;
             if (tmp)
                 delete tmp;
@@ -102,7 +101,7 @@ namespace stdext
         shared_ptr(T* p) { if (p != nullptr) base = new shared_base<T>(p); else base = nullptr; }
         shared_ptr(const shared_ptr& rhs) : base(rhs.base) { if (base != nullptr) base->add_ref(); }
         template<class U>
-        shared_ptr(const shared_ptr<U>& rhs, typename std::is_convertible<U, T>::type* = nullptr) : base(rhs.base) { if (base != nullptr) base->add_ref(); }
+        shared_ptr(const shared_ptr<U>& rhs, typename std::is_convertible_v<U, T>* = nullptr) : base(rhs.base) { if (base != nullptr) base->add_ref(); }
         ~shared_ptr() { if (base != nullptr) base->dec_ref(); }
 
         void reset() { shared_ptr().swap(*this); }
@@ -159,10 +158,10 @@ namespace stdext
         weak_ptr() : base(nullptr) {}
         weak_ptr(const shared_ptr<T>& rhs) : base(rhs.base) { if (base != nullptr) base->add_weak_ref(); }
         template<class U>
-        weak_ptr(const shared_ptr<U>& rhs, typename std::is_convertible<U, T>::type* = nullptr) : base(rhs.base) { if (base != nullptr) base->add_weak_ref(); }
+        weak_ptr(const shared_ptr<U>& rhs, typename std::is_convertible_v<U, T>* = nullptr) : base(rhs.base) { if (base != nullptr) base->add_weak_ref(); }
         weak_ptr(const weak_ptr<T>& rhs) : base(rhs.base) { if (base != nullptr) base->add_weak_ref(); }
         template<class U>
-        weak_ptr(const weak_ptr<U>& rhs, typename std::is_convertible<U, T>::type* = nullptr) : base(rhs.base) { if (base != nullptr) base->add_weak_ref(); }
+        weak_ptr(const weak_ptr<U>& rhs, typename std::is_convertible_v<U, T>* = nullptr) : base(rhs.base) { if (base != nullptr) base->add_weak_ref(); }
         ~weak_ptr() { if (base != nullptr) base->dec_weak_ref(); }
 
         void reset() { weak_ptr().swap(*this); }
@@ -230,13 +229,11 @@ namespace stdext
 
 namespace std
 {
-    // hash, for unordered_map support
-    template<typename T> struct hash<stdext::shared_ptr<T>> { size_t operator()(const stdext::shared_ptr<T>& p) const { return std::hash<T*>()(p.get()); } };
-    template<typename T> struct hash<stdext::weak_ptr<T>> { size_t operator()(const stdext::weak_ptr<T>& p) const { return std::hash<T*>()(p.get()); } };
+    // hash, for map support
+    template<typename T> struct hash<stdext::shared_ptr<T>> { size_t operator()(const stdext::shared_ptr<T>& p) const { return stdext::hash<T*>()(p.get()); } };
+    template<typename T> struct hash<stdext::weak_ptr<T>> { size_t operator()(const stdext::weak_ptr<T>& p) const { return stdext::hash<T*>()(p.get()); } };
 
     // swap support
     template<class T> void swap(stdext::shared_ptr<T>& lhs, stdext::shared_ptr<T>& rhs) { lhs.swap(rhs); }
     template<class T> void swap(stdext::weak_ptr<T>& lhs, stdext::weak_ptr<T>& rhs) { lhs.swap(rhs); }
 }
-
-#endif

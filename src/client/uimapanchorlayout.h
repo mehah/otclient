@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef UIMAPANCHORLAYOUT_H
-#define UIMAPANCHORLAYOUT_H
+#pragma once
 
 #include "declarations.h"
 #include <framework/ui/uianchorlayout.h>
@@ -32,7 +31,7 @@ class UIPositionAnchor : public UIAnchor
 {
 public:
     UIPositionAnchor(Fw::AnchorEdge anchoredEdge, const Position& hookedPosition, Fw::AnchorEdge hookedEdge) :
-        UIAnchor(anchoredEdge, std::string(), hookedEdge), m_hookedPosition(hookedPosition)
+        UIAnchor(anchoredEdge, {}, hookedEdge), m_hookedPosition(hookedPosition)
     {}
 
     UIWidgetPtr getHookedWidget(const UIWidgetPtr& /*widget*/, const UIWidgetPtr& parentWidget) override { return parentWidget; }
@@ -51,8 +50,4 @@ public:
                            const Position& hookedPosition, Fw::AnchorEdge hookedEdge);
     void centerInPosition(const UIWidgetPtr& anchoredWidget, const Position& hookedPosition);
     void fillPosition(const UIWidgetPtr& anchoredWidget, const Position& hookedPosition);
-
-protected:
 };
-
-#endif

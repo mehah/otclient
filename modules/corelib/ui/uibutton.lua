@@ -1,5 +1,5 @@
 -- @docclass
-UIButton = extends(UIWidget, "UIButton")
+UIButton = extends(UIWidget, 'UIButton')
 
 function UIButton.create()
     local button = UIButton.internalCreate()
@@ -7,4 +7,6 @@ function UIButton.create()
     return button
 end
 
-function UIButton:onMouseRelease(pos, button) return self:isPressed() end
+function UIButton:onMouseRelease(pos, button)
+    return self:isPressed()
+end

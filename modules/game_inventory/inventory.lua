@@ -1,14 +1,14 @@
 InventorySlotStyles = {
-    [InventorySlotHead] = "HeadSlot",
-    [InventorySlotNeck] = "NeckSlot",
-    [InventorySlotBack] = "BackSlot",
-    [InventorySlotBody] = "BodySlot",
-    [InventorySlotRight] = "RightSlot",
-    [InventorySlotLeft] = "LeftSlot",
-    [InventorySlotLeg] = "LegSlot",
-    [InventorySlotFeet] = "FeetSlot",
-    [InventorySlotFinger] = "FingerSlot",
-    [InventorySlotAmmo] = "AmmoSlot"
+    [InventorySlotHead] = 'HeadSlot',
+    [InventorySlotNeck] = 'NeckSlot',
+    [InventorySlotBack] = 'BackSlot',
+    [InventorySlotBody] = 'BodySlot',
+    [InventorySlotRight] = 'RightSlot',
+    [InventorySlotLeft] = 'LeftSlot',
+    [InventorySlotLeg] = 'LegSlot',
+    [InventorySlotFeet] = 'FeetSlot',
+    [InventorySlotFinger] = 'FingerSlot',
+    [InventorySlotAmmo] = 'AmmoSlot'
 }
 
 inventoryWindow = nil
@@ -28,9 +28,8 @@ function init()
 
     g_keyboard.bindKeyDown('Ctrl+I', toggle)
 
-    inventoryButton = modules.client_topmenu.addRightGameToggleButton(
-                          'inventoryButton', tr('Inventory') .. ' (Ctrl+I)',
-                          '/images/topbuttons/inventory', toggle)
+    inventoryButton = modules.client_topmenu.addRightGameToggleButton('inventoryButton', tr('Inventory') .. ' (Ctrl+I)',
+                                                                      '/images/topbuttons/inventory', toggle)
     inventoryButton:setOn(true)
 
     inventoryWindow = g_ui.loadUI('inventory')
@@ -39,9 +38,10 @@ function init()
 
     purseButton = inventoryPanel:getChildById('purseButton')
     local function purseFunction()
-        local purse = g_game.getLocalPlayer():getInventoryItem(
-                          InventorySlotPurse)
-        if purse then g_game.use(purse) end
+        local purse = g_game.getLocalPlayer():getInventoryItem(InventorySlotPurse)
+        if purse then
+            g_game.use(purse)
+        end
     end
     purseButton.onClick = purseFunction
 
@@ -76,7 +76,9 @@ end
 function toggleAdventurerStyle(hasBlessing)
     for slot = InventorySlotFirst, InventorySlotLast do
         local itemWidget = inventoryPanel:getChildById('slot' .. slot)
-        if itemWidget then itemWidget:setOn(hasBlessing) end
+        if itemWidget then
+            itemWidget:setOn(hasBlessing)
+        end
     end
 end
 
@@ -97,9 +99,7 @@ function refresh()
         else
             onInventoryChange(player, i, nil)
         end
-        toggleAdventurerStyle(player and
-                                  Bit.hasBit(player:getBlessings(),
-                                             Blessings.Adventurer) or false)
+        toggleAdventurerStyle(player and Bit.hasBit(player:getBlessings(), Blessings.Adventurer) or false)
     end
 
     purseButton:setVisible(g_game.getFeature(GamePurseSlot))
@@ -115,11 +115,19 @@ function toggle()
     end
 end
 
-function onMiniWindowClose() inventoryButton:setOn(false) end
+function onMiniWindowOpen()
+    inventoryButton:setOn(true)
+end
+
+function onMiniWindowClose()
+    inventoryButton:setOn(false)
+end
 
 -- hooked events
 function onInventoryChange(player, slot, item, oldItem)
-    if slot > InventorySlotPurse then return end
+    if slot > InventorySlotPurse then
+        return
+    end
 
     if slot == InventorySlotPurse then
         if g_game.getFeature(GamePurseSlot) then

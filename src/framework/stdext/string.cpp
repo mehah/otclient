@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,7 @@
  */
 
 #include <algorithm>
+#include <vector>
 
 #include "exception.h"
 #include "format.h"
@@ -32,17 +33,20 @@
 
 namespace stdext
 {
-    std::string resolve_path(const std::string& filePath, std::string sourcePath)
+    std::string resolve_path(const std::string_view filePath, std::string_view sourcePath)
     {
-        if (filePath.starts_with("/"))
-            return filePath;
+        const std::string _filePath(filePath);
+        if (_filePath.starts_with("/"))
+            return _filePath;
+
+        std::string _sourcePath(sourcePath);
         if (!sourcePath.ends_with("/")) {
             const std::size_t slashPos = sourcePath.find_last_of('/');
             if (slashPos == std::string::npos)
-                throw_exception(format("invalid source path '%s', for file '%s'", sourcePath, filePath));
-            sourcePath = sourcePath.substr(0, slashPos + 1);
+                throw Exception("invalid source path '%s', for file '%s'", sourcePath, filePath);
+            _sourcePath = sourcePath.substr(0, slashPos + 1);
         }
-        return sourcePath + filePath;
+        return _sourcePath + _filePath;
     }
 
     std::string date_time_string(const char* format/* = "%b %d %Y %H:%M:%S"*/)
@@ -62,17 +66,17 @@ namespace stdext
         return o.str();
     }
 
-    uint64_t hex_to_dec(const std::string& str)
+    uint64_t hex_to_dec(const std::string_view str)
     {
         uint64_t num;
-        std::istringstream i(str);
+        std::istringstream i(str.data());
         i >> std::hex >> num;
         return num;
     }
 
-    bool is_valid_utf8(const std::string& src)
+    bool is_valid_utf8(const std::string_view src)
     {
-        const auto* bytes = (const unsigned char*)src.c_str();
+        const auto* bytes = src.data();
         while (*bytes) {
             if ((// ASCII
                  // use bytes[0] <= 0x7F to allow ASCII control characters
@@ -141,15 +145,15 @@ namespace stdext
         return true;
     }
 
-    std::string utf8_to_latin1(const std::string& src)
+    std::string utf8_to_latin1(const std::string_view src)
     {
         std::string out;
-        for (uint i = 0; i < src.length();) {
-            const uchar c = src[i++];
+        for (int i = -1, s = src.length(); ++i < s;) {
+            const uint8_t c = src[i];
             if ((c >= 32 && c < 128) || c == 0x0d || c == 0x0a || c == 0x09)
                 out += c;
             else if (c == 0xc2 || c == 0xc3) {
-                const uchar c2 = src[i++];
+                const uint8_t c2 = src[++i];
                 if (c == 0xc2) {
                     if (c2 > 0xa1 && c2 < 0xbb)
                         out += c2;
@@ -165,10 +169,10 @@ namespace stdext
         return out;
     }
 
-    std::string latin1_to_utf8(const std::string& src)
+    std::string latin1_to_utf8(const std::string_view src)
     {
         std::string out;
-        for (uchar c : src) {
+        for (const uint8_t c : src) {
             if ((c >= 32 && c < 128) || c == 0x0d || c == 0x0a || c == 0x09)
                 out += c;
             else {
@@ -183,30 +187,30 @@ namespace stdext
 #include <winsock2.h>
 #include <windows.h>
 
-    std::wstring utf8_to_utf16(const std::string& src)
+    std::wstring utf8_to_utf16(const std::string_view src)
     {
         std::wstring res;
         wchar_t out[4096];
-        if (MultiByteToWideChar(CP_UTF8, 0, src.c_str(), -1, out, 4096))
+        if (MultiByteToWideChar(CP_UTF8, 0, src.data(), -1, out, 4096))
             res = out;
         return res;
     }
 
-    std::string utf16_to_utf8(const std::wstring& src)
+    std::string utf16_to_utf8(const std::wstring_view src)
     {
         std::string res;
         char out[4096];
-        if (WideCharToMultiByte(CP_UTF8, 0, src.c_str(), -1, out, 4096, nullptr, nullptr))
+        if (WideCharToMultiByte(CP_UTF8, 0, src.data(), -1, out, 4096, nullptr, nullptr))
             res = out;
         return res;
     }
 
-    std::wstring latin1_to_utf16(const std::string& src)
+    std::wstring latin1_to_utf16(const std::string_view src)
     {
         return utf8_to_utf16(latin1_to_utf8(src));
     }
 
-    std::string utf16_to_latin1(const std::wstring& src)
+    std::string utf16_to_latin1(const std::wstring_view src)
     {
         return utf8_to_latin1(utf16_to_utf8(src));
     }
@@ -224,14 +228,14 @@ namespace stdext
 
     void ltrim(std::string& s)
     {
-        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](uint8_t ch) {
             return !std::isspace(ch);
         }));
     }
 
     void rtrim(std::string& s)
     {
-        s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+        s.erase(std::find_if(s.rbegin(), s.rend(), [](uint8_t ch) {
             return !std::isspace(ch);
         }).base(), s.end());
     }
@@ -244,18 +248,18 @@ namespace stdext
 
     void ucwords(std::string& str)
     {
-        const uint32 strLen = str.length();
+        const uint32_t strLen = str.length();
         if (strLen == 0)
             return;
 
         str[0] = static_cast<char>(std::toupper(str[0]));
-        for (uint32 i = 1; i < strLen; ++i) {
+        for (uint32_t i = 1; i < strLen; ++i) {
             if (str[i - 1] == ' ')
                 str[i] = static_cast<char>(std::toupper(str[i]));
         }
     }
 
-    void replace_all(std::string& str, const std::string& search, const std::string& replacement)
+    void replace_all(std::string& str, const std::string_view search, const std::string_view replacement)
     {
         size_t pos = 0;
         while ((pos = str.find(search, pos)) != std::string::npos) {
@@ -269,7 +273,7 @@ namespace stdext
         std::erase_if(str, isspace);
     }
 
-    std::vector<std::string> split(const std::string& str, const std::string& separators)
+    std::vector<std::string> split(const std::string_view str, const std::string_view separators)
     {
         std::vector<std::string> result;
 

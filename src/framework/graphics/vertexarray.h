@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,18 +20,26 @@
  * THE SOFTWARE.
  */
 
-#ifndef VERTEXARRAY_H
-#define VERTEXARRAY_H
+#pragma once
 
 #include "declarations.h"
-#include <framework/util/databuffer.h>
+#include "hardwarebuffer.h"
 
 class VertexArray
 {
 public:
+    static constexpr int CACHE_MIN_VERTICES_COUNT = 42;
+
+    ~VertexArray()
+    {
+        if (m_hardwareBuffer)
+            delete m_hardwareBuffer;
+    }
+
     void addVertex(float x, float y)
     {
-        m_buffer << x << y;
+        m_buffer.push_back(x);
+        m_buffer.push_back(y);
     }
 
     void addTriangle(const Point& a, const Point& b, const Point& c)
@@ -97,13 +105,41 @@ public:
         addVertex(right, top);
     }
 
-    void clear() { m_buffer.reset(); }
-    float* vertices() const { return m_buffer.data(); }
+    void append(const VertexArray* buffer)
+    {
+        m_buffer.insert(m_buffer.end(), buffer->m_buffer.begin(), buffer->m_buffer.end());
+    }
+
+    void clear()
+    {
+        m_buffer.clear();
+        m_cached = false;
+    }
+
+    const float* vertices() const { return m_buffer.data(); }
     int vertexCount() const { return m_buffer.size() / 2; }
     int size() const { return m_buffer.size(); }
 
-private:
-    DataBuffer<float> m_buffer;
-};
+    // cache
+    void cache()
+    {
+        if (m_cached || m_buffer.size() < CACHE_MIN_VERTICES_COUNT) return;
 
-#endif
+        if (!m_hardwareBuffer)
+            m_hardwareBuffer = new HardwareBuffer(HardwareBuffer::Type::VERTEX_BUFFER);
+
+        m_hardwareBuffer->bind();
+        m_hardwareBuffer->write(m_buffer.data(), m_buffer.size() * sizeof(float), HardwareBuffer::UsagePattern::DYNAMIC_DRAW);
+
+        m_cached = true;
+    }
+
+    bool isCached() { return m_cached; }
+
+    HardwareBuffer* getHardwareCache() { return m_hardwareBuffer; }
+
+private:
+    bool m_cached{ false };
+    std::vector<float> m_buffer;
+    HardwareBuffer* m_hardwareBuffer = nullptr;
+};

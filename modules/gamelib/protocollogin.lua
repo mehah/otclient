@@ -1,5 +1,5 @@
 -- @docclass
-ProtocolLogin = extends(Protocol, "ProtocolLogin")
+ProtocolLogin = extends(Protocol, 'ProtocolLogin')
 
 LoginServerError = 10
 LoginServerTokenSuccess = 12
@@ -15,11 +15,9 @@ LoginServerExtendedCharacterList = 101
 LoginServerRetry = 10
 LoginServerErrorNew = 11
 
-function ProtocolLogin:login(host, port, accountName, accountPassword,
-                             authenticatorToken, stayLogged)
+function ProtocolLogin:login(host, port, accountName, accountPassword, authenticatorToken, stayLogged)
     if string.len(host) == 0 or port == nil or port == 0 then
-        signalcall(self.onLoginError, self,
-                   tr("You must enter a valid server address and port."))
+        signalcall(self.onLoginError, self, tr('You must enter a valid server address and port.'))
         return
     end
 
@@ -32,7 +30,9 @@ function ProtocolLogin:login(host, port, accountName, accountPassword,
     self:connect(host, port)
 end
 
-function ProtocolLogin:cancelLogin() self:disconnect() end
+function ProtocolLogin:cancelLogin()
+    self:disconnect()
+end
 
 function ProtocolLogin:sendLoginPacket()
     local msg = OutputMessage.create()
@@ -54,7 +54,9 @@ function ProtocolLogin:sendLoginPacket()
     msg:addU32(g_sprites.getSprSignature())
     msg:addU32(PIC_SIGNATURE)
 
-    if g_game.getFeature(GamePreviewState) then msg:addU8(0) end
+    if g_game.getFeature(GamePreviewState) then
+        msg:addU8(0)
+    end
 
     local offset = msg:getMessageSize()
     if g_game.getFeature(GameLoginPacketEncryption) then
@@ -85,17 +87,20 @@ function ProtocolLogin:sendLoginPacket()
 
     local paddingBytes = g_crypt.rsaGetSize() - (msg:getMessageSize() - offset)
     assert(paddingBytes >= 0)
-    for i = 1, paddingBytes do msg:addU8(math.random(0, 0xff)) end
+    for i = 1, paddingBytes do
+        msg:addU8(math.random(0, 0xff))
+    end
 
-    if g_game.getFeature(GameLoginPacketEncryption) then msg:encryptRsa() end
+    if g_game.getFeature(GameLoginPacketEncryption) then
+        msg:encryptRsa()
+    end
 
     if g_game.getFeature(GameOGLInformation) then
         msg:addU8(1) -- unknown
         msg:addU8(1) -- unknown
 
         if g_game.getClientVersion() >= 1072 then
-            msg:addString(string.format('%s %s', g_graphics.getVendor(),
-                                        g_graphics.getRenderer()))
+            msg:addString(string.format('%s %s', g_graphics.getVendor(), g_graphics.getRenderer()))
         else
             msg:addString(g_graphics.getRenderer())
         end
@@ -116,12 +121,16 @@ function ProtocolLogin:sendLoginPacket()
 
         paddingBytes = g_crypt.rsaGetSize() - (msg:getMessageSize() - offset)
         assert(paddingBytes >= 0)
-        for i = 1, paddingBytes do msg:addU8(math.random(0, 0xff)) end
+        for i = 1, paddingBytes do
+            msg:addU8(math.random(0, 0xff))
+        end
 
         msg:encryptRsa()
     end
 
-    if g_game.getFeature(GameProtocolChecksum) then self:enableChecksum() end
+    if g_game.getFeature(GameProtocolChecksum) then
+        self:enableChecksum()
+    end
 
     self:send(msg)
     if g_game.getFeature(GameLoginPacketEncryption) then
@@ -146,14 +155,13 @@ function ProtocolLogin:onRecv(msg)
         elseif opcode == LoginServerMotd then
             self:parseMotd(msg)
         elseif opcode == LoginServerUpdateNeeded then
-            signalcall(self.onLoginError, self, tr("Client needs update."))
+            signalcall(self.onLoginError, self, tr('Client needs update.'))
         elseif opcode == LoginServerTokenSuccess then
             local unknown = msg:getU8()
         elseif opcode == LoginServerTokenError then
             -- TODO: prompt for token here
             local unknown = msg:getU8()
-            signalcall(self.onLoginError, self,
-                       tr("Invalid authentification token."))
+            signalcall(self.onLoginError, self, tr('Invalid authentification token.'))
         elseif opcode == LoginServerCharacterList then
             self:parseCharacterList(msg)
         elseif opcode == LoginServerExtendedCharacterList then
@@ -238,15 +246,12 @@ function ProtocolLogin:parseCharacterList(msg)
 
         account.premDays = msg:getU32()
         if account.premDays ~= 0 and account.premDays ~= 65535 then
-            account.premDays =
-                math.floor((account.premDays - os.time()) / 86400)
+            account.premDays = math.floor((account.premDays - os.time()) / 86400)
         end
     else
         account.status = AccountStatus.Ok
         account.premDays = msg:getU16()
-        account.subStatus =
-            account.premDays > 0 and SubscriptionStatus.Premium or
-                SubscriptionStatus.Free
+        account.subStatus = account.premDays > 0 and SubscriptionStatus.Premium or SubscriptionStatus.Free
     end
 
     signalcall(self.onCharacterList, self, characters, account)

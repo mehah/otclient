@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef STDEXT_DEMANGLE_H
-#define STDEXT_DEMANGLE_H
+#pragma once
 
 #include <string>
 #include <typeinfo>
@@ -44,5 +43,3 @@ namespace stdext
     /// Returns the name of a type
     template<typename T> std::string demangle_type() { return demangle_name(typeid(T).name()); }
 }
-
-#endif

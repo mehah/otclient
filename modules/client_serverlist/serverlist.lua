@@ -12,7 +12,9 @@ function ServerList.init()
     serverTextList = serverListWindow:getChildById('serverList')
 
     servers = g_settings.getNode('ServerList') or {}
-    if servers then ServerList.load() end
+    if servers then
+        ServerList.load()
+    end
 end
 
 function ServerList.terminate()
@@ -36,8 +38,7 @@ function ServerList.select()
     if selected then
         local server = servers[selected:getId()]
         if server then
-            EnterGame.setDefaultServer(selected:getId(), server.port,
-                                       server.protocol)
+            EnterGame.setDefaultServer(selected:getId(), server.port, server.protocol)
             EnterGame.setAccountName(server.account)
             EnterGame.setPassword(server.password)
             ServerList.hide()
@@ -83,7 +84,9 @@ end
 function ServerList.remove(widget)
     local host = widget:getId()
 
-    if removeWindow then return end
+    if removeWindow then
+        return
+    end
 
     local yesCallback = function()
         widget:destroy()
@@ -96,10 +99,15 @@ function ServerList.remove(widget)
         removeWindow = nil
     end
 
-    removeWindow = displayGeneralBox(tr('Remove'), tr('Remove ' .. host .. '?'),
-                                     {
-        {text = tr('Yes'), callback = yesCallback},
-        {text = tr('No'), callback = noCallback},
+    removeWindow = displayGeneralBox(tr('Remove'), tr('Remove ' .. host .. '?'), {
+        {
+            text = tr('Yes'),
+            callback = yesCallback
+        },
+        {
+            text = tr('No'),
+            callback = noCallback
+        },
         anchor = AnchorHorizontalCenter
     }, yesCallback, noCallback)
 end
@@ -113,18 +121,26 @@ function ServerList.destroy()
 end
 
 function ServerList.show()
-    if g_game.isOnline() then return end
+    if g_game.isOnline() then
+        return
+    end
     serverListWindow:show()
     serverListWindow:raise()
     serverListWindow:focus()
 end
 
-function ServerList.hide() serverListWindow:hide() end
+function ServerList.hide()
+    serverListWindow:hide()
+end
 
 function ServerList.setServerAccount(host, account)
-    if servers[host] then servers[host].account = account end
+    if servers[host] then
+        servers[host].account = account
+    end
 end
 
 function ServerList.setServerPassword(host, password)
-    if servers[host] then servers[host].password = password end
+    if servers[host] then
+        servers[host].password = password
+    end
 end

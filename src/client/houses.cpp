@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@
 
 HouseManager g_houses;
 
-House::House(uint32 hId, const std::string& name, const Position& pos)
+House::House(uint32_t hId, const std::string_view name, const Position& pos)
 {
     setId(hId);
     setName(name);
@@ -40,7 +40,7 @@ void House::setTile(const TilePtr& tile)
 {
     tile->setFlag(TILESTATE_HOUSE);
     tile->setHouseId(getId());
-    m_tiles.insert(std::make_pair(tile->getPosition(), tile));
+    m_tiles.emplace(tile->getPosition(), tile);
 }
 
 TilePtr House::getTile(const Position& position)
@@ -58,11 +58,11 @@ void House::addDoor(const ItemPtr& door)
     m_doors[++m_lastDoorId] = door;
 }
 
-void House::removeDoorById(uint32 doorId)
+void House::removeDoorById(uint32_t doorId)
 {
     if (doorId >= m_lastDoorId)
-        stdext::throw_exception(stdext::format("Failed to remove door of id %d (would overflow), max id: %d",
-                                               doorId, m_lastDoorId));
+        throw Exception("Failed to remove door of id %d (would overflow), max id: %d",
+                                               doorId, m_lastDoorId);
     m_doors[doorId] = nullptr;
 }
 
@@ -73,9 +73,9 @@ void House::load(const TiXmlElement* elem)
         name = stdext::format("Unnamed house #%lu", getId());
 
     setName(name);
-    setRent(elem->readType<uint32>("rent"));
-    setSize(elem->readType<uint32>("size"));
-    setTownId(elem->readType<uint32>("townid"));
+    setRent(elem->readType<uint32_t >("rent"));
+    setSize(elem->readType<uint32_t >("size"));
+    setTownId(elem->readType<uint32_t >("townid"));
     m_isGuildHall = elem->readType<bool>("guildhall");
 
     Position entryPos;
@@ -98,68 +98,68 @@ void House::save(TiXmlElement* elem)
     elem->SetAttribute("rent", getRent());
     elem->SetAttribute("townid", getTownId());
     elem->SetAttribute("size", getSize());
-    elem->SetAttribute("guildhall", static_cast<int>(m_isGuildHall));
+    elem->SetAttribute("guildhall", m_isGuildHall);
 }
 
 HouseManager::HouseManager()
 = default;
 
-void HouseManager::addHouse(const HousePtr & house)
+void HouseManager::addHouse(const HousePtr& house)
 {
     if (findHouse(house->getId()) == m_houses.end())
         m_houses.push_back(house);
 }
 
-void HouseManager::removeHouse(uint32 houseId)
+void HouseManager::removeHouse(uint32_t houseId)
 {
     const auto it = findHouse(houseId);
     if (it != m_houses.end())
         m_houses.erase(it);
 }
 
-HousePtr HouseManager::getHouse(uint32 houseId)
+HousePtr HouseManager::getHouse(uint32_t houseId)
 {
     const auto it = findHouse(houseId);
     return it != m_houses.end() ? *it : nullptr;
 }
 
-HousePtr HouseManager::getHouseByName(const std::string & name)
+HousePtr HouseManager::getHouseByName(const std::string_view name)
 {
     const auto it = std::find_if(m_houses.begin(), m_houses.end(),
                                  [=](const HousePtr& house) -> bool { return house->getName() == name; });
     return it != m_houses.end() ? *it : nullptr;
 }
 
-void HouseManager::load(const std::string & fileName)
+void HouseManager::load(const std::string& fileName)
 {
     try {
         TiXmlDocument doc;
         doc.Parse(g_resources.readFileContents(fileName).c_str());
         if (doc.Error())
-            stdext::throw_exception(stdext::format("failed to load '%s': %s (House XML)", fileName, doc.ErrorDesc()));
+            throw Exception("failed to load '%s': %s (House XML)", fileName, doc.ErrorDesc());
 
         TiXmlElement* root = doc.FirstChildElement();
         if (!root || root->ValueTStr() != "houses")
-            stdext::throw_exception("invalid root tag name");
+            throw Exception("invalid root tag name");
 
         for (TiXmlElement* elem = root->FirstChildElement(); elem; elem = elem->NextSiblingElement()) {
             if (elem->ValueTStr() != "house")
-                stdext::throw_exception("invalid house tag.");
+                throw Exception("invalid house tag.");
 
-            const auto houseId = elem->readType<uint32>("houseid");
+            const auto houseId = elem->readType<uint32_t >("houseid");
             HousePtr house = getHouse(houseId);
             if (!house)
                 house = HousePtr(new House(houseId)), addHouse(house);
 
             house->load(elem);
         }
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to load '%s': %s", fileName, e.what()));
     }
     sort();
 }
 
-void HouseManager::save(const std::string & fileName)
+void HouseManager::save(const std::string& fileName)
 {
     try {
         TiXmlDocument doc;
@@ -178,13 +178,13 @@ void HouseManager::save(const std::string & fileName)
         }
 
         if (!doc.SaveFile("data" + fileName))
-            stdext::throw_exception(stdext::format("failed to save houses XML %s: %s", fileName, doc.ErrorDesc()));
-    } catch (std::exception& e) {
+            throw Exception("failed to save houses XML %s: %s", fileName, doc.ErrorDesc());
+    } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
     }
 }
 
-HouseList HouseManager::filterHouses(uint32 townId)
+HouseList HouseManager::filterHouses(uint32_t townId)
 {
     HouseList ret;
     for (const HousePtr& house : m_houses)
@@ -193,7 +193,7 @@ HouseList HouseManager::filterHouses(uint32 townId)
     return ret;
 }
 
-HouseList::iterator HouseManager::findHouse(uint32 houseId)
+HouseList::iterator HouseManager::findHouse(uint32_t houseId)
 {
     return std::find_if(m_houses.begin(), m_houses.end(),
                         [=](const HousePtr& house) -> bool { return house->getId() == houseId; });

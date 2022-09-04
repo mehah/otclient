@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,13 +20,12 @@
  * THE SOFTWARE.
  */
 
-#ifndef STATICTEXT_H
-#define STATICTEXT_H
+#pragma once
 
 #include "thing.h"
 #include <framework/graphics/cachedtext.h>
 
-// @bindclass
+ // @bindclass
 class StaticText : public Thing
 {
 public:
@@ -40,9 +39,9 @@ public:
 
     bool isYell() { return m_mode == Otc::MessageYell || m_mode == Otc::MessageMonsterYell || m_mode == Otc::MessageBarkLoud; }
 
-    void setText(const std::string& text);
-    void setFont(const std::string& fontName);
-    bool addMessage(const std::string& name, Otc::MessageMode mode, const std::string& text);
+    void setText(const std::string_view text);
+    void setFont(const std::string_view fontName);
+    bool addMessage(const std::string_view name, Otc::MessageMode mode, const std::string_view text);
 
     StaticTextPtr asStaticText() { return static_self_cast<StaticText>(); }
     bool isStaticText() override { return true; }
@@ -63,5 +62,3 @@ private:
     CachedText m_cachedText;
     ScheduledEventPtr m_updateEvent;
 };
-
-#endif

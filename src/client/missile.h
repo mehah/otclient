@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,37 +20,33 @@
  * THE SOFTWARE.
  */
 
-#ifndef SHOT_H
-#define SHOT_H
+#pragma once
 
 #include "thing.h"
 #include <framework/core/timer.h>
 #include <framework/global.h>
 
-// @bindclass
+ // @bindclass
 class Missile : public Thing
 {
 public:
-    void draw(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
+    void drawMissile(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
 
-    void setId(uint32 id) override;
+    void setId(uint32_t id) override;
     void setPath(const Position& fromPosition, const Position& toPosition);
 
-    uint32 getId() override { return m_id; }
+    uint32_t getId() override { return m_id; }
 
     MissilePtr asMissile() { return static_self_cast<Missile>(); }
     bool isMissile() override { return true; }
 
     const ThingTypePtr& getThingType() override;
-    ThingType* rawGetThingType() override;
 
 private:
     Timer m_animationTimer;
     Point m_delta;
-    uint8 m_distance;
-    float m_duration;
-    uint16 m_id;
-    Otc::Direction m_direction;
+    uint8_t m_distance{ 0 };
+    uint16_t m_id{ 0 };
+    float m_duration{ 0.f };
+    Otc::Direction m_direction{ Otc::InvalidDirection };
 };
-
-#endif

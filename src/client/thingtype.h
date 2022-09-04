@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,29 +20,23 @@
  * THE SOFTWARE.
  */
 
-#ifndef THINGTYPE_H
-#define THINGTYPE_H
+#pragma once
 
 #include "animator.h"
 #include "declarations.h"
 
 #include <framework/core/declarations.h>
 #include <framework/graphics/texture.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include <framework/luaengine/luaobject.h>
 #include <framework/net/server.h>
 #include <framework/otml/declarations.h>
 
-using namespace tibia::protobuf;
-using namespace tibia::protobuf::shared;
+using namespace otclient::protobuf;
 
-enum class TextureType
-{
-    NONE,
-    SMOOTH,
-    ALL_BLANK
-};
+enum class TextureType { NONE, SMOOTH, ALL_BLANK };
 
-enum FrameGroupType : uint8
+enum FrameGroupType : uint8_t
 {
     FrameGroupDefault = 0,
     FrameGroupIdle = FrameGroupDefault,
@@ -50,7 +44,7 @@ enum FrameGroupType : uint8
     FrameGroupInitial
 };
 
-enum ThingCategory : uint8
+enum ThingCategory : uint8_t
 {
     ThingCategoryItem = 0,
     ThingCategoryCreature,
@@ -60,7 +54,7 @@ enum ThingCategory : uint8
     ThingLastCategory = ThingInvalidCategory
 };
 
-enum ThingAttr : uint8
+enum ThingAttr : uint8_t
 {
     ThingAttrGround = 0,
     ThingAttrGroundBorder = 1,
@@ -114,6 +108,21 @@ enum ThingAttr : uint8
     ThingLastAttr = 255
 };
 
+struct Imbuement
+{
+    int id;
+    std::string name;
+    std::string description;
+    std::string group;
+    int imageId;
+    int duration;
+    bool premiumOnly;
+    std::vector<std::pair<ItemPtr, std::string>> sources;
+    int cost;
+    int successRate;
+    int protectionCost;
+};
+
 enum SpriteMask
 {
     SpriteMaskRed = 1,
@@ -126,33 +135,46 @@ struct MarketData
 {
     std::string name;
     int category;
-    uint16 requiredLevel;
-    uint16 restrictVocation;
-    uint16 showAs;
-    uint16 tradeAs;
+    uint16_t requiredLevel;
+    uint16_t restrictVocation;
+    uint16_t showAs;
+    uint16_t tradeAs;
+};
+
+struct MarketOffer
+{
+    uint32_t timestamp = 0;
+    uint16_t counter = 0;
+    uint8_t action = 0;
+    uint16_t itemId = 0;
+    uint16_t amount = 0;
+    uint64_t price = 0;
+    std::string playerName;
+    uint8_t state = 0;
+    uint16_t var = 0;
 };
 
 struct Light
 {
     Light() = default;
     Light(uint8_t intensity, uint8_t color) : intensity(intensity), color(color) {}
-    uint8 intensity = 0;
-    uint8 color = 215;
+    uint8_t intensity = 0;
+    uint8_t color = 215;
 };
 
 class ThingType : public LuaObject
 {
 public:
-    void unserializeAppearance(uint16 clientId, ThingCategory category, const appearances::Appearance& appearance);
-    void unserialize(uint16 clientId, ThingCategory category, const FileStreamPtr& fin);
+    void unserializeAppearance(uint16_t clientId, ThingCategory category, const appearances::Appearance& appearance);
+    void unserialize(uint16_t clientId, ThingCategory category, const FileStreamPtr& fin);
     void unserializeOtml(const OTMLNodePtr& node);
 
     void serialize(const FileStreamPtr& fin);
     void exportImage(const std::string& fileName);
 
-    void draw(const Point& dest, float scaleFactor, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, TextureType textureType, Color color = Color::white, LightView* lightView = nullptr);
+    void draw(const Point& dest, float scaleFactor, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, uint32_t flags, TextureType textureType, Color color = Color::white, LightView* lightView = nullptr, const DrawBufferPtr& drawBuffer = nullptr);
 
-    uint16 getId() { return m_id; }
+    uint16_t getId() { return m_id; }
     ThingCategory getCategory() { return m_category; }
     bool isNull() { return m_null; }
     bool hasAttr(ThingAttr attr) { return m_attribs.has(attr); }
@@ -173,14 +195,14 @@ public:
     Point getDisplacement() { return m_displacement; }
     int getDisplacementX() { return getDisplacement().x; }
     int getDisplacementY() { return getDisplacement().y; }
-    int getElevation() { return m_attribs.get<uint16>(ThingAttrElevation); }
+    int getElevation() { return m_attribs.get<uint16_t>(ThingAttrElevation); }
 
-    int getGroundSpeed() { return m_attribs.get<uint16>(ThingAttrGround); }
-    int getMaxTextLength() { return m_attribs.has(ThingAttrWritableOnce) ? m_attribs.get<uint16>(ThingAttrWritableOnce) : m_attribs.get<uint16>(ThingAttrWritable); }
+    int getGroundSpeed() { return m_attribs.get<uint16_t>(ThingAttrGround); }
+    int getMaxTextLength() { return m_attribs.has(ThingAttrWritableOnce) ? m_attribs.get<uint16_t>(ThingAttrWritableOnce) : m_attribs.get<uint16_t>(ThingAttrWritable); }
     Light getLight() { return m_attribs.get<Light>(ThingAttrLight); }
-    int getMinimapColor() { return m_attribs.get<uint16>(ThingAttrMinimapColor); }
-    int getLensHelp() { return m_attribs.get<uint16>(ThingAttrLensHelp); }
-    int getClothSlot() { return m_attribs.get<uint16>(ThingAttrCloth); }
+    int getMinimapColor() { return m_attribs.get<uint16_t>(ThingAttrMinimapColor); }
+    int getLensHelp() { return m_attribs.get<uint16_t>(ThingAttrLensHelp); }
+    int getClothSlot() { return m_attribs.get<uint32_t>(ThingAttrCloth); }
     MarketData getMarketData() { return m_attribs.get<MarketData>(ThingAttrMarket); }
     bool isGround() { return m_attribs.has(ThingAttrGround); }
     bool isGroundBorder() { return m_attribs.has(ThingAttrGroundBorder); }
@@ -244,25 +266,27 @@ private:
     bool hasTexture() const { return !m_textures.empty(); }
 
     static Size getBestTextureDimension(int w, int h, int count);
-    uint getSpriteIndex(int w, int h, int l, int x, int y, int z, int a);
-    uint getTextureIndex(int l, int x, int y, int z);
+    uint32_t getSpriteIndex(int w, int h, int l, int x, int y, int z, int a);
+    uint32_t getTextureIndex(int l, int x, int y, int z);
 
     ThingCategory m_category{ ThingInvalidCategory };
-    uint16 m_id{ 0 };
+    uint16_t m_id{ 0 };
 
-    bool m_null{ true },
-        m_opaque{ false };
+    bool m_null{ true };
+    bool m_opaque{ false };
 
-    dynamic_storage<uint8> m_attribs;
+    stdext::small_dynamic_storage<ThingAttr, ThingLastAttr> m_attribs;
 
     Size m_size;
     Point m_displacement;
     AnimatorPtr m_animator;
     AnimatorPtr m_idleAnimator;
-    int m_animationPhases;
+    int m_animationPhases{ 0 };
     int m_exactSize{ 0 };
     int m_realSize{ 0 };
-    int m_numPatternX{ 0 }, m_numPatternY{ 0 }, m_numPatternZ{ 0 };
+    int m_numPatternX{ 0 };
+    int m_numPatternY{ 0 };
+    int m_numPatternZ{ 0 };
     int m_layers{ 0 };
     int m_exactHeight{ 0 };
     float m_opacity{ 1.f };
@@ -270,13 +294,11 @@ private:
 
     std::vector<int> m_spritesIndex;
 
-    std::vector<TexturePtr> m_textures,
-        m_blankTextures,
-        m_smoothTextures;
+    std::vector<TexturePtr> m_textures;
+    std::vector<TexturePtr> m_blankTextures;
+    std::vector<TexturePtr> m_smoothTextures;
 
     std::vector<std::vector<Rect>> m_texturesFramesRects;
     std::vector<std::vector<Rect>> m_texturesFramesOriginRects;
     std::vector<std::vector<Point>> m_texturesFramesOffsets;
 };
-
-#endif

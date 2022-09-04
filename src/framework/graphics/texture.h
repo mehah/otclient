@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef TEXTURE_H
-#define TEXTURE_H
+#pragma once
 
 #include "declarations.h"
 
@@ -34,6 +33,7 @@ public:
     ~Texture() override;
 
     void uploadPixels(const ImagePtr& image, bool buildMipmaps = false, bool compress = false);
+    void updateImage(const ImagePtr& image) { m_image = image; }
     void bind();
     void copyFromScreen(const Rect& screenRect);
     virtual bool buildHardwareMipmaps();
@@ -43,8 +43,8 @@ public:
     void setUpsideDown(bool upsideDown);
     void setTime(ticks_t time) { m_time = time; }
 
-    uint getId() { return m_id; }
-    uint getUniqueId() const { return m_uniqueId; }
+    uint32_t getId() { return m_id; }
+    uint32_t getUniqueId() const { return m_uniqueId; }
     ticks_t getTime() { return m_time; }
     int getWidth() { return m_size.width(); }
     int getHeight() { return m_size.height(); }
@@ -62,30 +62,29 @@ public:
 
 protected:
     void createTexture();
-    bool setupSize(const Size& size, bool forcePowerOfTwo = false);
+    bool setupSize(const Size& size);
     void setupWrap();
     void setupFilters();
     void setupTranformMatrix();
-    void setupPixels(int level, const Size& size, uchar* pixels, int channels = 4, bool compress = false);
+    void setupPixels(int level, const Size& size, uint8_t* pixels, int channels = 4, bool compress = false);
 
-    const uint m_uniqueId;
+    const uint32_t m_uniqueId;
 
-    uint m_id;
-    ticks_t m_time;
-    Size m_size, m_glSize;
+    uint32_t m_id{ 0 };
+    ticks_t m_time{ 0 };
+    Size m_size;
+    Size m_glSize;
 
     Matrix3 m_transformMatrix;
 
     ImagePtr m_image;
 
-    bool m_hasMipmaps{ false },
-        m_smooth{ false },
-        m_upsideDown{ false },
-        m_repeat{ false },
-        m_opaque{ false },
-        m_canSuperimposed{ false },
-        m_compress{ false },
-        m_buildMipmaps{ false };
+    bool m_hasMipmaps{ false };
+    bool m_smooth{ false };
+    bool m_upsideDown{ false };
+    bool m_repeat{ false };
+    bool m_opaque{ false };
+    bool m_canSuperimposed{ false };
+    bool m_compress{ false };
+    bool m_buildMipmaps{ false };
 };
-
-#endif

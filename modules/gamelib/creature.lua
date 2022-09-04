@@ -1,30 +1,5 @@
 -- @docclass Creature
 -- @docconsts @{
-SkullNone = 0
-SkullYellow = 1
-SkullGreen = 2
-SkullWhite = 3
-SkullRed = 4
-SkullBlack = 5
-SkullOrange = 6
-
-ShieldNone = 0
-ShieldWhiteYellow = 1
-ShieldWhiteBlue = 2
-ShieldBlue = 3
-ShieldYellow = 4
-ShieldBlueSharedExp = 5
-ShieldYellowSharedExp = 6
-ShieldBlueNoSharedExpBlink = 7
-ShieldYellowNoSharedExpBlink = 8
-ShieldBlueNoSharedExp = 9
-ShieldYellowNoSharedExp = 10
-
-EmblemNone = 0
-EmblemGreen = 1
-EmblemRed = 2
-EmblemBlue = 3
-
 NpcIconNone = 0
 NpcIconChat = 1
 NpcIconTrade = 2
@@ -36,11 +11,14 @@ CreatureTypeMonster = 1
 CreatureTypeNpc = 2
 CreatureTypeSummonOwn = 3
 CreatureTypeSummonOther = 4
+CreatureTypeHidden = 5
 
 -- @}
 
 function getNextSkullId(skullId)
-    if skullId == SkullRed or skullId == SkullBlack then return SkullBlack end
+    if skullId == SkullRed or skullId == SkullBlack then
+        return SkullBlack
+    end
     return SkullRed
 end
 
@@ -132,25 +110,35 @@ end
 
 function Creature:onSkullChange(skullId)
     local imagePath = getSkullImagePath(skullId)
-    if imagePath then self:setSkullTexture(imagePath) end
+    if imagePath then
+        self:setSkullTexture(imagePath)
+    end
 end
 
 function Creature:onShieldChange(shieldId)
     local imagePath, blink = getShieldImagePathAndBlink(shieldId)
-    if imagePath then self:setShieldTexture(imagePath, blink) end
+    if imagePath then
+        self:setShieldTexture(imagePath, blink)
+    end
 end
 
 function Creature:onEmblemChange(emblemId)
     local imagePath = getEmblemImagePath(emblemId)
-    if imagePath then self:setEmblemTexture(imagePath) end
+    if imagePath then
+        self:setEmblemTexture(imagePath)
+    end
 end
 
 function Creature:onTypeChange(typeId)
     local imagePath = getTypeImagePath(typeId)
-    if imagePath then self:setTypeTexture(imagePath) end
+    if imagePath then
+        self:setTypeTexture(imagePath)
+    end
 end
 
 function Creature:onIconChange(iconId)
     local imagePath = getIconImagePath(iconId)
-    if imagePath then self:setIconTexture(imagePath) end
+    if imagePath then
+        self:setIconTexture(imagePath)
+    end
 end

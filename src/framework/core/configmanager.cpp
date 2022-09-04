@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -110,8 +110,7 @@ ConfigPtr ConfigManager::load(const std::string& file)
 
 bool ConfigManager::unload(const std::string& file)
 {
-    ConfigPtr config = get(file);
-    if (config) {
+    if (ConfigPtr config = get(file); config) {
         config->unload();
         remove(config);
         config = nullptr;

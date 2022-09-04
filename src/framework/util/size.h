@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef SIZE_H
-#define SIZE_H
+#pragma once
 
 #include "../const.h"
 #include "point.h"
@@ -135,5 +134,3 @@ std::istream& operator>>(std::istream& in, TSize<T>& size)
     size.resize(w, h);
     return in;
 }
-
-#endif

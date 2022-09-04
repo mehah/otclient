@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef CREATURES_H
-#define CREATURES_H
+#pragma once
 
 #include <framework/luaengine/luaobject.h>
 #include <framework/xml/tinyxml.h>
@@ -29,36 +28,38 @@
 #include "declarations.h"
 #include "outfit.h"
 
-enum CreatureAttr : uint8
+enum CreatureAttr : uint8_t
 {
     CreatureAttrPosition = 0,
-    CreatureAttrName = 1,
-    CreatureAttrOutfit = 2,
-    CreatureAttrSpawnTime = 3,
-    CreatureAttrDir = 4,
-    CreatureAttrRace = 5
+    CreatureAttrName,
+    CreatureAttrOutfit,
+    CreatureAttrSpawnTime,
+    CreatureAttrDir,
+    CreatureAttrRace,
+    CreatureAttrLast
 };
 
-enum CreatureRace : uint8
+enum CreatureRace : uint8_t
 {
     CreatureRaceNpc = 0,
     CreatureRaceMonster = 1
 };
 
-enum SpawnAttr : uint8
+enum SpawnAttr : uint8_t
 {
     SpawnAttrRadius = 0,
-    SpawnAttrCenter = 1,
+    SpawnAttrCenter,
+    SpawnAttrLast,
 };
 
 class Spawn : public LuaObject
 {
 public:
     Spawn() = default;
-    Spawn(int32 radius) { setRadius(radius); }
+    Spawn(int32_t radius) { setRadius(radius); }
 
-    void setRadius(int32 r) { m_attribs.set(SpawnAttrRadius, r); }
-    int32 getRadius() { return m_attribs.get<int32>(SpawnAttrRadius); }
+    void setRadius(int32_t r) { m_attribs.set(SpawnAttrRadius, r); }
+    int32_t getRadius() { return m_attribs.get<int32_t>(SpawnAttrRadius); }
 
     void setCenterPos(const Position& pos) { m_attribs.set(SpawnAttrCenter, pos); }
     Position getCenterPos() { return m_attribs.get<Position>(SpawnAttrCenter); }
@@ -73,8 +74,8 @@ protected:
     void save(TiXmlElement* node);
 
 private:
-    dynamic_storage<uint8> m_attribs;
-    std::unordered_map<Position, CreatureTypePtr, Position::Hasher> m_creatures;
+    stdext::small_dynamic_storage<SpawnAttr, SpawnAttrLast> m_attribs;
+    CreatureMap m_creatures;
     friend class CreatureManager;
 };
 
@@ -84,8 +85,8 @@ public:
     CreatureType() = default;
     CreatureType(const std::string& name) { setName(name); }
 
-    void setSpawnTime(int32 spawnTime) { m_attribs.set(CreatureAttrSpawnTime, spawnTime); }
-    int32 getSpawnTime() { return m_attribs.get<int32>(CreatureAttrSpawnTime); }
+    void setSpawnTime(int32_t spawnTime) { m_attribs.set(CreatureAttrSpawnTime, spawnTime); }
+    int32_t getSpawnTime() { return m_attribs.get<int32_t>(CreatureAttrSpawnTime); }
 
     void setName(const std::string& name) { m_attribs.set(CreatureAttrName, name); }
     std::string getName() { return m_attribs.get<std::string>(CreatureAttrName); }
@@ -102,7 +103,7 @@ public:
     CreaturePtr cast();
 
 private:
-    dynamic_storage<uint8> m_attribs;
+    stdext::small_dynamic_storage<CreatureAttr, CreatureAttrLast> m_attribs;
 };
 
 class CreatureManager
@@ -135,15 +136,14 @@ public:
     const std::vector<CreatureTypePtr>& getCreatures() { return m_creatures; }
 
 protected:
-    void internalLoadCreatureBuffer(TiXmlElement* attrib, const CreatureTypePtr& m);
+    void internalLoadCreatureBuffer(const TiXmlElement* attrib, const CreatureTypePtr& m);
 
 private:
     std::vector<CreatureTypePtr> m_creatures;
-    std::unordered_map<Position, SpawnPtr, Position::Hasher> m_spawns;
-    bool m_loaded{ false }, m_spawnLoaded{ false };
+    stdext::map<Position, SpawnPtr, Position::Hasher> m_spawns;
+    bool m_loaded{ false };
+    bool m_spawnLoaded{ false };
     CreatureTypePtr m_nullCreature;
 };
 
 extern CreatureManager g_creatures;
-
-#endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef CONNECTION_H
-#define CONNECTION_H
+#pragma once
 
 #include <asio/streambuf.hpp>
 
@@ -31,7 +30,7 @@
 class Connection : public LuaObject
 {
     using ErrorCallback = std::function<void(const std::error_code&)>;
-    using RecvCallback = std::function<void(uint8*, uint16)>;
+    using RecvCallback = std::function<void(uint8_t*, uint16_t)>;
 
     enum
     {
@@ -48,12 +47,12 @@ public:
     static void poll();
     static void terminate();
 
-    void connect(const std::string& host, uint16 port, const std::function<void()>& connectCallback);
+    void connect(const std::string_view host, uint16_t port, const std::function<void()>& connectCallback);
     void close();
 
-    void write(uint8* buffer, size_t size);
-    void read(uint16 bytes, const RecvCallback& callback);
-    void read_until(const std::string& what, const RecvCallback& callback);
+    void write(uint8_t* buffer, size_t size);
+    void read(uint16_t bytes, const RecvCallback& callback);
+    void read_until(const std::string_view what, const RecvCallback& callback);
     void read_some(const RecvCallback& callback);
 
     void setErrorCallback(const ErrorCallback& errorCallback) { m_errorCallback = errorCallback; }
@@ -91,12 +90,10 @@ protected:
     static std::list<std::shared_ptr<asio::streambuf>> m_outputStreams;
     std::shared_ptr<asio::streambuf> m_outputStream;
     asio::streambuf m_inputStream;
-    bool m_connected;
-    bool m_connecting;
+    bool m_connected{ false };
+    bool m_connecting{ false };
     std::error_code m_error;
     stdext::timer m_activityTimer;
 
     friend class Server;
 };
-
-#endif

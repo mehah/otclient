@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@
 
 namespace Proto
 {
-    std::map<uint8, uint8> messageModesMap;
+    stdext::map<uint8_t, uint8_t > messageModesMap;
 
     void buildMessageModesMap(int version)
     {
@@ -194,7 +194,7 @@ namespace Proto
             messageModesMap[Otc::MessageLook] = 25;
             messageModesMap[Otc::MessageFailure] = 26;
             messageModesMap[Otc::MessageBlue] = 27;
-        } else if (version >= 760) {
+        } else if (version >= 740) {
             messageModesMap[Otc::MessageNone] = 0;
             messageModesMap[Otc::MessageSay] = 1;
             messageModesMap[Otc::MessageWhisper] = 2;
@@ -224,20 +224,19 @@ namespace Proto
         }
     }
 
-    Otc::MessageMode translateMessageModeFromServer(uint8 mode)
+    Otc::MessageMode translateMessageModeFromServer(uint8_t mode)
     {
-        const auto it = std::find_if(messageModesMap.begin(), messageModesMap.end(), [=](const std::pair<uint8, uint8>& p) { return p.second == mode; });
+        const auto it = std::find_if(messageModesMap.begin(), messageModesMap.end(), [=](const std::pair<uint8_t, uint8_t >& p) { return p.second == mode; });
         if (it != messageModesMap.end())
             return static_cast<Otc::MessageMode>(it->first);
         return Otc::MessageInvalid;
     }
 
-    uint8 translateMessageModeToServer(Otc::MessageMode mode)
+    uint8_t translateMessageModeToServer(Otc::MessageMode mode)
     {
         if (mode >= Otc::LastMessage)
             return Otc::MessageInvalid;
-        const auto it = messageModesMap.find(mode);
-        if (it != messageModesMap.end())
+        if (const auto it = messageModesMap.find(mode); it != messageModesMap.end())
             return it->second;
         return Otc::MessageInvalid;
     }

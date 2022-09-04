@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,8 +34,8 @@
 #include <openssl/rsa.h>
 #endif
 
-static const std::string base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-static inline bool is_base64(unsigned char c) { return (isalnum(c) || (c == '+') || (c == '/')); }
+static constexpr std::string_view base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+static inline bool is_base64(uint8_t c) { return (isalnum(c) || (c == '+') || (c == '/')); }
 
 Crypt g_crypt;
 
@@ -70,8 +70,8 @@ std::string Crypt::base64Encode(const std::string& decoded_string)
     std::string ret;
     int i = 0;
     int j = 0;
-    uint8 char_array_3[3];
-    uint8 char_array_4[4];
+    uint8_t char_array_3[3];
+    uint8_t char_array_4[4];
     int pos = 0;
     int len = decoded_string.size();
 
@@ -114,7 +114,7 @@ std::string Crypt::base64Decode(const std::string& encoded_string)
     int i = 0;
     int j = 0;
     int in_ = 0;
-    uint8 char_array_4[4], char_array_3[3];
+    uint8_t char_array_4[4], char_array_3[3];
     std::string ret;
 
     while (len-- && (encoded_string[in_] != '=') && is_base64(encoded_string[in_])) {
@@ -172,7 +172,7 @@ std::string Crypt::genUUID()
     std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
     std::mt19937 generator(seq);
 
-    return uuids::to_string(uuids::uuid_random_generator{ generator }());
+    return to_string(uuids::uuid_random_generator{ generator }());
 }
 
 bool Crypt::setMachineUUID(std::string uuidstr)
@@ -201,7 +201,7 @@ std::string Crypt::getMachineUUID()
 
         m_machineUUID = uuids::uuid_random_generator{ generator }();
     }
-    return _encrypt(uuids::to_string(m_machineUUID), false);
+    return _encrypt(to_string(m_machineUUID), false);
 }
 
 std::string Crypt::getCryptKey(bool useMachineUUID)
@@ -219,24 +219,24 @@ std::string Crypt::getCryptKey(bool useMachineUUID)
 
 std::string Crypt::_encrypt(const std::string& decrypted_string, bool useMachineUUID)
 {
-    const uint32 sum = stdext::adler32((const uint8*)decrypted_string.c_str(), decrypted_string.size());
+    const uint32_t sum = stdext::adler32((const uint8_t*)decrypted_string.c_str(), decrypted_string.size());
 
     std::string tmp = "0000" + decrypted_string;
 
-    stdext::writeULE32((uint8*)&tmp[0], sum);
+    stdext::writeULE32((uint8_t*)&tmp[0], sum);
     std::string encrypted = base64Encode(xorCrypt(tmp, getCryptKey(useMachineUUID)));
     return encrypted;
 }
 
 std::string Crypt::_decrypt(const std::string& encrypted_string, bool useMachineUUID)
 {
-    const std::string decoded = base64Decode(encrypted_string);
-    const std::string tmp = xorCrypt(decoded, getCryptKey(useMachineUUID));
+    const auto& decoded = base64Decode(encrypted_string);
+    const auto& tmp = xorCrypt(decoded, getCryptKey(useMachineUUID));
 
     if (tmp.length() >= 4) {
-        const uint32 readsum = stdext::readULE32((const uint8*)tmp.c_str());
+        const uint32_t readsum = stdext::readULE32((const uint8_t*)tmp.c_str());
         std::string decrypted_string = tmp.substr(4);
-        const uint32 sum = stdext::adler32((const uint8*)decrypted_string.c_str(), decrypted_string.size());
+        const uint32_t sum = stdext::adler32((const uint8_t*)decrypted_string.c_str(), decrypted_string.size());
         if (readsum == sum)
             return decrypted_string;
     }
@@ -246,12 +246,12 @@ std::string Crypt::_decrypt(const std::string& encrypted_string, bool useMachine
 void Crypt::rsaSetPublicKey(const std::string& n, const std::string& e)
 {
 #ifdef USE_GMP
-    mpz_set_str(m_n, n.c_str(), 10);
-    mpz_set_str(m_e, e.c_str(), 10);
+    mpz_set_str(m_n, n, 10);
+    mpz_set_str(m_e, e, 10);
 #else
 #if OPENSSL_VERSION_NUMBER < 0x10100005L
-    BN_dec2bn(&m_rsa->n, n.c_str());
-    BN_dec2bn(&m_rsa->e, e.c_str());
+    BN_dec2bn(&m_rsa->n, n);
+    BN_dec2bn(&m_rsa->e, e);
     // clear rsa cache
     if (m_rsa->_method_mod_n) {
         BN_MONT_CTX_free(m_rsa->_method_mod_n);
@@ -269,17 +269,17 @@ void Crypt::rsaSetPublicKey(const std::string& n, const std::string& e)
 void Crypt::rsaSetPrivateKey(const std::string& p, const std::string& q, const std::string& d)
 {
 #ifdef USE_GMP
-    mpz_set_str(m_p, p.c_str(), 10);
-    mpz_set_str(m_q, q.c_str(), 10);
-    mpz_set_str(m_d, d.c_str(), 10);
+    mpz_set_str(m_p, p, 10);
+    mpz_set_str(m_q, q, 10);
+    mpz_set_str(m_d, d, 10);
 
     // n = p * q
-    mpz_mul(n, p, q);
+    mpz_mul(m_n, m_p, m_q);
 #else
 #if OPENSSL_VERSION_NUMBER < 0x10100005L
-    BN_dec2bn(&m_rsa->p, p.c_str());
-    BN_dec2bn(&m_rsa->q, q.c_str());
-    BN_dec2bn(&m_rsa->d, d.c_str());
+    BN_dec2bn(&m_rsa->p, p);
+    BN_dec2bn(&m_rsa->q, q);
+    BN_dec2bn(&m_rsa->d, d);
     // clear rsa cache
     if (m_rsa->_method_mod_p) {
         BN_MONT_CTX_free(m_rsa->_method_mod_p);
@@ -300,7 +300,7 @@ void Crypt::rsaSetPrivateKey(const std::string& p, const std::string& q, const s
 #endif
 }
 
-bool Crypt::rsaEncrypt(unsigned char* msg, int size)
+bool Crypt::rsaEncrypt(uint8_t* msg, int size)
 {
     if (size != rsaGetSize())
         return false;
@@ -327,7 +327,7 @@ bool Crypt::rsaEncrypt(unsigned char* msg, int size)
 #endif
 }
 
-bool Crypt::rsaDecrypt(unsigned char* msg, int size)
+bool Crypt::rsaDecrypt(uint8_t* msg, int size)
 {
     if (size != rsaGetSize())
         return false;

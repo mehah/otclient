@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,13 +23,13 @@
 #include "luaexception.h"
 #include "luainterface.h"
 
-LuaException::LuaException(const std::string& error, int traceLevel)
+LuaException::LuaException(const std::string_view error, int traceLevel)
 {
     g_lua.clearStack(); // on every exception, clear lua stack
     generateLuaErrorMessage(error, traceLevel);
 }
 
-void LuaException::generateLuaErrorMessage(const std::string& error, int traceLevel)
+void LuaException::generateLuaErrorMessage(const std::string_view error, int traceLevel)
 {
     // append trace level to error message
     if (traceLevel >= 0)
@@ -46,8 +46,8 @@ LuaBadNumberOfArgumentsException::LuaBadNumberOfArgumentsException(int expected,
     generateLuaErrorMessage(error, 1);
 }
 
-LuaBadValueCastException::LuaBadValueCastException(const std::string& luaTypeName, const std::string& cppTypeName)
+LuaBadValueCastException::LuaBadValueCastException(const std::string_view luaTypeName, const std::string_view cppTypeName)
 {
-    const std::string error = stdext::format("attempt to cast a '%s' lua value to '%s'", luaTypeName, cppTypeName);
+    const auto& error = stdext::format("attempt to cast a '%s' lua value to '%s'", luaTypeName, cppTypeName);
     generateLuaErrorMessage(error, 0);
 }

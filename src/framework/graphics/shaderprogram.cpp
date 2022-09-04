@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,13 +25,10 @@
 
 #include <framework/core/application.h>
 
-uint ShaderProgram::m_currentProgram = 0;
+uint32_t ShaderProgram::m_currentProgram = 0;
 
-ShaderProgram::ShaderProgram()
+ShaderProgram::ShaderProgram() :m_programId(glCreateProgram())
 {
-    m_linked = false;
-    m_programId = glCreateProgram();
-    m_uniformLocations.fill(-1);
     if (!m_programId)
         g_logger.fatal("Unable to create GL shader program");
 }
@@ -53,7 +50,7 @@ bool ShaderProgram::addShader(const ShaderPtr& shader)
     return true;
 }
 
-bool ShaderProgram::addShaderFromSourceCode(Shader::ShaderType shaderType, const std::string& sourceCode)
+bool ShaderProgram::addShaderFromSourceCode(ShaderType shaderType, const std::string_view sourceCode)
 {
     const ShaderPtr shader(new Shader(shaderType));
     if (!shader->compileSourceCode(sourceCode)) {
@@ -63,7 +60,7 @@ bool ShaderProgram::addShaderFromSourceCode(Shader::ShaderType shaderType, const
     return addShader(shader);
 }
 
-bool ShaderProgram::addShaderFromSourceFile(Shader::ShaderType shaderType, const std::string& sourceFile)
+bool ShaderProgram::addShaderFromSourceFile(ShaderType shaderType, const std::string_view sourceFile)
 {
     const ShaderPtr shader(new Shader(shaderType));
     if (!shader->compileSourceFile(sourceFile)) {

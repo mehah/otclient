@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,14 +26,13 @@
 #include <framework/core/application.h>
 #include <framework/core/resourcemanager.h>
 
-Shader::Shader(ShaderType shaderType)
+Shader::Shader(ShaderType shaderType) : m_shaderType(shaderType)
 {
-    m_shaderType = shaderType;
     switch (shaderType) {
-        case Vertex:
+        case ShaderType::VERTEX:
             m_shaderId = glCreateShader(GL_VERTEX_SHADER);
             break;
-        case Fragment:
+        case ShaderType::FRAGMENT:
             m_shaderId = glCreateShader(GL_FRAGMENT_SHADER);
             break;
     }
@@ -51,24 +50,24 @@ Shader::~Shader()
         glDeleteShader(m_shaderId);
 }
 
-bool Shader::compileSourceCode(const std::string& sourceCode)
+bool Shader::compileSourceCode(const std::string_view sourceCode)
 {
-#ifndef OPENGL_ES
-    static const auto* qualifierDefines =
-        "#define lowp\n"
-        "#define mediump\n"
-        "#define highp\n";
-#else
-    static const char* qualifierDefines =
+#ifdef OPENGL_ES
+    static constexpr std::string_view =
         "#ifndef GL_FRAGMENT_PRECISION_HIGH\n"
         "#define highp mediump\n"
         "#endif\n"
         "precision highp float;\n";
+#else
+    static constexpr std::string_view qualifierDefines =
+        "#define lowp\n"
+        "#define mediump\n"
+        "#define highp\n";
 #endif
 
-    std::string code = qualifierDefines;
+    std::string code = std::string{ qualifierDefines };
     code.append(sourceCode);
-    const char* c_source = code.c_str();
+    const char* c_source = code.data();
     glShaderSource(m_shaderId, 1, &c_source, nullptr);
     glCompileShader(m_shaderId);
 
@@ -77,12 +76,12 @@ bool Shader::compileSourceCode(const std::string& sourceCode)
     return (res == GL_TRUE);
 }
 
-bool Shader::compileSourceFile(const std::string& sourceFile)
+bool Shader::compileSourceFile(const std::string_view sourceFile)
 {
     try {
-        const std::string sourceCode = g_resources.readFileContents(sourceFile);
+        const auto& sourceCode = g_resources.readFileContents(sourceFile.data());
         return compileSourceCode(sourceCode);
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("unable to load shader source form file '%s': %s", sourceFile, e.what()));
     }
     return false;

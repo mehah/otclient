@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -106,7 +106,7 @@ void UIAnchorGroup::addAnchor(const UIAnchorPtr& anchor)
 }
 
 void UIAnchorLayout::addAnchor(const UIWidgetPtr& anchoredWidget, Fw::AnchorEdge anchoredEdge,
-                               const std::string& hookedWidgetId, Fw::AnchorEdge hookedEdge)
+                               const std::string_view hookedWidgetId, Fw::AnchorEdge hookedEdge)
 {
     if (!anchoredWidget)
         return;
@@ -135,13 +135,13 @@ bool UIAnchorLayout::hasAnchors(const UIWidgetPtr& anchoredWidget)
     return m_anchorsGroups.contains(anchoredWidget);
 }
 
-void UIAnchorLayout::centerIn(const UIWidgetPtr& anchoredWidget, const std::string& hookedWidgetId)
+void UIAnchorLayout::centerIn(const UIWidgetPtr& anchoredWidget, const std::string_view hookedWidgetId)
 {
     addAnchor(anchoredWidget, Fw::AnchorHorizontalCenter, hookedWidgetId, Fw::AnchorHorizontalCenter);
     addAnchor(anchoredWidget, Fw::AnchorVerticalCenter, hookedWidgetId, Fw::AnchorVerticalCenter);
 }
 
-void UIAnchorLayout::fill(const UIWidgetPtr& anchoredWidget, const std::string& hookedWidgetId)
+void UIAnchorLayout::fill(const UIWidgetPtr& anchoredWidget, const std::string_view hookedWidgetId)
 {
     addAnchor(anchoredWidget, Fw::AnchorLeft, hookedWidgetId, Fw::AnchorLeft);
     addAnchor(anchoredWidget, Fw::AnchorRight, hookedWidgetId, Fw::AnchorRight);
@@ -161,7 +161,7 @@ void UIAnchorLayout::removeWidget(const UIWidgetPtr& widget)
 
 bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroupPtr& anchorGroup, UIWidgetPtr first)
 {
-    const UIWidgetPtr parentWidget = getParentWidget();
+    const UIWidgetPtr& parentWidget = getParentWidget();
     if (!parentWidget)
         return false;
 
@@ -184,7 +184,7 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
             continue;
 
         // determine hooked widget
-        UIWidgetPtr hookedWidget = anchor->getHookedWidget(widget, parentWidget);
+        const UIWidgetPtr& hookedWidget = anchor->getHookedWidget(widget, parentWidget);
 
         // skip invalid anchors
         if (!hookedWidget)

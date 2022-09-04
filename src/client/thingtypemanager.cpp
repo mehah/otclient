@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,12 +36,12 @@
 #include <client/spriteappearances.h>
 #include <client/spritemanager.h>
 
-#include "framework/protobuf/appearances.pb.h"
+#include "protobuf/appearances.pb.h"
 
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
-using namespace tibia::protobuf;
+using namespace otclient::protobuf;
 
 ThingTypeManager g_things;
 
@@ -74,32 +74,32 @@ void ThingTypeManager::terminate()
 void ThingTypeManager::saveDat(const std::string& fileName)
 {
     if (!m_datLoaded)
-        stdext::throw_exception("failed to save, dat is not loaded");
+        throw Exception("failed to save, dat is not loaded");
 
     try {
         const FileStreamPtr fin = g_resources.createFile(fileName);
         if (!fin)
-            stdext::throw_exception(stdext::format("failed to open file '%s' for write", fileName));
+            throw Exception("failed to open file '%s' for write", fileName);
 
         fin->cache();
 
         fin->addU32(m_datSignature);
 
-        for (auto& m_thingType : m_thingTypes)
+        for (const auto& m_thingType : m_thingTypes)
             fin->addU16(m_thingType.size() - 1);
 
         for (int category = 0; category < ThingLastCategory; ++category) {
-            uint16 firstId = 1;
+            uint16_t firstId = 1;
             if (category == ThingCategoryItem)
                 firstId = 100;
 
-            for (uint16 id = firstId; id < m_thingTypes[category].size(); ++id)
+            for (uint16_t id = firstId; id < m_thingTypes[category].size(); ++id)
                 m_thingTypes[category][id]->serialize(fin);
         }
 
         fin->flush();
         fin->close();
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
     }
 }
@@ -129,9 +129,9 @@ bool ThingTypeManager::loadDat(std::string file)
         }
 
         for (int category = -1; ++category < ThingLastCategory;) {
-            const uint16 firstId = category == ThingCategoryItem ? 100 : 1;
+            const uint16_t firstId = category == ThingCategoryItem ? 100 : 1;
 
-            for (uint16 id = firstId - 1, s = m_thingTypes[category].size(); ++id < s;) {
+            for (uint16_t id = firstId - 1, s = m_thingTypes[category].size(); ++id < s;) {
                 const ThingTypePtr type(new ThingType);
                 type->unserialize(id, static_cast<ThingCategory>(category), fin);
                 m_thingTypes[category][id] = type;
@@ -141,7 +141,7 @@ bool ThingTypeManager::loadDat(std::string file)
         m_datLoaded = true;
         g_lua.callGlobalField("g_things", "onLoadDat", file);
         return true;
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("Failed to read dat '%s': %s'", file, e.what()));
         return false;
     }
@@ -168,15 +168,15 @@ bool ThingTypeManager::loadOtml(std::string file)
             }
 
             for (const OTMLNodePtr& node2 : node->children()) {
-                const auto id = stdext::safe_cast<uint16>(node2->tag());
-                ThingTypePtr type = getThingType(id, category);
+                const auto id = stdext::safe_cast<uint16_t>(node2->tag());
+                const auto& type = getThingType(id, category);
                 if (!type)
                     throw OTMLException(node2, "thing not found");
                 type->unserializeOtml(node2);
             }
         }
         return true;
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to read dat otml '%s': %s'", file, e.what()));
         return false;
     }
@@ -188,22 +188,20 @@ void ThingTypeManager::loadOtb(const std::string& file)
         const FileStreamPtr fin = g_resources.openFile(file);
         fin->cache();
 
-        uint signature = fin->getU32();
+        uint32_t signature = fin->getU32();
         if (signature != 0)
-            stdext::throw_exception("invalid otb file");
+            throw Exception("invalid otb file");
 
         const BinaryTreePtr root = fin->getBinaryTree();
         root->skip(1); // otb first byte is always 0
 
         signature = root->getU32();
         if (signature != 0)
-            stdext::throw_exception("invalid otb file");
+            throw Exception("invalid otb file");
 
-        const uint8 rootAttr = root->getU8();
-        if (rootAttr == 0x01) { // OTB_ROOT_ATTR_VERSION
-            const uint16 size = root->getU16();
-            if (size != 4 + 4 + 4 + 128)
-                stdext::throw_exception("invalid otb root attr version size");
+        if (const uint8_t rootAttr = root->getU8(); rootAttr == 0x01) { // OTB_ROOT_ATTR_VERSION
+            if (const uint16_t size = root->getU16(); size != 4 + 4 + 4 + 128)
+                throw Exception("invalid otb root attr version size");
 
             m_otbMajorVersion = root->getU32();
             m_otbMinorVersion = root->getU32();
@@ -221,7 +219,7 @@ void ThingTypeManager::loadOtb(const std::string& file)
             itemType->unserialize(node);
             addItemType(itemType);
 
-            const uint16 clientId = itemType->getClientId();
+            const uint16_t clientId = itemType->getClientId();
             if (unlikely(clientId >= m_reverseItemTypes.size()))
                 m_reverseItemTypes.resize(clientId + 1);
             m_reverseItemTypes[clientId] = itemType;
@@ -229,7 +227,7 @@ void ThingTypeManager::loadOtb(const std::string& file)
 
         m_otbLoaded = true;
         g_lua.callGlobalField("g_things", "onLoadOtb", file);
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to load '%s' (OTB file): %s", file, e.what()));
     }
 }
@@ -238,36 +236,36 @@ void ThingTypeManager::loadXml(const std::string& file)
 {
     try {
         if (!isOtbLoaded())
-            stdext::throw_exception("OTB must be loaded before XML");
+            throw Exception("OTB must be loaded before XML");
 
         TiXmlDocument doc;
         doc.Parse(g_resources.readFileContents(file).c_str());
         if (doc.Error())
-            stdext::throw_exception(stdext::format("failed to parse '%s': '%s'", file, doc.ErrorDesc()));
+            throw Exception("failed to parse '%s': '%s'", file, doc.ErrorDesc());
 
         TiXmlElement* root = doc.FirstChildElement();
         if (!root || root->ValueTStr() != "items")
-            stdext::throw_exception("invalid root tag name");
+            throw Exception("invalid root tag name");
 
         for (TiXmlElement* element = root->FirstChildElement(); element; element = element->NextSiblingElement()) {
             if (unlikely(element->ValueTStr() != "item"))
                 continue;
 
-            const auto id = element->readType<uint16>("id");
+            const auto id = element->readType<uint16_t>("id");
             if (id != 0) {
                 std::vector<std::string> s_ids = stdext::split(element->Attribute("id"), ";");
                 for (const std::string& s : s_ids) {
-                    std::vector<int32> ids = stdext::split<int32>(s, "-");
+                    std::vector<int32_t> ids = stdext::split<int32_t>(s, "-");
                     if (ids.size() > 1) {
-                        int32 i = ids[0];
+                        int32_t i = ids[0];
                         while (i <= ids[1])
                             parseItemType(++i, element);
                     } else
                         parseItemType(atoi(s.c_str()), element);
                 }
             } else {
-                std::vector<int32> begin = stdext::split<int32>(element->Attribute("fromid"), ";");
-                std::vector<int32> end = stdext::split<int32>(element->Attribute("toid"), ";");
+                std::vector<int32_t> begin = stdext::split<int32_t>(element->Attribute("fromid"), ";");
+                std::vector<int32_t> end = stdext::split<int32_t>(element->Attribute("toid"), ";");
                 if (begin[0] && begin.size() == end.size()) {
                     const size_t size = begin.size();
                     for (size_t i = 0; i < size; ++i)
@@ -280,7 +278,7 @@ void ThingTypeManager::loadXml(const std::string& file)
         doc.Clear();
         m_xmlLoaded = true;
         g_logger.debug("items.xml read successfully.");
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to load '%s' (XML file): %s", file, e.what()));
     }
 }
@@ -299,7 +297,7 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
             } else if (type == "sprite") {
                 int lastSpriteId = obj["lastspriteid"].get<int>();
                 g_spriteAppearances.addSpriteSheet(SpriteSheetPtr(new SpriteSheet(obj["firstspriteid"].get<int>(), lastSpriteId, static_cast<SpriteLayout>(obj["spritetype"].get<int>()), obj["file"].get<std::string>())));
-                spritesCount = std::max(spritesCount, lastSpriteId);
+                spritesCount = std::max<int>(spritesCount, lastSpriteId);
             }
         }
 
@@ -333,20 +331,20 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
 
             for (const auto& appearance : *appearances) {
                 const ThingTypePtr type(new ThingType);
-                const uint16 id = appearance.id();
+                const uint16_t id = appearance.id();
                 type->unserializeAppearance(id, static_cast<ThingCategory>(category), appearance);
                 m_thingTypes[category][id] = type;
             }
         }
         m_datLoaded = true;
         return true;
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to load '%s' (Appearances): %s", file, e.what()));
         return false;
     }
 }
 
-void ThingTypeManager::parseItemType(uint16 serverId, TiXmlElement* elem)
+void ThingTypeManager::parseItemType(uint16_t serverId, TiXmlElement* elem)
 {
     ItemTypePtr itemType = nullptr;
 
@@ -404,13 +402,13 @@ void ThingTypeManager::parseItemType(uint16 serverId, TiXmlElement* elem)
 
 void ThingTypeManager::addItemType(const ItemTypePtr& itemType)
 {
-    const uint16 id = itemType->getServerId();
+    const uint16_t id = itemType->getServerId();
     if (unlikely(id >= m_itemTypes.size()))
         m_itemTypes.resize(id + 1, m_nullItemType);
     m_itemTypes[id] = itemType;
 }
 
-const ItemTypePtr& ThingTypeManager::findItemTypeByClientId(uint16 id)
+const ItemTypePtr& ThingTypeManager::findItemTypeByClientId(uint16_t id)
 {
     if (id == 0 || id >= m_reverseItemTypes.size())
         return m_nullItemType;
@@ -446,7 +444,7 @@ ItemTypeList ThingTypeManager::findItemTypesByString(const std::string& name)
     return ret;
 }
 
-const ThingTypePtr& ThingTypeManager::getThingType(uint16 id, ThingCategory category)
+const ThingTypePtr& ThingTypeManager::getThingType(uint16_t id, ThingCategory category)
 {
     if (category >= ThingLastCategory || id >= m_thingTypes[category].size()) {
         g_logger.error(stdext::format("invalid thing type client id %d in category %d", id, category));
@@ -455,7 +453,7 @@ const ThingTypePtr& ThingTypeManager::getThingType(uint16 id, ThingCategory cate
     return m_thingTypes[category][id];
 }
 
-const ItemTypePtr& ThingTypeManager::getItemType(uint16 id)
+const ItemTypePtr& ThingTypeManager::getItemType(uint16_t id)
 {
     if (id >= m_itemTypes.size() || m_itemTypes[id] == m_nullItemType) {
         g_logger.error(stdext::format("invalid thing type, server id: %d", id));
@@ -467,7 +465,7 @@ const ItemTypePtr& ThingTypeManager::getItemType(uint16 id)
 ThingTypeList ThingTypeManager::findThingTypeByAttr(ThingAttr attr, ThingCategory category)
 {
     ThingTypeList ret;
-    for (const ThingTypePtr& type : m_thingTypes[category])
+    for (const auto& type : m_thingTypes[category])
         if (type->hasAttr(attr))
             ret.push_back(type);
     return ret;
@@ -484,10 +482,10 @@ ItemTypeList ThingTypeManager::findItemTypeByCategory(ItemCategory category)
 
 const ThingTypeList& ThingTypeManager::getThingTypes(ThingCategory category)
 {
-    ThingTypeList ret;
-    if (category >= ThingLastCategory)
-        stdext::throw_exception(stdext::format("invalid thing type category %d", category));
-    return m_thingTypes[category];
+    if (category < ThingLastCategory)
+        return m_thingTypes[category];
+
+    throw Exception("invalid thing type category %d", category);
 }
 
 /* vim: set ts=4 sw=4 et: */

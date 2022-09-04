@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef OUTFIT_H
-#define OUTFIT_H
+#pragma once
 
 #include "thingtypemanager.h"
 #include <framework/util/color.h>
@@ -83,8 +82,16 @@ public:
 
 private:
     ThingCategory m_category{ ThingCategoryCreature };
-    int m_id{ 1 }, m_auxId{ 0 }, m_head{ 0 }, m_body{ 0 }, m_legs{ 0 }, m_feet{ 0 }, m_addons{ 0 }, m_mount{ 0 };
-    Color m_headColor, m_bodyColor, m_legsColor, m_feetColor;
+    int m_id{ 1 };
+    int m_auxId{ 0 };
+    int m_head{ 0 };
+    int m_body{ 0 };
+    int m_legs{ 0 };
+    int m_feet{ 0 };
+    int m_addons{ 0 };
+    int m_mount{ 0 };
+    Color m_headColor;
+    Color m_bodyColor;
+    Color m_legsColor;
+    Color m_feetColor;
 };
-
-#endif

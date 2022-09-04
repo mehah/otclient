@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef FILESTREAM_H
-#define FILESTREAM_H
+#pragma once
 
 #include "declarations.h"
 #include <framework/core/resourcemanager.h>
@@ -36,44 +35,44 @@ class FileStream : public LuaObject
 {
 public:
     FileStream(std::string name, PHYSFS_File* fileHandle, bool writeable);
-    FileStream(std::string name, const std::string& buffer);
+    FileStream(std::string name, const std::string_view buffer);
     ~FileStream() override;
 
     void cache();
     void close();
     void flush();
-    void write(const void* buffer, uint count);
-    int read(void* buffer, uint size, uint nmemb = 1);
-    void seek(uint pos);
-    void skip(uint len);
-    uint size();
-    uint tell();
+    void write(const void* buffer, uint32_t count);
+    int read(void* buffer, uint32_t size, uint32_t nmemb = 1);
+    void seek(uint32_t pos);
+    void skip(uint32_t len);
+    uint32_t size();
+    uint32_t tell();
     bool eof();
     std::string name() { return m_name; }
 
-    uint8 getU8();
-    uint16 getU16();
-    uint32 getU32();
-    uint64 getU64();
-    int8 get8();
-    int16 get16();
-    int32 get32();
-    int64 get64();
+    uint8_t getU8();
+    uint16_t getU16();
+    uint32_t getU32();
+    uint64_t getU64();
+    int8_t get8();
+    int16_t get16();
+    int32_t get32();
+    int64_t get64();
     std::string getString();
     BinaryTreePtr getBinaryTree();
 
-    void startNode(uint8 n);
+    void startNode(uint8_t n);
     void endNode();
-    void addU8(uint8 v);
-    void addU16(uint16 v);
-    void addU32(uint32 v);
-    void addU64(uint64 v);
-    void add8(int8 v);
-    void add16(int16 v);
-    void add32(int32 v);
-    void add64(int64 v);
-    void addString(const std::string& v);
-    void addPos(uint16 x, uint16 y, uint8 z) { addU16(x); addU16(y); addU8(z); }
+    void addU8(uint8_t v);
+    void addU16(uint16_t v);
+    void addU32(uint32_t v);
+    void addU64(uint64_t v);
+    void add8(int8_t v);
+    void add16(int16_t v);
+    void add32(int32_t v);
+    void add64(int64_t v);
+    void addString(const std::string_view v);
+    void addPos(uint16_t x, uint16_t y, uint8_t z) { addU16(x); addU16(y); addU8(z); }
     void addPoint(const Point& p) { addU8(p.x); addU8(p.y); }
 
     FileStreamPtr asFileStream() { return static_self_cast<FileStream>(); }
@@ -81,14 +80,11 @@ public:
     DataBuffer<uint8_t> m_data;
 
 private:
-    void checkWrite();
-    void throwError(const std::string& message, bool physfsError = false);
+    void throwError(const std::string_view message, bool physfsError = false);
 
     std::string m_name;
     PHYSFS_File* m_fileHandle;
-    uint m_pos;
+    uint32_t m_pos;
     bool m_writeable;
     bool m_caching;
 };
-
-#endif

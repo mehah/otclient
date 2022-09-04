@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,14 +20,13 @@
  * THE SOFTWARE.
  */
 
-#ifndef UIMANAGER_H
-#define UIMANAGER_H
+#pragma once
 
 #include "declarations.h"
 #include <framework/core/inputevent.h>
 #include <framework/otml/declarations.h>
 
-//@bindsingleton g_ui
+ //@bindsingleton g_ui
 class UIManager
 {
 public:
@@ -38,19 +37,19 @@ public:
     void resize(const Size& size);
     void inputEvent(const InputEvent& event);
 
-    void updatePressedWidget(const UIWidgetPtr& newPressedWidget, const Point& clickedPos = Point(), bool fireClicks = true);
-    bool updateDraggingWidget(const UIWidgetPtr& draggingWidget, const Point& clickedPos = Point());
+    void updatePressedWidget(const UIWidgetPtr& newPressedWidget, const Point& clickedPos = {}, bool fireClicks = true);
+    bool updateDraggingWidget(const UIWidgetPtr& draggingWidget, const Point& clickedPos = {});
     void updateHoveredWidget(bool now = false);
 
     void clearStyles();
-    bool importStyle(std::string file);
+    bool importStyle(const std::string& file);
     void importStyleFromOTML(const OTMLNodePtr& styleNode);
-    OTMLNodePtr getStyle(const std::string& styleName);
-    std::string getStyleClass(const std::string& styleName);
+    OTMLNodePtr getStyle(const std::string_view styleName);
+    std::string getStyleClass(const std::string_view styleName);
 
-    UIWidgetPtr loadUI(std::string file, const UIWidgetPtr& parent);
+    UIWidgetPtr loadUI(const std::string& file, const UIWidgetPtr& parent);
     UIWidgetPtr displayUI(const std::string& file) { return loadUI(file, m_rootWidget); }
-    UIWidgetPtr createWidget(const std::string& styleName, const UIWidgetPtr& parent);
+    UIWidgetPtr createWidget(const std::string_view styleName, const UIWidgetPtr& parent);
     UIWidgetPtr createWidgetFromOTML(const OTMLNodePtr& widgetNode, const UIWidgetPtr& parent);
 
     void setMouseReceiver(const UIWidgetPtr& widget) { m_mouseReceiver = widget; }
@@ -83,13 +82,11 @@ private:
     UIWidgetPtr m_draggingWidget;
     UIWidgetPtr m_hoveredWidget;
     UIWidgetPtr m_pressedWidget;
-    bool m_hoverUpdateScheduled{ false },
-        m_drawDebugBoxes{ false };
-    std::unordered_map<std::string, OTMLNodePtr> m_styles;
+    bool m_hoverUpdateScheduled{ false };
+    bool m_drawDebugBoxes{ false };
+    stdext::map<std::string, OTMLNodePtr> m_styles;
     UIWidgetList m_destroyedWidgets;
     ScheduledEventPtr m_checkEvent;
 };
 
 extern UIManager g_ui;
-
-#endif

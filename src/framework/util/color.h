@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,25 +20,23 @@
  * THE SOFTWARE.
  */
 
-#ifndef COLOR_H
-#define COLOR_H
+#pragma once
 
 #include "../stdext/cast.h"
 #include "../stdext/string.h"
 #include "../stdext/types.h"
-#include <iomanip>
 
 class Color
 {
 public:
     Color() = default;
-    Color(const std::string& coltext);
-    Color(const uint32 rgba) { setRGBA(rgba); }
-    Color(const int r, const int g, const int b, const int a = 0xFF) : m_r(r / 255.f), m_g(g / 255.f), m_b(b / 255.f), m_a(a / 255.f) {}
-    Color(const float r, const float g, const float b, const float a = 1.0f) : m_r(r), m_g(g), m_b(b), m_a(a) {}
-    Color(const uint8 r, const uint8 g, const uint8 b, const uint8 a = 0xFF) : m_r(r / 255.f), m_g(g / 255.f), m_b(b / 255.f), m_a(a / 255.f) {}
+    Color(const std::string_view coltext);
+    Color(const uint32_t rgba) { setRGBA(rgba); }
+    Color(const int r, const int g, const int b, const int a = 0xFF) : m_r(r / 255.f), m_g(g / 255.f), m_b(b / 255.f), m_a(a / 255.f) { update(); }
+    Color(const float r, const float g, const float b, const float a = 1.0f) : m_r(r), m_g(g), m_b(b), m_a(a) { update(); }
+    Color(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a = 0xFF) : m_r(r / 255.f), m_g(g / 255.f), m_b(b / 255.f), m_a(a / 255.f) { update(); }
 
-    Color(const uint8 byteColor, const uint8 intensity, const float formule = 0.5f)
+    Color(const uint8_t byteColor, const uint8_t intensity, const float formule = 0.5f)
     {
         const float brightness = formule + (intensity / 8.f) * formule;
         const Color colorMap = from8bit(byteColor);
@@ -47,34 +45,35 @@ public:
         m_b = colorMap.bF() * brightness;
         m_g = colorMap.gF() * brightness;
         m_r = colorMap.rF() * brightness;
+        update();
     }
 
     Color(const Color& color) = default;
 
-    uint8 a() const { return static_cast<uint8>(m_a * 255.f); }
-    uint8 b() const { return static_cast<uint8>(m_b * 255.f); }
-    uint8 g() const { return static_cast<uint8>(m_g * 255.f); }
-    uint8 r() const { return static_cast<uint8>(m_r * 255.f); }
+    uint8_t a() const { return static_cast<uint8_t>(m_a * 255.f); }
+    uint8_t b() const { return static_cast<uint8_t>(m_b * 255.f); }
+    uint8_t g() const { return static_cast<uint8_t>(m_g * 255.f); }
+    uint8_t r() const { return static_cast<uint8_t>(m_r * 255.f); }
 
     float aF() const { return m_a; }
     float bF() const { return m_b; }
     float gF() const { return m_g; }
     float rF() const { return m_r; }
 
-    uint32 rgba() const { return static_cast<uint32>(a() | b() << 8 | g() << 16 | r() << 24); }
+    uint32_t rgba() const { return m_rgba; }
 
-    void setRed(const int r) { m_r = static_cast<uint8>(r) / 255.f; }
-    void setGreen(const int g) { m_g = static_cast<uint8>(g) / 255.f; }
-    void setBlue(const int b) { m_b = static_cast<uint8>(b) / 255.f; }
-    void setAlpha(const int a) { m_a = static_cast<uint8>(a) / 255.f; }
+    void setRed(const int r) { m_r = static_cast<uint8_t>(r) / 255.f; update(); }
+    void setGreen(const int g) { m_g = static_cast<uint8_t>(g) / 255.f; update(); }
+    void setBlue(const int b) { m_b = static_cast<uint8_t>(b) / 255.f; update(); }
+    void setAlpha(const int a) { m_a = static_cast<uint8_t>(a) / 255.f; update(); }
 
-    void setRed(const float r) { m_r = r; }
-    void setGreen(const float g) { m_g = g; }
-    void setBlue(const float b) { m_b = b; }
-    void setAlpha(const float a) { m_a = a; }
+    void setRed(const float r) { m_r = r; update(); }
+    void setGreen(const float g) { m_g = g; update(); }
+    void setBlue(const float b) { m_b = b; update(); }
+    void setAlpha(const float a) { m_a = a; update(); }
 
-    void setRGBA(const uint8 r, const uint8 g, const uint8 b, const uint8 a = 0xFF) { m_r = r / 255.f; m_g = g / 255.f; m_b = b / 255.f; m_a = a / 255.f; }
-    void setRGBA(const uint32 rgba) { setRGBA((rgba >> 0) & 0xff, (rgba >> 8) & 0xff, (rgba >> 16) & 0xff, (rgba >> 24) & 0xff); }
+    void setRGBA(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a = 0xFF) { m_r = r / 255.f; m_g = g / 255.f; m_b = b / 255.f; m_a = a / 255.f; update(); }
+    void setRGBA(const uint32_t rgba) { setRGBA((rgba >> 0) & 0xff, (rgba >> 8) & 0xff, (rgba >> 16) & 0xff, (rgba >> 24) & 0xff); }
 
     Color operator+(const Color& other) const { return Color(m_r + other.m_r, m_g + other.m_g, m_b + other.m_b, m_a + other.m_a); }
     Color operator-(const Color& other) const { return Color(m_r - other.m_r, m_g - other.m_g, m_b - other.m_b, m_a - other.m_a); }
@@ -94,11 +93,12 @@ public:
         m_r *= (1 - color.m_a) + color.m_r * color.m_a;
         m_g *= (1 - color.m_a) + color.m_g * color.m_a;
         m_b *= (1 - color.m_a) + color.m_b * color.m_a;
+        update();
     }
 
-    static uint8 to8bit(const Color& color)
+    static uint8_t to8bit(const Color& color)
     {
-        uint8 c = 0;
+        uint8_t c = 0;
         c += (color.r() / 51) * 36;
         c += (color.g() / 51) * 6;
         c += (color.b() / 51);
@@ -111,10 +111,9 @@ public:
         if (color >= 216 || color <= 0)
             return Color(0, 0, 0);
 
-        const int
-            r = static_cast<int>((color / 36 % 6 * 51) * brightness),
-            g = static_cast<int>((color / 6 % 6 * 51) * brightness),
-            b = static_cast<int>((color % 6 * 51) * brightness);
+        const int r = static_cast<int>((color / 36 % 6 * 51) * brightness);
+        const int g = static_cast<int>((color / 6 % 6 * 51) * brightness);
+        const int b = static_cast<int>((color % 6 * 51) * brightness);
 
         return Color(r, g, b);
     }
@@ -127,88 +126,15 @@ public:
         lightGray, orange;
 
 private:
-    float m_r{ 1.f },
-        m_g{ 1.f },
-        m_b{ 1.f },
-        m_a{ 1.f };
+    void update();
+
+    float m_r{ 1.f };
+    float m_g{ 1.f };
+    float m_b{ 1.f };
+    float m_a{ 1.f };
+
+    uint32_t m_rgba{ UINT32_MAX };
 };
 
-inline std::ostream& operator<<(std::ostream& out, const Color& color)
-{
-    return out << '#'
-        << std::hex << std::setfill('0')
-        << std::setw(2) << static_cast<int>(color.r())
-        << std::setw(2) << static_cast<int>(color.g())
-        << std::setw(2) << static_cast<int>(color.b())
-        << std::setw(2) << static_cast<int>(color.a())
-        << std::dec << std::setfill(' ');
-}
-
-inline std::istream& operator>>(std::istream& in, Color& color)
-{
-    std::string tmp;
-
-    if (in.peek() == '#') {
-        in.ignore() >> tmp;
-
-        if (tmp.length() == 6 || tmp.length() == 8) {
-            color.setRed(static_cast<uint8>(stdext::hex_to_dec(tmp.substr(0, 2))));
-            color.setGreen(static_cast<uint8>(stdext::hex_to_dec(tmp.substr(2, 2))));
-            color.setBlue(static_cast<uint8>(stdext::hex_to_dec(tmp.substr(4, 2))));
-            if (tmp.length() == 8)
-                color.setAlpha(static_cast<uint8>(stdext::hex_to_dec(tmp.substr(6, 2))));
-            else
-                color.setAlpha(255);
-        } else {
-            in.seekg(0 - tmp.length() - 1, std::ios_base::cur);
-        }
-    } else {
-        in >> tmp;
-
-        if (tmp == "alpha") {
-            color = Color::alpha;
-        } else if (tmp == "black") {
-            color = Color::black;
-        } else if (tmp == "white") {
-            color = Color::white;
-        } else if (tmp == "red") {
-            color = Color::red;
-        } else if (tmp == "darkRed") {
-            color = Color::darkRed;
-        } else if (tmp == "green") {
-            color = Color::green;
-        } else if (tmp == "darkGreen") {
-            color = Color::darkGreen;
-        } else if (tmp == "blue") {
-            color = Color::blue;
-        } else if (tmp == "darkBlue") {
-            color = Color::darkBlue;
-        } else if (tmp == "pink") {
-            color = Color::pink;
-        } else if (tmp == "darkPink") {
-            color = Color::darkPink;
-        } else if (tmp == "yellow") {
-            color = Color::yellow;
-        } else if (tmp == "darkYellow") {
-            color = Color::darkYellow;
-        } else if (tmp == "teal") {
-            color = Color::teal;
-        } else if (tmp == "darkTeal") {
-            color = Color::darkTeal;
-        } else if (tmp == "gray") {
-            color = Color::gray;
-        } else if (tmp == "darkGray") {
-            color = Color::darkGray;
-        } else if (tmp == "lightGray") {
-            color = Color::lightGray;
-        } else if (tmp == "orange") {
-            color = Color::orange;
-        } else {
-            in.seekg(0 - tmp.length(), std::ios_base::cur);
-        }
-    }
-
-    return in;
-}
-
-#endif
+std::ostream& operator<<(std::ostream& out, const Color& color);
+std::istream& operator>>(std::istream& in, Color& color);

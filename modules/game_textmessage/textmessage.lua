@@ -1,8 +1,17 @@
 MessageSettings = {
     none = {},
-    consoleRed = {color = TextColors.red, consoleTab = 'Default'},
-    consoleOrange = {color = TextColors.orange, consoleTab = 'Default'},
-    consoleBlue = {color = TextColors.blue, consoleTab = 'Default'},
+    consoleRed = {
+        color = TextColors.red,
+        consoleTab = 'Default'
+    },
+    consoleOrange = {
+        color = TextColors.orange,
+        consoleTab = 'Default'
+    },
+    consoleBlue = {
+        color = TextColors.blue,
+        consoleTab = 'Default'
+    },
     centerRed = {
         color = TextColors.red,
         consoleTab = 'Server Log',
@@ -32,8 +41,14 @@ MessageSettings = {
         screenTarget = 'statusLabel',
         consoleOption = 'showStatusMessagesInConsole'
     },
-    statusSmall = {color = TextColors.white, screenTarget = 'statusLabel'},
-    private = {color = TextColors.lightblue, screenTarget = 'privateLabel'}
+    statusSmall = {
+        color = TextColors.white,
+        screenTarget = 'statusLabel'
+    },
+    private = {
+        color = TextColors.lightblue,
+        screenTarget = 'privateLabel'
+    }
 }
 
 MessageTypes = {
@@ -88,8 +103,7 @@ function init()
     end
 
     connect(g_game, 'onGameEnd', clearMessages)
-    messagesPanel = g_ui.loadUI('textmessage',
-                                modules.game_interface.getRootPanel())
+    messagesPanel = g_ui.loadUI('textmessage', modules.game_interface.getRootPanel())
 end
 
 function terminate()
@@ -103,18 +117,26 @@ function terminate()
     messagesPanel = nil
 end
 
-function calculateVisibleTime(text) return math.max(#text * 100, 4000) end
+function calculateVisibleTime(text)
+    return math.max(#text * 100, 4000)
+end
 
 function displayMessage(mode, text)
-    if not g_game.isOnline() then return end
+    if not g_game.isOnline() then
+        return
+    end
 
     local msgtype = MessageTypes[mode]
-    if not msgtype then return end
+    if not msgtype then
+        return
+    end
 
-    if msgtype == MessageSettings.none then return end
+    if msgtype == MessageSettings.none then
+        return
+    end
 
-    if msgtype.consoleTab ~= nil and (msgtype.consoleOption == nil or
-        modules.client_options.getOption(msgtype.consoleOption)) then
+    if msgtype.consoleTab ~= nil and
+        (msgtype.consoleOption == nil or modules.client_options.getOption(msgtype.consoleOption)) then
         modules.game_console.addText(text, msgtype, tr(msgtype.consoleTab))
         -- TODO move to game_console
     end
@@ -131,15 +153,25 @@ function displayMessage(mode, text)
     end
 end
 
-function displayPrivateMessage(text) displayMessage(254, text) end
+function displayPrivateMessage(text)
+    displayMessage(254, text)
+end
 
-function displayStatusMessage(text) displayMessage(MessageModes.Status, text) end
+function displayStatusMessage(text)
+    displayMessage(MessageModes.Status, text)
+end
 
-function displayFailureMessage(text) displayMessage(MessageModes.Failure, text) end
+function displayFailureMessage(text)
+    displayMessage(MessageModes.Failure, text)
+end
 
-function displayGameMessage(text) displayMessage(MessageModes.Game, text) end
+function displayGameMessage(text)
+    displayMessage(MessageModes.Game, text)
+end
 
-function displayBroadcastMessage(text) displayMessage(MessageModes.Warning, text) end
+function displayBroadcastMessage(text)
+    displayMessage(MessageModes.Warning, text)
+end
 
 function clearMessages()
     for _i, child in pairs(messagesPanel:recursiveGetChildren()) do

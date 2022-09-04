@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef APPLICATION_H
-#define APPLICATION_H
+#pragma once
 
 #include <framework/global.h>
 
@@ -29,7 +28,6 @@
 class Application
 {
 public:
-    Application();
     virtual ~Application() = default;
 
     virtual void init(std::vector<std::string>& args);
@@ -40,19 +38,21 @@ public:
     virtual void exit();
     virtual void close();
 
-    void setName(const std::string& name) { m_appName = name; }
-    void setCompactName(const std::string& compactName) { m_appCompactName = compactName; }
+    void setName(const std::string_view name) { m_appName = name; }
+    void setCompactName(const std::string_view name) { m_appCompactName = name; }
+    void setOrganizationName(const std::string_view name) { m_organizationName = name; }
 
     bool isRunning() { return m_running; }
     bool isStopping() { return m_stopping; }
     bool isTerminated() { return m_terminated; }
     const std::string& getName() { return m_appName; }
     const std::string& getCompactName() { return m_appCompactName; }
+    const std::string& getOrganizationName() { return m_organizationName; }
     std::string getVersion();
 
     std::string getCharset() { return m_charset; }
     std::string getBuildCompiler() { return BUILD_COMPILER; }
-    std::string getBuildDate() { return std::string(__DATE__); }
+    std::string getBuildDate() { return std::string{ __DATE__ }; }
     std::string getBuildType() { return BUILD_TYPE; }
     std::string getBuildArch() { return BUILD_ARCH; }
     std::string getBuildRevision();
@@ -63,19 +63,15 @@ public:
 protected:
     void registerLuaFunctions();
 
-    std::string m_charset;
-    std::string m_appName;
-    std::string m_appCompactName;
+    std::string m_charset{ "cp1252" };
+    std::string m_organizationName{ "org" };
+    std::string m_appName{ "application" };
+    std::string m_appCompactName{ "app" };
     std::string m_startupOptions;
-    bool m_running{ false },
-        m_stopping{ false },
-        m_terminated{ false };
+
+    bool m_running{ false };
+    bool m_stopping{ false };
+    bool m_terminated{ false };
 };
 
-#ifdef FW_GRAPHICS
 #include "graphicalapplication.h"
-#else
-#include "consoleapplication.h"
-#endif
-
-#endif

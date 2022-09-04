@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef GRAPHICALAPPLICATION_H
-#define GRAPHICALAPPLICATION_H
+#pragma once
 
 #include <framework/core/adaptativeframecounter.h>
 #include <framework/core/inputevent.h>
@@ -32,12 +31,6 @@
 
 class GraphicalApplication : public Application
 {
-    enum
-    {
-        POLL_CYCLE_DELAY = 10,
-        FOREGROUND_REFRESH_TIME = 1000 / 20 // 20 FPS (50ms)
-    };
-
 public:
     void init(std::vector<std::string>& args) override;
     void deinit() override;
@@ -45,8 +38,6 @@ public:
     void run() override;
     void poll() override;
     void close() override;
-
-    void repaint() { m_mustRepaint = true; }
 
     void setMaxFps(int maxFps) { m_frameCounter.setMaxFps(maxFps); }
 
@@ -63,35 +54,22 @@ public:
     void setDrawEffectOnTop(const bool draw) { m_drawEffectOnTop = draw; }
     bool isDrawingEffectsOnTop() { return m_drawEffectOnTop || canOptimize(); }
 
+    void repaint();
+
 protected:
     void resize(const Size& size);
     void inputEvent(const InputEvent& event);
 
 private:
-    bool foregroundCanUpdate()
-    {
-        if (m_mustRepaint || m_foregroundRefreshTime.ticksElapsed() >= FOREGROUND_REFRESH_TIME) {
-            m_foregroundRefreshTime.restart();
-            m_mustRepaint = false;
-            return true;
-        }
-
-        return false;
-    }
-
-    bool m_onInputEvent{ false },
-        m_mustRepaint{ false },
-        m_optimize{ true },
-        m_forceEffectOptimization{ false },
-        m_drawEffectOnTop{ false };
+    bool m_onInputEvent{ false };
+    bool m_optimize{ true };
+    bool m_forceEffectOptimization{ false };
+    bool m_drawEffectOnTop{ false };
+    bool m_repaint{ true };
 
     Timer m_foregroundRefreshTime;
 
     AdaptativeFrameCounter m_frameCounter;
-
-    PoolFramedPtr m_foregroundFramed;
 };
 
 extern GraphicalApplication g_app;
-
-#endif

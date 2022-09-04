@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef STDEXT_FORMAT_H
-#define STDEXT_FORMAT_H
+#pragma once
 
 #include "traits.h"
 
@@ -36,7 +35,7 @@
 
 namespace stdext
 {
-    template<class T> void print_ostream(std::ostringstream& stream, const T& last) { stream << last; }
+    template<class T> void print_ostream(const std::ostringstream& stream, const T& last) { stream << last; }
     template<class T, class... Args>
     void print_ostream(std::ostringstream& stream, const T& first, const Args&... rest) { stream << "\t" << first; print_ostream(stream, rest...); }
     template<class... T>
@@ -45,12 +44,12 @@ namespace stdext
     void print(const T&... args) { std::ostringstream buf; print_ostream(buf, args...); std::cout << buf.str() << std::endl; }
 
     template<typename T>
-    typename std::enable_if<std::is_integral<T>::value ||
-        std::is_pointer<T>::value ||
-        std::is_floating_point<T>::value ||
-        std::is_enum<T>::value, T>::type sprintf_cast(const T& t) { return t; }
+    std::enable_if_t<std::is_integral_v<T> ||
+        std::is_pointer_v<T> ||
+        std::is_floating_point_v<T> ||
+        std::is_enum_v<T>, T> sprintf_cast(const T& t) { return t; }
     inline const char* sprintf_cast(const char* s) { return s; }
-    inline const char* sprintf_cast(const std::string& s) { return s.c_str(); }
+    inline const char* sprintf_cast(const std::string_view s) { return s.data(); }
 
     template<int N> struct expand_snprintf
     {
@@ -76,7 +75,7 @@ namespace stdext
     int snprintf(char* s, size_t maxlen, const char* format, const Args&... args)
     {
         std::tuple<typename replace_extent<Args>::type...> tuple(args...);
-        return expand_snprintf<std::tuple_size<decltype(tuple)>::value>::call(s, maxlen, format, tuple);
+        return expand_snprintf<std::tuple_size_v<decltype(tuple)>>::call(s, maxlen, format, tuple);
     }
 
     template<typename... Args>
@@ -88,23 +87,21 @@ namespace stdext
     }
 
     template<typename... Args>
-    std::string format() { return std::string(); }
+    std::string format() { return {}; }
 
     template<typename... Args>
-    std::string format(const std::string& format) { return format; }
+    std::string format(const std::string_view format) { return std::string(format); }
 
     // Format strings with the sprintf style, accepting std::string and string convertible types for %s
     template<typename... Args>
-    std::string format(const std::string& format, const Args&... args)
+    std::string format(const std::string_view format, const Args&... args)
     {
-        int n = snprintf(NULL, 0, format.c_str(), args...);
+        int n = snprintf(NULL, 0, format.data(), args...);
         assert(n != -1);
         std::string buffer(n + 1, '\0');
-        n = snprintf(&buffer[0], buffer.size(), format.c_str(), args...);
+        n = snprintf(&buffer[0], buffer.size(), format.data(), args...);
         assert(n != -1);
         buffer.resize(n);
         return buffer;
     }
 }
-
-#endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -59,8 +59,7 @@ void EventDispatcher::poll()
     int loops = 0;
     while (m_pollEventsSize > 0) {
         if (loops > 50) {
-            static Timer reportTimer;
-            if (reportTimer.running() && reportTimer.ticksElapsed() > 100) {
+            if (static Timer reportTimer; reportTimer.running() && reportTimer.ticksElapsed() > 100) {
                 g_logger.error("ATTENTION the event list is not getting empty, this could be caused by some bad code");
                 reportTimer.restart();
             }
@@ -74,7 +73,7 @@ void EventDispatcher::poll()
         }
         m_pollEventsSize = m_eventList.size();
 
-        loops++;
+        ++loops;
     }
 }
 
@@ -110,7 +109,7 @@ EventPtr EventDispatcher::addEvent(const std::function<void()>& callback, bool p
     if (pushFront) {
         m_eventList.push_front(event);
         // the poll event list only grows when pushing into front
-        m_pollEventsSize++;
+        ++m_pollEventsSize;
     } else
         m_eventList.push_back(event);
     return event;

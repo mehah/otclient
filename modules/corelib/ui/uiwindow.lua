@@ -1,5 +1,5 @@
 -- @docclass
-UIWindow = extends(UIWidget, "UIWindow")
+UIWindow = extends(UIWidget, 'UIWindow')
 
 function UIWindow.create()
     local window = UIWindow.internalCreate()
@@ -19,7 +19,11 @@ function UIWindow:onKeyPress(keyCode, keyboardModifiers)
     end
 end
 
-function UIWindow:onFocusChange(focused) if focused then self:raise() end end
+function UIWindow:onFocusChange(focused)
+    if focused then
+        self:raise()
+    end
+end
 
 function UIWindow:onDragEnter(mousePos)
     self:breakAnchors()
@@ -42,7 +46,6 @@ function UIWindow:onDragMove(mousePos, mouseMoved)
     self:setPosition(pos)
     self:bindRectToParent()
 end
-
 
 function UIWindow:show(dontDisableHotkeys)
     if modules.game_hotkeys and not dontDisableHotkeys then

@@ -164,11 +164,11 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>$(PREPROCESSOR_DEFS);_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>$(PREPROCESSOR_DEFS);_SCL_SECURE_NO_WARNINGS;VS_SOLUTION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <AdditionalIncludeDirectories>$(VcpkgInstalledDir)$(VcpkgTriplet)\include\luajit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VcpkgRoot)\installed\$(VcpkgTriplet)\include\luajit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <DisableSpecificWarnings>4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
@@ -177,17 +177,21 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>if NOT EXIST "$(ProjectDir)../src/framework/protobuf/appearances.pb.cc" (
-cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$(ProjectDir)../src/framework/protobuf/ --proto_path=$(ProjectDir)../src/framework/protobuf/proto/ appearances.proto shared.proto"
-)</Command>
+      <Command>
+	set size=0
+	for /f %%i in ("../src/protobuf/appearances.pb.cc") do set size=%%~zi
+	if %size% EQU 0 (
+		cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc" --cpp_out=../src/protobuf/ --proto_path=../src/protobuf/ appearances.proto
+	)
+	  </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>$(PREPROCESSOR_DEFS);_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>$(PREPROCESSOR_DEFS);VS_SOLUTION</PreprocessorDefinitions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
-      <AdditionalIncludeDirectories>$(VcpkgInstalledDir)$(VcpkgTriplet)\include\luajit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VcpkgRoot)\installed\$(VcpkgTriplet)\include\luajit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <DisableSpecificWarnings>4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
@@ -195,20 +199,24 @@ cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>if NOT EXIST "$(ProjectDir)../src/framework/protobuf/appearances.pb.cc" (
-cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$(ProjectDir)../src/framework/protobuf/ --proto_path=$(ProjectDir)../src/framework/protobuf/proto/ appearances.proto shared.proto"
-)</Command>
+      <Command>
+	set size=0
+	for /f %%i in ("../src/protobuf/appearances.pb.cc") do set size=%%~zi
+	if %size% EQU 0 (
+		cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc" --cpp_out=../src/protobuf/ --proto_path=../src/protobuf/ appearances.proto
+	)	  
+	  </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>$(PREPROCESSOR_DEFS);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>$(PREPROCESSOR_DEFS);VS_SOLUTION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(VcpkgInstalledDir)$(VcpkgTriplet)\include\luajit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VcpkgRoot)\installed\$(VcpkgTriplet)\include\luajit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>Default</LanguageStandard_C>
       <DisableSpecificWarnings>4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
@@ -220,20 +228,24 @@ cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PreBuildEvent>
-      <Command>if NOT EXIST "$(ProjectDir)../src/framework/protobuf/appearances.pb.cc" (
-cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$(ProjectDir)../src/framework/protobuf/ --proto_path=$(ProjectDir)../src/framework/protobuf/proto/ appearances.proto shared.proto"
-)</Command>
+      <Command>
+	set size=0
+	for /f %%i in ("../src/protobuf/appearances.pb.cc") do set size=%%~zi
+	if %size% EQU 0 (
+		cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc" --cpp_out=../src/protobuf/ --proto_path=../src/protobuf/ appearances.proto
+	)
+	  </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='static|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>$(PREPROCESSOR_DEFS);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>$(PREPROCESSOR_DEFS);VS_SOLUTION</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(VcpkgInstalledDir)$(VcpkgTriplet)\include\luajit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VcpkgRoot)\installed\$(VcpkgTriplet)\include\luajit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>Default</LanguageStandard_C>
       <DisableSpecificWarnings>4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
@@ -246,20 +258,24 @@ cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$
       <AdditionalDependencies>glew32.lib;zlib.lib;physfs-static.lib;openal32.lib;lua51.lib;ogg.lib;vorbisfile.lib;vorbis.lib;opengl32.lib;dbghelp.lib;kernel32.lib;user32.lib;shell32.lib;gdi32.lib;advapi32.lib;ole32.lib;crypt32.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>if NOT EXIST "$(ProjectDir)../src/framework/protobuf/appearances.pb.cc" (
-cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$(ProjectDir)../src/framework/protobuf/ --proto_path=$(ProjectDir)../src/framework/protobuf/proto/ appearances.proto shared.proto"
-)</Command>
+      <Command>
+	set size=0
+	for /f %%i in ("../src/protobuf/appearances.pb.cc") do set size=%%~zi
+	if %size% EQU 0 (
+		cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc" --cpp_out=../src/protobuf/ --proto_path=../src/protobuf/ appearances.proto
+	)
+	</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release - GIT Version|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>$(PREPROCESSOR_DEFS);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>$(PREPROCESSOR_DEFS);VS_SOLUTION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(VcpkgInstalledDir)$(VcpkgTriplet)\include\luajit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VcpkgRoot)\installed\$(VcpkgTriplet)\include\luajit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>Default</LanguageStandard_C>
       <DisableSpecificWarnings>4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
@@ -272,9 +288,12 @@ cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$
       <AdditionalDependencies>glew32.lib;zlib.lib;physfs-static.lib;openal32.lib;lua51.lib;ogg.lib;vorbisfile.lib;vorbis.lib;opengl32.lib;dbghelp.lib;kernel32.lib;user32.lib;shell32.lib;gdi32.lib;advapi32.lib;ole32.lib;crypt32.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>if NOT EXIST "$(ProjectDir)../src/framework/protobuf/appearances.pb.cc" (
-cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$(ProjectDir)../src/framework/protobuf/ --proto_path=$(ProjectDir)../src/framework/protobuf/proto/ appearances.proto shared.proto"
-)
+      <Command>
+	set size=0
+	for /f %%i in ("../src/protobuf/appearances.pb.cc") do set size=%%~zi
+	if %size% EQU 0 (
+		cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc" --cpp_out=../src/protobuf/ --proto_path=../src/protobuf/ appearances.proto
+	)
 
 echo | set /p dummyName=#define GIT_BRANCH &gt;  ../src/gitinfo.h
 git rev-parse --abbrev-ref HEAD &gt;&gt;  ../src/gitinfo.h
@@ -289,7 +308,7 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>$(PREPROCESSOR_DEFS);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>$(PREPROCESSOR_DEFS);VS_SOLUTION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <WarningLevel>Level4</WarningLevel>
@@ -297,7 +316,7 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(VcpkgInstalledDir)$(VcpkgTriplet)\include\luajit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VcpkgRoot)\installed\$(VcpkgTriplet)\include\luajit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>Default</LanguageStandard_C>
       <DisableSpecificWarnings>4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
@@ -308,9 +327,13 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PreBuildEvent>
-      <Command>if NOT EXIST "$(ProjectDir)../src/framework/protobuf/appearances.pb.cc" (
-cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$(ProjectDir)../src/framework/protobuf/ --proto_path=$(ProjectDir)../src/framework/protobuf/proto/ appearances.proto shared.proto"
-)</Command>
+      <Command>
+	set size=0
+	for /f %%i in ("../src/protobuf/appearances.pb.cc") do set size=%%~zi
+	if %size% EQU 0 (
+		cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc" --cpp_out=../src/protobuf/ --proto_path=../src/protobuf/ appearances.proto
+	)
+	  </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='static|x64'">
@@ -323,7 +346,7 @@ cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(VcpkgInstalledDir)$(VcpkgTriplet)\include\luajit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VcpkgRoot)\installed\$(VcpkgTriplet)\include\luajit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>Default</LanguageStandard_C>
       <DisableSpecificWarnings>4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
@@ -336,7 +359,7 @@ cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release - GIT Version|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>$(PREPROCESSOR_DEFS);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>$(PREPROCESSOR_DEFS);VS_SOLUTION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <WarningLevel>Level4</WarningLevel>
@@ -344,7 +367,7 @@ cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(VcpkgInstalledDir)$(VcpkgTriplet)\include\luajit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VcpkgRoot)\installed\$(VcpkgTriplet)\include\luajit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <DisableSpecificWarnings>4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
@@ -354,9 +377,12 @@ cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PreBuildEvent>
-      <Command>if NOT EXIST "$(ProjectDir)../src/framework/protobuf/appearances.pb.cc" (
-cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc --cpp_out=$(ProjectDir)../src/framework/protobuf/ --proto_path=$(ProjectDir)../src/framework/protobuf/proto/ appearances.proto shared.proto"
-)
+      <Command>
+	set size=0
+	for /f %%i in ("../src/protobuf/appearances.pb.cc") do set size=%%~zi
+	if %size% EQU 0 (
+		cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc" --cpp_out=../src/protobuf/ --proto_path=../src/protobuf/ appearances.proto
+	)
 
 echo | set /p dummyName=#define GIT_BRANCH &gt;  ../src/gitinfo.h
 git rev-parse --abbrev-ref HEAD &gt;&gt;  ../src/gitinfo.h
@@ -419,14 +445,7 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
     <ClCompile Include="..\src\framework\core\clock.cpp" />
     <ClCompile Include="..\src\framework\core\config.cpp" />
     <ClCompile Include="..\src\framework\core\configmanager.cpp" />
-    <ClCompile Include="..\src\framework\core\event.cpp">
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">FW_GRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='static|Win32'">FW_GRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release - GIT Version|Win32'">FW_GRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">FW_GRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='static|x64'">FW_GRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release - GIT Version|x64'">FW_GRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
+    <ClCompile Include="..\src\framework\core\event.cpp" />
     <ClCompile Include="..\src\framework\core\eventdispatcher.cpp" />
     <ClCompile Include="..\src\framework\core\filestream.cpp" />
     <ClCompile Include="..\src\framework\core\graphicalapplication.cpp" />
@@ -441,15 +460,13 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
     <ClCompile Include="..\src\framework\graphics\bitmapfont.cpp" />
     <ClCompile Include="..\src\framework\graphics\cachedtext.cpp" />
     <ClCompile Include="..\src\framework\graphics\coordsbuffer.cpp" />
-    <ClCompile Include="..\src\framework\graphics\drawpool.cpp" />
+    <ClCompile Include="..\src\framework\graphics\drawpoolmanager.cpp" />
     <ClCompile Include="..\src\framework\graphics\fontmanager.cpp" />
     <ClCompile Include="..\src\framework\graphics\framebuffer.cpp" />
     <ClCompile Include="..\src\framework\graphics\framebuffermanager.cpp" />
     <ClCompile Include="..\src\framework\graphics\graphics.cpp" />
+    <ClCompile Include="..\src\framework\graphics\hardwarebuffer.cpp" />
     <ClCompile Include="..\src\framework\graphics\image.cpp" />
-    <ClCompile Include="..\src\framework\graphics\ogl\painterogl.cpp" />
-    <ClCompile Include="..\src\framework\graphics\ogl\painterogl1.cpp" />
-    <ClCompile Include="..\src\framework\graphics\ogl\painterogl2.cpp" />
     <ClCompile Include="..\src\framework\graphics\painter.cpp" />
     <ClCompile Include="..\src\framework\graphics\paintershaderprogram.cpp" />
     <ClCompile Include="..\src\framework\graphics\particle.cpp" />
@@ -459,13 +476,12 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
     <ClCompile Include="..\src\framework\graphics\particlemanager.cpp" />
     <ClCompile Include="..\src\framework\graphics\particlesystem.cpp" />
     <ClCompile Include="..\src\framework\graphics\particletype.cpp" />
-    <ClCompile Include="..\src\framework\graphics\pool.cpp" />
+    <ClCompile Include="..\src\framework\graphics\drawpool.cpp" />
     <ClCompile Include="..\src\framework\graphics\shader.cpp" />
     <ClCompile Include="..\src\framework\graphics\shaderprogram.cpp" />
     <ClCompile Include="..\src\framework\graphics\texture.cpp" />
     <ClCompile Include="..\src\framework\graphics\texturemanager.cpp" />
     <ClCompile Include="..\src\framework\input\mouse.cpp" />
-    <ClCompile Include="..\src\framework\luaengine\lbitlib.cpp" />
     <ClCompile Include="..\src\framework\luaengine\luaexception.cpp" />
     <ClCompile Include="..\src\framework\luaengine\luainterface.cpp" />
     <ClCompile Include="..\src\framework\luaengine\luaobject.cpp" />
@@ -524,8 +540,7 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
     <ClCompile Include="..\src\framework\xml\tinyxml.cpp" />
     <ClCompile Include="..\src\framework\xml\tinyxmlerror.cpp" />
     <ClCompile Include="..\src\framework\xml\tinyxmlparser.cpp" />
-    <ClCompile Include="..\src\framework\protobuf\appearances.pb.cc" />
-    <ClCompile Include="..\src\framework\protobuf\shared.pb.cc" />
+    <ClCompile Include="..\src\protobuf\appearances.pb.cc" />
     <ClCompile Include="..\src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -599,17 +614,15 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
     <ClInclude Include="..\src\framework\graphics\cachedtext.h" />
     <ClInclude Include="..\src\framework\graphics\coordsbuffer.h" />
     <ClInclude Include="..\src\framework\graphics\declarations.h" />
-    <ClInclude Include="..\src\framework\graphics\drawpool.h" />
+    <ClInclude Include="..\src\framework\graphics\drawpoolmanager.h" />
     <ClInclude Include="..\src\framework\graphics\fontmanager.h" />
     <ClInclude Include="..\src\framework\graphics\framebuffer.h" />
     <ClInclude Include="..\src\framework\graphics\framebuffermanager.h" />
     <ClInclude Include="..\src\framework\graphics\glutil.h" />
     <ClInclude Include="..\src\framework\graphics\graphics.h" />
+    <ClInclude Include="..\src\framework\graphics\hardwarebuffer.h" />
     <ClInclude Include="..\src\framework\graphics\image.h" />
-    <ClInclude Include="..\src\framework\graphics\ogl\painterogl.h" />
-    <ClInclude Include="..\src\framework\graphics\ogl\painterogl1.h" />
-    <ClInclude Include="..\src\framework\graphics\ogl\painterogl2.h" />
-    <ClInclude Include="..\src\framework\graphics\ogl\painterogl2_shadersources.h" />
+    <ClInclude Include="..\src\framework\graphics\shader\shadersources.h" />
     <ClInclude Include="..\src\framework\graphics\painter.h" />
     <ClInclude Include="..\src\framework\graphics\paintershaderprogram.h" />
     <ClInclude Include="..\src\framework\graphics\particle.h" />
@@ -619,7 +632,7 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
     <ClInclude Include="..\src\framework\graphics\particlemanager.h" />
     <ClInclude Include="..\src\framework\graphics\particlesystem.h" />
     <ClInclude Include="..\src\framework\graphics\particletype.h" />
-    <ClInclude Include="..\src\framework\graphics\pool.h" />
+    <ClInclude Include="..\src\framework\graphics\drawpool.h" />
     <ClInclude Include="..\src\framework\graphics\shader.h" />
     <ClInclude Include="..\src\framework\graphics\shaderprogram.h" />
     <ClInclude Include="..\src\framework\graphics\texture.h" />
@@ -627,7 +640,6 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
     <ClInclude Include="..\src\framework\graphics\vertexarray.h" />
     <ClInclude Include="..\src\framework\input\mouse.h" />
     <ClInclude Include="..\src\framework\luaengine\declarations.h" />
-    <ClInclude Include="..\src\framework\luaengine\lbitlib.h" />
     <ClInclude Include="..\src\framework\luaengine\luabinder.h" />
     <ClInclude Include="..\src\framework\luaengine\luaexception.h" />
     <ClInclude Include="..\src\framework\luaengine\luainterface.h" />
@@ -670,8 +682,7 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
     <ClInclude Include="..\src\framework\stdext\hash.h" />
     <ClInclude Include="..\src\framework\stdext\math.h" />
     <ClInclude Include="..\src\framework\stdext\net.h" />
-    <ClInclude Include="..\src\framework\stdext\packed_any.h" />
-    <ClInclude Include="..\src\framework\stdext\packed_storage.h" />
+    <ClInclude Include="..\src\framework\stdext\storage.h" />
     <ClInclude Include="..\src\framework\stdext\shared_object.h" />
     <ClInclude Include="..\src\framework\stdext\shared_ptr.h" />
     <ClInclude Include="..\src\framework\stdext\stdext.h" />
@@ -699,11 +710,9 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
     <ClInclude Include="..\src\framework\util\point.h" />
     <ClInclude Include="..\src\framework\util\rect.h" />
     <ClInclude Include="..\src\framework\util\size.h" />
-    <ClInclude Include="..\src\framework\util\uuid.h" />
     <ClInclude Include="..\src\framework\xml\tinystr.h" />
     <ClInclude Include="..\src\framework\xml\tinyxml.h" />
-    <ClInclude Include="..\src\framework\protobuf\appearances.pb.h" />
-    <ClInclude Include="..\src\framework\protobuf\shared.pb.h" />
+    <ClInclude Include="..\src\protobuf\appearances.pb.h" />
     <ClInclude Include="..\src\gitinfo.h" />
   </ItemGroup>
   <ItemGroup>

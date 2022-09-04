@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef UISPRITE_H
-#define UISPRITE_H
+#pragma once
 
 #include "declarations.h"
 #include <framework/ui/uiwidget.h>
@@ -43,13 +42,11 @@ public:
     bool hasSprite() { return m_sprite != nullptr; }
 
 protected:
-    void onStyleApply(const std::string& styleName, const OTMLNodePtr& styleNode) override;
+    void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
 
     TexturePtr m_sprite;
-    uint16 m_spriteId{ 0 };
+    uint16_t m_spriteId{ 0 };
     Color m_spriteColor{ Color::white };
 
     bool m_spriteVisible{ true };
 };
-
-#endif

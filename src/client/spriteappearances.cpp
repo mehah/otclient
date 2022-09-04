@@ -63,14 +63,14 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet)
 
         const auto decompressed = std::make_unique<uint8_t[]>(LZMA_UNCOMPRESSED_SIZE); // uncompressed size, bmp file + 122 bytes header
 
-         /*
-            CIP's header, always 32 (0x20) bytes.
-            Header format:
-            [0x00, X):          A variable number of NULL (0x00) bytes. The amount of pad-bytes can vary depending on how many
-                                bytes the "7-bit integer encoded LZMA file size" take.
-            [X, X + 0x05):      The constant byte sequence [0x70 0x0A 0xFA 0x80 0x24]
-            [X + 0x05, 0x20]:   LZMA file size (Note: excluding the 32 bytes of this header) encoded as a 7-bit integer
-        */
+        /*
+           CIP's header, always 32 (0x20) bytes.
+           Header format:
+           [0x00, X):          A variable number of NULL (0x00) bytes. The amount of pad-bytes can vary depending on how many
+                               bytes the "7-bit integer encoded LZMA file size" take.
+           [X, X + 0x05):      The constant byte sequence [0x70 0x0A 0xFA 0x80 0x24]
+           [X + 0x05, 0x20]:   LZMA file size (Note: excluding the 32 bytes of this header) encoded as a 7-bit integer
+       */
 
         while (fin->getU8() == 0x00);
         fin->skip(4);
@@ -125,14 +125,14 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet)
         uint8_t* bufferStart = decompressed.get() + data;
 
         // reverse channels
-        for (uint8* itr = bufferStart; itr < bufferStart + BYTES_IN_SPRITE_SHEET; itr += 4) {
+        for (uint8_t* itr = bufferStart; itr < bufferStart + BYTES_IN_SPRITE_SHEET; itr += 4) {
             std::swap(*(itr + 0), *(itr + 2));
         }
 
         // flip vertically
         for (int y = 0; y < 192; ++y) {
-            uint8* itr1 = &bufferStart[y * SPRITE_SHEET_WIDTH_BYTES];
-            uint8* itr2 = &bufferStart[(384 - y - 1) * SPRITE_SHEET_WIDTH_BYTES];
+            uint8_t* itr1 = &bufferStart[y * SPRITE_SHEET_WIDTH_BYTES];
+            uint8_t* itr2 = &bufferStart[(384 - y - 1) * SPRITE_SHEET_WIDTH_BYTES];
 
             for (std::size_t x = 0; x < SPRITE_SHEET_WIDTH_BYTES; ++x) {
                 std::swap(*(itr1 + x), *(itr2 + x));
@@ -153,7 +153,7 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet)
         sheet->loaded = true;
         sheet->loading = false;
         return true;
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to load single sprite sheet '%s': %s", sheet->file, e.what()));
         return false;
     }
@@ -207,7 +207,7 @@ ImagePtr SpriteAppearances::getSpriteImage(int id)
         const Size& size = sheet->getSpriteSize();
 
         ImagePtr image(new Image(size));
-        uint8* pixelData = image->getPixelData();
+        uint8_t* pixelData = image->getPixelData();
 
         const int spriteOffset = id - sheet->firstId;
         const int allColumns = size.width() == 32 ? 12 : 6; // 64 pixel width == 6 columns each 64x or 32 pixels, 12 columns
@@ -222,8 +222,8 @@ ImagePtr SpriteAppearances::getSpriteImage(int id)
 
         if (!image->hasTransparentPixel()) {
             // The image must be more than 4 pixels transparent to be considered transparent.
-            uint8 cntTrans = 0;
-            for (const uint8 pixel : image->getPixels()) {
+            uint8_t cntTrans = 0;
+            for (const uint8_t pixel : image->getPixels()) {
                 if (pixel == 0x00 && ++cntTrans > 4) {
                     image->setTransparentPixel(true);
                     break;
@@ -232,7 +232,7 @@ ImagePtr SpriteAppearances::getSpriteImage(int id)
         }
 
         return image;
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("Failed to get sprite id %d: %s", id, e.what()));
         return nullptr;
     }
@@ -250,13 +250,13 @@ void SpriteAppearances::saveSheetToFileBySprite(int id, const std::string& file)
 {
     const SpriteSheetPtr sheet = getSheetBySpriteId(id);
     if (sheet) {
-        Image image(Size(384, 384), 4, sheet->data.get());
+        Image image({ 384 }, 4, sheet->data.get());
         image.savePNG(file);
     }
 }
 
 void SpriteAppearances::saveSheetToFile(const SpriteSheetPtr& sheet, const std::string& file)
 {
-    Image image(Size(384, 384), 4, sheet->data.get());
+    Image image({ 384 }, 4, sheet->data.get());
     image.savePNG(file);
 }

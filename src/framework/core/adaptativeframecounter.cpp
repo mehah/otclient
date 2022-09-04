@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,22 +21,22 @@
  */
 
 #include "adaptativeframecounter.h"
+#include <framework/platform/platformwindow.h>
 
-bool AdaptativeFrameCounter::canRefresh()
-{
-    if (m_maxFps == 0) return true;
-
-    m_currentTime = stdext::millis();
-    return m_currentTime - m_lastTime >= 1000 / m_maxFps;
-}
+void AdaptativeFrameCounter::start() { if (m_maxFps > 0) m_startTime = stdext::micros(); }
 
 bool AdaptativeFrameCounter::update()
 {
     ++m_fpsCount;
 
-    m_lastTime = m_currentTime;
+    if (m_maxFps > 0 && m_fpsCount > m_maxFps) {
+        if (const int sleep = getMaxPeriod() - static_cast<int>(stdext::micros() - m_startTime);
+            sleep > 0) stdext::microsleep(sleep);
 
-    const uint tickCount = stdext::millis();
+        m_fpsCount = m_maxFps + (stdext::random_range(0, 2) - 1);
+    }
+
+    const uint32_t tickCount = stdext::millis();
     if (tickCount - m_interval <= 1000)
         return false;
 

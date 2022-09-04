@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,42 +20,36 @@
  * THE SOFTWARE.
  */
 
-#ifndef STDEXT_COMPILER_H
-#define STDEXT_COMPILER_H
+#pragma once
 
 #ifdef WIN32
 #include <winsock2.h>
 #endif
 
 #ifdef __clang__
- // clang is supported
+#error "Clang is not supported by the project, you can use the docker"
 #define BUILD_COMPILER "clang " __VERSION__
 #elif defined(__GNUC__)
-#if !(__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6))
-#error "Sorry, you need gcc 4.6 or greater to compile."
+#if !(__GNUC__ > 4 || (__GNUC__ == 11 && __GNUC_MINOR__ >= 0))
+#error "Sorry, you need gcc 11 or greater to compile."
 #endif
 #define BUILD_COMPILER "gcc " __VERSION__
 #elif defined(_MSC_VER)
-#if _MSC_VER < 1800
-#error "You need Visual Studio 2013 or greater to compile."
+
+#if _MSC_VER < 1932
+#error "You need Visual Studio 2022(17.2) or greater to compile."
 #endif
+
+#define BUILD_COMPILER "Visual Studio"
+
 #pragma warning(disable:4244) // conversion from 'A' to 'B', possible loss of data
 #pragma warning(disable:4267) // '?' : conversion from 'A' to 'B', possible loss of data
 #pragma warning(disable:4305) // 'initializing' : truncation from 'A' to 'B'
 #pragma warning(disable:4146) // unary minus operator applied to unsigned type, result still unsigned
 #pragma warning(disable:4800) // 'A' : forcing value to bool 'true' or 'false' (performance warning)
 
-#if _MSC_VER == 1912 || _MSC_VER == 1911 || _MSC_VER == 1910
-#define BUILD_COMPILER "Visual Studio 2017"
-#elif _MSC_VER == 1900
-#define BUILD_COMPILER "Visual Studio 2015"
-#elif _MSC_VER == 1800
-#define BUILD_COMPILER "Visual Studio 2013"
-#else
-#define BUILD_COMPILER "Visual Studio"
-#endif
-
 #define __PRETTY_FUNCTION__ __FUNCDNAME__
+
 #else
 #error "Compiler not supported."
 #endif
@@ -73,6 +67,4 @@
 
 #if !defined(_MSC_VER) && !defined(__GXX_EXPERIMENTAL_CXX0X__)
 #error "C++0x is required to compile this application.  Try updating your compiler."
-#endif
-
 #endif

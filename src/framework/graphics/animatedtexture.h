@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef ANIMATEDTEXTURE_H
-#define ANIMATEDTEXTURE_H
+#pragma once
 
 #include "texture.h"
 #include <framework/core/timer.h>
@@ -44,8 +43,6 @@ public:
 private:
     std::vector<TexturePtr> m_frames;
     std::vector<int> m_framesDelay;
-    uint m_currentFrame;
+    uint32_t m_currentFrame;
     Timer m_animTimer;
 };
-
-#endif

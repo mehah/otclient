@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef LUABINDER_H
-#define LUABINDER_H
+#pragma once
 
  // this file is and must be included only from luainterface.h
 #include "luaexception.h"
@@ -45,7 +44,7 @@ namespace luabinder
         template<typename Tuple>
         static void call(Tuple& tuple, LuaInterface* lua)
         {
-            using ValueType = typename std::tuple_element<N - 1, Tuple>::type;
+            using ValueType = std::tuple_element_t<N - 1, Tuple>;
             std::get<N - 1>(tuple) = lua->polymorphicPop<ValueType>();
             pack_values_into_tuple<N - 1>::call(tuple, lua);
         }
@@ -54,12 +53,12 @@ namespace luabinder
     struct pack_values_into_tuple<0>
     {
         template<typename Tuple>
-        static void call(Tuple& /*tuple*/, LuaInterface* /*lua*/) {}
+        static void call(const Tuple& /*tuple*/, const LuaInterface* /*lua*/) {}
     };
 
     /// C++ function caller that can push results to lua
     template<typename Ret, typename F, typename... Args>
-    typename std::enable_if<!std::is_void<Ret>::value, int>::type
+    std::enable_if_t<!std::is_void_v<Ret>, int>
         call_fun_and_push_result(const F& f, LuaInterface* lua, const Args&... args)
     {
         Ret ret = f(args...);
@@ -69,7 +68,7 @@ namespace luabinder
 
     /// C++ void function caller
     template<typename Ret, typename F, typename... Args>
-    typename std::enable_if<std::is_void<Ret>::value, int>::type
+    std::enable_if_t<std::is_void_v<Ret>, int>
         call_fun_and_push_result(const F& f, LuaInterface* /*lua*/, const Args&... args)
     {
         f(args...);
@@ -100,7 +99,7 @@ namespace luabinder
     template<typename Ret, typename F, typename Tuple>
     LuaCppFunction bind_fun_specializer(const F& f)
     {
-        enum { N = std::tuple_size<Tuple>::value };
+        enum { N = std::tuple_size_v<Tuple> };
         return [=](LuaInterface* lua) -> int {
             while (lua->stackSize() != N) {
                 if (lua->stackSize() < N)
@@ -148,7 +147,7 @@ namespace luabinder
     };
 
     template<typename Lambda>
-    typename std::enable_if<std::is_constructible<decltype(&Lambda::operator())>::value, LuaCppFunction>::type bind_fun(const Lambda& f)
+    std::enable_if_t<std::is_constructible_v<decltype(&Lambda::operator())>, LuaCppFunction> bind_fun(const Lambda& f)
     {
         using F = decltype(&Lambda::operator());
         return bind_lambda_fun<F>::call(f);
@@ -176,7 +175,7 @@ namespace luabinder
     std::function<void(const stdext::shared_object_ptr<C>&, const Args&...)> make_mem_func(void (C::* f)(Args...))
     {
         auto mf = std::mem_fn(f);
-        return [=](const stdext::shared_object_ptr<C>& obj, const Args&... args) mutable -> void {
+        return [=](const stdext::shared_object_ptr<C>& obj, const Args&... args) mutable {
             if (!obj)
                 throw LuaException("failed to call a member function because the passed object is nil");
             mf(obj.get(), args...);
@@ -194,7 +193,7 @@ namespace luabinder
     std::function<void(const Args&...)> make_mem_func_singleton(void (C::* f)(Args...), C* instance)
     {
         auto mf = std::mem_fn(f);
-        return [=](Args... args) mutable -> void { mf(instance, args...); };
+        return [=](Args... args) mutable { mf(instance, args...); };
     }
 
     /// Bind member functions
@@ -232,5 +231,3 @@ namespace luabinder
         };
     }
 }
-
-#endif

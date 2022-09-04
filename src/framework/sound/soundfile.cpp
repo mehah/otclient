@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,22 +26,18 @@
 
 #include "framework/stdext/time.h"
 
-SoundFile::SoundFile(const FileStreamPtr& fileStream)
-{
-    m_file = fileStream;
-}
+SoundFile::SoundFile(const FileStreamPtr& fileStream) : m_file(fileStream) { m_file = fileStream; }
 
 SoundFilePtr SoundFile::loadSoundFile(const std::string& filename)
 {
-    stdext::timer t;
     const FileStreamPtr file = g_resources.openFile(filename);
     if (!file)
-        stdext::throw_exception(stdext::format("unable to open %s", filename));
+        throw Exception("unable to open %s", filename);
 
     // cache file buffer to avoid lags from hard drive
     file->cache();
 
-    char magic[4];
+    char magic[4]{ 0 };
     file->read(magic, 4);
     file->seek(0);
 
@@ -51,7 +47,7 @@ SoundFilePtr SoundFile::loadSoundFile(const std::string& filename)
         if (oggSoundFile->prepareOgg())
             soundFile = oggSoundFile;
     } else
-        stdext::throw_exception(stdext::format("unknown sound file format %s", filename));
+        throw Exception("unknown sound file format %s", filename);
 
     return soundFile;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef POSITION_H
-#define POSITION_H
+#pragma once
 
 #include "config.h"
 #include "const.h"
@@ -35,6 +34,7 @@
 #include <ostream>
 #include <string>
 #include <vector>
+#include <numbers>
 
 class Position
 {
@@ -151,15 +151,12 @@ public:
 
         double angle = std::atan2<int32_t>(dy * -1, dx);
         if (angle < 0)
-            angle += 2 * Fw::pi;
+            angle += 2 * std::numbers::pi;
 
         return angle;
     }
 
-    double getAngleFromPosition(const Position& position) const
-    {
-        return getAngleFromPositions(*this, position);
-    }
+    double getAngleFromPosition(const Position& position) const { return getAngleFromPositions(*this, position); }
 
     static Otc::Direction getDirectionFromPositions(const Position& fromPos, const Position& toPos)
     {
@@ -192,15 +189,12 @@ public:
         return Otc::InvalidDirection;
     }
 
-    Otc::Direction getDirectionFromPosition(const Position& position) const
-    {
-        return getDirectionFromPositions(*this, position);
-    }
+    Otc::Direction getDirectionFromPosition(const Position& position) const { return getDirectionFromPositions(*this, position); }
 
     bool isMapPosition() const { return ((x >= 0) && (y >= 0) && (x < UINT16_MAX) && (y < UINT16_MAX) && (z <= MAX_Z)); }
     bool isValid() const { return !(x == UINT16_MAX && y == UINT16_MAX && z == UINT8_MAX); }
     double distance(const Position& pos) const { return sqrt(pow<int32_t>(pos.x - x, 2) + pow<int32_t>(pos.y - y, 2)); }
-    uint16 manhattanDistance(const Position& pos) const { return static_cast<uint16>(std::abs(pos.x - x) + std::abs(pos.y - y)); }
+    uint16_t manhattanDistance(const Position& pos) const { return static_cast<uint16_t>(std::abs(pos.x - x) + std::abs(pos.y - y)); }
 
     void translate(int32_t dx, int32_t dy, int8_t dz = 0) { x += dx; y += dy; z += dz; }
     Position translated(int32_t dx, int32_t dy, int8_t dz = 0) const { Position pos = *this; pos.x += dx; pos.y += dy; pos.z += dz; return pos; }
@@ -233,7 +227,8 @@ public:
     Position& operator=(const Position& other) = default;
     bool operator==(const Position& other) const { return other.x == x && other.y == y && other.z == z; }
     bool operator!=(const Position& other) const { return other.x != x || other.y != y || other.z != z; }
-    bool isInRange(const Position& pos, uint16 xRange, uint16 yRange, const bool ignoreZ = false) const
+
+    bool isInRange(const Position& pos, uint16_t xRange, uint16_t yRange, const bool ignoreZ = false) const
     {
         auto _pos = pos;
         if (pos.z != z) {
@@ -243,7 +238,8 @@ public:
 
         return std::abs(x - _pos.x) <= xRange && std::abs(y - _pos.y) <= yRange && z == pos.z;
     }
-    bool isInRange(const Position& pos, uint16 minXRange, uint16 maxXRange, uint16 minYRange, uint16 maxYRange, const bool ignoreZ = false) const
+
+    bool isInRange(const Position& pos, uint16_t minXRange, uint16_t maxXRange, uint16_t minYRange, uint16_t maxYRange, const bool ignoreZ = false) const
     {
         auto _pos = pos;
         if (pos.z != z) {
@@ -253,7 +249,8 @@ public:
 
         return _pos.x >= x - minXRange && _pos.x <= x + maxXRange && _pos.y >= y - minYRange && _pos.y <= y + maxYRange;
     }
-    // operator less than for std::map
+
+    // operator less than for stdext::map
     bool operator<(const Position& other) const { return x < other.x || y < other.y || z < other.z; }
 
     bool up(int8_t n = 1)
@@ -322,13 +319,14 @@ public:
 
 inline std::ostream& operator<<(std::ostream& out, const Position& pos)
 {
-    out << static_cast<int>(pos.x) << " " << static_cast<int>(pos.y) << " " << static_cast<int>(pos.z);
+    out << pos.x << " " << pos.y << " " << static_cast<int>(pos.z);
     return out;
 }
 
 inline std::istream& operator>>(std::istream& in, Position& pos)
 {
-    int32_t x, y;
+    int32_t x;
+    int32_t y;
     uint8_t z;
     in >> x >> y >> z;
     pos.x = x;
@@ -336,5 +334,3 @@ inline std::istream& operator>>(std::istream& in, Position& pos)
     pos.z = z;
     return in;
 }
-
-#endif

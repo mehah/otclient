@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef STDEXT_CAST_H
-#define STDEXT_CAST_H
+#pragma once
 
 #include "demangle.h"
 #include "exception.h"
@@ -53,7 +52,6 @@ namespace stdext
     }
 
     // cast string to string
-    template<>
     inline bool cast(const std::string& in, std::string& out)
     {
         out = in;
@@ -61,7 +59,6 @@ namespace stdext
     }
 
     // special cast from string to boolean
-    template<>
     inline bool cast(const std::string& in, bool& b)
     {
         if (in == "true")
@@ -74,7 +71,6 @@ namespace stdext
     }
 
     // special cast from string to char
-    template<>
     inline bool cast(const std::string& in, char& c)
     {
         if (in.length() != 1)
@@ -84,24 +80,20 @@ namespace stdext
     }
 
     // special cast from string to long
-    template<>
     inline bool cast(const std::string& in, long& l)
     {
         if (in.find_first_not_of("-0123456789") != std::string::npos)
             return false;
-        const std::size_t t = in.find_last_of('-');
-        if (t != std::string::npos && t != 0)
+        if (const std::size_t t = in.find_last_of('-'); t != std::string::npos && t != 0)
             return false;
-        l = atol(in.c_str());
+        l = atol(in.data());
         return true;
     }
 
     // special cast from string to int
-    template<>
     inline bool cast(const std::string& in, int& i)
     {
-        long l;
-        if (cast(in, l)) {
+        if (long l; cast(in, l)) {
             i = l;
             return true;
         }
@@ -109,7 +101,6 @@ namespace stdext
     }
 
     // special cast from string to double
-    template<>
     inline bool cast(const std::string& in, double& d)
     {
         if (in.find_first_not_of("-0123456789.") != std::string::npos)
@@ -120,16 +111,14 @@ namespace stdext
         t = in.find_first_of('.');
         if (t != std::string::npos && (t == 0 || t == in.length() - 1 || in.find_first_of('.', t + 1) != std::string::npos))
             return false;
-        d = atof(in.c_str());
+        d = atof(in.data());
         return true;
     }
 
     // special cast from string to float
-    template<>
     inline bool cast(const std::string& in, float& f)
     {
-        double d;
-        if (cast(in, d)) {
+        if (double d; cast(in, d)) {
             f = static_cast<float>(d);
             return true;
         }
@@ -137,7 +126,6 @@ namespace stdext
     }
 
     // special cast from boolean to string
-    template<>
     inline bool cast(const bool& in, std::string& out)
     {
         out = (in ? "true" : "false");
@@ -182,11 +170,9 @@ namespace stdext
     {
         try {
             return safe_cast<R, T>(t);
-        } catch (cast_exception& e) {
+        } catch (const cast_exception& e) {
             std::cerr << "CAST ERROR: " << e.what() << std::endl;
             return def;
         }
     }
 }
-
-#endif

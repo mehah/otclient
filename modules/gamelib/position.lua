@@ -21,8 +21,7 @@ function Position.lessThan(pos1, pos2, orEqualTo)
 end
 
 function Position.isInRange(pos1, pos2, xRange, yRange)
-    return math.abs(pos1.x - pos2.x) <= xRange and math.abs(pos1.y - pos2.y) <=
-               yRange and pos1.z == pos2.z;
+    return math.abs(pos1.x - pos2.x) <= xRange and math.abs(pos1.y - pos2.y) <= yRange and pos1.z == pos2.z;
 end
 
 function Position.isValid(pos)
@@ -30,8 +29,7 @@ function Position.isValid(pos)
 end
 
 function Position.distance(pos1, pos2)
-    return math.sqrt(math.pow((pos2.x - pos1.x), 2) +
-                         math.pow((pos2.y - pos1.y), 2))
+    return math.sqrt(math.pow((pos2.x - pos1.x), 2) + math.pow((pos2.y - pos1.y), 2))
 end
 
 function Position.manhattanDistance(pos1, pos2)
@@ -39,7 +37,11 @@ function Position.manhattanDistance(pos1, pos2)
 end
 
 function Position.translatedToDirection(pos, direction)
-    local newPos = {x = pos.x, y = pos.y, z = pos.z}
+    local newPos = {
+        x = pos.x,
+        y = pos.y,
+        z = pos.z
+    }
     if direction == Directions.North then
         newPos.y = newPos.y - 1
     elseif direction == Directions.East then
@@ -66,6 +68,12 @@ function Position.translatedToDirection(pos, direction)
 end
 
 function Position.parse(pos)
-    if not pos then return nil end
-    return {x = pos.x, y = pos.y, z = pos.z}
+    if not pos then
+        return nil
+    end
+    return {
+        x = pos.x,
+        y = pos.y,
+        z = pos.z
+    }
 end

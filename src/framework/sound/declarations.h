@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,12 +20,9 @@
  * THE SOFTWARE.
  */
 
-#ifndef FRAMEWORK_SOUND_DECLARATIONS_H
-#define FRAMEWORK_SOUND_DECLARATIONS_H
+#pragma once
 
 #include <framework/global.h>
-
-#define AL_LIBTYPE_STATIC
 
 #if defined(__APPLE__)
 #include <OpenAL/al.h>
@@ -51,5 +48,3 @@ using SoundChannelPtr = stdext::shared_object_ptr<SoundChannel>;
 using StreamSoundSourcePtr = stdext::shared_object_ptr<StreamSoundSource>;
 using CombinedSoundSourcePtr = stdext::shared_object_ptr<CombinedSoundSource>;
 using OggSoundFilePtr = stdext::shared_object_ptr<OggSoundFile>;
-
-#endif

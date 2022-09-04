@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef TIMER_H
-#define TIMER_H
+#pragma once
 
 #include <framework/global.h>
 
@@ -44,5 +43,3 @@ private:
     ticks_t m_startTicks;
     bool m_stopped{ false };
 };
-
-#endif

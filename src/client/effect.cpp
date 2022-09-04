@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
 
-void Effect::drawEffect(const Point& dest, float scaleFactor, LightView* lightView)
+void Effect::drawEffect(const Point& dest, float scaleFactor, uint32_t flags, int offsetX, int offsetY, LightView* lightView)
 {
     if (m_id == 0 || !canDraw()) return;
 
@@ -36,12 +36,12 @@ void Effect::drawEffect(const Point& dest, float scaleFactor, LightView* lightVi
 
     int animationPhase;
     if (g_game.getFeature(Otc::GameEnhancedAnimations)) {
-        const auto& animator = rawGetThingType()->getIdleAnimator();
+        const auto& animator = getThingType()->getIdleAnimator();
         if (!animator)
             return;
 
         // This requires a separate getPhaseAt method as using getPhase would make all magic effects use the same phase regardless of their appearance time
-        animationPhase = rawGetThingType()->getIdleAnimator()->getPhaseAt(m_animationTimer);
+        animationPhase = animator->getPhaseAt(m_animationTimer);
     } else {
         // hack to fix some animation phases duration, currently there is no better solution
         int ticks = EFFECT_TICKS_PER_FRAME;
@@ -52,10 +52,19 @@ void Effect::drawEffect(const Point& dest, float scaleFactor, LightView* lightVi
         animationPhase = std::min<int>(static_cast<int>(m_animationTimer.ticksElapsed() / ticks), getAnimationPhases() - 1);
     }
 
-    const int xPattern = m_position.x % getNumPatternX();
-    const int yPattern = m_position.y % getNumPatternY();
+    int xPattern = m_numPatternX;
+    int yPattern = m_numPatternY;
+    if (g_game.getFeature(Otc::GameMapOldEffectRendering)) {
+        xPattern = offsetX % getNumPatternX();
+        if (xPattern < 0)
+            xPattern += getNumPatternX();
 
-    rawGetThingType()->draw(dest, scaleFactor, 0, xPattern, yPattern, 0, animationPhase, TextureType::NONE, Color::white, lightView);
+        yPattern = offsetY % getNumPatternY();
+        if (yPattern < 0)
+            yPattern += getNumPatternY();
+    }
+
+    getThingType()->draw(dest, scaleFactor, 0, xPattern, yPattern, 0, animationPhase, flags, TextureType::NONE, Color::white, lightView, m_drawBuffer);
 }
 
 void Effect::onAppear()
@@ -81,7 +90,9 @@ void Effect::onAppear()
 
     // schedule removal
     const auto self = asEffect();
-    g_dispatcher.scheduleEvent([self]() { g_map.removeThing(self); }, m_duration);
+    g_dispatcher.scheduleEvent([self] { g_map.removeThing(self); }, m_duration);
+
+    generateBuffer();
 }
 
 void Effect::waitFor(const EffectPtr& effect)
@@ -89,20 +100,24 @@ void Effect::waitFor(const EffectPtr& effect)
     m_timeToStartDrawing = effect->m_duration * (g_app.canOptimize() || g_app.isForcedEffectOptimization() ? .7 : .5);
 }
 
-void Effect::setId(uint32 id)
+void Effect::setId(uint32_t id)
 {
     if (!g_things.isValidDatId(id, ThingCategoryEffect))
         id = 0;
 
     m_id = id;
+    m_thingType = nullptr;
+}
+
+void Effect::setPosition(const Position& position, uint8_t stackPos, bool hasElevation)
+{
+    Thing::setPosition(position, stackPos, hasElevation);
+
+    m_numPatternX = m_position.x % getNumPatternX();
+    m_numPatternY = m_position.y % getNumPatternY();
 }
 
 const ThingTypePtr& Effect::getThingType()
 {
-    return g_things.getThingType(m_id, ThingCategoryEffect);
-}
-
-ThingType* Effect::rawGetThingType()
-{
-    return g_things.rawGetThingType(m_id, ThingCategoryEffect);
+    return m_thingType ? m_thingType : m_thingType = g_things.getThingType(m_id, ThingCategoryEffect);
 }

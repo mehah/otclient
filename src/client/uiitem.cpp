@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -50,10 +50,10 @@ void UIItem::drawSelf(Fw::DrawPane drawPane)
         const float scaleFactor = std::min<float>(drawRect.width() / static_cast<float>(exactSize), drawRect.height() / static_cast<float>(exactSize));
         dest += (m_item->getDisplacement() - Point(SPRITE_SIZE)) * scaleFactor;
 
-        m_item->draw(dest, scaleFactor, true, Highlight(), TextureType::SMOOTH, m_color);
+        m_item->draw(dest, scaleFactor, true, Otc::DrawThings, Highlight(), TextureType::SMOOTH, m_color);
 
         if (m_font && (m_item->isStackable() || m_item->isChargeable()) && m_item->getCountOrSubType() > 1) {
-            const std::string count = std::to_string(m_item->getCountOrSubType());
+            const auto& count = std::to_string(m_item->getCountOrSubType());
             m_font->drawText(count, Rect(m_rect.topLeft(), m_rect.bottomRight() - Point(3, 0)), Color(231, 231, 231), Fw::AlignBottomRight);
         }
 
@@ -79,7 +79,7 @@ void UIItem::setItemId(int id)
     }
 }
 
-void UIItem::onStyleApply(const std::string& styleName, const OTMLNodePtr& styleNode)
+void UIItem::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
 {
     UIWidget::onStyleApply(styleName, styleNode);
 

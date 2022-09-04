@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,19 +20,10 @@
  * THE SOFTWARE.
  */
 
-#ifndef FRAMEWORK_CONST_H
-#define FRAMEWORK_CONST_H
+#pragma once
 
 #define DEG_TO_RAD (std::acos(-1.f)/180.f)
 #define RAD_TO_DEC (180.f/std::acos(-1.f))
-
-#ifndef BUILD_COMMIT
-#define BUILD_COMMIT "devel"
-#endif
-
-#ifndef BUILD_REVISION
-#define BUILD_REVISION "0"
-#endif
 
 #ifndef BUILD_TYPE
 #define BUILD_TYPE "unknown"
@@ -50,8 +41,7 @@
 
 namespace Fw
 {
-    static constexpr float pi = 3.14159265f,
-        MIN_ALPHA = 0.003f;
+    static constexpr float MIN_ALPHA = 0.003f;
 
     enum Key : unsigned char
     {
@@ -172,7 +162,8 @@ namespace Fw
         KeyNumpad6 = 147,
         KeyNumpad7 = 148,
         KeyNumpad8 = 149,
-        KeyNumpad9 = 150
+        KeyNumpad9 = 150,
+        KeyLast
     };
 
     enum LogLevel
@@ -300,5 +291,3 @@ namespace Fw
         BothPanes = 3
     };
 }
-
-#endif

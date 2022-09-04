@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef PLAYER_H
-#define PLAYER_H
+#pragma once
 
 #include "creature.h"
 
@@ -35,5 +34,3 @@ public:
     PlayerPtr asPlayer() { return static_self_cast<Player>(); }
     bool isPlayer() override { return true; }
 };
-
-#endif

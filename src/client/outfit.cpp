@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,13 +27,15 @@ Color Outfit::getColor(int color)
     if (color >= HSI_H_STEPS * HSI_SI_VALUES)
         color = 0;
 
-    float loc1 = 0, loc2 = 0, loc3 = 0;
+    float loc1 = 0;
+    float loc2 = 0;
+    float loc3 = 0;
     if (color % HSI_H_STEPS != 0) {
         loc1 = color % HSI_H_STEPS * 1.0 / 18.0;
         loc2 = 1;
         loc3 = 1;
 
-        switch (static_cast<int>(color / HSI_H_STEPS)) {
+        switch (color / HSI_H_STEPS) {
             case 0:
                 loc2 = 0.25;
                 loc3 = 1.00;
@@ -77,7 +79,9 @@ Color Outfit::getColor(int color)
         return Color(loc7, loc7, loc7);
     }
 
-    float red = 0, green = 0, blue = 0;
+    float red = 0;
+    float green = 0;
+    float blue = 0;
 
     if (loc1 < 1.0 / 6.0) {
         red = loc3;

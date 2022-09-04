@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef OTMLPARSER_H
-#define OTMLPARSER_H
+#pragma once
 
 #include "declarations.h"
 
@@ -37,20 +36,20 @@ private:
     /// Retrieve next line from the input stream
     std::string getNextLine();
     /// Counts depth of a line (every 2 spaces increments one depth)
-    int getLineDepth(const std::string& line, bool multilining = false);
+    int getLineDepth(const std::string_view line, bool multilining = false);
 
     /// Parse each line of the input stream
     void parseLine(std::string line);
     /// Parse nodes tag and value
-    void parseNode(const std::string& data);
+    void parseNode(const std::string_view data);
 
     int currentDepth;
     int currentLine;
     OTMLDocumentPtr doc;
     OTMLNodePtr currentParent;
-    std::unordered_map<OTMLNodePtr, OTMLNodePtr> parentMap;
     OTMLNodePtr previousNode;
+
+    std::map<OTMLNodePtr, OTMLNodePtr> parentMap;
+
     std::istream& in;
 };
-
-#endif

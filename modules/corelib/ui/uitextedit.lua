@@ -36,32 +36,28 @@ end
 
 function UITextEdit:setVerticalScrollBar(scrollbar)
     self.verticalScrollBar = scrollbar
-    self.verticalScrollBar.onValueChange =
-        function(scrollbar, value)
-            local virtualOffset = self:getTextVirtualOffset()
-            virtualOffset.y = value
-            self:setTextVirtualOffset(virtualOffset)
-        end
+    self.verticalScrollBar.onValueChange = function(scrollbar, value)
+        local virtualOffset = self:getTextVirtualOffset()
+        virtualOffset.y = value
+        self:setTextVirtualOffset(virtualOffset)
+    end
     self:updateScrollBars()
 end
 
 function UITextEdit:setHorizontalScrollBar(scrollbar)
     self.horizontalScrollBar = scrollbar
-    self.horizontalScrollBar.onValueChange =
-        function(scrollbar, value)
-            local virtualOffset = self:getTextVirtualOffset()
-            virtualOffset.x = value
-            self:setTextVirtualOffset(virtualOffset)
-        end
+    self.horizontalScrollBar.onValueChange = function(scrollbar, value)
+        local virtualOffset = self:getTextVirtualOffset()
+        virtualOffset.x = value
+        self:setTextVirtualOffset(virtualOffset)
+    end
     self:updateScrollBars()
 end
 
 function UITextEdit:updateScrollBars()
     local scrollSize = self:getTextTotalSize()
-    local scrollWidth = math.max(scrollSize.width -
-                                     self:getTextVirtualSize().width, 0)
-    local scrollHeight = math.max(scrollSize.height -
-                                      self:getTextVirtualSize().height, 0)
+    local scrollWidth = math.max(scrollSize.width - self:getTextVirtualSize().width, 0)
+    local scrollHeight = math.max(scrollSize.height - self:getTextVirtualSize().height, 0)
 
     local scrollbar = self.verticalScrollBar
     if scrollbar then

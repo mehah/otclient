@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+* Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -20,26 +20,25 @@
 * THE SOFTWARE.
 */
 
-#ifndef ANIMATOR_H
-#define ANIMATOR_H
+#pragma once
 
 #include "declarations.h"
 
 #include <framework/core/declarations.h>
 #include <framework/core/timer.h>
 
-#include <framework/protobuf/appearances.pb.h>
+#include <protobuf/appearances.pb.h>
 
-using namespace tibia::protobuf;
+using namespace otclient::protobuf;
 
-enum AnimationPhase : int16
+enum AnimationPhase : int16_t
 {
     AnimPhaseAutomatic = -1,
     AnimPhaseRandom = 254,
     AnimPhaseAsync = 255,
 };
 
-enum AnimationDirection : uint8
+enum AnimationDirection : uint8_t
 {
     AnimDirForward = 0,
     AnimDirBackward = 1
@@ -63,7 +62,7 @@ public:
     bool isAsync() { return m_async; }
     bool isComplete() { return m_isComplete; }
 
-    ticks_t getTotalDuration();
+    uint16_t getTotalDuration();
 
 private:
     int getPingPongPhase();
@@ -86,5 +85,3 @@ private:
     AnimationDirection m_currentDirection{ AnimDirForward };
     ticks_t m_lastPhaseTicks{ 0 };
 };
-
-#endif

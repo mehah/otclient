@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef CACHEDTEXT_H
-#define CACHEDTEXT_H
+#pragma once
 
 #include "declarations.h"
 
@@ -33,9 +32,9 @@ public:
     void draw(const Rect& rect, Color color);
 
     void wrapText(int maxWidth);
-    void setFont(const BitmapFontPtr& font) { m_font = font; update(); }
-    void setText(const std::string& text) { m_text = text; update(); }
-    void setAlign(const Fw::AlignmentFlag align) { m_align = align; update(); }
+    void setFont(const BitmapFontPtr& font);
+    void setText(const std::string_view text);
+    void setAlign(const Fw::AlignmentFlag align);
 
     Size getTextSize() { return m_textSize; }
     std::string getText() const { return m_text; }
@@ -45,15 +44,14 @@ public:
 private:
     void update();
 
+    std::vector<std::pair<Rect, Rect>> m_TextureCoords;
+    std::vector<Point> m_glyphsPositions;
+
     std::string m_text;
     Size m_textSize;
-    Rect m_textCachedScreenCoords;
+    Rect m_textScreenCoords;
     BitmapFontPtr m_font;
     Fw::AlignmentFlag m_align;
 
-    bool m_textMustRecache{ true };
-
-    std::vector<std::pair<Rect, Rect>> m_textCoordsCache;
+    CoordsBufferPtr m_coordsBuffer;
 };
-
-#endif

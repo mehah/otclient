@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef PROTOCOL_H
-#define PROTOCOL_H
+#pragma once
 
 #include "connection.h"
 #include "declarations.h"
@@ -37,19 +36,19 @@ public:
     Protocol();
     ~Protocol() override;
 
-    void connect(const std::string& host, uint16 port);
+    void connect(const std::string_view host, uint16_t port);
     void disconnect();
 
-    bool isConnected();
-    bool isConnecting();
+    bool isConnected() { return m_connection && m_connection->isConnected(); }
+    bool isConnecting() { return m_connection && m_connection->isConnecting(); }
     ticks_t getElapsedTicksSinceLastRead() { return m_connection ? m_connection->getElapsedTicksSinceLastRead() : -1; }
 
     ConnectionPtr getConnection() { return m_connection; }
     void setConnection(const ConnectionPtr& connection) { m_connection = connection; }
 
     void generateXteaKey();
-    void setXteaKey(uint32 a, uint32 b, uint32 c, uint32 d) { m_xteaKey = { a, b, c, d }; }
-    std::vector<uint32> getXteaKey() { return { m_xteaKey.begin(), m_xteaKey.end() }; }
+    void setXteaKey(uint32_t a, uint32_t b, uint32_t c, uint32_t d) { m_xteaKey = { a, b, c, d }; }
+    std::vector<uint32_t > getXteaKey() { return { m_xteaKey.begin(), m_xteaKey.end() }; }
     void enableXteaEncryption() { m_xteaEncryptionEnabled = true; }
 
     void enableChecksum() { m_checksumEnabled = true; }
@@ -64,19 +63,17 @@ protected:
     virtual void onRecv(const InputMessagePtr& inputMessage);
     virtual void onError(const std::error_code& err);
 
-    std::array<uint32, 4> m_xteaKey;
+    std::array<uint32_t, 4> m_xteaKey{};
 
 private:
-    void internalRecvHeader(uint8* buffer, uint16 size);
-    void internalRecvData(uint8* buffer, uint16 size);
+    void internalRecvHeader(uint8_t* buffer, uint16_t size);
+    void internalRecvData(uint8_t* buffer, uint16_t size);
 
     bool xteaDecrypt(const InputMessagePtr& inputMessage);
     void xteaEncrypt(const OutputMessagePtr& outputMessage);
 
-    bool m_checksumEnabled;
-    bool m_xteaEncryptionEnabled;
+    bool m_checksumEnabled{ false };
+    bool m_xteaEncryptionEnabled{ false };
     ConnectionPtr m_connection;
     InputMessagePtr m_inputMessage;
 };
-
-#endif

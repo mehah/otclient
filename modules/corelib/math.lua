@@ -13,13 +13,21 @@ function math.round(num, idp)
     end
 end
 
-function math.isu8(num) return math.isinteger(num) and num >= 0 and num < U8 end
+function math.isu8(num)
+    return math.isinteger(num) and num >= 0 and num < U8
+end
 
-function math.isu16(num) return math.isinteger(num) and num >= U8 and num < U16 end
+function math.isu16(num)
+    return math.isinteger(num) and num >= U8 and num < U16
+end
 
-function math.isu32(num) return math.isinteger(num) and num >= U16 and num < U32 end
+function math.isu32(num)
+    return math.isinteger(num) and num >= U16 and num < U32
+end
 
-function math.isu64(num) return math.isinteger(num) and num >= U32 and num < U64 end
+function math.isu64(num)
+    return math.isinteger(num) and num >= U32 and num < U64
+end
 
 function math.isinteger(num)
     return ((type(num) == 'number') and (num == math.floor(num)))

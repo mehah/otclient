@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -92,7 +92,7 @@ void StreamSoundSource::unqueueBuffers()
     int queued;
     alGetSourcei(m_sourceId, AL_BUFFERS_QUEUED, &queued);
     for (int i = 0; i < queued; ++i) {
-        uint buffer;
+        uint32_t buffer;
         alSourceUnqueueBuffers(m_sourceId, 1, &buffer);
     }
 }
@@ -107,7 +107,7 @@ void StreamSoundSource::update()
     int processed = 0;
     alGetSourcei(m_sourceId, AL_BUFFERS_PROCESSED, &processed);
     for (int i = 0; i < processed; ++i) {
-        uint buffer;
+        uint32_t buffer;
         alSourceUnqueueBuffers(m_sourceId, 1, &buffer);
         //SoundManager::check_al_error("Couldn't unqueue audio buffer: ");
 
@@ -127,7 +127,7 @@ void StreamSoundSource::update()
     }
 }
 
-bool StreamSoundSource::fillBufferAndQueue(uint buffer)
+bool StreamSoundSource::fillBufferAndQueue(uint32_t buffer)
 {
     if (m_waitingFile)
         return false;
@@ -161,7 +161,7 @@ bool StreamSoundSource::fillBufferAndQueue(uint buffer)
                 assert(bytesRead % 2 == 0);
                 bytesRead /= 2;
                 auto* const data = (uint16_t*)bufferData.data();
-                for (int i = 0; i < bytesRead / 2; i++)
+                for (int i = 0; i < bytesRead / 2; ++i)
                     data[i] = data[2 * i + (m_downMix == DownMixLeft ? 0 : 1)];
                 format = AL_FORMAT_MONO16;
             }

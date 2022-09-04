@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -76,8 +76,8 @@ void TextureManager::liveReload()
     if (m_liveReloadEvent)
         return;
     m_liveReloadEvent = g_dispatcher.cycleEvent([this] {
-        for (auto& it : m_textures) {
-            const std::string& path = g_resources.guessFilePath(it.first, "png");
+        for (const auto& it : m_textures) {
+            const auto& path = g_resources.guessFilePath(it.first, "png");
             const TexturePtr& tex = it.second;
             if (tex->getTime() >= g_resources.getFileTime(path))
                 continue;
@@ -96,7 +96,7 @@ TexturePtr TextureManager::getTexture(const std::string& fileName)
     TexturePtr texture;
 
     // before must resolve filename to full path
-    const std::string filePath = g_resources.resolvePath(fileName);
+    const auto& filePath = g_resources.resolvePath(fileName);
 
     // check if the texture is already loaded
     const auto it = m_textures.find(filePath);
@@ -119,13 +119,13 @@ TexturePtr TextureManager::getTexture(const std::string& fileName)
     // texture not found, load it
     if (!texture) {
         try {
-            const std::string filePathEx = g_resources.guessFilePath(filePath, "png");
+            const auto& filePathEx = g_resources.guessFilePath(filePath, "png");
 
             // load texture file data
             std::stringstream fin;
             g_resources.readFileStream(filePathEx, fin);
             texture = loadTexture(fin);
-        } catch (stdext::exception& e) {
+        } catch (const stdext::exception& e) {
             g_logger.error(stdext::format("Unable to load texture '%s': %s", fileName, e.what()));
             texture = g_textures.getEmptyTexture();
         }
@@ -144,14 +144,13 @@ TexturePtr TextureManager::loadTexture(std::stringstream& file)
 {
     TexturePtr texture;
 
-    apng_data apng;
-    if (load_apng(file, &apng) == 0) {
+    if (apng_data apng; load_apng(file, &apng) == 0) {
         const Size imageSize(apng.width, apng.height);
         if (apng.num_frames > 1) { // animated texture
             std::vector<ImagePtr> frames;
             std::vector<int> framesDelay;
-            for (uint i = 0; i < apng.num_frames; ++i) {
-                uchar* frameData = apng.pdata + ((apng.first_frame + i) * imageSize.area() * apng.bpp);
+            for (uint32_t i = 0; i < apng.num_frames; ++i) {
+                uint8_t* frameData = apng.pdata + ((apng.first_frame + i) * imageSize.area() * apng.bpp);
                 int frameDelay = apng.frames_delay[i];
 
                 framesDelay.push_back(frameDelay);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,10 +20,10 @@
  * THE SOFTWARE.
  */
 
-#ifndef FRAMEWORK_GRAPHICS_DECLARATIONS_H
-#define FRAMEWORK_GRAPHICS_DECLARATIONS_H
+#pragma once
 
 #include <framework/global.h>
+#include "glutil.h"
 
 class Texture;
 class TextureManager;
@@ -44,9 +44,11 @@ class ParticleSystem;
 class ParticleEffect;
 class ParticleEffectType;
 class SpriteSheet;
-class Pool;
-class PoolFramed;
 class DrawPool;
+class DrawPoolFramed;
+class DrawPoolManager;
+class DrawBuffer;
+class CoordsBuffer;
 
 using ImagePtr = stdext::shared_object_ptr<Image>;
 using TexturePtr = stdext::shared_object_ptr<Texture>;
@@ -67,7 +69,5 @@ using ParticleEffectTypePtr = stdext::shared_object_ptr<ParticleEffectType>;
 using SpriteSheetPtr = stdext::shared_object_ptr<SpriteSheet>;
 using ShaderList = std::vector<ShaderPtr>;
 
-using PoolPtr = std::shared_ptr<Pool>;
-using PoolFramedPtr = std::shared_ptr<PoolFramed>;
-
-#endif
+using DrawBufferPtr = std::shared_ptr<DrawBuffer>;
+using CoordsBufferPtr = std::shared_ptr<CoordsBuffer>;

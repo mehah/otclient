@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,13 +20,12 @@
  * THE SOFTWARE.
  */
 
-#ifndef RESOURCES_H
-#define RESOURCES_H
+#pragma once
 
 #include "declarations.h"
 #include <filesystem>
 
-// @bindsingleton g_resources
+ // @bindsingleton g_resources
 class ResourceManager
 {
 public:
@@ -50,11 +49,12 @@ public:
     void readFileStream(const std::string& fileName, std::iostream& out);
     std::string readFileContents(const std::string& fileName);
     // @dontbind
-    bool writeFileBuffer(const std::string& fileName, const uchar* data, uint size);
+    bool writeFileBuffer(const std::string& fileName, const uint8_t* data, uint32_t size);
     bool writeFileContents(const std::string& fileName, const std::string& data);
     // @dontbind
     bool writeFileStream(const std::string& fileName, std::iostream& in);
 
+    // String_view Support
     FileStreamPtr openFile(const std::string& fileName);
     FileStreamPtr appendFile(const std::string& fileName);
     FileStreamPtr createFile(const std::string& fileName);
@@ -93,5 +93,3 @@ private:
 };
 
 extern ResourceManager g_resources;
-
-#endif

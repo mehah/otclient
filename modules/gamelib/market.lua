@@ -3,9 +3,18 @@ MarketMaxAmountStackable = 64000
 MarketMaxPrice = 999999999
 MarketMaxOffers = 100
 
-MarketAction = {Buy = 0, Sell = 1}
+MarketAction = {
+    Buy = 0,
+    Sell = 1
+}
 
-MarketRequest = {MyOffers = 0xFFFE, MyHistory = 0xFFFF}
+MarketRequest = {
+    MyHistory = 1,
+    MyOffers = 2,
+    BrowseItem = 3,
+    OldMyOffers = 0xFFFE,
+    OldMyHistory = 0xFFFF
+}
 
 MarketOfferState = {
     Active = 0,
@@ -13,6 +22,14 @@ MarketOfferState = {
     Expired = 2,
     Accepted = 3,
     AcceptedEx = 255
+}
+
+MarketOfferStateString = {
+    [0] = 'active',
+    [1] = 'cancelled',
+    [2] = 'expired',
+    [3] = 'accepted',
+    [255] = 'acceptedEx'
 }
 
 MarketCategory = {
@@ -47,7 +64,9 @@ MarketCategory.First = MarketCategory.Armors
 MarketCategory.Last = MarketCategory.TibiaCoins
 
 MarketCategoryWeapons = {
-    [MarketCategory.Ammunition] = {slots = {255}},
+    [MarketCategory.Ammunition] = {
+        slots = {255}
+    },
     [MarketCategory.Axes] = {
         slots = {255, InventorySlotOther, InventorySlotLeft}
     },
@@ -101,7 +120,9 @@ end
 
 function getMarketCategoryId(name)
     local id = table.find(MarketCategoryStrings, name)
-    if id then return id end
+    if id then
+        return id
+    end
 end
 
 MarketItemDescription = {
@@ -165,25 +186,36 @@ end
 
 function getMarketDescriptionId(name)
     local id = table.find(MarketItemDescriptionStrings, name)
-    if id then return id end
+    if id then
+        return id
+    end
 end
 
 MarketSlotFilters = {
-    [InventorySlotOther] = "Two-Handed",
-    [InventorySlotLeft] = "One-Handed",
-    [255] = "Any"
+    [InventorySlotOther] = 'Two-Handed',
+    [InventorySlotLeft] = 'One-Handed',
+    [255] = 'Any'
 }
 
-MarketFilters = {Vocation = 1, Level = 2, Depot = 3, SearchAll = 4}
+MarketFilters = {
+    Vocation = 1,
+    Level = 2,
+    Depot = 3,
+    SearchAll = 4
+}
 
 MarketFilters.First = MarketFilters.Vocation
 MarketFilters.Last = MarketFilters.Depot
 
 function getMarketSlotFilterId(name)
     local id = table.find(MarketSlotFilters, name)
-    if id then return id end
+    if id then
+        return id
+    end
 end
 
 function getMarketSlotFilterName(id)
-    if table.haskey(MarketSlotFilters, id) then return MarketSlotFilters[id] end
+    if table.haskey(MarketSlotFilters, id) then
+        return MarketSlotFilters[id]
+    end
 end

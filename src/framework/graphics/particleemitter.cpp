@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,19 +25,6 @@
 #include "particlemanager.h"
 #include "particlesystem.h"
 
-ParticleEmitter::ParticleEmitter()
-{
-    m_position = Point();
-    m_duration = -1;
-    m_delay = 0;
-    m_burstRate = 1;
-    m_burstCount = 32;
-    m_currentBurst = 0;
-    m_elapsedTime = 0;
-    m_finished = false;
-    m_active = false;
-}
-
 void ParticleEmitter::load(const OTMLNodePtr& node)
 {
     for (const OTMLNodePtr& childNode : node->children()) {
@@ -57,7 +44,7 @@ void ParticleEmitter::load(const OTMLNodePtr& node)
     }
 
     if (!m_particleType)
-        stdext::throw_exception("emitter didn't provide a valid particle type");
+        throw Exception("emitter didn't provide a valid particle type");
 }
 
 void ParticleEmitter::update(float elapsedTime, const ParticleSystemPtr& system)

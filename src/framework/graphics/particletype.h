@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef PARTICLETYPE_H
-#define PARTICLETYPE_H
+#pragma once
 
 #include "declarations.h"
 #include <framework/graphics/painter.h>
@@ -38,35 +37,44 @@ public:
     std::string getName() { return pName; }
 
 protected:
+
     // name
     std::string pName;
-
-    // size
-    Size pStartSize, pFinalSize;
-
-    // initial position related to emitter position
-    float pMinPositionRadius, pMaxPositionRadius;
-    float pMinPositionAngle, pMaxPositionAngle;
-
-    // initial velocity
-    float pMinVelocity, pMaxVelocity;
-    float pMinVelocityAngle, pMaxVelocityAngle;
-
-    // initial acceleration
-    float pMinAcceleration, pMaxAcceleration;
-    float pMinAccelerationAngle, pMaxAccelerationAngle;
-
-    // duration
-    float pMinDuration, pMaxDuration, pIgnorePhysicsAfter;
 
     // visual ralated
     std::vector<Color> pColors;
     std::vector<float> pColorsStops;
     TexturePtr pTexture;
     ParticleTypePtr particleType;
-    Painter::CompositionMode pCompositionMode;
+    CompositionMode pCompositionMode;
+
+    // particles default configuration. (make them reasonable for user detect missing properties on scripts)
+    // size
+    Size pStartSize{ 32 };
+    Size pFinalSize{ 32 };
+
+    // initial position related to emitter position
+    float pMinPositionRadius{ 0 };
+    float pMaxPositionRadius{ 3 };
+    float pMinPositionAngle{ 0 };
+    float pMaxPositionAngle{ 360 };
+
+    // initial velocity
+    float pMinVelocity{ 32 };
+    float pMaxVelocity{ 64 };
+    float pMinVelocityAngle{ 0 };
+    float pMaxVelocityAngle{ 360 };
+
+    // initial acceleration
+    float pMinAcceleration{ 32 };
+    float pMaxAcceleration{ 64 };
+    float pMinAccelerationAngle{ 0 };
+    float pMaxAccelerationAngle{ 360 };
+
+    // duration
+    float pMinDuration{ 0 };
+    float pMaxDuration{ 10 };
+    float pIgnorePhysicsAfter{ -1 };
 
     friend class ParticleEmitter;
 };
-
-#endif

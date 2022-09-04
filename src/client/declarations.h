@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,14 +20,13 @@
  * THE SOFTWARE.
  */
 
-#ifndef CLIENT_DECLARATIONS_H
-#define CLIENT_DECLARATIONS_H
+#pragma once
 
 #include "global.h"
 #include <framework/net/declarations.h>
 #include <framework/ui/declarations.h>
 
-// core
+ // core
 class Map;
 class Game;
 class MapView;
@@ -84,9 +83,11 @@ using HouseList = std::list<HousePtr>;
 using TownList = std::list<TownPtr>;
 using TileList = std::list<TilePtr>;
 using ItemVector = std::vector<ItemPtr>;
-using TileMap = std::unordered_map<Position, TilePtr, Position::Hasher>;
-using CreatureMap = std::unordered_map<Position, CreatureTypePtr, Position::Hasher>;
-using SpawnMap = std::unordered_map<Position, SpawnPtr, Position::Hasher>;
+
+using ItemMap = stdext::map<Position, ItemPtr, Position::Hasher>;
+using TileMap = stdext::map<Position, TilePtr, Position::Hasher>;
+using CreatureMap = stdext::map<Position, CreatureTypePtr, Position::Hasher>;
+using SpawnMap = stdext::map<Position, SpawnPtr, Position::Hasher>;
 
 // net
 class ProtocolLogin;
@@ -113,5 +114,3 @@ using UIMinimapPtr = stdext::shared_object_ptr<UIMinimap>;
 using UIProgressRectPtr = stdext::shared_object_ptr<UIProgressRect>;
 using UIMapAnchorLayoutPtr = stdext::shared_object_ptr<UIMapAnchorLayout>;
 using UIPositionAnchorPtr = stdext::shared_object_ptr<UIPositionAnchor>;
-
-#endif

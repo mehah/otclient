@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef UI_H
-#define UI_H
+#pragma once
 
 #include "uianchorlayout.h"
 #include "uigridlayout.h"
@@ -32,5 +31,3 @@
 #include "uitextedit.h"
 #include "uiverticallayout.h"
 #include "uiwidget.h"
-
-#endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -49,7 +49,7 @@ std::string OTMLEmitter::emitNode(const OTMLNodePtr& node, int currentDepth)
         else if (node->hasValue()) {
             ss << " ";
 
-            std::string value = node->value();
+            const auto& value = node->value();
 
             // emit multiline values
             if (value.find('\n') != std::string::npos) {
@@ -72,7 +72,7 @@ std::string OTMLEmitter::emitNode(const OTMLNodePtr& node, int currentDepth)
                     while (pos < value.length()) {
                         if (value[pos] == '\n')
                             break;
-                        ss << value[pos++];
+                        ss << value[++pos];
                     }
                 }
                 // emit inline values

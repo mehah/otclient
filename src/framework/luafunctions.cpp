@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,14 @@
 
 #include "graphics/particleeffect.h"
 
-#ifdef FW_SOUND
+#include "framework/graphics/fontmanager.h"
+#include "framework/graphics/graphics.h"
+#include "framework/graphics/particlemanager.h"
+#include "framework/input/mouse.h"
+#include "framework/platform/platformwindow.h"
+#include "framework/ui/ui.h"
+
+#ifdef FRAMEWORK_SOUND
 #include <framework/sound/combinedsoundsource.h>
 #include <framework/sound/soundchannel.h>
 #include <framework/sound/soundmanager.h>
@@ -43,16 +50,7 @@
 #include <framework/sound/streamsoundsource.h>
 #endif
 
-#ifdef FW_GRAPHICS
-#include <framework/graphics/fontmanager.h>
-#include <framework/graphics/graphics.h>
-#include <framework/graphics/particlemanager.h>
-#include <framework/input/mouse.h>
-#include <framework/platform/platformwindow.h>
-#include <framework/ui/ui.h>
-#endif
-
-#ifdef FW_NET
+#ifdef FRAMEWORK_NET
 #include <framework/net/protocol.h>
 #include <framework/net/protocolhttp.h>
 #include <framework/net/server.h>
@@ -61,17 +59,17 @@
 void Application::registerLuaFunctions()
 {
     // conversion globals
-    g_lua.bindGlobalFunction("torect", [](const std::string& v) { return stdext::from_string<Rect>(v); });
-    g_lua.bindGlobalFunction("topoint", [](const std::string& v) { return stdext::from_string<Point>(v); });
-    g_lua.bindGlobalFunction("tocolor", [](const std::string& v) { return stdext::from_string<Color>(v); });
-    g_lua.bindGlobalFunction("tosize", [](const std::string& v) { return stdext::from_string<Size>(v); });
+    g_lua.bindGlobalFunction("torect", [](const std::string_view v) { return stdext::from_string<Rect>(v); });
+    g_lua.bindGlobalFunction("topoint", [](const std::string_view v) { return stdext::from_string<Point>(v); });
+    g_lua.bindGlobalFunction("tocolor", [](const std::string_view v) { return stdext::from_string<Color>(v); });
+    g_lua.bindGlobalFunction("tosize", [](const std::string_view v) { return stdext::from_string<Size>(v); });
     g_lua.bindGlobalFunction("recttostring", [](const Rect& v) { return stdext::to_string(v); });
     g_lua.bindGlobalFunction("pointtostring", [](const Point& v) { return stdext::to_string(v); });
     g_lua.bindGlobalFunction("colortostring", [](const Color& v) { return stdext::to_string(v); });
     g_lua.bindGlobalFunction("sizetostring", [](const Size& v) { return stdext::to_string(v); });
-    g_lua.bindGlobalFunction("iptostring", [](uint32 v) { return stdext::ip_to_string(v); });
-    g_lua.bindGlobalFunction("stringtoip", [](const std::string& v) { return stdext::string_to_ip(v); });
-    g_lua.bindGlobalFunction("listSubnetAddresses", [](uint32 a, uint8 b) { return stdext::listSubnetAddresses(a, b); });
+    g_lua.bindGlobalFunction("iptostring", [](uint32_t v) { return stdext::ip_to_string(v); });
+    g_lua.bindGlobalFunction("stringtoip", [](const std::string_view v) { return stdext::string_to_ip(v); });
+    g_lua.bindGlobalFunction("listSubnetAddresses", [](uint32_t a, uint8_t b) { return stdext::listSubnetAddresses(a, b); });
     g_lua.bindGlobalFunction("ucwords", [](std::string s) { return stdext::ucwords(s); });
 
     // Platform
@@ -251,7 +249,6 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ScheduledEvent>("cyclesExecuted", &ScheduledEvent::cyclesExecuted);
     g_lua.bindClassMemberFunction<ScheduledEvent>("maxCycles", &ScheduledEvent::maxCycles);
 
-#ifdef FW_GRAPHICS
     // GraphicalApplication
     g_lua.bindSingletonFunction("g_app", "isOnInputEvent", &GraphicalApplication::isOnInputEvent, &g_app);
 
@@ -314,13 +311,6 @@ void Application::registerLuaFunctions()
 
     // Graphics
     g_lua.registerSingletonClass("g_graphics");
-    g_lua.bindSingletonFunction("g_graphics", "isPainterEngineAvailable", &Graphics::isPainterEngineAvailable, &g_graphics);
-    g_lua.bindSingletonFunction("g_graphics", "selectPainterEngine", &Graphics::selectPainterEngine, &g_graphics);
-    g_lua.bindSingletonFunction("g_graphics", "canCacheBackbuffer", &Graphics::canCacheBackbuffer, &g_graphics);
-    g_lua.bindSingletonFunction("g_graphics", "canUseShaders", &Graphics::canUseShaders, &g_graphics);
-    g_lua.bindSingletonFunction("g_graphics", "shouldUseShaders", &Graphics::shouldUseShaders, &g_graphics);
-    g_lua.bindSingletonFunction("g_graphics", "setShouldUseShaders", &Graphics::setShouldUseShaders, &g_graphics);
-    g_lua.bindSingletonFunction("g_graphics", "getPainterEngine", &Graphics::getPainterEngine, &g_graphics);
     g_lua.bindSingletonFunction("g_graphics", "getViewportSize", &Graphics::getViewportSize, &g_graphics);
     g_lua.bindSingletonFunction("g_graphics", "getVendor", &Graphics::getVendor, &g_graphics);
     g_lua.bindSingletonFunction("g_graphics", "getRenderer", &Graphics::getRenderer, &g_graphics);
@@ -570,6 +560,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("getBorderRightWidth", &UIWidget::getBorderRightWidth);
     g_lua.bindClassMemberFunction<UIWidget>("getBorderBottomWidth", &UIWidget::getBorderBottomWidth);
     g_lua.bindClassMemberFunction<UIWidget>("getBorderLeftWidth", &UIWidget::getBorderLeftWidth);
+    g_lua.bindClassMemberFunction<UIWidget>("getImageSource", &UIWidget::getImageSource);
     g_lua.bindClassMemberFunction<UIWidget>("getMarginTop", &UIWidget::getMarginTop);
     g_lua.bindClassMemberFunction<UIWidget>("getMarginRight", &UIWidget::getMarginRight);
     g_lua.bindClassMemberFunction<UIWidget>("getMarginBottom", &UIWidget::getMarginBottom);
@@ -757,9 +748,8 @@ void Application::registerLuaFunctions()
     g_lua.registerClass<UIParticles, UIWidget>();
     g_lua.bindClassStaticFunction<UIParticles>("create", [] { return UIParticlesPtr(new UIParticles); });
     g_lua.bindClassMemberFunction<UIParticles>("addEffect", &UIParticles::addEffect);
-#endif
 
-#ifdef FW_NET
+#ifdef FRAMEWORK_NET
     // Server
     g_lua.registerClass<Server>();
     g_lua.bindClassStaticFunction<Server>("create", &Server::create);
@@ -828,7 +818,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<OutputMessage>("setWritePos", &OutputMessage::setWritePos);
 #endif
 
-#ifdef FW_SOUND
+#ifdef FRAMEWORK_SOUND
     // SoundManager
     g_lua.registerSingletonClass("g_sounds");
     g_lua.bindSingletonFunction("g_sounds", "preload", &SoundManager::preload, &g_sounds);

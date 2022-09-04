@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef UICREATURE_H
-#define UICREATURE_H
+#pragma once
 
 #include "creature.h"
 #include "declarations.h"
@@ -40,10 +39,8 @@ public:
     bool isFixedCreatureSize() { return m_fixedCreatureSize; }
 
 protected:
-    void onStyleApply(const std::string& styleName, const OTMLNodePtr& styleNode) override;
+    void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
 
     CreaturePtr m_creature;
     bool m_fixedCreatureSize{ false };
 };
-
-#endif

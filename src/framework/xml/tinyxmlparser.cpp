@@ -59,7 +59,7 @@ TiXmlBase::Entity TiXmlBase::entity[NUM_ENTITY] =
 //                ef bf be
 //                ef bf bf
 
-constexpr unsigned char TIXML_UTF_LEAD_0 = 0xefU,
+constexpr uint8_t TIXML_UTF_LEAD_0 = 0xefU,
 TIXML_UTF_LEAD_1 = 0xbbU,
 TIXML_UTF_LEAD_2 = 0xbfU;
 
@@ -84,9 +84,9 @@ const int TiXmlBase::utf8ByteTable[256] =
         4,    4,    4,    4,    4,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1    // 0xf0 0xf0 to 0xf4 4 byte, 0xf5 and higher invalid
 };
 
-void TiXmlBase::ConvertUTF32ToUTF8(unsigned long input, char* output, int* length)
+void TiXmlBase::ConvertUTF32ToUTF8(uint64_t input, char* output, int* length)
 {
-    constexpr unsigned long BYTE_MASK = 0xBF,
+    constexpr uint64_t BYTE_MASK = 0xBF,
         BYTE_MARK = 0x80,
         FIRST_BYTE_MARK[7] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC };
 
@@ -128,7 +128,7 @@ void TiXmlBase::ConvertUTF32ToUTF8(unsigned long input, char* output, int* lengt
     }
 }
 
-/*static*/ int TiXmlBase::IsAlpha(unsigned char anyByte, TiXmlEncoding /*encoding*/)
+/*static*/ int TiXmlBase::IsAlpha(uint8_t anyByte, TiXmlEncoding /*encoding*/)
 {
     // This will only work for low-ascii, everything else is assumed to be a valid
     // letter. I'm not sure this is the best approach, but it is quite tricky trying
@@ -148,7 +148,7 @@ void TiXmlBase::ConvertUTF32ToUTF8(unsigned long input, char* output, int* lengt
 //    }
 }
 
-/*static*/ int TiXmlBase::IsAlphaNum(unsigned char anyByte, TiXmlEncoding /*encoding*/)
+/*static*/ int TiXmlBase::IsAlphaNum(uint8_t anyByte, TiXmlEncoding /*encoding*/)
 {
     // This will only work for low-ascii, everything else is assumed to be a valid
     // letter. I'm not sure this is the best approach, but it is quite tricky trying
@@ -209,7 +209,7 @@ void TiXmlParsingData::Stamp(const char* now, TiXmlEncoding encoding)
 
     while (p < now) {
         // Treat p as unsigned, so we have a happy compiler.
-        const auto* const pU = (const unsigned char*)p;
+        const auto* const pU = (const uint8_t*)p;
 
         // Code contributed by Fletcher Dunn: (modified by lee)
         switch (*pU) {
@@ -279,7 +279,7 @@ void TiXmlParsingData::Stamp(const char* now, TiXmlEncoding encoding)
             default:
                 if (encoding == TIXML_ENCODING_UTF8) {
                     // Eat the 1 to 4 byte utf8 character.
-                    int step = TiXmlBase::utf8ByteTable[*((const unsigned char*)p)];
+                    int step = TiXmlBase::utf8ByteTable[*((const uint8_t*)p)];
                     if (step == 0)
                         step = 1;        // Error case from bad encoding, but handle gracefully.
                     p += step;
@@ -308,7 +308,7 @@ const char* TiXmlBase::SkipWhiteSpace(const char* p, TiXmlEncoding encoding)
     }
     if (encoding == TIXML_ENCODING_UTF8) {
         while (*p) {
-            const auto* const pU = (const unsigned char*)p;
+            const auto* const pU = (const uint8_t*)p;
 
             // Skip the stupid Microsoft UTF-8 Byte order marks
             if (*(pU + 0) == TIXML_UTF_LEAD_0
@@ -394,10 +394,10 @@ const char* TiXmlBase::ReadName(const char* p, TIXML_STRING* name, TiXmlEncoding
     // hyphens, or colons. (Colons are valid ony for namespaces,
     // but tinyxml can't tell namespaces from names.)
     if (p && *p
-       && (IsAlpha(static_cast<unsigned char>(*p), encoding) || *p == '_')) {
+       && (IsAlpha(static_cast<uint8_t>(*p), encoding) || *p == '_')) {
         const char* start = p;
         while (p && *p
-              && (IsAlphaNum(static_cast<unsigned char>(*p), encoding)
+              && (IsAlphaNum(static_cast<uint8_t>(*p), encoding)
                   || *p == '_'
                   || *p == '-'
                   || *p == '.'
@@ -420,7 +420,7 @@ const char* TiXmlBase::GetEntity(const char* p, char* value, int* length, TiXmlE
     *length = 0;
 
     if (*(p + 1) && *(p + 1) == '#' && *(p + 2)) {
-        unsigned long ucs = 0;
+        uint64_t ucs = 0;
         ptrdiff_t delta = 0;
         unsigned mult = 1;
 
@@ -616,7 +616,7 @@ void TiXmlDocument::StreamIn(std::istream* in, TIXML_STRING* tag)
             // We now have something we presume to be a node of
             // some sort. Identify it, and call the node to
             // continue streaming.
-            TiXmlNode* node = Identify(tag->c_str() + tagIndex, TIXML_DEFAULT_ENCODING);
+            TiXmlNode* node = Identify(tag->data() + tagIndex, TIXML_DEFAULT_ENCODING);
 
             if (node) {
                 node->StreamIn(in, tag);
@@ -669,7 +669,7 @@ const char* TiXmlDocument::Parse(const char* p, TiXmlParsingData* prevData, TiXm
 
     if (encoding == TIXML_ENCODING_UNKNOWN) {
         // Check for the Microsoft UTF-8 lead bytes.
-        const auto* const pU = (const unsigned char*)p;
+        const auto* const pU = (const uint8_t*)p;
         if (*(pU + 0) && *(pU + 0) == TIXML_UTF_LEAD_0
            && *(pU + 1) && *(pU + 1) == TIXML_UTF_LEAD_1
            && *(pU + 2) && *(pU + 2) == TIXML_UTF_LEAD_2) {
@@ -890,7 +890,7 @@ void TiXmlElement::StreamIn(std::istream* in, TIXML_STRING* tag)
                 // Early out if we find the CDATA id.
                 if (c == '[' && tag->size() >= 9) {
                     const size_t len = tag->size();
-                    const char* start = tag->c_str() + len - 9;
+                    const char* start = tag->data() + len - 9;
                     if (strcmp(start, "<![CDATA[") == 0) {
                         assert(!closingTag);
                         break;
@@ -923,7 +923,7 @@ void TiXmlElement::StreamIn(std::istream* in, TIXML_STRING* tag)
                 return;
             }
             // If not a closing tag, id it, and stream.
-            const char* tagloc = tag->c_str() + tagIndex;
+            const char* tagloc = tag->data() + tagIndex;
             TiXmlNode* node = Identify(tagloc, TIXML_DEFAULT_ENCODING);
             if (!node)
                 return;
@@ -1007,7 +1007,7 @@ const char* TiXmlElement::Parse(const char* p, TiXmlParsingData* data, TiXmlEnco
             // </foo > and
             // </foo>
             // are both valid end tags.
-            if (StringEqual(p, endTag.c_str(), false, encoding)) {
+            if (StringEqual(p, endTag.data(), false, encoding)) {
                 p += endTag.length();
                 p = SkipWhiteSpace(p, encoding);
                 if (p && *p && *p == '>') {

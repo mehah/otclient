@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,15 +20,14 @@
  * THE SOFTWARE.
  */
 
-#ifndef IMAGE_H
-#define IMAGE_H
+#pragma once
 
 #include "declarations.h"
 
 class Image : public stdext::shared_object
 {
 public:
-    Image(const Size& size, int bpp = 4, uint8* pixels = nullptr);
+    Image(const Size& size, int bpp = 4, uint8_t* pixels = nullptr);
 
     static ImagePtr load(std::string file);
     static ImagePtr loadPNG(const std::string& file);
@@ -45,27 +44,25 @@ public:
     void flipVertically();
     void reverseChannels(); // argb -> bgra or bgra -> argb
 
-    void setPixel(int x, int y, uint8* pixel) { memcpy(&m_pixels[(y * m_size.width() + x) * m_bpp], pixel, m_bpp); }
-    void setPixel(int x, int y, const Color& color) { uint32 tmp = color.rgba(); setPixel(x, y, (uint8*)&tmp); }
+    void setPixel(int x, int y, const uint8_t* pixel) { memcpy(&m_pixels[(y * m_size.width() + x) * m_bpp], pixel, m_bpp); }
+    void setPixel(int x, int y, const Color& color) { uint32_t tmp = color.rgba(); setPixel(x, y, (uint8_t*)&tmp); }
 
-    std::vector<uint8>& getPixels() { return m_pixels; }
-    uint8* getPixelData() { return &m_pixels[0]; }
+    std::vector<uint8_t >& getPixels() { return m_pixels; }
+    uint8_t* getPixelData() { return &m_pixels[0]; }
     int getPixelCount() { return m_size.area(); }
     const Size& getSize() { return m_size; }
     int getWidth() { return m_size.width(); }
     int getHeight() { return m_size.height(); }
     int getBpp() { return m_bpp; }
-    uint8* getPixel(int x, int y) { return &m_pixels[(y * m_size.width() + x) * m_bpp]; }
+    uint8_t* getPixel(int x, int y) { return &m_pixels[(y * m_size.width() + x) * m_bpp]; }
 
     bool hasTransparentPixel() const { return m_transparentPixel; }
     void setTransparentPixel(const bool value) { m_transparentPixel = value; }
 
 private:
-    std::vector<uint8> m_pixels;
+    std::vector<uint8_t > m_pixels;
     Size m_size;
 
     int m_bpp;
     bool m_transparentPixel{ false };
 };
-
-#endif

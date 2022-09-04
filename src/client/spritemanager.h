@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef SPRITEMANAGER_H
-#define SPRITEMANAGER_H
+#pragma once
 
 #include <framework/core/declarations.h>
 #include <framework/graphics/declarations.h>
@@ -38,7 +37,7 @@ public:
 
     void saveSpr(const std::string& fileName);
 
-    uint32 getSignature() { return m_signature; }
+    uint32_t getSignature() { return m_signature; }
     int getSpritesCount() { return m_spritesCount; }
 
     ImagePtr getSpriteImage(int id);
@@ -56,15 +55,14 @@ private:
     void generateLightTexture(),
         generateShadeTexture();
 
-    TexturePtr m_lightTexture, m_shadeTexture;
+    TexturePtr m_lightTexture;
+    TexturePtr m_shadeTexture;
 
     bool m_loaded{ false };
-    uint32 m_signature{ 0 };
+    uint32_t m_signature{ 0 };
     int m_spritesCount{ 0 };
-    int m_spritesOffset;
+    int m_spritesOffset{ 0 };
     FileStreamPtr m_spritesFile;
 };
 
 extern SpriteManager g_sprites;
-
-#endif

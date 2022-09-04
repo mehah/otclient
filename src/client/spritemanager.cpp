@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -59,7 +59,7 @@ bool SpriteManager::loadSpr(std::string file)
         m_loaded = true;
         g_lua.callGlobalField("g_sprites", "onLoadSpr", file);
         return true;
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("Failed to load sprites from '%s': %s", file, e.what()));
         return false;
     }
@@ -68,12 +68,12 @@ bool SpriteManager::loadSpr(std::string file)
 void SpriteManager::saveSpr(const std::string& fileName)
 {
     if (!m_loaded)
-        stdext::throw_exception("failed to save, spr is not loaded");
+        throw Exception("failed to save, spr is not loaded");
 
     try {
         const FileStreamPtr fin = g_resources.createFile(fileName);
         if (!fin)
-            stdext::throw_exception(stdext::format("failed to open file '%s' for write", fileName));
+            throw Exception("failed to open file '%s' for write", fileName);
 
         fin->cache();
 
@@ -83,14 +83,14 @@ void SpriteManager::saveSpr(const std::string& fileName)
         else
             fin->addU16(m_spritesCount);
 
-        const uint32 offset = fin->tell();
-        uint32 spriteAddress = offset + 4 * m_spritesCount;
+        const uint32_t offset = fin->tell();
+        uint32_t spriteAddress = offset + 4 * m_spritesCount;
         for (int i = 1; i <= m_spritesCount; ++i)
             fin->addU32(0);
 
         for (int i = 1; i <= m_spritesCount; ++i) {
             m_spritesFile->seek((i - 1) * 4 + m_spritesOffset);
-            const uint32 fromAdress = m_spritesFile->getU32();
+            const uint32_t fromAdress = m_spritesFile->getU32();
             if (fromAdress != 0) {
                 fin->seek(offset + (i - 1) * 4);
                 fin->addU32(spriteAddress);
@@ -101,7 +101,7 @@ void SpriteManager::saveSpr(const std::string& fileName)
                 fin->addU8(m_spritesFile->getU8());
                 fin->addU8(m_spritesFile->getU8());
 
-                const uint16 dataSize = m_spritesFile->getU16();
+                const uint16_t dataSize = m_spritesFile->getU16();
                 fin->addU16(dataSize);
                 char spriteData[SPRITE_DATA_SIZE];
                 m_spritesFile->read(spriteData, dataSize);
@@ -114,7 +114,7 @@ void SpriteManager::saveSpr(const std::string& fileName)
 
         fin->flush();
         fin->close();
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
     }
 }
@@ -138,7 +138,7 @@ ImagePtr SpriteManager::getSpriteImage(int id)
 
         m_spritesFile->seek(((id - 1) * 4) + m_spritesOffset);
 
-        const uint32 spriteAddress = m_spritesFile->getU32();
+        const uint32_t spriteAddress = m_spritesFile->getU32();
 
         // no sprite? return an empty texture
         if (spriteAddress == 0)
@@ -151,19 +151,19 @@ ImagePtr SpriteManager::getSpriteImage(int id)
         m_spritesFile->getU8();
         m_spritesFile->getU8();
 
-        const uint16 pixelDataSize = m_spritesFile->getU16();
+        const uint16_t pixelDataSize = m_spritesFile->getU16();
 
-        ImagePtr image(new Image(Size(SPRITE_SIZE, SPRITE_SIZE)));
+        ImagePtr image(new Image(Size(SPRITE_SIZE)));
 
-        uint8* pixels = image->getPixelData();
+        uint8_t* pixels = image->getPixelData();
         int writePos = 0;
         int read = 0;
         const bool useAlpha = g_game.getFeature(Otc::GameSpritesAlphaChannel);
-        const uint8 channels = useAlpha ? 4 : 3;
+        const uint8_t channels = useAlpha ? 4 : 3;
         // decompress pixels
         while (read < pixelDataSize && writePos < SPRITE_DATA_SIZE) {
-            const uint16 transparentPixels = m_spritesFile->getU16();
-            const uint16 coloredPixels = m_spritesFile->getU16();
+            const uint16_t transparentPixels = m_spritesFile->getU16();
+            const uint16_t coloredPixels = m_spritesFile->getU16();
 
             for (int i = 0; i < transparentPixels && writePos < SPRITE_DATA_SIZE; ++i) {
                 pixels[writePos + 0] = 0x00;
@@ -178,7 +178,7 @@ ImagePtr SpriteManager::getSpriteImage(int id)
                 pixels[writePos + 1] = m_spritesFile->getU8();
                 pixels[writePos + 2] = m_spritesFile->getU8();
 
-                const uint8 alphaColor = useAlpha ? m_spritesFile->getU8() : 0xFF;
+                const uint8_t alphaColor = useAlpha ? m_spritesFile->getU8() : 0xFF;
                 if (alphaColor != 0xFF)
                     image->setTransparentPixel(true);
 
@@ -205,8 +205,8 @@ ImagePtr SpriteManager::getSpriteImage(int id)
 
         if (!image->hasTransparentPixel()) {
             // The image must be more than 4 pixels transparent to be considered transparent.
-            uint8 cntTrans = 0;
-            for (const uint8 pixel : image->getPixels()) {
+            uint8_t cntTrans = 0;
+            for (const uint8_t pixel : image->getPixels()) {
                 if (pixel == 0x00 && ++cntTrans > 4) {
                     image->setTransparentPixel(true);
                     break;
@@ -215,7 +215,7 @@ ImagePtr SpriteManager::getSpriteImage(int id)
         }
 
         return image;
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("Failed to get sprite id %d: %s", id, e.what()));
         return nullptr;
     }
@@ -225,10 +225,10 @@ void SpriteManager::generateLightTexture()
 {
     constexpr float brightnessIntensity = 1.5f;
 
-    constexpr int bubbleRadius = 6,
-        bubbleDiameter = bubbleRadius * 2.3;
+    constexpr int bubbleRadius = 6;
+    constexpr int bubbleDiameter = bubbleRadius * 2.3;
 
-    const auto lightImage = ImagePtr(new Image(Size(bubbleDiameter, bubbleDiameter)));
+    const auto image = ImagePtr(new Image(Size(bubbleDiameter)));
     for (int_fast16_t x = -1; ++x < bubbleDiameter;) {
         for (int_fast16_t y = -1; ++y < bubbleDiameter;) {
             const float radius = std::sqrt((bubbleRadius - x) * (bubbleRadius - x) + (bubbleRadius - y) * (bubbleRadius - y));
@@ -238,22 +238,22 @@ void SpriteManager::generateLightTexture()
             const uint8_t colorByte = intensity * 0xff;
 
             uint8_t pixel[4] = { colorByte, colorByte, colorByte, 0xff };
-            lightImage->setPixel(x, y, pixel);
+            image->setPixel(x, y, pixel);
         }
     }
 
-    m_lightTexture = TexturePtr(new Texture(lightImage));
+    m_lightTexture = TexturePtr(new Texture(image));
     m_lightTexture->setSmooth(true);
 }
 
 void SpriteManager::generateShadeTexture()
 {
-    constexpr uint16 diameter = 4;
+    constexpr uint16_t diameter = 4;
 
-    const auto image = ImagePtr(new Image(Size(diameter, diameter)));
+    const auto image = ImagePtr(new Image(Size(diameter)));
     for (int_fast16_t x = -1; ++x < diameter;) {
         for (int_fast16_t y = -1; ++y < diameter;) {
-            const uint8 alpha = x == 0 || y == 0 || x == diameter - 1 || y == diameter - 1 ? 0 : 0xff;
+            const uint8_t alpha = x == 0 || y == 0 || x == diameter - 1 || y == diameter - 1 ? 0 : 0xff;
             uint8_t pixel[4] = { 0xff, 0xff, 0xff, alpha };
             image->setPixel(x, y, pixel);
         }

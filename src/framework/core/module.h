@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef MODULE_H
-#define MODULE_H
+#pragma once
 
 #include "declarations.h"
 
@@ -32,7 +31,7 @@
 class Module : public LuaObject
 {
 public:
-    Module(const std::string& name);
+    Module(const std::string_view name);
 
     bool load();
     void unload();
@@ -44,7 +43,7 @@ public:
     bool isReloadable() { return m_reloadable; }
     bool isDependent();
     bool isSandboxed() { return m_sandboxed; }
-    bool hasDependency(const std::string& name, bool recursive = false);
+    bool hasDependency(const std::string_view name, bool recursive = false);
     int getSandbox(LuaInterface* lua);
 
     std::string getDescription() { return m_description; }
@@ -63,10 +62,10 @@ protected:
     friend class ModuleManager;
 
 private:
-    bool m_loaded{ false },
-        m_autoLoad{ false },
-        m_reloadable{ false },
-        m_sandboxed{ false };
+    bool m_loaded{ false };
+    bool m_autoLoad{ false };
+    bool m_reloadable{ false };
+    bool m_sandboxed{ false };
 
     int m_autoLoadPriority;
     int m_sandboxEnv;
@@ -83,5 +82,3 @@ private:
     std::list<std::string> m_scripts;
     std::list<std::string> m_loadLaterModules;
 };
-
-#endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef WIN32WINDOW_H
-#define WIN32WINDOW_H
+#pragma once
 
 #include "platformwindow.h"
 
@@ -47,7 +46,7 @@ class WIN32Window : public PlatformWindow
     void* getExtensionProcAddress(const char* ext);
     bool isExtensionSupported(const char* ext);
 
-    LRESULT windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
     friend struct WindowProcProxy;
 
     Fw::Key retranslateVirtualKey(WPARAM wParam, LPARAM lParam);
@@ -67,17 +66,17 @@ public:
     void swapBuffers() override;
     void showMouse() override;
     void hideMouse() override;
-    void displayFatalError(const std::string& message) override;
+    void displayFatalError(const std::string_view message) override;
 
     void setMouseCursor(int cursorId) override;
     void restoreMouseCursor() override;
 
-    void setTitle(const std::string& title) override;
+    void setTitle(const std::string_view title) override;
     void setMinimumSize(const Size& minimumSize) override;
     void setFullscreen(bool fullscreen) override;
     void setVerticalSync(bool enable) override;
     void setIcon(const std::string& file) override;
-    void setClipboardText(const std::string& text) override;
+    void setClipboardText(const std::string_view text) override;
 
     Size getDisplaySize() override;
     std::string getClipboardText() override;
@@ -113,5 +112,3 @@ private:
     HGLRC m_wglContext;
 #endif
 };
-
-#endif

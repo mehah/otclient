@@ -4,7 +4,7 @@
 
 #### :heart:  If you are interested in supporting the project, go to this [link](https://www.paypal.com/donate/?business=CV9D5JF8E46LY&no_recurring=0&item_name=Thank+you+very+much+for+your+donation.&currency_code=BRL), any value is great help, thank you.
 
-### Based on [edubart/otclient](https://github.com/edubart/otclient) Rev: [2.758](https://github.com/edubart/otclient/commit/45afb65b90284ce70f328733715043860186bf50)
+### Based on [edubart/otclient](https://github.com/edubart/otclient) Rev: [2.760](https://github.com/edubart/otclient/commit/fc39ee4adba8e780a2820bfda66fc942d74cedf4)
 
 
 ### Features
@@ -36,12 +36,14 @@
 - Health&Mana Circle by [@EgzoT](https://github.com/EgzoT), [@GustavoBlaze](https://github.com/GustavoBlaze), [@Tekadon58](https://github.com/Tekadon58) ([GITHUB Project](https://github.com/EgzoT/-OTClient-Mod-health_and_mana_circle))
 - Tibia Theme 1.2 by Zews ([Forum Thread](https://otland.net/threads/otc-tibia-theme-v1-2.230988/))
 - Add option ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE in [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h) by [@SkullzOTS](https://github.com/SkullzOTS)
-- Encryption System by [@Mrpox](https://github.com/Mrpox)
+- Encryption System by [@Mrpox](https://github.com/Mrpox) (Note: This implementation is unsafe)
   - To enable just go to [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h), set 1 in ENABLE_ENCRYPTION and change password on ENCRYPTION_PASSWORD
+  - To enable Encrypting by "--encrypt" change ENABLE_ENCRYPTION_BUILDER to 1 (by [@TheMaoci](https://github.com/TheMaoci)). This allows to remove code of creating encrypted files off the production build
   - To generate an encryption, just run the client with flag "--encrypt SET_YOUR_PASSWORD_HERE" and don't forget to change the password.
+  - you can also skip adding password to --encrypt command it automatically will be taken from [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h) file (by [@TheMaoci](https://github.com/TheMaoci))
 
 ##### [Active Developers]
-[@mehah](https://github.com/mehah) [@scopz](https://github.com/scopz)
+[@mehah](https://github.com/mehah) [@scopz](https://github.com/scopz) [@nekiro](https://github.com/nekiro)
 
 <h2>
 
@@ -85,11 +87,7 @@ client, instead otclient was designed to be a combination of a framework and tib
 
 ### Compiling
 
-In short, if you need to compile OTClient, follow these tutorials:
-
-- [Compiling on Windows](https://github.com/mehah/otclient/wiki/Compiling-on-Windows)
-- [Compiling on Linux](https://github.com/edubart/otclient/wiki/Compiling-on-Linux)
-- [Compiling on OS X](https://github.com/edubart/otclient/wiki/Compiling-on-Mac-OS-X)
+[If you are interested in compiling this project, just go to the wiki.](https://github.com/mehah/otclient/wiki)
 
 ### Build and run with Docker
 

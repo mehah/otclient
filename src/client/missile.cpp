@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,43 +26,14 @@
 #include "tile.h"
 #include <framework/core/eventdispatcher.h>
 
-void Missile::draw(const Point& dest, float scaleFactor, LightView* lightView)
+void Missile::drawMissile(const Point& dest, float scaleFactor, LightView* lightView)
 {
-    if (m_id == 0)
+    if (m_id == 0 || !m_drawBuffer)
         return;
 
-    int xPattern = 0, yPattern = 0;
-    if (m_direction == Otc::NorthWest) {
-        xPattern = 0;
-        yPattern = 0;
-    } else if (m_direction == Otc::North) {
-        xPattern = 1;
-        yPattern = 0;
-    } else if (m_direction == Otc::NorthEast) {
-        xPattern = 2;
-        yPattern = 0;
-    } else if (m_direction == Otc::East) {
-        xPattern = 2;
-        yPattern = 1;
-    } else if (m_direction == Otc::SouthEast) {
-        xPattern = 2;
-        yPattern = 2;
-    } else if (m_direction == Otc::South) {
-        xPattern = 1;
-        yPattern = 2;
-    } else if (m_direction == Otc::SouthWest) {
-        xPattern = 0;
-        yPattern = 2;
-    } else if (m_direction == Otc::West) {
-        xPattern = 0;
-        yPattern = 1;
-    } else {
-        xPattern = 1;
-        yPattern = 1;
-    }
-
     const float fraction = m_animationTimer.ticksElapsed() / m_duration;
-    rawGetThingType()->draw(dest + m_delta * fraction * scaleFactor, scaleFactor, 0, xPattern, yPattern, 0, 0, TextureType::NONE, Color::white, lightView);
+    getThingType()->draw(dest + m_delta * fraction * scaleFactor, scaleFactor, 0, m_numPatternX, m_numPatternY, 0, 0,
+                         Otc::DrawThings | Otc::DrawLights, TextureType::NONE, Color::white, lightView, m_drawBuffer);
 }
 
 void Missile::setPath(const Position& fromPosition, const Position& toPosition)
@@ -83,24 +54,54 @@ void Missile::setPath(const Position& fromPosition, const Position& toPosition)
     m_animationTimer.restart();
     m_distance = fromPosition.distance(toPosition);
 
+    { // Update Pattern
+        if (m_direction == Otc::NorthWest) {
+            m_numPatternX = 0;
+            m_numPatternY = 0;
+        } else if (m_direction == Otc::North) {
+            m_numPatternX = 1;
+            m_numPatternY = 0;
+        } else if (m_direction == Otc::NorthEast) {
+            m_numPatternX = 2;
+            m_numPatternY = 0;
+        } else if (m_direction == Otc::East) {
+            m_numPatternX = 2;
+            m_numPatternY = 1;
+        } else if (m_direction == Otc::SouthEast) {
+            m_numPatternX = 2;
+            m_numPatternY = 2;
+        } else if (m_direction == Otc::South) {
+            m_numPatternX = 1;
+            m_numPatternY = 2;
+        } else if (m_direction == Otc::SouthWest) {
+            m_numPatternX = 0;
+            m_numPatternY = 2;
+        } else if (m_direction == Otc::West) {
+            m_numPatternX = 0;
+            m_numPatternY = 1;
+        } else {
+            m_numPatternX = 1;
+            m_numPatternY = 1;
+        }
+    }
+
     // schedule removal
     const auto self = asMissile();
-    g_dispatcher.scheduleEvent([self]() { g_map.removeThing(self); }, m_duration);
+    g_dispatcher.scheduleEvent([self] { g_map.removeThing(self); }, m_duration);
+
+    generateBuffer();
 }
 
-void Missile::setId(uint32 id)
+void Missile::setId(uint32_t id)
 {
     if (!g_things.isValidDatId(id, ThingCategoryMissile))
         id = 0;
+
     m_id = id;
+    m_thingType = nullptr;
 }
 
 const ThingTypePtr& Missile::getThingType()
 {
-    return g_things.getThingType(m_id, ThingCategoryMissile);
-}
-
-ThingType* Missile::rawGetThingType()
-{
-    return g_things.rawGetThingType(m_id, ThingCategoryMissile);
+    return m_thingType ? m_thingType : m_thingType = g_things.getThingType(m_id, ThingCategoryMissile);
 }

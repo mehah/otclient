@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,11 +20,11 @@
  * THE SOFTWARE.
  */
 
-#ifndef STDEXT_EXCEPTION_H
-#define STDEXT_EXCEPTION_H
+#pragma once
 
 #include <exception>
 #include <string>
+#include "format.h"
 
 namespace stdext
 {
@@ -32,15 +32,17 @@ namespace stdext
     {
     public:
         exception() = default;
-        exception(std::string what) : m_what(std::move(what)) {}
+
+        exception(std::string_view what) : m_what(std::string(what)) {}
+
+        template<typename... Args>
+        exception(std::string_view what, const Args&... args) : m_what(stdext::format({ what }, args...)) {}
+
         ~exception() noexcept override = default;;
-        const char* what() const noexcept override { return m_what.c_str(); }
+        const char* what() const noexcept override { return m_what.data(); }
     protected:
         std::string m_what;
     };
-
-    /// Throws a generic exception
-    inline void throw_exception(const std::string& what) { throw exception(what); }
 }
 
-#endif
+using Exception = stdext::exception;

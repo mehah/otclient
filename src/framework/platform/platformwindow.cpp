@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -135,7 +135,7 @@ void PlatformWindow::processKeyUp(Fw::Key keyCode)
         return;
     }
     if (keyCode == Fw::KeyNumLock) {
-        for (uchar k = Fw::KeyNumpad0; k <= Fw::KeyNumpad9; ++k) {
+        for (uint8_t k = Fw::KeyNumpad0; k <= Fw::KeyNumpad9; ++k) {
             if (m_keysState[static_cast<Fw::Key>(k)])
                 processKeyUp(static_cast<Fw::Key>(k));
         }
@@ -155,14 +155,12 @@ void PlatformWindow::processKeyUp(Fw::Key keyCode)
 
 void PlatformWindow::releaseAllKeys()
 {
-    for (const auto it : m_keysState) {
-        const Fw::Key keyCode = it.first;
-        const bool pressed = it.second;
-
+    for (size_t keyCode = 0; keyCode < Fw::KeyLast; ++keyCode) {
+        const bool pressed = m_keysState[keyCode];
         if (!pressed)
             continue;
 
-        processKeyUp(keyCode);
+        processKeyUp(static_cast<Fw::Key>(keyCode));
     }
 
     m_inputEvent.keyboardModifiers = 0;
@@ -178,9 +176,8 @@ void PlatformWindow::fireKeysPress()
         return;
     m_keyPressTimer.restart();
 
-    for (const auto it : m_keysState) {
-        Fw::Key keyCode = it.first;
-        const bool pressed = it.second;
+    for (size_t keyCode = 0; keyCode < Fw::KeyLast; ++keyCode) {
+        const bool pressed = m_keysState[keyCode];
 
         if (!pressed)
             continue;
@@ -190,7 +187,7 @@ void PlatformWindow::fireKeysPress()
         if (g_clock.millis() - lastPressTicks >= KEY_PRESS_REPEAT_INTERVAL) {
             if (m_onInputEvent) {
                 m_inputEvent.reset(Fw::KeyPressInputEvent);
-                m_inputEvent.keyCode = keyCode;
+                m_inputEvent.keyCode = static_cast<Fw::Key>(keyCode);
                 m_inputEvent.autoRepeatTicks = g_clock.millis() - firstKeyPress;
                 m_onInputEvent(m_inputEvent);
             }

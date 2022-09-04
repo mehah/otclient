@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,27 +20,27 @@
  * THE SOFTWARE.
  */
 
-#ifndef EFFECT_H
-#define EFFECT_H
+#pragma once
 
 #include "thing.h"
 #include <framework/core/timer.h>
 #include <framework/global.h>
 
-// @bindclass
+ // @bindclass
 class Effect : public Thing
 {
 public:
-    void drawEffect(const Point& dest, float scaleFactor, LightView* lightView = nullptr);
+    void drawEffect(const Point& dest, float scaleFactor, uint32_t flags, int offsetX, int offsetY, LightView* lightView = nullptr);
 
-    void setId(uint32 id) override;
-    uint32 getId() override { return m_id; }
+    uint32_t getId() override { return m_id; }
+
+    void setId(uint32_t id) override;
+    void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false) override;
 
     EffectPtr asEffect() { return static_self_cast<Effect>(); }
     bool isEffect() override { return true; }
 
     const ThingTypePtr& getThingType() override;
-    ThingType* rawGetThingType() override;
 
     void waitFor(const EffectPtr&);
 
@@ -50,10 +50,8 @@ protected:
 private:
     Timer m_animationTimer;
 
-    uint16 m_id;
+    uint16_t m_id;
 
-    int m_duration;
+    int m_duration{ 0 };
     int m_timeToStartDrawing{ 0 };
 };
-
-#endif

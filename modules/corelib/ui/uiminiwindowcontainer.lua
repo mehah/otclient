@@ -1,5 +1,5 @@
 -- @docclass
-UIMiniWindowContainer = extends(UIWidget, "UIMiniWindowContainer")
+UIMiniWindowContainer = extends(UIWidget, 'UIMiniWindowContainer')
 
 function UIMiniWindowContainer.create()
     local container = UIMiniWindowContainer.internalCreate()
@@ -13,7 +13,9 @@ end
 -- TODO: try to resize another widget?
 -- TODO: try to find another panel?
 function UIMiniWindowContainer:fitAll(noRemoveChild)
-    if not self:isVisible() then return end
+    if not self:isVisible() then
+        return
+    end
 
     if not noRemoveChild then
         local children = self:getChildren()
@@ -32,23 +34,27 @@ function UIMiniWindowContainer:fitAll(noRemoveChild)
         end
     end
 
-    local selfHeight = self:getHeight() -
-                           (self:getPaddingTop() + self:getPaddingBottom())
-    if sumHeight <= selfHeight then return end
+    local selfHeight = self:getHeight() - (self:getPaddingTop() + self:getPaddingBottom())
+    if sumHeight <= selfHeight then
+        return
+    end
 
     local removeChildren = {}
 
     -- try to resize noRemoveChild
     local maximumHeight = selfHeight - (sumHeight - noRemoveChild:getHeight())
-    if noRemoveChild:isResizeable() and noRemoveChild:getMinimumHeight() <=
-        maximumHeight then
+    if noRemoveChild:isResizeable() and noRemoveChild:getMinimumHeight() <= maximumHeight then
         sumHeight = sumHeight - noRemoveChild:getHeight() + maximumHeight
-        addEvent(function() noRemoveChild:setHeight(maximumHeight) end)
+        addEvent(function()
+            noRemoveChild:setHeight(maximumHeight)
+        end)
     end
 
     -- try to remove no-save widget
     for i = #children, 1, -1 do
-        if sumHeight <= selfHeight then break end
+        if sumHeight <= selfHeight then
+            break
+        end
 
         local child = children[i]
         if child ~= noRemoveChild and not child.save then
@@ -60,7 +66,9 @@ function UIMiniWindowContainer:fitAll(noRemoveChild)
 
     -- try to remove save widget
     for i = #children, 1, -1 do
-        if sumHeight <= selfHeight then break end
+        if sumHeight <= selfHeight then
+            break
+        end
 
         local child = children[i]
         if child ~= noRemoveChild and child:isVisible() then
@@ -71,19 +79,19 @@ function UIMiniWindowContainer:fitAll(noRemoveChild)
     end
 
     -- close widgets
-    for i = 1, #removeChildren do removeChildren[i]:close() end
+    for i = 1, #removeChildren do
+        removeChildren[i]:close()
+    end
 end
 
 function UIMiniWindowContainer:fits(child, minContentHeight, maxContentHeight)
     local containerPanel = child:getChildById('contentsPanel')
-    local indispensableHeight = containerPanel:getMarginTop() +
-        containerPanel:getMarginBottom() +
-        containerPanel:getPaddingTop() +
-        containerPanel:getPaddingBottom()
+    local indispensableHeight = containerPanel:getMarginTop() + containerPanel:getMarginBottom() +
+                                    containerPanel:getPaddingTop() + containerPanel:getPaddingBottom()
 
     local totalHeight = 0
     local children = self:getChildren()
-    for i=1,#children do
+    for i = 1, #children do
         if children[i]:isVisible() then
             totalHeight = totalHeight + children[i]:getHeight()
         end
@@ -93,8 +101,8 @@ function UIMiniWindowContainer:fits(child, minContentHeight, maxContentHeight)
 
     if maxContentHeight > 0 and available >= (maxContentHeight + indispensableHeight) then
         return maxContentHeight + indispensableHeight
-    elseif available >= (minContentHeight + indispensableHeight)
-        then return available
+    elseif available >= (minContentHeight + indispensableHeight) then
+        return available
     else
         return -1
     end
@@ -103,9 +111,13 @@ end
 function UIMiniWindowContainer:onDrop(widget, mousePos)
     if widget.UIMiniWindowContainer then
         local oldParent = widget:getParent()
-        if oldParent == self then return true end
+        if oldParent == self then
+            return true
+        end
 
-        if oldParent then oldParent:removeChild(widget) end
+        if oldParent then
+            oldParent:removeChild(widget)
+        end
 
         if widget.movedWidget then
             local index = self:getChildIndex(widget.movedWidget)
@@ -143,7 +155,9 @@ function UIMiniWindowContainer:scheduleInsert(widget, index)
     else
         local oldParent = widget:getParent()
         if oldParent ~= self then
-            if oldParent then oldParent:removeChild(widget) end
+            if oldParent then
+                oldParent:removeChild(widget)
+            end
             self:insertChild(index, widget)
 
             while true do
@@ -156,7 +170,9 @@ function UIMiniWindowContainer:scheduleInsert(widget, index)
                         break
                     end
                 end
-                if not placed then break end
+                if not placed then
+                    break
+                end
             end
 
         end
@@ -165,7 +181,11 @@ end
 
 function UIMiniWindowContainer:order()
     local children = self:getChildren()
-    for i = 1, #children do if not children[i].miniLoaded then return end end
+    for i = 1, #children do
+        if not children[i].miniLoaded then
+            return
+        end
+    end
 
     for i = 1, #children do
         if children[i].miniIndex then

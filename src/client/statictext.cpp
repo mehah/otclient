@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -46,17 +46,10 @@ void StaticText::drawText(const Point& dest, const Rect& parentRect)
     //}
 }
 
-void StaticText::setFont(const std::string& fontName)
-{
-    m_cachedText.setFont(g_fonts.getFont(fontName));
-}
+void StaticText::setText(const std::string_view text) { m_cachedText.setText(text); }
+void StaticText::setFont(const std::string_view fontName) { m_cachedText.setFont(g_fonts.getFont(fontName)); }
 
-void StaticText::setText(const std::string& text)
-{
-    m_cachedText.setText(text);
-}
-
-bool StaticText::addMessage(const std::string& name, Otc::MessageMode mode, const std::string& text)
+bool StaticText::addMessage(const std::string_view name, Otc::MessageMode mode, const std::string_view text)
 {
     //TODO: this could be moved to lua
     // first message
@@ -68,6 +61,7 @@ bool StaticText::addMessage(const std::string& name, Otc::MessageMode mode, cons
     else if (m_name != name || m_mode != mode) {
         return false;
     }
+
     // too many messages
     else if (m_messages.size() > 10) {
         m_messages.pop_front();
@@ -97,7 +91,7 @@ void StaticText::update()
     if (m_messages.empty()) {
         // schedule removal
         auto self = asStaticText();
-        g_dispatcher.addEvent([self]() { g_map.removeThing(self); });
+        g_dispatcher.addEvent([self] { g_map.removeThing(self); });
     } else {
         compose();
         scheduleUpdate();
@@ -109,7 +103,7 @@ void StaticText::scheduleUpdate()
     const int delay = std::max<int>(m_messages.front().second - g_clock.millis(), 0);
 
     auto self = asStaticText();
-    m_updateEvent = g_dispatcher.scheduleEvent([self]() {
+    m_updateEvent = g_dispatcher.scheduleEvent([self] {
         self->m_updateEvent = nullptr;
         self->update();
     }, delay);
@@ -143,7 +137,7 @@ void StaticText::compose()
         g_logger.warning(stdext::format("Unknown speak type: %d", m_mode));
     }
 
-    for (uint i = 0; i < m_messages.size(); ++i) {
+    for (uint32_t i = 0; i < m_messages.size(); ++i) {
         text += m_messages[i].first;
 
         if (i < m_messages.size() - 1)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -164,7 +164,7 @@ void SoundManager::preload(std::string filename)
         m_buffers[filename] = buffer;
 }
 
-SoundSourcePtr SoundManager::play(std::string filename, float fadetime, float gain)
+SoundSourcePtr SoundManager::play(const std::string& fn, float fadetime, float gain, float pitch)
 {
     if (!m_audioEnabled)
         return nullptr;
@@ -174,7 +174,10 @@ SoundSourcePtr SoundManager::play(std::string filename, float fadetime, float ga
     if (gain == 0)
         gain = 1.0f;
 
-    filename = resolveSoundFile(filename);
+    if (pitch == 0)
+        pitch = 1.0f;
+
+    const std::string& filename = resolveSoundFile(fn);
     SoundSourcePtr soundSource = createSoundSource(filename);
     if (!soundSource) {
         g_logger.error(stdext::format("unable to play '%s'", filename));
@@ -184,6 +187,7 @@ SoundSourcePtr SoundManager::play(std::string filename, float fadetime, float ga
     soundSource->setName(filename);
     soundSource->setRelative(true);
     soundSource->setGain(gain);
+    soundSource->setPitch(pitch);
 
     if (fadetime > 0)
         soundSource->setFading(StreamSoundSource::FadingOn, fadetime);
@@ -220,7 +224,7 @@ SoundSourcePtr SoundManager::createSoundSource(const std::string& filename)
     SoundSourcePtr source;
 
     try {
-        const auto it = m_buffers.find(filename);
+        const auto it = m_buffers.find(filename.data());
         if (it != m_buffers.end()) {
             source = SoundSourcePtr(new SoundSource);
             source->setBuffer(it->second);
@@ -283,11 +287,11 @@ SoundSourcePtr SoundManager::createSoundSource(const std::string& filename)
     return source;
 }
 
-std::string SoundManager::resolveSoundFile(std::string file)
+std::string SoundManager::resolveSoundFile(const std::string& file)
 {
-    file = g_resources.guessFilePath(file, "ogg");
-    file = g_resources.resolvePath(file);
-    return file;
+    std::string _file = g_resources.guessFilePath(file, "ogg");
+    _file = g_resources.resolvePath(_file);
+    return _file;
 }
 
 void SoundManager::ensureContext()

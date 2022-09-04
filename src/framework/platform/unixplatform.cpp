@@ -65,12 +65,12 @@ int Platform::getProcessId()
     return getpid();
 }
 
-bool Platform::isProcessRunning(const std::string& name)
+bool Platform::isProcessRunning(const std::string_view name)
 {
     return false;
 }
 
-bool Platform::killProcess(const std::string& name)
+bool Platform::killProcess(const std::string_view name)
 {
     return false;
 }
@@ -125,7 +125,10 @@ void Platform::openUrl(std::string url)
 #if defined(__APPLE__)
     system(stdext::format("open %s", url).c_str());
 #else
-    system(stdext::format("xdg-open %s", url).c_str());
+    int systemRet = system(stdext::format("xdg-open %s", url).c_str());
+    if(systemRet == -1){
+        return;
+    }
 #endif
 }
 
@@ -175,7 +178,7 @@ std::string Platform::getOSName()
     return std::string();
 }
 
-std::string Platform::traceback(const std::string& where, int level, int maxDepth)
+std::string Platform::traceback(const std::string_view where, int level, int maxDepth)
 {
     std::stringstream ss;
 

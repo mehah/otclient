@@ -26,7 +26,9 @@ function createWindow()
         local widget = g_ui.createWidget('LocalesButton', localesPanel)
         widget:setImageSource('/images/flags/' .. name .. '')
         widget:setText(locale.languageName)
-        widget.onClick = function() selectFirstLocale(name) end
+        widget.onClick = function()
+            selectFirstLocale(name)
+        end
         count = count + 1
     end
 
@@ -46,15 +48,21 @@ function selectFirstLocale(name)
         localesWindow:destroy()
         localesWindow = nil
     end
-    if setLocale(name) then g_modules.reloadModules() end
+    if setLocale(name) then
+        g_modules.reloadModules()
+    end
 end
 
 -- hooked functions
-function onGameStart() sendLocale(currentLocale.name) end
+function onGameStart()
+    sendLocale(currentLocale.name)
+end
 
 function onExtendedLocales(protocol, opcode, buffer)
     local locale = installedLocales[buffer]
-    if locale and setLocale(locale.name) then g_modules.reloadModules() end
+    if locale and setLocale(locale.name) then
+        g_modules.reloadModules()
+    end
 end
 
 -- public functions
@@ -68,11 +76,15 @@ function init()
         pdebug('Using configured locale: ' .. userLocaleName)
     else
         setLocale(defaultLocaleName)
-        connect(g_app, {onRun = createWindow})
+        connect(g_app, {
+            onRun = createWindow
+        })
     end
 
     ProtocolGame.registerExtendedOpcode(ExtendedIds.Locale, onExtendedLocales)
-    connect(g_game, {onGameStart = onGameStart})
+    connect(g_game, {
+        onGameStart = onGameStart
+    })
 end
 
 function terminate()
@@ -80,8 +92,12 @@ function terminate()
     currentLocale = nil
 
     ProtocolGame.unregisterExtendedOpcode(ExtendedIds.Locale)
-    disconnect(g_app, {onRun = createWindow})
-    disconnect(g_game, {onGameStart = onGameStart})
+    disconnect(g_app, {
+        onRun = createWindow
+    })
+    disconnect(g_game, {
+        onGameStart = onGameStart
+    })
 end
 
 function generateNewTranslationTable(localename)
@@ -105,9 +121,13 @@ function generateNewTranslationTable(localename)
 end
 
 function installLocale(locale)
-    if not locale or not locale.name then error('Unable to install locale.') end
+    if not locale or not locale.name then
+        error('Unable to install locale.')
+    end
 
-    if _G.allowedLocales and not _G.allowedLocales[locale.name] then return end
+    if _G.allowedLocales and not _G.allowedLocales[locale.name] then
+        return
+    end
 
     if locale.name ~= defaultLocaleName then
         local updatesNamesMissing = {}
@@ -118,8 +138,7 @@ function installLocale(locale)
         end
 
         if #updatesNamesMissing > 0 then
-            pdebug('Locale \'' .. locale.name .. '\' is missing ' ..
-                       #updatesNamesMissing .. ' translations.')
+            pdebug('Locale \'' .. locale.name .. '\' is missing ' .. #updatesNamesMissing .. ' translations.')
             for _, name in pairs(updatesNamesMissing) do
                 pdebug('["' .. name .. '"] = \"\",')
             end
@@ -136,7 +155,9 @@ function installLocale(locale)
     end
 end
 
-function installLocales(directory) dofiles(directory) end
+function installLocales(directory)
+    dofiles(directory)
+end
 
 function setLocale(name)
     local locale = installedLocales[name]
@@ -145,19 +166,27 @@ function setLocale(name)
         return
     end
     if not locale then
-        pwarning("Locale " .. name .. ' does not exist.')
+        pwarning('Locale ' .. name .. ' does not exist.')
         return false
     end
-    if currentLocale then sendLocale(locale.name) end
+    if currentLocale then
+        sendLocale(locale.name)
+    end
     currentLocale = locale
     g_settings.set('locale', name)
-    if onLocaleChanged then onLocaleChanged(name) end
+    if onLocaleChanged then
+        onLocaleChanged(name)
+    end
     return true
 end
 
-function getInstalledLocales() return installedLocales end
+function getInstalledLocales()
+    return installedLocales
+end
 
-function getCurrentLocale() return currentLocale end
+function getCurrentLocale()
+    return currentLocale
+end
 
 -- global function used to translate texts
 function _G.tr(text, ...)

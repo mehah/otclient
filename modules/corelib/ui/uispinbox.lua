@@ -1,5 +1,5 @@
 -- @docclass
-UISpinBox = extends(UITextEdit, "UISpinBox")
+UISpinBox = extends(UITextEdit, 'UISpinBox')
 
 function UISpinBox.create()
     local spinbox = UISpinBox.internalCreate()
@@ -12,19 +12,24 @@ function UISpinBox.create()
     spinbox.step = 1
     spinbox.firstchange = true
     spinbox.mouseScroll = true
-    spinbox:setText("1")
+    spinbox:setText('1')
     spinbox:setValue(1)
     return spinbox
 end
 
 function UISpinBox:onSetup()
-    g_mouse.bindAutoPress(self:getChildById('up'), function() self:upSpin() end, 300)
-    g_mouse.bindAutoPress(self:getChildById('down'), function() self:downSpin() end,
-                          300)
+    g_mouse.bindAutoPress(self:getChildById('up'), function()
+        self:upSpin()
+    end, 300)
+    g_mouse.bindAutoPress(self:getChildById('down'), function()
+        self:downSpin()
+    end, 300)
 end
 
 function UISpinBox:onMouseWheel(mousePos, direction)
-    if not self.mouseScroll then return false end
+    if not self.mouseScroll then
+        return false
+    end
     if direction == MouseWheelUp then
         self:upSpin()
     elseif direction == MouseWheelDown then
@@ -70,18 +75,26 @@ end
 
 function UISpinBox:onFocusChange(focused)
     if not focused then
-        if self:getText():len() == 0 then self:setText(self.minimum) end
+        if self:getText():len() == 0 then
+            self:setText(self.minimum)
+        end
     end
 end
 
 function UISpinBox:onStyleApply(styleName, styleNode)
     for name, value in pairs(styleNode) do
         if name == 'maximum' then
-            addEvent(function() self:setMaximum(value) end)
+            addEvent(function()
+                self:setMaximum(value)
+            end)
         elseif name == 'minimum' then
-            addEvent(function() self:setMinimum(value) end)
+            addEvent(function()
+                self:setMinimum(value)
+            end)
         elseif name == 'mouse-scroll' then
-            addEvent(function() self:setMouseScroll(value) end)
+            addEvent(function()
+                self:setMouseScroll(value)
+            end)
         elseif name == 'buttons' then
             addEvent(function()
                 if value then
@@ -106,58 +119,88 @@ function UISpinBox:hideButtons()
     self.displayButtons = false
 end
 
-function UISpinBox:up() self:setValue(self.value + self.step) end
+function UISpinBox:up()
+    self:setValue(self.value + self.step)
+end
 
-function UISpinBox:down() self:setValue(self.value - self.step) end
+function UISpinBox:down()
+    self:setValue(self.value - self.step)
+end
 
 function UISpinBox:setValue(value, dontSignal)
     value = value or 0
     value = math.max(math.min(self.maximum, value), self.minimum)
 
-    if value == self.value then return end
+    if value == self.value then
+        return
+    end
 
     self.value = value
-    if self:getText():len() > 0 then self:setText(value) end
+    if self:getText():len() > 0 then
+        self:setText(value)
+    end
 
     local upButton = self:getChildById('up')
     local downButton = self:getChildById('down')
     if upButton then
-        upButton:setEnabled(self.maximum ~= self.minimum and self.value ~=
-                                self.maximum)
+        upButton:setEnabled(self.maximum ~= self.minimum and self.value ~= self.maximum)
     end
     if downButton then
-        downButton:setEnabled(self.maximum ~= self.minimum and self.value ~=
-                                  self.minimum)
+        downButton:setEnabled(self.maximum ~= self.minimum and self.value ~= self.minimum)
     end
 
-    if not dontSignal then signalcall(self.onValueChange, self, value) end
+    if not dontSignal then
+        signalcall(self.onValueChange, self, value)
+    end
 end
 
-function UISpinBox:getValue() return self.value end
+function UISpinBox:getValue()
+    return self.value
+end
 
 function UISpinBox:setMinimum(minimum)
     minimum = minimum or -9223372036854775808
     self.minimum = minimum
-    if self.minimum > self.maximum then self.maximum = self.minimum end
-    if self.value < minimum then self:setValue(minimum) end
+    if self.minimum > self.maximum then
+        self.maximum = self.minimum
+    end
+    if self.value < minimum then
+        self:setValue(minimum)
+    end
 end
 
-function UISpinBox:getMinimum() return self.minimum end
+function UISpinBox:getMinimum()
+    return self.minimum
+end
 
 function UISpinBox:setMaximum(maximum)
     maximum = maximum or 9223372036854775807
     self.maximum = maximum
-    if self.value > maximum then self:setValue(maximum) end
+    if self.value > maximum then
+        self:setValue(maximum)
+    end
 end
 
-function UISpinBox:getMaximum() return self.maximum end
+function UISpinBox:getMaximum()
+    return self.maximum
+end
 
-function UISpinBox:setStep(step) self.step = step or 1 end
+function UISpinBox:setStep(step)
+    self.step = step or 1
+end
 
-function UISpinBox:setMouseScroll(mouseScroll) self.mouseScroll = mouseScroll end
+function UISpinBox:setMouseScroll(mouseScroll)
+    self.mouseScroll = mouseScroll
+end
 
-function UISpinBox:getMouseScroll() return self.mouseScroll end
+function UISpinBox:getMouseScroll()
+    return self.mouseScroll
+end
 
-function UISpinBox:upSpin() self:setValue(self.value + self.step) end
+function UISpinBox:upSpin()
+    self:setValue(self.value + self.step)
+end
 
-function UISpinBox:downSpin() self:setValue(self.value - self.step) end
+function UISpinBox:downSpin()
+    self:setValue(self.value - self.step)
+end

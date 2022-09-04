@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef TOWNS_H
-#define TOWNS_H
+#pragma once
 
 #include "declarations.h"
 #include <framework/luaengine/luaobject.h>
@@ -30,18 +29,18 @@ class Town : public LuaObject
 {
 public:
     Town() = default;
-    Town(uint32 tid, std::string name, const Position& pos = Position());
+    Town(uint32_t tid, std::string name, const Position& pos = {});
 
-    void setId(uint32 tid) { m_id = tid; }
-    void setName(const std::string& name) { m_name = name; }
+    void setId(uint32_t tid) { m_id = tid; }
+    void setName(const std::string_view name) { m_name = name; }
     void setPos(const Position& pos) { m_pos = pos; }
 
-    uint32 getId() { return m_id; }
+    uint32_t getId() { return m_id; }
     std::string getName() { return m_name; }
     Position getPos() { return m_pos; }
 
 private:
-    uint32 m_id;
+    uint32_t m_id{ 0 };
     std::string m_name;
     Position m_pos; // temple pos
 };
@@ -52,9 +51,9 @@ public:
     TownManager();
 
     void addTown(const TownPtr& town);
-    void removeTown(uint32 townId);
-    const TownPtr& getTown(uint32 townId);
-    const TownPtr& getTownByName(const std::string& name);
+    void removeTown(uint32_t townId);
+    const TownPtr& getTown(uint32_t townId);
+    const TownPtr& getTownByName(const std::string_view name);
 
     void sort();
     TownList getTowns() { return m_towns; }
@@ -65,9 +64,7 @@ private:
     TownPtr m_nullTown;
 
 protected:
-    TownList::iterator findTown(uint32 townId);
+    TownList::iterator findTown(uint32_t townId);
 };
 
 extern TownManager g_towns;
-
-#endif

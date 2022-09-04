@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,7 @@ void ModuleManager::discoverModules()
             if (g_resources.isFileType(moduleFile, "otmod")) {
                 ModulePtr module = discoverModule("/" + moduleDir + "/" + moduleFile);
                 if (module && module->isAutoLoad())
-                    m_autoLoadModules.insert(std::make_pair(module->getAutoLoadPriority(), module));
+                    m_autoLoadModules.emplace(module->getAutoLoadPriority(), module);
             }
         }
     }
@@ -55,8 +55,7 @@ void ModuleManager::discoverModules()
 void ModuleManager::autoLoadModules(int maxPriority)
 {
     for (const auto& pair : m_autoLoadModules) {
-        const int priority = pair.first;
-        if (priority > maxPriority)
+        if (const int priority = pair.first; priority > maxPriority)
             break;
         const ModulePtr module = pair.second;
         module->load();
@@ -70,7 +69,7 @@ ModulePtr ModuleManager::discoverModule(const std::string& moduleFile)
         const OTMLDocumentPtr doc = OTMLDocument::parse(moduleFile);
         const OTMLNodePtr moduleNode = doc->at("Module");
 
-        const std::string name = moduleNode->valueAt("name");
+        const auto& name = moduleNode->valueAt("name");
 
         bool push = false;
         module = getModule(name);
@@ -83,13 +82,13 @@ ModulePtr ModuleManager::discoverModule(const std::string& moduleFile)
         // not loaded modules are always in back
         if (push)
             m_modules.push_back(module);
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("Unable to discover module from file '%s': %s", moduleFile, e.what()));
     }
     return module;
 }
 
-void ModuleManager::ensureModuleLoaded(const std::string& moduleName)
+void ModuleManager::ensureModuleLoaded(const std::string_view moduleName)
 {
     const ModulePtr module = g_modules.getModule(moduleName);
     if (!module || !module->load())
@@ -122,7 +121,7 @@ void ModuleManager::reloadModules()
         module->load();
 }
 
-ModulePtr ModuleManager::getModule(const std::string& moduleName)
+ModulePtr ModuleManager::getModule(const std::string_view moduleName)
 {
     for (const ModulePtr& module : m_modules)
         if (module->getName() == moduleName)
@@ -132,8 +131,8 @@ ModulePtr ModuleManager::getModule(const std::string& moduleName)
 
 void ModuleManager::updateModuleLoadOrder(const ModulePtr& module)
 {
-    const auto it = std::find(m_modules.begin(), m_modules.end(), module);
-    if (it != m_modules.end())
+    if (const auto it = std::find(m_modules.begin(), m_modules.end(), module);
+        it != m_modules.end())
         m_modules.erase(it);
     if (module->isLoaded())
         m_modules.push_front(module);

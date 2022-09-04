@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ FileStream::FileStream(std::string name, PHYSFS_File* fileHandle, bool writeable
     m_caching(false)
 {}
 
-FileStream::FileStream(std::string name, const std::string& buffer) :
+FileStream::FileStream(std::string name, const std::string_view buffer) :
     m_name(std::move(name)),
     m_fileHandle(nullptr),
     m_pos(0),
@@ -95,7 +95,7 @@ void FileStream::flush()
         if (m_caching) {
             if (!PHYSFS_seek(m_fileHandle, 0))
                 throwError("flush seek failed", true);
-            const uint len = m_data.size();
+            const uint32_t len = m_data.size();
             if (PHYSFS_writeBytes(m_fileHandle, m_data.data(), len) != len)
                 throwError("flush write failed", true);
         }
@@ -105,27 +105,27 @@ void FileStream::flush()
     }
 }
 
-int FileStream::read(void* buffer, uint32 size, uint32 nmemb)
+int FileStream::read(void* buffer, uint32_t size, uint32_t nmemb)
 {
     if (!m_caching) {
-        const int res = PHYSFS_readBytes(m_fileHandle, buffer, size * nmemb);
+        const int res = PHYSFS_readBytes(m_fileHandle, buffer, static_cast<PHYSFS_uint64>(size) * nmemb);
         if (res == -1)
             throwError("read failed", true);
         return res;
     }
     int writePos = 0;
-    auto* const outBuffer = static_cast<uint8*>(buffer);
-    for (uint i = 0; i < nmemb; ++i) {
+    auto* const outBuffer = static_cast<uint8_t*>(buffer);
+    for (uint32_t i = 0; i < nmemb; ++i) {
         if (m_pos + size > m_data.size())
             return i;
 
-        for (uint j = 0; j < size; ++j)
+        for (uint32_t j = 0; j < size; ++j)
             outBuffer[writePos++] = m_data[m_pos++];
     }
     return nmemb;
 }
 
-void FileStream::write(const void* buffer, uint32 count)
+void FileStream::write(const void* buffer, uint32_t count)
 {
     if (!m_caching) {
         if (PHYSFS_writeBytes(m_fileHandle, buffer, count) != count)
@@ -137,7 +137,7 @@ void FileStream::write(const void* buffer, uint32 count)
     }
 }
 
-void FileStream::seek(uint32 pos)
+void FileStream::seek(uint32_t pos)
 {
     if (!m_caching) {
         if (!PHYSFS_seek(m_fileHandle, pos))
@@ -149,19 +149,19 @@ void FileStream::seek(uint32 pos)
     }
 }
 
-void FileStream::skip(uint len)
+void FileStream::skip(uint32_t len)
 {
     seek(tell() + len);
 }
 
-uint FileStream::size()
+uint32_t FileStream::size()
 {
     if (!m_caching)
         return PHYSFS_fileLength(m_fileHandle);
     return m_data.size();
 }
 
-uint FileStream::tell()
+uint32_t FileStream::tell()
 {
     if (!m_caching)
         return PHYSFS_tell(m_fileHandle);
@@ -175,9 +175,9 @@ bool FileStream::eof()
     return m_pos >= m_data.size();
 }
 
-uint8 FileStream::getU8()
+uint8_t FileStream::getU8()
 {
-    uint8 v = 0;
+    uint8_t v = 0;
     if (!m_caching) {
         if (PHYSFS_readBytes(m_fileHandle, &v, 1) != 1)
             throwError("read failed", true);
@@ -191,9 +191,9 @@ uint8 FileStream::getU8()
     return v;
 }
 
-uint16 FileStream::getU16()
+uint16_t FileStream::getU16()
 {
-    uint16 v = 0;
+    uint16_t v = 0;
     if (!m_caching) {
         if (PHYSFS_readULE16(m_fileHandle, &v) == 0)
             throwError("read failed", true);
@@ -207,9 +207,9 @@ uint16 FileStream::getU16()
     return v;
 }
 
-uint32 FileStream::getU32()
+uint32_t FileStream::getU32()
 {
-    uint32 v = 0;
+    uint32_t v = 0;
     if (!m_caching) {
         if (PHYSFS_readULE32(m_fileHandle, &v) == 0)
             throwError("read failed", true);
@@ -223,9 +223,9 @@ uint32 FileStream::getU32()
     return v;
 }
 
-uint64 FileStream::getU64()
+uint64_t FileStream::getU64()
 {
-    uint64 v = 0;
+    uint64_t v = 0;
     if (!m_caching) {
         if (PHYSFS_readULE64(m_fileHandle, (PHYSFS_uint64*)&v) == 0)
             throwError("read failed", true);
@@ -238,9 +238,9 @@ uint64 FileStream::getU64()
     return v;
 }
 
-int8 FileStream::get8()
+int8_t FileStream::get8()
 {
-    int8 v = 0;
+    int8_t v = 0;
     if (!m_caching) {
         if (PHYSFS_readBytes(m_fileHandle, &v, 1) != 1)
             throwError("read failed", true);
@@ -254,9 +254,9 @@ int8 FileStream::get8()
     return v;
 }
 
-int16 FileStream::get16()
+int16_t FileStream::get16()
 {
-    int16 v = 0;
+    int16_t v = 0;
     if (!m_caching) {
         if (PHYSFS_readSLE16(m_fileHandle, &v) == 0)
             throwError("read failed", true);
@@ -270,9 +270,9 @@ int16 FileStream::get16()
     return v;
 }
 
-int32 FileStream::get32()
+int32_t FileStream::get32()
 {
-    int32 v = 0;
+    int32_t v = 0;
     if (!m_caching) {
         if (PHYSFS_readSLE32(m_fileHandle, &v) == 0)
             throwError("read failed", true);
@@ -286,9 +286,9 @@ int32 FileStream::get32()
     return v;
 }
 
-int64 FileStream::get64()
+int64_t FileStream::get64()
 {
-    int64 v = 0;
+    int64_t v = 0;
     if (!m_caching) {
         if (PHYSFS_readSLE64(m_fileHandle, (PHYSFS_sint64*)&v) == 0)
             throwError("read failed", true);
@@ -304,49 +304,47 @@ int64 FileStream::get64()
 std::string FileStream::getString()
 {
     std::string str;
-    const uint16 len = getU16();
-    if (len > 0 && len < 8192) {
+    if (const uint16_t len = getU16(); len > 0 && len < 8192) {
         char buffer[8192];
         if (m_fileHandle) {
             if (PHYSFS_readBytes(m_fileHandle, buffer, len) == 0)
                 throwError("read failed", true);
             else
-                str = std::string(buffer, len);
+                str = { buffer, len };
         } else {
             if (m_pos + len > m_data.size()) {
-                throwError("read failed");
-                return nullptr;
+                throwError("[FileStream::getString] - Read failed");
+                return {};
             }
 
-            str = std::string((char*)&m_data[m_pos], len);
+            str = { (char*)&m_data[m_pos], len };
             m_pos += len;
         }
     } else if (len != 0)
-        throwError("read failed because string is too big");
+        throwError("[FileStream::getString] - Read failed because string is too big");
     return str;
 }
 
 BinaryTreePtr FileStream::getBinaryTree()
 {
-    const uint8 byte = getU8();
-    if (byte != BINARYTREE_NODE_START)
-        stdext::throw_exception(stdext::format("failed to read node start (getBinaryTree): %d", byte));
+    if (const uint8_t byte = getU8(); byte != static_cast<uint8_t>(BinaryTree::Node::START))
+        throw Exception("failed to read node start (getBinaryTree): %d", byte);
 
     return { new BinaryTree(asFileStream()) };
 }
 
-void FileStream::startNode(uint8 n)
+void FileStream::startNode(uint8_t n)
 {
-    addU8(BINARYTREE_NODE_START);
+    addU8(static_cast<uint8_t>(BinaryTree::Node::START));
     addU8(n);
 }
 
 void FileStream::endNode()
 {
-    addU8(BINARYTREE_NODE_END);
+    addU8(static_cast<uint8_t>(BinaryTree::Node::END));
 }
 
-void FileStream::addU8(uint8 v)
+void FileStream::addU8(uint8_t v)
 {
     if (!m_caching) {
         if (PHYSFS_writeBytes(m_fileHandle, &v, 1) != 1)
@@ -357,7 +355,7 @@ void FileStream::addU8(uint8 v)
     }
 }
 
-void FileStream::addU16(uint16 v)
+void FileStream::addU16(uint16_t v)
 {
     if (!m_caching) {
         if (PHYSFS_writeULE16(m_fileHandle, v) == 0)
@@ -369,7 +367,7 @@ void FileStream::addU16(uint16 v)
     }
 }
 
-void FileStream::addU32(uint32 v)
+void FileStream::addU32(uint32_t v)
 {
     if (!m_caching) {
         if (PHYSFS_writeULE32(m_fileHandle, v) == 0)
@@ -381,7 +379,7 @@ void FileStream::addU32(uint32 v)
     }
 }
 
-void FileStream::addU64(uint64 v)
+void FileStream::addU64(uint64_t v)
 {
     if (!m_caching) {
         if (PHYSFS_writeULE64(m_fileHandle, v) == 0)
@@ -393,7 +391,7 @@ void FileStream::addU64(uint64 v)
     }
 }
 
-void FileStream::add8(int8 v)
+void FileStream::add8(int8_t v)
 {
     if (!m_caching) {
         if (PHYSFS_writeBytes(m_fileHandle, &v, 1) != 1)
@@ -404,7 +402,7 @@ void FileStream::add8(int8 v)
     }
 }
 
-void FileStream::add16(int16 v)
+void FileStream::add16(int16_t v)
 {
     if (!m_caching) {
         if (PHYSFS_writeSLE16(m_fileHandle, v) == 0)
@@ -416,7 +414,7 @@ void FileStream::add16(int16 v)
     }
 }
 
-void FileStream::add32(int32 v)
+void FileStream::add32(int32_t v)
 {
     if (!m_caching) {
         if (PHYSFS_writeSLE32(m_fileHandle, v) == 0)
@@ -428,7 +426,7 @@ void FileStream::add32(int32 v)
     }
 }
 
-void FileStream::add64(int64 v)
+void FileStream::add64(int64_t v)
 {
     if (!m_caching) {
         if (PHYSFS_writeSLE64(m_fileHandle, v) == 0)
@@ -440,16 +438,16 @@ void FileStream::add64(int64 v)
     }
 }
 
-void FileStream::addString(const std::string& v)
+void FileStream::addString(const std::string_view v)
 {
     addU16(v.length());
-    write(v.c_str(), v.length());
+    write(v.data(), v.length());
 }
 
-void FileStream::throwError(const std::string& message, bool physfsError)
+void FileStream::throwError(const std::string_view message, bool physfsError)
 {
     std::string completeMessage = stdext::format("in file '%s': %s", m_name, message);
     if (physfsError)
-        completeMessage += std::string(": ") + PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
-    stdext::throw_exception(completeMessage);
+        completeMessage += ": "s + PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+    throw Exception(completeMessage);
 }

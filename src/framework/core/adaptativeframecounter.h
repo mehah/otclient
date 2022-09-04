@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef ADAPTATIVEFRAMECOUNTER_H
-#define ADAPTATIVEFRAMECOUNTER_H
+#pragma once
 
 #include <framework/global.h>
 
@@ -34,22 +33,20 @@ public:
     AdaptativeFrameCounter() : m_interval(stdext::millis()) {}
 
     bool update();
-    bool canRefresh();
+    void start();
 
-    uint getFps() const { return m_fps; }
-    uint getMaxFps() const { return m_maxFps; }
+    uint32_t getFps() const { return m_fps; }
+    uint32_t getMaxFps() const { return m_maxFps; }
 
-    void setMaxFps(const uint max) { m_maxFps = max; }
+    void setMaxFps(const uint32_t max) { m_maxFps = max; }
 
 private:
-    double getMaxPeriod() { return 1.0 / m_maxFps; }
+    int getMaxPeriod() const { return 1000000 / m_maxFps; }
 
-    uint m_fps{ 0 },
-        m_maxFps{ 0 },
-        m_fpsCount{ 0 },
-        m_interval{ 0 };
+    uint32_t m_fps{ 0 };
+    uint32_t m_maxFps{ 0 };
+    uint32_t m_fpsCount{ 0 };
+    uint32_t m_interval{ 0 };
 
-    ticks_t m_currentTime{ 0 }, m_lastTime{ 0 };
+    ticks_t m_startTime{ 0 };
 };
-
-#endif

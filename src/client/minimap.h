@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,15 +20,14 @@
  * THE SOFTWARE.
  */
 
-#ifndef MINIMAP_H
-#define MINIMAP_H
+#pragma once
 
 #include "declarations.h"
 #include <framework/graphics/declarations.h>
 
-constexpr uint8 MMBLOCK_SIZE = 64;
-constexpr uint8 OTMM_VERSION = 1;
-constexpr uint32 OTMM_SIGNATURE = 0x4D4d544F;
+constexpr uint8_t MMBLOCK_SIZE = 64;
+constexpr uint8_t OTMM_VERSION = 1;
+constexpr uint32_t OTMM_SIGNATURE = 0x4D4d544F;
 
 enum MinimapTileFlags
 {
@@ -41,9 +40,9 @@ enum MinimapTileFlags
 #pragma pack(push,1) // disable memory alignment
 struct MinimapTile
 {
-    uint8 flags{ 0 };
-    uint8 color{ 255 };
-    uint8 speed{ 10 };
+    uint8_t flags{ 0 };
+    uint8_t color{ 255 };
+    uint8_t speed{ 10 };
     bool hasFlag(MinimapTileFlags flag) const { return flags & flag; }
     int getSpeed() const { return speed * 10; }
     bool operator==(const MinimapTile& other) const { return color == other.color && flags == other.flags && speed == other.speed; }
@@ -58,7 +57,7 @@ public:
     void updateTile(int x, int y, const MinimapTile& tile);
     MinimapTile& getTile(int x, int y) { return m_tiles[getTileIndex(x, y)]; }
     void resetTile(int x, int y) { m_tiles[getTileIndex(x, y)] = MinimapTile(); }
-    uint getTileIndex(int x, int y) { return ((y % MMBLOCK_SIZE) * MMBLOCK_SIZE) + (x % MMBLOCK_SIZE); }
+    uint32_t getTileIndex(int x, int y) { return ((y % MMBLOCK_SIZE) * MMBLOCK_SIZE) + (x % MMBLOCK_SIZE); }
     const TexturePtr& getTexture() { return m_texture; }
     std::array<MinimapTile, MMBLOCK_SIZE* MMBLOCK_SIZE>& getTiles() { return m_tiles; }
     void mustUpdate() { m_mustUpdate = true; }
@@ -66,11 +65,14 @@ public:
     bool wasSeen() { return m_wasSeen; }
 private:
     TexturePtr m_texture;
+    ImagePtr m_image;
+
+    Size m_size{ MMBLOCK_SIZE, MMBLOCK_SIZE };
 
     std::array<MinimapTile, MMBLOCK_SIZE* MMBLOCK_SIZE> m_tiles;
 
-    bool m_mustUpdate{ true },
-        m_wasSeen{ false };
+    bool m_mustUpdate{ true };
+    bool m_wasSeen{ false };
 };
 
 #pragma pack(pop)
@@ -124,11 +126,9 @@ private:
                         (index / (65536 / MMBLOCK_SIZE)) * MMBLOCK_SIZE, static_cast<uint8_t>(z)
         };
     }
-    uint getBlockIndex(const Position& pos) { return ((pos.y / MMBLOCK_SIZE) * (65536 / MMBLOCK_SIZE)) + (pos.x / MMBLOCK_SIZE); }
-    std::unordered_map<uint, MinimapBlock_ptr> m_tileBlocks[MAX_Z + 1];
+    uint32_t getBlockIndex(const Position& pos) { return ((pos.y / MMBLOCK_SIZE) * (65536 / MMBLOCK_SIZE)) + (pos.x / MMBLOCK_SIZE); }
+    stdext::map<uint32_t, MinimapBlock_ptr> m_tileBlocks[MAX_Z + 1];
     std::mutex m_lock;
 };
 
 extern Minimap g_minimap;
-
-#endif

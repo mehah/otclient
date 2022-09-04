@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,18 +41,24 @@ void OTMLParser::parse()
 
 std::string OTMLParser::getNextLine()
 {
-    currentLine++;
+    ++currentLine;
     std::string line;
     std::getline(in, line);
     return line;
 }
 
-int OTMLParser::getLineDepth(const std::string& line, bool multilining)
+int OTMLParser::getLineDepth(const std::string_view line, bool multilining)
 {
+    if (line.empty())
+        return 0;
+
     // count number of spaces at the line beginning
     std::size_t spaces = 0;
-    while (line[spaces] == ' ')
-        spaces++;
+    while (line[spaces] == ' ') {
+        if (++spaces == line.length()) {
+            --spaces; break;
+        }
+    }
 
     // pre calculate depth
     const int depth = spaces / 2;
@@ -107,7 +113,7 @@ void OTMLParser::parseLine(std::string line)
     parseNode(line);
 }
 
-void OTMLParser::parseNode(const std::string& data)
+void OTMLParser::parseNode(const std::string_view data)
 {
     std::string tag;
     std::string value;
@@ -150,7 +156,7 @@ void OTMLParser::parseNode(const std::string& data)
                 if (!line.empty()) {
                     // rewind and break
                     in.seekg(lastPos, std::ios::beg);
-                    currentLine--;
+                    --currentLine;
                     break;
                 }
             }
@@ -187,7 +193,7 @@ void OTMLParser::parseNode(const std::string& data)
         node->setNull(true);
     else {
         if (value.starts_with("[") && value.ends_with("]")) {
-            const std::string tmp = value.substr(1, value.length() - 2);
+            const auto& tmp = value.substr(1, value.length() - 2);
             const std::vector tokens = stdext::split(tmp, ",");
             for (std::string v : tokens) {
                 stdext::trim(v);

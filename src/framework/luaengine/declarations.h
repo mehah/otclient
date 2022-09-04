@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef FRAMEWORK_LUA_DECLARATIONS_H
-#define FRAMEWORK_LUA_DECLARATIONS_H
+#pragma once
 
 #include <framework/global.h>
 
@@ -31,5 +30,3 @@ class LuaObject;
 using LuaCppFunction = std::function<int(LuaInterface*)>;
 using LuaCppFunctionPtr = std::unique_ptr<LuaCppFunction>;
 using LuaObjectPtr = stdext::shared_object_ptr<LuaObject>;
-
-#endif

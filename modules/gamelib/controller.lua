@@ -22,7 +22,9 @@ function Controller:new()
 end
 
 function Controller:init()
-    if self.onInit then self:onInit() end
+    if self.onInit then
+        self:onInit()
+    end
 
     local gameEvent = self.events.game
     if gameEvent then
@@ -34,7 +36,9 @@ function Controller:init()
 end
 
 function Controller:terminate()
-    if self.onTerminate then self:onTerminate() end
+    if self.onTerminate then
+        self:onTerminate()
+    end
 
     local gameEvent = self.events.game
     if gameEvent then
@@ -45,9 +49,13 @@ function Controller:terminate()
         self.events.game = nil
     end
 
-    for actor, events in pairs(self.events) do disconnect(actor, events) end
+    for actor, events in pairs(self.events) do
+        disconnect(actor, events)
+    end
 
-    for name, widget in pairs(self.widgets) do widget:destroy() end
+    for name, widget in pairs(self.widgets) do
+        widget:destroy()
+    end
 
     for i, event in pairs(self.keyboardEvents) do
         g_keyboard['unbind' .. event.name](event.args)
@@ -77,27 +85,41 @@ function Controller:gameEvent(name, callback)
     gameEvent[name] = callback
 end
 
-function Controller:onGameStart(callback) self:gameEvent('onGameStart', callback) end
+function Controller:onGameStart(callback)
+    self:gameEvent('onGameStart', callback)
+end
 
-function Controller:onGameEnd(callback) self:gameEvent('onGameEnd', callback) end
+function Controller:onGameEnd(callback)
+    self:gameEvent('onGameEnd', callback)
+end
 
 function Controller:attachExternalEvent(event)
     table.insert(self.externalEvents, event)
 end
 
 function Controller:connectExternalEvents()
-    for i, event in pairs(self.externalEvents) do event:connect() end
+    for i, event in pairs(self.externalEvents) do
+        event:connect()
+    end
 end
 
 function Controller:disconnectExternalEvents()
-    for i, event in pairs(self.externalEvents) do event:disconnect() end
+    for i, event in pairs(self.externalEvents) do
+        event:disconnect()
+    end
 end
 
-function Controller:registerEvents(actor, events) self.events[actor] = events end
+function Controller:registerEvents(actor, events)
+    self.events[actor] = events
+end
 
-function Controller:registerWidget(name, widget) self.widgets[name] = widget end
+function Controller:registerWidget(name, widget)
+    self.widgets[name] = widget
+end
 
-function Controller:getWidget(name) return self.widgets[name] end
+function Controller:getWidget(name)
+    return self.widgets[name]
+end
 
 function Controller:connectEvents(actor, events)
     if type(actor) == 'table' then
@@ -128,7 +150,9 @@ function Controller:disconnectEvents(actor, destroy)
     local events = self.events[actor]
     if events then
         disconnect(actor, events)
-        if destroy ~= false then self.events[actor] = nil end
+        if destroy ~= false then
+            self.events[actor] = nil
+        end
     end
 end
 
@@ -139,24 +163,39 @@ end
 
 function Controller:sendExtendedOpcode(opcode, ...)
     local protocol = g_game.getProtocolGame()
-    if protocol then protocol:sendExtendedOpcode(opcode, ...) end
+    if protocol then
+        protocol:sendExtendedOpcode(opcode, ...)
+    end
 end
 
-function Controller:setAttribute(name, value) self.attributes[name] = value end
+function Controller:setAttribute(name, value)
+    self.attributes[name] = value
+end
 
-function Controller:getAttribute(name) return self.attributes[name] end
+function Controller:getAttribute(name)
+    return self.attributes[name]
+end
 
 function Controller:bindKeyDown(...)
-    table.insert(self.keyboardEvents, {name = 'KeyDown', args = ...})
+    table.insert(self.keyboardEvents, {
+        name = 'KeyDown',
+        args = ...
+    })
     g_keyboard.bindKeyDown(...)
 end
 
 function Controller:bindKeyUp(...)
-    table.insert(self.keyboardEvents, {name = 'KeyUp', args = ...})
+    table.insert(self.keyboardEvents, {
+        name = 'KeyUp',
+        args = ...
+    })
     g_keyboard.bindKeyUp(...)
 end
 
 function Controller:bindKeyPress(...)
-    table.insert(self.keyboardEvents, {name = 'KeyPress', args = ...})
+    table.insert(self.keyboardEvents, {
+        name = 'KeyPress',
+        args = ...
+    })
     g_keyboard.bindKeyPress(...)
 end

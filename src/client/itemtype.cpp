@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,17 +34,17 @@ void ItemType::unserialize(const BinaryTreePtr& node)
 
     node->getU32(); // flags
 
-    static uint16 lastId = 99;
+    static uint16_t lastId = 99;
     while (node->canRead()) {
-        const uint8 attr = node->getU8();
+        const uint8_t attr = node->getU8();
         if (attr == 0 || attr == 0xFF)
             break;
 
-        const uint16 len = node->getU16();
+        const uint16_t len = node->getU16();
         switch (attr) {
             case ItemTypeAttrServerId:
             {
-                uint16 serverId = node->getU16();
+                uint16_t serverId = node->getU16();
                 if (g_game.getClientVersion() < 960) {
                     if (serverId > 20000 && serverId < 20100) {
                         serverId -= 20000;

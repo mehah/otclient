@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,7 @@
  */
 
 #include <filesystem>
+#include <ranges>
 
 #include "resourcemanager.h"
 #include "filestream.h"
@@ -146,9 +147,7 @@ bool ResourceManager::removeSearchPath(const std::string& path)
 void ResourceManager::searchAndAddPackages(const std::string& packagesDir, const std::string& packageExt)
 {
     auto files = listDirectoryFiles(packagesDir);
-    for (auto it = files.rbegin(); it != files.rend(); ++it) {
-        const std::string& file = *it;
-
+    for (const auto& file : files | std::views::reverse) {
         if (!file.ends_with(packageExt))
             continue;
         std::string package = getRealDir(packagesDir) + "/" + file;
@@ -190,11 +189,11 @@ std::string ResourceManager::readFileContents(const std::string& fileName)
 
     PHYSFS_File* file = PHYSFS_openRead(fullPath.c_str());
     if (!file)
-        stdext::throw_exception(stdext::format("unable to open file '%s': %s", fullPath, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+        throw Exception("unable to open file '%s': %s", fullPath, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
 
     const int fileSize = PHYSFS_fileLength(file);
     std::string buffer(fileSize, 0);
-    PHYSFS_readBytes(file, static_cast<void*>(&buffer[0]), fileSize);
+    PHYSFS_readBytes(file, &buffer[0], fileSize);
     PHYSFS_close(file);
 
 #if ENABLE_ENCRYPTION == 1
@@ -204,7 +203,7 @@ std::string ResourceManager::readFileContents(const std::string& fileName)
     return buffer;
 }
 
-bool ResourceManager::writeFileBuffer(const std::string& fileName, const uchar* data, uint size)
+bool ResourceManager::writeFileBuffer(const std::string& fileName, const uint8_t* data, uint32_t size)
 {
     PHYSFS_file* file = PHYSFS_openWrite(fileName.c_str());
     if (!file) {
@@ -212,7 +211,7 @@ bool ResourceManager::writeFileBuffer(const std::string& fileName, const uchar* 
         return false;
     }
 
-    PHYSFS_writeBytes(file, (void*)data, size);
+    PHYSFS_writeBytes(file, data, size);
     PHYSFS_close(file);
     return true;
 }
@@ -225,7 +224,7 @@ bool ResourceManager::writeFileStream(const std::string& fileName, std::iostream
     in.seekg(0, std::ios::beg);
     std::vector<char> buffer(size);
     in.read(&buffer[0], size);
-    const bool ret = writeFileBuffer(fileName, (const uchar*)&buffer[0], size);
+    const bool ret = writeFileBuffer(fileName, (const uint8_t*)&buffer[0], size);
     in.seekg(oldPos, std::ios::beg);
     return ret;
 }
@@ -233,9 +232,9 @@ bool ResourceManager::writeFileStream(const std::string& fileName, std::iostream
 bool ResourceManager::writeFileContents(const std::string& fileName, const std::string& data)
 {
 #if ENABLE_ENCRYPTION == 1
-    return writeFileBuffer(fileName, (const uchar*)encrypt(data, std::string(ENCRYPTION_PASSWORD)).c_str(), data.size());
+    return writeFileBuffer(fileName, (const uint8_t*)encrypt(data, std::string(ENCRYPTION_PASSWORD)).c_str(), data.size());
 #else
-    return writeFileBuffer(fileName, (const uchar*)data.c_str(), data.size());
+    return writeFileBuffer(fileName, (const uint8_t*)data.c_str(), data.size());
 #endif
 }
 
@@ -245,7 +244,7 @@ FileStreamPtr ResourceManager::openFile(const std::string& fileName)
 
     PHYSFS_File* file = PHYSFS_openRead(fullPath.c_str());
     if (!file)
-        stdext::throw_exception(stdext::format("unable to open file '%s': %s", fullPath, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+        throw Exception("unable to open file '%s': %s", fullPath, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
     return { new FileStream(fullPath, file, false) };
 }
 
@@ -253,7 +252,7 @@ FileStreamPtr ResourceManager::appendFile(const std::string& fileName)
 {
     PHYSFS_File* file = PHYSFS_openAppend(fileName.c_str());
     if (!file)
-        stdext::throw_exception(stdext::format("failed to append file '%s': %s", fileName, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+        throw Exception("failed to append file '%s': %s", fileName, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
     return { new FileStream(fileName, file, true) };
 }
 
@@ -261,7 +260,7 @@ FileStreamPtr ResourceManager::createFile(const std::string& fileName)
 {
     PHYSFS_File* file = PHYSFS_openWrite(fileName.c_str());
     if (!file)
-        stdext::throw_exception(stdext::format("failed to create file '%s': %s", fileName, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+        throw Exception("failed to create file '%s': %s", fileName, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
     return { new FileStream(fileName, file, true) };
 }
 
@@ -280,7 +279,7 @@ std::list<std::string> ResourceManager::listDirectoryFiles(const std::string& di
     std::list<std::string> files;
     auto* const rc = PHYSFS_enumerateFiles(resolvePath(directoryPath).c_str());
 
-    for (int i = 0; rc[i] != nullptr; i++)
+    for (int i = 0; rc[i] != nullptr; ++i)
         files.emplace_back(rc[i]);
 
     PHYSFS_freeList(rc);
@@ -324,8 +323,7 @@ std::string ResourceManager::resolvePath(const std::string& path)
     if (path.starts_with("/"))
         fullPath = path;
     else {
-        const std::string scriptPath = "/" + g_lua.getCurrentSourcePath();
-        if (!scriptPath.empty())
+        if (const std::string scriptPath = "/" + g_lua.getCurrentSourcePath(); !scriptPath.empty())
             fullPath += scriptPath + "/";
         fullPath += path;
     }
@@ -339,8 +337,7 @@ std::string ResourceManager::resolvePath(const std::string& path)
 std::string ResourceManager::getRealDir(const std::string& path)
 {
     std::string dir;
-    const char* cdir = PHYSFS_getRealDir(resolvePath(path).c_str());
-    if (cdir)
+    if (const char* cdir = PHYSFS_getRealDir(resolvePath(path).c_str()))
         dir = cdir;
     return dir;
 }
@@ -357,7 +354,10 @@ std::string ResourceManager::getBaseDir()
 
 std::string ResourceManager::getUserDir()
 {
-    return PHYSFS_getPrefDir("otclient", "otclient");
+    static const char* orgName = g_app.getOrganizationName().data();
+    static const char* appName = g_app.getCompactName().data();
+
+    return PHYSFS_getPrefDir(orgName, appName);
 }
 
 std::string ResourceManager::guessFilePath(const std::string& filename, const std::string& type)
@@ -394,7 +394,7 @@ std::string ResourceManager::encrypt(const std::string& data, const std::string&
             ct = ct + password[j] - i;
         }
         ss << static_cast<char>(ct);
-        j++;
+        ++j;
 
         if (j >= plen)
             j = 0;
@@ -457,8 +457,8 @@ void ResourceManager::runEncryption(const std::string& password)
 {
     std::vector<std::string> excludedExtensions = { ".rar",".ogg",".xml",".dll",".exe", ".log",".otb" };
     for (const auto& entry : std::filesystem::recursive_directory_iterator("./")) {
-        std::string ext = entry.path().extension().string();
-        if (std::find(excludedExtensions.begin(), excludedExtensions.end(), ext) != excludedExtensions.end())
+        if (std::string ext = entry.path().extension().string();
+            std::find(excludedExtensions.begin(), excludedExtensions.end(), ext) != excludedExtensions.end())
             continue;
 
         std::ifstream ifs(entry.path().string(), std::ios_base::binary);

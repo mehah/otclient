@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,6 +34,8 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/filestream.h>
 
+#include "shadermanager.h"
+
 ItemPtr Item::create(int id)
 {
     ItemPtr item(new Item);
@@ -46,6 +48,7 @@ ItemPtr Item::createFromOtb(int id)
 {
     ItemPtr item(new Item);
     item->setOtbId(id);
+
     return item;
 }
 
@@ -54,7 +57,7 @@ std::string Item::getName()
     return g_things.findItemTypeByClientId(m_clientId)->getName();
 }
 
-void Item::draw(const Point& dest, float scaleFactor, bool animate, const Highlight& highLight, TextureType textureType, Color color, LightView* lightView)
+void Item::draw(const Point& dest, float scaleFactor, bool animate, uint32_t flags, const Highlight& highLight, TextureType textureType, Color color, LightView* lightView)
 {
     if (m_clientId == 0 || !canDraw())
         return;
@@ -62,52 +65,75 @@ void Item::draw(const Point& dest, float scaleFactor, bool animate, const Highli
     // determine animation phase
     const int animationPhase = calculateAnimationPhase(animate);
 
-    // determine x,y,z patterns
-    int xPattern = 0, yPattern = 0, zPattern = 0;
-    calculatePatterns(xPattern, yPattern, zPattern);
-
     if (m_color != Color::alpha)
         color = m_color;
 
-    rawGetThingType()->draw(dest, scaleFactor, 0, xPattern, yPattern, zPattern, animationPhase, textureType, color, lightView);
+    getThingType()->draw(dest, scaleFactor, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, textureType, color, lightView, m_drawBuffer);
+    if (textureType != TextureType::ALL_BLANK && m_shader) {
+        g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
+    }
 
     if (highLight.enabled && this == highLight.thing) {
-        rawGetThingType()->draw(dest, scaleFactor, 0, xPattern, yPattern, zPattern, animationPhase, TextureType::ALL_BLANK, highLight.rgbColor);
+        getThingType()->draw(dest, scaleFactor, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, TextureType::ALL_BLANK, highLight.rgbColor);
     }
 }
 
-void Item::setId(uint32 id)
+void Item::setId(uint32_t id)
 {
     if (!g_things.isValidDatId(id, ThingCategoryItem))
         id = 0;
 
     m_serverId = g_things.findItemTypeByClientId(id)->getServerId();
     m_clientId = id;
+    m_thingType = nullptr;
+    generateBuffer();
+
+    // Shader example on only items that can be marketed.
+    /*
+    if (isMarketable()) {
+        m_shader = g_shaders.getShader("Outfit - Rainbow");
+
+        // Example of how to send a UniformValue to shader
+        m_shaderAction = [=]()-> void {
+            m_shader->bind();
+            m_shader->setUniformValue(ShaderManager::ITEM_ID_UNIFORM, static_cast<int>(id));
+        };
+    }
+    */
 }
 
-void Item::setOtbId(uint16 id)
+void Item::setOtbId(uint16_t id)
 {
     if (!g_things.isValidOtbId(id))
         id = 0;
-    const auto itemType = g_things.getItemType(id);
+
+    const auto& itemType = g_things.getItemType(id);
     m_serverId = id;
 
     id = itemType->getClientId();
     if (!g_things.isValidDatId(id, ThingCategoryItem))
         id = 0;
+
     m_clientId = id;
+    m_thingType = nullptr;
+    generateBuffer();
 }
 
-bool Item::isValid()
+void Item::setPosition(const Position& position, uint8_t stackPos, bool hasElevation)
 {
-    return g_things.isValidDatId(m_clientId, ThingCategoryItem) && !g_things.getThingType(m_clientId, ThingCategoryItem)->isNull();
+    Thing::setPosition(position, stackPos);
+
+    if (hasElevation)
+        m_drawBuffer = nullptr;
+    else if (m_drawBuffer)
+        m_drawBuffer->agroup(stackPos == 0);
 }
 
 void Item::unserializeItem(const BinaryTreePtr& in)
 {
     try {
         while (in->canRead()) {
-            int attrib = in->getU8();
+            ItemAttr attrib = static_cast<ItemAttr>(in->getU8());
             if (attrib == 0)
                 break;
 
@@ -162,10 +188,10 @@ void Item::unserializeItem(const BinaryTreePtr& in)
                     m_attribs.set(attrib, in->getString());
                     break;
                 default:
-                    stdext::throw_exception(stdext::format("invalid item attribute %d", attrib));
+                    throw Exception("invalid item attribute %d", attrib);
             }
         }
-    } catch (stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("Failed to unserialize OTBM item: %s", e.what()));
     }
 }
@@ -181,8 +207,7 @@ void Item::serializeItem(const OutputBinaryTreePtr& out)
     out->addU8(ATTR_CHARGES);
     out->addU16(getCountOrSubType());
 
-    const auto dest = m_attribs.get<Position>(ATTR_TELE_DEST);
-    if (dest.isValid()) {
+    if (const auto dest = m_attribs.get<Position>(ATTR_TELE_DEST); dest.isValid()) {
         out->addU8(ATTR_TELE_DEST);
         out->addPos(dest.x, dest.y, dest.z);
     }
@@ -197,8 +222,8 @@ void Item::serializeItem(const OutputBinaryTreePtr& out)
         out->addU8(getDoorId());
     }
 
-    const auto aid = m_attribs.get<uint16>(ATTR_ACTION_ID);
-    const auto uid = m_attribs.get<uint16>(ATTR_UNIQUE_ID);
+    const auto aid = m_attribs.get<uint16_t>(ATTR_ACTION_ID);
+    const auto uid = m_attribs.get<uint16_t>(ATTR_UNIQUE_ID);
     if (aid) {
         out->addU8(ATTR_ACTION_ID);
         out->addU16(aid);
@@ -209,13 +234,11 @@ void Item::serializeItem(const OutputBinaryTreePtr& out)
         out->addU16(uid);
     }
 
-    const std::string text = getText();
-    if (g_things.getItemType(m_serverId)->isWritable() && !text.empty()) {
+    if (const std::string text = getText(); g_things.getItemType(m_serverId)->isWritable() && !text.empty()) {
         out->addU8(ATTR_TEXT);
         out->addString(text);
     }
-    const std::string desc = getDescription();
-    if (!desc.empty()) {
+    if (const std::string desc = getDescription(); !desc.empty()) {
         out->addU8(ATTR_DESC);
         out->addString(desc);
     }
@@ -248,39 +271,45 @@ ItemPtr Item::clone()
     return item;
 }
 
-void Item::calculatePatterns(int& xPattern, int& yPattern, int& zPattern)
+void Item::updatePatterns()
 {
+    m_numPatternX = m_numPatternY =
+        m_numPatternZ = 0;
+
     // Avoid crashes with invalid items
     if (!isValid())
         return;
 
-    if (isStackable() && getNumPatternX() == 4 && getNumPatternY() == 2) {
+    const int numPatternX = getNumPatternX();
+    const int numPatternY = getNumPatternY();
+
+    if (isStackable() && numPatternX == 4 && numPatternY == 2) {
         if (m_countOrSubType <= 0) {
-            xPattern = 0;
-            yPattern = 0;
+            m_numPatternX = 0;
+            m_numPatternY = 0;
         } else if (m_countOrSubType < 5) {
-            xPattern = m_countOrSubType - 1;
-            yPattern = 0;
+            m_numPatternX = m_countOrSubType - 1;
+            m_numPatternY = 0;
         } else if (m_countOrSubType < 10) {
-            xPattern = 0;
-            yPattern = 1;
+            m_numPatternX = 0;
+            m_numPatternY = 1;
         } else if (m_countOrSubType < 25) {
-            xPattern = 1;
-            yPattern = 1;
+            m_numPatternX = 1;
+            m_numPatternY = 1;
         } else if (m_countOrSubType < 50) {
-            xPattern = 2;
-            yPattern = 1;
+            m_numPatternX = 2;
+            m_numPatternY = 1;
         } else {
-            xPattern = 3;
-            yPattern = 1;
+            m_numPatternX = 3;
+            m_numPatternY = 1;
         }
     } else if (isHangable()) {
         const TilePtr& tile = getTile();
         if (tile) {
             if (tile->mustHookSouth())
-                xPattern = getNumPatternX() >= 2 ? 1 : 0;
+                m_numPatternX = numPatternX >= 2 ? 1 : 0;
             else if (tile->mustHookEast())
-                xPattern = getNumPatternX() >= 3 ? 2 : 0;
+                m_numPatternX = numPatternX >= 3 ? 2 : 0;
         }
     } else if (isSplash() || isFluidContainer()) {
         int color = Otc::FluidTransparent;
@@ -347,12 +376,12 @@ void Item::calculatePatterns(int& xPattern, int& yPattern, int& zPattern)
         } else
             color = m_countOrSubType;
 
-        xPattern = (color % 4) % getNumPatternX();
-        yPattern = (color / 4) % getNumPatternY();
+        m_numPatternX = (color % 4) % numPatternX;
+        m_numPatternY = (color / 4) % numPatternY;
     } else {
-        xPattern = m_position.x % getNumPatternX();
-        yPattern = m_position.y % getNumPatternY();
-        zPattern = m_position.z % getNumPatternZ();
+        m_numPatternX = m_position.x % std::max<int>(1, numPatternX);
+        m_numPatternY = m_position.y % std::max<int>(1, numPatternY);
+        m_numPatternZ = m_position.z % std::max<int>(1, getNumPatternZ());
     }
 }
 
@@ -378,18 +407,12 @@ int Item::calculateAnimationPhase(bool animate)
 
 int Item::getExactSize(int layer, int xPattern, int yPattern, int zPattern, int animationPhase)
 {
-    calculatePatterns(xPattern, yPattern, zPattern);
     animationPhase = calculateAnimationPhase(true);
-    return Thing::getExactSize(layer, xPattern, yPattern, zPattern, animationPhase);
+    return Thing::getExactSize(layer, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase);
 }
 
 const ThingTypePtr& Item::getThingType()
 {
-    return g_things.getThingType(m_clientId, ThingCategoryItem);
-}
-
-ThingType* Item::rawGetThingType()
-{
-    return g_things.rawGetThingType(m_clientId, ThingCategoryItem);
+    return m_thingType ? m_thingType : m_thingType = g_things.getThingType(m_clientId, ThingCategoryItem);
 }
 /* vim: set ts=4 sw=4 et :*/

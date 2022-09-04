@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,12 +20,10 @@
  * THE SOFTWARE.
  */
 
-#ifndef CRYPT_H
-#define CRYPT_H
+#pragma once
 
 #include <string>
-
-#include "uuid.h"
+#include <stduuid/uuid.h>
 
 #ifdef USE_GMP
 #include <gmp.h>
@@ -50,8 +48,8 @@ public:
 
     void rsaSetPublicKey(const std::string& n, const std::string& e);
     void rsaSetPrivateKey(const std::string& p, const std::string& q, const std::string& d);
-    bool rsaEncrypt(unsigned char* msg, int size);
-    bool rsaDecrypt(unsigned char* msg, int size);
+    bool rsaEncrypt(uint8_t* msg, int size);
+    bool rsaDecrypt(uint8_t* msg, int size);
     int rsaGetSize();
 
 private:
@@ -69,5 +67,3 @@ private:
 };
 
 extern Crypt g_crypt;
-
-#endif

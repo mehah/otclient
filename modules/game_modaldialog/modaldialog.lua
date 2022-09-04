@@ -3,15 +3,22 @@ modalDialog = nil
 function init()
     g_ui.importStyle('modaldialog')
 
-    connect(g_game, {onModalDialog = onModalDialog, onGameEnd = destroyDialog})
+    connect(g_game, {
+        onModalDialog = onModalDialog,
+        onGameEnd = destroyDialog
+    })
 
     local dialog = rootWidget:recursiveGetChildById('modalDialog')
-    if dialog then modalDialog = dialog end
+    if dialog then
+        modalDialog = dialog
+    end
 end
 
 function terminate()
-    disconnect(g_game,
-               {onModalDialog = onModalDialog, onGameEnd = destroyDialog})
+    disconnect(g_game, {
+        onModalDialog = onModalDialog,
+        onGameEnd = destroyDialog
+    })
 end
 
 function destroyDialog()
@@ -21,10 +28,11 @@ function destroyDialog()
     end
 end
 
-function onModalDialog(id, title, message, buttons, enterButton, escapeButton,
-                       choices, priority)
+function onModalDialog(id, title, message, buttons, enterButton, escapeButton, choices, priority)
     -- priority parameter is unused, not sure what its use is.
-    if modalDialog then return end
+    if modalDialog then
+        return
+    end
 
     modalDialog = g_ui.createWidget('ModalDialog', rootWidget)
 
@@ -45,7 +53,9 @@ function onModalDialog(id, title, message, buttons, enterButton, escapeButton,
         label.choiceId = choiceId
         label:setText(choiceName)
         label:setPhantom(false)
-        if not labelHeight then labelHeight = label:getHeight() end
+        if not labelHeight then
+            labelHeight = label:getHeight()
+        end
     end
     choiceList:focusChild(choiceList:getFirstChild())
 
@@ -66,13 +76,13 @@ function onModalDialog(id, title, message, buttons, enterButton, escapeButton,
         button.onClick = function(self)
             local focusedChoice = choiceList:getFocusedChild()
             local choice = 0xFF
-            if focusedChoice then choice = focusedChoice.choiceId end
+            if focusedChoice then
+                choice = focusedChoice.choiceId
+            end
             g_game.answerModalDialog(id, buttonId, choice)
             destroyDialog()
         end
-        buttonsWidth =
-            buttonsWidth + button:getWidth() + button:getMarginLeft() +
-                button:getMarginRight()
+        buttonsWidth = buttonsWidth + button:getWidth() + button:getMarginLeft() + button:getMarginRight()
     end
 
     local additionalHeight = 0
@@ -80,31 +90,27 @@ function onModalDialog(id, title, message, buttons, enterButton, escapeButton,
         choiceList:setVisible(true)
         choiceScrollbar:setVisible(true)
 
-        additionalHeight = math.min(modalDialog.maximumChoices, math.max(
-                                        modalDialog.minimumChoices, #choices)) *
+        additionalHeight = math.min(modalDialog.maximumChoices, math.max(modalDialog.minimumChoices, #choices)) *
                                labelHeight
-        additionalHeight = additionalHeight + choiceList:getPaddingTop() +
-                               choiceList:getPaddingBottom()
+        additionalHeight = additionalHeight + choiceList:getPaddingTop() + choiceList:getPaddingBottom()
     end
 
-    local horizontalPadding = modalDialog:getPaddingLeft() +
-                                  modalDialog:getPaddingRight()
+    local horizontalPadding = modalDialog:getPaddingLeft() + modalDialog:getPaddingRight()
     buttonsWidth = buttonsWidth + horizontalPadding
 
-    modalDialog:setWidth(math.min(modalDialog.maximumWidth, math.max(
-                                      buttonsWidth, messageLabel:getWidth(),
-                                      modalDialog.minimumWidth)))
-    messageLabel:setWidth(math.min(modalDialog.maximumWidth, math.max(
-                                       buttonsWidth, messageLabel:getWidth(),
-                                       modalDialog.minimumWidth)) -
+    modalDialog:setWidth(math.min(modalDialog.maximumWidth,
+                                  math.max(buttonsWidth, messageLabel:getWidth(), modalDialog.minimumWidth)))
+    messageLabel:setWidth(math.min(modalDialog.maximumWidth,
+                                   math.max(buttonsWidth, messageLabel:getWidth(), modalDialog.minimumWidth)) -
                               horizontalPadding)
-    modalDialog:setHeight(modalDialog:getHeight() + additionalHeight +
-                              messageLabel:getHeight() - 8)
+    modalDialog:setHeight(modalDialog:getHeight() + additionalHeight + messageLabel:getHeight() - 8)
 
     local enterFunc = function()
         local focusedChoice = choiceList:getFocusedChild()
         local choice = 0xFF
-        if focusedChoice then choice = focusedChoice.choiceId end
+        if focusedChoice then
+            choice = focusedChoice.choiceId
+        end
         g_game.answerModalDialog(id, enterButton, choice)
         destroyDialog()
     end
@@ -112,7 +118,9 @@ function onModalDialog(id, title, message, buttons, enterButton, escapeButton,
     local escapeFunc = function()
         local focusedChoice = choiceList:getFocusedChild()
         local choice = 0xFF
-        if focusedChoice then choice = focusedChoice.choiceId end
+        if focusedChoice then
+            choice = focusedChoice.choiceId
+        end
         g_game.answerModalDialog(id, escapeButton, choice)
         destroyDialog()
     end

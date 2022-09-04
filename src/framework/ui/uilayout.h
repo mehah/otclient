@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef UILAYOUT_H
-#define UILAYOUT_H
+#pragma once
 
 #include "declarations.h"
 #include <framework/luaengine/luaobject.h>
@@ -41,7 +40,7 @@ public:
     virtual void applyStyle(const OTMLNodePtr& /*styleNode*/) {}
     virtual void addWidget(const UIWidgetPtr& /*widget*/) {}
     virtual void removeWidget(const UIWidgetPtr& /*widget*/) {}
-    void disableUpdates() { m_updateDisabled++; }
+    void disableUpdates() { ++m_updateDisabled; }
     void enableUpdates() { m_updateDisabled = std::max<int>(m_updateDisabled - 1, 0); }
 
     void setParent(UIWidgetPtr parentWidget) { m_parentWidget = std::move(parentWidget); }
@@ -60,9 +59,7 @@ protected:
     virtual bool internalUpdate() { return false; }
 
     int m_updateDisabled;
-    bool m_updating{ false },
-        m_updateScheduled{ false };
+    bool m_updating{ false };
+    bool m_updateScheduled{ false };
     UIWidgetPtr m_parentWidget;
 };
-
-#endif

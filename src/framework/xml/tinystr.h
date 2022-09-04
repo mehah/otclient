@@ -23,8 +23,7 @@ distribution.
 
 #ifndef TIXML_USE_STL
 
-#ifndef TIXML_STRING_INCLUDED
-#define TIXML_STRING_INCLUDED
+#pragma once
 
 #include <cassert>
 #include <cstring>
@@ -73,7 +72,7 @@ public:
     // TiXmlString constructor, based on a string
     TIXML_EXPLICIT TiXmlString(const char* copy) : rep_(nullptr)
     {
-        init(static_cast<size_type>(strlen(copy)));
+        init(strlen(copy));
         memcpy(start(), copy, length());
     }
 
@@ -92,7 +91,7 @@ public:
 
     TiXmlString& operator = (const char* copy)
     {
-        return assign(copy, static_cast<size_type>(strlen(copy)));
+        return assign(copy, strlen(copy));
     }
 
     TiXmlString& operator = (const TiXmlString& copy)
@@ -103,7 +102,7 @@ public:
     // += operator. Maps to append
     TiXmlString& operator += (const char* suffix)
     {
-        return append(suffix, static_cast<size_type>(strlen(suffix)));
+        return append(suffix, strlen(suffix));
     }
 
     // += operator. Maps to append
@@ -202,7 +201,8 @@ private:
 
     struct Rep
     {
-        size_type size, capacity;
+        size_type size;
+        size_type capacity;
         char str[1];
     };
 
@@ -285,5 +285,4 @@ public:
     }
 };
 
-#endif    // TIXML_STRING_INCLUDED
 #endif    // TIXML_USE_STL

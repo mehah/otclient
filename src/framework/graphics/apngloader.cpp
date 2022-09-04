@@ -56,10 +56,10 @@
 
 #define ROWBYTES(pixel_bits, width) \
 ((pixel_bits) >= 8 ? \
-((width) * (((unsigned int)(pixel_bits)) >> 3)) : \
-(( ((width) * ((unsigned int)(pixel_bits))) + 7) >> 3) )
+((width) * (((uint32_t )(pixel_bits)) >> 3)) : \
+(( ((width) * ((uint32_t )(pixel_bits))) + 7) >> 3) )
 
-unsigned char   png_sign[8] = { 137, 80, 78, 71, 13, 10, 26, 10 };
+uint8_t   png_sign[8] = { 137, 80, 78, 71, 13, 10, 26, 10 };
 
 int mask4[2] = { 240,15 };
 int shift4[2] = { 4,0 };
@@ -70,56 +70,56 @@ int shift2[4] = { 6,4,2,0 };
 int mask1[8] = { 128,64,32,16,8,4,2,1 };
 int shift1[8] = { 7,6,5,4,3,2,1,0 };
 
-unsigned int    keep_original = 1;
-unsigned char   pal[256][3];
-unsigned char   trns[256];
-unsigned int    palsize, trnssize;
-unsigned int    hasTRNS;
+uint32_t    keep_original = 1;
+uint8_t   pal[256][3];
+uint8_t   trns[256];
+uint32_t    palsize, trnssize;
+uint32_t    hasTRNS;
 unsigned short  trns1, trns2, trns3;
 
 #ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4244)
 #endif
-unsigned int read32(std::istream& f1)
+uint32_t read32(std::istream& f1)
 {
-    unsigned char a, b, c, d;
+    uint8_t a, b, c, d;
     f1.read((char*)&a, 1);
     f1.read((char*)&b, 1);
     f1.read((char*)&c, 1);
     f1.read((char*)&d, 1);
-    return (static_cast<unsigned int>(a) << 24) + (static_cast<unsigned int>(b) << 16) + (static_cast<unsigned int>(c) << 8) + static_cast<unsigned int>(d);
+    return (static_cast<uint32_t>(a) << 24) + (static_cast<uint32_t>(b) << 16) + (static_cast<uint32_t>(c) << 8) + static_cast<uint32_t>(d);
 }
 
 unsigned short read16(std::istream& f1)
 {
-    unsigned char a, b;
+    uint8_t a, b;
     f1.read((char*)&a, 1);
     f1.read((char*)&b, 1);
     return (static_cast<unsigned short>(a) << 8) + static_cast<unsigned short>(b);
 }
 
-unsigned short readshort(unsigned char* p)
+unsigned short readshort(uint8_t* p)
 {
     return (static_cast<unsigned short>(*p) << 8) + static_cast<unsigned short>(*(p + 1));
 }
 
-void read_sub_row(unsigned char* row, unsigned int rowbytes, unsigned int bpp)
+void read_sub_row(uint8_t* row, uint32_t rowbytes, uint32_t bpp)
 {
-    for (unsigned int i = bpp; i < rowbytes; i++)
+    for (uint32_t i = bpp; i < rowbytes; i++)
         row[i] += row[i - bpp];
 }
 
-void read_up_row(unsigned char* row, unsigned char* prev_row, unsigned int rowbytes, unsigned int)
+void read_up_row(uint8_t* row, uint8_t* prev_row, uint32_t rowbytes, uint32_t)
 {
     if (prev_row)
-        for (unsigned int i = 0; i < rowbytes; i++)
+        for (uint32_t i = 0; i < rowbytes; i++)
             row[i] += prev_row[i];
 }
 
-void read_average_row(unsigned char* row, unsigned char* prev_row, unsigned int rowbytes, unsigned int bpp)
+void read_average_row(uint8_t* row, uint8_t* prev_row, uint32_t rowbytes, uint32_t bpp)
 {
-    unsigned int i;
+    uint32_t i;
 
     if (prev_row) {
         for (i = 0; i < bpp; i++)
@@ -132,9 +132,9 @@ void read_average_row(unsigned char* row, unsigned char* prev_row, unsigned int 
     }
 }
 
-void read_paeth_row(unsigned char* row, unsigned char* prev_row, unsigned int rowbytes, unsigned int bpp)
+void read_paeth_row(uint8_t* row, uint8_t* prev_row, uint32_t rowbytes, uint32_t bpp)
 {
-    unsigned int i;
+    uint32_t i;
 
     if (prev_row) {
         for (i = 0; i < bpp; i++)
@@ -156,10 +156,10 @@ void read_paeth_row(unsigned char* row, unsigned char* prev_row, unsigned int ro
     }
 }
 
-void unpack(z_stream& zstream, unsigned char* dst, unsigned int dst_size, unsigned char* src, unsigned int src_size, unsigned int h, unsigned int rowbytes, unsigned char bpp)
+void unpack(z_stream& zstream, uint8_t* dst, uint32_t dst_size, uint8_t* src, uint32_t src_size, uint32_t h, uint32_t rowbytes, uint8_t bpp)
 {
-    unsigned char* row = dst;
-    unsigned char* prev_row = nullptr;
+    uint8_t* row = dst;
+    uint8_t* prev_row = nullptr;
 
     zstream.next_out = dst;
     zstream.avail_out = dst_size;
@@ -168,7 +168,7 @@ void unpack(z_stream& zstream, unsigned char* dst, unsigned int dst_size, unsign
     inflate(&zstream, Z_FINISH);
     inflateReset(&zstream);
 
-    for (unsigned int j = 0; j < h; j++) {
+    for (uint32_t j = 0; j < h; j++) {
         switch (*row++) {
             case 0: break;
             case 1: read_sub_row(row, rowbytes, bpp); break;
@@ -181,14 +181,14 @@ void unpack(z_stream& zstream, unsigned char* dst, unsigned int dst_size, unsign
     }
 }
 
-void compose0(unsigned char* dst1, unsigned int dstbytes1, unsigned char* dst2, unsigned int dstbytes2, unsigned char* src, unsigned int srcbytes, unsigned int w, unsigned int h, unsigned int bop, unsigned char depth)
+void compose0(uint8_t* dst1, uint32_t dstbytes1, uint8_t* dst2, uint32_t dstbytes2, uint8_t* src, uint32_t srcbytes, uint32_t w, uint32_t h, uint32_t bop, uint8_t depth)
 {
-    unsigned int    i, g, a;
+    uint32_t    i, g, a;
 
-    for (unsigned int j = 0; j < h; j++) {
-        unsigned char* sp = src + 1;
-        unsigned char* dp1 = dst1;
-        auto* dp2 = (unsigned int*)dst2;
+    for (uint32_t j = 0; j < h; j++) {
+        uint8_t* sp = src + 1;
+        uint8_t* dp1 = dst1;
+        auto* dp2 = (uint32_t*)dst2;
 
         if (bop == PNG_BLEND_OP_SOURCE) {
             switch (depth) {
@@ -215,15 +215,15 @@ void compose0(unsigned char* dst1, unsigned int dstbytes1, unsigned char* dst2, 
     }
 }
 
-void compose2(unsigned char* dst1, unsigned int dstbytes1, unsigned char* dst2, unsigned int dstbytes2, unsigned char* src, unsigned int srcbytes, unsigned int w, unsigned int h, unsigned int bop, unsigned char depth)
+void compose2(uint8_t* dst1, uint32_t dstbytes1, uint8_t* dst2, uint32_t dstbytes2, uint8_t* src, uint32_t srcbytes, uint32_t w, uint32_t h, uint32_t bop, uint8_t depth)
 {
-    unsigned int    i;
-    unsigned int    r, g, b, a;
+    uint32_t    i;
+    uint32_t    r, g, b, a;
 
-    for (unsigned int j = 0; j < h; j++) {
-        unsigned char* sp = src + 1;
-        unsigned char* dp1 = dst1;
-        auto* dp2 = (unsigned int*)dst2;
+    for (uint32_t j = 0; j < h; j++) {
+        uint8_t* sp = src + 1;
+        uint8_t* dp1 = dst1;
+        auto* dp2 = (uint32_t*)dst2;
 
         if (bop == PNG_BLEND_OP_SOURCE) {
             if (depth == 8) {
@@ -271,17 +271,17 @@ void compose2(unsigned char* dst1, unsigned int dstbytes1, unsigned char* dst2, 
     }
 }
 
-void compose3(unsigned char* dst1, unsigned int dstbytes1, unsigned char* dst2, unsigned int dstbytes2, unsigned char* src, unsigned int srcbytes, unsigned int w, unsigned int h, unsigned int bop, unsigned char depth)
+void compose3(uint8_t* dst1, uint32_t dstbytes1, uint8_t* dst2, uint32_t dstbytes2, uint8_t* src, uint32_t srcbytes, uint32_t w, uint32_t h, uint32_t bop, uint8_t depth)
 {
-    unsigned int a2;
-    unsigned char   col = 0;
+    uint32_t a2;
+    uint8_t   col = 0;
 
-    for (unsigned int j = 0; j < h; j++) {
-        unsigned char* sp = src + 1;
-        unsigned char* dp1 = dst1;
-        auto* dp2 = (unsigned int*)dst2;
+    for (uint32_t j = 0; j < h; j++) {
+        const uint8_t* sp = src + 1;
+        uint8_t* dp1 = dst1;
+        auto* dp2 = (uint32_t*)dst2;
 
-        for (unsigned int i = 0; i < w; i++) {
+        for (uint32_t i = 0; i < w; i++) {
             switch (depth) {
                 case 8: col = sp[i]; break;
                 case 4: col = (sp[i >> 1] & mask4[i & 1]) >> shift4[i & 1]; break;
@@ -289,10 +289,10 @@ void compose3(unsigned char* dst1, unsigned int dstbytes1, unsigned char* dst2, 
                 case 1: col = (sp[i >> 3] & mask1[i & 7]) >> shift1[i & 7]; break;
             }
 
-            unsigned int b = pal[col][0];
-            unsigned int g = pal[col][1];
-            unsigned int r = pal[col][2];
-            unsigned int a = trns[col];
+            uint32_t b = pal[col][0];
+            uint32_t g = pal[col][1];
+            uint32_t r = pal[col][2];
+            uint32_t a = trns[col];
 
             if (bop == PNG_BLEND_OP_SOURCE) {
                 *dp1++ = col;
@@ -309,9 +309,9 @@ void compose3(unsigned char* dst1, unsigned int dstbytes1, unsigned char* dst2, 
                             const int u = a * 255;
                             const int v = (255 - a) * a2;
                             const int al = 255 * 255 - (255 - a) * (255 - a2);
-                            const unsigned int b2 = ((*dp2) & 255);
-                            const unsigned int g2 = (((*dp2) >> 8) & 255);
-                            const unsigned int r2 = (((*dp2) >> 16) & 255);
+                            const uint32_t b2 = ((*dp2) & 255);
+                            const uint32_t g2 = (((*dp2) >> 8) & 255);
+                            const uint32_t r2 = (((*dp2) >> 16) & 255);
                             b = (b * u + b2 * v) / al;
                             g = (g * u + g2 * v) / al;
                             r = (r * u + r2 * v) / al;
@@ -331,16 +331,16 @@ void compose3(unsigned char* dst1, unsigned int dstbytes1, unsigned char* dst2, 
     }
 }
 
-void compose4(unsigned char* dst, unsigned int dstbytes, unsigned char* src, unsigned int srcbytes, unsigned int w, unsigned int h, unsigned int bop, unsigned char depth)
+void compose4(uint8_t* dst, uint32_t dstbytes, uint8_t* src, uint32_t srcbytes, uint32_t w, uint32_t h, uint32_t bop, uint8_t depth)
 {
-    unsigned int    i;
-    unsigned int    g, a, a2;
+    uint32_t    i;
+    uint32_t    g, a, a2;
 
-    const unsigned int step = (depth + 7) / 8;
+    const uint32_t step = (depth + 7) / 8;
 
-    for (unsigned int j = 0; j < h; j++) {
-        unsigned char* sp = src + 1;
-        unsigned char* dp = dst;
+    for (uint32_t j = 0; j < h; j++) {
+        uint8_t* sp = src + 1;
+        uint8_t* dp = dst;
 
         if (bop == PNG_BLEND_OP_SOURCE) {
             for (i = 0; i < w; i++) {
@@ -363,7 +363,7 @@ void compose4(unsigned char* dst, unsigned int dstbytes, unsigned char* src, uns
                             const int u = a * 255;
                             const int v = (255 - a) * a2;
                             const int al = 255 * 255 - (255 - a) * (255 - a2);
-                            const unsigned int g2 = ((*dp) & 255);
+                            const uint32_t g2 = ((*dp) & 255);
                             g = (g * u + g2 * v) / al;
                             a = al / 255;
                         }
@@ -378,17 +378,17 @@ void compose4(unsigned char* dst, unsigned int dstbytes, unsigned char* src, uns
     }
 }
 
-void compose6(unsigned char* dst, unsigned int dstbytes, unsigned char* src, unsigned int srcbytes, unsigned int w, unsigned int h, unsigned int bop, unsigned char depth)
+void compose6(uint8_t* dst, uint32_t dstbytes, uint8_t* src, uint32_t srcbytes, uint32_t w, uint32_t h, uint32_t bop, uint8_t depth)
 {
-    unsigned int    i;
-    unsigned int    r, g, b, a;
-    unsigned int a2;
+    uint32_t    i;
+    uint32_t    r, g, b, a;
+    uint32_t a2;
 
-    const unsigned int step = (depth + 7) / 8;
+    const uint32_t step = (depth + 7) / 8;
 
-    for (unsigned int j = 0; j < h; j++) {
-        unsigned char* sp = src + 1;
-        auto* dp = (unsigned int*)dst;
+    for (uint32_t j = 0; j < h; j++) {
+        uint8_t* sp = src + 1;
+        auto* dp = (uint32_t*)dst;
 
         if (bop == PNG_BLEND_OP_SOURCE) {
             for (i = 0; i < w; i++) {
@@ -413,9 +413,9 @@ void compose6(unsigned char* dst, unsigned int dstbytes, unsigned char* src, uns
                             const int u = a * 255;
                             const int v = (255 - a) * a2;
                             const int al = 255 * 255 - (255 - a) * (255 - a2);
-                            const unsigned int b2 = ((*dp) & 255);
-                            const unsigned int g2 = (((*dp) >> 8) & 255);
-                            const unsigned int r2 = (((*dp) >> 16) & 255);
+                            const uint32_t b2 = ((*dp) & 255);
+                            const uint32_t g2 = (((*dp) >> 8) & 255);
+                            const uint32_t r2 = (((*dp) >> 16) & 255);
                             b = (b * u + b2 * v) / al;
                             g = (g * u + g2 * v) / al;
                             r = (r * u + r2 * v) / al;
@@ -431,21 +431,21 @@ void compose6(unsigned char* dst, unsigned int dstbytes, unsigned char* src, uns
     }
 }
 
-int load_apng(std::stringstream& file, struct apng_data* apng)
+int load_apng(std::stringstream& file, apng_data* apng)
 {
-    unsigned int    i, j;
-    unsigned int    rowbytes;
+    uint32_t    i, j;
+    uint32_t    rowbytes;
     int             imagesize, zbuf_size, zsize, trns_idx;
-    unsigned int    len, chunk/*, crc, seq*/;
-    unsigned int    w, h, w0, h0, x0, y0;
-    unsigned int    frames, loops, first_frame, cur_frame;
-    unsigned int    outrow1, outrow2, outimg1, outimg2;
+    uint32_t    len, chunk/*, crc, seq*/;
+    uint32_t    w, h, w0, h0, x0, y0;
+    uint32_t    frames, loops, first_frame, cur_frame;
+    uint32_t    outrow1, outrow2, outimg1, outimg2;
     unsigned short  d1, d2;
-    unsigned char   c, dop = PNG_DISPOSE_OP_NONE, bop;
-    unsigned char   channels, depth, pixeldepth, bpp;
-    unsigned char   coltype, compr, filter, interl;
+    uint8_t   c, dop = PNG_DISPOSE_OP_NONE, bop;
+    uint8_t   channels, depth, pixeldepth, bpp;
+    uint8_t   coltype, compr, filter, interl;
     z_stream        zstream;
-    memset(apng, 0, sizeof(struct apng_data));
+    memset(apng, 0, sizeof(apng_data));
 
     for (i = 0; i < 256; i++) {
         pal[i][0] = i;
@@ -470,15 +470,15 @@ int load_apng(std::stringstream& file, struct apng_data* apng)
     loops = 0;
     bop = PNG_BLEND_OP_SOURCE;
 
-    unsigned char sig[8];
-    unsigned char* pOut1;
-    unsigned char* pOut2;
-    unsigned char* pTemp;
-    unsigned char* pData;
-    unsigned char* pImg1;
-    unsigned char* pImg2;
-    unsigned char* pDst1;
-    unsigned char* pDst2;
+    uint8_t sig[8];
+    uint8_t* pOut1;
+    uint8_t* pOut2;
+    uint8_t* pTemp;
+    uint8_t* pData;
+    uint8_t* pImg1;
+    uint8_t* pImg2;
+    uint8_t* pDst1;
+    uint8_t* pDst2;
     unsigned short* frames_delay;
 
     file.read((char*)sig, 8);
@@ -525,10 +525,10 @@ int load_apng(std::stringstream& file, struct apng_data* apng)
             outimg1 = h * outrow1;
             outimg2 = h * outrow2;
 
-            pOut1 = static_cast<unsigned char*>(malloc(outimg1));
-            pOut2 = static_cast<unsigned char*>(malloc(outimg2));
-            pTemp = static_cast<unsigned char*>(malloc(imagesize));
-            pData = static_cast<unsigned char*>(malloc(zbuf_size));
+            pOut1 = static_cast<uint8_t*>(malloc(outimg1));
+            pOut2 = static_cast<uint8_t*>(malloc(outimg2));
+            pTemp = static_cast<uint8_t*>(malloc(imagesize));
+            pData = static_cast<uint8_t*>(malloc(zbuf_size));
             pImg1 = pOut1;
             pImg2 = pOut2;
             frames_delay = nullptr;
@@ -543,7 +543,7 @@ int load_apng(std::stringstream& file, struct apng_data* apng)
 
                 if (chunk == 0x504C5445) /* PLTE */
                 {
-                    unsigned int col;
+                    uint32_t col;
                     for (i = 0; i < len; i++) {
                         file.read((char*)&c, 1);
                         col = i / 3;
@@ -594,8 +594,8 @@ int load_apng(std::stringstream& file, struct apng_data* apng)
                         free(pOut1);
                     if (pOut2)
                         free(pOut2);
-                    pOut1 = static_cast<unsigned char*>(malloc((frames + 1) * outimg1));
-                    pOut2 = static_cast<unsigned char*>(malloc((frames + 1) * outimg2));
+                    pOut1 = static_cast<uint8_t*>(malloc((frames + 1) * outimg1));
+                    pOut2 = static_cast<uint8_t*>(malloc((frames + 1) * outimg2));
                     pImg1 = pOut1;
                     pImg2 = pOut2;
                     memset(pOut1, 0, outimg1);
@@ -703,13 +703,13 @@ int load_apng(std::stringstream& file, struct apng_data* apng)
                     }
                     break;
                 } else {
-                    c = static_cast<unsigned char>(chunk >> 24);
+                    c = static_cast<uint8_t>(chunk >> 24);
                     if (notabc(c)) break;
-                    c = static_cast<unsigned char>((chunk >> 16) & 0xFF);
+                    c = static_cast<uint8_t>((chunk >> 16) & 0xFF);
                     if (notabc(c)) break;
-                    c = static_cast<unsigned char>((chunk >> 8) & 0xFF);
+                    c = static_cast<uint8_t>((chunk >> 8) & 0xFF);
                     if (notabc(c)) break;
-                    c = static_cast<unsigned char>(chunk & 0xFF);
+                    c = static_cast<uint8_t>(chunk & 0xFF);
                     if (notabc(c)) break;
 
                     file.seekg(len, std::ios_base::cur);
@@ -755,10 +755,10 @@ int load_apng(std::stringstream& file, struct apng_data* apng)
     return 0;
 }
 
-void write_chunk(std::ostream& f, const char* name, unsigned char* data, unsigned int length)
+void write_chunk(std::ostream& f, const char* name, uint8_t* data, uint32_t length)
 {
-    unsigned int crc = crc32(0, nullptr, 0);
-    unsigned int len = swap32(length);
+    uint32_t crc = crc32(0, nullptr, 0);
+    uint32_t len = swap32(length);
 
     f.write((char*)&len, 4);
     f.write(name, 4);
@@ -773,14 +773,14 @@ void write_chunk(std::ostream& f, const char* name, unsigned char* data, unsigne
     f.write((char*)&crc, 4);
 }
 
-void write_IDATs(std::ostream& f, unsigned char* data, unsigned int length, unsigned int idat_size)
+void write_IDATs(std::ostream& f, uint8_t* data, uint32_t length, uint32_t idat_size)
 {
-    unsigned int z_cmf = data[0];
+    uint32_t z_cmf = data[0];
 
     if ((z_cmf & 0x0f) == 8 && (z_cmf & 0xf0) <= 0x70) {
         if (length >= 2) {
-            unsigned int z_cinfo = z_cmf >> 4;
-            unsigned int half_z_window_size = 1 << (z_cinfo + 7);
+            uint32_t z_cinfo = z_cmf >> 4;
+            uint32_t half_z_window_size = 1 << (z_cinfo + 7);
 
             while (idat_size <= half_z_window_size && half_z_window_size >= 256) {
                 z_cinfo--;
@@ -789,16 +789,16 @@ void write_IDATs(std::ostream& f, unsigned char* data, unsigned int length, unsi
 
             z_cmf = (z_cmf & 0x0f) | (z_cinfo << 4);
 
-            if (data[0] != static_cast<unsigned char>(z_cmf)) {
-                data[0] = static_cast<unsigned char>(z_cmf);
+            if (data[0] != static_cast<uint8_t>(z_cmf)) {
+                data[0] = static_cast<uint8_t>(z_cmf);
                 data[1] &= 0xe0;
-                data[1] += static_cast<unsigned char>(0x1f - ((z_cmf << 8) + data[1]) % 0x1f);
+                data[1] += static_cast<uint8_t>(0x1f - ((z_cmf << 8) + data[1]) % 0x1f);
             }
         }
     }
 
     while (length > 0) {
-        unsigned int ds = length;
+        uint32_t ds = length;
 
         if (ds > PNG_ZBUF_SIZE)
             ds = PNG_ZBUF_SIZE;
@@ -810,10 +810,10 @@ void write_IDATs(std::ostream& f, unsigned char* data, unsigned int length, unsi
     }
 }
 
-void save_png(std::stringstream& f, unsigned int width, unsigned int height, int channels, unsigned char* pixels)
+void save_png(std::stringstream& f, uint32_t width, uint32_t height, int channels, uint8_t* pixels)
 {
-    unsigned int bpp = 4;
-    unsigned char coltype = 0;
+    uint32_t bpp = 4;
+    uint8_t coltype = 0;
 
     if (channels == 3)
         coltype = 2;
@@ -824,30 +824,30 @@ void save_png(std::stringstream& f, unsigned int width, unsigned int height, int
 
     struct IHDR
     {
-        unsigned int    mWidth;
-        unsigned int    mHeight;
-        unsigned char   mDepth;
-        unsigned char   mColorType;
-        unsigned char   mCompression;
-        unsigned char   mFilterMethod;
-        unsigned char   mInterlaceMethod;
+        uint32_t    mWidth;
+        uint32_t    mHeight;
+        uint8_t   mDepth;
+        uint8_t   mColorType;
+        uint8_t   mCompression;
+        uint8_t   mFilterMethod;
+        uint8_t   mInterlaceMethod;
     } ihdr = { swap32(width), swap32(height), 8, coltype, 0, 0, 0 };
 
     z_stream        zstream1;
     z_stream        zstream2;
-    unsigned int    i, j;
+    uint32_t    i, j;
 
-    unsigned int rowbytes = width * bpp;
-    unsigned int idat_size = (rowbytes + 1) * height;
-    unsigned int zbuf_size = idat_size + ((idat_size + 7) >> 3) + ((idat_size + 63) >> 6) + 11;
+    uint32_t rowbytes = width * bpp;
+    uint32_t idat_size = (rowbytes + 1) * height;
+    uint32_t zbuf_size = idat_size + ((idat_size + 7) >> 3) + ((idat_size + 63) >> 6) + 11;
 
-    auto* row_buf = static_cast<unsigned char*>(malloc(rowbytes + 1));
-    auto* sub_row = static_cast<unsigned char*>(malloc(rowbytes + 1));
-    auto* up_row = static_cast<unsigned char*>(malloc(rowbytes + 1));
-    auto* avg_row = static_cast<unsigned char*>(malloc(rowbytes + 1));
-    auto* paeth_row = static_cast<unsigned char*>(malloc(rowbytes + 1));
-    auto* zbuf1 = static_cast<unsigned char*>(malloc(zbuf_size));
-    auto* zbuf2 = static_cast<unsigned char*>(malloc(zbuf_size));
+    auto* row_buf = static_cast<uint8_t*>(malloc(rowbytes + 1));
+    auto* sub_row = static_cast<uint8_t*>(malloc(rowbytes + 1));
+    auto* up_row = static_cast<uint8_t*>(malloc(rowbytes + 1));
+    auto* avg_row = static_cast<uint8_t*>(malloc(rowbytes + 1));
+    auto* paeth_row = static_cast<uint8_t*>(malloc(rowbytes + 1));
+    auto* zbuf1 = static_cast<uint8_t*>(malloc(zbuf_size));
+    auto* zbuf2 = static_cast<uint8_t*>(malloc(zbuf_size));
 
     if (!row_buf || !sub_row || !up_row || !avg_row || !paeth_row || !zbuf1 || !zbuf2) {
         free(row_buf);
@@ -880,14 +880,14 @@ void save_png(std::stringstream& f, unsigned int width, unsigned int height, int
     deflateInit2(&zstream2, Z_BEST_COMPRESSION, 8, 15, 8, Z_FILTERED);
 
     int a, b, c, pa, pb, pc, p, v;
-    unsigned char* prev;
-    unsigned char* row;
+    uint8_t* prev;
+    uint8_t* row;
 
     f.write((char*)png_sign, 8);
-    write_chunk(f, "IHDR", (unsigned char*)(&ihdr), 13);
+    write_chunk(f, "IHDR", (uint8_t*)(&ihdr), 13);
 
     if (palsize > 0)
-        write_chunk(f, "PLTE", (unsigned char*)(&pal), palsize * 3);
+        write_chunk(f, "PLTE", (uint8_t*)(&pal), palsize * 3);
 
     if (trnssize > 0)
         write_chunk(f, "tRNS", trns, trnssize);
@@ -900,11 +900,11 @@ void save_png(std::stringstream& f, unsigned int width, unsigned int height, int
     prev = nullptr;
     row = pixels;
 
-    for (j = 0; j < static_cast<unsigned int>(height); j++) {
-        unsigned char* out;
-        unsigned int    sum = 0;
-        unsigned char* best_row = row_buf;
-        unsigned int    mins = static_cast<unsigned int>(-1) >> 1;
+    for (j = 0; j < height; j++) {
+        uint8_t* out;
+        uint32_t    sum = 0;
+        uint8_t* best_row = row_buf;
+        uint32_t    mins = static_cast<uint32_t>(-1) >> 1;
 
         out = row_buf + 1;
 
@@ -1038,7 +1038,7 @@ void save_png(std::stringstream& f, unsigned int width, unsigned int height, int
     free(paeth_row);
 }
 
-void free_apng(struct apng_data* apng)
+void free_apng(apng_data* apng)
 {
     if (apng->pdata)
         free(apng->pdata);

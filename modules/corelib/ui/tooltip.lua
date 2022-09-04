@@ -7,8 +7,7 @@ local currentHoveredWidget
 
 -- private functions
 local function moveToolTip(first)
-    if not first and
-        (not toolTipLabel:isVisible() or toolTipLabel:getOpacity() < 0.1) then
+    if not first and (not toolTipLabel:isVisible() or toolTipLabel:getOpacity() < 0.1) then
         return
     end
 
@@ -49,7 +48,9 @@ local function onWidgetHoverChange(widget, hovered)
 end
 
 local function onWidgetStyleApply(widget, styleName, styleNode)
-    if styleNode.tooltip then widget.tooltip = styleNode.tooltip end
+    if styleNode.tooltip then
+        widget.tooltip = styleNode.tooltip
+    end
 end
 
 -- public functions
@@ -82,38 +83,53 @@ function g_tooltip.terminate()
 end
 
 function g_tooltip.display(text)
-    if text == nil or text:len() == 0 then return end
-    if not toolTipLabel then return end
+    if text == nil or text:len() == 0 then
+        return
+    end
+    if not toolTipLabel then
+        return
+    end
 
     toolTipLabel:setText(text)
     toolTipLabel:resizeToText()
-    toolTipLabel:resize(toolTipLabel:getWidth() + 4,
-                        toolTipLabel:getHeight() + 4)
+    toolTipLabel:resize(toolTipLabel:getWidth() + 4, toolTipLabel:getHeight() + 4)
     toolTipLabel:show()
     toolTipLabel:raise()
     toolTipLabel:enable()
     g_effects.fadeIn(toolTipLabel, 100)
     moveToolTip(true)
 
-    connect(rootWidget, {onMouseMove = moveToolTip})
+    connect(rootWidget, {
+        onMouseMove = moveToolTip
+    })
 end
 
 function g_tooltip.hide()
     g_effects.fadeOut(toolTipLabel, 100)
 
-    disconnect(rootWidget, {onMouseMove = moveToolTip})
+    disconnect(rootWidget, {
+        onMouseMove = moveToolTip
+    })
 end
 
 -- @docclass UIWidget @{
 
 -- UIWidget extensions
-function UIWidget:setTooltip(text) self.tooltip = text end
+function UIWidget:setTooltip(text)
+    self.tooltip = text
+end
 
-function UIWidget:removeTooltip() self.tooltip = nil end
+function UIWidget:removeTooltip()
+    self.tooltip = nil
+end
 
-function UIWidget:getTooltip() return self.tooltip end
+function UIWidget:getTooltip()
+    return self.tooltip
+end
 
 -- @}
 
 g_tooltip.init()
-connect(g_app, {onTerminate = g_tooltip.terminate})
+connect(g_app, {
+    onTerminate = g_tooltip.terminate
+})

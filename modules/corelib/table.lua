@@ -1,9 +1,11 @@
 -- @docclass table
 function table.dump(t, depth)
-    if not depth then depth = 0 end
+    if not depth then
+        depth = 0
+    end
     for k, v in pairs(t) do
         str = (' '):rep(depth * 2) .. k .. ': '
-        if type(v) ~= "table" then
+        if type(v) ~= 'table' then
             print(str .. tostring(v))
         else
             print(str)
@@ -12,18 +14,24 @@ function table.dump(t, depth)
     end
 end
 
-function table.clear(t) for k, v in pairs(t) do t[k] = nil end end
+function table.clear(t)
+    for k, v in pairs(t) do
+        t[k] = nil
+    end
+end
 
 function table.copy(t)
     local res = {}
-    for k, v in pairs(t) do res[k] = v end
+    for k, v in pairs(t) do
+        res[k] = v
+    end
     return res
 end
 
 function table.recursivecopy(t)
     local res = {}
     for k, v in pairs(t) do
-        if type(v) == "table" then
+        if type(v) == 'table' then
             res[k] = table.recursivecopy(v)
         else
             res[k] = v
@@ -34,27 +42,41 @@ end
 
 function table.selectivecopy(t, keys)
     local res = {}
-    for i, v in ipairs(keys) do res[v] = t[v] end
+    for i, v in ipairs(keys) do
+        res[v] = t[v]
+    end
     return res
 end
 
-function table.merge(t, src) for k, v in pairs(src) do t[k] = v end end
+function table.merge(t, src)
+    for k, v in pairs(src) do
+        t[k] = v
+    end
+end
 
 function table.find(t, value, lowercase)
     for k, v in pairs(t) do
         if lowercase and type(value) == 'string' and type(v) == 'string' then
-            if v:lower() == value:lower() then return k end
+            if v:lower() == value:lower() then
+                return k
+            end
         end
-        if v == value then return k end
+        if v == value then
+            return k
+        end
     end
 end
 
 function table.findbykey(t, key, lowercase)
     for k, v in pairs(t) do
         if lowercase and type(key) == 'string' and type(k) == 'string' then
-            if k:lower() == key:lower() then return v end
+            if k:lower() == key:lower() then
+                return v
+            end
         end
-        if k == key then return v end
+        if k == key then
+            return v
+        end
     end
 end
 
@@ -64,11 +86,17 @@ end
 
 function table.findkey(t, key)
     if t and type(t) == 'table' then
-        for k, v in pairs(t) do if k == key then return k end end
+        for k, v in pairs(t) do
+            if k == key then
+                return k
+            end
+        end
     end
 end
 
-function table.haskey(t, key) return table.findkey(t, key) ~= nil end
+function table.haskey(t, key)
+    return table.findkey(t, key) ~= nil
+end
 
 function table.removevalue(t, value)
     for k, v in pairs(t) do
@@ -82,7 +110,11 @@ end
 
 function table.popvalue(value)
     local index = nil
-    for k, v in pairs(t) do if v == value or not value then index = k end end
+    for k, v in pairs(t) do
+        if v == value or not value then
+            index = k
+        end
+    end
     if index then
         table.remove(t, index)
         return true
@@ -91,13 +123,21 @@ function table.popvalue(value)
 end
 
 function table.compare(t, other)
-    if #t ~= #other then return false end
-    for k, v in pairs(t) do if v ~= other[k] then return false end end
+    if #t ~= #other then
+        return false
+    end
+    for k, v in pairs(t) do
+        if v ~= other[k] then
+            return false
+        end
+    end
     return true
 end
 
 function table.empty(t)
-    if t and type(t) == 'table' then return next(t) == nil end
+    if t and type(t) == 'table' then
+        return next(t) == nil
+    end
     return true
 end
 
@@ -112,29 +152,33 @@ end
 
 function table.findbyfield(t, fieldname, fieldvalue)
     for _i, subt in pairs(t) do
-        if subt[fieldname] == fieldvalue then return subt end
+        if subt[fieldname] == fieldvalue then
+            return subt
+        end
     end
     return nil
 end
 
 function table.size(t)
     local size = 0
-    for i, n in pairs(t) do size = size + 1 end
+    for i, n in pairs(t) do
+        size = size + 1
+    end
 
     return size
 end
 
 function table.tostring(t)
     local maxn = #t
-    local str = ""
+    local str = ''
     for k, v in pairs(t) do
         v = tostring(v)
         if k == maxn and k ~= 1 then
-            str = str .. " and " .. v
+            str = str .. ' and ' .. v
         elseif maxn > 1 and k ~= 1 then
-            str = str .. ", " .. v
+            str = str .. ', ' .. v
         else
-            str = str .. " " .. v
+            str = str .. ' ' .. v
         end
     end
     return str
@@ -154,8 +198,12 @@ function table.collect(t, func)
 end
 
 function table.equals(t, comp)
-    if type(t) == "table" and type(comp) == "table" then
-        for k, v in pairs(t) do if v ~= comp[k] then return false end end
+    if type(t) == 'table' and type(comp) == 'table' then
+        for k, v in pairs(t) do
+            if v ~= comp[k] then
+                return false
+            end
+        end
     end
     return true
 end

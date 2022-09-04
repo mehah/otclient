@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,33 +20,31 @@
  * THE SOFTWARE.
  */
 
-#ifndef SHADER_H
-#define SHADER_H
+#pragma once
 
 #include "declarations.h"
+
+enum class ShaderType
+{
+    VERTEX,
+    FRAGMENT
+};
 
 class Shader : public stdext::shared_object
 {
 public:
-    enum ShaderType
-    {
-        Vertex,
-        Fragment
-    };
 
     Shader(ShaderType shaderType);
     ~Shader() override;
 
-    bool compileSourceCode(const std::string& sourceCode);
-    bool compileSourceFile(const std::string& sourceFile);
+    bool compileSourceCode(const std::string_view sourceCode);
+    bool compileSourceFile(const std::string_view sourceFile);
     std::string log();
 
-    uint getShaderId() { return m_shaderId; }
+    uint32_t getShaderId() { return m_shaderId; }
     ShaderType getShaderType() { return m_shaderType; }
 
 private:
-    uint m_shaderId;
+    uint32_t m_shaderId{ 0 };
     ShaderType m_shaderType;
 };
-
-#endif

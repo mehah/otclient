@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+* Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -82,7 +82,7 @@ void Animator::setPhase(int phase)
         if (phase == AnimPhaseAsync)
             m_phase = 0;
         else if (phase == AnimPhaseRandom)
-            m_phase = static_cast<int>(stdext::random_range(0, static_cast<long>(m_animationPhases)));
+            m_phase = stdext::random_range(0, m_animationPhases);
         else if (phase >= 0 && phase < m_animationPhases)
             m_phase = phase;
         else
@@ -98,8 +98,7 @@ void Animator::setPhase(int phase)
 
 int Animator::getPhase()
 {
-    const ticks_t ticks = g_clock.millis();
-    if (ticks != m_lastPhaseTicks && !m_isComplete) {
+    if (const ticks_t ticks = g_clock.millis(); ticks != m_lastPhaseTicks && !m_isComplete) {
         const int elapsedTicks = static_cast<int>(ticks - m_lastPhaseTicks);
         if (elapsedTicks >= m_currentDuration) {
             int phase;
@@ -152,7 +151,7 @@ int Animator::getStartPhase() const
     if (m_startPhase > -1)
         return m_startPhase;
 
-    return static_cast<int>(stdext::random_range(0, static_cast<long>(m_animationPhases)));
+    return stdext::random_range(0, m_animationPhases);
 }
 
 void Animator::resetAnimation()
@@ -195,10 +194,10 @@ int Animator::getPhaseDuration(int phase)
 {
     assert(phase < static_cast<int>(m_phaseDurations.size()));
 
-    const auto& data = m_phaseDurations.at(phase);
+    const auto& data = m_phaseDurations[phase];
     if (data.first == data.second) return data.first;
 
-    return static_cast<int>(stdext::random_range(static_cast<long>(data.first), static_cast<long>(data.second)));
+    return stdext::random_range(data.first, data.second);
 }
 
 void Animator::calculateSynchronous()
@@ -222,9 +221,9 @@ void Animator::calculateSynchronous()
     m_lastPhaseTicks = ticks;
 }
 
-ticks_t Animator::getTotalDuration()
+uint16_t Animator::getTotalDuration()
 {
-    ticks_t time = 0;
+    uint16_t time = 0;
     for (const auto& pair : m_phaseDurations) {
         time += pair.first + (pair.second - pair.first);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@
 #include "luainterface.h"
 #include <framework/otml/otmlnode.h>
 
-// bool
+ // bool
 int push_luavalue(bool b)
 {
     g_lua.pushBoolean(b);
@@ -68,13 +68,7 @@ bool luavalue_cast(int index, double& d)
 }
 
 // string
-int push_luavalue(const char* cstr)
-{
-    g_lua.pushCString(cstr);
-    return 1;
-}
-
-int push_luavalue(const std::string& str)
+int push_luavalue(const std::string_view str)
 {
     g_lua.pushString(str);
     return 1;
@@ -163,7 +157,7 @@ bool luavalue_cast(int index, Rect& rect)
         return stdext::cast(g_lua.toString(index), rect);
     }
     if (g_lua.isNil()) {
-        rect = Rect();
+        rect = {};
         return true;
     }
     return false;
@@ -193,7 +187,7 @@ bool luavalue_cast(int index, Point& point)
         return stdext::cast(g_lua.toString(index), point);
     }
     if (g_lua.isNil()) {
-        point = Point();
+        point = {};
         return true;
     }
     return false;
@@ -223,7 +217,7 @@ bool luavalue_cast(int index, Size& size)
         return stdext::cast(g_lua.toString(index), size);
     }
     if (g_lua.isNil()) {
-        size = Size();
+        size = {};
         return true;
     }
     return false;
@@ -239,7 +233,7 @@ void push_otml_subnode_luavalue(const OTMLNodePtr& node)
             double d;
             long l;
         };
-        const std::string value = node->rawValue();
+        const auto& value = node->rawValue();
         if (stdext::cast(value, b))
             g_lua.pushBoolean(b);
         else if (stdext::cast(value, l))
@@ -260,7 +254,7 @@ void push_otml_subnode_luavalue(const OTMLNodePtr& node)
                     g_lua.insert(-2);
                     g_lua.rawSet();
                 } else
-                    g_lua.rawSeti(currentIndex++);
+                    g_lua.rawSeti(++currentIndex);
                 pushedChild = true;
             } else
                 g_lua.pop();
@@ -283,7 +277,7 @@ int push_luavalue(const OTMLNodePtr& node)
             if (cnode->isUnique() && !cnode->tag().empty()) {
                 g_lua.setField(cnode->tag());
             } else
-                g_lua.rawSeti(currentIndex++);
+                g_lua.rawSeti(++currentIndex);
         }
     } else
         g_lua.pushNil();

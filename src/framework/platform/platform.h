@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef PLATFORM_H
-#define PLATFORM_H
+#pragma once
 
 #include <framework/stdext/types.h>
 #include <string>
@@ -33,8 +32,8 @@ public:
     void processArgs(std::vector<std::string>& args);
     bool spawnProcess(std::string process, const std::vector<std::string>& args);
     int getProcessId();
-    bool isProcessRunning(const std::string& name);
-    bool killProcess(const std::string& name);
+    bool isProcessRunning(const std::string_view name);
+    bool killProcess(const std::string_view name);
     std::string getTempPath();
     std::string getCurrentDir();
     bool copyFile(std::string from, std::string to);
@@ -45,9 +44,7 @@ public:
     std::string getCPUName();
     double getTotalSystemMemory();
     std::string getOSName();
-    std::string traceback(const std::string& where, int level = 1, int maxDepth = 32);
+    std::string traceback(const std::string_view where, int level = 1, int maxDepth = 32);
 };
 
 extern Platform g_platform;
-
-#endif

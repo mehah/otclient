@@ -1,5 +1,5 @@
 -- @docclass
-UISplitter = extends(UIWidget, "UISplitter")
+UISplitter = extends(UIWidget, 'UISplitter')
 
 function UISplitter.create()
     local splitter = UISplitter.internalCreate()
@@ -10,12 +10,11 @@ end
 
 function UISplitter:onHoverChange(hovered)
     -- Check if margin can be changed
-    local margin = (self.vertical and self:getMarginBottom() or
-                       self:getMarginRight())
-    if hovered and
-        (self:canUpdateMargin(margin + 1) ~= margin or
-            self:canUpdateMargin(margin - 1) ~= margin) then
-        if g_mouse.isCursorChanged() or g_mouse.isPressed() then return end
+    local margin = (self.vertical and self:getMarginBottom() or self:getMarginRight())
+    if hovered and (self:canUpdateMargin(margin + 1) ~= margin or self:canUpdateMargin(margin - 1) ~= margin) then
+        if g_mouse.isCursorChanged() or g_mouse.isPressed() then
+            return
+        end
         if self:getWidth() > self:getHeight() then
             self.vertical = true
             self.cursortype = 'vertical'
@@ -25,7 +24,9 @@ function UISplitter:onHoverChange(hovered)
         end
         self.hovering = true
         g_mouse.pushCursor(self.cursortype)
-        if not self:isPressed() then g_effects.fadeIn(self) end
+        if not self:isPressed() then
+            g_effects.fadeIn(self)
+        end
     else
         if not self:isPressed() and self.hovering then
             g_mouse.popCursor(self.cursortype)
@@ -40,8 +41,7 @@ function UISplitter:onMouseMove(mousePos, mouseMoved)
         -- local currentmargin, newmargin, delta
         if self.vertical then
             local delta = mousePos.y - self:getY() - self:getHeight() / 2
-            local newMargin = self:canUpdateMargin(
-                                  self:getMarginBottom() - delta)
+            local newMargin = self:canUpdateMargin(self:getMarginBottom() - delta)
             local currentMargin = self:getMarginBottom()
             if newMargin ~= currentMargin then
                 self.newMargin = newMargin
@@ -53,8 +53,7 @@ function UISplitter:onMouseMove(mousePos, mouseMoved)
             end
         else
             local delta = mousePos.x - self:getX() - self:getWidth() / 2
-            local newMargin =
-                self:canUpdateMargin(self:getMarginRight() - delta)
+            local newMargin = self:canUpdateMargin(self:getMarginRight() - delta)
             local currentMargin = self:getMarginRight()
             if newMargin ~= currentMargin then
                 self.newMargin = newMargin
@@ -83,4 +82,6 @@ function UISplitter:onStyleApply(styleName, styleNode)
     end
 end
 
-function UISplitter:canUpdateMargin(newMargin) return newMargin end
+function UISplitter:canUpdateMargin(newMargin)
+    return newMargin
+end

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,8 +30,8 @@ ParticleType::ParticleType()
     pMaxPositionRadius = 3;
     pMinPositionAngle = 0;
     pMaxPositionAngle = 360;
-    pStartSize = Size(32);
-    pFinalSize = Size(32);
+    pStartSize = { 32 };
+    pFinalSize = { 32 };
     pMinDuration = 0;
     pMaxDuration = 10;
     pIgnorePhysicsAfter = -1;
@@ -126,11 +126,11 @@ void ParticleType::load(const OTMLNodePtr& node)
             pTexture = g_textures.getTexture(childNode->value());
         else if (childNode->tag() == "composition-mode") {
             if (childNode->value() == "normal")
-                pCompositionMode = Painter::CompositionMode_Normal;
+                pCompositionMode = CompositionMode::NORMAL;
             else if (childNode->value() == "multiply")
-                pCompositionMode = Painter::CompositionMode_Multiply;
+                pCompositionMode = CompositionMode::MULTIPLY;
             else if (childNode->value() == "addition")
-                pCompositionMode = Painter::CompositionMode_Add;
+                pCompositionMode = CompositionMode::ADD;
         }
     }
 
@@ -140,7 +140,7 @@ void ParticleType::load(const OTMLNodePtr& node)
         pColorsStops.push_back(0);
 
     if (pColors.size() != pColorsStops.size())
-        stdext::throw_exception("particle colors must be equal to colorstops-1");
+        throw Exception("particle colors must be equal to colorstops-1");
 
     pTexture->setSmooth(true);
     pTexture->buildHardwareMipmaps();

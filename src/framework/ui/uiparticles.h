@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,28 +20,23 @@
  * THE SOFTWARE.
  */
 
-#ifndef UIPARTICLES_H
-#define UIPARTICLES_H
+#pragma once
 
 #include <framework/ui/uiwidget.h>
 
 class UIParticles : public UIWidget
 {
 public:
-    UIParticles();
-
     void drawSelf(Fw::DrawPane drawPane) override;
 
-    void addEffect(const std::string& name);
+    void addEffect(const std::string_view name);
 
-    void onStyleApply(const std::string& styleName, const OTMLNodePtr& styleNode) override;
+    void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
 
     void setReferencePos(const PointF& point) { m_referencePos = point; }
     PointF getReferencePos() { return m_referencePos; }
 
 private:
     std::vector<ParticleEffectPtr> m_effects;
-    PointF m_referencePos;
+    PointF m_referencePos{ -1, -1 };
 };
-
-#endif

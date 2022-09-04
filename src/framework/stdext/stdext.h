@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,13 +20,14 @@
  * THE SOFTWARE.
  */
 
-#ifndef STDEXT_H
-#define STDEXT_H
+#pragma once
 
 #include <cmath>
 #include <cstring>
 #include <ctime>
 #include <ctime>
+
+#include "types.h"
 
 #include "cast.h"
 #include "compiler.h"
@@ -35,11 +36,7 @@
 #include "format.h"
 #include "hash.h"
 #include "math.h"
-#include "packed_any.h"
-#include "packed_storage.h"
+#include "storage.h"
 #include "shared_object.h"
 #include "string.h"
 #include "time.h"
-#include "types.h"
-
-#endif

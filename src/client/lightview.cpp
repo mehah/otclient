@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,9 +24,9 @@
 #include "map.h"
 #include "mapview.h"
 #include "spritemanager.h"
-#include <framework/graphics/drawpool.h>
+#include <framework/graphics/drawpoolmanager.h>
 
-LightView::LightView() : m_pool(g_drawPool.get<PoolFramed>(PoolType::LIGHT)) {}
+LightView::LightView() : m_pool(g_drawPool.get<DrawPoolFramed>(DrawPoolType::LIGHT)) {}
 
 void LightView::setSmooth(bool enabled) { m_pool->setSmooth(enabled); }
 
@@ -39,12 +39,12 @@ void LightView::addLightSource(const Point& pos, const Light& light)
     if (!m_sources.empty()) {
         auto& prevLight = m_sources.back();
         if (prevLight.pos == pos && prevLight.color == light.color) {
-            prevLight.intensity = std::max<uint16>(prevLight.intensity, light.intensity);
+            prevLight.intensity = std::max<uint16_t>(prevLight.intensity, light.intensity);
             return;
         }
     }
 
-    m_sources.push_back(Source{ pos , light.color, light.intensity, g_drawPool.getOpacity() });
+    m_sources.emplace_back(pos, light.color, light.intensity, g_drawPool.getOpacity());
 }
 
 void LightView::draw(const Rect& dest, const Rect& src)
@@ -57,16 +57,17 @@ void LightView::draw(const Rect& dest, const Rect& src)
 
     const float size = m_tileSize * 3.3;
 
-    for (auto& light : m_sources) {
+    bool _clr = true;
+    for (const auto& light : m_sources) {
         if (light.color) {
             const Color color = Color::from8bit(light.color, std::min<float>(light.opacity, light.intensity / 6.f));
-            const uint16 radius = light.intensity * m_tileSize;
-
-            g_painter->setBlendEquation(Painter::BlendEquation_Max);
-
+            const uint16_t radius = light.intensity * m_tileSize;
             g_drawPool.addTexturedRect(Rect(light.pos - radius, Size(radius * 2)), g_sprites.getLightTexture(), color);
+            g_drawPool.setBlendEquation(BlendEquation::MAX, true);
+            _clr = true;
         } else {
-            g_painter->setBlendEquation(Painter::BlendEquation_Add);
+            // Empty the lightings references
+            if (_clr) { g_drawPool.flush(); _clr = false; }
 
             g_drawPool.setOpacity(light.opacity);
             g_drawPool.addTexturedRect(Rect(light.pos - m_tileSize * 1.8, size, size), g_sprites.getShadeTexture(), m_globalLightColor);
@@ -75,6 +76,4 @@ void LightView::draw(const Rect& dest, const Rect& src)
     }
 
     m_sources.clear();
-
-    g_painter->setBlendEquation(Painter::BlendEquation_Add);
 }

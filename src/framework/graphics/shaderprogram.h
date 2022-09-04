@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef SHADERPROGRAM_H
-#define SHADERPROGRAM_H
+#pragma once
 
 #include <GL/glew.h>
 #include <framework/luaengine/luaobject.h>
@@ -41,8 +40,8 @@ public:
     ~ShaderProgram() override;
 
     bool addShader(const ShaderPtr& shader);
-    bool addShaderFromSourceCode(Shader::ShaderType shaderType, const std::string& sourceCode);
-    bool addShaderFromSourceFile(Shader::ShaderType shaderType, const std::string& sourceFile);
+    bool addShaderFromSourceCode(ShaderType shaderType, const std::string_view sourceCode);
+    bool addShaderFromSourceFile(ShaderType shaderType, const std::string_view sourceFile);
     void removeShader(const ShaderPtr& shader);
     void removeAllShaders();
     virtual bool link();
@@ -87,15 +86,13 @@ public:
     // TODO: Point, PointF, Color, Size, SizeF ?
 
     bool isLinked() { return m_linked; }
-    uint getProgramId() { return m_programId; }
+    uint32_t getProgramId() { return m_programId; }
     ShaderList getShaders() { return m_shaders; }
 
 private:
-    bool m_linked;
-    uint m_programId;
-    static uint m_currentProgram;
+    bool m_linked{ false };
+    uint32_t m_programId;
+    static uint32_t m_currentProgram;
     ShaderList m_shaders;
-    std::array<int, MAX_UNIFORM_LOCATIONS> m_uniformLocations;
+    std::array<int, MAX_UNIFORM_LOCATIONS> m_uniformLocations{ };
 };
-
-#endif

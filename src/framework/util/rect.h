@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef RECT_H
-#define RECT_H
+#pragma once
 
 #include "../const.h"
 
@@ -117,7 +116,13 @@ public:
 
     TRect<T> expanded(T add) const { return TRect<T>(TPoint<T>(x1 - add, y1 - add), TPoint<T>(x2 + add, y2 + add)); }
 
-    std::size_t hash() const { return (7 * 15 + x1) * 15 + y1; }
+    std::size_t hash() const
+    {
+        size_t h = 37;
+        h = (h * 54059) ^ (x1 * 76963);
+        h = (h * 54059) ^ (y1 * 76963);
+        return h;
+    }
 
     void moveCenter(const TPoint<T>& p)
     {
@@ -344,5 +349,3 @@ std::istream& operator>>(std::istream& in, TRect<T>& rect)
     rect.setRect(x, y, w, h);
     return in;
 }
-
-#endif
