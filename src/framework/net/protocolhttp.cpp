@@ -762,7 +762,7 @@ void WebsocketSession::on_read(const std::error_code& ec, size_t bytes_transferr
         m_response.prepare(bytes_transferred);
         const auto& data = m_response.data();
         std::string response = std::string(asio::buffers_begin(data), asio::buffers_end(data));
-        uint8 fin_code = response.at(0);
+        uint8_t fin_code = response.at(0);
         size_t lenght = (response.at(1) & 127);
         response.erase(0 ,1);
 
@@ -830,9 +830,9 @@ void WebsocketSession::onTimeout(const std::error_code& ec)
     }    
 }
 
-void WebsocketSession::send(std::string data, uint8 ws_opcode)
+void WebsocketSession::send(std::string data, uint8_t ws_opcode)
 {
-    std::vector<uint8> ws_frame;
+    std::vector<uint8_t> ws_frame;
     std::array<unsigned char, 4> mask;
     std::uniform_int_distribution<unsigned short> dist(0, 255);
     std::random_device rd;

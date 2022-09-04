@@ -101,7 +101,7 @@ private:
     asio::steady_timer m_timer;
     ParsedURI instance_uri;
 
-    asio::ssl::context m_context{ asio::ssl::context::sslv23_client };
+    asio::ssl::context m_context{ asio::ssl::context::tlsv12_client };
     asio::ssl::stream<asio::ip::tcp::socket> m_ssl{ m_service, m_context };
 
     std::string m_request;
@@ -154,7 +154,7 @@ public:
     };
 
     void start();
-    void send(std::string data, uint8 ws_opcode = 0);
+    void send(std::string data, uint8_t ws_opcode = 0);
     void close();
 
 private:
@@ -171,7 +171,7 @@ private:
     bool m_closed;
     ParsedURI instance_uri;
 
-    asio::ssl::context m_context{ asio::ssl::context::sslv23_client };
+    asio::ssl::context m_context{ asio::ssl::context::tlsv12_client };
     asio::ssl::stream<asio::ip::tcp::socket> m_ssl{ m_service, m_context };
 
     std::queue<std::string> m_sendQueue;
