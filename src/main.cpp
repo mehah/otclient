@@ -25,7 +25,7 @@
 #include <framework/core/resourcemanager.h>
 #include <framework/luaengine/luainterface.h>
 
-#ifdef FW_NET
+#ifdef FRAMEWORK_NET
     #include <framework/net/protocolhttp.h>
 #endif
 
@@ -54,7 +54,7 @@ int main(int argc, const char* argv[])
     // initialize application framework and otclient
     g_app.init(args);
     g_client.init(args);
-    #ifdef FW_NET
+    #ifdef FRAMEWORK_NET
         g_http.init();
     #endif
 
@@ -74,7 +74,7 @@ int main(int argc, const char* argv[])
     // terminate everything and free memory
     Client::terminate();
     g_app.terminate();
-    #ifdef FW_NET
+    #ifdef FRAMEWORK_NET
         g_http.terminate();
     #endif    
     return 0;

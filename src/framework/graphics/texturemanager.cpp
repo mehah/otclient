@@ -30,7 +30,7 @@
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/apngloader.h>
 
-#ifdef FW_NET
+#ifdef FRAMEWORK_NET
     #include <framework/net/protocolhttp.h>
 #endif
 
@@ -104,7 +104,7 @@ TexturePtr TextureManager::getTexture(const std::string& fileName)
         texture = it->second;
     }
 
-    #ifdef FW_NET
+    #ifdef FRAMEWORK_NET
         // load texture from "virtual directory"
         if(filePath.substr(0, 11) == "/downloads/"){
             std::string _filePath = filePath;            
