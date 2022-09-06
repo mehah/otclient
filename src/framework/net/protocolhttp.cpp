@@ -242,7 +242,7 @@ void HttpSession::start()
     asio::ip::tcp::resolver::query query_resolver(instance_uri.domain, instance_uri.port);
 
     if(m_result->postData == "") {
-        m_request.append("GET " + instance_uri.query + " HTTP/1.0\r\n");
+        m_request.append("GET " + instance_uri.query + " HTTP/1.1\r\n");
         m_request.append("Host: " + instance_uri.domain + "\r\n");
         m_request.append("User-Agent: " + m_agent + "\r\n");
         m_request.append("Accept: */*\r\n");
@@ -251,7 +251,7 @@ void HttpSession::start()
         }        
         m_request.append("Connection: close\r\n\r\n");
     } else {
-        m_request.append("POST " + instance_uri.query + " HTTP/1.0\r\n");
+        m_request.append("POST " + instance_uri.query + " HTTP/1.1\r\n");
         m_request.append("Host: " + instance_uri.domain + "\r\n");
         m_request.append("User-Agent: " + m_agent + "\r\n");
         m_request.append("Accept: */*\r\n");
@@ -266,7 +266,7 @@ void HttpSession::start()
         m_request.append("Content-Length: " + std::to_string(m_result->postData.size()) + "\r\n");
         m_request.append("\r\n");
         m_request.append(m_result->postData + "\r\n");
-        m_request.append("\r\n\r\n");
+        m_request.append("Connection: close\r\n\r\n");
     }
 
     m_resolver.async_resolve(
@@ -326,13 +326,24 @@ void HttpSession::on_connect(const std::error_code& ec)
     }
 
     if(instance_uri.port == "443") {
-        std::error_code _ec;
-        m_ssl.handshake(asio::ssl::stream_base::client, _ec);
-        if (_ec) {
-            onError("HttpSession unable to handshake " + m_url + ": " + _ec.message());
+        m_ssl.set_verify_mode(asio::ssl::verify_peer);
+        m_ssl.set_verify_callback([](bool, asio::ssl::verify_context&) { return true; });
+        if(! SSL_set_tlsext_host_name(m_ssl.native_handle(), instance_uri.domain.c_str()))
+        {
+            std::error_code _ec{static_cast<int>(::ERR_get_error()), asio::error::get_ssl_category()};            
+            onError("HttpSession on SSL_set_tlsext_host_name unable to handshake " + m_url + ": " + _ec.message());
             return;
-        }
-        on_write();
+        }   
+
+        m_ssl.async_handshake(asio::ssl::stream_base::client,
+            [sft = shared_from_this()](const std::error_code& ec)
+            {
+                if (ec) {
+                    sft->onError("HttpSession unable to handshake " + sft->m_url + ": " + ec.message());
+                    return;
+                }
+                sft->on_write();
+            });
     } else {
         on_write();
     }
@@ -441,14 +452,18 @@ void HttpSession::on_request_sent(const std::error_code& ec, size_t bytes_transf
 
 void HttpSession::on_read(const std::error_code& ec, size_t bytes_transferred)
 {
+    auto on_done_read = [&](){
+        m_timer.cancel();
+        const auto& data = m_response.data();
+        m_result->response.append(asio::buffers_begin(data), asio::buffers_end(data));
+        m_result->finished = true;
+        m_callback(m_result);
+    };
+
     if(ec && ec !=  asio::error::eof) {
         onError("HttpSession unable to on_read " + m_url + ": " + ec.message());
         return;
     } else if (!ec && ec !=  asio::error::eof) {
-        // to transfer is chuncked
-        // if(m_result->size == 0) {
-        //     m_result->size = m_result->size + bytes_transferred;
-        // }
         sum_bytes_response += bytes_transferred;
         sum_bytes_speed_response += bytes_transferred;
 
@@ -461,10 +476,6 @@ void HttpSession::on_read(const std::error_code& ec, size_t bytes_transferred)
             m_callback(m_result);
         }
 
-        // if(m_result->canceled) {
-        //     break;
-        // }
-
         if(m_enable_time_out_on_read_write) {
             m_timer.expires_after(std::chrono::seconds(m_timeout));
             m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec){sft->onTimeout(ec);});
@@ -472,29 +483,31 @@ void HttpSession::on_read(const std::error_code& ec, size_t bytes_transferred)
             m_timer.cancel();
         }
 
-    if(instance_uri.port == "443") {
-        asio::async_read(m_ssl, m_response,
-            asio::transfer_at_least(1),
-                [sft = shared_from_this()](
-                    const std::error_code& ec, size_t bytes)
-                {
-                    sft->on_read(ec, bytes);
-                });        
-    } else {
-        asio::async_read(m_socket, m_response,
-            asio::transfer_at_least(1),
-                [sft = shared_from_this()](
-                    const std::error_code& ec, size_t bytes)
-                {
-                    sft->on_read(ec, bytes);
-                });
-    }
-    } else if(ec ==  asio::error::eof) {
-        m_timer.cancel();
-        const auto& data = m_response.data();
-        m_result->response.append(asio::buffers_begin(data), asio::buffers_end(data));
-        m_result->finished = true;
-        m_callback(m_result);
+        if(instance_uri.port == "443") {
+            asio::async_read(m_ssl, m_response,
+                asio::transfer_at_least(1),
+                    [sft = shared_from_this(), on_done_read](
+                        const std::error_code& ec, size_t bytes)
+                    {
+                        if(bytes > 0){
+                            sft->on_read(ec, bytes);
+                        } else {
+                            on_done_read();
+                        }
+                    });        
+        } else {
+            asio::async_read(m_socket, m_response,
+                asio::transfer_at_least(1),
+                    [sft = shared_from_this(), on_done_read](
+                        const std::error_code& ec, size_t bytes)
+                    {
+                        if(bytes > 0){
+                            sft->on_read(ec, bytes);
+                        } else {
+                            on_done_read();
+                        }
+                    });
+        }
     }
 }
 
