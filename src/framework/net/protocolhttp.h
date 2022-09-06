@@ -33,10 +33,11 @@
 #include <zlib.h>
 #include <random>
 
-//  result
+ //  result
 class HttpSession;
 
-struct HttpResult {
+struct HttpResult
+{
     std::string url;
     int operationId = 0;
     int status = 0;
@@ -62,22 +63,22 @@ class HttpSession : public std::enable_shared_from_this<HttpSession>
 {
 public:
 
-    HttpSession(asio::io_service& service, const std::string& url, const std::string& agent, 
+    HttpSession(asio::io_service& service, const std::string& url, const std::string& agent,
             const bool& enable_time_out_on_read_write,
-            const std::map<std::string, std::string>& custom_header,
+            const stdext::map<std::string, std::string>& custom_header,
             int timeout, bool isJson, HttpResult_ptr result, HttpResult_cb callback) :
-                m_service(service),
-                m_url(url),
-                m_agent(agent),
-                m_enable_time_out_on_read_write(enable_time_out_on_read_write),
-                m_custom_header(custom_header),
-                m_timeout(timeout),
-                m_isJson(isJson),
-                m_result(result),
-                m_callback(callback),
-                m_socket(service),
-                m_resolver(service),
-                m_timer(service)
+        m_service(service),
+        m_url(url),
+        m_agent(agent),
+        m_enable_time_out_on_read_write(enable_time_out_on_read_write),
+        m_custom_header(custom_header),
+        m_timeout(timeout),
+        m_isJson(isJson),
+        m_result(result),
+        m_callback(callback),
+        m_socket(service),
+        m_resolver(service),
+        m_timer(service)
     {
         assert(m_callback != nullptr);
         assert(m_result != nullptr);
@@ -85,13 +86,13 @@ public:
     void start();
     void cancel() { onError("canceled"); }
     void close();
-    
+
 private:
     asio::io_service& m_service;
     std::string m_url;
     std::string m_agent;
     bool m_enable_time_out_on_read_write;
-    std::map<std::string, std::string> m_custom_header;
+    stdext::map<std::string, std::string> m_custom_header;
     int m_timeout;
     bool m_isJson;
     HttpResult_ptr m_result;
@@ -123,38 +124,32 @@ private:
 };
 
 //  web socket
-enum WebsocketCallbackType {
-    WEBSOCKET_OPEN,
-    WEBSOCKET_MESSAGE,
-    WEBSOCKET_ERROR,
-    WEBSOCKET_CLOSE
-};
-
-using WebsocketSession_cb = std::function<void(WebsocketCallbackType, std::string message)>;
+enum class WebsocketCallbackType { OPEN, MESSAGE, ERROR_, CLOSE };
+using WebsocketSession_cb = std::function<void(WebsocketCallbackType, const std::string& message)>;
 
 class WebsocketSession : public std::enable_shared_from_this<WebsocketSession>
 {
 public:
 
-    WebsocketSession(asio::io_service& service, const std::string& url, const std::string& agent, 
+    WebsocketSession(asio::io_service& service, const std::string& url, const std::string& agent,
                     const bool& enable_time_out_on_read_write, int timeout, HttpResult_ptr result, WebsocketSession_cb callback) :
-            m_service(service),
-            m_url(url),
-            m_agent(agent),
-            m_enable_time_out_on_read_write(enable_time_out_on_read_write),
-            m_timeout(timeout),
-            m_result(result),
-            m_callback(callback),
-            m_timer(service),
-            m_socket(service),
-            m_resolver(service)
+        m_service(service),
+        m_url(url),
+        m_agent(agent),
+        m_enable_time_out_on_read_write(enable_time_out_on_read_write),
+        m_timeout(timeout),
+        m_result(result),
+        m_callback(callback),
+        m_timer(service),
+        m_socket(service),
+        m_resolver(service)
     {
         assert(m_callback != nullptr);
         assert(m_result != nullptr);
     };
 
     void start();
-    void send(std::string data, uint8_t ws_opcode = 0);
+    void send(const std::string& data, uint8_t ws_opcode = 0);
     void close();
 
 private:
@@ -191,7 +186,8 @@ private:
     void onError(const std::string& ec, const std::string& details = "");
 };
 
-class Http {
+class Http
+{
 public:
     Http() : m_ios(), m_guard(asio::make_work_guard(m_ios)) {}
 
@@ -200,19 +196,18 @@ public:
 
     int get(const std::string& url, int timeout = 5);
     int post(const std::string& url, const std::string& data, int timeout = 5, bool isJson = false);
-    int download(const std::string& url, std::string path, int timeout = 5);
+    int download(const std::string& url, const std::string& path, int timeout = 5);
     int ws(const std::string& url, int timeout = 5);
-    bool wsSend(int operationId, std::string message);
+    bool wsSend(int operationId, const std::string& message);
     bool wsClose(int operationId);
     bool cancel(int id);
 
-    const std::map<std::string, HttpResult_ptr>& downloads() {
-        return m_downloads;
-    }
-    void clearDownloads() {
-        m_downloads.clear();
-    }
-    HttpResult_ptr getFile(std::string path) {
+    const stdext::map<std::string, HttpResult_ptr>& downloads() const { return m_downloads; }
+
+    void clearDownloads() { m_downloads.clear(); }
+
+    HttpResult_ptr getFile(std::string path)
+    {
         if (!path.empty() && path[0] == '/')
             path = path.substr(1);
         auto it = m_downloads.find(path);
@@ -221,31 +216,24 @@ public:
         return it->second;
     }
 
-    void setUserAgent(const std::string& userAgent)
-    {
-        m_userAgent = userAgent;
-    }
+    void setUserAgent(const std::string& userAgent) { m_userAgent = userAgent; }
 
-    void addCustomHeader(std::string name, std::string value) {
-        m_custom_header[name] = value;
-    }
+    void addCustomHeader(const std::string& name, const std::string& value) { m_custom_header[name] = value; }
 
-    void setEnableTimeOutOnReadWrite(bool enable_time_out_on_read_write){
-        m_enable_time_out_on_read_write = enable_time_out_on_read_write;
-    }
+    void setEnableTimeOutOnReadWrite(bool enable_time_out_on_read_write) { m_enable_time_out_on_read_write = enable_time_out_on_read_write; }
 
 private:
     bool m_working = false;
     bool m_enable_time_out_on_read_write = false;
     int m_operationId = 1;
     std::thread m_thread;
-    asio::io_context m_ios;
+    asio::io_context m_ios{};
     asio::executor_work_guard<asio::io_context::executor_type> m_guard;
-    std::map<int, HttpResult_ptr> m_operations;
-    std::map<int, std::shared_ptr<WebsocketSession>> m_websockets;
-    std::map<std::string, HttpResult_ptr> m_downloads;
+    stdext::map<int, HttpResult_ptr> m_operations;
+    stdext::map<int, std::shared_ptr<WebsocketSession>> m_websockets;
+    stdext::map<std::string, HttpResult_ptr> m_downloads;
     std::string m_userAgent = "Mozilla/5.0";
-    std::map<std::string, std::string> m_custom_header;
+    stdext::map<std::string, std::string> m_custom_header;
 };
 
 extern Http g_http;
