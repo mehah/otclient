@@ -166,37 +166,12 @@ find_package(ZLIB REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(LibLZMA REQUIRED)
 find_package(nlohmann_json REQUIRED)
-if(UNIX)
-	find_path(ASIO_INCLUDE_PATH asio.hpp HINTS 
-		"/usr/include"
-		"/usr/local/include"
-		"/opt/local/include"
-	)
-
-	if(ASIO_INCLUDE_PATH)
-		message(STATUS "Found existing ASIO install")
-	endif(ASIO_INCLUDE_PATH)
-else()
-	find_package(asio REQUIRED)
-endif()
+find_package(asio REQUIRED)
 find_package(Threads REQUIRED)
 # OpenGL/GLEW = Graphics
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
-if(UNIX)
-	find_path(STDUUID_INCLUDE_PATH uuid.h HINTS 
-		"/usr/include/"
-		"/usr/local/include/"
-		"/opt/local/include/"
-	)
-
-	if(STDUUID_INCLUDE_PATH)
-		message(STATUS "Found existing STDUUID install")
-	endif(STDUUID_INCLUDE_PATH)
-else()
-	find_package(STDUUID CONFIG REQUIRED)
-endif()
-
+find_package(STDUUID CONFIG REQUIRED)
 if(UNIX)
 	find_package(X11 REQUIRED)
 endif()
@@ -213,12 +188,8 @@ endif()
 if(TOGGLE_FRAMEWORK_SOUND)
 	find_package(OpenAL CONFIG REQUIRED)
 	find_package(VorbisFile REQUIRED)
+	find_package(Vorbis CONFIG REQUIRED)
 	find_package(Ogg CONFIG REQUIRED)
-	if(UNIX)
-		find_package(Vorbis REQUIRED)
-	else()
-		find_package(Vorbis CONFIG REQUIRED)
-	endif()		
 endif()
 
 # *****************************************************************************
@@ -442,8 +413,6 @@ else()
 		${GLEW_INCLUDE_DIR}
 		${PARALLEL_HASHMAP_INCLUDE_DIRS}
 		${NLOHMANN_JSON_INCLUDE_DIR}
-		${OPENAL_INCLUDE_DIR} 
-		${VORBISFILE_INCLUDE_DIR}
 	)
 	target_link_libraries(${PROJECT_NAME}
 		PRIVATE
@@ -460,14 +429,13 @@ else()
 		${GMP_LIBRARY}
 		${OPENSSL_LIBRARIES}
 		${STDUUID}
-		${OPENAL_LIBRARY}
-		${VORBISFILE_LIBRARY}
-		${VORBIS_LIBRARY}
-		${OGG_LIBRARY}
 
 		Threads::Threads
 		X11::X11
+		asio::asio
 		OpenAL::OpenAL
+		Vorbis::vorbis
+		Vorbis::vorbisfile
 		LibLZMA::LibLZMA
 	)
 endif()
