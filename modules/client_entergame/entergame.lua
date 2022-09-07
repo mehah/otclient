@@ -8,7 +8,6 @@ local motdButton
 local enterGameButton
 local clientBox
 local protocolLogin
-local protocolHttp
 local motdEnabled = true
 
 -- private functions
@@ -226,9 +225,6 @@ function EnterGame.terminate()
         protocolLogin:cancelLogin()
         protocolLogin = nil
     end
-    if protocolHttp then
-        protocolHttp = nil
-    end
     EnterGame = nil
 end
 
@@ -339,30 +335,10 @@ end
 
 function EnterGame.tryHttpLogin(clientVersion)
     -- http login server
-    protocolHttp = ProtocolHttp.create()
-    protocolHttp.onConnect = function(protocol)
-        local body = json.encode({
-            email = G.account,
-            password = G.password,
-            type = 'login'
-        })
-        local message = ''
-        message = message .. 'POST /login.php HTTP/1.1\r\n'
-        message = message .. 'Host: ' .. G.host .. '\r\n'
-        message = message .. 'User-Agent: Mozilla/5.0\r\n'
-        message = message .. 'Accept: */*\r\n'
-        message = message .. 'Content-Type: application/json\r\n'
-        message = message .. 'Connection: close\r\n'
-        message = message .. 'Content-Length: ' .. body:len() .. '\r\n\r\n'
-        message = message .. body
-        protocol:send(message)
-        protocol:recv()
-    end
-
-    protocolHttp.onRecv = function(protocol, message)
-        if not string.find(message, 'HTTP/1.1 200 OK') then
-            onError(nil, 'Connection timed out.', 408)
-            return
+    local onRecv = function(message, err)
+        if err then
+            onError(nil, 'Bad Request.', 400)
+            return 
         end
 
         local _, bodyStart = message:find('{')
@@ -371,8 +347,6 @@ function EnterGame.tryHttpLogin(clientVersion)
             onError(nil, 'Bad Request.', 400)
             return
         end
-
-        protocol:disconnect()
 
         local response = json.decode(message:sub(bodyStart, bodyEnd))
         if response.errorMessage then
@@ -416,23 +390,27 @@ function EnterGame.tryHttpLogin(clientVersion)
         onCharacterList(nil, characters, account)
     end
 
-    protocolHttp.onError = onError
+    HTTP.post(G.host .. "/login.php", 
+        json.encode({
+            email = G.account,
+            password = G.password,
+            type = 'login'
+        }),
+        onRecv
+    )
 
     loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to login server...'))
     connect(loadBox, {
         onCancel = function(msgbox)
             loadBox = nil
-            protocolHttp:disconnect()
             EnterGame.show()
         end
     })
 
     g_game.setClientVersion(clientVersion)
     g_game.setProtocolVersion(g_game.getClientProtocolVersion(clientVersion))
-    g_game.chooseRsa(G.host)
-
+    g_game.chooseRsa(G.host)        
     if modules.game_things.isLoaded() then
-        protocolHttp:connect(G.host, G.port)
     else
         loadBox:destroy()
         loadBox = nil

@@ -519,6 +519,7 @@ git rev-list --count head &gt;&gt;  ../src/gitinfo.h
     <ClCompile Include="..\src\framework\stdext\net.cpp" />
     <ClCompile Include="..\src\framework\stdext\string.cpp" />
     <ClCompile Include="..\src\framework\stdext\time.cpp" />
+    <ClCompile Include="..\src\framework\stdext\uri.cpp" />
     <ClCompile Include="..\src\framework\ui\uianchorlayout.cpp" />
     <ClCompile Include="..\src\framework\ui\uiboxlayout.cpp" />
     <ClCompile Include="..\src\framework\ui\uigridlayout.cpp" />

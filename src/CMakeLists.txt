@@ -320,6 +320,7 @@ target_sources(${PROJECT_NAME}
 	framework/stdext/net.cpp
 	framework/stdext/string.cpp
 	framework/stdext/time.cpp
+	framework/stdext/uri.cpp
 	framework/ui/uianchorlayout.cpp
 	framework/ui/uiboxlayout.cpp
 	framework/ui/uigridlayout.cpp
