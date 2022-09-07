@@ -59,7 +59,7 @@ jobs:
         if: ${{ matrix.language == 'cpp' }}
         uses: lukka/run-vcpkg@v10
         with:
-          vcpkgGitCommitId: 8b62d95a81afcb9efe74bebeb62f04c1e0e2a003
+          vcpkgGitCommitId: e99d9a4facea9d7e15a91212364d7a12762b7512
 
       - name: Get latest CMake and ninja
         if: ${{ matrix.language == 'cpp' }}
