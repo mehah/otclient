@@ -13,6 +13,7 @@ option(TOGGLE_BOT_PROTECTION "Use bot protection" ON)
 option(TOGGLE_PRE_COMPILED_HEADER "Use precompiled header (speed up compile)" OFF)
 option(DEBUG_LOG "Enable Debug Log" OFF)
 option(ASAN_ENABLED "Build this target with AddressSanitizer" OFF)
+option(BUILD_STATIC_LIBRARY "Build using static libraries" OFF)
 
 # *****************************************************************************
 # Cmake Features
@@ -320,6 +321,7 @@ target_sources(${PROJECT_NAME}
 	framework/stdext/net.cpp
 	framework/stdext/string.cpp
 	framework/stdext/time.cpp
+	framework/stdext/uri.cpp
 	framework/ui/uianchorlayout.cpp
 	framework/ui/uiboxlayout.cpp
 	framework/ui/uigridlayout.cpp
@@ -360,7 +362,15 @@ if(MSVC)
 		string(REPLACE "/Zi" "/Z7" CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO}")
 	endif()
 
-	target_compile_options(${PROJECT_NAME} PUBLIC /MP /FS /Zf )
+	if(BUILD_STATIC_LIBRARY)
+		log_option_enabled("STATIC_LIBRARY")
+		set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib")
+		find_package(Vorbis REQUIRED)
+		set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+	else()
+		log_option_disabled("STATIC_LIBRARY")
+		target_compile_options(${PROJECT_NAME} PUBLIC /MP /FS /Zf /EHsc )
+	endif()
 
 	target_include_directories(${PROJECT_NAME}
 		PRIVATE

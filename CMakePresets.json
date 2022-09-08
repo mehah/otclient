@@ -15,8 +15,10 @@
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": {
           "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-           "type": "FILEPATH"
+          "type": "FILEPATH"
         },
+        "BUILD_STATIC_LIBRARY": "ON",
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static",
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
         "OPTIONS_ENABLE_SCCACHE": "ON"
       },
@@ -44,7 +46,7 @@
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": {
           "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-           "type": "FILEPATH"
+          "type": "FILEPATH"
         },
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
         "OPTIONS_ENABLE_CCACHE": "ON"
@@ -61,20 +63,12 @@
       "displayName": "Windows - Release + ASAN",
       "description": "Release Mode with ASAN",
       "cacheVariables": {
-        "ASAN_ENABLED": "ON"
+        "ASAN_ENABLED": "ON",
+        "BUILD_STATIC_LIBRARY": "OFF",
+        "VCPKG_TARGET_TRIPLET": "x64-windows"
       },
       "architecture": {
         "value": "x64",
-        "strategy": "external"
-      }
-    },
-    {
-      "name": "windows-release-static-lib",
-      "inherits": "windows-release",
-      "displayName": "Windows - Release + Static-lib",
-      "description": "Release Mode with Static-lib",
-      "architecture": {
-        "value": "x86",
         "strategy": "external"
       }
     },
@@ -86,7 +80,9 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "DEBUG_LOG": "ON",
-        "ASAN_ENABLED": "ON"
+        "ASAN_ENABLED": "ON",
+        "BUILD_STATIC_LIBRARY": "OFF",
+        "VCPKG_TARGET_TRIPLET": "x64-windows"
       },
       "architecture": {
         "value": "x64",
@@ -121,10 +117,6 @@
     {
       "name": "windows-release-asan",
       "configurePreset": "windows-release-asan"
-    },
-    {
-      "name": "windows-release-static-lib",
-      "configurePreset": "windows-release-static-lib"
     },
     {
       "name": "windows-debug",

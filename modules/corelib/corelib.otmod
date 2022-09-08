@@ -28,3 +28,4 @@ Module
     dofile 'outputmessage'
 
     dofile 'json'
+    dofile 'http'

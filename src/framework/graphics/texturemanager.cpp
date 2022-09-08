@@ -30,6 +30,10 @@
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/apngloader.h>
 
+#ifdef FRAMEWORK_NET
+    #include <framework/net/protocolhttp.h>
+#endif
+
 TextureManager g_textures;
 
 void TextureManager::init()
@@ -99,6 +103,18 @@ TexturePtr TextureManager::getTexture(const std::string& fileName)
     if (it != m_textures.end()) {
         texture = it->second;
     }
+
+    #ifdef FRAMEWORK_NET
+        // load texture from "virtual directory"
+        if(filePath.substr(0, 11) == "/downloads/"){
+            std::string _filePath = filePath;            
+            const auto fileDownload = g_http.getFile(_filePath.erase(0, 11));
+            if(fileDownload) {
+                std::stringstream fin(fileDownload->response);
+                texture = loadTexture(fin);
+            }
+        }
+    #endif
 
     // texture not found, load it
     if (!texture) {

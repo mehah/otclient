@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-2022]
-        buildtype: [windows-release, windows-release-asan, windows-debug, windows-release-static-lib]
+        buildtype: [windows-release, windows-release-asan, windows-debug]
         include:
           - os: windows-2022
             triplet: x64-windows
@@ -42,7 +42,7 @@ jobs:
       - name: Restore artifacts and install vcpkg
         uses: lukka/run-vcpkg@v10
         with:
-          vcpkgGitCommitId: 0d209ca968e9d07228d2ee56f823689dd95303ab
+          vcpkgGitCommitId: e99d9a4facea9d7e15a91212364d7a12762b7512
 
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@latest
