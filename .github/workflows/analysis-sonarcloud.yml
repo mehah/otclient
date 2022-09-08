@@ -73,7 +73,7 @@ jobs:
       - name: Restore artifacts, or setup vcpkg (do not install any package)
         uses: lukka/run-vcpkg@v10
         with:
-          vcpkgGitCommitId: 0d209ca968e9d07228d2ee56f823689dd95303ab
+          vcpkgGitCommitId: e99d9a4facea9d7e15a91212364d7a12762b7512
 
       - name: Set up JDK 11
         uses: actions/setup-java@v1

@@ -20,12 +20,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04]
+        os: [ubuntu-20.04, ubuntu-22.04]
         buildtype: [linux-release, linux-debug]
         include:
-          - os: ubuntu-18.04
-            triplet: x64-linux
           - os: ubuntu-20.04
+            triplet: x64-linux
+          - os: ubuntu-22.04
             triplet: x64-linux
 
     steps:
@@ -53,7 +53,7 @@ jobs:
       - name: Restore artifacts and install vcpkg
         uses: lukka/run-vcpkg@v10
         with:
-          vcpkgGitCommitId: 0d209ca968e9d07228d2ee56f823689dd95303ab
+          vcpkgGitCommitId: e99d9a4facea9d7e15a91212364d7a12762b7512
 
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@latest
