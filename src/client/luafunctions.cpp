@@ -587,6 +587,11 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ThingType>("hasAttribute", &ThingType::hasAttr);
     g_lua.bindClassMemberFunction<ThingType>("exportImage", &ThingType::exportImage);
     g_lua.bindClassMemberFunction<ThingType>("getUpgradeClassification", &ThingType::getClassification);
+    g_lua.bindClassMemberFunction<ThingType>("hasWearOut", &ThingType::hasWearOut);
+    g_lua.bindClassMemberFunction<ThingType>("hasClockExpire", &ThingType::hasClockExpire);
+    g_lua.bindClassMemberFunction<ThingType>("hasExpire", &ThingType::hasExpire);
+    g_lua.bindClassMemberFunction<ThingType>("hasExpireStop", &ThingType::hasExpireStop);
+    g_lua.bindClassMemberFunction<ThingType>("isPodium", &ThingType::isPodium);
 
     g_lua.registerClass<Item, Thing>();
     g_lua.bindClassStaticFunction<Item>("create", &Item::create);
@@ -621,6 +626,10 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Item>("getMarketData", &Item::getMarketData);
     g_lua.bindClassMemberFunction<Item>("getClothSlot", &Item::getClothSlot);
     g_lua.bindClassMemberFunction<Item>("getUpgradeClassification", &Item::getClassification);
+    g_lua.bindClassMemberFunction<Item>("hasWearOut", &ThingType::hasWearOut);
+    g_lua.bindClassMemberFunction<Item>("hasClockExpire", &ThingType::hasClockExpire);
+    g_lua.bindClassMemberFunction<Item>("hasExpire", &ThingType::hasExpire);
+    g_lua.bindClassMemberFunction<Item>("hasExpireStop", &ThingType::hasExpireStop);
 
     g_lua.registerClass<Effect, Thing>();
     g_lua.bindClassStaticFunction<Effect>("create", [] { return EffectPtr(new Effect); });

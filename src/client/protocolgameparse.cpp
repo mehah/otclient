@@ -2767,18 +2767,41 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
 
     if (item->isStackable() || item->isFluidContainer() || item->isSplash() || item->isChargeable()) {
         item->setCountOrSubType(msg->getU8());
-    } else if (g_game.getClientVersion() >= 1281) {
-        if (item->isContainer()) {
-            if (const uint8_t hasQuickLootFlags = msg->getU8()) {
+    }
+
+    if (item->isContainer()) {
+        if (g_game.getFeature(Otc::GameThingQuickLoot)) {
+            bool hasQuickLootFlags = msg->getU8() != 0;
+            if (hasQuickLootFlags) {
                 msg->getU32(); // quick loot flags
             }
+        }
 
+        if (g_game.getFeature(Otc::GameThingQuiver)) {
             const uint8_t hasQuiverAmmoCount = msg->getU8();
             if (hasQuiverAmmoCount) {
                 msg->getU32(); // ammoTotal
             }
-        } else if (item->getClassification() != 0) {
-            msg->getU8();
+        }
+    }
+
+    if (g_game.getFeature(Otc::GameThingUpgradeClassification)) {
+        if (item->getClassification() != 0) {
+            msg->getU8(); // Item tier
+        }
+    }
+
+    if (g_game.getFeature(Otc::GameThingClock)) {
+        if (item->hasClockExpire() || item->hasExpire() || item->hasExpireStop()) {
+            msg->getU32(); // Item duration (UI)
+            msg->getU8(); // Is brand-new
+        }
+    }
+
+    if (g_game.getFeature(Otc::GameThingCounter)) {
+        if (item->hasWearOut()) {
+            msg->getU32(); // Item charge (UI)
+            msg->getU8(); // Is brand-new
         }
     }
 
@@ -2792,14 +2815,17 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
         }
     }
 
-    if (g_game.getClientVersion() >= 1281) {
-        if (id == 35973 || id == 35974) {
-            if (const int looktype = msg->getU16(); looktype != 0) {
+    if (g_game.getFeature(Otc::GameThingPodium)) {
+        if (item->isPodium()) {
+            const int looktype = msg->getU16();
+            if (looktype != 0) {
                 msg->getU8(); // lookHead
                 msg->getU8(); // lookBody
                 msg->getU8(); // lookLegs
                 msg->getU8(); // lookFeet
                 msg->getU8(); // lookAddons
+            } else if (g_game.getFeature(Otc::GameThingPodiumItemType)) {
+                msg->getU16(); // LookTypeEx
             }
 
             if (const int lookmount = msg->getU16(); lookmount != 0) {

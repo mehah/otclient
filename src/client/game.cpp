@@ -1723,11 +1723,31 @@ void Game::setClientVersion(int version)
 
     if (version >= 1200) {
         enableFeature(Otc::GamePrey);
+        enableFeature(Otc::GameThingQuickLoot);
+    }
+
+    if (version >= 1260) {
+        enableFeature(Otc::GameThingQuiver);
+    }
+
+    if (version >= 1264) {
+        enableFeature(Otc::GameThingPodium);
+    }
+
+    if (version >= 1272) {
+        enableFeature(Otc::GameThingUpgradeClassification);
     }
 
     if (version >= 1281) {
         disableFeature(Otc::GameEnvironmentEffect);
         disableFeature(Otc::GameItemAnimationPhase);
+    }
+
+    if (version >= 1290) {
+        enableFeature(Otc::GameThingClock);
+        enableFeature(Otc::GameThingCounter);
+        enableFeature(Otc::GameThingPodiumItemType);
+        enableFeature(Otc::GameDoubleShopSellAmount);
     }
 
     m_clientVersion = version;
