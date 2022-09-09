@@ -349,15 +349,23 @@ std::string ResourceManager::getRealPath(const std::string& path)
 
 std::string ResourceManager::getBaseDir()
 {
+#ifdef ANDROID
+    return g_androidManager.getAppBaseDir();
+#else
     return PHYSFS_getBaseDir();
+#endif
 }
 
 std::string ResourceManager::getUserDir()
 {
+#ifdef ANDROID
+    return getBaseDir() + "/";
+#else
     static const char* orgName = g_app.getOrganizationName().data();
     static const char* appName = g_app.getCompactName().data();
 
     return PHYSFS_getPrefDir(orgName, appName);
+#endif
 }
 
 std::string ResourceManager::guessFilePath(const std::string& filename, const std::string& type)

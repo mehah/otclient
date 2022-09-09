@@ -172,6 +172,8 @@ std::string Application::getOs()
     return "mac";
 #elif __linux
     return "linux";
+#elif ANDROID
+	return "android";
 #else
     return "unknown";
 #endif

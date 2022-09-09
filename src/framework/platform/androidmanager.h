@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2014 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,31 +20,34 @@
  * THE SOFTWARE.
  */
 
-#pragma once
+#ifndef ANDROIDMANAGER_H
+#define ANDROIDMANAGER_H
 
-#include <client/config.h>
+#include <game-activity/native_app_glue/android_native_app_glue.h>
+#include <string>
 
-#include "stdext/compiler.h"
+class AndroidManager {
+public:
+    ~AndroidManager();
 
- // common C/C++ headers
-#include "pch.h"
+    void setAndroidApp(android_app*);
+    void setAndroidManager(JNIEnv*, jobject);
 
-// global constants
-#include "const.h"
+    void showKeyboardSoft();
+    void hideKeyboard();
 
-// stdext which includes additional C++ algorithms
-#include "stdext/stdext.h"
+    std::string getStringFromJString(jstring);
+    std::string getAppBaseDir();
+private:
+    JNIEnv* getJNIEnv();
 
-// additional utilities
-#include "util/color.h"
-#include "util/matrix.h"
-#include "util/point.h"
-#include "util/rect.h"
-#include "util/size.h"
+    android_app* m_app;
+    JavaVM* m_javaVM;
+    jobject m_androidManagerJObject;
+    jmethodID m_midShowSoftKeyboard;
+    jmethodID m_midHideSoftKeyboard;
+};
 
-// logger
-#include "core/logger.h"
+extern AndroidManager g_androidManager;
 
-#ifdef ANDROID
-#include "platform/androidmanager.h"
 #endif

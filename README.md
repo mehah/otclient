@@ -69,6 +69,17 @@ Otclient is written in C++20 and heavily scripted in lua.
 For a server to connect to, you can build your own with the [forgottenserver](https://github.com/otland/forgottenserver)
 or connect to one listed on [otservlist](https://otservlist.org/).#
 
+## The Mobile Project
+This is a fork of edubart's otclient. The objective of this fork it's to develop a runnable otclient on mobiles devices.
+
+Tasks that need to do:
+- [X] Compile on Android devices
+- [ ] Compile on Apple devices
+- [ ] Adapt the UI reusing the existing lua code
+
+Current compiling tutorials:
+* [Compiling for Android](https://github.com/edubart/mehah/wiki/Compiling-for-Android)
+
 ### Where do I download?
 
 Compiled for Windows can be found here (but can be outdated):

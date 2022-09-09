@@ -13,9 +13,12 @@
     "protobuf",
     "zlib",
     "liblzma",
-    "luajit",
     "parallel-hashmap",
     "stduuid",
+    {
+      "name": "luajit",
+      "platform": "!android"
+    },
     {
       "name": "glew",
       "platform": "windows"

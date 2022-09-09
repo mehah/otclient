@@ -46,6 +46,10 @@ option(OPTIONS_ENABLE_IPO "Check and Enable interprocedural optimization (IPO/LT
 # Options Code
 # *****************************************************************************
 
+if (ANDROID)
+	include(android/CMakeLists.txt)
+endif()
+
 # === CCACHE ===
 if(OPTIONS_ENABLE_CCACHE)
 	find_program(CCACHE ccache)

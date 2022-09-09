@@ -46,6 +46,9 @@ endif()
 if (TOGGLE_FRAMEWORK_NET)
 	set(FRAMEWORK_DEFINITIONS ${FRAMEWORK_DEFINITIONS} -DFRAMEWORK_NET)
 endif()
+if (ANDROID)
+set(FRAMEWORK_DEFINITIONS ${FRAMEWORK_DEFINITIONS} -DOPENGL_ES=2)
+endif()
 
 # Set for use bot protection
 if(TOGGLE_BOT_PROTECTION)
@@ -72,6 +75,8 @@ set(VERSION "1.0.0")
 # *****************************************************************************
 if (MSVC)
 	add_executable(${PROJECT_NAME} "" ../cmake/icon/otcicon.rc)
+elseif(ANDROID)
+	add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 else()
 	add_executable(${PROJECT_NAME} "")
 endif()
@@ -169,11 +174,8 @@ find_package(LibLZMA REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(asio REQUIRED)
 find_package(Threads REQUIRED)
-# OpenGL/GLEW = Graphics
-find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
 find_package(STDUUID CONFIG REQUIRED)
-if(UNIX)
+if(UNIX AND NOT ANDROID)
 	find_package(X11 REQUIRED)
 endif()
 find_package(LuaJIT REQUIRED)
@@ -186,6 +188,17 @@ endif()
 if(TOGGLE_DIRECTX)
 	find_package(DirectX REQUIRED)
 endif()
+if(ANDROID)
+	find_package(game-activity REQUIRED CONFIG)
+	set(Libs_DIR ${Libs_DIR} ${CMAKE_SOURCE_DIR}/android/app/libs)
+	set(LUAJIT_INCLUDE_DIR ${LUAJIT_INCLUDE_DIR} ${Libs_DIR}/include/luajit)
+	set(LUAJIT_LIBRARY ${LUAJIT_LIBRARY} ${Libs_DIR}/lib/${CMAKE_ANDROID_ARCH_ABI}/libluajit.a)
+	find_package(OpenGLES2 REQUIRED)
+	find_package(EGL REQUIRED)
+else()
+	find_package(OpenGL REQUIRED)
+	find_package(GLEW REQUIRED)
+endif()
 if(TOGGLE_FRAMEWORK_SOUND)
 	find_package(OpenAL CONFIG REQUIRED)
 	find_package(VorbisFile REQUIRED)
@@ -196,8 +209,7 @@ endif()
 # *****************************************************************************
 # OTClient source files configuration
 # *****************************************************************************
-target_sources(${PROJECT_NAME}
-	PRIVATE
+set(SOURCE_FILES
 	client/animatedtext.cpp
 	client/animator.cpp
 	client/client.cpp
@@ -300,6 +312,11 @@ target_sources(${PROJECT_NAME}
 	framework/otml//otmlexception.cpp
 	framework/otml//otmlnode.cpp
 	framework/otml//otmlparser.cpp
+	framework/platform/androidgameactivity.cpp
+	framework/platform/androidmanager.cpp
+	framework/platform/androidmanager.h
+	framework/platform/androidwindow.cpp
+	framework/platform/androidwindow.h
 	framework/platform/platform.cpp
 	framework/platform/platformwindow.cpp
 	framework/platform/unixcrashhandler.cpp
@@ -344,7 +361,10 @@ target_sources(${PROJECT_NAME}
 	framework/xml/tinyxmlparser.cpp
 	protobuf/appearances.pb.cc
 	main.cpp
+	androidmain.cpp
 )
+
+target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES})
 
 # *****************************************************************************
 # Includes and librarys
@@ -408,6 +428,44 @@ if(MSVC)
 		asio::asio
 		OpenAL::OpenAL
 		LibLZMA::LibLZMA
+	)
+elseif(ANDROID)
+	target_include_directories(${PROJECT_NAME}
+		PRIVATE
+		${CMAKE_SOURCE_DIR}/src
+		${LUAJIT_INCLUDE_DIR}
+		${CMAKE_THREAD_LIBS_INIT}
+		${Protobuf_INCLUDE_DIRS}
+		${GMP_INCLUDE_DIR}
+		${OPENSSL_INCLUDE_DIR}
+		${PHYSFS_INCLUDE_DIR}
+		${EGL_INCLUDE_DIR}
+		${OPENGLES2_INCLUDE_DIR}
+		${PARALLEL_HASHMAP_INCLUDE_DIRS}
+		${NLOHMANN_JSON_INCLUDE_DIR}
+	)
+	target_link_libraries(${PROJECT_NAME}
+		PRIVATE
+		${LUAJIT_LIBRARY}
+		${PHYSFS_LIBRARY}
+		${ZLIB_LIBRARY}
+		${PROTOBUF_LIBRARY}
+		${NLOHMANN_JSON_LIBRARY}
+		${EGL_LIBRARY}
+		${OpenGLES2_LIBRARIES}
+		${OGG_LIBRARY}
+		${GMP_LIBRARY}
+		${OPENSSL_LIBRARIES}
+		${STDUUID}
+
+		Threads::Threads
+		asio::asio
+		Vorbis::vorbis
+		Vorbis::vorbisfile
+		LibLZMA::LibLZMA
+		game-activity::game-activity
+		android
+		log
 	)
 else()
 	target_include_directories(${PROJECT_NAME}
