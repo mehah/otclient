@@ -48,7 +48,7 @@ bool Platform::spawnProcess(std::string process, const std::vector<std::string>&
         commandLine += stdext::format(" \"%s\"", arg);
 
     stdext::replace_all(process, "/", "\\");
-    if (!process.ends_with(".exe"))
+    if (!stdext::ends_with(process, ".exe"))
         process += ".exe";
 
     const auto& wfile = stdext::utf8_to_utf16(process);
@@ -279,60 +279,60 @@ std::string Platform::getOSName()
             pGPI(osvi.dwMajorVersion, osvi.dwMinorVersion, 0, 0, &dwType);
 
             switch (dwType) {
-                case PRODUCT_ULTIMATE:
-                    ret += "Ultimate Edition";
-                    break;
-                case PRODUCT_PROFESSIONAL:
-                    ret += "Professional";
-                    break;
-                case PRODUCT_HOME_PREMIUM:
-                    ret += "Home Premium Edition";
-                    break;
-                case PRODUCT_HOME_BASIC:
-                    ret += "Home Basic Edition";
-                    break;
-                case PRODUCT_ENTERPRISE:
-                    ret += "Enterprise Edition";
-                    break;
-                case PRODUCT_BUSINESS:
-                    ret += "Business Edition";
-                    break;
-                case PRODUCT_STARTER:
-                    ret += "Starter Edition";
-                    break;
-                case PRODUCT_CLUSTER_SERVER:
-                    ret += "Cluster Server Edition";
-                    break;
-                case PRODUCT_DATACENTER_SERVER:
-                    ret += "Datacenter Edition";
-                    break;
-                case PRODUCT_DATACENTER_SERVER_CORE:
-                    ret += "Datacenter Edition (core installation)";
-                    break;
-                case PRODUCT_ENTERPRISE_SERVER:
-                    ret += "Enterprise Edition";
-                    break;
-                case PRODUCT_ENTERPRISE_SERVER_CORE:
-                    ret += "Enterprise Edition (core installation)";
-                    break;
-                case PRODUCT_ENTERPRISE_SERVER_IA64:
-                    ret += "Enterprise Edition for Itanium-based Systems";
-                    break;
-                case PRODUCT_SMALLBUSINESS_SERVER:
-                    ret += "Small Business Server";
-                    break;
-                case PRODUCT_SMALLBUSINESS_SERVER_PREMIUM:
-                    ret += "Small Business Server Premium Edition";
-                    break;
-                case PRODUCT_STANDARD_SERVER:
-                    ret += "Standard Edition";
-                    break;
-                case PRODUCT_STANDARD_SERVER_CORE:
-                    ret += "Standard Edition (core installation)";
-                    break;
-                case PRODUCT_WEB_SERVER:
-                    ret += "Web Server Edition";
-                    break;
+            case PRODUCT_ULTIMATE:
+                ret += "Ultimate Edition";
+                break;
+            case PRODUCT_PROFESSIONAL:
+                ret += "Professional";
+                break;
+            case PRODUCT_HOME_PREMIUM:
+                ret += "Home Premium Edition";
+                break;
+            case PRODUCT_HOME_BASIC:
+                ret += "Home Basic Edition";
+                break;
+            case PRODUCT_ENTERPRISE:
+                ret += "Enterprise Edition";
+                break;
+            case PRODUCT_BUSINESS:
+                ret += "Business Edition";
+                break;
+            case PRODUCT_STARTER:
+                ret += "Starter Edition";
+                break;
+            case PRODUCT_CLUSTER_SERVER:
+                ret += "Cluster Server Edition";
+                break;
+            case PRODUCT_DATACENTER_SERVER:
+                ret += "Datacenter Edition";
+                break;
+            case PRODUCT_DATACENTER_SERVER_CORE:
+                ret += "Datacenter Edition (core installation)";
+                break;
+            case PRODUCT_ENTERPRISE_SERVER:
+                ret += "Enterprise Edition";
+                break;
+            case PRODUCT_ENTERPRISE_SERVER_CORE:
+                ret += "Enterprise Edition (core installation)";
+                break;
+            case PRODUCT_ENTERPRISE_SERVER_IA64:
+                ret += "Enterprise Edition for Itanium-based Systems";
+                break;
+            case PRODUCT_SMALLBUSINESS_SERVER:
+                ret += "Small Business Server";
+                break;
+            case PRODUCT_SMALLBUSINESS_SERVER_PREMIUM:
+                ret += "Small Business Server Premium Edition";
+                break;
+            case PRODUCT_STANDARD_SERVER:
+                ret += "Standard Edition";
+                break;
+            case PRODUCT_STANDARD_SERVER_CORE:
+                ret += "Standard Edition (core installation)";
+                break;
+            case PRODUCT_WEB_SERVER:
+                ret += "Web Server Edition";
+                break;
             }
         }
 
@@ -363,7 +363,8 @@ std::string Platform::getOSName()
                         ret += "Enterprise x64 Edition";
                     else
                         ret += "Standard x64 Edition";
-                } else {
+                }
+                else {
                     if (osvi.wSuiteMask & VER_SUITE_COMPUTE_SERVER)
                         ret += "Compute Cluster Edition";
                     else if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
@@ -388,7 +389,8 @@ std::string Platform::getOSName()
             ret += "Windows 2000 ";
             if (osvi.wProductType == VER_NT_WORKSTATION) {
                 ret += "Professional";
-            } else {
+            }
+            else {
                 if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
                     ret += "Datacenter Server";
                 else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
@@ -405,7 +407,8 @@ std::string Platform::getOSName()
             else if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL)
                 ret += ", 32-bit";
         }
-    } else {
+    }
+    else {
         ret = "Windows";
     }
     return ret;

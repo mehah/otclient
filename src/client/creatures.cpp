@@ -30,14 +30,14 @@
 CreatureManager g_creatures;
 
 static bool isInZone(const Position& pos/* placePos*/,
-                     const Position& centerPos,
-                     int radius)
+    const Position& centerPos,
+    int radius)
 {
     if (radius == -1)
         return true;
 
     return ((pos.x >= centerPos.x - radius) && (pos.x <= centerPos.x + radius) &&
-            (pos.y >= centerPos.y - radius) && (pos.y <= centerPos.y + radius));
+        (pos.y >= centerPos.y - radius) && (pos.y <= centerPos.y + radius));
 }
 
 void CreatureManager::terminate()
@@ -124,8 +124,8 @@ void Spawn::addCreature(const Position& placePos, const CreatureTypePtr& cType)
     const int m_radius = getRadius();
     if (!isInZone(placePos, centerPos, m_radius)) {
         g_logger.warning(stdext::format("cannot place creature at %s (spawn's center position: %s, spawn radius: %d) (increment radius)",
-                                        stdext::to_string(placePos), stdext::to_string(centerPos),
-                                        m_radius
+            stdext::to_string(placePos), stdext::to_string(centerPos),
+            m_radius
         ));
         return;
     }
@@ -210,7 +210,7 @@ void CreatureManager::loadSingleCreature(const std::string& file)
 void CreatureManager::loadNpcs(const std::string& folder)
 {
     std::string tmp{ folder };
-    if (!tmp.ends_with("/"))
+    if (!stdext::ends_with(tmp, "/"))
         tmp += "/";
 
     if (!g_resources.directoryExists(tmp))
@@ -253,7 +253,8 @@ void CreatureManager::loadSpawns(const std::string& fileName)
         }
         doc.Clear();
         m_spawnLoaded = true;
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to load '%s': %s", fileName, e.what()));
     }
 }
@@ -278,7 +279,8 @@ void CreatureManager::saveSpawns(const std::string& fileName)
 
         if (!doc.SaveFile("data" + fileName))
             throw Exception("failed to save spawns XML %s: %s", fileName, doc.ErrorDesc());
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
     }
 }
@@ -323,7 +325,8 @@ void CreatureManager::internalLoadCreatureBuffer(const TiXmlElement* attrib, con
     if (const auto type = attrib->readType<int32_t>("type"); type > 0) {
         out.setCategory(ThingCategoryCreature);
         out.setId(type);
-    } else {
+    }
+    else {
         out.setCategory(ThingCategoryItem);
         out.setAuxId(attrib->readType<int32_t>("typeex"));
     }
@@ -347,7 +350,7 @@ const CreatureTypePtr& CreatureManager::getCreatureByName(std::string name)
     stdext::trim(name);
     stdext::ucwords(name);
     const auto it = std::find_if(m_creatures.begin(), m_creatures.end(),
-                                 [=](const CreatureTypePtr& m) -> bool { return m->getName() == name; });
+        [=](const CreatureTypePtr& m) -> bool { return m->getName() == name; });
     if (it != m_creatures.end())
         return *it;
     g_logger.warning(stdext::format("could not find creature with name: %s", name));

@@ -48,7 +48,7 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
     // parse lua variables and callbacks first
     for (const OTMLNodePtr& node : styleNode->children()) {
         // lua functions
-        if (node->tag().starts_with("@")) {
+        if (stdext::starts_with(node->tag(), "@")) {
             // load once
             if (m_firstOnStyle) {
                 std::string funcName = node->tag().substr(1);
@@ -57,7 +57,8 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
                 luaSetField(funcName);
             }
             // lua fields value
-        } else if (node->tag().starts_with("&")) {
+        }
+        else if (stdext::starts_with(node->tag(), "&")) {
             std::string fieldName = node->tag().substr(1);
             std::string fieldOrigin = "@" + node->source() + ": [" + node->tag() + "]";
 
@@ -154,9 +155,11 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
             if (split.size() == 2) {
                 setBorderWidth(stdext::safe_cast<int>(split[0]));
                 setBorderColor(stdext::safe_cast<Color>(split[1]));
-            } else
+            }
+            else
                 throw OTMLException(node, "border param must have its width followed by its color");
-        } else if (node->tag() == "border-width")
+        }
+        else if (node->tag() == "border-width")
             setBorderWidth(node->value<int>());
         else if (node->tag() == "border-width-top")
             setBorderWidthTop(node->value<int>());
@@ -192,7 +195,8 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
                 setMarginRight(stdext::safe_cast<int>(split[1]));
                 setMarginBottom(stdext::safe_cast<int>(split[2]));
                 setMarginLeft(stdext::safe_cast<int>(split[3]));
-            } else if (split.size() == 3) {
+            }
+            else if (split.size() == 3) {
                 int marginTop = stdext::safe_cast<int>(split[0]);
                 int marginHorizontal = stdext::safe_cast<int>(split[1]);
                 int marginBottom = stdext::safe_cast<int>(split[2]);
@@ -200,21 +204,24 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
                 setMarginRight(marginHorizontal);
                 setMarginBottom(marginBottom);
                 setMarginLeft(marginHorizontal);
-            } else if (split.size() == 2) {
+            }
+            else if (split.size() == 2) {
                 int marginVertical = stdext::safe_cast<int>(split[0]);
                 int marginHorizontal = stdext::safe_cast<int>(split[1]);
                 setMarginTop(marginVertical);
                 setMarginRight(marginHorizontal);
                 setMarginBottom(marginVertical);
                 setMarginLeft(marginHorizontal);
-            } else if (split.size() == 1) {
+            }
+            else if (split.size() == 1) {
                 int margin = stdext::safe_cast<int>(split[0]);
                 setMarginTop(margin);
                 setMarginRight(margin);
                 setMarginBottom(margin);
                 setMarginLeft(margin);
             }
-        } else if (node->tag() == "padding-top")
+        }
+        else if (node->tag() == "padding-top")
             setPaddingTop(node->value<int>());
         else if (node->tag() == "padding-right")
             setPaddingRight(node->value<int>());
@@ -230,7 +237,8 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
                 setPaddingRight(stdext::safe_cast<int>(split[1]));
                 setPaddingBottom(stdext::safe_cast<int>(split[2]));
                 setPaddingLeft(stdext::safe_cast<int>(split[3]));
-            } else if (split.size() == 3) {
+            }
+            else if (split.size() == 3) {
                 int paddingTop = stdext::safe_cast<int>(split[0]);
                 int paddingHorizontal = stdext::safe_cast<int>(split[1]);
                 int paddingBottom = stdext::safe_cast<int>(split[2]);
@@ -238,14 +246,16 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
                 setPaddingRight(paddingHorizontal);
                 setPaddingBottom(paddingBottom);
                 setPaddingLeft(paddingHorizontal);
-            } else if (split.size() == 2) {
+            }
+            else if (split.size() == 2) {
                 int paddingVertical = stdext::safe_cast<int>(split[0]);
                 int paddingHorizontal = stdext::safe_cast<int>(split[1]);
                 setPaddingTop(paddingVertical);
                 setPaddingRight(paddingHorizontal);
                 setPaddingBottom(paddingVertical);
                 setPaddingLeft(paddingHorizontal);
-            } else if (split.size() == 1) {
+            }
+            else if (split.size() == 1) {
                 int padding = stdext::safe_cast<int>(split[0]);
                 setPaddingTop(padding);
                 setPaddingRight(padding);
@@ -280,7 +290,7 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
                 m_layout->applyStyle(node);
         }
         // anchors
-        else if (node->tag().starts_with("anchors.")) {
+        else if (stdext::starts_with(node->tag(), "anchors.")) {
             UIWidgetPtr parent = getParent();
             if (!parent) {
                 if (m_firstOnStyle)
@@ -299,14 +309,17 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
             std::string what = node->tag().substr(8);
             if (what == "fill") {
                 fill(node->value());
-            } else if (what == "centerIn") {
+            }
+            else if (what == "centerIn") {
                 centerIn(node->value());
-            } else {
+            }
+            else {
                 Fw::AnchorEdge anchoredEdge = Fw::translateAnchorEdge(what);
 
                 if (node->value() == "none") {
                     removeAnchor(anchoredEdge);
-                } else {
+                }
+                else {
                     std::vector<std::string> split = stdext::split(node->value(), ".");
                     if (split.size() != 2)
                         throw OTMLException(node, "invalid anchor description");
@@ -372,7 +385,8 @@ void UIWidget::drawIcon(const Rect& screenCoords)
         drawRect = screenCoords;
         drawRect.translate(m_iconRect.topLeft());
         drawRect.resize(m_iconRect.size());
-    } else {
+    }
+    else {
         drawRect.resize(m_iconClipRect.size());
 
         if (m_iconAlign == Fw::AlignNone)

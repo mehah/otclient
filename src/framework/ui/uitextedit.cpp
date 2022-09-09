@@ -116,7 +116,8 @@ void UITextEdit::drawSelf(Fw::DrawPane drawPane)
                 color = m_selectionColor;
 
             g_drawPool.addFilledRect(cursorRect, color);
-        } else if (elapsed >= 2 * delay) {
+        }
+        else if (elapsed >= 2 * delay) {
             m_cursorTicks = g_clock.millis();
         }
     }
@@ -128,7 +129,7 @@ void UITextEdit::update(bool focusCursor)
         return;
 
     std::string text = getDisplayedText();
-    if (m_text.ends_with(" "))
+    if (stdext::ends_with(m_text, " "))
         text += " ";
 
     m_drawText = text;
@@ -204,11 +205,13 @@ void UITextEdit::update(bool focusCursor)
                     }
                 }
             }
-        } else {
+        }
+        else {
             m_textVirtualOffset = {};
         }
         m_cursorInRange = true;
-    } else {
+    }
+    else {
         if (m_cursorPos > 0 && textLength > 0) {
             const Rect virtualRect(m_textVirtualOffset, m_rect.size() - Size(2 * m_padding.left + m_padding.right, 0)); // previous rendered virtual rect
             const int pos = m_cursorPos - 1; // element before cursor
@@ -216,7 +219,8 @@ void UITextEdit::update(bool focusCursor)
             const Rect glyphRect(glyphsPositions[pos], glyphsSize[glyph]);
             if (virtualRect.contains(glyphRect.topLeft()) && virtualRect.contains(glyphRect.bottomRight()))
                 m_cursorInRange = true;
-        } else {
+        }
+        else {
             m_cursorInRange = true;
         }
     }
@@ -249,16 +253,20 @@ void UITextEdit::update(bool focusCursor)
 
     if (m_textAlign & Fw::AlignBottom) {
         m_drawArea.translate(0, textScreenCoords.height() - textBoxSize.height());
-    } else if (m_textAlign & Fw::AlignVerticalCenter) {
+    }
+    else if (m_textAlign & Fw::AlignVerticalCenter) {
         m_drawArea.translate(0, (textScreenCoords.height() - textBoxSize.height()) / 2);
-    } else { // AlignTop
+    }
+    else { // AlignTop
     }
 
     if (m_textAlign & Fw::AlignRight) {
         m_drawArea.translate(textScreenCoords.width() - textBoxSize.width(), 0);
-    } else if (m_textAlign & Fw::AlignHorizontalCenter) {
+    }
+    else if (m_textAlign & Fw::AlignHorizontalCenter) {
         m_drawArea.translate((textScreenCoords.width() - textBoxSize.width()) / 2, 0);
-    } else { // AlignLeft
+    }
+    else { // AlignLeft
     }
 
     for (int i = 0; i < textLength; ++i) {
@@ -276,17 +284,21 @@ void UITextEdit::update(bool focusCursor)
         // first translate to align position
         if (m_textAlign & Fw::AlignBottom) {
             glyphScreenCoords.translate(0, textScreenCoords.height() - textBoxSize.height());
-        } else if (m_textAlign & Fw::AlignVerticalCenter) {
+        }
+        else if (m_textAlign & Fw::AlignVerticalCenter) {
             glyphScreenCoords.translate(0, (textScreenCoords.height() - textBoxSize.height()) / 2);
-        } else { // AlignTop
+        }
+        else { // AlignTop
             // nothing to do
         }
 
         if (m_textAlign & Fw::AlignRight) {
             glyphScreenCoords.translate(textScreenCoords.width() - textBoxSize.width(), 0);
-        } else if (m_textAlign & Fw::AlignHorizontalCenter) {
+        }
+        else if (m_textAlign & Fw::AlignHorizontalCenter) {
             glyphScreenCoords.translate((textScreenCoords.width() - textBoxSize.width()) / 2, 0);
-        } else { // AlignLeft
+        }
+        else { // AlignLeft
             // nothing to do
         }
 
@@ -449,7 +461,8 @@ void UITextEdit::removeCharacter(bool right)
     if (static_cast<size_t>(m_cursorPos) >= 0 && tmp.length() > 0) {
         if (static_cast<size_t>(m_cursorPos) >= tmp.length()) {
             tmp.erase(tmp.begin() + (--m_cursorPos));
-        } else if (right)
+        }
+        else if (right)
             tmp.erase(tmp.begin() + m_cursorPos);
         else if (m_cursorPos > 0)
             tmp.erase(tmp.begin() + --m_cursorPos);
@@ -472,7 +485,8 @@ void UITextEdit::del(bool right)
         setCursorPos(m_selectionStart);
         clearSelection();
         setText(tmp);
-    } else
+    }
+    else
         removeCharacter(right);
 }
 
@@ -513,7 +527,8 @@ void UITextEdit::moveCursorHorizontally(bool right)
             ++m_cursorPos;
         else
             m_cursorPos = 0;
-    } else if (m_cursorPos - 1 >= 0)
+    }
+    else if (m_cursorPos - 1 >= 0)
         --m_cursorPos;
     else
         m_cursorPos = m_text.length();
@@ -623,7 +638,8 @@ void UITextEdit::onStyleApply(const std::string_view styleName, const OTMLNodePt
         if (node->tag() == "text") {
             setText(node->value());
             setCursorPos(m_text.length());
-        } else if (node->tag() == "text-hidden")
+        }
+        else if (node->tag() == "text-hidden")
             setTextHidden(node->value<bool>());
         else if (node->tag() == "shift-navigation")
             setShiftNavigation(node->value<bool>());
@@ -642,7 +658,8 @@ void UITextEdit::onStyleApply(const std::string_view styleName, const OTMLNodePt
         else if (node->tag() == "selection") {
             const auto selectionRange = node->value<Point>();
             setSelection(selectionRange.x, selectionRange.y);
-        } else if (node->tag() == "cursor-visible")
+        }
+        else if (node->tag() == "cursor-visible")
             setCursorVisible(node->value<bool>());
         else if (node->tag() == "change-cursor-image")
             setChangeCursorImage(node->value<bool>());
@@ -665,7 +682,8 @@ void UITextEdit::onFocusChange(bool focused, Fw::FocusReason reason)
         else
             blinkCursor();
         update(true);
-    } else if (m_selectable)
+    }
+    else if (m_selectable)
         clearSelection();
     UIWidget::onFocusChange(focused, reason);
 }
@@ -681,47 +699,57 @@ bool UITextEdit::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepe
                 del(true);
                 return true;
             }
-        } else if (keyCode == Fw::KeyBackspace && m_editable) { // erase left character
+        }
+        else if (keyCode == Fw::KeyBackspace && m_editable) { // erase left character
             if (hasSelection() || !m_text.empty()) {
                 del(false);
                 return true;
             }
-        } else if (keyCode == Fw::KeyRight && !m_shiftNavigation) { // move cursor right
+        }
+        else if (keyCode == Fw::KeyRight && !m_shiftNavigation) { // move cursor right
             clearSelection();
             moveCursorHorizontally(true);
             return true;
-        } else if (keyCode == Fw::KeyLeft && !m_shiftNavigation) { // move cursor left
+        }
+        else if (keyCode == Fw::KeyLeft && !m_shiftNavigation) { // move cursor left
             clearSelection();
             moveCursorHorizontally(false);
             return true;
-        } else if (keyCode == Fw::KeyHome) { // move cursor to first character
+        }
+        else if (keyCode == Fw::KeyHome) { // move cursor to first character
             if (m_cursorPos != 0) {
                 clearSelection();
                 setCursorPos(0);
                 return true;
             }
-        } else if (keyCode == Fw::KeyEnd) { // move cursor to last character
+        }
+        else if (keyCode == Fw::KeyEnd) { // move cursor to last character
             if (m_cursorPos != static_cast<int>(m_text.length())) {
                 clearSelection();
                 setCursorPos(m_text.length());
                 return true;
             }
-        } else if (keyCode == Fw::KeyTab && !m_shiftNavigation) {
+        }
+        else if (keyCode == Fw::KeyTab && !m_shiftNavigation) {
             clearSelection();
             if (const UIWidgetPtr parent = getParent())
                 parent->focusNextChild(Fw::KeyboardFocusReason, true);
             return true;
-        } else if (keyCode == Fw::KeyEnter && m_multiline && m_editable) {
+        }
+        else if (keyCode == Fw::KeyEnter && m_multiline && m_editable) {
             appendCharacter('\n');
             return true;
-        } else if (keyCode == Fw::KeyUp && !m_shiftNavigation && m_multiline) {
+        }
+        else if (keyCode == Fw::KeyUp && !m_shiftNavigation && m_multiline) {
             moveCursorVertically(true);
             return true;
-        } else if (keyCode == Fw::KeyDown && !m_shiftNavigation && m_multiline) {
+        }
+        else if (keyCode == Fw::KeyDown && !m_shiftNavigation && m_multiline) {
             moveCursorVertically(false);
             return true;
         }
-    } else if (keyboardModifiers == Fw::KeyboardCtrlModifier) {
+    }
+    else if (keyboardModifiers == Fw::KeyboardCtrlModifier) {
         if (keyCode == Fw::KeyV && m_editable) {
             paste(g_window.getClipboardText());
             return true;
@@ -731,18 +759,21 @@ bool UITextEdit::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepe
                 cut();
                 return true;
             }
-        } else if (keyCode == Fw::KeyC && m_selectable) {
+        }
+        else if (keyCode == Fw::KeyC && m_selectable) {
             if (hasSelection()) {
                 copy();
                 return true;
             }
-        } else if (keyCode == Fw::KeyA && m_selectable) {
+        }
+        else if (keyCode == Fw::KeyA && m_selectable) {
             if (m_text.length() > 0) {
                 selectAll();
                 return true;
             }
         }
-    } else if (keyboardModifiers == Fw::KeyboardShiftModifier) {
+    }
+    else if (keyboardModifiers == Fw::KeyboardShiftModifier) {
         if (keyCode == Fw::KeyTab && !m_shiftNavigation) {
             if (const UIWidgetPtr parent = getParent())
                 parent->focusPreviousChild(Fw::KeyboardFocusReason, true);
@@ -771,7 +802,8 @@ bool UITextEdit::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepe
                 setCursorPos(0);
                 return true;
             }
-        } else if (keyCode == Fw::KeyEnd) { // move cursor to last character
+        }
+        else if (keyCode == Fw::KeyEnd) { // move cursor to last character
             if (m_cursorPos != static_cast<int>(m_text.length())) {
                 setSelection(m_cursorPos, m_text.length());
                 setCursorPos(m_text.length());

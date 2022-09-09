@@ -21,7 +21,6 @@
  */
 
 #include <filesystem>
-#include <ranges>
 
 #include "resourcemanager.h"
 #include "filestream.h"
@@ -147,8 +146,10 @@ bool ResourceManager::removeSearchPath(const std::string& path)
 void ResourceManager::searchAndAddPackages(const std::string& packagesDir, const std::string& packageExt)
 {
     auto files = listDirectoryFiles(packagesDir);
-    for (const auto& file : files | std::views::reverse) {
-        if (!file.ends_with(packageExt))
+    for (auto it = files.rbegin(); it != files.rend(); ++it) {
+        const auto& file = *it;
+
+        if (!stdext::ends_with(file, packageExt))
             continue;
         std::string package = getRealDir(packagesDir) + "/" + file;
         if (!addSearchPath(package, true))
@@ -306,7 +307,8 @@ std::vector<std::string> ResourceManager::discoverPath(const std::filesystem::pa
         if (std::filesystem::is_directory(it->path().generic_string()) && recursive) {
             std::vector<std::string> subfiles = discoverPath(it->path(), filenameOnly, recursive);
             files.insert(files.end(), subfiles.begin(), subfiles.end());
-        } else {
+        }
+        else {
             if (filenameOnly)
                 files.push_back(it->path().filename().string());
             else
@@ -320,14 +322,14 @@ std::vector<std::string> ResourceManager::discoverPath(const std::filesystem::pa
 std::string ResourceManager::resolvePath(const std::string& path)
 {
     std::string fullPath;
-    if (path.starts_with("/"))
+    if (stdext::starts_with(path, "/"))
         fullPath = path;
     else {
         if (const std::string scriptPath = "/" + g_lua.getCurrentSourcePath(); !scriptPath.empty())
             fullPath += scriptPath + "/";
         fullPath += path;
     }
-    if (!(fullPath.starts_with("/")))
+    if (!(stdext::starts_with(fullPath, "/")))
         g_logger.traceWarning(stdext::format("the following file path is not fully resolved: %s", path));
 
     stdext::replace_all(fullPath, "//", "/");
@@ -369,7 +371,7 @@ std::string ResourceManager::guessFilePath(const std::string& filename, const st
 
 bool ResourceManager::isFileType(const std::string& filename, const std::string& type)
 {
-    if (filename.ends_with(std::string(".") + type))
+    if (stdext::ends_with(filename, std::string(".") + type))
         return true;
     return false;
 }
@@ -390,7 +392,8 @@ std::string ResourceManager::encrypt(const std::string& data, const std::string&
         int ct = data[i];
         if (i % 2) {
             ct = ct - password[j] + i;
-        } else {
+        }
+        else {
             ct = ct + password[j] - i;
         }
         ss << static_cast<char>(ct);
@@ -415,7 +418,8 @@ std::string ResourceManager::decrypt(const std::string& data)
         int ct = data[i];
         if (i % 2) {
             ct = ct + password[j] - i;
-        } else {
+        }
+        else {
             ct = ct - password[j] + i;
         }
         ss << static_cast<char>(ct);
@@ -440,7 +444,8 @@ uint8_t* ResourceManager::decrypt(uint8_t* data, int32_t size)
         const int ct = data[i];
         if (i % 2) {
             new_Data[i] = ct + password[j] - i;
-        } else {
+        }
+        else {
             new_Data[i] = ct - password[j] + i;
         }
         data[i] = new_Data[i];

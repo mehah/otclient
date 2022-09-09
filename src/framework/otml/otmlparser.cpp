@@ -91,18 +91,20 @@ void OTMLParser::parseLine(std::string line)
         return;
 
     // skip comments
-    if (line.starts_with("//"))
+    if (stdext::starts_with(line, "//"))
         return;
 
     // a depth above, change current parent to the previous added node
     if (depth == currentDepth + 1) {
         currentParent = previousNode;
         // a depth below, change parent to previous parent
-    } else if (depth < currentDepth) {
+    }
+    else if (depth < currentDepth) {
         for (int i = 0; i < currentDepth - depth; ++i)
             currentParent = parentMap[currentParent];
         // if it isn't the current depth, it's a syntax error
-    } else if (depth != currentDepth)
+    }
+    else if (depth != currentDepth)
         throw OTMLException(doc, "invalid indentation depth, are you indenting correctly?", currentLine);
 
     // sets current depth
@@ -125,12 +127,14 @@ void OTMLParser::parseNode(const std::string_view data)
         value = data.substr(1);
         stdext::trim(value);
         // node that has tag and possible a value
-    } else if (dotsPos != std::string::npos) {
+    }
+    else if (dotsPos != std::string::npos) {
         tag = data.substr(0, dotsPos);
         if (data.size() > dotsPos + 1)
             value = data.substr(dotsPos + 1);
         // node that has only a tag
-    } else {
+    }
+    else {
         tag = data;
     }
 
@@ -150,7 +154,8 @@ void OTMLParser::parseNode(const std::string_view data)
             if (depth > currentDepth) {
                 multiLineData += line.substr((currentDepth + 1) * 2);
                 // it has contents below the current depth
-            } else {
+            }
+            else {
                 // if not empty, its a node
                 stdext::trim(line);
                 if (!line.empty()) {
@@ -192,14 +197,15 @@ void OTMLParser::parseNode(const std::string_view data)
     if (value == "~")
         node->setNull(true);
     else {
-        if (value.starts_with("[") && value.ends_with("]")) {
+        if (stdext::starts_with(value, "[") && stdext::ends_with(value, "]")) {
             const auto& tmp = value.substr(1, value.length() - 2);
             const std::vector tokens = stdext::split(tmp, ",");
             for (std::string v : tokens) {
                 stdext::trim(v);
                 node->writeIn(v);
             }
-        } else
+        }
+        else
             node->setValue(value);
     }
 

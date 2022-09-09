@@ -49,6 +49,9 @@ namespace stdext
     void eraseWhiteSpace(std::string& str);
     void replace_all(std::string& str, const std::string_view search, const std::string_view replacement);
 
+    bool ends_with(const std::string& str, const std::string& test);
+    bool starts_with(const std::string& str, const std::string& test);
+
     bool is_valid_utf8(const std::string_view src);
     std::string utf8_to_latin1(const std::string_view src);
     std::string latin1_to_utf8(const std::string_view src);

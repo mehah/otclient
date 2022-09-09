@@ -107,7 +107,7 @@ template<>
 inline std::string OTMLNode::value<std::string>()
 {
     std::string value = m_value;
-    if (value.starts_with("\"") && value.ends_with("\"")) {
+    if (stdext::starts_with(value, "\"") && stdext::ends_with(value, "\"")) {
         value = value.substr(1, value.length() - 2);
         stdext::replace_all(value, "\\\\", "\\");
         stdext::replace_all(value, "\\\"", "\"");

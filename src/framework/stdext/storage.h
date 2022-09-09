@@ -38,11 +38,8 @@ namespace stdext
         class Alloc = phmap::priv::Allocator<T>>
         using set = phmap::flat_hash_set<T, Hash, Eq, Alloc>;
 
-    template<typename T>
-    concept OnlyEnum = std::is_enum_v<T>;
-
-    template<OnlyEnum Key, uint8_t _Size = UINT8_MAX>
-    class small_dynamic_storage
+    template<typename Key, uint8_t _Size = UINT8_MAX>
+    class small_storage
     {
     public:
         template<typename T>
@@ -61,7 +58,7 @@ namespace stdext
         std::array<std::any, _Size> m_data{};
     };
 
-    template<OnlyEnum Key>
+    template<typename Key>
     class dynamic_storage
     {
     public:

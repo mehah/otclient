@@ -75,7 +75,7 @@ protected:
     void save(TiXmlElement* elem);
 
 private:
-    stdext::small_dynamic_storage<HouseAttr, HouseAttrLast> m_attribs;
+    stdext::small_storage<HouseAttr, HouseAttrLast> m_attribs;
     TileMap m_tiles;
     ItemVector m_doors;
     uint32_t m_lastDoorId{ 0 };

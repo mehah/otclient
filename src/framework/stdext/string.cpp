@@ -35,12 +35,12 @@ namespace stdext
 {
     std::string resolve_path(const std::string_view filePath, std::string_view sourcePath)
     {
-        const std::string _filePath(filePath);
-        if (_filePath.starts_with("/"))
+        const std::string _filePath{ filePath };
+        if (stdext::starts_with(_filePath, "/"))
             return _filePath;
 
-        std::string _sourcePath(sourcePath);
-        if (!sourcePath.ends_with("/")) {
+        std::string _sourcePath{ sourcePath };
+        if (!stdext::ends_with(_sourcePath, "/")) {
             const std::size_t slashPos = sourcePath.find_last_of('/');
             if (slashPos == std::string::npos)
                 throw Exception("invalid source path '%s', for file '%s'", sourcePath, filePath);
@@ -79,64 +79,64 @@ namespace stdext
         const auto* bytes = src.data();
         while (*bytes) {
             if ((// ASCII
-                 // use bytes[0] <= 0x7F to allow ASCII control characters
-                 bytes[0] == 0x09 ||
-                 bytes[0] == 0x0A ||
-                 bytes[0] == 0x0D ||
-                 (0x20 <= bytes[0] && bytes[0] <= 0x7E)
-                 )
-               ) {
+                // use bytes[0] <= 0x7F to allow ASCII control characters
+                bytes[0] == 0x09 ||
+                bytes[0] == 0x0A ||
+                bytes[0] == 0x0D ||
+                (0x20 <= bytes[0] && bytes[0] <= 0x7E)
+                )
+                ) {
                 bytes += 1;
                 continue;
             }
             if ((// non-overlong 2-byte
-                 (0xC2 <= bytes[0] && bytes[0] <= 0xDF) &&
-                 (0x80 <= bytes[1] && bytes[1] <= 0xBF)
-                 )
-               ) {
+                (0xC2 <= bytes[0] && bytes[0] <= 0xDF) &&
+                (0x80 <= bytes[1] && bytes[1] <= 0xBF)
+                )
+                ) {
                 bytes += 2;
                 continue;
             }
             if ((// excluding overlongs
-                 bytes[0] == 0xE0 &&
-                 (0xA0 <= bytes[1] && bytes[1] <= 0xBF) &&
-                 (0x80 <= bytes[2] && bytes[2] <= 0xBF)
-                 ) ||
-               (// straight 3-byte
-                ((0xE1 <= bytes[0] && bytes[0] <= 0xEC) ||
-                 bytes[0] == 0xEE ||
-                 bytes[0] == 0xEF) &&
-                (0x80 <= bytes[1] && bytes[1] <= 0xBF) &&
+                bytes[0] == 0xE0 &&
+                (0xA0 <= bytes[1] && bytes[1] <= 0xBF) &&
                 (0x80 <= bytes[2] && bytes[2] <= 0xBF)
                 ) ||
-               (// excluding surrogates
-                bytes[0] == 0xED &&
-                (0x80 <= bytes[1] && bytes[1] <= 0x9F) &&
-                (0x80 <= bytes[2] && bytes[2] <= 0xBF)
-                )
-               ) {
+                (// straight 3-byte
+                    ((0xE1 <= bytes[0] && bytes[0] <= 0xEC) ||
+                        bytes[0] == 0xEE ||
+                        bytes[0] == 0xEF) &&
+                    (0x80 <= bytes[1] && bytes[1] <= 0xBF) &&
+                    (0x80 <= bytes[2] && bytes[2] <= 0xBF)
+                    ) ||
+                (// excluding surrogates
+                    bytes[0] == 0xED &&
+                    (0x80 <= bytes[1] && bytes[1] <= 0x9F) &&
+                    (0x80 <= bytes[2] && bytes[2] <= 0xBF)
+                    )
+                ) {
                 bytes += 3;
                 continue;
             }
             if ((// planes 1-3
-                 bytes[0] == 0xF0 &&
-                 (0x90 <= bytes[1] && bytes[1] <= 0xBF) &&
-                 (0x80 <= bytes[2] && bytes[2] <= 0xBF) &&
-                 (0x80 <= bytes[3] && bytes[3] <= 0xBF)
-                 ) ||
-               (// planes 4-15
-                (0xF1 <= bytes[0] && bytes[0] <= 0xF3) &&
-                (0x80 <= bytes[1] && bytes[1] <= 0xBF) &&
+                bytes[0] == 0xF0 &&
+                (0x90 <= bytes[1] && bytes[1] <= 0xBF) &&
                 (0x80 <= bytes[2] && bytes[2] <= 0xBF) &&
                 (0x80 <= bytes[3] && bytes[3] <= 0xBF)
                 ) ||
-               (// plane 16
-                bytes[0] == 0xF4 &&
-                (0x80 <= bytes[1] && bytes[1] <= 0x8F) &&
-                (0x80 <= bytes[2] && bytes[2] <= 0xBF) &&
-                (0x80 <= bytes[3] && bytes[3] <= 0xBF)
-                )
-               ) {
+                (// planes 4-15
+                    (0xF1 <= bytes[0] && bytes[0] <= 0xF3) &&
+                    (0x80 <= bytes[1] && bytes[1] <= 0xBF) &&
+                    (0x80 <= bytes[2] && bytes[2] <= 0xBF) &&
+                    (0x80 <= bytes[3] && bytes[3] <= 0xBF)
+                    ) ||
+                (// plane 16
+                    bytes[0] == 0xF4 &&
+                    (0x80 <= bytes[1] && bytes[1] <= 0x8F) &&
+                    (0x80 <= bytes[2] && bytes[2] <= 0xBF) &&
+                    (0x80 <= bytes[3] && bytes[3] <= 0xBF)
+                    )
+                ) {
                 bytes += 4;
                 continue;
             }
@@ -157,9 +157,11 @@ namespace stdext
                 if (c == 0xc2) {
                     if (c2 > 0xa1 && c2 < 0xbb)
                         out += c2;
-                } else if (c == 0xc3)
+                }
+                else if (c == 0xc3)
                     out += 64 + c2;
-            } else if (c >= 0xc4 && c <= 0xdf)
+            }
+            else if (c >= 0xc4 && c <= 0xdf)
                 i += 1;
             else if (c >= 0xe0 && c <= 0xed)
                 i += 2;
@@ -230,14 +232,14 @@ namespace stdext
     {
         s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](uint8_t ch) {
             return !std::isspace(ch);
-        }));
+            }));
     }
 
     void rtrim(std::string& s)
     {
         s.erase(std::find_if(s.rbegin(), s.rend(), [](uint8_t ch) {
             return !std::isspace(ch);
-        }).base(), s.end());
+            }).base(), s.end());
     }
 
     void trim(std::string& s)
@@ -268,10 +270,21 @@ namespace stdext
         }
     }
 
-    void eraseWhiteSpace(std::string& str)
-    {
-        std::erase_if(str, isspace);
+    // C++20
+    // str::ends_with
+    bool ends_with(const std::string& str, const std::string& test) {
+        return str.size() >= test.size() && 0 == str.compare(str.size() - test.size(), test.size(), test);
     }
+
+    // C++20
+    // str::starts_with
+    bool starts_with(const std::string& str, const std::string& test) {
+        return str.size() >= test.size() && 0 == str.compare(0, test.size(), test);
+    }
+
+    // C++20
+    // void eraseWhiteSpace(std::string& str) { std::erase_if(str, isspace); }
+    void eraseWhiteSpace(std::string& str) { str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end()); }
 
     std::vector<std::string> split(const std::string_view str, const std::string_view separators)
     {

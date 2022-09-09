@@ -69,102 +69,102 @@ void UIManager::inputEvent(const InputEvent& event)
 {
     UIWidgetList widgetList;
     switch (event.type) {
-        case Fw::KeyTextInputEvent:
-            m_keyboardReceiver->propagateOnKeyText(event.keyText);
-            break;
-        case Fw::KeyDownInputEvent:
-            m_keyboardReceiver->propagateOnKeyDown(event.keyCode, event.keyboardModifiers);
-            break;
-        case Fw::KeyPressInputEvent:
-            m_keyboardReceiver->propagateOnKeyPress(event.keyCode, event.keyboardModifiers, event.autoRepeatTicks);
-            break;
-        case Fw::KeyUpInputEvent:
-            m_keyboardReceiver->propagateOnKeyUp(event.keyCode, event.keyboardModifiers);
-            break;
-        case Fw::MousePressInputEvent:
-            if (event.mouseButton == Fw::MouseLeftButton && m_mouseReceiver->isVisible()) {
-                UIWidgetPtr pressedWidget = m_mouseReceiver->recursiveGetChildByPos(event.mousePos, false);
-                if (pressedWidget && !pressedWidget->isEnabled())
-                    pressedWidget = nullptr;
-                updatePressedWidget(pressedWidget, event.mousePos);
-            }
+    case Fw::KeyTextInputEvent:
+        m_keyboardReceiver->propagateOnKeyText(event.keyText);
+        break;
+    case Fw::KeyDownInputEvent:
+        m_keyboardReceiver->propagateOnKeyDown(event.keyCode, event.keyboardModifiers);
+        break;
+    case Fw::KeyPressInputEvent:
+        m_keyboardReceiver->propagateOnKeyPress(event.keyCode, event.keyboardModifiers, event.autoRepeatTicks);
+        break;
+    case Fw::KeyUpInputEvent:
+        m_keyboardReceiver->propagateOnKeyUp(event.keyCode, event.keyboardModifiers);
+        break;
+    case Fw::MousePressInputEvent:
+        if (event.mouseButton == Fw::MouseLeftButton && m_mouseReceiver->isVisible()) {
+            UIWidgetPtr pressedWidget = m_mouseReceiver->recursiveGetChildByPos(event.mousePos, false);
+            if (pressedWidget && !pressedWidget->isEnabled())
+                pressedWidget = nullptr;
+            updatePressedWidget(pressedWidget, event.mousePos);
+        }
 
+        m_mouseReceiver->propagateOnMouseEvent(event.mousePos, widgetList);
+        for (const UIWidgetPtr& widget : widgetList) {
+            widget->recursiveFocus(Fw::MouseFocusReason);
+            if (widget->onMousePress(event.mousePos, event.mouseButton))
+                break;
+        }
+
+        break;
+    case Fw::MouseReleaseInputEvent:
+    {
+        // release dragging widget
+        bool accepted = false;
+        if (m_draggingWidget && event.mouseButton == Fw::MouseLeftButton)
+            accepted = updateDraggingWidget(nullptr, event.mousePos);
+
+        if (!accepted) {
             m_mouseReceiver->propagateOnMouseEvent(event.mousePos, widgetList);
-            for (const UIWidgetPtr& widget : widgetList) {
-                widget->recursiveFocus(Fw::MouseFocusReason);
-                if (widget->onMousePress(event.mousePos, event.mouseButton))
-                    break;
-            }
 
-            break;
-        case Fw::MouseReleaseInputEvent:
-        {
-            // release dragging widget
-            bool accepted = false;
-            if (m_draggingWidget && event.mouseButton == Fw::MouseLeftButton)
-                accepted = updateDraggingWidget(nullptr, event.mousePos);
-
-            if (!accepted) {
-                m_mouseReceiver->propagateOnMouseEvent(event.mousePos, widgetList);
-
-                // mouse release is always fired first on the pressed widget
-                if (m_pressedWidget) {
-                    const auto it = std::find(widgetList.begin(), widgetList.end(), m_pressedWidget);
-                    if (it != widgetList.end())
-                        widgetList.erase(it);
-                    widgetList.push_front(m_pressedWidget);
-                }
-
-                for (const UIWidgetPtr& widget : widgetList) {
-                    if (widget->onMouseRelease(event.mousePos, event.mouseButton))
-                        break;
-                }
-            }
-
-            if (m_pressedWidget && event.mouseButton == Fw::MouseLeftButton)
-                updatePressedWidget(nullptr, event.mousePos, !accepted);
-            break;
-        }
-        case Fw::MouseMoveInputEvent:
-        {
-            // start dragging when moving a pressed widget
-            if (m_pressedWidget && m_pressedWidget->isDraggable() && m_draggingWidget != m_pressedWidget) {
-                // only drags when moving more than 4 pixels
-                if ((event.mousePos - m_pressedWidget->getLastClickPosition()).length() >= 4)
-                    updateDraggingWidget(m_pressedWidget, event.mousePos - event.mouseMoved);
-            }
-
-            // mouse move can change hovered widgets
-            updateHoveredWidget(true);
-
-            // first fire dragging move
-            if (m_draggingWidget) {
-                if (m_draggingWidget->onDragMove(event.mousePos, event.mouseMoved))
-                    break;
-            }
-
+            // mouse release is always fired first on the pressed widget
             if (m_pressedWidget) {
-                if (m_pressedWidget->onMouseMove(event.mousePos, event.mouseMoved)) {
-                    break;
-                }
+                const auto it = std::find(widgetList.begin(), widgetList.end(), m_pressedWidget);
+                if (it != widgetList.end())
+                    widgetList.erase(it);
+                widgetList.push_front(m_pressedWidget);
             }
 
-            m_mouseReceiver->propagateOnMouseMove(event.mousePos, event.mouseMoved, widgetList);
             for (const UIWidgetPtr& widget : widgetList) {
-                if (widget->onMouseMove(event.mousePos, event.mouseMoved))
+                if (widget->onMouseRelease(event.mousePos, event.mouseButton))
                     break;
             }
-            break;
         }
-        case Fw::MouseWheelInputEvent:
-            m_rootWidget->propagateOnMouseEvent(event.mousePos, widgetList);
-            for (const UIWidgetPtr& widget : widgetList) {
-                if (widget->onMouseWheel(event.mousePos, event.wheelDirection))
-                    break;
+
+        if (m_pressedWidget && event.mouseButton == Fw::MouseLeftButton)
+            updatePressedWidget(nullptr, event.mousePos, !accepted);
+        break;
+    }
+    case Fw::MouseMoveInputEvent:
+    {
+        // start dragging when moving a pressed widget
+        if (m_pressedWidget && m_pressedWidget->isDraggable() && m_draggingWidget != m_pressedWidget) {
+            // only drags when moving more than 4 pixels
+            if ((event.mousePos - m_pressedWidget->getLastClickPosition()).length() >= 4)
+                updateDraggingWidget(m_pressedWidget, event.mousePos - event.mouseMoved);
+        }
+
+        // mouse move can change hovered widgets
+        updateHoveredWidget(true);
+
+        // first fire dragging move
+        if (m_draggingWidget) {
+            if (m_draggingWidget->onDragMove(event.mousePos, event.mouseMoved))
+                break;
+        }
+
+        if (m_pressedWidget) {
+            if (m_pressedWidget->onMouseMove(event.mousePos, event.mouseMoved)) {
+                break;
             }
-            break;
-        default:
-            break;
+        }
+
+        m_mouseReceiver->propagateOnMouseMove(event.mousePos, event.mouseMoved, widgetList);
+        for (const UIWidgetPtr& widget : widgetList) {
+            if (widget->onMouseMove(event.mousePos, event.mouseMoved))
+                break;
+        }
+        break;
+    }
+    case Fw::MouseWheelInputEvent:
+        m_rootWidget->propagateOnMouseEvent(event.mousePos, widgetList);
+        for (const UIWidgetPtr& widget : widgetList) {
+            if (widget->onMouseWheel(event.mousePos, event.wheelDirection))
+                break;
+        }
+        break;
+    default:
+        break;
     }
 }
 
@@ -304,8 +304,8 @@ void UIManager::onWidgetDestroy(const UIWidgetPtr& widget)
                 if (widget->ref_count() != 1)
                     g_logger.warning(stdext::format("widget '%s' destroyed but still have %d reference(s) left", widget->getId(), widget->getUseCount() - 1));
             }
-        }, 1);
-    }, 1000);
+            }, 1);
+        }, 1000);
 #endif
 }
 
@@ -324,7 +324,8 @@ bool UIManager::importStyle(const std::string& fl)
             importStyleFromOTML(styleNode);
 
         return true;
-    } catch (stdext::exception& e) {
+    }
+    catch (stdext::exception& e) {
         g_logger.error(stdext::format("Failed to import UI styles from '%s': %s", file, e.what()));
         return false;
     }
@@ -376,13 +377,13 @@ void UIManager::importStyleFromOTML(const OTMLNodePtr& styleNode)
 
 OTMLNodePtr UIManager::getStyle(const std::string_view sn)
 {
-    const auto* styleName = sn.data();
+    const auto& styleName = std::string{ sn };
     const auto it = m_styles.find(styleName);
     if (it != m_styles.end())
         return m_styles[styleName];
 
     // styles starting with UI are automatically defined
-    if (sn.starts_with("UI")) {
+    if (stdext::starts_with(styleName, "UI")) {
         OTMLNodePtr node = OTMLNode::create(styleName);
         node->writeAt("__class", styleName);
         m_styles[styleName] = node;
@@ -419,7 +420,8 @@ UIWidgetPtr UIManager::loadUI(const std::string& file, const UIWidgetPtr& parent
         }
 
         return widget;
-    } catch (stdext::exception& e) {
+    }
+    catch (stdext::exception& e) {
         g_logger.error(stdext::format("failed to load UI from '%s': %s", file, e.what()));
         return nullptr;
     }
@@ -430,7 +432,8 @@ UIWidgetPtr UIManager::createWidget(const std::string_view styleName, const UIWi
     const OTMLNodePtr node = OTMLNode::create(styleName);
     try {
         return createWidgetFromOTML(node, parent);
-    } catch (stdext::exception& e) {
+    }
+    catch (stdext::exception& e) {
         g_logger.error(stdext::format("failed to create widget from style '%s': %s", styleName, e.what()));
         return nullptr;
     }
@@ -463,7 +466,8 @@ UIWidgetPtr UIManager::createWidgetFromOTML(const OTMLNodePtr& widgetNode, const
                 styleNode->removeChild(childNode);
             }
         }
-    } else
+    }
+    else
         throw Exception("unable to create widget of type '%s'", widgetType);
 
     widget->callLuaField("onSetup");
