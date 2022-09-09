@@ -82,10 +82,12 @@ bool UIHorizontalLayout::internalUpdate()
     };
 
     if (m_alignRight) {
-        for (auto it = parentWidget->m_children.rbegin(); it != parentWidget->m_children.rend(); ++it)
-            action(*it);
-    } else for (const UIWidgetPtr& widget : parentWidget->m_children)
-        action(widget);
+        for (const UIWidgetPtr& widget : parentWidget->m_children | std::views::reverse)
+            action(widget);
+    } else {
+        for (const UIWidgetPtr& widget : parentWidget->m_children)
+            action(widget);
+    }
 
     preferredWidth -= m_spacing;
     preferredWidth += parentWidget->getPaddingLeft() + parentWidget->getPaddingRight();

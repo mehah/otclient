@@ -74,7 +74,7 @@ protected:
     void save(TiXmlElement* node);
 
 private:
-    stdext::small_storage<SpawnAttr, SpawnAttrLast> m_attribs;
+    stdext::small_dynamic_storage<SpawnAttr, SpawnAttrLast> m_attribs;
     CreatureMap m_creatures;
     friend class CreatureManager;
 };
@@ -103,7 +103,7 @@ public:
     CreaturePtr cast();
 
 private:
-    stdext::small_storage<CreatureAttr, CreatureAttrLast> m_attribs;
+    stdext::small_dynamic_storage<CreatureAttr, CreatureAttrLast> m_attribs;
 };
 
 class CreatureManager

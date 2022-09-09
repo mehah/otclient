@@ -153,5 +153,5 @@ private:
     ItemCategory m_category{ ItemCategoryInvalid };
     bool m_null{ true };
 
-    stdext::small_storage<ItemTypeAttr, ItemTypeAttrLast> m_attribs;
+    stdext::small_dynamic_storage<ItemTypeAttr, ItemTypeAttrLast> m_attribs;
 };
