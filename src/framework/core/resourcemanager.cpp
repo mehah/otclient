@@ -21,7 +21,6 @@
  */
 
 #include <filesystem>
-#include <ranges>
 
 #include "resourcemanager.h"
 #include "filestream.h"
@@ -147,7 +146,9 @@ bool ResourceManager::removeSearchPath(const std::string& path)
 void ResourceManager::searchAndAddPackages(const std::string& packagesDir, const std::string& packageExt)
 {
     auto files = listDirectoryFiles(packagesDir);
-    for (const auto& file : files | std::views::reverse) {
+    for (auto it = files.rbegin(); it != files.rend(); ++it) {
+        const auto& file = *it;
+
         if (!file.ends_with(packageExt))
             continue;
         std::string package = getRealDir(packagesDir) + "/" + file;

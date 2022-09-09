@@ -9,7 +9,7 @@
 
 ### Features
 
-- C++20
+- C++17
 - Refactored/Optimized Rendering System
 - New Light System
 - Idle Animation Support

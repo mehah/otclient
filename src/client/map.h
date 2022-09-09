@@ -283,7 +283,7 @@ private:
 
     stdext::map<uint32_t, Color> m_zoneColors;
 
-    stdext::small_dynamic_storage<OTBM_ItemAttr, OTBM_ATTR_LAST> m_attribs;
+    stdext::small_storage<OTBM_ItemAttr, OTBM_ATTR_LAST> m_attribs;
 
     uint8_t m_animationFlags{ 0 };
     uint32_t m_zoneFlags{ 0 };
