@@ -29,7 +29,7 @@
 
 UIGridLayout::UIGridLayout(UIWidgetPtr parentWidget) : UILayout(std::move(parentWidget))
 {
-    m_cellSize = { 16 };
+    m_cellSize = 16;
     m_cellSpacing = 0;
     m_numColumns = 1;
     m_numLines = 0;
@@ -120,7 +120,7 @@ bool UIGridLayout::internalUpdate()
         // must set the preferred height later
         g_dispatcher.addEvent([=] {
             parentWidget->setHeight(preferredHeight);
-        });
+            });
     }
 
     return changed;

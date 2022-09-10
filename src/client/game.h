@@ -34,7 +34,7 @@
 
 struct UnjustifiedPoints
 {
-    bool operator==(const UnjustifiedPoints& other)
+    bool operator==(const UnjustifiedPoints& other) const
     {
         return killsDay == other.killsDay &&
             killsDayRemaining == other.killsDayRemaining &&
@@ -127,7 +127,7 @@ protected:
 
     // outfit
     void processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<int, std::string, int> >& outfitList,
-                                 const std::vector<std::tuple<int, std::string> >& mountList);
+        const std::vector<std::tuple<int, std::string> >& mountList);
 
     // npc trade
     static void processOpenNpcTrade(const std::vector<std::tuple<ItemPtr, std::string, int, int, int> >& items);
@@ -149,8 +149,8 @@ protected:
 
     // modal dialogs >= 970
     static void processModalDialog(uint32_t id, const std::string_view title, const std::string_view message, const std::vector<std::tuple<int, std::string> >
-                                   & buttonList, int enterButton, int escapeButton, const std::vector<std::tuple<int, std::string> >
-                                   & choiceList, bool priority);
+        & buttonList, int enterButton, int escapeButton, const std::vector<std::tuple<int, std::string> >
+        & choiceList, bool priority);
 
     friend class ProtocolGame;
     friend class Map;

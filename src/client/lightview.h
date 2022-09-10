@@ -36,7 +36,7 @@ public:
     void draw(const Rect& dest, const Rect& src);
 
     void addLightSource(const Point& pos, const Light& light);
-    void addShade(const Point& pos, const float opacity) { m_sources.emplace_back(pos, 0, 0, opacity); }
+    void addShade(const Point& pos, const float opacity) { m_sources.emplace_back(pos, opacity); }
 
     void setGlobalLight(const Light& light)
     {
@@ -53,6 +53,9 @@ public:
 private:
     struct Source
     {
+        Source(const Point& p, float o) : pos(p), opacity(o) {};
+        Source(const Point& p, uint8_t c, uint16_t i, float o) : pos(p), color(c), intensity(i), opacity(o) {};
+
         Point pos;
         uint8_t color{ 0 };
         uint16_t intensity{ 0 };

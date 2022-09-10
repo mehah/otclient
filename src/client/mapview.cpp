@@ -82,12 +82,12 @@ MapView::MapView()
         }
 
         g_painter->setOpacity(fadeOpacity);
-    });
+        });
 
     mapPool->onAfterDraw([&] {
         g_painter->resetShaderProgram();
         g_painter->resetOpacity();
-    });
+        });
 
     m_shadowBuffer = std::make_shared<DrawBuffer>(DrawPool::DrawOrder::FIFTH, false);
     m_shader = g_shaders.getDefaultMapShader();
@@ -488,7 +488,7 @@ void MapView::onMouseMove(const Position& mousePos, const bool /*isVirtualMove*/
         }
 
         if (m_drawHighlightTarget) {
-            if (m_lastHighlightTile = (m_shiftPressed ? getTopTile(mousePos) : g_map.getTile(mousePos)))
+            if ((m_lastHighlightTile = (m_shiftPressed ? getTopTile(mousePos) : g_map.getTile(mousePos))))
                 m_lastHighlightTile->select(m_shiftPressed);
         }
     }
@@ -810,35 +810,35 @@ void MapView::updateViewportDirectionCache()
         vp.left = vp.right;
 
         switch (dir) {
-            case Otc::North:
-            case Otc::South:
-                vp.top += 1;
-                vp.bottom += 1;
-                break;
+        case Otc::North:
+        case Otc::South:
+            vp.top += 1;
+            vp.bottom += 1;
+            break;
 
-            case Otc::West:
-            case Otc::East:
-                vp.right += 1;
-                vp.left += 1;
-                break;
+        case Otc::West:
+        case Otc::East:
+            vp.right += 1;
+            vp.left += 1;
+            break;
 
-            case Otc::NorthEast:
-            case Otc::SouthEast:
-            case Otc::NorthWest:
-            case Otc::SouthWest:
-                vp.left += 1;
-                vp.bottom += 1;
-                vp.top += 1;
-                vp.right += 1;
-                break;
+        case Otc::NorthEast:
+        case Otc::SouthEast:
+        case Otc::NorthWest:
+        case Otc::SouthWest:
+            vp.left += 1;
+            vp.bottom += 1;
+            vp.top += 1;
+            vp.right += 1;
+            break;
 
-            case Otc::InvalidDirection:
-                vp.left -= 1;
-                vp.right -= 1;
-                break;
+        case Otc::InvalidDirection:
+            vp.left -= 1;
+            vp.right -= 1;
+            break;
 
-            default:
-                break;
+        default:
+            break;
         }
     }
 }
