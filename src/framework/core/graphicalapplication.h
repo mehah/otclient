@@ -65,7 +65,6 @@ private:
     bool m_optimize{ true };
     bool m_forceEffectOptimization{ false };
     bool m_drawEffectOnTop{ false };
-    bool m_repaint{ true };
 
     Timer m_foregroundRefreshTime;
 

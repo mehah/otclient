@@ -663,7 +663,7 @@ void Tile::checkTranslucentLight()
 
 bool Tile::checkForDetachableThing()
 {
-    if (m_highlight.thing = getTopCreature())
+    if ((m_highlight.thing = getTopCreature()))
         return true;
 
     if (m_highlightWithoutFilter) {
@@ -824,7 +824,7 @@ void Tile::select(const bool noFilter)
         if (highLight.invertedColorSelection ? highLight.fadeLevel > HIGHTLIGHT_FADE_END : highLight.fadeLevel < HIGHTLIGHT_FADE_START) {
             highLight.invertedColorSelection = !highLight.invertedColorSelection;
         }
-    }, 40);
+        }, 40);
 }
 
 void Tile::unselect()

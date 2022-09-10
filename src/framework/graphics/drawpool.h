@@ -112,7 +112,7 @@ protected:
     struct DrawObject
     {
         DrawObject(std::function<void()> action) : action(std::move(action)) {}
-        DrawObject(const PoolState& state, const DrawBufferPtr& buffer) : state(state), buffer(buffer) {}
+        DrawObject(const PoolState& state, const DrawBufferPtr& buffer) : buffer(buffer), state(state) {}
         DrawObject(const DrawMode drawMode, const PoolState& state, const DrawMethod& method) :
             drawMode(drawMode), state(state), method(method)
         {}
@@ -156,8 +156,8 @@ private:
     }
 
     void add(const Color& color, const TexturePtr& texture, const DrawPool::DrawMethod& method,
-             DrawMode drawMode = DrawMode::TRIANGLES, const DrawBufferPtr& drawBuffer = nullptr,
-             const CoordsBufferPtr& coordsBuffer = nullptr);
+        DrawMode drawMode = DrawMode::TRIANGLES, const DrawBufferPtr& drawBuffer = nullptr,
+        const CoordsBufferPtr& coordsBuffer = nullptr);
 
     void addCoords(const DrawPool::DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode);
     void updateHash(const PoolState& state, const DrawPool::DrawMethod& method, size_t& stateHash, size_t& methodHash);

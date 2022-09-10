@@ -510,7 +510,13 @@ namespace Otc
         GameMapOldEffectRendering = 80,
         GameMapDontCorrectCorpse = 81,
         GamePrey = 82,
-
+        GameThingQuickLoot = 83,
+        GameThingQuiver = 84,
+        GameThingPodium = 85,
+        GameThingUpgradeClassification = 86,
+        GameThingCounter = 87,
+        GameThingClock = 88,
+        GameThingPodiumItemType = 89,
         LastGameFeature = 101
     };
 

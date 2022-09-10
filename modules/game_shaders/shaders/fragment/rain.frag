@@ -11,7 +11,8 @@ uniform vec2 u_WalkOffset;
 
 float rainLayer(vec2 uv, float scale, float ttime)
 {
-  float w = smoothstep(1., 0., -uv.y * (scale / 5.)); if (w < .1) return 0.0;
+  float w = smoothstep(1., 0., -uv.y * (scale / 5.));
+  if (w < .1) return 0.0;
 
   uv += ttime * 0.5 / scale;
   uv.y += ttime * 2.5 / scale;
@@ -47,8 +48,6 @@ void main(void)
   rain += rainLayer(uv, 3.0, ttime);
   rain += rainLayer(uv, 4.0, ttime);
 
-  float opacity = (0.15);
-
-  vec3 _output = Game + rain * opacity;
-  gl_FragColor = vec4(_output, 1.0);
+  float opacity = 0.6;
+  gl_FragColor = vec4(Game + rain * opacity);
 }

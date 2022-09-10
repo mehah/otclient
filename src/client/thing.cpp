@@ -98,7 +98,7 @@ void Thing::generateBuffer()
         order = DrawPool::DrawOrder::SECOND;
     else if ((isCommon() || isOnBottom()) && isSingleDimension() && !hasDisplacement() && isNotMoveable())
         order = DrawPool::DrawOrder::THIRD;
-    else if (isTopGround() || g_app.isDrawingEffectsOnTop() && isEffect())
+    else if (isTopGround() || (g_app.isDrawingEffectsOnTop() && isEffect()))
         order = DrawPool::DrawOrder::FOURTH;
     else if (isMissile())
         order = DrawPool::DrawOrder::FIFTH;
