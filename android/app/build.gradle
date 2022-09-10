@@ -17,7 +17,9 @@ android {
         externalNativeBuild {
             cmake {
                 def vcpkg_toolchain_file = System.getenv('VCPKG_ROOT') + "/scripts/buildsystems/vcpkg.cmake"
-                def android_toolchain_file = System.getenv('ANDROID_NDK_HOME') + "/build/cmake/android.toolchain.cmake"
+                def ndkDir = new File("${project.android.sdkDirectory}/ndk")
+                def ndkRootDir = ndkDir.listFiles()[0]
+                def android_toolchain_file = "$ndkRootDir/build/cmake/android.toolchain.cmake"
                 cppFlags '-std=c++20'
                 arguments "-DCMAKE_TOOLCHAIN_FILE=${vcpkg_toolchain_file}",
                           "-DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=${android_toolchain_file}",
@@ -44,7 +46,7 @@ android {
     externalNativeBuild {
         cmake {
             path file('../../CMakeLists.txt')
-            version '3.24.1'
+            version '3.22.1'
         }
     }
     buildFeatures {
