@@ -33,14 +33,30 @@
 
 namespace stdext
 {
+    // C++20
+    // str::ends_with
+    bool ends_with(const std::string& str, const std::string& test) {
+        return str.size() >= test.size() && 0 == str.compare(str.size() - test.size(), test.size(), test);
+    }
+
+    // C++20
+    // str::starts_with
+    bool starts_with(const std::string& str, const std::string& test) {
+        return str.size() >= test.size() && 0 == str.compare(0, test.size(), test);
+    }
+
+    // C++20
+    // void eraseWhiteSpace(std::string& str) { std::erase_if(str, isspace); }
+    void eraseWhiteSpace(std::string& str) { str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end()); }
+
     std::string resolve_path(const std::string_view filePath, std::string_view sourcePath)
     {
         const std::string _filePath{ filePath };
-        if (stdext::starts_with(_filePath, "/"))
+        if (starts_with(_filePath, "/"))
             return _filePath;
 
         std::string _sourcePath{ sourcePath };
-        if (!stdext::ends_with(_sourcePath, "/")) {
+        if (!ends_with(_sourcePath, "/")) {
             const std::size_t slashPos = sourcePath.find_last_of('/');
             if (slashPos == std::string::npos)
                 throw Exception("invalid source path '%s', for file '%s'", sourcePath, filePath);
@@ -270,21 +286,6 @@ namespace stdext
         }
     }
 
-    // C++20
-    // str::ends_with
-    bool ends_with(const std::string& str, const std::string& test) {
-        return str.size() >= test.size() && 0 == str.compare(str.size() - test.size(), test.size(), test);
-    }
-
-    // C++20
-    // str::starts_with
-    bool starts_with(const std::string& str, const std::string& test) {
-        return str.size() >= test.size() && 0 == str.compare(0, test.size(), test);
-    }
-
-    // C++20
-    // void eraseWhiteSpace(std::string& str) { std::erase_if(str, isspace); }
-    void eraseWhiteSpace(std::string& str) { str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end()); }
 
     std::vector<std::string> split(const std::string_view str, const std::string_view separators)
     {

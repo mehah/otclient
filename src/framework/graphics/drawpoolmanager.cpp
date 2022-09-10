@@ -85,7 +85,8 @@ void DrawPoolManager::draw()
                 pf->m_framebuffer->draw();
                 if (pf->m_afterDraw) pf->m_afterDraw();
             }
-        } else for (const auto& obj : pool->m_objects[0][static_cast<int>(DrawPool::DrawOrder::FIRST)]) {
+        }
+        else for (const auto& obj : pool->m_objects[0][static_cast<int>(DrawPool::DrawOrder::FIRST)]) {
             drawObject(obj);
         }
 
@@ -108,7 +109,8 @@ void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)
 
         if (!obj.methods.has_value()) {
             m_currentPool->addCoords(*obj.method, buffer, obj.drawMode);
-        } else for (const auto& method : *obj.methods) {
+        }
+        else for (const auto& method : *obj.methods) {
             m_currentPool->addCoords(method, buffer, obj.drawMode);
         }
     }
@@ -150,9 +152,10 @@ void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& textur
         return;
 
     const DrawPool::DrawMethod method{
-        .type = DrawPool::DrawMethodType::RECT,
-        .rects = std::make_pair(dest, src),
-        .dest = originalDest.isNull() ? std::optional<Point>{} : originalDest
+        DrawPool::DrawMethodType::RECT,
+        std::make_pair(dest, src),
+        {/* points */},
+        originalDest.isNull() ? std::optional<Point>{} : originalDest
     };
 
     if (buffer)
@@ -196,7 +199,7 @@ void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Po
     if (a == b || a == c || b == c)
         return;
 
-    const DrawPool::DrawMethod method{ .type = DrawPool::DrawMethodType::TRIANGLE, .points = std::make_tuple(a, b, c) };
+    const DrawPool::DrawMethod method{ DrawPool::DrawMethodType::TRIANGLE, {/* rects */}, std::make_tuple(a, b, c) };
 
     m_currentPool->add(color, nullptr, method);
 }
@@ -207,9 +210,10 @@ void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, int 
         return;
 
     const DrawPool::DrawMethod method{
-        .type = DrawPool::DrawMethodType::BOUNDING_RECT,
-        .rects = std::make_pair(dest, Rect()),
-        .intValue = static_cast<uint16_t>(innerLineWidth)
+        DrawPool::DrawMethodType::BOUNDING_RECT,
+        std::make_pair(dest, Rect()),
+        {/* points */}, {/* dest */},
+        static_cast<uint16_t>(innerLineWidth)
     };
 
     m_currentPool->add(color, nullptr, method);

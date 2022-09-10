@@ -23,7 +23,7 @@
 #pragma once
 
 #include <string>
-#include <stduuid/uuid.h>
+#include "uuid.h"
 
 #ifdef USE_GMP
 #include <gmp.h>

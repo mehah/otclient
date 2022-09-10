@@ -332,7 +332,7 @@
     </ClCompile>
     <ClCompile Include="..\src\framework\stdext\uri.cpp">
       <Filter>Source Files\framework\stdext</Filter>
-    </ClCompile>    
+    </ClCompile>
     <ClCompile Include="..\src\framework\ui\uianchorlayout.cpp">
       <Filter>Source Files\framework\ui</Filter>
     </ClCompile>
@@ -1048,6 +1048,9 @@
     </ClInclude>
     <ClInclude Include="..\src\protobuf\appearances.pb.h">
       <Filter>Header Files\protobuf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\util\uuid.h">
+      <Filter>Header Files\framework\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -444,6 +444,7 @@ IF %ERRORLEVEL% EQU 0 (
     <ClInclude Include="..\src\framework\util\point.h" />
     <ClInclude Include="..\src\framework\util\rect.h" />
     <ClInclude Include="..\src\framework\util\size.h" />
+    <ClInclude Include="..\src\framework\util\uuid.h" />
     <ClInclude Include="..\src\framework\xml\tinystr.h" />
     <ClInclude Include="..\src\framework\xml\tinyxml.h" />
     <ClInclude Include="..\src\protobuf\appearances.pb.h" />
