@@ -28,5 +28,5 @@
 #ifndef _MSC_VER
 #define GLEW_STATIC
 #endif
-#include <gl/glew.h>
+#include <GL/glew.h>
 #endif
