@@ -288,7 +288,7 @@ std::string AndroidWindow::getClipboardText() {
     return "";
 }
 
-void AndroidWindow::setClipboardText(const std::string& text) {
+void AndroidWindow::setClipboardText(const std::string_view text) {
     // TODO
 }
 
@@ -323,7 +323,7 @@ void AndroidWindow::setMouseCursor(int cursorId) {}
 
 void AndroidWindow::restoreMouseCursor() {}
 
-void AndroidWindow::setTitle(const std::string& title) {}
+void AndroidWindow::setTitle(const std::string_view title) {}
 
 void AndroidWindow::setMinimumSize(const Size& minimumSize) {}
 
