@@ -188,21 +188,21 @@ endif()
 if(TOGGLE_DIRECTX)
 	find_package(DirectX REQUIRED)
 endif()
-if(ANDROID)
-	set(Libs_DIR ${Libs_DIR} ${CMAKE_SOURCE_DIR}/android/app/libs)
-	set(LUAJIT_INCLUDE_DIR ${LUAJIT_INCLUDE_DIR} ${Libs_DIR}/include/luajit)
-	set(LUAJIT_LIBRARY ${LUAJIT_LIBRARY} ${Libs_DIR}/lib/${CMAKE_ANDROID_ARCH_ABI}/libluajit.a)
-	find_package(game-activity REQUIRED CONFIG)
-	find_package(EGL REQUIRED)
-else()
-	find_package(OpenGL REQUIRED)
-	find_package(GLEW REQUIRED)
-endif()
 if(TOGGLE_FRAMEWORK_SOUND)
 	find_package(OpenAL CONFIG REQUIRED)
 	find_package(VorbisFile REQUIRED)
 	find_package(Vorbis CONFIG REQUIRED)
 	find_package(Ogg CONFIG REQUIRED)
+endif()
+if(ANDROID)
+	set(Libs_DIR ${Libs_DIR} ${CMAKE_SOURCE_DIR}/android/app/libs)
+	set(LUAJIT_LIBRARY ${LUAJIT_LIBRARY} ${Libs_DIR}/lib/${CMAKE_ANDROID_ARCH_ABI}/libluajit.a)
+	set(OpenAL_LIBRARY ${OpenAL_LIBRARY} ${Libs_DIR}/lib/${CMAKE_ANDROID_ARCH_ABI}/libopenal.a)
+	find_package(game-activity REQUIRED CONFIG)
+	find_package(EGL REQUIRED)
+else()
+	find_package(OpenGL REQUIRED)
+	find_package(GLEW REQUIRED)
 endif()
 
 # *****************************************************************************
@@ -452,6 +452,7 @@ elseif(ANDROID)
 		${EGL_LIBRARY}
 		${OGG_LIBRARY}
 		${GMP_LIBRARY}
+		${OpenAL_LIBRARY}
 		${OPENSSL_LIBRARIES}
 		${STDUUID}
 
