@@ -34,6 +34,7 @@ void Graphics::init()
     g_logger.info(stdext::format("GPU %s", glGetString(GL_RENDERER)));
     g_logger.info(stdext::format("OpenGL %s", glGetString(GL_VERSION)));
 
+#ifndef OPENGL_ES
     // init GL extensions
     if (const GLenum err = glewInit(); err != GLEW_OK)
         g_logger.fatal(stdext::format("Unable to init GLEW: %s", glewGetErrorString(err)));
@@ -47,6 +48,7 @@ void Graphics::init()
         glCheckFramebufferStatus = glCheckFramebufferStatusEXT;
         glGenerateMipmap = glGenerateMipmapEXT;
     }
+#endif
 
     // blending is always enabled
     glEnable(GL_BLEND);

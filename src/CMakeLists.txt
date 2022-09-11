@@ -189,11 +189,10 @@ if(TOGGLE_DIRECTX)
 	find_package(DirectX REQUIRED)
 endif()
 if(ANDROID)
-	find_package(game-activity REQUIRED CONFIG)
 	set(Libs_DIR ${Libs_DIR} ${CMAKE_SOURCE_DIR}/android/app/libs)
 	set(LUAJIT_INCLUDE_DIR ${LUAJIT_INCLUDE_DIR} ${Libs_DIR}/include/luajit)
 	set(LUAJIT_LIBRARY ${LUAJIT_LIBRARY} ${Libs_DIR}/lib/${CMAKE_ANDROID_ARCH_ABI}/libluajit.a)
-	find_package(OpenGLES2 REQUIRED)
+	find_package(game-activity REQUIRED CONFIG)
 	find_package(EGL REQUIRED)
 else()
 	find_package(OpenGL REQUIRED)
@@ -440,7 +439,6 @@ elseif(ANDROID)
 		${OPENSSL_INCLUDE_DIR}
 		${PHYSFS_INCLUDE_DIR}
 		${EGL_INCLUDE_DIR}
-		${OPENGLES2_INCLUDE_DIR}
 		${PARALLEL_HASHMAP_INCLUDE_DIRS}
 		${NLOHMANN_JSON_INCLUDE_DIR}
 	)
@@ -452,7 +450,6 @@ elseif(ANDROID)
 		${PROTOBUF_LIBRARY}
 		${NLOHMANN_JSON_LIBRARY}
 		${EGL_LIBRARY}
-		${OpenGLES2_LIBRARIES}
 		${OGG_LIBRARY}
 		${GMP_LIBRARY}
 		${OPENSSL_LIBRARIES}
@@ -464,6 +461,7 @@ elseif(ANDROID)
 		Vorbis::vorbisfile
 		LibLZMA::LibLZMA
 		game-activity::game-activity
+		GLESv3
 		android
 		log
 	)
