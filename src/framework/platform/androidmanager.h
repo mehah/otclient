@@ -38,6 +38,8 @@ public:
 
     std::string getStringFromJString(jstring);
     std::string getAppBaseDir();
+
+    void attachToAppMainThread();
 private:
     JNIEnv* getJNIEnv();
 

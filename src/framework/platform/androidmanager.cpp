@@ -69,6 +69,10 @@ std::string AndroidManager::getStringFromJString(jstring text) {
     return newText;
 }
 
+void AndroidManager::attachToAppMainThread() {
+    getJNIEnv();
+}
+
 JNIEnv* AndroidManager::getJNIEnv() {
     JNIEnv *env;
 
