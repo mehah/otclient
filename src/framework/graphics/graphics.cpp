@@ -20,11 +20,11 @@
  * THE SOFTWARE.
  */
 
+#include "graphics.h"
 #include "fontmanager.h"
 
 #include "framebuffermanager.h"
 #include "texturemanager.h"
-#include <framework/graphics/graphics.h>
 #include <framework/platform/platformwindow.h>
 
 Graphics g_graphics;

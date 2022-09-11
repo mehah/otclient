@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include <GL/glew.h>
+#include "glutil.h"
 #include <framework/luaengine/luaobject.h>
 
 #include "shader.h"

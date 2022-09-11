@@ -43,6 +43,8 @@
 
 namespace Fw
 {
+    // clang c++20 dont support std::numbers::pi
+    static constexpr float pi = 3.141592653589793f;
     static constexpr float MIN_ALPHA = 0.003f;
 
     enum Key : unsigned char

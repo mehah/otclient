@@ -23,7 +23,7 @@
 #pragma once
 
 #include "declarations.h"
-#include <GL/glew.h>
+#include "glutil.h"
 
  // @bindsingleton g_graphics
 class Graphics

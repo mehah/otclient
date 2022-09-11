@@ -23,7 +23,6 @@
 #include "uiverticallayout.h"
 #include "uiwidget.h"
 #include <framework/core/eventdispatcher.h>
-#include <ranges>
 
 void UIVerticalLayout::applyStyle(const OTMLNodePtr& styleNode)
 {
@@ -84,12 +83,10 @@ bool UIVerticalLayout::internalUpdate()
     };
 
     if (m_alignBottom) {
-        for (const UIWidgetPtr& widget : parentWidget->m_children | std::views::reverse)
-            action(widget);
-    } else {
-        for (const UIWidgetPtr& widget : parentWidget->m_children)
-            action(widget);
-    }
+        for (auto it = parentWidget->m_children.rbegin(); it != parentWidget->m_children.rend(); ++it)
+            action(*it);
+    } else for (const UIWidgetPtr& widget : parentWidget->m_children)
+        action(widget);
 
     preferredHeight -= m_spacing;
     preferredHeight += parentWidget->getPaddingTop() + parentWidget->getPaddingBottom();
@@ -98,7 +95,7 @@ bool UIVerticalLayout::internalUpdate()
         // must set the preferred width later
         g_dispatcher.addEvent([=] {
             parentWidget->setHeight(preferredHeight);
-        });
+                              });
     }
 
     return changed;

@@ -23,7 +23,6 @@
 #include "uihorizontallayout.h"
 #include "uiwidget.h"
 #include <framework/core/eventdispatcher.h>
-#include <ranges>
 
 void UIHorizontalLayout::applyStyle(const OTMLNodePtr& styleNode)
 {
@@ -82,12 +81,10 @@ bool UIHorizontalLayout::internalUpdate()
     };
 
     if (m_alignRight) {
-        for (const UIWidgetPtr& widget : parentWidget->m_children | std::views::reverse)
-            action(widget);
-    } else {
-        for (const UIWidgetPtr& widget : parentWidget->m_children)
-            action(widget);
-    }
+        for (auto it = parentWidget->m_children.rbegin(); it != parentWidget->m_children.rend(); ++it)
+            action(*it);
+    } else for (const UIWidgetPtr& widget : parentWidget->m_children)
+        action(widget);
 
     preferredWidth -= m_spacing;
     preferredWidth += parentWidget->getPaddingLeft() + parentWidget->getPaddingRight();
@@ -96,7 +93,7 @@ bool UIHorizontalLayout::internalUpdate()
         // must set the preferred width later
         g_dispatcher.addEvent([=] {
             parentWidget->setWidth(preferredWidth);
-        });
+                              });
     }
 
     return changed;
