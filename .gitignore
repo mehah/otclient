@@ -11,6 +11,7 @@
 *.sln.docstates
 .idea/
 .vscode/
+vcpkg_installed/
 
 # Build results
 
