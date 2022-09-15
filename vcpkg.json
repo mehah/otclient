@@ -15,10 +15,7 @@
     "liblzma",
     "parallel-hashmap",
     "stduuid",
-    {
-      "name": "luajit",
-      "platform": "!android"
-    },
+    "luajit",
     {
       "name": "glew",
       "platform": "windows"

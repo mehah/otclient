@@ -19,6 +19,11 @@ endif()
 set(VCPKG_FEATURE_FLAGS "versions")
 set(VCPKG_BUILD_TYPE "release")
 
+if (VCPKG_TARGET_ANDROID)
+    include("cmake/vcpkg_android.cmake")
+	set(Android_LIBRARIES ${Android_LIBRARIES} ${CMAKE_SOURCE_DIR}/android/app/libs/lib/${CMAKE_ANDROID_ARCH_ABI})
+endif()
+
 # *****************************************************************************
 # Project otclient
 # *****************************************************************************
@@ -45,10 +50,6 @@ option(OPTIONS_ENABLE_IPO "Check and Enable interprocedural optimization (IPO/LT
 # *****************************************************************************
 # Options Code
 # *****************************************************************************
-
-if (ANDROID)
-	include(android/CMakeLists.txt)
-endif()
 
 # === CCACHE ===
 if(OPTIONS_ENABLE_CCACHE)
