@@ -327,14 +327,6 @@ set(SOURCE_FILES
 	framework/platform/win32platform.cpp
 	framework/platform/win32window.cpp
 	framework/platform/x11window.cpp
-	framework/sound/combinedsoundsource.cpp
-	framework/sound/oggsoundfile.cpp
-	framework/sound/soundbuffer.cpp
-	framework/sound/soundchannel.cpp
-	framework/sound/soundfile.cpp
-	framework/sound/soundmanager.cpp
-	framework/sound/soundsource.cpp
-	framework/sound/streamsoundsource.cpp
 	framework/stdext/demangle.cpp
 	framework/stdext/math.cpp
 	framework/stdext/net.cpp
@@ -365,6 +357,19 @@ set(SOURCE_FILES
 	main.cpp
 	androidmain.cpp
 )
+
+if (TOGGLE_FRAMEWORK_SOUND)
+	set(SOURCE_FILES ${SOURCE_FILES}
+		framework/sound/combinedsoundsource.cpp
+		framework/sound/oggsoundfile.cpp
+		framework/sound/soundbuffer.cpp
+		framework/sound/soundchannel.cpp
+		framework/sound/soundfile.cpp
+		framework/sound/soundmanager.cpp
+		framework/sound/soundsource.cpp
+		framework/sound/streamsoundsource.cpp
+	)
+endif()
 
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES})
 
