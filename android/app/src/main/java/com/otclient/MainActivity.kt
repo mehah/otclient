@@ -14,7 +14,6 @@ class MainActivity : GameActivity() {
         super.onCreate(savedInstanceState)
         val binding = ActivityMainBinding.inflate(layoutInflater)
         findViewById<ViewGroup>(contentViewId).addView(binding.root)
-        GameDataManager().initialize(this)
         AndroidManager(
             editText = binding.editText,
         ).apply { nativeInit() }

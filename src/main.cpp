@@ -58,6 +58,11 @@ int main(int argc, const char* argv[])
         g_http.init();
     #endif
 
+#ifdef ANDROID
+    // Unzip Android assets/data.zip
+    g_androidManager.unZipAssetData();
+#endif
+
     // find script init.lua and run it
     if (!g_resources.discoverWorkDir("init.lua"))
         g_logger.fatal("Unable to find work directory, the application cannot be initialized.");

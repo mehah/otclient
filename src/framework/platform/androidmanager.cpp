@@ -23,6 +23,8 @@
 
 #include "androidmanager.h"
 #include <framework/global.h>
+#include <framework/core/unzipper.h>
+#include <framework/core/resourcemanager.h>
 
 AndroidManager g_androidManager;
 
@@ -55,6 +57,30 @@ void AndroidManager::hideKeyboard() {
     env->CallVoidMethod(m_androidManagerJObject, m_midHideSoftKeyboard);
 }
 
+void AndroidManager::unZipAssetData() {
+    std::string destFolder = getAppBaseDir() + "/game_data/";
+
+    const std::filesystem::path initLua { destFolder + "init.lua" };
+    if (std::filesystem::exists(initLua)) {
+        return;
+    }
+
+    AAsset* dataAsset = AAssetManager_open(
+            m_app->activity->assetManager,
+            "data.zip",
+            AASSET_MODE_BUFFER);
+
+    auto dataFileLength = AAsset_getLength(dataAsset);
+    char* dataContent = (char *) malloc(dataFileLength + 1);
+    AAsset_read(dataAsset, dataContent, dataFileLength);
+    dataContent[dataFileLength] = '\0';
+
+    unzipper::extract(dataContent, dataFileLength, destFolder);
+
+    AAsset_close(dataAsset);
+    delete [] dataContent;
+}
+
 std::string AndroidManager::getAppBaseDir() {
     return { m_app->activity->internalDataPath };
 }
@@ -62,7 +88,7 @@ std::string AndroidManager::getAppBaseDir() {
 std::string AndroidManager::getStringFromJString(jstring text) {
     JNIEnv* env = getJNIEnv();
 
-    const char* newChar = env->GetStringUTFChars(text,NULL);
+    const char* newChar = env->GetStringUTFChars(text,nullptr);
     std::string newText = newChar;
     env->ReleaseStringUTFChars(text, newChar);
 

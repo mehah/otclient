@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2014 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,38 +20,11 @@
  * THE SOFTWARE.
  */
 
-#ifndef ANDROIDMANAGER_H
-#define ANDROIDMANAGER_H
+#pragma once
 
-#include <game-activity/native_app_glue/android_native_app_glue.h>
 #include <string>
 
-class AndroidManager {
-public:
-    ~AndroidManager();
+namespace unzipper {
 
-    void setAndroidApp(android_app*);
-    void setAndroidManager(JNIEnv*, jobject);
-
-    void showKeyboardSoft();
-    void hideKeyboard();
-
-    void unZipAssetData();
-
-    std::string getStringFromJString(jstring);
-    std::string getAppBaseDir();
-
-    void attachToAppMainThread();
-private:
-    JNIEnv* getJNIEnv();
-
-    android_app* m_app;
-    JavaVM* m_javaVM;
-    jobject m_androidManagerJObject;
-    jmethodID m_midShowSoftKeyboard;
-    jmethodID m_midHideSoftKeyboard;
+    void extract(const char* fileBuffer, uint fileLength, std::string& destinationPath);
 };
-
-extern AndroidManager g_androidManager;
-
-#endif

@@ -197,6 +197,8 @@ endif()
 if(ANDROID)
 	set(LUAJIT_LIBRARY ${LUAJIT_LIBRARY} ${Android_LIBRARIES}/libluajit.a)
 	set(OpenAL_LIBRARY ${OpenAL_LIBRARY} ${Android_LIBRARIES}/libopenal.a)
+	set(MINIZIP_INCLUDE_DIR ${MINIZIP_INCLUDE_DIR} ${Android_INCLUDES}/minizip)
+	set(MINIZIP_LIBRARY ${MINIZIP_LIBRARY} ${Android_LIBRARIES}/libminizip.a)
 	find_package(game-activity REQUIRED CONFIG)
 	find_package(EGL REQUIRED)
 else()
@@ -266,6 +268,8 @@ set(SOURCE_FILES
 	framework/core/modulemanager.cpp
 	framework/core/resourcemanager.cpp
 	framework/core/scheduledevent.cpp
+	framework/core/unzipper.cpp
+	framework/core/unzipper.h
 	framework/core/timer.cpp
 	framework/graphics/animatedtexture.cpp
 	framework/graphics/apngloader.cpp
@@ -440,6 +444,7 @@ elseif(ANDROID)
 		${EGL_INCLUDE_DIR}
 		${PARALLEL_HASHMAP_INCLUDE_DIRS}
 		${NLOHMANN_JSON_INCLUDE_DIR}
+		${MINIZIP_INCLUDE_DIR}
 	)
 	target_link_libraries(${PROJECT_NAME}
 		PRIVATE
@@ -454,6 +459,7 @@ elseif(ANDROID)
 		${OpenAL_LIBRARY}
 		${OPENSSL_LIBRARIES}
 		${STDUUID}
+		${MINIZIP_LIBRARY}
 
 		Threads::Threads
 		asio::asio
