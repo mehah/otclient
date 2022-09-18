@@ -207,7 +207,7 @@ public:
     Light getLight() { return m_attribs.get<Light>(ThingAttrLight); }
     int getMinimapColor() { return m_attribs.get<uint16_t>(ThingAttrMinimapColor); }
     int getLensHelp() { return m_attribs.get<uint16_t>(ThingAttrLensHelp); }
-    int getClothSlot() { return m_attribs.get<uint32_t>(ThingAttrCloth); }
+    int getClothSlot() { return m_attribs.get<uint16_t>(ThingAttrCloth); }
     MarketData getMarketData() { return m_attribs.get<MarketData>(ThingAttrMarket); }
     bool isGround() { return m_attribs.has(ThingAttrGround); }
     bool isGroundBorder() { return m_attribs.has(ThingAttrGroundBorder); }
