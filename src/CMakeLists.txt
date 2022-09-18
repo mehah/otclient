@@ -195,6 +195,7 @@ if(TOGGLE_FRAMEWORK_SOUND)
 	find_package(Ogg CONFIG REQUIRED)
 endif()
 if(ANDROID)
+	set(LUA_LIBRARY ${LUA_LIBRARY} ${Android_LIBRARIES}/liblua.a)
 	set(LUAJIT_LIBRARY ${LUAJIT_LIBRARY} ${Android_LIBRARIES}/libluajit.a)
 	set(OpenAL_LIBRARY ${OpenAL_LIBRARY} ${Android_LIBRARIES}/libopenal.a)
 	set(MINIZIP_INCLUDE_DIR ${MINIZIP_INCLUDE_DIR} ${Android_INCLUDES}/minizip)
@@ -453,6 +454,7 @@ elseif(ANDROID)
 	)
 	target_link_libraries(${PROJECT_NAME}
 		PRIVATE
+		${LUA_LIBRARY}
 		${LUAJIT_LIBRARY}
 		${PHYSFS_LIBRARY}
 		${ZLIB_LIBRARY}
