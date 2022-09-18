@@ -20,6 +20,8 @@
  * THE SOFTWARE.
  */
 
+#ifdef ANDROID
+
 #include "unzipper.h"
 #include "logger.h"
 #include "resourcemanager.h"
@@ -138,3 +140,5 @@ void unzipper::extract(const char* fileBuffer, uint fileLength, std::string& des
 
     unzClose(zipfile);
 }
+
+#endif
