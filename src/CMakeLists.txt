@@ -175,6 +175,11 @@ find_package(nlohmann_json REQUIRED)
 find_package(asio REQUIRED)
 find_package(Threads REQUIRED)
 find_package(STDUUID CONFIG REQUIRED)
+if(APPLE)
+	# Required for Physfs
+	find_library(FOUNDATION Foundation REQUIRED)
+	find_library(IOKIT IOKit REQUIRED)
+endif()
 if(UNIX AND NOT ANDROID)
 	find_package(X11 REQUIRED)
 endif()
@@ -507,6 +512,8 @@ else()
 		${GMP_LIBRARY}
 		${OPENSSL_LIBRARIES}
 		${STDUUID}
+		${FOUNDATION}
+		${IOKIT}
 
 		Threads::Threads
 		X11::X11

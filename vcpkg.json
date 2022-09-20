@@ -3,7 +3,6 @@
   "version-string": "1.0.0",
   "dependencies": [
     "asio",
-    "opengl",
     "libogg",
     "libvorbis",
     "nlohmann-json",
@@ -17,8 +16,12 @@
     "stduuid",
     "luajit",
     {
+      "name": "opengl",
+      "platform": "windows | linux"
+    },
+    {
       "name": "glew",
-      "platform": "windows"
+      "platform": "windows | osx"
     }
   ]
 }
