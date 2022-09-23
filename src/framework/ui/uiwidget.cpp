@@ -31,9 +31,6 @@
 #include <framework/otml/otmlnode.h>
 #include <framework/platform/platformwindow.h>
 
-#include <ranges>
-#include <numbers>
-
 #include "framework/graphics/drawpoolmanager.h"
 
 UIWidget::UIWidget()
@@ -64,7 +61,7 @@ void UIWidget::draw(const Rect& visibleRect, Fw::DrawPane drawPane)
 
     if (m_rotation != 0.0f) {
         g_painter->pushTransformMatrix();
-        g_painter->rotate(m_rect.center(), m_rotation * (std::numbers::pi / 180.0));
+        g_painter->rotate(m_rect.center(), m_rotation * (Fw::pi / 180.0));
     }
 
     drawSelf(drawPane);
@@ -617,8 +614,8 @@ void UIWidget::applyStyle(const OTMLNodePtr& styleNode)
         if (m_firstOnStyle) {
             const UIWidgetPtr parent = getParent();
             if (isFocusable() && isExplicitlyVisible() && isExplicitlyEnabled() &&
-               parent && ((!parent->getFocusedChild() && parent->getAutoFocusPolicy() == Fw::AutoFocusFirst) ||
-                          parent->getAutoFocusPolicy() == Fw::AutoFocusLast)) {
+                parent && ((!parent->getFocusedChild() && parent->getAutoFocusPolicy() == Fw::AutoFocusFirst) ||
+                           parent->getAutoFocusPolicy() == Fw::AutoFocusLast)) {
                 focus();
             }
         }
@@ -980,7 +977,7 @@ bool UIWidget::setRect(const Rect& rect)
             self->m_updateEventScheduled = false;
             if (oldRect != self->getRect())
                 self->onGeometryChange(oldRect, self->getRect());
-        });
+                              });
         m_updateEventScheduled = true;
     }
 
@@ -1218,7 +1215,8 @@ UIWidgetPtr UIWidget::getChildByPos(const Point& childPos)
     if (!containsPaddingPoint(childPos))
         return nullptr;
 
-    for (const auto& child : m_children | std::views::reverse) {
+    for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
+        const auto& child = (*it);
         if (child->isExplicitlyVisible() && child->containsPoint(childPos))
             return child;
     }
@@ -1254,7 +1252,9 @@ UIWidgetPtr UIWidget::recursiveGetChildByPos(const Point& childPos, bool wantsPh
     if (!containsPaddingPoint(childPos))
         return nullptr;
 
-    for (const auto& child : m_children | std::views::reverse) {
+    for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
+        const auto& child = (*it);
+
         if (child->isExplicitlyVisible() && child->containsPoint(childPos)) {
             if (const UIWidgetPtr& subChild = child->recursiveGetChildByPos(childPos, wantsPhantom))
                 return subChild;
@@ -1285,7 +1285,9 @@ UIWidgetList UIWidget::recursiveGetChildrenByPos(const Point& childPos)
         return {};
 
     UIWidgetList children;
-    for (const auto& child : m_children | std::views::reverse) {
+    for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
+        const auto& child = (*it);
+
         if (child->isExplicitlyVisible() && child->containsPoint(childPos)) {
             if (const UIWidgetList& subChildren = child->recursiveGetChildrenByPos(childPos); !subChildren.empty())
                 children.insert(children.end(), subChildren.begin(), subChildren.end());
@@ -1303,7 +1305,8 @@ UIWidgetList UIWidget::recursiveGetChildrenByMarginPos(const Point& childPos)
     if (!containsPaddingPoint(childPos))
         return children;
 
-    for (const auto& child : m_children | std::views::reverse) {
+    for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
+        const auto& child = (*it);
         if (child->isExplicitlyVisible() && child->containsMarginPoint(childPos)) {
             UIWidgetList subChildren = child->recursiveGetChildrenByMarginPos(childPos);
             if (!subChildren.empty())
@@ -1375,7 +1378,7 @@ void UIWidget::updateState(Fw::WidgetState state)
             do {
                 parent = widget->getParent();
                 if (!widget->isExplicitlyEnabled() ||
-                   ((parent && parent->getFocusedChild() != widget))) {
+                    ((parent && parent->getFocusedChild() != widget))) {
                     newStatus = false;
                     break;
                 }
@@ -1466,7 +1469,7 @@ void UIWidget::updateStyle()
         g_dispatcher.addEvent([self] {
             self->m_updateStyleScheduled = false;
             self->updateStyle();
-        });
+                              });
         m_updateStyleScheduled = true;
         return;
     }
@@ -1750,7 +1753,9 @@ bool UIWidget::propagateOnMouseEvent(const Point& mousePos, UIWidgetList& widget
 {
     bool ret = false;
     if (containsPaddingPoint(mousePos)) {
-        for (const auto& child : m_children | std::views::reverse) {
+        for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
+            const auto& child = *it;
+
             if (child->isExplicitlyEnabled() && child->isExplicitlyVisible() && child->containsPoint(mousePos)) {
                 if (child->propagateOnMouseEvent(mousePos, widgetList)) {
                     ret = true;

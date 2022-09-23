@@ -13,9 +13,9 @@
     "protobuf",
     "zlib",
     "liblzma",
-    "luajit",
     "parallel-hashmap",
     "stduuid",
+    "luajit",
     {
       "name": "glew",
       "platform": "windows"

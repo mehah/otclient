@@ -30,6 +30,10 @@
 #include <framework/platform/platform.h>
 #include <framework/platform/platformwindow.h>
 
+#ifdef ANDROID
+#include <android/log.h>
+#endif // ANDROID
+
 Logger g_logger;
 
 namespace
@@ -55,6 +59,10 @@ void Logger::log(Fw::LogLevel level, const std::string_view message)
         return;
 
     std::string outmsg{ std::string{s_logPrefixes[level]} + message.data() };
+
+#ifdef ANDROID
+    __android_log_print(ANDROID_LOG_INFO, "OTClientMobile", "%s", outmsg.c_str());
+#endif // ANDROID
 
     std::cout << outmsg << std::endl;
 

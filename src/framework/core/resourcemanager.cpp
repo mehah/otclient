@@ -21,7 +21,6 @@
  */
 
 #include <filesystem>
-#include <ranges>
 
 #include "resourcemanager.h"
 #include "filestream.h"
@@ -50,6 +49,7 @@ bool ResourceManager::discoverWorkDir(const std::string& existentFile)
     // search for modules directory
     std::string possiblePaths[] = { g_platform.getCurrentDir(),
                                     g_resources.getBaseDir(),
+                                    g_resources.getBaseDir() + "/game_data/",
                                     g_resources.getBaseDir() + "../",
                                     g_resources.getBaseDir() + "../share/" + g_app.getCompactName() + "/" };
 
@@ -147,7 +147,9 @@ bool ResourceManager::removeSearchPath(const std::string& path)
 void ResourceManager::searchAndAddPackages(const std::string& packagesDir, const std::string& packageExt)
 {
     auto files = listDirectoryFiles(packagesDir);
-    for (const auto& file : files | std::views::reverse) {
+    for (auto it = files.rbegin(); it != files.rend(); ++it) {
+        const auto& file = *it;
+
         if (!file.ends_with(packageExt))
             continue;
         std::string package = getRealDir(packagesDir) + "/" + file;
@@ -349,15 +351,23 @@ std::string ResourceManager::getRealPath(const std::string& path)
 
 std::string ResourceManager::getBaseDir()
 {
+#ifdef ANDROID
+    return g_androidManager.getAppBaseDir();
+#else
     return PHYSFS_getBaseDir();
+#endif
 }
 
 std::string ResourceManager::getUserDir()
 {
+#ifdef ANDROID
+    return getBaseDir() + "/";
+#else
     static const char* orgName = g_app.getOrganizationName().data();
     static const char* appName = g_app.getCompactName().data();
 
     return PHYSFS_getPrefDir(orgName, appName);
+#endif
 }
 
 std::string ResourceManager::guessFilePath(const std::string& filename, const std::string& type)

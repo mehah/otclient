@@ -44,3 +44,7 @@
 
 // logger
 #include "core/logger.h"
+
+#ifdef ANDROID
+#include "platform/androidmanager.h"
+#endif

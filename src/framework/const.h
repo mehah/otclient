@@ -34,6 +34,8 @@
 #define BUILD_ARCH "x64"
 #elif defined(__i386) || defined(_M_IX86) || defined(_X86_)
 #define BUILD_ARCH "x86"
+#elif defined(__arm__)
+#define BUILD_ARCH "ARM"
 #else
 #define BUILD_ARCH "unknown"
 #endif
@@ -41,6 +43,8 @@
 
 namespace Fw
 {
+    // clang c++20 dont support std::numbers::pi
+    static constexpr float pi = 3.141592653589793f;
     static constexpr float MIN_ALPHA = 0.003f;
 
     enum Key : unsigned char

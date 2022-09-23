@@ -23,7 +23,7 @@
 #pragma once
 
 #ifdef OPENGL_ES
-#include <GLES2/gl2.h>
+#include <GLES3/gl3.h>
 #else
 #ifndef _MSC_VER
 #define GLEW_STATIC
