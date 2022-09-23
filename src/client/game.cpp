@@ -185,7 +185,7 @@ void Game::processGameStart()
             g_lua.callGlobalField("g_game", "onConnectionFailing", false);
             m_connectionFailWarned = false;
         }
-        }, 1000);
+                                                     }, 1000);
 }
 
 void Game::processGameEnd()
@@ -398,7 +398,7 @@ void Game::processRemoveAutomapFlag(const Position& pos, int icon, const std::st
 }
 
 void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<int, std::string, int> >& outfitList,
-    const std::vector<std::tuple<int, std::string> >& mountList)
+                                   const std::vector<std::tuple<int, std::string> >& mountList)
 {
     // create virtual creature outfit
     const auto virtualOutfitCreature = CreaturePtr(new Creature);
@@ -478,8 +478,8 @@ void Game::processQuestLine(int questId, const std::vector<std::tuple<std::strin
 }
 
 void Game::processModalDialog(uint32_t id, const std::string_view title, const std::string_view message, const std::vector<std::tuple<int, std::string> >
-    & buttonList, int enterButton, int escapeButton, const std::vector<std::tuple<int, std::string> >
-    & choiceList, bool priority)
+                              & buttonList, int enterButton, int escapeButton, const std::vector<std::tuple<int, std::string> >
+                              & choiceList, bool priority)
 {
     g_lua.callGlobalField("g_game", "onModalDialog", id, title, message, buttonList, enterButton, escapeButton, choiceList, priority);
 }
@@ -671,32 +671,32 @@ void Game::forceWalk(Otc::Direction direction)
         return;
 
     switch (direction) {
-    case Otc::North:
-        m_protocolGame->sendWalkNorth();
-        break;
-    case Otc::East:
-        m_protocolGame->sendWalkEast();
-        break;
-    case Otc::South:
-        m_protocolGame->sendWalkSouth();
-        break;
-    case Otc::West:
-        m_protocolGame->sendWalkWest();
-        break;
-    case Otc::NorthEast:
-        m_protocolGame->sendWalkNorthEast();
-        break;
-    case Otc::SouthEast:
-        m_protocolGame->sendWalkSouthEast();
-        break;
-    case Otc::SouthWest:
-        m_protocolGame->sendWalkSouthWest();
-        break;
-    case Otc::NorthWest:
-        m_protocolGame->sendWalkNorthWest();
-        break;
-    default:
-        break;
+        case Otc::North:
+            m_protocolGame->sendWalkNorth();
+            break;
+        case Otc::East:
+            m_protocolGame->sendWalkEast();
+            break;
+        case Otc::South:
+            m_protocolGame->sendWalkSouth();
+            break;
+        case Otc::West:
+            m_protocolGame->sendWalkWest();
+            break;
+        case Otc::NorthEast:
+            m_protocolGame->sendWalkNorthEast();
+            break;
+        case Otc::SouthEast:
+            m_protocolGame->sendWalkSouthEast();
+            break;
+        case Otc::SouthWest:
+            m_protocolGame->sendWalkSouthWest();
+            break;
+        case Otc::NorthWest:
+            m_protocolGame->sendWalkNorthWest();
+            break;
+        default:
+            break;
     }
 
     g_lua.callGlobalField("g_game", "onForceWalk", direction);
@@ -708,20 +708,20 @@ void Game::turn(Otc::Direction direction)
         return;
 
     switch (direction) {
-    case Otc::North:
-        m_protocolGame->sendTurnNorth();
-        break;
-    case Otc::East:
-        m_protocolGame->sendTurnEast();
-        break;
-    case Otc::South:
-        m_protocolGame->sendTurnSouth();
-        break;
-    case Otc::West:
-        m_protocolGame->sendTurnWest();
-        break;
-    default:
-        break;
+        case Otc::North:
+            m_protocolGame->sendTurnNorth();
+            break;
+        case Otc::East:
+            m_protocolGame->sendTurnEast();
+            break;
+        case Otc::South:
+            m_protocolGame->sendTurnSouth();
+            break;
+        case Otc::West:
+            m_protocolGame->sendTurnWest();
+            break;
+        default:
+            break;
     }
 }
 
@@ -1811,7 +1811,10 @@ Otc::OperatingSystem_t Game::getOs()
 
 void Game::leaveMarket()
 {
+    enableBotCall();
     m_protocolGame->sendMarketLeave();
+    disableBotCall();
+
     g_lua.callGlobalField("g_game", "onMarketLeave");
 }
 
