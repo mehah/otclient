@@ -115,9 +115,9 @@ bool ThingTypeManager::loadDat(std::string file)
         const FileStreamPtr fin = g_resources.openFile(file);
         fin->cache();
 
-    #if ENABLE_ENCRYPTION == 1
+#if ENABLE_ENCRYPTION == 1
         ResourceManager::decrypt(fin->m_data.data(), fin->m_data.size());
-    #endif
+#endif
 
         m_datSignature = fin->getU32();
         m_contentRevision = static_cast<uint16_t>(m_datSignature);
@@ -215,7 +215,7 @@ void ThingTypeManager::loadOtb(const std::string& file)
         m_reverseItemTypes.resize(children.size() + 1, m_nullItemType);
 
         for (const BinaryTreePtr& node : children) {
-            ItemTypePtr itemType(new ItemType);
+            const ItemTypePtr& itemType(new ItemType);
             itemType->unserialize(node);
             addItemType(itemType);
 
@@ -330,7 +330,7 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
             things.resize(lastAppearance.id() + 1, m_nullThingType);
 
             for (const auto& appearance : *appearances) {
-                const ThingTypePtr type(new ThingType);
+                const ThingTypePtr& type(new ThingType);
                 const uint16_t id = appearance.id();
                 type->unserializeAppearance(id, static_cast<ThingCategory>(category), appearance);
                 m_thingTypes[category][id] = type;
@@ -346,8 +346,6 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
 
 void ThingTypeManager::parseItemType(uint16_t serverId, TiXmlElement* elem)
 {
-    ItemTypePtr itemType = nullptr;
-
     bool s;
     int d;
 
@@ -359,6 +357,7 @@ void ThingTypeManager::parseItemType(uint16_t serverId, TiXmlElement* elem)
         d = 30000;
     }
 
+    ItemTypePtr itemType;
     if (s) {
         serverId -= d;
         itemType = ItemTypePtr(new ItemType);

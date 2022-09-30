@@ -219,7 +219,7 @@ std::pair<MinimapBlock_ptr, MinimapTile> Minimap::threadGetTile(const Position& 
     static MinimapTile nulltile;
 
     if (pos.z <= MAX_Z && hasBlock(pos)) {
-        MinimapBlock_ptr block = m_tileBlocks[pos.z][getBlockIndex(pos)];
+        const auto& block = m_tileBlocks[pos.z][getBlockIndex(pos)];
         if (block) {
             const Point offsetPos = getBlockOffset(Point(pos.x, pos.y));
             return std::make_pair(block, block->getTile(pos.x - offsetPos.x, pos.y - offsetPos.y));

@@ -50,7 +50,7 @@ void ItemType::unserialize(const BinaryTreePtr& node)
                         serverId -= 20000;
                     } else if (lastId > 99 && lastId != serverId - 1) {
                         while (lastId != serverId - 1) {
-                            ItemTypePtr tmp(new ItemType);
+                            const ItemTypePtr& tmp(new ItemType);
                             tmp->setServerId(++lastId);
                             g_things.addItemType(tmp);
                         }
@@ -60,7 +60,7 @@ void ItemType::unserialize(const BinaryTreePtr& node)
                         serverId -= 30000;
                     } else if (lastId > 99 && lastId != serverId - 1) {
                         while (lastId != serverId - 1) {
-                            ItemTypePtr tmp(new ItemType);
+                            const ItemTypePtr& tmp(new ItemType);
                             tmp->setServerId(++lastId);
                             g_things.addItemType(tmp);
                         }

@@ -85,7 +85,7 @@ void Container::onUpdateItem(int slot, const ItemPtr& item)
         return;
     }
 
-    const ItemPtr oldItem = m_items[slot];
+    const auto& oldItem = m_items[slot];
     m_items[slot] = item;
     item->setPosition(getSlotPosition(slot));
 
@@ -106,7 +106,7 @@ void Container::onRemoveItem(int slot, const ItemPtr& lastItem)
         return;
     }
 
-    const ItemPtr item = m_items[slot];
+    const auto& item = m_items[slot];
     m_items.erase(m_items.begin() + slot);
 
     if (lastItem) {

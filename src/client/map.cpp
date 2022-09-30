@@ -152,7 +152,7 @@ void Map::addThing(const ThingPtr& thing, const Position& pos, int16_t stackPos)
             m_floorMissiles[pos.z].push_back(thing->static_self_cast<Missile>());
         } else if (thing->isAnimatedText()) {
             // this code will stack animated texts of the same color
-            const AnimatedTextPtr animatedText = thing->static_self_cast<AnimatedText>();
+            const auto& animatedText = thing->static_self_cast<AnimatedText>();
             AnimatedTextPtr prevAnimatedText;
 
             bool merged = false;
@@ -180,7 +180,7 @@ void Map::addThing(const ThingPtr& thing, const Position& pos, int16_t stackPos)
                 m_animatedTexts.push_back(animatedText);
             }
         } else if (thing->isStaticText()) {
-            const StaticTextPtr staticText = thing->static_self_cast<StaticText>();
+            const auto& staticText = thing->static_self_cast<StaticText>();
             for (const auto& other : m_staticTexts) {
                 // try to combine messages
                 if (other->getPosition() == pos && other->addMessage(staticText->getName(), staticText->getMessageMode(), staticText->getFirstMessage())) {
@@ -200,7 +200,7 @@ void Map::addThing(const ThingPtr& thing, const Position& pos, int16_t stackPos)
 
 ThingPtr Map::getThing(const Position& pos, int16_t stackPos)
 {
-    if (const TilePtr tile = getTile(pos))
+    if (const auto& tile = getTile(pos))
         return tile->getThing(stackPos);
 
     return nullptr;
@@ -213,14 +213,14 @@ bool Map::removeThing(const ThingPtr& thing)
 
     bool ret = false;
     if (thing->isAnimatedText()) {
-        const AnimatedTextPtr animatedText = thing->static_self_cast<AnimatedText>();
+        const auto& animatedText = thing->static_self_cast<AnimatedText>();
         const auto it = std::find(m_animatedTexts.begin(), m_animatedTexts.end(), animatedText);
         if (it != m_animatedTexts.end()) {
             m_animatedTexts.erase(it);
             ret = true;
         }
     } else if (thing->isStaticText()) {
-        const StaticTextPtr staticText = thing->static_self_cast<StaticText>();
+        const auto& staticText = thing->static_self_cast<StaticText>();
         const auto it = std::find(m_staticTexts.begin(), m_staticTexts.end(), staticText);
         if (it != m_staticTexts.end()) {
             m_staticTexts.erase(it);
@@ -228,7 +228,8 @@ bool Map::removeThing(const ThingPtr& thing)
         }
     } else {
         if (thing->isMissile()) {
-            const MissilePtr missile = thing->static_self_cast<Missile>();
+            const auto& missile = thing->static_self_cast<Missile>();
+
             const uint8_t z = missile->getPosition().z;
             const auto it = std::find(m_floorMissiles[z].begin(), m_floorMissiles[z].end(), missile);
             if (it != m_floorMissiles[z].end()) {
@@ -247,7 +248,7 @@ bool Map::removeThing(const ThingPtr& thing)
 
 bool Map::removeThingByPos(const Position& pos, int16_t stackPos)
 {
-    if (const TilePtr tile = getTile(pos))
+    if (const auto& tile = getTile(pos))
         return removeThing(tile->getThing(stackPos));
 
     return false;
@@ -489,6 +490,7 @@ CreaturePtr Map::getCreatureById(uint32_t  id)
     const auto it = m_knownCreatures.find(id);
     if (it == m_knownCreatures.end())
         return nullptr;
+
     return it->second;
 }
 
@@ -561,14 +563,17 @@ void Map::setCentralPosition(const Position& centralPosition)
     // the local player is removed from the map when there are too many creatures on his tile,
     // so there is no enough stackpos to the server send him
     g_dispatcher.addEvent([this] {
-        const LocalPlayerPtr localPlayer = g_game.getLocalPlayer();
+        const auto& localPlayer = g_game.getLocalPlayer();
         if (!localPlayer || localPlayer->getPosition() == m_centralPosition)
             return;
-        if (const TilePtr tile = localPlayer->getTile(); tile && tile->hasThing(localPlayer))
-            return;
 
-        const Position oldPos = localPlayer->getPosition();
-        const Position pos = m_centralPosition;
+        if (const auto& tile = localPlayer->getTile()) {
+            if (tile->hasThing(localPlayer))
+                return;
+        }
+
+        const auto& oldPos = localPlayer->getPosition();
+        const auto& pos = m_centralPosition;
         if (oldPos != pos) {
             if (!localPlayer->isRemoved())
                 localPlayer->onDisappear();
@@ -576,7 +581,7 @@ void Map::setCentralPosition(const Position& centralPosition)
             localPlayer->onAppear();
             g_logger.debug("forced player position update");
         }
-    });
+                          });
 
     for (const MapViewPtr& mapView : m_mapViews)
         mapView->onMapCenterChange(centralPosition, mapView->m_lastCameraPosition);
@@ -633,7 +638,7 @@ std::vector<CreaturePtr> Map::getSpectatorsInRangeEx(const Position& centerPos, 
 
 bool Map::isLookPossible(const Position& pos)
 {
-    const TilePtr tile = getTile(pos);
+    const auto& tile = getTile(pos);
     return tile && tile->isLookPossible();
 }
 
@@ -787,12 +792,12 @@ std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::findPath(const
 
     // check the goal pos is walkable
     if (g_map.isAwareOfPosition(goalPos)) {
-        const TilePtr goalTile = getTile(goalPos);
+        const auto& goalTile = getTile(goalPos);
         if (!goalTile || (!goalTile->isWalkable(flags & Otc::PathFindIgnoreCreatures))) {
             return ret;
         }
     } else {
-        const MinimapTile& goalTile = g_minimap.getTile(goalPos);
+        const auto& goalTile = g_minimap.getTile(goalPos);
         if (goalTile.hasFlag(MinimapTileNotWalkable)) {
             return ret;
         }
@@ -944,12 +949,12 @@ PathFindResult_ptr Map::newFindPath(const Position& start, const Position& goal,
 
     // check the goal pos is walkable
     if (g_map.isAwareOfPosition(goal)) {
-        const TilePtr goalTile = getTile(goal);
+        const auto& goalTile = getTile(goal);
         if (!goalTile || (!goalTile->isWalkable())) {
             return ret;
         }
     } else {
-        const MinimapTile& goalTile = g_minimap.getTile(goal);
+        const auto& goalTile = g_minimap.getTile(goal);
         if (goalTile.hasFlag(MinimapTileNotWalkable)) {
             return ret;
         }
@@ -1071,5 +1076,5 @@ void Map::findPathAsync(const Position& start, const Position& goal, const std::
     g_asyncDispatcher.dispatch([=] {
         auto ret = g_map.newFindPath(start, goal, visibleNodes);
         g_dispatcher.addEvent(std::bind(callback, ret));
-    });
+                               });
 }

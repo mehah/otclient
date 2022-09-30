@@ -293,7 +293,7 @@ void Game::processOpenContainer(int containerId, const ItemPtr& containerItem, c
 
 void Game::processCloseContainer(int containerId)
 {
-    if (const ContainerPtr container = getContainer(containerId)) {
+    if (const auto& container = getContainer(containerId)) {
         m_containers[containerId] = nullptr;
         container->onClose();
     }
@@ -301,19 +301,19 @@ void Game::processCloseContainer(int containerId)
 
 void Game::processContainerAddItem(int containerId, const ItemPtr& item, int slot)
 {
-    if (const ContainerPtr container = getContainer(containerId))
+    if (const auto& container = getContainer(containerId))
         container->onAddItem(item, slot);
 }
 
 void Game::processContainerUpdateItem(int containerId, int slot, const ItemPtr& item)
 {
-    if (const ContainerPtr container = getContainer(containerId))
+    if (const auto& container = getContainer(containerId))
         container->onUpdateItem(slot, item);
 }
 
 void Game::processContainerRemoveItem(int containerId, int slot, const ItemPtr& lastItem)
 {
-    if (const ContainerPtr container = getContainer(containerId))
+    if (const auto& container = getContainer(containerId))
         container->onRemoveItem(slot, lastItem);
 }
 
@@ -585,7 +585,7 @@ bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
     const Position toPos = m_localPlayer->getPosition().translatedToDirection(direction);
 
     // only do prewalks to walkable tiles (like grounds and not walls)
-    if (const TilePtr toTile = g_map.getTile(toPos); toTile && toTile->isWalkable()) {
+    if (const auto& toTile = g_map.getTile(toPos); toTile && toTile->isWalkable()) {
         m_localPlayer->preWalk(direction);
     } else {
         // check if can walk to a lower floor
@@ -595,7 +595,7 @@ bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
                 return false;
 
             // check walk to another floor (e.g: when above 3 parcels)
-            if (const TilePtr toTile = g_map.getTile(pos); toTile && toTile->hasElevation(3))
+            if (const auto& toTile = g_map.getTile(pos); toTile && toTile->hasElevation(3))
                 return true;
 
             return false;
@@ -603,14 +603,14 @@ bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
 
         // check if can walk to a higher floor
         auto canChangeFloorUp = [&]() -> bool {
-            if (const TilePtr fromTile = m_localPlayer->getTile(); !fromTile || !fromTile->hasElevation(3))
+            if (const auto& fromTile = m_localPlayer->getTile(); !fromTile || !fromTile->hasElevation(3))
                 return false;
 
             Position pos = toPos;
             if (!pos.up())
 
                 return false;
-            if (const TilePtr toTile = g_map.getTile(pos); !toTile || !toTile->isWalkable())
+            if (const auto& toTile = g_map.getTile(pos); !toTile || !toTile->isWalkable())
                 return false;
 
             return true;
@@ -655,9 +655,10 @@ void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& sta
     const auto it = dirs.begin();
     const Otc::Direction direction = *it;
 
-    TilePtr toTile = g_map.getTile(startPos.translatedToDirection(direction));
-    if (startPos == m_localPlayer->m_lastPrewalkDestination && toTile && toTile->isWalkable() && !m_localPlayer->isWalking() && m_localPlayer->canWalk(true)) {
-        m_localPlayer->preWalk(direction);
+    if (const auto& toTile = g_map.getTile(startPos.translatedToDirection(direction))) {
+        if (startPos == m_localPlayer->m_lastPrewalkDestination && toTile->isWalkable() && !m_localPlayer->isWalking() && m_localPlayer->canWalk(true)) {
+            m_localPlayer->preWalk(direction);
+        }
     }
 
     g_lua.callGlobalField("g_game", "onAutoWalk", dirs);
@@ -836,12 +837,10 @@ void Game::useInventoryItemWith(int itemId, const ThingPtr& toThing)
 ItemPtr Game::findItemInContainers(uint32_t itemId, int subType)
 {
     for (const auto& it : m_containers) {
-        const ContainerPtr& container = it.second;
-
-        if (container) {
-            ItemPtr item = container->findItemById(itemId, subType);
-            if (item != nullptr)
+        if (const auto& container = it.second) {
+            if (const auto& item = container->findItemById(itemId, subType)) {
                 return item;
+            }
         }
     }
 

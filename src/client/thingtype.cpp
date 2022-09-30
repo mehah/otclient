@@ -355,7 +355,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
 
         m_animationPhases += std::max<int>(1, spritesPhases.size());
 
-        if (SpriteSheetPtr sheet = g_spriteAppearances.getSheetBySpriteId(spriteInfo.sprite_id(0), false); sheet) {
+        if (const auto& sheet = g_spriteAppearances.getSheetBySpriteId(spriteInfo.sprite_id(0), false)) {
             m_size = sheet->getSpriteSize() / SPRITE_SIZE;
             sizes.push_back(m_size);
         }
@@ -575,7 +575,7 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
 
     if (!done)
         throw Exception("corrupt data (id: %d, category: %d, count: %d, lastAttr: %d)",
-                                               m_id, m_category, count, attr);
+                        m_id, m_category, count, attr);
 
     const bool hasFrameGroups = category == ThingCategoryCreature && g_game.getFeature(Otc::GameIdleAnimations);
     const uint8_t groupCount = hasFrameGroups ? fin->getU8() : 1;
@@ -686,7 +686,7 @@ void ThingType::exportImage(const std::string& fileName)
     if (m_spritesIndex.empty())
         throw Exception("cannot export thingtype without sprites");
 
-    const ImagePtr image(new Image(Size(SPRITE_SIZE * m_size.width() * m_layers * m_numPatternX, SPRITE_SIZE * m_size.height() * m_animationPhases * m_numPatternY * m_numPatternZ)));
+    const ImagePtr& image(new Image(Size(SPRITE_SIZE * m_size.width() * m_layers * m_numPatternX, SPRITE_SIZE * m_size.height() * m_animationPhases * m_numPatternY * m_numPatternZ)));
     for (int z = 0; z < m_numPatternZ; ++z) {
         for (int y = 0; y < m_numPatternY; ++y) {
             for (int x = 0; x < m_numPatternX; ++x) {
@@ -916,7 +916,7 @@ Size ThingType::getBestTextureDimension(int w, int h, int count)
             if (candidateDimension.area() < numSprites)
                 continue;
             if ((candidateDimension.area() < bestDimension.area()) ||
-               (candidateDimension.area() == bestDimension.area() && candidateDimension.width() + candidateDimension.height() < bestDimension.width() + bestDimension.height()))
+                (candidateDimension.area() == bestDimension.area() && candidateDimension.width() + candidateDimension.height() < bestDimension.width() + bestDimension.height()))
                 bestDimension = candidateDimension;
         }
     }
@@ -931,7 +931,7 @@ uint32_t ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int
                          * m_numPatternY + y)
                         * m_numPatternX + x)
                        * m_layers + l)
-                  * m_size.height() + h)
+                      * m_size.height() + h)
         * m_size.width() + w;
 
     if (w == -1 && h == -1) { // protobuf does not use width and height, because sprite image is the exact sprite size, not split by 32x32, so -1 is passed instead

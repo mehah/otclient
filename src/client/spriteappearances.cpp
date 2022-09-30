@@ -174,7 +174,7 @@ SpriteSheetPtr SpriteAppearances::getSheetBySpriteId(int id, bool load /* = true
     // find sheet
     const auto sheetIt = std::find_if(m_sheets.begin(), m_sheets.end(), [=](const SpriteSheetPtr& sheet) {
         return id >= sheet->firstId && id <= sheet->lastId;
-    });
+                                      });
 
     if (sheetIt == m_sheets.end()) {
         return nullptr;
@@ -187,7 +187,7 @@ SpriteSheetPtr SpriteAppearances::getSheetBySpriteId(int id, bool load /* = true
             sheet->loading = true;
             g_asyncDispatcher.dispatch([this, &sheet] {
                 loadSpriteSheet(sheet);
-            });
+                                       });
         }
 
         return nullptr;
@@ -240,16 +240,14 @@ ImagePtr SpriteAppearances::getSpriteImage(int id)
 
 void SpriteAppearances::saveSpriteToFile(int id, const std::string& file)
 {
-    const ImagePtr sprite = getSpriteImage(id);
-    if (sprite) {
+    if (const auto& sprite = getSpriteImage(id)) {
         sprite->savePNG(file);
     }
 }
 
 void SpriteAppearances::saveSheetToFileBySprite(int id, const std::string& file)
 {
-    const SpriteSheetPtr sheet = getSheetBySpriteId(id);
-    if (sheet) {
+    if (const auto& sheet = getSheetBySpriteId(id)) {
         Image image({ 384 }, 4, sheet->data.get());
         image.savePNG(file);
     }

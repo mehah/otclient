@@ -49,9 +49,9 @@ bool SpriteManager::loadSpr(std::string file)
         // cache file buffer to avoid lags from hard drive
         m_spritesFile->cache();
 
-    #if ENABLE_ENCRYPTION == 1
+#if ENABLE_ENCRYPTION == 1
         ResourceManager::decrypt(m_spritesFile->m_data.data(), m_spritesFile->m_data.size());
-    #endif
+#endif
 
         m_signature = m_spritesFile->getU32();
         m_spritesCount = g_game.getFeature(Otc::GameSpritesU32) ? m_spritesFile->getU32() : m_spritesFile->getU16();
@@ -153,7 +153,7 @@ ImagePtr SpriteManager::getSpriteImage(int id)
 
         const uint16_t pixelDataSize = m_spritesFile->getU16();
 
-        ImagePtr image(new Image(Size(SPRITE_SIZE)));
+        const ImagePtr& image(new Image(Size(SPRITE_SIZE)));
 
         uint8_t* pixels = image->getPixelData();
         int writePos = 0;

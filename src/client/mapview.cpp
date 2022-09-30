@@ -82,12 +82,12 @@ MapView::MapView()
         }
 
         g_painter->setOpacity(fadeOpacity);
-        });
+                          });
 
     mapPool->onAfterDraw([&] {
         g_painter->resetShaderProgram();
         g_painter->resetOpacity();
-        });
+                         });
 
     m_shadowBuffer = std::make_shared<DrawBuffer>(DrawPool::DrawOrder::FIFTH, false);
     m_shader = g_shaders.getDefaultMapShader();
@@ -686,17 +686,19 @@ uint8_t MapView::calcFirstVisibleFloor(bool checkLimitsFloorsView)
                         const auto isLookPossible = g_map.isLookPossible(pos);
                         while (coveredPos.coveredUp() && upperPos.up() && upperPos.z >= firstFloor) {
                             // check tiles physically above
-                            TilePtr tile = g_map.getTile(upperPos);
-                            if (tile && tile->limitsFloorsView(!isLookPossible)) {
-                                firstFloor = upperPos.z + 1;
-                                break;
+                            if (const TilePtr& tile = g_map.getTile(upperPos)) {
+                                if (tile->limitsFloorsView(!isLookPossible)) {
+                                    firstFloor = upperPos.z + 1;
+                                    break;
+                                }
                             }
 
                             // check tiles geometrically above
-                            tile = g_map.getTile(coveredPos);
-                            if (tile && tile->limitsFloorsView(isLookPossible)) {
-                                firstFloor = coveredPos.z + 1;
-                                break;
+                            if (const TilePtr& tile = g_map.getTile(coveredPos)) {
+                                if (tile->limitsFloorsView(isLookPossible)) {
+                                    firstFloor = coveredPos.z + 1;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -737,23 +739,19 @@ uint8_t MapView::calcLastVisibleFloor()
 TilePtr MapView::getTopTile(Position tilePos)
 {
     // we must check every floor, from top to bottom to check for a clickable tile
-    TilePtr tile;
-
     if (m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && tilePos.isInRange(m_lastCameraPosition, TRANSPARENT_FLOOR_VIEW_RANGE, TRANSPARENT_FLOOR_VIEW_RANGE))
-        tile = g_map.getTile(tilePos);
-    else {
-        tilePos.coveredUp(tilePos.z - m_cachedFirstVisibleFloor);
-        for (uint8_t i = m_cachedFirstVisibleFloor; i <= m_floorMax; ++i) {
-            tile = g_map.getTile(tilePos);
-            if (tile && tile->isClickable())
-                break;
+        return g_map.getTile(tilePos);
 
-            tilePos.coveredDown();
-            tile = nullptr;
-        }
+    tilePos.coveredUp(tilePos.z - m_cachedFirstVisibleFloor);
+    for (uint8_t i = m_cachedFirstVisibleFloor; i <= m_floorMax; ++i) {
+        const TilePtr& tile = g_map.getTile(tilePos);
+        if (tile && tile->isClickable())
+            return tile;
+
+        tilePos.coveredDown();
     }
 
-    return tile;
+    return nullptr;
 }
 
 Position MapView::getCameraPosition()
@@ -766,7 +764,7 @@ Position MapView::getCameraPosition()
 
 void MapView::setShader(const PainterShaderProgramPtr& shader, float fadein, float fadeout)
 {
-    if ((m_shader == shader))
+    if (m_shader == shader)
         return;
 
     if (fadeout > 0.0f && m_shader) {
@@ -777,6 +775,7 @@ void MapView::setShader(const PainterShaderProgramPtr& shader, float fadein, flo
         m_nextShader = nullptr;
         m_shaderSwitchDone = true;
     }
+
     m_fadeTimer.restart();
     m_fadeInTime = fadein;
     m_fadeOutTime = fadeout;
@@ -786,8 +785,8 @@ void MapView::setShader(const PainterShaderProgramPtr& shader, float fadein, flo
 
 void MapView::setDrawLights(bool enable)
 {
-    auto* pool = g_drawPool.get<DrawPoolFramed>(DrawPoolType::LIGHT);
-    if (pool) pool->setEnable(enable);
+    if (auto* pool = g_drawPool.get<DrawPoolFramed>(DrawPoolType::LIGHT))
+        pool->setEnable(enable);
 
     if (enable) {
         if (m_lightView)
@@ -810,35 +809,35 @@ void MapView::updateViewportDirectionCache()
         vp.left = vp.right;
 
         switch (dir) {
-        case Otc::North:
-        case Otc::South:
-            vp.top += 1;
-            vp.bottom += 1;
-            break;
+            case Otc::North:
+            case Otc::South:
+                vp.top += 1;
+                vp.bottom += 1;
+                break;
 
-        case Otc::West:
-        case Otc::East:
-            vp.right += 1;
-            vp.left += 1;
-            break;
+            case Otc::West:
+            case Otc::East:
+                vp.right += 1;
+                vp.left += 1;
+                break;
 
-        case Otc::NorthEast:
-        case Otc::SouthEast:
-        case Otc::NorthWest:
-        case Otc::SouthWest:
-            vp.left += 1;
-            vp.bottom += 1;
-            vp.top += 1;
-            vp.right += 1;
-            break;
+            case Otc::NorthEast:
+            case Otc::SouthEast:
+            case Otc::NorthWest:
+            case Otc::SouthWest:
+                vp.left += 1;
+                vp.bottom += 1;
+                vp.top += 1;
+                vp.right += 1;
+                break;
 
-        case Otc::InvalidDirection:
-            vp.left -= 1;
-            vp.right -= 1;
-            break;
+            case Otc::InvalidDirection:
+                vp.left -= 1;
+                vp.right -= 1;
+                break;
 
-        default:
-            break;
+            default:
+                break;
         }
     }
 }
