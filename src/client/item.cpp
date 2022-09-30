@@ -68,6 +68,8 @@ void Item::draw(const Point& dest, float scaleFactor, bool animate, uint32_t fla
     if (m_color != Color::alpha)
         color = m_color;
 
+    tryOptimize();
+
     getThingType()->draw(dest, scaleFactor, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, textureType, color, lightView, m_drawBuffer);
     if (textureType != TextureType::ALL_BLANK && m_shader) {
         g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
@@ -86,7 +88,7 @@ void Item::setId(uint32_t id)
     m_serverId = g_things.findItemTypeByClientId(id)->getServerId();
     m_clientId = id;
     m_thingType = nullptr;
-    generateBuffer();
+    createBuffer();
 
     // Shader example on only items that can be marketed.
     /*
@@ -116,7 +118,35 @@ void Item::setOtbId(uint16_t id)
 
     m_clientId = id;
     m_thingType = nullptr;
-    generateBuffer();
+    createBuffer();
+}
+
+// Do not change if you do not understand what is being done.
+void Item::createBuffer()
+{
+    DrawPool::DrawOrder order = DrawPool::DrawOrder::NONE;
+    if (isSingleGround())
+        order = DrawPool::DrawOrder::FIRST;
+    else if (isGroundBorder())
+        order = DrawPool::DrawOrder::SECOND;
+    else if ((isCommon() || isOnBottom()) && isSingleDimension() && !hasDisplacement() && isNotMoveable())
+        order = DrawPool::DrawOrder::THIRD;
+
+    m_drawBuffer = order != DrawPool::DrawOrder::NONE ? std::make_shared<DrawBuffer>(order) : nullptr;
+}
+
+void Item::tryOptimize()
+{
+    if (g_app.canOptimize()) {
+        if (m_drawBuffer)
+            m_drawBuffer->agroup(true);
+        else {
+            const auto order = isTopGround() ? DrawPool::DrawOrder::FOURTH : DrawPool::DrawOrder::THIRD;
+            m_drawBuffer = std::make_shared<DrawBuffer>(order, true, false);
+        }
+    } else if (m_drawBuffer && !m_drawBuffer->isStatic()) {
+        m_drawBuffer->agroup(false);
+    }
 }
 
 void Item::setPosition(const Position& position, uint8_t stackPos, bool hasElevation)

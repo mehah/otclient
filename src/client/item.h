@@ -146,6 +146,9 @@ public:
     void onPositionChange(const Position& /*newPos*/, const Position& /*oldPos*/) override { updatePatterns(); }
 
 private:
+    void createBuffer();
+    void tryOptimize();
+
     uint16_t m_clientId{ 0 };
     uint16_t m_serverId{ 0 };
 

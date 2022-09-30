@@ -64,6 +64,9 @@ void Effect::drawEffect(const Point& dest, float scaleFactor, uint32_t flags, in
             yPattern += getNumPatternY();
     }
 
+    if (g_app.isDrawingEffectsOnTop() && !m_drawBuffer)
+        m_drawBuffer = std::make_shared<DrawBuffer>(DrawPool::DrawOrder::FOURTH);
+
     getThingType()->draw(dest, scaleFactor, 0, xPattern, yPattern, 0, animationPhase, flags, TextureType::NONE, Color::white, lightView, m_drawBuffer);
 }
 
@@ -91,8 +94,6 @@ void Effect::onAppear()
     // schedule removal
     const auto self = asEffect();
     g_dispatcher.scheduleEvent([self] { g_map.removeThing(self); }, m_duration);
-
-    generateBuffer();
 }
 
 void Effect::waitFor(const EffectPtr& effect)

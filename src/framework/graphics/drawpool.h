@@ -156,8 +156,8 @@ private:
     }
 
     void add(const Color& color, const TexturePtr& texture, const DrawPool::DrawMethod& method,
-        DrawMode drawMode = DrawMode::TRIANGLES, const DrawBufferPtr& drawBuffer = nullptr,
-        const CoordsBufferPtr& coordsBuffer = nullptr);
+             DrawMode drawMode = DrawMode::TRIANGLES, const DrawBufferPtr& drawBuffer = nullptr,
+             const CoordsBufferPtr& coordsBuffer = nullptr);
 
     void addCoords(const DrawPool::DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode);
     void updateHash(const PoolState& state, const DrawPool::DrawMethod& method, size_t& stateHash, size_t& methodHash);
@@ -244,9 +244,11 @@ extern DrawPoolManager g_drawPool;
 class DrawBuffer
 {
 public:
-    DrawBuffer(DrawPool::DrawOrder order, bool agroup = true) : m_agroup(agroup), m_order(order) {}
+    DrawBuffer(DrawPool::DrawOrder order, bool agroup = true, bool isStatic = true) : m_agroup(agroup), m_order(order), m_static(isStatic) {}
     void agroup(bool v) { m_agroup = v; }
     void setOrder(DrawPool::DrawOrder order) { m_order = order; }
+
+    bool isStatic() { return m_static; }
 
 private:
     static DrawBufferPtr createTemporaryBuffer(DrawPool::DrawOrder order)
@@ -271,6 +273,8 @@ private:
 
     int m_i{ -1 };
     bool m_agroup{ true };
+    bool m_static{ true };
+
     DrawPool::DrawOrder m_order{ DrawPool::DrawOrder::FIRST };
     Point m_ref;
     size_t m_stateHash{ 0 };
