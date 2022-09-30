@@ -68,7 +68,7 @@ void AnimatedText::onAppear()
     m_animationTimer.restart();
 
     uint16_t textDuration = ANIMATED_TEXT_DURATION;
-    if (g_app.canOptimize())
+    if (g_app.mustOptimize())
         textDuration /= 2;
 
     // schedule removal

@@ -137,7 +137,7 @@ void Item::createBuffer()
 
 void Item::tryOptimize()
 {
-    if (g_app.canOptimize()) {
+    if (g_app.mustOptimize(!isTopGround())) {
         if (m_drawBuffer)
             m_drawBuffer->agroup(true);
         else {

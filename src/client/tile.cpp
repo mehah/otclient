@@ -169,15 +169,15 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
     if (thing->isEffect()) {
         const EffectPtr& newEffect = thing->static_self_cast<Effect>();
 
-        const bool canOptimize = g_app.canOptimize() || g_app.isForcedEffectOptimization();
+        const bool mustOptimize = g_app.mustOptimize() || g_app.isForcedEffectOptimization();
 
         for (const EffectPtr& prevEffect : m_effects) {
             if (!prevEffect->canDraw())
                 continue;
 
-            if (canOptimize && newEffect->getSize() > prevEffect->getSize()) {
+            if (mustOptimize && newEffect->getSize() > prevEffect->getSize()) {
                 prevEffect->canDraw(false);
-            } else if (canOptimize || newEffect->getId() == prevEffect->getId()) {
+            } else if (mustOptimize || newEffect->getId() == prevEffect->getId()) {
                 newEffect->waitFor(prevEffect);
             }
         }
