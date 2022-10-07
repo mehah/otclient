@@ -71,7 +71,7 @@ void SpriteManager::saveSpr(const std::string& fileName)
         throw Exception("failed to save, spr is not loaded");
 
     try {
-        const FileStreamPtr fin = g_resources.createFile(fileName);
+        const auto& fin = g_resources.createFile(fileName);
         if (!fin)
             throw Exception("failed to open file '%s' for write", fileName);
 

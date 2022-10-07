@@ -77,7 +77,7 @@ void ThingTypeManager::saveDat(const std::string& fileName)
         throw Exception("failed to save, dat is not loaded");
 
     try {
-        const FileStreamPtr fin = g_resources.createFile(fileName);
+        const auto& fin = g_resources.createFile(fileName);
         if (!fin)
             throw Exception("failed to open file '%s' for write", fileName);
 
@@ -112,7 +112,7 @@ bool ThingTypeManager::loadDat(std::string file)
     try {
         file = g_resources.guessFilePath(file, "dat");
 
-        const FileStreamPtr fin = g_resources.openFile(file);
+        const auto& fin = g_resources.openFile(file);
         fin->cache();
 
 #if ENABLE_ENCRYPTION == 1
@@ -132,7 +132,7 @@ bool ThingTypeManager::loadDat(std::string file)
             const uint16_t firstId = category == ThingCategoryItem ? 100 : 1;
 
             for (uint16_t id = firstId - 1, s = m_thingTypes[category].size(); ++id < s;) {
-                const ThingTypePtr type(new ThingType);
+                const ThingTypePtr& type(new ThingType);
                 type->unserialize(id, static_cast<ThingCategory>(category), fin);
                 m_thingTypes[category][id] = type;
             }
@@ -152,8 +152,8 @@ bool ThingTypeManager::loadOtml(std::string file)
     try {
         file = g_resources.guessFilePath(file, "otml");
 
-        const OTMLDocumentPtr doc = OTMLDocument::parse(file);
-        for (const OTMLNodePtr& node : doc->children()) {
+        const auto& doc = OTMLDocument::parse(file);
+        for (const auto& node : doc->children()) {
             ThingCategory category;
             if (node->tag() == "creatures")
                 category = ThingCategoryCreature;
@@ -185,14 +185,14 @@ bool ThingTypeManager::loadOtml(std::string file)
 void ThingTypeManager::loadOtb(const std::string& file)
 {
     try {
-        const FileStreamPtr fin = g_resources.openFile(file);
+        const auto& fin = g_resources.openFile(file);
         fin->cache();
 
         uint32_t signature = fin->getU32();
         if (signature != 0)
             throw Exception("invalid otb file");
 
-        const BinaryTreePtr root = fin->getBinaryTree();
+        const auto& root = fin->getBinaryTree();
         root->skip(1); // otb first byte is always 0
 
         signature = root->getU32();

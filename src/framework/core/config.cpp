@@ -39,7 +39,7 @@ bool Config::load(const std::string& file)
         return false;
 
     try {
-        if (const OTMLDocumentPtr confsDoc = OTMLDocument::parse(file); confsDoc)
+        if (const auto& confsDoc = OTMLDocument::parse(file); confsDoc)
             m_confsDoc = confsDoc;
 
         return true;
@@ -78,7 +78,7 @@ void Config::setValue(const std::string& key, const std::string& value)
         return;
     }
 
-    const OTMLNodePtr child = OTMLNode::create(key, value);
+    const auto& child = OTMLNode::create(key, value);
     m_confsDoc->addChild(child);
 }
 
@@ -89,7 +89,7 @@ void Config::setList(const std::string& key, const std::vector<std::string>& lis
     if (list.empty())
         return;
 
-    const OTMLNodePtr child = OTMLNode::create(key, true);
+    const auto& child = OTMLNode::create(key, true);
     for (const std::string& value : list)
         child->writeIn(value);
     m_confsDoc->addChild(child);
@@ -102,7 +102,7 @@ bool Config::exists(const std::string& key)
 
 std::string Config::getValue(const std::string& key)
 {
-    if (const OTMLNodePtr child = m_confsDoc->get(key); child)
+    if (const auto& child = m_confsDoc->get(key); child)
         return child->value();
     return "";
 }
@@ -110,8 +110,8 @@ std::string Config::getValue(const std::string& key)
 std::vector<std::string> Config::getList(const std::string& key)
 {
     std::vector<std::string> list;
-    if (const OTMLNodePtr child = m_confsDoc->get(key); child) {
-        for (const OTMLNodePtr& subchild : child->children())
+    if (const auto& child = m_confsDoc->get(key); child) {
+        for (const auto& subchild : child->children())
             list.push_back(subchild->value());
     }
     return list;
@@ -119,7 +119,7 @@ std::vector<std::string> Config::getList(const std::string& key)
 
 void Config::remove(const std::string& key)
 {
-    const OTMLNodePtr child = m_confsDoc->get(key);
+    const auto& child = m_confsDoc->get(key);
     if (child)
         m_confsDoc->removeChild(child);
 }
@@ -132,7 +132,7 @@ void Config::setNode(const std::string& key, const OTMLNodePtr& node)
 
 void Config::mergeNode(const std::string& key, const OTMLNodePtr& node)
 {
-    OTMLNodePtr clone = node->clone();
+    const auto& clone = node->clone();
     node->setTag(key);
     node->setUnique(true);
     m_confsDoc->addChild(node);

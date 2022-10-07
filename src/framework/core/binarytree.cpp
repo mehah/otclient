@@ -72,7 +72,7 @@ BinaryTreeVec BinaryTree::getChildren()
         switch (byte) {
             case static_cast<uint8_t>(Node::START):
             {
-                BinaryTreePtr node(new BinaryTree(m_fin));
+                const BinaryTreePtr& node(new BinaryTree(m_fin));
                 children.push_back(node);
                 node->skipNodes();
                 break;

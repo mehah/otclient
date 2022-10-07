@@ -199,14 +199,14 @@ SpriteSheetPtr SpriteAppearances::getSheetBySpriteId(int id, bool load /* = true
 ImagePtr SpriteAppearances::getSpriteImage(int id)
 {
     try {
-        const SpriteSheetPtr sheet = getSheetBySpriteId(id);
+        const auto& sheet = getSheetBySpriteId(id);
         if (!sheet) {
             return nullptr;
         }
 
         const Size& size = sheet->getSpriteSize();
 
-        ImagePtr image(new Image(size));
+        const ImagePtr& image(new Image(size));
         uint8_t* pixelData = image->getPixelData();
 
         const int spriteOffset = id - sheet->firstId;
