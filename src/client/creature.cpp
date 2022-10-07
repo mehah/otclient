@@ -404,7 +404,7 @@ void Creature::updateJump()
     const auto self = static_self_cast<Creature>();
     g_dispatcher.scheduleEvent([self] {
         self->updateJump();
-                               }, nextT - m_jumpTimer.ticksElapsed());
+    }, nextT - m_jumpTimer.ticksElapsed());
 }
 
 void Creature::onPositionChange(const Position& newPos, const Position& oldPos)
@@ -464,7 +464,7 @@ void Creature::onDisappear()
 
         self->m_oldPosition = {};
         self->m_disappearEvent = nullptr;
-                                             });
+    });
 }
 
 void Creature::onDeath()
@@ -567,7 +567,7 @@ void Creature::nextWalkUpdate()
     m_walkUpdateEvent = g_dispatcher.scheduleEvent([self] {
         self->m_walkUpdateEvent = nullptr;
         self->nextWalkUpdate();
-                                                   }, m_stepCache.walkDuration);
+    }, m_stepCache.walkDuration);
 }
 
 void Creature::updateWalk(const bool isPreWalking)
@@ -618,7 +618,7 @@ void Creature::terminateWalk()
     m_walkFinishAnimEvent = g_dispatcher.scheduleEvent([self] {
         self->m_walkAnimationPhase = 0;
         self->m_walkFinishAnimEvent = nullptr;
-                                                       }, g_game.getServerBeat());
+    }, g_game.getServerBeat());
 }
 
 void Creature::setName(const std::string_view name)
@@ -736,7 +736,7 @@ void Creature::updateOutfitColor(Color color, Color finalColor, Color delta, int
     const auto self = static_self_cast<Creature>();
     m_outfitColorUpdateEvent = g_dispatcher.scheduleEvent([=] {
         self->updateOutfitColor(color, finalColor, delta, duration);
-                                                          }, 100);
+    }, 100);
 }
 
 void Creature::setSpeed(uint16_t speed)
@@ -794,7 +794,7 @@ void Creature::setShieldTexture(const std::string& filename, bool blink)
         auto self = static_self_cast<Creature>();
         g_dispatcher.scheduleEvent([self] {
             self->updateShield();
-                                   }, SHIELD_BLINK_TICKS);
+        }, SHIELD_BLINK_TICKS);
     }
 
     m_shieldBlink = blink;
@@ -809,7 +809,7 @@ void Creature::addTimedSquare(uint8_t color)
     const auto self = static_self_cast<Creature>();
     g_dispatcher.scheduleEvent([self] {
         self->removeTimedSquare();
-                               }, VOLATILE_SQUARE_DURATION);
+    }, VOLATILE_SQUARE_DURATION);
 }
 
 void Creature::updateShield()
@@ -820,7 +820,7 @@ void Creature::updateShield()
         auto self = static_self_cast<Creature>();
         g_dispatcher.scheduleEvent([self] {
             self->updateShield();
-                                   }, SHIELD_BLINK_TICKS);
+        }, SHIELD_BLINK_TICKS);
     } else if (!m_shieldBlink)
         m_showShieldTexture = true;
 }

@@ -62,11 +62,11 @@ namespace stdext
     {
         template<typename Tuple, typename... Args> static int call(char* s, size_t maxlen, const char* format, const Tuple& /*tuple*/, const Args&... args)
         {
-        #ifdef _MSC_VER
+#ifdef _MSC_VER
             return _snprintf(s, maxlen, format, args...);
-        #else
+#else
             return snprintf(s, maxlen, format, args...);
-        #endif
+#endif
         }
     };
 

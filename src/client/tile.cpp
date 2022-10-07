@@ -648,11 +648,11 @@ void Tile::checkTranslucentLight()
     Position downPos = m_position;
     if (!downPos.down()) return;
 
-    const TilePtr tile = g_map.getOrCreateTile(downPos);
+    const auto& tile = g_map.getOrCreateTile(downPos);
     if (!tile)
         return;
 
-    for (const ThingPtr& thing : m_things) {
+    for (const auto& thing : m_things) {
         if (thing->isTranslucent() || thing->hasLensHelp()) {
             tile->m_flags |= TILESTATE_TRANSLUECENT_LIGHT;
             return;
@@ -828,7 +828,7 @@ void Tile::select(const bool noFilter)
         if (highLight.invertedColorSelection ? highLight.fadeLevel > HIGHTLIGHT_FADE_END : highLight.fadeLevel < HIGHTLIGHT_FADE_START) {
             highLight.invertedColorSelection = !highLight.invertedColorSelection;
         }
-                                                         }, 40);
+    }, 40);
 }
 
 void Tile::unselect()

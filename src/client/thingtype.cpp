@@ -791,7 +791,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
     const bool useCustomImage = animationPhase == 0 && !m_customImage.empty();
     const int indexSize = textureLayers * m_numPatternX * m_numPatternY * m_numPatternZ;
     const Size textureSize = getBestTextureDimension(m_size.width(), m_size.height(), indexSize);
-    const ImagePtr fullImage = useCustomImage ? Image::load(m_customImage) : ImagePtr(new Image(textureSize * SPRITE_SIZE));
+    const auto& fullImage = useCustomImage ? Image::load(m_customImage) : ImagePtr(new Image(textureSize * SPRITE_SIZE));
 
     m_texturesFramesRects[animationPhase].resize(indexSize);
     m_texturesFramesOriginRects[animationPhase].resize(indexSize);
@@ -814,7 +814,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
                     if (!useCustomImage) {
                         if (protobufSupported) {
                             const uint32_t spriteIndex = getSpriteIndex(-1, -1, spriteMask ? 1 : l, x, y, z, animationPhase);
-                            ImagePtr spriteImage = g_sprites.getSpriteImage(m_spritesIndex[spriteIndex]);
+                            const auto& spriteImage = g_sprites.getSpriteImage(m_spritesIndex[spriteIndex]);
                             if (!spriteImage) {
                                 return nullptr;
                             }
@@ -835,7 +835,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
                             for (int h = 0; h < m_size.height(); ++h) {
                                 for (int w = 0; w < m_size.width(); ++w) {
                                     const uint32_t spriteIndex = getSpriteIndex(w, h, spriteMask ? 1 : l, x, y, z, animationPhase);
-                                    ImagePtr spriteImage = g_sprites.getSpriteImage(m_spritesIndex[spriteIndex]);
+                                    const auto& spriteImage = g_sprites.getSpriteImage(m_spritesIndex[spriteIndex]);
 
                                     // verifies that the first block in the lower right corner is transparent.
                                     if (h == 0 && w == 0 && (!spriteImage || spriteImage->hasTransparentPixel())) {
@@ -849,9 +849,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
                                             spriteImage->overwriteMask(maskColors[(l - 1)]);
                                         }
 
-                                        Point spritePos = Point(m_size.width() - w - 1,
-                                                                m_size.height() - h - 1) * SPRITE_SIZE;
-
+                                        const Point& spritePos = Point(m_size.width() - w - 1, m_size.height() - h - 1) * SPRITE_SIZE;
                                         fullImage->blit(framePos + spritePos, spriteImage);
                                     }
                                 }

@@ -38,7 +38,7 @@
 
 ItemPtr Item::create(int id)
 {
-    const auto& item(new Item);
+    const ItemPtr& item(new Item);
     item->setId(id);
 
     return item;
@@ -46,7 +46,7 @@ ItemPtr Item::create(int id)
 
 ItemPtr Item::createFromOtb(int id)
 {
-    const auto& item(new Item);
+    const ItemPtr& item(new Item);
     item->setOtbId(id);
 
     return item;

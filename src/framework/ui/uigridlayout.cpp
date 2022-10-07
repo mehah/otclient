@@ -120,7 +120,7 @@ bool UIGridLayout::internalUpdate()
         // must set the preferred height later
         g_dispatcher.addEvent([=] {
             parentWidget->setHeight(preferredHeight);
-            });
+        });
     }
 
     return changed;

@@ -57,7 +57,7 @@ void Spawn::load(TiXmlElement* node)
     setCenterPos(centerPos);
     setRadius(node->readType<int32_t>("radius"));
 
-    CreatureTypePtr cType(nullptr);
+    CreatureTypePtr cType;
     for (TiXmlElement* cNode = node->FirstChildElement(); cNode; cNode = cNode->NextSiblingElement()) {
         if (cNode->ValueStr() != "monster" && cNode->ValueStr() != "npc")
             throw Exception("invalid spawn-subnode %s", cNode->ValueStr());

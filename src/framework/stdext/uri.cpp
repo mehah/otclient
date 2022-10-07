@@ -11,7 +11,7 @@ ParsedURI parseURI(const std::string& url)
     };
 
     auto value_to_lower = [](std::string data) -> std::string {
-        for(char &c : data)
+        for (char& c : data)
             c = tolower(c);
         return data;
     };

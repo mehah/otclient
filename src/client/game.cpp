@@ -185,7 +185,7 @@ void Game::processGameStart()
             g_lua.callGlobalField("g_game", "onConnectionFailing", false);
             m_connectionFailWarned = false;
         }
-                                                     }, 1000);
+    }, 1000);
 }
 
 void Game::processGameEnd()

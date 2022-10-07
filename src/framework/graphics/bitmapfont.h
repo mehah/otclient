@@ -50,7 +50,7 @@ public:
 
     void fillTextCoords(const CoordsBufferPtr& coords, const std::string_view text,
                         const Size& textBoxSize, Fw::AlignmentFlag align,
-                                                         const Rect& screenCoords, const std::vector<Point>& glyphsPositions);
+                        const Rect& screenCoords, const std::vector<Point>& glyphsPositions);
 
     /// Calculate glyphs positions to use on render, also calculates textBoxSize if wanted
     const std::vector<Point>& calculateGlyphsPositions(const std::string_view text,

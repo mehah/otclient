@@ -54,11 +54,11 @@ namespace stdext
         shared_object_ptr<T> const_self_cast() { return stdext::shared_object_ptr<T>(const_cast<T*>(this)); }
 
     private:
-    #ifdef THREAD_SAFE
+#ifdef THREAD_SAFE
         std::atomic<refcount_t> refs{ 0 };
-    #else
+#else
         refcount_t refs{ 0 };
-    #endif
+#endif
     };
 
     template<class T>

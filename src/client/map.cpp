@@ -581,7 +581,7 @@ void Map::setCentralPosition(const Position& centralPosition)
             localPlayer->onAppear();
             g_logger.debug("forced player position update");
         }
-                          });
+    });
 
     for (const MapViewPtr& mapView : m_mapViews)
         mapView->onMapCenterChange(centralPosition, mapView->m_lastCameraPosition);
@@ -647,14 +647,16 @@ bool Map::isCovered(const Position& pos, uint8_t firstFloor)
     // check for tiles on top of the postion
     Position tilePos = pos;
     while (tilePos.coveredUp() && tilePos.z >= firstFloor) {
-        TilePtr tile = getTile(tilePos);
         // the below tile is covered when the above tile has a full opaque
-        if (tile && tile->isFullyOpaque())
-            return true;
+        if (const TilePtr& tile = getTile(tilePos)) {
+            if (tile->isFullyOpaque())
+                return true;
+        }
 
-        tile = getTile(tilePos.translated(1, 1));
-        if (tile && tile->isTopGround())
-            return true;
+        if (const TilePtr& tile = getTile(tilePos.translated(1, 1))) {
+            if (tile->isTopGround())
+                return true;
+        }
     }
 
     return false;
@@ -1076,5 +1078,5 @@ void Map::findPathAsync(const Position& start, const Position& goal, const std::
     g_asyncDispatcher.dispatch([=] {
         auto ret = g_map.newFindPath(start, goal, visibleNodes);
         g_dispatcher.addEvent(std::bind(callback, ret));
-                               });
+    });
 }

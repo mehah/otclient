@@ -82,12 +82,12 @@ MapView::MapView()
         }
 
         g_painter->setOpacity(fadeOpacity);
-                          });
+    });
 
     mapPool->onAfterDraw([&] {
         g_painter->resetShaderProgram();
         g_painter->resetOpacity();
-                         });
+    });
 
     m_shadowBuffer = std::make_shared<DrawBuffer>(DrawPool::DrawOrder::FIFTH, false);
     m_shader = g_shaders.getDefaultMapShader();

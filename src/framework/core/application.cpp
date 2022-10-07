@@ -173,7 +173,7 @@ std::string Application::getOs()
 #elif __linux
     return "linux";
 #elif ANDROID
-	return "android";
+    return "android";
 #else
     return "unknown";
 #endif
