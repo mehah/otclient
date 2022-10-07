@@ -398,8 +398,8 @@ void MapView::updateVisibleTiles()
 void MapView::updateGeometry(const Size& visibleDimension)
 {
     const uint8_t tileSize = SPRITE_SIZE * m_scaleFactor;
-    const Size& drawDimension = visibleDimension + 3;
-    const Size bufferSize = drawDimension * tileSize;
+    const auto& drawDimension = visibleDimension + 3;
+    const auto& bufferSize = drawDimension * tileSize;
 
     if (bufferSize.width() > g_graphics.getMaxTextureSize() || bufferSize.height() > g_graphics.getMaxTextureSize()) {
         g_logger.traceError("reached max zoom out");
@@ -530,7 +530,7 @@ void MapView::setVisibleDimension(const Size& visibleDimension)
         return;
     }
 
-    if (visibleDimension < Size(3)) {
+    if (visibleDimension < 3) {
         g_logger.traceError("reach max zoom in");
         return;
     }

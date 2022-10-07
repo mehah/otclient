@@ -127,7 +127,7 @@ void Item::createBuffer()
     DrawPool::DrawOrder order = DrawPool::DrawOrder::NONE;
     if (isSingleGround())
         order = DrawPool::DrawOrder::FIRST;
-    else if (isGroundBorder())
+    else if (isSingleGroundBorder() && !hasElevation())
         order = DrawPool::DrawOrder::SECOND;
     else if ((isCommon() || isOnBottom()) && isSingleDimension() && !hasDisplacement() && isNotMoveable())
         order = DrawPool::DrawOrder::THIRD;
