@@ -92,6 +92,17 @@ inline bool luavalue_cast(int index, int64_t& v)
     double d;
     const bool r = luavalue_cast(index, d); v = d; return r;
 }
+
+#ifdef __APPLE__
+// ulong
+inline int push_luavalue(ulong v) { push_luavalue(static_cast<double>(v)); return 1; }
+inline bool luavalue_cast(int index, ulong& v)
+{
+    double d;
+    const bool r = luavalue_cast(index, d); v = d; return r;
+}
+#endif
+
 // uint64
 inline int push_luavalue(uint64_t v) { push_luavalue(static_cast<double>(v)); return 1; }
 inline bool luavalue_cast(int index, uint64_t& v)
@@ -101,6 +112,7 @@ inline bool luavalue_cast(int index, uint64_t& v)
 }
 
 // string
+int push_luavalue(const char* cstr);
 int push_luavalue(const std::string_view str);
 bool luavalue_cast(int index, std::string& str);
 
