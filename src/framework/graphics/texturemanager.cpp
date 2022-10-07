@@ -82,7 +82,7 @@ void TextureManager::liveReload()
             if (tex->getTime() >= g_resources.getFileTime(path))
                 continue;
 
-            ImagePtr image = Image::load(path);
+            const auto& image = Image::load(path);
             if (!image)
                 continue;
             tex->uploadPixels(image, tex->hasMipmaps());

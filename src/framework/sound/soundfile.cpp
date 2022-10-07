@@ -30,7 +30,7 @@ SoundFile::SoundFile(const FileStreamPtr& fileStream) : m_file(fileStream) { m_f
 
 SoundFilePtr SoundFile::loadSoundFile(const std::string& filename)
 {
-    const FileStreamPtr file = g_resources.openFile(filename);
+    const auto& file = g_resources.openFile(filename);
     if (!file)
         throw Exception("unable to open %s", filename);
 

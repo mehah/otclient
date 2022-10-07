@@ -99,8 +99,8 @@ void SoundManager::poll()
     ensureContext();
 
     for (auto it = m_streamFiles.begin(); it != m_streamFiles.end();) {
-        const StreamSoundSourcePtr source = it->first;
-        auto& future = it->second;
+        const auto& source = it->first;
+        const auto& future = it->second;
 
         if (future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
             SoundFilePtr sound = future.get();
@@ -115,7 +115,7 @@ void SoundManager::poll()
     }
 
     for (auto it = m_sources.begin(); it != m_sources.end();) {
-        const SoundSourcePtr source = *it;
+        const auto& source = *it;
 
         source->update();
 
@@ -157,7 +157,7 @@ void SoundManager::preload(std::string filename)
         return;
 
     ensureContext();
-    const SoundFilePtr soundFile = SoundFile::loadSoundFile(filename);
+    const auto& soundFile = SoundFile::loadSoundFile(filename);
 
     // only keep small files
     if (!soundFile || soundFile->getSize() > MAX_CACHE_SIZE)
@@ -182,7 +182,7 @@ SoundSourcePtr SoundManager::play(const std::string& fn, float fadetime, float g
         pitch = 1.0f;
 
     const std::string& filename = resolveSoundFile(fn);
-    SoundSourcePtr soundSource = createSoundSource(filename);
+    const auto& soundSource = createSoundSource(filename);
     if (!soundSource) {
         g_logger.error(stdext::format("unable to play '%s'", filename));
         return nullptr;

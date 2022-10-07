@@ -49,7 +49,7 @@ bool Module::load()
             if (depName == m_name)
                 throw Exception("cannot depend on itself");
 
-            ModulePtr dep = g_modules.getModule(depName);
+            const auto& dep = g_modules.getModule(depName);
             if (!dep)
                 throw Exception("dependency '%s' was not found", depName);
 
@@ -100,7 +100,7 @@ bool Module::load()
     g_modules.updateModuleLoadOrder(asModule());
 
     for (const std::string& modName : m_loadLaterModules) {
-        ModulePtr dep = g_modules.getModule(modName);
+        const auto& dep = g_modules.getModule(modName);
         if (!dep)
             g_logger.error(stdext::format("Unable to find module '%s' required by '%s'", modName, m_name));
         else if (!dep->isLoaded())
@@ -171,9 +171,10 @@ bool Module::hasDependency(const std::string_view name, bool recursive)
 
     if (recursive) {
         for (const std::string& depName : m_dependencies) {
-            const ModulePtr dep = g_modules.getModule(depName);
-            if (dep && dep->hasDependency(name, true))
-                return true;
+            if (const auto& dep = g_modules.getModule(depName)) {
+                if (dep->hasDependency(name, true))
+                    return true;
+            }
         }
     }
 
@@ -198,24 +199,24 @@ void Module::discover(const OTMLNodePtr& moduleNode)
     m_sandboxed = moduleNode->valueAt<bool>("sandboxed", false);
     m_autoLoadPriority = moduleNode->valueAt<int>("autoload-priority", 9999);
 
-    if (const OTMLNodePtr node = moduleNode->get("dependencies")) {
-        for (const OTMLNodePtr& tmp : node->children())
+    if (const auto& node = moduleNode->get("dependencies")) {
+        for (const auto& tmp : node->children())
             m_dependencies.push_back(tmp->value());
     }
 
-    if (const OTMLNodePtr node = moduleNode->get("scripts")) {
-        for (const OTMLNodePtr& tmp : node->children())
+    if (const auto& node = moduleNode->get("scripts")) {
+        for (const auto& tmp : node->children())
             m_scripts.push_back(stdext::resolve_path(tmp->value(), node->source()));
     }
 
-    if (const OTMLNodePtr node = moduleNode->get("load-later")) {
-        for (const OTMLNodePtr& tmp : node->children())
+    if (const auto& node = moduleNode->get("load-later")) {
+        for (const auto& tmp : node->children())
             m_loadLaterModules.push_back(tmp->value());
     }
 
-    if (const OTMLNodePtr node = moduleNode->get("@onLoad"))
+    if (const auto& node = moduleNode->get("@onLoad"))
         m_onLoadFunc = std::make_tuple(node->value(), "@" + node->source() + ":[" + node->tag() + "]");
 
-    if (const OTMLNodePtr node = moduleNode->get("@onUnload"))
+    if (const auto& node = moduleNode->get("@onUnload"))
         m_onUnloadFunc = std::make_tuple(node->value(), "@" + node->source() + ":[" + node->tag() + "]");
 }

@@ -144,7 +144,7 @@ T OTMLNode::valueAtIndex(int childIndex)
 template<typename T>
 T OTMLNode::valueAt(const std::string_view childTag, const T& def)
 {
-    if (const OTMLNodePtr node = get(childTag))
+    if (const auto& node = get(childTag))
         if (!node->isNull())
             return node->value<T>();
     return def;
@@ -153,7 +153,7 @@ T OTMLNode::valueAt(const std::string_view childTag, const T& def)
 template<typename T>
 T OTMLNode::valueAtIndex(int childIndex, const T& def)
 {
-    if (const OTMLNodePtr node = getIndex(childIndex))
+    if (const auto& node = getIndex(childIndex))
         return node->value<T>();
     return def;
 }
@@ -167,7 +167,7 @@ void OTMLNode::write(const T& v)
 template<typename T>
 void OTMLNode::writeAt(const std::string_view childTag, const T& v)
 {
-    const OTMLNodePtr child = create(childTag);
+    const auto& child = create(childTag);
     child->setUnique(true);
     child->write<T>(v);
     addChild(child);
@@ -176,7 +176,7 @@ void OTMLNode::writeAt(const std::string_view childTag, const T& v)
 template<typename T>
 void OTMLNode::writeIn(const T& v)
 {
-    const OTMLNodePtr child = create();
+    const auto& child = create();
     child->write<T>(v);
     addChild(child);
 }

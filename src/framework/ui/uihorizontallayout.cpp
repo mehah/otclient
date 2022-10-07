@@ -36,7 +36,7 @@ void UIHorizontalLayout::applyStyle(const OTMLNodePtr& styleNode)
 
 bool UIHorizontalLayout::internalUpdate()
 {
-    const UIWidgetPtr parentWidget = getParentWidget();
+    const auto& parentWidget = getParentWidget();
     if (!parentWidget)
         return false;
 

@@ -69,7 +69,7 @@ OTMLNodePtr OTMLNode::getIndex(int childIndex)
 OTMLNodePtr OTMLNode::at(const std::string_view childTag)
 {
     OTMLNodePtr res;
-    for (const OTMLNodePtr& child : m_children) {
+    for (const auto& child : m_children) {
         if (child->tag() == childTag && !child->isNull()) {
             res = child;
             break;
@@ -177,7 +177,7 @@ OTMLNodeList OTMLNode::children()
 
 OTMLNodePtr OTMLNode::clone()
 {
-    OTMLNodePtr myClone(new OTMLNode);
+    const OTMLNodePtr& myClone(new OTMLNode);
     myClone->setTag(m_tag);
     myClone->setValue(m_value);
     myClone->setUnique(m_unique);

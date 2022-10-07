@@ -41,8 +41,7 @@ PlatformWindow& g_window = window;
 
 int PlatformWindow::loadMouseCursor(const std::string& file, const Point& hotSpot)
 {
-    const ImagePtr image = Image::load(file);
-
+    const auto& image = Image::load(file);
     if (!image) {
         g_logger.traceError(stdext::format("unable to load cursor image file %s", file));
         return -1;

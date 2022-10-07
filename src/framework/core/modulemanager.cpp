@@ -44,9 +44,10 @@ void ModuleManager::discoverModules()
         auto moduleFiles = g_resources.listDirectoryFiles("/" + moduleDir);
         for (const std::string& moduleFile : moduleFiles) {
             if (g_resources.isFileType(moduleFile, "otmod")) {
-                ModulePtr module = discoverModule("/" + moduleDir + "/" + moduleFile);
-                if (module && module->isAutoLoad())
-                    m_autoLoadModules.emplace(module->getAutoLoadPriority(), module);
+                if (const auto& module = discoverModule("/" + moduleDir + "/" + moduleFile)) {
+                    if (module->isAutoLoad())
+                        m_autoLoadModules.emplace(module->getAutoLoadPriority(), module);
+                }
             }
         }
     }
@@ -66,9 +67,8 @@ ModulePtr ModuleManager::discoverModule(const std::string& moduleFile)
 {
     ModulePtr module;
     try {
-        const OTMLDocumentPtr doc = OTMLDocument::parse(moduleFile);
-        const OTMLNodePtr moduleNode = doc->at("Module");
-
+        const auto& doc = OTMLDocument::parse(moduleFile);
+        const auto& moduleNode = doc->at("Module");
         const auto& name = moduleNode->valueAt("name");
 
         bool push = false;
@@ -90,7 +90,7 @@ ModulePtr ModuleManager::discoverModule(const std::string& moduleFile)
 
 void ModuleManager::ensureModuleLoaded(const std::string_view moduleName)
 {
-    const ModulePtr module = g_modules.getModule(moduleName);
+    const auto& module = g_modules.getModule(moduleName);
     if (!module || !module->load())
         g_logger.fatal(stdext::format("Unable to load '%s' module", moduleName));
 }
