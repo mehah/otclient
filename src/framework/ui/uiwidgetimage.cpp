@@ -162,11 +162,11 @@ void UIWidget::drawImage(const Rect& screenCoords)
     // smooth is now enabled by default for all textures
     //m_imageTexture->setSmooth(m_imageSmooth);
     const bool useRepeated = m_imageBordered || m_imageRepeated;
-    for (const auto& rect : m_imageCoordsCache) {
+    for (const auto& [dest, src] : m_imageCoordsCache) {
         if (useRepeated)
-            g_drawPool.addTexturedRepeatedRect(rect.first, m_imageTexture, rect.second, m_imageColor);
+            g_drawPool.addTexturedRepeatedRect(dest, m_imageTexture, src, m_imageColor);
         else
-            g_drawPool.addTexturedRect(rect.first, m_imageTexture, rect.second, m_imageColor);
+            g_drawPool.addTexturedRect(dest, m_imageTexture, src, m_imageColor);
     }
 }
 

@@ -90,11 +90,11 @@ void UITextEdit::drawSelf(Fw::DrawPane drawPane)
             for (int i = m_selectionStart; i < m_selectionEnd; ++i)
                 m_glyphsSelectRectCache.emplace_back(m_glyphsCoords[i], m_glyphsTexCoords[i]);
         }
-        for (const auto& rect : m_glyphsSelectRectCache)
-            g_drawPool.addFilledRect(rect.first, m_selectionBackgroundColor);
+        for (const auto& [dest, src] : m_glyphsSelectRectCache)
+            g_drawPool.addFilledRect(dest, m_selectionBackgroundColor);
 
-        for (const auto& rect : m_glyphsSelectRectCache)
-            g_drawPool.addTexturedRect(rect.first, texture, rect.second, m_selectionColor);
+        for (const auto& [dest, src] : m_glyphsSelectRectCache)
+            g_drawPool.addTexturedRect(dest, texture, src, m_selectionColor);
     }
 
     // render cursor
@@ -640,7 +640,7 @@ void UITextEdit::onStyleApply(const std::string_view styleName, const OTMLNodePt
         else if (node->tag() == "selection-background-color")
             setSelectionBackgroundColor(node->value<Color>());
         else if (node->tag() == "selection") {
-            const auto selectionRange = node->value<Point>();
+            const auto& selectionRange = node->value<Point>();
             setSelection(selectionRange.x, selectionRange.y);
         } else if (node->tag() == "cursor-visible")
             setCursorVisible(node->value<bool>());
@@ -711,7 +711,7 @@ bool UITextEdit::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepe
             }
         } else if (keyCode == Fw::KeyTab && !m_shiftNavigation) {
             clearSelection();
-            if (const UIWidgetPtr parent = getParent())
+            if (const auto& parent = getParent())
                 parent->focusNextChild(Fw::KeyboardFocusReason, true);
             return true;
         } else if (keyCode == Fw::KeyEnter && m_multiline && m_editable) {
@@ -747,7 +747,7 @@ bool UITextEdit::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepe
         }
     } else if (keyboardModifiers == Fw::KeyboardShiftModifier) {
         if (keyCode == Fw::KeyTab && !m_shiftNavigation) {
-            if (const UIWidgetPtr parent = getParent())
+            if (const auto& parent = getParent())
                 parent->focusPreviousChild(Fw::KeyboardFocusReason, true);
             return true;
         }

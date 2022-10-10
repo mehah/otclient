@@ -59,7 +59,7 @@ void UISprite::setSpriteId(int id)
     if (id == 0)
         m_sprite = nullptr;
     else {
-        const ImagePtr image = g_sprites.getSpriteImage(id);
+        const auto& image = g_sprites.getSpriteImage(id);
         if (image)
             m_sprite = new Texture(image);
         else

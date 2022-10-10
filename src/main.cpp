@@ -26,7 +26,7 @@
 #include <framework/luaengine/luainterface.h>
 
 #ifdef FRAMEWORK_NET
-    #include <framework/net/protocolhttp.h>
+#include <framework/net/protocolhttp.h>
 #endif
 
 int main(int argc, const char* argv[])
@@ -44,9 +44,9 @@ int main(int argc, const char* argv[])
         g_resources.init(args[0].data());
         g_resources.runEncryption(args.size() >= 3 ? args[2] : ENCRYPTION_PASSWORD);
         std::cout << "Encryption complete" << std::endl;
-    #ifdef WIN32
+#ifdef WIN32
         MessageBoxA(NULL, "Encryption complete", "Success", 0);
-    #endif
+#endif
         return 0;
     }
 #endif
@@ -54,9 +54,9 @@ int main(int argc, const char* argv[])
     // initialize application framework and otclient
     g_app.init(args);
     g_client.init(args);
-    #ifdef FRAMEWORK_NET
-        g_http.init();
-    #endif
+#ifdef FRAMEWORK_NET
+    g_http.init();
+#endif
 
 #ifdef ANDROID
     // Unzip Android assets/data.zip
@@ -79,8 +79,8 @@ int main(int argc, const char* argv[])
     // terminate everything and free memory
     Client::terminate();
     g_app.terminate();
-    #ifdef FRAMEWORK_NET
-        g_http.terminate();
-    #endif    
+#ifdef FRAMEWORK_NET
+    g_http.terminate();
+#endif
     return 0;
 }

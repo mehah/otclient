@@ -34,9 +34,9 @@ static std::vector<int> s_lineWidths(1);
 
 void BitmapFont::load(const OTMLNodePtr& fontNode)
 {
-    const OTMLNodePtr textureNode = fontNode->at("texture");
+    const auto& textureNode = fontNode->at("texture");
     const auto& textureFile = stdext::resolve_path(textureNode->value(), textureNode->source());
-    const auto glyphSize = fontNode->valueAt<Size>("glyph-size");
+    const auto& glyphSize = fontNode->valueAt<Size>("glyph-size");
     const int spaceWidth = fontNode->valueAt("space-width", glyphSize.width());
 
     m_glyphHeight = fontNode->valueAt<int>("height");
@@ -48,7 +48,7 @@ void BitmapFont::load(const OTMLNodePtr& fontNode)
     m_texture = g_textures.getTexture(textureFile);
     const Size textureSize = m_texture->getSize();
 
-    if (const OTMLNodePtr node = fontNode->get("fixed-glyph-width")) {
+    if (const auto& node = fontNode->get("fixed-glyph-width")) {
         for (int glyph = m_firstGlyph; glyph < 256; ++glyph)
             m_glyphsSize[glyph] = Size(node->value<int>(), m_glyphHeight);
     } else {
@@ -67,7 +67,7 @@ void BitmapFont::load(const OTMLNodePtr& fontNode)
 
     // read custom widths
     /*
-    if(OTMLNodePtr node = fontNode->get("glyph-widths")) {
+    if(const auto& node = fontNode->get("glyph-widths")) {
             for(const OTMLNodePtr& child : node->children())
                     m_glyphsSize[stdext::safe_cast<int>(child->tag())].setWidth(child->value<int>());
     }
@@ -94,8 +94,8 @@ void BitmapFont::drawText(const std::string_view text, const Rect& screenCoords,
 {
     Size textBoxSize;
     const auto& glyphsPositions = calculateGlyphsPositions(text, align, &textBoxSize);
-    for (const auto& rects : getDrawTextCoords(text, textBoxSize, align, screenCoords, glyphsPositions)) {
-        g_drawPool.addTexturedRect(rects.first, m_texture, rects.second, color);
+    for (const auto& [dest, src] : getDrawTextCoords(text, textBoxSize, align, screenCoords, glyphsPositions)) {
+        g_drawPool.addTexturedRect(dest, m_texture, src, color);
     }
 }
 

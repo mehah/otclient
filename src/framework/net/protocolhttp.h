@@ -64,9 +64,9 @@ class HttpSession : public std::enable_shared_from_this<HttpSession>
 public:
 
     HttpSession(asio::io_service& service, const std::string& url, const std::string& agent,
-            const bool& enable_time_out_on_read_write,
-            const stdext::map<std::string, std::string>& custom_header,
-            int timeout, bool isJson, HttpResult_ptr result, HttpResult_cb callback) :
+                const bool& enable_time_out_on_read_write,
+                const stdext::map<std::string, std::string>& custom_header,
+                int timeout, bool isJson, HttpResult_ptr result, HttpResult_cb callback) :
         m_service(service),
         m_url(url),
         m_agent(agent),
@@ -132,7 +132,7 @@ class WebsocketSession : public std::enable_shared_from_this<WebsocketSession>
 public:
 
     WebsocketSession(asio::io_service& service, const std::string& url, const std::string& agent,
-                    const bool& enable_time_out_on_read_write, int timeout, HttpResult_ptr result, WebsocketSession_cb callback) :
+                     const bool& enable_time_out_on_read_write, int timeout, HttpResult_ptr result, WebsocketSession_cb callback) :
         m_service(service),
         m_url(url),
         m_agent(agent),

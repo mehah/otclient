@@ -89,7 +89,7 @@ void Texture::uploadPixels(const ImagePtr& image, bool buildMipmaps, bool compre
     if (!setupSize(image->getSize()))
         return;
 
-    ImagePtr glImage = image;
+    ImagePtr glImage;
     if (m_size != m_glSize) {
         glImage = ImagePtr(new Image(m_glSize, image->getBpp()));
         glImage->paste(image);

@@ -68,7 +68,7 @@ void Map::loadOtbm(const std::string& fileName)
         const uint32_t headerMajorItems = root->getU8();
         if (headerMajorItems > g_things.getOtbMajorVersion()) {
             throw Exception("This map was saved with different OTB version. read %d what it's supposed to be: %d",
-                                                   headerMajorItems, g_things.getOtbMajorVersion());
+                            headerMajorItems, g_things.getOtbMajorVersion());
         }
 
         root->skip(3);
@@ -155,7 +155,7 @@ void Map::loadOtbm(const std::string& fileName)
                             default:
                             {
                                 throw Exception("invalid tile attribute %d at pos %s",
-                                                                       static_cast<int>(tileAttr), stdext::to_string(pos));
+                                                static_cast<int>(tileAttr), stdext::to_string(pos));
                             }
                         }
                     }
@@ -318,8 +318,8 @@ void Map::saveOtbm(const std::string& fileName)
                                 continue;
 
                             if (pos.x < px || pos.x >= px + 256
-                               || pos.y < py || pos.y >= py + 256
-                               || pos.z != pz) {
+                                || pos.y < py || pos.y >= py + 256
+                                || pos.z != pz) {
                                 if (!firstNode)
                                     root->endNode(); /// OTBM_TILE_AREA
 
@@ -348,7 +348,7 @@ void Map::saveOtbm(const std::string& fileName)
                                 // Those types are called "complex" needs other stuff to be written.
                                 // For containers, there is container items, for depot, depot it and so on.
                                 if (!ground->isContainer() && !ground->isDepot()
-                                   && !ground->isDoor() && !ground->isTeleport()) {
+                                    && !ground->isDoor() && !ground->isTeleport()) {
                                     root->addU8(OTBM_ATTR_ITEM);
                                     root->addU16(ground->getServerId());
                                 } else

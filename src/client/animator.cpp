@@ -68,9 +68,9 @@ void Animator::serialize(const FileStreamPtr& fin)
     fin->add32(m_loopCount);
     fin->add8(m_startPhase);
 
-    for (const auto& phase : m_phaseDurations) {
-        fin->addU32(phase.first);
-        fin->addU32(phase.second);
+    for (const auto [min, max] : m_phaseDurations) {
+        fin->addU32(min);
+        fin->addU32(max);
     }
 }
 
@@ -132,8 +132,8 @@ int Animator::getPhaseAt(Timer& timer)
     int index = 0;
     ticks_t total = 0;
 
-    for (const auto& pair : m_phaseDurations) {
-        total += pair.first + (pair.second - pair.first);
+    for (const auto [min, max] : m_phaseDurations) {
+        total += min + (max - min);
 
         if (time < total) {
             return index;
@@ -194,10 +194,10 @@ int Animator::getPhaseDuration(int phase)
 {
     assert(phase < static_cast<int>(m_phaseDurations.size()));
 
-    const auto& data = m_phaseDurations[phase];
-    if (data.first == data.second) return data.first;
+    const auto [min, max] = m_phaseDurations[phase];
+    if (min == max) return min;
 
-    return stdext::random_range(data.first, data.second);
+    return stdext::random_range(min, max);
 }
 
 void Animator::calculateSynchronous()
@@ -224,8 +224,8 @@ void Animator::calculateSynchronous()
 uint16_t Animator::getTotalDuration()
 {
     uint16_t time = 0;
-    for (const auto& pair : m_phaseDurations) {
-        time += pair.first + (pair.second - pair.first);
+    for (const auto [min, max] : m_phaseDurations) {
+        time += min + (max - min);
     }
 
     return time * std::max<int>(m_loopCount, 1);

@@ -62,7 +62,7 @@ void House::removeDoorById(uint32_t doorId)
 {
     if (doorId >= m_lastDoorId)
         throw Exception("Failed to remove door of id %d (would overflow), max id: %d",
-                                               doorId, m_lastDoorId);
+                        doorId, m_lastDoorId);
     m_doors[doorId] = nullptr;
 }
 

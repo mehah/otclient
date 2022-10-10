@@ -39,14 +39,15 @@ void ModuleManager::discoverModules()
     // remove modules that are not loaded
     m_autoLoadModules.clear();
 
-    const auto moduleDirs = g_resources.listDirectoryFiles("/");
-    for (const std::string& moduleDir : moduleDirs) {
-        auto moduleFiles = g_resources.listDirectoryFiles("/" + moduleDir);
-        for (const std::string& moduleFile : moduleFiles) {
+    const auto& moduleDirs = g_resources.listDirectoryFiles("/");
+    for (const auto& moduleDir : moduleDirs) {
+        const auto& moduleFiles = g_resources.listDirectoryFiles("/" + moduleDir);
+        for (const auto& moduleFile : moduleFiles) {
             if (g_resources.isFileType(moduleFile, "otmod")) {
-                ModulePtr module = discoverModule("/" + moduleDir + "/" + moduleFile);
-                if (module && module->isAutoLoad())
-                    m_autoLoadModules.emplace(module->getAutoLoadPriority(), module);
+                if (const auto& module = discoverModule("/" + moduleDir + "/" + moduleFile)) {
+                    if (module->isAutoLoad())
+                        m_autoLoadModules.emplace(module->getAutoLoadPriority(), module);
+                }
             }
         }
     }
@@ -54,10 +55,10 @@ void ModuleManager::discoverModules()
 
 void ModuleManager::autoLoadModules(int maxPriority)
 {
-    for (const auto& pair : m_autoLoadModules) {
-        if (const int priority = pair.first; priority > maxPriority)
+    for (const auto& [priority, module] : m_autoLoadModules) {
+        if (priority > maxPriority)
             break;
-        const ModulePtr module = pair.second;
+
         module->load();
     }
 }
@@ -66,14 +67,12 @@ ModulePtr ModuleManager::discoverModule(const std::string& moduleFile)
 {
     ModulePtr module;
     try {
-        const OTMLDocumentPtr doc = OTMLDocument::parse(moduleFile);
-        const OTMLNodePtr moduleNode = doc->at("Module");
-
+        const auto& doc = OTMLDocument::parse(moduleFile);
+        const auto& moduleNode = doc->at("Module");
         const auto& name = moduleNode->valueAt("name");
 
         bool push = false;
-        module = getModule(name);
-        if (!module) {
+        if (!(module = getModule(name))) {
             module = ModulePtr(new Module(name));
             push = true;
         }
@@ -90,7 +89,7 @@ ModulePtr ModuleManager::discoverModule(const std::string& moduleFile)
 
 void ModuleManager::ensureModuleLoaded(const std::string_view moduleName)
 {
-    const ModulePtr module = g_modules.getModule(moduleName);
+    const auto& module = g_modules.getModule(moduleName);
     if (!module || !module->load())
         g_logger.fatal(stdext::format("Unable to load '%s' module", moduleName));
 }
@@ -98,7 +97,7 @@ void ModuleManager::ensureModuleLoaded(const std::string_view moduleName)
 void ModuleManager::unloadModules()
 {
     const auto modulesBackup = m_modules;
-    for (const ModulePtr& module : modulesBackup)
+    for (const auto& module : modulesBackup)
         module->unload();
 }
 

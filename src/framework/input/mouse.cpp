@@ -38,10 +38,10 @@ void Mouse::loadCursors(const std::string& filename)
 {
     const auto& path = g_resources.guessFilePath(filename, "otml");
     try {
-        const OTMLDocumentPtr doc = OTMLDocument::parse(path);
-        const OTMLNodePtr cursorsNode = doc->at("Cursors");
+        const auto& doc = OTMLDocument::parse(path);
+        const auto& cursorsNode = doc->at("Cursors");
 
-        for (const OTMLNodePtr& cursorNode : cursorsNode->children())
+        for (const auto& cursorNode : cursorsNode->children())
             addCursor(cursorNode->tag(),
                       stdext::resolve_path(cursorNode->valueAt("image"), cursorNode->source()),
                       cursorNode->valueAt<Point>("hot-spot"));

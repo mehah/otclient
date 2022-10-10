@@ -925,7 +925,7 @@ void WIN32Window::setVerticalSync(bool enable)
 
 void WIN32Window::setIcon(const std::string& file)
 {
-    const ImagePtr image = Image::load(file);
+    const auto& image = Image::load(file);
 
     if (!image) {
         g_logger.traceError(stdext::format("unable to load icon file %s", file));

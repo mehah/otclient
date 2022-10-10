@@ -33,19 +33,20 @@ void EventDispatcher::shutdown()
         poll();
 
     while (!m_scheduledEventList.empty()) {
-        const ScheduledEventPtr scheduledEvent = m_scheduledEventList.top();
-        scheduledEvent->cancel();
+        m_scheduledEventList.top()->cancel();
         m_scheduledEventList.pop();
     }
+
     m_disabled = true;
 }
 
 void EventDispatcher::poll()
 {
     for (int count = 0, max = m_scheduledEventList.size(); count < max && !m_scheduledEventList.empty(); ++count) {
-        ScheduledEventPtr scheduledEvent = m_scheduledEventList.top();
+        const auto scheduledEvent = m_scheduledEventList.top();
         if (scheduledEvent->remainingTicks() > 0)
             break;
+
         m_scheduledEventList.pop();
         scheduledEvent->execute();
 
@@ -67,7 +68,7 @@ void EventDispatcher::poll()
         }
 
         for (int i = 0; i < m_pollEventsSize; ++i) {
-            const EventPtr event = m_eventList.front();
+            const auto event = m_eventList.front();
             m_eventList.pop_front();
             event->execute();
         }

@@ -38,7 +38,7 @@
 
 ItemPtr Item::create(int id)
 {
-    const auto& item(new Item);
+    const ItemPtr& item(new Item);
     item->setId(id);
 
     return item;
@@ -46,7 +46,7 @@ ItemPtr Item::create(int id)
 
 ItemPtr Item::createFromOtb(int id)
 {
-    const auto& item(new Item);
+    const ItemPtr& item(new Item);
     item->setOtbId(id);
 
     return item;
@@ -127,7 +127,7 @@ void Item::createBuffer()
     DrawPool::DrawOrder order = DrawPool::DrawOrder::NONE;
     if (isSingleGround())
         order = DrawPool::DrawOrder::FIRST;
-    else if (isGroundBorder())
+    else if (isSingleGroundBorder() && !hasElevation())
         order = DrawPool::DrawOrder::SECOND;
     else if ((isCommon() || isOnBottom()) && isSingleDimension() && !hasDisplacement() && isNotMoveable())
         order = DrawPool::DrawOrder::THIRD;
@@ -237,7 +237,8 @@ void Item::serializeItem(const OutputBinaryTreePtr& out)
     out->addU8(ATTR_CHARGES);
     out->addU16(getCountOrSubType());
 
-    if (const auto dest = m_attribs.get<Position>(ATTR_TELE_DEST); dest.isValid()) {
+    const auto& dest = m_attribs.get<Position>(ATTR_TELE_DEST);
+    if (dest.isValid()) {
         out->addU8(ATTR_TELE_DEST);
         out->addPos(dest.x, dest.y, dest.z);
     }

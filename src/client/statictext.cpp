@@ -35,8 +35,8 @@ StaticText::StaticText()
 
 void StaticText::drawText(const Point& dest, const Rect& parentRect)
 {
-    const Size textSize = m_cachedText.getTextSize();
-    const auto rect = Rect(dest - Point(textSize.width() / 2, textSize.height()) + Point(20, 5), textSize);
+    const auto& textSize = m_cachedText.getTextSize();
+    const auto& rect = Rect(dest - Point(textSize.width() / 2, textSize.height()) + Point(20, 5), textSize);
     Rect boundRect = rect;
     boundRect.bind(parentRect);
 
@@ -127,7 +127,7 @@ void StaticText::compose()
         text += " yells:\n";
         m_color = Color(239, 239, 0);
     } else if (m_mode == Otc::MessageMonsterSay || m_mode == Otc::MessageMonsterYell || m_mode == Otc::MessageSpell
-              || m_mode == Otc::MessageBarkLow || m_mode == Otc::MessageBarkLoud) {
+               || m_mode == Otc::MessageBarkLow || m_mode == Otc::MessageBarkLoud) {
         m_color = Color(254, 101, 0);
     } else if (m_mode == Otc::MessageNpcFrom || m_mode == Otc::MessageNpcFromStartBlock) {
         text += m_name;

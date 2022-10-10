@@ -27,8 +27,8 @@
 
 int UIPositionAnchor::getHookedPoint(const UIWidgetPtr& hookedWidget, const UIWidgetPtr&)
 {
-    const UIMinimapPtr minimap = hookedWidget->static_self_cast<UIMinimap>();
-    const Rect hookedRect = minimap->getTileRect(m_hookedPosition);
+    const auto& minimap = hookedWidget->static_self_cast<UIMinimap>();
+    const auto& hookedRect = minimap->getTileRect(m_hookedPosition);
     int point = 0;
     if (hookedRect.isValid()) {
         switch (m_hookedEdge) {

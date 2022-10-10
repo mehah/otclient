@@ -36,7 +36,7 @@ void UIHorizontalLayout::applyStyle(const OTMLNodePtr& styleNode)
 
 bool UIHorizontalLayout::internalUpdate()
 {
-    const UIWidgetPtr parentWidget = getParentWidget();
+    const auto& parentWidget = getParentWidget();
     if (!parentWidget)
         return false;
 
@@ -93,7 +93,7 @@ bool UIHorizontalLayout::internalUpdate()
         // must set the preferred width later
         g_dispatcher.addEvent([=] {
             parentWidget->setWidth(preferredWidth);
-                              });
+        });
     }
 
     return changed;

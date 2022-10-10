@@ -46,10 +46,10 @@ namespace stdext
         static constexpr unsigned BufferSize = 1024;
         static char Buffer[BufferSize] = {};
 
-    #ifdef _MSC_VER
+#ifdef _MSC_VER
         const int written = UnDecorateSymbolName(name, Buffer, BufferSize - 1, UNDNAME_COMPLETE);
         Buffer[written] = '\0';
-    #else
+#else
         size_t len;
         int status;
         char* demangled = abi::__cxa_demangle(name, nullptr, &len, &status);
@@ -60,7 +60,7 @@ namespace stdext
         } else {
             Buffer[0] = '\0';
         }
-    #endif
+#endif
 
         return Buffer;
     }

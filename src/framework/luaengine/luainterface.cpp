@@ -46,7 +46,7 @@ void LuaInterface::init()
     bindClassMemberFunction<LuaObject>("getClassName", &LuaObject::getClassName);
 
     registerClassMemberFunction<LuaObject>("getFieldsTable", [](LuaInterface*) -> int {
-        const LuaObjectPtr obj = g_lua.popObject();
+        const auto& obj = g_lua.popObject();
         obj->luaGetFieldsTable();
         return 1;
     });
@@ -179,7 +179,7 @@ void LuaInterface::registerGlobalFunction(const std::string_view functionName, c
 int LuaInterface::luaObjectGetEvent(LuaInterface* lua)
 {
     // stack: obj, key
-    const LuaObjectPtr obj = lua->toObject(-2);
+    const auto& obj = lua->toObject(-2);
     const auto& key = lua->toString(-1);
     assert(obj);
 
@@ -222,7 +222,7 @@ int LuaInterface::luaObjectGetEvent(LuaInterface* lua)
 int LuaInterface::luaObjectSetEvent(LuaInterface* lua)
 {
     // stack: obj, key, value
-    const LuaObjectPtr obj = lua->toObject(-3);
+    const auto& obj = lua->toObject(-3);
     const auto& key = lua->toString(-2);
     assert(obj);
 
@@ -1124,7 +1124,7 @@ void* LuaInterface::popUserdata()
 LuaObjectPtr LuaInterface::popObject()
 {
     assert(hasIndex(-1));
-    LuaObjectPtr v = toObject(-1);
+    const auto& v = toObject(-1);
     pop();
     return v;
 }

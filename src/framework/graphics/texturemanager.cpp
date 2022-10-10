@@ -31,7 +31,7 @@
 #include <framework/graphics/apngloader.h>
 
 #ifdef FRAMEWORK_NET
-    #include <framework/net/protocolhttp.h>
+#include <framework/net/protocolhttp.h>
 #endif
 
 TextureManager g_textures;
@@ -76,13 +76,12 @@ void TextureManager::liveReload()
     if (m_liveReloadEvent)
         return;
     m_liveReloadEvent = g_dispatcher.cycleEvent([this] {
-        for (const auto& it : m_textures) {
-            const auto& path = g_resources.guessFilePath(it.first, "png");
-            const TexturePtr& tex = it.second;
+        for (const auto& [fileName, tex] : m_textures) {
+            const auto& path = g_resources.guessFilePath(fileName, "png");
             if (tex->getTime() >= g_resources.getFileTime(path))
                 continue;
 
-            ImagePtr image = Image::load(path);
+            const auto& image = Image::load(path);
             if (!image)
                 continue;
             tex->uploadPixels(image, tex->hasMipmaps());
@@ -104,17 +103,17 @@ TexturePtr TextureManager::getTexture(const std::string& fileName)
         texture = it->second;
     }
 
-    #ifdef FRAMEWORK_NET
-        // load texture from "virtual directory"
-        if(filePath.substr(0, 11) == "/downloads/"){
-            std::string _filePath = filePath;            
-            const auto fileDownload = g_http.getFile(_filePath.erase(0, 11));
-            if(fileDownload) {
-                std::stringstream fin(fileDownload->response);
-                texture = loadTexture(fin);
-            }
+#ifdef FRAMEWORK_NET
+    // load texture from "virtual directory"
+    if (filePath.substr(0, 11) == "/downloads/") {
+        std::string _filePath = filePath;
+        const auto& fileDownload = g_http.getFile(_filePath.erase(0, 11));
+        if (fileDownload) {
+            std::stringstream fin(fileDownload->response);
+            texture = loadTexture(fin);
         }
-    #endif
+    }
+#endif
 
     // texture not found, load it
     if (!texture) {
@@ -160,7 +159,7 @@ TexturePtr TextureManager::loadTexture(std::stringstream& file)
             m_animatedTextures.push_back(animatedTexture);
             texture = animatedTexture;
         } else {
-            const auto image = ImagePtr(new Image(imageSize, apng.bpp, apng.pdata));
+            const auto& image = ImagePtr(new Image(imageSize, apng.bpp, apng.pdata));
             texture = TexturePtr(new Texture(image));
         }
         free_apng(&apng);

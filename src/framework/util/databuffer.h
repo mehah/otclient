@@ -100,7 +100,7 @@ public:
             T* buffer = new T[m_capacity];
 
             std::copy(v->m_buffer, v->m_buffer + v->m_size,
-                  std::copy(m_buffer, m_buffer + m_size, buffer));
+                      std::copy(m_buffer, m_buffer + m_size, buffer));
 
             delete[] m_buffer;
             m_buffer = buffer;

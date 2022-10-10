@@ -406,19 +406,17 @@ void Minimap::saveOtmm(const std::string& fileName)
         std::vector<uint8_t> compressBuffer(compressBound(blockSize));
 
         for (uint_fast8_t z = 0; z <= MAX_Z; ++z) {
-            for (const auto& it : m_tileBlocks[z]) {
-                const int index = it.first;
-                MinimapBlock& block = *it.second;
-                if (!block.wasSeen())
+            for (const auto& [index, block] : m_tileBlocks[z]) {
+                if (!(*block).wasSeen())
                     continue;
 
-                const Position pos = getIndexPosition(index, z);
+                const auto& pos = getIndexPosition(index, z);
                 fin->addU16(pos.x);
                 fin->addU16(pos.y);
                 fin->addU8(pos.z);
 
                 unsigned long len = blockSize;
-                const int ret = compress2(compressBuffer.data(), &len, (uint8_t*)&block.getTiles(), blockSize, COMPRESS_LEVEL);
+                const int ret = compress2(compressBuffer.data(), &len, (uint8_t*)&(*block).getTiles(), blockSize, COMPRESS_LEVEL);
                 assert(ret == Z_OK);
                 fin->addU16(len);
                 fin->write(compressBuffer.data(), len);

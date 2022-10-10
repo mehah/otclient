@@ -246,10 +246,8 @@ luavalue_cast(int index, stdext::shared_object_ptr<T>& ptr)
     LuaObjectPtr obj;
     if (!luavalue_cast(index, obj))
         return false;
-    if (obj)
-        ptr = obj->dynamic_self_cast<T>();
-    else
-        ptr = nullptr;
+
+    ptr = obj ? obj->dynamic_self_cast<T>() : nullptr;
     return true;
 }
 
@@ -424,9 +422,9 @@ template<class K, class V>
 int push_luavalue(const std::map<K, V>& map)
 {
     g_lua.newTable();
-    for (auto& it : map) {
-        push_internal_luavalue(it.first);
-        push_internal_luavalue(it.second);
+    for (const auto& [key, value] : map) {
+        push_internal_luavalue(key);
+        push_internal_luavalue(value);
         g_lua.rawSet();
     }
     return 1;

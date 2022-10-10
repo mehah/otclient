@@ -182,6 +182,7 @@ private:
         int hasBottomItem{ 0 };
         int hasGroundBorder{ 0 };
         int hasTopGroundBorder{ 0 };
+        int hasThingWithElevation{ 0 };
         int correctCorpse{ 0 };
     };
 
@@ -191,6 +192,7 @@ private:
 
     void checkTranslucentLight();
     bool checkForDetachableThing();
+    bool hasThingWithElevation() { return hasElevation() && m_countFlag.hasThingWithElevation > 0; }
 
     Position m_position;
     Point m_lastDrawDest;

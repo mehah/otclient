@@ -46,9 +46,8 @@ bool FontManager::importFont(const std::string& file)
 {
     const auto& path = g_resources.guessFilePath(file, "otfont");
     try {
-        const OTMLDocumentPtr doc = OTMLDocument::parse(path);
-        const OTMLNodePtr fontNode = doc->at("Font");
-
+        const auto& doc = OTMLDocument::parse(path);
+        const auto& fontNode = doc->at("Font");
         const auto& name = fontNode->valueAt("name");
 
         // remove any font with the same name
@@ -59,7 +58,7 @@ bool FontManager::importFont(const std::string& file)
             }
         }
 
-        const BitmapFontPtr font(new BitmapFont(name));
+        const BitmapFontPtr& font(new BitmapFont(name));
         font->load(fontNode);
         m_fonts.push_back(font);
 

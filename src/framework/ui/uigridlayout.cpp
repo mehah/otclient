@@ -27,13 +27,7 @@
 
 #include <utility>
 
-UIGridLayout::UIGridLayout(UIWidgetPtr parentWidget) : UILayout(std::move(parentWidget))
-{
-    m_cellSize = 16;
-    m_cellSpacing = 0;
-    m_numColumns = 1;
-    m_numLines = 0;
-}
+UIGridLayout::UIGridLayout(UIWidgetPtr parentWidget) : UILayout(std::move(parentWidget)) {}
 
 void UIGridLayout::applyStyle(const OTMLNodePtr& styleNode)
 {
@@ -67,14 +61,14 @@ void UIGridLayout::addWidget(const UIWidgetPtr&) { update(); }
 bool UIGridLayout::internalUpdate()
 {
     bool changed = false;
-    const UIWidgetPtr parentWidget = getParentWidget();
+    const auto& parentWidget = getParentWidget();
     if (!parentWidget)
         return false;
 
-    const UIWidgetList& widgets = parentWidget->m_children;
+    const auto& widgets = parentWidget->m_children;
 
-    const Rect clippingRect = parentWidget->getPaddingRect();
-    const Point topLeft = clippingRect.topLeft();
+    const auto& clippingRect = parentWidget->getPaddingRect();
+    const auto& topLeft = clippingRect.topLeft();
 
     int numColumns = m_numColumns;
     if (m_flow && m_cellSize.width() > 0) {
@@ -100,9 +94,9 @@ bool UIGridLayout::internalUpdate()
 
         const int line = index / numColumns;
         const int column = index % numColumns;
-        auto virtualPos = Point(column * (m_cellSize.width() + cellSpacing), line * (m_cellSize.height() + cellSpacing));
+        const auto& virtualPos = Point(column * (m_cellSize.width() + cellSpacing), line * (m_cellSize.height() + cellSpacing));
         preferredHeight = virtualPos.y + m_cellSize.height();
-        Point pos = topLeft + virtualPos - parentWidget->getVirtualOffset();
+        const auto& pos = topLeft + virtualPos - parentWidget->getVirtualOffset();
         auto dest = Rect(pos, m_cellSize);
         dest.expand(-widget->getMarginTop(), -widget->getMarginRight(), -widget->getMarginBottom(), -widget->getMarginLeft());
 
@@ -120,7 +114,7 @@ bool UIGridLayout::internalUpdate()
         // must set the preferred height later
         g_dispatcher.addEvent([=] {
             parentWidget->setHeight(preferredHeight);
-            });
+        });
     }
 
     return changed;

@@ -99,15 +99,16 @@ void SoundManager::poll()
     ensureContext();
 
     for (auto it = m_streamFiles.begin(); it != m_streamFiles.end();) {
-        const StreamSoundSourcePtr source = it->first;
-        auto& future = it->second;
+        const auto& source = it->first;
+        const auto& future = it->second;
 
         if (future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-            SoundFilePtr sound = future.get();
+            const auto& sound = future.get();
             if (sound)
                 source->setSoundFile(sound);
             else
                 source->stop();
+
             it = m_streamFiles.erase(it);
         } else {
             ++it;
@@ -115,7 +116,7 @@ void SoundManager::poll()
     }
 
     for (auto it = m_sources.begin(); it != m_sources.end();) {
-        const SoundSourcePtr source = *it;
+        const auto& source = *it;
 
         source->update();
 
@@ -157,13 +158,13 @@ void SoundManager::preload(std::string filename)
         return;
 
     ensureContext();
-    const SoundFilePtr soundFile = SoundFile::loadSoundFile(filename);
+    const auto& soundFile = SoundFile::loadSoundFile(filename);
 
     // only keep small files
     if (!soundFile || soundFile->getSize() > MAX_CACHE_SIZE)
         return;
 
-    const auto buffer = SoundBufferPtr(new SoundBuffer);
+    const auto& buffer = SoundBufferPtr(new SoundBuffer);
     if (buffer->fillBuffer(soundFile))
         m_buffers[filename] = buffer;
 }
@@ -182,7 +183,7 @@ SoundSourcePtr SoundManager::play(const std::string& fn, float fadetime, float g
         pitch = 1.0f;
 
     const std::string& filename = resolveSoundFile(fn);
-    SoundSourcePtr soundSource = createSoundSource(filename);
+    const auto& soundSource = createSoundSource(filename);
     if (!soundSource) {
         g_logger.error(stdext::format("unable to play '%s'", filename));
         return nullptr;
@@ -233,7 +234,7 @@ SoundSourcePtr SoundManager::createSoundSource(const std::string& filename)
             source = SoundSourcePtr(new SoundSource);
             source->setBuffer(it->second);
         } else {
-        #if defined __linux && !defined OPENGL_ES
+#if defined __linux && !defined OPENGL_ES
             // due to OpenAL implementation bug, stereo buffers are always downmixed to mono on linux systems
             // this is hack to work around the issue
             // solution taken from http://opensource.creative.com/pipermail/openal/2007-April/010355.html
@@ -270,7 +271,7 @@ SoundSourcePtr SoundManager::createSoundSource(const std::string& filename)
             });
 
             source = combinedSource;
-        #else
+#else
             const StreamSoundSourcePtr streamSource(new StreamSoundSource);
             m_streamFiles[streamSource] = g_asyncDispatcher.schedule([=]() -> SoundFilePtr {
                 try {
@@ -281,7 +282,7 @@ SoundSourcePtr SoundManager::createSoundSource(const std::string& filename)
                 }
             });
             source = streamSource;
-        #endif
+#endif
         }
     } catch (std::exception& e) {
         g_logger.error(stdext::format("failed to load sound source: '%s'", e.what()));

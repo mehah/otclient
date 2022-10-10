@@ -64,7 +64,7 @@ MapView::MapView()
             fadeOpacity = std::min<float>(m_fadeTimer.timeElapsed() / m_fadeInTime, 1.f);
 
         if (m_shader) {
-            auto framebufferRect = Rect(0, 0, m_drawDimension * m_tileSize);
+            const auto& framebufferRect = Rect(0, 0, m_drawDimension * m_tileSize);
             const Point center = m_posInfo.srcRect.center();
             const Point globalCoord = Point(cameraPosition.x - m_drawDimension.width() / 2, -(cameraPosition.y - m_drawDimension.height() / 2)) * m_tileSize;
             m_shader->bind();
@@ -82,12 +82,12 @@ MapView::MapView()
         }
 
         g_painter->setOpacity(fadeOpacity);
-                          });
+    });
 
     mapPool->onAfterDraw([&] {
         g_painter->resetShaderProgram();
         g_painter->resetOpacity();
-                         });
+    });
 
     m_shadowBuffer = std::make_shared<DrawBuffer>(DrawPool::DrawOrder::FIFTH, false);
     m_shader = g_shaders.getDefaultMapShader();
@@ -212,8 +212,8 @@ void MapView::drawFloor()
 
         if (m_posInfo.rect.contains(g_window.getMousePosition())) {
             if (m_crosshairTexture) {
-                const Point& point = transformPositionTo2D(m_mousePosition, cameraPosition);
-                const auto crosshairRect = Rect(point, m_tileSize, m_tileSize);
+                const auto& point = transformPositionTo2D(m_mousePosition, cameraPosition);
+                const auto& crosshairRect = Rect(point, m_tileSize, m_tileSize);
                 g_drawPool.addTexturedRect(crosshairRect, m_crosshairTexture);
             }
         } else if (m_lastHighlightTile) {
@@ -398,8 +398,8 @@ void MapView::updateVisibleTiles()
 void MapView::updateGeometry(const Size& visibleDimension)
 {
     const uint8_t tileSize = SPRITE_SIZE * m_scaleFactor;
-    const Size& drawDimension = visibleDimension + 3;
-    const Size bufferSize = drawDimension * tileSize;
+    const auto& drawDimension = visibleDimension + 3;
+    const auto& bufferSize = drawDimension * tileSize;
 
     if (bufferSize.width() > g_graphics.getMaxTextureSize() || bufferSize.height() > g_graphics.getMaxTextureSize()) {
         g_logger.traceError("reached max zoom out");
@@ -530,7 +530,7 @@ void MapView::setVisibleDimension(const Size& visibleDimension)
         return;
     }
 
-    if (visibleDimension < Size(3)) {
+    if (visibleDimension < 3) {
         g_logger.traceError("reach max zoom in");
         return;
     }
@@ -591,14 +591,14 @@ Position MapView::getPosition(const Point& point, const Size& mapSize)
     if (!cameraPosition.isValid())
         return {};
 
-    const Rect srcRect = calcFramebufferSource(mapSize);
+    const auto& srcRect = calcFramebufferSource(mapSize);
     const float sh = srcRect.width() / static_cast<float>(mapSize.width());
     const float sv = srcRect.height() / static_cast<float>(mapSize.height());
 
-    const auto framebufferPos = Point(point.x * sh, point.y * sv);
-    const Point centerOffset = (framebufferPos + srcRect.topLeft()) / m_tileSize;
+    const auto& framebufferPos = Point(point.x * sh, point.y * sv);
+    const auto& centerOffset = (framebufferPos + srcRect.topLeft()) / m_tileSize;
 
-    const Point tilePos2D = m_virtualCenterOffset - m_drawDimension.toPoint() + centerOffset + Point(2);
+    const auto& tilePos2D = m_virtualCenterOffset - m_drawDimension.toPoint() + centerOffset + Point(2);
     if (tilePos2D.x + cameraPosition.x < 0 && tilePos2D.y + cameraPosition.y < 0)
         return {};
 
@@ -683,7 +683,7 @@ uint8_t MapView::calcFirstVisibleFloor(bool checkLimitsFloorsView)
                         Position upperPos = pos;
                         Position coveredPos = pos;
 
-                        const auto isLookPossible = g_map.isLookPossible(pos);
+                        const bool isLookPossible = g_map.isLookPossible(pos);
                         while (coveredPos.coveredUp() && upperPos.up() && upperPos.z >= firstFloor) {
                             // check tiles physically above
                             if (const TilePtr& tile = g_map.getTile(upperPos)) {

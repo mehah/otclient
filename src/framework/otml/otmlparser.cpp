@@ -182,7 +182,7 @@ void OTMLParser::parseNode(const std::string_view data)
     }
 
     // create the node
-    const OTMLNodePtr node = OTMLNode::create(tag);
+    const auto& node = OTMLNode::create(tag);
 
     node->setUnique(dotsPos != std::string::npos);
     node->setTag(tag);
