@@ -112,8 +112,7 @@ void Map::clean()
 
 void Map::cleanDynamicThings()
 {
-    for (const auto& pair : m_knownCreatures) {
-        const CreaturePtr& creature = pair.second;
+    for (const auto& [uid, creature] : m_knownCreatures) {
         removeThing(creature);
     }
     m_knownCreatures.clear();
@@ -461,12 +460,11 @@ std::map<Position, ItemPtr> Map::findItemsById(uint16_t clientId, uint32_t  max)
     std::map<Position, ItemPtr> ret;
     uint32_t  count = 0;
     for (uint8_t z = 0; z <= MAX_Z; ++z) {
-        for (const auto& pair : m_tileBlocks[z]) {
-            const TileBlock& block = pair.second;
-            for (const TilePtr& tile : block.getTiles()) {
+        for (const auto& [uid, block] : m_tileBlocks[z]) {
+            for (const auto& tile : block.getTiles()) {
                 if (unlikely(!tile || tile->isEmpty()))
                     continue;
-                for (const ItemPtr& item : tile->getItems()) {
+                for (const auto& item : tile->getItems()) {
                     if (item->getId() == clientId) {
                         ret.emplace(tile->getPosition(), item);
                         if (++count >= max)
@@ -507,15 +505,14 @@ void Map::removeCreatureById(uint32_t  id)
 void Map::removeUnawareThings()
 {
     // remove creatures from tiles that we are not aware of anymore
-    for (const auto& pair : m_knownCreatures) {
-        const CreaturePtr& creature = pair.second;
+    for (const auto& [uid, creature] : m_knownCreatures) {
         if (!isAwareOfPosition(creature->getPosition()))
             removeThing(creature);
     }
 
     // remove static texts from tiles that we are not aware anymore
     for (auto it = m_staticTexts.begin(); it != m_staticTexts.end();) {
-        const StaticTextPtr& staticText = *it;
+        const auto& staticText = *it;
         if (staticText->getMessageMode() == Otc::MessageNone && !isAwareOfPosition(staticText->getPosition()))
             it = m_staticTexts.erase(it);
         else

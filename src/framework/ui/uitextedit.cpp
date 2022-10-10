@@ -90,11 +90,11 @@ void UITextEdit::drawSelf(Fw::DrawPane drawPane)
             for (int i = m_selectionStart; i < m_selectionEnd; ++i)
                 m_glyphsSelectRectCache.emplace_back(m_glyphsCoords[i], m_glyphsTexCoords[i]);
         }
-        for (const auto& rect : m_glyphsSelectRectCache)
-            g_drawPool.addFilledRect(rect.first, m_selectionBackgroundColor);
+        for (const auto& [dest, src] : m_glyphsSelectRectCache)
+            g_drawPool.addFilledRect(dest, m_selectionBackgroundColor);
 
-        for (const auto& rect : m_glyphsSelectRectCache)
-            g_drawPool.addTexturedRect(rect.first, texture, rect.second, m_selectionColor);
+        for (const auto& [dest, src] : m_glyphsSelectRectCache)
+            g_drawPool.addTexturedRect(dest, texture, src, m_selectionColor);
     }
 
     // render cursor

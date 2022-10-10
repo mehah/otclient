@@ -96,8 +96,7 @@ void Spawn::save(TiXmlElement* node)
 
     node->SetAttribute("radius", getRadius());
 
-    for (const auto& pair : m_creatures) {
-        const CreatureTypePtr& creature = pair.second;
+    for (const auto& [placePos, creature] : m_creatures) {
         auto* const creatureNode = new TiXmlElement(creature->getRace() == CreatureRaceNpc ? "npc" : "monster");
 
         if (!creatureNode)
@@ -107,7 +106,6 @@ void Spawn::save(TiXmlElement* node)
         creatureNode->SetAttribute("spawntime", creature->getSpawnTime());
         creatureNode->SetAttribute("direction", creature->getDirection());
 
-        const Position& placePos = pair.first;
         assert(placePos.isValid());
 
         creatureNode->SetAttribute("x", placePos.x - c.x);
@@ -378,10 +376,7 @@ SpawnPtr CreatureManager::getSpawn(const Position& centerPos)
 
 SpawnPtr CreatureManager::getSpawnForPlacePos(const Position& pos)
 {
-    for (const auto& pair : m_spawns) {
-        const Position& centerPos = pair.first;
-        const SpawnPtr& spawn = pair.second;
-
+    for (const auto& [centerPos, spawn] : m_spawns) {
         if (isInZone(pos, centerPos, spawn->getRadius()))
             return spawn;
     }

@@ -264,9 +264,7 @@ bool UIAnchorLayout::internalUpdate()
     }
 
     // update all anchors
-    for (auto& it : m_anchorsGroups) {
-        const UIWidgetPtr& widget = it.first;
-        const UIAnchorGroupPtr& anchorGroup = it.second;
+    for (const auto& [widget, anchorGroup] : m_anchorsGroups) {
         if (!anchorGroup->isUpdated()) {
             if (updateWidget(widget, anchorGroup))
                 changed = true;

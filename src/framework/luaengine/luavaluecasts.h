@@ -410,9 +410,9 @@ template<class K, class V>
 int push_luavalue(const std::map<K, V>& map)
 {
     g_lua.newTable();
-    for (auto& it : map) {
-        push_internal_luavalue(it.first);
-        push_internal_luavalue(it.second);
+    for (const auto& [key, value] : map) {
+        push_internal_luavalue(key);
+        push_internal_luavalue(value);
         g_lua.rawSet();
     }
     return 1;

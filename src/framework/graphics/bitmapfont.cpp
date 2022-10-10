@@ -94,8 +94,8 @@ void BitmapFont::drawText(const std::string_view text, const Rect& screenCoords,
 {
     Size textBoxSize;
     const auto& glyphsPositions = calculateGlyphsPositions(text, align, &textBoxSize);
-    for (const auto& rects : getDrawTextCoords(text, textBoxSize, align, screenCoords, glyphsPositions)) {
-        g_drawPool.addTexturedRect(rects.first, m_texture, rects.second, color);
+    for (const auto& [dest, src] : getDrawTextCoords(text, textBoxSize, align, screenCoords, glyphsPositions)) {
+        g_drawPool.addTexturedRect(dest, m_texture, src, color);
     }
 }
 
