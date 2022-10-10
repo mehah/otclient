@@ -25,19 +25,21 @@
 
 UIWidgetPtr UIAnchor::getHookedWidget(const UIWidgetPtr& widget, const UIWidgetPtr& parentWidget)
 {
+    if (!parentWidget)
+        return nullptr;
+
     // determine hooked widget
-    UIWidgetPtr hookedWidget;
-    if (parentWidget) {
-        if (m_hookedWidgetId == "parent")
-            hookedWidget = parentWidget;
-        else if (m_hookedWidgetId == "next")
-            hookedWidget = parentWidget->getChildAfter(widget);
-        else if (m_hookedWidgetId == "prev")
-            hookedWidget = parentWidget->getChildBefore(widget);
-        else
-            hookedWidget = parentWidget->getChildById(m_hookedWidgetId);
-    }
-    return hookedWidget;
+    if (m_hookedWidgetId == "parent")
+        return parentWidget;
+
+    if (m_hookedWidgetId == "next")
+        return  parentWidget->getChildAfter(widget);
+
+    if (m_hookedWidgetId == "prev")
+        return  parentWidget->getChildBefore(widget);
+
+    return parentWidget->getChildById(m_hookedWidgetId);
+
 }
 
 int UIAnchor::getHookedPoint(const UIWidgetPtr& hookedWidget, const UIWidgetPtr& parentWidget)

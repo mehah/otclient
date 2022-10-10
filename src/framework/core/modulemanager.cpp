@@ -55,10 +55,10 @@ void ModuleManager::discoverModules()
 
 void ModuleManager::autoLoadModules(int maxPriority)
 {
-    for (const auto& pair : m_autoLoadModules) {
-        if (const int priority = pair.first; priority > maxPriority)
+    for (const auto& [priority, module] : m_autoLoadModules) {
+        if (priority > maxPriority)
             break;
-        const ModulePtr module = pair.second;
+
         module->load();
     }
 }
@@ -72,8 +72,7 @@ ModulePtr ModuleManager::discoverModule(const std::string& moduleFile)
         const auto& name = moduleNode->valueAt("name");
 
         bool push = false;
-        module = getModule(name);
-        if (!module) {
+        if (!(module = getModule(name))) {
             module = ModulePtr(new Module(name));
             push = true;
         }

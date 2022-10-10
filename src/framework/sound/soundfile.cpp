@@ -41,15 +41,14 @@ SoundFilePtr SoundFile::loadSoundFile(const std::string& filename)
     file->read(magic, 4);
     file->seek(0);
 
-    SoundFilePtr soundFile;
     if (strncmp(magic, "OggS", 4) == 0) {
-        const auto oggSoundFile = OggSoundFilePtr(new OggSoundFile(file));
+        const auto& oggSoundFile = OggSoundFilePtr(new OggSoundFile(file));
         if (oggSoundFile->prepareOgg())
-            soundFile = oggSoundFile;
+            return oggSoundFile;
     } else
         throw Exception("unknown sound file format %s", filename);
 
-    return soundFile;
+    return nullptr;
 }
 
 ALenum SoundFile::getSampleFormat()

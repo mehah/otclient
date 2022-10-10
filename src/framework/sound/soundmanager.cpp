@@ -103,11 +103,12 @@ void SoundManager::poll()
         const auto& future = it->second;
 
         if (future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-            SoundFilePtr sound = future.get();
+            const auto& sound = future.get();
             if (sound)
                 source->setSoundFile(sound);
             else
                 source->stop();
+
             it = m_streamFiles.erase(it);
         } else {
             ++it;

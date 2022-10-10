@@ -148,7 +148,7 @@ void PainterShaderProgram::addMultiTexture(const std::string& file)
     if (m_multiTextures.size() > 3)
         g_logger.error("cannot add more multi textures to shader, the max is 3");
 
-    const TexturePtr texture = g_textures.getTexture(file);
+    const auto& texture = g_textures.getTexture(file);
     if (!texture)
         return;
 

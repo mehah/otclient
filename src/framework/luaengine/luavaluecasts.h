@@ -234,10 +234,8 @@ luavalue_cast(int index, stdext::shared_object_ptr<T>& ptr)
     LuaObjectPtr obj;
     if (!luavalue_cast(index, obj))
         return false;
-    if (obj)
-        ptr = obj->dynamic_self_cast<T>();
-    else
-        ptr = nullptr;
+
+    ptr = obj ? obj->dynamic_self_cast<T>() : nullptr;
     return true;
 }
 

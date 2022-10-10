@@ -281,14 +281,14 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
         }
         // anchors
         else if (node->tag().starts_with("anchors.")) {
-            UIWidgetPtr parent = getParent();
+            const auto& parent = getParent();
             if (!parent) {
                 if (m_firstOnStyle)
                     throw OTMLException(node, "cannot create anchor, there is no parent widget!");
                 continue;
             }
 
-            UILayoutPtr layout = parent->getLayout();
+            const auto& layout = parent->getLayout();
             UIAnchorLayoutPtr anchorLayout;
             if (layout->isUIAnchorLayout())
                 anchorLayout = layout->static_self_cast<UIAnchorLayout>();
@@ -389,5 +389,6 @@ void UIWidget::setIcon(const std::string& iconFile)
     m_icon = iconFile.empty() ? nullptr : g_textures.getTexture(iconFile);
     if (m_icon && !m_iconClipRect.isValid())
         m_iconClipRect = Rect(0, 0, m_icon->getSize());
+
     repaint();
 }

@@ -711,7 +711,7 @@ bool UITextEdit::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepe
             }
         } else if (keyCode == Fw::KeyTab && !m_shiftNavigation) {
             clearSelection();
-            if (const UIWidgetPtr parent = getParent())
+            if (const auto& parent = getParent())
                 parent->focusNextChild(Fw::KeyboardFocusReason, true);
             return true;
         } else if (keyCode == Fw::KeyEnter && m_multiline && m_editable) {
@@ -747,7 +747,7 @@ bool UITextEdit::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepe
         }
     } else if (keyboardModifiers == Fw::KeyboardShiftModifier) {
         if (keyCode == Fw::KeyTab && !m_shiftNavigation) {
-            if (const UIWidgetPtr parent = getParent())
+            if (const auto& parent = getParent())
                 parent->focusPreviousChild(Fw::KeyboardFocusReason, true);
             return true;
         }

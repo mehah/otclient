@@ -27,13 +27,7 @@
 
 #include <utility>
 
-UIGridLayout::UIGridLayout(UIWidgetPtr parentWidget) : UILayout(std::move(parentWidget))
-{
-    m_cellSize = 16;
-    m_cellSpacing = 0;
-    m_numColumns = 1;
-    m_numLines = 0;
-}
+UIGridLayout::UIGridLayout(UIWidgetPtr parentWidget) : UILayout(std::move(parentWidget)) {}
 
 void UIGridLayout::applyStyle(const OTMLNodePtr& styleNode)
 {
@@ -67,14 +61,14 @@ void UIGridLayout::addWidget(const UIWidgetPtr&) { update(); }
 bool UIGridLayout::internalUpdate()
 {
     bool changed = false;
-    const UIWidgetPtr parentWidget = getParentWidget();
+    const auto& parentWidget = getParentWidget();
     if (!parentWidget)
         return false;
 
-    const UIWidgetList& widgets = parentWidget->m_children;
+    const auto& widgets = parentWidget->m_children;
 
-    const Rect clippingRect = parentWidget->getPaddingRect();
-    const Point topLeft = clippingRect.topLeft();
+    const auto& clippingRect = parentWidget->getPaddingRect();
+    const auto& topLeft = clippingRect.topLeft();
 
     int numColumns = m_numColumns;
     if (m_flow && m_cellSize.width() > 0) {

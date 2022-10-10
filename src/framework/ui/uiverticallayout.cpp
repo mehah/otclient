@@ -38,11 +38,11 @@ bool UIVerticalLayout::internalUpdate()
 {
     bool changed = false;
 
-    const UIWidgetPtr parentWidget = getParentWidget();
+    const auto& parentWidget = getParentWidget();
     if (!parentWidget)
         return false;
 
-    const Rect paddingRect = parentWidget->getPaddingRect();
+    const auto& paddingRect = parentWidget->getPaddingRect();
     Point pos = (m_alignBottom) ? paddingRect.bottomLeft() : paddingRect.topLeft();
     int preferredHeight = 0;
 
