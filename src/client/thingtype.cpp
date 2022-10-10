@@ -65,14 +65,14 @@ void ThingType::serialize(const FileStreamPtr& fin)
             }
             case ThingAttrLight:
             {
-                const auto light = m_attribs.get<Light>(thingAttr);
+                const auto& light = m_attribs.get<Light>(thingAttr);
                 fin->addU16(light.intensity);
                 fin->addU16(light.color);
                 break;
             }
             case ThingAttrMarket:
             {
-                auto market = m_attribs.get<MarketData>(thingAttr);
+                const auto& market = m_attribs.get<MarketData>(thingAttr);
                 fin->addU16(market.category);
                 fin->addU16(market.tradeAs);
                 fin->addU16(market.showAs);
@@ -362,7 +362,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
 
         // animations
         if (spritesPhases.size() > 1) {
-            const auto animator = AnimatorPtr(new Animator);
+            const auto& animator = AnimatorPtr(new Animator);
             animator->unserializeAppearance(animation);
 
             if (frameGroupType == FrameGroupMoving)
@@ -613,7 +613,7 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
         m_animationPhases += groupAnimationsPhases;
 
         if (groupAnimationsPhases > 1 && g_game.getFeature(Otc::GameEnhancedAnimations)) {
-            const auto animator = AnimatorPtr(new Animator);
+            const auto& animator = AnimatorPtr(new Animator);
             animator->unserialize(groupAnimationsPhases, fin);
 
             if (frameGroupType == FrameGroupMoving)

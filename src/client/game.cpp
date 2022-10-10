@@ -589,7 +589,7 @@ bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
         m_localPlayer->preWalk(direction);
     } else {
         // check if can walk to a lower floor
-        auto canChangeFloorDown = [&]() -> bool {
+        const auto& canChangeFloorDown = [&]() -> bool {
             Position pos = toPos;
             if (!pos.down())
                 return false;
@@ -602,7 +602,7 @@ bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
         };
 
         // check if can walk to a higher floor
-        auto canChangeFloorUp = [&]() -> bool {
+        const auto& canChangeFloorUp = [&]() -> bool {
             if (const auto& fromTile = m_localPlayer->getTile(); !fromTile || !fromTile->hasElevation(3))
                 return false;
 
@@ -652,8 +652,7 @@ void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& sta
         cancelFollow();
     }
 
-    const auto it = dirs.begin();
-    const Otc::Direction direction = *it;
+    const Otc::Direction direction = *dirs.begin();
 
     if (const auto& toTile = g_map.getTile(startPos.translatedToDirection(direction))) {
         if (startPos == m_localPlayer->m_lastPrewalkDestination && toTile->isWalkable() && !m_localPlayer->isWalking() && m_localPlayer->canWalk(true)) {
@@ -801,8 +800,7 @@ void Game::useInventoryItem(int itemId)
     if (!canPerformGameAction() || !g_things.isValidDatId(itemId, ThingCategoryItem))
         return;
 
-    const auto pos = Position(0xFFFF, 0, 0); // means that is a item in inventory
-
+    const auto& pos = Position(0xFFFF, 0, 0); // means that is a item in inventory
     m_protocolGame->sendUseItem(pos, itemId, 0, 0);
 }
 
@@ -826,8 +824,7 @@ void Game::useInventoryItemWith(int itemId, const ThingPtr& toThing)
     if (!canPerformGameAction() || !toThing)
         return;
 
-    const auto pos = Position(0xFFFF, 0, 0); // means that is a item in inventory
-
+    const auto& pos = Position(0xFFFF, 0, 0); // means that is a item in inventory
     if (toThing->isCreature())
         m_protocolGame->sendUseOnCreature(pos, itemId, 0, toThing->getId());
     else

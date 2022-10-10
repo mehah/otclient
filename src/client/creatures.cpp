@@ -75,6 +75,7 @@ void Spawn::load(TiXmlElement* node)
         auto dir_ = cNode->readType<int16_t>("direction");
         if (dir_ >= Otc::East && dir_ <= Otc::West)
             dir = static_cast<Otc::Direction>(dir_);
+
         cType->setDirection(dir);
 
         Position placePos;
@@ -354,7 +355,7 @@ const CreatureTypePtr& CreatureManager::getCreatureByName(std::string name)
 
 const CreatureTypePtr& CreatureManager::getCreatureByLook(int look)
 {
-    auto findFun = [=](const CreatureTypePtr& c) -> bool {
+    auto findFun = [=](const auto& c) -> bool {
         const Outfit& o = c->getOutfit();
         return o.getId() == look || o.getAuxId() == look;
     };

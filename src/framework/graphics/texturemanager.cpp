@@ -107,7 +107,7 @@ TexturePtr TextureManager::getTexture(const std::string& fileName)
     // load texture from "virtual directory"
     if (filePath.substr(0, 11) == "/downloads/") {
         std::string _filePath = filePath;
-        const auto fileDownload = g_http.getFile(_filePath.erase(0, 11));
+        const auto& fileDownload = g_http.getFile(_filePath.erase(0, 11));
         if (fileDownload) {
             std::stringstream fin(fileDownload->response);
             texture = loadTexture(fin);
@@ -159,7 +159,7 @@ TexturePtr TextureManager::loadTexture(std::stringstream& file)
             m_animatedTextures.push_back(animatedTexture);
             texture = animatedTexture;
         } else {
-            const auto image = ImagePtr(new Image(imageSize, apng.bpp, apng.pdata));
+            const auto& image = ImagePtr(new Image(imageSize, apng.bpp, apng.pdata));
             texture = TexturePtr(new Texture(image));
         }
         free_apng(&apng);

@@ -32,7 +32,7 @@ void ParticleSystem::load(const OTMLNodePtr& node)
 {
     for (const OTMLNodePtr& childNode : node->children()) {
         if (childNode->tag() == "Emitter") {
-            auto emitter = ParticleEmitterPtr(new ParticleEmitter());
+            const auto& emitter = ParticleEmitterPtr(new ParticleEmitter());
             emitter->load(childNode);
             m_emitters.push_back(emitter);
         } else if (childNode->tag().find("Affector") != std::string::npos) {

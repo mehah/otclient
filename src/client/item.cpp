@@ -237,7 +237,8 @@ void Item::serializeItem(const OutputBinaryTreePtr& out)
     out->addU8(ATTR_CHARGES);
     out->addU16(getCountOrSubType());
 
-    if (const auto dest = m_attribs.get<Position>(ATTR_TELE_DEST); dest.isValid()) {
+    const auto& dest = m_attribs.get<Position>(ATTR_TELE_DEST);
+    if (dest.isValid()) {
         out->addU8(ATTR_TELE_DEST);
         out->addPos(dest.x, dest.y, dest.z);
     }

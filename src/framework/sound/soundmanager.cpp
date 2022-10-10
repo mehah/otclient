@@ -164,7 +164,7 @@ void SoundManager::preload(std::string filename)
     if (!soundFile || soundFile->getSize() > MAX_CACHE_SIZE)
         return;
 
-    const auto buffer = SoundBufferPtr(new SoundBuffer);
+    const auto& buffer = SoundBufferPtr(new SoundBuffer);
     if (buffer->fillBuffer(soundFile))
         m_buffers[filename] = buffer;
 }

@@ -228,7 +228,7 @@ void SpriteManager::generateLightTexture()
     constexpr int bubbleRadius = 6;
     constexpr int bubbleDiameter = bubbleRadius * 2.3;
 
-    const auto image = ImagePtr(new Image(Size(bubbleDiameter)));
+    const auto& image = ImagePtr(new Image(Size(bubbleDiameter)));
     for (int_fast16_t x = -1; ++x < bubbleDiameter;) {
         for (int_fast16_t y = -1; ++y < bubbleDiameter;) {
             const float radius = std::sqrt((bubbleRadius - x) * (bubbleRadius - x) + (bubbleRadius - y) * (bubbleRadius - y));
@@ -250,7 +250,7 @@ void SpriteManager::generateShadeTexture()
 {
     constexpr uint16_t diameter = 4;
 
-    const auto image = ImagePtr(new Image(Size(diameter)));
+    const auto& image = ImagePtr(new Image(Size(diameter)));
     for (int_fast16_t x = -1; ++x < diameter;) {
         for (int_fast16_t y = -1; ++y < diameter;) {
             const uint8_t alpha = x == 0 || y == 0 || x == diameter - 1 || y == diameter - 1 ? 0 : 0xff;

@@ -640,7 +640,7 @@ void UITextEdit::onStyleApply(const std::string_view styleName, const OTMLNodePt
         else if (node->tag() == "selection-background-color")
             setSelectionBackgroundColor(node->value<Color>());
         else if (node->tag() == "selection") {
-            const auto selectionRange = node->value<Point>();
+            const auto& selectionRange = node->value<Point>();
             setSelection(selectionRange.x, selectionRange.y);
         } else if (node->tag() == "cursor-visible")
             setCursorVisible(node->value<bool>());

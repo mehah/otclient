@@ -38,7 +38,7 @@ public:
     std::shared_future<std::invoke_result_t<F>> schedule(const F& task)
     {
         std::lock_guard lock(m_mutex);
-        auto prom = std::make_shared<std::promise<std::invoke_result_t<F>>>();
+        const auto& prom = std::make_shared<std::promise<std::invoke_result_t<F>>>();
         m_tasks.push_back([=] { prom->set_value(task()); });
         m_condition.notify_all();
         return std::shared_future<std::invoke_result_t<F>>(prom->get_future());

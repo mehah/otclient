@@ -135,9 +135,10 @@ void Map::addThing(const ThingPtr& thing, const Position& pos, int16_t stackPos)
         return;
 
     if (thing->isItem()) {
-        const ItemPtr& item = thing->static_self_cast<Item>();
-        if (item && item->getClientId() == 0) {
-            return;
+        if (const auto& item = thing->static_self_cast<Item>()) {
+            if (item->getClientId() == 0) {
+                return;
+            }
         }
     }
 
@@ -315,7 +316,7 @@ const TilePtr& Map::createTileEx(const Position& pos, const Items&... items)
     if (!pos.isValid())
         return m_nulltile;
 
-    const TilePtr& tile = getOrCreateTile(pos);
+    const auto& tile = getOrCreateTile(pos);
     for (auto vec = { items... }; auto it : vec)
         addThing(it, pos);
 
@@ -622,8 +623,8 @@ std::vector<CreaturePtr> Map::getSpectatorsInRangeEx(const Position& centerPos, 
     for (int_fast8_t iz = -minZRange; iz <= maxZRange; ++iz) {
         for (int_fast32_t iy = -minYRange; iy <= maxYRange; ++iy) {
             for (int_fast32_t ix = -minXRange; ix <= maxXRange; ++ix) {
-                if (const TilePtr& tile = getTile(centerPos.translated(ix, iy, iz))) {
-                    auto tileCreatures = tile->getCreatures();
+                if (const auto& tile = getTile(centerPos.translated(ix, iy, iz))) {
+                    const auto& tileCreatures = tile->getCreatures();
                     creatures.insert(creatures.end(), tileCreatures.rbegin(), tileCreatures.rend());
                 }
             }
@@ -942,6 +943,7 @@ PathFindResult_ptr Map::newFindPath(const Position& start, const Position& goal,
         ret->status = Otc::PathFindResultSamePosition;
         return ret;
     }
+
     if (goal.z != start.z) {
         return ret;
     }
@@ -975,7 +977,7 @@ PathFindResult_ptr Map::newFindPath(const Position& start, const Position& goal,
             nodes.emplace(node->pos, node);
     }
 
-    auto initNode = new Node{ 1, 0, start, nullptr, 0, 0 };
+    const auto& initNode = new Node{ 1, 0, start, nullptr, 0, 0 };
     nodes[start] = initNode;
     searchList.push(initNode);
 
@@ -1000,12 +1002,12 @@ PathFindResult_ptr Map::newFindPath(const Position& start, const Position& goal,
                 if (neighbor.x < 0 || neighbor.y < 0) continue;
                 auto it = nodes.find(neighbor);
                 if (it == nodes.end()) {
-                    auto blockAndTile = g_minimap.threadGetTile(neighbor);
-                    const bool wasSeen = blockAndTile.second.hasFlag(MinimapTileWasSeen);
-                    const bool isNotWalkable = blockAndTile.second.hasFlag(MinimapTileNotWalkable);
-                    const bool isNotPathable = blockAndTile.second.hasFlag(MinimapTileNotPathable);
-                    const bool isEmpty = blockAndTile.second.hasFlag(MinimapTileEmpty);
-                    float speed = blockAndTile.second.getSpeed();
+                    const auto& [block, tile] = g_minimap.threadGetTile(neighbor);
+                    const bool wasSeen = tile.hasFlag(MinimapTileWasSeen);
+                    const bool isNotWalkable = tile.hasFlag(MinimapTileNotWalkable);
+                    const bool isNotPathable = tile.hasFlag(MinimapTileNotPathable);
+                    const bool isEmpty = tile.hasFlag(MinimapTileEmpty);
+                    float speed = tile.getSpeed();
                     if ((isNotWalkable || isNotPathable || isEmpty) && neighbor != goal) {
                         it = nodes.emplace(neighbor, nullptr).first;
                     } else {
@@ -1016,6 +1018,7 @@ PathFindResult_ptr Map::newFindPath(const Position& start, const Position& goal,
                 }
                 if (!it->second) // no way
                     continue;
+
                 if (it->second->unseen > 50)
                     continue;
 
@@ -1073,7 +1076,7 @@ void Map::findPathAsync(const Position& start, const Position& goal, const std::
     }
 
     g_asyncDispatcher.dispatch([=] {
-        auto ret = g_map.newFindPath(start, goal, visibleNodes);
+        const auto ret = g_map.newFindPath(start, goal, visibleNodes);
         g_dispatcher.addEvent(std::bind(callback, ret));
     });
 }

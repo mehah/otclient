@@ -36,11 +36,11 @@ bool ParticleManager::importParticle(std::string file)
         const auto& doc = OTMLDocument::parse(file);
         for (const auto& node : doc->children()) {
             if (node->tag() == "Effect") {
-                const auto particleEffectType = ParticleEffectTypePtr(new ParticleEffectType);
+                const auto& particleEffectType = ParticleEffectTypePtr(new ParticleEffectType);
                 particleEffectType->load(node);
                 m_effectsTypes[particleEffectType->getName()] = particleEffectType;
             } else if (node->tag() == "Particle") {
-                const auto particleType = ParticleTypePtr(new ParticleType);
+                const auto& particleType = ParticleTypePtr(new ParticleType);
                 particleType->load(node);
                 m_particleTypes[particleType->getName()] = particleType;
             }
@@ -55,7 +55,7 @@ bool ParticleManager::importParticle(std::string file)
 ParticleEffectPtr ParticleManager::createEffect(const std::string_view name)
 {
     try {
-        auto particleEffect = ParticleEffectPtr(new ParticleEffect);
+        const auto& particleEffect = ParticleEffectPtr(new ParticleEffect);
         particleEffect->load(m_effectsTypes[std::string(name)]);
         m_effects.push_back(particleEffect);
         return particleEffect;

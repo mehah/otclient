@@ -42,9 +42,9 @@ void ParticleEffect::load(const ParticleEffectTypePtr& effectType)
     if (!effectType)
         throw Exception("effect type not found");
 
-    for (const OTMLNodePtr& childNode : effectType->getNode()->children()) {
+    for (const auto& childNode : effectType->getNode()->children()) {
         if (childNode->tag() == "System") {
-            auto system = ParticleSystemPtr(new ParticleSystem);
+            const auto& system = ParticleSystemPtr(new ParticleSystem);
             system->load(childNode);
             m_systems.push_back(system);
         }

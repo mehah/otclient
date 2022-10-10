@@ -64,7 +64,7 @@ MapView::MapView()
             fadeOpacity = std::min<float>(m_fadeTimer.timeElapsed() / m_fadeInTime, 1.f);
 
         if (m_shader) {
-            auto framebufferRect = Rect(0, 0, m_drawDimension * m_tileSize);
+            const auto& framebufferRect = Rect(0, 0, m_drawDimension * m_tileSize);
             const Point center = m_posInfo.srcRect.center();
             const Point globalCoord = Point(cameraPosition.x - m_drawDimension.width() / 2, -(cameraPosition.y - m_drawDimension.height() / 2)) * m_tileSize;
             m_shader->bind();
@@ -212,8 +212,8 @@ void MapView::drawFloor()
 
         if (m_posInfo.rect.contains(g_window.getMousePosition())) {
             if (m_crosshairTexture) {
-                const Point& point = transformPositionTo2D(m_mousePosition, cameraPosition);
-                const auto crosshairRect = Rect(point, m_tileSize, m_tileSize);
+                const auto& point = transformPositionTo2D(m_mousePosition, cameraPosition);
+                const auto& crosshairRect = Rect(point, m_tileSize, m_tileSize);
                 g_drawPool.addTexturedRect(crosshairRect, m_crosshairTexture);
             }
         } else if (m_lastHighlightTile) {
@@ -591,14 +591,14 @@ Position MapView::getPosition(const Point& point, const Size& mapSize)
     if (!cameraPosition.isValid())
         return {};
 
-    const Rect srcRect = calcFramebufferSource(mapSize);
+    const auto& srcRect = calcFramebufferSource(mapSize);
     const float sh = srcRect.width() / static_cast<float>(mapSize.width());
     const float sv = srcRect.height() / static_cast<float>(mapSize.height());
 
-    const auto framebufferPos = Point(point.x * sh, point.y * sv);
-    const Point centerOffset = (framebufferPos + srcRect.topLeft()) / m_tileSize;
+    const auto& framebufferPos = Point(point.x * sh, point.y * sv);
+    const auto& centerOffset = (framebufferPos + srcRect.topLeft()) / m_tileSize;
 
-    const Point tilePos2D = m_virtualCenterOffset - m_drawDimension.toPoint() + centerOffset + Point(2);
+    const auto& tilePos2D = m_virtualCenterOffset - m_drawDimension.toPoint() + centerOffset + Point(2);
     if (tilePos2D.x + cameraPosition.x < 0 && tilePos2D.y + cameraPosition.y < 0)
         return {};
 
@@ -683,7 +683,7 @@ uint8_t MapView::calcFirstVisibleFloor(bool checkLimitsFloorsView)
                         Position upperPos = pos;
                         Position coveredPos = pos;
 
-                        const auto isLookPossible = g_map.isLookPossible(pos);
+                        const bool isLookPossible = g_map.isLookPossible(pos);
                         while (coveredPos.coveredUp() && upperPos.up() && upperPos.z >= firstFloor) {
                             // check tiles physically above
                             if (const TilePtr& tile = g_map.getTile(upperPos)) {

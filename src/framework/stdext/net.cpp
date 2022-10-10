@@ -28,7 +28,7 @@ namespace stdext
     std::string ip_to_string(uint32_t ip)
     {
         ip = asio::detail::socket_ops::network_to_host_long(ip);
-        const auto address_v4 = asio::ip::address_v4(ip);
+        const auto& address_v4 = asio::ip::address_v4(ip);
         return address_v4.to_string();
     }
 

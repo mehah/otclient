@@ -274,23 +274,23 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, flo
         }
 
         if (m_skull != Otc::SkullNone && m_skullTexture) {
-            const auto skullRect = Rect(backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5, m_skullTexture->getSize());
+            const auto& skullRect = Rect(backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5, m_skullTexture->getSize());
             g_drawPool.addTexturedRect(skullRect, m_skullTexture);
         }
         if (m_shield != Otc::ShieldNone && m_shieldTexture && m_showShieldTexture) {
-            const auto shieldRect = Rect(backgroundRect.x() + 13.5, backgroundRect.y() + 5, m_shieldTexture->getSize());
+            const auto& shieldRect = Rect(backgroundRect.x() + 13.5, backgroundRect.y() + 5, m_shieldTexture->getSize());
             g_drawPool.addTexturedRect(shieldRect, m_shieldTexture);
         }
         if (m_emblem != Otc::EmblemNone && m_emblemTexture) {
-            const auto emblemRect = Rect(backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 16, m_emblemTexture->getSize());
+            const auto& emblemRect = Rect(backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 16, m_emblemTexture->getSize());
             g_drawPool.addTexturedRect(emblemRect, m_emblemTexture);
         }
         if (m_type != Proto::CreatureTypeUnknown && m_typeTexture) {
-            const auto typeRect = Rect(backgroundRect.x() + 13.5 + 12 + 12, backgroundRect.y() + 16, m_typeTexture->getSize());
+            const auto& typeRect = Rect(backgroundRect.x() + 13.5 + 12 + 12, backgroundRect.y() + 16, m_typeTexture->getSize());
             g_drawPool.addTexturedRect(typeRect, m_typeTexture);
         }
         if (m_icon != Otc::NpcIconNone && m_iconTexture) {
-            const auto iconRect = Rect(backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5, m_iconTexture->getSize());
+            const auto& iconRect = Rect(backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5, m_iconTexture->getSize());
             g_drawPool.addTexturedRect(iconRect, m_iconTexture);
         }
     }
@@ -852,7 +852,7 @@ uint64_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
         } else stepDuration /= m_speed;
 
         if (FORCE_NEW_WALKING_FORMULA || g_game.getClientVersion() >= 860) {
-            const auto serverBeat = g_game.getServerBeat();
+            const int serverBeat = g_game.getServerBeat();
             stepDuration = std::ceil(stepDuration / serverBeat) * serverBeat;
 
             if (isLocalPlayer() && hasSpeedFormula())
@@ -930,7 +930,7 @@ int Creature::getCurrentAnimationPhase(const bool mount)
 {
     const auto& thingType = mount ? getMountThingType() : getThingType();
 
-    const auto idleAnimator = thingType->getIdleAnimator();
+    const auto& idleAnimator = thingType->getIdleAnimator();
     if (idleAnimator) {
         if (m_walkAnimationPhase == 0) return idleAnimator->getPhase();
         return m_walkAnimationPhase + idleAnimator->getAnimationPhases() - 1;

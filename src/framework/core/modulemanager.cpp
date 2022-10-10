@@ -39,10 +39,10 @@ void ModuleManager::discoverModules()
     // remove modules that are not loaded
     m_autoLoadModules.clear();
 
-    const auto moduleDirs = g_resources.listDirectoryFiles("/");
-    for (const std::string& moduleDir : moduleDirs) {
-        auto moduleFiles = g_resources.listDirectoryFiles("/" + moduleDir);
-        for (const std::string& moduleFile : moduleFiles) {
+    const auto& moduleDirs = g_resources.listDirectoryFiles("/");
+    for (const auto& moduleDir : moduleDirs) {
+        const auto& moduleFiles = g_resources.listDirectoryFiles("/" + moduleDir);
+        for (const auto& moduleFile : moduleFiles) {
             if (g_resources.isFileType(moduleFile, "otmod")) {
                 if (const auto& module = discoverModule("/" + moduleDir + "/" + moduleFile)) {
                     if (module->isAutoLoad())
@@ -97,7 +97,7 @@ void ModuleManager::ensureModuleLoaded(const std::string_view moduleName)
 void ModuleManager::unloadModules()
 {
     const auto modulesBackup = m_modules;
-    for (const ModulePtr& module : modulesBackup)
+    for (const auto& module : modulesBackup)
         module->unload();
 }
 

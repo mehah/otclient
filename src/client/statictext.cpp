@@ -35,8 +35,8 @@ StaticText::StaticText()
 
 void StaticText::drawText(const Point& dest, const Rect& parentRect)
 {
-    const Size textSize = m_cachedText.getTextSize();
-    const auto rect = Rect(dest - Point(textSize.width() / 2, textSize.height()) + Point(20, 5), textSize);
+    const auto& textSize = m_cachedText.getTextSize();
+    const auto& rect = Rect(dest - Point(textSize.width() / 2, textSize.height()) + Point(20, 5), textSize);
     Rect boundRect = rect;
     boundRect.bind(parentRect);
 

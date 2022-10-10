@@ -94,9 +94,9 @@ bool UIGridLayout::internalUpdate()
 
         const int line = index / numColumns;
         const int column = index % numColumns;
-        auto virtualPos = Point(column * (m_cellSize.width() + cellSpacing), line * (m_cellSize.height() + cellSpacing));
+        const auto& virtualPos = Point(column * (m_cellSize.width() + cellSpacing), line * (m_cellSize.height() + cellSpacing));
         preferredHeight = virtualPos.y + m_cellSize.height();
-        Point pos = topLeft + virtualPos - parentWidget->getVirtualOffset();
+        const auto& pos = topLeft + virtualPos - parentWidget->getVirtualOffset();
         auto dest = Rect(pos, m_cellSize);
         dest.expand(-widget->getMarginTop(), -widget->getMarginRight(), -widget->getMarginBottom(), -widget->getMarginLeft());
 

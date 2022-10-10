@@ -150,7 +150,7 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
         else if (node->tag() == "clipping")
             setClipping(node->value<bool>());
         else if (node->tag() == "border") {
-            auto split = stdext::split(node->value(), " ");
+            const auto& split = stdext::split(node->value(), " ");
             if (split.size() == 2) {
                 setBorderWidth(stdext::safe_cast<int>(split[0]));
                 setBorderColor(stdext::safe_cast<Color>(split[1]));
