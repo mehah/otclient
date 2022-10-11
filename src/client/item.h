@@ -77,7 +77,7 @@ public:
     static ItemPtr create(int id);
     static ItemPtr createFromOtb(int id);
 
-    void draw(const Point& dest, float scaleFactor, bool animate, uint32_t flags, const Highlight& highLight, TextureType textureType = TextureType::NONE, Color color = Color::white, LightView* lightView = nullptr) override;
+    void draw(const Point& dest, float scaleFactor, bool animate, uint32_t flags, TextureType textureType = TextureType::NONE, bool isMarked = false, LightView* lightView = nullptr) override;
 
     void setId(uint32_t id) override;
     void setOtbId(uint16_t id);
@@ -154,7 +154,7 @@ private:
 
     uint8_t m_countOrSubType{ 0 };
 
-    Color m_color{ Color::alpha };
+    Color m_color{ Color::white };
 
     stdext::small_storage<ItemAttr, ATTR_LAST> m_attribs;
     ItemVector m_containerItems;

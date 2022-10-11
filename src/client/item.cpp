@@ -57,7 +57,7 @@ std::string Item::getName()
     return g_things.findItemTypeByClientId(m_clientId)->getName();
 }
 
-void Item::draw(const Point& dest, float scaleFactor, bool animate, uint32_t flags, const Highlight& highLight, TextureType textureType, Color color, LightView* lightView)
+void Item::draw(const Point& dest, float scaleFactor, bool animate, uint32_t flags, TextureType textureType, bool isMarked, LightView* lightView)
 {
     if (m_clientId == 0 || !canDraw())
         return;
@@ -65,18 +65,15 @@ void Item::draw(const Point& dest, float scaleFactor, bool animate, uint32_t fla
     // determine animation phase
     const int animationPhase = calculateAnimationPhase(animate);
 
-    if (m_color != Color::alpha)
-        color = m_color;
-
     tryOptimize();
 
-    getThingType()->draw(dest, scaleFactor, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, textureType, color, lightView, m_drawBuffer);
+    getThingType()->draw(dest, scaleFactor, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, textureType, m_color, lightView, m_drawBuffer);
     if (textureType != TextureType::ALL_BLANK && m_shader) {
         g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
     }
 
-    if (highLight.enabled && this == highLight.thing) {
-        getThingType()->draw(dest, scaleFactor, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, TextureType::ALL_BLANK, highLight.rgbColor);
+    if (isMarked) {
+        getThingType()->draw(dest, scaleFactor, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, TextureType::ALL_BLANK, getMarkedColor());
     }
 }
 

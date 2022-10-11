@@ -489,7 +489,7 @@ void MapView::onMouseMove(const Position& mousePos, const bool /*isVirtualMove*/
 
         if (m_drawHighlightTarget) {
             if ((m_lastHighlightTile = (m_shiftPressed ? getTopTile(mousePos) : g_map.getTile(mousePos))))
-                m_lastHighlightTile->select(m_shiftPressed);
+                m_lastHighlightTile->select(m_shiftPressed ? TileSelectType::NO_FILTERED : TileSelectType::FILTERED);
         }
     }
 }

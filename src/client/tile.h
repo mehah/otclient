@@ -51,6 +51,11 @@ enum tileflags_t : uint32_t
     TILESTATE_LAST = 1 << 24
 };
 
+enum class TileSelectType
+{
+    NONE, FILTERED, NO_FILTERED
+};
+
 class Tile : public LuaObject
 {
 public:
@@ -146,9 +151,9 @@ public:
     uint32_t getHouseId() { return m_houseId; }
     bool isHouseTile() { return m_houseId != 0 && (m_flags & TILESTATE_HOUSE) == TILESTATE_HOUSE; }
 
-    void select(bool noFilter = false);
+    void select(TileSelectType selectType = TileSelectType::NO_FILTERED);
     void unselect();
-    bool isSelected() { return m_highlight.enabled; }
+    bool isSelected() { return m_selectType != TileSelectType::NONE; }
 
     TilePtr asTile() { return static_self_cast<Tile>(); }
 
@@ -188,7 +193,7 @@ private:
 
     void drawTop(const Point& dest, float scaleFactor, int flags, bool forceDraw, LightView* lightView = nullptr);
     void drawCreature(const Point& dest, const MapPosInfo& mapRect, float scaleFactor, int flags, bool isCovered, bool forceDraw, LightView* lightView = nullptr);
-    void drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor, bool animate, int flags, LightView* lightView);
+    void drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor, int flags, LightView* lightView);
 
     void checkTranslucentLight();
     bool checkForDetachableThing();
@@ -216,9 +221,10 @@ private:
     ItemPtr m_ground;
 
     CountFlag m_countFlag;
-    Highlight m_highlight;
+    ThingPtr m_highlightThing;
 
-    bool m_highlightWithoutFilter{ false };
+    TileSelectType m_selectType{ TileSelectType::NONE };
+
     bool m_covered{ false };
     bool m_drawTopAndCreature{ true };
 };

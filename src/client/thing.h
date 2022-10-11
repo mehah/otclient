@@ -27,26 +27,15 @@
 #include "thingtypemanager.h"
 #include <framework/luaengine/luaobject.h>
 #include <framework/graphics/drawpool.h>
+#include <framework/core/clock.h>
 
-struct Highlight
-{
-    int fadeLevel;
-    Color rgbColor = Color::alpha;
-    ThingPtr thing;
-    ScheduledEventPtr listeningEvent;
-
-    bool enabled{ false };
-    bool update{ false };
-    bool invertedColorSelection{ false };
-};
-
-// @bindclass
+ // @bindclass
 #pragma pack(push,1) // disable memory alignment
 class Thing : public LuaObject
 {
 public:
     ~Thing() override = default;
-    virtual void draw(const Point& /*dest*/, float /*scaleFactor*/, bool /*animate*/, uint32_t flags, const Highlight& /*highLight*/, TextureType /*textureType*/ = TextureType::NONE, Color /* color */ = Color::white, LightView* /*lightView*/ = nullptr) {}
+    virtual void draw(const Point& /*dest*/, float /*scaleFactor*/, bool /*animate*/, uint32_t flags, TextureType /*textureType*/ = TextureType::NONE, bool isMarked = false, LightView* /*lightView*/ = nullptr) {}
     virtual void setId(uint32_t /*id*/) {}
 
     virtual void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false);
@@ -165,6 +154,8 @@ public:
     virtual void onAppear() {}
     virtual void onDisappear() {}
 
+    const Color& getMarkedColor() { m_markedColor.setAlpha(0.1f + std::abs(500 - g_clock.millis() % 1000) / 1000.0f); return m_markedColor; }
+
 protected:
     uint8_t m_numPatternX{ 0 };
     uint8_t m_numPatternY{ 0 };
@@ -175,6 +166,8 @@ protected:
     Position m_position;
     ThingTypePtr m_thingType;
     DrawBufferPtr m_drawBuffer;
+
+    Color m_markedColor{ Color::yellow };
 
     // Shader
     PainterShaderProgramPtr m_shader;
