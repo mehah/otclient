@@ -156,7 +156,7 @@ private:
 
     Color m_color{ Color::alpha };
 
-    stdext::small_dynamic_storage<ItemAttr, ATTR_LAST> m_attribs;
+    stdext::small_storage<ItemAttr, ATTR_LAST> m_attribs;
     ItemVector m_containerItems;
 
     uint8_t m_phase{ 0 };
