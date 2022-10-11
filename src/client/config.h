@@ -41,10 +41,6 @@
 #define VOLATILE_SQUARE_DURATION 1000
 #define ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE 0 // 1 to enable
 
-// HIGHLIGHT
-#define HIGHTLIGHT_FADE_START 60
-#define HIGHTLIGHT_FADE_END 120
-
 // WALK SYSTEM
 // 1 - Nostalrius 7.2
 // 0 - Nekiro TFS1.4-Downgrades and 7.72-downgrade, YurOTS 7.76, OTServ 0.6.4 (8.6), Evolutions (7.6), OTHire 7.2
