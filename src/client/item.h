@@ -99,32 +99,32 @@ public:
     void unserializeItem(const BinaryTreePtr& in);
     void serializeItem(const OutputBinaryTreePtr& out);
 
-    void setDepotId(uint16_t depotId) { m_attribs.set(ATTR_DEPOT_ID, depotId); }
-    uint16_t getDepotId() { return m_attribs.get<uint16_t>(ATTR_DEPOT_ID); }
+    void setDepotId(uint16_t depotId) { (*m_attribs).set(ATTR_DEPOT_ID, depotId); }
+    uint16_t getDepotId() { return (*m_attribs).get<uint16_t>(ATTR_DEPOT_ID); }
 
-    void setDoorId(uint8_t doorId) { m_attribs.set(ATTR_HOUSEDOORID, doorId); }
-    uint8_t getDoorId() { return m_attribs.get<uint8_t >(ATTR_HOUSEDOORID); }
+    void setDoorId(uint8_t doorId) { (*m_attribs).set(ATTR_HOUSEDOORID, doorId); }
+    uint8_t getDoorId() { return (*m_attribs).get<uint8_t >(ATTR_HOUSEDOORID); }
 
-    uint16_t getUniqueId() { return m_attribs.get<uint16_t>(ATTR_ACTION_ID); }
-    uint16_t getActionId() { return m_attribs.get<uint16_t>(ATTR_UNIQUE_ID); }
-    void setActionId(uint16_t actionId) { m_attribs.set(ATTR_ACTION_ID, actionId); }
-    void setUniqueId(uint16_t uniqueId) { m_attribs.set(ATTR_UNIQUE_ID, uniqueId); }
+    uint16_t getUniqueId() { return (*m_attribs).get<uint16_t>(ATTR_ACTION_ID); }
+    uint16_t getActionId() { return (*m_attribs).get<uint16_t>(ATTR_UNIQUE_ID); }
+    void setActionId(uint16_t actionId) { (*m_attribs).set(ATTR_ACTION_ID, actionId); }
+    void setUniqueId(uint16_t uniqueId) { (*m_attribs).set(ATTR_UNIQUE_ID, uniqueId); }
 
-    std::string getText() { return m_attribs.get<std::string>(ATTR_TEXT); }
-    std::string getDescription() { return m_attribs.get<std::string>(ATTR_DESC); }
-    void setDescription(const std::string& desc) { m_attribs.set(ATTR_DESC, desc); }
-    void setText(const std::string& txt) { m_attribs.set(ATTR_TEXT, txt); }
+    std::string getText() { return (*m_attribs).get<std::string>(ATTR_TEXT); }
+    std::string getDescription() { return (*m_attribs).get<std::string>(ATTR_DESC); }
+    void setDescription(const std::string& desc) { (*m_attribs).set(ATTR_DESC, desc); }
+    void setText(const std::string& txt) { (*m_attribs).set(ATTR_TEXT, txt); }
 
-    Position getTeleportDestination() { return m_attribs.get<Position>(ATTR_TELE_DEST); }
-    void setTeleportDestination(const Position& pos) { m_attribs.set(ATTR_TELE_DEST, pos); }
+    Position getTeleportDestination() { return (*m_attribs).get<Position>(ATTR_TELE_DEST); }
+    void setTeleportDestination(const Position& pos) { (*m_attribs).set(ATTR_TELE_DEST, pos); }
 
     void setAsync(bool enable) { m_async = enable; }
 
-    bool isHouseDoor() { return m_attribs.has(ATTR_HOUSEDOORID); }
-    bool isDepot() { return m_attribs.has(ATTR_DEPOT_ID); }
-    bool isContainer() override { return m_attribs.has(ATTR_CONTAINER_ITEMS) || Thing::isContainer(); }
-    bool isDoor() { return m_attribs.has(ATTR_HOUSEDOORID); }
-    bool isTeleport() { return m_attribs.has(ATTR_TELE_DEST); }
+    bool isHouseDoor() { return (*m_attribs).has(ATTR_HOUSEDOORID); }
+    bool isDepot() { return (*m_attribs).has(ATTR_DEPOT_ID); }
+    bool isContainer() override { return m_attribs.has_value() && (*m_attribs).has(ATTR_CONTAINER_ITEMS) || Thing::isContainer(); }
+    bool isDoor() { return (*m_attribs).has(ATTR_HOUSEDOORID); }
+    bool isTeleport() { return (*m_attribs).has(ATTR_TELE_DEST); }
 
     ItemPtr clone();
     ItemPtr asItem() { return static_self_cast<Item>(); }
@@ -156,7 +156,7 @@ private:
 
     Color m_color{ Color::white };
 
-    stdext::small_storage<ItemAttr, ATTR_LAST> m_attribs;
+    std::optional<stdext::dynamic_storage<ItemAttr>> m_attribs;
     ItemVector m_containerItems;
 
     uint8_t m_phase{ 0 };

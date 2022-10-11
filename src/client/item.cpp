@@ -164,6 +164,7 @@ void Item::unserializeItem(const BinaryTreePtr& in)
             if (attrib == 0)
                 break;
 
+            m_attribs = std::optional<stdext::dynamic_storage<ItemAttr>>{};
             switch (attrib) {
                 case ATTR_COUNT:
                 case ATTR_RUNE_CHARGES:
@@ -176,12 +177,12 @@ void Item::unserializeItem(const BinaryTreePtr& in)
                 case ATTR_SCRIPTPROTECTED:
                 case ATTR_DUALWIELD:
                 case ATTR_DECAYING_STATE:
-                    m_attribs.set(attrib, in->getU8());
+                    (*m_attribs).set(attrib, in->getU8());
                     break;
                 case ATTR_ACTION_ID:
                 case ATTR_UNIQUE_ID:
                 case ATTR_DEPOT_ID:
-                    m_attribs.set(attrib, in->getU16());
+                    (*m_attribs).set(attrib, in->getU16());
                     break;
                 case ATTR_CONTAINER_ITEMS:
                 case ATTR_ATTACK:
@@ -196,15 +197,14 @@ void Item::unserializeItem(const BinaryTreePtr& in)
                 case ATTR_SLEEPERGUID:
                 case ATTR_SLEEPSTART:
                 case ATTR_ATTRIBUTE_MAP:
-                    m_attribs.set(attrib, in->getU32());
+                    (*m_attribs).set(attrib, in->getU32());
                     break;
                 case ATTR_TELE_DEST:
                 {
-                    Position pos;
-                    pos.x = in->getU16();
-                    pos.y = in->getU16();
-                    pos.z = in->getU8();
-                    m_attribs.set(attrib, pos);
+                    const uint16_t x = in->getU16();
+                    const uint16_t y = in->getU16();
+                    const uint8_t z = in->getU8();
+                    (*m_attribs).set(attrib, Position{ x, y, z });
                     break;
                 }
                 case ATTR_NAME:
@@ -212,7 +212,7 @@ void Item::unserializeItem(const BinaryTreePtr& in)
                 case ATTR_DESC:
                 case ATTR_ARTICLE:
                 case ATTR_WRITTENBY:
-                    m_attribs.set(attrib, in->getString());
+                    (*m_attribs).set(attrib, in->getString());
                     break;
                 default:
                     throw Exception("invalid item attribute %d", attrib);
@@ -234,7 +234,7 @@ void Item::serializeItem(const OutputBinaryTreePtr& out)
     out->addU8(ATTR_CHARGES);
     out->addU16(getCountOrSubType());
 
-    const auto& dest = m_attribs.get<Position>(ATTR_TELE_DEST);
+    const auto& dest = (*m_attribs).get<Position>(ATTR_TELE_DEST);
     if (dest.isValid()) {
         out->addU8(ATTR_TELE_DEST);
         out->addPos(dest.x, dest.y, dest.z);
@@ -250,8 +250,8 @@ void Item::serializeItem(const OutputBinaryTreePtr& out)
         out->addU8(getDoorId());
     }
 
-    const auto aid = m_attribs.get<uint16_t>(ATTR_ACTION_ID);
-    const auto uid = m_attribs.get<uint16_t>(ATTR_UNIQUE_ID);
+    const auto aid = (*m_attribs).get<uint16_t>(ATTR_ACTION_ID);
+    const auto uid = (*m_attribs).get<uint16_t>(ATTR_UNIQUE_ID);
     if (aid) {
         out->addU8(ATTR_ACTION_ID);
         out->addU16(aid);
