@@ -25,6 +25,7 @@
 - Module Controller System ([Code example](https://github.com/mehah/otclient/blob/cache-for-all/modules/game_minimap/minimap.lua))
 - Some bugs fixed contained in [edubart/otclient](https://github.com/edubart/otclient)
 - Client Config in [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h)
+- Client 12.85 - 12.92 support (protobuf)
 
 ##### Community (Features)
 - Support Tibia 12.85/protobuf by [@Nekiro](https://github.com/nekiro)
