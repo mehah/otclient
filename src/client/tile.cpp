@@ -75,8 +75,8 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, float scaleFactor,
 
     // after we render 2x2 lying corpses, we must redraw previous creatures/ontop above them
     for (const auto& tile : m_tilesRedraw) {
-        tile->drawCreature(tile->m_lastDrawDest, mapRect, scaleFactor, flags, isCovered, true);
-        tile->drawTop(tile->m_lastDrawDest, scaleFactor, flags, true);
+        tile->drawCreature(tile->m_lastDrawDest, mapRect, scaleFactor, flags, isCovered, true, lightView);
+        tile->drawTop(tile->m_lastDrawDest, scaleFactor, flags, true, lightView);
     }
 
     drawCreature(dest, mapRect, scaleFactor, flags, isCovered, false, lightView);
