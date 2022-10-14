@@ -46,7 +46,7 @@ namespace stdext
     {
     public:
         template<typename T>
-        T get(const Key k) const { return has(k) ? std::any_cast<T>(m_data[k]) : T{}; }
+        T get(const Key k, const T defaultValue = T()) const { return has(k) ? std::any_cast<T>(m_data[k]) : defaultValue; }
 
         template<typename T>
         void set(const Key k, const T& value) { m_data[k] = value; }
@@ -70,17 +70,17 @@ namespace stdext
 
         bool remove(const Key& k) { return m_data.erase(k) > 0; }
 
-        template<typename T> T get(const Key& k) const
+        template<typename T> T get(const Key& k, const T defaultValue = T()) const
         {
             auto it = m_data.find(k);
             if (it == m_data.end()) {
-                return T();
+                return defaultValue;
             }
 
             try {
                 return std::any_cast<T>(it->second);
             } catch (const std::exception&) {
-                return T();
+                return defaultValue;
             }
         }
 
