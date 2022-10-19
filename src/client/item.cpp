@@ -275,8 +275,10 @@ void Item::serializeItem(const OutputBinaryTreePtr& out)
     }
 
     out->endNode();
-    for (const auto& i : m_containerItems)
-        i->serializeItem(out);
+    if (m_containerItems.has_value()) {
+        for (const auto& i : *m_containerItems)
+            i->serializeItem(out);
+    }
 }
 
 int Item::getSubType()
@@ -285,13 +287,6 @@ int Item::getSubType()
         return m_countOrSubType;
     if (g_game.getClientVersion() > 862)
         return 0;
-    return 1;
-}
-
-int Item::getCount()
-{
-    if (isStackable())
-        return m_countOrSubType;
     return 1;
 }
 

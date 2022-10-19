@@ -763,7 +763,6 @@ void Tile::select(TileSelectType selectType)
     m_selectType = selectType;
 }
 
-
 void Tile::unselect()
 {
     if (m_selectType == TileSelectType::NO_FILTERED)

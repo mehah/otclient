@@ -89,7 +89,7 @@ public:
 
     int getCountOrSubType() { return m_countOrSubType; }
     int getSubType();
-    int getCount();
+    int getCount() { return isStackable() ? m_countOrSubType : 1; }
     uint32_t getId() override { return m_clientId; }
     uint16_t getClientId() { return m_clientId; }
     uint16_t getServerId() { return m_serverId; }
@@ -130,12 +130,12 @@ public:
     ItemPtr asItem() { return static_self_cast<Item>(); }
     bool isItem() override { return true; }
 
-    ItemVector getContainerItems() { return m_containerItems; }
-    ItemPtr getContainerItem(int slot) { return m_containerItems[slot]; }
-    void addContainerItemIndexed(const ItemPtr& i, int slot) { m_containerItems[slot] = i; }
-    void addContainerItem(const ItemPtr& i) { m_containerItems.push_back(i); }
-    void removeContainerItem(int slot) { m_containerItems[slot] = nullptr; }
-    void clearContainerItems() { m_containerItems.clear(); }
+    ItemVector getContainerItems() { return *m_containerItems; }
+    ItemPtr getContainerItem(int slot) { return __getContainerItems()[slot]; }
+    void addContainerItemIndexed(const ItemPtr& i, int slot) { __getContainerItems()[slot] = i; }
+    void addContainerItem(const ItemPtr& i) { __getContainerItems().push_back(i); }
+    void removeContainerItem(int slot) { __getContainerItems()[slot] = nullptr; }
+    void clearContainerItems() { __getContainerItems().clear(); }
 
     void updatePatterns();
     int calculateAnimationPhase(bool animate);
@@ -153,6 +153,12 @@ private:
                 autoCreate ? *(m_attribs = std::optional<stdext::dynamic_storage<ItemAttr>>{}) : DEFAULT_ATTR);
     }
 
+    ItemVector& __getContainerItems()
+    {
+        return *(m_containerItems.has_value() ? m_containerItems :
+                 (m_containerItems = std::optional<ItemVector>{}));
+    }
+
     void createBuffer();
     void tryOptimize();
 
@@ -164,7 +170,7 @@ private:
     Color m_color{ Color::white };
 
     std::optional<stdext::dynamic_storage<ItemAttr>> m_attribs;
-    ItemVector m_containerItems;
+    std::optional<ItemVector> m_containerItems;
 
     uint8_t m_phase{ 0 };
     ticks_t m_lastPhase{ 0 };
