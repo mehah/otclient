@@ -58,14 +58,14 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, float scaleFactor,
         drawThing(thing, dest - m_drawElevation * scaleFactor, scaleFactor, flags, lightView);
     }
 
-    if (m_countFlag.hasBottomItem) {
+    if (hasBottomItem()) {
         for (const auto& item : m_things) {
             if (!item->isOnBottom()) continue;
             drawThing(item, dest - m_drawElevation * scaleFactor, scaleFactor, flags, lightView);
         }
     }
 
-    if (m_countFlag.hasCommonItem) {
+    if (hasCommonItem()) {
         for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
             const auto& item = *it;
             if (!item->isCommon()) continue;
@@ -127,7 +127,7 @@ void Tile::drawTop(const Point& dest, float scaleFactor, int flags, bool forceDr
         }
     }
 
-    if (m_countFlag.hasTopItem) {
+    if (hasTopItem()) {
         for (const auto& item : m_things) {
             if (!item->isOnTop()) continue;
             drawThing(item, dest, scaleFactor, flags, lightView);
@@ -137,24 +137,27 @@ void Tile::drawTop(const Point& dest, float scaleFactor, int flags, bool forceDr
 
 void Tile::clean()
 {
+    m_highlightThing = nullptr;
     while (!m_things.empty())
         removeThing(m_things.front());
+
     m_tilesRedraw.clear();
-    m_countFlag.opaque = 0;
+    m_thingTypeFlag = 0;
+    m_flags = 0;
 }
 
 void Tile::addWalkingCreature(const CreaturePtr& creature)
 {
     m_walkingCreatures.push_back(creature);
-    analyzeThing(creature, true);
+    setThingFlag(creature);
 }
 
 void Tile::removeWalkingCreature(const CreaturePtr& creature)
 {
     const auto it = std::find(m_walkingCreatures.begin(), m_walkingCreatures.end(), creature);
     if (it != m_walkingCreatures.end()) {
-        analyzeThing(creature, false);
         m_walkingCreatures.erase(it);
+        recalculateThingFlag();
     }
 }
 
@@ -186,7 +189,7 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
         else
             m_effects.push_back(newEffect);
 
-        analyzeThing(thing, true);
+        setThingFlag(thing);
 
         thing->setPosition(m_position);
         thing->onAppear();
@@ -229,7 +232,7 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
 
     // common items are drawn from back to front, so if the item being added now is common and has elevation,
     // look for any item behind it and destroy its buffer.
-    if (m_countFlag.hasCommonItem && thing->isCommon() && thing->hasElevation()) {
+    if (hasCommonItem() && thing->isCommon() && thing->hasElevation()) {
         for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
             if (const auto& item = *it; item->isCommon())
                 item->destroyBuffer();
@@ -241,7 +244,7 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
     // get the elevation status before analyze the new item.
     const bool hasElev = hasElevation();
 
-    analyzeThing(thing, true);
+    setThingFlag(thing);
     checkForDetachableThing();
 
     if (size > MAX_THINGS)
@@ -274,8 +277,6 @@ bool Tile::removeThing(const ThingPtr thing)
         if (it == m_effects.end())
             return false;
 
-        analyzeThing(thing, false);
-
         m_effects.erase(it);
         return true;
     }
@@ -286,9 +287,12 @@ bool Tile::removeThing(const ThingPtr thing)
 
     if (thing->isGround()) m_ground = nullptr;
 
-    analyzeThing(thing, false);
-
     m_things.erase(it);
+
+    recalculateThingFlag();
+    if (thing->hasElevation())
+        --m_elevation;
+
 
     checkForDetachableThing();
 
@@ -512,7 +516,7 @@ ThingPtr Tile::getTopMultiUseThing()
 
 bool Tile::isWalkable(bool ignoreCreatures)
 {
-    if (m_countFlag.notWalkable > 0 || !getGround()) {
+    if (m_thingTypeFlag & TileThingType::NOT_WALKABLE || !getGround()) {
         return false;
     }
 
@@ -577,7 +581,7 @@ void Tile::onAddInMapView()
     m_drawTopAndCreature = true;
     m_tilesRedraw.clear();
 
-    if (m_countFlag.correctCorpse) {
+    if (m_thingTypeFlag & TileThingType::CORRECT_CORPSE) {
         uint8_t redrawPreviousTopW = 0,
             redrawPreviousTopH = 0;
 
@@ -636,7 +640,7 @@ bool Tile::checkForDetachableThing()
     if ((m_highlightThing = getTopCreature()))
         return true;
 
-    if (m_countFlag.hasCommonItem) {
+    if (hasCommonItem()) {
         for (const auto& item : m_things) {
             if ((!item->isCommon() || !item->canDraw() || item->isIgnoreLook() || item->isCloth()) && (!item->isUsable()) && (!item->hasLight())) {
                 continue;
@@ -647,7 +651,7 @@ bool Tile::checkForDetachableThing()
         }
     }
 
-    if (m_countFlag.hasBottomItem) {
+    if (hasBottomItem()) {
         for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
             const auto& item = *it;
             if (!item->isOnBottom() || !item->canDraw() || item->isIgnoreLook() || item->isFluidContainer()) continue;
@@ -656,7 +660,7 @@ bool Tile::checkForDetachableThing()
         }
     }
 
-    if (m_countFlag.hasTopItem) {
+    if (hasTopItem()) {
         for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
             const auto& item = *it;
             if (!item->isOnTop()) break;
@@ -672,84 +676,82 @@ bool Tile::checkForDetachableThing()
     return false;
 }
 
-void Tile::analyzeThing(const ThingPtr& thing, bool add)
+void Tile::setThingFlag(const ThingPtr& thing)
 {
-    const int value = add ? 1 : -1;
-
     if (thing->hasLight())
-        m_countFlag.hasLight += value;
+        m_thingTypeFlag |= TileThingType::HAS_LIGHT;
 
     if (thing->hasDisplacement())
-        m_countFlag.hasDisplacement += value;
+        m_thingTypeFlag |= TileThingType::HAS_DISPLACEMENT;
 
     if (thing->isEffect()) return;
 
     if (thing->isCommon())
-        m_countFlag.hasCommonItem += value;
+        m_thingTypeFlag |= TileThingType::HAS_COMMON_ITEM;
 
     if (thing->isOnTop())
-        m_countFlag.hasTopItem += value;
+        m_thingTypeFlag |= TileThingType::HAS_TOP_ITEM;
 
     if (thing->isCreature())
-        m_countFlag.hasCreature += value;
+        m_thingTypeFlag |= TileThingType::HAS_CREATURE;
 
     if (thing->isSingleGroundBorder())
-        m_countFlag.hasGroundBorder += value;
+        m_thingTypeFlag |= TileThingType::HAS_GROUND_BORDER;
 
     if (thing->isTopGroundBorder())
-        m_countFlag.hasTopGroundBorder += value;
+        m_thingTypeFlag |= TileThingType::HAS_TOP_GROUND_BORDER;
 
     if (thing->isLyingCorpse() && !g_game.getFeature(Otc::GameMapDontCorrectCorpse))
-        m_countFlag.correctCorpse += value;
+        m_thingTypeFlag |= TileThingType::CORRECT_CORPSE;
 
     // Creatures and items
     if (thing->isOnBottom()) {
-        m_countFlag.hasBottomItem += value;
+        m_thingTypeFlag |= TileThingType::HAS_BOTTOM_ITEM;
 
         if (thing->isHookSouth())
-            m_countFlag.hasHookSouth += value;
+            m_thingTypeFlag |= TileThingType::HAS_HOOK_SOUTH;
 
         if (thing->isHookEast())
-            m_countFlag.hasHookEast += value;
+            m_thingTypeFlag |= TileThingType::HAS_HOOK_EAST;
     }
 
     if (hasElevation())
-        m_countFlag.hasThingWithElevation += value;
+        m_thingTypeFlag |= TileThingType::HAS_THING_WITH_ELEVATION;
 
     // best option to have something more real, but in some cases as a custom project,
     // the developers are not defining crop size
     //if(thing->getRealSize() > SPRITE_SIZE)
     if (!thing->isSingleDimension() || thing->hasElevation() || thing->hasDisplacement())
-        m_countFlag.notSingleDimension += value;
+        m_thingTypeFlag |= TileThingType::NOT_SINGLE_DIMENSION;
 
     if (thing->getHeight() > 1)
-        m_countFlag.hasTallThings += value;
+        m_thingTypeFlag |= TileThingType::HAS_TALL_THINGS;
 
     if (thing->getWidth() > 1)
-        m_countFlag.hasWideThings += value;
+        m_thingTypeFlag |= TileThingType::HAS_WIDE_THINGS;
 
     if (!thing->isItem()) return;
 
     if (thing->getWidth() > 1 && thing->getHeight() > 1)
-        m_countFlag.hasWall += value;
+        m_thingTypeFlag |= TileThingType::HAS_WALL;
 
     if (thing->isNotWalkable())
-        m_countFlag.notWalkable += value;
+        m_thingTypeFlag |= TileThingType::NOT_WALKABLE;
 
     if (thing->isNotPathable())
-        m_countFlag.notPathable += value;
+        m_thingTypeFlag |= TileThingType::NOT_PATHABLE;
 
     if (thing->blockProjectile())
-        m_countFlag.blockProjectile += value;
+        m_thingTypeFlag |= TileThingType::BLOCK_PROJECTTILE;
 
     if (thing->isFullGround())
-        m_countFlag.fullGround += value;
+        m_thingTypeFlag |= TileThingType::FULL_GROUND;
 
     if (thing->isOpaque())
-        m_countFlag.opaque += value;
+        m_thingTypeFlag |= TileThingType::IS_OPAQUE;
 
     if (thing->hasElevation())
-        m_elevation += value;
+        ++m_elevation;
 }
 
 void Tile::select(TileSelectType selectType)
