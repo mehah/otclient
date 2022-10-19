@@ -261,9 +261,6 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
 
     thing->setPosition(m_position, stackPos, hasElev);
     thing->onAppear();
-
-    if (thing->isTranslucent())
-        checkTranslucentLight();
 }
 
 // TODO: Need refactoring
@@ -296,9 +293,6 @@ bool Tile::removeThing(const ThingPtr thing)
     checkForDetachableThing();
 
     thing->onDisappear();
-
-    if (thing->isTranslucent())
-        checkTranslucentLight();
 
     return true;
 }
@@ -637,28 +631,6 @@ bool Tile::limitsFloorsView(bool isFreeView)
     return firstThing && (firstThing->isGround() || (isFreeView ? firstThing->isOnBottom() : firstThing->isOnBottom() && firstThing->blockProjectile()));
 }
 
-void Tile::checkTranslucentLight()
-{
-    if (m_position.z != SEA_FLOOR)
-        return;
-
-    Position downPos = m_position;
-    if (!downPos.down()) return;
-
-    const auto& tile = g_map.getOrCreateTile(downPos);
-    if (!tile)
-        return;
-
-    for (const auto& thing : m_things) {
-        if (thing->isTranslucent() || thing->hasLensHelp()) {
-            tile->m_flags |= TILESTATE_TRANSLUECENT_LIGHT;
-            return;
-        }
-    }
-
-    tile->m_flags &= ~TILESTATE_TRANSLUECENT_LIGHT;
-}
-
 bool Tile::checkForDetachableThing()
 {
     if ((m_highlightThing = getTopCreature()))
@@ -758,12 +730,6 @@ void Tile::analyzeThing(const ThingPtr& thing, bool add)
 
     if (!thing->isItem()) return;
 
-    if (thing->getHeight() > 1)
-        m_countFlag.hasTallItems += value;
-
-    if (thing->getWidth() > 1)
-        m_countFlag.hasWideItems += value;
-
     if (thing->getWidth() > 1 && thing->getHeight() > 1)
         m_countFlag.hasWall += value;
 
@@ -776,20 +742,14 @@ void Tile::analyzeThing(const ThingPtr& thing, bool add)
     if (thing->blockProjectile())
         m_countFlag.blockProjectile += value;
 
-    m_totalElevation += thing->getElevation() * value;
-
     if (thing->isFullGround())
         m_countFlag.fullGround += value;
 
-    if (thing->hasElevation())
-        m_countFlag.elevation += value;
-
-    if (thing->isOpaque()) {
+    if (thing->isOpaque())
         m_countFlag.opaque += value;
-    }
 
-    if (thing->isGroundBorder() && thing->isNotWalkable())
-        m_countFlag.hasNoWalkableEdge += value;
+    if (thing->hasElevation())
+        m_elevation += value;
 }
 
 void Tile::select(TileSelectType selectType)

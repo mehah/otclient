@@ -101,7 +101,6 @@ public:
 
     bool isPathable() { return m_countFlag.notPathable == 0; }
     bool isFullGround() { return m_countFlag.fullGround > 0; }
-    bool isTranslucent() { return m_countFlag.translucent; }
     bool isFullyOpaque() { return m_countFlag.opaque > 0; }
     bool isSingleDimension() { return m_countFlag.notSingleDimension == 0 && m_walkingCreatures.empty(); }
     bool isLookPossible() { return m_countFlag.blockProjectile == 0; }
@@ -124,10 +123,7 @@ public:
     bool hasLight() { return m_countFlag.hasLight > 0; }
     bool hasTallThings() { return m_countFlag.hasTallThings; }
     bool hasWideThings() { return m_countFlag.hasWideThings; }
-    bool hasTallItems() { return m_countFlag.hasTallItems; }
-    bool hasWideItems() { return m_countFlag.hasWideItems; }
     bool hasWall() { return m_countFlag.hasWall; }
-    bool hasTranslucentLight() { return m_flags & TILESTATE_TRANSLUECENT_LIGHT; }
 
     bool mustHookSouth() { return m_countFlag.hasHookSouth > 0; }
     bool mustHookEast() { return m_countFlag.hasHookEast > 0; }
@@ -163,7 +159,6 @@ private:
     struct CountFlag
     {
         int fullGround{ 0 };
-        int translucent{ 0 };
         int notWalkable{ 0 };
         int notPathable{ 0 };
         int notSingleDimension{ 0 };
@@ -175,12 +170,9 @@ private:
         int hasLight{ 0 };
         int hasTallThings{ 0 };
         int hasWideThings{ 0 };
-        int hasTallItems{ 0 };
-        int hasWideItems{ 0 };
         int hasWall{ 0 };
         int hasHookEast{ 0 };
         int hasHookSouth{ 0 };
-        int hasNoWalkableEdge{ 0 };
         int hasCreature{ 0 };
         int hasCommonItem{ 0 };
         int hasTopItem{ 0 };
@@ -195,7 +187,6 @@ private:
     void drawCreature(const Point& dest, const MapPosInfo& mapRect, float scaleFactor, int flags, bool isCovered, bool forceDraw, LightView* lightView = nullptr);
     void drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor, int flags, LightView* lightView);
 
-    void checkTranslucentLight();
     bool checkForDetachableThing();
     bool hasThingWithElevation() { return hasElevation() && m_countFlag.hasThingWithElevation > 0; }
 
@@ -204,7 +195,7 @@ private:
 
     uint8_t m_drawElevation{ 0 };
     uint8_t m_minimapColor{ 0 };
-    uint8_t m_totalElevation{ 0 };
+    uint8_t m_elevation{ 0 };
 
     int8_t m_lastFloorMin{ -1 };
 
