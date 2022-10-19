@@ -93,7 +93,9 @@ void Map::notificateTileUpdate(const Position& pos, const ThingPtr& thing, const
         mapView->onTileUpdate(pos, thing, operation);
     }
 
-    g_minimap.updateTile(pos, getTile(pos));
+    if (thing && thing->isItem()) {
+        g_minimap.updateTile(pos, getTile(pos));
+    }
 }
 
 void Map::clean()
