@@ -289,17 +289,21 @@ private:
 
     Size m_size;
     Point m_displacement;
+
     AnimatorPtr m_animator;
     AnimatorPtr m_idleAnimator;
-    int m_animationPhases{ 0 };
-    int m_exactSize{ 0 };
-    int m_realSize{ 0 };
-    int m_numPatternX{ 0 };
-    int m_numPatternY{ 0 };
-    int m_numPatternZ{ 0 };
-    int m_layers{ 0 };
-    int m_exactHeight{ 0 };
+
+    uint8_t m_animationPhases{ 0 };
+    uint8_t m_exactSize{ 0 };
+    uint8_t m_realSize{ 0 };
+    uint8_t m_numPatternX{ 0 };
+    uint8_t m_numPatternY{ 0 };
+    uint8_t m_numPatternZ{ 0 };
+    uint8_t m_layers{ 0 };
+    uint8_t m_exactHeight{ 0 };
+
     float m_opacity{ 1.f };
+
     std::string m_customImage;
 
     std::vector<int> m_spritesIndex;
