@@ -13,8 +13,11 @@ function init()
         onTotalCapacityChange = onTotalCapacityChange,
         onStaminaChange = onStaminaChange,
         onStrengthChange = onStrengthChange,
+        onBaseStrengthChange = onBaseStrengthChange,
         onAgilityChange = onAgilityChange,
+        onBaseAgilityChange = onBaseAgilityChange,
         onIntellectChange = onIntellectChange,
+        onBaseIntellectChange = onBaseIntellectChange,
         onOfflineTrainingChange = onOfflineTrainingChange,
         onRegenerationChange = onRegenerationChange,
         onSpeedChange = onSpeedChange,
@@ -58,9 +61,12 @@ function terminate()
         onFreeCapacityChange = onFreeCapacityChange,
         onTotalCapacityChange = onTotalCapacityChange,
         onStaminaChange = onStaminaChange,
-        onStrengthChange = onStrengthChange,
+       onStrengthChange = onStrengthChange,
+        onBaseStrengthChange = onBaseStrengthChange,
         onAgilityChange = onAgilityChange,
+        onBaseAgilityChange = onBaseAgilityChange,
         onIntellectChange = onIntellectChange,
+        onBaseIntellectChange = onBaseIntellectChange,
         onRegenerationChange = onRegenerationChange,
         onSpeedChange = onSpeedChange,
         onBaseSpeedChange = onBaseSpeedChange,
@@ -237,8 +243,11 @@ function refresh()
     onFreeCapacityChange(player, player:getFreeCapacity())
     onStaminaChange(player, player:getStamina())
     onStrengthChange(player, player:getStrength())
+    onBaseStrengthChange(player, player:getBaseStrength())
     onAgilityChange(player, player:getAgility())
+    onBaseAgilityChange(player, player:getBaseAgility())
     onIntellectChange(player, player:getIntellect())
+    onBaseIntellectChange(player, player:getBaseIntellect())
     onRegenerationChange(player, player:getRegenerationTime())
     onSpeedChange(player, player:getSpeed())
 
@@ -438,14 +447,32 @@ end
 
 function onStrengthChange(localPlayer, strength)
     setSkillValue('strength', comma_value(strength))
+
+    onBaseStrengthChange(localPlayer, localPlayer:getBaseStrength())
 end
 
 function onAgilityChange(localPlayer, agility)
     setSkillValue('agility', comma_value(agility))
+
+    onBaseAgilityChange(localPlayer, localPlayer:getBaseAgility())
 end
 
 function onIntellectChange(localPlayer, intellect)
     setSkillValue('intellect', comma_value(intellect))
+    
+    onBaseIntellectChange(localPlayer, localPlayer:getBaseIntellect())
+end
+
+function onBaseStrengthChange(localPlayer, strength)
+    setSkillBase('strength', localPlayer:getStrength(), strength)
+end
+
+function onBaseAgilityChange(localPlayer, agility)
+    setSkillBase('agility', localPlayer:getAgility(), agility)
+end
+
+function onBaseIntellectChange(localPlayer, intellect)
+    setSkillBase('intellect', localPlayer:getIntellect(), intellect)
 end
 
 function onRegenerationChange(localPlayer, regenerationTime)

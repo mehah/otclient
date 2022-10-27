@@ -391,6 +391,18 @@ void LocalPlayer::setStrength(double strength)
     callLuaField("onStrengthChange", strength, oldStrength);
 }
 
+void LocalPlayer::setBaseStrength(double strength)
+{
+    if (m_baseStrength == strength)
+        return;
+
+    const double oldStrength = m_baseStrength;
+
+    m_baseStrength = strength;
+
+    callLuaField("onBaseStrengthChange", strength, oldStrength);
+}
+
 void LocalPlayer::setAgility(double agility)
 {
     if (m_agility == agility)
@@ -403,6 +415,18 @@ void LocalPlayer::setAgility(double agility)
     callLuaField("onAgilityChange", agility, oldAgility);
 }
 
+void LocalPlayer::setBaseAgility(double agility)
+{
+    if (m_baseAgility == agility)
+        return;
+
+    const double oldAgility = m_baseAgility;
+
+    m_baseAgility = agility;
+
+    callLuaField("onBaseAgilityChange", agility, oldAgility);
+}
+
 void LocalPlayer::setIntellect(double intellect)
 {
     if (m_intellect == intellect)
@@ -412,6 +436,17 @@ void LocalPlayer::setIntellect(double intellect)
     m_intellect = intellect;
 
     callLuaField("onIntellectChange", intellect, oldIntellect);
+}
+
+void LocalPlayer::setBaseIntellect(double intellect)
+{
+    if (m_baseIntellect == intellect)
+        return;
+
+    const double oldIntellect = m_baseIntellect;
+    m_baseIntellect = intellect;
+
+    callLuaField("onBaseIntellectChange", intellect, oldIntellect);
 }
 
 void LocalPlayer::setBaseMagicLevel(double baseMagicLevel)

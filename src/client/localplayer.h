@@ -53,8 +53,11 @@ public:
     void setMagicLevel(double magicLevel, double magicLevelPercent);
     void setBaseMagicLevel(double baseMagicLevel);
     void setStrength(double strength);
+    void setBaseStrength(double strength);
     void setAgility(double agility);
+    void setBaseAgility(double agility);
     void setIntellect(double intellect);
+    void setBaseIntellect(double intellect);
     void setSoul(double soul);
     void setStamina(double stamina);
     void setKnown(bool known) { m_known = known; }
@@ -88,8 +91,11 @@ public:
     double getSoul() { return m_soul; }
     double getStamina() { return m_stamina; }
     double getStrength() { return m_strength; }
+    double getBaseStrength() { return m_baseStrength; }
     double getAgility() { return m_agility; }
+    double getBaseAgility() { return m_baseAgility; }
     double getIntellect() { return m_intellect; }
+    double getBaseIntellect() { return m_baseIntellect; }
     double getRegenerationTime() { return m_regenerationTime; }
     double getOfflineTrainingTime() { return m_offlineTrainingTime; }
     const std::vector<int>& getSpells() { return m_spells; }
@@ -179,8 +185,11 @@ private:
     double m_soul{ -1 };
     double m_stamina{ -1 };
     double m_strength{ -1 };
+    double m_baseStrength{ -1 };
     double m_agility{ -1 };
+    double m_baseAgility{ -1 };
     double m_intellect{ -1 };
+    double m_baseIntellect{ -1 };
     double m_regenerationTime{ -1 };
     double m_offlineTrainingTime{ -1 };
 };
