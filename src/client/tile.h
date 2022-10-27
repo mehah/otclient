@@ -74,13 +74,13 @@ enum TileThingType : uint32_t
     HAS_HOOK_EAST = 1 << 13,
     HAS_HOOK_SOUTH = 1 << 14,
     HAS_CREATURE = 1 << 15,
-    HAS_COMMON_ITEM = 1 << 15,
-    HAS_TOP_ITEM = 1 << 16,
-    HAS_BOTTOM_ITEM = 1 << 17,
-    HAS_GROUND_BORDER = 1 << 18,
-    HAS_TOP_GROUND_BORDER = 1 << 19,
-    HAS_THING_WITH_ELEVATION = 1 << 20,
-    CORRECT_CORPSE = 1 << 21
+    HAS_COMMON_ITEM = 1 << 16,
+    HAS_TOP_ITEM = 1 << 17,
+    HAS_BOTTOM_ITEM = 1 << 18,
+    HAS_GROUND_BORDER = 1 << 19,
+    HAS_TOP_GROUND_BORDER = 1 << 20,
+    HAS_THING_WITH_ELEVATION = 1 << 21,
+    CORRECT_CORPSE = 1 << 22
 };
 
 class Tile : public LuaObject
@@ -210,7 +210,7 @@ private:
     std::array<int8_t, MAX_Z + 1> m_completelyCoveredCache;
 
     uint32_t m_flags{ 0 };
-    uint32_t m_thingTypeFlag{0};
+    uint32_t m_thingTypeFlag{ 0 };
     uint32_t m_houseId{ 0 };
 
     std::vector<CreaturePtr> m_walkingCreatures;
@@ -219,7 +219,7 @@ private:
     std::vector<TilePtr> m_tilesRedraw;
 
     ItemPtr m_ground;
-    
+
     ThingPtr m_highlightThing;
 
     TileSelectType m_selectType{ TileSelectType::NONE };
