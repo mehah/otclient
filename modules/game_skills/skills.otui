@@ -111,102 +111,23 @@ MiniWindow
       SkillValueLabel
       SkillPercentPanel
 
-    SkillButton
-      id: offlineTraining
+    SmallSkillButton
+      id: strength
       SkillNameLabel
-        !text: tr('Offline Training')
+        !text: tr('Strength')
       SkillValueLabel
-      SkillPercentPanel
 
-    SkillButton
-      id: magiclevel
-      SkillNameLabel
-        !text: tr('Magic Level')
-      SkillValueLabel
-      SkillPercentPanel
-        background-color: red
-
-    SkillButton
-      id: skillId0
-      SkillNameLabel
-        !text: tr('Fist Fighting')
-      SkillValueLabel
-      SkillPercentPanel
-
-    SkillButton
-      id: skillId1
-      SkillNameLabel
-        !text: tr('Club Fighting')
-      SkillValueLabel
-      SkillPercentPanel
-
-    SkillButton
-      id: skillId2
-      SkillNameLabel
-        !text: tr('Sword Fighting')
-      SkillValueLabel
-      SkillPercentPanel
-
-    SkillButton
-      id: skillId3
-      SkillNameLabel
-        !text: tr('Axe Fighting')
-      SkillValueLabel
-      SkillPercentPanel
-
-    SkillButton
-      id: skillId4
-      SkillNameLabel
-        !text: tr('Distance Fighting')
-      SkillValueLabel
-      SkillPercentPanel
-
-    SkillButton
-      id: skillId5
-      SkillNameLabel
-        !text: tr('Shielding')
-      SkillValueLabel
-      SkillPercentPanel
-
-    SkillButton
-      id: skillId6
-      SkillNameLabel
-        !text: tr('Fishing')
-      SkillValueLabel
-      SkillPercentPanel
 
     SmallSkillButton
-      id: skillId7
+      id: agility
       SkillNameLabel
-        !text: tr('Critical Hit Chance')
+        !text: tr('Agility')
       SkillValueLabel
 
-    SmallSkillButton
-      id: skillId8
-      SkillNameLabel
-        !text: tr('Critical Hit Damage')
-      SkillValueLabel
 
     SmallSkillButton
-      id: skillId9
+      id: intellect
       SkillNameLabel
-        !text: tr('Life Leech Chance')
+        !text: tr('Intellect')
       SkillValueLabel
 
-    SmallSkillButton
-      id: skillId10
-      SkillNameLabel
-        !text: tr('Life Leech Amount')
-      SkillValueLabel
-
-    SmallSkillButton
-      id: skillId11
-      SkillNameLabel
-        !text: tr('Mana Leech Chance')
-      SkillValueLabel
-
-    SmallSkillButton
-      id: skillId12
-      SkillNameLabel
-        !text: tr('Mana Leech Amount')
-      SkillValueLabel

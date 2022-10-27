@@ -123,6 +123,9 @@ namespace Otc
         MagicLevelPercent,
         Soul,
         Stamina,
+        Strength,
+        Agility,
+        Intellect,
         LastStatistic
     };
 

@@ -669,6 +669,9 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<LocalPlayer>("setMagicLevel", &LocalPlayer::setMagicLevel);
     g_lua.bindClassMemberFunction<LocalPlayer>("setSoul", &LocalPlayer::setSoul);
     g_lua.bindClassMemberFunction<LocalPlayer>("setStamina", &LocalPlayer::setStamina);
+    g_lua.bindClassMemberFunction<LocalPlayer>("setStrength", &LocalPlayer::setStrength);
+    g_lua.bindClassMemberFunction<LocalPlayer>("setAgility", &LocalPlayer::setAgility);
+    g_lua.bindClassMemberFunction<LocalPlayer>("setIntellect", &LocalPlayer::setIntellect);
     g_lua.bindClassMemberFunction<LocalPlayer>("setKnown", &LocalPlayer::setKnown);
     g_lua.bindClassMemberFunction<LocalPlayer>("setInventoryItem", &LocalPlayer::setInventoryItem);
     g_lua.bindClassMemberFunction<LocalPlayer>("getStates", &LocalPlayer::getStates);
@@ -687,6 +690,9 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<LocalPlayer>("getMagicLevelPercent", &LocalPlayer::getMagicLevelPercent);
     g_lua.bindClassMemberFunction<LocalPlayer>("getSoul", &LocalPlayer::getSoul);
     g_lua.bindClassMemberFunction<LocalPlayer>("getStamina", &LocalPlayer::getStamina);
+    g_lua.bindClassMemberFunction<LocalPlayer>("getStrength", &LocalPlayer::getStrength);
+    g_lua.bindClassMemberFunction<LocalPlayer>("getIntellect", &LocalPlayer::getIntellect);
+    g_lua.bindClassMemberFunction<LocalPlayer>("getAgility", &LocalPlayer::getAgility);
     g_lua.bindClassMemberFunction<LocalPlayer>("getOfflineTrainingTime", &LocalPlayer::getOfflineTrainingTime);
     g_lua.bindClassMemberFunction<LocalPlayer>("getRegenerationTime", &LocalPlayer::getRegenerationTime);
     g_lua.bindClassMemberFunction<LocalPlayer>("getBaseMagicLevel", &LocalPlayer::getBaseMagicLevel);

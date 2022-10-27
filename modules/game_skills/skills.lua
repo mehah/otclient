@@ -12,6 +12,9 @@ function init()
         onFreeCapacityChange = onFreeCapacityChange,
         onTotalCapacityChange = onTotalCapacityChange,
         onStaminaChange = onStaminaChange,
+        onStrengthChange = onStrengthChange,
+        onAgilityChange = onAgilityChange,
+        onIntellectChange = onIntellectChange,
         onOfflineTrainingChange = onOfflineTrainingChange,
         onRegenerationChange = onRegenerationChange,
         onSpeedChange = onSpeedChange,
@@ -55,14 +58,12 @@ function terminate()
         onFreeCapacityChange = onFreeCapacityChange,
         onTotalCapacityChange = onTotalCapacityChange,
         onStaminaChange = onStaminaChange,
-        onOfflineTrainingChange = onOfflineTrainingChange,
+        onStrengthChange = onStrengthChange,
+        onAgilityChange = onAgilityChange,
+        onIntellectChange = onIntellectChange,
         onRegenerationChange = onRegenerationChange,
         onSpeedChange = onSpeedChange,
         onBaseSpeedChange = onBaseSpeedChange,
-        onMagicLevelChange = onMagicLevelChange,
-        onBaseMagicLevelChange = onBaseMagicLevelChange,
-        onSkillChange = onSkillChange,
-        onBaseSkillChange = onBaseSkillChange
     })
     disconnect(g_game, {
         onGameStart = online,
@@ -204,13 +205,6 @@ function checkAlert(id, value, maxValue, threshold, greaterThan)
 end
 
 function update()
-    local offlineTraining = skillsWindow:recursiveGetChildById('offlineTraining')
-    if not g_game.getFeature(GameOfflineTrainingTime) then
-        offlineTraining:hide()
-    else
-        offlineTraining:show()
-    end
-
     local regenerationTime = skillsWindow:recursiveGetChildById('regenerationTime')
     if not g_game.getFeature(GamePlayerRegenerationTime) then
         regenerationTime:hide()
@@ -242,20 +236,11 @@ function refresh()
     onSoulChange(player, player:getSoul())
     onFreeCapacityChange(player, player:getFreeCapacity())
     onStaminaChange(player, player:getStamina())
-    onMagicLevelChange(player, player:getMagicLevel(), player:getMagicLevelPercent())
-    onOfflineTrainingChange(player, player:getOfflineTrainingTime())
+    onStrengthChange(player, player:getStrength())
+    onAgilityChange(player, player:getAgility())
+    onIntellectChange(player, player:getIntellect())
     onRegenerationChange(player, player:getRegenerationTime())
     onSpeedChange(player, player:getSpeed())
-
-    local hasAdditionalSkills = g_game.getFeature(GameAdditionalSkills)
-    for i = Skill.Fist, Skill.ManaLeechAmount do
-        onSkillChange(player, i, player:getSkillLevel(i), player:getSkillLevelPercent(i))
-        onBaseSkillChange(player, i, player:getSkillBaseLevel(i))
-
-        if i > Skill.Fishing then
-            toggleSkill('skillId' .. i, hasAdditionalSkills)
-        end
-    end
 
     update()
     updateHeight()
@@ -451,19 +436,16 @@ function onStaminaChange(localPlayer, stamina)
     end
 end
 
-function onOfflineTrainingChange(localPlayer, offlineTrainingTime)
-    if not g_game.getFeature(GameOfflineTrainingTime) then
-        return
-    end
-    local hours = math.floor(offlineTrainingTime / 60)
-    local minutes = offlineTrainingTime % 60
-    if minutes < 10 then
-        minutes = '0' .. minutes
-    end
-    local percent = 100 * offlineTrainingTime / (12 * 60) -- max is 12 hours
+function onStrengthChange(localPlayer, strength)
+    setSkillValue('strength', comma_value(strength))
+end
 
-    setSkillValue('offlineTraining', hours .. ':' .. minutes)
-    setSkillPercent('offlineTraining', percent, tr('You have %s percent', percent))
+function onAgilityChange(localPlayer, agility)
+    setSkillValue('agility', comma_value(agility))
+end
+
+function onIntellectChange(localPlayer, intellect)
+    setSkillValue('intellect', comma_value(intellect))
 end
 
 function onRegenerationChange(localPlayer, regenerationTime)
@@ -488,26 +470,4 @@ end
 
 function onBaseSpeedChange(localPlayer, baseSpeed)
     setSkillBase('speed', localPlayer:getSpeed(), baseSpeed)
-end
-
-function onMagicLevelChange(localPlayer, magiclevel, percent)
-    setSkillValue('magiclevel', comma_value(magiclevel))
-    setSkillPercent('magiclevel', percent, tr('You have %s percent to go', 100 - percent))
-
-    onBaseMagicLevelChange(localPlayer, localPlayer:getBaseMagicLevel())
-end
-
-function onBaseMagicLevelChange(localPlayer, baseMagicLevel)
-    setSkillBase('magiclevel', localPlayer:getMagicLevel(), baseMagicLevel)
-end
-
-function onSkillChange(localPlayer, id, level, percent)
-    setSkillValue('skillId' .. id, comma_value(level))
-    setSkillPercent('skillId' .. id, percent, tr('You have %s percent to go', 100 - percent))
-
-    onBaseSkillChange(localPlayer, id, localPlayer:getSkillBaseLevel(id))
-end
-
-function onBaseSkillChange(localPlayer, id, baseLevel)
-    setSkillBase('skillId' .. id, localPlayer:getSkillLevel(id), baseLevel)
 end
