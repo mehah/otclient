@@ -1650,6 +1650,19 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg)
     if (g_game.getFeature(Otc::GamePlayerStamina))
         stamina = msg->getU16();
 
+    double strength = 0;
+    strength = msg->getU32();
+    double baseStrength = 0;
+    baseStrength = msg->getU32();
+    double agility = 0;
+    agility = msg->getU32();
+    double baseAgility = 0;
+    baseAgility = msg->getU32();
+    double intellect = 0;
+    intellect = msg->getU32();
+    double baseIntellect = 0;
+    baseIntellect = msg->getU32();
+
     double baseSpeed = 0;
     if (g_game.getFeature(Otc::GameSkillsBase))
         baseSpeed = msg->getU16();
@@ -1680,6 +1693,12 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg)
     m_localPlayer->setLevel(level, levelPercent);
     m_localPlayer->setMana(mana, maxMana);
     m_localPlayer->setStamina(stamina);
+    m_localPlayer->setStrength(strength);
+    m_localPlayer->setBaseStrength(baseStrength);
+    m_localPlayer->setAgility(agility);
+    m_localPlayer->setBaseAgility(baseAgility);
+    m_localPlayer->setIntellect(intellect);
+    m_localPlayer->setBaseIntellect(baseIntellect);
     m_localPlayer->setSoul(soul);
     m_localPlayer->setBaseSpeed(baseSpeed);
     m_localPlayer->setRegenerationTime(regeneration);

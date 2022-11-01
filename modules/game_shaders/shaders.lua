@@ -7,6 +7,9 @@ MAP_SHADERS = {{
     frag = 'shaders/fragment/fog.frag',
     tex1 = 'images/clouds'
 }, {
+    name = 'Map - Test',
+    frag = 'shaders/fragment/test.frag',
+}, {
     name = 'Map - Rain',
     frag = 'shaders/fragment/rain.frag'
 }, {
@@ -48,6 +51,9 @@ MAP_SHADERS = {{
 OUTFIT_SHADERS = {{
     name = 'Outfit - Default',
     frag = nil
+}, {
+    name = 'Outfit - test',
+    frag = 'shaders/fragment/test.frag'
 }, {
     name = 'Outfit - Rainbow',
     frag = 'shaders/fragment/party.frag'
