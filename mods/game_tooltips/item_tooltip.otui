@@ -1,0 +1,45 @@
+TooltipLabel < Label
+  anchors.top: prev.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  font: verdana-11px-rounded
+  text-align: center
+
+TooltipSeparator < HorizontalSeparator
+  anchors.top: prev.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin-top: 3
+
+TooltipEmpty < UIWidget
+  anchors.top: prev.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+
+FlatPanel
+  Label
+    id: itemWeightLabel
+    font: verdana-11px-rounded
+    anchors.top: parent.top
+    anchors.left: parent.left
+    text-auto-resize: true
+    margin-top: 5
+    margin-left: 5
+    
+  UIItem
+    id: itemSprite
+    font: verdana-11px-rounded
+    virtual: true
+    anchors.top: parent.top
+    anchors.right: parent.right
+    size: 32 32
+    margin-top: 5
+    margin-right: 5
+
+  Panel
+    id: labels
+    anchors.fill: parent
+    margin-top: 5
+    margin-bottom: 5
+    margin-left: 37
+    margin-right: 37
