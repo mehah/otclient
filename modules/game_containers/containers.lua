@@ -1,5 +1,3 @@
-local CODE_TOOLTIPS = 106
-
 function init()
     g_ui.importStyle('container')
 
@@ -9,8 +7,6 @@ function init()
         onSizeChange = onContainerChangeSize,
         onUpdateItem = onContainerUpdateItem
     })
-        ProtocolGame.registerExtendedOpcode(CODE_TOOLTIPS, onExtendedOpcode)
-
     connect(Game, {
         onGameEnd = clean()
     })
@@ -28,8 +24,6 @@ function terminate()
     disconnect(Game, {
         onGameEnd = clean()
     })
-        ProtocolGame.unregisterExtendedOpcode(CODE_TOOLTIPS, onExtendedOpcode)
-
 end
 
 function reloadContainers()
@@ -56,15 +50,8 @@ end
 function refreshContainerItems(container)
     for slot = 0, container:getCapacity() - 1 do
         local itemWidget = container.itemsPanel:getChildById('item' .. slot)
-        local item = container:getItem(slot)
-        itemWidget:setItem(item)
-        --if item then 
-        --   tdump("RefreshContainer - Item", item:getStackPos())
-        --   local pos = item:getPosition()
-        --   g_game.getProtocolGame():sendExtendedOpcode(CODE_TOOLTIPS, json.encode({containerId = container:getId(), widgetId = itemWidget:getId(), position = {pos.x, pos.y, pos.z, item:getStackPos()}}))
-        --end
+        itemWidget:setItem(container:getItem(slot))
     end
-    g_game.getProtocolGame():sendExtendedOpcode(CODE_TOOLTIPS, json.encode({containerId = container:getId()}))
 
     if container:hasPages() then
         refreshContainerPages(container)
@@ -143,12 +130,7 @@ function onContainerOpen(container, previousContainer)
     for slot = 0, container:getCapacity() - 1 do
         local itemWidget = g_ui.createWidget('Item', containerPanel)
         itemWidget:setId('item' .. slot)
-        local item = container:getItem(slot)
-        itemWidget:setItem(item)
-        --if item then
-        --    local pos = item:getPosition()
-        --    g_game.getProtocolGame():sendExtendedOpcode(CODE_TOOLTIPS, json.encode({containerId = container:getId(),widgetId = itemWidget:getId(), position = {pos.x, pos.y, pos.z, item:getStackPos()}}))
-        --end
+        itemWidget:setItem(container:getItem(slot))
         itemWidget:setMargin(0)
         itemWidget.position = container:getSlotPosition(slot)
 
@@ -180,8 +162,6 @@ function onContainerOpen(container, previousContainer)
         end
     end
 
-    g_game.getProtocolGame():sendExtendedOpcode(CODE_TOOLTIPS, json.encode({containerId = container:getId()}))
-
     containerWindow:setup()
 end
 
@@ -197,47 +177,9 @@ function onContainerChangeSize(container, size)
 end
 
 function onContainerUpdateItem(container, slot, item, oldItem)
-    print("ItemUpdate")
     if not container.window then
         return
     end
     local itemWidget = container.itemsPanel:getChildById('item' .. slot)
     itemWidget:setItem(item)
-    if item then
-        local pos = item:getPosition()
-        g_game.getProtocolGame():sendExtendedOpcode(CODE_TOOLTIPS, json.encode({containerId = container:getId(), widgetId = itemWidget:getId(), position = {pos.x, pos.y, pos.z, item:getStackPos()}}))
-    end
-end
-
-function onExtendedOpcode(protocol, code, buffer)
-  local json_status, json_data =
-    pcall(
-    function()
-      return json.decode(buffer)
-    end
-  )
-
-  if not json_status then
-    g_logger.error("Tooltips JSON error: " .. json_data)
-    return
-  end
-  local action = json_data.action
-  local data = json_data.data
-  local containerId = json_data.containerId
-  if not action or not data or not containerId then
-    return
-  end
-  local rootWidget = g_ui.getRootWidget()
-  local container = rootWidget:recursiveGetChildById("container" .. containerId)
-  if action == "new" then
-     for i, item in ipairs(data.items) do 
-         local itemWidget = container:recursiveGetChildById("item" .. i-1)
-         itemWidget:setData(newTooltip(item))
-     end
-  end
-
-  --local itemWidget = container:recursiveGetChildById(widget)
-  --  if action == "new" then
-  --  itemWidget:setData(newTooltip(data))
-  --end
 end

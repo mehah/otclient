@@ -1,5 +1,3 @@
-local CODE_TOOLTIPS = 105
-
 InventorySlotStyles = {
     [InventorySlotHead] = 'HeadSlot',
     [InventorySlotNeck] = 'NeckSlot',
@@ -27,7 +25,6 @@ function init()
         onGameStart = online,
         onGameEnd = offline
     })
-    ProtocolGame.registerExtendedOpcode(CODE_TOOLTIPS, onExtendedOpcode)
 
     g_keyboard.bindKeyDown('Ctrl+I', toggle)
 
@@ -64,7 +61,6 @@ function terminate()
         onGameStart = online,
         onGameEnd = offline
     })
-    ProtocolGame.unregisterExtendedOpcode(CODE_TOOLTIPS, onExtendedOpcode)
 
     g_keyboard.unbindKeyDown('Ctrl+I')
 
@@ -132,7 +128,6 @@ function onInventoryChange(player, slot, item, oldItem)
     if slot > InventorySlotPurse then
         return
     end
-    local protocolGame = g_game.getProtocolGame()
 
     if slot == InventorySlotPurse then
         if g_game.getFeature(GamePurseSlot) then
@@ -145,12 +140,9 @@ function onInventoryChange(player, slot, item, oldItem)
     if item then
         itemWidget:setStyle('InventoryItem')
         itemWidget:setItem(item)
-        local pos = item:getPosition()
-        protocolGame:sendExtendedOpcode(CODE_TOOLTIPS, json.encode({widgetId = itemWidget:getId(), position = {pos.x, pos.y, pos.z, item:getStackPos()}}))
     else
         itemWidget:setStyle(InventorySlotStyles[slot])
         itemWidget:setItem(nil)
-        itemWidget:setData(nil)
     end
 end
 
@@ -159,28 +151,4 @@ function onBlessingsChange(player, blessings, oldBlessings)
     if hasAdventurerBlessing ~= Bit.hasBit(oldBlessings, Blessings.Adventurer) then
         toggleAdventurerStyle(hasAdventurerBlessing)
     end
-end
-
-function onExtendedOpcode(protocol, code, buffer)
-  local json_status, json_data =
-    pcall(
-    function()
-      return json.decode(buffer)
-    end
-  )
-
-  if not json_status then
-    g_logger.error("Tooltips JSON error: " .. json_data)
-    return
-  end
-  local action = json_data.action
-  local data = json_data.data
-  local widget = json_data.widgetId
-  if not action or not data or not widget then
-    return
-  end
-  local itemWidget = inventoryPanel:getChildById(widget)
-  if action == "new" then
-    itemWidget:setData(newTooltip(data))
-  end
 end

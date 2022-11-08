@@ -29,4 +29,3 @@ Module
 
     dofile 'json'
     dofile 'http'
-    dofile 'tooltip'

@@ -305,7 +305,6 @@ protected:
     EdgeGroup<int> m_padding;
     float m_opacity{ 1.f };
     float m_rotation{ 0.f };
-    std::string m_data="";
     int m_autoRepeatDelay{ 500 };
     Point m_lastClickPosition;
 
@@ -362,7 +361,6 @@ public:
     void setPaddingLeft(int padding) { m_padding.left = padding; updateLayout(); }
     void setOpacity(float opacity) { m_opacity = std::clamp<float>(opacity, 0.0f, 1.0f); repaint(); }
     void setRotation(float degrees) { m_rotation = degrees; repaint(); }
-    void setData(std::string data) { m_data = data; }
 
     int getX() { return m_rect.x(); }
     int getY() { return m_rect.y(); }
@@ -408,7 +406,6 @@ public:
     int getPaddingLeft() { return m_padding.left; }
     float getOpacity() { return m_opacity; }
     float getRotation() { return m_rotation; }
-    std::string getData() { return m_data; }
 
     // image
 private:

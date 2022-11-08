@@ -3,8 +3,6 @@
 rootWidget = g_ui.getRootWidget()
 modules = package.loaded
 
-cachedItems = {}
-
 -- G is used as a global table to save variables in memory between reloads
 G = G or {}
 
