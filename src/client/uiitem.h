@@ -42,7 +42,7 @@ public:
 
     int getItemId() { return m_item ? m_item->getId() : 0; }
     int getItemCount() { return m_item ? m_item->getCount() : 0; }
-    int getItemSubType() { return m_item ? m_item->getSubType() : 0; }
+    int getItemSubType() { return m_item ? m_item->getSubType() : 0; } 
     ItemPtr getItem() { return m_item; }
     bool isVirtual() { return m_virtual; }
     bool isItemVisible() { return m_itemVisible; }
