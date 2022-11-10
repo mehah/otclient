@@ -306,7 +306,7 @@ private:
 
     std::string m_customImage;
 
-    std::vector<int> m_spritesIndex;
+    std::vector<uint32_t> m_spritesIndex;
 
     std::vector<TexturePtr> m_textures;
     std::vector<TexturePtr> m_blankTextures;
