@@ -532,7 +532,7 @@ bool Tile::isWalkable(bool ignoreCreatures)
 
 bool Tile::isCompletelyCovered(uint8_t firstFloor, bool resetCache)
 {
-    if (m_position.z == 0) return false; // TOP FLOOR
+    if (m_position.z == 0 || m_position.z == firstFloor) return false;
 
     if (resetCache) {
         m_isCompletelyCovered = m_isCovered = 0;
@@ -557,7 +557,7 @@ bool Tile::isCompletelyCovered(uint8_t firstFloor, bool resetCache)
 
 bool Tile::isCovered(int8_t firstFloor)
 {
-    if (m_position.z == 0) return false; // TOP FLOOR
+    if (m_position.z == 0 || m_position.z == firstFloor) return false;
 
     const uint32_t idChecked = 1 << firstFloor;
     const uint32_t idState = 1 << (firstFloor + MAX_Z);
