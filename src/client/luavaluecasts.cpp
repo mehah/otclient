@@ -134,7 +134,7 @@ bool luavalue_cast(int index, MarketData& data)
         return false;
 
     g_lua.getField("category", index);
-    data.category = g_lua.popInteger();
+    data.category = static_cast<ThingCategory>(g_lua.popInteger());
     g_lua.getField("name", index);
     data.name = g_lua.popString();
     g_lua.getField("requiredLevel", index);

@@ -139,7 +139,7 @@ enum SpriteMask
 struct MarketData
 {
     std::string name;
-    int category;
+    ThingCategory category;
     uint16_t requiredLevel;
     uint16_t restrictVocation;
     uint16_t showAs;
@@ -263,7 +263,7 @@ public:
     bool isTall(const bool useRealSize = false) { return useRealSize ? getRealSize() > SPRITE_SIZE : getHeight() > 1; }
     uint16_t getClassification() { return m_attribs.get<uint16_t>(ThingAttrUpgradeClassification); }
     bool isSingleDimension() { return m_size.area() == 1; }
-    std::vector<int> getSprites() { return m_spritesIndex; }
+    std::vector<uint32_t> getSprites() { return m_spritesIndex; }
 
     // additional
     float getOpacity() { return m_opacity; }
@@ -273,7 +273,18 @@ public:
     TexturePtr getTexture(int animationPhase, TextureType txtType = TextureType::NONE);
 
 private:
-    bool hasTexture() const { return !m_textures.empty(); }
+    struct TextureData {
+        struct Pos {
+            Rect rects;
+            Rect originRects;
+            Point offsets;
+        };
+
+        TexturePtr main;
+        TexturePtr smooth;
+        TexturePtr blank;
+        std::vector<Pos> pos;
+    };
 
     static Size getBestTextureDimension(int w, int h, int count);
     uint32_t getSpriteIndex(int w, int h, int l, int x, int y, int z, int a);
@@ -308,11 +319,5 @@ private:
 
     std::vector<uint32_t> m_spritesIndex;
 
-    std::vector<TexturePtr> m_textures;
-    std::vector<TexturePtr> m_blankTextures;
-    std::vector<TexturePtr> m_smoothTextures;
-
-    std::vector<std::vector<Rect>> m_texturesFramesRects;
-    std::vector<std::vector<Rect>> m_texturesFramesOriginRects;
-    std::vector<std::vector<Point>> m_texturesFramesOffsets;
+    std::vector<TextureData> m_textureData;
 };

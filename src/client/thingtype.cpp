@@ -271,7 +271,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
 
     if (flags.has_market()) {
         MarketData market;
-        market.category = flags.market().category();
+        market.category = static_cast<ThingCategory>(flags.market().category());
         market.tradeAs = flags.market().trade_as_object_id();
         market.showAs = flags.market().show_as_object_id();
         market.name = flags.market().name();
@@ -420,12 +420,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
         }
     }
 
-    m_textures.resize(m_animationPhases);
-    m_blankTextures.resize(m_animationPhases);
-    m_smoothTextures.resize(m_animationPhases);
-    m_texturesFramesRects.resize(m_animationPhases);
-    m_texturesFramesOriginRects.resize(m_animationPhases);
-    m_texturesFramesOffsets.resize(m_animationPhases);
+    m_textureData.resize(m_animationPhases);
 }
 
 void ThingType::unserialize(uint16_t clientId, ThingCategory category, const FileStreamPtr& fin)
@@ -544,7 +539,7 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
             case ThingAttrMarket:
             {
                 MarketData market;
-                market.category = fin->getU16();
+                market.category = static_cast<ThingCategory>(fin->getU16());
                 market.tradeAs = fin->getU16();
                 market.showAs = fin->getU16();
                 market.name = fin->getString();
@@ -575,7 +570,7 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
 
     if (!done)
         throw Exception("corrupt data (id: %d, category: %d, count: %d, lastAttr: %d)",
-                        m_id, m_category, count, attr);
+        m_id, m_category, count, attr);
 
     const bool hasFrameGroups = category == ThingCategoryCreature && g_game.getFeature(Otc::GameIdleAnimations);
     const uint8_t groupCount = hasFrameGroups ? fin->getU8() : 1;
@@ -670,12 +665,7 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
         }
     }
 
-    m_textures.resize(m_animationPhases);
-    m_blankTextures.resize(m_animationPhases);
-    m_smoothTextures.resize(m_animationPhases);
-    m_texturesFramesRects.resize(m_animationPhases);
-    m_texturesFramesOriginRects.resize(m_animationPhases);
-    m_texturesFramesOffsets.resize(m_animationPhases);
+    m_textureData.resize(m_animationPhases);
 }
 
 void ThingType::exportImage(const std::string& fileName)
@@ -695,8 +685,8 @@ void ThingType::exportImage(const std::string& fileName)
                         for (int w = 0; w < m_size.width(); ++w) {
                             for (int h = 0; h < m_size.height(); ++h) {
                                 image->blit(Point(SPRITE_SIZE * (m_size.width() - w - 1 + m_size.width() * x + m_size.width() * m_numPatternX * l),
-                                                  SPRITE_SIZE * (m_size.height() - h - 1 + m_size.height() * y + m_size.height() * m_numPatternY * a + m_size.height() * m_numPatternY * m_animationPhases * z)),
-                                            g_sprites.getSpriteImage(m_spritesIndex[getSpriteIndex(w, h, l, x, y, z, a)]));
+                                    SPRITE_SIZE * (m_size.height() - h - 1 + m_size.height() * y + m_size.height() * m_numPatternY * a + m_size.height() * m_numPatternY * m_animationPhases * z)),
+                                    g_sprites.getSpriteImage(m_spritesIndex[getSpriteIndex(w, h, l, x, y, z, a)]));
                             }
                         }
                     }
@@ -738,14 +728,14 @@ void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPatte
     if (!texture)
         return;
 
-    const auto& textureRectList = m_texturesFramesRects[animationPhase];
+    const auto& textureData = m_textureData[animationPhase];
 
     const uint32_t frameIndex = getTextureIndex(layer, xPattern, yPattern, zPattern);
-    if (frameIndex >= textureRectList.size())
+    if (frameIndex >= textureData.pos.size())
         return;
 
-    const Point& textureOffset = m_texturesFramesOffsets[animationPhase][frameIndex];
-    const Rect& textureRect = textureRectList[frameIndex];
+    const Point& textureOffset = textureData.pos[frameIndex].offsets;
+    const Rect& textureRect = textureData.pos[frameIndex].rects;
 
     const Rect screenRect(dest + (textureOffset - m_displacement - (m_size.toPoint() - Point(1)) * SPRITE_SIZE) * scaleFactor, textureRect.size() * scaleFactor);
 
@@ -773,9 +763,11 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
     const bool allBlank = txtType == TextureType::ALL_BLANK;
     const bool smooth = txtType == TextureType::SMOOTH;
 
-    TexturePtr& animationPhaseTexture = (
-        allBlank ? m_blankTextures :
-        smooth ? m_smoothTextures : m_textures)[animationPhase];
+    auto& textureData = m_textureData[animationPhase];
+
+    TexturePtr& animationPhaseTexture =
+        allBlank ? textureData.blank :
+        smooth ? textureData.smooth : textureData.main;
 
     if (animationPhaseTexture) return animationPhaseTexture;
 
@@ -793,9 +785,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
     const Size textureSize = getBestTextureDimension(m_size.width(), m_size.height(), indexSize);
     const auto& fullImage = useCustomImage ? Image::load(m_customImage) : ImagePtr(new Image(textureSize * SPRITE_SIZE));
 
-    m_texturesFramesRects[animationPhase].resize(indexSize);
-    m_texturesFramesOriginRects[animationPhase].resize(indexSize);
-    m_texturesFramesOffsets[animationPhase].resize(indexSize);
+    textureData.pos.resize(indexSize);
 
     const bool protobufSupported = g_game.getProtocolVersion() >= 1281;
 
@@ -808,8 +798,10 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
                     const bool spriteMask = m_category == ThingCategoryCreature && l > 0;
                     const int frameIndex = getTextureIndex(l % textureLayers, x, y, z);
 
-                    Point framePos = Point(frameIndex % (textureSize.width() / m_size.width()) * m_size.width(),
-                                           frameIndex / (textureSize.width() / m_size.width()) * m_size.height()) * SPRITE_SIZE;
+                    const auto& framePos = Point(frameIndex % (textureSize.width() / m_size.width()) * m_size.width(),
+                        frameIndex / (textureSize.width() / m_size.width()) * m_size.height()) * SPRITE_SIZE;
+
+                    auto& posData = textureData.pos[frameIndex];
 
                     if (!useCustomImage) {
                         if (protobufSupported) {
@@ -870,9 +862,9 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
                         }
                     }
 
-                    m_texturesFramesRects[animationPhase][frameIndex] = drawRect;
-                    m_texturesFramesOriginRects[animationPhase][frameIndex] = Rect(framePos, Size(m_size.width(), m_size.height()) * SPRITE_SIZE);
-                    m_texturesFramesOffsets[animationPhase][frameIndex] = drawRect.topLeft() - framePos;
+                    posData.rects = drawRect;
+                    posData.originRects = Rect(framePos, Size(m_size.width(), m_size.height()) * SPRITE_SIZE);
+                    posData.offsets = drawRect.topLeft() - framePos;
                 }
             }
         }
@@ -925,18 +917,18 @@ Size ThingType::getBestTextureDimension(int w, int h, int count)
 uint32_t ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int a)
 {
     uint32_t index = ((((((a % m_animationPhases)
-                          * m_numPatternZ + z)
-                         * m_numPatternY + y)
-                        * m_numPatternX + x)
-                       * m_layers + l)
-                      * m_size.height() + h)
+        * m_numPatternZ + z)
+        * m_numPatternY + y)
+        * m_numPatternX + x)
+        * m_layers + l)
+        * m_size.height() + h)
         * m_size.width() + w;
 
     if (w == -1 && h == -1) { // protobuf does not use width and height, because sprite image is the exact sprite size, not split by 32x32, so -1 is passed instead
         index = ((((a % m_animationPhases)
-                   * m_numPatternZ + z)
-                  * m_numPatternY + y)
-                 * m_numPatternX + x)
+            * m_numPatternZ + z)
+            * m_numPatternY + y)
+            * m_numPatternX + x)
             * m_layers + l;
     }
 
@@ -947,7 +939,7 @@ uint32_t ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int
 uint32_t ThingType::getTextureIndex(int l, int x, int y, int z)
 {
     return ((l * m_numPatternZ + z)
-            * m_numPatternY + y)
+        * m_numPatternY + y)
         * m_numPatternX + x;
 }
 
@@ -958,7 +950,9 @@ int ThingType::getExactSize(int layer, int xPattern, int yPattern, int zPattern,
 
     getTexture(animationPhase); // we must calculate it anyway.
     const int frameIndex = getTextureIndex(layer, xPattern, yPattern, zPattern);
-    const Size size = m_texturesFramesOriginRects[animationPhase][frameIndex].size() - m_texturesFramesOffsets[animationPhase][frameIndex].toSize();
+
+    const auto& textureDataPos = m_textureData[animationPhase].pos[frameIndex];
+    const Size& size = textureDataPos.originRects.size() - textureDataPos.offsets.toSize();
     return std::max<int>(size.width(), size.height());
 }
 
@@ -989,7 +983,8 @@ int ThingType::getExactHeight()
 
     getTexture(0);
     const int frameIndex = getTextureIndex(0, 0, 0, 0);
-    const Size size = m_texturesFramesOriginRects[0][frameIndex].size() - m_texturesFramesOffsets[0][frameIndex].toSize();
 
+    const auto& textureDataPos = m_textureData[0].pos[frameIndex];
+    const Size& size = textureDataPos.originRects.size() - textureDataPos.offsets.toSize();
     return m_exactHeight = size.height();
 }
