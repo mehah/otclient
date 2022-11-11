@@ -205,9 +205,8 @@ private:
     uint8_t m_minimapColor{ 0 };
     uint8_t m_elevation{ 0 };
 
-    int8_t m_lastFloorMin{ -1 };
-
-    std::array<int8_t, MAX_Z + 1> m_completelyCoveredCache;
+    uint32_t m_isCompletelyCovered{ 0 };
+    uint32_t m_isCovered{ 0 };
 
     uint32_t m_flags{ 0 };
     uint32_t m_thingTypeFlag{ 0 };
@@ -220,10 +219,9 @@ private:
 
     ItemPtr m_ground;
 
-    ThingPtr m_highlightThing;
+    uint16_t m_highlightThingId{ 0 };
 
     TileSelectType m_selectType{ TileSelectType::NONE };
 
-    bool m_covered{ false };
     bool m_drawTopAndCreature{ true };
 };

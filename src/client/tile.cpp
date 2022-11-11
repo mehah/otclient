@@ -30,14 +30,11 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/graphics/drawpoolmanager.h>
 
-Tile::Tile(const Position& position) : m_position(position)
-{
-    m_completelyCoveredCache.fill(-1);
-}
+Tile::Tile(const Position& position) : m_position(position) {}
 
 void Tile::drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor, int flags, LightView* lightView)
 {
-    thing->draw(dest, scaleFactor, true, flags, TextureType::NONE, m_selectType != TileSelectType::NONE && m_highlightThing == thing, lightView);
+    thing->draw(dest, scaleFactor, true, flags, TextureType::NONE, m_selectType != TileSelectType::NONE && m_highlightThingId == thing->getThingType()->getId(), lightView);
 
     if (thing->isItem()) {
         m_drawElevation += thing->getElevation();
@@ -137,7 +134,7 @@ void Tile::drawTop(const Point& dest, float scaleFactor, int flags, bool forceDr
 
 void Tile::clean()
 {
-    m_highlightThing = nullptr;
+    m_highlightThingId = 0;
     while (!m_things.empty())
         removeThing(m_things.front());
 
@@ -535,24 +532,43 @@ bool Tile::isWalkable(bool ignoreCreatures)
 
 bool Tile::isCompletelyCovered(uint8_t firstFloor, bool resetCache)
 {
-    if (resetCache)
-        m_completelyCoveredCache.fill(-1);
+    if (m_position.z == 0) return false; // TOP FLOOR
+
+    if (resetCache) {
+        m_isCompletelyCovered = m_isCovered = 0;
+    }
 
     if (hasCreature() || !m_walkingCreatures.empty() || hasLight())
         return false;
 
-    auto& is = m_completelyCoveredCache[firstFloor];
-    if (is == -1) {
-        is = g_map.isCompletelyCovered(m_position, firstFloor);
+    const uint32_t idChecked = 1 << firstFloor;
+    const uint32_t idState = 1 << (firstFloor + MAX_Z);
+    if ((m_isCompletelyCovered & idChecked) == 0) {
+        m_isCompletelyCovered |= idChecked;
+        if (g_map.isCompletelyCovered(m_position, firstFloor)) {
+            m_isCompletelyCovered |= idState;
+            m_isCovered |= idChecked; // Set covered is Checked
+            m_isCovered |= idState;
+        }
     }
 
-    return is == 1;
+    return (m_isCompletelyCovered & idState) == idState;
 }
 
 bool Tile::isCovered(int8_t firstFloor)
 {
-    return firstFloor == m_lastFloorMin ? m_covered :
-        m_covered = g_map.isCovered(m_position, m_lastFloorMin = firstFloor);
+    if (m_position.z == 0) return false; // TOP FLOOR
+
+    const uint32_t idChecked = 1 << firstFloor;
+    const uint32_t idState = 1 << (firstFloor + MAX_Z);
+
+    if ((m_isCovered & idChecked) == 0) {
+        m_isCovered |= idChecked;
+        if (g_map.isCovered(m_position, firstFloor))
+            m_isCovered |= idState;
+    }
+
+    return (m_isCovered & idState) == idState;
 }
 
 bool Tile::isClickable()
@@ -637,8 +653,10 @@ bool Tile::limitsFloorsView(bool isFreeView)
 
 bool Tile::checkForDetachableThing()
 {
-    if ((m_highlightThing = getTopCreature()))
+    if (const auto& creature = getTopCreature()) {
+        m_highlightThingId = creature->getThingType()->getId();
         return true;
+    }
 
     if (hasCommonItem()) {
         for (const auto& item : m_things) {
@@ -646,7 +664,7 @@ bool Tile::checkForDetachableThing()
                 continue;
             }
 
-            m_highlightThing = item;
+            m_highlightThingId = item->getThingType()->getId();
             return true;
         }
     }
@@ -655,7 +673,7 @@ bool Tile::checkForDetachableThing()
         for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
             const auto& item = *it;
             if (!item->isOnBottom() || !item->canDraw() || item->isIgnoreLook() || item->isFluidContainer()) continue;
-            m_highlightThing = item;
+            m_highlightThingId = item->getThingType()->getId();
             return true;
         }
     }
@@ -667,7 +685,7 @@ bool Tile::checkForDetachableThing()
             if (!item->canDraw() || item->isIgnoreLook()) continue;
 
             if (item->hasLensHelp()) {
-                m_highlightThing = item;
+                m_highlightThingId = item->getThingType()->getId();
                 return true;
             }
         }
@@ -757,9 +775,11 @@ void Tile::setThingFlag(const ThingPtr& thing)
 void Tile::select(TileSelectType selectType)
 {
     if (selectType == TileSelectType::NO_FILTERED) {
-        m_highlightThing = getTopCreature();
-        if (!m_highlightThing)
-            m_highlightThing = m_things.back();
+        if (const CreaturePtr& topCreature = getTopCreature())
+            m_highlightThingId = topCreature->getThingType()->getId();
+
+        if (!m_highlightThingId)
+            m_highlightThingId = m_things.back()->getThingType()->getId();
     }
 
     m_selectType = selectType;

@@ -161,8 +161,6 @@ protected:
     uint8_t m_numPatternY{ 0 };
     uint8_t m_numPatternZ{ 0 };
 
-    uint16_t m_datId{ 0 };
-
     Position m_position;
     ThingTypePtr m_thingType;
     DrawBufferPtr m_drawBuffer;
