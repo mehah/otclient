@@ -812,7 +812,7 @@ void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPatte
     }
 }
 
-TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
+const TexturePtr& ThingType::getTexture(int animationPhase, const TextureType txtType)
 {
     if (m_null) {
         return nullptr;
@@ -840,7 +840,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
 
     const bool useCustomImage = animationPhase == 0 && !m_customImage.empty();
     const int indexSize = textureLayers * m_numPatternX * m_numPatternY * m_numPatternZ;
-    const Size textureSize = getBestTextureDimension(m_size.width(), m_size.height(), indexSize);
+    const auto& textureSize = getBestTextureDimension(m_size.width(), m_size.height(), indexSize);
     const auto& fullImage = useCustomImage ? Image::load(m_customImage) : ImagePtr(new Image(textureSize * SPRITE_SIZE));
 
     textureData.pos.resize(indexSize);

@@ -320,7 +320,7 @@ public:
     float getOpacity() { return m_opacity; }
     void setPathable(bool var);
     int getExactHeight();
-    TexturePtr getTexture(int animationPhase, TextureType txtType = TextureType::NONE);
+    const TexturePtr& getTexture(int animationPhase, TextureType txtType = TextureType::NONE);
 
 private:
     struct TextureData {
