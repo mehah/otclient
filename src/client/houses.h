@@ -27,17 +27,6 @@
 
 #include <framework/luaengine/luaobject.h>
 
-enum HouseAttr : uint8_t
-{
-    HouseAttrId,
-    HouseAttrName,
-    HouseAttrTown,
-    HouseAttrEntry,
-    HouseAttrSize,
-    HouseAttrRent,
-    HouseAttrLast,
-};
-
 class House : public LuaObject
 {
 public:
@@ -48,23 +37,23 @@ public:
     void setTile(const TilePtr& tile);
     TilePtr getTile(const Position& pos);
 
-    void setName(const std::string_view name) { m_attribs.set(HouseAttrName, name); }
-    std::string getName() { return m_attribs.get<std::string>(HouseAttrName); }
+    void setName(const std::string_view name) { m_name = std::string{ name }; }
+    std::string getName() { return m_name; }
 
-    void setId(uint32_t hId) { m_attribs.set(HouseAttrId, hId); }
-    uint32_t getId() { return m_attribs.get<uint32_t >(HouseAttrId); }
+    void setId(uint32_t hId) { m_id = hId; }
+    uint32_t getId() { return m_id; }
 
-    void setTownId(uint32_t tid) { m_attribs.set(HouseAttrTown, tid); }
-    uint32_t getTownId() { return m_attribs.get<uint32_t >(HouseAttrTown); }
+    void setTownId(uint32_t tid) { m_townId = tid; }
+    uint32_t getTownId() { return m_townId; }
 
-    void setSize(uint32_t s) { m_attribs.set(HouseAttrSize, s); }
-    uint32_t getSize() { return m_attribs.get<uint32_t >(HouseAttrSize); }
+    void setSize(uint32_t s) { m_size = s; }
+    uint32_t getSize() { return m_size; }
 
-    void setRent(uint32_t r) { m_attribs.set(HouseAttrRent, r); }
-    uint32_t getRent() { return m_attribs.get<uint32_t >(HouseAttrRent); }
+    void setRent(uint32_t r) { m_rent = r; }
+    uint32_t getRent() { return m_rent; }
 
-    void setEntry(const Position& p) { m_attribs.set(HouseAttrEntry, p); }
-    Position getEntry() { return m_attribs.get<Position>(HouseAttrEntry); }
+    void setEntry(const Position& p) { m_entry = p; }
+    Position getEntry() { return m_entry; }
 
     void addDoor(const ItemPtr& door);
     void removeDoor(const ItemPtr& door) { removeDoorById(door->getDoorId()); }
@@ -75,11 +64,18 @@ protected:
     void save(TiXmlElement* elem);
 
 private:
-    stdext::small_storage<HouseAttr, HouseAttrLast> m_attribs;
     TileMap m_tiles;
     ItemVector m_doors;
     uint32_t m_lastDoorId{ 0 };
+    uint32_t m_id{ 0 };
+    uint32_t m_townId{ 0 };
+    uint32_t m_size{ 0 };
+    uint32_t m_rent{ 0 };
+    Position m_entry;
+
     bool m_isGuildHall{ false };
+
+    std::string m_name;
 
     friend class HouseManager;
 };
