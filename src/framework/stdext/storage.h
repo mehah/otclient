@@ -41,26 +41,6 @@ namespace stdext
     template<typename T>
     concept OnlyEnum = std::is_enum_v<T>;
 
-    template<OnlyEnum Key, uint8_t _Size = UINT8_MAX>
-    class small_storage
-    {
-    public:
-        template<typename T>
-        T get(const Key k, const T defaultValue = T()) const { return has(k) ? std::any_cast<T>(m_data[k]) : defaultValue; }
-
-        template<typename T>
-        void set(const Key k, const T& value) { m_data[k] = value; }
-
-        void remove(const Key k) { m_data[k].reset(); }
-        void clear() { m_data.clear(); }
-
-        bool has(const Key k) const { return static_cast<uint8_t>(m_data.size()) >= k && m_data[k].has_value(); }
-        size_t size() const { return m_data.size(); }
-
-    private:
-        std::array<std::any, _Size> m_data{};
-    };
-
     template<OnlyEnum Key>
     class dynamic_storage
     {

@@ -55,7 +55,6 @@ public:
     const ThingTypePtr& getThingType(uint16_t id, ThingCategory category);
     const ItemTypePtr& getItemType(uint16_t id);
 
-    ThingTypeList findThingTypeByAttr(ThingAttr attr, ThingCategory category);
     ItemTypeList findItemTypeByCategory(ItemCategory category);
 
     const ThingTypeList& getThingTypes(ThingCategory category);

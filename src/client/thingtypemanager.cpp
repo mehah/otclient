@@ -461,15 +461,6 @@ const ItemTypePtr& ThingTypeManager::getItemType(uint16_t id)
     return m_itemTypes[id];
 }
 
-ThingTypeList ThingTypeManager::findThingTypeByAttr(ThingAttr attr, ThingCategory category)
-{
-    ThingTypeList ret;
-    for (const auto& type : m_thingTypes[category])
-        if (type->hasAttr(attr))
-            ret.push_back(type);
-    return ret;
-}
-
 ItemTypeList ThingTypeManager::findItemTypeByCategory(ItemCategory category)
 {
     ItemTypeList ret;
