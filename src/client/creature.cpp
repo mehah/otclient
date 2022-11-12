@@ -762,12 +762,13 @@ void Creature::setSpeed(uint16_t speed)
 
 void Creature::setBaseSpeed(double baseSpeed)
 {
-    if (m_baseSpeed != baseSpeed) {
-        const double oldBaseSpeed = m_baseSpeed;
-        m_baseSpeed = baseSpeed;
+    if (m_baseSpeed == baseSpeed)
+        return;
 
-        callLuaField("onBaseSpeedChange", baseSpeed, oldBaseSpeed);
-    }
+    const double oldBaseSpeed = m_baseSpeed;
+    m_baseSpeed = baseSpeed;
+
+    callLuaField("onBaseSpeedChange", baseSpeed, oldBaseSpeed);
 }
 
 void Creature::setType(uint8_t type) { callLuaField("onTypeChange", m_type = type); }
@@ -897,36 +898,23 @@ int Creature::getDisplacementY()
     if (m_outfit.getCategory() == ThingCategoryItem)
         return 0;
 
-    if (m_outfit.hasMount()) {
+    if (m_outfit.hasMount())
         return m_mountType->getDisplacementY();
-    }
 
     return Thing::getDisplacementY();
 }
 
 Light Creature::getLight()
 {
-    Light light = Thing::getLight();
-
-    if (m_light.color > 0 && m_light.intensity >= light.intensity)
-        light = m_light;
-
-    return light;
-}
-
-int Creature::getTotalAnimationPhase()
-{
-    if (!m_outfit.hasMount())
-        return getAnimationPhases();
-
-    return m_mountType->getAnimationPhases();
+    const auto& light = Thing::getLight();
+    return m_light.color > 0 && m_light.intensity >= light.intensity ? m_light : light;
 }
 
 int Creature::getCurrentAnimationPhase(const bool mount)
 {
     const auto& thingType = mount ? m_mountType : getThingType();
 
-    const auto& idleAnimator = thingType->getIdleAnimator();
+    auto* idleAnimator = thingType->getIdleAnimator();
     if (idleAnimator) {
         if (m_walkAnimationPhase == 0) return idleAnimator->getPhase();
         return m_walkAnimationPhase + idleAnimator->getAnimationPhases() - 1;

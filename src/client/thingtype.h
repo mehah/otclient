@@ -241,8 +241,8 @@ public:
     int getNumPatternY() { return m_numPatternY; }
     int getNumPatternZ() { return m_numPatternZ; }
     int getAnimationPhases();
-    AnimatorPtr getAnimator() { return m_animator; }
-    AnimatorPtr getIdleAnimator() { return m_idleAnimator; }
+    Animator* getAnimator() { return m_animator; }
+    Animator* getIdleAnimator() { return m_idleAnimator; }
 
     Point getDisplacement() { return m_displacement; }
     Light getLight() { return m_light; }
@@ -348,8 +348,8 @@ private:
     Size m_size;
     Point m_displacement;
 
-    AnimatorPtr m_animator;
-    AnimatorPtr m_idleAnimator;
+    Animator* m_animator{ nullptr };
+    Animator* m_idleAnimator{ nullptr };
 
     uint8_t m_animationPhases{ 0 };
     uint8_t m_realSize{ 0 };

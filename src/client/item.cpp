@@ -414,7 +414,7 @@ int Item::calculateAnimationPhase(bool animate)
 
     if (!animate) return getAnimationPhases() - 1;
 
-    if (getIdleAnimator() != nullptr) return getIdleAnimator()->getPhase();
+    if (getIdleAnimator()) return getIdleAnimator()->getPhase();
 
     if (m_async) {
         return (g_clock.millis() % (ITEM_TICKS_PER_FRAME * getAnimationPhases())) / ITEM_TICKS_PER_FRAME;

@@ -61,6 +61,9 @@ public:
 
     // type shortcuts
     ThingType* getThingType() { return m_thingType; }
+    Animator* getAnimator() { return m_thingType->getAnimator(); }
+    Animator* getIdleAnimator() { return m_thingType->getIdleAnimator(); }
+
     Size getSize() { return m_thingType->getSize(); }
     int getWidth() { return m_thingType->getWidth(); }
     int getHeight() { return m_thingType->getHeight(); }
@@ -77,8 +80,6 @@ public:
     int getNumPatternZ() { return m_thingType->getNumPatternZ(); }
     int getAnimationPhases() { return m_thingType->getAnimationPhases(); }
     bool hasAnimationPhases() { return m_thingType->getAnimationPhases() > 1; }
-    AnimatorPtr getAnimator() { return m_thingType->getAnimator(); }
-    AnimatorPtr getIdleAnimator() { return m_thingType->getIdleAnimator(); }
     int getGroundSpeed() { return m_thingType->getGroundSpeed(); }
     int getMaxTextLength() { return m_thingType->getMaxTextLength(); }
     virtual Light getLight() { return m_thingType->getLight(); }
@@ -163,7 +164,7 @@ protected:
     uint8_t m_numPatternZ{ 0 };
 
     Position m_position;
-    ThingType* m_thingType;
+    ThingType* m_thingType{ nullptr };
     DrawBufferPtr m_drawBuffer;
 
     Color m_markedColor{ Color::yellow };

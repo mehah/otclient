@@ -115,7 +115,7 @@ public:
     int getDisplacementY() override;
     int getExactSize() override;
 
-    int getTotalAnimationPhase();
+    int getTotalAnimationPhase() { return m_outfit.hasMount() ? m_mountType->getAnimationPhases() : getAnimationPhases(); }
     int getCurrentAnimationPhase(bool mount = false);
 
     void updateShield();
@@ -251,7 +251,7 @@ private:
     StepCache m_stepCache;
     SizeCache m_sizeCache;
 
-    ThingType* m_mountType;
+    ThingType* m_mountType{nullptr};
 
     bool m_drawOutfitColor{ true };
 

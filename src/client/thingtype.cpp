@@ -108,7 +108,7 @@ void ThingType::serialize(const FileStreamPtr& fin)
     fin->addU8(m_animationPhases);
 
     if (g_game.getFeature(Otc::GameEnhancedAnimations)) {
-        if (m_animationPhases > 1 && m_animator != nullptr) {
+        if (m_animationPhases > 1 && m_animator) {
             m_animator->serialize(fin);
         }
     }
@@ -367,7 +367,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
 
         // animations
         if (spritesPhases.size() > 1) {
-            const auto& animator = AnimatorPtr(new Animator);
+            auto* animator = new Animator;
             animator->unserializeAppearance(animation);
 
             if (frameGroupType == FrameGroupMoving)
@@ -670,7 +670,7 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
         m_animationPhases += groupAnimationsPhases;
 
         if (groupAnimationsPhases > 1 && g_game.getFeature(Otc::GameEnhancedAnimations)) {
-            const auto& animator = AnimatorPtr(new Animator);
+            auto* animator = new Animator;
             animator->unserialize(groupAnimationsPhases, fin);
 
             if (frameGroupType == FrameGroupMoving)
