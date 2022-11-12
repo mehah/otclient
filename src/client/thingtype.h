@@ -231,7 +231,7 @@ public:
     ThingCategory getCategory() { return m_category; }
     bool isNull() { return m_null; }
 
-    Size getSize() { return m_size; }
+
     int getWidth() { return m_size.width(); }
     int getHeight() { return m_size.height(); }
     int getExactSize(int layer = 0, int xPattern = 0, int yPattern = 0, int zPattern = 0, int animationPhase = 0);
@@ -241,12 +241,13 @@ public:
     int getNumPatternY() { return m_numPatternY; }
     int getNumPatternZ() { return m_numPatternZ; }
     int getAnimationPhases();
-    Animator* getAnimator() { return m_animator; }
-    Animator* getIdleAnimator() { return m_idleAnimator; }
+    Animator* getAnimator() const { return m_animator; }
+    Animator* getIdleAnimator() const { return m_idleAnimator; }
 
-    Point getDisplacement() { return m_displacement; }
-    Light getLight() { return m_light; }
-    MarketData getMarketData() { return m_market; }
+    const Size& getSize() { return m_size; }
+    const Point& getDisplacement() { return m_displacement; }
+    const Light& getLight() { return m_light; }
+    const MarketData& getMarketData() { return m_market; }
 
     int getDisplacementX() { return getDisplacement().x; }
     int getDisplacementY() { return getDisplacement().y; }

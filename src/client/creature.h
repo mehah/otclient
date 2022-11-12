@@ -91,8 +91,8 @@ public:
     uint8_t getHealthPercent() { return m_healthPercent; }
     Otc::Direction getDirection() { return m_direction; }
     Outfit getOutfit() { return m_outfit; }
-    Light getLight() override;
-    bool hasLight() override { return Thing::hasLight() || getLight().intensity > 0; }
+    const Light& getLight() const override;
+    bool hasLight() const override { return Thing::hasLight() || getLight().intensity > 0; }
     uint16_t getSpeed() { return m_speed; }
     double getBaseSpeed() { return m_baseSpeed; }
     uint8_t getSkull() { return m_skull; }
@@ -110,10 +110,10 @@ public:
     float getStepTicksLeft() { return static_cast<float>(m_stepCache.getDuration(m_lastStepDirection)) - m_walkTimer.ticksElapsed(); }
     ticks_t getWalkTicksElapsed() { return m_walkTimer.ticksElapsed(); }
     std::array<double, Otc::LastSpeedFormula> getSpeedFormulaArray() { return m_speedFormula; }
-    Point getDisplacement() override;
-    int getDisplacementX() override;
-    int getDisplacementY() override;
-    int getExactSize() override;
+    Point getDisplacement() const override;
+    int getDisplacementX() const override;
+    int getDisplacementY() const override;
+    int getExactSize(int layer = 0, int xPattern = 0, int yPattern = 0, int zPattern = 0, int animationPhase = 0) override;
 
     int getTotalAnimationPhase() { return m_outfit.hasMount() ? m_mountType->getAnimationPhases() : getAnimationPhases(); }
     int getCurrentAnimationPhase(bool mount = false);
@@ -251,7 +251,7 @@ private:
     StepCache m_stepCache;
     SizeCache m_sizeCache;
 
-    ThingType* m_mountType{nullptr};
+    ThingType* m_mountType{ nullptr };
 
     bool m_drawOutfitColor{ true };
 

@@ -390,7 +390,6 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Thing>("getStackPos", &Thing::getStackPos);
     g_lua.bindClassMemberFunction<Thing>("getMarketData", &Thing::getMarketData);
     g_lua.bindClassMemberFunction<Thing>("getStackPriority", &Thing::getStackPriority);
-    g_lua.bindClassMemberFunction<Thing>("getAnimationPhases", &Thing::getAnimationPhases);
     g_lua.bindClassMemberFunction<Thing>("getParentContainer", &Thing::getParentContainer);
     g_lua.bindClassMemberFunction<Thing>("isItem", &Thing::isItem);
     g_lua.bindClassMemberFunction<Thing>("isMonster", &Thing::isMonster);
@@ -528,7 +527,6 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ThingType>("getDisplacement", &ThingType::getDisplacement);
     g_lua.bindClassMemberFunction<ThingType>("getDisplacementX", &ThingType::getDisplacementX);
     g_lua.bindClassMemberFunction<ThingType>("getDisplacementY", &ThingType::getDisplacementY);
-    g_lua.bindClassMemberFunction<ThingType>("getExactSize", &ThingType::getExactSize);
     g_lua.bindClassMemberFunction<ThingType>("getRealSize", &ThingType::getRealSize);
     g_lua.bindClassMemberFunction<ThingType>("getLayers", &ThingType::getLayers);
     g_lua.bindClassMemberFunction<ThingType>("getNumPatternX", &ThingType::getNumPatternX);
@@ -623,7 +621,6 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Item>("isFluidContainer", &Item::isFluidContainer);
     g_lua.bindClassMemberFunction<Item>("getMarketData", &Item::getMarketData);
     g_lua.bindClassMemberFunction<Item>("getClothSlot", &Item::getClothSlot);
-    g_lua.bindClassMemberFunction<Item>("getUpgradeClassification", &Item::getClassification);
     g_lua.bindClassMemberFunction<Item>("hasWearOut", &ThingType::hasWearOut);
     g_lua.bindClassMemberFunction<Item>("hasClockExpire", &ThingType::hasClockExpire);
     g_lua.bindClassMemberFunction<Item>("hasExpire", &ThingType::hasExpire);

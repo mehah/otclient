@@ -65,51 +65,56 @@ public:
     Animator* getAnimator() { return m_thingType->getAnimator(); }
     Animator* getIdleAnimator() { return m_thingType->getIdleAnimator(); }
 
-    virtual Point getDisplacement() { return m_thingType->getDisplacement(); }
-    virtual int getDisplacementX() { return m_thingType->getDisplacementX(); }
-    virtual int getDisplacementY() { return m_thingType->getDisplacementY(); }
-    virtual int getExactSize() { return m_thingType->getExactSize(0, 0, 0, 0, 0); }
-    virtual int getExactSize(int layer, int xPattern, int yPattern, int zPattern, int animationPhase) { return m_thingType->getExactSize(layer, xPattern, yPattern, zPattern, animationPhase); }
+    virtual Point getDisplacement() const { return m_thingType->getDisplacement(); }
+    virtual int getDisplacementX() const { return m_thingType->getDisplacementX(); }
+    virtual int getDisplacementY() const { return m_thingType->getDisplacementY(); }
+    virtual int getExactSize(int layer = 0, int xPattern = 0, int yPattern = 0, int zPattern = 0, int animationPhase = 0) { return m_thingType->getExactSize(layer, xPattern, yPattern, zPattern, animationPhase); }
 
-    virtual Light getLight() { return m_thingType->getLight(); }
-    virtual bool hasLight() { return m_thingType->hasLight(); }
+    virtual const Light& getLight() const { return m_thingType->getLight(); }
+    virtual bool hasLight() const { return m_thingType->hasLight(); }
 
-    Size getSize() { return m_thingType->getSize(); }
+    const MarketData& getMarketData() { return m_thingType->getMarketData(); }
+    const Size& getSize() const { return m_thingType->getSize(); }
 
-    int getWidth() { return m_thingType->getWidth(); }
-    int getHeight() { return m_thingType->getHeight(); }
-    int getRealSize() { return m_thingType->getRealSize(); }
-    int getLayers() { return m_thingType->getLayers(); }
-    int getNumPatternX() { return m_thingType->getNumPatternX(); }
-    int getNumPatternY() { return m_thingType->getNumPatternY(); }
-    int getNumPatternZ() { return m_thingType->getNumPatternZ(); }
-    int getAnimationPhases() { return m_thingType->getAnimationPhases(); }
-    int getGroundSpeed() { return m_thingType->getGroundSpeed(); }
-    int getMaxTextLength() { return m_thingType->getMaxTextLength(); }
-    int getMinimapColor() { return m_thingType->getMinimapColor(); }
-    int getLensHelp() { return m_thingType->getLensHelp(); }
+    int getWidth() const { return m_thingType->getWidth(); }
+    int getHeight() const { return m_thingType->getHeight(); }
+    int getRealSize()const { return m_thingType->getRealSize(); }
+    int getLayers() const { return m_thingType->getLayers(); }
+    int getNumPatternX()const { return m_thingType->getNumPatternX(); }
+    int getNumPatternY()const { return m_thingType->getNumPatternY(); }
+    int getNumPatternZ()const { return m_thingType->getNumPatternZ(); }
+    int getAnimationPhases()const { return m_thingType->getAnimationPhases(); }
+    int getGroundSpeed() const { return m_thingType->getGroundSpeed(); }
+    int getMaxTextLength()const { return m_thingType->getMaxTextLength(); }
+    int getMinimapColor()const { return m_thingType->getMinimapColor(); }
+    int getLensHelp()const { return m_thingType->getLensHelp(); }
+    int getElevation() const { return m_thingType->getElevation(); }
+
     int getClothSlot() { return m_thingType->getClothSlot(); }
-    int getElevation() { return m_thingType->getElevation(); }
+
+    bool hasAnimationPhases() const { return m_thingType->getAnimationPhases() > 1; }
 
     virtual bool isContainer() { return m_thingType->isContainer(); }
 
-    bool hasAnimationPhases() { return m_thingType->getAnimationPhases() > 1; }
+    bool isTopGround() const { return m_thingType->isTopGround(); }
+    bool isTopGroundBorder() const { return m_thingType->isTopGroundBorder(); }
+    bool isSingleGround() const { return m_thingType->isSingleGround(); }
+    bool isSingleGroundBorder() const { return m_thingType->isSingleGroundBorder(); }
+
     bool isGround() { return m_thingType->isGround(); }
     bool isGroundBorder() { return m_thingType->isGroundBorder(); }
-    bool isTopGround() { return m_thingType->isTopGround(); }
-    bool isTopGroundBorder() { return m_thingType->isTopGroundBorder(); }
-    bool isSingleGround() { return m_thingType->isSingleGround(); }
-    bool isSingleGroundBorder() { return m_thingType->isSingleGroundBorder(); }
     bool isOnBottom() { return m_thingType->isOnBottom(); }
     bool isOnTop() { return m_thingType->isOnTop(); }
+
     bool isCommon() { return !isGround() && !isGroundBorder() && !isOnTop() && !isCreature() && !isOnBottom(); }
+    bool isMarketable() { return m_thingType->isMarketable(); }
     bool isStackable() { return m_thingType->isStackable(); }
+    bool isFluidContainer() { return m_thingType->isFluidContainer(); }
     bool isForceUse() { return m_thingType->isForceUse(); }
     bool isMultiUse() { return m_thingType->isMultiUse(); }
     bool isWritable() { return m_thingType->isWritable(); }
     bool isChargeable() { return m_thingType->isChargeable(); }
     bool isWritableOnce() { return m_thingType->isWritableOnce(); }
-    bool isFluidContainer() { return m_thingType->isFluidContainer(); }
     bool isSplash() { return m_thingType->isSplash(); }
     bool isNotWalkable() { return m_thingType->isNotWalkable(); }
     bool isNotMoveable() { return m_thingType->isNotMoveable(); }
@@ -132,7 +137,6 @@ public:
     bool isFullGround() { return m_thingType->isFullGround(); }
     bool isIgnoreLook() { return m_thingType->isIgnoreLook(); }
     bool isCloth() { return m_thingType->isCloth(); }
-    bool isMarketable() { return m_thingType->isMarketable(); }
     bool isUsable() { return m_thingType->isUsable(); }
     bool isWrapable() { return m_thingType->isWrapable(); }
     bool isUnwrapable() { return m_thingType->isUnwrapable(); }
@@ -146,14 +150,13 @@ public:
     bool isOpaque() { return m_thingType->isOpaque(); }
     bool isSingleDimension() { return m_thingType->isSingleDimension(); }
     bool isTall(const bool useRealSize = false) { return m_thingType->isTall(useRealSize); }
-    uint16_t getClassification() { return m_thingType->getClassification(); }
+
+    uint16_t getClassification() const { return m_thingType->getClassification(); }
 
     void canDraw(bool canDraw) { m_canDraw = canDraw; }
-    bool canDraw()  const { return m_canDraw; }
+    bool canDraw() const { return m_canDraw; }
 
     void destroyBuffer() { m_drawBuffer = nullptr; }
-
-    const MarketData& getMarketData() { return m_thingType->getMarketData(); }
 
     void setShader(const PainterShaderProgramPtr& shader) { m_shader = shader; }
 

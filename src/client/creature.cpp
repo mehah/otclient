@@ -865,7 +865,7 @@ uint64_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
     return ignoreDiagonal ? m_stepCache.duration : m_stepCache.getDuration(m_lastStepDirection);
 }
 
-Point Creature::getDisplacement()
+Point Creature::getDisplacement() const
 {
     if (m_outfit.getCategory() == ThingCategoryEffect)
         return { 8 };
@@ -876,7 +876,7 @@ Point Creature::getDisplacement()
     return Thing::getDisplacement();
 }
 
-int Creature::getDisplacementX()
+int Creature::getDisplacementX() const
 {
     if (m_outfit.getCategory() == ThingCategoryEffect)
         return 8;
@@ -890,7 +890,7 @@ int Creature::getDisplacementX()
     return Thing::getDisplacementX();
 }
 
-int Creature::getDisplacementY()
+int Creature::getDisplacementY() const
 {
     if (m_outfit.getCategory() == ThingCategoryEffect)
         return 8;
@@ -904,7 +904,7 @@ int Creature::getDisplacementY()
     return Thing::getDisplacementY();
 }
 
-Light Creature::getLight()
+const Light& Creature::getLight() const
 {
     const auto& light = Thing::getLight();
     return m_light.color > 0 && m_light.intensity >= light.intensity ? m_light : light;
@@ -928,14 +928,14 @@ int Creature::getCurrentAnimationPhase(const bool mount)
     return m_walkAnimationPhase;
 }
 
-int Creature::getExactSize()
+int Creature::getExactSize(int layer, int xPattern, int yPattern, int zPattern, int animationPhase)
 {
-    const int numPatternY = getNumPatternY();
-    const int layers = getLayers();
-    const int zPattern = m_outfit.hasMount() ? 1 : 0;
+    yPattern = getNumPatternY();
+    zPattern = m_outfit.hasMount() ? 1 : 0;
 
+    const int layers = getLayers();
     int exactSize = 0;
-    for (int yPattern = 0; yPattern < numPatternY; ++yPattern) {
+    for (int yPattern = 0; yPattern < yPattern; ++yPattern) {
         if (yPattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
             continue;
 

@@ -30,14 +30,14 @@
 CreatureManager g_creatures;
 
 static bool isInZone(const Position& pos/* placePos*/,
-                     const Position& centerPos,
-                     int radius)
+    const Position& centerPos,
+    int radius)
 {
     if (radius == -1)
         return true;
 
     return ((pos.x >= centerPos.x - radius) && (pos.x <= centerPos.x + radius) &&
-            (pos.y >= centerPos.y - radius) && (pos.y <= centerPos.y + radius));
+        (pos.y >= centerPos.y - radius) && (pos.y <= centerPos.y + radius));
 }
 
 void CreatureManager::terminate()
@@ -123,8 +123,8 @@ void Spawn::addCreature(const Position& placePos, const CreatureTypePtr& cType)
     const int m_radius = getRadius();
     if (!isInZone(placePos, centerPos, m_radius)) {
         g_logger.warning(stdext::format("cannot place creature at %s (spawn's center position: %s, spawn radius: %d) (increment radius)",
-                                        stdext::to_string(placePos), stdext::to_string(centerPos),
-                                        m_radius
+            stdext::to_string(placePos), stdext::to_string(centerPos),
+            m_radius
         ));
         return;
     }
@@ -346,7 +346,7 @@ const CreatureTypePtr& CreatureManager::getCreatureByName(std::string name)
     stdext::trim(name);
     stdext::ucwords(name);
     const auto it = std::find_if(m_creatures.begin(), m_creatures.end(),
-                                 [=](const CreatureTypePtr& m) -> bool { return m->getName() == name; });
+        [=](const CreatureTypePtr& m) -> bool { return m->getName() == name; });
     if (it != m_creatures.end())
         return *it;
     g_logger.warning(stdext::format("could not find creature with name: %s", name));
@@ -356,7 +356,7 @@ const CreatureTypePtr& CreatureManager::getCreatureByName(std::string name)
 const CreatureTypePtr& CreatureManager::getCreatureByLook(int look)
 {
     auto findFun = [=](const auto& c) -> bool {
-        const Outfit& o = c->getOutfit();
+        const auto& o = c->getOutfit();
         return o.getId() == look || o.getAuxId() == look;
     };
     const auto it = std::find_if(m_creatures.begin(), m_creatures.end(), findFun);

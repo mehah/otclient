@@ -428,9 +428,4 @@ int Item::calculateAnimationPhase(bool animate)
     return m_phase;
 }
 
-int Item::getExactSize(int layer, int xPattern, int yPattern, int zPattern, int animationPhase)
-{
-    animationPhase = calculateAnimationPhase(true);
-    return Thing::getExactSize(layer, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase);
-}
 /* vim: set ts=4 sw=4 et :*/

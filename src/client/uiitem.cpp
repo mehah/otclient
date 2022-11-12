@@ -40,14 +40,14 @@ void UIItem::drawSelf(Fw::DrawPane drawPane)
     drawImage(m_rect);
 
     if (m_itemVisible && m_item) {
-        const Rect drawRect = getPaddingRect();
-        Point dest = drawRect.bottomRight() + Point(1);
-
-        const int exactSize = std::max<int>(32, m_item->getExactSize());
+        const auto& drawRect = getPaddingRect();
+        const int exactSize = std::max<int>(SPRITE_SIZE, m_item->getExactSize());
         if (exactSize == 0)
             return;
 
         const float scaleFactor = std::min<float>(drawRect.width() / static_cast<float>(exactSize), drawRect.height() / static_cast<float>(exactSize));
+
+        Point dest = drawRect.bottomRight() + Point(1);
         dest += (m_item->getDisplacement() - Point(SPRITE_SIZE)) * scaleFactor;
 
         m_item->setColor(m_color);
