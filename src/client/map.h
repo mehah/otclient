@@ -297,7 +297,6 @@ private:
     Position m_centralPosition;
 
     AwareRange m_awareRange;
-    static TilePtr m_nulltile;
 
     bool m_floatingEffect{ true };
 };

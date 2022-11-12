@@ -39,8 +39,9 @@
 static constexpr uint8_t MAX_VIEWPORT_X = 8;
 static constexpr uint8_t MAX_VIEWPORT_Y = 6;
 
+const static TilePtr m_nulltile;
+
 Map g_map;
-TilePtr Map::m_nulltile;
 
 void Map::init()
 {
