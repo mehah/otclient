@@ -307,7 +307,6 @@ private:
 
     TilePtr m_lastHighlightTile;
     TexturePtr m_crosshairTexture;
-    EffectPtr m_crosshairEffect;
 
     DrawBufferPtr m_shadowBuffer;
 };
