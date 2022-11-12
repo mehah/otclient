@@ -114,6 +114,7 @@ enum ThingAttr : uint8_t
 };
 
 enum ThingFlagAttr :uint64_t {
+    ThingFlagAttrNone = 0,
     ThingFlagAttrGround = 1 << 0,
     ThingFlagAttrGroundBorder = 1 << 1,
     ThingFlagAttrOnBottom = 1 << 2,
@@ -230,7 +231,7 @@ public:
     uint16_t getId() { return m_id; }
     ThingCategory getCategory() { return m_category; }
     bool isNull() { return m_null; }
-
+    bool hasAttr(ThingAttr attr) { return (m_flags & thingAttrToThingFlagAttr(attr)); }
 
     int getWidth() { return m_size.width(); }
     int getHeight() { return m_size.height(); }
@@ -324,6 +325,7 @@ public:
     const TexturePtr& getTexture(int animationPhase, TextureType txtType = TextureType::NONE);
 
 private:
+    static ThingFlagAttr thingAttrToThingFlagAttr(ThingAttr attr);
     struct TextureData {
         struct Pos {
             Rect rects;

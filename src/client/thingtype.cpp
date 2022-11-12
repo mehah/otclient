@@ -39,6 +39,7 @@ const static TexturePtr m_textureNull;
 void ThingType::serialize(const FileStreamPtr& fin)
 {
     for (int i = 0; i < ThingLastAttr; ++i) {
+
         int attr = i;
         if (g_game.getClientVersion() >= 780) {
             if (attr == ThingAttrChargeable)
@@ -52,9 +53,9 @@ void ThingType::serialize(const FileStreamPtr& fin)
                 attr += 1;
         }
 
-        fin->addU8(attr);
+        if (!hasAttr(static_cast<ThingAttr>(attr)))
+            continue;
 
-        const auto thingAttr = static_cast<ThingAttr>(attr);
         switch (attr) {
             case ThingAttrDisplacement:
             {
@@ -83,12 +84,12 @@ void ThingType::serialize(const FileStreamPtr& fin)
             case ThingAttrMinimapColor: fin->add16(m_minimapColor); break;
             case ThingAttrCloth: fin->add16(m_clothSlot); break;
             case ThingAttrLensHelp: fin->add16(m_lensHelp); break;
-
             case ThingAttrUsable: fin->add16(isUsable()); break;
             case ThingAttrGround:  fin->add16(isGround()); break;
             case ThingAttrWritable:   fin->add16(isWritable()); break;
             case ThingAttrWritableOnce:   fin->add16(isWritableOnce()); break;
                 break;
+
             default:
                 break;
         }
@@ -518,6 +519,8 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
         }
 
         const auto thingAttr = static_cast<ThingAttr>(attr);
+        m_flags |= thingAttrToThingFlagAttr(thingAttr);
+
         switch (attr) {
             case ThingAttrDisplacement:
             {
@@ -528,14 +531,12 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
                     m_displacement.x = 8;
                     m_displacement.y = 8;
                 }
-                m_flags |= ThingFlagAttrDisplacement;
                 break;
             }
             case ThingAttrLight:
             {
                 m_light.intensity = fin->getU16();
                 m_light.color = fin->getU16();
-                m_flags |= ThingFlagAttrLight;
                 break;
             }
             case ThingAttrMarket:
@@ -546,89 +547,16 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
                 m_market.name = fin->getString();
                 m_market.restrictVocation = fin->getU16();
                 m_market.requiredLevel = fin->getU16();
-                m_flags |= ThingFlagAttrMarket;
                 break;
             }
-            case ThingAttrElevation:
-            {
-                m_elevation = fin->getU16();
-                m_flags |= ThingFlagAttrElevation;
-                break;
-            }
-
-            case ThingAttrGround: {
-                m_flags |= ThingFlagAttrGround;
-                m_groundSpeed = fin->getU16();
-                break;
-            }
-
-            case ThingAttrWritable: {
-                m_flags |= ThingFlagAttrWritable;
-                m_maxTextLength = fin->getU16();
-                break;
-            }
-            case ThingAttrWritableOnce: {
-                m_flags |= ThingFlagAttrWritableOnce;
-                m_maxTextLength = fin->getU16();
-                break;
-            }
-            case ThingAttrMinimapColor: {
-                m_flags |= ThingFlagAttrMinimapColor;
-                m_minimapColor = fin->getU16();
-                break;
-            }
-            case ThingAttrCloth: {
-                m_flags |= ThingFlagAttrCloth;
-                m_clothSlot = fin->getU16();
-                break;
-            }
-            case ThingAttrLensHelp: {
-                m_flags |= ThingFlagAttrLensHelp;
-                m_lensHelp = fin->getU16();
-                break;
-            }
-            case ThingAttrDefaultAction: {
-                m_flags |= ThingFlagAttrDefaultAction;
-                m_defaultAction = fin->getU16();
-                break;
-            }
-
-            case ThingAttrUsable: m_flags |= ThingFlagAttrUsable; break;
-            case ThingAttrGroundBorder: m_flags |= ThingFlagAttrGroundBorder; break;
-            case ThingAttrOnBottom: m_flags |= ThingFlagAttrOnBottom; break;
-            case ThingAttrOnTop: m_flags |= ThingFlagAttrOnTop; break;
-            case ThingAttrContainer: m_flags |= ThingFlagAttrContainer; break;
-            case ThingAttrStackable: m_flags |= ThingFlagAttrStackable; break;
-            case ThingAttrForceUse: m_flags |= ThingFlagAttrForceUse; break;
-            case ThingAttrMultiUse: m_flags |= ThingFlagAttrMultiUse; break;
-            case ThingAttrChargeable: m_flags |= ThingFlagAttrChargeable; break;
-            case ThingAttrFluidContainer: m_flags |= ThingFlagAttrFluidContainer; break;
-            case ThingAttrSplash: m_flags |= ThingFlagAttrSplash; break;
-            case ThingAttrNotWalkable: m_flags |= ThingFlagAttrNotWalkable; break;
-            case ThingAttrNotMoveable: m_flags |= ThingFlagAttrNotMoveable; break;
-            case ThingAttrBlockProjectile: m_flags |= ThingFlagAttrBlockProjectile; break;
-            case ThingAttrNotPathable: m_flags |= ThingFlagAttrNotPathable; break;
-            case ThingAttrPickupable: m_flags |= ThingFlagAttrPickupable; break;
-            case ThingAttrHangable: m_flags |= ThingFlagAttrHangable; break;
-            case ThingAttrHookSouth: m_flags |= ThingFlagAttrHookSouth; break;
-            case ThingAttrHookEast: m_flags |= ThingFlagAttrHookEast; break;
-            case ThingAttrRotateable: m_flags |= ThingFlagAttrRotateable; break;
-            case ThingAttrDontHide: m_flags |= ThingFlagAttrDontHide; break;
-            case ThingAttrTranslucent: m_flags |= ThingFlagAttrTranslucent; break;
-            case ThingAttrLyingCorpse: m_flags |= ThingFlagAttrLyingCorpse; break;
-            case ThingAttrAnimateAlways: m_flags |= ThingFlagAttrAnimateAlways; break;
-            case ThingAttrFullGround: m_flags |= ThingFlagAttrFullGround; break;
-            case ThingAttrLook: m_flags |= ThingFlagAttrLook; break;
-            case ThingAttrWrapable: m_flags |= ThingFlagAttrWrapable; break;
-            case ThingAttrUnwrapable: m_flags |= ThingFlagAttrUnwrapable; break;
-            case ThingAttrWearOut: m_flags |= ThingFlagAttrWearOut; break;
-            case ThingAttrClockExpire: m_flags |= ThingFlagAttrClockExpire; break;
-            case ThingAttrExpire: m_flags |= ThingFlagAttrExpire; break;
-            case ThingAttrExpireStop: m_flags |= ThingFlagAttrExpireStop; break;
-            case ThingAttrPodium: m_flags |= ThingFlagAttrPodium; break;
-            case ThingAttrTopEffect: m_flags |= ThingFlagAttrTopEffect; break;
-            default:
-                break;
+            case ThingAttrElevation: m_elevation = fin->getU16(); break;
+            case ThingAttrGround: m_groundSpeed = fin->getU16(); break;
+            case ThingAttrWritable: m_maxTextLength = fin->getU16(); break;
+            case ThingAttrWritableOnce:m_maxTextLength = fin->getU16(); break;
+            case ThingAttrMinimapColor: m_minimapColor = fin->getU16(); break;
+            case ThingAttrCloth: m_clothSlot = fin->getU16(); break;
+            case ThingAttrLensHelp: m_lensHelp = fin->getU16(); break;
+            case ThingAttrDefaultAction: m_defaultAction = fin->getU16(); break;
         }
     }
 
@@ -1044,4 +972,55 @@ int ThingType::getExactHeight()
     const auto& textureDataPos = m_textureData[0].pos[frameIndex];
     const Size& size = textureDataPos.originRects.size() - textureDataPos.offsets.toSize();
     return m_exactHeight = size.height();
+}
+
+ThingFlagAttr ThingType::thingAttrToThingFlagAttr(ThingAttr attr) {
+    switch (attr) {
+        case ThingAttrDisplacement: return ThingFlagAttrDisplacement;
+        case ThingAttrLight: return ThingFlagAttrLight;
+        case ThingAttrElevation: return ThingFlagAttrElevation;
+        case ThingAttrGround: return ThingFlagAttrGround;
+        case ThingAttrWritable: return ThingFlagAttrWritable;
+        case ThingAttrWritableOnce: return ThingFlagAttrWritableOnce;
+        case ThingAttrMinimapColor: return ThingFlagAttrMinimapColor;
+        case ThingAttrCloth: return ThingFlagAttrCloth;
+        case ThingAttrLensHelp: return ThingFlagAttrLensHelp;
+        case ThingAttrDefaultAction: return ThingFlagAttrDefaultAction;
+        case ThingAttrUsable: return ThingFlagAttrUsable;
+        case ThingAttrGroundBorder: return ThingFlagAttrGroundBorder;
+        case ThingAttrOnBottom: return ThingFlagAttrOnBottom;
+        case ThingAttrOnTop: return ThingFlagAttrOnTop;
+        case ThingAttrContainer: return ThingFlagAttrContainer;
+        case ThingAttrStackable: return ThingFlagAttrStackable;
+        case ThingAttrForceUse: return ThingFlagAttrForceUse;
+        case ThingAttrMultiUse: return ThingFlagAttrMultiUse;
+        case ThingAttrChargeable: return ThingFlagAttrChargeable;
+        case ThingAttrFluidContainer: return ThingFlagAttrFluidContainer;
+        case ThingAttrSplash: return ThingFlagAttrSplash;
+        case ThingAttrNotWalkable: return ThingFlagAttrNotWalkable;
+        case ThingAttrNotMoveable: return ThingFlagAttrNotMoveable;
+        case ThingAttrBlockProjectile: return ThingFlagAttrBlockProjectile;
+        case ThingAttrNotPathable: return ThingFlagAttrNotPathable;
+        case ThingAttrPickupable: return ThingFlagAttrPickupable;
+        case ThingAttrHangable: return ThingFlagAttrHangable;
+        case ThingAttrHookSouth: return ThingFlagAttrHookSouth;
+        case ThingAttrHookEast: return ThingFlagAttrHookEast;
+        case ThingAttrRotateable: return ThingFlagAttrRotateable;
+        case ThingAttrDontHide: return ThingFlagAttrDontHide;
+        case ThingAttrTranslucent: return ThingFlagAttrTranslucent;
+        case ThingAttrLyingCorpse: return ThingFlagAttrLyingCorpse;
+        case ThingAttrAnimateAlways: return ThingFlagAttrAnimateAlways;
+        case ThingAttrFullGround: return ThingFlagAttrFullGround;
+        case ThingAttrLook: return ThingFlagAttrLook;
+        case ThingAttrWrapable: return ThingFlagAttrWrapable;
+        case ThingAttrUnwrapable: return ThingFlagAttrUnwrapable;
+        case ThingAttrWearOut: return ThingFlagAttrWearOut;
+        case ThingAttrClockExpire: return ThingFlagAttrClockExpire;
+        case ThingAttrExpire: return ThingFlagAttrExpire;
+        case ThingAttrExpireStop: return ThingFlagAttrExpireStop;
+        case ThingAttrPodium: return ThingFlagAttrPodium;
+        case ThingAttrTopEffect: return ThingFlagAttrTopEffect;
+    }
+
+    return ThingFlagAttrNone;
 }

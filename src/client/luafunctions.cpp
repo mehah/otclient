@@ -74,6 +74,8 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_things", "findItemTypesByName", &ThingTypeManager::findItemTypesByName, &g_things);
     g_lua.bindSingletonFunction("g_things", "findItemTypesByString", &ThingTypeManager::findItemTypesByString, &g_things);
     g_lua.bindSingletonFunction("g_things", "findItemTypeByCategory", &ThingTypeManager::findItemTypeByCategory, &g_things);
+    g_lua.bindSingletonFunction("g_things", "findThingTypeByAttr", &ThingTypeManager::findThingTypeByAttr, &g_things);
+
 
     g_lua.registerSingletonClass("g_houses");
     g_lua.bindSingletonFunction("g_houses", "clear", &HouseManager::clear, &g_houses);
@@ -581,6 +583,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ThingType>("isUnwrapable", &ThingType::isUnwrapable);
     g_lua.bindClassMemberFunction<ThingType>("isTopEffect", &ThingType::isTopEffect);
     g_lua.bindClassMemberFunction<ThingType>("getSprites", &ThingType::getSprites);
+    g_lua.bindClassMemberFunction<ThingType>("hasAttribute", &ThingType::hasAttr);
     g_lua.bindClassMemberFunction<ThingType>("exportImage", &ThingType::exportImage);
     g_lua.bindClassMemberFunction<ThingType>("getUpgradeClassification", &ThingType::getClassification);
     g_lua.bindClassMemberFunction<ThingType>("hasWearOut", &ThingType::hasWearOut);
