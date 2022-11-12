@@ -34,6 +34,8 @@
 #include <framework/graphics/texture.h>
 #include <framework/otml/otml.h>
 
+const static TexturePtr m_textureNull;
+
 void ThingType::serialize(const FileStreamPtr& fin)
 {
     for (int i = 0; i < ThingLastAttr; ++i) {
@@ -814,14 +816,11 @@ void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPatte
 
 const TexturePtr& ThingType::getTexture(int animationPhase, const TextureType txtType)
 {
-    if (m_null) {
-        return nullptr;
-    }
-
-    const bool allBlank = txtType == TextureType::ALL_BLANK;
-    const bool smooth = txtType == TextureType::SMOOTH;
+    if (m_null) return m_textureNull;
 
     auto& textureData = m_textureData[animationPhase];
+    const bool allBlank = txtType == TextureType::ALL_BLANK;
+    const bool smooth = txtType == TextureType::SMOOTH;
 
     TexturePtr& animationPhaseTexture =
         allBlank ? textureData.blank :

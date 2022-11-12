@@ -31,6 +31,7 @@ class ScheduledEvent : public Event
 public:
     ScheduledEvent(const std::function<void()>& callback, int delay, int maxCycles);
     void execute() override;
+    void postpone() { m_ticks = g_clock.millis() + m_delay; }
     bool nextCycle();
 
     int ticks() { return m_ticks; }
@@ -51,5 +52,5 @@ private:
     ticks_t m_ticks;
     int m_delay;
     int m_maxCycles;
-    int m_cyclesExecuted;
+    int m_cyclesExecuted{ 0 };
 };
