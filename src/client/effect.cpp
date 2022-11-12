@@ -107,7 +107,7 @@ void Effect::setId(uint32_t id)
         id = 0;
 
     m_id = id;
-    m_thingType = nullptr;
+    m_thingType = g_things.getThingType(m_id, ThingCategoryEffect).get();
 }
 
 void Effect::setPosition(const Position& position, uint8_t stackPos, bool hasElevation)
@@ -116,9 +116,4 @@ void Effect::setPosition(const Position& position, uint8_t stackPos, bool hasEle
 
     m_numPatternX = m_position.x % getNumPatternX();
     m_numPatternY = m_position.y % getNumPatternY();
-}
-
-const ThingTypePtr& Effect::getThingType()
-{
-    return m_thingType ? m_thingType : m_thingType = g_things.getThingType(m_id, ThingCategoryEffect);
 }

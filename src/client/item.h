@@ -141,8 +141,6 @@ public:
     int calculateAnimationPhase(bool animate);
     int getExactSize(int layer = 0, int xPattern = 0, int yPattern = 0, int zPattern = 0, int animationPhase = 0) override;
 
-    const ThingTypePtr& getThingType() override;
-
     void onPositionChange(const Position& /*newPos*/, const Position& /*oldPos*/) override { updatePatterns(); }
 
 private:

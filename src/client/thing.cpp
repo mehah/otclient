@@ -85,8 +85,3 @@ int Thing::getStackPos()
     g_logger.traceError("got a thing with invalid stackpos");
     return -1;
 }
-
-const ThingTypePtr& Thing::getThingType()
-{
-    return g_things.getNullThingType();
-}

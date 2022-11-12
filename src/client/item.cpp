@@ -84,7 +84,7 @@ void Item::setId(uint32_t id)
 
     m_serverId = g_things.findItemTypeByClientId(id)->getServerId();
     m_clientId = id;
-    m_thingType = nullptr;
+    m_thingType = g_things.getThingType(m_clientId, ThingCategoryItem).get();
     createBuffer();
 
     // Shader example on only items that can be marketed.
@@ -114,7 +114,7 @@ void Item::setOtbId(uint16_t id)
         id = 0;
 
     m_clientId = id;
-    m_thingType = nullptr;
+    m_thingType = g_things.getThingType(m_clientId, ThingCategoryItem).get();
     createBuffer();
 }
 
@@ -432,10 +432,5 @@ int Item::getExactSize(int layer, int xPattern, int yPattern, int zPattern, int 
 {
     animationPhase = calculateAnimationPhase(true);
     return Thing::getExactSize(layer, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase);
-}
-
-const ThingTypePtr& Item::getThingType()
-{
-    return m_thingType ? m_thingType : m_thingType = g_things.getThingType(m_clientId, ThingCategoryItem);
 }
 /* vim: set ts=4 sw=4 et :*/

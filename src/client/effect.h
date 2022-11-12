@@ -40,8 +40,6 @@ public:
     EffectPtr asEffect() { return static_self_cast<Effect>(); }
     bool isEffect() override { return true; }
 
-    const ThingTypePtr& getThingType() override;
-
     void waitFor(const EffectPtr&);
 
 protected:

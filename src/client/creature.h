@@ -136,8 +136,7 @@ public:
     bool isCreature() override { return true; }
     bool isParalyzed() const { return m_speed < 10; }
 
-    const ThingTypePtr& getThingType() override;
-    const ThingTypePtr& getMountThingType();
+    ThingType* getMountThingType() { return m_mountType; }
 
     void onPositionChange(const Position& newPos, const Position& oldPos) override;
     void onAppear() override;
@@ -254,7 +253,7 @@ private:
     StepCache m_stepCache;
     SizeCache m_sizeCache;
 
-    ThingTypePtr m_mountType;
+    ThingType* m_mountType;
 
     bool m_drawOutfitColor{ true };
 
