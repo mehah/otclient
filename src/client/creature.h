@@ -136,8 +136,6 @@ public:
     bool isCreature() override { return true; }
     bool isParalyzed() const { return m_speed < 10; }
 
-    ThingType* getMountThingType() { return m_mountType; }
-
     void onPositionChange(const Position& newPos, const Position& oldPos) override;
     void onAppear() override;
     void onDisappear() override;
