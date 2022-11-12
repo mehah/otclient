@@ -138,7 +138,6 @@ void Tile::clean()
     while (!m_things.empty())
         removeThing(m_things.front());
 
-    m_ground = nullptr;
     m_tilesRedraw.clear();
     m_thingTypeFlag = 0;
     m_flags = 0;
@@ -250,14 +249,13 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
 
     // Do not change if you do not understand what is being done.
     {
-        if (m_ground) {
+        if (const auto& ground = getGround()) {
             --stackPos;
-            if (m_ground->isTopGround()) {
-                m_ground->destroyBuffer();
+            if (ground->isTopGround()) {
+                ground->destroyBuffer();
                 thing->destroyBuffer();
             }
-        } else if (thing->isGround())
-            m_ground = thing->static_self_cast<Item>();
+        }
     }
 
     thing->setPosition(m_position, stackPos, hasElev);
@@ -282,8 +280,6 @@ bool Tile::removeThing(const ThingPtr thing)
     const auto it = std::find(m_things.begin(), m_things.end(), thing);
     if (it == m_things.end())
         return false;
-
-    if (thing->isGround()) m_ground = nullptr;
 
     m_things.erase(it);
 

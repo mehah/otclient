@@ -118,7 +118,7 @@ public:
     std::vector<CreaturePtr> getCreatures();
 
     std::vector<ItemPtr> getItems();
-    ItemPtr getGround() { return m_ground; }
+    ItemPtr getGround() { const auto& ground = getThing(0); return ground && ground->isGround() ? ground->static_self_cast<Item>() : nullptr; }
     int getGroundSpeed();
     uint8_t getMinimapColorByte();
     int getThingCount() { return m_things.size() + m_effects.size(); }
@@ -134,15 +134,15 @@ public:
     bool isEmpty() { return m_things.empty(); }
     bool isDrawable() { return !isEmpty() || !m_walkingCreatures.empty() || !m_effects.empty(); }
     bool hasCreature() { return m_thingTypeFlag & TileThingType::HAS_CREATURE; }
-    bool isTopGround() const { return m_ground && m_ground->isTopGround(); }
+    bool isTopGround() { return getGround() && getGround()->isTopGround(); }
     bool isCovered(int8_t firstFloor);
     bool isCompletelyCovered(uint8_t firstFloor, bool resetCache);
 
     bool hasBlockingCreature();
 
     bool hasEffect() { return !m_effects.empty(); }
-    bool hasGround() { return (m_ground && m_ground->isSingleGround()) || m_thingTypeFlag & TileThingType::HAS_GROUND_BORDER; };
-    bool hasTopGround(bool ignoreBorder = false) { return (m_ground && m_ground->isTopGround()) || (!ignoreBorder && m_thingTypeFlag & TileThingType::HAS_TOP_GROUND_BORDER); }
+    bool hasGround() { return (getGround() && getGround()->isSingleGround()) || m_thingTypeFlag & TileThingType::HAS_GROUND_BORDER; };
+    bool hasTopGround(bool ignoreBorder = false) { return (getGround() && getGround()->isTopGround()) || (!ignoreBorder && m_thingTypeFlag & TileThingType::HAS_TOP_GROUND_BORDER); }
     bool hasSurface() { return hasTopItem() || !m_effects.empty() || m_thingTypeFlag & TileThingType::HAS_BOTTOM_ITEM || m_thingTypeFlag & TileThingType::HAS_COMMON_ITEM || hasCreature() || !m_walkingCreatures.empty() || hasTopGround(); }
     bool hasTopItem() { return m_thingTypeFlag & TileThingType::HAS_TOP_ITEM; }
     bool hasCommonItem() { return m_thingTypeFlag & TileThingType::HAS_COMMON_ITEM; }
@@ -217,8 +217,6 @@ private:
     std::vector<ThingPtr> m_things;
     std::vector<EffectPtr> m_effects;
     std::vector<TilePtr> m_tilesRedraw;
-
-    ItemPtr m_ground;
 
     uint16_t m_highlightThingId{ 0 };
 
