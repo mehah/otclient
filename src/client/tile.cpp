@@ -138,6 +138,7 @@ void Tile::clean()
     while (!m_things.empty())
         removeThing(m_things.front());
 
+    m_ground = nullptr;
     m_tilesRedraw.clear();
     m_thingTypeFlag = 0;
     m_flags = 0;
