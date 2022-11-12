@@ -35,16 +35,18 @@ class Thing : public LuaObject
 {
 public:
     virtual void draw(const Point& /*dest*/, float /*scaleFactor*/, bool /*animate*/, uint32_t flags, TextureType /*textureType*/ = TextureType::NONE, bool isMarked = false, LightView* /*lightView*/ = nullptr) {}
-    virtual void setId(uint32_t /*id*/) {}
 
+    virtual void setId(uint32_t /*id*/) {}
     virtual void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false);
 
     virtual uint32_t getId() { return 0; }
 
     Position getPosition() { return m_position; }
-    int getStackPriority();
+
     const TilePtr& getTile();
     ContainerPtr getParentContainer();
+
+    int getStackPriority();
     int getStackPos();
 
     virtual bool isItem() { return false; }
@@ -59,35 +61,39 @@ public:
     virtual bool isAnimatedText() { return false; }
     virtual bool isStaticText() { return false; }
 
-    // type shortcuts
     ThingType* getThingType() { return m_thingType; }
     Animator* getAnimator() { return m_thingType->getAnimator(); }
     Animator* getIdleAnimator() { return m_thingType->getIdleAnimator(); }
 
-    Size getSize() { return m_thingType->getSize(); }
-    int getWidth() { return m_thingType->getWidth(); }
-    int getHeight() { return m_thingType->getHeight(); }
-    int getRealSize() { return m_thingType->getRealSize(); }
     virtual Point getDisplacement() { return m_thingType->getDisplacement(); }
     virtual int getDisplacementX() { return m_thingType->getDisplacementX(); }
     virtual int getDisplacementY() { return m_thingType->getDisplacementY(); }
-
     virtual int getExactSize() { return m_thingType->getExactSize(0, 0, 0, 0, 0); }
     virtual int getExactSize(int layer, int xPattern, int yPattern, int zPattern, int animationPhase) { return m_thingType->getExactSize(layer, xPattern, yPattern, zPattern, animationPhase); }
+
+    virtual Light getLight() { return m_thingType->getLight(); }
+    virtual bool hasLight() { return m_thingType->hasLight(); }
+
+    Size getSize() { return m_thingType->getSize(); }
+
+    int getWidth() { return m_thingType->getWidth(); }
+    int getHeight() { return m_thingType->getHeight(); }
+    int getRealSize() { return m_thingType->getRealSize(); }
     int getLayers() { return m_thingType->getLayers(); }
     int getNumPatternX() { return m_thingType->getNumPatternX(); }
     int getNumPatternY() { return m_thingType->getNumPatternY(); }
     int getNumPatternZ() { return m_thingType->getNumPatternZ(); }
     int getAnimationPhases() { return m_thingType->getAnimationPhases(); }
-    bool hasAnimationPhases() { return m_thingType->getAnimationPhases() > 1; }
     int getGroundSpeed() { return m_thingType->getGroundSpeed(); }
     int getMaxTextLength() { return m_thingType->getMaxTextLength(); }
-    virtual Light getLight() { return m_thingType->getLight(); }
-    virtual bool hasLight() { return m_thingType->hasLight(); }
     int getMinimapColor() { return m_thingType->getMinimapColor(); }
     int getLensHelp() { return m_thingType->getLensHelp(); }
     int getClothSlot() { return m_thingType->getClothSlot(); }
     int getElevation() { return m_thingType->getElevation(); }
+
+    virtual bool isContainer() { return m_thingType->isContainer(); }
+
+    bool hasAnimationPhases() { return m_thingType->getAnimationPhases() > 1; }
     bool isGround() { return m_thingType->isGround(); }
     bool isGroundBorder() { return m_thingType->isGroundBorder(); }
     bool isTopGround() { return m_thingType->isTopGround(); }
@@ -97,7 +103,6 @@ public:
     bool isOnBottom() { return m_thingType->isOnBottom(); }
     bool isOnTop() { return m_thingType->isOnTop(); }
     bool isCommon() { return !isGround() && !isGroundBorder() && !isOnTop() && !isCreature() && !isOnBottom(); }
-    virtual bool isContainer() { return m_thingType->isContainer(); }
     bool isStackable() { return m_thingType->isStackable(); }
     bool isForceUse() { return m_thingType->isForceUse(); }
     bool isMultiUse() { return m_thingType->isMultiUse(); }
@@ -148,7 +153,7 @@ public:
 
     void destroyBuffer() { m_drawBuffer = nullptr; }
 
-    MarketData getMarketData() { return m_thingType->getMarketData(); }
+    const MarketData& getMarketData() { return m_thingType->getMarketData(); }
 
     void setShader(const PainterShaderProgramPtr& shader) { m_shader = shader; }
 
