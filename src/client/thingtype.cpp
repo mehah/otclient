@@ -34,11 +34,11 @@
 #include <framework/graphics/texture.h>
 #include <framework/otml/otml.h>
 
+const static TexturePtr m_textureNull;
+
 void ThingType::serialize(const FileStreamPtr& fin)
 {
     for (int i = 0; i < ThingLastAttr; ++i) {
-        if (!hasAttr(static_cast<ThingAttr>(i)))
-            continue;
 
         int attr = i;
         if (g_game.getClientVersion() >= 780) {
@@ -53,9 +53,9 @@ void ThingType::serialize(const FileStreamPtr& fin)
                 attr += 1;
         }
 
-        fin->addU8(attr);
+        if (!hasAttr(static_cast<ThingAttr>(attr)))
+            continue;
 
-        const auto thingAttr = static_cast<ThingAttr>(attr);
         switch (attr) {
             case ThingAttrDisplacement:
             {
@@ -65,32 +65,31 @@ void ThingType::serialize(const FileStreamPtr& fin)
             }
             case ThingAttrLight:
             {
-                const auto& light = m_attribs.get<Light>(thingAttr);
-                fin->addU16(light.intensity);
-                fin->addU16(light.color);
+                fin->addU16(m_light.intensity);
+                fin->addU16(m_light.color);
                 break;
             }
             case ThingAttrMarket:
             {
-                const auto& market = m_attribs.get<MarketData>(thingAttr);
-                fin->addU16(market.category);
-                fin->addU16(market.tradeAs);
-                fin->addU16(market.showAs);
-                fin->addString(market.name);
-                fin->addU16(market.restrictVocation);
-                fin->addU16(market.requiredLevel);
+                fin->addU16(m_market.category);
+                fin->addU16(m_market.tradeAs);
+                fin->addU16(m_market.showAs);
+                fin->addString(m_market.name);
+                fin->addU16(m_market.restrictVocation);
+                fin->addU16(m_market.requiredLevel);
                 break;
             }
-            case ThingAttrUsable:
-            case ThingAttrElevation:
-            case ThingAttrGround:
-            case ThingAttrWritable:
-            case ThingAttrWritableOnce:
-            case ThingAttrMinimapColor:
-            case ThingAttrCloth:
-            case ThingAttrLensHelp:
-                fin->addU16(m_attribs.get<uint16_t>(thingAttr));
+
+            case ThingAttrElevation: fin->addU16(m_elevation); break;
+            case ThingAttrMinimapColor: fin->add16(m_minimapColor); break;
+            case ThingAttrCloth: fin->add16(m_clothSlot); break;
+            case ThingAttrLensHelp: fin->add16(m_lensHelp); break;
+            case ThingAttrUsable: fin->add16(isUsable()); break;
+            case ThingAttrGround:  fin->add16(isGround()); break;
+            case ThingAttrWritable:   fin->add16(isWritable()); break;
+            case ThingAttrWritableOnce:   fin->add16(isWritableOnce()); break;
                 break;
+
             default:
                 break;
         }
@@ -110,7 +109,7 @@ void ThingType::serialize(const FileStreamPtr& fin)
     fin->addU8(m_animationPhases);
 
     if (g_game.getFeature(Otc::GameEnhancedAnimations)) {
-        if (m_animationPhases > 1 && m_animator != nullptr) {
+        if (m_animationPhases > 1 && m_animator) {
             m_animator->serialize(fin);
         }
     }
@@ -132,168 +131,175 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
     const appearances::AppearanceFlags& flags = appearance.flags();
 
     if (flags.has_bank()) {
-        m_attribs.set<uint16_t>(ThingAttrGround, flags.bank().waypoints());
+        m_groundSpeed = flags.bank().waypoints();
+        m_flags |= ThingFlagAttrGround;
     }
 
-    if (flags.has_clip()) {
-        m_attribs.set(ThingAttrGroundBorder, flags.clip());
+    if (flags.has_clip() && flags.clip()) {
+        m_flags |= ThingFlagAttrGroundBorder;
     }
 
     if (flags.has_bottom()) {
-        m_attribs.set(ThingAttrOnBottom, flags.bottom());
+        m_flags |= ThingFlagAttrOnBottom;
     }
 
     if (flags.has_top()) {
-        m_attribs.set(ThingAttrOnTop, flags.top());
+        m_flags |= ThingFlagAttrOnTop;
     }
 
-    if (flags.has_container()) {
-        m_attribs.set(ThingAttrContainer, flags.container());
+    if (flags.has_container() && flags.container()) {
+        m_flags |= ThingFlagAttrContainer;
     }
 
-    if (flags.has_cumulative()) {
-        m_attribs.set(ThingAttrStackable, flags.cumulative());
+    if (flags.has_cumulative() && flags.cumulative()) {
+        m_flags |= ThingFlagAttrStackable;
     }
 
-    if (flags.has_multiuse()) {
-        m_attribs.set(ThingAttrMultiUse, flags.multiuse());
+    if (flags.has_multiuse() && flags.multiuse()) {
+        m_flags |= ThingFlagAttrMultiUse;
     }
 
-    if (flags.has_forceuse()) {
-        m_attribs.set(ThingAttrForceUse, flags.forceuse());
+    if (flags.has_forceuse() && flags.forceuse()) {
+        m_flags |= ThingFlagAttrForceUse;
     }
 
     if (flags.has_write()) {
-        m_attribs.set(ThingAttrWritable, flags.write().max_text_length());
+        m_flags |= ThingFlagAttrWritable;
+        m_maxTextLength = flags.write().max_text_length();
     }
 
     if (flags.has_write_once()) {
-        m_attribs.set(ThingAttrWritableOnce, flags.write_once().max_text_length_once());
+        m_flags |= ThingFlagAttrWritableOnce;
+        m_maxTextLength = flags.write_once().max_text_length_once();
     }
 
-    if (flags.has_liquidpool()) {
-        m_attribs.set(ThingAttrSplash, flags.liquidpool());
+    if (flags.has_liquidpool() && flags.liquidpool()) {
+        m_flags |= ThingFlagAttrSplash;
     }
 
-    if (flags.has_unpass()) {
-        m_attribs.set(ThingAttrNotWalkable, flags.unpass());
+    if (flags.has_unpass() && flags.unpass()) {
+        m_flags |= ThingFlagAttrNotWalkable;
     }
 
-    if (flags.has_unmove()) {
-        m_attribs.set(ThingAttrNotMoveable, flags.unmove());
+    if (flags.has_unmove() && flags.unmove()) {
+        m_flags |= ThingFlagAttrNotMoveable;
     }
 
-    if (flags.has_unsight()) {
-        m_attribs.set(ThingAttrBlockProjectile, flags.unsight());
+    if (flags.has_unsight() && flags.unsight()) {
+        m_flags |= ThingFlagAttrBlockProjectile;
     }
 
-    if (flags.has_avoid()) {
-        m_attribs.set(ThingAttrNotPathable, flags.avoid());
+    if (flags.has_avoid() && flags.avoid()) {
+        m_flags |= ThingFlagAttrNotPathable;
     }
 
     // no_movement_animation (?)
 
-    if (flags.has_take()) {
-        m_attribs.set(ThingAttrPickupable, flags.take());
+    if (flags.has_take() && flags.take()) {
+        m_flags |= ThingFlagAttrPickupable;
     }
 
-    if (flags.has_liquidcontainer()) {
-        m_attribs.set(ThingAttrFluidContainer, flags.liquidcontainer());
+    if (flags.has_liquidcontainer() && flags.liquidcontainer()) {
+        m_flags |= ThingFlagAttrFluidContainer;
     }
 
-    if (flags.has_hang()) {
-        m_attribs.set(ThingAttrHangable, flags.hang());
+    if (flags.has_hang() && flags.hang()) {
+        m_flags |= ThingFlagAttrHangable;
     }
 
     if (flags.has_hook()) {
         const auto& hookDirection = flags.hook();
         if (hookDirection.east()) {
-            m_attribs.set(ThingAttrHookEast, true);
+            m_flags |= ThingFlagAttrHookEast;
         } else if (hookDirection.south()) {
-            m_attribs.set(ThingAttrHookSouth, true);
+            m_flags |= ThingFlagAttrHookSouth;
         }
     }
 
     if (flags.has_light()) {
-        m_attribs.set(ThingAttrLight, Light(flags.light().brightness(), flags.light().color()));
+        m_flags |= ThingFlagAttrLight;
+        m_light = { static_cast<uint8_t>(flags.light().brightness()), static_cast<uint8_t>(flags.light().color()) };
     }
 
-    if (flags.has_rotate()) {
-        m_attribs.set(ThingAttrRotateable, flags.rotate());
+    if (flags.has_rotate() && flags.rotate()) {
+        m_flags |= ThingFlagAttrRotateable;
     }
 
-    if (flags.has_dont_hide()) {
-        m_attribs.set(ThingAttrDontHide, flags.dont_hide());
+    if (flags.has_dont_hide() && flags.dont_hide()) {
+        m_flags |= ThingFlagAttrDontHide;
     }
 
-    if (flags.has_translucent()) {
-        m_attribs.set(ThingAttrTranslucent, flags.translucent());
+    if (flags.has_translucent() && flags.translucent()) {
+        m_flags |= ThingFlagAttrTranslucent;
     }
 
     if (flags.has_shift()) {
         m_displacement = Point(flags.shift().x(), flags.shift().y());
-        m_attribs.set(ThingAttrDisplacement, true);
+        m_flags |= ThingFlagAttrDisplacement;
     }
 
     if (flags.has_height()) {
-        m_attribs.set<uint16_t>(ThingAttrElevation, flags.height().elevation());
+        m_elevation = flags.height().elevation();
+        m_flags |= ThingFlagAttrElevation;
     }
 
-    if (flags.has_lying_object()) {
-        m_attribs.set(ThingAttrLyingCorpse, flags.lying_object());
+    if (flags.has_lying_object() && flags.lying_object()) {
+        m_flags |= ThingFlagAttrLyingCorpse;
     }
 
-    if (flags.has_animate_always()) {
-        m_attribs.set(ThingAttrAnimateAlways, flags.animate_always());
+    if (flags.has_animate_always() && flags.animate_always()) {
+        m_flags |= ThingFlagAttrAnimateAlways;
     }
 
     if (flags.has_automap()) {
-        m_attribs.set(ThingAttrMinimapColor, static_cast<uint16_t>(flags.automap().color()));
+        m_minimapColor = flags.automap().color();
+        m_flags |= ThingFlagAttrMinimapColor;
     }
 
     if (flags.has_lenshelp()) {
-        m_attribs.set(ThingAttrLensHelp, flags.lenshelp().id());
+        m_lensHelp = flags.lenshelp().id();
+        m_flags |= ThingFlagAttrLensHelp;
     }
 
-    if (flags.has_fullbank()) {
-        m_attribs.set(ThingAttrFullGround, flags.fullbank());
+    if (flags.has_fullbank() && flags.fullbank()) {
+        m_flags |= ThingFlagAttrFullGround;
     }
 
-    if (flags.has_ignore_look()) {
-        m_attribs.set(ThingAttrLook, flags.ignore_look());
+    if (flags.has_ignore_look() && flags.ignore_look()) {
+        m_flags |= ThingFlagAttrLook;
     }
 
     if (flags.has_clothes()) {
-        m_attribs.set(ThingAttrCloth, flags.clothes().slot());
+        m_clothSlot = flags.clothes().slot();
+        m_flags |= ThingFlagAttrCloth;
     }
 
     // default action
 
     if (flags.has_market()) {
-        MarketData market;
-        market.category = flags.market().category();
-        market.tradeAs = flags.market().trade_as_object_id();
-        market.showAs = flags.market().show_as_object_id();
-        market.name = flags.market().name();
+        m_market.category = static_cast<ThingCategory>(flags.market().category());
+        m_market.tradeAs = flags.market().trade_as_object_id();
+        m_market.showAs = flags.market().show_as_object_id();
+        m_market.name = flags.market().name();
 
         for (const int32_t voc : flags.market().restrict_to_profession()) {
-            market.restrictVocation |= voc;
+            m_market.restrictVocation |= voc;
         }
 
-        market.requiredLevel = flags.market().minimum_level();
-        m_attribs.set(ThingAttrMarket, market);
+        m_market.requiredLevel = flags.market().minimum_level();
+        m_flags |= ThingFlagAttrMarket;
     }
 
-    if (flags.has_wrap()) {
-        m_attribs.set(ThingAttrWrapable, flags.wrap());
+    if (flags.has_wrap() && flags.wrap()) {
+        m_flags |= ThingFlagAttrWrapable;
     }
 
-    if (flags.has_unwrap()) {
-        m_attribs.set(ThingAttrUnwrapable, flags.unwrap());
+    if (flags.has_unwrap() && flags.unwrap()) {
+        m_flags |= ThingFlagAttrUnwrapable;
     }
 
-    if (flags.has_topeffect()) {
-        m_attribs.set(ThingAttrTopEffect, flags.topeffect());
+    if (flags.has_topeffect() && flags.topeffect()) {
+        m_flags |= ThingFlagAttrTopEffect;
     }
 
     // npcsaledata
@@ -304,13 +310,13 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
     // ammo
 
     if (flags.has_show_off_socket()) {
-        m_attribs.set(ThingAttrPodium, flags.show_off_socket());
+        m_flags |= ThingFlagAttrPodium;
     }
 
     // reportable
 
     if (flags.has_upgradeclassification()) {
-        m_attribs.set<uint16_t>(ThingAttrUpgradeClassification, flags.upgradeclassification().upgrade_classification());
+        m_upgradeClassification = flags.upgradeclassification().upgrade_classification();
     }
 
     // reverse_addons_east
@@ -318,20 +324,20 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
     // reverse_addons_south
     // reverse_addons_north
 
-    if (flags.has_wearout()) {
-        m_attribs.set(ThingAttrWearOut, flags.clip());
+    if (flags.has_wearout() && flags.clip()) {
+        m_flags |= ThingFlagAttrWearOut;
     }
 
-    if (flags.has_clockexpire()) {
-        m_attribs.set(ThingAttrClockExpire, flags.clip());
+    if (flags.has_clockexpire() && flags.clip()) {
+        m_flags |= ThingFlagAttrClockExpire;
     }
 
-    if (flags.has_expire()) {
-        m_attribs.set(ThingAttrExpire, flags.clip());
+    if (flags.has_expire() && flags.clip()) {
+        m_flags |= ThingFlagAttrExpire;
     }
 
-    if (flags.has_expirestop()) {
-        m_attribs.set(ThingAttrExpireStop, flags.clip());
+    if (flags.has_expirestop() && flags.clip()) {
+        m_flags |= ThingFlagAttrExpireStop;
     }
 
     // now lets parse sprite data
@@ -362,7 +368,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
 
         // animations
         if (spritesPhases.size() > 1) {
-            const auto& animator = AnimatorPtr(new Animator);
+            auto* animator = new Animator;
             animator->unserializeAppearance(animation);
 
             if (frameGroupType == FrameGroupMoving)
@@ -420,12 +426,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
         }
     }
 
-    m_textures.resize(m_animationPhases);
-    m_blankTextures.resize(m_animationPhases);
-    m_smoothTextures.resize(m_animationPhases);
-    m_texturesFramesRects.resize(m_animationPhases);
-    m_texturesFramesOriginRects.resize(m_animationPhases);
-    m_texturesFramesOffsets.resize(m_animationPhases);
+    m_textureData.resize(m_animationPhases);
 }
 
 void ThingType::unserialize(uint16_t clientId, ThingCategory category, const FileStreamPtr& fin)
@@ -453,11 +454,9 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
             if (attr == 16)
                 attr = ThingAttrNoMoveAnimation;
             else if (attr == 254) { // Usable
-                m_attribs.set(ThingAttrUsable, true);
-                continue;
+                attr = ThingAttrUsable;
             } else if (attr == 35) { // Default Action
-                m_attribs.set(ThingAttrDefaultAction, fin->getU16());
-                continue;
+                attr = ThingAttrDefaultAction;
             } else if (attr > 16)
                 attr -= 1;
         } else if (g_game.getClientVersion() >= 860) {
@@ -471,7 +470,7 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
              * "Item Charges" flag.
              */
             if (attr == 8) {
-                m_attribs.set(ThingAttrChargeable, true);
+                attr = ThingAttrChargeable;
                 continue;
             }
             if (attr > 8)
@@ -520,6 +519,8 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
         }
 
         const auto thingAttr = static_cast<ThingAttr>(attr);
+        m_flags |= thingAttrToThingFlagAttr(thingAttr);
+
         switch (attr) {
             case ThingAttrDisplacement:
             {
@@ -530,52 +531,38 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
                     m_displacement.x = 8;
                     m_displacement.y = 8;
                 }
-                m_attribs.set(thingAttr, true);
                 break;
             }
             case ThingAttrLight:
             {
-                Light light;
-                light.intensity = fin->getU16();
-                light.color = fin->getU16();
-                m_attribs.set(thingAttr, light);
+                m_light.intensity = fin->getU16();
+                m_light.color = fin->getU16();
                 break;
             }
             case ThingAttrMarket:
             {
-                MarketData market;
-                market.category = fin->getU16();
-                market.tradeAs = fin->getU16();
-                market.showAs = fin->getU16();
-                market.name = fin->getString();
-                market.restrictVocation = fin->getU16();
-                market.requiredLevel = fin->getU16();
-                m_attribs.set(thingAttr, market);
+                m_market.category = static_cast<ThingCategory>(fin->getU16());
+                m_market.tradeAs = fin->getU16();
+                m_market.showAs = fin->getU16();
+                m_market.name = fin->getString();
+                m_market.restrictVocation = fin->getU16();
+                m_market.requiredLevel = fin->getU16();
                 break;
             }
-            case ThingAttrElevation:
-            {
-                m_attribs.set<uint16_t>(thingAttr, fin->getU16());
-                break;
-            }
-            case ThingAttrUsable:
-            case ThingAttrGround:
-            case ThingAttrWritable:
-            case ThingAttrWritableOnce:
-            case ThingAttrMinimapColor:
-            case ThingAttrCloth:
-            case ThingAttrLensHelp:
-                m_attribs.set(thingAttr, fin->getU16());
-                break;
-            default:
-                m_attribs.set(thingAttr, true);
-                break;
+            case ThingAttrElevation: m_elevation = fin->getU16(); break;
+            case ThingAttrGround: m_groundSpeed = fin->getU16(); break;
+            case ThingAttrWritable: m_maxTextLength = fin->getU16(); break;
+            case ThingAttrWritableOnce:m_maxTextLength = fin->getU16(); break;
+            case ThingAttrMinimapColor: m_minimapColor = fin->getU16(); break;
+            case ThingAttrCloth: m_clothSlot = fin->getU16(); break;
+            case ThingAttrLensHelp: m_lensHelp = fin->getU16(); break;
+            case ThingAttrDefaultAction: m_defaultAction = fin->getU16(); break;
         }
     }
 
     if (!done)
         throw Exception("corrupt data (id: %d, category: %d, count: %d, lastAttr: %d)",
-                        m_id, m_category, count, attr);
+        m_id, m_category, count, attr);
 
     const bool hasFrameGroups = category == ThingCategoryCreature && g_game.getFeature(Otc::GameIdleAnimations);
     const uint8_t groupCount = hasFrameGroups ? fin->getU8() : 1;
@@ -597,9 +584,7 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
         sizes.push_back(m_size);
         if (width > 1 || height > 1) {
             m_realSize = fin->getU8();
-            m_exactSize = std::min<int>(m_realSize, std::max<int>(width * SPRITE_SIZE, height * SPRITE_SIZE));
-        } else
-            m_exactSize = SPRITE_SIZE;
+        }
 
         m_layers = fin->getU8();
         m_numPatternX = fin->getU8();
@@ -613,7 +598,7 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
         m_animationPhases += groupAnimationsPhases;
 
         if (groupAnimationsPhases > 1 && g_game.getFeature(Otc::GameEnhancedAnimations)) {
-            const auto& animator = AnimatorPtr(new Animator);
+            auto* animator = new Animator;
             animator->unserialize(groupAnimationsPhases, fin);
 
             if (frameGroupType == FrameGroupMoving)
@@ -670,12 +655,7 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
         }
     }
 
-    m_textures.resize(m_animationPhases);
-    m_blankTextures.resize(m_animationPhases);
-    m_smoothTextures.resize(m_animationPhases);
-    m_texturesFramesRects.resize(m_animationPhases);
-    m_texturesFramesOriginRects.resize(m_animationPhases);
-    m_texturesFramesOffsets.resize(m_animationPhases);
+    m_textureData.resize(m_animationPhases);
 }
 
 void ThingType::exportImage(const std::string& fileName)
@@ -695,8 +675,8 @@ void ThingType::exportImage(const std::string& fileName)
                         for (int w = 0; w < m_size.width(); ++w) {
                             for (int h = 0; h < m_size.height(); ++h) {
                                 image->blit(Point(SPRITE_SIZE * (m_size.width() - w - 1 + m_size.width() * x + m_size.width() * m_numPatternX * l),
-                                                  SPRITE_SIZE * (m_size.height() - h - 1 + m_size.height() * y + m_size.height() * m_numPatternY * a + m_size.height() * m_numPatternY * m_animationPhases * z)),
-                                            g_sprites.getSpriteImage(m_spritesIndex[getSpriteIndex(w, h, l, x, y, z, a)]));
+                                    SPRITE_SIZE * (m_size.height() - h - 1 + m_size.height() * y + m_size.height() * m_numPatternY * a + m_size.height() * m_numPatternY * m_animationPhases * z)),
+                                    g_sprites.getSpriteImage(m_spritesIndex[getSpriteIndex(w, h, l, x, y, z, a)]));
                             }
                         }
                     }
@@ -713,15 +693,13 @@ void ThingType::unserializeOtml(const OTMLNodePtr& node)
     for (const OTMLNodePtr& node2 : node->children()) {
         if (node2->tag() == "opacity")
             m_opacity = node2->value<float>();
-        else if (node2->tag() == "notprewalkable")
-            m_attribs.set(ThingAttrNotPreWalkable, node2->value<bool>());
         else if (node2->tag() == "image")
             m_customImage = node2->value();
         else if (node2->tag() == "full-ground") {
             if (node2->value<bool>())
-                m_attribs.set(ThingAttrFullGround, true);
+                m_flags &= ~ThingFlagAttrFullGround;
             else
-                m_attribs.remove(ThingAttrFullGround);
+                m_flags |= ThingFlagAttrFullGround;
         }
     }
 }
@@ -738,14 +716,14 @@ void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPatte
     if (!texture)
         return;
 
-    const auto& textureRectList = m_texturesFramesRects[animationPhase];
+    const auto& textureData = m_textureData[animationPhase];
 
     const uint32_t frameIndex = getTextureIndex(layer, xPattern, yPattern, zPattern);
-    if (frameIndex >= textureRectList.size())
+    if (frameIndex >= textureData.pos.size())
         return;
 
-    const Point& textureOffset = m_texturesFramesOffsets[animationPhase][frameIndex];
-    const Rect& textureRect = textureRectList[frameIndex];
+    const Point& textureOffset = textureData.pos[frameIndex].offsets;
+    const Rect& textureRect = textureData.pos[frameIndex].rects;
 
     const Rect screenRect(dest + (textureOffset - m_displacement - (m_size.toPoint() - Point(1)) * SPRITE_SIZE) * scaleFactor, textureRect.size() * scaleFactor);
 
@@ -764,18 +742,17 @@ void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPatte
     }
 }
 
-TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
+const TexturePtr& ThingType::getTexture(int animationPhase, const TextureType txtType)
 {
-    if (m_null) {
-        return nullptr;
-    }
+    if (m_null) return m_textureNull;
 
+    auto& textureData = m_textureData[animationPhase];
     const bool allBlank = txtType == TextureType::ALL_BLANK;
     const bool smooth = txtType == TextureType::SMOOTH;
 
-    TexturePtr& animationPhaseTexture = (
-        allBlank ? m_blankTextures :
-        smooth ? m_smoothTextures : m_textures)[animationPhase];
+    TexturePtr& animationPhaseTexture =
+        allBlank ? textureData.blank :
+        smooth ? textureData.smooth : textureData.main;
 
     if (animationPhaseTexture) return animationPhaseTexture;
 
@@ -790,12 +767,10 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
 
     const bool useCustomImage = animationPhase == 0 && !m_customImage.empty();
     const int indexSize = textureLayers * m_numPatternX * m_numPatternY * m_numPatternZ;
-    const Size textureSize = getBestTextureDimension(m_size.width(), m_size.height(), indexSize);
+    const auto& textureSize = getBestTextureDimension(m_size.width(), m_size.height(), indexSize);
     const auto& fullImage = useCustomImage ? Image::load(m_customImage) : ImagePtr(new Image(textureSize * SPRITE_SIZE));
 
-    m_texturesFramesRects[animationPhase].resize(indexSize);
-    m_texturesFramesOriginRects[animationPhase].resize(indexSize);
-    m_texturesFramesOffsets[animationPhase].resize(indexSize);
+    textureData.pos.resize(indexSize);
 
     const bool protobufSupported = g_game.getProtocolVersion() >= 1281;
 
@@ -808,8 +783,10 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
                     const bool spriteMask = m_category == ThingCategoryCreature && l > 0;
                     const int frameIndex = getTextureIndex(l % textureLayers, x, y, z);
 
-                    Point framePos = Point(frameIndex % (textureSize.width() / m_size.width()) * m_size.width(),
-                                           frameIndex / (textureSize.width() / m_size.width()) * m_size.height()) * SPRITE_SIZE;
+                    const auto& framePos = Point(frameIndex % (textureSize.width() / m_size.width()) * m_size.width(),
+                        frameIndex / (textureSize.width() / m_size.width()) * m_size.height()) * SPRITE_SIZE;
+
+                    auto& posData = textureData.pos[frameIndex];
 
                     if (!useCustomImage) {
                         if (protobufSupported) {
@@ -870,9 +847,9 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
                         }
                     }
 
-                    m_texturesFramesRects[animationPhase][frameIndex] = drawRect;
-                    m_texturesFramesOriginRects[animationPhase][frameIndex] = Rect(framePos, Size(m_size.width(), m_size.height()) * SPRITE_SIZE);
-                    m_texturesFramesOffsets[animationPhase][frameIndex] = drawRect.topLeft() - framePos;
+                    posData.rects = drawRect;
+                    posData.originRects = Rect(framePos, Size(m_size.width(), m_size.height()) * SPRITE_SIZE);
+                    posData.offsets = drawRect.topLeft() - framePos;
                 }
             }
         }
@@ -925,18 +902,18 @@ Size ThingType::getBestTextureDimension(int w, int h, int count)
 uint32_t ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int a)
 {
     uint32_t index = ((((((a % m_animationPhases)
-                          * m_numPatternZ + z)
-                         * m_numPatternY + y)
-                        * m_numPatternX + x)
-                       * m_layers + l)
-                      * m_size.height() + h)
+        * m_numPatternZ + z)
+        * m_numPatternY + y)
+        * m_numPatternX + x)
+        * m_layers + l)
+        * m_size.height() + h)
         * m_size.width() + w;
 
     if (w == -1 && h == -1) { // protobuf does not use width and height, because sprite image is the exact sprite size, not split by 32x32, so -1 is passed instead
         index = ((((a % m_animationPhases)
-                   * m_numPatternZ + z)
-                  * m_numPatternY + y)
-                 * m_numPatternX + x)
+            * m_numPatternZ + z)
+            * m_numPatternY + y)
+            * m_numPatternX + x)
             * m_layers + l;
     }
 
@@ -947,7 +924,7 @@ uint32_t ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int
 uint32_t ThingType::getTextureIndex(int l, int x, int y, int z)
 {
     return ((l * m_numPatternZ + z)
-            * m_numPatternY + y)
+        * m_numPatternY + y)
         * m_numPatternX + x;
 }
 
@@ -958,16 +935,18 @@ int ThingType::getExactSize(int layer, int xPattern, int yPattern, int zPattern,
 
     getTexture(animationPhase); // we must calculate it anyway.
     const int frameIndex = getTextureIndex(layer, xPattern, yPattern, zPattern);
-    const Size size = m_texturesFramesOriginRects[animationPhase][frameIndex].size() - m_texturesFramesOffsets[animationPhase][frameIndex].toSize();
+
+    const auto& textureDataPos = m_textureData[animationPhase].pos[frameIndex];
+    const Size& size = textureDataPos.originRects.size() - textureDataPos.offsets.toSize();
     return std::max<int>(size.width(), size.height());
 }
 
 void ThingType::setPathable(bool var)
 {
     if (var == true)
-        m_attribs.remove(ThingAttrNotPathable);
+        m_flags &= ~ThingFlagAttrNotPathable;
     else
-        m_attribs.set(ThingAttrNotPathable, true);
+        m_flags |= ThingFlagAttrNotPathable;
 }
 
 int ThingType::getAnimationPhases()
@@ -989,7 +968,59 @@ int ThingType::getExactHeight()
 
     getTexture(0);
     const int frameIndex = getTextureIndex(0, 0, 0, 0);
-    const Size size = m_texturesFramesOriginRects[0][frameIndex].size() - m_texturesFramesOffsets[0][frameIndex].toSize();
 
+    const auto& textureDataPos = m_textureData[0].pos[frameIndex];
+    const Size& size = textureDataPos.originRects.size() - textureDataPos.offsets.toSize();
     return m_exactHeight = size.height();
+}
+
+ThingFlagAttr ThingType::thingAttrToThingFlagAttr(ThingAttr attr) {
+    switch (attr) {
+        case ThingAttrDisplacement: return ThingFlagAttrDisplacement;
+        case ThingAttrLight: return ThingFlagAttrLight;
+        case ThingAttrElevation: return ThingFlagAttrElevation;
+        case ThingAttrGround: return ThingFlagAttrGround;
+        case ThingAttrWritable: return ThingFlagAttrWritable;
+        case ThingAttrWritableOnce: return ThingFlagAttrWritableOnce;
+        case ThingAttrMinimapColor: return ThingFlagAttrMinimapColor;
+        case ThingAttrCloth: return ThingFlagAttrCloth;
+        case ThingAttrLensHelp: return ThingFlagAttrLensHelp;
+        case ThingAttrDefaultAction: return ThingFlagAttrDefaultAction;
+        case ThingAttrUsable: return ThingFlagAttrUsable;
+        case ThingAttrGroundBorder: return ThingFlagAttrGroundBorder;
+        case ThingAttrOnBottom: return ThingFlagAttrOnBottom;
+        case ThingAttrOnTop: return ThingFlagAttrOnTop;
+        case ThingAttrContainer: return ThingFlagAttrContainer;
+        case ThingAttrStackable: return ThingFlagAttrStackable;
+        case ThingAttrForceUse: return ThingFlagAttrForceUse;
+        case ThingAttrMultiUse: return ThingFlagAttrMultiUse;
+        case ThingAttrChargeable: return ThingFlagAttrChargeable;
+        case ThingAttrFluidContainer: return ThingFlagAttrFluidContainer;
+        case ThingAttrSplash: return ThingFlagAttrSplash;
+        case ThingAttrNotWalkable: return ThingFlagAttrNotWalkable;
+        case ThingAttrNotMoveable: return ThingFlagAttrNotMoveable;
+        case ThingAttrBlockProjectile: return ThingFlagAttrBlockProjectile;
+        case ThingAttrNotPathable: return ThingFlagAttrNotPathable;
+        case ThingAttrPickupable: return ThingFlagAttrPickupable;
+        case ThingAttrHangable: return ThingFlagAttrHangable;
+        case ThingAttrHookSouth: return ThingFlagAttrHookSouth;
+        case ThingAttrHookEast: return ThingFlagAttrHookEast;
+        case ThingAttrRotateable: return ThingFlagAttrRotateable;
+        case ThingAttrDontHide: return ThingFlagAttrDontHide;
+        case ThingAttrTranslucent: return ThingFlagAttrTranslucent;
+        case ThingAttrLyingCorpse: return ThingFlagAttrLyingCorpse;
+        case ThingAttrAnimateAlways: return ThingFlagAttrAnimateAlways;
+        case ThingAttrFullGround: return ThingFlagAttrFullGround;
+        case ThingAttrLook: return ThingFlagAttrLook;
+        case ThingAttrWrapable: return ThingFlagAttrWrapable;
+        case ThingAttrUnwrapable: return ThingFlagAttrUnwrapable;
+        case ThingAttrWearOut: return ThingFlagAttrWearOut;
+        case ThingAttrClockExpire: return ThingFlagAttrClockExpire;
+        case ThingAttrExpire: return ThingFlagAttrExpire;
+        case ThingAttrExpireStop: return ThingFlagAttrExpireStop;
+        case ThingAttrPodium: return ThingFlagAttrPodium;
+        case ThingAttrTopEffect: return ThingFlagAttrTopEffect;
+    }
+
+    return ThingFlagAttrNone;
 }

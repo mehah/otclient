@@ -31,6 +31,7 @@
 #include <framework/luaengine/luaobject.h>
 #include <framework/net/server.h>
 #include <framework/otml/declarations.h>
+#include <variant>
 
 using namespace otclient::protobuf;
 
@@ -103,7 +104,6 @@ enum ThingAttr : uint8_t
 
     // additional
     ThingAttrOpacity = 100,
-    ThingAttrNotPreWalkable = 101,
 
     ThingAttrDefaultAction = 251,
 
@@ -113,19 +113,68 @@ enum ThingAttr : uint8_t
     ThingLastAttr = 255
 };
 
+enum ThingFlagAttr :uint64_t {
+    ThingFlagAttrNone = 0,
+    ThingFlagAttrGround = 1 << 0,
+    ThingFlagAttrGroundBorder = 1 << 1,
+    ThingFlagAttrOnBottom = 1 << 2,
+    ThingFlagAttrOnTop = 1 << 3,
+    ThingFlagAttrContainer = 1 << 4,
+    ThingFlagAttrStackable = 1 << 5,
+    ThingFlagAttrForceUse = 1 << 6,
+    ThingFlagAttrMultiUse = 1 << 7,
+    ThingFlagAttrWritable = 1 << 8,
+    ThingFlagAttrChargeable = 1 << 9,
+    ThingFlagAttrWritableOnce = 1 << 10,
+    ThingFlagAttrFluidContainer = 1 << 11,
+    ThingFlagAttrSplash = 1 << 12,
+    ThingFlagAttrNotWalkable = 1 << 13,
+    ThingFlagAttrNotMoveable = 1 << 14,
+    ThingFlagAttrBlockProjectile = 1 << 15,
+    ThingFlagAttrNotPathable = 1 << 16,
+    ThingFlagAttrPickupable = 1 << 17,
+    ThingFlagAttrHangable = 1 << 18,
+    ThingFlagAttrHookSouth = 1 << 19,
+    ThingFlagAttrHookEast = 1 << 20,
+    ThingFlagAttrRotateable = 1 << 21,
+    ThingFlagAttrLight = 1 << 22,
+    ThingFlagAttrDontHide = 1 << 23,
+    ThingFlagAttrTranslucent = 1 << 24,
+    ThingFlagAttrDisplacement = 1 << 25,
+    ThingFlagAttrElevation = 1 << 26,
+    ThingFlagAttrLyingCorpse = 1 << 27,
+    ThingFlagAttrAnimateAlways = 1 << 28,
+    ThingFlagAttrMinimapColor = 1 << 29,
+    ThingFlagAttrLensHelp = 1 << 30,
+    ThingFlagAttrFullGround = static_cast<uint64_t>(1) << 31,
+    ThingFlagAttrLook = static_cast<uint64_t>(1) << 32,
+    ThingFlagAttrCloth = static_cast<uint64_t>(1) << 33,
+    ThingFlagAttrMarket = static_cast<uint64_t>(1) << 34,
+    ThingFlagAttrUsable = static_cast<uint64_t>(1) << 35,
+    ThingFlagAttrWrapable = static_cast<uint64_t>(1) << 36,
+    ThingFlagAttrUnwrapable = static_cast<uint64_t>(1) << 37,
+    ThingFlagAttrWearOut = static_cast<uint64_t>(1) << 38,
+    ThingFlagAttrClockExpire = static_cast<uint64_t>(1) << 39,
+    ThingFlagAttrExpire = static_cast<uint64_t>(1) << 40,
+    ThingFlagAttrExpireStop = static_cast<uint64_t>(1) << 41,
+    ThingFlagAttrPodium = static_cast<uint64_t>(1) << 42,
+    ThingFlagAttrTopEffect = static_cast<uint64_t>(1) << 43,
+    ThingFlagAttrDefaultAction = static_cast<uint64_t>(1) << 44
+};
+
 struct Imbuement
 {
-    int id;
+    uint32_t id;
     std::string name;
     std::string description;
     std::string group;
-    int imageId;
-    int duration;
+    uint16_t imageId;
+    uint32_t duration;
     bool premiumOnly;
     std::vector<std::pair<ItemPtr, std::string>> sources;
-    int cost;
-    int successRate;
-    int protectionCost;
+    uint32_t cost;
+    uint8_t successRate;
+    uint32_t protectionCost;
 };
 
 enum SpriteMask
@@ -139,7 +188,7 @@ enum SpriteMask
 struct MarketData
 {
     std::string name;
-    int category;
+    ThingCategory category;
     uint16_t requiredLevel;
     uint16_t restrictVocation;
     uint16_t showAs;
@@ -182,9 +231,8 @@ public:
     uint16_t getId() { return m_id; }
     ThingCategory getCategory() { return m_category; }
     bool isNull() { return m_null; }
-    bool hasAttr(ThingAttr attr) { return m_attribs.has(attr); }
+    bool hasAttr(ThingAttr attr) { return (m_flags & thingAttrToThingFlagAttr(attr)); }
 
-    Size getSize() { return m_size; }
     int getWidth() { return m_size.width(); }
     int getHeight() { return m_size.height(); }
     int getExactSize(int layer = 0, int xPattern = 0, int yPattern = 0, int zPattern = 0, int animationPhase = 0);
@@ -194,121 +242,145 @@ public:
     int getNumPatternY() { return m_numPatternY; }
     int getNumPatternZ() { return m_numPatternZ; }
     int getAnimationPhases();
-    AnimatorPtr getAnimator() { return m_animator; }
-    AnimatorPtr getIdleAnimator() { return m_idleAnimator; }
+    Animator* getAnimator() const { return m_animator; }
+    Animator* getIdleAnimator() const { return m_idleAnimator; }
 
-    Point getDisplacement() { return m_displacement; }
+    const Size& getSize() { return m_size; }
+    const Point& getDisplacement() { return m_displacement; }
+    const Light& getLight() { return m_light; }
+    const MarketData& getMarketData() { return m_market; }
+
     int getDisplacementX() { return getDisplacement().x; }
     int getDisplacementY() { return getDisplacement().y; }
-    int getElevation() { return m_attribs.get<uint16_t>(ThingAttrElevation); }
+    int getElevation() { return m_elevation; }
 
-    int getGroundSpeed() { return m_attribs.get<uint16_t>(ThingAttrGround); }
-    int getMaxTextLength() { return m_attribs.has(ThingAttrWritableOnce) ? m_attribs.get<uint16_t>(ThingAttrWritableOnce) : m_attribs.get<uint16_t>(ThingAttrWritable); }
-    Light getLight() { return m_attribs.get<Light>(ThingAttrLight); }
-    int getMinimapColor() { return m_attribs.get<uint16_t>(ThingAttrMinimapColor); }
-    int getLensHelp() { return m_attribs.get<uint16_t>(ThingAttrLensHelp); }
-    int getClothSlot() { return m_attribs.get<uint16_t>(ThingAttrCloth); }
-    MarketData getMarketData() { return m_attribs.get<MarketData>(ThingAttrMarket); }
-    bool isGround() { return m_attribs.has(ThingAttrGround); }
-    bool isGroundBorder() { return m_attribs.has(ThingAttrGroundBorder); }
+    uint16_t getGroundSpeed() { return m_groundSpeed; }
+    int getMaxTextLength() { return m_maxTextLength; }
+
+    int getMinimapColor() { return m_minimapColor; }
+    int getLensHelp() { return m_lensHelp; }
+    int getClothSlot() { return m_clothSlot; }
+
     bool isTopGround() { return isGround() && !isSingleDimension(); }
     bool isTopGroundBorder() { return isGroundBorder() && !isSingleDimension(); }
     bool isSingleGround() { return isGround() && isSingleDimension(); }
     bool isSingleGroundBorder() { return isGroundBorder() && isSingleDimension(); }
-
-    bool isOnBottom() { return m_attribs.has(ThingAttrOnBottom); }
-    bool isOnTop() { return m_attribs.has(ThingAttrOnTop); }
-    bool isContainer() { return m_attribs.has(ThingAttrContainer); }
-    bool isStackable() { return m_attribs.has(ThingAttrStackable); }
-    bool isForceUse() { return m_attribs.has(ThingAttrForceUse); }
-    bool isMultiUse() { return m_attribs.has(ThingAttrMultiUse); }
-    bool isWritable() { return m_attribs.has(ThingAttrWritable); }
-    bool isChargeable() { return m_attribs.has(ThingAttrChargeable); }
-    bool isWritableOnce() { return m_attribs.has(ThingAttrWritableOnce); }
-    bool isFluidContainer() { return m_attribs.has(ThingAttrFluidContainer); }
-    bool isSplash() { return m_attribs.has(ThingAttrSplash); }
-    bool isNotWalkable() { return m_attribs.has(ThingAttrNotWalkable); }
-    bool isNotMoveable() { return m_attribs.has(ThingAttrNotMoveable); }
-    bool blockProjectile() { return m_attribs.has(ThingAttrBlockProjectile); }
-    bool isNotPathable() { return m_attribs.has(ThingAttrNotPathable); }
-    bool isPickupable() { return m_attribs.has(ThingAttrPickupable); }
-    bool isHangable() { return m_attribs.has(ThingAttrHangable); }
-    bool isHookSouth() { return m_attribs.has(ThingAttrHookSouth); }
-    bool isHookEast() { return m_attribs.has(ThingAttrHookEast); }
-    bool isRotateable() { return m_attribs.has(ThingAttrRotateable); }
-    bool hasLight() { return m_attribs.has(ThingAttrLight); }
-    bool isDontHide() { return m_attribs.has(ThingAttrDontHide); }
-    bool isTranslucent() { return m_attribs.has(ThingAttrTranslucent); }
-    bool hasDisplacement() { return m_attribs.has(ThingAttrDisplacement); }
-    bool hasElevation() { return m_attribs.has(ThingAttrElevation); }
-    bool isLyingCorpse() { return m_attribs.has(ThingAttrLyingCorpse); }
-    bool isAnimateAlways() { return m_attribs.has(ThingAttrAnimateAlways); }
-    bool hasMiniMapColor() { return m_attribs.has(ThingAttrMinimapColor); }
-    bool hasLensHelp() { return m_attribs.has(ThingAttrLensHelp); }
-    bool isFullGround() { return m_attribs.has(ThingAttrFullGround); }
-    bool isIgnoreLook() { return m_attribs.has(ThingAttrLook); }
-    bool isCloth() { return m_attribs.has(ThingAttrCloth); }
-    bool isMarketable() { return m_attribs.has(ThingAttrMarket); }
-    bool isUsable() { return m_attribs.has(ThingAttrUsable); }
-    bool isWrapable() { return m_attribs.has(ThingAttrWrapable); }
-    bool isUnwrapable() { return m_attribs.has(ThingAttrUnwrapable); }
-    bool hasWearOut() { return m_attribs.has(ThingAttrWearOut); }
-    bool hasClockExpire() { return m_attribs.has(ThingAttrClockExpire); }
-    bool hasExpire() { return m_attribs.has(ThingAttrExpire); }
-    bool hasExpireStop() { return m_attribs.has(ThingAttrExpireStop); }
-    bool isPodium() { return m_attribs.has(ThingAttrPodium); }
-    bool isTopEffect() { return m_attribs.has(ThingAttrTopEffect); }
-    bool hasAction() { return m_attribs.has(ThingAttrDefaultAction); }
-    bool isOpaque() { getTexture(0); return m_opaque; }
     bool isTall(const bool useRealSize = false) { return useRealSize ? getRealSize() > SPRITE_SIZE : getHeight() > 1; }
-    uint16_t getClassification() { return m_attribs.get<uint16_t>(ThingAttrUpgradeClassification); }
     bool isSingleDimension() { return m_size.area() == 1; }
-    std::vector<int> getSprites() { return m_spritesIndex; }
+
+    bool isGround() { return (m_flags & ThingFlagAttrGround); }
+    bool isGroundBorder() { return (m_flags & ThingFlagAttrGroundBorder); }
+    bool isOnBottom() { return (m_flags & ThingFlagAttrOnBottom); }
+    bool isOnTop() { return (m_flags & ThingFlagAttrOnTop); }
+    bool isContainer() { return (m_flags & ThingFlagAttrContainer); }
+    bool isStackable() { return (m_flags & ThingFlagAttrStackable); }
+    bool isForceUse() { return (m_flags & ThingFlagAttrForceUse); }
+    bool isMultiUse() { return (m_flags & ThingFlagAttrMultiUse); }
+    bool isWritable() { return (m_flags & ThingFlagAttrWritable); }
+    bool isChargeable() { return (m_flags & ThingFlagAttrChargeable); }
+    bool isWritableOnce() { return (m_flags & ThingFlagAttrWritableOnce); }
+    bool isFluidContainer() { return (m_flags & ThingFlagAttrFluidContainer); }
+    bool isSplash() { return (m_flags & ThingFlagAttrSplash); }
+    bool isNotWalkable() { return (m_flags & ThingFlagAttrNotWalkable); }
+    bool isNotMoveable() { return (m_flags & ThingFlagAttrNotMoveable); }
+    bool blockProjectile() { return (m_flags & ThingFlagAttrBlockProjectile); }
+    bool isNotPathable() { return (m_flags & ThingFlagAttrNotPathable); }
+    bool isPickupable() { return (m_flags & ThingFlagAttrPickupable); }
+    bool isHangable() { return (m_flags & ThingFlagAttrHangable); }
+    bool isHookSouth() { return (m_flags & ThingFlagAttrHookSouth); }
+    bool isHookEast() { return (m_flags & ThingFlagAttrHookEast); }
+    bool isRotateable() { return (m_flags & ThingFlagAttrRotateable); }
+    bool hasLight() { return (m_flags & ThingFlagAttrLight); }
+    bool isDontHide() { return (m_flags & ThingFlagAttrDontHide); }
+    bool isTranslucent() { return (m_flags & ThingFlagAttrTranslucent); }
+    bool hasDisplacement() { return (m_flags & ThingFlagAttrDisplacement); }
+    bool hasElevation() { return (m_flags & ThingFlagAttrElevation); }
+    bool isLyingCorpse() { return (m_flags & ThingFlagAttrLyingCorpse); }
+    bool isAnimateAlways() { return (m_flags & ThingFlagAttrAnimateAlways); }
+    bool hasMiniMapColor() { return (m_flags & ThingFlagAttrMinimapColor); }
+    bool hasLensHelp() { return (m_flags & ThingFlagAttrLensHelp); }
+    bool isFullGround() { return (m_flags & ThingFlagAttrFullGround); }
+    bool isIgnoreLook() { return (m_flags & ThingFlagAttrLook); }
+    bool isCloth() { return (m_flags & ThingFlagAttrCloth); }
+    bool isMarketable() { return (m_flags & ThingFlagAttrMarket); }
+    bool isUsable() { return (m_flags & ThingFlagAttrUsable); }
+    bool isWrapable() { return (m_flags & ThingFlagAttrWrapable); }
+    bool isUnwrapable() { return (m_flags & ThingFlagAttrUnwrapable); }
+    bool hasWearOut() { return (m_flags & ThingFlagAttrWearOut); }
+    bool hasClockExpire() { return (m_flags & ThingFlagAttrClockExpire); }
+    bool hasExpire() { return (m_flags & ThingFlagAttrExpire); }
+    bool hasExpireStop() { return (m_flags & ThingFlagAttrExpireStop); }
+    bool isPodium() { return (m_flags & ThingFlagAttrPodium); }
+    bool isTopEffect() { return (m_flags & ThingFlagAttrTopEffect); }
+    bool hasAction() { return (m_flags & ThingFlagAttrDefaultAction); }
+    bool isOpaque() { getTexture(0); return m_opaque; }
+
+    uint16_t getClassification() { return m_upgradeClassification; }
+    std::vector<uint32_t> getSprites() { return m_spritesIndex; }
 
     // additional
     float getOpacity() { return m_opacity; }
-    bool isNotPreWalkable() { return m_attribs.has(ThingAttrNotPreWalkable); }
     void setPathable(bool var);
     int getExactHeight();
-    TexturePtr getTexture(int animationPhase, TextureType txtType = TextureType::NONE);
+    const TexturePtr& getTexture(int animationPhase, TextureType txtType = TextureType::NONE);
 
 private:
-    bool hasTexture() const { return !m_textures.empty(); }
+    static ThingFlagAttr thingAttrToThingFlagAttr(ThingAttr attr);
+    struct TextureData {
+        struct Pos {
+            Rect rects;
+            Rect originRects;
+            Point offsets;
+        };
+
+        TexturePtr main;
+        TexturePtr smooth;
+        TexturePtr blank;
+        std::vector<Pos> pos;
+    };
 
     static Size getBestTextureDimension(int w, int h, int count);
     uint32_t getSpriteIndex(int w, int h, int l, int x, int y, int z, int a);
     uint32_t getTextureIndex(int l, int x, int y, int z);
 
     ThingCategory m_category{ ThingInvalidCategory };
-    uint16_t m_id{ 0 };
 
     bool m_null{ true };
     bool m_opaque{ false };
 
-    stdext::small_storage<ThingAttr, ThingLastAttr> m_attribs;
-
     Size m_size;
     Point m_displacement;
-    AnimatorPtr m_animator;
-    AnimatorPtr m_idleAnimator;
-    int m_animationPhases{ 0 };
-    int m_exactSize{ 0 };
-    int m_realSize{ 0 };
-    int m_numPatternX{ 0 };
-    int m_numPatternY{ 0 };
-    int m_numPatternZ{ 0 };
-    int m_layers{ 0 };
-    int m_exactHeight{ 0 };
+
+    Animator* m_animator{ nullptr };
+    Animator* m_idleAnimator{ nullptr };
+
+    uint8_t m_animationPhases{ 0 };
+    uint8_t m_realSize{ 0 };
+    uint8_t m_numPatternX{ 0 };
+    uint8_t m_numPatternY{ 0 };
+    uint8_t m_numPatternZ{ 0 };
+    uint8_t m_layers{ 0 };
+    uint8_t m_exactHeight{ 0 };
+    uint8_t m_minimapColor{ 0 };
+    uint8_t m_clothSlot{ 0 };
+    uint8_t m_lensHelp{ 0 };
+    uint8_t m_defaultAction{ 0 };
+    uint8_t m_elevation{ 0 };
+
+    uint16_t m_id{ 0 };
+    uint16_t m_groundSpeed{ 0 };
+    uint16_t m_maxTextLength{ 0 };
+    uint16_t m_upgradeClassification{ 0 };
+
+    uint64_t m_flags{ 0 };
+
+    MarketData m_market;
+    Light m_light;
+
     float m_opacity{ 1.f };
+
     std::string m_customImage;
 
-    std::vector<int> m_spritesIndex;
-
-    std::vector<TexturePtr> m_textures;
-    std::vector<TexturePtr> m_blankTextures;
-    std::vector<TexturePtr> m_smoothTextures;
-
-    std::vector<std::vector<Rect>> m_texturesFramesRects;
-    std::vector<std::vector<Rect>> m_texturesFramesOriginRects;
-    std::vector<std::vector<Point>> m_texturesFramesOffsets;
+    std::vector<uint32_t> m_spritesIndex;
+    std::vector<TextureData> m_textureData;
 };

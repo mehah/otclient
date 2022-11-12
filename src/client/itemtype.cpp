@@ -79,7 +79,7 @@ void ItemType::unserialize(const BinaryTreePtr& node)
                 break;
 
             case ItemTypeAttrWritable:
-                m_attribs.set(ItemTypeAttrWritable, true);
+                m_writable = true;
                 break;
 
             default:

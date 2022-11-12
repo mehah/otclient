@@ -25,25 +25,6 @@
 #include <framework/core/declarations.h>
 #include <framework/luaengine/luaobject.h>
 
-enum ItemCategory : uint8_t
-{
-    ItemCategoryInvalid = 0,
-    ItemCategoryGround = 1,
-    ItemCategoryContainer = 2,
-    ItemCategoryWeapon = 3,
-    ItemCategoryAmmunition = 4,
-    ItemCategoryArmor = 5,
-    ItemCategoryCharges = 6,
-    ItemCategoryTeleport = 7,
-    ItemCategoryMagicField = 8,
-    ItemCategoryWritable = 9,
-    ItemCategoryKey = 10,
-    ItemCategorySplash = 11,
-    ItemCategoryFluid = 12,
-    ItemCategoryDoor = 13,
-    ItemCategoryDeprecated = 14,
-    ItemCategoryLast = 15
-};
 
 enum ItemTypeAttr : uint8_t
 {
@@ -79,6 +60,26 @@ enum ItemTypeAttr : uint8_t
     ItemTypeAttrWareId = 45,
     ItemTypeAttrLast = 46
 };
+
+enum ItemCategory : uint8_t
+{
+    ItemCategoryInvalid = 0,
+    ItemCategoryGround = 1,
+    ItemCategoryContainer = 2,
+    ItemCategoryWeapon = 3,
+    ItemCategoryAmmunition = 4,
+    ItemCategoryArmor = 5,
+    ItemCategoryCharges = 6,
+    ItemCategoryTeleport = 7,
+    ItemCategoryMagicField = 8,
+    ItemCategoryWritable = 9,
+    ItemCategoryKey = 10,
+    ItemCategorySplash = 11,
+    ItemCategoryFluid = 12,
+    ItemCategoryDoor = 13,
+    ItemCategoryDeprecated = 14
+};
+
 
 enum ClientVersion
 {
@@ -131,27 +132,31 @@ class ItemType : public LuaObject
 public:
     void unserialize(const BinaryTreePtr& node);
 
-    void setServerId(uint16_t serverId) { m_attribs.set(ItemTypeAttrServerId, serverId); }
-    uint16_t getServerId() { return m_attribs.get<uint16_t>(ItemTypeAttrServerId); }
+    void setServerId(uint16_t serverId) { m_serverId = serverId; }
+    uint16_t getServerId() { return m_serverId; }
 
-    void setClientId(uint16_t clientId) { m_attribs.set(ItemTypeAttrClientId, clientId); }
-    uint16_t getClientId() { return m_attribs.get<uint16_t>(ItemTypeAttrClientId); }
+    void setClientId(uint16_t clientId) { m_clientId = clientId; }
+    uint16_t getClientId() { return m_clientId; }
 
     void setCategory(ItemCategory category) { m_category = category; }
     ItemCategory getCategory() { return m_category; }
 
-    void setName(const std::string& name) { m_attribs.set(ItemTypeAttrName, name); }
-    std::string getName() { return m_attribs.get<std::string>(ItemTypeAttrName); }
+    void setName(const std::string& name) { m_name = name; }
+    std::string getName() { return m_name; }
 
-    void setDesc(const std::string& desc) { m_attribs.set(ItemTypeAttrDesc, desc); }
-    std::string getDesc() { return m_attribs.get<std::string>(ItemTypeAttrDesc); }
+    void setDesc(const std::string& desc) { m_desc = desc; }
+    std::string getDesc() { return m_desc; }
 
     bool isNull() { return m_null; }
-    bool isWritable() { return m_attribs.get<bool>(ItemTypeAttrWritable); }
+    bool isWritable() { return m_writable; }
 
 private:
     ItemCategory m_category{ ItemCategoryInvalid };
     bool m_null{ true };
+    bool m_writable{ false };
 
-    stdext::small_storage<ItemTypeAttr, ItemTypeAttrLast> m_attribs;
+    uint16_t m_serverId{ 0 };
+    uint16_t m_clientId{ 0 };
+    std::string m_name;
+    std::string m_desc;
 };

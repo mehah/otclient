@@ -30,14 +30,11 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/graphics/drawpoolmanager.h>
 
-Tile::Tile(const Position& position) : m_position(position)
-{
-    m_completelyCoveredCache.fill(-1);
-}
+Tile::Tile(const Position& position) : m_position(position) {}
 
 void Tile::drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor, int flags, LightView* lightView)
 {
-    thing->draw(dest, scaleFactor, true, flags, TextureType::NONE, m_selectType != TileSelectType::NONE && m_highlightThing == thing, lightView);
+    thing->draw(dest, scaleFactor, true, flags, TextureType::NONE, m_selectType != TileSelectType::NONE && m_highlightThingId == thing->getThingType()->getId(), lightView);
 
     if (thing->isItem()) {
         m_drawElevation += thing->getElevation();
@@ -58,14 +55,14 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, float scaleFactor,
         drawThing(thing, dest - m_drawElevation * scaleFactor, scaleFactor, flags, lightView);
     }
 
-    if (m_countFlag.hasBottomItem) {
+    if (hasBottomItem()) {
         for (const auto& item : m_things) {
             if (!item->isOnBottom()) continue;
             drawThing(item, dest - m_drawElevation * scaleFactor, scaleFactor, flags, lightView);
         }
     }
 
-    if (m_countFlag.hasCommonItem) {
+    if (hasCommonItem()) {
         for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
             const auto& item = *it;
             if (!item->isCommon()) continue;
@@ -127,7 +124,7 @@ void Tile::drawTop(const Point& dest, float scaleFactor, int flags, bool forceDr
         }
     }
 
-    if (m_countFlag.hasTopItem) {
+    if (hasTopItem()) {
         for (const auto& item : m_things) {
             if (!item->isOnTop()) continue;
             drawThing(item, dest, scaleFactor, flags, lightView);
@@ -137,24 +134,27 @@ void Tile::drawTop(const Point& dest, float scaleFactor, int flags, bool forceDr
 
 void Tile::clean()
 {
+    m_highlightThingId = 0;
     while (!m_things.empty())
         removeThing(m_things.front());
+
     m_tilesRedraw.clear();
-    m_countFlag.opaque = 0;
+    m_thingTypeFlag = 0;
+    m_flags = 0;
 }
 
 void Tile::addWalkingCreature(const CreaturePtr& creature)
 {
     m_walkingCreatures.push_back(creature);
-    analyzeThing(creature, true);
+    setThingFlag(creature);
 }
 
 void Tile::removeWalkingCreature(const CreaturePtr& creature)
 {
     const auto it = std::find(m_walkingCreatures.begin(), m_walkingCreatures.end(), creature);
     if (it != m_walkingCreatures.end()) {
-        analyzeThing(creature, false);
         m_walkingCreatures.erase(it);
+        recalculateThingFlag();
     }
 }
 
@@ -186,7 +186,7 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
         else
             m_effects.push_back(newEffect);
 
-        analyzeThing(thing, true);
+        setThingFlag(thing);
 
         thing->setPosition(m_position);
         thing->onAppear();
@@ -229,7 +229,7 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
 
     // common items are drawn from back to front, so if the item being added now is common and has elevation,
     // look for any item behind it and destroy its buffer.
-    if (m_countFlag.hasCommonItem && thing->isCommon() && thing->hasElevation()) {
+    if (hasCommonItem() && thing->isCommon() && thing->hasElevation()) {
         for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
             if (const auto& item = *it; item->isCommon())
                 item->destroyBuffer();
@@ -241,7 +241,7 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
     // get the elevation status before analyze the new item.
     const bool hasElev = hasElevation();
 
-    analyzeThing(thing, true);
+    setThingFlag(thing);
     checkForDetachableThing();
 
     if (size > MAX_THINGS)
@@ -249,21 +249,17 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
 
     // Do not change if you do not understand what is being done.
     {
-        if (m_ground) {
+        if (const auto& ground = getGround()) {
             --stackPos;
-            if (m_ground->isTopGround()) {
-                m_ground->destroyBuffer();
+            if (ground->isTopGround()) {
+                ground->destroyBuffer();
                 thing->destroyBuffer();
             }
-        } else if (thing->isGround())
-            m_ground = thing->static_self_cast<Item>();
+        }
     }
 
     thing->setPosition(m_position, stackPos, hasElev);
     thing->onAppear();
-
-    if (thing->isTranslucent())
-        checkTranslucentLight();
 }
 
 // TODO: Need refactoring
@@ -277,8 +273,6 @@ bool Tile::removeThing(const ThingPtr thing)
         if (it == m_effects.end())
             return false;
 
-        analyzeThing(thing, false);
-
         m_effects.erase(it);
         return true;
     }
@@ -287,18 +281,16 @@ bool Tile::removeThing(const ThingPtr thing)
     if (it == m_things.end())
         return false;
 
-    if (thing->isGround()) m_ground = nullptr;
-
-    analyzeThing(thing, false);
-
     m_things.erase(it);
+
+    recalculateThingFlag();
+    if (thing->hasElevation())
+        --m_elevation;
+
 
     checkForDetachableThing();
 
     thing->onDisappear();
-
-    if (thing->isTranslucent())
-        checkTranslucentLight();
 
     return true;
 }
@@ -518,7 +510,7 @@ ThingPtr Tile::getTopMultiUseThing()
 
 bool Tile::isWalkable(bool ignoreCreatures)
 {
-    if (m_countFlag.notWalkable > 0 || !getGround()) {
+    if (m_thingTypeFlag & TileThingType::NOT_WALKABLE || !getGround()) {
         return false;
     }
 
@@ -537,24 +529,43 @@ bool Tile::isWalkable(bool ignoreCreatures)
 
 bool Tile::isCompletelyCovered(uint8_t firstFloor, bool resetCache)
 {
-    if (resetCache)
-        m_completelyCoveredCache.fill(-1);
+    if (m_position.z == 0 || m_position.z == firstFloor) return false;
+
+    if (resetCache) {
+        m_isCompletelyCovered = m_isCovered = 0;
+    }
 
     if (hasCreature() || !m_walkingCreatures.empty() || hasLight())
         return false;
 
-    auto& is = m_completelyCoveredCache[firstFloor];
-    if (is == -1) {
-        is = g_map.isCompletelyCovered(m_position, firstFloor);
+    const uint32_t idChecked = 1 << firstFloor;
+    const uint32_t idState = 1 << (firstFloor + MAX_Z);
+    if ((m_isCompletelyCovered & idChecked) == 0) {
+        m_isCompletelyCovered |= idChecked;
+        if (g_map.isCompletelyCovered(m_position, firstFloor)) {
+            m_isCompletelyCovered |= idState;
+            m_isCovered |= idChecked; // Set covered is Checked
+            m_isCovered |= idState;
+        }
     }
 
-    return is == 1;
+    return (m_isCompletelyCovered & idState) == idState;
 }
 
 bool Tile::isCovered(int8_t firstFloor)
 {
-    return firstFloor == m_lastFloorMin ? m_covered :
-        m_covered = g_map.isCovered(m_position, m_lastFloorMin = firstFloor);
+    if (m_position.z == 0 || m_position.z == firstFloor) return false;
+
+    const uint32_t idChecked = 1 << firstFloor;
+    const uint32_t idState = 1 << (firstFloor + MAX_Z);
+
+    if ((m_isCovered & idChecked) == 0) {
+        m_isCovered |= idChecked;
+        if (g_map.isCovered(m_position, firstFloor))
+            m_isCovered |= idState;
+    }
+
+    return (m_isCovered & idState) == idState;
 }
 
 bool Tile::isClickable()
@@ -583,7 +594,7 @@ void Tile::onAddInMapView()
     m_drawTopAndCreature = true;
     m_tilesRedraw.clear();
 
-    if (m_countFlag.correctCorpse) {
+    if (m_thingTypeFlag & TileThingType::CORRECT_CORPSE) {
         uint8_t redrawPreviousTopW = 0,
             redrawPreviousTopH = 0;
 
@@ -637,61 +648,41 @@ bool Tile::limitsFloorsView(bool isFreeView)
     return firstThing && (firstThing->isGround() || (isFreeView ? firstThing->isOnBottom() : firstThing->isOnBottom() && firstThing->blockProjectile()));
 }
 
-void Tile::checkTranslucentLight()
-{
-    if (m_position.z != SEA_FLOOR)
-        return;
-
-    Position downPos = m_position;
-    if (!downPos.down()) return;
-
-    const auto& tile = g_map.getOrCreateTile(downPos);
-    if (!tile)
-        return;
-
-    for (const auto& thing : m_things) {
-        if (thing->isTranslucent() || thing->hasLensHelp()) {
-            tile->m_flags |= TILESTATE_TRANSLUECENT_LIGHT;
-            return;
-        }
-    }
-
-    tile->m_flags &= ~TILESTATE_TRANSLUECENT_LIGHT;
-}
-
 bool Tile::checkForDetachableThing()
 {
-    if ((m_highlightThing = getTopCreature()))
+    if (const auto& creature = getTopCreature()) {
+        m_highlightThingId = creature->getThingType()->getId();
         return true;
+    }
 
-    if (m_countFlag.hasCommonItem) {
+    if (hasCommonItem()) {
         for (const auto& item : m_things) {
             if ((!item->isCommon() || !item->canDraw() || item->isIgnoreLook() || item->isCloth()) && (!item->isUsable()) && (!item->hasLight())) {
                 continue;
             }
 
-            m_highlightThing = item;
+            m_highlightThingId = item->getThingType()->getId();
             return true;
         }
     }
 
-    if (m_countFlag.hasBottomItem) {
+    if (hasBottomItem()) {
         for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
             const auto& item = *it;
             if (!item->isOnBottom() || !item->canDraw() || item->isIgnoreLook() || item->isFluidContainer()) continue;
-            m_highlightThing = item;
+            m_highlightThingId = item->getThingType()->getId();
             return true;
         }
     }
 
-    if (m_countFlag.hasTopItem) {
+    if (hasTopItem()) {
         for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
             const auto& item = *it;
             if (!item->isOnTop()) break;
             if (!item->canDraw() || item->isIgnoreLook()) continue;
 
             if (item->hasLensHelp()) {
-                m_highlightThing = item;
+                m_highlightThingId = item->getThingType()->getId();
                 return true;
             }
         }
@@ -700,109 +691,96 @@ bool Tile::checkForDetachableThing()
     return false;
 }
 
-void Tile::analyzeThing(const ThingPtr& thing, bool add)
+void Tile::setThingFlag(const ThingPtr& thing)
 {
-    const int value = add ? 1 : -1;
-
     if (thing->hasLight())
-        m_countFlag.hasLight += value;
+        m_thingTypeFlag |= TileThingType::HAS_LIGHT;
 
     if (thing->hasDisplacement())
-        m_countFlag.hasDisplacement += value;
+        m_thingTypeFlag |= TileThingType::HAS_DISPLACEMENT;
 
     if (thing->isEffect()) return;
 
     if (thing->isCommon())
-        m_countFlag.hasCommonItem += value;
+        m_thingTypeFlag |= TileThingType::HAS_COMMON_ITEM;
 
     if (thing->isOnTop())
-        m_countFlag.hasTopItem += value;
+        m_thingTypeFlag |= TileThingType::HAS_TOP_ITEM;
 
     if (thing->isCreature())
-        m_countFlag.hasCreature += value;
+        m_thingTypeFlag |= TileThingType::HAS_CREATURE;
 
     if (thing->isSingleGroundBorder())
-        m_countFlag.hasGroundBorder += value;
+        m_thingTypeFlag |= TileThingType::HAS_GROUND_BORDER;
 
     if (thing->isTopGroundBorder())
-        m_countFlag.hasTopGroundBorder += value;
+        m_thingTypeFlag |= TileThingType::HAS_TOP_GROUND_BORDER;
 
     if (thing->isLyingCorpse() && !g_game.getFeature(Otc::GameMapDontCorrectCorpse))
-        m_countFlag.correctCorpse += value;
+        m_thingTypeFlag |= TileThingType::CORRECT_CORPSE;
 
     // Creatures and items
     if (thing->isOnBottom()) {
-        m_countFlag.hasBottomItem += value;
+        m_thingTypeFlag |= TileThingType::HAS_BOTTOM_ITEM;
 
         if (thing->isHookSouth())
-            m_countFlag.hasHookSouth += value;
+            m_thingTypeFlag |= TileThingType::HAS_HOOK_SOUTH;
 
         if (thing->isHookEast())
-            m_countFlag.hasHookEast += value;
+            m_thingTypeFlag |= TileThingType::HAS_HOOK_EAST;
     }
 
     if (hasElevation())
-        m_countFlag.hasThingWithElevation += value;
+        m_thingTypeFlag |= TileThingType::HAS_THING_WITH_ELEVATION;
 
     // best option to have something more real, but in some cases as a custom project,
     // the developers are not defining crop size
     //if(thing->getRealSize() > SPRITE_SIZE)
     if (!thing->isSingleDimension() || thing->hasElevation() || thing->hasDisplacement())
-        m_countFlag.notSingleDimension += value;
+        m_thingTypeFlag |= TileThingType::NOT_SINGLE_DIMENSION;
 
     if (thing->getHeight() > 1)
-        m_countFlag.hasTallThings += value;
+        m_thingTypeFlag |= TileThingType::HAS_TALL_THINGS;
 
     if (thing->getWidth() > 1)
-        m_countFlag.hasWideThings += value;
+        m_thingTypeFlag |= TileThingType::HAS_WIDE_THINGS;
 
     if (!thing->isItem()) return;
 
-    if (thing->getHeight() > 1)
-        m_countFlag.hasTallItems += value;
-
-    if (thing->getWidth() > 1)
-        m_countFlag.hasWideItems += value;
-
     if (thing->getWidth() > 1 && thing->getHeight() > 1)
-        m_countFlag.hasWall += value;
+        m_thingTypeFlag |= TileThingType::HAS_WALL;
 
     if (thing->isNotWalkable())
-        m_countFlag.notWalkable += value;
+        m_thingTypeFlag |= TileThingType::NOT_WALKABLE;
 
     if (thing->isNotPathable())
-        m_countFlag.notPathable += value;
+        m_thingTypeFlag |= TileThingType::NOT_PATHABLE;
 
     if (thing->blockProjectile())
-        m_countFlag.blockProjectile += value;
-
-    m_totalElevation += thing->getElevation() * value;
+        m_thingTypeFlag |= TileThingType::BLOCK_PROJECTTILE;
 
     if (thing->isFullGround())
-        m_countFlag.fullGround += value;
+        m_thingTypeFlag |= TileThingType::FULL_GROUND;
+
+    if (thing->isOpaque())
+        m_thingTypeFlag |= TileThingType::IS_OPAQUE;
 
     if (thing->hasElevation())
-        m_countFlag.elevation += value;
-
-    if (thing->isOpaque()) {
-        m_countFlag.opaque += value;
-    }
-
-    if (thing->isGroundBorder() && thing->isNotWalkable())
-        m_countFlag.hasNoWalkableEdge += value;
+        ++m_elevation;
 }
 
 void Tile::select(TileSelectType selectType)
 {
     if (selectType == TileSelectType::NO_FILTERED) {
-        m_highlightThing = getTopCreature();
-        if (!m_highlightThing)
-            m_highlightThing = m_things.back();
+        if (const CreaturePtr& topCreature = getTopCreature())
+            m_highlightThingId = topCreature->getThingType()->getId();
+
+        if (!m_highlightThingId)
+            m_highlightThingId = m_things.back()->getThingType()->getId();
     }
 
     m_selectType = selectType;
 }
-
 
 void Tile::unselect()
 {

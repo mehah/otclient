@@ -84,7 +84,7 @@ void Item::setId(uint32_t id)
 
     m_serverId = g_things.findItemTypeByClientId(id)->getServerId();
     m_clientId = id;
-    m_thingType = nullptr;
+    m_thingType = g_things.getThingType(m_clientId, ThingCategoryItem).get();
     createBuffer();
 
     // Shader example on only items that can be marketed.
@@ -114,7 +114,7 @@ void Item::setOtbId(uint16_t id)
         id = 0;
 
     m_clientId = id;
-    m_thingType = nullptr;
+    m_thingType = g_things.getThingType(m_clientId, ThingCategoryItem).get();
     createBuffer();
 }
 
@@ -164,7 +164,6 @@ void Item::unserializeItem(const BinaryTreePtr& in)
             if (attrib == 0)
                 break;
 
-            m_attribs = std::optional<stdext::dynamic_storage<ItemAttr>>{};
             switch (attrib) {
                 case ATTR_COUNT:
                 case ATTR_RUNE_CHARGES:
@@ -177,12 +176,12 @@ void Item::unserializeItem(const BinaryTreePtr& in)
                 case ATTR_SCRIPTPROTECTED:
                 case ATTR_DUALWIELD:
                 case ATTR_DECAYING_STATE:
-                    attr(true).set(attrib, in->getU8());
+                    m_attribs.set(attrib, in->getU8());
                     break;
                 case ATTR_ACTION_ID:
                 case ATTR_UNIQUE_ID:
                 case ATTR_DEPOT_ID:
-                    attr(true).set(attrib, in->getU16());
+                    m_attribs.set(attrib, in->getU16());
                     break;
                 case ATTR_CONTAINER_ITEMS:
                 case ATTR_ATTACK:
@@ -197,14 +196,14 @@ void Item::unserializeItem(const BinaryTreePtr& in)
                 case ATTR_SLEEPERGUID:
                 case ATTR_SLEEPSTART:
                 case ATTR_ATTRIBUTE_MAP:
-                    attr(true).set(attrib, in->getU32());
+                    m_attribs.set(attrib, in->getU32());
                     break;
                 case ATTR_TELE_DEST:
                 {
                     const uint16_t x = in->getU16();
                     const uint16_t y = in->getU16();
                     const uint8_t z = in->getU8();
-                    attr(true).set(attrib, Position{ x, y, z });
+                    m_attribs.set(attrib, Position{ x, y, z });
                     break;
                 }
                 case ATTR_NAME:
@@ -212,7 +211,7 @@ void Item::unserializeItem(const BinaryTreePtr& in)
                 case ATTR_DESC:
                 case ATTR_ARTICLE:
                 case ATTR_WRITTENBY:
-                    attr(true).set(attrib, in->getString());
+                    m_attribs.set(attrib, in->getString());
                     break;
                 default:
                     throw Exception("invalid item attribute %d", attrib);
@@ -285,13 +284,6 @@ int Item::getSubType()
         return m_countOrSubType;
     if (g_game.getClientVersion() > 862)
         return 0;
-    return 1;
-}
-
-int Item::getCount()
-{
-    if (isStackable())
-        return m_countOrSubType;
     return 1;
 }
 
@@ -422,7 +414,7 @@ int Item::calculateAnimationPhase(bool animate)
 
     if (!animate) return getAnimationPhases() - 1;
 
-    if (getIdleAnimator() != nullptr) return getIdleAnimator()->getPhase();
+    if (getIdleAnimator()) return getIdleAnimator()->getPhase();
 
     if (m_async) {
         return (g_clock.millis() % (ITEM_TICKS_PER_FRAME * getAnimationPhases())) / ITEM_TICKS_PER_FRAME;
@@ -436,14 +428,4 @@ int Item::calculateAnimationPhase(bool animate)
     return m_phase;
 }
 
-int Item::getExactSize(int layer, int xPattern, int yPattern, int zPattern, int animationPhase)
-{
-    animationPhase = calculateAnimationPhase(true);
-    return Thing::getExactSize(layer, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase);
-}
-
-const ThingTypePtr& Item::getThingType()
-{
-    return m_thingType ? m_thingType : m_thingType = g_things.getThingType(m_clientId, ThingCategoryItem);
-}
 /* vim: set ts=4 sw=4 et :*/

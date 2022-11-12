@@ -40,8 +40,6 @@ public:
     MissilePtr asMissile() { return static_self_cast<Missile>(); }
     bool isMissile() override { return true; }
 
-    const ThingTypePtr& getThingType() override;
-
 private:
     Timer m_animationTimer;
     Point m_delta;

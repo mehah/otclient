@@ -49,25 +49,25 @@ class Animator : public stdext::shared_object
 public:
     void unserializeAppearance(const appearances::SpriteAnimation& phases);
     void unserialize(int animationPhases, const FileStreamPtr& fin);
-    void serialize(const FileStreamPtr& fin);
+    void serialize(const FileStreamPtr& fin) const;
     void setPhase(int phase);
     void resetAnimation();
 
     int getPhase();
-    int getPhaseAt(Timer& time);
+    int getPhaseAt(Timer& time) const;
     int getStartPhase() const;
-    int getAnimationPhases() { return m_animationPhases; }
-    int getAverageDuration() { return getTotalDuration() / getAnimationPhases(); }
+    int getAnimationPhases() const { return m_animationPhases; }
+    int getAverageDuration() const { return getTotalDuration() / getAnimationPhases(); }
 
     bool isAsync() { return m_async; }
     bool isComplete() { return m_isComplete; }
 
-    uint16_t getTotalDuration();
+    uint16_t getTotalDuration() const;
 
 private:
     int getPingPongPhase();
     int getLoopPhase();
-    int getPhaseDuration(int phase);
+    int getPhaseDuration(int phase) const;
 
     void calculateSynchronous();
 

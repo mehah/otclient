@@ -28,28 +28,11 @@
 #include "declarations.h"
 #include "outfit.h"
 
-enum CreatureAttr : uint8_t
-{
-    CreatureAttrPosition = 0,
-    CreatureAttrName,
-    CreatureAttrOutfit,
-    CreatureAttrSpawnTime,
-    CreatureAttrDir,
-    CreatureAttrRace,
-    CreatureAttrLast
-};
-
 enum CreatureRace : uint8_t
 {
-    CreatureRaceNpc = 0,
-    CreatureRaceMonster = 1
-};
-
-enum SpawnAttr : uint8_t
-{
-    SpawnAttrRadius = 0,
-    SpawnAttrCenter,
-    SpawnAttrLast,
+    CreatureRaceNone = 0,
+    CreatureRaceNpc = 1,
+    CreatureRaceMonster = 2
 };
 
 class Spawn : public LuaObject
@@ -58,11 +41,11 @@ public:
     Spawn() = default;
     Spawn(int32_t radius) { setRadius(radius); }
 
-    void setRadius(int32_t r) { m_attribs.set(SpawnAttrRadius, r); }
-    int32_t getRadius() { return m_attribs.get<int32_t>(SpawnAttrRadius); }
+    void setRadius(int32_t r) { m_radius = r; }
+    int32_t getRadius() { return m_radius; }
 
-    void setCenterPos(const Position& pos) { m_attribs.set(SpawnAttrCenter, pos); }
-    Position getCenterPos() { return m_attribs.get<Position>(SpawnAttrCenter); }
+    void setCenterPos(const Position& pos) { m_centerPos = pos; }
+    Position getCenterPos() { return m_centerPos; }
 
     std::vector<CreatureTypePtr> getCreatures();
     void addCreature(const Position& placePos, const CreatureTypePtr& cType);
@@ -74,9 +57,11 @@ protected:
     void save(TiXmlElement* node);
 
 private:
-    stdext::small_storage<SpawnAttr, SpawnAttrLast> m_attribs;
     CreatureMap m_creatures;
     friend class CreatureManager;
+
+    int32_t m_radius;
+    Position m_centerPos;
 };
 
 class CreatureType : public LuaObject
@@ -85,25 +70,29 @@ public:
     CreatureType() = default;
     CreatureType(const std::string& name) { setName(name); }
 
-    void setSpawnTime(int32_t spawnTime) { m_attribs.set(CreatureAttrSpawnTime, spawnTime); }
-    int32_t getSpawnTime() { return m_attribs.get<int32_t>(CreatureAttrSpawnTime); }
+    void setSpawnTime(int32_t spawnTime) { m_spawnTime = spawnTime; }
+    int32_t getSpawnTime() { return m_spawnTime; }
 
-    void setName(const std::string& name) { m_attribs.set(CreatureAttrName, name); }
-    std::string getName() { return m_attribs.get<std::string>(CreatureAttrName); }
+    void setName(const std::string& name) { m_name = name; }
+    std::string getName() { return m_name; }
 
-    void setOutfit(const Outfit& o) { m_attribs.set(CreatureAttrOutfit, o); }
-    Outfit getOutfit() { return m_attribs.get<Outfit>(CreatureAttrOutfit); }
+    void setOutfit(const Outfit& o) { m_outfit = o; }
+    Outfit getOutfit() { return m_outfit; }
 
-    void setDirection(Otc::Direction dir) { m_attribs.set(CreatureAttrDir, dir); }
-    Otc::Direction getDirection() { return m_attribs.get<Otc::Direction>(CreatureAttrDir); }
+    void setDirection(Otc::Direction dir) { m_direction = dir; }
+    Otc::Direction getDirection() { return m_direction; }
 
-    void setRace(CreatureRace race) { m_attribs.set(CreatureAttrRace, race); }
-    CreatureRace getRace() { return m_attribs.get<CreatureRace>(CreatureAttrRace); }
+    void setRace(CreatureRace race) { m_race = race; }
+    CreatureRace getRace() { return m_race; }
 
     CreaturePtr cast();
 
 private:
-    stdext::small_storage<CreatureAttr, CreatureAttrLast> m_attribs;
+    int32_t m_spawnTime{ 0 };
+    std::string m_name;
+    Outfit m_outfit;
+    Otc::Direction m_direction{ Otc::InvalidDirection };
+    CreatureRace m_race{ CreatureRaceNone };
 };
 
 class CreatureManager

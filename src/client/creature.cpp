@@ -114,10 +114,8 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
         if (m_outfit.hasMount()) {
             if (animateWalk) animationPhase = getCurrentAnimationPhase(true);
 
-            const auto& datType = getMountThingType();
-
-            dest -= datType->getDisplacement() * scaleFactor;
-            datType->draw(dest, scaleFactor, 0, m_numPatternX, 0, 0, animationPhase, Otc::DrawThingsAndLights, textureType, color);
+            dest -= m_mountType->getDisplacement() * scaleFactor;
+            m_mountType->draw(dest, scaleFactor, 0, m_numPatternX, 0, 0, animationPhase, Otc::DrawThingsAndLights, textureType, color);
             dest += getDisplacement() * scaleFactor;
 
             if (canDrawShader && m_mountShader) {
@@ -157,9 +155,7 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
 
         // outfit is a creature imitating an item or the invisible effect
     } else {
-        const auto& type = g_things.getThingType(m_outfit.getAuxId(), m_outfit.getCategory());
-
-        int animationPhases = type->getAnimationPhases();
+        int animationPhases = m_thingType->getAnimationPhases();
         int animateTicks = ITEM_TICKS_PER_FRAME;
 
         // when creature is an effect we cant render the first and last animation phase,
@@ -176,7 +172,7 @@ void Creature::internalDrawOutfit(Point dest, float scaleFactor, bool animateWal
         if (m_outfit.getCategory() == ThingCategoryEffect)
             animationPhase = std::min<int>(animationPhase + 1, animationPhases);
 
-        type->draw(dest - (getDisplacement() * scaleFactor), scaleFactor, 0, 0, 0, 0, animationPhase, Otc::DrawThingsAndLights, textureType, color);
+        m_thingType->draw(dest - (getDisplacement() * scaleFactor), scaleFactor, 0, 0, 0, 0, animationPhase, Otc::DrawThingsAndLights, textureType, color);
 
         if (canDrawShader && m_shader) {
             g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
@@ -404,7 +400,7 @@ void Creature::updateJump()
     const auto self = static_self_cast<Creature>();
     g_dispatcher.scheduleEvent([self] {
         self->updateJump();
-    }, nextT - m_jumpTimer.ticksElapsed());
+        }, nextT - m_jumpTimer.ticksElapsed());
 }
 
 void Creature::onPositionChange(const Position& newPos, const Position& oldPos)
@@ -464,7 +460,7 @@ void Creature::onDisappear()
 
         self->m_oldPosition = {};
         self->m_disappearEvent = nullptr;
-    });
+        });
 }
 
 void Creature::onDeath()
@@ -521,8 +517,8 @@ void Creature::updateWalkingTile()
     TilePtr newWalkingTile;
 
     const Rect virtualCreatureRect(SPRITE_SIZE + (m_walkOffset.x - getDisplacementX()),
-                                   SPRITE_SIZE + (m_walkOffset.y - getDisplacementY()),
-                                   SPRITE_SIZE, SPRITE_SIZE);
+        SPRITE_SIZE + (m_walkOffset.y - getDisplacementY()),
+        SPRITE_SIZE, SPRITE_SIZE);
 
     for (int xi = -1; xi <= 1 && !newWalkingTile; ++xi) {
         for (int yi = -1; yi <= 1 && !newWalkingTile; ++yi) {
@@ -567,7 +563,7 @@ void Creature::nextWalkUpdate()
     m_walkUpdateEvent = g_dispatcher.scheduleEvent([self] {
         self->m_walkUpdateEvent = nullptr;
         self->nextWalkUpdate();
-    }, m_stepCache.walkDuration);
+        }, m_stepCache.walkDuration);
 }
 
 void Creature::updateWalk(const bool isPreWalking)
@@ -618,7 +614,7 @@ void Creature::terminateWalk()
     m_walkFinishAnimEvent = g_dispatcher.scheduleEvent([self] {
         self->m_walkAnimationPhase = 0;
         self->m_walkFinishAnimEvent = nullptr;
-    }, g_game.getServerBeat());
+        }, g_game.getServerBeat());
 }
 
 void Creature::setName(const std::string_view name)
@@ -672,6 +668,10 @@ void Creature::setOutfit(const Outfit& outfit)
     if (m_outfit == outfit)
         return;
 
+    m_thingType = nullptr;
+    m_mountType = nullptr;
+    m_numPatternZ = 0;
+
     const Outfit oldOutfit = m_outfit;
     if (outfit.getCategory() != ThingCategoryCreature) {
         if (!g_things.isValidDatId(outfit.getAuxId(), outfit.getCategory()))
@@ -679,31 +679,27 @@ void Creature::setOutfit(const Outfit& outfit)
 
         m_outfit.setAuxId(outfit.getAuxId());
         m_outfit.setCategory(outfit.getCategory());
+        m_thingType = g_things.getThingType(m_outfit.getAuxId(), m_outfit.getCategory()).get();
+
+        m_sizeCache.exactSize = g_things.getThingType(m_outfit.getAuxId(), m_outfit.getCategory())->getExactSize();
     } else {
         if (outfit.getId() > 0 && !g_things.isValidDatId(outfit.getId(), ThingCategoryCreature))
             return;
 
         m_outfit = outfit;
-    }
+        m_thingType = g_things.getThingType(m_outfit.getId(), ThingCategoryCreature).get();
+        if (m_outfit.hasMount()) {
+            m_mountType = g_things.getThingType(m_outfit.getMount(), ThingCategoryCreature).get();
+            m_numPatternZ = std::min<int>(1, getNumPatternZ() - 1);
+        }
 
-    m_thingType = nullptr;
-    m_mountType = nullptr;
+        m_sizeCache.exactSize = getExactSize();
+    }
 
     m_walkAnimationPhase = 0; // might happen when player is walking and outfit is changed.
-
-    m_numPatternZ = outfit.hasMount() ? std::min<int>(1, getNumPatternZ() - 1) : 0;
+    m_sizeCache.frameSizeNotResized = std::max<int>(m_sizeCache.exactSize * 0.75f, 2 * SPRITE_SIZE * 0.75f);
 
     callLuaField("onOutfitChange", m_outfit, oldOutfit);
-
-    // Cache
-    {
-        if (m_outfit.getCategory() == ThingCategoryCreature)
-            m_sizeCache.exactSize = getExactSize();
-        else
-            m_sizeCache.exactSize = g_things.getThingType(m_outfit.getAuxId(), m_outfit.getCategory())->getExactSize();
-
-        m_sizeCache.frameSizeNotResized = std::max<int>(m_sizeCache.exactSize * 0.75f, 2 * SPRITE_SIZE * 0.75f);
-    }
 }
 
 void Creature::setOutfitColor(const Color& color, int duration)
@@ -736,7 +732,7 @@ void Creature::updateOutfitColor(Color color, Color finalColor, Color delta, int
     const auto self = static_self_cast<Creature>();
     m_outfitColorUpdateEvent = g_dispatcher.scheduleEvent([=] {
         self->updateOutfitColor(color, finalColor, delta, duration);
-    }, 100);
+        }, 100);
 }
 
 void Creature::setSpeed(uint16_t speed)
@@ -766,12 +762,13 @@ void Creature::setSpeed(uint16_t speed)
 
 void Creature::setBaseSpeed(double baseSpeed)
 {
-    if (m_baseSpeed != baseSpeed) {
-        const double oldBaseSpeed = m_baseSpeed;
-        m_baseSpeed = baseSpeed;
+    if (m_baseSpeed == baseSpeed)
+        return;
 
-        callLuaField("onBaseSpeedChange", baseSpeed, oldBaseSpeed);
-    }
+    const double oldBaseSpeed = m_baseSpeed;
+    m_baseSpeed = baseSpeed;
+
+    callLuaField("onBaseSpeedChange", baseSpeed, oldBaseSpeed);
 }
 
 void Creature::setType(uint8_t type) { callLuaField("onTypeChange", m_type = type); }
@@ -794,7 +791,7 @@ void Creature::setShieldTexture(const std::string& filename, bool blink)
         auto self = static_self_cast<Creature>();
         g_dispatcher.scheduleEvent([self] {
             self->updateShield();
-        }, SHIELD_BLINK_TICKS);
+            }, SHIELD_BLINK_TICKS);
     }
 
     m_shieldBlink = blink;
@@ -809,7 +806,7 @@ void Creature::addTimedSquare(uint8_t color)
     const auto self = static_self_cast<Creature>();
     g_dispatcher.scheduleEvent([self] {
         self->removeTimedSquare();
-    }, VOLATILE_SQUARE_DURATION);
+        }, VOLATILE_SQUARE_DURATION);
 }
 
 void Creature::updateShield()
@@ -820,7 +817,7 @@ void Creature::updateShield()
         auto self = static_self_cast<Creature>();
         g_dispatcher.scheduleEvent([self] {
             self->updateShield();
-        }, SHIELD_BLINK_TICKS);
+            }, SHIELD_BLINK_TICKS);
     } else if (!m_shieldBlink)
         m_showShieldTexture = true;
 }
@@ -868,7 +865,7 @@ uint64_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
     return ignoreDiagonal ? m_stepCache.duration : m_stepCache.getDuration(m_lastStepDirection);
 }
 
-Point Creature::getDisplacement()
+Point Creature::getDisplacement() const
 {
     if (m_outfit.getCategory() == ThingCategoryEffect)
         return { 8 };
@@ -879,7 +876,7 @@ Point Creature::getDisplacement()
     return Thing::getDisplacement();
 }
 
-int Creature::getDisplacementX()
+int Creature::getDisplacementX() const
 {
     if (m_outfit.getCategory() == ThingCategoryEffect)
         return 8;
@@ -888,12 +885,12 @@ int Creature::getDisplacementX()
         return 0;
 
     if (m_outfit.hasMount())
-        return getMountThingType()->getDisplacementX();
+        return m_mountType->getDisplacementX();
 
     return Thing::getDisplacementX();
 }
 
-int Creature::getDisplacementY()
+int Creature::getDisplacementY() const
 {
     if (m_outfit.getCategory() == ThingCategoryEffect)
         return 8;
@@ -901,36 +898,23 @@ int Creature::getDisplacementY()
     if (m_outfit.getCategory() == ThingCategoryItem)
         return 0;
 
-    if (m_outfit.hasMount()) {
-        return getMountThingType()->getDisplacementY();
-    }
+    if (m_outfit.hasMount())
+        return m_mountType->getDisplacementY();
 
     return Thing::getDisplacementY();
 }
 
-Light Creature::getLight()
+const Light& Creature::getLight() const
 {
-    Light light = Thing::getLight();
-
-    if (m_light.color > 0 && m_light.intensity >= light.intensity)
-        light = m_light;
-
-    return light;
-}
-
-int Creature::getTotalAnimationPhase()
-{
-    if (!m_outfit.hasMount())
-        return getAnimationPhases();
-
-    return getMountThingType()->getAnimationPhases();
+    const auto& light = Thing::getLight();
+    return m_light.color > 0 && m_light.intensity >= light.intensity ? m_light : light;
 }
 
 int Creature::getCurrentAnimationPhase(const bool mount)
 {
-    const auto& thingType = mount ? getMountThingType() : getThingType();
+    const auto& thingType = mount ? m_mountType : getThingType();
 
-    const auto& idleAnimator = thingType->getIdleAnimator();
+    auto* idleAnimator = thingType->getIdleAnimator();
     if (idleAnimator) {
         if (m_walkAnimationPhase == 0) return idleAnimator->getPhase();
         return m_walkAnimationPhase + idleAnimator->getAnimationPhases() - 1;
@@ -944,14 +928,14 @@ int Creature::getCurrentAnimationPhase(const bool mount)
     return m_walkAnimationPhase;
 }
 
-int Creature::getExactSize()
+int Creature::getExactSize(int layer, int xPattern, int yPattern, int zPattern, int animationPhase)
 {
-    const int numPatternY = getNumPatternY();
-    const int layers = getLayers();
-    const int zPattern = m_outfit.hasMount() ? 1 : 0;
+    yPattern = getNumPatternY();
+    zPattern = m_outfit.hasMount() ? 1 : 0;
 
+    const int layers = getLayers();
     int exactSize = 0;
-    for (int yPattern = 0; yPattern < numPatternY; ++yPattern) {
+    for (int yPattern = 0; yPattern < yPattern; ++yPattern) {
         if (yPattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
             continue;
 
@@ -960,14 +944,4 @@ int Creature::getExactSize()
     }
 
     return exactSize;
-}
-
-const ThingTypePtr& Creature::getThingType()
-{
-    return m_thingType ? m_thingType : m_thingType = g_things.getThingType(m_outfit.getId(), ThingCategoryCreature);
-}
-
-const ThingTypePtr& Creature::getMountThingType()
-{
-    return m_mountType ? m_mountType : m_mountType = g_things.getThingType(m_outfit.getMount(), ThingCategoryCreature);
 }

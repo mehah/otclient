@@ -82,6 +82,7 @@ public:
 
 private:
     ThingCategory m_category{ ThingCategoryCreature };
+
     int m_id{ 1 };
     int m_auxId{ 0 };
     int m_head{ 0 };

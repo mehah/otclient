@@ -26,8 +26,44 @@
 #include "creatures.h"
 #include "tile.h"
 
-enum OTBM_ItemAttr
+enum
 {
+    OTCM_SIGNATURE = 0x4D43544F,
+    OTCM_VERSION = 1
+};
+
+enum
+{
+    BLOCK_SIZE = 32
+};
+
+enum : uint8_t
+{
+    Animation_Force,
+    Animation_Show
+};
+
+enum OTBM_NodeTypes_t
+{
+    OTBM_ROOTV2 = 1,
+    OTBM_MAP_DATA = 2,
+    OTBM_ITEM_DEF = 3,
+    OTBM_TILE_AREA = 4,
+    OTBM_TILE = 5,
+    OTBM_ITEM = 6,
+    OTBM_TILE_SQUARE = 7,
+    OTBM_TILE_REF = 8,
+    OTBM_SPAWNS = 9,
+    OTBM_SPAWN_AREA = 10,
+    OTBM_MONSTER = 11,
+    OTBM_TOWNS = 12,
+    OTBM_TOWN = 13,
+    OTBM_HOUSETILE = 14,
+    OTBM_WAYPOINTS = 15,
+    OTBM_WAYPOINT = 16
+};
+
+enum OTBM_ItemAttr {
     OTBM_ATTR_DESCRIPTION = 1,
     OTBM_ATTR_EXT_FILE = 2,
     OTBM_ATTR_TILE_FLAGS = 3,
@@ -54,45 +90,7 @@ enum OTBM_ItemAttr
     OTBM_ATTR_ATTRIBUTE_MAP = 128,
     /// just random numbers, they're not actually used by the binary reader...
     OTBM_ATTR_WIDTH = 129,
-    OTBM_ATTR_HEIGHT = 130,
-    OTBM_ATTR_LAST,
-};
-
-enum OTBM_NodeTypes_t
-{
-    OTBM_ROOTV2 = 1,
-    OTBM_MAP_DATA = 2,
-    OTBM_ITEM_DEF = 3,
-    OTBM_TILE_AREA = 4,
-    OTBM_TILE = 5,
-    OTBM_ITEM = 6,
-    OTBM_TILE_SQUARE = 7,
-    OTBM_TILE_REF = 8,
-    OTBM_SPAWNS = 9,
-    OTBM_SPAWN_AREA = 10,
-    OTBM_MONSTER = 11,
-    OTBM_TOWNS = 12,
-    OTBM_TOWN = 13,
-    OTBM_HOUSETILE = 14,
-    OTBM_WAYPOINTS = 15,
-    OTBM_WAYPOINT = 16
-};
-
-enum
-{
-    OTCM_SIGNATURE = 0x4D43544F,
-    OTCM_VERSION = 1
-};
-
-enum
-{
-    BLOCK_SIZE = 32
-};
-
-enum : uint8_t
-{
-    Animation_Force,
-    Animation_Show
+    OTBM_ATTR_HEIGHT = 130
 };
 
 class TileBlock
@@ -165,18 +163,18 @@ public:
     void saveOtbm(const std::string& fileName);
 
     // otbm attributes (description, size, etc.)
-    void setHouseFile(const std::string& file) { m_attribs.set(OTBM_ATTR_HOUSE_FILE, file); }
-    void setSpawnFile(const std::string& file) { m_attribs.set(OTBM_ATTR_SPAWN_FILE, file); }
-    void setDescription(const std::string& desc) { m_attribs.set(OTBM_ATTR_DESCRIPTION, desc); }
+    void setHouseFile(const std::string& file) { m_houseFile = file; }
+    void setSpawnFile(const std::string& file) { m_spawnFile = file; }
+    void setDescription(const std::string& desc) { m_desc = desc; }
 
-    void clearDescriptions() { m_attribs.remove(OTBM_ATTR_DESCRIPTION); }
-    void setWidth(uint16_t w) { m_attribs.set(OTBM_ATTR_WIDTH, w); }
-    void setHeight(uint16_t h) { m_attribs.set(OTBM_ATTR_HEIGHT, h); }
+    void clearDescriptions() { m_desc.clear(); }
+    void setWidth(uint16_t w) { m_width = w; }
+    void setHeight(uint16_t h) { m_height = h; }
 
-    std::string getHouseFile() { return m_attribs.get<std::string>(OTBM_ATTR_HOUSE_FILE); }
-    std::string getSpawnFile() { return m_attribs.get<std::string>(OTBM_ATTR_SPAWN_FILE); }
-    Size getSize() { return { m_attribs.get<uint16_t>(OTBM_ATTR_WIDTH), m_attribs.get<uint16_t>(OTBM_ATTR_HEIGHT) }; }
-    std::vector<std::string> getDescriptions() { return stdext::split(m_attribs.get<std::string>(OTBM_ATTR_DESCRIPTION), "\n"); }
+    std::string getHouseFile() { return m_houseFile; }
+    std::string getSpawnFile() { return m_spawnFile; }
+    Size getSize() { return { m_width, m_height }; }
+    std::vector<std::string> getDescriptions() { return stdext::split(m_desc, "\n"); }
 
     void clean();
     void cleanDynamicThings();
@@ -258,10 +256,10 @@ public:
     std::vector<StaticTextPtr> getStaticTexts() { return m_staticTexts; }
 
     std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> findPath(const Position& start, const Position& goal,
-                                                                          int maxComplexity, int flags = 0);
+        int maxComplexity, int flags = 0);
     PathFindResult_ptr newFindPath(const Position& start, const Position& goal, const std::shared_ptr<std::list<Node*>>& visibleNodes);
     void findPathAsync(const Position& start, const Position& goal,
-                       const std::function<void(PathFindResult_ptr)>& callback);
+        const std::function<void(PathFindResult_ptr)>& callback);
 
     void setFloatingEffect(bool enable) { m_floatingEffect = enable; }
     bool isDrawingFloatingEffects() { return m_floatingEffect; }
@@ -283,7 +281,12 @@ private:
 
     stdext::map<uint32_t, Color> m_zoneColors;
 
-    stdext::small_storage<OTBM_ItemAttr, OTBM_ATTR_LAST> m_attribs;
+    std::string m_houseFile;
+    std::string m_spawnFile;
+    std::string m_desc;
+
+    uint16_t m_width;
+    uint16_t m_height;
 
     uint8_t m_animationFlags{ 0 };
     uint32_t m_zoneFlags{ 0 };
@@ -294,7 +297,6 @@ private:
     Position m_centralPosition;
 
     AwareRange m_awareRange;
-    static TilePtr m_nulltile;
 
     bool m_floatingEffect{ true };
 };

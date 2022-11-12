@@ -415,7 +415,7 @@ namespace Otc
         PREY_ACTION_CHANGE_FROM_ALL = 4,
         PREY_ACTION_LOCK_PREY = 5,
     };
-    enum PreyConfigState
+    enum PreyConfigState : uint8_t
     {
         PREY_CONFIG_STATE_FREE,
         PREY_CONFIG_STATE_PREMIUM,

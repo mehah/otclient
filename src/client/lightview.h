@@ -67,7 +67,7 @@ private:
     Light m_globalLight;
     Color m_globalLightColor;
 
-    DrawPoolFramed* m_pool;
+    DrawPoolFramed* m_pool{ nullptr };
 
     std::vector<Source> m_sources;
 };

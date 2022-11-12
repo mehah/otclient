@@ -242,7 +242,6 @@ private:
     }
 
     int8_t m_lockedFirstVisibleFloor{ -1 };
-
     uint8_t m_cachedFirstVisibleFloor{ SEA_FLOOR };
     uint8_t m_cachedLastVisibleFloor{ SEA_FLOOR };
     uint8_t m_tileSize{ SPRITE_SIZE };
@@ -274,8 +273,7 @@ private:
     std::array<AwareRange, Otc::InvalidDirection + 1> m_viewPortDirection;
     AwareRange m_viewport;
 
-    bool
-        m_limitVisibleDimension{ true };
+    bool m_limitVisibleDimension{ true };
     bool m_updateVisibleTiles{ true };
     bool m_resetCoveredCache{ true };
     bool m_shaderSwitchDone{ true };
@@ -307,7 +305,6 @@ private:
 
     TilePtr m_lastHighlightTile;
     TexturePtr m_crosshairTexture;
-    EffectPtr m_crosshairEffect;
 
     DrawBufferPtr m_shadowBuffer;
 };

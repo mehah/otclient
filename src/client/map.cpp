@@ -39,8 +39,9 @@
 static constexpr uint8_t MAX_VIEWPORT_X = 8;
 static constexpr uint8_t MAX_VIEWPORT_Y = 6;
 
+const static TilePtr m_nulltile;
+
 Map g_map;
-TilePtr Map::m_nulltile;
 
 void Map::init()
 {
@@ -145,9 +146,11 @@ void Map::addThing(const ThingPtr& thing, const Position& pos, int16_t stackPos)
     }
 
     if (thing->isItem() || thing->isCreature() || thing->isEffect()) {
-        const TilePtr& tile = getOrCreateTile(pos);
-        if (tile && (m_floatingEffect || !thing->isEffect() || tile->getGround())) {
-            tile->addThing(thing, stackPos);
+        if (const auto& tile = getOrCreateTile(pos)) {
+            if (m_floatingEffect || !thing->isEffect() || tile->getGround()) {
+                tile->addThing(thing, stackPos);
+                notificateTileUpdate(pos, thing, Otc::OPERATION_ADD);
+            }
         }
     } else {
         if (thing->isMissile()) {
@@ -196,8 +199,6 @@ void Map::addThing(const ThingPtr& thing, const Position& pos, int16_t stackPos)
         thing->setPosition(pos);
         thing->onAppear();
     }
-
-    notificateTileUpdate(pos, thing, Otc::OPERATION_ADD);
 }
 
 ThingPtr Map::getThing(const Position& pos, int16_t stackPos)
@@ -213,39 +214,36 @@ bool Map::removeThing(const ThingPtr& thing)
     if (!thing)
         return false;
 
-    bool ret = false;
     if (thing->isAnimatedText()) {
         const auto& animatedText = thing->static_self_cast<AnimatedText>();
         const auto it = std::find(m_animatedTexts.begin(), m_animatedTexts.end(), animatedText);
         if (it != m_animatedTexts.end()) {
             m_animatedTexts.erase(it);
-            ret = true;
+            return true;
         }
     } else if (thing->isStaticText()) {
         const auto& staticText = thing->static_self_cast<StaticText>();
         const auto it = std::find(m_staticTexts.begin(), m_staticTexts.end(), staticText);
         if (it != m_staticTexts.end()) {
             m_staticTexts.erase(it);
-            ret = true;
+            return true;
         }
-    } else {
-        if (thing->isMissile()) {
-            const auto& missile = thing->static_self_cast<Missile>();
-
-            const uint8_t z = missile->getPosition().z;
-            const auto it = std::find(m_floorMissiles[z].begin(), m_floorMissiles[z].end(), missile);
-            if (it != m_floorMissiles[z].end()) {
-                m_floorMissiles[z].erase(it);
-                ret = true;
-            }
-        } else if (const TilePtr& tile = thing->getTile()) {
-            ret = tile->removeThing(thing);
+    } else if (thing->isMissile()) {
+        const auto& missile = thing->static_self_cast<Missile>();
+        const uint8_t z = missile->getPosition().z;
+        const auto it = std::find(m_floorMissiles[z].begin(), m_floorMissiles[z].end(), missile);
+        if (it != m_floorMissiles[z].end()) {
+            m_floorMissiles[z].erase(it);
+            return true;
+        }
+    } else if (const TilePtr& tile = thing->getTile()) {
+        if (tile->removeThing(thing)) {
+            notificateTileUpdate(thing->getPosition(), thing, Otc::OPERATION_REMOVE);
+            return true;
         }
     }
 
-    notificateTileUpdate(thing->getPosition(), thing, Otc::OPERATION_REMOVE);
-
-    return ret;
+    return false;
 }
 
 bool Map::removeThingByPos(const Position& pos, int16_t stackPos)
@@ -581,7 +579,7 @@ void Map::setCentralPosition(const Position& centralPosition)
             localPlayer->onAppear();
             g_logger.debug("forced player position update");
         }
-    });
+        });
 
     for (const MapViewPtr& mapView : m_mapViews)
         mapView->onMapCenterChange(centralPosition, mapView->m_lastCameraPosition);
@@ -727,9 +725,9 @@ bool Map::isAwareOfPosition(const Position& pos)
     }
 
     return m_centralPosition.isInRange(groundedPos, m_awareRange.left,
-                                       m_awareRange.right,
-                                       m_awareRange.top,
-                                       m_awareRange.bottom);
+        m_awareRange.right,
+        m_awareRange.top,
+        m_awareRange.bottom);
 }
 
 void Map::setAwareRange(const AwareRange& range)
@@ -935,7 +933,7 @@ void Map::resetLastCamera()
 }
 
 PathFindResult_ptr Map::newFindPath(const Position& start, const Position& goal, const std::shared_ptr<std::list<Node*>>
-                                    & visibleNodes)
+    & visibleNodes)
 {
     auto ret = std::make_shared<PathFindResult>();
     ret->start = start;
@@ -1061,7 +1059,7 @@ PathFindResult_ptr Map::newFindPath(const Position& start, const Position& goal,
 }
 
 void Map::findPathAsync(const Position& start, const Position& goal, const std::function<void(PathFindResult_ptr)>&
-                        callback)
+    callback)
 {
     const auto visibleNodes = std::make_shared<std::list<Node*>>();
     for (const auto& tile : getTiles(start.z)) {
@@ -1080,5 +1078,5 @@ void Map::findPathAsync(const Position& start, const Position& goal, const std::
     g_asyncDispatcher.dispatch([=] {
         const auto ret = g_map.newFindPath(start, goal, visibleNodes);
         g_dispatcher.addEvent(std::bind(callback, ret));
-    });
+        });
 }

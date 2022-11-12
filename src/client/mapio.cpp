@@ -68,14 +68,14 @@ void Map::loadOtbm(const std::string& fileName)
         const uint32_t headerMajorItems = root->getU8();
         if (headerMajorItems > g_things.getOtbMajorVersion()) {
             throw Exception("This map was saved with different OTB version. read %d what it's supposed to be: %d",
-                            headerMajorItems, g_things.getOtbMajorVersion());
+                headerMajorItems, g_things.getOtbMajorVersion());
         }
 
         root->skip(3);
         const uint32_t headerMinorItems = root->getU32();
         if (headerMinorItems > g_things.getOtbMinorVersion()) {
             g_logger.warning(stdext::format("This map needs an updated OTB. read %d what it's supposed to be: %d or less",
-                                            headerMinorItems, g_things.getOtbMinorVersion()));
+                headerMinorItems, g_things.getOtbMinorVersion()));
         }
 
         const BinaryTreePtr node = root->getChildren()[0];
@@ -155,7 +155,7 @@ void Map::loadOtbm(const std::string& fileName)
                             default:
                             {
                                 throw Exception("invalid tile attribute %d at pos %s",
-                                                static_cast<int>(tileAttr), stdext::to_string(pos));
+                                    static_cast<int>(tileAttr), stdext::to_string(pos));
                             }
                         }
                     }
@@ -293,7 +293,7 @@ void Map::saveOtbm(const std::string& fileName)
             root->startNode(OTBM_MAP_DATA);
             {
                 root->addU8(OTBM_ATTR_DESCRIPTION);
-                root->addString(m_attribs.get<std::string>(OTBM_ATTR_DESCRIPTION));
+                root->addString(m_desc);
 
                 root->addU8(OTBM_ATTR_SPAWN_FILE);
                 root->addString(spawnFile);

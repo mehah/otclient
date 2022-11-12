@@ -62,7 +62,7 @@ void Animator::unserialize(int animationPhases, const FileStreamPtr& fin)
     assert(m_startPhase >= -1 && m_startPhase < m_animationPhases);
 }
 
-void Animator::serialize(const FileStreamPtr& fin)
+void Animator::serialize(const FileStreamPtr& fin) const
 {
     fin->addU8(m_async ? 0 : 1);
     fin->add32(m_loopCount);
@@ -125,7 +125,7 @@ int Animator::getPhase()
     return m_phase;
 }
 
-int Animator::getPhaseAt(Timer& timer)
+int Animator::getPhaseAt(Timer& timer) const
 {
     const ticks_t time = timer.ticksElapsed();
 
@@ -190,7 +190,7 @@ int Animator::getLoopPhase()
     return m_phase;
 }
 
-int Animator::getPhaseDuration(int phase)
+int Animator::getPhaseDuration(int phase) const
 {
     assert(phase < static_cast<int>(m_phaseDurations.size()));
 
@@ -221,7 +221,7 @@ void Animator::calculateSynchronous()
     m_lastPhaseTicks = ticks;
 }
 
-uint16_t Animator::getTotalDuration()
+uint16_t Animator::getTotalDuration() const
 {
     uint16_t time = 0;
     for (const auto [min, max] : m_phaseDurations) {

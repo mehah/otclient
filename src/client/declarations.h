@@ -68,7 +68,6 @@ using EffectPtr = stdext::shared_object_ptr<Effect>;
 using MissilePtr = stdext::shared_object_ptr<Missile>;
 using AnimatedTextPtr = stdext::shared_object_ptr<AnimatedText>;
 using StaticTextPtr = stdext::shared_object_ptr<StaticText>;
-using AnimatorPtr = stdext::shared_object_ptr<Animator>;
 using ThingTypePtr = stdext::shared_object_ptr<ThingType>;
 using ItemTypePtr = stdext::shared_object_ptr<ItemType>;
 using HousePtr = stdext::shared_object_ptr<House>;
