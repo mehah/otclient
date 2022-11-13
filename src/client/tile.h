@@ -207,11 +207,9 @@ private:
 
     uint32_t m_isCompletelyCovered{ 0 };
     uint32_t m_isCovered{ 0 };
-
     uint32_t m_thingTypeFlag{ 0 };
     uint32_t m_houseId{ 0 };
-
-    uint64_t m_flags{ 0 };
+    uint32_t m_flags{ 0 };
 
     std::vector<CreaturePtr> m_walkingCreatures;
     std::vector<ThingPtr> m_things;

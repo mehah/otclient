@@ -322,7 +322,7 @@ public:
     float getOpacity() { return m_opacity; }
     void setPathable(bool var);
     int getExactHeight();
-    const TexturePtr& getTexture(int animationPhase, TextureType txtType = TextureType::NONE);
+    TexturePtr getTexture(int animationPhase, TextureType txtType = TextureType::NONE);
 
 private:
     static ThingFlagAttr thingAttrToThingFlagAttr(ThingAttr attr);

@@ -742,7 +742,7 @@ void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPatte
     }
 }
 
-const TexturePtr& ThingType::getTexture(int animationPhase, const TextureType txtType)
+TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
 {
     if (m_null) return m_textureNull;
 
