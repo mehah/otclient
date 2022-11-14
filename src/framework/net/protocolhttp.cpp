@@ -264,9 +264,9 @@ void HttpSession::start()
             m_request.append("Content-Type: application/x-www-form-urlencoded\r\n");
         }
         m_request.append("Content-Length: " + std::to_string(m_result->postData.size()) + "\r\n");
-        m_request.append("\r\n");
-        m_request.append(m_result->postData + "\r\n");
         m_request.append("Connection: close\r\n\r\n");
+        m_request.append(m_result->postData);
+        
     }
 
     m_resolver.async_resolve(
@@ -448,7 +448,7 @@ void HttpSession::on_read(const std::error_code& ec, size_t bytes_transferred)
     if (ec && ec != asio::error::eof) {
         onError("HttpSession unable to on_read " + m_url + ": " + ec.message());
         return;
-    } else if (!ec && ec != asio::error::eof) {
+    } else if (ec && ec == asio::error::eof) {
         sum_bytes_response += bytes_transferred;
         sum_bytes_speed_response += bytes_transferred;
 
