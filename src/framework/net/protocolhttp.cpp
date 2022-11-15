@@ -264,9 +264,9 @@ void HttpSession::start()
             m_request.append("Content-Type: application/x-www-form-urlencoded\r\n");
         }
         m_request.append("Content-Length: " + std::to_string(m_result->postData.size()) + "\r\n");
-        m_request.append("\r\n");
-        m_request.append(m_result->postData + "\r\n");
         m_request.append("Connection: close\r\n\r\n");
+        m_request.append(m_result->postData);
+        
     }
 
     m_resolver.async_resolve(
@@ -448,49 +448,49 @@ void HttpSession::on_read(const std::error_code& ec, size_t bytes_transferred)
     if (ec && ec != asio::error::eof) {
         onError("HttpSession unable to on_read " + m_url + ": " + ec.message());
         return;
-    } else if (!ec && ec != asio::error::eof) {
-        sum_bytes_response += bytes_transferred;
-        sum_bytes_speed_response += bytes_transferred;
+    }
+    
+    sum_bytes_response += bytes_transferred;
+    sum_bytes_speed_response += bytes_transferred;
 
-        if (stdext::millis() > m_last_progress_update) {
-            m_result->speed = (sum_bytes_speed_response) / ((stdext::millis() - (m_last_progress_update - 100)));
+    if (stdext::millis() > m_last_progress_update) {
+        m_result->speed = (sum_bytes_speed_response) / ((stdext::millis() - (m_last_progress_update - 100)));
 
-            m_result->progress = ((double)sum_bytes_response / m_result->size) * 100;
-            m_last_progress_update = stdext::millis() + 100;
-            sum_bytes_speed_response = 0;
-            m_callback(m_result);
-        }
+        m_result->progress = ((double)sum_bytes_response / m_result->size) * 100;
+        m_last_progress_update = stdext::millis() + 100;
+        sum_bytes_speed_response = 0;
+        m_callback(m_result);
+    }
 
-        if (m_enable_time_out_on_read_write) {
-            m_timer.expires_after(std::chrono::seconds(m_timeout));
-            m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec) {sft->onTimeout(ec); });
-        } else {
-            m_timer.cancel();
-        }
+    if (m_enable_time_out_on_read_write) {
+        m_timer.expires_after(std::chrono::seconds(m_timeout));
+        m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec) {sft->onTimeout(ec); });
+    } else {
+        m_timer.cancel();
+    }
 
-        if (instance_uri.port == "443") {
-            asio::async_read(m_ssl, m_response,
-                             asio::transfer_at_least(1),
-                             [sft = shared_from_this(), on_done_read](
-                                 const std::error_code& ec, size_t bytes) {
-                if (bytes > 0) {
-                    sft->on_read(ec, bytes);
-                } else {
-                    on_done_read();
-                }
-            });
-        } else {
-            asio::async_read(m_socket, m_response,
-                             asio::transfer_at_least(1),
-                             [sft = shared_from_this(), on_done_read](
-                                 const std::error_code& ec, size_t bytes) {
-                if (bytes > 0) {
-                    sft->on_read(ec, bytes);
-                } else {
-                    on_done_read();
-                }
-            });
-        }
+    if (instance_uri.port == "443") {
+        asio::async_read(m_ssl, m_response,
+                         asio::transfer_at_least(1),
+                         [sft = shared_from_this(), on_done_read](
+                             const std::error_code& ec, size_t bytes) {
+            if (bytes > 0) {
+                sft->on_read(ec, bytes);
+            } else {
+                on_done_read();
+            }
+        });
+    } else {
+        asio::async_read(m_socket, m_response,
+                         asio::transfer_at_least(1),
+                         [sft = shared_from_this(), on_done_read](
+                             const std::error_code& ec, size_t bytes) {
+            if (bytes > 0) {
+                sft->on_read(ec, bytes);
+            } else {
+                on_done_read();
+            }
+        });
     }
 }
 
