@@ -1,4 +1,4 @@
-local function pcolored(text, color)
+function pcolored(text, color)
     color = color or 'white'
     modules.client_terminal.addLine(tostring(text), color)
 end
@@ -17,96 +17,6 @@ end
 
 function live_textures_reload()
     g_textures.liveReload()
-end
-
-function live_module_reload(name)
-    if not name then
-        pcolored('ERROR: missing module name', 'red')
-        return
-    end
-
-    local module = g_modules.getModule(name)
-    if not module then
-        pcolored('ERROR: unable to find module ' .. name, 'red')
-        return
-    end
-
-    if not module:isReloadble() then
-        pcolored('ERROR: that module is not reloadable', 'red')
-        return
-    end
-
-    if not module:canReload() then
-        pcolored('ERROR: some other modules requires this module, cannot reload now', 'red')
-        return
-    end
-
-    local files = {}
-    local hasFile = false
-    for _, file in pairs(g_resources.listDirectoryFiles('/' .. name)) do
-        local filepath = '/' .. name .. '/' .. file
-        local time = g_resources.getFileTime(filepath)
-        if time > 0 then
-            files[filepath] = time
-            hasFile = true
-        end
-    end
-
-    if not hasFile then
-        pcolored('ERROR: unable to find any file for module', 'red')
-        return
-    end
-
-    return cycleEvent(function()
-        for filepath, time in pairs(files) do
-            local newtime = g_resources.getFileTime(filepath)
-            if newtime > time then
-                pcolored('Reloading ' .. name, 'green')
-                modules.client_terminal.flushLines()
-                module:reload()
-                files[filepath] = newtime
-
-                if name == 'client_terminal' then
-                    modules.client_terminal.show()
-                end
-                break
-            end
-        end
-    end, 1000)
-end
-
-function live_sprites_reload()
-    local files = {}
-    for _, file in pairs(g_resources.listDirectoryFiles('/things')) do
-        local filepath = '/things/' .. file
-        local time = g_resources.getFileTime(filepath)
-        if time > 0 then
-            files[filepath] = time
-            hasFile = true
-        end
-    end
-
-    if not hasFile then
-        pcolored('ERROR: unable to find things file for module', 'red')
-        return
-    end
-
-    cycleEvent(function()
-        for filepath, time in pairs(files) do
-            local newtime = g_resources.getFileTime(filepath)
-            if newtime > time then
-                pcolored('Reloading sprites...', 'green')
-                modules.client_terminal.flushLines()
-                modules.game_things.load()
-                files[filepath] = newtime
-
-                if name == 'client_terminal' then
-                    modules.client_terminal.show()
-                end
-                break
-            end
-        end
-    end, 1000)
 end
 
 local pinging = false

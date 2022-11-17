@@ -276,15 +276,30 @@ bool ResourceManager::makeDir(const std::string& directory)
     return PHYSFS_mkdir(directory.c_str());
 }
 
-std::list<std::string> ResourceManager::listDirectoryFiles(const std::string& directoryPath)
+std::list<std::string> ResourceManager::listDirectoryFiles(const std::string& directoryPath, bool fullPath /* = false */, bool raw /*= false*/, bool recursive)
 {
     std::list<std::string> files;
-    auto* const rc = PHYSFS_enumerateFiles(resolvePath(directoryPath).c_str());
+    const auto path = raw ? directoryPath : resolvePath(directoryPath);
+    const auto rc = PHYSFS_enumerateFiles(path.c_str());
 
-    for (int i = 0; rc[i] != nullptr; ++i)
-        files.emplace_back(rc[i]);
+    if (!rc)
+        return files;
+
+    for (int i = 0; rc[i] != nullptr; i++) {
+        std::string fileOrDir = rc[i];
+        if (fullPath)
+            fileOrDir = path + "/" + fileOrDir;
+
+        if (recursive && directoryExists("/" + fileOrDir)) {
+            const auto& moreFiles = listDirectoryFiles(fileOrDir, fullPath, raw);
+            files.insert(files.end(), moreFiles.begin(), moreFiles.end());
+        } else {
+            files.push_back(fileOrDir);
+        }
+    }
 
     PHYSFS_freeList(rc);
+    files.sort();
     return files;
 }
 

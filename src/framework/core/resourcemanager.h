@@ -61,7 +61,7 @@ public:
     bool deleteFile(const std::string& fileName);
 
     bool makeDir(const std::string& directory);
-    std::list<std::string> listDirectoryFiles(const std::string& directoryPath = "");
+    std::list<std::string> listDirectoryFiles(const std::string& directoryPath = "", bool fullPath = false, bool raw = false, bool recursive = false);
     std::vector<std::string> getDirectoryFiles(const std::string& path, bool filenameOnly, bool recursive);
 
     std::string resolvePath(const std::string& path);

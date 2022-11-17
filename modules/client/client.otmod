@@ -17,5 +17,5 @@ Module
     - client_options
     - client_entergame
     - client_terminal
-    - client_modulemanager
+    - client_autoreloadmodule
     - client_serverlist
