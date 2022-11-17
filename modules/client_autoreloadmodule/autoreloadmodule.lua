@@ -6,19 +6,6 @@ function init()
     for i, module in ipairs(g_modules.getModules()) do
         local id = live_module_reload(module)
     end
-
-    local otmlPath = '/data/game.otml';
-    local otmlTime = g_resources.getFileTime(otmlPath)
-
-    -- otml auto reload
-    cycleEvent(function()
-        local newtime = g_resources.getFileTime(otmlPath)
-        if newtime > otmlTime then
-            pcolored('Reloading Game OTML')
-            g_things.loadOtml(otmlPath)
-            otmlTime = newtime
-        end
-    end, 1000)
 end
 
 function live_module_reload(module)
