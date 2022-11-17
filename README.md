@@ -58,7 +58,7 @@
 
    </h2>
 
-[![Build Status](https://github.com/edubart/otclient/actions/workflows/build-vcpkg.yml/badge.svg)](https://github.com/edubart/otclient/actions/workflows/build-vcpkg.yml) [![Join the chat at https://gitter.im/edubart/otclient](https://img.shields.io/badge/GITTER-join%20chat-green.svg)](https://gitter.im/edubart/otclient?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Open Source Helpers](https://www.codetriage.com/edubart/otclient/badges/users.svg)](https://www.codetriage.com/edubart/otclient)
+[![Build Status](https://github.com/mehah/otclient/actions/workflows/build-vcpkg.yml/badge.svg)](https://github.com/mehah/otclient/actions/workflows/build-vcpkg.yml) [![Join the chat at https://gitter.im/mehah/otclient](https://img.shields.io/badge/GITTER-join%20chat-green.svg)](https://gitter.im/mehah/otclient?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Open Source Helpers](https://www.codetriage.com/mehah/otclient/badges/users.svg)](https://www.codetriage.com/mehah/otclient)
 
 ### What is otclient?
 
@@ -81,7 +81,7 @@ Tasks that need to do:
 - [ ] Adapt the UI reusing the existing lua code
 
 Current compiling tutorials:
-* [Compiling for Android](https://github.com/edubart/mehah/wiki/Compiling-for-Android)
+* [Compiling for Android](https://github.com/mehah/otclient/wiki/Compiling-on-Android)
 
 ### Where do I download?
 
@@ -110,7 +110,7 @@ client, instead otclient was designed to be a combination of a framework and tib
 To build the image:
 
 ```sh
-docker build -t edubart/otclient .
+docker build -t mehah/otclient .
 ```
 
 To run the built image:
@@ -124,7 +124,7 @@ docker run -it --rm \
   --env DISPLAY \
   --volume /tmp/.X11-unix:/tmp/.X11-unix \
   --device /dev/dri \
-  --device /dev/snd edubart/otclient /bin/bash
+  --device /dev/snd mehah/otclient /bin/bash
 
 # Enable access control for the X server.
 xhost -
@@ -137,15 +137,7 @@ or talk with us at the gitter chat.
 
 ### Bugs
 
-Have found a bug? Please create an issue in our [bug tracker](https://github.com/edubart/otclient/issues)
-
-### Contributing
-
-We encourage you to contribute to otclient! You can make pull requests of any improvement in our github page, alternatively, see [Contributing Wiki Page](https://github.com/edubart/otclient/wiki/Contributing).
-
-### Contact
-
-Talk directly with us at the gitter chat [![Join the chat at https://gitter.im/edubart/otclient](https://img.shields.io/badge/GITTER-join%20chat-green.svg)](https://gitter.im/edubart/otclient?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge).
+Have found a bug? Please create an issue in our [bug tracker](https://github.com/mehah/otclient/issues)
 
 ### License
 
