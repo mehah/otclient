@@ -358,6 +358,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
         m_numPatternY = spriteInfo.pattern_height();
         m_numPatternZ = spriteInfo.pattern_depth();
         m_layers = spriteInfo.layers();
+        m_opaque = spriteInfo.is_opaque();
 
         m_animationPhases += std::max<int>(1, spritesPhases.size());
 
@@ -858,6 +859,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
     if (m_opacity < 1.0f)
         fullImage->setTransparentPixel(true);
 
+    if(m_opaque == -1)
     m_opaque = !fullImage->hasTransparentPixel();
 
     animationPhaseTexture = TexturePtr(new Texture(fullImage, true, false, m_size.area() == 1 && !hasElevation(), false));
