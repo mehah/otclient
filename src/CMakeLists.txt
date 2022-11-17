@@ -94,6 +94,10 @@ if(THREADS_HAVE_PTHREAD_ARG)
 	target_compile_options(${PROJECT_NAME} PUBLIC "-pthread")
 endif()
 
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+	add_definitions(-DNDEBUG)
+endif()
+
 # *****************************************************************************
 # Definitions code
 # *****************************************************************************

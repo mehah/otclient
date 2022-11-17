@@ -287,7 +287,6 @@ void UIManager::onWidgetDestroy(const UIWidgetPtr& widget)
     if (m_draggingWidget == widget)
         updateDraggingWidget(nullptr);
 
-#ifndef NDEBUG
     if (widget == m_rootWidget || !m_rootWidget)
         return;
 
@@ -306,9 +305,8 @@ void UIManager::onWidgetDestroy(const UIWidgetPtr& widget)
                 if (widget->ref_count() != 1)
                     g_logger.warning(stdext::format("widget '%s' destroyed but still have %d reference(s) left", widget->getId(), widget->getUseCount() - 1));
             }
-        }, 1);
-    }, 1000);
-#endif
+            }, 1);
+        }, 1000);
 }
 
 void UIManager::clearStyles()
