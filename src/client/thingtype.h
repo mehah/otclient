@@ -313,7 +313,7 @@ public:
     bool isPodium() { return (m_flags & ThingFlagAttrPodium); }
     bool isTopEffect() { return (m_flags & ThingFlagAttrTopEffect); }
     bool hasAction() { return (m_flags & ThingFlagAttrDefaultAction); }
-    bool isOpaque() { getTexture(0); return m_opaque; }
+    bool isOpaque() { if (m_opaque == -1) getTexture(0); return m_opaque == 1; }
 
     uint16_t getClassification() { return m_upgradeClassification; }
     std::vector<uint32_t> getSprites() { return m_spritesIndex; }
@@ -346,7 +346,7 @@ private:
     ThingCategory m_category{ ThingInvalidCategory };
 
     bool m_null{ true };
-    bool m_opaque{ false };
+    int8_t m_opaque{ -1 };
 
     Size m_size;
     Point m_displacement;
