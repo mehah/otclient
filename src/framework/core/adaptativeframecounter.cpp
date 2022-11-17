@@ -23,8 +23,6 @@
 #include "adaptativeframecounter.h"
 #include <framework/platform/platformwindow.h>
 
-void AdaptativeFrameCounter::start() { if (m_maxFps > 0) m_startTime = stdext::micros(); }
-
 bool AdaptativeFrameCounter::update()
 {
     ++m_fpsCount;

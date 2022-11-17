@@ -45,7 +45,7 @@ public:
     int getMaxFps() { return m_frameCounter.getMaxFps(); }
 
     bool isOnInputEvent() { return m_onInputEvent; }
-    bool mustOptimize(bool critical = false) { return m_optimize && getFps() < (critical ? 50 : 60); }
+    bool mustOptimize(bool critical = false) { return m_optimize && getCPUInterval() > (critical ? 15000u : 8000u); }
     bool isForcedEffectOptimization() { return m_forceEffectOptimization; }
 
     void optimize(const bool optimize) { m_optimize = optimize; }
@@ -55,6 +55,9 @@ public:
     bool isDrawingEffectsOnTop() { return m_drawEffectOnTop || mustOptimize(); }
 
     void repaint();
+
+    void updateCPUInterval() { m_frameCounter.updateCPUInterval(); }
+    uint32_t getCPUInterval() const { return m_frameCounter.getCPUInterval(); }
 
 protected:
     void resize(const Size& size);

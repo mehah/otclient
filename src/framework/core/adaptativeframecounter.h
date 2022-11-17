@@ -33,20 +33,25 @@ public:
     AdaptativeFrameCounter() : m_interval(stdext::millis()) {}
 
     bool update();
-    void start();
 
-    uint32_t getFps() const { return m_fps; }
-    uint32_t getMaxFps() const { return m_maxFps; }
+    uint16_t getFps() const { return m_fps; }
+    uint16_t getMaxFps() const { return m_maxFps; }
+    uint32_t getCPUInterval() const { return m_cpuInterval; }
 
-    void setMaxFps(const uint32_t max) { m_maxFps = max; }
+    void start() { m_startTime = stdext::micros(); }
+    void setMaxFps(const uint8_t max) { m_maxFps = max; }
+    void updateCPUInterval() { m_cpuInterval = stdext::micros() - m_startTime; }
 
 private:
     int getMaxPeriod() const { return 1000000 / m_maxFps; }
 
-    uint32_t m_fps{ 0 };
-    uint32_t m_maxFps{ 0 };
-    uint32_t m_fpsCount{ 0 };
-    uint32_t m_interval{ 0 };
+    uint8_t m_maxFps{};
 
-    ticks_t m_startTime{ 0 };
+    uint16_t m_fps{};
+    uint16_t m_fpsCount{ };
+
+    uint32_t m_cpuInterval{};
+    uint32_t m_interval{};
+
+    ticks_t m_startTime{};
 };
