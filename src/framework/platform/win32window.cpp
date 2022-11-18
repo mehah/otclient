@@ -217,11 +217,11 @@ void WIN32Window::init()
 
     // create a device class using this information and information from the d3dpp stuct
     m_d3d->CreateDevice(D3DADAPTER_DEFAULT,
-                        D3DDEVTYPE_HAL,
-                        m_window,
-                        D3DCREATE_SOFTWARE_VERTEXPROCESSING,
-                        &d3dpp,
-                        &m_d3ddev);
+        D3DDEVTYPE_HAL,
+        m_window,
+        D3DCREATE_SOFTWARE_VERTEXPROCESSING,
+        &d3dpp,
+        &m_d3ddev);
 
 #endif
 
@@ -299,17 +299,17 @@ void WIN32Window::internalCreateWindow()
 
     updateUnmaximizedCoords();
     m_window = CreateWindowExA(dwExStyle,
-                               g_app.getCompactName().data(),
-                               nullptr,
-                               dwStyle,
-                               screenRect.left(),
-                               screenRect.top(),
-                               screenRect.width(),
-                               screenRect.height(),
-                               nullptr,
-                               nullptr,
-                               m_instance,
-                               nullptr);
+        g_app.getCompactName().data(),
+        nullptr,
+        dwStyle,
+        screenRect.left(),
+        screenRect.top(),
+        screenRect.width(),
+        screenRect.height(),
+        nullptr,
+        nullptr,
+        m_instance,
+        nullptr);
 
     if (!m_window)
         g_logger.fatal("Unable to create window");
@@ -653,7 +653,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
             SetCapture(m_window);
             m_inputEvent.reset(Fw::MousePressInputEvent);
             m_inputEvent.mouseButton = Fw::MouseLeftButton;
-            m_mouseButtonStates[Fw::MouseLeftButton] = true;
+            m_mouseButtonStates |= Fw::MouseLeftButton;
             if (m_onInputEvent)
                 m_onInputEvent(m_inputEvent);
             break;
@@ -663,7 +663,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
             SetCapture(nullptr);
             m_inputEvent.reset(Fw::MouseReleaseInputEvent);
             m_inputEvent.mouseButton = Fw::MouseLeftButton;
-            m_mouseButtonStates[Fw::MouseLeftButton] = false;
+            m_mouseButtonStates &= ~Fw::MouseLeftButton;
             if (m_onInputEvent)
                 m_onInputEvent(m_inputEvent);
             break;
@@ -673,7 +673,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
             SetCapture(m_window);
             m_inputEvent.reset(Fw::MousePressInputEvent);
             m_inputEvent.mouseButton = Fw::MouseMidButton;
-            m_mouseButtonStates[Fw::MouseMidButton] = true;
+            m_mouseButtonStates |= Fw::MouseMidButton;
             if (m_onInputEvent)
                 m_onInputEvent(m_inputEvent);
             break;
@@ -683,7 +683,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
             SetCapture(nullptr);
             m_inputEvent.reset(Fw::MouseReleaseInputEvent);
             m_inputEvent.mouseButton = Fw::MouseMidButton;
-            m_mouseButtonStates[Fw::MouseMidButton] = false;
+            m_mouseButtonStates &= ~Fw::MouseMidButton;
             if (m_onInputEvent)
                 m_onInputEvent(m_inputEvent);
             break;
@@ -693,7 +693,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
             SetCapture(m_window);
             m_inputEvent.reset(Fw::MousePressInputEvent);
             m_inputEvent.mouseButton = Fw::MouseRightButton;
-            m_mouseButtonStates[Fw::MouseRightButton] = true;
+            m_mouseButtonStates |= Fw::MouseRightButton;
             if (m_onInputEvent)
                 m_onInputEvent(m_inputEvent);
             break;
@@ -703,11 +703,39 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
             SetCapture(nullptr);
             m_inputEvent.reset(Fw::MouseReleaseInputEvent);
             m_inputEvent.mouseButton = Fw::MouseRightButton;
-            m_mouseButtonStates[Fw::MouseRightButton] = false;
+            m_mouseButtonStates &= ~Fw::MouseRightButton;
             if (m_onInputEvent)
                 m_onInputEvent(m_inputEvent);
             break;
         }
+
+        case WM_XBUTTONDOWN:
+        {
+            SetCapture(m_window);
+
+            const uint32_t mouseButton = (Fw::MouseXButton - 1) + GET_XBUTTON_WPARAM(wParam);
+            m_inputEvent.reset(Fw::MousePressInputEvent);
+            m_inputEvent.mouseButton = static_cast<Fw::MouseButton>(mouseButton);
+            m_mouseButtonStates |= mouseButton;
+            if (m_onInputEvent)
+                m_onInputEvent(m_inputEvent);
+
+            break;
+        }
+        case WM_XBUTTONUP:
+        {
+            SetCapture(nullptr);
+
+            const uint32_t mouseButton = (Fw::MouseXButton - 1) + GET_XBUTTON_WPARAM(wParam);
+            m_inputEvent.reset(Fw::MouseReleaseInputEvent);
+            m_inputEvent.mouseButton = static_cast<Fw::MouseButton>(mouseButton);
+            m_mouseButtonStates &= ~mouseButton;
+            if (m_onInputEvent)
+                m_onInputEvent(m_inputEvent);
+
+            break;
+        }
+
         case WM_MOUSEMOVE:
         {
             m_inputEvent.reset(Fw::MouseMoveInputEvent);

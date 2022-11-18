@@ -166,9 +166,7 @@ void PlatformWindow::releaseAllKeys()
     }
 
     m_inputEvent.keyboardModifiers = 0;
-
-    for (auto& mouseButtonState : m_mouseButtonStates)
-        mouseButtonState = false;
+    m_mouseButtonStates = 0;
 }
 
 void PlatformWindow::fireKeysPress()

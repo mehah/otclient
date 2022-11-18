@@ -250,7 +250,8 @@ namespace Fw
         MouseNoButton = 0,
         MouseLeftButton,
         MouseRightButton,
-        MouseMidButton
+        MouseMidButton,
+        MouseXButton
     };
 
     enum MouseWheelDirection
