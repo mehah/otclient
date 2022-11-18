@@ -930,12 +930,13 @@ int Creature::getCurrentAnimationPhase(const bool mount)
 
 int Creature::getExactSize(int layer, int xPattern, int yPattern, int zPattern, int animationPhase)
 {
-    yPattern = getNumPatternY();
+    const int numPatternY = getNumPatternY();
+
     zPattern = m_outfit.hasMount() ? 1 : 0;
 
     const int layers = getLayers();
     int exactSize = 0;
-    for (int yPattern = 0; yPattern < yPattern; ++yPattern) {
+    for (yPattern = 0; yPattern < numPatternY; ++yPattern) {
         if (yPattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
             continue;
 
