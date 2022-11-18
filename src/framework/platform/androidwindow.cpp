@@ -252,8 +252,12 @@ void AndroidWindow::processFingerdownAndFingerup() {
 
     m_inputEvent.reset();
     m_inputEvent.type = (isTouchdown) ? Fw::MousePressInputEvent : Fw::MouseReleaseInputEvent;
-    m_inputEvent.mouseButton = Fw::MouseLeftButton;
-    m_mouseButtonStates[mouseButton] = isTouchdown;
+    m_inputEvent.mouseButton = mouseButton;
+	if(isTouchdown) {
+		m_mouseButtonStates |= mouseButton;
+	} else {
+		m_mouseButtonStates &= ~mouseButton;
+	}
 
     Point newMousePos(m_currentEvent.x, m_currentEvent.y);
     m_inputEvent.mouseMoved = newMousePos - m_inputEvent.mousePos;

@@ -770,15 +770,15 @@ void X11Window::poll()
                 switch(event.xbutton.button) {
                     case Button1:
                         m_inputEvent.mouseButton = Fw::MouseLeftButton;
-                        m_mouseButtonStates[Fw::MouseLeftButton] = (event.type == ButtonPress);
+						if(event.type == ButtonPress) m_mouseButtonStates |= Fw::MouseLeftButton; else m_mouseButtonStates &= ~Fw::MouseLeftButton;
                         break;
                     case Button3:
                         m_inputEvent.mouseButton = Fw::MouseRightButton;
-                        m_mouseButtonStates[Fw::MouseRightButton] = (event.type == ButtonPress);
+						if(event.type == ButtonPress) m_mouseButtonStates |= Fw::MouseRightButton; else m_mouseButtonStates &= ~Fw::MouseRightButton;
                         break;
                     case Button2:
                         m_inputEvent.mouseButton = Fw::MouseMidButton;
-                        m_mouseButtonStates[Fw::MouseMidButton] = (event.type == ButtonPress);
+						if(event.type == ButtonPress) m_mouseButtonStates |= Fw::MouseMidButton; else m_mouseButtonStates &= ~Fw::MouseMidButton;
                         break;
                     case Button4:
                         if(event.type == ButtonPress) {

@@ -84,7 +84,7 @@ public:
     int getKeyboardModifiers() { return m_inputEvent.keyboardModifiers; }
 
     bool isKeyPressed(Fw::Key keyCode) { return m_keysState[keyCode]; }
-    bool isMouseButtonPressed(Fw::MouseButton mouseButton) { return m_mouseButtonStates[mouseButton]; }
+    bool isMouseButtonPressed(Fw::MouseButton mouseButton) { return (m_mouseButtonStates & mouseButton) == mouseButton; }
     bool isVisible() { return m_visible; }
     bool isMaximized() { return m_maximized; }
     bool isFullscreen() { return m_fullscreen; }
@@ -118,7 +118,9 @@ protected:
     Size m_unmaximizedSize;
     Point m_unmaximizedPos;
     InputEvent m_inputEvent;
-    bool m_mouseButtonStates[4]{ false };
+
+    uint32_t m_mouseButtonStates{ 0 };
+
     bool m_created{ false };
     bool m_visible{ false };
     bool m_focused{ false };
