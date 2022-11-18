@@ -23,7 +23,6 @@
 #include "drawpoolmanager.h"
 #include "declarations.h"
 #include "painter.h"
-#include <utility>
 
 DrawPoolManager g_drawPool;
 
@@ -231,10 +230,10 @@ void DrawPoolManager::use(const DrawPoolType type, const Rect& dest, const Rect&
     if (m_currentPool->hasFrameBuffer()) {
         m_currentPool->toPoolFramed()
             ->m_framebuffer->prepare(dest, src, colorClear);
-    }
 
-    // when the selected pool is MAP, reset the creature information state.
-    if (type == DrawPoolType::MAP) {
-        get<DrawPool>(DrawPoolType::CREATURE_INFORMATION)->resetState();
+        // when the selected pool is MAP, reset the creature information state.
+        if (type == DrawPoolType::MAP) {
+            get<DrawPool>(DrawPoolType::CREATURE_INFORMATION)->resetState();
+        }
     }
 }

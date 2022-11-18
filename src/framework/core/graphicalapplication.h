@@ -45,7 +45,7 @@ public:
     int getMaxFps() { return m_frameCounter.getMaxFps(); }
 
     bool isOnInputEvent() { return m_onInputEvent; }
-    bool mustOptimize(bool critical = false) { return m_optimize && getCPUInterval() > (critical ? 15000u : 8000u); }
+    bool mustOptimize(bool critical = false) { return critical && m_forceCriticalOptimization || m_optimize && getCPUInterval() > (critical ? 15000u : 8000u); }
     bool isForcedEffectOptimization() { return m_forceEffectOptimization; }
 
     void optimize(const bool optimize) { m_optimize = optimize; }
@@ -59,6 +59,8 @@ public:
     void updateCPUInterval() { m_frameCounter.updateCPUInterval(); }
     uint32_t getCPUInterval() const { return m_frameCounter.getCPUInterval(); }
 
+    void forceCriticalOptimization(bool force) { m_forceCriticalOptimization = force; }
+
 protected:
     void resize(const Size& size);
     void inputEvent(const InputEvent& event);
@@ -68,6 +70,7 @@ private:
     bool m_optimize{ true };
     bool m_forceEffectOptimization{ false };
     bool m_drawEffectOnTop{ false };
+    bool m_forceCriticalOptimization{ false };
 
     Timer m_foregroundRefreshTime;
 

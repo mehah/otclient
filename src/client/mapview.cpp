@@ -82,12 +82,12 @@ MapView::MapView()
         }
 
         g_painter->setOpacity(fadeOpacity);
-    });
+        });
 
     mapPool->onAfterDraw([&] {
         g_painter->resetShaderProgram();
         g_painter->resetOpacity();
-    });
+        });
 
     m_shadowBuffer = std::make_shared<DrawBuffer>(DrawPool::DrawOrder::FIFTH, false);
     m_shader = g_shaders.getDefaultMapShader();
@@ -397,6 +397,16 @@ void MapView::updateVisibleTiles()
 
 void MapView::updateGeometry(const Size& visibleDimension)
 {
+    m_scaleFactor = m_antiAliasingMode == ANTIALIASING_SMOOTH_RETRO ? 2.f : 1.f;
+
+    size_t maxSize = std::max<size_t>(visibleDimension.width(), visibleDimension.height());
+    g_app.forceCriticalOptimization(maxSize > 100);
+
+    while (maxSize > 100) {
+        maxSize /= 2;
+        m_scaleFactor /= 2;
+    }
+
     const uint8_t tileSize = SPRITE_SIZE * m_scaleFactor;
     const auto& drawDimension = visibleDimension + 3;
     const auto& bufferSize = drawDimension * tileSize;
@@ -557,10 +567,10 @@ void MapView::setFloorViewMode(FloorViewMode floorViewMode)
 
 void MapView::setAntiAliasingMode(const AntialiasingMode mode)
 {
+    m_antiAliasingMode = mode;
+
     g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP)
         ->setSmooth(mode != ANTIALIASING_DISABLED);
-
-    m_scaleFactor = mode == ANTIALIASING_SMOOTH_RETRO ? 2.f : 1.f;
 
     if (m_lightView) m_lightView->setSmooth(mode != ANTIALIASING_DISABLED);
 

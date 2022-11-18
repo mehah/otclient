@@ -247,7 +247,6 @@ private:
     uint8_t m_tileSize{ SPRITE_SIZE };
     uint8_t m_floorMin{ 0 };
     uint8_t m_floorMax{ 0 };
-    uint8_t m_antiAliasingMode;
 
     uint16_t m_floorFading = 500;
 
@@ -288,6 +287,8 @@ private:
     bool m_drawViewportEdge{ false };
     bool m_drawHighlightTarget{ false };
     bool m_shiftPressed{ false };
+
+    AntialiasingMode m_antiAliasingMode{ AntialiasingMode::ANTIALIASING_DISABLED };
 
     std::array<MapObject, MAX_Z + 1> m_cachedVisibleTiles;
 
