@@ -36,26 +36,30 @@ class Outfit
 public:
     static Color getColor(int color);
 
-    void setId(int id) { m_id = id; }
-    void setAuxId(int id) { m_auxId = id; }
-    void setHead(int head) { m_head = head; m_headColor = getColor(head); }
-    void setBody(int body) { m_body = body; m_bodyColor = getColor(body); }
-    void setLegs(int legs) { m_legs = legs; m_legsColor = getColor(legs); }
-    void setFeet(int feet) { m_feet = feet; m_feetColor = getColor(feet); }
-    void setAddons(int addons) { m_addons = addons; }
-    void setMount(int mount) { m_mount = mount; }
+    void setId(uint16_t id) { m_id = id; }
+    void setAuxId(uint16_t id) { m_auxId = id; }
+    void setMount(uint16_t mount) { m_mount = mount; }
+
+    void setHead(uint8_t head) { m_head = head; m_headColor = getColor(head); }
+    void setBody(uint8_t body) { m_body = body; m_bodyColor = getColor(body); }
+    void setLegs(uint8_t legs) { m_legs = legs; m_legsColor = getColor(legs); }
+    void setFeet(uint8_t feet) { m_feet = feet; m_feetColor = getColor(feet); }
+    void setAddons(uint8_t addons) { m_addons = addons; }
+
     void setCategory(ThingCategory category) { m_category = category; }
 
     void resetClothes();
 
-    int getId() const { return m_id; }
-    int getAuxId() const { return m_auxId; }
-    int getHead() const { return m_head; }
-    int getBody() const { return m_body; }
-    int getLegs() const { return m_legs; }
-    int getFeet() const { return m_feet; }
-    int getAddons() const { return m_addons; }
-    int getMount() const { return m_mount; }
+    uint16_t getId() const { return m_id; }
+    uint16_t getAuxId() const { return m_auxId; }
+    uint16_t getMount() const { return m_mount; }
+
+    uint8_t getHead() const { return m_head; }
+    uint8_t getBody() const { return m_body; }
+    uint8_t getLegs() const { return m_legs; }
+    uint8_t getFeet() const { return m_feet; }
+    uint8_t getAddons() const { return m_addons; }
+
 
     bool hasMount() const { return m_mount > 0; }
 
@@ -83,14 +87,16 @@ public:
 private:
     ThingCategory m_category{ ThingCategoryCreature };
 
-    int m_id{ 1 };
-    int m_auxId{ 0 };
-    int m_head{ 0 };
-    int m_body{ 0 };
-    int m_legs{ 0 };
-    int m_feet{ 0 };
-    int m_addons{ 0 };
-    int m_mount{ 0 };
+    uint16_t m_id{ 0 };
+    uint16_t m_auxId{ 0 };
+    uint16_t m_mount{ 0 };
+
+    uint8_t m_head{ 0 };
+    uint8_t m_body{ 0 };
+    uint8_t m_legs{ 0 };
+    uint8_t m_feet{ 0 };
+    uint8_t m_addons{ 0 };
+
     Color m_headColor;
     Color m_bodyColor;
     Color m_legsColor;
