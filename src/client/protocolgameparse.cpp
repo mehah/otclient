@@ -521,7 +521,7 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
         }
     } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("ProtocolGame parse message exception (%d bytes unread, last opcode is %d, prev opcode is %d): %s",
-                                      msg->getUnreadSize(), opcode, prevOpcode, e.what()));
+            msg->getUnreadSize(), opcode, prevOpcode, e.what()));
     }
 }
 
@@ -2352,7 +2352,7 @@ void ProtocolGame::parseChangeMapAwareRange(const InputMessagePtr& msg)
         .top = static_cast<uint8_t>(yrange / 2 - (yrange + 1) % 2),
         .right = static_cast<uint8_t>(xrange / 2),
         .bottom = static_cast<uint8_t>(yrange / 2)
-                        });
+        });
 
     g_lua.callGlobalField("g_game", "onMapChangeAwareRange", xrange, yrange);
 }
@@ -2584,17 +2584,18 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type)
             int creatureType;
             if (g_game.getClientVersion() >= 910)
                 creatureType = msg->getU8();
-            else {
-                if (id >= Proto::PlayerStartId && id < Proto::PlayerEndId)
-                    creatureType = Proto::CreatureTypePlayer;
-                else if (id >= Proto::MonsterStartId && id < Proto::MonsterEndId)
-                    creatureType = Proto::CreatureTypeMonster;
-                else
-                    creatureType = Proto::CreatureTypeNpc;
-            }
+            else if (id >= Proto::PlayerStartId && id < Proto::PlayerEndId)
+                creatureType = Proto::CreatureTypePlayer;
+            else if (id >= Proto::MonsterStartId && id < Proto::MonsterEndId)
+                creatureType = Proto::CreatureTypeMonster;
+            else
+                creatureType = Proto::CreatureTypeNpc;
 
+            uint32_t masterId = 0;
             if (g_game.getClientVersion() >= 1281 && creatureType == Proto::CreatureTypeSummonOwn) {
-                msg->getU32(); // master id
+                masterId = msg->getU32();
+                if (m_localPlayer->getId() != masterId)
+                    creatureType = Proto::CreatureTypeSummonOther;
             }
 
             const auto name = g_game.formatCreatureName(msg->getString());
@@ -2628,6 +2629,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type)
             if (creature) {
                 creature->setId(id);
                 creature->setName(name);
+                creature->setMasterId(masterId);
 
                 g_map.addCreature(creature);
             }
@@ -2668,9 +2670,12 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type)
             creatureType = msg->getU8();
         }
 
+        uint32_t masterId = 0;
         if (g_game.getClientVersion() >= 1281) {
             if (creatureType == Proto::CreatureTypeSummonOwn) {
-                msg->getU32(); // master id
+                masterId = msg->getU32();
+                if (m_localPlayer->getId() != masterId)
+                    creatureType = Proto::CreatureTypeSummonOther;
             } else if (creatureType == Proto::CreatureTypePlayer) {
                 msg->getU8(); // voc id
             }
@@ -2711,6 +2716,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type)
             creature->setShield(shield);
             creature->setPassable(!unpass);
             creature->setLight(light);
+            creature->setMasterId(masterId);
 
             if (emblem != -1)
                 creature->setEmblem(emblem);

@@ -57,6 +57,7 @@ public:
     void drawInformation(const MapPosInfo& mapRect, const Point& dest, float scaleFactor, bool useGray, int drawFlags);
 
     void setId(uint32_t id) override { m_id = id; }
+    void setMasterId(uint32_t id) { m_masterId = id; }
     void setName(const std::string_view name);
     void setHealthPercent(uint8_t healthPercent);
     void setDirection(Otc::Direction direction);
@@ -87,6 +88,7 @@ public:
     void setDrawOutfitColor(const bool draw) { m_drawOutfitColor = draw; }
 
     uint32_t getId() override { return m_id; }
+    uint32_t getMasterId() { return m_masterId; }
     std::string getName() { return m_name; }
     uint8_t getHealthPercent() { return m_healthPercent; }
     Otc::Direction getDirection() { return m_direction; }
@@ -155,6 +157,8 @@ protected:
     void updateJump();
 
     uint32_t m_id{ 0 };
+    uint32_t m_masterId{ 0 };
+
     std::string m_name;
     Outfit m_outfit;
     Light m_light;
@@ -236,6 +240,7 @@ private:
         int exactSize{ 0 };
         int frameSizeNotResized{ 0 };
     };
+
     struct StepCache
     {
         uint16_t speed{ 0 };
