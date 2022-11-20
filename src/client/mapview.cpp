@@ -803,6 +803,8 @@ void MapView::setDrawLights(bool enable)
 
         m_lightView = LightViewPtr(new LightView);
         m_lightView->resize(m_drawDimension, m_tileSize);
+
+        requestUpdateVisibleTiles();
     } else m_lightView = nullptr;
 
     updateLight();
