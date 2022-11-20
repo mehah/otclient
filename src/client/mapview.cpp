@@ -70,7 +70,7 @@ MapView::MapView()
             m_shader->bind();
             m_shader->setUniformValue(ShaderManager::MAP_CENTER_COORD, center.x / static_cast<float>(m_rectDimension.width()), 1.f - center.y / static_cast<float>(m_rectDimension.height()));
             m_shader->setUniformValue(ShaderManager::MAP_GLOBAL_COORD, globalCoord.x / static_cast<float>(m_rectDimension.height()), globalCoord.y / static_cast<float>(m_rectDimension.height()));
-            m_shader->setUniformValue(ShaderManager::MAP_ZOOM, m_scaleFactor);
+            m_shader->setUniformValue(ShaderManager::MAP_ZOOM, g_sprites.getScaleFactor());
 
             Point last = transformPositionTo2D(cameraPosition, m_shader->getPosition());
             //Reverse vertical axis.
@@ -190,14 +190,14 @@ void MapView::drawFloor()
                     g_drawPool.setOpacity(inRange ? .16 : .7);
                 }
 
-                tile->draw(transformPositionTo2D(tile->getPosition(), cameraPosition), m_posInfo, m_scaleFactor, tileFlags, isCovered, lightView);
+                tile->draw(transformPositionTo2D(tile->getPosition(), cameraPosition), m_posInfo, tileFlags, isCovered, lightView);
 
                 if (alwaysTransparent)
                     g_drawPool.resetOpacity();
             }
 
             for (const MissilePtr& missile : g_map.getFloorMissiles(z))
-                missile->drawMissile(transformPositionTo2D(missile->getPosition(), cameraPosition), m_scaleFactor, lightView);
+                missile->drawMissile(transformPositionTo2D(missile->getPosition(), cameraPosition), lightView);
 
             if (m_shadowFloorIntensity > 0 && z == cameraPosition.z + 1) {
                 g_drawPool.addFilledRect(m_rectDimension, Color::black, m_shadowBuffer);
@@ -397,17 +397,19 @@ void MapView::updateVisibleTiles()
 
 void MapView::updateGeometry(const Size& visibleDimension)
 {
-    m_scaleFactor = m_antiAliasingMode == ANTIALIASING_SMOOTH_RETRO ? 2.f : 1.f;
+    float scaleFactor = m_antiAliasingMode == ANTIALIASING_SMOOTH_RETRO ? 2.f : 1.f;
 
-    size_t maxSize = std::max<size_t>(visibleDimension.width(), visibleDimension.height());
-    g_app.forceCriticalOptimization(maxSize > 100);
+    size_t maxAwareRange = std::max<size_t>(visibleDimension.width(), visibleDimension.height());
 
-    while (maxSize > 100) {
-        maxSize /= 2;
-        m_scaleFactor /= 2;
+    g_drawPool.optimize(maxAwareRange);
+    while (maxAwareRange > 100) {
+        maxAwareRange /= 2;
+        scaleFactor /= 2;
     }
 
-    const uint8_t tileSize = SPRITE_SIZE * m_scaleFactor;
+    g_sprites.setScaleFactor(scaleFactor);
+
+    const uint8_t tileSize = SPRITE_SIZE * g_sprites.getScaleFactor();
     const auto& drawDimension = visibleDimension + 3;
     const auto& bufferSize = drawDimension * tileSize;
 
@@ -419,13 +421,10 @@ void MapView::updateGeometry(const Size& visibleDimension)
     m_visibleDimension = visibleDimension;
     m_drawDimension = drawDimension;
     m_tileSize = tileSize;
-
     m_virtualCenterOffset = (drawDimension / 2 - Size(1)).toPoint();
-
     m_rectDimension = { 0, 0, bufferSize };
 
-    g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP)
-        ->resize(bufferSize);
+    g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP)->resize(bufferSize);
 
     if (m_lightView) m_lightView->resize(drawDimension, tileSize);
 
@@ -652,9 +651,9 @@ Rect MapView::calcFramebufferSource(const Size& destSize)
 {
     Point drawOffset = ((m_drawDimension - m_visibleDimension - Size(1)).toPoint() / 2) * m_tileSize;
     if (isFollowingCreature())
-        drawOffset += m_followingCreature->getWalkOffset() * m_scaleFactor;
+        drawOffset += m_followingCreature->getWalkOffset() * g_sprites.getScaleFactor();
     else if (!m_moveOffset.isNull())
-        drawOffset += m_moveOffset * m_scaleFactor;
+        drawOffset += m_moveOffset * g_sprites.getScaleFactor();
 
     Size srcSize = destSize;
     const Size srcVisible = m_visibleDimension * m_tileSize;

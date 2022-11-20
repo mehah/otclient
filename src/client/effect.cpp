@@ -26,7 +26,7 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
 
-void Effect::drawEffect(const Point& dest, float scaleFactor, uint32_t flags, int offsetX, int offsetY, LightView* lightView)
+void Effect::drawEffect(const Point& dest, uint32_t flags, int offsetX, int offsetY, LightView* lightView)
 {
     if (m_id == 0 || !canDraw()) return;
 
@@ -67,7 +67,7 @@ void Effect::drawEffect(const Point& dest, float scaleFactor, uint32_t flags, in
     if (g_app.isDrawingEffectsOnTop() && !m_drawBuffer)
         m_drawBuffer = std::make_shared<DrawBuffer>(DrawPool::DrawOrder::FOURTH);
 
-    getThingType()->draw(dest, scaleFactor, 0, xPattern, yPattern, 0, animationPhase, flags, TextureType::NONE, Color::white, lightView, m_drawBuffer);
+    getThingType()->draw(dest, 0, xPattern, yPattern, 0, animationPhase, flags, TextureType::NONE, Color::white, lightView, m_drawBuffer);
 }
 
 void Effect::onAppear()

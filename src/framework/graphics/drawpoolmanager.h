@@ -34,6 +34,8 @@ public:
     template <class T>
     T* get(const DrawPoolType type) { return static_cast<T*>(m_pools[static_cast<uint8_t>(type)]); }
 
+    void optimize(int size);
+
     void select(DrawPoolType type) { m_currentPool = get<DrawPool>(type); }
     void use(DrawPoolType type);
     void use(DrawPoolType type, const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha);
@@ -64,6 +66,9 @@ public:
     void resetCompositionMode() { m_currentPool->resetCompositionMode(); }
 
     void flush() { if (m_currentPool) m_currentPool->flush(); }
+
+    DrawPoolType getCurrentType() const { return m_currentPool->m_type; }
+
 private:
     void draw();
     void init();

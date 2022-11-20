@@ -89,7 +89,7 @@ public:
     Tile(const Position& position);
 
     void onAddInMapView();
-    void draw(const Point& dest, const MapPosInfo& mapRect, float scaleFactor, int flags, bool isCovered, LightView* lightView = nullptr);
+    void draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, LightView* lightView = nullptr);
 
     void clean();
 
@@ -184,9 +184,9 @@ public:
     void setThingFlag(const ThingPtr& thing);
 
 private:
-    void drawTop(const Point& dest, float scaleFactor, int flags, bool forceDraw, LightView* lightView = nullptr);
-    void drawCreature(const Point& dest, const MapPosInfo& mapRect, float scaleFactor, int flags, bool isCovered, bool forceDraw, LightView* lightView = nullptr);
-    void drawThing(const ThingPtr& thing, const Point& dest, float scaleFactor, int flags, LightView* lightView);
+    void drawTop(const Point& dest, int flags, bool forceDraw, LightView* lightView = nullptr);
+    void drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, bool forceDraw, LightView* lightView = nullptr);
+    void drawThing(const ThingPtr& thing, const Point& dest, int flags, LightView* lightView);
 
     void recalculateThingFlag()
     {

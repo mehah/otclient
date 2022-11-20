@@ -26,13 +26,13 @@
 #include "tile.h"
 #include <framework/core/eventdispatcher.h>
 
-void Missile::drawMissile(const Point& dest, float scaleFactor, LightView* lightView)
+void Missile::drawMissile(const Point& dest, LightView* lightView)
 {
     if (m_id == 0 || !m_drawBuffer)
         return;
 
     const float fraction = m_animationTimer.ticksElapsed() / m_duration;
-    getThingType()->draw(dest + m_delta * fraction * scaleFactor, scaleFactor, 0, m_numPatternX, m_numPatternY, 0, 0,
+    getThingType()->draw(dest + m_delta * fraction * g_sprites.getScaleFactor(), 0, m_numPatternX, m_numPatternY, 0, 0,
         Otc::DrawThings | Otc::DrawLights, TextureType::NONE, Color::white, lightView, m_drawBuffer);
 }
 

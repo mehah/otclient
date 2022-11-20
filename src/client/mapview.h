@@ -254,7 +254,6 @@ private:
     float m_fadeInTime{ 0 };
     float m_fadeOutTime{ 0 };
     float m_shadowFloorIntensity{ 0 };
-    float m_scaleFactor{ 1.f };
     float m_lastFadeLevel{ 1.f };
 
     Rect m_rectDimension;

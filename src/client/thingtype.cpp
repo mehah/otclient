@@ -705,7 +705,7 @@ void ThingType::unserializeOtml(const OTMLNodePtr& node)
     }
 }
 
-void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, uint32_t flags, TextureType textureType, Color color, LightView* lightView, const DrawBufferPtr& drawBuffer)
+void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, uint32_t flags, TextureType textureType, Color color, LightView* lightView, const DrawBufferPtr& drawBuffer)
 {
     if (m_null)
         return;
@@ -726,7 +726,7 @@ void ThingType::draw(const Point& dest, float scaleFactor, int layer, int xPatte
     const Point& textureOffset = textureData.pos[frameIndex].offsets;
     const Rect& textureRect = textureData.pos[frameIndex].rects;
 
-    const Rect screenRect(dest + (textureOffset - m_displacement - (m_size.toPoint() - Point(1)) * SPRITE_SIZE) * scaleFactor, textureRect.size() * scaleFactor);
+    const Rect screenRect(dest + (textureOffset - m_displacement - (m_size.toPoint() - Point(1)) * SPRITE_SIZE) * g_sprites.getScaleFactor(), textureRect.size() * g_sprites.getScaleFactor());
 
     if (flags & Otc::DrawThings) {
         if (m_opacity < 1.0f)
@@ -859,8 +859,8 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
     if (m_opacity < 1.0f)
         fullImage->setTransparentPixel(true);
 
-    if(m_opaque == -1)
-    m_opaque = !fullImage->hasTransparentPixel();
+    if (m_opaque == -1)
+        m_opaque = !fullImage->hasTransparentPixel();
 
     animationPhaseTexture = TexturePtr(new Texture(fullImage, true, false, m_size.area() == 1 && !hasElevation(), false));
     if (smooth)

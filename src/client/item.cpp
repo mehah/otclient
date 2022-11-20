@@ -57,7 +57,7 @@ std::string Item::getName()
     return g_things.findItemTypeByClientId(m_clientId)->getName();
 }
 
-void Item::draw(const Point& dest, float scaleFactor, bool animate, uint32_t flags, TextureType textureType, bool isMarked, LightView* lightView)
+void Item::draw(const Point& dest, bool animate, uint32_t flags, TextureType textureType, bool isMarked, LightView* lightView)
 {
     if (m_clientId == 0 || !canDraw())
         return;
@@ -67,13 +67,13 @@ void Item::draw(const Point& dest, float scaleFactor, bool animate, uint32_t fla
 
     tryOptimize();
 
-    getThingType()->draw(dest, scaleFactor, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, textureType, m_color, lightView, m_drawBuffer);
+    getThingType()->draw(dest, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, textureType, m_color, lightView, m_drawBuffer);
     if (textureType != TextureType::ALL_BLANK && m_shader) {
         g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
     }
 
     if (isMarked) {
-        getThingType()->draw(dest, scaleFactor, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, TextureType::ALL_BLANK, getMarkedColor());
+        getThingType()->draw(dest, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, TextureType::ALL_BLANK, getMarkedColor());
     }
 }
 
@@ -135,9 +135,7 @@ void Item::createBuffer()
 void Item::tryOptimize()
 {
     if (g_app.mustOptimize(!isTopGround())) {
-        if (m_drawBuffer)
-            m_drawBuffer->agroup(true);
-        else {
+        if (!m_drawBuffer) {
             const auto order = isTopGround() ? DrawPool::DrawOrder::FOURTH : DrawPool::DrawOrder::THIRD;
             m_drawBuffer = std::make_shared<DrawBuffer>(order, true, false);
         }

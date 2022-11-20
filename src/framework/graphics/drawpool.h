@@ -56,13 +56,16 @@ public:
         LAST
     };
 
-    void setEnable(const bool v) { m_enabled = v; }
-    bool isEnabled() const { return m_enabled; }
+    void setEnable(bool v) { m_enabled = v; }
+
     DrawPoolType getType() const { return m_type; }
+
+    bool isEnabled() const { return m_enabled; }
     bool isType(DrawPoolType type) const { return m_type == type; }
 
     bool canRepaint() { return canRepaint(false); }
     void repaint() { m_status.first = 1; }
+
 
 protected:
     struct PoolState
@@ -156,8 +159,8 @@ private:
     }
 
     void add(const Color& color, const TexturePtr& texture, const DrawPool::DrawMethod& method,
-             DrawMode drawMode = DrawMode::TRIANGLES, const DrawBufferPtr& drawBuffer = nullptr,
-             const CoordsBufferPtr& coordsBuffer = nullptr);
+        DrawMode drawMode = DrawMode::TRIANGLES, const DrawBufferPtr& drawBuffer = nullptr,
+        const CoordsBufferPtr& coordsBuffer = nullptr);
 
     void addCoords(const DrawPool::DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode);
     void updateHash(const PoolState& state, const DrawPool::DrawMethod& method, size_t& stateHash, size_t& methodHash);

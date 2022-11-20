@@ -237,3 +237,11 @@ void DrawPoolManager::use(const DrawPoolType type, const Rect& dest, const Rect&
         }
     }
 }
+
+void DrawPoolManager::optimize(int size) {
+    if (!m_currentPool || m_currentPool->m_type != DrawPoolType::MAP)
+        return;
+
+    g_app.forceCriticalOptimization(size > 105); // Medium optimization
+    m_currentPool->m_alwaysGroupDrawings = size > 115; // Max optimization
+}

@@ -83,7 +83,9 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const DrawMeth
             return;
         }
 
-        const DrawBufferPtr& buffer = drawBuffer ? drawBuffer : DrawBuffer::createTemporaryBuffer(DrawPool::DrawOrder::FIRST);
+        const DrawOrder order = m_type == DrawPoolType::MAP ? DrawPool::DrawOrder::THIRD : DrawPool::DrawOrder::FIRST;
+        const DrawBufferPtr& buffer = drawBuffer ? drawBuffer : DrawBuffer::createTemporaryBuffer(order);
+
         bool addCoord = buffer->isTemporary();
         if (!addCoord) { // is not temp buffer
             if (buffer->m_stateHash != stateHash || !buffer->isValid()) {

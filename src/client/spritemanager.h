@@ -35,6 +35,9 @@ public:
     bool loadSpr(std::string file);
     void unload();
 
+    void setScaleFactor(float scale) { m_scaleFactor = scale; }
+    inline float getScaleFactor() const { return m_scaleFactor; }
+
     void saveSpr(const std::string& fileName);
 
     uint32_t getSignature() { return m_signature; }
@@ -62,6 +65,8 @@ private:
     uint32_t m_signature{ 0 };
     int m_spritesCount{ 0 };
     int m_spritesOffset{ 0 };
+    float m_scaleFactor{ 1.f };
+
     FileStreamPtr m_spritesFile;
 };
 
