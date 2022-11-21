@@ -107,7 +107,8 @@ SpeakTypes = {
     -- ignored types
     [MessageModes.Spell] = SpeakTypesSettings.none,
     [MessageModes.BarkLow] = SpeakTypesSettings.none,
-    [MessageModes.BarkLoud] = SpeakTypesSettings.none
+    [MessageModes.BarkLoud] = SpeakTypesSettings.none,
+    [MessageModes.Potion] = SpeakTypesSettings.none
 }
 
 SayModes = {

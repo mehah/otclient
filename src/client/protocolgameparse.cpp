@@ -1858,6 +1858,7 @@ void ProtocolGame::parseTalk(const InputMessagePtr& msg)
     Position pos;
 
     switch (mode) {
+        case Otc::MessagePotion:
         case Otc::MessageSay:
         case Otc::MessageWhisper:
         case Otc::MessageYell:

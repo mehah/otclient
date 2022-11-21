@@ -77,6 +77,7 @@ MessageTypes = {
     [MessageModes.DamageOthers] = MessageSettings.none,
     [MessageModes.HealOthers] = MessageSettings.none,
     [MessageModes.ExpOthers] = MessageSettings.none,
+    [MessageModes.Potion] = MessageSettings.none,
 
     [MessageModes.TradeNpc] = MessageSettings.centerWhite,
     [MessageModes.Guild] = MessageSettings.centerWhite,
@@ -90,7 +91,6 @@ MessageTypes = {
     [MessageModes.BoostedCreature] = MessageSettings.centerWhite,
     [MessageModes.OfflineTrainning] = MessageSettings.centerWhite,
     [MessageModes.Transaction] = MessageSettings.centerWhite,
-    [MessageModes.Potion] = MessageSettings.none,
 
     [254] = MessageSettings.private
 }
