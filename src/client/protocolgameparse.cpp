@@ -1261,12 +1261,56 @@ void ProtocolGame::parseWorldLight(const InputMessagePtr& msg)
 void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
 {
     const Position pos = getPosition(msg);
-    Position toPos;
+    if (g_game.getProtocolVersion() >= 1203) {
+        uint8_t effectType = msg->getU8();
+        while (effectType != Otc::MAGIC_EFFECTS_END_LOOP) {
+            switch (effectType) {
+                case Otc::MAGIC_EFFECTS_DELAY:
+                case Otc::MAGIC_EFFECTS_DELTA: {
+                    msg->getU8(); // ?
+                    break;
+                }
 
-    Otc::MagicEffectsType_t type = Otc::MAGIC_EFFECTS_CREATE_EFFECT;
+                case Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT:
+                case Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT_REVERSED: {
+                    const uint8_t shotId = msg->getU8();
+                    const int8_t offsetX = static_cast<int8_t>(msg->getU8());
+                    const int8_t offsetY = static_cast<int8_t>(msg->getU8());
+                    if (!g_things.isValidDatId(shotId, ThingCategoryMissile)) {
+                        g_logger.traceError(stdext::format("invalid missile id %d", shotId));
+                        return;
+                    }
 
-    if (g_game.getClientVersion() >= 1281) {
-        type = static_cast<Otc::MagicEffectsType_t>(msg->getU8()); // type
+                    const auto& missile = MissilePtr(new Missile);
+                    missile->setId(shotId);
+
+                    if (effectType == Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT)
+                        missile->setPath(pos, Position(pos.x + offsetX, pos.y + offsetY, pos.z));
+                    else
+                        missile->setPath(Position(pos.x + offsetX, pos.y + offsetY, pos.z), pos);
+
+                    g_map.addThing(missile, pos);
+                    break;
+                }
+
+                case Otc::MAGIC_EFFECTS_CREATE_EFFECT: {
+                    const uint8_t effectId = msg->getU8();
+                    if (!g_things.isValidDatId(effectId, ThingCategoryEffect)) {
+                        g_logger.traceError(stdext::format("invalid effect id %d", effectId));
+                        continue;
+                    }
+
+                    const auto& effect = EffectPtr(new Effect());
+                    effect->setId(effectId);
+                    g_map.addThing(effect, pos);
+                    break;
+                }
+            }
+
+            effectType = msg->getU8();
+        }
+
+        return;
     }
 
     int effectId;
@@ -1283,26 +1327,9 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
         return;
     }
 
-    if (g_game.getClientVersion() >= 1281) {
-        if (type == Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT) {
-            const int8_t x = msg->getU8();
-            const int8_t y = msg->getU8();
-            toPos = Position(pos.x + x, pos.y + y, pos.z);
-        }
-
-        msg->getU8(); // end loop
-    }
-
-    if (type == Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT) {
-        const auto missile = MissilePtr(new Missile());
-        missile->setId(effectId);
-        missile->setPath(pos, toPos);
-        g_map.addThing(missile, pos);
-    } else {
-        const auto effect = EffectPtr(new Effect());
-        effect->setId(effectId);
-        g_map.addThing(effect, pos);
-    }
+    const auto& effect = EffectPtr(new Effect());
+    effect->setId(effectId);
+    g_map.addThing(effect, pos);
 }
 
 void ProtocolGame::parseAnimatedText(const InputMessagePtr& msg)
