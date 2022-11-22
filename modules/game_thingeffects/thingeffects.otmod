@@ -1,0 +1,9 @@
+Module
+  name: game_thingeffects
+  description: Effect Thing, like aura, wings...
+  author: Mehah
+  website:
+  scripts: [ effects.lua, thingeffects.lua ]
+  sandboxed: true
+  @onLoad: init()
+  @onUnload: terminate()

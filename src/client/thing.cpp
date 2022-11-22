@@ -85,3 +85,13 @@ int Thing::getStackPos()
     g_logger.traceError("got a thing with invalid stackpos");
     return -1;
 }
+
+bool Thing::removeThingEffectById(uint16_t id) {
+    const auto it = std::find_if(m_effects.begin(), m_effects.end(), [id](const ThingEffectPtr& obj) { return obj->getId() == id; });
+    if (it == m_effects.end())
+        return false;
+
+    m_effects.erase(it);
+
+    return true;
+}
