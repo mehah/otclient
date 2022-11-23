@@ -265,7 +265,7 @@ IF %ERRORLEVEL% EQU 0 (
   <ItemGroup>
     <ClCompile Include="..\src\client\animatedtext.cpp" />
     <ClCompile Include="..\src\client\animator.cpp" />
-    <ClCompile Include="..\src\client\thingeffect.cpp" />
+    <ClCompile Include="..\src\client\staticeffect.cpp" />
     <ClCompile Include="..\src\client\spriteappearances.cpp" />
     <ClCompile Include="..\src\client\client.cpp" />
     <ClCompile Include="..\src\client\container.cpp" />
@@ -414,7 +414,7 @@ IF %ERRORLEVEL% EQU 0 (
   <ItemGroup>
     <ClInclude Include="..\src\client\animatedtext.h" />
     <ClInclude Include="..\src\client\animator.h" />
-    <ClInclude Include="..\src\client\thingeffect.h" />
+    <ClInclude Include="..\src\client\staticeffect.h" />
     <ClInclude Include="..\src\client\spriteappearances.h" />
     <ClInclude Include="..\src\client\client.h" />
     <ClInclude Include="..\src\client\const.h" />

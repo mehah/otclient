@@ -24,7 +24,7 @@
 
 #include "declarations.h"
 #include "thingtype.h"
-#include "thingeffect.h"
+#include "staticeffect.h"
 #include "thingtypemanager.h"
 #include "spritemanager.h"
 #include <framework/luaengine/luaobject.h>
@@ -168,8 +168,8 @@ public:
 
     const Color& getMarkedColor() { m_markedColor.setAlpha(0.1f + std::abs(500 - g_clock.millis() % 1000) / 1000.0f); return m_markedColor; }
 
-    void addThingEffect(const ThingEffectPtr& obj) { m_effects.emplace_back(obj); }
-    bool removeThingEffectById(uint16_t id);
+    void addStaticEffect(const StaticEffectPtr& obj) { m_effects.emplace_back(obj); }
+    bool removeStaticEffectById(uint16_t id);
 
 protected:
     uint8_t m_numPatternX{ 0 };
@@ -186,7 +186,7 @@ protected:
     PainterShaderProgramPtr m_shader;
     std::function<void()> m_shaderAction{ nullptr };
 
-    std::vector<ThingEffectPtr> m_effects;
+    std::vector<StaticEffectPtr> m_effects;
 
 private:
     bool m_canDraw{ true };

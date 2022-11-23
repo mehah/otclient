@@ -20,16 +20,16 @@
  * THE SOFTWARE.
  */
 
-#include "thingeffect.h"
+#include "staticeffect.h"
 #include "thingtypemanager.h"
 
-ThingEffectPtr ThingEffect::create(uint16_t id, uint16_t thingId, ThingCategory category) {
+StaticEffectPtr StaticEffect::create(uint16_t id, uint16_t thingId, ThingCategory category) {
     if (!g_things.isValidDatId(thingId, category)) {
-        g_logger.error(stdext::format("invalid thing with id %d on create ThingEffect.", thingId));
+        g_logger.error(stdext::format("invalid thing with id %d on create StaticEffect.", thingId));
         return nullptr;
     }
 
-    const ThingEffectPtr& obj(new ThingEffect);
+    const StaticEffectPtr& obj(new StaticEffect);
     obj->m_id = id;
     obj->m_thingType = g_things.getThingType(thingId, category).get();
     return obj;

@@ -24,10 +24,10 @@
 
 #include "thingtype.h"
 
-class ThingEffect : public LuaObject
+class StaticEffect : public LuaObject
 {
 public:
-    static ThingEffectPtr create(uint16_t id, uint16_t thingId, ThingCategory category);
+    static StaticEffectPtr create(uint16_t id, uint16_t thingId, ThingCategory category);
 
     uint16_t getId() { return m_id; }
 

@@ -86,8 +86,8 @@ int Thing::getStackPos()
     return -1;
 }
 
-bool Thing::removeThingEffectById(uint16_t id) {
-    const auto it = std::find_if(m_effects.begin(), m_effects.end(), [id](const ThingEffectPtr& obj) { return obj->getId() == id; });
+bool Thing::removeStaticEffectById(uint16_t id) {
+    const auto it = std::find_if(m_effects.begin(), m_effects.end(), [id](const StaticEffectPtr& obj) { return obj->getId() == id; });
     if (it == m_effects.end())
         return false;
 

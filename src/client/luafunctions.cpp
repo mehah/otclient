@@ -50,7 +50,7 @@
 #include "uiminimap.h"
 #include "uiprogressrect.h"
 #include "uisprite.h"
-#include "thingeffect.h"
+#include "staticeffect.h"
 
 #include <framework/luaengine/luainterface.h>
 
@@ -639,14 +639,14 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Missile>("setId", &Missile::setId);
     g_lua.bindClassMemberFunction<Missile>("setPath", &Missile::setPath);
 
-    g_lua.registerClass<ThingEffect>();
-    g_lua.bindClassStaticFunction<Missile>("create", &ThingEffect::create);
-    g_lua.bindClassMemberFunction<Missile>("setOnTop", &ThingEffect::setOnTop);
-    g_lua.bindClassMemberFunction<Missile>("setSpeed", &ThingEffect::setSpeed);
-    g_lua.bindClassMemberFunction<Missile>("setOffset", &ThingEffect::setOffset);
-    g_lua.bindClassMemberFunction<Missile>("setOffsetX", &ThingEffect::setOffsetX);
-    g_lua.bindClassMemberFunction<Missile>("setOffsetY", &ThingEffect::setOffsetY);
-    g_lua.bindClassMemberFunction<Missile>("setDirOffset", &ThingEffect::setDirOffset);
+    g_lua.registerClass<StaticEffect>();
+    g_lua.bindClassStaticFunction<Missile>("create", &StaticEffect::create);
+    g_lua.bindClassMemberFunction<Missile>("setOnTop", &StaticEffect::setOnTop);
+    g_lua.bindClassMemberFunction<Missile>("setSpeed", &StaticEffect::setSpeed);
+    g_lua.bindClassMemberFunction<Missile>("setOffset", &StaticEffect::setOffset);
+    g_lua.bindClassMemberFunction<Missile>("setOffsetX", &StaticEffect::setOffsetX);
+    g_lua.bindClassMemberFunction<Missile>("setOffsetY", &StaticEffect::setOffsetY);
+    g_lua.bindClassMemberFunction<Missile>("setDirOffset", &StaticEffect::setDirOffset);
 
     g_lua.registerClass<StaticText, Thing>();
     g_lua.bindClassStaticFunction<StaticText>("create", [] { return StaticTextPtr(new StaticText); });
