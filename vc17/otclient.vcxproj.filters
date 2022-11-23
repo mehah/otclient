@@ -537,10 +537,7 @@
     <ClCompile Include="..\src\protobuf\appearances.pb.cc">
       <Filter>Source Files\protobuf</Filter>
     </ClCompile>
-    <ClCompile Include="creatureeffect.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\client\thingeffect.cpp">
+    <ClCompile Include="..\src\client\staticeffect.cpp">
       <Filter>Source Files\client</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1055,7 +1052,7 @@
     <ClInclude Include="..\src\protobuf\appearances.pb.h">
       <Filter>Header Files\protobuf</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\client\thingeffect.h">
+    <ClInclude Include="..\src\client\staticeffect.h">
       <Filter>Header Files\client</Filter>
     </ClInclude>
   </ItemGroup>
