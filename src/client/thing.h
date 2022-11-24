@@ -169,19 +169,22 @@ public:
     const Color& getMarkedColor() { m_markedColor.setAlpha(0.1f + std::abs(500 - g_clock.millis() % 1000) / 1000.0f); return m_markedColor; }
 
     void addStaticEffect(const StaticEffectPtr& obj);
+    void clearStaticEffect() { m_staticEffects.clear(); }
     bool removeStaticEffectById(uint16_t id);
+    StaticEffectPtr getStaticEffectById(uint16_t id);
 
 protected:
     void drawStaticEffect(const Point& dest, LightView* lightView, bool isOnTop) {
         for (const auto& staticEffect : m_staticEffects) {
-            if (isOnTop == staticEffect->isOnTop())
-                staticEffect->draw(dest, lightView);
+            staticEffect->draw(dest, isOnTop, lightView);
         }
     }
 
     void setStaticEffectDirection(Otc::Direction dir) {
         for (const auto& staticEffect : m_staticEffects) {
-            staticEffect->m_direction = dir;
+            if (staticEffect->m_thingType->getCategory() == ThingCategoryCreature ||
+                staticEffect->m_thingType->getCategory() == ThingCategoryMissile)
+                staticEffect->m_direction = dir;
         }
     }
 

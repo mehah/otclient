@@ -29,21 +29,28 @@ class StaticEffect : public LuaObject
 public:
     static StaticEffectPtr create(uint16_t id, uint16_t thingId, ThingCategory category);
 
-    void draw(const Point& /*dest*/, LightView* = nullptr);
+    void draw(const Point& /*dest*/, bool /*isOnTop*/, LightView* = nullptr);
 
     uint16_t getId() { return m_id; }
 
     float getSpeed() { return m_speed; }
     void setSpeed(float speed) { m_speed = speed; }
 
-    bool isOnTop() { return m_onTop; }
-    void setOnTop(bool onTop) { m_onTop = onTop; }
+    void setOnTop(bool onTop) { for (auto& control : m_offsetDirections) control.onTop = onTop; }
+    void setOffset(int8_t x, int8_t y) { for (auto& control : m_offsetDirections) control.offset = { x, y }; }
+    void setOnTopByDir(Otc::Direction direction, bool onTop) { m_offsetDirections[direction].onTop = onTop; }
 
-    void setOffset(int8_t x, int8_t y) { m_offsetDirections.fill({ x, y }); }
-    void setDirOffset(Otc::Direction direction, int8_t x, int8_t y) { m_offsetDirections[direction] = { x, y }; }
+    void setDirOffset(Otc::Direction direction, int8_t x, int8_t y, bool onTop = false) { m_offsetDirections[direction] = { onTop, {x, y} }; }
 
 private:
+    struct DirControl {
+        bool onTop{ false };
+        Point offset;
+    };
+
     uint16_t m_id;
+
+    Size m_size;
 
     float m_speed{ 1.f };
     bool m_onTop{ false };
@@ -53,7 +60,7 @@ private:
 
     Otc::Direction m_direction{ Otc::North };
 
-    std::array<Point, Otc::Direction::West + 1> m_offsetDirections;
+    std::array<DirControl, Otc::Direction::West + 1> m_offsetDirections;
 
     friend class Thing;
 };

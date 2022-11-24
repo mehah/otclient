@@ -92,7 +92,9 @@ void Thing::addStaticEffect(const StaticEffectPtr& obj) {
 }
 
 bool Thing::removeStaticEffectById(uint16_t id) {
-    const auto it = std::find_if(m_staticEffects.begin(), m_staticEffects.end(), [id](const StaticEffectPtr& obj) { return obj->getId() == id; });
+    const auto it = std::find_if(m_staticEffects.begin(), m_staticEffects.end(),
+        [id](const StaticEffectPtr& obj) { return obj->getId() == id; });
+
     if (it == m_staticEffects.end())
         return false;
 
@@ -100,4 +102,14 @@ bool Thing::removeStaticEffectById(uint16_t id) {
     m_staticEffects.erase(it);
 
     return true;
+}
+
+StaticEffectPtr Thing::getStaticEffectById(uint16_t id) {
+    const auto it = std::find_if(m_staticEffects.begin(), m_staticEffects.end(),
+        [id](const StaticEffectPtr& obj) { return obj->getId() == id; });
+
+    if (it == m_staticEffects.end())
+        return nullptr;
+
+    return *it;
 }

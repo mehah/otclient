@@ -425,6 +425,8 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Thing>("isTopEffect", &Thing::isTopEffect);
     g_lua.bindClassMemberFunction<Thing>("addStaticEffect", &Thing::addStaticEffect);
     g_lua.bindClassMemberFunction<Thing>("removeStaticEffectById", &Thing::removeStaticEffectById);
+    g_lua.bindClassMemberFunction<Thing>("getStaticEffectById", &Thing::getStaticEffectById);
+    g_lua.bindClassMemberFunction<Thing>("clearStaticEffect", &Thing::clearStaticEffect);
 
     g_lua.registerClass<House>();
     g_lua.bindClassStaticFunction<House>("create", [] { return HousePtr(new House); });
@@ -648,6 +650,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<StaticEffect>("setSpeed", &StaticEffect::setSpeed);
     g_lua.bindClassMemberFunction<StaticEffect>("setOffset", &StaticEffect::setOffset);
     g_lua.bindClassMemberFunction<StaticEffect>("setDirOffset", &StaticEffect::setDirOffset);
+    g_lua.bindClassMemberFunction<StaticEffect>("setOnTopByDir", &StaticEffect::setOnTopByDir);
 
     g_lua.registerClass<StaticText, Thing>();
     g_lua.bindClassStaticFunction<StaticText>("create", [] { return StaticTextPtr(new StaticText); });

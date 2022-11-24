@@ -36,10 +36,18 @@ StaticEffectPtr StaticEffect::create(uint16_t id, uint16_t thingId, ThingCategor
     return obj;
 }
 
-void StaticEffect::draw(const Point& dest, LightView* lightView) {
-    const auto* animator = m_thingType->getIdleAnimator();
-    if (!animator)
+void StaticEffect::draw(const Point& dest, bool isOnTop, LightView* lightView) {
+    const auto& dirControl = m_offsetDirections[m_direction];
+    if (dirControl.onTop != isOnTop)
         return;
 
-    m_thingType->draw(dest - (m_offsetDirections[m_direction] * g_sprites.getScaleFactor()), 0, 0, 0, 0, animator->getPhaseAt(m_animationTimer, m_speed), Otc::DrawThingsAndLights, TextureType::NONE, Color::white, lightView);
+    const auto* animator = m_thingType->getIdleAnimator();
+    if (!animator) {
+        if (!m_thingType->isAnimateAlways())
+            return;
+
+        animator = m_thingType->getAnimator();
+    }
+
+    m_thingType->draw(dest - (dirControl.offset * g_sprites.getScaleFactor()), 0, m_direction, 0, 0, animator->getPhaseAt(m_animationTimer, m_speed), Otc::DrawThingsAndLights, TextureType::NONE, Color::white, lightView);
 }

@@ -1,62 +1,41 @@
--- outfit
--- 307
--- 293 - raio
--- effect 32, 12
-EFFECTS = {{
+__EFFECTS = {{
     id = 1,
-    name = 'Teste',
-    thingId = 130,
+    name = 'Raio',
+    thingId = 12,
     category = ThingCategoryEffect,
     speed = 0.5,
-    onTop = true,
+    onTop = false,
     offset = {
-        x = -30,
-        y = -20
-    }, -- Default for All outfit
+        x = 0,
+        y = 0
+    }
+}, {
+    id = 2,
+    name = 'Raio',
+    thingId = 307,
+    category = ThingCategoryCreature,
+    speed = 2,
     dirsControl = {
         [North] = {
             onTop = true,
             offset = {
-                x = -10,
+                x = 0,
                 y = 2
             }
         },
         [East] = {
-            x = -11,
-            y = 10
+            x = 5,
+            y = -5
         },
         [South] = {
-            x = -12,
-            y = 15
+            x = -5,
+            y = 0
         },
         [West] = {
-            x = -13,
-            y = 15
-        }
-    },
-    outfitOffset = { -- Offset based on outfit
-        [300] = { -- Outfit ID
+            onTop = true,
             offset = {
-                x = -30,
-                y = -20
-            },
-            dirsOffset = {
-                [North] = {
-                    x = -10,
-                    y = 2
-                },
-                [East] = {
-                    x = -11,
-                    y = 10
-                },
-                [South] = {
-                    x = -12,
-                    y = 15
-                },
-                [West] = {
-                    x = -13,
-                    y = 15
-                }
+                x = -10,
+                y = -5
             }
         }
     }

@@ -17,7 +17,9 @@ function init()
 end
 
 function terminate()
-    onGameEnd()
+    if g_game.isOnline() then
+        onGameEnd()
+    end
 
     disconnect(StaticEffect, {
         onAdd = onAddStaticEffect,
@@ -31,16 +33,13 @@ function terminate()
 end
 
 function onGameStart()
-    local staticEffect = StaticEffect.create(1, 12, ThingCategoryEffect)
-    staticEffect:setSpeed(0.2)
-    staticEffect:setOffset(0, -10)
-    staticEffect:setOnTop(false)
+    g_game.getLocalPlayer():addStaticEffect(createEffectById(1))
+    g_game.getLocalPlayer():addStaticEffect(createEffectById(2))
 
-    g_game.getLocalPlayer():addStaticEffect(staticEffect)
 end
 
 function onGameEnd()
-    g_game.getLocalPlayer():removeStaticEffectById(1)
+    g_game.getLocalPlayer():clearStaticEffect()
 end
 
 function onAddStaticEffect(effect, owner)
@@ -49,4 +48,57 @@ end
 
 function onRemoveStaticEffect(effect, oldOwner)
     print(345)
+end
+
+function getEffectById(id)
+    for i, effect in pairs(__EFFECTS) do
+        if effect.id == id then
+            return effect
+        end
+    end
+    return nil
+end
+
+function createEffectById(id)
+    local effect = getEffectById(id)
+
+    if effect then
+        if effect.id == id then
+            local staticEffect = StaticEffect.create(effect.id, effect.thingId, effect.category)
+            if effect.speed then
+                staticEffect:setSpeed(effect.speed)
+            end
+            if effect.offset then
+                staticEffect:setOffset(effect.offset.x, effect.offsety)
+            end
+            if effect.onTop then
+                staticEffect:setOnTop(effect.onTop)
+            end
+
+            if effect.dirsControl then
+                for dir, control in pairs(effect.dirsControl) do
+                    local offset = control.offset
+                    if not offset and control.x and control.y then
+                        offset = {
+                            x = control.x,
+                            y = control.y
+                        }
+                    end
+
+                    if not offset and effect.offset then
+                        offset = effect.offset
+                    end
+
+                    if offset then
+                        staticEffect:setDirOffset(dir, offset.x, offset.y, control.onTop or effect.onTop or false)
+                    elseif control.onTop then
+                        staticEffect:setOnTopByDir(dir, control.onTop)
+                    end
+                end
+            end
+            return staticEffect
+        end
+    end
+
+    return nil
 end
