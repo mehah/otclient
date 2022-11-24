@@ -423,7 +423,8 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Thing>("isWrapable", &Thing::isWrapable);
     g_lua.bindClassMemberFunction<Thing>("isUnwrapable", &Thing::isUnwrapable);
     g_lua.bindClassMemberFunction<Thing>("isTopEffect", &Thing::isTopEffect);
-    g_lua.bindClassMemberFunction<Thing>("isLyingCorpse", &Thing::isLyingCorpse);
+    g_lua.bindClassMemberFunction<Thing>("addStaticEffect", &Thing::addStaticEffect);
+    g_lua.bindClassMemberFunction<Thing>("removeStaticEffectById", &Thing::removeStaticEffectById);
 
     g_lua.registerClass<House>();
     g_lua.bindClassStaticFunction<House>("create", [] { return HousePtr(new House); });
@@ -640,13 +641,13 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Missile>("setPath", &Missile::setPath);
 
     g_lua.registerClass<StaticEffect>();
-    g_lua.bindClassStaticFunction<Missile>("create", &StaticEffect::create);
-    g_lua.bindClassMemberFunction<Missile>("setOnTop", &StaticEffect::setOnTop);
-    g_lua.bindClassMemberFunction<Missile>("setSpeed", &StaticEffect::setSpeed);
-    g_lua.bindClassMemberFunction<Missile>("setOffset", &StaticEffect::setOffset);
-    g_lua.bindClassMemberFunction<Missile>("setOffsetX", &StaticEffect::setOffsetX);
-    g_lua.bindClassMemberFunction<Missile>("setOffsetY", &StaticEffect::setOffsetY);
-    g_lua.bindClassMemberFunction<Missile>("setDirOffset", &StaticEffect::setDirOffset);
+    g_lua.bindClassStaticFunction<StaticEffect>("create", &StaticEffect::create);
+    // g_lua.bindClassStaticFunction<StaticEffect>("getId", &StaticEffect::getId);
+    // g_lua.bindClassStaticFunction<StaticEffect>("getSpeed", &StaticEffect::getSpeed);
+    g_lua.bindClassMemberFunction<StaticEffect>("setOnTop", &StaticEffect::setOnTop);
+    g_lua.bindClassMemberFunction<StaticEffect>("setSpeed", &StaticEffect::setSpeed);
+    g_lua.bindClassMemberFunction<StaticEffect>("setOffset", &StaticEffect::setOffset);
+    g_lua.bindClassMemberFunction<StaticEffect>("setDirOffset", &StaticEffect::setDirOffset);
 
     g_lua.registerClass<StaticText, Thing>();
     g_lua.bindClassStaticFunction<StaticText>("create", [] { return StaticTextPtr(new StaticText); });

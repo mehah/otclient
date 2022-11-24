@@ -22,6 +22,7 @@
 
 #include "staticeffect.h"
 #include "thingtypemanager.h"
+#include "spritemanager.h"
 
 StaticEffectPtr StaticEffect::create(uint16_t id, uint16_t thingId, ThingCategory category) {
     if (!g_things.isValidDatId(thingId, category)) {
@@ -33,4 +34,12 @@ StaticEffectPtr StaticEffect::create(uint16_t id, uint16_t thingId, ThingCategor
     obj->m_id = id;
     obj->m_thingType = g_things.getThingType(thingId, category).get();
     return obj;
+}
+
+void StaticEffect::draw(const Point& dest, LightView* lightView) {
+    const auto* animator = m_thingType->getIdleAnimator();
+    if (!animator)
+        return;
+
+    m_thingType->draw(dest - (m_offsetDirections[m_direction] * g_sprites.getScaleFactor()), 0, 0, 0, 0, animator->getPhaseAt(m_animationTimer, m_speed), Otc::DrawThingsAndLights, TextureType::NONE, Color::white, lightView);
 }

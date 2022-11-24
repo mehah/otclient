@@ -54,7 +54,7 @@ public:
     void resetAnimation();
 
     int getPhase();
-    int getPhaseAt(Timer& time) const;
+    int getPhaseAt(Timer& time, float durationFactor = 1.f) const;
     int getStartPhase() const;
     int getAnimationPhases() const { return m_animationPhases; }
     int getAverageDuration() const { return getTotalDuration() / getAnimationPhases(); }

@@ -86,12 +86,18 @@ int Thing::getStackPos()
     return -1;
 }
 
+void Thing::addStaticEffect(const StaticEffectPtr& obj) {
+    m_staticEffects.emplace_back(obj);
+    obj->callLuaField("onAdd", this);
+}
+
 bool Thing::removeStaticEffectById(uint16_t id) {
-    const auto it = std::find_if(m_effects.begin(), m_effects.end(), [id](const StaticEffectPtr& obj) { return obj->getId() == id; });
-    if (it == m_effects.end())
+    const auto it = std::find_if(m_staticEffects.begin(), m_staticEffects.end(), [id](const StaticEffectPtr& obj) { return obj->getId() == id; });
+    if (it == m_staticEffects.end())
         return false;
 
-    m_effects.erase(it);
+    (*it)->callLuaField("onRemove", this);
+    m_staticEffects.erase(it);
 
     return true;
 }

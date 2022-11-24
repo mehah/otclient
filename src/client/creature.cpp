@@ -75,10 +75,14 @@ void Creature::draw(const Point& dest, bool animate, uint32_t flags, TextureType
             g_drawPool.addBoundingRect(Rect(dest + (m_walkOffset - getDisplacement()) * g_sprites.getScaleFactor(), Size(SPRITE_SIZE * g_sprites.getScaleFactor())), m_staticSquareColor, std::max<int>(static_cast<int>(2 * g_sprites.getScaleFactor()), 1));
         }
 
-        internalDrawOutfit(dest + m_walkOffset * g_sprites.getScaleFactor(), animate, textureType, m_direction, Color::white);
+        const auto& _dest = dest + m_walkOffset * g_sprites.getScaleFactor();
+
+        drawStaticEffect(_dest, lightView, false); // On Bottom
+        internalDrawOutfit(_dest, animate, textureType, m_direction, Color::white);
+        drawStaticEffect(_dest, lightView, true); // On Top
 
         if (isMarked) {
-            internalDrawOutfit(dest + m_walkOffset * g_sprites.getScaleFactor(), animate, TextureType::ALL_BLANK, m_direction, getMarkedColor());
+            internalDrawOutfit(_dest, animate, TextureType::ALL_BLANK, m_direction, getMarkedColor());
         }
     }
 
@@ -664,6 +668,8 @@ void Creature::setDirection(Otc::Direction direction)
         m_numPatternX = Otc::West;
     else
         m_numPatternX = direction;
+
+    setStaticEffectDirection(direction);
 }
 
 void Creature::setOutfit(const Outfit& outfit)

@@ -29,18 +29,17 @@ class StaticEffect : public LuaObject
 public:
     static StaticEffectPtr create(uint16_t id, uint16_t thingId, ThingCategory category);
 
+    void draw(const Point& /*dest*/, LightView* = nullptr);
+
     uint16_t getId() { return m_id; }
 
     float getSpeed() { return m_speed; }
     void setSpeed(float speed) { m_speed = speed; }
 
-    bool getOnTop() { return m_onTop; }
+    bool isOnTop() { return m_onTop; }
     void setOnTop(bool onTop) { m_onTop = onTop; }
 
-    void setOffset(int8_t x, int8_t y) { m_offset = { x, y }; }
-    void setOffsetX(int8_t x) { m_offset.x = x; }
-    void setOffsetY(int8_t y) { m_offset.y = y; }
-
+    void setOffset(int8_t x, int8_t y) { m_offsetDirections.fill({ x, y }); }
     void setDirOffset(Otc::Direction direction, int8_t x, int8_t y) { m_offsetDirections[direction] = { x, y }; }
 
 private:
@@ -48,8 +47,13 @@ private:
 
     float m_speed{ 1.f };
     bool m_onTop{ false };
-    Point m_offset;
     ThingType* m_thingType;
 
+    Timer m_animationTimer;
+
+    Otc::Direction m_direction{ Otc::North };
+
     std::array<Point, Otc::Direction::West + 1> m_offsetDirections;
+
+    friend class Thing;
 };
