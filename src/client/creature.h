@@ -120,6 +120,12 @@ public:
     int getTotalAnimationPhase() { return m_outfit.hasMount() ? m_mountType->getAnimationPhases() : getAnimationPhases(); }
     int getCurrentAnimationPhase(bool mount = false);
 
+    bool isDisabledWalkAnimation() { return m_disableWalkAnimation > 0; }
+    void setDisableWalkAnimation(bool v) {
+        if (!v && m_disableWalkAnimation <= 1) { m_disableWalkAnimation = 0; return; }
+        if (v) ++m_disableWalkAnimation; else --m_disableWalkAnimation;
+    }
+
     void updateShield();
 
     // walk related
@@ -188,6 +194,8 @@ protected:
     bool m_showStaticSquare{ false };
     bool m_forceWalk{ false };
     bool m_removed{ true };
+
+    uint8_t m_disableWalkAnimation{ 0 };
 
     Color m_timedSquareColor;
     Color m_staticSquareColor;

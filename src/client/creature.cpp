@@ -934,7 +934,7 @@ int Creature::getCurrentAnimationPhase(const bool mount)
         return (g_clock.millis() % (static_cast<long long>(ticksPerFrame) * thingType->getAnimationPhases())) / ticksPerFrame;
     }
 
-    return m_walkAnimationPhase;
+    return isDisabledWalkAnimation() ? 0 : m_walkAnimationPhase;
 }
 
 int Creature::getExactSize(int layer, int xPattern, int yPattern, int zPattern, int animationPhase)

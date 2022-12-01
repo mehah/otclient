@@ -77,7 +77,6 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_things", "findItemTypeByCategory", &ThingTypeManager::findItemTypeByCategory, &g_things);
     g_lua.bindSingletonFunction("g_things", "findThingTypeByAttr", &ThingTypeManager::findThingTypeByAttr, &g_things);
 
-
     g_lua.registerSingletonClass("g_houses");
     g_lua.bindSingletonFunction("g_houses", "clear", &HouseManager::clear, &g_houses);
     g_lua.bindSingletonFunction("g_houses", "load", &HouseManager::load, &g_houses);
@@ -520,6 +519,8 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Creature>("jump", &Creature::jump);
     g_lua.bindClassMemberFunction<Creature>("setMountShader", &Creature::setMountShader);
     g_lua.bindClassMemberFunction<Creature>("setDrawOutfitColor", &Creature::setDrawOutfitColor);
+    g_lua.bindClassMemberFunction<Creature>("setDisableWalkAnimation", &Creature::setDisableWalkAnimation);
+    g_lua.bindClassMemberFunction<Creature>("isDisabledWalkAnimation", &Creature::isDisabledWalkAnimation);
 
     g_lua.registerClass<ItemType>();
     g_lua.bindClassMemberFunction<ItemType>("getServerId", &ItemType::getServerId);

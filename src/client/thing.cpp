@@ -93,7 +93,7 @@ void Thing::addStaticEffect(const StaticEffectPtr& obj) {
     }
 
     m_staticEffects.emplace_back(obj);
-    obj->callLuaField("onAdd", this);
+    obj->callLuaField("onAdd", asLuaObject());
 }
 
 bool Thing::removeStaticEffectById(uint16_t id) {
@@ -103,7 +103,7 @@ bool Thing::removeStaticEffectById(uint16_t id) {
     if (it == m_staticEffects.end())
         return false;
 
-    (*it)->callLuaField("onRemove", this);
+    (*it)->callLuaField("onRemove", asLuaObject());
     m_staticEffects.erase(it);
 
     return true;
@@ -111,7 +111,7 @@ bool Thing::removeStaticEffectById(uint16_t id) {
 
 void Thing::clearStaticEffect() {
     for (const auto& e : m_staticEffects)
-        e->callLuaField("onRemove", this);
+        e->callLuaField("onRemove", asLuaObject());
     m_staticEffects.clear();
 }
 
