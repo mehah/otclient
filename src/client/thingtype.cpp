@@ -276,7 +276,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
     // default action
 
     if (flags.has_market()) {
-        m_market.category = static_cast<ThingCategory>(flags.market().category());
+        m_market.category = static_cast<ITEM_CATEGORY>(flags.market().category());
         m_market.tradeAs = flags.market().trade_as_object_id();
         m_market.showAs = flags.market().show_as_object_id();
         m_market.name = flags.market().name();
@@ -545,7 +545,7 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
             }
             case ThingAttrMarket:
             {
-                m_market.category = static_cast<ThingCategory>(fin->getU16());
+                m_market.category = static_cast<ITEM_CATEGORY>(fin->getU16());
                 m_market.tradeAs = fin->getU16();
                 m_market.showAs = fin->getU16();
                 m_market.name = fin->getString();

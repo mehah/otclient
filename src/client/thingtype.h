@@ -170,7 +170,34 @@ enum PLAYER_ACTION : uint8_t {
     PLAYER_ACTION_AUTOWALK_HIGHLIGHT = 4
 };
 
-enum SpriteMask
+enum ITEM_CATEGORY : uint8_t {
+    ITEM_CATEGORY_ARMORS = 1,
+    ITEM_CATEGORY_AMULETS = 2,
+    ITEM_CATEGORY_BOOTS = 3,
+    ITEM_CATEGORY_CONTAINERS = 4,
+    ITEM_CATEGORY_DECORATION = 5,
+    ITEM_CATEGORY_FOOD = 6,
+    ITEM_CATEGORY_HELMETS_HATS = 7,
+    ITEM_CATEGORY_LEGS = 8,
+    ITEM_CATEGORY_OTHERS = 9,
+    ITEM_CATEGORY_POTIONS = 10,
+    ITEM_CATEGORY_RINGS = 11,
+    ITEM_CATEGORY_RUNES = 12,
+    ITEM_CATEGORY_SHIELDS = 13,
+    ITEM_CATEGORY_TOOLS = 14,
+    ITEM_CATEGORY_VALUABLES = 15,
+    ITEM_CATEGORY_AMMUNITION = 16,
+    ITEM_CATEGORY_AXES = 17,
+    ITEM_CATEGORY_CLUBS = 18,
+    ITEM_CATEGORY_DISTANCE_WEAPONS = 19,
+    ITEM_CATEGORY_SWORDS = 20,
+    ITEM_CATEGORY_WANDS_RODS = 21,
+    ITEM_CATEGORY_PREMIUM_SCROLLS = 22,
+    ITEM_CATEGORY_TIBIA_COINS = 23,
+    ITEM_CATEGORY_CREATURE_PRODUCTS = 24
+};
+
+enum SpriteMask :uint8_t
 {
     SpriteMaskRed = 1,
     SpriteMaskGreen,
@@ -196,7 +223,7 @@ struct Imbuement
 struct MarketData
 {
     std::string name;
-    ThingCategory category;
+    ITEM_CATEGORY category;
     uint16_t requiredLevel;
     uint16_t restrictVocation;
     uint16_t showAs;
