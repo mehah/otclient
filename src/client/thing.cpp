@@ -87,6 +87,11 @@ int Thing::getStackPos()
 }
 
 void Thing::addStaticEffect(const StaticEffectPtr& obj) {
+    if (isCreature()) {
+        if (obj->m_thingType->getCategory() == ThingCategoryCreature || obj->m_thingType->getCategory() == ThingCategoryMissile)
+            obj->m_direction = static_self_cast<Creature>()->getDirection();
+    }
+
     m_staticEffects.emplace_back(obj);
     obj->callLuaField("onAdd", this);
 }
@@ -102,6 +107,12 @@ bool Thing::removeStaticEffectById(uint16_t id) {
     m_staticEffects.erase(it);
 
     return true;
+}
+
+void Thing::clearStaticEffect() {
+    for (const auto& e : m_staticEffects)
+        e->callLuaField("onRemove", this);
+    m_staticEffects.clear();
 }
 
 StaticEffectPtr Thing::getStaticEffectById(uint16_t id) {

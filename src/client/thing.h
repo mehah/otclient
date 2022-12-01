@@ -169,7 +169,7 @@ public:
     const Color& getMarkedColor() { m_markedColor.setAlpha(0.1f + std::abs(500 - g_clock.millis() % 1000) / 1000.0f); return m_markedColor; }
 
     void addStaticEffect(const StaticEffectPtr& obj);
-    void clearStaticEffect() { m_staticEffects.clear(); }
+    void clearStaticEffect();
     bool removeStaticEffectById(uint16_t id);
     StaticEffectPtr getStaticEffectById(uint16_t id);
 

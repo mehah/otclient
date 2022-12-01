@@ -1,0 +1,9 @@
+Module
+  name: game_staticeffects
+  description: Static Effect, like aura, wings...
+  author: Mehah
+  website:
+  scripts: [ lib.lua, effects.lua, staticeffects.lua ]
+  sandboxed: true
+  @onLoad: init()
+  @onUnload: terminate()

@@ -35,6 +35,6 @@ Module
     - game_modaldialog
     - game_unjustifiedpoints
     - game_shaders
-    - game_thingeffects
+    - game_staticeffects
   @onLoad: init()
   @onUnload: terminate()
