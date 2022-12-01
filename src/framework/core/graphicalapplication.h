@@ -45,7 +45,13 @@ public:
     int getMaxFps() { return m_frameCounter.getMaxFps(); }
 
     bool isOnInputEvent() { return m_onInputEvent; }
-    bool mustOptimize(bool critical = false) { return critical && m_forceCriticalOptimization || m_optimize && getCPUInterval() > (critical ? 15000u : 8000u); }
+    bool mustOptimize(bool critical = false) {
+#ifdef NDEBUG
+        return critical && m_forceCriticalOptimization || m_optimize && getCPUInterval() > (critical ? 15000u : 8000u);
+#else
+        return false;
+#endif
+    }
     bool isForcedEffectOptimization() { return m_forceEffectOptimization; }
 
     void optimize(const bool optimize) { m_optimize = optimize; }
@@ -71,8 +77,6 @@ private:
     bool m_forceEffectOptimization{ false };
     bool m_drawEffectOnTop{ false };
     bool m_forceCriticalOptimization{ false };
-
-    Timer m_foregroundRefreshTime;
 
     AdaptativeFrameCounter m_frameCounter;
 };
