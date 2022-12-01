@@ -1,7 +1,8 @@
---[[ (thingId, thingType) ]] --
+--[[
+    registerThingConfig(thingId, thingType)
+    set(staticEffectId, config)
+]] --
 local c = StaticEffectManager.registerThingConfig(ThingCategoryCreature, 618)
-
---[[ set(staticEffectId, {offsetX, offsetY, onTop} or {[dir] = {offsetX, offsetY, onTop}}) ]]
 
 c:set(1, {
     speed = 10
