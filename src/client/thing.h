@@ -173,6 +173,8 @@ public:
     bool removeStaticEffectById(uint16_t id);
     StaticEffectPtr getStaticEffectById(uint16_t id);
 
+    const std::vector<StaticEffectPtr>& getStaticEffects() { return m_staticEffects; };
+
 protected:
     void drawStaticEffect(const Point& dest, LightView* lightView, bool isOnTop) {
         for (const auto& staticEffect : m_staticEffects) {

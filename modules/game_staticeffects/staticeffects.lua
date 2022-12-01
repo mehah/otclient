@@ -1,5 +1,13 @@
 function init()
 
+    connect(LocalPlayer, {
+        onOutfitChange = onOutfitChange
+    })
+
+    connect(Creature, {
+        onOutfitChange = onOutfitChange
+    })
+
     connect(StaticEffect, {
         onAdd = onAddStaticEffect,
         onRemove = onRemoveStaticEffect
@@ -21,6 +29,14 @@ function terminate()
         onGameEnd()
     end
 
+    disconnect(LocalPlayer, {
+        onOutfitChange = onOutfitChange
+    })
+
+    disconnect(Creature, {
+        onOutfitChange = onOutfitChange
+    })
+
     disconnect(StaticEffect, {
         onAdd = onAddStaticEffect,
         onRemove = onRemoveStaticEffect
@@ -35,6 +51,8 @@ end
 function onGameStart()
     g_game.getLocalPlayer():addStaticEffect(StaticEffectManager.create(1))
     g_game.getLocalPlayer():addStaticEffect(StaticEffectManager.create(2))
+
+    onOutfitChange(g_game.getLocalPlayer(), g_game.getLocalPlayer():getOutfit())
 end
 
 function onGameEnd()
@@ -47,4 +65,10 @@ end
 
 function onRemoveStaticEffect(effect, oldOwner)
     print(345)
+end
+
+function onOutfitChange(creature, outfit, oldOutfit)
+    for _i, effect in pairs(creature:getStaticEffects()) do
+        StaticEffectManager.executeThingConfig(effect, ThingCategoryCreature, outfit.type)
+    end
 end

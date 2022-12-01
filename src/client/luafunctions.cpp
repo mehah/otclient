@@ -423,6 +423,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Thing>("isWrapable", &Thing::isWrapable);
     g_lua.bindClassMemberFunction<Thing>("isUnwrapable", &Thing::isUnwrapable);
     g_lua.bindClassMemberFunction<Thing>("isTopEffect", &Thing::isTopEffect);
+    g_lua.bindClassMemberFunction<Thing>("getStaticEffects", &Thing::getStaticEffects);
     g_lua.bindClassMemberFunction<Thing>("addStaticEffect", &Thing::addStaticEffect);
     g_lua.bindClassMemberFunction<Thing>("removeStaticEffectById", &Thing::removeStaticEffectById);
     g_lua.bindClassMemberFunction<Thing>("getStaticEffectById", &Thing::getStaticEffectById);
@@ -644,8 +645,8 @@ void Client::registerLuaFunctions()
 
     g_lua.registerClass<StaticEffect>();
     g_lua.bindClassStaticFunction<StaticEffect>("create", &StaticEffect::create);
-    // g_lua.bindClassStaticFunction<StaticEffect>("getId", &StaticEffect::getId);
-    // g_lua.bindClassStaticFunction<StaticEffect>("getSpeed", &StaticEffect::getSpeed);
+    g_lua.bindClassMemberFunction<StaticEffect>("getId", &StaticEffect::getId);
+    g_lua.bindClassMemberFunction<StaticEffect>("getSpeed", &StaticEffect::getSpeed);
     g_lua.bindClassMemberFunction<StaticEffect>("setOnTop", &StaticEffect::setOnTop);
     g_lua.bindClassMemberFunction<StaticEffect>("setSpeed", &StaticEffect::setSpeed);
     g_lua.bindClassMemberFunction<StaticEffect>("setOffset", &StaticEffect::setOffset);

@@ -4,7 +4,6 @@ StaticEffectManager.register(1, 'Spoke Lighting', 12, ThingCategoryEffect, {
 })
 
 StaticEffectManager.register(2, 'Bat Wings', 307, ThingCategoryCreature, {
-    speed = 2,
     dirOffset = {
         [North] = {0, 2, true},
         [East] = {5, -5},
