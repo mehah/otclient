@@ -78,8 +78,6 @@ private:
     bool m_drawEffectOnTop{ false };
     bool m_forceCriticalOptimization{ false };
 
-    Timer m_foregroundRefreshTime;
-
     AdaptativeFrameCounter m_frameCounter;
 };
 

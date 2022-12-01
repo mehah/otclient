@@ -39,7 +39,6 @@ const static TexturePtr m_textureNull;
 void ThingType::serialize(const FileStreamPtr& fin)
 {
     for (int i = 0; i < ThingLastAttr; ++i) {
-
         int attr = i;
         if (g_game.getClientVersion() >= 780) {
             if (attr == ThingAttrChargeable)
@@ -302,6 +301,10 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
         m_flags |= ThingFlagAttrTopEffect;
     }
 
+    if (flags.has_default_action()) {
+        m_defaultAction = static_cast<PLAYER_ACTION>(flags.default_action().action());
+    }
+
     // npcsaledata
     // charged to expire
     // corpse
@@ -557,7 +560,7 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
             case ThingAttrMinimapColor: m_minimapColor = fin->getU16(); break;
             case ThingAttrCloth: m_clothSlot = fin->getU16(); break;
             case ThingAttrLensHelp: m_lensHelp = fin->getU16(); break;
-            case ThingAttrDefaultAction: m_defaultAction = fin->getU16(); break;
+            case ThingAttrDefaultAction: m_defaultAction = static_cast<PLAYER_ACTION>(fin->getU16()); break;
         }
     }
 

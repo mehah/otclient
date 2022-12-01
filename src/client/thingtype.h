@@ -162,6 +162,22 @@ enum ThingFlagAttr :uint64_t {
     ThingFlagAttrDefaultAction = static_cast<uint64_t>(1) << 44
 };
 
+enum PLAYER_ACTION : uint8_t {
+    PLAYER_ACTION_NONE = 0,
+    PLAYER_ACTION_LOOK = 1,
+    PLAYER_ACTION_USE = 2,
+    PLAYER_ACTION_OPEN = 3,
+    PLAYER_ACTION_AUTOWALK_HIGHLIGHT = 4
+};
+
+enum SpriteMask
+{
+    SpriteMaskRed = 1,
+    SpriteMaskGreen,
+    SpriteMaskBlue,
+    SpriteMaskYellow
+};
+
 struct Imbuement
 {
     uint32_t id;
@@ -175,14 +191,6 @@ struct Imbuement
     uint32_t cost;
     uint8_t successRate;
     uint32_t protectionCost;
-};
-
-enum SpriteMask
-{
-    SpriteMaskRed = 1,
-    SpriteMaskGreen,
-    SpriteMaskBlue,
-    SpriteMaskYellow
 };
 
 struct MarketData
@@ -315,6 +323,8 @@ public:
     bool hasAction() { return (m_flags & ThingFlagAttrDefaultAction); }
     bool isOpaque() { if (m_opaque == -1) getTexture(0); return m_opaque == 1; }
 
+    PLAYER_ACTION getDefaultAction() { return m_defaultAction; }
+
     uint16_t getClassification() { return m_upgradeClassification; }
     std::vector<uint32_t> getSprites() { return m_spritesIndex; }
 
@@ -364,8 +374,9 @@ private:
     uint8_t m_minimapColor{ 0 };
     uint8_t m_clothSlot{ 0 };
     uint8_t m_lensHelp{ 0 };
-    uint8_t m_defaultAction{ 0 };
     uint8_t m_elevation{ 0 };
+
+    PLAYER_ACTION m_defaultAction{ 0 };
 
     uint16_t m_id{ 0 };
     uint16_t m_groundSpeed{ 0 };

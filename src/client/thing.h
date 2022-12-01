@@ -152,6 +152,8 @@ public:
     bool isSingleDimension() { return m_thingType->isSingleDimension(); }
     bool isTall(const bool useRealSize = false) { return m_thingType->isTall(useRealSize); }
 
+    PLAYER_ACTION getDefaultAction() { return m_thingType->getDefaultAction(); }
+
     uint16_t getClassification() const { return m_thingType->getClassification(); }
 
     void canDraw(bool canDraw) { m_canDraw = canDraw; }
