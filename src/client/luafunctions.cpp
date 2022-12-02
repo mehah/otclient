@@ -657,6 +657,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<StaticEffect>("setOffset", &StaticEffect::setOffset);
     g_lua.bindClassMemberFunction<StaticEffect>("setDirOffset", &StaticEffect::setDirOffset);
     g_lua.bindClassMemberFunction<StaticEffect>("setOnTopByDir", &StaticEffect::setOnTopByDir);
+    g_lua.bindClassMemberFunction<StaticEffect>("setShader", &StaticEffect::setShader);
 
     g_lua.registerClass<StaticText, Thing>();
     g_lua.bindClassStaticFunction<StaticText>("create", [] { return StaticTextPtr(new StaticText); });

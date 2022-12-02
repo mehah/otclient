@@ -11,11 +11,14 @@ local executeConfig = function(staticEffect, config)
             staticEffect:setSpeed(config.speed)
         end
 
-        local config = config
         if config.offset then
             x = config.offset[1] or 0
             y = config.offset[2] or 0
             onTop = config.offset[3] or false
+        end
+
+        if config.shader then
+            staticEffect:setShader(g_shaders.getShader(config.shader))
         end
 
         staticEffect:setOffset(x, y)

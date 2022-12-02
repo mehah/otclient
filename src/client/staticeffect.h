@@ -41,7 +41,7 @@ public:
     void setOnTopByDir(Otc::Direction direction, bool onTop) { m_offsetDirections[direction].onTop = onTop; }
 
     void setDirOffset(Otc::Direction direction, int8_t x, int8_t y, bool onTop = false) { m_offsetDirections[direction] = { onTop, {x, y} }; }
-
+    void setShader(const PainterShaderProgramPtr& shader) { m_shader = shader; }
 private:
     struct DirControl {
         bool onTop{ false };
@@ -61,6 +61,8 @@ private:
     Otc::Direction m_direction{ Otc::North };
 
     std::array<DirControl, Otc::Direction::West + 1> m_offsetDirections;
+
+    PainterShaderProgramPtr m_shader;
 
     friend class Thing;
 };
