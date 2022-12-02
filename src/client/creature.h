@@ -122,8 +122,10 @@ public:
 
     bool isDisabledWalkAnimation() { return m_disableWalkAnimation > 0; }
     void setDisableWalkAnimation(bool v) {
-        if (!v && m_disableWalkAnimation <= 1) { m_disableWalkAnimation = 0; return; }
-        if (v) ++m_disableWalkAnimation; else --m_disableWalkAnimation;
+        if (v) ++m_disableWalkAnimation; else {
+            if (m_disableWalkAnimation <= 1) m_disableWalkAnimation = 0;
+            else --m_disableWalkAnimation;
+        }
     }
 
     void updateShield();
