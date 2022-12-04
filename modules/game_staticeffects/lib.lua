@@ -84,6 +84,17 @@ StaticEffectManager = {
         local methods = {
             set = function(self, id, config)
                 thingConfig[id] = config
+                local effect = StaticEffectManager.get(id)
+                if effect then
+                    local originalConfig = effect.config
+                    if config.onAdd then
+                        originalConfig.onAdd = config.onAdd
+                    end
+
+                    if config.onRemove then
+                        originalConfig.onRemove = config.onRemove
+                    end
+                end
             end
         }
 

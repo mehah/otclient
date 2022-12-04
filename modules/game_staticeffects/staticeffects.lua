@@ -60,12 +60,16 @@ function onGameEnd()
 end
 
 function onAddStaticEffect(effect, owner)
-    if owner:isCreature() then
-        local config = StaticEffectManager.get(effect:getId()).config
+    local config = StaticEffectManager.get(effect:getId()).config
 
+    if owner:isCreature() then
         if config.disableWalkAnimation then
             owner:setDisableWalkAnimation(config.disableWalkAnimation)
         end
+    end
+
+    if config.onAdd then
+        config.onAdd(effect, owner)
     end
 end
 
@@ -74,6 +78,11 @@ function onRemoveStaticEffect(effect, oldOwner)
     if config.disableWalkAnimation then
         oldOwner:setDisableWalkAnimation(false)
     end
+
+    if config.onRemove then
+        config.onRemove(effect, oldOwner)
+    end
+
 end
 
 function onOutfitChange(creature, outfit, oldOutfit)
