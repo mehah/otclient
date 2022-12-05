@@ -24,6 +24,7 @@
 
 #include "declarations.h"
 #include "thingtype.h"
+#include "attachedeffect.h"
 #include "thingtypemanager.h"
 #include "spritemanager.h"
 #include <framework/luaengine/luaobject.h>
@@ -169,7 +170,28 @@ public:
 
     const Color& getMarkedColor() { m_markedColor.setAlpha(0.1f + std::abs(500 - g_clock.millis() % 1000) / 1000.0f); return m_markedColor; }
 
+    void attachEffect(const AttachedEffectPtr& obj);
+    void clearAttachedEffects();
+    bool detachEffectById(uint16_t id);
+    AttachedEffectPtr getAttachedEffectById(uint16_t id);
+
+    const std::vector<AttachedEffectPtr>& getAttachedEffects() { return m_attachedEffects; };
+
 protected:
+    void drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop) {
+        for (const auto& effect : m_attachedEffects) {
+            effect->draw(dest, isOnTop, lightView);
+        }
+    }
+
+    void setAttachedEffectDirection(Otc::Direction dir) {
+        for (const auto& effect : m_attachedEffects) {
+            if (effect->m_thingType->getCategory() == ThingCategoryCreature ||
+                effect->m_thingType->getCategory() == ThingCategoryMissile)
+                effect->m_direction = dir;
+        }
+    }
+
     uint8_t m_numPatternX{ 0 };
     uint8_t m_numPatternY{ 0 };
     uint8_t m_numPatternZ{ 0 };
@@ -183,6 +205,8 @@ protected:
     // Shader
     PainterShaderProgramPtr m_shader;
     std::function<void()> m_shaderAction{ nullptr };
+
+    std::vector<AttachedEffectPtr> m_attachedEffects;
 
 private:
     bool m_canDraw{ true };

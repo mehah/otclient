@@ -332,7 +332,7 @@
     </ClCompile>
     <ClCompile Include="..\src\framework\stdext\uri.cpp">
       <Filter>Source Files\framework\stdext</Filter>
-    </ClCompile>    
+    </ClCompile>
     <ClCompile Include="..\src\framework\ui\uianchorlayout.cpp">
       <Filter>Source Files\framework\ui</Filter>
     </ClCompile>
@@ -536,6 +536,9 @@
     </ClCompile>
     <ClCompile Include="..\src\protobuf\appearances.pb.cc">
       <Filter>Source Files\protobuf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\client\attachedeffect.cpp">
+      <Filter>Source Files\client</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1048,6 +1051,9 @@
     </ClInclude>
     <ClInclude Include="..\src\protobuf\appearances.pb.h">
       <Filter>Header Files\protobuf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\attachedeffect.h">
+      <Filter>Header Files\client</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,9 @@
+Module
+  name: game_attachedeffects
+  description: Attached Effects System, to create aura, wings...
+  author: Mehah
+  website:
+  scripts: [lib, attachedeffects, effects, configs/outfit_618]
+  sandboxed: true
+  @onLoad: init()
+  @onUnload: terminate()

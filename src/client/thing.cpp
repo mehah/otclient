@@ -85,3 +85,42 @@ int Thing::getStackPos()
     g_logger.traceError("got a thing with invalid stackpos");
     return -1;
 }
+
+void Thing::attachEffect(const AttachedEffectPtr& obj) {
+    if (isCreature()) {
+        if (obj->m_thingType->getCategory() == ThingCategoryCreature || obj->m_thingType->getCategory() == ThingCategoryMissile)
+            obj->m_direction = static_self_cast<Creature>()->getDirection();
+    }
+
+    m_attachedEffects.emplace_back(obj);
+    obj->callLuaField("onAttach", asLuaObject());
+}
+
+bool Thing::detachEffectById(uint16_t id) {
+    const auto it = std::find_if(m_attachedEffects.begin(), m_attachedEffects.end(),
+        [id](const AttachedEffectPtr& obj) { return obj->getId() == id; });
+
+    if (it == m_attachedEffects.end())
+        return false;
+
+    (*it)->callLuaField("onDetach", asLuaObject());
+    m_attachedEffects.erase(it);
+
+    return true;
+}
+
+void Thing::clearAttachedEffects() {
+    for (const auto& e : m_attachedEffects)
+        e->callLuaField("onDetach", asLuaObject());
+    m_attachedEffects.clear();
+}
+
+AttachedEffectPtr Thing::getAttachedEffectById(uint16_t id) {
+    const auto it = std::find_if(m_attachedEffects.begin(), m_attachedEffects.end(),
+        [id](const AttachedEffectPtr& obj) { return obj->getId() == id; });
+
+    if (it == m_attachedEffects.end())
+        return nullptr;
+
+    return *it;
+}

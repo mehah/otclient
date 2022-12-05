@@ -50,6 +50,7 @@
 #include "uiminimap.h"
 #include "uiprogressrect.h"
 #include "uisprite.h"
+#include "attachedeffect.h"
 
 #include <framework/luaengine/luainterface.h>
 
@@ -424,6 +425,11 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Thing>("isTopEffect", &Thing::isTopEffect);
     g_lua.bindClassMemberFunction<Thing>("isLyingCorpse", &Thing::isLyingCorpse);
     g_lua.bindClassMemberFunction<Thing>("getDefaultAction", &Thing::getDefaultAction);
+    g_lua.bindClassMemberFunction<Thing>("getAttachedEffects", &Thing::getAttachedEffects);
+    g_lua.bindClassMemberFunction<Thing>("attachEffect", &Thing::attachEffect);
+    g_lua.bindClassMemberFunction<Thing>("detachEffectById", &Thing::detachEffectById);
+    g_lua.bindClassMemberFunction<Thing>("getAttachedEffectById", &Thing::getAttachedEffectById);
+    g_lua.bindClassMemberFunction<Thing>("clearAttachedEffects", &Thing::clearAttachedEffects);
 
     g_lua.registerClass<House>();
     g_lua.bindClassStaticFunction<House>("create", [] { return HousePtr(new House); });
@@ -513,6 +519,8 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Creature>("jump", &Creature::jump);
     g_lua.bindClassMemberFunction<Creature>("setMountShader", &Creature::setMountShader);
     g_lua.bindClassMemberFunction<Creature>("setDrawOutfitColor", &Creature::setDrawOutfitColor);
+    g_lua.bindClassMemberFunction<Creature>("setDisableWalkAnimation", &Creature::setDisableWalkAnimation);
+    g_lua.bindClassMemberFunction<Creature>("isDisabledWalkAnimation", &Creature::isDisabledWalkAnimation);
 
     g_lua.registerClass<ItemType>();
     g_lua.bindClassMemberFunction<ItemType>("getServerId", &ItemType::getServerId);
@@ -639,6 +647,17 @@ void Client::registerLuaFunctions()
     g_lua.bindClassStaticFunction<Missile>("create", [] { return MissilePtr(new Missile); });
     g_lua.bindClassMemberFunction<Missile>("setId", &Missile::setId);
     g_lua.bindClassMemberFunction<Missile>("setPath", &Missile::setPath);
+
+    g_lua.registerClass<AttachedEffect>();
+    g_lua.bindClassStaticFunction<AttachedEffect>("create", &AttachedEffect::create);
+    g_lua.bindClassMemberFunction<AttachedEffect>("getId", &AttachedEffect::getId);
+    g_lua.bindClassMemberFunction<AttachedEffect>("getSpeed", &AttachedEffect::getSpeed);
+    g_lua.bindClassMemberFunction<AttachedEffect>("setOnTop", &AttachedEffect::setOnTop);
+    g_lua.bindClassMemberFunction<AttachedEffect>("setSpeed", &AttachedEffect::setSpeed);
+    g_lua.bindClassMemberFunction<AttachedEffect>("setOffset", &AttachedEffect::setOffset);
+    g_lua.bindClassMemberFunction<AttachedEffect>("setDirOffset", &AttachedEffect::setDirOffset);
+    g_lua.bindClassMemberFunction<AttachedEffect>("setOnTopByDir", &AttachedEffect::setOnTopByDir);
+    g_lua.bindClassMemberFunction<AttachedEffect>("setShader", &AttachedEffect::setShader);
 
     g_lua.registerClass<StaticText, Thing>();
     g_lua.bindClassStaticFunction<StaticText>("create", [] { return StaticTextPtr(new StaticText); });

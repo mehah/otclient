@@ -125,7 +125,7 @@ int Animator::getPhase()
     return m_phase;
 }
 
-int Animator::getPhaseAt(Timer& timer) const
+int Animator::getPhaseAt(Timer& timer, float durationFactor) const
 {
     const ticks_t time = timer.ticksElapsed();
 
@@ -133,7 +133,7 @@ int Animator::getPhaseAt(Timer& timer) const
     ticks_t total = 0;
 
     for (const auto [min, max] : m_phaseDurations) {
-        total += min + (max - min);
+        total += (min + (max - min)) / durationFactor;
 
         if (time < total) {
             return index;
