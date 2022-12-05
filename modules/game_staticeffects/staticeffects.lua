@@ -1,5 +1,17 @@
-function init()
+-- Example
+--[[
+function onGameStart()
+    g_game.getLocalPlayer():addStaticEffect(StaticEffectManager.create(1))
+    g_game.getLocalPlayer():addStaticEffect(StaticEffectManager.create(2))
 
+    onOutfitChange(g_game.getLocalPlayer(), g_game.getLocalPlayer():getOutfit())
+end
+
+function onGameEnd()
+    g_game.getLocalPlayer():clearStaticEffect()
+end
+]] --
+function init()
     connect(LocalPlayer, {
         onOutfitChange = onOutfitChange
     })
@@ -21,7 +33,6 @@ function init()
     if g_game.isOnline() then
         onGameStart()
     end
-
 end
 
 function terminate()
@@ -46,17 +57,6 @@ function terminate()
         onGameStart = onGameStart,
         onGameEnd = onGameEnd
     })
-end
-
-function onGameStart()
-    g_game.getLocalPlayer():addStaticEffect(StaticEffectManager.create(1))
-    g_game.getLocalPlayer():addStaticEffect(StaticEffectManager.create(2))
-
-    onOutfitChange(g_game.getLocalPlayer(), g_game.getLocalPlayer():getOutfit())
-end
-
-function onGameEnd()
-    g_game.getLocalPlayer():clearStaticEffect()
 end
 
 function onAddStaticEffect(effect, owner)

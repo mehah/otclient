@@ -18,7 +18,7 @@ StaticEffectManager.register(1, 'Spoke Lighting', 12, ThingCategoryEffect, {
 
 StaticEffectManager.register(2, 'Bat Wings', 307, ThingCategoryCreature, {
     speed = 5,
-    disableWalkAnimation = false,
+    disableWalkAnimation = true,
     shader = 'Outfit - Ghost',
     dirOffset = {
         [North] = {0, -10, true},
