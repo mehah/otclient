@@ -154,7 +154,7 @@ public:
     bool hasWideThings() { return m_thingTypeFlag & TileThingType::HAS_WIDE_THINGS; }
     bool hasWall() { return m_thingTypeFlag & TileThingType::HAS_WALL; }
 
-    bool mustHookSouth() { return m_thingTypeFlag & TileThingType::HAS_HOOK_EAST; }
+    bool mustHookSouth() { return m_thingTypeFlag & TileThingType::HAS_HOOK_SOUTH; }
     bool mustHookEast() { return m_thingTypeFlag & TileThingType::HAS_HOOK_EAST; }
 
     bool limitsFloorsView(bool isFreeView = false);
