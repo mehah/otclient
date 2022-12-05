@@ -5,7 +5,11 @@
 local c = StaticEffectManager.registerThingConfig(ThingCategoryCreature, 618)
 
 c:set(1, {
-    speed = 10
+    speed = 10,
+    onAdd = function(effect, owner, oldEventFnc)
+        oldEventFnc(effect, owner)
+        print('OnAdd in Config: ', effect:getId(), owner:getName())
+    end
 })
 
 c:set(2, {
@@ -16,10 +20,10 @@ c:set(2, {
         [South] = {0, 10},
         [West] = {-10, 0, true}
     },
-    onAdd = function(effect, owner)
+    onAdd = function(effect, owner, oldEventFnc)
         print('OnAdd in Config: ', effect:getId(), owner:getName())
     end,
-    onRemove = function(effect, oldOwner)
+    onRemove = function(effect, oldOwner, oldEventFnc)
         print('OnRemove in Config: ', effect:getId(), oldOwner:getName())
     end
 })

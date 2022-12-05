@@ -69,7 +69,7 @@ function onAddStaticEffect(effect, owner)
     end
 
     if config.onAdd then
-        config.onAdd(effect, owner)
+        config.onAdd(effect, owner, config.__onAdd)
     end
 end
 
@@ -80,7 +80,7 @@ function onRemoveStaticEffect(effect, oldOwner)
     end
 
     if config.onRemove then
-        config.onRemove(effect, oldOwner)
+        config.onRemove(effect, oldOwner, config.__onRemove)
     end
 
 end

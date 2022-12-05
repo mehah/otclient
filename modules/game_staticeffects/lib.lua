@@ -88,10 +88,12 @@ StaticEffectManager = {
                 if effect then
                     local originalConfig = effect.config
                     if config.onAdd then
+                        originalConfig.__onAdd = originalConfig.onAdd
                         originalConfig.onAdd = config.onAdd
                     end
 
                     if config.onRemove then
+                        originalConfig.__onRemove = originalConfig.onRemove
                         originalConfig.onRemove = config.onRemove
                     end
                 end
