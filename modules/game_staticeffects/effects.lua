@@ -1,6 +1,10 @@
 --[[
     register(id, name, thingId, thingType, config)
-    config = {speed, disableWalkAnimation, shader, offset{x, y, onTop}, dirOffset[dir]{x, y, onTop}}
+    config = {
+        speed, disableWalkAnimation, shader,
+        offset{x, y, onTop}, dirOffset[dir]{x, y, onTop},
+        onAdd, onRemove
+    }
 ]] --
 StaticEffectManager.register(1, 'Spoke Lighting', 12, ThingCategoryEffect, {
     speed = 0.5,
