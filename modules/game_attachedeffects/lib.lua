@@ -83,38 +83,55 @@ AttachedEffectManager = {
 
         local methods = {
             set = function(self, id, config)
-                thingConfig[id] = config
                 local effect = AttachedEffectManager.get(id)
-                if effect then
-                    local originalConfig = effect.config
-                    if config.onAdd then
-                        originalConfig.__onAdd = originalConfig.onAdd
-                        originalConfig.onAdd = config.onAdd
-                    end
+                if effect == nil then
+                    g_logger.error('Invalid Static Effect ID(' .. id .. ')')
+                    return
+                end
 
-                    if config.onRemove then
-                        originalConfig.__onRemove = originalConfig.onRemove
-                        originalConfig.onRemove = config.onRemove
-                    end
+                local __config = table.recursivecopy(effect.config)
+                table.merge(__config, config)
+
+                thingConfig[id] = __config
+
+                local originalConfig = effect.config
+                if config.onAdd then
+                    __config.__onAdd = effect.config.onAdd
+                end
+
+                if config.onRemove then
+                    __config.__onRemove = effect.config.onRemove
                 end
             end
         }
 
         return methods
     end,
-    executeThingConfig = function(effect, category, thingId)
+    getConfig = function(id, category, thingId)
         local config = __THING_CONFIG[category]
         if config then
             config = config[thingId]
             if config then
-                config = config[effect:getId()]
+                config = config[id]
                 if config then
-                    executeConfig(effect, config)
-                    return
+                    return config
                 end
             end
         end
+        return __EFFECTS[id].config
+    end,
+    executeThingConfig = function(effect, category, thingId)
+        executeConfig(effect, AttachedEffectManager.getConfig(effect:getId(), category, thingId))
+    end,
+    getDataThing = function(thing)
+        if thing:isCreature() then
+            return ThingCategoryCreature, thing:getOutfit().type
+        end
 
-        executeConfig(effect, __EFFECTS[effect:getId()].config)
+        if thing:isItem() then
+            return ThingCategoryItem, thing:getId()
+        end
+
+        return ThingInvalidCategory, 0
     end
 }

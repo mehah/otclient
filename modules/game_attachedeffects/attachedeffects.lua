@@ -1,16 +1,19 @@
 -- Example
 --[[
 function onGameStart()
-    g_game.getLocalPlayer():attachEffect(AttachedEffectManager.create(1))
-    g_game.getLocalPlayer():attachEffect(AttachedEffectManager.create(2))
+    addEvent(function()
+        g_game.getLocalPlayer():attachEffect(AttachedEffectManager.create(1))
+        g_game.getLocalPlayer():attachEffect(AttachedEffectManager.create(2))
 
-    onOutfitChange(g_game.getLocalPlayer(), g_game.getLocalPlayer():getOutfit())
+        onOutfitChange(g_game.getLocalPlayer(), g_game.getLocalPlayer():getOutfit())
+
+    end)
 end
-
+]] --
 function onGameEnd()
     g_game.getLocalPlayer():clearAttachedEffects()
 end
-]] --
+
 function init()
     connect(LocalPlayer, {
         onOutfitChange = onOutfitChange
@@ -60,12 +63,11 @@ function terminate()
 end
 
 function onAdd(effect, owner)
-    local config = AttachedEffectManager.get(effect:getId()).config
+    local category, thingId = AttachedEffectManager.getDataThing(owner)
+    local config = AttachedEffectManager.getConfig(effect:getId(), category, thingId)
 
     if owner:isCreature() then
-        if config.disableWalkAnimation then
-            owner:setDisableWalkAnimation(config.disableWalkAnimation)
-        end
+        owner:setDisableWalkAnimation(config.disableWalkAnimation or false)
     end
 
     if config.onAdd then
@@ -74,10 +76,10 @@ function onAdd(effect, owner)
 end
 
 function onRemove(effect, oldOwner)
-    local config = AttachedEffectManager.get(effect:getId()).config
-    if config.disableWalkAnimation then
-        oldOwner:setDisableWalkAnimation(false)
-    end
+    local category, thingId = AttachedEffectManager.getDataThing(oldOwner)
+    local config = AttachedEffectManager.getConfig(effect:getId(), category, thingId)
+
+    oldOwner:setDisableWalkAnimation(config.disableWalkAnimation or false)
 
     if config.onRemove then
         config.onRemove(effect, oldOwner, config.__onRemove)
