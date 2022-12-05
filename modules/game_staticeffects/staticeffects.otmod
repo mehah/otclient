@@ -1,9 +1,0 @@
-Module
-  name: game_staticeffects
-  description: Static Effect, like aura, wings...
-  author: Mehah
-  website:
-  scripts: [lib, staticeffects, effects, configs/outfit_618]
-  sandboxed: true
-  @onLoad: init()
-  @onUnload: terminate()

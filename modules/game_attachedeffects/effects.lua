@@ -6,7 +6,7 @@
         onAdd, onRemove
     }
 ]] --
-StaticEffectManager.register(1, 'Spoke Lighting', 12, ThingCategoryEffect, {
+AttachedEffectManager.register(1, 'Spoke Lighting', 12, ThingCategoryEffect, {
     speed = 0.5,
     onAdd = function(effect, owner)
         print('OnAdd: ', effect:getId(), owner:getName())
@@ -16,7 +16,7 @@ StaticEffectManager.register(1, 'Spoke Lighting', 12, ThingCategoryEffect, {
     end
 })
 
-StaticEffectManager.register(2, 'Bat Wings', 307, ThingCategoryCreature, {
+AttachedEffectManager.register(2, 'Bat Wings', 307, ThingCategoryCreature, {
     speed = 5,
     disableWalkAnimation = true,
     shader = 'Outfit - Ghost',

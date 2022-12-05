@@ -1,14 +1,14 @@
 local __EFFECTS = {}
 local __THING_CONFIG = {}
 
-local executeConfig = function(staticEffect, config)
+local executeConfig = function(attachedEffect, config)
     local x = 0
     local y = 0
     local onTop = false
 
     if config then
         if config.speed then
-            staticEffect:setSpeed(config.speed)
+            attachedEffect:setSpeed(config.speed)
         end
 
         if config.offset then
@@ -18,11 +18,11 @@ local executeConfig = function(staticEffect, config)
         end
 
         if config.shader then
-            staticEffect:setShader(g_shaders.getShader(config.shader))
+            attachedEffect:setShader(g_shaders.getShader(config.shader))
         end
 
-        staticEffect:setOffset(x, y)
-        staticEffect:setOnTop(onTop)
+        attachedEffect:setOffset(x, y)
+        attachedEffect:setOnTop(onTop)
 
         if config.dirOffset then
             for dir, offset in pairs(config.dirOffset) do
@@ -31,9 +31,9 @@ local executeConfig = function(staticEffect, config)
                 local _onTop = offset[3] or onTop
 
                 if type(x) == 'boolean' then -- onTop Config
-                    staticEffect:setOnTopByDir(dir, _x)
+                    attachedEffect:setOnTopByDir(dir, _x)
                 else
-                    staticEffect:setDirOffset(dir, _x, _y, _onTop)
+                    attachedEffect:setDirOffset(dir, _x, _y, _onTop)
                 end
             end
         end
@@ -41,7 +41,7 @@ local executeConfig = function(staticEffect, config)
 
 end
 
-StaticEffectManager = {
+AttachedEffectManager = {
     get = function(id)
         return __EFFECTS[id]
     end,
@@ -65,10 +65,10 @@ StaticEffectManager = {
             return
         end
 
-        local staticEffect = StaticEffect.create(effect.id, effect.thingId, effect.thingCategory)
-        executeConfig(staticEffect, effect.config)
+        local attachedEffect = AttachedEffect.create(effect.id, effect.thingId, effect.thingCategory)
+        executeConfig(attachedEffect, effect.config)
 
-        return staticEffect
+        return attachedEffect
     end,
     registerThingConfig = function(category, thingId)
         if __THING_CONFIG[category] == nil then
@@ -84,7 +84,7 @@ StaticEffectManager = {
         local methods = {
             set = function(self, id, config)
                 thingConfig[id] = config
-                local effect = StaticEffectManager.get(id)
+                local effect = AttachedEffectManager.get(id)
                 if effect then
                     local originalConfig = effect.config
                     if config.onAdd then

@@ -77,9 +77,9 @@ void Creature::draw(const Point& dest, bool animate, uint32_t flags, TextureType
 
         const auto& _dest = dest + m_walkOffset * g_sprites.getScaleFactor();
 
-        drawStaticEffect(_dest, lightView, false); // On Bottom
+        drawAttachedEffect(_dest, lightView, false); // On Bottom
         internalDrawOutfit(_dest, animate, textureType, m_direction, Color::white);
-        drawStaticEffect(_dest, lightView, true); // On Top
+        drawAttachedEffect(_dest, lightView, true); // On Top
 
         if (isMarked) {
             internalDrawOutfit(_dest, animate, TextureType::ALL_BLANK, m_direction, getMarkedColor());
@@ -669,7 +669,7 @@ void Creature::setDirection(Otc::Direction direction)
     else
         m_numPatternX = direction;
 
-    setStaticEffectDirection(direction);
+    setAttachedEffectDirection(direction);
 }
 
 void Creature::setOutfit(const Outfit& outfit)

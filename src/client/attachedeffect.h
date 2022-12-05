@@ -24,10 +24,10 @@
 
 #include "thingtype.h"
 
-class StaticEffect : public LuaObject
+class AttachedEffect : public LuaObject
 {
 public:
-    static StaticEffectPtr create(uint16_t id, uint16_t thingId, ThingCategory category);
+    static AttachedEffectPtr create(uint16_t id, uint16_t thingId, ThingCategory category);
 
     void draw(const Point& /*dest*/, bool /*isOnTop*/, LightView* = nullptr);
 

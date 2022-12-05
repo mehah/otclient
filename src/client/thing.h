@@ -24,7 +24,7 @@
 
 #include "declarations.h"
 #include "thingtype.h"
-#include "staticeffect.h"
+#include "attachedeffect.h"
 #include "thingtypemanager.h"
 #include "spritemanager.h"
 #include <framework/luaengine/luaobject.h>
@@ -170,25 +170,25 @@ public:
 
     const Color& getMarkedColor() { m_markedColor.setAlpha(0.1f + std::abs(500 - g_clock.millis() % 1000) / 1000.0f); return m_markedColor; }
 
-    void addStaticEffect(const StaticEffectPtr& obj);
-    void clearStaticEffect();
-    bool removeStaticEffectById(uint16_t id);
-    StaticEffectPtr getStaticEffectById(uint16_t id);
+    void attachEffect(const AttachedEffectPtr& obj);
+    void clearAttachedEffects();
+    bool detachEffectById(uint16_t id);
+    AttachedEffectPtr getAttachedEffectById(uint16_t id);
 
-    const std::vector<StaticEffectPtr>& getStaticEffects() { return m_staticEffects; };
+    const std::vector<AttachedEffectPtr>& getAttachedEffects() { return m_attachedEffects; };
 
 protected:
-    void drawStaticEffect(const Point& dest, LightView* lightView, bool isOnTop) {
-        for (const auto& staticEffect : m_staticEffects) {
-            staticEffect->draw(dest, isOnTop, lightView);
+    void drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop) {
+        for (const auto& effect : m_attachedEffects) {
+            effect->draw(dest, isOnTop, lightView);
         }
     }
 
-    void setStaticEffectDirection(Otc::Direction dir) {
-        for (const auto& staticEffect : m_staticEffects) {
-            if (staticEffect->m_thingType->getCategory() == ThingCategoryCreature ||
-                staticEffect->m_thingType->getCategory() == ThingCategoryMissile)
-                staticEffect->m_direction = dir;
+    void setAttachedEffectDirection(Otc::Direction dir) {
+        for (const auto& effect : m_attachedEffects) {
+            if (effect->m_thingType->getCategory() == ThingCategoryCreature ||
+                effect->m_thingType->getCategory() == ThingCategoryMissile)
+                effect->m_direction = dir;
         }
     }
 
@@ -206,7 +206,7 @@ protected:
     PainterShaderProgramPtr m_shader;
     std::function<void()> m_shaderAction{ nullptr };
 
-    std::vector<StaticEffectPtr> m_staticEffects;
+    std::vector<AttachedEffectPtr> m_attachedEffects;
 
 private:
     bool m_canDraw{ true };

@@ -1,8 +1,8 @@
 --[[
     registerThingConfig(thingId, thingType)
-    set(staticEffectId, config)
+    set(attachedEffectId, config)
 ]] --
-local c = StaticEffectManager.registerThingConfig(ThingCategoryCreature, 618)
+local c = AttachedEffectManager.registerThingConfig(ThingCategoryCreature, 618)
 
 c:set(1, {
     speed = 10,

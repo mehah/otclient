@@ -1,14 +1,14 @@
 -- Example
 --[[
 function onGameStart()
-    g_game.getLocalPlayer():addStaticEffect(StaticEffectManager.create(1))
-    g_game.getLocalPlayer():addStaticEffect(StaticEffectManager.create(2))
+    g_game.getLocalPlayer():attachEffect(AttachedEffectManager.create(1))
+    g_game.getLocalPlayer():attachEffect(AttachedEffectManager.create(2))
 
     onOutfitChange(g_game.getLocalPlayer(), g_game.getLocalPlayer():getOutfit())
 end
 
 function onGameEnd()
-    g_game.getLocalPlayer():clearStaticEffect()
+    g_game.getLocalPlayer():clearAttachedEffects()
 end
 ]] --
 function init()
@@ -20,9 +20,9 @@ function init()
         onOutfitChange = onOutfitChange
     })
 
-    connect(StaticEffect, {
-        onAdd = onAddStaticEffect,
-        onRemove = onRemoveStaticEffect
+    connect(AttachedEffect, {
+        onAdd = onAdd,
+        onRemove = onRemove
     })
 
     connect(g_game, {
@@ -48,9 +48,9 @@ function terminate()
         onOutfitChange = onOutfitChange
     })
 
-    disconnect(StaticEffect, {
-        onAdd = onAddStaticEffect,
-        onRemove = onRemoveStaticEffect
+    disconnect(AttachedEffect, {
+        onAdd = onAdd,
+        onRemove = onRemove
     })
 
     disconnect(g_game, {
@@ -59,8 +59,8 @@ function terminate()
     })
 end
 
-function onAddStaticEffect(effect, owner)
-    local config = StaticEffectManager.get(effect:getId()).config
+function onAdd(effect, owner)
+    local config = AttachedEffectManager.get(effect:getId()).config
 
     if owner:isCreature() then
         if config.disableWalkAnimation then
@@ -73,8 +73,8 @@ function onAddStaticEffect(effect, owner)
     end
 end
 
-function onRemoveStaticEffect(effect, oldOwner)
-    local config = StaticEffectManager.get(effect:getId()).config
+function onRemove(effect, oldOwner)
+    local config = AttachedEffectManager.get(effect:getId()).config
     if config.disableWalkAnimation then
         oldOwner:setDisableWalkAnimation(false)
     end
@@ -86,7 +86,7 @@ function onRemoveStaticEffect(effect, oldOwner)
 end
 
 function onOutfitChange(creature, outfit, oldOutfit)
-    for _i, effect in pairs(creature:getStaticEffects()) do
-        StaticEffectManager.executeThingConfig(effect, ThingCategoryCreature, outfit.type)
+    for _i, effect in pairs(creature:getAttachedEffects()) do
+        AttachedEffectManager.executeThingConfig(effect, ThingCategoryCreature, outfit.type)
     end
 end

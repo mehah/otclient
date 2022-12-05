@@ -20,23 +20,23 @@
  * THE SOFTWARE.
  */
 
-#include "staticeffect.h"
+#include "attachedeffect.h"
 #include "thingtypemanager.h"
 #include "spritemanager.h"
 
-StaticEffectPtr StaticEffect::create(uint16_t id, uint16_t thingId, ThingCategory category) {
+AttachedEffectPtr AttachedEffect::create(uint16_t id, uint16_t thingId, ThingCategory category) {
     if (!g_things.isValidDatId(thingId, category)) {
-        g_logger.error(stdext::format("invalid thing with id %d on create StaticEffect.", thingId));
+        g_logger.error(stdext::format("invalid thing with id %d on create AttachedEffect.", thingId));
         return nullptr;
     }
 
-    const StaticEffectPtr& obj(new StaticEffect);
+    const AttachedEffectPtr& obj(new AttachedEffect);
     obj->m_id = id;
     obj->m_thingType = g_things.getThingType(thingId, category).get();
     return obj;
 }
 
-void StaticEffect::draw(const Point& dest, bool isOnTop, LightView* lightView) {
+void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView) {
     const auto& dirControl = m_offsetDirections[m_direction];
     if (dirControl.onTop != isOnTop)
         return;

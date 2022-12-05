@@ -52,7 +52,7 @@ class Town;
 class CreatureType;
 class Spawn;
 class TileBlock;
-class StaticEffect;
+class AttachedEffect;
 
 using MapViewPtr = stdext::shared_object_ptr<MapView>;
 using LightViewPtr = stdext::shared_object_ptr<LightView>;
@@ -75,7 +75,7 @@ using HousePtr = stdext::shared_object_ptr<House>;
 using TownPtr = stdext::shared_object_ptr<Town>;
 using CreatureTypePtr = stdext::shared_object_ptr<CreatureType>;
 using SpawnPtr = stdext::shared_object_ptr<Spawn>;
-using StaticEffectPtr = stdext::shared_object_ptr<StaticEffect>;
+using AttachedEffectPtr = stdext::shared_object_ptr<AttachedEffect>;
 
 using ThingList = std::vector<ThingPtr>;
 using ThingTypeList = std::vector<ThingTypePtr>;

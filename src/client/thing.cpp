@@ -86,40 +86,40 @@ int Thing::getStackPos()
     return -1;
 }
 
-void Thing::addStaticEffect(const StaticEffectPtr& obj) {
+void Thing::attachEffect(const AttachedEffectPtr& obj) {
     if (isCreature()) {
         if (obj->m_thingType->getCategory() == ThingCategoryCreature || obj->m_thingType->getCategory() == ThingCategoryMissile)
             obj->m_direction = static_self_cast<Creature>()->getDirection();
     }
 
-    m_staticEffects.emplace_back(obj);
+    m_attachedEffects.emplace_back(obj);
     obj->callLuaField("onAdd", asLuaObject());
 }
 
-bool Thing::removeStaticEffectById(uint16_t id) {
-    const auto it = std::find_if(m_staticEffects.begin(), m_staticEffects.end(),
-        [id](const StaticEffectPtr& obj) { return obj->getId() == id; });
+bool Thing::detachEffectById(uint16_t id) {
+    const auto it = std::find_if(m_attachedEffects.begin(), m_attachedEffects.end(),
+        [id](const AttachedEffectPtr& obj) { return obj->getId() == id; });
 
-    if (it == m_staticEffects.end())
+    if (it == m_attachedEffects.end())
         return false;
 
     (*it)->callLuaField("onRemove", asLuaObject());
-    m_staticEffects.erase(it);
+    m_attachedEffects.erase(it);
 
     return true;
 }
 
-void Thing::clearStaticEffect() {
-    for (const auto& e : m_staticEffects)
+void Thing::clearAttachedEffects() {
+    for (const auto& e : m_attachedEffects)
         e->callLuaField("onRemove", asLuaObject());
-    m_staticEffects.clear();
+    m_attachedEffects.clear();
 }
 
-StaticEffectPtr Thing::getStaticEffectById(uint16_t id) {
-    const auto it = std::find_if(m_staticEffects.begin(), m_staticEffects.end(),
-        [id](const StaticEffectPtr& obj) { return obj->getId() == id; });
+AttachedEffectPtr Thing::getAttachedEffectById(uint16_t id) {
+    const auto it = std::find_if(m_attachedEffects.begin(), m_attachedEffects.end(),
+        [id](const AttachedEffectPtr& obj) { return obj->getId() == id; });
 
-    if (it == m_staticEffects.end())
+    if (it == m_attachedEffects.end())
         return nullptr;
 
     return *it;
