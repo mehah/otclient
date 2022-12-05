@@ -15,7 +15,7 @@
 - Refactored/Optimized Rendering System
 - New Light System
 - Auto Reload Module (Set true in [init.lua](https://github.com/mehah/otclient/blob/1026132e3dfa661807a1ff10ced2f4e09f1b7a7d/init.lua#L4) to enable)
-- Attached Effects System (to create aura, wings...) (code sample: [effects.lua](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/effects.lua), [outfit_618.lua](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/configs/outfit_618.lua))
+- Attached Effects System (to create aura, wings...) (code sample: [effects.lua](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/effects.lua), [outfit_618.lua](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/configs/outfit_618.lua), [code test[uncomment line]](https://github.com/mehah/otclient/blob/502cd34dbba8eb485e56ca599356e64cc2ca2c6f/modules/game_attachedeffects/attachedeffects.lua#L2))
 - Idle Animation Support
 - Highlight Mouse Target (press shift to select any object)
 - Crosshair
