@@ -24,8 +24,8 @@ function init()
     })
 
     connect(AttachedEffect, {
-        onAdd = onAdd,
-        onRemove = onRemove
+        onAttach = onAttach,
+        onDetach = onDetach
     })
 
     connect(g_game, {
@@ -52,8 +52,8 @@ function terminate()
     })
 
     disconnect(AttachedEffect, {
-        onAdd = onAdd,
-        onRemove = onRemove
+        onAttach = onAttach,
+        onDetach = onDetach
     })
 
     disconnect(g_game, {
@@ -62,7 +62,7 @@ function terminate()
     })
 end
 
-function onAdd(effect, owner)
+function onAttach(effect, owner)
     local category, thingId = AttachedEffectManager.getDataThing(owner)
     local config = AttachedEffectManager.getConfig(effect:getId(), category, thingId)
 
@@ -70,19 +70,19 @@ function onAdd(effect, owner)
         owner:setDisableWalkAnimation(config.disableWalkAnimation or false)
     end
 
-    if config.onAdd then
-        config.onAdd(effect, owner, config.__onAdd)
+    if config.onAttach then
+        config.onAttach(effect, owner, config.__onAttach)
     end
 end
 
-function onRemove(effect, oldOwner)
+function onDetach(effect, oldOwner)
     local category, thingId = AttachedEffectManager.getDataThing(oldOwner)
     local config = AttachedEffectManager.getConfig(effect:getId(), category, thingId)
 
     oldOwner:setDisableWalkAnimation(config.disableWalkAnimation or false)
 
-    if config.onRemove then
-        config.onRemove(effect, oldOwner, config.__onRemove)
+    if config.onDetach then
+        config.onDetach(effect, oldOwner, config.__onDetach)
     end
 end
 

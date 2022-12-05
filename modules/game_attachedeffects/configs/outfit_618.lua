@@ -6,9 +6,9 @@ local c = AttachedEffectManager.registerThingConfig(ThingCategoryCreature, 618)
 
 c:set(1, {
     speed = 10,
-    onAdd = function(effect, owner, oldEventFnc)
+    onAttach = function(effect, owner, oldEventFnc)
         oldEventFnc(effect, owner)
-        print('OnAdd in Config: ', effect:getId(), owner:getName())
+        print('onAttach in Config: ', effect:getId(), owner:getName())
     end
 })
 
@@ -20,10 +20,10 @@ c:set(2, {
         [South] = {0, 10},
         [West] = {-10, 0, true}
     },
-    onAdd = function(effect, owner, oldEventFnc)
-        print('OnAdd in Config: ', effect:getId(), owner:getName())
+    onAttach = function(effect, owner, oldEventFnc)
+        print('onAttach in Config: ', effect:getId(), owner:getName())
     end,
-    onRemove = function(effect, oldOwner, oldEventFnc)
-        print('OnRemove in Config: ', effect:getId(), oldOwner:getName())
+    onDetach = function(effect, oldOwner, oldEventFnc)
+        print('onDetach in Config: ', effect:getId(), oldOwner:getName())
     end
 })

@@ -3,16 +3,16 @@
     config = {
         speed, disableWalkAnimation, shader,
         offset{x, y, onTop}, dirOffset[dir]{x, y, onTop},
-        onAdd, onRemove
+        onAttach, onDetach
     }
 ]] --
 AttachedEffectManager.register(1, 'Spoke Lighting', 12, ThingCategoryEffect, {
     speed = 0.5,
-    onAdd = function(effect, owner)
-        print('OnAdd: ', effect:getId(), owner:getName())
+    onAttach = function(effect, owner)
+        print('onAttach: ', effect:getId(), owner:getName())
     end,
-    onRemove = function(effect, oldOwner)
-        print('OnRemove: ', effect:getId(), oldOwner:getName())
+    onDetach = function(effect, oldOwner)
+        print('onDetach: ', effect:getId(), oldOwner:getName())
     end
 })
 

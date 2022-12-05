@@ -95,12 +95,12 @@ AttachedEffectManager = {
                 thingConfig[id] = __config
 
                 local originalConfig = effect.config
-                if config.onAdd then
-                    __config.__onAdd = effect.config.onAdd
+                if config.onAttach then
+                    __config.__onAttach = effect.config.onAttach
                 end
 
-                if config.onRemove then
-                    __config.__onRemove = effect.config.onRemove
+                if config.onDetach then
+                    __config.__onDetach = effect.config.onDetach
                 end
             end
         }

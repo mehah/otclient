@@ -93,7 +93,7 @@ void Thing::attachEffect(const AttachedEffectPtr& obj) {
     }
 
     m_attachedEffects.emplace_back(obj);
-    obj->callLuaField("onAdd", asLuaObject());
+    obj->callLuaField("onAttach", asLuaObject());
 }
 
 bool Thing::detachEffectById(uint16_t id) {
@@ -103,7 +103,7 @@ bool Thing::detachEffectById(uint16_t id) {
     if (it == m_attachedEffects.end())
         return false;
 
-    (*it)->callLuaField("onRemove", asLuaObject());
+    (*it)->callLuaField("onDetach", asLuaObject());
     m_attachedEffects.erase(it);
 
     return true;
@@ -111,7 +111,7 @@ bool Thing::detachEffectById(uint16_t id) {
 
 void Thing::clearAttachedEffects() {
     for (const auto& e : m_attachedEffects)
-        e->callLuaField("onRemove", asLuaObject());
+        e->callLuaField("onDetach", asLuaObject());
     m_attachedEffects.clear();
 }
 
