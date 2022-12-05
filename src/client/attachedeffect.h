@@ -48,13 +48,13 @@ private:
         Point offset;
     };
 
-    uint16_t m_id;
-
-    Size m_size;
+    uint16_t m_id{ 0 };
 
     float m_speed{ 1.f };
     bool m_onTop{ false };
-    ThingType* m_thingType;
+    ThingType* m_thingType{ nullptr };
+
+    Size m_size;
 
     Timer m_animationTimer;
 
