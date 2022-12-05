@@ -82,7 +82,6 @@ function onRemove(effect, oldOwner)
     if config.onRemove then
         config.onRemove(effect, oldOwner, config.__onRemove)
     end
-
 end
 
 function onOutfitChange(creature, outfit, oldOutfit)

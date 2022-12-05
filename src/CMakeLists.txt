@@ -222,6 +222,7 @@ endif()
 set(SOURCE_FILES
 	client/animatedtext.cpp
 	client/animator.cpp
+	client/attachedeffect.cpp
 	client/client.cpp
 	client/container.cpp
 	client/creature.cpp
