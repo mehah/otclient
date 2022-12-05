@@ -1,5 +1,4 @@
--- Example
---[[
+--[[ -- uncomment this line to apply an effect on the local player, just for testing purposes.
 function onGameStart()
     addEvent(function()
         g_game.getLocalPlayer():attachEffect(AttachedEffectManager.create(1))
