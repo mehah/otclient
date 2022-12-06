@@ -3,9 +3,6 @@ function onGameStart()
     addEvent(function()
         g_game.getLocalPlayer():attachEffect(AttachedEffectManager.create(1))
         g_game.getLocalPlayer():attachEffect(AttachedEffectManager.create(2))
-
-        onOutfitChange(g_game.getLocalPlayer(), g_game.getLocalPlayer():getOutfit())
-
     end)
 end
 ]] --
