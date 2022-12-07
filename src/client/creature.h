@@ -47,7 +47,7 @@ public:
 
     Creature();
 
-    static bool hasSpeedFormula() { return speedA != 0 && speedB != 0 && speedC != 0; }
+    static bool hasSpeedFormula();
 
     void draw(const Point& dest, bool animate, uint32_t flags, TextureType textureType, bool isMarked = false, LightView* lightView = nullptr) override;
 

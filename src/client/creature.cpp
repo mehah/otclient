@@ -575,10 +575,7 @@ void Creature::nextWalkUpdate()
 
 void Creature::updateWalk(const bool isPreWalking)
 {
-    const uint32_t stepDuration = getStepDuration(true);
-
-    const float extraSpeed = isLocalPlayer() && !hasSpeedFormula() ? 800.f / static_cast<float>(stepDuration) : 0.f;
-    const float walkTicksPerPixel = (stepDuration + extraSpeed) / SPRITE_SIZE;
+    const float walkTicksPerPixel = (getStepDuration(true) + 10.f) / SPRITE_SIZE;
 
     const int totalPixelsWalked = std::min<int>((m_walkTimer.ticksElapsed() / walkTicksPerPixel), SPRITE_SIZE);
 
@@ -831,6 +828,8 @@ void Creature::updateShield()
         m_showShieldTexture = true;
 }
 
+bool Creature::hasSpeedFormula() { return g_game.getFeature(Otc::GameNewSpeedLaw) && speedA != 0 && speedB != 0 && speedC != 0; }
+
 uint64_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
 {
     if (isParalyzed())
@@ -863,8 +862,7 @@ uint64_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
 
             if (isLocalPlayer() && hasSpeedFormula())
                 stepDuration = std::max<double>(stepDuration, 110.f);
-        } else if (isLocalPlayer())
-            stepDuration += 8.f;
+        }
 
         m_stepCache.duration = stepDuration;
         m_stepCache.walkDuration = m_stepCache.duration / SPRITE_SIZE;
