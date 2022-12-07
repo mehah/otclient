@@ -669,7 +669,7 @@ void Creature::setDirection(Otc::Direction direction)
     else
         m_numPatternX = direction;
 
-    setAttachedEffectDirection(direction);
+    setAttachedEffectDirection(static_cast<Otc::Direction>(m_numPatternX));
 }
 
 void Creature::setOutfit(const Outfit& outfit)
