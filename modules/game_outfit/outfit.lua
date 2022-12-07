@@ -173,10 +173,12 @@ controller:gameEvent('onOpenOutfitWindow',
             end
         end
 
-        for i = 1, #mountList do
-            if mountList[i][1] == mount.type then
-                currentMount = i
-                break
+        if mount ~= nil then
+            for i = 1, #mountList do
+                if mountList[i][1] == mount.type then
+                    currentMount = i
+                    break
+                end
             end
         end
     end
