@@ -127,7 +127,7 @@ protected:
 
     // outfit
     void processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<int, std::string, int> >& outfitList,
-                                 const std::vector<std::tuple<int, std::string> >& mountList);
+        const std::vector<std::tuple<int, std::string> >& mountList);
 
     // npc trade
     static void processOpenNpcTrade(const std::vector<std::tuple<ItemPtr, std::string, int, int, int> >& items);
@@ -149,8 +149,8 @@ protected:
 
     // modal dialogs >= 970
     static void processModalDialog(uint32_t id, const std::string_view title, const std::string_view message, const std::vector<std::tuple<int, std::string> >
-                                   & buttonList, int enterButton, int escapeButton, const std::vector<std::tuple<int, std::string> >
-                                   & choiceList, bool priority);
+        & buttonList, int enterButton, int escapeButton, const std::vector<std::tuple<int, std::string> >
+        & choiceList, bool priority);
 
     friend class ProtocolGame;
     friend class Map;
@@ -373,6 +373,9 @@ public:
     void clearImbuement(uint8_t slot);
     void closeImbuingWindow();
 
+    void setForceNewWalkingFormula(bool v) { m_forceNewWalkingFormula = v; }
+    bool isForcingNewWalkingFormula() { return m_forceNewWalkingFormula; }
+
 protected:
     void enableBotCall() { m_denyBotCall = false; }
     void disableBotCall() { m_denyBotCall = true; }
@@ -388,6 +391,7 @@ private:
     std::map<int, ContainerPtr> m_containers;
     std::map<int, Vip> m_vips;
 
+    bool m_forceNewWalkingFormula{ false };
     bool m_online{ false };
     bool m_denyBotCall{ false };
     bool m_dead{ false };

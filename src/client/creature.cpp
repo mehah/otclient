@@ -856,7 +856,7 @@ uint64_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
             stepDuration = std::floor(stepDuration / m_calculatedStepSpeed);
         } else stepDuration /= m_speed;
 
-        if (FORCE_NEW_WALKING_FORMULA || g_game.getClientVersion() >= 860) {
+        if (g_game.isForcingNewWalkingFormula() || g_game.getClientVersion() >= 860) {
             const int serverBeat = g_game.getServerBeat();
             stepDuration = std::ceil(stepDuration / serverBeat) * serverBeat;
 
@@ -866,7 +866,7 @@ uint64_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
 
         m_stepCache.duration = stepDuration;
         m_stepCache.walkDuration = m_stepCache.duration / SPRITE_SIZE;
-        m_stepCache.diagonalDuration = stepDuration * (g_game.getClientVersion() > 810 || FORCE_NEW_WALKING_FORMULA ? 3 : 2);
+        m_stepCache.diagonalDuration = stepDuration * (g_game.getClientVersion() > 810 || g_game.isForcingNewWalkingFormula() ? 3 : 2);
     }
 
     return ignoreDiagonal ? m_stepCache.duration : m_stepCache.getDuration(m_lastStepDirection);

@@ -41,11 +41,6 @@
 #define VOLATILE_SQUARE_DURATION 1000
 #define ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE 0 // 1 to enable
 
-// WALK SYSTEM
-// 1 - Nostalrius 7.2, Nekiro TFS-1.5-Downgrades-7.72
-// 0 - Nekiro TFS1.4-Downgrades and 7.72-downgrade, YurOTS 7.76, OTServ 0.6.4 (8.6), Evolutions (7.6), OTHire 7.2
-#define FORCE_NEW_WALKING_FORMULA 0
-
 // FLOOR
 #define SEA_FLOOR 7
 #define MAX_Z 15

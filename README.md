@@ -8,6 +8,7 @@
 
 ### Based on [edubart/otclient](https://github.com/edubart/otclient) Rev: [2.760](https://github.com/edubart/otclient/commit/fc39ee4adba8e780a2820bfda66fc942d74cedf4)
 
+#### [Note for those using Nostalrius 7.2 or Nekiro TFS-1.5-Downgrades-7.72](https://github.com/mehah/otclient/blob/main/init.lua#L7)
 
 ### Features
 
