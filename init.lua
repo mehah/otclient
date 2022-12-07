@@ -3,6 +3,10 @@
 -- set true so that modules are reloaded when modified. (Note: Use only dev mod)
 AUTO_RELOAD_MODULE = false
 
+-- WALKING SYSTEM
+-- Set true if using Nostalrius 7.2 or Nekiro TFS-1.5-Downgrades-7.72
+g_game.setForceNewWalkingFormula(false)
+
 -- set latest supported version
 g_game.setLastSupportedVersion(1291)
 
