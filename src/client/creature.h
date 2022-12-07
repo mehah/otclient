@@ -117,7 +117,7 @@ public:
     int getDisplacementY() const override;
     int getExactSize(int layer = 0, int xPattern = 0, int yPattern = 0, int zPattern = 0, int animationPhase = 0) override;
 
-    int getTotalAnimationPhase() { return m_outfit.hasMount() ? m_mountType->getAnimationPhases() : getAnimationPhases(); }
+    int getTotalAnimationPhase() { return m_outfit.hasMount() ? m_mountType->getAnimationPhases() : getAnimationPhases() - 1; }
     int getCurrentAnimationPhase(bool mount = false);
 
     bool isDisabledWalkAnimation() { return m_disableWalkAnimation > 0; }

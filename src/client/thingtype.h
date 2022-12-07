@@ -276,7 +276,7 @@ public:
     int getNumPatternX() { return m_numPatternX; }
     int getNumPatternY() { return m_numPatternY; }
     int getNumPatternZ() { return m_numPatternZ; }
-    int getAnimationPhases();
+    int getAnimationPhases() { return m_animator ? m_animator->getAnimationPhases() : m_animationPhases; }
     Animator* getAnimator() const { return m_animator; }
     Animator* getIdleAnimator() const { return m_idleAnimator; }
 

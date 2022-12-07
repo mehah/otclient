@@ -954,15 +954,6 @@ void ThingType::setPathable(bool var)
         m_flags |= ThingFlagAttrNotPathable;
 }
 
-int ThingType::getAnimationPhases()
-{
-    if (m_animator) return m_animator->getAnimationPhases();
-
-    if (m_category == ThingCategoryCreature) return m_animationPhases - 1;
-
-    return m_animationPhases;
-}
-
 int ThingType::getExactHeight()
 {
     if (m_null)
