@@ -90,8 +90,8 @@ function onDetach(effect, oldOwner)
     local category, thingId = AttachedEffectManager.getDataThing(oldOwner)
     local config = AttachedEffectManager.getConfig(effect:getId(), category, thingId)
 
-    if oldOwner:isCreature() then
-        oldOwner:setDisableWalkAnimation(config.disableWalkAnimation or false)
+    if oldOwner:isCreature() and config.disableWalkAnimation then
+        oldOwner:setDisableWalkAnimation(false)
     end
 
     if config.onDetach then
