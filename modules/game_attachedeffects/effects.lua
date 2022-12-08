@@ -27,3 +27,7 @@ AttachedEffectManager.register(2, 'Bat Wings', 307, ThingCategoryCreature, {
         [West] = {-10, -5, true}
     }
 })
+
+AttachedEffectManager.register(3, 'Angel Light', 50, ThingCategoryEffect, {
+    shader = 'Map - Party'
+})
