@@ -138,8 +138,7 @@ void Item::tryOptimize()
 {
     if (g_app.mustOptimize(!isTopGround())) {
         if (!m_drawBuffer) {
-            const auto order = isTopGround() ? DrawPool::DrawOrder::FOURTH : DrawPool::DrawOrder::THIRD;
-            m_drawBuffer = std::make_shared<DrawBuffer>(order, true, false);
+            m_drawBuffer = std::make_shared<DrawBuffer>(DrawPool::DrawOrder::THIRD, true, false);
         }
     } else if (m_drawBuffer && !m_drawBuffer->isStatic()) {
         m_drawBuffer->agroup(false);
