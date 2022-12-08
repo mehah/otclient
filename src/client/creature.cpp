@@ -480,7 +480,9 @@ void Creature::updateWalkAnimation()
     if (m_outfit.getCategory() != ThingCategoryCreature)
         return;
 
-    const int footAnimPhases = getTotalAnimationPhase();
+    int footAnimPhases = m_outfit.hasMount() ? m_mountType->getAnimationPhases() : getAnimationPhases();
+    if (!g_game.getFeature(Otc::GameItemAnimationPhase))
+        --footAnimPhases;
 
     // looktype has no animations
     if (footAnimPhases == 0)
@@ -489,7 +491,7 @@ void Creature::updateWalkAnimation()
     int minFootDelay = 20;
     int footAnimDelay = footAnimPhases;
 
-    if (hasSpeedFormula()) {
+    if (g_game.getFeature(Otc::GameItemAnimationPhase)) {
         minFootDelay += 10;
         footAnimDelay /= 1.5;
     }
