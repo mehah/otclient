@@ -22,16 +22,19 @@
 
 #include "thingtypemanager.h"
 #include "creature.h"
-#include "creatures.h"
 #include "game.h"
-#include "itemtype.h"
 #include "thingtype.h"
+
+#ifdef FRAMEWORK_EDITOR
+#include "itemtype.h"
+#include "creatures.h"
+#include <framework/xml/tinyxml.h>
+#endif
 
 #include <framework/core/binarytree.h>
 #include <framework/core/filestream.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/otml/otml.h>
-#include <framework/xml/tinyxml.h>
 
 #include <client/spriteappearances.h>
 #include <client/spritemanager.h>
@@ -48,60 +51,26 @@ ThingTypeManager g_things;
 void ThingTypeManager::init()
 {
     m_nullThingType = ThingTypePtr(new ThingType);
-    m_nullItemType = ItemTypePtr(new ItemType);
-    m_datSignature = 0;
-    m_contentRevision = 0;
-    m_otbMinorVersion = 0;
-    m_otbMajorVersion = 0;
-    m_datLoaded = false;
-    m_xmlLoaded = false;
-    m_otbLoaded = false;
     for (auto& m_thingType : m_thingTypes)
         m_thingType.resize(1, m_nullThingType);
+#ifdef FRAMEWORK_EDITOR
+    m_nullItemType = ItemTypePtr(new ItemType);
     m_itemTypes.resize(1, m_nullItemType);
+#endif
 }
 
 void ThingTypeManager::terminate()
 {
     for (auto& m_thingType : m_thingTypes)
         m_thingType.clear();
+
+    m_nullThingType = nullptr;
+
+#ifdef FRAMEWORK_EDITOR
     m_itemTypes.clear();
     m_reverseItemTypes.clear();
-    m_nullThingType = nullptr;
     m_nullItemType = nullptr;
-}
-
-void ThingTypeManager::saveDat(const std::string& fileName)
-{
-    if (!m_datLoaded)
-        throw Exception("failed to save, dat is not loaded");
-
-    try {
-        const auto& fin = g_resources.createFile(fileName);
-        if (!fin)
-            throw Exception("failed to open file '%s' for write", fileName);
-
-        fin->cache();
-
-        fin->addU32(m_datSignature);
-
-        for (const auto& m_thingType : m_thingTypes)
-            fin->addU16(m_thingType.size() - 1);
-
-        for (int category = 0; category < ThingLastCategory; ++category) {
-            uint16_t firstId = 1;
-            if (category == ThingCategoryItem)
-                firstId = 100;
-
-            for (uint16_t id = firstId; id < m_thingTypes[category].size(); ++id)
-                m_thingTypes[category][id]->serialize(fin);
-        }
-
-        fin->flush();
-        fin->close();
-    } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
-    }
+#endif
 }
 
 bool ThingTypeManager::loadDat(std::string file)
@@ -179,6 +148,244 @@ bool ThingTypeManager::loadOtml(std::string file)
     } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to read dat otml '%s': %s'", file, e.what()));
         return false;
+    }
+}
+
+bool ThingTypeManager::loadAppearances(const std::string& file)
+{
+    try {
+        int spritesCount = 0;
+        std::string appearancesFile;
+
+        json document = json::parse(g_resources.readFileContents(g_resources.resolvePath(g_resources.guessFilePath(file, "json"))));
+        for (const auto& obj : document) {
+            const auto& type = obj["type"];
+            if (type == "appearances") {
+                appearancesFile = obj["file"];
+            } else if (type == "sprite") {
+                int lastSpriteId = obj["lastspriteid"].get<int>();
+                g_spriteAppearances.addSpriteSheet(SpriteSheetPtr(new SpriteSheet(obj["firstspriteid"].get<int>(), lastSpriteId, static_cast<SpriteLayout>(obj["spritetype"].get<int>()), obj["file"].get<std::string>())));
+                spritesCount = std::max<int>(spritesCount, lastSpriteId);
+            }
+        }
+
+        g_spriteAppearances.setSpritesCount(spritesCount + 1);
+
+        // load appearances.dat
+        std::stringstream fin;
+        g_resources.readFileStream(g_resources.resolvePath(stdext::format("/things/%d/%s", g_game.getClientVersion(), appearancesFile)), fin);
+
+        auto appearancesLib = appearances::Appearances();
+        if (!appearancesLib.ParseFromIstream(&fin)) {
+            throw stdext::exception("Couldn't parse appearances lib.");
+        }
+
+        for (int category = ThingCategoryItem; category < ThingLastCategory; ++category) {
+            const google::protobuf::RepeatedPtrField<appearances::Appearance>* appearances = nullptr;
+
+            switch (category) {
+                case ThingCategoryItem: appearances = &appearancesLib.object(); break;
+                case ThingCategoryCreature: appearances = &appearancesLib.outfit(); break;
+                case ThingCategoryEffect: appearances = &appearancesLib.effect(); break;
+                case ThingCategoryMissile: appearances = &appearancesLib.missile(); break;
+                default: return false;
+            }
+
+            const auto& lastAppearance = appearances->Get(appearances->size() - 1);
+
+            auto& things = m_thingTypes[category];
+            things.clear();
+            things.resize(lastAppearance.id() + 1, m_nullThingType);
+
+            for (const auto& appearance : *appearances) {
+                const ThingTypePtr& type(new ThingType);
+                const uint16_t id = appearance.id();
+                type->unserializeAppearance(id, static_cast<ThingCategory>(category), appearance);
+                m_thingTypes[category][id] = type;
+            }
+        }
+        m_datLoaded = true;
+        return true;
+    } catch (const std::exception& e) {
+        g_logger.error(stdext::format("Failed to load '%s' (Appearances): %s", file, e.what()));
+        return false;
+    }
+}
+
+const ThingTypeList& ThingTypeManager::getThingTypes(ThingCategory category)
+{
+    if (category < ThingLastCategory)
+        return m_thingTypes[category];
+
+    throw Exception("invalid thing type category %d", category);
+}
+
+const ThingTypePtr& ThingTypeManager::getThingType(uint16_t id, ThingCategory category)
+{
+    if (category >= ThingLastCategory || id >= m_thingTypes[category].size()) {
+        g_logger.error(stdext::format("invalid thing type client id %d in category %d", id, category));
+        return m_nullThingType;
+    }
+    return m_thingTypes[category][id];
+}
+
+#ifdef FRAMEWORK_EDITOR
+void ThingTypeManager::parseItemType(uint16_t serverId, TiXmlElement* elem)
+{
+    bool s;
+    int d;
+
+    if (g_game.getClientVersion() < 960) {
+        s = serverId > 20000 && serverId < 20100;
+        d = 20000;
+    } else {
+        s = serverId > 30000 && serverId < 30100;
+        d = 30000;
+    }
+
+    ItemTypePtr itemType;
+    if (s) {
+        serverId -= d;
+        itemType = ItemTypePtr(new ItemType);
+        itemType->setServerId(serverId);
+        addItemType(itemType);
+    } else
+        itemType = getItemType(serverId);
+
+    itemType->setName(elem->Attribute("name"));
+    for (TiXmlElement* attrib = elem->FirstChildElement(); attrib; attrib = attrib->NextSiblingElement()) {
+        std::string key = attrib->Attribute("key");
+        if (key.empty())
+            continue;
+
+        stdext::tolower(key);
+        if (key == "description")
+            itemType->setDesc(attrib->Attribute("value"));
+        else if (key == "weapontype")
+            itemType->setCategory(ItemCategoryWeapon);
+        else if (key == "ammotype")
+            itemType->setCategory(ItemCategoryAmmunition);
+        else if (key == "armor")
+            itemType->setCategory(ItemCategoryArmor);
+        else if (key == "charges")
+            itemType->setCategory(ItemCategoryCharges);
+        else if (key == "type") {
+            std::string value = attrib->Attribute("value");
+            stdext::tolower(value);
+
+            if (value == "key")
+                itemType->setCategory(ItemCategoryKey);
+            else if (value == "magicfield")
+                itemType->setCategory(ItemCategoryMagicField);
+            else if (value == "teleport")
+                itemType->setCategory(ItemCategoryTeleport);
+            else if (value == "door")
+                itemType->setCategory(ItemCategoryDoor);
+        }
+    }
+}
+
+void ThingTypeManager::addItemType(const ItemTypePtr& itemType)
+{
+    const uint16_t id = itemType->getServerId();
+    if (unlikely(id >= m_itemTypes.size()))
+        m_itemTypes.resize(id + 1, m_nullItemType);
+    m_itemTypes[id] = itemType;
+}
+
+const ItemTypePtr& ThingTypeManager::findItemTypeByClientId(uint16_t id)
+{
+    if (id == 0 || id >= m_reverseItemTypes.size())
+        return m_nullItemType;
+
+    if (m_reverseItemTypes[id])
+        return m_reverseItemTypes[id];
+    return m_nullItemType;
+}
+
+const ItemTypePtr& ThingTypeManager::findItemTypeByName(const std::string& name)
+{
+    for (const ItemTypePtr& it : m_itemTypes)
+        if (it->getName() == name)
+            return it;
+    return m_nullItemType;
+}
+
+ItemTypeList ThingTypeManager::findItemTypesByName(const std::string& name)
+{
+    ItemTypeList ret;
+    for (const ItemTypePtr& it : m_itemTypes)
+        if (it->getName() == name)
+            ret.push_back(it);
+    return ret;
+}
+
+ItemTypeList ThingTypeManager::findItemTypesByString(const std::string& name)
+{
+    ItemTypeList ret;
+    for (const ItemTypePtr& it : m_itemTypes)
+        if (it->getName().find(name) != std::string::npos)
+            ret.push_back(it);
+    return ret;
+}
+
+const ItemTypePtr& ThingTypeManager::getItemType(uint16_t id)
+{
+    if (id >= m_itemTypes.size() || m_itemTypes[id] == m_nullItemType) {
+        g_logger.error(stdext::format("invalid thing type, server id: %d", id));
+        return m_nullItemType;
+    }
+    return m_itemTypes[id];
+}
+
+ThingTypeList ThingTypeManager::findThingTypeByAttr(ThingAttr attr, ThingCategory category)
+{
+    ThingTypeList ret;
+    for (const auto& type : m_thingTypes[category])
+        if (type->hasAttr(attr))
+            ret.push_back(type);
+    return ret;
+}
+
+ItemTypeList ThingTypeManager::findItemTypeByCategory(ItemCategory category)
+{
+    ItemTypeList ret;
+    for (const ItemTypePtr& type : m_itemTypes)
+        if (type->getCategory() == category)
+            ret.push_back(type);
+    return ret;
+}
+
+void ThingTypeManager::saveDat(const std::string& fileName)
+{
+    if (!m_datLoaded)
+        throw Exception("failed to save, dat is not loaded");
+
+    try {
+        const auto& fin = g_resources.createFile(fileName);
+        if (!fin)
+            throw Exception("failed to open file '%s' for write", fileName);
+
+        fin->cache();
+
+        fin->addU32(m_datSignature);
+
+        for (const auto& m_thingType : m_thingTypes)
+            fin->addU16(m_thingType.size() - 1);
+
+        for (int category = 0; category < ThingLastCategory; ++category) {
+            uint16_t firstId = 1;
+            if (category == ThingCategoryItem)
+                firstId = 100;
+
+            for (uint16_t id = firstId; id < m_thingTypes[category].size(); ++id)
+                m_thingTypes[category][id]->serialize(fin);
+        }
+
+        fin->flush();
+        fin->close();
+    } catch (const std::exception& e) {
+        g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
     }
 }
 
@@ -282,209 +489,6 @@ void ThingTypeManager::loadXml(const std::string& file)
         g_logger.error(stdext::format("Failed to load '%s' (XML file): %s", file, e.what()));
     }
 }
-
-bool ThingTypeManager::loadAppearances(const std::string& file)
-{
-    try {
-        int spritesCount = 0;
-        std::string appearancesFile;
-
-        json document = json::parse(g_resources.readFileContents(g_resources.resolvePath(g_resources.guessFilePath(file, "json"))));
-        for (const auto& obj : document) {
-            const auto& type = obj["type"];
-            if (type == "appearances") {
-                appearancesFile = obj["file"];
-            } else if (type == "sprite") {
-                int lastSpriteId = obj["lastspriteid"].get<int>();
-                g_spriteAppearances.addSpriteSheet(SpriteSheetPtr(new SpriteSheet(obj["firstspriteid"].get<int>(), lastSpriteId, static_cast<SpriteLayout>(obj["spritetype"].get<int>()), obj["file"].get<std::string>())));
-                spritesCount = std::max<int>(spritesCount, lastSpriteId);
-            }
-        }
-
-        g_spriteAppearances.setSpritesCount(spritesCount + 1);
-
-        // load appearances.dat
-        std::stringstream fin;
-        g_resources.readFileStream(g_resources.resolvePath(stdext::format("/things/%d/%s", g_game.getClientVersion(), appearancesFile)), fin);
-
-        auto appearancesLib = appearances::Appearances();
-        if (!appearancesLib.ParseFromIstream(&fin)) {
-            throw stdext::exception("Couldn't parse appearances lib.");
-        }
-
-        for (int category = ThingCategoryItem; category < ThingLastCategory; ++category) {
-            const google::protobuf::RepeatedPtrField<appearances::Appearance>* appearances = nullptr;
-
-            switch (category) {
-                case ThingCategoryItem: appearances = &appearancesLib.object(); break;
-                case ThingCategoryCreature: appearances = &appearancesLib.outfit(); break;
-                case ThingCategoryEffect: appearances = &appearancesLib.effect(); break;
-                case ThingCategoryMissile: appearances = &appearancesLib.missile(); break;
-                default: return false;
-            }
-
-            const auto& lastAppearance = appearances->Get(appearances->size() - 1);
-
-            auto& things = m_thingTypes[category];
-            things.clear();
-            things.resize(lastAppearance.id() + 1, m_nullThingType);
-
-            for (const auto& appearance : *appearances) {
-                const ThingTypePtr& type(new ThingType);
-                const uint16_t id = appearance.id();
-                type->unserializeAppearance(id, static_cast<ThingCategory>(category), appearance);
-                m_thingTypes[category][id] = type;
-            }
-        }
-        m_datLoaded = true;
-        return true;
-    } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to load '%s' (Appearances): %s", file, e.what()));
-        return false;
-    }
-}
-
-void ThingTypeManager::parseItemType(uint16_t serverId, TiXmlElement* elem)
-{
-    bool s;
-    int d;
-
-    if (g_game.getClientVersion() < 960) {
-        s = serverId > 20000 && serverId < 20100;
-        d = 20000;
-    } else {
-        s = serverId > 30000 && serverId < 30100;
-        d = 30000;
-    }
-
-    ItemTypePtr itemType;
-    if (s) {
-        serverId -= d;
-        itemType = ItemTypePtr(new ItemType);
-        itemType->setServerId(serverId);
-        addItemType(itemType);
-    } else
-        itemType = getItemType(serverId);
-
-    itemType->setName(elem->Attribute("name"));
-    for (TiXmlElement* attrib = elem->FirstChildElement(); attrib; attrib = attrib->NextSiblingElement()) {
-        std::string key = attrib->Attribute("key");
-        if (key.empty())
-            continue;
-
-        stdext::tolower(key);
-        if (key == "description")
-            itemType->setDesc(attrib->Attribute("value"));
-        else if (key == "weapontype")
-            itemType->setCategory(ItemCategoryWeapon);
-        else if (key == "ammotype")
-            itemType->setCategory(ItemCategoryAmmunition);
-        else if (key == "armor")
-            itemType->setCategory(ItemCategoryArmor);
-        else if (key == "charges")
-            itemType->setCategory(ItemCategoryCharges);
-        else if (key == "type") {
-            std::string value = attrib->Attribute("value");
-            stdext::tolower(value);
-
-            if (value == "key")
-                itemType->setCategory(ItemCategoryKey);
-            else if (value == "magicfield")
-                itemType->setCategory(ItemCategoryMagicField);
-            else if (value == "teleport")
-                itemType->setCategory(ItemCategoryTeleport);
-            else if (value == "door")
-                itemType->setCategory(ItemCategoryDoor);
-        }
-    }
-}
-
-void ThingTypeManager::addItemType(const ItemTypePtr& itemType)
-{
-    const uint16_t id = itemType->getServerId();
-    if (unlikely(id >= m_itemTypes.size()))
-        m_itemTypes.resize(id + 1, m_nullItemType);
-    m_itemTypes[id] = itemType;
-}
-
-const ItemTypePtr& ThingTypeManager::findItemTypeByClientId(uint16_t id)
-{
-    if (id == 0 || id >= m_reverseItemTypes.size())
-        return m_nullItemType;
-
-    if (m_reverseItemTypes[id])
-        return m_reverseItemTypes[id];
-    return m_nullItemType;
-}
-
-const ItemTypePtr& ThingTypeManager::findItemTypeByName(const std::string& name)
-{
-    for (const ItemTypePtr& it : m_itemTypes)
-        if (it->getName() == name)
-            return it;
-    return m_nullItemType;
-}
-
-ItemTypeList ThingTypeManager::findItemTypesByName(const std::string& name)
-{
-    ItemTypeList ret;
-    for (const ItemTypePtr& it : m_itemTypes)
-        if (it->getName() == name)
-            ret.push_back(it);
-    return ret;
-}
-
-ItemTypeList ThingTypeManager::findItemTypesByString(const std::string& name)
-{
-    ItemTypeList ret;
-    for (const ItemTypePtr& it : m_itemTypes)
-        if (it->getName().find(name) != std::string::npos)
-            ret.push_back(it);
-    return ret;
-}
-
-const ThingTypePtr& ThingTypeManager::getThingType(uint16_t id, ThingCategory category)
-{
-    if (category >= ThingLastCategory || id >= m_thingTypes[category].size()) {
-        g_logger.error(stdext::format("invalid thing type client id %d in category %d", id, category));
-        return m_nullThingType;
-    }
-    return m_thingTypes[category][id];
-}
-
-const ItemTypePtr& ThingTypeManager::getItemType(uint16_t id)
-{
-    if (id >= m_itemTypes.size() || m_itemTypes[id] == m_nullItemType) {
-        g_logger.error(stdext::format("invalid thing type, server id: %d", id));
-        return m_nullItemType;
-    }
-    return m_itemTypes[id];
-}
-
-ThingTypeList ThingTypeManager::findThingTypeByAttr(ThingAttr attr, ThingCategory category)
-{
-    ThingTypeList ret;
-    for (const auto& type : m_thingTypes[category])
-        if (type->hasAttr(attr))
-            ret.push_back(type);
-    return ret;
-}
-
-ItemTypeList ThingTypeManager::findItemTypeByCategory(ItemCategory category)
-{
-    ItemTypeList ret;
-    for (const ItemTypePtr& type : m_itemTypes)
-        if (type->getCategory() == category)
-            ret.push_back(type);
-    return ret;
-}
-
-const ThingTypeList& ThingTypeManager::getThingTypes(ThingCategory category)
-{
-    if (category < ThingLastCategory)
-        return m_thingTypes[category];
-
-    throw Exception("invalid thing type category %d", category);
-}
+#endif
 
 /* vim: set ts=4 sw=4 et: */

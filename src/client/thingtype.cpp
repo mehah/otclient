@@ -36,91 +36,6 @@
 
 const static TexturePtr m_textureNull;
 
-void ThingType::serialize(const FileStreamPtr& fin)
-{
-    for (int i = 0; i < ThingLastAttr; ++i) {
-        int attr = i;
-        if (g_game.getClientVersion() >= 780) {
-            if (attr == ThingAttrChargeable)
-                attr = ThingAttrWritable;
-            else if (attr >= ThingAttrWritable)
-                attr += 1;
-        } else if (g_game.getClientVersion() >= 1000) {
-            if (attr == ThingAttrNoMoveAnimation)
-                attr = 16;
-            else if (attr >= ThingAttrPickupable)
-                attr += 1;
-        }
-
-        if (!hasAttr(static_cast<ThingAttr>(attr)))
-            continue;
-
-        switch (attr) {
-            case ThingAttrDisplacement:
-            {
-                fin->addU16(m_displacement.x);
-                fin->addU16(m_displacement.y);
-                break;
-            }
-            case ThingAttrLight:
-            {
-                fin->addU16(m_light.intensity);
-                fin->addU16(m_light.color);
-                break;
-            }
-            case ThingAttrMarket:
-            {
-                fin->addU16(m_market.category);
-                fin->addU16(m_market.tradeAs);
-                fin->addU16(m_market.showAs);
-                fin->addString(m_market.name);
-                fin->addU16(m_market.restrictVocation);
-                fin->addU16(m_market.requiredLevel);
-                break;
-            }
-
-            case ThingAttrElevation: fin->addU16(m_elevation); break;
-            case ThingAttrMinimapColor: fin->add16(m_minimapColor); break;
-            case ThingAttrCloth: fin->add16(m_clothSlot); break;
-            case ThingAttrLensHelp: fin->add16(m_lensHelp); break;
-            case ThingAttrUsable: fin->add16(isUsable()); break;
-            case ThingAttrGround:  fin->add16(isGround()); break;
-            case ThingAttrWritable:   fin->add16(isWritable()); break;
-            case ThingAttrWritableOnce:   fin->add16(isWritableOnce()); break;
-                break;
-
-            default:
-                break;
-        }
-    }
-    fin->addU8(ThingLastAttr);
-
-    fin->addU8(m_size.width());
-    fin->addU8(m_size.height());
-
-    if (m_size.width() > 1 || m_size.height() > 1)
-        fin->addU8(m_realSize);
-
-    fin->addU8(m_layers);
-    fin->addU8(m_numPatternX);
-    fin->addU8(m_numPatternY);
-    fin->addU8(m_numPatternZ);
-    fin->addU8(m_animationPhases);
-
-    if (g_game.getFeature(Otc::GameEnhancedAnimations)) {
-        if (m_animationPhases > 1 && m_animator) {
-            m_animator->serialize(fin);
-        }
-    }
-
-    for (const int i : m_spritesIndex) {
-        if (g_game.getFeature(Otc::GameSpritesU32))
-            fin->addU32(i);
-        else
-            fin->addU16(i);
-    }
-}
-
 void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category, const appearances::Appearance& appearance)
 {
     m_null = false;
@@ -662,36 +577,6 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
     m_textureData.resize(m_animationPhases);
 }
 
-void ThingType::exportImage(const std::string& fileName)
-{
-    if (m_null)
-        throw Exception("cannot export null thingtype");
-
-    if (m_spritesIndex.empty())
-        throw Exception("cannot export thingtype without sprites");
-
-    const ImagePtr& image(new Image(Size(SPRITE_SIZE * m_size.width() * m_layers * m_numPatternX, SPRITE_SIZE * m_size.height() * m_animationPhases * m_numPatternY * m_numPatternZ)));
-    for (int z = 0; z < m_numPatternZ; ++z) {
-        for (int y = 0; y < m_numPatternY; ++y) {
-            for (int x = 0; x < m_numPatternX; ++x) {
-                for (int l = 0; l < m_layers; ++l) {
-                    for (int a = 0; a < m_animationPhases; ++a) {
-                        for (int w = 0; w < m_size.width(); ++w) {
-                            for (int h = 0; h < m_size.height(); ++h) {
-                                image->blit(Point(SPRITE_SIZE * (m_size.width() - w - 1 + m_size.width() * x + m_size.width() * m_numPatternX * l),
-                                    SPRITE_SIZE * (m_size.height() - h - 1 + m_size.height() * y + m_size.height() * m_numPatternY * a + m_size.height() * m_numPatternY * m_animationPhases * z)),
-                                    g_sprites.getSpriteImage(m_spritesIndex[getSpriteIndex(w, h, l, x, y, z, a)]));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    image->savePNG(fileName);
-}
-
 void ThingType::unserializeOtml(const OTMLNodePtr& node)
 {
     for (const OTMLNodePtr& node2 : node->children()) {
@@ -1020,3 +905,120 @@ ThingFlagAttr ThingType::thingAttrToThingFlagAttr(ThingAttr attr) {
 
     return ThingFlagAttrNone;
 }
+
+#ifdef FRAMEWORK_EDITOR
+void ThingType::serialize(const FileStreamPtr& fin)
+{
+    for (int i = 0; i < ThingLastAttr; ++i) {
+        int attr = i;
+        if (g_game.getClientVersion() >= 780) {
+            if (attr == ThingAttrChargeable)
+                attr = ThingAttrWritable;
+            else if (attr >= ThingAttrWritable)
+                attr += 1;
+        } else if (g_game.getClientVersion() >= 1000) {
+            if (attr == ThingAttrNoMoveAnimation)
+                attr = 16;
+            else if (attr >= ThingAttrPickupable)
+                attr += 1;
+        }
+
+        if (!hasAttr(static_cast<ThingAttr>(attr)))
+            continue;
+
+        switch (attr) {
+            case ThingAttrDisplacement:
+            {
+                fin->addU16(m_displacement.x);
+                fin->addU16(m_displacement.y);
+                break;
+            }
+            case ThingAttrLight:
+            {
+                fin->addU16(m_light.intensity);
+                fin->addU16(m_light.color);
+                break;
+            }
+            case ThingAttrMarket:
+            {
+                fin->addU16(m_market.category);
+                fin->addU16(m_market.tradeAs);
+                fin->addU16(m_market.showAs);
+                fin->addString(m_market.name);
+                fin->addU16(m_market.restrictVocation);
+                fin->addU16(m_market.requiredLevel);
+                break;
+            }
+
+            case ThingAttrElevation: fin->addU16(m_elevation); break;
+            case ThingAttrMinimapColor: fin->add16(m_minimapColor); break;
+            case ThingAttrCloth: fin->add16(m_clothSlot); break;
+            case ThingAttrLensHelp: fin->add16(m_lensHelp); break;
+            case ThingAttrUsable: fin->add16(isUsable()); break;
+            case ThingAttrGround:  fin->add16(isGround()); break;
+            case ThingAttrWritable:   fin->add16(isWritable()); break;
+            case ThingAttrWritableOnce:   fin->add16(isWritableOnce()); break;
+                break;
+
+            default:
+                break;
+        }
+    }
+    fin->addU8(ThingLastAttr);
+
+    fin->addU8(m_size.width());
+    fin->addU8(m_size.height());
+
+    if (m_size.width() > 1 || m_size.height() > 1)
+        fin->addU8(m_realSize);
+
+    fin->addU8(m_layers);
+    fin->addU8(m_numPatternX);
+    fin->addU8(m_numPatternY);
+    fin->addU8(m_numPatternZ);
+    fin->addU8(m_animationPhases);
+
+    if (g_game.getFeature(Otc::GameEnhancedAnimations)) {
+        if (m_animationPhases > 1 && m_animator) {
+            m_animator->serialize(fin);
+        }
+    }
+
+    for (const int i : m_spritesIndex) {
+        if (g_game.getFeature(Otc::GameSpritesU32))
+            fin->addU32(i);
+        else
+            fin->addU16(i);
+    }
+}
+
+void ThingType::exportImage(const std::string& fileName)
+{
+    if (m_null)
+        throw Exception("cannot export null thingtype");
+
+    if (m_spritesIndex.empty())
+        throw Exception("cannot export thingtype without sprites");
+
+    const ImagePtr& image(new Image(Size(SPRITE_SIZE * m_size.width() * m_layers * m_numPatternX, SPRITE_SIZE * m_size.height() * m_animationPhases * m_numPatternY * m_numPatternZ)));
+    for (int z = 0; z < m_numPatternZ; ++z) {
+        for (int y = 0; y < m_numPatternY; ++y) {
+            for (int x = 0; x < m_numPatternX; ++x) {
+                for (int l = 0; l < m_layers; ++l) {
+                    for (int a = 0; a < m_animationPhases; ++a) {
+                        for (int w = 0; w < m_size.width(); ++w) {
+                            for (int h = 0; h < m_size.height(); ++h) {
+                                image->blit(Point(SPRITE_SIZE * (m_size.width() - w - 1 + m_size.width() * x + m_size.width() * m_numPatternX * l),
+                                    SPRITE_SIZE * (m_size.height() - h - 1 + m_size.height() * y + m_size.height() * m_numPatternY * a + m_size.height() * m_numPatternY * m_animationPhases * z)),
+                                    g_sprites.getSpriteImage(m_spritesIndex[getSpriteIndex(w, h, l, x, y, z, a)]));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    image->savePNG(fileName);
+}
+#endif

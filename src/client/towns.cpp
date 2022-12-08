@@ -20,6 +20,7 @@
  * THE SOFTWARE.
  */
 
+#ifdef FRAMEWORK_EDITOR
 #include "towns.h"
 
 #include <utility>
@@ -53,7 +54,7 @@ void TownManager::removeTown(uint32_t townId)
 const TownPtr& TownManager::getTown(uint32_t townId)
 {
     const auto it = std::find_if(m_towns.begin(), m_towns.end(),
-                                 [=](const TownPtr& town) -> bool { return town->getId() == townId; });
+        [=](const TownPtr& town) -> bool { return town->getId() == townId; });
     if (it != m_towns.end())
         return *it;
     return m_nullTown;
@@ -62,7 +63,7 @@ const TownPtr& TownManager::getTown(uint32_t townId)
 const TownPtr& TownManager::getTownByName(const std::string_view name)
 {
     const auto it = std::find_if(m_towns.begin(), m_towns.end(),
-                                 [=](const TownPtr& town) -> bool { return town->getName() == name; });
+        [=](const TownPtr& town) -> bool { return town->getName() == name; });
     if (it != m_towns.end())
         return *it;
     return m_nullTown;
@@ -71,10 +72,12 @@ const TownPtr& TownManager::getTownByName(const std::string_view name)
 TownList::iterator TownManager::findTown(uint32_t townId)
 {
     return std::find_if(m_towns.begin(), m_towns.end(),
-                        [=](const TownPtr& town) -> bool { return town->getId() == townId; });
+        [=](const TownPtr& town) -> bool { return town->getId() == townId; });
 }
 
 void TownManager::sort()
 {
     m_towns.sort([](const TownPtr& lhs, const TownPtr& rhs) { return lhs->getName() < rhs->getName(); });
 }
+
+#endif

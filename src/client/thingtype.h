@@ -258,8 +258,10 @@ public:
     void unserialize(uint16_t clientId, ThingCategory category, const FileStreamPtr& fin);
     void unserializeOtml(const OTMLNodePtr& node);
 
+#ifdef FRAMEWORK_EDITOR
     void serialize(const FileStreamPtr& fin);
     void exportImage(const std::string& fileName);
+#endif
 
     void draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, uint32_t flags, TextureType textureType, Color color = Color::white, LightView* lightView = nullptr, const DrawBufferPtr& drawBuffer = nullptr);
 

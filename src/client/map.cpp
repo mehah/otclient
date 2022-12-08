@@ -33,8 +33,10 @@
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/eventdispatcher.h>
 
+#ifdef FRAMEWORK_EDITOR
 #include "houses.h"
 #include "towns.h"
+#endif
 
 static constexpr uint8_t MAX_VIEWPORT_X = 8;
 static constexpr uint8_t MAX_VIEWPORT_Y = 6;
@@ -46,7 +48,10 @@ Map g_map;
 void Map::init()
 {
     resetAwareRange();
+
+#ifdef FRAMEWORK_EDITOR
     m_animationFlags |= Animation_Show;
+#endif
 }
 
 void Map::terminate()
@@ -106,11 +111,12 @@ void Map::clean()
     for (int_fast8_t i = -1; ++i <= MAX_Z;)
         m_tileBlocks[i].clear();
 
+#ifdef FRAMEWORK_EDITOR
     m_waypoints.clear();
-
     g_towns.clear();
     g_houses.clear();
     g_creatures.clearSpawns();
+#endif
 }
 
 void Map::cleanDynamicThings()
@@ -402,6 +408,7 @@ void Map::cleanTile(const Position& pos)
     }
 }
 
+#ifdef FRAMEWORK_EDITOR
 void Map::setShowZone(tileflags_t zone, bool show)
 {
     if (show)
@@ -452,6 +459,7 @@ void Map::setShowAnimations(bool show)
     } else
         m_animationFlags &= ~Animation_Show;
 }
+#endif
 
 void Map::beginGhostMode(float opacity) { g_painter->setOpacity(opacity); }
 void Map::endGhostMode() { g_painter->resetOpacity(); }

@@ -26,7 +26,6 @@
 #include "creature.h"
 #include "effect.h"
 #include "game.h"
-#include "houses.h"
 #include "item.h"
 #include "localplayer.h"
 #include "luavaluecasts.h"
@@ -52,6 +51,10 @@
 #include "uisprite.h"
 #include "attachedeffect.h"
 
+#ifdef FRAMEWORK_EDITOR
+#include "houses.h"
+#endif
+
 #include <framework/luaengine/luainterface.h>
 
 void Client::registerLuaFunctions()
@@ -59,24 +62,28 @@ void Client::registerLuaFunctions()
     g_lua.registerSingletonClass("g_things");
     g_lua.bindSingletonFunction("g_things", "loadAppearances", &ThingTypeManager::loadAppearances, &g_things);
     g_lua.bindSingletonFunction("g_things", "loadDat", &ThingTypeManager::loadDat, &g_things);
-    g_lua.bindSingletonFunction("g_things", "saveDat", &ThingTypeManager::saveDat, &g_things);
-    g_lua.bindSingletonFunction("g_things", "loadOtb", &ThingTypeManager::loadOtb, &g_things);
-    g_lua.bindSingletonFunction("g_things", "loadXml", &ThingTypeManager::loadXml, &g_things);
     g_lua.bindSingletonFunction("g_things", "loadOtml", &ThingTypeManager::loadOtml, &g_things);
     g_lua.bindSingletonFunction("g_things", "isDatLoaded", &ThingTypeManager::isDatLoaded, &g_things);
-    g_lua.bindSingletonFunction("g_things", "isOtbLoaded", &ThingTypeManager::isOtbLoaded, &g_things);
     g_lua.bindSingletonFunction("g_things", "getDatSignature", &ThingTypeManager::getDatSignature, &g_things);
     g_lua.bindSingletonFunction("g_things", "getContentRevision", &ThingTypeManager::getContentRevision, &g_things);
     g_lua.bindSingletonFunction("g_things", "getThingType", &ThingTypeManager::getThingType, &g_things);
-    g_lua.bindSingletonFunction("g_things", "getItemType", &ThingTypeManager::getItemType, &g_things);
     g_lua.bindSingletonFunction("g_things", "getThingTypes", &ThingTypeManager::getThingTypes, &g_things);
+
+#ifdef FRAMEWORK_EDITOR
+    g_lua.bindSingletonFunction("g_things", "getItemType", &ThingTypeManager::getItemType, &g_things);
     g_lua.bindSingletonFunction("g_things", "findItemTypeByClientId", &ThingTypeManager::findItemTypeByClientId, &g_things);
     g_lua.bindSingletonFunction("g_things", "findItemTypeByName", &ThingTypeManager::findItemTypeByName, &g_things);
     g_lua.bindSingletonFunction("g_things", "findItemTypesByName", &ThingTypeManager::findItemTypesByName, &g_things);
     g_lua.bindSingletonFunction("g_things", "findItemTypesByString", &ThingTypeManager::findItemTypesByString, &g_things);
     g_lua.bindSingletonFunction("g_things", "findItemTypeByCategory", &ThingTypeManager::findItemTypeByCategory, &g_things);
     g_lua.bindSingletonFunction("g_things", "findThingTypeByAttr", &ThingTypeManager::findThingTypeByAttr, &g_things);
+    g_lua.bindSingletonFunction("g_things", "saveDat", &ThingTypeManager::saveDat, &g_things);
+    g_lua.bindSingletonFunction("g_things", "loadOtb", &ThingTypeManager::loadOtb, &g_things);
+    g_lua.bindSingletonFunction("g_things", "loadXml", &ThingTypeManager::loadXml, &g_things);
+    g_lua.bindSingletonFunction("g_things", "isOtbLoaded", &ThingTypeManager::isOtbLoaded, &g_things);
+#endif
 
+#ifdef FRAMEWORK_EDITOR
     g_lua.registerSingletonClass("g_houses");
     g_lua.bindSingletonFunction("g_houses", "clear", &HouseManager::clear, &g_houses);
     g_lua.bindSingletonFunction("g_houses", "load", &HouseManager::load, &g_houses);
@@ -96,14 +103,19 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_towns", "removeTown", &TownManager::removeTown, &g_towns);
     g_lua.bindSingletonFunction("g_towns", "getTowns", &TownManager::getTowns, &g_towns);
     g_lua.bindSingletonFunction("g_towns", "sort", &TownManager::sort, &g_towns);
+#endif
 
     g_lua.registerSingletonClass("g_sprites");
     g_lua.bindSingletonFunction("g_sprites", "loadSpr", &SpriteManager::loadSpr, &g_sprites);
-    g_lua.bindSingletonFunction("g_sprites", "saveSpr", &SpriteManager::saveSpr, &g_sprites);
+
     g_lua.bindSingletonFunction("g_sprites", "unload", &SpriteManager::unload, &g_sprites);
     g_lua.bindSingletonFunction("g_sprites", "isLoaded", &SpriteManager::isLoaded, &g_sprites);
     g_lua.bindSingletonFunction("g_sprites", "getSprSignature", &SpriteManager::getSignature, &g_sprites);
     g_lua.bindSingletonFunction("g_sprites", "getSpritesCount", &SpriteManager::getSpritesCount, &g_sprites);
+
+#ifdef FRAMEWORK_EDITOR
+    g_lua.bindSingletonFunction("g_sprites", "saveSpr", &SpriteManager::saveSpr, &g_sprites);
+#endif
 
     g_lua.registerSingletonClass("g_spriteAppearances");
     g_lua.bindSingletonFunction("g_spriteAppearances", "saveSpriteToFile", &SpriteAppearances::saveSpriteToFile, &g_spriteAppearances);
@@ -130,6 +142,12 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_map", "removeCreatureById", &Map::removeCreatureById, &g_map);
     g_lua.bindSingletonFunction("g_map", "getSpectators", &Map::getSpectators, &g_map);
     g_lua.bindSingletonFunction("g_map", "findPath", &Map::findPath, &g_map);
+    g_lua.bindSingletonFunction("g_map", "createTile", &Map::createTile, &g_map);
+    g_lua.bindSingletonFunction("g_map", "setWidth", &Map::setWidth, &g_map);
+    g_lua.bindSingletonFunction("g_map", "setHeight", &Map::setHeight, &g_map);
+    g_lua.bindSingletonFunction("g_map", "getSize", &Map::getSize, &g_map);
+
+#ifdef FRAMEWORK_EDITOR
     g_lua.bindSingletonFunction("g_map", "loadOtbm", &Map::loadOtbm, &g_map);
     g_lua.bindSingletonFunction("g_map", "saveOtbm", &Map::saveOtbm, &g_map);
     g_lua.bindSingletonFunction("g_map", "loadOtcm", &Map::loadOtcm, &g_map);
@@ -138,10 +156,6 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_map", "setHouseFile", &Map::setHouseFile, &g_map);
     g_lua.bindSingletonFunction("g_map", "getSpawnFile", &Map::getSpawnFile, &g_map);
     g_lua.bindSingletonFunction("g_map", "setSpawnFile", &Map::setSpawnFile, &g_map);
-    g_lua.bindSingletonFunction("g_map", "createTile", &Map::createTile, &g_map);
-    g_lua.bindSingletonFunction("g_map", "setWidth", &Map::setWidth, &g_map);
-    g_lua.bindSingletonFunction("g_map", "setHeight", &Map::setHeight, &g_map);
-    g_lua.bindSingletonFunction("g_map", "getSize", &Map::getSize, &g_map);
     g_lua.bindSingletonFunction("g_map", "setDescription", &Map::setDescription, &g_map);
     g_lua.bindSingletonFunction("g_map", "getDescriptions", &Map::getDescriptions, &g_map);
     g_lua.bindSingletonFunction("g_map", "clearDescriptions", &Map::clearDescriptions, &g_map);
@@ -157,6 +171,7 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_map", "isForcingAnimations", &Map::isForcingAnimations, &g_map);
     g_lua.bindSingletonFunction("g_map", "isShowingAnimations", &Map::isShowingAnimations, &g_map);
     g_lua.bindSingletonFunction("g_map", "setShowAnimations", &Map::setShowAnimations, &g_map);
+#endif
     g_lua.bindSingletonFunction("g_map", "beginGhostMode", &Map::beginGhostMode, &g_map);
     g_lua.bindSingletonFunction("g_map", "endGhostMode", &Map::endGhostMode, &g_map);
     g_lua.bindSingletonFunction("g_map", "findItemsById", &Map::findItemsById, &g_map);
@@ -170,6 +185,7 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_minimap", "loadOtmm", &Minimap::loadOtmm, &g_minimap);
     g_lua.bindSingletonFunction("g_minimap", "saveOtmm", &Minimap::saveOtmm, &g_minimap);
 
+#ifdef FRAMEWORK_EDITOR
     g_lua.registerSingletonClass("g_creatures");
     g_lua.bindSingletonFunction("g_creatures", "getCreatures", &CreatureManager::getCreatures, &g_creatures);
     g_lua.bindSingletonFunction("g_creatures", "getCreatureByName", &CreatureManager::getCreatureByName, &g_creatures);
@@ -188,6 +204,7 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_creatures", "clearSpawns", &CreatureManager::clearSpawns, &g_creatures);
     g_lua.bindSingletonFunction("g_creatures", "getSpawns", &CreatureManager::getSpawns, &g_creatures);
     g_lua.bindSingletonFunction("g_creatures", "deleteSpawn", &CreatureManager::deleteSpawn, &g_creatures);
+#endif
 
     g_lua.registerSingletonClass("g_game");
     g_lua.bindSingletonFunction("g_game", "loginWorld", &Game::loginWorld, &g_game);
@@ -433,6 +450,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Thing>("getAttachedEffectById", &Thing::getAttachedEffectById);
     g_lua.bindClassMemberFunction<Thing>("clearAttachedEffects", &Thing::clearAttachedEffects);
 
+#ifdef FRAMEWORK_EDITOR
     g_lua.registerClass<House>();
     g_lua.bindClassStaticFunction<House>("create", [] { return HousePtr(new House); });
     g_lua.bindClassMemberFunction<House>("setId", &House::setId);
@@ -483,6 +501,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<CreatureType>("getOutfit", &CreatureType::getOutfit);
     g_lua.bindClassMemberFunction<CreatureType>("getSpawnTime", &CreatureType::getSpawnTime);
     g_lua.bindClassMemberFunction<CreatureType>("cast", &CreatureType::cast);
+#endif
 
     g_lua.registerClass<Creature, Thing>();
     g_lua.bindClassStaticFunction<Creature>("create", [] { return CreaturePtr(new Creature); });
@@ -524,10 +543,12 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Creature>("setDisableWalkAnimation", &Creature::setDisableWalkAnimation);
     g_lua.bindClassMemberFunction<Creature>("isDisabledWalkAnimation", &Creature::isDisabledWalkAnimation);
 
+#ifdef FRAMEWORK_EDITOR
     g_lua.registerClass<ItemType>();
     g_lua.bindClassMemberFunction<ItemType>("getServerId", &ItemType::getServerId);
     g_lua.bindClassMemberFunction<ItemType>("getClientId", &ItemType::getClientId);
     g_lua.bindClassMemberFunction<ItemType>("isWritable", &ItemType::isWritable);
+#endif
 
     g_lua.registerClass<ThingType>();
     g_lua.bindClassStaticFunction<ThingType>("create", [] { return ThingTypePtr(new ThingType); });
@@ -595,7 +616,6 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ThingType>("isTopEffect", &ThingType::isTopEffect);
     g_lua.bindClassMemberFunction<ThingType>("getSprites", &ThingType::getSprites);
     g_lua.bindClassMemberFunction<ThingType>("hasAttribute", &ThingType::hasAttr);
-    g_lua.bindClassMemberFunction<ThingType>("exportImage", &ThingType::exportImage);
     g_lua.bindClassMemberFunction<ThingType>("getUpgradeClassification", &ThingType::getClassification);
     g_lua.bindClassMemberFunction<ThingType>("hasWearOut", &ThingType::hasWearOut);
     g_lua.bindClassMemberFunction<ThingType>("hasClockExpire", &ThingType::hasClockExpire);
@@ -603,10 +623,13 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ThingType>("hasExpireStop", &ThingType::hasExpireStop);
     g_lua.bindClassMemberFunction<ThingType>("isPodium", &ThingType::isPodium);
     g_lua.bindClassMemberFunction<ThingType>("getDefaultAction", &ThingType::getDefaultAction);
+#ifdef FRAMEWORK_EDITOR
+    g_lua.bindClassMemberFunction<ThingType>("exportImage", &ThingType::exportImage);
+#endif
 
     g_lua.registerClass<Item, Thing>();
     g_lua.bindClassStaticFunction<Item>("create", &Item::create);
-    g_lua.bindClassStaticFunction<Item>("createOtb", &Item::createFromOtb);
+
     g_lua.bindClassMemberFunction<Item>("clone", &Item::clone);
     g_lua.bindClassMemberFunction<Item>("getContainerItems", &Item::getContainerItems);
     g_lua.bindClassMemberFunction<Item>("getContainerItem", &Item::getContainerItem);
@@ -619,8 +642,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Item>("getCount", &Item::getCount);
     g_lua.bindClassMemberFunction<Item>("getSubType", &Item::getSubType);
     g_lua.bindClassMemberFunction<Item>("getId", &Item::getId);
-    g_lua.bindClassMemberFunction<Item>("getServerId", &Item::getServerId);
-    g_lua.bindClassMemberFunction<Item>("getName", &Item::getName);
+
     g_lua.bindClassMemberFunction<Item>("getDescription", &Item::getDescription);
     g_lua.bindClassMemberFunction<Item>("getText", &Item::getText);
     g_lua.bindClassMemberFunction<Item>("setDescription", &Item::setDescription);
@@ -640,6 +662,11 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Item>("hasClockExpire", &ThingType::hasClockExpire);
     g_lua.bindClassMemberFunction<Item>("hasExpire", &ThingType::hasExpire);
     g_lua.bindClassMemberFunction<Item>("hasExpireStop", &ThingType::hasExpireStop);
+#ifdef FRAMEWORK_EDITOR
+    g_lua.bindClassMemberFunction<Item>("getName", &Item::getName);
+    g_lua.bindClassMemberFunction<Item>("getServerId", &Item::getServerId);
+    g_lua.bindClassStaticFunction<Item>("createOtb", &Item::createFromOtb);
+#endif
 
     g_lua.registerClass<Effect, Thing>();
     g_lua.bindClassStaticFunction<Effect>("create", [] { return EffectPtr(new Effect); });
@@ -746,7 +773,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Tile>("getCreatures", &Tile::getCreatures);
     g_lua.bindClassMemberFunction<Tile>("getGround", &Tile::getGround);
     g_lua.bindClassMemberFunction<Tile>("isWalkable", &Tile::isWalkable);
-    g_lua.bindClassMemberFunction<Tile>("isHouseTile", &Tile::isHouseTile);
+
     g_lua.bindClassMemberFunction<Tile>("isFullGround", &Tile::isFullGround);
     g_lua.bindClassMemberFunction<Tile>("isFullyOpaque", &Tile::isFullyOpaque);
     g_lua.bindClassMemberFunction<Tile>("isLookPossible", &Tile::isLookPossible);
@@ -754,15 +781,19 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Tile>("isEmpty", &Tile::isEmpty);
     g_lua.bindClassMemberFunction<Tile>("isClickable", &Tile::isClickable);
     g_lua.bindClassMemberFunction<Tile>("isPathable", &Tile::isPathable);
-    g_lua.bindClassMemberFunction<Tile>("overwriteMinimapColor", &Tile::overwriteMinimapColor);
+
     g_lua.bindClassMemberFunction<Tile>("select", &Tile::select);
     g_lua.bindClassMemberFunction<Tile>("unselect", &Tile::unselect);
     g_lua.bindClassMemberFunction<Tile>("isSelected", &Tile::isSelected);
+#ifdef FRAMEWORK_EDITOR
+    g_lua.bindClassMemberFunction<Tile>("isHouseTile", &Tile::isHouseTile);
+    g_lua.bindClassMemberFunction<Tile>("overwriteMinimapColor", &Tile::overwriteMinimapColor);
     g_lua.bindClassMemberFunction<Tile>("remFlag", &Tile::remFlag);
     g_lua.bindClassMemberFunction<Tile>("setFlag", &Tile::setFlag);
     g_lua.bindClassMemberFunction<Tile>("setFlags", &Tile::setFlags);
     g_lua.bindClassMemberFunction<Tile>("getFlags", &Tile::getFlags);
     g_lua.bindClassMemberFunction<Tile>("hasFlag", &Tile::hasFlag);
+#endif
 
     g_lua.registerClass<UIItem, UIWidget>();
     g_lua.bindClassStaticFunction<UIItem>("create", [] { return UIItemPtr(new UIItem); });

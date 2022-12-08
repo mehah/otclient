@@ -140,7 +140,10 @@ void Tile::clean()
 
     m_tilesRedraw.clear();
     m_thingTypeFlag = 0;
+
+#ifdef FRAMEWORK_EDITOR
     m_flags = 0;
+#endif
 }
 
 void Tile::addWalkingCreature(const CreaturePtr& creature)

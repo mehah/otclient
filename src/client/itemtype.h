@@ -22,9 +22,9 @@
 
 #pragma once
 
+#ifdef FRAMEWORK_EDITOR
 #include <framework/core/declarations.h>
 #include <framework/luaengine/luaobject.h>
-
 
 enum ItemTypeAttr : uint8_t
 {
@@ -79,7 +79,6 @@ enum ItemCategory : uint8_t
     ItemCategoryDoor = 13,
     ItemCategoryDeprecated = 14
 };
-
 
 enum ClientVersion
 {
@@ -160,3 +159,4 @@ private:
     std::string m_name;
     std::string m_desc;
 };
+#endif

@@ -61,8 +61,10 @@ void UIItem::drawSelf(Fw::DrawPane drawPane)
             m_font->drawText(count, Rect(m_rect.topLeft(), m_rect.bottomRight() - Point(3, 0)), Color(231, 231, 231), Fw::AlignBottomRight);
         }
 
+#ifdef FRAMEWORK_EDITOR
         if (m_showId)
             m_font->drawText(std::to_string(m_item->getServerId()), m_rect, Fw::AlignBottomRight);
+#endif
     }
 
     drawBorder(m_rect);

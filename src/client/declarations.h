@@ -47,12 +47,15 @@ class StaticText;
 class Animator;
 class ThingType;
 class ItemType;
+class TileBlock;
+class AttachedEffect;
+
+#ifdef FRAMEWORK_EDITOR
 class House;
 class Town;
 class CreatureType;
 class Spawn;
-class TileBlock;
-class AttachedEffect;
+#endif
 
 using MapViewPtr = stdext::shared_object_ptr<MapView>;
 using LightViewPtr = stdext::shared_object_ptr<LightView>;
@@ -71,24 +74,29 @@ using AnimatedTextPtr = stdext::shared_object_ptr<AnimatedText>;
 using StaticTextPtr = stdext::shared_object_ptr<StaticText>;
 using ThingTypePtr = stdext::shared_object_ptr<ThingType>;
 using ItemTypePtr = stdext::shared_object_ptr<ItemType>;
+using AttachedEffectPtr = stdext::shared_object_ptr<AttachedEffect>;
+
+#ifdef FRAMEWORK_EDITOR
 using HousePtr = stdext::shared_object_ptr<House>;
 using TownPtr = stdext::shared_object_ptr<Town>;
 using CreatureTypePtr = stdext::shared_object_ptr<CreatureType>;
 using SpawnPtr = stdext::shared_object_ptr<Spawn>;
-using AttachedEffectPtr = stdext::shared_object_ptr<AttachedEffect>;
+
+using HouseList = std::list<HousePtr>;
+using TownList = std::list<TownPtr>;
+using CreatureMap = stdext::map<Position, CreatureTypePtr, Position::Hasher>;
+using SpawnMap = stdext::map<Position, SpawnPtr, Position::Hasher>;
+#endif
 
 using ThingList = std::vector<ThingPtr>;
 using ThingTypeList = std::vector<ThingTypePtr>;
 using ItemTypeList = std::vector<ItemTypePtr>;
-using HouseList = std::list<HousePtr>;
-using TownList = std::list<TownPtr>;
+
 using TileList = std::list<TilePtr>;
 using ItemVector = std::vector<ItemPtr>;
 
 using ItemMap = stdext::map<Position, ItemPtr, Position::Hasher>;
 using TileMap = stdext::map<Position, TilePtr, Position::Hasher>;
-using CreatureMap = stdext::map<Position, CreatureTypePtr, Position::Hasher>;
-using SpawnMap = stdext::map<Position, SpawnPtr, Position::Hasher>;
 
 // net
 class ProtocolLogin;

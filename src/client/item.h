@@ -75,12 +75,11 @@ class Item : public Thing
 {
 public:
     static ItemPtr create(int id);
-    static ItemPtr createFromOtb(int id);
 
     void draw(const Point& dest, bool animate, uint32_t flags, TextureType textureType = TextureType::NONE, bool isMarked = false, LightView* lightView = nullptr) override;
 
     void setId(uint32_t id) override;
-    void setOtbId(uint16_t id);
+
     void setCountOrSubType(int value) { m_countOrSubType = value; updatePatterns(); }
     void setCount(int count) { m_countOrSubType = count; updatePatterns(); }
     void setSubType(int subType) { m_countOrSubType = subType; updatePatterns(); }
@@ -92,18 +91,8 @@ public:
     int getCount() { return isStackable() ? m_countOrSubType : 1; }
     uint32_t getId() override { return m_clientId; }
     uint16_t getClientId() { return m_clientId; }
-    uint16_t getServerId() { return m_serverId; }
-    std::string getName();
+
     bool isValid() { return getThingType() != nullptr; }
-
-    void unserializeItem(const BinaryTreePtr& in);
-    void serializeItem(const OutputBinaryTreePtr& out);
-
-    void setDepotId(uint16_t depotId) { m_attribs.set(ATTR_DEPOT_ID, depotId); }
-    uint16_t getDepotId() { return m_attribs.get<uint16_t>(ATTR_DEPOT_ID, 0); }
-
-    void setDoorId(uint8_t doorId) { m_attribs.set(ATTR_HOUSEDOORID, doorId); }
-    uint8_t getDoorId() { return m_attribs.get<uint8_t >(ATTR_HOUSEDOORID, 0); }
 
     uint16_t getUniqueId() { return m_attribs.get<uint16_t>(ATTR_UNIQUE_ID, 0); }
     uint16_t getActionId() { return m_attribs.get<uint16_t>(ATTR_ACTION_ID, 0); }
@@ -145,14 +134,26 @@ public:
 
     void onPositionChange(const Position& /*newPos*/, const Position& /*oldPos*/) override { updatePatterns(); }
 
-private:
+#ifdef FRAMEWORK_EDITOR
+    std::string getName();
+    static ItemPtr createFromOtb(int id);
+    uint16_t getServerId() { return m_serverId; }
+    void setOtbId(uint16_t id);
+    void unserializeItem(const BinaryTreePtr& in);
+    void serializeItem(const OutputBinaryTreePtr& out);
 
+    void setDepotId(uint16_t depotId) { m_attribs.set(ATTR_DEPOT_ID, depotId); }
+    uint16_t getDepotId() { return m_attribs.get<uint16_t>(ATTR_DEPOT_ID, 0); }
+
+    void setDoorId(uint8_t doorId) { m_attribs.set(ATTR_HOUSEDOORID, doorId); }
+    uint8_t getDoorId() { return m_attribs.get<uint8_t >(ATTR_HOUSEDOORID, 0); }
+#endif
+
+private:
     void createBuffer();
     void tryOptimize();
 
     uint16_t m_clientId{ 0 };
-    uint16_t m_serverId{ 0 };
-
     uint8_t m_countOrSubType{ 0 };
 
     Color m_color{ Color::white };
@@ -164,6 +165,10 @@ private:
     ticks_t m_lastPhase{ 0 };
 
     bool m_async{ true };
+
+#ifdef FRAMEWORK_EDITOR
+    uint16_t m_serverId{ 0 };
+#endif
 };
 
 #pragma pack(pop)

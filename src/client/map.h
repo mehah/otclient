@@ -23,8 +23,11 @@
 #pragma once
 
 #include "animatedtext.h"
-#include "creatures.h"
 #include "tile.h"
+
+#ifdef FRAMEWORK_EDITOR
+#include "creatures.h"
+#endif
 
 enum
 {
@@ -156,6 +159,7 @@ public:
     void notificateCameraMove(const Point& offset);
     void notificateKeyRelease(const InputEvent& inputEvent);
 
+#ifdef FRAMEWORK_EDITOR
     bool loadOtcm(const std::string& fileName);
     void saveOtcm(const std::string& fileName);
 
@@ -168,13 +172,32 @@ public:
     void setDescription(const std::string& desc) { m_desc = desc; }
 
     void clearDescriptions() { m_desc.clear(); }
-    void setWidth(uint16_t w) { m_width = w; }
-    void setHeight(uint16_t h) { m_height = h; }
-
+    std::vector<std::string> getDescriptions() { return stdext::split(m_desc, "\n"); }
     std::string getHouseFile() { return m_houseFile; }
     std::string getSpawnFile() { return m_spawnFile; }
+
+    // tile zone related
+    void setShowZone(tileflags_t zone, bool show);
+    void setShowZones(bool show);
+    void setZoneColor(tileflags_t zone, const Color& color);
+    void setZoneOpacity(float opacity) { m_zoneOpacity = opacity; }
+
+    float getZoneOpacity() { return m_zoneOpacity; }
+    Color getZoneColor(tileflags_t flag);
+    tileflags_t getZoneFlags() { return static_cast<tileflags_t>(m_zoneFlags); }
+    bool showZones() { return m_zoneFlags != 0; }
+    bool showZone(tileflags_t zone) { return (m_zoneFlags & zone) == zone; }
+
+    void setForceShowAnimations(bool force);
+    bool isShowingAnimations() { return (m_animationFlags & Animation_Show) == Animation_Show; }
+    bool isForcingAnimations() { return (m_animationFlags & Animation_Force) == Animation_Force; }
+
+    void setShowAnimations(bool show);
+#endif
+
+    void setWidth(uint16_t w) { m_width = w; }
+    void setHeight(uint16_t h) { m_height = h; }
     Size getSize() { return { m_width, m_height }; }
-    std::vector<std::string> getDescriptions() { return stdext::split(m_desc, "\n"); }
 
     void clean();
     void cleanDynamicThings();
@@ -198,24 +221,6 @@ public:
     const TilePtr& getTile(const Position& pos);
     TileList getTiles(int8_t floor = -1);
     void cleanTile(const Position& pos);
-
-    // tile zone related
-    void setShowZone(tileflags_t zone, bool show);
-    void setShowZones(bool show);
-    void setZoneColor(tileflags_t zone, const Color& color);
-    void setZoneOpacity(float opacity) { m_zoneOpacity = opacity; }
-
-    float getZoneOpacity() { return m_zoneOpacity; }
-    Color getZoneColor(tileflags_t flag);
-    tileflags_t getZoneFlags() { return static_cast<tileflags_t>(m_zoneFlags); }
-    bool showZones() { return m_zoneFlags != 0; }
-    bool showZone(tileflags_t zone) { return (m_zoneFlags & zone) == zone; }
-
-    void setForceShowAnimations(bool force);
-    bool isShowingAnimations() { return (m_animationFlags & Animation_Show) == Animation_Show; }
-    bool isForcingAnimations() { return (m_animationFlags & Animation_Force) == Animation_Force; }
-
-    void setShowAnimations(bool show);
 
     void beginGhostMode(float opacity);
     void endGhostMode();
@@ -277,21 +282,23 @@ private:
 
     stdext::map<uint32_t, TileBlock> m_tileBlocks[MAX_Z + 1];
     stdext::map<uint32_t, CreaturePtr> m_knownCreatures;
-    stdext::map<Position, std::string, Position::Hasher> m_waypoints;
 
+#ifdef FRAMEWORK_EDITOR
+    stdext::map<Position, std::string, Position::Hasher> m_waypoints;
     stdext::map<uint32_t, Color> m_zoneColors;
 
     std::string m_houseFile;
     std::string m_spawnFile;
     std::string m_desc;
 
-    uint16_t m_width;
-    uint16_t m_height;
-
     uint8_t m_animationFlags{ 0 };
     uint32_t m_zoneFlags{ 0 };
 
     float m_zoneOpacity{ 1.f };
+#endif
+
+    uint16_t m_width;
+    uint16_t m_height;
 
     Light m_light;
     Position m_centralPosition;

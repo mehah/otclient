@@ -20,6 +20,7 @@
  * THE SOFTWARE.
  */
 
+#ifdef FRAMEWORK_EDITOR
 #include "game.h"
 #include "thingtypemanager.h"
 
@@ -88,3 +89,5 @@ void ItemType::unserialize(const BinaryTreePtr& node)
         }
     }
 }
+
+#endif

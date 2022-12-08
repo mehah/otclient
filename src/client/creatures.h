@@ -22,6 +22,8 @@
 
 #pragma once
 
+#ifdef FRAMEWORK_EDITOR
+
 #include <framework/luaengine/luaobject.h>
 #include <framework/xml/tinyxml.h>
 
@@ -136,3 +138,5 @@ private:
 };
 
 extern CreatureManager g_creatures;
+
+#endif

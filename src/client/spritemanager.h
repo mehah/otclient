@@ -38,7 +38,9 @@ public:
     void setScaleFactor(float scale) { m_scaleFactor = scale; }
     inline float getScaleFactor() const { return m_scaleFactor; }
 
+#ifdef FRAMEWORK_EDITOR
     void saveSpr(const std::string& fileName);
+#endif
 
     uint32_t getSignature() { return m_signature; }
     int getSpritesCount() { return m_spritesCount; }

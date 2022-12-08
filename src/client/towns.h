@@ -22,6 +22,8 @@
 
 #pragma once
 
+#ifdef FRAMEWORK_EDITOR
+
 #include "declarations.h"
 #include <framework/luaengine/luaobject.h>
 
@@ -68,3 +70,5 @@ protected:
 };
 
 extern TownManager g_towns;
+
+#endif

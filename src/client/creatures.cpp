@@ -20,6 +20,8 @@
  * THE SOFTWARE.
  */
 
+#ifdef FRAMEWORK_EDITOR
+
 #include "creatures.h"
 #include "creature.h"
 #include "map.h"
@@ -419,4 +421,5 @@ std::vector<SpawnPtr> CreatureManager::getSpawns()
     return spawns;
 }
 
+#endif
 /* vim: set ts=4 sw=4 et: */

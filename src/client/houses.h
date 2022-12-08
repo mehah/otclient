@@ -22,6 +22,7 @@
 
 #pragma once
 
+#ifdef FRAMEWORK_EDITOR
 #include "declarations.h"
 #include "tile.h"
 
@@ -106,3 +107,5 @@ protected:
 };
 
 extern HouseManager g_houses;
+
+#endif

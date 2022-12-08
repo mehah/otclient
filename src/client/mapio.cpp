@@ -20,6 +20,8 @@
  * THE SOFTWARE.
  */
 
+#ifdef FRAMEWORK_EDITOR
+
 #include "game.h"
 #include "map.h"
 #include "tile.h"
@@ -549,4 +551,5 @@ void Map::saveOtcm(const std::string& fileName)
     }
 }
 
+#endif
 /* vim: set ts=4 sw=4 et: */

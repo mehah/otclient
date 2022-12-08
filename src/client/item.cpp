@@ -44,19 +44,6 @@ ItemPtr Item::create(int id)
     return item;
 }
 
-ItemPtr Item::createFromOtb(int id)
-{
-    const ItemPtr& item(new Item);
-    item->setOtbId(id);
-
-    return item;
-}
-
-std::string Item::getName()
-{
-    return g_things.findItemTypeByClientId(m_clientId)->getName();
-}
-
 void Item::draw(const Point& dest, bool animate, uint32_t flags, TextureType textureType, bool isMarked, LightView* lightView)
 {
     if (m_clientId == 0 || !canDraw())
@@ -77,47 +64,6 @@ void Item::draw(const Point& dest, bool animate, uint32_t flags, TextureType tex
     if (isMarked) {
         getThingType()->draw(dest, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, TextureType::ALL_BLANK, getMarkedColor());
     }
-}
-
-void Item::setId(uint32_t id)
-{
-    if (!g_things.isValidDatId(id, ThingCategoryItem))
-        id = 0;
-
-    m_serverId = g_things.findItemTypeByClientId(id)->getServerId();
-    m_clientId = id;
-    m_thingType = g_things.getThingType(m_clientId, ThingCategoryItem).get();
-    createBuffer();
-
-    // Shader example on only items that can be marketed.
-    /*
-    if (isMarketable()) {
-        m_shader = g_shaders.getShader("Outfit - Rainbow");
-
-        // Example of how to send a UniformValue to shader
-        m_shaderAction = [=]()-> void {
-            m_shader->bind();
-            m_shader->setUniformValue(ShaderManager::ITEM_ID_UNIFORM, static_cast<int>(id));
-        };
-    }
-    */
-}
-
-void Item::setOtbId(uint16_t id)
-{
-    if (!g_things.isValidOtbId(id))
-        id = 0;
-
-    const auto& itemType = g_things.getItemType(id);
-    m_serverId = id;
-
-    id = itemType->getClientId();
-    if (!g_things.isValidDatId(id, ThingCategoryItem))
-        id = 0;
-
-    m_clientId = id;
-    m_thingType = g_things.getThingType(m_clientId, ThingCategoryItem).get();
-    createBuffer();
 }
 
 // Do not change if you do not understand what is being done.
@@ -153,128 +99,6 @@ void Item::setPosition(const Position& position, uint8_t stackPos, bool hasEleva
         m_drawBuffer = nullptr;
     else if (m_drawBuffer)
         m_drawBuffer->agroup(stackPos == 0);
-}
-
-void Item::unserializeItem(const BinaryTreePtr& in)
-{
-    try {
-        while (in->canRead()) {
-            ItemAttr attrib = static_cast<ItemAttr>(in->getU8());
-            if (attrib == 0)
-                break;
-
-            switch (attrib) {
-                case ATTR_COUNT:
-                case ATTR_RUNE_CHARGES:
-                    setCount(in->getU8());
-                    break;
-                case ATTR_CHARGES:
-                    setCount(in->getU16());
-                    break;
-                case ATTR_HOUSEDOORID:
-                case ATTR_SCRIPTPROTECTED:
-                case ATTR_DUALWIELD:
-                case ATTR_DECAYING_STATE:
-                    m_attribs.set(attrib, in->getU8());
-                    break;
-                case ATTR_ACTION_ID:
-                case ATTR_UNIQUE_ID:
-                case ATTR_DEPOT_ID:
-                    m_attribs.set(attrib, in->getU16());
-                    break;
-                case ATTR_CONTAINER_ITEMS:
-                case ATTR_ATTACK:
-                case ATTR_EXTRAATTACK:
-                case ATTR_DEFENSE:
-                case ATTR_EXTRADEFENSE:
-                case ATTR_ARMOR:
-                case ATTR_ATTACKSPEED:
-                case ATTR_HITCHANCE:
-                case ATTR_DURATION:
-                case ATTR_WRITTENDATE:
-                case ATTR_SLEEPERGUID:
-                case ATTR_SLEEPSTART:
-                case ATTR_ATTRIBUTE_MAP:
-                    m_attribs.set(attrib, in->getU32());
-                    break;
-                case ATTR_TELE_DEST:
-                {
-                    const uint16_t x = in->getU16();
-                    const uint16_t y = in->getU16();
-                    const uint8_t z = in->getU8();
-                    m_attribs.set(attrib, Position{ x, y, z });
-                    break;
-                }
-                case ATTR_NAME:
-                case ATTR_TEXT:
-                case ATTR_DESC:
-                case ATTR_ARTICLE:
-                case ATTR_WRITTENBY:
-                    m_attribs.set(attrib, in->getString());
-                    break;
-                default:
-                    throw Exception("invalid item attribute %d", attrib);
-            }
-        }
-    } catch (const stdext::exception& e) {
-        g_logger.error(stdext::format("Failed to unserialize OTBM item: %s", e.what()));
-    }
-}
-
-void Item::serializeItem(const OutputBinaryTreePtr& out)
-{
-    out->startNode(OTBM_ITEM);
-    out->addU16(getServerId());
-
-    out->addU8(ATTR_COUNT);
-    out->addU8(getCount());
-
-    out->addU8(ATTR_CHARGES);
-    out->addU16(getCountOrSubType());
-
-    const auto& dest = getTeleportDestination();
-    if (dest.isValid()) {
-        out->addU8(ATTR_TELE_DEST);
-        out->addPos(dest.x, dest.y, dest.z);
-    }
-
-    if (isDepot()) {
-        out->addU8(ATTR_DEPOT_ID);
-        out->addU16(getDepotId());
-    }
-
-    if (isHouseDoor()) {
-        out->addU8(ATTR_HOUSEDOORID);
-        out->addU8(getDoorId());
-    }
-
-    const auto aid = getActionId();
-    const auto uid = getUniqueId();
-    if (aid) {
-        out->addU8(ATTR_ACTION_ID);
-        out->addU16(aid);
-    }
-
-    if (uid) {
-        out->addU8(ATTR_UNIQUE_ID);
-        out->addU16(uid);
-    }
-
-    const auto& text = getText();
-    if (g_things.getItemType(m_serverId)->isWritable() && !text.empty()) {
-        out->addU8(ATTR_TEXT);
-        out->addString(text);
-    }
-
-    const auto& desc = getDescription();
-    if (!desc.empty()) {
-        out->addU8(ATTR_DESC);
-        out->addString(desc);
-    }
-
-    out->endNode();
-    for (const auto& i : m_containerItems)
-        i->serializeItem(out);
 }
 
 int Item::getSubType()
@@ -426,5 +250,188 @@ int Item::calculateAnimationPhase(bool animate)
 
     return m_phase;
 }
+
+void Item::setId(uint32_t id)
+{
+    if (!g_things.isValidDatId(id, ThingCategoryItem))
+        id = 0;
+
+#ifdef FRAMEWORK_EDITOR
+    m_serverId = g_things.findItemTypeByClientId(id)->getServerId();
+#endif
+
+    m_clientId = id;
+    m_thingType = g_things.getThingType(m_clientId, ThingCategoryItem).get();
+    createBuffer();
+
+    // Shader example on only items that can be marketed.
+    /*
+    if (isMarketable()) {
+        m_shader = g_shaders.getShader("Outfit - Rainbow");
+
+        // Example of how to send a UniformValue to shader
+        m_shaderAction = [=]()-> void {
+            m_shader->bind();
+            m_shader->setUniformValue(ShaderManager::ITEM_ID_UNIFORM, static_cast<int>(id));
+        };
+    }
+    */
+}
+
+#ifdef FRAMEWORK_EDITOR
+
+std::string Item::getName()
+{
+    return g_things.findItemTypeByClientId(m_clientId)->getName();
+}
+
+ItemPtr Item::createFromOtb(int id)
+{
+    const ItemPtr& item(new Item);
+    item->setOtbId(id);
+
+    return item;
+}
+
+void Item::setOtbId(uint16_t id)
+{
+    if (!g_things.isValidOtbId(id))
+        id = 0;
+
+    const auto& itemType = g_things.getItemType(id);
+    m_serverId = id;
+
+    id = itemType->getClientId();
+    if (!g_things.isValidDatId(id, ThingCategoryItem))
+        id = 0;
+
+    m_clientId = id;
+    m_thingType = g_things.getThingType(m_clientId, ThingCategoryItem).get();
+    createBuffer();
+}
+
+void Item::unserializeItem(const BinaryTreePtr& in)
+{
+    try {
+        while (in->canRead()) {
+            ItemAttr attrib = static_cast<ItemAttr>(in->getU8());
+            if (attrib == 0)
+                break;
+
+            switch (attrib) {
+                case ATTR_COUNT:
+                case ATTR_RUNE_CHARGES:
+                    setCount(in->getU8());
+                    break;
+                case ATTR_CHARGES:
+                    setCount(in->getU16());
+                    break;
+                case ATTR_HOUSEDOORID:
+                case ATTR_SCRIPTPROTECTED:
+                case ATTR_DUALWIELD:
+                case ATTR_DECAYING_STATE:
+                    m_attribs.set(attrib, in->getU8());
+                    break;
+                case ATTR_ACTION_ID:
+                case ATTR_UNIQUE_ID:
+                case ATTR_DEPOT_ID:
+                    m_attribs.set(attrib, in->getU16());
+                    break;
+                case ATTR_CONTAINER_ITEMS:
+                case ATTR_ATTACK:
+                case ATTR_EXTRAATTACK:
+                case ATTR_DEFENSE:
+                case ATTR_EXTRADEFENSE:
+                case ATTR_ARMOR:
+                case ATTR_ATTACKSPEED:
+                case ATTR_HITCHANCE:
+                case ATTR_DURATION:
+                case ATTR_WRITTENDATE:
+                case ATTR_SLEEPERGUID:
+                case ATTR_SLEEPSTART:
+                case ATTR_ATTRIBUTE_MAP:
+                    m_attribs.set(attrib, in->getU32());
+                    break;
+                case ATTR_TELE_DEST:
+                {
+                    const uint16_t x = in->getU16();
+                    const uint16_t y = in->getU16();
+                    const uint8_t z = in->getU8();
+                    m_attribs.set(attrib, Position{ x, y, z });
+                    break;
+                }
+                case ATTR_NAME:
+                case ATTR_TEXT:
+                case ATTR_DESC:
+                case ATTR_ARTICLE:
+                case ATTR_WRITTENBY:
+                    m_attribs.set(attrib, in->getString());
+                    break;
+                default:
+                    throw Exception("invalid item attribute %d", attrib);
+            }
+        }
+    } catch (const stdext::exception& e) {
+        g_logger.error(stdext::format("Failed to unserialize OTBM item: %s", e.what()));
+    }
+}
+
+void Item::serializeItem(const OutputBinaryTreePtr& out)
+{
+    out->startNode(OTBM_ITEM);
+    out->addU16(getServerId());
+
+    out->addU8(ATTR_COUNT);
+    out->addU8(getCount());
+
+    out->addU8(ATTR_CHARGES);
+    out->addU16(getCountOrSubType());
+
+    const auto& dest = getTeleportDestination();
+    if (dest.isValid()) {
+        out->addU8(ATTR_TELE_DEST);
+        out->addPos(dest.x, dest.y, dest.z);
+    }
+
+    if (isDepot()) {
+        out->addU8(ATTR_DEPOT_ID);
+        out->addU16(getDepotId());
+    }
+
+    if (isHouseDoor()) {
+        out->addU8(ATTR_HOUSEDOORID);
+        out->addU8(getDoorId());
+    }
+
+    const auto aid = getActionId();
+    const auto uid = getUniqueId();
+    if (aid) {
+        out->addU8(ATTR_ACTION_ID);
+        out->addU16(aid);
+    }
+
+    if (uid) {
+        out->addU8(ATTR_UNIQUE_ID);
+        out->addU16(uid);
+    }
+
+    const auto& text = getText();
+    if (g_things.getItemType(m_serverId)->isWritable() && !text.empty()) {
+        out->addU8(ATTR_TEXT);
+        out->addString(text);
+    }
+
+    const auto& desc = getDescription();
+    if (!desc.empty()) {
+        out->addU8(ATTR_DESC);
+        out->addString(desc);
+    }
+
+    out->endNode();
+    for (const auto& i : m_containerItems)
+        i->serializeItem(out);
+}
+
+#endif
 
 /* vim: set ts=4 sw=4 et :*/

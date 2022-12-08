@@ -65,6 +65,7 @@ bool SpriteManager::loadSpr(std::string file)
     }
 }
 
+#ifdef FRAMEWORK_EDITOR
 void SpriteManager::saveSpr(const std::string& fileName)
 {
     if (!m_loaded)
@@ -118,6 +119,7 @@ void SpriteManager::saveSpr(const std::string& fileName)
         g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
     }
 }
+#endif
 
 void SpriteManager::unload()
 {

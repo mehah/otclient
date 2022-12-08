@@ -28,6 +28,7 @@
 #include "mapview.h"
 #include <framework/luaengine/luaobject.h>
 
+#ifdef FRAMEWORK_EDITOR
 enum tileflags_t : uint32_t
 {
     TILESTATE_NONE = 0,
@@ -50,6 +51,7 @@ enum tileflags_t : uint32_t
 
     TILESTATE_LAST = 1 << 24
 };
+#endif
 
 enum class TileSelectType : uint8_t
 {
@@ -161,9 +163,17 @@ public:
 
     bool canShade(const MapViewPtr& mapView);
     bool canRender(uint32_t& flags, const Position& cameraPosition, AwareRange viewPort, LightView* lightView);
-    bool canErase() { return m_walkingCreatures.empty() && m_effects.empty() && isEmpty() && m_flags == 0 && m_minimapColor == 0; }
+    bool canErase() {
+        return m_walkingCreatures.empty() && m_effects.empty() && isEmpty() && m_minimapColor == 0
+#ifdef FRAMEWORK_EDITOR
+            && m_flags == 0
+#endif
+            ;
+    }
 
     bool hasElevation(int elevation = 1) { return m_elevation >= elevation; }
+
+#ifdef FRAMEWORK_EDITOR
     void overwriteMinimapColor(uint8_t color) { m_minimapColor = color; }
 
     void remFlag(uint32_t flag) { m_flags &= ~flag; }
@@ -175,18 +185,20 @@ public:
     void setHouseId(uint32_t hid) { m_houseId = hid; }
     uint32_t getHouseId() { return m_houseId; }
     bool isHouseTile() { return m_houseId != 0 && hasFlag(TILESTATE_HOUSE); }
+#endif
 
     void select(TileSelectType selectType = TileSelectType::NO_FILTERED);
     void unselect();
     bool isSelected() { return m_selectType != TileSelectType::NONE; }
 
     TilePtr asTile() { return static_self_cast<Tile>(); }
-    void setThingFlag(const ThingPtr& thing);
 
 private:
     void drawTop(const Point& dest, int flags, bool forceDraw, LightView* lightView = nullptr);
     void drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, bool forceDraw, LightView* lightView = nullptr);
     void drawThing(const ThingPtr& thing, const Point& dest, int flags, LightView* lightView);
+
+    void setThingFlag(const ThingPtr& thing);
 
     void recalculateThingFlag()
     {
@@ -208,8 +220,11 @@ private:
     uint32_t m_isCompletelyCovered{ 0 };
     uint32_t m_isCovered{ 0 };
     uint32_t m_thingTypeFlag{ 0 };
+
+#ifdef FRAMEWORK_EDITOR
     uint32_t m_houseId{ 0 };
     uint32_t m_flags{ 0 };
+#endif
 
     std::vector<CreaturePtr> m_walkingCreatures;
     std::vector<ThingPtr> m_things;

@@ -42,12 +42,16 @@ void Client::init(std::vector<std::string>& /*args*/)
     g_shaders.init();
     g_sprites.init();
     g_spriteAppearances.init();
+#ifdef FRAMEWORK_EDITOR
     g_things.init();
+#endif
 }
 
 void Client::terminate()
 {
+#ifdef FRAMEWORK_EDITOR
     g_creatures.terminate();
+#endif
     g_game.terminate();
     g_map.terminate();
     g_minimap.terminate();
