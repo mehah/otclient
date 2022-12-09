@@ -42,9 +42,7 @@ void Client::init(std::vector<std::string>& /*args*/)
     g_shaders.init();
     g_sprites.init();
     g_spriteAppearances.init();
-#ifdef FRAMEWORK_EDITOR
     g_things.init();
-#endif
 }
 
 void Client::terminate()
