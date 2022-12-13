@@ -77,10 +77,10 @@ void Creature::draw(const Point& dest, uint32_t flags, TextureType textureType, 
 
         const auto& _dest = dest + m_walkOffset * g_sprites.getScaleFactor();
 
-        internalDrawOutfit(_dest, false, textureType, m_direction, Color::white);
+        internalDrawOutfit(_dest, textureType, m_direction, Color::white);
 
         if (isMarked) {
-            internalDrawOutfit(_dest, false, TextureType::ALL_BLANK, m_direction, getMarkedColor());
+            internalDrawOutfit(_dest, TextureType::ALL_BLANK, m_direction, getMarkedColor());
         }
     }
 
@@ -101,7 +101,7 @@ void Creature::draw(const Point& dest, uint32_t flags, TextureType textureType, 
     }
 }
 
-void Creature::internalDrawOutfit(Point dest, bool isUI, TextureType textureType, Otc::Direction direction, Color color, LightView* lightView)
+void Creature::internalDrawOutfit(Point dest, TextureType textureType, Otc::Direction direction, Color color, LightView* lightView)
 {
     if (m_outfitColor != Color::white)
         color = m_outfitColor;
@@ -112,7 +112,7 @@ void Creature::internalDrawOutfit(Point dest, bool isUI, TextureType textureType
     int animationPhase = 0;
 
     if (isNotBlank) {
-        drawAttachedEffect(dest, lightView, false, isUI); // On Bottom
+        drawAttachedEffect(dest, lightView, false); // On Bottom
     }
 
     // outfit is a real creature
@@ -186,7 +186,7 @@ void Creature::internalDrawOutfit(Point dest, bool isUI, TextureType textureType
     }
 
     if (isNotBlank) {
-        drawAttachedEffect(dest, lightView, true, isUI); // On Top
+        drawAttachedEffect(dest, lightView, true); // On Top
     }
 }
 
@@ -203,7 +203,7 @@ void Creature::drawOutfit(const Rect& destRect, bool resize, const Color color)
 
     float oldScaleFactor = g_sprites.getScaleFactor();
     g_sprites.setScaleFactor(scaleFactor);
-    internalDrawOutfit(dest, true, TextureType::SMOOTH, Otc::South, color);
+    internalDrawOutfit(dest, TextureType::SMOOTH, Otc::South, color);
     g_sprites.setScaleFactor(oldScaleFactor);
 }
 

@@ -29,9 +29,11 @@ class AttachedEffect : public LuaObject
 public:
     static AttachedEffectPtr create(uint16_t id, uint16_t thingId, ThingCategory category);
 
-    void draw(const Point& /*dest*/, bool /*isOnTop*/, bool /*canDrawOnUI*/, LightView* = nullptr);
+    void draw(const Point& /*dest*/, bool /*isOnTop*/, LightView* = nullptr);
 
     uint16_t getId() { return m_id; }
+
+    AttachedEffectPtr clone();
 
     float getSpeed() { return m_speed; }
     void setSpeed(float speed) { m_speed = speed; }

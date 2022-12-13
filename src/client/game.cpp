@@ -404,6 +404,8 @@ void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vecto
     const auto virtualOutfitCreature = CreaturePtr(new Creature);
     virtualOutfitCreature->setDirection(Otc::South);
     virtualOutfitCreature->setOutfit(currentOutfit);
+    for (const auto& effect : m_localPlayer->getAttachedEffects())
+        virtualOutfitCreature->attachEffect(effect->clone());
 
     // creature virtual mount outfit
     CreaturePtr virtualMountCreature;

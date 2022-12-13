@@ -178,9 +178,9 @@ public:
     const std::vector<AttachedEffectPtr>& getAttachedEffects() { return m_attachedEffects; };
 
 protected:
-    void drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop, bool canDrawOnUI) {
+    void drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop) {
         for (const auto& effect : m_attachedEffects) {
-            effect->draw(dest, isOnTop, canDrawOnUI, lightView);
+            effect->draw(dest, isOnTop, lightView);
         }
     }
 
