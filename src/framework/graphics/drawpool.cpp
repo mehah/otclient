@@ -55,6 +55,25 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const DrawMeth
        m_state.clipRect, texture, m_state.shaderProgram
     };
 
+    if (m_onlyOnceStateFlag > 0) { // Only Once State
+        if (m_onlyOnceStateFlag & STATE_OPACITY)
+            resetOpacity();
+
+        if (m_onlyOnceStateFlag & STATE_BLEND_EQUATION)
+            resetBlendEquation();
+
+        if (m_onlyOnceStateFlag & STATE_CLIP_RECT)
+            resetClipRect();
+
+        if (m_onlyOnceStateFlag & STATE_COMPOSITE_MODE)
+            resetCompositionMode();
+
+        if (m_onlyOnceStateFlag & STATE_SHADER_PROGRAM)
+            resetShaderProgram();
+
+        m_onlyOnceStateFlag = 0;
+    }
+
     size_t stateHash = 0;
     size_t methodHash = 0;
     updateHash(state, method, stateHash, methodHash);
@@ -182,8 +201,7 @@ void DrawPool::addCoords(const DrawMethod& method, CoordsBuffer& buffer, DrawMod
     }
 }
 
-void DrawPool::updateHash(const PoolState& state, const DrawMethod& method,
-    size_t& stateHash, size_t& methodhash)
+void DrawPool::updateHash(const PoolState& state, const DrawMethod& method, size_t& stateHash, size_t& methodhash)
 {
     { // State Hash
         if (state.blendEquation != BlendEquation::ADD)
@@ -238,67 +256,40 @@ void DrawPool::updateHash(const PoolState& state, const DrawMethod& method,
     }
 }
 
-void DrawPool::setCompositionMode(const CompositionMode mode, bool onLastDrawing)
+void DrawPool::setCompositionMode(const CompositionMode mode, bool onlyOnce)
 {
-    if (!onLastDrawing) {
-        m_state.compositionMode = mode;
-        return;
-    }
-
-    getLastDrawObject().state->compositionMode = mode;
-    stdext::hash_combine(m_status.second, mode);
+    m_state.compositionMode = mode;
+    if (onlyOnce) m_onlyOnceStateFlag |= STATE_COMPOSITE_MODE;
 }
 
-void DrawPool::setBlendEquation(BlendEquation equation, bool onLastDrawing)
+void DrawPool::setBlendEquation(BlendEquation equation, bool onlyOnce)
 {
-    if (!onLastDrawing) {
-        m_state.blendEquation = equation;
-        return;
-    }
-
-    getLastDrawObject().state->blendEquation = equation;
-    stdext::hash_combine(m_status.second, equation);
+    m_state.blendEquation = equation;
+    if (onlyOnce) m_onlyOnceStateFlag |= STATE_BLEND_EQUATION;
 }
 
-void DrawPool::setClipRect(const Rect& clipRect, bool onLastDrawing)
+void DrawPool::setClipRect(const Rect& clipRect, bool onlyOnce)
 {
-    if (!onLastDrawing) {
-        m_state.clipRect = clipRect;
-        return;
-    }
-
-    getLastDrawObject().state->clipRect = clipRect;
-    stdext::hash_union(m_status.second, clipRect.hash());
+    m_state.clipRect = clipRect;
+    if (onlyOnce) m_onlyOnceStateFlag |= STATE_CLIP_RECT;
 }
 
-void DrawPool::setOpacity(const float opacity, bool onLastDrawing)
+void DrawPool::setOpacity(const float opacity, bool onlyOnce)
 {
-    if (!onLastDrawing) {
-        m_state.opacity = opacity;
-        return;
-    }
-
-    getLastDrawObject().state->opacity = opacity;
-    stdext::hash_combine(m_status.second, opacity);
+    m_state.opacity = opacity;
+    if (onlyOnce) m_onlyOnceStateFlag |= STATE_OPACITY;
 }
 
-void DrawPool::setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onLastDrawing, const std::function<void()>& action)
+void DrawPool::setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onlyOnce, const std::function<void()>& action)
 {
-    const auto& shader = shaderProgram ? shaderProgram.get() : nullptr;
+    m_state.shaderProgram = shaderProgram ? shaderProgram.get() : nullptr;
+    m_state.action = action;
 
-    if (!onLastDrawing) {
-        m_state.shaderProgram = shader;
-        m_state.action = action;
-        return;
-    }
-
-    if (shader) {
+    if (m_state.shaderProgram) {
         m_refreshTimeMS = REFRESH_TIME;
     }
 
-    auto& o = getLastDrawObject();
-    o.state->shaderProgram = shader;
-    o.state->action = action;
+    if (onlyOnce) m_onlyOnceStateFlag |= STATE_SHADER_PROGRAM;
 }
 
 void DrawPool::resetState()

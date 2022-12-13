@@ -121,12 +121,11 @@ void Creature::internalDrawOutfit(Point dest, TextureType textureType, Otc::Dire
             animationPhase = getCurrentAnimationPhase(true);
 
             dest -= m_mountType->getDisplacement() * g_sprites.getScaleFactor();
+
+            if (canDrawShader && m_mountShader)
+                g_drawPool.setShaderProgram(m_mountShader, true, m_mountShaderAction);
             m_mountType->draw(dest, 0, m_numPatternX, 0, 0, animationPhase, Otc::DrawThingsAndLights, textureType, color);
             dest += getDisplacement() * g_sprites.getScaleFactor();
-
-            if (canDrawShader && m_mountShader) {
-                g_drawPool.setShaderProgram(m_mountShader, true, m_mountShaderAction);
-            }
         }
 
         animationPhase = getCurrentAnimationPhase();
@@ -144,10 +143,9 @@ void Creature::internalDrawOutfit(Point dest, TextureType textureType, Otc::Dire
             if (yPattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
                 continue;
 
-            datType->draw(dest, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, textureType, color);
-            if (canDrawShader && m_shader) {
+            if (canDrawShader && m_shader)
                 g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
-            }
+            datType->draw(dest, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, textureType, color);
 
             if (m_drawOutfitColor && isNotBlank && getLayers() > 1) {
                 g_drawPool.setCompositionMode(CompositionMode::MULTIPLY);
@@ -178,11 +176,9 @@ void Creature::internalDrawOutfit(Point dest, TextureType textureType, Otc::Dire
         if (m_outfit.getCategory() == ThingCategoryEffect)
             animationPhase = std::min<int>(animationPhase + 1, animationPhases);
 
-        m_thingType->draw(dest - (getDisplacement() * g_sprites.getScaleFactor()), 0, 0, 0, 0, animationPhase, Otc::DrawThingsAndLights, textureType, color);
-
-        if (canDrawShader && m_shader) {
+        if (canDrawShader && m_shader)
             g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
-        }
+        m_thingType->draw(dest - (getDisplacement() * g_sprites.getScaleFactor()), 0, 0, 0, 0, animationPhase, Otc::DrawThingsAndLights, textureType, color);
     }
 
     if (isNotBlank) {

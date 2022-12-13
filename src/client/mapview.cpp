@@ -200,8 +200,8 @@ void MapView::drawFloor()
                 missile->drawMissile(transformPositionTo2D(missile->getPosition(), cameraPosition), lightView);
 
             if (m_shadowFloorIntensity > 0 && z == cameraPosition.z + 1) {
-                g_drawPool.addFilledRect(m_rectDimension, Color::black, m_shadowBuffer);
                 g_drawPool.setOpacity(m_shadowFloorIntensity, true);
+                g_drawPool.addFilledRect(m_rectDimension, Color::black, m_shadowBuffer);
             }
 
             if (canFloorFade())

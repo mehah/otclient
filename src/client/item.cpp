@@ -55,10 +55,9 @@ void Item::draw(const Point& dest, uint32_t flags, TextureType textureType, bool
     tryOptimize();
 
     drawAttachedEffect(dest, lightView, false); // On Bottom
-    getThingType()->draw(dest, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, textureType, m_color, lightView, m_drawBuffer);
-    if (textureType != TextureType::ALL_BLANK && m_shader) {
+    if (textureType != TextureType::ALL_BLANK && m_shader)
         g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
-    }
+    getThingType()->draw(dest, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, textureType, m_color, lightView, m_drawBuffer);
     drawAttachedEffect(dest, lightView, true); // On Top
 
     if (isMarked) {

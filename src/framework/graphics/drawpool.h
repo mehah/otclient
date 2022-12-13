@@ -148,14 +148,16 @@ protected:
     };
 
 private:
+    enum STATE_TYPE : uint32_t {
+        STATE_OPACITY = 1 << 0,
+        STATE_CLIP_RECT = 1 << 1,
+        STATE_SHADER_PROGRAM = 1 << 2,
+        STATE_COMPOSITE_MODE = 1 << 3,
+        STATE_BLEND_EQUATION = 1 << 4,
+    };
+
     static constexpr uint8_t ARR_MAX_Z = MAX_Z + 1;
     static DrawPool* create(const DrawPoolType type);
-
-    DrawObject& getLastDrawObject()
-    {
-        auto& list = m_objects[m_currentFloor][m_currentOrder];
-        return list[list.size() - 1];
-    }
 
     void add(const Color& color, const TexturePtr& texture, const DrawPool::DrawMethod& method,
         DrawMode drawMode = DrawMode::TRIANGLES, const DrawBufferPtr& drawBuffer = nullptr,
@@ -164,8 +166,8 @@ private:
     void addCoords(const DrawPool::DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode);
     void updateHash(const PoolState& state, const DrawPool::DrawMethod& method, size_t& stateHash, size_t& methodHash);
 
-    float getOpacity(bool lastDrawing = false) { return !lastDrawing ? m_state.opacity : getLastDrawObject().state->opacity; }
-    Rect getClipRect(bool lastDrawing = false) { return !lastDrawing ? m_state.clipRect : getLastDrawObject().state->clipRect; }
+    float getOpacity() { return m_state.opacity; }
+    Rect getClipRect() { return m_state.clipRect; }
 
     void setCompositionMode(CompositionMode mode, bool onLastDrawing = false);
     void setBlendEquation(BlendEquation equation, bool onLastDrawing = false);
@@ -201,6 +203,7 @@ private:
     uint8_t m_currentFloor{ 0 };
 
     uint16_t m_refreshTimeMS{ 0 };
+    uint32_t m_onlyOnceStateFlag{ 0 };
 
     PoolState m_state;
 

@@ -59,6 +59,6 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
         animator = m_thingType->getAnimator();
     }
 
-    m_thingType->draw(dest - (dirControl.offset * g_sprites.getScaleFactor()), 0, m_direction, 0, 0, animator->getPhaseAt(m_animationTimer, m_speed), Otc::DrawThingsAndLights, TextureType::NONE, Color::white, lightView);
     if (m_shader) g_drawPool.setShaderProgram(m_shader, true);
+    m_thingType->draw(dest - (dirControl.offset * g_sprites.getScaleFactor()), 0, m_direction, 0, 0, animator->getPhaseAt(m_animationTimer, m_speed), Otc::DrawThingsAndLights, TextureType::NONE, Color::white, lightView);
 }

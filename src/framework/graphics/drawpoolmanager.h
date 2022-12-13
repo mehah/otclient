@@ -50,14 +50,14 @@ public:
     void addBoundingRect(const Rect& dest, const Color& color = Color::white, int innerLineWidth = 1);
     void addAction(std::function<void()> action);
 
-    void setOpacity(const float opacity, bool onLastDrawing = false) { m_currentPool->setOpacity(opacity, onLastDrawing); }
-    void setClipRect(const Rect& clipRect, bool onLastDrawing = false) { m_currentPool->setClipRect(clipRect, onLastDrawing); }
-    void setBlendEquation(BlendEquation equation, bool onLastDrawing = false) { m_currentPool->setBlendEquation(equation, onLastDrawing); }
-    void setCompositionMode(const CompositionMode mode, bool onLastDrawing = false) { m_currentPool->setCompositionMode(mode, onLastDrawing); }
-    void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onLastDrawing = false, const std::function<void()>& action = nullptr) { m_currentPool->setShaderProgram(shaderProgram, onLastDrawing, action); }
+    void setOpacity(const float opacity, bool onlyOnce = false) { m_currentPool->setOpacity(opacity, onlyOnce); }
+    void setClipRect(const Rect& clipRect, bool onlyOnce = false) { m_currentPool->setClipRect(clipRect, onlyOnce); }
+    void setBlendEquation(BlendEquation equation, bool onlyOnce = false) { m_currentPool->setBlendEquation(equation, onlyOnce); }
+    void setCompositionMode(const CompositionMode mode, bool onlyOnce = false) { m_currentPool->setCompositionMode(mode, onlyOnce); }
+    void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onlyOnce = false, const std::function<void()>& action = nullptr) { m_currentPool->setShaderProgram(shaderProgram, onlyOnce, action); }
 
-    float getOpacity(bool onLastDrawing = false) { return m_currentPool->getOpacity(onLastDrawing); }
-    Rect getClipRect(bool onLastDrawing = false) { return m_currentPool->getClipRect(onLastDrawing); }
+    float getOpacity() { return m_currentPool->getOpacity(); }
+    Rect getClipRect() { return m_currentPool->getClipRect(); }
 
     void resetState() { m_currentPool->resetState(); }
     void resetOpacity() { m_currentPool->resetOpacity(); }
