@@ -47,7 +47,7 @@ public:
     bool isOnInputEvent() { return m_onInputEvent; }
     bool mustOptimize(bool critical = false) {
 #ifdef NDEBUG
-        return critical && m_forceCriticalOptimization || m_optimize && getCPUInterval() > (critical ? 15000u : 8000u);
+        return (critical && m_forceCriticalOptimization) || (m_optimize && getCPUInterval() > (critical ? 15000u : 8000u));
 #else
         return false;
 #endif

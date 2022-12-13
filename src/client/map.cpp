@@ -59,21 +59,13 @@ void Map::terminate()
     clean();
 }
 
-void Map::addMapView(const MapViewPtr& mapView)
-{
-    m_mapViews.push_back(mapView);
-}
+void Map::addMapView(const MapViewPtr& mapView) { m_mapViews.push_back(mapView); }
 
 void Map::removeMapView(const MapViewPtr& mapView)
 {
     const auto it = std::find(m_mapViews.begin(), m_mapViews.end(), mapView);
     if (it != m_mapViews.end())
         m_mapViews.erase(it);
-}
-
-void Map::resetAwareRange()
-{
-    setAwareRange({ MAX_VIEWPORT_X , MAX_VIEWPORT_Y, MAX_VIEWPORT_X + 1, MAX_VIEWPORT_Y + 1 });
 }
 
 void Map::notificateKeyRelease(const InputEvent& inputEvent)
@@ -130,12 +122,6 @@ void Map::cleanDynamicThings()
         m_floorMissiles[i].clear();
 
     cleanTexts();
-}
-
-void Map::cleanTexts()
-{
-    m_animatedTexts.clear();
-    m_staticTexts.clear();
 }
 
 void Map::addThing(const ThingPtr& thing, const Position& pos, int16_t stackPos)
@@ -271,7 +257,7 @@ void Map::colorizeThing(const ThingPtr& thing, const Color& color)
         const TilePtr& tile = thing->getTile();
         assert(tile);
 
-        const ThingPtr& topThing = tile->getTopThing();
+        const auto& topThing = tile->getTopThing();
         assert(topThing);
 
         topThing->static_self_cast<Item>()->setColor(color);
@@ -286,10 +272,10 @@ void Map::removeThingColor(const ThingPtr& thing)
     if (thing->isItem())
         thing->static_self_cast<Item>()->setColor(Color::alpha);
     else if (thing->isCreature()) {
-        const TilePtr& tile = thing->getTile();
+        const auto& tile = thing->getTile();
         assert(tile);
 
-        const ThingPtr& topThing = tile->getTopThing();
+        const auto& topThing = tile->getTopThing();
         assert(topThing);
 
         topThing->static_self_cast<Item>()->setColor(Color::alpha);
@@ -307,14 +293,8 @@ StaticTextPtr Map::getStaticText(const Position& pos)
     return nullptr;
 }
 
-const TilePtr& Map::createTile(const Position& pos)
-{
-    if (!pos.isMapPosition())
-        return m_nulltile;
-
-    TileBlock& block = m_tileBlocks[pos.z][getBlockIndex(pos)];
-    return block.create(pos);
-}
+const TilePtr& Map::createTile(const Position& pos) { return pos.isMapPosition() ? m_tileBlocks[pos.z][getBlockIndex(pos)].create(pos) : m_nulltile; }
+const TilePtr& Map::getOrCreateTile(const Position& pos) { return pos.isMapPosition() ? m_tileBlocks[pos.z][getBlockIndex(pos)].getOrCreate(pos) : m_nulltile; }
 
 template <typename... Items>
 const TilePtr& Map::createTileEx(const Position& pos, const Items&... items)
@@ -327,15 +307,6 @@ const TilePtr& Map::createTileEx(const Position& pos, const Items&... items)
         addThing(it, pos);
 
     return tile;
-}
-
-const TilePtr& Map::getOrCreateTile(const Position& pos)
-{
-    if (!pos.isMapPosition())
-        return m_nulltile;
-
-    TileBlock& block = m_tileBlocks[pos.z][getBlockIndex(pos)];
-    return block.getOrCreate(pos);
 }
 
 const TilePtr& Map::getTile(const Position& pos)
@@ -362,7 +333,7 @@ TileList Map::getTiles(int8_t floor/* = -1*/)
         // Search all floors
         for (int_fast8_t z = -1; ++z <= MAX_Z;) {
             for (const auto& [key, block] : m_tileBlocks[z]) {
-                for (const TilePtr& tile : block.getTiles()) {
+                for (const auto& tile : block.getTiles()) {
                     if (tile != nullptr)
                         tiles.push_back(tile);
                 }
@@ -370,7 +341,7 @@ TileList Map::getTiles(int8_t floor/* = -1*/)
         }
     } else {
         for (const auto& [key, block] : m_tileBlocks[floor]) {
-            for (const TilePtr& tile : block.getTiles()) {
+            for (const auto& tile : block.getTiles()) {
                 if (tile != nullptr)
                     tiles.push_back(tile);
             }
@@ -387,8 +358,8 @@ void Map::cleanTile(const Position& pos)
 
     const auto it = m_tileBlocks[pos.z].find(getBlockIndex(pos));
     if (it != m_tileBlocks[pos.z].end()) {
-        TileBlock& block = it->second;
-        if (const TilePtr& tile = block.get(pos)) {
+        auto& block = it->second;
+        if (const auto& tile = block.get(pos)) {
             tile->clean();
             if (tile->canErase())
                 block.remove(pos);
@@ -487,20 +458,13 @@ std::map<Position, ItemPtr> Map::findItemsById(uint16_t clientId, uint32_t  max)
     return ret;
 }
 
-void Map::addCreature(const CreaturePtr& creature)
-{
-    m_knownCreatures[creature->getId()] = creature;
-}
-
 CreaturePtr Map::getCreatureById(uint32_t  id)
 {
     const auto it = m_knownCreatures.find(id);
-    if (it == m_knownCreatures.end())
-        return nullptr;
-
-    return it->second;
+    return it != m_knownCreatures.end() ? it->second : nullptr;
 }
 
+void Map::addCreature(const CreaturePtr& creature) { m_knownCreatures[creature->getId()] = creature; }
 void Map::removeCreatureById(uint32_t  id)
 {
     if (id == 0)
@@ -533,12 +497,12 @@ void Map::removeUnawareThings()
         for (int_fast8_t z = -1; ++z <= MAX_Z;) {
             auto& tileBlocks = m_tileBlocks[z];
             for (auto it = tileBlocks.begin(); it != tileBlocks.end();) {
-                TileBlock& block = (*it).second;
+                auto& block = (*it).second;
                 bool blockEmpty = true;
                 for (const TilePtr& tile : block.getTiles()) {
                     if (!tile) continue;
 
-                    const Position& pos = tile->getPosition();
+                    const auto& pos = tile->getPosition();
                     if (isAwareOfPosition(pos)) {
                         blockEmpty = false;
                         continue;
@@ -596,23 +560,8 @@ void Map::setCentralPosition(const Position& centralPosition)
 void Map::setLight(const Light& light)
 {
     m_light = light;
-    for (const MapViewPtr& mapView : m_mapViews)
+    for (const auto& mapView : m_mapViews)
         mapView->onGlobalLightChange(m_light);
-}
-
-std::vector<CreaturePtr> Map::getSpectators(const Position& centerPos, bool multiFloor)
-{
-    return getSpectatorsInRangeEx(centerPos, multiFloor, m_awareRange.left, m_awareRange.right, m_awareRange.top, m_awareRange.bottom);
-}
-
-std::vector<CreaturePtr> Map::getSightSpectators(const Position& centerPos, bool multiFloor)
-{
-    return getSpectatorsInRangeEx(centerPos, multiFloor, m_awareRange.left - 1, m_awareRange.right - 2, m_awareRange.top - 1, m_awareRange.bottom - 2);
-}
-
-std::vector<CreaturePtr> Map::getSpectatorsInRange(const Position& centerPos, bool multiFloor, int32_t xRange, int32_t yRange)
-{
-    return getSpectatorsInRangeEx(centerPos, multiFloor, xRange, xRange, yRange, yRange);
 }
 
 std::vector<CreaturePtr> Map::getSpectatorsInRangeEx(const Position& centerPos, bool multiFloor, int32_t minXRange, int32_t maxXRange, int32_t minYRange, int32_t maxYRange)
@@ -743,6 +692,8 @@ void Map::setAwareRange(const AwareRange& range)
     m_awareRange = range;
     removeUnawareThings();
 }
+
+void Map::resetAwareRange() { setAwareRange({ MAX_VIEWPORT_X , MAX_VIEWPORT_Y, MAX_VIEWPORT_X + 1, MAX_VIEWPORT_Y + 1 }); }
 
 uint8_t Map::getFirstAwareFloor()
 {

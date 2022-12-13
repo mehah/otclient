@@ -309,7 +309,7 @@ std::vector<CreaturePtr> Tile::getCreatures()
 {
     std::vector<CreaturePtr> creatures;
     if (hasCreature()) {
-        for (const ThingPtr& thing : m_things) {
+        for (const auto& thing : m_things) {
             if (thing->isCreature())
                 creatures.push_back(thing->static_self_cast<Creature>());
         }
@@ -337,7 +337,7 @@ ThingPtr Tile::getTopThing()
     if (isEmpty())
         return nullptr;
 
-    for (const ThingPtr& thing : m_things)
+    for (const auto& thing : m_things)
         if (thing->isCommon())
             return thing;
 
@@ -347,7 +347,7 @@ ThingPtr Tile::getTopThing()
 std::vector<ItemPtr> Tile::getItems()
 {
     std::vector<ItemPtr> items;
-    for (const ThingPtr& thing : m_things) {
+    for (const auto& thing : m_things) {
         if (!thing->isItem())
             continue;
 
@@ -462,7 +462,7 @@ ThingPtr Tile::getTopMoveThing()
         return nullptr;
 
     for (int8_t i = -1, s = m_things.size(); ++i < s;) {
-        const ThingPtr& thing = m_things[i];
+        const auto& thing = m_things[i];
         if (thing->isCommon()) {
             if (i > 0 && thing->isNotMoveable())
                 return m_things[i - 1];
@@ -471,7 +471,7 @@ ThingPtr Tile::getTopMoveThing()
         }
     }
 
-    for (const ThingPtr& thing : m_things) {
+    for (const auto& thing : m_things) {
         if (thing->isCreature())
             return thing;
     }
@@ -493,7 +493,7 @@ ThingPtr Tile::getTopMultiUseThing()
     }
 
     for (int8_t i = -1, s = m_things.size(); ++i < s;) {
-        const ThingPtr& thing = m_things[i];
+        const auto& thing = m_things[i];
         if (!thing->isGround() && !thing->isGroundBorder() && !thing->isOnBottom() && !thing->isOnTop()) {
             if (i > 0 && thing->isSplash())
                 return m_things[i - 1];
@@ -575,7 +575,7 @@ bool Tile::isClickable()
     bool hasGround = false;
     bool hasOnBottom = false;
     bool hasIgnoreLook = false;
-    for (const ThingPtr& thing : m_things) {
+    for (const auto& thing : m_things) {
         if (thing->isGround())
             hasGround = true;
         else if (thing->isOnBottom())
@@ -637,7 +637,7 @@ bool Tile::canShade(const MapViewPtr& mapView)
 
 bool Tile::hasBlockingCreature()
 {
-    for (const ThingPtr& thing : m_things)
+    for (const auto& thing : m_things)
         if (thing->isCreature() && !thing->static_self_cast<Creature>()->isPassable() && !thing->isLocalPlayer())
             return true;
     return false;
@@ -646,7 +646,7 @@ bool Tile::hasBlockingCreature()
 bool Tile::limitsFloorsView(bool isFreeView)
 {
     // ground and walls limits the view
-    const ThingPtr& firstThing = getThing(0);
+    const auto& firstThing = getThing(0);
     return firstThing && (firstThing->isGround() || (isFreeView ? firstThing->isOnBottom() : firstThing->isOnBottom() && firstThing->blockProjectile()));
 }
 

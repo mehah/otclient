@@ -844,7 +844,7 @@ int ThingType::getExactHeight()
     if (m_null)
         return 0;
 
-    if (m_exactHeight != -1)
+    if (m_exactHeight != 0)
         return m_exactHeight;
 
     getTexture(0);

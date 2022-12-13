@@ -201,7 +201,7 @@ public:
 
     void clean();
     void cleanDynamicThings();
-    void cleanTexts();
+    void cleanTexts() { m_animatedTexts.clear(); m_staticTexts.clear(); }
 
     // thing related
     void addThing(const ThingPtr& thing, const Position& pos, int16_t stackPos = -1);
@@ -227,13 +227,25 @@ public:
 
     std::map<Position, ItemPtr> findItemsById(uint16_t clientId, uint32_t max);
 
-    // known creature related
-    void addCreature(const CreaturePtr& creature);
     CreaturePtr getCreatureById(uint32_t id);
+    void addCreature(const CreaturePtr& creature);
     void removeCreatureById(uint32_t id);
-    std::vector<CreaturePtr> getSightSpectators(const Position& centerPos, bool multiFloor);
-    std::vector<CreaturePtr> getSpectators(const Position& centerPos, bool multiFloor);
-    std::vector<CreaturePtr> getSpectatorsInRange(const Position& centerPos, bool multiFloor, int32_t xRange, int32_t yRange);
+
+    std::vector<CreaturePtr> getSpectators(const Position& centerPos, bool multiFloor)
+    {
+        return getSpectatorsInRangeEx(centerPos, multiFloor, m_awareRange.left, m_awareRange.right, m_awareRange.top, m_awareRange.bottom);
+    }
+
+    std::vector<CreaturePtr> getSightSpectators(const Position& centerPos, bool multiFloor)
+    {
+        return getSpectatorsInRangeEx(centerPos, multiFloor, m_awareRange.left - 1, m_awareRange.right - 2, m_awareRange.top - 1, m_awareRange.bottom - 2);
+    }
+
+    std::vector<CreaturePtr> getSpectatorsInRange(const Position& centerPos, bool multiFloor, int32_t xRange, int32_t yRange)
+    {
+        return getSpectatorsInRangeEx(centerPos, multiFloor, xRange, xRange, yRange, yRange);
+    }
+
     std::vector<CreaturePtr> getSpectatorsInRangeEx(const Position& centerPos, bool multiFloor, int32_t minXRange, int32_t maxXRange, int32_t minYRange, int32_t maxYRange);
 
     void setLight(const Light& light);

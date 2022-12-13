@@ -64,9 +64,9 @@ MapView::MapView()
             fadeOpacity = std::min<float>(m_fadeTimer.timeElapsed() / m_fadeInTime, 1.f);
 
         if (m_shader) {
-            const auto& framebufferRect = Rect(0, 0, m_drawDimension * m_tileSize);
-            const Point center = m_posInfo.srcRect.center();
-            const Point globalCoord = Point(cameraPosition.x - m_drawDimension.width() / 2, -(cameraPosition.y - m_drawDimension.height() / 2)) * m_tileSize;
+            const auto& center = m_posInfo.srcRect.center();
+            const auto& globalCoord = Point(cameraPosition.x - m_drawDimension.width() / 2, -(cameraPosition.y - m_drawDimension.height() / 2)) * m_tileSize;
+
             m_shader->bind();
             m_shader->setUniformValue(ShaderManager::MAP_CENTER_COORD, center.x / static_cast<float>(m_rectDimension.width()), 1.f - center.y / static_cast<float>(m_rectDimension.height()));
             m_shader->setUniformValue(ShaderManager::MAP_GLOBAL_COORD, globalCoord.x / static_cast<float>(m_rectDimension.height()), globalCoord.y / static_cast<float>(m_rectDimension.height()));
@@ -233,7 +233,7 @@ void MapView::drawText()
     const auto& cameraPosition = getCameraPosition();
 
     g_drawPool.use(DrawPoolType::TEXT);
-    for (const StaticTextPtr& staticText : g_map.getStaticTexts()) {
+    for (const auto& staticText : g_map.getStaticTexts()) {
         if (staticText->getMessageMode() == Otc::MessageNone)
             continue;
 
@@ -248,13 +248,13 @@ void MapView::drawText()
         staticText->drawText(p, m_posInfo.rect);
     }
 
-    for (const AnimatedTextPtr& animatedText : g_map.getAnimatedTexts()) {
+    for (const auto& animatedText : g_map.getAnimatedTexts()) {
         const auto& pos = animatedText->getPosition();
 
         if (pos.z != cameraPosition.z)
             continue;
 
-        Point p = transformPositionTo2D(pos, cameraPosition) - m_posInfo.drawOffset;
+        auto p = transformPositionTo2D(pos, cameraPosition) - m_posInfo.drawOffset;
         p.x *= m_posInfo.horizontalStretchFactor;
         p.y *= m_posInfo.verticalStretchFactor;
         p += m_posInfo.rect.topLeft();
@@ -450,6 +450,11 @@ void MapView::onCameraMove(const Point& /*offset*/)
     }
 }
 
+void MapView::onFloorChange(const uint8_t /*floor*/, const uint8_t /*previousFloor*/)
+{
+    updateLight();
+}
+
 void MapView::onGlobalLightChange(const Light&)
 {
     updateLight();
@@ -464,11 +469,6 @@ void MapView::updateLight()
     Light ambientLight = cameraPosition.z > SEA_FLOOR ? Light() : g_map.getLight();
     ambientLight.intensity = std::max<uint8_t >(m_minimumAmbientLight * 255, ambientLight.intensity);
     m_lightView->setGlobalLight(ambientLight);
-}
-
-void MapView::onFloorChange(const uint8_t /*floor*/, const uint8_t /*previousFloor*/)
-{
-    updateLight();
 }
 
 void MapView::onTileUpdate(const Position&, const ThingPtr& thing, const Otc::Operation op)
@@ -544,7 +544,7 @@ void MapView::setVisibleDimension(const Size& visibleDimension)
         return;
     }
 
-    const Size& awareRangeSize = Size(g_map.getAwareRange().left * 2, g_map.getAwareRange().top * 2);
+    const auto& awareRangeSize = Size(g_map.getAwareRange().left * 2, g_map.getAwareRange().top * 2);
 
     m_drawViewportEdge = false;
     if (visibleDimension.width() > awareRangeSize.width() || visibleDimension.height() > awareRangeSize.height()) {
@@ -583,6 +583,11 @@ void MapView::followCreature(const CreaturePtr& creature)
     m_lastCameraPosition = {};
 
     requestUpdateVisibleTiles();
+}
+
+Position MapView::getCameraPosition()
+{
+    return isFollowingCreature() ? m_followingCreature->getPosition() : m_customCameraPosition;
 }
 
 void MapView::setCameraPosition(const Position& pos)
@@ -655,8 +660,9 @@ Rect MapView::calcFramebufferSource(const Size& destSize)
     else if (!m_moveOffset.isNull())
         drawOffset += m_moveOffset * g_sprites.getScaleFactor();
 
+    const auto& srcVisible = m_visibleDimension * m_tileSize;
+
     Size srcSize = destSize;
-    const Size srcVisible = m_visibleDimension * m_tileSize;
     srcSize.scale(srcVisible, Fw::KeepAspectRatio);
     drawOffset.x += (srcVisible.width() - srcSize.width()) / 2;
     drawOffset.y += (srcVisible.height() - srcSize.height()) / 2;
@@ -753,7 +759,7 @@ TilePtr MapView::getTopTile(Position tilePos)
 
     tilePos.coveredUp(tilePos.z - m_cachedFirstVisibleFloor);
     for (uint8_t i = m_cachedFirstVisibleFloor; i <= m_floorMax; ++i) {
-        const TilePtr& tile = g_map.getTile(tilePos);
+        const auto& tile = g_map.getTile(tilePos);
         if (tile && tile->isClickable())
             return tile;
 
@@ -761,14 +767,6 @@ TilePtr MapView::getTopTile(Position tilePos)
     }
 
     return nullptr;
-}
-
-Position MapView::getCameraPosition()
-{
-    if (isFollowingCreature())
-        return m_followingCreature->getPosition();
-
-    return m_customCameraPosition;
 }
 
 void MapView::setShader(const PainterShaderProgramPtr& shader, float fadein, float fadeout)

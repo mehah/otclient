@@ -1752,6 +1752,9 @@ void Game::setAttackingCreature(const CreaturePtr& creature)
 
 void Game::setFollowingCreature(const CreaturePtr& creature)
 {
+    if (creature == m_followingCreature)
+        return;
+
     const CreaturePtr oldCreature = m_followingCreature;
     m_followingCreature = creature;
 
@@ -1781,7 +1784,6 @@ int Game::findEmptyContainerId()
 {
     int id = -1;
     while (m_containers[++id] != nullptr);
-
     return id;
 }
 

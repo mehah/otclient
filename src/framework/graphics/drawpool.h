@@ -66,7 +66,6 @@ public:
     bool canRepaint() { return canRepaint(false); }
     void repaint() { m_status.first = 1; }
 
-
 protected:
     struct PoolState
     {
@@ -247,7 +246,7 @@ extern DrawPoolManager g_drawPool;
 class DrawBuffer
 {
 public:
-    DrawBuffer(DrawPool::DrawOrder order, bool agroup = true, bool isStatic = true) : m_agroup(agroup), m_order(order), m_static(isStatic) {}
+    DrawBuffer(DrawPool::DrawOrder order, bool agroup = true, bool isStatic = true) : m_agroup(agroup), m_static(isStatic), m_order(order) {}
     void agroup(bool v) { m_agroup = v; }
     void setOrder(DrawPool::DrawOrder order) { m_order = order; }
 

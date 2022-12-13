@@ -133,9 +133,9 @@ void Config::setNode(const std::string& key, const OTMLNodePtr& node)
 void Config::mergeNode(const std::string& key, const OTMLNodePtr& node)
 {
     const auto& clone = node->clone();
-    node->setTag(key);
-    node->setUnique(true);
-    m_confsDoc->addChild(node);
+    clone->setTag(key);
+    clone->setUnique(true);
+    m_confsDoc->addChild(clone);
 }
 
 OTMLNodePtr Config::getNode(const std::string& key)
