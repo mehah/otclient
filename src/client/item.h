@@ -76,7 +76,7 @@ class Item : public Thing
 public:
     static ItemPtr create(int id);
 
-    void draw(const Point& dest, bool animate, uint32_t flags, TextureType textureType = TextureType::NONE, bool isMarked = false, LightView* lightView = nullptr) override;
+    void draw(const Point& dest, uint32_t flags, TextureType textureType = TextureType::NONE, bool isMarked = false, LightView* lightView = nullptr) override;
 
     void setId(uint32_t id) override;
 
@@ -127,9 +127,9 @@ public:
     void clearContainerItems() { m_containerItems.clear(); }
 
     void updatePatterns();
-    int calculateAnimationPhase(bool animate);
+    int calculateAnimationPhase();
     int getExactSize(int layer = 0, int xPattern = 0, int yPattern = 0, int zPattern = 0, int animationPhase = 0) override {
-        return Thing::getExactSize(layer, m_numPatternX, m_numPatternY, m_numPatternZ, calculateAnimationPhase(true));
+        return Thing::getExactSize(layer, m_numPatternX, m_numPatternY, m_numPatternZ, calculateAnimationPhase());
     }
 
     void onPositionChange(const Position& /*newPos*/, const Position& /*oldPos*/) override { updatePatterns(); }

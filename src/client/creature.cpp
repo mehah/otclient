@@ -61,7 +61,7 @@ Creature::Creature() :m_type(Proto::CreatureTypeUnknown)
     */
 }
 
-void Creature::draw(const Point& dest, bool animate, uint32_t flags, TextureType textureType, bool isMarked, LightView* lightView)
+void Creature::draw(const Point& dest, uint32_t flags, TextureType textureType, bool isMarked, LightView* lightView)
 {
     if (!canBeSeen())
         return;
@@ -77,12 +77,10 @@ void Creature::draw(const Point& dest, bool animate, uint32_t flags, TextureType
 
         const auto& _dest = dest + m_walkOffset * g_sprites.getScaleFactor();
 
-        drawAttachedEffect(_dest, lightView, false); // On Bottom
-        internalDrawOutfit(_dest, animate, textureType, m_direction, Color::white);
-        drawAttachedEffect(_dest, lightView, true); // On Top
+        internalDrawOutfit(_dest, false, textureType, m_direction, Color::white);
 
         if (isMarked) {
-            internalDrawOutfit(_dest, animate, TextureType::ALL_BLANK, m_direction, getMarkedColor());
+            internalDrawOutfit(_dest, false, TextureType::ALL_BLANK, m_direction, getMarkedColor());
         }
     }
 
@@ -103,7 +101,7 @@ void Creature::draw(const Point& dest, bool animate, uint32_t flags, TextureType
     }
 }
 
-void Creature::internalDrawOutfit(Point dest, bool animateWalk, TextureType textureType, Otc::Direction direction, Color color)
+void Creature::internalDrawOutfit(Point dest, bool isUI, TextureType textureType, Otc::Direction direction, Color color, LightView* lightView)
 {
     if (m_outfitColor != Color::white)
         color = m_outfitColor;
@@ -113,10 +111,14 @@ void Creature::internalDrawOutfit(Point dest, bool animateWalk, TextureType text
 
     int animationPhase = 0;
 
+    if (isNotBlank) {
+        drawAttachedEffect(dest, lightView, false, isUI); // On Bottom
+    }
+
     // outfit is a real creature
     if (m_outfit.getCategory() == ThingCategoryCreature) {
         if (m_outfit.hasMount()) {
-            if (animateWalk) animationPhase = getCurrentAnimationPhase(true);
+            animationPhase = getCurrentAnimationPhase(true);
 
             dest -= m_mountType->getDisplacement() * g_sprites.getScaleFactor();
             m_mountType->draw(dest, 0, m_numPatternX, 0, 0, animationPhase, Otc::DrawThingsAndLights, textureType, color);
@@ -127,7 +129,7 @@ void Creature::internalDrawOutfit(Point dest, bool animateWalk, TextureType text
             }
         }
 
-        if (animateWalk) animationPhase = getCurrentAnimationPhase();
+        animationPhase = getCurrentAnimationPhase();
 
         if (!m_jumpOffset.isNull()) {
             const PointF jumpOffset = m_jumpOffset * g_sprites.getScaleFactor();
@@ -181,6 +183,10 @@ void Creature::internalDrawOutfit(Point dest, bool animateWalk, TextureType text
         if (canDrawShader && m_shader) {
             g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
         }
+    }
+
+    if (isNotBlank) {
+        drawAttachedEffect(dest, lightView, true, isUI); // On Top
     }
 }
 

@@ -49,9 +49,9 @@ public:
 
     static bool hasSpeedFormula();
 
-    void draw(const Point& dest, bool animate, uint32_t flags, TextureType textureType, bool isMarked = false, LightView* lightView = nullptr) override;
+    void draw(const Point& dest, uint32_t flags, TextureType textureType, bool isMarked = false, LightView* lightView = nullptr) override;
 
-    void internalDrawOutfit(Point dest, bool animateWalk, TextureType textureType, Otc::Direction direction, Color color);
+    void internalDrawOutfit(Point dest, bool animateWalk, TextureType textureType, Otc::Direction direction, Color color, LightView* lightView = nullptr);
 
     void drawOutfit(const Rect& destRect, bool resize, Color color = Color::white);
     void drawInformation(const MapPosInfo& mapRect, const Point& dest, bool useGray, int drawFlags);

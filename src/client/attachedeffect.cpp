@@ -36,9 +36,9 @@ AttachedEffectPtr AttachedEffect::create(uint16_t id, uint16_t thingId, ThingCat
     return obj;
 }
 
-void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView) {
+void AttachedEffect::draw(const Point& dest, bool isOnTop, bool canDrawOnUI, LightView* lightView) {
     const auto& dirControl = m_offsetDirections[m_direction];
-    if (dirControl.onTop != isOnTop)
+    if (dirControl.onTop != isOnTop || m_canDrawOnUI != canDrawOnUI)
         return;
 
     const auto* animator = m_thingType->getIdleAnimator();
