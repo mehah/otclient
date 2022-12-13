@@ -68,6 +68,7 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_things", "getContentRevision", &ThingTypeManager::getContentRevision, &g_things);
     g_lua.bindSingletonFunction("g_things", "getThingType", &ThingTypeManager::getThingType, &g_things);
     g_lua.bindSingletonFunction("g_things", "getThingTypes", &ThingTypeManager::getThingTypes, &g_things);
+    g_lua.bindSingletonFunction("g_things", "findThingTypeByAttr", &ThingTypeManager::findThingTypeByAttr, &g_things);
 
 #ifdef FRAMEWORK_EDITOR
     g_lua.bindSingletonFunction("g_things", "getItemType", &ThingTypeManager::getItemType, &g_things);
@@ -76,7 +77,6 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_things", "findItemTypesByName", &ThingTypeManager::findItemTypesByName, &g_things);
     g_lua.bindSingletonFunction("g_things", "findItemTypesByString", &ThingTypeManager::findItemTypesByString, &g_things);
     g_lua.bindSingletonFunction("g_things", "findItemTypeByCategory", &ThingTypeManager::findItemTypeByCategory, &g_things);
-    g_lua.bindSingletonFunction("g_things", "findThingTypeByAttr", &ThingTypeManager::findThingTypeByAttr, &g_things);
     g_lua.bindSingletonFunction("g_things", "saveDat", &ThingTypeManager::saveDat, &g_things);
     g_lua.bindSingletonFunction("g_things", "loadOtb", &ThingTypeManager::loadOtb, &g_things);
     g_lua.bindSingletonFunction("g_things", "loadXml", &ThingTypeManager::loadXml, &g_things);

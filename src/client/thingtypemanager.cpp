@@ -229,6 +229,15 @@ const ThingTypePtr& ThingTypeManager::getThingType(uint16_t id, ThingCategory ca
     return m_thingTypes[category][id];
 }
 
+ThingTypeList ThingTypeManager::findThingTypeByAttr(ThingAttr attr, ThingCategory category)
+{
+    ThingTypeList ret;
+    for (const auto& type : m_thingTypes[category])
+        if (type->hasAttr(attr))
+            ret.push_back(type);
+    return ret;
+}
+
 #ifdef FRAMEWORK_EDITOR
 void ThingTypeManager::parseItemType(uint16_t serverId, TiXmlElement* elem)
 {
@@ -336,15 +345,6 @@ const ItemTypePtr& ThingTypeManager::getItemType(uint16_t id)
         return m_nullItemType;
     }
     return m_itemTypes[id];
-}
-
-ThingTypeList ThingTypeManager::findThingTypeByAttr(ThingAttr attr, ThingCategory category)
-{
-    ThingTypeList ret;
-    for (const auto& type : m_thingTypes[category])
-        if (type->hasAttr(attr))
-            ret.push_back(type);
-    return ret;
 }
 
 ItemTypeList ThingTypeManager::findItemTypeByCategory(ItemCategory category)
@@ -485,9 +485,9 @@ void ThingTypeManager::loadXml(const std::string& file)
         doc.Clear();
         m_xmlLoaded = true;
         g_logger.debug("items.xml read successfully.");
-    } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to load '%s' (XML file): %s", file, e.what()));
-    }
+} catch (const std::exception& e) {
+    g_logger.error(stdext::format("Failed to load '%s' (XML file): %s", file, e.what()));
+}
 }
 #endif
 

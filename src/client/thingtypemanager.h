@@ -59,9 +59,10 @@ public:
     const ItemTypePtr& getNullItemType() { return m_nullItemType; }
     const ItemTypePtr& getItemType(uint16_t id);
 
-    ThingTypeList findThingTypeByAttr(ThingAttr attr, ThingCategory category);
     ItemTypeList findItemTypeByCategory(ItemCategory category);
 #endif
+
+    ThingTypeList findThingTypeByAttr(ThingAttr attr, ThingCategory category);
 
     const ThingTypePtr& getNullThingType() { return m_nullThingType; }
 
