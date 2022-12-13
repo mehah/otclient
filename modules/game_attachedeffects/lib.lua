@@ -25,9 +25,11 @@ local executeConfig = function(attachedEffect, config)
             attachedEffect:setShader(g_shaders.getShader(config.shader))
         end
 
-        if x ~= 0 or y ~= 0 or onTop then
+        if x ~= 0 or y ~= 0 then
             attachedEffect:setOffset(x, y)
-            attachedEffect:setOnTop(onTop)
+        end
+        if onTop then
+            attachedEffect:setOnTop(true)
         end
 
         if config.dirOffset then
