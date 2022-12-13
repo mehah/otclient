@@ -467,6 +467,11 @@ void Creature::onDisappear()
 
         self->m_oldPosition = {};
         self->m_disappearEvent = nullptr;
+
+        if (g_game.getAttackingCreature() == self)
+            g_game.cancelAttack();
+        else if (g_game.getFollowingCreature() == self)
+            g_game.cancelFollow();
         });
 }
 
