@@ -24,6 +24,13 @@
 #include "thingtypemanager.h"
 #include "spritemanager.h"
 
+AttachedEffectPtr AttachedEffect::clone()
+{
+    auto obj = AttachedEffectPtr(new AttachedEffect);
+    *(obj.get()) = *this;
+    return obj;
+}
+
 AttachedEffectPtr AttachedEffect::create(uint16_t id, uint16_t thingId, ThingCategory category) {
     if (!g_things.isValidDatId(thingId, category)) {
         g_logger.error(stdext::format("invalid thing with id %d on create AttachedEffect.", thingId));
@@ -39,6 +46,9 @@ AttachedEffectPtr AttachedEffect::create(uint16_t id, uint16_t thingId, ThingCat
 void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView) {
     const auto& dirControl = m_offsetDirections[m_direction];
     if (dirControl.onTop != isOnTop)
+        return;
+
+    if (!m_canDrawOnUI && g_drawPool.getCurrentType() == DrawPoolType::FOREGROUND)
         return;
 
     const auto* animator = m_thingType->getIdleAnimator();

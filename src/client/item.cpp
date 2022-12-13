@@ -44,13 +44,13 @@ ItemPtr Item::create(int id)
     return item;
 }
 
-void Item::draw(const Point& dest, bool animate, uint32_t flags, TextureType textureType, bool isMarked, LightView* lightView)
+void Item::draw(const Point& dest, uint32_t flags, TextureType textureType, bool isMarked, LightView* lightView)
 {
     if (m_clientId == 0 || !canDraw())
         return;
 
     // determine animation phase
-    const int animationPhase = calculateAnimationPhase(animate);
+    const int animationPhase = calculateAnimationPhase();
 
     tryOptimize();
 
@@ -231,11 +231,9 @@ void Item::updatePatterns()
     }
 }
 
-int Item::calculateAnimationPhase(bool animate)
+int Item::calculateAnimationPhase()
 {
     if (!hasAnimationPhases()) return 0;
-
-    if (!animate) return getAnimationPhases() - 1;
 
     if (getIdleAnimator()) return getIdleAnimator()->getPhase();
 

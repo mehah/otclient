@@ -33,6 +33,8 @@ public:
 
     uint16_t getId() { return m_id; }
 
+    AttachedEffectPtr clone();
+
     float getSpeed() { return m_speed; }
     void setSpeed(float speed) { m_speed = speed; }
 
@@ -42,6 +44,9 @@ public:
 
     void setDirOffset(Otc::Direction direction, int8_t x, int8_t y, bool onTop = false) { m_offsetDirections[direction] = { onTop, {x, y} }; }
     void setShader(const PainterShaderProgramPtr& shader) { m_shader = shader; }
+    void setCanDrawOnUI(bool canDraw) { m_canDrawOnUI = canDraw; }
+    bool canDrawOnUI() { return m_canDrawOnUI; }
+
 private:
     struct DirControl {
         bool onTop{ false };
@@ -52,6 +57,7 @@ private:
 
     float m_speed{ 1.f };
     bool m_onTop{ false };
+    bool m_canDrawOnUI{ true };
     ThingType* m_thingType{ nullptr };
 
     Size m_size;

@@ -29,5 +29,6 @@ AttachedEffectManager.register(2, 'Bat Wings', 307, ThingCategoryCreature, {
 })
 
 AttachedEffectManager.register(3, 'Angel Light', 50, ThingCategoryEffect, {
-    shader = 'Map - Party'
+    shader = 'Map - Party',
+    drawOnUI = false
 })
