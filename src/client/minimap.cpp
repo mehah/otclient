@@ -87,7 +87,7 @@ void Minimap::terminate() { clean(); }
 
 void Minimap::clean()
 {
-    std::lock_guard lock(m_lock);
+    std::scoped_lock lock(m_lock);
     for (uint_fast8_t i = 0; i <= MAX_Z; ++i)
         m_tileBlocks[i].clear();
 }
@@ -215,7 +215,7 @@ const MinimapTile& Minimap::getTile(const Position& pos)
 
 std::pair<MinimapBlock_ptr, MinimapTile> Minimap::threadGetTile(const Position& pos)
 {
-    std::lock_guard lock(m_lock);
+    std::scoped_lock lock(m_lock);
     static MinimapTile nulltile;
 
     if (pos.z <= MAX_Z && hasBlock(pos)) {

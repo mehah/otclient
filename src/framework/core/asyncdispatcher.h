@@ -37,7 +37,7 @@ public:
     template<class F>
     std::shared_future<std::invoke_result_t<F>> schedule(const F& task)
     {
-        std::lock_guard lock(m_mutex);
+        std::scoped_lock lock(m_mutex);
         const auto& prom = std::make_shared<std::promise<std::invoke_result_t<F>>>();
         m_tasks.push_back([=] { prom->set_value(task()); });
         m_condition.notify_all();
@@ -46,7 +46,7 @@ public:
 
     void dispatch(const std::function<void()>& f)
     {
-        std::lock_guard lock(m_mutex);
+        std::scoped_lock lock(m_mutex);
         m_tasks.push_back(f);
         m_condition.notify_all();
     }
