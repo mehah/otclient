@@ -77,7 +77,7 @@ void Creature::draw(const Point& dest, uint32_t flags, TextureType textureType, 
 
         const auto& _dest = dest + m_walkOffset * g_sprites.getScaleFactor();
 
-        internalDrawOutfit(_dest, textureType, m_direction, Color::white);
+        internalDrawOutfit(_dest, textureType, m_direction, Color::white, lightView);
 
         if (isMarked) {
             internalDrawOutfit(_dest, TextureType::ALL_BLANK, m_direction, getMarkedColor());
