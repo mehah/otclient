@@ -86,7 +86,7 @@ void Item::tryOptimize()
             m_drawBuffer = std::make_shared<DrawBuffer>(DrawPool::DrawOrder::THIRD, true, false);
         }
     } else if (m_drawBuffer && !m_drawBuffer->isStatic()) {
-        m_drawBuffer->agroup(false);
+        m_drawBuffer = nullptr;
     }
 }
 
