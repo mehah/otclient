@@ -77,8 +77,8 @@ function onAttach(effect, owner)
     local category, thingId = AttachedEffectManager.getDataThing(owner)
     local config = AttachedEffectManager.getConfig(effect:getId(), category, thingId)
 
-    if owner:isCreature() then
-        owner:setDisableWalkAnimation(config.disableWalkAnimation or false)
+    if owner:isCreature() and config.disableWalkAnimation then
+        owner:setDisableWalkAnimation(true)
     end
 
     if config.onAttach then
