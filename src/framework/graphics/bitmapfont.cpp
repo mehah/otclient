@@ -46,6 +46,10 @@ void BitmapFont::load(const OTMLNodePtr& fontNode)
 
     // load font texture
     m_texture = g_textures.getTexture(textureFile);
+    if (!m_texture)
+        return;
+    m_texture->create();
+
     const Size textureSize = m_texture->getSize();
 
     if (const auto& node = fontNode->get("fixed-glyph-width")) {
@@ -77,9 +81,9 @@ void BitmapFont::load(const OTMLNodePtr& fontNode)
     const int numHorizontalGlyphs = textureSize.width() / glyphSize.width();
     for (int glyph = m_firstGlyph; glyph < 256; ++glyph) {
         m_glyphsTextureCoords[glyph].setRect(((glyph - m_firstGlyph) % numHorizontalGlyphs) * glyphSize.width(),
-                                             ((glyph - m_firstGlyph) / numHorizontalGlyphs) * glyphSize.height(),
-                                             m_glyphsSize[glyph].width(),
-                                             m_glyphHeight);
+            ((glyph - m_firstGlyph) / numHorizontalGlyphs) * glyphSize.height(),
+            m_glyphsSize[glyph].width(),
+            m_glyphHeight);
     }
 }
 
@@ -175,8 +179,8 @@ std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::stri
 }
 
 void BitmapFont::fillTextCoords(const CoordsBufferPtr& coords, const std::string_view text,
-                                const Size& textBoxSize, Fw::AlignmentFlag align, const Rect& screenCoords,
-                                const std::vector<Point>& glyphsPositions)
+    const Size& textBoxSize, Fw::AlignmentFlag align, const Rect& screenCoords,
+    const std::vector<Point>& glyphsPositions)
 {
     coords->clear();
 
@@ -348,9 +352,9 @@ void BitmapFont::calculateGlyphsWidthsAutomatically(const ImagePtr& image, const
     // small AI to auto calculate pixels widths
     for (int glyph = m_firstGlyph; glyph < 256; ++glyph) {
         Rect glyphCoords(((glyph - m_firstGlyph) % numHorizontalGlyphs) * glyphSize.width(),
-                         ((glyph - m_firstGlyph) / numHorizontalGlyphs) * glyphSize.height(),
-                         glyphSize.width(),
-                         m_glyphHeight);
+            ((glyph - m_firstGlyph) / numHorizontalGlyphs) * glyphSize.height(),
+            glyphSize.width(),
+            m_glyphHeight);
         int width = glyphSize.width();
         for (int x = glyphCoords.left(); x <= glyphCoords.right(); ++x) {
             int filledPixels = 0;

@@ -93,8 +93,6 @@ void DrawPoolManager::draw()
         } else for (const auto& obj : pool->m_objects[0][static_cast<int>(DrawPool::DrawOrder::FIRST)]) {
             drawObject(obj);
         }
-
-        pool->clear();
     }
 }
 
@@ -229,6 +227,7 @@ void DrawPoolManager::use(const DrawPoolType type) { use(type, {}, {}); }
 void DrawPoolManager::use(const DrawPoolType type, const Rect& dest, const Rect& src, const Color& colorClear)
 {
     select(type);
+
     getCurrentPull()->resetState();
 
     if (getCurrentPull()->hasFrameBuffer()) {

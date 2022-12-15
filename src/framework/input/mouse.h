@@ -42,6 +42,7 @@ private:
 
     stdext::map<std::string, int> m_cursors;
     std::deque<int> m_cursorStack;
+    std::mutex m_mutex;
 };
 
 extern Mouse g_mouse;

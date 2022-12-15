@@ -424,9 +424,11 @@ void MapView::updateGeometry(const Size& visibleDimension)
     m_virtualCenterOffset = (drawDimension / 2 - Size(1)).toPoint();
     m_rectDimension = { 0, 0, bufferSize };
 
-    g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP)->resize(bufferSize);
+    g_mainDispatcher.addEvent([=]() {
+        g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP)->resize(bufferSize);
 
-    if (m_lightView) m_lightView->resize(drawDimension, tileSize);
+        if (m_lightView) m_lightView->resize(drawDimension, tileSize);
+        });
 
     const uint8_t left = std::min<uint8_t>(g_map.getAwareRange().left, (m_drawDimension.width() / 2) - 1);
     const uint8_t top = std::min<uint8_t>(g_map.getAwareRange().top, (m_drawDimension.height() / 2) - 1);

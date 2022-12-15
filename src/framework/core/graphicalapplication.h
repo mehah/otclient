@@ -72,7 +72,7 @@ protected:
     void inputEvent(const InputEvent& event);
 
 private:
-    bool m_onInputEvent{ false };
+    std::atomic_bool m_onInputEvent{ false };
     bool m_optimize{ true };
     bool m_forceEffectOptimization{ false };
     bool m_drawEffectOnTop{ false };

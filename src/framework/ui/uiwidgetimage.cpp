@@ -25,6 +25,7 @@
 #include <framework/graphics/painter.h>
 #include <framework/graphics/texture.h>
 #include <framework/graphics/texturemanager.h>
+#include <framework/core/eventdispatcher.h>
 
 void UIWidget::initImage() {}
 
@@ -76,6 +77,21 @@ void UIWidget::drawImage(const Rect& screenCoords)
 {
     if (!m_imageTexture || !screenCoords.isValid())
         return;
+
+    if (m_needUpdate) {
+        if (!m_rect.isValid() || m_imageAutoResize) {
+            const Size imageSize = m_imageTexture->getSize();
+
+            Size size = getSize();
+            if (size.width() <= 0 || m_imageAutoResize)
+                size.setWidth(imageSize.width());
+
+            if (size.height() <= 0 || m_imageAutoResize)
+                size.setHeight(imageSize.height());
+
+            setSize(size);
+        }
+    }
 
     // cache vertex buffers
     if (m_imageCachedScreenCoords != screenCoords) {
@@ -180,18 +196,8 @@ void UIWidget::setImageSource(const std::string_view source)
         return;
     }
 
-    m_imageTexture = g_textures.getTexture(m_imageSource = std::string{ source });
-
-    if (!m_rect.isValid() || m_imageAutoResize) {
-        const Size imageSize = m_imageTexture->getSize();
-
-        Size size = getSize();
-        if (size.width() <= 0 || m_imageAutoResize)
-            size.setWidth(imageSize.width());
-
-        if (size.height() <= 0 || m_imageAutoResize)
-            size.setHeight(imageSize.height());
-
-        setSize(size);
-    }
+    g_mainDispatcher.addEvent([&, source = std::string{ source }]() {
+        m_imageTexture = g_textures.getTexture(m_imageSource = source);
+        m_needUpdate = true;
+        });
 }
