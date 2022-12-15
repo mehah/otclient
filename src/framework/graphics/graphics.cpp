@@ -31,6 +31,18 @@ Graphics g_graphics;
 
 void Graphics::init()
 {
+    if (const auto* v = reinterpret_cast<const char*>(glGetString(GL_VENDOR)))
+        m_vendor = v;
+
+    if (const auto* v = reinterpret_cast<const char*>(glGetString(GL_RENDERER)))
+        m_renderer = v;
+
+    if (const auto* v = reinterpret_cast<const char*>(glGetString(GL_VERSION)))
+        m_version = v;
+
+    if (const auto* v = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS)))
+        m_extensions = v;
+
     g_logger.info(stdext::format("GPU %s", glGetString(GL_RENDERER)));
     g_logger.info(stdext::format("OpenGL %s", glGetString(GL_VERSION)));
 
