@@ -134,7 +134,14 @@ void GraphicalApplication::run()
     std::condition_variable m_condition;
     std::condition_variable m_condition2;
     std::mutex mainMutex;
-    std::atomic_uint8_t loaded = 0;
+
+    enum THREAD : uint8_t {
+        FORE = 1 << 0,
+        BACK = 1 << 1,
+        ALL = FORE | BACK,
+    };
+
+    std::atomic_uint32_t loaded = 0;
 
     std::thread t1([&]() -> void {
         std::unique_lock lock(m_foregroundMutex);
@@ -151,7 +158,7 @@ void GraphicalApplication::run()
                 g_ui.render(Fw::ForegroundPane);
             }
 
-            ++loaded;
+            loaded |= FORE;
 
             return m_stopping;
             });
@@ -163,7 +170,7 @@ void GraphicalApplication::run()
             g_clock.update();
             // background pane - high updated and animated pane (where the game are stuff happens)
             g_ui.render(Fw::BackgroundPane);
-            ++loaded;
+            loaded |= BACK;
             return m_stopping;
             });
         });
@@ -195,7 +202,7 @@ void GraphicalApplication::run()
         }
 
         std::scoped_lock l(m_backgroundMutex, m_foregroundMutex);
-        if (loaded == 2) {
+        if (loaded & ALL) {
             // Draw All Pools
             g_drawPool.draw();
 

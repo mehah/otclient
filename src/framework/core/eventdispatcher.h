@@ -42,8 +42,6 @@ private:
     std::deque<EventPtr> m_eventList;
     int m_pollEventsSize;
     bool m_disabled{ false };
-
-    std::recursive_mutex m_mutex;
     std::priority_queue<ScheduledEventPtr, std::deque<ScheduledEventPtr>, ScheduledEvent::Compare> m_scheduledEventList;
 };
 
