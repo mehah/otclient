@@ -123,7 +123,7 @@
     </Link>
     <PreBuildEvent>
       <Command>if NOT EXIST "../src/protobuf/appearances.pb.cc" (
-cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc" --cpp_out=../src/protobuf/ --proto_path=../src/protobuf/ appearances.proto
+cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\protoc" --cpp_out=../src/protobuf/ --proto_path=../src/protobuf/ appearances.proto
 )</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
@@ -142,7 +142,7 @@ cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc" --cpp_out=
     </Link>
     <PreBuildEvent>
       <Command>if NOT EXIST "../src/protobuf/appearances.pb.cc" (
-cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc" --cpp_out=../src/protobuf/ --proto_path=../src/protobuf/ appearances.proto
+cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\protoc" --cpp_out=../src/protobuf/ --proto_path=../src/protobuf/ appearances.proto
 )</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
@@ -186,9 +186,8 @@ cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc" --cpp_out=
 	  </AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>
-if NOT EXIST "../src/protobuf/appearances.pb.cc" (
-	cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc" --cpp_out=../src/protobuf/ --proto_path=../src/protobuf/ appearances.proto
+      <Command>if NOT EXIST "../src/protobuf/appearances.pb.cc" (
+	cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\protoc" --cpp_out=../src/protobuf/ --proto_path=../src/protobuf/ appearances.proto
 )
 WHERE git
 IF %ERRORLEVEL% EQU 0 (
@@ -245,9 +244,8 @@ IF %ERRORLEVEL% EQU 0 (
 	  </AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>
-if NOT EXIST "../src/protobuf/appearances.pb.cc" (
-	cmd /c "$(VcpkgRoot)\installed\$(VcpkgTriplet)\tools\protobuf\protoc" --cpp_out=../src/protobuf/ --proto_path=../src/protobuf/ appearances.proto
+      <Command>if NOT EXIST "../src/protobuf/appearances.pb.cc" (
+	cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\protoc" --cpp_out=../src/protobuf/ --proto_path=../src/protobuf/ appearances.proto
 )
 WHERE git
 IF %ERRORLEVEL% EQU 0 (
