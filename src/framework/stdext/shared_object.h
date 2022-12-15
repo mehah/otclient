@@ -28,9 +28,7 @@
 #include <type_traits>
 #include "types.h"
 
-#ifdef THREAD_SAFE
 #include <atomic>
-#endif
 
 namespace stdext
 {
@@ -54,11 +52,7 @@ namespace stdext
         shared_object_ptr<T> const_self_cast() { return stdext::shared_object_ptr<T>(const_cast<T*>(this)); }
 
     private:
-#ifdef THREAD_SAFE
         std::atomic<refcount_t> refs{ 0 };
-#else
-        refcount_t refs{ 0 };
-#endif
     };
 
     template<class T>
@@ -131,7 +125,7 @@ namespace stdext
 
     // operator<< support
     template<class E, class T, class Y> std::basic_ostream<E, T>& operator<<(std::basic_ostream<E, T>& os, const shared_object_ptr<Y>& p) { os << p.get(); return os; }
-}
+    }
 
 namespace std
 {

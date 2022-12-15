@@ -26,6 +26,8 @@
 
 DrawPoolManager g_drawPool;
 
+thread_local uint8_t CURRENT_POOL;
+
 void DrawPoolManager::init()
 {
     // Create Pools
@@ -37,11 +39,13 @@ void DrawPoolManager::init()
 void DrawPoolManager::terminate()
 {
     // Destroy Pools
-    m_currentPool = nullptr;
     for (int_fast8_t i = -1; ++i <= static_cast<uint8_t>(DrawPoolType::UNKNOW);) {
         delete m_pools[i];
     }
 }
+
+DrawPool* DrawPoolManager::getCurrentPull() { return m_pools[CURRENT_POOL]; }
+void DrawPoolManager::select(DrawPoolType type) { CURRENT_POOL = static_cast<uint8_t>(type); }
 
 void DrawPoolManager::draw()
 {
@@ -108,9 +112,9 @@ void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)
         m_coordsBuffer.clear();
 
         if (!obj.methods.has_value()) {
-            m_currentPool->addCoords(*obj.method, buffer, obj.drawMode);
+            getCurrentPull()->addCoords(*obj.method, buffer, obj.drawMode);
         } else for (const auto& method : *obj.methods) {
-            m_currentPool->addCoords(method, buffer, obj.drawMode);
+            getCurrentPull()->addCoords(method, buffer, obj.drawMode);
         }
     }
 
@@ -137,7 +141,7 @@ void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)
 
 void DrawPoolManager::addTexturedCoordsBuffer(const TexturePtr& texture, const CoordsBufferPtr& coords, const Color& color)
 {
-    m_currentPool->add(color, texture, {}, DrawMode::TRIANGLE_STRIP, nullptr, coords);
+    getCurrentPull()->add(color, texture, {}, DrawMode::TRIANGLE_STRIP, nullptr, coords);
 }
 
 void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Color& color)
@@ -159,7 +163,7 @@ void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& textur
     if (buffer)
         buffer->validate(originalDest);
 
-    m_currentPool->add(color, texture, method, DrawMode::TRIANGLE_STRIP, buffer);
+    getCurrentPull()->add(color, texture, method, DrawMode::TRIANGLE_STRIP, buffer);
 }
 
 void DrawPoolManager::addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color)
@@ -169,7 +173,7 @@ void DrawPoolManager::addUpsideDownTexturedRect(const Rect& dest, const TextureP
 
     const DrawPool::DrawMethod method{ DrawPool::DrawMethodType::UPSIDEDOWN_RECT, std::make_pair(dest, src) };
 
-    m_currentPool->add(color, texture, method, DrawMode::TRIANGLE_STRIP);
+    getCurrentPull()->add(color, texture, method, DrawMode::TRIANGLE_STRIP);
 }
 
 void DrawPoolManager::addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color)
@@ -179,7 +183,7 @@ void DrawPoolManager::addTexturedRepeatedRect(const Rect& dest, const TexturePtr
 
     const DrawPool::DrawMethod method{ DrawPool::DrawMethodType::REPEATED_RECT, std::make_pair(dest, src) };
 
-    m_currentPool->add(color, texture, method);
+    getCurrentPull()->add(color, texture, method);
 }
 
 void DrawPoolManager::addFilledRect(const Rect& dest, const Color& color, const DrawBufferPtr& buffer)
@@ -189,7 +193,7 @@ void DrawPoolManager::addFilledRect(const Rect& dest, const Color& color, const 
 
     const DrawPool::DrawMethod method{ DrawPool::DrawMethodType::RECT, std::make_pair(dest, Rect()) };
 
-    m_currentPool->add(color, nullptr, method, DrawMode::TRIANGLES, buffer);
+    getCurrentPull()->add(color, nullptr, method, DrawMode::TRIANGLES, buffer);
 }
 
 void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color)
@@ -199,7 +203,7 @@ void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Po
 
     const DrawPool::DrawMethod method{ .type = DrawPool::DrawMethodType::TRIANGLE, .points = std::make_tuple(a, b, c) };
 
-    m_currentPool->add(color, nullptr, method);
+    getCurrentPull()->add(color, nullptr, method);
 }
 
 void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, int innerLineWidth)
@@ -213,22 +217,22 @@ void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, int 
         .intValue = static_cast<uint16_t>(innerLineWidth)
     };
 
-    m_currentPool->add(color, nullptr, method);
+    getCurrentPull()->add(color, nullptr, method);
 }
 
 void DrawPoolManager::addAction(std::function<void()> action)
 {
-    m_currentPool->m_objects[0][static_cast<uint8_t>(DrawPool::DrawOrder::FIRST)].emplace_back(action);
+    getCurrentPull()->m_objects[0][static_cast<uint8_t>(DrawPool::DrawOrder::FIRST)].emplace_back(action);
 }
 
 void DrawPoolManager::use(const DrawPoolType type) { use(type, {}, {}); }
 void DrawPoolManager::use(const DrawPoolType type, const Rect& dest, const Rect& src, const Color& colorClear)
 {
-    m_currentPool = get<DrawPool>(type);
-    m_currentPool->resetState();
+    select(type);
+    getCurrentPull()->resetState();
 
-    if (m_currentPool->hasFrameBuffer()) {
-        m_currentPool->toPoolFramed()
+    if (getCurrentPull()->hasFrameBuffer()) {
+        getCurrentPull()->toPoolFramed()
             ->m_framebuffer->prepare(dest, src, colorClear);
 
         // when the selected pool is MAP, reset the creature information state.
@@ -239,9 +243,9 @@ void DrawPoolManager::use(const DrawPoolType type, const Rect& dest, const Rect&
 }
 
 void DrawPoolManager::optimize(int size) {
-    if (!m_currentPool || m_currentPool->m_type != DrawPoolType::MAP)
+    if (!getCurrentPull() || getCurrentPull()->m_type != DrawPoolType::MAP)
         return;
 
     g_app.forceCriticalOptimization(size > 105); // Medium optimization
-    m_currentPool->m_alwaysGroupDrawings = size > 115; // Max optimization
+    getCurrentPull()->m_alwaysGroupDrawings = size > 115; // Max optimization
 }

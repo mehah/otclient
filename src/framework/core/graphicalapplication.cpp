@@ -33,6 +33,8 @@
 
 #include "framework/stdext/time.h"
 
+#include <framework/core/asyncdispatcher.h>
+
 #ifdef FRAMEWORK_SOUND
 #include <framework/sound/soundmanager.h>
 #endif
@@ -127,22 +129,17 @@ void GraphicalApplication::run()
 
     Timer foregroundRefresh;
 
-    while (!m_stopping) {
-        g_clock.update();
+    std::atomic_bool m_back, m_fore;
 
-        // poll all events before rendering
-        poll();
+    std::condition_variable m_condition;
+    std::condition_variable m_condition2;
+    std::mutex mainMutex;
+    std::atomic_uint8_t loaded = 0;
 
-        if (!g_window.isVisible()) {
-            // sleeps until next poll to avoid massive cpu usage
-            stdext::millisleep(1);
-            continue;
-        }
-
-        m_frameCounter.start();
-
-        // the screen consists of two panes
-        {
+    std::thread t1([&]() -> void {
+        std::unique_lock lock(m_foregroundMutex);
+        m_condition.wait(lock, [&]() {
+            g_clock.update();
             if (foregroundRefresh.ticksElapsed() >= 100) { // 10 FPS (1000 / 10)
                 foreground->repaint();
                 foregroundRefresh.restart();
@@ -154,25 +151,67 @@ void GraphicalApplication::run()
                 g_ui.render(Fw::ForegroundPane);
             }
 
+            ++loaded;
+
+            return m_stopping;
+            });
+        });
+
+    std::thread t2([&]() -> void {
+        std::unique_lock lock(m_backgroundMutex);
+        m_condition.wait(lock, [&]() {
+            g_clock.update();
             // background pane - high updated and animated pane (where the game are stuff happens)
             g_ui.render(Fw::BackgroundPane);
+            ++loaded;
+            return m_stopping;
+            });
+        });
 
+    std::unique_lock mainLock(mainMutex);
+    while (!m_stopping) {
+        g_clock.update();
+        // poll all events before rendering
+        poll();
+
+        if (!g_window.isVisible()) {
+            // sleeps until next poll to avoid massive cpu usage
+            stdext::millisleep(1);
+            continue;
+        }
+        g_clock.update();
+
+        if (loaded == 0)
+            m_condition.notify_all();
+
+        m_frameCounter.start();
+
+        // the screen consists of two panes
+        {
             // force map repaint if vsync is enabled or maxFPS set.
             if (g_window.vsyncEnabled() || getMaxFps() > 0) {
                 map->repaint();
             }
         }
 
-        // Draw All Pools
-        g_drawPool.draw();
+        std::scoped_lock l(m_backgroundMutex, m_foregroundMutex);
+        if (loaded == 2) {
+            // Draw All Pools
+            g_drawPool.draw();
 
-        // update screen pixels
-        g_window.swapBuffers();
+            // update screen pixels
+            g_window.swapBuffers();
+
+            loaded = 0;
+        }
 
         if (m_frameCounter.update()) {
             g_lua.callGlobalField("g_app", "onFps", m_frameCounter.getFps());
         }
     }
+
+    t1.join();
+    t2.join();
 
     m_stopping = false;
     m_running = false;

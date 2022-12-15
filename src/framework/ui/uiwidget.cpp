@@ -102,7 +102,7 @@ void UIWidget::drawSelf(Fw::DrawPane drawPane)
 void UIWidget::drawChildren(const Rect& visibleRect, Fw::DrawPane drawPane)
 {
     // draw children
-    for (const UIWidgetPtr& child : m_children) {
+    for (const UIWidgetPtr child : m_children) {
         // render only visible children with a valid rect inside parent rect
         if (!child->isExplicitlyVisible() || !child->getRect().isValid() || child->getOpacity() < Fw::MIN_ALPHA)
             continue;

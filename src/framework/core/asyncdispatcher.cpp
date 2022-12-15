@@ -26,7 +26,8 @@ AsyncDispatcher g_asyncDispatcher;
 
 void AsyncDispatcher::init()
 {
-    spawn_thread();
+    for (int i = std::thread::hardware_concurrency(); --i >= 0;)
+        spawn_thread();
 }
 
 void AsyncDispatcher::terminate()

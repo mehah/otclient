@@ -37,9 +37,9 @@ public:
     float seconds() { return m_currentSeconds; }
 
 private:
-    ticks_t m_currentMicros;
-    ticks_t m_currentMillis;
-    float m_currentSeconds;
+    std::atomic<ticks_t> m_currentMicros;
+    std::atomic<ticks_t> m_currentMillis;
+    std::atomic<float> m_currentSeconds;
 };
 
 extern Clock g_clock;
