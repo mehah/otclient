@@ -136,8 +136,9 @@ void GraphicalApplication::run()
         Timer foregroundRefresh;
 
         while (!m_stopping) {
-            mutex.lock();
+            stdext::millisleep(1);
 
+            std::scoped_lock l(mutex);
             m_frameCounter.start();
 
             g_clock.update();
@@ -162,10 +163,6 @@ void GraphicalApplication::run()
             if (g_window.vsyncEnabled() || getMaxFps() > 0) {
                 map->repaint();
             }
-
-            mutex.unlock();
-
-            stdext::millisleep(1);
         }
         });
 
@@ -179,17 +176,16 @@ void GraphicalApplication::run()
             stdext::millisleep(1);
             continue;
         }
-        g_clock.update();
 
-        mutex.lock();
+        { // Draw All Pools
+            std::scoped_lock l(mutex);
 
-        // Draw All Pools
-        g_drawPool.draw();
+            g_drawPool.draw();
 
-        if (m_frameCounter.update()) {
-            g_lua.callGlobalField("g_app", "onFps", m_frameCounter.getFps());
+            if (m_frameCounter.update()) {
+                g_lua.callGlobalField("g_app", "onFps", m_frameCounter.getFps());
+            }
         }
-        mutex.unlock();
 
         // update screen pixels
         g_window.swapBuffers();
