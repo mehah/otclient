@@ -127,6 +127,7 @@ void GraphicalApplication::run()
 
     g_lua.callGlobalField("g_app", "onRun");
 
+    std::condition_variable m_condition;
     std::mutex m_backMutex, m_foreMutex;
 
     std::thread t1([&]() {
@@ -142,6 +143,8 @@ void GraphicalApplication::run()
             Application::poll();
             g_clock.update();
 
+            m_condition.notify_all();
+
             // background pane - high updated and animated pane (where the game are stuff happens)
             g_ui.render(Fw::BackgroundPane);
 
@@ -155,9 +158,8 @@ void GraphicalApplication::run()
         const auto& foreground = g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND);
         Timer foregroundRefresh;
 
-        while (!m_stopping) {
-            stdext::millisleep(1);
-            std::scoped_lock l(m_foreMutex);
+        std::unique_lock lock(m_foreMutex);
+        m_condition.wait(lock, [&]() -> bool {
             if (foregroundRefresh.ticksElapsed() >= 100) { // 10 FPS (1000 / 10)
                 foreground->repaint();
                 foregroundRefresh.restart();
@@ -169,7 +171,9 @@ void GraphicalApplication::run()
                 g_drawPool.use(DrawPoolType::FOREGROUND);
                 g_ui.render(Fw::ForegroundPane);
             }
-        }
+
+            return m_stopping;
+            });
         });
 
     while (!m_stopping) {
