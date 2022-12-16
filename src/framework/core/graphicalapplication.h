@@ -62,8 +62,7 @@ public:
 
     void repaint();
 
-    void updateCPUInterval() { m_frameCounter.updateCPUInterval(); }
-    uint32_t getCPUInterval() const { return m_frameCounter.getCPUInterval(); }
+    ticks_t getCPUInterval() { return m_frameCounter.getCPUInterval(); }
 
     void forceCriticalOptimization(bool force) { m_forceCriticalOptimization = force; }
 

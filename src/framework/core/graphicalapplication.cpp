@@ -130,15 +130,19 @@ void GraphicalApplication::run()
     std::condition_variable m_condition;
     std::mutex m_backMutex, m_foreMutex;
 
+    const uint16_t FPS_60 = 1000000 / 60;
+
     std::thread t1([&]() {
         const auto& map = g_drawPool.get<DrawPool>(DrawPoolType::MAP);
 
         while (!m_stopping) {
-            stdext::millisleep(1);
+            const uint32_t fpsTime = getMaxFps() == 0 || g_window.vsyncEnabled() ?
+                FPS_60 : m_frameCounter.getMaxPeriod();
+
+            stdext::microPrecisionSleep(std::max<uint32_t>(fpsTime, 5u));
 
             std::scoped_lock l(m_foreMutex, m_backMutex);
 
-            m_frameCounter.start();
             g_clock.update();
             Application::poll();
             g_clock.update();
@@ -176,6 +180,7 @@ void GraphicalApplication::run()
             });
         });
 
+    m_frameCounter.start();
     while (!m_stopping) {
         g_clock.update();
         // poll all events before rendering
@@ -187,6 +192,7 @@ void GraphicalApplication::run()
             continue;
         }
 
+        m_frameCounter.start();
         { // Draw All Pools
             std::scoped_lock l(m_backMutex, m_foreMutex);
 

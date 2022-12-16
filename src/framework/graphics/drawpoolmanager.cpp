@@ -72,8 +72,6 @@ void DrawPoolManager::draw()
         }
     }
 
-    g_app.updateCPUInterval();
-
     g_painter->setResolution(m_size, m_transformMatrix);
 
     // Draw
