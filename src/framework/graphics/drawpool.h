@@ -66,6 +66,8 @@ public:
     bool canRepaint() { return canRepaint(false); }
     void repaint() { m_status.first = 1; }
 
+    virtual bool isValid() const { return true; };
+
 protected:
     struct PoolState
     {
@@ -227,6 +229,7 @@ public:
     void setSmooth(bool enabled) { m_framebuffer->setSmooth(enabled); }
     void resize(const Size& size) { m_framebuffer->resize(size); }
     Size getSize() { return m_framebuffer->getSize(); }
+    bool isValid() const override { return m_framebuffer->isValid(); }
 
 protected:
     DrawPoolFramed(const FrameBufferPtr& fb) : m_framebuffer(fb) {};
@@ -235,7 +238,7 @@ protected:
     friend DrawPool;
 
 private:
-    bool hasFrameBuffer() const override { return true; }
+    bool hasFrameBuffer() const override { return m_framebuffer->isValid(); }
     DrawPoolFramed* toPoolFramed() override { return this; }
 
     FrameBufferPtr m_framebuffer;

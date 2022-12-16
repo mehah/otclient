@@ -51,8 +51,7 @@ private:
     uint16_t m_fpsCount{};
 
     uint32_t m_interval{};
+    uint32_t m_cpuInterval{};
 
-    std::atomic_uint32_t m_cpuInterval{};
-
-    std::atomic<ticks_t> m_startTime{};
+    ticks_t m_startTime{};
 };

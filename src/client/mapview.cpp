@@ -227,6 +227,7 @@ void MapView::drawFloor()
 void MapView::drawText()
 {
     if (!m_drawTexts || (g_map.getStaticTexts().empty() && g_map.getAnimatedTexts().empty())) {
+        g_drawPool.get<DrawPool>(DrawPoolType::TEXT)->setEnable(false);
         return;
     }
 
@@ -802,7 +803,8 @@ void MapView::setDrawLights(bool enable)
             return;
 
         m_lightView = LightViewPtr(new LightView);
-        m_lightView->resize(m_drawDimension, m_tileSize);
+        g_mainDispatcher.addEvent([&]
+        () { if (m_lightView) m_lightView->resize(m_drawDimension, m_tileSize); });
 
         requestUpdateVisibleTiles();
     } else m_lightView = nullptr;

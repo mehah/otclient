@@ -50,27 +50,27 @@ public:
     void addBoundingRect(const Rect& dest, const Color& color = Color::white, int innerLineWidth = 1);
     void addAction(std::function<void()> action);
 
-    void setOpacity(const float opacity, bool onlyOnce = false) { getCurrentPull()->setOpacity(opacity, onlyOnce); }
-    void setClipRect(const Rect& clipRect, bool onlyOnce = false) { getCurrentPull()->setClipRect(clipRect, onlyOnce); }
-    void setBlendEquation(BlendEquation equation, bool onlyOnce = false) { getCurrentPull()->setBlendEquation(equation, onlyOnce); }
-    void setCompositionMode(const CompositionMode mode, bool onlyOnce = false) { getCurrentPull()->setCompositionMode(mode, onlyOnce); }
-    void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onlyOnce = false, const std::function<void()>& action = nullptr) { getCurrentPull()->setShaderProgram(shaderProgram, onlyOnce, action); }
+    void setOpacity(const float opacity, bool onlyOnce = false) { getCurrentPool()->setOpacity(opacity, onlyOnce); }
+    void setClipRect(const Rect& clipRect, bool onlyOnce = false) { getCurrentPool()->setClipRect(clipRect, onlyOnce); }
+    void setBlendEquation(BlendEquation equation, bool onlyOnce = false) { getCurrentPool()->setBlendEquation(equation, onlyOnce); }
+    void setCompositionMode(const CompositionMode mode, bool onlyOnce = false) { getCurrentPool()->setCompositionMode(mode, onlyOnce); }
+    void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onlyOnce = false, const std::function<void()>& action = nullptr) { getCurrentPool()->setShaderProgram(shaderProgram, onlyOnce, action); }
 
-    float getOpacity() { return getCurrentPull()->getOpacity(); }
-    Rect getClipRect() { return getCurrentPull()->getClipRect(); }
+    float getOpacity() { return getCurrentPool()->getOpacity(); }
+    Rect getClipRect() { return getCurrentPool()->getClipRect(); }
 
-    void resetState() { getCurrentPull()->resetState(); }
-    void resetOpacity() { getCurrentPull()->resetOpacity(); }
-    void resetClipRect() { getCurrentPull()->resetClipRect(); }
-    void resetShaderProgram() { getCurrentPull()->resetShaderProgram(); }
-    void resetCompositionMode() { getCurrentPull()->resetCompositionMode(); }
+    void resetState() { getCurrentPool()->resetState(); }
+    void resetOpacity() { getCurrentPool()->resetOpacity(); }
+    void resetClipRect() { getCurrentPool()->resetClipRect(); }
+    void resetShaderProgram() { getCurrentPool()->resetShaderProgram(); }
+    void resetCompositionMode() { getCurrentPool()->resetCompositionMode(); }
 
-    void flush() { if (getCurrentPull()) getCurrentPull()->flush(); }
+    void flush() { if (getCurrentPool()) getCurrentPool()->flush(); }
 
-    DrawPoolType getCurrentType() { return getCurrentPull()->m_type; }
+    DrawPoolType getCurrentType() { return getCurrentPool()->m_type; }
 
 private:
-    DrawPool* getCurrentPull();
+    DrawPool* getCurrentPool();
 
     void draw();
     void init();

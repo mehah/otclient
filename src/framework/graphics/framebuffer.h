@@ -39,6 +39,7 @@ public:
     void setSmooth(bool enabled) { m_smooth = enabled; m_texture = nullptr; }
     void setBackuping(bool enabled) { m_backuping = enabled; }
 
+    bool isValid() const { return m_texture != nullptr; }
     TexturePtr getTexture() { return m_texture; }
     Size getSize() { return m_texture->getSize(); }
 
