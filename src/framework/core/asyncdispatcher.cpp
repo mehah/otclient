@@ -21,12 +21,14 @@
  */
 
 #include "asyncdispatcher.h"
+#include <client/config.h>
 
 AsyncDispatcher g_asyncDispatcher;
 
 void AsyncDispatcher::init()
 {
-    for (int i = std::thread::hardware_concurrency(); --i >= 0;)
+    int_fast8_t threads = std::min<int_fast8_t>(std::thread::hardware_concurrency(), ASYNC_DISPATCHER_MAX_THREAD);
+    for (; --threads >= 0;)
         spawn_thread();
 }
 

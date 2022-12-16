@@ -38,8 +38,8 @@
 #include "towns.h"
 #endif
 
-static constexpr uint8_t MAX_VIEWPORT_X = 55;
-static constexpr uint8_t MAX_VIEWPORT_Y = 28;
+static constexpr uint8_t MAX_VIEWPORT_X = 8;
+static constexpr uint8_t MAX_VIEWPORT_Y = 6;
 
 const static TilePtr m_nulltile;
 

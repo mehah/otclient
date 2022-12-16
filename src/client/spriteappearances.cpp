@@ -51,7 +51,7 @@ void SpriteAppearances::terminate()
 
 bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet)
 {
-    std::lock_guard lock(sheet->mutex);
+    std::scoped_lock lock(sheet->mutex);
 
     if (sheet->loaded) {
         return true;
@@ -174,7 +174,7 @@ SpriteSheetPtr SpriteAppearances::getSheetBySpriteId(int id, bool load /* = true
     // find sheet
     const auto sheetIt = std::find_if(m_sheets.begin(), m_sheets.end(), [=](const SpriteSheetPtr& sheet) {
         return id >= sheet->firstId && id <= sheet->lastId;
-    });
+        });
 
     if (sheetIt == m_sheets.end()) {
         return nullptr;
@@ -187,7 +187,7 @@ SpriteSheetPtr SpriteAppearances::getSheetBySpriteId(int id, bool load /* = true
             sheet->loading = true;
             g_asyncDispatcher.dispatch([this, &sheet] {
                 loadSpriteSheet(sheet);
-            });
+                });
         }
 
         return nullptr;
