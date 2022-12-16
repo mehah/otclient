@@ -48,10 +48,11 @@ private:
     uint8_t m_maxFps{};
 
     uint16_t m_fps{};
-    uint16_t m_fpsCount{ };
+    uint16_t m_fpsCount{};
 
-    uint32_t m_cpuInterval{};
     uint32_t m_interval{};
 
-    ticks_t m_startTime{};
+    std::atomic_uint32_t m_cpuInterval{};
+
+    std::atomic<ticks_t> m_startTime{};
 };

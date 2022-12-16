@@ -60,9 +60,6 @@ public:
     std::string getOs();
     std::string getStartupOptions() { return m_startupOptions; }
 
-    void lock() { m_backgroundMutex.lock(); m_foregroundMutex.lock(); }
-    void unlock() { m_backgroundMutex.unlock();  m_foregroundMutex.unlock(); }
-
 protected:
     void registerLuaFunctions();
 
@@ -73,10 +70,8 @@ protected:
     std::string m_startupOptions;
 
     bool m_running{ false };
-    bool m_stopping{ false };
     bool m_terminated{ false };
-
-    std::mutex m_backgroundMutex, m_foregroundMutex;
+    std::atomic_bool m_stopping{ false };
 };
 
 #include "graphicalapplication.h"

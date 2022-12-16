@@ -127,28 +127,16 @@ void GraphicalApplication::run()
 
     g_lua.callGlobalField("g_app", "onRun");
 
-    const auto& foreground = g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND);
-    const auto& map = g_drawPool.get<DrawPool>(DrawPoolType::MAP);
-
-    Timer foregroundRefresh;
-
-    std::atomic_bool m_back, m_fore;
-
-    std::condition_variable m_condition;
-    std::condition_variable m_condition2;
-    std::mutex mainMutex;
-
-    enum THREAD : uint8_t {
-        FORE = 1 << 0,
-        BACK = 1 << 1,
-        ALL = FORE | BACK,
-    };
-
-    std::atomic_uint32_t loaded = 0;
+    std::mutex mutex;
 
     std::thread t1([&]() -> void {
+        const auto& foreground = g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND);
+        Timer foregroundRefresh;
+
         while (!m_stopping) {
-            m_backgroundMutex.lock();
+            mutex.lock();
+
+            m_frameCounter.start();
 
             g_clock.update();
             Application::poll();
@@ -167,56 +155,16 @@ void GraphicalApplication::run()
 
             // background pane - high updated and animated pane (where the game are stuff happens)
             g_ui.render(Fw::BackgroundPane);
+            mutex.unlock();
 
-            // force map repaint if vsync is enabled or maxFPS set.
-            if (g_window.vsyncEnabled() || getMaxFps() > 0) {
-                map->repaint();
-            }
-
-            m_backgroundMutex.unlock();
             stdext::millisleep(1);
         }
         });
 
-    /*std::thread t2([&]() -> void {
-        while (!m_stopping) {
-            m_appMutex.lock();
-            m_foregroundMutex.lock();
-            g_clock.update();
-            if (foregroundRefresh.ticksElapsed() >= 100) { // 10 FPS (1000 / 10)
-                foreground->repaint();
-                foregroundRefresh.restart();
-            }
-
-            // foreground pane - steady pane with few animated stuff (UI)
-            if (foreground->canRepaint()) {
-                g_drawPool.use(DrawPoolType::FOREGROUND);
-                g_ui.render(Fw::ForegroundPane);
-            }
-
-            loaded |= FORE;
-            m_foregroundMutex.unlock();
-            m_appMutex.unlock();
-            stdext::millisleep(1);
-        }
-        });
-    std::thread t3([&]() -> void {
-        while (!m_stopping) {
-            m_appMutex.lock();
-            m_backgroundMutex.lock();
-            g_clock.update();
-            // background pane - high updated and animated pane (where the game are stuff happens)
-            g_ui.render(Fw::BackgroundPane);
-            loaded |= BACK;
-            m_backgroundMutex.unlock();
-            m_appMutex.unlock();
-
-            stdext::millisleep(1);
-        }
-        });    */
-
+    const auto& map = g_drawPool.get<DrawPool>(DrawPoolType::MAP);
     while (!m_stopping) {
         g_clock.update();
+
         // poll all events before rendering
         poll();
 
@@ -227,7 +175,12 @@ void GraphicalApplication::run()
         }
         g_clock.update();
 
-        m_backgroundMutex.lock();
+        mutex.lock();
+        // force map repaint if vsync is enabled or maxFPS set.
+        if (g_window.vsyncEnabled() || getMaxFps() > 0) {
+            map->repaint();
+        }
+
         // Draw All Pools
         g_drawPool.draw();
 
@@ -237,12 +190,10 @@ void GraphicalApplication::run()
         if (m_frameCounter.update()) {
             g_lua.callGlobalField("g_app", "onFps", m_frameCounter.getFps());
         }
-        m_backgroundMutex.unlock();
+        mutex.unlock();
     }
 
     t1.join();
-    //t2.join();
-    //t3.join();
 
     m_stopping = false;
     m_running = false;
@@ -263,16 +214,13 @@ void GraphicalApplication::poll()
 
 void GraphicalApplication::close()
 {
-    m_backgroundMutex.lock();
     m_onInputEvent = true;
     Application::close();
     m_onInputEvent = false;
-    m_backgroundMutex.unlock();
 }
 
 void GraphicalApplication::resize(const Size& size)
 {
-    m_backgroundMutex.lock();
     m_onInputEvent = true;
     g_graphics.resize(size);
     g_ui.resize(size);
@@ -280,16 +228,13 @@ void GraphicalApplication::resize(const Size& size)
 
     g_drawPool.get<DrawPoolFramed>(DrawPoolType::FOREGROUND)
         ->resize(size);
-    m_backgroundMutex.unlock();
 }
 
 void GraphicalApplication::inputEvent(const InputEvent& event)
 {
-    m_backgroundMutex.lock();
     m_onInputEvent = true;
     g_ui.inputEvent(event);
     m_onInputEvent = false;
-    m_backgroundMutex.unlock();
 }
 
 void GraphicalApplication::repaint() { g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND)->repaint(); }
