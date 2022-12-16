@@ -129,8 +129,10 @@ void GraphicalApplication::run()
 
     std::mutex mutex;
 
-    std::thread t1([&]() -> void {
+    std::thread t1([&]() {
         const auto& foreground = g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND);
+        const auto& map = g_drawPool.get<DrawPool>(DrawPoolType::MAP);
+
         Timer foregroundRefresh;
 
         while (!m_stopping) {
@@ -155,16 +157,20 @@ void GraphicalApplication::run()
 
             // background pane - high updated and animated pane (where the game are stuff happens)
             g_ui.render(Fw::BackgroundPane);
+
+            // force map repaint if vsync is enabled or maxFPS set.
+            if (g_window.vsyncEnabled() || getMaxFps() > 0) {
+                map->repaint();
+            }
+
             mutex.unlock();
 
             stdext::millisleep(1);
         }
         });
 
-    const auto& map = g_drawPool.get<DrawPool>(DrawPoolType::MAP);
     while (!m_stopping) {
         g_clock.update();
-
         // poll all events before rendering
         poll();
 
@@ -176,21 +182,17 @@ void GraphicalApplication::run()
         g_clock.update();
 
         mutex.lock();
-        // force map repaint if vsync is enabled or maxFPS set.
-        if (g_window.vsyncEnabled() || getMaxFps() > 0) {
-            map->repaint();
-        }
 
         // Draw All Pools
         g_drawPool.draw();
-
-        // update screen pixels
-        g_window.swapBuffers();
 
         if (m_frameCounter.update()) {
             g_lua.callGlobalField("g_app", "onFps", m_frameCounter.getFps());
         }
         mutex.unlock();
+
+        // update screen pixels
+        g_window.swapBuffers();
     }
 
     t1.join();

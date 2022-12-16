@@ -793,7 +793,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
             break;
         }
         case WM_LBUTTONUP: {
-            SetCapture(NULL);
+            SetCapture(nullptr);
             break;
         }
         case WM_MBUTTONDOWN: {
@@ -801,7 +801,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
             break;
         }
         case WM_MBUTTONUP: {
-            SetCapture(NULL);
+            SetCapture(nullptr);
             break;
         }
         case WM_RBUTTONDOWN: {
@@ -809,7 +809,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
             break;
         }
         case WM_RBUTTONUP: {
-            SetCapture(NULL);
+            SetCapture(nullptr);
             break;
         }
         case WM_GETMINMAXINFO: {
@@ -852,6 +852,20 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
 
             break;
         }
+
+        case WM_ACTIVATE:
+        case WM_SETFOCUS:
+        case WM_KILLFOCUS:
+        case WM_CHAR:
+        case WM_CLOSE:
+        case WM_KEYDOWN:
+        case WM_KEYUP:
+        case WM_SYSKEYUP:
+        case WM_MOUSEMOVE:
+        case WM_MOUSEWHEEL:
+        case WM_MOVE:
+            break;
+
         default:
             return DefWindowProc(hWnd, uMsg, wParam, lParam);
     }
