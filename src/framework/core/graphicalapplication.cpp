@@ -127,24 +127,37 @@ void GraphicalApplication::run()
 
     g_lua.callGlobalField("g_app", "onRun");
 
-    std::mutex mutex;
+    std::mutex m_backMutex, m_foreMutex;
 
     std::thread t1([&]() {
-        const auto& foreground = g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND);
         const auto& map = g_drawPool.get<DrawPool>(DrawPoolType::MAP);
-
-        Timer foregroundRefresh;
 
         while (!m_stopping) {
             stdext::millisleep(1);
 
-            std::scoped_lock l(mutex);
-            m_frameCounter.start();
+            std::scoped_lock l(m_foreMutex, m_backMutex);
 
+            m_frameCounter.start();
             g_clock.update();
             Application::poll();
             g_clock.update();
 
+            // background pane - high updated and animated pane (where the game are stuff happens)
+            g_ui.render(Fw::BackgroundPane);
+
+            // force map repaint if vsync is enabled or maxFPS set.
+            if (g_window.vsyncEnabled() || getMaxFps() > 0)
+                map->repaint();
+        }
+        });
+
+    std::thread t2([&]() {
+        const auto& foreground = g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND);
+        Timer foregroundRefresh;
+
+        while (!m_stopping) {
+            stdext::millisleep(1);
+            std::scoped_lock l(m_foreMutex);
             if (foregroundRefresh.ticksElapsed() >= 100) { // 10 FPS (1000 / 10)
                 foreground->repaint();
                 foregroundRefresh.restart();
@@ -152,16 +165,9 @@ void GraphicalApplication::run()
 
             // foreground pane - steady pane with few animated stuff (UI)
             if (foreground->canRepaint()) {
+                g_clock.update();
                 g_drawPool.use(DrawPoolType::FOREGROUND);
                 g_ui.render(Fw::ForegroundPane);
-            }
-
-            // background pane - high updated and animated pane (where the game are stuff happens)
-            g_ui.render(Fw::BackgroundPane);
-
-            // force map repaint if vsync is enabled or maxFPS set.
-            if (g_window.vsyncEnabled() || getMaxFps() > 0) {
-                map->repaint();
             }
         }
         });
@@ -178,7 +184,7 @@ void GraphicalApplication::run()
         }
 
         { // Draw All Pools
-            std::scoped_lock l(mutex);
+            std::scoped_lock l(m_backMutex, m_foreMutex);
 
             g_drawPool.draw();
 
@@ -192,6 +198,7 @@ void GraphicalApplication::run()
     }
 
     t1.join();
+    t2.join();
 
     m_stopping = false;
     m_running = false;
