@@ -427,7 +427,6 @@ void MapView::updateGeometry(const Size& visibleDimension)
 
     g_mainDispatcher.addEvent([=]() {
         g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP)->resize(bufferSize);
-
         if (m_lightView) m_lightView->resize(drawDimension, tileSize);
         });
 

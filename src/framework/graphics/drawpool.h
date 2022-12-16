@@ -227,7 +227,7 @@ public:
     void onBeforeDraw(std::function<void()> f) { m_beforeDraw = std::move(f); }
     void onAfterDraw(std::function<void()> f) { m_afterDraw = std::move(f); }
     void setSmooth(bool enabled) { m_framebuffer->setSmooth(enabled); }
-    void resize(const Size& size) { m_framebuffer->resize(size); }
+    void resize(const Size& size) { m_framebuffer->resize(size); repaint(); }
     Size getSize() { return m_framebuffer->getSize(); }
     bool isValid() const override { return m_framebuffer->isValid(); }
 
