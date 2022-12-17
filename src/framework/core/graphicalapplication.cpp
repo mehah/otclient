@@ -180,7 +180,6 @@ void GraphicalApplication::run()
             });
         });
 
-    m_frameCounter.start();
     while (!m_stopping) {
         g_clock.update();
         // poll all events before rendering

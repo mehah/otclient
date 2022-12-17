@@ -341,7 +341,7 @@ end
 
 function onZoomChange()
     removeEvent(eventOnCheckCreature)
-    eventOnCheckCreature = scheduleEvent(checkCreatures, 200)
+    eventOnCheckCreature = scheduleEvent(checkCreatures, 1000)
 end
 
 function onChangeSortType(comboBox, option) -- Callback when change the sort type (distance, age, name, health)

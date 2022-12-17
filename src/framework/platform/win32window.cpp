@@ -923,21 +923,25 @@ int WIN32Window::internalLoadMouseCursor(const ImagePtr& image, const Point& hot
 
 void WIN32Window::setMouseCursor(int cursorId)
 {
-    if (cursorId >= static_cast<int>(m_cursors.size()) || cursorId < 0)
-        return;
+    g_mainDispatcher.addEvent([&, cursorId] {
+        if (cursorId >= static_cast<int>(m_cursors.size()) || cursorId < 0)
+            return;
 
-    m_cursor = m_cursors[cursorId];
-    SetCursor(m_cursor);
-    ShowCursor(true);
+        m_cursor = m_cursors[cursorId];
+        SetCursor(m_cursor);
+        ShowCursor(true);
+        });
 }
 
 void WIN32Window::restoreMouseCursor()
 {
-    if (m_cursor) {
-        m_cursor = nullptr;
-        SetCursor(m_defaultCursor);
-        ShowCursor(true);
-    }
+    g_mainDispatcher.addEvent([&] {
+        if (m_cursor) {
+            m_cursor = nullptr;
+            SetCursor(m_defaultCursor);
+            ShowCursor(true);
+        }
+        });
 }
 
 void WIN32Window::setTitle(const std::string_view title)
@@ -1054,23 +1058,25 @@ void WIN32Window::setIcon(const std::string& file)
 
 void WIN32Window::setClipboardText(const std::string_view text)
 {
-    if (!OpenClipboard(m_window))
-        return;
+    g_mainDispatcher.addEvent([&, text = std::string{ text }] {
+        if (!OpenClipboard(m_window))
+            return;
 
-    const HGLOBAL hglb = GlobalAlloc(GMEM_MOVEABLE, (text.length() + 1) * sizeof(WCHAR));
-    if (!hglb)
-        return;
+        const HGLOBAL hglb = GlobalAlloc(GMEM_MOVEABLE, (text.length() + 1) * sizeof(WCHAR));
+        if (!hglb)
+            return;
 
-    const std::wstring wtext = stdext::latin1_to_utf16(text);
+        const std::wstring wtext = stdext::latin1_to_utf16(text);
 
-    auto* lpwstr = static_cast<LPWSTR>(GlobalLock(hglb));
-    memcpy(lpwstr, &wtext[0], wtext.length() * sizeof(WCHAR));
-    lpwstr[text.length()] = static_cast<WCHAR>(0);
-    GlobalUnlock(hglb);
+        auto* lpwstr = static_cast<LPWSTR>(GlobalLock(hglb));
+        memcpy(lpwstr, &wtext[0], wtext.length() * sizeof(WCHAR));
+        lpwstr[text.length()] = static_cast<WCHAR>(0);
+        GlobalUnlock(hglb);
 
-    EmptyClipboard();
-    SetClipboardData(CF_UNICODETEXT, hglb);
-    CloseClipboard();
+        EmptyClipboard();
+        SetClipboardData(CF_UNICODETEXT, hglb);
+        CloseClipboard();
+        });
 }
 
 Size WIN32Window::getDisplaySize()

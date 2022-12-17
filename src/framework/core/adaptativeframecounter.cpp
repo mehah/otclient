@@ -37,12 +37,14 @@ bool AdaptativeFrameCounter::update()
 
     const bool fpsChanged = m_fps != m_fpsCount;
     if (fpsChanged) {
+        if (!g_window.vsyncEnabled())
+            m_fpsCount /= 1.85;
+        if (m_fpsCount > 1000)
+            m_fpsCount = 1000 + (stdext::random_range(0, 2) - 1);
+
         m_fps = m_fpsCount;
         m_fpsCount = 0;
         m_interval = tickCount;
-
-        if (m_maxFps > 0 && !g_window.vsyncEnabled())
-            m_fps /= 1.85;
     }
 
     return fpsChanged;

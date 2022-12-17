@@ -42,8 +42,8 @@ X11Window::X11Window()
     m_xic = nullptr;
     m_screen = 0;
     m_wmDelete = 0;
-    m_minimumSize = Size(600,480);
-    m_size = Size(600,480);
+    m_minimumSize = Size(600, 480);
+    m_size = Size(600, 480);
 
 #ifdef OPENGL_ES
     m_eglConfig = 0;
@@ -224,48 +224,48 @@ void X11Window::init()
 
 void X11Window::terminate()
 {
-    if(m_cursor != None) {
+    if (m_cursor != None) {
         XUndefineCursor(m_display, m_window);
         m_cursor = None;
     }
 
-    if(m_hiddenCursor) {
+    if (m_hiddenCursor) {
         XFreeCursor(m_display, m_hiddenCursor);
         m_hiddenCursor = 0;
     }
 
-    for(Cursor cursor : m_cursors)
+    for (Cursor cursor : m_cursors)
         XFreeCursor(m_display, cursor);
     m_cursors.clear();
 
-    if(m_window) {
+    if (m_window) {
         XDestroyWindow(m_display, m_window);
         m_window = 0;
     }
 
-    if(m_colormap) {
+    if (m_colormap) {
         XFreeColormap(m_display, m_colormap);
         m_colormap = 0;
     }
 
     internalDestroyGLContext();
 
-    if(m_visual) {
+    if (m_visual) {
         XFree(m_visual);
         m_visual = nullptr;
     }
 
-    if(m_xic) {
+    if (m_xic) {
         XDestroyIC(m_xic);
         m_xic = nullptr;
     }
 
-    if(m_xim) {
+    if (m_xim) {
         XCloseIM(m_xim);
         m_xim = nullptr;
     }
 
-    if(m_display) {
+    if (m_display) {
         XCloseDisplay(m_display);
         m_display = nullptr;
     }
@@ -276,23 +276,23 @@ void X11Window::terminate()
 void X11Window::internalOpenDisplay()
 {
     m_display = XOpenDisplay(nullptr);
-    if(!m_display)
+    if (!m_display)
         g_logger.fatal("Unable to open X11 display");
     m_screen = DefaultScreen(m_display);
 }
 
 void X11Window::internalCreateWindow()
 {
-    Visual *vis;
+    Visual* vis;
     int depth;
     unsigned int attrsMask;
     XSetWindowAttributes attrs;
     memset(&attrs, 0, sizeof(attrs));
 
     attrs.event_mask = KeyPressMask | KeyReleaseMask |
-                       ButtonPressMask | ButtonReleaseMask | PointerMotionMask |
-                       ExposureMask | VisibilityChangeMask |
-                       StructureNotifyMask | FocusChangeMask;
+        ButtonPressMask | ButtonReleaseMask | PointerMotionMask |
+        ExposureMask | VisibilityChangeMask |
+        StructureNotifyMask | FocusChangeMask;
 
     m_colormap = XCreateColormap(m_display, m_rootWindow, m_visual->visual, AllocNone);
     attrs.colormap = m_colormap;
@@ -309,15 +309,15 @@ void X11Window::internalCreateWindow()
 
     updateUnmaximizedCoords();
     m_window = XCreateWindow(m_display, m_rootWindow,
-                             m_position.x, m_position.y, m_size.width(), m_size.height(),
-                             0,
-                             depth,
-                             InputOutput,
-                             vis,
-                             attrsMask, &attrs);
+        m_position.x, m_position.y, m_size.width(), m_size.height(),
+        0,
+        depth,
+        InputOutput,
+        vis,
+        attrsMask, &attrs);
     m_visible = true;
 
-    if(!m_window)
+    if (!m_window)
         g_logger.fatal("Unable to create X11 window!");
 
     // ensure window input focus
@@ -331,9 +331,9 @@ void X11Window::internalCreateWindow()
 
     // handle wm_delete events
     m_wmDelete = XInternAtom(m_display, "WM_DELETE_WINDOW", True);
-    XSetWMProtocols(m_display, m_window, &m_wmDelete , 1);
+    XSetWMProtocols(m_display, m_window, &m_wmDelete, 1);
 
-    if(!internalSetupWindowInput())
+    if (!internalSetupWindowInput())
         g_logger.warning("Input of special keys may be messed up, because window input initialization failed");
 
     internalConnectGLContext();
@@ -342,20 +342,20 @@ void X11Window::internalCreateWindow()
 bool X11Window::internalSetupWindowInput()
 {
     //  create input context (to have better key input handling)
-    if(!XSupportsLocale()) {
+    if (!XSupportsLocale()) {
         g_logger.error("X11 doesn't support the current locale");
         return false;
     }
 
     XSetLocaleModifiers("");
     m_xim = XOpenIM(m_display, nullptr, nullptr, nullptr);
-    if(!m_xim) {
+    if (!m_xim) {
         g_logger.error("XOpenIM failed");
         return false;
     }
 
     m_xic = XCreateIC(m_xim, XNInputStyle, XIMPreeditNothing | XIMStatusNothing, XNClientWindow, m_window, NULL);
-    if(!m_xic) {
+    if (!m_xic) {
         g_logger.error("Unable to create the input context");
         return false;
     }
@@ -367,13 +367,13 @@ void X11Window::internalCheckGL()
 {
 #ifdef OPENGL_ES
     m_eglDisplay = eglGetDisplay((EGLNativeDisplayType)m_display);
-    if(m_eglDisplay == EGL_NO_DISPLAY)
+    if (m_eglDisplay == EGL_NO_DISPLAY)
         g_logger.fatal("EGL not supported");
 
-    if(!eglInitialize(m_eglDisplay, NULL, NULL))
+    if (!eglInitialize(m_eglDisplay, NULL, NULL))
         g_logger.fatal("Unable to initialize EGL");
 #else
-    if(!glXQueryExtension(m_display, nullptr, nullptr))
+    if (!glXQueryExtension(m_display, nullptr, nullptr))
         g_logger.fatal("GLX not supported");
 #endif
 }
@@ -398,20 +398,20 @@ void X11Window::internalChooseGLVisual()
     XVisualInfo visTemplate;
     int numVisuals;
 
-    if(!eglChooseConfig(m_eglDisplay, attrList, &m_eglConfig, 1, &numConfig))
+    if (!eglChooseConfig(m_eglDisplay, attrList, &m_eglConfig, 1, &numConfig))
         g_logger.fatal("Failed to choose EGL config");
 
-    if(numConfig != 1)
+    if (numConfig != 1)
         g_logger.warning("Didn't got the exact EGL config");
 
     EGLint vid;
-    if(!eglGetConfigAttrib(m_eglDisplay, m_eglConfig, EGL_NATIVE_VISUAL_ID, &vid))
+    if (!eglGetConfigAttrib(m_eglDisplay, m_eglConfig, EGL_NATIVE_VISUAL_ID, &vid))
         g_logger.fatal("Unable to get visual EGL visual id");
 
     memset(&visTemplate, 0, sizeof(visTemplate));
     visTemplate.visualid = vid;
     m_visual = XGetVisualInfo(m_display, VisualIDMask, &visTemplate, &numVisuals);
-    if(!m_visual)
+    if (!m_visual)
         g_logger.fatal("Couldn't choose RGBA, double buffered visual");
 
     m_rootWindow = DefaultRootWindow(m_display);
@@ -428,11 +428,11 @@ void X11Window::internalChooseGLVisual()
 
     int nelements;
     m_fbConfig = glXChooseFBConfig(m_display, m_screen, attrList, &nelements);
-    if(!m_fbConfig)
+    if (!m_fbConfig)
         g_logger.fatal("Couldn't choose RGBA, double buffered fbconfig");
 
     m_visual = glXGetVisualFromFBConfig(m_display, *m_fbConfig);
-    if(!m_visual)
+    if (!m_visual)
         g_logger.fatal("Couldn't choose RGBA, double buffered visual");
 
     m_rootWindow = RootWindow(m_display, m_visual->screen);
@@ -452,15 +452,15 @@ void X11Window::internalCreateGLContext()
     };
 
     m_eglContext = eglCreateContext(m_eglDisplay, m_eglConfig, EGL_NO_CONTEXT, attrList);
-    if(m_eglContext == EGL_NO_CONTEXT )
+    if (m_eglContext == EGL_NO_CONTEXT)
         g_logger.fatal(stdext::format("Unable to create EGL context: %s", eglGetError()));
 #else
     m_glxContext = glXCreateContext(m_display, m_visual, nullptr, True);
 
-    if(!m_glxContext)
+    if (!m_glxContext)
         g_logger.fatal("Unable to create GLX context");
 
-    if(!glXIsDirect(m_display, m_glxContext))
+    if (!glXIsDirect(m_display, m_glxContext))
         g_logger.warning("GL direct rendering is not possible");
 #endif
 }
@@ -468,12 +468,12 @@ void X11Window::internalCreateGLContext()
 void X11Window::internalDestroyGLContext()
 {
 #ifdef OPENGL_ES
-    if(m_eglDisplay) {
-        if(m_eglContext) {
+    if (m_eglDisplay) {
+        if (m_eglContext) {
             eglDestroyContext(m_eglDisplay, m_eglContext);
             m_eglContext = 0;
         }
-        if(m_eglSurface) {
+        if (m_eglSurface) {
             eglDestroySurface(m_eglDisplay, m_eglSurface);
             m_eglSurface = 0;
         }
@@ -481,7 +481,7 @@ void X11Window::internalDestroyGLContext()
         m_eglDisplay = 0;
     }
 #else
-    if(m_glxContext) {
+    if (m_glxContext) {
         glXMakeCurrent(m_display, None, nullptr);
         glXDestroyContext(m_display, m_glxContext);
         m_glxContext = nullptr;
@@ -493,34 +493,34 @@ void X11Window::internalConnectGLContext()
 {
 #ifdef OPENGL_ES
     m_eglSurface = eglCreateWindowSurface(m_eglDisplay, m_eglConfig, m_window, NULL);
-    if(m_eglSurface == EGL_NO_SURFACE)
+    if (m_eglSurface == EGL_NO_SURFACE)
         g_logger.fatal(stdext::format("Unable to create EGL surface: %s", eglGetError()));
-    if(!eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext))
+    if (!eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext))
         g_logger.fatal("Unable to connect EGL context into X11 window");
 #else
-    if(!glXMakeCurrent(m_display, m_window, m_glxContext))
+    if (!glXMakeCurrent(m_display, m_window, m_glxContext))
         g_logger.fatal("Unable to set GLX context on X11 window");
 #endif
 }
 
-void *X11Window::getExtensionProcAddress(const char *ext)
+void* X11Window::getExtensionProcAddress(const char* ext)
 {
 #ifdef OPENGL_ES
     //TODO
     return NULL;
 #else
-    return (void *)glXGetProcAddressARB((const GLubyte*)ext);
+    return (void*)glXGetProcAddressARB((const GLubyte*)ext);
 #endif
 }
 
-bool X11Window::isExtensionSupported(const char *ext)
+bool X11Window::isExtensionSupported(const char* ext)
 {
 #ifdef OPENGL_ES
     //TODO
     return false;
 #else
-    const char *exts = glXQueryExtensionsString(m_display, m_screen);
-    if(strstr(exts, ext))
+    const char* exts = glXQueryExtensionsString(m_display, m_screen);
+    if (strstr(exts, ext))
         return true;
 #endif
     return false;
@@ -528,62 +528,72 @@ bool X11Window::isExtensionSupported(const char *ext)
 
 void X11Window::move(const Point& pos)
 {
-    m_position = pos;
-    if(m_visible) {
-        XMoveWindow(m_display, m_window, m_position.x, m_position.y);
-        XFlush(m_display);
-    }
+    g_mainDispatcher.addEvent([&, pos] {
+        m_position = pos;
+        if (m_visible) {
+            XMoveWindow(m_display, m_window, m_position.x, m_position.y);
+            XFlush(m_display);
+        }
+        });
 }
 
 void X11Window::resize(const Size& size)
 {
-    if(size.width() < m_minimumSize.width() || size.height() < m_minimumSize.height())
-        return;
-    XResizeWindow(m_display, m_window, size.width(), size.height());
-    XFlush(m_display);
+    g_mainDispatcher.addEvent([&, size] {
+        if (size.width() < m_minimumSize.width() || size.height() < m_minimumSize.height())
+            return;
+        XResizeWindow(m_display, m_window, size.width(), size.height());
+        XFlush(m_display);
+        });
 }
 
 void X11Window::show()
 {
-    m_visible = true;
-    XMapWindow(m_display, m_window);
-    XMoveWindow(m_display, m_window, m_position.x, m_position.y);
-    XFlush(m_display);
-    if(m_maximized)
-        maximize();
-    if(m_fullscreen)
-        setFullscreen(true);
+    g_mainDispatcher.addEvent([&] {
+        m_visible = true;
+        XMapWindow(m_display, m_window);
+        XMoveWindow(m_display, m_window, m_position.x, m_position.y);
+        XFlush(m_display);
+        if (m_maximized)
+            maximize();
+        if (m_fullscreen)
+            setFullscreen(true);
+        });
 }
 
 void X11Window::hide()
 {
-    m_visible = false;
-    XUnmapWindow(m_display, m_window);
-    XFlush(m_display);
+    g_mainDispatcher.addEvent([&] {
+        m_visible = false;
+        XUnmapWindow(m_display, m_window);
+        XFlush(m_display);
+        });
 }
 
 void X11Window::maximize()
 {
-    if(m_visible) {
-        Atom wmState = XInternAtom(m_display, "_NET_WM_STATE", False);
-        Atom wmStateMaximizedVert = XInternAtom(m_display, "_NET_WM_STATE_MAXIMIZED_VERT", False);
-        Atom wmStateMaximizedHorz = XInternAtom(m_display, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
+    g_mainDispatcher.addEvent([&] {
+        if (m_visible) {
+            Atom wmState = XInternAtom(m_display, "_NET_WM_STATE", False);
+            Atom wmStateMaximizedVert = XInternAtom(m_display, "_NET_WM_STATE_MAXIMIZED_VERT", False);
+            Atom wmStateMaximizedHorz = XInternAtom(m_display, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
 
-        XEvent e = {0};
-        e.xany.type = ClientMessage;
-        e.xclient.send_event = True;
-        e.xclient.message_type = wmState;
-        e.xclient.format = 32;
-        e.xclient.window = m_window;
-        e.xclient.data.l[0] = 1;
-        e.xclient.data.l[1] = wmStateMaximizedVert;
-        e.xclient.data.l[2] = wmStateMaximizedHorz;
-        e.xclient.data.l[3] = 0;
+            XEvent e = { 0 };
+            e.xany.type = ClientMessage;
+            e.xclient.send_event = True;
+            e.xclient.message_type = wmState;
+            e.xclient.format = 32;
+            e.xclient.window = m_window;
+            e.xclient.data.l[0] = 1;
+            e.xclient.data.l[1] = wmStateMaximizedVert;
+            e.xclient.data.l[2] = wmStateMaximizedHorz;
+            e.xclient.data.l[3] = 0;
 
-        XSendEvent(m_display, m_rootWindow, 0, SubstructureNotifyMask | SubstructureRedirectMask, &e);
-        XFlush(m_display);
-    }
-    m_maximized = true;
+            XSendEvent(m_display, m_rootWindow, 0, SubstructureNotifyMask | SubstructureRedirectMask, &e);
+            XFlush(m_display);
+        }
+        m_maximized = true;
+        });
 }
 
 void X11Window::poll()
@@ -591,19 +601,19 @@ void X11Window::poll()
     bool needsResizeUpdate = false;
 
     XEvent event, peekEvent;
-    while(XPending(m_display) > 0) {
+    while (XPending(m_display) > 0) {
         XNextEvent(m_display, &event);
 
         // check for repeated key releases
         bool repatedKeyRelease = false;
-        if(event.type == KeyRelease && XPending(m_display)) {
+        if (event.type == KeyRelease && XPending(m_display)) {
             XPeekEvent(m_display, &peekEvent);
-            if((peekEvent.type == KeyPress) && (peekEvent.xkey.keycode == event.xkey.keycode) && ((peekEvent.xkey.time-event.xkey.time) < 2))
+            if ((peekEvent.type == KeyPress) && (peekEvent.xkey.keycode == event.xkey.keycode) && ((peekEvent.xkey.time - event.xkey.time) < 2))
                 repatedKeyRelease = true;
         }
 
         // process keydown and keyrelease events first
-        if(event.type == KeyPress || (event.type == KeyRelease && !repatedKeyRelease)) {
+        if (event.type == KeyPress || (event.type == KeyRelease && !repatedKeyRelease)) {
             // remove caps lock and shift maks
             XKeyEvent xkey = event.xkey;
             xkey.state &= ~(ShiftMask | LockMask);
@@ -614,27 +624,27 @@ void X11Window::poll()
             XLookupString(&xkey, buf, sizeof(buf), &keysym, nullptr);
             Fw::Key keyCode = Fw::KeyUnknown;
 
-            if(m_keyMap.find(keysym) != m_keyMap.end())
+            if (m_keyMap.find(keysym) != m_keyMap.end())
                 keyCode = m_keyMap[keysym];
 
-            if(event.type == KeyPress)
+            if (event.type == KeyPress)
                 processKeyDown(keyCode);
-            else if(event.type == KeyRelease)
+            else if (event.type == KeyRelease)
                 processKeyUp(keyCode);
         }
 
         // call filter because xim will discard KeyPress events when keys still composing
-        if(XFilterEvent(&event, m_window))
+        if (XFilterEvent(&event, m_window))
             continue;
 
         // discard repated key releases
-        if(repatedKeyRelease)
+        if (repatedKeyRelease)
             continue;
 
-        switch(event.type) {
+        switch (event.type) {
             case ClientMessage: {
                 // close event
-                if((Atom)event.xclient.data.l[0] == m_wmDelete && m_onClose)
+                if ((Atom)event.xclient.data.l[0] == m_wmDelete && m_onClose)
                     m_onClose();
                 break;
             }
@@ -643,37 +653,37 @@ void X11Window::poll()
                 Point newPos(event.xconfigure.x, event.xconfigure.y);
 
                 // updates window size
-                if(m_size != newSize) {
+                if (m_size != newSize) {
                     m_size = newSize;
                     needsResizeUpdate = true;
                 }
 
                 // checks if the window is maximized
-                if(m_visible) {
+                if (m_visible) {
                     m_maximized = false;
                     Atom wmState = XInternAtom(m_display, "_NET_WM_STATE", False);
                     Atom wmStateMaximizedVert = XInternAtom(m_display, "_NET_WM_STATE_MAXIMIZED_VERT", False);
                     Atom wmStateMaximizedHorz = XInternAtom(m_display, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
                     Atom actualType;
                     ulong i, numItems, bytesAfter;
-                    uint8_t *propertyValue = nullptr;
+                    uint8_t* propertyValue = nullptr;
                     int actualFormat;
 
-                    if(XGetWindowProperty(m_display, m_window, wmState,
-                                        0, 1024, False, XA_ATOM, &actualType,
-                                        &actualFormat, &numItems, &bytesAfter,
-                                        &propertyValue) == Success) {
-                        Atom *atoms = (Atom*)propertyValue;
+                    if (XGetWindowProperty(m_display, m_window, wmState,
+                        0, 1024, False, XA_ATOM, &actualType,
+                        &actualFormat, &numItems, &bytesAfter,
+                        &propertyValue) == Success) {
+                        Atom* atoms = (Atom*)propertyValue;
                         int maximizedMask = 0;
 
-                        for(i=0; i<numItems; ++i) {
-                            if(atoms[i] == wmStateMaximizedVert)
+                        for (i = 0; i < numItems; ++i) {
+                            if (atoms[i] == wmStateMaximizedVert)
                                 maximizedMask |= 1;
-                            else if(atoms[i] == wmStateMaximizedHorz)
+                            else if (atoms[i] == wmStateMaximizedHorz)
                                 maximizedMask |= 2;
                         }
 
-                        if(maximizedMask == 3)
+                        if (maximizedMask == 3)
                             m_maximized = true;
 
                         XFree(propertyValue);
@@ -681,17 +691,17 @@ void X11Window::poll()
                 }
 
                 // updates window pos
-                if(m_visible)
+                if (m_visible)
                     m_position = newPos;
                 updateUnmaximizedCoords();
                 break;
             }
             case SelectionRequest: {
                 XEvent respond;
-                XSelectionRequestEvent *req = &(event.xselectionrequest);
+                XSelectionRequestEvent* req = &(event.xselectionrequest);
 
                 Atom targets = XInternAtom(m_display, "TARGETS", False);
-                if(req->target == targets) {
+                if (req->target == targets) {
                     Atom typeList[] = { XInternAtom(m_display, "UTF8_STRING", False),
                                         XInternAtom(m_display, "TEXT", False),
                                         XInternAtom(m_display, "STRING", False),
@@ -701,20 +711,20 @@ void X11Window::poll()
                                         XA_STRING };
 
                     XChangeProperty(m_display, req->requestor,
-                                    req->property, req->target,
-                                    8, PropModeReplace,
-                                    (uint8_t *)&typeList,
-                                    sizeof(typeList));
+                        req->property, req->target,
+                        8, PropModeReplace,
+                        (uint8_t*)&typeList,
+                        sizeof(typeList));
                     respond.xselection.property = req->property;
                 } else {
                     std::string clipboardText = stdext::latin1_to_utf8(m_clipboardText);
                     XChangeProperty(m_display,
-                                    req->requestor,
-                                    req->property, req->target,
-                                    8,
-                                    PropModeReplace,
-                                    (uint8_t *)clipboardText.c_str(),
-                                    clipboardText.length());
+                        req->requestor,
+                        req->property, req->target,
+                        8,
+                        PropModeReplace,
+                        (uint8_t*)clipboardText.c_str(),
+                        clipboardText.length());
                     respond.xselection.property = req->property;
                 }
 
@@ -728,10 +738,10 @@ void X11Window::poll()
                 XFlush(m_display);
                 break;
             }
-            // process text events
+                                 // process text events
             case KeyPress: {
                 // text cant be insert while holding ctrl or alt
-                if(event.xkey.state & ControlMask || event.xkey.state & Mod1Mask)
+                if (event.xkey.state & ControlMask || event.xkey.state & Mod1Mask)
                     break;
 
                 // process key text events
@@ -741,22 +751,22 @@ void X11Window::poll()
                 int len;
 
                 // lookup for keyText
-                if(m_xic) { // with xim we can get latin1 input correctly
+                if (m_xic) { // with xim we can get latin1 input correctly
                     Status status;
                     len = XmbLookupString(m_xic, &event.xkey, buf, sizeof(buf), &keysym, &status);
                 } else { // otherwise use XLookupString, but often it doesn't work right with dead keys
-                    static XComposeStatus compose = {nullptr, 0};
+                    static XComposeStatus compose = { nullptr, 0 };
                     len = XLookupString(&event.xkey, buf, sizeof(buf), &keysym, &compose);
                 }
 
                 // filter unwanted characters
-                if(len == 0 || (uint8_t)(buf[0]) < 32 || keysym == XK_BackSpace || keysym == XK_Return || keysym == XK_Delete || keysym == XK_Escape)
+                if (len == 0 || (uint8_t)(buf[0]) < 32 || keysym == XK_BackSpace || keysym == XK_Return || keysym == XK_Delete || keysym == XK_Escape)
                     break;
                 std::string text = buf;
 
                 //g_logger.debug("char: ", buf[0], " code: ", (int)((uint8_t)buf[0]));
 
-                if(m_onInputEvent && text.length() > 0) {
+                if (m_onInputEvent && text.length() > 0) {
                     m_inputEvent.reset(Fw::KeyTextInputEvent);
                     m_inputEvent.keyText = text;
                     m_onInputEvent(m_inputEvent);
@@ -767,21 +777,21 @@ void X11Window::poll()
             case ButtonRelease: {
                 m_inputEvent.reset();
                 m_inputEvent.type = (event.type == ButtonPress) ? Fw::MousePressInputEvent : Fw::MouseReleaseInputEvent;
-                switch(event.xbutton.button) {
+                switch (event.xbutton.button) {
                     case Button1:
                         m_inputEvent.mouseButton = Fw::MouseLeftButton;
-						if(event.type == ButtonPress) m_mouseButtonStates |= Fw::MouseLeftButton; else m_mouseButtonStates &= ~Fw::MouseLeftButton;
+                        if (event.type == ButtonPress) m_mouseButtonStates |= Fw::MouseLeftButton; else m_mouseButtonStates &= ~Fw::MouseLeftButton;
                         break;
                     case Button3:
                         m_inputEvent.mouseButton = Fw::MouseRightButton;
-						if(event.type == ButtonPress) m_mouseButtonStates |= Fw::MouseRightButton; else m_mouseButtonStates &= ~Fw::MouseRightButton;
+                        if (event.type == ButtonPress) m_mouseButtonStates |= Fw::MouseRightButton; else m_mouseButtonStates &= ~Fw::MouseRightButton;
                         break;
                     case Button2:
                         m_inputEvent.mouseButton = Fw::MouseMidButton;
-						if(event.type == ButtonPress) m_mouseButtonStates |= Fw::MouseMidButton; else m_mouseButtonStates &= ~Fw::MouseMidButton;
+                        if (event.type == ButtonPress) m_mouseButtonStates |= Fw::MouseMidButton; else m_mouseButtonStates &= ~Fw::MouseMidButton;
                         break;
                     case Button4:
-                        if(event.type == ButtonPress) {
+                        if (event.type == ButtonPress) {
                             m_inputEvent.type = Fw::MouseWheelInputEvent;
                             m_inputEvent.mouseButton = Fw::MouseMidButton;
                             m_inputEvent.wheelDirection = Fw::MouseWheelUp;
@@ -789,7 +799,7 @@ void X11Window::poll()
                             m_inputEvent.type = Fw::NoInputEvent;
                         break;
                     case Button5:
-                        if(event.type == ButtonPress) {
+                        if (event.type == ButtonPress) {
                             m_inputEvent.type = Fw::MouseWheelInputEvent;
                             m_inputEvent.mouseButton = Fw::MouseMidButton;
                             m_inputEvent.wheelDirection = Fw::MouseWheelDown;
@@ -800,7 +810,7 @@ void X11Window::poll()
                         m_inputEvent.type = Fw::NoInputEvent;
                         break;
                 }
-                if(m_inputEvent.type != Fw::NoInputEvent && m_onInputEvent)
+                if (m_inputEvent.type != Fw::NoInputEvent && m_onInputEvent)
                     m_onInputEvent(m_inputEvent);
                 break;
             }
@@ -811,7 +821,7 @@ void X11Window::poll()
                 Point newMousePos(event.xbutton.x, event.xbutton.y);
                 m_inputEvent.mouseMoved = newMousePos - m_inputEvent.mousePos;
                 m_inputEvent.mousePos = newMousePos;
-                if(m_onInputEvent)
+                if (m_onInputEvent)
                     m_onInputEvent(m_inputEvent);
                 break;
             }
@@ -837,7 +847,7 @@ void X11Window::poll()
         }
     }
 
-    if(needsResizeUpdate && m_onResize)
+    if (needsResizeUpdate && m_onResize)
         m_onResize(m_size);
 
     fireKeysPress();
@@ -859,10 +869,10 @@ void X11Window::showMouse()
 
 void X11Window::hideMouse()
 {
-    if(m_cursor != None)
+    if (m_cursor != None)
         restoreMouseCursor();
 
-    if(m_hiddenCursor == None) {
+    if (m_hiddenCursor == None) {
         char bm[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
         Pixmap pix = XCreateBitmapFromData(m_display, m_window, bm, 8, 8);
         XColor black;
@@ -878,20 +888,24 @@ void X11Window::hideMouse()
 
 void X11Window::setMouseCursor(int cursorId)
 {
-    if(cursorId >= (int)m_cursors.size() || cursorId < 0)
-        return;
+    g_mainDispatcher.addEvent([&, cursorId] {
+        if (cursorId >= (int)m_cursors.size() || cursorId < 0)
+            return;
 
-    if(m_cursor != None)
-        restoreMouseCursor();
+        if (m_cursor != None)
+            restoreMouseCursor();
 
-    m_cursor = m_cursors[cursorId];
-    XDefineCursor(m_display, m_window, m_cursor);
+        m_cursor = m_cursors[cursorId];
+        XDefineCursor(m_display, m_window, m_cursor);
+        });
 }
 
 void X11Window::restoreMouseCursor()
 {
-    XUndefineCursor(m_display, m_window);
-    m_cursor = None;
+    g_mainDispatcher.addEvent([&] {
+        XUndefineCursor(m_display, m_window);
+        m_cursor = None;
+        });
 }
 
 int X11Window::internalLoadMouseCursor(const ImagePtr& image, const Point& hotSpot)
@@ -899,24 +913,24 @@ int X11Window::internalLoadMouseCursor(const ImagePtr& image, const Point& hotSp
     int width = image->getWidth();
     int height = image->getHeight();
     int numbits = width * height;
-    int numbytes = (width * height)/8;
+    int numbytes = (width * height) / 8;
 
     XColor bg, fg;
-    bg.red   = 255 << 8;
+    bg.red = 255 << 8;
     bg.green = 255 << 8;
-    bg.blue  = 255 << 8;
-    fg.red   = 0;
+    bg.blue = 255 << 8;
+    fg.red = 0;
     fg.green = 0;
-    fg.blue  = 0;
+    fg.blue = 0;
 
     std::vector<uint8_t> mapBits(numbytes, 0);
     std::vector<uint8_t> maskBits(numbytes, 0);
 
-    for(int i=0;i<numbits;++i) {
-        uint32_t rgba = stdext::readULE32(image->getPixelData() + i*4);
-        if(rgba == 0xffffffff) { //white, background
+    for (int i = 0; i < numbits; ++i) {
+        uint32_t rgba = stdext::readULE32(image->getPixelData() + i * 4);
+        if (rgba == 0xffffffff) { //white, background
             LSB_BIT_SET(maskBits, i);
-        } else if(rgba == 0xff000000) { //black, foreground
+        } else if (rgba == 0xff000000) { //black, foreground
             LSB_BIT_SET(mapBits, i);
             LSB_BIT_SET(maskBits, i);
         } //otherwise 0x00000000 => alpha
@@ -929,96 +943,106 @@ int X11Window::internalLoadMouseCursor(const ImagePtr& image, const Point& hotSp
     XFreePixmap(m_display, mp);
 
     m_cursors.push_back(cursor);
-    return m_cursors.size()-1;
+    return m_cursors.size() - 1;
 }
 
 void X11Window::setTitle(const std::string_view title)
 {
-    XStoreName(m_display, m_window, title.data());
-    XSetIconName(m_display, m_window, title.data());
+    g_mainDispatcher.addEvent([&, title = std::string{ title }] {
+        XStoreName(m_display, m_window, title.data());
+        XSetIconName(m_display, m_window, title.data());
+        });
 }
 
 void X11Window::setMinimumSize(const Size& minimumSize)
 {
-    XSizeHints sizeHints;
-    memset(&sizeHints, 0, sizeof(sizeHints));
-    sizeHints.flags = PMinSize;
-    sizeHints.min_width = minimumSize.width();
-    sizeHints.min_height= minimumSize.height();
-    XSetWMSizeHints(m_display, m_window, &sizeHints, XA_WM_NORMAL_HINTS);
+    g_mainDispatcher.addEvent([&, minimumSize] {
+        XSizeHints sizeHints;
+        memset(&sizeHints, 0, sizeof(sizeHints));
+        sizeHints.flags = PMinSize;
+        sizeHints.min_width = minimumSize.width();
+        sizeHints.min_height = minimumSize.height();
+        XSetWMSizeHints(m_display, m_window, &sizeHints, XA_WM_NORMAL_HINTS);
+        });
 }
 
 void X11Window::setFullscreen(bool fullscreen)
 {
-    if(m_visible) {
-        Atom wmState = XInternAtom(m_display, "_NET_WM_STATE", False);
-        Atom wmStateFullscreen = XInternAtom(m_display, "_NET_WM_STATE_FULLSCREEN", False);
+    g_mainDispatcher.addEvent([&, fullscreen] {
+        if (m_visible) {
+            Atom wmState = XInternAtom(m_display, "_NET_WM_STATE", False);
+            Atom wmStateFullscreen = XInternAtom(m_display, "_NET_WM_STATE_FULLSCREEN", False);
 
-        XEvent xev;
-        xev.xclient.type = ClientMessage;
-        xev.xclient.serial = 0;
-        xev.xclient.send_event = True;
-        xev.xclient.window = m_window;
-        xev.xclient.message_type = wmState;
-        xev.xclient.format = 32;
-        xev.xclient.data.l[0] = fullscreen ? 1 : 0;
-        xev.xclient.data.l[1] = wmStateFullscreen;
-        xev.xclient.data.l[2] = 0;
+            XEvent xev;
+            xev.xclient.type = ClientMessage;
+            xev.xclient.serial = 0;
+            xev.xclient.send_event = True;
+            xev.xclient.window = m_window;
+            xev.xclient.message_type = wmState;
+            xev.xclient.format = 32;
+            xev.xclient.data.l[0] = fullscreen ? 1 : 0;
+            xev.xclient.data.l[1] = wmStateFullscreen;
+            xev.xclient.data.l[2] = 0;
 
-        XSendEvent(m_display, m_rootWindow, False,  SubstructureRedirectMask | SubstructureNotifyMask, &xev);
-        XFlush(m_display);
-    }
-    m_fullscreen = fullscreen;
+            XSendEvent(m_display, m_rootWindow, False, SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+            XFlush(m_display);
+        }
+        m_fullscreen = fullscreen;
+        });
 }
 
 void X11Window::setVerticalSync(bool enable)
 {
-	m_vsync = enable;
+    g_mainDispatcher.addEvent([&, enable] {
+        m_vsync = enable;
 #ifdef OPENGL_ES
-    //TODO
+        //TODO
 #else
-    typedef GLint (*glSwapIntervalProc)(GLint);
-    glSwapIntervalProc glSwapInterval = nullptr;
+        typedef GLint(*glSwapIntervalProc)(GLint);
+        glSwapIntervalProc glSwapInterval = nullptr;
 
-    if(isExtensionSupported("GLX_MESA_swap_control"))
-        glSwapInterval = (glSwapIntervalProc)getExtensionProcAddress("glXSwapIntervalMESA");
-    else if(isExtensionSupported("GLX_SGI_swap_control"))
-        glSwapInterval = (glSwapIntervalProc)getExtensionProcAddress("glXSwapIntervalSGI");
+        if (isExtensionSupported("GLX_MESA_swap_control"))
+            glSwapInterval = (glSwapIntervalProc)getExtensionProcAddress("glXSwapIntervalMESA");
+        else if (isExtensionSupported("GLX_SGI_swap_control"))
+            glSwapInterval = (glSwapIntervalProc)getExtensionProcAddress("glXSwapIntervalSGI");
 
-    if(glSwapInterval)
-        glSwapInterval(enable ? 1 : 0);
+        if (glSwapInterval)
+            glSwapInterval(enable ? 1 : 0);
 #endif
+        });
 }
 
 void X11Window::setIcon(const std::string& file)
 {
-    ImagePtr image = Image::load(file);
+    g_mainDispatcher.addEvent([&, file] {
+        ImagePtr image = Image::load(file);
 
-    if(!image) {
-        g_logger.traceError(stdext::format("unable to load icon file %s", file));
-        return;
-    }
+        if (!image) {
+            g_logger.traceError(stdext::format("unable to load icon file %s", file));
+            return;
+        }
 
-    if(image->getBpp() != 4) {
-        g_logger.error("the app icon must have 4 channels");
-        return;
-    }
+        if (image->getBpp() != 4) {
+            g_logger.error("the app icon must have 4 channels");
+            return;
+        }
 
-    int n = image->getWidth() * image->getHeight();
-    std::vector<unsigned long int> iconData(n + 2);
-    iconData[0] = image->getWidth();
-    iconData[1] = image->getHeight();
-    for(int i=0; i < n;++i) {
-        uint8_t *pixel = (uint8_t*)&iconData[2 + i];
-        pixel[2] = *(image->getPixelData() + (i * 4) + 0);
-        pixel[1] = *(image->getPixelData() + (i * 4) + 1);
-        pixel[0] = *(image->getPixelData() + (i * 4) + 2);
-        pixel[3] = *(image->getPixelData() + (i * 4) + 3);
-    }
+        int n = image->getWidth() * image->getHeight();
+        std::vector<unsigned long int> iconData(n + 2);
+        iconData[0] = image->getWidth();
+        iconData[1] = image->getHeight();
+        for (int i = 0; i < n; ++i) {
+            uint8_t* pixel = (uint8_t*)&iconData[2 + i];
+            pixel[2] = *(image->getPixelData() + (i * 4) + 0);
+            pixel[1] = *(image->getPixelData() + (i * 4) + 1);
+            pixel[0] = *(image->getPixelData() + (i * 4) + 2);
+            pixel[3] = *(image->getPixelData() + (i * 4) + 3);
+        }
 
-    Atom property = XInternAtom(m_display, "_NET_WM_ICON", 0);
-    if(!XChangeProperty(m_display, m_window, property, XA_CARDINAL, 32, PropModeReplace, (const unsigned char*)&iconData[0], iconData.size()))
-        g_logger.error("Couldn't set app icon");
+        Atom property = XInternAtom(m_display, "_NET_WM_ICON", 0);
+        if (!XChangeProperty(m_display, m_window, property, XA_CARDINAL, 32, PropModeReplace, (const unsigned char*)&iconData[0], iconData.size()))
+            g_logger.error("Couldn't set app icon");
+        });
 }
 
 void X11Window::setClipboardText(const std::string_view text)
@@ -1038,11 +1062,11 @@ std::string X11Window::getClipboardText()
 {
     Atom clipboard = XInternAtom(m_display, "CLIPBOARD", False);
     Window ownerWindow = XGetSelectionOwner(m_display, clipboard);
-    if(ownerWindow == m_window)
+    if (ownerWindow == m_window)
         return m_clipboardText;
 
     std::string clipboardText;
-    if(ownerWindow != None) {
+    if (ownerWindow != None) {
         XConvertSelection(m_display, clipboard, XA_STRING, XA_PRIMARY, ownerWindow, CurrentTime);
         XFlush(m_display);
 
@@ -1054,16 +1078,16 @@ std::string X11Window::getClipboardText()
         Atom type;
         int format;
         ulong len, bytesLeft;
-        char *data;
+        char* data;
         XGetWindowProperty(m_display, ownerWindow,
-                            XA_PRIMARY, 0, 10000000L, 0, XA_STRING,
-                            &type,
-                            &format,
-                            &len,
-                            &bytesLeft,
-                            (uint8_t**)&data);
-        if(len > 0) {
-            if(stdext::is_valid_utf8(data))
+            XA_PRIMARY, 0, 10000000L, 0, XA_STRING,
+            &type,
+            &format,
+            &len,
+            &bytesLeft,
+            (uint8_t**)&data);
+        if (len > 0) {
+            if (stdext::is_valid_utf8(data))
                 clipboardText = stdext::utf8_to_latin1(data);
             else
                 clipboardText = data;
