@@ -232,10 +232,12 @@ void GraphicalApplication::close()
 
 void GraphicalApplication::resize(const Size& size)
 {
-    m_onInputEvent = true;
-    g_graphics.resize(size);
-    g_ui.resize(size);
-    m_onInputEvent = false;
+    g_dispatcher.addEvent([&] {
+        m_onInputEvent = true;
+        g_graphics.resize(size);
+        g_ui.resize(size);
+        m_onInputEvent = false;
+        });
 
     g_drawPool.get<DrawPoolFramed>(DrawPoolType::FOREGROUND)
         ->resize(size);
