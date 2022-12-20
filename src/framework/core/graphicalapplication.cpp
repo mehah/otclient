@@ -162,11 +162,6 @@ void GraphicalApplication::run()
 
             // background pane - high updated and animated pane (where the game are stuff happens)
             g_ui.render(Fw::BackgroundPane);
-
-            /*const uint32_t fpsTime = getMaxFps() == 0 || g_window.vsyncEnabled() ?
-                FPS_60 : m_frameCounter.getMaxPeriod();
-
-            stdext::microPrecisionSleep(std::max<uint32_t>(fpsTime, 5u));*/
         }
 
         m_condition.notify_all();

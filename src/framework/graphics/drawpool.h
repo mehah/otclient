@@ -150,6 +150,8 @@ protected:
     };
 
 private:
+    static void addCoords(const DrawPool::DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode);
+
     enum STATE_TYPE : uint32_t {
         STATE_OPACITY = 1 << 0,
         STATE_CLIP_RECT = 1 << 1,
@@ -165,7 +167,6 @@ private:
         DrawMode drawMode = DrawMode::TRIANGLES, const DrawBufferPtr& drawBuffer = nullptr,
         const CoordsBufferPtr& coordsBuffer = nullptr);
 
-    void addCoords(const DrawPool::DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode);
     void updateHash(const PoolState& state, const DrawPool::DrawMethod& method, size_t& stateHash, size_t& methodHash);
 
     float getOpacity() { return m_state.opacity; }

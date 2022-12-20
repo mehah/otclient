@@ -24,9 +24,9 @@
 #include "declarations.h"
 #include "painter.h"
 
-DrawPoolManager g_drawPool;
-
 thread_local uint8_t CURRENT_POOL;
+
+DrawPoolManager g_drawPool;
 
 void DrawPoolManager::init()
 {
@@ -55,12 +55,12 @@ void DrawPoolManager::draw()
     }
 
     // Pre Draw
-    for (const auto& pool : m_pools) {
+    for (auto* pool : m_pools) {
         if (!pool->isEnabled() || !pool->hasFrameBuffer()) continue;
 
-        const auto& pf = pool->toPoolFramed();
-
         if (pool->canRepaint(true)) {
+            const auto* pf = pool->toPoolFramed();
+
             pf->m_framebuffer->bind();
             for (int_fast8_t z = -1; ++z <= pool->m_currentFloor;) {
                 for (const auto& order : pool->m_objects[z])
@@ -75,7 +75,7 @@ void DrawPoolManager::draw()
     g_painter->setResolution(m_size, m_transformMatrix);
 
     // Draw
-    for (const auto& pool : m_pools) {
+    for (auto* pool : m_pools) {
         if (!pool->isEnabled()) continue;
 
         if (pool->hasFrameBuffer()) {
@@ -105,12 +105,12 @@ void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)
     auto& buffer = useGlobalCoord ? m_coordsBuffer : *obj.buffer->m_coords;
 
     if (useGlobalCoord) {
-        m_coordsBuffer.clear();
+        buffer.clear();
 
         if (!obj.methods.has_value()) {
-            getCurrentPool()->addCoords(*obj.method, buffer, obj.drawMode);
+            DrawPool::addCoords(*obj.method, buffer, obj.drawMode);
         } else for (const auto& method : *obj.methods) {
-            getCurrentPool()->addCoords(method, buffer, obj.drawMode);
+            DrawPool::addCoords(method, buffer, obj.drawMode);
         }
     }
 
