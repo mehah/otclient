@@ -28,7 +28,9 @@ bool AdaptativeFrameCounter::update()
     ++m_fpsCount;
 
     if (m_maxFps > 0 && m_fpsCount > m_maxFps) {
-        stdext::microPrecisionSleep(getMaxPeriod() - m_timer.elapsed_millis());
+        const int32_t sleepPeriod = getMaxPeriod() - m_timer.elapsed_millis();
+        if (sleepPeriod > 0)
+            stdext::microPrecisionSleep(sleepPeriod);
     }
 
     const uint32_t tickCount = stdext::millis();
@@ -38,9 +40,7 @@ bool AdaptativeFrameCounter::update()
     const bool fpsChanged = m_fps != m_fpsCount;
     if (fpsChanged) {
         if (!g_window.vsyncEnabled())
-            m_fpsCount /= 1.85;
-        if (m_fpsCount > 1000)
-            m_fpsCount = 1000 + (stdext::random_range(0, 2) - 1);
+            m_fpsCount /= 1.91;
 
         m_fps = m_fpsCount;
         m_fpsCount = 0;

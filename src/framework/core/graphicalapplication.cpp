@@ -132,38 +132,24 @@ void GraphicalApplication::run()
 
     const uint16_t FPS_60 = 1000000 / 60;
 
-    std::thread t1([&]() {
+    std::jthread t1([&]() {
         const auto& map = g_drawPool.get<DrawPool>(DrawPoolType::MAP);
+        const auto& foreground = g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND);
+        Timer foregroundRefresh;
 
         while (!m_stopping) {
-            const uint32_t fpsTime = getMaxFps() == 0 || g_window.vsyncEnabled() ?
-                FPS_60 : m_frameCounter.getMaxPeriod();
+            stdext::milliPrecisionSleep(1);
 
-            stdext::microPrecisionSleep(std::max<uint32_t>(fpsTime, 5u));
+            std::scoped_lock l(m_backMutex);
 
-            std::scoped_lock l(m_foreMutex, m_backMutex);
+            m_foreMutex.lock();
 
             g_clock.update();
             Application::poll();
             g_clock.update();
 
-            m_condition.notify_all();
+            m_foreMutex.unlock();
 
-            // background pane - high updated and animated pane (where the game are stuff happens)
-            g_ui.render(Fw::BackgroundPane);
-
-            // force map repaint if vsync is enabled or maxFPS set.
-            if (g_window.vsyncEnabled() || getMaxFps() > 0)
-                map->repaint();
-        }
-        });
-
-    std::thread t2([&]() {
-        const auto& foreground = g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND);
-        Timer foregroundRefresh;
-
-        std::unique_lock lock(m_foreMutex);
-        m_condition.wait(lock, [&]() -> bool {
             if (foregroundRefresh.ticksElapsed() >= 100) { // 10 FPS (1000 / 10)
                 foreground->repaint();
                 foregroundRefresh.restart();
@@ -171,10 +157,26 @@ void GraphicalApplication::run()
 
             // foreground pane - steady pane with few animated stuff (UI)
             if (foreground->canRepaint()) {
-                g_clock.update();
-                g_drawPool.use(DrawPoolType::FOREGROUND);
-                g_ui.render(Fw::ForegroundPane);
+                m_condition.notify_all();
             }
+
+            // background pane - high updated and animated pane (where the game are stuff happens)
+            g_ui.render(Fw::BackgroundPane);
+
+            /*const uint32_t fpsTime = getMaxFps() == 0 || g_window.vsyncEnabled() ?
+                FPS_60 : m_frameCounter.getMaxPeriod();
+
+            stdext::microPrecisionSleep(std::max<uint32_t>(fpsTime, 5u));*/
+        }
+
+        m_condition.notify_all();
+        });
+
+    std::jthread t2([&]() {
+        std::unique_lock lock(m_foreMutex);
+        m_condition.wait(lock, [&]() -> bool {
+            g_drawPool.use(DrawPoolType::FOREGROUND);
+            g_ui.render(Fw::ForegroundPane);
 
             return m_stopping;
             });
