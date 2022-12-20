@@ -139,7 +139,6 @@ void Painter::resetState()
     resetClipRect();
     resetShaderProgram();
     resetAlphaWriting();
-    resetTransformMatrix();
 }
 
 void Painter::refreshState()
@@ -249,59 +248,6 @@ Matrix3 Painter::getTransformMatrix(const Size& resolution)
     return { 2.0f / resolution.width(),  0.0f,                       0.0f,
                                   0.0f, -2.0f / resolution.height(), 0.0f,
                                  -1.0f,  1.0f,                       1.0f };
-}
-
-void Painter::scale(float x, float y)
-{
-    const Matrix3 scaleMatrix = {
-              x,   0.0f,  0.0f,
-            0.0f,     y,  0.0f,
-            0.0f,  0.0f,  1.0f
-    };
-
-    setTransformMatrix(m_transformMatrix * scaleMatrix.transposed());
-}
-
-void Painter::translate(float x, float y)
-{
-    const Matrix3 translateMatrix = {
-            1.0f,  0.0f,     x,
-            0.0f,  1.0f,     y,
-            0.0f,  0.0f,  1.0f
-    };
-
-    setTransformMatrix(m_transformMatrix * translateMatrix.transposed());
-}
-
-void Painter::rotate(float angle)
-{
-    const Matrix3 rotationMatrix = {
-            std::cos(angle), -std::sin(angle),  0.0f,
-            std::sin(angle),  std::cos(angle),  0.0f,
-                                 0.0f,             0.0f,  1.0f
-    };
-
-    setTransformMatrix(m_transformMatrix * rotationMatrix.transposed());
-}
-
-void Painter::rotate(float x, float y, float angle)
-{
-    translate(-x, -y);
-    rotate(angle);
-    translate(x, y);
-}
-
-void Painter::pushTransformMatrix()
-{
-    m_transformMatrixStack.push_back(m_transformMatrix);
-    assert(m_transformMatrixStack.size() < 100);
-}
-
-void Painter::popTransformMatrix()
-{
-    assert(!m_transformMatrixStack.empty());
-    setTransformMatrix(m_transformMatrixStack.back());
-    m_transformMatrixStack.pop_back();
 }
 
 void Painter::updateGlTexture()

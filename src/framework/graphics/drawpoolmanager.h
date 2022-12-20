@@ -65,6 +65,16 @@ public:
     void resetShaderProgram() { getCurrentPool()->resetShaderProgram(); }
     void resetCompositionMode() { getCurrentPool()->resetCompositionMode(); }
 
+    void pushTransformMatrix() { getCurrentPool()->pushTransformMatrix(); }
+    void popTransformMatrix() { getCurrentPool()->popTransformMatrix(); }
+    void scale(float x, float y) { getCurrentPool()->scale(x, y); }
+    void scale(float factor) { getCurrentPool()->scale(factor); }
+    void translate(float x, float y) { getCurrentPool()->translate(x, y); }
+    void translate(const Point& p) { getCurrentPool()->translate(p); }
+    void rotate(float angle) { getCurrentPool()->rotate(angle); }
+    void rotate(float x, float y, float angle) { getCurrentPool()->rotate(x, y, angle); }
+    void rotate(const Point& p, float angle) { getCurrentPool()->rotate(p, angle); }
+
     void flush() { if (getCurrentPool()) getCurrentPool()->flush(); }
 
     DrawPoolType getCurrentType() { return getCurrentPool()->m_type; }

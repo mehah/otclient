@@ -68,7 +68,6 @@ public:
 
     virtual bool isValid() const { return true; };
 
-protected:
     struct PoolState
     {
         Matrix3 transformMatrix;
@@ -94,6 +93,8 @@ protected:
                 shaderProgram == s2.shaderProgram;
         }
     };
+
+protected:
 
     enum class DrawMethodType
     {
@@ -185,6 +186,18 @@ private:
     void resetCompositionMode() { m_state.compositionMode = CompositionMode::NORMAL; }
     void resetBlendEquation() { m_state.blendEquation = BlendEquation::ADD; }
 
+    void setTransformMatrix(const Matrix3& transformMatrix) { m_transformMatrix = transformMatrix; }
+    void resetTransformMatrix() { setTransformMatrix(DEFAULT_MATRIX3); }
+    void pushTransformMatrix();
+    void popTransformMatrix();
+    void scale(float x, float y);
+    void scale(float factor) { scale(factor, factor); }
+    void translate(float x, float y);
+    void translate(const Point& p) { translate(p.x, p.y); }
+    void rotate(float angle);
+    void rotate(float x, float y, float angle);
+    void rotate(const Point& p, float angle) { rotate(p.x, p.y, angle); }
+
     void clear();
     void flush()
     {
@@ -218,6 +231,9 @@ private:
 
     std::vector<DrawObject> m_objects[ARR_MAX_Z][static_cast<uint8_t>(DrawOrder::LAST)];
     stdext::map<size_t, DrawObject> m_objectsByhash;
+
+    std::vector<Matrix3> m_transformMatrixStack;
+    Matrix3 m_transformMatrix;
 
     friend DrawPoolManager;
 };

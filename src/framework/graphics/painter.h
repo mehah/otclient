@@ -67,14 +67,6 @@ public:
 
     void drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode = DrawMode::TRIANGLES);
 
-    void scale(float x, float y);
-    void scale(float factor) { scale(factor, factor); }
-    void translate(float x, float y);
-    void translate(const Point& p) { translate(p.x, p.y); }
-    void rotate(float angle);
-    void rotate(float x, float y, float angle);
-    void rotate(const Point& p, float angle) { rotate(p.x, p.y, angle); }
-
     float getOpacity() { return m_opacity; }
     bool getAlphaWriting() { return m_alphaWriting; }
 
@@ -106,14 +98,10 @@ public:
     void setTransformMatrix(const Matrix3& transformMatrix) { m_transformMatrix = transformMatrix; }
     void setProjectionMatrix(const Matrix3& projectionMatrix) { m_projectionMatrix = projectionMatrix; }
 
-    void pushTransformMatrix();
-    void popTransformMatrix();
-
     void resetState();
     void resetBlendEquation() { setBlendEquation(BlendEquation::ADD); }
     void resetTexture() { setTexture(nullptr); }
     void resetAlphaWriting() { setAlphaWriting(false); }
-    void resetTransformMatrix() { setTransformMatrix(DEFAULT_MATRIX3); }
     void resetClipRect() { setClipRect({}); }
     void resetOpacity() { setOpacity(1.f); }
     void resetCompositionMode() { setCompositionMode(CompositionMode::NORMAL); }
@@ -128,8 +116,6 @@ protected:
     void updateGlClipRect();
     void updateGlAlphaWriting();
     void updateGlViewport();
-
-    std::vector<Matrix3> m_transformMatrixStack;
 
     Matrix3 m_transformMatrix;
     Matrix3 m_projectionMatrix;

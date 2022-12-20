@@ -24,7 +24,7 @@
 #include "declarations.h"
 #include "painter.h"
 
-thread_local uint8_t CURRENT_POOL;
+thread_local static uint8_t CURRENT_POOL;
 
 DrawPoolManager g_drawPool;
 

@@ -31,7 +31,7 @@
 #include "framework/stdext/math.h"
 
  // UINT16_MAX = just to avoid conflicts with GL generated ID.
-static std::atomic<uint32_t > UID(UINT16_MAX);
+thread_local static uint32_t UID(UINT16_MAX);
 
 Texture::Texture() : m_uniqueId(++UID) {}
 
@@ -184,9 +184,9 @@ bool Texture::setupSize(const Size& size)
     // checks texture max size
     if (std::max<int>(glSize.width(), glSize.height()) > g_graphics.getMaxTextureSize()) {
         g_logger.error(stdext::format("loading texture with size %dx%d failed, "
-                                      "the maximum size allowed by the graphics card is %dx%d,"
-                                      "to prevent crashes the texture will be displayed as a blank texture",
-                                      size.width(), size.height(), g_graphics.getMaxTextureSize(), g_graphics.getMaxTextureSize()));
+            "the maximum size allowed by the graphics card is %dx%d,"
+            "to prevent crashes the texture will be displayed as a blank texture",
+            size.width(), size.height(), g_graphics.getMaxTextureSize(), g_graphics.getMaxTextureSize()));
         return false;
     }
 

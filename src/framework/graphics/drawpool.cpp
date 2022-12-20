@@ -50,7 +50,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
 void DrawPool::add(const Color& color, const TexturePtr& texture, const DrawMethod& method, const DrawMode drawMode, const DrawBufferPtr& drawBuffer, const CoordsBufferPtr& coordsBuffer)
 {
     const auto& state = PoolState{
-       g_painter->m_transformMatrix, color, m_state.opacity,
+       m_transformMatrix, color, m_state.opacity,
        m_state.compositionMode, m_state.blendEquation,
        m_state.clipRect, texture, m_state.shaderProgram
     };
@@ -300,6 +300,7 @@ void DrawPool::resetState()
     resetShaderProgram();
     resetBlendEquation();
     resetCompositionMode();
+    resetTransformMatrix();
 
     m_status.second = 0;
     if (!m_autoUpdate)
@@ -327,4 +328,57 @@ void DrawPool::clear()
 
     m_objectsByhash.clear();
     m_currentFloor = 0;
+}
+
+void DrawPool::scale(float x, float y)
+{
+    const Matrix3 scaleMatrix = {
+              x,   0.0f,  0.0f,
+            0.0f,     y,  0.0f,
+            0.0f,  0.0f,  1.0f
+    };
+
+    setTransformMatrix(m_transformMatrix * scaleMatrix.transposed());
+}
+
+void DrawPool::translate(float x, float y)
+{
+    const Matrix3 translateMatrix = {
+            1.0f,  0.0f,     x,
+            0.0f,  1.0f,     y,
+            0.0f,  0.0f,  1.0f
+    };
+
+    setTransformMatrix(m_transformMatrix * translateMatrix.transposed());
+}
+
+void DrawPool::rotate(float angle)
+{
+    const Matrix3 rotationMatrix = {
+            std::cos(angle), -std::sin(angle),  0.0f,
+            std::sin(angle),  std::cos(angle),  0.0f,
+                                 0.0f,             0.0f,  1.0f
+    };
+
+    setTransformMatrix(m_transformMatrix * rotationMatrix.transposed());
+}
+
+void DrawPool::rotate(float x, float y, float angle)
+{
+    translate(-x, -y);
+    rotate(angle);
+    translate(x, y);
+}
+
+void DrawPool::pushTransformMatrix()
+{
+    m_transformMatrixStack.push_back(m_transformMatrix);
+    assert(m_transformMatrixStack.size() < 100);
+}
+
+void DrawPool::popTransformMatrix()
+{
+    assert(!m_transformMatrixStack.empty());
+    setTransformMatrix(m_transformMatrixStack.back());
+    m_transformMatrixStack.pop_back();
 }

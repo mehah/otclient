@@ -60,8 +60,8 @@ void UIWidget::draw(const Rect& visibleRect, Fw::DrawPane drawPane)
     }
 
     if (m_rotation != 0.0f) {
-        g_painter->pushTransformMatrix();
-        g_painter->rotate(m_rect.center(), m_rotation * (Fw::pi / 180.0));
+        g_drawPool.pushTransformMatrix();
+        g_drawPool.rotate(m_rect.center(), m_rotation * (Fw::pi / 180.0));
     }
 
     drawSelf(drawPane);
@@ -74,7 +74,7 @@ void UIWidget::draw(const Rect& visibleRect, Fw::DrawPane drawPane)
     }
 
     if (m_rotation != 0.0f)
-        g_painter->popTransformMatrix();
+        g_drawPool.popTransformMatrix();
 
     if (m_clipping) {
         g_drawPool.setClipRect(oldClipRect);
@@ -614,7 +614,7 @@ void UIWidget::applyStyle(const OTMLNodePtr& styleNode)
             const auto& parent = getParent();
             if (isFocusable() && isExplicitlyVisible() && isExplicitlyEnabled() &&
                 parent && ((!parent->getFocusedChild() && parent->getAutoFocusPolicy() == Fw::AutoFocusFirst) ||
-                           parent->getAutoFocusPolicy() == Fw::AutoFocusLast)) {
+                parent->getAutoFocusPolicy() == Fw::AutoFocusLast)) {
                 focus();
             }
         }
@@ -978,7 +978,7 @@ bool UIWidget::setRect(const Rect& rect)
             self->m_updateEventScheduled = false;
             if (oldRect != self->getRect())
                 self->onGeometryChange(oldRect, self->getRect());
-        });
+            });
         m_updateEventScheduled = true;
     }
 
@@ -1472,7 +1472,7 @@ void UIWidget::updateStyle()
         g_dispatcher.addEvent([self] {
             self->m_updateStyleScheduled = false;
             self->updateStyle();
-        });
+            });
         m_updateStyleScheduled = true;
         return;
     }
