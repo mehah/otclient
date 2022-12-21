@@ -28,6 +28,7 @@
 #include <type_traits>
 #include "dumper.h"
 #include "types.h"
+#include <atomic>
 
 namespace stdext
 {
@@ -76,9 +77,9 @@ namespace stdext
         bool expired() { return refs == 0; }
 
     private:
-        refcount_t refs;
-        refcount_t weaks;
-        T* px;
+        std::atomic<refcount_t> refs;
+        std::atomic<refcount_t> weaks;
+        std::atomic<T*> px;
     };
 
     template<class T>

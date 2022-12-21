@@ -26,6 +26,7 @@
 #include "image.h"
 
 #include <framework/core/application.h>
+#include <framework/core/eventdispatcher.h>
 #include "framework/stdext/math.h"
 
  // UINT16_MAX = just to avoid conflicts with GL generated ID.
@@ -68,9 +69,11 @@ Texture::~Texture()
 #ifndef NDEBUG
     assert(!g_app.isTerminated());
 #endif
-    // free texture from gl memory
-    if (g_graphics.ok() && m_id != 0)
-        glDeleteTextures(1, &m_id);
+    if (g_graphics.ok() && m_id != 0) {
+        g_mainDispatcher.addEvent([id = m_id]() {
+            glDeleteTextures(1, &id);
+            });
+    }
 }
 
 void Texture::create()

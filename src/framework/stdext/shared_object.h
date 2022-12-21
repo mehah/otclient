@@ -27,6 +27,7 @@
 #include <ostream>
 #include <type_traits>
 #include "types.h"
+#include <atomic>
 
 namespace stdext
 {
@@ -50,7 +51,7 @@ namespace stdext
         shared_object_ptr<T> const_self_cast() { return stdext::shared_object_ptr<T>(const_cast<T*>(this)); }
 
     private:
-        refcount_t refs{ 0 };
+        std::atomic<refcount_t> refs{ 0 };
     };
 
     template<class T>
