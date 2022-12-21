@@ -365,6 +365,8 @@ public:
 
 private:
     static ThingFlagAttr thingAttrToThingFlagAttr(ThingAttr attr);
+    static Size getBestTextureDimension(int w, int h, int count);
+
     struct TextureData {
         struct Pos {
             Rect rects;
@@ -378,7 +380,8 @@ private:
         std::vector<Pos> pos;
     };
 
-    static Size getBestTextureDimension(int w, int h, int count);
+    void prepareTextureLoad(const std::vector<Size>& sizes, const std::vector<int>& total_sprites);
+
     uint32_t getSpriteIndex(int w, int h, int l, int x, int y, int z, int a);
     uint32_t getTextureIndex(int l, int x, int y, int z);
 
@@ -388,6 +391,7 @@ private:
     int8_t m_opaque{ -1 };
 
     Size m_size;
+    Size m_textureSize;
     Point m_displacement;
 
     Animator* m_animator{ nullptr };
@@ -404,6 +408,9 @@ private:
     uint8_t m_clothSlot{ 0 };
     uint8_t m_lensHelp{ 0 };
     uint8_t m_elevation{ 0 };
+
+    uint8_t m_textureLayers{ 0 };
+    uint8_t m_colorLayers{ 0 };
 
     PLAYER_ACTION m_defaultAction{ 0 };
 
