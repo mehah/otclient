@@ -67,14 +67,12 @@ bool Mouse::pushCursor(const std::string& name)
 
     const int cursorId = it->second;
     g_window.setMouseCursor(cursorId);
-    std::scoped_lock<std::mutex> lock(m_mutex);
     m_cursorStack.push_back(cursorId);
     return true;
 }
 
 void Mouse::popCursor(const std::string& name)
 {
-    std::scoped_lock<std::mutex> lock(m_mutex);
     if (m_cursorStack.empty())
         return;
 
@@ -101,7 +99,6 @@ void Mouse::popCursor(const std::string& name)
 
 bool Mouse::isCursorChanged()
 {
-    std::scoped_lock<std::mutex> lock(m_mutex);
     return !m_cursorStack.empty();
 }
 
