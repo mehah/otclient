@@ -23,7 +23,6 @@
 #pragma once
 
 #include <utility>
-#include <optional>
 
 #include "declarations.h"
 #include "framebuffer.h"
@@ -113,9 +112,9 @@ protected:
     struct DrawMethod
     {
         DrawMethodType type;
-        std::optional<std::pair<Rect, Rect>> rects;
-        std::optional<std::tuple<Point, Point, Point>> points;
-        std::optional<Point> dest;
+        std::pair<Rect, Rect> rects;
+        std::tuple<Point, Point, Point> points;
+        Point dest;
         uint16_t intValue{ 0 };
     };
 
@@ -129,19 +128,18 @@ protected:
 
         void addMethod(const DrawMethod& method)
         {
-            if (!methods.has_value()) {
-                methods = std::vector<DrawMethod>();
-                methods->emplace_back(*this->method);
-            }
+            if (methods.empty())
+                methods.emplace_back(this->method);
+
             drawMode = DrawMode::TRIANGLES;
-            methods->emplace_back(method);
+            methods.emplace_back(method);
         }
 
         DrawMode drawMode{ DrawMode::TRIANGLES };
         DrawBufferPtr buffer;
-        std::optional<PoolState> state;
-        std::optional<DrawMethod> method;
-        std::optional<std::vector<DrawMethod>> methods;
+        PoolState state;
+        DrawMethod method;
+        std::vector<DrawMethod> methods;
         std::function<void()> action{ nullptr };
     };
 

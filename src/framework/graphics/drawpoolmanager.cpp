@@ -107,9 +107,9 @@ void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)
     if (useGlobalCoord) {
         buffer.clear();
 
-        if (!obj.methods.has_value()) {
-            DrawPool::addCoords(*obj.method, buffer, obj.drawMode);
-        } else for (const auto& method : *obj.methods) {
+        if (obj.methods.empty()) {
+            DrawPool::addCoords(obj.method, buffer, obj.drawMode);
+        } else for (const auto& method : obj.methods) {
             DrawPool::addCoords(method, buffer, obj.drawMode);
         }
     }
@@ -117,19 +117,19 @@ void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)
     { // Set DrawState
         const auto& state = obj.state;
 
-        if (state->texture) {
-            state->texture->create();
-            g_painter->setTexture(state->texture.get());
+        if (state.texture) {
+            state.texture->create();
+            g_painter->setTexture(state.texture.get());
         }
 
-        g_painter->setColor(state->color);
-        g_painter->setOpacity(state->opacity);
-        g_painter->setCompositionMode(state->compositionMode);
-        g_painter->setBlendEquation(state->blendEquation);
-        g_painter->setClipRect(state->clipRect);
-        g_painter->setShaderProgram(state->shaderProgram);
-        g_painter->setTransformMatrix(state->transformMatrix);
-        if (state->action) state->action();
+        g_painter->setColor(state.color);
+        g_painter->setOpacity(state.opacity);
+        g_painter->setCompositionMode(state.compositionMode);
+        g_painter->setBlendEquation(state.blendEquation);
+        g_painter->setClipRect(state.clipRect);
+        g_painter->setShaderProgram(state.shaderProgram);
+        g_painter->setTransformMatrix(state.transformMatrix);
+        if (state.action) state.action();
     }
 
     g_painter->drawCoords(buffer, obj.drawMode);
@@ -153,7 +153,7 @@ void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& textur
     const DrawPool::DrawMethod method{
         .type = DrawPool::DrawMethodType::RECT,
         .rects = std::make_pair(dest, src),
-        .dest = originalDest.isNull() ? std::optional<Point>{} : originalDest
+        .dest = originalDest
     };
 
     if (buffer)
