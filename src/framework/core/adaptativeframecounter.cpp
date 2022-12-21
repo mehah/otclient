@@ -27,7 +27,8 @@ bool AdaptativeFrameCounter::update()
 {
     ++m_fpsCount;
 
-    if (m_maxFps > 0 && m_fpsCount > m_maxFps) {
+    const bool mustSleep = m_maxFps > 0 && m_fpsCount > m_maxFps;
+    if (mustSleep) {
         const int32_t sleepPeriod = getMaxPeriod() - m_timer.elapsed_millis();
         if (sleepPeriod > 0)
             stdext::microPrecisionSleep(sleepPeriod);
@@ -39,8 +40,8 @@ bool AdaptativeFrameCounter::update()
 
     const bool fpsChanged = m_fps != m_fpsCount;
     if (fpsChanged) {
-        if (!g_window.vsyncEnabled())
-            m_fpsCount /= 1.91;
+        if (!g_window.vsyncEnabled() && mustSleep)
+            m_fpsCount /= 1.89;
 
         m_fps = m_fpsCount;
         m_fpsCount = 0;

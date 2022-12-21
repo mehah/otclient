@@ -307,4 +307,5 @@ private:
     TexturePtr m_crosshairTexture;
 
     DrawBufferPtr m_shadowBuffer;
+    DrawPoolFramed* m_pool;
 };

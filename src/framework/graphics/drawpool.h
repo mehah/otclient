@@ -68,6 +68,11 @@ public:
 
     virtual bool isValid() const { return true; };
 
+    void optimize(int size);
+
+    void setScaleFactor(float scale) { m_scaleFactor = scale; }
+    inline float getScaleFactor() const { return m_scaleFactor; }
+
     struct PoolState
     {
         Matrix3 transformMatrix;
@@ -197,9 +202,6 @@ private:
     void rotate(float angle);
     void rotate(float x, float y, float angle);
     void rotate(const Point& p, float angle) { rotate(p.x, p.y, angle); }
-
-    void setScaleFactor(float scale) { m_scaleFactor = scale; }
-    inline float getScaleFactor() const { return m_scaleFactor; }
 
     void clear();
     void flush()

@@ -33,6 +33,7 @@
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/filestream.h>
+#include <framework/core/graphicalapplication.h>
 
 #include "shadermanager.h"
 
