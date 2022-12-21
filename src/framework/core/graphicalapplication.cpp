@@ -138,7 +138,7 @@ void GraphicalApplication::run()
         Timer foregroundRefresh;
 
         while (!m_stopping) {
-            stdext::milliPrecisionSleep(1);
+            stdext::microPrecisionSleep(100);
 
             std::scoped_lock l(m_backMutex);
 
