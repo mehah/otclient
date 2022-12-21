@@ -125,7 +125,7 @@ namespace stdext
 
     // operator<< support
     template<class E, class T, class Y> std::basic_ostream<E, T>& operator<<(std::basic_ostream<E, T>& os, const shared_object_ptr<Y>& p) { os << p.get(); return os; }
-    }
+}
 
 namespace std
 {
