@@ -430,6 +430,4 @@ private:
 
     std::vector<uint32_t> m_spritesIndex;
     std::vector<TextureData> m_textureData;
-
-    std::mutex m_mutex;
 };

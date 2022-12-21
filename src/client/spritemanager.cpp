@@ -138,6 +138,8 @@ ImagePtr SpriteManager::getSpriteImage(int id)
         if (id == 0 || !m_spritesFile)
             return nullptr;
 
+        std::scoped_lock lock(mutex);
+
         m_spritesFile->seek(((id - 1) * 4) + m_spritesOffset);
 
         const uint32_t spriteAddress = m_spritesFile->getU32();

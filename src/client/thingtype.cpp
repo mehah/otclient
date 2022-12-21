@@ -641,7 +641,7 @@ void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, i
     if (animationPhase >= m_animationPhases)
         return;
 
-    const TexturePtr& texture = getTexture(animationPhase, textureType); // texture might not exists, neither its rects.
+    const auto& texture = getTexture(animationPhase, textureType); // texture might not exists, neither its rects.
     if (!texture)
         return;
 
@@ -651,8 +651,8 @@ void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, i
     if (frameIndex >= textureData.pos.size())
         return;
 
-    const Point& textureOffset = textureData.pos[frameIndex].offsets;
-    const Rect& textureRect = textureData.pos[frameIndex].rects;
+    const auto& textureOffset = textureData.pos[frameIndex].offsets;
+    const auto& textureRect = textureData.pos[frameIndex].rects;
 
     const Rect screenRect(dest + (textureOffset - m_displacement - (m_size.toPoint() - Point(1)) * SPRITE_SIZE) * g_drawPool.getScaleFactor(), textureRect.size() * g_drawPool.getScaleFactor());
 
@@ -674,8 +674,6 @@ void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, i
 TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
 {
     if (m_null) return m_textureNull;
-
-    std::scoped_lock lock(m_mutex);
 
     auto& textureData = m_textureData[animationPhase];
     const bool allBlank = txtType == TextureType::ALL_BLANK;
