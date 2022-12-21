@@ -132,13 +132,13 @@ void GraphicalApplication::run()
 
     const uint16_t FPS_60 = 1000000 / 60;
 
-    std::jthread t1([&]() {
+    std::jthread t1([&](std::stop_token st) {
         const auto& map = g_drawPool.get<DrawPool>(DrawPoolType::MAP);
         const auto& foreground = g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND);
         Timer foregroundRefresh;
 
-        while (!m_stopping) {
-            stdext::microPrecisionSleep(100);
+        while (!st.stop_requested()) {
+            stdext::milliPrecisionSleep(1);
 
             std::scoped_lock l(m_backMutex);
 
@@ -167,13 +167,13 @@ void GraphicalApplication::run()
         m_condition.notify_all();
         });
 
-    std::jthread t2([&]() {
+    std::jthread t2([&](std::stop_token st) {
         std::unique_lock lock(m_foreMutex);
         m_condition.wait(lock, [&]() -> bool {
             g_drawPool.use(DrawPoolType::FOREGROUND);
             g_ui.render(Fw::ForegroundPane);
 
-            return m_stopping;
+            return st.stop_requested();
             });
         });
 
@@ -202,9 +202,6 @@ void GraphicalApplication::run()
         // update screen pixels
         g_window.swapBuffers();
     }
-
-    t1.join();
-    t2.join();
 
     m_stopping = false;
     m_running = false;

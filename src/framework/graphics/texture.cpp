@@ -24,10 +24,8 @@
 #include "framebuffer.h"
 #include "graphics.h"
 #include "image.h"
-#include <atomic>
 
 #include <framework/core/application.h>
-
 #include "framework/stdext/math.h"
 
  // UINT16_MAX = just to avoid conflicts with GL generated ID.
