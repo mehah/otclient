@@ -635,6 +635,8 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
 {
     if (m_null) return m_textureNull;
 
+    std::scoped_lock lock(m_mutex);
+
     auto& textureData = m_textureData[animationPhase];
     const bool allBlank = txtType == TextureType::ALL_BLANK;
     const bool smooth = txtType == TextureType::SMOOTH;
