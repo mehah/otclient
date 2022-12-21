@@ -109,11 +109,13 @@ void Application::deinit()
 
     // poll remaining events
     poll();
+    Application::poll();
 
     g_asyncDispatcher.terminate();
 
     // disable dispatcher events
     g_dispatcher.shutdown();
+    g_mainDispatcher.shutdown();
 }
 
 void Application::terminate()
