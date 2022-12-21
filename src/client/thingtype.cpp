@@ -614,7 +614,7 @@ void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, i
     const Point& textureOffset = textureData.pos[frameIndex].offsets;
     const Rect& textureRect = textureData.pos[frameIndex].rects;
 
-    const Rect screenRect(dest + (textureOffset - m_displacement - (m_size.toPoint() - Point(1)) * SPRITE_SIZE) * g_sprites.getScaleFactor(), textureRect.size() * g_sprites.getScaleFactor());
+    const Rect screenRect(dest + (textureOffset - m_displacement - (m_size.toPoint() - Point(1)) * SPRITE_SIZE) * g_drawPool.getScaleFactor(), textureRect.size() * g_drawPool.getScaleFactor());
 
     if (flags & Otc::DrawThings) {
         if (m_opacity < 1.0f)

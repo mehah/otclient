@@ -75,6 +75,9 @@ public:
     void rotate(float x, float y, float angle) { getCurrentPool()->rotate(x, y, angle); }
     void rotate(const Point& p, float angle) { getCurrentPool()->rotate(p, angle); }
 
+    void setScaleFactor(float scale) { getCurrentPool()->setScaleFactor(scale); }
+    inline float getScaleFactor() { return getCurrentPool()->getScaleFactor(); }
+
     void flush() { if (getCurrentPool()) getCurrentPool()->flush(); }
 
     DrawPoolType getCurrentType() { return getCurrentPool()->m_type; }

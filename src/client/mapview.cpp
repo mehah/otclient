@@ -70,7 +70,7 @@ MapView::MapView()
             m_shader->bind();
             m_shader->setUniformValue(ShaderManager::MAP_CENTER_COORD, center.x / static_cast<float>(m_rectDimension.width()), 1.f - center.y / static_cast<float>(m_rectDimension.height()));
             m_shader->setUniformValue(ShaderManager::MAP_GLOBAL_COORD, globalCoord.x / static_cast<float>(m_rectDimension.height()), globalCoord.y / static_cast<float>(m_rectDimension.height()));
-            m_shader->setUniformValue(ShaderManager::MAP_ZOOM, g_sprites.getScaleFactor());
+            m_shader->setUniformValue(ShaderManager::MAP_ZOOM, g_drawPool.getScaleFactor());
 
             Point last = transformPositionTo2D(cameraPosition, m_shader->getPosition());
             //Reverse vertical axis.
@@ -408,9 +408,9 @@ void MapView::updateGeometry(const Size& visibleDimension)
         scaleFactor /= 2;
     }
 
-    g_sprites.setScaleFactor(scaleFactor);
+    g_drawPool.setScaleFactor(scaleFactor);
 
-    const uint8_t tileSize = SPRITE_SIZE * g_sprites.getScaleFactor();
+    const uint8_t tileSize = SPRITE_SIZE * g_drawPool.getScaleFactor();
     const auto& drawDimension = visibleDimension + 3;
     const auto& bufferSize = drawDimension * tileSize;
 
@@ -658,9 +658,9 @@ Rect MapView::calcFramebufferSource(const Size& destSize)
 {
     Point drawOffset = ((m_drawDimension - m_visibleDimension - Size(1)).toPoint() / 2) * m_tileSize;
     if (isFollowingCreature())
-        drawOffset += m_followingCreature->getWalkOffset() * g_sprites.getScaleFactor();
+        drawOffset += m_followingCreature->getWalkOffset() * g_drawPool.getScaleFactor();
     else if (!m_moveOffset.isNull())
-        drawOffset += m_moveOffset * g_sprites.getScaleFactor();
+        drawOffset += m_moveOffset * g_drawPool.getScaleFactor();
 
     const auto& srcVisible = m_visibleDimension * m_tileSize;
 

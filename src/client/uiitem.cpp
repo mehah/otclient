@@ -50,11 +50,11 @@ void UIItem::drawSelf(Fw::DrawPane drawPane)
         Point dest = drawRect.bottomRight() + Point(1);
         dest += (m_item->getDisplacement() - Point(SPRITE_SIZE)) * scaleFactor;
 
-        float oldScaleFactor = g_sprites.getScaleFactor();
-        g_sprites.setScaleFactor(scaleFactor);
+        float oldScaleFactor = g_drawPool.getScaleFactor();
+        g_drawPool.setScaleFactor(scaleFactor);
         m_item->setColor(m_color);
         m_item->draw(dest, Otc::DrawThings, TextureType::SMOOTH);
-        g_sprites.setScaleFactor(oldScaleFactor);
+        g_drawPool.setScaleFactor(oldScaleFactor);
 
         if (m_font && (m_item->isStackable() || m_item->isChargeable()) && m_item->getCountOrSubType() > 1) {
             const auto& count = std::to_string(m_item->getCountOrSubType());

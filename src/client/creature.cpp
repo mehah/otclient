@@ -68,14 +68,14 @@ void Creature::draw(const Point& dest, uint32_t flags, TextureType textureType, 
 
     if (flags & Otc::DrawThings) {
         if (m_showTimedSquare) {
-            g_drawPool.addBoundingRect(Rect(dest + (m_walkOffset - getDisplacement() + 2) * g_sprites.getScaleFactor(), Size(28 * g_sprites.getScaleFactor())), m_timedSquareColor, std::max<int>(static_cast<int>(2 * g_sprites.getScaleFactor()), 1));
+            g_drawPool.addBoundingRect(Rect(dest + (m_walkOffset - getDisplacement() + 2) * g_drawPool.getScaleFactor(), Size(28 * g_drawPool.getScaleFactor())), m_timedSquareColor, std::max<int>(static_cast<int>(2 * g_drawPool.getScaleFactor()), 1));
         }
 
         if (m_showStaticSquare) {
-            g_drawPool.addBoundingRect(Rect(dest + (m_walkOffset - getDisplacement()) * g_sprites.getScaleFactor(), Size(SPRITE_SIZE * g_sprites.getScaleFactor())), m_staticSquareColor, std::max<int>(static_cast<int>(2 * g_sprites.getScaleFactor()), 1));
+            g_drawPool.addBoundingRect(Rect(dest + (m_walkOffset - getDisplacement()) * g_drawPool.getScaleFactor(), Size(SPRITE_SIZE * g_drawPool.getScaleFactor())), m_staticSquareColor, std::max<int>(static_cast<int>(2 * g_drawPool.getScaleFactor()), 1));
         }
 
-        const auto& _dest = dest + m_walkOffset * g_sprites.getScaleFactor();
+        const auto& _dest = dest + m_walkOffset * g_drawPool.getScaleFactor();
 
         internalDrawOutfit(_dest, textureType, m_direction, Color::white, lightView);
 
@@ -96,7 +96,7 @@ void Creature::draw(const Point& dest, uint32_t flags, TextureType textureType, 
         }
 
         if (light.intensity > 0) {
-            lightView->addLightSource(dest + (m_walkOffset + (Point(SPRITE_SIZE / 2))) * g_sprites.getScaleFactor(), light);
+            lightView->addLightSource(dest + (m_walkOffset + (Point(SPRITE_SIZE / 2))) * g_drawPool.getScaleFactor(), light);
         }
     }
 }
@@ -120,18 +120,18 @@ void Creature::internalDrawOutfit(Point dest, TextureType textureType, Otc::Dire
         if (m_outfit.hasMount()) {
             animationPhase = getCurrentAnimationPhase(true);
 
-            dest -= m_mountType->getDisplacement() * g_sprites.getScaleFactor();
+            dest -= m_mountType->getDisplacement() * g_drawPool.getScaleFactor();
 
             if (canDrawShader && m_mountShader)
                 g_drawPool.setShaderProgram(m_mountShader, true, m_mountShaderAction);
             m_mountType->draw(dest, 0, m_numPatternX, 0, 0, animationPhase, Otc::DrawThingsAndLights, textureType, color);
-            dest += getDisplacement() * g_sprites.getScaleFactor();
+            dest += getDisplacement() * g_drawPool.getScaleFactor();
         }
 
         animationPhase = getCurrentAnimationPhase();
 
         if (!m_jumpOffset.isNull()) {
-            const PointF jumpOffset = m_jumpOffset * g_sprites.getScaleFactor();
+            const PointF jumpOffset = m_jumpOffset * g_drawPool.getScaleFactor();
             dest -= Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
         }
 
@@ -178,7 +178,7 @@ void Creature::internalDrawOutfit(Point dest, TextureType textureType, Otc::Dire
 
         if (canDrawShader && m_shader)
             g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
-        m_thingType->draw(dest - (getDisplacement() * g_sprites.getScaleFactor()), 0, 0, 0, 0, animationPhase, Otc::DrawThingsAndLights, textureType, color);
+        m_thingType->draw(dest - (getDisplacement() * g_drawPool.getScaleFactor()), 0, 0, 0, 0, animationPhase, Otc::DrawThingsAndLights, textureType, color);
     }
 
     if (isNotBlank) {
@@ -197,10 +197,10 @@ void Creature::drawOutfit(const Rect& destRect, bool resize, const Color color)
     const float scaleFactor = destRect.width() / static_cast<float>(frameSize);
     const Point dest = destRect.bottomRight() - (Point(SPRITE_SIZE) - getDisplacement()) * scaleFactor;
 
-    float oldScaleFactor = g_sprites.getScaleFactor();
-    g_sprites.setScaleFactor(scaleFactor);
+    float oldScaleFactor = g_drawPool.getScaleFactor();
+    g_drawPool.setScaleFactor(scaleFactor);
     internalDrawOutfit(dest, TextureType::SMOOTH, Otc::South, color);
-    g_sprites.setScaleFactor(oldScaleFactor);
+    g_drawPool.setScaleFactor(oldScaleFactor);
 }
 
 void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, bool useGray, int drawFlags)
@@ -208,12 +208,12 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
     if (isDead() || !canBeSeen() || !(drawFlags & Otc::DrawCreatureInfo) || !mapRect.isInRange(m_position))
         return;
 
-    const PointF& jumpOffset = m_jumpOffset * g_sprites.getScaleFactor();
+    const PointF& jumpOffset = m_jumpOffset * g_drawPool.getScaleFactor();
     const auto& parentRect = mapRect.rect;
     const auto& creatureOffset = Point(16 - getDisplacementX(), -getDisplacementY() - 2) + m_walkOffset;
 
     Point p = dest - mapRect.drawOffset;
-    p += creatureOffset * g_sprites.getScaleFactor() - Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
+    p += creatureOffset * g_drawPool.getScaleFactor() - Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
     p.x *= mapRect.horizontalStretchFactor;
     p.y *= mapRect.verticalStretchFactor;
     p += parentRect.topLeft();

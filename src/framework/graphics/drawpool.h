@@ -198,6 +198,9 @@ private:
     void rotate(float x, float y, float angle);
     void rotate(const Point& p, float angle) { rotate(p.x, p.y, angle); }
 
+    void setScaleFactor(float scale) { m_scaleFactor = scale; }
+    inline float getScaleFactor() const { return m_scaleFactor; }
+
     void clear();
     void flush()
     {
@@ -234,6 +237,8 @@ private:
 
     std::vector<Matrix3> m_transformMatrixStack;
     Matrix3 m_transformMatrix;
+
+    float m_scaleFactor{ 1.f };
 
     friend DrawPoolManager;
 };
