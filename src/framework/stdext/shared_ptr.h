@@ -28,7 +28,6 @@
 #include <type_traits>
 #include "dumper.h"
 #include "types.h"
-#include <atomic>
 
 namespace stdext
 {
@@ -77,9 +76,9 @@ namespace stdext
         bool expired() { return refs == 0; }
 
     private:
-        std::atomic<refcount_t> refs;
-        std::atomic<refcount_t> weaks;
-        std::atomic<T*> px;
+        refcount_t refs;
+        refcount_t weaks;
+        T* px;
     };
 
     template<class T>
@@ -216,7 +215,7 @@ namespace stdext
     // operator<< support
     template<class E, class T, class Y> std::basic_ostream<E, T>& operator<<(std::basic_ostream<E, T>& os, const shared_ptr<Y>& p) { os << p.get(); return os; }
     template<class E, class T, class Y> std::basic_ostream<E, T>& operator<<(std::basic_ostream<E, T>& os, const weak_ptr<Y>& p) { os << p.get(); return os; }
-    }
+}
 
 namespace std
 {
