@@ -73,7 +73,6 @@ protected:
     bool m_destroyed{ false };
     bool m_clipping{ false };
     bool m_customId{ false };
-    bool m_needUpdate{ false };
 
     UILayoutPtr m_layout;
     UIWidgetPtr m_parent;

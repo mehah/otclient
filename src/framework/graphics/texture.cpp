@@ -61,6 +61,7 @@ Texture::Texture(const ImagePtr& image, bool buildMipmaps, bool compress, bool c
         uploadPixels(image, m_buildMipmaps, m_compress);
     } else {
         m_image = image;
+        setupSize(image->getSize());
     }
 }
 

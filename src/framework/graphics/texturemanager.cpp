@@ -160,7 +160,7 @@ TexturePtr TextureManager::loadTexture(std::stringstream& file)
             texture = animatedTexture;
         } else {
             const auto& image = ImagePtr(new Image(imageSize, apng.bpp, apng.pdata));
-            texture = TexturePtr(new Texture(image));
+            texture = TexturePtr(new Texture(image, false, false, false, false));
         }
         free_apng(&apng);
     }
