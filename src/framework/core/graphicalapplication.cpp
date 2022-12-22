@@ -48,7 +48,7 @@ void GraphicalApplication::init(std::vector<std::string>& args)
     // setup platform window
     g_window.init();
     g_window.hide();
-    g_window.setOnResize([this](auto&& PH1) { resize(std::forward<decltype(PH1)>(PH1)); });
+    g_window.setOnResize([this](auto&& PH1) { g_dispatcher.addEvent([&] { resize(std::forward<decltype(PH1)>(PH1)); }); });
     g_window.setOnInputEvent([this](auto&& PH1) {
         g_dispatcher.addEvent([&, PH1]() {inputEvent(std::forward<decltype(PH1)>(PH1)); });
         });
@@ -148,9 +148,10 @@ void GraphicalApplication::run()
 
             g_clock.update();
             Application::poll();
-            g_clock.update();
 
             m_foreMutex.unlock();
+
+            g_clock.update();
 
             if (foregroundRefresh.ticksElapsed() >= 100) { // 10 FPS (1000 / 10)
                 foreground->repaint();
@@ -231,15 +232,15 @@ void GraphicalApplication::close()
 
 void GraphicalApplication::resize(const Size& size)
 {
-    g_dispatcher.addEvent([&] {
-        m_onInputEvent = true;
-        g_graphics.resize(size);
-        g_ui.resize(size);
-        m_onInputEvent = false;
-        });
+    m_onInputEvent = true;
+    g_graphics.resize(size);
+    g_ui.resize(size);
+    m_onInputEvent = false;
 
-    g_drawPool.get<DrawPoolFramed>(DrawPoolType::FOREGROUND)
-        ->resize(size);
+    g_mainDispatcher.addEvent([&, size] {
+        g_drawPool.get<DrawPoolFramed>(DrawPoolType::FOREGROUND)
+            ->resize(size);
+        });
 }
 
 void GraphicalApplication::inputEvent(const InputEvent& event)
