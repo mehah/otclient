@@ -92,6 +92,8 @@ void DrawPoolManager::draw()
             drawObject(obj);
         }
     }
+
+    get<DrawPoolFramed>(DrawPoolType::FOREGROUND)->resize(m_size);
 }
 
 void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)

@@ -31,10 +31,7 @@ namespace stdext
 {
     const static auto startup_time = std::chrono::high_resolution_clock::now();
 
-    ticks_t time()
-    {
-        return std::time(nullptr);
-    }
+    ticks_t time() { return std::time(nullptr); }
 
     ticks_t millis()
     {
@@ -45,25 +42,7 @@ namespace stdext
         return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - startup_time).count();
     }
 
-    void microsleep(size_t us, bool spinlock)
-    {
-        if (spinlock) {
-            const double time = us / 1000000.f;
-            auto start = std::chrono::high_resolution_clock::now();
-            while ((std::chrono::high_resolution_clock::now() - start).count() / 1e9 < time);
-            return;
-        }
+    void microsleep(size_t us) { std::this_thread::sleep_for(std::chrono::microseconds(us)); };
 
-        std::this_thread::sleep_for(std::chrono::microseconds(us));
-    };
-
-    void millisleep(size_t ms, bool spinlock)
-    {
-        if (spinlock) {
-            microsleep(ms * 1000.f, true);
-            return;
-        }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(ms));
-    };
+    void millisleep(size_t ms) { std::this_thread::sleep_for(std::chrono::milliseconds(ms)); };
 }

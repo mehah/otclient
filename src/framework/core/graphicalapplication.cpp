@@ -47,10 +47,16 @@ void GraphicalApplication::init(std::vector<std::string>& args)
     // setup platform window
     g_window.init();
     g_window.hide();
-    g_window.setOnResize([this](auto&& PH1) { g_dispatcher.addEvent([&] { resize(std::forward<decltype(PH1)>(PH1)); }); });
+
+    g_window.setOnResize([this](auto&& PH1) {
+        if (!m_running) resize(PH1);
+        else g_dispatcher.addEvent([&, PH1] { resize(PH1); });
+        });
+
     g_window.setOnInputEvent([this](auto&& PH1) {
         g_dispatcher.addEvent([&, PH1]() {inputEvent(std::forward<decltype(PH1)>(PH1)); });
         });
+
     g_window.setOnClose([this] { g_dispatcher.addEvent([&]() {close(); }); });
 
     g_mouse.init();
@@ -107,8 +113,6 @@ void GraphicalApplication::terminate()
 
 void GraphicalApplication::run()
 {
-    m_running = true;
-
     // first clock update
     g_clock.update();
 
@@ -137,8 +141,9 @@ void GraphicalApplication::run()
         Timer foregroundRefresh;
 
         while (!st.stop_requested()) {
-            stdext::microsleep(100, true);
+            stdext::millisleep(1);
 
+            std::scoped_lock l(backMutex);
             Application::poll();
 
             if (foregroundRefresh.ticksElapsed() >= 100) { // 10 FPS (1000 / 10)
@@ -150,10 +155,7 @@ void GraphicalApplication::run()
                 foreCondition.notify_all();
             }
 
-            std::scoped_lock l(backMutex);
             g_ui.render(Fw::BackgroundPane);
-
-            stdext::millisleep(1);
         }
 
         foreCondition.notify_all();
@@ -169,11 +171,12 @@ void GraphicalApplication::run()
             });
         });
 
+    m_running = true;
     while (!m_stopping) {
         poll();
 
         if (!g_window.isVisible()) {
-            stdext::millisleep(1);
+            stdext::millisleep(10);
             continue;
         }
 
@@ -220,11 +223,6 @@ void GraphicalApplication::resize(const Size& size)
     g_graphics.resize(size);
     g_ui.resize(size);
     m_onInputEvent = false;
-
-    g_mainDispatcher.addEvent([&, size] {
-        g_drawPool.get<DrawPoolFramed>(DrawPoolType::FOREGROUND)
-            ->resize(size);
-        });
 }
 
 void GraphicalApplication::inputEvent(const InputEvent& event)
