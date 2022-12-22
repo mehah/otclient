@@ -132,8 +132,6 @@ void GraphicalApplication::run()
     std::condition_variable m_condition;
     std::mutex m_backMutex, m_foreMutex;
 
-    const uint16_t FPS_60 = 1000000 / 60;
-
     std::jthread t1([&](std::stop_token st) {
         const auto& map = g_drawPool.get<DrawPool>(DrawPoolType::MAP);
         const auto& foreground = g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND);
@@ -145,14 +143,11 @@ void GraphicalApplication::run()
             std::scoped_lock l(m_backMutex);
 
             m_foreMutex.lock();
-
             g_clock.update();
             Application::poll();
-
             m_foreMutex.unlock();
 
             g_clock.update();
-
             if (foregroundRefresh.ticksElapsed() >= 100) { // 10 FPS (1000 / 10)
                 foreground->repaint();
                 foregroundRefresh.restart();
