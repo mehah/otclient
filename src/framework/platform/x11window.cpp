@@ -646,7 +646,7 @@ void X11Window::poll()
             case ClientMessage: {
                 // close event
                 if ((Atom)event.xclient.data.l[0] == m_wmDelete && m_onClose)
-                    g_dispatcher.addEvent([this] { m_onClose(); });
+                    m_onClose();
                 break;
             }
             case ConfigureNotify: {
@@ -767,69 +767,65 @@ void X11Window::poll()
 
                 //g_logger.debug("char: ", buf[0], " code: ", (int)((uint8_t)buf[0]));
 
-				g_dispatcher.addEvent([&, text] {
-                    if(m_onInputEvent && text.length() > 0) {
-                        m_inputEvent.reset(Fw::KeyTextInputEvent);
-                        m_inputEvent.keyText = text;
-                        m_onInputEvent(m_inputEvent);
-                    }
-                });
+                if (m_onInputEvent && text.length() > 0) {
+                    m_inputEvent.reset(Fw::KeyTextInputEvent);
+                    m_inputEvent.keyText = text;
+                    m_onInputEvent(m_inputEvent);
+                }
                 break;
             }
             case ButtonPress:
             case ButtonRelease: {
-				g_dispatcher.addEvent([this, event] {
-					m_inputEvent.reset();
-					m_inputEvent.type = (event.type == ButtonPress) ? Fw::MousePressInputEvent : Fw::MouseReleaseInputEvent;
-					switch (event.xbutton.button) {
-						case Button1:
-							m_inputEvent.mouseButton = Fw::MouseLeftButton;
-							if (event.type == ButtonPress) m_mouseButtonStates |= Fw::MouseLeftButton; else m_mouseButtonStates &= ~Fw::MouseLeftButton;
-							break;
-						case Button3:
-							m_inputEvent.mouseButton = Fw::MouseRightButton;
-							if (event.type == ButtonPress) m_mouseButtonStates |= Fw::MouseRightButton; else m_mouseButtonStates &= ~Fw::MouseRightButton;
-							break;
-						case Button2:
-							m_inputEvent.mouseButton = Fw::MouseMidButton;
-							if (event.type == ButtonPress) m_mouseButtonStates |= Fw::MouseMidButton; else m_mouseButtonStates &= ~Fw::MouseMidButton;
-							break;
-						case Button4:
-							if (event.type == ButtonPress) {
-								m_inputEvent.type = Fw::MouseWheelInputEvent;
-								m_inputEvent.mouseButton = Fw::MouseMidButton;
-								m_inputEvent.wheelDirection = Fw::MouseWheelUp;
-							} else
-								m_inputEvent.type = Fw::NoInputEvent;
-							break;
-						case Button5:
-							if (event.type == ButtonPress) {
-								m_inputEvent.type = Fw::MouseWheelInputEvent;
-								m_inputEvent.mouseButton = Fw::MouseMidButton;
-								m_inputEvent.wheelDirection = Fw::MouseWheelDown;
-							} else
-								m_inputEvent.type = Fw::NoInputEvent;
-							break;
-						default:
-							m_inputEvent.type = Fw::NoInputEvent;
-							break;
-					}
-					if (m_inputEvent.type != Fw::NoInputEvent && m_onInputEvent)
-						m_onInputEvent(m_inputEvent);
-				});
+                g_dispatcher.addEvent([this, event] {
+                    m_inputEvent.reset();
+                    m_inputEvent.type = (event.type == ButtonPress) ? Fw::MousePressInputEvent : Fw::MouseReleaseInputEvent;
+                    switch (event.xbutton.button) {
+                        case Button1:
+                            m_inputEvent.mouseButton = Fw::MouseLeftButton;
+                            if (event.type == ButtonPress) m_mouseButtonStates |= Fw::MouseLeftButton; else m_mouseButtonStates &= ~Fw::MouseLeftButton;
+                            break;
+                        case Button3:
+                            m_inputEvent.mouseButton = Fw::MouseRightButton;
+                            if (event.type == ButtonPress) m_mouseButtonStates |= Fw::MouseRightButton; else m_mouseButtonStates &= ~Fw::MouseRightButton;
+                            break;
+                        case Button2:
+                            m_inputEvent.mouseButton = Fw::MouseMidButton;
+                            if (event.type == ButtonPress) m_mouseButtonStates |= Fw::MouseMidButton; else m_mouseButtonStates &= ~Fw::MouseMidButton;
+                            break;
+                        case Button4:
+                            if (event.type == ButtonPress) {
+                                m_inputEvent.type = Fw::MouseWheelInputEvent;
+                                m_inputEvent.mouseButton = Fw::MouseMidButton;
+                                m_inputEvent.wheelDirection = Fw::MouseWheelUp;
+                            } else
+                                m_inputEvent.type = Fw::NoInputEvent;
+                            break;
+                        case Button5:
+                            if (event.type == ButtonPress) {
+                                m_inputEvent.type = Fw::MouseWheelInputEvent;
+                                m_inputEvent.mouseButton = Fw::MouseMidButton;
+                                m_inputEvent.wheelDirection = Fw::MouseWheelDown;
+                            } else
+                                m_inputEvent.type = Fw::NoInputEvent;
+                            break;
+                        default:
+                            m_inputEvent.type = Fw::NoInputEvent;
+                            break;
+                    }
+                    if (m_inputEvent.type != Fw::NoInputEvent && m_onInputEvent)
+                        m_onInputEvent(m_inputEvent);
+                    });
                 break;
             }
 
             case MotionNotify: {
-				g_dispatcher.addEvent([this, event] {
-					m_inputEvent.reset();
-					m_inputEvent.type = Fw::MouseMoveInputEvent;
-					Point newMousePos(event.xbutton.x, event.xbutton.y);
-					m_inputEvent.mouseMoved = newMousePos - m_inputEvent.mousePos;
-					m_inputEvent.mousePos = newMousePos;
-					if (m_onInputEvent)
-						m_onInputEvent(m_inputEvent);
-				});
+                m_inputEvent.reset();
+                m_inputEvent.type = Fw::MouseMoveInputEvent;
+                Point newMousePos(event.xbutton.x, event.xbutton.y);
+                m_inputEvent.mouseMoved = newMousePos - m_inputEvent.mousePos;
+                m_inputEvent.mousePos = newMousePos;
+                if (m_onInputEvent)
+                    m_onInputEvent(m_inputEvent);
                 break;
             }
             case MapNotify:
@@ -876,23 +872,23 @@ void X11Window::showMouse()
 
 void X11Window::hideMouse()
 {
-	g_mainDispatcher.addEvent([&] {
-		if (m_cursor != None)
-			restoreMouseCursor();
+    g_mainDispatcher.addEvent([&] {
+        if (m_cursor != None)
+            restoreMouseCursor();
 
-		if (m_hiddenCursor == None) {
-			char bm[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-			Pixmap pix = XCreateBitmapFromData(m_display, m_window, bm, 8, 8);
-			XColor black;
-			memset(&black, 0, sizeof(black));
-			black.flags = DoRed | DoGreen | DoBlue;
-			m_hiddenCursor = XCreatePixmapCursor(m_display, pix, pix, &black, &black, 0, 0);
-			XFreePixmap(m_display, pix);
-		}
+        if (m_hiddenCursor == None) {
+            char bm[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+            Pixmap pix = XCreateBitmapFromData(m_display, m_window, bm, 8, 8);
+            XColor black;
+            memset(&black, 0, sizeof(black));
+            black.flags = DoRed | DoGreen | DoBlue;
+            m_hiddenCursor = XCreatePixmapCursor(m_display, pix, pix, &black, &black, 0, 0);
+            XFreePixmap(m_display, pix);
+        }
 
-		m_cursor = m_hiddenCursor;
-		XDefineCursor(m_display, m_window, m_cursor);
-	});
+        m_cursor = m_hiddenCursor;
+        XDefineCursor(m_display, m_window, m_cursor);
+        });
 }
 
 void X11Window::setMouseCursor(int cursorId)

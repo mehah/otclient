@@ -49,8 +49,10 @@ void GraphicalApplication::init(std::vector<std::string>& args)
     g_window.init();
     g_window.hide();
     g_window.setOnResize([this](auto&& PH1) { resize(std::forward<decltype(PH1)>(PH1)); });
-    g_window.setOnInputEvent([this](auto&& PH1) { inputEvent(std::forward<decltype(PH1)>(PH1)); });
-    g_window.setOnClose([this] { close(); });
+    g_window.setOnInputEvent([this](auto&& PH1) {
+        g_dispatcher.addEvent([&, PH1]() {inputEvent(std::forward<decltype(PH1)>(PH1)); });
+        });
+    g_window.setOnClose([this] { g_dispatcher.addEvent([&]() {close(); }); });
 
     g_mouse.init();
 
