@@ -21,6 +21,7 @@
  */
 
 #include "adaptativeframecounter.h"
+#include <framework/core/eventdispatcher.h>
 #include <framework/platform/platformwindow.h>
 
 bool AdaptativeFrameCounter::update()
@@ -30,8 +31,7 @@ bool AdaptativeFrameCounter::update()
     const bool mustSleep = m_maxFps > 0 && m_fpsCount > m_maxFps;
     if (mustSleep) {
         const int32_t sleepPeriod = getMaxPeriod() - m_timer.elapsed_millis();
-        if (sleepPeriod > 0)
-            stdext::microPrecisionSleep(sleepPeriod);
+        if (sleepPeriod > 0) stdext::microsleep(sleepPeriod);
     }
 
     const uint32_t tickCount = stdext::millis();
@@ -40,12 +40,11 @@ bool AdaptativeFrameCounter::update()
 
     const bool fpsChanged = m_fps != m_fpsCount;
     if (fpsChanged) {
-        if (!g_window.vsyncEnabled() && mustSleep)
-            m_fpsCount /= 1.89;
-
         m_fps = m_fpsCount;
         m_fpsCount = 0;
         m_interval = tickCount;
+
+        g_dispatcher.addEvent([&] { g_lua.callGlobalField("g_app", "onFps", getFps()); });
     }
 
     return fpsChanged;

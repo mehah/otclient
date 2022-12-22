@@ -183,6 +183,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
 	  vorbis.lib;
 	  vorbisfile.lib;
 	  zlib.lib;
+	  winmm.lib
 	  </AdditionalDependencies>
     </Link>
     <PreBuildEvent>
@@ -241,6 +242,7 @@ IF %ERRORLEVEL% EQU 0 (
 	  vorbis.lib;
 	  vorbisfile.lib;
 	  zlib.lib;
+	  winmm.lib
 	  </AdditionalDependencies>
     </Link>
     <PreBuildEvent>

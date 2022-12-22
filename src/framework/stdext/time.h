@@ -29,10 +29,8 @@ namespace stdext
     ticks_t time();
     ticks_t millis();
     ticks_t micros();
-    void millisleep(size_t ms);
-    void microsleep(size_t us);
-    void microPrecisionSleep(size_t us);
-    void milliPrecisionSleep(size_t us);
+    void millisleep(size_t ms, bool spinlock = false);
+    void microsleep(size_t us, bool spinlock = false);
 
     struct timer
     {

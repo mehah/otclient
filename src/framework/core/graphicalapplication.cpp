@@ -128,8 +128,8 @@ void GraphicalApplication::run()
 
     g_lua.callGlobalField("g_app", "onRun");
 
-    std::condition_variable m_condition;
-    std::mutex m_backMutex, m_foreMutex;
+    std::condition_variable foreCondition;
+    std::mutex backMutex, foreMutex;
 
     std::jthread t1([&](std::stop_token st) {
         const auto& map = g_drawPool.get<DrawPool>(DrawPoolType::MAP);
@@ -137,36 +137,31 @@ void GraphicalApplication::run()
         Timer foregroundRefresh;
 
         while (!st.stop_requested()) {
-            stdext::milliPrecisionSleep(1);
+            stdext::microsleep(100, true);
 
-            std::scoped_lock l(m_backMutex);
-
-            m_foreMutex.lock();
-            g_clock.update();
             Application::poll();
-            m_foreMutex.unlock();
 
-            g_clock.update();
             if (foregroundRefresh.ticksElapsed() >= 100) { // 10 FPS (1000 / 10)
                 foreground->repaint();
                 foregroundRefresh.restart();
             }
 
-            // foreground pane - steady pane with few animated stuff (UI)
             if (foreground->canRepaint()) {
-                m_condition.notify_all();
+                foreCondition.notify_all();
             }
 
-            // background pane - high updated and animated pane (where the game are stuff happens)
+            std::scoped_lock l(backMutex);
             g_ui.render(Fw::BackgroundPane);
+
+            stdext::millisleep(1);
         }
 
-        m_condition.notify_all();
+        foreCondition.notify_all();
         });
 
     std::jthread t2([&](std::stop_token st) {
-        std::unique_lock lock(m_foreMutex);
-        m_condition.wait(lock, [&]() -> bool {
+        std::unique_lock lock(foreMutex);
+        foreCondition.wait(lock, [&]() -> bool {
             g_drawPool.use(DrawPoolType::FOREGROUND);
             g_ui.render(Fw::ForegroundPane);
 
@@ -175,29 +170,21 @@ void GraphicalApplication::run()
         });
 
     while (!m_stopping) {
-        g_clock.update();
-        // poll all events before rendering
         poll();
 
         if (!g_window.isVisible()) {
-            // sleeps until next poll to avoid massive cpu usage
             stdext::millisleep(1);
             continue;
         }
 
-        m_frameCounter.start();
-        { // Draw All Pools
-            std::scoped_lock l(m_backMutex, m_foreMutex);
-
+        {
+            std::scoped_lock l(backMutex, foreMutex);
             g_drawPool.draw();
-
-            if (m_frameCounter.update()) {
-                g_lua.callGlobalField("g_app", "onFps", m_frameCounter.getFps());
-            }
         }
 
         // update screen pixels
         g_window.swapBuffers();
+        m_frameCounter.update();
     }
 
     m_stopping = false;
@@ -206,6 +193,9 @@ void GraphicalApplication::run()
 
 void GraphicalApplication::poll()
 {
+    g_clock.update();
+    m_frameCounter.start();
+
 #ifdef FRAMEWORK_SOUND
     g_sounds.poll();
 #endif

@@ -142,6 +142,8 @@ void Application::terminate()
 
 void Application::poll()
 {
+    g_clock.update();
+
 #ifdef FRAMEWORK_NET
     Connection::poll();
 #endif
@@ -152,6 +154,8 @@ void Application::poll()
 #ifdef FRAMEWORK_NET
     Connection::poll();
 #endif
+
+    g_clock.update();
 }
 
 void Application::exit()

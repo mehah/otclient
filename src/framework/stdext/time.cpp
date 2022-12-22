@@ -45,46 +45,25 @@ namespace stdext
         return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - startup_time).count();
     }
 
-    void millisleep(size_t ms)
+    void microsleep(size_t us, bool spinlock)
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(ms));
-    };
+        if (spinlock) {
+            const double time = us / 1000000.f;
+            auto start = std::chrono::high_resolution_clock::now();
+            while ((std::chrono::high_resolution_clock::now() - start).count() / 1e9 < time);
+            return;
+        }
 
-    void microsleep(size_t us)
-    {
         std::this_thread::sleep_for(std::chrono::microseconds(us));
     };
 
-    void microPrecisionSleep(size_t us) {
-        double time = us / 1000000.f;
-
-        static double estimate = 5e-3;
-        static double mean = 5e-3;
-        static double m2 = 0;
-        static int64_t count = 1;
-
-        while (time > estimate) {
-            auto start = std::chrono::high_resolution_clock::now();
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            auto end = std::chrono::high_resolution_clock::now();
-
-            double observed = (end - start).count() / 1e9;
-            time -= observed;
-
-            ++count;
-            double delta = observed - mean;
-            mean += delta / count;
-            m2 += delta * (observed - mean);
-            double stddev = std::sqrt(m2 / (count - 1));
-            estimate = mean + stddev;
+    void millisleep(size_t ms, bool spinlock)
+    {
+        if (spinlock) {
+            microsleep(ms * 1000.f, true);
+            return;
         }
 
-        // spin lock
-        auto start = std::chrono::high_resolution_clock::now();
-        while ((std::chrono::high_resolution_clock::now() - start).count() / 1e9 < time);
-    }
-
-    void milliPrecisionSleep(size_t us) {
-        microPrecisionSleep(us * 1000.f);
-    }
+        std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+    };
 }

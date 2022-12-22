@@ -205,6 +205,8 @@ WIN32Window::WIN32Window()
 
 void WIN32Window::init()
 {
+    timeBeginPeriod(1);
+
     m_instance = GetModuleHandle(nullptr);
 
 #ifdef DIRECTX
@@ -263,6 +265,8 @@ void WIN32Window::terminate()
             g_logger.error("UnregisterClassA failed");
         m_instance = nullptr;
     }
+
+    timeEndPeriod(1);
 }
 
 struct WindowProcProxy
@@ -971,7 +975,7 @@ void WIN32Window::setVerticalSync(bool enable)
 
         wglSwapInterval(enable);
 #endif
-        });
+});
 }
 
 void WIN32Window::setIcon(const std::string& file)
