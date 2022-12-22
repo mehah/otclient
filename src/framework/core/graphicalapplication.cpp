@@ -30,10 +30,9 @@
 #include <framework/input/mouse.h>
 #include <framework/platform/platformwindow.h>
 #include <framework/ui/uimanager.h>
-
 #include "framework/stdext/time.h"
-
 #include <framework/core/asyncdispatcher.h>
+#include <thread>
 
 #ifdef FRAMEWORK_SOUND
 #include <framework/sound/soundmanager.h>

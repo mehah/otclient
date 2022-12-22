@@ -423,7 +423,7 @@ void MapView::updateGeometry(const Size& visibleDimension)
     m_virtualCenterOffset = (drawDimension / 2 - Size(1)).toPoint();
     m_rectDimension = { 0, 0, bufferSize };
 
-    g_mainDispatcher.addEvent([=]() {
+    g_mainDispatcher.addEvent([&, bufferSize, drawDimension, tileSize]() {
         m_pool->resize(bufferSize);
         if (m_lightView) m_lightView->resize(drawDimension, tileSize);
         });
