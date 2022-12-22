@@ -57,8 +57,6 @@ namespace stdext
 
     void microPrecisionSleep(size_t us) {
         double time = us / 1000000.f;
-        using namespace std;
-        using namespace std::chrono;
 
         static double estimate = 5e-3;
         static double mean = 5e-3;
@@ -66,9 +64,9 @@ namespace stdext
         static int64_t count = 1;
 
         while (time > estimate) {
-            auto start = high_resolution_clock::now();
-            this_thread::sleep_for(milliseconds(1));
-            auto end = high_resolution_clock::now();
+            auto start = std::chrono::high_resolution_clock::now();
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            auto end = std::chrono::high_resolution_clock::now();
 
             double observed = (end - start).count() / 1e9;
             time -= observed;
@@ -77,13 +75,13 @@ namespace stdext
             double delta = observed - mean;
             mean += delta / count;
             m2 += delta * (observed - mean);
-            double stddev = sqrt(m2 / (count - 1));
+            double stddev = std::sqrt(m2 / (count - 1));
             estimate = mean + stddev;
         }
 
         // spin lock
-        auto start = high_resolution_clock::now();
-        while ((high_resolution_clock::now() - start).count() / 1e9 < time);
+        auto start = std::chrono::high_resolution_clock::now();
+        while ((std::chrono::high_resolution_clock::now() - start).count() / 1e9 < time);
     }
 
     void milliPrecisionSleep(size_t us) {
