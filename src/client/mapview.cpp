@@ -88,7 +88,6 @@ MapView::MapView() : m_pool(g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP))
         });
 
     m_shadowBuffer = std::make_shared<DrawBuffer>(DrawPool::DrawOrder::FIFTH, false);
-    m_shader = g_shaders.getDefaultMapShader();
 
     setVisibleDimension(Size(15, 11));
 }
@@ -769,8 +768,10 @@ TilePtr MapView::getTopTile(Position tilePos)
     return nullptr;
 }
 
-void MapView::setShader(const PainterShaderProgramPtr& shader, float fadein, float fadeout)
+void MapView::setShader(const std::string_view name, float fadein, float fadeout)
 {
+    const auto& shader = g_shaders.getShader(name);
+
     if (m_shader == shader)
         return;
 

@@ -960,3 +960,5 @@ int Creature::getExactSize(int layer, int xPattern, int yPattern, int zPattern, 
 
     return exactSize;
 }
+
+void Creature::setMountShader(const std::string_view name) { m_mountShader = g_shaders.getShader(name); }

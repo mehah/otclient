@@ -140,7 +140,7 @@ public:
 
     void move(int32_t x, int32_t y);
 
-    void setShader(const PainterShaderProgramPtr& shader, float fadein, float fadeout);
+    void setShader(const std::string_view name, float fadein, float fadeout);
     PainterShaderProgramPtr getShader() { return m_shader; }
 
     Position getPosition(const Point& point, const Size& mapSize);

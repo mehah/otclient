@@ -21,6 +21,7 @@
  */
 
 #include "shadermanager.h"
+#include <framework/core/eventdispatcher.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/graphics.h>
 #include <framework/graphics/shader/shadersources.h>
@@ -28,156 +29,112 @@
 
 ShaderManager g_shaders;
 
-void ShaderManager::init()
+void ShaderManager::init() { PainterShaderProgram::release(); }
+void ShaderManager::terminate() { m_shaders.clear(); }
+
+void ShaderManager::createShader(const std::string_view name)
 {
-    m_defaultItemShader = createFragmentShaderFromCode("Item", std::string{ glslMainFragmentShader } + glslTextureSrcFragmentShader.data());
-    setupItemShader(m_defaultItemShader);
-
-    m_defaultOutfitShader = createFragmentShaderFromCode("Outfit", std::string{ glslMainFragmentShader } + glslTextureSrcFragmentShader.data());
-    setupItemShader(m_defaultOutfitShader);
-
-    m_defaultMountShader = createFragmentShaderFromCode("Mount", std::string{ glslMainFragmentShader } + glslTextureSrcFragmentShader.data());
-    setupItemShader(m_defaultMountShader);
-
-    m_defaultMapShader = createFragmentShaderFromCode("Map", std::string{ glslMainFragmentShader } + glslTextureSrcFragmentShader.data());
-
-    PainterShaderProgram::release();
+    g_mainDispatcher.addEvent([&, name = name.data()] {
+        PainterShaderProgramPtr shader(new PainterShaderProgram);
+        m_shaders[name] = shader;
+        return shader;
+        });
 }
 
-void ShaderManager::terminate()
+void ShaderManager::createFragmentShader(const std::string_view name, const std::string_view file)
 {
-    m_defaultItemShader = nullptr;
-    m_defaultOutfitShader = nullptr;
-    m_defaultMountShader = nullptr;
-    m_defaultMapShader = nullptr;
-    m_shaders.clear();
+    const auto& filePath = g_resources.resolvePath(file.data());
+    g_mainDispatcher.addEvent([&, name = name.data(), filePath] {
+        PainterShaderProgramPtr shader(new PainterShaderProgram);
+        if (!shader)
+            return;
+
+        const auto& path = g_resources.guessFilePath(filePath, "frag");
+
+        shader->addShaderFromSourceCode(ShaderType::VERTEX, std::string{ glslMainWithTexCoordsVertexShader } + glslPositionOnlyVertexShader.data());
+        if (!shader->addShaderFromSourceFile(ShaderType::FRAGMENT, path)) {
+            g_logger.error(stdext::format("unable to load fragment shader '%s' from source file '%s'", name, path));
+            return;
+        }
+
+        if (!shader->link()) {
+            g_logger.error(stdext::format("unable to link shader '%s' from file '%s'", name, path));
+            return;
+        }
+
+        m_shaders[name] = shader;
+        });
 }
 
-PainterShaderProgramPtr ShaderManager::createShader(const std::string_view name)
+void ShaderManager::createFragmentShaderFromCode(const std::string_view name, const std::string_view code)
 {
-    PainterShaderProgramPtr shader(new PainterShaderProgram);
-    m_shaders[name.data()] = shader;
-    return shader;
+    g_mainDispatcher.addEvent([&, name = name.data(), code = code.data()] {
+        PainterShaderProgramPtr shader(new PainterShaderProgram);
+        if (!shader)
+            return;
+
+        shader->addShaderFromSourceCode(ShaderType::VERTEX, std::string{ glslMainWithTexCoordsVertexShader } + glslPositionOnlyVertexShader.data());
+        if (!shader->addShaderFromSourceCode(ShaderType::FRAGMENT, code)) {
+            g_logger.error(stdext::format("unable to load fragment shader '%s'", name));
+            return;
+        }
+
+        if (!shader->link()) {
+            g_logger.error(stdext::format("unable to link shader '%s'", name));
+            return;
+        }
+
+        m_shaders[name] = shader;
+        });
 }
 
-PainterShaderProgramPtr ShaderManager::createFragmentShader(const std::string_view name, const std::string_view file)
+void ShaderManager::setupItemShader(const std::string_view name)
 {
-    PainterShaderProgramPtr shader = createShader(name);
-    if (!shader)
-        return nullptr;
-
-    const auto& path = g_resources.guessFilePath(file.data(), "frag");
-
-    shader->addShaderFromSourceCode(ShaderType::VERTEX, std::string{ glslMainWithTexCoordsVertexShader } + glslPositionOnlyVertexShader.data());
-    if (!shader->addShaderFromSourceFile(ShaderType::FRAGMENT, path)) {
-        g_logger.error(stdext::format("unable to load fragment shader '%s' from source file '%s'", name, path));
-        return nullptr;
-    }
-
-    if (!shader->link()) {
-        g_logger.error(stdext::format("unable to link shader '%s' from file '%s'", name, path));
-        return nullptr;
-    }
-
-    registerShader(name, shader);
-    return shader;
+    g_mainDispatcher.addEvent([&, name = name.data()] {
+        const auto& shader = getShader(name);
+        if (!shader) return;
+        shader->bindUniformLocation(ITEM_ID_UNIFORM, "u_ItemId");
+        });
 }
 
-PainterShaderProgramPtr ShaderManager::createFragmentShaderFromCode(const std::string_view name, const std::string_view code)
+void ShaderManager::setupOutfitShader(const std::string_view name)
 {
-    PainterShaderProgramPtr shader = createShader(name);
-    if (!shader)
-        return nullptr;
-
-    shader->addShaderFromSourceCode(ShaderType::VERTEX, std::string{ glslMainWithTexCoordsVertexShader } + glslPositionOnlyVertexShader.data());
-    if (!shader->addShaderFromSourceCode(ShaderType::FRAGMENT, code)) {
-        g_logger.error(stdext::format("unable to load fragment shader '%s'", name));
-        return nullptr;
-    }
-
-    if (!shader->link()) {
-        g_logger.error(stdext::format("unable to link shader '%s'", name));
-        return nullptr;
-    }
-
-    m_shaders[name.data()] = shader;
-    return shader;
+    g_mainDispatcher.addEvent([&, name = name.data()] {
+        const auto& shader = getShader(name);
+        if (!shader) return;
+        shader->bindUniformLocation(OUTFIT_ID_UNIFORM, "u_OutfitId");
+        });
 }
 
-PainterShaderProgramPtr ShaderManager::createItemShader(const std::string_view name, const std::string_view file)
+void ShaderManager::setupMountShader(const std::string_view name)
 {
-    PainterShaderProgramPtr shader = createFragmentShader(name, file);
-    if (shader)
-        setupItemShader(shader);
-
-    return shader;
+    g_mainDispatcher.addEvent([&, name = name.data()] {
+        const auto& shader = getShader(name);
+        if (!shader) return;
+        shader->bindUniformLocation(MOUNT_ID_UNIFORM, "u_MountId");
+        });
 }
 
-PainterShaderProgramPtr ShaderManager::createOutfitShader(const std::string_view name, const std::string_view file)
+void ShaderManager::setupMapShader(const std::string_view name)
 {
-    PainterShaderProgramPtr shader = createFragmentShader(name, file);
-    if (shader)
-        setupOutfitShader(shader);
-
-    return shader;
+    g_mainDispatcher.addEvent([&, name = name.data()] {
+        const auto& shader = getShader(name);
+        if (!shader) return;
+        shader->bindUniformLocation(MAP_CENTER_COORD, "u_MapCenterCoord");
+        shader->bindUniformLocation(MAP_GLOBAL_COORD, "u_MapGlobalCoord");
+        shader->bindUniformLocation(MAP_WALKOFFSET, "u_WalkOffset");
+        shader->bindUniformLocation(MAP_ZOOM, "u_MapZoom");
+        });
 }
 
-PainterShaderProgramPtr ShaderManager::createMountShader(const std::string_view name, const std::string_view file)
+void ShaderManager::addMultiTexture(const std::string_view name, const std::string_view file)
 {
-    PainterShaderProgramPtr shader = createFragmentShader(name, file);
-    if (shader)
-        setupMountShader(shader);
-
-    return shader;
-}
-
-PainterShaderProgramPtr ShaderManager::createMapShader(const std::string_view name, const std::string_view file)
-{
-    PainterShaderProgramPtr shader = createFragmentShader(name, file);
-    if (shader)
-        setupMapShader(shader);
-
-    return shader;
-}
-
-void ShaderManager::setupItemShader(const PainterShaderProgramPtr& shader)
-{
-    if (!shader)
-        return;
-
-    shader->bindUniformLocation(ITEM_ID_UNIFORM, "u_ItemId");
-}
-
-void ShaderManager::setupOutfitShader(const PainterShaderProgramPtr& shader)
-{
-    if (!shader)
-        return;
-
-    shader->bindUniformLocation(OUTFIT_ID_UNIFORM, "u_OutfitId");
-}
-
-void ShaderManager::setupMountShader(const PainterShaderProgramPtr& shader)
-{
-    if (!shader)
-        return;
-
-    shader->bindUniformLocation(MOUNT_ID_UNIFORM, "u_MountId");
-}
-
-void ShaderManager::setupMapShader(const PainterShaderProgramPtr& shader)
-{
-    if (!shader)
-        return;
-
-    shader->bindUniformLocation(MAP_CENTER_COORD, "u_MapCenterCoord");
-    shader->bindUniformLocation(MAP_GLOBAL_COORD, "u_MapGlobalCoord");
-    shader->bindUniformLocation(MAP_WALKOFFSET, "u_WalkOffset");
-    shader->bindUniformLocation(MAP_ZOOM, "u_MapZoom");
-}
-
-void ShaderManager::registerShader(const std::string_view name, const PainterShaderProgramPtr& shader)
-{
-    m_shaders[name.data()] = shader;
+    const auto& filePath = g_resources.resolvePath(file.data());
+    g_mainDispatcher.addEvent([&, name = name.data(), filePath] {
+        const auto& shader = getShader(name);
+        if (!shader) return;
+        shader->addMultiTexture(filePath);
+        });
 }
 
 PainterShaderProgramPtr ShaderManager::getShader(const std::string_view name)

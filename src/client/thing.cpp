@@ -25,6 +25,7 @@
 #include "map.h"
 #include "thingtypemanager.h"
 #include "tile.h"
+#include "shadermanager.h"
 
 #include <framework/core/graphicalapplication.h>
 
@@ -85,6 +86,8 @@ int Thing::getStackPos()
     g_logger.traceError("got a thing with invalid stackpos");
     return -1;
 }
+
+void Thing::setShader(const std::string_view name) { m_shader = g_shaders.getShader(name); }
 
 void Thing::attachEffect(const AttachedEffectPtr& obj) {
     if (isCreature()) {
