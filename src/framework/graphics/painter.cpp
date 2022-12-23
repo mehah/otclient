@@ -139,6 +139,7 @@ void Painter::resetState()
     resetClipRect();
     resetShaderProgram();
     resetAlphaWriting();
+    resetTransformMatrix();
 }
 
 void Painter::refreshState()

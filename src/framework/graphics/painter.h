@@ -107,6 +107,7 @@ public:
     void resetCompositionMode() { setCompositionMode(CompositionMode::NORMAL); }
     void resetColor() { setColor(Color::white); }
     void resetShaderProgram() { setShaderProgram(nullptr); }
+    void resetTransformMatrix() { setTransformMatrix(DEFAULT_MATRIX3); }
 
 protected:
     void refreshState();

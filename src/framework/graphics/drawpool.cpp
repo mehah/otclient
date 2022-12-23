@@ -51,7 +51,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
 void DrawPool::add(const Color& color, const TexturePtr& texture, const DrawMethod& method, const DrawMode drawMode, const DrawBufferPtr& drawBuffer, const CoordsBufferPtr& coordsBuffer)
 {
     const auto& state = PoolState{
-       m_transformMatrix, color, m_state.opacity,
+       m_state.transformMatrix, color, m_state.opacity,
        m_state.compositionMode, m_state.blendEquation,
        m_state.clipRect, texture, m_state.shaderProgram
     };
@@ -335,7 +335,7 @@ void DrawPool::scale(float x, float y)
             0.0f,  0.0f,  1.0f
     };
 
-    setTransformMatrix(m_transformMatrix * scaleMatrix.transposed());
+    m_state.transformMatrix = m_state.transformMatrix * scaleMatrix.transposed();
 }
 
 void DrawPool::translate(float x, float y)
@@ -346,7 +346,7 @@ void DrawPool::translate(float x, float y)
             0.0f,  0.0f,  1.0f
     };
 
-    setTransformMatrix(m_transformMatrix * translateMatrix.transposed());
+    m_state.transformMatrix = m_state.transformMatrix * translateMatrix.transposed();
 }
 
 void DrawPool::rotate(float angle)
@@ -357,7 +357,7 @@ void DrawPool::rotate(float angle)
                                  0.0f,             0.0f,  1.0f
     };
 
-    setTransformMatrix(m_transformMatrix * rotationMatrix.transposed());
+    m_state.transformMatrix = m_state.transformMatrix * rotationMatrix.transposed();
 }
 
 void DrawPool::rotate(float x, float y, float angle)
@@ -369,14 +369,14 @@ void DrawPool::rotate(float x, float y, float angle)
 
 void DrawPool::pushTransformMatrix()
 {
-    m_transformMatrixStack.push_back(m_transformMatrix);
+    m_transformMatrixStack.push_back(m_state.transformMatrix);
     assert(m_transformMatrixStack.size() < 100);
 }
 
 void DrawPool::popTransformMatrix()
 {
     assert(!m_transformMatrixStack.empty());
-    setTransformMatrix(m_transformMatrixStack.back());
+    m_state.transformMatrix = m_transformMatrixStack.back();
     m_transformMatrixStack.pop_back();
 }
 

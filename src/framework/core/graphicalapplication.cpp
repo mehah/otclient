@@ -144,6 +144,8 @@ void GraphicalApplication::run()
             stdext::millisleep(1);
 
             std::scoped_lock l(backMutex);
+
+            g_particles.poll();
             Application::poll();
 
             if (foregroundRefresh.ticksElapsed() >= 100) { // 10 FPS (1000 / 10)
@@ -205,7 +207,6 @@ void GraphicalApplication::poll()
 
     // poll window input events
     g_window.poll();
-    g_particles.poll();
     g_textures.poll();
     g_mainDispatcher.poll();
 }

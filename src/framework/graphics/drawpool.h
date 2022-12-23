@@ -189,9 +189,8 @@ private:
     void resetShaderProgram() { m_state.shaderProgram = nullptr; }
     void resetCompositionMode() { m_state.compositionMode = CompositionMode::NORMAL; }
     void resetBlendEquation() { m_state.blendEquation = BlendEquation::ADD; }
+    void resetTransformMatrix() { m_state.transformMatrix = DEFAULT_MATRIX3; }
 
-    void setTransformMatrix(const Matrix3& transformMatrix) { m_transformMatrix = transformMatrix; }
-    void resetTransformMatrix() { setTransformMatrix(DEFAULT_MATRIX3); }
     void pushTransformMatrix();
     void popTransformMatrix();
     void scale(float x, float y);
@@ -237,7 +236,6 @@ private:
     stdext::map<size_t, DrawObject> m_objectsByhash;
 
     std::vector<Matrix3> m_transformMatrixStack;
-    Matrix3 m_transformMatrix;
 
     float m_scaleFactor{ 1.f };
 
