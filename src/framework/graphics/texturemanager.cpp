@@ -87,7 +87,7 @@ void TextureManager::liveReload()
             tex->uploadPixels(image, tex->hasMipmaps());
             tex->setTime(stdext::time());
         }
-        }, 1000);
+    }, 1000);
 }
 
 TexturePtr TextureManager::getTexture(const std::string& fileName)

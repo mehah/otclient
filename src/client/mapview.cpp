@@ -80,12 +80,12 @@ MapView::MapView() : m_pool(g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP))
         }
 
         g_painter->setOpacity(fadeOpacity);
-        });
+    });
 
     m_pool->onAfterDraw([&] {
         g_painter->resetShaderProgram();
         g_painter->resetOpacity();
-        });
+    });
 
     m_shadowBuffer = std::make_shared<DrawBuffer>(DrawPool::DrawOrder::FIFTH, false);
 
@@ -425,7 +425,7 @@ void MapView::updateGeometry(const Size& visibleDimension)
     g_mainDispatcher.addEvent([&, bufferSize, drawDimension, tileSize]() {
         m_pool->resize(bufferSize);
         if (m_lightView) m_lightView->resize(drawDimension, tileSize);
-        });
+    });
 
     const uint8_t left = std::min<uint8_t>(g_map.getAwareRange().left, (m_drawDimension.width() / 2) - 1);
     const uint8_t top = std::min<uint8_t>(g_map.getAwareRange().top, (m_drawDimension.height() / 2) - 1);

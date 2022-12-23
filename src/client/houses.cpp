@@ -63,7 +63,7 @@ void House::removeDoorById(uint32_t doorId)
 {
     if (doorId >= m_lastDoorId)
         throw Exception("Failed to remove door of id %d (would overflow), max id: %d",
-        doorId, m_lastDoorId);
+                        doorId, m_lastDoorId);
     m_doors[doorId] = nullptr;
 }
 
@@ -127,7 +127,7 @@ HousePtr HouseManager::getHouse(uint32_t houseId)
 HousePtr HouseManager::getHouseByName(const std::string_view name)
 {
     const auto it = std::find_if(m_houses.begin(), m_houses.end(),
-        [=](const HousePtr& house) -> bool { return house->getName() == name; });
+                                 [=](const HousePtr& house) -> bool { return house->getName() == name; });
     return it != m_houses.end() ? *it : nullptr;
 }
 
@@ -197,7 +197,7 @@ HouseList HouseManager::filterHouses(uint32_t townId)
 HouseList::iterator HouseManager::findHouse(uint32_t houseId)
 {
     return std::find_if(m_houses.begin(), m_houses.end(),
-        [=](const HousePtr& house) -> bool { return house->getId() == houseId; });
+                        [=](const HousePtr& house) -> bool { return house->getId() == houseId; });
 }
 
 void HouseManager::sort()

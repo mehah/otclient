@@ -221,11 +221,11 @@ void WIN32Window::init()
 
     // create a device class using this information and information from the d3dpp stuct
     m_d3d->CreateDevice(D3DADAPTER_DEFAULT,
-        D3DDEVTYPE_HAL,
-        m_window,
-        D3DCREATE_SOFTWARE_VERTEXPROCESSING,
-        &d3dpp,
-        &m_d3ddev);
+                        D3DDEVTYPE_HAL,
+                        m_window,
+                        D3DCREATE_SOFTWARE_VERTEXPROCESSING,
+                        &d3dpp,
+                        &m_d3ddev);
 
 #endif
 
@@ -305,17 +305,17 @@ void WIN32Window::internalCreateWindow()
 
     updateUnmaximizedCoords();
     m_window = CreateWindowExA(dwExStyle,
-        g_app.getCompactName().data(),
-        nullptr,
-        dwStyle,
-        screenRect.left(),
-        screenRect.top(),
-        screenRect.width(),
-        screenRect.height(),
-        nullptr,
-        nullptr,
-        m_instance,
-        nullptr);
+                               g_app.getCompactName().data(),
+                               nullptr,
+                               dwStyle,
+                               screenRect.left(),
+                               screenRect.top(),
+                               screenRect.width(),
+                               screenRect.height(),
+                               nullptr,
+                               nullptr,
+                               m_instance,
+                               nullptr);
 
     if (!m_window)
         g_logger.fatal("Unable to create window");
@@ -475,7 +475,7 @@ void WIN32Window::move(const Point& pos)
         MoveWindow(m_window, windowRect.x(), windowRect.y(), windowRect.width(), windowRect.height(), TRUE);
         if (m_hidden)
             ShowWindow(m_window, SW_HIDE);
-        });
+    });
 }
 
 void WIN32Window::resize(const Size& size)
@@ -488,7 +488,7 @@ void WIN32Window::resize(const Size& size)
         MoveWindow(m_window, windowRect.x(), windowRect.y(), windowRect.width(), windowRect.height(), TRUE);
         if (m_hidden)
             ShowWindow(m_window, SW_HIDE);
-        });
+    });
 }
 
 void WIN32Window::show()
@@ -499,7 +499,7 @@ void WIN32Window::show()
             ShowWindow(m_window, SW_MAXIMIZE);
         else
             ShowWindow(m_window, SW_SHOW);
-        });
+    });
 }
 
 void WIN32Window::hide()
@@ -507,7 +507,7 @@ void WIN32Window::hide()
     g_mainDispatcher.addEvent([&] {
         m_hidden = true;
         ShowWindow(m_window, SW_HIDE);
-        });
+    });
 }
 
 void WIN32Window::maximize()
@@ -517,7 +517,7 @@ void WIN32Window::maximize()
             ShowWindow(m_window, SW_MAXIMIZE);
         else
             m_maximized = true;
-        });
+    });
 }
 
 void WIN32Window::poll()
@@ -896,7 +896,7 @@ void WIN32Window::setMouseCursor(int cursorId)
         m_cursor = m_cursors[cursorId];
         SetCursor(m_cursor);
         ShowCursor(true);
-        });
+    });
 }
 
 void WIN32Window::restoreMouseCursor()
@@ -907,21 +907,21 @@ void WIN32Window::restoreMouseCursor()
             SetCursor(m_defaultCursor);
             ShowCursor(true);
         }
-        });
+    });
 }
 
 void WIN32Window::setTitle(const std::string_view title)
 {
     g_mainDispatcher.addEvent([&, title = std::string{ title }] {
         SetWindowTextW(m_window, stdext::latin1_to_utf16(title).data());
-        });
+    });
 }
 
 void WIN32Window::setMinimumSize(const Size& minimumSize)
 {
     g_mainDispatcher.addEvent([&, minimumSize] {
         m_minimumSize = minimumSize;
-        });
+    });
 }
 
 void WIN32Window::setFullscreen(bool fullscreen)
@@ -955,7 +955,7 @@ void WIN32Window::setFullscreen(bool fullscreen)
             SetWindowPlacement(m_window, &wpPrev);
             SetWindowPos(m_window, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
         }
-        });
+    });
 }
 
 void WIN32Window::setVerticalSync(bool enable)
@@ -975,7 +975,7 @@ void WIN32Window::setVerticalSync(bool enable)
 
         wglSwapInterval(enable);
 #endif
-});
+    });
 }
 
 void WIN32Window::setIcon(const std::string& file)
@@ -1019,7 +1019,7 @@ void WIN32Window::setIcon(const std::string& file)
 
         SendMessage(m_window, WM_SETICON, ICON_SMALL, (LPARAM)icon);
         SendMessage(m_window, WM_SETICON, ICON_BIG, (LPARAM)icon);
-        });
+    });
 }
 
 void WIN32Window::setClipboardText(const std::string_view text)
@@ -1042,7 +1042,7 @@ void WIN32Window::setClipboardText(const std::string_view text)
         EmptyClipboard();
         SetClipboardData(CF_UNICODETEXT, hglb);
         CloseClipboard();
-        });
+    });
 }
 
 Size WIN32Window::getDisplaySize()

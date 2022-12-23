@@ -38,7 +38,7 @@ void ShaderManager::createShader(const std::string_view name)
         PainterShaderProgramPtr shader(new PainterShaderProgram);
         m_shaders[name] = shader;
         return shader;
-        });
+    });
 }
 
 void ShaderManager::createFragmentShader(const std::string_view name, const std::string_view file)
@@ -63,7 +63,7 @@ void ShaderManager::createFragmentShader(const std::string_view name, const std:
         }
 
         m_shaders[name] = shader;
-        });
+    });
 }
 
 void ShaderManager::createFragmentShaderFromCode(const std::string_view name, const std::string_view code)
@@ -85,7 +85,7 @@ void ShaderManager::createFragmentShaderFromCode(const std::string_view name, co
         }
 
         m_shaders[name] = shader;
-        });
+    });
 }
 
 void ShaderManager::setupItemShader(const std::string_view name)
@@ -94,7 +94,7 @@ void ShaderManager::setupItemShader(const std::string_view name)
         const auto& shader = getShader(name);
         if (!shader) return;
         shader->bindUniformLocation(ITEM_ID_UNIFORM, "u_ItemId");
-        });
+    });
 }
 
 void ShaderManager::setupOutfitShader(const std::string_view name)
@@ -103,7 +103,7 @@ void ShaderManager::setupOutfitShader(const std::string_view name)
         const auto& shader = getShader(name);
         if (!shader) return;
         shader->bindUniformLocation(OUTFIT_ID_UNIFORM, "u_OutfitId");
-        });
+    });
 }
 
 void ShaderManager::setupMountShader(const std::string_view name)
@@ -112,7 +112,7 @@ void ShaderManager::setupMountShader(const std::string_view name)
         const auto& shader = getShader(name);
         if (!shader) return;
         shader->bindUniformLocation(MOUNT_ID_UNIFORM, "u_MountId");
-        });
+    });
 }
 
 void ShaderManager::setupMapShader(const std::string_view name)
@@ -124,7 +124,7 @@ void ShaderManager::setupMapShader(const std::string_view name)
         shader->bindUniformLocation(MAP_GLOBAL_COORD, "u_MapGlobalCoord");
         shader->bindUniformLocation(MAP_WALKOFFSET, "u_WalkOffset");
         shader->bindUniformLocation(MAP_ZOOM, "u_MapZoom");
-        });
+    });
 }
 
 void ShaderManager::addMultiTexture(const std::string_view name, const std::string_view file)
@@ -134,7 +134,7 @@ void ShaderManager::addMultiTexture(const std::string_view name, const std::stri
         const auto& shader = getShader(name);
         if (!shader) return;
         shader->addMultiTexture(filePath);
-        });
+    });
 }
 
 PainterShaderProgramPtr ShaderManager::getShader(const std::string_view name)

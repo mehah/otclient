@@ -60,7 +60,6 @@ public:
     uint8_t getFeet() const { return m_feet; }
     uint8_t getAddons() const { return m_addons; }
 
-
     bool hasMount() const { return m_mount > 0; }
 
     ThingCategory getCategory() const { return m_category; }

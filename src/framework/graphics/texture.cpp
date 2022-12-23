@@ -73,7 +73,7 @@ Texture::~Texture()
     if (g_graphics.ok() && m_id != 0) {
         g_mainDispatcher.addEvent([id = m_id]() {
             glDeleteTextures(1, &id);
-            });
+        });
     }
 }
 
@@ -186,9 +186,9 @@ bool Texture::setupSize(const Size& size)
     // checks texture max size
     if (std::max<int>(glSize.width(), glSize.height()) > g_graphics.getMaxTextureSize()) {
         g_logger.error(stdext::format("loading texture with size %dx%d failed, "
-            "the maximum size allowed by the graphics card is %dx%d,"
-            "to prevent crashes the texture will be displayed as a blank texture",
-            size.width(), size.height(), g_graphics.getMaxTextureSize(), g_graphics.getMaxTextureSize()));
+                       "the maximum size allowed by the graphics card is %dx%d,"
+                       "to prevent crashes the texture will be displayed as a blank texture",
+                       size.width(), size.height(), g_graphics.getMaxTextureSize(), g_graphics.getMaxTextureSize()));
         return false;
     }
 

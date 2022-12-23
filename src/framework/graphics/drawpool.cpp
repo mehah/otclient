@@ -127,14 +127,14 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const DrawMeth
         }
 
         m_objectsByhash.emplace(stateHash,
-            m_objects[m_currentFloor][m_currentOrder = static_cast<uint8_t>(buffer->m_order)]
-            .emplace_back(state, buffer));
+                                m_objects[m_currentFloor][m_currentOrder = static_cast<uint8_t>(buffer->m_order)]
+                                .emplace_back(state, buffer));
 
         return;
     }
 
     m_currentOrder = static_cast<uint8_t>(m_type == DrawPoolType::FOREGROUND ? DrawPool::DrawOrder::FIRST :
-        drawBuffer ? drawBuffer->m_order : DrawPool::DrawOrder::THIRD);
+                                          drawBuffer ? drawBuffer->m_order : DrawPool::DrawOrder::THIRD);
 
     auto& list = m_objects[m_currentFloor][m_currentOrder];
 

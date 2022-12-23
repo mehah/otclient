@@ -66,7 +66,8 @@ enum OTBM_NodeTypes_t
     OTBM_WAYPOINT = 16
 };
 
-enum OTBM_ItemAttr {
+enum OTBM_ItemAttr
+{
     OTBM_ATTR_DESCRIPTION = 1,
     OTBM_ATTR_EXT_FILE = 2,
     OTBM_ATTR_TILE_FLAGS = 3,
@@ -273,10 +274,10 @@ public:
     std::vector<StaticTextPtr> getStaticTexts() { return m_staticTexts; }
 
     std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> findPath(const Position& start, const Position& goal,
-        int maxComplexity, int flags = 0);
+                                                                          int maxComplexity, int flags = 0);
     PathFindResult_ptr newFindPath(const Position& start, const Position& goal, const std::shared_ptr<std::list<Node*>>& visibleNodes);
     void findPathAsync(const Position& start, const Position& goal,
-        const std::function<void(PathFindResult_ptr)>& callback);
+                       const std::function<void(PathFindResult_ptr)>& callback);
 
     void setFloatingEffect(bool enable) { m_floatingEffect = enable; }
     bool isDrawingFloatingEffects() { return m_floatingEffect; }

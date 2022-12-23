@@ -48,7 +48,8 @@ public:
     bool canDrawOnUI() { return m_canDrawOnUI; }
 
 private:
-    struct DirControl {
+    struct DirControl
+    {
         bool onTop{ false };
         Point offset;
     };

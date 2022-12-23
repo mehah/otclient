@@ -156,7 +156,8 @@ protected:
 private:
     static void addCoords(const DrawPool::DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode);
 
-    enum STATE_TYPE : uint32_t {
+    enum STATE_TYPE : uint32_t
+    {
         STATE_OPACITY = 1 << 0,
         STATE_CLIP_RECT = 1 << 1,
         STATE_SHADER_PROGRAM = 1 << 2,
@@ -168,8 +169,8 @@ private:
     static DrawPool* create(const DrawPoolType type);
 
     void add(const Color& color, const TexturePtr& texture, const DrawPool::DrawMethod& method,
-        DrawMode drawMode = DrawMode::TRIANGLES, const DrawBufferPtr& drawBuffer = nullptr,
-        const CoordsBufferPtr& coordsBuffer = nullptr);
+             DrawMode drawMode = DrawMode::TRIANGLES, const DrawBufferPtr& drawBuffer = nullptr,
+             const CoordsBufferPtr& coordsBuffer = nullptr);
 
     void updateHash(const PoolState& state, const DrawPool::DrawMethod& method, size_t& stateHash, size_t& methodHash);
 

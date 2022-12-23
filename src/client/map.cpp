@@ -492,7 +492,7 @@ void Map::removeUnawareThings()
             ++it;
     }
 
-    /*if (!g_game.getFeature(Otc::GameKeepUnawareTiles)) {
+    if (!g_game.getFeature(Otc::GameKeepUnawareTiles)) {
         // remove tiles that we are not aware anymore
         for (int_fast8_t z = -1; ++z <= MAX_Z;) {
             auto& tileBlocks = m_tileBlocks[z];
@@ -517,7 +517,7 @@ void Map::removeUnawareThings()
                     ++it;
             }
         }
-    } */
+    }
 }
 
 void Map::setCentralPosition(const Position& centralPosition)
@@ -551,7 +551,7 @@ void Map::setCentralPosition(const Position& centralPosition)
             localPlayer->onAppear();
             g_logger.debug("forced player position update");
         }
-        });
+    });
 
     for (const MapViewPtr& mapView : m_mapViews)
         mapView->onMapCenterChange(centralPosition, mapView->m_lastCameraPosition);
@@ -682,9 +682,9 @@ bool Map::isAwareOfPosition(const Position& pos)
     }
 
     return m_centralPosition.isInRange(groundedPos, m_awareRange.left,
-        m_awareRange.right,
-        m_awareRange.top,
-        m_awareRange.bottom);
+                                       m_awareRange.right,
+                                       m_awareRange.top,
+                                       m_awareRange.bottom);
 }
 
 void Map::setAwareRange(const AwareRange& range)
@@ -892,7 +892,7 @@ void Map::resetLastCamera()
 }
 
 PathFindResult_ptr Map::newFindPath(const Position& start, const Position& goal, const std::shared_ptr<std::list<Node*>>
-    & visibleNodes)
+                                    & visibleNodes)
 {
     auto ret = std::make_shared<PathFindResult>();
     ret->start = start;
@@ -1018,7 +1018,7 @@ PathFindResult_ptr Map::newFindPath(const Position& start, const Position& goal,
 }
 
 void Map::findPathAsync(const Position& start, const Position& goal, const std::function<void(PathFindResult_ptr)>&
-    callback)
+                        callback)
 {
     const auto visibleNodes = std::make_shared<std::list<Node*>>();
     for (const auto& tile : getTiles(start.z)) {
@@ -1037,5 +1037,5 @@ void Map::findPathAsync(const Position& start, const Position& goal, const std::
     g_asyncDispatcher.dispatch([=] {
         const auto ret = g_map.newFindPath(start, goal, visibleNodes);
         g_dispatcher.addEvent(std::bind(callback, ret));
-        });
+    });
 }

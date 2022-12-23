@@ -398,10 +398,10 @@ const char* TiXmlBase::ReadName(const char* p, TIXML_STRING* name, TiXmlEncoding
         const char* start = p;
         while (p && *p
                && (IsAlphaNum(static_cast<uint8_t>(*p), encoding)
-                   || *p == '_'
-                   || *p == '-'
-                   || *p == '.'
-                   || *p == ':')) {
+               || *p == '_'
+               || *p == '-'
+               || *p == '.'
+               || *p == ':')) {
             //(*name) += *p; // expensive
             ++p;
         }

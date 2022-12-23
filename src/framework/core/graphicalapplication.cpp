@@ -51,11 +51,11 @@ void GraphicalApplication::init(std::vector<std::string>& args)
     g_window.setOnResize([this](auto&& PH1) {
         if (!m_running) resize(PH1);
         else g_dispatcher.addEvent([&, PH1] { resize(PH1); });
-        });
+    });
 
     g_window.setOnInputEvent([this](auto&& PH1) {
         g_dispatcher.addEvent([&, PH1]() {inputEvent(std::forward<decltype(PH1)>(PH1)); });
-        });
+    });
 
     g_window.setOnClose([this] { g_dispatcher.addEvent([&]() {close(); }); });
 
@@ -159,7 +159,7 @@ void GraphicalApplication::run()
         }
 
         foreCondition.notify_all();
-        });
+    });
 
     std::jthread t2([&](std::stop_token st) {
         std::unique_lock lock(foreMutex);
@@ -168,8 +168,8 @@ void GraphicalApplication::run()
             g_ui.render(Fw::ForegroundPane);
 
             return st.stop_requested();
-            });
         });
+    });
 
     m_running = true;
     while (!m_stopping) {

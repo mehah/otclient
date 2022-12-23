@@ -113,7 +113,8 @@ enum ThingAttr : uint8_t
     ThingLastAttr = 255
 };
 
-enum ThingFlagAttr :uint64_t {
+enum ThingFlagAttr :uint64_t
+{
     ThingFlagAttrNone = 0,
     ThingFlagAttrGround = 1 << 0,
     ThingFlagAttrGroundBorder = 1 << 1,
@@ -162,7 +163,8 @@ enum ThingFlagAttr :uint64_t {
     ThingFlagAttrDefaultAction = static_cast<uint64_t>(1) << 44
 };
 
-enum PLAYER_ACTION : uint8_t {
+enum PLAYER_ACTION : uint8_t
+{
     PLAYER_ACTION_NONE = 0,
     PLAYER_ACTION_LOOK = 1,
     PLAYER_ACTION_USE = 2,
@@ -170,7 +172,8 @@ enum PLAYER_ACTION : uint8_t {
     PLAYER_ACTION_AUTOWALK_HIGHLIGHT = 4
 };
 
-enum ITEM_CATEGORY : uint8_t {
+enum ITEM_CATEGORY : uint8_t
+{
     ITEM_CATEGORY_ARMORS = 1,
     ITEM_CATEGORY_AMULETS = 2,
     ITEM_CATEGORY_BOOTS = 3,
@@ -367,8 +370,10 @@ private:
     static ThingFlagAttr thingAttrToThingFlagAttr(ThingAttr attr);
     static Size getBestTextureDimension(int w, int h, int count);
 
-    struct TextureData {
-        struct Pos {
+    struct TextureData
+    {
+        struct Pos
+        {
             Rect rects;
             Rect originRects;
             Point offsets;

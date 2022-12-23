@@ -978,7 +978,7 @@ bool UIWidget::setRect(const Rect& rect)
             self->m_updateEventScheduled = false;
             if (oldRect != self->getRect())
                 self->onGeometryChange(oldRect, self->getRect());
-            });
+        });
         m_updateEventScheduled = true;
     }
 
@@ -1472,7 +1472,7 @@ void UIWidget::updateStyle()
         g_dispatcher.addEvent([self] {
             self->m_updateStyleScheduled = false;
             self->updateStyle();
-            });
+        });
         m_updateStyleScheduled = true;
         return;
     }

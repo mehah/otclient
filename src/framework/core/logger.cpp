@@ -81,7 +81,7 @@ void Logger::log(Fw::LogLevel level, const std::string_view message)
         g_dispatcher.addEvent([this, level, outmsg, now] {
             if (m_onLog)
                 m_onLog(level, outmsg, now);
-            });
+        });
     }
 
     if (level == Fw::LogFatal) {

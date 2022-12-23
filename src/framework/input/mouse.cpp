@@ -43,8 +43,8 @@ void Mouse::loadCursors(const std::string& filename)
 
         for (const auto& cursorNode : cursorsNode->children())
             addCursor(cursorNode->tag(),
-            stdext::resolve_path(cursorNode->valueAt("image"), cursorNode->source()),
-            cursorNode->valueAt<Point>("hot-spot"));
+                      stdext::resolve_path(cursorNode->valueAt("image"), cursorNode->source()),
+                      cursorNode->valueAt<Point>("hot-spot"));
     } catch (stdext::exception& e) {
         g_logger.error(stdext::format("unable to load cursors file: %s", e.what()));
     }

@@ -395,5 +395,5 @@ void UIWidget::setIcon(const std::string& iconFile)
         }
 
         repaint();
-        });
+    });
 }

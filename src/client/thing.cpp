@@ -101,7 +101,7 @@ void Thing::attachEffect(const AttachedEffectPtr& obj) {
 
 bool Thing::detachEffectById(uint16_t id) {
     const auto it = std::find_if(m_attachedEffects.begin(), m_attachedEffects.end(),
-        [id](const AttachedEffectPtr& obj) { return obj->getId() == id; });
+                                 [id](const AttachedEffectPtr& obj) { return obj->getId() == id; });
 
     if (it == m_attachedEffects.end())
         return false;
@@ -120,7 +120,7 @@ void Thing::clearAttachedEffects() {
 
 AttachedEffectPtr Thing::getAttachedEffectById(uint16_t id) {
     const auto it = std::find_if(m_attachedEffects.begin(), m_attachedEffects.end(),
-        [id](const AttachedEffectPtr& obj) { return obj->getId() == id; });
+                                 [id](const AttachedEffectPtr& obj) { return obj->getId() == id; });
 
     if (it == m_attachedEffects.end())
         return nullptr;
