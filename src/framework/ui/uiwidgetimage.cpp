@@ -25,6 +25,7 @@
 #include <framework/graphics/painter.h>
 #include <framework/graphics/texture.h>
 #include <framework/graphics/texturemanager.h>
+#include <framework/core/eventdispatcher.h>
 
 void UIWidget::initImage() {}
 
@@ -180,8 +181,7 @@ void UIWidget::setImageSource(const std::string_view source)
         return;
     }
 
-    m_imageTexture = g_textures.getTexture(m_imageSource = std::string{ source });
-
+    m_imageTexture = g_textures.getTexture(m_imageSource = source);
     if (!m_rect.isValid() || m_imageAutoResize) {
         const Size imageSize = m_imageTexture->getSize();
 

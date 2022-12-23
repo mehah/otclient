@@ -185,7 +185,7 @@ void Game::processGameStart()
             g_lua.callGlobalField("g_game", "onConnectionFailing", false);
             m_connectionFailWarned = false;
         }
-        }, 1000);
+    }, 1000);
 }
 
 void Game::processGameEnd()
@@ -398,7 +398,7 @@ void Game::processRemoveAutomapFlag(const Position& pos, int icon, const std::st
 }
 
 void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<int, std::string, int> >& outfitList,
-    const std::vector<std::tuple<int, std::string> >& mountList)
+                                   const std::vector<std::tuple<int, std::string> >& mountList)
 {
     // create virtual creature outfit
     const auto virtualOutfitCreature = CreaturePtr(new Creature);
@@ -472,8 +472,8 @@ void Game::processQuestLine(int questId, const std::vector<std::tuple<std::strin
 }
 
 void Game::processModalDialog(uint32_t id, const std::string_view title, const std::string_view message, const std::vector<std::tuple<int, std::string> >
-    & buttonList, int enterButton, int escapeButton, const std::vector<std::tuple<int, std::string> >
-    & choiceList, bool priority)
+                              & buttonList, int enterButton, int escapeButton, const std::vector<std::tuple<int, std::string> >
+                              & choiceList, bool priority)
 {
     g_lua.callGlobalField("g_game", "onModalDialog", id, title, message, buttonList, enterButton, escapeButton, choiceList, priority);
 }

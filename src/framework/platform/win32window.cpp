@@ -26,6 +26,8 @@
 #include <client/map.h>
 #include <framework/core/application.h>
 #include <framework/core/resourcemanager.h>
+#include <framework/core/eventdispatcher.h>
+
 #include <framework/graphics/image.h>
 
 #define HSB_BIT_SET(p, n) (p[(n)/8] |= (128 >>((n)%8)))
@@ -203,6 +205,8 @@ WIN32Window::WIN32Window()
 
 void WIN32Window::init()
 {
+    timeBeginPeriod(1);
+
     m_instance = GetModuleHandle(nullptr);
 
 #ifdef DIRECTX
@@ -217,11 +221,11 @@ void WIN32Window::init()
 
     // create a device class using this information and information from the d3dpp stuct
     m_d3d->CreateDevice(D3DADAPTER_DEFAULT,
-        D3DDEVTYPE_HAL,
-        m_window,
-        D3DCREATE_SOFTWARE_VERTEXPROCESSING,
-        &d3dpp,
-        &m_d3ddev);
+                        D3DDEVTYPE_HAL,
+                        m_window,
+                        D3DCREATE_SOFTWARE_VERTEXPROCESSING,
+                        &d3dpp,
+                        &m_d3ddev);
 
 #endif
 
@@ -261,6 +265,8 @@ void WIN32Window::terminate()
             g_logger.error("UnregisterClassA failed");
         m_instance = nullptr;
     }
+
+    timeEndPeriod(1);
 }
 
 struct WindowProcProxy
@@ -299,17 +305,17 @@ void WIN32Window::internalCreateWindow()
 
     updateUnmaximizedCoords();
     m_window = CreateWindowExA(dwExStyle,
-        g_app.getCompactName().data(),
-        nullptr,
-        dwStyle,
-        screenRect.left(),
-        screenRect.top(),
-        screenRect.width(),
-        screenRect.height(),
-        nullptr,
-        nullptr,
-        m_instance,
-        nullptr);
+                               g_app.getCompactName().data(),
+                               nullptr,
+                               dwStyle,
+                               screenRect.left(),
+                               screenRect.top(),
+                               screenRect.width(),
+                               screenRect.height(),
+                               nullptr,
+                               nullptr,
+                               m_instance,
+                               nullptr);
 
     if (!m_window)
         g_logger.fatal("Unable to create window");
@@ -463,51 +469,60 @@ void* WIN32Window::getExtensionProcAddress(const char* ext)
 
 void WIN32Window::move(const Point& pos)
 {
-    const Rect clientRect(pos, getClientRect().size());
-    const Rect windowRect = adjustWindowRect(clientRect);
-    MoveWindow(m_window, windowRect.x(), windowRect.y(), windowRect.width(), windowRect.height(), TRUE);
-    if (m_hidden)
-        ShowWindow(m_window, SW_HIDE);
+    g_mainDispatcher.addEvent([&, pos] {
+        const Rect clientRect(pos, getClientRect().size());
+        const Rect windowRect = adjustWindowRect(clientRect);
+        MoveWindow(m_window, windowRect.x(), windowRect.y(), windowRect.width(), windowRect.height(), TRUE);
+        if (m_hidden)
+            ShowWindow(m_window, SW_HIDE);
+    });
 }
 
 void WIN32Window::resize(const Size& size)
 {
-    if (size.width() < m_minimumSize.width() || size.height() < m_minimumSize.height())
-        return;
-    const Rect clientRect(getClientRect().topLeft(), size);
-    const Rect windowRect = adjustWindowRect(clientRect);
-    MoveWindow(m_window, windowRect.x(), windowRect.y(), windowRect.width(), windowRect.height(), TRUE);
-    if (m_hidden)
-        ShowWindow(m_window, SW_HIDE);
+    g_mainDispatcher.addEvent([&, size] {
+        if (size.width() < m_minimumSize.width() || size.height() < m_minimumSize.height())
+            return;
+        const Rect clientRect(getClientRect().topLeft(), size);
+        const Rect windowRect = adjustWindowRect(clientRect);
+        MoveWindow(m_window, windowRect.x(), windowRect.y(), windowRect.width(), windowRect.height(), TRUE);
+        if (m_hidden)
+            ShowWindow(m_window, SW_HIDE);
+    });
 }
 
 void WIN32Window::show()
 {
-    m_hidden = false;
-    if (m_maximized)
-        ShowWindow(m_window, SW_MAXIMIZE);
-    else
-        ShowWindow(m_window, SW_SHOW);
+    g_mainDispatcher.addEvent([&] {
+        m_hidden = false;
+        if (m_maximized)
+            ShowWindow(m_window, SW_MAXIMIZE);
+        else
+            ShowWindow(m_window, SW_SHOW);
+    });
 }
 
 void WIN32Window::hide()
 {
-    m_hidden = true;
-    ShowWindow(m_window, SW_HIDE);
+    g_mainDispatcher.addEvent([&] {
+        m_hidden = true;
+        ShowWindow(m_window, SW_HIDE);
+    });
 }
 
 void WIN32Window::maximize()
 {
-    if (!m_hidden)
-        ShowWindow(m_window, SW_MAXIMIZE);
-    else
-        m_maximized = true;
+    g_mainDispatcher.addEvent([&] {
+        if (!m_hidden)
+            ShowWindow(m_window, SW_MAXIMIZE);
+        else
+            m_maximized = true;
+    });
 }
 
 void WIN32Window::poll()
 {
     fireKeysPress();
-
     MSG msg;
     while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
         TranslateMessage(&msg);
@@ -874,144 +889,160 @@ int WIN32Window::internalLoadMouseCursor(const ImagePtr& image, const Point& hot
 
 void WIN32Window::setMouseCursor(int cursorId)
 {
-    if (cursorId >= static_cast<int>(m_cursors.size()) || cursorId < 0)
-        return;
+    g_mainDispatcher.addEvent([&, cursorId] {
+        if (cursorId >= static_cast<int>(m_cursors.size()) || cursorId < 0)
+            return;
 
-    m_cursor = m_cursors[cursorId];
-    SetCursor(m_cursor);
-    ShowCursor(true);
+        m_cursor = m_cursors[cursorId];
+        SetCursor(m_cursor);
+        ShowCursor(true);
+    });
 }
 
 void WIN32Window::restoreMouseCursor()
 {
-    if (m_cursor) {
-        m_cursor = nullptr;
-        SetCursor(m_defaultCursor);
-        ShowCursor(true);
-    }
+    g_mainDispatcher.addEvent([&] {
+        if (m_cursor) {
+            m_cursor = nullptr;
+            SetCursor(m_defaultCursor);
+            ShowCursor(true);
+        }
+    });
 }
 
 void WIN32Window::setTitle(const std::string_view title)
 {
-    SetWindowTextW(m_window, stdext::latin1_to_utf16(title).data());
+    g_mainDispatcher.addEvent([&, title = std::string{ title }] {
+        SetWindowTextW(m_window, stdext::latin1_to_utf16(title).data());
+    });
 }
 
 void WIN32Window::setMinimumSize(const Size& minimumSize)
 {
-    m_minimumSize = minimumSize;
+    g_mainDispatcher.addEvent([&, minimumSize] {
+        m_minimumSize = minimumSize;
+    });
 }
 
 void WIN32Window::setFullscreen(bool fullscreen)
 {
-    if (m_fullscreen == fullscreen)
-        return;
+    g_mainDispatcher.addEvent([&, fullscreen] {
+        if (m_fullscreen == fullscreen)
+            return;
 
-    m_fullscreen = fullscreen;
+        m_fullscreen = fullscreen;
 
-    const DWORD dwStyle = GetWindowLong(m_window, GWL_STYLE);
-    static WINDOWPLACEMENT wpPrev;
-    wpPrev.length = sizeof(wpPrev);
+        const DWORD dwStyle = GetWindowLong(m_window, GWL_STYLE);
+        static WINDOWPLACEMENT wpPrev;
+        wpPrev.length = sizeof(wpPrev);
 
-    if (fullscreen) {
-        MONITORINFO mi;
-        const HMONITOR m = MonitorFromWindow(m_window, MONITOR_DEFAULTTONEAREST);
-        mi.cbSize = sizeof(mi);
-        GetMonitorInfoW(m, &mi);
-        const uint32_t x = mi.rcMonitor.left;
-        const uint32_t y = mi.rcMonitor.top;
-        const uint32_t width = mi.rcMonitor.right - mi.rcMonitor.left;
-        const uint32_t height = mi.rcMonitor.bottom - mi.rcMonitor.top;
+        if (fullscreen) {
+            MONITORINFO mi;
+            const HMONITOR m = MonitorFromWindow(m_window, MONITOR_DEFAULTTONEAREST);
+            mi.cbSize = sizeof(mi);
+            GetMonitorInfoW(m, &mi);
+            const uint32_t x = mi.rcMonitor.left;
+            const uint32_t y = mi.rcMonitor.top;
+            const uint32_t width = mi.rcMonitor.right - mi.rcMonitor.left;
+            const uint32_t height = mi.rcMonitor.bottom - mi.rcMonitor.top;
 
-        GetWindowPlacement(m_window, &wpPrev);
+            GetWindowPlacement(m_window, &wpPrev);
 
-        SetWindowLong(m_window, GWL_STYLE, (dwStyle & ~WS_OVERLAPPEDWINDOW) | WS_POPUP | WS_EX_TOPMOST);
-        SetWindowPos(m_window, HWND_TOPMOST, x, y, width, height, SWP_FRAMECHANGED);
-    } else {
-        SetWindowLong(m_window, GWL_STYLE, (dwStyle & ~(WS_POPUP | WS_EX_TOPMOST)) | WS_OVERLAPPEDWINDOW);
-        SetWindowPlacement(m_window, &wpPrev);
-        SetWindowPos(m_window, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-    }
+            SetWindowLong(m_window, GWL_STYLE, (dwStyle & ~WS_OVERLAPPEDWINDOW) | WS_POPUP | WS_EX_TOPMOST);
+            SetWindowPos(m_window, HWND_TOPMOST, x, y, width, height, SWP_FRAMECHANGED);
+        } else {
+            SetWindowLong(m_window, GWL_STYLE, (dwStyle & ~(WS_POPUP | WS_EX_TOPMOST)) | WS_OVERLAPPEDWINDOW);
+            SetWindowPlacement(m_window, &wpPrev);
+            SetWindowPos(m_window, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+        }
+    });
 }
 
 void WIN32Window::setVerticalSync(bool enable)
 {
-    m_vsync = enable;
+    g_mainDispatcher.addEvent([&, enable] {
+        m_vsync = enable;
 #ifdef OPENGL_ES
-    eglSwapInterval(m_eglDisplay, enable);
+        eglSwapInterval(m_eglDisplay, enable);
 #else
-    if (!isExtensionSupported("WGL_EXT_swap_control"))
-        return;
+        if (!isExtensionSupported("WGL_EXT_swap_control"))
+            return;
 
-    using wglSwapIntervalProc = BOOL(WINAPI*)(int);
-    const auto wglSwapInterval = static_cast<wglSwapIntervalProc>(getExtensionProcAddress("wglSwapIntervalEXT"));
-    if (!wglSwapInterval)
-        return;
+        using wglSwapIntervalProc = BOOL(WINAPI*)(int);
+        const auto wglSwapInterval = static_cast<wglSwapIntervalProc>(getExtensionProcAddress("wglSwapIntervalEXT"));
+        if (!wglSwapInterval)
+            return;
 
-    wglSwapInterval(enable);
+        wglSwapInterval(enable);
 #endif
+    });
 }
 
 void WIN32Window::setIcon(const std::string& file)
 {
-    const auto& image = Image::load(file);
+    g_mainDispatcher.addEvent([&, file] {
+        const auto& image = Image::load(file);
 
-    if (!image) {
-        g_logger.traceError(stdext::format("unable to load icon file %s", file));
-        return;
-    }
+        if (!image) {
+            g_logger.traceError(stdext::format("unable to load icon file %s", file));
+            return;
+        }
 
-    if (image->getBpp() != 4) {
-        g_logger.error("the app icon must have 4 channels");
-        return;
-    }
+        if (image->getBpp() != 4) {
+            g_logger.error("the app icon must have 4 channels");
+            return;
+        }
 
-    const int n = image->getWidth() * image->getHeight();
-    std::vector<uint32_t > iconData(n);
-    for (int i = 0; i < n; ++i) {
-        auto* const pixel = (uint8_t*)&iconData[i];
-        pixel[2] = *(image->getPixelData() + (i * 4) + 0);
-        pixel[1] = *(image->getPixelData() + (i * 4) + 1);
-        pixel[0] = *(image->getPixelData() + (i * 4) + 2);
-        pixel[3] = *(image->getPixelData() + (i * 4) + 3);
-    }
+        const int n = image->getWidth() * image->getHeight();
+        std::vector<uint32_t > iconData(n);
+        for (int i = 0; i < n; ++i) {
+            auto* const pixel = (uint8_t*)&iconData[i];
+            pixel[2] = *(image->getPixelData() + (i * 4) + 0);
+            pixel[1] = *(image->getPixelData() + (i * 4) + 1);
+            pixel[0] = *(image->getPixelData() + (i * 4) + 2);
+            pixel[3] = *(image->getPixelData() + (i * 4) + 3);
+        }
 
-    const HBITMAP hbmColor = CreateBitmap(image->getWidth(), image->getHeight(), 1, 32, &iconData[0]);
-    const HBITMAP hbmMask = CreateCompatibleBitmap(GetDC(nullptr), image->getWidth(), image->getHeight());
+        const HBITMAP hbmColor = CreateBitmap(image->getWidth(), image->getHeight(), 1, 32, &iconData[0]);
+        const HBITMAP hbmMask = CreateCompatibleBitmap(GetDC(nullptr), image->getWidth(), image->getHeight());
 
-    ICONINFO ii;
-    ii.fIcon = TRUE;
-    ii.hbmColor = hbmColor;
-    ii.hbmMask = hbmMask;
-    ii.xHotspot = 0;
-    ii.yHotspot = 0;
+        ICONINFO ii;
+        ii.fIcon = TRUE;
+        ii.hbmColor = hbmColor;
+        ii.hbmMask = hbmMask;
+        ii.xHotspot = 0;
+        ii.yHotspot = 0;
 
-    HICON icon = CreateIconIndirect(&ii);
-    DeleteObject(hbmMask);
-    DeleteObject(hbmColor);
+        HICON icon = CreateIconIndirect(&ii);
+        DeleteObject(hbmMask);
+        DeleteObject(hbmColor);
 
-    SendMessage(m_window, WM_SETICON, ICON_SMALL, (LPARAM)icon);
-    SendMessage(m_window, WM_SETICON, ICON_BIG, (LPARAM)icon);
+        SendMessage(m_window, WM_SETICON, ICON_SMALL, (LPARAM)icon);
+        SendMessage(m_window, WM_SETICON, ICON_BIG, (LPARAM)icon);
+    });
 }
 
 void WIN32Window::setClipboardText(const std::string_view text)
 {
-    if (!OpenClipboard(m_window))
-        return;
+    g_mainDispatcher.addEvent([&, text = std::string{ text }] {
+        if (!OpenClipboard(m_window))
+            return;
 
-    const HGLOBAL hglb = GlobalAlloc(GMEM_MOVEABLE, (text.length() + 1) * sizeof(WCHAR));
-    if (!hglb)
-        return;
+        const HGLOBAL hglb = GlobalAlloc(GMEM_MOVEABLE, (text.length() + 1) * sizeof(WCHAR));
+        if (!hglb)
+            return;
 
-    const std::wstring wtext = stdext::latin1_to_utf16(text);
+        const std::wstring wtext = stdext::latin1_to_utf16(text);
 
-    auto* lpwstr = static_cast<LPWSTR>(GlobalLock(hglb));
-    memcpy(lpwstr, &wtext[0], wtext.length() * sizeof(WCHAR));
-    lpwstr[text.length()] = static_cast<WCHAR>(0);
-    GlobalUnlock(hglb);
+        auto* lpwstr = static_cast<LPWSTR>(GlobalLock(hglb));
+        memcpy(lpwstr, &wtext[0], wtext.length() * sizeof(WCHAR));
+        lpwstr[text.length()] = static_cast<WCHAR>(0);
+        GlobalUnlock(hglb);
 
-    EmptyClipboard();
-    SetClipboardData(CF_UNICODETEXT, hglb);
-    CloseClipboard();
+        EmptyClipboard();
+        SetClipboardData(CF_UNICODETEXT, hglb);
+        CloseClipboard();
+    });
 }
 
 Size WIN32Window::getDisplaySize()

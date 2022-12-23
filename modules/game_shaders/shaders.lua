@@ -120,11 +120,11 @@ end
 
 function attachShaders()
     local map = modules.game_interface.getMapPanel()
-    map:setMapShader(g_shaders.getShader('Default'))
+    map:setMapShader('Default')
 
     local player = g_game.getLocalPlayer()
-    player:setShader(g_shaders.getShader('Default'))
-    player:setMountShader(g_shaders.getShader('Default'))
+    player:setShader('Default')
+    player:setMountShader('Default')
 
     connect(g_game.getLocalPlayer(), {
         onWalkEnd = onWalkEvent --[[, onAutoWalk = function() end]]
@@ -146,14 +146,14 @@ function init()
     local mapComboBox = shadersPanel:getChildById('mapComboBox')
     mapComboBox.onOptionChange = function(combobox, option)
         local map = modules.game_interface.getMapPanel()
-        map:setMapShader(g_shaders.getShader(option))
+        map:setMapShader(option)
     end
 
     local outfitComboBox = shadersPanel:getChildById('outfitComboBox')
     outfitComboBox.onOptionChange = function(combobox, option)
         local player = g_game.getLocalPlayer()
         if player then
-            player:setShader(g_shaders.getShader(option))
+            player:setShader(option)
             local data = combobox:getCurrentOption().data
             player:setDrawOutfitColor(data.drawColor ~= false)
         end
@@ -163,7 +163,7 @@ function init()
     mountComboBox.onOptionChange = function(combobox, option)
         local player = g_game.getLocalPlayer()
         if player then
-            player:setMountShader(g_shaders.getShader(option))
+            player:setMountShader(option)
         end
     end
 
@@ -173,18 +173,17 @@ function init()
 
         if fragmentShaderPath ~= nil then
             --  local shader = g_shaders.createShader()
-            local shader = g_shaders.createFragmentShader(opts.name, opts.frag)
+            g_shaders.createFragmentShader(opts.name, opts.frag)
 
             if opts.tex1 then
-                shader:addMultiTexture(opts.tex1)
+                g_shaders.addMultiTexture(opts.name, opts.tex1)
             end
             if opts.tex2 then
-                shader:addMultiTexture(opts.tex2)
+                g_shaders.addMultiTexture(opts.name, opts.tex2)
             end
 
             -- Setup proper uniforms
-            g_shaders[method](shader)
-            g_shaders.registerShader(opts.name, shader)
+            g_shaders[method](opts.name)
         end
     end
 

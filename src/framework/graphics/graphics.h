@@ -39,15 +39,20 @@ public:
     int getMaxTextureSize() { return m_maxTextureSize; }
     const Size& getViewportSize() { return m_viewportSize; }
 
-    std::string getVendor() { return (const char*)glGetString(GL_VENDOR); }
-    std::string getRenderer() { return (const char*)glGetString(GL_RENDERER); }
-    std::string getVersion() { return (const char*)glGetString(GL_VERSION); }
-    std::string getExtensions() { return (const char*)glGetString(GL_EXTENSIONS); }
+    std::string getVendor() { return m_vendor; }
+    std::string getRenderer() { return m_renderer; }
+    std::string getVersion() { return m_version; }
+    std::string getExtensions() { return m_extensions; }
 
     bool ok() { return m_ok; }
 
 private:
     bool m_ok{ false };
+
+    std::string m_vendor;
+    std::string m_renderer;
+    std::string m_version;
+    std::string m_extensions;
 
     int m_maxTextureSize{ -1 };
     int m_alphaBits{ 0 };

@@ -23,7 +23,6 @@
 #pragma once
 
 #include <utility>
-#include <optional>
 
 #include "declarations.h"
 #include "framebuffer.h"
@@ -66,7 +65,13 @@ public:
     bool canRepaint() { return canRepaint(false); }
     void repaint() { m_status.first = 1; }
 
-protected:
+    virtual bool isValid() const { return true; };
+
+    void optimize(int size);
+
+    void setScaleFactor(float scale) { m_scaleFactor = scale; }
+    inline float getScaleFactor() const { return m_scaleFactor; }
+
     struct PoolState
     {
         Matrix3 transformMatrix;
@@ -93,6 +98,8 @@ protected:
         }
     };
 
+protected:
+
     enum class DrawMethodType
     {
         RECT,
@@ -105,9 +112,9 @@ protected:
     struct DrawMethod
     {
         DrawMethodType type;
-        std::optional<std::pair<Rect, Rect>> rects;
-        std::optional<std::tuple<Point, Point, Point>> points;
-        std::optional<Point> dest;
+        std::pair<Rect, Rect> rects;
+        std::tuple<Point, Point, Point> points;
+        Point dest;
         uint16_t intValue{ 0 };
     };
 
@@ -121,19 +128,18 @@ protected:
 
         void addMethod(const DrawMethod& method)
         {
-            if (!methods.has_value()) {
-                methods = std::vector<DrawMethod>();
-                methods->emplace_back(*this->method);
-            }
+            if (methods.empty())
+                methods.emplace_back(this->method);
+
             drawMode = DrawMode::TRIANGLES;
-            methods->emplace_back(method);
+            methods.emplace_back(method);
         }
 
         DrawMode drawMode{ DrawMode::TRIANGLES };
         DrawBufferPtr buffer;
-        std::optional<PoolState> state;
-        std::optional<DrawMethod> method;
-        std::optional<std::vector<DrawMethod>> methods;
+        PoolState state;
+        DrawMethod method;
+        std::vector<DrawMethod> methods;
         std::function<void()> action{ nullptr };
     };
 
@@ -148,7 +154,10 @@ protected:
     };
 
 private:
-    enum STATE_TYPE : uint32_t {
+    static void addCoords(const DrawPool::DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode);
+
+    enum STATE_TYPE : uint32_t
+    {
         STATE_OPACITY = 1 << 0,
         STATE_CLIP_RECT = 1 << 1,
         STATE_SHADER_PROGRAM = 1 << 2,
@@ -160,10 +169,9 @@ private:
     static DrawPool* create(const DrawPoolType type);
 
     void add(const Color& color, const TexturePtr& texture, const DrawPool::DrawMethod& method,
-        DrawMode drawMode = DrawMode::TRIANGLES, const DrawBufferPtr& drawBuffer = nullptr,
-        const CoordsBufferPtr& coordsBuffer = nullptr);
+             DrawMode drawMode = DrawMode::TRIANGLES, const DrawBufferPtr& drawBuffer = nullptr,
+             const CoordsBufferPtr& coordsBuffer = nullptr);
 
-    void addCoords(const DrawPool::DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode);
     void updateHash(const PoolState& state, const DrawPool::DrawMethod& method, size_t& stateHash, size_t& methodHash);
 
     float getOpacity() { return m_state.opacity; }
@@ -181,6 +189,18 @@ private:
     void resetShaderProgram() { m_state.shaderProgram = nullptr; }
     void resetCompositionMode() { m_state.compositionMode = CompositionMode::NORMAL; }
     void resetBlendEquation() { m_state.blendEquation = BlendEquation::ADD; }
+
+    void setTransformMatrix(const Matrix3& transformMatrix) { m_transformMatrix = transformMatrix; }
+    void resetTransformMatrix() { setTransformMatrix(DEFAULT_MATRIX3); }
+    void pushTransformMatrix();
+    void popTransformMatrix();
+    void scale(float x, float y);
+    void scale(float factor) { scale(factor, factor); }
+    void translate(float x, float y);
+    void translate(const Point& p) { translate(p.x, p.y); }
+    void rotate(float angle);
+    void rotate(float x, float y, float angle);
+    void rotate(const Point& p, float angle) { rotate(p.x, p.y, angle); }
 
     void clear();
     void flush()
@@ -216,6 +236,11 @@ private:
     std::vector<DrawObject> m_objects[ARR_MAX_Z][static_cast<uint8_t>(DrawOrder::LAST)];
     stdext::map<size_t, DrawObject> m_objectsByhash;
 
+    std::vector<Matrix3> m_transformMatrixStack;
+    Matrix3 m_transformMatrix;
+
+    float m_scaleFactor{ 1.f };
+
     friend DrawPoolManager;
 };
 
@@ -225,8 +250,9 @@ public:
     void onBeforeDraw(std::function<void()> f) { m_beforeDraw = std::move(f); }
     void onAfterDraw(std::function<void()> f) { m_afterDraw = std::move(f); }
     void setSmooth(bool enabled) { m_framebuffer->setSmooth(enabled); }
-    void resize(const Size& size) { m_framebuffer->resize(size); }
+    void resize(const Size& size) { if (m_framebuffer->resize(size)) repaint(); }
     Size getSize() { return m_framebuffer->getSize(); }
+    bool isValid() const override { return m_framebuffer->isValid(); }
 
 protected:
     DrawPoolFramed(const FrameBufferPtr& fb) : m_framebuffer(fb) {};
@@ -235,7 +261,7 @@ protected:
     friend DrawPool;
 
 private:
-    bool hasFrameBuffer() const override { return true; }
+    bool hasFrameBuffer() const override { return m_framebuffer->isValid(); }
     DrawPoolFramed* toPoolFramed() override { return this; }
 
     FrameBufferPtr m_framebuffer;

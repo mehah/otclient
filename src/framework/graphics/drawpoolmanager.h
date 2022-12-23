@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include <framework/core/graphicalapplication.h>
 #include <framework/graphics/declarations.h>
 #include <framework/graphics/framebuffer.h>
 #include <framework/graphics/graphics.h>
@@ -36,7 +35,7 @@ public:
 
     void optimize(int size);
 
-    void select(DrawPoolType type) { m_currentPool = get<DrawPool>(type); }
+    void select(DrawPoolType type);
     void use(DrawPoolType type);
     void use(DrawPoolType type, const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha);
 
@@ -50,26 +49,41 @@ public:
     void addBoundingRect(const Rect& dest, const Color& color = Color::white, int innerLineWidth = 1);
     void addAction(std::function<void()> action);
 
-    void setOpacity(const float opacity, bool onlyOnce = false) { m_currentPool->setOpacity(opacity, onlyOnce); }
-    void setClipRect(const Rect& clipRect, bool onlyOnce = false) { m_currentPool->setClipRect(clipRect, onlyOnce); }
-    void setBlendEquation(BlendEquation equation, bool onlyOnce = false) { m_currentPool->setBlendEquation(equation, onlyOnce); }
-    void setCompositionMode(const CompositionMode mode, bool onlyOnce = false) { m_currentPool->setCompositionMode(mode, onlyOnce); }
-    void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onlyOnce = false, const std::function<void()>& action = nullptr) { m_currentPool->setShaderProgram(shaderProgram, onlyOnce, action); }
+    void setOpacity(const float opacity, bool onlyOnce = false) { getCurrentPool()->setOpacity(opacity, onlyOnce); }
+    void setClipRect(const Rect& clipRect, bool onlyOnce = false) { getCurrentPool()->setClipRect(clipRect, onlyOnce); }
+    void setBlendEquation(BlendEquation equation, bool onlyOnce = false) { getCurrentPool()->setBlendEquation(equation, onlyOnce); }
+    void setCompositionMode(const CompositionMode mode, bool onlyOnce = false) { getCurrentPool()->setCompositionMode(mode, onlyOnce); }
+    void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onlyOnce = false, const std::function<void()>& action = nullptr) { getCurrentPool()->setShaderProgram(shaderProgram, onlyOnce, action); }
 
-    float getOpacity() { return m_currentPool->getOpacity(); }
-    Rect getClipRect() { return m_currentPool->getClipRect(); }
+    float getOpacity() { return getCurrentPool()->getOpacity(); }
+    Rect getClipRect() { return getCurrentPool()->getClipRect(); }
 
-    void resetState() { m_currentPool->resetState(); }
-    void resetOpacity() { m_currentPool->resetOpacity(); }
-    void resetClipRect() { m_currentPool->resetClipRect(); }
-    void resetShaderProgram() { m_currentPool->resetShaderProgram(); }
-    void resetCompositionMode() { m_currentPool->resetCompositionMode(); }
+    void resetState() { getCurrentPool()->resetState(); }
+    void resetOpacity() { getCurrentPool()->resetOpacity(); }
+    void resetClipRect() { getCurrentPool()->resetClipRect(); }
+    void resetShaderProgram() { getCurrentPool()->resetShaderProgram(); }
+    void resetCompositionMode() { getCurrentPool()->resetCompositionMode(); }
 
-    void flush() { if (m_currentPool) m_currentPool->flush(); }
+    void pushTransformMatrix() { getCurrentPool()->pushTransformMatrix(); }
+    void popTransformMatrix() { getCurrentPool()->popTransformMatrix(); }
+    void scale(float x, float y) { getCurrentPool()->scale(x, y); }
+    void scale(float factor) { getCurrentPool()->scale(factor); }
+    void translate(float x, float y) { getCurrentPool()->translate(x, y); }
+    void translate(const Point& p) { getCurrentPool()->translate(p); }
+    void rotate(float angle) { getCurrentPool()->rotate(angle); }
+    void rotate(float x, float y, float angle) { getCurrentPool()->rotate(x, y, angle); }
+    void rotate(const Point& p, float angle) { getCurrentPool()->rotate(p, angle); }
 
-    DrawPoolType getCurrentType() const { return m_currentPool->m_type; }
+    void setScaleFactor(float scale) { getCurrentPool()->setScaleFactor(scale); }
+    inline float getScaleFactor() { return getCurrentPool()->getScaleFactor(); }
+
+    void flush() { if (getCurrentPool()) getCurrentPool()->flush(); }
+
+    DrawPoolType getCurrentType() { return getCurrentPool()->m_type; }
 
 private:
+    DrawPool* getCurrentPool();
+
     void draw();
     void init();
     void terminate();
@@ -77,8 +91,6 @@ private:
 
     CoordsBuffer m_coordsBuffer;
     std::array<DrawPool*, static_cast<uint8_t>(DrawPoolType::UNKNOW) + 1> m_pools{};
-
-    DrawPool* m_currentPool{ nullptr };
 
     Size m_size;
     Matrix3 m_transformMatrix;

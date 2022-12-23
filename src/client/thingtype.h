@@ -113,7 +113,8 @@ enum ThingAttr : uint8_t
     ThingLastAttr = 255
 };
 
-enum ThingFlagAttr :uint64_t {
+enum ThingFlagAttr :uint64_t
+{
     ThingFlagAttrNone = 0,
     ThingFlagAttrGround = 1 << 0,
     ThingFlagAttrGroundBorder = 1 << 1,
@@ -162,7 +163,8 @@ enum ThingFlagAttr :uint64_t {
     ThingFlagAttrDefaultAction = static_cast<uint64_t>(1) << 44
 };
 
-enum PLAYER_ACTION : uint8_t {
+enum PLAYER_ACTION : uint8_t
+{
     PLAYER_ACTION_NONE = 0,
     PLAYER_ACTION_LOOK = 1,
     PLAYER_ACTION_USE = 2,
@@ -170,7 +172,8 @@ enum PLAYER_ACTION : uint8_t {
     PLAYER_ACTION_AUTOWALK_HIGHLIGHT = 4
 };
 
-enum ITEM_CATEGORY : uint8_t {
+enum ITEM_CATEGORY : uint8_t
+{
     ITEM_CATEGORY_ARMORS = 1,
     ITEM_CATEGORY_AMULETS = 2,
     ITEM_CATEGORY_BOOTS = 3,
@@ -365,8 +368,12 @@ public:
 
 private:
     static ThingFlagAttr thingAttrToThingFlagAttr(ThingAttr attr);
-    struct TextureData {
-        struct Pos {
+    static Size getBestTextureDimension(int w, int h, int count);
+
+    struct TextureData
+    {
+        struct Pos
+        {
             Rect rects;
             Rect originRects;
             Point offsets;
@@ -378,7 +385,8 @@ private:
         std::vector<Pos> pos;
     };
 
-    static Size getBestTextureDimension(int w, int h, int count);
+    void prepareTextureLoad(const std::vector<Size>& sizes, const std::vector<int>& total_sprites);
+
     uint32_t getSpriteIndex(int w, int h, int l, int x, int y, int z, int a);
     uint32_t getTextureIndex(int l, int x, int y, int z);
 
@@ -388,6 +396,7 @@ private:
     int8_t m_opaque{ -1 };
 
     Size m_size;
+    Size m_textureSize;
     Point m_displacement;
 
     Animator* m_animator{ nullptr };
@@ -404,6 +413,9 @@ private:
     uint8_t m_clothSlot{ 0 };
     uint8_t m_lensHelp{ 0 };
     uint8_t m_elevation{ 0 };
+
+    uint8_t m_textureLayers{ 0 };
+    uint8_t m_colorLayers{ 0 };
 
     PLAYER_ACTION m_defaultAction{ 0 };
 

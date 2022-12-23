@@ -162,7 +162,7 @@ public:
 
     void destroyBuffer() { m_drawBuffer = nullptr; }
 
-    void setShader(const PainterShaderProgramPtr& shader) { m_shader = shader; }
+    void setShader(const std::string_view name);
 
     virtual void onPositionChange(const Position& /*newPos*/, const Position& /*oldPos*/) {}
     virtual void onAppear() {}

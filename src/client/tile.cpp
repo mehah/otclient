@@ -28,6 +28,7 @@
 #include "map.h"
 #include "protocolgame.h"
 #include <framework/core/eventdispatcher.h>
+#include <framework/core/graphicalapplication.h>
 #include <framework/graphics/drawpoolmanager.h>
 
 Tile::Tile(const Position& position) : m_position(position) {}
@@ -52,13 +53,13 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool is
         if (!thing->isGround() && !thing->isGroundBorder())
             break;
 
-        drawThing(thing, dest - m_drawElevation * g_sprites.getScaleFactor(), flags, lightView);
+        drawThing(thing, dest - m_drawElevation * g_drawPool.getScaleFactor(), flags, lightView);
     }
 
     if (hasBottomItem()) {
         for (const auto& item : m_things) {
             if (!item->isOnBottom()) continue;
-            drawThing(item, dest - m_drawElevation * g_sprites.getScaleFactor(), flags, lightView);
+            drawThing(item, dest - m_drawElevation * g_drawPool.getScaleFactor(), flags, lightView);
         }
     }
 
@@ -66,7 +67,7 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool is
         for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
             const auto& item = *it;
             if (!item->isCommon()) continue;
-            drawThing(item, dest - m_drawElevation * g_sprites.getScaleFactor(), flags, lightView);
+            drawThing(item, dest - m_drawElevation * g_drawPool.getScaleFactor(), flags, lightView);
         }
     }
 
@@ -89,7 +90,7 @@ void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags,
         for (const auto& thing : m_things) {
             if (!thing->isCreature() || thing->static_self_cast<Creature>()->isWalking()) continue;
 
-            const Point& cDest = dest - m_drawElevation * g_sprites.getScaleFactor();
+            const Point& cDest = dest - m_drawElevation * g_drawPool.getScaleFactor();
             drawThing(thing, cDest, flags, lightView);
             thing->static_self_cast<Creature>()->drawInformation(mapRect, cDest, isCovered, flags);
         }
@@ -97,8 +98,8 @@ void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags,
 
     for (const auto& creature : m_walkingCreatures) {
         const auto& cDest = Point(
-            dest.x + ((creature->getPosition().x - m_position.x) * SPRITE_SIZE - m_drawElevation) * g_sprites.getScaleFactor(),
-            dest.y + ((creature->getPosition().y - m_position.y) * SPRITE_SIZE - m_drawElevation) * g_sprites.getScaleFactor()
+            dest.x + ((creature->getPosition().x - m_position.x) * SPRITE_SIZE - m_drawElevation) * g_drawPool.getScaleFactor(),
+            dest.y + ((creature->getPosition().y - m_position.y) * SPRITE_SIZE - m_drawElevation) * g_drawPool.getScaleFactor()
         );
         drawThing(creature, cDest, flags, lightView);
         creature->drawInformation(mapRect, cDest, isCovered, flags);
@@ -120,7 +121,7 @@ void Tile::drawTop(const Point& dest, int flags, bool forceDraw, LightView* ligh
         }
 
         for (const auto& effect : m_effects) {
-            effect->drawEffect(dest - m_drawElevation * g_sprites.getScaleFactor(), flags, offsetX, offsetY, lightView);
+            effect->drawEffect(dest - m_drawElevation * g_drawPool.getScaleFactor(), flags, offsetX, offsetY, lightView);
         }
     }
 

@@ -5,7 +5,6 @@
 
 ParsedURI parseURI(const std::string& url)
 {
-
     const auto& value_default = [](const std::string& value, std::string&& deflt) -> std::string {
         return (value.empty() ? deflt : value);
     };

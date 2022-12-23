@@ -46,6 +46,10 @@ void BitmapFont::load(const OTMLNodePtr& fontNode)
 
     // load font texture
     m_texture = g_textures.getTexture(textureFile);
+    if (!m_texture)
+        return;
+    m_texture->create();
+
     const Size textureSize = m_texture->getSize();
 
     if (const auto& node = fontNode->get("fixed-glyph-width")) {

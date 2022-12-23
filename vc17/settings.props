@@ -47,6 +47,7 @@
         shell32.lib;
         gdi32.lib;
         advapi32.lib;
+		winmm.lib
 	</OTCLIENT_LIBDEPS_D>
   </PropertyGroup>
   <PropertyGroup>

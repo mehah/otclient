@@ -67,7 +67,7 @@ void MinimapBlock::update()
         if (m_texture)
             m_texture->updateImage(m_image);
         else
-            m_texture = TexturePtr(new Texture(m_image, true));
+            m_texture = TexturePtr(new Texture(m_image, true, false, false, false));
     else
         m_texture.reset();
 

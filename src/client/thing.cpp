@@ -25,6 +25,7 @@
 #include "map.h"
 #include "thingtypemanager.h"
 #include "tile.h"
+#include "shadermanager.h"
 
 #include <framework/core/graphicalapplication.h>
 
@@ -86,6 +87,8 @@ int Thing::getStackPos()
     return -1;
 }
 
+void Thing::setShader(const std::string_view name) { m_shader = g_shaders.getShader(name); }
+
 void Thing::attachEffect(const AttachedEffectPtr& obj) {
     if (isCreature()) {
         if (obj->m_thingType->getCategory() == ThingCategoryCreature || obj->m_thingType->getCategory() == ThingCategoryMissile)
@@ -98,7 +101,7 @@ void Thing::attachEffect(const AttachedEffectPtr& obj) {
 
 bool Thing::detachEffectById(uint16_t id) {
     const auto it = std::find_if(m_attachedEffects.begin(), m_attachedEffects.end(),
-        [id](const AttachedEffectPtr& obj) { return obj->getId() == id; });
+                                 [id](const AttachedEffectPtr& obj) { return obj->getId() == id; });
 
     if (it == m_attachedEffects.end())
         return false;
@@ -117,7 +120,7 @@ void Thing::clearAttachedEffects() {
 
 AttachedEffectPtr Thing::getAttachedEffectById(uint16_t id) {
     const auto it = std::find_if(m_attachedEffects.begin(), m_attachedEffects.end(),
-        [id](const AttachedEffectPtr& obj) { return obj->getId() == id; });
+                                 [id](const AttachedEffectPtr& obj) { return obj->getId() == id; });
 
     if (it == m_attachedEffects.end())
         return nullptr;

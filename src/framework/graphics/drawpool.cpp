@@ -21,7 +21,8 @@
  */
 
 #include "drawpool.h"
-#include <framework/graphics/framebuffermanager.h>
+#include "framebuffermanager.h"
+#include <framework/core/graphicalapplication.h>
 
 static constexpr int REFRESH_TIME = 1000 / 20; // 20 FPS (50ms)
 
@@ -50,7 +51,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
 void DrawPool::add(const Color& color, const TexturePtr& texture, const DrawMethod& method, const DrawMode drawMode, const DrawBufferPtr& drawBuffer, const CoordsBufferPtr& coordsBuffer)
 {
     const auto& state = PoolState{
-       g_painter->m_transformMatrix, color, m_state.opacity,
+       m_transformMatrix, color, m_state.opacity,
        m_state.compositionMode, m_state.blendEquation,
        m_state.clipRect, texture, m_state.shaderProgram
     };
@@ -126,14 +127,14 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const DrawMeth
         }
 
         m_objectsByhash.emplace(stateHash,
-            m_objects[m_currentFloor][m_currentOrder = static_cast<uint8_t>(buffer->m_order)]
-            .emplace_back(state, buffer));
+                                m_objects[m_currentFloor][m_currentOrder = static_cast<uint8_t>(buffer->m_order)]
+                                .emplace_back(state, buffer));
 
         return;
     }
 
     m_currentOrder = static_cast<uint8_t>(m_type == DrawPoolType::FOREGROUND ? DrawPool::DrawOrder::FIRST :
-        drawBuffer ? drawBuffer->m_order : DrawPool::DrawOrder::THIRD);
+                                          drawBuffer ? drawBuffer->m_order : DrawPool::DrawOrder::THIRD);
 
     auto& list = m_objects[m_currentFloor][m_currentOrder];
 
@@ -141,14 +142,14 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const DrawMeth
         auto& prevObj = list.back();
 
         const bool sameState = prevObj.state == state;
-        if (method.dest.has_value() && prevObj.methods.has_value()) {
+        if (!method.dest.isNull() && !prevObj.methods.empty()) {
             // Look for identical or opaque textures that are greater than or
             // equal to the size of the previous texture, if so, remove it from the list so they don't get drawn.
-            auto& drawMethods = *prevObj.methods;
+            auto& drawMethods = prevObj.methods;
             for (auto itm = drawMethods.begin(); itm != drawMethods.end(); ++itm) {
                 auto& prevMtd = *itm;
                 if (prevMtd.dest == method.dest &&
-                    ((sameState && prevMtd.rects->second == method.rects->second) || (state.texture->isOpaque() && prevObj.state->texture->canSuperimposed()))) {
+                    ((sameState && prevMtd.rects.second == method.rects.second) || (state.texture->isOpaque() && prevObj.state.texture->canSuperimposed()))) {
                     drawMethods.erase(itm);
                     break;
                 }
@@ -182,22 +183,21 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const DrawMeth
 void DrawPool::addCoords(const DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode)
 {
     if (method.type == DrawMethodType::BOUNDING_RECT) {
-        buffer.addBoudingRect(method.rects->first, method.intValue);
+        buffer.addBoudingRect(method.rects.first, method.intValue);
     } else if (method.type == DrawMethodType::RECT) {
         if (drawMode == DrawMode::TRIANGLES)
-            buffer.addRect(method.rects->first, method.rects->second);
+            buffer.addRect(method.rects.first, method.rects.second);
         else
-            buffer.addQuad(method.rects->first, method.rects->second);
+            buffer.addQuad(method.rects.first, method.rects.second);
     } else if (method.type == DrawMethodType::TRIANGLE) {
-        const auto& points = *method.points;
-        buffer.addTriangle(std::get<0>(points), std::get<1>(points), std::get<2>(points));
+        buffer.addTriangle(std::get<0>(method.points), std::get<1>(method.points), std::get<2>(method.points));
     } else if (method.type == DrawMethodType::UPSIDEDOWN_RECT) {
         if (drawMode == DrawMode::TRIANGLES)
-            buffer.addUpsideDownRect(method.rects->first, method.rects->second);
+            buffer.addUpsideDownRect(method.rects.first, method.rects.second);
         else
-            buffer.addUpsideDownQuad(method.rects->first, method.rects->second);
+            buffer.addUpsideDownQuad(method.rects.first, method.rects.second);
     } else if (method.type == DrawMethodType::REPEATED_RECT) {
-        buffer.addRepeatedRects(method.rects->first, method.rects->second);
+        buffer.addRepeatedRects(method.rects.first, method.rects.second);
     }
 }
 
@@ -234,16 +234,13 @@ void DrawPool::updateHash(const PoolState& state, const DrawMethod& method, size
     }
 
     { // Method Hash
-        if (method.rects.has_value()) {
-            if (method.rects->first.isValid()) stdext::hash_union(methodhash, method.rects->first.hash());
-            if (method.rects->second.isValid()) stdext::hash_union(methodhash, method.rects->second.hash());
-        }
+        if (method.rects.first.isValid()) stdext::hash_union(methodhash, method.rects.first.hash());
+        if (method.rects.second.isValid()) stdext::hash_union(methodhash, method.rects.second.hash());
 
-        if (method.points.has_value()) {
-            const auto& points = *method.points;
-            const auto& a = std::get<0>(points);
-            const auto& b = std::get<1>(points);
-            const auto& c = std::get<2>(points);
+        if (method.type == DrawPool::DrawMethodType::TRIANGLE) {
+            const auto& a = std::get<0>(method.points);
+            const auto& b = std::get<1>(method.points);
+            const auto& c = std::get<2>(method.points);
 
             if (!a.isNull()) stdext::hash_union(methodhash, a.hash());
             if (!b.isNull()) stdext::hash_union(methodhash, b.hash());
@@ -300,6 +297,7 @@ void DrawPool::resetState()
     resetShaderProgram();
     resetBlendEquation();
     resetCompositionMode();
+    resetTransformMatrix();
 
     m_status.second = 0;
     if (!m_autoUpdate)
@@ -327,4 +325,65 @@ void DrawPool::clear()
 
     m_objectsByhash.clear();
     m_currentFloor = 0;
+}
+
+void DrawPool::scale(float x, float y)
+{
+    const Matrix3 scaleMatrix = {
+              x,   0.0f,  0.0f,
+            0.0f,     y,  0.0f,
+            0.0f,  0.0f,  1.0f
+    };
+
+    setTransformMatrix(m_transformMatrix * scaleMatrix.transposed());
+}
+
+void DrawPool::translate(float x, float y)
+{
+    const Matrix3 translateMatrix = {
+            1.0f,  0.0f,     x,
+            0.0f,  1.0f,     y,
+            0.0f,  0.0f,  1.0f
+    };
+
+    setTransformMatrix(m_transformMatrix * translateMatrix.transposed());
+}
+
+void DrawPool::rotate(float angle)
+{
+    const Matrix3 rotationMatrix = {
+            std::cos(angle), -std::sin(angle),  0.0f,
+            std::sin(angle),  std::cos(angle),  0.0f,
+                                 0.0f,             0.0f,  1.0f
+    };
+
+    setTransformMatrix(m_transformMatrix * rotationMatrix.transposed());
+}
+
+void DrawPool::rotate(float x, float y, float angle)
+{
+    translate(-x, -y);
+    rotate(angle);
+    translate(x, y);
+}
+
+void DrawPool::pushTransformMatrix()
+{
+    m_transformMatrixStack.push_back(m_transformMatrix);
+    assert(m_transformMatrixStack.size() < 100);
+}
+
+void DrawPool::popTransformMatrix()
+{
+    assert(!m_transformMatrixStack.empty());
+    setTransformMatrix(m_transformMatrixStack.back());
+    m_transformMatrixStack.pop_back();
+}
+
+void DrawPool::optimize(int size) {
+    if (m_type != DrawPoolType::MAP)
+        return;
+
+    g_app.forceCriticalOptimization(size > 105); // Medium optimization
+    m_alwaysGroupDrawings = size > 115; // Max optimization
 }

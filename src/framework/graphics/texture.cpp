@@ -24,14 +24,13 @@
 #include "framebuffer.h"
 #include "graphics.h"
 #include "image.h"
-#include <atomic>
 
 #include <framework/core/application.h>
-
+#include <framework/core/eventdispatcher.h>
 #include "framework/stdext/math.h"
 
  // UINT16_MAX = just to avoid conflicts with GL generated ID.
-static std::atomic<uint32_t > UID(UINT16_MAX);
+thread_local static uint32_t UID(UINT16_MAX);
 
 Texture::Texture() : m_uniqueId(++UID) {}
 
@@ -62,6 +61,7 @@ Texture::Texture(const ImagePtr& image, bool buildMipmaps, bool compress, bool c
         uploadPixels(image, m_buildMipmaps, m_compress);
     } else {
         m_image = image;
+        setupSize(image->getSize());
     }
 }
 
@@ -70,9 +70,11 @@ Texture::~Texture()
 #ifndef NDEBUG
     assert(!g_app.isTerminated());
 #endif
-    // free texture from gl memory
-    if (g_graphics.ok() && m_id != 0)
-        glDeleteTextures(1, &m_id);
+    if (g_graphics.ok() && m_id != 0) {
+        g_mainDispatcher.addEvent([id = m_id]() {
+            glDeleteTextures(1, &id);
+        });
+    }
 }
 
 void Texture::create()
@@ -184,9 +186,9 @@ bool Texture::setupSize(const Size& size)
     // checks texture max size
     if (std::max<int>(glSize.width(), glSize.height()) > g_graphics.getMaxTextureSize()) {
         g_logger.error(stdext::format("loading texture with size %dx%d failed, "
-                                      "the maximum size allowed by the graphics card is %dx%d,"
-                                      "to prevent crashes the texture will be displayed as a blank texture",
-                                      size.width(), size.height(), g_graphics.getMaxTextureSize(), g_graphics.getMaxTextureSize()));
+                       "the maximum size allowed by the graphics card is %dx%d,"
+                       "to prevent crashes the texture will be displayed as a blank texture",
+                       size.width(), size.height(), g_graphics.getMaxTextureSize(), g_graphics.getMaxTextureSize()));
         return false;
     }
 

@@ -51,7 +51,7 @@ void LightView::draw(const Rect& dest, const Rect& src)
 {
     // draw light, only if there is darkness
     m_pool->setEnable(isDark());
-    if (!isDark()) return;
+    if (!isDark() || !m_pool->isValid()) return;
 
     g_drawPool.use(m_pool->getType(), dest, src, m_globalLightColor);
 

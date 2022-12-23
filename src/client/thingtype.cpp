@@ -345,7 +345,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
         }
     }
 
-    m_textureData.resize(m_animationPhases);
+    prepareTextureLoad(sizes, total_sprites);
 }
 
 void ThingType::unserialize(uint16_t clientId, ThingCategory category, const FileStreamPtr& fin)
@@ -481,7 +481,7 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
 
     if (!done)
         throw Exception("corrupt data (id: %d, category: %d, count: %d, lastAttr: %d)",
-        m_id, m_category, count, attr);
+                        m_id, m_category, count, attr);
 
     const bool hasFrameGroups = category == ThingCategoryCreature && g_game.getFeature(Otc::GameIdleAnimations);
     const uint8_t groupCount = hasFrameGroups ? fin->getU8() : 1;
@@ -539,6 +539,10 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
         totalSpritesCount += totalSprites;
     }
 
+    prepareTextureLoad(sizes, total_sprites);
+}
+
+void ThingType::prepareTextureLoad(const std::vector<Size>& sizes, const std::vector<int>& total_sprites) {
     if (sizes.size() > 1) {
         // correction for some sprites
         for (const auto& s : sizes) {
@@ -575,6 +579,42 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
     }
 
     m_textureData.resize(m_animationPhases);
+
+    // we don't need layers in common items, they will be pre-drawn
+    m_textureLayers = 1;
+    m_colorLayers = m_layers;
+    if (m_category == ThingCategoryCreature && m_colorLayers >= 2) {
+        // 5 layers: outfit base, red mask, green mask, blue mask, yellow mask
+        m_textureLayers = 5;
+        m_colorLayers = 5;
+    }
+
+    const int indexSize = m_textureLayers * m_numPatternX * m_numPatternY * m_numPatternZ;
+
+    for (auto& textureData : m_textureData)
+        textureData.pos.resize(indexSize);
+
+    m_textureSize = getBestTextureDimension(m_size.width(), m_size.height(), indexSize);
+
+    for (int z = 0; z < m_numPatternZ; ++z) {
+        for (int y = 0; y < m_numPatternY; ++y) {
+            for (int x = 0; x < m_numPatternX; ++x) {
+                for (int l = 0; l < m_colorLayers; ++l) {
+                    const bool spriteMask = m_category == ThingCategoryCreature && l > 0;
+                    const int frameIndex = getTextureIndex(l % m_textureLayers, x, y, z);
+
+                    const auto& framePos = Point(frameIndex % (m_textureSize.width() / m_size.width()) * m_size.width(),
+                                                 frameIndex / (m_textureSize.width() / m_size.width()) * m_size.height()) * SPRITE_SIZE;
+
+                    for (auto& textureData : m_textureData) {
+                        auto& posData = textureData.pos[frameIndex];
+                        posData.rects = Rect(framePos + Point(m_size.width(), m_size.height()) * SPRITE_SIZE - Point(1), framePos);
+                        posData.originRects = Rect(framePos, Size(m_size.width(), m_size.height()) * SPRITE_SIZE);
+                    }
+                }
+            }
+        }
+    }
 }
 
 void ThingType::unserializeOtml(const OTMLNodePtr& node)
@@ -601,7 +641,7 @@ void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, i
     if (animationPhase >= m_animationPhases)
         return;
 
-    const TexturePtr& texture = getTexture(animationPhase, textureType); // texture might not exists, neither its rects.
+    const auto& texture = getTexture(animationPhase, textureType); // texture might not exists, neither its rects.
     if (!texture)
         return;
 
@@ -611,10 +651,10 @@ void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, i
     if (frameIndex >= textureData.pos.size())
         return;
 
-    const Point& textureOffset = textureData.pos[frameIndex].offsets;
-    const Rect& textureRect = textureData.pos[frameIndex].rects;
+    const auto& textureOffset = textureData.pos[frameIndex].offsets;
+    const auto& textureRect = textureData.pos[frameIndex].rects;
 
-    const Rect screenRect(dest + (textureOffset - m_displacement - (m_size.toPoint() - Point(1)) * SPRITE_SIZE) * g_sprites.getScaleFactor(), textureRect.size() * g_sprites.getScaleFactor());
+    const Rect screenRect(dest + (textureOffset - m_displacement - (m_size.toPoint() - Point(1)) * SPRITE_SIZE) * g_drawPool.getScaleFactor(), textureRect.size() * g_drawPool.getScaleFactor());
 
     if (flags & Otc::DrawThings) {
         if (m_opacity < 1.0f)
@@ -645,21 +685,8 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
 
     if (animationPhaseTexture) return animationPhaseTexture;
 
-    // we don't need layers in common items, they will be pre-drawn
-    int textureLayers = 1;
-    int numLayers = m_layers;
-    if (m_category == ThingCategoryCreature && numLayers >= 2) {
-        // 5 layers: outfit base, red mask, green mask, blue mask, yellow mask
-        textureLayers = 5;
-        numLayers = 5;
-    }
-
     const bool useCustomImage = animationPhase == 0 && !m_customImage.empty();
-    const int indexSize = textureLayers * m_numPatternX * m_numPatternY * m_numPatternZ;
-    const auto& textureSize = getBestTextureDimension(m_size.width(), m_size.height(), indexSize);
-    const auto& fullImage = useCustomImage ? Image::load(m_customImage) : ImagePtr(new Image(textureSize * SPRITE_SIZE));
-
-    textureData.pos.resize(indexSize);
+    const auto& fullImage = useCustomImage ? Image::load(m_customImage) : ImagePtr(new Image(m_textureSize * SPRITE_SIZE));
 
     const bool protobufSupported = g_game.getProtocolVersion() >= 1281;
 
@@ -668,14 +695,12 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
     for (int z = 0; z < m_numPatternZ; ++z) {
         for (int y = 0; y < m_numPatternY; ++y) {
             for (int x = 0; x < m_numPatternX; ++x) {
-                for (int l = 0; l < numLayers; ++l) {
+                for (int l = 0; l < m_colorLayers; ++l) {
                     const bool spriteMask = m_category == ThingCategoryCreature && l > 0;
-                    const int frameIndex = getTextureIndex(l % textureLayers, x, y, z);
+                    const int frameIndex = getTextureIndex(l % m_textureLayers, x, y, z);
 
-                    const auto& framePos = Point(frameIndex % (textureSize.width() / m_size.width()) * m_size.width(),
-                        frameIndex / (textureSize.width() / m_size.width()) * m_size.height()) * SPRITE_SIZE;
-
-                    auto& posData = textureData.pos[frameIndex];
+                    const auto& framePos = Point(frameIndex % (m_textureSize.width() / m_size.width()) * m_size.width(),
+                                                 frameIndex / (m_textureSize.width() / m_size.width()) * m_size.height()) * SPRITE_SIZE;
 
                     if (!useCustomImage) {
                         if (protobufSupported) {
@@ -723,22 +748,20 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
                         }
                     }
 
-                    Rect drawRect(framePos + Point(m_size.width(), m_size.height()) * SPRITE_SIZE - Point(1), framePos);
+                    auto& posData = textureData.pos[frameIndex];
                     for (int fx = framePos.x; fx < framePos.x + m_size.width() * SPRITE_SIZE; ++fx) {
                         for (int fy = framePos.y; fy < framePos.y + m_size.height() * SPRITE_SIZE; ++fy) {
                             const uint8_t* p = fullImage->getPixel(fx, fy);
                             if (p[3] != 0x00) {
-                                drawRect.setTop(std::min<int>(fy, drawRect.top()));
-                                drawRect.setLeft(std::min<int>(fx, drawRect.left()));
-                                drawRect.setBottom(std::max<int>(fy, drawRect.bottom()));
-                                drawRect.setRight(std::max<int>(fx, drawRect.right()));
+                                posData.rects.setTop(std::min<int>(fy, posData.rects.top()));
+                                posData.rects.setLeft(std::min<int>(fx, posData.rects.left()));
+                                posData.rects.setBottom(std::max<int>(fy, posData.rects.bottom()));
+                                posData.rects.setRight(std::max<int>(fx, posData.rects.right()));
                             }
                         }
                     }
 
-                    posData.rects = drawRect;
-                    posData.originRects = Rect(framePos, Size(m_size.width(), m_size.height()) * SPRITE_SIZE);
-                    posData.offsets = drawRect.topLeft() - framePos;
+                    posData.offsets = posData.rects.topLeft() - framePos;
                 }
             }
         }
@@ -792,18 +815,18 @@ Size ThingType::getBestTextureDimension(int w, int h, int count)
 uint32_t ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int a)
 {
     uint32_t index = ((((((a % m_animationPhases)
-        * m_numPatternZ + z)
-        * m_numPatternY + y)
-        * m_numPatternX + x)
-        * m_layers + l)
-        * m_size.height() + h)
+                      * m_numPatternZ + z)
+                      * m_numPatternY + y)
+                      * m_numPatternX + x)
+                      * m_layers + l)
+                      * m_size.height() + h)
         * m_size.width() + w;
 
     if (w == -1 && h == -1) { // protobuf does not use width and height, because sprite image is the exact sprite size, not split by 32x32, so -1 is passed instead
         index = ((((a % m_animationPhases)
-            * m_numPatternZ + z)
-            * m_numPatternY + y)
-            * m_numPatternX + x)
+                 * m_numPatternZ + z)
+                 * m_numPatternY + y)
+                 * m_numPatternX + x)
             * m_layers + l;
     }
 
@@ -814,7 +837,7 @@ uint32_t ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int
 uint32_t ThingType::getTextureIndex(int l, int x, int y, int z)
 {
     return ((l * m_numPatternZ + z)
-        * m_numPatternY + y)
+            * m_numPatternY + y)
         * m_numPatternX + x;
 }
 
@@ -1009,8 +1032,8 @@ void ThingType::exportImage(const std::string& fileName)
                         for (int w = 0; w < m_size.width(); ++w) {
                             for (int h = 0; h < m_size.height(); ++h) {
                                 image->blit(Point(SPRITE_SIZE * (m_size.width() - w - 1 + m_size.width() * x + m_size.width() * m_numPatternX * l),
-                                    SPRITE_SIZE * (m_size.height() - h - 1 + m_size.height() * y + m_size.height() * m_numPatternY * a + m_size.height() * m_numPatternY * m_animationPhases * z)),
-                                    g_sprites.getSpriteImage(m_spritesIndex[getSpriteIndex(w, h, l, x, y, z, a)]));
+                                            SPRITE_SIZE * (m_size.height() - h - 1 + m_size.height() * y + m_size.height() * m_numPatternY * a + m_size.height() * m_numPatternY * m_animationPhases * z)),
+                                            g_sprites.getSpriteImage(m_spritesIndex[getSpriteIndex(w, h, l, x, y, z, a)]));
                             }
                         }
                     }

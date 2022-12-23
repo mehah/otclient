@@ -28,8 +28,6 @@
 class Clock
 {
 public:
-    Clock();
-
     void update();
 
     ticks_t micros() { return m_currentMicros; }
@@ -37,9 +35,9 @@ public:
     float seconds() { return m_currentSeconds; }
 
 private:
-    ticks_t m_currentMicros;
-    ticks_t m_currentMillis;
-    float m_currentSeconds;
+    std::atomic<ticks_t> m_currentMicros{ 0 };
+    std::atomic<ticks_t> m_currentMillis{ 0 };
+    std::atomic<float> m_currentSeconds{ 0 };
 };
 
 extern Clock g_clock;

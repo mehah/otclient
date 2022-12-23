@@ -521,7 +521,7 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
         }
     } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("ProtocolGame parse message exception (%d bytes unread, last opcode is %d, prev opcode is %d): %s",
-            msg->getUnreadSize(), opcode, prevOpcode, e.what()));
+                       msg->getUnreadSize(), opcode, prevOpcode, e.what()));
     }
 }
 
@@ -2380,7 +2380,7 @@ void ProtocolGame::parseChangeMapAwareRange(const InputMessagePtr& msg)
         .top = static_cast<uint8_t>(yrange / 2 - (yrange + 1) % 2),
         .right = static_cast<uint8_t>(xrange / 2),
         .bottom = static_cast<uint8_t>(yrange / 2)
-        });
+                        });
 
     g_lua.callGlobalField("g_game", "onMapChangeAwareRange", xrange, yrange);
 }

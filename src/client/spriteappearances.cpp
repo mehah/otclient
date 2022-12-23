@@ -51,7 +51,7 @@ void SpriteAppearances::terminate()
 
 bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet)
 {
-    std::lock_guard lock(sheet->mutex);
+    std::scoped_lock lock(sheet->mutex);
 
     if (sheet->loaded) {
         return true;

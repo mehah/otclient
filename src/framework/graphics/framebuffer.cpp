@@ -54,12 +54,12 @@ FrameBuffer::~FrameBuffer()
         glDeleteFramebuffers(1, &m_fbo);
 }
 
-void FrameBuffer::resize(const Size& size)
+bool FrameBuffer::resize(const Size& size)
 {
     assert(size.isValid());
 
     if (m_texture && m_texture->getSize() == size)
-        return;
+        return false;
 
     m_texture = TexturePtr(new Texture(size));
     m_texture->setSmooth(m_smooth);
@@ -74,6 +74,8 @@ void FrameBuffer::resize(const Size& size)
         g_logger.fatal("Unable to setup framebuffer object");
 
     internalRelease();
+
+    return true;
 }
 
 void FrameBuffer::bind()

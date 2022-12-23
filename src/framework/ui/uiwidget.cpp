@@ -60,8 +60,8 @@ void UIWidget::draw(const Rect& visibleRect, Fw::DrawPane drawPane)
     }
 
     if (m_rotation != 0.0f) {
-        g_painter->pushTransformMatrix();
-        g_painter->rotate(m_rect.center(), m_rotation * (Fw::pi / 180.0));
+        g_drawPool.pushTransformMatrix();
+        g_drawPool.rotate(m_rect.center(), m_rotation * (Fw::pi / 180.0));
     }
 
     drawSelf(drawPane);
@@ -74,7 +74,7 @@ void UIWidget::draw(const Rect& visibleRect, Fw::DrawPane drawPane)
     }
 
     if (m_rotation != 0.0f)
-        g_painter->popTransformMatrix();
+        g_drawPool.popTransformMatrix();
 
     if (m_clipping) {
         g_drawPool.setClipRect(oldClipRect);
@@ -102,7 +102,7 @@ void UIWidget::drawSelf(Fw::DrawPane drawPane)
 void UIWidget::drawChildren(const Rect& visibleRect, Fw::DrawPane drawPane)
 {
     // draw children
-    for (const UIWidgetPtr& child : m_children) {
+    for (const auto& child : m_children) {
         // render only visible children with a valid rect inside parent rect
         if (!child->isExplicitlyVisible() || !child->getRect().isValid() || child->getOpacity() < Fw::MIN_ALPHA)
             continue;
@@ -614,7 +614,7 @@ void UIWidget::applyStyle(const OTMLNodePtr& styleNode)
             const auto& parent = getParent();
             if (isFocusable() && isExplicitlyVisible() && isExplicitlyEnabled() &&
                 parent && ((!parent->getFocusedChild() && parent->getAutoFocusPolicy() == Fw::AutoFocusFirst) ||
-                           parent->getAutoFocusPolicy() == Fw::AutoFocusLast)) {
+                parent->getAutoFocusPolicy() == Fw::AutoFocusLast)) {
                 focus();
             }
         }

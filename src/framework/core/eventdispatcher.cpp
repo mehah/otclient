@@ -24,8 +24,9 @@
 
 #include "timer.h"
 #include <framework/core/clock.h>
+#include <framework/core/graphicalapplication.h>
 
-EventDispatcher g_dispatcher;
+EventDispatcher g_dispatcher, g_mainDispatcher;
 
 void EventDispatcher::shutdown()
 {
@@ -42,13 +43,16 @@ void EventDispatcher::shutdown()
 
 void EventDispatcher::poll()
 {
+    std::unique_lock<std::recursive_mutex> lock(m_mutex);
     for (int count = 0, max = m_scheduledEventList.size(); count < max && !m_scheduledEventList.empty(); ++count) {
         const auto scheduledEvent = m_scheduledEventList.top();
         if (scheduledEvent->remainingTicks() > 0)
             break;
 
         m_scheduledEventList.pop();
+        lock.unlock();
         scheduledEvent->execute();
+        lock.lock();
 
         if (scheduledEvent->nextCycle())
             m_scheduledEventList.push(scheduledEvent);
@@ -70,7 +74,9 @@ void EventDispatcher::poll()
         for (int i = 0; i < m_pollEventsSize; ++i) {
             const auto event = m_eventList.front();
             m_eventList.pop_front();
+            lock.unlock();
             event->execute();
+            lock.lock();
         }
         m_pollEventsSize = m_eventList.size();
 
@@ -83,6 +89,8 @@ ScheduledEventPtr EventDispatcher::scheduleEvent(const std::function<void()>& ca
     if (m_disabled)
         return { new ScheduledEvent(nullptr, delay, 1) };
 
+    std::scoped_lock<std::recursive_mutex> lock(m_mutex);
+
     assert(delay >= 0);
     ScheduledEventPtr scheduledEvent(new ScheduledEvent(callback, delay, 1));
     m_scheduledEventList.push(scheduledEvent);
@@ -94,6 +102,8 @@ ScheduledEventPtr EventDispatcher::cycleEvent(const std::function<void()>& callb
     if (m_disabled)
         return { new ScheduledEvent(nullptr, delay, 0) };
 
+    std::scoped_lock<std::recursive_mutex> lock(m_mutex);
+
     assert(delay > 0);
     ScheduledEventPtr scheduledEvent(new ScheduledEvent(callback, delay, 0));
     m_scheduledEventList.push(scheduledEvent);
@@ -104,6 +114,8 @@ EventPtr EventDispatcher::addEvent(const std::function<void()>& callback, bool p
 {
     if (m_disabled)
         return { new Event(nullptr) };
+
+    std::scoped_lock<std::recursive_mutex> lock(m_mutex);
 
     EventPtr event(new Event(callback));
     // front pushing is a way to execute an event before others

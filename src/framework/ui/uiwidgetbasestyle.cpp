@@ -32,6 +32,8 @@
 #include <framework/graphics/texture.h>
 #include <framework/graphics/texturemanager.h>
 
+#include <framework/core/eventdispatcher.h>
+
 #include <atomic>
 
 void UIWidget::initBaseStyle()
@@ -386,9 +388,12 @@ void UIWidget::drawIcon(const Rect& screenCoords)
 
 void UIWidget::setIcon(const std::string& iconFile)
 {
-    m_icon = iconFile.empty() ? nullptr : g_textures.getTexture(iconFile);
-    if (m_icon && !m_iconClipRect.isValid())
-        m_iconClipRect = Rect(0, 0, m_icon->getSize());
+    g_mainDispatcher.addEvent([&, iconFile = iconFile]() {
+        m_icon = iconFile.empty() ? nullptr : g_textures.getTexture(iconFile);
+        if (m_icon && !m_iconClipRect.isValid()) {
+            m_iconClipRect = Rect(0, 0, m_icon->getSize());
+        }
 
-    repaint();
+        repaint();
+    });
 }

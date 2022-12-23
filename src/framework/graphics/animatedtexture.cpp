@@ -34,7 +34,7 @@ AnimatedTexture::AnimatedTexture(const Size& size, const std::vector<ImagePtr>& 
         return;
 
     for (const auto& frame : frames) {
-        m_frames.push_back(new Texture(frame, buildMipmaps, compress));
+        m_frames.push_back(new Texture(frame, buildMipmaps, compress, false, false));
     }
 
     m_framesDelay = std::move(framesDelay);

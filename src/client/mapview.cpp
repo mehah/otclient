@@ -42,11 +42,9 @@
 
 #include <framework/platform/platformwindow.h>
 
-MapView::MapView()
+MapView::MapView() : m_pool(g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP))
 {
-    auto* mapPool = g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP);
-
-    mapPool->onBeforeDraw([&] {
+    m_pool->onBeforeDraw([&] {
         const auto& cameraPosition = getCameraPosition();
 
         float fadeOpacity = 1.f;
@@ -70,7 +68,7 @@ MapView::MapView()
             m_shader->bind();
             m_shader->setUniformValue(ShaderManager::MAP_CENTER_COORD, center.x / static_cast<float>(m_rectDimension.width()), 1.f - center.y / static_cast<float>(m_rectDimension.height()));
             m_shader->setUniformValue(ShaderManager::MAP_GLOBAL_COORD, globalCoord.x / static_cast<float>(m_rectDimension.height()), globalCoord.y / static_cast<float>(m_rectDimension.height()));
-            m_shader->setUniformValue(ShaderManager::MAP_ZOOM, g_sprites.getScaleFactor());
+            m_shader->setUniformValue(ShaderManager::MAP_ZOOM, m_pool->getScaleFactor());
 
             Point last = transformPositionTo2D(cameraPosition, m_shader->getPosition());
             //Reverse vertical axis.
@@ -82,15 +80,14 @@ MapView::MapView()
         }
 
         g_painter->setOpacity(fadeOpacity);
-        });
+    });
 
-    mapPool->onAfterDraw([&] {
+    m_pool->onAfterDraw([&] {
         g_painter->resetShaderProgram();
         g_painter->resetOpacity();
-        });
+    });
 
     m_shadowBuffer = std::make_shared<DrawBuffer>(DrawPool::DrawOrder::FIFTH, false);
-    m_shader = g_shaders.getDefaultMapShader();
 
     setVisibleDimension(Size(15, 11));
 }
@@ -196,7 +193,7 @@ void MapView::drawFloor()
                     g_drawPool.resetOpacity();
             }
 
-            for (const MissilePtr& missile : g_map.getFloorMissiles(z))
+            for (const auto& missile : g_map.getFloorMissiles(z))
                 missile->drawMissile(transformPositionTo2D(missile->getPosition(), cameraPosition), lightView);
 
             if (m_shadowFloorIntensity > 0 && z == cameraPosition.z + 1) {
@@ -227,6 +224,7 @@ void MapView::drawFloor()
 void MapView::drawText()
 {
     if (!m_drawTexts || (g_map.getStaticTexts().empty() && g_map.getAnimatedTexts().empty())) {
+        g_drawPool.get<DrawPool>(DrawPoolType::TEXT)->setEnable(false);
         return;
     }
 
@@ -401,15 +399,15 @@ void MapView::updateGeometry(const Size& visibleDimension)
 
     size_t maxAwareRange = std::max<size_t>(visibleDimension.width(), visibleDimension.height());
 
-    g_drawPool.optimize(maxAwareRange);
+    m_pool->optimize(maxAwareRange);
     while (maxAwareRange > 100) {
         maxAwareRange /= 2;
         scaleFactor /= 2;
     }
 
-    g_sprites.setScaleFactor(scaleFactor);
+    m_pool->setScaleFactor(scaleFactor);
 
-    const uint8_t tileSize = SPRITE_SIZE * g_sprites.getScaleFactor();
+    const uint8_t tileSize = SPRITE_SIZE * m_pool->getScaleFactor();
     const auto& drawDimension = visibleDimension + 3;
     const auto& bufferSize = drawDimension * tileSize;
 
@@ -424,9 +422,10 @@ void MapView::updateGeometry(const Size& visibleDimension)
     m_virtualCenterOffset = (drawDimension / 2 - Size(1)).toPoint();
     m_rectDimension = { 0, 0, bufferSize };
 
-    g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP)->resize(bufferSize);
-
-    if (m_lightView) m_lightView->resize(drawDimension, tileSize);
+    g_mainDispatcher.addEvent([&, bufferSize, drawDimension, tileSize]() {
+        m_pool->resize(bufferSize);
+        if (m_lightView) m_lightView->resize(drawDimension, tileSize);
+    });
 
     const uint8_t left = std::min<uint8_t>(g_map.getAwareRange().left, (m_drawDimension.width() / 2) - 1);
     const uint8_t top = std::min<uint8_t>(g_map.getAwareRange().top, (m_drawDimension.height() / 2) - 1);
@@ -656,9 +655,9 @@ Rect MapView::calcFramebufferSource(const Size& destSize)
 {
     Point drawOffset = ((m_drawDimension - m_visibleDimension - Size(1)).toPoint() / 2) * m_tileSize;
     if (isFollowingCreature())
-        drawOffset += m_followingCreature->getWalkOffset() * g_sprites.getScaleFactor();
+        drawOffset += m_followingCreature->getWalkOffset() * m_pool->getScaleFactor();
     else if (!m_moveOffset.isNull())
-        drawOffset += m_moveOffset * g_sprites.getScaleFactor();
+        drawOffset += m_moveOffset * m_pool->getScaleFactor();
 
     const auto& srcVisible = m_visibleDimension * m_tileSize;
 
@@ -769,8 +768,10 @@ TilePtr MapView::getTopTile(Position tilePos)
     return nullptr;
 }
 
-void MapView::setShader(const PainterShaderProgramPtr& shader, float fadein, float fadeout)
+void MapView::setShader(const std::string_view name, float fadein, float fadeout)
 {
+    const auto& shader = g_shaders.getShader(name);
+
     if (m_shader == shader)
         return;
 
@@ -800,7 +801,8 @@ void MapView::setDrawLights(bool enable)
             return;
 
         m_lightView = LightViewPtr(new LightView);
-        m_lightView->resize(m_drawDimension, m_tileSize);
+        g_mainDispatcher.addEvent([&]
+        () { if (m_lightView) m_lightView->resize(m_drawDimension, m_tileSize); });
 
         requestUpdateVisibleTiles();
     } else m_lightView = nullptr;

@@ -24,13 +24,6 @@
 
 Clock g_clock;
 
-Clock::Clock()
-{
-    m_currentMicros = 0;
-    m_currentMillis = 0;
-    m_currentSeconds = 0;
-}
-
 void Clock::update()
 {
     m_currentMicros = stdext::micros();

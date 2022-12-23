@@ -52,7 +52,7 @@ public:
     void setLimitVisibleDimension(bool enable) { m_mapView->setLimitVisibleDimension(enable); updateVisibleDimension(); }
     void setDrawManaBar(bool enable) { m_mapView->setDrawManaBar(enable); }
     void setKeepAspectRatio(bool enable);
-    void setMapShader(const PainterShaderProgramPtr& shader, float fadein, float fadeout) { m_mapView->setShader(shader, fadein, fadeout); }
+    void setMapShader(const std::string_view name, float fadein, float fadeout) { m_mapView->setShader(name, fadein, fadeout); }
     void setMinimumAmbientLight(float intensity) { m_mapView->setMinimumAmbientLight(intensity); }
     void setLimitVisibleRange(bool limitVisibleRange) { m_limitVisibleRange = limitVisibleRange; updateVisibleDimension(); }
 

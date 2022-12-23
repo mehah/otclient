@@ -77,7 +77,7 @@ public:
     void setTypeTexture(const std::string& filename);
     void setIconTexture(const std::string& filename);
     void setPassable(bool passable) { m_passable = passable; }
-    void setMountShader(const PainterShaderProgramPtr& shader) { m_mountShader = shader; }
+    void setMountShader(const std::string_view name);
 
     void addTimedSquare(uint8_t color);
     void removeTimedSquare() { m_showTimedSquare = false; }

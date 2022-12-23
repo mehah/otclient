@@ -39,7 +39,6 @@ UIWidgetPtr UIAnchor::getHookedWidget(const UIWidgetPtr& widget, const UIWidgetP
         return  parentWidget->getChildBefore(widget);
 
     return parentWidget->getChildById(m_hookedWidgetId);
-
 }
 
 int UIAnchor::getHookedPoint(const UIWidgetPtr& hookedWidget, const UIWidgetPtr& parentWidget)
