@@ -75,11 +75,14 @@ void AnimatedTexture::updateAnimation()
     if (m_animTimer.ticksElapsed() < m_framesDelay[m_currentFrame])
         return;
 
-    m_animTimer.restart();
-    ++m_currentFrame;
-    if (m_currentFrame >= m_frames.size())
+    if (++m_currentFrame >= m_frames.size())
         m_currentFrame = 0;
-    m_id = m_frames[m_currentFrame]->getId();
+
+    auto& txt = m_frames[m_currentFrame];
+    txt->create();
+
+    m_id = txt->getId();
+    m_animTimer.restart();
 
     g_app.repaint();
 }
