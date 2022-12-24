@@ -409,7 +409,7 @@ void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vecto
 
     // creature virtual mount outfit
     CreaturePtr virtualMountCreature;
-    if (getFeature(Otc::GamePlayerMounts) && currentOutfit.hasMount()) {
+    if (getFeature(Otc::GamePlayerMounts)) {
         Outfit mountOutfit;
         mountOutfit.setId(currentOutfit.getMount());
 
