@@ -30,15 +30,13 @@
 class AdaptativeFrameCounter
 {
 public:
-    AdaptativeFrameCounter() : m_interval(stdext::millis()) {}
+    AdaptativeFrameCounter() : m_interval(stdext::millis()) { }
 
-    bool update();
+    void update();
 
     uint16_t getFps() const { return m_fps; }
     uint16_t getMaxFps() const { return m_maxFps; }
-    ticks_t getCPUInterval() { return m_timer.elapsed_millis(); }
 
-    void start() { m_timer.restart(); }
     void setMaxFps(const uint8_t max) { m_maxFps = max; }
 
 private:

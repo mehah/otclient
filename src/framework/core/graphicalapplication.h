@@ -45,9 +45,9 @@ public:
     int getMaxFps() { return m_frameCounter.getMaxFps(); }
 
     bool isOnInputEvent() { return m_onInputEvent; }
-    bool mustOptimize(bool critical = false) {
+    bool mustOptimize() {
 #ifdef NDEBUG
-        return (critical && m_forceCriticalOptimization) || (m_optimize && getCPUInterval() > (critical ? 15000u : 8000u));
+        return m_optimize && getMaxFps() >= getFps() && getFps() < 58;
 #else
         return false;
 #endif
@@ -62,10 +62,6 @@ public:
 
     void repaint();
 
-    ticks_t getCPUInterval() { return m_frameCounter.getCPUInterval(); }
-
-    void forceCriticalOptimization(bool force) { m_forceCriticalOptimization = force; }
-
 protected:
     void resize(const Size& size);
     void inputEvent(const InputEvent& event);
@@ -75,7 +71,6 @@ private:
     bool m_optimize{ true };
     bool m_forceEffectOptimization{ false };
     bool m_drawEffectOnTop{ false };
-    bool m_forceCriticalOptimization{ false };
 
     AdaptativeFrameCounter m_frameCounter;
 };

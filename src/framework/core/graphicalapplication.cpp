@@ -199,7 +199,6 @@ void GraphicalApplication::run()
 void GraphicalApplication::poll()
 {
     g_clock.update();
-    m_frameCounter.start();
 
 #ifdef FRAMEWORK_SOUND
     g_sounds.poll();

@@ -22,7 +22,6 @@
 
 #include "drawpool.h"
 #include "framebuffermanager.h"
-#include <framework/core/graphicalapplication.h>
 
 static constexpr int REFRESH_TIME = 1000 / 20; // 20 FPS (50ms)
 
@@ -384,6 +383,5 @@ void DrawPool::optimize(int size) {
     if (m_type != DrawPoolType::MAP)
         return;
 
-    g_app.forceCriticalOptimization(size > 105); // Medium optimization
     m_alwaysGroupDrawings = size > 115; // Max optimization
 }

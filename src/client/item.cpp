@@ -53,8 +53,6 @@ void Item::draw(const Point& dest, uint32_t flags, TextureType textureType, bool
     // determine animation phase
     const int animationPhase = calculateAnimationPhase();
 
-    tryOptimize();
-
     drawAttachedEffect(dest, lightView, false); // On Bottom
     if (textureType != TextureType::ALL_BLANK && m_shader)
         g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
@@ -78,17 +76,6 @@ void Item::createBuffer()
         order = DrawPool::DrawOrder::THIRD;
 
     m_drawBuffer = order != DrawPool::DrawOrder::NONE ? std::make_shared<DrawBuffer>(order) : nullptr;
-}
-
-void Item::tryOptimize()
-{
-    if (g_app.mustOptimize(!isTopGround())) {
-        if (!m_drawBuffer) {
-            m_drawBuffer = std::make_shared<DrawBuffer>(DrawPool::DrawOrder::THIRD, true, false);
-        }
-    } else if (m_drawBuffer && !m_drawBuffer->isStatic()) {
-        m_drawBuffer = nullptr;
-    }
 }
 
 void Item::setPosition(const Position& position, uint8_t stackPos, bool hasElevation)

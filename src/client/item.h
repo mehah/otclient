@@ -151,7 +151,6 @@ public:
 
 private:
     void createBuffer();
-    void tryOptimize();
 
     uint16_t m_clientId{ 0 };
     uint8_t m_countOrSubType{ 0 };
