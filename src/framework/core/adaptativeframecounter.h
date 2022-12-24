@@ -32,6 +32,7 @@ class AdaptativeFrameCounter
 public:
     AdaptativeFrameCounter() : m_interval(stdext::millis()) { }
 
+    void init() { m_timer.restart(); }
     void update();
 
     uint16_t getFps() const { return m_fps; }

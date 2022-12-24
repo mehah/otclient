@@ -75,6 +75,8 @@ void GraphicalApplication::init(std::vector<std::string>& args)
     // initialize sound
     g_sounds.init();
 #endif
+
+    m_frameCounter.init();
 }
 
 void GraphicalApplication::deinit()
@@ -113,22 +115,16 @@ void GraphicalApplication::terminate()
 
 void GraphicalApplication::run()
 {
-    // first clock update
-    g_clock.update();
-
     // run the first poll
-
-    Application::poll();
     poll();
-    g_clock.update();
+    Application::poll();
 
     // show window
     g_window.show();
 
     // run the second poll
-    Application::poll();
     poll();
-    g_clock.update();
+    Application::poll();
 
     g_lua.callGlobalField("g_app", "onRun");
 
