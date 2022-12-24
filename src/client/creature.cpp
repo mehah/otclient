@@ -585,9 +585,9 @@ void Creature::nextWalkUpdate()
 
 void Creature::updateWalk(const bool isPreWalking)
 {
-    const float walkTicksPerPixel = (getStepDuration(true) + 10.f) / SPRITE_SIZE;
+    const float walkTicksPerPixel = getStepDuration(true) / static_cast<float>(SPRITE_SIZE);
 
-    const int totalPixelsWalked = std::min<int>((m_walkTimer.ticksElapsed() / walkTicksPerPixel), SPRITE_SIZE);
+    const int totalPixelsWalked = std::min<int>(m_walkTimer.ticksElapsed() / walkTicksPerPixel, SPRITE_SIZE);
 
     // needed for paralyze effect
     m_walkedPixels = std::max<int>(m_walkedPixels, totalPixelsWalked);
@@ -861,14 +861,18 @@ uint64_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
         m_stepCache.speed = m_speed;
         m_stepCache.groundSpeed = groundSpeed;
 
-        double stepDuration = 1000. * groundSpeed;
+        uint32_t stepDuration = 1000 * groundSpeed;
         if (hasSpeedFormula()) {
-            stepDuration = std::floor(stepDuration / m_calculatedStepSpeed);
+            stepDuration /= m_calculatedStepSpeed;
         } else stepDuration /= m_speed;
 
         if (g_game.isForcingNewWalkingFormula() || g_game.getClientVersion() >= 860) {
             const int serverBeat = g_game.getServerBeat();
-            stepDuration = std::ceil(stepDuration / serverBeat) * serverBeat;
+            stepDuration = ((stepDuration + serverBeat - 1) / serverBeat) * serverBeat;
+        }
+
+        if (isLocalPlayer() && stepDuration <= 100) {
+            stepDuration += 10;
         }
 
         m_stepCache.duration = stepDuration;
