@@ -446,6 +446,7 @@ if(MSVC)
 		asio::asio
 		OpenAL::OpenAL
 		LibLZMA::LibLZMA
+		winmm.lib
 	)
 elseif(ANDROID)
 	target_include_directories(${PROJECT_NAME}
