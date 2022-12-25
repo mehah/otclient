@@ -69,7 +69,7 @@ void GravityAffector::load(const OTMLNodePtr& node)
     m_angle = 270 * DEG_TO_RAD;
     m_gravity = 9.8f;
 
-    for (const OTMLNodePtr& childNode : node->children()) {
+    for (const auto& childNode : node->children()) {
         if (childNode->tag() == "angle")
             m_angle = childNode->value<float>() * DEG_TO_RAD;
         else if (childNode->tag() == "gravity")
@@ -117,10 +117,7 @@ void AttractionAffector::updateParticle(const ParticlePtr& particle, float elaps
     if (d.length() == 0)
         return;
 
-    auto direction = PointF(1, 1);
-    if (m_repelish)
-        direction = PointF(-1, -1);
-
+    const auto& direction = m_repelish ? PointF(-1, -1) : PointF(1, 1);
     const auto& pVelocity = particle->getVelocity() + (d / d.length() * m_acceleration * elapsedTime) * direction;
     particle->setVelocity(pVelocity - pVelocity * m_reduction / 100.f * elapsedTime);
 }

@@ -29,7 +29,7 @@ ParticleEffectType::ParticleEffectType() = default;
 void ParticleEffectType::load(const OTMLNodePtr& node)
 {
     m_node = node->clone();
-    for (const OTMLNodePtr& childNode : node->children()) {
+    for (const auto& childNode : node->children()) {
         if (childNode->tag() == "name")
             m_name = childNode->value();
         else if (childNode->tag() == "description")
@@ -60,7 +60,7 @@ void ParticleEffect::render()
 void ParticleEffect::update()
 {
     for (auto it = m_systems.begin(); it != m_systems.end();) {
-        const ParticleSystemPtr& system = *it;
+        const auto& system = *it;
 
         if (system->hasFinished()) {
             it = m_systems.erase(it);

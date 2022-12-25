@@ -26,8 +26,11 @@
 
 #include "framework/graphics/particleeffect.h"
 
-void UIParticles::drawSelf(Fw::DrawPane /*drawPane*/)
+void UIParticles::drawSelf(Fw::DrawPane drawPane)
 {
+    if (drawPane & Fw::BackgroundPane)
+        return;
+
     UIWidget::drawSelf(Fw::ForegroundPane);
 
     const auto& oldClipRect = g_drawPool.getClipRect();

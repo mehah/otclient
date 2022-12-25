@@ -110,7 +110,7 @@ void ParticleSystem::update()
                 it = m_particles.erase(it);
             } else {
                 // pass particles through affectors
-                for (const ParticleAffectorPtr& particleAffector : m_affectors)
+                for (const auto& particleAffector : m_affectors)
                     particleAffector->updateParticle(particle, delay);
 
                 particle->update(delay);

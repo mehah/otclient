@@ -75,7 +75,7 @@ void ParticleManager::terminate()
 void ParticleManager::poll()
 {
     for (auto it = m_effects.begin(); it != m_effects.end();) {
-        const ParticleEffectPtr& particleEffect = *it;
+        const auto& particleEffect = *it;
 
         if (particleEffect->hasFinished()) {
             it = m_effects.erase(it);
