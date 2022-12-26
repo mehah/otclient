@@ -475,6 +475,8 @@ void Creature::onDisappear()
         else if (g_game.getFollowingCreature() == self)
             g_game.cancelFollow();
     });
+
+    Thing::onDisappear();
 }
 
 void Creature::onDeath()
