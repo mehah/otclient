@@ -661,7 +661,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
     const bool useCustomImage = animationPhase == 0 && !m_customImage.empty();
     const int indexSize = textureLayers * m_numPatternX * m_numPatternY * m_numPatternZ;
     const auto& textureSize = getBestTextureDimension(m_size.width(), m_size.height(), indexSize);
-    const auto& fullImage = useCustomImage ? Image::load(m_customImage) : ImagePtr(new Image(m_textureSize * SPRITE_SIZE));
+    const auto& fullImage = useCustomImage ? Image::load(m_customImage) : ImagePtr(new Image(textureSize * SPRITE_SIZE));
 
     const bool protobufSupported = g_game.getProtocolVersion() >= 1281;
 
