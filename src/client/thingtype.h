@@ -396,7 +396,6 @@ private:
     int8_t m_opaque{ -1 };
 
     Size m_size;
-    Size m_textureSize;
     Point m_displacement;
 
     Animator* m_animator{ nullptr };
@@ -413,9 +412,6 @@ private:
     uint8_t m_clothSlot{ 0 };
     uint8_t m_lensHelp{ 0 };
     uint8_t m_elevation{ 0 };
-
-    uint8_t m_textureLayers{ 0 };
-    uint8_t m_colorLayers{ 0 };
 
     PLAYER_ACTION m_defaultAction{ 0 };
 
