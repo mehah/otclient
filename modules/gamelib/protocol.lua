@@ -157,6 +157,7 @@ ClientOpcodes = {
     ClientUpContainer = 136,
     ClientEditText = 137,
     ClientEditList = 138,
+    ClientOnWrapItem = 139,
     ClientLook = 140,
     ClientTalk = 150,
     ClientRequestChannels = 151,

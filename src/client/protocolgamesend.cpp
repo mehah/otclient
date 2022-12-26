@@ -436,6 +436,16 @@ void ProtocolGame::sendRotateItem(const Position& pos, int thingId, int stackpos
     send(msg);
 }
 
+void ProtocolGame::sendOnWrapItem(const Position& pos, int thingId, int stackpos)
+{
+    OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientOnWrapItem);
+    addPosition(msg, pos);
+    msg->addU16(thingId);
+    msg->addU8(stackpos);
+    send(msg);
+}
+
 void ProtocolGame::sendCloseContainer(int containerId)
 {
     const OutputMessagePtr& msg(new OutputMessage);
