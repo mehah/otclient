@@ -251,6 +251,7 @@ namespace Proto
         ClientUpContainer = 136,
         ClientEditText = 137,
         ClientEditList = 138,
+        ClientOnWrapItem = 139,
         ClientLook = 140,
         ClientLookCreature = 141,
         ClientTalk = 150,

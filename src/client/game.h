@@ -175,6 +175,7 @@ public:
     void move(const ThingPtr& thing, const Position& toPos, int count);
     void moveToParentContainer(const ThingPtr& thing, int count);
     void rotate(const ThingPtr& thing);
+    void wrap(const ThingPtr& thing);
     void use(const ThingPtr& thing);
     void useWith(const ItemPtr& item, const ThingPtr& toThing);
     void useInventoryItem(int itemId);

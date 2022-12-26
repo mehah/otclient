@@ -658,6 +658,14 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
             end)
         end
 
+        local onWrapItem = function() g_game.wrap(useThing) end
+        if useThing:isWrapable() then
+            menu:addOption(tr('Wrap'), onWrapItem)
+        end
+        if useThing:isUnwrapable() then
+        menu:addOption(tr('Unwrap'), onWrapItem)
+        end
+
         if g_game.getFeature(GameBrowseField) and useThing:getPosition().x ~= 0xffff then
             menu:addOption(tr('Browse Field'), function()
                 g_game.browseField(useThing:getPosition())
