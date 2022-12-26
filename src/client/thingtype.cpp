@@ -662,11 +662,11 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
     const int indexSize = textureLayers * m_numPatternX * m_numPatternY * m_numPatternZ;
     const auto& textureSize = getBestTextureDimension(m_size.width(), m_size.height(), indexSize);
     const auto& fullImage = useCustomImage ? Image::load(m_customImage) : ImagePtr(new Image(textureSize * SPRITE_SIZE));
-
     const bool protobufSupported = g_game.getProtocolVersion() >= 1281;
 
     static Color maskColors[] = { Color::red, Color::green, Color::blue, Color::yellow };
 
+    textureData.pos.resize(indexSize);
     for (int z = 0; z < m_numPatternZ; ++z) {
         for (int y = 0; y < m_numPatternY; ++y) {
             for (int x = 0; x < m_numPatternX; ++x) {
@@ -676,8 +676,6 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
 
                     const auto& framePos = Point(frameIndex % (textureSize.width() / m_size.width()) * m_size.width(),
                         frameIndex / (textureSize.width() / m_size.width()) * m_size.height()) * SPRITE_SIZE;
-
-                    auto& posData = textureData.pos[frameIndex];
 
                     if (!useCustomImage) {
                         if (protobufSupported) {
@@ -738,6 +736,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
                         }
                     }
 
+                    auto& posData = textureData.pos[frameIndex];
                     posData.rects = drawRect;
                     posData.originRects = Rect(framePos, Size(m_size.width(), m_size.height()) * SPRITE_SIZE);
                     posData.offsets = drawRect.topLeft() - framePos;
