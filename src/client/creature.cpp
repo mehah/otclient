@@ -48,13 +48,13 @@ Creature::Creature() :m_type(Proto::CreatureTypeUnknown)
 
     // Example of how to send a UniformValue to shader
     /*
-    m_shaderAction = [=]()-> void {
+    m_shaderAction = [&]()-> void {
         const int id = m_outfit.getCategory() == ThingCategoryCreature ? m_outfit.getId() : m_outfit.getAuxId();
         m_shader->bind();
         m_shader->setUniformValue(ShaderManager::OUTFIT_ID_UNIFORM, id);
     };
 
-    m_mountShaderAction = [=]()-> void {
+    m_mountShaderAction = [&]()-> void {
         m_mountShader->bind();
         m_mountShader->setUniformValue(ShaderManager::MOUNT_ID_UNIFORM, m_outfit.getMount());
     };

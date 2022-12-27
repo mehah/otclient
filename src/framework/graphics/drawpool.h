@@ -186,7 +186,7 @@ private:
     void resetState();
     void resetOpacity() { m_state.opacity = 1.f; }
     void resetClipRect() { m_state.clipRect = {}; }
-    void resetShaderProgram() { m_state.shaderProgram = nullptr; }
+    void resetShaderProgram() { m_state.shaderProgram = nullptr; m_state.action = nullptr; }
     void resetCompositionMode() { m_state.compositionMode = CompositionMode::NORMAL; }
     void resetBlendEquation() { m_state.blendEquation = BlendEquation::ADD; }
     void resetTransformMatrix() { m_state.transformMatrix = DEFAULT_MATRIX3; }

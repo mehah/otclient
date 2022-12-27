@@ -52,7 +52,8 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const DrawMeth
     const auto& state = PoolState{
        m_state.transformMatrix, color, m_state.opacity,
        m_state.compositionMode, m_state.blendEquation,
-       m_state.clipRect, texture, m_state.shaderProgram
+       m_state.clipRect, texture, m_state.shaderProgram,
+       m_state.action
     };
 
     if (m_onlyOnceStateFlag > 0) { // Only Once State
