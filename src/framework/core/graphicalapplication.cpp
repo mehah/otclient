@@ -144,6 +144,11 @@ void GraphicalApplication::run()
             g_particles.poll();
             Application::poll();
 
+            if (!g_window.isVisible()) {
+                stdext::millisleep(10);
+                continue;
+            }
+
             if (foregroundRefresh.ticksElapsed() >= 100) { // 10 FPS (1000 / 10)
                 foreground->repaint();
                 foregroundRefresh.restart();
