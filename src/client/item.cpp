@@ -72,8 +72,6 @@ void Item::createBuffer()
         order = DrawPool::DrawOrder::FIRST;
     else if (isSingleGroundBorder() && !hasElevation())
         order = DrawPool::DrawOrder::SECOND;
-    else if ((isCommon() || isOnBottom()) && isSingleDimension() && !hasDisplacement() && isNotMoveable())
-        order = DrawPool::DrawOrder::THIRD;
 
     m_drawBuffer = order != DrawPool::DrawOrder::NONE ? std::make_shared<DrawBuffer>(order) : nullptr;
 }

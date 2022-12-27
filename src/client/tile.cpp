@@ -231,15 +231,6 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
     } else if (stackPos > static_cast<int>(size))
         stackPos = size;
 
-    // common items are drawn from back to front, so if the item being added now is common and has elevation,
-    // look for any item behind it and destroy its buffer.
-    if (hasCommonItem() && thing->isCommon() && thing->hasElevation()) {
-        for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
-            if (const auto& item = *it; item->isCommon())
-                item->destroyBuffer();
-        }
-    }
-
     m_things.insert(m_things.begin() + stackPos, thing);
 
     // get the elevation status before analyze the new item.
