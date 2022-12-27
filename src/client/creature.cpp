@@ -766,8 +766,7 @@ void Creature::setSpeed(uint16_t speed)
         speed *= 2;
 
         if (speed > -speedB) {
-            m_calculatedStepSpeed = floor((speedA * log((speed / 2.) + speedB) + speedC) + 0.5);
-            if (m_calculatedStepSpeed == 0) m_calculatedStepSpeed = 1;
+            m_calculatedStepSpeed = std::max<int>(1, floor((speedA * log((speed / 2.) + speedB) + speedC) + .5));
         } else m_calculatedStepSpeed = 1;
     }
 
@@ -842,7 +841,7 @@ void Creature::updateShield()
 
 bool Creature::hasSpeedFormula() { return g_game.getFeature(Otc::GameNewSpeedLaw) && speedA != 0 && speedB != 0 && speedC != 0; }
 
-uint64_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
+uint16_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
 {
     if (isParalyzed())
         return 0;
@@ -873,12 +872,12 @@ uint64_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
             stepDuration = ((stepDuration + serverBeat - 1) / serverBeat) * serverBeat;
         }
 
-        if (isLocalPlayer() && stepDuration <= 100) {
+        if (m_stepCache.mustStabilizeCam = (isLocalPlayer() && stepDuration <= 100)) {
             stepDuration += 10;
         }
 
         m_stepCache.duration = stepDuration;
-        m_stepCache.walkDuration = m_stepCache.duration / SPRITE_SIZE;
+        m_stepCache.walkDuration = stepDuration / SPRITE_SIZE;
         m_stepCache.diagonalDuration = stepDuration * (g_game.getClientVersion() > 810 || g_game.isForcingNewWalkingFormula() ? 3 : 2);
     }
 

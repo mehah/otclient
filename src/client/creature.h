@@ -103,7 +103,7 @@ public:
     uint8_t getType() { return m_type; }
     uint8_t getIcon() { return m_icon; }
     bool isPassable() { return m_passable; }
-    uint64_t getStepDuration(bool ignoreDiagonal = false, Otc::Direction dir = Otc::InvalidDirection);
+    uint16_t getStepDuration(bool ignoreDiagonal = false, Otc::Direction dir = Otc::InvalidDirection);
     Point getWalkOffset() { return m_walkOffset; }
     PointF getJumpOffset() { return m_jumpOffset; }
     Position getLastStepFromPosition() { return m_lastStepFromPosition; }
@@ -162,6 +162,8 @@ protected:
 
     void updateOutfitColor(Color color, Color finalColor, Color delta, int duration);
     void updateJump();
+
+    bool mustStabilizeCam() { return m_stepCache.mustStabilizeCam; }
 
     uint32_t m_id{ 0 };
     uint32_t m_masterId{ 0 };
@@ -255,11 +257,13 @@ private:
         uint16_t speed{ 0 };
         uint16_t groundSpeed{ 0 };
 
-        uint64_t duration{ 0 };
-        uint64_t walkDuration{ 0 };
-        uint64_t diagonalDuration{ 0 };
+        uint16_t duration{ 0 };
+        uint16_t walkDuration{ 0 };
+        uint16_t diagonalDuration{ 0 };
 
-        uint64_t getDuration(Otc::Direction dir) const { return Position::isDiagonal(dir) ? diagonalDuration : duration; }
+        bool mustStabilizeCam{ false };
+
+        uint16_t getDuration(Otc::Direction dir) const { return Position::isDiagonal(dir) ? diagonalDuration : duration; }
     };
 
     StepCache m_stepCache;

@@ -56,8 +56,11 @@ bool LocalPlayer::canWalk(bool ignoreLock)
         return true;
     }
 
-    const int stepDuration = std::max<int>(getStepDuration() - 10, g_game.getPing());
-    return m_walkTimer.ticksElapsed() >= stepDuration;
+    int stepDuration = getStepDuration();
+    if (mustStabilizeCam())
+        stepDuration -= 10;
+
+    return m_walkTimer.ticksElapsed() >= std::max<int>(stepDuration, g_game.getPing());
 }
 
 void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
