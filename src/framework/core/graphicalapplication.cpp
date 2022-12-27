@@ -185,8 +185,10 @@ void GraphicalApplication::run()
 
         {
             std::scoped_lock l(backMutex, foreMutex);
-            g_drawPool.draw();
+            g_drawPool.preDraw();
         }
+
+        g_drawPool.draw();
 
         // update screen pixels
         g_window.swapBuffers();

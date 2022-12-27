@@ -47,14 +47,13 @@ void DrawPoolManager::terminate()
 DrawPool* DrawPoolManager::getCurrentPool() { return m_pools[CURRENT_POOL]; }
 void DrawPoolManager::select(DrawPoolType type) { CURRENT_POOL = static_cast<uint8_t>(type); }
 
-void DrawPoolManager::draw()
+void DrawPoolManager::preDraw()
 {
     if (m_size != g_painter->getResolution()) {
         m_size = g_painter->getResolution();
         m_transformMatrix = g_painter->getTransformMatrix(m_size);
     }
 
-    // Pre Draw
     for (auto* pool : m_pools) {
         if (!pool->isEnabled() || !pool->hasFrameBuffer()) continue;
 
@@ -71,10 +70,11 @@ void DrawPoolManager::draw()
             pf->m_framebuffer->release();
         }
     }
+}
 
+void DrawPoolManager::draw()
+{
     g_painter->setResolution(m_size, m_transformMatrix);
-
-    // Draw
     for (auto* pool : m_pools) {
         if (!pool->isEnabled()) continue;
 
@@ -92,7 +92,6 @@ void DrawPoolManager::draw()
             drawObject(obj);
         }
     }
-
     get<DrawPoolFramed>(DrawPoolType::FOREGROUND)->resize(m_size);
 }
 
