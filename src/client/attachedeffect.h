@@ -43,11 +43,13 @@ public:
     void setOnTopByDir(Otc::Direction direction, bool onTop) { m_offsetDirections[direction].onTop = onTop; }
 
     void setDirOffset(Otc::Direction direction, int8_t x, int8_t y, bool onTop = false) { m_offsetDirections[direction] = { onTop, {x, y} }; }
-    void setShader(const PainterShaderProgramPtr& shader) { m_shader = shader; }
+    void setShader(const std::string_view name);
     void setCanDrawOnUI(bool canDraw) { m_canDrawOnUI = canDraw; }
     bool canDrawOnUI() { return m_canDrawOnUI; }
 
 private:
+    int getCurrentAnimationPhase();
+
     struct DirControl
     {
         bool onTop{ false };

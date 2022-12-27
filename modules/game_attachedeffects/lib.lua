@@ -22,7 +22,7 @@ local executeConfig = function(attachedEffect, config)
         end
 
         if config.shader then
-            attachedEffect:setShader(g_shaders.getShader(config.shader))
+            attachedEffect:setShader(config.shader)
         end
 
         if x ~= 0 or y ~= 0 then
