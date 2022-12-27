@@ -125,10 +125,6 @@ function attachShaders()
     local player = g_game.getLocalPlayer()
     player:setShader('Default')
     player:setMountShader('Default')
-
-    connect(g_game.getLocalPlayer(), {
-        onWalkEnd = onWalkEvent --[[, onAutoWalk = function() end]]
-    })
 end
 
 function init()
@@ -204,12 +200,6 @@ function init()
 end
 
 function terminate()
-    if g_game.getLocalPlayer() then
-        disconnect(g_game.getLocalPlayer(), {
-            onWalkEnd = onWalkEvent,
-            onAutoWalk = onAutoWalkEvent
-        })
-    end
     disconnect(g_game, {
         onGameStart = attachShaders
     })
