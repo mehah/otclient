@@ -84,7 +84,6 @@ public:
 private:
     DrawPool* getCurrentPool();
 
-    void preDraw();
     void draw();
     void init();
     void terminate();
