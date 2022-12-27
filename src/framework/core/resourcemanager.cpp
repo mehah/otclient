@@ -291,7 +291,7 @@ std::list<std::string> ResourceManager::listDirectoryFiles(const std::string& di
             fileOrDir = path + "/" + fileOrDir;
 
         if (recursive && directoryExists("/" + fileOrDir)) {
-            const auto& moreFiles = listDirectoryFiles(fileOrDir, fullPath, raw);
+            const auto& moreFiles = listDirectoryFiles(fileOrDir, fullPath, raw, recursive);
             files.insert(files.end(), moreFiles.begin(), moreFiles.end());
         } else {
             files.push_back(fileOrDir);
