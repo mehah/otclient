@@ -21,8 +21,10 @@
  */
 
 #include "graphicalapplication.h"
+#include <client/map.h>
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>
+#include <framework/graphics/drawpool.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
 #include <framework/graphics/particlemanager.h>
@@ -128,12 +130,14 @@ void GraphicalApplication::run()
 
     g_lua.callGlobalField("g_app", "onRun");
 
-    std::condition_variable foreCondition;
-    std::mutex backMutex, foreMutex;
+    std::condition_variable foreCondition, txtCondition;
+    std::mutex backMutex, foreMutex, txtMutex;
 
     std::jthread t1([&](std::stop_token st) {
         const auto& map = g_drawPool.get<DrawPool>(DrawPoolType::MAP);
         const auto& foreground = g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND);
+        const auto& txt = g_drawPool.get<DrawPool>(DrawPoolType::TEXT);
+
         Timer foregroundRefresh;
 
         while (!st.stop_requested()) {
@@ -155,21 +159,30 @@ void GraphicalApplication::run()
             }
 
             if (foreground->canRepaint()) {
-                foreCondition.notify_all();
+                foreCondition.notify_one();
             }
 
-            g_ui.render(Fw::BackgroundPane);
-        }
+            txt->setEnable(isDrawingTexts());
+            if (txt->isEnabled()) {
+                txtCondition.notify_one();
+            }
 
-        foreCondition.notify_all();
+            g_ui.render(DrawPoolType::MAP);
+        }
     });
 
     std::jthread t2([&](std::stop_token st) {
         std::unique_lock lock(foreMutex);
         foreCondition.wait(lock, [&]() -> bool {
-            g_drawPool.use(DrawPoolType::FOREGROUND);
-            g_ui.render(Fw::ForegroundPane);
+            g_ui.render(DrawPoolType::FOREGROUND);
+            return st.stop_requested();
+        });
+    });
 
+    std::jthread t3([&](std::stop_token st) {
+        std::unique_lock lock(txtMutex);
+        txtCondition.wait(lock, [&]() -> bool {
+            g_ui.render(DrawPoolType::TEXT);
             return st.stop_requested();
         });
     });
@@ -184,7 +197,7 @@ void GraphicalApplication::run()
         }
 
         {
-            std::scoped_lock l(backMutex, foreMutex);
+            std::scoped_lock l(backMutex, foreMutex, txtMutex);
             g_drawPool.draw();
         }
 
@@ -192,6 +205,9 @@ void GraphicalApplication::run()
         g_window.swapBuffers();
         m_frameCounter.update();
     }
+
+    foreCondition.notify_one();
+    txtCondition.notify_one();
 
     m_stopping = false;
     m_running = false;
@@ -234,3 +250,4 @@ void GraphicalApplication::inputEvent(const InputEvent& event)
 }
 
 void GraphicalApplication::repaint() { g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND)->repaint(); }
+bool GraphicalApplication::isDrawingTexts() { return m_drawText && (!g_map.getStaticTexts().empty() || !g_map.getAnimatedTexts().empty()); }

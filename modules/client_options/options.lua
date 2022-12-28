@@ -274,7 +274,7 @@ function setOption(key, value, force)
     elseif key == 'displayMana' then
         gameMapPanel:setDrawManaBar(value)
     elseif key == 'displayText' then
-        gameMapPanel:setDrawTexts(value)
+        g_app.setDrawTexts(value)
     elseif key == 'dontStretchShrink' then
         addEvent(function()
             modules.game_interface.updateStretchShrink()

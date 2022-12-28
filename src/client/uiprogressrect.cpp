@@ -26,9 +26,9 @@
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/drawpool.h"
 
-void UIProgressRect::drawSelf(Fw::DrawPane drawPane)
+void UIProgressRect::drawSelf(DrawPoolType drawPane)
 {
-    if ((drawPane & Fw::ForegroundPane) == 0)
+    if (drawPane != DrawPoolType::FOREGROUND)
         return;
 
     // todo: check +1 to right/bottom

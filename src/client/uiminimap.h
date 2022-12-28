@@ -30,7 +30,7 @@ class UIMinimap : public UIWidget
 public:
     UIMinimap();
 
-    void drawSelf(Fw::DrawPane drawPane) override;
+    void drawSelf(DrawPoolType drawPane) override;
 
     bool zoomIn() { return setZoom(m_zoom + 1); }
     bool zoomOut() { return setZoom(m_zoom - 1); }

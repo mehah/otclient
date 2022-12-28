@@ -25,6 +25,8 @@
 #include <framework/global.h>
 #include "glutil.h"
 
+enum class DrawPoolType : uint8_t;
+
 class Texture;
 class TextureManager;
 class Image;

@@ -25,9 +25,9 @@
 
 UIItem::UIItem() { m_draggable = true; }
 
-void UIItem::drawSelf(Fw::DrawPane drawPane)
+void UIItem::drawSelf(DrawPoolType drawPane)
 {
-    if ((drawPane & Fw::ForegroundPane) == 0)
+    if (drawPane != DrawPoolType::FOREGROUND)
         return;
 
     // draw style components in order

@@ -29,7 +29,7 @@
 class UICreature : public UIWidget
 {
 public:
-    void drawSelf(Fw::DrawPane drawPane) override;
+    void drawSelf(DrawPoolType drawPane) override;
 
     void setCreature(const CreaturePtr& creature) { m_creature = creature; }
     void setFixedCreatureSize(bool fixed) { m_fixedCreatureSize = fixed; }

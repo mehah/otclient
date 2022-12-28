@@ -100,21 +100,13 @@ MapView::~MapView()
     m_lightView = nullptr;
 }
 
-void MapView::draw(const Rect& rect)
+void MapView::draw()
 {
     m_posInfo.camera = getCameraPosition();
 
     // update visible tiles cache when needed
     if (m_updateVisibleTiles)
         updateVisibleTiles();
-
-    if (m_posInfo.rect != rect) {
-        m_posInfo.rect = rect;
-        m_posInfo.srcRect = calcFramebufferSource(rect.size());
-        m_posInfo.drawOffset = m_posInfo.srcRect.topLeft();
-        m_posInfo.horizontalStretchFactor = rect.width() / static_cast<float>(m_posInfo.srcRect.width());
-        m_posInfo.verticalStretchFactor = rect.height() / static_cast<float>(m_posInfo.srcRect.height());
-    }
 
     if (canFloorFade()) {
         const float fadeLevel = getFadeLevel(m_cachedFirstVisibleFloor);
@@ -131,8 +123,7 @@ void MapView::draw(const Rect& rect)
         return;
     }
 
-    if (m_lightView) m_lightView->draw(rect, m_posInfo.srcRect);
-    drawText();
+    if (m_lightView) m_lightView->draw(m_posInfo.rect, m_posInfo.srcRect);
 }
 
 void MapView::drawFloor()
@@ -223,11 +214,6 @@ void MapView::drawFloor()
 
 void MapView::drawText()
 {
-    if (!m_drawTexts || (g_map.getStaticTexts().empty() && g_map.getAnimatedTexts().empty())) {
-        g_drawPool.get<DrawPool>(DrawPoolType::TEXT)->setEnable(false);
-        return;
-    }
-
     const auto& cameraPosition = getCameraPosition();
 
     g_drawPool.use(DrawPoolType::TEXT);

@@ -60,6 +60,9 @@ public:
     void setDrawEffectOnTop(const bool draw) { m_drawEffectOnTop = draw; }
     bool isDrawingEffectsOnTop() { return m_drawEffectOnTop || mustOptimize(); }
 
+    void setDrawTexts(bool v) { m_drawText = v; }
+    bool isDrawingTexts();
+
     void repaint();
 
 protected:
@@ -71,6 +74,7 @@ private:
     bool m_optimize{ true };
     bool m_forceEffectOptimization{ false };
     bool m_drawEffectOnTop{ false };
+    bool m_drawText{ true };
 
     AdaptativeFrameCounter m_frameCounter;
 };

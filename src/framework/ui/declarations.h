@@ -24,6 +24,8 @@
 
 #include <framework/global.h>
 
+enum class DrawPoolType : uint8_t;
+
 class UIManager;
 class UIWidget;
 class UITextEdit;

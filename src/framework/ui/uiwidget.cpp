@@ -51,7 +51,7 @@ UIWidget::~UIWidget()
 #endif
 }
 
-void UIWidget::draw(const Rect& visibleRect, Fw::DrawPane drawPane)
+void UIWidget::draw(const Rect& visibleRect, DrawPoolType drawPane)
 {
     Rect oldClipRect;
     if (m_clipping) {
@@ -81,9 +81,9 @@ void UIWidget::draw(const Rect& visibleRect, Fw::DrawPane drawPane)
     }
 }
 
-void UIWidget::drawSelf(Fw::DrawPane drawPane)
+void UIWidget::drawSelf(DrawPoolType drawPane)
 {
-    if ((drawPane & Fw::ForegroundPane) == 0)
+    if (drawPane != DrawPoolType::FOREGROUND)
         return;
 
     // draw style components in order
@@ -99,7 +99,7 @@ void UIWidget::drawSelf(Fw::DrawPane drawPane)
     drawBorder(m_rect);
 }
 
-void UIWidget::drawChildren(const Rect& visibleRect, Fw::DrawPane drawPane)
+void UIWidget::drawChildren(const Rect& visibleRect, DrawPoolType drawPane)
 {
     // draw children
     for (const auto& child : m_children) {
@@ -121,7 +121,7 @@ void UIWidget::drawChildren(const Rect& visibleRect, Fw::DrawPane drawPane)
         child->draw(childVisibleRect, drawPane);
 
         // debug draw box
-        if (g_ui.isDrawingDebugBoxes() && drawPane & Fw::ForegroundPane) {
+        if (g_ui.isDrawingDebugBoxes() && drawPane == DrawPoolType::FOREGROUND) {
             g_drawPool.addBoundingRect(child->getRect(), Color::green);
         }
 

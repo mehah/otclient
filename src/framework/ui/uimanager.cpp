@@ -28,6 +28,7 @@
 #include <framework/core/resourcemanager.h>
 #include <framework/otml/otml.h>
 #include <framework/platform/platformwindow.h>
+#include <framework/graphics/drawpoolmanager.h>
 
 UIManager g_ui;
 
@@ -55,8 +56,11 @@ void UIManager::terminate()
     m_checkEvent = nullptr;
 }
 
-void UIManager::render(Fw::DrawPane drawPane)
+void UIManager::render(DrawPoolType drawPane)
 {
+    if (drawPane == DrawPoolType::FOREGROUND)
+        g_drawPool.use(DrawPoolType::FOREGROUND);
+
     m_rootWidget->draw(m_rootWidget->getRect(), drawPane);
 }
 

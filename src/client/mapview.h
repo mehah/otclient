@@ -86,7 +86,8 @@ public:
 
     MapView();
     ~MapView() override;
-    void draw(const Rect& rect);
+    void draw();
+    void drawText();
 
     // floor visibility related
     uint8_t getLockedFirstVisibleFloor() { return m_lockedFirstVisibleFloor; }
@@ -118,10 +119,6 @@ public:
 
     void setShadowFloorIntensity(float intensity) { m_shadowFloorIntensity = intensity; updateLight(); }
     float getShadowFloorIntensity() { return m_shadowFloorIntensity; }
-
-    // drawing related
-    void setDrawTexts(bool enable) { m_drawTexts = enable; }
-    bool isDrawingTexts() { return m_drawTexts; }
 
     void setDrawNames(bool enable) { m_drawNames = enable; }
     bool isDrawingNames() { return m_drawNames; }
@@ -186,6 +183,7 @@ protected:
     void onFadeInFinished();
 
     friend class Map;
+    friend class UIMap;
     friend class Tile;
     friend class LightView;
 
@@ -215,7 +213,6 @@ private:
     void updateLight();
     void updateViewportDirectionCache();
     void drawFloor();
-    void drawText();
 
     void updateViewport(const Otc::Direction dir = Otc::InvalidDirection) { m_viewport = m_viewPortDirection[dir]; }
 
@@ -277,7 +274,6 @@ private:
     bool m_shaderSwitchDone{ true };
     bool m_drawHealthBars{ true };
     bool m_drawManaBar{ true };
-    bool m_drawTexts{ true };
     bool m_drawNames{ true };
     bool m_smooth{ true };
     bool m_follow{ true };

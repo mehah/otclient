@@ -34,7 +34,7 @@ public:
     UIMap();
     ~UIMap() override;
 
-    void drawSelf(Fw::DrawPane drawPane) override;
+    void drawSelf(DrawPoolType drawPane) override;
 
     void movePixels(int x, int y);
     void followCreature(const CreaturePtr& creature) { m_mapView->followCreature(creature); }
@@ -45,7 +45,6 @@ public:
     void unlockVisibleFloor() { m_mapView->unlockFirstVisibleFloor(); }
     void setVisibleDimension(const Size& visibleDimension);
     void setFloorViewMode(MapView::FloorViewMode viewMode) { m_mapView->setFloorViewMode(viewMode); }
-    void setDrawTexts(bool enable) { m_mapView->setDrawTexts(enable); }
     void setDrawNames(bool enable) { m_mapView->setDrawNames(enable); }
     void setDrawHealthBars(bool enable) { m_mapView->setDrawHealthBars(enable); }
     void setDrawLights(bool enable) { m_mapView->setDrawLights(enable); }
@@ -59,7 +58,6 @@ public:
     bool zoomIn();
     bool zoomOut();
     bool setZoom(int zoom);
-    bool isDrawingTexts() { return m_mapView->isDrawingTexts(); }
     bool isDrawingNames() { return m_mapView->isDrawingNames(); }
     bool isDrawingHealthBars() { return m_mapView->isDrawingHealthBars(); }
     bool isDrawingLights() { return m_mapView->isDrawingLights(); }

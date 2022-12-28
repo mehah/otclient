@@ -33,7 +33,7 @@ public:
     void init();
     void terminate();
 
-    void render(Fw::DrawPane drawPane);
+    void render(DrawPoolType drawPane);
     void resize(const Size& size);
     void inputEvent(const InputEvent& event);
 

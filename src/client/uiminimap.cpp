@@ -36,11 +36,11 @@ UIMinimap::UIMinimap()
     m_layout = UIMapAnchorLayoutPtr(new UIMapAnchorLayout(static_self_cast<UIWidget>()));
 }
 
-void UIMinimap::drawSelf(Fw::DrawPane drawPane)
+void UIMinimap::drawSelf(DrawPoolType drawPane)
 {
     UIWidget::drawSelf(drawPane);
 
-    if ((drawPane & Fw::ForegroundPane) == 0)
+    if (drawPane != DrawPoolType::FOREGROUND)
         return;
 
     g_minimap.draw(getPaddingRect(), getCameraPosition(), m_scale, m_color);

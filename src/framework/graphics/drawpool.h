@@ -72,6 +72,8 @@ public:
     void setScaleFactor(float scale) { m_scaleFactor = scale; }
     inline float getScaleFactor() const { return m_scaleFactor; }
 
+    void resetState();
+
     struct PoolState
     {
         Matrix3 transformMatrix;
@@ -183,7 +185,6 @@ private:
     void setOpacity(float opacity, bool onLastDrawing = false);
     void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onLastDrawing = false, const std::function<void()>& action = nullptr);
 
-    void resetState();
     void resetOpacity() { m_state.opacity = 1.f; }
     void resetClipRect() { m_state.clipRect = {}; }
     void resetShaderProgram() { m_state.shaderProgram = nullptr; m_state.action = nullptr; }

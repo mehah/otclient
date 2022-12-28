@@ -53,9 +53,9 @@ public:
     ~UIWidget() override;
 
 protected:
-    virtual void draw(const Rect& visibleRect, Fw::DrawPane drawPane);
-    virtual void drawSelf(Fw::DrawPane drawPane);
-    virtual void drawChildren(const Rect& visibleRect, Fw::DrawPane drawPane);
+    virtual void draw(const Rect& visibleRect, DrawPoolType drawPane);
+    virtual void drawSelf(DrawPoolType drawPane);
+    virtual void drawChildren(const Rect& visibleRect, DrawPoolType drawPane);
 
     friend class UIManager;
 

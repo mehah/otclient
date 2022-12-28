@@ -28,7 +28,7 @@
 class UISprite : public UIWidget
 {
 public:
-    void drawSelf(Fw::DrawPane drawPane) override;
+    void drawSelf(DrawPoolType drawPane) override;
 
     void setSpriteId(int id);
     int getSpriteId() { return m_spriteId; }

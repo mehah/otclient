@@ -288,11 +288,4 @@ namespace Fw
         HiddenState = 4096,
         LastWidgetState = 8192
     };
-
-    enum DrawPane
-    {
-        ForegroundPane = 1,
-        BackgroundPane = 2,
-        BothPanes = 3
-    };
 }

@@ -26,12 +26,12 @@
 
 #include "framework/graphics/particleeffect.h"
 
-void UIParticles::drawSelf(Fw::DrawPane drawPane)
+void UIParticles::drawSelf(DrawPoolType drawPane)
 {
-    if (drawPane & Fw::BackgroundPane)
+    if (drawPane != DrawPoolType::FOREGROUND)
         return;
 
-    UIWidget::drawSelf(Fw::ForegroundPane);
+    UIWidget::drawSelf(DrawPoolType::FOREGROUND);
 
     const auto& oldClipRect = g_drawPool.getClipRect();
     g_drawPool.setClipRect(getPaddingRect());

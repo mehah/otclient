@@ -47,19 +47,31 @@ UIMap::~UIMap()
     g_map.removeMapView(m_mapView);
 }
 
-void UIMap::drawSelf(Fw::DrawPane drawPane)
+void UIMap::drawSelf(DrawPoolType drawPane)
 {
     UIWidget::drawSelf(drawPane);
 
-    if (drawPane & Fw::ForegroundPane) {
+    if (drawPane == DrawPoolType::FOREGROUND) {
         g_drawPool.addBoundingRect(m_mapRect.expanded(1), Color::black);
         g_drawPool.addAction([] {glDisable(GL_BLEND); });
         g_drawPool.addFilledRect(m_mapRect, Color::alpha);
         g_drawPool.addAction([] {glEnable(GL_BLEND); });
+        return;
     }
 
-    if (drawPane & Fw::BackgroundPane) {
-        m_mapView->draw(m_mapRect);
+    auto& posInfo = m_mapView->m_posInfo;
+    if (posInfo.rect != m_mapRect) {
+        posInfo.rect = m_mapRect;
+        posInfo.srcRect = m_mapView->calcFramebufferSource(m_mapRect.size());
+        posInfo.drawOffset = posInfo.srcRect.topLeft();
+        posInfo.horizontalStretchFactor = m_mapRect.width() / static_cast<float>(posInfo.srcRect.width());
+        posInfo.verticalStretchFactor = m_mapRect.height() / static_cast<float>(posInfo.srcRect.height());
+    }
+
+    if (drawPane == DrawPoolType::MAP) {
+        m_mapView->draw();
+    } else if (drawPane == DrawPoolType::TEXT) {
+        m_mapView->drawText();
     }
 }
 
@@ -152,9 +164,7 @@ void UIMap::onStyleApply(const std::string_view styleName, const OTMLNodePtr& st
 {
     UIWidget::onStyleApply(styleName, styleNode);
     for (const OTMLNodePtr& node : styleNode->children()) {
-        if (node->tag() == "draw-texts")
-            setDrawTexts(node->value<bool>());
-        else if (node->tag() == "draw-lights")
+        if (node->tag() == "draw-lights")
             setDrawLights(node->value<bool>());
     }
 }

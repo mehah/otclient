@@ -22,9 +22,9 @@
 
 #include "uicreature.h"
 
-void UICreature::drawSelf(Fw::DrawPane drawPane)
+void UICreature::drawSelf(DrawPoolType drawPane)
 {
-    if ((drawPane & Fw::ForegroundPane) == 0)
+    if (drawPane != DrawPoolType::FOREGROUND)
         return;
 
     UIWidget::drawSelf(drawPane);

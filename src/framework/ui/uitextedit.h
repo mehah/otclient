@@ -30,7 +30,7 @@ class UITextEdit : public UIWidget
 public:
     UITextEdit();
 
-    void drawSelf(Fw::DrawPane drawPane) override;
+    void drawSelf(DrawPoolType drawPane) override;
 
 private:
     void update(bool focusCursor = false);

@@ -27,7 +27,7 @@
 class UIParticles : public UIWidget
 {
 public:
-    void drawSelf(Fw::DrawPane drawPane) override;
+    void drawSelf(DrawPoolType drawPane) override;
 
     void addEffect(const std::string_view name);
 

@@ -29,7 +29,7 @@
 class UIProgressRect : public UIWidget
 {
 public:
-    void drawSelf(Fw::DrawPane drawPane) override;
+    void drawSelf(DrawPoolType drawPane) override;
 
     void setPercent(float percent);
     float getPercent() { return m_percent; }

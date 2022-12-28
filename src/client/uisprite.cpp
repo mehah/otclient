@@ -27,9 +27,9 @@
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/drawpool.h"
 
-void UISprite::drawSelf(Fw::DrawPane drawPane)
+void UISprite::drawSelf(DrawPoolType drawPane)
 {
-    if ((drawPane & Fw::ForegroundPane) == 0)
+    if (drawPane != DrawPoolType::FOREGROUND)
         return;
 
     // draw style components in order
