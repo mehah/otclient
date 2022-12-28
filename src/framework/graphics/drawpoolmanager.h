@@ -81,8 +81,6 @@ public:
 
     DrawPoolType getCurrentType() { return getCurrentPool()->m_type; }
 
-    void finish() { getCurrentPool()->m_mutex.unlock(); }
-
 private:
     DrawPool* getCurrentPool();
 
