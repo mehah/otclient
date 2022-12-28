@@ -56,33 +56,28 @@ void DrawPoolManager::draw()
 
     // Pre Draw
     for (auto* pool : m_pools) {
-        if (!pool->isEnabled() || !pool->hasFrameBuffer()) continue;
-
-        if (pool->canRepaint(true)) {
-            const auto* pf = pool->toPoolFramed();
-
-            pf->m_framebuffer->bind();
-            for (int_fast8_t z = -1; ++z <= pool->m_currentFloor;) {
-                for (const auto& order : pool->m_objects[z])
-                    for (const auto& obj : order)
-                        drawObject(obj);
-            }
-
-            pf->m_framebuffer->release();
-        }
-    }
-
-    g_painter->setResolution(m_size, m_transformMatrix);
-
-    // Draw
-    for (auto* pool : m_pools) {
         if (!pool->isEnabled()) continue;
 
-        if (pool->hasFrameBuffer()) {
-            // Reset before events as there may be paint controls such as shaders.
-            g_painter->resetState();
+        std::scoped_lock l(pool->m_mutex);
 
-            const auto* const pf = pool->toPoolFramed();
+        if (pool->hasFrameBuffer()) {
+            if (pool->canRepaint(true)) {
+                const auto* pf = pool->toPoolFramed();
+
+                pf->m_framebuffer->bind();
+                for (int_fast8_t z = -1; ++z <= pool->m_currentFloor;) {
+                    for (const auto& order : pool->m_objects[z])
+                        for (const auto& obj : order)
+                            drawObject(obj);
+                }
+
+                pf->m_framebuffer->release();
+            }
+
+            g_painter->resetState();
+            g_painter->setResolution(m_size, m_transformMatrix);
+
+            auto* const pf = pool->toPoolFramed();
             {
                 if (pf->m_beforeDraw) pf->m_beforeDraw();
                 pf->m_framebuffer->draw();
@@ -229,6 +224,7 @@ void DrawPoolManager::use(const DrawPoolType type, const Rect& dest, const Rect&
     select(type);
 
     auto* currentPoll = getCurrentPool();
+
     currentPoll->setEnable(true);
     currentPoll->resetState();
 

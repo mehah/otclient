@@ -130,21 +130,16 @@ void GraphicalApplication::run()
 
     g_lua.callGlobalField("g_app", "onRun");
 
+    const auto& foreground = g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND);
+    const auto& txt = g_drawPool.get<DrawPool>(DrawPoolType::TEXT);
+    const auto& map = g_drawPool.get<DrawPool>(DrawPoolType::MAP);
+    const auto& creatureInformation = g_drawPool.get<DrawPool>(DrawPoolType::CREATURE_INFORMATION);
+
     std::condition_variable foreCondition, txtCondition;
-    std::mutex backMutex, foreMutex, txtMutex;
-
     std::jthread t1([&](std::stop_token st) {
-        const auto& map = g_drawPool.get<DrawPool>(DrawPoolType::MAP);
-        const auto& foreground = g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND);
-        const auto& txt = g_drawPool.get<DrawPool>(DrawPoolType::TEXT);
-
         Timer foregroundRefresh;
 
         while (!st.stop_requested()) {
-            stdext::millisleep(1);
-
-            std::scoped_lock l(backMutex);
-
             g_particles.poll();
             Application::poll();
 
@@ -167,12 +162,17 @@ void GraphicalApplication::run()
                 txtCondition.notify_one();
             }
 
-            g_ui.render(DrawPoolType::MAP);
+            {
+                std::scoped_lock l(map->getMutex(), creatureInformation->getMutex());
+                g_ui.render(DrawPoolType::MAP);
+            }
+
+            stdext::millisleep(1);
         }
     });
 
     std::jthread t2([&](std::stop_token st) {
-        std::unique_lock lock(foreMutex);
+        std::unique_lock lock(foreground->getMutex());
         foreCondition.wait(lock, [&]() -> bool {
             g_ui.render(DrawPoolType::FOREGROUND);
             return st.stop_requested();
@@ -180,7 +180,7 @@ void GraphicalApplication::run()
     });
 
     std::jthread t3([&](std::stop_token st) {
-        std::unique_lock lock(txtMutex);
+        std::unique_lock lock(txt->getMutex());
         txtCondition.wait(lock, [&]() -> bool {
             g_ui.render(DrawPoolType::TEXT);
             return st.stop_requested();
@@ -196,10 +196,7 @@ void GraphicalApplication::run()
             continue;
         }
 
-        {
-            std::scoped_lock l(backMutex, foreMutex, txtMutex);
-            g_drawPool.draw();
-        }
+        g_drawPool.draw();
 
         // update screen pixels
         g_window.swapBuffers();
