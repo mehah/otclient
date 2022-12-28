@@ -54,11 +54,17 @@ void DrawPoolManager::draw()
         m_transformMatrix = g_painter->getTransformMatrix(m_size);
     }
 
+    auto& mapMutex = get<DrawPool>(DrawPoolType::MAP)->getMutex();
+
     // Pre Draw
     for (auto* pool : m_pools) {
         if (!pool->isEnabled()) continue;
 
-        std::scoped_lock l(pool->m_mutex);
+        // Light and Creature Info, are in the same thread as the MAP
+        auto& mutex = pool->getType() == DrawPoolType::CREATURE_INFORMATION ||
+            pool->getType() == DrawPoolType::LIGHT ? mapMutex : pool->getMutex();
+
+        std::scoped_lock l(mutex);
 
         if (pool->hasFrameBuffer()) {
             if (pool->canRepaint(true)) {

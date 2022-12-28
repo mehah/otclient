@@ -133,7 +133,6 @@ void GraphicalApplication::run()
     const auto& foreground = g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND);
     const auto& txt = g_drawPool.get<DrawPool>(DrawPoolType::TEXT);
     const auto& map = g_drawPool.get<DrawPool>(DrawPoolType::MAP);
-    const auto& creatureInformation = g_drawPool.get<DrawPool>(DrawPoolType::CREATURE_INFORMATION);
 
     std::condition_variable foreCondition, txtCondition;
     std::jthread t1([&](std::stop_token st) {
@@ -163,7 +162,7 @@ void GraphicalApplication::run()
             }
 
             {
-                std::scoped_lock l(map->getMutex(), creatureInformation->getMutex());
+                std::scoped_lock l(map->getMutex());
                 g_ui.render(DrawPoolType::MAP);
             }
 
