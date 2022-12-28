@@ -74,6 +74,8 @@ public:
 
     void resetState();
 
+    std::mutex& getMutex() { return m_mutex; }
+
     struct PoolState
     {
         Matrix3 transformMatrix;
@@ -239,6 +241,8 @@ private:
     std::vector<Matrix3> m_transformMatrixStack;
 
     float m_scaleFactor{ 1.f };
+
+    std::mutex m_mutex;
 
     friend DrawPoolManager;
 };

@@ -56,10 +56,11 @@ void GraphicalApplication::init(std::vector<std::string>& args)
     });
 
     g_window.setOnInputEvent([this](auto&& PH1) {
-        g_dispatcher.addEvent([&, PH1]() {inputEvent(std::forward<decltype(PH1)>(PH1)); });
+        if (!m_running) inputEvent(PH1);
+        else g_dispatcher.addEvent([&, PH1]() { inputEvent(PH1); });
     });
 
-    g_window.setOnClose([this] { g_dispatcher.addEvent([&]() {close(); }); });
+    g_window.setOnClose([this] { g_dispatcher.addEvent([&]() { close(); }); });
 
     g_mouse.init();
 
@@ -130,21 +131,15 @@ void GraphicalApplication::run()
 
     g_lua.callGlobalField("g_app", "onRun");
 
+    const auto& foreground = g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND);
+    const auto& txt = g_drawPool.get<DrawPool>(DrawPoolType::TEXT);
+    const auto& map = g_drawPool.get<DrawPool>(DrawPoolType::MAP);
+
     std::condition_variable foreCondition, txtCondition;
-    std::mutex backMutex, foreMutex, txtMutex;
-
     std::jthread t1([&](std::stop_token st) {
-        const auto& map = g_drawPool.get<DrawPool>(DrawPoolType::MAP);
-        const auto& foreground = g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND);
-        const auto& txt = g_drawPool.get<DrawPool>(DrawPoolType::TEXT);
-
         Timer foregroundRefresh;
 
         while (!st.stop_requested()) {
-            stdext::millisleep(1);
-
-            std::scoped_lock l(backMutex);
-
             g_particles.poll();
             Application::poll();
 
@@ -167,12 +162,17 @@ void GraphicalApplication::run()
                 txtCondition.notify_one();
             }
 
-            g_ui.render(DrawPoolType::MAP);
+            {
+                std::scoped_lock l(map->getMutex());
+                g_ui.render(DrawPoolType::MAP);
+            }
+
+            stdext::millisleep(1);
         }
     });
 
     std::jthread t2([&](std::stop_token st) {
-        std::unique_lock lock(foreMutex);
+        std::unique_lock lock(foreground->getMutex());
         foreCondition.wait(lock, [&]() -> bool {
             g_ui.render(DrawPoolType::FOREGROUND);
             return st.stop_requested();
@@ -180,7 +180,7 @@ void GraphicalApplication::run()
     });
 
     std::jthread t3([&](std::stop_token st) {
-        std::unique_lock lock(txtMutex);
+        std::unique_lock lock(txt->getMutex());
         txtCondition.wait(lock, [&]() -> bool {
             g_ui.render(DrawPoolType::TEXT);
             return st.stop_requested();
@@ -196,10 +196,7 @@ void GraphicalApplication::run()
             continue;
         }
 
-        {
-            std::scoped_lock l(backMutex, foreMutex, txtMutex);
-            g_drawPool.draw();
-        }
+        g_drawPool.draw();
 
         // update screen pixels
         g_window.swapBuffers();
@@ -237,7 +234,10 @@ void GraphicalApplication::close()
 void GraphicalApplication::resize(const Size& size)
 {
     m_onInputEvent = true;
-    g_graphics.resize(size);
+    g_mainDispatcher.addEvent([=, this] {
+        g_graphics.resize(size);
+        g_drawPool.get<DrawPoolFramed>(DrawPoolType::FOREGROUND)->resize(size);
+    });
     g_ui.resize(size);
     m_onInputEvent = false;
 }
