@@ -49,8 +49,8 @@ void DrawPoolManager::select(DrawPoolType type) { CURRENT_POOL = static_cast<uin
 
 void DrawPoolManager::draw()
 {
-    if (m_size != g_painter->getResolution()) {
-        m_size = g_painter->getResolution();
+    if (m_size != g_graphics.getViewportSize()) {
+        m_size = g_graphics.getViewportSize();
         m_transformMatrix = g_painter->getTransformMatrix(m_size);
     }
 
@@ -67,9 +67,9 @@ void DrawPoolManager::draw()
         std::scoped_lock l(mutex);
 
         if (pool->hasFrameBuffer()) {
-            if (pool->canRepaint(true)) {
-                const auto* pf = pool->toPoolFramed();
+            auto* pf = pool->toPoolFramed();
 
+            if (pool->canRepaint(true)) {
                 pf->m_framebuffer->bind();
                 for (int_fast8_t z = -1; ++z <= pool->m_currentFloor;) {
                     for (const auto& order : pool->m_objects[z])
@@ -83,18 +83,13 @@ void DrawPoolManager::draw()
             g_painter->resetState();
             g_painter->setResolution(m_size, m_transformMatrix);
 
-            auto* const pf = pool->toPoolFramed();
-            {
-                if (pf->m_beforeDraw) pf->m_beforeDraw();
-                pf->m_framebuffer->draw();
-                if (pf->m_afterDraw) pf->m_afterDraw();
-            }
+            if (pf->m_beforeDraw) pf->m_beforeDraw();
+            pf->m_framebuffer->draw();
+            if (pf->m_afterDraw) pf->m_afterDraw();
         } else for (const auto& obj : pool->m_objects[0][static_cast<int>(DrawPool::DrawOrder::FIRST)]) {
             drawObject(obj);
         }
     }
-
-    get<DrawPoolFramed>(DrawPoolType::FOREGROUND)->resize(m_size);
 }
 
 void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)

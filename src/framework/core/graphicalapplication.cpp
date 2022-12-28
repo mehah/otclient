@@ -56,10 +56,11 @@ void GraphicalApplication::init(std::vector<std::string>& args)
     });
 
     g_window.setOnInputEvent([this](auto&& PH1) {
-        g_dispatcher.addEvent([&, PH1]() {inputEvent(std::forward<decltype(PH1)>(PH1)); });
+        if (!m_running) inputEvent(PH1);
+        else g_dispatcher.addEvent([&, PH1]() { inputEvent(PH1); });
     });
 
-    g_window.setOnClose([this] { g_dispatcher.addEvent([&]() {close(); }); });
+    g_window.setOnClose([this] { g_dispatcher.addEvent([&]() { close(); }); });
 
     g_mouse.init();
 
@@ -233,7 +234,10 @@ void GraphicalApplication::close()
 void GraphicalApplication::resize(const Size& size)
 {
     m_onInputEvent = true;
-    g_graphics.resize(size);
+    g_mainDispatcher.addEvent([=, this] {
+        g_graphics.resize(size);
+        g_drawPool.get<DrawPoolFramed>(DrawPoolType::FOREGROUND)->resize(size);
+    });
     g_ui.resize(size);
     m_onInputEvent = false;
 }
