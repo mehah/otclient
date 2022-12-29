@@ -662,7 +662,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
     const int indexSize = textureLayers * m_numPatternX * m_numPatternY * m_numPatternZ;
     const auto& textureSize = getBestTextureDimension(m_size.width(), m_size.height(), indexSize);
     const auto& fullImage = useCustomImage ? Image::load(m_customImage) : ImagePtr(new Image(textureSize * SPRITE_SIZE));
-    const bool protobufSupported = g_game.getProtocolVersion() >= 1281;
+    const bool protobufSupported = g_game.getProtocolVersion() >= 1281 && !g_game.getFeature(Otc::GameLoadSprInsteadProtobuf);
 
     static Color maskColors[] = { Color::red, Color::green, Color::blue, Color::yellow };
 

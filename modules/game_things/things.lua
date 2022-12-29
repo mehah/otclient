@@ -24,7 +24,7 @@ end
 function load(version)
     local errorMessage = ''
 
-    if version >= 1281 then
+    if version >= 1281 and not g_game.getFeature(GameLoadSprInsteadProtobuf) then
         if not g_things.loadAppearances(resolvepath(string.format('/things/%d/catalog-content', version))) then
             errorMessage = errorMessage .. 'Couldn\'t load assets'
         end

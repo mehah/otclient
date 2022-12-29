@@ -517,6 +517,9 @@ namespace Otc
         GameThingCounter = 87,
         GameThingClock = 88,
         GameThingPodiumItemType = 89,
+
+        //  others
+        GameLoadSprInsteadProtobuf = 100,
         LastGameFeature = 101
     };
 

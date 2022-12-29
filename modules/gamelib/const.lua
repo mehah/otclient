@@ -165,6 +165,7 @@ GameThingUpgradeClassification = 86
 GameThingCounter = 87
 GameThingClock = 88
 GameThingPodiumItemType = 89
+GameLoadSprInsteadProtobuf = 100
 
 TextColors = {
     red = '#f55e5e', -- '#c83200'
