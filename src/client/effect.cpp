@@ -98,7 +98,8 @@ void Effect::onAppear()
 
 void Effect::waitFor(const EffectPtr& effect)
 {
-    m_timeToStartDrawing = effect->m_duration * (g_app.mustOptimize() || g_app.isForcedEffectOptimization() ? .7 : .5);
+    const int duration = effect->m_duration / (g_app.mustOptimize() || g_app.isForcedEffectOptimization() ? 1.5 : 3);
+    m_timeToStartDrawing = duration - effect->m_animationTimer.ticksElapsed();
 }
 
 void Effect::setId(uint32_t id)
