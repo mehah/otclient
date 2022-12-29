@@ -121,6 +121,12 @@ function onContainerOpen(container, previousContainer)
 
     local name = container:getName()
     name = name:sub(1, 1):upper() .. name:sub(2)
+    
+    if name:len() > 11 then
+        name = string.sub(name, 1, #name - 3)
+        name = name.."..."
+    end
+    
     containerWindow:setText(name)
 
     containerItemWidget:setItem(container:getContainerItem())
