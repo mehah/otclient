@@ -278,16 +278,11 @@ extern DrawPoolManager g_drawPool;
 class DrawBuffer
 {
 public:
-    DrawBuffer(DrawPool::DrawOrder order, bool agroup = true, bool isStatic = true) : m_agroup(agroup), m_static(isStatic), m_order(order) {}
+    DrawBuffer(DrawPool::DrawOrder order, bool agroup = true) : m_agroup(agroup), m_order(order) {}
     void agroup(bool v) { m_agroup = v; }
     void setOrder(DrawPool::DrawOrder order) { m_order = order; }
 
-    bool isStatic() { return m_static; }
-    void invalidate() {
-        m_i = -1;
-        if (m_mainBuffer)
-            m_mainBuffer->invalidate();
-    }
+    void invalidate() { m_i = -1; }
 
 private:
     static DrawBufferPtr createTemporaryBuffer(DrawPool::DrawOrder order)
@@ -306,16 +301,10 @@ private:
         return isValid();
     }
 
-    void setMainBuffer(const DrawBufferPtr& buffer) {
-        if (m_mainBuffer != buffer)
-            m_mainBuffer = buffer;
-    }
-
     inline CoordsBuffer* getCoords() { return (m_coords ? m_coords : m_coords = std::make_shared<CoordsBuffer>()).get(); }
 
     int m_i{ -1 };
     bool m_agroup{ true };
-    bool m_static{ true };
 
     DrawPool::DrawOrder m_order{ DrawPool::DrawOrder::FIRST };
     Point m_ref;
@@ -323,7 +312,6 @@ private:
 
     std::vector<size_t> m_hashs;
     CoordsBufferPtr m_coords;
-    DrawBufferPtr m_mainBuffer;
 
     friend class DrawPool;
     friend class DrawPoolManager;
