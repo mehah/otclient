@@ -58,7 +58,7 @@ bool LocalPlayer::canWalk(bool ignoreLock)
 
     int stepDuration = getStepDuration();
     if (mustStabilizeCam())
-        stepDuration -= 10;
+        stepDuration -= 9;
 
     return m_walkTimer.ticksElapsed() >= std::max<int>(stepDuration, g_game.getPing());
 }
