@@ -204,6 +204,7 @@ private:
 
     void updateGeometry(const Size& visibleDimension);
     void updateVisibleTiles();
+    void updateRect(const Rect& rect);
     void requestUpdateVisibleTiles() { m_updateVisibleTiles = true; }
     void requestUpdateMapPosInfo() { m_posInfo.rect = {}; }
 
