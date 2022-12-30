@@ -297,7 +297,8 @@ private:
 
     bool validate(const Point& p)
     {
-        if (m_ref != p) { m_ref = p; invalidate(); }
+        const size_t hash = p.hash();
+        if (m_ref != hash) { m_ref = hash; invalidate(); }
         return isValid();
     }
 
@@ -307,7 +308,7 @@ private:
     bool m_agroup{ true };
 
     DrawPool::DrawOrder m_order{ DrawPool::DrawOrder::FIRST };
-    Point m_ref;
+    size_t m_ref;
     size_t m_stateHash{ 0 };
 
     std::vector<size_t> m_hashs;
