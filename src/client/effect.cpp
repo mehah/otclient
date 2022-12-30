@@ -98,6 +98,12 @@ void Effect::onAppear()
 
 void Effect::waitFor(const EffectPtr& effect)
 {
+    const ticks_t ticksElapsed = effect->m_animationTimer.ticksElapsed();
+    if (ticksElapsed <= 20) {
+        canDraw(false);
+        return;
+    }
+
     const int duration = effect->m_duration / (g_app.mustOptimize() || g_app.isForcedEffectOptimization() ? 1.5 : 3);
     m_timeToStartDrawing = duration - effect->m_animationTimer.ticksElapsed();
 }

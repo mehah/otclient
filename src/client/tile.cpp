@@ -182,6 +182,8 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
                 prevEffect->canDraw(false);
             } else if (mustOptimize || newEffect->getId() == prevEffect->getId()) {
                 newEffect->waitFor(prevEffect);
+                if (!newEffect->canDraw())
+                    return;
             }
         }
 
