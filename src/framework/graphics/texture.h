@@ -49,7 +49,6 @@ public:
     int getWidth() { return m_size.width(); }
     int getHeight() { return m_size.height(); }
     const Size& getSize() { return m_size; }
-    const Size& getGlSize() { return m_glSize; }
     const Matrix3& getTransformMatrix() { return m_transformMatrix; }
     bool isEmpty() { return m_id == 0; }
     bool hasRepeat() { return m_repeat; }
@@ -73,7 +72,6 @@ protected:
     uint32_t m_id{ 0 };
     ticks_t m_time{ 0 };
     Size m_size;
-    Size m_glSize;
 
     Matrix3 m_transformMatrix;
 
