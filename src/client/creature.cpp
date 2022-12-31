@@ -188,6 +188,9 @@ void Creature::internalDrawOutfit(Point dest, TextureType textureType, Otc::Dire
 
 void Creature::drawOutfit(const Rect& destRect, bool resize, const Color color)
 {
+    if (!m_thingType)
+        return;
+
     int frameSize;
     if (!resize)
         frameSize = m_sizeCache.frameSizeNotResized;
