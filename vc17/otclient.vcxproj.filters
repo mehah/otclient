@@ -405,10 +405,10 @@
     <ClCompile Include="..\src\client\creature.cpp">
       <Filter>Source Files\client</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\client\discord.cpp">
+    <ClCompile Include="..\src\client\creatures.cpp">
       <Filter>Source Files\client</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\client\creatures.cpp">
+    <ClCompile Include="..\src\client\discord.cpp">
       <Filter>Source Files\client</Filter>
     </ClCompile>
     <ClCompile Include="..\src\client\effect.cpp">
@@ -914,10 +914,10 @@
     <ClInclude Include="..\src\client\creature.h">
       <Filter>Header Files\client</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\client\discord.h">
+    <ClInclude Include="..\src\client\creatures.h">
       <Filter>Header Files\client</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\client\creatures.h">
+    <ClInclude Include="..\src\client\discord.h">
       <Filter>Header Files\client</Filter>
     </ClInclude>
     <ClInclude Include="..\src\client\declarations.h">
