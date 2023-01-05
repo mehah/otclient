@@ -206,7 +206,7 @@ ImagePtr SpriteAppearances::getSpriteImage(int id)
 
         const Size& size = sheet->getSpriteSize();
 
-        const ImagePtr& image(new Image(size));
+        const auto& image = std::make_shared<Image>(size);
         uint8_t* pixelData = image->getPixelData();
 
         const int spriteOffset = id - sheet->firstId;

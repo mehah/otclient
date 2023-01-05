@@ -34,7 +34,7 @@ enum class SpriteLayout
     TWO_BY_TWO = 3
 };
 
-class SpriteSheet : public LuaObject
+class SpriteSheet
 {
 public:
     SpriteSheet(int firstId, int lastId, SpriteLayout spriteLayout, const std::string& file) : firstId(firstId), lastId(lastId), spriteLayout(spriteLayout), file(file) {}

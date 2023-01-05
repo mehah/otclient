@@ -58,7 +58,7 @@ bool FontManager::importFont(const std::string& file)
             }
         }
 
-        const BitmapFontPtr& font(new BitmapFont(name));
+        const auto& font(std::make_shared<BitmapFont>(name));
         font->load(fontNode);
         m_fonts.push_back(font);
 

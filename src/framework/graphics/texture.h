@@ -24,13 +24,13 @@
 
 #include "declarations.h"
 
-class Texture : public stdext::shared_object
+class Texture
 {
 public:
     Texture();
     Texture(const Size& size);
     Texture(const ImagePtr& image, bool buildMipmaps = false, bool compress = false, bool canSuperimposed = false, bool load = true);
-    ~Texture() override;
+    virtual ~Texture();
 
     void uploadPixels(const ImagePtr& image, bool buildMipmaps = false, bool compress = false);
     void updateImage(const ImagePtr& image) { m_image = image; }

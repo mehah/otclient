@@ -155,7 +155,7 @@ TexturePtr TextureManager::loadTexture(std::stringstream& file)
                 framesDelay.push_back(frameDelay);
                 frames.push_back(ImagePtr(new Image(imageSize, apng.bpp, frameData)));
             }
-            const AnimatedTexturePtr animatedTexture = new AnimatedTexture(imageSize, frames, framesDelay);
+            const auto& animatedTexture = std::make_shared<AnimatedTexture>(imageSize, frames, framesDelay);
             m_animatedTextures.push_back(animatedTexture);
             texture = animatedTexture;
         } else {

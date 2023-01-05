@@ -330,7 +330,7 @@ BinaryTreePtr FileStream::getBinaryTree()
     if (const uint8_t byte = getU8(); byte != static_cast<uint8_t>(BinaryTree::Node::START))
         throw Exception("failed to read node start (getBinaryTree): %d", byte);
 
-    return { new BinaryTree(asFileStream()) };
+    return  std::make_shared<BinaryTree>(std::shared_ptr<FileStream>(this));
 }
 
 void FileStream::startNode(uint8_t n)

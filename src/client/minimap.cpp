@@ -47,7 +47,7 @@ void MinimapBlock::update()
     if (m_image)
         m_image->resize(m_size);
     else
-        m_image = new Image(m_size);
+        m_image = std::make_shared<Image>(m_size);
 
     bool shouldDraw = false;
     for (uint_fast8_t x = 0; x < MMBLOCK_SIZE; ++x) {

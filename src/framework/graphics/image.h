@@ -24,7 +24,7 @@
 
 #include "declarations.h"
 
-class Image : public stdext::shared_object
+class Image
 {
 public:
     Image(const Size& size, int bpp = 4, uint8_t* pixels = nullptr);

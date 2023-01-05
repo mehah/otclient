@@ -247,7 +247,7 @@ FileStreamPtr ResourceManager::openFile(const std::string& fileName)
     PHYSFS_File* file = PHYSFS_openRead(fullPath.c_str());
     if (!file)
         throw Exception("unable to open file '%s': %s", fullPath, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
-    return { new FileStream(fullPath, file, false) };
+    return { std::make_shared<FileStream>(fullPath, file, false) };
 }
 
 FileStreamPtr ResourceManager::appendFile(const std::string& fileName)
@@ -255,7 +255,7 @@ FileStreamPtr ResourceManager::appendFile(const std::string& fileName)
     PHYSFS_File* file = PHYSFS_openAppend(fileName.c_str());
     if (!file)
         throw Exception("failed to append file '%s': %s", fileName, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
-    return { new FileStream(fileName, file, true) };
+    return { std::make_shared<FileStream>(fileName, file, true) };
 }
 
 FileStreamPtr ResourceManager::createFile(const std::string& fileName)
@@ -263,7 +263,7 @@ FileStreamPtr ResourceManager::createFile(const std::string& fileName)
     PHYSFS_File* file = PHYSFS_openWrite(fileName.c_str());
     if (!file)
         throw Exception("failed to create file '%s': %s", fileName, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
-    return { new FileStream(fileName, file, true) };
+    return { std::make_shared<FileStream>(fileName, file, true) };
 }
 
 bool ResourceManager::deleteFile(const std::string& fileName)

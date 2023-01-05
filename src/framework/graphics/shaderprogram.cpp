@@ -53,7 +53,7 @@ bool ShaderProgram::addShader(const ShaderPtr& shader)
 
 bool ShaderProgram::addShaderFromSourceCode(ShaderType shaderType, const std::string_view sourceCode)
 {
-    const ShaderPtr& shader(new Shader(shaderType));
+    const auto& shader = std::make_shared<Shader>(shaderType);
     if (!shader->compileSourceCode(sourceCode)) {
         g_logger.error(stdext::format("failed to compile shader: %s", shader->log()));
         return false;
@@ -63,7 +63,7 @@ bool ShaderProgram::addShaderFromSourceCode(ShaderType shaderType, const std::st
 
 bool ShaderProgram::addShaderFromSourceFile(ShaderType shaderType, const std::string_view sourceFile)
 {
-    const ShaderPtr& shader(new Shader(shaderType));
+    const auto& shader = std::make_shared<Shader>(shaderType);
     if (!shader->compileSourceFile(sourceFile)) {
         g_logger.error(stdext::format("failed to compile shader: %s", shader->log()));
         return false;

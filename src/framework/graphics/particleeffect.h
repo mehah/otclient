@@ -43,7 +43,7 @@ private:
     OTMLNodePtr m_node;
 };
 
-class ParticleEffect : public LuaObject
+class ParticleEffect
 {
 public:
     ParticleEffect() = default;

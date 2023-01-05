@@ -26,7 +26,7 @@
 #include <framework/global.h>
 #include <framework/otml/otml.h>
 
-class ParticleEmitter : public stdext::shared_object
+class ParticleEmitter
 {
 public:
 
