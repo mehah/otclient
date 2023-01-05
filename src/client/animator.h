@@ -59,6 +59,8 @@ public:
     int getAnimationPhases() const { return m_animationPhases; }
     int getAverageDuration() const { return getTotalDuration() / getAnimationPhases(); }
 
+    uint16_t getMinDuration() const { return m_minDuration; }
+
     bool isAsync() { return m_async; }
     bool isComplete() { return m_isComplete; }
 
@@ -77,6 +79,8 @@ private:
     int m_startPhase{ 0 };
     int m_loopCount{ 0 };
     int m_phase{ 0 };
+
+    uint16_t m_minDuration{ 0 };
 
     bool m_isComplete{ false };
     bool m_async{ false };

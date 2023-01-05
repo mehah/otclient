@@ -54,6 +54,9 @@ void Animator::unserialize(int animationPhases, const FileStreamPtr& fin)
         int minimum = fin->getU32();
         int maximum = fin->getU32();
         m_phaseDurations.emplace_back(minimum, maximum);
+
+        m_minDuration = m_minDuration == 0 ? minimum :
+            std::min<uint16_t>(m_minDuration, minimum);
     }
 
     m_phase = getStartPhase();
