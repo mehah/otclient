@@ -49,8 +49,8 @@
   - To generate an encryption, just run the client with flag "--encrypt SET_YOUR_PASSWORD_HERE" and don't forget to change the password.
   - you can also skip adding password to --encrypt command it automatically will be taken from [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h) file (by [@TheMaoci](https://github.com/TheMaoci))
 
- - Support HTTP/HTTPS/WS/WSS. Based on [@Kondra](https://github.com/OTCv8/otcv8-dev) make by [@alfuveam](https://github.com/alfuveam)
- - Discord RPC by [@SkullzOTS](https://github.com/SkullzOTS)
+- Support HTTP/HTTPS/WS/WSS. Based on [@Kondra](https://github.com/OTCv8/otcv8-dev) make by [@alfuveam](https://github.com/alfuveam)
+- Discord RPC by [@SkullzOTS](https://github.com/SkullzOTS)
   - To enable just go to [config.h](https://github.com/mehah/otclient/blob/main/src/client/config.h), set 1 in ENABLE_DISCORD_RPC and configure the others definitions
   - You can see the step by step in [YouTube](https://www.youtube.com/watch?v=zCHYtRlD58g)
 
