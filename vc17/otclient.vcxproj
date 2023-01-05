@@ -273,8 +273,8 @@ IF %ERRORLEVEL% EQU 0 (
     <ClCompile Include="..\src\client\client.cpp" />
     <ClCompile Include="..\src\client\container.cpp" />
     <ClCompile Include="..\src\client\creature.cpp" />
-    <ClCompile Include="..\src\client\discord.cpp" />
     <ClCompile Include="..\src\client\creatures.cpp" />
+    <ClCompile Include="..\src\client\discord.cpp" />
     <ClCompile Include="..\src\client\effect.cpp" />
     <ClCompile Include="..\src\client\game.cpp" />
     <ClCompile Include="..\src\client\houses.cpp" />
@@ -424,8 +424,8 @@ IF %ERRORLEVEL% EQU 0 (
     <ClInclude Include="..\src\client\const.h" />
     <ClInclude Include="..\src\client\container.h" />
     <ClInclude Include="..\src\client\creature.h" />
-    <ClInclude Include="..\src\client\discord.h" />
     <ClInclude Include="..\src\client\creatures.h" />
+    <ClInclude Include="..\src\client\discord.h" />
     <ClInclude Include="..\src\client\declarations.h" />
     <ClInclude Include="..\src\client\effect.h" />
     <ClInclude Include="..\src\client\game.h" />
