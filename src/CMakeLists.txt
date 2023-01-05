@@ -227,6 +227,7 @@ set(SOURCE_FILES
 	client/container.cpp
 	client/creature.cpp
 	client/creatures.cpp
+	client/discord.cpp
 	client/effect.cpp
 	client/game.cpp
 	client/houses.cpp
