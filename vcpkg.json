@@ -15,6 +15,7 @@
     "parallel-hashmap",
     "stduuid",
     "luajit",
+    "discord-rpc",
     {
       "name": "opengl",
       "platform": "windows | linux"
