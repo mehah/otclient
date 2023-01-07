@@ -59,14 +59,7 @@ void UIMap::drawSelf(DrawPoolType drawPane)
         return;
     }
 
-    auto& posInfo = m_mapView->m_posInfo;
-    if (posInfo.rect != m_mapRect) {
-        posInfo.rect = m_mapRect;
-        posInfo.srcRect = m_mapView->calcFramebufferSource(m_mapRect.size());
-        posInfo.drawOffset = posInfo.srcRect.topLeft();
-        posInfo.horizontalStretchFactor = m_mapRect.width() / static_cast<float>(posInfo.srcRect.width());
-        posInfo.verticalStretchFactor = m_mapRect.height() / static_cast<float>(posInfo.srcRect.height());
-    }
+    m_mapView->updateRect(m_mapRect);
 
     if (drawPane == DrawPoolType::MAP) {
         m_mapView->draw();

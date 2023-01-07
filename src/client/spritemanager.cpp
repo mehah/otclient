@@ -157,7 +157,7 @@ ImagePtr SpriteManager::getSpriteImage(int id)
 
         const uint16_t pixelDataSize = m_spritesFile->getU16();
 
-        const ImagePtr& image(new Image(Size(SPRITE_SIZE)));
+        const auto& image = std::make_shared<Image>(Size(SPRITE_SIZE));
 
         uint8_t* pixels = image->getPixelData();
         int writePos = 0;

@@ -204,6 +204,7 @@ private:
 
     void updateGeometry(const Size& visibleDimension);
     void updateVisibleTiles();
+    void updateRect(const Rect& rect);
     void requestUpdateVisibleTiles() { m_updateVisibleTiles = true; }
     void requestUpdateMapPosInfo() { m_posInfo.rect = {}; }
 
@@ -280,6 +281,7 @@ private:
 
     bool m_autoViewMode{ false };
     bool m_drawViewportEdge{ false };
+    bool m_forceDrawViewportEdge{ false };
     bool m_drawHighlightTarget{ false };
     bool m_shiftPressed{ false };
 

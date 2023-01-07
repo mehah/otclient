@@ -25,7 +25,7 @@
 #include "declarations.h"
 #include <framework/util/databuffer.h>
 
-class BinaryTree : public stdext::shared_object
+class BinaryTree
 {
 public:
     enum class Node
@@ -36,7 +36,6 @@ public:
     };
 
     explicit BinaryTree(const FileStreamPtr& fin);
-    ~BinaryTree() override;
 
     void seek(uint32_t pos);
     void skip(uint32_t len);
@@ -58,12 +57,12 @@ private:
     void skipNodes();
 
     FileStreamPtr m_fin;
-    DataBuffer<uint8_t > m_buffer;
+    DataBuffer<uint8_t> m_buffer;
     uint32_t m_pos;
     uint32_t m_startPos;
 };
 
-class OutputBinaryTree : public stdext::shared_object
+class OutputBinaryTree
 {
 public:
     OutputBinaryTree(FileStreamPtr finish);

@@ -24,7 +24,8 @@ MAP_SHADERS = {{
     frag = 'shaders/fragment/sepia.frag'
 }, {
     name = 'Map - Pulse',
-    frag = 'shaders/fragment/pulse.frag'
+    frag = 'shaders/fragment/pulse.frag',
+    drawViewportEdge = true
 }, {
     name = 'Map - Old Tv',
     frag = 'shaders/fragment/oldtv.frag'
@@ -33,13 +34,16 @@ MAP_SHADERS = {{
     frag = 'shaders/fragment/party.frag'
 }, {
     name = 'Map - Radial Blur',
-    frag = 'shaders/fragment/radialblur.frag'
+    frag = 'shaders/fragment/radialblur.frag',
+    drawViewportEdge = true
 }, {
     name = 'Map - Zomg',
-    frag = 'shaders/fragment/zomg.frag'
+    frag = 'shaders/fragment/zomg.frag',
+    drawViewportEdge = true
 }, {
     name = 'Map - Heat',
-    frag = 'shaders/fragment/heat.frag'
+    frag = 'shaders/fragment/heat.frag',
+    drawViewportEdge = true
 }, {
     name = 'Map - Noise',
     frag = 'shaders/fragment/noise.frag'
@@ -143,6 +147,9 @@ function init()
     mapComboBox.onOptionChange = function(combobox, option)
         local map = modules.game_interface.getMapPanel()
         map:setMapShader(option)
+
+        local data = combobox:getCurrentOption().data
+        map:setDrawViewportEdge(data.drawViewportEdge == true)
     end
 
     local outfitComboBox = shadersPanel:getChildById('outfitComboBox')

@@ -30,12 +30,12 @@ enum class ShaderType
     FRAGMENT
 };
 
-class Shader : public stdext::shared_object
+class Shader
 {
 public:
 
     Shader(ShaderType shaderType);
-    ~Shader() override;
+    ~Shader();
 
     bool compileSourceCode(const std::string_view sourceCode);
     bool compileSourceFile(const std::string_view sourceFile);

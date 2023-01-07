@@ -25,7 +25,7 @@
 #include "declarations.h"
 #include <framework/otml/otml.h>
 
-class ParticleAffector : public stdext::shared_object
+class ParticleAffector
 {
 public:
     void update(float elapsedTime);

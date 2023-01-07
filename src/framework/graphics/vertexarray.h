@@ -30,6 +30,8 @@ class VertexArray
 public:
     static constexpr int CACHE_MIN_VERTICES_COUNT = 42;
 
+    VertexArray() { m_buffer.reserve(1024); }
+
     ~VertexArray()
     {
         if (m_hardwareBuffer)

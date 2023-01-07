@@ -849,6 +849,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIMap>("setMinimumAmbientLight", &UIMap::setMinimumAmbientLight);
     g_lua.bindClassMemberFunction<UIMap>("setShadowFloorIntensity", &UIMap::setShadowFloorIntensity);
     g_lua.bindClassMemberFunction<UIMap>("setLimitVisibleRange", &UIMap::setLimitVisibleRange);
+    g_lua.bindClassMemberFunction<UIMap>("setDrawViewportEdge", &UIMap::setDrawViewportEdge);
     g_lua.bindClassMemberFunction<UIMap>("isDrawingNames", &UIMap::isDrawingNames);
     g_lua.bindClassMemberFunction<UIMap>("isDrawingHealthBars", &UIMap::isDrawingHealthBars);
     g_lua.bindClassMemberFunction<UIMap>("isDrawingLights", &UIMap::isDrawingLights);
@@ -866,7 +867,6 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIMap>("getMaxZoomIn", &UIMap::getMaxZoomIn);
     g_lua.bindClassMemberFunction<UIMap>("getMaxZoomOut", &UIMap::getMaxZoomOut);
     g_lua.bindClassMemberFunction<UIMap>("getZoom", &UIMap::getZoom);
-    g_lua.bindClassMemberFunction<UIMap>("getMapShader", &UIMap::getMapShader);
     g_lua.bindClassMemberFunction<UIMap>("getMinimumAmbientLight", &UIMap::getMinimumAmbientLight);
     g_lua.bindClassMemberFunction<UIMap>("getSpectators", &UIMap::getSpectators);
     g_lua.bindClassMemberFunction<UIMap>("getSightSpectators", &UIMap::getSightSpectators);

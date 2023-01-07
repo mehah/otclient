@@ -40,7 +40,7 @@ public:
     EffectPtr asEffect() { return static_self_cast<Effect>(); }
     bool isEffect() override { return true; }
 
-    void waitFor(const EffectPtr&);
+    bool waitFor(const EffectPtr&);
 
 protected:
     void onAppear() override;

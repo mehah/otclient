@@ -28,7 +28,7 @@
 #include "shader.h"
 
  // @bindclass
-class ShaderProgram : public LuaObject
+class ShaderProgram
 {
     enum
     {
@@ -37,7 +37,7 @@ class ShaderProgram : public LuaObject
 
 public:
     ShaderProgram();
-    ~ShaderProgram() override;
+    ~ShaderProgram();
 
     bool addShader(const ShaderPtr& shader);
     bool addShaderFromSourceCode(ShaderType shaderType, const std::string_view sourceCode);

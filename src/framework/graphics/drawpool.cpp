@@ -83,9 +83,6 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const DrawMeth
         if (auto it = m_objectsByhash.find(stateHash); it != m_objectsByhash.end()) {
             const auto& buffer = it->second.buffer;
 
-            if (drawBuffer)
-                drawBuffer->setMainBuffer(buffer);
-
             if (!buffer->isTemporary() && buffer->isValid()) {
                 auto& hashList = buffer->m_hashs;
                 if (++buffer->m_i != hashList.size()) {

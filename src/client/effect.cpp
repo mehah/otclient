@@ -96,9 +96,19 @@ void Effect::onAppear()
     g_dispatcher.scheduleEvent([self] { g_map.removeThing(self); }, m_duration);
 }
 
-void Effect::waitFor(const EffectPtr& effect)
+bool Effect::waitFor(const EffectPtr& effect)
 {
-    m_timeToStartDrawing = effect->m_duration * (g_app.mustOptimize() || g_app.isForcedEffectOptimization() ? .7 : .5);
+    const ticks_t ticksElapsed = effect->m_animationTimer.ticksElapsed();
+    uint16_t minDuration = getIdleAnimator() ? getIdleAnimator()->getMinDuration() : EFFECT_TICKS_PER_FRAME;
+    minDuration = minDuration * std::max<uint8_t>(getAnimationPhases() / 3, 1);
+
+    if (ticksElapsed <= minDuration)
+        return false;
+
+    const int duration = effect->m_duration / (g_app.mustOptimize() || g_app.isForcedEffectOptimization() ? 1.5 : 3);
+    m_timeToStartDrawing = duration - effect->m_animationTimer.ticksElapsed();
+
+    return true;
 }
 
 void Effect::setId(uint32_t id)

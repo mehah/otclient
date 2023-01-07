@@ -58,7 +58,7 @@ bool LocalPlayer::canWalk(bool ignoreLock)
 
     int stepDuration = getStepDuration();
     if (mustStabilizeCam())
-        stepDuration -= 10;
+        stepDuration -= 9;
 
     return m_walkTimer.ticksElapsed() >= std::max<int>(stepDuration, g_game.getPing());
 }
@@ -102,7 +102,7 @@ bool LocalPlayer::retryAutoWalk()
                 m_autoWalkContinueEvent->cancel();
 
             m_autoWalkContinueEvent = g_dispatcher.scheduleEvent(
-                [capture0 = asLocalPlayer(), this] { capture0->autoWalk(m_autoWalkDestination, true); }, 200
+                [capture0 = asLocalPlayer(), this, autoWalkDest = m_autoWalkDestination] { capture0->autoWalk(autoWalkDest, true); }, 200
             );
 
             m_autoWalkRetries += 1;

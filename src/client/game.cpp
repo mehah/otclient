@@ -569,10 +569,10 @@ bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
         return false;
     }
 
+    m_nextScheduledDir = Otc::InvalidDirection;
+
     // if it's going to walk, but there is another scheduled event, cancel it
     if (m_walkEvent && !m_walkEvent->isExecuted()) {
-        m_nextScheduledDir = Otc::InvalidDirection;
-
         m_walkEvent->cancel();
         m_walkEvent = nullptr;
     }

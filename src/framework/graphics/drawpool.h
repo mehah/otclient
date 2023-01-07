@@ -125,7 +125,7 @@ protected:
     struct DrawObject
     {
         DrawObject(std::function<void()> action) : action(std::move(action)) {}
-        DrawObject(const PoolState& state, const DrawBufferPtr& buffer) : buffer(buffer), state(state) {}
+        DrawObject(const PoolState& state, const DrawBufferPtr& buffer) : buffer(buffer), state(std::move(state)) {}
         DrawObject(const DrawMode drawMode, const PoolState& state, const DrawMethod& method) :
             drawMode(drawMode), state(state), method(method)
         {}
@@ -278,16 +278,11 @@ extern DrawPoolManager g_drawPool;
 class DrawBuffer
 {
 public:
-    DrawBuffer(DrawPool::DrawOrder order, bool agroup = true, bool isStatic = true) : m_agroup(agroup), m_static(isStatic), m_order(order) {}
+    DrawBuffer(DrawPool::DrawOrder order, bool agroup = true) : m_agroup(agroup), m_order(order) {}
     void agroup(bool v) { m_agroup = v; }
     void setOrder(DrawPool::DrawOrder order) { m_order = order; }
 
-    bool isStatic() { return m_static; }
-    void invalidate() {
-        m_i = -1;
-        if (m_mainBuffer)
-            m_mainBuffer->invalidate();
-    }
+    void invalidate() { m_i = -1; }
 
 private:
     static DrawBufferPtr createTemporaryBuffer(DrawPool::DrawOrder order)
@@ -302,28 +297,22 @@ private:
 
     bool validate(const Point& p)
     {
-        if (m_ref != p) { m_ref = p; invalidate(); }
+        const size_t hash = p.hash();
+        if (m_ref != hash) { m_ref = hash; invalidate(); }
         return isValid();
-    }
-
-    void setMainBuffer(const DrawBufferPtr& buffer) {
-        if (m_mainBuffer != buffer)
-            m_mainBuffer = buffer;
     }
 
     inline CoordsBuffer* getCoords() { return (m_coords ? m_coords : m_coords = std::make_shared<CoordsBuffer>()).get(); }
 
     int m_i{ -1 };
     bool m_agroup{ true };
-    bool m_static{ true };
 
     DrawPool::DrawOrder m_order{ DrawPool::DrawOrder::FIRST };
-    Point m_ref;
+    size_t m_ref;
     size_t m_stateHash{ 0 };
 
     std::vector<size_t> m_hashs;
     CoordsBufferPtr m_coords;
-    DrawBufferPtr m_mainBuffer;
 
     friend class DrawPool;
     friend class DrawPoolManager;

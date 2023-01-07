@@ -31,12 +31,12 @@
 struct PHYSFS_File;
 
 // @bindclass
-class FileStream : public LuaObject
+class FileStream
 {
 public:
     FileStream(std::string name, PHYSFS_File* fileHandle, bool writeable);
     FileStream(std::string name, const std::string_view buffer);
-    ~FileStream() override;
+    ~FileStream();
 
     void cache();
     void close();
@@ -74,8 +74,6 @@ public:
     void addString(const std::string_view v);
     void addPos(uint16_t x, uint16_t y, uint8_t z) { addU16(x); addU16(y); addU8(z); }
     void addPoint(const Point& p) { addU8(p.x); addU8(p.y); }
-
-    FileStreamPtr asFileStream() { return static_self_cast<FileStream>(); }
 
     DataBuffer<uint8_t> m_data;
 

@@ -28,7 +28,7 @@
 
 #include <utility>
 
-class BitmapFont : public stdext::shared_object
+class BitmapFont
 {
 public:
     BitmapFont(std::string_view name) : m_name(name) {}

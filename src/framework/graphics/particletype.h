@@ -27,7 +27,7 @@
 #include <framework/luaengine/luaobject.h>
 #include <framework/otml/otml.h>
 
-class ParticleType : public LuaObject
+class ParticleType
 {
 public:
     ParticleType();
