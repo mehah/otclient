@@ -29,6 +29,13 @@ function load(version)
             errorMessage = errorMessage .. 'Couldn\'t load assets'
         end
     else
+        if g_game.getFeature(GameLoadSprInsteadProtobuf) then
+            local warningBox = displayErrorBox(tr('Warning'), 'Load spr instead protobuf it\'s instable, use by yours on risk!')
+            addEvent(function()
+                warningBox:raise()
+                warningBox:focus()
+            end)            
+        end
         local datPath, sprPath
         if filename then
             datPath = resolvepath('/data/things/' .. filename)
