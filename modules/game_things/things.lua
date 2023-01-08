@@ -30,7 +30,7 @@ function load(version)
         end
     else
         if g_game.getFeature(GameLoadSprInsteadProtobuf) then
-            local warningBox = displayErrorBox(tr('Warning'), 'Load spr instead protobuf it\'s instable, use by yours on risk!')
+            local warningBox = displayErrorBox(tr('Warning'), 'Load spr instead protobuf it\'s unstable, use by yours risk!')
             addEvent(function()
                 warningBox:raise()
                 warningBox:focus()
