@@ -26,14 +26,7 @@
 #include "tile.h"
 #include <framework/core/eventdispatcher.h>
 
-LocalPlayer::LocalPlayer()
-{
-    m_skillsLevel.fill(-1);
-    m_skillsBaseLevel.fill(-1);
-    m_skillsLevelPercent.fill(-1);
-}
-
-void LocalPlayer::lockWalk(int millis)
+void LocalPlayer::lockWalk(uint16_t millis)
 {
     m_walkLockExpiration = std::max<ticks_t>(m_walkLockExpiration, g_clock.millis() + millis);
 }
@@ -56,7 +49,7 @@ bool LocalPlayer::canWalk(bool ignoreLock)
         return true;
     }
 
-    int stepDuration = getStepDuration();
+    uint16_t stepDuration = getStepDuration();
     if (mustStabilizeCam())
         stepDuration -= 9;
 
@@ -204,7 +197,7 @@ void LocalPlayer::stopWalk()
     m_lastPrewalkDestination = {};
 }
 
-void LocalPlayer::updateWalkOffset(int totalPixelsWalked)
+void LocalPlayer::updateWalkOffset(uint8_t totalPixelsWalked)
 {
     if (!m_preWalking) {
         Creature::updateWalkOffset(totalPixelsWalked);

@@ -27,17 +27,11 @@
  // @bindclass
 class LocalPlayer : public Player
 {
-    enum
-    {
-        PREWALK_TIMEOUT = 1000
-    };
-
 public:
-    LocalPlayer();
-
     void unlockWalk() { m_walkLockExpiration = 0; }
-    void lockWalk(int millis = 250);
+    void lockWalk(uint16_t millis = 250);
     void stopAutoWalk();
+
     bool autoWalk(const Position& destination, bool retry = false);
     bool canWalk(bool ignoreLock = false);
 
@@ -65,30 +59,35 @@ public:
     void setBlessings(uint16_t blessings);
     void setResourceBalance(Otc::ResourceTypes_t type, uint64_t value);
 
-    uint32_t getStates() { return m_states; }
-    uint16_t getSkillLevel(Otc::Skill skill) { return m_skills[skill].level; }
-    uint16_t getSkillBaseLevel(Otc::Skill skill) { return m_skills[skill].baseLevel; }
-    uint16_t getSkillLevelPercent(Otc::Skill skill) { return m_skills[skill].levelPercent; }
-    uint8_t getVocation() { return m_vocation; }
-    uint32_t getHealth() { return m_health; }
-    uint32_t getMaxHealth() { return m_maxHealth; }
     double getFreeCapacity() { return m_freeCapacity; }
     double getTotalCapacity() { return m_totalCapacity; }
-    uint64_t getExperience() { return m_experience; }
-    uint16_t getLevel() { return m_level; }
-    uint8_t getLevelPercent() { return m_levelPercent; }
-    uint32_t getMana() { return m_mana; }
-    uint32_t getMaxMana() { return m_maxMana; }
+
+    uint8_t getVocation() { return m_vocation; }
     uint8_t getMagicLevel() { return m_magicLevel; }
     uint8_t getMagicLevelPercent() { return m_magicLevelPercent; }
     uint8_t getBaseMagicLevel() { return m_baseMagicLevel; }
     uint8_t getSoul() { return m_soul; }
+    uint8_t getLevelPercent() { return m_levelPercent; }
+
+    uint16_t getLevel() { return m_level; }
+    uint16_t getSkillLevel(Otc::Skill skill) { return m_skills[skill].level; }
+    uint16_t getSkillBaseLevel(Otc::Skill skill) { return m_skills[skill].baseLevel; }
+    uint16_t getSkillLevelPercent(Otc::Skill skill) { return m_skills[skill].levelPercent; }
     uint16_t getStamina() { return m_stamina; }
+    uint16_t getBlessings() { return m_blessings; }
     uint16_t getRegenerationTime() { return m_regenerationTime; }
     uint16_t getOfflineTrainingTime() { return m_offlineTrainingTime; }
+
+    uint32_t getStates() { return m_states; }
+    uint32_t getMana() { return m_mana; }
+    uint32_t getMaxMana() { return m_maxMana; }
+    uint32_t getHealth() { return m_health; }
+    uint32_t getMaxHealth() { return m_maxHealth; }
+    uint64_t getExperience() { return m_experience; }
+
     const std::vector<uint8_t>& getSpells() { return m_spells; }
     ItemPtr getInventoryItem(Otc::InventorySlot inventory) { return m_inventoryItems[inventory]; }
-    uint16_t getBlessings() { return m_blessings; }
+
     uint64_t getResourceBalance(Otc::ResourceTypes_t type)
     {
         const auto it = m_resourcesBalance.find(type);
@@ -97,8 +96,8 @@ public:
 
     uint64_t getTotalMoney()
     {
-        uint64_t bankBalance = getResourceBalance(Otc::RESOURCE_BANK_BALANCE);
-        uint64_t equippedBalance = getResourceBalance(Otc::RESOURCE_GOLD_EQUIPPED);
+        const uint64_t bankBalance = getResourceBalance(Otc::RESOURCE_BANK_BALANCE);
+        const uint64_t equippedBalance = getResourceBalance(Otc::RESOURCE_GOLD_EQUIPPED);
         return bankBalance + equippedBalance;
     }
 
@@ -120,7 +119,7 @@ protected:
     void cancelWalk(Otc::Direction direction = Otc::InvalidDirection);
     void stopWalk() override;
     void updateWalk(const bool /*isPreWalking*/ = false) override { Creature::updateWalk(m_preWalking); }
-    void updateWalkOffset(int totalPixelsWalked) override;
+    void updateWalkOffset(uint8_t totalPixelsWalked) override;
     void terminateWalk() override;
 
     friend class Game;

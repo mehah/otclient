@@ -875,8 +875,8 @@ void ProtocolGame::parseDeath(const InputMessagePtr& msg)
 
 void ProtocolGame::parseFloorDescription(const InputMessagePtr& msg)
 {
-    Position pos = getPosition(msg);
-    Position oldPos = m_localPlayer->getPosition();
+    const auto& pos = getPosition(msg);
+    const auto& oldPos = m_localPlayer->getPosition();
     uint8_t floor = msg->getU8();
 
     if (pos.z == floor) {
@@ -898,7 +898,7 @@ void ProtocolGame::parseFloorDescription(const InputMessagePtr& msg)
 
 void ProtocolGame::parseMapDescription(const InputMessagePtr& msg)
 {
-    const Position pos = getPosition(msg);
+    const auto& pos = getPosition(msg);
 
     if (!m_mapKnown)
         m_localPlayer->setPosition(pos);
@@ -918,11 +918,7 @@ void ProtocolGame::parseMapDescription(const InputMessagePtr& msg)
 
 void ProtocolGame::parseMapMoveNorth(const InputMessagePtr& msg)
 {
-    Position pos;
-    if (g_game.getFeature(Otc::GameMapMovePosition))
-        pos = getPosition(msg);
-    else
-        pos = g_map.getCentralPosition();
+    auto pos = g_game.getFeature(Otc::GameMapMovePosition) ? getPosition(msg) : g_map.getCentralPosition();
     --pos.y;
 
     AwareRange range = g_map.getAwareRange();
@@ -932,11 +928,7 @@ void ProtocolGame::parseMapMoveNorth(const InputMessagePtr& msg)
 
 void ProtocolGame::parseMapMoveEast(const InputMessagePtr& msg)
 {
-    Position pos;
-    if (g_game.getFeature(Otc::GameMapMovePosition))
-        pos = getPosition(msg);
-    else
-        pos = g_map.getCentralPosition();
+    auto pos = g_game.getFeature(Otc::GameMapMovePosition) ? getPosition(msg) : g_map.getCentralPosition();
     ++pos.x;
 
     AwareRange range = g_map.getAwareRange();
@@ -946,12 +938,7 @@ void ProtocolGame::parseMapMoveEast(const InputMessagePtr& msg)
 
 void ProtocolGame::parseMapMoveSouth(const InputMessagePtr& msg)
 {
-    Position pos;
-    if (g_game.getFeature(Otc::GameMapMovePosition))
-        pos = getPosition(msg);
-    else
-        pos = g_map.getCentralPosition();
-
+    auto pos = g_game.getFeature(Otc::GameMapMovePosition) ? getPosition(msg) : g_map.getCentralPosition();
     ++pos.y;
 
     AwareRange range = g_map.getAwareRange();
@@ -961,11 +948,7 @@ void ProtocolGame::parseMapMoveSouth(const InputMessagePtr& msg)
 
 void ProtocolGame::parseMapMoveWest(const InputMessagePtr& msg)
 {
-    Position pos;
-    if (g_game.getFeature(Otc::GameMapMovePosition))
-        pos = getPosition(msg);
-    else
-        pos = g_map.getCentralPosition();
+    auto pos = g_game.getFeature(Otc::GameMapMovePosition) ? getPosition(msg) : g_map.getCentralPosition();
     --pos.x;
 
     AwareRange range = g_map.getAwareRange();
@@ -975,13 +958,13 @@ void ProtocolGame::parseMapMoveWest(const InputMessagePtr& msg)
 
 void ProtocolGame::parseUpdateTile(const InputMessagePtr& msg)
 {
-    const Position tilePos = getPosition(msg);
+    const auto& tilePos = getPosition(msg);
     setTileDescription(msg, tilePos);
 }
 
 void ProtocolGame::parseTileAddThing(const InputMessagePtr& msg)
 {
-    const Position pos = getPosition(msg);
+    const auto& pos = getPosition(msg);
     int stackPos = -1;
 
     if (g_game.getClientVersion() >= 841)
@@ -1245,7 +1228,7 @@ void ProtocolGame::parseWorldLight(const InputMessagePtr& msg)
 
 void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
 {
-    const Position pos = getPosition(msg);
+    const auto& pos = getPosition(msg);
     if (g_game.getProtocolVersion() >= 1203) {
         uint8_t effectType = msg->getU8();
         while (effectType != Otc::MAGIC_EFFECTS_END_LOOP) {
@@ -1331,8 +1314,8 @@ void ProtocolGame::parseAnimatedText(const InputMessagePtr& msg)
 
 void ProtocolGame::parseDistanceMissile(const InputMessagePtr& msg)
 {
-    const Position fromPos = getPosition(msg);
-    const Position toPos = getPosition(msg);
+    const auto& fromPos = getPosition(msg);
+    const auto& toPos = getPosition(msg);
 
     uint16_t shotId;
     if (g_game.getFeature(Otc::GameDistanceEffectU16))
@@ -1442,7 +1425,7 @@ void ProtocolGame::parseCreatureSpeed(const InputMessagePtr& msg)
 {
     const uint32_t id = msg->getU32();
 
-    int baseSpeed = -1;
+    uint16_t baseSpeed = -1;
     if (g_game.getClientVersion() >= 1059)
         baseSpeed = msg->getU16();
 
@@ -1983,7 +1966,7 @@ void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
         case Otc::MessageDamageReceived:
         case Otc::MessageDamageOthers:
         {
-            const Position pos = getPosition(msg);
+            const auto& pos = getPosition(msg);
             std::array<uint32_t, 2> value;
             std::array<uint32_t, 2> color;
 
@@ -2012,7 +1995,7 @@ void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
         case Otc::MessageHealOthers:
         case Otc::MessageExpOthers:
         {
-            const Position pos = getPosition(msg);
+            const auto& pos = getPosition(msg);
             const uint32_t value = msg->getU32();
             const int color = msg->getU8();
             text = msg->getString();
@@ -2049,12 +2032,9 @@ void ProtocolGame::parseWalkWait(const InputMessagePtr& msg)
 
 void ProtocolGame::parseFloorChangeUp(const InputMessagePtr& msg)
 {
-    Position pos;
-    if (g_game.getFeature(Otc::GameMapMovePosition))
-        pos = getPosition(msg);
-    else
-        pos = g_map.getCentralPosition();
-    AwareRange range = g_map.getAwareRange();
+    const AwareRange& range = g_map.getAwareRange();
+
+    auto pos = g_game.getFeature(Otc::GameMapMovePosition) ? getPosition(msg) : g_map.getCentralPosition();
     --pos.z;
 
     int skip = 0;
@@ -2071,12 +2051,9 @@ void ProtocolGame::parseFloorChangeUp(const InputMessagePtr& msg)
 
 void ProtocolGame::parseFloorChangeDown(const InputMessagePtr& msg)
 {
-    Position pos;
-    if (g_game.getFeature(Otc::GameMapMovePosition))
-        pos = getPosition(msg);
-    else
-        pos = g_map.getCentralPosition();
-    AwareRange range = g_map.getAwareRange();
+    const AwareRange& range = g_map.getAwareRange();
+
+    auto pos = g_game.getFeature(Otc::GameMapMovePosition) ? getPosition(msg) : g_map.getCentralPosition();
     ++pos.z;
 
     int skip = 0;
@@ -2228,7 +2205,7 @@ void ProtocolGame::parseTutorialHint(const InputMessagePtr& msg)
 
 void ProtocolGame::parseAutomapFlag(const InputMessagePtr& msg)
 {
-    const Position pos = getPosition(msg);
+    const auto& pos = getPosition(msg);
     const int icon = msg->getU8();
     const auto description = msg->getString();
 
@@ -2434,7 +2411,7 @@ int ProtocolGame::setFloorDescription(const InputMessagePtr& msg, int x, int y, 
 {
     for (int nx = 0; nx < width; ++nx) {
         for (int ny = 0; ny < height; ++ny) {
-            Position tilePos(x + nx + offset, y + ny + offset, z);
+            const Position tilePos(x + nx + offset, y + ny + offset, z);
             if (skip == 0)
                 skip = setTileDescription(msg, tilePos);
             else {
