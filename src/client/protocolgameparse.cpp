@@ -2515,7 +2515,8 @@ ThingPtr ProtocolGame::getThing(const InputMessagePtr& msg)
 
 ThingPtr ProtocolGame::getMappedThing(const InputMessagePtr& msg)
 {
-    if (const uint16_t x = msg->getU16(); x != 0xffff) {
+    const uint16_t x = msg->getU16();
+    if (x != 0xffff) {
         const uint16_t y = msg->getU16();
         const uint8_t z = msg->getU8();
 
