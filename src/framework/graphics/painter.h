@@ -26,15 +26,6 @@
 #include <framework/graphics/declarations.h>
 #include <framework/graphics/paintershaderprogram.h>
 
-enum class BlendEquation
-{
-    ADD,
-    MAX,
-    MIN,
-    SUBTRACT,
-    REVER_SUBTRACT,
-};
-
 enum class CompositionMode
 {
     NORMAL,
@@ -50,6 +41,15 @@ enum class DrawMode
     NONE = GL_NONE,
     TRIANGLES = GL_TRIANGLES,
     TRIANGLE_STRIP = GL_TRIANGLE_STRIP
+};
+
+enum class BlendEquation
+{
+    ADD = GL_FUNC_ADD,
+    MAX = GL_MAX,
+    MIN = GL_MIN,
+    SUBTRACT = GL_FUNC_SUBTRACT,
+    REVER_SUBTRACT = GL_FUNC_REVERSE_SUBTRACT,
 };
 
 class Painter

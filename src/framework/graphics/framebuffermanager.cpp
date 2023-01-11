@@ -30,15 +30,4 @@ void FrameBufferManager::init()
     m_temporaryFramebuffer->setSmooth(true);
 }
 
-void FrameBufferManager::terminate()
-{
-    m_framebuffers.clear();
-    m_temporaryFramebuffer = nullptr;
-}
-
-FrameBufferPtr FrameBufferManager::createFrameBuffer()
-{
-    const auto& fbo = std::make_shared<FrameBuffer>();
-    m_framebuffers.push_back(fbo);
-    return fbo;
-}
+void FrameBufferManager::terminate() { m_temporaryFramebuffer = nullptr; }

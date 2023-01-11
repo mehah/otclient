@@ -102,12 +102,12 @@ void UIWidget::drawSelf(DrawPoolType drawPane)
 void UIWidget::drawChildren(const Rect& visibleRect, DrawPoolType drawPane)
 {
     // draw children
-    for (const auto& child : m_children) {
+    for (const auto child : m_children) { // don't use auto&
         // render only visible children with a valid rect inside parent rect
         if (!child->isExplicitlyVisible() || !child->getRect().isValid() || child->getOpacity() < Fw::MIN_ALPHA)
             continue;
 
-        Rect childVisibleRect = visibleRect.intersection(child->getRect());
+        const auto& childVisibleRect = visibleRect.intersection(child->getRect());
         if (!childVisibleRect.isValid())
             continue;
 
@@ -146,7 +146,7 @@ void UIWidget::addChild(const UIWidgetPtr& child)
         return;
     }
 
-    const UIWidgetPtr& oldLastChild = getLastChild();
+    const auto& oldLastChild = getLastChild();
 
     m_children.push_back(child);
     m_childrenById[child->getId()] = child;
@@ -298,7 +298,7 @@ void UIWidget::focusChild(const UIWidgetPtr& child, Fw::FocusReason reason)
         return;
     }
 
-    const UIWidgetPtr oldFocused = m_focusedChild;
+    const auto oldFocused = m_focusedChild;
     m_focusedChild = child;
 
     if (child) {
@@ -575,8 +575,8 @@ void UIWidget::unlockChild(const UIWidgetPtr& child)
 void UIWidget::mergeStyle(const OTMLNodePtr& styleNode)
 {
     applyStyle(styleNode);
-    const std::string name = m_style->tag();
-    const std::string source = m_style->source();
+    const auto& name = m_style->tag();
+    const auto& source = m_style->source();
     m_style->merge(styleNode);
     m_style->setTag(name);
     m_style->setSource(source);

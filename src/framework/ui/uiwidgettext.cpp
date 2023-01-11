@@ -94,7 +94,7 @@ void UIWidget::parseTextStyle(const OTMLNodePtr& styleNode)
 
 void UIWidget::drawText(const Rect& screenCoords)
 {
-    if (m_drawText.length() == 0 || m_color.aF() == 0.f)
+    if (m_drawText.empty() || m_color.aF() == 0.f)
         return;
 
     if (screenCoords != m_textCachedScreenCoords) {
@@ -112,10 +112,7 @@ void UIWidget::onTextChange(const std::string_view text, const std::string_view 
     callLuaField("onTextChange", text, oldText);
 }
 
-void UIWidget::onFontChange(const std::string_view font)
-{
-    callLuaField("onFontChange", font);
-}
+void UIWidget::onFontChange(const std::string_view font) { callLuaField("onFontChange", font); }
 
 void UIWidget::setText(const std::string_view text, bool dontFireLuaCall)
 {

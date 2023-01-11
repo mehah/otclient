@@ -35,7 +35,6 @@ public:
 
 protected:
     FrameBufferPtr m_temporaryFramebuffer;
-    std::vector<FrameBufferPtr> m_framebuffers;
 };
 
 extern FrameBufferManager g_framebuffers;

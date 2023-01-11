@@ -257,7 +257,7 @@ public:
     bool isValid() const override { return m_framebuffer->isValid(); }
 
 protected:
-    DrawPoolFramed(const FrameBufferPtr& fb) : m_framebuffer(fb) {};
+    DrawPoolFramed() : m_framebuffer(std::make_shared<FrameBuffer>()) {};
 
     friend DrawPoolManager;
     friend DrawPool;
