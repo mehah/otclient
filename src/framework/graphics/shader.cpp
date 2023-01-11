@@ -26,17 +26,10 @@
 #include <framework/core/application.h>
 #include <framework/core/resourcemanager.h>
 
-Shader::Shader(ShaderType shaderType) : m_shaderType(shaderType)
+Shader::Shader(ShaderType shaderType) : m_shaderType(shaderType),
+m_shaderId(glCreateShader(static_cast<GLenum>(shaderType)))
 {
-    switch (shaderType) {
-        case ShaderType::VERTEX:
-            m_shaderId = glCreateShader(GL_VERTEX_SHADER);
-            break;
-        case ShaderType::FRAGMENT:
-            m_shaderId = glCreateShader(GL_FRAGMENT_SHADER);
-            break;
-    }
-
+    ;
     if (!m_shaderId)
         g_logger.fatal("Unable to create GL shader");
 }
