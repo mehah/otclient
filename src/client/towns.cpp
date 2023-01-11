@@ -35,7 +35,7 @@ Town::Town(uint32_t tid, std::string name, const Position& pos) : m_id(tid), m_n
 
 TownManager::TownManager()
 {
-    m_nullTown = TownPtr(new Town);
+    m_nullTown = std::make_shared < Town>();
 }
 
 void TownManager::addTown(const TownPtr& town)

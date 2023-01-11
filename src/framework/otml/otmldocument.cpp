@@ -28,7 +28,7 @@
 
 OTMLDocumentPtr OTMLDocument::create()
 {
-    OTMLDocumentPtr doc(new OTMLDocument);
+    const auto& doc(OTMLDocumentPtr(new OTMLDocument));
     doc->setTag("doc");
     return doc;
 }
@@ -43,20 +43,16 @@ OTMLDocumentPtr OTMLDocument::parse(const std::string& fileName)
 
 OTMLDocumentPtr OTMLDocument::parse(std::istream& in, const std::string_view source)
 {
-    OTMLDocumentPtr doc(new OTMLDocument);
+    const auto& doc(OTMLDocumentPtr(new OTMLDocument));
     doc->setSource(source);
     OTMLParser parser(doc, in);
     parser.parse();
     return doc;
 }
 
-std::string OTMLDocument::emit()
-{
-    return OTMLEmitter::emitNode(asOTMLNode()) + "\n";
-}
+std::string OTMLDocument::emit() { return OTMLEmitter::emitNode(asOTMLNode()) + "\n"; }
 
 bool OTMLDocument::save(const std::string_view fileName)
 {
-    m_source = fileName;
-    return g_resources.writeFileContents(fileName.data(), emit());
+    return g_resources.writeFileContents((m_source = fileName).data(), emit());
 }

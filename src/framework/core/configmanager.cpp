@@ -24,10 +24,7 @@
 
 ConfigManager g_configs;
 
-void ConfigManager::init()
-{
-    m_settings = ConfigPtr(new Config());
-}
+void ConfigManager::init() { m_settings = std::make_shared < Config>(); }
 
 void ConfigManager::terminate()
 {
@@ -39,7 +36,7 @@ void ConfigManager::terminate()
         m_settings = nullptr;
     }
 
-    for (ConfigPtr config : m_configs) {
+    for (auto config : m_configs) {
         config->unload();
         config = nullptr;
     }
@@ -54,7 +51,7 @@ ConfigPtr ConfigManager::getSettings()
 
 ConfigPtr ConfigManager::get(const std::string& file)
 {
-    for (const ConfigPtr& config : m_configs) {
+    for (const auto& config : m_configs) {
         if (config->getFileName() == file) {
             return config;
         }
@@ -76,9 +73,9 @@ ConfigPtr ConfigManager::loadSettings(const std::string& file)
 
 ConfigPtr ConfigManager::create(const std::string& file)
 {
-    ConfigPtr config = load(file);
+    auto config = load(file);
     if (!config) {
-        config = ConfigPtr(new Config());
+        config = std::make_shared < Config>();
 
         config->load(file);
         config->save();
@@ -94,9 +91,9 @@ ConfigPtr ConfigManager::load(const std::string& file)
         g_logger.error("Must provide a configuration file to load.");
         return nullptr;
     }
-    ConfigPtr config = get(file);
+    auto config = get(file);
     if (!config) {
-        config = ConfigPtr(new Config());
+        config = std::make_shared < Config>();
 
         if (config->load(file)) {
             m_configs.push_back(config);
@@ -110,7 +107,7 @@ ConfigPtr ConfigManager::load(const std::string& file)
 
 bool ConfigManager::unload(const std::string& file)
 {
-    if (ConfigPtr config = get(file)) {
+    if (auto config = get(file)) {
         config->unload();
         remove(config);
         config = nullptr;
@@ -119,7 +116,4 @@ bool ConfigManager::unload(const std::string& file)
     return false;
 }
 
-void ConfigManager::remove(const ConfigPtr& config)
-{
-    m_configs.remove(config);
-}
+void ConfigManager::remove(const ConfigPtr& config) { m_configs.remove(config); }

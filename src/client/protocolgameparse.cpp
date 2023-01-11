@@ -1249,7 +1249,7 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
                         return;
                     }
 
-                    const auto& missile = MissilePtr(new Missile);
+                    const auto& missile = std::make_shared < Missile>();
                     missile->setId(shotId);
 
                     if (effectType == Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT)
@@ -1268,7 +1268,7 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
                         continue;
                     }
 
-                    const auto& effect = EffectPtr(new Effect());
+                    const auto& effect = std::make_shared < Effect>();
                     effect->setId(effectId);
                     g_map.addThing(effect, pos);
                     break;
@@ -1295,7 +1295,7 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
         return;
     }
 
-    const auto& effect = EffectPtr(new Effect());
+    const auto& effect = std::make_shared < Effect>();
     effect->setId(effectId);
     g_map.addThing(effect, pos);
 }
@@ -1306,7 +1306,7 @@ void ProtocolGame::parseAnimatedText(const InputMessagePtr& msg)
     const uint8_t color = msg->getU8();
     const auto text = msg->getString();
 
-    const auto& animatedText = AnimatedTextPtr(new AnimatedText);
+    const auto& animatedText = std::make_shared < AnimatedText>();
     animatedText->setColor(color);
     animatedText->setText(text);
     g_map.addThing(animatedText, position);
@@ -1328,7 +1328,7 @@ void ProtocolGame::parseDistanceMissile(const InputMessagePtr& msg)
         return;
     }
 
-    const auto& missile = MissilePtr(new Missile());
+    const auto& missile = std::make_shared < Missile>();
     missile->setId(shotId);
     missile->setPath(fromPos, toPos);
     g_map.addThing(missile, fromPos);
@@ -1974,7 +1974,7 @@ void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
             for (int_fast32_t i = 0; i < 2; ++i) {
                 if (value[i] == 0)
                     continue;
-                auto animatedText = AnimatedTextPtr(new AnimatedText);
+                const auto& animatedText = std::make_shared < AnimatedText>();
                 animatedText->setColor(color[i]);
                 animatedText->setText(std::to_string(value[i]));
                 g_map.addThing(animatedText, pos);
@@ -1992,7 +1992,7 @@ void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
             const uint8_t color = msg->getU8();
             text = msg->getString();
 
-            const auto animatedText = AnimatedTextPtr(new AnimatedText);
+            const auto& animatedText = std::make_shared < AnimatedText>();
             animatedText->setColor(color);
             animatedText->setText(std::to_string(value));
             g_map.addThing(animatedText, pos);
@@ -2588,11 +2588,11 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type)
                     creature = m_localPlayer;
                 } else switch (creatureType) {
                     case Proto::CreatureTypePlayer:
-                        creature = PlayerPtr(new Player);
+                        creature = std::make_shared < Player>();
                         break;
 
                     case Proto::CreatureTypeNpc:
-                        creature = NpcPtr(new Npc);
+                        creature = std::make_shared < Npc>();
                         break;
 
                     case Proto::CreatureTypeHidden:
@@ -2833,7 +2833,7 @@ StaticTextPtr ProtocolGame::getStaticText(const InputMessagePtr& msg, int)
     const auto& fontName = msg->getString();
     const auto& text = msg->getString();
 
-    auto staticText = StaticTextPtr(new StaticText);
+    const auto& staticText = std::make_shared < StaticText>();
     staticText->setText(text);
     staticText->setFont(fontName);
     staticText->setColor(color);

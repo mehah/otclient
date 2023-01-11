@@ -38,7 +38,7 @@ TextureManager g_textures;
 
 void TextureManager::init()
 {
-    m_emptyTexture = TexturePtr(new Texture);
+    m_emptyTexture = std::make_shared < Texture>();
 }
 
 void TextureManager::terminate()
@@ -153,14 +153,14 @@ TexturePtr TextureManager::loadTexture(std::stringstream& file)
                 int frameDelay = apng.frames_delay[i];
 
                 framesDelay.push_back(frameDelay);
-                frames.push_back(ImagePtr(new Image(imageSize, apng.bpp, frameData)));
+                frames.push_back(std::make_shared < Image>(imageSize, apng.bpp, frameData));
             }
             const auto& animatedTexture = std::make_shared<AnimatedTexture>(imageSize, frames, framesDelay);
             m_animatedTextures.push_back(animatedTexture);
             texture = animatedTexture;
         } else {
-            const auto& image = ImagePtr(new Image(imageSize, apng.bpp, apng.pdata));
-            texture = TexturePtr(new Texture(image, false, false, false, false));
+            const auto& image = std::make_shared < Image>(imageSize, apng.bpp, apng.pdata);
+            texture = std::make_shared < Texture>(image, false, false, false, false);
         }
         free_apng(&apng);
     }

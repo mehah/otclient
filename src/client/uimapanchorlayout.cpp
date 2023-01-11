@@ -66,10 +66,10 @@ void UIMapAnchorLayout::addPositionAnchor(const UIWidgetPtr& anchoredWidget, Fw:
 
     assert(anchoredWidget != getParentWidget());
 
-    const UIPositionAnchorPtr anchor(new UIPositionAnchor(anchoredEdge, hookedPosition, hookedEdge));
-    UIAnchorGroupPtr& anchorGroup = m_anchorsGroups[anchoredWidget];
+    const auto& anchor = std::make_shared < UIPositionAnchor>(anchoredEdge, hookedPosition, hookedEdge);
+    auto& anchorGroup = m_anchorsGroups[anchoredWidget];
     if (!anchorGroup)
-        anchorGroup = UIAnchorGroupPtr(new UIAnchorGroup);
+        anchorGroup = std::make_shared<UIAnchorGroup>();
 
     anchorGroup->addAnchor(anchor);
 

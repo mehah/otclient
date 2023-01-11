@@ -29,7 +29,7 @@
 
 AttachedEffectPtr AttachedEffect::clone()
 {
-    auto obj = AttachedEffectPtr(new AttachedEffect);
+    auto obj = std::make_shared < AttachedEffect>();
     *(obj.get()) = *this;
     return obj;
 }

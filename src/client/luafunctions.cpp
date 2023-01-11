@@ -364,7 +364,7 @@ void Client::registerLuaFunctions()
     g_lua.bindGlobalFunction("getDirectionFromPos", Position::getDirectionFromPositions);
 
     g_lua.registerClass<ProtocolGame, Protocol>();
-    g_lua.bindClassStaticFunction<ProtocolGame>("create", [] { return ProtocolGamePtr(new ProtocolGame); });
+    g_lua.bindClassStaticFunction<ProtocolGame>("create", [] { return std::make_shared < ProtocolGame>(); });
     g_lua.bindClassMemberFunction<ProtocolGame>("login", &ProtocolGame::login);
     g_lua.bindClassMemberFunction<ProtocolGame>("sendExtendedOpcode", &ProtocolGame::sendExtendedOpcode);
     g_lua.bindClassMemberFunction<ProtocolGame>("addPosition", &ProtocolGame::addPosition);
@@ -444,7 +444,7 @@ void Client::registerLuaFunctions()
 
 #ifdef FRAMEWORK_EDITOR
     g_lua.registerClass<House>();
-    g_lua.bindClassStaticFunction<House>("create", [] { return HousePtr(new House); });
+    g_lua.bindClassStaticFunction<House>("create", [] { return std::make_shared < House>(); });
     g_lua.bindClassMemberFunction<House>("setId", &House::setId);
     g_lua.bindClassMemberFunction<House>("getId", &House::getId);
     g_lua.bindClassMemberFunction<House>("setName", &House::setName);
@@ -464,7 +464,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<House>("getRent", &House::getRent);
 
     g_lua.registerClass<Spawn>();
-    g_lua.bindClassStaticFunction<Spawn>("create", [] { return SpawnPtr(new Spawn); });
+    g_lua.bindClassStaticFunction<Spawn>("create", [] { return std::make_shared < Spawn>(); });
     g_lua.bindClassMemberFunction<Spawn>("setRadius", &Spawn::setRadius);
     g_lua.bindClassMemberFunction<Spawn>("getRadius", &Spawn::getRadius);
     g_lua.bindClassMemberFunction<Spawn>("setCenterPos", &Spawn::setCenterPos);
@@ -474,7 +474,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Spawn>("getCreatures", &Spawn::getCreatures);
 
     g_lua.registerClass<Town>();
-    g_lua.bindClassStaticFunction<Town>("create", [] { return TownPtr(new Town); });
+    g_lua.bindClassStaticFunction<Town>("create", [] { return std::make_shared < Town>(); });
     g_lua.bindClassMemberFunction<Town>("setId", &Town::setId);
     g_lua.bindClassMemberFunction<Town>("setName", &Town::setName);
     g_lua.bindClassMemberFunction<Town>("setPos", &Town::setPos);
@@ -485,7 +485,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Town>("getTemplePos", &Town::getPos); // alternative method
 
     g_lua.registerClass<CreatureType>();
-    g_lua.bindClassStaticFunction<CreatureType>("create", [] { return CreatureTypePtr(new CreatureType); });
+    g_lua.bindClassStaticFunction<CreatureType>("create", [] { return std::make_shared < CreatureType>(); });
     g_lua.bindClassMemberFunction<CreatureType>("setName", &CreatureType::setName);
     g_lua.bindClassMemberFunction<CreatureType>("setOutfit", &CreatureType::setOutfit);
     g_lua.bindClassMemberFunction<CreatureType>("setSpawnTime", &CreatureType::setSpawnTime);
@@ -496,7 +496,7 @@ void Client::registerLuaFunctions()
 #endif
 
     g_lua.registerClass<Creature, Thing>();
-    g_lua.bindClassStaticFunction<Creature>("create", [] { return CreaturePtr(new Creature); });
+    g_lua.bindClassStaticFunction<Creature>("create", [] { return std::make_shared < Creature>(); });
     g_lua.bindClassMemberFunction<Creature>("getId", &Creature::getId);
     g_lua.bindClassMemberFunction<Creature>("getMasterId", &Creature::getMasterId);
     g_lua.bindClassMemberFunction<Creature>("getName", &Creature::getName);
@@ -543,7 +543,7 @@ void Client::registerLuaFunctions()
 #endif
 
     g_lua.registerClass<ThingType>();
-    g_lua.bindClassStaticFunction<ThingType>("create", [] { return ThingTypePtr(new ThingType); });
+    g_lua.bindClassStaticFunction<ThingType>("create", [] { return std::make_shared < ThingType>(); });
     g_lua.bindClassMemberFunction<ThingType>("getId", &ThingType::getId);
     g_lua.bindClassMemberFunction<ThingType>("getClothSlot", &ThingType::getClothSlot);
     g_lua.bindClassMemberFunction<ThingType>("getCategory", &ThingType::getCategory);
@@ -664,11 +664,11 @@ void Client::registerLuaFunctions()
 #endif
 
     g_lua.registerClass<Effect, Thing>();
-    g_lua.bindClassStaticFunction<Effect>("create", [] { return EffectPtr(new Effect); });
+    g_lua.bindClassStaticFunction<Effect>("create", [] { return std::make_shared < Effect>(); });
     g_lua.bindClassMemberFunction<Effect>("setId", &Effect::setId);
 
     g_lua.registerClass<Missile, Thing>();
-    g_lua.bindClassStaticFunction<Missile>("create", [] { return MissilePtr(new Missile); });
+    g_lua.bindClassStaticFunction<Missile>("create", [] { return std::make_shared < Missile>(); });
     g_lua.bindClassMemberFunction<Missile>("setId", &Missile::setId);
     g_lua.bindClassMemberFunction<Missile>("setPath", &Missile::setPath);
 
@@ -686,7 +686,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<AttachedEffect>("setCanDrawOnUI", &AttachedEffect::setCanDrawOnUI);
 
     g_lua.registerClass<StaticText, Thing>();
-    g_lua.bindClassStaticFunction<StaticText>("create", [] { return StaticTextPtr(new StaticText); });
+    g_lua.bindClassStaticFunction<StaticText>("create", [] { return std::make_shared < StaticText>(); });
     g_lua.bindClassMemberFunction<StaticText>("addMessage", &StaticText::addMessage);
     g_lua.bindClassMemberFunction<StaticText>("setText", &StaticText::setText);
     g_lua.bindClassMemberFunction<StaticText>("setFont", &StaticText::setFont);
@@ -793,7 +793,7 @@ void Client::registerLuaFunctions()
 #endif
 
     g_lua.registerClass<UIItem, UIWidget>();
-    g_lua.bindClassStaticFunction<UIItem>("create", [] { return UIItemPtr(new UIItem); });
+    g_lua.bindClassStaticFunction<UIItem>("create", [] { return std::make_shared < UIItem>(); });
     g_lua.bindClassMemberFunction<UIItem>("setItemId", &UIItem::setItemId);
     g_lua.bindClassMemberFunction<UIItem>("setItemCount", &UIItem::setItemCount);
     g_lua.bindClassMemberFunction<UIItem>("setItemSubType", &UIItem::setItemSubType);
@@ -809,7 +809,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIItem>("isItemVisible", &UIItem::isItemVisible);
 
     g_lua.registerClass<UISprite, UIWidget>();
-    g_lua.bindClassStaticFunction<UISprite>("create", [] { return UISpritePtr(new UISprite); });
+    g_lua.bindClassStaticFunction<UISprite>("create", [] { return std::make_shared < UISprite>(); });
     g_lua.bindClassMemberFunction<UISprite>("setSpriteId", &UISprite::setSpriteId);
     g_lua.bindClassMemberFunction<UISprite>("clearSprite", &UISprite::clearSprite);
     g_lua.bindClassMemberFunction<UISprite>("getSpriteId", &UISprite::getSpriteId);
@@ -817,7 +817,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UISprite>("hasSprite", &UISprite::hasSprite);
 
     g_lua.registerClass<UICreature, UIWidget>();
-    g_lua.bindClassStaticFunction<UICreature>("create", [] { return UICreaturePtr(new UICreature); });
+    g_lua.bindClassStaticFunction<UICreature>("create", [] { return std::make_shared < UICreature>(); });
     g_lua.bindClassMemberFunction<UICreature>("setCreature", &UICreature::setCreature);
     g_lua.bindClassMemberFunction<UICreature>("setOutfit", &UICreature::setOutfit);
     g_lua.bindClassMemberFunction<UICreature>("setFixedCreatureSize", &UICreature::setFixedCreatureSize);
@@ -825,7 +825,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UICreature>("isFixedCreatureSize", &UICreature::isFixedCreatureSize);
 
     g_lua.registerClass<UIMap, UIWidget>();
-    g_lua.bindClassStaticFunction<UIMap>("create", [] { return UIMapPtr(new UIMap); });
+    g_lua.bindClassStaticFunction<UIMap>("create", [] { return std::make_shared < UIMap>(); });
     g_lua.bindClassMemberFunction<UIMap>("drawSelf", &UIMap::drawSelf);
     g_lua.bindClassMemberFunction<UIMap>("movePixels", &UIMap::movePixels);
     g_lua.bindClassMemberFunction<UIMap>("setZoom", &UIMap::setZoom);
@@ -898,7 +898,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIMinimap>("centerInPosition", &UIMinimap::centerInPosition);
 
     g_lua.registerClass<UIProgressRect, UIWidget>();
-    g_lua.bindClassStaticFunction<UIProgressRect>("create", [] { return UIProgressRectPtr(new UIProgressRect); });
+    g_lua.bindClassStaticFunction<UIProgressRect>("create", [] { return std::make_shared < UIProgressRect>(); });
     g_lua.bindClassMemberFunction<UIProgressRect>("setPercent", &UIProgressRect::setPercent);
     g_lua.bindClassMemberFunction<UIProgressRect>("getPercent", &UIProgressRect::getPercent);
 

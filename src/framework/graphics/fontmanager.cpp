@@ -39,7 +39,7 @@ void FontManager::terminate()
 void FontManager::clearFonts()
 {
     m_fonts.clear();
-    m_defaultFont = BitmapFontPtr(new BitmapFont("emptyfont"));
+    m_defaultFont = std::make_shared < BitmapFont>("emptyfont");
 }
 
 bool FontManager::importFont(const std::string& file)

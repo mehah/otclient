@@ -438,7 +438,7 @@ void ProtocolGame::sendRotateItem(const Position& pos, int thingId, int stackpos
 
 void ProtocolGame::sendOnWrapItem(const Position& pos, int thingId, int stackpos)
 {
-    OutputMessagePtr msg(new OutputMessage);
+    const auto& msg = std::make_shared < OutputMessage>();
     msg->addU8(Proto::ClientOnWrapItem);
     addPosition(msg, pos);
     msg->addU16(thingId);
@@ -1055,7 +1055,7 @@ void ProtocolGame::sendMarketAcceptOffer(uint32_t timestamp, uint16_t counter, u
 
 void ProtocolGame::sendPreyAction(uint8_t slot, uint8_t actionType, uint16_t index)
 {
-    OutputMessagePtr msg(new OutputMessage);
+    const auto& msg = std::make_shared < OutputMessage>();
     msg->addU8(Proto::ClientPreyAction);
     msg->addU8(slot);
     msg->addU8(actionType);
@@ -1069,14 +1069,14 @@ void ProtocolGame::sendPreyAction(uint8_t slot, uint8_t actionType, uint16_t ind
 
 void ProtocolGame::sendPreyRequest()
 {
-    OutputMessagePtr msg(new OutputMessage);
+    const auto& msg = std::make_shared < OutputMessage>();
     msg->addU8(Proto::ClientPreyRequest);
     send(msg);
 }
 
 void ProtocolGame::sendApplyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm)
 {
-    OutputMessagePtr msg(new OutputMessage);
+    const auto& msg = std::make_shared < OutputMessage>();
     msg->addU8(Proto::ClientApplyImbuement);
     msg->addU8(slot);
     msg->addU32(imbuementId);
@@ -1086,7 +1086,7 @@ void ProtocolGame::sendApplyImbuement(uint8_t slot, uint32_t imbuementId, bool p
 
 void ProtocolGame::sendClearImbuement(uint8_t slot)
 {
-    OutputMessagePtr msg(new OutputMessage);
+    const auto& msg = std::make_shared < OutputMessage>();
     msg->addU8(Proto::ClientClearImbuement);
     msg->addU8(slot);
     send(msg);
@@ -1094,7 +1094,7 @@ void ProtocolGame::sendClearImbuement(uint8_t slot)
 
 void ProtocolGame::sendCloseImbuingWindow()
 {
-    OutputMessagePtr msg(new OutputMessage);
+    const auto& msg = std::make_shared < OutputMessage>();
     msg->addU8(Proto::ClientCloseImbuingWindow);
     send(msg);
 }

@@ -52,7 +52,7 @@ ImagePtr Image::loadPNG(const std::string& file)
     g_resources.readFileStream(file, fin);
     ImagePtr image;
     if (apng_data apng; load_apng(fin, &apng) == 0) {
-        image = ImagePtr(new Image(Size(apng.width, apng.height), apng.bpp, apng.pdata));
+        image = std::make_shared <Image>(Size(apng.width, apng.height), apng.bpp, apng.pdata);
         free_apng(&apng);
     }
 

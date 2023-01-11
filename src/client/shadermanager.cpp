@@ -35,7 +35,7 @@ void ShaderManager::terminate() { m_shaders.clear(); }
 void ShaderManager::createShader(const std::string_view name)
 {
     g_mainDispatcher.addEvent([&, name = name.data()] {
-        PainterShaderProgramPtr shader(new PainterShaderProgram);
+        const auto& shader = std::make_shared < PainterShaderProgram>();
         m_shaders[name] = shader;
         return shader;
     });
@@ -45,7 +45,7 @@ void ShaderManager::createFragmentShader(const std::string_view name, const std:
 {
     const auto& filePath = g_resources.resolvePath(file.data());
     g_mainDispatcher.addEvent([&, name = name.data(), filePath] {
-        PainterShaderProgramPtr shader(new PainterShaderProgram);
+        const auto& shader = std::make_shared < PainterShaderProgram>();
         if (!shader)
             return;
 
@@ -69,7 +69,7 @@ void ShaderManager::createFragmentShader(const std::string_view name, const std:
 void ShaderManager::createFragmentShaderFromCode(const std::string_view name, const std::string_view code)
 {
     g_mainDispatcher.addEvent([&, name = name.data(), code = code.data()] {
-        PainterShaderProgramPtr shader(new PainterShaderProgram);
+        const auto& shader = std::make_shared < PainterShaderProgram>();
         if (!shader)
             return;
 

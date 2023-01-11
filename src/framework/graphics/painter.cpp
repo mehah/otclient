@@ -38,13 +38,13 @@ Painter::Painter()
 {
     setResolution(g_window.getSize());
 
-    m_drawTexturedProgram = PainterShaderProgramPtr(new PainterShaderProgram);
+    m_drawTexturedProgram = std::make_shared < PainterShaderProgram>();
     assert(m_drawTexturedProgram);
     m_drawTexturedProgram->addShaderFromSourceCode(ShaderType::VERTEX, std::string{ glslMainWithTexCoordsVertexShader } + glslPositionOnlyVertexShader.data());
     m_drawTexturedProgram->addShaderFromSourceCode(ShaderType::FRAGMENT, std::string{ glslMainFragmentShader } + glslTextureSrcFragmentShader.data());
     m_drawTexturedProgram->link();
 
-    m_drawSolidColorProgram = PainterShaderProgramPtr(new PainterShaderProgram);
+    m_drawSolidColorProgram = std::make_shared < PainterShaderProgram>();
     assert(m_drawSolidColorProgram);
     m_drawSolidColorProgram->addShaderFromSourceCode(ShaderType::VERTEX, std::string{ glslMainVertexShader } + glslPositionOnlyVertexShader.data());
     m_drawSolidColorProgram->addShaderFromSourceCode(ShaderType::FRAGMENT, std::string{ glslMainFragmentShader } + glslSolidColorFragmentShader.data());
