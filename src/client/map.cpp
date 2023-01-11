@@ -38,8 +38,8 @@
 #include "towns.h"
 #endif
 
-static constexpr uint8_t MAX_VIEWPORT_X = 70;
-static constexpr uint8_t MAX_VIEWPORT_Y = 45;
+static constexpr uint8_t MAX_VIEWPORT_X = 8;
+static constexpr uint8_t MAX_VIEWPORT_Y = 6;
 
 const static TilePtr m_nulltile;
 
@@ -490,6 +490,33 @@ void Map::removeUnawareThings()
             it = m_staticTexts.erase(it);
         else
             ++it;
+    }
+
+    if (!g_game.getFeature(Otc::GameKeepUnawareTiles)) {
+        // remove tiles that we are not aware anymore
+        for (int_fast8_t z = -1; ++z <= MAX_Z;) {
+            auto& tileBlocks = m_tileBlocks[z];
+            for (auto it = tileBlocks.begin(); it != tileBlocks.end();) {
+                auto& block = (*it).second;
+                bool blockEmpty = true;
+                for (const TilePtr& tile : block.getTiles()) {
+                    if (!tile) continue;
+
+                    const auto& pos = tile->getPosition();
+                    if (isAwareOfPosition(pos)) {
+                        blockEmpty = false;
+                        continue;
+                    }
+
+                    block.remove(pos);
+                }
+
+                if (blockEmpty)
+                    it = tileBlocks.erase(it);
+                else
+                    ++it;
+            }
+        }
     }
 }
 
