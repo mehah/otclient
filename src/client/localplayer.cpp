@@ -248,23 +248,25 @@ void LocalPlayer::setStates(uint32_t states)
     callLuaField("onStatesChange", states, oldStates);
 }
 
-void LocalPlayer::setSkill(Otc::Skill skill, uint16_t level, uint16_t levelPercent)
+void LocalPlayer::setSkill(Otc::Skill skillId, uint16_t level, uint16_t levelPercent)
 {
-    if (skill >= Otc::LastSkill) {
+    if (skillId >= Otc::LastSkill) {
         g_logger.traceError("invalid skill");
         return;
     }
 
-    const uint16_t oldLevel = m_skills[skill].level;
-    const uint16_t oldLevelPercent = m_skills[skill].levelPercent;
+    auto& skill = m_skills[skillId];
+
+    const uint16_t oldLevel = skill.level;
+    const uint16_t oldLevelPercent = skill.levelPercent;
 
     if (level == oldLevel && levelPercent == oldLevelPercent)
         return;
 
-    m_skills[skill].level = level;
-    m_skills[skill].levelPercent = levelPercent;
+    skill.level = level;
+    skill.levelPercent = levelPercent;
 
-    callLuaField("onSkillChange", skill, level, levelPercent, oldLevel, oldLevelPercent);
+    callLuaField("onSkillChange", skillId, level, levelPercent, oldLevel, oldLevelPercent);
 }
 
 void LocalPlayer::setBaseSkill(Otc::Skill skill, uint16_t baseLevel)

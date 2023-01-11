@@ -29,7 +29,10 @@ DrawPool* DrawPool::create(const DrawPoolType type)
 {
     DrawPool* pool;
     if (type == DrawPoolType::MAP || type == DrawPoolType::LIGHT || type == DrawPoolType::FOREGROUND) {
-        const auto& frameBuffer = g_framebuffers.createFrameBuffer(true);
+        const auto& frameBuffer = g_framebuffers.createFrameBuffer();
+
+        if (type == DrawPoolType::MAP)
+            frameBuffer->setUseAlphaWriting(false);
 
         pool = new DrawPoolFramed{ frameBuffer };
 

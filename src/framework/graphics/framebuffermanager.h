@@ -30,7 +30,7 @@ public:
     void init();
     void terminate();
 
-    FrameBufferPtr createFrameBuffer(bool useAlphaWriting = false);
+    FrameBufferPtr createFrameBuffer();
     const FrameBufferPtr& getTemporaryFrameBuffer() { return m_temporaryFramebuffer; }
 
 protected:

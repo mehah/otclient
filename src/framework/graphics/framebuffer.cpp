@@ -31,15 +31,8 @@
 
 uint32_t FrameBuffer::boundFbo = 0;
 
-FrameBuffer::FrameBuffer(const bool useAlphaWriting) :m_useAlphaWriting(useAlphaWriting)
+FrameBuffer::FrameBuffer()
 {
-    internalCreate();
-}
-
-void FrameBuffer::internalCreate()
-{
-    m_prevBoundFbo = 0;
-    m_fbo = 0;
     glGenFramebuffers(1, &m_fbo);
     if (!m_fbo)
         g_logger.fatal("Unable to create framebuffer object");
