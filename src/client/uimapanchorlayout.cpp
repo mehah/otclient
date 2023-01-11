@@ -29,34 +29,18 @@ int UIPositionAnchor::getHookedPoint(const UIWidgetPtr& hookedWidget, const UIWi
 {
     const auto& minimap = hookedWidget->static_self_cast<UIMinimap>();
     const auto& hookedRect = minimap->getTileRect(m_hookedPosition);
-    int point = 0;
     if (hookedRect.isValid()) {
         switch (m_hookedEdge) {
-            case Fw::AnchorLeft:
-                point = hookedRect.left();
-                break;
-            case Fw::AnchorRight:
-                point = hookedRect.right();
-                break;
-            case Fw::AnchorTop:
-                point = hookedRect.top();
-                break;
-            case Fw::AnchorBottom:
-                point = hookedRect.bottom();
-                break;
-            case Fw::AnchorHorizontalCenter:
-                point = hookedRect.horizontalCenter();
-                break;
-            case Fw::AnchorVerticalCenter:
-                point = hookedRect.verticalCenter();
-                break;
-            default:
-                // must never happens
-                assert(false);
-                break;
+            case Fw::AnchorTop: return hookedRect.top();
+            case Fw::AnchorLeft: return hookedRect.left();
+            case Fw::AnchorRight:return hookedRect.right();
+            case Fw::AnchorBottom: return hookedRect.bottom();
+            case Fw::AnchorVerticalCenter: return hookedRect.verticalCenter();
+            case Fw::AnchorHorizontalCenter: return hookedRect.horizontalCenter();
         }
     }
-    return point;
+
+    return 0;
 }
 
 void UIMapAnchorLayout::addPositionAnchor(const UIWidgetPtr& anchoredWidget, Fw::AnchorEdge anchoredEdge, const Position& hookedPosition, Fw::AnchorEdge hookedEdge)
