@@ -57,30 +57,30 @@ class CreatureType;
 class Spawn;
 #endif
 
-using MapViewPtr = stdext::shared_object_ptr<MapView>;
-using LightViewPtr = stdext::shared_object_ptr<LightView>;
-using TilePtr = stdext::shared_object_ptr<Tile>;
-using ThingPtr = stdext::shared_object_ptr<Thing>;
-using ItemPtr = stdext::shared_object_ptr<Item>;
-using ContainerPtr = stdext::shared_object_ptr<Container>;
-using CreaturePtr = stdext::shared_object_ptr<Creature>;
-using MonsterPtr = stdext::shared_object_ptr<Monster>;
-using NpcPtr = stdext::shared_object_ptr<Npc>;
-using PlayerPtr = stdext::shared_object_ptr<Player>;
-using LocalPlayerPtr = stdext::shared_object_ptr<LocalPlayer>;
-using EffectPtr = stdext::shared_object_ptr<Effect>;
-using MissilePtr = stdext::shared_object_ptr<Missile>;
-using AnimatedTextPtr = stdext::shared_object_ptr<AnimatedText>;
-using StaticTextPtr = stdext::shared_object_ptr<StaticText>;
-using ThingTypePtr = stdext::shared_object_ptr<ThingType>;
-using ItemTypePtr = stdext::shared_object_ptr<ItemType>;
-using AttachedEffectPtr = stdext::shared_object_ptr<AttachedEffect>;
+using MapViewPtr = std::shared_ptr<MapView>;
+using LightViewPtr = std::shared_ptr<LightView>;
+using TilePtr = std::shared_ptr<Tile>;
+using ThingPtr = std::shared_ptr<Thing>;
+using ItemPtr = std::shared_ptr<Item>;
+using ContainerPtr = std::shared_ptr<Container>;
+using CreaturePtr = std::shared_ptr<Creature>;
+using MonsterPtr = std::shared_ptr<Monster>;
+using NpcPtr = std::shared_ptr<Npc>;
+using PlayerPtr = std::shared_ptr<Player>;
+using LocalPlayerPtr = std::shared_ptr<LocalPlayer>;
+using EffectPtr = std::shared_ptr<Effect>;
+using MissilePtr = std::shared_ptr<Missile>;
+using AnimatedTextPtr = std::shared_ptr<AnimatedText>;
+using StaticTextPtr = std::shared_ptr<StaticText>;
+using ThingTypePtr = std::shared_ptr<ThingType>;
+using ItemTypePtr = std::shared_ptr<ItemType>;
+using AttachedEffectPtr = std::shared_ptr<AttachedEffect>;
 
 #ifdef FRAMEWORK_EDITOR
-using HousePtr = stdext::shared_object_ptr<House>;
-using TownPtr = stdext::shared_object_ptr<Town>;
-using CreatureTypePtr = stdext::shared_object_ptr<CreatureType>;
-using SpawnPtr = stdext::shared_object_ptr<Spawn>;
+using HousePtr = std::shared_ptr<House>;
+using TownPtr = std::shared_ptr<Town>;
+using CreatureTypePtr = std::shared_ptr<CreatureType>;
+using SpawnPtr = std::shared_ptr<Spawn>;
 
 using HouseList = std::list<HousePtr>;
 using TownList = std::list<TownPtr>;
@@ -102,8 +102,8 @@ using TileMap = stdext::map<Position, TilePtr, Position::Hasher>;
 class ProtocolLogin;
 class ProtocolGame;
 
-using ProtocolGamePtr = stdext::shared_object_ptr<ProtocolGame>;
-using ProtocolLoginPtr = stdext::shared_object_ptr<ProtocolLogin>;
+using ProtocolGamePtr = std::shared_ptr<ProtocolGame>;
+using ProtocolLoginPtr = std::shared_ptr<ProtocolLogin>;
 
 // ui
 class UIItem;
@@ -115,11 +115,11 @@ class UIMapAnchorLayout;
 class UIPositionAnchor;
 class UISprite;
 
-using UIItemPtr = stdext::shared_object_ptr<UIItem>;
-using UICreaturePtr = stdext::shared_object_ptr<UICreature>;
-using UISpritePtr = stdext::shared_object_ptr<UISprite>;
-using UIMapPtr = stdext::shared_object_ptr<UIMap>;
-using UIMinimapPtr = stdext::shared_object_ptr<UIMinimap>;
-using UIProgressRectPtr = stdext::shared_object_ptr<UIProgressRect>;
-using UIMapAnchorLayoutPtr = stdext::shared_object_ptr<UIMapAnchorLayout>;
-using UIPositionAnchorPtr = stdext::shared_object_ptr<UIPositionAnchor>;
+using UIItemPtr = std::shared_ptr<UIItem>;
+using UICreaturePtr = std::shared_ptr<UICreature>;
+using UISpritePtr = std::shared_ptr<UISprite>;
+using UIMapPtr = std::shared_ptr<UIMap>;
+using UIMinimapPtr = std::shared_ptr<UIMinimap>;
+using UIProgressRectPtr = std::shared_ptr<UIProgressRect>;
+using UIMapAnchorLayoutPtr = std::shared_ptr<UIMapAnchorLayout>;
+using UIPositionAnchorPtr = std::shared_ptr<UIPositionAnchor>;

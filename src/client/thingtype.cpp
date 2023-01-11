@@ -661,8 +661,8 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
     const bool useCustomImage = animationPhase == 0 && !m_customImage.empty();
     const int indexSize = textureLayers * m_numPatternX * m_numPatternY * m_numPatternZ;
     const auto& textureSize = getBestTextureDimension(m_size.width(), m_size.height(), indexSize);
-    const auto& fullImage = useCustomImage ? Image::load(m_customImage) : ImagePtr(new Image(textureSize * SPRITE_SIZE));
-    const bool protobufSupported = g_game.getProtocolVersion() >= 1281 && !g_game.getFeature(Otc::GameLoadSprInsteadProtobuf);
+    const auto& fullImage = useCustomImage ? Image::load(m_customImage) : std::make_shared<Image>(textureSize * SPRITE_SIZE);
+    const bool protobufSupported = g_game.getProtocolVersion() >= 1281;
 
     static Color maskColors[] = { Color::red, Color::green, Color::blue, Color::yellow };
 
@@ -675,7 +675,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
                     const int frameIndex = getTextureIndex(l % textureLayers, x, y, z);
 
                     const auto& framePos = Point(frameIndex % (textureSize.width() / m_size.width()) * m_size.width(),
-                        frameIndex / (textureSize.width() / m_size.width()) * m_size.height()) * SPRITE_SIZE;
+                                                 frameIndex / (textureSize.width() / m_size.width()) * m_size.height()) * SPRITE_SIZE;
 
                     if (!useCustomImage) {
                         if (protobufSupported) {
@@ -751,7 +751,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
     if (m_opaque == -1)
         m_opaque = !fullImage->hasTransparentPixel();
 
-    animationPhaseTexture = TexturePtr(new Texture(fullImage, true, false, m_size.area() == 1 && !hasElevation(), false));
+    animationPhaseTexture = std::make_shared<Texture>(fullImage, true, false, m_size.area() == 1 && !hasElevation(), false);
     if (smooth)
         animationPhaseTexture->setSmooth(true);
 
@@ -1001,7 +1001,7 @@ void ThingType::exportImage(const std::string& fileName)
     if (m_spritesIndex.empty())
         throw Exception("cannot export thingtype without sprites");
 
-    const ImagePtr& image(new Image(Size(SPRITE_SIZE * m_size.width() * m_layers * m_numPatternX, SPRITE_SIZE * m_size.height() * m_animationPhases * m_numPatternY * m_numPatternZ)));
+    const auto & = std::make_shared<Image>(Size(SPRITE_SIZE * m_size.width() * m_layers * m_numPatternX, SPRITE_SIZE * m_size.height() * m_animationPhases * m_numPatternY * m_numPatternZ));
     for (int z = 0; z < m_numPatternZ; ++z) {
         for (int y = 0; y < m_numPatternY; ++y) {
             for (int x = 0; x < m_numPatternX; ++x) {

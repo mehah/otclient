@@ -24,11 +24,9 @@
 
 #include "declarations.h"
 
-class OTMLNode : public stdext::shared_object
+class OTMLNode : public std::enable_shared_from_this<OTMLNode>
 {
 public:
-    ~OTMLNode() override = default;
-
     static OTMLNodePtr create(const std::string_view tag = "", bool unique = false);
     static OTMLNodePtr create(const std::string_view tag, const std::string_view value);
 
@@ -88,11 +86,9 @@ public:
 
     virtual std::string emit();
 
-    OTMLNodePtr asOTMLNode() { return static_self_cast<OTMLNode>(); }
+    OTMLNodePtr asOTMLNode() { return this->shared_from_this(); }
 
 protected:
-    OTMLNode() = default;
-
     OTMLNodeList m_children;
     std::string m_tag;
     std::string m_value;

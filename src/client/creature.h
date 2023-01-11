@@ -58,14 +58,14 @@ public:
 
     void setId(uint32_t id) override { m_id = id; }
     void setMasterId(uint32_t id) { m_masterId = id; }
-    void setName(const std::string_view name);
+    void setName(const std::string_view name) { m_name.setText(name); }
     void setHealthPercent(uint8_t healthPercent);
     void setDirection(Otc::Direction direction);
     void setOutfit(const Outfit& outfit);
     void setOutfitColor(const Color& color, int duration);
     void setLight(const Light& light) { m_light = light; }
     void setSpeed(uint16_t speed);
-    void setBaseSpeed(double baseSpeed);
+    void setBaseSpeed(uint16_t baseSpeed);
     void setSkull(uint8_t skull);
     void setShield(uint8_t shield);
     void setEmblem(uint8_t emblem);
@@ -89,14 +89,14 @@ public:
 
     uint32_t getId() override { return m_id; }
     uint32_t getMasterId() { return m_masterId; }
-    std::string getName() { return m_name; }
+    std::string getName() { return m_name.getText(); }
     uint8_t getHealthPercent() { return m_healthPercent; }
     Otc::Direction getDirection() { return m_direction; }
     Outfit getOutfit() { return m_outfit; }
     const Light& getLight() const override;
     bool hasLight() const override { return Thing::hasLight() || getLight().intensity > 0; }
     uint16_t getSpeed() { return m_speed; }
-    double getBaseSpeed() { return m_baseSpeed; }
+    uint16_t getBaseSpeed() { return m_baseSpeed; }
     uint8_t getSkull() { return m_skull; }
     uint8_t getShield() { return m_shield; }
     uint8_t getEmblem() { return m_emblem; }
@@ -111,13 +111,12 @@ public:
     float getStepProgress() { return m_walkTimer.ticksElapsed() / m_stepCache.duration; }
     float getStepTicksLeft() { return static_cast<float>(m_stepCache.getDuration(m_lastStepDirection)) - m_walkTimer.ticksElapsed(); }
     ticks_t getWalkTicksElapsed() { return m_walkTimer.ticksElapsed(); }
-    std::array<double, Otc::LastSpeedFormula> getSpeedFormulaArray() { return m_speedFormula; }
     Point getDisplacement() const override;
     int getDisplacementX() const override;
     int getDisplacementY() const override;
     int getExactSize(int layer = 0, int xPattern = 0, int yPattern = 0, int zPattern = 0, int animationPhase = 0) override;
 
-    int getCurrentAnimationPhase(bool mount = false);
+    uint16_t getCurrentAnimationPhase(bool mount = false);
 
     bool isDisabledWalkAnimation() { return m_disableWalkAnimation > 0; }
     void setDisableWalkAnimation(bool v) {
@@ -150,12 +149,12 @@ public:
     void onDisappear() override;
     virtual void onDeath();
 
-    int getWalkedPixel() const { return m_walkedPixels; }
+    uint8_t getWalkedPixel() const { return m_walkedPixels; }
 
 protected:
     void updateWalkingTile();
     virtual void updateWalkAnimation();
-    virtual void updateWalkOffset(int totalPixelsWalked);
+    virtual void updateWalkOffset(uint8_t totalPixelsWalked);
     virtual void updateWalk(bool isPreWalking = false);
     virtual void nextWalkUpdate();
     virtual void terminateWalk();
@@ -168,14 +167,12 @@ protected:
     uint32_t m_id{ 0 };
     uint32_t m_masterId{ 0 };
 
-    std::string m_name;
     Outfit m_outfit;
     Light m_light;
 
-    int m_calculatedStepSpeed{ 0 };
-    int m_speed{ 0 };
-
-    double m_baseSpeed{ 0 };
+    uint16_t m_calculatedStepSpeed{ 0 };
+    uint16_t m_speed{ 0 };
+    uint16_t m_baseSpeed{ 0 };
 
     uint8_t m_type;
     uint8_t m_healthPercent{ 101 };
@@ -205,15 +202,12 @@ protected:
     Color m_informationColor;
     Color m_outfitColor{ Color::white };
 
-    CachedText m_nameCache;
-
-    std::array<double, Otc::LastSpeedFormula> m_speedFormula;
+    CachedText m_name;
 
     // walk related
-    int m_walkAnimationPhase{ 0 };
-    int m_walkedPixels{ 0 };
+    uint8_t m_walkAnimationPhase{ 0 };
+    uint8_t m_walkedPixels{ 0 };
 
-    uint32_t m_footStep{ 0 };
     Timer m_walkTimer;
     Timer m_footTimer;
     Timer m_outfitColorTimer;
@@ -248,8 +242,8 @@ protected:
 private:
     struct SizeCache
     {
-        int exactSize{ 0 };
-        int frameSizeNotResized{ 0 };
+        uint8_t exactSize{ 0 };
+        uint8_t frameSizeNotResized{ 0 };
     };
 
     struct StepCache

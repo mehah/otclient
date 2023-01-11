@@ -582,14 +582,6 @@ namespace Otc
         VipStatePending = 2
     };
 
-    enum SpeedFormula : uint8_t
-    {
-        SpeedFormulaA = 0,
-        SpeedFormulaB,
-        SpeedFormulaC,
-        LastSpeedFormula
-    };
-
     enum Blessings : uint32_t
     {
         BlessingNone = 0,

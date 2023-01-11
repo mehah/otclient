@@ -34,9 +34,9 @@ class Protocol;
 class ProtocolHttp;
 class Server;
 
-using InputMessagePtr = stdext::shared_object_ptr<InputMessage>;
-using OutputMessagePtr = stdext::shared_object_ptr<OutputMessage>;
-using ConnectionPtr = stdext::shared_object_ptr<Connection>;
-using ProtocolPtr = stdext::shared_object_ptr<Protocol>;
-using ProtocolHttpPtr = stdext::shared_object_ptr<ProtocolHttp>;
-using ServerPtr = stdext::shared_object_ptr<Server>;
+using InputMessagePtr = std::shared_ptr<InputMessage>;
+using OutputMessagePtr = std::shared_ptr<OutputMessage>;
+using ConnectionPtr = std::shared_ptr<Connection>;
+using ProtocolPtr = std::shared_ptr<Protocol>;
+using ProtocolHttpPtr = std::shared_ptr<ProtocolHttp>;
+using ServerPtr = std::shared_ptr<Server>;

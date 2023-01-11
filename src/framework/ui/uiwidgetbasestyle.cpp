@@ -266,13 +266,13 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
             if (!layoutType.empty()) {
                 UILayoutPtr layout;
                 if (layoutType == "horizontalBox")
-                    layout = UIHorizontalLayoutPtr(new UIHorizontalLayout(static_self_cast<UIWidget>()));
+                    layout = std::make_shared<UIHorizontalLayout>(static_self_cast<UIWidget>());
                 else if (layoutType == "verticalBox")
-                    layout = UIVerticalLayoutPtr(new UIVerticalLayout(static_self_cast<UIWidget>()));
+                    layout = std::make_shared<UIVerticalLayout>(static_self_cast<UIWidget>());
                 else if (layoutType == "grid")
-                    layout = UIGridLayoutPtr(new UIGridLayout(static_self_cast<UIWidget>()));
+                    layout = std::make_shared<UIGridLayout>(static_self_cast<UIWidget>());
                 else if (layoutType == "anchor")
-                    layout = UIAnchorLayoutPtr(new UIAnchorLayout(static_self_cast<UIWidget>()));
+                    layout = std::make_shared<UIAnchorLayout>(static_self_cast<UIWidget>());
                 else
                     throw OTMLException(node, "cannot determine layout type");
                 setLayout(layout);

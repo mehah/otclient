@@ -37,6 +37,5 @@
 #include "hash.h"
 #include "math.h"
 #include "storage.h"
-#include "shared_object.h"
 #include "string.h"
 #include "time.h"

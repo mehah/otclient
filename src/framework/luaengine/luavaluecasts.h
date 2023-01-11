@@ -157,7 +157,7 @@ bool luavalue_cast(int index, LuaObjectPtr& obj);
 
 template<class T>
 std::enable_if_t<std::is_base_of_v<LuaObject, T>, bool>
-luavalue_cast(int index, stdext::shared_object_ptr<T>& ptr);
+luavalue_cast(int index, std::shared_ptr<T>& ptr);
 
 // std::function
 template<typename Ret, typename... Args>
@@ -241,7 +241,7 @@ push_luavalue(const T& obj)
 
 template<class T>
 std::enable_if_t<std::is_base_of_v<LuaObject, T>, bool>
-luavalue_cast(int index, stdext::shared_object_ptr<T>& ptr)
+luavalue_cast(int index, std::shared_ptr<T>& ptr)
 {
     LuaObjectPtr obj;
     if (!luavalue_cast(index, obj))
