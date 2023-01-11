@@ -162,20 +162,20 @@ namespace luabinder
 
     /// Create member function lambdas
     template<typename Ret, typename C, typename... Args>
-    std::function<Ret(const stdext::shared_object_ptr<C>&, const Args&...)> make_mem_func(Ret(C::* f)(Args...))
+    std::function<Ret(const std::shared_ptr<C>&, const Args&...)> make_mem_func(Ret(C::* f)(Args...))
     {
         auto mf = std::mem_fn(f);
-        return [=](const stdext::shared_object_ptr<C>& obj, const Args&... args) mutable -> Ret {
+        return [=](const std::shared_ptr<C>& obj, const Args&... args) mutable -> Ret {
             if (!obj)
                 throw LuaException("failed to call a member function because the passed object is nil");
             return mf(obj.get(), args...);
         };
     }
     template<typename C, typename... Args>
-    std::function<void(const stdext::shared_object_ptr<C>&, const Args&...)> make_mem_func(void (C::* f)(Args...))
+    std::function<void(const std::shared_ptr<C>&, const Args&...)> make_mem_func(void (C::* f)(Args...))
     {
         auto mf = std::mem_fn(f);
-        return [=](const stdext::shared_object_ptr<C>& obj, const Args&... args) mutable {
+        return [=](const std::shared_ptr<C>& obj, const Args&... args) mutable {
             if (!obj)
                 throw LuaException("failed to call a member function because the passed object is nil");
             mf(obj.get(), args...);
@@ -200,7 +200,7 @@ namespace luabinder
     template<typename C, typename Ret, class FC, typename... Args>
     LuaCppFunction bind_mem_fun(Ret(FC::* f)(Args...))
     {
-        using Tuple = std::tuple<stdext::shared_object_ptr<FC>, typename stdext::remove_const_ref<Args>::type...>;
+        using Tuple = std::tuple<std::shared_ptr<FC>, typename stdext::remove_const_ref<Args>::type...>;
         auto lambda = make_mem_func<Ret, FC>(f);
         return bind_fun_specializer<typename stdext::remove_const_ref<Ret>::type,
             decltype(lambda),
@@ -225,7 +225,7 @@ namespace luabinder
     {
         auto mf = std::mem_fn(f);
         return [=](LuaInterface* lua) mutable -> int {
-            auto obj = lua->castValue<stdext::shared_object_ptr<C>>(1);
+            auto obj = lua->castValue<std::shared_ptr<C>>(1);
             lua->remove(1);
             return mf(obj, lua);
         };

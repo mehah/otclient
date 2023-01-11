@@ -306,8 +306,8 @@ void UIManager::onWidgetDestroy(const UIWidgetPtr& widget)
         g_dispatcher.scheduleEvent([backupList] {
             g_lua.collectGarbage();
             for (const UIWidgetPtr& widget : backupList) {
-                if (widget->ref_count() != 1)
-                    g_logger.warning(stdext::format("widget '%s' destroyed but still have %d reference(s) left", widget->getId(), widget->getUseCount() - 1));
+                if (widget.use_count() != 1)
+                    g_logger.warning(stdext::format("widget '%s' destroyed but still have %d reference(s) left", widget->getId(), widget.use_count() - 1));
             }
         }, 1);
     }, 1000);
@@ -456,22 +456,22 @@ UIWidgetPtr UIManager::createWidgetFromOTML(const OTMLNodePtr& widgetNode, const
 
     // call widget creation from lua
     const auto& widget = g_lua.callGlobalField<UIWidgetPtr>(widgetType, "create");
+    if (!widget)
+        throw Exception("unable to create widget of type '%s'", widgetType);
+
     if (parent)
         parent->addChild(widget);
 
-    if (widget) {
-        widget->callLuaField("onCreate");
+    widget->callLuaField("onCreate");
 
-        widget->setStyleFromNode(styleNode);
+    widget->setStyleFromNode(styleNode);
 
-        for (const auto& childNode : styleNode->children()) {
-            if (!childNode->isUnique()) {
-                createWidgetFromOTML(childNode, widget);
-                styleNode->removeChild(childNode);
-            }
+    for (const auto& childNode : styleNode->children()) {
+        if (!childNode->isUnique()) {
+            createWidgetFromOTML(childNode, widget);
+            styleNode->removeChild(childNode);
         }
-    } else
-        throw Exception("unable to create widget of type '%s'", widgetType);
+    }
 
     widget->callLuaField("onSetup");
     return widget;

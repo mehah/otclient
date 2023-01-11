@@ -32,11 +32,10 @@ Server::Server(int port)
 ServerPtr Server::create(int port)
 {
     try {
-        auto* server = new Server(port);
-        return { server };
+        return std::make_shared<Server>(port);
     } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to initialize server: %s", e.what()));
-        return {};
+        return nullptr;
     }
 }
 

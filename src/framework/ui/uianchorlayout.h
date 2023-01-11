@@ -26,7 +26,7 @@
 
 #include "uilayout.h"
 
-class UIAnchor : public stdext::shared_object
+class UIAnchor :public std::enable_shared_from_this<UIAnchor>
 {
 public:
     UIAnchor(Fw::AnchorEdge anchoredEdge, std::string_view hookedWidgetId, Fw::AnchorEdge hookedEdge) :
@@ -45,7 +45,7 @@ protected:
     std::string m_hookedWidgetId;
 };
 
-class UIAnchorGroup : public stdext::shared_object
+class UIAnchorGroup : public std::enable_shared_from_this<UIAnchorGroup>
 {
 public:
     UIAnchorGroup() = default;

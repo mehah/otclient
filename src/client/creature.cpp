@@ -554,12 +554,14 @@ void Creature::updateWalkingTile()
 
     if (newWalkingTile == m_walkingTile) return;
 
+    const auto& self = static_self_cast<Creature>();
+
     if (m_walkingTile)
-        m_walkingTile->removeWalkingCreature(static_self_cast<Creature>());
+        m_walkingTile->removeWalkingCreature(self);
 
     if (newWalkingTile) {
-        newWalkingTile->addWalkingCreature(static_self_cast<Creature>());
-        g_map.notificateTileUpdate(newWalkingTile->getPosition(), this, Otc::OPERATION_CLEAN);
+        newWalkingTile->addWalkingCreature(self);
+        g_map.notificateTileUpdate(newWalkingTile->getPosition(), self, Otc::OPERATION_CLEAN);
     }
 
     m_walkingTile = newWalkingTile;

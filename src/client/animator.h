@@ -44,7 +44,7 @@ enum AnimationDirection : uint8_t
     AnimDirBackward = 1
 };
 
-class Animator : public stdext::shared_object
+class Animator : public std::enable_shared_from_this<Animator>
 {
 public:
     void unserializeAppearance(const appearances::SpriteAnimation& phases);

@@ -876,7 +876,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIMap>("setFloorFading", &UIMap::setFloorFading);
 
     g_lua.registerClass<UIMinimap, UIWidget>();
-    g_lua.bindClassStaticFunction<UIMinimap>("create", [] { return UIMinimapPtr(new UIMinimap); });
+    g_lua.bindClassStaticFunction<UIMinimap>("create", [] { return std::make_shared<UIMinimap>(); });
     g_lua.bindClassMemberFunction<UIMinimap>("zoomIn", &UIMinimap::zoomIn);
     g_lua.bindClassMemberFunction<UIMinimap>("zoomOut", &UIMinimap::zoomOut);
     g_lua.bindClassMemberFunction<UIMinimap>("setZoom", &UIMinimap::setZoom);

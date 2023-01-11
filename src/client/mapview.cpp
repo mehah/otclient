@@ -354,7 +354,7 @@ void MapView::updateVisibleTiles()
                         tile->onAddInMapView();
                     }
 
-                    if (isDrawingLights() && tile->canShade(this))
+                    if (isDrawingLights() && tile->canShade(static_self_cast<MapView>()))
                         floor.shades.emplace_back(tile);
 
                     if (addTile || !floor.shades.empty()) {

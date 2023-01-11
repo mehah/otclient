@@ -39,7 +39,7 @@
 
 ItemPtr Item::create(int id)
 {
-    const ItemPtr& item(new Item);
+    const auto& item = std::make_shared<Item>();
     item->setId(id);
 
     return item;

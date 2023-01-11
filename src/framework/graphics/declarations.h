@@ -73,4 +73,4 @@ using ShaderList = std::vector<ShaderPtr>;
 using DrawBufferPtr = std::shared_ptr<DrawBuffer>;
 using CoordsBufferPtr = std::shared_ptr<CoordsBuffer>;
 
-using ParticleEffectTypePtr = stdext::shared_object_ptr<ParticleEffectType>;
+using ParticleEffectTypePtr = std::shared_ptr<ParticleEffectType>;

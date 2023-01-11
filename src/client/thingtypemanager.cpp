@@ -101,7 +101,7 @@ bool ThingTypeManager::loadDat(std::string file)
             const uint16_t firstId = category == ThingCategoryItem ? 100 : 1;
 
             for (uint16_t id = firstId - 1, s = m_thingTypes[category].size(); ++id < s;) {
-                const ThingTypePtr& type(new ThingType);
+                const auto& type = std::make_shared<ThingType>();
                 type->unserialize(id, static_cast<ThingCategory>(category), fin);
                 m_thingTypes[category][id] = type;
             }
@@ -198,7 +198,7 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
             things.resize(lastAppearance.id() + 1, m_nullThingType);
 
             for (const auto& appearance : *appearances) {
-                const ThingTypePtr& type(new ThingType);
+                const auto& type = std::make_shared<ThingType>();
                 const uint16_t id = appearance.id();
                 type->unserializeAppearance(id, static_cast<ThingCategory>(category), appearance);
                 m_thingTypes[category][id] = type;

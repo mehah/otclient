@@ -42,7 +42,6 @@ void LuaInterface::init()
 
     // register LuaObject, the base of all other objects
     registerClass<LuaObject>();
-    bindClassMemberFunction<LuaObject>("getUseCount", &LuaObject::getUseCount);
     bindClassMemberFunction<LuaObject>("getClassName", &LuaObject::getClassName);
 
     registerClassMemberFunction<LuaObject>("getFieldsTable", [](LuaInterface*) -> int {
