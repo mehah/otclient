@@ -130,7 +130,7 @@ void SpriteManager::unload()
 
 ImagePtr SpriteManager::getSpriteImage(int id)
 {
-    if (g_game.getClientVersion() >= 1281) {
+    if (g_game.getClientVersion() >= 1281 && !g_game.getFeature(Otc::GameLoadSprInsteadProtobuf)) {
         return g_spriteAppearances.getSpriteImage(id);
     }
 
