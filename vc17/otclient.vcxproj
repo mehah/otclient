@@ -557,8 +557,6 @@ IF %ERRORLEVEL% EQU 0 (
     <ClInclude Include="..\src\framework\stdext\math.h" />
     <ClInclude Include="..\src\framework\stdext\net.h" />
     <ClInclude Include="..\src\framework\stdext\storage.h" />
-    <ClInclude Include="..\src\framework\stdext\shared_object.h" />
-    <ClInclude Include="..\src\framework\stdext\shared_ptr.h" />
     <ClInclude Include="..\src\framework\stdext\stdext.h" />
     <ClInclude Include="..\src\framework\stdext\string.h" />
     <ClInclude Include="..\src\framework\stdext\time.h" />

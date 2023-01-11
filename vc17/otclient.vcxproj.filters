@@ -815,12 +815,6 @@
     <ClInclude Include="..\src\framework\stdext\storage.h">
       <Filter>Header Files\framework\stdext</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\framework\stdext\shared_object.h">
-      <Filter>Header Files\framework\stdext</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\framework\stdext\shared_ptr.h">
-      <Filter>Header Files\framework\stdext</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\framework\stdext\stdext.h">
       <Filter>Header Files\framework\stdext</Filter>
     </ClInclude>

@@ -33,11 +33,13 @@ UIMinimap::UIMinimap()
     m_scale = 1.0f;
     m_minZoom = -5;
     m_maxZoom = 5;
-    m_layout = UIMapAnchorLayoutPtr(new UIMapAnchorLayout(static_self_cast<UIWidget>()));
 }
 
 void UIMinimap::drawSelf(DrawPoolType drawPane)
 {
+    if (!m_layout)
+        m_layout = std::make_shared<UIMapAnchorLayout>(static_self_cast<UIWidget>());
+
     UIWidget::drawSelf(drawPane);
 
     if (drawPane != DrawPoolType::FOREGROUND)

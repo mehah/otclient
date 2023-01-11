@@ -30,7 +30,7 @@ class OggSoundFile : public SoundFile
 {
 public:
     OggSoundFile(const FileStreamPtr& fileStream);
-    ~OggSoundFile() override;
+    ~OggSoundFile();
 
     bool prepareOgg();
 

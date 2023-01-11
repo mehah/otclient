@@ -29,4 +29,4 @@ class LuaObject;
 
 using LuaCppFunction = std::function<int(LuaInterface*)>;
 using LuaCppFunctionPtr = std::unique_ptr<LuaCppFunction>;
-using LuaObjectPtr = stdext::shared_object_ptr<LuaObject>;
+using LuaObjectPtr = std::shared_ptr<LuaObject>;

@@ -517,6 +517,9 @@ namespace Otc
         GameThingCounter = 87,
         GameThingClock = 88,
         GameThingPodiumItemType = 89,
+
+        //  others
+        GameLoadSprInsteadProtobuf = 100,
         LastGameFeature = 101
     };
 
@@ -577,14 +580,6 @@ namespace Otc
         VipStateOffline = 0,
         VipStateOnline = 1,
         VipStatePending = 2
-    };
-
-    enum SpeedFormula : uint8_t
-    {
-        SpeedFormulaA = 0,
-        SpeedFormulaB,
-        SpeedFormulaC,
-        LastSpeedFormula
     };
 
     enum Blessings : uint32_t

@@ -23,28 +23,6 @@
 #include "particletype.h"
 #include <framework/graphics/texturemanager.h>
 
-ParticleType::ParticleType()
-{
-    // particles default configuration. (make them reasonable for user detect missing properties on scripts)
-    pMinPositionRadius = 0;
-    pMaxPositionRadius = 3;
-    pMinPositionAngle = 0;
-    pMaxPositionAngle = 360;
-    pStartSize = 32;
-    pFinalSize = 32;
-    pMinDuration = 0;
-    pMaxDuration = 10;
-    pIgnorePhysicsAfter = -1;
-    pMinVelocity = 32;
-    pMaxVelocity = 64;
-    pMinVelocityAngle = 0;
-    pMaxVelocityAngle = 360;
-    pMinAcceleration = 32;
-    pMaxAcceleration = 64;
-    pMinAccelerationAngle = 0;
-    pMaxAccelerationAngle = 360;
-}
-
 void ParticleType::load(const OTMLNodePtr& node)
 {
     for (const OTMLNodePtr& childNode : node->children()) {

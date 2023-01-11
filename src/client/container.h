@@ -30,12 +30,8 @@
  // @bindclass
 class Container : public LuaObject
 {
-protected:
-    Container(int id, int capacity, const std::string_view name, const ItemPtr& containerItem, bool hasParent, bool isUnlocked, bool hasPages, int containerSize, int firstIndex)
-        :m_id(id), m_capacity(capacity), m_containerItem(containerItem), m_name(name), m_hasParent(hasParent), m_unlocked(isUnlocked), m_hasPages(hasPages), m_size(containerSize), m_firstIndex(firstIndex)
-    {}
-
 public:
+
     ItemPtr getItem(int slot);
     std::deque<ItemPtr> getItems() { return m_items; }
     int getItemsCount() { return m_items.size(); }
@@ -53,6 +49,10 @@ public:
     ItemPtr findItemById(uint32_t itemId, int subType);
 
 protected:
+    Container(int id, int capacity, const std::string_view name, const ItemPtr& containerItem, bool hasParent, bool isUnlocked, bool hasPages, int containerSize, int firstIndex)
+        :m_id(id), m_capacity(capacity), m_containerItem(containerItem), m_name(name), m_hasParent(hasParent), m_unlocked(isUnlocked), m_hasPages(hasPages), m_size(containerSize), m_firstIndex(firstIndex)
+    {}
+
     void onOpen(const ContainerPtr& previousContainer);
     void onClose();
     void onAddItem(const ItemPtr& item, int slot);

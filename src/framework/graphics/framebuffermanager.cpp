@@ -26,19 +26,8 @@ FrameBufferManager g_framebuffers;
 
 void FrameBufferManager::init()
 {
-    m_temporaryFramebuffer = FrameBufferPtr(new FrameBuffer(true));
+    m_temporaryFramebuffer = std::make_shared<FrameBuffer>();
     m_temporaryFramebuffer->setSmooth(true);
 }
 
-void FrameBufferManager::terminate()
-{
-    m_framebuffers.clear();
-    m_temporaryFramebuffer = nullptr;
-}
-
-FrameBufferPtr FrameBufferManager::createFrameBuffer(const bool useAlphaWriting)
-{
-    auto fbo = FrameBufferPtr(new FrameBuffer(useAlphaWriting));
-    m_framebuffers.push_back(fbo);
-    return fbo;
-}
+void FrameBufferManager::terminate() { m_temporaryFramebuffer = nullptr; }

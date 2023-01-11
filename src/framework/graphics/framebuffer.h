@@ -29,6 +29,7 @@
 class FrameBuffer
 {
 public:
+    FrameBuffer();
     ~FrameBuffer();
 
     void release();
@@ -37,6 +38,7 @@ public:
 
     void setSmooth(bool enabled) { m_smooth = enabled; m_texture = nullptr; }
     void setBackuping(bool enabled) { m_backuping = enabled; }
+    void setUseAlphaWriting(bool use) { m_useAlphaWriting = use; }
 
     bool resize(const Size& size);
     bool isValid() const { return m_texture != nullptr; }
@@ -50,33 +52,30 @@ public:
     void disableBlend() { m_disableBlend = true; }
 
 protected:
-    FrameBuffer(bool useAlphaWriting);
-
     Color m_colorClear{ Color::alpha };
 
     friend class FrameBufferManager;
     friend class DrawPoolManager;
 
 private:
-    void internalCreate();
+    static uint32_t boundFbo;
+
     void internalBind();
     void internalRelease();
     void prepare(const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha);
-
-    static uint32_t boundFbo;
 
     Matrix3 m_textureMatrix;
     TexturePtr m_texture;
     TexturePtr m_screenBackup;
 
-    uint32_t m_fbo;
-    uint32_t m_prevBoundFbo;
+    uint32_t m_fbo{ 0 };
+    uint32_t m_prevBoundFbo{ 0 };
 
     CompositionMode m_compositeMode{ CompositionMode::NORMAL };
 
     bool m_backuping{ true };
     bool m_smooth{ true };
-    bool m_useAlphaWriting{ false };
+    bool m_useAlphaWriting{ true };
     bool m_disableBlend{ false };
 
     Rect m_dest;

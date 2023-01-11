@@ -26,11 +26,11 @@
 
  /// LuaObject, all script-able classes have it as base
  // @bindclass
-class LuaObject : public stdext::shared_object
+class LuaObject : public std::enable_shared_from_this<LuaObject>
 {
 public:
     LuaObject();
-    ~LuaObject() override;
+    virtual ~LuaObject();
 
     template<typename T>
     void connectLuaField(const std::string_view field, const std::function<T>& f, bool pushFront = false);
@@ -74,14 +74,15 @@ public:
     /// Gets the table containing all stored fields of this lua object, the result is pushed onto the stack
     void luaGetFieldsTable();
 
-    /// Returns the number of references of this object
-    /// @note each userdata of this object on lua counts as a reference
-    int getUseCount();
-
     /// Returns the derived class name, its the same name used in Lua
     std::string getClassName();
 
-    LuaObjectPtr asLuaObject() { return static_self_cast<LuaObject>(); }
+    LuaObjectPtr asLuaObject() { return shared_from_this(); }
+
+    template<typename T>
+    std::shared_ptr<T> static_self_cast() { return std::static_pointer_cast<T>(shared_from_this()); }
+    template<typename T>
+    std::shared_ptr<T> dynamic_self_cast() { return std::dynamic_pointer_cast<T>(shared_from_this()); }
 
     void operator=(const LuaObject&) {}
 

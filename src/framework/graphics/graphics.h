@@ -23,7 +23,6 @@
 #pragma once
 
 #include "declarations.h"
-#include "glutil.h"
 
  // @bindsingleton g_graphics
 class Graphics

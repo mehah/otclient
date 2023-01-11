@@ -25,11 +25,10 @@
 #include "declarations.h"
 #include <framework/core/filestream.h>
 
-class SoundFile : public stdext::shared_object
+class SoundFile : public std::enable_shared_from_this<SoundFile>
 {
 public:
     SoundFile(const FileStreamPtr& fileStream);
-    ~SoundFile() override = default;
     static SoundFilePtr loadSoundFile(const std::string& filename);
 
     virtual int read(void* /*buffer*/, int /*bufferSize*/) { return -1; }

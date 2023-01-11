@@ -24,11 +24,18 @@ end
 function load(version)
     local errorMessage = ''
 
-    if version >= 1281 then
+    if version >= 1281 and not g_game.getFeature(GameLoadSprInsteadProtobuf) then
         if not g_things.loadAppearances(resolvepath(string.format('/things/%d/catalog-content', version))) then
             errorMessage = errorMessage .. 'Couldn\'t load assets'
         end
     else
+        if g_game.getFeature(GameLoadSprInsteadProtobuf) then
+            local warningBox = displayErrorBox(tr('Warning'), 'Load spr instead protobuf it\'s unstable, use by yours risk!')
+            addEvent(function()
+                warningBox:raise()
+                warningBox:focus()
+            end)            
+        end
         local datPath, sprPath
         if filename then
             datPath = resolvepath('/data/things/' .. filename)

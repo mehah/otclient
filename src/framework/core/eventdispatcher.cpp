@@ -87,12 +87,12 @@ void EventDispatcher::poll()
 ScheduledEventPtr EventDispatcher::scheduleEvent(const std::function<void()>& callback, int delay)
 {
     if (m_disabled)
-        return { new ScheduledEvent(nullptr, delay, 1) };
+        return std::make_shared<ScheduledEvent>(nullptr, delay, 1);
 
     std::scoped_lock<std::recursive_mutex> lock(m_mutex);
 
     assert(delay >= 0);
-    ScheduledEventPtr scheduledEvent(new ScheduledEvent(callback, delay, 1));
+    const auto& scheduledEvent = std::make_shared<ScheduledEvent>(callback, delay, 1);
     m_scheduledEventList.push(scheduledEvent);
     return scheduledEvent;
 }
@@ -100,12 +100,12 @@ ScheduledEventPtr EventDispatcher::scheduleEvent(const std::function<void()>& ca
 ScheduledEventPtr EventDispatcher::cycleEvent(const std::function<void()>& callback, int delay)
 {
     if (m_disabled)
-        return { new ScheduledEvent(nullptr, delay, 0) };
+        return std::make_shared<ScheduledEvent>(nullptr, delay, 0);
 
     std::scoped_lock<std::recursive_mutex> lock(m_mutex);
 
     assert(delay > 0);
-    ScheduledEventPtr scheduledEvent(new ScheduledEvent(callback, delay, 0));
+    const auto& scheduledEvent = std::make_shared<ScheduledEvent>(callback, delay, 0);
     m_scheduledEventList.push(scheduledEvent);
     return scheduledEvent;
 }
@@ -113,7 +113,7 @@ ScheduledEventPtr EventDispatcher::cycleEvent(const std::function<void()>& callb
 EventPtr EventDispatcher::addEvent(const std::function<void()>& callback, bool pushFront)
 {
     if (m_disabled)
-        return { new Event(nullptr) };
+        return std::make_shared<Event>(nullptr);
 
     std::scoped_lock<std::recursive_mutex> lock(m_mutex);
 

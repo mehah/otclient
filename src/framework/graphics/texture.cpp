@@ -36,9 +36,6 @@ Texture::Texture() : m_uniqueId(++UID) {}
 
 Texture::Texture(const Size& size) : m_uniqueId(++UID)
 {
-    m_id = 0;
-    m_time = 0;
-
     if (!setupSize(size))
         return;
 
@@ -51,8 +48,6 @@ Texture::Texture(const Size& size) : m_uniqueId(++UID)
 
 Texture::Texture(const ImagePtr& image, bool buildMipmaps, bool compress, bool canSuperimposed, bool load) : m_uniqueId(++UID)
 {
-    m_id = 0;
-    m_time = 0;
     m_canSuperimposed = canSuperimposed;
     m_compress = compress;
     m_buildMipmaps = buildMipmaps;
@@ -158,6 +153,7 @@ void Texture::setUpsideDown(bool upsideDown)
 {
     if (m_upsideDown == upsideDown)
         return;
+
     m_upsideDown = upsideDown;
     setupTranformMatrix();
 }
@@ -214,13 +210,13 @@ void Texture::setupFilters()
 void Texture::setupTranformMatrix()
 {
     if (m_upsideDown) {
-        m_transformMatrix = { 1.0f / m_size.width(), 0.0f,                                                    0.0f,
-                              0.0f,                   -1.0f / m_size.height(),                                0.0f,
-                              0.0f,                    m_size.height() / static_cast<float>(m_size.height()), 1.0f };
+        m_transformMatrix = { 1.0f / m_size.width(), 0.0f,                                                  0.0f,
+                              0.0f,                 -1.0f / m_size.height(),                                0.0f,
+                              0.0f,                  m_size.height() / static_cast<float>(m_size.height()), 1.0f };
     } else {
         m_transformMatrix = { 1.0f / m_size.width(), 0.0f,                     0.0f,
-                              0.0f,                    1.0f / m_size.height(), 0.0f,
-                              0.0f,                    0.0f,                     1.0f };
+                              0.0f,                  1.0f / m_size.height(),   0.0f,
+                              0.0f,                  0.0f,                     1.0f };
     }
 }
 

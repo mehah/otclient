@@ -29,6 +29,6 @@ class OTMLDocument;
 class OTMLParser;
 class OTMLEmitter;
 
-using OTMLNodePtr = stdext::shared_object_ptr<OTMLNode>;
-using OTMLDocumentPtr = stdext::shared_object_ptr<OTMLDocument>;
+using OTMLNodePtr = std::shared_ptr<OTMLNode>;
+using OTMLDocumentPtr = std::shared_ptr<OTMLDocument>;
 using OTMLNodeList = std::vector<OTMLNodePtr>;

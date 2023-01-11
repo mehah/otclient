@@ -27,68 +27,67 @@
  // @bindclass
 class LocalPlayer : public Player
 {
-    enum
-    {
-        PREWALK_TIMEOUT = 1000
-    };
-
 public:
-    LocalPlayer();
-
     void unlockWalk() { m_walkLockExpiration = 0; }
-    void lockWalk(int millis = 250);
+    void lockWalk(uint16_t millis = 250);
     void stopAutoWalk();
+
     bool autoWalk(const Position& destination, bool retry = false);
     bool canWalk(bool ignoreLock = false);
 
-    void setStates(int states);
-    void setSkill(Otc::Skill skill, int level, int levelPercent);
-    void setBaseSkill(Otc::Skill skill, int baseLevel);
-    void setHealth(double health, double maxHealth);
+    void setStates(uint32_t states);
+    void setSkill(Otc::Skill skill, uint16_t level, uint16_t levelPercent);
+    void setBaseSkill(Otc::Skill skill, uint16_t baseLevel);
+    void setHealth(uint32_t health, uint32_t maxHealth);
     void setFreeCapacity(double freeCapacity);
     void setTotalCapacity(double totalCapacity);
-    void setExperience(double experience);
-    void setLevel(double level, double levelPercent);
-    void setMana(double mana, double maxMana);
-    void setMagicLevel(double magicLevel, double magicLevelPercent);
-    void setBaseMagicLevel(double baseMagicLevel);
-    void setSoul(double soul);
-    void setStamina(double stamina);
+    void setExperience(uint64_t experience);
+    void setLevel(uint16_t level, uint8_t levelPercent);
+    void setMana(uint32_t mana, uint32_t maxMana);
+    void setMagicLevel(uint8_t magicLevel, uint8_t magicLevelPercent);
+    void setBaseMagicLevel(uint8_t baseMagicLevel);
+    void setSoul(uint8_t soul);
+    void setStamina(uint16_t stamina);
     void setKnown(bool known) { m_known = known; }
     void setPendingGame(bool pending) { m_pending = pending; }
     void setInventoryItem(Otc::InventorySlot inventory, const ItemPtr& item);
-    void setVocation(int vocation);
+    void setVocation(uint8_t vocation);
     void setPremium(bool premium);
-    void setRegenerationTime(double regenerationTime);
-    void setOfflineTrainingTime(double offlineTrainingTime);
-    void setSpells(const std::vector<int>& spells);
-    void setBlessings(int blessings);
+    void setRegenerationTime(uint16_t regenerationTime);
+    void setOfflineTrainingTime(uint16_t offlineTrainingTime);
+    void setSpells(const std::vector<uint8_t>& spells);
+    void setBlessings(uint16_t blessings);
     void setResourceBalance(Otc::ResourceTypes_t type, uint64_t value);
 
-    int getStates() { return m_states; }
-    int getSkillLevel(Otc::Skill skill) { return m_skillsLevel[skill]; }
-    int getSkillBaseLevel(Otc::Skill skill) { return m_skillsBaseLevel[skill]; }
-    int getSkillLevelPercent(Otc::Skill skill) { return m_skillsLevelPercent[skill]; }
-    int getVocation() { return m_vocation; }
-    double getHealth() { return m_health; }
-    double getMaxHealth() { return m_maxHealth; }
     double getFreeCapacity() { return m_freeCapacity; }
     double getTotalCapacity() { return m_totalCapacity; }
-    double getExperience() { return m_experience; }
-    double getLevel() { return m_level; }
-    double getLevelPercent() { return m_levelPercent; }
-    double getMana() { return m_mana; }
-    double getMaxMana() { return m_maxMana; }
-    double getMagicLevel() { return m_magicLevel; }
-    double getMagicLevelPercent() { return m_magicLevelPercent; }
-    double getBaseMagicLevel() { return m_baseMagicLevel; }
-    double getSoul() { return m_soul; }
-    double getStamina() { return m_stamina; }
-    double getRegenerationTime() { return m_regenerationTime; }
-    double getOfflineTrainingTime() { return m_offlineTrainingTime; }
-    const std::vector<int>& getSpells() { return m_spells; }
+
+    uint8_t getVocation() { return m_vocation; }
+    uint8_t getMagicLevel() { return m_magicLevel; }
+    uint8_t getMagicLevelPercent() { return m_magicLevelPercent; }
+    uint8_t getBaseMagicLevel() { return m_baseMagicLevel; }
+    uint8_t getSoul() { return m_soul; }
+    uint8_t getLevelPercent() { return m_levelPercent; }
+
+    uint16_t getLevel() { return m_level; }
+    uint16_t getSkillLevel(Otc::Skill skill) { return m_skills[skill].level; }
+    uint16_t getSkillBaseLevel(Otc::Skill skill) { return m_skills[skill].baseLevel; }
+    uint16_t getSkillLevelPercent(Otc::Skill skill) { return m_skills[skill].levelPercent; }
+    uint16_t getStamina() { return m_stamina; }
+    uint16_t getBlessings() { return m_blessings; }
+    uint16_t getRegenerationTime() { return m_regenerationTime; }
+    uint16_t getOfflineTrainingTime() { return m_offlineTrainingTime; }
+
+    uint32_t getStates() { return m_states; }
+    uint32_t getMana() { return m_mana; }
+    uint32_t getMaxMana() { return m_maxMana; }
+    uint32_t getHealth() { return m_health; }
+    uint32_t getMaxHealth() { return m_maxHealth; }
+    uint64_t getExperience() { return m_experience; }
+
+    const std::vector<uint8_t>& getSpells() { return m_spells; }
     ItemPtr getInventoryItem(Otc::InventorySlot inventory) { return m_inventoryItems[inventory]; }
-    int getBlessings() { return m_blessings; }
+
     uint64_t getResourceBalance(Otc::ResourceTypes_t type)
     {
         const auto it = m_resourcesBalance.find(type);
@@ -97,8 +96,8 @@ public:
 
     uint64_t getTotalMoney()
     {
-        uint64_t bankBalance = getResourceBalance(Otc::RESOURCE_BANK_BALANCE);
-        uint64_t equippedBalance = getResourceBalance(Otc::RESOURCE_GOLD_EQUIPPED);
+        const uint64_t bankBalance = getResourceBalance(Otc::RESOURCE_BANK_BALANCE);
+        const uint64_t equippedBalance = getResourceBalance(Otc::RESOURCE_GOLD_EQUIPPED);
         return bankBalance + equippedBalance;
     }
 
@@ -120,13 +119,19 @@ protected:
     void cancelWalk(Otc::Direction direction = Otc::InvalidDirection);
     void stopWalk() override;
     void updateWalk(const bool /*isPreWalking*/ = false) override { Creature::updateWalk(m_preWalking); }
+    void updateWalkOffset(uint8_t totalPixelsWalked) override;
+    void terminateWalk() override;
 
     friend class Game;
 
-    void updateWalkOffset(int totalPixelsWalked) override;
-    void terminateWalk() override;
-
 private:
+    struct Skill
+    {
+        uint16_t level{ 0 };
+        uint16_t baseLevel{ 0 };
+        uint16_t levelPercent{ 0 };
+    };
+
     bool retryAutoWalk();
 
     // walk related
@@ -145,33 +150,32 @@ private:
 
     ItemPtr m_inventoryItems[Otc::LastInventorySlot];
 
-    std::array<int, Otc::LastSkill> m_skillsLevel;
-    std::array<int, Otc::LastSkill> m_skillsBaseLevel;
-    std::array<int, Otc::LastSkill> m_skillsLevelPercent;
-    std::vector<int> m_spells;
+    std::array<Skill, Otc::LastSkill> m_skills;
+    std::vector<uint8_t> m_spells;
 
     stdext::map<Otc::ResourceTypes_t, uint64_t> m_resourcesBalance;
 
     uint8_t m_autoWalkRetries{ 0 };
 
-    int m_states{ 0 };
-    int m_vocation{ 0 };
-    int m_blessings{ Otc::BlessingNone };
+    uint32_t m_states{ 0 };
+    uint8_t m_vocation{ 0 };
+    uint16_t m_blessings{ Otc::BlessingNone };
 
-    double m_health{ -1 };
-    double m_maxHealth{ -1 };
-    double m_freeCapacity{ -1 };
-    double m_totalCapacity{ -1 };
-    double m_experience{ -1 };
-    double m_level{ -1 };
-    double m_levelPercent{ -1 };
-    double m_mana{ -1 };
-    double m_maxMana{ -1 };
-    double m_magicLevel{ -1 };
-    double m_magicLevelPercent{ -1 };
-    double m_baseMagicLevel{ -1 };
-    double m_soul{ -1 };
-    double m_stamina{ -1 };
-    double m_regenerationTime{ -1 };
-    double m_offlineTrainingTime{ -1 };
+    double m_freeCapacity{ 0 };
+    double m_totalCapacity{ 0 };
+
+    uint32_t m_health{ 0 };
+    uint32_t m_maxHealth{ 0 };
+    uint64_t m_experience{ 0 };
+    uint16_t m_level{ 0 };
+    uint8_t m_levelPercent{ 0 };
+    uint32_t m_mana{ 0 };
+    uint32_t m_maxMana{ 0 };
+    uint8_t m_magicLevel{ 0 };
+    uint8_t m_magicLevelPercent{ 0 };
+    uint8_t m_baseMagicLevel{ 0 };
+    uint8_t m_soul{ 0 };
+    uint16_t m_stamina{ 0 };
+    uint16_t m_regenerationTime{ 0 };
+    uint16_t m_offlineTrainingTime{ 0 };
 };
