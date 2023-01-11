@@ -25,7 +25,7 @@
 
 OTMLNodePtr OTMLNode::create(const std::string_view tag, bool unique)
 {
-    const OTMLNodePtr& node(new OTMLNode);
+    const auto& node = std::make_shared<OTMLNode>();
     node->setTag(tag);
     node->setUnique(unique);
     return node;
@@ -33,7 +33,7 @@ OTMLNodePtr OTMLNode::create(const std::string_view tag, bool unique)
 
 OTMLNodePtr OTMLNode::create(const std::string_view tag, const std::string_view value)
 {
-    const OTMLNodePtr& node(new OTMLNode);
+    const auto& node = std::make_shared<OTMLNode>();
     node->setTag(tag);
     node->setValue(value);
     node->setUnique(true);
@@ -172,7 +172,7 @@ OTMLNodeList OTMLNode::children()
 
 OTMLNodePtr OTMLNode::clone()
 {
-    const OTMLNodePtr& myClone(new OTMLNode);
+    const auto& myClone = std::make_shared<OTMLNode>();
     myClone->setTag(m_tag);
     myClone->setValue(m_value);
     myClone->setUnique(m_unique);

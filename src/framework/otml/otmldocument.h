@@ -27,8 +27,6 @@
 class OTMLDocument : public OTMLNode
 {
 public:
-    ~OTMLDocument() override = default;
-
     /// Create a new OTML document for filling it with nodes
     static OTMLDocumentPtr create();
 

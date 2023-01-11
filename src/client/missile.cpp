@@ -43,7 +43,7 @@ void Missile::setPath(const Position& fromPosition, const Position& toPosition)
 
     const float deltaLength = m_delta.length();
     if (deltaLength == 0) {
-        g_map.removeThing(this);
+        g_map.removeThing(asMissile());
         return;
     }
 

@@ -155,7 +155,7 @@ std::vector<CreatureTypePtr> Spawn::getCreatures()
 
 CreaturePtr CreatureType::cast()
 {
-    CreaturePtr ret(new Creature);
+    const auto& ret = std::make_shared<Creature>();
 
     std::string cName = getName();
     stdext::tolower(cName);
@@ -170,7 +170,7 @@ CreaturePtr CreatureType::cast()
 
 CreatureManager::CreatureManager()
 {
-    m_nullCreature = CreatureTypePtr(new CreatureType);
+    m_nullCreature = std::make_shared<CreatureType>();
 }
 
 void CreatureManager::clearSpawns()
@@ -248,7 +248,7 @@ void CreatureManager::loadSpawns(const std::string& fileName)
             if (node->ValueTStr() != "spawn")
                 throw Exception("invalid spawn node");
 
-            SpawnPtr spawn(new Spawn);
+            const auto& spawn = std::make_shared<Spawn>();
             spawn->load(node);
             m_spawns.emplace(spawn->getCenterPos(), spawn);
         }
@@ -302,7 +302,7 @@ void CreatureManager::loadCreatureBuffer(const std::string& buffer)
     stdext::trim(cName);
     stdext::ucwords(cName);
 
-    const CreatureTypePtr& newType(new CreatureType(cName));
+    const auto& newType = std::make_shared<CreatureType>(cName);
     for (TiXmlElement* attrib = root->FirstChildElement(); attrib; attrib = attrib->NextSiblingElement()) {
         if (attrib->ValueStr() != "look")
             continue;
@@ -396,8 +396,7 @@ SpawnPtr CreatureManager::addSpawn(const Position& centerPos, int radius)
         return iter->second;
     }
 
-    SpawnPtr ret(new Spawn);
-
+    const auto& ret = std::make_shared<Spawn>();
     ret->setRadius(radius);
     ret->setCenterPos(centerPos);
 

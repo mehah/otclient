@@ -33,10 +33,10 @@ UIWidgetPtr UIAnchor::getHookedWidget(const UIWidgetPtr& widget, const UIWidgetP
         return parentWidget;
 
     if (m_hookedWidgetId == "next")
-        return  parentWidget->getChildAfter(widget);
+        return parentWidget->getChildAfter(widget);
 
     if (m_hookedWidgetId == "prev")
-        return  parentWidget->getChildBefore(widget);
+        return parentWidget->getChildBefore(widget);
 
     return parentWidget->getChildById(m_hookedWidgetId);
 }
@@ -44,9 +44,8 @@ UIWidgetPtr UIAnchor::getHookedWidget(const UIWidgetPtr& widget, const UIWidgetP
 int UIAnchor::getHookedPoint(const UIWidgetPtr& hookedWidget, const UIWidgetPtr& parentWidget)
 {
     // determine hooked widget edge point
-    Rect hookedWidgetRect = hookedWidget->getRect();
-    if (hookedWidget == parentWidget)
-        hookedWidgetRect = parentWidget->getPaddingRect();
+    const auto& hookedWidgetRect = hookedWidget == parentWidget ?
+        parentWidget->getPaddingRect() : hookedWidget->getRect();
 
     int point = 0;
     switch (m_hookedEdge) {
@@ -97,7 +96,7 @@ int UIAnchor::getHookedPoint(const UIWidgetPtr& hookedWidget, const UIWidgetPtr&
 void UIAnchorGroup::addAnchor(const UIAnchorPtr& anchor)
 {
     // duplicated anchors must be replaced
-    for (UIAnchorPtr& other : m_anchors) {
+    for (auto& other : m_anchors) {
         if (other->getAnchoredEdge() == anchor->getAnchoredEdge()) {
             other = anchor;
             return;
@@ -114,10 +113,10 @@ void UIAnchorLayout::addAnchor(const UIWidgetPtr& anchoredWidget, Fw::AnchorEdge
 
     assert(anchoredWidget != getParentWidget());
 
-    const UIAnchorPtr anchor(new UIAnchor(anchoredEdge, hookedWidgetId, hookedEdge));
-    UIAnchorGroupPtr& anchorGroup = m_anchorsGroups[anchoredWidget];
+    const auto& anchor = std::make_shared<UIAnchor>(anchoredEdge, hookedWidgetId, hookedEdge);
+    auto& anchorGroup = m_anchorsGroups[anchoredWidget];
     if (!anchorGroup)
-        anchorGroup = UIAnchorGroupPtr(new UIAnchorGroup);
+        anchorGroup = std::make_shared<UIAnchorGroup>();
 
     anchorGroup->addAnchor(anchor);
 

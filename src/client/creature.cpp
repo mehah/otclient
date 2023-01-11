@@ -42,9 +42,8 @@ double Creature::speedC = 0;
 
 Creature::Creature() :m_type(Proto::CreatureTypeUnknown)
 {
-    m_nameCache.setFont(g_fonts.getFont("verdana-11px-rounded"));
-    m_nameCache.setAlign(Fw::AlignTopCenter);
-    m_speedFormula.fill(-1);
+    m_name.setFont(g_fonts.getFont("verdana-11px-rounded"));
+    m_name.setAlign(Fw::AlignTopCenter);
 
     // Example of how to send a UniformValue to shader
     /*
@@ -231,7 +230,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
 
     // calculate main rects
 
-    const Size nameSize = m_nameCache.getTextSize();
+    const Size nameSize = m_name.getTextSize();
     const int cropSizeText = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? m_sizeCache.exactSize : 12;
     const int cropSizeBackGround = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? cropSizeText - nameSize.height() : 0;
 
@@ -278,7 +277,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
         }
 
         if (drawFlags & Otc::DrawNames) {
-            m_nameCache.draw(textRect, fillColor);
+            m_name.draw(textRect, fillColor);
         }
 
         if (m_skull != Otc::SkullNone && m_skullTexture) {
@@ -519,7 +518,7 @@ void Creature::updateWalkAnimation()
     }
 }
 
-void Creature::updateWalkOffset(int totalPixelsWalked)
+void Creature::updateWalkOffset(uint8_t totalPixelsWalked)
 {
     m_walkOffset = {};
     if (m_direction == Otc::North || m_direction == Otc::NorthEast || m_direction == Otc::NorthWest)
@@ -555,12 +554,14 @@ void Creature::updateWalkingTile()
 
     if (newWalkingTile == m_walkingTile) return;
 
+    const auto& self = static_self_cast<Creature>();
+
     if (m_walkingTile)
-        m_walkingTile->removeWalkingCreature(static_self_cast<Creature>());
+        m_walkingTile->removeWalkingCreature(self);
 
     if (newWalkingTile) {
-        newWalkingTile->addWalkingCreature(static_self_cast<Creature>());
-        g_map.notificateTileUpdate(newWalkingTile->getPosition(), this, Otc::OPERATION_CLEAN);
+        newWalkingTile->addWalkingCreature(self);
+        g_map.notificateTileUpdate(newWalkingTile->getPosition(), self, Otc::OPERATION_CLEAN);
     }
 
     m_walkingTile = newWalkingTile;
@@ -634,12 +635,6 @@ void Creature::terminateWalk()
         self->m_walkAnimationPhase = 0;
         self->m_walkFinishAnimEvent = nullptr;
     }, g_game.getServerBeat());
-}
-
-void Creature::setName(const std::string_view name)
-{
-    m_nameCache.setText(name);
-    m_name = name;
 }
 
 void Creature::setHealthPercent(uint8_t healthPercent)
@@ -780,12 +775,12 @@ void Creature::setSpeed(uint16_t speed)
     callLuaField("onSpeedChange", m_speed, oldSpeed);
 }
 
-void Creature::setBaseSpeed(double baseSpeed)
+void Creature::setBaseSpeed(uint16_t baseSpeed)
 {
     if (m_baseSpeed == baseSpeed)
         return;
 
-    const double oldBaseSpeed = m_baseSpeed;
+    const uint16_t oldBaseSpeed = m_baseSpeed;
     m_baseSpeed = baseSpeed;
 
     callLuaField("onBaseSpeedChange", baseSpeed, oldBaseSpeed);
@@ -932,7 +927,7 @@ const Light& Creature::getLight() const
     return m_light.color > 0 && m_light.intensity >= light.intensity ? m_light : light;
 }
 
-int Creature::getCurrentAnimationPhase(const bool mount)
+uint16_t Creature::getCurrentAnimationPhase(const bool mount)
 {
     const auto& thingType = mount ? m_mountType : getThingType();
 

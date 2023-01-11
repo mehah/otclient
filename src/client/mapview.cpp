@@ -354,7 +354,7 @@ void MapView::updateVisibleTiles()
                         tile->onAddInMapView();
                     }
 
-                    if (isDrawingLights() && tile->canShade(this))
+                    if (isDrawingLights() && tile->canShade(static_self_cast<MapView>()))
                         floor.shades.emplace_back(tile);
 
                     if (addTile || !floor.shades.empty()) {
@@ -788,7 +788,7 @@ void MapView::setDrawLights(bool enable)
         if (m_lightView)
             return;
 
-        m_lightView = LightViewPtr(new LightView);
+        m_lightView = std::make_shared<LightView>();
         g_mainDispatcher.addEvent([&]
         () { if (m_lightView) m_lightView->resize(m_drawDimension, m_tileSize); });
 

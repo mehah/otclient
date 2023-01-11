@@ -125,10 +125,9 @@ protected:
     struct DrawObject
     {
         DrawObject(std::function<void()> action) : action(std::move(action)) {}
-        DrawObject(const PoolState& state, const DrawBufferPtr& buffer) : buffer(buffer), state(std::move(state)) {}
+        DrawObject(const PoolState& state, const DrawBufferPtr& buffer) : buffer(buffer), state(state) {}
         DrawObject(const DrawMode drawMode, const PoolState& state, const DrawMethod& method) :
-            drawMode(drawMode), state(state), method(method)
-        {}
+            drawMode(drawMode), state(state), method(method) {}
 
         void addMethod(const DrawMethod& method)
         {
@@ -258,7 +257,7 @@ public:
     bool isValid() const override { return m_framebuffer->isValid(); }
 
 protected:
-    DrawPoolFramed(const FrameBufferPtr& fb) : m_framebuffer(fb) {};
+    DrawPoolFramed() : m_framebuffer(std::make_shared<FrameBuffer>()) {};
 
     friend DrawPoolManager;
     friend DrawPool;

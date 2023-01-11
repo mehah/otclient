@@ -29,12 +29,13 @@ DrawPool* DrawPool::create(const DrawPoolType type)
 {
     DrawPool* pool;
     if (type == DrawPoolType::MAP || type == DrawPoolType::LIGHT || type == DrawPoolType::FOREGROUND) {
-        const auto& frameBuffer = g_framebuffers.createFrameBuffer(true);
+        pool = new DrawPoolFramed;
 
-        pool = new DrawPoolFramed{ frameBuffer };
-
-        if (type == DrawPoolType::MAP) frameBuffer->disableBlend();
-        else if (type == DrawPoolType::LIGHT) {
+        const auto& frameBuffer = pool->toPoolFramed()->m_framebuffer;
+        if (type == DrawPoolType::MAP) {
+            frameBuffer->setUseAlphaWriting(false);
+            frameBuffer->disableBlend();
+        } else if (type == DrawPoolType::LIGHT) {
             pool->m_alwaysGroupDrawings = true;
             frameBuffer->setCompositionMode(CompositionMode::LIGHT);
         }

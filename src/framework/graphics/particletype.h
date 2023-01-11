@@ -30,10 +30,7 @@
 class ParticleType
 {
 public:
-    ParticleType();
-
     void load(const OTMLNodePtr& node);
-
     std::string getName() { return pName; }
 
 protected:

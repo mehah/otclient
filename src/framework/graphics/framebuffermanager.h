@@ -30,12 +30,11 @@ public:
     void init();
     void terminate();
 
-    FrameBufferPtr createFrameBuffer(bool useAlphaWriting = false);
+    FrameBufferPtr createFrameBuffer();
     const FrameBufferPtr& getTemporaryFrameBuffer() { return m_temporaryFramebuffer; }
 
 protected:
     FrameBufferPtr m_temporaryFramebuffer;
-    std::vector<FrameBufferPtr> m_framebuffers;
 };
 
 extern FrameBufferManager g_framebuffers;

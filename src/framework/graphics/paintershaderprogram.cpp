@@ -26,10 +26,7 @@
 #include <framework/core/clock.h>
 #include <framework/platform/platformwindow.h>
 
-PainterShaderProgram::PainterShaderProgram() :m_startTime(g_clock.seconds())
-{
-    m_startTime = g_clock.seconds();
-}
+PainterShaderProgram::PainterShaderProgram() :m_startTime(g_clock.seconds()) {}
 
 void PainterShaderProgram::setupUniforms()
 {
@@ -63,13 +60,13 @@ bool PainterShaderProgram::link()
     m_startTime = g_clock.seconds();
     bindAttributeLocation(VERTEX_ATTR, "a_Vertex");
     bindAttributeLocation(TEXCOORD_ATTR, "a_TexCoord");
-    if (ShaderProgram::link()) {
-        bind();
-        setupUniforms();
-        release();
-        return true;
-    }
-    return false;
+    if (!ShaderProgram::link())
+        return false;
+
+    bind();
+    setupUniforms();
+    release();
+    return true;
 }
 
 void PainterShaderProgram::setTransformMatrix(const Matrix3& transformMatrix)

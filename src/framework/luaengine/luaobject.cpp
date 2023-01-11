@@ -114,11 +114,6 @@ void LuaObject::luaGetFieldsTable()
         g_lua.pushNil();
 }
 
-int LuaObject::getUseCount()
-{
-    return ref_count();
-}
-
 std::string LuaObject::getClassName()
 {
     // TODO: this could be cached for more performance
