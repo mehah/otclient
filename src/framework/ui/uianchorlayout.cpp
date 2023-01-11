@@ -114,10 +114,10 @@ void UIAnchorLayout::addAnchor(const UIWidgetPtr& anchoredWidget, Fw::AnchorEdge
 
     assert(anchoredWidget != getParentWidget());
 
-    const auto& anchor = std::make_shared < UIAnchor>(anchoredEdge, hookedWidgetId, hookedEdge);
+    const auto& anchor = std::make_shared<UIAnchor>(anchoredEdge, hookedWidgetId, hookedEdge);
     auto& anchorGroup = m_anchorsGroups[anchoredWidget];
     if (!anchorGroup)
-        anchorGroup = std::make_shared < UIAnchorGroup>();
+        anchorGroup = std::make_shared<UIAnchorGroup>();
 
     anchorGroup->addAnchor(anchor);
 

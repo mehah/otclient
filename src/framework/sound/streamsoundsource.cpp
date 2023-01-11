@@ -29,7 +29,7 @@
 StreamSoundSource::StreamSoundSource()
 {
     for (auto& buffer : m_buffers)
-        buffer = std::make_shared < SoundBuffer>();
+        buffer = std::make_shared<SoundBuffer>();
     m_downMix = NoDownMix;
 }
 

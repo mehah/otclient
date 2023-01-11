@@ -44,7 +44,7 @@ void ParticleEffect::load(const ParticleEffectTypePtr& effectType)
 
     for (const auto& childNode : effectType->getNode()->children()) {
         if (childNode->tag() == "System") {
-            const auto& system = std::make_shared < ParticleSystem>();
+            const auto& system = std::make_shared<ParticleSystem>();
             system->load(childNode);
             m_systems.push_back(system);
         }

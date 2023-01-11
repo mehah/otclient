@@ -51,7 +51,7 @@ void ItemType::unserialize(const BinaryTreePtr& node)
                         serverId -= 20000;
                     } else if (lastId > 99 && lastId != serverId - 1) {
                         while (lastId != serverId - 1) {
-                            const auto& tmp = std::make_shared < ItemType>();
+                            const auto& tmp = std::make_shared<ItemType>();
                             tmp->setServerId(++lastId);
                             g_things.addItemType(tmp);
                         }
@@ -61,7 +61,7 @@ void ItemType::unserialize(const BinaryTreePtr& node)
                         serverId -= 30000;
                     } else if (lastId > 99 && lastId != serverId - 1) {
                         while (lastId != serverId - 1) {
-                            const auto& tmp = std::make_shared< ItemType>();
+                            const auto& tmp = std::make_shared<ItemType>();
                             tmp->setServerId(++lastId);
                             g_things.addItemType(tmp);
                         }

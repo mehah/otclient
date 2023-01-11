@@ -38,7 +38,7 @@ void UICreature::drawSelf(DrawPoolType drawPane)
 void UICreature::setOutfit(const Outfit& outfit)
 {
     if (!m_creature)
-        m_creature = std::make_shared < Creature>();
+        m_creature = std::make_shared<Creature>();
     m_creature->setDirection(Otc::South);
     m_creature->setOutfit(outfit);
 }

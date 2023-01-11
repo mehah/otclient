@@ -42,7 +42,7 @@ SoundFilePtr SoundFile::loadSoundFile(const std::string& filename)
     file->seek(0);
 
     if (strncmp(magic, "OggS", 4) == 0) {
-        const auto& oggSoundFile = std::make_shared < OggSoundFile>(file);
+        const auto& oggSoundFile = std::make_shared<OggSoundFile>(file);
         if (oggSoundFile->prepareOgg())
             return oggSoundFile;
     } else

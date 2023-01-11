@@ -32,16 +32,16 @@ void ParticleSystem::load(const OTMLNodePtr& node)
 {
     for (const OTMLNodePtr& childNode : node->children()) {
         if (childNode->tag() == "Emitter") {
-            const auto& emitter = std::make_shared < ParticleEmitter>();
+            const auto& emitter = std::make_shared<ParticleEmitter>();
             emitter->load(childNode);
             m_emitters.push_back(emitter);
         } else if (childNode->tag().find("Affector") != std::string::npos) {
             ParticleAffectorPtr affector;
 
             if (childNode->tag() == "GravityAffector")
-                affector = std::make_shared < GravityAffector>();
+                affector = std::make_shared<GravityAffector>();
             else if (childNode->tag() == "AttractionAffector")
-                affector = std::make_shared < AttractionAffector>();
+                affector = std::make_shared<AttractionAffector>();
 
             if (affector) {
                 affector->load(childNode);

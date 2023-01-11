@@ -92,7 +92,7 @@ ScheduledEventPtr EventDispatcher::scheduleEvent(const std::function<void()>& ca
     std::scoped_lock<std::recursive_mutex> lock(m_mutex);
 
     assert(delay >= 0);
-    const auto& scheduledEvent = std::make_shared < ScheduledEvent>(callback, delay, 1);
+    const auto& scheduledEvent = std::make_shared<ScheduledEvent>(callback, delay, 1);
     m_scheduledEventList.push(scheduledEvent);
     return scheduledEvent;
 }
@@ -105,7 +105,7 @@ ScheduledEventPtr EventDispatcher::cycleEvent(const std::function<void()>& callb
     std::scoped_lock<std::recursive_mutex> lock(m_mutex);
 
     assert(delay > 0);
-    const auto& scheduledEvent = std::make_shared < ScheduledEvent>(callback, delay, 0);
+    const auto& scheduledEvent = std::make_shared<ScheduledEvent>(callback, delay, 0);
     m_scheduledEventList.push(scheduledEvent);
     return scheduledEvent;
 }

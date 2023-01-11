@@ -73,7 +73,7 @@ ModulePtr ModuleManager::discoverModule(const std::string& moduleFile)
 
         bool push = false;
         if (!(module = getModule(name))) {
-            module = std::make_shared < Module>(name);
+            module = std::make_shared<Module>(name);
             push = true;
         }
         module->discover(moduleNode);

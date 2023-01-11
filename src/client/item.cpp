@@ -97,7 +97,7 @@ int Item::getSubType()
 
 ItemPtr Item::clone()
 {
-    auto item = std::make_shared < Item>();
+    auto item = std::make_shared<Item>();
     *(item.get()) = *this;
     return item;
 }
@@ -270,7 +270,7 @@ std::string Item::getName()
 
 ItemPtr Item::createFromOtb(int id)
 {
-    const auto& item = std::make_shared < Item>();
+    const auto& item = std::make_shared<Item>();
     item->setOtbId(id);
 
     return item;

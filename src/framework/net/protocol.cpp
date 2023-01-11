@@ -25,7 +25,7 @@
 #include <framework/core/application.h>
 #include <random>
 
-Protocol::Protocol() :m_inputMessage(std::make_shared < InputMessage>()) {}
+Protocol::Protocol() :m_inputMessage(std::make_shared<InputMessage>()) {}
 
 Protocol::~Protocol()
 {
@@ -37,7 +37,7 @@ Protocol::~Protocol()
 
 void Protocol::connect(const std::string_view host, uint16_t port)
 {
-    m_connection = std::make_shared < Connection>();
+    m_connection = std::make_shared<Connection>();
     m_connection->setErrorCallback([capture0 = asProtocol()](auto&& PH1) { capture0->onError(std::forward<decltype(PH1)>(PH1));    });
     m_connection->connect(host, port, [capture0 = asProtocol()] { capture0->onConnect(); });
 }

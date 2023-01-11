@@ -50,11 +50,11 @@ ThingTypeManager g_things;
 
 void ThingTypeManager::init()
 {
-    m_nullThingType = std::make_shared < ThingType>();
+    m_nullThingType = std::make_shared<ThingType>();
     for (auto& m_thingType : m_thingTypes)
         m_thingType.resize(1, m_nullThingType);
 #ifdef FRAMEWORK_EDITOR
-    m_nullItemType = std::make_shared < ItemType>();
+    m_nullItemType = std::make_shared<ItemType>();
     m_itemTypes.resize(1, m_nullItemType);
 #endif
 }
@@ -164,7 +164,7 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
                 appearancesFile = obj["file"];
             } else if (type == "sprite") {
                 int lastSpriteId = obj["lastspriteid"].get<int>();
-                g_spriteAppearances.addSpriteSheet(std::make_shared < SpriteSheet>(obj["firstspriteid"].get<int>(), lastSpriteId, static_cast<SpriteLayout>(obj["spritetype"].get<int>()), obj["file"].get<std::string>()));
+                g_spriteAppearances.addSpriteSheet(std::make_shared<SpriteSheet>(obj["firstspriteid"].get<int>(), lastSpriteId, static_cast<SpriteLayout>(obj["spritetype"].get<int>()), obj["file"].get<std::string>()));
                 spritesCount = std::max<int>(spritesCount, lastSpriteId);
             }
         }
@@ -255,7 +255,7 @@ void ThingTypeManager::parseItemType(uint16_t serverId, TiXmlElement* elem)
     ItemTypePtr itemType;
     if (s) {
         serverId -= d;
-        itemType = std::make_shared < ItemType>();
+        itemType = std::make_shared<ItemType>();
         itemType->setServerId(serverId);
         addItemType(itemType);
     } else
@@ -422,7 +422,7 @@ void ThingTypeManager::loadOtb(const std::string& file)
         m_reverseItemTypes.resize(children.size() + 1, m_nullItemType);
 
         for (const BinaryTreePtr& node : children) {
-            const auto& itemType = std::make_shared < ItemType>();
+            const auto& itemType = std::make_shared<ItemType>();
             itemType->unserialize(node);
             addItemType(itemType);
 

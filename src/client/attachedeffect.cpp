@@ -29,7 +29,7 @@
 
 AttachedEffectPtr AttachedEffect::clone()
 {
-    auto obj = std::make_shared < AttachedEffect>();
+    auto obj = std::make_shared<AttachedEffect>();
     *(obj.get()) = *this;
     return obj;
 }
@@ -40,7 +40,7 @@ AttachedEffectPtr AttachedEffect::create(uint16_t id, uint16_t thingId, ThingCat
         return nullptr;
     }
 
-    const auto& obj = std::make_shared< AttachedEffect>();
+    const auto& obj = std::make_shared<AttachedEffect>();
     obj->m_id = id;
     obj->m_thingType = g_things.getThingType(thingId, category).get();
     return obj;

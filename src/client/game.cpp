@@ -402,7 +402,7 @@ void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vecto
                                    const std::vector<std::tuple<int, std::string> >& mountList)
 {
     // create virtual creature outfit
-    const auto& virtualOutfitCreature = std::make_shared < Creature>();
+    const auto& virtualOutfitCreature = std::make_shared<Creature>();
     virtualOutfitCreature->setDirection(Otc::South);
     virtualOutfitCreature->setOutfit(currentOutfit);
     for (const auto& effect : m_localPlayer->getAttachedEffects())
@@ -414,7 +414,7 @@ void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vecto
         Outfit mountOutfit;
         mountOutfit.setId(currentOutfit.getMount());
 
-        virtualMountCreature = std::make_shared < Creature>();
+        virtualMountCreature = std::make_shared<Creature>();
         virtualMountCreature->setDirection(Otc::South);
         virtualMountCreature->setOutfit(mountOutfit);
     }
@@ -501,10 +501,10 @@ void Game::loginWorld(const std::string_view account, const std::string_view pas
     // reset the new game state
     resetGameStates();
 
-    m_localPlayer = std::make_shared < LocalPlayer>();
+    m_localPlayer = std::make_shared<LocalPlayer>();
     m_localPlayer->setName(characterName);
 
-    m_protocolGame = std::make_shared < ProtocolGame>();
+    m_protocolGame = std::make_shared<ProtocolGame>();
     m_protocolGame->login(account, password, worldHost, static_cast<uint16_t>(worldPort), characterName, authenticatorToken, sessionKey);
     m_characterName = characterName;
     m_worldName = worldName;

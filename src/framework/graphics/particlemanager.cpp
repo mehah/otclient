@@ -36,11 +36,11 @@ bool ParticleManager::importParticle(std::string file)
         const auto& doc = OTMLDocument::parse(file);
         for (const auto& node : doc->children()) {
             if (node->tag() == "Effect") {
-                const auto& particleEffectType = std::make_shared < ParticleEffectType>();
+                const auto& particleEffectType = std::make_shared<ParticleEffectType>();
                 particleEffectType->load(node);
                 m_effectsTypes[particleEffectType->getName()] = particleEffectType;
             } else if (node->tag() == "Particle") {
-                const auto& particleType = std::make_shared < ParticleType>();
+                const auto& particleType = std::make_shared<ParticleType>();
                 particleType->load(node);
                 m_particleTypes[particleType->getName()] = particleType;
             }
@@ -55,7 +55,7 @@ bool ParticleManager::importParticle(std::string file)
 ParticleEffectPtr ParticleManager::createEffect(const std::string_view name)
 {
     try {
-        const auto& particleEffect = std::make_shared < ParticleEffect>();
+        const auto& particleEffect = std::make_shared<ParticleEffect>();
         particleEffect->load(m_effectsTypes[std::string(name)]);
         m_effects.push_back(particleEffect);
         return particleEffect;

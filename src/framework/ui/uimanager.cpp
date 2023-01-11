@@ -35,7 +35,7 @@ UIManager g_ui;
 void UIManager::init()
 {
     // creates root widget
-    m_rootWidget = std::make_shared < UIWidget>();
+    m_rootWidget = std::make_shared<UIWidget>();
     m_rootWidget->setId("root");
     m_mouseReceiver = m_rootWidget;
     m_keyboardReceiver = m_rootWidget;

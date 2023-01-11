@@ -54,7 +54,7 @@ bool FrameBuffer::resize(const Size& size)
     if (m_texture && m_texture->getSize() == size)
         return false;
 
-    m_texture = std::make_shared < Texture>(size);
+    m_texture = std::make_shared<Texture>(size);
     m_texture->setSmooth(m_smooth);
     m_texture->setUpsideDown(true);
     m_textureMatrix = g_painter->getTransformMatrix(size);

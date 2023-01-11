@@ -48,7 +48,7 @@ void Server::close()
 
 void Server::acceptNext()
 {
-    const auto& connection = std::make_shared < Connection>();
+    const auto& connection = std::make_shared<Connection>();
     connection->m_connecting = true;
 
     const auto self = static_self_cast<Server>();
