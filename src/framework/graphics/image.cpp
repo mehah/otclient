@@ -169,7 +169,6 @@ void Image::paste(const ImagePtr& other)
 bool Image::nextMipmap()
 {
     assert(m_bpp == 4);
-    assert(stdext::is_power_of_two(m_size.width()) && stdext::is_power_of_two(m_size.height()));
 
     const int iw = m_size.width();
     const int ih = m_size.height();
@@ -247,73 +246,3 @@ void Image::reverseChannels()
         std::swap(*(itr + 0), *(itr + 2));
     }
 }
-
-/*
- *
-void Texture::generateSoftwareMipmaps(std::vector<uint8_t > inPixels)
-{
-        bind();
-
-        assert(stdext::is_power_of_two(m_glSize.width()) && stdext::is_power_of_two(m_glSize.height()));
-
-        Size inSize = m_glSize;
-        Size outSize = inSize / 2;
-        std::vector<uint8_t > outPixels;
-
-        int mipmap = 1;
-        while(true) {
-                outPixels.resize(outSize.area()*4, 0);
-
-                // this is a simple bilinear filtering algorithm, it combines every 4 pixels in one pixel
-                for(int x=0;x<outSize.width();++x) {
-                        for(int y=0;y<outSize.height();++y) {
-                                uint8_t *inPixel[4];
-                                inPixel[0] = &inPixels[((y*2)*inSize.width() + (x*2))*4];
-                                inPixel[1] = &inPixels[((y*2)*inSize.width() + (x*2)+1)*4];
-                                inPixel[2] = &inPixels[((y*2+1)*inSize.width() + (x*2))*4];
-                                inPixel[3] = &inPixels[((y*2+1)*inSize.width() + (x*2)+1)*4];
-                                uint8_t *outPixel = &outPixels[(y*outSize.width() + x)*4];
-
-                                int pixelsSum[4];
-                                for(int i=0;i<4;++i)
-                                        pixelsSum[i] = 0;
-
-                                int usedPixels = 0;
-                                for(int j=0;j<4;++j) {
-                                        // ignore colors of complete alpha pixels
-                                        if(inPixel[j][3] < 16)
-                                                continue;
-
-                                        for(int i=0;i<4;++i)
-                                                pixelsSum[i] += inPixel[j][i];
-
-                                        ++usedPixels;
-                                }
-
-                                // try to guess the alpha pixel more accurately
-                                for(int i=0;i<4;++i) {
-                                        if(usedPixels > 0)
-                                                outPixel[i] = pixelsSum[i] / usedPixels;
-                                        else
-                                                outPixel[i] = 0;
-                                }
-                                outPixel[3] = pixelsSum[3]/4;
-                        }
-                }
-
-                glTexImage2D(GL_TEXTURE_2D, mipmap++, GL_RGBA, outSize.width(), outSize.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, &outPixels[0]);
-
-                if(inSize.width() == 1 || inSize.height() == 1)
-                        break;
-
-                inPixels = std::move(outPixels);
-                inSize /= 2;
-                outSize /= 2;
-        }
-
-        if(!m_hasMipmaps) {
-                m_hasMipmaps = true;
-                setupFilters();
-        }
-}
-*/
