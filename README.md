@@ -35,7 +35,7 @@
 
 ##### Community (Features)
 - Support Tibia 12.85/protobuf by [@Nekiro](https://github.com/nekiro)
-- Support Discord RPG by [@SkullzOTS](https://github.com/SkullzOTS)
+- Support Discord RPC by [@SkullzOTS](https://github.com/SkullzOTS)
 - Floor Fading by [@Kondra](https://github.com/OTCv8)
 - Action Bar by [@DipSet](https://github.com/Dip-Set1)
 - Access to widget children via widget.childId by [@Hugo0x1337](https://github.com/Hugo0x1337)
