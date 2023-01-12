@@ -27,13 +27,13 @@
 
 #if ENABLE_DISCORD_RPC == 1
 #include <framework/discord/discord.h>
+Discord* g_Discord;
 #endif
 
 #ifdef FRAMEWORK_NET
 #include <framework/net/protocolhttp.h>
 #endif
 
-Discord* g_Discord;
 int main(int argc, const char* argv[])
 {
     std::vector<std::string> args(argv, argv + argc);
