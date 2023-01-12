@@ -226,7 +226,7 @@ public:
     void beginGhostMode(float opacity);
     void endGhostMode();
 
-    std::map<Position, ItemPtr> findItemsById(uint16_t clientId, uint32_t max);
+    stdext::map<Position, ItemPtr, Position::Hasher> findItemsById(uint16_t clientId, uint32_t max);
 
     CreaturePtr getCreatureById(uint32_t id);
     void addCreature(const CreaturePtr& creature);

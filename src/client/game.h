@@ -329,8 +329,8 @@ public:
 
     int getPing() { return m_ping; }
     ContainerPtr getContainer(int index) { return m_containers[index]; }
-    std::map<int, ContainerPtr> getContainers() { return m_containers; }
-    std::map<int, Vip> getVips() { return m_vips; }
+    stdext::map<int, ContainerPtr> getContainers() { return m_containers; }
+    stdext::map<int, Vip> getVips() { return m_vips; }
     CreaturePtr getAttackingCreature() { return m_attackingCreature; }
     CreaturePtr getFollowingCreature() { return m_followingCreature; }
     void setServerBeat(int beat) { m_serverBeat = beat; }
@@ -389,8 +389,8 @@ private:
     CreaturePtr m_attackingCreature;
     CreaturePtr m_followingCreature;
     ProtocolGamePtr m_protocolGame;
-    std::map<int, ContainerPtr> m_containers;
-    std::map<int, Vip> m_vips;
+    stdext::map<int, ContainerPtr> m_containers;
+    stdext::map<int, Vip> m_vips;
 
     bool m_forceNewWalkingFormula{ false };
     bool m_online{ false };

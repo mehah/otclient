@@ -37,13 +37,13 @@ public:
     ParticleTypePtr getParticleType(const std::string& name) { return m_particleTypes[name]; }
     ParticleEffectTypePtr getParticleEffectType(const std::string& name) { return m_effectsTypes[name]; }
 
-    const std::map<std::string, ParticleTypePtr>& getParticleTypes() { return m_particleTypes; }
-    const std::map<std::string, ParticleEffectTypePtr>& getEffectsTypes() { return m_effectsTypes; }
+    const stdext::map<std::string, ParticleTypePtr>& getParticleTypes() { return m_particleTypes; }
+    const stdext::map<std::string, ParticleEffectTypePtr>& getEffectsTypes() { return m_effectsTypes; }
 
 private:
     std::list<ParticleEffectPtr> m_effects;
-    std::map<std::string, ParticleEffectTypePtr> m_effectsTypes;
-    std::map<std::string, ParticleTypePtr> m_particleTypes;
+    stdext::map<std::string, ParticleEffectTypePtr> m_effectsTypes;
+    stdext::map<std::string, ParticleTypePtr> m_particleTypes;
 };
 
 extern ParticleManager g_particles;

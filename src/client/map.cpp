@@ -435,9 +435,9 @@ void Map::setShowAnimations(bool show)
 void Map::beginGhostMode(float opacity) { g_painter->setOpacity(opacity); }
 void Map::endGhostMode() { g_painter->resetOpacity(); }
 
-std::map<Position, ItemPtr> Map::findItemsById(uint16_t clientId, uint32_t  max)
+stdext::map<Position, ItemPtr, Position::Hasher> Map::findItemsById(uint16_t clientId, uint32_t  max)
 {
-    std::map<Position, ItemPtr> ret;
+    stdext::map<Position, ItemPtr, Position::Hasher> ret;
     uint32_t  count = 0;
     for (uint8_t z = 0; z <= MAX_Z; ++z) {
         for (const auto& [uid, block] : m_tileBlocks[z]) {

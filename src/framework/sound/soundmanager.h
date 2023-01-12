@@ -58,7 +58,7 @@ private:
     ALCdevice* m_device{};
     ALCcontext* m_context{};
 
-    std::map<StreamSoundSourcePtr, std::shared_future<SoundFilePtr>> m_streamFiles;
+    stdext::map<StreamSoundSourcePtr, std::shared_future<SoundFilePtr>> m_streamFiles;
     stdext::map<std::string, SoundBufferPtr> m_buffers;
     stdext::map<int, SoundChannelPtr> m_channels;
 

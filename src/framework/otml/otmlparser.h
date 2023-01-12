@@ -49,7 +49,7 @@ private:
     OTMLNodePtr currentParent;
     OTMLNodePtr previousNode;
 
-    std::map<OTMLNodePtr, OTMLNodePtr> parentMap;
+    stdext::map<OTMLNodePtr, OTMLNodePtr> parentMap;
 
     std::istream& in;
 };
