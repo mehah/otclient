@@ -33,6 +33,8 @@ function Controller:init()
             gameEvent.onGameStart()
         end
     end
+
+    self:connectExternalEvents()
 end
 
 function Controller:terminate()

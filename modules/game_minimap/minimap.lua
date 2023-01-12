@@ -100,7 +100,6 @@ function controller:onInit()
     self:registerWidget('minimapWidget', minimapWidget)
 
     minimapWindow:setup()
-    localPlayerEvent:connect()
 end
 
 controller:onGameStart(function()

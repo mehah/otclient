@@ -1,77 +1,41 @@
---[[ -- uncomment this line to apply an effect on the local player, just for testing purposes.
-function onGameStart()
-    addEvent(function()
-        g_game.getLocalPlayer():attachEffect(AttachedEffectManager.create(1))
-        g_game.getLocalPlayer():attachEffect(AttachedEffectManager.create(2))
+controller = Controller:new()
 
-        local angelLight1 = AttachedEffectManager.create(3)
-        local angelLight2 = AttachedEffectManager.create(3)
-        local angelLight3 = AttachedEffectManager.create(3)
-        local angelLight4 = AttachedEffectManager.create(3)
+-- uncomment this line to apply an effect on the local player, just for testing purposes.
+--[[controller:onGameStart(function()
+    g_game.getLocalPlayer():attachEffect(AttachedEffectManager.create(1))
+    g_game.getLocalPlayer():attachEffect(AttachedEffectManager.create(2))
 
-        angelLight1:setOffset(-50, 50, true)
-        angelLight2:setOffset(50, 50, true)
-        angelLight3:setOffset(50, -50, true)
-        angelLight4:setOffset(-50, -50, true)
+    local angelLight1 = AttachedEffectManager.create(3)
+    local angelLight2 = AttachedEffectManager.create(3)
+    local angelLight3 = AttachedEffectManager.create(3)
+    local angelLight4 = AttachedEffectManager.create(3)
 
-        g_game.getLocalPlayer():attachEffect(angelLight1)
-        g_game.getLocalPlayer():attachEffect(angelLight2)
-        g_game.getLocalPlayer():attachEffect(angelLight3)
-        g_game.getLocalPlayer():attachEffect(angelLight4)
-    end)
-end
-]] --
-function onGameEnd()
+    angelLight1:setOffset(-50, 50, true)
+    angelLight2:setOffset(50, 50, true)
+    angelLight3:setOffset(50, -50, true)
+    angelLight4:setOffset(-50, -50, true)
+
+    g_game.getLocalPlayer():attachEffect(angelLight1)
+    g_game.getLocalPlayer():attachEffect(angelLight2)
+    g_game.getLocalPlayer():attachEffect(angelLight3)
+    g_game.getLocalPlayer():attachEffect(angelLight4)
+end)]]
+
+controller:onGameEnd(function()
     g_game.getLocalPlayer():clearAttachedEffects()
-end
+end)
 
-function init()
-    connect(LocalPlayer, {
-        onOutfitChange = onOutfitChange
-    })
+controller:attachExternalEvent(EventController:new(LocalPlayer, {
+    onOutfitChange = onOutfitChange
+}))
+controller:attachExternalEvent(EventController:new(Creature, {
+    onOutfitChange = onOutfitChange
+}))
 
-    connect(Creature, {
-        onOutfitChange = onOutfitChange
-    })
-
-    connect(AttachedEffect, {
-        onAttach = onAttach,
-        onDetach = onDetach
-    })
-
-    connect(g_game, {
-        onGameStart = onGameStart,
-        onGameEnd = onGameEnd
-    })
-
-    if g_game.isOnline() then
-        onGameStart()
-    end
-end
-
-function terminate()
-    if g_game.isOnline() then
-        onGameEnd()
-    end
-
-    disconnect(LocalPlayer, {
-        onOutfitChange = onOutfitChange
-    })
-
-    disconnect(Creature, {
-        onOutfitChange = onOutfitChange
-    })
-
-    disconnect(AttachedEffect, {
-        onAttach = onAttach,
-        onDetach = onDetach
-    })
-
-    disconnect(g_game, {
-        onGameStart = onGameStart,
-        onGameEnd = onGameEnd
-    })
-end
+controller:attachExternalEvent(EventController:new(AttachedEffect, {
+    onAttach = onAttach,
+    onDetach = onDetach
+}))
 
 function onAttach(effect, owner)
     local category, thingId = AttachedEffectManager.getDataThing(owner)
