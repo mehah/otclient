@@ -106,6 +106,12 @@
     <Filter Include="Header Files\protobuf">
       <UniqueIdentifier>{8616aecc-d171-4390-b004-38517b68a5a4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\framework\discord">
+      <UniqueIdentifier>{463d02c0-28f4-491d-9eda-9e7bcb4dc8a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\framework\discord">
+      <UniqueIdentifier>{ec2d9dd0-52dd-4258-83be-2ceb7ec02b73}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\framework\luafunctions.cpp">
@@ -408,9 +414,6 @@
     <ClCompile Include="..\src\client\creatures.cpp">
       <Filter>Source Files\client</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\client\discord.cpp">
-      <Filter>Source Files\client</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\client\effect.cpp">
       <Filter>Source Files\client</Filter>
     </ClCompile>
@@ -542,6 +545,9 @@
     </ClCompile>
     <ClCompile Include="..\src\client\attachedeffect.cpp">
       <Filter>Source Files\client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\framework\discord\discord.cpp">
+      <Filter>Source Files\framework\discord</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -911,9 +917,6 @@
     <ClInclude Include="..\src\client\creatures.h">
       <Filter>Header Files\client</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\client\discord.h">
-      <Filter>Header Files\client</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\client\declarations.h">
       <Filter>Header Files\client</Filter>
     </ClInclude>
@@ -1054,6 +1057,9 @@
     </ClInclude>
     <ClInclude Include="..\src\client\attachedeffect.h">
       <Filter>Header Files\client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\discord\discord.h">
+      <Filter>Header Files\framework\discord</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

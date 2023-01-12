@@ -227,7 +227,6 @@ set(SOURCE_FILES
 	client/container.cpp
 	client/creature.cpp
 	client/creatures.cpp
-	client/discord.cpp
 	client/effect.cpp
 	client/game.cpp
 	client/houses.cpp
@@ -283,6 +282,7 @@ set(SOURCE_FILES
 	framework/core/unzipper.cpp
 	framework/core/unzipper.h
 	framework/core/timer.cpp
+	framework/discord/discord.cpp
 	framework/graphics/animatedtexture.cpp
 	framework/graphics/apngloader.cpp
 	framework/graphics/bitmapfont.cpp
