@@ -2599,7 +2599,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type)
                     case Proto::CreatureTypeMonster:
                     case Proto::CreatureTypeSummonOwn:
                     case Proto::CreatureTypeSummonOther:
-                        creature = MonsterPtr(new Monster);
+                        creature = std::make_shared<Monster>();
                         break;
 
                     default:

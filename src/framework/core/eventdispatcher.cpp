@@ -61,17 +61,18 @@ void EventDispatcher::poll()
     // execute events list until all events are out, this is needed because some events can schedule new events that would
     // change the UIWidgets layout, in this case we must execute these new events before we continue rendering,
     m_pollEventsSize = m_eventList.size();
-    int loops = 0;
+    int_fast32_t loops = 0;
     while (m_pollEventsSize > 0) {
         if (loops > 50) {
-            if (static Timer reportTimer; reportTimer.running() && reportTimer.ticksElapsed() > 100) {
+            static Timer reportTimer;
+            if (reportTimer.running() && reportTimer.ticksElapsed() > 100) {
                 g_logger.error("ATTENTION the event list is not getting empty, this could be caused by some bad code");
                 reportTimer.restart();
             }
             break;
         }
 
-        for (int i = 0; i < m_pollEventsSize; ++i) {
+        for (int_fast32_t i = -1; ++i < m_pollEventsSize;) {
             const auto event = m_eventList.front();
             m_eventList.pop_front();
             lock.unlock();
@@ -93,7 +94,7 @@ ScheduledEventPtr EventDispatcher::scheduleEvent(const std::function<void()>& ca
 
     assert(delay >= 0);
     const auto& scheduledEvent = std::make_shared<ScheduledEvent>(callback, delay, 1);
-    m_scheduledEventList.push(scheduledEvent);
+    m_scheduledEventList.emplace(scheduledEvent);
     return scheduledEvent;
 }
 
@@ -106,7 +107,7 @@ ScheduledEventPtr EventDispatcher::cycleEvent(const std::function<void()>& callb
 
     assert(delay > 0);
     const auto& scheduledEvent = std::make_shared<ScheduledEvent>(callback, delay, 0);
-    m_scheduledEventList.push(scheduledEvent);
+    m_scheduledEventList.emplace(scheduledEvent);
     return scheduledEvent;
 }
 
@@ -117,7 +118,7 @@ EventPtr EventDispatcher::addEvent(const std::function<void()>& callback, bool p
 
     std::scoped_lock<std::recursive_mutex> lock(m_mutex);
 
-    EventPtr event(new Event(callback));
+    const auto& event = std::make_shared<Event>(callback);
     // front pushing is a way to execute an event before others
     if (pushFront) {
         m_eventList.push_front(event);
