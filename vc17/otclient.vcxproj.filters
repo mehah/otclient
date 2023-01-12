@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -105,6 +105,12 @@
     </Filter>
     <Filter Include="Header Files\protobuf">
       <UniqueIdentifier>{8616aecc-d171-4390-b004-38517b68a5a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\framework\discord">
+      <UniqueIdentifier>{463d02c0-28f4-491d-9eda-9e7bcb4dc8a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\framework\discord">
+      <UniqueIdentifier>{ec2d9dd0-52dd-4258-83be-2ceb7ec02b73}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -539,6 +545,9 @@
     </ClCompile>
     <ClCompile Include="..\src\client\attachedeffect.cpp">
       <Filter>Source Files\client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\framework\discord\discord.cpp">
+      <Filter>Source Files\framework\discord</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1048,6 +1057,9 @@
     </ClInclude>
     <ClInclude Include="..\src\client\attachedeffect.h">
       <Filter>Header Files\client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\discord\discord.h">
+      <Filter>Header Files\framework\discord</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

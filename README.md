@@ -35,6 +35,7 @@
 
 ##### Community (Features)
 - Support Tibia 12.85/protobuf by [@Nekiro](https://github.com/nekiro)
+- Support Discord RPG by [@SkullzOTS](https://github.com/SkullzOTS)
 - Floor Fading by [@Kondra](https://github.com/OTCv8)
 - Action Bar by [@DipSet](https://github.com/Dip-Set1)
 - Access to widget children via widget.childId by [@Hugo0x1337](https://github.com/Hugo0x1337)
@@ -48,8 +49,10 @@
   - To enable Encrypting by "--encrypt" change ENABLE_ENCRYPTION_BUILDER to 1 (by [@TheMaoci](https://github.com/TheMaoci)). This allows to remove code of creating encrypted files off the production build
   - To generate an encryption, just run the client with flag "--encrypt SET_YOUR_PASSWORD_HERE" and don't forget to change the password.
   - you can also skip adding password to --encrypt command it automatically will be taken from [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h) file (by [@TheMaoci](https://github.com/TheMaoci))
-
- - Support HTTP/HTTPS/WS/WSS. Based on [@Kondra](https://github.com/OTCv8/otcv8-dev) make by [@alfuveam](https://github.com/alfuveam)
+- Support HTTP/HTTPS/WS/WSS. Based on [@Kondra](https://github.com/OTCv8/otcv8-dev) make by [@alfuveam](https://github.com/alfuveam)
+- Discord RPC by [@SkullzOTS](https://github.com/SkullzOTS)
+  - To enable just go to [config.h](https://github.com/mehah/otclient/blob/main/src/client/config.h), set 1 in ENABLE_DISCORD_RPC and configure the others definitions
+  - You can see the step by step in [YouTube](https://www.youtube.com/watch?v=zCHYtRlD58g)
 
 ##### [Active Developers]
 [@mehah](https://github.com/mehah) [@scopz](https://github.com/scopz) [@nekiro](https://github.com/nekiro)
