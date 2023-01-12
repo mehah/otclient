@@ -29,15 +29,17 @@
 
 const static int64_t EP_TIME = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-void Discord::Initialize()
+Discord g_discord;
+
+void Discord::init()
 {
     DiscordEventHandlers Handle;
     memset(&Handle, 0, sizeof(Handle));
     Discord_Initialize(RPC_API_KEY, &Handle, 1, NULL);
-    Update();
+    update();
 }
 
-void Discord::Update()
+void Discord::update()
 {
     std::string info;
     if (g_game.isOnline()) {
@@ -51,7 +53,7 @@ void Discord::Update()
 #endif
 
 #if SHOW_CHARACTER_WORLD_RPC == 1
-        if (!info.empty()) info += " | ";
+        if (!info.empty()) info += "\n";
         info += "World: " + g_game.getWorldName();
 #endif
     } else {
@@ -70,5 +72,5 @@ void Discord::Update()
     discordPresence.largeImageKey = RPC_LARGE_IMAGE;
     discordPresence.largeImageText = RPC_LARGE_TEXT;
     Discord_UpdatePresence(&discordPresence);
-    g_dispatcher.scheduleEvent([this] { Update(); }, 30000);
+    g_dispatcher.scheduleEvent([this] { update(); }, 30000);
 }

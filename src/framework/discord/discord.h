@@ -27,6 +27,10 @@
 class Discord
 {
 public:
-    void Initialize();
-    void Update();
+    void init();
+
+private:
+    void update();
 };
+
+extern Discord g_discord;

@@ -27,7 +27,6 @@
 
 #if ENABLE_DISCORD_RPC == 1
 #include <framework/discord/discord.h>
-Discord* g_Discord;
 #endif
 
 #ifdef FRAMEWORK_NET
@@ -53,11 +52,11 @@ int main(int argc, const char* argv[])
         MessageBoxA(NULL, "Encryption complete", "Success", 0);
 #endif
         return 0;
-}
+    }
 #endif
 
 #if ENABLE_DISCORD_RPC == 1
-    g_Discord->Initialize();
+    g_discord.init();
 #endif
 
     // initialize application framework and otclient
