@@ -53,10 +53,6 @@ function Controller:terminate()
         disconnect(actor, events)
     end
 
-    for name, widget in pairs(self.widgets) do
-        widget:destroy()
-    end
-
     for i, event in pairs(self.keyboardEvents) do
         g_keyboard['unbind' .. event.name](event.args)
     end
