@@ -21,10 +21,13 @@
  */
 
 #include <client/client.h>
-#include <client/discord.h>
 #include <framework/core/application.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/luaengine/luainterface.h>
+
+#if ENABLE_DISCORD_RPC == 1
+#include <framework/discord/discord.h>
+#endif
 
 #ifdef FRAMEWORK_NET
 #include <framework/net/protocolhttp.h>
@@ -50,7 +53,7 @@ int main(int argc, const char* argv[])
         MessageBoxA(NULL, "Encryption complete", "Success", 0);
 #endif
         return 0;
-    }
+}
 #endif
 
 #if ENABLE_DISCORD_RPC == 1
