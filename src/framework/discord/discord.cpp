@@ -22,8 +22,8 @@
 
 #include "discord.h"
 
-#include "game.h"
-#include "localplayer.h"
+#include <client/game.h>
+#include <client/localplayer.h>
 #include <framework/core/eventdispatcher.h>
 #include <time.h>
 
