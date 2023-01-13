@@ -160,7 +160,7 @@ TexturePtr TextureManager::loadTexture(std::stringstream& file)
             texture = animatedTexture;
         } else {
             const auto& image = std::make_shared<Image>(imageSize, apng.bpp, apng.pdata);
-            texture = std::make_shared<Texture>(image, false, false, false, false);
+            texture = std::make_shared<Texture>(image, false, false, false);
         }
         free_apng(&apng);
     }

@@ -34,7 +34,7 @@ AnimatedTexture::AnimatedTexture(const Size& size, const std::vector<ImagePtr>& 
         return;
 
     for (const auto& frame : frames) {
-        m_frames.push_back(std::make_shared<Texture>(frame, buildMipmaps, compress, false, false));
+        m_frames.push_back(std::make_shared<Texture>(frame, buildMipmaps, compress, false));
     }
 
     m_framesDelay = std::move(framesDelay);
@@ -47,13 +47,13 @@ AnimatedTexture::AnimatedTexture(const Size& size, const std::vector<ImagePtr>& 
 AnimatedTexture::~AnimatedTexture()
 = default;
 
-bool AnimatedTexture::buildHardwareMipmaps()
+void AnimatedTexture::buildHardwareMipmaps()
 {
+    if (m_hasMipmaps) return;
     for (const TexturePtr& frame : m_frames)
         frame->buildHardwareMipmaps();
 
     m_hasMipmaps = true;
-    return true;
 }
 
 void AnimatedTexture::setSmooth(bool smooth)

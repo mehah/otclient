@@ -751,7 +751,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
     if (m_opaque == -1)
         m_opaque = !fullImage->hasTransparentPixel();
 
-    animationPhaseTexture = std::make_shared<Texture>(fullImage, true, false, m_size.area() == 1 && !hasElevation(), false);
+    animationPhaseTexture = std::make_shared<Texture>(fullImage, true, false, m_size.area() == 1 && !hasElevation());
     if (smooth)
         animationPhaseTexture->setSmooth(true);
 
