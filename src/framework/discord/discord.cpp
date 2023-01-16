@@ -68,7 +68,7 @@ void Discord::update()
     discordPresence.state = STATE_RPC_TEXT;
     discordPresence.details = info.c_str();
     discordPresence.startTimestamp = EP_TIME;
-    discordPresence.endTimestamp = NULL;
+    discordPresence.endTimestamp = 0;
     discordPresence.largeImageKey = RPC_LARGE_IMAGE;
     discordPresence.largeImageText = RPC_LARGE_TEXT;
     Discord_UpdatePresence(&discordPresence);
