@@ -21,6 +21,11 @@
  */
 
 #pragma once
+
+#include <client/config.h>
+
+#if ENABLE_DISCORD_RPC == 1
+
 #include <discord_register.h>
 #include <discord_rpc.h>
 
@@ -34,3 +39,5 @@ private:
 };
 
 extern Discord g_discord;
+
+#endif
