@@ -107,10 +107,8 @@ void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)
     if (useGlobalCoord) {
         buffer.clear();
 
-        if (obj.methods.empty()) {
-            DrawPool::addCoords(obj.method, buffer, obj.drawMode);
-        } else for (const auto& method : obj.methods) {
-            DrawPool::addCoords(method, buffer, obj.drawMode);
+        for (const auto& method : obj.methods) {
+            DrawPool::addCoords(method, &buffer, obj.drawMode);
         }
     }
 

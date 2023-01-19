@@ -31,10 +31,11 @@
 #include <zlib.h>
 
 Minimap g_minimap;
+static MinimapTile nulltile;
 
 void MinimapBlock::clean()
 {
-    m_tiles.fill(MinimapTile());
+    m_tiles.fill({});
     m_texture.reset();
     m_mustUpdate = false;
 }
@@ -194,7 +195,7 @@ void Minimap::updateTile(const Position& pos, const TilePtr& tile)
         minimapTile.flags |= MinimapTileNotWalkable | MinimapTileNotPathable;
     }
 
-    if (minimapTile != MinimapTile()) {
+    if (minimapTile != nulltile) {
         MinimapBlock& block = getBlock(pos);
         const Point offsetPos = getBlockOffset(Point(pos.x, pos.y));
         block.updateTile(pos.x - offsetPos.x, pos.y - offsetPos.y, minimapTile);
@@ -204,7 +205,6 @@ void Minimap::updateTile(const Position& pos, const TilePtr& tile)
 
 const MinimapTile& Minimap::getTile(const Position& pos)
 {
-    static MinimapTile nulltile;
     if (pos.z <= MAX_Z && hasBlock(pos)) {
         MinimapBlock& block = getBlock(pos);
         const Point offsetPos = getBlockOffset(Point(pos.x, pos.y));
@@ -216,7 +216,6 @@ const MinimapTile& Minimap::getTile(const Position& pos)
 std::pair<MinimapBlock_ptr, MinimapTile> Minimap::threadGetTile(const Position& pos)
 {
     std::scoped_lock lock(m_lock);
-    static MinimapTile nulltile;
 
     if (pos.z <= MAX_Z && hasBlock(pos)) {
         const auto& block = m_tileBlocks[pos.z][getBlockIndex(pos)];

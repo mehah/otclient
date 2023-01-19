@@ -43,6 +43,6 @@ public:
 private:
     std::vector<TexturePtr> m_frames;
     std::vector<int> m_framesDelay;
-    uint32_t m_currentFrame;
+    uint32_t m_currentFrame{ 0 };
     Timer m_animTimer;
 };

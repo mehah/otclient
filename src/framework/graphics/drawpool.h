@@ -127,13 +127,10 @@ protected:
         DrawObject(std::function<void()> action) : action(std::move(action)) {}
         DrawObject(const PoolState& state, const DrawBufferPtr& buffer) : buffer(buffer), state(state) {}
         DrawObject(const DrawMode drawMode, const PoolState& state, const DrawMethod& method) :
-            drawMode(drawMode), state(state), method(method) {}
+            drawMode(drawMode), state(state) { methods.emplace_back(method); }
 
         void addMethod(const DrawMethod& method)
         {
-            if (methods.empty())
-                methods.emplace_back(this->method);
-
             drawMode = DrawMode::TRIANGLES;
             methods.emplace_back(method);
         }
@@ -141,7 +138,6 @@ protected:
         DrawMode drawMode{ DrawMode::TRIANGLES };
         DrawBufferPtr buffer;
         PoolState state;
-        DrawMethod method;
         std::vector<DrawMethod> methods;
         std::function<void()> action{ nullptr };
     };
@@ -157,7 +153,7 @@ protected:
     };
 
 private:
-    static void addCoords(const DrawPool::DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode);
+    static void addCoords(const DrawPool::DrawMethod& method, CoordsBuffer* buffer, DrawMode drawMode);
 
     enum STATE_TYPE : uint32_t
     {
@@ -218,12 +214,11 @@ private:
 
     bool m_enabled{ true };
     bool m_alwaysGroupDrawings{ false };
-    bool m_autoUpdate{ false };
 
     uint8_t m_currentOrder{ 0 };
     uint8_t m_currentFloor{ 0 };
 
-    uint16_t m_refreshTimeMS{ 0 };
+    uint16_t m_refreshDelay{ 0 }, m_shaderRefreshDelay;
     uint32_t m_onlyOnceStateFlag{ 0 };
 
     PoolState m_state;
@@ -234,10 +229,10 @@ private:
 
     std::pair<size_t, size_t> m_status{ 1, 0 };
 
-    std::vector<DrawObject> m_objects[ARR_MAX_Z][static_cast<uint8_t>(DrawOrder::LAST)];
-    stdext::map<size_t, DrawObject> m_objectsByhash;
-
     std::vector<Matrix3> m_transformMatrixStack;
+    std::vector<DrawObject> m_objects[ARR_MAX_Z][static_cast<uint8_t>(DrawOrder::LAST)];
+
+    stdext::map<size_t, DrawObject> m_objectsByhash;
 
     float m_scaleFactor{ 1.f };
 
@@ -307,7 +302,7 @@ private:
     bool m_agroup{ true };
 
     DrawPool::DrawOrder m_order{ DrawPool::DrawOrder::FIRST };
-    size_t m_ref;
+    size_t m_ref{ 0 };
     size_t m_stateHash{ 0 };
 
     std::vector<size_t> m_hashs;

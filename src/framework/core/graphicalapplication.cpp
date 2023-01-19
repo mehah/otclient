@@ -139,8 +139,6 @@ void GraphicalApplication::run()
 
     // clang c++20 dont support jthread
     std::thread t1([&]() {
-        Timer foregroundRefresh;
-
         while (!m_stopping) {
             g_particles.poll();
             Application::poll();
@@ -148,11 +146,6 @@ void GraphicalApplication::run()
             if (!g_window.isVisible()) {
                 stdext::millisleep(10);
                 continue;
-            }
-
-            if (foregroundRefresh.ticksElapsed() >= 100) { // 10 FPS (1000 / 10)
-                foreground->repaint();
-                foregroundRefresh.restart();
             }
 
             if (foreground->canRepaint()) {

@@ -38,7 +38,7 @@ public:
     void overwrite(const Color& color);
     void blit(const Point& dest, const ImagePtr& other);
     void paste(const ImagePtr& other);
-    void resize(const Size& size) { m_size = size; m_pixels.resize(size.area() * static_cast<size_t>(m_bpp), 0); }
+    void resize(const Size& size) { m_pixels.resize((m_size = size).area() * static_cast<size_t>(m_bpp), 0); }
     bool nextMipmap();
 
     void flipVertically();

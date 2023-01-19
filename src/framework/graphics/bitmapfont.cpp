@@ -345,9 +345,9 @@ void BitmapFont::calculateGlyphsWidthsAutomatically(const ImagePtr& image, const
     if (!image)
         return;
 
-    const Size imageSize = image->getSize();
-    const int numHorizontalGlyphs = imageSize.width() / glyphSize.width();
+    const auto& imageSize = image->getSize();
     const auto& texturePixels = image->getPixels();
+    const int numHorizontalGlyphs = imageSize.width() / glyphSize.width();
 
     // small AI to auto calculate pixels widths
     for (int glyph = m_firstGlyph; glyph < 256; ++glyph) {

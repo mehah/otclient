@@ -23,7 +23,7 @@
 #include "drawpool.h"
 #include "framebuffermanager.h"
 
-static constexpr int REFRESH_TIME = 1000 / 20; // 20 FPS (50ms)
+static constexpr uint16_t SHADER_REFRESH_DELAY = 1000 / 20; // 20 FPS (50ms)
 
 DrawPool* DrawPool::create(const DrawPoolType type)
 {
@@ -35,6 +35,8 @@ DrawPool* DrawPool::create(const DrawPoolType type)
         if (type == DrawPoolType::MAP) {
             frameBuffer->setUseAlphaWriting(false);
             frameBuffer->disableBlend();
+        } else if (type == DrawPoolType::FOREGROUND) {
+            pool->m_refreshDelay = 100; // 10 FPS (1000 / 10)
         } else if (type == DrawPoolType::LIGHT) {
             pool->m_alwaysGroupDrawings = true;
             frameBuffer->setCompositionMode(CompositionMode::LIGHT);
@@ -99,7 +101,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const DrawMeth
             if (coordsBuffer)
                 buffer->getCoords()->append(coordsBuffer.get());
             else
-                addCoords(method, *buffer->m_coords.get(), DrawMode::TRIANGLES);
+                addCoords(method, buffer->m_coords.get(), DrawMode::TRIANGLES);
 
             return;
         }
@@ -124,7 +126,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const DrawMeth
             if (coordsBuffer)
                 coords->append(coordsBuffer.get());
             else
-                addCoords(method, *coords, DrawMode::TRIANGLES);
+                addCoords(method, coords, DrawMode::TRIANGLES);
         }
 
         m_objectsByhash.emplace(stateHash,
@@ -167,7 +169,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const DrawMeth
                 if (coordsBuffer) {
                     prevObj.buffer->getCoords()->append(coordsBuffer.get());
                 } else {
-                    addCoords(method, *prevObj.buffer->getCoords(), DrawMode::TRIANGLES);
+                    addCoords(method, prevObj.buffer->getCoords(), DrawMode::TRIANGLES);
                 }
             }
         }
@@ -181,24 +183,24 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const DrawMeth
         list.emplace_back(drawMode, state, method);
 }
 
-void DrawPool::addCoords(const DrawMethod& method, CoordsBuffer& buffer, DrawMode drawMode)
+void DrawPool::addCoords(const DrawMethod& method, CoordsBuffer* buffer, DrawMode drawMode)
 {
     if (method.type == DrawMethodType::BOUNDING_RECT) {
-        buffer.addBoudingRect(method.rects.first, method.intValue);
+        buffer->addBoudingRect(method.rects.first, method.intValue);
     } else if (method.type == DrawMethodType::RECT) {
         if (drawMode == DrawMode::TRIANGLES)
-            buffer.addRect(method.rects.first, method.rects.second);
+            buffer->addRect(method.rects.first, method.rects.second);
         else
-            buffer.addQuad(method.rects.first, method.rects.second);
+            buffer->addQuad(method.rects.first, method.rects.second);
     } else if (method.type == DrawMethodType::TRIANGLE) {
-        buffer.addTriangle(std::get<0>(method.points), std::get<1>(method.points), std::get<2>(method.points));
+        buffer->addTriangle(std::get<0>(method.points), std::get<1>(method.points), std::get<2>(method.points));
     } else if (method.type == DrawMethodType::UPSIDEDOWN_RECT) {
         if (drawMode == DrawMode::TRIANGLES)
-            buffer.addUpsideDownRect(method.rects.first, method.rects.second);
+            buffer->addUpsideDownRect(method.rects.first, method.rects.second);
         else
-            buffer.addUpsideDownQuad(method.rects.first, method.rects.second);
+            buffer->addUpsideDownQuad(method.rects.first, method.rects.second);
     } else if (method.type == DrawMethodType::REPEATED_RECT) {
-        buffer.addRepeatedRects(method.rects.first, method.rects.second);
+        buffer->addRepeatedRects(method.rects.first, method.rects.second);
     }
 }
 
@@ -219,7 +221,7 @@ void DrawPool::updateHash(const PoolState& state, const DrawMethod& method, size
             stdext::hash_combine(stateHash, state.opacity);
 
         if (state.shaderProgram) {
-            m_refreshTimeMS = REFRESH_TIME;
+            m_shaderRefreshDelay = SHADER_REFRESH_DELAY;
             stdext::hash_combine(stateHash, state.shaderProgram->getProgramId());
         }
 
@@ -284,7 +286,7 @@ void DrawPool::setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bo
     m_state.action = action;
 
     if (m_state.shaderProgram) {
-        m_refreshTimeMS = REFRESH_TIME;
+        m_shaderRefreshDelay = SHADER_REFRESH_DELAY;
     }
 
     if (onlyOnce) m_onlyOnceStateFlag |= STATE_SHADER_PROGRAM;
@@ -301,17 +303,23 @@ void DrawPool::resetState()
     resetTransformMatrix();
 
     m_status.second = 0;
-    if (!m_autoUpdate)
-        m_refreshTimeMS = 0;
+    m_shaderRefreshDelay = 0;
 }
 
 bool DrawPool::canRepaint(const bool autoUpdateStatus)
 {
-    const bool canRepaint = m_status.first != m_status.second || (m_refreshTimeMS > 0 && m_refreshTimer.ticksElapsed() > m_refreshTimeMS);
+    uint16_t refreshDelay = m_refreshDelay;
+    if (m_shaderRefreshDelay > 0 && (m_refreshDelay == 0 || m_shaderRefreshDelay < m_refreshDelay))
+        refreshDelay = m_shaderRefreshDelay;
 
-    if (canRepaint && autoUpdateStatus) {
-        m_refreshTimer.restart();
-        m_status.first = m_status.second;
+    const bool canRepaint = m_status.first != m_status.second || refreshDelay > 0 && m_refreshTimer.ticksElapsed() >= refreshDelay;
+
+    if (canRepaint) {
+        if (static_cast<bool>(m_refreshDelay) != autoUpdateStatus)
+            m_refreshTimer.restart();
+
+        if (autoUpdateStatus)
+            m_status.first = m_status.second;
     }
 
     return canRepaint;
