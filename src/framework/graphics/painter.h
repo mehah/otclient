@@ -57,11 +57,6 @@ class Painter
 public:
     Painter();
 
-    ~Painter() = default;
-
-    void bind();
-    void unbind();
-
     void clear(const Color& color);
     void clearRect(const Color& color, const Rect& rect);
 

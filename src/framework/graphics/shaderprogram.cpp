@@ -54,21 +54,21 @@ bool ShaderProgram::addShader(const ShaderPtr& shader)
 bool ShaderProgram::addShaderFromSourceCode(ShaderType shaderType, const std::string_view sourceCode)
 {
     const auto& shader = std::make_shared<Shader>(shaderType);
-    if (!shader->compileSourceCode(sourceCode)) {
-        g_logger.error(stdext::format("failed to compile shader: %s", shader->log()));
-        return false;
-    }
-    return addShader(shader);
+    if (shader->compileSourceCode(sourceCode))
+        return addShader(shader);
+
+    g_logger.error(stdext::format("failed to compile shader: %s", shader->log()));
+    return false;
 }
 
 bool ShaderProgram::addShaderFromSourceFile(ShaderType shaderType, const std::string_view sourceFile)
 {
     const auto& shader = std::make_shared<Shader>(shaderType);
-    if (!shader->compileSourceFile(sourceFile)) {
-        g_logger.error(stdext::format("failed to compile shader: %s", shader->log()));
-        return false;
-    }
-    return addShader(shader);
+    if (shader->compileSourceFile(sourceFile))
+        return addShader(shader);
+
+    g_logger.error(stdext::format("failed to compile shader: %s", shader->log()));
+    return false;
 }
 
 void ShaderProgram::removeShader(const ShaderPtr& shader)
@@ -101,26 +101,30 @@ bool ShaderProgram::link()
 
     if (!m_linked)
         g_logger.traceWarning(log());
+
     return m_linked;
 }
 
 bool ShaderProgram::bind()
 {
-    if (m_currentProgram != m_programId) {
-        if (!m_linked && !link())
-            return false;
-        glUseProgram(m_programId);
-        m_currentProgram = m_programId;
-    }
+    if (m_currentProgram == m_programId)
+        return false;
+
+    if (!m_linked && !link())
+        return false;
+
+    glUseProgram(m_programId);
+    m_currentProgram = m_programId;
     return true;
 }
 
 void ShaderProgram::release()
 {
-    if (m_currentProgram != 0) {
-        m_currentProgram = 0;
-        glUseProgram(0);
-    }
+    if (m_currentProgram == 0)
+        return;
+
+    m_currentProgram = 0;
+    glUseProgram(0);
 }
 
 std::string ShaderProgram::log()
@@ -136,15 +140,9 @@ std::string ShaderProgram::log()
     return infoLog;
 }
 
-int ShaderProgram::getAttributeLocation(const char* name)
-{
-    return glGetAttribLocation(m_programId, name);
-}
+int ShaderProgram::getAttributeLocation(const char* name) { return glGetAttribLocation(m_programId, name); }
 
-void ShaderProgram::bindAttributeLocation(int location, const char* name)
-{
-    return glBindAttribLocation(m_programId, location, name);
-}
+void ShaderProgram::bindAttributeLocation(int location, const char* name) { return glBindAttribLocation(m_programId, location, name); }
 
 void ShaderProgram::bindUniformLocation(int location, const char* name)
 {

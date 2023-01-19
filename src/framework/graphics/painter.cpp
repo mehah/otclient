@@ -51,23 +51,13 @@ Painter::Painter()
     m_drawSolidColorProgram->link();
 
     PainterShaderProgram::release();
-}
 
-void Painter::bind()
-{
     refreshState();
 
     // vertex and texture coord attributes are always enabled
     // to avoid massive enable/disables, thus improving frame rate
     PainterShaderProgram::enableAttributeArray(PainterShaderProgram::VERTEX_ATTR);
     PainterShaderProgram::enableAttributeArray(PainterShaderProgram::TEXCOORD_ATTR);
-}
-
-void Painter::unbind()
-{
-    PainterShaderProgram::disableAttributeArray(PainterShaderProgram::VERTEX_ATTR);
-    PainterShaderProgram::disableAttributeArray(PainterShaderProgram::TEXCOORD_ATTR);
-    PainterShaderProgram::release();
 }
 
 void Painter::drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode)
@@ -88,10 +78,6 @@ void Painter::drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode)
     m_drawProgram->bind();
     m_drawProgram->setTransformMatrix(m_transformMatrix);
     m_drawProgram->setProjectionMatrix(m_projectionMatrix);
-    if (textured) {
-        m_drawProgram->setTextureMatrix(m_textureMatrix);
-        m_drawProgram->bindMultiTextures();
-    }
     m_drawProgram->setOpacity(m_opacity);
     m_drawProgram->setColor(m_color);
     m_drawProgram->setResolution(m_resolution);
@@ -102,6 +88,9 @@ void Painter::drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode)
     // only set texture coords arrays when needed
     {
         if (textured) {
+            m_drawProgram->setTextureMatrix(m_textureMatrix);
+            m_drawProgram->bindMultiTextures();
+
             auto* hardwareBuffer = coordsBuffer.getHardwareTextureCoordCache();
             if (hardwareBuffer)
                 hardwareBuffer->bind();

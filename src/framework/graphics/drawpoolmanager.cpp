@@ -68,6 +68,8 @@ void DrawPoolManager::draw()
 
         if (pool->hasFrameBuffer()) {
             auto* pf = pool->toPoolFramed();
+            if (!pf->m_framebuffer->canDraw())
+                continue;
 
             if (pool->canRepaint(true)) {
                 pf->m_framebuffer->bind();

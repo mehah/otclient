@@ -42,6 +42,7 @@ public:
 
     bool resize(const Size& size);
     bool isValid() const { return m_texture != nullptr; }
+    bool canDraw() const { return m_coordsBuffer.getVertexCount() > 0; }
     TexturePtr getTexture() { return m_texture; }
     Size getSize() { return m_texture->getSize(); }
 
