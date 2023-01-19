@@ -144,22 +144,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const DrawMeth
     if (!list.empty()) {
         auto& prevObj = list.back();
 
-        const bool sameState = prevObj.state == state;
-        if (!method.dest.isNull() && !prevObj.methods.empty()) {
-            // Look for identical or opaque textures that are greater than or
-            // equal to the size of the previous texture, if so, remove it from the list so they don't get drawn.
-            auto& drawMethods = prevObj.methods;
-            for (auto itm = drawMethods.begin(); itm != drawMethods.end(); ++itm) {
-                auto& prevMtd = *itm;
-                if (prevMtd.dest == method.dest &&
-                    ((sameState && prevMtd.rects.second == method.rects.second) || (state.texture->isOpaque() && prevObj.state.texture->canSuperimposed()))) {
-                    drawMethods.erase(itm);
-                    break;
-                }
-            }
-        }
-
-        if (sameState) {
+        if (prevObj.state == state) {
             if (!prevObj.buffer) {
                 prevObj.addMethod(method);
                 return;

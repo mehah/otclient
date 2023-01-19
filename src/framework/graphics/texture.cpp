@@ -45,9 +45,8 @@ Texture::Texture(const Size& size) : m_uniqueId(++UID)
     setupFilters();
 }
 
-Texture::Texture(const ImagePtr& image, bool buildMipmaps, bool compress, bool canSuperimposed) : m_uniqueId(++UID)
+Texture::Texture(const ImagePtr& image, bool buildMipmaps, bool compress) : m_uniqueId(++UID)
 {
-    m_canSuperimposed = canSuperimposed;
     m_compress = compress;
     m_buildMipmaps = buildMipmaps;
     m_image = image;
@@ -91,8 +90,6 @@ void Texture::uploadPixels(const ImagePtr& image, bool buildMipmaps, bool compre
 
     setupWrap();
     setupFilters();
-
-    m_opaque = !image->hasTransparentPixel();
 }
 
 void Texture::bind()

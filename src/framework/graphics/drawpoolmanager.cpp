@@ -143,19 +143,15 @@ void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& textur
     addTexturedRect(dest, texture, Rect(Point(), texture->getSize()), color);
 }
 
-void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const Point& originalDest, const DrawBufferPtr& buffer)
+void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const DrawBufferPtr& buffer)
 {
     if (dest.isEmpty() || src.isEmpty())
         return;
 
     const DrawPool::DrawMethod method{
         .type = DrawPool::DrawMethodType::RECT,
-        .rects = std::make_pair(dest, src),
-        .dest = originalDest
+        .rects = std::make_pair(dest, src)
     };
-
-    if (buffer)
-        buffer->validate(originalDest);
 
     getCurrentPool()->add(color, texture, method, DrawMode::TRIANGLE_STRIP, buffer);
 }

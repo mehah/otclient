@@ -118,7 +118,6 @@ protected:
         DrawMethodType type;
         std::pair<Rect, Rect> rects;
         std::tuple<Point, Point, Point> points;
-        Point dest;
         uint16_t intValue{ 0 };
     };
 
@@ -278,6 +277,13 @@ public:
 
     void invalidate() { m_i = -1; }
 
+    bool validate(const Point& p)
+    {
+        const size_t hash = p.hash();
+        if (m_ref != hash) { m_ref = hash; invalidate(); }
+        return isValid();
+    }
+
 private:
     static DrawBufferPtr createTemporaryBuffer(DrawPool::DrawOrder order)
     {
@@ -288,13 +294,6 @@ private:
 
     inline bool isValid() { return m_i != -1; }
     inline bool isTemporary() { return m_i == -2; }
-
-    bool validate(const Point& p)
-    {
-        const size_t hash = p.hash();
-        if (m_ref != hash) { m_ref = hash; invalidate(); }
-        return isValid();
-    }
 
     inline CoordsBuffer* getCoords() { return (m_coords ? m_coords : m_coords = std::make_shared<CoordsBuffer>()).get(); }
 

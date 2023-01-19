@@ -29,12 +29,14 @@ class Texture
 public:
     Texture();
     Texture(const Size& size);
-    Texture(const ImagePtr& image, bool buildMipmaps = false, bool compress = false, bool canSuperimposed = false);
+    Texture(const ImagePtr& image, bool buildMipmaps = false, bool compress = false);
     virtual ~Texture();
 
+    void bind();
+    void create();
     void uploadPixels(const ImagePtr& image, bool buildMipmaps = false, bool compress = false);
     void updateImage(const ImagePtr& image) { m_image = image; }
-    void bind();
+
     void copyFromScreen(const Rect& screenRect);
     virtual void buildHardwareMipmaps();
 
@@ -54,10 +56,6 @@ public:
     bool hasRepeat() { return m_repeat; }
     bool hasMipmaps() { return m_hasMipmaps; }
     virtual bool isAnimatedTexture() { return false; }
-    bool isOpaque() const { return m_opaque; }
-    bool canSuperimposed() const { return m_canSuperimposed; }
-
-    void create();
 
 protected:
     void createTexture();
@@ -81,8 +79,6 @@ protected:
     bool m_smooth{ false };
     bool m_upsideDown{ false };
     bool m_repeat{ false };
-    bool m_opaque{ false };
-    bool m_canSuperimposed{ false };
     bool m_compress{ false };
     bool m_buildMipmaps{ false };
 };

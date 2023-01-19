@@ -624,7 +624,10 @@ void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, i
         if (m_opacity < 1.0f)
             color.setAlpha(m_opacity);
 
-        g_drawPool.addTexturedRect(screenRect, texture, textureRect, color, dest, drawBuffer);
+        if (drawBuffer)
+            drawBuffer->validate(dest);
+
+        g_drawPool.addTexturedRect(screenRect, texture, textureRect, color, drawBuffer);
     }
 
     if (lightView && hasLight() && flags & Otc::DrawLights) {
@@ -723,23 +726,23 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
                         }
                     }
 
-                    Rect drawRect(framePos + Point(m_size.width(), m_size.height()) * SPRITE_SIZE - Point(1), framePos);
+                    auto& posData = textureData.pos[frameIndex];
+                    posData.rects = { framePos + Point(m_size.width(), m_size.height()) * SPRITE_SIZE - Point(1), framePos };
                     for (int fx = framePos.x; fx < framePos.x + m_size.width() * SPRITE_SIZE; ++fx) {
                         for (int fy = framePos.y; fy < framePos.y + m_size.height() * SPRITE_SIZE; ++fy) {
                             const uint8_t* p = fullImage->getPixel(fx, fy);
-                            if (p[3] != 0x00) {
-                                drawRect.setTop(std::min<int>(fy, drawRect.top()));
-                                drawRect.setLeft(std::min<int>(fx, drawRect.left()));
-                                drawRect.setBottom(std::max<int>(fy, drawRect.bottom()));
-                                drawRect.setRight(std::max<int>(fx, drawRect.right()));
-                            }
+                            if (p[3] == 0x00)
+                                continue;
+
+                            posData.rects.setTop(std::min<int>(fy, posData.rects.top()));
+                            posData.rects.setLeft(std::min<int>(fx, posData.rects.left()));
+                            posData.rects.setBottom(std::max<int>(fy, posData.rects.bottom()));
+                            posData.rects.setRight(std::max<int>(fx, posData.rects.right()));
                         }
                     }
 
-                    auto& posData = textureData.pos[frameIndex];
-                    posData.rects = drawRect;
                     posData.originRects = Rect(framePos, Size(m_size.width(), m_size.height()) * SPRITE_SIZE);
-                    posData.offsets = drawRect.topLeft() - framePos;
+                    posData.offsets = posData.rects.topLeft() - framePos;
                 }
             }
         }
@@ -751,7 +754,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
     if (m_opaque == -1)
         m_opaque = !fullImage->hasTransparentPixel();
 
-    animationPhaseTexture = std::make_shared<Texture>(fullImage, true, false, m_size.area() == 1 && !hasElevation());
+    animationPhaseTexture = std::make_shared<Texture>(fullImage, true, false);
     if (smooth)
         animationPhaseTexture->setSmooth(true);
 

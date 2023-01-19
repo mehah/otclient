@@ -68,7 +68,7 @@ void MinimapBlock::update()
         if (m_texture)
             m_texture->updateImage(m_image);
         else
-            m_texture = std::make_shared<Texture>(m_image, true, false, false);
+            m_texture = std::make_shared<Texture>(m_image, true, false);
     else
         m_texture.reset();
 
