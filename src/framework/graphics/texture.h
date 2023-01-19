@@ -29,14 +29,14 @@ class Texture
 public:
     Texture();
     Texture(const Size& size);
-    Texture(const ImagePtr& image, bool buildMipmaps = false, bool compress = false, bool canSuperimposed = false, bool load = true);
+    Texture(const ImagePtr& image, bool buildMipmaps = false, bool compress = false, bool canSuperimposed = false);
     virtual ~Texture();
 
     void uploadPixels(const ImagePtr& image, bool buildMipmaps = false, bool compress = false);
     void updateImage(const ImagePtr& image) { m_image = image; }
     void bind();
     void copyFromScreen(const Rect& screenRect);
-    virtual bool buildHardwareMipmaps();
+    virtual void buildHardwareMipmaps();
 
     virtual void setSmooth(bool smooth);
     virtual void setRepeat(bool repeat);
