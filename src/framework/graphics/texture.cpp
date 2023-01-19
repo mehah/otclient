@@ -33,7 +33,6 @@
 static std::atomic_uint32_t UID(UINT16_MAX);
 
 Texture::Texture() : m_uniqueId(++UID) {}
-
 Texture::Texture(const Size& size) : m_uniqueId(++UID)
 {
     if (!setupSize(size))
@@ -46,18 +45,13 @@ Texture::Texture(const Size& size) : m_uniqueId(++UID)
     setupFilters();
 }
 
-Texture::Texture(const ImagePtr& image, bool buildMipmaps, bool compress, bool canSuperimposed, bool load) : m_uniqueId(++UID)
+Texture::Texture(const ImagePtr& image, bool buildMipmaps, bool compress, bool canSuperimposed) : m_uniqueId(++UID)
 {
     m_canSuperimposed = canSuperimposed;
     m_compress = compress;
     m_buildMipmaps = buildMipmaps;
-    if (load) {
-        createTexture();
-        uploadPixels(image, m_buildMipmaps, m_compress);
-    } else {
-        m_image = image;
-        setupSize(image->getSize());
-    }
+    m_image = image;
+    setupSize(image->getSize());
 }
 
 Texture::~Texture()
@@ -74,11 +68,12 @@ Texture::~Texture()
 
 void Texture::create()
 {
-    if (m_image) {
-        createTexture();
-        uploadPixels(m_image, m_buildMipmaps, m_compress);
-        m_image = nullptr;
-    }
+    if (!m_image)
+        return;
+
+    createTexture();
+    uploadPixels(m_image, m_buildMipmaps, m_compress);
+    m_image = nullptr;
 }
 
 void Texture::uploadPixels(const ImagePtr& image, bool buildMipmaps, bool compress)
@@ -88,14 +83,11 @@ void Texture::uploadPixels(const ImagePtr& image, bool buildMipmaps, bool compre
 
     bind();
 
-    if (buildMipmaps) {
-        int level = 0;
-        do {
-            setupPixels(level++, image->getSize(), image->getPixelData(), image->getBpp(), compress);
-        } while (image->nextMipmap());
-        m_hasMipmaps = true;
-    } else
-        setupPixels(0, image->getSize(), image->getPixelData(), image->getBpp(), compress);
+    uint_fast8_t level = 0;
+    do {
+        setupPixels(level++, image->getSize(), image->getPixelData(), image->getBpp(), compress);
+    } while (buildMipmaps && image->nextMipmap());
+    if (buildMipmaps) m_hasMipmaps = true;
 
     setupWrap();
     setupFilters();
@@ -116,17 +108,21 @@ void Texture::copyFromScreen(const Rect& screenRect)
     glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, screenRect.x(), screenRect.y(), screenRect.width(), screenRect.height());
 }
 
-bool Texture::buildHardwareMipmaps()
+void Texture::buildHardwareMipmaps()
 {
+    if (m_hasMipmaps)
+        return;
+
+#ifndef OPENGL_ES
+    if (!glGenerateMipmap)
+        return;
+#endif
+
+    m_hasMipmaps = true;
+
     bind();
-
-    if (!m_hasMipmaps) {
-        m_hasMipmaps = true;
-        setupFilters();
-    }
-
+    setupFilters();
     glGenerateMipmap(GL_TEXTURE_2D);
-    return true;
 }
 
 void Texture::setSmooth(bool smooth)
@@ -194,8 +190,8 @@ void Texture::setupWrap()
 
 void Texture::setupFilters()
 {
-    int minFilter;
-    int magFilter;
+    GLenum minFilter;
+    GLenum magFilter;
     if (m_smooth) {
         minFilter = m_hasMipmaps ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
         magFilter = GL_LINEAR;
