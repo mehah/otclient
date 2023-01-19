@@ -136,10 +136,12 @@ void GraphicalApplication::run()
     const auto& map = g_drawPool.get<DrawPool>(DrawPoolType::MAP);
 
     std::condition_variable foreCondition, txtCondition;
-    std::jthread t1([&](std::stop_token st) {
+
+    // clang c++20 dont support jthread
+    std::thread t1([&]() {
         Timer foregroundRefresh;
 
-        while (!st.stop_requested()) {
+        while (!m_stopping) {
             g_particles.poll();
             Application::poll();
 
@@ -169,21 +171,24 @@ void GraphicalApplication::run()
 
             stdext::millisleep(1);
         }
+
+        foreCondition.notify_one();
+        txtCondition.notify_one();
     });
 
-    std::jthread t2([&](std::stop_token st) {
+    std::thread t2([&]() {
         std::unique_lock lock(foreground->getMutex());
         foreCondition.wait(lock, [&]() -> bool {
             g_ui.render(DrawPoolType::FOREGROUND);
-            return st.stop_requested();
+            return m_stopping;
         });
     });
 
-    std::jthread t3([&](std::stop_token st) {
+    std::thread t3([&]() {
         std::unique_lock lock(txt->getMutex());
         txtCondition.wait(lock, [&]() -> bool {
             g_ui.render(DrawPoolType::TEXT);
-            return st.stop_requested();
+            return m_stopping;
         });
     });
 
@@ -203,8 +208,9 @@ void GraphicalApplication::run()
         m_frameCounter.update();
     }
 
-    foreCondition.notify_one();
-    txtCondition.notify_one();
+    t1.join();
+    t2.join();
+    t3.join();
 
     m_stopping = false;
     m_running = false;

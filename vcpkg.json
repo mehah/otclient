@@ -14,8 +14,11 @@
     "liblzma",
     "parallel-hashmap",
     "stduuid",
-    "luajit",
     "discord-rpc",
+    {
+      "name": "luajit",
+      "platform": "!android"
+    },
     {
       "name": "opengl",
       "platform": "windows | linux"
