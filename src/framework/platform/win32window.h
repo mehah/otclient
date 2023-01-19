@@ -30,10 +30,6 @@
 #include <EGL/egl.h>
 #endif
 
-#ifdef DIRECTX
-#include <d3d9.h>
-#endif
-
 struct WindowProcProxy;
 
 class WIN32Window : public PlatformWindow
@@ -97,11 +93,6 @@ private:
     HCURSOR m_cursor;
     HCURSOR m_defaultCursor;
     bool m_hidden;
-
-#ifdef DIRECTX
-    LPDIRECT3D9 m_d3d;    // the pointer to our Direct3D interface
-    LPDIRECT3DDEVICE9 m_d3ddev;    // the pointer to the device class
-#endif
 
 #ifdef OPENGL_ES
     EGLConfig m_eglConfig;
