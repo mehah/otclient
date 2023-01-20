@@ -171,21 +171,21 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const DrawMeth
 void DrawPool::addCoords(const DrawMethod& method, CoordsBuffer* buffer, DrawMode drawMode)
 {
     if (method.type == DrawMethodType::BOUNDING_RECT) {
-        buffer->addBoudingRect(method.rects.first, method.intValue);
+        buffer->addBoudingRect(method.dest, method.intValue);
     } else if (method.type == DrawMethodType::RECT) {
         if (drawMode == DrawMode::TRIANGLES)
-            buffer->addRect(method.rects.first, method.rects.second);
+            buffer->addRect(method.dest, method.src);
         else
-            buffer->addQuad(method.rects.first, method.rects.second);
+            buffer->addQuad(method.dest, method.src);
     } else if (method.type == DrawMethodType::TRIANGLE) {
-        buffer->addTriangle(std::get<0>(method.points), std::get<1>(method.points), std::get<2>(method.points));
+        buffer->addTriangle(method.a, method.b, method.c);
     } else if (method.type == DrawMethodType::UPSIDEDOWN_RECT) {
         if (drawMode == DrawMode::TRIANGLES)
-            buffer->addUpsideDownRect(method.rects.first, method.rects.second);
+            buffer->addUpsideDownRect(method.dest, method.src);
         else
-            buffer->addUpsideDownQuad(method.rects.first, method.rects.second);
+            buffer->addUpsideDownQuad(method.dest, method.src);
     } else if (method.type == DrawMethodType::REPEATED_RECT) {
-        buffer->addRepeatedRects(method.rects.first, method.rects.second);
+        buffer->addRepeatedRects(method.dest, method.src);
     }
 }
 
@@ -222,17 +222,13 @@ void DrawPool::updateHash(const PoolState& state, const DrawMethod& method, size
     }
 
     { // Method Hash
-        if (method.rects.first.isValid()) stdext::hash_union(methodhash, method.rects.first.hash());
-        if (method.rects.second.isValid()) stdext::hash_union(methodhash, method.rects.second.hash());
+        if (method.dest.isValid()) stdext::hash_union(methodhash, method.dest.hash());
+        if (method.src.isValid()) stdext::hash_union(methodhash, method.src.hash());
 
         if (method.type == DrawPool::DrawMethodType::TRIANGLE) {
-            const auto& a = std::get<0>(method.points);
-            const auto& b = std::get<1>(method.points);
-            const auto& c = std::get<2>(method.points);
-
-            if (!a.isNull()) stdext::hash_union(methodhash, a.hash());
-            if (!b.isNull()) stdext::hash_union(methodhash, b.hash());
-            if (!c.isNull()) stdext::hash_union(methodhash, c.hash());
+            if (!method.a.isNull()) stdext::hash_union(methodhash, method.a.hash());
+            if (!method.b.isNull()) stdext::hash_union(methodhash, method.b.hash());
+            if (!method.c.isNull()) stdext::hash_union(methodhash, method.c.hash());
         }
 
         if (method.intValue) stdext::hash_combine(methodhash, method.intValue);

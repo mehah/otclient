@@ -150,7 +150,7 @@ void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& textur
 
     const DrawPool::DrawMethod method{
         .type = DrawPool::DrawMethodType::RECT,
-        .rects = std::make_pair(dest, src)
+        .dest = dest, .src = src
     };
 
     getCurrentPool()->add(color, texture, method, DrawMode::TRIANGLE_STRIP, buffer);
@@ -161,7 +161,7 @@ void DrawPoolManager::addUpsideDownTexturedRect(const Rect& dest, const TextureP
     if (dest.isEmpty() || src.isEmpty())
         return;
 
-    const DrawPool::DrawMethod method{ DrawPool::DrawMethodType::UPSIDEDOWN_RECT, std::make_pair(dest, src) };
+    const DrawPool::DrawMethod method{ DrawPool::DrawMethodType::UPSIDEDOWN_RECT, dest, src };
 
     getCurrentPool()->add(color, texture, method, DrawMode::TRIANGLE_STRIP);
 }
@@ -171,7 +171,7 @@ void DrawPoolManager::addTexturedRepeatedRect(const Rect& dest, const TexturePtr
     if (dest.isEmpty() || src.isEmpty())
         return;
 
-    const DrawPool::DrawMethod method{ DrawPool::DrawMethodType::REPEATED_RECT, std::make_pair(dest, src) };
+    const DrawPool::DrawMethod method{ DrawPool::DrawMethodType::REPEATED_RECT, dest, src };
 
     getCurrentPool()->add(color, texture, method);
 }
@@ -181,7 +181,7 @@ void DrawPoolManager::addFilledRect(const Rect& dest, const Color& color, const 
     if (dest.isEmpty())
         return;
 
-    const DrawPool::DrawMethod method{ DrawPool::DrawMethodType::RECT, std::make_pair(dest, Rect()) };
+    const DrawPool::DrawMethod method{ DrawPool::DrawMethodType::RECT, dest };
 
     getCurrentPool()->add(color, nullptr, method, DrawMode::TRIANGLES, buffer);
 }
@@ -191,7 +191,7 @@ void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Po
     if (a == b || a == c || b == c)
         return;
 
-    const DrawPool::DrawMethod method{ .type = DrawPool::DrawMethodType::TRIANGLE, .points = std::make_tuple(a, b, c) };
+    const DrawPool::DrawMethod method{ .type = DrawPool::DrawMethodType::TRIANGLE, .a = a, .b = b, .c = c };
 
     getCurrentPool()->add(color, nullptr, method);
 }
@@ -203,7 +203,7 @@ void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, int 
 
     const DrawPool::DrawMethod method{
         .type = DrawPool::DrawMethodType::BOUNDING_RECT,
-        .rects = std::make_pair(dest, Rect()),
+        .dest = dest,
         .intValue = static_cast<uint16_t>(innerLineWidth)
     };
 
