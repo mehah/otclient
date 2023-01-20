@@ -45,30 +45,35 @@ public:
     void setUpsideDown(bool upsideDown);
     void setTime(ticks_t time) { m_time = time; }
 
-    uint32_t getId() { return m_id; }
+    uint32_t getId() const { return m_id; }
     uint32_t getUniqueId() const { return m_uniqueId; }
-    ticks_t getTime() { return m_time; }
-    int getWidth() { return m_size.width(); }
-    int getHeight() { return m_size.height(); }
-    const Size& getSize() { return m_size; }
-    const Matrix3& getTransformMatrix() { return m_transformMatrix; }
-    bool isEmpty() { return m_id == 0; }
-    bool hasRepeat() { return m_repeat; }
-    bool hasMipmaps() { return m_hasMipmaps; }
-    virtual bool isAnimatedTexture() { return false; }
+    size_t hash() const { return m_hash; }
+    ticks_t getTime() const { return m_time; }
+    int getWidth() const { return m_size.width(); }
+    int getHeight() const { return m_size.height(); }
+    const Size& getSize() const { return m_size; }
+    const Matrix3& getTransformMatrix() const { return m_transformMatrix; }
+    bool isEmpty() const { return m_id == 0; }
+    bool hasRepeat() const { return m_repeat; }
+    bool hasMipmaps() const { return m_hasMipmaps; }
+    virtual bool isAnimatedTexture() const { return false; }
 
 protected:
     void createTexture();
-    bool setupSize(const Size& size);
-    void setupWrap();
-    void setupFilters();
+    void setupWrap() const;
+    void setupFilters() const;
     void setupTranformMatrix();
-    void setupPixels(int level, const Size& size, uint8_t* pixels, int channels = 4, bool compress = false);
+    void setupPixels(int level, const Size& size, uint8_t* pixels, int channels = 4, bool compress = false) const;
+    void generateHash() { m_hash = stdext::hash_int(m_id > 0 ? m_id : m_uniqueId); }
+
+    bool setupSize(const Size& size);
 
     const uint32_t m_uniqueId;
 
     uint32_t m_id{ 0 };
     ticks_t m_time{ 0 };
+    size_t m_hash{ 0 };
+
     Size m_size;
 
     Matrix3 m_transformMatrix;

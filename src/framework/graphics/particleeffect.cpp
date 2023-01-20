@@ -49,7 +49,7 @@ void ParticleEffect::load(const ParticleEffectTypePtr& effectType)
     }
 }
 
-void ParticleEffect::render()
+void ParticleEffect::render() const
 {
     for (const auto& system : m_systems)
         system->render();

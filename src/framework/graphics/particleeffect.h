@@ -48,7 +48,7 @@ public:
 
     void load(const ParticleEffectTypePtr& effectType);
     bool hasFinished() { return m_systems.empty(); }
-    void render();
+    void render() const;
     void update();
 
 private:

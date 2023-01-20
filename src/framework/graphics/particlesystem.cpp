@@ -56,7 +56,7 @@ void ParticleSystem::addParticle(const ParticlePtr& particle)
     m_particles.push_back(particle);
 }
 
-void ParticleSystem::render()
+void ParticleSystem::render() const
 {
     for (const auto& particle : m_particles)
         particle->render();

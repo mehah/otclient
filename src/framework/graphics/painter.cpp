@@ -131,8 +131,7 @@ void Painter::resetState()
     resetTransformMatrix();
 }
 
-void Painter::refreshState()
-{
+void Painter::refreshState() const {
     updateGlViewport();
     updateGlCompositionMode();
     updateGlBlendEquation();
@@ -218,7 +217,7 @@ void Painter::setResolution(const Size& resolution, const Matrix3& projectionMat
     updateGlViewport();
 }
 
-Matrix3 Painter::getTransformMatrix(const Size& resolution)
+Matrix3 Painter::getTransformMatrix(const Size& resolution) const
 {
     // The projection matrix converts from Painter's coordinate system to GL's coordinate system
     //    * GL's viewport is 2x2, Painter's is width x height
@@ -238,7 +237,7 @@ Matrix3 Painter::getTransformMatrix(const Size& resolution)
                                  -1.0f,  1.0f,                       1.0f };
 }
 
-void Painter::updateGlCompositionMode()
+void Painter::updateGlCompositionMode() const
 {
     switch (m_compositionMode) {
         case CompositionMode::NORMAL:
@@ -262,7 +261,7 @@ void Painter::updateGlCompositionMode()
     }
 }
 
-void Painter::updateGlClipRect()
+void Painter::updateGlClipRect() const
 {
     if (m_clipRect.isValid()) {
         glEnable(GL_SCISSOR_TEST);
@@ -272,7 +271,7 @@ void Painter::updateGlClipRect()
         glDisable(GL_SCISSOR_TEST);
     }
 }
-void Painter::updateGlTexture() { if (m_glTextureId != 0) glBindTexture(GL_TEXTURE_2D, m_glTextureId); }
-void Painter::updateGlBlendEquation() { glBlendEquation(static_cast<GLenum>(m_blendEquation)); }
-void Painter::updateGlAlphaWriting() { glColorMask(1, 1, 1, m_alphaWriting); }
-void Painter::updateGlViewport() { glViewport(0, 0, m_resolution.width(), m_resolution.height()); }
+void Painter::updateGlTexture() const { if (m_glTextureId != 0) glBindTexture(GL_TEXTURE_2D, m_glTextureId); }
+void Painter::updateGlBlendEquation() const { glBlendEquation(static_cast<GLenum>(m_blendEquation)); }
+void Painter::updateGlAlphaWriting() const { glColorMask(1, 1, 1, m_alphaWriting); }
+void Painter::updateGlViewport() const { glViewport(0, 0, m_resolution.width(), m_resolution.height()); }

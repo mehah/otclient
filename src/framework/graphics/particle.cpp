@@ -23,7 +23,7 @@
 #include "particle.h"
 #include "drawpoolmanager.h"
 
-void Particle::render()
+void Particle::render() const
 {
     if (!m_texture) {
         g_drawPool.addFilledRect(m_rect, m_color);

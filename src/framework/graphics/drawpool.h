@@ -79,14 +79,14 @@ public:
     struct PoolState
     {
         Matrix3 transformMatrix;
-        Color color;
         float opacity{ 1.f };
         CompositionMode compositionMode{ CompositionMode::NORMAL };
         BlendEquation blendEquation{ BlendEquation::ADD };
         Rect clipRect;
-        TexturePtr texture;
         PainterShaderProgram* shaderProgram{ nullptr };
         std::function<void()> action{ nullptr };
+        Color color;
+        TexturePtr texture;
         size_t hash;
 
         bool operator==(const PoolState& s2) const { return hash == s2.hash; }
@@ -188,7 +188,6 @@ private:
     void rotate(float x, float y, float angle);
     void rotate(const Point& p, float angle) { rotate(p.x, p.y, angle); }
 
-    void clear();
     void flush()
     {
         m_objectsByhash.clear();

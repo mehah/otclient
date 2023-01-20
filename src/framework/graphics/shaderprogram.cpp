@@ -140,9 +140,9 @@ std::string ShaderProgram::log()
     return infoLog;
 }
 
-int ShaderProgram::getAttributeLocation(const char* name) { return glGetAttribLocation(m_programId, name); }
+int ShaderProgram::getAttributeLocation(const char* name) const { return glGetAttribLocation(m_programId, name); }
 
-void ShaderProgram::bindAttributeLocation(int location, const char* name) { return glBindAttribLocation(m_programId, location, name); }
+void ShaderProgram::bindAttributeLocation(int location, const char* name) const { return glBindAttribLocation(m_programId, location, name); }
 
 void ShaderProgram::bindUniformLocation(int location, const char* name)
 {

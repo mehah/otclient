@@ -54,8 +54,8 @@ public:
     void disableAttributeArray(const char* name) { glDisableVertexAttribArray(getAttributeLocation(name)); }
     void enableAttributeArray(const char* name) { glEnableVertexAttribArray(getAttributeLocation(name)); }
 
-    int getAttributeLocation(const char* name);
-    void bindAttributeLocation(int location, const char* name);
+    int getAttributeLocation(const char* name) const;
+    void bindAttributeLocation(int location, const char* name) const;
     void bindUniformLocation(int location, const char* name);
 
     void setAttributeArray(int location, const float* values, int size, int stride = 0) { glVertexAttribPointer(location, size, GL_FLOAT, GL_FALSE, stride, values); }

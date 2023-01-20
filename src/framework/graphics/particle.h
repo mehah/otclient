@@ -36,7 +36,7 @@ public:
         m_compositionMode(compositionMode), m_duration(duration), m_ignorePhysicsAfter(ignorePhysicsAfter)
     {}
 
-    void render();
+    void render() const;
     void update(float elapsedTime);
 
     bool hasFinished() { return m_finished; }

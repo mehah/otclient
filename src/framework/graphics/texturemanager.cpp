@@ -36,10 +36,7 @@
 
 TextureManager g_textures;
 
-void TextureManager::init()
-{
-    m_emptyTexture = std::make_shared<Texture>();
-}
+void TextureManager::init() { m_emptyTexture = std::make_shared<Texture>(); }
 
 void TextureManager::terminate()
 {
@@ -75,6 +72,7 @@ void TextureManager::liveReload()
 {
     if (m_liveReloadEvent)
         return;
+
     m_liveReloadEvent = g_dispatcher.cycleEvent([this] {
         for (const auto& [fileName, tex] : m_textures) {
             const auto& path = g_resources.guessFilePath(fileName, "png");

@@ -77,7 +77,7 @@ void GravityAffector::load(const OTMLNodePtr& node)
     }
 }
 
-void GravityAffector::updateParticle(const ParticlePtr& particle, float elapsedTime)
+void GravityAffector::updateParticle(const ParticlePtr& particle, float elapsedTime) const
 {
     if (!m_active)
         return;
@@ -107,7 +107,7 @@ void AttractionAffector::load(const OTMLNodePtr& node)
     }
 }
 
-void AttractionAffector::updateParticle(const ParticlePtr& particle, float elapsedTime)
+void AttractionAffector::updateParticle(const ParticlePtr& particle, float elapsedTime) const
 {
     if (!m_active)
         return;

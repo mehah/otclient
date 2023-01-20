@@ -78,29 +78,9 @@ public:
     float length() const { return sqrt(static_cast<float>(x * x + y * y)); }
     T manhattanLength() const { return std::abs(x) + std::abs(y); }
 
-    float distanceFrom(const TPoint<T>& other) const
-    {
-        return TPoint<T>(x - other.x, y - other.y).length();
-    }
+    float distanceFrom(const TPoint<T>& other) const { return TPoint<T>(x - other.x, y - other.y).length(); }
 
     std::size_t hash() const { return (7 * 15 + x) * 15 + y; }
-
-    std::array<TPoint<T>, static_cast<uint8_t>(8)> getPointsAround(const uint8_t pixel) const
-    {
-        std::array<TPoint<T>, static_cast<uint8_t>(8)> positions;
-        int_fast8_t i = -1;
-        for (int_fast32_t xi = -1; xi <= 1; ++xi) {
-            for (int_fast32_t yi = -1; yi <= 1; ++yi) {
-                const TPoint<T>& pos = translated(xi * pixel, yi * pixel, xi, yi);
-                if (pos == *this)
-                    continue;
-
-                positions[++i] = pos;
-            }
-        }
-
-        return positions;
-    }
 
     T x, y;
 };

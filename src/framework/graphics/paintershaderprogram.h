@@ -66,7 +66,7 @@ public:
     void updateTime();
 
     void addMultiTexture(const std::string& file);
-    void bindMultiTextures();
+    void bindMultiTextures() const;
 
 private:
     float m_startTime{ 0 };

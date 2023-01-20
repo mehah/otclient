@@ -38,7 +38,7 @@ public:
 
     void updateAnimation();
 
-    bool isAnimatedTexture() override { return true; }
+    bool isAnimatedTexture() const override { return true; }
 
 private:
     std::vector<TexturePtr> m_frames;

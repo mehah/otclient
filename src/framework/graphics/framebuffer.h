@@ -32,7 +32,7 @@ public:
     FrameBuffer();
     ~FrameBuffer();
 
-    void release();
+    void release() { internalRelease(); };
     void bind();
     void draw();
 
@@ -43,11 +43,11 @@ public:
     bool resize(const Size& size);
     bool isValid() const { return m_texture != nullptr; }
     bool canDraw() const { return m_coordsBuffer.getVertexCount() > 0; }
-    TexturePtr getTexture() { return m_texture; }
-    Size getSize() { return m_texture->getSize(); }
+    TexturePtr getTexture() const { return m_texture; }
+    Size getSize() const { return m_texture->getSize(); }
 
-    bool isBackuping() { return m_backuping; }
-    bool isSmooth() { return m_smooth; }
+    bool isBackuping() const { return m_backuping; }
+    bool isSmooth() const { return m_smooth; }
 
     void setCompositionMode(const CompositionMode mode) { m_compositeMode = mode; }
     void disableBlend() { m_disableBlend = true; }

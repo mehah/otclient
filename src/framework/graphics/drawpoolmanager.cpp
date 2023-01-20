@@ -44,7 +44,7 @@ void DrawPoolManager::terminate()
     }
 }
 
-DrawPool* DrawPoolManager::getCurrentPool() { return m_pools[CURRENT_POOL]; }
+DrawPool* DrawPoolManager::getCurrentPool() const { return m_pools[CURRENT_POOL]; }
 void DrawPoolManager::select(DrawPoolType type) { CURRENT_POOL = static_cast<uint8_t>(type); }
 
 void DrawPoolManager::draw()
@@ -133,18 +133,18 @@ void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)
     g_painter->drawCoords(buffer, obj.drawMode);
 }
 
-void DrawPoolManager::addTexturedCoordsBuffer(const TexturePtr& texture, const CoordsBufferPtr& coords, const Color& color)
+void DrawPoolManager::addTexturedCoordsBuffer(const TexturePtr& texture, const CoordsBufferPtr& coords, const Color& color) const
 {
     DrawPool::DrawMethod method;
     getCurrentPool()->add(color, texture, method, DrawMode::TRIANGLE_STRIP, nullptr, coords);
 }
 
-void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Color& color)
+void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Color& color) const
 {
     addTexturedRect(dest, texture, Rect(Point(), texture->getSize()), color);
 }
 
-void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const DrawBufferPtr& buffer)
+void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const DrawBufferPtr& buffer) const
 {
     if (dest.isEmpty() || src.isEmpty())
         return;
@@ -157,7 +157,7 @@ void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& textur
     getCurrentPool()->add(color, texture, method, DrawMode::TRIANGLE_STRIP, buffer);
 }
 
-void DrawPoolManager::addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color)
+void DrawPoolManager::addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color) const
 {
     if (dest.isEmpty() || src.isEmpty())
         return;
@@ -167,7 +167,7 @@ void DrawPoolManager::addUpsideDownTexturedRect(const Rect& dest, const TextureP
     getCurrentPool()->add(color, texture, method, DrawMode::TRIANGLE_STRIP);
 }
 
-void DrawPoolManager::addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color)
+void DrawPoolManager::addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color) const
 {
     if (dest.isEmpty() || src.isEmpty())
         return;
@@ -177,7 +177,7 @@ void DrawPoolManager::addTexturedRepeatedRect(const Rect& dest, const TexturePtr
     getCurrentPool()->add(color, texture, method);
 }
 
-void DrawPoolManager::addFilledRect(const Rect& dest, const Color& color, const DrawBufferPtr& buffer)
+void DrawPoolManager::addFilledRect(const Rect& dest, const Color& color, const DrawBufferPtr& buffer) const
 {
     if (dest.isEmpty())
         return;
@@ -187,7 +187,7 @@ void DrawPoolManager::addFilledRect(const Rect& dest, const Color& color, const 
     getCurrentPool()->add(color, nullptr, method, DrawMode::TRIANGLES, buffer);
 }
 
-void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color)
+void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color) const
 {
     if (a == b || a == c || b == c)
         return;
@@ -197,7 +197,7 @@ void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Po
     getCurrentPool()->add(color, nullptr, method);
 }
 
-void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, int innerLineWidth)
+void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, int innerLineWidth) const
 {
     if (dest.isEmpty() || innerLineWidth == 0)
         return;
@@ -211,7 +211,7 @@ void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, int 
     getCurrentPool()->add(color, nullptr, method);
 }
 
-void DrawPoolManager::addAction(std::function<void()> action)
+void DrawPoolManager::addAction(std::function<void()> action) const
 {
     getCurrentPool()->m_objects[0][static_cast<uint8_t>(DrawPool::DrawOrder::FIRST)].emplace_back(action);
 }

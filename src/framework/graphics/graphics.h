@@ -35,7 +35,7 @@ public:
 
     void resize(const Size& size);
 
-    int getMaxTextureSize() { return m_maxTextureSize; }
+    int getMaxTextureSize() const { return m_maxTextureSize; }
     const Size& getViewportSize() { return m_viewportSize; }
 
     std::string getVendor() { return m_vendor; }
@@ -43,7 +43,7 @@ public:
     std::string getVersion() { return m_version; }
     std::string getExtensions() { return m_extensions; }
 
-    bool ok() { return m_ok; }
+    bool ok() const { return m_ok; }
 
 private:
     bool m_ok{ false };

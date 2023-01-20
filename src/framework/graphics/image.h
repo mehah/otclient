@@ -47,13 +47,13 @@ public:
     void setPixel(int x, int y, const uint8_t* pixel) { memcpy(&m_pixels[static_cast<size_t>(y * m_size.width() + x) * m_bpp], pixel, m_bpp); }
     void setPixel(int x, int y, const Color& color) { uint32_t tmp = color.rgba(); setPixel(x, y, reinterpret_cast<uint8_t*>(&tmp)); }
 
-    std::vector<uint8_t >& getPixels() { return m_pixels; }
+    std::vector<uint8_t>& getPixels() { return m_pixels; }
     uint8_t* getPixelData() { return &m_pixels[0]; }
-    int getPixelCount() { return m_size.area(); }
-    const Size& getSize() { return m_size; }
-    int getWidth() { return m_size.width(); }
-    int getHeight() { return m_size.height(); }
-    int getBpp() { return m_bpp; }
+    int getPixelCount() const { return m_size.area(); }
+    const Size& getSize() const { return m_size; }
+    int getWidth() const { return m_size.width(); }
+    int getHeight() const { return m_size.height(); }
+    int getBpp() const { return m_bpp; }
     uint8_t* getPixel(int x, int y) { return &m_pixels[static_cast<size_t>(y * m_size.width() + x) * m_bpp]; }
 
     bool hasTransparentPixel() const { return m_transparentPixel; }

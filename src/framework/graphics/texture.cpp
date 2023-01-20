@@ -32,9 +32,10 @@
  // UINT16_MAX = just to avoid conflicts with GL generated ID.
 static std::atomic_uint32_t UID(UINT16_MAX);
 
-Texture::Texture() : m_uniqueId(++UID) {}
+Texture::Texture() : m_uniqueId(++UID) { generateHash(); }
 Texture::Texture(const Size& size) : m_uniqueId(++UID)
 {
+    generateHash();
     if (!setupSize(size))
         return;
 
@@ -47,6 +48,8 @@ Texture::Texture(const Size& size) : m_uniqueId(++UID)
 
 Texture::Texture(const ImagePtr& image, bool buildMipmaps, bool compress) : m_uniqueId(++UID)
 {
+    generateHash();
+
     m_compress = compress;
     m_buildMipmaps = buildMipmaps;
     m_image = image;
@@ -158,6 +161,8 @@ void Texture::createTexture()
 
     glGenTextures(1, &m_id);
     assert(m_id != 0);
+
+    generateHash();
 }
 
 bool Texture::setupSize(const Size& size)
@@ -178,14 +183,14 @@ bool Texture::setupSize(const Size& size)
     return true;
 }
 
-void Texture::setupWrap()
+void Texture::setupWrap() const
 {
     const GLint texParam = m_repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE;
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texParam);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texParam);
 }
 
-void Texture::setupFilters()
+void Texture::setupFilters() const
 {
     GLenum minFilter;
     GLenum magFilter;
@@ -213,7 +218,7 @@ void Texture::setupTranformMatrix()
     }
 }
 
-void Texture::setupPixels(int level, const Size& size, uint8_t* pixels, int channels, bool compress)
+void Texture::setupPixels(int level, const Size& size, uint8_t* pixels, int channels, bool compress) const
 {
     GLenum format = 0;
     switch (channels) {

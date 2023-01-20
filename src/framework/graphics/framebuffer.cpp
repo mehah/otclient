@@ -86,11 +86,6 @@ void FrameBuffer::bind()
     }
 }
 
-void FrameBuffer::release()
-{
-    internalRelease();
-}
-
 void FrameBuffer::draw()
 {
     if (m_disableBlend) glDisable(GL_BLEND);

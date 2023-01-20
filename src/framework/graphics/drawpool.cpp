@@ -53,10 +53,10 @@ DrawPool* DrawPool::create(const DrawPoolType type)
 void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod& method, const DrawMode drawMode, const DrawBufferPtr& drawBuffer, const CoordsBufferPtr& coordsBuffer)
 {
     auto state = PoolState{
-       m_state.transformMatrix, color, m_state.opacity,
+       m_state.transformMatrix, m_state.opacity,
        m_state.compositionMode, m_state.blendEquation,
-       m_state.clipRect, texture, m_state.shaderProgram,
-       m_state.action
+       m_state.clipRect, m_state.shaderProgram,
+       m_state.action, color, texture
     };
 
     if (m_onlyOnceStateFlag > 0) { // Only Once State
@@ -128,15 +128,13 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod& me
                 addCoords(method, coords, DrawMode::TRIANGLES);
         }
 
-        m_objectsByhash.emplace(state.hash,
-                                m_objects[m_currentFloor][m_currentOrder = static_cast<uint8_t>(buffer->m_order)]
-                                .emplace_back(state, buffer));
+        m_currentOrder = static_cast<uint8_t>(buffer->m_order);
+        m_objectsByhash.emplace(state.hash, m_objects[m_currentFloor][m_currentOrder].emplace_back(state, buffer));
 
         return;
     }
 
     m_currentOrder = static_cast<uint8_t>(drawBuffer ? drawBuffer->m_order : drawOrder);
-
     auto& list = m_objects[m_currentFloor][m_currentOrder];
 
     if (!list.empty()) {
@@ -193,9 +191,8 @@ size_t DrawPool::updateHash(PoolState& state, const DrawMethod& method)
         if (state.blendEquation != BlendEquation::ADD)
             stdext::hash_combine(state.hash, state.blendEquation);
 
-        if (state.clipRect.isValid()) stdext::hash_union(state.hash, state.clipRect.hash());
-        if (state.color != Color::white)
-            stdext::hash_combine(state.hash, state.color.rgba());
+        if (state.clipRect.isValid())
+            stdext::hash_union(state.hash, state.clipRect.hash());
 
         if (state.compositionMode != CompositionMode::NORMAL)
             stdext::hash_combine(state.hash, state.compositionMode);
@@ -203,18 +200,17 @@ size_t DrawPool::updateHash(PoolState& state, const DrawMethod& method)
         if (state.opacity < 1.f)
             stdext::hash_combine(state.hash, state.opacity);
 
-        if (state.shaderProgram) {
-            m_shaderRefreshDelay = SHADER_REFRESH_DELAY;
+        if (state.shaderProgram)
             stdext::hash_combine(state.hash, state.shaderProgram->getProgramId());
-        }
-
-        if (state.texture) {
-            // TODO: use uniqueID id when applying multithreading, not forgetting that in the APNG texture, the id changes every frame.
-            stdext::hash_combine(state.hash, !state.texture->isEmpty() ? state.texture->getId() : state.texture->getUniqueId());
-        }
 
         if (state.transformMatrix != DEFAULT_MATRIX3)
             stdext::hash_union(state.hash, state.transformMatrix.hash());
+
+        if (state.color != Color::white)
+            stdext::hash_combine(state.hash, state.color.rgba());
+
+        if (state.texture)
+            stdext::hash_union(state.hash, state.texture->hash());
 
         stdext::hash_union(m_status.second, state.hash);
     }
@@ -264,11 +260,13 @@ void DrawPool::setOpacity(const float opacity, bool onlyOnce)
 
 void DrawPool::setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onlyOnce, const std::function<void()>& action)
 {
-    m_state.shaderProgram = shaderProgram ? shaderProgram.get() : nullptr;
-    m_state.action = action;
-
-    if (m_state.shaderProgram) {
+    if (shaderProgram) {
         m_shaderRefreshDelay = SHADER_REFRESH_DELAY;
+        m_state.shaderProgram = shaderProgram.get();
+        m_state.action = action;
+    } else {
+        m_state.shaderProgram = nullptr;
+        m_state.action = nullptr;
     }
 
     if (onlyOnce) m_onlyOnceStateFlag |= STATE_SHADER_PROGRAM;
@@ -276,7 +274,6 @@ void DrawPool::setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bo
 
 void DrawPool::resetState()
 {
-    clear();
     resetOpacity();
     resetClipRect();
     resetShaderProgram();
@@ -284,6 +281,13 @@ void DrawPool::resetState()
     resetCompositionMode();
     resetTransformMatrix();
 
+    for (auto& objs : m_objects) {
+        for (auto& order : objs)
+            order.clear();
+    }
+
+    m_objectsByhash.clear();
+    m_currentFloor = 0;
     m_status.second = 0;
     m_shaderRefreshDelay = 0;
 }
@@ -305,17 +309,6 @@ bool DrawPool::canRepaint(const bool autoUpdateStatus)
     }
 
     return canRepaint;
-}
-
-void DrawPool::clear()
-{
-    for (auto& objs : m_objects) {
-        for (auto& order : objs)
-            order.clear();
-    }
-
-    m_objectsByhash.clear();
-    m_currentFloor = 0;
 }
 
 void DrawPool::scale(float x, float y)
@@ -345,7 +338,7 @@ void DrawPool::rotate(float angle)
     const Matrix3 rotationMatrix = {
             std::cos(angle), -std::sin(angle),  0.0f,
             std::sin(angle),  std::cos(angle),  0.0f,
-                                 0.0f,             0.0f,  1.0f
+                       0.0f,             0.0f,  1.0f
     };
 
     m_state.transformMatrix = m_state.transformMatrix * rotationMatrix.transposed();

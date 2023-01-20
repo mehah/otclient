@@ -34,7 +34,7 @@ public:
 
     void addParticle(const ParticlePtr& particle);
 
-    void render();
+    void render() const;
     void update();
 
     bool hasFinished() { return m_finished; }

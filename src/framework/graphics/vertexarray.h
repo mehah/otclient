@@ -136,9 +136,8 @@ public:
         m_cached = true;
     }
 
-    bool isCached() { return m_cached; }
-
-    HardwareBuffer* getHardwareCache() { return m_hardwareBuffer; }
+    bool isCached() const { return m_cached; }
+    HardwareBuffer* getHardwareCache() const { return m_hardwareBuffer; }
 
 private:
     bool m_cached{ false };
