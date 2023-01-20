@@ -28,12 +28,18 @@
 #include <framework/graphics/fontmanager.h>
 
  // @bindclass
-class AnimatedText : public Thing
+class AnimatedText : public LuaObject
 {
 public:
     AnimatedText();
+    AnimatedText(const std::string_view text, int color) : AnimatedText() {
+        setText(text);
+        setColor(color);
+    }
 
     void drawText(const Point& dest, const Rect& visibleRect);
+
+    void onAppear();
 
     void setColor(int color) { m_color = Color::from8bit(color); }
     void setText(const std::string_view text) { m_cachedText.setText(text); }
@@ -45,16 +51,15 @@ public:
     Timer getTimer() { return m_animationTimer; }
 
     bool merge(const AnimatedTextPtr& other);
+    Position getPosition() { return m_position; }
+    void setPosition(const Position& position) { m_position = position; }
 
     AnimatedTextPtr asAnimatedText() { return static_self_cast<AnimatedText>(); }
-    bool isAnimatedText() override { return true; }
-
-protected:
-    void onAppear() override;
 
 private:
     Color m_color;
     Timer m_animationTimer;
     CachedText m_cachedText;
     Point m_offset;
+    Position m_position;
 };

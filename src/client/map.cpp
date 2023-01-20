@@ -126,71 +126,66 @@ void Map::cleanDynamicThings()
 
 void Map::addThing(const ThingPtr& thing, const Position& pos, int16_t stackPos)
 {
-    if (!thing)
+    if (!thing || thing->isItem() && thing->getId() == 0)
         return;
 
-    if (thing->isItem()) {
-        if (const auto& item = thing->static_self_cast<Item>()) {
-            if (item->getClientId() == 0) {
-                return;
-            }
-        }
-    }
-
-    if (thing->isItem() || thing->isCreature() || thing->isEffect()) {
-        if (const auto& tile = getOrCreateTile(pos)) {
-            if (m_floatingEffect || !thing->isEffect() || tile->getGround()) {
-                tile->addThing(thing, stackPos);
-                notificateTileUpdate(pos, thing, Otc::OPERATION_ADD);
-            }
-        }
-    } else {
-        if (thing->isMissile()) {
-            m_floorMissiles[pos.z].push_back(thing->static_self_cast<Missile>());
-        } else if (thing->isAnimatedText()) {
-            // this code will stack animated texts of the same color
-            const auto& animatedText = thing->static_self_cast<AnimatedText>();
-            AnimatedTextPtr prevAnimatedText;
-
-            bool merged = false;
-            for (const auto& other : m_animatedTexts) {
-                if (other->getPosition() == pos) {
-                    prevAnimatedText = other;
-                    if (other->merge(animatedText)) {
-                        merged = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!merged) {
-                if (prevAnimatedText) {
-                    Point offset = prevAnimatedText->getOffset();
-                    if (const float t = prevAnimatedText->getTimer().ticksElapsed();
-                        t < ANIMATED_TEXT_DURATION / 4.0) { // didnt move 12 pixels
-                        const int32_t y = 12 - 48 * t / static_cast<float>(ANIMATED_TEXT_DURATION);
-                        offset += Point(0, y);
-                    }
-                    offset.y = std::min<int32_t>(offset.y, 12);
-                    animatedText->setOffset(offset);
-                }
-                m_animatedTexts.push_back(animatedText);
-            }
-        } else if (thing->isStaticText()) {
-            const auto& staticText = thing->static_self_cast<StaticText>();
-            for (const auto& other : m_staticTexts) {
-                // try to combine messages
-                if (other->getPosition() == pos && other->addMessage(staticText->getName(), staticText->getMessageMode(), staticText->getFirstMessage())) {
-                    return;
-                }
-            }
-
-            m_staticTexts.push_back(staticText);
-        }
-
+    if (thing->isMissile()) {
+        m_floorMissiles[pos.z].emplace_back(thing->static_self_cast<Missile>());
         thing->setPosition(pos);
         thing->onAppear();
     }
+
+    if (const auto& tile = getOrCreateTile(pos)) {
+        if (m_floatingEffect || !thing->isEffect() || tile->getGround()) {
+            tile->addThing(thing, stackPos);
+            notificateTileUpdate(pos, thing, Otc::OPERATION_ADD);
+        }
+    }
+}
+
+void Map::addStaticText(const StaticTextPtr& txt, const Position& pos) {
+    for (const auto& other : m_staticTexts) {
+        // try to combine messages
+        if (other->getPosition() == pos && other->addMessage(txt->getName(), txt->getMessageMode(), txt->getFirstMessage())) {
+            return;
+        }
+    }
+
+    txt->setPosition(pos);
+    m_staticTexts.emplace_back(txt);
+}
+
+void Map::addAnimatedText(const AnimatedTextPtr& txt, const Position& pos) {
+    // this code will stack animated texts of the same color
+    AnimatedTextPtr prevAnimatedText;
+
+    bool merged = false;
+    for (const auto& other : m_animatedTexts) {
+        if (other->getPosition() == pos) {
+            prevAnimatedText = other;
+            if (other->merge(txt)) {
+                merged = true;
+                break;
+            }
+        }
+    }
+
+    if (!merged) {
+        if (prevAnimatedText) {
+            Point offset = prevAnimatedText->getOffset();
+            if (const float t = prevAnimatedText->getTimer().ticksElapsed();
+                t < ANIMATED_TEXT_DURATION / 4.0) { // didnt move 12 pixels
+                const int32_t y = 12 - 48 * t / static_cast<float>(ANIMATED_TEXT_DURATION);
+                offset += Point(0, y);
+            }
+            offset.y = std::min<int32_t>(offset.y, 12);
+            txt->setOffset(offset);
+        }
+        m_animatedTexts.push_back(txt);
+    }
+
+    txt->setPosition(pos);
+    txt->onAppear();
 }
 
 ThingPtr Map::getThing(const Position& pos, int16_t stackPos)
@@ -206,29 +201,17 @@ bool Map::removeThing(const ThingPtr& thing)
     if (!thing)
         return false;
 
-    if (thing->isAnimatedText()) {
-        const auto& animatedText = thing->static_self_cast<AnimatedText>();
-        const auto it = std::find(m_animatedTexts.begin(), m_animatedTexts.end(), animatedText);
-        if (it != m_animatedTexts.end()) {
-            m_animatedTexts.erase(it);
-            return true;
-        }
-    } else if (thing->isStaticText()) {
-        const auto& staticText = thing->static_self_cast<StaticText>();
-        const auto it = std::find(m_staticTexts.begin(), m_staticTexts.end(), staticText);
-        if (it != m_staticTexts.end()) {
-            m_staticTexts.erase(it);
-            return true;
-        }
-    } else if (thing->isMissile()) {
-        const auto& missile = thing->static_self_cast<Missile>();
-        const uint8_t z = missile->getPosition().z;
-        const auto it = std::find(m_floorMissiles[z].begin(), m_floorMissiles[z].end(), missile);
-        if (it != m_floorMissiles[z].end()) {
-            m_floorMissiles[z].erase(it);
-            return true;
-        }
-    } else if (const TilePtr& tile = thing->getTile()) {
+    if (thing->isMissile()) {
+        auto& missiles = m_floorMissiles[thing->getPosition().z];
+        const auto it = std::find(missiles.begin(), missiles.end(), thing->static_self_cast<Missile>());
+        if (it == missiles.end())
+            return false;
+
+        missiles.erase(it);
+        return true;
+    }
+
+    if (const TilePtr& tile = thing->getTile()) {
         if (tile->removeThing(thing)) {
             notificateTileUpdate(thing->getPosition(), thing, Otc::OPERATION_REMOVE);
             return true;
@@ -244,6 +227,24 @@ bool Map::removeThingByPos(const Position& pos, int16_t stackPos)
         return removeThing(tile->getThing(stackPos));
 
     return false;
+}
+
+bool Map::removeStaticText(const StaticTextPtr& txt) {
+    const auto it = std::find(m_staticTexts.begin(), m_staticTexts.end(), txt);
+    if (it == m_staticTexts.end())
+        return false;
+
+    m_staticTexts.erase(it);
+    return true;
+}
+
+bool Map::removeAnimatedText(const AnimatedTextPtr& txt) {
+    const auto it = std::find(m_animatedTexts.begin(), m_animatedTexts.end(), txt);
+    if (it == m_animatedTexts.end())
+        return false;
+
+    m_animatedTexts.erase(it);
+    return true;
 }
 
 void Map::colorizeThing(const ThingPtr& thing, const Color& color)

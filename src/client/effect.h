@@ -32,13 +32,10 @@ class Effect : public Thing
 public:
     void drawEffect(const Point& dest, uint32_t flags, int offsetX, int offsetY, LightView* lightView = nullptr);
 
-    uint32_t getId() override { return m_id; }
-
     void setId(uint32_t id) override;
     void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false) override;
 
     EffectPtr asEffect() { return static_self_cast<Effect>(); }
-    bool isEffect() override { return true; }
 
     bool waitFor(const EffectPtr&);
 
@@ -47,8 +44,6 @@ protected:
 
 private:
     Timer m_animationTimer;
-
-    uint16_t m_id;
 
     int m_duration{ 0 };
     int m_timeToStartDrawing{ 0 };

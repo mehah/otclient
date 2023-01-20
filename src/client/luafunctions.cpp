@@ -126,11 +126,15 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_map", "isCovered", &Map::isCovered, &g_map);
     g_lua.bindSingletonFunction("g_map", "isCompletelyCovered", &Map::isCompletelyCovered, &g_map);
     g_lua.bindSingletonFunction("g_map", "addThing", &Map::addThing, &g_map);
+    g_lua.bindSingletonFunction("g_map", "addStaticText", &Map::addStaticText, &g_map);
+    g_lua.bindSingletonFunction("g_map", "addAnimatedText", &Map::addAnimatedText, &g_map);
     g_lua.bindSingletonFunction("g_map", "getThing", &Map::getThing, &g_map);
     g_lua.bindSingletonFunction("g_map", "removeThingByPos", &Map::removeThingByPos, &g_map);
     g_lua.bindSingletonFunction("g_map", "removeThing", &Map::removeThing, &g_map);
-    g_lua.bindSingletonFunction("g_map", "colorizeThing", &Map::colorizeThing, &g_map);
+    g_lua.bindSingletonFunction("g_map", "removeStaticText", &Map::removeStaticText, &g_map);
+    g_lua.bindSingletonFunction("g_map", "removeAnimatedText", &Map::removeAnimatedText, &g_map);
     g_lua.bindSingletonFunction("g_map", "removeThingColor", &Map::removeThingColor, &g_map);
+    g_lua.bindSingletonFunction("g_map", "colorizeThing", &Map::colorizeThing, &g_map);
     g_lua.bindSingletonFunction("g_map", "clean", &Map::clean, &g_map);
     g_lua.bindSingletonFunction("g_map", "cleanTile", &Map::cleanTile, &g_map);
     g_lua.bindSingletonFunction("g_map", "cleanTexts", &Map::cleanTexts, &g_map);
@@ -412,8 +416,6 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Thing>("isMissile", &Thing::isMissile);
     g_lua.bindClassMemberFunction<Thing>("isPlayer", &Thing::isPlayer);
     g_lua.bindClassMemberFunction<Thing>("isLocalPlayer", &Thing::isLocalPlayer);
-    g_lua.bindClassMemberFunction<Thing>("isAnimatedText", &Thing::isAnimatedText);
-    g_lua.bindClassMemberFunction<Thing>("isStaticText", &Thing::isStaticText);
     g_lua.bindClassMemberFunction<Thing>("isGround", &Thing::isGround);
     g_lua.bindClassMemberFunction<Thing>("isGroundBorder", &Thing::isGroundBorder);
     g_lua.bindClassMemberFunction<Thing>("isOnBottom", &Thing::isOnBottom);
@@ -685,7 +687,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<AttachedEffect>("canDrawOnUI", &AttachedEffect::canDrawOnUI);
     g_lua.bindClassMemberFunction<AttachedEffect>("setCanDrawOnUI", &AttachedEffect::setCanDrawOnUI);
 
-    g_lua.registerClass<StaticText, Thing>();
+    g_lua.registerClass<StaticText>();
     g_lua.bindClassStaticFunction<StaticText>("create", [] { return std::make_shared<StaticText>(); });
     g_lua.bindClassMemberFunction<StaticText>("addMessage", &StaticText::addMessage);
     g_lua.bindClassMemberFunction<StaticText>("setText", &StaticText::setText);
@@ -693,7 +695,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<StaticText>("setColor", &StaticText::setColor);
     g_lua.bindClassMemberFunction<StaticText>("getColor", &StaticText::getColor);
 
-    g_lua.registerClass<AnimatedText, Thing>();
+    g_lua.registerClass<AnimatedText>();
 
     g_lua.registerClass<Player, Creature>();
     g_lua.registerClass<Npc, Creature>();

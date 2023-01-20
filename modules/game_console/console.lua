@@ -1499,8 +1499,9 @@ function onTalk(name, level, mode, message, channelId, creaturePos)
             end
             staticText:setColor(speaktype.color)
         end
+
         staticText:addMessage(name, mode, staticMessage)
-        g_map.addThing(staticText, creaturePos, -1)
+        g_map.addStaticText(staticText, creaturePos)
     end
 
     local defaultMessage = mode <= 3 and true or false

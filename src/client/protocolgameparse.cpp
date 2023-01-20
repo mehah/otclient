@@ -1302,14 +1302,10 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
 
 void ProtocolGame::parseAnimatedText(const InputMessagePtr& msg)
 {
-    const Position& position = getPosition(msg);
+    const auto& position = getPosition(msg);
     const uint8_t color = msg->getU8();
     const auto text = msg->getString();
-
-    const auto& animatedText = std::make_shared<AnimatedText>();
-    animatedText->setColor(color);
-    animatedText->setText(text);
-    g_map.addThing(animatedText, position);
+    g_map.addAnimatedText(std::make_shared<AnimatedText>(text, color), position);
 }
 
 void ProtocolGame::parseDistanceMissile(const InputMessagePtr& msg)
@@ -1974,10 +1970,8 @@ void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
             for (int_fast32_t i = 0; i < 2; ++i) {
                 if (value[i] == 0)
                     continue;
-                const auto& animatedText = std::make_shared<AnimatedText>();
-                animatedText->setColor(color[i]);
-                animatedText->setText(std::to_string(value[i]));
-                g_map.addThing(animatedText, pos);
+
+                g_map.addAnimatedText(std::make_shared<AnimatedText>(std::to_string(value[i]), color[i]), pos);
             }
             break;
         }
@@ -1992,10 +1986,7 @@ void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
             const uint8_t color = msg->getU8();
             text = msg->getString();
 
-            const auto& animatedText = std::make_shared<AnimatedText>();
-            animatedText->setColor(color);
-            animatedText->setText(std::to_string(value));
-            g_map.addThing(animatedText, pos);
+            g_map.addAnimatedText(std::make_shared<AnimatedText>(std::to_string(value), color), pos);
             break;
         }
         case Otc::MessageInvalid:
@@ -2507,9 +2498,6 @@ ThingPtr ProtocolGame::getThing(const InputMessagePtr& msg)
     if (id == Proto::UnknownCreature || id == Proto::OutdatedCreature || id == Proto::Creature)
         return getCreature(msg, id);
 
-    if (id == Proto::StaticText) // otclient only
-        return getStaticText(msg, id);
-
     return getItem(msg, id); // item
 }
 
@@ -2824,20 +2812,6 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
     }
 
     return item;
-}
-
-StaticTextPtr ProtocolGame::getStaticText(const InputMessagePtr& msg, int)
-{
-    const uint8_t colorByte = msg->getU8();
-    const Color color = Color::from8bit(colorByte);
-    const auto& fontName = msg->getString();
-    const auto& text = msg->getString();
-
-    const auto& staticText = std::make_shared<StaticText>();
-    staticText->setText(text);
-    staticText->setFont(fontName);
-    staticText->setColor(color);
-    return staticText;
 }
 
 Position ProtocolGame::getPosition(const InputMessagePtr& msg)

@@ -29,9 +29,7 @@ Http g_http;
 void Http::init()
 {
     m_working = true;
-    m_thread = std::thread([&] {
-        m_ios.run();
-    });
+    m_thread = std::thread([this] { m_ios.run(); });
 }
 
 void Http::terminate()

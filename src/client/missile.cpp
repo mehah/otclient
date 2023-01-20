@@ -28,7 +28,7 @@
 
 void Missile::drawMissile(const Point& dest, LightView* lightView)
 {
-    if (m_id == 0 || !m_drawBuffer)
+    if (!canDraw() || !m_drawBuffer)
         return;
 
     const float fraction = m_animationTimer.ticksElapsed() / m_duration;
@@ -87,8 +87,7 @@ void Missile::setPath(const Position& fromPosition, const Position& toPosition)
     }
 
     // schedule removal
-    const auto self = asMissile();
-    g_dispatcher.scheduleEvent([self] { g_map.removeThing(self); }, m_duration);
+    g_dispatcher.scheduleEvent([self = asMissile()] { g_map.removeThing(self); }, m_duration);
 }
 
 void Missile::setId(uint32_t id)
@@ -96,6 +95,6 @@ void Missile::setId(uint32_t id)
     if (!g_things.isValidDatId(id, ThingCategoryMissile))
         id = 0;
 
-    m_id = id;
-    m_thingType = g_things.getThingType(m_id, ThingCategoryMissile).get();
+    m_clientId = id;
+    m_thingType = g_things.getThingType(id, ThingCategoryMissile).get();
 }

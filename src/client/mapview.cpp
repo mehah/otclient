@@ -44,7 +44,7 @@
 
 MapView::MapView() : m_pool(g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP))
 {
-    m_pool->onBeforeDraw([&] {
+    m_pool->onBeforeDraw([this] {
         float fadeOpacity = 1.f;
         if (!m_shaderSwitchDone && m_fadeOutTime > 0) {
             fadeOpacity = 1.f - (m_fadeTimer.timeElapsed() / m_fadeOutTime);
@@ -80,7 +80,7 @@ MapView::MapView() : m_pool(g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP))
         g_painter->setOpacity(fadeOpacity);
     });
 
-    m_pool->onAfterDraw([&] {
+    m_pool->onAfterDraw([this] {
         g_painter->resetShaderProgram();
         g_painter->resetOpacity();
     });
@@ -413,7 +413,7 @@ void MapView::updateGeometry(const Size& visibleDimension)
     m_virtualCenterOffset = (drawDimension / 2 - Size(1)).toPoint();
     m_rectDimension = { 0, 0, bufferSize };
 
-    g_mainDispatcher.addEvent([&, bufferSize, drawDimension, tileSize]() {
+    g_mainDispatcher.addEvent([=, this]() {
         m_pool->resize(bufferSize);
         if (m_lightView) m_lightView->resize(drawDimension, tileSize);
     });
@@ -789,7 +789,7 @@ void MapView::setDrawLights(bool enable)
             return;
 
         m_lightView = std::make_shared<LightView>();
-        g_mainDispatcher.addEvent([&]
+        g_mainDispatcher.addEvent([this]
         () { if (m_lightView) m_lightView->resize(m_drawDimension, m_tileSize); });
 
         requestUpdateVisibleTiles();
@@ -801,7 +801,7 @@ void MapView::setDrawLights(bool enable)
 void MapView::updateViewportDirectionCache()
 {
     for (uint8_t dir = Otc::North; dir <= Otc::InvalidDirection; ++dir) {
-        AwareRange& vp = m_viewPortDirection[dir];
+        auto& vp = m_viewPortDirection[dir];
         vp.top = m_posInfo.awareRange.top;
         vp.right = m_posInfo.awareRange.right;
         vp.bottom = vp.top;

@@ -89,8 +89,6 @@ public:
     int getCountOrSubType() { return m_countOrSubType; }
     int getSubType();
     int getCount() { return isStackable() ? m_countOrSubType : 1; }
-    uint32_t getId() override { return m_clientId; }
-    uint16_t getClientId() { return m_clientId; }
 
     bool isValid() { return getThingType() != nullptr; }
 
@@ -152,7 +150,6 @@ public:
 private:
     void createBuffer();
 
-    uint16_t m_clientId{ 0 };
     uint8_t m_countOrSubType{ 0 };
 
     Color m_color{ Color::white };

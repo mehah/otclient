@@ -578,7 +578,7 @@ bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
         m_walkEvent = nullptr;
     }
 
-    const Position toPos = m_localPlayer->getPosition().translatedToDirection(direction);
+    const auto& toPos = m_localPlayer->getPosition().translatedToDirection(direction);
 
     // only do prewalks to walkable tiles (like grounds and not walls)
     if (const auto& toTile = g_map.getTile(toPos); toTile && toTile->isWalkable()) {

@@ -26,7 +26,7 @@
 #include <framework/graphics/cachedtext.h>
 
  // @bindclass
-class StaticText : public Thing
+class StaticText : public LuaObject
 {
 public:
     StaticText();
@@ -44,10 +44,12 @@ public:
     bool addMessage(const std::string_view name, Otc::MessageMode mode, const std::string_view text);
 
     StaticTextPtr asStaticText() { return static_self_cast<StaticText>(); }
-    bool isStaticText() override { return true; }
 
     void setColor(const Color& color) { m_color = color; }
     Color getColor() { return m_color; }
+
+    Position getPosition() { return m_position; }
+    void setPosition(const Position& position) { m_position = position; }
 
 private:
     void update();
@@ -60,4 +62,5 @@ private:
     Color m_color{ Color::white };
     CachedText m_cachedText;
     ScheduledEventPtr m_updateEvent;
+    Position m_position;
 };

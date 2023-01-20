@@ -85,7 +85,7 @@ bool UIVerticalLayout::internalUpdate()
     if (m_alignBottom) {
         for (auto it = parentWidget->m_children.rbegin(); it != parentWidget->m_children.rend(); ++it)
             action(*it);
-    } else for (const UIWidgetPtr& widget : parentWidget->m_children)
+    } else for (const auto& widget : parentWidget->m_children)
         action(widget);
 
     preferredHeight -= m_spacing;

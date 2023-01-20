@@ -416,7 +416,7 @@ void WIN32Window::internalRestoreGLContext()
     if (!wglMakeCurrent(m_deviceContext, m_wglContext))
         g_logger.fatal("Unable to make current WGL context");
 #endif
-    }
+}
 
 bool WIN32Window::isExtensionSupported(const char* ext)
 {
@@ -468,7 +468,7 @@ void WIN32Window::resize(const Size& size)
         MoveWindow(m_window, windowRect.x(), windowRect.y(), windowRect.width(), windowRect.height(), TRUE);
         if (m_hidden)
             ShowWindow(m_window, SW_HIDE);
-});
+    });
 }
 
 void WIN32Window::show()
@@ -484,7 +484,7 @@ void WIN32Window::show()
 
 void WIN32Window::hide()
 {
-    g_mainDispatcher.addEvent([&] {
+    g_mainDispatcher.addEvent([this] {
         m_hidden = true;
         ShowWindow(m_window, SW_HIDE);
     });
@@ -492,7 +492,7 @@ void WIN32Window::hide()
 
 void WIN32Window::maximize()
 {
-    g_mainDispatcher.addEvent([&] {
+    g_mainDispatcher.addEvent([this] {
         if (!m_hidden)
             ShowWindow(m_window, SW_MAXIMIZE);
         else
@@ -594,7 +594,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
             m_focused = !(wParam == WA_INACTIVE);
             releaseAllKeys();
             break;
-    }
+        }
         case WM_SETFOCUS:
         case WM_KILLFOCUS:
         {
@@ -810,7 +810,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
         }
         default:
             return DefWindowProc(hWnd, uMsg, wParam, lParam);
-}
+    }
 
     if (m_inputEvent.keyboardModifiers || notificateMapKeyEvent) {
         g_map.notificateKeyRelease(m_inputEvent);
@@ -881,7 +881,7 @@ void WIN32Window::setMouseCursor(int cursorId)
 
 void WIN32Window::restoreMouseCursor()
 {
-    g_mainDispatcher.addEvent([&] {
+    g_mainDispatcher.addEvent([this] {
         if (m_cursor) {
             m_cursor = nullptr;
             SetCursor(m_defaultCursor);

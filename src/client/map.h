@@ -205,10 +205,17 @@ public:
     void cleanTexts() { m_animatedTexts.clear(); m_staticTexts.clear(); }
 
     // thing related
-    void addThing(const ThingPtr& thing, const Position& pos, int16_t stackPos = -1);
     ThingPtr getThing(const Position& pos, int16_t stackPos);
+    void addThing(const ThingPtr& thing, const Position& pos, int16_t stackPos = -1);
     bool removeThing(const ThingPtr& thing);
     bool removeThingByPos(const Position& pos, int16_t stackPos);
+
+    void addStaticText(const StaticTextPtr& txt, const Position& pos);
+    bool removeStaticText(const StaticTextPtr& txt);
+
+    void addAnimatedText(const AnimatedTextPtr& txt, const Position& pos);
+    bool removeAnimatedText(const AnimatedTextPtr& txt);
+
     void colorizeThing(const ThingPtr& thing, const Color& color);
     void removeThingColor(const ThingPtr& thing);
 

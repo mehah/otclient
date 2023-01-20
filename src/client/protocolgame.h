@@ -307,7 +307,6 @@ public:
     ThingPtr getThing(const InputMessagePtr& msg);
     ThingPtr getMappedThing(const InputMessagePtr& msg);
     CreaturePtr getCreature(const InputMessagePtr& msg, int type = 0);
-    StaticTextPtr getStaticText(const InputMessagePtr& msg, int type = 0);
     ItemPtr getItem(const InputMessagePtr& msg, int id = 0);
     Position getPosition(const InputMessagePtr& msg);
 

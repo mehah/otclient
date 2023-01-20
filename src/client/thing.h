@@ -41,7 +41,8 @@ public:
     virtual void setId(uint32_t /*id*/) {}
     virtual void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false);
 
-    virtual uint32_t getId() { return 0; }
+    virtual uint32_t getId() { return m_clientId; }
+    uint16_t getClientId() { return m_clientId; }
 
     Position getPosition() { return m_position; }
 
@@ -60,8 +61,6 @@ public:
     virtual bool isMonster() { return false; }
     virtual bool isPlayer() { return false; }
     virtual bool isLocalPlayer() { return false; }
-    virtual bool isAnimatedText() { return false; }
-    virtual bool isStaticText() { return false; }
 
     ThingType* getThingType() { return m_thingType; }
     Animator* getAnimator() { return m_thingType->getAnimator(); }
@@ -158,7 +157,7 @@ public:
     uint16_t getClassification() const { return m_thingType->getClassification(); }
 
     void canDraw(bool canDraw) { m_canDraw = canDraw; }
-    bool canDraw() const { return m_canDraw; }
+    inline bool canDraw() const { return m_canDraw && m_clientId > 0; }
 
     void destroyBuffer() { m_drawBuffer = nullptr; }
 
@@ -194,6 +193,8 @@ protected:
     uint8_t m_numPatternX{ 0 };
     uint8_t m_numPatternY{ 0 };
     uint8_t m_numPatternZ{ 0 };
+
+    uint16_t m_clientId{ 0 };
 
     Position m_position;
     ThingType* m_thingType{ nullptr };
