@@ -24,8 +24,6 @@
 
 #include "particlesystem.h"
 
-ParticleEffectType::ParticleEffectType() = default;
-
 void ParticleEffectType::load(const OTMLNodePtr& node)
 {
     m_node = node->clone();

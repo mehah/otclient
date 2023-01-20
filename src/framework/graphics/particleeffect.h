@@ -29,8 +29,6 @@
 class ParticleEffectType : public LuaObject
 {
 public:
-    ParticleEffectType();
-
     void load(const OTMLNodePtr& node);
 
     std::string getName() { return m_name; }

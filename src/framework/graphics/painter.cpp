@@ -149,7 +149,7 @@ void Painter::clear(const Color& color)
 
 void Painter::clearRect(const Color& color, const Rect& rect)
 {
-    const Rect oldClipRect = m_clipRect;
+    const auto& oldClipRect = m_clipRect;
     setClipRect(rect);
     glClearColor(color.rF(), color.gF(), color.bF(), color.aF());
     glClear(GL_COLOR_BUFFER_BIT);

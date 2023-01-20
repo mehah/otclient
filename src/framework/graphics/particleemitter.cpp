@@ -27,7 +27,7 @@
 
 void ParticleEmitter::load(const OTMLNodePtr& node)
 {
-    for (const OTMLNodePtr& childNode : node->children()) {
+    for (const auto& childNode : node->children()) {
         // self related
         if (childNode->tag() == "position")
             m_position = childNode->value<Point>();
@@ -64,7 +64,7 @@ void ParticleEmitter::update(float elapsedTime, const ParticleSystemPtr& system)
         return;
 
     const int nextBurst = std::floor((m_elapsedTime - m_delay) * m_burstRate) + 1;
-    const ParticleType* type = m_particleType.get();
+    const auto* type = m_particleType.get();
     for (int b = m_currentBurst; b < nextBurst; ++b) {
         // every burst created at same position.
         const float pRadius = stdext::random_range(type->pMinPositionRadius, type->pMaxPositionRadius);
@@ -78,12 +78,12 @@ void ParticleEmitter::update(float elapsedTime, const ParticleSystemPtr& system)
             // particles initial velocity
             const float pVelocityAbs = stdext::random_range(type->pMinVelocity, type->pMaxVelocity);
             const float pVelocityAngle = stdext::random_range(type->pMinVelocityAngle, type->pMaxVelocityAngle);
-            PointF pVelocity(pVelocityAbs * std::cos(pVelocityAngle), pVelocityAbs * std::sin(pVelocityAngle));
+            const PointF pVelocity(pVelocityAbs * std::cos(pVelocityAngle), pVelocityAbs * std::sin(pVelocityAngle));
 
             // particles initial acceleration
             const float pAccelerationAbs = stdext::random_range(type->pMinAcceleration, type->pMaxAcceleration);
             const float pAccelerationAngle = stdext::random_range(type->pMinAccelerationAngle, type->pMaxAccelerationAngle);
-            PointF pAcceleration(pAccelerationAbs * std::cos(pAccelerationAngle), pAccelerationAbs * std::sin(pAccelerationAngle));
+            const PointF pAcceleration(pAccelerationAbs * std::cos(pAccelerationAngle), pAccelerationAbs * std::sin(pAccelerationAngle));
 
             system->addParticle(std::make_shared<Particle>(pPosition, type->pStartSize, type->pFinalSize,
                                 pVelocity, pAcceleration,
