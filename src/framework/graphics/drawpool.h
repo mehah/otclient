@@ -87,19 +87,9 @@ public:
         TexturePtr texture;
         PainterShaderProgram* shaderProgram{ nullptr };
         std::function<void()> action{ nullptr };
+        size_t hash;
 
-        bool operator==(const PoolState& s2) const
-        {
-            return
-                transformMatrix == s2.transformMatrix &&
-                color == s2.color &&
-                opacity == s2.opacity &&
-                compositionMode == s2.compositionMode &&
-                blendEquation == s2.blendEquation &&
-                clipRect == s2.clipRect &&
-                texture == s2.texture &&
-                shaderProgram == s2.shaderProgram;
-        }
+        bool operator==(const PoolState& s2) const { return hash == s2.hash; }
     };
 
 protected:
@@ -124,14 +114,14 @@ protected:
     struct DrawObject
     {
         DrawObject(std::function<void()> action) : action(std::move(action)) {}
-        DrawObject(const PoolState& state, const DrawBufferPtr& buffer) : buffer(buffer), state(state) {}
-        DrawObject(const DrawMode drawMode, const PoolState& state, const DrawMethod& method) :
-            drawMode(drawMode), state(state) { methods.emplace_back(method); }
+        DrawObject(PoolState& state, const DrawBufferPtr& buffer) : buffer(buffer), state(std::move(state)) {}
+        DrawObject(const DrawMode drawMode, PoolState& state, DrawMethod& method) :
+            drawMode(drawMode), state(std::move(state)) { methods.emplace_back(std::move(method)); }
 
-        void addMethod(const DrawMethod& method)
+        void addMethod(DrawMethod& method)
         {
             drawMode = DrawMode::TRIANGLES;
-            methods.emplace_back(method);
+            methods.emplace_back(std::move(method));
         }
 
         DrawMode drawMode{ DrawMode::TRIANGLES };
@@ -166,11 +156,11 @@ private:
     static constexpr uint8_t ARR_MAX_Z = MAX_Z + 1;
     static DrawPool* create(const DrawPoolType type);
 
-    void add(const Color& color, const TexturePtr& texture, const DrawPool::DrawMethod& method,
+    void add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod& method,
              DrawMode drawMode = DrawMode::TRIANGLES, const DrawBufferPtr& drawBuffer = nullptr,
              const CoordsBufferPtr& coordsBuffer = nullptr);
 
-    void updateHash(const PoolState& state, const DrawPool::DrawMethod& method, size_t& stateHash, size_t& methodHash);
+    size_t updateHash(PoolState& state, const DrawPool::DrawMethod& method);
 
     float getOpacity() { return m_state.opacity; }
     Rect getClipRect() { return m_state.clipRect; }

@@ -135,7 +135,8 @@ void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)
 
 void DrawPoolManager::addTexturedCoordsBuffer(const TexturePtr& texture, const CoordsBufferPtr& coords, const Color& color)
 {
-    getCurrentPool()->add(color, texture, {}, DrawMode::TRIANGLE_STRIP, nullptr, coords);
+    DrawPool::DrawMethod method;
+    getCurrentPool()->add(color, texture, method, DrawMode::TRIANGLE_STRIP, nullptr, coords);
 }
 
 void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Color& color)
@@ -148,7 +149,7 @@ void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& textur
     if (dest.isEmpty() || src.isEmpty())
         return;
 
-    const DrawPool::DrawMethod method{
+    DrawPool::DrawMethod method{
         .type = DrawPool::DrawMethodType::RECT,
         .dest = dest, .src = src
     };
@@ -161,7 +162,7 @@ void DrawPoolManager::addUpsideDownTexturedRect(const Rect& dest, const TextureP
     if (dest.isEmpty() || src.isEmpty())
         return;
 
-    const DrawPool::DrawMethod method{ DrawPool::DrawMethodType::UPSIDEDOWN_RECT, dest, src };
+    DrawPool::DrawMethod method{ DrawPool::DrawMethodType::UPSIDEDOWN_RECT, dest, src };
 
     getCurrentPool()->add(color, texture, method, DrawMode::TRIANGLE_STRIP);
 }
@@ -171,7 +172,7 @@ void DrawPoolManager::addTexturedRepeatedRect(const Rect& dest, const TexturePtr
     if (dest.isEmpty() || src.isEmpty())
         return;
 
-    const DrawPool::DrawMethod method{ DrawPool::DrawMethodType::REPEATED_RECT, dest, src };
+    DrawPool::DrawMethod method{ DrawPool::DrawMethodType::REPEATED_RECT, dest, src };
 
     getCurrentPool()->add(color, texture, method);
 }
@@ -181,7 +182,7 @@ void DrawPoolManager::addFilledRect(const Rect& dest, const Color& color, const 
     if (dest.isEmpty())
         return;
 
-    const DrawPool::DrawMethod method{ DrawPool::DrawMethodType::RECT, dest };
+    DrawPool::DrawMethod method{ DrawPool::DrawMethodType::RECT, dest };
 
     getCurrentPool()->add(color, nullptr, method, DrawMode::TRIANGLES, buffer);
 }
@@ -191,7 +192,7 @@ void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Po
     if (a == b || a == c || b == c)
         return;
 
-    const DrawPool::DrawMethod method{ .type = DrawPool::DrawMethodType::TRIANGLE, .a = a, .b = b, .c = c };
+    DrawPool::DrawMethod method{ .type = DrawPool::DrawMethodType::TRIANGLE, .a = a, .b = b, .c = c };
 
     getCurrentPool()->add(color, nullptr, method);
 }
@@ -201,7 +202,7 @@ void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, int 
     if (dest.isEmpty() || innerLineWidth == 0)
         return;
 
-    const DrawPool::DrawMethod method{
+    DrawPool::DrawMethod method{
         .type = DrawPool::DrawMethodType::BOUNDING_RECT,
         .dest = dest,
         .intValue = static_cast<uint16_t>(innerLineWidth)

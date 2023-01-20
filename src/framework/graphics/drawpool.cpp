@@ -50,9 +50,9 @@ DrawPool* DrawPool::create(const DrawPoolType type)
     return pool;
 }
 
-void DrawPool::add(const Color& color, const TexturePtr& texture, const DrawMethod& method, const DrawMode drawMode, const DrawBufferPtr& drawBuffer, const CoordsBufferPtr& coordsBuffer)
+void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod& method, const DrawMode drawMode, const DrawBufferPtr& drawBuffer, const CoordsBufferPtr& coordsBuffer)
 {
-    const auto& state = PoolState{
+    auto state = PoolState{
        m_state.transformMatrix, color, m_state.opacity,
        m_state.compositionMode, m_state.blendEquation,
        m_state.clipRect, texture, m_state.shaderProgram,
@@ -78,12 +78,12 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const DrawMeth
         m_onlyOnceStateFlag = 0;
     }
 
-    size_t stateHash = 0;
-    size_t methodHash = 0;
-    updateHash(state, method, stateHash, methodHash);
+    size_t methodHash = updateHash(state, method);
+
+    const DrawOrder drawOrder = m_type == DrawPoolType::MAP ? DrawPool::DrawOrder::THIRD : DrawPool::DrawOrder::FIRST;
 
     if (m_type != DrawPoolType::FOREGROUND && (m_alwaysGroupDrawings || (drawBuffer && drawBuffer->m_agroup))) {
-        if (auto it = m_objectsByhash.find(stateHash); it != m_objectsByhash.end()) {
+        if (auto it = m_objectsByhash.find(state.hash); it != m_objectsByhash.end()) {
             const auto& buffer = it->second.buffer;
 
             if (!buffer->isTemporary() && buffer->isValid()) {
@@ -106,14 +106,13 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const DrawMeth
             return;
         }
 
-        const DrawOrder order = m_type == DrawPoolType::MAP ? DrawPool::DrawOrder::THIRD : DrawPool::DrawOrder::FIRST;
-        const DrawBufferPtr& buffer = drawBuffer ? drawBuffer : DrawBuffer::createTemporaryBuffer(order);
+        const auto& buffer = drawBuffer ? drawBuffer : DrawBuffer::createTemporaryBuffer(drawOrder);
 
         bool addCoord = buffer->isTemporary();
         if (!addCoord) { // is not temp buffer
-            if (buffer->m_stateHash != stateHash || !buffer->isValid()) {
+            if (buffer->m_stateHash != state.hash || !buffer->isValid()) {
                 buffer->getCoords()->clear();
-                buffer->m_stateHash = stateHash;
+                buffer->m_stateHash = state.hash;
                 buffer->m_hashs.clear();
                 buffer->m_hashs.push_back(methodHash);
                 addCoord = true;
@@ -129,15 +128,14 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const DrawMeth
                 addCoords(method, coords, DrawMode::TRIANGLES);
         }
 
-        m_objectsByhash.emplace(stateHash,
+        m_objectsByhash.emplace(state.hash,
                                 m_objects[m_currentFloor][m_currentOrder = static_cast<uint8_t>(buffer->m_order)]
                                 .emplace_back(state, buffer));
 
         return;
     }
 
-    m_currentOrder = static_cast<uint8_t>(m_type == DrawPoolType::FOREGROUND ? DrawPool::DrawOrder::FIRST :
-                                          drawBuffer ? drawBuffer->m_order : DrawPool::DrawOrder::THIRD);
+    m_currentOrder = static_cast<uint8_t>(drawBuffer ? drawBuffer->m_order : drawOrder);
 
     auto& list = m_objects[m_currentFloor][m_currentOrder];
 
@@ -161,7 +159,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, const DrawMeth
     }
 
     if (coordsBuffer) {
-        const DrawBufferPtr& buffer = DrawBuffer::createTemporaryBuffer(DrawPool::DrawOrder::FIRST);
+        const auto& buffer = DrawBuffer::createTemporaryBuffer(DrawPool::DrawOrder::FIRST);
         buffer->getCoords()->append(coordsBuffer.get());
         list.emplace_back(state, buffer);
     } else
@@ -189,52 +187,55 @@ void DrawPool::addCoords(const DrawMethod& method, CoordsBuffer* buffer, DrawMod
     }
 }
 
-void DrawPool::updateHash(const PoolState& state, const DrawMethod& method, size_t& stateHash, size_t& methodhash)
+size_t DrawPool::updateHash(PoolState& state, const DrawMethod& method)
 {
     { // State Hash
         if (state.blendEquation != BlendEquation::ADD)
-            stdext::hash_combine(stateHash, state.blendEquation);
+            stdext::hash_combine(state.hash, state.blendEquation);
 
-        if (state.clipRect.isValid()) stdext::hash_union(stateHash, state.clipRect.hash());
+        if (state.clipRect.isValid()) stdext::hash_union(state.hash, state.clipRect.hash());
         if (state.color != Color::white)
-            stdext::hash_combine(stateHash, state.color.rgba());
+            stdext::hash_combine(state.hash, state.color.rgba());
 
         if (state.compositionMode != CompositionMode::NORMAL)
-            stdext::hash_combine(stateHash, state.compositionMode);
+            stdext::hash_combine(state.hash, state.compositionMode);
 
         if (state.opacity < 1.f)
-            stdext::hash_combine(stateHash, state.opacity);
+            stdext::hash_combine(state.hash, state.opacity);
 
         if (state.shaderProgram) {
             m_shaderRefreshDelay = SHADER_REFRESH_DELAY;
-            stdext::hash_combine(stateHash, state.shaderProgram->getProgramId());
+            stdext::hash_combine(state.hash, state.shaderProgram->getProgramId());
         }
 
         if (state.texture) {
             // TODO: use uniqueID id when applying multithreading, not forgetting that in the APNG texture, the id changes every frame.
-            stdext::hash_combine(stateHash, !state.texture->isEmpty() ? state.texture->getId() : state.texture->getUniqueId());
+            stdext::hash_combine(state.hash, !state.texture->isEmpty() ? state.texture->getId() : state.texture->getUniqueId());
         }
 
         if (state.transformMatrix != DEFAULT_MATRIX3)
-            stdext::hash_union(stateHash, state.transformMatrix.hash());
+            stdext::hash_union(state.hash, state.transformMatrix.hash());
 
-        stdext::hash_union(m_status.second, stateHash);
+        stdext::hash_union(m_status.second, state.hash);
     }
 
+    size_t methodhash = 0;
     { // Method Hash
-        if (method.dest.isValid()) stdext::hash_union(methodhash, method.dest.hash());
-        if (method.src.isValid()) stdext::hash_union(methodhash, method.src.hash());
-
         if (method.type == DrawPool::DrawMethodType::TRIANGLE) {
             if (!method.a.isNull()) stdext::hash_union(methodhash, method.a.hash());
             if (!method.b.isNull()) stdext::hash_union(methodhash, method.b.hash());
             if (!method.c.isNull()) stdext::hash_union(methodhash, method.c.hash());
+        } else if (method.type == DrawPool::DrawMethodType::BOUNDING_RECT) {
+            if (method.intValue) stdext::hash_combine(methodhash, method.intValue);
+        } else {
+            if (method.dest.isValid()) stdext::hash_union(methodhash, method.dest.hash());
+            if (method.src.isValid()) stdext::hash_union(methodhash, method.src.hash());
         }
-
-        if (method.intValue) stdext::hash_combine(methodhash, method.intValue);
 
         stdext::hash_union(m_status.second, methodhash);
     }
+
+    return methodhash;
 }
 
 void DrawPool::setCompositionMode(const CompositionMode mode, bool onlyOnce)
