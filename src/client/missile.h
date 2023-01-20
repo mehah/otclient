@@ -35,7 +35,10 @@ public:
     void setId(uint32_t id) override;
     void setPath(const Position& fromPosition, const Position& toPosition);
 
+    bool isMissile() { return true; }
+
     MissilePtr asMissile() { return static_self_cast<Missile>(); }
+
 private:
     Timer m_animationTimer;
     Point m_delta;

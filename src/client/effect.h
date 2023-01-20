@@ -35,9 +35,10 @@ public:
     void setId(uint32_t id) override;
     void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false) override;
 
-    EffectPtr asEffect() { return static_self_cast<Effect>(); }
-
+    bool isEffect() { return true; }
     bool waitFor(const EffectPtr&);
+
+    EffectPtr asEffect() { return static_self_cast<Effect>(); }
 
 protected:
     void onAppear() override;
