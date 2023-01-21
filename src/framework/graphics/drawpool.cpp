@@ -101,7 +101,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod& me
             if (coordsBuffer)
                 buffer->getCoords()->append(coordsBuffer.get());
             else
-                addCoords(method, buffer->m_coords.get(), DrawMode::TRIANGLES);
+                addCoords(buffer->getCoords(), method, DrawMode::TRIANGLES);
 
             return;
         }
@@ -125,7 +125,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod& me
             if (coordsBuffer)
                 coords->append(coordsBuffer.get());
             else
-                addCoords(method, coords, DrawMode::TRIANGLES);
+                addCoords(coords, method, DrawMode::TRIANGLES);
         }
 
         m_currentOrder = static_cast<uint8_t>(buffer->m_order);
@@ -150,7 +150,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod& me
                 if (coordsBuffer) {
                     prevObj.buffer->getCoords()->append(coordsBuffer.get());
                 } else {
-                    addCoords(method, prevObj.buffer->getCoords(), DrawMode::TRIANGLES);
+                    addCoords(prevObj.buffer->getCoords(), method, DrawMode::TRIANGLES);
                 }
             }
         }
@@ -164,7 +164,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod& me
         list.emplace_back(drawMode, state, method);
 }
 
-void DrawPool::addCoords(const DrawMethod& method, CoordsBuffer* buffer, DrawMode drawMode)
+void DrawPool::addCoords(CoordsBuffer* buffer, const DrawMethod& method, DrawMode drawMode)
 {
     if (method.type == DrawMethodType::BOUNDING_RECT) {
         buffer->addBoudingRect(method.dest, method.intValue);

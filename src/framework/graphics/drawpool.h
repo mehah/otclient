@@ -87,7 +87,7 @@ public:
         std::function<void()> action{ nullptr };
         Color color;
         TexturePtr texture;
-        size_t hash;
+        size_t hash{ 0 };
 
         bool operator==(const PoolState& s2) const { return hash == s2.hash; }
     };
@@ -142,7 +142,7 @@ protected:
     };
 
 private:
-    static void addCoords(const DrawPool::DrawMethod& method, CoordsBuffer* buffer, DrawMode drawMode);
+    static void addCoords(CoordsBuffer* buffer, const DrawPool::DrawMethod& method, DrawMode drawMode);
 
     enum STATE_TYPE : uint32_t
     {
@@ -206,7 +206,7 @@ private:
     uint8_t m_currentOrder{ 0 };
     uint8_t m_currentFloor{ 0 };
 
-    uint16_t m_refreshDelay{ 0 }, m_shaderRefreshDelay;
+    uint16_t m_refreshDelay{ 0 }, m_shaderRefreshDelay{ 0 };
     uint32_t m_onlyOnceStateFlag{ 0 };
 
     PoolState m_state;

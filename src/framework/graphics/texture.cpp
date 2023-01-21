@@ -68,14 +68,15 @@ Texture::~Texture()
     }
 }
 
-void Texture::create()
+Texture* Texture::create()
 {
-    if (!m_image)
-        return;
+    if (m_image) {
+        createTexture();
+        uploadPixels(m_image, m_buildMipmaps, m_compress);
+        m_image = nullptr;
+    }
 
-    createTexture();
-    uploadPixels(m_image, m_buildMipmaps, m_compress);
-    m_image = nullptr;
+    return this;
 }
 
 void Texture::uploadPixels(const ImagePtr& image, bool buildMipmaps, bool compress)
@@ -100,12 +101,6 @@ void Texture::bind()
     // must reset painter texture state
     g_painter->setTexture(this);
     glBindTexture(GL_TEXTURE_2D, m_id);
-}
-
-void Texture::copyFromScreen(const Rect& screenRect)
-{
-    bind();
-    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, screenRect.x(), screenRect.y(), screenRect.width(), screenRect.height());
 }
 
 void Texture::buildHardwareMipmaps()

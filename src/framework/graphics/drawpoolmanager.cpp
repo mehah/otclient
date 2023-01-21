@@ -106,20 +106,12 @@ void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)
 
     if (useGlobalCoord) {
         buffer.clear();
-
-        for (const auto& method : obj.methods) {
-            DrawPool::addCoords(method, &buffer, obj.drawMode);
-        }
+        for (const auto& method : obj.methods)
+            DrawPool::addCoords(&buffer, method, obj.drawMode);
     }
 
     { // Set DrawState
         const auto& state = obj.state;
-
-        if (state.texture) {
-            state.texture->create();
-            g_painter->setTexture(state.texture.get());
-        }
-
         g_painter->setColor(state.color);
         g_painter->setOpacity(state.opacity);
         g_painter->setCompositionMode(state.compositionMode);
@@ -128,6 +120,8 @@ void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)
         g_painter->setShaderProgram(state.shaderProgram);
         g_painter->setTransformMatrix(state.transformMatrix);
         if (state.action) state.action();
+        if (state.texture)
+            g_painter->setTexture(state.texture->create());
     }
 
     g_painter->drawCoords(buffer, obj.drawMode);
