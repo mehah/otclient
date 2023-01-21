@@ -49,9 +49,9 @@ std::string OTMLParser::getNextLine()
 
 int OTMLParser::getLineDepth(const std::string_view line, bool multilining)
 {
-    auto __line = std::string{ line };
-    stdext::trim(__line); // fix for lines without content.
-    if (__line.empty())
+    auto _line = std::string{ line };
+    stdext::trim(_line); // fix for lines without content.
+    if (_line.empty())
         return 0;
 
     // count number of spaces at the line beginning
