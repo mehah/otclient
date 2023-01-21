@@ -27,7 +27,7 @@
 #include <framework/core/timer.h>
 #include <framework/graphics/declarations.h>
 
-//@bindsingleton g_window
+ //@bindsingleton g_window
 class PlatformWindow
 {
     enum

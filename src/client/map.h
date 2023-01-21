@@ -317,8 +317,8 @@ private:
     float m_zoneOpacity{ 1.f };
 #endif
 
-    uint16_t m_width;
-    uint16_t m_height;
+    uint16_t m_width{ 0 };
+    uint16_t m_height{ 0 };
 
     Light m_light;
     Position m_centralPosition;

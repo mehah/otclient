@@ -45,8 +45,8 @@ public:
 
 protected:
     FileStreamPtr m_file;
-    int m_channels;
-    int m_rate;
-    int m_bps;
-    int m_size;
+    int m_channels{ 0 };
+    int m_rate{ 0 };
+    int m_bps{ 0 };
+    int m_size{ 0 };
 };

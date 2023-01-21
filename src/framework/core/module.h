@@ -67,8 +67,8 @@ private:
     bool m_reloadable{ false };
     bool m_sandboxed{ false };
 
-    int m_autoLoadPriority;
-    int m_sandboxEnv;
+    int m_autoLoadPriority{};
+    int m_sandboxEnv{};
     std::tuple<std::string, std::string> m_onLoadFunc;
     std::tuple<std::string, std::string> m_onUnloadFunc;
     std::string m_name;

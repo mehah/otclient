@@ -165,11 +165,11 @@ private:
     float getOpacity() { return m_state.opacity; }
     Rect getClipRect() { return m_state.clipRect; }
 
-    void setCompositionMode(CompositionMode mode, bool onLastDrawing = false);
-    void setBlendEquation(BlendEquation equation, bool onLastDrawing = false);
-    void setClipRect(const Rect& clipRect, bool onLastDrawing = false);
-    void setOpacity(float opacity, bool onLastDrawing = false);
-    void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onLastDrawing = false, const std::function<void()>& action = nullptr);
+    void setCompositionMode(CompositionMode mode, bool onlyOnce = false);
+    void setBlendEquation(BlendEquation equation, bool onlyOnce = false);
+    void setClipRect(const Rect& clipRect, bool onlyOnce = false);
+    void setOpacity(float opacity, bool onlyOnce = false);
+    void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onlyOnce = false, const std::function<void()>& action = nullptr);
 
     void resetOpacity() { m_state.opacity = 1.f; }
     void resetClipRect() { m_state.clipRect = {}; }

@@ -158,8 +158,7 @@ Point BinaryTree::getPoint()
     return ret;
 }
 
-OutputBinaryTree::OutputBinaryTree(FileStreamPtr fin)
-    : m_fin(std::move(fin))
+OutputBinaryTree::OutputBinaryTree(FileStreamPtr fin) : m_fin(std::move(fin))
 {
     startNode(0);
 }

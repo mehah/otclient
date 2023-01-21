@@ -143,7 +143,7 @@ void Item::updatePatterns()
                 m_numPatternX = numPatternX >= 3 ? 2 : 0;
         }
     } else if (isSplash() || isFluidContainer()) {
-        int color = Otc::FluidTransparent;
+        int color = m_countOrSubType;
         if (g_game.getFeature(Otc::GameNewFluids)) {
             switch (m_countOrSubType) {
                 case Otc::FluidNone:
@@ -204,8 +204,7 @@ void Item::updatePatterns()
                     color = Otc::FluidTransparent;
                     break;
             }
-        } else
-            color = m_countOrSubType;
+        }
 
         m_numPatternX = (color % 4) % numPatternX;
         m_numPatternY = (color / 4) % numPatternY;

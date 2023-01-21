@@ -65,7 +65,7 @@ private:
 class OutputBinaryTree
 {
 public:
-    OutputBinaryTree(FileStreamPtr finish);
+    OutputBinaryTree(FileStreamPtr fin);
 
     void addU8(uint8_t v);
     void addU16(uint16_t v);

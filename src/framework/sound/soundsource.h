@@ -50,7 +50,7 @@ public:
     virtual void setPitch(float pitch);
     virtual void setPosition(const Point& pos);
     virtual void setVelocity(const Point& velocity);
-    virtual void setFading(FadeState state, float fadetime);
+    virtual void setFading(FadeState state, float fadeTime);
 
     std::string getName() { return m_name; }
     uint8_t getChannel() { return m_channel; }

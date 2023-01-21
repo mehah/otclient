@@ -29,7 +29,7 @@ SoundSource::SoundSource()
 {
     alGenSources(1, &m_sourceId);
     assert(alGetError() == AL_NO_ERROR);
-    setReferenceDistance(128);
+    SoundSource::setReferenceDistance(128);
 }
 
 SoundSource::~SoundSource()

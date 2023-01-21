@@ -26,7 +26,7 @@
 #include "declarations.h"
 #include "soundchannel.h"
 
-//@bindsingleton g_sounds
+ //@bindsingleton g_sounds
 class SoundManager
 {
     enum
@@ -46,7 +46,7 @@ public:
     void stopAll();
 
     void preload(std::string filename);
-    SoundSourcePtr play(const std::string& filename, float fadetime = 0, float gain = 1.0f, float pitch = 1.0f);
+    SoundSourcePtr play(const std::string& fn, float fadetime = 0, float gain = 1.0f, float pitch = 1.0f);
     SoundChannelPtr getChannel(int channel);
 
     std::string resolveSoundFile(const std::string& file);

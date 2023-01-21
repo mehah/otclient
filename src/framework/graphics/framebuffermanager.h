@@ -30,7 +30,6 @@ public:
     void init();
     void terminate();
 
-    FrameBufferPtr createFrameBuffer();
     const FrameBufferPtr& getTemporaryFrameBuffer() { return m_temporaryFramebuffer; }
 
 protected:
