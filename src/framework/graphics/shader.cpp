@@ -58,7 +58,7 @@ bool Shader::compileSourceCode(const std::string_view sourceCode) const
         "#define highp\n";
 #endif
 
-    std::string code = std::string{ qualifierDefines };
+    auto code = std::string{ qualifierDefines };
     code.append(sourceCode);
     const char* c_source = code.data();
     glShaderSource(m_shaderId, 1, &c_source, nullptr);
