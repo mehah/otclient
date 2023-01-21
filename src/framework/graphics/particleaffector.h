@@ -49,8 +49,8 @@ public:
     void updateParticle(const ParticlePtr& particle, float elapsedTime) const override;
 
 private:
-    float m_angle;
-    float m_gravity;
+    float m_angle{ 0 };
+    float m_gravity{ 0 };
 };
 
 class AttractionAffector : public ParticleAffector

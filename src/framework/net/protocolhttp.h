@@ -163,7 +163,7 @@ private:
     asio::steady_timer m_timer;
     asio::ip::tcp::socket m_socket;
     asio::ip::tcp::resolver m_resolver;
-    bool m_closed;
+    bool m_closed{ false };
     ParsedURI instance_uri;
 
     asio::ssl::context m_context{ asio::ssl::context::tlsv12_client };
