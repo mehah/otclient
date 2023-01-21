@@ -22,12 +22,12 @@
 
 #pragma once
 
-#include "thing.h"
 #include <framework/core/timer.h>
 #include <framework/graphics/cachedtext.h>
 #include <framework/graphics/fontmanager.h>
+#include "thing.h"
 
- // @bindclass
+// @bindclass
 class AnimatedText : public LuaObject
 {
 public:

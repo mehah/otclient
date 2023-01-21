@@ -21,9 +21,9 @@
  */
 
 #include "protocol.h"
-#include "connection.h"
-#include <framework/core/application.h>
 #include <random>
+#include <framework/core/application.h>
+#include "connection.h"
 
 Protocol::Protocol() :m_inputMessage(std::make_shared<InputMessage>()) {}
 

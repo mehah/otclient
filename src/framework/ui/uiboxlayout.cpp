@@ -22,8 +22,8 @@
 
 #include "uiboxlayout.h"
 
-#include "uiwidget.h"
 #include <utility>
+#include "uiwidget.h"
 
 UIBoxLayout::UIBoxLayout(UIWidgetPtr parentWidget) : UILayout(std::move(parentWidget)) {}
 

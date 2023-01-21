@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include "declarations.h"
 #include <framework/core/resourcemanager.h>
 #include <framework/luaengine/luaobject.h>
 #include <framework/util/databuffer.h>
 #include <framework/util/point.h>
+#include "declarations.h"
 
 struct PHYSFS_File;
 

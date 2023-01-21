@@ -23,8 +23,8 @@
 #include "uiprogressrect.h"
 #include <framework/graphics/fontmanager.h>
 
-#include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/drawpool.h"
+#include "framework/graphics/drawpoolmanager.h"
 
 void UIProgressRect::drawSelf(DrawPoolType drawPane)
 {

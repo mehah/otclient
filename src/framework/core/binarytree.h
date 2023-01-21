@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "declarations.h"
 #include <framework/util/databuffer.h>
+#include "declarations.h"
 
 class BinaryTree
 {

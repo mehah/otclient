@@ -25,6 +25,7 @@
 #include "effect.h"
 #include "framework/net/inputmessage.h"
 
+#include <framework/core/eventdispatcher.h>
 #include "item.h"
 #include "localplayer.h"
 #include "luavaluecasts.h"
@@ -34,7 +35,6 @@
 #include "thingtypemanager.h"
 #include "tile.h"
 #include "time.h"
-#include <framework/core/eventdispatcher.h>
 
 void ProtocolGame::parseMessage(const InputMessagePtr& msg)
 {

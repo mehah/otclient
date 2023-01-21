@@ -21,6 +21,7 @@
  */
 
 #include "animatedtext.h"
+#include "attachedeffect.h"
 #include "client.h"
 #include "container.h"
 #include "creature.h"
@@ -49,7 +50,6 @@
 #include "uiminimap.h"
 #include "uiprogressrect.h"
 #include "uisprite.h"
-#include "attachedeffect.h"
 
 #ifdef FRAMEWORK_EDITOR
 #include "houses.h"

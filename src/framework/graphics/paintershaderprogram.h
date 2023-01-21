@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "shaderprogram.h"
 #include <client/position.h>
+#include "shaderprogram.h"
 
 class PainterShaderProgram : public ShaderProgram
 {

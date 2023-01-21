@@ -21,15 +21,15 @@
  */
 
 #include "tile.h"
+#include <framework/core/eventdispatcher.h>
+#include <framework/core/graphicalapplication.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include "effect.h"
 #include "game.h"
 #include "item.h"
 #include "lightview.h"
 #include "map.h"
 #include "protocolgame.h"
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/graphicalapplication.h>
-#include <framework/graphics/drawpoolmanager.h>
 
 Tile::Tile(const Position& position) : m_position(position) {}
 

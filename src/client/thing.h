@@ -22,16 +22,16 @@
 
 #pragma once
 
-#include "declarations.h"
-#include "thingtype.h"
-#include "attachedeffect.h"
-#include "thingtypemanager.h"
-#include "spritemanager.h"
-#include <framework/luaengine/luaobject.h>
-#include <framework/graphics/drawpool.h>
 #include <framework/core/clock.h>
+#include <framework/graphics/drawpool.h>
+#include <framework/luaengine/luaobject.h>
+#include "attachedeffect.h"
+#include "declarations.h"
+#include "spritemanager.h"
+#include "thingtype.h"
+#include "thingtypemanager.h"
 
- // @bindclass
+// @bindclass
 #pragma pack(push,1) // disable memory alignment
 class Thing : public LuaObject
 {

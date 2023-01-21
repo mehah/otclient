@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "thing.h"
 #include <framework/graphics/cachedtext.h>
+#include "thing.h"
 
- // @bindclass
+// @bindclass
 class StaticText : public LuaObject
 {
 public:

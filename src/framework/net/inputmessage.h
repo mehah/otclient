@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "declarations.h"
 #include <framework/luaengine/luaobject.h>
+#include "declarations.h"
 
- // @bindclass
+// @bindclass
 class InputMessage : public LuaObject
 {
 public:

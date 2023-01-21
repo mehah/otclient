@@ -26,9 +26,9 @@
 #include "localplayer.h"
 #include "luavaluecasts.h"
 #include "map.h"
+#include "shadermanager.h"
 #include "thingtypemanager.h"
 #include "tile.h"
-#include "shadermanager.h"
 
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>

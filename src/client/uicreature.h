@@ -22,9 +22,9 @@
 
 #pragma once
 
+#include <framework/ui/uiwidget.h>
 #include "creature.h"
 #include "declarations.h"
-#include <framework/ui/uiwidget.h>
 
 class UICreature : public UIWidget
 {

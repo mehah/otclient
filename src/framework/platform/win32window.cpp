@@ -25,8 +25,8 @@
 #include "win32window.h"
 #include <client/map.h>
 #include <framework/core/application.h>
-#include <framework/core/resourcemanager.h>
 #include <framework/core/eventdispatcher.h>
+#include <framework/core/resourcemanager.h>
 
 #include <framework/graphics/image.h>
 

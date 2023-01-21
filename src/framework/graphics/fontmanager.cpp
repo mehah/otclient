@@ -28,7 +28,7 @@
 
 FontManager g_fonts;
 
-FontManager::FontManager() : m_defaultFont(BitmapFontPtr(new BitmapFont("emptyfont"))) {}
+FontManager::FontManager() : m_defaultFont(std::make_shared<BitmapFont>("emptyfont")) {}
 
 void FontManager::terminate()
 {

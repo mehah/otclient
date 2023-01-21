@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "declarations.h"
 #include <framework/graphics/declarations.h>
+#include "declarations.h"
 
 constexpr uint8_t MMBLOCK_SIZE = 64;
 constexpr uint8_t OTMM_VERSION = 1;

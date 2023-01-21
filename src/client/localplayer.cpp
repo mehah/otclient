@@ -21,10 +21,10 @@
  */
 
 #include "localplayer.h"
+#include <framework/core/eventdispatcher.h>
 #include "game.h"
 #include "map.h"
 #include "tile.h"
-#include <framework/core/eventdispatcher.h>
 
 void LocalPlayer::lockWalk(uint16_t millis)
 {

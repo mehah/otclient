@@ -21,10 +21,10 @@
  */
 
 #include "effect.h"
-#include "game.h"
-#include "map.h"
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
+#include "game.h"
+#include "map.h"
 
 void Effect::drawEffect(const Point& dest, uint32_t flags, int offsetX, int offsetY, LightView* lightView)
 {

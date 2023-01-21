@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include "thing.h"
-#include <framework/core/timer.h>
 #include <framework/global.h>
+#include <framework/core/timer.h>
+#include "thing.h"
 
- // @bindclass
+// @bindclass
 class Effect : public Thing
 {
 public:

@@ -30,10 +30,10 @@
 #include <asio.hpp>
 #include <asio/ssl.hpp>
 
-#include <zlib.h>
 #include <random>
+#include <zlib.h>
 
- //  result
+//  result
 class HttpSession;
 
 struct HttpResult

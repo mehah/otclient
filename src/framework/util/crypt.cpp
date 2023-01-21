@@ -112,7 +112,6 @@ std::string Crypt::base64Decode(const std::string& encoded_string)
 {
     int len = encoded_string.size();
     int i = 0;
-    int j = 0;
     int in_ = 0;
     uint8_t char_array_4[4], char_array_3[3];
     std::string ret;
@@ -134,6 +133,7 @@ std::string Crypt::base64Decode(const std::string& encoded_string)
     }
 
     if (i) {
+        int j = 0;
         for (j = i; j < 4; j++)
             char_array_4[j] = 0;
 

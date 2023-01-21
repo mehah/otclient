@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "declarations.h"
 #include <framework/otml/otml.h>
+#include "declarations.h"
 
 class ParticleAffector
 {

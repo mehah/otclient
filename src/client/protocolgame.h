@@ -22,10 +22,10 @@
 
 #pragma once
 
+#include <framework/net/protocol.h>
 #include "creature.h"
 #include "declarations.h"
 #include "protocolcodes.h"
-#include <framework/net/protocol.h>
 
 class ProtocolGame : public Protocol
 {

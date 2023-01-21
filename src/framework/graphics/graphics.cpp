@@ -23,9 +23,9 @@
 #include "graphics.h"
 #include "fontmanager.h"
 
+#include <framework/platform/platformwindow.h>
 #include "framebuffermanager.h"
 #include "texturemanager.h"
-#include <framework/platform/platformwindow.h>
 
 Graphics g_graphics;
 

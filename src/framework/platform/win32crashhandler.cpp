@@ -23,8 +23,8 @@
 #include "framework/core/graphicalapplication.h"
 #if defined(WIN32) && defined(CRASH_HANDLER)
 
-#include "crashhandler.h"
 #include <framework/global.h>
+#include "crashhandler.h"
 
 #include <windows.h>
 #include <winsock2.h>

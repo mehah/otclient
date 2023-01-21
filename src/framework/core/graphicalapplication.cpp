@@ -21,7 +21,9 @@
  */
 
 #include "graphicalapplication.h"
+#include <thread>
 #include <client/map.h>
+#include <framework/core/asyncdispatcher.h>
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/graphics/drawpool.h>
@@ -33,8 +35,6 @@
 #include <framework/platform/platformwindow.h>
 #include <framework/ui/uimanager.h>
 #include "framework/stdext/time.h"
-#include <framework/core/asyncdispatcher.h>
-#include <thread>
 
 #ifdef FRAMEWORK_SOUND
 #include <framework/sound/soundmanager.h>

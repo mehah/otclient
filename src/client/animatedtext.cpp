@@ -21,10 +21,10 @@
  */
 
 #include "animatedtext.h"
-#include "game.h"
-#include "map.h"
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
+#include "game.h"
+#include "map.h"
 
 AnimatedText::AnimatedText()
 {
@@ -52,7 +52,7 @@ void AnimatedText::drawText(const Point& dest, const Rect& visibleRect)
     const Rect rect{ p, textSize };
 
     if (visibleRect.contains(rect)) {
-        const float t0 = tf / 1.2;
+        constexpr float t0 = tf / 1.2;
 
         Color color = m_color;
         if (t > t0) {

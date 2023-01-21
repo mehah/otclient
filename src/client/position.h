@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include "config.h"
-#include "const.h"
 #include <framework/const.h>
 #include <framework/stdext/types.h>
 #include <framework/util/point.h>
+#include "config.h"
+#include "const.h"
 
 #include <array>
 #include <istream>

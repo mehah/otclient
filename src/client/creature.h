@@ -22,12 +22,12 @@
 
 #pragma once
 
-#include "mapview.h"
-#include "outfit.h"
-#include "thing.h"
 #include <framework/core/declarations.h>
 #include <framework/core/timer.h>
 #include <framework/graphics/cachedtext.h>
+#include "mapview.h"
+#include "outfit.h"
+#include "thing.h"
 
 struct PreyMonster
 {

@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "glutil.h"
 #include <framework/luaengine/luaobject.h>
+#include "glutil.h"
 
 #include "shader.h"
 

@@ -21,9 +21,9 @@
  */
 
 #include "attachedeffect.h"
-#include "thingtypemanager.h"
 #include "shadermanager.h"
 #include "spritemanager.h"
+#include "thingtypemanager.h"
 
 #include <framework/core/clock.h>
 

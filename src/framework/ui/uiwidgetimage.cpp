@@ -20,12 +20,12 @@
  * THE SOFTWARE.
  */
 
-#include "framework/graphics/drawpoolmanager.h"
-#include "uiwidget.h"
+#include <framework/core/eventdispatcher.h>
 #include <framework/graphics/painter.h>
 #include <framework/graphics/texture.h>
 #include <framework/graphics/texturemanager.h>
-#include <framework/core/eventdispatcher.h>
+#include "uiwidget.h"
+#include "framework/graphics/drawpoolmanager.h"
 
 void UIWidget::initImage() {}
 

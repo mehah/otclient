@@ -22,8 +22,8 @@
 
 #ifdef WIN32
 
-#include <framework/stdext/stdext.h>
 #include <tchar.h>
+#include <framework/stdext/stdext.h>
 
 #include "platform.h"
 
@@ -54,7 +54,7 @@ bool Platform::spawnProcess(std::string process, const std::vector<std::string>&
     const auto& wfile = stdext::utf8_to_utf16(process);
     const auto& wcommandLine = stdext::utf8_to_utf16(commandLine);
 
-    if ((size_t)ShellExecuteW(nullptr, L"open", wfile.data(), wcommandLine.data(), nullptr, SW_SHOWNORMAL) > 32)
+    if (reinterpret_cast<size_t>(ShellExecuteW(nullptr, L"open", wfile.data(), wcommandLine.data(), nullptr, SW_SHOWNORMAL)) > 32)
         return true;
     return false;
 }
