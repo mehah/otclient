@@ -377,13 +377,11 @@ bool Minimap::loadOtmm(const std::string& fileName)
 void Minimap::saveOtmm(const std::string& fileName)
 {
     try {
-        stdext::timer saveTimer;
-
         const FileStreamPtr fin = g_resources.createFile(fileName);
         fin->cache();
 
         //TODO: compression flag with zlib
-        const uint32_t flags = 0;
+        constexpr uint32_t flags = 0;
 
         // header
         fin->addU32(OTMM_SIGNATURE);

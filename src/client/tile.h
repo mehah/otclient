@@ -162,7 +162,7 @@ public:
     bool limitsFloorsView(bool isFreeView = false);
 
     bool canShade(const MapViewPtr& mapView);
-    bool canRender(uint32_t& flags, const Position& cameraPosition, AwareRange viewPort, LightView* lightView);
+    bool canRender(uint32_t& flags, const Position& cameraPosition, AwareRange viewPort);
     bool canErase() {
         return m_walkingCreatures.empty() && m_effects.empty() && isEmpty() && m_minimapColor == 0
 #ifdef FRAMEWORK_EDITOR

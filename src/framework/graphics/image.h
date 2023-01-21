@@ -29,7 +29,7 @@ class Image
 public:
     Image(const Size& size, int bpp = 4, uint8_t* pixels = nullptr);
 
-    static ImagePtr load(std::string file);
+    static ImagePtr load(const std::string& file);
     static ImagePtr loadPNG(const std::string& file);
 
     void savePNG(const std::string& fileName);

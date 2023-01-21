@@ -117,7 +117,7 @@ void Tile::drawTop(const Point& dest, int flags, bool forceDraw, LightView* ligh
 
         if (g_game.getFeature(Otc::GameMapOldEffectRendering)) {
             offsetX = m_position.x - g_map.getCentralPosition().x;
-            offsetX = m_position.y - g_map.getCentralPosition().y;
+            offsetY = m_position.y - g_map.getCentralPosition().y;
         }
 
         for (const auto& effect : m_effects) {
@@ -264,7 +264,7 @@ bool Tile::removeThing(const ThingPtr thing)
     if (!thing) return false;
 
     if (thing->isEffect()) {
-        const EffectPtr& effect = thing->static_self_cast<Effect>();
+        const auto& effect = thing->static_self_cast<Effect>();
         const auto it = std::find(m_effects.begin(), m_effects.end(), effect);
         if (it == m_effects.end())
             return false;
@@ -785,7 +785,7 @@ void Tile::unselect()
     m_selectType = TileSelectType::NONE;
 }
 
-bool Tile::canRender(uint32_t& flags, const Position& cameraPosition, const AwareRange viewPort, LightView* lightView)
+bool Tile::canRender(uint32_t& flags, const Position& cameraPosition, const AwareRange viewPort)
 {
     const int8_t dz = m_position.z - cameraPosition.z;
     const Position checkPos = m_position.translated(dz, dz);

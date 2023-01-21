@@ -88,7 +88,7 @@ void UIWidget::drawImage(const Rect& screenCoords)
         if (m_imageRect.isValid())
             drawRect.resize(m_imageRect.size());
 
-        Rect clipRect = m_imageClipRect.isValid() ? m_imageClipRect : Rect(0, 0, m_imageTexture->getSize());
+        auto clipRect = m_imageClipRect.isValid() ? m_imageClipRect : Rect(0, 0, m_imageTexture->getSize());
 
         if (m_imageBordered) {
             int top = m_imageBorder.top;
@@ -97,16 +97,15 @@ void UIWidget::drawImage(const Rect& screenCoords)
             int right = m_imageBorder.right;
 
             // calculates border coords
-            const Rect clip = clipRect;
-            Rect leftBorder(clip.left(), clip.top() + top, left, clip.height() - top - bottom);
-            Rect rightBorder(clip.right() - right + 1, clip.top() + top, right, clip.height() - top - bottom);
-            Rect topBorder(clip.left() + left, clip.top(), clip.width() - right - left, top);
-            Rect bottomBorder(clip.left() + left, clip.bottom() - bottom + 1, clip.width() - right - left, bottom);
-            Rect topLeftCorner(clip.left(), clip.top(), left, top);
-            Rect topRightCorner(clip.right() - right + 1, clip.top(), right, top);
-            Rect bottomLeftCorner(clip.left(), clip.bottom() - bottom + 1, left, bottom);
-            Rect bottomRightCorner(clip.right() - right + 1, clip.bottom() - bottom + 1, right, bottom);
-            Rect center(clip.left() + left, clip.top() + top, clip.width() - right - left, clip.height() - top - bottom);
+            Rect leftBorder(clipRect.left(), clipRect.top() + top, left, clipRect.height() - top - bottom);
+            Rect rightBorder(clipRect.right() - right + 1, clipRect.top() + top, right, clipRect.height() - top - bottom);
+            Rect topBorder(clipRect.left() + left, clipRect.top(), clipRect.width() - right - left, top);
+            Rect bottomBorder(clipRect.left() + left, clipRect.bottom() - bottom + 1, clipRect.width() - right - left, bottom);
+            Rect topLeftCorner(clipRect.left(), clipRect.top(), left, top);
+            Rect topRightCorner(clipRect.right() - right + 1, clipRect.top(), right, top);
+            Rect bottomLeftCorner(clipRect.left(), clipRect.bottom() - bottom + 1, left, bottom);
+            Rect bottomRightCorner(clipRect.right() - right + 1, clipRect.bottom() - bottom + 1, right, bottom);
+            Rect center(clipRect.left() + left, clipRect.top() + top, clipRect.width() - right - left, clipRect.height() - top - bottom);
             Size bordersSize(leftBorder.width() + rightBorder.width(), topBorder.height() + bottomBorder.height());
             Size centerSize = drawRect.size() - bordersSize;
             Rect rectCoords;

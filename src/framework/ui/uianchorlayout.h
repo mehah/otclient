@@ -30,7 +30,7 @@ class UIAnchor :public std::enable_shared_from_this<UIAnchor>
 {
 public:
     UIAnchor(Fw::AnchorEdge anchoredEdge, std::string_view hookedWidgetId, Fw::AnchorEdge hookedEdge) :
-        m_anchoredEdge(anchoredEdge), m_hookedEdge(hookedEdge), m_hookedWidgetId(std::move(hookedWidgetId))
+        m_anchoredEdge(anchoredEdge), m_hookedEdge(hookedEdge), m_hookedWidgetId(std::string{ hookedWidgetId })
     {}
 
     Fw::AnchorEdge getAnchoredEdge() const { return m_anchoredEdge; }

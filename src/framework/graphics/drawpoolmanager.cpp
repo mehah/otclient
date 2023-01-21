@@ -205,7 +205,7 @@ void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, int 
     getCurrentPool()->add(color, nullptr, method);
 }
 
-void DrawPoolManager::addAction(std::function<void()> action) const
+void DrawPoolManager::addAction(const std::function<void()>& action) const
 {
     getCurrentPool()->m_objects[0][static_cast<uint8_t>(DrawPool::DrawOrder::FIRST)].emplace_back(action);
 }

@@ -2025,7 +2025,7 @@ void ProtocolGame::parseFloorChangeUp(const InputMessagePtr& msg)
         for (int_fast32_t i = SEA_FLOOR - AWARE_UNDEGROUND_FLOOR_RANGE; i >= 0; --i)
             skip = setFloorDescription(msg, pos.x - range.left, pos.y - range.top, i, range.horizontal(), range.vertical(), 8 - i, skip);
     else if (pos.z > SEA_FLOOR)
-        skip = setFloorDescription(msg, pos.x - range.left, pos.y - range.top, pos.z - AWARE_UNDEGROUND_FLOOR_RANGE, range.horizontal(), range.vertical(), 3, skip);
+        setFloorDescription(msg, pos.x - range.left, pos.y - range.top, pos.z - AWARE_UNDEGROUND_FLOOR_RANGE, range.horizontal(), range.vertical(), 3, skip);
 
     ++pos.x;
     ++pos.y;
@@ -2046,7 +2046,7 @@ void ProtocolGame::parseFloorChangeDown(const InputMessagePtr& msg)
         for (i = pos.z, j = -1; i <= pos.z + AWARE_UNDEGROUND_FLOOR_RANGE; ++i, --j)
             skip = setFloorDescription(msg, pos.x - range.left, pos.y - range.top, i, range.horizontal(), range.vertical(), j, skip);
     } else if (pos.z > UNDERGROUND_FLOOR && pos.z < MAX_Z - 1)
-        skip = setFloorDescription(msg, pos.x - range.left, pos.y - range.top, pos.z + AWARE_UNDEGROUND_FLOOR_RANGE, range.horizontal(), range.vertical(), -3, skip);
+        setFloorDescription(msg, pos.x - range.left, pos.y - range.top, pos.z + AWARE_UNDEGROUND_FLOOR_RANGE, range.horizontal(), range.vertical(), -3, skip);
 
     --pos.x;
     --pos.y;
@@ -3533,7 +3533,7 @@ MarketOffer ProtocolGame::readMarketOffer(const InputMessagePtr& msg, uint8_t ac
     const uint16_t amount = msg->getU16();
     const uint64_t price = g_game.getClientVersion() >= 1281 ? msg->getU64() : msg->getU32();
 
-    std::string playerName = "";
+    std::string playerName;
     uint8_t state = Otc::OFFER_STATE_ACTIVE;
     if (var == Otc::OLD_MARKETREQUEST_MY_HISTORY || var == Otc::MARKETREQUEST_OWN_HISTORY) {
         state = msg->getU8();
@@ -3541,10 +3541,8 @@ MarketOffer ProtocolGame::readMarketOffer(const InputMessagePtr& msg, uint8_t ac
         playerName = std::string{ msg->getString() };
     }
 
-    const MarketOffer offer{ timestamp, counter, action, itemId, amount, price, playerName, state, var };
     g_lua.callGlobalField("g_game", "onMarketReadOffer", action, amount, counter, itemId, playerName, price, state, timestamp, var);
-
-    return offer;
+    return { timestamp, counter, action, itemId, amount, price, playerName, state, var };
 }
 
 void ProtocolGame::parseMarketBrowse(const InputMessagePtr& msg)

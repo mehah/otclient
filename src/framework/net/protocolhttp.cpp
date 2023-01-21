@@ -22,6 +22,8 @@
 
 #include <framework/core/eventdispatcher.h>
 
+#include <utility>
+
 #include "protocolhttp.h"
 
 Http g_http;
@@ -41,8 +43,7 @@ void Http::terminate()
         ws.second->close();
     }
     for (const auto& op : m_operations) {
-        auto session = op.second->session.lock();
-        if (session)
+        if (const auto& session = op.second->session.lock())
             session->close();
     }
     m_guard.reset();
@@ -64,7 +65,7 @@ int Http::get(const std::string& url, int timeout)
         result->url = url;
         result->operationId = operationId;
         m_operations[operationId] = result;
-        auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
+        const auto& session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
                                                      false, result, [&](HttpResult_ptr result) {
             bool finished = result->finished;
             g_dispatcher.addEvent([result, finished] {
@@ -101,7 +102,7 @@ int Http::post(const std::string& url, const std::string& data, int timeout, boo
         result->operationId = operationId;
         result->postData = data;
         m_operations[operationId] = result;
-        auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
+        const auto& session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
                                                      isJson, result, [&](HttpResult_ptr result) {
             bool finished = result->finished;
             g_dispatcher.addEvent([result, finished] {
@@ -132,7 +133,7 @@ int Http::download(const std::string& url, const std::string& path, int timeout)
         result->url = url;
         result->operationId = operationId;
         m_operations[operationId] = result;
-        auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
+        const auto& session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
                                                      false, result, [&, path](HttpResult_ptr result) {
             if (!result->finished) {
                 g_dispatcher.addEvent([result] {
@@ -174,7 +175,7 @@ int Http::ws(const std::string& url, int timeout)
         result->url = url;
         result->operationId = operationId;
         m_operations[operationId] = result;
-        auto session = std::make_shared<WebsocketSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, timeout, result, [&, result](WebsocketCallbackType type, std::string message) {
+        const auto& session = std::make_shared<WebsocketSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, timeout, result, [&, result](WebsocketCallbackType type, std::string message) {
             g_dispatcher.addEvent([result, type, message]() {
                 if (type == WebsocketCallbackType::OPEN) {
                     g_lua.callGlobalField("g_http", "onWsOpen", result->operationId, message);
@@ -227,7 +228,7 @@ bool Http::cancel(int id)
             return;
         if (it->second->canceled)
             return;
-        auto session = it->second->session.lock();
+        const auto& session = it->second->session.lock();
         if (session)
             session->close();
     });
@@ -270,7 +271,7 @@ void HttpSession::start()
         query_resolver,
         [sft = shared_from_this()](
         const std::error_code& ec, asio::ip::tcp::resolver::iterator iterator) {
-        sft->on_resolve(ec, iterator);
+        sft->on_resolve(ec, std::move(iterator));
     });
 }
 
@@ -362,7 +363,7 @@ void HttpSession::on_write()
     m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec) {sft->onTimeout(ec); });
 }
 
-void HttpSession::on_request_sent(const std::error_code& ec, size_t bytes_transferred)
+void HttpSession::on_request_sent(const std::error_code& ec, size_t /*bytes_transferred*/)
 {
     if (ec) {
         onError("HttpSession error on sending request " + m_url + ": " + ec.message());
@@ -527,7 +528,7 @@ void HttpSession::onTimeout(const std::error_code& ec)
     }
 }
 
-void HttpSession::onError(const std::string& ec, const std::string& details)
+void HttpSession::onError(const std::string& ec, const std::string& /*details*/)
 {
     g_logger.error(stdext::format("%s", ec));
     m_result->error = stdext::format("%s", ec);
@@ -552,7 +553,7 @@ void WebsocketSession::start()
         query_resolver,
         [sft = shared_from_this()](
         const std::error_code& ec, asio::ip::tcp::resolver::iterator iterator) {
-        sft->on_resolve(ec, iterator);
+        sft->on_resolve(ec, std::move(iterator));
     });
 }
 
@@ -630,7 +631,7 @@ void WebsocketSession::on_connect(const std::error_code& ec)
     m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec) {sft->onTimeout(ec); });
 }
 
-void WebsocketSession::on_request_sent(const std::error_code& ec, size_t bytes_transferred)
+void WebsocketSession::on_request_sent(const std::error_code& ec, size_t /*bytes_transferred*/)
 {
     if (ec) {
         onError("WebsocketSession error on sending request " + m_url + ": " + ec.message());
@@ -650,11 +651,12 @@ void WebsocketSession::on_request_sent(const std::error_code& ec, size_t bytes_t
                 asio::buffers_begin(m_response.data()) + size);
             m_response.consume(size);
 
-            size_t pos = header.find("Sec-WebSocket-Accept: ");
+            //TODO: Local variable 'websocket_accept' is only assigned but never accessed
+            /*size_t pos = header.find("Sec-WebSocket-Accept: ");
             std::string websocket_accept;
             if (pos != std::string::npos) {
                 websocket_accept = header.c_str() + pos + sizeof("Sec-WebSocket-Accept: ") - 1;
-            }
+            }*/
 
             asio::async_read(m_ssl, m_response,
                              asio::transfer_at_least(1),
@@ -676,11 +678,12 @@ void WebsocketSession::on_request_sent(const std::error_code& ec, size_t bytes_t
                 asio::buffers_begin(m_response.data()) + size);
             m_response.consume(size);
 
-            size_t pos = header.find("Sec-WebSocket-Accept: ");
+            //TODO: Local variable 'websocket_accept' is only assigned but never accessed
+            /*size_t pos = header.find("Sec-WebSocket-Accept: ");
             std::string websocket_accept;
             if (pos != std::string::npos) {
                 websocket_accept = header.c_str() + pos + sizeof("Sec-WebSocket-Accept: ") - 1;
-            }
+            }*/
 
             asio::async_read(m_socket, m_response,
                              asio::transfer_at_least(1),
@@ -694,7 +697,7 @@ void WebsocketSession::on_request_sent(const std::error_code& ec, size_t bytes_t
     m_timer.cancel();
 }
 
-void WebsocketSession::on_write(const std::error_code& ec, size_t bytes_transferred)
+void WebsocketSession::on_write(const std::error_code& ec, size_t /*bytes_transferred*/)
 {
     if (ec) {
         onError("WebsocketSession unable to on_write " + m_url + ": " + ec.message());
@@ -793,7 +796,7 @@ void WebsocketSession::on_close(const std::error_code& ec)
     m_callback(WebsocketCallbackType::CLOSE, "close_code::normal");
 }
 
-void WebsocketSession::onError(const std::string& ec, const std::string& details)
+void WebsocketSession::onError(const std::string& ec, const std::string& /*details*/)
 {
     g_logger.error(stdext::format("WebsocketSession error %s", ec));
     m_closed = true;

@@ -159,7 +159,7 @@ void MapView::drawFloor()
             for (const auto& tile : map.tiles) {
                 uint32_t tileFlags = flags;
 
-                if (!m_drawViewportEdge && !tile->canRender(tileFlags, cameraPosition, m_viewport, lightView))
+                if (!m_drawViewportEdge && !tile->canRender(tileFlags, cameraPosition, m_viewport))
                     continue;
 
                 bool isCovered = false;

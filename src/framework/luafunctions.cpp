@@ -655,18 +655,18 @@ void Application::registerLuaFunctions()
 
     // UIVerticalLayout
     g_lua.registerClass<UIVerticalLayout, UIBoxLayout>();
-    g_lua.bindClassStaticFunction<UIVerticalLayout>("create", [](UIWidgetPtr parent) { return std::make_shared<UIVerticalLayout>(parent); });
+    g_lua.bindClassStaticFunction<UIVerticalLayout>("create", [](const UIWidgetPtr& parent) { return std::make_shared<UIVerticalLayout>(parent); });
     g_lua.bindClassMemberFunction<UIVerticalLayout>("setAlignBottom", &UIVerticalLayout::setAlignBottom);
     g_lua.bindClassMemberFunction<UIVerticalLayout>("isAlignBottom", &UIVerticalLayout::isAlignBottom);
 
     // UIHorizontalLayout
     g_lua.registerClass<UIHorizontalLayout, UIBoxLayout>();
-    g_lua.bindClassStaticFunction<UIHorizontalLayout>("create", [](UIWidgetPtr parent) { return std::make_shared<UIHorizontalLayout>(parent); });
+    g_lua.bindClassStaticFunction<UIHorizontalLayout>("create", [](const UIWidgetPtr& parent) { return std::make_shared<UIHorizontalLayout>(parent); });
     g_lua.bindClassMemberFunction<UIHorizontalLayout>("setAlignRight", &UIHorizontalLayout::setAlignRight);
 
     // UIGridLayout
     g_lua.registerClass<UIGridLayout, UILayout>();
-    g_lua.bindClassStaticFunction<UIGridLayout>("create", [](UIWidgetPtr parent) { return std::make_shared<UIGridLayout>(parent); });
+    g_lua.bindClassStaticFunction<UIGridLayout>("create", [](const UIWidgetPtr& parent) { return std::make_shared<UIGridLayout>(parent); });
     g_lua.bindClassMemberFunction<UIGridLayout>("setCellSize", &UIGridLayout::setCellSize);
     g_lua.bindClassMemberFunction<UIGridLayout>("setCellWidth", &UIGridLayout::setCellWidth);
     g_lua.bindClassMemberFunction<UIGridLayout>("setCellHeight", &UIGridLayout::setCellHeight);
@@ -682,7 +682,7 @@ void Application::registerLuaFunctions()
 
     // UIAnchorLayout
     g_lua.registerClass<UIAnchorLayout, UILayout>();
-    g_lua.bindClassStaticFunction<UIAnchorLayout>("create", [](UIWidgetPtr parent) { return std::make_shared<UIAnchorLayout>(parent); });
+    g_lua.bindClassStaticFunction<UIAnchorLayout>("create", [](const UIWidgetPtr& parent) { return std::make_shared<UIAnchorLayout>(parent); });
     g_lua.bindClassMemberFunction<UIAnchorLayout>("removeAnchors", &UIAnchorLayout::removeAnchors);
     g_lua.bindClassMemberFunction<UIAnchorLayout>("centerIn", &UIAnchorLayout::centerIn);
     g_lua.bindClassMemberFunction<UIAnchorLayout>("fill", &UIAnchorLayout::fill);

@@ -76,10 +76,10 @@ void Creature::draw(const Point& dest, uint32_t flags, TextureType textureType, 
 
         const auto& _dest = dest + m_walkOffset * g_drawPool.getScaleFactor();
 
-        internalDrawOutfit(_dest, textureType, m_direction, Color::white, lightView);
+        internalDrawOutfit(_dest, textureType, Color::white, lightView);
 
         if (isMarked) {
-            internalDrawOutfit(_dest, TextureType::ALL_BLANK, m_direction, getMarkedColor());
+            internalDrawOutfit(_dest, TextureType::ALL_BLANK, getMarkedColor());
         }
     }
 
@@ -100,7 +100,7 @@ void Creature::draw(const Point& dest, uint32_t flags, TextureType textureType, 
     }
 }
 
-void Creature::internalDrawOutfit(Point dest, TextureType textureType, Otc::Direction direction, Color color, LightView* lightView)
+void Creature::internalDrawOutfit(Point dest, TextureType textureType, Color color, LightView* lightView)
 {
     if (m_outfitColor != Color::white)
         color = m_outfitColor;
@@ -201,7 +201,7 @@ void Creature::drawOutfit(const Rect& destRect, bool resize, const Color color)
 
     float oldScaleFactor = g_drawPool.getScaleFactor();
     g_drawPool.setScaleFactor(scaleFactor);
-    internalDrawOutfit(dest, TextureType::SMOOTH, Otc::South, color);
+    internalDrawOutfit(dest, TextureType::SMOOTH, color);
     g_drawPool.setScaleFactor(oldScaleFactor);
 }
 

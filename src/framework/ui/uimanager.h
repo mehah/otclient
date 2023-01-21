@@ -42,9 +42,9 @@ public:
     void updateHoveredWidget(bool now = false);
 
     void clearStyles();
-    bool importStyle(const std::string& file);
+    bool importStyle(const std::string& fl);
     void importStyleFromOTML(const OTMLNodePtr& styleNode);
-    OTMLNodePtr getStyle(const std::string_view styleName);
+    OTMLNodePtr getStyle(const std::string_view sn);
     std::string getStyleClass(const std::string_view styleName);
 
     UIWidgetPtr loadUI(const std::string& file, const UIWidgetPtr& parent);

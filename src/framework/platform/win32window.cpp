@@ -769,7 +769,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
         }
         case WM_GETMINMAXINFO:
         {
-            auto* const pMMI = (LPMINMAXINFO)lParam;
+            auto* const pMMI = reinterpret_cast<LPMINMAXINFO>(lParam);
             const Rect adjustedRect = adjustWindowRect(Rect(0, 0, m_minimumSize));
             pMMI->ptMinTrackSize.x = adjustedRect.width();
             pMMI->ptMinTrackSize.y = adjustedRect.height();

@@ -111,7 +111,7 @@ void Stacktrace(LPEXCEPTION_POINTERS e, std::stringstream& ss)
 
         dwModBase = SymGetModuleBase(process, sf.AddrPC.Offset);
         if (dwModBase)
-            GetModuleFileName((HINSTANCE)dwModBase, modname, MAX_PATH);
+            GetModuleFileName(reinterpret_cast<HINSTANCE>(dwModBase), modname, MAX_PATH);
         else
             strcpy(modname, "Unknown");
 

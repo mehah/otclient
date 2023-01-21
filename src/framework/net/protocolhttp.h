@@ -66,7 +66,7 @@ public:
     HttpSession(asio::io_service& service, const std::string& url, const std::string& agent,
                 const bool& enable_time_out_on_read_write,
                 const stdext::map<std::string, std::string>& custom_header,
-                int timeout, bool isJson, HttpResult_ptr result, HttpResult_cb callback) :
+                int timeout, bool isJson, const HttpResult_ptr& result, HttpResult_cb callback) :
         m_service(service),
         m_url(url),
         m_agent(agent),
@@ -75,7 +75,7 @@ public:
         m_timeout(timeout),
         m_isJson(isJson),
         m_result(result),
-        m_callback(callback),
+        m_callback(std::move(callback)),
         m_socket(service),
         m_resolver(service),
         m_timer(service)
