@@ -77,7 +77,7 @@ void AnimatedTexture::updateAnimation()
     if (++m_currentFrame >= m_frames.size())
         m_currentFrame = 0;
 
-    auto& txt = m_frames[m_currentFrame];
+    const auto& txt = m_frames[m_currentFrame];
     txt->create();
 
     m_id = txt->getId();

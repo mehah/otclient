@@ -108,6 +108,6 @@ int OggSoundFile::cb_close(void* source)
 
 long OggSoundFile::cb_tell(void* source)
 {
-    auto* const file = static_cast<FileStream*>(source);
+    const auto* const file = static_cast<FileStream*>(source);
     return file->tell();
 }

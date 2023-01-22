@@ -136,13 +136,13 @@ void MapView::drawFloor()
         if (m_drawManaBar) { flags |= Otc::DrawManaBar; }
 
         for (int_fast8_t z = m_floorMax; z >= m_floorMin; --z) {
-            float fadeLevel = getFadeLevel(z);
+            const float fadeLevel = getFadeLevel(z);
             if (fadeLevel == 0.f) break;
             if (fadeLevel < .99f)
                 g_drawPool.setOpacity(fadeLevel);
 
             Position _camera = cameraPosition;
-            bool alwaysTransparent = m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && z < m_cachedFirstVisibleFloor&& _camera.coveredUp(cameraPosition.z - z);
+            const bool alwaysTransparent = m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && z < m_cachedFirstVisibleFloor&& _camera.coveredUp(cameraPosition.z - z);
 
             const auto& map = m_cachedVisibleTiles[z];
 

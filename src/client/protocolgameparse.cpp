@@ -658,18 +658,18 @@ void ProtocolGame::parseCoinBalance(const InputMessagePtr& msg) const
     if (update) {
         // amount of coins that can be used to buy prodcuts
         // in the ingame store
-        uint32_t coins = msg->getU32(); // coins
+        const uint32_t coins = msg->getU32(); // coins
         m_localPlayer->setResourceBalance(Otc::RESOURE_COIN_NORMAL, coins);
 
         // amount of coins that can be sold in market
         // or be transfered to another player
-        uint32_t transferrableCoins = msg->getU32(); // transferableCoins
+        const uint32_t transferrableCoins = msg->getU32(); // transferableCoins
         m_localPlayer->setResourceBalance(Otc::RESOURE_COIN_TRANSFERRABLE, transferrableCoins);
 
         if (g_game.getClientVersion() >= 1281) {
-            uint32_t auctionCoins = msg->getU32();
+            const uint32_t auctionCoins = msg->getU32();
             m_localPlayer->setResourceBalance(Otc::RESOURE_COIN_AUCTION, auctionCoins);
-            uint32_t tournamentCoins = msg->getU32();
+            const uint32_t tournamentCoins = msg->getU32();
             m_localPlayer->setResourceBalance(Otc::RESOURE_COIN_TOURNAMENT, tournamentCoins);
         }
     }
@@ -877,7 +877,7 @@ void ProtocolGame::parseFloorDescription(const InputMessagePtr& msg)
 {
     const auto& pos = getPosition(msg);
     const auto& oldPos = m_localPlayer->getPosition();
-    uint8_t floor = msg->getU8();
+    const uint8_t floor = msg->getU8();
 
     if (pos.z == floor) {
         if (!m_mapKnown)
@@ -892,7 +892,7 @@ void ProtocolGame::parseFloorDescription(const InputMessagePtr& msg)
         g_lua.callGlobalField("g_game", "onTeleport", m_localPlayer, pos, oldPos);
     }
 
-    AwareRange range = g_map.getAwareRange();
+    const auto& range = g_map.getAwareRange();
     setFloorDescription(msg, pos.x - range.left, pos.y - range.top, floor, range.horizontal(), range.vertical(), pos.z - floor, 0);
 }
 
@@ -905,7 +905,7 @@ void ProtocolGame::parseMapDescription(const InputMessagePtr& msg)
 
     g_map.setCentralPosition(pos);
 
-    AwareRange range = g_map.getAwareRange();
+    const auto& range = g_map.getAwareRange();
     setMapDescription(msg, pos.x - range.left, pos.y - range.top, pos.z, range.horizontal(), range.vertical());
 
     if (!m_mapKnown) {
@@ -921,7 +921,7 @@ void ProtocolGame::parseMapMoveNorth(const InputMessagePtr& msg)
     auto pos = g_game.getFeature(Otc::GameMapMovePosition) ? getPosition(msg) : g_map.getCentralPosition();
     --pos.y;
 
-    AwareRange range = g_map.getAwareRange();
+    const auto& range = g_map.getAwareRange();
     setMapDescription(msg, pos.x - range.left, pos.y - range.top, pos.z, range.horizontal(), 1);
     g_map.setCentralPosition(pos);
 }
@@ -931,7 +931,7 @@ void ProtocolGame::parseMapMoveEast(const InputMessagePtr& msg)
     auto pos = g_game.getFeature(Otc::GameMapMovePosition) ? getPosition(msg) : g_map.getCentralPosition();
     ++pos.x;
 
-    AwareRange range = g_map.getAwareRange();
+    const auto& range = g_map.getAwareRange();
     setMapDescription(msg, pos.x + range.right, pos.y - range.top, pos.z, 1, range.vertical());
     g_map.setCentralPosition(pos);
 }
@@ -941,7 +941,7 @@ void ProtocolGame::parseMapMoveSouth(const InputMessagePtr& msg)
     auto pos = g_game.getFeature(Otc::GameMapMovePosition) ? getPosition(msg) : g_map.getCentralPosition();
     ++pos.y;
 
-    AwareRange range = g_map.getAwareRange();
+    const auto& range = g_map.getAwareRange();
     setMapDescription(msg, pos.x - range.left, pos.y + range.bottom, pos.z, range.horizontal(), 1);
     g_map.setCentralPosition(pos);
 }
@@ -951,7 +951,7 @@ void ProtocolGame::parseMapMoveWest(const InputMessagePtr& msg)
     auto pos = g_game.getFeature(Otc::GameMapMovePosition) ? getPosition(msg) : g_map.getCentralPosition();
     --pos.x;
 
-    AwareRange range = g_map.getAwareRange();
+    const auto& range = g_map.getAwareRange();
     setMapDescription(msg, pos.x - range.left, pos.y - range.top, pos.z, 1, range.vertical());
     g_map.setCentralPosition(pos);
 }
@@ -2741,7 +2741,7 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
 
     if (item->isContainer()) {
         if (g_game.getFeature(Otc::GameThingQuickLoot)) {
-            bool hasQuickLootFlags = msg->getU8() != 0;
+            const bool hasQuickLootFlags = msg->getU8() != 0;
             if (hasQuickLootFlags) {
                 msg->getU32(); // quick loot flags
             }
@@ -3048,7 +3048,7 @@ void ProtocolGame::parseItemsPrice(const InputMessagePtr& msg)
     const uint16_t priceCount = msg->getU16(); // count
 
     for (int_fast32_t i = 0; i < priceCount; i++) {
-        uint16_t itemId = msg->getU16(); // item client id
+        const uint16_t itemId = msg->getU16(); // item client id
         if (g_game.getClientVersion() >= 1281) {
             const auto& item = Item::create(itemId);
             if (item->getId() == 0)

@@ -1206,7 +1206,7 @@ UIWidgetPtr UIWidget::getChildBefore(const UIWidgetPtr& relativeChild)
 
 UIWidgetPtr UIWidget::getChildById(const std::string_view childId)
 {
-    if (auto it = m_childrenById.find(childId); it != m_childrenById.end())
+    if (const auto it = m_childrenById.find(childId); it != m_childrenById.end())
         return it->second;
 
     return nullptr;

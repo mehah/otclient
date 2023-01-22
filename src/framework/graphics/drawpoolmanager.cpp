@@ -67,7 +67,7 @@ void DrawPoolManager::draw()
         std::scoped_lock l(mutex);
 
         if (pool->hasFrameBuffer()) {
-            auto* pf = pool->toPoolFramed();
+            const auto* pf = pool->toPoolFramed();
             if (!pf->m_framebuffer->canDraw())
                 continue;
 

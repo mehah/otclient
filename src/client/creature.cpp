@@ -199,7 +199,7 @@ void Creature::drawOutfit(const Rect& destRect, bool resize, const Color color)
     const float scaleFactor = destRect.width() / static_cast<float>(frameSize);
     const Point dest = destRect.bottomRight() - (Point(SPRITE_SIZE) - getDisplacement()) * scaleFactor;
 
-    float oldScaleFactor = g_drawPool.getScaleFactor();
+    const float oldScaleFactor = g_drawPool.getScaleFactor();
     g_drawPool.setScaleFactor(scaleFactor);
     internalDrawOutfit(dest, TextureType::SMOOTH, color);
     g_drawPool.setScaleFactor(oldScaleFactor);

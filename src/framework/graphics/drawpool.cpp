@@ -78,12 +78,12 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod& me
         m_onlyOnceStateFlag = 0;
     }
 
-    size_t methodHash = updateHash(state, method);
+    const size_t methodHash = updateHash(state, method);
 
     const DrawOrder drawOrder = m_type == DrawPoolType::MAP ? DrawPool::DrawOrder::THIRD : DrawPool::DrawOrder::FIRST;
 
     if (m_type != DrawPoolType::FOREGROUND && (m_alwaysGroupDrawings || (drawBuffer && drawBuffer->m_agroup))) {
-        if (auto it = m_objectsByhash.find(state.hash); it != m_objectsByhash.end()) {
+        if (const auto it = m_objectsByhash.find(state.hash); it != m_objectsByhash.end()) {
             const auto& buffer = it->second.buffer;
 
             if (!buffer->isTemporary() && buffer->isValid()) {

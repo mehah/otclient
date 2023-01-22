@@ -91,7 +91,7 @@ void Painter::drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode)
             m_drawProgram->setTextureMatrix(m_textureMatrix);
             m_drawProgram->bindMultiTextures();
 
-            auto* hardwareBuffer = coordsBuffer.getHardwareTextureCoordCache();
+            const auto* hardwareBuffer = coordsBuffer.getHardwareTextureCoordCache();
             if (hardwareBuffer)
                 hardwareBuffer->bind();
 
@@ -102,7 +102,7 @@ void Painter::drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode)
 
     // set vertex array
     {
-        auto* hardwareBuffer = coordsBuffer.getHardwareVertexCache();
+        const auto* hardwareBuffer = coordsBuffer.getHardwareVertexCache();
         if (hardwareBuffer)
             hardwareBuffer->bind();
 
