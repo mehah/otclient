@@ -103,7 +103,7 @@ void BitmapFont::drawText(const std::string_view text, const Rect& screenCoords,
     }
 }
 
-std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::string_view text, const Size& textBoxSize, Fw::AlignmentFlag align, const Rect& screenCoords, const std::vector<Point>& glyphsPositions)
+std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::string_view text, const Size& textBoxSize, Fw::AlignmentFlag align, const Rect& screenCoords, const std::vector<Point>& glyphsPositions) const
 {
     std::vector<std::pair<Rect, Rect>> list;
     // prevent glitches from invalid rects
@@ -180,7 +180,7 @@ std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::stri
 
 void BitmapFont::fillTextCoords(const CoordsBufferPtr& coords, const std::string_view text,
                                 const Size& textBoxSize, Fw::AlignmentFlag align, const Rect& screenCoords,
-                                const std::vector<Point>& glyphsPositions)
+                                const std::vector<Point>& glyphsPositions) const
 {
     coords->clear();
 
@@ -254,7 +254,7 @@ void BitmapFont::fillTextCoords(const CoordsBufferPtr& coords, const std::string
     }
 }
 
-const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string_view text, Fw::AlignmentFlag align, Size* textBoxSize)
+const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string_view text, Fw::AlignmentFlag align, Size* textBoxSize) const
 {
     const int textLength = text.length();
     int maxLineWidth = 0;

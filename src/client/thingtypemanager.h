@@ -74,7 +74,7 @@ public:
     uint16_t getContentRevision() { return m_contentRevision; }
 
     bool isDatLoaded() { return m_datLoaded; }
-    bool isValidDatId(uint16_t id, ThingCategory category) { return id >= 1 && id < m_thingTypes[category].size(); }
+    bool isValidDatId(uint16_t id, ThingCategory category) const { return id >= 1 && id < m_thingTypes[category].size(); }
 
 private:
     ThingTypeList m_thingTypes[ThingLastCategory];

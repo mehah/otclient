@@ -528,7 +528,7 @@ void HttpSession::onTimeout(const std::error_code& ec)
     }
 }
 
-void HttpSession::onError(const std::string& ec, const std::string& /*details*/)
+void HttpSession::onError(const std::string& ec, const std::string& /*details*/) const
 {
     g_logger.error(stdext::format("%s", ec));
     m_result->error = stdext::format("%s", ec);

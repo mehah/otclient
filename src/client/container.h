@@ -46,7 +46,7 @@ public:
     bool hasPages() { return m_hasPages; }
     int getSize() { return m_size; }
     int getFirstIndex() { return m_firstIndex; }
-    ItemPtr findItemById(uint32_t itemId, int subType);
+    ItemPtr findItemById(uint32_t itemId, int subType) const;
 
 protected:
     Container(int id, int capacity, const std::string_view name, const ItemPtr& containerItem, bool hasParent, bool isUnlocked, bool hasPages, int containerSize, int firstIndex)

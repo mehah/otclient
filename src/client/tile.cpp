@@ -349,7 +349,7 @@ std::vector<ItemPtr> Tile::getItems()
     return items;
 }
 
-EffectPtr Tile::getEffect(uint16_t id)
+EffectPtr Tile::getEffect(uint16_t id) const
 {
     for (const EffectPtr& effect : m_effects)
         if (effect->getId() == id)
@@ -628,7 +628,7 @@ bool Tile::canShade(const MapViewPtr& mapView)
     return isFullyOpaque() || hasTopGround(true) || isFullGround();
 }
 
-bool Tile::hasBlockingCreature()
+bool Tile::hasBlockingCreature() const
 {
     for (const auto& thing : m_things)
         if (thing->isCreature() && !thing->static_self_cast<Creature>()->isPassable() && !thing->isLocalPlayer())

@@ -901,7 +901,7 @@ public:
     ~TiXmlAttributeSet();
 
     void Add(TiXmlAttribute* attribute);
-    void Remove(TiXmlAttribute* attribute);
+    void Remove(TiXmlAttribute* attribute) const;
 
     const TiXmlAttribute* First()    const { return (sentinel.next == &sentinel) ? nullptr : sentinel.next; }
     TiXmlAttribute* First() { return (sentinel.next == &sentinel) ? nullptr : sentinel.next; }
@@ -1655,14 +1655,14 @@ public:
     */
     void SetIndent(const char* _indent) { indent = _indent ? _indent : ""; }
     /// Query the indention string.
-    const char* Indent() { return indent.data(); }
+    const char* Indent() const { return indent.data(); }
     /** Set the line breaking string. By default set to newline (\n).
         Some operating systems prefer other characters, or can be
         set to the null/empty string for no indenation.
     */
     void SetLineBreak(const char* _lineBreak) { lineBreak = _lineBreak ? _lineBreak : ""; }
     /// Query the current line breaking string.
-    const char* LineBreak() { return lineBreak.data(); }
+    const char* LineBreak() const { return lineBreak.data(); }
 
     /** Switch over to "stream printing" which is the most dense formatting without
         linebreaks. Common when the XML is needed for network transmission.
@@ -1673,9 +1673,9 @@ public:
         lineBreak = "";
     }
     /// Return the result.
-    const char* CStr() { return buffer.data(); }
+    const char* CStr() const { return buffer.data(); }
     /// Return the length of the result string.
-    size_t Size() { return buffer.size(); }
+    size_t Size() const { return buffer.size(); }
 
 #ifdef TIXML_USE_STL
     /// Return the result.

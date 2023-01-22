@@ -660,7 +660,7 @@ Rect MapView::calcFramebufferSource(const Size& destSize)
     return Rect(drawOffset, srcSize);
 }
 
-uint8_t MapView::calcFirstVisibleFloor(bool checkLimitsFloorsView)
+uint8_t MapView::calcFirstVisibleFloor(bool checkLimitsFloorsView) const
 {
     uint8_t z = SEA_FLOOR;
     // return forced first visible floor
@@ -717,7 +717,7 @@ uint8_t MapView::calcFirstVisibleFloor(bool checkLimitsFloorsView)
     return z;
 }
 
-uint8_t MapView::calcLastVisibleFloor()
+uint8_t MapView::calcLastVisibleFloor() const
 {
     uint8_t z = SEA_FLOOR;
 
@@ -738,7 +738,7 @@ uint8_t MapView::calcLastVisibleFloor()
     return z;
 }
 
-TilePtr MapView::getTopTile(Position tilePos)
+TilePtr MapView::getTopTile(Position tilePos) const
 {
     // we must check every floor, from top to bottom to check for a clickable tile
     if (m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && tilePos.isInRange(m_lastCameraPosition, TRANSPARENT_FLOOR_VIEW_RANGE, TRANSPARENT_FLOOR_VIEW_RANGE))

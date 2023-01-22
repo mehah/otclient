@@ -27,7 +27,7 @@
 #include <framework/graphics/fontmanager.h>
 #include "thing.h"
 
-// @bindclass
+ // @bindclass
 class AnimatedText : public LuaObject
 {
 public:
@@ -45,13 +45,13 @@ public:
     void setText(const std::string_view text) { m_cachedText.setText(text); }
     void setOffset(const Point& offset) { m_offset = offset; }
 
-    Color getColor() { return m_color; }
+    Color getColor() const { return m_color; }
     const CachedText& getCachedText() const { return m_cachedText; }
     Point getOffset() { return m_offset; }
-    Timer getTimer() { return m_animationTimer; }
+    Timer getTimer() const { return m_animationTimer; }
 
     bool merge(const AnimatedTextPtr& other);
-    Position getPosition() { return m_position; }
+    Position getPosition() const { return m_position; }
     void setPosition(const Position& position) { m_position = position; }
 
     AnimatedTextPtr asAnimatedText() { return static_self_cast<AnimatedText>(); }

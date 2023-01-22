@@ -41,7 +41,7 @@ public:
 
     bool isConnected() { return m_connection && m_connection->isConnected(); }
     bool isConnecting() { return m_connection && m_connection->isConnecting(); }
-    ticks_t getElapsedTicksSinceLastRead() { return m_connection ? m_connection->getElapsedTicksSinceLastRead() : -1; }
+    ticks_t getElapsedTicksSinceLastRead() const { return m_connection ? m_connection->getElapsedTicksSinceLastRead() : -1; }
 
     ConnectionPtr getConnection() { return m_connection; }
     void setConnection(const ConnectionPtr& connection) { m_connection = connection; }
@@ -69,8 +69,8 @@ private:
     void internalRecvHeader(uint8_t* buffer, uint16_t size);
     void internalRecvData(uint8_t* buffer, uint16_t size);
 
-    bool xteaDecrypt(const InputMessagePtr& inputMessage);
-    void xteaEncrypt(const OutputMessagePtr& outputMessage);
+    bool xteaDecrypt(const InputMessagePtr& inputMessage) const;
+    void xteaEncrypt(const OutputMessagePtr& outputMessage) const;
 
     bool m_checksumEnabled{ false };
     bool m_xteaEncryptionEnabled{ false };

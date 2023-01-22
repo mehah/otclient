@@ -51,7 +51,7 @@ SoundFilePtr SoundFile::loadSoundFile(const std::string& filename)
     return nullptr;
 }
 
-ALenum SoundFile::getSampleFormat()
+ALenum SoundFile::getSampleFormat() const
 {
     if (m_channels == 2) {
         if (m_bps == 16)

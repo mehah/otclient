@@ -49,7 +49,7 @@ void SpriteAppearances::terminate()
     unload();
 }
 
-bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet)
+bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const
 {
     std::scoped_lock lock(sheet->mutex);
 

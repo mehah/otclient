@@ -45,9 +45,9 @@ public:
     int read(void* buffer, uint32_t size, uint32_t nmemb = 1);
     void seek(uint32_t pos);
     void skip(uint32_t len);
-    uint32_t size();
-    uint32_t tell();
-    bool eof();
+    uint32_t size() const;
+    uint32_t tell() const;
+    bool eof() const;
     std::string name() { return m_name; }
 
     uint8_t getU8();
@@ -78,7 +78,7 @@ public:
     DataBuffer<uint8_t> m_data;
 
 private:
-    void throwError(const std::string_view message, bool physfsError = false);
+    void throwError(const std::string_view message, bool physfsError = false) const;
 
     std::string m_name;
     PHYSFS_File* m_fileHandle;

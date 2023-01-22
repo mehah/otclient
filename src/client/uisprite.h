@@ -36,7 +36,7 @@ public:
 
     void setSpriteColor(Color color) { m_spriteColor = color; }
 
-    bool isSpriteVisible() { return m_spriteVisible; }
+    bool isSpriteVisible() const { return m_spriteVisible; }
     void setSpriteVisible(bool visible) { m_spriteVisible = visible; }
 
     bool hasSprite() { return m_sprite != nullptr; }

@@ -151,7 +151,7 @@ bool Module::reload()
     return load();
 }
 
-bool Module::isDependent()
+bool Module::isDependent() const
 {
     for (const ModulePtr& module : g_modules.getModules()) {
         if (module->isLoaded() && module->hasDependency(m_name))

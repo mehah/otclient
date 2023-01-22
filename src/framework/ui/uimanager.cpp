@@ -56,7 +56,7 @@ void UIManager::terminate()
     m_checkEvent = nullptr;
 }
 
-void UIManager::render(DrawPoolType drawPane)
+void UIManager::render(DrawPoolType drawPane) const
 {
     if (drawPane == DrawPoolType::FOREGROUND)
         g_drawPool.use(DrawPoolType::FOREGROUND);
@@ -64,7 +64,7 @@ void UIManager::render(DrawPoolType drawPane)
     m_rootWidget->draw(m_rootWidget->getRect(), drawPane);
 }
 
-void UIManager::resize(const Size&)
+void UIManager::resize(const Size&) const
 {
     m_rootWidget->setSize(g_window.getSize());
 }

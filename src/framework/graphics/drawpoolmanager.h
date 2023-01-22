@@ -84,7 +84,7 @@ private:
 
     void draw();
     void init();
-    void terminate();
+    void terminate() const;
     void drawObject(const DrawPool::DrawObject& obj);
 
     CoordsBuffer m_coordsBuffer;

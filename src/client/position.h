@@ -297,7 +297,7 @@ public:
         return false;
     }
 
-    std::string toString()
+    std::string toString() const
     {
         return std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z);
     }

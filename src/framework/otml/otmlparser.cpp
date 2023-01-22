@@ -47,7 +47,7 @@ std::string OTMLParser::getNextLine()
     return line;
 }
 
-int OTMLParser::getLineDepth(const std::string_view line, bool multilining)
+int OTMLParser::getLineDepth(const std::string_view line, bool multilining) const
 {
     auto _line = std::string{ line };
     stdext::trim(_line); // fix for lines without content.

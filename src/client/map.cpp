@@ -68,14 +68,14 @@ void Map::removeMapView(const MapViewPtr& mapView)
         m_mapViews.erase(it);
 }
 
-void Map::notificateKeyRelease(const InputEvent& inputEvent)
+void Map::notificateKeyRelease(const InputEvent& inputEvent) const
 {
     for (const MapViewPtr& mapView : m_mapViews) {
         mapView->onKeyRelease(inputEvent);
     }
 }
 
-void Map::notificateCameraMove(const Point& offset)
+void Map::notificateCameraMove(const Point& offset) const
 {
     for (const MapViewPtr& mapView : m_mapViews) {
         mapView->onCameraMove(offset);
@@ -283,7 +283,7 @@ void Map::removeThingColor(const ThingPtr& thing)
     }
 }
 
-StaticTextPtr Map::getStaticText(const Position& pos)
+StaticTextPtr Map::getStaticText(const Position& pos) const
 {
     for (const auto& staticText : m_staticTexts) {
         // try to combine messages
@@ -664,7 +664,7 @@ bool Map::isCompletelyCovered(const Position& pos, uint8_t firstFloor)
     return false;
 }
 
-bool Map::isAwareOfPosition(const Position& pos)
+bool Map::isAwareOfPosition(const Position& pos) const
 {
     if (pos.z < getFirstAwareFloor() || pos.z > getLastAwareFloor())
         return false;
@@ -696,7 +696,7 @@ void Map::setAwareRange(const AwareRange& range)
 
 void Map::resetAwareRange() { setAwareRange({ MAX_VIEWPORT_X , MAX_VIEWPORT_Y, MAX_VIEWPORT_X + 1, MAX_VIEWPORT_Y + 1 }); }
 
-uint8_t Map::getFirstAwareFloor()
+uint8_t Map::getFirstAwareFloor() const
 {
     if (m_centralPosition.z <= SEA_FLOOR)
         return 0;
@@ -704,7 +704,7 @@ uint8_t Map::getFirstAwareFloor()
     return m_centralPosition.z - AWARE_UNDEGROUND_FLOOR_RANGE;
 }
 
-uint8_t Map::getLastAwareFloor()
+uint8_t Map::getLastAwareFloor() const
 {
     if (m_centralPosition.z <= SEA_FLOOR)
         return SEA_FLOOR;
@@ -886,7 +886,7 @@ std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::findPath(const
     return ret;
 }
 
-void Map::resetLastCamera()
+void Map::resetLastCamera() const
 {
     for (const MapViewPtr& mapView : m_mapViews)
         mapView->resetLastCamera();

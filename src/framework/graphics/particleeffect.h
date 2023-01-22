@@ -47,7 +47,7 @@ public:
     ParticleEffect() = default;
 
     void load(const ParticleEffectTypePtr& effectType);
-    bool hasFinished() { return m_systems.empty(); }
+    bool hasFinished() const { return m_systems.empty(); }
     void render() const;
     void update();
 

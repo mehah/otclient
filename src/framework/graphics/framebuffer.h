@@ -32,7 +32,7 @@ public:
     FrameBuffer();
     ~FrameBuffer();
 
-    void release() { internalRelease(); };
+    void release() const { internalRelease(); };
     void bind();
     void draw();
 
@@ -62,7 +62,7 @@ private:
     static uint32_t boundFbo;
 
     void internalBind();
-    void internalRelease();
+    void internalRelease() const;
     void prepare(const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha);
 
     Matrix3 m_textureMatrix;

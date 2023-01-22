@@ -26,15 +26,15 @@
 #include <framework/otml/declarations.h>
 #include "declarations.h"
 
-//@bindsingleton g_ui
+ //@bindsingleton g_ui
 class UIManager
 {
 public:
     void init();
     void terminate();
 
-    void render(DrawPoolType drawPane);
-    void resize(const Size& size);
+    void render(DrawPoolType drawPane) const;
+    void resize(const Size& size) const;
     void inputEvent(const InputEvent& event);
 
     void updatePressedWidget(const UIWidgetPtr& newPressedWidget, const Point& clickedPos = {}, bool fireClicks = true);

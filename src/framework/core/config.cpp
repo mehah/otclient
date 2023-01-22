@@ -66,7 +66,7 @@ bool Config::save()
     return m_confsDoc->save(m_fileName);
 }
 
-void Config::clear()
+void Config::clear() const
 {
     m_confsDoc->clear();
 }
@@ -143,7 +143,7 @@ OTMLNodePtr Config::getNode(const std::string& key)
     return m_confsDoc->get(key);
 }
 
-bool Config::isLoaded()
+bool Config::isLoaded() const
 {
     return !m_fileName.empty() && m_confsDoc;
 }

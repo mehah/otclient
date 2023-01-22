@@ -171,7 +171,7 @@ Rect Minimap::getTileRect(const Position& pos, const Rect& screenRect, const Pos
     return tileRect;
 }
 
-Rect Minimap::calcMapRect(const Rect& screenRect, const Position& mapCenter, float scale)
+Rect Minimap::calcMapRect(const Rect& screenRect, const Position& mapCenter, float scale) const
 {
     const int w = screenRect.width() / scale;
     const int h = std::ceil(screenRect.height() / scale);

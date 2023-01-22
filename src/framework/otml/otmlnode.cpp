@@ -40,7 +40,7 @@ OTMLNodePtr OTMLNode::create(const std::string_view tag, const std::string_view 
     return node;
 }
 
-bool OTMLNode::hasChildren()
+bool OTMLNode::hasChildren() const
 {
     int count = 0;
     for (const OTMLNodePtr& child : m_children) {
@@ -50,7 +50,7 @@ bool OTMLNode::hasChildren()
     return count > 0;
 }
 
-OTMLNodePtr OTMLNode::get(const std::string_view childTag)
+OTMLNodePtr OTMLNode::get(const std::string_view childTag) const
 {
     for (const OTMLNodePtr& child : m_children) {
         if (child->tag() == childTag && !child->isNull())
@@ -161,7 +161,7 @@ void OTMLNode::clear()
     m_children.clear();
 }
 
-OTMLNodeList OTMLNode::children()
+OTMLNodeList OTMLNode::children() const
 {
     OTMLNodeList children;
     for (const OTMLNodePtr& child : m_children)
@@ -170,7 +170,7 @@ OTMLNodeList OTMLNode::children()
     return children;
 }
 
-OTMLNodePtr OTMLNode::clone()
+OTMLNodePtr OTMLNode::clone() const
 {
     const auto& myClone = std::make_shared<OTMLNode>();
     myClone->setTag(m_tag);

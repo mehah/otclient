@@ -36,7 +36,7 @@ void DrawPoolManager::init()
     }
 }
 
-void DrawPoolManager::terminate()
+void DrawPoolManager::terminate() const
 {
     // Destroy Pools
     for (int_fast8_t i = -1; ++i <= static_cast<uint8_t>(DrawPoolType::UNKNOW);) {

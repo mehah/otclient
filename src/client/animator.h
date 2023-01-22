@@ -61,8 +61,8 @@ public:
 
     uint16_t getMinDuration() const { return m_minDuration; }
 
-    bool isAsync() { return m_async; }
-    bool isComplete() { return m_isComplete; }
+    bool isAsync() const { return m_async; }
+    bool isComplete() const { return m_isComplete; }
 
     uint16_t getTotalDuration() const;
 

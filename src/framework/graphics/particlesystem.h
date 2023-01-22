@@ -37,7 +37,7 @@ public:
     void render() const;
     void update();
 
-    bool hasFinished() { return m_finished; }
+    bool hasFinished() const { return m_finished; }
 
 private:
     bool m_finished{ false };

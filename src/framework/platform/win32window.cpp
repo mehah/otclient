@@ -407,7 +407,7 @@ void WIN32Window::internalDestroyGLContext()
 #endif
 }
 
-void WIN32Window::internalRestoreGLContext()
+void WIN32Window::internalRestoreGLContext() const
 {
 #ifdef OPENGL_ES
     if (!eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext))
@@ -1058,7 +1058,7 @@ std::string WIN32Window::getPlatformType()
 #endif
 }
 
-Rect WIN32Window::getClientRect()
+Rect WIN32Window::getClientRect() const
 {
     if (m_window) {
         RECT clientRect = { 0,0,0,0 };
@@ -1080,7 +1080,7 @@ Rect WIN32Window::getWindowRect()
     return adjustWindowRect(getClientRect());
 }
 
-Rect WIN32Window::adjustWindowRect(const Rect& clientRect)
+Rect WIN32Window::adjustWindowRect(const Rect& clientRect) const
 {
     Rect rect;
     DWORD dwStyle;

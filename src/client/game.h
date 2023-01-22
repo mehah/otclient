@@ -317,8 +317,8 @@ public:
     void setCustomOs(Otc::OperatingSystem_t os) { m_clientCustomOs = os; }
     Otc::OperatingSystem_t getOs();
 
-    bool canPerformGameAction();
-    bool checkBotProtection();
+    bool canPerformGameAction() const;
+    bool checkBotProtection() const;
 
     bool isOnline() { return m_online; }
     bool isLogging() { return !m_online && m_protocolGame; }

@@ -25,7 +25,7 @@
 #include <framework/luaengine/luaobject.h>
 #include "declarations.h"
 
-// @bindclass
+ // @bindclass
 class InputMessage : public LuaObject
 {
 public:
@@ -84,7 +84,7 @@ protected:
     uint8_t* getReadBuffer() { return m_buffer + m_readPos; }
     uint8_t* getHeaderBuffer() { return m_buffer + m_headerPos; }
     uint8_t* getDataBuffer() { return m_buffer + MAX_HEADER_SIZE; }
-    uint16_t getHeaderSize() { return (MAX_HEADER_SIZE - m_headerPos); }
+    uint16_t getHeaderSize() const { return (MAX_HEADER_SIZE - m_headerPos); }
 
     uint16_t readSize() { return getU16(); }
     bool readChecksum();
@@ -92,7 +92,7 @@ protected:
     friend class Protocol;
 
 private:
-    bool canRead(int bytes);
+    bool canRead(int bytes) const;
     void checkRead(int bytes);
     void checkWrite(int bytes);
 

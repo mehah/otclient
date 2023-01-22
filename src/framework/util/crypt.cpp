@@ -204,7 +204,7 @@ std::string Crypt::getMachineUUID()
     return _encrypt(to_string(m_machineUUID), false);
 }
 
-std::string Crypt::getCryptKey(bool useMachineUUID)
+std::string Crypt::getCryptKey(bool useMachineUUID) const
 {
     constexpr std::hash<uuids::uuid> uuid_hasher;
     const uuids::uuid uuid = useMachineUUID ? m_machineUUID : uuids::uuid();

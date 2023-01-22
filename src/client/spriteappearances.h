@@ -39,7 +39,7 @@ class SpriteSheet
 public:
     SpriteSheet(int firstId, int lastId, SpriteLayout spriteLayout, const std::string& file) : firstId(firstId), lastId(lastId), spriteLayout(spriteLayout), file(file) {}
 
-    Size getSpriteSize()
+    Size getSpriteSize() const
     {
         Size size(SPRITE_SIZE, SPRITE_SIZE);
 
@@ -77,7 +77,7 @@ public:
     void setSpritesCount(int count) { m_spritesCount = count; }
     int getSpritesCount() const { return m_spritesCount; }
 
-    bool loadSpriteSheet(const SpriteSheetPtr& sheet);
+    bool loadSpriteSheet(const SpriteSheetPtr& sheet) const;
     void saveSheetToFileBySprite(int id, const std::string& file);
     void saveSheetToFile(const SpriteSheetPtr& sheet, const std::string& file);
     SpriteSheetPtr getSheetBySpriteId(int id, bool load = true);

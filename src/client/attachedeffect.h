@@ -33,7 +33,7 @@ public:
 
     uint16_t getId() { return m_id; }
 
-    AttachedEffectPtr clone();
+    AttachedEffectPtr clone() const;
 
     float getSpeed() { return m_speed; }
     void setSpeed(float speed) { m_speed = speed; }

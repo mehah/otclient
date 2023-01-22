@@ -299,7 +299,7 @@ std::string SoundManager::resolveSoundFile(const std::string& file)
     return _file;
 }
 
-void SoundManager::ensureContext()
+void SoundManager::ensureContext() const
 {
     if (m_context)
         alcMakeContextCurrent(m_context);

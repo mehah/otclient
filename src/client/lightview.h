@@ -45,7 +45,7 @@ public:
         m_pool->repaint();
     }
 
-    void setSmooth(bool enabled);
+    void setSmooth(bool enabled) const;
 
     const Light& getGlobalLight() const { return m_globalLight; }
     bool isDark() const { return m_globalLight.intensity < 250; }

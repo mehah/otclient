@@ -250,7 +250,7 @@ FileStreamPtr ResourceManager::openFile(const std::string& fileName)
     return { std::make_shared<FileStream>(fullPath, file, false) };
 }
 
-FileStreamPtr ResourceManager::appendFile(const std::string& fileName)
+FileStreamPtr ResourceManager::appendFile(const std::string& fileName) const
 {
     PHYSFS_File* file = PHYSFS_openAppend(fileName.c_str());
     if (!file)
@@ -258,7 +258,7 @@ FileStreamPtr ResourceManager::appendFile(const std::string& fileName)
     return { std::make_shared<FileStream>(fileName, file, true) };
 }
 
-FileStreamPtr ResourceManager::createFile(const std::string& fileName)
+FileStreamPtr ResourceManager::createFile(const std::string& fileName) const
 {
     PHYSFS_File* file = PHYSFS_openWrite(fileName.c_str());
     if (!file)

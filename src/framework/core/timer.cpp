@@ -29,7 +29,7 @@ void Timer::restart()
     m_stopped = false;
 }
 
-ticks_t Timer::ticksElapsed()
+ticks_t Timer::ticksElapsed() const
 {
     return g_clock.millis() - m_startTicks;
 }

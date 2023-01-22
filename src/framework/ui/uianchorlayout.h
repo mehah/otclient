@@ -52,7 +52,7 @@ public:
 
     void addAnchor(const UIAnchorPtr& anchor);
     const UIAnchorList& getAnchors() { return m_anchors; }
-    bool isUpdated() { return m_updated; }
+    bool isUpdated() const { return m_updated; }
     void setUpdated(bool updated) { m_updated = updated; }
 
 private:
@@ -69,7 +69,7 @@ public:
     void addAnchor(const UIWidgetPtr& anchoredWidget, Fw::AnchorEdge anchoredEdge,
                    const std::string_view hookedWidgetId, Fw::AnchorEdge hookedEdge);
     void removeAnchors(const UIWidgetPtr& anchoredWidget);
-    bool hasAnchors(const UIWidgetPtr& anchoredWidget);
+    bool hasAnchors(const UIWidgetPtr& anchoredWidget) const;
     void centerIn(const UIWidgetPtr& anchoredWidget, const std::string_view hookedWidgetId);
     void fill(const UIWidgetPtr& anchoredWidget, const std::string_view hookedWidgetId);
 

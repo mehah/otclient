@@ -37,7 +37,7 @@ class WIN32Window : public PlatformWindow
     void internalCreateWindow();
     void internalCreateGLContext();
     void internalDestroyGLContext();
-    void internalRestoreGLContext();
+    void internalRestoreGLContext() const;
 
     void* getExtensionProcAddress(const char* ext);
     bool isExtensionSupported(const char* ext);
@@ -82,9 +82,9 @@ protected:
     int internalLoadMouseCursor(const ImagePtr& image, const Point& hotSpot) override;
 
 private:
-    Rect getClientRect();
+    Rect getClientRect() const;
     Rect getWindowRect();
-    Rect adjustWindowRect(const Rect& rect);
+    Rect adjustWindowRect(const Rect& rect) const;
 
     std::vector<HCURSOR> m_cursors;
     HWND m_window;

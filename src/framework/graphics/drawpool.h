@@ -162,7 +162,7 @@ private:
 
     size_t updateHash(PoolState& state, const DrawPool::DrawMethod& method);
 
-    float getOpacity() { return m_state.opacity; }
+    float getOpacity() const { return m_state.opacity; }
     Rect getClipRect() { return m_state.clipRect; }
 
     void setCompositionMode(CompositionMode mode, bool onlyOnce = false);
@@ -234,9 +234,9 @@ class DrawPoolFramed : public DrawPool
 public:
     void onBeforeDraw(std::function<void()> f) { m_beforeDraw = std::move(f); }
     void onAfterDraw(std::function<void()> f) { m_afterDraw = std::move(f); }
-    void setSmooth(bool enabled) { m_framebuffer->setSmooth(enabled); }
+    void setSmooth(bool enabled) const { m_framebuffer->setSmooth(enabled); }
     void resize(const Size& size) { if (m_framebuffer->resize(size)) repaint(); }
-    Size getSize() { return m_framebuffer->getSize(); }
+    Size getSize() const { return m_framebuffer->getSize(); }
     bool isValid() const override { return m_framebuffer->isValid(); }
 
 protected:
@@ -281,8 +281,8 @@ private:
         return buffer;
     }
 
-    inline bool isValid() { return m_i != -1; }
-    inline bool isTemporary() { return m_i == -2; }
+    inline bool isValid() const { return m_i != -1; }
+    inline bool isTemporary() const { return m_i == -2; }
 
     inline CoordsBuffer* getCoords() { return (m_coords ? m_coords : m_coords = std::make_shared<CoordsBuffer>()).get(); }
 

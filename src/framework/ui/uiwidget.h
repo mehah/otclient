@@ -287,9 +287,9 @@ private:
     void parseBaseStyle(const OTMLNodePtr& styleNode);
 
 protected:
-    void drawBackground(const Rect& screenCoords);
-    void drawBorder(const Rect& screenCoords);
-    void drawIcon(const Rect& screenCoords);
+    void drawBackground(const Rect& screenCoords) const;
+    void drawBorder(const Rect& screenCoords) const;
+    void drawIcon(const Rect& screenCoords) const;
 
     Color m_color{ Color::white };
     Color m_backgroundColor{ Color::alpha };

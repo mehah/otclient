@@ -30,7 +30,7 @@ class TextureManager
 public:
     void init();
     void terminate();
-    void poll();
+    void poll() const;
 
     void clearCache();
     void liveReload();

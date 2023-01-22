@@ -90,10 +90,10 @@ public:
     void drawText();
 
     // floor visibility related
-    uint8_t getLockedFirstVisibleFloor() { return m_lockedFirstVisibleFloor; }
-    uint8_t getCachedFirstVisibleFloor() { return m_cachedFirstVisibleFloor; }
-    uint8_t getCachedLastVisibleFloor() { return m_cachedLastVisibleFloor; }
-    uint8_t getTileSize() { return m_tileSize; }
+    uint8_t getLockedFirstVisibleFloor() const { return m_lockedFirstVisibleFloor; }
+    uint8_t getCachedFirstVisibleFloor() const { return m_cachedFirstVisibleFloor; }
+    uint8_t getCachedLastVisibleFloor() const { return m_cachedLastVisibleFloor; }
+    uint8_t getTileSize() const { return m_tileSize; }
 
     void lockFirstVisibleFloor(uint8_t firstVisibleFloor);
     void unlockFirstVisibleFloor();
@@ -103,37 +103,37 @@ public:
     void setVisibleDimension(const Size& visibleDimension);
 
     // view mode related
-    FloorViewMode getFloorViewMode() { return m_floorViewMode; }
+    FloorViewMode getFloorViewMode() const { return m_floorViewMode; }
     void setFloorViewMode(FloorViewMode viewMode);
 
     // camera related
     CreaturePtr getFollowingCreature() { return m_followingCreature; }
     void followCreature(const CreaturePtr& creature);
-    bool isFollowingCreature() { return m_followingCreature && m_follow; }
+    bool isFollowingCreature() const { return m_followingCreature && m_follow; }
 
     Position getCameraPosition();
     void setCameraPosition(const Position& pos);
 
     void setMinimumAmbientLight(float intensity) { m_minimumAmbientLight = intensity; updateLight(); }
-    float getMinimumAmbientLight() { return m_minimumAmbientLight; }
+    float getMinimumAmbientLight() const { return m_minimumAmbientLight; }
 
     void setShadowFloorIntensity(float intensity) { m_shadowFloorIntensity = intensity; updateLight(); }
-    float getShadowFloorIntensity() { return m_shadowFloorIntensity; }
+    float getShadowFloorIntensity() const { return m_shadowFloorIntensity; }
 
     void setDrawNames(bool enable) { m_drawNames = enable; }
-    bool isDrawingNames() { return m_drawNames; }
+    bool isDrawingNames() const { return m_drawNames; }
 
     void setDrawHealthBars(bool enable) { m_drawHealthBars = enable; }
-    bool isDrawingHealthBars() { return m_drawHealthBars; }
+    bool isDrawingHealthBars() const { return m_drawHealthBars; }
 
     void setDrawLights(bool enable);
-    bool isDrawingLights() { return m_lightView && m_lightView->isDark(); }
+    bool isDrawingLights() const { return m_lightView && m_lightView->isDark(); }
 
     void setLimitVisibleDimension(bool v) { m_limitVisibleDimension = v; }
-    bool isLimitedVisibleDimension() { return m_limitVisibleDimension; }
+    bool isLimitedVisibleDimension() const { return m_limitVisibleDimension; }
 
     void setDrawManaBar(bool enable) { m_drawManaBar = enable; }
-    bool isDrawingManaBar() { return m_drawManaBar; }
+    bool isDrawingManaBar() const { return m_drawManaBar; }
 
     void move(int32_t x, int32_t y);
 
@@ -159,7 +159,7 @@ public:
         return getCameraPosition().isInRange(pos, m_posInfo.awareRange.left, m_posInfo.awareRange.right, m_posInfo.awareRange.top, m_posInfo.awareRange.bottom, ignoreZ);
     }
 
-    TilePtr getTopTile(Position tilePos);
+    TilePtr getTopTile(Position tilePos) const;
 
     void setCrosshairTexture(const std::string& texturePath);
     void setAntiAliasingMode(AntialiasingMode mode);
@@ -168,7 +168,7 @@ public:
     void onKeyRelease(const InputEvent& inputEvent);
 
     void setLastMousePosition(const Position& mousePos) { m_mousePosition = mousePos; }
-    const Position& getLastMousePosition() { return m_mousePosition; }
+    const Position& getLastMousePosition() const { return m_mousePosition; }
 
     void setDrawHighlightTarget(const bool enable) { m_drawHighlightTarget = enable; }
 
@@ -208,8 +208,8 @@ private:
     void requestUpdateVisibleTiles() { m_updateVisibleTiles = true; }
     void requestUpdateMapPosInfo() { m_posInfo.rect = {}; }
 
-    uint8_t calcFirstVisibleFloor(bool checkLimitsFloorsView);
-    uint8_t calcLastVisibleFloor();
+    uint8_t calcFirstVisibleFloor(bool checkLimitsFloorsView) const;
+    uint8_t calcLastVisibleFloor() const;
 
     void updateLight();
     void updateViewportDirectionCache();
@@ -217,9 +217,9 @@ private:
 
     void updateViewport(const Otc::Direction dir = Otc::InvalidDirection) { m_viewport = m_viewPortDirection[dir]; }
 
-    bool canFloorFade() { return m_floorViewMode == FADE && m_floorFading; }
+    bool canFloorFade() const { return m_floorViewMode == FADE && m_floorFading; }
 
-    float getFadeLevel(uint8_t z)
+    float getFadeLevel(uint8_t z) const
     {
         if (!canFloorFade()) return 1.f;
 
@@ -231,7 +231,7 @@ private:
 
     Rect calcFramebufferSource(const Size& destSize);
 
-    Point transformPositionTo2D(const Position& position, const Position& relativePosition)
+    Point transformPositionTo2D(const Position& position, const Position& relativePosition) const
     {
         return {
             (m_virtualCenterOffset.x + (position.x - relativePosition.x) - (relativePosition.z - position.z)) * m_tileSize,

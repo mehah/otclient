@@ -86,7 +86,7 @@ public:
     void setColor(const Color& c) { m_color = c; }
     void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false) override;
 
-    int getCountOrSubType() { return m_countOrSubType; }
+    int getCountOrSubType() const { return m_countOrSubType; }
     int getSubType();
     int getCount() { return isStackable() ? m_countOrSubType : 1; }
 

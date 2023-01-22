@@ -55,7 +55,7 @@ public:
 private:
     std::string _encrypt(const std::string& decrypted_string, bool useMachineUUID);
     std::string _decrypt(const std::string& encrypted_string, bool useMachineUUID);
-    std::string getCryptKey(bool useMachineUUID);
+    std::string getCryptKey(bool useMachineUUID) const;
 
     uuids::uuid m_machineUUID;
 

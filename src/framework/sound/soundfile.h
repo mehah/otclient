@@ -33,15 +33,15 @@ public:
 
     virtual int read(void* /*buffer*/, int /*bufferSize*/) { return -1; }
     virtual void reset() {}
-    bool eof() { return m_file->eof(); }
+    bool eof() const { return m_file->eof(); }
 
-    ALenum getSampleFormat();
+    ALenum getSampleFormat() const;
 
-    int getChannels() { return m_channels; }
-    int getRate() { return m_rate; }
-    int getBps() { return m_bps; }
-    int getSize() { return m_size; }
-    std::string getName() { return m_file ? m_file->name() : std::string(); }
+    int getChannels() const { return m_channels; }
+    int getRate() const { return m_rate; }
+    int getBps() const { return m_bps; }
+    int getSize() const { return m_size; }
+    std::string getName() const { return m_file ? m_file->name() : std::string(); }
 
 protected:
     FileStreamPtr m_file;

@@ -106,7 +106,7 @@ public:
     bool isPreWalking() { return m_preWalking; }
     bool isAutoWalking() { return m_autoWalkDestination.isValid(); }
     bool isPremium() { return m_premium; }
-    bool isPendingGame() { return m_pending; }
+    bool isPendingGame() const { return m_pending; }
 
     LocalPlayerPtr asLocalPlayer() { return static_self_cast<LocalPlayer>(); }
     bool isLocalPlayer() override { return true; }

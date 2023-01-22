@@ -157,8 +157,8 @@ public:
     void removeMapView(const MapViewPtr& mapView);
 
     void notificateTileUpdate(const Position& pos, const ThingPtr& thing, Otc::Operation operation);
-    void notificateCameraMove(const Point& offset);
-    void notificateKeyRelease(const InputEvent& inputEvent);
+    void notificateCameraMove(const Point& offset) const;
+    void notificateKeyRelease(const InputEvent& inputEvent) const;
 
 #ifdef FRAMEWORK_EDITOR
     bool loadOtcm(const std::string& fileName);
@@ -219,7 +219,7 @@ public:
     void colorizeThing(const ThingPtr& thing, const Color& color);
     void removeThingColor(const ThingPtr& thing);
 
-    StaticTextPtr getStaticText(const Position& pos);
+    StaticTextPtr getStaticText(const Position& pos) const;
 
     // tile related
     const TilePtr& createTile(const Position& pos);
@@ -263,18 +263,18 @@ public:
     bool isLookPossible(const Position& pos);
     bool isCovered(const Position& pos, uint8_t firstFloor = 0);
     bool isCompletelyCovered(const Position& pos, uint8_t firstFloor = 0);
-    bool isAwareOfPosition(const Position& pos);
+    bool isAwareOfPosition(const Position& pos) const;
 
-    void resetLastCamera();
+    void resetLastCamera() const;
 
     void setAwareRange(const AwareRange& range);
     void resetAwareRange();
-    AwareRange getAwareRange() { return m_awareRange; }
+    AwareRange getAwareRange() const { return m_awareRange; }
 
-    Light getLight() { return m_light; }
+    Light getLight() const { return m_light; }
     Position getCentralPosition() { return m_centralPosition; }
-    uint8_t getFirstAwareFloor();
-    uint8_t getLastAwareFloor();
+    uint8_t getFirstAwareFloor() const;
+    uint8_t getLastAwareFloor() const;
     const std::vector<MissilePtr>& getFloorMissiles(uint8_t z) { return m_floorMissiles[z]; }
 
     std::vector<AnimatedTextPtr> getAnimatedTexts() { return m_animatedTexts; }

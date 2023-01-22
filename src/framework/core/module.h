@@ -41,7 +41,7 @@ public:
     bool canReload() { return m_reloadable && !isDependent(); }
     bool isLoaded() { return m_loaded; }
     bool isReloadable() { return m_reloadable; }
-    bool isDependent();
+    bool isDependent() const;
     bool isSandboxed() { return m_sandboxed; }
     bool hasDependency(const std::string_view name, bool recursive = false);
     int getSandbox(LuaInterface* lua);

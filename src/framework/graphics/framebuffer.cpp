@@ -104,7 +104,7 @@ void FrameBuffer::internalBind()
     boundFbo = m_fbo;
 }
 
-void FrameBuffer::internalRelease()
+void FrameBuffer::internalRelease() const
 {
     assert(boundFbo == m_fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, m_prevBoundFbo);

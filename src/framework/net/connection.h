@@ -58,10 +58,10 @@ public:
     void setErrorCallback(const ErrorCallback& errorCallback) { m_errorCallback = errorCallback; }
 
     int getIp();
-    std::error_code getError() { return m_error; }
-    bool isConnecting() { return m_connecting; }
-    bool isConnected() { return m_connected; }
-    ticks_t getElapsedTicksSinceLastRead() { return m_connected ? m_activityTimer.elapsed_millis() : -1; }
+    std::error_code getError() const { return m_error; }
+    bool isConnecting() const { return m_connecting; }
+    bool isConnected() const { return m_connected; }
+    ticks_t getElapsedTicksSinceLastRead() const { return m_connected ? m_activityTimer.elapsed_millis() : -1; }
 
     ConnectionPtr asConnection() { return static_self_cast<Connection>(); }
 

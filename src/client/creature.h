@@ -84,7 +84,7 @@ public:
     void showStaticSquare(const Color& color) { m_showStaticSquare = true; m_staticSquareColor = color; }
     void hideStaticSquare() { m_showStaticSquare = false; }
 
-    bool isDrawingOutfitColor() { return m_drawOutfitColor; }
+    bool isDrawingOutfitColor() const { return m_drawOutfitColor; }
     void setDrawOutfitColor(const bool draw) { m_drawOutfitColor = draw; }
 
     uint32_t getId() override { return m_id; }
@@ -102,12 +102,12 @@ public:
     uint8_t getEmblem() { return m_emblem; }
     uint8_t getType() { return m_type; }
     uint8_t getIcon() { return m_icon; }
-    bool isPassable() { return m_passable; }
+    bool isPassable() const { return m_passable; }
     uint16_t getStepDuration(bool ignoreDiagonal = false, Otc::Direction dir = Otc::InvalidDirection);
     Point getWalkOffset() { return m_walkOffset; }
     PointF getJumpOffset() { return m_jumpOffset; }
-    Position getLastStepFromPosition() { return m_lastStepFromPosition; }
-    Position getLastStepToPosition() { return m_lastStepToPosition; }
+    Position getLastStepFromPosition() const { return m_lastStepFromPosition; }
+    Position getLastStepToPosition() const { return m_lastStepToPosition; }
     float getStepProgress() { return m_walkTimer.ticksElapsed() / m_stepCache.duration; }
     float getStepTicksLeft() { return static_cast<float>(m_stepCache.getDuration(m_lastStepDirection)) - m_walkTimer.ticksElapsed(); }
     ticks_t getWalkTicksElapsed() { return m_walkTimer.ticksElapsed(); }
@@ -139,7 +139,7 @@ public:
     bool isRemoved() { return m_removed; }
     bool isInvisible() { return m_outfit.getCategory() == ThingCategoryEffect && m_outfit.getAuxId() == 13; }
     bool isDead() { return m_healthPercent <= 0; }
-    bool isFullHealth() { return m_healthPercent == 100; }
+    bool isFullHealth() const { return m_healthPercent == 100; }
     bool canBeSeen() { return !isInvisible() || isPlayer(); }
     bool isCreature() override { return true; }
     bool isParalyzed() const { return m_speed < 10; }
@@ -162,7 +162,7 @@ protected:
     void updateOutfitColor(Color color, Color finalColor, Color delta, int duration);
     void updateJump();
 
-    bool mustStabilizeCam() { return m_stepCache.mustStabilizeCam; }
+    bool mustStabilizeCam() const { return m_stepCache.mustStabilizeCam; }
 
     uint32_t m_id{ 0 };
     uint32_t m_masterId{ 0 };

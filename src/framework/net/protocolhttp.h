@@ -33,7 +33,7 @@
 #include <random>
 #include <zlib.h>
 
-//  result
+ //  result
 class HttpSession;
 
 struct HttpResult
@@ -84,7 +84,7 @@ public:
         assert(m_result != nullptr);
     };
     void start();
-    void cancel() { onError("canceled"); }
+    void cancel() const { onError("canceled"); }
     void close();
 
 private:
@@ -120,7 +120,7 @@ private:
     void on_read(const std::error_code& ec, size_t bytes_transferred);
 
     void onTimeout(const std::error_code& ec);
-    void onError(const std::string& ec, const std::string& details = "");
+    void onError(const std::string& ec, const std::string& details = "") const;
 };
 
 //  web socket

@@ -25,7 +25,7 @@
 #include <filesystem>
 #include "declarations.h"
 
-// @bindsingleton g_resources
+ // @bindsingleton g_resources
 class ResourceManager
 {
 public:
@@ -56,8 +56,8 @@ public:
 
     // String_view Support
     FileStreamPtr openFile(const std::string& fileName);
-    FileStreamPtr appendFile(const std::string& fileName);
-    FileStreamPtr createFile(const std::string& fileName);
+    FileStreamPtr appendFile(const std::string& fileName) const;
+    FileStreamPtr createFile(const std::string& fileName) const;
     bool deleteFile(const std::string& fileName);
 
     bool makeDir(const std::string& directory);

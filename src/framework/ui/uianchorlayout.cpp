@@ -130,7 +130,7 @@ void UIAnchorLayout::removeAnchors(const UIWidgetPtr& anchoredWidget)
     update();
 }
 
-bool UIAnchorLayout::hasAnchors(const UIWidgetPtr& anchoredWidget)
+bool UIAnchorLayout::hasAnchors(const UIWidgetPtr& anchoredWidget) const
 {
     return m_anchorsGroups.contains(anchoredWidget);
 }

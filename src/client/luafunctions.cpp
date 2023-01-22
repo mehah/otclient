@@ -81,9 +81,7 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_things", "loadOtb", &ThingTypeManager::loadOtb, &g_things);
     g_lua.bindSingletonFunction("g_things", "loadXml", &ThingTypeManager::loadXml, &g_things);
     g_lua.bindSingletonFunction("g_things", "isOtbLoaded", &ThingTypeManager::isOtbLoaded, &g_things);
-#endif
 
-#ifdef FRAMEWORK_EDITOR
     g_lua.registerSingletonClass("g_houses");
     g_lua.bindSingletonFunction("g_houses", "clear", &HouseManager::clear, &g_houses);
     g_lua.bindSingletonFunction("g_houses", "load", &HouseManager::load, &g_houses);
@@ -296,9 +294,7 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "ping", &Game::ping, &g_game);
     g_lua.bindSingletonFunction("g_game", "setPingDelay", &Game::setPingDelay, &g_game);
     g_lua.bindSingletonFunction("g_game", "changeMapAwareRange", &Game::changeMapAwareRange, &g_game);
-    g_lua.bindSingletonFunction("g_game", "canPerformGameAction", &Game::canPerformGameAction, &g_game);
     g_lua.bindSingletonFunction("g_game", "canReportBugs", &Game::canReportBugs, &g_game);
-    g_lua.bindSingletonFunction("g_game", "checkBotProtection", &Game::checkBotProtection, &g_game);
     g_lua.bindSingletonFunction("g_game", "isOnline", &Game::isOnline, &g_game);
     g_lua.bindSingletonFunction("g_game", "isLogging", &Game::isLogging, &g_game);
     g_lua.bindSingletonFunction("g_game", "isDead", &Game::isDead, &g_game);
@@ -369,17 +365,7 @@ void Client::registerLuaFunctions()
 
     g_lua.registerClass<ProtocolGame, Protocol>();
     g_lua.bindClassStaticFunction<ProtocolGame>("create", [] { return std::make_shared<ProtocolGame>(); });
-    g_lua.bindClassMemberFunction<ProtocolGame>("login", &ProtocolGame::login);
     g_lua.bindClassMemberFunction<ProtocolGame>("sendExtendedOpcode", &ProtocolGame::sendExtendedOpcode);
-    g_lua.bindClassMemberFunction<ProtocolGame>("addPosition", &ProtocolGame::addPosition);
-    g_lua.bindClassMemberFunction<ProtocolGame>("setMapDescription", &ProtocolGame::setMapDescription);
-    g_lua.bindClassMemberFunction<ProtocolGame>("setFloorDescription", &ProtocolGame::setFloorDescription);
-    g_lua.bindClassMemberFunction<ProtocolGame>("setTileDescription", &ProtocolGame::setTileDescription);
-    g_lua.bindClassMemberFunction<ProtocolGame>("getOutfit", &ProtocolGame::getOutfit);
-    g_lua.bindClassMemberFunction<ProtocolGame>("getThing", &ProtocolGame::getThing);
-    g_lua.bindClassMemberFunction<ProtocolGame>("getCreature", &ProtocolGame::getCreature);
-    g_lua.bindClassMemberFunction<ProtocolGame>("getItem", &ProtocolGame::getItem);
-    g_lua.bindClassMemberFunction<ProtocolGame>("getPosition", &ProtocolGame::getPosition);
 
     g_lua.registerClass<Container>();
     g_lua.bindClassMemberFunction<Container>("getItem", &Container::getItem);

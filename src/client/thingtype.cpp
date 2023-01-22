@@ -793,7 +793,7 @@ Size ThingType::getBestTextureDimension(int w, int h, int count)
     return bestDimension;
 }
 
-uint32_t ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int a)
+uint32_t ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int a) const
 {
     uint32_t index = ((((((a % m_animationPhases)
                       * m_numPatternZ + z)
@@ -815,7 +815,7 @@ uint32_t ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int
     return index;
 }
 
-uint32_t ThingType::getTextureIndex(int l, int x, int y, int z)
+uint32_t ThingType::getTextureIndex(int l, int x, int y, int z) const
 {
     return ((l * m_numPatternZ + z)
             * m_numPatternY + y)

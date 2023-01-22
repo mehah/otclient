@@ -33,9 +33,9 @@ public:
     ~SoundBuffer();
 
     bool fillBuffer(const SoundFilePtr& soundFile);
-    bool fillBuffer(ALenum sampleFormat, const DataBuffer<char>& data, int size, int rate);
+    bool fillBuffer(ALenum sampleFormat, const DataBuffer<char>& data, int size, int rate) const;
 
-    uint32_t getBufferId() { return m_bufferId; }
+    uint32_t getBufferId() const { return m_bufferId; }
 
 private:
     uint32_t m_bufferId{ 0 };

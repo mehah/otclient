@@ -49,7 +49,7 @@ void TextureManager::terminate()
     m_emptyTexture = nullptr;
 }
 
-void TextureManager::poll()
+void TextureManager::poll() const
 {
     // update only every 16msec, this allows upto 60 fps for animated textures
     static ticks_t lastUpdate = 0;

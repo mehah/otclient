@@ -1488,7 +1488,7 @@ void Game::changeMapAwareRange(int xrange, int yrange)
     m_protocolGame->sendChangeMapAwareRange(xrange, yrange);
 }
 
-bool Game::checkBotProtection()
+bool Game::checkBotProtection() const
 {
 #ifdef BOT_PROTECTION
     // accepts calls comming from a stacktrace containing only C++ functions,
@@ -1501,7 +1501,7 @@ bool Game::checkBotProtection()
     return true;
 }
 
-bool Game::canPerformGameAction()
+bool Game::canPerformGameAction() const
 {
     // we can only perform game actions if we meet these conditions:
     // - the game is online

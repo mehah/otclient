@@ -33,11 +33,11 @@ public:
     void stop() { m_stopped = true; }
     void update(const ticks_t tick) { m_startTicks += tick; }
 
-    ticks_t startTicks() { return m_startTicks; }
-    ticks_t ticksElapsed();
-    float timeElapsed() { return ticksElapsed() / 1000.0f; }
+    ticks_t startTicks() const { return m_startTicks; }
+    ticks_t ticksElapsed() const;
+    float timeElapsed() const { return ticksElapsed() / 1000.0f; }
 
-    bool running() { return !m_stopped; }
+    bool running() const { return !m_stopped; }
 
 private:
     ticks_t m_startTicks;

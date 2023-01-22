@@ -329,7 +329,7 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
     }
 }
 
-void UIWidget::drawBackground(const Rect& screenCoords)
+void UIWidget::drawBackground(const Rect& screenCoords) const
 {
     if (m_backgroundColor.aF() > 0.0f) {
         Rect drawRect = screenCoords;
@@ -340,7 +340,7 @@ void UIWidget::drawBackground(const Rect& screenCoords)
     }
 }
 
-void UIWidget::drawBorder(const Rect& screenCoords)
+void UIWidget::drawBorder(const Rect& screenCoords) const
 {
     // top
     if (m_borderWidth.top > 0) {
@@ -364,7 +364,7 @@ void UIWidget::drawBorder(const Rect& screenCoords)
     }
 }
 
-void UIWidget::drawIcon(const Rect& screenCoords)
+void UIWidget::drawIcon(const Rect& screenCoords) const
 {
     if (!m_icon)
         return;

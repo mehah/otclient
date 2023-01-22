@@ -777,7 +777,7 @@ void LuaInterface::closeLuaState()
     }
 }
 
-void LuaInterface::collectGarbage()
+void LuaInterface::collectGarbage() const
 {
     // prevents recursive collects
     static bool collecting = false;
@@ -819,7 +819,7 @@ void LuaInterface::error()
     lua_error(L);
 }
 
-int LuaInterface::ref()
+int LuaInterface::ref() const
 {
     const int ref = luaL_ref(L, LUA_REGISTRYINDEX);
     assert(ref != LUA_NOREF);
@@ -849,7 +849,7 @@ int LuaInterface::weakRef()
     return id;
 }
 
-void LuaInterface::unref(int ref)
+void LuaInterface::unref(int ref) const
 {
     if (ref >= 0 && L != nullptr)
         luaL_unref(L, LUA_REGISTRYINDEX, ref);
@@ -862,7 +862,7 @@ const char* LuaInterface::typeName(int index)
     return lua_typename(L, type);
 }
 
-std::string LuaInterface::functionSourcePath()
+std::string LuaInterface::functionSourcePath() const
 {
     std::string path;
 
@@ -909,7 +909,7 @@ void LuaInterface::getStackFunction(int level)
         pushNil();
 }
 
-void LuaInterface::getRef(int ref)
+void LuaInterface::getRef(int ref) const
 {
     lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
 }
@@ -1012,7 +1012,7 @@ void LuaInterface::clearTable(int index)
     }
 }
 
-void LuaInterface::getGlobal(const std::string_view key)
+void LuaInterface::getGlobal(const std::string_view key) const
 {
     lua_getglobal(L, key.data());
 }
@@ -1057,17 +1057,17 @@ void LuaInterface::rawSeti(int n, int index)
     lua_rawseti(L, index, n);
 }
 
-void LuaInterface::newTable()
+void LuaInterface::newTable() const
 {
     lua_newtable(L);
 }
 
-void LuaInterface::createTable(int narr, int nrec)
+void LuaInterface::createTable(int narr, int nrec) const
 {
     lua_createtable(L, narr, nrec);
 }
 
-void* LuaInterface::newUserdata(int size)
+void* LuaInterface::newUserdata(int size) const
 {
     return lua_newuserdata(L, size);
 }
@@ -1128,7 +1128,7 @@ LuaObjectPtr LuaInterface::popObject()
     return v;
 }
 
-void* LuaInterface::popUpvalueUserdata()
+void* LuaInterface::popUpvalueUserdata() const
 {
     return lua_touserdata(L, lua_upvalueindex(1));
 }
@@ -1317,7 +1317,7 @@ LuaObjectPtr LuaInterface::toObject(int index)
     return nullptr;
 }
 
-int LuaInterface::getTop()
+int LuaInterface::getTop() const
 {
     return lua_gettop(L);
 }

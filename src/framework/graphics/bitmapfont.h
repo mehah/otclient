@@ -46,16 +46,16 @@ public:
                                                          const Size& textBoxSize,
                                                          Fw::AlignmentFlag align,
                                                          const Rect& screenCoords,
-                                                         const std::vector<Point>& glyphsPositions);
+                                                         const std::vector<Point>& glyphsPositions) const;
 
     void fillTextCoords(const CoordsBufferPtr& coords, const std::string_view text,
                         const Size& textBoxSize, Fw::AlignmentFlag align,
-                        const Rect& screenCoords, const std::vector<Point>& glyphsPositions);
+                        const Rect& screenCoords, const std::vector<Point>& glyphsPositions) const;
 
     /// Calculate glyphs positions to use on render, also calculates textBoxSize if wanted
     const std::vector<Point>& calculateGlyphsPositions(const std::string_view text,
                                                        Fw::AlignmentFlag align,
-                                                       Size* textBoxSize = nullptr);
+                                                       Size* textBoxSize = nullptr) const;
 
     /// Simulate render and calculate text size
     Size calculateTextRectSize(const std::string_view text);
@@ -63,11 +63,11 @@ public:
     std::string wrapText(const std::string_view text, int maxWidth);
 
     const std::string& getName() { return m_name; }
-    int getGlyphHeight() { return m_glyphHeight; }
+    int getGlyphHeight() const { return m_glyphHeight; }
     const Rect* getGlyphsTextureCoords() { return m_glyphsTextureCoords; }
     const Size* getGlyphsSize() { return m_glyphsSize; }
     const TexturePtr& getTexture() { return m_texture; }
-    int getYOffset() { return m_yOffset; }
+    int getYOffset() const { return m_yOffset; }
     Size getGlyphSpacing() { return m_glyphSpacing; }
 
 private:

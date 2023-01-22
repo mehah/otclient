@@ -221,7 +221,7 @@ public:
     template<typename R, typename... T>
     R callGlobalField(const std::string_view global, const std::string_view field, const T&... args);
 
-    bool isInCppCallback() { return m_cppCallbackDepth != 0; }
+    bool isInCppCallback() const { return m_cppCallbackDepth != 0; }
 
 private:
     /// Load scripts requested by lua 'require'
@@ -256,7 +256,7 @@ public:
     void createLuaState();
     void closeLuaState();
 
-    void collectGarbage();
+    void collectGarbage() const;
 
     void loadBuffer(const std::string_view buffer, const std::string_view source);
 
@@ -264,25 +264,25 @@ public:
     void call(int numArgs = 0, int numRets = 0);
     void error();
 
-    int ref();
+    int ref() const;
     int weakRef();
-    void unref(int ref);
+    void unref(int ref) const;
     void useValue() { pushValue(); ref(); }
 
     const char* typeName(int index = -1);
-    std::string functionSourcePath();
+    std::string functionSourcePath() const;
 
     void insert(int index);
     void remove(int index);
     bool next(int index = -2);
 
-    void checkStack() { assert(getTop() <= 20); }
+    void checkStack() const { assert(getTop() <= 20); }
     void getStackFunction(int level = 0);
 
-    void getRef(int ref);
+    void getRef(int ref) const;
     void getWeakRef(int weakRef);
 
-    int getGlobalEnvironment() { return m_globalEnv; }
+    int getGlobalEnvironment() const { return m_globalEnv; }
     void setGlobalEnvironment(int env);
     void resetGlobalEnvironment() { setGlobalEnvironment(m_globalEnv); }
 
@@ -299,7 +299,7 @@ public:
     void getEnv(int index = -1);
     void setEnv(int index = -2);
 
-    void getGlobal(const std::string_view key);
+    void getGlobal(const std::string_view key) const;
     void getGlobalField(const std::string_view globalKey, const std::string_view fieldKey);
     void setGlobal(const std::string_view key);
 
@@ -308,9 +308,9 @@ public:
     void rawSet(int index = -3);
     void rawSeti(int n, int index = -2);
 
-    void newTable();
-    void createTable(int narr, int nrec);
-    void* newUserdata(int size);
+    void newTable() const;
+    void createTable(int narr, int nrec) const;
+    void* newUserdata(int size) const;
 
     void pop(int n = 1);
     long popInteger();
@@ -318,7 +318,7 @@ public:
     bool popBoolean();
     std::string popString();
     void* popUserdata();
-    void* popUpvalueUserdata();
+    void* popUpvalueUserdata() const;
     LuaObjectPtr popObject();
 
     void pushNil();
@@ -351,8 +351,8 @@ public:
     void* toUserdata(int index = -1);
     LuaObjectPtr toObject(int index = -1);
 
-    int getTop();
-    int stackSize() { return getTop(); }
+    int getTop() const;
+    int stackSize() const { return getTop(); }
     void clearStack() { pop(stackSize()); }
     bool hasIndex(int index) { return (stackSize() >= (index < 0 ? -index : index) && index != 0); }
 

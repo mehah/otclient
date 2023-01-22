@@ -55,7 +55,7 @@ public:
     bool link() override;
 
     void setPosition(const Position& position) { m_startPos = position; };
-    Position getPosition() { return m_startPos; };
+    Position getPosition() const { return m_startPos; };
 
     void setTransformMatrix(const Matrix3& transformMatrix);
     void setProjectionMatrix(const Matrix3& projectionMatrix);

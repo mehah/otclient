@@ -1154,7 +1154,7 @@ void TiXmlAttributeSet::Add(TiXmlAttribute* addMe)
     sentinel.prev = addMe;
 }
 
-void TiXmlAttributeSet::Remove(TiXmlAttribute* removeMe)
+void TiXmlAttributeSet::Remove(TiXmlAttribute* removeMe) const
 {
     for (TiXmlAttribute* node = sentinel.next; node != &sentinel; node = node->next) {
         if (node == removeMe) {

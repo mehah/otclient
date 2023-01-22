@@ -25,7 +25,7 @@
 #include <framework/graphics/cachedtext.h>
 #include "thing.h"
 
-// @bindclass
+ // @bindclass
 class StaticText : public LuaObject
 {
 public:
@@ -34,10 +34,10 @@ public:
     void drawText(const Point& dest, const Rect& parentRect);
 
     std::string getName() { return m_name; }
-    Otc::MessageMode getMessageMode() { return m_mode; }
+    Otc::MessageMode getMessageMode() const { return m_mode; }
     std::string getFirstMessage() { return m_messages[0].first; }
 
-    bool isYell() { return m_mode == Otc::MessageYell || m_mode == Otc::MessageMonsterYell || m_mode == Otc::MessageBarkLoud; }
+    bool isYell() const { return m_mode == Otc::MessageYell || m_mode == Otc::MessageMonsterYell || m_mode == Otc::MessageBarkLoud; }
 
     void setText(const std::string_view text);
     void setFont(const std::string_view fontName);
@@ -48,7 +48,7 @@ public:
     void setColor(const Color& color) { m_color = color; }
     Color getColor() { return m_color; }
 
-    Position getPosition() { return m_position; }
+    Position getPosition() const { return m_position; }
     void setPosition(const Position& position) { m_position = position; }
 
 private:

@@ -127,7 +127,7 @@ void ShaderProgram::release()
     glUseProgram(0);
 }
 
-std::string ShaderProgram::log()
+std::string ShaderProgram::log() const
 {
     std::string infoLog;
     int infoLogLength = 0;

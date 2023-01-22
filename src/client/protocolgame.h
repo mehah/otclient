@@ -146,26 +146,26 @@ public:
 private:
     void parseStoreButtonIndicators(const InputMessagePtr& msg);
     void parseSetStoreDeepLink(const InputMessagePtr& msg);
-    void parseStore(const InputMessagePtr& msg);
-    void parseStoreError(const InputMessagePtr& msg);
-    void parseStoreTransactionHistory(const InputMessagePtr& msg);
+    void parseStore(const InputMessagePtr& msg) const;
+    void parseStoreError(const InputMessagePtr& msg) const;
+    void parseStoreTransactionHistory(const InputMessagePtr& msg) const;
     void parseStoreOffers(const InputMessagePtr& msg);
-    void parseCompleteStorePurchase(const InputMessagePtr& msg);
+    void parseCompleteStorePurchase(const InputMessagePtr& msg) const;
     void parseRequestPurchaseData(const InputMessagePtr& msg);
-    void parseResourceBalance(const InputMessagePtr& msg);
+    void parseResourceBalance(const InputMessagePtr& msg) const;
     void parseWorldTime(const InputMessagePtr& msg);
-    void parseCoinBalance(const InputMessagePtr& msg);
+    void parseCoinBalance(const InputMessagePtr& msg) const;
     void parseCoinBalanceUpdating(const InputMessagePtr& msg);
-    void parseBlessings(const InputMessagePtr& msg);
+    void parseBlessings(const InputMessagePtr& msg) const;
     void parseUnjustifiedStats(const InputMessagePtr& msg);
     void parsePvpSituations(const InputMessagePtr& msg);
     void parsePreset(const InputMessagePtr& msg);
     void parseCreatureType(const InputMessagePtr& msg);
-    void parsePlayerHelpers(const InputMessagePtr& msg);
+    void parsePlayerHelpers(const InputMessagePtr& msg) const;
     void parseMessage(const InputMessagePtr& msg);
     void parsePendingGame(const InputMessagePtr& msg);
     void parseEnterGame(const InputMessagePtr& msg);
-    void parseLogin(const InputMessagePtr& msg);
+    void parseLogin(const InputMessagePtr& msg) const;
     void parseGMActions(const InputMessagePtr& msg);
     void parseUpdateNeeded(const InputMessagePtr& msg);
     void parseLoginError(const InputMessagePtr& msg);
@@ -185,7 +185,7 @@ private:
     void parseUpdateTile(const InputMessagePtr& msg);
     void parseTileAddThing(const InputMessagePtr& msg);
     void parseTileTransformThing(const InputMessagePtr& msg);
-    void parseTileRemoveThing(const InputMessagePtr& msg);
+    void parseTileRemoveThing(const InputMessagePtr& msg) const;
     void parseCreatureMove(const InputMessagePtr& msg);
     void parseOpenContainer(const InputMessagePtr& msg);
     void parseCloseContainer(const InputMessagePtr& msg);
@@ -195,7 +195,7 @@ private:
     void parseAddInventoryItem(const InputMessagePtr& msg);
     void parseRemoveInventoryItem(const InputMessagePtr& msg);
     void parseOpenNpcTrade(const InputMessagePtr& msg);
-    void parsePlayerGoods(const InputMessagePtr& msg);
+    void parsePlayerGoods(const InputMessagePtr& msg) const;
     void parseCloseNpcTrade(const InputMessagePtr&);
     void parseWorldLight(const InputMessagePtr& msg);
     void parseMagicEffect(const InputMessagePtr& msg);
@@ -206,7 +206,7 @@ private:
     void parseTrappers(const InputMessagePtr& msg);
     void parseCreatureHealth(const InputMessagePtr& msg);
     void parseCreatureLight(const InputMessagePtr& msg);
-    void parseCreatureOutfit(const InputMessagePtr& msg);
+    void parseCreatureOutfit(const InputMessagePtr& msg) const;
     void parseCreatureSpeed(const InputMessagePtr& msg);
     void parseCreatureSkulls(const InputMessagePtr& msg);
     void parseCreatureShields(const InputMessagePtr& msg);
@@ -214,10 +214,10 @@ private:
     void parseEditText(const InputMessagePtr& msg);
     void parseEditList(const InputMessagePtr& msg);
     void parsePremiumTrigger(const InputMessagePtr& msg);
-    void parsePlayerInfo(const InputMessagePtr& msg);
-    void parsePlayerStats(const InputMessagePtr& msg);
-    void parsePlayerSkills(const InputMessagePtr& msg);
-    void parsePlayerState(const InputMessagePtr& msg);
+    void parsePlayerInfo(const InputMessagePtr& msg) const;
+    void parsePlayerStats(const InputMessagePtr& msg) const;
+    void parsePlayerSkills(const InputMessagePtr& msg) const;
+    void parsePlayerState(const InputMessagePtr& msg) const;
     void parsePlayerCancelAttack(const InputMessagePtr& msg);
     void parsePlayerModes(const InputMessagePtr& msg);
     void parseSpellCooldown(const InputMessagePtr& msg);
@@ -238,11 +238,11 @@ private:
     void parseCloseTrade(const InputMessagePtr&);
     void parseTextMessage(const InputMessagePtr& msg);
     void parseCancelWalk(const InputMessagePtr& msg);
-    void parseWalkWait(const InputMessagePtr& msg);
+    void parseWalkWait(const InputMessagePtr& msg) const;
     void parseFloorChangeUp(const InputMessagePtr& msg);
     void parseFloorChangeDown(const InputMessagePtr& msg);
     void parseKillTracker(const InputMessagePtr& msg);
-    void parseOpenOutfitWindow(const InputMessagePtr& msg);
+    void parseOpenOutfitWindow(const InputMessagePtr& msg) const;
     void parseVipAdd(const InputMessagePtr& msg);
     void parseVipState(const InputMessagePtr& msg);
     void parseVipLogout(const InputMessagePtr& msg);
@@ -251,7 +251,7 @@ private:
     void parseQuestLog(const InputMessagePtr& msg);
     void parseQuestLine(const InputMessagePtr& msg);
     void parseChannelEvent(const InputMessagePtr& msg);
-    void parseItemInfo(const InputMessagePtr& msg);
+    void parseItemInfo(const InputMessagePtr& msg) const;
     void parsePlayerInventory(const InputMessagePtr& msg);
     void parseModalDialog(const InputMessagePtr& msg);
     void parseExtendedOpcode(const InputMessagePtr& msg);
@@ -295,7 +295,7 @@ private:
     MarketOffer readMarketOffer(const InputMessagePtr& msg, uint8_t action, uint16_t var);
 
     Imbuement getImbuementInfo(const InputMessagePtr& msg);
-    PreyMonster getPreyMonster(const InputMessagePtr& msg);
+    PreyMonster getPreyMonster(const InputMessagePtr& msg) const;
     std::vector<PreyMonster> getPreyMonsters(const InputMessagePtr& msg);
 
 public:
@@ -303,10 +303,10 @@ public:
     int setFloorDescription(const InputMessagePtr& msg, int x, int y, int z, int width, int height, int offset, int skip);
     int setTileDescription(const InputMessagePtr& msg, Position position);
 
-    Outfit getOutfit(const InputMessagePtr& msg, bool parseMount = true);
+    Outfit getOutfit(const InputMessagePtr& msg, bool parseMount = true) const;
     ThingPtr getThing(const InputMessagePtr& msg);
-    ThingPtr getMappedThing(const InputMessagePtr& msg);
-    CreaturePtr getCreature(const InputMessagePtr& msg, int type = 0);
+    ThingPtr getMappedThing(const InputMessagePtr& msg) const;
+    CreaturePtr getCreature(const InputMessagePtr& msg, int type = 0) const;
     ItemPtr getItem(const InputMessagePtr& msg, int id = 0);
     Position getPosition(const InputMessagePtr& msg);
 

@@ -210,12 +210,12 @@ void OutputBinaryTree::startNode(uint8_t node)
     write(&node, 1);
 }
 
-void OutputBinaryTree::endNode()
+void OutputBinaryTree::endNode() const
 {
     m_fin->addU8(static_cast<uint8_t>(BinaryTree::Node::END));
 }
 
-void OutputBinaryTree::write(const uint8_t* data, size_t size)
+void OutputBinaryTree::write(const uint8_t* data, size_t size) const
 {
     for (size_t i = 0; i < size; ++i) {
         if (const auto v = static_cast<BinaryTree::Node>(data[i]);
