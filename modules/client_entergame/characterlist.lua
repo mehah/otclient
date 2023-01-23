@@ -21,6 +21,10 @@ local function tryLogin(charInfo, tries)
     if g_game.isOnline() then
         if tries == 1 then
             g_game.safeLogout()
+			if loginEvent then
+				removeEvent(loginEvent)
+				loginEvent = nil
+			end
         end
         loginEvent = scheduleEvent(function()
             tryLogin(charInfo, tries + 1)
