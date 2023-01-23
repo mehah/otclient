@@ -192,8 +192,8 @@ void Creature::drawOutfit(const Rect& destRect, bool resize, const Color color)
 
     int frameSize;
     if (!resize)
-        frameSize = m_sizeCache.frameSizeNotResized;
-    else if ((frameSize = m_sizeCache.exactSize) == 0)
+        frameSize = m_frameSizeNotResized;
+    else if ((frameSize = m_exactSize) == 0)
         return;
 
     const float scaleFactor = destRect.width() / static_cast<float>(frameSize);
@@ -231,7 +231,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
     // calculate main rects
 
     const Size nameSize = m_name.getTextSize();
-    const int cropSizeText = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? m_sizeCache.exactSize : 12;
+    const int cropSizeText = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? m_exactSize : 12;
     const int cropSizeBackGround = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? cropSizeText - nameSize.height() : 0;
 
     auto backgroundRect = Rect(p.x - (13.5), p.y - cropSizeBackGround, 27, 4);
@@ -280,26 +280,20 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
             m_name.draw(textRect, fillColor);
         }
 
-        if (m_skull != Otc::SkullNone && m_skullTexture) {
-            const auto& skullRect = Rect(backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5, m_skullTexture->getSize());
-            g_drawPool.addTexturedRect(skullRect, m_skullTexture);
-        }
-        if (m_shield != Otc::ShieldNone && m_shieldTexture && m_showShieldTexture) {
-            const auto& shieldRect = Rect(backgroundRect.x() + 13.5, backgroundRect.y() + 5, m_shieldTexture->getSize());
-            g_drawPool.addTexturedRect(shieldRect, m_shieldTexture);
-        }
-        if (m_emblem != Otc::EmblemNone && m_emblemTexture) {
-            const auto& emblemRect = Rect(backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 16, m_emblemTexture->getSize());
-            g_drawPool.addTexturedRect(emblemRect, m_emblemTexture);
-        }
-        if (m_type != Proto::CreatureTypeUnknown && m_typeTexture) {
-            const auto& typeRect = Rect(backgroundRect.x() + 13.5 + 12 + 12, backgroundRect.y() + 16, m_typeTexture->getSize());
-            g_drawPool.addTexturedRect(typeRect, m_typeTexture);
-        }
-        if (m_icon != Otc::NpcIconNone && m_iconTexture) {
-            const auto& iconRect = Rect(backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5, m_iconTexture->getSize());
-            g_drawPool.addTexturedRect(iconRect, m_iconTexture);
-        }
+        if (m_skull != Otc::SkullNone && m_skullTexture)
+            g_drawPool.addTexturedPos(m_skullTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5);
+
+        if (m_shield != Otc::ShieldNone && m_shieldTexture && m_showShieldTexture)
+            g_drawPool.addTexturedPos(m_shieldTexture, backgroundRect.x() + 13.5, backgroundRect.y() + 5);
+
+        if (m_emblem != Otc::EmblemNone && m_emblemTexture)
+            g_drawPool.addTexturedPos(m_emblemTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 16);
+
+        if (m_type != Proto::CreatureTypeUnknown && m_typeTexture)
+            g_drawPool.addTexturedPos(m_typeTexture, backgroundRect.x() + 13.5 + 12 + 12, backgroundRect.y() + 16);
+
+        if (m_icon != Otc::NpcIconNone && m_iconTexture)
+            g_drawPool.addTexturedPos(m_iconTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5);
     }
     // Go back to use map pool
     g_drawPool.select(DrawPoolType::MAP);
@@ -697,7 +691,7 @@ void Creature::setOutfit(const Outfit& outfit)
         m_outfit.setCategory(outfit.getCategory());
         m_thingType = g_things.getThingType(m_outfit.getAuxId(), m_outfit.getCategory()).get();
 
-        m_sizeCache.exactSize = g_things.getThingType(m_outfit.getAuxId(), m_outfit.getCategory())->getExactSize();
+        m_exactSize = g_things.getThingType(m_outfit.getAuxId(), m_outfit.getCategory())->getExactSize();
     } else {
         if (outfit.getId() > 0 && !g_things.isValidDatId(outfit.getId(), ThingCategoryCreature))
             return;
@@ -709,11 +703,11 @@ void Creature::setOutfit(const Outfit& outfit)
             m_numPatternZ = std::min<int>(1, getNumPatternZ() - 1);
         }
 
-        m_sizeCache.exactSize = getExactSize();
+        m_exactSize = getExactSize();
     }
 
     m_walkAnimationPhase = 0; // might happen when player is walking and outfit is changed.
-    m_sizeCache.frameSizeNotResized = std::max<int>(m_sizeCache.exactSize * 0.75f, 2 * SPRITE_SIZE * 0.75f);
+    m_frameSizeNotResized = std::max<int>(m_exactSize * 0.75f, 2 * SPRITE_SIZE * 0.75f);
 
     callLuaField("onOutfitChange", m_outfit, oldOutfit);
 }

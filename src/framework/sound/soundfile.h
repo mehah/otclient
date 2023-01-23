@@ -28,7 +28,7 @@
 class SoundFile : public std::enable_shared_from_this<SoundFile>
 {
 public:
-    SoundFile(const FileStreamPtr& fileStream);
+    SoundFile(const FileStreamPtr& fileStream) : m_file(fileStream) {}
     static SoundFilePtr loadSoundFile(const std::string& filename);
 
     virtual int read(void* /*buffer*/, int /*bufferSize*/) { return -1; }

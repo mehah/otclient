@@ -152,11 +152,9 @@ public:
     uint8_t getWalkedPixel() const { return m_walkedPixels; }
 
 protected:
-    void updateWalkingTile();
-    virtual void updateWalkAnimation();
+
     virtual void updateWalkOffset(uint8_t totalPixelsWalked);
     virtual void updateWalk(bool isPreWalking = false);
-    virtual void nextWalkUpdate();
     virtual void terminateWalk();
 
     void updateOutfitColor(Color color, Color finalColor, Color delta, int duration);
@@ -192,7 +190,7 @@ protected:
     bool m_passable{ false };
     bool m_showTimedSquare{ false };
     bool m_showStaticSquare{ false };
-    bool m_forceWalk{ false };
+    ;
     bool m_removed{ true };
 
     uint8_t m_disableWalkAnimation{ 0 };
@@ -209,42 +207,17 @@ protected:
     uint8_t m_walkedPixels{ 0 };
 
     Timer m_walkTimer;
-    Timer m_footTimer;
-    Timer m_outfitColorTimer;
-    TilePtr m_walkingTile;
 
     bool m_walking{ false };
-    bool m_allowAppearWalk{ false };
-
-    ScheduledEventPtr m_walkUpdateEvent;
-    ScheduledEventPtr m_walkFinishAnimEvent;
-    ScheduledEventPtr m_outfitColorUpdateEvent;
-
-    EventPtr m_disappearEvent;
 
     Point m_walkOffset;
 
     Otc::Direction m_direction{ Otc::South };
-    Otc::Direction m_walkTurnDirection{ Otc::InvalidDirection };
-    Otc::Direction m_lastStepDirection{ Otc::InvalidDirection };
-
-    Position m_lastStepFromPosition;
-    Position m_lastStepToPosition;
-    Position m_oldPosition;
-
-    // jump related
-    float m_jumpHeight{ 0 };
-    float m_jumpDuration{ 0 };
-
-    PointF m_jumpOffset;
-    Timer m_jumpTimer;
 
 private:
-    struct SizeCache
-    {
-        uint8_t exactSize{ 0 };
-        uint8_t frameSizeNotResized{ 0 };
-    };
+    void nextWalkUpdate();
+    void updateWalkingTile();
+    void updateWalkAnimation();
 
     struct StepCache
     {
@@ -261,15 +234,42 @@ private:
     };
 
     StepCache m_stepCache;
-    SizeCache m_sizeCache;
 
-    ThingType* m_mountType{ nullptr };
+    uint8_t m_exactSize{ 0 };
+    uint8_t m_frameSizeNotResized{ 0 };
 
     bool m_drawOutfitColor{ true };
+
+    bool m_allowAppearWalk{ false };
+
+    ScheduledEventPtr m_walkUpdateEvent;
+    ScheduledEventPtr m_walkFinishAnimEvent;
+    ScheduledEventPtr m_outfitColorUpdateEvent;
+
+    EventPtr m_disappearEvent;
+
+    Otc::Direction m_walkTurnDirection{ Otc::InvalidDirection };
+    Otc::Direction m_lastStepDirection{ Otc::InvalidDirection };
+
+    Timer m_footTimer;
+    Timer m_outfitColorTimer;
+    TilePtr m_walkingTile;
+
+    Position m_lastStepFromPosition;
+    Position m_lastStepToPosition;
+    Position m_oldPosition;
+
+    // jump related
+    float m_jumpHeight{ 0 };
+    float m_jumpDuration{ 0 };
+    PointF m_jumpOffset;
+    Timer m_jumpTimer;
 
     // Mount Shader
     PainterShaderProgramPtr m_mountShader;
     std::function<void()> m_mountShaderAction{ nullptr };
+
+    ThingType* m_mountType{ nullptr };
 };
 
 // @bindclass

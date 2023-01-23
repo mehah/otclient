@@ -26,8 +26,6 @@
 
 #include "framework/stdext/time.h"
 
-SoundFile::SoundFile(const FileStreamPtr& fileStream) : m_file(fileStream) { m_file = fileStream; }
-
 SoundFilePtr SoundFile::loadSoundFile(const std::string& filename)
 {
     const auto& file = g_resources.openFile(filename);

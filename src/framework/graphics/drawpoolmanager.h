@@ -34,10 +34,18 @@ public:
     T* get(const DrawPoolType type) const { return static_cast<T*>(m_pools[static_cast<uint8_t>(type)]); }
 
     void select(DrawPoolType type);
-    void use(DrawPoolType type);
+    void use(const DrawPoolType type) { use(type, {}, {}); }
     void use(DrawPoolType type, const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha);
 
-    void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Color& color = Color::white) const;
+    void addTexturedPoint(const TexturePtr& texture, const Point& point, const Color& color = Color::white) const
+    { addTexturedRect(Rect(point, texture->getSize()), texture, color); }
+
+    void addTexturedPos(const TexturePtr& texture, int x, int y, const Color& color = Color::white) const
+    { addTexturedRect(Rect(x, y, texture->getSize()), texture, color); }
+
+    void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Color& color = Color::white) const
+    { addTexturedRect(dest, texture, Rect(Point(), texture->getSize()), color); }
+
     void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white, const DrawBufferPtr& buffer = nullptr) const;
     void addTexturedCoordsBuffer(const TexturePtr& texture, const CoordsBufferPtr& coords, const Color& color = Color::white) const;
     void addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white) const;

@@ -29,8 +29,8 @@
 class OggSoundFile : public SoundFile
 {
 public:
-    OggSoundFile(const FileStreamPtr& fileStream);
-    ~OggSoundFile();
+    OggSoundFile(const FileStreamPtr& fileStream) : SoundFile(fileStream) { memset(&m_vorbisFile, 0, sizeof(m_vorbisFile)); }
+    ~OggSoundFile() { ov_clear(&m_vorbisFile); }
 
     bool prepareOgg();
 

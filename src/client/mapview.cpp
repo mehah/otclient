@@ -151,8 +151,7 @@ void MapView::drawFloor()
                     if (alwaysTransparent && tile->getPosition().isInRange(_camera, TRANSPARENT_FLOOR_VIEW_RANGE, TRANSPARENT_FLOOR_VIEW_RANGE, true))
                         continue;
 
-                    auto pos2D = transformPositionTo2D(tile->getPosition(), cameraPosition);
-                    lightView->addShade(pos2D, fadeLevel);
+                    lightView->addShade(transformPositionTo2D(tile->getPosition(), cameraPosition), fadeLevel);
                 }
             }
 
@@ -252,11 +251,7 @@ void MapView::updateVisibleTiles()
         m_cachedVisibleTiles[m_floorMin].clear();
     } while (++m_floorMin <= m_floorMax);
 
-    if (m_floorViewMode == LOCKED) {
-        m_lockedFirstVisibleFloor = m_posInfo.camera.z;
-    } else {
-        m_lockedFirstVisibleFloor = -1;
-    }
+    m_lockedFirstVisibleFloor = m_floorViewMode == LOCKED ? m_posInfo.camera.z : -1;
 
     const uint8_t prevFirstVisibleFloor = m_cachedFirstVisibleFloor;
     if (m_lastCameraPosition != m_posInfo.camera) {
@@ -277,15 +272,8 @@ void MapView::updateVisibleTiles()
         }
 
         const uint8_t cachedFirstVisibleFloor = calcFirstVisibleFloor(m_floorViewMode != ALWAYS);
-        uint8_t cachedLastVisibleFloor = calcLastVisibleFloor();
-
-        assert(cachedFirstVisibleFloor <= MAX_Z && cachedLastVisibleFloor <= MAX_Z);
-
-        if (cachedLastVisibleFloor < cachedFirstVisibleFloor)
-            cachedLastVisibleFloor = cachedFirstVisibleFloor;
-
         m_cachedFirstVisibleFloor = cachedFirstVisibleFloor;
-        m_cachedLastVisibleFloor = cachedLastVisibleFloor;
+        m_cachedLastVisibleFloor = std::max<uint8_t>(cachedFirstVisibleFloor, calcLastVisibleFloor());
 
         m_floorMin = m_floorMax = m_posInfo.camera.z;
     }

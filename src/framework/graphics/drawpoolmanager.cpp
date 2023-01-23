@@ -133,11 +133,6 @@ void DrawPoolManager::addTexturedCoordsBuffer(const TexturePtr& texture, const C
     getCurrentPool()->add(color, texture, method, DrawMode::TRIANGLE_STRIP, nullptr, coords);
 }
 
-void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Color& color) const
-{
-    addTexturedRect(dest, texture, Rect(Point(), texture->getSize()), color);
-}
-
 void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const DrawBufferPtr& buffer) const
 {
     if (dest.isEmpty() || src.isEmpty())
@@ -210,7 +205,6 @@ void DrawPoolManager::addAction(const std::function<void()>& action) const
     getCurrentPool()->m_objects[0][static_cast<uint8_t>(DrawPool::DrawOrder::FIRST)].emplace_back(action);
 }
 
-void DrawPoolManager::use(const DrawPoolType type) { use(type, {}, {}); }
 void DrawPoolManager::use(const DrawPoolType type, const Rect& dest, const Rect& src, const Color& colorClear)
 {
     select(type);

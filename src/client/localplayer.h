@@ -115,8 +115,6 @@ public:
 
 protected:
     void walk(const Position& oldPos, const Position& newPos) override;
-    void preWalk(Otc::Direction direction);
-    void cancelWalk(Otc::Direction direction = Otc::InvalidDirection);
     void stopWalk() override;
     void updateWalk(const bool /*isPreWalking*/ = false) override { Creature::updateWalk(m_preWalking); }
     void updateWalkOffset(uint8_t totalPixelsWalked) override;
@@ -125,14 +123,19 @@ protected:
     friend class Game;
 
 private:
+
     struct Skill
     {
         uint16_t level{ 0 };
         uint16_t baseLevel{ 0 };
         uint16_t levelPercent{ 0 };
     };
+    void preWalk(Otc::Direction direction);
+    void cancelWalk(Otc::Direction direction = Otc::InvalidDirection);
 
     bool retryAutoWalk();
+
+    bool m_forceWalk{ false };
 
     // walk related
     Position m_lastPrewalkDestination;
