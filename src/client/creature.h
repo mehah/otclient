@@ -40,7 +40,6 @@ public:
 class Creature : public Thing
 {
 public:
-
     static double speedA;
     static double speedB;
     static double speedC;
@@ -48,6 +47,9 @@ public:
     Creature();
 
     static bool hasSpeedFormula();
+
+    void onAppear() override;
+    void onDisappear() override;
 
     void draw(const Point& dest, uint32_t flags, TextureType textureType, bool isMarked = false, LightView* lightView = nullptr) override;
 
@@ -84,50 +86,6 @@ public:
     void showStaticSquare(const Color& color) { m_showStaticSquare = true; m_staticSquareColor = color; }
     void hideStaticSquare() { m_showStaticSquare = false; }
 
-    bool isDrawingOutfitColor() const { return m_drawOutfitColor; }
-    void setDrawOutfitColor(const bool draw) { m_drawOutfitColor = draw; }
-
-    uint32_t getId() override { return m_id; }
-    uint32_t getMasterId() { return m_masterId; }
-    std::string getName() { return m_name.getText(); }
-    uint8_t getHealthPercent() { return m_healthPercent; }
-    Otc::Direction getDirection() { return m_direction; }
-    Outfit getOutfit() { return m_outfit; }
-    const Light& getLight() const override;
-    bool hasLight() const override { return Thing::hasLight() || getLight().intensity > 0; }
-    uint16_t getSpeed() { return m_speed; }
-    uint16_t getBaseSpeed() { return m_baseSpeed; }
-    uint8_t getSkull() { return m_skull; }
-    uint8_t getShield() { return m_shield; }
-    uint8_t getEmblem() { return m_emblem; }
-    uint8_t getType() { return m_type; }
-    uint8_t getIcon() { return m_icon; }
-    bool isPassable() const { return m_passable; }
-    uint16_t getStepDuration(bool ignoreDiagonal = false, Otc::Direction dir = Otc::InvalidDirection);
-    Point getWalkOffset() { return m_walkOffset; }
-    PointF getJumpOffset() { return m_jumpOffset; }
-    Position getLastStepFromPosition() const { return m_lastStepFromPosition; }
-    Position getLastStepToPosition() const { return m_lastStepToPosition; }
-    float getStepProgress() { return m_walkTimer.ticksElapsed() / m_stepCache.duration; }
-    float getStepTicksLeft() { return static_cast<float>(m_stepCache.getDuration(m_lastStepDirection)) - m_walkTimer.ticksElapsed(); }
-    ticks_t getWalkTicksElapsed() { return m_walkTimer.ticksElapsed(); }
-    Point getDisplacement() const override;
-    int getDisplacementX() const override;
-    int getDisplacementY() const override;
-    int getExactSize(int layer = 0, int xPattern = 0, int yPattern = 0, int zPattern = 0, int animationPhase = 0) override;
-
-    uint16_t getCurrentAnimationPhase(bool mount = false);
-
-    bool isDisabledWalkAnimation() { return m_disableWalkAnimation > 0; }
-    void setDisableWalkAnimation(bool v) {
-        if (v) ++m_disableWalkAnimation; else {
-            if (m_disableWalkAnimation <= 1) m_disableWalkAnimation = 0;
-            else --m_disableWalkAnimation;
-        }
-    }
-
-    void updateShield();
-
     // walk related
     void turn(Otc::Direction direction);
     void jump(int height, int duration);
@@ -135,6 +93,45 @@ public:
     virtual void walk(const Position& oldPos, const Position& newPos);
     virtual void stopWalk();
 
+    bool isDrawingOutfitColor() const { return m_drawOutfitColor; }
+    void setDrawOutfitColor(const bool draw) { m_drawOutfitColor = draw; }
+
+    int getDisplacementX() const override;
+    int getDisplacementY() const override;
+    int getExactSize(int layer = 0, int xPattern = 0, int yPattern = 0, int zPattern = 0, int animationPhase = 0) override;
+
+    float getStepProgress() { return m_walkTimer.ticksElapsed() / m_stepCache.duration; }
+    float getStepTicksLeft() { return static_cast<float>(m_stepCache.getDuration(m_lastStepDirection)) - m_walkTimer.ticksElapsed(); }
+
+    uint8_t getSkull() { return m_skull; }
+    uint8_t getShield() { return m_shield; }
+    uint8_t getEmblem() { return m_emblem; }
+    uint8_t getType() { return m_type; }
+    uint8_t getIcon() { return m_icon; }
+    uint8_t getHealthPercent() { return m_healthPercent; }
+
+    uint16_t getSpeed() { return m_speed; }
+    uint16_t getBaseSpeed() { return m_baseSpeed; }
+    uint16_t getStepDuration(bool ignoreDiagonal = false, Otc::Direction dir = Otc::InvalidDirection);
+
+    uint32_t getId() override { return m_id; }
+    uint32_t getMasterId() { return m_masterId; }
+    std::string getName() { return m_name.getText(); }
+
+    Otc::Direction getDirection() { return m_direction; }
+    Outfit getOutfit() { return m_outfit; }
+    const Light& getLight() const override;
+    bool hasLight() const override { return Thing::hasLight() || getLight().intensity > 0; }
+
+    Point getDisplacement() const override;
+    Point getWalkOffset() { return m_walkOffset; }
+    PointF getJumpOffset() { return m_jumpOffset; }
+    Position getLastStepFromPosition() const { return m_lastStepFromPosition; }
+    Position getLastStepToPosition() const { return m_lastStepToPosition; }
+
+    ticks_t getWalkTicksElapsed() { return m_walkTimer.ticksElapsed(); }
+
+    bool isPassable() const { return m_passable; }
     bool isWalking() { return m_walking; }
     bool isRemoved() { return m_removed; }
     bool isInvisible() { return m_outfit.getCategory() == ThingCategoryEffect && m_outfit.getAuxId() == 13; }
@@ -144,82 +141,42 @@ public:
     bool isCreature() override { return true; }
     bool isParalyzed() const { return m_speed < 10; }
 
-    void onPositionChange(const Position& newPos, const Position& oldPos) override;
-    void onAppear() override;
-    void onDisappear() override;
-    virtual void onDeath();
-
-    uint8_t getWalkedPixel() const { return m_walkedPixels; }
+    bool isDisabledWalkAnimation() { return m_disableWalkAnimation > 0; }
+    void setDisableWalkAnimation(bool v) {
+        if (v) ++m_disableWalkAnimation; else {
+            if (m_disableWalkAnimation <= 1) m_disableWalkAnimation = 0;
+            else --m_disableWalkAnimation;
+        }
+    }
 
 protected:
 
+    virtual void onDeath();
     virtual void updateWalkOffset(uint8_t totalPixelsWalked);
     virtual void updateWalk(bool isPreWalking = false);
     virtual void terminateWalk();
 
-    void updateOutfitColor(Color color, Color finalColor, Color delta, int duration);
-    void updateJump();
-
+    void onPositionChange(const Position& newPos, const Position& oldPos) override;
     bool mustStabilizeCam() const { return m_stepCache.mustStabilizeCam; }
 
-    uint32_t m_id{ 0 };
-    uint32_t m_masterId{ 0 };
-
-    Outfit m_outfit;
-    Light m_light;
-
-    uint16_t m_calculatedStepSpeed{ 0 };
-    uint16_t m_speed{ 0 };
-    uint16_t m_baseSpeed{ 0 };
-
-    uint8_t m_type;
-    uint8_t m_healthPercent{ 101 };
-    uint8_t m_skull{ Otc::SkullNone };
-    uint8_t m_icon{ Otc::NpcIconNone };
-    uint8_t m_shield{ Otc::ShieldNone };
-    uint8_t m_emblem{ Otc::EmblemNone };
-
-    TexturePtr m_skullTexture;
-    TexturePtr m_shieldTexture;
-    TexturePtr m_emblemTexture;
-    TexturePtr m_typeTexture;
-    TexturePtr m_iconTexture;
-
-    bool m_showShieldTexture{ true };
-    bool m_shieldBlink{ false };
-    bool m_passable{ false };
-    bool m_showTimedSquare{ false };
-    bool m_showStaticSquare{ false };
-    ;
-    bool m_removed{ true };
-
-    uint8_t m_disableWalkAnimation{ 0 };
-
-    Color m_timedSquareColor;
-    Color m_staticSquareColor;
-    Color m_informationColor;
-    Color m_outfitColor{ Color::white };
-
-    CachedText m_name;
-
-    // walk related
-    uint8_t m_walkAnimationPhase{ 0 };
-    uint8_t m_walkedPixels{ 0 };
+    bool m_walking{ false };
+    Point m_walkOffset;
+    Otc::Direction m_direction{ Otc::South };
 
     Timer m_walkTimer;
 
-    bool m_walking{ false };
-
-    Point m_walkOffset;
-
-    Otc::Direction m_direction{ Otc::South };
-
 private:
     void nextWalkUpdate();
+    void updateJump();
+    void updateShield();
     void updateWalkingTile();
     void updateWalkAnimation();
 
-    struct StepCache
+    void updateOutfitColor(Color color, Color finalColor, Color delta, int duration);
+
+    uint16_t getCurrentAnimationPhase(bool mount = false);
+
+    struct CachedStep
     {
         uint16_t speed{ 0 };
         uint16_t groundSpeed{ 0 };
@@ -233,14 +190,55 @@ private:
         uint16_t getDuration(Otc::Direction dir) const { return Position::isDiagonal(dir) ? diagonalDuration : duration; }
     };
 
-    StepCache m_stepCache;
+    Outfit m_outfit;
+    Light m_light;
+
+    uint8_t m_type;
+    uint8_t m_healthPercent{ 101 };
+    uint8_t m_skull{ Otc::SkullNone };
+    uint8_t m_icon{ Otc::NpcIconNone };
+    uint8_t m_shield{ Otc::ShieldNone };
+    uint8_t m_emblem{ Otc::EmblemNone };
+
+    // walk related
+    uint8_t m_walkAnimationPhase{ 0 };
+    uint8_t m_walkedPixels{ 0 };
 
     uint8_t m_exactSize{ 0 };
     uint8_t m_frameSizeNotResized{ 0 };
 
-    bool m_drawOutfitColor{ true };
+    uint16_t m_calculatedStepSpeed{ 0 };
+    uint16_t m_speed{ 0 };
+    uint16_t m_baseSpeed{ 0 };
 
+    uint32_t m_id{ 0 };
+    uint32_t m_masterId{ 0 };
+
+    TexturePtr m_skullTexture;
+    TexturePtr m_shieldTexture;
+    TexturePtr m_emblemTexture;
+    TexturePtr m_typeTexture;
+    TexturePtr m_iconTexture;
+
+    bool m_shieldBlink{ false };
+    bool m_passable{ false };
     bool m_allowAppearWalk{ false };
+    bool m_showTimedSquare{ false };
+    bool m_showStaticSquare{ false };
+
+    bool m_removed{ true };
+    bool m_drawOutfitColor{ true };
+    bool m_showShieldTexture{ true };
+
+    uint8_t m_disableWalkAnimation{ 0 };
+
+    Color m_timedSquareColor;
+    Color m_staticSquareColor;
+    Color m_informationColor;
+    Color m_outfitColor{ Color::white };
+
+    CachedText m_name;
+    CachedStep m_stepCache;
 
     ScheduledEventPtr m_walkUpdateEvent;
     ScheduledEventPtr m_walkFinishAnimEvent;
@@ -253,6 +251,7 @@ private:
 
     Timer m_footTimer;
     Timer m_outfitColorTimer;
+
     TilePtr m_walkingTile;
 
     Position m_lastStepFromPosition;
