@@ -304,8 +304,6 @@ end
 
 function refreshItem(item)
     nameLabel:setText(item.name)
-    weightLabel:setText(string.format('%.2f', item.weight) .. ' ' .. WEIGHT_UNIT)
-    priceLabel:setText(formatCurrency(getItemPrice(item)))
 
     if getCurrentTradeType() == BUY then
         local capacityMaxCount = math.floor(playerFreeCapacity / item.weight)
@@ -320,6 +318,8 @@ function refreshItem(item)
         quantityScroll:setMinimum(1)
         quantityScroll:setMaximum(math.max(0, math.min(getMaxAmount(), getSellQuantity(item.ptr))))
     end
+
+    onQuantityValueChange(quantityScroll:getValue())
 
     setupPanel:enable()
 end

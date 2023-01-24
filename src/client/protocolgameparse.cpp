@@ -1421,7 +1421,7 @@ void ProtocolGame::parseCreatureSpeed(const InputMessagePtr& msg)
 {
     const uint32_t id = msg->getU32();
 
-    uint16_t baseSpeed = -1;
+    uint16_t baseSpeed = 0;
     if (g_game.getClientVersion() >= 1059)
         baseSpeed = msg->getU16();
 
@@ -1431,7 +1431,7 @@ void ProtocolGame::parseCreatureSpeed(const InputMessagePtr& msg)
     if (!creature) return;
 
     creature->setSpeed(speed);
-    if (baseSpeed != -1)
+    if (baseSpeed != 0)
         creature->setBaseSpeed(baseSpeed);
 }
 
@@ -1566,8 +1566,8 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg) const
         maxHealth = msg->getU16();
     }
 
-    double freeCapacity = 0;
-    double totalCapacity = 0;
+    uint32_t freeCapacity = 0;
+    uint32_t totalCapacity = 0;
 
     if (g_game.getFeature(Otc::GameDoubleFreeCapacity))
         freeCapacity = msg->getU32() / 100.f;
@@ -1576,7 +1576,7 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg) const
 
     if (g_game.getClientVersion() < 1281) {
         if (g_game.getFeature(Otc::GameTotalCapacity))
-            totalCapacity = msg->getU32() / 100.0;
+            totalCapacity = msg->getU32() / 100.f;
     }
 
     uint64_t experience;
@@ -2627,9 +2627,9 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
         const uint8_t shield = msg->getU8();
 
         // emblem is sent only when the creature is not known
-        int8_t emblem = -1;
-        int8_t creatureType = -1;
-        int8_t icon = -1;
+        uint8_t emblem = 0;
+        uint8_t creatureType = 0;
+        uint8_t icon = 0;
         bool unpass = true;
 
         if (g_game.getFeature(Otc::GameCreatureEmblems) && !known)
@@ -2687,13 +2687,13 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
             creature->setLight(light);
             creature->setMasterId(masterId);
 
-            if (emblem != -1)
+            if (emblem > 0)
                 creature->setEmblem(emblem);
 
-            if (creatureType != -1)
+            if (creatureType > 0)
                 creature->setType(creatureType);
 
-            if (icon != -1)
+            if (icon > 0)
                 creature->setIcon(icon);
 
             if (creature == m_localPlayer && !m_localPlayer->isKnown())

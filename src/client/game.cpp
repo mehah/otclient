@@ -541,10 +541,6 @@ bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
     if (!canPerformGameAction())
         return false;
 
-    // must cancel follow before any new walk
-    if (isFollowing())
-        cancelFollow();
-
     // must cancel auto walking, and wait next try
     if (m_localPlayer->isAutoWalking()) {
         m_protocolGame->sendStop();
@@ -618,6 +614,11 @@ bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
         m_localPlayer->lockWalk();
     }
 
+
+    // must cancel follow before any new walk
+    if (isFollowing())
+        cancelFollow();
+    
     m_localPlayer->stopAutoWalk();
 
     g_lua.callGlobalField("g_game", "onWalk", direction);
