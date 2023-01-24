@@ -29,7 +29,7 @@ class CachedText
 public:
     CachedText();
 
-    void draw(const Rect& rect, Color color);
+    void draw(const Rect& rect, const Color& color);
 
     void wrapText(int maxWidth);
     void setFont(const BitmapFontPtr& font);

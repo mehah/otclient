@@ -27,7 +27,7 @@
 CachedText::CachedText() : m_font(g_fonts.getDefaultFont()), m_align(Fw::AlignCenter), m_coordsBuffer(std::make_shared<CoordsBuffer>())
 {}
 
-void CachedText::draw(const Rect& rect, const Color color)
+void CachedText::draw(const Rect& rect, const Color& color)
 {
     if (!m_font)
         return;
