@@ -1194,7 +1194,7 @@ void ProtocolGame::parseCloseNpcTrade(const InputMessagePtr&) { Game::processClo
 
 void ProtocolGame::parseOwnTrade(const InputMessagePtr& msg)
 {
-    const auto name = g_game.formatCreatureName(msg->getString());
+    const auto& name = g_game.formatCreatureName(msg->getString());
     const uint8_t count = msg->getU8();
 
     std::vector<ItemPtr> items(count);
@@ -1206,7 +1206,7 @@ void ProtocolGame::parseOwnTrade(const InputMessagePtr& msg)
 
 void ProtocolGame::parseCounterTrade(const InputMessagePtr& msg)
 {
-    const auto name = g_game.formatCreatureName(msg->getString());
+    const auto& name = g_game.formatCreatureName(msg->getString());
     const uint8_t count = msg->getU8();
 
     std::vector<ItemPtr> items(count);
@@ -1806,7 +1806,7 @@ void ProtocolGame::parseTalk(const InputMessagePtr& msg)
     if (g_game.getFeature(Otc::GameMessageStatements))
         msg->getU32(); // channel statement guid
 
-    const auto name = g_game.formatCreatureName(msg->getString());
+    const auto& name = g_game.formatCreatureName(msg->getString());
 
     if (g_game.getClientVersion() >= 1281) {
         msg->getU8(); // suffix
@@ -1893,14 +1893,14 @@ void ProtocolGame::parseOpenChannel(const InputMessagePtr& msg)
 
 void ProtocolGame::parseOpenPrivateChannel(const InputMessagePtr& msg)
 {
-    const auto name = g_game.formatCreatureName(msg->getString());
+    const auto& name = g_game.formatCreatureName(msg->getString());
     Game::processOpenPrivateChannel(name);
 }
 
 void ProtocolGame::parseOpenOwnPrivateChannel(const InputMessagePtr& msg)
 {
     const uint16_t channelId = msg->getU16();
-    const auto name = msg->getString();
+    const auto& name = g_game.formatCreatureName(msg->getString());
 
     Game::processOpenOwnPrivateChannel(channelId, name);
 }
@@ -2148,7 +2148,7 @@ void ProtocolGame::parseVipAdd(const InputMessagePtr& msg)
     bool notifyLogin = false;
 
     const uint32_t id = msg->getU32();
-    const auto name = g_game.formatCreatureName(msg->getString());
+    const auto& name = g_game.formatCreatureName(msg->getString());
     if (g_game.getFeature(Otc::GameAdditionalVipInfo)) {
         desc = msg->getString();
         iconId = msg->getU32();
@@ -2233,7 +2233,7 @@ void ProtocolGame::parseQuestLine(const InputMessagePtr& msg)
 void ProtocolGame::parseChannelEvent(const InputMessagePtr& msg)
 {
     const uint16_t channelId = msg->getU16();
-    const auto name = g_game.formatCreatureName(msg->getString());
+    const auto& name = g_game.formatCreatureName(msg->getString());
     const uint8_t type = msg->getU8();
 
     g_lua.callGlobalField("g_game", "onChannelEvent", channelId, name, type);
@@ -2567,7 +2567,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
                     creatureType = Proto::CreatureTypeSummonOther;
             }
 
-            const auto name = g_game.formatCreatureName(msg->getString());
+            const auto& name = g_game.formatCreatureName(msg->getString());
 
             if (!creature) {
                 if ((id == m_localPlayer->getId()) ||
