@@ -98,9 +98,10 @@ void UIWidget::drawText(const Rect& screenCoords)
         return;
 
     if (screenCoords != m_textCachedScreenCoords) {
+        m_textCachedScreenCoords = screenCoords;
+
         auto coords = Rect(screenCoords.topLeft(), screenCoords.bottomRight());
         coords.translate(m_textOffset);
-        m_textCachedScreenCoords = coords;
         m_font->fillTextCoords(m_coordsBuffer, m_text, m_textSize, m_textAlign, coords, m_glyphsPositionsCache);
     }
 
