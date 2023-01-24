@@ -1570,8 +1570,8 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg)
         maxHealth = msg->getU16();
     }
 
-    double freeCapacity = 0;
-    double totalCapacity = 0;
+    uint32_t freeCapacity = 0;
+    uint32_t totalCapacity = 0;
 
     if (g_game.getFeature(Otc::GameDoubleFreeCapacity))
         freeCapacity = msg->getU32() / 100.f;

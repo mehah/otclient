@@ -39,8 +39,8 @@ public:
     void setSkill(Otc::Skill skill, uint16_t level, uint16_t levelPercent);
     void setBaseSkill(Otc::Skill skill, uint16_t baseLevel);
     void setHealth(uint32_t health, uint32_t maxHealth);
-    void setFreeCapacity(double freeCapacity);
-    void setTotalCapacity(double totalCapacity);
+    void setFreeCapacity(uint32_t freeCapacity);
+    void setTotalCapacity(uint32_t totalCapacity);
     void setExperience(uint64_t experience);
     void setLevel(uint16_t level, uint8_t levelPercent);
     void setMana(uint32_t mana, uint32_t maxMana);
@@ -59,8 +59,8 @@ public:
     void setBlessings(uint16_t blessings);
     void setResourceBalance(Otc::ResourceTypes_t type, uint64_t value);
 
-    double getFreeCapacity() { return m_freeCapacity; }
-    double getTotalCapacity() { return m_totalCapacity; }
+    uint32_t getFreeCapacity() { return m_freeCapacity; }
+    uint32_t getTotalCapacity() { return m_totalCapacity; }
 
     uint8_t getVocation() { return m_vocation; }
     uint8_t getMagicLevel() { return m_magicLevel; }
@@ -161,8 +161,8 @@ private:
     uint8_t m_vocation{ 0 };
     uint16_t m_blessings{ Otc::BlessingNone };
 
-    double m_freeCapacity{ 0 };
-    double m_totalCapacity{ 0 };
+    uint32_t m_freeCapacity{ 0 };
+    uint32_t m_totalCapacity{ 0 };
 
     uint32_t m_health{ 0 };
     uint32_t m_maxHealth{ 0 };

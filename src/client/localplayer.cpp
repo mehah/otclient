@@ -303,23 +303,23 @@ void LocalPlayer::setHealth(uint32_t health, uint32_t maxHealth)
     }
 }
 
-void LocalPlayer::setFreeCapacity(double freeCapacity)
+void LocalPlayer::setFreeCapacity(uint32_t freeCapacity)
 {
     if (m_freeCapacity == freeCapacity)
         return;
 
-    const double oldFreeCapacity = m_freeCapacity;
+    const uint32_t oldFreeCapacity = m_freeCapacity;
     m_freeCapacity = freeCapacity;
 
     callLuaField("onFreeCapacityChange", freeCapacity, oldFreeCapacity);
 }
 
-void LocalPlayer::setTotalCapacity(double totalCapacity)
+void LocalPlayer::setTotalCapacity(uint32_t totalCapacity)
 {
     if (m_totalCapacity == totalCapacity)
         return;
 
-    const double oldTotalCapacity = m_totalCapacity;
+    const uint32_t oldTotalCapacity = m_totalCapacity;
     m_totalCapacity = totalCapacity;
 
     callLuaField("onTotalCapacityChange", totalCapacity, oldTotalCapacity);

@@ -393,21 +393,21 @@ function onLevelChange(localPlayer, value, percent)
 end
 
 function onHealthChange(localPlayer, health, maxHealth)
-    setSkillValue('health', comma_value(health))
+    setSkillValue('health', health)
     checkAlert('health', health, maxHealth, 30)
 end
 
 function onManaChange(localPlayer, mana, maxMana)
-    setSkillValue('mana', comma_value(mana))
+    setSkillValue('mana', mana)
     checkAlert('mana', mana, maxMana, 30)
 end
 
 function onSoulChange(localPlayer, soul)
-    setSkillValue('soul', comma_value(soul))
+    setSkillValue('soul', soul)
 end
 
 function onFreeCapacityChange(localPlayer, freeCapacity)
-    setSkillValue('capacity', comma_value(freeCapacity))
+    setSkillValue('capacity', freeCapacity)
     checkAlert('capacity', freeCapacity, localPlayer:getTotalCapacity(), 20)
 end
 
@@ -481,7 +481,7 @@ function onRegenerationChange(localPlayer, regenerationTime)
 end
 
 function onSpeedChange(localPlayer, speed)
-    setSkillValue('speed', comma_value(speed))
+    setSkillValue('speed', speed)
 
     onBaseSpeedChange(localPlayer, localPlayer:getBaseSpeed())
 end
@@ -491,7 +491,7 @@ function onBaseSpeedChange(localPlayer, baseSpeed)
 end
 
 function onMagicLevelChange(localPlayer, magiclevel, percent)
-    setSkillValue('magiclevel', comma_value(magiclevel))
+    setSkillValue('magiclevel', magiclevel)
     setSkillPercent('magiclevel', percent, tr('You have %s percent to go', 100 - percent))
 
     onBaseMagicLevelChange(localPlayer, localPlayer:getBaseMagicLevel())
@@ -502,7 +502,7 @@ function onBaseMagicLevelChange(localPlayer, baseMagicLevel)
 end
 
 function onSkillChange(localPlayer, id, level, percent)
-    setSkillValue('skillId' .. id, comma_value(level))
+    setSkillValue('skillId' .. id, level)
     setSkillPercent('skillId' .. id, percent, tr('You have %s percent to go', 100 - percent))
 
     onBaseSkillChange(localPlayer, id, localPlayer:getSkillBaseLevel(id))
