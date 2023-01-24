@@ -25,6 +25,7 @@
 #include "androidwindow.h"
 #include "androidmanager.h"
 #include <game-activity/native_app_glue/android_native_app_glue.h>
+#include <framework/core/eventdispatcher.h>
 
 AndroidWindow& g_androidWindow = (AndroidWindow&) g_window;
 
@@ -256,7 +257,7 @@ void AndroidWindow::processFingerdownAndFingerup() {
 	if(isTouchdown) {
 		m_mouseButtonStates |= mouseButton;
 	} else {
-		m_mouseButtonStates &= ~mouseButton;
+		g_dispatcher.addEvent([this, mouseButton] { m_mouseButtonStates &= ~mouseButton; });
 	}
 
     Point newMousePos(m_currentEvent.x, m_currentEvent.y);
