@@ -71,7 +71,7 @@ void UISprite::onStyleApply(const std::string_view styleName, const OTMLNodePtr&
 {
     UIWidget::onStyleApply(styleName, styleNode);
 
-    for (const OTMLNodePtr& node : styleNode->children()) {
+    for (const auto& node : styleNode->children()) {
         if (node->tag() == "sprite-id")
             setSpriteId(node->value<int>());
         else if (node->tag() == "sprite-visible")

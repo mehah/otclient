@@ -583,7 +583,7 @@ void ThingType::prepareTextureLoad(const std::vector<Size>& sizes, const std::ve
 
 void ThingType::unserializeOtml(const OTMLNodePtr& node)
 {
-    for (const OTMLNodePtr& node2 : node->children()) {
+    for (const auto& node2 : node->children()) {
         if (node2->tag() == "opacity")
             m_opacity = node2->value<float>();
         else if (node2->tag() == "image")

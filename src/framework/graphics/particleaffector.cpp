@@ -41,7 +41,7 @@ void ParticleAffector::load(const OTMLNodePtr& node)
     float minDelay = 0, maxDelay = 0;
     float minDuration = -1, maxDuration = -1;
 
-    for (const OTMLNodePtr& childNode : node->children()) {
+    for (const auto& childNode : node->children()) {
         if (childNode->tag() == "delay") {
             minDelay = childNode->value<float>();
             maxDelay = childNode->value<float>();
@@ -95,7 +95,7 @@ void AttractionAffector::load(const OTMLNodePtr& node)
     m_reduction = 0;
     m_repelish = false;
 
-    for (const OTMLNodePtr& childNode : node->children()) {
+    for (const auto& childNode : node->children()) {
         if (childNode->tag() == "position")
             m_position = childNode->value<Point>();
         else if (childNode->tag() == "acceleration")

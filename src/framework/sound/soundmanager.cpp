@@ -143,7 +143,7 @@ void SoundManager::setAudioEnabled(bool enable)
     m_audioEnabled = enable;
     if (!enable) {
         ensureContext();
-        for (const SoundSourcePtr& source : m_sources) {
+        for (const auto& source : m_sources) {
             source->stop();
         }
     }
@@ -215,7 +215,7 @@ SoundChannelPtr SoundManager::getChannel(int channel)
 void SoundManager::stopAll()
 {
     ensureContext();
-    for (const SoundSourcePtr& source : m_sources) {
+    for (const auto& source : m_sources) {
         source->stop();
     }
 

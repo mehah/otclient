@@ -161,7 +161,7 @@ void UIAnchorLayout::removeWidget(const UIWidgetPtr& widget)
 
 bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroupPtr& anchorGroup, UIWidgetPtr first)
 {
-    const UIWidgetPtr& parentWidget = getParentWidget();
+    const auto& parentWidget = getParentWidget();
     if (!parentWidget)
         return false;
 
@@ -178,13 +178,13 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
     bool horizontalMoved = false;
 
     // calculates new rect based on anchors
-    for (const UIAnchorPtr& anchor : anchorGroup->getAnchors()) {
+    for (const auto& anchor : anchorGroup->getAnchors()) {
         // skip invalid anchors
         if (anchor->getHookedEdge() == Fw::AnchorNone)
             continue;
 
         // determine hooked widget
-        const UIWidgetPtr& hookedWidget = anchor->getHookedWidget(widget, parentWidget);
+        const auto& hookedWidget = anchor->getHookedWidget(widget, parentWidget);
 
         // skip invalid anchors
         if (!hookedWidget)
@@ -194,7 +194,7 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
             // update this hooked widget anchors
             auto it = m_anchorsGroups.find(hookedWidget);
             if (it != m_anchorsGroups.end()) {
-                const UIAnchorGroupPtr& hookedAnchorGroup = it->second;
+                const auto& hookedAnchorGroup = it->second;
                 if (!hookedAnchorGroup->isUpdated())
                     updateWidget(hookedWidget, hookedAnchorGroup, first);
             }
@@ -257,7 +257,7 @@ bool UIAnchorLayout::internalUpdate()
 
     // reset all anchors groups update state
     for (auto& it : m_anchorsGroups) {
-        const UIAnchorGroupPtr& anchorGroup = it.second;
+        const auto& anchorGroup = it.second;
         anchorGroup->setUpdated(false);
     }
 

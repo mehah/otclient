@@ -30,7 +30,7 @@ ParticleSystem::ParticleSystem() :m_lastUpdateTime(g_clock.seconds()) {}
 
 void ParticleSystem::load(const OTMLNodePtr& node)
 {
-    for (const OTMLNodePtr& childNode : node->children()) {
+    for (const auto& childNode : node->children()) {
         if (childNode->tag() == "Emitter") {
             const auto& emitter = std::make_shared<ParticleEmitter>();
             emitter->load(childNode);

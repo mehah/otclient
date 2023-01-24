@@ -136,7 +136,7 @@ bool ThingTypeManager::loadOtml(std::string file)
                 throw OTMLException(node, "not a valid thing category");
             }
 
-            for (const OTMLNodePtr& node2 : node->children()) {
+            for (const auto& node2 : node->children()) {
                 const auto id = stdext::safe_cast<uint16_t>(node2->tag());
                 const auto& type = getThingType(id, category);
                 if (!type)
@@ -421,7 +421,7 @@ void ThingTypeManager::loadOtb(const std::string& file)
         m_itemTypes.resize(children.size() + 1, m_nullItemType);
         m_reverseItemTypes.resize(children.size() + 1, m_nullItemType);
 
-        for (const BinaryTreePtr& node : children) {
+        for (const auto& node : children) {
             const auto& itemType = std::make_shared<ItemType>();
             itemType->unserialize(node);
             addItemType(itemType);

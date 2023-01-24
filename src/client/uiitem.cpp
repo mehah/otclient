@@ -89,7 +89,7 @@ void UIItem::onStyleApply(const std::string_view styleName, const OTMLNodePtr& s
 {
     UIWidget::onStyleApply(styleName, styleNode);
 
-    for (const OTMLNodePtr& node : styleNode->children()) {
+    for (const auto& node : styleNode->children()) {
         if (node->tag() == "item-id")
             setItemId(node->value<int>());
         else if (node->tag() == "item-count")

@@ -844,7 +844,7 @@ uint16_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
     if (!tilePos.isValid())
         tilePos = m_position;
 
-    const TilePtr& tile = g_map.getTile(tilePos);
+    const auto& tile = g_map.getTile(tilePos);
     int groundSpeed = 0;
     if (tile) groundSpeed = tile->getGroundSpeed();
     if (groundSpeed == 0)

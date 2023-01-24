@@ -28,7 +28,7 @@ void UIHorizontalLayout::applyStyle(const OTMLNodePtr& styleNode)
 {
     UIBoxLayout::applyStyle(styleNode);
 
-    for (const OTMLNodePtr& node : styleNode->children()) {
+    for (const auto& node : styleNode->children()) {
         if (node->tag() == "align-right")
             setAlignRight(node->value<bool>());
     }
@@ -83,7 +83,7 @@ bool UIHorizontalLayout::internalUpdate()
     if (m_alignRight) {
         for (auto it = parentWidget->m_children.rbegin(); it != parentWidget->m_children.rend(); ++it)
             action(*it);
-    } else for (const UIWidgetPtr& widget : parentWidget->m_children)
+    } else for (const auto& widget : parentWidget->m_children)
         action(widget);
 
     preferredWidth -= m_spacing;

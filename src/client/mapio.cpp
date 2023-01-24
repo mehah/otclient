@@ -102,7 +102,7 @@ void Map::loadOtbm(const std::string& fileName)
             }
         }
 
-        for (const BinaryTreePtr& nodeMapData : node->getChildren()) {
+        for (const auto& nodeMapData : node->getChildren()) {
             const uint8_t mapDataType = nodeMapData->getU8();
             if (mapDataType == OTBM_TILE_AREA) {
                 Position basePos;
@@ -110,7 +110,7 @@ void Map::loadOtbm(const std::string& fileName)
                 basePos.y = nodeMapData->getU16();
                 basePos.z = nodeMapData->getU8();
 
-                for (const BinaryTreePtr& nodeTile : nodeMapData->getChildren()) {
+                for (const auto& nodeTile : nodeMapData->getChildren()) {
                     const uint8_t type = nodeTile->getU8();
                     if (unlikely(type != OTBM_TILE && type != OTBM_HOUSETILE))
                         throw Exception("invalid node tile type %d", static_cast<int>(type));
@@ -162,7 +162,7 @@ void Map::loadOtbm(const std::string& fileName)
                         }
                     }
 
-                    for (const BinaryTreePtr& nodeItem : nodeTile->getChildren()) {
+                    for (const auto& nodeItem : nodeTile->getChildren()) {
                         if (unlikely(nodeItem->getU8() != OTBM_ITEM))
                             throw Exception("invalid item node");
 
@@ -170,7 +170,7 @@ void Map::loadOtbm(const std::string& fileName)
                         item->unserializeItem(nodeItem);
 
                         if (item->isContainer()) {
-                            for (const BinaryTreePtr& containerItem : nodeItem->getChildren()) {
+                            for (const auto& containerItem : nodeItem->getChildren()) {
                                 if (containerItem->getU8() != OTBM_ITEM)
                                     throw Exception("invalid container item node");
 
@@ -196,7 +196,7 @@ void Map::loadOtbm(const std::string& fileName)
                 }
             } else if (mapDataType == OTBM_TOWNS) {
                 TownPtr town = nullptr;
-                for (const BinaryTreePtr& nodeTown : nodeMapData->getChildren()) {
+                for (const auto& nodeTown : nodeMapData->getChildren()) {
                     if (nodeTown->getU8() != OTBM_TOWN)
                         throw Exception("invalid town node.");
 
@@ -213,7 +213,7 @@ void Map::loadOtbm(const std::string& fileName)
                 }
                 g_towns.sort();
             } else if (mapDataType == OTBM_WAYPOINTS && headerVersion > 1) {
-                for (const BinaryTreePtr& nodeWaypoint : nodeMapData->getChildren()) {
+                for (const auto& nodeWaypoint : nodeMapData->getChildren()) {
                     if (nodeWaypoint->getU8() != OTBM_WAYPOINT)
                         throw Exception("invalid waypoint node.");
 

@@ -24,7 +24,7 @@
 #include <framework/otml/otmlnode.h>
 #include "luainterface.h"
 
-// bool
+ // bool
 int push_luavalue(bool b)
 {
     g_lua.pushBoolean(b);
@@ -246,7 +246,7 @@ void push_otml_subnode_luavalue(const OTMLNodePtr& node)
         g_lua.newTable();
         bool pushedChild = false;
         int currentIndex = 1;
-        for (const OTMLNodePtr& cnode : node->children()) {
+        for (const auto& cnode : node->children()) {
             push_otml_subnode_luavalue(cnode);
             if (!g_lua.isNil()) {
                 if (cnode->isUnique()) {
@@ -272,7 +272,7 @@ int push_luavalue(const OTMLNodePtr& node)
     if (node) {
         g_lua.newTable();
         int currentIndex = 1;
-        for (const OTMLNodePtr& cnode : node->children()) {
+        for (const auto& cnode : node->children()) {
             push_otml_subnode_luavalue(cnode);
             if (cnode->isUnique() && !cnode->tag().empty()) {
                 g_lua.setField(cnode->tag());

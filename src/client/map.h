@@ -104,13 +104,13 @@ public:
 
     const TilePtr& create(const Position& pos)
     {
-        TilePtr& tile = m_tiles[getTileIndex(pos)];
+        auto& tile = m_tiles[getTileIndex(pos)];
         tile = std::make_shared<Tile>(pos);
         return tile;
     }
     const TilePtr& getOrCreate(const Position& pos)
     {
-        TilePtr& tile = m_tiles[getTileIndex(pos)];
+        auto& tile = m_tiles[getTileIndex(pos)];
         if (!tile)
             tile = std::make_shared<Tile>(pos);
         return tile;

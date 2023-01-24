@@ -95,7 +95,7 @@ void UIManager::inputEvent(const InputEvent& event)
             }
 
             m_mouseReceiver->propagateOnMouseEvent(event.mousePos, widgetList);
-            for (const UIWidgetPtr& widget : widgetList) {
+            for (const auto& widget : widgetList) {
                 widget->recursiveFocus(Fw::MouseFocusReason);
                 if (widget->onMousePress(event.mousePos, event.mouseButton))
                     break;
@@ -120,7 +120,7 @@ void UIManager::inputEvent(const InputEvent& event)
                     widgetList.emplace_front(m_pressedWidget);
                 }
 
-                for (const UIWidgetPtr& widget : widgetList) {
+                for (const auto& widget : widgetList) {
                     if (widget->onMouseRelease(event.mousePos, event.mouseButton))
                         break;
                 }
@@ -155,7 +155,7 @@ void UIManager::inputEvent(const InputEvent& event)
             }
 
             m_mouseReceiver->propagateOnMouseMove(event.mousePos, event.mouseMoved, widgetList);
-            for (const UIWidgetPtr& widget : widgetList) {
+            for (const auto& widget : widgetList) {
                 if (widget->onMouseMove(event.mousePos, event.mouseMoved))
                     break;
             }
@@ -163,7 +163,7 @@ void UIManager::inputEvent(const InputEvent& event)
         }
         case Fw::MouseWheelInputEvent:
             m_rootWidget->propagateOnMouseEvent(event.mousePos, widgetList);
-            for (const UIWidgetPtr& widget : widgetList) {
+            for (const auto& widget : widgetList) {
                 if (widget->onMouseWheel(event.mousePos, event.wheelDirection))
                     break;
             }
@@ -200,7 +200,7 @@ bool UIManager::updateDraggingWidget(const UIWidgetPtr& draggingWidget, const Po
         UIWidgetPtr droppedWidget;
         if (!clickedPos.isNull()) {
             const auto clickedChildren = m_rootWidget->recursiveGetChildrenByPos(clickedPos);
-            for (const UIWidgetPtr& child : clickedChildren) {
+            for (const auto& child : clickedChildren) {
                 if (child->onDrop(oldDraggingWidget, clickedPos)) {
                     droppedWidget = child;
                     break;
@@ -305,7 +305,7 @@ void UIManager::onWidgetDestroy(const UIWidgetPtr& widget)
         m_destroyedWidgets.clear();
         g_dispatcher.scheduleEvent([backupList] {
             g_lua.collectGarbage();
-            for (const UIWidgetPtr& widget : backupList) {
+            for (const auto& widget : backupList) {
                 if (widget.use_count() != 1)
                     g_logger.warning(stdext::format("widget '%s' destroyed but still have %d reference(s) left", widget->getId(), widget.use_count() - 1));
             }

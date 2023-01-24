@@ -28,7 +28,7 @@ void UIVerticalLayout::applyStyle(const OTMLNodePtr& styleNode)
 {
     UIBoxLayout::applyStyle(styleNode);
 
-    for (const OTMLNodePtr& node : styleNode->children()) {
+    for (const auto& node : styleNode->children()) {
         if (node->tag() == "align-bottom")
             setAlignBottom(node->value<bool>());
     }

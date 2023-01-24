@@ -31,7 +31,7 @@ void UIBoxLayout::applyStyle(const OTMLNodePtr& styleNode)
 {
     UILayout::applyStyle(styleNode);
 
-    for (const OTMLNodePtr& node : styleNode->children()) {
+    for (const auto& node : styleNode->children()) {
         if (node->tag() == "spacing")
             setSpacing(node->value<int>());
         else if (node->tag() == "fit-children")

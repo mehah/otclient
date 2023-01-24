@@ -619,7 +619,7 @@ void UITextEdit::onStyleApply(const std::string_view styleName, const OTMLNodePt
 {
     UIWidget::onStyleApply(styleName, styleNode);
 
-    for (const OTMLNodePtr& node : styleNode->children()) {
+    for (const auto& node : styleNode->children()) {
         if (node->tag() == "text") {
             setText(node->value());
             setCursorPos(m_text.length());

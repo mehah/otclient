@@ -477,7 +477,7 @@ ThingPtr Tile::getTopMultiUseThing()
     if (isEmpty())
         return nullptr;
 
-    if (const CreaturePtr& topCreature = getTopCreature())
+    if (const auto& topCreature = getTopCreature())
         return topCreature;
 
     for (const auto& thing : m_things) {
@@ -767,7 +767,7 @@ void Tile::setThingFlag(const ThingPtr& thing)
 void Tile::select(TileSelectType selectType)
 {
     if (selectType == TileSelectType::NO_FILTERED) {
-        if (const CreaturePtr& topCreature = getTopCreature())
+        if (const auto& topCreature = getTopCreature())
             m_highlightThingId = topCreature->getThingType()->getId();
 
         if (!m_highlightThingId)

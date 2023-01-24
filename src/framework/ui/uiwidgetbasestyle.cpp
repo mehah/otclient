@@ -48,7 +48,7 @@ void UIWidget::initBaseStyle()
 void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
 {
     // parse lua variables and callbacks first
-    for (const OTMLNodePtr& node : styleNode->children()) {
+    for (const auto& node : styleNode->children()) {
         // lua functions
         if (node->tag().starts_with("@")) {
             // load once
@@ -68,7 +68,7 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
         }
     }
     // load styles used by all widgets
-    for (const OTMLNodePtr& node : styleNode->children()) {
+    for (const auto& node : styleNode->children()) {
         if (node->tag() == "color")
             setColor(node->value<Color>());
         else if (node->tag() == "x")

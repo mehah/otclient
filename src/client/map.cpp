@@ -70,14 +70,14 @@ void Map::removeMapView(const MapViewPtr& mapView)
 
 void Map::notificateKeyRelease(const InputEvent& inputEvent) const
 {
-    for (const MapViewPtr& mapView : m_mapViews) {
+    for (const auto& mapView : m_mapViews) {
         mapView->onKeyRelease(inputEvent);
     }
 }
 
 void Map::notificateCameraMove(const Point& offset) const
 {
-    for (const MapViewPtr& mapView : m_mapViews) {
+    for (const auto& mapView : m_mapViews) {
         mapView->onCameraMove(offset);
     }
 }
@@ -87,7 +87,7 @@ void Map::notificateTileUpdate(const Position& pos, const ThingPtr& thing, const
     if (!pos.isMapPosition())
         return;
 
-    for (const MapViewPtr& mapView : m_mapViews) {
+    for (const auto& mapView : m_mapViews) {
         mapView->onTileUpdate(pos, thing, operation);
     }
 
@@ -211,7 +211,7 @@ bool Map::removeThing(const ThingPtr& thing)
         return true;
     }
 
-    if (const TilePtr& tile = thing->getTile()) {
+    if (const auto& tile = thing->getTile()) {
         if (tile->removeThing(thing)) {
             notificateTileUpdate(thing->getPosition(), thing, Otc::OPERATION_REMOVE);
             return true;
@@ -255,7 +255,7 @@ void Map::colorizeThing(const ThingPtr& thing, const Color& color)
     if (thing->isItem())
         thing->static_self_cast<Item>()->setColor(color);
     else if (thing->isCreature()) {
-        const TilePtr& tile = thing->getTile();
+        const auto& tile = thing->getTile();
         assert(tile);
 
         const auto& topThing = tile->getTopThing();
@@ -372,7 +372,7 @@ void Map::cleanTile(const Position& pos)
     }
 
     for (auto itt = m_staticTexts.begin(); itt != m_staticTexts.end();) {
-        const StaticTextPtr& staticText = *itt;
+        const auto& staticText = *itt;
         if (staticText->getPosition() == pos && staticText->getMessageMode() == Otc::MessageNone)
             itt = m_staticTexts.erase(itt);
         else
@@ -500,7 +500,7 @@ void Map::removeUnawareThings()
             for (auto it = tileBlocks.begin(); it != tileBlocks.end();) {
                 auto& block = (*it).second;
                 bool blockEmpty = true;
-                for (const TilePtr& tile : block.getTiles()) {
+                for (const auto& tile : block.getTiles()) {
                     if (!tile) continue;
 
                     const auto& pos = tile->getPosition();
@@ -554,7 +554,7 @@ void Map::setCentralPosition(const Position& centralPosition)
         }
     });
 
-    for (const MapViewPtr& mapView : m_mapViews)
+    for (const auto& mapView : m_mapViews)
         mapView->onMapCenterChange(centralPosition, mapView->m_lastCameraPosition);
 }
 
@@ -604,12 +604,12 @@ bool Map::isCovered(const Position& pos, uint8_t firstFloor)
     Position tilePos = pos;
     while (tilePos.coveredUp() && tilePos.z >= firstFloor) {
         // the below tile is covered when the above tile has a full opaque
-        if (const TilePtr& tile = getTile(tilePos)) {
+        if (const auto& tile = getTile(tilePos)) {
             if (tile->isFullyOpaque())
                 return true;
         }
 
-        if (const TilePtr& tile = getTile(tilePos.translated(1, 1))) {
+        if (const auto& tile = getTile(tilePos.translated(1, 1))) {
             if (tile->isTopGround())
                 return true;
         }
@@ -620,7 +620,7 @@ bool Map::isCovered(const Position& pos, uint8_t firstFloor)
 
 bool Map::isCompletelyCovered(const Position& pos, uint8_t firstFloor)
 {
-    const TilePtr& checkTile = getTile(pos);
+    const auto& checkTile = getTile(pos);
     Position tilePos = pos;
     while (tilePos.coveredUp() && tilePos.z >= firstFloor) {
         bool covered = true;
@@ -629,7 +629,7 @@ bool Map::isCompletelyCovered(const Position& pos, uint8_t firstFloor)
         // Check is Top Ground
         for (int_fast8_t x = -1; ++x < 2 && !done;) {
             for (int_fast8_t y = -1; ++y < 2 && !done;) {
-                const TilePtr& tile = getTile(tilePos.translated(x, x));
+                const auto& tile = getTile(tilePos.translated(x, x));
                 if (!tile || !tile->isTopGround()) {
                     covered = false;
                     done = true;
@@ -648,7 +648,7 @@ bool Map::isCompletelyCovered(const Position& pos, uint8_t firstFloor)
         // check in 2x2 range tiles that has no transparent pixels
         for (int_fast8_t x = -1; ++x < 2 && !done;) {
             for (int_fast8_t y = -1; ++y < 2 && !done;) {
-                const TilePtr& tile = getTile(tilePos.translated(-x, -y));
+                const auto& tile = getTile(tilePos.translated(-x, -y));
                 if (!tile || !tile->isFullyOpaque()) {
                     covered = false;
                     done = true;
@@ -799,14 +799,14 @@ std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::findPath(const
                 if (neighborPos.x < 0 || neighborPos.y < 0) continue;
                 if (g_map.isAwareOfPosition(neighborPos)) {
                     wasSeen = true;
-                    if (const TilePtr& tile = getTile(neighborPos)) {
+                    if (const auto& tile = getTile(neighborPos)) {
                         hasCreature = tile->hasCreature() && (!(flags & Otc::PathFindIgnoreCreatures));
                         isNotWalkable = !tile->isWalkable(flags & Otc::PathFindIgnoreCreatures);
                         isNotPathable = !tile->isPathable();
                         speed = tile->getGroundSpeed();
                     }
                 } else {
-                    const MinimapTile& mtile = g_minimap.getTile(neighborPos);
+                    const auto& mtile = g_minimap.getTile(neighborPos);
                     wasSeen = mtile.hasFlag(MinimapTileWasSeen);
                     isNotWalkable = mtile.hasFlag(MinimapTileNotWalkable);
                     isNotPathable = mtile.hasFlag(MinimapTileNotPathable);
@@ -888,7 +888,7 @@ std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::findPath(const
 
 void Map::resetLastCamera() const
 {
-    for (const MapViewPtr& mapView : m_mapViews)
+    for (const auto& mapView : m_mapViews)
         mapView->resetLastCamera();
 }
 

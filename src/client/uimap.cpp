@@ -156,7 +156,7 @@ TilePtr UIMap::getTile(const Point& mousePos)
 void UIMap::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
 {
     UIWidget::onStyleApply(styleName, styleNode);
-    for (const OTMLNodePtr& node : styleNode->children()) {
+    for (const auto& node : styleNode->children()) {
         if (node->tag() == "draw-lights")
             setDrawLights(node->value<bool>());
     }

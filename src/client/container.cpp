@@ -64,7 +64,7 @@ void Container::onAddItem(const ItemPtr& item, int slot)
 
 ItemPtr Container::findItemById(uint32_t itemId, int subType) const
 {
-    for (const ItemPtr& item : m_items)
+    for (const auto& item : m_items)
         if (item->getId() == itemId && (subType == -1 || item->getSubType() == subType))
             return item;
     return nullptr;
@@ -72,7 +72,7 @@ ItemPtr Container::findItemById(uint32_t itemId, int subType) const
 
 void Container::onAddItems(const std::vector<ItemPtr>& items)
 {
-    for (const ItemPtr& item : items)
+    for (const auto& item : items)
         m_items.push_back(item);
     updateItemsPositions();
 }

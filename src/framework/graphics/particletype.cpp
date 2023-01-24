@@ -25,7 +25,7 @@
 
 void ParticleType::load(const OTMLNodePtr& node)
 {
-    for (const OTMLNodePtr& childNode : node->children()) {
+    for (const auto& childNode : node->children()) {
         if (childNode->tag() == "name")
             pName = childNode->value();
         else if (childNode->tag() == "position-radius") {

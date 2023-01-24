@@ -135,7 +135,7 @@ void Item::updatePatterns()
             m_numPatternY = 1;
         }
     } else if (isHangable()) {
-        const TilePtr& tile = getTile();
+        const auto& tile = getTile();
         if (tile) {
             if (tile->mustHookSouth())
                 m_numPatternX = numPatternX >= 2 ? 1 : 0;

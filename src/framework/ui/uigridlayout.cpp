@@ -33,7 +33,7 @@ void UIGridLayout::applyStyle(const OTMLNodePtr& styleNode)
 {
     UILayout::applyStyle(styleNode);
 
-    for (const OTMLNodePtr& node : styleNode->children()) {
+    for (const auto& node : styleNode->children()) {
         if (node->tag() == "cell-size")
             setCellSize(node->value<Size>());
         else if (node->tag() == "cell-width")
@@ -88,7 +88,7 @@ bool UIGridLayout::internalUpdate()
 
     int index = 0;
     int preferredHeight = 0;
-    for (const UIWidgetPtr& widget : widgets) {
+    for (const auto& widget : widgets) {
         if (!widget->isExplicitlyVisible())
             continue;
 
