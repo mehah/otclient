@@ -60,7 +60,7 @@ bool FontManager::importFont(const std::string& file)
 
         const auto& font(std::make_shared<BitmapFont>(name));
         font->load(fontNode);
-        m_fonts.push_back(font);
+        m_fonts.emplace_back(font);
 
         // set as default if needed
         if (!m_defaultFont || fontNode->valueAt<bool>("default", false))

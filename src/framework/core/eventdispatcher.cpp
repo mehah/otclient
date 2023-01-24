@@ -121,10 +121,10 @@ EventPtr EventDispatcher::addEvent(const std::function<void()>& callback, bool p
     const auto& event = std::make_shared<Event>(callback);
     // front pushing is a way to execute an event before others
     if (pushFront) {
-        m_eventList.push_front(event);
+        m_eventList.emplace_front(event);
         // the poll event list only grows when pushing into front
         ++m_pollEventsSize;
     } else
-        m_eventList.push_back(event);
+        m_eventList.emplace_back(event);
     return event;
 }

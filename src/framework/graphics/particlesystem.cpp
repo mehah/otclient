@@ -34,7 +34,7 @@ void ParticleSystem::load(const OTMLNodePtr& node)
         if (childNode->tag() == "Emitter") {
             const auto& emitter = std::make_shared<ParticleEmitter>();
             emitter->load(childNode);
-            m_emitters.push_back(emitter);
+            m_emitters.emplace_back(emitter);
         } else if (childNode->tag().find("Affector") != std::string::npos) {
             ParticleAffectorPtr affector;
 
@@ -45,16 +45,13 @@ void ParticleSystem::load(const OTMLNodePtr& node)
 
             if (affector) {
                 affector->load(childNode);
-                m_affectors.push_back(affector);
+                m_affectors.emplace_back(affector);
             }
         }
     }
 }
 
-void ParticleSystem::addParticle(const ParticlePtr& particle)
-{
-    m_particles.push_back(particle);
-}
+void ParticleSystem::addParticle(const ParticlePtr& particle) { m_particles.emplace_back(particle); }
 
 void ParticleSystem::render() const
 {

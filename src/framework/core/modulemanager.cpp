@@ -80,7 +80,7 @@ ModulePtr ModuleManager::discoverModule(const std::string& moduleFile)
 
         // not loaded modules are always in back
         if (push)
-            m_modules.push_back(module);
+            m_modules.emplace_back(module);
     } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("Unable to discover module from file '%s': %s", moduleFile, e.what()));
     }
@@ -111,7 +111,7 @@ void ModuleManager::reloadModules()
         for (const ModulePtr& module : modulesBackup) {
             if (module->isLoaded() && module->canUnload()) {
                 module->unload();
-                toLoadList.push_front(module);
+                toLoadList.emplace_front(module);
             }
         }
     }
@@ -134,7 +134,7 @@ void ModuleManager::updateModuleLoadOrder(const ModulePtr& module)
         it != m_modules.end())
         m_modules.erase(it);
     if (module->isLoaded())
-        m_modules.push_front(module);
+        m_modules.emplace_front(module);
     else
-        m_modules.push_back(module);
+        m_modules.emplace_back(module);
 }

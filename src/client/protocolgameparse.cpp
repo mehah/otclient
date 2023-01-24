@@ -3202,7 +3202,7 @@ std::vector<PreyMonster> ProtocolGame::getPreyMonsters(const InputMessagePtr& ms
     std::vector<PreyMonster> monsters;
     const uint8_t monstersSize = msg->getU8(); // monster list size
     for (uint8_t i = 0; i < monstersSize; i++)
-        monsters.push_back(getPreyMonster(msg));
+        monsters.emplace_back(getPreyMonster(msg));
 
     return monsters;
 }

@@ -181,7 +181,7 @@ void Map::addAnimatedText(const AnimatedTextPtr& txt, const Position& pos) {
             offset.y = std::min<int32_t>(offset.y, 12);
             txt->setOffset(offset);
         }
-        m_animatedTexts.push_back(txt);
+        m_animatedTexts.emplace_back(txt);
     }
 
     txt->setPosition(pos);
@@ -336,7 +336,7 @@ TileList Map::getTiles(int8_t floor/* = -1*/)
             for (const auto& [key, block] : m_tileBlocks[z]) {
                 for (const auto& tile : block.getTiles()) {
                     if (tile != nullptr)
-                        tiles.push_back(tile);
+                        tiles.emplace_back(tile);
                 }
             }
         }
@@ -344,7 +344,7 @@ TileList Map::getTiles(int8_t floor/* = -1*/)
         for (const auto& [key, block] : m_tileBlocks[floor]) {
             for (const auto& tile : block.getTiles()) {
                 if (tile != nullptr)
-                    tiles.push_back(tile);
+                    tiles.emplace_back(tile);
             }
         }
     }

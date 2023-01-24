@@ -112,7 +112,7 @@ void OTMLNode::addChild(const OTMLNodePtr& newChild)
         }
     }
 
-    m_children.push_back(newChild);
+    m_children.emplace_back(newChild);
 }
 
 bool OTMLNode::removeChild(const OTMLNodePtr& oldChild)
@@ -166,7 +166,7 @@ OTMLNodeList OTMLNode::children() const
     OTMLNodeList children;
     for (const OTMLNodePtr& child : m_children)
         if (!child->isNull())
-            children.push_back(child);
+            children.emplace_back(child);
     return children;
 }
 

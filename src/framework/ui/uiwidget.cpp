@@ -148,7 +148,7 @@ void UIWidget::addChild(const UIWidgetPtr& child)
 
     const auto& oldLastChild = getLastChild();
 
-    m_children.push_back(child);
+    m_children.emplace_back(child);
     m_childrenById[child->getId()] = child;
 
     // cache index
@@ -421,7 +421,7 @@ void UIWidget::lowerChild(const UIWidgetPtr& child)
     }
 
     m_children.erase(it);
-    m_children.push_front(child);
+    m_children.emplace_front(child);
 
     { // cache index
         for (int i = (child->m_childIndex = 1), s = m_children.size(); i < s; ++i)
@@ -447,7 +447,7 @@ void UIWidget::raiseChild(const UIWidgetPtr& child)
     }
 
     m_children.erase(it);
-    m_children.push_back(child);
+    m_children.emplace_back(child);
 
     { // cache index
         for (int i = child->m_childIndex - 1, s = m_children.size(); i < s; ++i)
@@ -520,7 +520,7 @@ void UIWidget::lockChild(const UIWidgetPtr& child)
             otherChild->setEnabled(false);
     }
 
-    m_lockedChildren.push_front(child);
+    m_lockedChildren.emplace_front(child);
 
     // lock child focus
     if (child->isFocusable())
@@ -1275,7 +1275,7 @@ UIWidgetList UIWidget::recursiveGetChildren()
         if (const UIWidgetList& subChildren = child->recursiveGetChildren(); !subChildren.empty())
             children.insert(children.end(), subChildren.begin(), subChildren.end());
 
-        children.push_back(child);
+        children.emplace_back(child);
     }
 
     return children;
@@ -1294,7 +1294,7 @@ UIWidgetList UIWidget::recursiveGetChildrenByPos(const Point& childPos)
             if (const UIWidgetList& subChildren = child->recursiveGetChildrenByPos(childPos); !subChildren.empty())
                 children.insert(children.end(), subChildren.begin(), subChildren.end());
 
-            children.push_back(child);
+            children.emplace_back(child);
         }
     }
 
@@ -1313,7 +1313,7 @@ UIWidgetList UIWidget::recursiveGetChildrenByMarginPos(const Point& childPos)
             UIWidgetList subChildren = child->recursiveGetChildrenByMarginPos(childPos);
             if (!subChildren.empty())
                 children.insert(children.end(), subChildren.begin(), subChildren.end());
-            children.push_back(child);
+            children.emplace_back(child);
         }
     }
     return children;
@@ -1673,7 +1673,7 @@ bool UIWidget::propagateOnKeyText(const std::string_view keyText)
 
         // key events go only to containers or focused child
         if (child->isFocused())
-            children.push_back(child);
+            children.emplace_back(child);
     }
 
     for (const UIWidgetPtr& child : children) {
@@ -1695,7 +1695,7 @@ bool UIWidget::propagateOnKeyDown(uint8_t keyCode, int keyboardModifiers)
 
         // key events go only to containers or focused child
         if (child->isFocused())
-            children.push_back(child);
+            children.emplace_back(child);
     }
 
     for (const UIWidgetPtr& child : children) {
@@ -1717,7 +1717,7 @@ bool UIWidget::propagateOnKeyPress(uint8_t keyCode, int keyboardModifiers, int a
 
         // key events go only to containers or focused child
         if (child->isFocused())
-            children.push_back(child);
+            children.emplace_back(child);
     }
 
     for (const UIWidgetPtr& child : children) {
@@ -1741,7 +1741,7 @@ bool UIWidget::propagateOnKeyUp(uint8_t keyCode, int keyboardModifiers)
 
         // key events go only to focused child
         if (child->isFocused())
-            children.push_back(child);
+            children.emplace_back(child);
     }
 
     for (const UIWidgetPtr& child : children) {
@@ -1768,7 +1768,7 @@ bool UIWidget::propagateOnMouseEvent(const Point& mousePos, UIWidgetList& widget
         }
     }
 
-    widgetList.push_back(static_self_cast<UIWidget>());
+    widgetList.emplace_back(static_self_cast<UIWidget>());
 
     if (!isPhantom())
         ret = true;
@@ -1782,7 +1782,7 @@ bool UIWidget::propagateOnMouseMove(const Point& mousePos, const Point& mouseMov
             if (child->isExplicitlyVisible() && child->isExplicitlyEnabled() && child->containsPoint(mousePos))
                 child->propagateOnMouseMove(mousePos, mouseMoved, widgetList);
 
-            widgetList.push_back(static_self_cast<UIWidget>());
+            widgetList.emplace_back(static_self_cast<UIWidget>());
         }
     }
 

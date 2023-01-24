@@ -151,10 +151,10 @@ TexturePtr TextureManager::loadTexture(std::stringstream& file)
                 int frameDelay = apng.frames_delay[i];
 
                 framesDelay.push_back(frameDelay);
-                frames.push_back(std::make_shared<Image>(imageSize, apng.bpp, frameData));
+                frames.emplace_back(std::make_shared<Image>(imageSize, apng.bpp, frameData));
             }
             const auto& animatedTexture = std::make_shared<AnimatedTexture>(imageSize, frames, framesDelay);
-            m_animatedTextures.push_back(animatedTexture);
+            m_animatedTextures.emplace_back(animatedTexture);
             texture = animatedTexture;
         } else {
             const auto& image = std::make_shared<Image>(imageSize, apng.bpp, apng.pdata);

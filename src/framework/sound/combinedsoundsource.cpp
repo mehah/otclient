@@ -26,7 +26,7 @@ CombinedSoundSource::CombinedSoundSource() : SoundSource(0) {}
 
 void CombinedSoundSource::addSource(const SoundSourcePtr& source)
 {
-    m_sources.push_back(source);
+    m_sources.emplace_back(source);
 }
 
 void CombinedSoundSource::play()

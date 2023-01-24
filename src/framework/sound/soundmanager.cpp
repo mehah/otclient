@@ -199,7 +199,7 @@ SoundSourcePtr SoundManager::play(const std::string& fn, float fadetime, float g
 
     soundSource->play();
 
-    m_sources.push_back(soundSource);
+    m_sources.emplace_back(soundSource);
 
     return soundSource;
 }

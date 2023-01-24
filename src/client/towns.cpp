@@ -41,7 +41,7 @@ TownManager::TownManager()
 void TownManager::addTown(const TownPtr& town)
 {
     if (findTown(town->getId()) == m_towns.end())
-        m_towns.push_back(town);
+        m_towns.emplace_back(town);
 }
 
 void TownManager::removeTown(uint32_t townId)

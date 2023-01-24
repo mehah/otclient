@@ -353,7 +353,7 @@ void DrawPool::rotate(float x, float y, float angle)
 
 void DrawPool::pushTransformMatrix()
 {
-    m_transformMatrixStack.push_back(m_state.transformMatrix);
+    m_transformMatrixStack.emplace_back(m_state.transformMatrix);
     assert(m_transformMatrixStack.size() < 100);
 }
 

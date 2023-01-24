@@ -57,7 +57,7 @@ ParticleEffectPtr ParticleManager::createEffect(const std::string_view name)
     try {
         const auto& particleEffect = std::make_shared<ParticleEffect>();
         particleEffect->load(m_effectsTypes[std::string(name)]);
-        m_effects.push_back(particleEffect);
+        m_effects.emplace_back(particleEffect);
         return particleEffect;
     } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("failed to create effect '%s': %s", name, e.what()));

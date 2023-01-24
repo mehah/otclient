@@ -117,7 +117,7 @@ void UIManager::inputEvent(const InputEvent& event)
                     const auto it = std::find(widgetList.begin(), widgetList.end(), m_pressedWidget);
                     if (it != widgetList.end())
                         widgetList.erase(it);
-                    widgetList.push_front(m_pressedWidget);
+                    widgetList.emplace_front(m_pressedWidget);
                 }
 
                 for (const UIWidgetPtr& widget : widgetList) {
@@ -294,7 +294,7 @@ void UIManager::onWidgetDestroy(const UIWidgetPtr& widget)
     if (widget == m_rootWidget || !m_rootWidget)
         return;
 
-    m_destroyedWidgets.push_back(widget);
+    m_destroyedWidgets.emplace_back(widget);
 
     if (m_checkEvent && !m_checkEvent->isExecuted())
         return;

@@ -149,7 +149,7 @@ void Tile::clean()
 
 void Tile::addWalkingCreature(const CreaturePtr& creature)
 {
-    m_walkingCreatures.push_back(creature);
+    m_walkingCreatures.emplace_back(creature);
     setThingFlag(creature);
 }
 
@@ -189,7 +189,7 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
         if (newEffect->isTopEffect())
             m_effects.insert(m_effects.begin(), newEffect);
         else
-            m_effects.push_back(newEffect);
+            m_effects.emplace_back(newEffect);
 
         setThingFlag(thing);
 
@@ -304,7 +304,7 @@ std::vector<CreaturePtr> Tile::getCreatures()
     if (hasCreature()) {
         for (const auto& thing : m_things) {
             if (thing->isCreature())
-                creatures.push_back(thing->static_self_cast<Creature>());
+                creatures.emplace_back(thing->static_self_cast<Creature>());
         }
     }
 
@@ -344,7 +344,7 @@ std::vector<ItemPtr> Tile::getItems()
         if (!thing->isItem())
             continue;
 
-        items.push_back(thing->static_self_cast<Item>());
+        items.emplace_back(thing->static_self_cast<Item>());
     }
     return items;
 }
@@ -608,7 +608,7 @@ void Tile::onAddInMapView()
                 const TilePtr& tile = g_map.getTile(m_position.translated(x, y));
                 if (tile && (tile->hasCreature() || tile->hasEffect() || tile->hasTopItem())) {
                     tile->m_drawTopAndCreature = false;
-                    m_tilesRedraw.push_back(tile);
+                    m_tilesRedraw.emplace_back(tile);
                 }
             }
         }

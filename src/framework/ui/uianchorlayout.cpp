@@ -102,7 +102,7 @@ void UIAnchorGroup::addAnchor(const UIAnchorPtr& anchor)
             return;
         }
     }
-    m_anchors.push_back(anchor);
+    m_anchors.emplace_back(anchor);
 }
 
 void UIAnchorLayout::addAnchor(const UIWidgetPtr& anchoredWidget, Fw::AnchorEdge anchoredEdge,

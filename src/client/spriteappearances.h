@@ -82,10 +82,7 @@ public:
     void saveSheetToFile(const SpriteSheetPtr& sheet, const std::string& file);
     SpriteSheetPtr getSheetBySpriteId(int id, bool load = true);
 
-    void addSpriteSheet(const SpriteSheetPtr& sheet)
-    {
-        m_sheets.push_back(sheet);
-    }
+    void addSpriteSheet(const SpriteSheetPtr& sheet) { m_sheets.emplace_back(sheet); }
 
     ImagePtr getSpriteImage(int id);
     void saveSpriteToFile(int id, const std::string& file);

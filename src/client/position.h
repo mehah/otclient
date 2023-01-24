@@ -126,13 +126,13 @@ public:
         if (!lastPos.isValid())
             return positions;
 
-        positions.push_back(lastPos);
+        positions.emplace_back(lastPos);
 
         for (const auto dir : dirs) {
             lastPos = lastPos.translatedToDirection(dir);
             if (!lastPos.isValid())
                 break;
-            positions.push_back(lastPos);
+            positions.emplace_back(lastPos);
         }
 
         return positions;

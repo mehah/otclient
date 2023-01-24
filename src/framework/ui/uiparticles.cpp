@@ -65,5 +65,5 @@ void UIParticles::addEffect(const std::string_view name)
 {
     const ParticleEffectPtr effect = g_particles.createEffect(name);
     if (effect)
-        m_effects.push_back(effect);
+        m_effects.emplace_back(effect);
 }

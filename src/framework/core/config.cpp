@@ -112,7 +112,7 @@ std::vector<std::string> Config::getList(const std::string& key)
     std::vector<std::string> list;
     if (const auto& child = m_confsDoc->get(key); child) {
         for (const auto& subchild : child->children())
-            list.push_back(subchild->value());
+            list.emplace_back(subchild->value());
     }
     return list;
 }

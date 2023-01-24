@@ -197,17 +197,17 @@ void Module::discover(const OTMLNodePtr& moduleNode)
 
     if (const auto& node = moduleNode->get("dependencies")) {
         for (const auto& tmp : node->children())
-            m_dependencies.push_back(tmp->value());
+            m_dependencies.emplace_back(tmp->value());
     }
 
     if (const auto& node = moduleNode->get("scripts")) {
         for (const auto& tmp : node->children())
-            m_scripts.push_back(stdext::resolve_path(tmp->value(), node->source()));
+            m_scripts.emplace_back(stdext::resolve_path(tmp->value(), node->source()));
     }
 
     if (const auto& node = moduleNode->get("load-later")) {
         for (const auto& tmp : node->children())
-            m_loadLaterModules.push_back(tmp->value());
+            m_loadLaterModules.emplace_back(tmp->value());
     }
 
     if (const auto& node = moduleNode->get("@onLoad"))

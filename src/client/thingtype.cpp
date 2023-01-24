@@ -282,7 +282,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
 
         if (const auto& sheet = g_spriteAppearances.getSheetBySpriteId(spriteInfo.sprite_id(0), false)) {
             m_size = sheet->getSpriteSize() / SPRITE_SIZE;
-            sizes.push_back(m_size);
+            sizes.emplace_back(m_size);
         }
 
         // animations
@@ -500,7 +500,7 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
         const uint8_t width = fin->getU8();
         const uint8_t height = fin->getU8();
         m_size = { width, height };
-        sizes.push_back(m_size);
+        sizes.emplace_back(m_size);
         if (width > 1 || height > 1) {
             m_realSize = fin->getU8();
         }

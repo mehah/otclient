@@ -47,7 +47,7 @@ bool ShaderProgram::addShader(const ShaderPtr& shader)
 {
     glAttachShader(m_programId, shader->getShaderId());
     m_linked = false;
-    m_shaders.push_back(shader);
+    m_shaders.emplace_back(shader);
     return true;
 }
 
