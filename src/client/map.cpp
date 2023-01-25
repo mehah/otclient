@@ -133,6 +133,7 @@ void Map::addThing(const ThingPtr& thing, const Position& pos, int16_t stackPos)
         m_floorMissiles[pos.z].emplace_back(thing->static_self_cast<Missile>());
         thing->setPosition(pos);
         thing->onAppear();
+        return;
     }
 
     if (const auto& tile = getOrCreateTile(pos)) {
