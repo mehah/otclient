@@ -125,6 +125,9 @@ void ProtocolGame::sendLoginPacket(uint32_t challengeTimestamp, uint8_t challeng
 
     if (g_game.getFeature(Otc::GameLoginPacketEncryption))
         enableXteaEncryption();
+
+    if (g_game.getFeature(Otc::GameSequencedPackets))
+        enabledSequencedPackets();
 }
 
 void ProtocolGame::sendEnterGame()

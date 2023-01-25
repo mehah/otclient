@@ -165,6 +165,7 @@ GameThingUpgradeClassification = 86
 GameThingCounter = 87
 GameThingClock = 88
 GameThingPodiumItemType = 89
+GameSequencedPackets = 90
 GameLoadSprInsteadProtobuf = 100
 
 TextColors = {

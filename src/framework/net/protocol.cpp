@@ -25,7 +25,9 @@
 #include <framework/core/application.h>
 #include "connection.h"
 
-Protocol::Protocol() :m_inputMessage(std::make_shared<InputMessage>()) {}
+Protocol::Protocol() :m_inputMessage(std::make_shared<InputMessage>()) {
+    inflateInit2(&m_zstream, -15);
+}
 
 Protocol::~Protocol()
 {
@@ -33,6 +35,7 @@ Protocol::~Protocol()
     assert(!g_app.isTerminated());
 #endif
     disconnect();
+    inflateEnd(&m_zstream);
 }
 
 void Protocol::connect(const std::string_view host, uint16_t port)
@@ -57,7 +60,9 @@ void Protocol::send(const OutputMessagePtr& outputMessage)
         xteaEncrypt(outputMessage);
 
     // write checksum
-    if (m_checksumEnabled)
+    if (m_sequencedPackets)
+        outputMessage->writeSequence(m_packetNumber++);
+    else if (m_checksumEnabled)
         outputMessage->writeChecksum();
 
     // write message size
@@ -115,8 +120,11 @@ void Protocol::internalRecvData(uint8_t* buffer, uint16_t size)
 
     m_inputMessage->fillBuffer(buffer, size);
 
-    if (m_checksumEnabled && !m_inputMessage->readChecksum()) {
-        g_logger.traceError("got a network message with invalid checksum");
+    bool decompress = false;
+    if (m_sequencedPackets) {
+        decompress = (m_inputMessage->getU32() & 1 << 31);
+    } else if (m_checksumEnabled && !m_inputMessage->readChecksum()) {
+        g_logger.traceError(stdext::format("got a network message with invalid checksum, size: %i", (int)m_inputMessage->getMessageSize()));
         return;
     }
 
@@ -126,6 +134,32 @@ void Protocol::internalRecvData(uint8_t* buffer, uint16_t size)
             return;
         }
     }
+
+    if (decompress) {
+        static uint8_t zbuffer[InputMessage::BUFFER_MAXSIZE];
+
+        m_zstream.next_in = m_inputMessage->getDataBuffer();
+        m_zstream.next_out = zbuffer;
+        m_zstream.avail_in = m_inputMessage->getUnreadSize();
+        m_zstream.avail_out = InputMessage::BUFFER_MAXSIZE;
+
+        int32_t ret = inflate(&m_zstream, Z_FINISH);
+        if (ret != Z_OK && ret != Z_STREAM_END) {
+            g_logger.traceError(stdext::format("failed to decompress message - %s", m_zstream.msg));
+            return;
+        }
+
+        const uint32_t totalSize = m_zstream.total_out;
+        inflateReset(&m_zstream);
+        if (totalSize == 0) {
+            g_logger.traceError(stdext::format("invalid size of decompressed message - %i", totalSize));
+            return;
+        }
+
+        m_inputMessage->fillBuffer(zbuffer, totalSize);
+        m_inputMessage->setMessageSize(m_inputMessage->getHeaderSize() + totalSize);
+    }
+
     onRecv(m_inputMessage);
 }
 

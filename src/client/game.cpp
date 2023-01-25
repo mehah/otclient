@@ -614,11 +614,10 @@ bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
         m_localPlayer->lockWalk();
     }
 
-
     // must cancel follow before any new walk
     if (isFollowing())
         cancelFollow();
-    
+
     m_localPlayer->stopAutoWalk();
 
     g_lua.callGlobalField("g_game", "onWalk", direction);
@@ -1739,6 +1738,7 @@ void Game::setClientVersion(int version)
     }
 
     if (version >= 1290) {
+        enableFeature(Otc::GameSequencedPackets);
         enableFeature(Otc::GameThingClock);
         enableFeature(Otc::GameThingCounter);
         enableFeature(Otc::GameThingPodiumItemType);

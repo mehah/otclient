@@ -28,6 +28,7 @@
 #include "outputmessage.h"
 
 #include <framework/luaengine/luaobject.h>
+#include <zlib.h>
 
  // @bindclass
 class Protocol : public LuaObject
@@ -52,6 +53,7 @@ public:
     void enableXteaEncryption() { m_xteaEncryptionEnabled = true; }
 
     void enableChecksum() { m_checksumEnabled = true; }
+    void enabledSequencedPackets() { m_sequencedPackets = true; }
 
     virtual void send(const OutputMessagePtr& outputMessage);
     virtual void recv();
@@ -64,6 +66,7 @@ protected:
     virtual void onError(const std::error_code& err);
 
     std::array<uint32_t, 4> m_xteaKey{};
+    uint32_t m_packetNumber{ 0 };
 
 private:
     void internalRecvHeader(uint8_t* buffer, uint16_t size);
@@ -73,7 +76,11 @@ private:
     void xteaEncrypt(const OutputMessagePtr& outputMessage) const;
 
     bool m_checksumEnabled{ false };
+    bool m_sequencedPackets{ false };
     bool m_xteaEncryptionEnabled{ false };
+
     ConnectionPtr m_connection;
     InputMessagePtr m_inputMessage;
+
+    z_stream m_zstream{};
 };
