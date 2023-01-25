@@ -113,12 +113,11 @@ void UIAnchorLayout::addAnchor(const UIWidgetPtr& anchoredWidget, Fw::AnchorEdge
 
     assert(anchoredWidget != getParentWidget());
 
-    const auto& anchor = std::make_shared<UIAnchor>(anchoredEdge, hookedWidgetId, hookedEdge);
     auto& anchorGroup = m_anchorsGroups[anchoredWidget];
     if (!anchorGroup)
         anchorGroup = std::make_shared<UIAnchorGroup>();
 
-    anchorGroup->addAnchor(anchor);
+    anchorGroup->addAnchor(std::make_shared<UIAnchor>(anchoredEdge, hookedWidgetId, hookedEdge));
 
     // layout must be updated because a new anchor got in
     update();
@@ -201,7 +200,6 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
         }
 
         const int point = anchor->getHookedPoint(hookedWidget, parentWidget);
-
         switch (anchor->getAnchoredEdge()) {
             case Fw::AnchorHorizontalCenter:
                 newRect.moveHorizontalCenter(point + widget->getMarginLeft() - widget->getMarginRight());
@@ -244,29 +242,25 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
         }
     }
 
-    bool changed = false;
-    if (widget->setRect(newRect))
-        changed = true;
     anchorGroup->setUpdated(true);
-    return changed;
+    return widget->setRect(newRect);
 }
 
 bool UIAnchorLayout::internalUpdate()
 {
-    bool changed = false;
-
     // reset all anchors groups update state
-    for (auto& it : m_anchorsGroups) {
-        const auto& anchorGroup = it.second;
-        anchorGroup->setUpdated(false);
-    }
+    for (auto& it : m_anchorsGroups)
+        it.second->setUpdated(false);
+
+    bool changed = false;
 
     // update all anchors
     for (const auto& [widget, anchorGroup] : m_anchorsGroups) {
-        if (!anchorGroup->isUpdated()) {
-            if (updateWidget(widget, anchorGroup))
-                changed = true;
-        }
+        if (anchorGroup->isUpdated())
+            continue;
+
+        if (updateWidget(widget, anchorGroup))
+            changed = true;
     }
 
     return changed;

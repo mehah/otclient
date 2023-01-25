@@ -973,7 +973,7 @@ bool UIWidget::setRect(const Rect& rect)
 
     // avoid massive update events
     if (!m_updateEventScheduled) {
-        UIWidgetPtr self = static_self_cast<UIWidget>();
+        auto self = static_self_cast<UIWidget>();
         g_dispatcher.addEvent([self, oldRect] {
             self->m_updateEventScheduled = false;
             if (oldRect != self->getRect())
