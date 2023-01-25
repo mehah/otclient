@@ -22,6 +22,8 @@
 
 #include <framework/core/eventdispatcher.h>
 
+#include <utility>
+
 #include "protocolhttp.h"
 
 Http g_http;
@@ -29,9 +31,7 @@ Http g_http;
 void Http::init()
 {
     m_working = true;
-    m_thread = std::thread([&] {
-        m_ios.run();
-    });
+    m_thread = std::thread([this] { m_ios.run(); });
 }
 
 void Http::terminate()
@@ -43,8 +43,7 @@ void Http::terminate()
         ws.second->close();
     }
     for (const auto& op : m_operations) {
-        auto session = op.second->session.lock();
-        if (session)
+        if (const auto& session = op.second->session.lock())
             session->close();
     }
     m_guard.reset();
@@ -66,7 +65,7 @@ int Http::get(const std::string& url, int timeout)
         result->url = url;
         result->operationId = operationId;
         m_operations[operationId] = result;
-        auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
+        const auto& session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
                                                      false, result, [&](HttpResult_ptr result) {
             bool finished = result->finished;
             g_dispatcher.addEvent([result, finished] {
@@ -103,7 +102,7 @@ int Http::post(const std::string& url, const std::string& data, int timeout, boo
         result->operationId = operationId;
         result->postData = data;
         m_operations[operationId] = result;
-        auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
+        const auto& session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
                                                      isJson, result, [&](HttpResult_ptr result) {
             bool finished = result->finished;
             g_dispatcher.addEvent([result, finished] {
@@ -134,7 +133,7 @@ int Http::download(const std::string& url, const std::string& path, int timeout)
         result->url = url;
         result->operationId = operationId;
         m_operations[operationId] = result;
-        auto session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
+        const auto& session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
                                                      false, result, [&, path](HttpResult_ptr result) {
             if (!result->finished) {
                 g_dispatcher.addEvent([result] {
@@ -143,7 +142,7 @@ int Http::download(const std::string& url, const std::string& path, int timeout)
                 return;
             }
 
-            uint32_t  crc = crc32(0L, Z_NULL, 0);
+            const uint32_t  crc = crc32(0L, Z_NULL, 0);
             uint32_t checksum = crc32(crc, (const unsigned char*)result->response.c_str(), result->response.size());
 
             g_dispatcher.addEvent([this, result, path, checksum] {
@@ -176,7 +175,7 @@ int Http::ws(const std::string& url, int timeout)
         result->url = url;
         result->operationId = operationId;
         m_operations[operationId] = result;
-        auto session = std::make_shared<WebsocketSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, timeout, result, [&, result](WebsocketCallbackType type, std::string message) {
+        const auto& session = std::make_shared<WebsocketSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, timeout, result, [&, result](WebsocketCallbackType type, std::string message) {
             g_dispatcher.addEvent([result, type, message]() {
                 if (type == WebsocketCallbackType::OPEN) {
                     g_lua.callGlobalField("g_http", "onWsOpen", result->operationId, message);
@@ -202,7 +201,7 @@ int Http::ws(const std::string& url, int timeout)
 bool Http::wsSend(int operationId, const std::string& message)
 {
     asio::post(m_ios, [&, operationId, message] {
-        auto wit = m_websockets.find(operationId);
+        const auto wit = m_websockets.find(operationId);
         if (wit == m_websockets.end()) {
             return;
         }
@@ -220,16 +219,16 @@ bool Http::wsClose(int operationId)
 bool Http::cancel(int id)
 {
     asio::post(m_ios, [&, id] {
-        auto wit = m_websockets.find(id);
+        const auto wit = m_websockets.find(id);
         if (wit != m_websockets.end()) {
             wit->second->close();
         }
-        auto it = m_operations.find(id);
+        const auto it = m_operations.find(id);
         if (it == m_operations.end())
             return;
         if (it->second->canceled)
             return;
-        auto session = it->second->session.lock();
+        const auto& session = it->second->session.lock();
         if (session)
             session->close();
     });
@@ -239,7 +238,7 @@ bool Http::cancel(int id)
 void HttpSession::start()
 {
     instance_uri = parseURI(m_url);
-    asio::ip::tcp::resolver::query query_resolver(instance_uri.domain, instance_uri.port);
+    const asio::ip::tcp::resolver::query query_resolver(instance_uri.domain, instance_uri.port);
 
     if (m_result->postData == "") {
         m_request.append("GET " + instance_uri.query + " HTTP/1.1\r\n");
@@ -272,7 +271,7 @@ void HttpSession::start()
         query_resolver,
         [sft = shared_from_this()](
         const std::error_code& ec, asio::ip::tcp::resolver::iterator iterator) {
-        sft->on_resolve(ec, iterator);
+        sft->on_resolve(ec, std::move(iterator));
     });
 }
 
@@ -289,7 +288,7 @@ void HttpSession::on_resolve(const std::error_code& ec, asio::ip::tcp::resolver:
             m_ssl.lowest_layer().close();
             m_ssl.lowest_layer().connect(*iterator++, _ec);
             if (!_ec) {
-                std::error_code __ec;
+                const std::error_code __ec;
                 on_connect(__ec);
                 break;
             }
@@ -299,7 +298,7 @@ void HttpSession::on_resolve(const std::error_code& ec, asio::ip::tcp::resolver:
             m_socket.close();
             m_socket.connect(*iterator++, _ec);
             if (!_ec) {
-                std::error_code __ec;
+                const std::error_code __ec;
                 on_connect(__ec);
                 break;
             }
@@ -327,7 +326,7 @@ void HttpSession::on_connect(const std::error_code& ec)
         m_ssl.set_verify_mode(asio::ssl::verify_peer);
         m_ssl.set_verify_callback([](bool, const asio::ssl::verify_context&) { return true; });
         if (!SSL_set_tlsext_host_name(m_ssl.native_handle(), instance_uri.domain.c_str())) {
-            std::error_code _ec{ static_cast<int>(::ERR_get_error()), asio::error::get_ssl_category() };
+            const std::error_code _ec{ static_cast<int>(::ERR_get_error()), asio::error::get_ssl_category() };
             onError("HttpSession on SSL_set_tlsext_host_name unable to handshake " + m_url + ": " + _ec.message());
             return;
         }
@@ -364,7 +363,7 @@ void HttpSession::on_write()
     m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec) {sft->onTimeout(ec); });
 }
 
-void HttpSession::on_request_sent(const std::error_code& ec, size_t bytes_transferred)
+void HttpSession::on_request_sent(const std::error_code& ec, size_t /*bytes_transferred*/)
 {
     if (ec) {
         onError("HttpSession error on sending request " + m_url + ": " + ec.message());
@@ -384,9 +383,9 @@ void HttpSession::on_request_sent(const std::error_code& ec, size_t bytes_transf
                 asio::buffers_begin(m_response.data()) + size);
             m_response.consume(size);
 
-            size_t pos = header.find("Content-Length: ");
+            const size_t pos = header.find("Content-Length: ");
             if (pos != std::string::npos) {
-                size_t len = std::strtoul(
+                const size_t len = std::strtoul(
                     header.c_str() + pos + sizeof("Content-Length: ") - 1,
                     nullptr, 10);
                 m_result->size = len - m_response.size();
@@ -412,9 +411,9 @@ void HttpSession::on_request_sent(const std::error_code& ec, size_t bytes_transf
                 asio::buffers_begin(m_response.data()) + size);
             m_response.consume(size);
 
-            size_t pos = header.find("Content-Length: ");
+            const size_t pos = header.find("Content-Length: ");
             if (pos != std::string::npos) {
-                size_t len = std::strtoul(
+                const size_t len = std::strtoul(
                     header.c_str() + pos + sizeof("Content-Length: ") - 1,
                     nullptr, 10);
                 m_result->size = len - m_response.size();
@@ -529,7 +528,7 @@ void HttpSession::onTimeout(const std::error_code& ec)
     }
 }
 
-void HttpSession::onError(const std::string& ec, const std::string& details)
+void HttpSession::onError(const std::string& ec, const std::string& /*details*/) const
 {
     g_logger.error(stdext::format("%s", ec));
     m_result->error = stdext::format("%s", ec);
@@ -540,7 +539,7 @@ void HttpSession::onError(const std::string& ec, const std::string& details)
 void WebsocketSession::start()
 {
     instance_uri = parseURI(m_url);
-    asio::ip::tcp::resolver::query query_resolver(instance_uri.domain, instance_uri.port);
+    const asio::ip::tcp::resolver::query query_resolver(instance_uri.domain, instance_uri.port);
 
     m_request.append("GET " + instance_uri.query + " HTTP/1.1\r\n");
     m_request.append("Host: " + instance_uri.domain + ":" + instance_uri.port + "\r\n");
@@ -554,7 +553,7 @@ void WebsocketSession::start()
         query_resolver,
         [sft = shared_from_this()](
         const std::error_code& ec, asio::ip::tcp::resolver::iterator iterator) {
-        sft->on_resolve(ec, iterator);
+        sft->on_resolve(ec, std::move(iterator));
     });
 }
 
@@ -571,7 +570,7 @@ void WebsocketSession::on_resolve(const std::error_code& ec, asio::ip::tcp::reso
             m_ssl.lowest_layer().close();
             m_ssl.lowest_layer().connect(*iterator++, _ec);
             if (!_ec) {
-                std::error_code __ec;
+                const std::error_code __ec;
                 on_connect(__ec);
                 break;
             }
@@ -581,7 +580,7 @@ void WebsocketSession::on_resolve(const std::error_code& ec, asio::ip::tcp::reso
             m_socket.close();
             m_socket.connect(*iterator++, _ec);
             if (!_ec) {
-                std::error_code __ec;
+                const std::error_code __ec;
                 on_connect(__ec);
                 break;
             }
@@ -632,7 +631,7 @@ void WebsocketSession::on_connect(const std::error_code& ec)
     m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec) {sft->onTimeout(ec); });
 }
 
-void WebsocketSession::on_request_sent(const std::error_code& ec, size_t bytes_transferred)
+void WebsocketSession::on_request_sent(const std::error_code& ec, size_t /*bytes_transferred*/)
 {
     if (ec) {
         onError("WebsocketSession error on sending request " + m_url + ": " + ec.message());
@@ -652,11 +651,12 @@ void WebsocketSession::on_request_sent(const std::error_code& ec, size_t bytes_t
                 asio::buffers_begin(m_response.data()) + size);
             m_response.consume(size);
 
-            size_t pos = header.find("Sec-WebSocket-Accept: ");
+            //TODO: Local variable 'websocket_accept' is only assigned but never accessed
+            /*size_t pos = header.find("Sec-WebSocket-Accept: ");
             std::string websocket_accept;
             if (pos != std::string::npos) {
                 websocket_accept = header.c_str() + pos + sizeof("Sec-WebSocket-Accept: ") - 1;
-            }
+            }*/
 
             asio::async_read(m_ssl, m_response,
                              asio::transfer_at_least(1),
@@ -678,11 +678,12 @@ void WebsocketSession::on_request_sent(const std::error_code& ec, size_t bytes_t
                 asio::buffers_begin(m_response.data()) + size);
             m_response.consume(size);
 
-            size_t pos = header.find("Sec-WebSocket-Accept: ");
+            //TODO: Local variable 'websocket_accept' is only assigned but never accessed
+            /*size_t pos = header.find("Sec-WebSocket-Accept: ");
             std::string websocket_accept;
             if (pos != std::string::npos) {
                 websocket_accept = header.c_str() + pos + sizeof("Sec-WebSocket-Accept: ") - 1;
-            }
+            }*/
 
             asio::async_read(m_socket, m_response,
                              asio::transfer_at_least(1),
@@ -696,7 +697,7 @@ void WebsocketSession::on_request_sent(const std::error_code& ec, size_t bytes_t
     m_timer.cancel();
 }
 
-void WebsocketSession::on_write(const std::error_code& ec, size_t bytes_transferred)
+void WebsocketSession::on_write(const std::error_code& ec, size_t /*bytes_transferred*/)
 {
     if (ec) {
         onError("WebsocketSession unable to on_write " + m_url + ": " + ec.message());
@@ -746,7 +747,7 @@ void WebsocketSession::on_read(const std::error_code& ec, size_t bytes_transferr
         m_response.prepare(bytes_transferred);
         const auto& data = m_response.data();
         std::string response = { asio::buffers_begin(data), asio::buffers_end(data) };
-        uint8_t fin_code = response.at(0);
+        const uint8_t fin_code = response.at(0);
         // size_t length = (response.at(1) & 127);
         response.erase(0, 1);
 
@@ -795,7 +796,7 @@ void WebsocketSession::on_close(const std::error_code& ec)
     m_callback(WebsocketCallbackType::CLOSE, "close_code::normal");
 }
 
-void WebsocketSession::onError(const std::string& ec, const std::string& details)
+void WebsocketSession::onError(const std::string& ec, const std::string& /*details*/)
 {
     g_logger.error(stdext::format("WebsocketSession error %s", ec));
     m_closed = true;
@@ -821,7 +822,7 @@ void WebsocketSession::send(const std::string& data, uint8_t ws_opcode)
     for (auto c = 0; c < 4; c++)
         mask[c] = static_cast<unsigned char>(dist(rd));
 
-    size_t length = data.size();
+    const size_t length = data.size();
 
     if (ws_opcode == 0) {
         /*

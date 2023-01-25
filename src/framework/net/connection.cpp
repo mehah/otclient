@@ -284,7 +284,7 @@ void Connection::onWrite(const std::error_code& error, size_t, const std::shared
 
     // free output stream and store for using it again later
     outputStream->consume(outputStream->size());
-    m_outputStreams.push_back(outputStream);
+    m_outputStreams.emplace_back(outputStream);
 
     if (m_connected && error)
         handleError(error);

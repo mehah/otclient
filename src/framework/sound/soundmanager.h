@@ -22,9 +22,9 @@
 
 #pragma once
 
+#include <future>
 #include "declarations.h"
 #include "soundchannel.h"
-#include <future>
 
  //@bindsingleton g_sounds
 class SoundManager
@@ -42,15 +42,15 @@ public:
     void setAudioEnabled(bool enable);
     bool isAudioEnabled() { return m_device && m_context && m_audioEnabled; }
     void enableAudio() { setAudioEnabled(true); }
-    void disableAudio() { setAudioEnabled(true); }
+    void disableAudio() { setAudioEnabled(false); }
     void stopAll();
 
     void preload(std::string filename);
-    SoundSourcePtr play(const std::string& filename, float fadetime = 0, float gain = 1.0f, float pitch = 1.0f);
+    SoundSourcePtr play(const std::string& fn, float fadetime = 0, float gain = 1.0f, float pitch = 1.0f);
     SoundChannelPtr getChannel(int channel);
 
     std::string resolveSoundFile(const std::string& file);
-    void ensureContext();
+    void ensureContext() const;
 
 private:
     SoundSourcePtr createSoundSource(const std::string& filename);

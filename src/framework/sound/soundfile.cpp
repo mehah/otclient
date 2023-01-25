@@ -21,12 +21,10 @@
  */
 
 #include "soundfile.h"
-#include "oggsoundfile.h"
 #include <framework/core/resourcemanager.h>
+#include "oggsoundfile.h"
 
 #include "framework/stdext/time.h"
-
-SoundFile::SoundFile(const FileStreamPtr& fileStream) : m_file(fileStream) { m_file = fileStream; }
 
 SoundFilePtr SoundFile::loadSoundFile(const std::string& filename)
 {
@@ -51,7 +49,7 @@ SoundFilePtr SoundFile::loadSoundFile(const std::string& filename)
     return nullptr;
 }
 
-ALenum SoundFile::getSampleFormat()
+ALenum SoundFile::getSampleFormat() const
 {
     if (m_channels == 2) {
         if (m_bps == 16)

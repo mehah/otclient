@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "declarations.h"
 #include <framework/ui/uianchorlayout.h>
+#include "declarations.h"
 
 #include <utility>
 

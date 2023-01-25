@@ -22,31 +22,31 @@
 
 #pragma once
 
-#include "declarations.h"
 #include <framework/core/filestream.h>
+#include "declarations.h"
 
 class SoundFile : public std::enable_shared_from_this<SoundFile>
 {
 public:
-    SoundFile(const FileStreamPtr& fileStream);
+    SoundFile(const FileStreamPtr& fileStream) : m_file(fileStream) {}
     static SoundFilePtr loadSoundFile(const std::string& filename);
 
     virtual int read(void* /*buffer*/, int /*bufferSize*/) { return -1; }
     virtual void reset() {}
-    bool eof() { return m_file->eof(); }
+    bool eof() const { return m_file->eof(); }
 
-    ALenum getSampleFormat();
+    ALenum getSampleFormat() const;
 
-    int getChannels() { return m_channels; }
-    int getRate() { return m_rate; }
-    int getBps() { return m_bps; }
-    int getSize() { return m_size; }
-    std::string getName() { return m_file ? m_file->name() : std::string(); }
+    int getChannels() const { return m_channels; }
+    int getRate() const { return m_rate; }
+    int getBps() const { return m_bps; }
+    int getSize() const { return m_size; }
+    std::string getName() const { return m_file ? m_file->name() : std::string(); }
 
 protected:
     FileStreamPtr m_file;
-    int m_channels;
-    int m_rate;
-    int m_bps;
-    int m_size;
+    int m_channels{ 0 };
+    int m_rate{ 0 };
+    int m_bps{ 0 };
+    int m_size{ 0 };
 };

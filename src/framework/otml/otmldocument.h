@@ -34,6 +34,7 @@ public:
     static OTMLDocumentPtr parse(const std::string& fileName);
 
     /// Parse OTML from input stream
+    /// @param in
     /// @param source is the file name that will be used to show errors messages
     static OTMLDocumentPtr parse(std::istream& in, const std::string_view source);
 

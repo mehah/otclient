@@ -282,7 +282,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
 
         if (const auto& sheet = g_spriteAppearances.getSheetBySpriteId(spriteInfo.sprite_id(0), false)) {
             m_size = sheet->getSpriteSize() / SPRITE_SIZE;
-            sizes.push_back(m_size);
+            sizes.emplace_back(m_size);
         }
 
         // animations
@@ -500,7 +500,7 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
         const uint8_t width = fin->getU8();
         const uint8_t height = fin->getU8();
         m_size = { width, height };
-        sizes.push_back(m_size);
+        sizes.emplace_back(m_size);
         if (width > 1 || height > 1) {
             m_realSize = fin->getU8();
         }
@@ -583,7 +583,7 @@ void ThingType::prepareTextureLoad(const std::vector<Size>& sizes, const std::ve
 
 void ThingType::unserializeOtml(const OTMLNodePtr& node)
 {
-    for (const OTMLNodePtr& node2 : node->children()) {
+    for (const auto& node2 : node->children()) {
         if (node2->tag() == "opacity")
             m_opacity = node2->value<float>();
         else if (node2->tag() == "image")
@@ -624,7 +624,10 @@ void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, i
         if (m_opacity < 1.0f)
             color.setAlpha(m_opacity);
 
-        g_drawPool.addTexturedRect(screenRect, texture, textureRect, color, dest, drawBuffer);
+        if (drawBuffer)
+            drawBuffer->validate(dest);
+
+        g_drawPool.addTexturedRect(screenRect, texture, textureRect, color, drawBuffer);
     }
 
     if (lightView && hasLight() && flags & Otc::DrawLights) {
@@ -723,23 +726,23 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
                         }
                     }
 
-                    Rect drawRect(framePos + Point(m_size.width(), m_size.height()) * SPRITE_SIZE - Point(1), framePos);
+                    auto& posData = textureData.pos[frameIndex];
+                    posData.rects = { framePos + Point(m_size.width(), m_size.height()) * SPRITE_SIZE - Point(1), framePos };
                     for (int fx = framePos.x; fx < framePos.x + m_size.width() * SPRITE_SIZE; ++fx) {
                         for (int fy = framePos.y; fy < framePos.y + m_size.height() * SPRITE_SIZE; ++fy) {
                             const uint8_t* p = fullImage->getPixel(fx, fy);
-                            if (p[3] != 0x00) {
-                                drawRect.setTop(std::min<int>(fy, drawRect.top()));
-                                drawRect.setLeft(std::min<int>(fx, drawRect.left()));
-                                drawRect.setBottom(std::max<int>(fy, drawRect.bottom()));
-                                drawRect.setRight(std::max<int>(fx, drawRect.right()));
-                            }
+                            if (p[3] == 0x00)
+                                continue;
+
+                            posData.rects.setTop(std::min<int>(fy, posData.rects.top()));
+                            posData.rects.setLeft(std::min<int>(fx, posData.rects.left()));
+                            posData.rects.setBottom(std::max<int>(fy, posData.rects.bottom()));
+                            posData.rects.setRight(std::max<int>(fx, posData.rects.right()));
                         }
                     }
 
-                    auto& posData = textureData.pos[frameIndex];
-                    posData.rects = drawRect;
                     posData.originRects = Rect(framePos, Size(m_size.width(), m_size.height()) * SPRITE_SIZE);
-                    posData.offsets = drawRect.topLeft() - framePos;
+                    posData.offsets = posData.rects.topLeft() - framePos;
                 }
             }
         }
@@ -751,7 +754,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
     if (m_opaque == -1)
         m_opaque = !fullImage->hasTransparentPixel();
 
-    animationPhaseTexture = std::make_shared<Texture>(fullImage, true, false, m_size.area() == 1 && !hasElevation());
+    animationPhaseTexture = std::make_shared<Texture>(fullImage, true, false);
     if (smooth)
         animationPhaseTexture->setSmooth(true);
 
@@ -790,7 +793,7 @@ Size ThingType::getBestTextureDimension(int w, int h, int count)
     return bestDimension;
 }
 
-uint32_t ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int a)
+uint32_t ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int a) const
 {
     uint32_t index = ((((((a % m_animationPhases)
                       * m_numPatternZ + z)
@@ -812,7 +815,7 @@ uint32_t ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int
     return index;
 }
 
-uint32_t ThingType::getTextureIndex(int l, int x, int y, int z)
+uint32_t ThingType::getTextureIndex(int l, int x, int y, int z) const
 {
     return ((l * m_numPatternZ + z)
             * m_numPatternY + y)

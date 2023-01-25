@@ -22,15 +22,13 @@
 
 #pragma once
 
-#include "declarations.h"
 #include <framework/luaengine/luaobject.h>
 #include <framework/otml/otml.h>
+#include "declarations.h"
 
 class ParticleEffectType : public LuaObject
 {
 public:
-    ParticleEffectType();
-
     void load(const OTMLNodePtr& node);
 
     std::string getName() { return m_name; }
@@ -49,8 +47,8 @@ public:
     ParticleEffect() = default;
 
     void load(const ParticleEffectTypePtr& effectType);
-    bool hasFinished() { return m_systems.empty(); }
-    void render();
+    bool hasFinished() const { return m_systems.empty(); }
+    void render() const;
     void update();
 
 private:

@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "thing.h"
-#include <framework/core/timer.h>
 #include <framework/global.h>
+#include <framework/core/timer.h>
+#include "thing.h"
 
  // @bindclass
 class Missile : public Thing
@@ -35,16 +35,14 @@ public:
     void setId(uint32_t id) override;
     void setPath(const Position& fromPosition, const Position& toPosition);
 
-    uint32_t getId() override { return m_id; }
+    bool isMissile() { return true; }
 
     MissilePtr asMissile() { return static_self_cast<Missile>(); }
-    bool isMissile() override { return true; }
 
 private:
     Timer m_animationTimer;
     Point m_delta;
     uint8_t m_distance{ 0 };
-    uint16_t m_id{ 0 };
     float m_duration{ 0.f };
     Otc::Direction m_direction{ Otc::InvalidDirection };
 };

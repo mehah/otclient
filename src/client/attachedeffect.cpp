@@ -21,13 +21,13 @@
  */
 
 #include "attachedeffect.h"
-#include "thingtypemanager.h"
 #include "shadermanager.h"
 #include "spritemanager.h"
+#include "thingtypemanager.h"
 
 #include <framework/core/clock.h>
 
-AttachedEffectPtr AttachedEffect::clone()
+AttachedEffectPtr AttachedEffect::clone() const
 {
     auto obj = std::make_shared<AttachedEffect>();
     *(obj.get()) = *this;

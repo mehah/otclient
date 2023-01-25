@@ -21,9 +21,9 @@
  */
 
 #include "protocol.h"
-#include "connection.h"
-#include <framework/core/application.h>
 #include <random>
+#include <framework/core/application.h>
+#include "connection.h"
 
 Protocol::Protocol() :m_inputMessage(std::make_shared<InputMessage>()) {}
 
@@ -161,7 +161,7 @@ namespace
     }
 }
 
-bool Protocol::xteaDecrypt(const InputMessagePtr& inputMessage)
+bool Protocol::xteaDecrypt(const InputMessagePtr& inputMessage) const
 {
     const uint16_t encryptedSize = inputMessage->getUnreadSize();
     if (encryptedSize % 8 != 0) {
@@ -187,7 +187,7 @@ bool Protocol::xteaDecrypt(const InputMessagePtr& inputMessage)
     return true;
 }
 
-void Protocol::xteaEncrypt(const OutputMessagePtr& outputMessage)
+void Protocol::xteaEncrypt(const OutputMessagePtr& outputMessage) const
 {
     outputMessage->writeMessageSize();
     uint16_t encryptedSize = outputMessage->getMessageSize();

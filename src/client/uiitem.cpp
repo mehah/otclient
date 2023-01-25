@@ -50,7 +50,7 @@ void UIItem::drawSelf(DrawPoolType drawPane)
         Point dest = drawRect.bottomRight() + Point(1);
         dest += (m_item->getDisplacement() - Point(SPRITE_SIZE)) * scaleFactor;
 
-        float oldScaleFactor = g_drawPool.getScaleFactor();
+        const float oldScaleFactor = g_drawPool.getScaleFactor();
         g_drawPool.setScaleFactor(scaleFactor);
         m_item->setColor(m_color);
         m_item->draw(dest, Otc::DrawThings, TextureType::SMOOTH);
@@ -89,7 +89,7 @@ void UIItem::onStyleApply(const std::string_view styleName, const OTMLNodePtr& s
 {
     UIWidget::onStyleApply(styleName, styleNode);
 
-    for (const OTMLNodePtr& node : styleNode->children()) {
+    for (const auto& node : styleNode->children()) {
         if (node->tag() == "item-id")
             setItemId(node->value<int>());
         else if (node->tag() == "item-count")

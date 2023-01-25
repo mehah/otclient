@@ -23,70 +23,76 @@
 #pragma once
 
 #include <framework/graphics/declarations.h>
+#include <framework/graphics/drawpool.h>
 #include <framework/graphics/framebuffer.h>
 #include <framework/graphics/graphics.h>
-#include <framework/graphics/drawpool.h>
 
 class DrawPoolManager
 {
 public:
     template <class T>
-    T* get(const DrawPoolType type) { return static_cast<T*>(m_pools[static_cast<uint8_t>(type)]); }
-
-    void optimize(int size);
+    T* get(const DrawPoolType type) const { return static_cast<T*>(m_pools[static_cast<uint8_t>(type)]); }
 
     void select(DrawPoolType type);
-    void use(DrawPoolType type);
+    void use(const DrawPoolType type) { use(type, {}, {}); }
     void use(DrawPoolType type, const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha);
 
-    void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Color& color = Color::white);
-    void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white, const Point& originalDest = {}, const DrawBufferPtr& buffer = nullptr);
-    void addTexturedCoordsBuffer(const TexturePtr& texture, const CoordsBufferPtr& coords, const Color& color = Color::white);
-    void addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white);
-    void addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white);
-    void addFilledRect(const Rect& dest, const Color& color = Color::white, const DrawBufferPtr& buffer = nullptr);
-    void addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color = Color::white);
-    void addBoundingRect(const Rect& dest, const Color& color = Color::white, int innerLineWidth = 1);
-    void addAction(std::function<void()> action);
+    void addTexturedPoint(const TexturePtr& texture, const Point& point, const Color& color = Color::white) const
+    { addTexturedRect(Rect(point, texture->getSize()), texture, color); }
 
-    void setOpacity(const float opacity, bool onlyOnce = false) { getCurrentPool()->setOpacity(opacity, onlyOnce); }
-    void setClipRect(const Rect& clipRect, bool onlyOnce = false) { getCurrentPool()->setClipRect(clipRect, onlyOnce); }
-    void setBlendEquation(BlendEquation equation, bool onlyOnce = false) { getCurrentPool()->setBlendEquation(equation, onlyOnce); }
-    void setCompositionMode(const CompositionMode mode, bool onlyOnce = false) { getCurrentPool()->setCompositionMode(mode, onlyOnce); }
-    void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onlyOnce = false, const std::function<void()>& action = nullptr) { getCurrentPool()->setShaderProgram(shaderProgram, onlyOnce, action); }
+    void addTexturedPos(const TexturePtr& texture, int x, int y, const Color& color = Color::white) const
+    { addTexturedRect(Rect(x, y, texture->getSize()), texture, color); }
 
-    float getOpacity() { return getCurrentPool()->getOpacity(); }
-    Rect getClipRect() { return getCurrentPool()->getClipRect(); }
+    void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Color& color = Color::white) const
+    { addTexturedRect(dest, texture, Rect(Point(), texture->getSize()), color); }
 
-    void resetState() { getCurrentPool()->resetState(); }
-    void resetOpacity() { getCurrentPool()->resetOpacity(); }
-    void resetClipRect() { getCurrentPool()->resetClipRect(); }
-    void resetShaderProgram() { getCurrentPool()->resetShaderProgram(); }
-    void resetCompositionMode() { getCurrentPool()->resetCompositionMode(); }
+    void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white, const DrawBufferPtr& buffer = nullptr) const;
+    void addTexturedCoordsBuffer(const TexturePtr& texture, const CoordsBufferPtr& coords, const Color& color = Color::white) const;
+    void addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white) const;
+    void addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white) const;
+    void addFilledRect(const Rect& dest, const Color& color = Color::white, const DrawBufferPtr& buffer = nullptr) const;
+    void addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color = Color::white) const;
+    void addBoundingRect(const Rect& dest, const Color& color = Color::white, int innerLineWidth = 1) const;
+    void addAction(const std::function<void()>& action) const;
 
-    void pushTransformMatrix() { getCurrentPool()->pushTransformMatrix(); }
-    void popTransformMatrix() { getCurrentPool()->popTransformMatrix(); }
-    void scale(float x, float y) { getCurrentPool()->scale(x, y); }
-    void scale(float factor) { getCurrentPool()->scale(factor); }
-    void translate(float x, float y) { getCurrentPool()->translate(x, y); }
-    void translate(const Point& p) { getCurrentPool()->translate(p); }
-    void rotate(float angle) { getCurrentPool()->rotate(angle); }
-    void rotate(float x, float y, float angle) { getCurrentPool()->rotate(x, y, angle); }
-    void rotate(const Point& p, float angle) { getCurrentPool()->rotate(p, angle); }
+    void setOpacity(const float opacity, bool onlyOnce = false) const { getCurrentPool()->setOpacity(opacity, onlyOnce); }
+    void setClipRect(const Rect& clipRect, bool onlyOnce = false) const { getCurrentPool()->setClipRect(clipRect, onlyOnce); }
+    void setBlendEquation(BlendEquation equation, bool onlyOnce = false) const { getCurrentPool()->setBlendEquation(equation, onlyOnce); }
+    void setCompositionMode(const CompositionMode mode, bool onlyOnce = false) const { getCurrentPool()->setCompositionMode(mode, onlyOnce); }
+    void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onlyOnce = false, const std::function<void()>& action = nullptr) const { getCurrentPool()->setShaderProgram(shaderProgram, onlyOnce, action); }
 
-    void setScaleFactor(float scale) { getCurrentPool()->setScaleFactor(scale); }
-    inline float getScaleFactor() { return getCurrentPool()->getScaleFactor(); }
+    float getOpacity() const { return getCurrentPool()->getOpacity(); }
+    Rect getClipRect() const { return getCurrentPool()->getClipRect(); }
 
-    void flush() { if (getCurrentPool()) getCurrentPool()->flush(); }
+    void resetState() const { getCurrentPool()->resetState(); }
+    void resetOpacity() const { getCurrentPool()->resetOpacity(); }
+    void resetClipRect() const { getCurrentPool()->resetClipRect(); }
+    void resetShaderProgram() const { getCurrentPool()->resetShaderProgram(); }
+    void resetCompositionMode() const { getCurrentPool()->resetCompositionMode(); }
 
-    DrawPoolType getCurrentType() { return getCurrentPool()->m_type; }
+    void pushTransformMatrix() const { getCurrentPool()->pushTransformMatrix(); }
+    void popTransformMatrix() const { getCurrentPool()->popTransformMatrix(); }
+    void scale(float x, float y) const { getCurrentPool()->scale(x, y); }
+    void scale(float factor) const { getCurrentPool()->scale(factor); }
+    void translate(float x, float y) const { getCurrentPool()->translate(x, y); }
+    void translate(const Point& p) const { getCurrentPool()->translate(p); }
+    void rotate(float angle) const { getCurrentPool()->rotate(angle); }
+    void rotate(float x, float y, float angle) const { getCurrentPool()->rotate(x, y, angle); }
+    void rotate(const Point& p, float angle) const { getCurrentPool()->rotate(p, angle); }
+
+    void setScaleFactor(float scale) const { getCurrentPool()->setScaleFactor(scale); }
+    inline float getScaleFactor() const { return getCurrentPool()->getScaleFactor(); }
+
+    void flush() const { if (getCurrentPool()) getCurrentPool()->flush(); }
+
+    DrawPoolType getCurrentType() const { return getCurrentPool()->m_type; }
 
 private:
-    DrawPool* getCurrentPool();
+    DrawPool* getCurrentPool() const;
 
     void draw();
     void init();
-    void terminate();
+    void terminate() const;
     void drawObject(const DrawPool::DrawObject& obj);
 
     CoordsBuffer m_coordsBuffer;

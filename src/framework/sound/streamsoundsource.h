@@ -52,7 +52,7 @@ public:
 
 private:
     void queueBuffers();
-    void unqueueBuffers();
+    void unqueueBuffers() const;
     bool fillBufferAndQueue(uint32_t buffer);
 
     SoundFilePtr m_soundFile;

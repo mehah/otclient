@@ -68,16 +68,16 @@ void Map::removeMapView(const MapViewPtr& mapView)
         m_mapViews.erase(it);
 }
 
-void Map::notificateKeyRelease(const InputEvent& inputEvent)
+void Map::notificateKeyRelease(const InputEvent& inputEvent) const
 {
-    for (const MapViewPtr& mapView : m_mapViews) {
+    for (const auto& mapView : m_mapViews) {
         mapView->onKeyRelease(inputEvent);
     }
 }
 
-void Map::notificateCameraMove(const Point& offset)
+void Map::notificateCameraMove(const Point& offset) const
 {
-    for (const MapViewPtr& mapView : m_mapViews) {
+    for (const auto& mapView : m_mapViews) {
         mapView->onCameraMove(offset);
     }
 }
@@ -87,7 +87,7 @@ void Map::notificateTileUpdate(const Position& pos, const ThingPtr& thing, const
     if (!pos.isMapPosition())
         return;
 
-    for (const MapViewPtr& mapView : m_mapViews) {
+    for (const auto& mapView : m_mapViews) {
         mapView->onTileUpdate(pos, thing, operation);
     }
 
@@ -126,71 +126,66 @@ void Map::cleanDynamicThings()
 
 void Map::addThing(const ThingPtr& thing, const Position& pos, int16_t stackPos)
 {
-    if (!thing)
+    if (!thing || thing->isItem() && thing->getId() == 0)
         return;
 
-    if (thing->isItem()) {
-        if (const auto& item = thing->static_self_cast<Item>()) {
-            if (item->getClientId() == 0) {
-                return;
-            }
-        }
-    }
-
-    if (thing->isItem() || thing->isCreature() || thing->isEffect()) {
-        if (const auto& tile = getOrCreateTile(pos)) {
-            if (m_floatingEffect || !thing->isEffect() || tile->getGround()) {
-                tile->addThing(thing, stackPos);
-                notificateTileUpdate(pos, thing, Otc::OPERATION_ADD);
-            }
-        }
-    } else {
-        if (thing->isMissile()) {
-            m_floorMissiles[pos.z].push_back(thing->static_self_cast<Missile>());
-        } else if (thing->isAnimatedText()) {
-            // this code will stack animated texts of the same color
-            const auto& animatedText = thing->static_self_cast<AnimatedText>();
-            AnimatedTextPtr prevAnimatedText;
-
-            bool merged = false;
-            for (const auto& other : m_animatedTexts) {
-                if (other->getPosition() == pos) {
-                    prevAnimatedText = other;
-                    if (other->merge(animatedText)) {
-                        merged = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!merged) {
-                if (prevAnimatedText) {
-                    Point offset = prevAnimatedText->getOffset();
-                    if (const float t = prevAnimatedText->getTimer().ticksElapsed();
-                        t < ANIMATED_TEXT_DURATION / 4.0) { // didnt move 12 pixels
-                        const int32_t y = 12 - 48 * t / static_cast<float>(ANIMATED_TEXT_DURATION);
-                        offset += Point(0, y);
-                    }
-                    offset.y = std::min<int32_t>(offset.y, 12);
-                    animatedText->setOffset(offset);
-                }
-                m_animatedTexts.push_back(animatedText);
-            }
-        } else if (thing->isStaticText()) {
-            const auto& staticText = thing->static_self_cast<StaticText>();
-            for (const auto& other : m_staticTexts) {
-                // try to combine messages
-                if (other->getPosition() == pos && other->addMessage(staticText->getName(), staticText->getMessageMode(), staticText->getFirstMessage())) {
-                    return;
-                }
-            }
-
-            m_staticTexts.push_back(staticText);
-        }
-
+    if (thing->isMissile()) {
+        m_floorMissiles[pos.z].emplace_back(thing->static_self_cast<Missile>());
         thing->setPosition(pos);
         thing->onAppear();
     }
+
+    if (const auto& tile = getOrCreateTile(pos)) {
+        if (m_floatingEffect || !thing->isEffect() || tile->getGround()) {
+            tile->addThing(thing, stackPos);
+            notificateTileUpdate(pos, thing, Otc::OPERATION_ADD);
+        }
+    }
+}
+
+void Map::addStaticText(const StaticTextPtr& txt, const Position& pos) {
+    for (const auto& other : m_staticTexts) {
+        // try to combine messages
+        if (other->getPosition() == pos && other->addMessage(txt->getName(), txt->getMessageMode(), txt->getFirstMessage())) {
+            return;
+        }
+    }
+
+    txt->setPosition(pos);
+    m_staticTexts.emplace_back(txt);
+}
+
+void Map::addAnimatedText(const AnimatedTextPtr& txt, const Position& pos) {
+    // this code will stack animated texts of the same color
+    AnimatedTextPtr prevAnimatedText;
+
+    bool merged = false;
+    for (const auto& other : m_animatedTexts) {
+        if (other->getPosition() == pos) {
+            prevAnimatedText = other;
+            if (other->merge(txt)) {
+                merged = true;
+                break;
+            }
+        }
+    }
+
+    if (!merged) {
+        if (prevAnimatedText) {
+            Point offset = prevAnimatedText->getOffset();
+            if (const float t = prevAnimatedText->getTimer().ticksElapsed();
+                t < ANIMATED_TEXT_DURATION / 4.0) { // didnt move 12 pixels
+                const int32_t y = 12 - 48 * t / static_cast<float>(ANIMATED_TEXT_DURATION);
+                offset += Point(0, y);
+            }
+            offset.y = std::min<int32_t>(offset.y, 12);
+            txt->setOffset(offset);
+        }
+        m_animatedTexts.emplace_back(txt);
+    }
+
+    txt->setPosition(pos);
+    txt->onAppear();
 }
 
 ThingPtr Map::getThing(const Position& pos, int16_t stackPos)
@@ -206,29 +201,17 @@ bool Map::removeThing(const ThingPtr& thing)
     if (!thing)
         return false;
 
-    if (thing->isAnimatedText()) {
-        const auto& animatedText = thing->static_self_cast<AnimatedText>();
-        const auto it = std::find(m_animatedTexts.begin(), m_animatedTexts.end(), animatedText);
-        if (it != m_animatedTexts.end()) {
-            m_animatedTexts.erase(it);
-            return true;
-        }
-    } else if (thing->isStaticText()) {
-        const auto& staticText = thing->static_self_cast<StaticText>();
-        const auto it = std::find(m_staticTexts.begin(), m_staticTexts.end(), staticText);
-        if (it != m_staticTexts.end()) {
-            m_staticTexts.erase(it);
-            return true;
-        }
-    } else if (thing->isMissile()) {
-        const auto& missile = thing->static_self_cast<Missile>();
-        const uint8_t z = missile->getPosition().z;
-        const auto it = std::find(m_floorMissiles[z].begin(), m_floorMissiles[z].end(), missile);
-        if (it != m_floorMissiles[z].end()) {
-            m_floorMissiles[z].erase(it);
-            return true;
-        }
-    } else if (const TilePtr& tile = thing->getTile()) {
+    if (thing->isMissile()) {
+        auto& missiles = m_floorMissiles[thing->getPosition().z];
+        const auto it = std::find(missiles.begin(), missiles.end(), thing->static_self_cast<Missile>());
+        if (it == missiles.end())
+            return false;
+
+        missiles.erase(it);
+        return true;
+    }
+
+    if (const auto& tile = thing->getTile()) {
         if (tile->removeThing(thing)) {
             notificateTileUpdate(thing->getPosition(), thing, Otc::OPERATION_REMOVE);
             return true;
@@ -246,6 +229,24 @@ bool Map::removeThingByPos(const Position& pos, int16_t stackPos)
     return false;
 }
 
+bool Map::removeStaticText(const StaticTextPtr& txt) {
+    const auto it = std::find(m_staticTexts.begin(), m_staticTexts.end(), txt);
+    if (it == m_staticTexts.end())
+        return false;
+
+    m_staticTexts.erase(it);
+    return true;
+}
+
+bool Map::removeAnimatedText(const AnimatedTextPtr& txt) {
+    const auto it = std::find(m_animatedTexts.begin(), m_animatedTexts.end(), txt);
+    if (it == m_animatedTexts.end())
+        return false;
+
+    m_animatedTexts.erase(it);
+    return true;
+}
+
 void Map::colorizeThing(const ThingPtr& thing, const Color& color)
 {
     if (!thing)
@@ -254,7 +255,7 @@ void Map::colorizeThing(const ThingPtr& thing, const Color& color)
     if (thing->isItem())
         thing->static_self_cast<Item>()->setColor(color);
     else if (thing->isCreature()) {
-        const TilePtr& tile = thing->getTile();
+        const auto& tile = thing->getTile();
         assert(tile);
 
         const auto& topThing = tile->getTopThing();
@@ -282,7 +283,7 @@ void Map::removeThingColor(const ThingPtr& thing)
     }
 }
 
-StaticTextPtr Map::getStaticText(const Position& pos)
+StaticTextPtr Map::getStaticText(const Position& pos) const
 {
     for (const auto& staticText : m_staticTexts) {
         // try to combine messages
@@ -335,7 +336,7 @@ TileList Map::getTiles(int8_t floor/* = -1*/)
             for (const auto& [key, block] : m_tileBlocks[z]) {
                 for (const auto& tile : block.getTiles()) {
                     if (tile != nullptr)
-                        tiles.push_back(tile);
+                        tiles.emplace_back(tile);
                 }
             }
         }
@@ -343,7 +344,7 @@ TileList Map::getTiles(int8_t floor/* = -1*/)
         for (const auto& [key, block] : m_tileBlocks[floor]) {
             for (const auto& tile : block.getTiles()) {
                 if (tile != nullptr)
-                    tiles.push_back(tile);
+                    tiles.emplace_back(tile);
             }
         }
     }
@@ -371,7 +372,7 @@ void Map::cleanTile(const Position& pos)
     }
 
     for (auto itt = m_staticTexts.begin(); itt != m_staticTexts.end();) {
-        const StaticTextPtr& staticText = *itt;
+        const auto& staticText = *itt;
         if (staticText->getPosition() == pos && staticText->getMessageMode() == Otc::MessageNone)
             itt = m_staticTexts.erase(itt);
         else
@@ -499,7 +500,7 @@ void Map::removeUnawareThings()
             for (auto it = tileBlocks.begin(); it != tileBlocks.end();) {
                 auto& block = (*it).second;
                 bool blockEmpty = true;
-                for (const TilePtr& tile : block.getTiles()) {
+                for (const auto& tile : block.getTiles()) {
                     if (!tile) continue;
 
                     const auto& pos = tile->getPosition();
@@ -553,7 +554,7 @@ void Map::setCentralPosition(const Position& centralPosition)
         }
     });
 
-    for (const MapViewPtr& mapView : m_mapViews)
+    for (const auto& mapView : m_mapViews)
         mapView->onMapCenterChange(centralPosition, mapView->m_lastCameraPosition);
 }
 
@@ -603,12 +604,12 @@ bool Map::isCovered(const Position& pos, uint8_t firstFloor)
     Position tilePos = pos;
     while (tilePos.coveredUp() && tilePos.z >= firstFloor) {
         // the below tile is covered when the above tile has a full opaque
-        if (const TilePtr& tile = getTile(tilePos)) {
+        if (const auto& tile = getTile(tilePos)) {
             if (tile->isFullyOpaque())
                 return true;
         }
 
-        if (const TilePtr& tile = getTile(tilePos.translated(1, 1))) {
+        if (const auto& tile = getTile(tilePos.translated(1, 1))) {
             if (tile->isTopGround())
                 return true;
         }
@@ -619,7 +620,7 @@ bool Map::isCovered(const Position& pos, uint8_t firstFloor)
 
 bool Map::isCompletelyCovered(const Position& pos, uint8_t firstFloor)
 {
-    const TilePtr& checkTile = getTile(pos);
+    const auto& checkTile = getTile(pos);
     Position tilePos = pos;
     while (tilePos.coveredUp() && tilePos.z >= firstFloor) {
         bool covered = true;
@@ -628,7 +629,7 @@ bool Map::isCompletelyCovered(const Position& pos, uint8_t firstFloor)
         // Check is Top Ground
         for (int_fast8_t x = -1; ++x < 2 && !done;) {
             for (int_fast8_t y = -1; ++y < 2 && !done;) {
-                const TilePtr& tile = getTile(tilePos.translated(x, x));
+                const auto& tile = getTile(tilePos.translated(x, x));
                 if (!tile || !tile->isTopGround()) {
                     covered = false;
                     done = true;
@@ -647,7 +648,7 @@ bool Map::isCompletelyCovered(const Position& pos, uint8_t firstFloor)
         // check in 2x2 range tiles that has no transparent pixels
         for (int_fast8_t x = -1; ++x < 2 && !done;) {
             for (int_fast8_t y = -1; ++y < 2 && !done;) {
-                const TilePtr& tile = getTile(tilePos.translated(-x, -y));
+                const auto& tile = getTile(tilePos.translated(-x, -y));
                 if (!tile || !tile->isFullyOpaque()) {
                     covered = false;
                     done = true;
@@ -663,7 +664,7 @@ bool Map::isCompletelyCovered(const Position& pos, uint8_t firstFloor)
     return false;
 }
 
-bool Map::isAwareOfPosition(const Position& pos)
+bool Map::isAwareOfPosition(const Position& pos) const
 {
     if (pos.z < getFirstAwareFloor() || pos.z > getLastAwareFloor())
         return false;
@@ -695,7 +696,7 @@ void Map::setAwareRange(const AwareRange& range)
 
 void Map::resetAwareRange() { setAwareRange({ MAX_VIEWPORT_X , MAX_VIEWPORT_Y, MAX_VIEWPORT_X + 1, MAX_VIEWPORT_Y + 1 }); }
 
-uint8_t Map::getFirstAwareFloor()
+uint8_t Map::getFirstAwareFloor() const
 {
     if (m_centralPosition.z <= SEA_FLOOR)
         return 0;
@@ -703,7 +704,7 @@ uint8_t Map::getFirstAwareFloor()
     return m_centralPosition.z - AWARE_UNDEGROUND_FLOOR_RANGE;
 }
 
-uint8_t Map::getLastAwareFloor()
+uint8_t Map::getLastAwareFloor() const
 {
     if (m_centralPosition.z <= SEA_FLOOR)
         return SEA_FLOOR;
@@ -798,14 +799,14 @@ std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::findPath(const
                 if (neighborPos.x < 0 || neighborPos.y < 0) continue;
                 if (g_map.isAwareOfPosition(neighborPos)) {
                     wasSeen = true;
-                    if (const TilePtr& tile = getTile(neighborPos)) {
+                    if (const auto& tile = getTile(neighborPos)) {
                         hasCreature = tile->hasCreature() && (!(flags & Otc::PathFindIgnoreCreatures));
                         isNotWalkable = !tile->isWalkable(flags & Otc::PathFindIgnoreCreatures);
                         isNotPathable = !tile->isPathable();
                         speed = tile->getGroundSpeed();
                     }
                 } else {
-                    const MinimapTile& mtile = g_minimap.getTile(neighborPos);
+                    const auto& mtile = g_minimap.getTile(neighborPos);
                     wasSeen = mtile.hasFlag(MinimapTileWasSeen);
                     isNotWalkable = mtile.hasFlag(MinimapTileNotWalkable);
                     isNotPathable = mtile.hasFlag(MinimapTileNotPathable);
@@ -885,9 +886,9 @@ std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::findPath(const
     return ret;
 }
 
-void Map::resetLastCamera()
+void Map::resetLastCamera() const
 {
-    for (const MapViewPtr& mapView : m_mapViews)
+    for (const auto& mapView : m_mapViews)
         mapView->resetLastCamera();
 }
 

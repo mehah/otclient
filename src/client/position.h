@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include "config.h"
-#include "const.h"
 #include <framework/const.h>
 #include <framework/stdext/types.h>
 #include <framework/util/point.h>
+#include "config.h"
+#include "const.h"
 
 #include <array>
 #include <istream>
@@ -126,13 +126,13 @@ public:
         if (!lastPos.isValid())
             return positions;
 
-        positions.push_back(lastPos);
+        positions.emplace_back(lastPos);
 
         for (const auto dir : dirs) {
             lastPos = lastPos.translatedToDirection(dir);
             if (!lastPos.isValid())
                 break;
-            positions.push_back(lastPos);
+            positions.emplace_back(lastPos);
         }
 
         return positions;
@@ -297,7 +297,7 @@ public:
         return false;
     }
 
-    std::string toString()
+    std::string toString() const
     {
         return std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z);
     }

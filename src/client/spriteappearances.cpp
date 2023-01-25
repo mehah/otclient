@@ -21,10 +21,10 @@
  */
 
 #include "spriteappearances.h"
-#include "game.h"
 #include <framework/core/filestream.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/image.h>
+#include "game.h"
 
 #include <framework/core/asyncdispatcher.h>
 #include <nlohmann/json.hpp>
@@ -49,7 +49,7 @@ void SpriteAppearances::terminate()
     unload();
 }
 
-bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet)
+bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const
 {
     std::scoped_lock lock(sheet->mutex);
 

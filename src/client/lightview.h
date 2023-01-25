@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "declarations.h"
-#include "thingtype.h"
 #include <framework/graphics/declarations.h>
 #include <framework/graphics/framebuffer.h>
+#include "declarations.h"
+#include "thingtype.h"
 
 class LightView : public LuaObject
 {
@@ -45,7 +45,7 @@ public:
         m_pool->repaint();
     }
 
-    void setSmooth(bool enabled);
+    void setSmooth(bool enabled) const;
 
     const Light& getGlobalLight() const { return m_globalLight; }
     bool isDark() const { return m_globalLight.intensity < 250; }

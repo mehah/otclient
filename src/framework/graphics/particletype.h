@@ -22,16 +22,16 @@
 
 #pragma once
 
-#include "declarations.h"
 #include <framework/graphics/painter.h>
 #include <framework/luaengine/luaobject.h>
 #include <framework/otml/otml.h>
+#include "declarations.h"
 
 class ParticleType
 {
 public:
     void load(const OTMLNodePtr& node);
-    std::string getName() { return pName; }
+    std::string getName() const { return pName; }
 
 protected:
 
@@ -43,7 +43,7 @@ protected:
     std::vector<float> pColorsStops;
     TexturePtr pTexture;
     ParticleTypePtr particleType;
-    CompositionMode pCompositionMode;
+    CompositionMode pCompositionMode{ CompositionMode::NORMAL };
 
     // particles default configuration. (make them reasonable for user detect missing properties on scripts)
     // size

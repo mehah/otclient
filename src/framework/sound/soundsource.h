@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "declarations.h"
 #include <framework/luaengine/luaobject.h>
+#include "declarations.h"
 
 class SoundSource : public LuaObject
 {
@@ -50,11 +50,11 @@ public:
     virtual void setPitch(float pitch);
     virtual void setPosition(const Point& pos);
     virtual void setVelocity(const Point& velocity);
-    virtual void setFading(FadeState state, float fadetime);
+    virtual void setFading(FadeState state, float fadeTime);
 
     std::string getName() { return m_name; }
-    uint8_t getChannel() { return m_channel; }
-    float getGain() { return m_gain; }
+    uint8_t getChannel() const { return m_channel; }
+    float getGain() const { return m_gain; }
 
 protected:
     void setBuffer(const SoundBufferPtr& buffer);

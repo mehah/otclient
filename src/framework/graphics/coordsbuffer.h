@@ -81,11 +81,11 @@ public:
 
     void cache();
 
-    bool isCached() { return m_vertexArray.isCached() || m_textureCoordArray.isCached(); }
+    bool isCached() const { return m_vertexArray.isCached() || m_textureCoordArray.isCached(); }
     void enableCache() { m_canCache = true; }
 
-    HardwareBuffer* getHardwareVertexCache() { return m_vertexArray.getHardwareCache(); }
-    HardwareBuffer* getHardwareTextureCoordCache() { return m_textureCoordArray.getHardwareCache(); }
+    HardwareBuffer* getHardwareVertexCache() const { return m_vertexArray.getHardwareCache(); }
+    HardwareBuffer* getHardwareTextureCoordCache() const { return m_textureCoordArray.getHardwareCache(); }
 
 private:
     VertexArray m_vertexArray;

@@ -30,10 +30,6 @@
 #include <EGL/egl.h>
 #endif
 
-#ifdef DIRECTX
-#include <d3d9.h>
-#endif
-
 struct WindowProcProxy;
 
 class WIN32Window : public PlatformWindow
@@ -41,7 +37,7 @@ class WIN32Window : public PlatformWindow
     void internalCreateWindow();
     void internalCreateGLContext();
     void internalDestroyGLContext();
-    void internalRestoreGLContext();
+    void internalRestoreGLContext() const;
 
     void* getExtensionProcAddress(const char* ext);
     bool isExtensionSupported(const char* ext);
@@ -86,9 +82,9 @@ protected:
     int internalLoadMouseCursor(const ImagePtr& image, const Point& hotSpot) override;
 
 private:
-    Rect getClientRect();
+    Rect getClientRect() const;
     Rect getWindowRect();
-    Rect adjustWindowRect(const Rect& rect);
+    Rect adjustWindowRect(const Rect& rect) const;
 
     std::vector<HCURSOR> m_cursors;
     HWND m_window;
@@ -97,11 +93,6 @@ private:
     HCURSOR m_cursor;
     HCURSOR m_defaultCursor;
     bool m_hidden;
-
-#ifdef DIRECTX
-    LPDIRECT3D9 m_d3d;    // the pointer to our Direct3D interface
-    LPDIRECT3DDEVICE9 m_d3ddev;    // the pointer to the device class
-#endif
 
 #ifdef OPENGL_ES
     EGLConfig m_eglConfig;

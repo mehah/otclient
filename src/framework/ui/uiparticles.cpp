@@ -53,7 +53,7 @@ void UIParticles::onStyleApply(const std::string_view styleName, const OTMLNodeP
 {
     UIWidget::onStyleApply(styleName, styleNode);
 
-    for (const OTMLNodePtr& node : styleNode->children()) {
+    for (const auto& node : styleNode->children()) {
         if (node->tag() == "effect")
             addEffect(node->value());
         else if (node->tag() == "reference-pos")
@@ -65,5 +65,5 @@ void UIParticles::addEffect(const std::string_view name)
 {
     const ParticleEffectPtr effect = g_particles.createEffect(name);
     if (effect)
-        m_effects.push_back(effect);
+        m_effects.emplace_back(effect);
 }

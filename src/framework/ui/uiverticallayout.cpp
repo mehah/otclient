@@ -21,14 +21,14 @@
  */
 
 #include "uiverticallayout.h"
-#include "uiwidget.h"
 #include <framework/core/eventdispatcher.h>
+#include "uiwidget.h"
 
 void UIVerticalLayout::applyStyle(const OTMLNodePtr& styleNode)
 {
     UIBoxLayout::applyStyle(styleNode);
 
-    for (const OTMLNodePtr& node : styleNode->children()) {
+    for (const auto& node : styleNode->children()) {
         if (node->tag() == "align-bottom")
             setAlignBottom(node->value<bool>());
     }
@@ -85,7 +85,7 @@ bool UIVerticalLayout::internalUpdate()
     if (m_alignBottom) {
         for (auto it = parentWidget->m_children.rbegin(); it != parentWidget->m_children.rend(); ++it)
             action(*it);
-    } else for (const UIWidgetPtr& widget : parentWidget->m_children)
+    } else for (const auto& widget : parentWidget->m_children)
         action(widget);
 
     preferredHeight -= m_spacing;

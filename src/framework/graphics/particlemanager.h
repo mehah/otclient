@@ -37,7 +37,7 @@ public:
     ParticleTypePtr getParticleType(const std::string& name) { return m_particleTypes[name]; }
     ParticleEffectTypePtr getParticleEffectType(const std::string& name) { return m_effectsTypes[name]; }
 
-    const stdext::map<std::string, ParticleTypePtr>& getParticleTypes() { return m_particleTypes; }
+    const stdext::map<std::string, ParticleTypePtr>& getParticleTypes() const { return m_particleTypes; }
     const stdext::map<std::string, ParticleEffectTypePtr>& getEffectsTypes() { return m_effectsTypes; }
 
 private:

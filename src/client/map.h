@@ -104,13 +104,13 @@ public:
 
     const TilePtr& create(const Position& pos)
     {
-        TilePtr& tile = m_tiles[getTileIndex(pos)];
+        auto& tile = m_tiles[getTileIndex(pos)];
         tile = std::make_shared<Tile>(pos);
         return tile;
     }
     const TilePtr& getOrCreate(const Position& pos)
     {
-        TilePtr& tile = m_tiles[getTileIndex(pos)];
+        auto& tile = m_tiles[getTileIndex(pos)];
         if (!tile)
             tile = std::make_shared<Tile>(pos);
         return tile;
@@ -157,8 +157,8 @@ public:
     void removeMapView(const MapViewPtr& mapView);
 
     void notificateTileUpdate(const Position& pos, const ThingPtr& thing, Otc::Operation operation);
-    void notificateCameraMove(const Point& offset);
-    void notificateKeyRelease(const InputEvent& inputEvent);
+    void notificateCameraMove(const Point& offset) const;
+    void notificateKeyRelease(const InputEvent& inputEvent) const;
 
 #ifdef FRAMEWORK_EDITOR
     bool loadOtcm(const std::string& fileName);
@@ -205,14 +205,21 @@ public:
     void cleanTexts() { m_animatedTexts.clear(); m_staticTexts.clear(); }
 
     // thing related
-    void addThing(const ThingPtr& thing, const Position& pos, int16_t stackPos = -1);
     ThingPtr getThing(const Position& pos, int16_t stackPos);
+    void addThing(const ThingPtr& thing, const Position& pos, int16_t stackPos = -1);
     bool removeThing(const ThingPtr& thing);
     bool removeThingByPos(const Position& pos, int16_t stackPos);
+
+    void addStaticText(const StaticTextPtr& txt, const Position& pos);
+    bool removeStaticText(const StaticTextPtr& txt);
+
+    void addAnimatedText(const AnimatedTextPtr& txt, const Position& pos);
+    bool removeAnimatedText(const AnimatedTextPtr& txt);
+
     void colorizeThing(const ThingPtr& thing, const Color& color);
     void removeThingColor(const ThingPtr& thing);
 
-    StaticTextPtr getStaticText(const Position& pos);
+    StaticTextPtr getStaticText(const Position& pos) const;
 
     // tile related
     const TilePtr& createTile(const Position& pos);
@@ -256,18 +263,18 @@ public:
     bool isLookPossible(const Position& pos);
     bool isCovered(const Position& pos, uint8_t firstFloor = 0);
     bool isCompletelyCovered(const Position& pos, uint8_t firstFloor = 0);
-    bool isAwareOfPosition(const Position& pos);
+    bool isAwareOfPosition(const Position& pos) const;
 
-    void resetLastCamera();
+    void resetLastCamera() const;
 
     void setAwareRange(const AwareRange& range);
     void resetAwareRange();
-    AwareRange getAwareRange() { return m_awareRange; }
+    AwareRange getAwareRange() const { return m_awareRange; }
 
-    Light getLight() { return m_light; }
+    Light getLight() const { return m_light; }
     Position getCentralPosition() { return m_centralPosition; }
-    uint8_t getFirstAwareFloor();
-    uint8_t getLastAwareFloor();
+    uint8_t getFirstAwareFloor() const;
+    uint8_t getLastAwareFloor() const;
     const std::vector<MissilePtr>& getFloorMissiles(uint8_t z) { return m_floorMissiles[z]; }
 
     std::vector<AnimatedTextPtr> getAnimatedTexts() { return m_animatedTexts; }
@@ -310,8 +317,8 @@ private:
     float m_zoneOpacity{ 1.f };
 #endif
 
-    uint16_t m_width;
-    uint16_t m_height;
+    uint16_t m_width{ 0 };
+    uint16_t m_height{ 0 };
 
     Light m_light;
     Position m_centralPosition;

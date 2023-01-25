@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "declarations.h"
 #include <framework/util/databuffer.h>
+#include "declarations.h"
 
 class BinaryTree
 {
@@ -39,7 +39,7 @@ public:
 
     void seek(uint32_t pos);
     void skip(uint32_t len);
-    uint32_t tell() { return m_pos; }
+    uint32_t tell() const { return m_pos; }
     uint32_t size() { unserialize(); return m_buffer.size(); }
 
     uint8_t getU8();
@@ -65,7 +65,7 @@ private:
 class OutputBinaryTree
 {
 public:
-    OutputBinaryTree(FileStreamPtr finish);
+    OutputBinaryTree(FileStreamPtr fin);
 
     void addU8(uint8_t v);
     void addU16(uint16_t v);
@@ -75,11 +75,11 @@ public:
     void addPoint(const Point& point);
 
     void startNode(uint8_t node);
-    void endNode();
+    void endNode() const;
 
 private:
     FileStreamPtr m_fin;
 
 protected:
-    void write(const uint8_t* data, size_t size);
+    void write(const uint8_t* data, size_t size) const;
 };

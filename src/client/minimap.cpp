@@ -23,18 +23,19 @@
 #include "minimap.h"
 #include "tile.h"
 
+#include <zlib.h>
 #include <framework/core/filestream.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/image.h>
 #include <framework/graphics/texture.h>
-#include <zlib.h>
 
 Minimap g_minimap;
+static MinimapTile nulltile;
 
 void MinimapBlock::clean()
 {
-    m_tiles.fill(MinimapTile());
+    m_tiles.fill({});
     m_texture.reset();
     m_mustUpdate = false;
 }
@@ -67,7 +68,7 @@ void MinimapBlock::update()
         if (m_texture)
             m_texture->updateImage(m_image);
         else
-            m_texture = std::make_shared<Texture>(m_image, true, false, false);
+            m_texture = std::make_shared<Texture>(m_image, true, false);
     else
         m_texture.reset();
 
@@ -170,7 +171,7 @@ Rect Minimap::getTileRect(const Position& pos, const Rect& screenRect, const Pos
     return tileRect;
 }
 
-Rect Minimap::calcMapRect(const Rect& screenRect, const Position& mapCenter, float scale)
+Rect Minimap::calcMapRect(const Rect& screenRect, const Position& mapCenter, float scale) const
 {
     const int w = screenRect.width() / scale;
     const int h = std::ceil(screenRect.height() / scale);
@@ -194,7 +195,7 @@ void Minimap::updateTile(const Position& pos, const TilePtr& tile)
         minimapTile.flags |= MinimapTileNotWalkable | MinimapTileNotPathable;
     }
 
-    if (minimapTile != MinimapTile()) {
+    if (minimapTile != nulltile) {
         MinimapBlock& block = getBlock(pos);
         const Point offsetPos = getBlockOffset(Point(pos.x, pos.y));
         block.updateTile(pos.x - offsetPos.x, pos.y - offsetPos.y, minimapTile);
@@ -204,7 +205,6 @@ void Minimap::updateTile(const Position& pos, const TilePtr& tile)
 
 const MinimapTile& Minimap::getTile(const Position& pos)
 {
-    static MinimapTile nulltile;
     if (pos.z <= MAX_Z && hasBlock(pos)) {
         MinimapBlock& block = getBlock(pos);
         const Point offsetPos = getBlockOffset(Point(pos.x, pos.y));
@@ -216,7 +216,6 @@ const MinimapTile& Minimap::getTile(const Position& pos)
 std::pair<MinimapBlock_ptr, MinimapTile> Minimap::threadGetTile(const Position& pos)
 {
     std::scoped_lock lock(m_lock);
-    static MinimapTile nulltile;
 
     if (pos.z <= MAX_Z && hasBlock(pos)) {
         const auto& block = m_tileBlocks[pos.z][getBlockIndex(pos)];
@@ -378,13 +377,11 @@ bool Minimap::loadOtmm(const std::string& fileName)
 void Minimap::saveOtmm(const std::string& fileName)
 {
     try {
-        stdext::timer saveTimer;
-
         const FileStreamPtr fin = g_resources.createFile(fileName);
         fin->cache();
 
         //TODO: compression flag with zlib
-        const uint32_t flags = 0;
+        constexpr uint32_t flags = 0;
 
         // header
         fin->addU32(OTMM_SIGNATURE);

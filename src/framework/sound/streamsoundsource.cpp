@@ -87,7 +87,7 @@ void StreamSoundSource::queueBuffers()
     }
 }
 
-void StreamSoundSource::unqueueBuffers()
+void StreamSoundSource::unqueueBuffers() const
 {
     int queued;
     alGetSourcei(m_sourceId, AL_BUFFERS_QUEUED, &queued);

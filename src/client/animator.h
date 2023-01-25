@@ -47,22 +47,22 @@ enum AnimationDirection : uint8_t
 class Animator : public std::enable_shared_from_this<Animator>
 {
 public:
-    void unserializeAppearance(const appearances::SpriteAnimation& phases);
+    void unserializeAppearance(const appearances::SpriteAnimation& animation);
     void unserialize(int animationPhases, const FileStreamPtr& fin);
     void serialize(const FileStreamPtr& fin) const;
     void setPhase(int phase);
     void resetAnimation();
 
     int getPhase();
-    int getPhaseAt(Timer& time, float durationFactor = 1.f) const;
+    int getPhaseAt(Timer& timer, float durationFactor = 1.f) const;
     int getStartPhase() const;
     int getAnimationPhases() const { return m_animationPhases; }
     int getAverageDuration() const { return getTotalDuration() / getAnimationPhases(); }
 
     uint16_t getMinDuration() const { return m_minDuration; }
 
-    bool isAsync() { return m_async; }
-    bool isComplete() { return m_isComplete; }
+    bool isAsync() const { return m_async; }
+    bool isComplete() const { return m_isComplete; }
 
     uint16_t getTotalDuration() const;
 

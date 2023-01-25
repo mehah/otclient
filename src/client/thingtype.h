@@ -25,13 +25,13 @@
 #include "animator.h"
 #include "declarations.h"
 
+#include <variant>
 #include <framework/core/declarations.h>
-#include <framework/graphics/texture.h>
 #include <framework/graphics/drawpoolmanager.h>
+#include <framework/graphics/texture.h>
 #include <framework/luaengine/luaobject.h>
 #include <framework/net/server.h>
 #include <framework/otml/declarations.h>
-#include <variant>
 
 using namespace otclient::protobuf;
 
@@ -387,8 +387,8 @@ private:
 
     void prepareTextureLoad(const std::vector<Size>& sizes, const std::vector<int>& total_sprites);
 
-    uint32_t getSpriteIndex(int w, int h, int l, int x, int y, int z, int a);
-    uint32_t getTextureIndex(int l, int x, int y, int z);
+    uint32_t getSpriteIndex(int w, int h, int l, int x, int y, int z, int a) const;
+    uint32_t getTextureIndex(int l, int x, int y, int z) const;
 
     ThingCategory m_category{ ThingInvalidCategory };
 

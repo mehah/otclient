@@ -25,8 +25,8 @@
 #include "win32window.h"
 #include <client/map.h>
 #include <framework/core/application.h>
-#include <framework/core/resourcemanager.h>
 #include <framework/core/eventdispatcher.h>
+#include <framework/core/resourcemanager.h>
 
 #include <framework/graphics/image.h>
 
@@ -208,26 +208,6 @@ void WIN32Window::init()
     timeBeginPeriod(1);
 
     m_instance = GetModuleHandle(nullptr);
-
-#ifdef DIRECTX
-    m_d3d = Direct3DCreate9(D3D_SDK_VERSION);    // create the Direct3D interface
-
-    D3DPRESENT_PARAMETERS d3dpp;    // create a struct to hold various device information
-
-    ZeroMemory(&d3dpp, sizeof(d3dpp));    // clear out the struct for use
-    d3dpp.Windowed = TRUE;    // program windowed, not fullscreen
-    d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;    // discard old frames
-    d3dpp.hDeviceWindow = m_window;    // set the window to be used by Direct3D
-
-    // create a device class using this information and information from the d3dpp stuct
-    m_d3d->CreateDevice(D3DADAPTER_DEFAULT,
-                        D3DDEVTYPE_HAL,
-                        m_window,
-                        D3DCREATE_SOFTWARE_VERTEXPROCESSING,
-                        &d3dpp,
-                        &m_d3ddev);
-
-#endif
 
     internalCreateWindow();
     internalCreateGLContext();
@@ -427,7 +407,7 @@ void WIN32Window::internalDestroyGLContext()
 #endif
 }
 
-void WIN32Window::internalRestoreGLContext()
+void WIN32Window::internalRestoreGLContext() const
 {
 #ifdef OPENGL_ES
     if (!eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext))
@@ -504,7 +484,7 @@ void WIN32Window::show()
 
 void WIN32Window::hide()
 {
-    g_mainDispatcher.addEvent([&] {
+    g_mainDispatcher.addEvent([this] {
         m_hidden = true;
         ShowWindow(m_window, SW_HIDE);
     });
@@ -512,7 +492,7 @@ void WIN32Window::hide()
 
 void WIN32Window::maximize()
 {
-    g_mainDispatcher.addEvent([&] {
+    g_mainDispatcher.addEvent([this] {
         if (!m_hidden)
             ShowWindow(m_window, SW_MAXIMIZE);
         else
@@ -789,7 +769,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
         }
         case WM_GETMINMAXINFO:
         {
-            auto* const pMMI = (LPMINMAXINFO)lParam;
+            auto* const pMMI = reinterpret_cast<LPMINMAXINFO>(lParam);
             const Rect adjustedRect = adjustWindowRect(Rect(0, 0, m_minimumSize));
             pMMI->ptMinTrackSize.x = adjustedRect.width();
             pMMI->ptMinTrackSize.y = adjustedRect.height();
@@ -901,7 +881,7 @@ void WIN32Window::setMouseCursor(int cursorId)
 
 void WIN32Window::restoreMouseCursor()
 {
-    g_mainDispatcher.addEvent([&] {
+    g_mainDispatcher.addEvent([this] {
         if (m_cursor) {
             m_cursor = nullptr;
             SetCursor(m_defaultCursor);
@@ -1078,7 +1058,7 @@ std::string WIN32Window::getPlatformType()
 #endif
 }
 
-Rect WIN32Window::getClientRect()
+Rect WIN32Window::getClientRect() const
 {
     if (m_window) {
         RECT clientRect = { 0,0,0,0 };
@@ -1100,7 +1080,7 @@ Rect WIN32Window::getWindowRect()
     return adjustWindowRect(getClientRect());
 }
 
-Rect WIN32Window::adjustWindowRect(const Rect& clientRect)
+Rect WIN32Window::adjustWindowRect(const Rect& clientRect) const
 {
     Rect rect;
     DWORD dwStyle;

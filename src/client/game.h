@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <bitset>
+#include <framework/core/timer.h>
 #include "animatedtext.h"
 #include "container.h"
 #include "creature.h"
@@ -29,8 +31,6 @@
 #include "item.h"
 #include "outfit.h"
 #include "protocolgame.h"
-#include <framework/core/timer.h>
-#include <bitset>
 
 struct UnjustifiedPoints
 {
@@ -317,8 +317,8 @@ public:
     void setCustomOs(Otc::OperatingSystem_t os) { m_clientCustomOs = os; }
     Otc::OperatingSystem_t getOs();
 
-    bool canPerformGameAction();
-    bool checkBotProtection();
+    bool canPerformGameAction() const;
+    bool checkBotProtection() const;
 
     bool isOnline() { return m_online; }
     bool isLogging() { return !m_online && m_protocolGame; }

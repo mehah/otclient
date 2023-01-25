@@ -21,8 +21,8 @@
  */
 
 #include "filestream.h"
-#include "binarytree.h"
 #include <framework/core/application.h>
+#include "binarytree.h"
 
 #include <physfs.h>
 
@@ -154,21 +154,21 @@ void FileStream::skip(uint32_t len)
     seek(tell() + len);
 }
 
-uint32_t FileStream::size()
+uint32_t FileStream::size() const
 {
     if (!m_caching)
         return PHYSFS_fileLength(m_fileHandle);
     return m_data.size();
 }
 
-uint32_t FileStream::tell()
+uint32_t FileStream::tell() const
 {
     if (!m_caching)
         return PHYSFS_tell(m_fileHandle);
     return m_pos;
 }
 
-bool FileStream::eof()
+bool FileStream::eof() const
 {
     if (!m_caching)
         return PHYSFS_eof(m_fileHandle);
@@ -444,7 +444,7 @@ void FileStream::addString(const std::string_view v)
     write(v.data(), v.length());
 }
 
-void FileStream::throwError(const std::string_view message, bool physfsError)
+void FileStream::throwError(const std::string_view message, bool physfsError) const
 {
     std::string completeMessage = stdext::format("in file '%s': %s", m_name, message);
     if (physfsError)

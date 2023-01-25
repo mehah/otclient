@@ -26,9 +26,9 @@
 #include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/resourcemanager.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include <framework/otml/otml.h>
 #include <framework/platform/platformwindow.h>
-#include <framework/graphics/drawpoolmanager.h>
 
 UIManager g_ui;
 
@@ -56,7 +56,7 @@ void UIManager::terminate()
     m_checkEvent = nullptr;
 }
 
-void UIManager::render(DrawPoolType drawPane)
+void UIManager::render(DrawPoolType drawPane) const
 {
     if (drawPane == DrawPoolType::FOREGROUND)
         g_drawPool.use(DrawPoolType::FOREGROUND);
@@ -64,7 +64,7 @@ void UIManager::render(DrawPoolType drawPane)
     m_rootWidget->draw(m_rootWidget->getRect(), drawPane);
 }
 
-void UIManager::resize(const Size&)
+void UIManager::resize(const Size&) const
 {
     m_rootWidget->setSize(g_window.getSize());
 }
@@ -95,7 +95,7 @@ void UIManager::inputEvent(const InputEvent& event)
             }
 
             m_mouseReceiver->propagateOnMouseEvent(event.mousePos, widgetList);
-            for (const UIWidgetPtr& widget : widgetList) {
+            for (const auto& widget : widgetList) {
                 widget->recursiveFocus(Fw::MouseFocusReason);
                 if (widget->onMousePress(event.mousePos, event.mouseButton))
                     break;
@@ -117,10 +117,10 @@ void UIManager::inputEvent(const InputEvent& event)
                     const auto it = std::find(widgetList.begin(), widgetList.end(), m_pressedWidget);
                     if (it != widgetList.end())
                         widgetList.erase(it);
-                    widgetList.push_front(m_pressedWidget);
+                    widgetList.emplace_front(m_pressedWidget);
                 }
 
-                for (const UIWidgetPtr& widget : widgetList) {
+                for (const auto& widget : widgetList) {
                     if (widget->onMouseRelease(event.mousePos, event.mouseButton))
                         break;
                 }
@@ -155,7 +155,7 @@ void UIManager::inputEvent(const InputEvent& event)
             }
 
             m_mouseReceiver->propagateOnMouseMove(event.mousePos, event.mouseMoved, widgetList);
-            for (const UIWidgetPtr& widget : widgetList) {
+            for (const auto& widget : widgetList) {
                 if (widget->onMouseMove(event.mousePos, event.mouseMoved))
                     break;
             }
@@ -163,7 +163,7 @@ void UIManager::inputEvent(const InputEvent& event)
         }
         case Fw::MouseWheelInputEvent:
             m_rootWidget->propagateOnMouseEvent(event.mousePos, widgetList);
-            for (const UIWidgetPtr& widget : widgetList) {
+            for (const auto& widget : widgetList) {
                 if (widget->onMouseWheel(event.mousePos, event.wheelDirection))
                     break;
             }
@@ -200,7 +200,7 @@ bool UIManager::updateDraggingWidget(const UIWidgetPtr& draggingWidget, const Po
         UIWidgetPtr droppedWidget;
         if (!clickedPos.isNull()) {
             const auto clickedChildren = m_rootWidget->recursiveGetChildrenByPos(clickedPos);
-            for (const UIWidgetPtr& child : clickedChildren) {
+            for (const auto& child : clickedChildren) {
                 if (child->onDrop(oldDraggingWidget, clickedPos)) {
                     droppedWidget = child;
                     break;
@@ -294,7 +294,7 @@ void UIManager::onWidgetDestroy(const UIWidgetPtr& widget)
     if (widget == m_rootWidget || !m_rootWidget)
         return;
 
-    m_destroyedWidgets.push_back(widget);
+    m_destroyedWidgets.emplace_back(widget);
 
     if (m_checkEvent && !m_checkEvent->isExecuted())
         return;
@@ -305,7 +305,7 @@ void UIManager::onWidgetDestroy(const UIWidgetPtr& widget)
         m_destroyedWidgets.clear();
         g_dispatcher.scheduleEvent([backupList] {
             g_lua.collectGarbage();
-            for (const UIWidgetPtr& widget : backupList) {
+            for (const auto& widget : backupList) {
                 if (widget.use_count() != 1)
                     g_logger.warning(stdext::format("widget '%s' destroyed but still have %d reference(s) left", widget->getId(), widget.use_count() - 1));
             }

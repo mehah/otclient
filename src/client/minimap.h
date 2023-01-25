@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "declarations.h"
 #include <framework/graphics/declarations.h>
+#include "declarations.h"
 
 constexpr uint8_t MMBLOCK_SIZE = 64;
 constexpr uint8_t OTMM_VERSION = 1;
@@ -62,7 +62,7 @@ public:
     std::array<MinimapTile, MMBLOCK_SIZE* MMBLOCK_SIZE>& getTiles() { return m_tiles; }
     void mustUpdate() { m_mustUpdate = true; }
     void justSaw() { m_wasSeen = true; }
-    bool wasSeen() { return m_wasSeen; }
+    bool wasSeen() const { return m_wasSeen; }
 private:
     TexturePtr m_texture;
     ImagePtr m_image;
@@ -102,7 +102,7 @@ public:
     void saveOtmm(const std::string& fileName);
 
 private:
-    Rect calcMapRect(const Rect& screenRect, const Position& mapCenter, float scale);
+    Rect calcMapRect(const Rect& screenRect, const Position& mapCenter, float scale) const;
     bool hasBlock(const Position& pos) { return m_tileBlocks[pos.z].contains(getBlockIndex(pos)); }
     MinimapBlock& getBlock(const Position& pos)
     {

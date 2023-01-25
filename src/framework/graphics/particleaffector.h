@@ -22,17 +22,17 @@
 
 #pragma once
 
-#include "declarations.h"
 #include <framework/otml/otml.h>
+#include "declarations.h"
 
 class ParticleAffector
 {
 public:
     void update(float elapsedTime);
     virtual void load(const OTMLNodePtr& node);
-    virtual void updateParticle(const ParticlePtr&, float) {}
+    virtual void updateParticle(const ParticlePtr&, float) const {}
 
-    bool hasFinished() { return m_finished; }
+    bool hasFinished() const { return m_finished; }
 
 protected:
     bool m_finished{ false };
@@ -46,18 +46,18 @@ class GravityAffector : public ParticleAffector
 {
 public:
     void load(const OTMLNodePtr& node) override;
-    void updateParticle(const ParticlePtr& particle, float elapsedTime) override;
+    void updateParticle(const ParticlePtr& particle, float elapsedTime) const override;
 
 private:
-    float m_angle;
-    float m_gravity;
+    float m_angle{ 0 };
+    float m_gravity{ 0 };
 };
 
 class AttractionAffector : public ParticleAffector
 {
 public:
     void load(const OTMLNodePtr& node) override;
-    void updateParticle(const ParticlePtr& particle, float elapsedTime) override;
+    void updateParticle(const ParticlePtr& particle, float elapsedTime) const override;
 
 private:
     Point m_position;

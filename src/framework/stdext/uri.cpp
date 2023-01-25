@@ -1,5 +1,5 @@
-#include <regex>
 #include <locale>
+#include <regex>
 
 #include "uri.h"
 

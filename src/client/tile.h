@@ -22,11 +22,11 @@
 
 #pragma once
 
+#include <framework/luaengine/luaobject.h>
 #include "declarations.h"
 #include "effect.h"
 #include "item.h"
 #include "mapview.h"
-#include <framework/luaengine/luaobject.h>
 
 #ifdef FRAMEWORK_EDITOR
 enum tileflags_t : uint32_t
@@ -101,7 +101,7 @@ public:
     void addThing(const ThingPtr& thing, int stackPos);
     bool removeThing(ThingPtr thing);
     ThingPtr getThing(int stackPos);
-    EffectPtr getEffect(uint16_t id);
+    EffectPtr getEffect(uint16_t id) const;
     bool hasThing(const ThingPtr& thing);
     int getThingStackPos(const ThingPtr& thing);
     ThingPtr getTopThing();
@@ -140,30 +140,31 @@ public:
     bool isCovered(int8_t firstFloor);
     bool isCompletelyCovered(uint8_t firstFloor, bool resetCache);
 
-    bool hasBlockingCreature();
+    bool hasBlockingCreature() const;
 
-    bool hasEffect() { return !m_effects.empty(); }
+    bool hasEffect() const { return !m_effects.empty(); }
     bool hasGround() { return (getGround() && getGround()->isSingleGround()) || m_thingTypeFlag & TileThingType::HAS_GROUND_BORDER; };
     bool hasTopGround(bool ignoreBorder = false) { return (getGround() && getGround()->isTopGround()) || (!ignoreBorder && m_thingTypeFlag & TileThingType::HAS_TOP_GROUND_BORDER); }
     bool hasSurface() { return hasTopItem() || !m_effects.empty() || m_thingTypeFlag & TileThingType::HAS_BOTTOM_ITEM || m_thingTypeFlag & TileThingType::HAS_COMMON_ITEM || hasCreature() || !m_walkingCreatures.empty() || hasTopGround(); }
-    bool hasTopItem() { return m_thingTypeFlag & TileThingType::HAS_TOP_ITEM; }
-    bool hasCommonItem() { return m_thingTypeFlag & TileThingType::HAS_COMMON_ITEM; }
-    bool hasBottomItem() { return m_thingTypeFlag & TileThingType::HAS_BOTTOM_ITEM; }
+    bool hasTopItem() const { return m_thingTypeFlag & TileThingType::HAS_TOP_ITEM; }
+    bool hasCommonItem() const { return m_thingTypeFlag & TileThingType::HAS_COMMON_ITEM; }
+    bool hasBottomItem() const { return m_thingTypeFlag & TileThingType::HAS_BOTTOM_ITEM; }
 
-    bool hasDisplacement() { return m_thingTypeFlag & TileThingType::HAS_DISPLACEMENT; }
-    bool hasLight() { return m_thingTypeFlag & TileThingType::HAS_LIGHT; }
-    bool hasTallThings() { return m_thingTypeFlag & TileThingType::HAS_TALL_THINGS; }
-    bool hasWideThings() { return m_thingTypeFlag & TileThingType::HAS_WIDE_THINGS; }
-    bool hasWall() { return m_thingTypeFlag & TileThingType::HAS_WALL; }
+    bool hasDisplacement() const { return m_thingTypeFlag & TileThingType::HAS_DISPLACEMENT; }
+    bool hasLight() const { return m_thingTypeFlag & TileThingType::HAS_LIGHT; }
+    bool hasTallThings() const { return m_thingTypeFlag & TileThingType::HAS_TALL_THINGS; }
+    bool hasWideThings() const { return m_thingTypeFlag & TileThingType::HAS_WIDE_THINGS; }
+    bool hasWall() const { return m_thingTypeFlag & TileThingType::HAS_WALL; }
 
-    bool mustHookSouth() { return m_thingTypeFlag & TileThingType::HAS_HOOK_SOUTH; }
-    bool mustHookEast() { return m_thingTypeFlag & TileThingType::HAS_HOOK_EAST; }
+    bool mustHookSouth() const { return m_thingTypeFlag & TileThingType::HAS_HOOK_SOUTH; }
+    bool mustHookEast() const { return m_thingTypeFlag & TileThingType::HAS_HOOK_EAST; }
 
     bool limitsFloorsView(bool isFreeView = false);
 
     bool canShade(const MapViewPtr& mapView);
-    bool canRender(uint32_t& flags, const Position& cameraPosition, AwareRange viewPort, LightView* lightView);
-    bool canErase() {
+    bool canRender(uint32_t& flags, const Position& cameraPosition, AwareRange viewPort);
+    bool canErase()
+    {
         return m_walkingCreatures.empty() && m_effects.empty() && isEmpty() && m_minimapColor == 0
 #ifdef FRAMEWORK_EDITOR
             && m_flags == 0
@@ -171,7 +172,7 @@ public:
             ;
     }
 
-    bool hasElevation(int elevation = 1) { return m_elevation >= elevation; }
+    bool hasElevation(int elevation = 1) const { return m_elevation >= elevation; }
 
 #ifdef FRAMEWORK_EDITOR
     void overwriteMinimapColor(uint8_t color) { m_minimapColor = color; }
@@ -208,7 +209,7 @@ private:
     }
 
     bool checkForDetachableThing();
-    bool hasThingWithElevation() { return hasElevation() && m_thingTypeFlag & TileThingType::HAS_THING_WITH_ELEVATION; }
+    bool hasThingWithElevation() const { return hasElevation() && m_thingTypeFlag & TileThingType::HAS_THING_WITH_ELEVATION; }
 
     Position m_position;
     Point m_lastDrawDest;

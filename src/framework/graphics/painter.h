@@ -57,36 +57,31 @@ class Painter
 public:
     Painter();
 
-    ~Painter() = default;
-
-    void bind();
-    void unbind();
-
     void clear(const Color& color);
     void clearRect(const Color& color, const Rect& rect);
 
     void drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode = DrawMode::TRIANGLES);
 
-    float getOpacity() { return m_opacity; }
-    bool getAlphaWriting() { return m_alphaWriting; }
+    float getOpacity() const { return m_opacity; }
+    bool getAlphaWriting() const { return m_alphaWriting; }
 
-    Matrix3 getTextureMatrix() { return m_textureMatrix; }
-    Matrix3 getTransformMatrix(const Size& size);
-    Matrix3 getTransformMatrix() { return m_transformMatrix; }
-    Matrix3 getProjectionMatrix() { return m_projectionMatrix; }
+    Matrix3 getTextureMatrix() const { return m_textureMatrix; }
+    Matrix3 getTransformMatrix(const Size& size) const;
+    Matrix3 getTransformMatrix() const { return m_transformMatrix; }
+    Matrix3 getProjectionMatrix() const { return m_projectionMatrix; }
 
-    Color getColor() { return m_color; }
-    Rect getClipRect() { return m_clipRect; }
-    Size getResolution() { return m_resolution; }
-    BlendEquation getBlendEquation() { return m_blendEquation; }
-    CompositionMode getCompositionMode() { return m_compositionMode; }
-    PainterShaderProgram* getShaderProgram() { return m_shaderProgram; }
+    Color getColor() const { return m_color; }
+    Rect getClipRect() const { return m_clipRect; }
+    Size getResolution() const { return m_resolution; }
+    BlendEquation getBlendEquation() const { return m_blendEquation; }
+    CompositionMode getCompositionMode() const { return m_compositionMode; }
+    PainterShaderProgram* getShaderProgram() const { return m_shaderProgram; }
 
     void setColor(const Color& color) { m_color = color; }
     void setTexture(Texture* texture);
     void setOpacity(float opacity) { m_opacity = opacity; }
     void setClipRect(const Rect& clipRect);
-    void setResolution(const Size& resolution, const Matrix3& matrix = {});
+    void setResolution(const Size& resolution, const Matrix3& projectionMatrix = {});
     void setDrawProgram(PainterShaderProgram* drawProgram) { m_drawProgram = drawProgram; }
     void setAlphaWriting(bool enable);
     void setBlendEquation(BlendEquation blendEquation);
@@ -110,13 +105,13 @@ public:
     void resetTransformMatrix() { setTransformMatrix(DEFAULT_MATRIX3); }
 
 protected:
-    void refreshState();
-    void updateGlTexture();
-    void updateGlCompositionMode();
-    void updateGlBlendEquation();
-    void updateGlClipRect();
-    void updateGlAlphaWriting();
-    void updateGlViewport();
+    void refreshState() const;
+    void updateGlTexture() const;
+    void updateGlCompositionMode() const;
+    void updateGlBlendEquation() const;
+    void updateGlClipRect() const;
+    void updateGlAlphaWriting() const;
+    void updateGlViewport() const;
 
     Matrix3 m_transformMatrix;
     Matrix3 m_projectionMatrix;

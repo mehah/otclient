@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "texture.h"
 #include <framework/core/timer.h>
+#include "texture.h"
 
 class AnimatedTexture : public Texture
 {
@@ -38,11 +38,11 @@ public:
 
     void updateAnimation();
 
-    bool isAnimatedTexture() override { return true; }
+    bool isAnimatedTexture() const override { return true; }
 
 private:
     std::vector<TexturePtr> m_frames;
     std::vector<int> m_framesDelay;
-    uint32_t m_currentFrame;
+    uint32_t m_currentFrame{ 0 };
     Timer m_animTimer;
 };

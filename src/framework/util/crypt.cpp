@@ -69,7 +69,6 @@ std::string Crypt::base64Encode(const std::string& decoded_string)
 {
     std::string ret;
     int i = 0;
-    int j = 0;
     uint8_t char_array_3[3];
     uint8_t char_array_4[4];
     int pos = 0;
@@ -90,6 +89,7 @@ std::string Crypt::base64Encode(const std::string& decoded_string)
     }
 
     if (i) {
+        int j = 0;
         for (j = i; j < 3; j++)
             char_array_3[j] = '\0';
 
@@ -112,7 +112,6 @@ std::string Crypt::base64Decode(const std::string& encoded_string)
 {
     int len = encoded_string.size();
     int i = 0;
-    int j = 0;
     int in_ = 0;
     uint8_t char_array_4[4], char_array_3[3];
     std::string ret;
@@ -134,6 +133,7 @@ std::string Crypt::base64Decode(const std::string& encoded_string)
     }
 
     if (i) {
+        int j = 0;
         for (j = i; j < 4; j++)
             char_array_4[j] = 0;
 
@@ -204,7 +204,7 @@ std::string Crypt::getMachineUUID()
     return _encrypt(to_string(m_machineUUID), false);
 }
 
-std::string Crypt::getCryptKey(bool useMachineUUID)
+std::string Crypt::getCryptKey(bool useMachineUUID) const
 {
     constexpr std::hash<uuids::uuid> uuid_hasher;
     const uuids::uuid uuid = useMachineUUID ? m_machineUUID : uuids::uuid();

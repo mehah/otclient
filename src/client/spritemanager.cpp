@@ -21,11 +21,11 @@
  */
 
 #include "spritemanager.h"
-#include "game.h"
-#include "spriteappearances.h"
 #include <framework/core/filestream.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/image.h>
+#include "game.h"
+#include "spriteappearances.h"
 
 SpriteManager g_sprites;
 
@@ -241,7 +241,7 @@ void SpriteManager::generateLightTexture()
             // light intensity varies inversely with the square of the distance
             const uint8_t colorByte = intensity * 0xff;
 
-            uint8_t pixel[4] = { colorByte, colorByte, colorByte, 0xff };
+            const uint8_t pixel[4] = { colorByte, colorByte, colorByte, 0xff };
             image->setPixel(x, y, pixel);
         }
     }
@@ -258,7 +258,7 @@ void SpriteManager::generateShadeTexture()
     for (int_fast16_t x = -1; ++x < diameter;) {
         for (int_fast16_t y = -1; ++y < diameter;) {
             const uint8_t alpha = x == 0 || y == 0 || x == diameter - 1 || y == diameter - 1 ? 0 : 0xff;
-            uint8_t pixel[4] = { 0xff, 0xff, 0xff, alpha };
+            const uint8_t pixel[4] = { 0xff, 0xff, 0xff, alpha };
             image->setPixel(x, y, pixel);
         }
     }

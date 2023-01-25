@@ -21,20 +21,20 @@
  */
 
 #include "particlesystem.h"
-#include "particle.h"
-#include "particleaffector.h"
 #include <framework/core/clock.h>
 #include <framework/core/graphicalapplication.h>
+#include "particle.h"
+#include "particleaffector.h"
 
 ParticleSystem::ParticleSystem() :m_lastUpdateTime(g_clock.seconds()) {}
 
 void ParticleSystem::load(const OTMLNodePtr& node)
 {
-    for (const OTMLNodePtr& childNode : node->children()) {
+    for (const auto& childNode : node->children()) {
         if (childNode->tag() == "Emitter") {
             const auto& emitter = std::make_shared<ParticleEmitter>();
             emitter->load(childNode);
-            m_emitters.push_back(emitter);
+            m_emitters.emplace_back(emitter);
         } else if (childNode->tag().find("Affector") != std::string::npos) {
             ParticleAffectorPtr affector;
 
@@ -45,18 +45,15 @@ void ParticleSystem::load(const OTMLNodePtr& node)
 
             if (affector) {
                 affector->load(childNode);
-                m_affectors.push_back(affector);
+                m_affectors.emplace_back(affector);
             }
         }
     }
 }
 
-void ParticleSystem::addParticle(const ParticlePtr& particle)
-{
-    m_particles.push_back(particle);
-}
+void ParticleSystem::addParticle(const ParticlePtr& particle) { m_particles.emplace_back(particle); }
 
-void ParticleSystem::render()
+void ParticleSystem::render() const
 {
     for (const auto& particle : m_particles)
         particle->render();

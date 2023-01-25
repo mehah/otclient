@@ -195,7 +195,7 @@ public:
 private:
 
     void init(size_type sz) { init(sz, sz); }
-    void set_size(size_type sz) { rep_->str[rep_->size = sz] = '\0'; }
+    void set_size(size_type sz) const { rep_->str[rep_->size = sz] = '\0'; }
     char* start() const { return rep_->str; }
     char* finish() const { return rep_->str + rep_->size; }
 
@@ -225,7 +225,7 @@ private:
         }
     }
 
-    void quit()
+    void quit() const
     {
         if (rep_ != &nullrep_) {
             // The rep_ is really an array of ints. (see the allocator, above).

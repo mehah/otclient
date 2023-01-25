@@ -47,7 +47,7 @@ public:
     void callLuaField(const std::string_view field, const T&... args);
 
     /// Returns true if the lua field exists
-    bool hasLuaField(const std::string_view field);
+    bool hasLuaField(const std::string_view field) const;
 
     /// Sets a field in this lua object
     template<typename T>
@@ -66,13 +66,13 @@ public:
     void luaSetField(const std::string_view key);
 
     /// Gets a field from this lua object, the result is pushed onto the stack
-    void luaGetField(const std::string_view key);
+    void luaGetField(const std::string_view key) const;
 
     /// Get object's metatable
     void luaGetMetatable();
 
     /// Gets the table containing all stored fields of this lua object, the result is pushed onto the stack
-    void luaGetFieldsTable();
+    void luaGetFieldsTable() const;
 
     /// Returns the derived class name, its the same name used in Lua
     std::string getClassName();
@@ -84,7 +84,7 @@ public:
     template<typename T>
     std::shared_ptr<T> dynamic_self_cast() { return std::dynamic_pointer_cast<T>(shared_from_this()); }
 
-    void operator=(const LuaObject&) {}
+    void operator=(const LuaObject&) const {}
 
 private:
     int m_fieldsTableRef;

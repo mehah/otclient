@@ -136,7 +136,7 @@ bool ThingTypeManager::loadOtml(std::string file)
                 throw OTMLException(node, "not a valid thing category");
             }
 
-            for (const OTMLNodePtr& node2 : node->children()) {
+            for (const auto& node2 : node->children()) {
                 const auto id = stdext::safe_cast<uint16_t>(node2->tag());
                 const auto& type = getThingType(id, category);
                 if (!type)
@@ -234,7 +234,7 @@ ThingTypeList ThingTypeManager::findThingTypeByAttr(ThingAttr attr, ThingCategor
     ThingTypeList ret;
     for (const auto& type : m_thingTypes[category])
         if (type->hasAttr(attr))
-            ret.push_back(type);
+            ret.emplace_back(type);
     return ret;
 }
 
@@ -325,7 +325,7 @@ ItemTypeList ThingTypeManager::findItemTypesByName(const std::string& name)
     ItemTypeList ret;
     for (const ItemTypePtr& it : m_itemTypes)
         if (it->getName() == name)
-            ret.push_back(it);
+            ret.emplace_back(it);
     return ret;
 }
 
@@ -334,7 +334,7 @@ ItemTypeList ThingTypeManager::findItemTypesByString(const std::string& name)
     ItemTypeList ret;
     for (const ItemTypePtr& it : m_itemTypes)
         if (it->getName().find(name) != std::string::npos)
-            ret.push_back(it);
+            ret.emplace_back(it);
     return ret;
 }
 
@@ -352,7 +352,7 @@ ItemTypeList ThingTypeManager::findItemTypeByCategory(ItemCategory category)
     ItemTypeList ret;
     for (const ItemTypePtr& type : m_itemTypes)
         if (type->getCategory() == category)
-            ret.push_back(type);
+            ret.emplace_back(type);
     return ret;
 }
 
@@ -421,7 +421,7 @@ void ThingTypeManager::loadOtb(const std::string& file)
         m_itemTypes.resize(children.size() + 1, m_nullItemType);
         m_reverseItemTypes.resize(children.size() + 1, m_nullItemType);
 
-        for (const BinaryTreePtr& node : children) {
+        for (const auto& node : children) {
             const auto& itemType = std::make_shared<ItemType>();
             itemType->unserialize(node);
             addItemType(itemType);

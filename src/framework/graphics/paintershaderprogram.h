@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "shaderprogram.h"
 #include <client/position.h>
+#include "shaderprogram.h"
 
 class PainterShaderProgram : public ShaderProgram
 {
@@ -55,7 +55,7 @@ public:
     bool link() override;
 
     void setPosition(const Position& position) { m_startPos = position; };
-    Position getPosition() { return m_startPos; };
+    Position getPosition() const { return m_startPos; };
 
     void setTransformMatrix(const Matrix3& transformMatrix);
     void setProjectionMatrix(const Matrix3& projectionMatrix);
@@ -66,7 +66,7 @@ public:
     void updateTime();
 
     void addMultiTexture(const std::string& file);
-    void bindMultiTextures();
+    void bindMultiTextures() const;
 
 private:
     float m_startTime{ 0 };

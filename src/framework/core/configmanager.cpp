@@ -80,7 +80,7 @@ ConfigPtr ConfigManager::create(const std::string& file)
         config->load(file);
         config->save();
 
-        m_configs.push_back(config);
+        m_configs.emplace_back(config);
     }
     return config;
 }
@@ -96,7 +96,7 @@ ConfigPtr ConfigManager::load(const std::string& file)
         config = std::make_shared<Config>();
 
         if (config->load(file)) {
-            m_configs.push_back(config);
+            m_configs.emplace_back(config);
         } else {
             // cannot load config
             config = nullptr;

@@ -27,11 +27,7 @@
 #include <framework/luaengine/luainterface.h>
 #include <framework/otml/otml.h>
 
-Module::Module(const std::string_view name)
-{
-    m_name = name;
-    m_sandboxEnv = g_lua.newSandboxEnv();
-}
+Module::Module(const std::string_view name) : m_name(name.data()), m_sandboxEnv(g_lua.newSandboxEnv()) {}
 
 bool Module::load()
 {
@@ -155,7 +151,7 @@ bool Module::reload()
     return load();
 }
 
-bool Module::isDependent()
+bool Module::isDependent() const
 {
     for (const ModulePtr& module : g_modules.getModules()) {
         if (module->isLoaded() && module->hasDependency(m_name))
@@ -201,17 +197,17 @@ void Module::discover(const OTMLNodePtr& moduleNode)
 
     if (const auto& node = moduleNode->get("dependencies")) {
         for (const auto& tmp : node->children())
-            m_dependencies.push_back(tmp->value());
+            m_dependencies.emplace_back(tmp->value());
     }
 
     if (const auto& node = moduleNode->get("scripts")) {
         for (const auto& tmp : node->children())
-            m_scripts.push_back(stdext::resolve_path(tmp->value(), node->source()));
+            m_scripts.emplace_back(stdext::resolve_path(tmp->value(), node->source()));
     }
 
     if (const auto& node = moduleNode->get("load-later")) {
         for (const auto& tmp : node->children())
-            m_loadLaterModules.push_back(tmp->value());
+            m_loadLaterModules.emplace_back(tmp->value());
     }
 
     if (const auto& node = moduleNode->get("@onLoad"))

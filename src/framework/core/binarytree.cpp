@@ -70,7 +70,7 @@ BinaryTreeVec BinaryTree::getChildren()
             case static_cast<uint8_t>(Node::START):
             {
                 const auto& node = std::make_shared<BinaryTree>(m_fin);
-                children.push_back(node);
+                children.emplace_back(node);
                 node->skipNodes();
                 break;
             }
@@ -158,8 +158,7 @@ Point BinaryTree::getPoint()
     return ret;
 }
 
-OutputBinaryTree::OutputBinaryTree(FileStreamPtr fin)
-    : m_fin(std::move(fin))
+OutputBinaryTree::OutputBinaryTree(FileStreamPtr fin) : m_fin(std::move(fin))
 {
     startNode(0);
 }
@@ -211,12 +210,12 @@ void OutputBinaryTree::startNode(uint8_t node)
     write(&node, 1);
 }
 
-void OutputBinaryTree::endNode()
+void OutputBinaryTree::endNode() const
 {
     m_fin->addU8(static_cast<uint8_t>(BinaryTree::Node::END));
 }
 
-void OutputBinaryTree::write(const uint8_t* data, size_t size)
+void OutputBinaryTree::write(const uint8_t* data, size_t size) const
 {
     for (size_t i = 0; i < size; ++i) {
         if (const auto v = static_cast<BinaryTree::Node>(data[i]);

@@ -30,7 +30,7 @@ class UIAnchor :public std::enable_shared_from_this<UIAnchor>
 {
 public:
     UIAnchor(Fw::AnchorEdge anchoredEdge, std::string_view hookedWidgetId, Fw::AnchorEdge hookedEdge) :
-        m_anchoredEdge(anchoredEdge), m_hookedEdge(hookedEdge), m_hookedWidgetId(std::move(hookedWidgetId))
+        m_anchoredEdge(anchoredEdge), m_hookedEdge(hookedEdge), m_hookedWidgetId(std::string{ hookedWidgetId })
     {}
 
     Fw::AnchorEdge getAnchoredEdge() const { return m_anchoredEdge; }
@@ -52,7 +52,7 @@ public:
 
     void addAnchor(const UIAnchorPtr& anchor);
     const UIAnchorList& getAnchors() { return m_anchors; }
-    bool isUpdated() { return m_updated; }
+    bool isUpdated() const { return m_updated; }
     void setUpdated(bool updated) { m_updated = updated; }
 
 private:
@@ -69,7 +69,7 @@ public:
     void addAnchor(const UIWidgetPtr& anchoredWidget, Fw::AnchorEdge anchoredEdge,
                    const std::string_view hookedWidgetId, Fw::AnchorEdge hookedEdge);
     void removeAnchors(const UIWidgetPtr& anchoredWidget);
-    bool hasAnchors(const UIWidgetPtr& anchoredWidget);
+    bool hasAnchors(const UIWidgetPtr& anchoredWidget) const;
     void centerIn(const UIWidgetPtr& anchoredWidget, const std::string_view hookedWidgetId);
     void fill(const UIWidgetPtr& anchoredWidget, const std::string_view hookedWidgetId);
 

@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "declarations.h"
 #include <framework/ui/uiwidget.h>
+#include "declarations.h"
 
 class UIMinimap : public UIWidget
 {
@@ -60,8 +60,6 @@ protected:
     void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
 
 private:
-    void update();
-
     Rect m_mapArea;
     Position m_cameraPosition;
     float m_scale{ 1.f };

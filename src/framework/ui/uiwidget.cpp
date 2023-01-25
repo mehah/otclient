@@ -104,7 +104,7 @@ void UIWidget::drawChildren(const Rect& visibleRect, DrawPoolType drawPane)
     // draw children
     for (const auto child : m_children) { // don't use auto&
         // render only visible children with a valid rect inside parent rect
-        if (!child->isExplicitlyVisible() || !child->getRect().isValid() || child->getOpacity() < Fw::MIN_ALPHA)
+        if (!child || !child->isExplicitlyVisible() || !child->getRect().isValid() || child->getOpacity() < Fw::MIN_ALPHA)
             continue;
 
         const auto& childVisibleRect = visibleRect.intersection(child->getRect());
@@ -148,7 +148,7 @@ void UIWidget::addChild(const UIWidgetPtr& child)
 
     const auto& oldLastChild = getLastChild();
 
-    m_children.push_back(child);
+    m_children.emplace_back(child);
     m_childrenById[child->getId()] = child;
 
     // cache index
@@ -393,7 +393,7 @@ void UIWidget::focusPreviousChild(Fw::FocusReason reason, bool rotate)
             it = std::find(m_children.rbegin(), m_children.rend(), m_focusedChild);
 
         for (; it != m_children.rend(); ++it) {
-            const UIWidgetPtr& child = *it;
+            const auto& child = *it;
             if (child != m_focusedChild && child->isFocusable() && child->isExplicitlyEnabled() && child->isVisible()) {
                 toFocus = child;
                 break;
@@ -421,7 +421,7 @@ void UIWidget::lowerChild(const UIWidgetPtr& child)
     }
 
     m_children.erase(it);
-    m_children.push_front(child);
+    m_children.emplace_front(child);
 
     { // cache index
         for (int i = (child->m_childIndex = 1), s = m_children.size(); i < s; ++i)
@@ -447,7 +447,7 @@ void UIWidget::raiseChild(const UIWidgetPtr& child)
     }
 
     m_children.erase(it);
-    m_children.push_back(child);
+    m_children.emplace_back(child);
 
     { // cache index
         for (int i = child->m_childIndex - 1, s = m_children.size(); i < s; ++i)
@@ -513,14 +513,14 @@ void UIWidget::lockChild(const UIWidgetPtr& child)
         unlockChild(child);
 
     // disable all other children
-    for (const UIWidgetPtr& otherChild : m_children) {
+    for (const auto& otherChild : m_children) {
         if (otherChild == child)
             child->setEnabled(true);
         else
             otherChild->setEnabled(false);
     }
 
-    m_lockedChildren.push_front(child);
+    m_lockedChildren.emplace_front(child);
 
     // lock child focus
     if (child->isFocusable())
@@ -553,7 +553,7 @@ void UIWidget::unlockChild(const UIWidgetPtr& child)
         assert(hasChild(lockedChild));
     }
 
-    for (const UIWidgetPtr& otherChild : m_children) {
+    for (const auto& otherChild : m_children) {
         // lock new child
         if (lockedChild) {
             if (otherChild == lockedChild)
@@ -594,7 +594,7 @@ void UIWidget::applyStyle(const OTMLNodePtr& styleNode)
     m_loadingStyle = true;
     try {
         // translate ! style tags
-        for (const OTMLNodePtr& node : styleNode->children()) {
+        for (const auto& node : styleNode->children()) {
             if (node->tag()[0] == '!') {
                 std::string tag = node->tag().substr(1);
                 std::string code = stdext::format("tostring(%s)", node->value());
@@ -822,7 +822,7 @@ void UIWidget::internalDestroy()
     m_lockedChildren.clear();
     m_childrenById.clear();
 
-    for (const UIWidgetPtr& child : m_children)
+    for (const auto& child : m_children)
         child->internalDestroy();
     m_children.clear();
 
@@ -937,7 +937,7 @@ void UIWidget::setLayout(const UILayoutPtr& layout)
     layout->setParent(static_self_cast<UIWidget>());
     layout->disableUpdates();
 
-    for (const UIWidgetPtr& child : m_children) {
+    for (const auto& child : m_children) {
         if (m_layout)
             m_layout->removeWidget(child);
         layout->addWidget(child);
@@ -973,7 +973,7 @@ bool UIWidget::setRect(const Rect& rect)
 
     // avoid massive update events
     if (!m_updateEventScheduled) {
-        UIWidgetPtr self = static_self_cast<UIWidget>();
+        auto self = static_self_cast<UIWidget>();
         g_dispatcher.addEvent([self, oldRect] {
             self->m_updateEventScheduled = false;
             if (oldRect != self->getRect())
@@ -1149,7 +1149,7 @@ Rect UIWidget::getMarginRect()
 Rect UIWidget::getChildrenRect()
 {
     Rect childrenRect;
-    for (const UIWidgetPtr& child : m_children) {
+    for (const auto& child : m_children) {
         if (!child->isExplicitlyVisible() || !child->getRect().isValid())
             continue;
         Rect marginRect = child->getMarginRect();
@@ -1206,7 +1206,7 @@ UIWidgetPtr UIWidget::getChildBefore(const UIWidgetPtr& relativeChild)
 
 UIWidgetPtr UIWidget::getChildById(const std::string_view childId)
 {
-    if (auto it = m_childrenById.find(childId); it != m_childrenById.end())
+    if (const auto it = m_childrenById.find(childId); it != m_childrenById.end())
         return it->second;
 
     return nullptr;
@@ -1258,7 +1258,7 @@ UIWidgetPtr UIWidget::recursiveGetChildByPos(const Point& childPos, bool wantsPh
         const auto& child = (*it);
 
         if (child->isExplicitlyVisible() && child->containsPoint(childPos)) {
-            if (const UIWidgetPtr& subChild = child->recursiveGetChildByPos(childPos, wantsPhantom))
+            if (const auto& subChild = child->recursiveGetChildByPos(childPos, wantsPhantom))
                 return subChild;
 
             if (wantsPhantom || !child->isPhantom())
@@ -1271,11 +1271,11 @@ UIWidgetPtr UIWidget::recursiveGetChildByPos(const Point& childPos, bool wantsPh
 UIWidgetList UIWidget::recursiveGetChildren()
 {
     UIWidgetList children;
-    for (const UIWidgetPtr& child : m_children) {
+    for (const auto& child : m_children) {
         if (const UIWidgetList& subChildren = child->recursiveGetChildren(); !subChildren.empty())
             children.insert(children.end(), subChildren.begin(), subChildren.end());
 
-        children.push_back(child);
+        children.emplace_back(child);
     }
 
     return children;
@@ -1294,7 +1294,7 @@ UIWidgetList UIWidget::recursiveGetChildrenByPos(const Point& childPos)
             if (const UIWidgetList& subChildren = child->recursiveGetChildrenByPos(childPos); !subChildren.empty())
                 children.insert(children.end(), subChildren.begin(), subChildren.end());
 
-            children.push_back(child);
+            children.emplace_back(child);
         }
     }
 
@@ -1313,7 +1313,7 @@ UIWidgetList UIWidget::recursiveGetChildrenByMarginPos(const Point& childPos)
             UIWidgetList subChildren = child->recursiveGetChildrenByMarginPos(childPos);
             if (!subChildren.empty())
                 children.insert(children.end(), subChildren.begin(), subChildren.end());
-            children.push_back(child);
+            children.emplace_back(child);
         }
     }
     return children;
@@ -1426,7 +1426,7 @@ void UIWidget::updateState(Fw::WidgetState state)
     if (updateChildren) {
         // do a backup of children list, because it may change while looping it
         const UIWidgetList& children = m_children;
-        for (const UIWidgetPtr& child : children)
+        for (const auto& child : children)
             child->updateState(state);
     }
 
@@ -1454,7 +1454,7 @@ void UIWidget::updateChildrenIndexStates()
     if (m_destroyed)
         return;
 
-    for (const UIWidgetPtr& child : m_children) {
+    for (const auto& child : m_children) {
         child->updateState(Fw::FirstState);
         child->updateState(Fw::MiddleState);
         child->updateState(Fw::LastState);
@@ -1529,7 +1529,7 @@ void UIWidget::onStyleApply(const std::string_view, const OTMLNodePtr& styleNode
         return;
 
     // first set id
-    if (const OTMLNodePtr& node = styleNode->get("id"))
+    if (const auto& node = styleNode->get("id"))
         setId(node->value());
 
     parseBaseStyle(styleNode);
@@ -1545,7 +1545,7 @@ void UIWidget::onGeometryChange(const Rect& oldRect, const Rect& newRect)
         updateText();
 
     // move children that is outside the parent rect to inside again
-    for (const UIWidgetPtr& child : m_children) {
+    for (const auto& child : m_children) {
         if (!child->isAnchored() && child->isVisible())
             child->bindRectToParent();
     }
@@ -1666,17 +1666,17 @@ bool UIWidget::propagateOnKeyText(const std::string_view keyText)
 {
     // do a backup of children list, because it may change while looping it
     UIWidgetList children;
-    for (const UIWidgetPtr& child : m_children) {
+    for (const auto& child : m_children) {
         // events on hidden or disabled widgets are discarded
         if (!child->isExplicitlyEnabled() || !child->isExplicitlyVisible())
             continue;
 
         // key events go only to containers or focused child
         if (child->isFocused())
-            children.push_back(child);
+            children.emplace_back(child);
     }
 
-    for (const UIWidgetPtr& child : children) {
+    for (const auto& child : children) {
         if (child->propagateOnKeyText(keyText))
             return true;
     }
@@ -1688,17 +1688,17 @@ bool UIWidget::propagateOnKeyDown(uint8_t keyCode, int keyboardModifiers)
 {
     // do a backup of children list, because it may change while looping it
     UIWidgetList children;
-    for (const UIWidgetPtr& child : m_children) {
+    for (const auto& child : m_children) {
         // events on hidden or disabled widgets are discarded
         if (!child->isExplicitlyEnabled() || !child->isExplicitlyVisible())
             continue;
 
         // key events go only to containers or focused child
         if (child->isFocused())
-            children.push_back(child);
+            children.emplace_back(child);
     }
 
-    for (const UIWidgetPtr& child : children) {
+    for (const auto& child : children) {
         if (child->propagateOnKeyDown(keyCode, keyboardModifiers))
             return true;
     }
@@ -1710,17 +1710,17 @@ bool UIWidget::propagateOnKeyPress(uint8_t keyCode, int keyboardModifiers, int a
 {
     // do a backup of children list, because it may change while looping it
     UIWidgetList children;
-    for (const UIWidgetPtr& child : m_children) {
+    for (const auto& child : m_children) {
         // events on hidden or disabled widgets are discarded
         if (!child->isExplicitlyEnabled() || !child->isExplicitlyVisible())
             continue;
 
         // key events go only to containers or focused child
         if (child->isFocused())
-            children.push_back(child);
+            children.emplace_back(child);
     }
 
-    for (const UIWidgetPtr& child : children) {
+    for (const auto& child : children) {
         if (child->propagateOnKeyPress(keyCode, keyboardModifiers, autoRepeatTicks))
             return true;
     }
@@ -1734,17 +1734,17 @@ bool UIWidget::propagateOnKeyUp(uint8_t keyCode, int keyboardModifiers)
 {
     // do a backup of children list, because it may change while looping it
     UIWidgetList children;
-    for (const UIWidgetPtr& child : m_children) {
+    for (const auto& child : m_children) {
         // events on hidden or disabled widgets are discarded
         if (!child->isExplicitlyEnabled() || !child->isExplicitlyVisible())
             continue;
 
         // key events go only to focused child
         if (child->isFocused())
-            children.push_back(child);
+            children.emplace_back(child);
     }
 
-    for (const UIWidgetPtr& child : children) {
+    for (const auto& child : children) {
         if (child->propagateOnKeyUp(keyCode, keyboardModifiers))
             return true;
     }
@@ -1768,7 +1768,7 @@ bool UIWidget::propagateOnMouseEvent(const Point& mousePos, UIWidgetList& widget
         }
     }
 
-    widgetList.push_back(static_self_cast<UIWidget>());
+    widgetList.emplace_back(static_self_cast<UIWidget>());
 
     if (!isPhantom())
         ret = true;
@@ -1782,7 +1782,7 @@ bool UIWidget::propagateOnMouseMove(const Point& mousePos, const Point& mouseMov
             if (child->isExplicitlyVisible() && child->isExplicitlyEnabled() && child->containsPoint(mousePos))
                 child->propagateOnMouseMove(mousePos, mouseMoved, widgetList);
 
-            widgetList.push_back(static_self_cast<UIWidget>());
+            widgetList.emplace_back(static_self_cast<UIWidget>());
         }
     }
 

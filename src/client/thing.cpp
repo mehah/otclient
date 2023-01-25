@@ -23,9 +23,9 @@
 #include "thing.h"
 #include "game.h"
 #include "map.h"
+#include "shadermanager.h"
 #include "thingtypemanager.h"
 #include "tile.h"
-#include "shadermanager.h"
 
 #include <framework/core/graphicalapplication.h>
 

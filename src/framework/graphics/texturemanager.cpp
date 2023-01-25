@@ -36,10 +36,7 @@
 
 TextureManager g_textures;
 
-void TextureManager::init()
-{
-    m_emptyTexture = std::make_shared<Texture>();
-}
+void TextureManager::init() { m_emptyTexture = std::make_shared<Texture>(); }
 
 void TextureManager::terminate()
 {
@@ -52,7 +49,7 @@ void TextureManager::terminate()
     m_emptyTexture = nullptr;
 }
 
-void TextureManager::poll()
+void TextureManager::poll() const
 {
     // update only every 16msec, this allows upto 60 fps for animated textures
     static ticks_t lastUpdate = 0;
@@ -75,6 +72,7 @@ void TextureManager::liveReload()
 {
     if (m_liveReloadEvent)
         return;
+
     m_liveReloadEvent = g_dispatcher.cycleEvent([this] {
         for (const auto& [fileName, tex] : m_textures) {
             const auto& path = g_resources.guessFilePath(fileName, "png");
@@ -153,14 +151,14 @@ TexturePtr TextureManager::loadTexture(std::stringstream& file)
                 int frameDelay = apng.frames_delay[i];
 
                 framesDelay.push_back(frameDelay);
-                frames.push_back(std::make_shared<Image>(imageSize, apng.bpp, frameData));
+                frames.emplace_back(std::make_shared<Image>(imageSize, apng.bpp, frameData));
             }
             const auto& animatedTexture = std::make_shared<AnimatedTexture>(imageSize, frames, framesDelay);
-            m_animatedTextures.push_back(animatedTexture);
+            m_animatedTextures.emplace_back(animatedTexture);
             texture = animatedTexture;
         } else {
             const auto& image = std::make_shared<Image>(imageSize, apng.bpp, apng.pdata);
-            texture = std::make_shared<Texture>(image, false, false, false);
+            texture = std::make_shared<Texture>(image, false, false);
         }
         free_apng(&apng);
     }

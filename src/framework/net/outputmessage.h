@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "declarations.h"
 #include <framework/luaengine/luaobject.h>
+#include "declarations.h"
 
  // @bindclass
 class OutputMessage : public LuaObject
@@ -67,7 +67,7 @@ protected:
     friend class Protocol;
 
 private:
-    bool canWrite(int bytes);
+    bool canWrite(int bytes) const;
     void checkWrite(int bytes);
 
     uint16_t m_headerPos{ MAX_HEADER_SIZE };

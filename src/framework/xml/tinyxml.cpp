@@ -493,7 +493,7 @@ std::string TiXmlElement::Attribute(const std::string_view name, int* i) const
 std::string TiXmlElement::Attribute(const std::string_view name, double* d) const
 {
     const TiXmlAttribute* attrib = attributeSet.Find(name);
-    std::string result = std::string();
+    auto result = std::string();
 
     if (attrib) {
         result = attrib->ValueStr();
@@ -1154,7 +1154,7 @@ void TiXmlAttributeSet::Add(TiXmlAttribute* addMe)
     sentinel.prev = addMe;
 }
 
-void TiXmlAttributeSet::Remove(TiXmlAttribute* removeMe)
+void TiXmlAttributeSet::Remove(TiXmlAttribute* removeMe) const
 {
     for (TiXmlAttribute* node = sentinel.next; node != &sentinel; node = node->next) {
         if (node == removeMe) {

@@ -21,10 +21,10 @@
  */
 
 #include "animatedtext.h"
-#include "game.h"
-#include "map.h"
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
+#include "game.h"
+#include "map.h"
 
 AnimatedText::AnimatedText()
 {
@@ -52,7 +52,7 @@ void AnimatedText::drawText(const Point& dest, const Rect& visibleRect)
     const Rect rect{ p, textSize };
 
     if (visibleRect.contains(rect)) {
-        const float t0 = tf / 1.2;
+        constexpr float t0 = tf / 1.2;
 
         Color color = m_color;
         if (t > t0) {
@@ -72,8 +72,7 @@ void AnimatedText::onAppear()
         textDuration /= 2;
 
     // schedule removal
-    auto self = asAnimatedText();
-    g_dispatcher.scheduleEvent([self] { g_map.removeThing(self); }, textDuration);
+    g_dispatcher.scheduleEvent([self = asAnimatedText()] { g_map.removeAnimatedText(self); }, textDuration);
 }
 
 bool AnimatedText::merge(const AnimatedTextPtr& other)

@@ -47,7 +47,7 @@ void UICreature::onStyleApply(const std::string_view styleName, const OTMLNodePt
 {
     UIWidget::onStyleApply(styleName, styleNode);
 
-    for (const OTMLNodePtr& node : styleNode->children()) {
+    for (const auto& node : styleNode->children()) {
         if (node->tag() == "fixed-creature-size")
             setFixedCreatureSize(node->value<bool>());
         else if (node->tag() == "outfit-id") {

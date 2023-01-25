@@ -21,10 +21,10 @@
  */
 
 #include "paintershaderprogram.h"
-#include "texture.h"
-#include "texturemanager.h"
 #include <framework/core/clock.h>
 #include <framework/platform/platformwindow.h>
+#include "texture.h"
+#include "texturemanager.h"
 
 PainterShaderProgram::PainterShaderProgram() :m_startTime(g_clock.seconds()) {}
 
@@ -153,16 +153,16 @@ void PainterShaderProgram::addMultiTexture(const std::string& file)
     texture->setSmooth(true);
     texture->setRepeat(true);
 
-    m_multiTextures.push_back(texture);
+    m_multiTextures.emplace_back(texture);
 }
 
-void PainterShaderProgram::bindMultiTextures()
+void PainterShaderProgram::bindMultiTextures() const
 {
     if (m_multiTextures.empty())
         return;
 
-    int i = 1;
-    for (const TexturePtr& tex : m_multiTextures) {
+    uint_fast8_t i = 1;
+    for (const auto& tex : m_multiTextures) {
         glActiveTexture(GL_TEXTURE0 + i++);
         glBindTexture(GL_TEXTURE_2D, tex->getId());
     }

@@ -23,8 +23,8 @@
 #include "luaobject.h"
 #include "luainterface.h"
 
-#include <framework/core/application.h>
 #include <typeinfo>
+#include <framework/core/application.h>
 
 LuaObject::LuaObject() :
     m_fieldsTableRef(-1)
@@ -38,7 +38,7 @@ LuaObject::~LuaObject()
     releaseLuaFieldsTable();
 }
 
-bool LuaObject::hasLuaField(const std::string_view field)
+bool LuaObject::hasLuaField(const std::string_view field) const
 {
     bool ret = false;
     if (m_fieldsTableRef != -1) {
@@ -78,7 +78,7 @@ void LuaObject::luaSetField(const std::string_view key)
     g_lua.pop(); // pop the fields table
 }
 
-void LuaObject::luaGetField(const std::string_view key)
+void LuaObject::luaGetField(const std::string_view key) const
 {
     if (m_fieldsTableRef != -1) {
         g_lua.getRef(m_fieldsTableRef); // push the obj's fields table
@@ -106,7 +106,7 @@ void LuaObject::luaGetMetatable()
     g_lua.getRef(metatableRef);
 }
 
-void LuaObject::luaGetFieldsTable()
+void LuaObject::luaGetFieldsTable() const
 {
     if (m_fieldsTableRef != -1)
         g_lua.getRef(m_fieldsTableRef);

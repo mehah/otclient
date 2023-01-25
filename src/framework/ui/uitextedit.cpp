@@ -104,17 +104,13 @@ void UITextEdit::drawSelf(DrawPoolType drawPane)
         constexpr int delay = 333;
         const ticks_t elapsed = g_clock.millis() - m_cursorTicks;
         if (elapsed <= delay) {
-            Rect cursorRect;
-            // when cursor is at 0
-            if (m_cursorPos == 0)
-                cursorRect = Rect(m_rect.left() + m_padding.left, m_rect.top() + m_padding.top, 1, m_font->getGlyphHeight());
-            else
-                cursorRect = Rect(m_glyphsCoords[m_cursorPos - 1].right(), m_glyphsCoords[m_cursorPos - 1].top(), 1, m_font->getGlyphHeight());
+            const auto& cursorRect = m_cursorPos > 0 ?
+                Rect(m_glyphsCoords[m_cursorPos - 1].right(), m_glyphsCoords[m_cursorPos - 1].top(), 1, m_font->getGlyphHeight())
+                :
+                Rect(m_rect.left() + m_padding.left, m_rect.top() + m_padding.top, 1, m_font->getGlyphHeight());
 
-            Color color = m_color;
-            if (hasSelection() && m_cursorPos >= m_selectionStart && m_cursorPos <= m_selectionEnd)
-                color = m_selectionColor;
-
+            const bool useSelectionColor = hasSelection() && m_cursorPos >= m_selectionStart && m_cursorPos <= m_selectionEnd;
+            const auto& color = useSelectionColor ? m_selectionColor : m_color;
             g_drawPool.addFilledRect(cursorRect, color);
         } else if (elapsed >= 2 * delay) {
             m_cursorTicks = g_clock.millis();
@@ -619,7 +615,7 @@ void UITextEdit::onStyleApply(const std::string_view styleName, const OTMLNodePt
 {
     UIWidget::onStyleApply(styleName, styleNode);
 
-    for (const OTMLNodePtr& node : styleNode->children()) {
+    for (const auto& node : styleNode->children()) {
         if (node->tag() == "text") {
             setText(node->value());
             setCursorPos(m_text.length());

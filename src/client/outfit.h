@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "thingtypemanager.h"
 #include <framework/util/color.h>
+#include "thingtypemanager.h"
 
 class Outfit
 {

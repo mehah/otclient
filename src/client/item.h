@@ -22,9 +22,9 @@
 
 #pragma once
 
+#include <framework/global.h>
 #include "effect.h"
 #include "thing.h"
-#include <framework/global.h>
 
 enum ItemAttr : uint8_t
 {
@@ -86,11 +86,9 @@ public:
     void setColor(const Color& c) { m_color = c; }
     void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false) override;
 
-    int getCountOrSubType() { return m_countOrSubType; }
+    int getCountOrSubType() const { return m_countOrSubType; }
     int getSubType();
     int getCount() { return isStackable() ? m_countOrSubType : 1; }
-    uint32_t getId() override { return m_clientId; }
-    uint16_t getClientId() { return m_clientId; }
 
     bool isValid() { return getThingType() != nullptr; }
 
@@ -152,7 +150,6 @@ public:
 private:
     void createBuffer();
 
-    uint16_t m_clientId{ 0 };
     uint8_t m_countOrSubType{ 0 };
 
     Color m_color{ Color::white };

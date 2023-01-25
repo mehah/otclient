@@ -48,7 +48,7 @@ void UIWidget::initBaseStyle()
 void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
 {
     // parse lua variables and callbacks first
-    for (const OTMLNodePtr& node : styleNode->children()) {
+    for (const auto& node : styleNode->children()) {
         // lua functions
         if (node->tag().starts_with("@")) {
             // load once
@@ -68,7 +68,7 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
         }
     }
     // load styles used by all widgets
-    for (const OTMLNodePtr& node : styleNode->children()) {
+    for (const auto& node : styleNode->children()) {
         if (node->tag() == "color")
             setColor(node->value<Color>());
         else if (node->tag() == "x")
@@ -329,7 +329,7 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
     }
 }
 
-void UIWidget::drawBackground(const Rect& screenCoords)
+void UIWidget::drawBackground(const Rect& screenCoords) const
 {
     if (m_backgroundColor.aF() > 0.0f) {
         Rect drawRect = screenCoords;
@@ -340,7 +340,7 @@ void UIWidget::drawBackground(const Rect& screenCoords)
     }
 }
 
-void UIWidget::drawBorder(const Rect& screenCoords)
+void UIWidget::drawBorder(const Rect& screenCoords) const
 {
     // top
     if (m_borderWidth.top > 0) {
@@ -364,7 +364,7 @@ void UIWidget::drawBorder(const Rect& screenCoords)
     }
 }
 
-void UIWidget::drawIcon(const Rect& screenCoords)
+void UIWidget::drawIcon(const Rect& screenCoords) const
 {
     if (!m_icon)
         return;

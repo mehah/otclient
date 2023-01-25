@@ -124,7 +124,7 @@ bool InputMessage::readChecksum()
     return receivedCheck == checksum;
 }
 
-bool InputMessage::canRead(int bytes)
+bool InputMessage::canRead(int bytes) const
 {
     if ((m_readPos - m_headerPos + bytes > m_messageSize) || (m_readPos + bytes > BUFFER_MAXSIZE))
         return false;

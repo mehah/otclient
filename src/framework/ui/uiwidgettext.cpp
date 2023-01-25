@@ -20,11 +20,11 @@
  * THE SOFTWARE.
  */
 
-#include "uitranslator.h"
-#include "uiwidget.h"
 #include <framework/core/graphicalapplication.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/fontmanager.h>
+#include "uitranslator.h"
+#include "uiwidget.h"
 
 void UIWidget::initText()
 {
@@ -70,7 +70,7 @@ void UIWidget::resizeToText()
 
 void UIWidget::parseTextStyle(const OTMLNodePtr& styleNode)
 {
-    for (const OTMLNodePtr& node : styleNode->children()) {
+    for (const auto& node : styleNode->children()) {
         if (node->tag() == "text")
             setText(node->value());
         else if (node->tag() == "text-align")
@@ -98,9 +98,10 @@ void UIWidget::drawText(const Rect& screenCoords)
         return;
 
     if (screenCoords != m_textCachedScreenCoords) {
+        m_textCachedScreenCoords = screenCoords;
+
         auto coords = Rect(screenCoords.topLeft(), screenCoords.bottomRight());
         coords.translate(m_textOffset);
-        m_textCachedScreenCoords = coords;
         m_font->fillTextCoords(m_coordsBuffer, m_text, m_textSize, m_textAlign, coords, m_glyphsPositionsCache);
     }
 

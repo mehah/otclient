@@ -36,7 +36,7 @@ public:
     bool canWalk(bool ignoreLock = false);
 
     void setStates(uint32_t states);
-    void setSkill(Otc::Skill skill, uint16_t level, uint16_t levelPercent);
+    void setSkill(Otc::Skill skillId, uint16_t level, uint16_t levelPercent);
     void setBaseSkill(Otc::Skill skill, uint16_t baseLevel);
     void setHealth(uint32_t health, uint32_t maxHealth);
     void setFreeCapacity(uint32_t freeCapacity);
@@ -106,7 +106,7 @@ public:
     bool isPreWalking() { return m_preWalking; }
     bool isAutoWalking() { return m_autoWalkDestination.isValid(); }
     bool isPremium() { return m_premium; }
-    bool isPendingGame() { return m_pending; }
+    bool isPendingGame() const { return m_pending; }
 
     LocalPlayerPtr asLocalPlayer() { return static_self_cast<LocalPlayer>(); }
     bool isLocalPlayer() override { return true; }
@@ -115,8 +115,6 @@ public:
 
 protected:
     void walk(const Position& oldPos, const Position& newPos) override;
-    void preWalk(Otc::Direction direction);
-    void cancelWalk(Otc::Direction direction = Otc::InvalidDirection);
     void stopWalk() override;
     void updateWalk(const bool /*isPreWalking*/ = false) override { Creature::updateWalk(m_preWalking); }
     void updateWalkOffset(uint8_t totalPixelsWalked) override;
@@ -125,14 +123,19 @@ protected:
     friend class Game;
 
 private:
+
     struct Skill
     {
         uint16_t level{ 0 };
         uint16_t baseLevel{ 0 };
         uint16_t levelPercent{ 0 };
     };
+    void preWalk(Otc::Direction direction);
+    void cancelWalk(Otc::Direction direction = Otc::InvalidDirection);
 
     bool retryAutoWalk();
+
+    bool m_forceWalk{ false };
 
     // walk related
     Position m_lastPrewalkDestination;

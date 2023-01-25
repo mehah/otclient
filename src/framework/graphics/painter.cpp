@@ -51,23 +51,13 @@ Painter::Painter()
     m_drawSolidColorProgram->link();
 
     PainterShaderProgram::release();
-}
 
-void Painter::bind()
-{
     refreshState();
 
     // vertex and texture coord attributes are always enabled
     // to avoid massive enable/disables, thus improving frame rate
     PainterShaderProgram::enableAttributeArray(PainterShaderProgram::VERTEX_ATTR);
     PainterShaderProgram::enableAttributeArray(PainterShaderProgram::TEXCOORD_ATTR);
-}
-
-void Painter::unbind()
-{
-    PainterShaderProgram::disableAttributeArray(PainterShaderProgram::VERTEX_ATTR);
-    PainterShaderProgram::disableAttributeArray(PainterShaderProgram::TEXCOORD_ATTR);
-    PainterShaderProgram::release();
 }
 
 void Painter::drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode)
@@ -88,10 +78,6 @@ void Painter::drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode)
     m_drawProgram->bind();
     m_drawProgram->setTransformMatrix(m_transformMatrix);
     m_drawProgram->setProjectionMatrix(m_projectionMatrix);
-    if (textured) {
-        m_drawProgram->setTextureMatrix(m_textureMatrix);
-        m_drawProgram->bindMultiTextures();
-    }
     m_drawProgram->setOpacity(m_opacity);
     m_drawProgram->setColor(m_color);
     m_drawProgram->setResolution(m_resolution);
@@ -102,7 +88,10 @@ void Painter::drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode)
     // only set texture coords arrays when needed
     {
         if (textured) {
-            auto* hardwareBuffer = coordsBuffer.getHardwareTextureCoordCache();
+            m_drawProgram->setTextureMatrix(m_textureMatrix);
+            m_drawProgram->bindMultiTextures();
+
+            const auto* hardwareBuffer = coordsBuffer.getHardwareTextureCoordCache();
             if (hardwareBuffer)
                 hardwareBuffer->bind();
 
@@ -113,7 +102,7 @@ void Painter::drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode)
 
     // set vertex array
     {
-        auto* hardwareBuffer = coordsBuffer.getHardwareVertexCache();
+        const auto* hardwareBuffer = coordsBuffer.getHardwareVertexCache();
         if (hardwareBuffer)
             hardwareBuffer->bind();
 
@@ -142,8 +131,7 @@ void Painter::resetState()
     resetTransformMatrix();
 }
 
-void Painter::refreshState()
-{
+void Painter::refreshState() const {
     updateGlViewport();
     updateGlCompositionMode();
     updateGlBlendEquation();
@@ -160,7 +148,7 @@ void Painter::clear(const Color& color)
 
 void Painter::clearRect(const Color& color, const Rect& rect)
 {
-    const Rect oldClipRect = m_clipRect;
+    const auto& oldClipRect = m_clipRect;
     setClipRect(rect);
     glClearColor(color.rF(), color.gF(), color.bF(), color.aF());
     glClear(GL_COLOR_BUFFER_BIT);
@@ -229,7 +217,7 @@ void Painter::setResolution(const Size& resolution, const Matrix3& projectionMat
     updateGlViewport();
 }
 
-Matrix3 Painter::getTransformMatrix(const Size& resolution)
+Matrix3 Painter::getTransformMatrix(const Size& resolution) const
 {
     // The projection matrix converts from Painter's coordinate system to GL's coordinate system
     //    * GL's viewport is 2x2, Painter's is width x height
@@ -249,7 +237,7 @@ Matrix3 Painter::getTransformMatrix(const Size& resolution)
                                  -1.0f,  1.0f,                       1.0f };
 }
 
-void Painter::updateGlCompositionMode()
+void Painter::updateGlCompositionMode() const
 {
     switch (m_compositionMode) {
         case CompositionMode::NORMAL:
@@ -273,7 +261,7 @@ void Painter::updateGlCompositionMode()
     }
 }
 
-void Painter::updateGlClipRect()
+void Painter::updateGlClipRect() const
 {
     if (m_clipRect.isValid()) {
         glEnable(GL_SCISSOR_TEST);
@@ -283,7 +271,7 @@ void Painter::updateGlClipRect()
         glDisable(GL_SCISSOR_TEST);
     }
 }
-void Painter::updateGlTexture() { if (m_glTextureId != 0) glBindTexture(GL_TEXTURE_2D, m_glTextureId); }
-void Painter::updateGlBlendEquation() { glBlendEquation(static_cast<GLenum>(m_blendEquation)); }
-void Painter::updateGlAlphaWriting() { glColorMask(1, 1, 1, m_alphaWriting); }
-void Painter::updateGlViewport() { glViewport(0, 0, m_resolution.width(), m_resolution.height()); }
+void Painter::updateGlTexture() const { if (m_glTextureId != 0) glBindTexture(GL_TEXTURE_2D, m_glTextureId); }
+void Painter::updateGlBlendEquation() const { glBlendEquation(static_cast<GLenum>(m_blendEquation)); }
+void Painter::updateGlAlphaWriting() const { glColorMask(1, 1, 1, m_alphaWriting); }
+void Painter::updateGlViewport() const { glViewport(0, 0, m_resolution.width(), m_resolution.height()); }

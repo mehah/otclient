@@ -22,15 +22,15 @@
 
 #pragma once
 
-#include "texture.h"
 #include <framework/core/declarations.h>
+#include "texture.h"
 
 class TextureManager
 {
 public:
     void init();
     void terminate();
-    void poll();
+    void poll() const;
 
     void clearCache();
     void liveReload();

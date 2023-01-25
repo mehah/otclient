@@ -36,7 +36,7 @@ public:
     bool load(const std::string& file);
     bool unload();
     bool save();
-    void clear();
+    void clear() const;
 
     void setValue(const std::string& key, const std::string& value);
     void setList(const std::string& key, const std::vector<std::string>& list);
@@ -51,7 +51,7 @@ public:
     void remove(const std::string& key);
 
     std::string getFileName();
-    bool isLoaded();
+    bool isLoaded() const;
 
     // @dontbind
     ConfigPtr asConfig() { return static_self_cast<Config>(); }

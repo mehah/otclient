@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include <framework/global.h>
-#include <asio/ip/tcp.hpp>
 #include <asio/io_service.hpp>
 #include <asio/write.hpp>
+#include <asio/ip/tcp.hpp>
+#include <framework/global.h>
 
 class InputMessage;
 class OutputMessage;

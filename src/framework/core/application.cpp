@@ -21,7 +21,6 @@
  */
 
 #include "application.h"
-#include "asyncdispatcher.h"
 #include <csignal>
 #include <framework/core/configmanager.h>
 #include <framework/core/eventdispatcher.h>
@@ -30,6 +29,7 @@
 #include <framework/luaengine/luainterface.h>
 #include <framework/platform/crashhandler.h>
 #include <framework/platform/platform.h>
+#include "asyncdispatcher.h"
 
 #include <gitinfo.h>
 

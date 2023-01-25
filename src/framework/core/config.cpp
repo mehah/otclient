@@ -66,7 +66,7 @@ bool Config::save()
     return m_confsDoc->save(m_fileName);
 }
 
-void Config::clear()
+void Config::clear() const
 {
     m_confsDoc->clear();
 }
@@ -112,7 +112,7 @@ std::vector<std::string> Config::getList(const std::string& key)
     std::vector<std::string> list;
     if (const auto& child = m_confsDoc->get(key); child) {
         for (const auto& subchild : child->children())
-            list.push_back(subchild->value());
+            list.emplace_back(subchild->value());
     }
     return list;
 }
@@ -143,7 +143,7 @@ OTMLNodePtr Config::getNode(const std::string& key)
     return m_confsDoc->get(key);
 }
 
-bool Config::isLoaded()
+bool Config::isLoaded() const
 {
     return !m_fileName.empty() && m_confsDoc;
 }

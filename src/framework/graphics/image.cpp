@@ -35,7 +35,7 @@ Image::Image(const Size& size, int bpp, uint8_t* pixels) : m_size(size), m_bpp(b
         memcpy(&m_pixels[0], pixels, m_pixels.size());
 }
 
-ImagePtr Image::load(std::string file)
+ImagePtr Image::load(const std::string& file)
 {
     const auto& path = g_resources.guessFilePath(file, "png");
     try {

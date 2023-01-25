@@ -23,9 +23,9 @@
 #include "graphics.h"
 #include "fontmanager.h"
 
+#include <framework/platform/platformwindow.h>
 #include "framebuffermanager.h"
 #include "texturemanager.h"
-#include <framework/platform/platformwindow.h>
 
 Graphics g_graphics;
 
@@ -48,7 +48,8 @@ void Graphics::init()
 
 #ifndef OPENGL_ES
     // init GL extensions
-    if (const GLenum err = glewInit(); err != GLEW_OK)
+    const GLenum err = glewInit();
+    if (err != GLEW_OK)
         g_logger.fatal(stdext::format("Unable to init GLEW: %s", glewGetErrorString(err)));
 
     // overwrite framebuffer API if needed
@@ -77,7 +78,6 @@ void Graphics::init()
     m_ok = true;
 
     g_painter = new Painter;
-    g_painter->bind();
 
     g_textures.init();
     g_framebuffers.init();
@@ -95,8 +95,4 @@ void Graphics::terminate()
     m_ok = false;
 }
 
-void Graphics::resize(const Size& size)
-{
-    m_viewportSize = size;
-    g_painter->setResolution(size);
-}
+void Graphics::resize(const Size& size) { g_painter->setResolution(m_viewportSize = size); }

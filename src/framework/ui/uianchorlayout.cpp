@@ -102,7 +102,7 @@ void UIAnchorGroup::addAnchor(const UIAnchorPtr& anchor)
             return;
         }
     }
-    m_anchors.push_back(anchor);
+    m_anchors.emplace_back(anchor);
 }
 
 void UIAnchorLayout::addAnchor(const UIWidgetPtr& anchoredWidget, Fw::AnchorEdge anchoredEdge,
@@ -113,12 +113,11 @@ void UIAnchorLayout::addAnchor(const UIWidgetPtr& anchoredWidget, Fw::AnchorEdge
 
     assert(anchoredWidget != getParentWidget());
 
-    const auto& anchor = std::make_shared<UIAnchor>(anchoredEdge, hookedWidgetId, hookedEdge);
     auto& anchorGroup = m_anchorsGroups[anchoredWidget];
     if (!anchorGroup)
         anchorGroup = std::make_shared<UIAnchorGroup>();
 
-    anchorGroup->addAnchor(anchor);
+    anchorGroup->addAnchor(std::make_shared<UIAnchor>(anchoredEdge, hookedWidgetId, hookedEdge));
 
     // layout must be updated because a new anchor got in
     update();
@@ -130,7 +129,7 @@ void UIAnchorLayout::removeAnchors(const UIWidgetPtr& anchoredWidget)
     update();
 }
 
-bool UIAnchorLayout::hasAnchors(const UIWidgetPtr& anchoredWidget)
+bool UIAnchorLayout::hasAnchors(const UIWidgetPtr& anchoredWidget) const
 {
     return m_anchorsGroups.contains(anchoredWidget);
 }
@@ -161,7 +160,7 @@ void UIAnchorLayout::removeWidget(const UIWidgetPtr& widget)
 
 bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroupPtr& anchorGroup, UIWidgetPtr first)
 {
-    const UIWidgetPtr& parentWidget = getParentWidget();
+    const auto& parentWidget = getParentWidget();
     if (!parentWidget)
         return false;
 
@@ -178,13 +177,13 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
     bool horizontalMoved = false;
 
     // calculates new rect based on anchors
-    for (const UIAnchorPtr& anchor : anchorGroup->getAnchors()) {
+    for (const auto& anchor : anchorGroup->getAnchors()) {
         // skip invalid anchors
         if (anchor->getHookedEdge() == Fw::AnchorNone)
             continue;
 
         // determine hooked widget
-        const UIWidgetPtr& hookedWidget = anchor->getHookedWidget(widget, parentWidget);
+        const auto& hookedWidget = anchor->getHookedWidget(widget, parentWidget);
 
         // skip invalid anchors
         if (!hookedWidget)
@@ -194,14 +193,13 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
             // update this hooked widget anchors
             auto it = m_anchorsGroups.find(hookedWidget);
             if (it != m_anchorsGroups.end()) {
-                const UIAnchorGroupPtr& hookedAnchorGroup = it->second;
+                const auto& hookedAnchorGroup = it->second;
                 if (!hookedAnchorGroup->isUpdated())
                     updateWidget(hookedWidget, hookedAnchorGroup, first);
             }
         }
 
         const int point = anchor->getHookedPoint(hookedWidget, parentWidget);
-
         switch (anchor->getAnchoredEdge()) {
             case Fw::AnchorHorizontalCenter:
                 newRect.moveHorizontalCenter(point + widget->getMarginLeft() - widget->getMarginRight());
@@ -244,29 +242,25 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
         }
     }
 
-    bool changed = false;
-    if (widget->setRect(newRect))
-        changed = true;
     anchorGroup->setUpdated(true);
-    return changed;
+    return widget->setRect(newRect);
 }
 
 bool UIAnchorLayout::internalUpdate()
 {
-    bool changed = false;
-
     // reset all anchors groups update state
-    for (auto& it : m_anchorsGroups) {
-        const UIAnchorGroupPtr& anchorGroup = it.second;
-        anchorGroup->setUpdated(false);
-    }
+    for (auto& it : m_anchorsGroups)
+        it.second->setUpdated(false);
+
+    bool changed = false;
 
     // update all anchors
     for (const auto& [widget, anchorGroup] : m_anchorsGroups) {
-        if (!anchorGroup->isUpdated()) {
-            if (updateWidget(widget, anchorGroup))
-                changed = true;
-        }
+        if (anchorGroup->isUpdated())
+            continue;
+
+        if (updateWidget(widget, anchorGroup))
+            changed = true;
     }
 
     return changed;

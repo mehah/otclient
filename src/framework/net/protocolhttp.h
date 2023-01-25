@@ -30,8 +30,8 @@
 #include <asio.hpp>
 #include <asio/ssl.hpp>
 
-#include <zlib.h>
 #include <random>
+#include <zlib.h>
 
  //  result
 class HttpSession;
@@ -66,7 +66,7 @@ public:
     HttpSession(asio::io_service& service, const std::string& url, const std::string& agent,
                 const bool& enable_time_out_on_read_write,
                 const stdext::map<std::string, std::string>& custom_header,
-                int timeout, bool isJson, HttpResult_ptr result, HttpResult_cb callback) :
+                int timeout, bool isJson, const HttpResult_ptr& result, HttpResult_cb callback) :
         m_service(service),
         m_url(url),
         m_agent(agent),
@@ -75,7 +75,7 @@ public:
         m_timeout(timeout),
         m_isJson(isJson),
         m_result(result),
-        m_callback(callback),
+        m_callback(std::move(callback)),
         m_socket(service),
         m_resolver(service),
         m_timer(service)
@@ -84,7 +84,7 @@ public:
         assert(m_result != nullptr);
     };
     void start();
-    void cancel() { onError("canceled"); }
+    void cancel() const { onError("canceled"); }
     void close();
 
 private:
@@ -120,7 +120,7 @@ private:
     void on_read(const std::error_code& ec, size_t bytes_transferred);
 
     void onTimeout(const std::error_code& ec);
-    void onError(const std::string& ec, const std::string& details = "");
+    void onError(const std::string& ec, const std::string& details = "") const;
 };
 
 //  web socket
@@ -163,7 +163,7 @@ private:
     asio::steady_timer m_timer;
     asio::ip::tcp::socket m_socket;
     asio::ip::tcp::resolver m_resolver;
-    bool m_closed;
+    bool m_closed{ false };
     ParsedURI instance_uri;
 
     asio::ssl::context m_context{ asio::ssl::context::tlsv12_client };
@@ -210,7 +210,7 @@ public:
     {
         if (!path.empty() && path[0] == '/')
             path = path.substr(1);
-        auto it = m_downloads.find(path);
+        const auto it = m_downloads.find(path);
         if (it == m_downloads.end())
             return nullptr;
         return it->second;

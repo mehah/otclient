@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "declarations.h"
 #include <framework/core/inputevent.h>
 #include <framework/otml/declarations.h>
+#include "declarations.h"
 
  //@bindsingleton g_ui
 class UIManager
@@ -33,8 +33,8 @@ public:
     void init();
     void terminate();
 
-    void render(DrawPoolType drawPane);
-    void resize(const Size& size);
+    void render(DrawPoolType drawPane) const;
+    void resize(const Size& size) const;
     void inputEvent(const InputEvent& event);
 
     void updatePressedWidget(const UIWidgetPtr& newPressedWidget, const Point& clickedPos = {}, bool fireClicks = true);
@@ -42,9 +42,9 @@ public:
     void updateHoveredWidget(bool now = false);
 
     void clearStyles();
-    bool importStyle(const std::string& file);
+    bool importStyle(const std::string& fl);
     void importStyleFromOTML(const OTMLNodePtr& styleNode);
-    OTMLNodePtr getStyle(const std::string_view styleName);
+    OTMLNodePtr getStyle(const std::string_view sn);
     std::string getStyleClass(const std::string_view styleName);
 
     UIWidgetPtr loadUI(const std::string& file, const UIWidgetPtr& parent);

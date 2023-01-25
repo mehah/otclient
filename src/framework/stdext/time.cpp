@@ -42,7 +42,7 @@ namespace stdext
         return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - startup_time).count();
     }
 
-    void microsleep(size_t us) { std::this_thread::sleep_for(std::chrono::microseconds(us)); };
+    void microsleep(size_t us) { std::this_thread::sleep_for(std::chrono::microseconds(us)); }
 
-    void millisleep(size_t ms) { std::this_thread::sleep_for(std::chrono::milliseconds(ms)); };
+    void millisleep(size_t ms) { std::this_thread::sleep_for(std::chrono::milliseconds(ms)); }
 }

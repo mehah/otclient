@@ -121,7 +121,7 @@ void OutputMessage::writeMessageSize()
     m_messageSize += 2;
 }
 
-bool OutputMessage::canWrite(int bytes)
+bool OutputMessage::canWrite(int bytes) const
 {
     return m_writePos + bytes <= BUFFER_MAXSIZE;
 }

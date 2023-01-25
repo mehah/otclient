@@ -23,8 +23,8 @@
 #include "framework/core/graphicalapplication.h"
 #if defined(WIN32) && defined(CRASH_HANDLER)
 
-#include "crashhandler.h"
 #include <framework/global.h>
+#include "crashhandler.h"
 
 #include <windows.h>
 #include <winsock2.h>
@@ -111,7 +111,7 @@ void Stacktrace(LPEXCEPTION_POINTERS e, std::stringstream& ss)
 
         dwModBase = SymGetModuleBase(process, sf.AddrPC.Offset);
         if (dwModBase)
-            GetModuleFileName((HINSTANCE)dwModBase, modname, MAX_PATH);
+            GetModuleFileName(reinterpret_cast<HINSTANCE>(dwModBase), modname, MAX_PATH);
         else
             strcpy(modname, "Unknown");
 

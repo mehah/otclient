@@ -35,9 +35,8 @@ namespace stdext
 {
     std::string resolve_path(const std::string_view filePath, std::string_view sourcePath)
     {
-        const std::string _filePath(filePath);
-        if (_filePath.starts_with("/"))
-            return _filePath;
+        if (filePath.starts_with("/"))
+            return filePath.data();
 
         std::string _sourcePath(sourcePath);
         if (!sourcePath.ends_with("/")) {
@@ -46,7 +45,7 @@ namespace stdext
                 throw Exception("invalid source path '%s', for file '%s'", sourcePath, filePath);
             _sourcePath = sourcePath.substr(0, slashPos + 1);
         }
-        return _sourcePath + _filePath;
+        return _sourcePath + filePath.data();
     }
 
     std::string date_time_string(const char* format/* = "%b %d %Y %H:%M:%S"*/)

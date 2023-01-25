@@ -23,8 +23,8 @@
 #include "uiprogressrect.h"
 #include <framework/graphics/fontmanager.h>
 
-#include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/drawpool.h"
+#include "framework/graphics/drawpoolmanager.h"
 
 void UIProgressRect::drawSelf(DrawPoolType drawPane)
 {
@@ -85,7 +85,7 @@ void UIProgressRect::onStyleApply(const std::string_view styleName, const OTMLNo
 {
     UIWidget::onStyleApply(styleName, styleNode);
 
-    for (const OTMLNodePtr& node : styleNode->children()) {
+    for (const auto& node : styleNode->children()) {
         if (node->tag() == "percent")
             setPercent(node->value<float>());
     }

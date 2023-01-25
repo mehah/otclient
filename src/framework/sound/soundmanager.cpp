@@ -20,10 +20,10 @@
  * THE SOFTWARE.
  */
 
+#include "soundmanager.h"
 #include "combinedsoundsource.h"
 #include "soundbuffer.h"
 #include "soundfile.h"
-#include "soundmanager.h"
 #include "soundsource.h"
 #include "streamsoundsource.h"
 
@@ -143,7 +143,7 @@ void SoundManager::setAudioEnabled(bool enable)
     m_audioEnabled = enable;
     if (!enable) {
         ensureContext();
-        for (const SoundSourcePtr& source : m_sources) {
+        for (const auto& source : m_sources) {
             source->stop();
         }
     }
@@ -199,7 +199,7 @@ SoundSourcePtr SoundManager::play(const std::string& fn, float fadetime, float g
 
     soundSource->play();
 
-    m_sources.push_back(soundSource);
+    m_sources.emplace_back(soundSource);
 
     return soundSource;
 }
@@ -215,7 +215,7 @@ SoundChannelPtr SoundManager::getChannel(int channel)
 void SoundManager::stopAll()
 {
     ensureContext();
-    for (const SoundSourcePtr& source : m_sources) {
+    for (const auto& source : m_sources) {
         source->stop();
     }
 
@@ -299,7 +299,7 @@ std::string SoundManager::resolveSoundFile(const std::string& file)
     return _file;
 }
 
-void SoundManager::ensureContext()
+void SoundManager::ensureContext() const
 {
     if (m_context)
         alcMakeContextCurrent(m_context);

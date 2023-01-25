@@ -21,15 +21,15 @@
  */
 
 #include "tile.h"
+#include <framework/core/eventdispatcher.h>
+#include <framework/core/graphicalapplication.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include "effect.h"
 #include "game.h"
 #include "item.h"
 #include "lightview.h"
 #include "map.h"
 #include "protocolgame.h"
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/graphicalapplication.h>
-#include <framework/graphics/drawpoolmanager.h>
 
 Tile::Tile(const Position& position) : m_position(position) {}
 
@@ -117,7 +117,7 @@ void Tile::drawTop(const Point& dest, int flags, bool forceDraw, LightView* ligh
 
         if (g_game.getFeature(Otc::GameMapOldEffectRendering)) {
             offsetX = m_position.x - g_map.getCentralPosition().x;
-            offsetX = m_position.y - g_map.getCentralPosition().y;
+            offsetY = m_position.y - g_map.getCentralPosition().y;
         }
 
         for (const auto& effect : m_effects) {
@@ -149,7 +149,7 @@ void Tile::clean()
 
 void Tile::addWalkingCreature(const CreaturePtr& creature)
 {
-    m_walkingCreatures.push_back(creature);
+    m_walkingCreatures.emplace_back(creature);
     setThingFlag(creature);
 }
 
@@ -189,7 +189,7 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
         if (newEffect->isTopEffect())
             m_effects.insert(m_effects.begin(), newEffect);
         else
-            m_effects.push_back(newEffect);
+            m_effects.emplace_back(newEffect);
 
         setThingFlag(thing);
 
@@ -264,7 +264,7 @@ bool Tile::removeThing(const ThingPtr thing)
     if (!thing) return false;
 
     if (thing->isEffect()) {
-        const EffectPtr& effect = thing->static_self_cast<Effect>();
+        const auto& effect = thing->static_self_cast<Effect>();
         const auto it = std::find(m_effects.begin(), m_effects.end(), effect);
         if (it == m_effects.end())
             return false;
@@ -304,7 +304,7 @@ std::vector<CreaturePtr> Tile::getCreatures()
     if (hasCreature()) {
         for (const auto& thing : m_things) {
             if (thing->isCreature())
-                creatures.push_back(thing->static_self_cast<Creature>());
+                creatures.emplace_back(thing->static_self_cast<Creature>());
         }
     }
 
@@ -344,12 +344,12 @@ std::vector<ItemPtr> Tile::getItems()
         if (!thing->isItem())
             continue;
 
-        items.push_back(thing->static_self_cast<Item>());
+        items.emplace_back(thing->static_self_cast<Item>());
     }
     return items;
 }
 
-EffectPtr Tile::getEffect(uint16_t id)
+EffectPtr Tile::getEffect(uint16_t id) const
 {
     for (const EffectPtr& effect : m_effects)
         if (effect->getId() == id)
@@ -477,7 +477,7 @@ ThingPtr Tile::getTopMultiUseThing()
     if (isEmpty())
         return nullptr;
 
-    if (const CreaturePtr& topCreature = getTopCreature())
+    if (const auto& topCreature = getTopCreature())
         return topCreature;
 
     for (const auto& thing : m_things) {
@@ -608,7 +608,7 @@ void Tile::onAddInMapView()
                 const TilePtr& tile = g_map.getTile(m_position.translated(x, y));
                 if (tile && (tile->hasCreature() || tile->hasEffect() || tile->hasTopItem())) {
                     tile->m_drawTopAndCreature = false;
-                    m_tilesRedraw.push_back(tile);
+                    m_tilesRedraw.emplace_back(tile);
                 }
             }
         }
@@ -628,7 +628,7 @@ bool Tile::canShade(const MapViewPtr& mapView)
     return isFullyOpaque() || hasTopGround(true) || isFullGround();
 }
 
-bool Tile::hasBlockingCreature()
+bool Tile::hasBlockingCreature() const
 {
     for (const auto& thing : m_things)
         if (thing->isCreature() && !thing->static_self_cast<Creature>()->isPassable() && !thing->isLocalPlayer())
@@ -767,7 +767,7 @@ void Tile::setThingFlag(const ThingPtr& thing)
 void Tile::select(TileSelectType selectType)
 {
     if (selectType == TileSelectType::NO_FILTERED) {
-        if (const CreaturePtr& topCreature = getTopCreature())
+        if (const auto& topCreature = getTopCreature())
             m_highlightThingId = topCreature->getThingType()->getId();
 
         if (!m_highlightThingId)
@@ -785,7 +785,7 @@ void Tile::unselect()
     m_selectType = TileSelectType::NONE;
 }
 
-bool Tile::canRender(uint32_t& flags, const Position& cameraPosition, const AwareRange viewPort, LightView* lightView)
+bool Tile::canRender(uint32_t& flags, const Position& cameraPosition, const AwareRange viewPort)
 {
     const int8_t dz = m_position.z - cameraPosition.z;
     const Position checkPos = m_position.translated(dz, dz);

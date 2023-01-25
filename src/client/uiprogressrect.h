@@ -22,9 +22,9 @@
 
 #pragma once
 
+#include <framework/ui/uiwidget.h>
 #include "declarations.h"
 #include "item.h"
-#include <framework/ui/uiwidget.h>
 
 class UIProgressRect : public UIWidget
 {

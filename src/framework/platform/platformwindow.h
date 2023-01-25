@@ -22,9 +22,9 @@
 
 #pragma once
 
+#include <framework/global.h>
 #include <framework/core/inputevent.h>
 #include <framework/core/timer.h>
-#include <framework/global.h>
 #include <framework/graphics/declarations.h>
 
  //@bindsingleton g_window
@@ -84,7 +84,8 @@ public:
     int getKeyboardModifiers() { return m_inputEvent.keyboardModifiers; }
 
     bool isKeyPressed(Fw::Key keyCode) { return m_keysState[keyCode]; }
-    bool isMouseButtonPressed(Fw::MouseButton mouseButton) { if (mouseButton == Fw::MouseNoButton) return m_mouseButtonStates != 0; return (m_mouseButtonStates & mouseButton) == mouseButton; }
+    bool isMouseButtonPressed(Fw::MouseButton mouseButton)
+    { if (mouseButton == Fw::MouseNoButton) return m_mouseButtonStates != 0; return (m_mouseButtonStates & mouseButton) == mouseButton; }
     bool isVisible() { return m_visible; }
     bool isMaximized() { return m_maximized; }
     bool isFullscreen() { return m_fullscreen; }

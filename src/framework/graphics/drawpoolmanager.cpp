@@ -36,7 +36,7 @@ void DrawPoolManager::init()
     }
 }
 
-void DrawPoolManager::terminate()
+void DrawPoolManager::terminate() const
 {
     // Destroy Pools
     for (int_fast8_t i = -1; ++i <= static_cast<uint8_t>(DrawPoolType::UNKNOW);) {
@@ -44,7 +44,7 @@ void DrawPoolManager::terminate()
     }
 }
 
-DrawPool* DrawPoolManager::getCurrentPool() { return m_pools[CURRENT_POOL]; }
+DrawPool* DrawPoolManager::getCurrentPool() const { return m_pools[CURRENT_POOL]; }
 void DrawPoolManager::select(DrawPoolType type) { CURRENT_POOL = static_cast<uint8_t>(type); }
 
 void DrawPoolManager::draw()
@@ -67,7 +67,9 @@ void DrawPoolManager::draw()
         std::scoped_lock l(mutex);
 
         if (pool->hasFrameBuffer()) {
-            auto* pf = pool->toPoolFramed();
+            const auto* pf = pool->toPoolFramed();
+            if (!pf->m_framebuffer->canDraw())
+                continue;
 
             if (pool->canRepaint(true)) {
                 pf->m_framebuffer->bind();
@@ -104,22 +106,12 @@ void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)
 
     if (useGlobalCoord) {
         buffer.clear();
-
-        if (obj.methods.empty()) {
-            DrawPool::addCoords(obj.method, buffer, obj.drawMode);
-        } else for (const auto& method : obj.methods) {
-            DrawPool::addCoords(method, buffer, obj.drawMode);
-        }
+        for (const auto& method : obj.methods)
+            DrawPool::addCoords(&buffer, method, obj.drawMode);
     }
 
     { // Set DrawState
         const auto& state = obj.state;
-
-        if (state.texture) {
-            state.texture->create();
-            g_painter->setTexture(state.texture.get());
-        }
-
         g_painter->setColor(state.color);
         g_painter->setOpacity(state.opacity);
         g_painter->setCompositionMode(state.compositionMode);
@@ -128,98 +120,91 @@ void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)
         g_painter->setShaderProgram(state.shaderProgram);
         g_painter->setTransformMatrix(state.transformMatrix);
         if (state.action) state.action();
+        if (state.texture)
+            g_painter->setTexture(state.texture->create());
     }
 
     g_painter->drawCoords(buffer, obj.drawMode);
 }
 
-void DrawPoolManager::addTexturedCoordsBuffer(const TexturePtr& texture, const CoordsBufferPtr& coords, const Color& color)
+void DrawPoolManager::addTexturedCoordsBuffer(const TexturePtr& texture, const CoordsBufferPtr& coords, const Color& color) const
 {
-    getCurrentPool()->add(color, texture, {}, DrawMode::TRIANGLE_STRIP, nullptr, coords);
+    DrawPool::DrawMethod method;
+    getCurrentPool()->add(color, texture, method, DrawMode::TRIANGLE_STRIP, nullptr, coords);
 }
 
-void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Color& color)
-{
-    addTexturedRect(dest, texture, Rect(Point(), texture->getSize()), color);
-}
-
-void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const Point& originalDest, const DrawBufferPtr& buffer)
+void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const DrawBufferPtr& buffer) const
 {
     if (dest.isEmpty() || src.isEmpty())
         return;
 
-    const DrawPool::DrawMethod method{
+    DrawPool::DrawMethod method{
         .type = DrawPool::DrawMethodType::RECT,
-        .rects = std::make_pair(dest, src),
-        .dest = originalDest
+        .dest = dest, .src = src
     };
-
-    if (buffer)
-        buffer->validate(originalDest);
 
     getCurrentPool()->add(color, texture, method, DrawMode::TRIANGLE_STRIP, buffer);
 }
 
-void DrawPoolManager::addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color)
+void DrawPoolManager::addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color) const
 {
     if (dest.isEmpty() || src.isEmpty())
         return;
 
-    const DrawPool::DrawMethod method{ DrawPool::DrawMethodType::UPSIDEDOWN_RECT, std::make_pair(dest, src) };
+    DrawPool::DrawMethod method{ DrawPool::DrawMethodType::UPSIDEDOWN_RECT, dest, src };
 
     getCurrentPool()->add(color, texture, method, DrawMode::TRIANGLE_STRIP);
 }
 
-void DrawPoolManager::addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color)
+void DrawPoolManager::addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color) const
 {
     if (dest.isEmpty() || src.isEmpty())
         return;
 
-    const DrawPool::DrawMethod method{ DrawPool::DrawMethodType::REPEATED_RECT, std::make_pair(dest, src) };
+    DrawPool::DrawMethod method{ DrawPool::DrawMethodType::REPEATED_RECT, dest, src };
 
     getCurrentPool()->add(color, texture, method);
 }
 
-void DrawPoolManager::addFilledRect(const Rect& dest, const Color& color, const DrawBufferPtr& buffer)
+void DrawPoolManager::addFilledRect(const Rect& dest, const Color& color, const DrawBufferPtr& buffer) const
 {
     if (dest.isEmpty())
         return;
 
-    const DrawPool::DrawMethod method{ DrawPool::DrawMethodType::RECT, std::make_pair(dest, Rect()) };
+    DrawPool::DrawMethod method{ DrawPool::DrawMethodType::RECT, dest };
 
     getCurrentPool()->add(color, nullptr, method, DrawMode::TRIANGLES, buffer);
 }
 
-void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color)
+void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color) const
 {
     if (a == b || a == c || b == c)
         return;
 
-    const DrawPool::DrawMethod method{ .type = DrawPool::DrawMethodType::TRIANGLE, .points = std::make_tuple(a, b, c) };
+    DrawPool::DrawMethod method{ .type = DrawPool::DrawMethodType::TRIANGLE, .a = a, .b = b, .c = c };
 
     getCurrentPool()->add(color, nullptr, method);
 }
 
-void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, int innerLineWidth)
+void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, int innerLineWidth) const
 {
     if (dest.isEmpty() || innerLineWidth == 0)
         return;
 
-    const DrawPool::DrawMethod method{
+    DrawPool::DrawMethod method{
         .type = DrawPool::DrawMethodType::BOUNDING_RECT,
-        .rects = std::make_pair(dest, Rect()),
+        .dest = dest,
         .intValue = static_cast<uint16_t>(innerLineWidth)
     };
 
     getCurrentPool()->add(color, nullptr, method);
 }
 
-void DrawPoolManager::addAction(std::function<void()> action)
+void DrawPoolManager::addAction(const std::function<void()>& action) const
 {
     getCurrentPool()->m_objects[0][static_cast<uint8_t>(DrawPool::DrawOrder::FIRST)].emplace_back(action);
 }
 
-void DrawPoolManager::use(const DrawPoolType type) { use(type, {}, {}); }
 void DrawPoolManager::use(const DrawPoolType type, const Rect& dest, const Rect& src, const Color& colorClear)
 {
     select(type);

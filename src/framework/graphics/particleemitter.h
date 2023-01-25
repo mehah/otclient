@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "declarations.h"
 #include <framework/global.h>
 #include <framework/otml/otml.h>
+#include "declarations.h"
 
 class ParticleEmitter
 {
@@ -34,7 +34,7 @@ public:
 
     void update(float elapsedTime, const ParticleSystemPtr& system);
 
-    bool hasFinished() { return m_finished; }
+    bool hasFinished() const { return m_finished; }
 
 private:
     // self related

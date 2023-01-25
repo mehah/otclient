@@ -43,7 +43,7 @@ Shader::~Shader()
         glDeleteShader(m_shaderId);
 }
 
-bool Shader::compileSourceCode(const std::string_view sourceCode)
+bool Shader::compileSourceCode(const std::string_view sourceCode) const
 {
 #ifdef OPENGL_ES
     static constexpr std::string_view qualifierDefines =
@@ -58,7 +58,7 @@ bool Shader::compileSourceCode(const std::string_view sourceCode)
         "#define highp\n";
 #endif
 
-    std::string code = std::string{ qualifierDefines };
+    auto code = std::string{ qualifierDefines };
     code.append(sourceCode);
     const char* c_source = code.data();
     glShaderSource(m_shaderId, 1, &c_source, nullptr);
@@ -69,7 +69,7 @@ bool Shader::compileSourceCode(const std::string_view sourceCode)
     return (res == GL_TRUE);
 }
 
-bool Shader::compileSourceFile(const std::string_view sourceFile)
+bool Shader::compileSourceFile(const std::string_view sourceFile) const
 {
     try {
         const auto& sourceCode = g_resources.readFileContents(sourceFile.data());
@@ -80,7 +80,7 @@ bool Shader::compileSourceFile(const std::string_view sourceFile)
     return false;
 }
 
-std::string Shader::log()
+std::string Shader::log() const
 {
     std::string infoLog;
     int infoLogLength = 0;

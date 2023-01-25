@@ -21,14 +21,14 @@
  */
 
 #include "effect.h"
-#include "game.h"
-#include "map.h"
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
+#include "game.h"
+#include "map.h"
 
 void Effect::drawEffect(const Point& dest, uint32_t flags, int offsetX, int offsetY, LightView* lightView)
 {
-    if (m_id == 0 || !canDraw()) return;
+    if (!canDraw()) return;
 
     // It only starts to draw when the first effect as it is about to end.
     if (m_animationTimer.ticksElapsed() < m_timeToStartDrawing)
@@ -45,7 +45,7 @@ void Effect::drawEffect(const Point& dest, uint32_t flags, int offsetX, int offs
     } else {
         // hack to fix some animation phases duration, currently there is no better solution
         int ticks = EFFECT_TICKS_PER_FRAME;
-        if (m_id == 33) {
+        if (m_clientId == 33) {
             ticks <<= 2;
         }
 
@@ -82,7 +82,7 @@ void Effect::onAppear()
         m_duration = EFFECT_TICKS_PER_FRAME;
 
         // hack to fix some animation phases duration, currently there is no better solution
-        if (m_id == 33) {
+        if (m_clientId == 33) {
             m_duration <<= 2;
         }
 
@@ -92,8 +92,7 @@ void Effect::onAppear()
     m_animationTimer.restart();
 
     // schedule removal
-    const auto self = asEffect();
-    g_dispatcher.scheduleEvent([self] { g_map.removeThing(self); }, m_duration);
+    g_dispatcher.scheduleEvent([self = asEffect()] { g_map.removeThing(self); }, m_duration);
 }
 
 bool Effect::waitFor(const EffectPtr& effect)
@@ -116,8 +115,8 @@ void Effect::setId(uint32_t id)
     if (!g_things.isValidDatId(id, ThingCategoryEffect))
         id = 0;
 
-    m_id = id;
-    m_thingType = g_things.getThingType(m_id, ThingCategoryEffect).get();
+    m_clientId = id;
+    m_thingType = g_things.getThingType(id, ThingCategoryEffect).get();
 }
 
 void Effect::setPosition(const Position& position, uint8_t stackPos, bool hasElevation)

@@ -21,6 +21,8 @@
  */
 
 #include "game.h"
+#include <framework/core/application.h>
+#include <framework/core/eventdispatcher.h>
 #include "container.h"
 #include "creature.h"
 #include "localplayer.h"
@@ -28,11 +30,9 @@
 #include "map.h"
 #include "protocolcodes.h"
 #include "protocolgame.h"
-#include <framework/core/application.h>
-#include <framework/core/eventdispatcher.h>
 
-#include "framework/core/graphicalapplication.h"
 #include "tile.h"
+#include "framework/core/graphicalapplication.h"
 
 Game g_game;
 
@@ -574,7 +574,7 @@ bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
         m_walkEvent = nullptr;
     }
 
-    const Position toPos = m_localPlayer->getPosition().translatedToDirection(direction);
+    const auto& toPos = m_localPlayer->getPosition().translatedToDirection(direction);
 
     // only do prewalks to walkable tiles (like grounds and not walls)
     if (const auto& toTile = g_map.getTile(toPos); toTile && toTile->isWalkable()) {
@@ -1489,7 +1489,7 @@ void Game::changeMapAwareRange(int xrange, int yrange)
     m_protocolGame->sendChangeMapAwareRange(xrange, yrange);
 }
 
-bool Game::checkBotProtection()
+bool Game::checkBotProtection() const
 {
 #ifdef BOT_PROTECTION
     // accepts calls comming from a stacktrace containing only C++ functions,
@@ -1502,7 +1502,7 @@ bool Game::checkBotProtection()
     return true;
 }
 
-bool Game::canPerformGameAction()
+bool Game::canPerformGameAction() const
 {
     // we can only perform game actions if we meet these conditions:
     // - the game is online

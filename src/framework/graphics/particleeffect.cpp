@@ -24,8 +24,6 @@
 
 #include "particlesystem.h"
 
-ParticleEffectType::ParticleEffectType() = default;
-
 void ParticleEffectType::load(const OTMLNodePtr& node)
 {
     m_node = node->clone();
@@ -46,12 +44,12 @@ void ParticleEffect::load(const ParticleEffectTypePtr& effectType)
         if (childNode->tag() == "System") {
             const auto& system = std::make_shared<ParticleSystem>();
             system->load(childNode);
-            m_systems.push_back(system);
+            m_systems.emplace_back(system);
         }
     }
 }
 
-void ParticleEffect::render()
+void ParticleEffect::render() const
 {
     for (const auto& system : m_systems)
         system->render();
