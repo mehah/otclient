@@ -51,14 +51,11 @@ void SpriteAppearances::terminate()
 
 bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const
 {
-    std::scoped_lock lock(sheet->mutex);
-
-    if (sheet->loaded) {
+    if (sheet->data)
         return true;
-    }
 
     try {
-        const FileStreamPtr& fin = g_resources.openFile(stdext::format("/things/%d/%s", g_game.getClientVersion(), sheet->file));
+        const auto& fin = g_resources.openFile(stdext::format("/things/%d/%s", g_game.getClientVersion(), sheet->file));
         fin->cache();
 
         const auto decompressed = std::make_unique<uint8_t[]>(LZMA_UNCOMPRESSED_SIZE); // uncompressed size, bmp file + 122 bytes header
@@ -150,8 +147,6 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const
         sheet->data = std::make_unique<uint8_t[]>(LZMA_UNCOMPRESSED_SIZE);
         std::memcpy(sheet->data.get(), bufferStart, BYTES_IN_SPRITE_SHEET);
 
-        sheet->loaded = true;
-        sheet->loading = false;
         return true;
     } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to load single sprite sheet '%s': %s", sheet->file, e.what()));
@@ -176,22 +171,12 @@ SpriteSheetPtr SpriteAppearances::getSheetBySpriteId(int id, bool load /* = true
         return id >= sheet->firstId && id <= sheet->lastId;
     });
 
-    if (sheetIt == m_sheets.end()) {
+    if (sheetIt == m_sheets.end())
         return nullptr;
-    }
 
-    const SpriteSheetPtr& sheet = *sheetIt;
-
-    if (!sheet->loaded && load) {
-        if (!sheet->loading) {
-            sheet->loading = true;
-            g_asyncDispatcher.dispatch([this, &sheet] {
-                loadSpriteSheet(sheet);
-            });
-        }
-
-        return nullptr;
-    }
+    const auto& sheet = *sheetIt;
+    if (load)
+        loadSpriteSheet(sheet);
 
     return sheet;
 }

@@ -59,10 +59,6 @@ public:
     SpriteLayout spriteLayout = SpriteLayout::ONE_BY_ONE;
     std::unique_ptr<uint8_t[]> data;
     std::string file;
-    bool loaded = false;
-    bool loading = false;
-
-    std::mutex mutex;
 };
 
 //@bindsingleton g_spriteAppearances
