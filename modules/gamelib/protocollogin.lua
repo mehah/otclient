@@ -141,7 +141,7 @@ function ProtocolLogin:sendLoginPacket()
     if g_game.getFeature(GameSequencedPackets) then
         scheduleEvent(function()
             self:enabledSequencedPackets()
-        end, 10)
+        end, 50)
     end
 
     self:recv()
