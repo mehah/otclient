@@ -43,16 +43,14 @@ void EventDispatcher::shutdown()
 
 void EventDispatcher::poll()
 {
-    std::unique_lock<std::recursive_mutex> lock(m_mutex);
+    std::scoped_lock<std::recursive_mutex> lock(m_mutex);
     for (int count = 0, max = m_scheduledEventList.size(); count < max && !m_scheduledEventList.empty(); ++count) {
         const auto scheduledEvent = m_scheduledEventList.top();
         if (scheduledEvent->remainingTicks() > 0)
             break;
 
         m_scheduledEventList.pop();
-        lock.unlock();
         scheduledEvent->execute();
-        lock.lock();
 
         if (scheduledEvent->nextCycle())
             m_scheduledEventList.push(scheduledEvent);
@@ -75,9 +73,7 @@ void EventDispatcher::poll()
         for (int_fast32_t i = -1; ++i < m_pollEventsSize;) {
             const auto event = m_eventList.front();
             m_eventList.pop_front();
-            lock.unlock();
             event->execute();
-            lock.lock();
         }
         m_pollEventsSize = m_eventList.size();
 
