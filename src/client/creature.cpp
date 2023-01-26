@@ -486,7 +486,7 @@ void Creature::updateWalkAnimation()
         return;
 
     int footAnimPhases = m_outfit.hasMount() ? m_mountType->getAnimationPhases() : getAnimationPhases();
-    if (!g_game.getFeature(Otc::GameItemAnimationPhase) && footAnimPhases > 2) {
+    if (!g_game.getFeature(Otc::GameEnhancedAnimations) && footAnimPhases > 2) {
         --footAnimPhases;
     }
 
@@ -497,7 +497,7 @@ void Creature::updateWalkAnimation()
     int minFootDelay = 20;
     int footAnimDelay = footAnimPhases;
 
-    if (g_game.getFeature(Otc::GameItemAnimationPhase)) {
+    if (g_game.getFeature(Otc::GameEnhancedAnimations)) {
         minFootDelay += 10;
         footAnimDelay /= 1.5;
     }
