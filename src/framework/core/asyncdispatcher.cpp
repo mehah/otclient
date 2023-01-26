@@ -27,7 +27,8 @@ AsyncDispatcher g_asyncDispatcher;
 
 void AsyncDispatcher::init()
 {
-    int_fast8_t threads = std::min<int_fast8_t>(std::thread::hardware_concurrency(), ASYNC_DISPATCHER_MAX_THREAD);
+    // -2 = Main Thread and Map Thread
+    int_fast8_t threads = std::clamp<int_fast8_t>(std::thread::hardware_concurrency() - 2, 1, ASYNC_DISPATCHER_MAX_THREAD);
     for (; --threads >= 0;)
         spawn_thread();
 }
