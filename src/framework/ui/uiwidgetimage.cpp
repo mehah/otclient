@@ -183,7 +183,7 @@ void UIWidget::setImageSource(const std::string_view source)
 
     m_imageTexture = g_textures.getTexture(m_imageSource = source);
     if (m_imageTexture->isAnimatedTexture())
-        std::static_pointer_cast<AnimatedTexture>(m_imageTexture)->startAnimation();
+        std::static_pointer_cast<AnimatedTexture>(m_imageTexture)->restart();
 
     if (!m_rect.isValid() || m_imageAutoResize) {
         const auto& imageSize = m_imageTexture->getSize();

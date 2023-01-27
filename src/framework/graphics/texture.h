@@ -85,7 +85,7 @@ protected:
     bool m_hasMipmaps{ false };
     bool m_smooth{ false };
     bool m_upsideDown{ false };
-    bool m_repeat{ true };
+    bool m_repeat{ false };
     bool m_compress{ false };
     bool m_buildMipmaps{ false };
 };
