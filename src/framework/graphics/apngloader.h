@@ -35,7 +35,7 @@ struct apng_data
     uint8_t coltype;
     uint32_t num_frames;
     uint32_t num_plays;
-    unsigned short* frames_delay; // each frame delay in ms
+    uint16_t* frames_delay; // each frame delay in ms
 };
 
 // returns -1 on error, 0 on success

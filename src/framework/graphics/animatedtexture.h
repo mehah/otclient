@@ -28,21 +28,25 @@
 class AnimatedTexture : public Texture
 {
 public:
-    AnimatedTexture(const Size& size, const std::vector<ImagePtr>& frames, std::vector<int> framesDelay, bool buildMipmaps = false, bool compress = false);
-    ~AnimatedTexture() override;
+    AnimatedTexture(const Size& size, const std::vector<ImagePtr>& frames, std::vector<uint16_t> framesDelay, uint16_t numPlays, bool buildMipmaps = false, bool compress = false);
+    ~AnimatedTexture() override = default;
 
     void buildHardwareMipmaps() override;
 
     void setSmooth(bool smooth) override;
     void setRepeat(bool repeat) override;
 
-    void updateAnimation();
+    void update();
+    void restart() { m_animTimer.restart(); m_currentPlay = 0; }
 
     bool isAnimatedTexture() const override { return true; }
 
 private:
     std::vector<TexturePtr> m_frames;
-    std::vector<int> m_framesDelay;
+    std::vector<uint16_t> m_framesDelay;
     uint32_t m_currentFrame{ 0 };
+    uint32_t m_currentPlay{ 0 };
+    uint32_t m_numPlays{ 0 };
+
     Timer m_animTimer;
 };

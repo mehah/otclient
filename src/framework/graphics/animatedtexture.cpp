@@ -28,7 +28,7 @@
 
 #include <utility>
 
-AnimatedTexture::AnimatedTexture(const Size& size, const std::vector<ImagePtr>& frames, std::vector<int> framesDelay, bool buildMipmaps, bool compress)
+AnimatedTexture::AnimatedTexture(const Size& size, const std::vector<ImagePtr>& frames, std::vector<uint16_t> framesDelay, uint16_t numPlays, bool buildMipmaps, bool compress)
 {
     if (!setupSize(size))
         return;
@@ -39,12 +39,10 @@ AnimatedTexture::AnimatedTexture(const Size& size, const std::vector<ImagePtr>& 
 
     m_framesDelay = std::move(framesDelay);
     m_hasMipmaps = buildMipmaps;
+    m_numPlays = numPlays;
     m_id = m_frames[0]->getId();
     m_animTimer.restart();
 }
-
-AnimatedTexture::~AnimatedTexture()
-= default;
 
 void AnimatedTexture::buildHardwareMipmaps()
 {
@@ -69,19 +67,26 @@ void AnimatedTexture::setRepeat(bool repeat)
         frame->setRepeat(repeat);
 }
 
-void AnimatedTexture::updateAnimation()
+void AnimatedTexture::update()
 {
+    if (!m_animTimer.running())
+        return;
+
     if (m_animTimer.ticksElapsed() < m_framesDelay[m_currentFrame])
         return;
 
-    if (++m_currentFrame >= m_frames.size())
+    m_animTimer.restart(); // it is necessary to restart the animation before stop()
+
+    if (++m_currentFrame >= m_frames.size()) {
         m_currentFrame = 0;
+        if (m_numPlays > 0 && ++m_currentPlay == m_numPlays)
+            m_animTimer.stop();
+    }
 
     const auto& txt = m_frames[m_currentFrame];
     txt->create();
 
     m_id = txt->getId();
-    m_animTimer.restart();
 
     g_app.repaint();
 }
