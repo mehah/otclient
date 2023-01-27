@@ -67,15 +67,31 @@ void AnimatedTexture::setRepeat(bool repeat)
     m_repeat = repeat;
     for (const TexturePtr& frame : m_frames)
         frame->setRepeat(repeat);
+
+    if (repeat)
+        startAnimation();
+}
+
+void AnimatedTexture::startAnimation()
+{
+    m_animTimer.restart();
+    m_currentFrame = 0;
+    m_id = m_frames[m_currentFrame]->getId();
 }
 
 void AnimatedTexture::updateAnimation()
 {
+    if (!m_animTimer.running())
+        return;
+
     if (m_animTimer.ticksElapsed() < m_framesDelay[m_currentFrame])
         return;
 
-    if (++m_currentFrame >= m_frames.size())
+    if (++m_currentFrame >= m_frames.size()) {
         m_currentFrame = 0;
+        if (!m_repeat)
+            m_animTimer.stop();
+    }
 
     const auto& txt = m_frames[m_currentFrame];
     txt->create();

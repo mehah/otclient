@@ -37,6 +37,7 @@ public:
     void setRepeat(bool repeat) override;
 
     void updateAnimation();
+    void startAnimation();
 
     bool isAnimatedTexture() const override { return true; }
 

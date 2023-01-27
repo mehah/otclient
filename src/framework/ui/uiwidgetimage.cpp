@@ -22,6 +22,7 @@
 
 #include <framework/core/eventdispatcher.h>
 #include <framework/graphics/painter.h>
+#include <framework/graphics/animatedtexture.h>
 #include <framework/graphics/texture.h>
 #include <framework/graphics/texturemanager.h>
 #include "uiwidget.h"
@@ -181,8 +182,11 @@ void UIWidget::setImageSource(const std::string_view source)
     }
 
     m_imageTexture = g_textures.getTexture(m_imageSource = source);
+    if (m_imageTexture->isAnimatedTexture())
+        std::static_pointer_cast<AnimatedTexture>(m_imageTexture)->startAnimation();
+
     if (!m_rect.isValid() || m_imageAutoResize) {
-        const Size imageSize = m_imageTexture->getSize();
+        const auto& imageSize = m_imageTexture->getSize();
 
         Size size = getSize();
         if (size.width() <= 0 || m_imageAutoResize)

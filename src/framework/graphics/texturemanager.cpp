@@ -146,20 +146,28 @@ TexturePtr TextureManager::loadTexture(std::stringstream& file)
         if (apng.num_frames > 1) { // animated texture
             std::vector<ImagePtr> frames;
             std::vector<int> framesDelay;
-            for (uint32_t i = 0; i < apng.num_frames; ++i) {
-                uint8_t* frameData = apng.pdata + ((apng.first_frame + i) * imageSize.area() * apng.bpp);
-                int frameDelay = apng.frames_delay[i];
 
-                framesDelay.push_back(frameDelay);
-                frames.emplace_back(std::make_shared<Image>(imageSize, apng.bpp, frameData));
+            const uint32_t plays = std::max<uint32_t>(1, apng.num_plays);
+            for (uint_fast32_t j = 0; ++j <= plays;) {
+                for (uint_fast32_t i = 0; i < apng.num_frames; ++i) {
+                    uint8_t* frameData = apng.pdata + ((apng.first_frame + i) * imageSize.area() * apng.bpp);
+                    int frameDelay = apng.frames_delay[i];
+
+                    framesDelay.push_back(frameDelay);
+                    frames.emplace_back(std::make_shared<Image>(imageSize, apng.bpp, frameData));
+                }
             }
+
             const auto& animatedTexture = std::make_shared<AnimatedTexture>(imageSize, frames, framesDelay);
+            animatedTexture->setRepeat(apng.num_plays == 0);
+
             m_animatedTextures.emplace_back(animatedTexture);
             texture = animatedTexture;
         } else {
             const auto& image = std::make_shared<Image>(imageSize, apng.bpp, apng.pdata);
             texture = std::make_shared<Texture>(image, false, false);
         }
+
         free_apng(&apng);
     }
 
