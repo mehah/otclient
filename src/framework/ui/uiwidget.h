@@ -170,6 +170,7 @@ public:
 private:
     void repaint();
     bool m_updateEventScheduled{ false };
+    bool m_updatingMove{ false };
     bool m_loadingStyle{ false };
 
     // state managment
@@ -225,7 +226,7 @@ protected:
     // function shortcuts
 public:
     void resize(int width, int height) { setRect(Rect(getPosition(), Size(width, height))); }
-    void move(int x, int y) { setRect(Rect(x, y, getSize())); }
+    void move(int x, int y);
     void rotate(float degrees) { setRotation(degrees); }
     void hide() { setVisible(false); }
     void show() { setVisible(true); }

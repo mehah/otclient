@@ -1789,4 +1789,18 @@ bool UIWidget::propagateOnMouseMove(const Point& mousePos, const Point& mouseMov
     return true;
 }
 
+void UIWidget::move(int x, int y) {
+    if (!m_updatingMove) {
+        m_updatingMove = true;
+        g_dispatcher.scheduleEvent([this] {
+            const auto rect = m_rect;
+            m_rect = {}; // force update
+            setRect(rect);
+            m_updatingMove = false;
+        }, 30);
+    }
+
+    m_rect = { x, y, getSize() };
+}
+
 void UIWidget::repaint() { g_app.repaint(); }
