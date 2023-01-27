@@ -1004,7 +1004,7 @@ void ThingType::exportImage(const std::string& fileName)
     if (m_spritesIndex.empty())
         throw Exception("cannot export thingtype without sprites");
 
-    const auto & = std::make_shared<Image>(Size(SPRITE_SIZE * m_size.width() * m_layers * m_numPatternX, SPRITE_SIZE * m_size.height() * m_animationPhases * m_numPatternY * m_numPatternZ));
+    const auto& image = std::make_shared<Image>(Size(SPRITE_SIZE * m_size.width() * m_layers * m_numPatternX, SPRITE_SIZE * m_size.height() * m_animationPhases * m_numPatternY * m_numPatternZ));
     for (int z = 0; z < m_numPatternZ; ++z) {
         for (int y = 0; y < m_numPatternY; ++y) {
             for (int x = 0; x < m_numPatternX; ++x) {
