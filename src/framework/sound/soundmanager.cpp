@@ -229,7 +229,7 @@ SoundSourcePtr SoundManager::createSoundSource(const std::string& filename)
     SoundSourcePtr source;
 
     try {
-        const auto it = m_buffers.find(filename.data());
+        const auto it = m_buffers.find(filename);
         if (it != m_buffers.end()) {
             source = std::make_shared<SoundSource>();
             source->setBuffer(it->second);
