@@ -605,8 +605,7 @@ void Tile::onAddInMapView()
                 if (x == 0 && y == 0)
                     continue;
 
-                const TilePtr& tile = g_map.getTile(m_position.translated(x, y));
-                if (tile && (tile->hasCreature() || tile->hasEffect() || tile->hasTopItem())) {
+                if (const auto& tile = g_map.getTile(m_position.translated(x, y))) {
                     tile->m_drawTopAndCreature = false;
                     m_tilesRedraw.emplace_back(tile);
                 }
