@@ -119,15 +119,15 @@ void GraphicalApplication::terminate()
 void GraphicalApplication::run()
 {
     // run the first poll
+    mainPoll();
     poll();
-    Application::poll();
 
     // show window
     g_window.show();
 
     // run the second poll
+    mainPoll();
     poll();
-    Application::poll();
 
     g_lua.callGlobalField("g_app", "onRun");
 
@@ -140,8 +140,7 @@ void GraphicalApplication::run()
     // clang c++20 dont support jthread
     std::thread t1([&]() {
         while (!m_stopping) {
-            g_particles.poll();
-            Application::poll();
+            poll();
 
             if (!g_window.isVisible()) {
                 stdext::millisleep(10);
@@ -187,7 +186,7 @@ void GraphicalApplication::run()
 
     m_running = true;
     while (!m_stopping) {
-        poll();
+        mainPoll();
 
         if (!g_window.isVisible()) {
             stdext::millisleep(10);
@@ -211,11 +210,17 @@ void GraphicalApplication::run()
 
 void GraphicalApplication::poll()
 {
-    g_clock.update();
+    g_particles.poll();
+    Application::poll();
 
 #ifdef FRAMEWORK_SOUND
     g_sounds.poll();
 #endif
+}
+
+void GraphicalApplication::mainPoll()
+{
+    g_clock.update();
 
     // poll window input events
     g_window.poll();

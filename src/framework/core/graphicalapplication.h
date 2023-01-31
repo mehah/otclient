@@ -37,6 +37,7 @@ public:
     void terminate() override;
     void run() override;
     void poll() override;
+    void mainPoll();
     void close() override;
 
     void setMaxFps(int maxFps) { m_frameCounter.setMaxFps(maxFps); }
