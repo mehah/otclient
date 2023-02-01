@@ -186,7 +186,7 @@ void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Po
     getCurrentPool()->add(color, nullptr, method);
 }
 
-void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, int innerLineWidth) const
+void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, uint16_t innerLineWidth) const
 {
     if (dest.isEmpty() || innerLineWidth == 0)
         return;
@@ -194,7 +194,7 @@ void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, int 
     DrawPool::DrawMethod method{
         .type = DrawPool::DrawMethodType::BOUNDING_RECT,
         .dest = dest,
-        .intValue = static_cast<uint16_t>(innerLineWidth)
+        .intValue = innerLineWidth
     };
 
     getCurrentPool()->add(color, nullptr, method);
