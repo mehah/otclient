@@ -163,6 +163,16 @@ enum ThingFlagAttr :uint64_t
     ThingFlagAttrDefaultAction = static_cast<uint64_t>(1) << 44
 };
 
+enum STACK_PRIORITY : uint8_t
+{
+    GROUND = 0,
+    GROUND_BORDER = 1,
+    ON_BOTTOM = 2,
+    ON_TOP = 3,
+    CREATURE = 4,
+    COMMON_ITEMS = 5
+};
+
 enum PLAYER_ACTION : uint8_t
 {
     PLAYER_ACTION_NONE = 0,

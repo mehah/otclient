@@ -42,22 +42,22 @@ void Thing::setPosition(const Position& position, uint8_t stackPos, bool hasElev
 int Thing::getStackPriority()
 {
     if (isGround())
-        return 0;
+        return STACK_PRIORITY::GROUND;
 
     if (isGroundBorder())
-        return 1;
+        return STACK_PRIORITY::GROUND_BORDER;
 
     if (isOnBottom())
-        return 2;
+        return STACK_PRIORITY::ON_BOTTOM;
 
     if (isOnTop())
-        return 3;
+        return STACK_PRIORITY::ON_TOP;
 
     if (isCreature())
-        return 4;
+        return STACK_PRIORITY::CREATURE;
 
     // common items
-    return 5;
+    return STACK_PRIORITY::COMMON_ITEMS;
 }
 
 const TilePtr& Thing::getTile()

@@ -49,8 +49,9 @@ public:
     const TilePtr& getTile();
     ContainerPtr getParentContainer();
 
-    int getStackPriority();
     int getStackPos();
+
+    virtual int getStackPriority();
 
     virtual bool isItem() { return false; }
     virtual bool isEffect() { return false; }
@@ -104,10 +105,11 @@ public:
 
     bool isCommon() { return !isGround() && !isGroundBorder() && !isOnTop() && !isCreature() && !isOnBottom(); }
 
-    bool isGround() { return m_thingType->isGround(); }
-    bool isGroundBorder() { return m_thingType->isGroundBorder(); }
-    bool isOnBottom() { return m_thingType->isOnBottom(); }
-    bool isOnTop() { return m_thingType->isOnTop(); }
+    virtual bool isGround() { return m_thingType->isGround(); }
+    virtual bool isGroundBorder() { return m_thingType->isGroundBorder(); }
+    virtual bool isOnBottom() { return m_thingType->isOnBottom(); }
+    virtual bool isOnTop() { return m_thingType->isOnTop(); }
+
     bool isMarketable() { return m_thingType->isMarketable(); }
     bool isStackable() { return m_thingType->isStackable(); }
     bool isFluidContainer() { return m_thingType->isFluidContainer(); }

@@ -96,6 +96,8 @@ public:
     bool isDrawingOutfitColor() const { return m_drawOutfitColor; }
     void setDrawOutfitColor(const bool draw) { m_drawOutfitColor = draw; }
 
+    int getStackPriority() override { return STACK_PRIORITY::CREATURE; };
+
     int getDisplacementX() const override;
     int getDisplacementY() const override;
     int getExactSize(int layer = 0, int xPattern = 0, int yPattern = 0, int zPattern = 0, int animationPhase = 0) override;
@@ -139,6 +141,11 @@ public:
     bool isFullHealth() const { return m_healthPercent == 100; }
     bool canBeSeen() { return !isInvisible() || isPlayer(); }
     bool isCreature() override { return true; }
+    bool isGround() override { return false; }
+    bool isGroundBorder() override { return false; }
+    bool isOnBottom() override { return false; }
+    bool isOnTop() override { return false; }
+
     bool isParalyzed() const { return m_speed < 10; }
 
     bool isDisabledWalkAnimation() { return m_disableWalkAnimation > 0; }
