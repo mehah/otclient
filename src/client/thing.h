@@ -105,10 +105,10 @@ public:
 
     bool isCommon() { return !isGround() && !isGroundBorder() && !isOnTop() && !isCreature() && !isOnBottom(); }
 
-    virtual bool isGround() { return m_thingType->isGround(); }
-    virtual bool isGroundBorder() { return m_thingType->isGroundBorder(); }
-    virtual bool isOnBottom() { return m_thingType->isOnBottom(); }
-    virtual bool isOnTop() { return m_thingType->isOnTop(); }
+    bool isGround() { return !isCreature() && m_thingType->isGround(); }
+    bool isGroundBorder() { return !isCreature() && m_thingType->isGroundBorder(); }
+    bool isOnBottom() { return !isCreature() && m_thingType->isOnBottom(); }
+    bool isOnTop() { return !isCreature() && m_thingType->isOnTop(); }
 
     bool isMarketable() { return m_thingType->isMarketable(); }
     bool isStackable() { return m_thingType->isStackable(); }
