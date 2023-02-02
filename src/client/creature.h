@@ -96,8 +96,6 @@ public:
     bool isDrawingOutfitColor() const { return m_drawOutfitColor; }
     void setDrawOutfitColor(const bool draw) { m_drawOutfitColor = draw; }
 
-    int getStackPriority() override { return STACK_PRIORITY::CREATURE; };
-
     int getDisplacementX() const override;
     int getDisplacementY() const override;
     int getExactSize(int layer = 0, int xPattern = 0, int yPattern = 0, int zPattern = 0, int animationPhase = 0) override;

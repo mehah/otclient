@@ -50,8 +50,7 @@ public:
     ContainerPtr getParentContainer();
 
     int getStackPos();
-
-    virtual int getStackPriority();
+    int getStackPriority();
 
     virtual bool isItem() { return false; }
     virtual bool isEffect() { return false; }
