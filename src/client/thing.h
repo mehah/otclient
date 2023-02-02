@@ -98,13 +98,12 @@ public:
 
     virtual bool isContainer() { return m_thingType->isContainer(); }
 
-    bool isTopGround() const { return m_thingType->isTopGround(); }
-    bool isTopGroundBorder() const { return m_thingType->isTopGroundBorder(); }
-    bool isSingleGround() const { return m_thingType->isSingleGround(); }
-    bool isSingleGroundBorder() const { return m_thingType->isSingleGroundBorder(); }
-
     bool isCommon() { return !isGround() && !isGroundBorder() && !isOnTop() && !isCreature() && !isOnBottom(); }
 
+    bool isTopGround() { return !isCreature() && m_thingType->isTopGround(); }
+    bool isTopGroundBorder() { return !isCreature() && m_thingType->isTopGroundBorder(); }
+    bool isSingleGround() { return !isCreature() && m_thingType->isSingleGround(); }
+    bool isSingleGroundBorder() { return !isCreature() && m_thingType->isSingleGroundBorder(); }
     bool isGround() { return !isCreature() && m_thingType->isGround(); }
     bool isGroundBorder() { return !isCreature() && m_thingType->isGroundBorder(); }
     bool isOnBottom() { return !isCreature() && m_thingType->isOnBottom(); }
