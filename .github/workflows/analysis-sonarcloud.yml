@@ -20,14 +20,14 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@main
         if: ${{ github.event_name == 'pull_request' || github.event_name == 'pull_request_target' }}
         with:
           fetch-depth: 0
           ref: ${{github.event.pull_request.head.ref}}
           repository: ${{github.event.pull_request.head.repo.full_name}}
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@main
         if: ${{ github.event_name == 'push' }}
         with:
           fetch-depth: 0
@@ -72,7 +72,7 @@ jobs:
         run: |
           vcpkgCommitId=$(grep '.builtin-baseline' vcpkg.json | awk -F: '{print $2}' | tr -d '," ')
           echo "vcpkg commit ID: $vcpkgCommitId"
-          echo "::set-output name=vcpkgGitCommitId::$vcpkgCommitId"
+          echo "name=vcpkgGitCommitId::$vcpkgCommitId" >> $env:GITHUB_OUTPUT
 
       - name: Get vcpkg commit id from vcpkg.json
         uses: lukka/run-vcpkg@main
