@@ -25,7 +25,7 @@
 #include "declarations.h"
 #include "particleemitter.h"
 
-class ParticleSystem
+class ParticleSystem : public std::enable_shared_from_this<ParticleSystem>
 {
 public:
     ParticleSystem();

@@ -210,8 +210,8 @@ void GraphicalApplication::run()
 
 void GraphicalApplication::poll()
 {
-    g_particles.poll();
     Application::poll();
+    g_particles.poll();
 
 #ifdef FRAMEWORK_SOUND
     g_sounds.poll();

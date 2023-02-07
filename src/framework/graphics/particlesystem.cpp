@@ -76,7 +76,7 @@ void ParticleSystem::update()
 
     m_lastUpdateTime = g_clock.seconds() - std::fmod(elapsedTime, delay);
 
-    const auto self = std::shared_ptr<ParticleSystem>(this);
+    const auto& self = shared_from_this();
     for (int i = 0; i < std::floor(elapsedTime / delay); ++i) {
         // update emitters
         for (auto it = m_emitters.begin(); it != m_emitters.end();) {
