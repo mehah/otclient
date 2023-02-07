@@ -88,4 +88,10 @@ protected:
     bool m_repeat{ false };
     bool m_compress{ false };
     bool m_buildMipmaps{ false };
+
+    static const Matrix3 toMatrix(const Size& size) {
+        return { 1.0f / size.width(), 0.0f, 0.0f,
+            0.0f, 1.0f / size.height(), 0.0f,
+            0.0f, 0.0f, 1.0f };
+    }
 };

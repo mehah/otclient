@@ -202,14 +202,43 @@ void Texture::setupFilters() const
 
 void Texture::setupTranformMatrix()
 {
+    const static Size SIZE32x64(32, 64);
+    const static Size SIZE64x32(64, 32);
+    const static Size SIZE64x128(64, 128);
+    const static Size SIZE128x256(128, 256);
+    const static Size SIZE256x512(256, 512);
+    const static Size SIZE512x1024(512, 1024);
+
+    const static Matrix3 MATRIX32x32_CACHED = toMatrix(32);
+    const static Matrix3 MATRIX64x64_CACHED = toMatrix(64);
+    const static Matrix3 MATRIX128x128_CACHED = toMatrix(128);
+    const static Matrix3 MATRIX256x256_CACHED = toMatrix(256);
+    const static Matrix3 MATRIX512x512_CACHED = toMatrix(512);
+
+    const static Matrix3 MATRIX32x64_CACHED = toMatrix(SIZE32x64);
+    const static Matrix3 MATRIX64x32_CACHED = toMatrix(SIZE64x32);
+    const static Matrix3 MATRIX64x128_CACHED = toMatrix(SIZE64x128);
+    const static Matrix3 MATRIX128x256_CACHED = toMatrix(SIZE128x256);
+    const static Matrix3 MATRIX256x512_CACHED = toMatrix(SIZE256x512);
+    const static Matrix3 MATRIX512x1024_CACHED = toMatrix(SIZE512x1024);
+
     if (m_upsideDown) {
         m_transformMatrix = { 1.0f / m_size.width(), 0.0f,                                                  0.0f,
                               0.0f,                 -1.0f / m_size.height(),                                0.0f,
                               0.0f,                  m_size.height() / static_cast<float>(m_size.height()), 1.0f };
     } else {
-        m_transformMatrix = { 1.0f / m_size.width(), 0.0f,                     0.0f,
-                              0.0f,                  1.0f / m_size.height(),   0.0f,
-                              0.0f,                  0.0f,                     1.0f };
+        if (m_size == 32) m_transformMatrix = MATRIX32x32_CACHED;
+        else if (m_size == 64) m_transformMatrix = MATRIX64x64_CACHED;
+        else if (m_size == 128) m_transformMatrix = MATRIX128x128_CACHED;
+        else if (m_size == 256) m_transformMatrix = MATRIX256x256_CACHED;
+        else if (m_size == 512) m_transformMatrix = MATRIX512x512_CACHED;
+        else if (m_size == SIZE32x64) m_transformMatrix = MATRIX32x64_CACHED;
+        else if (m_size == SIZE64x32) m_transformMatrix = MATRIX64x32_CACHED;
+        else if (m_size == SIZE64x128) m_transformMatrix = MATRIX64x128_CACHED;
+        else if (m_size == SIZE128x256) m_transformMatrix = MATRIX128x256_CACHED;
+        else if (m_size == SIZE256x512) m_transformMatrix = MATRIX256x512_CACHED;
+        else if (m_size == SIZE512x1024) m_transformMatrix = MATRIX512x1024_CACHED;
+        else m_transformMatrix = toMatrix(m_size);
     }
 }
 
