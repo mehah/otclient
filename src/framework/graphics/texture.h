@@ -78,7 +78,7 @@ protected:
 
     Size m_size;
 
-    Matrix3 m_transformMatrix;
+    Matrix3 m_transformMatrix = DEFAULT_MATRIX3;
 
     ImagePtr m_image;
 

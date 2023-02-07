@@ -59,6 +59,9 @@ bool FrameBuffer::resize(const Size& size)
     m_texture->setUpsideDown(true);
     m_textureMatrix = g_painter->getTransformMatrix(size);
 
+    m_screenCoordsBuffer.clear();
+    m_screenCoordsBuffer.addRect(Rect{ 0, 0, size });
+
     internalBind();
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texture->getId(), 0);
 
@@ -125,8 +128,5 @@ void FrameBuffer::prepare(const Rect& dest, const Rect& src, const Color& colorC
 
         m_coordsBuffer.clear();
         m_coordsBuffer.addQuad(m_dest, m_src);
-
-        m_screenCoordsBuffer.clear();
-        m_screenCoordsBuffer.addRect(Rect{ 0, 0, getSize() });
     }
 }

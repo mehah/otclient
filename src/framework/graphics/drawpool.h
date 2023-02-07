@@ -78,7 +78,7 @@ public:
 
     struct PoolState
     {
-        Matrix3 transformMatrix;
+        Matrix3 transformMatrix = DEFAULT_MATRIX3;
         float opacity{ 1.f };
         CompositionMode compositionMode{ CompositionMode::NORMAL };
         BlendEquation blendEquation{ BlendEquation::ADD };

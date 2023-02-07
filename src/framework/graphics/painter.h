@@ -81,7 +81,7 @@ public:
     void setTexture(Texture* texture);
     void setOpacity(float opacity) { m_opacity = opacity; }
     void setClipRect(const Rect& clipRect);
-    void setResolution(const Size& resolution, const Matrix3& projectionMatrix = {});
+    void setResolution(const Size& resolution, const Matrix3& projectionMatrix = DEFAULT_MATRIX3);
     void setDrawProgram(PainterShaderProgram* drawProgram) { m_drawProgram = drawProgram; }
     void setAlphaWriting(bool enable);
     void setBlendEquation(BlendEquation blendEquation);

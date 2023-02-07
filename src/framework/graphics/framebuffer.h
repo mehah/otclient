@@ -37,7 +37,6 @@ public:
     void draw();
 
     void setSmooth(bool enabled) { m_smooth = enabled; m_texture = nullptr; }
-    void setBackuping(bool enabled) { m_backuping = enabled; }
     void setUseAlphaWriting(bool use) { m_useAlphaWriting = use; }
 
     bool resize(const Size& size);
@@ -46,7 +45,6 @@ public:
     TexturePtr getTexture() const { return m_texture; }
     Size getSize() const { return m_texture->getSize(); }
 
-    bool isBackuping() const { return m_backuping; }
     bool isSmooth() const { return m_smooth; }
 
     void setCompositionMode(const CompositionMode mode) { m_compositeMode = mode; }
@@ -67,20 +65,19 @@ private:
 
     Matrix3 m_textureMatrix;
     TexturePtr m_texture;
-    TexturePtr m_screenBackup;
 
     uint32_t m_fbo{ 0 };
     uint32_t m_prevBoundFbo{ 0 };
 
     CompositionMode m_compositeMode{ CompositionMode::NORMAL };
 
-    bool m_backuping{ true };
     bool m_smooth{ true };
     bool m_useAlphaWriting{ true };
     bool m_disableBlend{ false };
 
     Rect m_dest;
     Rect m_src;
+
     CoordsBuffer m_coordsBuffer;
     CoordsBuffer m_screenCoordsBuffer;
 };
