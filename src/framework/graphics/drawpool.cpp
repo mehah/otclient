@@ -32,8 +32,10 @@ DrawPool* DrawPool::create(const DrawPoolType type)
         pool = new DrawPoolFramed;
 
         const auto& frameBuffer = pool->toPoolFramed()->m_framebuffer;
+        frameBuffer->m_isScane = true;
+
         if (type == DrawPoolType::MAP) {
-            frameBuffer->setUseAlphaWriting(false);
+            frameBuffer->m_useAlphaWriting = false;
             frameBuffer->disableBlend();
         } else if (type == DrawPoolType::FOREGROUND) {
             pool->m_refreshDelay = 100; // 10 FPS (1000 / 10)

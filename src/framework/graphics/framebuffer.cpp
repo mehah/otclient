@@ -78,19 +78,32 @@ void FrameBuffer::bind()
 {
     internalBind();
 
-    g_painter->resetState();
+    if (m_isScane) {
+        g_painter->resetState();
+    } else {
+        m_oldSize = g_painter->getResolution();
+        m_oldTextureMatrix = g_painter->getProjectionMatrix();
+    }
+
     g_painter->setResolution(getSize(), m_textureMatrix);
+
     g_painter->setAlphaWriting(m_useAlphaWriting);
 
     if (m_colorClear != Color::alpha) {
         g_painter->setTexture(nullptr);
         g_painter->setColor(m_colorClear);
         g_painter->drawCoords(m_screenCoordsBuffer, DrawMode::TRIANGLE_STRIP);
+    } else if (!m_isScane) {
+        g_painter->clear(Color::alpha);
     }
 }
 
 void FrameBuffer::draw()
 {
+    if (!m_isScane) {
+        g_painter->setResolution(m_oldSize, m_oldTextureMatrix);
+    }
+
     if (m_disableBlend) glDisable(GL_BLEND);
     g_painter->setCompositionMode(m_compositeMode);
     g_painter->setTexture(m_texture.get());
