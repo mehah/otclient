@@ -110,20 +110,7 @@ void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)
             DrawPool::addCoords(&buffer, method, obj.drawMode);
     }
 
-    { // Set DrawState
-        const auto& state = obj.state;
-        g_painter->setColor(state.color);
-        g_painter->setOpacity(state.opacity);
-        g_painter->setCompositionMode(state.compositionMode);
-        g_painter->setBlendEquation(state.blendEquation);
-        g_painter->setClipRect(state.clipRect);
-        g_painter->setShaderProgram(state.shaderProgram);
-        g_painter->setTransformMatrix(state.transformMatrix);
-        if (state.action) state.action();
-        if (state.texture)
-            g_painter->setTexture(state.texture->create());
-    }
-
+    obj.state.execute();
     g_painter->drawCoords(buffer, obj.drawMode);
 }
 

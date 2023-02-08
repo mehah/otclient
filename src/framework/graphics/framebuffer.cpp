@@ -86,7 +86,6 @@ void FrameBuffer::bind()
     }
 
     g_painter->setResolution(getSize(), m_textureMatrix);
-
     g_painter->setAlphaWriting(m_useAlphaWriting);
 
     if (m_colorClear != Color::alpha) {

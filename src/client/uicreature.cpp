@@ -30,8 +30,7 @@ void UICreature::drawSelf(DrawPoolType drawPane)
     UIWidget::drawSelf(drawPane);
 
     if (m_creature) {
-        const Rect drawRect = getPaddingRect();
-        m_creature->drawOutfit(drawRect, !m_fixedCreatureSize, m_imageColor);
+        m_creature->drawOutfit(getPaddingRect(), !m_fixedCreatureSize, m_imageColor);
     }
 }
 

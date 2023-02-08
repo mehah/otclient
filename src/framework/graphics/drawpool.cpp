@@ -372,3 +372,16 @@ void DrawPool::optimize(int size) {
 
     m_alwaysGroupDrawings = size > 115; // Max optimization
 }
+
+void DrawPool::PoolState::execute() const {
+    g_painter->setColor(color);
+    g_painter->setOpacity(opacity);
+    g_painter->setCompositionMode(compositionMode);
+    g_painter->setBlendEquation(blendEquation);
+    g_painter->setClipRect(clipRect);
+    g_painter->setShaderProgram(shaderProgram);
+    g_painter->setTransformMatrix(transformMatrix);
+    if (action) action();
+    if (texture)
+        g_painter->setTexture(texture->create());
+}
