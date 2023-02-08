@@ -215,7 +215,7 @@ void MapView::drawText()
             continue;
 
         const auto& pos = staticText->getPosition();
-        if (pos.z != m_posInfo.camera.z)
+        if (pos.z != m_posInfo.camera.z && staticText->getMessageMode() == Otc::MessageNone)
             continue;
 
         Point p = transformPositionTo2D(pos, m_posInfo.camera) - m_posInfo.drawOffset;
