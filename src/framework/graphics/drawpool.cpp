@@ -32,7 +32,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
         pool = new DrawPoolFramed;
 
         const auto& frameBuffer = pool->toPoolFramed()->m_framebuffer;
-        frameBuffer->m_isScane = true;
+        frameBuffer->m_isScene = true;
 
         if (type == DrawPoolType::MAP) {
             frameBuffer->m_useAlphaWriting = false;

@@ -78,7 +78,7 @@ void FrameBuffer::bind()
 {
     internalBind();
 
-    if (m_isScane) {
+    if (m_isScene) {
         g_painter->resetState();
     } else {
         m_oldSize = g_painter->getResolution();
@@ -92,14 +92,14 @@ void FrameBuffer::bind()
         g_painter->setTexture(nullptr);
         g_painter->setColor(m_colorClear);
         g_painter->drawCoords(m_screenCoordsBuffer, DrawMode::TRIANGLE_STRIP);
-    } else if (!m_isScane) {
+    } else if (!m_isScene) {
         g_painter->clear(Color::alpha);
     }
 }
 
 void FrameBuffer::draw()
 {
-    if (!m_isScane) {
+    if (!m_isScene) {
         g_painter->setResolution(m_oldSize, m_oldTextureMatrix);
     }
 
