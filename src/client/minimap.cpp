@@ -55,11 +55,12 @@ void MinimapBlock::update()
         for (uint_fast8_t y = 0; y < MMBLOCK_SIZE; ++y) {
             const uint8_t c = getTile(x, y).color;
 
-            Color col = Color::alpha.rgba();
+            Color col = Color::alpha;
             if (c != UINT8_MAX) {
-                col = Color::from8bit(c).rgba();
+                col = Color::from8bit(c);
                 shouldDraw = true;
             }
+
             m_image->setPixel(x, y, col);
         }
     }

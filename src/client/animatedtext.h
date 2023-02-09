@@ -57,7 +57,7 @@ public:
     AnimatedTextPtr asAnimatedText() { return static_self_cast<AnimatedText>(); }
 
 private:
-    Color m_color;
+    Color m_color{ Color::white };
     Timer m_animationTimer;
     CachedText m_cachedText;
     Point m_offset;

@@ -60,7 +60,8 @@ public:
     float gF() const { return m_g; }
     float rF() const { return m_r; }
 
-    uint32_t rgba() const { return m_rgba; }
+    uint32_t rgba() const { return static_cast<uint32_t>(a() | b() << 8 | g() << 16 | r() << 24); }
+    size_t hash() const { return m_hash; }
 
     void setRed(const int r) { m_r = static_cast<uint8_t>(r) / 255.f; update(); }
     void setGreen(const int g) { m_g = static_cast<uint8_t>(g) / 255.f; update(); }
@@ -85,8 +86,8 @@ public:
     bool operator==(uint32_t rgba) const { return this->rgba() == rgba; }
 
     Color& operator=(const Color& other) = default;
-    bool operator==(const Color& other) const { return other.rgba() == rgba(); }
-    bool operator!=(const Color& other) const { return other.rgba() != rgba(); }
+    bool operator==(const Color& other) const { return other.hash() == hash(); }
+    bool operator!=(const Color& other) const { return other.hash() != hash(); }
 
     void blend(const Color color)
     {
@@ -133,7 +134,7 @@ private:
     float m_b{ 1.f };
     float m_a{ 1.f };
 
-    uint32_t m_rgba{ UINT32_MAX };
+    size_t m_hash{ 14757395258967641292 }; // HASH WHITE COLOR
 };
 
 std::ostream& operator<<(std::ostream& out, const Color& color);

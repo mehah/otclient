@@ -21,6 +21,7 @@
  */
 
 #include "color.h"
+#include <framework/stdext/hash.h>
 #include <iomanip>
 
  // NOTE: AABBGGRR order
@@ -51,10 +52,7 @@ Color::Color(const std::string_view coltext)
     update();
 }
 
-void Color::update()
-{
-    m_rgba = static_cast<uint32_t>(a() | b() << 8 | g() << 16 | r() << 24);
-}
+void Color::update() { m_hash = stdext::hash_int(rgba()); }
 
 std::ostream& operator<<(std::ostream& out, const Color& color)
 {

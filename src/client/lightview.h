@@ -65,7 +65,7 @@ private:
     uint8_t m_tileSize{ SPRITE_SIZE };
 
     Light m_globalLight;
-    Color m_globalLightColor;
+    Color m_globalLightColor{ Color::white };
 
     DrawPoolFramed* m_pool{ nullptr };
 

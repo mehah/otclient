@@ -209,7 +209,7 @@ size_t DrawPool::updateHash(PoolState& state, const DrawMethod& method)
             stdext::hash_union(state.hash, state.transformMatrix.hash());
 
         if (state.color != Color::white)
-            stdext::hash_combine(state.hash, state.color.rgba());
+            stdext::hash_union(state.hash, state.color.hash());
 
         if (state.texture)
             stdext::hash_union(state.hash, state.texture->hash());

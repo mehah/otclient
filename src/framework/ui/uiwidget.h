@@ -428,7 +428,7 @@ protected:
     TexturePtr m_imageTexture;
     Rect m_imageClipRect;
     Rect m_imageRect;
-    Color m_imageColor;
+    Color m_imageColor{ Color::white };
     Point m_iconOffset;
     bool m_imageFixedRatio{ false };
     bool m_imageRepeated{ false };

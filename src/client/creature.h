@@ -232,9 +232,9 @@ private:
 
     uint8_t m_disableWalkAnimation{ 0 };
 
-    Color m_timedSquareColor;
-    Color m_staticSquareColor;
-    Color m_informationColor;
+    Color m_timedSquareColor{ Color::white };
+    Color m_staticSquareColor{ Color::white };
+    Color m_informationColor{ Color::white };
     Color m_outfitColor{ Color::white };
 
     CachedText m_name;
