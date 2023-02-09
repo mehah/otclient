@@ -77,7 +77,7 @@ private:
     bool m_smooth{ true };
     bool m_useAlphaWriting{ true };
     bool m_disableBlend{ false };
-    bool m_isScane{ false };
+    bool m_isScene{ false };
 
     Rect m_dest;
     Rect m_src;
