@@ -190,16 +190,14 @@ void Creature::drawOutfit(const Rect& destRect, bool resize, const Color color)
     if (!m_thingType)
         return;
 
-    int frameSize;
+    uint8_t frameSize;
     if (!resize)
         frameSize = m_frameSizeNotResized;
     else if ((frameSize = m_exactSize) == 0)
         return;
 
     g_drawPool.bindFrameBuffer(frameSize);
-
-    internalDrawOutfit(Point(frameSize - SPRITE_SIZE, frameSize - SPRITE_SIZE) + getDisplacement(), TextureType::NONE, color);
-
+    internalDrawOutfit(Point(std::max<int>(frameSize - SPRITE_SIZE, 0)) + getDisplacement(), TextureType::NONE, color);
     g_drawPool.releaseFrameBuffer(destRect);
 }
 
