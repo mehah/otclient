@@ -57,8 +57,10 @@ void UIItem::drawSelf(DrawPoolType drawPane)
         g_drawPool.setScaleFactor(oldScaleFactor);
 
         if (m_font && (m_item->isStackable() || m_item->isChargeable()) && m_item->getCountOrSubType() > 1) {
+            static const Color STACK_COLOR(231, 231, 231);
+
             const auto& count = std::to_string(m_item->getCountOrSubType());
-            m_font->drawText(count, Rect(m_rect.topLeft(), m_rect.bottomRight() - Point(3, 0)), Color(231, 231, 231), Fw::AlignBottomRight);
+            m_font->drawText(count, Rect(m_rect.topLeft(), m_rect.bottomRight() - Point(3, 0)), STACK_COLOR, Fw::AlignBottomRight);
         }
 
 #ifdef FRAMEWORK_EDITOR

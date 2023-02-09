@@ -40,10 +40,10 @@ public:
     void setAuxId(uint16_t id) { m_auxId = id; }
     void setMount(uint16_t mount) { m_mount = mount; }
 
-    void setHead(uint8_t head) { m_head = head; m_headColor = getColor(head); }
-    void setBody(uint8_t body) { m_body = body; m_bodyColor = getColor(body); }
-    void setLegs(uint8_t legs) { m_legs = legs; m_legsColor = getColor(legs); }
-    void setFeet(uint8_t feet) { m_feet = feet; m_feetColor = getColor(feet); }
+    void setHead(uint8_t head);
+    void setBody(uint8_t body);
+    void setLegs(uint8_t legs);
+    void setFeet(uint8_t feet);
     void setAddons(uint8_t addons) { m_addons = addons; }
 
     void setCategory(ThingCategory category) { m_category = category; }
@@ -96,8 +96,8 @@ private:
     uint8_t m_feet{ 0 };
     uint8_t m_addons{ 0 };
 
-    Color m_headColor;
-    Color m_bodyColor;
-    Color m_legsColor;
-    Color m_feetColor;
+    Color m_headColor{ Color::white };
+    Color m_bodyColor{ Color::white };
+    Color m_legsColor{ Color::white };
+    Color m_feetColor{ Color::white };
 };

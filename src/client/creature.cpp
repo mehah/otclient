@@ -224,6 +224,10 @@ void Creature::drawOutfit(const Rect& destRect, bool resize, const Color color)
 
 void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, bool useGray, int drawFlags)
 {
+    static const Color
+        DEFAULT_COLOR(96, 96, 96),
+        NPC_COLOR(0x66, 0xcc, 0xff);
+
     if (isDead() || !canBeSeen() || !(drawFlags & Otc::DrawCreatureInfo) || !mapRect.isInRange(m_position))
         return;
 
@@ -237,11 +241,11 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
     p.y *= mapRect.verticalStretchFactor;
     p += parentRect.topLeft();
 
-    auto fillColor = Color(96, 96, 96);
+    auto fillColor = DEFAULT_COLOR;
 
     if (!useGray) {
         if (g_game.getFeature(Otc::GameBlueNpcNameColor) && isNpc() && isFullHealth())
-            fillColor = Color(0x66, 0xcc, 0xff);
+            fillColor = NPC_COLOR;
         else fillColor = m_informationColor;
     }
 
@@ -650,20 +654,28 @@ void Creature::terminateWalk()
 
 void Creature::setHealthPercent(uint8_t healthPercent)
 {
+    static const Color
+        COLOR1(0x00, 0xBC, 0x00),
+        COLOR2(0x50, 0xA1, 0x50),
+        COLOR3(0xA1, 0xA1, 0x00),
+        COLOR4(0xBF, 0x0A, 0x0A),
+        COLOR5(0x91, 0x0F, 0x0F),
+        COLOR6(0x85, 0x0C, 0x0C);
+
     if (m_healthPercent == healthPercent) return;
 
     if (healthPercent > 92)
-        m_informationColor = Color(0x00, 0xBC, 0x00);
+        m_informationColor = COLOR1;
     else if (healthPercent > 60)
-        m_informationColor = Color(0x50, 0xA1, 0x50);
+        m_informationColor = COLOR2;
     else if (healthPercent > 30)
-        m_informationColor = Color(0xA1, 0xA1, 0x00);
+        m_informationColor = COLOR3;
     else if (healthPercent > 8)
-        m_informationColor = Color(0xBF, 0x0A, 0x0A);
+        m_informationColor = COLOR4;
     else if (healthPercent > 3)
-        m_informationColor = Color(0x91, 0x0F, 0x0F);
+        m_informationColor = COLOR5;
     else
-        m_informationColor = Color(0x85, 0x0C, 0x0C);
+        m_informationColor = COLOR6;
 
     const uint8_t oldHealthPercent = m_healthPercent;
     m_healthPercent = healthPercent;

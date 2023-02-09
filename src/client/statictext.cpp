@@ -108,28 +108,33 @@ void StaticText::scheduleUpdate()
 
 void StaticText::compose()
 {
+    static const Color
+        MESSAGE_COLOR1(239, 239, 0),
+        MESSAGE_COLOR2(254, 101, 0),
+        MESSAGE_COLOR3(95, 247, 247);
+
     //TODO: this could be moved to lua
     std::string text;
 
     if (m_mode == Otc::MessageSay) {
         text += m_name;
         text += " says:\n";
-        m_color = Color(239, 239, 0);
+        m_color = MESSAGE_COLOR1;
     } else if (m_mode == Otc::MessageWhisper) {
         text += m_name;
         text += " whispers:\n";
-        m_color = Color(239, 239, 0);
+        m_color = MESSAGE_COLOR1;
     } else if (m_mode == Otc::MessageYell) {
         text += m_name;
         text += " yells:\n";
-        m_color = Color(239, 239, 0);
+        m_color = MESSAGE_COLOR1;
     } else if (m_mode == Otc::MessageMonsterSay || m_mode == Otc::MessageMonsterYell || m_mode == Otc::MessageSpell
                || m_mode == Otc::MessageBarkLow || m_mode == Otc::MessageBarkLoud) {
-        m_color = Color(254, 101, 0);
+        m_color = MESSAGE_COLOR2;
     } else if (m_mode == Otc::MessageNpcFrom || m_mode == Otc::MessageNpcFromStartBlock) {
         text += m_name;
         text += " says:\n";
-        m_color = Color(95, 247, 247);
+        m_color = MESSAGE_COLOR3;
     } else {
         g_logger.warning(stdext::format("Unknown speak type: %d", m_mode));
     }
