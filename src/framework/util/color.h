@@ -29,7 +29,7 @@
 class Color
 {
 public:
-    Color() = default;
+    Color() { m_hash = Color::white.hash(); };
     Color(const std::string_view coltext);
     Color(const uint32_t rgba) { setRGBA(rgba); }
     Color(const int r, const int g, const int b, const int a = 0xFF) : m_r(r / 255.f), m_g(g / 255.f), m_b(b / 255.f), m_a(a / 255.f) { update(); }
@@ -134,7 +134,7 @@ private:
     float m_b{ 1.f };
     float m_a{ 1.f };
 
-    size_t m_hash{ 14757395258967641292 }; // HASH WHITE COLOR
+    size_t m_hash{ 0 };
 };
 
 std::ostream& operator<<(std::ostream& out, const Color& color);
