@@ -32,10 +32,10 @@ public:
     FrameBuffer();
     ~FrameBuffer();
 
-    void release() const { internalRelease(); };
+    void release() const;
     void bind();
-    void bind(const Rect& dest, const Rect& src) { prepare(dest, src); bind(); }
     void draw();
+    void draw(const Rect& dest) { prepare(dest, Rect(0, 0, getSize())); draw(); }
 
     void setSmooth(bool enabled) { m_smooth = enabled; m_texture = nullptr; }
 

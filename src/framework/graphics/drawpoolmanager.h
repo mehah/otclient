@@ -55,6 +55,9 @@ public:
     void addBoundingRect(const Rect& dest, const Color& color = Color::white, uint16_t innerLineWidth = 1) const;
     void addAction(const std::function<void()>& action) const;
 
+    void bindFrameBuffer(const Size& size) const;
+    void releaseFrameBuffer(const Rect& dest) const;
+
     void setOpacity(const float opacity, bool onlyOnce = false) const { getCurrentPool()->setOpacity(opacity, onlyOnce); }
     void setClipRect(const Rect& clipRect, bool onlyOnce = false) const { getCurrentPool()->setClipRect(clipRect, onlyOnce); }
     void setBlendEquation(BlendEquation equation, bool onlyOnce = false) const { getCurrentPool()->setBlendEquation(equation, onlyOnce); }
@@ -63,7 +66,6 @@ public:
 
     float getOpacity() const { return getCurrentPool()->getOpacity(); }
     Rect getClipRect() const { return getCurrentPool()->getClipRect(); }
-    const DrawPool::PoolState& getState() const { return getCurrentPool()->getState(); }
 
     void resetState() const { getCurrentPool()->resetState(); }
     void resetOpacity() const { getCurrentPool()->resetOpacity(); }

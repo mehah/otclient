@@ -74,25 +74,6 @@ public:
 
     std::mutex& getMutex() { return m_mutex; }
 
-    struct PoolState
-    {
-        Matrix3 transformMatrix = DEFAULT_MATRIX3;
-        float opacity{ 1.f };
-        CompositionMode compositionMode{ CompositionMode::NORMAL };
-        BlendEquation blendEquation{ BlendEquation::ADD };
-        Rect clipRect;
-        PainterShaderProgram* shaderProgram{ nullptr };
-        std::function<void()> action{ nullptr };
-        Color color{ Color::white };
-        TexturePtr texture;
-        size_t hash{ 0 };
-
-        bool operator==(const PoolState& s2) const { return hash == s2.hash; }
-        void execute() const;
-    };
-
-    const PoolState& getState() const { return m_state; }
-
 protected:
 
     enum class DrawMethodType
@@ -110,6 +91,23 @@ protected:
         Rect dest, src;
         Point a, b, c;
         uint16_t intValue{ 0 };
+    };
+
+    struct PoolState
+    {
+        Matrix3 transformMatrix = DEFAULT_MATRIX3;
+        float opacity{ 1.f };
+        CompositionMode compositionMode{ CompositionMode::NORMAL };
+        BlendEquation blendEquation{ BlendEquation::ADD };
+        Rect clipRect;
+        PainterShaderProgram* shaderProgram{ nullptr };
+        std::function<void()> action{ nullptr };
+        Color color{ Color::white };
+        TexturePtr texture;
+        size_t hash{ 0 };
+
+        bool operator==(const PoolState& s2) const { return hash == s2.hash; }
+        void execute() const;
     };
 
     struct DrawObject
@@ -212,7 +210,7 @@ private:
     uint16_t m_refreshDelay{ 0 }, m_shaderRefreshDelay{ 0 };
     uint32_t m_onlyOnceStateFlag{ 0 };
 
-    PoolState m_state;
+    PoolState m_state, m_oldState;
 
     DrawPoolType m_type{ DrawPoolType::UNKNOW };
 

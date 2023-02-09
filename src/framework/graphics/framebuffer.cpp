@@ -97,12 +97,16 @@ void FrameBuffer::bind()
     }
 }
 
-void FrameBuffer::draw()
+void FrameBuffer::release() const
 {
+    internalRelease();
     if (!m_isScene) {
         g_painter->setResolution(m_oldSize, m_oldTextureMatrix);
     }
+}
 
+void FrameBuffer::draw()
+{
     if (m_disableBlend) glDisable(GL_BLEND);
     g_painter->setCompositionMode(m_compositeMode);
     g_painter->setTexture(m_texture.get());
