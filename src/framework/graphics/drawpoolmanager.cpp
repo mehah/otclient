@@ -198,7 +198,8 @@ void DrawPoolManager::bindFrameBuffer(const Size& size) const
     getCurrentPool()->m_oldState = std::move(getCurrentPool()->m_state);
     getCurrentPool()->m_state = {};
 
-    g_drawPool.addAction([size] {
+    g_drawPool.addAction([size, drawState = getCurrentPool()->m_state] {
+        drawState.execute();
         const auto& frame = g_framebuffers.getTemporaryFrameBuffer();
         frame->resize(size);
         frame->bind();
