@@ -45,7 +45,8 @@ public:
     void reverseChannels(); // argb -> bgra or bgra -> argb
 
     void setPixel(int x, int y, const uint8_t* pixel) { memcpy(&m_pixels[static_cast<size_t>(y * m_size.width() + x) * m_bpp], pixel, m_bpp); }
-    void setPixel(int x, int y, const Color& color) { uint32_t tmp = color.rgba(); setPixel(x, y, reinterpret_cast<uint8_t*>(&tmp)); }
+    void setPixel(int x, int y, const Color& color) { setPixel(x, y, Color(color.rgba()).rgba()); }
+    void setPixel(int x, int y, uint32_t rgba) { setPixel(x, y, reinterpret_cast<uint8_t*>(&rgba)); }
 
     std::vector<uint8_t>& getPixels() { return m_pixels; }
     uint8_t* getPixelData() { return &m_pixels[0]; }

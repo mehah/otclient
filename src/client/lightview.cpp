@@ -60,7 +60,7 @@ void LightView::draw(const Rect& dest, const Rect& src)
     bool _clr = true;
     for (const auto& light : m_sources) {
         if (light.color) {
-            const Color color = Color::from8bit(light.color, std::min<float>(light.opacity, light.intensity / 6.f));
+            const auto& color = Color::from8bit(light.color, std::min<float>(light.opacity, light.intensity / 6.f));
             const uint16_t radius = light.intensity * m_tileSize;
 
             g_drawPool.setBlendEquation(BlendEquation::MAX, true);

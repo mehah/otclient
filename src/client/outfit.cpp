@@ -72,7 +72,7 @@ Color Outfit::getColor(int color)
     }
 
     if (loc3 == 0)
-        return Color(0, 0, 0);
+        return Color::alpha;
 
     if (loc2 == 0) {
         const int loc7 = static_cast<int>(loc3 * 255);
