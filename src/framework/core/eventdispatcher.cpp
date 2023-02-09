@@ -26,7 +26,7 @@
 #include <framework/core/graphicalapplication.h>
 #include "timer.h"
 
-EventDispatcher g_dispatcher, g_mainDispatcher;
+EventDispatcher g_dispatcher, g_textDispatcher, g_mainDispatcher;
 
 void EventDispatcher::shutdown()
 {

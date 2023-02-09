@@ -72,7 +72,7 @@ void AnimatedText::onAppear()
         textDuration /= 2;
 
     // schedule removal
-    g_dispatcher.scheduleEvent([self = asAnimatedText()] { g_map.removeAnimatedText(self); }, textDuration);
+    g_textDispatcher.scheduleEvent([self = asAnimatedText()] { g_map.removeAnimatedText(self); }, textDuration);
 }
 
 bool AnimatedText::merge(const AnimatedTextPtr& other)

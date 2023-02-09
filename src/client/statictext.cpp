@@ -90,7 +90,7 @@ void StaticText::update()
     m_messages.pop_front();
     if (m_messages.empty()) {
         // schedule removal
-        g_dispatcher.addEvent([self = asStaticText()] { g_map.removeStaticText(self); });
+        g_textDispatcher.addEvent([self = asStaticText()] { g_map.removeStaticText(self); });
     } else {
         compose();
         scheduleUpdate();

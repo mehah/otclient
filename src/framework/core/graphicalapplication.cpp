@@ -179,6 +179,7 @@ void GraphicalApplication::run()
     std::thread t3([&]() {
         std::unique_lock lock(txt->getMutex());
         txtCondition.wait(lock, [&]() -> bool {
+            g_textDispatcher.poll();
             g_ui.render(DrawPoolType::TEXT);
             return m_stopping;
         });
