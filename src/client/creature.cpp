@@ -197,8 +197,12 @@ void Creature::drawOutfit(const Rect& destRect, bool resize, const Color color)
     else if ((frameSize = m_exactSize) == 0)
         return;
 
-    g_drawPool.addAction([destRect, frameSize, drawStaste = g_drawPool.getState()] {
-        drawStaste.execute();
+    const auto& oldClipRect = g_drawPool.getClipRect();
+    g_drawPool.resetClipRect();
+
+    const auto& drawState = g_drawPool.getState();
+    g_drawPool.addAction([destRect, frameSize, drawState] {
+        drawState.execute();
 
         const auto& frame = g_framebuffers.getTemporaryFrameBuffer();
         frame->resize(frameSize);
@@ -207,13 +211,15 @@ void Creature::drawOutfit(const Rect& destRect, bool resize, const Color color)
 
     internalDrawOutfit(Point(frameSize - SPRITE_SIZE, frameSize - SPRITE_SIZE) + getDisplacement(), TextureType::NONE, color);
 
-    g_drawPool.addAction([drawStaste = g_drawPool.getState()] {
-        drawStaste.execute();
+    g_drawPool.addAction([drawState] {
+        drawState.execute();
 
         const auto& frame = g_framebuffers.getTemporaryFrameBuffer();
         frame->release();
         frame->draw();
     });
+
+    g_drawPool.setClipRect(oldClipRect);
 }
 
 void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, bool useGray, int drawFlags)

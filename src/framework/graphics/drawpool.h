@@ -72,8 +72,6 @@ public:
     void setScaleFactor(float scale) { m_scaleFactor = scale; }
     inline float getScaleFactor() const { return m_scaleFactor; }
 
-    void resetState();
-
     std::mutex& getMutex() { return m_mutex; }
 
     struct PoolState
@@ -93,7 +91,7 @@ public:
         void execute() const;
     };
 
-    PoolState getState() { return m_state; }
+    const PoolState& getState() const { return m_state; }
 
 protected:
 
@@ -162,6 +160,8 @@ private:
     void add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod& method,
              DrawMode drawMode = DrawMode::TRIANGLES, const DrawBufferPtr& drawBuffer = nullptr,
              const CoordsBufferPtr& coordsBuffer = nullptr);
+
+    void resetState();
 
     size_t updateHash(PoolState& state, const DrawPool::DrawMethod& method);
 

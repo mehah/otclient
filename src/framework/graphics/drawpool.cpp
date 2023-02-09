@@ -276,19 +276,13 @@ void DrawPool::setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bo
 
 void DrawPool::resetState()
 {
-    resetOpacity();
-    resetClipRect();
-    resetShaderProgram();
-    resetBlendEquation();
-    resetCompositionMode();
-    resetTransformMatrix();
-
     for (auto& objs : m_objects) {
         for (auto& order : objs)
             order.clear();
     }
 
     m_objectsByhash.clear();
+    m_state = {};
     m_currentFloor = 0;
     m_status.second = 0;
     m_shaderRefreshDelay = 0;
