@@ -63,6 +63,7 @@ public:
 
     float getOpacity() const { return getCurrentPool()->getOpacity(); }
     Rect getClipRect() const { return getCurrentPool()->getClipRect(); }
+    const DrawPool::PoolState& getState() const { return getCurrentPool()->getState(); }
 
     void resetState() const { getCurrentPool()->resetState(); }
     void resetOpacity() const { getCurrentPool()->resetOpacity(); }

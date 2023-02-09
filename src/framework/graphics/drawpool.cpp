@@ -32,8 +32,10 @@ DrawPool* DrawPool::create(const DrawPoolType type)
         pool = new DrawPoolFramed;
 
         const auto& frameBuffer = pool->toPoolFramed()->m_framebuffer;
+        frameBuffer->m_isScane = true;
+
         if (type == DrawPoolType::MAP) {
-            frameBuffer->setUseAlphaWriting(false);
+            frameBuffer->m_useAlphaWriting = false;
             frameBuffer->disableBlend();
         } else if (type == DrawPoolType::FOREGROUND) {
             pool->m_refreshDelay = 100; // 10 FPS (1000 / 10)
@@ -274,19 +276,13 @@ void DrawPool::setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bo
 
 void DrawPool::resetState()
 {
-    resetOpacity();
-    resetClipRect();
-    resetShaderProgram();
-    resetBlendEquation();
-    resetCompositionMode();
-    resetTransformMatrix();
-
     for (auto& objs : m_objects) {
         for (auto& order : objs)
             order.clear();
     }
 
     m_objectsByhash.clear();
+    m_state = {};
     m_currentFloor = 0;
     m_status.second = 0;
     m_shaderRefreshDelay = 0;
@@ -369,4 +365,17 @@ void DrawPool::optimize(int size) {
         return;
 
     m_alwaysGroupDrawings = size > 115; // Max optimization
+}
+
+void DrawPool::PoolState::execute() const {
+    g_painter->setColor(color);
+    g_painter->setOpacity(opacity);
+    g_painter->setCompositionMode(compositionMode);
+    g_painter->setBlendEquation(blendEquation);
+    g_painter->setClipRect(clipRect);
+    g_painter->setShaderProgram(shaderProgram);
+    g_painter->setTransformMatrix(transformMatrix);
+    if (action) action();
+    if (texture)
+        g_painter->setTexture(texture->create());
 }

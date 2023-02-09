@@ -35,6 +35,7 @@
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
 #include <framework/graphics/texturemanager.h>
+#include <framework/graphics/framebuffermanager.h>
 
 double Creature::speedA = 0;
 double Creature::speedB = 0;
@@ -196,13 +197,29 @@ void Creature::drawOutfit(const Rect& destRect, bool resize, const Color color)
     else if ((frameSize = m_exactSize) == 0)
         return;
 
-    const float scaleFactor = destRect.width() / static_cast<float>(frameSize);
-    const Point dest = destRect.bottomRight() - (Point(SPRITE_SIZE) - getDisplacement()) * scaleFactor;
+    const auto& oldClipRect = g_drawPool.getClipRect();
+    g_drawPool.resetClipRect();
 
-    const float oldScaleFactor = g_drawPool.getScaleFactor();
-    g_drawPool.setScaleFactor(scaleFactor);
-    internalDrawOutfit(dest, TextureType::SMOOTH, color);
-    g_drawPool.setScaleFactor(oldScaleFactor);
+    const auto& drawState = g_drawPool.getState();
+    g_drawPool.addAction([destRect, frameSize, drawState] {
+        drawState.execute();
+
+        const auto& frame = g_framebuffers.getTemporaryFrameBuffer();
+        frame->resize(frameSize);
+        frame->bind(destRect, Rect(0, 0, frame->getSize()));
+    });
+
+    internalDrawOutfit(Point(frameSize - SPRITE_SIZE, frameSize - SPRITE_SIZE) + getDisplacement(), TextureType::NONE, color);
+
+    g_drawPool.addAction([drawState] {
+        drawState.execute();
+
+        const auto& frame = g_framebuffers.getTemporaryFrameBuffer();
+        frame->release();
+        frame->draw();
+    });
+
+    g_drawPool.setClipRect(oldClipRect);
 }
 
 void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, bool useGray, int drawFlags)

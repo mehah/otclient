@@ -72,8 +72,6 @@ public:
     void setScaleFactor(float scale) { m_scaleFactor = scale; }
     inline float getScaleFactor() const { return m_scaleFactor; }
 
-    void resetState();
-
     std::mutex& getMutex() { return m_mutex; }
 
     struct PoolState
@@ -85,12 +83,15 @@ public:
         Rect clipRect;
         PainterShaderProgram* shaderProgram{ nullptr };
         std::function<void()> action{ nullptr };
-        Color color;
+        Color color{ Color::white };
         TexturePtr texture;
         size_t hash{ 0 };
 
         bool operator==(const PoolState& s2) const { return hash == s2.hash; }
+        void execute() const;
     };
+
+    const PoolState& getState() const { return m_state; }
 
 protected:
 
@@ -159,6 +160,8 @@ private:
     void add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod& method,
              DrawMode drawMode = DrawMode::TRIANGLES, const DrawBufferPtr& drawBuffer = nullptr,
              const CoordsBufferPtr& coordsBuffer = nullptr);
+
+    void resetState();
 
     size_t updateHash(PoolState& state, const DrawPool::DrawMethod& method);
 

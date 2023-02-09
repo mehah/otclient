@@ -34,10 +34,10 @@ public:
 
     void release() const { internalRelease(); };
     void bind();
+    void bind(const Rect& dest, const Rect& src) { prepare(dest, src); bind(); }
     void draw();
 
     void setSmooth(bool enabled) { m_smooth = enabled; m_texture = nullptr; }
-    void setUseAlphaWriting(bool use) { m_useAlphaWriting = use; }
 
     bool resize(const Size& size);
     bool isValid() const { return m_texture != nullptr; }
@@ -55,6 +55,7 @@ protected:
 
     friend class FrameBufferManager;
     friend class DrawPoolManager;
+    friend class DrawPool;
 
 private:
     static uint32_t boundFbo;
@@ -63,7 +64,9 @@ private:
     void internalRelease() const;
     void prepare(const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha);
 
-    Matrix3 m_textureMatrix;
+    Size m_oldSize;
+
+    Matrix3 m_textureMatrix, m_oldTextureMatrix;
     TexturePtr m_texture;
 
     uint32_t m_fbo{ 0 };
@@ -74,6 +77,7 @@ private:
     bool m_smooth{ true };
     bool m_useAlphaWriting{ true };
     bool m_disableBlend{ false };
+    bool m_isScane{ false };
 
     Rect m_dest;
     Rect m_src;
