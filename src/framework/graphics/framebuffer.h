@@ -45,8 +45,6 @@ public:
     TexturePtr getTexture() const { return m_texture; }
     Size getSize() const { return m_texture->getSize(); }
 
-    bool isSmooth() const { return m_smooth; }
-
     void setCompositionMode(const CompositionMode mode) { m_compositeMode = mode; }
     void disableBlend() { m_disableBlend = true; }
 

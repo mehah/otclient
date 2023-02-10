@@ -131,12 +131,6 @@ void Minimap::draw(const Rect& screenRect, const Position& mapCenter, float scal
             if (tex) {
                 Rect src(0, 0, MMBLOCK_SIZE, MMBLOCK_SIZE);
                 Rect dest(Point(xs, ys), src.size() * scale);
-
-                const bool smoth = scale < 1.0f;
-                if (smoth != tex->isSmoth()) {
-                    g_mainDispatcher.addEvent([tex, smoth] { tex->setSmooth(smoth); });
-                }
-
                 g_drawPool.addTexturedRect(dest, tex, src);
             }
         }
