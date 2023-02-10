@@ -79,6 +79,7 @@ Texture* Texture::create()
     return this;
 }
 
+void Texture::updateImage(const ImagePtr& image) { m_image = image; setupSize(image->getSize()); }
 void Texture::uploadPixels(const ImagePtr& image, bool buildMipmaps, bool compress)
 {
     if (!setupSize(image->getSize()))
@@ -162,6 +163,9 @@ void Texture::createTexture()
 
 bool Texture::setupSize(const Size& size)
 {
+    if (m_size == size)
+        return true;
+
     // checks texture max size
     if (std::max<int>(size.width(), size.height()) > g_graphics.getMaxTextureSize()) {
         g_logger.error(stdext::format("loading texture with size %dx%d failed, "

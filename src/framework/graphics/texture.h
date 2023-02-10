@@ -34,7 +34,7 @@ public:
 
     Texture* create();
     void uploadPixels(const ImagePtr& image, bool buildMipmaps = false, bool compress = false);
-    void updateImage(const ImagePtr& image) { m_image = image; }
+    void updateImage(const ImagePtr& image);
 
     virtual void buildHardwareMipmaps();
 
@@ -54,6 +54,7 @@ public:
     int getWidth() const { return m_size.width(); }
     int getHeight() const { return m_size.height(); }
 
+    bool isSmoth() const { return m_smooth; }
     bool isEmpty() const { return m_id == 0; }
     bool hasRepeat() const { return m_repeat; }
     bool hasMipmaps() const { return m_hasMipmaps; }
