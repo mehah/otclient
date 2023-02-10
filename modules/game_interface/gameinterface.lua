@@ -114,7 +114,7 @@ function onSelectPanel(self, checked)
 end
 
 function bindKeys()
-    gameRootPanel:setAutoRepeatDelay(200)
+    gameMapPanel:setAutoRepeatDelay(75)
 
     bindWalkKey('Up', North)
     bindWalkKey('Right', East)
