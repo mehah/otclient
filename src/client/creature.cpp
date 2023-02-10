@@ -190,14 +190,12 @@ void Creature::drawOutfit(const Rect& destRect, bool resize, const Color color)
     if (!m_thingType)
         return;
 
-    uint8_t frameSize;
-    if (!resize)
-        frameSize = m_frameSizeNotResized;
-    else if ((frameSize = m_exactSize) == 0)
+    const uint8_t frameSize = resize ? m_exactSize : m_frameSizeNotResized;
+    if (frameSize == 0)
         return;
 
-    g_drawPool.bindFrameBuffer(std::max<uint8_t>(frameSize, SPRITE_SIZE));
-    internalDrawOutfit(Point(std::max<int>(frameSize - SPRITE_SIZE, 0)) + getDisplacement(), TextureType::NONE, color);
+    g_drawPool.bindFrameBuffer(frameSize);
+    internalDrawOutfit(Point(frameSize - SPRITE_SIZE) + getDisplacement(), TextureType::NONE, color);
     g_drawPool.releaseFrameBuffer(destRect);
 }
 
@@ -715,6 +713,7 @@ void Creature::setOutfit(const Outfit& outfit)
     }
 
     m_walkAnimationPhase = 0; // might happen when player is walking and outfit is changed.
+    m_exactSize = std::max<uint8_t>(m_exactSize, SPRITE_SIZE);
     m_frameSizeNotResized = std::max<int>(m_exactSize * 0.75f, 2 * SPRITE_SIZE * 0.75f);
 
     callLuaField("onOutfitChange", m_outfit, oldOutfit);
