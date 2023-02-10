@@ -196,7 +196,7 @@ void Creature::drawOutfit(const Rect& destRect, bool resize, const Color color)
     else if ((frameSize = m_exactSize) == 0)
         return;
 
-    g_drawPool.bindFrameBuffer(frameSize);
+    g_drawPool.bindFrameBuffer(std::max<uint8_t>(frameSize, SPRITE_SIZE));
     internalDrawOutfit(Point(std::max<int>(frameSize - SPRITE_SIZE, 0)) + getDisplacement(), TextureType::NONE, color);
     g_drawPool.releaseFrameBuffer(destRect);
 }
