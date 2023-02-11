@@ -114,7 +114,7 @@ function onSelectPanel(self, checked)
 end
 
 function bindKeys()
-    gameMapPanel:setAutoRepeatDelay(75)
+    gameRootPanel:setAutoRepeatDelay(75)
 
     bindWalkKey('Up', North)
     bindWalkKey('Right', East)
@@ -658,12 +658,14 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
             end)
         end
 
-        local onWrapItem = function() g_game.wrap(useThing) end
+        local onWrapItem = function()
+            g_game.wrap(useThing)
+        end
         if useThing:isWrapable() then
             menu:addOption(tr('Wrap'), onWrapItem)
         end
         if useThing:isUnwrapable() then
-        menu:addOption(tr('Unwrap'), onWrapItem)
+            menu:addOption(tr('Unwrap'), onWrapItem)
         end
 
         if g_game.getFeature(GameBrowseField) and useThing:getPosition().x ~= 0xffff then
