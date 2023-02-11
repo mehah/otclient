@@ -13,21 +13,6 @@ function setMusic(filename)
     end
 end
 
-function reloadScripts()
-    g_textures.clearCache()
-    g_modules.reloadModules()
-
-    local script = '/' .. g_app.getCompactName() .. 'rc.lua'
-    if g_resources.fileExists(script) then
-        dofile(script)
-    end
-
-    local message = tr('All modules and scripts were reloaded.')
-
-    modules.game_textmessage.displayGameMessage(message)
-    print(message)
-end
-
 function startup()
     -- Play startup music (The Silver Tree, by Mattias Westlund)
     if musicChannel then
@@ -115,8 +100,6 @@ function init()
 
     -- poll resize events
     g_window.poll()
-
-    g_keyboard.bindKeyDown('Ctrl+Shift+R', reloadScripts)
 
     -- generate machine uuid, this is a security measure for storing passwords
     if not g_crypt.setMachineUUID(g_settings.get('uuid')) then
