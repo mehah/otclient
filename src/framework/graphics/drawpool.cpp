@@ -84,9 +84,12 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
     }
 
     uint8_t order = conductor.order;
-    if (m_type == DrawPoolType::MAP && order == DrawOrder::FIRST && !conductor.agroup) {
+    if (m_type == DrawPoolType::FOREGROUND)
+        order = DrawOrder::FIRST;
+    else if (m_type == DrawPoolType::MAP && order == DrawOrder::FIRST && !conductor.agroup)
         order = DrawOrder::THIRD;
-    }
+
+    auto& list = m_objects[m_currentFloor][order];
 
     if (m_alwaysGroupDrawings || conductor.agroup) {
         const auto it = m_objectsByhash.find(state.hash);
@@ -95,9 +98,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
         const auto& coords = bufferFound ? it->second.coords : std::make_shared<CoordsBuffer>();
 
         if (!bufferFound) {
-            m_objectsByhash.emplace(state.hash,
-                m_objects[m_currentFloor][order].emplace_back(state, coords)
-            );
+            m_objectsByhash.emplace(state.hash, list.emplace_back(state, coords));
         }
 
         if (coordsBuffer)
@@ -107,8 +108,6 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
 
         return;
     }
-
-    auto& list = m_objects[m_currentFloor][order];
 
     if (!list.empty()) {
         auto& prevObj = list.back();
