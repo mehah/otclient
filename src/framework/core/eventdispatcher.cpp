@@ -27,6 +27,7 @@
 #include "timer.h"
 
 EventDispatcher g_dispatcher, g_textDispatcher, g_mainDispatcher;
+std::thread::id g_mainThreadId = std::this_thread::get_id();
 
 void EventDispatcher::shutdown()
 {
@@ -43,18 +44,23 @@ void EventDispatcher::shutdown()
 
 void EventDispatcher::poll()
 {
-    std::scoped_lock<std::recursive_mutex> lock(m_mutex);
-    for (int count = 0, max = m_scheduledEventList.size(); count < max && !m_scheduledEventList.empty(); ++count) {
-        const auto scheduledEvent = m_scheduledEventList.top();
-        if (scheduledEvent->remainingTicks() > 0)
-            break;
+    {
+        std::scoped_lock l(m_mutex);
+        for (int count = 0, max = m_scheduledEventList.size(); count < max && !m_scheduledEventList.empty(); ++count) {
+            const auto scheduledEvent = m_scheduledEventList.top();
+            if (scheduledEvent->remainingTicks() > 0)
+                break;
 
-        m_scheduledEventList.pop();
-        scheduledEvent->execute();
+            m_scheduledEventList.pop();
+            scheduledEvent->execute();
 
-        if (scheduledEvent->nextCycle())
-            m_scheduledEventList.push(scheduledEvent);
+            if (scheduledEvent->nextCycle())
+                m_scheduledEventList.push(scheduledEvent);
+        }
     }
+
+    const bool isMainDispatcher = &g_mainDispatcher == this;
+    std::unique_lock ul(m_mutex);
 
     // execute events list until all events are out, this is needed because some events can schedule new events that would
     // change the UIWidgets layout, in this case we must execute these new events before we continue rendering,
@@ -73,7 +79,9 @@ void EventDispatcher::poll()
         for (int_fast32_t i = -1; ++i < m_pollEventsSize;) {
             const auto event = m_eventList.front();
             m_eventList.pop_front();
+            if (isMainDispatcher) ul.unlock();
             event->execute();
+            if (isMainDispatcher) ul.lock();
         }
         m_pollEventsSize = m_eventList.size();
 
@@ -111,6 +119,11 @@ EventPtr EventDispatcher::addEvent(const std::function<void()>& callback, bool p
 {
     if (m_disabled)
         return std::make_shared<Event>(nullptr);
+
+    if (&g_mainDispatcher == this && g_mainThreadId == std::this_thread::get_id()) {
+        callback();
+        return std::make_shared<Event>(nullptr);
+    }
 
     std::scoped_lock<std::recursive_mutex> lock(m_mutex);
 

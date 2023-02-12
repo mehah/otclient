@@ -906,30 +906,22 @@ void WIN32Window::setMinimumSize(const Size& minimumSize)
 
 void WIN32Window::setFullscreen(bool fullscreen)
 {
-    g_mainDispatcher.addEvent([&, fullscreen] {
-        if (m_fullscreen == fullscreen)
-            return;
+    static WINDOWPLACEMENT wpPrev;
 
-        m_fullscreen = fullscreen;
+    if (m_fullscreen == fullscreen)
+        return;
 
+    m_fullscreen = fullscreen;
+    wpPrev.length = sizeof(wpPrev);
+
+    g_mainDispatcher.addEvent([this, fullscreen] {
         const DWORD dwStyle = GetWindowLong(m_window, GWL_STYLE);
-        static WINDOWPLACEMENT wpPrev;
-        wpPrev.length = sizeof(wpPrev);
 
         if (fullscreen) {
-            MONITORINFO mi;
-            const HMONITOR m = MonitorFromWindow(m_window, MONITOR_DEFAULTTONEAREST);
-            mi.cbSize = sizeof(mi);
-            GetMonitorInfoW(m, &mi);
-            const uint32_t x = mi.rcMonitor.left;
-            const uint32_t y = mi.rcMonitor.top;
-            const uint32_t width = mi.rcMonitor.right - mi.rcMonitor.left;
-            const uint32_t height = mi.rcMonitor.bottom - mi.rcMonitor.top;
-
+            const auto& size = getDisplaySize();
             GetWindowPlacement(m_window, &wpPrev);
-
             SetWindowLong(m_window, GWL_STYLE, (dwStyle & ~WS_OVERLAPPEDWINDOW) | WS_POPUP | WS_EX_TOPMOST);
-            SetWindowPos(m_window, HWND_TOPMOST, x, y, width, height, SWP_FRAMECHANGED);
+            SetWindowPos(m_window, HWND_TOPMOST, 0, 0, size.width(), size.height(), SWP_FRAMECHANGED);
         } else {
             SetWindowLong(m_window, GWL_STYLE, (dwStyle & ~(WS_POPUP | WS_EX_TOPMOST)) | WS_OVERLAPPEDWINDOW);
             SetWindowPlacement(m_window, &wpPrev);

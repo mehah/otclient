@@ -182,6 +182,9 @@ void UIWidget::setImageSource(const std::string_view source)
     }
 
     m_imageTexture = g_textures.getTexture(m_imageSource = source);
+    if (!m_imageTexture)
+        return;
+
     if (m_imageTexture->isAnimatedTexture())
         std::static_pointer_cast<AnimatedTexture>(m_imageTexture)->restart();
 

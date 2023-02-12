@@ -239,12 +239,13 @@ void GraphicalApplication::close()
 void GraphicalApplication::resize(const Size& size)
 {
     m_onInputEvent = true;
-    g_mainDispatcher.addEvent([=, this] {
+    g_ui.resize(size);
+    m_onInputEvent = false;
+
+    g_mainDispatcher.addEvent([this, size] {
         g_graphics.resize(size);
         g_drawPool.get<DrawPoolFramed>(DrawPoolType::FOREGROUND)->resize(size);
     });
-    g_ui.resize(size);
-    m_onInputEvent = false;
 }
 
 void GraphicalApplication::inputEvent(const InputEvent& event)
