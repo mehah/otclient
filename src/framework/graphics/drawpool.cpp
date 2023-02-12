@@ -58,8 +58,8 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
     auto state = PoolState{
        std::move(m_state.transformMatrix), m_state.opacity,
        m_state.compositionMode, m_state.blendEquation,
-       m_state.clipRect, m_state.shaderProgram,
-       m_state.action, std::move(const_cast<Color&>(color)), texture
+       std::move(m_state.clipRect), m_state.shaderProgram,
+       std::move(m_state.action), std::move(const_cast<Color&>(color)), texture
     };
 
     updateHash(state, method);
