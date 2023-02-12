@@ -41,7 +41,7 @@ enum class DrawPoolType : uint8_t
     UNKNOW
 };
 
-enum DrawOrder
+enum DrawOrder : uint8_t
 {
     FIRST,  // GROUND
     SECOND, // BORDER
