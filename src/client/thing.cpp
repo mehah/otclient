@@ -87,11 +87,6 @@ int Thing::getStackPos()
     return -1;
 }
 
-void Thing::onDisappear() {
-    if (m_drawBuffer)
-        m_drawBuffer->invalidate();
-}
-
 void Thing::setShader(const std::string_view name) { m_shader = g_shaders.getShader(name); }
 
 void Thing::attachEffect(const AttachedEffectPtr& obj) {

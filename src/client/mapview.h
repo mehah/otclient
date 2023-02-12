@@ -304,6 +304,6 @@ private:
     TilePtr m_lastHighlightTile;
     TexturePtr m_crosshairTexture;
 
-    DrawBufferPtr m_shadowBuffer;
+    DrawConductor m_shadowConductor{ false, DrawOrder::FIFTH };
     DrawPoolFramed* m_pool;
 };

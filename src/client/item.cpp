@@ -56,7 +56,7 @@ void Item::draw(const Point& dest, uint32_t flags, TextureType textureType, bool
     drawAttachedEffect(dest, lightView, false); // On Bottom
     if (textureType != TextureType::ALL_BLANK && m_shader)
         g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
-    getThingType()->draw(dest, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, textureType, m_color, lightView, m_drawBuffer);
+    getThingType()->draw(dest, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, textureType, m_color, lightView, m_drawConductor);
     drawAttachedEffect(dest, lightView, true); // On Top
 
     if (isMarked) {
@@ -64,26 +64,24 @@ void Item::draw(const Point& dest, uint32_t flags, TextureType textureType, bool
     }
 }
 
-// Do not change if you do not understand what is being done.
-void Item::createBuffer()
+void Item::setConductor()
 {
-    DrawPool::DrawOrder order = DrawPool::DrawOrder::NONE;
-    if (isSingleGround())
-        order = DrawPool::DrawOrder::FIRST;
-    else if (isSingleGroundBorder() && !hasElevation())
-        order = DrawPool::DrawOrder::SECOND;
-
-    m_drawBuffer = order != DrawPool::DrawOrder::NONE ? std::make_shared<DrawBuffer>(order) : nullptr;
+    if (isSingleGround()) {
+        m_drawConductor.agroup = true;
+        m_drawConductor.order = DrawOrder::FIRST;
+    } else if (isSingleGroundBorder() && !hasElevation()) {
+        m_drawConductor.agroup = true;
+        m_drawConductor.order = DrawOrder::SECOND;
+    } else
+        m_drawConductor.order = DrawOrder::THIRD;
 }
 
 void Item::setPosition(const Position& position, uint8_t stackPos, bool hasElevation)
 {
     Thing::setPosition(position, stackPos);
 
-    if (hasElevation)
-        m_drawBuffer = nullptr;
-    else if (m_drawBuffer)
-        m_drawBuffer->agroup(stackPos == 0);
+    if (hasElevation || m_drawConductor.agroup && stackPos > 0)
+        m_drawConductor.agroup = false;
 }
 
 int Item::getSubType()
@@ -244,7 +242,7 @@ void Item::setId(uint32_t id)
 
     m_clientId = id;
     m_thingType = g_things.getThingType(m_clientId, ThingCategoryItem).get();
-    createBuffer();
+    setConductor();
 
     // Shader example on only items that can be marketed.
     /*
@@ -289,7 +287,7 @@ void Item::setOtbId(uint16_t id)
 
     m_clientId = id;
     m_thingType = g_things.getThingType(m_clientId, ThingCategoryItem).get();
-    createBuffer();
+    setConductor();
 }
 
 void Item::unserializeItem(const BinaryTreePtr& in)

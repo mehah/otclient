@@ -49,7 +49,6 @@ class SpriteSheet;
 class DrawPool;
 class DrawPoolFramed;
 class DrawPoolManager;
-class DrawBuffer;
 class CoordsBuffer;
 
 using ImagePtr = std::shared_ptr<Image>;
@@ -70,7 +69,6 @@ using ParticleEffectPtr = std::shared_ptr<ParticleEffect>;
 using SpriteSheetPtr = std::shared_ptr<SpriteSheet>;
 using ShaderList = std::vector<ShaderPtr>;
 
-using DrawBufferPtr = std::shared_ptr<DrawBuffer>;
 using CoordsBufferPtr = std::shared_ptr<CoordsBuffer>;
 
 using ParticleEffectTypePtr = std::shared_ptr<ParticleEffectType>;

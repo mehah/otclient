@@ -49,6 +49,13 @@ public:
     }
 
     Color(const Color& color) = default;
+    Color(const Color& color, float alpha) {
+        m_r = color.m_r;
+        m_g = color.m_g;
+        m_b = color.m_b;
+        m_a = alpha;
+        update();
+    }
 
     uint8_t a() const { return static_cast<uint8_t>(m_a * 255.f); }
     uint8_t b() const { return static_cast<uint8_t>(m_b * 255.f); }

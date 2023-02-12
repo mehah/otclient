@@ -248,8 +248,8 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
         if (const auto& ground = getGround()) {
             --stackPos;
             if (ground->isTopGround()) {
-                ground->destroyBuffer();
-                thing->destroyBuffer();
+                ground->ungroup();
+                thing->ungroup();
             }
         }
     }

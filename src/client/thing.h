@@ -160,13 +160,12 @@ public:
     void canDraw(bool canDraw) { m_canDraw = canDraw; }
     inline bool canDraw() const { return m_canDraw && m_clientId > 0; }
 
-    void destroyBuffer() { m_drawBuffer = nullptr; }
-
     void setShader(const std::string_view name);
+    void ungroup() { m_drawConductor.agroup = false; }
 
     virtual void onPositionChange(const Position& /*newPos*/, const Position& /*oldPos*/) {}
     virtual void onAppear() {}
-    virtual void onDisappear();
+    virtual void onDisappear() {};
     const Color& getMarkedColor() { m_markedColor.setAlpha(0.1f + std::abs(500 - g_clock.millis() % 1000) / 1000.0f); return m_markedColor; }
 
     void attachEffect(const AttachedEffectPtr& obj);
@@ -201,7 +200,7 @@ protected:
 
     Position m_position;
     ThingType* m_thingType{ nullptr };
-    DrawBufferPtr m_drawBuffer;
+    DrawConductor m_drawConductor;
 
     Color m_markedColor{ Color::yellow };
 

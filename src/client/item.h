@@ -148,7 +148,7 @@ public:
 #endif
 
 private:
-    void createBuffer();
+    void setConductor();
 
     uint8_t m_countOrSubType{ 0 };
 

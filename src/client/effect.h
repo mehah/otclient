@@ -30,6 +30,7 @@
 class Effect : public Thing
 {
 public:
+    Effect() { m_drawConductor.order = DrawOrder::THIRD; };
     void drawEffect(const Point& dest, uint32_t flags, int offsetX, int offsetY, LightView* lightView = nullptr);
 
     void setId(uint32_t id) override;

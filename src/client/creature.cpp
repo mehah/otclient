@@ -42,6 +42,7 @@ double Creature::speedC = 0;
 
 Creature::Creature() :m_type(Proto::CreatureTypeUnknown)
 {
+    m_drawConductor.order = DrawOrder::THIRD;
     m_name.setFont(g_fonts.getFont("verdana-11px-rounded"));
     m_name.setAlign(Fw::AlignTopCenter);
 

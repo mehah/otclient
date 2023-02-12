@@ -85,8 +85,6 @@ MapView::MapView() : m_pool(g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP))
         g_painter->resetOpacity();
     });
 
-    m_shadowBuffer = std::make_shared<DrawBuffer>(DrawPool::DrawOrder::FIFTH, false);
-
     setVisibleDimension(Size(15, 11));
 }
 
@@ -184,7 +182,7 @@ void MapView::drawFloor()
 
             if (m_shadowFloorIntensity > 0 && z == cameraPosition.z + 1) {
                 g_drawPool.setOpacity(m_shadowFloorIntensity, true);
-                g_drawPool.addFilledRect(m_rectDimension, Color::black, m_shadowBuffer);
+                g_drawPool.addFilledRect(m_rectDimension, Color::black, m_shadowConductor);
             }
 
             if (canFloorFade())
