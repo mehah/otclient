@@ -83,6 +83,11 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
         m_onlyOnceStateFlag = 0;
     }
 
+    uint8_t order = conductor.order;
+    if (m_type == DrawPoolType::MAP && order == DrawOrder::FIRST && !conductor.agroup) {
+        order = DrawOrder::THIRD;
+    }
+
     if (m_alwaysGroupDrawings || conductor.agroup) {
         const auto it = m_objectsByhash.find(state.hash);
 
@@ -91,7 +96,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
 
         if (!bufferFound) {
             m_objectsByhash.emplace(state.hash,
-                m_objects[m_currentFloor][conductor.order].emplace_back(state, coords)
+                m_objects[m_currentFloor][order].emplace_back(state, coords)
             );
         }
 
@@ -103,22 +108,20 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
         return;
     }
 
-    auto& list = m_objects[m_currentFloor][conductor.order];
+    auto& list = m_objects[m_currentFloor][order];
 
     if (!list.empty()) {
         auto& prevObj = list.back();
 
         if (prevObj.state == state) {
-            if (!prevObj.coords) {
+            if (!prevObj.coords)
                 prevObj.addMethod(method);
-                return;
-            }
-
-            if (coordsBuffer) {
+            else if (coordsBuffer)
                 prevObj.coords->append(coordsBuffer.get());
-            } else {
+            else
                 addCoords(prevObj.coords.get(), method, DrawMode::TRIANGLES);
-            }
+
+            return;
         }
     }
 

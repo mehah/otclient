@@ -246,7 +246,7 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
     // Do not change if you do not understand what is being done.
     {
         if (const auto& ground = getGround()) {
-            --stackPos;
+            stackPos = std::max<int>(--stackPos, 0);
             if (ground->isTopGround()) {
                 ground->ungroup();
                 thing->ungroup();

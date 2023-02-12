@@ -72,8 +72,7 @@ void Item::setConductor()
     } else if (isSingleGroundBorder() && !hasElevation()) {
         m_drawConductor.agroup = true;
         m_drawConductor.order = DrawOrder::SECOND;
-    } else
-        m_drawConductor.order = DrawOrder::THIRD;
+    }
 }
 
 void Item::setPosition(const Position& position, uint8_t stackPos, bool hasElevation)

@@ -200,7 +200,7 @@ protected:
 
     Position m_position;
     ThingType* m_thingType{ nullptr };
-    DrawConductor m_drawConductor;
+    DrawConductor m_drawConductor{ false, DrawOrder::THIRD };
 
     Color m_markedColor{ Color::yellow };
 
