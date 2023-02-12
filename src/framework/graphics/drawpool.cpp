@@ -82,23 +82,11 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod& me
 
     const size_t methodHash = updateHash(state, method);
 
-    const DrawOrder drawOrder = m_type == DrawPoolType::MAP ? DrawPool::DrawOrder::THIRD : DrawPool::DrawOrder::FIRST;
+    const uint8_t drawOrder = static_cast<uint8_t>(m_type == DrawPoolType::MAP ? drawBuffer ? drawBuffer->m_order : DrawPool::DrawOrder::THIRD : DrawPool::DrawOrder::FIRST);
 
     if (m_type != DrawPoolType::FOREGROUND && (m_alwaysGroupDrawings || (drawBuffer && drawBuffer->m_agroup))) {
         if (const auto it = m_objectsByhash.find(state.hash); it != m_objectsByhash.end()) {
             const auto& buffer = it->second.buffer;
-
-            if (!buffer->isTemporary() && buffer->isValid()) {
-                auto& hashList = buffer->m_hashs;
-                if (++buffer->m_i != hashList.size()) {
-                    // checks if the vertex to be added is in the same position,
-                    // otherwise the buffer will be invalidated to recreate the cache.
-                    if (hashList[buffer->m_i] != methodHash)
-                        buffer->invalidate();
-                    else return;
-                }
-                hashList.push_back(methodHash);
-            }
 
             if (coordsBuffer)
                 buffer->getCoords()->append(coordsBuffer.get());
@@ -108,36 +96,19 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod& me
             return;
         }
 
-        const auto& buffer = drawBuffer ? drawBuffer : DrawBuffer::createTemporaryBuffer(drawOrder);
+        const auto& buffer = DrawBuffer::createTemporaryBuffer(static_cast<DrawOrder>(drawOrder));
+        auto* coords = buffer->getCoords();
+        if (coordsBuffer)
+            coords->append(coordsBuffer.get());
+        else
+            addCoords(coords, method, DrawMode::TRIANGLES);
 
-        bool addCoord = buffer->isTemporary();
-        if (!addCoord) { // is not temp buffer
-            if (buffer->m_stateHash != state.hash || !buffer->isValid()) {
-                buffer->getCoords()->clear();
-                buffer->m_stateHash = state.hash;
-                buffer->m_hashs.clear();
-                buffer->m_hashs.push_back(methodHash);
-                addCoord = true;
-            }
-            buffer->m_i = 0; // reset identifier to say it is valid.
-        }
-
-        if (addCoord) {
-            auto* coords = buffer->getCoords();
-            if (coordsBuffer)
-                coords->append(coordsBuffer.get());
-            else
-                addCoords(coords, method, DrawMode::TRIANGLES);
-        }
-
-        m_currentOrder = static_cast<uint8_t>(buffer->m_order);
-        m_objectsByhash.emplace(state.hash, m_objects[m_currentFloor][m_currentOrder].emplace_back(state, buffer));
+        m_objectsByhash.emplace(state.hash, m_objects[m_currentFloor][drawOrder].emplace_back(state, buffer));
 
         return;
     }
 
-    m_currentOrder = static_cast<uint8_t>(drawBuffer ? drawBuffer->m_order : drawOrder);
-    auto& list = m_objects[m_currentFloor][m_currentOrder];
+    auto& list = m_objects[m_currentFloor][drawOrder];
 
     if (!list.empty()) {
         auto& prevObj = list.back();

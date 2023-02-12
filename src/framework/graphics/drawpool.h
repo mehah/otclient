@@ -204,7 +204,6 @@ private:
     bool m_enabled{ true };
     bool m_alwaysGroupDrawings{ false };
 
-    uint8_t m_currentOrder{ 0 };
     uint8_t m_currentFloor{ 0 };
 
     uint16_t m_refreshDelay{ 0 }, m_shaderRefreshDelay{ 0 };
@@ -294,7 +293,6 @@ private:
     size_t m_ref{ 0 };
     size_t m_stateHash{ 0 };
 
-    std::vector<size_t> m_hashs;
     CoordsBufferPtr m_coords;
 
     friend class DrawPool;
