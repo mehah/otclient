@@ -30,6 +30,7 @@
 class Missile : public Thing
 {
 public:
+    Missile() { m_drawConductor = { true, DrawOrder::FIFTH }; };
     void drawMissile(const Point& dest, LightView* lightView = nullptr);
 
     void setId(uint32_t id) override;

@@ -52,14 +52,17 @@ DrawPool* DrawPool::create(const DrawPoolType type)
     return pool;
 }
 
-void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod& method, const DrawMode drawMode, const DrawBufferPtr& drawBuffer, const CoordsBufferPtr& coordsBuffer)
+void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod& method,
+             DrawMode drawMode, const DrawConductor& conductor, const CoordsBufferPtr& coordsBuffer)
 {
     auto state = PoolState{
-       m_state.transformMatrix, m_state.opacity,
+       std::move(m_state.transformMatrix), m_state.opacity,
        m_state.compositionMode, m_state.blendEquation,
-       m_state.clipRect, m_state.shaderProgram,
-       m_state.action, color, texture
+       std::move(m_state.clipRect), m_state.shaderProgram,
+       std::move(m_state.action), std::move(const_cast<Color&>(color)), texture
     };
+
+    updateHash(state, method);
 
     if (m_onlyOnceStateFlag > 0) { // Only Once State
         if (m_onlyOnceStateFlag & STATE_OPACITY)
@@ -80,88 +83,51 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod& me
         m_onlyOnceStateFlag = 0;
     }
 
-    const size_t methodHash = updateHash(state, method);
+    uint8_t order = conductor.order;
+    if (m_type == DrawPoolType::MAP && order == DrawOrder::FIRST && !conductor.agroup) {
+        order = DrawOrder::THIRD;
+    }
 
-    const DrawOrder drawOrder = m_type == DrawPoolType::MAP ? DrawPool::DrawOrder::THIRD : DrawPool::DrawOrder::FIRST;
+    if (m_alwaysGroupDrawings || conductor.agroup) {
+        const auto it = m_objectsByhash.find(state.hash);
 
-    if (m_type != DrawPoolType::FOREGROUND && (m_alwaysGroupDrawings || (drawBuffer && drawBuffer->m_agroup))) {
-        if (const auto it = m_objectsByhash.find(state.hash); it != m_objectsByhash.end()) {
-            const auto& buffer = it->second.buffer;
+        const bool bufferFound = it != m_objectsByhash.end();
+        const auto& coords = bufferFound ? it->second.coords : std::make_shared<CoordsBuffer>();
 
-            if (!buffer->isTemporary() && buffer->isValid()) {
-                auto& hashList = buffer->m_hashs;
-                if (++buffer->m_i != hashList.size()) {
-                    // checks if the vertex to be added is in the same position,
-                    // otherwise the buffer will be invalidated to recreate the cache.
-                    if (hashList[buffer->m_i] != methodHash)
-                        buffer->invalidate();
-                    else return;
-                }
-                hashList.push_back(methodHash);
-            }
-
-            if (coordsBuffer)
-                buffer->getCoords()->append(coordsBuffer.get());
-            else
-                addCoords(buffer->getCoords(), method, DrawMode::TRIANGLES);
-
-            return;
+        if (!bufferFound) {
+            m_objectsByhash.emplace(state.hash,
+                m_objects[m_currentFloor][order].emplace_back(state, coords)
+            );
         }
 
-        const auto& buffer = drawBuffer ? drawBuffer : DrawBuffer::createTemporaryBuffer(drawOrder);
-
-        bool addCoord = buffer->isTemporary();
-        if (!addCoord) { // is not temp buffer
-            if (buffer->m_stateHash != state.hash || !buffer->isValid()) {
-                buffer->getCoords()->clear();
-                buffer->m_stateHash = state.hash;
-                buffer->m_hashs.clear();
-                buffer->m_hashs.push_back(methodHash);
-                addCoord = true;
-            }
-            buffer->m_i = 0; // reset identifier to say it is valid.
-        }
-
-        if (addCoord) {
-            auto* coords = buffer->getCoords();
-            if (coordsBuffer)
-                coords->append(coordsBuffer.get());
-            else
-                addCoords(coords, method, DrawMode::TRIANGLES);
-        }
-
-        m_currentOrder = static_cast<uint8_t>(buffer->m_order);
-        m_objectsByhash.emplace(state.hash, m_objects[m_currentFloor][m_currentOrder].emplace_back(state, buffer));
+        if (coordsBuffer)
+            coords->append(coordsBuffer.get());
+        else
+            addCoords(coords.get(), method, DrawMode::TRIANGLES);
 
         return;
     }
 
-    m_currentOrder = static_cast<uint8_t>(drawBuffer ? drawBuffer->m_order : drawOrder);
-    auto& list = m_objects[m_currentFloor][m_currentOrder];
+    auto& list = m_objects[m_currentFloor][order];
 
     if (!list.empty()) {
         auto& prevObj = list.back();
 
         if (prevObj.state == state) {
-            if (!prevObj.buffer) {
+            if (!prevObj.coords)
                 prevObj.addMethod(method);
-                return;
-            }
+            else if (coordsBuffer)
+                prevObj.coords->append(coordsBuffer.get());
+            else
+                addCoords(prevObj.coords.get(), method, DrawMode::TRIANGLES);
 
-            if (prevObj.buffer->isTemporary()) {
-                if (coordsBuffer) {
-                    prevObj.buffer->getCoords()->append(coordsBuffer.get());
-                } else {
-                    addCoords(prevObj.buffer->getCoords(), method, DrawMode::TRIANGLES);
-                }
-            }
+            return;
         }
     }
 
     if (coordsBuffer) {
-        const auto& buffer = DrawBuffer::createTemporaryBuffer(DrawPool::DrawOrder::FIRST);
-        buffer->getCoords()->append(coordsBuffer.get());
-        list.emplace_back(state, buffer);
+        list.emplace_back(state, std::make_shared<CoordsBuffer>())
+            .coords->append(coordsBuffer.get());
     } else
         list.emplace_back(drawMode, state, method);
 }
@@ -187,7 +153,7 @@ void DrawPool::addCoords(CoordsBuffer* buffer, const DrawMethod& method, DrawMod
     }
 }
 
-size_t DrawPool::updateHash(PoolState& state, const DrawMethod& method)
+void DrawPool::updateHash(PoolState& state, const DrawMethod& method)
 {
     { // State Hash
         if (state.blendEquation != BlendEquation::ADD)
@@ -217,8 +183,8 @@ size_t DrawPool::updateHash(PoolState& state, const DrawMethod& method)
         stdext::hash_union(m_status.second, state.hash);
     }
 
-    size_t methodhash = 0;
     { // Method Hash
+        size_t methodhash = 0;
         if (method.type == DrawPool::DrawMethodType::TRIANGLE) {
             if (!method.a.isNull()) stdext::hash_union(methodhash, method.a.hash());
             if (!method.b.isNull()) stdext::hash_union(methodhash, method.b.hash());
@@ -232,8 +198,6 @@ size_t DrawPool::updateHash(PoolState& state, const DrawMethod& method)
 
         stdext::hash_union(m_status.second, methodhash);
     }
-
-    return methodhash;
 }
 
 void DrawPool::setCompositionMode(const CompositionMode mode, bool onlyOnce)

@@ -64,10 +64,10 @@ void Effect::drawEffect(const Point& dest, uint32_t flags, int offsetX, int offs
             yPattern += getNumPatternY();
     }
 
-    if (g_app.isDrawingEffectsOnTop() && !m_drawBuffer)
-        m_drawBuffer = std::make_shared<DrawBuffer>(DrawPool::DrawOrder::FOURTH);
+    if (g_app.isDrawingEffectsOnTop())
+        m_drawConductor.agroup = true;
 
-    getThingType()->draw(dest, 0, xPattern, yPattern, 0, animationPhase, flags, TextureType::NONE, Color::white, lightView, m_drawBuffer);
+    getThingType()->draw(dest, 0, xPattern, yPattern, 0, animationPhase, flags, TextureType::NONE, Color::white, lightView, m_drawConductor);
 }
 
 void Effect::onAppear()

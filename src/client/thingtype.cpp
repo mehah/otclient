@@ -597,7 +597,7 @@ void ThingType::unserializeOtml(const OTMLNodePtr& node)
     }
 }
 
-void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, uint32_t flags, TextureType textureType, Color color, LightView* lightView, const DrawBufferPtr& drawBuffer)
+void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, uint32_t flags, TextureType textureType, const Color& color, LightView* lightView, const DrawConductor& conductor)
 {
     if (m_null)
         return;
@@ -621,13 +621,8 @@ void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, i
     const Rect screenRect(dest + (textureOffset - m_displacement - (m_size.toPoint() - Point(1)) * SPRITE_SIZE) * g_drawPool.getScaleFactor(), textureRect.size() * g_drawPool.getScaleFactor());
 
     if (flags & Otc::DrawThings) {
-        if (m_opacity < 1.0f)
-            color.setAlpha(m_opacity);
-
-        if (drawBuffer)
-            drawBuffer->validate(dest);
-
-        g_drawPool.addTexturedRect(screenRect, texture, textureRect, color, drawBuffer);
+        const Color& newColor = m_opacity < 1.0f ? Color(color, m_opacity) : color;
+        g_drawPool.addTexturedRect(screenRect, texture, textureRect, m_opacity < 1.0f ? Color(color) : color, conductor);
     }
 
     if (lightView && hasLight() && flags & Otc::DrawLights) {

@@ -28,12 +28,12 @@
 
 void Missile::drawMissile(const Point& dest, LightView* lightView)
 {
-    if (!canDraw() || !m_drawBuffer)
+    if (!canDraw())
         return;
 
     const float fraction = m_animationTimer.ticksElapsed() / m_duration;
     getThingType()->draw(dest + m_delta * fraction * g_drawPool.getScaleFactor(), 0, m_numPatternX, m_numPatternY, 0, 0,
-                         Otc::DrawThings | Otc::DrawLights, TextureType::NONE, Color::white, lightView, m_drawBuffer);
+                         Otc::DrawThings | Otc::DrawLights, TextureType::NONE, Color::white, lightView, m_drawConductor);
 }
 
 void Missile::setPath(const Position& fromPosition, const Position& toPosition)
@@ -53,7 +53,6 @@ void Missile::setPath(const Position& fromPosition, const Position& toPosition)
     m_delta *= SPRITE_SIZE;
     m_animationTimer.restart();
     m_distance = fromPosition.distance(toPosition);
-    m_drawBuffer = std::make_shared<DrawBuffer>(DrawPool::DrawOrder::FIFTH);
 
     { // Update Pattern
         if (m_direction == Otc::NorthWest) {
