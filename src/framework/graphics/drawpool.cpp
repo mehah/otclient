@@ -227,6 +227,9 @@ void DrawPool::setOpacity(const float opacity, bool onlyOnce)
 
 void DrawPool::setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onlyOnce, const std::function<void()>& action)
 {
+    if (m_state.shaderProgram == g_painter->getReplaceColorShader().get())
+        return;
+
     if (shaderProgram) {
         m_shaderRefreshDelay = SHADER_REFRESH_DELAY;
         m_state.shaderProgram = shaderProgram.get();

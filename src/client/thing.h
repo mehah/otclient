@@ -36,7 +36,7 @@
 class Thing : public LuaObject
 {
 public:
-    virtual void draw(const Point& /*dest*/, uint32_t flags, TextureType /*textureType*/ = TextureType::NONE, bool isMarked = false, LightView* /*lightView*/ = nullptr) {}
+    virtual void draw(const Point& /*dest*/, uint32_t flags, LightView* /*lightView*/ = nullptr) {}
 
     virtual void setId(uint32_t /*id*/) {}
     virtual void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false);
@@ -166,7 +166,16 @@ public:
     virtual void onPositionChange(const Position& /*newPos*/, const Position& /*oldPos*/) {}
     virtual void onAppear() {}
     virtual void onDisappear() {};
-    const Color& getMarkedColor() { m_markedColor.setAlpha(0.1f + std::abs(500 - g_clock.millis() % 1000) / 1000.0f); return m_markedColor; }
+    const Color& getMarkedColor() {
+        if (m_markedColor == Color::white)
+            return Color::white;
+
+        m_markedColor.setAlpha(0.1f + std::abs(500 - g_clock.millis() % 1000) / 1000.0f);
+        return m_markedColor;
+    }
+
+    bool isMarked() { return m_markedColor != Color::white; }
+    void setMarkColor(const Color& color) { if (m_markedColor != color) m_markedColor = color; }
 
     void attachEffect(const AttachedEffectPtr& obj);
     void clearAttachedEffects();
@@ -202,7 +211,7 @@ protected:
     ThingType* m_thingType{ nullptr };
     DrawConductor m_drawConductor{ false, DrawOrder::THIRD };
 
-    Color m_markedColor{ Color::yellow };
+    Color m_markedColor{ Color::white };
 
     // Shader
     PainterShaderProgramPtr m_shader;

@@ -45,7 +45,7 @@ ItemPtr Item::create(int id)
     return item;
 }
 
-void Item::draw(const Point& dest, uint32_t flags, TextureType textureType, bool isMarked, LightView* lightView)
+void Item::draw(const Point& dest, uint32_t flags, LightView* lightView)
 {
     if (m_clientId == 0 || !canDraw())
         return;
@@ -53,15 +53,21 @@ void Item::draw(const Point& dest, uint32_t flags, TextureType textureType, bool
     // determine animation phase
     const int animationPhase = calculateAnimationPhase();
 
-    drawAttachedEffect(dest, lightView, false); // On Bottom
-    if (textureType != TextureType::ALL_BLANK && m_shader)
-        g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
-    getThingType()->draw(dest, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, textureType, m_color, lightView, m_drawConductor);
-    drawAttachedEffect(dest, lightView, true); // On Top
+    internalDraw(animationPhase, dest, m_color, flags, lightView);
 
-    if (isMarked) {
-        getThingType()->draw(dest, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, TextureType::ALL_BLANK, getMarkedColor());
+    if (isMarked()) {
+        g_drawPool.setShaderProgram(g_painter->getReplaceColorShader());
+        internalDraw(animationPhase, dest, getMarkedColor(), flags);
+        g_drawPool.resetShaderProgram();
     }
+}
+
+void Item::internalDraw(int animationPhase, const Point& dest, const Color& color, uint32_t flags, LightView* lightView)
+{
+    drawAttachedEffect(dest, lightView, false); // On Bottom
+    if (m_shader) g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
+    getThingType()->draw(dest, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, color, lightView, m_drawConductor);
+    drawAttachedEffect(dest, lightView, true); // On Top
 }
 
 void Item::setConductor()

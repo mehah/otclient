@@ -55,7 +55,7 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
         return;
 
     if (m_shader) g_drawPool.setShaderProgram(m_shader, true);
-    m_thingType->draw(dest - (dirControl.offset * g_drawPool.getScaleFactor()), 0, m_direction, 0, 0, getCurrentAnimationPhase(), Otc::DrawThingsAndLights, TextureType::NONE, Color::white, lightView);
+    m_thingType->draw(dest - (dirControl.offset * g_drawPool.getScaleFactor()), 0, m_direction, 0, 0, getCurrentAnimationPhase(), Otc::DrawThingsAndLights, Color::white, lightView);
 }
 
 int AttachedEffect::getCurrentAnimationPhase()

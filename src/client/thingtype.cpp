@@ -599,7 +599,7 @@ void ThingType::unserializeOtml(const OTMLNodePtr& node)
     }
 }
 
-void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, uint32_t flags, TextureType textureType, const Color& color, LightView* lightView, const DrawConductor& conductor)
+void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, uint32_t flags, const Color& color, LightView* lightView, const DrawConductor& conductor)
 {
     if (m_null)
         return;
@@ -607,7 +607,7 @@ void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, i
     if (animationPhase >= m_animationPhases)
         return;
 
-    const auto& texture = getTexture(animationPhase, textureType); // texture might not exists, neither its rects.
+    const auto& texture = getTexture(animationPhase); // texture might not exists, neither its rects.
     if (!texture)
         return;
 
@@ -635,37 +635,33 @@ void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, i
     }
 }
 
-TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
+TexturePtr ThingType::getTexture(int animationPhase)
 {
     if (m_null) return m_textureNull;
 
     auto& textureData = m_textureData[animationPhase];
-    const bool allBlank = txtType == TextureType::ALL_BLANK;
-    const bool smooth = txtType == TextureType::SMOOTH;
 
-    TexturePtr& animationPhaseTexture =
-        allBlank ? textureData.blank :
-        smooth ? textureData.smooth : textureData.main;
+    TexturePtr& animationPhaseTexture = textureData.source;
 
     if (animationPhaseTexture) return animationPhaseTexture;
 
     ImagePtr image;
     if (g_app.isLoadingAsyncTexture()) {
-        if (!textureData.source) {
+        if (!textureData.imageSrc) {
             if (!textureData.loading) {
                 textureData.loading = true;
-                g_asyncDispatcher.dispatch([this, animationPhase, txtType] {
-                    m_textureData[animationPhase].source = getImage(animationPhase, txtType);
+                g_asyncDispatcher.dispatch([this, animationPhase] {
+                    m_textureData[animationPhase].imageSrc = getImage(animationPhase);
                     m_textureData[animationPhase].loading = false;
                 });
             }
             return nullptr;
         }
 
-        image = textureData.source;
-        textureData.source = nullptr;
+        image = textureData.imageSrc;
+        textureData.imageSrc = nullptr;
     } else
-        image = getImage(animationPhase, txtType);
+        image = getImage(animationPhase);
 
     if (m_opacity < 1.0f)
         image->setTransparentPixel(true);
@@ -674,16 +670,12 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
         m_opaque = !image->hasTransparentPixel();
 
     animationPhaseTexture = std::make_shared<Texture>(image, true, false);
-    if (smooth)
-        animationPhaseTexture->setSmooth(true);
-
     return animationPhaseTexture;
 }
 
-ImagePtr ThingType::getImage(int animationPhase, TextureType txtType)
+ImagePtr ThingType::getImage(int animationPhase)
 {
     auto& textureData = m_textureData[animationPhase];
-    const bool allBlank = txtType == TextureType::ALL_BLANK;
 
     // we don't need layers in common items, they will be pre-drawn
     int textureLayers = 1;
@@ -726,9 +718,7 @@ ImagePtr ThingType::getImage(int animationPhase, TextureType txtType)
                                 fullImage->setTransparentPixel(true);
                             }
 
-                            if (allBlank) {
-                                spriteImage->overwrite(Color::white);
-                            } else if (spriteMask) {
+                            if (spriteMask) {
                                 spriteImage->overwriteMask(maskColors[(l - 1)]);
                             }
 
@@ -745,9 +735,7 @@ ImagePtr ThingType::getImage(int animationPhase, TextureType txtType)
                                     }
 
                                     if (spriteImage) {
-                                        if (allBlank) {
-                                            spriteImage->overwrite(Color::white);
-                                        } else if (spriteMask) {
+                                        if (spriteMask) {
                                             spriteImage->overwriteMask(maskColors[(l - 1)]);
                                         }
 

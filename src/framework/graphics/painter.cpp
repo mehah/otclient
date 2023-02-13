@@ -50,6 +50,12 @@ Painter::Painter()
     m_drawSolidColorProgram->addShaderFromSourceCode(ShaderType::FRAGMENT, std::string{ glslMainFragmentShader } + glslSolidColorFragmentShader.data());
     m_drawSolidColorProgram->link();
 
+    m_drawReplaceColorProgram = std::make_shared<PainterShaderProgram>();
+    assert(m_drawReplaceColorProgram);
+    m_drawReplaceColorProgram->addShaderFromSourceCode(ShaderType::VERTEX, std::string{ glslMainWithTexCoordsVertexShader } + glslPositionOnlyVertexShader.data());
+    m_drawReplaceColorProgram->addShaderFromSourceCode(ShaderType::FRAGMENT, std::string{ glslMainFragmentShader } + glslReplaceColorFragmentShader.data());
+    m_drawReplaceColorProgram->link();
+
     PainterShaderProgram::release();
 
     refreshState();

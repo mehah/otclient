@@ -35,7 +35,11 @@ Tile::Tile(const Position& position) : m_position(position) {}
 
 void Tile::drawThing(const ThingPtr& thing, const Point& dest, int flags, LightView* lightView)
 {
-    thing->draw(dest, flags, TextureType::NONE, m_selectType != TileSelectType::NONE && m_highlightThingId == thing->getThingType()->getId(), lightView);
+    const bool isMarked = m_selectType != TileSelectType::NONE && m_highlightThingId == thing->getThingType()->getId();
+
+    thing->setMarkColor(isMarked ? Color::yellow : Color::white);
+
+    thing->draw(dest, flags, lightView);
 
     if (thing->isItem()) {
         m_drawElevation += thing->getElevation();

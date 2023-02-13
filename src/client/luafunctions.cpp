@@ -385,6 +385,8 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Thing>("setId", &Thing::setId);
     g_lua.bindClassMemberFunction<Thing>("setShader", &Thing::setShader);
     g_lua.bindClassMemberFunction<Thing>("setPosition", &Thing::setPosition);
+    g_lua.bindClassMemberFunction<Thing>("setMarkColor", &Thing::setMarkColor);
+    g_lua.bindClassMemberFunction<Thing>("isMarked", &Thing::isMarked);
     g_lua.bindClassMemberFunction<Thing>("getId", &Thing::getId);
     g_lua.bindClassMemberFunction<Thing>("getTile", &Thing::getTile);
     g_lua.bindClassMemberFunction<Thing>("getPosition", &Thing::getPosition);
@@ -496,7 +498,6 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Creature>("getIcon", &Creature::getIcon);
     g_lua.bindClassMemberFunction<Creature>("setOutfit", &Creature::setOutfit);
     g_lua.bindClassMemberFunction<Creature>("getOutfit", &Creature::getOutfit);
-    g_lua.bindClassMemberFunction<Creature>("setOutfitColor", &Creature::setOutfitColor);
     g_lua.bindClassMemberFunction<Creature>("getDirection", &Creature::getDirection);
     g_lua.bindClassMemberFunction<Creature>("getStepDuration", &Creature::getStepDuration);
     g_lua.bindClassMemberFunction<Creature>("getStepProgress", &Creature::getStepProgress);
