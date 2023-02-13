@@ -87,14 +87,14 @@ void BitmapFont::load(const OTMLNodePtr& fontNode)
     }
 }
 
-void BitmapFont::drawText(const std::string_view text, const Point& startPos, const Color color)
+void BitmapFont::drawText(const std::string_view text, const Point& startPos, const Color& color)
 {
     const Size boxSize = g_painter->getResolution() - startPos.toSize();
     const Rect screenCoords(startPos, boxSize);
     drawText(text, screenCoords, color, Fw::AlignTopLeft);
 }
 
-void BitmapFont::drawText(const std::string_view text, const Rect& screenCoords, const Color color, Fw::AlignmentFlag align)
+void BitmapFont::drawText(const std::string_view text, const Rect& screenCoords, const Color& color, Fw::AlignmentFlag align)
 {
     Size textBoxSize;
     const auto& glyphsPositions = calculateGlyphsPositions(text, align, &textBoxSize);

@@ -80,9 +80,8 @@ void LocalPlayer::preWalk(Otc::Direction direction)
     m_preWalking = true;
 
     // start walking to direction
-    const Position newPos = m_position.translatedToDirection(direction);
-    m_lastPrewalkDestination = newPos;
-    Creature::walk(m_position, newPos);
+    m_lastPrewalkDestination = m_position.translatedToDirection(direction);
+    Creature::walk(m_position, m_lastPrewalkDestination);
 }
 
 bool LocalPlayer::retryAutoWalk()

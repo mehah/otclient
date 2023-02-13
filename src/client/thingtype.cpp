@@ -621,8 +621,8 @@ void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, i
     const Rect screenRect(dest + (textureOffset - m_displacement - (m_size.toPoint() - Point(1)) * SPRITE_SIZE) * g_drawPool.getScaleFactor(), textureRect.size() * g_drawPool.getScaleFactor());
 
     if (flags & Otc::DrawThings) {
-        const Color& newColor = m_opacity < 1.0f ? Color(color, m_opacity) : color;
-        g_drawPool.addTexturedRect(screenRect, texture, textureRect, m_opacity < 1.0f ? Color(color) : color, conductor);
+        const auto& newColor = m_opacity < 1.0f ? Color(color, m_opacity) : color;
+        g_drawPool.addTexturedRect(screenRect, texture, textureRect, newColor, conductor);
     }
 
     if (lightView && hasLight() && flags & Otc::DrawLights) {

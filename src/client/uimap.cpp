@@ -140,7 +140,7 @@ Position UIMap::getPosition(const Point& mousePos)
     if (!m_mapRect.contains(mousePos))
         return {};
 
-    const Point relativeMousePos = mousePos - m_mapRect.topLeft();
+    const auto& relativeMousePos = mousePos - m_mapRect.topLeft();
     return m_mapView->getPosition(relativeMousePos, m_mapRect.size());
 }
 
@@ -204,10 +204,10 @@ void UIMap::updateVisibleDimension()
 
 void UIMap::updateMapSize()
 {
-    const Rect clippingRect = getPaddingRect();
+    const auto& clippingRect = getPaddingRect();
     Size mapSize;
     if (m_keepAspectRatio) {
-        const Rect mapRect = clippingRect.expanded(-1);
+        const auto& mapRect = clippingRect.expanded(-1);
         mapSize = { static_cast<int>(m_aspectRatio * m_zoom), m_zoom };
         mapSize.scale(mapRect.size(), Fw::KeepAspectRatio);
     } else {

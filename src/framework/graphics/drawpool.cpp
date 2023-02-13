@@ -55,33 +55,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
 void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod& method,
              DrawMode drawMode, const DrawConductor& conductor, const CoordsBufferPtr& coordsBuffer)
 {
-    auto state = PoolState{
-       std::move(m_state.transformMatrix), m_state.opacity,
-       m_state.compositionMode, m_state.blendEquation,
-       std::move(m_state.clipRect), m_state.shaderProgram,
-       std::move(m_state.action), std::move(const_cast<Color&>(color)), texture
-    };
-
-    updateHash(state, method);
-
-    if (m_onlyOnceStateFlag > 0) { // Only Once State
-        if (m_onlyOnceStateFlag & STATE_OPACITY)
-            resetOpacity();
-
-        if (m_onlyOnceStateFlag & STATE_BLEND_EQUATION)
-            resetBlendEquation();
-
-        if (m_onlyOnceStateFlag & STATE_CLIP_RECT)
-            resetClipRect();
-
-        if (m_onlyOnceStateFlag & STATE_COMPOSITE_MODE)
-            resetCompositionMode();
-
-        if (m_onlyOnceStateFlag & STATE_SHADER_PROGRAM)
-            resetShaderProgram();
-
-        m_onlyOnceStateFlag = 0;
-    }
+    auto state = getState(method, texture, color);
 
     uint8_t order = conductor.order;
     if (m_type == DrawPoolType::FOREGROUND)
@@ -152,8 +126,15 @@ void DrawPool::addCoords(CoordsBuffer* buffer, const DrawMethod& method, DrawMod
     }
 }
 
-void DrawPool::updateHash(PoolState& state, const DrawMethod& method)
+DrawPool::PoolState DrawPool::getState(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color)
 {
+    auto state = PoolState{
+       std::move(m_state.transformMatrix), m_state.opacity,
+       m_state.compositionMode, m_state.blendEquation,
+       std::move(m_state.clipRect), m_state.shaderProgram,
+       std::move(m_state.action), std::move(const_cast<Color&>(color)), texture
+    };
+
     { // State Hash
         if (state.blendEquation != BlendEquation::ADD)
             stdext::hash_combine(state.hash, state.blendEquation);
@@ -197,6 +178,27 @@ void DrawPool::updateHash(PoolState& state, const DrawMethod& method)
 
         stdext::hash_union(m_status.second, methodhash);
     }
+
+    if (m_onlyOnceStateFlag > 0) { // Only Once State
+        if (m_onlyOnceStateFlag & STATE_OPACITY)
+            resetOpacity();
+
+        if (m_onlyOnceStateFlag & STATE_BLEND_EQUATION)
+            resetBlendEquation();
+
+        if (m_onlyOnceStateFlag & STATE_CLIP_RECT)
+            resetClipRect();
+
+        if (m_onlyOnceStateFlag & STATE_COMPOSITE_MODE)
+            resetCompositionMode();
+
+        if (m_onlyOnceStateFlag & STATE_SHADER_PROGRAM)
+            resetShaderProgram();
+
+        m_onlyOnceStateFlag = 0;
+    }
+
+    return state;
 }
 
 void DrawPool::setCompositionMode(const CompositionMode mode, bool onlyOnce)

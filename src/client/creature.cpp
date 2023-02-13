@@ -100,10 +100,9 @@ void Creature::draw(const Point& dest, uint32_t flags, TextureType textureType, 
     }
 }
 
-void Creature::internalDrawOutfit(Point dest, TextureType textureType, Color color, LightView* lightView)
+void Creature::internalDrawOutfit(Point dest, TextureType textureType, const Color& color, LightView* lightView)
 {
-    if (m_outfitColor != Color::white)
-        color = m_outfitColor;
+    const auto& newColor = m_outfitColor != Color::white ? m_outfitColor : color;
 
     const bool isNotBlank = textureType != TextureType::ALL_BLANK;
     const bool canDrawShader = isNotBlank;
@@ -123,14 +122,14 @@ void Creature::internalDrawOutfit(Point dest, TextureType textureType, Color col
 
             if (canDrawShader && m_mountShader)
                 g_drawPool.setShaderProgram(m_mountShader, true, m_mountShaderAction);
-            m_mountType->draw(dest, 0, m_numPatternX, 0, 0, animationPhase, Otc::DrawThingsAndLights, textureType, color);
+            m_mountType->draw(dest, 0, m_numPatternX, 0, 0, animationPhase, Otc::DrawThingsAndLights, textureType, newColor);
             dest += getDisplacement() * g_drawPool.getScaleFactor();
         }
 
         animationPhase = getCurrentAnimationPhase();
 
         if (!m_jumpOffset.isNull()) {
-            const PointF jumpOffset = m_jumpOffset * g_drawPool.getScaleFactor();
+            const auto& jumpOffset = m_jumpOffset * g_drawPool.getScaleFactor();
             dest -= Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
         }
 
@@ -144,7 +143,7 @@ void Creature::internalDrawOutfit(Point dest, TextureType textureType, Color col
 
             if (canDrawShader && m_shader)
                 g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
-            datType->draw(dest, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, textureType, color);
+            datType->draw(dest, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, textureType, newColor);
 
             if (m_drawOutfitColor && isNotBlank && getLayers() > 1) {
                 g_drawPool.setCompositionMode(CompositionMode::MULTIPLY);
@@ -177,7 +176,7 @@ void Creature::internalDrawOutfit(Point dest, TextureType textureType, Color col
 
         if (canDrawShader && m_shader)
             g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
-        m_thingType->draw(dest - (getDisplacement() * g_drawPool.getScaleFactor()), 0, 0, 0, 0, animationPhase, Otc::DrawThingsAndLights, textureType, color);
+        m_thingType->draw(dest - (getDisplacement() * g_drawPool.getScaleFactor()), 0, 0, 0, 0, animationPhase, Otc::DrawThingsAndLights, textureType, newColor);
     }
 
     if (isNotBlank) {
@@ -185,7 +184,7 @@ void Creature::internalDrawOutfit(Point dest, TextureType textureType, Color col
     }
 }
 
-void Creature::drawOutfit(const Rect& destRect, bool resize, const Color color)
+void Creature::drawOutfit(const Rect& destRect, bool resize, const Color& color)
 {
     if (!m_thingType)
         return;
@@ -208,7 +207,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
     if (isDead() || !canBeSeen() || !(drawFlags & Otc::DrawCreatureInfo) || !mapRect.isInRange(m_position))
         return;
 
-    const PointF& jumpOffset = m_jumpOffset * g_drawPool.getScaleFactor();
+    const auto& jumpOffset = m_jumpOffset * g_drawPool.getScaleFactor();
     const auto& parentRect = mapRect.rect;
     const auto& creatureOffset = Point(16 - getDisplacementX(), -getDisplacementY() - 2) + m_walkOffset;
 
@@ -228,7 +227,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
 
     // calculate main rects
 
-    const Size nameSize = m_name.getTextSize();
+    const auto& nameSize = m_name.getTextSize();
     const int cropSizeText = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? m_exactSize : 12;
     const int cropSizeBackGround = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? cropSizeText - nameSize.height() : 0;
 
@@ -733,7 +732,7 @@ void Creature::setOutfitColor(const Color& color, int duration)
 
     m_outfitColorTimer.restart();
 
-    const Color delta = (color - m_outfitColor) / static_cast<float>(duration);
+    const auto& delta = (color - m_outfitColor) / static_cast<float>(duration);
     updateOutfitColor(m_outfitColor, color, delta, duration);
 }
 
@@ -845,13 +844,11 @@ uint16_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
     if (isParalyzed())
         return 0;
 
-    Position tilePos = dir == Otc::InvalidDirection ?
+    const auto& tilePos = dir == Otc::InvalidDirection ?
         m_lastStepToPosition : m_position.translatedToDirection(dir);
 
-    if (!tilePos.isValid())
-        tilePos = m_position;
+    const auto& tile = g_map.getTile(tilePos.isValid() ? tilePos : m_position);
 
-    const auto& tile = g_map.getTile(tilePos);
     int groundSpeed = 0;
     if (tile) groundSpeed = tile->getGroundSpeed();
     if (groundSpeed == 0)

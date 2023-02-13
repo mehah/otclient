@@ -53,9 +53,9 @@ public:
 
     void draw(const Point& dest, uint32_t flags, TextureType textureType, bool isMarked = false, LightView* lightView = nullptr) override;
 
-    void internalDrawOutfit(Point dest, TextureType textureType, Color color, LightView* lightView = nullptr);
+    void internalDrawOutfit(Point dest, TextureType textureType, const Color& color, LightView* lightView = nullptr);
 
-    void drawOutfit(const Rect& destRect, bool resize, Color color = Color::white);
+    void drawOutfit(const Rect& destRect, bool resize, const Color& color = Color::white);
     void drawInformation(const MapPosInfo& mapRect, const Point& dest, bool useGray, int drawFlags);
 
     void setId(uint32_t id) override { m_id = id; }

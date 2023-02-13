@@ -41,7 +41,7 @@ bool UIHorizontalLayout::internalUpdate()
         return false;
 
     bool changed = false;
-    const Rect paddingRect = parentWidget->getPaddingRect();
+    const auto& paddingRect = parentWidget->getPaddingRect();
     Point pos = (m_alignRight) ? paddingRect.topRight() : paddingRect.topLeft();
     int preferredWidth = 0;
 

@@ -33,7 +33,7 @@ void UIProgressRect::drawSelf(DrawPoolType drawPane)
 
     // todo: check +1 to right/bottom
     // todo: add smooth
-    const Rect drawRect = getPaddingRect();
+    const auto& drawRect = getPaddingRect();
 
     // 0% - 12.5% (12.5)
     // triangle from top center, to top right (var x)

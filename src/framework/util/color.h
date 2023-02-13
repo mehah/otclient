@@ -39,7 +39,7 @@ public:
     Color(const uint8_t byteColor, const uint8_t intensity, const float formule = 0.5f)
     {
         const float brightness = formule + (intensity / 8.f) * formule;
-        const Color colorMap = from8bit(byteColor);
+        const auto& colorMap = from8bit(byteColor);
 
         m_a = colorMap.aF();
         m_b = colorMap.bF() * brightness;
@@ -96,7 +96,7 @@ public:
     bool operator==(const Color& other) const { return other.hash() == hash(); }
     bool operator!=(const Color& other) const { return other.hash() != hash(); }
 
-    void blend(const Color color)
+    void blend(const Color& color)
     {
         m_r *= (1 - color.m_a) + color.m_r * color.m_a;
         m_g *= (1 - color.m_a) + color.m_g * color.m_a;

@@ -37,10 +37,10 @@ public:
     void load(const OTMLNodePtr& fontNode);
 
     /// Simple text render starting at startPos
-    void drawText(const std::string_view text, const Point& startPos, Color color = Color::white);
+    void drawText(const std::string_view text, const Point& startPos, const Color& color = Color::white);
 
     /// Advanced text render delimited by a screen region and alignment
-    void drawText(const std::string_view text, const Rect& screenCoords, Color color = Color::white, Fw::AlignmentFlag align = Fw::AlignTopLeft);
+    void drawText(const std::string_view text, const Rect& screenCoords, const Color& color = Color::white, Fw::AlignmentFlag align = Fw::AlignTopLeft);
 
     std::vector<std::pair<Rect, Rect>> getDrawTextCoords(const std::string_view text,
                                                          const Size& textBoxSize,

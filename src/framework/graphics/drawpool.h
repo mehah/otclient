@@ -169,7 +169,7 @@ private:
 
     void resetState();
 
-    void updateHash(PoolState& state, const DrawPool::DrawMethod& method);
+    PoolState getState(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color);
 
     float getOpacity() const { return m_state.opacity; }
     Rect getClipRect() { return m_state.clipRect; }

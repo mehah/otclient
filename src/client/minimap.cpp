@@ -143,9 +143,9 @@ Point Minimap::getTilePoint(const Position& pos, const Rect& screenRect, const P
     if (screenRect.isEmpty() || pos.z != mapCenter.z)
         return { -1 };
 
-    const Rect mapRect = calcMapRect(screenRect, mapCenter, scale);
-    const Point off = Point((mapRect.size() * scale).toPoint() - screenRect.size().toPoint()) / 2;
-    const Point posoff = (Point(pos.x, pos.y) - mapRect.topLeft()) * scale;
+    const auto& mapRect = calcMapRect(screenRect, mapCenter, scale);
+    const auto& off = Point((mapRect.size() * scale).toPoint() - screenRect.size().toPoint()) / 2;
+    const auto& posoff = (Point(pos.x, pos.y) - mapRect.topLeft()) * scale;
     return posoff + screenRect.topLeft() - off + (Point(1) * scale) / 2;
 }
 
@@ -154,9 +154,9 @@ Position Minimap::getTilePosition(const Point& point, const Rect& screenRect, co
     if (screenRect.isEmpty())
         return {};
 
-    const Rect mapRect = calcMapRect(screenRect, mapCenter, scale);
-    const Point off = Point((mapRect.size() * scale).toPoint() - screenRect.size().toPoint()) / 2;
-    const Point pos2d = (point - screenRect.topLeft() + off) / scale + mapRect.topLeft();
+    const auto& mapRect = calcMapRect(screenRect, mapCenter, scale);
+    const auto& off = Point((mapRect.size() * scale).toPoint() - screenRect.size().toPoint()) / 2;
+    const auto& pos2d = (point - screenRect.topLeft() + off) / scale + mapRect.topLeft();
     return { pos2d.x, pos2d.y, mapCenter.z };
 }
 
@@ -166,6 +166,7 @@ Rect Minimap::getTileRect(const Position& pos, const Rect& screenRect, const Pos
         return {};
 
     const int tileSize = SPRITE_SIZE * scale;
+
     Rect tileRect(0, 0, tileSize, tileSize);
     tileRect.moveCenter(getTilePoint(pos, screenRect, mapCenter, scale));
     return tileRect;
@@ -175,6 +176,7 @@ Rect Minimap::calcMapRect(const Rect& screenRect, const Position& mapCenter, flo
 {
     const int w = screenRect.width() / scale;
     const int h = std::ceil(screenRect.height() / scale);
+
     Rect mapRect(0, 0, w, h);
     mapRect.moveCenter(Point(mapCenter.x, mapCenter.y));
     return mapRect;
@@ -197,7 +199,7 @@ void Minimap::updateTile(const Position& pos, const TilePtr& tile)
 
     if (minimapTile != nulltile) {
         MinimapBlock& block = getBlock(pos);
-        const Point offsetPos = getBlockOffset(Point(pos.x, pos.y));
+        const auto& offsetPos = getBlockOffset(Point(pos.x, pos.y));
         block.updateTile(pos.x - offsetPos.x, pos.y - offsetPos.y, minimapTile);
         block.justSaw();
     }
@@ -207,7 +209,7 @@ const MinimapTile& Minimap::getTile(const Position& pos)
 {
     if (pos.z <= MAX_Z && hasBlock(pos)) {
         MinimapBlock& block = getBlock(pos);
-        const Point offsetPos = getBlockOffset(Point(pos.x, pos.y));
+        const auto& offsetPos = getBlockOffset(Point(pos.x, pos.y));
         return block.getTile(pos.x - offsetPos.x, pos.y - offsetPos.y);
     }
     return nulltile;
@@ -220,7 +222,7 @@ std::pair<MinimapBlock_ptr, MinimapTile> Minimap::threadGetTile(const Position& 
     if (pos.z <= MAX_Z && hasBlock(pos)) {
         const auto& block = m_tileBlocks[pos.z][getBlockIndex(pos)];
         if (block) {
-            const Point offsetPos = getBlockOffset(Point(pos.x, pos.y));
+            const auto& offsetPos = getBlockOffset(Point(pos.x, pos.y));
             return std::make_pair(block, block->getTile(pos.x - offsetPos.x, pos.y - offsetPos.y));
         }
     }
@@ -287,7 +289,7 @@ bool Minimap::loadImage(const std::string& fileName, const Position& topLeft, fl
 
                 Position pos(topLeft.x + x, topLeft.y + y, topLeft.z);
                 MinimapBlock& block = getBlock(pos);
-                const Point offsetPos = getBlockOffset(Point(pos.x, pos.y));
+                const auto& offsetPos = getBlockOffset(Point(pos.x, pos.y));
                 MinimapTile& tile = block.getTile(pos.x - offsetPos.x, pos.y - offsetPos.y);
                 if (!(tile.flags & MinimapTileWasSeen)) {
                     tile.color = c;

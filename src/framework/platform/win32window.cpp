@@ -281,7 +281,7 @@ void WIN32Window::internalCreateWindow()
     // initialize in the center of the screen
     m_position = ((getDisplaySize() - m_size) / 2).toPoint();
 
-    const Rect screenRect = adjustWindowRect(Rect(m_position, m_size));
+    const auto& screenRect = adjustWindowRect(Rect(m_position, m_size));
 
     updateUnmaximizedCoords();
     m_window = CreateWindowExA(dwExStyle,
@@ -451,7 +451,7 @@ void WIN32Window::move(const Point& pos)
 {
     g_mainDispatcher.addEvent([&, pos] {
         const Rect clientRect(pos, getClientRect().size());
-        const Rect windowRect = adjustWindowRect(clientRect);
+        const auto& windowRect = adjustWindowRect(clientRect);
         MoveWindow(m_window, windowRect.x(), windowRect.y(), windowRect.width(), windowRect.height(), TRUE);
         if (m_hidden)
             ShowWindow(m_window, SW_HIDE);
@@ -464,7 +464,7 @@ void WIN32Window::resize(const Size& size)
         if (size.width() < m_minimumSize.width() || size.height() < m_minimumSize.height())
             return;
         const Rect clientRect(getClientRect().topLeft(), size);
-        const Rect windowRect = adjustWindowRect(clientRect);
+        const auto& windowRect = adjustWindowRect(clientRect);
         MoveWindow(m_window, windowRect.x(), windowRect.y(), windowRect.width(), windowRect.height(), TRUE);
         if (m_hidden)
             ShowWindow(m_window, SW_HIDE);
@@ -770,7 +770,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
         case WM_GETMINMAXINFO:
         {
             auto* const pMMI = reinterpret_cast<LPMINMAXINFO>(lParam);
-            const Rect adjustedRect = adjustWindowRect(Rect(0, 0, m_minimumSize));
+            const auto& adjustedRect = adjustWindowRect(Rect(0, 0, m_minimumSize));
             pMMI->ptMinTrackSize.x = adjustedRect.width();
             pMMI->ptMinTrackSize.y = adjustedRect.height();
             break;
