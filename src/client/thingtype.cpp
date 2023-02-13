@@ -650,11 +650,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
     if (animationPhaseTexture) return animationPhaseTexture;
 
     ImagePtr image;
-    if (g_game.getProtocolVersion() >= 1281 && !g_game.getFeature(Otc::GameLoadSprInsteadProtobuf)) {
-        if (!(image = getImage(animationPhase, txtType))) {
-            return nullptr;
-        }
-    } else if (g_app.isLoadingAsyncTexture()) {
+    if (g_app.isLoadingAsyncTexture()) {
         if (!textureData.source) {
             if (!textureData.loading) {
                 textureData.loading = true;
@@ -855,7 +851,7 @@ int ThingType::getExactSize(int layer, int xPattern, int yPattern, int zPattern,
         return 0;
 
     if (!getTexture(animationPhase)) // we must calculate it anyway.
-        return m_realSize ? m_realSize : m_size.area() * SPRITE_SIZE;
+        return 0;
 
     const int frameIndex = getTextureIndex(layer, xPattern, yPattern, zPattern);
 

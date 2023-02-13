@@ -189,6 +189,14 @@ void Creature::drawOutfit(const Rect& destRect, bool resize, const Color& color)
     if (!m_thingType)
         return;
 
+    // ExactSize Cache
+    if (m_exactSize == 0) {
+        if (m_exactSize = getExactSize()) {
+            m_exactSize = std::max<uint8_t>(m_exactSize, SPRITE_SIZE);
+            m_frameSizeNotResized = std::max<int>(m_exactSize * 0.75f, 2 * SPRITE_SIZE * 0.75f);
+        }
+    }
+
     const uint8_t frameSize = resize ? m_exactSize : m_frameSizeNotResized;
     if (frameSize == 0)
         return;
@@ -683,37 +691,22 @@ void Creature::setOutfit(const Outfit& outfit)
     if (m_outfit == outfit)
         return;
 
+    const Outfit oldOutfit = m_outfit;
+
+    m_outfit = outfit;
     m_thingType = nullptr;
     m_mountType = nullptr;
     m_numPatternZ = 0;
-
-    const Outfit oldOutfit = m_outfit;
-    if (outfit.getCategory() != ThingCategoryCreature) {
-        if (!g_things.isValidDatId(outfit.getAuxId(), outfit.getCategory()))
-            return;
-
-        m_outfit.setAuxId(outfit.getAuxId());
-        m_outfit.setCategory(outfit.getCategory());
-        m_thingType = g_things.getThingType(m_outfit.getAuxId(), m_outfit.getCategory()).get();
-
-        m_exactSize = g_things.getThingType(m_outfit.getAuxId(), m_outfit.getCategory())->getExactSize();
-    } else {
-        if (outfit.getId() > 0 && !g_things.isValidDatId(outfit.getId(), ThingCategoryCreature))
-            return;
-
-        m_outfit = outfit;
-        m_thingType = g_things.getThingType(m_outfit.getId(), ThingCategoryCreature).get();
-        if (m_outfit.hasMount()) {
-            m_mountType = g_things.getThingType(m_outfit.getMount(), ThingCategoryCreature).get();
-            m_numPatternZ = std::min<int>(1, getNumPatternZ() - 1);
-        }
-
-        m_exactSize = getExactSize();
-    }
-
+    m_exactSize = 0;
+    m_frameSizeNotResized = 0;
     m_walkAnimationPhase = 0; // might happen when player is walking and outfit is changed.
-    m_exactSize = std::max<uint8_t>(m_exactSize, SPRITE_SIZE);
-    m_frameSizeNotResized = std::max<int>(m_exactSize * 0.75f, 2 * SPRITE_SIZE * 0.75f);
+
+    m_thingType = g_things.getThingType(m_outfit.isCreature() ? m_outfit.getId() : m_outfit.getAuxId(), m_outfit.getCategory()).get();
+
+    if (m_outfit.hasMount()) {
+        m_mountType = g_things.getThingType(m_outfit.getMount(), ThingCategoryCreature).get();
+        m_numPatternZ = std::min<int>(1, getNumPatternZ() - 1);
+    }
 
     callLuaField("onOutfitChange", m_outfit, oldOutfit);
 }
@@ -945,6 +938,9 @@ uint16_t Creature::getCurrentAnimationPhase(const bool mount)
 
 int Creature::getExactSize(int layer, int xPattern, int yPattern, int zPattern, int animationPhase)
 {
+    if (!m_outfit.isCreature())
+        return m_thingType->getExactSize();
+
     const int numPatternY = getNumPatternY();
 
     zPattern = m_outfit.hasMount() ? 1 : 0;

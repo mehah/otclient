@@ -57,8 +57,6 @@ public:
     int firstId = 0;
     int lastId = 0;
 
-    bool m_loading{ false };
-
     SpriteLayout spriteLayout = SpriteLayout::ONE_BY_ONE;
     std::mutex m_mutex;
     std::unique_ptr<uint8_t[]> data;

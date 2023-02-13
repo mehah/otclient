@@ -134,7 +134,7 @@ public:
     bool isPassable() const { return m_passable; }
     bool isWalking() { return m_walking; }
     bool isRemoved() { return m_removed; }
-    bool isInvisible() { return m_outfit.getCategory() == ThingCategoryEffect && m_outfit.getAuxId() == 13; }
+    bool isInvisible() { return m_outfit.isEffect() && m_outfit.getAuxId() == 13; }
     bool isDead() { return m_healthPercent <= 0; }
     bool isFullHealth() const { return m_healthPercent == 100; }
     bool canBeSeen() { return !isInvisible() || isPlayer(); }

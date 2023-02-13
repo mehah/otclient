@@ -179,21 +179,8 @@ SpriteSheetPtr SpriteAppearances::getSheetBySpriteId(int id, bool load /* = true
 
     const auto& sheet = *sheetIt;
 
-    if (load) {
-        if (g_app.isLoadingAsyncTexture()) {
-            if (!sheet->m_loading) {
-                sheet->m_loading = true;
-                g_asyncDispatcher.dispatch([this, &sheet] {
-                    loadSpriteSheet(sheet);
-                });
-            }
-
-            return nullptr;
-        }
-
-        // async off
+    if (load)
         loadSpriteSheet(sheet);
-    }
 
     return sheet;
 }
