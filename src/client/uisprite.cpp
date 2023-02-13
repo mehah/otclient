@@ -56,15 +56,13 @@ void UISprite::setSpriteId(int id)
         return;
 
     m_spriteId = id;
-    if (id == 0)
+    if (id == 0) {
         m_sprite = nullptr;
-    else {
-        const auto& image = g_sprites.getSpriteImage(id);
-        if (image)
-            m_sprite = std::make_shared<Texture>(image);
-        else
-            m_sprite = nullptr;
+        return;
     }
+
+    const auto& image = g_sprites.getSpriteImage(id);
+    m_sprite = image ? std::make_shared<Texture>(image) : nullptr;
 }
 
 void UISprite::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)

@@ -28,6 +28,8 @@
 #include "spritemanager.h"
 
 #include <framework/core/eventdispatcher.h>
+#include <framework/core/asyncdispatcher.h>
+#include <framework/core/graphicalapplication.h>
 #include <framework/core/filestream.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/image.h>
@@ -647,6 +649,46 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
 
     if (animationPhaseTexture) return animationPhaseTexture;
 
+    ImagePtr image;
+    if (g_game.getProtocolVersion() >= 1281 && !g_game.getFeature(Otc::GameLoadSprInsteadProtobuf)) {
+        if (!(image = getImage(animationPhase, txtType))) {
+            return nullptr;
+        }
+    } else if (g_app.isLoadingAsyncTexture()) {
+        if (!textureData.source) {
+            if (!textureData.loading) {
+                textureData.loading = true;
+                g_asyncDispatcher.dispatch([this, animationPhase, txtType] {
+                    m_textureData[animationPhase].source = getImage(animationPhase, txtType);
+                    m_textureData[animationPhase].loading = false;
+                });
+            }
+            return nullptr;
+        }
+
+        image = textureData.source;
+        textureData.source = nullptr;
+    } else
+        image = getImage(animationPhase, txtType);
+
+    if (m_opacity < 1.0f)
+        image->setTransparentPixel(true);
+
+    if (m_opaque == -1)
+        m_opaque = !image->hasTransparentPixel();
+
+    animationPhaseTexture = std::make_shared<Texture>(image, true, false);
+    if (smooth)
+        animationPhaseTexture->setSmooth(true);
+
+    return animationPhaseTexture;
+}
+
+ImagePtr ThingType::getImage(int animationPhase, TextureType txtType)
+{
+    auto& textureData = m_textureData[animationPhase];
+    const bool allBlank = txtType == TextureType::ALL_BLANK;
+
     // we don't need layers in common items, they will be pre-drawn
     int textureLayers = 1;
     int numLayers = m_layers;
@@ -743,17 +785,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
         }
     }
 
-    if (m_opacity < 1.0f)
-        fullImage->setTransparentPixel(true);
-
-    if (m_opaque == -1)
-        m_opaque = !fullImage->hasTransparentPixel();
-
-    animationPhaseTexture = std::make_shared<Texture>(fullImage, true, false);
-    if (smooth)
-        animationPhaseTexture->setSmooth(true);
-
-    return animationPhaseTexture;
+    return fullImage;
 }
 
 Size ThingType::getBestTextureDimension(int w, int h, int count)
@@ -822,7 +854,9 @@ int ThingType::getExactSize(int layer, int xPattern, int yPattern, int zPattern,
     if (m_null)
         return 0;
 
-    getTexture(animationPhase); // we must calculate it anyway.
+    if (!getTexture(animationPhase)) // we must calculate it anyway.
+        return m_realSize ? m_realSize : m_size.area() * SPRITE_SIZE;
+
     const int frameIndex = getTextureIndex(layer, xPattern, yPattern, zPattern);
 
     const auto& textureDataPos = m_textureData[animationPhase].pos[frameIndex];

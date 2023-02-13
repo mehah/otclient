@@ -380,6 +380,8 @@ private:
     static ThingFlagAttr thingAttrToThingFlagAttr(ThingAttr attr);
     static Size getBestTextureDimension(int w, int h, int count);
 
+    ImagePtr getImage(int animationPhase, TextureType txtType);
+
     struct TextureData
     {
         struct Pos
@@ -393,6 +395,9 @@ private:
         TexturePtr smooth;
         TexturePtr blank;
         std::vector<Pos> pos;
+
+        bool loading{ false };
+        ImagePtr source;
     };
 
     void prepareTextureLoad(const std::vector<Size>& sizes, const std::vector<int>& total_sprites);
