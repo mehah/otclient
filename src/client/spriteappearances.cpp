@@ -23,6 +23,7 @@
 #include "spriteappearances.h"
 #include <framework/core/filestream.h>
 #include <framework/core/resourcemanager.h>
+#include <framework/core/graphicalapplication.h>
 #include <framework/graphics/image.h>
 #include "game.h"
 
@@ -53,6 +54,8 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const
 {
     if (sheet->data)
         return true;
+
+    std::scoped_lock lock(sheet->m_mutex);
 
     try {
         const auto& fin = g_resources.openFile(stdext::format("/things/%d/%s", g_game.getClientVersion(), sheet->file));
@@ -175,6 +178,7 @@ SpriteSheetPtr SpriteAppearances::getSheetBySpriteId(int id, bool load /* = true
         return nullptr;
 
     const auto& sheet = *sheetIt;
+
     if (load)
         loadSpriteSheet(sheet);
 

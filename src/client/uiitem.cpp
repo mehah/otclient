@@ -53,7 +53,7 @@ void UIItem::drawSelf(DrawPoolType drawPane)
         const float oldScaleFactor = g_drawPool.getScaleFactor();
         g_drawPool.setScaleFactor(scaleFactor);
         m_item->setColor(m_color);
-        m_item->draw(dest, Otc::DrawThings, TextureType::SMOOTH);
+        m_item->draw(dest, Otc::DrawThings);
         g_drawPool.setScaleFactor(oldScaleFactor);
 
         if (m_font && (m_item->isStackable() || m_item->isChargeable()) && m_item->getCountOrSubType() > 1) {

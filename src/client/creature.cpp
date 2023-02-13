@@ -60,7 +60,7 @@ Creature::Creature() :m_type(Proto::CreatureTypeUnknown)
     */
 }
 
-void Creature::draw(const Point& dest, uint32_t flags, TextureType textureType, bool isMarked, LightView* lightView)
+void Creature::draw(const Point& dest, uint32_t flags, LightView* lightView)
 {
     if (!canBeSeen())
         return;
@@ -76,10 +76,12 @@ void Creature::draw(const Point& dest, uint32_t flags, TextureType textureType, 
 
         const auto& _dest = dest + m_walkOffset * g_drawPool.getScaleFactor();
 
-        internalDrawOutfit(_dest, textureType, Color::white, lightView);
+        internalDraw(_dest, false, Color::white, lightView);
 
-        if (isMarked) {
-            internalDrawOutfit(_dest, TextureType::ALL_BLANK, getMarkedColor());
+        if (isMarked()) {
+            g_drawPool.setShaderProgram(g_painter->getReplaceColorShader());
+            internalDraw(_dest, true, getMarkedColor());
+            g_drawPool.resetShaderProgram();
         }
     }
 
@@ -100,18 +102,11 @@ void Creature::draw(const Point& dest, uint32_t flags, TextureType textureType, 
     }
 }
 
-void Creature::internalDrawOutfit(Point dest, TextureType textureType, const Color& color, LightView* lightView)
+void Creature::internalDraw(Point dest, bool isMarked, const Color& color, LightView* lightView)
 {
-    const auto& newColor = m_outfitColor != Color::white ? m_outfitColor : color;
-
-    const bool isNotBlank = textureType != TextureType::ALL_BLANK;
-    const bool canDrawShader = isNotBlank;
-
     int animationPhase = 0;
 
-    if (isNotBlank) {
-        drawAttachedEffect(dest, lightView, false); // On Bottom
-    }
+    drawAttachedEffect(dest, lightView, false); // On Bottom
 
     // outfit is a real creature
     if (m_outfit.getCategory() == ThingCategoryCreature) {
@@ -120,9 +115,9 @@ void Creature::internalDrawOutfit(Point dest, TextureType textureType, const Col
 
             dest -= m_mountType->getDisplacement() * g_drawPool.getScaleFactor();
 
-            if (canDrawShader && m_mountShader)
+            if (!isMarked && m_mountShader)
                 g_drawPool.setShaderProgram(m_mountShader, true, m_mountShaderAction);
-            m_mountType->draw(dest, 0, m_numPatternX, 0, 0, animationPhase, Otc::DrawThingsAndLights, textureType, newColor);
+            m_mountType->draw(dest, 0, m_numPatternX, 0, 0, animationPhase, Otc::DrawThingsAndLights, color);
             dest += getDisplacement() * g_drawPool.getScaleFactor();
         }
 
@@ -141,16 +136,17 @@ void Creature::internalDrawOutfit(Point dest, TextureType textureType, const Col
             if (yPattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
                 continue;
 
-            if (canDrawShader && m_shader)
+            if (!isMarked && m_shader)
                 g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
-            datType->draw(dest, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, textureType, newColor);
 
-            if (m_drawOutfitColor && isNotBlank && getLayers() > 1) {
+            datType->draw(dest, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, color);
+
+            if (m_drawOutfitColor && !isMarked && getLayers() > 1) {
                 g_drawPool.setCompositionMode(CompositionMode::MULTIPLY);
-                datType->draw(dest, SpriteMaskYellow, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, textureType, m_outfit.getHeadColor());
-                datType->draw(dest, SpriteMaskRed, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, textureType, m_outfit.getBodyColor());
-                datType->draw(dest, SpriteMaskGreen, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, textureType, m_outfit.getLegsColor());
-                datType->draw(dest, SpriteMaskBlue, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, textureType, m_outfit.getFeetColor());
+                datType->draw(dest, SpriteMaskYellow, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, m_outfit.getHeadColor());
+                datType->draw(dest, SpriteMaskRed, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, m_outfit.getBodyColor());
+                datType->draw(dest, SpriteMaskGreen, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, m_outfit.getLegsColor());
+                datType->draw(dest, SpriteMaskBlue, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, m_outfit.getFeetColor());
                 g_drawPool.resetCompositionMode();
             }
         }
@@ -174,14 +170,12 @@ void Creature::internalDrawOutfit(Point dest, TextureType textureType, const Col
         if (m_outfit.getCategory() == ThingCategoryEffect)
             animationPhase = std::min<int>(animationPhase + 1, animationPhases);
 
-        if (canDrawShader && m_shader)
+        if (isMarked && m_shader)
             g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
-        m_thingType->draw(dest - (getDisplacement() * g_drawPool.getScaleFactor()), 0, 0, 0, 0, animationPhase, Otc::DrawThingsAndLights, textureType, newColor);
+        m_thingType->draw(dest - (getDisplacement() * g_drawPool.getScaleFactor()), 0, 0, 0, 0, animationPhase, Otc::DrawThingsAndLights, color);
     }
 
-    if (isNotBlank) {
-        drawAttachedEffect(dest, lightView, true); // On Top
-    }
+    drawAttachedEffect(dest, lightView, true); // On Top
 }
 
 void Creature::drawOutfit(const Rect& destRect, bool resize, const Color& color)
@@ -189,12 +183,20 @@ void Creature::drawOutfit(const Rect& destRect, bool resize, const Color& color)
     if (!m_thingType)
         return;
 
+    // ExactSize Cache
+    if (m_exactSize == 0) {
+        if (m_exactSize = getExactSize()) {
+            m_exactSize = std::max<uint8_t>(m_exactSize, SPRITE_SIZE);
+            m_frameSizeNotResized = std::max<int>(m_exactSize * 0.75f, 2 * SPRITE_SIZE * 0.75f);
+        }
+    }
+
     const uint8_t frameSize = resize ? m_exactSize : m_frameSizeNotResized;
     if (frameSize == 0)
         return;
 
     g_drawPool.bindFrameBuffer(frameSize);
-    internalDrawOutfit(Point(frameSize - SPRITE_SIZE) + getDisplacement(), TextureType::NONE, color);
+    internalDraw(Point(frameSize - SPRITE_SIZE) + getDisplacement(), false, color);
     g_drawPool.releaseFrameBuffer(destRect);
 }
 
@@ -683,72 +685,24 @@ void Creature::setOutfit(const Outfit& outfit)
     if (m_outfit == outfit)
         return;
 
+    const Outfit oldOutfit = m_outfit;
+
+    m_outfit = outfit;
     m_thingType = nullptr;
     m_mountType = nullptr;
     m_numPatternZ = 0;
-
-    const Outfit oldOutfit = m_outfit;
-    if (outfit.getCategory() != ThingCategoryCreature) {
-        if (!g_things.isValidDatId(outfit.getAuxId(), outfit.getCategory()))
-            return;
-
-        m_outfit.setAuxId(outfit.getAuxId());
-        m_outfit.setCategory(outfit.getCategory());
-        m_thingType = g_things.getThingType(m_outfit.getAuxId(), m_outfit.getCategory()).get();
-
-        m_exactSize = g_things.getThingType(m_outfit.getAuxId(), m_outfit.getCategory())->getExactSize();
-    } else {
-        if (outfit.getId() > 0 && !g_things.isValidDatId(outfit.getId(), ThingCategoryCreature))
-            return;
-
-        m_outfit = outfit;
-        m_thingType = g_things.getThingType(m_outfit.getId(), ThingCategoryCreature).get();
-        if (m_outfit.hasMount()) {
-            m_mountType = g_things.getThingType(m_outfit.getMount(), ThingCategoryCreature).get();
-            m_numPatternZ = std::min<int>(1, getNumPatternZ() - 1);
-        }
-
-        m_exactSize = getExactSize();
-    }
-
+    m_exactSize = 0;
+    m_frameSizeNotResized = 0;
     m_walkAnimationPhase = 0; // might happen when player is walking and outfit is changed.
-    m_exactSize = std::max<uint8_t>(m_exactSize, SPRITE_SIZE);
-    m_frameSizeNotResized = std::max<int>(m_exactSize * 0.75f, 2 * SPRITE_SIZE * 0.75f);
+
+    m_thingType = g_things.getThingType(m_outfit.isCreature() ? m_outfit.getId() : m_outfit.getAuxId(), m_outfit.getCategory()).get();
+
+    if (m_outfit.hasMount()) {
+        m_mountType = g_things.getThingType(m_outfit.getMount(), ThingCategoryCreature).get();
+        m_numPatternZ = std::min<int>(1, getNumPatternZ() - 1);
+    }
 
     callLuaField("onOutfitChange", m_outfit, oldOutfit);
-}
-
-void Creature::setOutfitColor(const Color& color, int duration)
-{
-    if (m_outfitColorUpdateEvent) {
-        m_outfitColorUpdateEvent->cancel();
-        m_outfitColorUpdateEvent = nullptr;
-    }
-
-    if (duration <= 0) {
-        m_outfitColor = color;
-        return;
-    }
-
-    m_outfitColorTimer.restart();
-
-    const auto& delta = (color - m_outfitColor) / static_cast<float>(duration);
-    updateOutfitColor(m_outfitColor, color, delta, duration);
-}
-
-void Creature::updateOutfitColor(Color color, Color finalColor, Color delta, int duration)
-{
-    if (m_outfitColorTimer.ticksElapsed() >= duration) {
-        m_outfitColor = finalColor;
-        return;
-    }
-
-    m_outfitColor = color + delta * m_outfitColorTimer.ticksElapsed();
-
-    const auto self = static_self_cast<Creature>();
-    m_outfitColorUpdateEvent = g_dispatcher.scheduleEvent([=] {
-        self->updateOutfitColor(color, finalColor, delta, duration);
-    }, 100);
 }
 
 void Creature::setSpeed(uint16_t speed)
@@ -945,6 +899,9 @@ uint16_t Creature::getCurrentAnimationPhase(const bool mount)
 
 int Creature::getExactSize(int layer, int xPattern, int yPattern, int zPattern, int animationPhase)
 {
+    if (!m_outfit.isCreature())
+        return m_thingType->getExactSize();
+
     const int numPatternY = getNumPatternY();
 
     zPattern = m_outfit.hasMount() ? 1 : 0;

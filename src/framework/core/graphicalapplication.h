@@ -64,6 +64,9 @@ public:
     void setDrawTexts(bool v) { m_drawText = v; }
     bool isDrawingTexts();
 
+    bool isLoadingAsyncTexture() { return m_loadingAsyncTexture; }
+    void setLoadingAsyncTexture(bool v) { m_loadingAsyncTexture = v; }
+
     void repaint();
 
 protected:
@@ -76,6 +79,7 @@ private:
     bool m_forceEffectOptimization{ false };
     bool m_drawEffectOnTop{ false };
     bool m_drawText{ true };
+    bool m_loadingAsyncTexture{ true };
 
     AdaptativeFrameCounter m_frameCounter;
 };

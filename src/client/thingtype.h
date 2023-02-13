@@ -35,8 +35,6 @@
 
 using namespace otclient::protobuf;
 
-enum class TextureType { NONE, SMOOTH, ALL_BLANK };
-
 enum FrameGroupType : uint8_t
 {
     FrameGroupDefault = 0,
@@ -276,7 +274,7 @@ public:
     void exportImage(const std::string& fileName);
 #endif
 
-    void draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, uint32_t flags, TextureType textureType, const Color& color, LightView* lightView = nullptr, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR);
+    void draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, uint32_t flags, const Color& color, LightView* lightView = nullptr, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR);
 
     uint16_t getId() { return m_id; }
     ThingCategory getCategory() { return m_category; }
@@ -374,11 +372,13 @@ public:
     float getOpacity() { return m_opacity; }
     void setPathable(bool var);
     int getExactHeight();
-    TexturePtr getTexture(int animationPhase, TextureType txtType = TextureType::NONE);
+    TexturePtr getTexture(int animationPhase);
 
 private:
     static ThingFlagAttr thingAttrToThingFlagAttr(ThingAttr attr);
     static Size getBestTextureDimension(int w, int h, int count);
+
+    ImagePtr getImage(int animationPhase);
 
     struct TextureData
     {
@@ -389,10 +389,11 @@ private:
             Point offsets;
         };
 
-        TexturePtr main;
-        TexturePtr smooth;
-        TexturePtr blank;
+        TexturePtr source;
         std::vector<Pos> pos;
+
+        bool loading{ false };
+        ImagePtr imageSrc;
     };
 
     void prepareTextureLoad(const std::vector<Size>& sizes, const std::vector<int>& total_sprites);

@@ -68,4 +68,14 @@ static constexpr std::string_view glslMainVertexShader = "\n\
     uniform lowp vec4 u_Color;\n\
     lowp vec4 calculatePixel() {\n\
         return u_Color;\n\
+    }\n",
+
+    glslReplaceColorFragmentShader = "\n\
+    uniform vec4 u_Color;\n\
+    varying vec2 v_TexCoord;\n\
+    uniform sampler2D u_Tex0;\n\
+    vec4 calculatePixel() {\n\
+        if(texture2D(u_Tex0, v_TexCoord).a > 0.01)\n\
+            return u_Color;\n\
+        return vec4(0,0,0,0);\n\
     }\n";

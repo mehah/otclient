@@ -63,6 +63,9 @@ public:
     bool hasMount() const { return m_mount > 0; }
 
     ThingCategory getCategory() const { return m_category; }
+    bool isCreature() const { return m_category == ThingCategoryCreature; }
+    bool isEffect() const { return m_category == ThingCategoryEffect; }
+    bool isItem() const { return m_category == ThingCategoryItem; }
 
     Color getHeadColor() const { return m_headColor; }
     Color getBodyColor() const { return m_bodyColor; }

@@ -28,6 +28,8 @@
 #include "spritemanager.h"
 
 #include <framework/core/eventdispatcher.h>
+#include <framework/core/asyncdispatcher.h>
+#include <framework/core/graphicalapplication.h>
 #include <framework/core/filestream.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/image.h>
@@ -597,7 +599,7 @@ void ThingType::unserializeOtml(const OTMLNodePtr& node)
     }
 }
 
-void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, uint32_t flags, TextureType textureType, const Color& color, LightView* lightView, const DrawConductor& conductor)
+void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, uint32_t flags, const Color& color, LightView* lightView, const DrawConductor& conductor)
 {
     if (m_null)
         return;
@@ -605,7 +607,7 @@ void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, i
     if (animationPhase >= m_animationPhases)
         return;
 
-    const auto& texture = getTexture(animationPhase, textureType); // texture might not exists, neither its rects.
+    const auto& texture = getTexture(animationPhase); // texture might not exists, neither its rects.
     if (!texture)
         return;
 
@@ -633,19 +635,63 @@ void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, i
     }
 }
 
-TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
+TexturePtr ThingType::getTexture(int animationPhase)
 {
+    static bool CACHE_ALL_PHASES = true;
+
     if (m_null) return m_textureNull;
 
     auto& textureData = m_textureData[animationPhase];
-    const bool allBlank = txtType == TextureType::ALL_BLANK;
-    const bool smooth = txtType == TextureType::SMOOTH;
 
-    TexturePtr& animationPhaseTexture =
-        allBlank ? textureData.blank :
-        smooth ? textureData.smooth : textureData.main;
+    TexturePtr& animationPhaseTexture = textureData.source;
 
     if (animationPhaseTexture) return animationPhaseTexture;
+
+    ImagePtr image;
+    if (g_app.isLoadingAsyncTexture()) {
+        if (!textureData.imageSrc) {
+            if (!textureData.loading) {
+                if (CACHE_ALL_PHASES) {
+                    for (auto& txtData : m_textureData)
+                        txtData.loading = true;
+                } else {
+                    textureData.loading = true;
+                }
+
+                g_asyncDispatcher.dispatch([this, animationPhase] {
+                    if (CACHE_ALL_PHASES) {
+                        int8_t i = -1;
+                        for (auto& txtData : m_textureData) {
+                            txtData.imageSrc = getImage(++i);
+                            txtData.loading = false;
+                        }
+                    } else {
+                        m_textureData[animationPhase].imageSrc = getImage(animationPhase);
+                        m_textureData[animationPhase].loading = false;
+                    }
+                });
+            }
+            return nullptr;
+        }
+
+        image = textureData.imageSrc;
+        textureData.imageSrc = nullptr;
+    } else
+        image = getImage(animationPhase);
+
+    if (m_opacity < 1.0f)
+        image->setTransparentPixel(true);
+
+    if (m_opaque == -1)
+        m_opaque = !image->hasTransparentPixel();
+
+    animationPhaseTexture = std::make_shared<Texture>(image, true, false);
+    return animationPhaseTexture;
+}
+
+ImagePtr ThingType::getImage(int animationPhase)
+{
+    auto& textureData = m_textureData[animationPhase];
 
     // we don't need layers in common items, they will be pre-drawn
     int textureLayers = 1;
@@ -688,9 +734,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
                                 fullImage->setTransparentPixel(true);
                             }
 
-                            if (allBlank) {
-                                spriteImage->overwrite(Color::white);
-                            } else if (spriteMask) {
+                            if (spriteMask) {
                                 spriteImage->overwriteMask(maskColors[(l - 1)]);
                             }
 
@@ -707,9 +751,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
                                     }
 
                                     if (spriteImage) {
-                                        if (allBlank) {
-                                            spriteImage->overwrite(Color::white);
-                                        } else if (spriteMask) {
+                                        if (spriteMask) {
                                             spriteImage->overwriteMask(maskColors[(l - 1)]);
                                         }
 
@@ -743,17 +785,7 @@ TexturePtr ThingType::getTexture(int animationPhase, const TextureType txtType)
         }
     }
 
-    if (m_opacity < 1.0f)
-        fullImage->setTransparentPixel(true);
-
-    if (m_opaque == -1)
-        m_opaque = !fullImage->hasTransparentPixel();
-
-    animationPhaseTexture = std::make_shared<Texture>(fullImage, true, false);
-    if (smooth)
-        animationPhaseTexture->setSmooth(true);
-
-    return animationPhaseTexture;
+    return fullImage;
 }
 
 Size ThingType::getBestTextureDimension(int w, int h, int count)
@@ -822,7 +854,9 @@ int ThingType::getExactSize(int layer, int xPattern, int yPattern, int zPattern,
     if (m_null)
         return 0;
 
-    getTexture(animationPhase); // we must calculate it anyway.
+    if (!getTexture(animationPhase)) // we must calculate it anyway.
+        return 0;
+
     const int frameIndex = getTextureIndex(layer, xPattern, yPattern, zPattern);
 
     const auto& textureDataPos = m_textureData[animationPhase].pos[frameIndex];

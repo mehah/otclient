@@ -51,9 +51,9 @@ public:
     void onAppear() override;
     void onDisappear() override;
 
-    void draw(const Point& dest, uint32_t flags, TextureType textureType, bool isMarked = false, LightView* lightView = nullptr) override;
+    void draw(const Point& dest, uint32_t flags, LightView* lightView = nullptr) override;
 
-    void internalDrawOutfit(Point dest, TextureType textureType, const Color& color, LightView* lightView = nullptr);
+    void internalDraw(Point dest, bool isMarked, const Color& color, LightView* lightView = nullptr);
 
     void drawOutfit(const Rect& destRect, bool resize, const Color& color = Color::white);
     void drawInformation(const MapPosInfo& mapRect, const Point& dest, bool useGray, int drawFlags);
@@ -64,7 +64,6 @@ public:
     void setHealthPercent(uint8_t healthPercent);
     void setDirection(Otc::Direction direction);
     void setOutfit(const Outfit& outfit);
-    void setOutfitColor(const Color& color, int duration);
     void setLight(const Light& light) { m_light = light; }
     void setSpeed(uint16_t speed);
     void setBaseSpeed(uint16_t baseSpeed);
@@ -134,7 +133,7 @@ public:
     bool isPassable() const { return m_passable; }
     bool isWalking() { return m_walking; }
     bool isRemoved() { return m_removed; }
-    bool isInvisible() { return m_outfit.getCategory() == ThingCategoryEffect && m_outfit.getAuxId() == 13; }
+    bool isInvisible() { return m_outfit.isEffect() && m_outfit.getAuxId() == 13; }
     bool isDead() { return m_healthPercent <= 0; }
     bool isFullHealth() const { return m_healthPercent == 100; }
     bool canBeSeen() { return !isInvisible() || isPlayer(); }
@@ -171,8 +170,6 @@ private:
     void updateShield();
     void updateWalkingTile();
     void updateWalkAnimation();
-
-    void updateOutfitColor(Color color, Color finalColor, Color delta, int duration);
 
     uint16_t getCurrentAnimationPhase(bool mount = false);
 
@@ -235,7 +232,6 @@ private:
     Color m_timedSquareColor{ Color::white };
     Color m_staticSquareColor{ Color::white };
     Color m_informationColor{ Color::white };
-    Color m_outfitColor{ Color::white };
 
     CachedText m_name;
     CachedStep m_stepCache;

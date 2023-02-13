@@ -76,6 +76,7 @@ public:
     BlendEquation getBlendEquation() const { return m_blendEquation; }
     CompositionMode getCompositionMode() const { return m_compositionMode; }
     PainterShaderProgram* getShaderProgram() const { return m_shaderProgram; }
+    PainterShaderProgramPtr getReplaceColorShader() const { return m_drawReplaceColorProgram; }
 
     void setColor(const Color& color) { m_color = color; }
     void setTexture(Texture* texture);
@@ -137,6 +138,7 @@ protected:
     PainterShaderProgram* m_drawProgram{ nullptr };
     PainterShaderProgramPtr m_drawTexturedProgram;
     PainterShaderProgramPtr m_drawSolidColorProgram;
+    PainterShaderProgramPtr m_drawReplaceColorProgram;
 };
 
 extern Painter* g_painter;
