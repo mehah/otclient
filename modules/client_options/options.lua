@@ -41,7 +41,8 @@ local defaultOptions = {
     forceEffectOptimization = false,
     drawEffectOnTop = false,
     floorViewMode = 1,
-    floorFading = 500
+    floorFading = 500,
+    asyncTxtLoading = true
 }
 
 local optionsWindow
@@ -215,6 +216,8 @@ function setOption(key, value, force)
         g_app.forceEffectOptimization(value)
     elseif key == 'drawEffectOnTop' then
         g_app.setDrawEffectOnTop(value)
+    elseif key == 'asyncTxtLoading' then
+        g_app.setLoadingAsyncTexture(value)
     elseif key == 'showPing' then
         modules.client_topmenu.setPingVisible(value)
     elseif key == 'fullscreen' then

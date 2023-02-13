@@ -45,6 +45,10 @@ Panel
     id: dontStretchShrink
     !text: tr('Don\'t stretch/shrink Game Window')
 
+  OptionCheckBox
+    id: asyncTxtLoading
+    !text: tr('Async texture loading')
+
   Label
     id: floorViewModeLabel
     !text: tr('Floor View Mode')..':'
