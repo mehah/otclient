@@ -363,6 +363,11 @@ public:
     bool hasAction() { return (m_flags & ThingFlagAttrDefaultAction); }
     bool isOpaque() { if (m_opaque == -1) getTexture(0); return m_opaque == 1; }
 
+    bool isItem() const { return m_category == ThingCategoryItem; }
+    bool isEffect() const { return m_category == ThingCategoryEffect; }
+    bool isMissile() const { return m_category == ThingCategoryMissile; }
+    bool isCreature() const { return m_category == ThingCategoryCreature; }
+
     PLAYER_ACTION getDefaultAction() { return m_defaultAction; }
 
     uint16_t getClassification() { return m_upgradeClassification; }

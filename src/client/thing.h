@@ -195,8 +195,7 @@ protected:
     void setAttachedEffectDirection(Otc::Direction dir) const
     {
         for (const auto& effect : m_attachedEffects) {
-            if (effect->m_thingType->getCategory() == ThingCategoryCreature ||
-                effect->m_thingType->getCategory() == ThingCategoryMissile)
+            if (effect->m_thingType->isCreature() || effect->m_thingType->isMissile())
                 effect->m_direction = dir;
         }
     }

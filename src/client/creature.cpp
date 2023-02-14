@@ -48,7 +48,7 @@ Creature::Creature() :m_type(Proto::CreatureTypeUnknown)
     // Example of how to send a UniformValue to shader
     /*
     m_shaderAction = [this]()-> void {
-        const int id = m_outfit.getCategory() == ThingCategoryCreature ? m_outfit.getId() : m_outfit.getAuxId();
+        const int id = m_outfit.isCreature() ? m_outfit.getId() : m_outfit.getAuxId();
         m_shader->bind();
         m_shader->setUniformValue(ShaderManager::OUTFIT_ID_UNIFORM, id);
     };
@@ -78,11 +78,8 @@ void Creature::draw(const Point& dest, uint32_t flags, LightView* lightView)
 
         internalDraw(_dest, false, Color::white, lightView);
 
-        if (isMarked()) {
-            g_drawPool.setShaderProgram(g_painter->getReplaceColorShader());
+        if (isMarked())
             internalDraw(_dest, true, getMarkedColor());
-            g_drawPool.resetShaderProgram();
-        }
     }
 
     if (lightView && flags & Otc::DrawLights) {
@@ -108,8 +105,11 @@ void Creature::internalDraw(Point dest, bool isMarked, const Color& color, Light
 
     drawAttachedEffect(dest, lightView, false); // On Bottom
 
+    if (isMarked)
+        g_drawPool.setShaderProgram(g_painter->getReplaceColorShader());
+
     // outfit is a real creature
-    if (m_outfit.getCategory() == ThingCategoryCreature) {
+    if (m_outfit.isCreature()) {
         if (m_outfit.hasMount()) {
             animationPhase = getCurrentAnimationPhase(true);
 
@@ -158,7 +158,7 @@ void Creature::internalDraw(Point dest, bool isMarked, const Color& color, Light
 
         // when creature is an effect we cant render the first and last animation phase,
         // instead we should loop in the phases between
-        if (m_outfit.getCategory() == ThingCategoryEffect) {
+        if (m_outfit.isEffect()) {
             animationPhases = std::max<int>(1, animationPhases - 2);
             animateTicks = INVISIBLE_TICKS_PER_FRAME;
         }
@@ -167,13 +167,16 @@ void Creature::internalDraw(Point dest, bool isMarked, const Color& color, Light
             animationPhase = (g_clock.millis() % (static_cast<long long>(animateTicks) * animationPhases)) / animateTicks;
         }
 
-        if (m_outfit.getCategory() == ThingCategoryEffect)
+        if (m_outfit.isEffect())
             animationPhase = std::min<int>(animationPhase + 1, animationPhases);
 
-        if (isMarked && m_shader)
+        if (!isMarked && m_shader)
             g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
         m_thingType->draw(dest - (getDisplacement() * g_drawPool.getScaleFactor()), 0, 0, 0, 0, animationPhase, Otc::DrawThingsAndLights, color);
     }
+
+    if (isMarked)
+        g_drawPool.resetShaderProgram();
 
     drawAttachedEffect(dest, lightView, true); // On Top
 }
@@ -473,7 +476,7 @@ void Creature::onDeath()
 
 void Creature::updateWalkAnimation()
 {
-    if (m_outfit.getCategory() != ThingCategoryCreature)
+    if (!m_outfit.isCreature())
         return;
 
     int footAnimPhases = m_outfit.hasMount() ? m_mountType->getAnimationPhases() : getAnimationPhases();
@@ -828,10 +831,10 @@ uint16_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
 
 Point Creature::getDisplacement() const
 {
-    if (m_outfit.getCategory() == ThingCategoryEffect)
+    if (m_outfit.isEffect())
         return { 8 };
 
-    if (m_outfit.getCategory() == ThingCategoryItem)
+    if (m_outfit.isItem())
         return {};
 
     return Thing::getDisplacement();
@@ -839,10 +842,10 @@ Point Creature::getDisplacement() const
 
 int Creature::getDisplacementX() const
 {
-    if (m_outfit.getCategory() == ThingCategoryEffect)
+    if (m_outfit.isEffect())
         return 8;
 
-    if (m_outfit.getCategory() == ThingCategoryItem)
+    if (m_outfit.isItem())
         return 0;
 
     if (m_outfit.hasMount())
@@ -853,10 +856,10 @@ int Creature::getDisplacementX() const
 
 int Creature::getDisplacementY() const
 {
-    if (m_outfit.getCategory() == ThingCategoryEffect)
+    if (m_outfit.isEffect())
         return 8;
 
-    if (m_outfit.getCategory() == ThingCategoryItem)
+    if (m_outfit.isItem())
         return 0;
 
     if (m_outfit.hasMount())

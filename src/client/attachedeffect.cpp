@@ -67,14 +67,14 @@ int AttachedEffect::getCurrentAnimationPhase()
     if (animator)
         return animator->getPhaseAt(m_animationTimer, m_speed);
 
-    if (m_thingType->getCategory() == ThingCategoryEffect) {
+    if (m_thingType->isEffect()) {
         const int lastPhase = m_thingType->getAnimationPhases() - 1;
         const int phase = std::min<int>(static_cast<int>(m_animationTimer.ticksElapsed() / (EFFECT_TICKS_PER_FRAME / m_speed)), lastPhase);
         if (phase == lastPhase) m_animationTimer.restart();
         return phase;
     }
 
-    if (m_thingType->getCategory() == ThingCategoryCreature && m_thingType->isAnimateAlways()) {
+    if (m_thingType->isCreature() && m_thingType->isAnimateAlways()) {
         const int ticksPerFrame = std::round(1000 / m_thingType->getAnimationPhases()) / m_speed;
         return (g_clock.millis() % (static_cast<long long>(ticksPerFrame) * m_thingType->getAnimationPhases())) / ticksPerFrame;
     }

@@ -77,7 +77,7 @@ public:
     static ItemPtr create(int id);
 
     void draw(const Point& dest, uint32_t flags, LightView* lightView = nullptr) override;
-    void internalDraw(int animationPhase, const Point& dest, const Color& color, uint32_t flags, LightView* lightView = nullptr);
+    void internalDraw(int animationPhase, const Point& dest, const Color& color, bool isMarked, uint32_t flags, LightView* lightView = nullptr);
 
     void setId(uint32_t id) override;
 

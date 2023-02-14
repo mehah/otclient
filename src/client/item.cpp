@@ -53,19 +53,21 @@ void Item::draw(const Point& dest, uint32_t flags, LightView* lightView)
     // determine animation phase
     const int animationPhase = calculateAnimationPhase();
 
-    internalDraw(animationPhase, dest, m_color, flags, lightView);
+    internalDraw(animationPhase, dest, m_color, false, flags, lightView);
 
-    if (isMarked()) {
-        g_drawPool.setShaderProgram(g_painter->getReplaceColorShader());
-        internalDraw(animationPhase, dest, getMarkedColor(), flags);
-        g_drawPool.resetShaderProgram();
-    }
+    if (isMarked())
+        internalDraw(animationPhase, dest, getMarkedColor(), true, flags);
 }
 
-void Item::internalDraw(int animationPhase, const Point& dest, const Color& color, uint32_t flags, LightView* lightView)
+void Item::internalDraw(int animationPhase, const Point& dest, const Color& color, bool isMarked, uint32_t flags, LightView* lightView)
 {
     drawAttachedEffect(dest, lightView, false); // On Bottom
-    if (m_shader) g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
+
+    if (isMarked)
+        g_drawPool.setShaderProgram(g_painter->getReplaceColorShader(), true);
+    else if (m_shader)
+        g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
+
     getThingType()->draw(dest, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, color, lightView, m_drawConductor);
     drawAttachedEffect(dest, lightView, true); // On Top
 }
