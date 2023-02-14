@@ -183,15 +183,7 @@ void Creature::drawOutfit(const Rect& destRect, bool resize, const Color& color)
     if (!m_thingType)
         return;
 
-    // ExactSize Cache
-    if (m_exactSize == 0) {
-        if (m_exactSize = getExactSize()) {
-            m_exactSize = std::max<uint8_t>(m_exactSize, SPRITE_SIZE);
-            m_frameSizeNotResized = std::max<int>(m_exactSize * 0.75f, 2 * SPRITE_SIZE * 0.75f);
-        }
-    }
-
-    const uint8_t frameSize = resize ? m_exactSize : m_frameSizeNotResized;
+    const uint8_t frameSize = resize ? getExactSize() : getFrameSizeNotResized();
     if (frameSize == 0)
         return;
 
@@ -230,7 +222,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
     // calculate main rects
 
     const auto& nameSize = m_name.getTextSize();
-    const int cropSizeText = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? m_exactSize : 12;
+    const int cropSizeText = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? getExactSize() : 12;
     const int cropSizeBackGround = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? cropSizeText - nameSize.height() : 0;
 
     auto backgroundRect = Rect(p.x - (13.5), p.y - cropSizeBackGround, 27, 4);
@@ -899,24 +891,39 @@ uint16_t Creature::getCurrentAnimationPhase(const bool mount)
 
 int Creature::getExactSize(int layer, int xPattern, int yPattern, int zPattern, int animationPhase)
 {
-    if (!m_outfit.isCreature())
-        return m_thingType->getExactSize();
+    if (m_exactSize > 0)
+        return m_exactSize;
 
-    const int numPatternY = getNumPatternY();
+    uint8_t exactSize = 0;
+    if (m_outfit.isCreature()) {
+        const int numPatternY = getNumPatternY();
+        const int layers = getLayers();
 
-    zPattern = m_outfit.hasMount() ? 1 : 0;
+        zPattern = m_outfit.hasMount() ? 1 : 0;
 
-    const int layers = getLayers();
-    int exactSize = 0;
-    for (yPattern = 0; yPattern < numPatternY; ++yPattern) {
-        if (yPattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
-            continue;
+        for (yPattern = 0; yPattern < numPatternY; ++yPattern) {
+            if (yPattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
+                continue;
 
-        for (int layer = 0; layer < layers; ++layer)
-            exactSize = std::max<int>(exactSize, Thing::getExactSize(layer, 0, yPattern, zPattern, 0));
+            for (int layer = 0; layer < layers; ++layer)
+                exactSize = std::max<int>(exactSize, Thing::getExactSize(layer, 0, yPattern, zPattern, 0));
+        }
+    } else {
+        exactSize = m_thingType->getExactSize();
     }
 
-    return exactSize;
+    return m_exactSize = std::max<uint8_t>(exactSize, SPRITE_SIZE);
+}
+
+uint8_t Creature::getFrameSizeNotResized()
+{
+    if (m_frameSizeNotResized > 0)
+        return m_frameSizeNotResized;
+
+    if (getExactSize() == 0)
+        return 0;
+
+    return m_frameSizeNotResized = std::max<int>(m_exactSize * 0.75f, 2 * SPRITE_SIZE * 0.75f);
 }
 
 void Creature::setMountShader(const std::string_view name) { m_mountShader = g_shaders.getShader(name); }

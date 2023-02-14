@@ -171,6 +171,7 @@ private:
     void updateWalkingTile();
     void updateWalkAnimation();
 
+    uint8_t getFrameSizeNotResized();
     uint16_t getCurrentAnimationPhase(bool mount = false);
 
     struct CachedStep
