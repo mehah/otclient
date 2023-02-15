@@ -22,6 +22,7 @@
 
 #include "graphicalapplication.h"
 #include <thread>
+#include <client/game.h>
 #include <client/map.h>
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/clock.h>
@@ -34,6 +35,7 @@
 #include <framework/input/mouse.h>
 #include <framework/platform/platformwindow.h>
 #include <framework/ui/uimanager.h>
+#include <framework/ui/uiwidget.h>
 #include "framework/stdext/time.h"
 
 #ifdef FRAMEWORK_SOUND
@@ -137,6 +139,8 @@ void GraphicalApplication::run()
 
     std::condition_variable foreCondition, txtCondition;
 
+    UIWidgetPtr mapWidget;
+
     // clang c++20 dont support jthread
     std::thread t1([&]() {
         while (!m_stopping) {
@@ -151,15 +155,20 @@ void GraphicalApplication::run()
                 foreCondition.notify_one();
             }
 
-            txt->setEnable(isDrawingTexts());
-            if (txt->isEnabled()) {
-                txtCondition.notify_one();
-            }
+            if (g_game.isOnline()) {
+                if (!mapWidget)
+                    mapWidget = g_ui.getRootWidget()->recursiveGetChildById("gameMapPanel");
 
-            {
-                std::scoped_lock l(map->getMutex());
-                g_ui.render(DrawPoolType::MAP);
-            }
+                txt->setEnable(isDrawingTexts());
+                if (txt->isEnabled()) {
+                    txtCondition.notify_one();
+                }
+
+                {
+                    std::scoped_lock l(map->getMutex());
+                    mapWidget->drawSelf(DrawPoolType::MAP);
+                }
+            } else mapWidget = nullptr;
 
             stdext::millisleep(1);
         }
@@ -180,7 +189,8 @@ void GraphicalApplication::run()
         std::unique_lock lock(txt->getMutex());
         txtCondition.wait(lock, [&]() -> bool {
             g_textDispatcher.poll();
-            g_ui.render(DrawPoolType::TEXT);
+            if (mapWidget)
+                mapWidget->drawSelf(DrawPoolType::TEXT);
             return m_stopping;
         });
     });

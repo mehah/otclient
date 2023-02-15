@@ -40,10 +40,10 @@ public:
     void mainPoll();
     void close() override;
 
-    void setMaxFps(int maxFps) { m_frameCounter.setMaxFps(maxFps); }
+    void setMaxFps(uint16_t maxFps) { m_frameCounter.setMaxFps(maxFps); }
 
-    int getFps() { return m_frameCounter.getFps(); }
-    int getMaxFps() { return m_frameCounter.getMaxFps(); }
+    uint16_t getFps() { return m_frameCounter.getFps(); }
+    uint16_t getMaxFps() { return m_frameCounter.getMaxFps(); }
 
     bool isOnInputEvent() { return m_onInputEvent; }
     bool mustOptimize() {

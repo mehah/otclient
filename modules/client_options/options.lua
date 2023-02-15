@@ -18,7 +18,7 @@ local defaultOptions = {
     showLeftPanel = false,
     showRightExtraPanel = false,
     openMaximized = false,
-    backgroundFrameRate = 201,
+    backgroundFrameRate = 401,
     enableAudio = true,
     enableMusicSound = true,
     musicSoundVolume = 100,
@@ -246,7 +246,7 @@ function setOption(key, value, force)
         modules.game_interface.getRightExtraPanel():setOn(value)
     elseif key == 'backgroundFrameRate' then
         local text, v = value, value
-        if value <= 0 or value >= 201 then
+        if value <= 0 or value >= 401 then
             text = 'max'
             v = 0
         end
