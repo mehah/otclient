@@ -493,7 +493,8 @@ void Creature::updateWalkAnimation()
 
     if (g_game.getFeature(Otc::GameEnhancedAnimations)) {
         minFootDelay += 10;
-        footAnimDelay /= 1.5;
+        if (footAnimDelay > 1)
+            footAnimDelay /= 1.5;
     }
 
     const int footDelay = std::max<int>(m_stepCache.getDuration(m_lastStepDirection) / footAnimDelay, minFootDelay);
