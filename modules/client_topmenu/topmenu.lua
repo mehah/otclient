@@ -5,6 +5,10 @@ local rightButtonsPanel
 local leftGameButtonsPanel
 local rightGameButtonsPanel
 
+local minFps = -1
+local maxFps = -1
+local midFps = -1
+
 -- private functions
 local function addButton(id, description, icon, callback, panel, toggle, front)
     local class
@@ -91,6 +95,7 @@ end
 function offline()
     hideGameButtons()
     pingLabel:hide()
+    minFps = -1
 end
 
 function updateFps(fps)
@@ -99,6 +104,29 @@ function updateFps(fps)
     end
 
     text = 'FPS: ' .. fps
+
+    if g_game.isOnline() then
+        if minFps == -1 then
+            midFps = fps
+            maxFps = fps
+            minFps = fps
+        end
+
+        if fps > maxFps then
+            maxFps = fps
+        end
+
+        if fps < minFps then
+            minFps = fps
+        end
+
+        midFps = math.floor((minFps + maxFps) / 2)
+
+        fpsLabel:setTooltip('Min: ' .. minFps .. '\nMid: ' .. midFps .. '\nMax: ' .. maxFps)
+    else
+        fpsLabel:removeTooltip()
+    end
+
     fpsLabel:setText(text)
 end
 

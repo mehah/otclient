@@ -19,6 +19,7 @@ TopMenuPanel
 
   TopMenuFrameCounterLabel
     id: fpsLabel
+    phantom: false
     text-auto-resize: true
     anchors.top: parent.top
     anchors.left: leftGameButtonsPanel.right

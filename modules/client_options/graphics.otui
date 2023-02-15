@@ -2,7 +2,7 @@ Panel
   OptionCheckBox
     id: vsync
     !text: tr('Enable vertical synchronization')
-    !tooltip: tr('Limits FPS to 60')
+    !tooltip: tr('Limits your fps based on monitor refresh rate')
 
   OptionCheckBox
     id: showFps
