@@ -111,7 +111,7 @@ private:
     void recacheGlyphs() { m_glyphsMustRecache = true; }
 
     std::string m_validCharacters;
-    uint32_t m_maxLength;
+    uint32_t m_maxLength{ 0 };
 
     Rect m_drawArea;
     Point m_textVirtualOffset;
@@ -119,25 +119,25 @@ private:
     Size m_textTotalSize;
     ticks_t m_cursorTicks;
 
-    bool m_textHidden;
-    bool m_shiftNavigation;
-    bool m_multiline;
-    bool m_cursorInRange;
+    bool m_textHidden{ false };
+    bool m_shiftNavigation{ false };
+    bool m_multiline{ false };
+    bool m_cursorInRange{ true };
     bool m_cursorVisible;
-    bool m_editable;
-    bool m_changeCursorImage;
-    bool m_updatesEnabled;
-    bool m_autoScroll;
+    bool m_editable{ true };
+    bool m_changeCursorImage{ true };
+    bool m_updatesEnabled{ true };
+    bool m_autoScroll{ true };
+    bool m_selectable{ true };
+    bool m_glyphsMustRecache{ true };
 
-    bool m_selectable;
-
-    int m_selectionReference;
-    int m_selectionStart;
-    int m_selectionEnd;
+    int m_selectionReference{ 0 };
+    int m_selectionStart{ 0 };
+    int m_selectionEnd{ 0 };
     int m_cursorPos{ 0 };
 
-    Color m_selectionColor;
-    Color m_selectionBackgroundColor;
+    Color m_selectionColor{ Color::white };
+    Color m_selectionBackgroundColor{ Color::black };
 
     std::vector<Rect> m_glyphsCoords;
     std::vector<Rect> m_glyphsTexCoords;
@@ -146,6 +146,4 @@ private:
     std::vector<std::pair<Rect, Rect>> m_glyphsSelectRectCache;
 
     std::string m_displayedText;
-
-    bool m_glyphsMustRecache;
 };
