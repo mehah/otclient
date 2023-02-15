@@ -720,7 +720,8 @@ function onAttack(creature) -- Update battleButton once you're attacking a targe
         lastCreatureSelected = nil
     end
 
-    local battleButton = creature and (battleButtons[creature:getId()]) or lastBattleButtonSwitched
+    local battleButton = battleButton:isOn() and creature and (battleButtons[creature:getId()]) or
+                             lastBattleButtonSwitched
 
     if battleButton then
         battleButton.isTarget = creature and true or false
