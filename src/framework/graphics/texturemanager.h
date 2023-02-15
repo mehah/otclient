@@ -30,7 +30,7 @@ class TextureManager
 public:
     void init();
     void terminate();
-    void poll() const;
+    void poll();
 
     void clearCache();
     void liveReload();
@@ -46,6 +46,7 @@ private:
     std::vector<AnimatedTexturePtr> m_animatedTextures;
     TexturePtr m_emptyTexture;
     ScheduledEventPtr m_liveReloadEvent;
+    std::mutex m_mutex;
 };
 
 extern TextureManager g_textures;

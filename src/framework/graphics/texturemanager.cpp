@@ -49,7 +49,7 @@ void TextureManager::terminate()
     m_emptyTexture = nullptr;
 }
 
-void TextureManager::poll() const
+void TextureManager::poll()
 {
     // update only every 16msec, this allows upto 60 fps for animated textures
     static ticks_t lastUpdate = 0;
@@ -58,12 +58,14 @@ void TextureManager::poll() const
         return;
     lastUpdate = now;
 
-    for (const AnimatedTexturePtr& animatedTexture : m_animatedTextures)
+    std::scoped_lock l(m_mutex);
+    for (const auto& animatedTexture : m_animatedTextures)
         animatedTexture->update();
 }
 
 void TextureManager::clearCache()
 {
+    std::scoped_lock l(m_mutex);
     m_animatedTextures.clear();
     m_textures.clear();
 }
@@ -155,6 +157,7 @@ TexturePtr TextureManager::loadTexture(std::stringstream& file)
             }
 
             const auto& animatedTexture = std::make_shared<AnimatedTexture>(imageSize, frames, framesDelay, apng.num_plays);
+            std::scoped_lock l(m_mutex);
             texture = m_animatedTextures.emplace_back(animatedTexture);
         } else {
             const auto& image = std::make_shared<Image>(imageSize, apng.bpp, apng.pdata);
