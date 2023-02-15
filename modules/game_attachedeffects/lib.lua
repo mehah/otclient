@@ -25,6 +25,10 @@ local executeConfig = function(attachedEffect, config)
             attachedEffect:setShader(config.shader)
         end
 
+        if config.opacity ~= nil and config.opacity < 1.0 then
+            attachedEffect:setOpacity(config.opacity)
+        end
+
         if x ~= 0 or y ~= 0 then
             attachedEffect:setOffset(x, y)
         end

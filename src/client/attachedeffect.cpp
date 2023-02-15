@@ -55,6 +55,7 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
         return;
 
     if (m_shader) g_drawPool.setShaderProgram(m_shader, true);
+    if (m_opacity < 100) g_drawPool.setOpacity(getOpacity(), true);
     m_thingType->draw(dest - (dirControl.offset * g_drawPool.getScaleFactor()), 0, m_direction, 0, 0, getCurrentAnimationPhase(), Otc::DrawThingsAndLights, Color::white, lightView);
 }
 
@@ -65,17 +66,17 @@ int AttachedEffect::getCurrentAnimationPhase()
         animator = m_thingType->getAnimator();
 
     if (animator)
-        return animator->getPhaseAt(m_animationTimer, m_speed);
+        return animator->getPhaseAt(m_animationTimer, getSpeed());
 
     if (m_thingType->isEffect()) {
         const int lastPhase = m_thingType->getAnimationPhases() - 1;
-        const int phase = std::min<int>(static_cast<int>(m_animationTimer.ticksElapsed() / (EFFECT_TICKS_PER_FRAME / m_speed)), lastPhase);
+        const int phase = std::min<int>(static_cast<int>(m_animationTimer.ticksElapsed() / (EFFECT_TICKS_PER_FRAME / getSpeed())), lastPhase);
         if (phase == lastPhase) m_animationTimer.restart();
         return phase;
     }
 
     if (m_thingType->isCreature() && m_thingType->isAnimateAlways()) {
-        const int ticksPerFrame = std::round(1000 / m_thingType->getAnimationPhases()) / m_speed;
+        const int ticksPerFrame = std::round(1000 / m_thingType->getAnimationPhases()) / getSpeed();
         return (g_clock.millis() % (static_cast<long long>(ticksPerFrame) * m_thingType->getAnimationPhases())) / ticksPerFrame;
     }
 

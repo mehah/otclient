@@ -35,8 +35,11 @@ public:
 
     AttachedEffectPtr clone() const;
 
-    float getSpeed() { return m_speed; }
-    void setSpeed(float speed) { m_speed = speed; }
+    float getSpeed() { return m_speed / 100.f; }
+    void setSpeed(float speed) { m_speed = speed * 100u; }
+
+    float getOpacity() { return m_opacity / 100.f; }
+    void setOpacity(float opacity) { m_opacity = opacity * 100u; }
 
     void setOnTop(bool onTop) { for (auto& control : m_offsetDirections) control.onTop = onTop; }
     void setOffset(int8_t x, int8_t y) { for (auto& control : m_offsetDirections) control.offset = { x, y }; }
@@ -56,9 +59,11 @@ private:
         Point offset;
     };
 
+    uint8_t m_speed{ 100 };
+    uint8_t m_opacity{ 100 };
+
     uint16_t m_id{ 0 };
 
-    float m_speed{ 1.f };
     bool m_onTop{ false };
     bool m_canDrawOnUI{ true };
     ThingType* m_thingType{ nullptr };

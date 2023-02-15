@@ -61,15 +61,16 @@ void Item::draw(const Point& dest, uint32_t flags, LightView* lightView)
 
 void Item::internalDraw(int animationPhase, const Point& dest, const Color& color, bool isMarked, uint32_t flags, LightView* lightView)
 {
-    drawAttachedEffect(dest, lightView, false); // On Bottom
-
     if (isMarked)
         g_drawPool.setShaderProgram(g_painter->getReplaceColorShader(), true);
-    else if (m_shader)
-        g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
-
+    else {
+        drawAttachedEffect(dest, lightView, false); // On Bottom
+        if (m_shader)
+            g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
+    }
     getThingType()->draw(dest, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, flags, color, lightView, m_drawConductor);
-    drawAttachedEffect(dest, lightView, true); // On Top
+    if (!isMarked)
+        drawAttachedEffect(dest, lightView, true); // On Top
 }
 
 void Item::setConductor()

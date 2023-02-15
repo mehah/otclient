@@ -19,7 +19,7 @@ AttachedEffectManager.register(1, 'Spoke Lighting', 12, ThingCategoryEffect, {
 AttachedEffectManager.register(2, 'Bat Wings', 307, ThingCategoryCreature, {
     speed = 5,
     disableWalkAnimation = true,
-    shader = 'Outfit - Ghost',
+    shader = 'Outfit - Rainbow',
     dirOffset = {
         [North] = {0, -10, true},
         [East] = {5, -5},
@@ -29,6 +29,6 @@ AttachedEffectManager.register(2, 'Bat Wings', 307, ThingCategoryCreature, {
 })
 
 AttachedEffectManager.register(3, 'Angel Light', 50, ThingCategoryEffect, {
-    shader = 'Map - Party',
+    opacity = 0.5,
     drawOnUI = false
 })

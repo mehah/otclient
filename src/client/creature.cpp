@@ -103,10 +103,10 @@ void Creature::internalDraw(Point dest, bool isMarked, const Color& color, Light
 {
     int animationPhase = 0;
 
-    drawAttachedEffect(dest, lightView, false); // On Bottom
-
     if (isMarked)
         g_drawPool.setShaderProgram(g_painter->getReplaceColorShader());
+    else
+        drawAttachedEffect(dest, lightView, false); // On Bottom
 
     // outfit is a real creature
     if (m_outfit.isCreature()) {
@@ -177,8 +177,8 @@ void Creature::internalDraw(Point dest, bool isMarked, const Color& color, Light
 
     if (isMarked)
         g_drawPool.resetShaderProgram();
-
-    drawAttachedEffect(dest, lightView, true); // On Top
+    else
+        drawAttachedEffect(dest, lightView, true); // On Top
 }
 
 void Creature::drawOutfit(const Rect& destRect, bool resize, const Color& color)
