@@ -997,6 +997,7 @@ function moveStackableItem(item, toPos)
     spinbox:setMinimum(0)
     spinbox:setValue(0)
     spinbox:hideButtons()
+    getRootPanel():hide()
     spinbox:focus()
     spinbox.firstEdit = true
 
@@ -1049,12 +1050,14 @@ function moveStackableItem(item, toPos)
         g_game.move(item, toPos, itembox:getItemCount())
         okButton:getParent():destroy()
         countWindow = nil
+        getRootPanel():show()
         modules.game_hotkeys.enableHotkeys(true)
     end
     local cancelButton = countWindow:getChildById('buttonCancel')
     local cancelFunc = function()
         cancelButton:getParent():destroy()
         countWindow = nil
+        getRootPanel():show()
         modules.game_hotkeys.enableHotkeys(true)
     end
 
