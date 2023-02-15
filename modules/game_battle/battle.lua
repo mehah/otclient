@@ -523,7 +523,7 @@ function addCreature(creature, sortType) -- Insert a creature in our binary tree
         local newIndex = binaryInsert(binaryTree, newCreature, BSComparatorSortType, sortType, true)
 
         battleButton = g_ui.createWidget('BattleButton')
-        battleButton:setup(creature)
+        battleButton:setup(creature, true)
         battleButton:show()
         battleButton:setOn(true)
 
@@ -720,8 +720,10 @@ function onAttack(creature) -- Update battleButton once you're attacking a targe
         lastCreatureSelected = nil
     end
 
-    local battleButton = battleButton:isOn() and creature and (battleButtons[creature:getId()]) or
-                             lastBattleButtonSwitched
+    local battleButton = nil
+    if battleWindow:isVisible() then
+        battleButton = creature and (battleButtons[creature:getId()]) or lastBattleButtonSwitched
+    end
 
     if battleButton then
         battleButton.isTarget = creature and true or false
@@ -739,7 +741,11 @@ function onFollow(creature) -- Update battleButton once you're following a targe
         lastCreatureSelected = nil
     end
 
-    local battleButton = creature and battleButtons[creature:getId()] or lastBattleButtonSwitched
+    local battleButton = nil
+    if battleWindow:isVisible() then
+        battleButton = creature and battleButtons[creature:getId()] or lastBattleButtonSwitched
+    end
+
     if battleButton then
         battleButton.isFollowed = creature and true or false
         updateBattleButton(battleButton)

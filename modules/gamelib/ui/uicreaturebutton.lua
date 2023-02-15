@@ -68,7 +68,7 @@ function UICreatureButton:getCreatureId()
     return self.creature:getId()
 end
 
-function UICreatureButton:setup(creature)
+function UICreatureButton:setup(creature, onlyOutfit)
     self.creature = creature
 
     local creatureWidget = self:getChildById('creature')
@@ -76,7 +76,11 @@ function UICreatureButton:setup(creature)
     local lifeBarWidget = self:getChildById('lifeBar')
 
     labelWidget:setText(creature:getName())
-    creatureWidget:setCreature(creature)
+    if onlyOutfit == true then
+        creatureWidget:setOutfit(creature:getOutfit())
+    else
+        creatureWidget:setCreature(creature)
+    end
 
     self:setId('CreatureButton_' .. creature:getName():gsub('%s', '_'))
     self:setLifeBarPercent(creature:getHealthPercent())
