@@ -934,6 +934,7 @@ ThingFlagAttr ThingType::thingAttrToThingFlagAttr(ThingAttr attr) {
         case ThingAttrExpireStop: return ThingFlagAttrExpireStop;
         case ThingAttrPodium: return ThingFlagAttrPodium;
         case ThingAttrTopEffect: return ThingFlagAttrTopEffect;
+        case ThingAttrMarket: return ThingFlagAttrMarket;
     }
 
     return ThingFlagAttrNone;
