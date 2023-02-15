@@ -62,7 +62,7 @@ Creature::Creature() :m_type(Proto::CreatureTypeUnknown)
 
 void Creature::draw(const Point& dest, uint32_t flags, LightView* lightView)
 {
-    if (!canBeSeen())
+    if (!canBeSeen() || !canDraw())
         return;
 
     if (flags & Otc::DrawThings) {
@@ -691,6 +691,7 @@ void Creature::setOutfit(const Outfit& outfit)
     m_walkAnimationPhase = 0; // might happen when player is walking and outfit is changed.
 
     m_thingType = g_things.getThingType(m_outfit.isCreature() ? m_outfit.getId() : m_outfit.getAuxId(), m_outfit.getCategory()).get();
+    m_clientId = m_thingType->getId();
 
     if (m_outfit.hasMount()) {
         m_mountType = g_things.getThingType(m_outfit.getMount(), ThingCategoryCreature).get();

@@ -158,7 +158,9 @@ public:
     uint16_t getClassification() const { return m_thingType->getClassification(); }
 
     void canDraw(bool canDraw) { m_canDraw = canDraw; }
-    inline bool canDraw() const { return m_canDraw && m_clientId > 0; }
+    inline bool canDraw(const Color& color = Color::white) const {
+        return m_canDraw && m_clientId > 0 && color.aF() > Fw::MIN_ALPHA && m_thingType && m_thingType->getOpacity() > Fw::MIN_ALPHA;
+    }
 
     void setShader(const std::string_view name);
     void ungroup() { m_drawConductor.agroup = false; }
