@@ -33,6 +33,15 @@
 
 UITextEdit::UITextEdit()
 {
+    setProp(Props::PropCursorInRange, true);
+    setProp(Props::PropCursorVisible, true);
+    setProp(Props::PropEditable, true);
+    setProp(Props::PropChangeCursorImage, true);
+    setProp(Props::PropUpdatesEnabled, true);
+    setProp(Props::PropAutoScroll, true);
+    setProp(Props::PropSelectable, true);
+    setProp(Props::PropGlyphsMustRecache, true);
+
     m_textAlign = Fw::AlignTopLeft;
     blinkCursor();
 }
@@ -52,12 +61,10 @@ void UITextEdit::drawSelf(DrawPoolType drawPane)
     if (!texture)
         return;
 
-    const bool glyphsMustRecache = m_glyphsMustRecache;
-    if (glyphsMustRecache)
-        m_glyphsMustRecache = false;
-
     if (m_color != Color::alpha) {
-        if (glyphsMustRecache) {
+        if (getProp(PropGlyphsMustRecache)) {
+            setProp(PropGlyphsMustRecache, false);
+
             m_glyphsTextRectCache.clear();
             for (int i = -1; ++i < textLength;)
                 m_glyphsTextRectCache.emplace_back(m_glyphsCoords[i].first, m_glyphsCoords[i].second);
@@ -67,7 +74,9 @@ void UITextEdit::drawSelf(DrawPoolType drawPane)
     }
 
     if (hasSelection()) {
-        if (glyphsMustRecache) {
+        if (getProp(PropGlyphsMustRecache)) {
+            setProp(PropGlyphsMustRecache, false);
+
             m_glyphsSelectRectCache.clear();
             for (int i = m_selectionStart; i < m_selectionEnd; ++i)
                 m_glyphsSelectRectCache.emplace_back(m_glyphsCoords[i].first, m_glyphsCoords[i].second);
@@ -80,7 +89,7 @@ void UITextEdit::drawSelf(DrawPoolType drawPane)
     }
 
     // render cursor
-    if (isExplicitlyEnabled() && m_cursorVisible && m_cursorInRange && isActive() && m_cursorPos >= 0) {
+    if (isExplicitlyEnabled() && getProp(PropCursorVisible) && getProp(PropCursorInRange) && isActive() && m_cursorPos >= 0) {
         assert(m_cursorPos <= textLength);
         // draw every 333ms
         constexpr int delay = 333;
@@ -102,7 +111,7 @@ void UITextEdit::drawSelf(DrawPoolType drawPane)
 
 void UITextEdit::update(bool focusCursor)
 {
-    if (!m_updatesEnabled)
+    if (!getProp(PropUpdatesEnabled))
         return;
 
     std::string text = getDisplayedText();
@@ -150,8 +159,8 @@ void UITextEdit::update(bool focusCursor)
         m_textVirtualOffset.y = 0;
 
     // readjust start view area based on cursor position
-    m_cursorInRange = false;
-    if (focusCursor && m_autoScroll) {
+    setProp(PropCursorInRange, false);
+    if (focusCursor && getProp(PropAutoScroll)) {
         if (m_cursorPos > 0 && textLength > 0) {
             assert(m_cursorPos <= textLength);
             const Rect virtualRect(m_textVirtualOffset, m_rect.size() - Size(m_padding.left + m_padding.right, 0)); // previous rendered virtual rect
@@ -184,7 +193,7 @@ void UITextEdit::update(bool focusCursor)
         } else {
             m_textVirtualOffset = {};
         }
-        m_cursorInRange = true;
+        setProp(PropCursorInRange, true);
     } else {
         if (m_cursorPos > 0 && textLength > 0) {
             const Rect virtualRect(m_textVirtualOffset, m_rect.size() - Size(2 * m_padding.left + m_padding.right, 0)); // previous rendered virtual rect
@@ -192,9 +201,9 @@ void UITextEdit::update(bool focusCursor)
             glyph = static_cast<uint8_t>(text[pos]); // glyph of the element before cursor
             const Rect glyphRect(glyphsPositions[pos], glyphsSize[glyph]);
             if (virtualRect.contains(glyphRect.topLeft()) && virtualRect.contains(glyphRect.bottomRight()))
-                m_cursorInRange = true;
+                setProp(PropCursorInRange, true);
         } else {
-            m_cursorInRange = true;
+            setProp(PropCursorInRange, true);
         }
     }
 
@@ -350,7 +359,7 @@ void UITextEdit::setSelection(int start, int end)
 
 void UITextEdit::setTextHidden(bool hidden)
 {
-    m_textHidden = hidden;
+    setProp(PropTextHidden, hidden);
     update(true);
 }
 
@@ -369,7 +378,7 @@ void UITextEdit::appendText(const std::string_view txt)
 
     if (m_cursorPos >= 0) {
         // replace characters that are now allowed
-        if (!m_multiline)
+        if (!getProp(PropMultiline))
             stdext::replace_all(text, "\n", " ");
         stdext::replace_all(text, "\r", "");
         stdext::replace_all(text, "\t", "    ");
@@ -397,7 +406,7 @@ void UITextEdit::appendText(const std::string_view txt)
 
 void UITextEdit::appendCharacter(char c)
 {
-    if ((c == '\n' && !m_multiline) || c == '\r')
+    if ((c == '\n' && !getProp(PropMultiline)) || c == '\r')
         return;
 
     if (hasSelection())
@@ -547,7 +556,7 @@ int UITextEdit::getTextPos(const Point& pos)
 void UITextEdit::updateDisplayedText()
 {
     std::string text;
-    if (m_textHidden)
+    if (getProp(PropTextHidden))
         text = std::string(m_text.length(), '*');
     else
         text = m_text;
@@ -571,7 +580,7 @@ void UITextEdit::updateText()
         m_cursorPos = m_text.length();
 
     // any text changes reset the selection
-    if (m_selectable) {
+    if (getProp(PropSelectable)) {
         m_selectionEnd = 0;
         m_selectionStart = 0;
     }
@@ -584,7 +593,7 @@ void UITextEdit::updateText()
 
 void UITextEdit::onHoverChange(bool hovered)
 {
-    if (m_changeCursorImage) {
+    if (getProp(PropChangeCursorImage)) {
         if (hovered && !g_mouse.isCursorChanged())
             g_mouse.pushCursor("text");
         else
@@ -645,7 +654,7 @@ void UITextEdit::onFocusChange(bool focused, Fw::FocusReason reason)
 #ifdef ANDROID
         g_androidManager.showKeyboardSoft();
 #endif
-    } else if (m_selectable)
+    } else if (getProp(PropSelectable))
         clearSelection();
     UIWidget::onFocusChange(focused, reason);
 }
@@ -656,21 +665,21 @@ bool UITextEdit::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepe
         return true;
 
     if (keyboardModifiers == Fw::KeyboardNoModifier) {
-        if (keyCode == Fw::KeyDelete && m_editable) { // erase right character
+        if (keyCode == Fw::KeyDelete && getProp(PropEditable)) { // erase right character
             if (hasSelection() || !m_text.empty()) {
                 del(true);
                 return true;
             }
-        } else if (keyCode == Fw::KeyBackspace && m_editable) { // erase left character
+        } else if (keyCode == Fw::KeyBackspace && getProp(PropEditable)) { // erase left character
             if (hasSelection() || !m_text.empty()) {
                 del(false);
                 return true;
             }
-        } else if (keyCode == Fw::KeyRight && !m_shiftNavigation) { // move cursor right
+        } else if (keyCode == Fw::KeyRight && !getProp(PropShiftNavigation)) { // move cursor right
             clearSelection();
             moveCursorHorizontally(true);
             return true;
-        } else if (keyCode == Fw::KeyLeft && !m_shiftNavigation) { // move cursor left
+        } else if (keyCode == Fw::KeyLeft && !getProp(PropShiftNavigation)) { // move cursor left
             clearSelection();
             moveCursorHorizontally(false);
             return true;
@@ -686,44 +695,44 @@ bool UITextEdit::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepe
                 setCursorPos(m_text.length());
                 return true;
             }
-        } else if (keyCode == Fw::KeyTab && !m_shiftNavigation) {
+        } else if (keyCode == Fw::KeyTab && !getProp(PropShiftNavigation)) {
             clearSelection();
             if (const auto& parent = getParent())
                 parent->focusNextChild(Fw::KeyboardFocusReason, true);
             return true;
-        } else if (keyCode == Fw::KeyEnter && m_multiline && m_editable) {
+        } else if (keyCode == Fw::KeyEnter && getProp(PropMultiline) && getProp(PropEditable)) {
             appendCharacter('\n');
             return true;
-        } else if (keyCode == Fw::KeyUp && !m_shiftNavigation && m_multiline) {
+        } else if (keyCode == Fw::KeyUp && !getProp(PropShiftNavigation) && getProp(PropMultiline)) {
             moveCursorVertically(true);
             return true;
-        } else if (keyCode == Fw::KeyDown && !m_shiftNavigation && m_multiline) {
+        } else if (keyCode == Fw::KeyDown && !getProp(PropShiftNavigation) && getProp(PropMultiline)) {
             moveCursorVertically(false);
             return true;
         }
     } else if (keyboardModifiers == Fw::KeyboardCtrlModifier) {
-        if (keyCode == Fw::KeyV && m_editable) {
+        if (keyCode == Fw::KeyV && getProp(PropEditable)) {
             paste(g_window.getClipboardText());
             return true;
         }
-        if (keyCode == Fw::KeyX && m_editable && m_selectable) {
+        if (keyCode == Fw::KeyX && getProp(PropEditable) && getProp(PropSelectable)) {
             if (hasSelection()) {
                 cut();
                 return true;
             }
-        } else if (keyCode == Fw::KeyC && m_selectable) {
+        } else if (keyCode == Fw::KeyC && getProp(PropSelectable)) {
             if (hasSelection()) {
                 copy();
                 return true;
             }
-        } else if (keyCode == Fw::KeyA && m_selectable) {
+        } else if (keyCode == Fw::KeyA && getProp(PropSelectable)) {
             if (m_text.length() > 0) {
                 selectAll();
                 return true;
             }
         }
     } else if (keyboardModifiers == Fw::KeyboardShiftModifier) {
-        if (keyCode == Fw::KeyTab && !m_shiftNavigation) {
+        if (keyCode == Fw::KeyTab && !getProp(PropShiftNavigation)) {
             if (const auto& parent = getParent())
                 parent->focusPreviousChild(Fw::KeyboardFocusReason, true);
             return true;
@@ -736,7 +745,7 @@ bool UITextEdit::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepe
             else if (keyCode == Fw::KeyLeft) // move cursor left
                 moveCursorHorizontally(false);
 
-            if (m_shiftNavigation)
+            if (getProp(PropShiftNavigation))
                 clearSelection();
             else {
                 if (!hasSelection())
@@ -765,7 +774,7 @@ bool UITextEdit::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepe
 
 bool UITextEdit::onKeyText(const std::string_view keyText)
 {
-    if (m_editable) {
+    if (getProp(PropEditable)) {
         appendText(keyText.data());
         return true;
     }
@@ -782,7 +791,7 @@ bool UITextEdit::onMousePress(const Point& mousePos, Fw::MouseButton button)
         if (pos >= 0) {
             setCursorPos(pos);
 
-            if (m_selectable) {
+            if (getProp(PropSelectable)) {
                 m_selectionReference = pos;
                 setSelection(pos, pos);
             }
@@ -802,7 +811,7 @@ bool UITextEdit::onMouseMove(const Point& mousePos, const Point& mouseMoved)
     if (UIWidget::onMouseMove(mousePos, mouseMoved))
         return true;
 
-    if (m_selectable && isPressed()) {
+    if (getProp(PropSelectable) && isPressed()) {
         const int pos = getTextPos(mousePos);
         if (pos >= 0) {
             setSelection(m_selectionReference, pos);
@@ -817,7 +826,7 @@ bool UITextEdit::onDoubleClick(const Point& mousePos)
 {
     if (UIWidget::onDoubleClick(mousePos))
         return true;
-    if (m_selectable && m_text.length() > 0) {
+    if (getProp(PropSelectable) && m_text.length() > 0) {
         selectAll();
         return true;
     }
