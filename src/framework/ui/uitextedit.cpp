@@ -130,7 +130,7 @@ void UITextEdit::update(bool focusCursor)
     if (!m_rect.isValid() || hasProp(PropTextHorizontalAutoResize) || hasProp(PropTextVerticalAutoResize)) {
         textBoxSize += Size(m_padding.left + m_padding.right, m_padding.top + m_padding.bottom) + m_textOffset.toSize();
         Size size = getSize();
-        if (size.width() <= 0 || (hasProp(PropTextHorizontalAutoResize) && !getTextWrap()))
+        if (size.width() <= 0 || (hasProp(PropTextHorizontalAutoResize) && !isTextWrap()))
             size.setWidth(textBoxSize.width());
         if (size.height() <= 0 || hasProp(PropTextVerticalAutoResize))
             size.setHeight(textBoxSize.height());
@@ -553,7 +553,7 @@ void UITextEdit::updateDisplayedText()
     else
         text = m_text;
 
-    if (getTextWrap() && m_rect.isValid())
+    if (isTextWrap() && m_rect.isValid())
         text = m_font->wrapText(text, getPaddingRect().width() - m_textOffset.x);
 
     m_displayedText = text;

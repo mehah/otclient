@@ -35,7 +35,7 @@ void UIWidget::initText()
 
 void UIWidget::updateText()
 {
-    if (getTextWrap() && m_rect.isValid())
+    if (isTextWrap() && m_rect.isValid())
         m_drawText = m_font->wrapText(m_text, getWidth() - m_textOffset.x);
     else
         m_drawText = m_text;
@@ -48,7 +48,7 @@ void UIWidget::updateText()
         Size textBoxSize = m_textSize;
         textBoxSize += Size(m_padding.left + m_padding.right, m_padding.top + m_padding.bottom) + m_textOffset.toSize();
         Size size = getSize();
-        if (size.width() <= 0 || (hasProp(PropTextHorizontalAutoResize) && !getTextWrap()))
+        if (size.width() <= 0 || (hasProp(PropTextHorizontalAutoResize) && !isTextWrap()))
             size.setWidth(textBoxSize.width());
         if (size.height() <= 0 || hasProp(PropTextVerticalAutoResize))
             size.setHeight(textBoxSize.height());

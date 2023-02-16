@@ -1558,7 +1558,7 @@ void UIWidget::onStyleApply(const std::string_view, const OTMLNodePtr& styleNode
 
 void UIWidget::onGeometryChange(const Rect& oldRect, const Rect& newRect)
 {
-    if (getTextWrap() && oldRect.size() != newRect.size())
+    if (isTextWrap() && oldRect.size() != newRect.size())
         updateText();
 
     // move children that is outside the parent rect to inside again

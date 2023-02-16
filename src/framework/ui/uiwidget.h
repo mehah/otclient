@@ -532,7 +532,7 @@ public:
     std::string getDrawText() { return m_drawText; }
     Fw::AlignmentFlag getTextAlign() { return m_textAlign; }
     Point getTextOffset() { return m_textOffset; }
-    bool getTextWrap() { return hasProp(PropTextWrap); }
+    bool isTextWrap() { return hasProp(PropTextWrap); }
     std::string getFont() { return m_font->getName(); }
     Size getTextSize() { return m_textSize; }
 };
