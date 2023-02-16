@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 #define DEG_TO_RAD (std::acos(-1.f)/180.f)
 #define RAD_TO_DEC (180.f/std::acos(-1.f))
 
@@ -189,12 +191,12 @@ namespace Fw
     enum AlignmentFlag : uint32_t
     {
         AlignNone = 0,
-        AlignLeft = 1,
-        AlignRight = 2,
-        AlignTop = 4,
-        AlignBottom = 8,
-        AlignHorizontalCenter = 16,
-        AlignVerticalCenter = 32,
+        AlignLeft = 1 << 0,
+        AlignRight = 1 << 1,
+        AlignTop = 1 << 2,
+        AlignBottom = 1 << 3,
+        AlignHorizontalCenter = 1 << 4,
+        AlignVerticalCenter = 1 << 5,
         AlignTopLeft = AlignTop | AlignLeft, // 5
         AlignTopRight = AlignTop | AlignRight, // 6
         AlignBottomLeft = AlignBottom | AlignLeft, // 9
@@ -269,23 +271,23 @@ namespace Fw
         KeyboardShiftModifier = 4
     };
 
-    enum WidgetState : uint32_t
+    enum WidgetState : int32_t
     {
         InvalidState = -1,
         DefaultState = 0,
-        ActiveState = 1,
-        FocusState = 2,
-        HoverState = 4,
-        PressedState = 8,
-        DisabledState = 16,
-        CheckedState = 32,
-        OnState = 64,
-        FirstState = 128,
-        MiddleState = 256,
-        LastState = 512,
-        AlternateState = 1024,
-        DraggingState = 2048,
-        HiddenState = 4096,
-        LastWidgetState = 8192
+        ActiveState = 1 << 0,
+        FocusState = 1 << 1,
+        HoverState = 1 << 2,
+        PressedState = 1 << 3,
+        DisabledState = 1 << 4,
+        CheckedState = 1 << 5,
+        OnState = 1 << 6,
+        FirstState = 1 << 7,
+        MiddleState = 1 << 8,
+        LastState = 1 << 9,
+        AlternateState = 1 << 10,
+        DraggingState = 1 << 11,
+        HiddenState = 1 << 12,
+        LastWidgetState = 1 << 13
     };
 }

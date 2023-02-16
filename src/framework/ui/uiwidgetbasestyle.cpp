@@ -52,7 +52,7 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
         // lua functions
         if (node->tag().starts_with("@")) {
             // load once
-            if (m_firstOnStyle) {
+            if (hasProp(PropFirstOnStyle)) {
                 std::string funcName = node->tag().substr(1);
                 std::string funcOrigin = "@" + node->source() + ": [" + node->tag() + "]";
                 g_lua.loadFunction(node->value(), funcOrigin);
@@ -285,7 +285,7 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
         else if (node->tag().starts_with("anchors.")) {
             const auto& parent = getParent();
             if (!parent) {
-                if (m_firstOnStyle)
+                if (hasProp(PropFirstOnStyle))
                     throw OTMLException(node, "cannot create anchor, there is no parent widget!");
                 continue;
             }

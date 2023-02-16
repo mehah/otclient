@@ -123,7 +123,7 @@ private:
     bool m_shiftNavigation{ false };
     bool m_multiline{ false };
     bool m_cursorInRange{ true };
-    bool m_cursorVisible;
+    bool m_cursorVisible{ true };
     bool m_editable{ true };
     bool m_changeCursorImage{ true };
     bool m_updatesEnabled{ true };

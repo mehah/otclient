@@ -44,6 +44,33 @@ struct EdgeGroup
     T left;
 };
 
+enum FlagProp : uint32_t
+{
+    PropTextWrap = 1 << 0,
+    PropTextVerticalAutoResize = 1 << 1,
+    PropTextHorizontalAutoResize = 1 << 2,
+    PropTextOnlyUpperCase = 1 << 3,
+    PropEnabled = 1 << 4,
+    PropVisible = 1 << 5,
+    PropFocusable = 1 << 6,
+    PropFixedSize = 1 << 7,
+    PropPhantom = 1 << 8,
+    PropDraggable = 1 << 9,
+    PropDestroyed = 1 << 10,
+    PropClipping = 1 << 11,
+    PropCustomId = 1 << 12,
+    PropUpdateEventScheduled = 1 << 13,
+    PropUpdatingMove = 1 << 14,
+    PropLoadingStyle = 1 << 15,
+    PropUpdateStyleScheduled = 1 << 16,
+    PropFirstOnStyle = 1 << 17,
+    PropImageBordered = 1 << 18,
+    PropImageFixedRatio = 1 << 19,
+    PropImageRepeated = 1 << 20,
+    PropImageSmooth = 1 << 21,
+    PropImageAutoResize = 1 << 22
+};
+
 // @bindclass
 class UIWidget : public LuaObject
 {
@@ -59,19 +86,10 @@ protected:
     friend class UIManager;
 
     std::string m_id;
-    int m_childIndex{ -1 };
+    int16_t m_childIndex{ -1 };
 
     Rect m_rect;
     Point m_virtualOffset;
-    bool m_enabled{ true };
-    bool m_visible{ true };
-    bool m_focusable{ true };
-    bool m_fixedSize{ false };
-    bool m_phantom{ false };
-    bool m_draggable{ false };
-    bool m_destroyed{ false };
-    bool m_clipping{ false };
-    bool m_customId{ false };
 
     UILayoutPtr m_layout;
     UIWidgetPtr m_parent;
@@ -139,7 +157,7 @@ public:
     void setPhantom(bool phantom);
     void setDraggable(bool draggable);
     void setFixedSize(bool fixed);
-    void setClipping(bool clipping) { m_clipping = clipping; }
+    void setClipping(bool clipping) { setProp(PropClipping, clipping); }
     void setLastFocusReason(Fw::FocusReason reason);
     void setAutoFocusPolicy(Fw::AutoFocusPolicy policy);
     void setAutoRepeatDelay(int delay) { m_autoRepeatDelay = delay; }
@@ -166,14 +184,16 @@ public:
     UIWidgetList recursiveGetChildrenByMarginPos(const Point& childPos);
     UIWidgetPtr backwardsGetWidgetById(const std::string_view id);
 
+    void setProp(FlagProp prop, bool v);
+    bool hasProp(FlagProp prop);
+
 private:
     void repaint();
-    bool m_updateEventScheduled{ false };
-    bool m_updatingMove{ false };
-    bool m_loadingStyle{ false };
+    uint32_t m_flagsProp{ 0 };
 
     // state managment
 protected:
+
     bool setState(Fw::WidgetState state, bool on);
     bool hasState(Fw::WidgetState state);
 
@@ -184,10 +204,8 @@ private:
     void updateChildrenIndexStates();
     void updateStyle();
 
-    bool m_updateStyleScheduled{ false };
-    bool m_firstOnStyle{ true };
     OTMLNodePtr m_stateStyle;
-    int m_states{ Fw::DefaultState };
+    int32_t m_states{ Fw::DefaultState };
 
     // event processing
 protected:
@@ -247,14 +265,14 @@ public:
     bool isDragging() { return hasState(Fw::DraggingState); }
     bool isVisible() { return !hasState(Fw::HiddenState); }
     bool isHidden() { return hasState(Fw::HiddenState); }
-    bool isExplicitlyEnabled() { return m_enabled; }
-    bool isExplicitlyVisible() { return m_visible; }
-    bool isFocusable() { return m_focusable; }
-    bool isPhantom() { return m_phantom; }
-    bool isDraggable() { return m_draggable; }
-    bool isFixedSize() { return m_fixedSize; }
-    bool isClipping() { return m_clipping; }
-    bool isDestroyed() { return m_destroyed; }
+    bool isExplicitlyEnabled() { return hasProp(PropEnabled); }
+    bool isExplicitlyVisible() { return hasProp(PropVisible); }
+    bool isFocusable() { return hasProp(PropFocusable); }
+    bool isPhantom() { return hasProp(PropPhantom); }
+    bool isDraggable() { return hasProp(PropDraggable); }
+    bool isFixedSize() { return hasProp(PropFixedSize); }
+    bool isClipping() { return hasProp(PropClipping); }
+    bool isDestroyed() { return hasProp(PropDestroyed); }
 
     bool isFirstChild() { return m_parent && m_childIndex == 1; }
     bool isLastChild() { return m_parent && m_childIndex == m_parent->m_children.size(); }
@@ -305,7 +323,7 @@ protected:
     EdgeGroup<int> m_padding;
     float m_opacity{ 1.f };
     float m_rotation{ 0.f };
-    int m_autoRepeatDelay{ 500 };
+    uint16_t m_autoRepeatDelay{ 500 };
     Point m_lastClickPosition;
 
 public:
@@ -413,12 +431,11 @@ private:
     void parseImageStyle(const OTMLNodePtr& styleNode);
 
     void updateImageCache() { if (!m_imageCachedScreenCoords.isNull()) m_imageCachedScreenCoords = {}; }
-    void configureBorderImage() { m_imageBordered = true; updateImageCache(); }
+    void configureBorderImage() { setProp(PropImageBordered, true); updateImageCache(); }
 
     std::vector<std::pair<Rect, Rect>> m_imageCoordsCache;
 
     Rect m_imageCachedScreenCoords;
-    bool m_imageBordered{ false };
 
 protected:
     void drawImage(const Rect& screenCoords);
@@ -429,10 +446,7 @@ protected:
     Rect m_imageRect;
     Color m_imageColor{ Color::white };
     Point m_iconOffset;
-    bool m_imageFixedRatio{ false };
-    bool m_imageRepeated{ false };
-    bool m_imageSmooth{ false };
-    bool m_imageAutoResize{ false };
+
     EdgeGroup<int> m_imageBorder;
 
 public:
@@ -446,10 +460,10 @@ public:
     void setImageSize(const Size& size) { m_imageRect.resize(size); updateImageCache(); }
     void setImageRect(const Rect& rect) { m_imageRect = rect; updateImageCache(); }
     void setImageColor(const Color& color) { m_imageColor = color; updateImageCache(); }
-    void setImageFixedRatio(bool fixedRatio) { m_imageFixedRatio = fixedRatio; updateImageCache(); }
-    void setImageRepeated(bool repeated) { m_imageRepeated = repeated; updateImageCache(); }
-    void setImageSmooth(bool smooth) { m_imageSmooth = smooth; }
-    void setImageAutoResize(bool autoResize) { m_imageAutoResize = autoResize; }
+    void setImageFixedRatio(bool fixedRatio) { setProp(PropImageFixedRatio, fixedRatio); updateImageCache(); }
+    void setImageRepeated(bool repeated) { setProp(PropImageRepeated, repeated); updateImageCache(); }
+    void setImageSmooth(bool smooth) { setProp(PropImageSmooth, smooth); }
+    void setImageAutoResize(bool autoResize) { setProp(PropImageAutoResize, autoResize); }
     void setImageBorderTop(int border) { m_imageBorder.top = border; configureBorderImage(); }
     void setImageBorderRight(int border) { m_imageBorder.right = border; configureBorderImage(); }
     void setImageBorderBottom(int border) { m_imageBorder.bottom = border; configureBorderImage(); }
@@ -466,9 +480,9 @@ public:
     Size getImageSize() { return m_imageRect.size(); }
     Rect getImageRect() { return m_imageRect; }
     Color getImageColor() { return m_imageColor; }
-    bool isImageFixedRatio() { return m_imageFixedRatio; }
-    bool isImageSmooth() { return m_imageSmooth; }
-    bool isImageAutoResize() { return m_imageAutoResize; }
+    bool isImageFixedRatio() { return hasProp(PropImageFixedRatio); }
+    bool isImageSmooth() { return hasProp(PropImageSmooth); }
+    bool isImageAutoResize() { return hasProp(PropImageAutoResize); }
     int getImageBorderTop() { return m_imageBorder.top; }
     int getImageBorderRight() { return m_imageBorder.right; }
     int getImageBorderBottom() { return m_imageBorder.bottom; }
@@ -483,8 +497,8 @@ private:
 
     Rect m_textCachedScreenCoords;
     std::vector<Point> m_glyphsPositionsCache;
-    CoordsBufferPtr m_coordsBuffer;
     Size m_textSize;
+    CoordsBufferPtr m_coordsBuffer;
 
 protected:
     virtual void updateText();
@@ -497,10 +511,7 @@ protected:
     std::string m_drawText;
     Fw::AlignmentFlag m_textAlign;
     Point m_textOffset;
-    bool m_textWrap{ false };
-    bool m_textVerticalAutoResize{ false };
-    bool m_textHorizontalAutoResize{ false };
-    bool m_textOnlyUpperCase{ false };
+
     BitmapFontPtr m_font;
 
 public:
@@ -510,18 +521,18 @@ public:
     void setText(const std::string_view text, bool dontFireLuaCall = false);
     void setTextAlign(Fw::AlignmentFlag align) { m_textAlign = align; updateText(); }
     void setTextOffset(const Point& offset) { m_textOffset = offset; updateText(); }
-    void setTextWrap(bool textWrap) { m_textWrap = textWrap; updateText(); }
-    void setTextAutoResize(bool textAutoResize) { m_textHorizontalAutoResize = textAutoResize; m_textVerticalAutoResize = textAutoResize; updateText(); }
-    void setTextHorizontalAutoResize(bool textAutoResize) { m_textHorizontalAutoResize = textAutoResize; updateText(); }
-    void setTextVerticalAutoResize(bool textAutoResize) { m_textVerticalAutoResize = textAutoResize; updateText(); }
-    void setTextOnlyUpperCase(bool textOnlyUpperCase) { m_textOnlyUpperCase = textOnlyUpperCase; setText(m_text); }
+    void setTextWrap(bool textWrap) { setProp(PropTextWrap, textWrap); updateText(); }
+    void setTextAutoResize(bool textAutoResize) { setProp(PropTextHorizontalAutoResize, textAutoResize); setProp(PropTextVerticalAutoResize, textAutoResize); updateText(); }
+    void setTextHorizontalAutoResize(bool textAutoResize) { setProp(PropTextHorizontalAutoResize, textAutoResize); updateText(); }
+    void setTextVerticalAutoResize(bool textAutoResize) { setProp(PropTextVerticalAutoResize, textAutoResize); updateText(); }
+    void setTextOnlyUpperCase(bool textOnlyUpperCase) { setProp(PropTextOnlyUpperCase, textOnlyUpperCase); setText(m_text); }
     void setFont(const std::string_view fontName);
 
     std::string getText() { return m_text; }
     std::string getDrawText() { return m_drawText; }
     Fw::AlignmentFlag getTextAlign() { return m_textAlign; }
     Point getTextOffset() { return m_textOffset; }
-    bool getTextWrap() { return m_textWrap; }
+    bool getTextWrap() { return hasProp(PropTextWrap); }
     std::string getFont() { return m_font->getName(); }
     Size getTextSize() { return m_textSize; }
 };

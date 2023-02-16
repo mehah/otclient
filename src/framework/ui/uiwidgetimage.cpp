@@ -91,7 +91,7 @@ void UIWidget::drawImage(const Rect& screenCoords)
 
         auto clipRect = m_imageClipRect.isValid() ? m_imageClipRect : Rect(0, 0, m_imageTexture->getSize());
 
-        if (m_imageBordered) {
+        if (hasProp(PropImageBordered)) {
             int top = m_imageBorder.top;
             int bottom = m_imageBorder.bottom;
             int left = m_imageBorder.left;
@@ -141,7 +141,7 @@ void UIWidget::drawImage(const Rect& screenCoords)
             rectCoords = Rect(drawRect.left() + bottomLeftCorner.width() + centerSize.width(), drawRect.top() + topRightCorner.height() + centerSize.height(), bottomRightCorner.size());
             m_imageCoordsCache.emplace_back(rectCoords, bottomRightCorner);
         } else {
-            if (m_imageFixedRatio) {
+            if (isImageFixedRatio()) {
                 Size textureSize = m_imageTexture->getSize(),
                     textureClipSize = drawRect.size();
 
@@ -162,7 +162,7 @@ void UIWidget::drawImage(const Rect& screenCoords)
 
     // smooth is now enabled by default for all textures
     //m_imageTexture->setSmooth(m_imageSmooth);
-    const bool useRepeated = m_imageBordered || m_imageRepeated;
+    const bool useRepeated = hasProp(PropImageBordered) || hasProp(PropImageRepeated);
     for (const auto& [dest, src] : m_imageCoordsCache) {
         if (useRepeated)
             g_drawPool.addTexturedRepeatedRect(dest, m_imageTexture, src, m_imageColor);
@@ -188,14 +188,14 @@ void UIWidget::setImageSource(const std::string_view source)
     if (m_imageTexture->isAnimatedTexture())
         std::static_pointer_cast<AnimatedTexture>(m_imageTexture)->restart();
 
-    if (!m_rect.isValid() || m_imageAutoResize) {
+    if (!m_rect.isValid() || hasProp(PropImageAutoResize)) {
         const auto& imageSize = m_imageTexture->getSize();
 
         Size size = getSize();
-        if (size.width() <= 0 || m_imageAutoResize)
+        if (size.width() <= 0 || hasProp(PropImageAutoResize))
             size.setWidth(imageSize.width());
 
-        if (size.height() <= 0 || m_imageAutoResize)
+        if (size.height() <= 0 || hasProp(PropImageAutoResize))
             size.setHeight(imageSize.height());
 
         setSize(size);

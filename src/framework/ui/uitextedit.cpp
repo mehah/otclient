@@ -127,12 +127,12 @@ void UITextEdit::update(bool focusCursor)
     int glyph;
 
     // update rect size
-    if (!m_rect.isValid() || m_textHorizontalAutoResize || m_textVerticalAutoResize) {
+    if (!m_rect.isValid() || hasProp(PropTextHorizontalAutoResize) || hasProp(PropTextVerticalAutoResize)) {
         textBoxSize += Size(m_padding.left + m_padding.right, m_padding.top + m_padding.bottom) + m_textOffset.toSize();
         Size size = getSize();
-        if (size.width() <= 0 || (m_textHorizontalAutoResize && !m_textWrap))
+        if (size.width() <= 0 || (hasProp(PropTextHorizontalAutoResize) && !getTextWrap()))
             size.setWidth(textBoxSize.width());
-        if (size.height() <= 0 || m_textVerticalAutoResize)
+        if (size.height() <= 0 || hasProp(PropTextVerticalAutoResize))
             size.setHeight(textBoxSize.height());
         setSize(size);
     }
@@ -553,7 +553,7 @@ void UITextEdit::updateDisplayedText()
     else
         text = m_text;
 
-    if (m_textWrap && m_rect.isValid())
+    if (getTextWrap() && m_rect.isValid())
         text = m_font->wrapText(text, getPaddingRect().width() - m_textOffset.x);
 
     m_displayedText = text;
@@ -661,107 +661,107 @@ bool UITextEdit::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepe
             if (hasSelection() || !m_text.empty()) {
                 del(true);
                 return true;
-        }
-    } else if (keyCode == Fw::KeyBackspace && m_editable) { // erase left character
-        if (hasSelection() || !m_text.empty()) {
-            del(false);
-            return true;
-        }
-    } else if (keyCode == Fw::KeyRight && !m_shiftNavigation) { // move cursor right
-        clearSelection();
-        moveCursorHorizontally(true);
-        return true;
-    } else if (keyCode == Fw::KeyLeft && !m_shiftNavigation) { // move cursor left
-        clearSelection();
-        moveCursorHorizontally(false);
-        return true;
-    } else if (keyCode == Fw::KeyHome) { // move cursor to first character
-        if (m_cursorPos != 0) {
+            }
+        } else if (keyCode == Fw::KeyBackspace && m_editable) { // erase left character
+            if (hasSelection() || !m_text.empty()) {
+                del(false);
+                return true;
+            }
+        } else if (keyCode == Fw::KeyRight && !m_shiftNavigation) { // move cursor right
             clearSelection();
-            setCursorPos(0);
-            return true;
-        }
-    } else if (keyCode == Fw::KeyEnd) { // move cursor to last character
-        if (m_cursorPos != static_cast<int>(m_text.length())) {
-            clearSelection();
-            setCursorPos(m_text.length());
-            return true;
-        }
-    } else if (keyCode == Fw::KeyTab && !m_shiftNavigation) {
-        clearSelection();
-        if (const auto& parent = getParent())
-            parent->focusNextChild(Fw::KeyboardFocusReason, true);
-        return true;
-    } else if (keyCode == Fw::KeyEnter && m_multiline && m_editable) {
-        appendCharacter('\n');
-        return true;
-    } else if (keyCode == Fw::KeyUp && !m_shiftNavigation && m_multiline) {
-        moveCursorVertically(true);
-        return true;
-    } else if (keyCode == Fw::KeyDown && !m_shiftNavigation && m_multiline) {
-        moveCursorVertically(false);
-        return true;
-    }
-} else if (keyboardModifiers == Fw::KeyboardCtrlModifier) {
-    if (keyCode == Fw::KeyV && m_editable) {
-        paste(g_window.getClipboardText());
-        return true;
-    }
-    if (keyCode == Fw::KeyX && m_editable && m_selectable) {
-        if (hasSelection()) {
-            cut();
-            return true;
-        }
-    } else if (keyCode == Fw::KeyC && m_selectable) {
-        if (hasSelection()) {
-            copy();
-            return true;
-        }
-    } else if (keyCode == Fw::KeyA && m_selectable) {
-        if (m_text.length() > 0) {
-            selectAll();
-            return true;
-        }
-    }
-} else if (keyboardModifiers == Fw::KeyboardShiftModifier) {
-    if (keyCode == Fw::KeyTab && !m_shiftNavigation) {
-        if (const auto& parent = getParent())
-            parent->focusPreviousChild(Fw::KeyboardFocusReason, true);
-        return true;
-    }
-    if (keyCode == Fw::KeyRight || keyCode == Fw::KeyLeft) {
-        const size_t oldCursorPos = m_cursorPos;
-
-        if (keyCode == Fw::KeyRight) // move cursor right
             moveCursorHorizontally(true);
-        else if (keyCode == Fw::KeyLeft) // move cursor left
-            moveCursorHorizontally(false);
-
-        if (m_shiftNavigation)
+            return true;
+        } else if (keyCode == Fw::KeyLeft && !m_shiftNavigation) { // move cursor left
             clearSelection();
-        else {
-            if (!hasSelection())
-                m_selectionReference = oldCursorPos;
-            setSelection(m_selectionReference, m_cursorPos);
-        }
-        return true;
-    }
-    if (keyCode == Fw::KeyHome) { // move cursor to first character
-        if (m_cursorPos != 0) {
-            setSelection(m_cursorPos, 0);
-            setCursorPos(0);
+            moveCursorHorizontally(false);
+            return true;
+        } else if (keyCode == Fw::KeyHome) { // move cursor to first character
+            if (m_cursorPos != 0) {
+                clearSelection();
+                setCursorPos(0);
+                return true;
+            }
+        } else if (keyCode == Fw::KeyEnd) { // move cursor to last character
+            if (m_cursorPos != static_cast<int>(m_text.length())) {
+                clearSelection();
+                setCursorPos(m_text.length());
+                return true;
+            }
+        } else if (keyCode == Fw::KeyTab && !m_shiftNavigation) {
+            clearSelection();
+            if (const auto& parent = getParent())
+                parent->focusNextChild(Fw::KeyboardFocusReason, true);
+            return true;
+        } else if (keyCode == Fw::KeyEnter && m_multiline && m_editable) {
+            appendCharacter('\n');
+            return true;
+        } else if (keyCode == Fw::KeyUp && !m_shiftNavigation && m_multiline) {
+            moveCursorVertically(true);
+            return true;
+        } else if (keyCode == Fw::KeyDown && !m_shiftNavigation && m_multiline) {
+            moveCursorVertically(false);
             return true;
         }
-    } else if (keyCode == Fw::KeyEnd) { // move cursor to last character
-        if (m_cursorPos != static_cast<int>(m_text.length())) {
-            setSelection(m_cursorPos, m_text.length());
-            setCursorPos(m_text.length());
+    } else if (keyboardModifiers == Fw::KeyboardCtrlModifier) {
+        if (keyCode == Fw::KeyV && m_editable) {
+            paste(g_window.getClipboardText());
             return true;
         }
-    }
-}
+        if (keyCode == Fw::KeyX && m_editable && m_selectable) {
+            if (hasSelection()) {
+                cut();
+                return true;
+            }
+        } else if (keyCode == Fw::KeyC && m_selectable) {
+            if (hasSelection()) {
+                copy();
+                return true;
+            }
+        } else if (keyCode == Fw::KeyA && m_selectable) {
+            if (m_text.length() > 0) {
+                selectAll();
+                return true;
+            }
+        }
+    } else if (keyboardModifiers == Fw::KeyboardShiftModifier) {
+        if (keyCode == Fw::KeyTab && !m_shiftNavigation) {
+            if (const auto& parent = getParent())
+                parent->focusPreviousChild(Fw::KeyboardFocusReason, true);
+            return true;
+        }
+        if (keyCode == Fw::KeyRight || keyCode == Fw::KeyLeft) {
+            const size_t oldCursorPos = m_cursorPos;
 
-return false;
+            if (keyCode == Fw::KeyRight) // move cursor right
+                moveCursorHorizontally(true);
+            else if (keyCode == Fw::KeyLeft) // move cursor left
+                moveCursorHorizontally(false);
+
+            if (m_shiftNavigation)
+                clearSelection();
+            else {
+                if (!hasSelection())
+                    m_selectionReference = oldCursorPos;
+                setSelection(m_selectionReference, m_cursorPos);
+            }
+            return true;
+        }
+        if (keyCode == Fw::KeyHome) { // move cursor to first character
+            if (m_cursorPos != 0) {
+                setSelection(m_cursorPos, 0);
+                setCursorPos(0);
+                return true;
+            }
+        } else if (keyCode == Fw::KeyEnd) { // move cursor to last character
+            if (m_cursorPos != static_cast<int>(m_text.length())) {
+                setSelection(m_cursorPos, m_text.length());
+                setCursorPos(m_text.length());
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 bool UITextEdit::onKeyText(const std::string_view keyText)

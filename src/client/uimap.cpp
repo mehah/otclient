@@ -29,7 +29,7 @@
 
 UIMap::UIMap()
 {
-    m_draggable = true;
+    setDraggable(true);
     m_keepAspectRatio = true;
     m_limitVisibleRange = false;
     m_maxZoomIn = 3;

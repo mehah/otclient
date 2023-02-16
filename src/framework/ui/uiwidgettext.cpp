@@ -35,7 +35,7 @@ void UIWidget::initText()
 
 void UIWidget::updateText()
 {
-    if (m_textWrap && m_rect.isValid())
+    if (getTextWrap() && m_rect.isValid())
         m_drawText = m_font->wrapText(m_text, getWidth() - m_textOffset.x);
     else
         m_drawText = m_text;
@@ -44,13 +44,13 @@ void UIWidget::updateText()
         m_glyphsPositionsCache = m_font->calculateGlyphsPositions(m_drawText, m_textAlign, &m_textSize);
 
     // update rect size
-    if (!m_rect.isValid() || m_textHorizontalAutoResize || m_textVerticalAutoResize) {
+    if (!m_rect.isValid() || hasProp(PropTextHorizontalAutoResize) || hasProp(PropTextVerticalAutoResize)) {
         Size textBoxSize = m_textSize;
         textBoxSize += Size(m_padding.left + m_padding.right, m_padding.top + m_padding.bottom) + m_textOffset.toSize();
         Size size = getSize();
-        if (size.width() <= 0 || (m_textHorizontalAutoResize && !m_textWrap))
+        if (size.width() <= 0 || (hasProp(PropTextHorizontalAutoResize) && !getTextWrap()))
             size.setWidth(textBoxSize.width());
-        if (size.height() <= 0 || m_textVerticalAutoResize)
+        if (size.height() <= 0 || hasProp(PropTextVerticalAutoResize))
             size.setHeight(textBoxSize.height());
         setSize(size);
     }
@@ -118,7 +118,7 @@ void UIWidget::onFontChange(const std::string_view font) { callLuaField("onFontC
 void UIWidget::setText(const std::string_view text, bool dontFireLuaCall)
 {
     std::string _text{ text.data() };
-    if (m_textOnlyUpperCase)
+    if (hasProp(PropTextOnlyUpperCase))
         stdext::toupper(_text);
 
     if (m_text == _text)
