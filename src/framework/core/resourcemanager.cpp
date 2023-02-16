@@ -28,6 +28,7 @@
 #include <framework/core/application.h>
 #include <framework/luaengine/luainterface.h>
 #include <framework/platform/platform.h>
+#include <framework/net/protocolhttp.h>
 
 #include <physfs.h>
 
