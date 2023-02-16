@@ -86,7 +86,7 @@ public:
     void saveSpriteToFile(int id, const std::string& file);
 
 private:
-    int m_spritesCount{ 0 };
+    uint32_t m_spritesCount{ 0 };
     std::vector<SpriteSheetPtr> m_sheets;
 };
 

@@ -192,7 +192,7 @@ void MapView::drawFloor()
         }
 
         if (m_posInfo.rect.contains(g_window.getMousePosition())) {
-            if (m_crosshairTexture) {
+            if (m_crosshairTexture && m_mousePosition.isValid()) {
                 const auto& point = transformPositionTo2D(m_mousePosition, cameraPosition);
                 const auto& crosshairRect = Rect(point, m_tileSize, m_tileSize);
                 g_drawPool.addTexturedRect(crosshairRect, m_crosshairTexture);

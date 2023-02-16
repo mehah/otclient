@@ -40,7 +40,7 @@ public:
     ScheduledEventPtr cycleEvent(const std::function<void()>& callback, int delay);
 
 private:
-    int m_pollEventsSize{};
+    size_t m_pollEventsSize{};
     bool m_disabled{ false };
 
     std::recursive_mutex m_mutex;

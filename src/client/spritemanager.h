@@ -62,8 +62,8 @@ private:
 
     bool m_loaded{ false };
     uint32_t m_signature{ 0 };
-    int m_spritesCount{ 0 };
-    int m_spritesOffset{ 0 };
+    uint32_t m_spritesCount{ 0 };
+    uint32_t m_spritesOffset{ 0 };
 
     FileStreamPtr m_spritesFile;
     std::mutex mutex;

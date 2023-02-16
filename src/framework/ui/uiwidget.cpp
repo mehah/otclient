@@ -35,6 +35,11 @@
 
 UIWidget::UIWidget()
 {
+    setProp(PropEnabled, true);
+    setProp(PropVisible, true);
+    setProp(PropFocusable, true);
+    setProp(PropFirstOnStyle, true);
+
     m_clickTimer.stop();
 
     initBaseStyle();
@@ -46,7 +51,7 @@ UIWidget::~UIWidget()
 {
 #ifndef NDEBUG
     assert(!g_app.isTerminated());
-    if (!m_destroyed)
+    if (!isDestroyed())
         g_logger.warning(stdext::format("widget '%s' was not explicitly destroyed", m_id));
 #endif
 }
@@ -54,7 +59,7 @@ UIWidget::~UIWidget()
 void UIWidget::draw(const Rect& visibleRect, DrawPoolType drawPane)
 {
     Rect oldClipRect;
-    if (m_clipping) {
+    if (isClipping()) {
         oldClipRect = g_drawPool.getClipRect();
         g_drawPool.setClipRect(visibleRect);
     }
@@ -67,7 +72,7 @@ void UIWidget::draw(const Rect& visibleRect, DrawPoolType drawPane)
     drawSelf(drawPane);
 
     if (!m_children.empty()) {
-        if (m_clipping)
+        if (isClipping())
             g_drawPool.setClipRect(visibleRect.intersection(getPaddingRect()));
 
         drawChildren(visibleRect, drawPane);
@@ -76,7 +81,7 @@ void UIWidget::draw(const Rect& visibleRect, DrawPoolType drawPane)
     if (m_rotation != 0.0f)
         g_drawPool.popTransformMatrix();
 
-    if (m_clipping) {
+    if (isClipping()) {
         g_drawPool.setClipRect(oldClipRect);
     }
 }
@@ -166,7 +171,7 @@ void UIWidget::addChild(const UIWidgetPtr& child)
     child->updateStates();
 
     // add access to child via widget.childId
-    if (child->m_customId) {
+    if (child->hasProp(PropCustomId)) {
         const std::string widgetId = child->getId();
         if (!hasLuaField(widgetId)) {
             setLuaField(widgetId, child->static_self_cast<UIWidget>());
@@ -266,7 +271,7 @@ void UIWidget::removeChild(const UIWidgetPtr& child)
         m_layout->removeWidget(child);
 
         // remove access to child via widget.childId
-        if (child->m_customId) {
+        if (child->hasProp(PropCustomId)) {
             const std::string widgetId = child->getId();
             if (hasLuaField(widgetId)) {
                 clearLuaField(widgetId);
@@ -287,7 +292,7 @@ void UIWidget::removeChild(const UIWidgetPtr& child)
 
 void UIWidget::focusChild(const UIWidgetPtr& child, Fw::FocusReason reason)
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     if (child == m_focusedChild)
@@ -322,7 +327,7 @@ void UIWidget::focusChild(const UIWidgetPtr& child, Fw::FocusReason reason)
 
 void UIWidget::focusNextChild(Fw::FocusReason reason, bool rotate)
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     UIWidgetPtr toFocus;
@@ -364,7 +369,7 @@ void UIWidget::focusNextChild(Fw::FocusReason reason, bool rotate)
 
 void UIWidget::focusPreviousChild(Fw::FocusReason reason, bool rotate)
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     UIWidgetPtr toFocus;
@@ -407,7 +412,7 @@ void UIWidget::focusPreviousChild(Fw::FocusReason reason, bool rotate)
 
 void UIWidget::lowerChild(const UIWidgetPtr& child)
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     if (!child)
@@ -433,7 +438,7 @@ void UIWidget::lowerChild(const UIWidgetPtr& child)
 
 void UIWidget::raiseChild(const UIWidgetPtr& child)
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     if (!child)
@@ -459,7 +464,7 @@ void UIWidget::raiseChild(const UIWidgetPtr& child)
 
 void UIWidget::moveChildToIndex(const UIWidgetPtr& child, int index)
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     if (!child)
@@ -497,7 +502,7 @@ void UIWidget::moveChildToIndex(const UIWidgetPtr& child, int index)
 
 void UIWidget::lockChild(const UIWidgetPtr& child)
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     if (!child)
@@ -529,7 +534,7 @@ void UIWidget::lockChild(const UIWidgetPtr& child)
 
 void UIWidget::unlockChild(const UIWidgetPtr& child)
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     if (!child)
@@ -585,13 +590,13 @@ void UIWidget::mergeStyle(const OTMLNodePtr& styleNode)
 
 void UIWidget::applyStyle(const OTMLNodePtr& styleNode)
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     if (styleNode->size() == 0)
         return;
 
-    m_loadingStyle = true;
+    setProp(PropLoadingStyle, true);
     try {
         // translate ! style tags
         for (const auto& node : styleNode->children()) {
@@ -610,7 +615,7 @@ void UIWidget::applyStyle(const OTMLNodePtr& styleNode)
         onStyleApply(styleNode->tag(), styleNode);
         callLuaField("onStyleApply", styleNode->tag(), styleNode);
 
-        if (m_firstOnStyle) {
+        if (hasProp(PropFirstOnStyle)) {
             const auto& parent = getParent();
             if (isFocusable() && isExplicitlyVisible() && isExplicitlyEnabled() &&
                 parent && ((!parent->getFocusedChild() && parent->getAutoFocusPolicy() == Fw::AutoFocusFirst) ||
@@ -619,16 +624,16 @@ void UIWidget::applyStyle(const OTMLNodePtr& styleNode)
             }
         }
 
-        m_firstOnStyle = false;
+        setProp(PropFirstOnStyle, false);
     } catch (stdext::exception& e) {
         g_logger.traceError(stdext::format("failed to apply style to widget '%s': %s", m_id, e.what()));
     }
-    m_loadingStyle = false;
+    setProp(PropLoadingStyle, false);
 }
 
 void UIWidget::addAnchor(Fw::AnchorEdge anchoredEdge, const std::string_view hookedWidgetId, Fw::AnchorEdge hookedEdge)
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     if (const auto& anchorLayout = getAnchoredLayout())
@@ -644,7 +649,7 @@ void UIWidget::removeAnchor(Fw::AnchorEdge anchoredEdge)
 
 void UIWidget::centerIn(const std::string_view hookedWidgetId)
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     if (const auto& anchorLayout = getAnchoredLayout()) {
@@ -656,7 +661,7 @@ void UIWidget::centerIn(const std::string_view hookedWidgetId)
 
 void UIWidget::fill(const std::string_view hookedWidgetId)
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     if (const auto& anchorLayout = getAnchoredLayout()) {
@@ -670,7 +675,7 @@ void UIWidget::fill(const std::string_view hookedWidgetId)
 
 void UIWidget::breakAnchors()
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     if (const auto& anchorLayout = getAnchoredLayout())
@@ -679,7 +684,7 @@ void UIWidget::breakAnchors()
 
 void UIWidget::updateParentLayout()
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     if (const auto& parent = getParent())
@@ -690,7 +695,7 @@ void UIWidget::updateParentLayout()
 
 void UIWidget::updateLayout()
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     if (m_layout)
@@ -705,7 +710,7 @@ void UIWidget::updateLayout()
 
 void UIWidget::lock()
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     if (const auto& parent = getParent())
@@ -714,7 +719,7 @@ void UIWidget::lock()
 
 void UIWidget::unlock()
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     if (const auto& parent = getParent())
@@ -723,10 +728,10 @@ void UIWidget::unlock()
 
 void UIWidget::focus()
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
-    if (!m_focusable)
+    if (!isFocusable())
         return;
 
     if (const auto& parent = getParent())
@@ -735,11 +740,11 @@ void UIWidget::focus()
 
 void UIWidget::recursiveFocus(Fw::FocusReason reason)
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     if (const auto& parent = getParent()) {
-        if (m_focusable)
+        if (isFocusable())
             parent->focusChild(static_self_cast<UIWidget>(), reason);
         parent->recursiveFocus(reason);
     }
@@ -747,7 +752,7 @@ void UIWidget::recursiveFocus(Fw::FocusReason reason)
 
 void UIWidget::lower()
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     const auto& parent = getParent();
@@ -757,7 +762,7 @@ void UIWidget::lower()
 
 void UIWidget::raise()
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     const auto& parent = getParent();
@@ -767,7 +772,7 @@ void UIWidget::raise()
 
 void UIWidget::grabMouse()
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     g_ui.setMouseReceiver(static_self_cast<UIWidget>());
@@ -781,7 +786,7 @@ void UIWidget::ungrabMouse()
 
 void UIWidget::grabKeyboard()
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     g_ui.setKeyboardReceiver(static_self_cast<UIWidget>());
@@ -795,7 +800,7 @@ void UIWidget::ungrabKeyboard()
 
 void UIWidget::bindRectToParent()
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     Rect boundRect = m_rect;
@@ -810,9 +815,9 @@ void UIWidget::bindRectToParent()
 
 void UIWidget::internalDestroy()
 {
-    m_destroyed = true;
-    m_visible = false;
-    m_enabled = false;
+    setProp(PropDestroyed, true);
+    setProp(PropVisible, false);
+    setProp(PropEnabled, false);
     m_focusedChild = nullptr;
     if (m_layout) {
         m_layout->setParent(nullptr);
@@ -835,12 +840,12 @@ void UIWidget::internalDestroy()
 
 void UIWidget::destroy()
 {
-    if (m_destroyed)
+    if (isDestroyed())
         g_logger.warning(stdext::format("attempt to destroy widget '%s' two times", m_id));
 
     // hold itself reference
     const UIWidgetPtr self = static_self_cast<UIWidget>();
-    m_destroyed = true;
+    setProp(PropDestroyed, true);
 
     // remove itself from parent
     if (const auto& parent = getParent())
@@ -870,7 +875,7 @@ void UIWidget::destroyChildren()
         child->m_childIndex = -1;
 
         // remove access to child via widget.childId
-        if (child->m_customId) {
+        if (child->hasProp(PropCustomId)) {
             std::string widgetId = child->getId();
             if (hasLuaField(widgetId)) {
                 clearLuaField(widgetId);
@@ -887,7 +892,7 @@ void UIWidget::setId(const std::string_view id)
     if (id == m_id)
         return;
 
-    m_customId = true;
+    setProp(PropCustomId, true);
 
     if (m_parent) {
         m_parent->clearLuaField(m_id);
@@ -972,14 +977,14 @@ bool UIWidget::setRect(const Rect& rect)
     updateLayout();
 
     // avoid massive update events
-    if (!m_updateEventScheduled) {
+    if (!hasProp(PropUpdateEventScheduled)) {
         auto self = static_self_cast<UIWidget>();
         g_dispatcher.addEvent([self, oldRect] {
-            self->m_updateEventScheduled = false;
+            self->setProp(PropUpdateEventScheduled, false);
             if (oldRect != self->getRect())
                 self->onGeometryChange(oldRect, self->getRect());
         });
-        m_updateEventScheduled = true;
+        setProp(PropUpdateEventScheduled, true);
     }
 
     // update hovered widget when moved behind mouse area
@@ -1011,10 +1016,10 @@ void UIWidget::setStyleFromNode(const OTMLNodePtr& styleNode)
 
 void UIWidget::setEnabled(bool enabled)
 {
-    if (enabled == m_enabled)
+    if (hasProp(PropEnabled) == enabled)
         return;
 
-    m_enabled = enabled;
+    setProp(PropEnabled, enabled);
 
     updateState(Fw::DisabledState);
     updateState(Fw::ActiveState);
@@ -1022,10 +1027,10 @@ void UIWidget::setEnabled(bool enabled)
 
 void UIWidget::setVisible(bool visible)
 {
-    if (m_visible == visible)
+    if (hasProp(PropVisible) == visible)
         return;
 
-    m_visible = visible;
+    setProp(PropVisible, visible);
 
     // hiding a widget make it lose focus
     if (!visible && isFocused()) {
@@ -1059,10 +1064,10 @@ void UIWidget::setChecked(bool checked)
 
 void UIWidget::setFocusable(bool focusable)
 {
-    if (m_focusable == focusable)
+    if (isFocusable() == focusable)
         return;
 
-    m_focusable = focusable;
+    setProp(PropFocusable, focusable);
 
     // make parent focus another child
     if (const auto& parent = getParent()) {
@@ -1076,17 +1081,17 @@ void UIWidget::setFocusable(bool focusable)
 
 void UIWidget::setPhantom(bool phantom)
 {
-    m_phantom = phantom;
+    setProp(PropPhantom, phantom);
 }
 
 void UIWidget::setDraggable(bool draggable)
 {
-    m_draggable = draggable;
+    setProp(PropDraggable, draggable);
 }
 
 void UIWidget::setFixedSize(bool fixed)
 {
-    m_fixedSize = fixed;
+    setProp(PropFixedSize, fixed);
     updateParentLayout();
 }
 
@@ -1358,7 +1363,7 @@ bool UIWidget::hasState(Fw::WidgetState state)
 
 void UIWidget::updateState(Fw::WidgetState state)
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     bool newStatus = true;
@@ -1442,7 +1447,7 @@ void UIWidget::updateState(Fw::WidgetState state)
 
 void UIWidget::updateStates()
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     for (int state = 1; state != Fw::LastWidgetState; state <<= 1)
@@ -1451,7 +1456,7 @@ void UIWidget::updateStates()
 
 void UIWidget::updateChildrenIndexStates()
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     for (const auto& child : m_children) {
@@ -1464,16 +1469,16 @@ void UIWidget::updateChildrenIndexStates()
 
 void UIWidget::updateStyle()
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
-    if (m_loadingStyle && !m_updateStyleScheduled) {
+    if (hasProp(PropLoadingStyle) && !hasProp(PropUpdateStyleScheduled)) {
         UIWidgetPtr self = static_self_cast<UIWidget>();
         g_dispatcher.addEvent([self] {
-            self->m_updateStyleScheduled = false;
+            self->setProp(PropUpdateStyleScheduled, false);
             self->updateStyle();
         });
-        m_updateStyleScheduled = true;
+        setProp(PropUpdateStyleScheduled, true);
         return;
     }
 
@@ -1525,7 +1530,7 @@ void UIWidget::updateStyle()
 
 void UIWidget::onStyleApply(const std::string_view, const OTMLNodePtr& styleNode)
 {
-    if (m_destroyed)
+    if (isDestroyed())
         return;
 
     // first set id
@@ -1541,7 +1546,7 @@ void UIWidget::onStyleApply(const std::string_view, const OTMLNodePtr& styleNode
 
 void UIWidget::onGeometryChange(const Rect& oldRect, const Rect& newRect)
 {
-    if (m_textWrap && oldRect.size() != newRect.size())
+    if (isTextWrap() && oldRect.size() != newRect.size())
         updateText();
 
     // move children that is outside the parent rect to inside again
@@ -1790,13 +1795,13 @@ bool UIWidget::propagateOnMouseMove(const Point& mousePos, const Point& mouseMov
 }
 
 void UIWidget::move(int x, int y) {
-    if (!m_updatingMove) {
-        m_updatingMove = true;
+    if (!hasProp(PropUpdatingMove)) {
+        setProp(PropUpdatingMove, true);
         g_dispatcher.scheduleEvent([this] {
             const auto rect = m_rect;
             m_rect = {}; // force update
             setRect(rect);
-            m_updatingMove = false;
+            setProp(PropUpdatingMove, false);
         }, 30);
     }
 

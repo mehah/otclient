@@ -38,19 +38,19 @@ private:
 public:
     void setCursorPos(int pos);
     void setSelection(int start, int end);
-    void setCursorVisible(bool enable) { m_cursorVisible = enable; }
-    void setChangeCursorImage(bool enable) { m_changeCursorImage = enable; }
+    void setCursorVisible(bool enable) { setProp(PropCursorVisible, enable); }
+    void setChangeCursorImage(bool enable) { setProp(PropChangeCursorImage, enable); }
     void setTextHidden(bool hidden);
     void setValidCharacters(const std::string_view validCharacters) { m_validCharacters = validCharacters; }
-    void setShiftNavigation(bool enable) { m_shiftNavigation = enable; }
-    void setMultiline(bool enable) { m_multiline = enable; }
+    void setShiftNavigation(bool enable) { setProp(PropShiftNavigation, enable); }
+    void setMultiline(bool enable) { setProp(PropMultiline, enable); }
     void setMaxLength(uint32_t maxLength) { m_maxLength = maxLength; }
     void setTextVirtualOffset(const Point& offset);
-    void setEditable(bool editable) { m_editable = editable; }
-    void setSelectable(bool selectable) { m_selectable = selectable; }
+    void setEditable(bool editable) { setProp(PropEditable, editable); }
+    void setSelectable(bool selectable) { setProp(PropSelectable, selectable); }
     void setSelectionColor(const Color& color) { m_selectionColor = color; }
     void setSelectionBackgroundColor(const Color& color) { m_selectionBackgroundColor = color; }
-    void setAutoScroll(bool autoScroll) { m_autoScroll = autoScroll; }
+    void setAutoScroll(bool autoScroll) { setProp(PropAutoScroll, autoScroll); }
 
     void moveCursorHorizontally(bool right);
     void moveCursorVertically(bool up);
@@ -80,14 +80,14 @@ public:
     Color getSelectionColor() { return m_selectionColor; }
     Color getSelectionBackgroundColor() { return m_selectionBackgroundColor; }
     bool hasSelection() { return m_selectionEnd - m_selectionStart > 0; }
-    bool isCursorVisible() { return m_cursorVisible; }
-    bool isChangingCursorImage() { return m_changeCursorImage; }
-    bool isTextHidden() { return m_textHidden; }
-    bool isShiftNavigation() { return m_shiftNavigation; }
-    bool isMultiline() { return m_multiline; }
-    bool isEditable() { return m_editable; }
-    bool isSelectable() { return m_selectable; }
-    bool isAutoScrolling() { return m_autoScroll; }
+    bool isCursorVisible() { return getProp(PropCursorVisible); }
+    bool isChangingCursorImage() { return getProp(PropChangeCursorImage); }
+    bool isTextHidden() { return getProp(PropTextHidden); }
+    bool isShiftNavigation() { return getProp(PropShiftNavigation); }
+    bool isMultiline() { return getProp(PropMultiline); }
+    bool isEditable() { return getProp(PropEditable); }
+    bool isSelectable() { return getProp(PropSelectable); }
+    bool isAutoScrolling() { return getProp(PropAutoScroll); }
 
 protected:
     void updateText() override;
@@ -105,13 +105,28 @@ protected:
     virtual void onTextAreaUpdate(const Point& vitualOffset, const Size& visibleSize, const Size& totalSize);
 
 private:
+    enum Props
+    {
+        PropTextHidden = 1 << 0,
+        PropShiftNavigation = 1 << 1,
+        PropMultiline = 1 << 2,
+        PropCursorInRange = 1 << 3,
+        PropCursorVisible = 1 << 4,
+        PropEditable = 1 << 5,
+        PropChangeCursorImage = 1 << 6,
+        PropUpdatesEnabled = 1 << 7,
+        PropAutoScroll = 1 << 8,
+        PropSelectable = 1 << 9,
+        PropGlyphsMustRecache = 1 << 10,
+    };
+
     void updateDisplayedText();
-    void disableUpdates() { m_updatesEnabled = false; }
-    void enableUpdates() { m_updatesEnabled = true; }
-    void recacheGlyphs() { m_glyphsMustRecache = true; }
+    void disableUpdates() { setProp(PropUpdatesEnabled, false); }
+    void enableUpdates() { setProp(PropUpdatesEnabled, true); }
+    void recacheGlyphs() { setProp(PropGlyphsMustRecache, true); }
 
     std::string m_validCharacters;
-    uint32_t m_maxLength;
+    uint32_t m_maxLength{ 0 };
 
     Rect m_drawArea;
     Point m_textVirtualOffset;
@@ -119,33 +134,22 @@ private:
     Size m_textTotalSize;
     ticks_t m_cursorTicks;
 
-    bool m_textHidden;
-    bool m_shiftNavigation;
-    bool m_multiline;
-    bool m_cursorInRange;
-    bool m_cursorVisible;
-    bool m_editable;
-    bool m_changeCursorImage;
-    bool m_updatesEnabled;
-    bool m_autoScroll;
+    uint32_t m_props{ 0 };
+    void setProp(Props prop, bool v) { if (v) m_props |= prop; else m_props &= ~prop; }
+    bool getProp(Props prop) const { return m_props & prop; };
 
-    bool m_selectable;
-
-    int m_selectionReference;
-    int m_selectionStart;
-    int m_selectionEnd;
+    int m_selectionReference{ 0 };
+    int m_selectionStart{ 0 };
+    int m_selectionEnd{ 0 };
     int m_cursorPos{ 0 };
 
-    Color m_selectionColor;
-    Color m_selectionBackgroundColor;
+    Color m_selectionColor{ Color::white };
+    Color m_selectionBackgroundColor{ Color::black };
 
-    std::vector<Rect> m_glyphsCoords;
-    std::vector<Rect> m_glyphsTexCoords;
+    std::vector<std::pair<Rect, Rect>> m_glyphsCoords;
 
     std::vector<std::pair<Rect, Rect>> m_glyphsTextRectCache;
     std::vector<std::pair<Rect, Rect>> m_glyphsSelectRectCache;
 
     std::string m_displayedText;
-
-    bool m_glyphsMustRecache;
 };

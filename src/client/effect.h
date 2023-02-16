@@ -46,6 +46,6 @@ protected:
 private:
     Timer m_animationTimer;
 
-    int m_duration{ 0 };
-    int m_timeToStartDrawing{ 0 };
+    uint16_t m_duration{ 0 };
+    uint16_t m_timeToStartDrawing{ 0 };
 };

@@ -32,7 +32,7 @@
 class UILayout : public LuaObject
 {
 public:
-    UILayout(UIWidgetPtr parentWidget) : m_parentWidget(std::move(parentWidget)) { m_updateDisabled = 0; }
+    UILayout(UIWidgetPtr parentWidget) : m_parentWidget(std::move(parentWidget)) { }
 
     void update();
     void updateLater();
@@ -58,7 +58,7 @@ public:
 protected:
     virtual bool internalUpdate() { return false; }
 
-    int m_updateDisabled;
+    uint8_t m_updateDisabled{ 0 };
     bool m_updating{ false };
     bool m_updateScheduled{ false };
     UIWidgetPtr m_parentWidget;
