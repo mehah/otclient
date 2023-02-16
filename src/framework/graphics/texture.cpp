@@ -50,8 +50,8 @@ Texture::Texture(const ImagePtr& image, bool buildMipmaps, bool compress) : m_un
 {
     generateHash();
 
-    m_compress = compress;
-    m_buildMipmaps = buildMipmaps;
+    setProp(Prop::compress, compress);
+    setProp(Prop::buildMipmaps, buildMipmaps);
     m_image = image;
     setupSize(image->getSize());
 }
@@ -72,7 +72,7 @@ Texture* Texture::create()
 {
     if (m_image) {
         createTexture();
-        uploadPixels(m_image, m_buildMipmaps, m_compress);
+        uploadPixels(m_image, getProp(Prop::buildMipmaps), getProp(Prop::compress));
         m_image = nullptr;
     }
 
@@ -91,7 +91,7 @@ void Texture::uploadPixels(const ImagePtr& image, bool buildMipmaps, bool compre
     do {
         setupPixels(level++, image->getSize(), image->getPixelData(), image->getBpp(), compress);
     } while (buildMipmaps && image->nextMipmap());
-    if (buildMipmaps) m_hasMipmaps = true;
+    if (buildMipmaps) setProp(Prop::buildMipmaps, true);
 
     setupWrap();
     setupFilters();
@@ -106,7 +106,7 @@ void Texture::bind()
 
 void Texture::buildHardwareMipmaps()
 {
-    if (m_hasMipmaps)
+    if (getProp(Prop::hasMipMaps))
         return;
 
 #ifndef OPENGL_ES
@@ -114,7 +114,7 @@ void Texture::buildHardwareMipmaps()
         return;
 #endif
 
-    m_hasMipmaps = true;
+    setProp(Prop::hasMipMaps, true);
 
     bind();
     setupFilters();
@@ -123,30 +123,30 @@ void Texture::buildHardwareMipmaps()
 
 void Texture::setSmooth(bool smooth)
 {
-    if (smooth == m_smooth)
+    if (smooth == getProp(Prop::smooth))
         return;
 
-    m_smooth = smooth;
+    setProp(Prop::smooth, smooth);
     bind();
     setupFilters();
 }
 
 void Texture::setRepeat(bool repeat)
 {
-    if (m_repeat == repeat)
+    if (getProp(Prop::repeat) == repeat)
         return;
 
-    m_repeat = repeat;
+    setProp(Prop::repeat, repeat);
     bind();
     setupWrap();
 }
 
 void Texture::setUpsideDown(bool upsideDown)
 {
-    if (m_upsideDown == upsideDown)
+    if (getProp(Prop::upsideDown) == upsideDown)
         return;
 
-    m_upsideDown = upsideDown;
+    setProp(Prop::upsideDown, upsideDown);
     setupTranformMatrix();
 }
 
@@ -184,7 +184,7 @@ bool Texture::setupSize(const Size& size)
 
 void Texture::setupWrap() const
 {
-    const GLint texParam = m_repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE;
+    const GLint texParam = getProp(Prop::repeat) ? GL_REPEAT : GL_CLAMP_TO_EDGE;
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texParam);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texParam);
 }
@@ -193,11 +193,11 @@ void Texture::setupFilters() const
 {
     GLenum minFilter;
     GLenum magFilter;
-    if (m_smooth) {
-        minFilter = m_hasMipmaps ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
+    if (getProp(Prop::smooth)) {
+        minFilter = getProp(Prop::hasMipMaps) ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
         magFilter = GL_LINEAR;
     } else {
-        minFilter = m_hasMipmaps ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST;
+        minFilter = getProp(Prop::hasMipMaps) ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST;
         magFilter = GL_NEAREST;
     }
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
@@ -226,7 +226,7 @@ void Texture::setupTranformMatrix()
     const static Matrix3 MATRIX256x512_CACHED = toMatrix(SIZE256x512);
     const static Matrix3 MATRIX512x1024_CACHED = toMatrix(SIZE512x1024);
 
-    if (m_upsideDown) {
+    if (getProp(Prop::upsideDown)) {
         m_transformMatrix = { 1.0f / m_size.width(), 0.0f,                                                  0.0f,
                               0.0f,                 -1.0f / m_size.height(),                                0.0f,
                               0.0f,                  m_size.height() / static_cast<float>(m_size.height()), 1.0f };

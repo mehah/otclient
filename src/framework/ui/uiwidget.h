@@ -184,9 +184,8 @@ public:
     UIWidgetList recursiveGetChildrenByMarginPos(const Point& childPos);
     UIWidgetPtr backwardsGetWidgetById(const std::string_view id);
 
-    void setProp(FlagProp prop, bool v);
-    bool hasProp(FlagProp prop);
-
+    void setProp(FlagProp prop, bool v) { if (v) m_flagsProp |= prop; else m_flagsProp &= ~prop; }
+    bool hasProp(FlagProp prop) { return (m_flagsProp & prop); }
 private:
     void repaint();
     uint32_t m_flagsProp{ 0 };

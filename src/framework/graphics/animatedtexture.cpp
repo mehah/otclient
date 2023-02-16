@@ -37,8 +37,9 @@ AnimatedTexture::AnimatedTexture(const Size& size, const std::vector<ImagePtr>& 
         m_frames.emplace_back(std::make_shared<Texture>(frame, buildMipmaps, compress));
     }
 
+    setProp(Prop::hasMipMaps, buildMipmaps);
+
     m_framesDelay = std::move(framesDelay);
-    m_hasMipmaps = buildMipmaps;
     m_numPlays = numPlays;
     m_id = m_frames[0]->getId();
     m_animTimer.restart();
@@ -46,23 +47,23 @@ AnimatedTexture::AnimatedTexture(const Size& size, const std::vector<ImagePtr>& 
 
 void AnimatedTexture::buildHardwareMipmaps()
 {
-    if (m_hasMipmaps) return;
+    if (getProp(Prop::hasMipMaps)) return;
     for (const TexturePtr& frame : m_frames)
         frame->buildHardwareMipmaps();
 
-    m_hasMipmaps = true;
+    setProp(Prop::hasMipMaps, true);
 }
 
 void AnimatedTexture::setSmooth(bool smooth)
 {
-    m_smooth = smooth;
+    setProp(Prop::smooth, smooth);
     for (const TexturePtr& frame : m_frames)
         frame->setSmooth(smooth);
 }
 
 void AnimatedTexture::setRepeat(bool repeat)
 {
-    m_repeat = repeat;
+    setProp(Prop::repeat, repeat);
     for (const TexturePtr& frame : m_frames)
         frame->setRepeat(repeat);
 }

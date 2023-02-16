@@ -1361,18 +1361,6 @@ bool UIWidget::hasState(Fw::WidgetState state)
     return (m_states & state);
 }
 
-void UIWidget::setProp(FlagProp prop, bool v)
-{
-    if (v)
-        m_flagsProp |= prop;
-    else
-        m_flagsProp &= ~prop;
-}
-bool UIWidget::hasProp(FlagProp prop)
-{
-    return (m_flagsProp & prop);
-}
-
 void UIWidget::updateState(Fw::WidgetState state)
 {
     if (isDestroyed())

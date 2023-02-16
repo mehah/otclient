@@ -55,8 +55,8 @@ public:
     int getHeight() const { return m_size.height(); }
 
     bool isEmpty() const { return m_id == 0; }
-    bool hasRepeat() const { return m_repeat; }
-    bool hasMipmaps() const { return m_hasMipmaps; }
+    bool hasRepeat() const { return getProp(Prop::repeat); }
+    bool hasMipmaps() const { return getProp(Prop::hasMipMaps); }
     virtual bool isAnimatedTexture() const { return false; }
 
 protected:
@@ -82,12 +82,19 @@ protected:
 
     ImagePtr m_image;
 
-    bool m_hasMipmaps{ false };
-    bool m_smooth{ false };
-    bool m_upsideDown{ false };
-    bool m_repeat{ false };
-    bool m_compress{ false };
-    bool m_buildMipmaps{ false };
+    enum Prop : uint16_t
+    {
+        hasMipMaps = 1 << 0,
+        smooth = 1 << 1,
+        upsideDown = 1 << 2,
+        repeat = 1 << 3,
+        compress = 1 << 4,
+        buildMipmaps = 1 << 5
+    };
+
+    uint16_t m_props{ 0 };
+    void setProp(Prop prop, bool v) { if (v) m_props |= prop; else m_props &= ~prop; }
+    bool getProp(Prop prop) const { return m_props & prop; };
 
     static const Matrix3 toMatrix(const Size& size) {
         return { 1.0f / size.width(), 0.0f, 0.0f,
