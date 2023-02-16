@@ -108,7 +108,7 @@ private:
     bool m_keepAspectRatio;
     bool m_limitVisibleRange;
 
-    int m_maxZoomIn;
-    int m_maxZoomOut;
-    int m_zoom;
+    uint16_t m_maxZoomIn;
+    uint16_t m_maxZoomOut;
+    uint16_t m_zoom;
 };

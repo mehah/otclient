@@ -49,7 +49,7 @@ public:
     ItemPtr findItemById(uint32_t itemId, int subType) const;
 
 protected:
-    Container(int id, int capacity, const std::string_view name, const ItemPtr& containerItem, bool hasParent, bool isUnlocked, bool hasPages, int containerSize, int firstIndex)
+    Container(uint8_t id, uint8_t capacity, const std::string_view name, const ItemPtr& containerItem, bool hasParent, bool isUnlocked, bool hasPages, uint16_t containerSize, uint16_t firstIndex)
         :m_id(id), m_capacity(capacity), m_containerItem(containerItem), m_name(name), m_hasParent(hasParent), m_unlocked(isUnlocked), m_hasPages(hasPages), m_size(containerSize), m_firstIndex(firstIndex)
     {}
 
@@ -65,15 +65,15 @@ protected:
 private:
     void updateItemsPositions();
 
-    int m_id;
-    int m_capacity;
+    uint8_t m_id;
+    uint8_t m_capacity;
     ItemPtr m_containerItem;
     std::string m_name;
     bool m_hasParent;
     bool m_closed{ false };
     bool m_unlocked;
     bool m_hasPages;
-    int m_size;
-    int m_firstIndex;
+    uint16_t m_size;
+    uint16_t m_firstIndex;
     std::deque<ItemPtr> m_items;
 };

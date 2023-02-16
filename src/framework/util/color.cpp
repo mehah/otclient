@@ -47,7 +47,7 @@ const Color Color::orange = 0xff008cffU;
 
 Color::Color(const std::string_view coltext)
 {
-    std::stringstream ss(std::string{ coltext });
+    std::stringstream ss(coltext.data());
     ss >> *this;
     update();
 }

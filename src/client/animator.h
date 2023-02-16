@@ -73,19 +73,20 @@ private:
 
     void calculateSynchronous();
 
-    int m_currentDuration{ 0 };
-    int m_animationPhases{ 0 };
-    int m_currentLoop{ 0 };
-    int m_startPhase{ 0 };
-    int m_loopCount{ 0 };
-    int m_phase{ 0 };
+    int8_t m_startPhase{ 0 };
+    int8_t m_loopCount{ 0 };
+
+    uint8_t m_currentLoop{ 0 };
+    uint8_t m_phase{ 0 };
 
     uint16_t m_minDuration{ 0 };
+    uint16_t m_currentDuration{ 0 };
+    uint16_t m_animationPhases{ 0 };
 
     bool m_isComplete{ false };
     bool m_async{ false };
 
-    std::vector<std::pair<int, int>> m_phaseDurations;
+    std::vector<std::pair<uint16_t, uint16_t>> m_phaseDurations;
     AnimationDirection m_currentDirection{ AnimDirForward };
     ticks_t m_lastPhaseTicks{ 0 };
 };
