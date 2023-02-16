@@ -150,7 +150,7 @@ Panel
     @onSetup: |
       local value = modules.client_options.getOption('backgroundFrameRate')
       local text = value
-      if value <= 0 or value >= 401 then
+      if value <= 0 or value >= 201 then
         text = 'max'
       end
 
@@ -163,4 +163,4 @@ Panel
     anchors.top: prev.bottom
     margin-top: 3
     minimum: 10
-    maximum: 401
+    maximum: 201

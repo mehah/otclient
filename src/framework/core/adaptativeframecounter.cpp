@@ -27,16 +27,12 @@
 
 void AdaptativeFrameCounter::update()
 {
-    const uint16_t oldMaxFPS = m_maxFps;
-    if (!g_game.isOnline())
-        m_maxFps = 60u; // FPS 60 for foreground rendering alone
-
-    if (m_maxFps > 0) {
-        const int32_t sleepPeriod = (getMaxPeriod() - 1000) - m_timer.elapsed_micros();
+    // FPS 60 for foreground rendering alone
+    const uint8_t maxFps = g_game.isOnline() ? m_maxFps : 60u;
+    if (maxFps > 0) {
+        const int32_t sleepPeriod = (getMaxPeriod(maxFps) - 1000) - m_timer.elapsed_micros();
         if (sleepPeriod > 0) stdext::microsleep(sleepPeriod);
     }
-
-    m_maxFps = oldMaxFPS;
 
     m_timer.restart();
 

@@ -43,12 +43,12 @@ public:
     void setMaxFps(uint16_t maxFps) { m_frameCounter.setMaxFps(maxFps); }
 
     uint16_t getFps() { return m_frameCounter.getFps(); }
-    uint16_t getMaxFps() { return m_frameCounter.getMaxFps(); }
+    uint8_t getMaxFps() { return m_frameCounter.getMaxFps(); }
 
     bool isOnInputEvent() { return m_onInputEvent; }
     bool mustOptimize() {
 #ifdef NDEBUG
-        return m_optimize && getMaxFps() >= getFps() && getFps() < 58;
+        return m_optimize && getMaxFps() >= getFps() && getFps() < 58u;
 #else
         return false;
 #endif
