@@ -139,8 +139,7 @@ private:
     Color m_selectionColor{ Color::white };
     Color m_selectionBackgroundColor{ Color::black };
 
-    std::vector<Rect> m_glyphsCoords;
-    std::vector<Rect> m_glyphsTexCoords;
+    std::vector<std::pair<Rect, Rect>> m_glyphsCoords;
 
     std::vector<std::pair<Rect, Rect>> m_glyphsTextRectCache;
     std::vector<std::pair<Rect, Rect>> m_glyphsSelectRectCache;

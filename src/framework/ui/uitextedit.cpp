@@ -59,8 +59,8 @@ void UITextEdit::drawSelf(DrawPoolType drawPane)
     if (m_color != Color::alpha) {
         if (glyphsMustRecache) {
             m_glyphsTextRectCache.clear();
-            for (int i = 0; i < textLength; ++i)
-                m_glyphsTextRectCache.emplace_back(m_glyphsCoords[i], m_glyphsTexCoords[i]);
+            for (int i = -1; ++i < textLength;)
+                m_glyphsTextRectCache.emplace_back(m_glyphsCoords[i].first, m_glyphsCoords[i].second);
         }
         for (const auto& [dest, src] : m_glyphsTextRectCache)
             g_drawPool.addTexturedRect(dest, texture, src, m_color);
@@ -70,7 +70,7 @@ void UITextEdit::drawSelf(DrawPoolType drawPane)
         if (glyphsMustRecache) {
             m_glyphsSelectRectCache.clear();
             for (int i = m_selectionStart; i < m_selectionEnd; ++i)
-                m_glyphsSelectRectCache.emplace_back(m_glyphsCoords[i], m_glyphsTexCoords[i]);
+                m_glyphsSelectRectCache.emplace_back(m_glyphsCoords[i].first, m_glyphsCoords[i].second);
         }
         for (const auto& [dest, src] : m_glyphsSelectRectCache)
             g_drawPool.addFilledRect(dest, m_selectionBackgroundColor);
@@ -87,7 +87,7 @@ void UITextEdit::drawSelf(DrawPoolType drawPane)
         const ticks_t elapsed = g_clock.millis() - m_cursorTicks;
         if (elapsed <= delay) {
             const auto& cursorRect = m_cursorPos > 0 ?
-                Rect(m_glyphsCoords[m_cursorPos - 1].right(), m_glyphsCoords[m_cursorPos - 1].top(), 1, m_font->getGlyphHeight())
+                Rect(m_glyphsCoords[m_cursorPos - 1].first.right(), m_glyphsCoords[m_cursorPos - 1].first.top(), 1, m_font->getGlyphHeight())
                 :
                 Rect(m_rect.left() + m_padding.left, m_rect.top() + m_padding.top, 1, m_font->getGlyphHeight());
 
@@ -140,7 +140,6 @@ void UITextEdit::update(bool focusCursor)
     // resize just on demand
     if (textLength > static_cast<int>(m_glyphsCoords.size())) {
         m_glyphsCoords.resize(textLength);
-        m_glyphsTexCoords.resize(textLength);
     }
 
     const Point oldTextAreaOffset = m_textVirtualOffset;
@@ -241,7 +240,7 @@ void UITextEdit::update(bool focusCursor)
 
     for (int i = 0; i < textLength; ++i) {
         glyph = static_cast<uint8_t>(text[i]);
-        m_glyphsCoords[i].clear();
+        m_glyphsCoords[i].first.clear();
 
         // skip invalid glyphs
         if (glyph < 32 && glyph != static_cast<uint8_t>('\n'))
@@ -303,8 +302,8 @@ void UITextEdit::update(bool focusCursor)
         }
 
         // render glyph
-        m_glyphsCoords[i] = glyphScreenCoords;
-        m_glyphsTexCoords[i] = glyphTextureCoords;
+        m_glyphsCoords[i].first = glyphScreenCoords;
+        m_glyphsCoords[i].second = glyphTextureCoords;
     }
 
     if (fireAreaUpdate)
@@ -513,7 +512,7 @@ int UITextEdit::getTextPos(const Point& pos)
     int candidatePos = -1;
     Rect firstGlyphRect, lastGlyphRect;
     for (int i = 0; i < textLength; ++i) {
-        Rect clickGlyphRect = m_glyphsCoords[i];
+        Rect clickGlyphRect = m_glyphsCoords[i].first;
         if (!clickGlyphRect.isValid())
             continue;
         if (!firstGlyphRect.isValid())
