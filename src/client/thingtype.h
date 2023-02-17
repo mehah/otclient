@@ -444,5 +444,6 @@ private:
 
     std::vector<uint32_t> m_spritesIndex;
     std::vector<TextureData> m_textureData;
+
     std::atomic_bool m_loading;
 };
