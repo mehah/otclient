@@ -65,7 +65,7 @@ public:
     bool isDrawingTexts();
 
     bool isLoadingAsyncTexture() { return m_loadingAsyncTexture; }
-    void setLoadingAsyncTexture(bool v) { m_loadingAsyncTexture = v; }
+    void setLoadingAsyncTexture(bool v);
 
     void repaint();
 

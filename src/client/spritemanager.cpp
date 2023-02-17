@@ -26,6 +26,7 @@
 #include <framework/graphics/image.h>
 #include "game.h"
 #include "spriteappearances.h"
+#include <framework/core/graphicalapplication.h>
 
 SpriteManager g_sprites;
 
@@ -37,19 +38,30 @@ void SpriteManager::terminate()
     m_lightTexture = nullptr;
 }
 
+void SpriteManager::reload() {
+    if (m_lastFileName.empty())
+        return;
+
+    if (m_spritesFile)
+        m_spritesFile->close();
+
+    m_spritesFile = g_resources.openFile(m_lastFileName);
+    if (!g_app.isLoadingAsyncTexture())
+        m_spritesFile->cache();
+}
+
 bool SpriteManager::loadSpr(std::string file)
 {
     m_spritesCount = 0;
     m_signature = 0;
     m_loaded = false;
     try {
-        file = g_resources.guessFilePath(file, "spr");
+        m_lastFileName = g_resources.guessFilePath(file, "spr");
 
-        m_spritesFile = g_resources.openFile(file);
-        // cache file buffer to avoid lags from hard drive
-        m_spritesFile->cache();
+        reload();
 
 #if ENABLE_ENCRYPTION == 1
+        m_spritesFile->cache();
         ResourceManager::decrypt(m_spritesFile->m_data.data(), m_spritesFile->m_data.size());
 #endif
 

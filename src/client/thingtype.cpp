@@ -637,8 +637,6 @@ void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, i
 
 TexturePtr ThingType::getTexture(int animationPhase)
 {
-    static bool CACHE_ALL_PHASES = true;
-
     if (m_null) return m_textureNull;
 
     auto& textureData = m_textureData[animationPhase];
@@ -651,23 +649,14 @@ TexturePtr ThingType::getTexture(int animationPhase)
     if (g_app.isLoadingAsyncTexture()) {
         if (!textureData.imageSrc) {
             if (!textureData.loading) {
-                if (CACHE_ALL_PHASES) {
-                    for (auto& txtData : m_textureData)
-                        txtData.loading = true;
-                } else {
-                    textureData.loading = true;
-                }
+                for (auto& txtData : m_textureData)
+                    txtData.loading = true;
 
                 g_asyncDispatcher.dispatch([this, animationPhase] {
-                    if (CACHE_ALL_PHASES) {
-                        int8_t i = -1;
-                        for (auto& txtData : m_textureData) {
-                            txtData.imageSrc = getImage(++i);
-                            txtData.loading = false;
-                        }
-                    } else {
-                        m_textureData[animationPhase].imageSrc = getImage(animationPhase);
-                        m_textureData[animationPhase].loading = false;
+                    int8_t i = -1;
+                    for (auto& txtData : m_textureData) {
+                        txtData.imageSrc = getImage(++i);
+                        txtData.loading = false;
                     }
                 });
             }
