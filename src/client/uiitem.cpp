@@ -40,21 +40,12 @@ void UIItem::drawSelf(DrawPoolType drawPane)
     drawImage(m_rect);
 
     if (m_itemVisible && m_item) {
-        const auto& drawRect = getPaddingRect();
         const int exactSize = std::max<int>(SPRITE_SIZE, m_item->getExactSize());
-        if (exactSize == 0)
-            return;
 
-        const float scaleFactor = std::min<float>(drawRect.width() / static_cast<float>(exactSize), drawRect.height() / static_cast<float>(exactSize));
-
-        Point dest = drawRect.bottomRight() + Point(1);
-        dest += (m_item->getDisplacement() - Point(SPRITE_SIZE)) * scaleFactor;
-
-        const float oldScaleFactor = g_drawPool.getScaleFactor();
-        g_drawPool.setScaleFactor(scaleFactor);
-        m_item->setColor(m_color);
-        m_item->draw(dest, Otc::DrawThings);
-        g_drawPool.setScaleFactor(oldScaleFactor);
+        g_drawPool.bindFrameBuffer(exactSize);
+        m_item->internalDraw(m_item->calculateAnimationPhase(), Point(exactSize - SPRITE_SIZE) +
+                             m_item->getDisplacement(), m_color, false, Otc::DrawThings);
+        g_drawPool.releaseFrameBuffer(getPaddingRect());
 
         if (m_font && (m_item->isStackable() || m_item->isChargeable()) && m_item->getCountOrSubType() > 1) {
             static const Color STACK_COLOR(231, 231, 231);
