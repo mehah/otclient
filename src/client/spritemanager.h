@@ -69,7 +69,7 @@ private:
     uint32_t m_spritesOffset{ 0 };
 
     FileStreamPtr m_spritesFile;
-    std::mutex mutex;
+    std::mutex m_mutex;
 };
 
 extern SpriteManager g_sprites;

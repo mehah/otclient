@@ -156,6 +156,9 @@ ImagePtr SpriteManager::getSpriteImage(int id)
 
         const auto& file = g_app.isLoadingAsyncTexture() ? g_resources.openFile(m_lastFileName) : m_spritesFile;
 
+        if (!g_app.isLoadingAsyncTexture())
+            m_mutex.lock();
+
         file->seek(((id - 1) * 4) + m_spritesOffset);
 
         const uint32_t spriteAddress = file->getU32();
@@ -233,6 +236,9 @@ ImagePtr SpriteManager::getSpriteImage(int id)
                 }
             }
         }
+
+        if (!g_app.isLoadingAsyncTexture())
+            m_mutex.unlock();
 
         return image;
     } catch (const stdext::exception& e) {
