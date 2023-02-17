@@ -62,8 +62,10 @@ bool SpriteManager::loadSpr(std::string file)
         m_lastFileName = g_resources.guessFilePath(file, "spr");
         m_spritesFile = g_resources.openFile(m_lastFileName);
 
-        if (g_app.isEncrypted()) {
+        if (!g_app.isLoadingAsyncTexture())
             m_spritesFile->cache();
+
+        if (g_app.isEncrypted()) {
             ResourceManager::decrypt(m_spritesFile->m_data.data(), m_spritesFile->m_data.size());
         }
 
