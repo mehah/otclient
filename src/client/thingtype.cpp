@@ -637,8 +637,6 @@ void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, i
 
 TexturePtr ThingType::getTexture(int animationPhase)
 {
-    static bool CACHE_ALL_PHASES = true;
-
     if (m_null) return m_textureNull;
 
     auto& textureData = m_textureData[animationPhase];
@@ -647,49 +645,27 @@ TexturePtr ThingType::getTexture(int animationPhase)
 
     if (animationPhaseTexture) return animationPhaseTexture;
 
-    ImagePtr image;
     if (g_app.isLoadingAsyncTexture()) {
-        if (!textureData.imageSrc) {
-            if (!textureData.loading) {
-                if (CACHE_ALL_PHASES) {
-                    for (auto& txtData : m_textureData)
-                        txtData.loading = true;
-                } else {
-                    textureData.loading = true;
-                }
-
+        if (!textureData.source) {
+            if (!m_loading) {
+                m_loading = true;
                 g_asyncDispatcher.dispatch([this, animationPhase] {
-                    if (CACHE_ALL_PHASES) {
-                        int8_t i = -1;
-                        for (auto& txtData : m_textureData) {
-                            txtData.imageSrc = getImage(++i);
-                            txtData.loading = false;
-                        }
-                    } else {
-                        m_textureData[animationPhase].imageSrc = getImage(animationPhase);
-                        m_textureData[animationPhase].loading = false;
+                    int8_t i = -1;
+                    for (auto& txtData : m_textureData) {
+                        loadTexture(++i);
                     }
+                    m_loading = false;
                 });
             }
             return nullptr;
         }
-
-        image = textureData.imageSrc;
-        textureData.imageSrc = nullptr;
     } else
-        image = getImage(animationPhase);
+        loadTexture(animationPhase);
 
-    if (m_opacity < 1.0f)
-        image->setTransparentPixel(true);
-
-    if (m_opaque == -1)
-        m_opaque = !image->hasTransparentPixel();
-
-    animationPhaseTexture = std::make_shared<Texture>(image, true, false);
-    return animationPhaseTexture;
+    return textureData.source;
 }
 
-ImagePtr ThingType::getImage(int animationPhase)
+void ThingType::loadTexture(int animationPhase)
 {
     auto& textureData = m_textureData[animationPhase];
 
@@ -726,7 +702,7 @@ ImagePtr ThingType::getImage(int animationPhase)
                             const uint32_t spriteIndex = getSpriteIndex(-1, -1, spriteMask ? 1 : l, x, y, z, animationPhase);
                             const auto& spriteImage = g_sprites.getSpriteImage(m_spritesIndex[spriteIndex]);
                             if (!spriteImage) {
-                                return nullptr;
+                                return;
                             }
 
                             // verifies that the first block in the lower right corner is transparent.
@@ -785,7 +761,13 @@ ImagePtr ThingType::getImage(int animationPhase)
         }
     }
 
-    return fullImage;
+    if (m_opacity < 1.0f)
+        fullImage->setTransparentPixel(true);
+
+    if (m_opaque == -1)
+        m_opaque = !fullImage->hasTransparentPixel();
+
+    textureData.source = std::make_shared<Texture>(fullImage, true, false);
 }
 
 Size ThingType::getBestTextureDimension(int w, int h, int count)

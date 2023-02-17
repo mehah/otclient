@@ -383,7 +383,7 @@ private:
     static ThingFlagAttr thingAttrToThingFlagAttr(ThingAttr attr);
     static Size getBestTextureDimension(int w, int h, int count);
 
-    ImagePtr getImage(int animationPhase);
+    void loadTexture(int animationPhase);
 
     struct TextureData
     {
@@ -396,9 +396,6 @@ private:
 
         TexturePtr source;
         std::vector<Pos> pos;
-
-        bool loading{ false };
-        ImagePtr imageSrc;
     };
 
     void prepareTextureLoad(const std::vector<Size>& sizes, const std::vector<int>& total_sprites);
@@ -447,4 +444,5 @@ private:
 
     std::vector<uint32_t> m_spritesIndex;
     std::vector<TextureData> m_textureData;
+    std::atomic_bool m_loading;
 };

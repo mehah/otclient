@@ -33,6 +33,7 @@ public:
     void terminate();
 
     bool loadSpr(std::string file);
+    void reload();
     void unload();
 
 #ifdef FRAMEWORK_EDITOR
@@ -56,6 +57,8 @@ private:
 
     void generateLightTexture(),
         generateShadeTexture();
+
+    std::string m_lastFileName;
 
     TexturePtr m_lightTexture;
     TexturePtr m_shadeTexture;

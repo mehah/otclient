@@ -65,7 +65,15 @@ public:
     bool isDrawingTexts();
 
     bool isLoadingAsyncTexture() { return m_loadingAsyncTexture; }
-    void setLoadingAsyncTexture(bool v) { m_loadingAsyncTexture = v; }
+    void setLoadingAsyncTexture(bool v);
+
+    bool isEncrypted() {
+#if ENABLE_ENCRYPTION == 1
+        return true;
+#else
+        return false;
+#endif
+    }
 
     void repaint();
 
