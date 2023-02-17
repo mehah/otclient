@@ -648,16 +648,14 @@ TexturePtr ThingType::getTexture(int animationPhase)
     ImagePtr image;
     if (g_app.isLoadingAsyncTexture()) {
         if (!textureData.imageSrc) {
-            if (!textureData.loading) {
-                for (auto& txtData : m_textureData)
-                    txtData.loading = true;
-
+            if (!m_loading) {
+                m_loading = true;
                 g_asyncDispatcher.dispatch([this, animationPhase] {
                     int8_t i = -1;
                     for (auto& txtData : m_textureData) {
                         txtData.imageSrc = getImage(++i);
-                        txtData.loading = false;
                     }
+                    m_loading = false;
                 });
             }
             return nullptr;
