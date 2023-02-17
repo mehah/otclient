@@ -50,6 +50,8 @@ public:
     const TexturePtr& getShadeTexture() const { return m_shadeTexture; }
 
 private:
+    ImagePtr getSpriteImage(int id, const FileStreamPtr& file);
+
     enum
     {
         SPRITE_DATA_SIZE = SPRITE_SIZE * SPRITE_SIZE * 4

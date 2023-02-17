@@ -645,24 +645,21 @@ TexturePtr ThingType::getTexture(int animationPhase)
 
     if (animationPhaseTexture) return animationPhaseTexture;
 
-    if (g_app.isLoadingAsyncTexture()) {
-        if (!textureData.source) {
-            if (!m_loading) {
-                m_loading = true;
-                g_asyncDispatcher.dispatch([this, animationPhase] {
-                    int8_t i = -1;
-                    for (auto& txtData : m_textureData) {
-                        loadTexture(++i);
-                    }
-                    m_loading = false;
-                });
-            }
-            return nullptr;
-        }
-    } else
+    if (!g_app.isLoadingAsyncTexture()) {
         loadTexture(animationPhase);
+        return textureData.source;
+    }
 
-    return textureData.source;
+    if (!m_loading) {
+        m_loading = true;
+        g_asyncDispatcher.dispatch([this] {
+            for (int_fast8_t i = -1; ++i < m_animationPhases;)
+                loadTexture(i);
+            m_loading = false;
+        });
+    }
+
+    return nullptr;
 }
 
 void ThingType::loadTexture(int animationPhase)
