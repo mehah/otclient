@@ -45,15 +45,16 @@ ItemPtr Item::create(int id)
     return item;
 }
 
-void Item::draw(const Point& dest, uint32_t flags, LightView* lightView)
+void Item::draw(const Point& dest, uint32_t flags, const Color& c, LightView* lightView)
 {
     if (!canDraw(m_color))
         return;
 
     // determine animation phase
     const int animationPhase = calculateAnimationPhase();
+    const auto& color = c == Color::white ? m_color : c;
 
-    internalDraw(animationPhase, dest, m_color, false, flags, lightView);
+    internalDraw(animationPhase, dest, color, false, flags, lightView);
 
     if (isMarked())
         internalDraw(animationPhase, dest, getMarkedColor(), true, flags);

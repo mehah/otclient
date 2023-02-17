@@ -61,10 +61,12 @@ void UITextEdit::drawSelf(DrawPoolType drawPane)
     if (!texture)
         return;
 
-    if (m_color != Color::alpha) {
-        if (getProp(PropGlyphsMustRecache)) {
-            setProp(PropGlyphsMustRecache, false);
+    const bool glyphsMustRecache = getProp(PropGlyphsMustRecache);
+    if (glyphsMustRecache)
+        setProp(PropGlyphsMustRecache, false);
 
+    if (m_color != Color::alpha) {
+        if (glyphsMustRecache) {
             m_glyphsTextRectCache.clear();
             for (int i = -1; ++i < textLength;)
                 m_glyphsTextRectCache.emplace_back(m_glyphsCoords[i].first, m_glyphsCoords[i].second);
@@ -74,9 +76,7 @@ void UITextEdit::drawSelf(DrawPoolType drawPane)
     }
 
     if (hasSelection()) {
-        if (getProp(PropGlyphsMustRecache)) {
-            setProp(PropGlyphsMustRecache, false);
-
+        if (glyphsMustRecache) {
             m_glyphsSelectRectCache.clear();
             for (int i = m_selectionStart; i < m_selectionEnd; ++i)
                 m_glyphsSelectRectCache.emplace_back(m_glyphsCoords[i].first, m_glyphsCoords[i].second);
@@ -657,7 +657,7 @@ void UITextEdit::onFocusChange(bool focused, Fw::FocusReason reason)
     } else if (getProp(PropSelectable))
         clearSelection();
     UIWidget::onFocusChange(focused, reason);
-}
+    }
 
 bool UITextEdit::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepeatTicks)
 {
