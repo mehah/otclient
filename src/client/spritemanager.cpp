@@ -39,6 +39,9 @@ void SpriteManager::terminate()
 }
 
 void SpriteManager::reload() {
+    if (g_app.isEncrypted())
+        return;
+
     if (m_lastFileName.empty())
         return;
 
@@ -57,13 +60,12 @@ bool SpriteManager::loadSpr(std::string file)
     m_loaded = false;
     try {
         m_lastFileName = g_resources.guessFilePath(file, "spr");
+        m_spritesFile = g_resources.openFile(m_lastFileName);
 
-        reload();
-
-#if ENABLE_ENCRYPTION == 1
-        m_spritesFile->cache();
-        ResourceManager::decrypt(m_spritesFile->m_data.data(), m_spritesFile->m_data.size());
-#endif
+        if (g_app.isEncrypted()) {
+            m_spritesFile->cache();
+            ResourceManager::decrypt(m_spritesFile->m_data.data(), m_spritesFile->m_data.size());
+        }
 
         m_signature = m_spritesFile->getU32();
         m_spritesCount = g_game.getFeature(Otc::GameSpritesU32) ? m_spritesFile->getU32() : m_spritesFile->getU16();
@@ -147,27 +149,27 @@ ImagePtr SpriteManager::getSpriteImage(int id)
     }
 
     try {
-        if (id == 0 || !m_spritesFile)
+        if (id == 0)
             return nullptr;
 
-        std::scoped_lock lock(mutex);
+        const auto& file = g_app.isLoadingAsyncTexture() ? g_resources.openFile(m_lastFileName) : m_spritesFile;
 
-        m_spritesFile->seek(((id - 1) * 4) + m_spritesOffset);
+        file->seek(((id - 1) * 4) + m_spritesOffset);
 
-        const uint32_t spriteAddress = m_spritesFile->getU32();
+        const uint32_t spriteAddress = file->getU32();
 
         // no sprite? return an empty texture
         if (spriteAddress == 0)
             return nullptr;
 
-        m_spritesFile->seek(spriteAddress);
+        file->seek(spriteAddress);
 
         // skip color key
-        m_spritesFile->getU8();
-        m_spritesFile->getU8();
-        m_spritesFile->getU8();
+        file->getU8();
+        file->getU8();
+        file->getU8();
 
-        const uint16_t pixelDataSize = m_spritesFile->getU16();
+        const uint16_t pixelDataSize = file->getU16();
 
         const auto& image = std::make_shared<Image>(Size(SPRITE_SIZE));
 
@@ -178,8 +180,8 @@ ImagePtr SpriteManager::getSpriteImage(int id)
         const uint8_t channels = useAlpha ? 4 : 3;
         // decompress pixels
         while (read < pixelDataSize && writePos < SPRITE_DATA_SIZE) {
-            const uint16_t transparentPixels = m_spritesFile->getU16();
-            const uint16_t coloredPixels = m_spritesFile->getU16();
+            const uint16_t transparentPixels = file->getU16();
+            const uint16_t coloredPixels = file->getU16();
 
             for (int i = 0; i < transparentPixels && writePos < SPRITE_DATA_SIZE; ++i) {
                 pixels[writePos + 0] = 0x00;
@@ -190,11 +192,11 @@ ImagePtr SpriteManager::getSpriteImage(int id)
             }
 
             for (int i = 0; i < coloredPixels && writePos < SPRITE_DATA_SIZE; ++i) {
-                pixels[writePos + 0] = m_spritesFile->getU8();
-                pixels[writePos + 1] = m_spritesFile->getU8();
-                pixels[writePos + 2] = m_spritesFile->getU8();
+                pixels[writePos + 0] = file->getU8();
+                pixels[writePos + 1] = file->getU8();
+                pixels[writePos + 2] = file->getU8();
 
-                const uint8_t alphaColor = useAlpha ? m_spritesFile->getU8() : 0xFF;
+                const uint8_t alphaColor = useAlpha ? file->getU8() : 0xFF;
                 if (alphaColor != 0xFF)
                     image->setTransparentPixel(true);
 

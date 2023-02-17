@@ -263,6 +263,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_app", "isDrawingTexts", &GraphicalApplication::isDrawingTexts, &g_app);
     g_lua.bindSingletonFunction("g_app", "setDrawTexts", &GraphicalApplication::setDrawTexts, &g_app);
     g_lua.bindSingletonFunction("g_app", "setLoadingAsyncTexture", &GraphicalApplication::setLoadingAsyncTexture, &g_app);
+    g_lua.bindSingletonFunction("g_app", "isEncrypted", &GraphicalApplication::isEncrypted, &g_app);
 
     // PlatformWindow
     g_lua.registerSingletonClass("g_window");

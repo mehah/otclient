@@ -217,7 +217,15 @@ function setOption(key, value, force)
     elseif key == 'drawEffectOnTop' then
         g_app.setDrawEffectOnTop(value)
     elseif key == 'asyncTxtLoading' then
+        if g_app.isEncrypted() then
+            local asyncWidget = graphicsPanel:getChildById('asyncTxtLoading')
+            asyncWidget:setEnabled(false)
+            asyncWidget:setChecked(false)
+            return
+        end
+
         g_app.setLoadingAsyncTexture(value)
+
     elseif key == 'showPing' then
         modules.client_topmenu.setPingVisible(value)
     elseif key == 'fullscreen' then

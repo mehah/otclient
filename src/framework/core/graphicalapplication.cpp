@@ -269,6 +269,9 @@ void GraphicalApplication::repaint() { g_drawPool.get<DrawPool>(DrawPoolType::FO
 bool GraphicalApplication::isDrawingTexts() { return m_drawText && (!g_map.getStaticTexts().empty() || !g_map.getAnimatedTexts().empty()); }
 
 void GraphicalApplication::setLoadingAsyncTexture(bool v) {
+    if (isEncrypted())
+        v = false;
+
     m_loadingAsyncTexture = v;
     g_sprites.reload();
 }
