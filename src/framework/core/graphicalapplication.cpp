@@ -151,18 +151,15 @@ void GraphicalApplication::run()
                 continue;
             }
 
-            if (foreground->canRepaint()) {
+            if (foreground->canRepaint())
                 foreCondition.notify_one();
-            }
 
             if (g_game.isOnline()) {
                 if (!mapWidget)
                     mapWidget = g_ui.getRootWidget()->recursiveGetChildById("gameMapPanel");
 
-                txt->setEnable(canDrawTexts());
-                if (txt->isEnabled()) {
+                if (txt->canRepaint())
                     txtCondition.notify_one();
-                }
 
                 {
                     std::scoped_lock l(map->getMutex());
@@ -189,8 +186,11 @@ void GraphicalApplication::run()
         std::unique_lock lock(txt->getMutex());
         txtCondition.wait(lock, [&]() -> bool {
             g_textDispatcher.poll();
-            if (mapWidget)
+
+            txt->setEnable(canDrawTexts());
+            if (mapWidget && txt->isEnabled())
                 mapWidget->drawSelf(DrawPoolType::TEXT);
+
             return m_stopping;
         });
     });

@@ -168,6 +168,7 @@ private:
              const CoordsBufferPtr& coordsBuffer = nullptr);
 
     void resetState();
+    inline void setFPS(uint16_t fps) { m_refreshDelay = fps; }
 
     PoolState getState(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color);
 
@@ -204,12 +205,18 @@ private:
             ++m_currentFloor;
     }
 
+    void disableUpdateHash() {
+        m_status.first = 0;
+        m_updateHash = false;
+    }
+
     virtual bool hasFrameBuffer() const { return false; };
     virtual DrawPoolFramed* toPoolFramed() { return nullptr; }
 
     bool canRepaint(bool autoUpdateStatus);
 
     bool m_enabled{ true };
+    bool m_updateHash{ true };
     bool m_alwaysGroupDrawings{ false };
 
     uint8_t m_currentFloor{ 0 };

@@ -23,7 +23,10 @@
 #include "drawpool.h"
 #include "framebuffermanager.h"
 
-static constexpr uint16_t SHADER_REFRESH_DELAY = 1000 / 20; // 20 FPS (50ms)
+static constexpr uint16_t
+FPS10 = 1000 / 10,
+FPS20 = 1000 / 20,
+FPS60 = 1000 / 60;
 
 DrawPool* DrawPool::create(const DrawPoolType type)
 {
@@ -38,7 +41,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
             frameBuffer->m_useAlphaWriting = false;
             frameBuffer->disableBlend();
         } else if (type == DrawPoolType::FOREGROUND) {
-            pool->m_refreshDelay = 100; // 10 FPS (1000 / 10)
+            pool->setFPS(FPS10);
         } else if (type == DrawPoolType::LIGHT) {
             pool->m_alwaysGroupDrawings = true;
             frameBuffer->setCompositionMode(CompositionMode::LIGHT);
@@ -46,6 +49,11 @@ DrawPool* DrawPool::create(const DrawPoolType type)
     } else {
         pool = new DrawPool;
         pool->m_alwaysGroupDrawings = true; // CREATURE_INFORMATION & TEXT
+        pool->disableUpdateHash();
+
+        if (type == DrawPoolType::TEXT) {
+            pool->setFPS(FPS60);
+        }
     }
 
     pool->m_type = type;
@@ -160,10 +168,11 @@ DrawPool::PoolState DrawPool::getState(const DrawPool::DrawMethod& method, const
         if (state.texture)
             stdext::hash_union(state.hash, state.texture->hash());
 
-        stdext::hash_union(m_status.second, state.hash);
+        if (m_updateHash)
+            stdext::hash_union(m_status.second, state.hash);
     }
 
-    { // Method Hash
+    if (m_updateHash) { // Method Hash
         size_t methodhash = 0;
         if (method.type == DrawPool::DrawMethodType::TRIANGLE) {
             if (!method.a.isNull()) stdext::hash_union(methodhash, method.a.hash());
@@ -231,7 +240,7 @@ void DrawPool::setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bo
         return;
 
     if (shaderProgram) {
-        m_shaderRefreshDelay = SHADER_REFRESH_DELAY;
+        setFPS(FPS20);
         m_state.shaderProgram = shaderProgram.get();
         m_state.action = action;
     } else {
