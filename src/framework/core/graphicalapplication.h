@@ -62,7 +62,7 @@ public:
     bool isDrawingEffectsOnTop() { return m_drawEffectOnTop || mustOptimize(); }
 
     void setDrawTexts(bool v) { m_drawText = v; }
-    bool isDrawingTexts();
+    bool isDrawingTexts() { return m_drawText; }
 
     bool isLoadingAsyncTexture() { return m_loadingAsyncTexture; }
     void setLoadingAsyncTexture(bool v);
@@ -82,6 +82,8 @@ protected:
     void inputEvent(const InputEvent& event);
 
 private:
+    bool canDrawTexts() const;
+
     bool m_onInputEvent{ false };
     bool m_optimize{ true };
     bool m_forceEffectOptimization{ false };

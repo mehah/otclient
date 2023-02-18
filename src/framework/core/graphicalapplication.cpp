@@ -159,7 +159,7 @@ void GraphicalApplication::run()
                 if (!mapWidget)
                     mapWidget = g_ui.getRootWidget()->recursiveGetChildById("gameMapPanel");
 
-                txt->setEnable(isDrawingTexts());
+                txt->setEnable(canDrawTexts());
                 if (txt->isEnabled()) {
                     txtCondition.notify_one();
                 }
@@ -266,7 +266,7 @@ void GraphicalApplication::inputEvent(const InputEvent& event)
 }
 
 void GraphicalApplication::repaint() { g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND)->repaint(); }
-bool GraphicalApplication::isDrawingTexts() { return m_drawText && (!g_map.getStaticTexts().empty() || !g_map.getAnimatedTexts().empty()); }
+bool GraphicalApplication::canDrawTexts() const { return m_drawText && (!g_map.getStaticTexts().empty() || !g_map.getAnimatedTexts().empty()); }
 
 void GraphicalApplication::setLoadingAsyncTexture(bool v) {
     if (isEncrypted())

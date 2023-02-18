@@ -31,6 +31,7 @@
 #include "tile.h"
 
 #include <framework/core/asyncdispatcher.h>
+#include <framework/core/graphicalapplication.h>
 #include <framework/core/eventdispatcher.h>
 
 #ifdef FRAMEWORK_EDITOR
@@ -145,6 +146,9 @@ void Map::addThing(const ThingPtr& thing, const Position& pos, int16_t stackPos)
 }
 
 void Map::addStaticText(const StaticTextPtr& txt, const Position& pos) {
+    if (!g_app.isDrawingTexts())
+        return;
+
     for (const auto& other : m_staticTexts) {
         // try to combine messages
         if (other->getPosition() == pos && other->addMessage(txt->getName(), txt->getMessageMode(), txt->getFirstMessage())) {
@@ -157,6 +161,9 @@ void Map::addStaticText(const StaticTextPtr& txt, const Position& pos) {
 }
 
 void Map::addAnimatedText(const AnimatedTextPtr& txt, const Position& pos) {
+    if (!g_app.isDrawingTexts())
+        return;
+
     // this code will stack animated texts of the same color
     AnimatedTextPtr prevAnimatedText;
 
@@ -431,7 +438,7 @@ void Map::setShowAnimations(bool show)
             m_animationFlags |= Animation_Show;
     } else
         m_animationFlags &= ~Animation_Show;
-}
+    }
 #endif
 
 void Map::beginGhostMode(float opacity) { g_painter->setOpacity(opacity); }
