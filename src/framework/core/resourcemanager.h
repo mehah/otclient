@@ -68,6 +68,7 @@ public:
     std::string getRealDir(const std::string& path);
     std::string getRealPath(const std::string& path);
     std::string getBaseDir();
+    std::string getPrefDir() const;
     std::string getUserDir();
     std::string getWriteDir() { return m_writeDir; }
     std::string getWorkDir() { return m_workDir; }

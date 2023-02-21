@@ -49,6 +49,7 @@ bool ResourceManager::discoverWorkDir(const std::string& existentFile)
 {
     // search for modules directory
     std::string possiblePaths[] = { g_platform.getCurrentDir(),
+                                    g_resources.getPrefDir(),
                                     g_resources.getBaseDir(),
                                     g_resources.getBaseDir() + "/game_data/",
                                     g_resources.getBaseDir() + "../",
@@ -384,6 +385,11 @@ std::string ResourceManager::getBaseDir()
 #else
     return PHYSFS_getBaseDir();
 #endif
+}
+
+std::string ResourceManager::getPrefDir() const
+{
+    return PHYSFS_getPrefDir("com.github.Mehah", g_app.getCompactName());
 }
 
 std::string ResourceManager::getUserDir()
