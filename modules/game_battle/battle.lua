@@ -407,14 +407,17 @@ function checkCreatures() -- Function that initially populates our tree once the
 
     removeAllCreatures() -- Remove all cache if there's any
 
-    local spectators = modules.game_interface.getMapPanel():getSpectators()
-    local sortType = getSortType()
+    -- fix for old protocols
+    addEvent(function()
+        local spectators = modules.game_interface.getMapPanel():getSpectators()
+        local sortType = getSortType()
 
-    for _, creature in ipairs(spectators) do
-        if doCreatureFitFilters(creature) then
-            addCreature(creature, sortType)
+        for _, creature in ipairs(spectators) do
+            if doCreatureFitFilters(creature) then
+                addCreature(creature, sortType)
+            end
         end
-    end
+    end)
 end
 
 function doCreatureFitFilters(creature) -- Check if creature fit current applied filters (By changing the filter we will call checkCreatures(true) to recreate the tree)
