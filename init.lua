@@ -4,8 +4,9 @@
 AUTO_RELOAD_MODULE = false
 
 -- WALKING SYSTEM
--- Set true if using Nostalrius 7.2 or Nekiro TFS-1.5-Downgrades-7.72
-g_game.setForceNewWalkingFormula(false)
+-- Set true if using Nostalrius 7.2, Nekiro TFS-1.5-Downgrades-7.72
+-- or any protocol below 860 that the walking system is stuttering.
+g_game.setForceNewWalkingFormula(true)
 
 -- set latest supported version
 g_game.setLastSupportedVersion(1291)
