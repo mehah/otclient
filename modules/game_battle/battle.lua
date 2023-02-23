@@ -407,17 +407,14 @@ function checkCreatures() -- Function that initially populates our tree once the
 
     removeAllCreatures() -- Remove all cache if there's any
 
-    -- fix for old protocols
-    addEvent(function()
-        local spectators = modules.game_interface.getMapPanel():getSpectators()
-        local sortType = getSortType()
+    local spectators = modules.game_interface.getMapPanel():getSpectators()
+    local sortType = getSortType()
 
-        for _, creature in ipairs(spectators) do
-            if doCreatureFitFilters(creature) then
-                addCreature(creature, sortType)
-            end
+    for _, creature in ipairs(spectators) do
+        if doCreatureFitFilters(creature) then
+            addCreature(creature, sortType)
         end
-    end)
+    end
 end
 
 function doCreatureFitFilters(creature) -- Check if creature fit current applied filters (By changing the filter we will call checkCreatures(true) to recreate the tree)
@@ -800,7 +797,9 @@ function onCreaturePositionChange(creature, newPos, oldPos) -- Update battleButt
     -- If it's the local player moving
     if creature:isLocalPlayer() then
         if oldPos and newPos and newPos.z ~= oldPos.z then
-            checkCreatures()
+            addEvent(function() -- fix for old protocols
+                checkCreatures()
+            end)
         elseif oldPos and newPos and (newPos.x ~= oldPos.x or newPos.y ~= oldPos.y) then
             -- Distance will change when moving, recalculate and move to correct index
             if #binaryTree > 0 and sortType == 'distance' then
