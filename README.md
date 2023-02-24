@@ -1,8 +1,8 @@
 # OTCLient - Redemption
-[![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/tterb/atomic-design-ui/blob/master/LICENSEs)
 [![Discord Shield](https://discordapp.com/api/guilds/888062548082061433/widget.png?style=shield)](https://discord.gg/HZN8yJJSyC)
 [![Build - Ubuntu](https://github.com/mehah/otclient/actions/workflows/build-ubuntu.yml/badge.svg)](https://github.com/mehah/otclient/actions/workflows/build-ubuntu.yml)
 [![Build - Windows](https://github.com/mehah/otclient/actions/workflows/build-windows.yml/badge.svg)](https://github.com/mehah/otclient/actions/workflows/build-windows.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 #### :heart:  If you are interested in supporting the project, go to this [link](https://www.paypal.com/donate/?business=CV9D5JF8E46LY&no_recurring=0&item_name=Thank+you+very+much+for+your+donation.&currency_code=BRL), any value is great help, thank you.
 
@@ -55,9 +55,6 @@
   - To enable just go to [config.h](https://github.com/mehah/otclient/blob/main/src/client/config.h), set 1 in ENABLE_DISCORD_RPC and configure the others definitions
   - You can see the step by step in [YouTube](https://www.youtube.com/watch?v=zCHYtRlD58g)
 
-##### [Active Developers]
-[@mehah](https://github.com/mehah) [@scopz](https://github.com/scopz) [@nekiro](https://github.com/nekiro)
-
 <h2>
 
 ```diff
@@ -65,8 +62,6 @@
 ```
 
    </h2>
-
-[![Build Status](https://github.com/mehah/otclient/actions/workflows/build-vcpkg.yml/badge.svg)](https://github.com/mehah/otclient/actions/workflows/build-vcpkg.yml) [![Join the chat at https://gitter.im/mehah/otclient](https://img.shields.io/badge/GITTER-join%20chat-green.svg)](https://gitter.im/mehah/otclient?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Open Source Helpers](https://www.codetriage.com/mehah/otclient/badges/users.svg)](https://www.codetriage.com/mehah/otclient)
 
 ### What is otclient?
 
@@ -78,7 +73,7 @@ anything easily. Users can also create new mods and extend game interface for th
 Otclient is written in C++20 and heavily scripted in lua.
 
 For a server to connect to, you can build your own with the [forgottenserver](https://github.com/otland/forgottenserver)
-or connect to one listed on [otservlist](https://otservlist.org/).#
+or [canary](https://github.com/opentibiabr/canary).
 
 ## The Mobile Project
 This is a fork of edubart's otclient. The objective of this fork it's to develop a runnable otclient on mobiles devices.
@@ -104,7 +99,7 @@ Compiled for Windows can be found here (but can be outdated):
 Beyond of it's flexibility with scripts, otclient comes with tons of other features that make possible
 the creation of new client side stuff in otserv that was not possible before. These include,
 sound system, graphics effects with shaders, modules/addons system, animated textures,
-styleable user interface, transparency, multi language, in game lua terminal, an OpenGL 1.1/2.0 ES engine that make possible
+styleable user interface, transparency, multi language, in game lua terminal, an OpenGL 2.0 ES engine that make possible
 to port to mobile platforms. Otclient is also flexible enough to
 create tibia tools like map editors just using scripts, because it wasn't designed to be just a
 client, instead otclient was designed to be a combination of a framework and tibia APIs.
@@ -140,8 +135,7 @@ xhost -
 
 ### Need help?
 
-Try to ask questions in [otland](http://otland.net/f494/), now we have a board for the project there,
-or talk with us at the gitter chat.
+Try to ask questions in [discord](https://discord.gg/HZN8yJJSyC)
 
 ### Bugs
 
