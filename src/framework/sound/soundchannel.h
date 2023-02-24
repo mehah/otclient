@@ -51,6 +51,8 @@ protected:
 private:
     struct QueueEntry
     {
+        QueueEntry(std::string fn, float ft, float g, float p) : filename(fn), fadetime(ft), gain(g), pitch(p) {};
+
         std::string filename;
         float fadetime;
         float gain;
