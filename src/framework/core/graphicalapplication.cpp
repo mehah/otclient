@@ -269,7 +269,9 @@ void GraphicalApplication::repaint() { g_drawPool.get<DrawPool>(DrawPoolType::FO
 bool GraphicalApplication::canDrawTexts() const { return m_drawText && (!g_map.getStaticTexts().empty() || !g_map.getAnimatedTexts().empty()); }
 
 void GraphicalApplication::setLoadingAsyncTexture(bool v) {
-    if (isEncrypted())
+    if (g_game.isUsingProtobuf())
+        v = true;
+    else if (isEncrypted())
         v = false;
 
     m_loadingAsyncTexture = v;

@@ -165,11 +165,6 @@ void Game::processGameStart()
 {
     m_online = true;
 
-    if (!usingProtobuf() && g_app.isLoadingAsyncTexture()) {
-        g_app.setLoadingAsyncTexture(false);
-        g_dispatcher.scheduleEvent([] {g_app.setLoadingAsyncTexture(true); }, 1000);
-    }
-
     // synchronize fight modes with the server
     m_protocolGame->sendChangeFightModes(m_fightMode, m_chaseMode, m_safeFight, m_pvpMode);
 

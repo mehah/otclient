@@ -24,7 +24,7 @@
 
  // GENERAL
 #define SPRITE_SIZE 32
-#define ASYNC_DISPATCHER_MAX_THREAD 4
+#define ASYNC_DISPATCHER_MAX_THREAD 6
 
 // APPEARANCES
 #define BYTES_IN_SPRITE_SHEET 384 * 384 * 4
@@ -68,9 +68,9 @@
 // for security reasons make sure you are using password with at last 100+ characters
 #define ENCRYPTION_PASSWORD "SET_YOUR_PASSWORD_HERE"
 
-// DISCORD RPC (https://discord.com/developers/applications) 
+// DISCORD RPC (https://discord.com/developers/applications)
 // Note: Only for VSSolution, doesn't work with CMAKE
-// Enable Discord Rich Presence 
+// Enable Discord Rich Presence
 #define ENABLE_DISCORD_RPC 0 // 1 to enable | 0 to disable
 #define RPC_API_KEY "1060650448522051664" // Your API Key
 // RPC Configs (https://youtu.be/zCHYtRlD58g) step by step to config your rich presence
