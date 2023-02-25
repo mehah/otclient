@@ -89,7 +89,7 @@ private:
     bool m_forceEffectOptimization{ false };
     bool m_drawEffectOnTop{ false };
     bool m_drawText{ true };
-    bool m_loadingAsyncTexture{ true };
+    bool m_loadingAsyncTexture{ false };
 
     AdaptativeFrameCounter m_frameCounter;
 };

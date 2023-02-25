@@ -42,7 +42,7 @@ local defaultOptions = {
     drawEffectOnTop = false,
     floorViewMode = 1,
     floorFading = 500,
-    asyncTxtLoading = true
+    asyncTxtLoading = false
 }
 
 local optionsWindow
@@ -217,7 +217,9 @@ function setOption(key, value, force)
     elseif key == 'drawEffectOnTop' then
         g_app.setDrawEffectOnTop(value)
     elseif key == 'asyncTxtLoading' then
-        if g_app.isEncrypted() then
+        if g_game.isUsingProtobuf() then
+            value = true
+        elseif g_app.isEncrypted() then
             local asyncWidget = graphicsPanel:getChildById('asyncTxtLoading')
             asyncWidget:setEnabled(false)
             asyncWidget:setChecked(false)
@@ -225,7 +227,6 @@ function setOption(key, value, force)
         end
 
         g_app.setLoadingAsyncTexture(value)
-
     elseif key == 'showPing' then
         modules.client_topmenu.setPingVisible(value)
     elseif key == 'fullscreen' then
