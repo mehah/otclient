@@ -20,6 +20,8 @@
  * THE SOFTWARE.
  */
 
+#include <algorithm>
+
 #include "asyncdispatcher.h"
 #include <client/config.h>
 
