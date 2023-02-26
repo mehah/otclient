@@ -40,6 +40,7 @@ public:
 
 protected:
     void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
+    Outfit getOutfit() { if (!m_creature) setOutfit({}); return m_creature->getOutfit(); }
     CreaturePtr m_creature;
     uint8_t m_creatureSize{ 0 };
 };

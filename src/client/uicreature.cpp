@@ -46,22 +46,19 @@ void UICreature::onStyleApply(const std::string_view styleName, const OTMLNodePt
 {
     UIWidget::onStyleApply(styleName, styleNode);
 
-    if (!m_creature)
-        setOutfit({});
-
     for (const auto& node : styleNode->children()) {
         if (node->tag() == "creature-size") {
             m_creatureSize = node->value<int>();
         } else if (node->tag() == "outfit-id") {
-            m_creature->getOutfit().setId(node->value<int>());
+            getOutfit().setId(node->value<int>());
         } else if (node->tag() == "outfit-head") {
-            m_creature->getOutfit().setHead(node->value<int>());
+            getOutfit().setHead(node->value<int>());
         } else if (node->tag() == "outfit-body") {
-            m_creature->getOutfit().setBody(node->value<int>());
+            getOutfit().setBody(node->value<int>());
         } else if (node->tag() == "outfit-legs") {
-            m_creature->getOutfit().setLegs(node->value<int>());
+            getOutfit().setLegs(node->value<int>());
         } else if (node->tag() == "outfit-feet") {
-            m_creature->getOutfit().setFeet(node->value<int>());
+            getOutfit().setFeet(node->value<int>());
         }
     }
 }
