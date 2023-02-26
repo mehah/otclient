@@ -181,14 +181,14 @@ void Creature::internalDraw(Point dest, bool isMarked, const Color& color, Light
         drawAttachedEffect(dest, lightView, true); // On Top
 }
 
-void Creature::drawOutfit(const Rect& destRect, bool resize, const Color& color)
+void Creature::drawOutfit(const Rect& destRect, uint8_t size, const Color& color)
 {
     if (!m_thingType)
         return;
 
-    const uint8_t frameSize = resize ? getExactSize() : getFrameSizeNotResized();
-    if (frameSize == 0)
-        return;
+    uint8_t frameSize = getExactSize();
+    if (size > 0)
+        frameSize = std::max<int>(frameSize * (size / 100.f), 2 * SPRITE_SIZE * (size / 100.f));
 
     g_drawPool.bindFrameBuffer(frameSize);
     internalDraw(Point(frameSize - SPRITE_SIZE) + getDisplacement(), false, color);
@@ -688,7 +688,6 @@ void Creature::setOutfit(const Outfit& outfit)
     m_mountType = nullptr;
     m_numPatternZ = 0;
     m_exactSize = 0;
-    m_frameSizeNotResized = 0;
     m_walkAnimationPhase = 0; // might happen when player is walking and outfit is changed.
 
     m_thingType = g_things.getThingType(m_outfit.isCreature() ? m_outfit.getId() : m_outfit.getAuxId(), m_outfit.getCategory()).get();
@@ -918,17 +917,6 @@ int Creature::getExactSize(int layer, int xPattern, int yPattern, int zPattern, 
     }
 
     return m_exactSize = std::max<uint8_t>(exactSize, SPRITE_SIZE);
-}
-
-uint8_t Creature::getFrameSizeNotResized()
-{
-    if (m_frameSizeNotResized > 0)
-        return m_frameSizeNotResized;
-
-    if (getExactSize() == 0)
-        return 0;
-
-    return m_frameSizeNotResized = std::max<int>(m_exactSize * 0.75f, 2 * SPRITE_SIZE * 0.75f);
 }
 
 void Creature::setMountShader(const std::string_view name) { m_mountShader = g_shaders.getShader(name); }

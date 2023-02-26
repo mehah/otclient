@@ -32,15 +32,14 @@ public:
     void drawSelf(DrawPoolType drawPane) override;
 
     void setCreature(const CreaturePtr& creature) { m_creature = creature; }
-    void setFixedCreatureSize(bool fixed) { m_fixedCreatureSize = fixed; }
     void setOutfit(const Outfit& outfit);
 
     CreaturePtr getCreature() { return m_creature; }
-    bool isFixedCreatureSize() { return m_fixedCreatureSize; }
+    uint8_t getCreatureSize() { return m_creatureSize; }
+    void setCreatureSize(uint8_t size) { m_creatureSize = size; }
 
 protected:
     void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
-
     CreaturePtr m_creature;
-    bool m_fixedCreatureSize{ false };
+    uint8_t m_creatureSize{ 0 };
 };
