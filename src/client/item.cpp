@@ -89,7 +89,7 @@ void Item::setPosition(const Position& position, uint8_t stackPos, bool hasEleva
 {
     Thing::setPosition(position, stackPos);
 
-    if (hasElevation || m_drawConductor.agroup && stackPos > 0)
+    if (hasElevation || (m_drawConductor.agroup && stackPos > 0))
         m_drawConductor.agroup = false;
 }
 

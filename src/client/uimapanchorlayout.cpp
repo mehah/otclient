@@ -37,6 +37,7 @@ int UIPositionAnchor::getHookedPoint(const UIWidgetPtr& hookedWidget, const UIWi
             case Fw::AnchorBottom: return hookedRect.bottom();
             case Fw::AnchorVerticalCenter: return hookedRect.verticalCenter();
             case Fw::AnchorHorizontalCenter: return hookedRect.horizontalCenter();
+            case Fw::AnchorNone: break;
         }
     }
 

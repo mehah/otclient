@@ -127,7 +127,10 @@ void Map::cleanDynamicThings()
 
 void Map::addThing(const ThingPtr& thing, const Position& pos, int16_t stackPos)
 {
-    if (!thing || thing->isItem() && thing->getId() == 0)
+    if (!thing)
+        return;
+
+    if (thing->isItem() && thing->getId() == 0)
         return;
 
     if (thing->isMissile()) {
@@ -438,7 +441,7 @@ void Map::setShowAnimations(bool show)
             m_animationFlags |= Animation_Show;
     } else
         m_animationFlags &= ~Animation_Show;
-    }
+}
 #endif
 
 void Map::beginGhostMode(float opacity) { g_painter->setOpacity(opacity); }

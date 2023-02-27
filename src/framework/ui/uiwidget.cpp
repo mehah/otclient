@@ -107,7 +107,7 @@ void UIWidget::drawSelf(DrawPoolType drawPane)
 void UIWidget::drawChildren(const Rect& visibleRect, DrawPoolType drawPane)
 {
     // draw children
-    for (const auto child : m_children) { // don't use auto&
+    for (const auto& child : m_children) {
         // render only visible children with a valid rect inside parent rect
         if (!child || !child->isExplicitlyVisible() || !child->getRect().isValid() || child->getOpacity() <= Fw::MIN_ALPHA)
             continue;

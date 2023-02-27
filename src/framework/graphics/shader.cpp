@@ -26,8 +26,7 @@
 #include <framework/core/application.h>
 #include <framework/core/resourcemanager.h>
 
-Shader::Shader(ShaderType shaderType) : m_shaderType(shaderType),
-m_shaderId(glCreateShader(static_cast<GLenum>(shaderType)))
+Shader::Shader(ShaderType shaderType) : m_shaderId(glCreateShader(static_cast<GLenum>(shaderType))), m_shaderType(shaderType)
 {
     ;
     if (!m_shaderId)
