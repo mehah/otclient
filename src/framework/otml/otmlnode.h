@@ -27,6 +27,8 @@
 class OTMLNode : public std::enable_shared_from_this<OTMLNode>
 {
 public:
+    virtual ~OTMLNode() {} // fix clang warning
+
     static OTMLNodePtr create(const std::string_view tag = "", bool unique = false);
     static OTMLNodePtr create(const std::string_view tag, const std::string_view value);
 

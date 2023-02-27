@@ -29,6 +29,8 @@
 class UIAnchor :public std::enable_shared_from_this<UIAnchor>
 {
 public:
+    virtual ~UIAnchor() {} // fix clang warning
+
     UIAnchor(Fw::AnchorEdge anchoredEdge, std::string_view hookedWidgetId, Fw::AnchorEdge hookedEdge) :
         m_anchoredEdge(anchoredEdge), m_hookedEdge(hookedEdge), m_hookedWidgetId(std::string{ hookedWidgetId })
     {}

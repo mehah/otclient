@@ -28,6 +28,8 @@
 class SoundFile : public std::enable_shared_from_this<SoundFile>
 {
 public:
+    virtual ~SoundFile() {} // fix clang warning
+
     SoundFile(const FileStreamPtr& fileStream) : m_file(fileStream) {}
     static SoundFilePtr loadSoundFile(const std::string& filename);
 
