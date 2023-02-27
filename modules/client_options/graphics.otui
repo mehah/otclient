@@ -48,6 +48,7 @@ Panel
   OptionCheckBox
     id: asyncTxtLoading
     !text: tr('Async texture loading')
+    !tooltip: tr('This option makes textures load asynchronously and uses less RAM.')
 
   Label
     id: floorViewModeLabel

@@ -55,7 +55,7 @@ public:
 
     void internalDraw(Point dest, bool isMarked, const Color& color, LightView* lightView = nullptr);
 
-    void drawOutfit(const Rect& destRect, bool resize, const Color& color = Color::white);
+    void drawOutfit(const Rect& destRect, uint8_t size, const Color& color = Color::white);
     void drawInformation(const MapPosInfo& mapRect, const Point& dest, bool useGray, int drawFlags);
 
     void setId(uint32_t id) override { m_id = id; }
@@ -171,7 +171,6 @@ private:
     void updateWalkingTile();
     void updateWalkAnimation();
 
-    uint8_t getFrameSizeNotResized();
     uint16_t getCurrentAnimationPhase(bool mount = false);
 
     struct CachedStep
@@ -203,7 +202,6 @@ private:
     uint8_t m_walkedPixels{ 0 };
 
     uint8_t m_exactSize{ 0 };
-    uint8_t m_frameSizeNotResized{ 0 };
 
     uint16_t m_calculatedStepSpeed{ 0 };
     uint16_t m_speed{ 0 };

@@ -30,7 +30,7 @@ void UICreature::drawSelf(DrawPoolType drawPane)
     UIWidget::drawSelf(drawPane);
 
     if (m_creature) {
-        m_creature->drawOutfit(getPaddingRect(), !m_fixedCreatureSize, m_imageColor);
+        m_creature->drawOutfit(getPaddingRect(), m_creatureSize, m_imageColor);
     }
 }
 
@@ -47,28 +47,18 @@ void UICreature::onStyleApply(const std::string_view styleName, const OTMLNodePt
     UIWidget::onStyleApply(styleName, styleNode);
 
     for (const auto& node : styleNode->children()) {
-        if (node->tag() == "fixed-creature-size")
-            setFixedCreatureSize(node->value<bool>());
-        else if (node->tag() == "outfit-id") {
-            Outfit outfit = m_creature ? m_creature->getOutfit() : Outfit();
-            outfit.setId(node->value<int>());
-            setOutfit(outfit);
+        if (node->tag() == "creature-size") {
+            m_creatureSize = node->value<int>();
+        } else if (node->tag() == "outfit-id") {
+            getOutfit().setId(node->value<int>());
         } else if (node->tag() == "outfit-head") {
-            Outfit outfit = m_creature ? m_creature->getOutfit() : Outfit();
-            outfit.setHead(node->value<int>());
-            setOutfit(outfit);
+            getOutfit().setHead(node->value<int>());
         } else if (node->tag() == "outfit-body") {
-            Outfit outfit = m_creature ? m_creature->getOutfit() : Outfit();
-            outfit.setBody(node->value<int>());
-            setOutfit(outfit);
+            getOutfit().setBody(node->value<int>());
         } else if (node->tag() == "outfit-legs") {
-            Outfit outfit = m_creature ? m_creature->getOutfit() : Outfit();
-            outfit.setLegs(node->value<int>());
-            setOutfit(outfit);
+            getOutfit().setLegs(node->value<int>());
         } else if (node->tag() == "outfit-feet") {
-            Outfit outfit = m_creature ? m_creature->getOutfit() : Outfit();
-            outfit.setFeet(node->value<int>());
-            setOutfit(outfit);
+            getOutfit().setFeet(node->value<int>());
         }
     }
 }

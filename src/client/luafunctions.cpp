@@ -346,6 +346,7 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "closeImbuingWindow", &Game::closeImbuingWindow, &g_game);
     g_lua.bindSingletonFunction("g_game", "setForceNewWalkingFormula", &Game::setForceNewWalkingFormula, &g_game);
     g_lua.bindSingletonFunction("g_game", "isForcingNewWalkingFormula", &Game::isForcingNewWalkingFormula, &g_game);
+    g_lua.bindSingletonFunction("g_game", "isUsingProtobuf", &Game::isUsingProtobuf, &g_game);
 
     g_lua.registerSingletonClass("g_shaders");
     g_lua.bindSingletonFunction("g_shaders", "createShader", &ShaderManager::createShader, &g_shaders);
@@ -808,9 +809,9 @@ void Client::registerLuaFunctions()
     g_lua.bindClassStaticFunction<UICreature>("create", [] { return std::make_shared<UICreature>(); });
     g_lua.bindClassMemberFunction<UICreature>("setCreature", &UICreature::setCreature);
     g_lua.bindClassMemberFunction<UICreature>("setOutfit", &UICreature::setOutfit);
-    g_lua.bindClassMemberFunction<UICreature>("setFixedCreatureSize", &UICreature::setFixedCreatureSize);
+    g_lua.bindClassMemberFunction<UICreature>("setCreatureSize", &UICreature::setCreatureSize);
     g_lua.bindClassMemberFunction<UICreature>("getCreature", &UICreature::getCreature);
-    g_lua.bindClassMemberFunction<UICreature>("isFixedCreatureSize", &UICreature::isFixedCreatureSize);
+    g_lua.bindClassMemberFunction<UICreature>("getCreatureSize", &UICreature::getCreatureSize);
 
     g_lua.registerClass<UIMap, UIWidget>();
     g_lua.bindClassStaticFunction<UIMap>("create", [] { return std::make_shared<UIMap>(); });

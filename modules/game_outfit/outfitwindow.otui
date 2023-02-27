@@ -18,7 +18,7 @@ MainWindow
     margin-top: 15
     margin-left: 22
     padding: 4 4 4 4
-    fixed-creature-size: true
+    creature-size: 80
 
   Label
     id: outfitName
@@ -51,7 +51,7 @@ MainWindow
     margin-top: 15
     margin-right: 22
     padding: 4 4 4 4
-    fixed-creature-size: true
+    creature-size: 80
 
   Label
     id: mountName
