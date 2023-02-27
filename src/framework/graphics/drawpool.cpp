@@ -240,7 +240,7 @@ void DrawPool::setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bo
         return;
 
     if (shaderProgram) {
-        setFPS(FPS20);
+        m_shaderRefreshDelay = FPS20;
         m_state.shaderProgram = shaderProgram.get();
         m_state.action = action;
     } else {
