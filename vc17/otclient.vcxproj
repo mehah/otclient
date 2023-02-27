@@ -100,6 +100,7 @@
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
+    <VcpkgAutoLink>false</VcpkgAutoLink>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <VcpkgTriplet>x86-windows</VcpkgTriplet>
@@ -165,26 +166,6 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>
-	  advapi32.lib;
-	  crypt32.lib;
-	  dbghelp.lib;
-	  gdi32.lib;	  
-	  glew32.lib;
-	  kernel32.lib;
-	  lua51.lib;
-	  ogg.lib;
-	  ole32.lib;
-	  openal32.lib;
-	  opengl32.lib;
-	  physfs-static.lib;
-	  shell32.lib;
-	  user32.lib;
-	  vorbis.lib;
-	  vorbisfile.lib;
-	  zlib.lib;
-	  winmm.lib
-	  </AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>if NOT EXIST "../src/protobuf/appearances.pb.cc" (
@@ -224,26 +205,6 @@ IF %ERRORLEVEL% EQU 0 (
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>
-	  advapi32.lib;
-	  crypt32.lib;
-	  dbghelp.lib;
-	  gdi32.lib;	  
-	  glew32.lib;
-	  kernel32.lib;
-	  lua51.lib;
-	  ogg.lib;
-	  ole32.lib;
-	  openal32.lib;
-	  opengl32.lib;
-	  physfs-static.lib;
-	  shell32.lib;
-	  user32.lib;
-	  vorbis.lib;
-	  vorbisfile.lib;
-	  zlib.lib;
-	  winmm.lib
-	  </AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>if NOT EXIST "../src/protobuf/appearances.pb.cc" (

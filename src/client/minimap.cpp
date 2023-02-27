@@ -415,8 +415,7 @@ void Minimap::saveOtmm(const std::string& fileName)
                 fin->addU8(pos.z);
 
                 unsigned long len = blockSize;
-                const int ret = compress2(compressBuffer.data(), &len, (uint8_t*)&(*block).getTiles(), blockSize, COMPRESS_LEVEL);
-                assert(ret == Z_OK);
+                compress2(compressBuffer.data(), &len, (uint8_t*)&(*block).getTiles(), blockSize, COMPRESS_LEVEL);
                 fin->addU16(len);
                 fin->write(compressBuffer.data(), len);
             }

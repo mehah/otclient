@@ -76,7 +76,7 @@ void EventDispatcher::poll()
             break;
         }
 
-        for (int_fast32_t i = -1; ++i < m_pollEventsSize;) {
+        for (int_fast32_t i = -1; ++i < static_cast<int_fast32_t>(m_pollEventsSize);) {
             const auto event = m_eventList.front();
             m_eventList.pop_front();
             if (isMainDispatcher) ul.unlock();

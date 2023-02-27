@@ -94,7 +94,7 @@ bool LocalPlayer::retryAutoWalk()
                 m_autoWalkContinueEvent->cancel();
 
             m_autoWalkContinueEvent = g_dispatcher.scheduleEvent(
-                [capture0 = asLocalPlayer(), this, autoWalkDest = m_autoWalkDestination] { capture0->autoWalk(autoWalkDest, true); }, 200
+                [capture0 = asLocalPlayer(), autoWalkDest = m_autoWalkDestination] { capture0->autoWalk(autoWalkDest, true); }, 200
             );
 
             m_autoWalkRetries += 1;

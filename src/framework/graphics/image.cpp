@@ -128,8 +128,6 @@ void Image::blit(const Point& dest, const ImagePtr& other)
     if (!other)
         return;
 
-    int coloredPixelSize = 0;
-
     const uint8_t* otherPixels = other->getPixelData();
     for (int p = 0; p < other->getPixelCount(); ++p) {
         const int x = p % other->getWidth();
@@ -141,7 +139,6 @@ void Image::blit(const Point& dest, const ImagePtr& other)
             m_pixels[pos + 1] = otherPixels[p * 4 + 1];
             m_pixels[pos + 2] = otherPixels[p * 4 + 2];
             m_pixels[pos + 3] = otherPixels[p * 4 + 3];
-            ++coloredPixelSize;
         }
     }
 }

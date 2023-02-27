@@ -252,7 +252,7 @@ void GraphicalApplication::resize(const Size& size)
     g_ui.resize(size);
     m_onInputEvent = false;
 
-    g_mainDispatcher.addEvent([this, size] {
+    g_mainDispatcher.addEvent([size] {
         g_graphics.resize(size);
         g_drawPool.get<DrawPoolFramed>(DrawPoolType::FOREGROUND)->resize(size);
     });

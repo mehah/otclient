@@ -80,7 +80,7 @@ MapView::MapView() : m_pool(g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP))
         g_painter->setOpacity(fadeOpacity);
     });
 
-    m_pool->onAfterDraw([this] {
+    m_pool->onAfterDraw([] {
         g_painter->resetShaderProgram();
         g_painter->resetOpacity();
     });
@@ -140,7 +140,7 @@ void MapView::drawFloor()
                 g_drawPool.setOpacity(fadeLevel);
 
             Position _camera = cameraPosition;
-            const bool alwaysTransparent = m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && z < m_cachedFirstVisibleFloor&& _camera.coveredUp(cameraPosition.z - z);
+            const bool alwaysTransparent = m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && z < m_cachedFirstVisibleFloor && _camera.coveredUp(cameraPosition.z - z);
 
             const auto& map = m_cachedVisibleTiles[z];
 
