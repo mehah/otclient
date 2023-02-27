@@ -20,8 +20,9 @@
  * THE SOFTWARE.
  */
 
-#ifndef ANDROIDWINDOW_H
-#define ANDROIDWINDOW_H
+#pragma once
+
+#ifdef ANDROID
 
 #include "platformwindow.h"
 #include <android/native_window.h>
@@ -89,10 +90,10 @@ class AndroidWindow : public PlatformWindow
                        uint32_t pointerIndex,
                        GameActivityMotionEvent* motionEvent);
 
-    void processKeyDownOrKeyUp();
+    void processKeyDownOrUp();
     void processTextInput();
-    void processFingerdownAndFingerup();
-    void processFingermotion();
+    void processFingerDownAndUp();
+    void processFingerMotion();
 
     void handleNativeEvents();
     void handleCmd(int32_t cmd);

@@ -89,7 +89,11 @@ void Application::init(std::vector<std::string>& args)
     g_configs.init();
 
     // initialize resources
+#ifdef ANDROID
+    g_resources.init(nullptr);
+#else
     g_resources.init(args[0].data());
+#endif
 
     // initialize lua
     g_lua.init();
