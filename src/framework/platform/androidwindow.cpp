@@ -200,14 +200,14 @@ void AndroidWindow::poll() {
             case TOUCH_DOWN:
             case TOUCH_LONGPRESS:
             case TOUCH_UP:
-                processFingerdownAndFingerup();
+                processFingerDownAndUp();
                 break;
             case TOUCH_MOTION:
-                processFingermotion();
+                processFingerMotion();
             case KEY_DOWN:
             case KEY_UP:
             case EVENT_UNDEFINED:
-                processKeyDownOrKeyUp();
+                processKeyDownOrUp();
                 break;
         }
 
@@ -217,7 +217,7 @@ void AndroidWindow::poll() {
     fireKeysPress();
 }
 
-void AndroidWindow::processKeyDownOrKeyUp() {
+void AndroidWindow::processKeyDownOrUp() {
     if(m_currentEvent.type == KEY_DOWN || m_currentEvent.type == KEY_UP) {
         Fw::Key keyCode = Fw::KeyUnknown;
         KeyCode key = m_currentEvent.keyCode;
@@ -246,7 +246,7 @@ void AndroidWindow::processTextInput() {
     }
 }
 
-void AndroidWindow::processFingerdownAndFingerup() {
+void AndroidWindow::processFingerDownAndUp() {
     bool isTouchdown = m_currentEvent.type == TOUCH_DOWN;
     Fw::MouseButton mouseButton = (m_currentEvent.type == TOUCH_LONGPRESS) ?
         Fw::MouseRightButton : Fw::MouseLeftButton;
@@ -268,7 +268,7 @@ void AndroidWindow::processFingerdownAndFingerup() {
         m_onInputEvent(m_inputEvent);
 }
 
-void AndroidWindow::processFingermotion() {
+void AndroidWindow::processFingerMotion() {
     m_inputEvent.reset();
     m_inputEvent.type = Fw::MouseMoveInputEvent;
 
@@ -344,6 +344,9 @@ void AndroidWindow::initializeAndroidApp(android_app* app) {
         auto *engine = (AndroidWindow*) app->userData;
         engine->handleCmd(cmd);
     };
+
+    android_app_set_key_event_filter(m_app, NULL);
+    android_app_set_motion_event_filter(m_app, NULL);
 }
 
 void AndroidWindow::onNativeTouch(int actionType,
