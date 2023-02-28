@@ -268,6 +268,8 @@ void GraphicalApplication::inputEvent(const InputEvent& event)
 void GraphicalApplication::repaint() { g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND)->repaint(); }
 bool GraphicalApplication::canDrawTexts() const { return m_drawText && (!g_map.getStaticTexts().empty() || !g_map.getAnimatedTexts().empty()); }
 
+bool GraphicalApplication::isLoadingAsyncTexture() { return m_loadingAsyncTexture || g_game.isUsingProtobuf(); }
+
 void GraphicalApplication::setLoadingAsyncTexture(bool v) {
     if (g_game.isUsingProtobuf())
         v = true;
