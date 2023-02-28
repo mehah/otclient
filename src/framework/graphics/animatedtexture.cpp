@@ -73,15 +73,17 @@ void AnimatedTexture::update()
     if (!m_animTimer.running())
         return;
 
-    if (m_animTimer.ticksElapsed() < m_framesDelay[m_currentFrame])
-        return;
+    if (!isEmpty()) {
+        if (m_animTimer.ticksElapsed() < m_framesDelay[m_currentFrame])
+            return;
 
-    m_animTimer.restart(); // it is necessary to restart the animation before stop()
+        m_animTimer.restart(); // it is necessary to restart the animation before stop()
 
-    if (++m_currentFrame >= m_frames.size()) {
-        m_currentFrame = 0;
-        if (m_numPlays > 0 && ++m_currentPlay == m_numPlays)
-            m_animTimer.stop();
+        if (++m_currentFrame >= m_frames.size()) {
+            m_currentFrame = 0;
+            if (m_numPlays > 0 && ++m_currentPlay == m_numPlays)
+                m_animTimer.stop();
+        }
     }
 
     const auto& txt = m_frames[m_currentFrame];
