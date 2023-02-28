@@ -424,8 +424,7 @@ bool WIN32Window::isExtensionSupported(const char* ext)
     //TODO
     return false;
 #else
-    using wglGetExtensionsStringProc = const char* (WINAPI*)();
-    const auto wglGetExtensionsString = static_cast<wglGetExtensionsStringProc>(getExtensionProcAddress("wglGetExtensionsStringEXT"));
+    const auto wglGetExtensionsString = (const char* (WINAPI*)())(getExtensionProcAddress("wglGetExtensionsStringEXT"));
     if (!wglGetExtensionsString)
         return false;
 
@@ -443,7 +442,7 @@ void* WIN32Window::getExtensionProcAddress(const char* ext)
     //TODO
     return NULL;
 #else
-    return static_cast<void*>(wglGetProcAddress(ext));
+    return (void*)wglGetProcAddress(ext);
 #endif
 }
 
@@ -940,8 +939,7 @@ void WIN32Window::setVerticalSync(bool enable)
         if (!isExtensionSupported("WGL_EXT_swap_control"))
             return;
 
-        using wglSwapIntervalProc = BOOL(WINAPI*)(int);
-        const auto wglSwapInterval = static_cast<wglSwapIntervalProc>(getExtensionProcAddress("wglSwapIntervalEXT"));
+        const auto wglSwapInterval = (BOOL(WINAPI*)(int))getExtensionProcAddress("wglSwapIntervalEXT");
         if (!wglSwapInterval)
             return;
 
@@ -1054,8 +1052,7 @@ Rect WIN32Window::getClientRect() const
 {
     if (m_window) {
         RECT clientRect = { 0,0,0,0 };
-        const int ret = GetClientRect(m_window, &clientRect);
-        assert(ret != 0);
+        GetClientRect(m_window, &clientRect);
         return Rect(Point(clientRect.left, clientRect.top), Point(clientRect.right, clientRect.bottom));
     }
     return Rect(m_position, m_size);
@@ -1065,8 +1062,7 @@ Rect WIN32Window::getWindowRect()
 {
     if (m_window) {
         RECT windowRect = { 0,0,0,0 };
-        const int ret = GetWindowRect(m_window, &windowRect);
-        assert(ret != 0);
+        GetWindowRect(m_window, &windowRect);
         return Rect(Point(windowRect.left, windowRect.top), Point(windowRect.right, windowRect.bottom));
     }
     return adjustWindowRect(getClientRect());

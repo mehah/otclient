@@ -64,7 +64,7 @@ public:
     void setDrawTexts(bool v) { m_drawText = v; }
     bool isDrawingTexts() { return m_drawText; }
 
-    bool isLoadingAsyncTexture() { return m_loadingAsyncTexture; }
+    bool isLoadingAsyncTexture();
     void setLoadingAsyncTexture(bool v);
 
     bool isEncrypted() {

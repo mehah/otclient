@@ -14,40 +14,53 @@
     </PREPROCESSOR_DEFS>
 
     <OTCLIENT_LIBDEPS>
-        glew32.lib;
-        zlib.lib;
-        physfs.lib;
-        openal32.lib;
-        lua51.lib;
-        ogg.lib;
-        vorbisfile.lib;
-        vorbis.lib;
-        opengl32.lib;
-        dbghelp.lib;
-        kernel32.lib;
-        user32.lib;
-        shell32.lib;
-        gdi32.lib;
-        advapi32.lib;
+      advapi32.lib;
+	  crypt32.lib;
+	  dbghelp.lib;
+	  gdi32.lib;	  
+	  discord-rpc.lib;
+	  glew32.lib;
+	  kernel32.lib;
+	  ole32.lib;
+	  physfs-static.lib;
+	  shell32.lib;
+	  user32.lib;	  
+	  winmm.lib;
+	  libcrypto.lib;
+	  libprotobuf.lib;
+	  libssl.lib;
+	  lua51.lib;
+	  lzma.lib;
+	  ogg.lib;
+	  openal32.lib;
+	  opengl32.lib;
+	  vorbis.lib;
+	  vorbisfile.lib;
+	  zlib.lib;
     </OTCLIENT_LIBDEPS>
     
     <OTCLIENT_LIBDEPS_D>
+        advapi32.lib;
+		discord-rpc.lib;
+        dbghelp.lib;
+        gdi32.lib;
         glew32d.lib;
-        zlibd.lib;
-        physfs.lib;
-        openal32.lib;
+        kernel32.lib;
         lua51.lib;
         ogg.lib;
-        vorbisfile.lib;
-        vorbis.lib;
+		lzma.lib;
+		libssl.lib;
+		libcrypto.lib;
+		libprotobufd.lib;
         opengl32.lib;
-        dbghelp.lib;
-        kernel32.lib;
-        user32.lib;
+        physfs.lib;
         shell32.lib;
-        gdi32.lib;
-        advapi32.lib;
-		winmm.lib
+        user32.lib;
+        vorbis.lib;
+        vorbisfile.lib;
+        winmm.lib;
+        zlibd.lib;
+        openal32.lib;      
 	</OTCLIENT_LIBDEPS_D>
   </PropertyGroup>
   <PropertyGroup>

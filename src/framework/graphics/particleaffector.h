@@ -22,15 +22,17 @@
 
 #pragma once
 
-#include <framework/otml/otml.h>
 #include "declarations.h"
+#include <framework/otml/otml.h>
 
 class ParticleAffector
 {
 public:
+    virtual ~ParticleAffector() {} // fix clang warning
+
     void update(float elapsedTime);
     virtual void load(const OTMLNodePtr& node);
-    virtual void updateParticle(const ParticlePtr&, float) const {}
+    virtual void updateParticle(const ParticlePtr&, float) const = 0;
 
     bool hasFinished() const { return m_finished; }
 

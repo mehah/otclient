@@ -104,6 +104,7 @@ public:
     void resetColor() { setColor(Color::white); }
     void resetShaderProgram() { setShaderProgram(nullptr); }
     void resetTransformMatrix() { setTransformMatrix(DEFAULT_MATRIX3); }
+    bool isReplaceColorShader(const PainterShaderProgram* shader) const { return m_drawReplaceColorProgram.get() == shader; }
 
 protected:
     void refreshState() const;

@@ -252,7 +252,7 @@ void GraphicalApplication::resize(const Size& size)
     g_ui.resize(size);
     m_onInputEvent = false;
 
-    g_mainDispatcher.addEvent([this, size] {
+    g_mainDispatcher.addEvent([size] {
         g_graphics.resize(size);
         g_drawPool.get<DrawPoolFramed>(DrawPoolType::FOREGROUND)->resize(size);
     });
@@ -267,6 +267,8 @@ void GraphicalApplication::inputEvent(const InputEvent& event)
 
 void GraphicalApplication::repaint() { g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND)->repaint(); }
 bool GraphicalApplication::canDrawTexts() const { return m_drawText && (!g_map.getStaticTexts().empty() || !g_map.getAnimatedTexts().empty()); }
+
+bool GraphicalApplication::isLoadingAsyncTexture() { return m_loadingAsyncTexture || g_game.isUsingProtobuf(); }
 
 void GraphicalApplication::setLoadingAsyncTexture(bool v) {
     if (g_game.isUsingProtobuf())

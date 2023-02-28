@@ -920,6 +920,7 @@ ThingFlagAttr ThingType::thingAttrToThingFlagAttr(ThingAttr attr) {
         case ThingAttrPodium: return ThingFlagAttrPodium;
         case ThingAttrTopEffect: return ThingFlagAttrTopEffect;
         case ThingAttrMarket: return ThingFlagAttrMarket;
+        default: break;
     }
 
     return ThingFlagAttrNone;
