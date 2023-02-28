@@ -422,8 +422,12 @@ function doCreatureFitFilters(creature) -- Check if creature fit current applied
         return false
     end
 
+    if creature:getHealthPercent() <= 0 then
+        return false
+    end    
+    
     local pos = creature:getPosition()
-    if not pos or not creature:canBeSeen() then
+    if not pos then
         return false
     end
 
