@@ -39,6 +39,7 @@ public:
 
     bool canUnload() { return m_loaded && m_reloadable && !isDependent(); }
     bool canReload() { return m_reloadable && !isDependent(); }
+    bool isEnabled() { return m_enabled; }
     bool isLoaded() { return m_loaded; }
     bool isReloadable() { return m_reloadable; }
     bool isDependent() const;
@@ -62,6 +63,7 @@ protected:
     friend class ModuleManager;
 
 private:
+    bool m_enabled{ true };
     bool m_loaded{ false };
     bool m_autoLoad{ false };
     bool m_reloadable{ false };

@@ -31,7 +31,7 @@ Module::Module(const std::string_view name) : m_sandboxEnv(g_lua.newSandboxEnv()
 
 bool Module::load()
 {
-    if (m_loaded)
+    if (m_loaded || !m_enabled)
         return true;
 
     try {
@@ -190,6 +190,7 @@ void Module::discover(const OTMLNodePtr& moduleNode)
     m_author = moduleNode->valueAt("author", none);
     m_website = moduleNode->valueAt("website", none);
     m_version = moduleNode->valueAt("version", none);
+    m_enabled = moduleNode->valueAt<bool>("enabled", true);
     m_autoLoad = moduleNode->valueAt<bool>("autoload", false);
     m_reloadable = moduleNode->valueAt<bool>("reloadable", true);
     m_sandboxed = moduleNode->valueAt<bool>("sandboxed", false);
