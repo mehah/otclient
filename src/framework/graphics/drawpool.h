@@ -31,6 +31,8 @@
 
 #include "../stdext/storage.h"
 
+#define MAX_DRAW_DEPTH 15
+
 enum class DrawPoolType : uint8_t
 {
     MAP,
@@ -160,7 +162,7 @@ private:
         STATE_BLEND_EQUATION = 1 << 4,
     };
 
-    static constexpr uint8_t ARR_MAX_Z = MAX_Z + 1;
+    static constexpr uint8_t ARR_MAX_Z = MAX_DRAW_DEPTH + 1;
     static DrawPool* create(const DrawPoolType type);
 
     void add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod& method,

@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include <client/position.h>
 #include "shaderprogram.h"
 
 class PainterShaderProgram : public ShaderProgram
@@ -54,9 +53,6 @@ public:
 
     bool link() override;
 
-    void setPosition(const Position& position) { m_startPos = position; };
-    Position getPosition() const { return m_startPos; };
-
     void setTransformMatrix(const Matrix3& transformMatrix);
     void setProjectionMatrix(const Matrix3& projectionMatrix);
     void setTextureMatrix(const Matrix3& textureMatrix);
@@ -82,6 +78,4 @@ private:
     Size m_resolution;
 
     std::vector<TexturePtr> m_multiTextures;
-
-    Position m_startPos;
 };

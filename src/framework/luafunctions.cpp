@@ -739,6 +739,11 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UITextEdit>("isShiftNavigation", &UITextEdit::isShiftNavigation);
     g_lua.bindClassMemberFunction<UITextEdit>("isMultiline", &UITextEdit::isMultiline);
 
+    // Shader
+    g_lua.registerClass<ShaderProgram>();
+    g_lua.registerClass<PainterShaderProgram>();
+    g_lua.bindClassMemberFunction<PainterShaderProgram>("addMultiTexture", &PainterShaderProgram::addMultiTexture);
+
     // ParticleEffect
     g_lua.registerClass<ParticleEffectType>();
     g_lua.bindClassStaticFunction<ParticleEffectType>("create", [] { return std::make_shared<ParticleEffectType>(); });
