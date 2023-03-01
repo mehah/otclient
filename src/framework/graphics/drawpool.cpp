@@ -31,7 +31,7 @@ FPS60 = 1000 / 60;
 DrawPool* DrawPool::create(const DrawPoolType type)
 {
     DrawPool* pool;
-    if (type == DrawPoolType::MAP || type == DrawPoolType::LIGHT || type == DrawPoolType::FOREGROUND) {
+    if (type == DrawPoolType::MAP || type == DrawPoolType::FOREGROUND) {
         pool = new DrawPoolFramed;
 
         const auto& frameBuffer = pool->toPoolFramed()->m_framebuffer;

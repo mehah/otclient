@@ -133,6 +133,8 @@ void MapView::drawFloor()
         if (m_drawHealthBars) { flags |= Otc::DrawBars; }
         if (m_drawManaBar) { flags |= Otc::DrawManaBar; }
 
+        size_t lightFloorStart = m_lightView ? m_lightView->size() : 0;
+
         for (int_fast8_t z = m_floorMax; z >= m_floorMin; --z) {
             const float fadeLevel = getFadeLevel(z);
             if (fadeLevel == 0.f) break;
@@ -149,7 +151,7 @@ void MapView::drawFloor()
                     if (alwaysTransparent && tile->getPosition().isInRange(_camera, TRANSPARENT_FLOOR_VIEW_RANGE, TRANSPARENT_FLOOR_VIEW_RANGE, true))
                         continue;
 
-                    lightView->addShade(transformPositionTo2D(tile->getPosition(), cameraPosition), fadeLevel);
+                    m_lightView->setFieldBrightness(transformPositionTo2D(tile->getPosition(), cameraPosition), lightFloorStart, 0);
                 }
             }
 
@@ -340,7 +342,7 @@ void MapView::updateVisibleTiles()
                         tile->onAddInMapView();
                     }
 
-                    if (isDrawingLights() && tile->canShade(static_self_cast<MapView>()))
+                    if (isDrawingLights() && (tile->isFullyOpaque() || tile->isFullGround()))
                         floor.shades.emplace_back(tile);
 
                     if (addTile || !floor.shades.empty()) {
@@ -399,9 +401,9 @@ void MapView::updateGeometry(const Size& visibleDimension)
     m_virtualCenterOffset = (drawDimension / 2 - Size(1)).toPoint();
     m_rectDimension = { 0, 0, bufferSize };
 
+    if (m_lightView) m_lightView->resize(m_drawDimension, tileSize);
     g_mainDispatcher.addEvent([=, this]() {
         m_pool->resize(bufferSize);
-        if (m_lightView) m_lightView->resize(drawDimension, tileSize);
     });
 
     const uint8_t left = std::min<uint8_t>(g_map.getAwareRange().left, (m_drawDimension.width() / 2) - 1);
@@ -546,8 +548,6 @@ void MapView::setAntiAliasingMode(const AntialiasingMode mode)
 
     g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP)
         ->setSmooth(mode != ANTIALIASING_DISABLED);
-
-    if (m_lightView) m_lightView->setSmooth(mode != ANTIALIASING_DISABLED);
 
     updateGeometry(m_visibleDimension);
 }

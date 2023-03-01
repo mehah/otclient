@@ -36,7 +36,7 @@ public:
     void draw(const Rect& dest, const Rect& src);
 
     void addLightSource(const Point& pos, const Light& light);
-    void addShade(const Point& pos, const float opacity) { m_sources.emplace_back(pos, opacity); }
+    void setFieldBrightness(const Point& pos, size_t start, uint8_t color);
 
     void setGlobalLight(const Light& light)
     {
@@ -45,29 +45,36 @@ public:
         m_pool->repaint();
     }
 
-    void setSmooth(bool enabled) const;
-
     const Light& getGlobalLight() const { return m_globalLight; }
     bool isDark() const { return m_globalLight.intensity < 250; }
 
-private:
-    struct Source
-    {
-        Source(const Point& p, float o) : pos(p), opacity(o) {};
-        Source(const Point& p, uint8_t c, uint16_t i, float o) : pos(p), color(c), intensity(i), opacity(o) {};
+    size_t size() { return m_lights.size(); }
 
+private:
+    struct TileLight : public Light
+    {
         Point pos;
-        uint8_t color{ 0 };
-        uint16_t intensity{ 0 };
-        float opacity{ 1.f };
+        TileLight(const Point& pos, uint8_t intensity, uint8_t color) : Light(intensity, color), pos(pos) {}
     };
 
-    uint8_t m_tileSize{ SPRITE_SIZE };
+    struct TileShade
+    {
+        size_t start;
+        uint8_t color;
+    };
+
+    void updateCoords(const Rect& dest, const Rect& src);
 
     Light m_globalLight;
     Color m_globalLightColor{ Color::white };
 
-    DrawPoolFramed* m_pool{ nullptr };
+    DrawPool* m_pool{ nullptr };
 
-    std::vector<Source> m_sources;
+    TexturePtr m_lightTexture;
+    Size m_mapSize;
+    std::vector<TileLight> m_lights;
+    std::vector<TileShade> m_tiles;
+
+    Rect m_dest, m_src;
+    CoordsBuffer m_coords;
 };

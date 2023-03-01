@@ -66,6 +66,21 @@ public:
         addVertex(right, bottom);
     }
 
+    void addRect(const RectF& rect)
+    {
+        float top = rect.top();
+        float right = rect.right() + 1.f;
+        float bottom = rect.bottom() + 1.f;
+        float left = rect.left();
+
+        addVertex(left, top);
+        addVertex(right, top);
+        addVertex(left, bottom);
+        addVertex(left, bottom);
+        addVertex(right, top);
+        addVertex(right, bottom);
+    }
+
     void addQuad(const Rect& rect)
     {
         const float top = rect.top();
