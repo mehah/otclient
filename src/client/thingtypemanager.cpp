@@ -61,9 +61,9 @@ void ThingTypeManager::init()
 
     // Garbage Collection
     {
-        constexpr uint16_t
+        static constexpr uint16_t
             WAITING_TIME = 2 * 1000, // waiting time for next check, default 2 seconds.
-            TICKET_ELAPSED = 60 * 1000, // Maximum time it can be idle, default 60 seconds.
+            IDLE_TIME = 60 * 1000, // Maximum time it can be idle, default 60 seconds.
             AMOUNT_PER_CHECK = 500; // maximum number of objects to be checked.
 
         m_gc.event = g_dispatcher.cycleEvent([&] {
@@ -75,7 +75,7 @@ void ThingTypeManager::init()
             const size_t limit = std::min<size_t>(m_gc.index + AMOUNT_PER_CHECK, category.size());
             while (m_gc.index < limit) {
                 auto& thing = category[m_gc.index];
-                if (thing->hasTexture() && thing->getLastTimeUsage().ticksElapsed() > TICKET_ELAPSED) {
+                if (thing->hasTexture() && thing->getLastTimeUsage().ticksElapsed() > IDLE_TIME) {
                     thing->unload();
                 }
                 ++m_gc.index;
