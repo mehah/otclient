@@ -368,6 +368,14 @@ public:
     bool isMissile() const { return m_category == ThingCategoryMissile; }
     bool isCreature() const { return m_category == ThingCategoryCreature; }
 
+    bool hasTexture() const { return !m_textureData.empty() && m_textureData[0].source != nullptr; }
+    const Timer getLastTimeUsage() const { return m_lastTimeUsage; }
+
+    void unload() {
+        m_textureData.clear();
+        m_textureData.resize(m_animationPhases);
+    }
+
     PLAYER_ACTION getDefaultAction() { return m_defaultAction; }
 
     uint16_t getClassification() { return m_upgradeClassification; }
@@ -446,4 +454,6 @@ private:
     std::vector<TextureData> m_textureData;
 
     std::atomic_bool m_loading;
+
+    Timer m_lastTimeUsage;
 };

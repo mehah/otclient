@@ -31,6 +31,7 @@
 #include <framework/xml/tinyxml.h>
 #endif
 
+#include <framework/core/eventdispatcher.h>
 #include <framework/core/binarytree.h>
 #include <framework/core/filestream.h>
 #include <framework/core/resourcemanager.h>
@@ -57,6 +58,35 @@ void ThingTypeManager::init()
     m_nullItemType = std::make_shared<ItemType>();
     m_itemTypes.resize(1, m_nullItemType);
 #endif
+
+    // Garbage Collection
+    {
+        constexpr uint16_t
+            WAITING_TIME = 2 * 1000, // waiting time for next check, default 2 seconds.
+            TICKET_ELAPSED = 60 * 1000, // Maximum time it can be idle, default 60 seconds.
+            AMOUNT_PER_CHECK = 500; // maximum number of objects to be checked.
+
+        m_gc.event = g_dispatcher.cycleEvent([&] {
+            if (m_gc.category == ThingLastCategory)
+                m_gc.category = ThingCategoryItem;
+
+            const auto& category = m_thingTypes[m_gc.category];
+
+            const size_t limit = std::min<size_t>(m_gc.index + AMOUNT_PER_CHECK, category.size());
+            while (m_gc.index < limit) {
+                auto& thing = category[m_gc.index];
+                if (thing->hasTexture() && thing->getLastTimeUsage().ticksElapsed() > TICKET_ELAPSED) {
+                    thing->unload();
+                }
+                ++m_gc.index;
+            }
+
+            if (limit == category.size()) {
+                m_gc.index = 0;
+                ++m_gc.category;
+            }
+        }, WAITING_TIME);
+    }
 }
 
 void ThingTypeManager::terminate()
@@ -65,6 +95,11 @@ void ThingTypeManager::terminate()
         m_thingType.clear();
 
     m_nullThingType = nullptr;
+
+    if (m_gc.event) {
+        m_gc.event->cancel();
+        m_gc.event = nullptr;
+    }
 
 #ifdef FRAMEWORK_EDITOR
     m_itemTypes.clear();

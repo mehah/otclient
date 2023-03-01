@@ -77,6 +77,13 @@ public:
     bool isValidDatId(uint16_t id, ThingCategory category) const { return id >= 1 && id < m_thingTypes[category].size(); }
 
 private:
+    struct GarbageCollection
+    {
+        uint8_t category{ ThingLastCategory };
+        size_t index;
+        ScheduledEventPtr event;
+    };
+
     ThingTypeList m_thingTypes[ThingLastCategory];
 
     ThingTypePtr m_nullThingType;
@@ -85,6 +92,8 @@ private:
 
     uint32_t m_datSignature{ 0 };
     uint16_t m_contentRevision{ 0 };
+
+    GarbageCollection m_gc;
 
 #ifdef FRAMEWORK_EDITOR
     ItemTypePtr m_nullItemType;

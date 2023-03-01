@@ -639,6 +639,8 @@ TexturePtr ThingType::getTexture(int animationPhase)
 {
     if (m_null) return m_textureNull;
 
+    m_lastTimeUsage.restart();
+
     auto& textureData = m_textureData[animationPhase];
 
     auto& animationPhaseTexture = textureData.source;
