@@ -54,4 +54,5 @@ protected:
     bool m_virtual{ false };
     bool m_showId{ false };
     bool m_itemVisible{ true };
+    bool m_alwaysShowCount{ false };
 };

@@ -46,7 +46,7 @@ void UIItem::drawSelf(DrawPoolType drawPane)
         m_item->draw(Point(exactSize - SPRITE_SIZE) + m_item->getDisplacement(), Otc::DrawThings, m_color);
         g_drawPool.releaseFrameBuffer(getPaddingRect());
 
-        if (m_font && (m_item->isStackable() || m_item->isChargeable()) && m_item->getCountOrSubType() > 1) {
+        if (m_font && (m_alwaysShowCount || m_item->isStackable() || m_item->isChargeable()) && m_item->getCountOrSubType() > 1) {
             static const Color STACK_COLOR(231, 231, 231);
 
             const auto& count = std::to_string(m_item->getCountOrSubType());
@@ -92,5 +92,7 @@ void UIItem::onStyleApply(const std::string_view styleName, const OTMLNodePtr& s
             setVirtual(node->value<bool>());
         else if (node->tag() == "show-id")
             m_showId = node->value<bool>();
+        else if (node->tag() == "always-show-count")
+            m_alwaysShowCount = node->value<bool>();
     }
 }
