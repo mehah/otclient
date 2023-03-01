@@ -51,7 +51,7 @@ public:
     void setLimitVisibleDimension(bool enable) { m_mapView->setLimitVisibleDimension(enable); updateVisibleDimension(); }
     void setDrawManaBar(bool enable) { m_mapView->setDrawManaBar(enable); }
     void setKeepAspectRatio(bool enable);
-    void setMapShader(const std::string_view name, float fadein, float fadeout) { m_mapView->setShader(name, fadein, fadeout); }
+    void setShader(const std::string_view name, float fadein, float fadeout) { m_mapView->setShader(name, fadein, fadeout); }
     void setMinimumAmbientLight(float intensity) { m_mapView->setMinimumAmbientLight(intensity); }
     void setLimitVisibleRange(bool limitVisibleRange) { m_limitVisibleRange = limitVisibleRange; updateVisibleDimension(); }
     void setDrawViewportEdge(bool force) { m_mapView->m_forceDrawViewportEdge = force; m_mapView->m_visibleDimension = {}; updateVisibleDimension(); }
@@ -66,6 +66,7 @@ public:
     bool isDrawingManaBar() { return m_mapView->isDrawingManaBar(); }
     bool isKeepAspectRatioEnabled() { return m_keepAspectRatio; }
     bool isLimitVisibleRangeEnabled() { return m_limitVisibleRange; }
+    bool isSwitchingShader() { return m_mapView->isSwitchingShader(); }
 
     void setShadowFloorIntensity(float intensity) { m_mapView->setShadowFloorIntensity(intensity); }
 
@@ -73,7 +74,8 @@ public:
     std::vector<CreaturePtr> getSightSpectators(bool multiFloor = false) { return m_mapView->getSightSpectators(multiFloor); }
     bool isInRange(const Position& pos) { return m_mapView->isInRange(pos); }
 
-    PainterShaderProgramPtr getMapShader() { return m_mapView->getShader(); }
+    PainterShaderProgramPtr getShader() { return m_mapView->getShader(); }
+    PainterShaderProgramPtr getNextShader() { return m_mapView->getNextShader(); }
     MapView::FloorViewMode getFloorViewMode() { return m_mapView->getFloorViewMode(); }
     CreaturePtr getFollowingCreature() { return m_mapView->getFollowingCreature(); }
     Position getCameraPosition() { return m_mapView->getCameraPosition(); }

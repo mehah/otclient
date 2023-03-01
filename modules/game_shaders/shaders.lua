@@ -124,7 +124,7 @@ end
 
 function attachShaders()
     local map = modules.game_interface.getMapPanel()
-    map:setMapShader('Default')
+    map:setShader('Default')
 
     local player = g_game.getLocalPlayer()
     player:setShader('Default')
@@ -146,7 +146,7 @@ function init()
     local mapComboBox = shadersPanel:getChildById('mapComboBox')
     mapComboBox.onOptionChange = function(combobox, option)
         local map = modules.game_interface.getMapPanel()
-        map:setMapShader(option)
+        map:setShader(option)
 
         local data = combobox:getCurrentOption().data
         map:setDrawViewportEdge(data.drawViewportEdge == true)

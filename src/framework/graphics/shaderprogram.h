@@ -28,7 +28,7 @@
 #include "shader.h"
 
  // @bindclass
-class ShaderProgram
+class ShaderProgram : public LuaObject
 {
     enum
     {

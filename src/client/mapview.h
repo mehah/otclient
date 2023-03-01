@@ -174,6 +174,9 @@ public:
 
     void setFloorFading(uint16_t value) { m_floorFading = value; }
 
+    PainterShaderProgramPtr getNextShader() { return m_nextShader; }
+    bool isSwitchingShader() { return !m_shaderSwitchDone; }
+
 protected:
     void onGlobalLightChange(const Light& light);
     void onFloorChange(uint8_t floor, uint8_t previousFloor);
@@ -265,6 +268,7 @@ private:
     Position m_customCameraPosition;
     Position m_lastCameraPosition;
     Position m_mousePosition;
+    Position m_shaderPosition;
 
     std::array<AwareRange, Otc::InvalidDirection + 1> m_viewPortDirection;
     AwareRange m_viewport;

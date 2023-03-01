@@ -68,7 +68,7 @@ MapView::MapView() : m_pool(g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP))
             m_shader->setUniformValue(ShaderManager::MAP_GLOBAL_COORD, globalCoord.x / static_cast<float>(m_rectDimension.height()), globalCoord.y / static_cast<float>(m_rectDimension.height()));
             m_shader->setUniformValue(ShaderManager::MAP_ZOOM, m_pool->getScaleFactor());
 
-            Point last = transformPositionTo2D(m_posInfo.camera, m_shader->getPosition());
+            Point last = transformPositionTo2D(m_posInfo.camera, m_shaderPosition);
             //Reverse vertical axis.
             last.y = -last.y;
 
@@ -762,7 +762,7 @@ void MapView::setShader(const std::string_view name, float fadein, float fadeout
     m_fadeInTime = fadein;
     m_fadeOutTime = fadeout;
 
-    if (shader) shader->setPosition(getCameraPosition());
+    if (shader) m_shaderPosition = getCameraPosition();
 }
 
 void MapView::setDrawLights(bool enable)
