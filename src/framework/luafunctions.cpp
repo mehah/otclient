@@ -147,6 +147,8 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_logger", "warning", &Logger::warning, &g_logger);
     g_lua.bindSingletonFunction("g_logger", "error", &Logger::error, &g_logger);
     g_lua.bindSingletonFunction("g_logger", "fatal", &Logger::fatal, &g_logger);
+    g_lua.bindSingletonFunction("g_logger", "setLevel", &Logger::setLevel, &g_logger);
+    g_lua.bindSingletonFunction("g_logger", "getLevel", &Logger::getLevel, &g_logger);
 
     g_lua.registerSingletonClass("g_http");
     g_lua.bindSingletonFunction("g_http", "setUserAgent", &Http::setUserAgent, &g_http);

@@ -59,6 +59,8 @@ public:
     void fireOldMessages();
     void setLogFile(const std::string_view file);
     void setOnLog(const OnLogCallback& onLog) { m_onLog = onLog; }
+    void setLevel(Fw::LogLevel level) { m_level = level; }
+    Fw::LogLevel getLevel() { return m_level; }
 
 private:
     std::deque<LogMessage> m_logMessages;
