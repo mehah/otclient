@@ -85,7 +85,7 @@ public:
 
     void setScaleFactor(float scale) const { getCurrentPool()->setScaleFactor(scale); }
     inline float getScaleFactor() const { return getCurrentPool()->getScaleFactor(); }
-    inline uint16_t getScaledSpriteSize() const { return SPRITE_SIZE * getScaleFactor(); }
+    inline uint16_t getScaledSpriteSize() const { return m_spriteSize * getScaleFactor(); }
 
     void flush() const { if (getCurrentPool()) getCurrentPool()->flush(); }
 
@@ -95,7 +95,7 @@ private:
     DrawPool* getCurrentPool() const;
 
     void draw();
-    void init();
+    void init(uint16_t spriteSize);
     void terminate() const;
     void drawObject(const DrawPool::DrawObject& obj);
 
@@ -106,6 +106,8 @@ private:
 
     Size m_size;
     Matrix3 m_transformMatrix;
+
+    uint16_t m_spriteSize{ 32 };
 
     friend class GraphicalApplication;
 };
