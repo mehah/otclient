@@ -36,7 +36,7 @@ public:
     void draw(const Rect& dest, const Rect& src);
 
     void addLightSource(const Point& pos, const Light& light);
-    void setFieldBrightness(const Point& pos, size_t start, float brightness);
+    void resetShade(const Point& pos);
 
     void setGlobalLight(const Light& light)
     {
@@ -48,8 +48,6 @@ public:
     const Light& getGlobalLight() const { return m_globalLight; }
     bool isDark() const { return m_globalLight.intensity < 250; }
 
-    size_t size() { return m_lights.size(); }
-
 private:
     struct TileLight : public Light
     {
@@ -57,12 +55,6 @@ private:
         float brightness{ 1.f };
 
         TileLight(const Point& pos, uint8_t intensity, uint8_t color, float brightness) : Light(intensity, color), pos(pos), brightness(brightness) {}
-    };
-
-    struct TileShade
-    {
-        size_t start{ 0 };
-        float brightness{ 0 };
     };
 
     void updateCoords(const Rect& dest, const Rect& src);
@@ -75,12 +67,12 @@ private:
 
     DrawPool* m_pool{ nullptr };
 
-    TexturePtr m_lightTexture;
-    Size m_mapSize;
     std::vector<TileLight> m_lights;
-    std::vector<TileShade> m_tiles;
+    std::vector<uint8_t> m_tiles;
     std::vector<uint8_t> m_pixels;
 
+    Size m_mapSize;
     Rect m_dest, m_src;
     CoordsBuffer m_coords;
+    TexturePtr m_lightTexture;
 };

@@ -55,15 +55,11 @@ void LightView::addLightSource(const Point& pos, const Light& light)
     stdext::hash_combine(m_updatingHash, g_drawPool.getOpacity());
 }
 
-void LightView::setFieldBrightness(const Point& pos, size_t start, float brightness)
+void LightView::resetShade(const Point& pos)
 {
     size_t index = (pos.y / g_drawPool.getScaledSpriteSize()) * m_mapSize.width() + (pos.x / g_drawPool.getScaledSpriteSize());
     if (index >= m_tiles.size()) return;
-
-    auto& tile = m_tiles[index];
-
-    tile.start = start;
-    tile.brightness = brightness;
+    m_tiles[index] = m_lights.size();
 }
 
 void LightView::draw(const Rect& dest, const Rect& src)
@@ -118,14 +114,12 @@ bool LightView::updatePixels() {
 
                 int index = (y * m_mapSize.width() + x);
 
-                const auto& tile = m_tiles[index];
-
                 int colorIndex = index * 4;
-                m_pixels[colorIndex] = m_globalLightColor.r() * tile.brightness;
-                m_pixels[colorIndex + 1] = m_globalLightColor.g() * tile.brightness;
-                m_pixels[colorIndex + 2] = m_globalLightColor.b() * tile.brightness;
+                m_pixels[colorIndex] = m_globalLightColor.r();
+                m_pixels[colorIndex + 1] = m_globalLightColor.g();
+                m_pixels[colorIndex + 2] = m_globalLightColor.b();
                 m_pixels[colorIndex + 3] = 255; // alpha channel
-                for (size_t i = tile.start; i < m_lights.size(); ++i) {
+                for (size_t i = m_tiles[index]; i < m_lights.size(); ++i) {
                     const auto& light = m_lights[i];
                     float distance = std::sqrt((pos.x - light.pos.x) * (pos.x - light.pos.x) +
                                                (pos.y - light.pos.y) * (pos.y - light.pos.y));

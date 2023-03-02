@@ -145,13 +145,11 @@ void MapView::drawFloor()
             const auto& map = m_cachedVisibleTiles[z];
 
             if (m_lightView && (m_fadeType != FadeType::OUT$ || fadeLevel == 1.f)) {
-                const size_t lightFloorStart = m_lightView ? m_lightView->size() : 0;
-
                 for (const auto& tile : map.shades) {
                     if (alwaysTransparent && tile->getPosition().isInRange(_camera, TRANSPARENT_FLOOR_VIEW_RANGE, TRANSPARENT_FLOOR_VIEW_RANGE, true))
                         continue;
 
-                    m_lightView->setFieldBrightness(transformPositionTo2D(tile->getPosition(), cameraPosition), lightFloorStart, fadeLevel);
+                    m_lightView->resetShade(transformPositionTo2D(tile->getPosition(), cameraPosition));
                 }
             }
 
