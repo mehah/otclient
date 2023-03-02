@@ -161,7 +161,7 @@ public:
 
     bool limitsFloorsView(bool isFreeView = false);
 
-    bool canShade(const MapViewPtr& mapView);
+    bool canShade() { return isFullyOpaque() || hasTopGround() || isFullGround(); }
     bool canRender(uint32_t& flags, const Position& cameraPosition, AwareRange viewPort);
     bool canErase()
     {

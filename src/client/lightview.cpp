@@ -31,7 +31,9 @@ LightView::LightView() : m_pool(g_drawPool.get<DrawPool>(DrawPoolType::LIGHT)) {
 void LightView::resize(const Size& size, const uint8_t tileSize) {
     m_lightTexture = nullptr;
     m_mapSize = size;
-    m_tiles.resize(size.area(), TileShade{ 0, 0 });
+    m_tiles.resize(size.area(), {});
+    if (m_pixels.size() < 4u * m_mapSize.area())
+        m_pixels.resize(m_mapSize.area() * 4);
 }
 
 void LightView::addLightSource(const Point& pos, const Light& light)
@@ -45,72 +47,50 @@ void LightView::addLightSource(const Point& pos, const Light& light)
             return;
         }
     }
-    m_lights.emplace_back(pos, light.intensity, light.color);
+    m_lights.emplace_back(pos, light.intensity, light.color, g_drawPool.getOpacity());
+
+    stdext::hash_union(m_updatingHash, pos.hash());
+    stdext::hash_combine(m_updatingHash, light.intensity);
+    stdext::hash_combine(m_updatingHash, light.color);
+    stdext::hash_combine(m_updatingHash, g_drawPool.getOpacity());
 }
 
-void LightView::setFieldBrightness(const Point& pos, size_t start, uint8_t color)
+void LightView::setFieldBrightness(const Point& pos, size_t start, float brightness)
 {
     size_t index = (pos.y / g_drawPool.getScaledSpriteSize()) * m_mapSize.width() + (pos.x / g_drawPool.getScaledSpriteSize());
     if (index >= m_tiles.size()) return;
-    m_tiles[index].start = start;
-    m_tiles[index].color = color;
+
+    auto& tile = m_tiles[index];
+
+    tile.start = start;
+    tile.brightness = brightness;
 }
 
 void LightView::draw(const Rect& dest, const Rect& src)
 {
-    static std::vector<uint8_t> buffer;
-
     // draw light, only if there is darkness
     m_pool->setEnable(isDark());
     if (!isDark() || !m_pool->isValid()) return;
 
-    if (buffer.size() < 4u * m_mapSize.area())
-        buffer.resize(m_mapSize.area() * 4);
-
     updateCoords(dest, src);
     g_drawPool.use(m_pool->getType());
 
-    for (int x = 0; x < m_mapSize.width(); ++x) {
-        for (int y = 0; y < m_mapSize.height(); ++y) {
-            const Point pos(x * g_drawPool.getScaledSpriteSize() + g_drawPool.getScaledSpriteSize() / 2, y * g_drawPool.getScaledSpriteSize() + g_drawPool.getScaledSpriteSize() / 2);
-
-            int index = (y * m_mapSize.width() + x);
-            int colorIndex = index * 4;
-            buffer[colorIndex] = m_globalLightColor.r();
-            buffer[colorIndex + 1] = m_globalLightColor.g();
-            buffer[colorIndex + 2] = m_globalLightColor.b();
-            buffer[colorIndex + 3] = 255; // alpha channel
-            for (size_t i = m_tiles[index].start; i < m_lights.size(); ++i) {
-                const auto& light = m_lights[i];
-                float distance = std::sqrt((pos.x - light.pos.x) * (pos.x - light.pos.x) +
-                                           (pos.y - light.pos.y) * (pos.y - light.pos.y));
-                distance /= g_drawPool.getScaledSpriteSize();
-                float intensity = (-distance + light.intensity) * 0.2f;
-                if (intensity < 0.01f) continue;
-                if (intensity > 1.0f) intensity = 1.0f;
-                Color lightColor = Color::from8bit(light.color) * intensity;
-                buffer[colorIndex] = std::max<int>(buffer[colorIndex], lightColor.r());
-                buffer[colorIndex + 1] = std::max<int>(buffer[colorIndex + 1], lightColor.g());
-                buffer[colorIndex + 2] = std::max<int>(buffer[colorIndex + 2], lightColor.b());
-            }
-        }
-    }
-
-    m_lights.clear();
-
-    g_drawPool.addAction([&] {
+    g_drawPool.addAction([&, updatePixel = updatePixels()] {
         if (!m_lightTexture) {
             m_lightTexture = std::make_shared<Texture>(m_mapSize);
             m_lightTexture->setSmooth(true);
         }
 
-        m_lightTexture->updatePixels(buffer.data());
+        if (updatePixel)
+            m_lightTexture->updatePixels(m_pixels.data());
 
         g_painter->resetColor();
         g_painter->setCompositionMode(CompositionMode::MULTIPLY);
         g_painter->setTexture(m_lightTexture.get());
         g_painter->drawCoords(m_coords);
     });
+
+    m_lights.clear();
 }
 
 void LightView::updateCoords(const Rect& dest, const Rect& src) {
@@ -126,4 +106,43 @@ void LightView::updateCoords(const Rect& dest, const Rect& src) {
                        RectF((float)offset.x / g_drawPool.getScaledSpriteSize(), (float)offset.y / g_drawPool.getScaledSpriteSize(),
                          (float)size.width() / g_drawPool.getScaledSpriteSize(), (float)size.height() / g_drawPool.getScaledSpriteSize()));
     }
+}
+
+bool LightView::updatePixels() {
+    bool updatePixel = m_updatingHash != m_hash;
+    if (updatePixel) {
+        for (int x = 0; x < m_mapSize.width(); ++x) {
+            for (int y = 0; y < m_mapSize.height(); ++y) {
+                const Point pos(x * g_drawPool.getScaledSpriteSize() + g_drawPool.getScaledSpriteSize() / 2, y * g_drawPool.getScaledSpriteSize() + g_drawPool.getScaledSpriteSize() / 2);
+
+                int index = (y * m_mapSize.width() + x);
+
+                const auto& tile = m_tiles[index];
+
+                int colorIndex = index * 4;
+                m_pixels[colorIndex] = m_globalLightColor.r() * tile.brightness;
+                m_pixels[colorIndex + 1] = m_globalLightColor.g() * tile.brightness;
+                m_pixels[colorIndex + 2] = m_globalLightColor.b() * tile.brightness;
+                m_pixels[colorIndex + 3] = 255; // alpha channel
+                for (size_t i = tile.start; i < m_lights.size(); ++i) {
+                    const auto& light = m_lights[i];
+                    float distance = std::sqrt((pos.x - light.pos.x) * (pos.x - light.pos.x) +
+                                               (pos.y - light.pos.y) * (pos.y - light.pos.y));
+                    distance /= g_drawPool.getScaledSpriteSize();
+                    float intensity = (-distance + (light.intensity * light.brightness)) * 0.2f;
+                    if (intensity < 0.01f) continue;
+                    if (intensity > 1.0f) intensity = 1.0f;
+                    Color lightColor = Color::from8bit(light.color) * intensity;
+                    m_pixels[colorIndex] = std::max<int>(m_pixels[colorIndex], lightColor.r());
+                    m_pixels[colorIndex + 1] = std::max<int>(m_pixels[colorIndex + 1], lightColor.g());
+                    m_pixels[colorIndex + 2] = std::max<int>(m_pixels[colorIndex + 2], lightColor.b());
+                }
+            }
+        }
+
+        m_hash = m_updatingHash;
+        m_updatingHash = 0;
+    }
+
+    return updatePixel;
 }

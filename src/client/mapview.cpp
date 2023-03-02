@@ -133,8 +133,6 @@ void MapView::drawFloor()
         if (m_drawHealthBars) { flags |= Otc::DrawBars; }
         if (m_drawManaBar) { flags |= Otc::DrawManaBar; }
 
-        size_t lightFloorStart = m_lightView ? m_lightView->size() : 0;
-
         for (int_fast8_t z = m_floorMax; z >= m_floorMin; --z) {
             const float fadeLevel = getFadeLevel(z);
             if (fadeLevel == 0.f) break;
@@ -146,12 +144,14 @@ void MapView::drawFloor()
 
             const auto& map = m_cachedVisibleTiles[z];
 
-            if (isDrawingLights() && z < m_floorMax) {
+            if (m_lightView && (m_fadeType != FadeType::OUT$ || fadeLevel == 1.f)) {
+                const size_t lightFloorStart = m_lightView ? m_lightView->size() : 0;
+
                 for (const auto& tile : map.shades) {
                     if (alwaysTransparent && tile->getPosition().isInRange(_camera, TRANSPARENT_FLOOR_VIEW_RANGE, TRANSPARENT_FLOOR_VIEW_RANGE, true))
                         continue;
 
-                    m_lightView->setFieldBrightness(transformPositionTo2D(tile->getPosition(), cameraPosition), lightFloorStart, 0);
+                    m_lightView->setFieldBrightness(transformPositionTo2D(tile->getPosition(), cameraPosition), lightFloorStart, fadeLevel);
                 }
             }
 
@@ -285,15 +285,18 @@ void MapView::updateVisibleTiles()
 
     // Fading System by Kondra https://github.com/OTCv8/otclientv8
     if (!m_lastCameraPosition.isValid() || m_lastCameraPosition.z != m_posInfo.camera.z || m_lastCameraPosition.distance(m_posInfo.camera) >= 3) {
+        m_fadeType = FadeType::NONE$;
         for (int iz = m_cachedLastVisibleFloor; iz >= cachedFirstVisibleFloor; --iz) {
             m_fadingFloorTimers[iz].restart(m_floorFading * 1000);
         }
     } else if (prevFirstVisibleFloor < m_cachedFirstVisibleFloor) { // hiding new floor
+        m_fadeType = FadeType::OUT$;
         for (int iz = prevFirstVisibleFloor; iz < m_cachedFirstVisibleFloor; ++iz) {
             const int shift = std::max<int>(0, m_floorFading - m_fadingFloorTimers[iz].elapsed_millis());
             m_fadingFloorTimers[iz].restart(shift * 1000);
         }
     } else if (prevFirstVisibleFloor > m_cachedFirstVisibleFloor) { // showing floor
+        m_fadeType = FadeType::IN$;
         m_lastFadeLevel = 0.f;
         for (int iz = m_cachedFirstVisibleFloor; iz < prevFirstVisibleFloor; ++iz) {
             const int shift = std::max<int>(0, m_floorFading - m_fadingFloorTimers[iz].elapsed_millis());
@@ -321,7 +324,7 @@ void MapView::updateVisibleTiles()
                 Position tilePos = m_posInfo.camera.translated(ix - m_virtualCenterOffset.x, iy - m_virtualCenterOffset.y);
                 // adjust tilePos to the wanted floor
                 tilePos.coveredUp(m_posInfo.camera.z - iz);
-                if (const TilePtr& tile = g_map.getTile(tilePos)) {
+                if (const auto& tile = g_map.getTile(tilePos)) {
                     // skip tiles that have nothing
                     if (!tile->isDrawable())
                         continue;
@@ -342,7 +345,7 @@ void MapView::updateVisibleTiles()
                         tile->onAddInMapView();
                     }
 
-                    if (isDrawingLights() && (tile->isFullyOpaque() || tile->isFullGround()))
+                    if (isDrawingLights() && tile->canShade())
                         floor.shades.emplace_back(tile);
 
                     if (addTile || !floor.shades.empty()) {

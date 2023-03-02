@@ -191,6 +191,11 @@ protected:
     friend class LightView;
 
 private:
+    enum class FadeType
+    {
+        NONE$, IN$, OUT$
+    };
+
     struct MapObject
     {
         std::vector<TilePtr> shades;
@@ -288,6 +293,8 @@ private:
     bool m_forceDrawViewportEdge{ false };
     bool m_drawHighlightTarget{ false };
     bool m_shiftPressed{ false };
+
+    FadeType m_fadeType{ FadeType::NONE$ };
 
     AntialiasingMode m_antiAliasingMode{ AntialiasingMode::ANTIALIASING_DISABLED };
 
