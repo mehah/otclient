@@ -623,7 +623,7 @@ bool Tile::limitsFloorsView(bool isFreeView)
 {
     // ground and walls limits the view
     const auto& firstThing = getThing(0);
-    return firstThing && (firstThing->isGround() || (isFreeView ? firstThing->isOnBottom() : firstThing->isOnBottom() && firstThing->blockProjectile()));
+    return firstThing && !firstThing->isDontHide() && (firstThing->isGround() || (isFreeView ? firstThing->isOnBottom() : firstThing->isOnBottom() && firstThing->blockProjectile()));
 }
 
 bool Tile::checkForDetachableThing()
