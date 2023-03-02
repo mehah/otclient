@@ -52,7 +52,9 @@ void LightView::addLightSource(const Point& pos, const Light& light)
     stdext::hash_union(m_updatingHash, pos.hash());
     stdext::hash_combine(m_updatingHash, light.intensity);
     stdext::hash_combine(m_updatingHash, light.color);
-    stdext::hash_combine(m_updatingHash, g_drawPool.getOpacity());
+
+    if (g_drawPool.getOpacity() < 1.f)
+        stdext::hash_combine(m_updatingHash, g_drawPool.getOpacity());
 }
 
 void LightView::resetShade(const Point& pos)
