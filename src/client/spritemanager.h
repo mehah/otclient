@@ -46,9 +46,6 @@ public:
     ImagePtr getSpriteImage(int id);
     bool isLoaded() { return m_loaded; }
 
-    const TexturePtr& getLightTexture() const { return m_lightTexture; }
-    const TexturePtr& getShadeTexture() const { return m_shadeTexture; }
-
 private:
     ImagePtr getSpriteImage(int id, const FileStreamPtr& file);
 
@@ -57,13 +54,7 @@ private:
         SPRITE_DATA_SIZE = SPRITE_SIZE * SPRITE_SIZE * 4
     };
 
-    void generateLightTexture(),
-        generateShadeTexture();
-
     std::string m_lastFileName;
-
-    TexturePtr m_lightTexture;
-    TexturePtr m_shadeTexture;
 
     bool m_loaded{ false };
     uint32_t m_signature{ 0 };

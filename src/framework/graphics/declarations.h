@@ -47,7 +47,6 @@ class ParticleEffect;
 class ParticleEffectType;
 class SpriteSheet;
 class DrawPool;
-class DrawPoolFramed;
 class DrawPoolManager;
 class CoordsBuffer;
 

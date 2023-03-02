@@ -30,7 +30,7 @@
 class LightView : public LuaObject
 {
 public:
-    LightView();
+    LightView(const Size& size, const uint16_t tileSize);
 
     void resize(const Size& size, uint16_t tileSize);
     void draw(const Rect& dest, const Rect& src);
@@ -70,7 +70,7 @@ private:
     Color m_globalLightColor{ Color::white };
 
     CoordsBuffer m_coords;
-    TexturePtr m_lightTexture;
+    TexturePtr m_texture;
 
     std::vector<size_t> m_tiles;
     std::vector<uint8_t> m_pixels;
