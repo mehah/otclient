@@ -37,7 +37,7 @@ void LightView::resize(const Size& size, const uint16_t tileSize) {
     if (m_pixels.size() < 4u * m_mapSize.area())
         m_pixels.resize(m_mapSize.area() * 4);
 
-    g_mainDispatcher.addEvent([&] { m_texture = nullptr; })
+    g_mainDispatcher.addEvent([&] { m_texture = nullptr; });
 }
 
 void LightView::addLightSource(const Point& pos, const Light& light, float brightness)
