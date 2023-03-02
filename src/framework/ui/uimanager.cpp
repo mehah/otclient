@@ -499,12 +499,20 @@ UIWidgetPtr UIManager::loadUI(const std::string& file, const UIWidgetPtr& parent
             const auto& deviceWidgetNode = loadDeviceUI(file, device.type);
             if (deviceWidgetNode)
                 widgetNode = deviceWidgetNode;
-        } catch (stdext::exception&) {}
+        } catch (stdext::exception& e) {
+#ifndef NDEBUG
+            g_logger.fine(stdext::format("no os ui found for '%s', reason: '%s'", file, e.what()));
+#endif
+        }
         try {
             auto osWidgetNode = loadDeviceUI(file, device.os);
             if (osWidgetNode)
                 widgetNode = osWidgetNode;
-        } catch (stdext::exception&) {}
+        } catch (stdext::exception& e) {
+#ifndef NDEBUG
+            g_logger.fine(stdext::format("no os ui found for '%s', reason: '%s'", file, e.what()));
+#endif
+        }
 
         if (!widgetNode) {
             g_logger.debug(stdext::format("failed to load a widget from '%s'", file));
