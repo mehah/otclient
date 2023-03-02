@@ -80,10 +80,10 @@ void FrameBuffer::bind()
 
     if (m_isScene) {
         g_painter->resetState();
-    } else {
-        m_oldSize = g_painter->getResolution();
-        m_oldTextureMatrix = g_painter->getProjectionMatrix();
     }
+
+    m_oldSize = std::move(g_painter->getResolution());
+    m_oldTextureMatrix = std::move(g_painter->getProjectionMatrix());
 
     g_painter->setResolution(getSize(), m_textureMatrix);
     g_painter->setAlphaWriting(m_useAlphaWriting);
@@ -100,9 +100,7 @@ void FrameBuffer::bind()
 void FrameBuffer::release() const
 {
     internalRelease();
-    if (!m_isScene) {
-        g_painter->setResolution(m_oldSize, m_oldTextureMatrix);
-    }
+    g_painter->setResolution(m_oldSize, m_oldTextureMatrix);
 }
 
 void FrameBuffer::draw()

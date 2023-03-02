@@ -42,7 +42,7 @@
 
 #include <framework/platform/platformwindow.h>
 
-MapView::MapView() : m_pool(g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP))
+MapView::MapView() : m_pool(g_drawPool.get(DrawPoolType::MAP))
 {
     m_pool->onBeforeDraw([this] {
         float fadeOpacity = 1.f;
@@ -144,12 +144,12 @@ void MapView::drawFloor()
 
             const auto& map = m_cachedVisibleTiles[z];
 
-            if (isDrawingLights() && z < m_floorMax) {
+            if (m_lightView && (m_fadeType != FadeType::OUT$ || fadeLevel == 1.f)) {
                 for (const auto& tile : map.shades) {
                     if (alwaysTransparent && tile->getPosition().isInRange(_camera, TRANSPARENT_FLOOR_VIEW_RANGE, TRANSPARENT_FLOOR_VIEW_RANGE, true))
                         continue;
 
-                    lightView->addShade(transformPositionTo2D(tile->getPosition(), cameraPosition), fadeLevel);
+                    m_lightView->resetShade(transformPositionTo2D(tile->getPosition(), cameraPosition));
                 }
             }
 
@@ -283,15 +283,18 @@ void MapView::updateVisibleTiles()
 
     // Fading System by Kondra https://github.com/OTCv8/otclientv8
     if (!m_lastCameraPosition.isValid() || m_lastCameraPosition.z != m_posInfo.camera.z || m_lastCameraPosition.distance(m_posInfo.camera) >= 3) {
+        m_fadeType = FadeType::NONE$;
         for (int iz = m_cachedLastVisibleFloor; iz >= cachedFirstVisibleFloor; --iz) {
             m_fadingFloorTimers[iz].restart(m_floorFading * 1000);
         }
     } else if (prevFirstVisibleFloor < m_cachedFirstVisibleFloor) { // hiding new floor
+        m_fadeType = FadeType::OUT$;
         for (int iz = prevFirstVisibleFloor; iz < m_cachedFirstVisibleFloor; ++iz) {
             const int shift = std::max<int>(0, m_floorFading - m_fadingFloorTimers[iz].elapsed_millis());
             m_fadingFloorTimers[iz].restart(shift * 1000);
         }
     } else if (prevFirstVisibleFloor > m_cachedFirstVisibleFloor) { // showing floor
+        m_fadeType = FadeType::IN$;
         m_lastFadeLevel = 0.f;
         for (int iz = m_cachedFirstVisibleFloor; iz < prevFirstVisibleFloor; ++iz) {
             const int shift = std::max<int>(0, m_floorFading - m_fadingFloorTimers[iz].elapsed_millis());
@@ -319,7 +322,7 @@ void MapView::updateVisibleTiles()
                 Position tilePos = m_posInfo.camera.translated(ix - m_virtualCenterOffset.x, iy - m_virtualCenterOffset.y);
                 // adjust tilePos to the wanted floor
                 tilePos.coveredUp(m_posInfo.camera.z - iz);
-                if (const TilePtr& tile = g_map.getTile(tilePos)) {
+                if (const auto& tile = g_map.getTile(tilePos)) {
                     // skip tiles that have nothing
                     if (!tile->isDrawable())
                         continue;
@@ -340,7 +343,7 @@ void MapView::updateVisibleTiles()
                         tile->onAddInMapView();
                     }
 
-                    if (isDrawingLights() && tile->canShade(static_self_cast<MapView>()))
+                    if (isDrawingLights() && tile->canShade())
                         floor.shades.emplace_back(tile);
 
                     if (addTile || !floor.shades.empty()) {
@@ -384,7 +387,7 @@ void MapView::updateGeometry(const Size& visibleDimension)
 
     m_pool->setScaleFactor(scaleFactor);
 
-    const uint8_t tileSize = SPRITE_SIZE * m_pool->getScaleFactor();
+    const uint16_t tileSize = SPRITE_SIZE * m_pool->getScaleFactor();
     const auto& drawDimension = visibleDimension + 3;
     const auto& bufferSize = drawDimension * tileSize;
 
@@ -399,9 +402,9 @@ void MapView::updateGeometry(const Size& visibleDimension)
     m_virtualCenterOffset = (drawDimension / 2 - Size(1)).toPoint();
     m_rectDimension = { 0, 0, bufferSize };
 
+    if (m_lightView) m_lightView->resize(m_drawDimension, tileSize);
     g_mainDispatcher.addEvent([=, this]() {
-        m_pool->resize(bufferSize);
-        if (m_lightView) m_lightView->resize(drawDimension, tileSize);
+        m_pool->getFrameBuffer()->resize(bufferSize);
     });
 
     const uint8_t left = std::min<uint8_t>(g_map.getAwareRange().left, (m_drawDimension.width() / 2) - 1);
@@ -544,10 +547,8 @@ void MapView::setAntiAliasingMode(const AntialiasingMode mode)
 {
     m_antiAliasingMode = mode;
 
-    g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP)
+    g_drawPool.get(DrawPoolType::MAP)->getFrameBuffer()
         ->setSmooth(mode != ANTIALIASING_DISABLED);
-
-    if (m_lightView) m_lightView->setSmooth(mode != ANTIALIASING_DISABLED);
 
     updateGeometry(m_visibleDimension);
 }
@@ -767,16 +768,14 @@ void MapView::setShader(const std::string_view name, float fadein, float fadeout
 
 void MapView::setDrawLights(bool enable)
 {
-    if (auto* pool = g_drawPool.get<DrawPoolFramed>(DrawPoolType::LIGHT))
+    if (auto* pool = g_drawPool.get(DrawPoolType::LIGHT))
         pool->setEnable(enable);
 
     if (enable) {
         if (m_lightView)
             return;
 
-        m_lightView = std::make_shared<LightView>();
-        g_mainDispatcher.addEvent([this]
-        () { if (m_lightView) m_lightView->resize(m_drawDimension, m_tileSize); });
+        m_lightView = std::make_shared<LightView>(m_drawDimension, m_tileSize);
 
         requestUpdateVisibleTiles();
     } else m_lightView = nullptr;

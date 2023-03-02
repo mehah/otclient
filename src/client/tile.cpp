@@ -611,19 +611,6 @@ void Tile::onAddInMapView()
     }
 }
 
-bool Tile::canShade(const MapViewPtr& mapView)
-{
-    for (const auto dir : { Otc::North, Otc::NorthWest, Otc::West }) {
-        const auto& pos = m_position.translatedToDirection(dir);
-        const auto& tile = g_map.getTile(pos);
-
-        if ((!tile && mapView->isInRangeEx(pos, true)) || (tile && !tile->isFullyOpaque() && !tile->isFullGround() && !tile->hasTopGround(true)))
-            return false;
-    }
-
-    return isFullyOpaque() || hasTopGround(true) || isFullGround();
-}
-
 bool Tile::hasBlockingCreature() const
 {
     for (const auto& thing : m_things)
@@ -636,7 +623,7 @@ bool Tile::limitsFloorsView(bool isFreeView)
 {
     // ground and walls limits the view
     const auto& firstThing = getThing(0);
-    return firstThing && (firstThing->isGround() || (isFreeView ? firstThing->isOnBottom() : firstThing->isOnBottom() && firstThing->blockProjectile()));
+    return firstThing && !firstThing->isDontHide() && (firstThing->isGround() || (isFreeView ? firstThing->isOnBottom() : firstThing->isOnBottom() && firstThing->blockProjectile()));
 }
 
 bool Tile::checkForDetachableThing()

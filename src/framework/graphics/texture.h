@@ -35,6 +35,7 @@ public:
     Texture* create();
     void uploadPixels(const ImagePtr& image, bool buildMipmaps = false, bool compress = false);
     void updateImage(const ImagePtr& image);
+    void updatePixels(uint8_t* pixels, int level = 0, int channels = 4, bool compress = false);
 
     virtual void buildHardwareMipmaps();
 
@@ -58,6 +59,7 @@ public:
     bool hasRepeat() const { return getProp(Prop::repeat); }
     bool hasMipmaps() const { return getProp(Prop::hasMipMaps); }
     virtual bool isAnimatedTexture() const { return false; }
+    bool setupSize(const Size& size);
 
 protected:
     void bind();
@@ -67,8 +69,6 @@ protected:
     void setupTranformMatrix();
     void setupPixels(int level, const Size& size, uint8_t* pixels, int channels = 4, bool compress = false) const;
     void generateHash() { m_hash = stdext::hash_int(m_id > 0 ? m_id : m_uniqueId); }
-
-    bool setupSize(const Size& size);
 
     const uint32_t m_uniqueId;
 

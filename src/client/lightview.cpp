@@ -21,30 +21,57 @@
  */
 
 #include "lightview.h"
-#include <framework/graphics/drawpoolmanager.h>
 #include "map.h"
 #include "mapview.h"
 #include "spritemanager.h"
 
-LightView::LightView() : m_pool(g_drawPool.get<DrawPoolFramed>(DrawPoolType::LIGHT)) {}
+#include <framework/core/eventdispatcher.h>
+#include <framework/graphics/drawpoolmanager.h>
 
-void LightView::setSmooth(bool enabled) const { m_pool->setSmooth(enabled); }
+LightView::LightView(const Size& size, const uint16_t tileSize) : m_pool(g_drawPool.get(DrawPoolType::LIGHT)) {
+    resize(size, tileSize);
+    g_mainDispatcher.addEvent([&] {
+        m_texture = std::make_shared<Texture>(m_mapSize);
+        m_texture->setSmooth(true);
+    });
+}
 
-void LightView::resize(const Size& size, const uint8_t tileSize) { m_pool->resize(size * (m_tileSize = tileSize)); }
+void LightView::resize(const Size& size, const uint16_t tileSize) {
+    m_mapSize = size;
+    m_tileSize = tileSize;
+    m_tiles.resize(size.area());
+    if (m_pixels.size() < 4u * m_mapSize.area())
+        m_pixels.resize(m_mapSize.area() * 4);
+    if (m_texture)
+        m_texture->setupSize(m_mapSize);
+}
 
-void LightView::addLightSource(const Point& pos, const Light& light)
+void LightView::addLightSource(const Point& pos, const Light& light, float brightness)
 {
     if (!isDark()) return;
 
-    if (!m_sources.empty()) {
-        auto& prevLight = m_sources.back();
+    if (!m_lights.empty()) {
+        auto& prevLight = m_lights.back();
         if (prevLight.pos == pos && prevLight.color == light.color) {
-            prevLight.intensity = std::max<uint16_t>(prevLight.intensity, light.intensity);
+            prevLight.intensity = std::max<uint8_t>(prevLight.intensity, light.intensity);
             return;
         }
     }
+    m_lights.emplace_back(pos, light.intensity, light.color, std::min<float>(brightness, g_drawPool.getOpacity()));
 
-    m_sources.emplace_back(pos, light.color, light.intensity, g_drawPool.getOpacity());
+    stdext::hash_union(m_updatingHash, pos.hash());
+    stdext::hash_combine(m_updatingHash, light.intensity);
+    stdext::hash_combine(m_updatingHash, light.color);
+
+    if (g_drawPool.getOpacity() < 1.f)
+        stdext::hash_combine(m_updatingHash, g_drawPool.getOpacity());
+}
+
+void LightView::resetShade(const Point& pos)
+{
+    size_t index = (pos.y / m_tileSize) * m_mapSize.width() + (pos.x / m_tileSize);
+    if (index >= m_tiles.size()) return;
+    m_tiles[index] = m_lights.size();
 }
 
 void LightView::draw(const Rect& dest, const Rect& src)
@@ -53,27 +80,71 @@ void LightView::draw(const Rect& dest, const Rect& src)
     m_pool->setEnable(isDark());
     if (!isDark() || !m_pool->isValid()) return;
 
-    g_drawPool.use(m_pool->getType(), dest, src, m_globalLightColor);
+    g_drawPool.use(DrawPoolType::LIGHT);
 
-    const float size = m_tileSize * 3.3;
+    updateCoords(dest, src);
+    updatePixels();
 
-    bool _clr = true;
-    for (const auto& light : m_sources) {
-        if (light.color) {
-            const auto& color = Color::from8bit(light.color, std::min<float>(light.opacity, light.intensity / 6.f));
-            const uint16_t radius = light.intensity * m_tileSize;
+    g_drawPool.addAction([&] {
+        m_texture->updatePixels(m_pixels.data());
+        g_painter->resetColor();
+        g_painter->setTexture(m_texture.get());
+        g_painter->setCompositionMode(CompositionMode::MULTIPLY);
+        g_painter->drawCoords(m_coords);
+    });
 
-            g_drawPool.setBlendEquation(BlendEquation::MAX, true);
-            g_drawPool.addTexturedRect(Rect(light.pos - radius, Size(radius * 2)), g_sprites.getLightTexture(), color);
-            _clr = true;
-        } else {
-            // Empty the lightings references
-            if (_clr) { g_drawPool.flush(); _clr = false; }
+    m_lights.clear();
+    m_tiles.assign(m_mapSize.area(), {});
+}
 
-            g_drawPool.setOpacity(light.opacity, true);
-            g_drawPool.addTexturedRect(Rect(light.pos - m_tileSize * 1.8, size, size), g_sprites.getShadeTexture(), m_globalLightColor);
+void LightView::updateCoords(const Rect& dest, const Rect& src) {
+    if (m_dest == dest && m_src == src)
+        return;
+
+    const auto& offset = src.topLeft();
+    const auto& size = src.size();
+
+    m_dest = dest;
+    m_src = src;
+
+    m_coords.clear();
+    m_coords.addRect(RectF(m_dest.left(), m_dest.top(), m_dest.width(), m_dest.height()),
+               RectF(static_cast<float>(offset.x) / m_tileSize, static_cast<float>(offset.y) / m_tileSize,
+                     static_cast<float>(size.width()) / m_tileSize, static_cast<float>(size.height()) / m_tileSize));
+}
+
+void LightView::updatePixels() {
+    if (m_updatingHash == m_hash)
+        return;
+
+    for (int x = 0; x < m_mapSize.width(); ++x) {
+        for (int y = 0; y < m_mapSize.height(); ++y) {
+            const Point pos(x * m_tileSize + m_tileSize / 2, y * m_tileSize + m_tileSize / 2);
+            const int index = (y * m_mapSize.width() + x);
+            const int colorIndex = index * 4;
+
+            m_pixels[colorIndex] = m_globalLightColor.r();
+            m_pixels[colorIndex + 1] = m_globalLightColor.g();
+            m_pixels[colorIndex + 2] = m_globalLightColor.b();
+            m_pixels[colorIndex + 3] = 255; // alpha channel
+            for (size_t i = m_tiles[index]; i < m_lights.size(); ++i) {
+                const auto& light = m_lights[i];
+                float distance = std::sqrt((pos.x - light.pos.x) * (pos.x - light.pos.x) +
+                                           (pos.y - light.pos.y) * (pos.y - light.pos.y));
+                distance /= m_tileSize;
+
+                float intensity = (-distance + (light.intensity * light.brightness)) * .2f;
+                if (intensity < .01f) continue;
+                if (intensity > 1.f) intensity = 1.f;
+
+                const auto& lightColor = Color::from8bit(light.color) * intensity;
+                m_pixels[colorIndex] = std::max<int>(m_pixels[colorIndex], lightColor.r());
+                m_pixels[colorIndex + 1] = std::max<int>(m_pixels[colorIndex + 1], lightColor.g());
+                m_pixels[colorIndex + 2] = std::max<int>(m_pixels[colorIndex + 2], lightColor.b());
+            }
         }
     }
 
-    m_sources.clear();
+    m_hash = m_updatingHash;
+    m_updatingHash = 0;
 }

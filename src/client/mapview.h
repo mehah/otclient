@@ -191,6 +191,11 @@ protected:
     friend class LightView;
 
 private:
+    enum class FadeType
+    {
+        NONE$, IN$, OUT$
+    };
+
     struct MapObject
     {
         std::vector<TilePtr> shades;
@@ -245,10 +250,10 @@ private:
     int8_t m_lockedFirstVisibleFloor{ -1 };
     uint8_t m_cachedFirstVisibleFloor{ SEA_FLOOR };
     uint8_t m_cachedLastVisibleFloor{ SEA_FLOOR };
-    uint8_t m_tileSize{ SPRITE_SIZE };
     uint8_t m_floorMin{ 0 };
     uint8_t m_floorMax{ 0 };
 
+    uint16_t m_tileSize{ SPRITE_SIZE };
     uint16_t m_floorFading = 500;
 
     float m_minimumAmbientLight{ 0 };
@@ -289,6 +294,8 @@ private:
     bool m_drawHighlightTarget{ false };
     bool m_shiftPressed{ false };
 
+    FadeType m_fadeType{ FadeType::NONE$ };
+
     AntialiasingMode m_antiAliasingMode{ AntialiasingMode::ANTIALIASING_DISABLED };
 
     std::array<MapObject, MAX_Z + 1> m_cachedVisibleTiles;
@@ -309,5 +316,5 @@ private:
     TexturePtr m_crosshairTexture;
 
     DrawConductor m_shadowConductor{ false, DrawOrder::FIFTH };
-    DrawPoolFramed* m_pool;
+    DrawPool* m_pool;
 };

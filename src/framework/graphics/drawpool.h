@@ -72,15 +72,20 @@ public:
     bool isEnabled() const { return m_enabled; }
     bool isType(DrawPoolType type) const { return m_type == type; }
 
+    bool isValid() const { return !m_framebuffer || m_framebuffer->isValid(); }
+    bool hasFrameBuffer() const { return m_framebuffer != nullptr; }
+    FrameBufferPtr getFrameBuffer() const { return m_framebuffer; }
+
     bool canRepaint() { return canRepaint(false); }
     void repaint() { m_status.first = 1; }
-
-    virtual bool isValid() const { return true; };
 
     void optimize(int size);
 
     void setScaleFactor(float scale) { m_scaleFactor = scale; }
     inline float getScaleFactor() const { return m_scaleFactor; }
+
+    void onBeforeDraw(std::function<void()> f) { m_beforeDraw = std::move(f); }
+    void onAfterDraw(std::function<void()> f) { m_afterDraw = std::move(f); }
 
     std::mutex& getMutex() { return m_mutex; }
 
@@ -151,6 +156,7 @@ protected:
     };
 
 private:
+    static DrawPool* create(const DrawPoolType type);
     static void addCoords(CoordsBuffer* buffer, const DrawPool::DrawMethod& method, DrawMode drawMode);
 
     enum STATE_TYPE : uint32_t
@@ -161,9 +167,6 @@ private:
         STATE_COMPOSITE_MODE = 1 << 3,
         STATE_BLEND_EQUATION = 1 << 4,
     };
-
-    static constexpr uint8_t ARR_MAX_Z = MAX_DRAW_DEPTH + 1;
-    static DrawPool* create(const DrawPoolType type);
 
     void add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod& method,
              DrawMode drawMode = DrawMode::TRIANGLES, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR,
@@ -203,8 +206,8 @@ private:
     void flush()
     {
         m_objectsByhash.clear();
-        if (m_currentFloor < ARR_MAX_Z - 1)
-            ++m_currentFloor;
+        if (m_depthLevel < MAX_DRAW_DEPTH)
+            ++m_depthLevel;
     }
 
     void disableUpdateHash() {
@@ -212,16 +215,13 @@ private:
         m_updateHash = false;
     }
 
-    virtual bool hasFrameBuffer() const { return false; };
-    virtual DrawPoolFramed* toPoolFramed() { return nullptr; }
-
     bool canRepaint(bool autoUpdateStatus);
 
     bool m_enabled{ true };
     bool m_updateHash{ true };
     bool m_alwaysGroupDrawings{ false };
 
-    uint8_t m_currentFloor{ 0 };
+    uint8_t m_depthLevel{ 0 };
 
     uint16_t m_refreshDelay{ 0 }, m_shaderRefreshDelay{ 0 };
     uint32_t m_onlyOnceStateFlag{ 0 };
@@ -235,41 +235,20 @@ private:
     std::pair<size_t, size_t> m_status{ 1, 0 };
 
     std::vector<Matrix3> m_transformMatrixStack;
-    std::vector<DrawObject> m_objects[ARR_MAX_Z][static_cast<uint8_t>(DrawOrder::LAST)];
+    std::vector<DrawObject> m_objects[MAX_DRAW_DEPTH + 1][static_cast<uint8_t>(DrawOrder::LAST)];
 
     stdext::map<size_t, DrawObject> m_objectsByhash;
 
     float m_scaleFactor{ 1.f };
 
-    std::mutex m_mutex;
-
-    friend DrawPoolManager;
-};
-
-class DrawPoolFramed : public DrawPool
-{
-public:
-    void onBeforeDraw(std::function<void()> f) { m_beforeDraw = std::move(f); }
-    void onAfterDraw(std::function<void()> f) { m_afterDraw = std::move(f); }
-    void setSmooth(bool enabled) const { m_framebuffer->setSmooth(enabled); }
-    void resize(const Size& size) { if (m_framebuffer->resize(size)) repaint(); }
-    Size getSize() const { return m_framebuffer->getSize(); }
-    bool isValid() const override { return m_framebuffer->isValid(); }
-
-protected:
-    DrawPoolFramed() : m_framebuffer(std::make_shared<FrameBuffer>()) {};
-
-    friend DrawPoolManager;
-    friend DrawPool;
-
-private:
-    bool hasFrameBuffer() const override { return m_framebuffer->isValid(); }
-    DrawPoolFramed* toPoolFramed() override { return this; }
-
     FrameBufferPtr m_framebuffer;
 
     std::function<void()> m_beforeDraw;
     std::function<void()> m_afterDraw;
+
+    std::mutex m_mutex;
+
+    friend DrawPoolManager;
 };
 
 extern DrawPoolManager g_drawPool;

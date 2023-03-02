@@ -101,7 +101,7 @@ bool Effect::waitFor(const EffectPtr& effect)
 {
     const ticks_t ticksElapsed = effect->m_animationTimer.ticksElapsed();
     uint16_t minDuration = getIdleAnimator() ? getIdleAnimator()->getMinDuration() : EFFECT_TICKS_PER_FRAME;
-    minDuration = minDuration * std::max<uint8_t>(getAnimationPhases() / 3, 1);
+    minDuration = minDuration * std::max<uint8_t>(getAnimationPhases() / 4, 1);
 
     if (ticksElapsed <= minDuration)
         return false;
