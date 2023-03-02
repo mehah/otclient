@@ -26,7 +26,7 @@ Platform g_platform;
 
 std::string Platform::getDeviceShortName(DeviceType type)
 {
-	static stdext::map<Platform::DeviceType, std::string> deviceShortNames = {
+    static stdext::map<Platform::DeviceType, std::string> deviceShortNames = {
         {Platform::Desktop, "desktop"},
         {Platform::Mobile,  "mobile"},
         {Platform::Console, "console"},
@@ -43,7 +43,7 @@ std::string Platform::getDeviceShortName(DeviceType type)
 
 std::string Platform::getOsShortName(OperatingSystem os)
 {
-	static stdext::map<Platform::OperatingSystem, std::string> osShortNames = {
+    static stdext::map<Platform::OperatingSystem, std::string> osShortNames = {
         {Platform::Windows, "windows"},
         {Platform::Linux,   "linux"},
         {Platform::macOS,   "macos"},
