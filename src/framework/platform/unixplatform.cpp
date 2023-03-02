@@ -40,7 +40,14 @@ void Platform::init(std::vector<std::string>& args)
 {
     processArgs(args);
 
-#ifdef ANDROID
+#ifdef __APPLE__
+    #include "TargetConditionals.h"
+    #if defined(TARGET_OS_IPHONE) || defined(TARGET_IPHONE_SIMULATOR)
+        setDevice({ Mobile, iOS });
+    #else
+        setDevice({ Desktop, macOS });
+    #endif
+#elifdef ANDROID
     setDevice({ Mobile, Android });
 #else
     setDevice({ Desktop, Linux });
