@@ -250,10 +250,10 @@ private:
     int8_t m_lockedFirstVisibleFloor{ -1 };
     uint8_t m_cachedFirstVisibleFloor{ SEA_FLOOR };
     uint8_t m_cachedLastVisibleFloor{ SEA_FLOOR };
-    uint8_t m_tileSize{ SPRITE_SIZE };
     uint8_t m_floorMin{ 0 };
     uint8_t m_floorMax{ 0 };
 
+    uint16_t m_tileSize{ SPRITE_SIZE };
     uint16_t m_floorFading = 500;
 
     float m_minimumAmbientLight{ 0 };
