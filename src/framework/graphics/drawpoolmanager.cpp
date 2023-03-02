@@ -29,8 +29,11 @@ thread_local static uint8_t CURRENT_POOL;
 
 DrawPoolManager g_drawPool;
 
-void DrawPoolManager::init()
+void DrawPoolManager::init(uint16_t spriteSize)
 {
+    if (spriteSize != 0)
+        m_spriteSize = spriteSize;
+
     // Create Pools
     for (int8_t i = -1; ++i <= static_cast<uint8_t>(DrawPoolType::UNKNOW);) {
         m_pools[i] = DrawPool::create(static_cast<DrawPoolType>(i));
