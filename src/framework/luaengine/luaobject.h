@@ -159,8 +159,8 @@ template<typename... T>
 int LuaObject::luaCallLuaField(const std::string_view field, const T&... args)
 {
     // we need to gracefully catch a cast exception here in case
-    // this is called from a constructor, most of the time this
-    // does not need to blow up, we can just debug log it.
+    // this is called from a constructor, this does not need to 
+    // blow up, we can just debug log it and exit.
     LuaObjectPtr self;
     try {
         self = asLuaObject();
