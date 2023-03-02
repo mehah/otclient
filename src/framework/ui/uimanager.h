@@ -24,6 +24,7 @@
 
 #include <framework/core/inputevent.h>
 #include <framework/otml/declarations.h>
+#include <framework/platform/platform.h>
 #include "declarations.h"
 
  //@bindsingleton g_ui
@@ -42,12 +43,16 @@ public:
     void updateHoveredWidget(bool now = false);
 
     void clearStyles();
-    bool importStyle(const std::string& fl);
+    bool importStyle(const std::string& fl, bool checkDeviceStyles = true);
     void importStyleFromOTML(const OTMLNodePtr& styleNode);
+    void importStyleFromOTML(const OTMLDocumentPtr& doc);
     OTMLNodePtr getStyle(const std::string_view sn);
     std::string getStyleClass(const std::string_view styleName);
-
+    OTMLNodePtr findMainWidgetNode(const OTMLDocumentPtr& doc);
+    
     UIWidgetPtr loadUI(const std::string& file, const UIWidgetPtr& parent);
+    OTMLNodePtr loadDeviceUI(const std::string& file, Platform::OperatingSystem os);
+    OTMLNodePtr loadDeviceUI(const std::string& file, Platform::DeviceType deviceType);
     UIWidgetPtr displayUI(const std::string& file) { return loadUI(file, m_rootWidget); }
     UIWidgetPtr createWidget(const std::string_view styleName, const UIWidgetPtr& parent);
     UIWidgetPtr createWidgetFromOTML(const OTMLNodePtr& widgetNode, const UIWidgetPtr& parent);

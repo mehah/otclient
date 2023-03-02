@@ -165,7 +165,7 @@ int LuaObject::luaCallLuaField(const std::string_view field, const T&... args)
     try {
         self = asLuaObject();
     } catch (std::exception e) {
-        g_logger.debug(stdext::format(
+        g_logger.fine(stdext::format(
             "luaCallLuaField: error calling '%s', likely called in ctor.", field));
         return 0;
     }

@@ -14,6 +14,7 @@ g_game.setLastSupportedVersion(1291)
 -- setup logger
 g_logger.setLogFile(g_resources.getWorkDir() .. g_app.getCompactName() .. '.log')
 g_logger.info(os.date('== application started at %b %d %Y %X'))
+g_logger.info("== operating system: " .. g_platform.getOSName())
 
 -- print first terminal message
 g_logger.info(g_app.getName() .. ' ' .. g_app.getVersion() .. ' rev ' .. g_app.getBuildRevision() .. ' (' ..

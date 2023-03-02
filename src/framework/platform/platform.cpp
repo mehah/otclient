@@ -23,3 +23,39 @@
 #include "platform.h"
 
 Platform g_platform;
+
+std::string Platform::getDeviceShortName(DeviceType type)
+{
+	static stdext::map<Platform::DeviceType, std::string> deviceShortNames = {
+        {Platform::Desktop, "desktop"},
+        {Platform::Mobile,  "mobile"},
+        {Platform::Console, "console"},
+    };
+
+    if (type == DeviceUnknown)
+        type = m_device.type;
+
+    auto it = deviceShortNames.find(type);
+    if (it == deviceShortNames.end())
+        return "";
+    return it->second;
+}
+
+std::string Platform::getOsShortName(OperatingSystem os)
+{
+	static stdext::map<Platform::OperatingSystem, std::string> osShortNames = {
+        {Platform::Windows, "windows"},
+        {Platform::Linux,   "linux"},
+        {Platform::macOS,   "macos"},
+        {Platform::Android, "android"},
+        {Platform::iOS,     "ios"},
+    };
+
+    if (os == OsUnknown)
+        os = m_device.os;
+
+    auto it = osShortNames.find(os);
+    if (it == osShortNames.end())
+        return "";
+    return it->second;
+}

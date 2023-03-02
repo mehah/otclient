@@ -25,6 +25,7 @@
  // this file is and must be included only from luainterface.h
 
 #include <framework/otml/declarations.h>
+#include <framework/platform/platform.h>
 #include "declarations.h"
 
 template<typename T>
@@ -134,6 +135,10 @@ bool luavalue_cast(int index, Point& point);
 // size
 int push_luavalue(const Size& size);
 bool luavalue_cast(int index, Size& size);
+
+// device
+int push_luavalue(const Platform::Device& device);
+bool luavalue_cast(int index, Platform::Device& device);
 
 // otml nodes
 int push_luavalue(const OTMLNodePtr& node);

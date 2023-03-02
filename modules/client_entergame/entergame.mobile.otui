@@ -1,0 +1,3 @@
+EnterGameWindow < MainWindow
+  !text: tr('Mobile: Enter Game')
+  size: 436 498

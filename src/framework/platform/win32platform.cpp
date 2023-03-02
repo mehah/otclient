@@ -27,6 +27,13 @@
 
 #include "platform.h"
 
+void Platform::init(std::vector<std::string>& args)
+{
+    processArgs(args);
+
+    setDevice({ Desktop, Windows });
+}
+
 void Platform::processArgs(std::vector<std::string>& args)
 {
     int nargs;
@@ -248,7 +255,7 @@ std::string Platform::getOSName()
     bOsVersionInfoEx = VerifyVersionInfo(&osvi, 0, 0);
 
     if (!bOsVersionInfoEx)
-        return {};
+        return "Windows";
 
     pGNSI = (PGNSI)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetNativeSystemInfo");
     if (nullptr != pGNSI)

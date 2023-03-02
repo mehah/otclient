@@ -25,10 +25,35 @@
 #include <string>
 #include <vector>
 #include <framework/stdext/types.h>
+#include <framework/stdext/storage.h>
 
 class Platform
 {
 public:
+    enum OperatingSystem {
+        OsUnknown,
+        Windows,
+        Linux,
+        macOS,
+        Android,
+        iOS
+    };
+
+    enum DeviceType {
+        DeviceUnknown,
+        Desktop,
+        Mobile,
+        Console
+    };
+
+    struct Device {
+        Device() {}
+        Device(DeviceType t, OperatingSystem o) : type(t), os(o) {}
+        DeviceType type{ DeviceUnknown };
+        OperatingSystem os{ OsUnknown };
+    };
+
+    void init(std::vector<std::string>& args);
     void processArgs(std::vector<std::string>& args);
     bool spawnProcess(std::string process, const std::vector<std::string>& args);
     int getProcessId();
@@ -44,7 +69,17 @@ public:
     std::string getCPUName();
     double getTotalSystemMemory();
     std::string getOSName();
+    Device getDevice() { return m_device; }
+    void setDevice(Device device) { m_device = device; }
+    bool isDesktop() { return m_device.type == Desktop; }
+    bool isMobile() { return m_device.type == Mobile; }
+    bool isConsole() { return m_device.type == Console; }
+    std::string getDeviceShortName(DeviceType type = DeviceUnknown);
+    std::string getOsShortName(OperatingSystem os = OsUnknown);
     std::string traceback(const std::string_view where, int level = 1, int maxDepth = 32);
+
+private:
+    Device m_device{ Device(Desktop, Windows) };
 };
 
 extern Platform g_platform;

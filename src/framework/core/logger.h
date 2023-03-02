@@ -49,6 +49,7 @@ public:
     void log(Fw::LogLevel level, const std::string_view message);
     void logFunc(Fw::LogLevel level, const std::string_view message, const std::string_view prettyFunction);
 
+    void fine(const std::string_view what) { log(Fw::LogFine, what); }
     void debug(const std::string_view what) { log(Fw::LogDebug, what); }
     void info(const std::string_view what) { log(Fw::LogInfo, what); }
     void warning(const std::string_view what) { log(Fw::LogWarning, what); }
@@ -64,6 +65,7 @@ private:
     OnLogCallback m_onLog;
     std::ofstream m_outFile;
     std::recursive_mutex m_mutex;
+    Fw::LogLevel m_level{ Fw::LogInfo };
 };
 
 extern Logger g_logger;

@@ -36,6 +36,17 @@
 #include <execinfo.h>
 #endif
 
+void Platform::init(std::vector<std::string>& args)
+{
+    processArgs(args);
+
+#ifdef ANDROID
+    setDevice({ Mobile, Android });
+#else
+    setDevice({ Desktop, Linux });
+#endif
+}
+
 void Platform::processArgs(std::vector<std::string>& args)
 {
     //nothing todo, linux args are already utf8 encoded
@@ -183,9 +194,9 @@ std::string Platform::getOSName()
     return std::string();
 }
 
-#ifndef ANDROID
 std::string Platform::traceback(const std::string_view where, int level, int maxDepth)
 {
+#ifndef ANDROID
     std::stringstream ss;
 
     ss << "\nC++ stack traceback:";
@@ -213,14 +224,13 @@ std::string Platform::traceback(const std::string_view where, int level, int max
     }
 
     return ss.str();
-}
 #else
-std::string Platform::traceback(const std::string_view where, int level, int maxDepth) {
-	std::stringstream ss;
+    std::stringstream ss;
     ss << "\nat:";
     ss << "\n\t[C++]: " << where;
     return ss.str();
-}
 #endif
+}
+
 
 #endif

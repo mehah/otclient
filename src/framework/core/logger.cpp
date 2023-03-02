@@ -51,9 +51,12 @@ void Logger::log(Fw::LogLevel level, const std::string_view message)
     std::scoped_lock lock(m_mutex);
 
 #ifdef NDEBUG
-    if (level == Fw::LogDebug)
+    if (level == Fw::LogDebug || level == Fw::LogFine)
         return;
 #endif
+
+    if (level < m_level)
+        return;
 
     if (s_ignoreLogs)
         return;
