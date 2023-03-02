@@ -53,46 +53,58 @@ void DrawPoolManager::draw()
     if (m_size != g_graphics.getViewportSize()) {
         m_size = g_graphics.getViewportSize();
         m_transformMatrix = g_painter->getTransformMatrix(m_size);
+        g_painter->setResolution(m_size, m_transformMatrix);
     }
 
-    auto& mapMutex = get<DrawPool>(DrawPoolType::MAP)->getMutex();
-
-    // Pre Draw
-    for (auto* pool : m_pools) {
-        if (!pool->isEnabled()) continue;
-
-        // Light and Creature Info, are in the same thread as the MAP
-        auto& mutex = pool->getType() == DrawPoolType::CREATURE_INFORMATION ||
-            pool->getType() == DrawPoolType::LIGHT ? mapMutex : pool->getMutex();
-
-        std::scoped_lock l(mutex);
-
-        if (pool->hasFrameBuffer()) {
-            const auto* pf = pool->toPoolFramed();
-            if (!pf->m_framebuffer->canDraw())
-                continue;
-
-            if (pool->canRepaint(true)) {
-                pf->m_framebuffer->bind();
-                for (int_fast8_t i = -1; ++i <= pool->m_depthLevel;) {
-                    for (const auto& order : pool->m_objects[i])
-                        for (const auto& obj : order)
-                            drawObject(obj);
-                }
-
-                pf->m_framebuffer->release();
-            }
-
-            g_painter->resetState();
-            g_painter->setResolution(m_size, m_transformMatrix);
-
-            if (pf->m_beforeDraw) pf->m_beforeDraw();
-            pf->m_framebuffer->draw();
-            if (pf->m_afterDraw) pf->m_afterDraw();
-        } else for (const auto& obj : pool->m_objects[0][DrawOrder::FIRST]) {
-            drawObject(obj);
+    const auto& map = get<DrawPool>(DrawPoolType::MAP); {
+        std::scoped_lock l(map->m_mutex);
+        if (drawPool(map)) {
+            drawPool(get<DrawPool>(DrawPoolType::CREATURE_INFORMATION));
+            drawPool(get<DrawPool>(DrawPoolType::LIGHT));
         }
     }
+
+    const auto& text = get<DrawPool>(DrawPoolType::TEXT); {
+        std::scoped_lock l(text->m_mutex);
+        drawPool(text);
+    }
+
+    const auto& foreground = get<DrawPool>(DrawPoolType::FOREGROUND); {
+        std::scoped_lock l(foreground->m_mutex);
+        drawPool(foreground);
+    }
+}
+
+bool DrawPoolManager::drawPool(const auto& pool) {
+    if (!pool->isEnabled())
+        return false;
+
+    if (pool->hasFrameBuffer()) {
+        const auto* pf = pool->toPoolFramed();
+        if (!pf->m_framebuffer->canDraw())
+            return false;
+
+        if (pool->canRepaint(true)) {
+            pf->m_framebuffer->bind();
+            for (int_fast8_t i = -1; ++i <= pool->m_depthLevel;) {
+                for (const auto& order : pool->m_objects[i])
+                    for (const auto& obj : order)
+                        drawObject(obj);
+            }
+
+            pf->m_framebuffer->release();
+        }
+
+        g_painter->resetState();
+
+        if (pf->m_beforeDraw) pf->m_beforeDraw();
+        pf->m_framebuffer->draw();
+        if (pf->m_afterDraw) pf->m_afterDraw();
+    } else for (const auto& obj : pool->m_objects[0][DrawOrder::FIRST]) {
+        drawObject(obj);
+    }
+
+    return true;
 }
 
 void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)

@@ -151,6 +151,7 @@ protected:
     };
 
 private:
+    static DrawPool* create(const DrawPoolType type);
     static void addCoords(CoordsBuffer* buffer, const DrawPool::DrawMethod& method, DrawMode drawMode);
 
     enum STATE_TYPE : uint32_t
@@ -161,8 +162,6 @@ private:
         STATE_COMPOSITE_MODE = 1 << 3,
         STATE_BLEND_EQUATION = 1 << 4,
     };
-
-    static DrawPool* create(const DrawPoolType type);
 
     void add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod& method,
              DrawMode drawMode = DrawMode::TRIANGLES, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR,
