@@ -387,7 +387,7 @@ void MapView::updateGeometry(const Size& visibleDimension)
 
     m_pool->setScaleFactor(scaleFactor);
 
-    const uint8_t tileSize = SPRITE_SIZE * m_pool->getScaleFactor();
+    const uint16_t tileSize = SPRITE_SIZE * m_pool->getScaleFactor();
     const auto& drawDimension = visibleDimension + 3;
     const auto& bufferSize = drawDimension * tileSize;
 

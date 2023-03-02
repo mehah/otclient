@@ -26,11 +26,14 @@
 #include "mapview.h"
 #include "spritemanager.h"
 
-LightView::LightView() : m_pool(g_drawPool.get<DrawPool>(DrawPoolType::LIGHT)) {}
+LightView::LightView() :
+    m_pool(g_drawPool.get<DrawPool>(DrawPoolType::LIGHT)),
+    m_mapPool(g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP)) {}
 
-void LightView::resize(const Size& size, const uint8_t tileSize) {
+void LightView::resize(const Size& size, const uint16_t tileSize) {
     m_lightTexture = nullptr;
     m_mapSize = size;
+    m_tileSize = tileSize;
     m_tiles.resize(size.area());
     if (m_pixels.size() < 4u * m_mapSize.area())
         m_pixels.resize(m_mapSize.area() * 4);
@@ -59,7 +62,7 @@ void LightView::addLightSource(const Point& pos, const Light& light)
 
 void LightView::resetShade(const Point& pos)
 {
-    size_t index = (pos.y / g_drawPool.getScaledSpriteSize()) * m_mapSize.width() + (pos.x / g_drawPool.getScaledSpriteSize());
+    size_t index = (pos.y / m_tileSize) * m_mapSize.width() + (pos.x / m_tileSize);
     if (index >= m_tiles.size()) return;
     m_tiles[index] = m_lights.size();
 }
@@ -70,8 +73,10 @@ void LightView::draw(const Rect& dest, const Rect& src)
     m_pool->setEnable(isDark());
     if (!isDark() || !m_pool->isValid()) return;
 
+    stdext::hash_union(m_updatingHash, src.hash());
+
     updateCoords(dest, src);
-    g_drawPool.use(m_pool->getType());
+    g_drawPool.use(DrawPoolType::LIGHT);
 
     g_drawPool.addAction([&, updatePixel = updatePixels()] {
         if (!m_lightTexture) {
@@ -101,9 +106,9 @@ void LightView::updateCoords(const Rect& dest, const Rect& src) {
         Size size = src.size();
 
         m_coords.clear();
-        m_coords.addRect(RectF(dest.left(), dest.top(), dest.width(), dest.height()),
-                       RectF((float)offset.x / g_drawPool.getScaledSpriteSize(), (float)offset.y / g_drawPool.getScaledSpriteSize(),
-                         (float)size.width() / g_drawPool.getScaledSpriteSize(), (float)size.height() / g_drawPool.getScaledSpriteSize()));
+        m_coords.addRect(RectF(m_dest.left(), m_dest.top(), m_dest.width(), m_dest.height()),
+                   RectF(static_cast<float>(offset.x) / m_tileSize, static_cast<float>(offset.y) / m_tileSize,
+                         static_cast<float>(size.width()) / m_tileSize, static_cast<float>(size.height()) / m_tileSize));
     }
 }
 
@@ -112,7 +117,7 @@ bool LightView::updatePixels() {
     if (updatePixel) {
         for (int x = 0; x < m_mapSize.width(); ++x) {
             for (int y = 0; y < m_mapSize.height(); ++y) {
-                const Point pos(x * g_drawPool.getScaledSpriteSize() + g_drawPool.getScaledSpriteSize() / 2, y * g_drawPool.getScaledSpriteSize() + g_drawPool.getScaledSpriteSize() / 2);
+                const Point pos(x * m_tileSize + m_tileSize / 2, y * m_tileSize + m_tileSize / 2);
 
                 int index = (y * m_mapSize.width() + x);
 
@@ -125,7 +130,7 @@ bool LightView::updatePixels() {
                     const auto& light = m_lights[i];
                     float distance = std::sqrt((pos.x - light.pos.x) * (pos.x - light.pos.x) +
                                                (pos.y - light.pos.y) * (pos.y - light.pos.y));
-                    distance /= g_drawPool.getScaledSpriteSize();
+                    distance /= m_tileSize;
                     float intensity = (-distance + (light.intensity * light.brightness)) * 0.2f;
                     if (intensity < 0.01f) continue;
                     if (intensity > 1.0f) intensity = 1.0f;
