@@ -26,25 +26,40 @@
 #include "mapview.h"
 #include "spritemanager.h"
 
-LightView::LightView() : m_pool(g_drawPool.get<DrawPoolFramed>(DrawPoolType::LIGHT)) {}
+LightView::LightView() : m_pool(g_drawPool.get<DrawPool>(DrawPoolType::LIGHT)) {}
 
-void LightView::setSmooth(bool enabled) const { m_pool->setSmooth(enabled); }
-
-void LightView::resize(const Size& size, const uint8_t tileSize) { m_pool->resize(size * (m_tileSize = tileSize)); }
+void LightView::resize(const Size& size, const uint8_t tileSize) {
+    m_lightTexture = nullptr;
+    m_mapSize = size;
+    m_tiles.resize(size.area());
+    if (m_pixels.size() < 4u * m_mapSize.area())
+        m_pixels.resize(m_mapSize.area() * 4);
+}
 
 void LightView::addLightSource(const Point& pos, const Light& light)
 {
     if (!isDark()) return;
 
-    if (!m_sources.empty()) {
-        auto& prevLight = m_sources.back();
+    if (!m_lights.empty()) {
+        auto& prevLight = m_lights.back();
         if (prevLight.pos == pos && prevLight.color == light.color) {
-            prevLight.intensity = std::max<uint16_t>(prevLight.intensity, light.intensity);
+            prevLight.intensity = std::max<uint8_t>(prevLight.intensity, light.intensity);
             return;
         }
     }
+    m_lights.emplace_back(pos, light.intensity, light.color, g_drawPool.getOpacity());
 
-    m_sources.emplace_back(pos, light.color, light.intensity, g_drawPool.getOpacity());
+    stdext::hash_union(m_updatingHash, pos.hash());
+    stdext::hash_combine(m_updatingHash, light.intensity);
+    stdext::hash_combine(m_updatingHash, light.color);
+    stdext::hash_combine(m_updatingHash, g_drawPool.getOpacity());
+}
+
+void LightView::resetShade(const Point& pos)
+{
+    size_t index = (pos.y / g_drawPool.getScaledSpriteSize()) * m_mapSize.width() + (pos.x / g_drawPool.getScaledSpriteSize());
+    if (index >= m_tiles.size()) return;
+    m_tiles[index] = m_lights.size();
 }
 
 void LightView::draw(const Rect& dest, const Rect& src)
@@ -53,27 +68,76 @@ void LightView::draw(const Rect& dest, const Rect& src)
     m_pool->setEnable(isDark());
     if (!isDark() || !m_pool->isValid()) return;
 
-    g_drawPool.use(m_pool->getType(), dest, src, m_globalLightColor);
+    updateCoords(dest, src);
+    g_drawPool.use(m_pool->getType());
 
-    const float size = m_tileSize * 3.3;
-
-    bool _clr = true;
-    for (const auto& light : m_sources) {
-        if (light.color) {
-            const auto& color = Color::from8bit(light.color, std::min<float>(light.opacity, light.intensity / 6.f));
-            const uint16_t radius = light.intensity * m_tileSize;
-
-            g_drawPool.setBlendEquation(BlendEquation::MAX, true);
-            g_drawPool.addTexturedRect(Rect(light.pos - radius, Size(radius * 2)), g_sprites.getLightTexture(), color);
-            _clr = true;
-        } else {
-            // Empty the lightings references
-            if (_clr) { g_drawPool.flush(); _clr = false; }
-
-            g_drawPool.setOpacity(light.opacity, true);
-            g_drawPool.addTexturedRect(Rect(light.pos - m_tileSize * 1.8, size, size), g_sprites.getShadeTexture(), m_globalLightColor);
+    g_drawPool.addAction([&, updatePixel = updatePixels()] {
+        if (!m_lightTexture) {
+            m_lightTexture = std::make_shared<Texture>(m_mapSize);
+            m_lightTexture->setSmooth(true);
         }
+
+        if (updatePixel)
+            m_lightTexture->updatePixels(m_pixels.data());
+
+        g_painter->resetColor();
+        g_painter->setCompositionMode(CompositionMode::MULTIPLY);
+        g_painter->setTexture(m_lightTexture.get());
+        g_painter->drawCoords(m_coords);
+    });
+
+    m_lights.clear();
+    m_tiles.assign(m_mapSize.area(), {});
+}
+
+void LightView::updateCoords(const Rect& dest, const Rect& src) {
+    if (m_dest != dest || m_src != src) {
+        m_dest = dest;
+        m_src = src;
+
+        Point offset = src.topLeft();
+        Size size = src.size();
+
+        m_coords.clear();
+        m_coords.addRect(RectF(dest.left(), dest.top(), dest.width(), dest.height()),
+                       RectF((float)offset.x / g_drawPool.getScaledSpriteSize(), (float)offset.y / g_drawPool.getScaledSpriteSize(),
+                         (float)size.width() / g_drawPool.getScaledSpriteSize(), (float)size.height() / g_drawPool.getScaledSpriteSize()));
+    }
+}
+
+bool LightView::updatePixels() {
+    bool updatePixel = m_updatingHash != m_hash;
+    if (updatePixel) {
+        for (int x = 0; x < m_mapSize.width(); ++x) {
+            for (int y = 0; y < m_mapSize.height(); ++y) {
+                const Point pos(x * g_drawPool.getScaledSpriteSize() + g_drawPool.getScaledSpriteSize() / 2, y * g_drawPool.getScaledSpriteSize() + g_drawPool.getScaledSpriteSize() / 2);
+
+                int index = (y * m_mapSize.width() + x);
+
+                int colorIndex = index * 4;
+                m_pixels[colorIndex] = m_globalLightColor.r();
+                m_pixels[colorIndex + 1] = m_globalLightColor.g();
+                m_pixels[colorIndex + 2] = m_globalLightColor.b();
+                m_pixels[colorIndex + 3] = 255; // alpha channel
+                for (size_t i = m_tiles[index]; i < m_lights.size(); ++i) {
+                    const auto& light = m_lights[i];
+                    float distance = std::sqrt((pos.x - light.pos.x) * (pos.x - light.pos.x) +
+                                               (pos.y - light.pos.y) * (pos.y - light.pos.y));
+                    distance /= g_drawPool.getScaledSpriteSize();
+                    float intensity = (-distance + (light.intensity * light.brightness)) * 0.2f;
+                    if (intensity < 0.01f) continue;
+                    if (intensity > 1.0f) intensity = 1.0f;
+                    Color lightColor = Color::from8bit(light.color) * intensity;
+                    m_pixels[colorIndex] = std::max<int>(m_pixels[colorIndex], lightColor.r());
+                    m_pixels[colorIndex + 1] = std::max<int>(m_pixels[colorIndex + 1], lightColor.g());
+                    m_pixels[colorIndex + 2] = std::max<int>(m_pixels[colorIndex + 2], lightColor.b());
+                }
+            }
+        }
+
+        m_hash = m_updatingHash;
+        m_updatingHash = 0;
     }
 
-    m_sources.clear();
+    return updatePixel;
 }

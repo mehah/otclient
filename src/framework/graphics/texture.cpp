@@ -80,6 +80,11 @@ Texture* Texture::create()
 }
 
 void Texture::updateImage(const ImagePtr& image) { m_image = image; setupSize(image->getSize()); }
+
+void Texture::updatePixels(uint8_t* pixels, int level, int channels, bool compress) {
+    bind();
+    setupPixels(level, m_size, pixels, channels, compress);
+}
 void Texture::uploadPixels(const ImagePtr& image, bool buildMipmaps, bool compress)
 {
     if (!setupSize(image->getSize()))

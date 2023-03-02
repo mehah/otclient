@@ -85,6 +85,7 @@ public:
 
     void setScaleFactor(float scale) const { getCurrentPool()->setScaleFactor(scale); }
     inline float getScaleFactor() const { return getCurrentPool()->getScaleFactor(); }
+    inline uint16_t getScaledSpriteSize() const { return SPRITE_SIZE * getScaleFactor(); }
 
     void flush() const { if (getCurrentPool()) getCurrentPool()->flush(); }
 

@@ -48,6 +48,13 @@ public:
         if (src.isValid())
             m_textureCoordArray.addRect(src);
     }
+
+    void addRect(const RectF& dest, const RectF& src)
+    {
+        m_vertexArray.addRect(dest);
+        m_textureCoordArray.addRect(src);
+    }
+
     void addQuad(const Rect& dest, const Rect& src)
     {
         m_vertexArray.addQuad(dest);
