@@ -427,6 +427,8 @@ void MapView::onCameraMove(const Point& /*offset*/)
     if (isFollowingCreature()) {
         updateViewport(m_followingCreature->isWalking() ? m_followingCreature->getDirection() : Otc::InvalidDirection);
     }
+
+    if (m_lightView) m_lightView->update();
 }
 
 void MapView::onFloorChange(const uint8_t /*floor*/, const uint8_t /*previousFloor*/)

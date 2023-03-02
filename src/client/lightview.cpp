@@ -73,8 +73,6 @@ void LightView::draw(const Rect& dest, const Rect& src)
     m_pool->setEnable(isDark());
     if (!isDark() || !m_pool->isValid()) return;
 
-    stdext::hash_union(m_updatingHash, src.hash());
-
     updateCoords(dest, src);
     g_drawPool.use(DrawPoolType::LIGHT);
 
@@ -118,10 +116,9 @@ bool LightView::updatePixels() {
         for (int x = 0; x < m_mapSize.width(); ++x) {
             for (int y = 0; y < m_mapSize.height(); ++y) {
                 const Point pos(x * m_tileSize + m_tileSize / 2, y * m_tileSize + m_tileSize / 2);
+                const int index = (y * m_mapSize.width() + x);
+                const int colorIndex = index * 4;
 
-                int index = (y * m_mapSize.width() + x);
-
-                int colorIndex = index * 4;
                 m_pixels[colorIndex] = m_globalLightColor.r();
                 m_pixels[colorIndex + 1] = m_globalLightColor.g();
                 m_pixels[colorIndex + 2] = m_globalLightColor.b();
@@ -131,10 +128,12 @@ bool LightView::updatePixels() {
                     float distance = std::sqrt((pos.x - light.pos.x) * (pos.x - light.pos.x) +
                                                (pos.y - light.pos.y) * (pos.y - light.pos.y));
                     distance /= m_tileSize;
+
                     float intensity = (-distance + (light.intensity * light.brightness)) * 0.2f;
                     if (intensity < 0.01f) continue;
                     if (intensity > 1.0f) intensity = 1.0f;
-                    Color lightColor = Color::from8bit(light.color) * intensity;
+
+                    const auto& lightColor = Color::from8bit(light.color) * intensity;
                     m_pixels[colorIndex] = std::max<int>(m_pixels[colorIndex], lightColor.r());
                     m_pixels[colorIndex + 1] = std::max<int>(m_pixels[colorIndex + 1], lightColor.g());
                     m_pixels[colorIndex + 2] = std::max<int>(m_pixels[colorIndex + 2], lightColor.b());
