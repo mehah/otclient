@@ -81,6 +81,14 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
             setWidth(node->value<int>());
         else if (node->tag() == "height")
             setHeight(node->value<int>());
+        else if (node->tag() == "min-width")
+            setMinWidth(node->value<int>());
+        else if (node->tag() == "max-width")
+            setMaxWidth(node->value<int>());
+        else if (node->tag() == "min-height")
+            setMinHeight(node->value<int>());
+        else if (node->tag() == "max-height")
+            setMaxHeight(node->value<int>());
         else if (node->tag() == "rect")
             setRect(node->value<Rect>());
         else if (node->tag() == "background")
@@ -149,6 +157,10 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
             setSize(node->value<Size>());
         else if (node->tag() == "fixed-size")
             setFixedSize(node->value<bool>());
+        else if (node->tag() == "min-size")
+            setMinSize(node->value<Size>());
+        else if (node->tag() == "max-size")
+            setMaxSize(node->value<Size>());
         else if (node->tag() == "clipping")
             setClipping(node->value<bool>());
         else if (node->tag() == "border") {

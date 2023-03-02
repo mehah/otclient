@@ -90,6 +90,8 @@ protected:
 
     Rect m_rect;
     Point m_virtualOffset;
+    Size m_minSize;
+    Size m_maxSize;
 
     UILayoutPtr m_layout;
     UIWidgetPtr m_parent;
@@ -177,14 +179,17 @@ public:
     UIWidgetPtr getChildById(const std::string_view childId);
     UIWidgetPtr getChildByPos(const Point& childPos);
     UIWidgetPtr getChildByIndex(int index);
+    UIWidgetPtr getChildByState(Fw::WidgetState state);
     UIWidgetPtr recursiveGetChildById(const std::string_view id);
     UIWidgetPtr recursiveGetChildByPos(const Point& childPos, bool wantsPhantom);
+    UIWidgetPtr recursiveGetChildByState(Fw::WidgetState state, bool wantsPhantom);
     UIWidgetList recursiveGetChildren();
     UIWidgetList recursiveGetChildrenByPos(const Point& childPos);
     UIWidgetList recursiveGetChildrenByMarginPos(const Point& childPos);
+    UIWidgetList recursiveGetChildrenByState(Fw::WidgetState state);
     UIWidgetPtr backwardsGetWidgetById(const std::string_view id);
 
-    void setProp(FlagProp prop, bool v) { if (v) m_flagsProp |= prop; else m_flagsProp &= ~prop; }
+    void setProp(FlagProp prop, bool v);
     bool hasProp(FlagProp prop) { return (m_flagsProp & prop); }
 private:
     void repaint();
@@ -331,6 +336,12 @@ public:
     void setWidth(int width) { resize(width, getHeight()); }
     void setHeight(int height) { resize(getWidth(), height); }
     void setSize(const Size& size) { resize(size.width(), size.height()); }
+    void setMinWidth(int minWidth) { m_minSize.setWidth(minWidth); setRect(m_rect); }
+    void setMaxWidth(int maxWidth) { m_maxSize.setWidth(maxWidth); setRect(m_rect); }
+    void setMinHeight(int minHeight) { m_minSize.setHeight(minHeight); setRect(m_rect); }
+    void setMaxHeight(int maxHeight) { m_maxSize.setHeight(maxHeight); setRect(m_rect); }
+    void setMinSize(const Size& minSize) { m_minSize = minSize; setRect(m_rect); }
+    void setMaxSize(const Size& maxSize) { m_maxSize = maxSize; setRect(m_rect); }
     void setPosition(const Point& pos) { move(pos.x, pos.y); }
     void setColor(const Color& color) { m_color = color; repaint(); }
     void setBackgroundColor(const Color& color) { m_backgroundColor = color; repaint(); }
@@ -385,6 +396,12 @@ public:
     int getWidth() { return m_rect.width(); }
     int getHeight() { return m_rect.height(); }
     Size getSize() { return m_rect.size(); }
+    int getMinWidth() { return m_minSize.width(); }
+    int getMaxWidth() { return m_maxSize.width(); }
+    int getMinHeight() { return m_minSize.height(); }
+    int getMaxHeight() { return m_maxSize.height(); }
+    Size getMinSize() { return m_minSize; }
+    Size getMaxSize() { return m_maxSize; }
     Rect getRect() { return m_rect; }
     Color getColor() { return m_color; }
     Color getBackgroundColor() { return m_backgroundColor; }

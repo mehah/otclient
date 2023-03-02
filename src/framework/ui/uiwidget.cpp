@@ -960,18 +960,29 @@ void UIWidget::setLayout(const UILayoutPtr& layout)
 
 bool UIWidget::setRect(const Rect& rect)
 {
+    Rect clampedRect = rect;
+    if (!m_minSize.isEmpty() || !m_maxSize.isEmpty()) {
+        Size minSize, maxSize;
+        minSize.setWidth(m_minSize.width() >= 0 ? m_minSize.width() : 0);
+        minSize.setHeight(m_minSize.height() >= 0 ? m_minSize.height() : 0);
+        maxSize.setWidth(m_maxSize.width() >= 0 ? m_maxSize.width() : INT_MAX);
+        maxSize.setHeight(m_maxSize.height() >= 0 ? m_maxSize.height() : INT_MAX);
+        clampedRect = rect.clamp(minSize, maxSize);
+    }
+
     /*
     if(rect.width() > 8192 || rect.height() > 8192) {
         g_logger.error(stdext::format("attempt to set huge rect size (%s) for %s", stdext::to_string(rect), m_id));
         return false;
     }
     */
+
     // only update if the rect really changed
-    if (rect == m_rect)
+    if (clampedRect == m_rect)
         return false;
 
     Rect oldRect = m_rect;
-    m_rect = rect;
+    m_rect = clampedRect;
 
     // updates own layout
     updateLayout();
@@ -991,6 +1002,12 @@ bool UIWidget::setRect(const Rect& rect)
     if (containsPoint(g_window.getMousePosition()))
         g_ui.updateHoveredWidget();
 
+    if (oldRect.width() != m_rect.width())
+        callLuaField("onWidthChange", oldRect.width(), m_rect.width());
+    if (oldRect.height() != m_rect.height())
+        callLuaField("onHeightChange", oldRect.height(), m_rect.height());
+
+    callLuaField("onResize", oldRect, m_rect);
     return true;
 }
 
@@ -1023,6 +1040,8 @@ void UIWidget::setEnabled(bool enabled)
 
     updateState(Fw::DisabledState);
     updateState(Fw::ActiveState);
+
+    callLuaField("onEnabled", enabled);
 }
 
 void UIWidget::setVisible(bool visible)
@@ -1240,6 +1259,17 @@ UIWidgetPtr UIWidget::getChildByIndex(int index)
     return nullptr;
 }
 
+UIWidgetPtr UIWidget::getChildByState(Fw::WidgetState state)
+{
+    for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
+        const auto& child = (*it);
+        if (child->hasState(state))
+            return child;
+    }
+
+    return nullptr;
+}
+
 UIWidgetPtr UIWidget::recursiveGetChildById(const std::string_view id)
 {
     const auto& widget = getChildById(id);
@@ -1264,6 +1294,22 @@ UIWidgetPtr UIWidget::recursiveGetChildByPos(const Point& childPos, bool wantsPh
 
         if (child->isExplicitlyVisible() && child->containsPoint(childPos)) {
             if (const auto& subChild = child->recursiveGetChildByPos(childPos, wantsPhantom))
+                return subChild;
+
+            if (wantsPhantom || !child->isPhantom())
+                return child;
+        }
+    }
+    return nullptr;
+}
+
+UIWidgetPtr UIWidget::recursiveGetChildByState(Fw::WidgetState state, bool wantsPhantom)
+{
+    for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
+        const auto& child = (*it);
+
+        if (child->hasState(state)) {
+            if (const auto& subChild = child->recursiveGetChildByState(state, wantsPhantom))
                 return subChild;
 
             if (wantsPhantom || !child->isPhantom())
@@ -1324,6 +1370,21 @@ UIWidgetList UIWidget::recursiveGetChildrenByMarginPos(const Point& childPos)
     return children;
 }
 
+UIWidgetList UIWidget::recursiveGetChildrenByState(Fw::WidgetState state)
+{
+    UIWidgetList children;
+    for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
+        const auto& child = (*it);
+        if (child->hasState(state)) {
+            UIWidgetList subChildren = child->recursiveGetChildrenByState(state);
+            if (!subChildren.empty())
+                children.insert(children.end(), subChildren.begin(), subChildren.end());
+            children.emplace_back(child);
+        }
+    }
+    return children;
+}
+
 UIWidgetPtr UIWidget::backwardsGetWidgetById(const std::string_view id)
 {
     UIWidgetPtr widget = getChildById(id);
@@ -1333,6 +1394,15 @@ UIWidgetPtr UIWidget::backwardsGetWidgetById(const std::string_view id)
     }
 
     return widget;
+}
+
+void UIWidget::setProp(FlagProp prop, bool v)
+{
+    bool lastProp = hasProp(prop);
+    if (v) m_flagsProp |= prop; else m_flagsProp &= ~prop;
+    
+    if (lastProp != v)
+        callLuaField("onPropertyChange", prop, v);
 }
 
 bool UIWidget::setState(Fw::WidgetState state, bool on)
