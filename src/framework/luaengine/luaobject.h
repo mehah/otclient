@@ -158,11 +158,23 @@ connect(const LuaObjectPtr& obj, const std::string_view field, const Lambda& f, 
 template<typename... T>
 int LuaObject::luaCallLuaField(const std::string_view field, const T&... args)
 {
+    // we need to gracefully catch a cast exception here in case
+    // this is called from a constructor, most of the time this
+    // does not need to blow up, we can just debug log it.
+    LuaObjectPtr self;
+    try {
+        self = asLuaObject();
+    } catch (std::exception e) {
+        g_logger.debug(stdext::format(
+            "luaCallLuaField: error calling '%s', likely called in ctor.", field));
+        return 0;
+    }
+
     // note that the field must be retrieved from this object lua value
     // to force using the __index metamethod of it's metatable
     // so cannot use LuaObject::getField here
     // push field
-    g_lua.pushObject(asLuaObject());
+    g_lua.pushObject(self);
     g_lua.getField(field);
 
     if (!g_lua.isNil()) {
