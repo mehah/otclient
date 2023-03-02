@@ -31,8 +31,10 @@
 - Client Config in [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h)
 - Client 12.85 - 12.92 support (protobuf)
 - Market has been rewritten to work only [Canary](https://github.com/opentibiabr/canary)
+- Async Texture Loading
 
 ##### Community (Features)
+- Mobile Support [@tuliomagalhaes](https://github.com/tuliomagalhaes) & [@BenDol](https://github.com/BenDol)
 - Support Tibia 12.85/protobuf by [@Nekiro](https://github.com/nekiro)
 - Support Discord RPC by [@SkullzOTS](https://github.com/SkullzOTS) (Doesn't work with CMAKE)
 - Action Bar by [@DipSet](https://github.com/Dip-Set1)
