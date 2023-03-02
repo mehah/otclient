@@ -26,9 +26,7 @@
 #include "mapview.h"
 #include "spritemanager.h"
 
-LightView::LightView() :
-    m_pool(g_drawPool.get<DrawPool>(DrawPoolType::LIGHT)),
-    m_mapPool(g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP)) {}
+LightView::LightView() : m_pool(g_drawPool.get<DrawPool>(DrawPoolType::LIGHT)) {}
 
 void LightView::resize(const Size& size, const uint16_t tileSize) {
     m_lightTexture = nullptr;

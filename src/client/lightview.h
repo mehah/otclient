@@ -61,21 +61,21 @@ private:
     void updateCoords(const Rect& dest, const Rect& src);
     bool updatePixels();
 
+    uint16_t m_tileSize{ 0 };
     size_t m_hash{ 0 }, m_updatingHash{ 0 };
 
     Light m_globalLight;
     Color m_globalLightColor{ Color::white };
 
     DrawPool* m_pool{ nullptr };
-    DrawPoolFramed* m_mapPool{ nullptr };
+
+    Size m_mapSize;
+    Rect m_dest, m_src;
+
+    CoordsBuffer m_coords;
+    TexturePtr m_lightTexture;
 
     std::vector<TileLight> m_lights;
     std::vector<size_t> m_tiles;
     std::vector<uint8_t> m_pixels;
-
-    Size m_mapSize;
-    uint16_t m_tileSize;
-    Rect m_dest, m_src;
-    CoordsBuffer m_coords;
-    TexturePtr m_lightTexture;
 };
