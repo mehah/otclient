@@ -37,7 +37,6 @@ public:
 
     void addLightSource(const Point& pos, const Light& light, float brightness = 1.f);
     void resetShade(const Point& pos);
-    void update() { m_hash = 0; m_updatingHash = 1; }
 
     void setGlobalLight(const Light& light)
     {
@@ -57,7 +56,7 @@ private:
     };
 
     void updateCoords(const Rect& dest, const Rect& src);
-    bool updatePixels();
+    void updatePixels();
 
     bool m_isDark{ false };
 
