@@ -37,7 +37,7 @@ void LightView::resize(const Size& size, const uint16_t tileSize) {
         m_pixels.resize(m_mapSize.area() * 4);
 }
 
-void LightView::addLightSource(const Point& pos, const Light& light)
+void LightView::addLightSource(const Point& pos, const Light& light, float brightness)
 {
     if (!isDark()) return;
 
@@ -48,7 +48,7 @@ void LightView::addLightSource(const Point& pos, const Light& light)
             return;
         }
     }
-    m_lights.emplace_back(pos, light.intensity, light.color, g_drawPool.getOpacity());
+    m_lights.emplace_back(pos, light.intensity, light.color, std::min<float>(brightness, g_drawPool.getOpacity()));
 
     stdext::hash_union(m_updatingHash, pos.hash());
     stdext::hash_combine(m_updatingHash, light.intensity);
@@ -84,8 +84,8 @@ void LightView::draw(const Rect& dest, const Rect& src)
             m_lightTexture->updatePixels(m_pixels.data());
 
         g_painter->resetColor();
-        g_painter->setCompositionMode(CompositionMode::MULTIPLY);
         g_painter->setTexture(m_lightTexture.get());
+        g_painter->setCompositionMode(CompositionMode::MULTIPLY);
         g_painter->drawCoords(m_coords);
     });
 
@@ -95,11 +95,11 @@ void LightView::draw(const Rect& dest, const Rect& src)
 
 void LightView::updateCoords(const Rect& dest, const Rect& src) {
     if (m_dest != dest || m_src != src) {
+        const auto& offset = src.topLeft();
+        const auto& size = src.size();
+
         m_dest = dest;
         m_src = src;
-
-        Point offset = src.topLeft();
-        Size size = src.size();
 
         m_coords.clear();
         m_coords.addRect(RectF(m_dest.left(), m_dest.top(), m_dest.width(), m_dest.height()),
@@ -127,9 +127,9 @@ bool LightView::updatePixels() {
                                                (pos.y - light.pos.y) * (pos.y - light.pos.y));
                     distance /= m_tileSize;
 
-                    float intensity = (-distance + (light.intensity * light.brightness)) * 0.2f;
-                    if (intensity < 0.01f) continue;
-                    if (intensity > 1.0f) intensity = 1.0f;
+                    float intensity = (-distance + (light.intensity * light.brightness)) * .2f;
+                    if (intensity < .01f) continue;
+                    if (intensity > 1.f) intensity = 1.f;
 
                     const auto& lightColor = Color::from8bit(light.color) * intensity;
                     m_pixels[colorIndex] = std::max<int>(m_pixels[colorIndex], lightColor.r());
