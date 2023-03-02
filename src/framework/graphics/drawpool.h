@@ -162,7 +162,6 @@ private:
         STATE_BLEND_EQUATION = 1 << 4,
     };
 
-    static constexpr uint8_t ARR_MAX_Z = MAX_DRAW_DEPTH + 1;
     static DrawPool* create(const DrawPoolType type);
 
     void add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod& method,
@@ -203,8 +202,8 @@ private:
     void flush()
     {
         m_objectsByhash.clear();
-        if (m_currentFloor < ARR_MAX_Z - 1)
-            ++m_currentFloor;
+        if (m_depthLevel < MAX_DRAW_DEPTH)
+            ++m_depthLevel;
     }
 
     void disableUpdateHash() {
@@ -221,7 +220,7 @@ private:
     bool m_updateHash{ true };
     bool m_alwaysGroupDrawings{ false };
 
-    uint8_t m_currentFloor{ 0 };
+    uint8_t m_depthLevel{ 0 };
 
     uint16_t m_refreshDelay{ 0 }, m_shaderRefreshDelay{ 0 };
     uint32_t m_onlyOnceStateFlag{ 0 };
@@ -235,7 +234,7 @@ private:
     std::pair<size_t, size_t> m_status{ 1, 0 };
 
     std::vector<Matrix3> m_transformMatrixStack;
-    std::vector<DrawObject> m_objects[ARR_MAX_Z][static_cast<uint8_t>(DrawOrder::LAST)];
+    std::vector<DrawObject> m_objects[MAX_DRAW_DEPTH + 1][static_cast<uint8_t>(DrawOrder::LAST)];
 
     stdext::map<size_t, DrawObject> m_objectsByhash;
 

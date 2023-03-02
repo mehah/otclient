@@ -74,8 +74,8 @@ void DrawPoolManager::draw()
 
             if (pool->canRepaint(true)) {
                 pf->m_framebuffer->bind();
-                for (int_fast8_t z = -1; ++z <= pool->m_currentFloor;) {
-                    for (const auto& order : pool->m_objects[z])
+                for (int_fast8_t i = -1; ++i <= pool->m_depthLevel;) {
+                    for (const auto& order : pool->m_objects[i])
                         for (const auto& obj : order)
                             drawObject(obj);
                 }

@@ -71,7 +71,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
     else if (m_type == DrawPoolType::MAP && order == DrawOrder::FIRST && !conductor.agroup)
         order = DrawOrder::THIRD;
 
-    auto& list = m_objects[m_currentFloor][order];
+    auto& list = m_objects[m_depthLevel][order];
 
     if (m_alwaysGroupDrawings || conductor.agroup) {
         const auto it = m_objectsByhash.find(state.hash);
@@ -262,7 +262,7 @@ void DrawPool::resetState()
 
     m_objectsByhash.clear();
     m_state = {};
-    m_currentFloor = 0;
+    m_depthLevel = 0;
     m_status.second = 0;
     m_shaderRefreshDelay = 0;
 }
