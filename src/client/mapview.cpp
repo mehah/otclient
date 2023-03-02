@@ -775,9 +775,7 @@ void MapView::setDrawLights(bool enable)
         if (m_lightView)
             return;
 
-        m_lightView = std::make_shared<LightView>();
-        g_mainDispatcher.addEvent([this]
-        () { if (m_lightView) m_lightView->resize(m_drawDimension, m_tileSize); });
+        m_lightView = std::make_shared<LightView>(m_drawDimension, m_tileSize);
 
         requestUpdateVisibleTiles();
     } else m_lightView = nullptr;
