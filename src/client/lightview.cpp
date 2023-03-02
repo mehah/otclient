@@ -31,7 +31,7 @@ LightView::LightView() : m_pool(g_drawPool.get<DrawPool>(DrawPoolType::LIGHT)) {
 void LightView::resize(const Size& size, const uint8_t tileSize) {
     m_lightTexture = nullptr;
     m_mapSize = size;
-    m_tiles.resize(size.area(), {});
+    m_tiles.resize(size.area());
     if (m_pixels.size() < 4u * m_mapSize.area())
         m_pixels.resize(m_mapSize.area() * 4);
 }
@@ -91,6 +91,7 @@ void LightView::draw(const Rect& dest, const Rect& src)
     });
 
     m_lights.clear();
+    m_tiles.assign(m_mapSize.area(), {});
 }
 
 void LightView::updateCoords(const Rect& dest, const Rect& src) {
