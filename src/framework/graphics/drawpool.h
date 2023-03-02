@@ -72,15 +72,20 @@ public:
     bool isEnabled() const { return m_enabled; }
     bool isType(DrawPoolType type) const { return m_type == type; }
 
+    bool isValid() const { return !m_framebuffer || m_framebuffer->isValid(); }
+    bool hasFrameBuffer() const { return m_framebuffer != nullptr; }
+    FrameBufferPtr getFrameBuffer() const { return m_framebuffer; }
+
     bool canRepaint() { return canRepaint(false); }
     void repaint() { m_status.first = 1; }
-
-    virtual bool isValid() const { return true; };
 
     void optimize(int size);
 
     void setScaleFactor(float scale) { m_scaleFactor = scale; }
     inline float getScaleFactor() const { return m_scaleFactor; }
+
+    void onBeforeDraw(std::function<void()> f) { m_beforeDraw = std::move(f); }
+    void onAfterDraw(std::function<void()> f) { m_afterDraw = std::move(f); }
 
     std::mutex& getMutex() { return m_mutex; }
 
@@ -210,9 +215,6 @@ private:
         m_updateHash = false;
     }
 
-    virtual bool hasFrameBuffer() const { return false; };
-    virtual DrawPoolFramed* toPoolFramed() { return nullptr; }
-
     bool canRepaint(bool autoUpdateStatus);
 
     bool m_enabled{ true };
@@ -239,35 +241,14 @@ private:
 
     float m_scaleFactor{ 1.f };
 
-    std::mutex m_mutex;
-
-    friend DrawPoolManager;
-};
-
-class DrawPoolFramed : public DrawPool
-{
-public:
-    void onBeforeDraw(std::function<void()> f) { m_beforeDraw = std::move(f); }
-    void onAfterDraw(std::function<void()> f) { m_afterDraw = std::move(f); }
-    void setSmooth(bool enabled) const { m_framebuffer->setSmooth(enabled); }
-    void resize(const Size& size) { if (m_framebuffer->resize(size)) repaint(); }
-    Size getSize() const { return m_framebuffer->getSize(); }
-    bool isValid() const override { return m_framebuffer->isValid(); }
-
-protected:
-    DrawPoolFramed() : m_framebuffer(std::make_shared<FrameBuffer>()) {};
-
-    friend DrawPoolManager;
-    friend DrawPool;
-
-private:
-    bool hasFrameBuffer() const override { return m_framebuffer->isValid(); }
-    DrawPoolFramed* toPoolFramed() override { return this; }
-
     FrameBufferPtr m_framebuffer;
 
     std::function<void()> m_beforeDraw;
     std::function<void()> m_afterDraw;
+
+    std::mutex m_mutex;
+
+    friend DrawPoolManager;
 };
 
 extern DrawPoolManager g_drawPool;

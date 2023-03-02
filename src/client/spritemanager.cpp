@@ -30,13 +30,8 @@
 
 SpriteManager g_sprites;
 
-void SpriteManager::init() { generateLightTexture(); generateShadeTexture(); }
-void SpriteManager::terminate()
-{
-    unload();
-    m_shadeTexture = nullptr;
-    m_lightTexture = nullptr;
-}
+void SpriteManager::init() { }
+void SpriteManager::terminate() { unload(); }
 
 void SpriteManager::reload() {
     if (g_app.isEncrypted())
@@ -245,46 +240,4 @@ ImagePtr SpriteManager::getSpriteImage(int id, const FileStreamPtr& file) {
         g_logger.error(stdext::format("Failed to get sprite id %d: %s", id, e.what()));
         return nullptr;
     }
-}
-
-void SpriteManager::generateLightTexture()
-{
-    constexpr float brightnessIntensity = 1.5f;
-
-    constexpr int bubbleRadius = 6;
-    constexpr int bubbleDiameter = bubbleRadius * 2.3;
-
-    const auto& image = std::make_shared<Image>(Size(bubbleDiameter));
-    for (int_fast16_t x = -1; ++x < bubbleDiameter;) {
-        for (int_fast16_t y = -1; ++y < bubbleDiameter;) {
-            const float radius = std::sqrt((bubbleRadius - x) * (bubbleRadius - x) + (bubbleRadius - y) * (bubbleRadius - y));
-            const float intensity = std::clamp<float>(((bubbleRadius - radius) / bubbleRadius) * brightnessIntensity, .01f, 1.0f);
-
-            // light intensity varies inversely with the square of the distance
-            const uint8_t colorByte = intensity * 0xff;
-
-            const uint8_t pixel[4] = { colorByte, colorByte, colorByte, 0xff };
-            image->setPixel(x, y, pixel);
-        }
-    }
-
-    m_lightTexture = std::make_shared<Texture>(image);
-    m_lightTexture->setSmooth(true);
-}
-
-void SpriteManager::generateShadeTexture()
-{
-    constexpr uint16_t diameter = 4;
-
-    const auto& image = std::make_shared<Image>(Size(diameter));
-    for (int_fast16_t x = -1; ++x < diameter;) {
-        for (int_fast16_t y = -1; ++y < diameter;) {
-            const uint8_t alpha = x == 0 || y == 0 || x == diameter - 1 || y == diameter - 1 ? 0 : 0xff;
-            const uint8_t pixel[4] = { 0xff, 0xff, 0xff, alpha };
-            image->setPixel(x, y, pixel);
-        }
-    }
-
-    m_shadeTexture = std::make_shared<Texture>(image);
-    m_shadeTexture->setSmooth(true);
 }

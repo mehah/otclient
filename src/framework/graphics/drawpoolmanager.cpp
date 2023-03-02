@@ -59,20 +59,20 @@ void DrawPoolManager::draw()
         g_painter->setResolution(m_size, m_transformMatrix);
     }
 
-    const auto& map = get<DrawPool>(DrawPoolType::MAP); {
+    const auto& map = get(DrawPoolType::MAP); {
         std::scoped_lock l(map->m_mutex);
         if (drawPool(map)) {
-            drawPool(get<DrawPool>(DrawPoolType::CREATURE_INFORMATION));
-            drawPool(get<DrawPool>(DrawPoolType::LIGHT));
+            drawPool(get(DrawPoolType::CREATURE_INFORMATION));
+            drawPool(get(DrawPoolType::LIGHT));
         }
     }
 
-    const auto& text = get<DrawPool>(DrawPoolType::TEXT); {
+    const auto& text = get(DrawPoolType::TEXT); {
         std::scoped_lock l(text->m_mutex);
         drawPool(text);
     }
 
-    const auto& foreground = get<DrawPool>(DrawPoolType::FOREGROUND); {
+    const auto& foreground = get(DrawPoolType::FOREGROUND); {
         std::scoped_lock l(foreground->m_mutex);
         drawPool(foreground);
     }
@@ -82,30 +82,32 @@ bool DrawPoolManager::drawPool(const auto& pool) {
     if (!pool->isEnabled())
         return false;
 
-    if (pool->hasFrameBuffer()) {
-        const auto* pf = pool->toPoolFramed();
-        if (!pf->m_framebuffer->canDraw())
-            return false;
+    if (!pool->hasFrameBuffer()) {
+        for (const auto& obj : pool->m_objects[0][DrawOrder::FIRST]) {
+            drawObject(obj);
+        }
+        return true;
+    }
 
-        if (pool->canRepaint(true)) {
-            pf->m_framebuffer->bind();
-            for (int_fast8_t i = -1; ++i <= pool->m_depthLevel;) {
-                for (const auto& order : pool->m_objects[i])
-                    for (const auto& obj : order)
-                        drawObject(obj);
-            }
+    if (!pool->m_framebuffer->canDraw())
+        return false;
 
-            pf->m_framebuffer->release();
+    if (pool->canRepaint(true)) {
+        pool->m_framebuffer->bind();
+        for (int_fast8_t i = -1; ++i <= pool->m_depthLevel;) {
+            for (const auto& order : pool->m_objects[i])
+                for (const auto& obj : order)
+                    drawObject(obj);
         }
 
-        g_painter->resetState();
-
-        if (pf->m_beforeDraw) pf->m_beforeDraw();
-        pf->m_framebuffer->draw();
-        if (pf->m_afterDraw) pf->m_afterDraw();
-    } else for (const auto& obj : pool->m_objects[0][DrawOrder::FIRST]) {
-        drawObject(obj);
+        pool->m_framebuffer->release();
     }
+
+    g_painter->resetState();
+
+    if (pool->m_beforeDraw) pool->m_beforeDraw();
+    pool->m_framebuffer->draw();
+    if (pool->m_afterDraw) pool->m_afterDraw();
 
     return true;
 }
@@ -239,12 +241,11 @@ void DrawPoolManager::use(const DrawPoolType type, const Rect& dest, const Rect&
     currentPoll->resetState();
 
     if (currentPoll->hasFrameBuffer()) {
-        currentPoll->toPoolFramed()
-            ->m_framebuffer->prepare(dest, src, colorClear);
+        currentPoll->m_framebuffer->prepare(dest, src, colorClear);
 
         // when the selected pool is MAP, reset the creature information state.
         if (type == DrawPoolType::MAP) {
-            get<DrawPool>(DrawPoolType::CREATURE_INFORMATION)->resetState();
+            get(DrawPoolType::CREATURE_INFORMATION)->resetState();
         }
     }
 }

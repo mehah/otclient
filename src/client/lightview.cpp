@@ -21,20 +21,23 @@
  */
 
 #include "lightview.h"
-#include <framework/graphics/drawpoolmanager.h>
 #include "map.h"
 #include "mapview.h"
 #include "spritemanager.h"
 
-LightView::LightView() : m_pool(g_drawPool.get<DrawPool>(DrawPoolType::LIGHT)) {}
+#include <framework/core/eventdispatcher.h>
+#include <framework/graphics/drawpoolmanager.h>
+
+LightView::LightView() : m_pool(g_drawPool.get(DrawPoolType::LIGHT)) {}
 
 void LightView::resize(const Size& size, const uint16_t tileSize) {
-    m_lightTexture = nullptr;
     m_mapSize = size;
     m_tileSize = tileSize;
     m_tiles.resize(size.area());
     if (m_pixels.size() < 4u * m_mapSize.area())
         m_pixels.resize(m_mapSize.area() * 4);
+
+    g_mainDispatcher.addEvent([&] { m_texture = nullptr; })
 }
 
 void LightView::addLightSource(const Point& pos, const Light& light, float brightness)
@@ -77,15 +80,15 @@ void LightView::draw(const Rect& dest, const Rect& src)
     updatePixels();
 
     g_drawPool.addAction([&] {
-        if (!m_lightTexture) {
-            m_lightTexture = std::make_shared<Texture>(m_mapSize);
-            m_lightTexture->setSmooth(true);
+        if (!m_texture) {
+            m_texture = std::make_shared<Texture>(m_mapSize);
+            m_texture->setSmooth(true);
         }
 
-        m_lightTexture->updatePixels(m_pixels.data());
+        m_texture->updatePixels(m_pixels.data());
 
         g_painter->resetColor();
-        g_painter->setTexture(m_lightTexture.get());
+        g_painter->setTexture(m_texture.get());
         g_painter->setCompositionMode(CompositionMode::MULTIPLY);
         g_painter->drawCoords(m_coords);
     });

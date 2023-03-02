@@ -30,8 +30,7 @@
 class DrawPoolManager
 {
 public:
-    template <class T>
-    T* get(const DrawPoolType type) const { return static_cast<T*>(m_pools[static_cast<uint8_t>(type)]); }
+    DrawPool* get(const DrawPoolType type) const { return m_pools[static_cast<uint8_t>(type)]; }
 
     void select(DrawPoolType type);
     void use(const DrawPoolType type) { use(type, {}, {}); }

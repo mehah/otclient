@@ -42,7 +42,7 @@
 
 #include <framework/platform/platformwindow.h>
 
-MapView::MapView() : m_pool(g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP))
+MapView::MapView() : m_pool(g_drawPool.get(DrawPoolType::MAP))
 {
     m_pool->onBeforeDraw([this] {
         float fadeOpacity = 1.f;
@@ -404,7 +404,7 @@ void MapView::updateGeometry(const Size& visibleDimension)
 
     if (m_lightView) m_lightView->resize(m_drawDimension, tileSize);
     g_mainDispatcher.addEvent([=, this]() {
-        m_pool->resize(bufferSize);
+        m_pool->getFrameBuffer()->resize(bufferSize);
     });
 
     const uint8_t left = std::min<uint8_t>(g_map.getAwareRange().left, (m_drawDimension.width() / 2) - 1);
@@ -547,7 +547,7 @@ void MapView::setAntiAliasingMode(const AntialiasingMode mode)
 {
     m_antiAliasingMode = mode;
 
-    g_drawPool.get<DrawPoolFramed>(DrawPoolType::MAP)
+    g_drawPool.get(DrawPoolType::MAP)->getFrameBuffer()
         ->setSmooth(mode != ANTIALIASING_DISABLED);
 
     updateGeometry(m_visibleDimension);
@@ -768,7 +768,7 @@ void MapView::setShader(const std::string_view name, float fadein, float fadeout
 
 void MapView::setDrawLights(bool enable)
 {
-    if (auto* pool = g_drawPool.get<DrawPoolFramed>(DrawPoolType::LIGHT))
+    if (auto* pool = g_drawPool.get(DrawPoolType::LIGHT))
         pool->setEnable(enable);
 
     if (enable) {

@@ -316,5 +316,5 @@ private:
     TexturePtr m_crosshairTexture;
 
     DrawConductor m_shadowConductor{ false, DrawOrder::FIFTH };
-    DrawPoolFramed* m_pool;
+    DrawPool* m_pool;
 };

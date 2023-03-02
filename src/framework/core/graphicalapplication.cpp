@@ -133,9 +133,9 @@ void GraphicalApplication::run()
 
     g_lua.callGlobalField("g_app", "onRun");
 
-    const auto& foreground = g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND);
-    const auto& txt = g_drawPool.get<DrawPool>(DrawPoolType::TEXT);
-    const auto& map = g_drawPool.get<DrawPool>(DrawPoolType::MAP);
+    const auto& foreground = g_drawPool.get(DrawPoolType::FOREGROUND);
+    const auto& txt = g_drawPool.get(DrawPoolType::TEXT);
+    const auto& map = g_drawPool.get(DrawPoolType::MAP);
 
     std::condition_variable foreCondition, txtCondition;
 
@@ -254,7 +254,9 @@ void GraphicalApplication::resize(const Size& size)
 
     g_mainDispatcher.addEvent([size] {
         g_graphics.resize(size);
-        g_drawPool.get<DrawPoolFramed>(DrawPoolType::FOREGROUND)->resize(size);
+        auto* foreGround = g_drawPool.get(DrawPoolType::FOREGROUND);
+        foreGround->getFrameBuffer()->resize(size);
+        foreGround->repaint();
     });
 }
 
@@ -265,7 +267,7 @@ void GraphicalApplication::inputEvent(const InputEvent& event)
     m_onInputEvent = false;
 }
 
-void GraphicalApplication::repaint() { g_drawPool.get<DrawPool>(DrawPoolType::FOREGROUND)->repaint(); }
+void GraphicalApplication::repaint() { g_drawPool.get(DrawPoolType::FOREGROUND)->repaint(); }
 bool GraphicalApplication::canDrawTexts() const { return m_drawText && (!g_map.getStaticTexts().empty() || !g_map.getAnimatedTexts().empty()); }
 
 bool GraphicalApplication::isLoadingAsyncTexture() { return m_loadingAsyncTexture || g_game.isUsingProtobuf(); }

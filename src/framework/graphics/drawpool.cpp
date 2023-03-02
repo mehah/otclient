@@ -30,24 +30,23 @@ FPS60 = 1000 / 60;
 
 DrawPool* DrawPool::create(const DrawPoolType type)
 {
-    DrawPool* pool;
+    DrawPool* pool = new DrawPool;
     if (type == DrawPoolType::MAP || type == DrawPoolType::FOREGROUND) {
-        pool = new DrawPoolFramed;
+        pool = new DrawPool;
 
-        const auto& frameBuffer = pool->toPoolFramed()->m_framebuffer;
-        frameBuffer->m_isScene = true;
+        pool->m_framebuffer = std::make_shared<FrameBuffer>();
+        pool->m_framebuffer->m_isScene = true;
 
         if (type == DrawPoolType::MAP) {
-            frameBuffer->m_useAlphaWriting = false;
-            frameBuffer->disableBlend();
+            pool->m_framebuffer->m_useAlphaWriting = false;
+            pool->m_framebuffer->disableBlend();
         } else if (type == DrawPoolType::FOREGROUND) {
             pool->setFPS(FPS10);
         } else if (type == DrawPoolType::LIGHT) {
             pool->m_alwaysGroupDrawings = true;
-            frameBuffer->setCompositionMode(CompositionMode::LIGHT);
+            pool->m_framebuffer->setCompositionMode(CompositionMode::LIGHT);
         }
     } else {
-        pool = new DrawPool;
         pool->m_alwaysGroupDrawings = true; // CREATURE_INFORMATION & TEXT
         pool->disableUpdateHash();
 
@@ -61,7 +60,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
 }
 
 void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod& method,
-             DrawMode drawMode, const DrawConductor& conductor, const CoordsBufferPtr& coordsBuffer)
+                   DrawMode drawMode, const DrawConductor& conductor, const CoordsBufferPtr& coordsBuffer)
 {
     auto state = getState(method, texture, color);
 
