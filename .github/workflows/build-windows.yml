@@ -39,11 +39,12 @@ jobs:
           restore-keys: |
             ccache-${{ matrix.os }}
 
-      - name: Install vcpkg
-        uses: lukka/run-vcpkg@main
-        with:
-          vcpkgGitURL: "https://github.com/microsoft/vcpkg.git"
-          vcpkgGitCommitId: ${{ secrets.VCPKG_COMMIT }}
+      - name: Restore artifacts and install vcpkg
+        id: vcpkg-step
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          cd vcpkg
+          ./bootstrap-vcpkg.bat
 
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@main
@@ -62,7 +63,7 @@ jobs:
             ${{ github.workspace }}/otclient.exe
             
       - name: Create and Upload Artifact (dlls)
-        if: ${{ matrix.buildtype != 'windows-release' }}
+        if: matrix.buildtype != 'windows-release'
         uses: actions/upload-artifact@main
         with:
           name: otclient-${{ matrix.buildtype }}-${{ github.sha }}
