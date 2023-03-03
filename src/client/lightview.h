@@ -55,6 +55,12 @@ private:
         TileLight(const Point& pos, uint8_t intensity, uint8_t color, float brightness) : Light(intensity, color), pos(pos), brightness(brightness) {}
     };
 
+    struct TileColor
+    {
+        Point pos;
+        int index;
+    };
+
     void updateCoords(const Rect& dest, const Rect& src);
     void updatePixels();
 
@@ -75,4 +81,5 @@ private:
     std::vector<size_t> m_tiles;
     std::vector<uint8_t> m_pixels;
     std::vector<TileLight> m_lights;
+    std::vector<TileColor> m_tileColors;
 };
