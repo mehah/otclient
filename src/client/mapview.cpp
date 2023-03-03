@@ -102,11 +102,11 @@ void MapView::draw()
     if (m_updateVisibleTiles)
         updateVisibleTiles();
 
+    const float fadeLevel = getFadeLevel(m_cachedFirstVisibleFloor);
     if (canFloorFade()) {
-        const float fadeLevel = getFadeLevel(m_cachedFirstVisibleFloor);
-        if (m_lastFadeLevel != fadeLevel && fadeLevel == 1.f) {
+        if (!m_fadeFinish && fadeLevel == 1.f) {
             onFadeInFinished();
-            m_lastFadeLevel = fadeLevel;
+            m_fadeFinish = true;
         }
     }
 
@@ -117,7 +117,7 @@ void MapView::draw()
         return;
     }
 
-    if (m_lightView) m_lightView->draw(m_posInfo.rect, m_posInfo.srcRect);
+    if (m_lightView) m_lightView->draw(m_posInfo.rect, m_posInfo.srcRect, m_cachedFirstVisibleFloor);
 }
 
 void MapView::drawFloor()
@@ -295,7 +295,7 @@ void MapView::updateVisibleTiles()
         }
     } else if (prevFirstVisibleFloor > m_cachedFirstVisibleFloor) { // showing floor
         m_fadeType = FadeType::IN$;
-        m_lastFadeLevel = 0.f;
+        m_fadeFinish = false;
         for (int iz = m_cachedFirstVisibleFloor; iz < prevFirstVisibleFloor; ++iz) {
             const int shift = std::max<int>(0, m_floorFading - m_fadingFloorTimers[iz].elapsed_millis());
             m_fadingFloorTimers[iz].restart(shift * 1000);

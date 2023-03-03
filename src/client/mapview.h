@@ -260,7 +260,6 @@ private:
     float m_fadeInTime{ 0 };
     float m_fadeOutTime{ 0 };
     float m_shadowFloorIntensity{ 0 };
-    float m_lastFadeLevel{ 1.f };
 
     Rect m_rectDimension;
 
@@ -287,6 +286,7 @@ private:
     bool m_drawNames{ true };
     bool m_smooth{ true };
     bool m_follow{ true };
+    bool m_fadeFinish{ false };
 
     bool m_autoViewMode{ false };
     bool m_drawViewportEdge{ false };

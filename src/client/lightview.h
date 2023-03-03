@@ -33,7 +33,7 @@ public:
     LightView(const Size& size, const uint16_t tileSize);
 
     void resize(const Size& size, uint16_t tileSize);
-    void draw(const Rect& dest, const Rect& src);
+    void draw(const Rect& dest, const Rect& src, uint8_t depth);
 
     void addLightSource(const Point& pos, const Light& light, float brightness = 1.f);
     void resetShade(const Point& pos);
@@ -66,6 +66,7 @@ private:
 
     bool m_isDark{ false };
 
+    uint8_t m_depth{ 0 };
     uint16_t m_tileSize{ SPRITE_SIZE };
     size_t m_hash{ 0 }, m_updatingHash{ 0 };
 

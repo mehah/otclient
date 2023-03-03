@@ -83,12 +83,11 @@ void LightView::resetShade(const Point& pos)
     m_tiles[index] = m_lights.size();
 }
 
-void LightView::draw(const Rect& dest, const Rect& src)
+void LightView::draw(const Rect& dest, const Rect& src, uint8_t depth)
 {
     // draw light, only if there is darkness
     m_pool->setEnable(isDark());
     if (!isDark() || !m_pool->isValid()) return;
-
     g_drawPool.use(DrawPoolType::LIGHT);
 
     updateCoords(dest, src);
@@ -103,7 +102,11 @@ void LightView::draw(const Rect& dest, const Rect& src)
     });
 
     m_lights.clear();
-    m_tiles.assign(m_mapSize.area(), {});
+
+    if (m_depth != depth) {
+        m_depth = depth;
+        m_tiles.assign(m_mapSize.area(), {});
+    }
 }
 
 void LightView::updateCoords(const Rect& dest, const Rect& src) {
