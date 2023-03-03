@@ -47,8 +47,8 @@ void LightView::resize(const Size& size, const uint16_t tileSize) {
 
     m_tileColors.clear();
     m_tileColors.reserve(m_tiles.size());
-    for (int x = 0; x < m_mapSize.width(); ++x) {
-        for (int y = 0; y < m_mapSize.height(); ++y) {
+    for (int x = -1; ++x < m_mapSize.width();) {
+        for (int y = -1; ++y < m_mapSize.height();) {
             const Point pos(x * m_tileSize + m_tileSize / 2, y * m_tileSize + m_tileSize / 2);
             m_tileColors.emplace_back(pos, (y * m_mapSize.width() + x));
         }
