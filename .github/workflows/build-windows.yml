@@ -45,13 +45,15 @@ jobs:
           $json=Get-Content vcpkg.json -Raw | ConvertFrom-Json
           $vcpkgCommitId=$json.'builtin-baseline'
           Write-Host "vcpkg commit ID: $vcpkgCommitId"
-          echo "vcpkgGitCommitId=$vcpkgCommitId" >> $GITHUB_OUTPUT
+          echo "vcpkgGitCommitId=$vcpkgCommitId"
 
       - name: Get vcpkg commit id from vcpkg.json
         uses: lukka/run-vcpkg@main
         with:
           vcpkgGitURL: "https://github.com/microsoft/vcpkg.git"
           vcpkgGitCommitId: ${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}
+          run: |
+            echo "beats=$vcpkgGitCommitId"
 
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@main
