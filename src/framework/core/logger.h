@@ -67,7 +67,7 @@ private:
     OnLogCallback m_onLog;
     std::ofstream m_outFile;
     std::recursive_mutex m_mutex;
-    Fw::LogLevel m_level{ Fw::LogInfo };
+    Fw::LogLevel m_level{ Fw::LogDebug };
 };
 
 extern Logger g_logger;

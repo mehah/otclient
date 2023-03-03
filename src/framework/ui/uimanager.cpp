@@ -500,18 +500,14 @@ UIWidgetPtr UIManager::loadUI(const std::string& file, const UIWidgetPtr& parent
             if (deviceWidgetNode)
                 widgetNode = deviceWidgetNode;
         } catch (stdext::exception& e) {
-#ifndef NDEBUG
             g_logger.fine(stdext::format("no device ui found for '%s', reason: '%s'", file, e.what()));
-#endif
         }
         try {
             auto osWidgetNode = loadDeviceUI(file, device.os);
             if (osWidgetNode)
                 widgetNode = osWidgetNode;
         } catch (stdext::exception& e) {
-#ifndef NDEBUG
             g_logger.fine(stdext::format("no os ui found for '%s', reason: '%s'", file, e.what()));
-#endif
         }
 
         if (!widgetNode) {
@@ -520,8 +516,7 @@ UIWidgetPtr UIManager::loadUI(const std::string& file, const UIWidgetPtr& parent
         }
 
         return createWidgetFromOTML(widgetNode, parent);
-    }
-    catch (stdext::exception& e) {
+    } catch (stdext::exception& e) {
         g_logger.error(stdext::format("failed to load UI from '%s': %s", file, e.what()));
         return nullptr;
     }
@@ -532,8 +527,7 @@ UIWidgetPtr UIManager::createWidget(const std::string_view styleName, const UIWi
     const auto& node = OTMLNode::create(styleName);
     try {
         return createWidgetFromOTML(node, parent);
-    }
-    catch (stdext::exception& e) {
+    } catch (stdext::exception& e) {
         g_logger.error(stdext::format("failed to create widget from style '%s': %s", styleName, e.what()));
         return nullptr;
     }
