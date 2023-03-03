@@ -101,13 +101,13 @@ bool Effect::waitFor(const EffectPtr& effect)
 {
     const ticks_t ticksElapsed = effect->m_animationTimer.ticksElapsed();
     uint16_t minDuration = getIdleAnimator() ? getIdleAnimator()->getMinDuration() : EFFECT_TICKS_PER_FRAME;
-    minDuration = minDuration * std::max<uint8_t>(getAnimationPhases() / 4, 1);
+    minDuration = minDuration * std::max<uint8_t>(getAnimationPhases() / 3, 1);
 
     if (ticksElapsed <= minDuration)
         return false;
 
     const int duration = effect->m_duration / (g_app.mustOptimize() || g_app.isForcedEffectOptimization() ? 1.5 : 3);
-    m_timeToStartDrawing = duration - effect->m_animationTimer.ticksElapsed();
+    m_timeToStartDrawing = std::max<int>(0, duration - effect->m_animationTimer.ticksElapsed());
 
     return true;
 }
