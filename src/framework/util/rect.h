@@ -116,6 +116,12 @@ public:
 
     TRect<T> expanded(T add) const { return TRect<T>(TPoint<T>(x1 - add, y1 - add), TPoint<T>(x2 + add, y2 + add)); }
 
+    TRect<T> clamp(const TSize<T>& min, const TSize<T>& max) const {
+        return TRect<T>(x1, y1,
+            std::min<int>(max.width(), std::max<int>(min.width(), width())),
+            std::min<int>(max.height(), std::max<int>(min.height(), height())));
+    }
+
     std::size_t hash() const
     {
         size_t h = 37;

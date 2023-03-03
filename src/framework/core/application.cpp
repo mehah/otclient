@@ -70,7 +70,7 @@ void Application::init(std::vector<std::string>& args)
     std::locale::global(std::locale());
 
     // process args encoding
-    g_platform.processArgs(args);
+    g_platform.init(args);
 
     g_asyncDispatcher.init();
 

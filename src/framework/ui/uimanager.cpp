@@ -318,7 +318,7 @@ void UIManager::clearStyles()
     m_styles.clear();
 }
 
-bool UIManager::importStyle(const std::string& fl)
+bool UIManager::importStyle(const std::string& fl, bool checkDeviceStyles)
 {
     const std::string file{ g_resources.guessFilePath(fl, "otui") };
     try {
@@ -326,12 +326,25 @@ bool UIManager::importStyle(const std::string& fl)
 
         for (const auto& styleNode : doc->children())
             importStyleFromOTML(styleNode);
-
-        return true;
     } catch (stdext::exception& e) {
         g_logger.error(stdext::format("Failed to import UI styles from '%s': %s", file, e.what()));
         return false;
     }
+
+    if (checkDeviceStyles) {
+        // check for device styles
+        auto fileName = fl.substr(0, fl.find("."));
+
+        auto deviceName = g_platform.getDeviceShortName();
+        if (!deviceName.empty())
+            importStyle(deviceName + "." + fileName, false);
+
+        auto osName = g_platform.getOsShortName();
+        if (!osName.empty())
+            importStyle(osName + "." + fileName, false);
+    }
+
+    return true;
 }
 
 void UIManager::importStyleFromOTML(const OTMLNodePtr& styleNode)
@@ -379,6 +392,17 @@ void UIManager::importStyleFromOTML(const OTMLNodePtr& styleNode)
     }
 }
 
+void UIManager::importStyleFromOTML(const OTMLDocumentPtr& doc)
+{
+    for (const auto& node : doc->children()) {
+        std::string tag = node->tag();
+
+        // import styles in these files too
+        if (tag.find('<') != std::string::npos)
+            importStyleFromOTML(node);
+    }
+}
+
 OTMLNodePtr UIManager::getStyle(const std::string_view sn)
 {
     const auto* styleName = sn.data();
@@ -407,11 +431,55 @@ std::string UIManager::getStyleClass(const std::string_view styleName)
     return "";
 }
 
+OTMLNodePtr UIManager::findMainWidgetNode(const OTMLDocumentPtr& doc)
+{
+    OTMLNodePtr mainNode = nullptr;
+    for (const auto& node : doc->children()) {
+        std::string tag = node->tag();
+
+        if (tag.find('<') == std::string::npos) {
+            if (mainNode)
+                throw Exception("cannot have multiple main widgets in otui files");
+            mainNode = node;
+        }
+    }
+    return mainNode;
+}
+
+OTMLNodePtr UIManager::loadDeviceUI(const std::string& file, Platform::OperatingSystem os)
+{
+    auto rawName = file.substr(0, file.find("."));
+    auto osName = g_platform.getOsShortName(os);
+
+    const auto& doc = OTMLDocument::parse(g_resources.guessFilePath(rawName + "." + osName, "otui"));
+    if (doc) {
+        g_logger.info(stdext::format("found os style '%s' for '%s'", osName, rawName));
+        importStyleFromOTML(doc);
+        return findMainWidgetNode(doc);
+    }
+    return nullptr;
+}
+
+OTMLNodePtr UIManager::loadDeviceUI(const std::string& file, Platform::DeviceType deviceType)
+{
+    auto rawName = file.substr(0, file.find("."));
+    auto deviceName = g_platform.getDeviceShortName(deviceType);
+
+    const auto& doc = OTMLDocument::parse(g_resources.guessFilePath(rawName + "." + deviceName, "otui"));
+    if (doc) {
+        g_logger.info(stdext::format("found device style '%s' for '%s'", deviceName, rawName));
+        importStyleFromOTML(doc);
+        return findMainWidgetNode(doc);
+    }
+    return nullptr;
+}
+
 UIWidgetPtr UIManager::loadUI(const std::string& file, const UIWidgetPtr& parent)
 {
     try {
+        OTMLNodePtr widgetNode = nullptr;
         const auto& doc = OTMLDocument::parse(g_resources.guessFilePath(file, "otui"));
-        UIWidgetPtr widget;
+
         for (const auto& node : doc->children()) {
             std::string tag = node->tag();
 
@@ -419,14 +487,41 @@ UIWidgetPtr UIManager::loadUI(const std::string& file, const UIWidgetPtr& parent
             if (tag.find('<') != std::string::npos)
                 importStyleFromOTML(node);
             else {
-                if (widget)
+                if (widgetNode)
                     throw Exception("cannot have multiple main widgets in otui files");
-                widget = createWidgetFromOTML(node, parent);
+                widgetNode = node;
             }
         }
 
-        return widget;
-    } catch (stdext::exception& e) {
+        // load device styles and widget
+        auto device = g_platform.getDevice();
+        try {
+            const auto& deviceWidgetNode = loadDeviceUI(file, device.type);
+            if (deviceWidgetNode)
+                widgetNode = deviceWidgetNode;
+        } catch (stdext::exception& e) {
+#ifndef NDEBUG
+            g_logger.fine(stdext::format("no device ui found for '%s', reason: '%s'", file, e.what()));
+#endif
+        }
+        try {
+            auto osWidgetNode = loadDeviceUI(file, device.os);
+            if (osWidgetNode)
+                widgetNode = osWidgetNode;
+        } catch (stdext::exception& e) {
+#ifndef NDEBUG
+            g_logger.fine(stdext::format("no os ui found for '%s', reason: '%s'", file, e.what()));
+#endif
+        }
+
+        if (!widgetNode) {
+            g_logger.debug(stdext::format("failed to load a widget from '%s'", file));
+            return nullptr;
+        }
+
+        return createWidgetFromOTML(widgetNode, parent);
+    }
+    catch (stdext::exception& e) {
         g_logger.error(stdext::format("failed to load UI from '%s': %s", file, e.what()));
         return nullptr;
     }
@@ -437,7 +532,8 @@ UIWidgetPtr UIManager::createWidget(const std::string_view styleName, const UIWi
     const auto& node = OTMLNode::create(styleName);
     try {
         return createWidgetFromOTML(node, parent);
-    } catch (stdext::exception& e) {
+    }
+    catch (stdext::exception& e) {
         g_logger.error(stdext::format("failed to create widget from style '%s': %s", styleName, e.what()));
         return nullptr;
     }

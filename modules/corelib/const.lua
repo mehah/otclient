@@ -1,4 +1,16 @@
 -- @docconsts @{
+OsUnknown = 0
+OsWindows = 1
+OsLinux = 2
+OsMacOS = 3
+OsAndroid = 4
+OsiOS = 5
+
+DeviceUnknown = 0
+DeviceDesktop = 1
+DeviceMobile  = 2
+DeviceConsole = 3
+
 AnchorNone = 0
 AnchorTop = 1
 AnchorBottom = 2
@@ -7,11 +19,12 @@ AnchorRight = 4
 AnchorVerticalCenter = 5
 AnchorHorizontalCenter = 6
 
-LogDebug = 0
-LogInfo = 1
-LogWarning = 2
-LogError = 3
-LogFatal = 4
+LogFine = 0
+LogDebug = 1
+LogInfo = 2
+LogWarning = 3
+LogError = 4
+LogFatal = 5
 
 MouseFocusReason = 0
 KeyboardFocusReason = 1

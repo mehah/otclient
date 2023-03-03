@@ -87,6 +87,9 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_platform", "getTotalSystemMemory", &Platform::getTotalSystemMemory, &g_platform);
     g_lua.bindSingletonFunction("g_platform", "getOSName", &Platform::getOSName, &g_platform);
     g_lua.bindSingletonFunction("g_platform", "getFileModificationTime", &Platform::getFileModificationTime, &g_platform);
+    g_lua.bindSingletonFunction("g_platform", "getDevice", &Platform::getDevice, &g_platform);
+    g_lua.bindSingletonFunction("g_platform", "getDeviceShortName", &Platform::getDeviceShortName, &g_platform);
+    g_lua.bindSingletonFunction("g_platform", "getOsShortName", &Platform::getOsShortName, &g_platform);
 
     // Application
     g_lua.registerSingletonClass("g_app");
@@ -144,6 +147,8 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_logger", "warning", &Logger::warning, &g_logger);
     g_lua.bindSingletonFunction("g_logger", "error", &Logger::error, &g_logger);
     g_lua.bindSingletonFunction("g_logger", "fatal", &Logger::fatal, &g_logger);
+    g_lua.bindSingletonFunction("g_logger", "setLevel", &Logger::setLevel, &g_logger);
+    g_lua.bindSingletonFunction("g_logger", "getLevel", &Logger::getLevel, &g_logger);
 
     g_lua.registerSingletonClass("g_http");
     g_lua.bindSingletonFunction("g_http", "setUserAgent", &Http::setUserAgent, &g_http);
@@ -425,11 +430,14 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("getChildById", &UIWidget::getChildById);
     g_lua.bindClassMemberFunction<UIWidget>("getChildByPos", &UIWidget::getChildByPos);
     g_lua.bindClassMemberFunction<UIWidget>("getChildByIndex", &UIWidget::getChildByIndex);
+    g_lua.bindClassMemberFunction<UIWidget>("getChildByState", &UIWidget::getChildByState);
     g_lua.bindClassMemberFunction<UIWidget>("recursiveGetChildById", &UIWidget::recursiveGetChildById);
     g_lua.bindClassMemberFunction<UIWidget>("recursiveGetChildByPos", &UIWidget::recursiveGetChildByPos);
+    g_lua.bindClassMemberFunction<UIWidget>("recursiveGetChildByState", &UIWidget::recursiveGetChildByState);
     g_lua.bindClassMemberFunction<UIWidget>("recursiveGetChildren", &UIWidget::recursiveGetChildren);
     g_lua.bindClassMemberFunction<UIWidget>("recursiveGetChildrenByPos", &UIWidget::recursiveGetChildrenByPos);
     g_lua.bindClassMemberFunction<UIWidget>("recursiveGetChildrenByMarginPos", &UIWidget::recursiveGetChildrenByMarginPos);
+    g_lua.bindClassMemberFunction<UIWidget>("recursiveGetChildrenByState", &UIWidget::recursiveGetChildrenByState);
     g_lua.bindClassMemberFunction<UIWidget>("backwardsGetWidgetById", &UIWidget::backwardsGetWidgetById);
     g_lua.bindClassMemberFunction<UIWidget>("resize", &UIWidget::resize);
     g_lua.bindClassMemberFunction<UIWidget>("move", &UIWidget::move);
@@ -485,6 +493,12 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("setWidth", &UIWidget::setWidth);
     g_lua.bindClassMemberFunction<UIWidget>("setHeight", &UIWidget::setHeight);
     g_lua.bindClassMemberFunction<UIWidget>("setSize", &UIWidget::setSize);
+    g_lua.bindClassMemberFunction<UIWidget>("setMinWidth", &UIWidget::setMinWidth);
+    g_lua.bindClassMemberFunction<UIWidget>("setMaxWidth", &UIWidget::setMaxWidth);
+    g_lua.bindClassMemberFunction<UIWidget>("setMinHeight", &UIWidget::setMinHeight);
+    g_lua.bindClassMemberFunction<UIWidget>("setMaxHeight", &UIWidget::setMaxHeight);
+    g_lua.bindClassMemberFunction<UIWidget>("setMinSize", &UIWidget::setMinSize);
+    g_lua.bindClassMemberFunction<UIWidget>("setMaxSize", &UIWidget::setMaxSize);
     g_lua.bindClassMemberFunction<UIWidget>("setPosition", &UIWidget::setPosition);
     g_lua.bindClassMemberFunction<UIWidget>("setColor", &UIWidget::setColor);
     g_lua.bindClassMemberFunction<UIWidget>("setBackgroundColor", &UIWidget::setBackgroundColor);
@@ -539,6 +553,12 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("getHeight", &UIWidget::getHeight);
     g_lua.bindClassMemberFunction<UIWidget>("getSize", &UIWidget::getSize);
     g_lua.bindClassMemberFunction<UIWidget>("getRect", &UIWidget::getRect);
+    g_lua.bindClassMemberFunction<UIWidget>("getMinWidth", &UIWidget::getMinWidth);
+    g_lua.bindClassMemberFunction<UIWidget>("getMaxWidth", &UIWidget::getMaxWidth);
+    g_lua.bindClassMemberFunction<UIWidget>("getMinHeight", &UIWidget::getMinHeight);
+    g_lua.bindClassMemberFunction<UIWidget>("getMaxHeight", &UIWidget::getMaxHeight);
+    g_lua.bindClassMemberFunction<UIWidget>("getMinSize", &UIWidget::getMinSize);
+    g_lua.bindClassMemberFunction<UIWidget>("getMaxSize", &UIWidget::getMaxSize);
     g_lua.bindClassMemberFunction<UIWidget>("getColor", &UIWidget::getColor);
     g_lua.bindClassMemberFunction<UIWidget>("getBackgroundColor", &UIWidget::getBackgroundColor);
     g_lua.bindClassMemberFunction<UIWidget>("getBackgroundOffsetX", &UIWidget::getBackgroundOffsetX);

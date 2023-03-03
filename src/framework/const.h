@@ -174,7 +174,8 @@ namespace Fw
 
     enum LogLevel : uint8_t
     {
-        LogDebug = 0,
+        LogFine = 0,
+        LogDebug,
         LogInfo,
         LogWarning,
         LogError,

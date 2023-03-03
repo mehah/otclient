@@ -223,6 +223,33 @@ bool luavalue_cast(int index, Size& size)
     return false;
 }
 
+// device
+int push_luavalue(const Platform::Device& device)
+{
+    g_lua.createTable(0, 2);
+    g_lua.pushInteger(device.type);
+    g_lua.setField("type");
+    g_lua.pushInteger(device.os);
+    g_lua.setField("os");
+    return 1;
+}
+
+bool luavalue_cast(int index, Platform::Device& device)
+{
+    if (g_lua.isTable(index)) {
+        g_lua.getField("type", index);
+        device.type = static_cast<Platform::DeviceType>(g_lua.popInteger());
+        g_lua.getField("os", index);
+        device.os = static_cast<Platform::OperatingSystem>(g_lua.popInteger());
+        return true;
+    }
+    if (g_lua.isNil()) {
+        device = {};
+        return true;
+    }
+    return false;
+}
+
 // otml nodes
 void push_otml_subnode_luavalue(const OTMLNodePtr& node)
 {

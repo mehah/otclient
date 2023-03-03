@@ -197,6 +197,13 @@ function table.collect(t, func)
     return res
 end
 
+function table.insertall(t, s)
+    for k,v in pairs(s) do
+      table.insert(t,v)
+    end
+    return res
+end
+
 function table.equals(t, comp)
     if type(t) == 'table' and type(comp) == 'table' then
         for k, v in pairs(t) do
