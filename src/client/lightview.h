@@ -31,6 +31,7 @@ class LightView : public LuaObject
 {
 public:
     LightView(const Size& size, const uint16_t tileSize);
+    ~LightView() { m_texture = nullptr; }
 
     void resize(const Size& size, uint16_t tileSize);
     void draw(const Rect& dest, const Rect& src, uint8_t depth);
@@ -45,6 +46,8 @@ public:
     }
 
     bool isDark() const { return m_isDark; }
+    bool isEnabled() const { return m_pool->isEnabled(); }
+    void setEnabled(bool v) { m_pool->setEnable(v); }
 
 private:
     struct TileLight : public Light

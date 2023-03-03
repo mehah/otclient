@@ -86,10 +86,10 @@ void LightView::resetShade(const Point& pos)
 void LightView::draw(const Rect& dest, const Rect& src, uint8_t depth)
 {
     // draw light, only if there is darkness
-    m_pool->setEnable(isDark());
-    if (!isDark() || !m_pool->isValid()) return;
-    g_drawPool.use(DrawPoolType::LIGHT);
+    if (!isDark())
+        return;
 
+    g_drawPool.use(DrawPoolType::LIGHT);
     updateCoords(dest, src);
     updatePixels();
 
@@ -146,16 +146,10 @@ void LightView::updatePixels() {
             if (intensity < .01f) continue;
             if (intensity > 1.f) intensity = 1.f;
 
-            const auto& lightColor = Color::from8bit(light.color) * intensity;
+            const auto& lightColor = Color::from8bit(light.color, intensity);
             m_pixels[colorIndex] = std::max<int>(m_pixels[colorIndex], lightColor.r());
             m_pixels[colorIndex + 1] = std::max<int>(m_pixels[colorIndex + 1], lightColor.g());
             m_pixels[colorIndex + 2] = std::max<int>(m_pixels[colorIndex + 2], lightColor.b());
-        }
-    }
-    for (int x = 0; x < m_mapSize.width(); ++x) {
-        for (int y = 0; y < m_mapSize.height(); ++y) {
-            const Point pos(x * m_tileSize + m_tileSize / 2, y * m_tileSize + m_tileSize / 2);
-            const int index = (y * m_mapSize.width() + x);
         }
     }
 
