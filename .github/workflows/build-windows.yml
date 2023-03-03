@@ -39,19 +39,11 @@ jobs:
           restore-keys: |
             ccache-${{ matrix.os }}
 
-      - name: Restore artifacts and install vcpkg
-        id: vcpkg-step
-        run: |
-          $json=Get-Content vcpkg.json -Raw | ConvertFrom-Json
-          $vcpkgCommitId=$json.'builtin-baseline'
-          Write-Host "vcpkg commit ID: $vcpkgCommitId"
-          echo "vcpkg_commit_id=$vcpkgCommitId" >> $GITHUB_ENV
-
-      - name: Get vcpkg commit id from vcpkg.json
+      - name: Install vcpkg
         uses: lukka/run-vcpkg@main
         with:
           vcpkgGitURL: "https://github.com/microsoft/vcpkg.git"
-          vcpkgGitCommitId: ${{ env.vcpkg_commit_id }}
+          vcpkgGitCommitId: ${{ secrets.VCPKG_COMMIT }}
 
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@main
