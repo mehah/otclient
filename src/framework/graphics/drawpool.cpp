@@ -32,8 +32,6 @@ DrawPool* DrawPool::create(const DrawPoolType type)
 {
     DrawPool* pool = new DrawPool;
     if (type == DrawPoolType::MAP || type == DrawPoolType::FOREGROUND) {
-        pool = new DrawPool;
-
         pool->m_framebuffer = std::make_shared<FrameBuffer>();
         pool->m_framebuffer->m_isScene = true;
 
@@ -42,9 +40,6 @@ DrawPool* DrawPool::create(const DrawPoolType type)
             pool->m_framebuffer->disableBlend();
         } else if (type == DrawPoolType::FOREGROUND) {
             pool->setFPS(FPS10);
-        } else if (type == DrawPoolType::LIGHT) {
-            pool->m_alwaysGroupDrawings = true;
-            pool->m_framebuffer->setCompositionMode(CompositionMode::LIGHT);
         }
     } else {
         pool->m_alwaysGroupDrawings = true; // CREATURE_INFORMATION & TEXT
