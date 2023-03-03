@@ -24,38 +24,56 @@
 
 Platform g_platform;
 
+stdext::map<Platform::DeviceType, std::string> Platform::m_deviceShortNames = {
+    {Platform::Desktop, "desktop"},
+    {Platform::Mobile,  "mobile"},
+    {Platform::Console, "console"},
+};
+
+stdext::map<Platform::OperatingSystem, std::string> Platform::m_osShortNames = {
+    {Platform::Windows, "windows"},
+    {Platform::Linux,   "linux"},
+    {Platform::macOS,   "macos"},
+    {Platform::Android, "android"},
+    {Platform::iOS,     "ios"},
+};
+
 std::string Platform::getDeviceShortName(DeviceType type)
 {
-    static stdext::map<Platform::DeviceType, std::string> deviceShortNames = {
-        {Platform::Desktop, "desktop"},
-        {Platform::Mobile,  "mobile"},
-        {Platform::Console, "console"},
-    };
-
     if (type == DeviceUnknown)
         type = m_device.type;
 
-    auto it = deviceShortNames.find(type);
-    if (it == deviceShortNames.end())
+    auto it = m_deviceShortNames.find(type);
+    if (it == m_deviceShortNames.end())
         return "";
     return it->second;
 }
 
 std::string Platform::getOsShortName(OperatingSystem os)
 {
-    static stdext::map<Platform::OperatingSystem, std::string> osShortNames = {
-        {Platform::Windows, "windows"},
-        {Platform::Linux,   "linux"},
-        {Platform::macOS,   "macos"},
-        {Platform::Android, "android"},
-        {Platform::iOS,     "ios"},
-    };
-
     if (os == OsUnknown)
         os = m_device.os;
 
-    auto it = osShortNames.find(os);
-    if (it == osShortNames.end())
+    auto it = m_osShortNames.find(os);
+    if (it == m_osShortNames.end())
         return "";
     return it->second;
+}
+
+Platform::DeviceType Platform::getDeviceTypeByName(std::string shortName)
+{
+    for (auto const& [type, name] : m_deviceShortNames) {
+        if (name == shortName)
+            return type;
+    }
+    return DeviceUnknown;
+}
+
+Platform::OperatingSystem Platform::getOsByName(std::string shortName)
+{
+    for (auto const& [type, name] : m_osShortNames) {
+        if (name == shortName)
+            return type;
+    }
+    return OsUnknown;
 }

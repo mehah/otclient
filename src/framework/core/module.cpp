@@ -34,6 +34,9 @@ bool Module::load()
     if (m_loaded || !m_enabled)
         return true;
 
+    if (!m_supportedDevices.empty() && !hasSupportedDevice(g_platform.getDevice()))
+        return true;
+
     try {
         // add to package.loaded
         g_lua.getGlobalField("package", "loaded");
@@ -177,6 +180,17 @@ bool Module::hasDependency(const std::string_view name, bool recursive)
     return false;
 }
 
+bool Module::hasSupportedDevice(Platform::Device device)
+{
+    for (const auto& sd : m_supportedDevices) {
+        if (sd.type == device.type || sd.type == Platform::DeviceUnknown) {
+            if (sd.os == device.os || sd.os == Platform::OsUnknown)
+                return true;
+        }
+    }
+    return false;
+}
+
 int Module::getSandbox(LuaInterface* lua)
 {
     lua->getRef(m_sandboxEnv);
@@ -195,6 +209,19 @@ void Module::discover(const OTMLNodePtr& moduleNode)
     m_reloadable = moduleNode->valueAt<bool>("reloadable", true);
     m_sandboxed = moduleNode->valueAt<bool>("sandboxed", false);
     m_autoLoadPriority = moduleNode->valueAt<int>("autoload-priority", 9999);
+
+    if (const auto& node = moduleNode->get("devices")) {
+        for (const auto& tmp : node->children()) {
+            auto deviceInfo = stdext::split(tmp->value(), ":");
+            if (deviceInfo.empty())
+                continue;
+
+            auto device = Platform::Device();
+            device.type = Platform::getDeviceTypeByName(deviceInfo.at(0));
+            if (deviceInfo.size() > 1) device.os = Platform::getOsByName(deviceInfo.at(1));
+            m_supportedDevices.emplace_back(device);
+        }
+    }
 
     if (const auto& node = moduleNode->get("dependencies")) {
         for (const auto& tmp : node->children())

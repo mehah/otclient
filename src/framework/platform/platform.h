@@ -51,6 +51,8 @@ public:
         Device(DeviceType t, OperatingSystem o) : type(t), os(o) {}
         DeviceType type{ DeviceUnknown };
         OperatingSystem os{ OsUnknown };
+
+        bool operator==(const Device& rhs) const { return type == rhs.type && os == rhs.os; }
     };
 
     void init(std::vector<std::string>& args);
@@ -78,8 +80,14 @@ public:
     std::string getOsShortName(OperatingSystem os = OsUnknown);
     std::string traceback(const std::string_view where, int level = 1, int maxDepth = 32);
 
+    static Platform::DeviceType getDeviceTypeByName(std::string shortName);
+    static Platform::OperatingSystem getOsByName(std::string shortName);
+
 private:
     Device m_device{ Device(Desktop, Windows) };
+
+    static stdext::map<Platform::DeviceType, std::string> m_deviceShortNames;
+    static stdext::map<Platform::OperatingSystem, std::string> m_osShortNames;
 };
 
 extern Platform g_platform;
