@@ -501,7 +501,7 @@ UIWidgetPtr UIManager::loadUI(const std::string& file, const UIWidgetPtr& parent
                 widgetNode = deviceWidgetNode;
         } catch (stdext::exception& e) {
 #ifndef NDEBUG
-            g_logger.fine(stdext::format("no os ui found for '%s', reason: '%s'", file, e.what()));
+            g_logger.fine(stdext::format("no device ui found for '%s', reason: '%s'", file, e.what()));
 #endif
         }
         try {
