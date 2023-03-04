@@ -264,6 +264,9 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_app", "getFps", &GraphicalApplication::getFps, &g_app);
     g_lua.bindSingletonFunction("g_app", "getMaxFps", &GraphicalApplication::getMaxFps, &g_app);
     g_lua.bindSingletonFunction("g_app", "setMaxFps", &GraphicalApplication::setMaxFps, &g_app);
+    g_lua.bindSingletonFunction("g_app", "getTargetFps", &GraphicalApplication::getTargetFps, &g_app);
+    g_lua.bindSingletonFunction("g_app", "setTargetFps", &GraphicalApplication::setTargetFps, &g_app);
+    g_lua.bindSingletonFunction("g_app", "resetTargetFps", &GraphicalApplication::resetTargetFps, &g_app);
 
     g_lua.bindSingletonFunction("g_app", "isDrawingTexts", &GraphicalApplication::isDrawingTexts, &g_app);
     g_lua.bindSingletonFunction("g_app", "setDrawTexts", &GraphicalApplication::setDrawTexts, &g_app);

@@ -44,9 +44,9 @@
 
 GraphicalApplication g_app;
 
-void GraphicalApplication::init(std::vector<std::string>& args)
+void GraphicalApplication::init(std::vector<std::string>& args, uint16_t asyncDispatchMaxThreads)
 {
-    Application::init(args);
+    Application::init(args, asyncDispatchMaxThreads);
 
     // setup platform window
     g_window.init();

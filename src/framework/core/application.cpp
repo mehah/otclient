@@ -56,7 +56,7 @@ void exitSignalHandler(int sig)
     }
 }
 
-void Application::init(std::vector<std::string>& args)
+void Application::init(std::vector<std::string>& args, uint16_t asyncDispatchMaxThreads)
 {
     // capture exit signals
     signal(SIGTERM, exitSignalHandler);
@@ -72,7 +72,7 @@ void Application::init(std::vector<std::string>& args)
     // process args encoding
     g_platform.init(args);
 
-    g_asyncDispatcher.init();
+    g_asyncDispatcher.init(asyncDispatchMaxThreads);
 
     std::string startupOptions;
     for (uint32_t i = 1; i < args.size(); ++i) {

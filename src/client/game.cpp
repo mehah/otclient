@@ -164,6 +164,7 @@ void Game::processEnterGame()
 void Game::processGameStart()
 {
     m_online = true;
+    g_app.setTargetFps(60u);
 
     // synchronize fight modes with the server
     m_protocolGame->sendChangeFightModes(m_fightMode, m_chaseMode, m_safeFight, m_pvpMode);
@@ -191,6 +192,7 @@ void Game::processGameStart()
 void Game::processGameEnd()
 {
     m_online = false;
+    g_app.resetTargetFps();
     g_lua.callGlobalField("g_game", "onGameEnd");
 
     if (m_connectionFailWarned) {

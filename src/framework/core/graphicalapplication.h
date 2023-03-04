@@ -32,7 +32,7 @@
 class GraphicalApplication : public Application
 {
 public:
-    void init(std::vector<std::string>& args) override;
+    void init(std::vector<std::string>& args, uint16_t asyncDispatchMaxThreads) override;
     void deinit() override;
     void terminate() override;
     void run() override;
@@ -41,9 +41,13 @@ public:
     void close() override;
 
     void setMaxFps(uint16_t maxFps) { m_frameCounter.setMaxFps(maxFps); }
+    void setTargetFps(uint16_t targetFps) { m_frameCounter.setTargetFps(targetFps); }
 
     uint16_t getFps() { return m_frameCounter.getFps(); }
     uint8_t getMaxFps() { return m_frameCounter.getMaxFps(); }
+    uint8_t getTargetFps() { return m_frameCounter.getTargetFps(); }
+
+    void resetTargetFps() { m_frameCounter.resetTargetFps(); }
 
     bool isOnInputEvent() { return m_onInputEvent; }
     bool mustOptimize() {

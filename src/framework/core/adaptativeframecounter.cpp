@@ -21,14 +21,12 @@
  */
 
 #include "adaptativeframecounter.h"
-#include <client/game.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/platform/platformwindow.h>
 
 void AdaptativeFrameCounter::update()
 {
-    // FPS 60 for foreground rendering alone
-    const uint8_t maxFps = g_game.isOnline() ? m_maxFps : 60u;
+    const uint8_t maxFps = m_targetFps == 0 ? m_maxFps : std::min<uint8_t>(m_maxFps, m_targetFps);
     if (maxFps > 0) {
         const int32_t sleepPeriod = (getMaxPeriod(maxFps) - 1000) - m_timer.elapsed_micros();
         if (sleepPeriod > 0) stdext::microsleep(sleepPeriod);

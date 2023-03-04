@@ -23,14 +23,16 @@
 #include <algorithm>
 
 #include "asyncdispatcher.h"
-#include <client/config.h>
 
 AsyncDispatcher g_asyncDispatcher;
 
-void AsyncDispatcher::init()
+void AsyncDispatcher::init(uint16_t maxThreads)
 {
+    if (maxThreads != 0)
+        m_maxThreads = maxThreads;
+
     // -2 = Main Thread and Map Thread
-    int_fast8_t threads = std::clamp<int_fast8_t>(std::thread::hardware_concurrency() - 2, 1, ASYNC_DISPATCHER_MAX_THREAD);
+    int_fast8_t threads = std::clamp<int_fast8_t>(std::thread::hardware_concurrency() - 2, 1, m_maxThreads);
     for (; --threads >= 0;)
         spawn_thread();
 }
