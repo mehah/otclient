@@ -31,6 +31,7 @@ class LightView : public LuaObject
 {
 public:
     LightView(const Size& size, const uint16_t tileSize);
+    ~LightView() { m_texture = nullptr; }
 
     void resize(const Size& size, uint16_t tileSize);
     void draw(const Rect& dest, const Rect& src);
@@ -45,6 +46,8 @@ public:
     }
 
     bool isDark() const { return m_isDark; }
+    bool isEnabled() const { return m_pool->isEnabled(); }
+    void setEnabled(bool v) { m_pool->setEnable(v); }
 
 private:
     struct TileLight : public Light
@@ -53,6 +56,34 @@ private:
         float brightness{ 1.f };
 
         TileLight(const Point& pos, uint8_t intensity, uint8_t color, float brightness) : Light(intensity, color), pos(pos), brightness(brightness) {}
+    };
+
+    struct TileColor
+    {
+        TileColor(Point& pos, size_t& shadeIndex, uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) :
+            pos(std::move(pos)), shadeIndex(shadeIndex), r(r), g(g), b(b), a(a) {}
+
+        Point pos;
+        size_t& shadeIndex;
+
+        void setLight(const Color& color, uint8_t alpha) {
+            r = color.r();
+            g = color.g();
+            b = color.b();
+            a = alpha;
+        }
+
+        void setLight(const Color& color) {
+            r = std::max<int>(r, color.r());
+            g = std::max<int>(g, color.g());
+            b = std::max<int>(b, color.b());
+        }
+
+    private:
+        uint8_t& r;
+        uint8_t& g;
+        uint8_t& b;
+        uint8_t& a;
     };
 
     void updateCoords(const Rect& dest, const Rect& src);
@@ -75,4 +106,5 @@ private:
     std::vector<size_t> m_tiles;
     std::vector<uint8_t> m_pixels;
     std::vector<TileLight> m_lights;
+    std::vector<TileColor> m_tileColors;
 };
