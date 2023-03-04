@@ -26,7 +26,7 @@
 
 AsyncDispatcher g_asyncDispatcher;
 
-void AsyncDispatcher::init(uint16_t maxThreads)
+void AsyncDispatcher::init(uint8_t maxThreads)
 {
     if (maxThreads != 0)
         m_maxThreads = maxThreads;

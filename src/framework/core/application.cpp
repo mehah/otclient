@@ -56,7 +56,7 @@ void exitSignalHandler(int sig)
     }
 }
 
-void Application::init(std::vector<std::string>& args, uint16_t asyncDispatchMaxThreads)
+void Application::init(std::vector<std::string>& args, uint8_t asyncDispatchMaxThreads)
 {
     // capture exit signals
     signal(SIGTERM, exitSignalHandler);

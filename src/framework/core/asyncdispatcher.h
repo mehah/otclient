@@ -28,7 +28,7 @@
 class AsyncDispatcher
 {
 public:
-    void init(uint16_t maxThreads = 0);
+    void init(uint8_t maxThreads = 0);
     void terminate();
 
     void spawn_thread();
@@ -60,7 +60,7 @@ private:
     std::mutex m_mutex;
     std::condition_variable m_condition;
     bool m_running{ false };
-    uint16_t m_maxThreads{ 6 };
+    uint8_t m_maxThreads{ 6 };
 };
 
 extern AsyncDispatcher g_asyncDispatcher;

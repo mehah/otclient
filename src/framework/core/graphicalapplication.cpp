@@ -44,7 +44,7 @@
 
 GraphicalApplication g_app;
 
-void GraphicalApplication::init(std::vector<std::string>& args, uint16_t asyncDispatchMaxThreads)
+void GraphicalApplication::init(std::vector<std::string>& args, uint8_t asyncDispatchMaxThreads)
 {
     Application::init(args, asyncDispatchMaxThreads);
 
