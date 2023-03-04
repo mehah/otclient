@@ -37,13 +37,18 @@ public:
 
     uint16_t getFps() const { return m_fps; }
     uint8_t getMaxFps() const { return m_maxFps; }
+    uint8_t getTargetFps() const { return m_targetFps; }
 
     void setMaxFps(const uint16_t max) { m_maxFps = max; }
+    void setTargetFps(const uint16_t target) { m_targetFps = target; }
+
+    void resetTargetFps() { m_targetFps = 0; }
 
 private:
     uint32_t getMaxPeriod(uint16_t fps) const { return 1000000u / fps; }
 
     uint8_t m_maxFps{};
+    uint8_t m_targetFps{ 60u };
 
     uint16_t m_fps{};
     uint16_t m_fpsCount{};

@@ -60,7 +60,7 @@ int main(int argc, const char* argv[])
 #endif
 
     // initialize application framework and otclient
-    g_app.init(args);
+    g_app.init(args, ASYNC_DISPATCHER_MAX_THREAD);
     g_client.init(args);
 #ifdef FRAMEWORK_NET
     g_http.init();

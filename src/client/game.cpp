@@ -164,6 +164,7 @@ void Game::processEnterGame()
 void Game::processGameStart()
 {
     m_online = true;
+    g_app.resetTargetFps();
 
     // synchronize fight modes with the server
     m_protocolGame->sendChangeFightModes(m_fightMode, m_chaseMode, m_safeFight, m_pvpMode);
@@ -190,6 +191,9 @@ void Game::processGameStart()
 
 void Game::processGameEnd()
 {
+    // FPS fixed at 60 for when UI is rendering alone.
+    g_app.setTargetFps(60u);
+
     m_online = false;
     g_lua.callGlobalField("g_game", "onGameEnd");
 
