@@ -78,6 +78,7 @@ public:
 
     bool canRepaint() { return canRepaint(false); }
     void repaint() { m_status.first = 1; }
+    void resetState();
 
     void optimize(int size);
 
@@ -172,7 +173,6 @@ private:
              DrawMode drawMode = DrawMode::TRIANGLES, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR,
              const CoordsBufferPtr& coordsBuffer = nullptr);
 
-    void resetState();
     inline void setFPS(uint16_t fps) { m_refreshDelay = fps; }
 
     PoolState getState(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color);

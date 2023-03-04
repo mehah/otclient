@@ -61,8 +61,6 @@ void LightView::resize(const Size& size, const uint16_t tileSize) {
 
 void LightView::addLightSource(const Point& pos, const Light& light, float brightness)
 {
-    if (!isDark()) return;
-
     if (!m_lights.empty()) {
         auto& prevLight = m_lights.back();
         if (prevLight.pos == pos && prevLight.color == light.color) {
@@ -89,10 +87,6 @@ void LightView::resetShade(const Point& pos)
 
 void LightView::draw(const Rect& dest, const Rect& src)
 {
-    // draw light, only if there is darkness
-    if (!isDark())
-        return;
-
     g_drawPool.use(DrawPoolType::LIGHT);
     updateCoords(dest, src);
     updatePixels();
@@ -147,4 +141,12 @@ void LightView::updatePixels() {
 
     m_hash = m_updatingHash;
     m_updatingHash = 0;
+}
+
+void LightView::setGlobalLight(const Light& light)
+{
+    m_isDark = light.intensity < 250;
+    m_globalLightColor = Color::from8bit(light.color, light.intensity / static_cast<float>(UINT8_MAX));
+
+    m_pool->resetState();
 }
