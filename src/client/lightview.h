@@ -34,7 +34,7 @@ public:
     ~LightView() { m_texture = nullptr; }
 
     void resize(const Size& size, uint16_t tileSize);
-    void draw(const Rect& dest, const Rect& src, uint8_t depth);
+    void draw(const Rect& dest, const Rect& src);
 
     void addLightSource(const Point& pos, const Light& light, float brightness = 1.f);
     void resetShade(const Point& pos);
@@ -60,8 +60,30 @@ private:
 
     struct TileColor
     {
+        TileColor(Point& pos, size_t& shadeIndex, uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) :
+            pos(std::move(pos)), shadeIndex(shadeIndex), r(r), g(g), b(b), a(a) {}
+
         Point pos;
-        int index;
+        size_t& shadeIndex;
+
+        void setLight(const Color& color, uint8_t alpha) {
+            r = color.r();
+            g = color.g();
+            b = color.b();
+            a = alpha;
+        }
+
+        void setLight(const Color& color) {
+            r = std::max<int>(r, color.r());
+            g = std::max<int>(g, color.g());
+            b = std::max<int>(b, color.b());
+        }
+
+    private:
+        uint8_t& r;
+        uint8_t& g;
+        uint8_t& b;
+        uint8_t& a;
     };
 
     void updateCoords(const Rect& dest, const Rect& src);
@@ -69,7 +91,6 @@ private:
 
     bool m_isDark{ false };
 
-    uint8_t m_depth{ 0 };
     uint16_t m_tileSize{ SPRITE_SIZE };
     size_t m_hash{ 0 }, m_updatingHash{ 0 };
 

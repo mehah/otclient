@@ -118,7 +118,7 @@ void MapView::draw()
     }
 
     if (isDrawingLights())
-        m_lightView->draw(m_posInfo.rect, m_posInfo.srcRect, m_cachedFirstVisibleFloor);
+        m_lightView->draw(m_posInfo.rect, m_posInfo.srcRect);
 }
 
 void MapView::drawFloor()
