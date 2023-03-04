@@ -32,7 +32,7 @@
 class GraphicalApplication : public Application
 {
 public:
-    void init(std::vector<std::string>& args, uint16_t asyncDispatchMaxThreads) override;
+    void init(std::vector<std::string>& args, uint16_t asyncDispatchMaxThreads = 0) override;
     void deinit() override;
     void terminate() override;
     void run() override;

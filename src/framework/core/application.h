@@ -30,7 +30,7 @@ class Application
 public:
     virtual ~Application() = default;
 
-    virtual void init(std::vector<std::string>& args, uint16_t asyncDispatchMaxThreads);
+    virtual void init(std::vector<std::string>& args, uint16_t asyncDispatchMaxThreads = 0);
     virtual void deinit();
     virtual void terminate();
     virtual void run() = 0;

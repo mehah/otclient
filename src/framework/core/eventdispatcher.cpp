@@ -23,7 +23,6 @@
 #include "eventdispatcher.h"
 
 #include <framework/core/clock.h>
-#include <framework/core/graphicalapplication.h>
 #include "timer.h"
 
 EventDispatcher g_dispatcher, g_textDispatcher, g_mainDispatcher;
