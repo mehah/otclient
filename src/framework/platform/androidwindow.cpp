@@ -260,7 +260,7 @@ void AndroidWindow::processFingerDownAndUp() {
 		g_dispatcher.addEvent([this, mouseButton] { m_mouseButtonStates &= ~mouseButton; });
 	}
 
-    Point newMousePos(m_currentEvent.x, m_currentEvent.y);
+    Point newMousePos(m_currentEvent.x * m_scale, m_currentEvent.y * m_scale);
     m_inputEvent.mouseMoved = newMousePos - m_inputEvent.mousePos;
     m_inputEvent.mousePos = newMousePos;
 
@@ -272,7 +272,7 @@ void AndroidWindow::processFingerMotion() {
     m_inputEvent.reset();
     m_inputEvent.type = Fw::MouseMoveInputEvent;
 
-    Point newMousePos(m_currentEvent.x, m_currentEvent.y);
+    Point newMousePos(m_currentEvent.x / m_scale, m_currentEvent.y / m_scale);
     m_inputEvent.mouseMoved = newMousePos - m_inputEvent.mousePos;
     m_inputEvent.mousePos = newMousePos;
 

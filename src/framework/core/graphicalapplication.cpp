@@ -248,16 +248,21 @@ void GraphicalApplication::close()
 
 void GraphicalApplication::resize(const Size& size)
 {
+    float scale = getScale();
+
     m_onInputEvent = true;
-    g_ui.resize(size);
+    g_ui.resize(size * scale);
     m_onInputEvent = false;
 
-    g_mainDispatcher.addEvent([size] {
+    g_mainDispatcher.addEvent([size, scale] {
         g_graphics.resize(size);
         auto* foreGround = g_drawPool.get(DrawPoolType::FOREGROUND);
-        foreGround->getFrameBuffer()->resize(size);
+        foreGround->getFrameBuffer()->resize(size * scale);
+        foreGround->setScaleFactor(scale);
         foreGround->repaint();
     });
+
+    g_window.setScale(scale);
 }
 
 void GraphicalApplication::inputEvent(const InputEvent& event)
@@ -265,6 +270,10 @@ void GraphicalApplication::inputEvent(const InputEvent& event)
     m_onInputEvent = true;
     g_ui.inputEvent(event);
     m_onInputEvent = false;
+}
+
+float GraphicalApplication::getScale() const {
+    return .5f;
 }
 
 void GraphicalApplication::repaint() { g_drawPool.get(DrawPoolType::FOREGROUND)->repaint(); }

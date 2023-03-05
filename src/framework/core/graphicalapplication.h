@@ -87,6 +87,7 @@ protected:
 
 private:
     bool canDrawTexts() const;
+    float getScale() const;
 
     bool m_onInputEvent{ false };
     bool m_optimize{ true };

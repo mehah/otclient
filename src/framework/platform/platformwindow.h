@@ -96,6 +96,7 @@ public:
     void setOnClose(const std::function<void()>& onClose) { m_onClose = onClose; }
     void setOnResize(const OnResizeCallback& onResize) { m_onResize = onResize; }
     void setOnInputEvent(const OnInputEventCallback& onInputEvent) { m_onInputEvent = onInputEvent; }
+    void setScale(float scale) { m_scale = scale; }
 
 protected:
     virtual int internalLoadMouseCursor(const ImagePtr& image, const Point& hotSpot) = 0;
@@ -128,6 +129,7 @@ protected:
     bool m_fullscreen{ false };
     bool m_maximized{ false };
     bool m_vsync{ false };
+    float m_scale{ 1.f };
 
     std::function<void()> m_onClose;
     OnResizeCallback m_onResize;
