@@ -95,4 +95,4 @@ void Graphics::terminate()
     m_ok = false;
 }
 
-void Graphics::resize(const Size& size) { g_painter->setResolution(m_viewportSize = size); }
+void Graphics::resize(const Size& size) { m_viewportSize = size; }
