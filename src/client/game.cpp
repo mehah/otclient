@@ -417,6 +417,7 @@ void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vecto
     if (getFeature(Otc::GamePlayerMounts)) {
         Outfit mountOutfit;
         mountOutfit.setId(currentOutfit.getMount());
+        mountOutfit.setCategory(ThingCategoryCreature);
 
         virtualMountCreature = std::make_shared<Creature>();
         virtualMountCreature->setDirection(Otc::South);
