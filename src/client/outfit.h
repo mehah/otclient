@@ -45,6 +45,7 @@ public:
     void setLegs(uint8_t legs);
     void setFeet(uint8_t feet);
     void setAddons(uint8_t addons) { m_addons = addons; }
+    void setTemp(bool temp) { m_temp = temp; }
 
     void setCategory(ThingCategory category) { m_category = category; }
 
@@ -64,8 +65,10 @@ public:
 
     ThingCategory getCategory() const { return m_category; }
     bool isCreature() const { return m_category == ThingCategoryCreature; }
+    bool isInvalid() const { return m_category == ThingInvalidCategory; }
     bool isEffect() const { return m_category == ThingCategoryEffect; }
     bool isItem() const { return m_category == ThingCategoryItem; }
+    bool isTemp() const { return m_temp; }
 
     Color getHeadColor() const { return m_headColor; }
     Color getBodyColor() const { return m_bodyColor; }
@@ -87,7 +90,9 @@ public:
     bool operator!=(const Outfit& other) const { return !(*this == other); }
 
 private:
-    ThingCategory m_category{ ThingCategoryCreature };
+    ThingCategory m_category{ ThingInvalidCategory };
+
+    bool m_temp{ false };
 
     uint16_t m_id{ 0 };
     uint16_t m_auxId{ 0 };

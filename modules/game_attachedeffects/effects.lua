@@ -32,3 +32,29 @@ AttachedEffectManager.register(3, 'Angel Light', 50, ThingCategoryEffect, {
     opacity = 0.5,
     drawOnUI = false
 })
+
+AttachedEffectManager.register(4, 'Transform', 40, ThingCategoryCreature, {
+    transform = true,
+    duration = 5000,
+    onAttach = function(effect, owner)
+        local e = Effect.create()
+        e:setId(7)
+        owner:getTile():addThing(e)
+    end,
+    onDetach = function(effect, oldOwner)
+        local e = Effect.create()
+        e:setId(50)
+        oldOwner:getTile():addThing(e)
+    end
+})
+
+AttachedEffectManager.register(5, 'Lake Monster', 34, ThingCategoryEffect, {
+    hideOwner = true,
+    duration = 1500,
+    -- loop = 1,
+    onDetach = function(effect, oldOwner)
+        local e = Effect.create()
+        e:setId(54)
+        oldOwner:getTile():addThing(e)
+    end
+})

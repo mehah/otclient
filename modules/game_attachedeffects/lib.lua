@@ -29,6 +29,22 @@ local executeConfig = function(attachedEffect, config)
             attachedEffect:setOpacity(config.opacity)
         end
 
+        if config.duration ~= nil and config.duration > 0 then
+            attachedEffect:setDuration(config.duration)
+        end
+
+        if config.loop ~= nil and config.loop > 0 then
+            attachedEffect:setLoop(config.loop)
+        end
+
+        if config.transform then
+            attachedEffect:setTransform(config.transform)
+        end
+
+        if config.hideOwner then
+            attachedEffect:setHideOwner(config.hideOwner)
+        end
+
         if x ~= 0 or y ~= 0 then
             attachedEffect:setOffset(x, y)
         end

@@ -28,7 +28,7 @@
 
 void Missile::drawMissile(const Point& dest, LightView* lightView)
 {
-    if (!canDraw())
+    if (!canDraw() || isHided())
         return;
 
     const float fraction = m_animationTimer.ticksElapsed() / m_duration;
