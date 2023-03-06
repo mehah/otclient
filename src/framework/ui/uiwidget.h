@@ -189,7 +189,7 @@ public:
     UIWidgetList recursiveGetChildrenByState(Fw::WidgetState state);
     UIWidgetPtr backwardsGetWidgetById(const std::string_view id);
 
-    void setProp(FlagProp prop, bool v);
+    void setProp(FlagProp prop, bool v, bool callEvent = true);
     bool hasProp(FlagProp prop) { return (m_flagsProp & prop); }
 private:
     void repaint();
