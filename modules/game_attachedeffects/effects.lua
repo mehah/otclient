@@ -32,3 +32,19 @@ AttachedEffectManager.register(3, 'Angel Light', 50, ThingCategoryEffect, {
     opacity = 0.5,
     drawOnUI = false
 })
+
+AttachedEffectManager.register(4, 'Transform Demon', 35, ThingCategoryCreature, {
+    hideOwner = true,
+    duration = 5000,
+    shader = 'Outfit - Rainbow',
+    onAttach = function(effect, owner)
+        local e = Effect.create()
+        e:setId(51)
+        owner:getTile():addThing(e)
+    end,
+    onDetach = function(effect, oldOwner)
+        local e = Effect.create()
+        e:setId(7)
+        oldOwner:getTile():addThing(e)
+    end
+})
