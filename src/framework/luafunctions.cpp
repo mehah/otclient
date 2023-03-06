@@ -90,6 +90,9 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_platform", "getDevice", &Platform::getDevice, &g_platform);
     g_lua.bindSingletonFunction("g_platform", "getDeviceShortName", &Platform::getDeviceShortName, &g_platform);
     g_lua.bindSingletonFunction("g_platform", "getOsShortName", &Platform::getOsShortName, &g_platform);
+    g_lua.bindSingletonFunction("g_platform", "isDesktop", &Platform::isDesktop, &g_platform);
+    g_lua.bindSingletonFunction("g_platform", "isMobile", &Platform::isMobile, &g_platform);
+    g_lua.bindSingletonFunction("g_platform", "isConsole", &Platform::isConsole, &g_platform);
 
     // Application
     g_lua.registerSingletonClass("g_app");
@@ -272,6 +275,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_app", "setDrawTexts", &GraphicalApplication::setDrawTexts, &g_app);
     g_lua.bindSingletonFunction("g_app", "setLoadingAsyncTexture", &GraphicalApplication::setLoadingAsyncTexture, &g_app);
     g_lua.bindSingletonFunction("g_app", "isEncrypted", &GraphicalApplication::isEncrypted, &g_app);
+    g_lua.bindSingletonFunction("g_app", "isScaled", &GraphicalApplication::isScaled, &g_app);
 
     // PlatformWindow
     g_lua.registerSingletonClass("g_window");

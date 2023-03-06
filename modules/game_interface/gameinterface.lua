@@ -93,8 +93,6 @@ function init()
         modules.client_topmenu.toggle()
     end
 
-    setupViewMode(0)
-
     bindKeys()
 
     if g_game.isOnline() then
@@ -157,7 +155,10 @@ function bindKeys()
         g_map.cleanTexts()
         modules.game_textmessage.clearMessages()
     end, gameRootPanel)
-    g_keyboard.bindKeyDown('Ctrl+.', nextViewMode, gameRootPanel)
+
+    if not g_app.isScaled() then
+        g_keyboard.bindKeyDown('Ctrl+.', nextViewMode, gameRootPanel)
+    end
 end
 
 function bindWalkKey(key, dir)
@@ -237,7 +238,6 @@ function onGameStart()
 end
 
 function onGameEnd()
-    setupViewMode(0)
     hide()
 end
 
@@ -249,7 +249,13 @@ function show()
     gameRootPanel:show()
     gameRootPanel:focus()
     gameMapPanel:followCreature(g_game.getLocalPlayer())
-    setupViewMode(0)
+
+    if g_app.isScaled() then
+        setupViewMode(2)
+    else
+        setupViewMode(0)
+    end
+
     updateStretchShrink()
     logoutButton:setTooltip(tr('Logout'))
 

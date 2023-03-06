@@ -71,6 +71,8 @@ public:
     bool isLoadingAsyncTexture();
     void setLoadingAsyncTexture(bool v);
 
+    bool isScaled() { return getScale() != 1.f; }
+
     bool isEncrypted() {
 #if ENABLE_ENCRYPTION == 1
         return true;

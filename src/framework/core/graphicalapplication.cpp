@@ -258,7 +258,6 @@ void GraphicalApplication::resize(const Size& size)
         g_graphics.resize(size);
         auto* foreGround = g_drawPool.get(DrawPoolType::FOREGROUND);
         foreGround->getFrameBuffer()->resize(size * scale);
-        foreGround->setScaleFactor(scale);
         foreGround->repaint();
     });
 
@@ -273,6 +272,10 @@ void GraphicalApplication::inputEvent(const InputEvent& event)
 }
 
 float GraphicalApplication::getScale() const {
+    if (g_platform.isDesktop())
+        return 1.f;
+
+    // need to calculate the desinity of the screen.
     return .5f;
 }
 
