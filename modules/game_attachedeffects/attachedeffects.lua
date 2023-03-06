@@ -4,6 +4,7 @@ controller = Controller:new()
 --[[controller:onGameStart(function()
     g_game.getLocalPlayer():attachEffect(AttachedEffectManager.create(1))
     g_game.getLocalPlayer():attachEffect(AttachedEffectManager.create(2))
+    g_game.getLocalPlayer():attachEffect(AttachedEffectManager.create(4))
 
     local angelLight1 = AttachedEffectManager.create(3)
     local angelLight2 = AttachedEffectManager.create(3)
@@ -19,25 +20,13 @@ controller = Controller:new()
     g_game.getLocalPlayer():attachEffect(angelLight2)
     g_game.getLocalPlayer():attachEffect(angelLight3)
     g_game.getLocalPlayer():attachEffect(angelLight4)
-end)]]
+end)
 
 controller:onGameEnd(function()
     g_game.getLocalPlayer():clearAttachedEffects()
-end)
+end)]]
 
-controller:attachExternalEvent(EventController:new(LocalPlayer, {
-    onOutfitChange = onOutfitChange
-}))
-controller:attachExternalEvent(EventController:new(Creature, {
-    onOutfitChange = onOutfitChange
-}))
-
-controller:attachExternalEvent(EventController:new(AttachedEffect, {
-    onAttach = onAttach,
-    onDetach = onDetach
-}))
-
-function onAttach(effect, owner)
+local function onAttach(effect, owner)
     local category, thingId = AttachedEffectManager.getDataThing(owner)
     local config = AttachedEffectManager.getConfig(effect:getId(), category, thingId)
 
@@ -50,7 +39,7 @@ function onAttach(effect, owner)
     end
 end
 
-function onDetach(effect, oldOwner)
+local function onDetach(effect, oldOwner)
     local category, thingId = AttachedEffectManager.getDataThing(oldOwner)
     local config = AttachedEffectManager.getConfig(effect:getId(), category, thingId)
 
@@ -63,8 +52,19 @@ function onDetach(effect, oldOwner)
     end
 end
 
-function onOutfitChange(creature, outfit, oldOutfit)
+local function onOutfitChange(creature, outfit, oldOutfit)
     for _i, effect in pairs(creature:getAttachedEffects()) do
         AttachedEffectManager.executeThingConfig(effect, ThingCategoryCreature, outfit.type)
     end
 end
+
+controller:attachExternalEvent(EventController:new(LocalPlayer, {
+    onOutfitChange = onOutfitChange
+}))
+controller:attachExternalEvent(EventController:new(Creature, {
+    onOutfitChange = onOutfitChange
+}))
+controller:attachExternalEvent(EventController:new(AttachedEffect, {
+    onAttach = onAttach,
+    onDetach = onDetach
+}))

@@ -37,6 +37,10 @@ local executeConfig = function(attachedEffect, config)
             attachedEffect:setLoop(config.loop)
         end
 
+        if config.transform then
+            attachedEffect:setTransform(config.transform)
+        end
+
         if config.hideOwner then
             attachedEffect:setHideOwner(config.hideOwner)
         end

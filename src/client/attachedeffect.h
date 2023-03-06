@@ -23,6 +23,7 @@
 #pragma once
 
 #include "thingtype.h"
+#include "outfit.h"
 
 class AttachedEffect : public LuaObject
 {
@@ -43,6 +44,9 @@ public:
 
     bool isHidedOwner() { return m_hideOwner; }
     void setHideOwner(bool v) { m_hideOwner = v; }
+
+    bool isTransform() { return m_transform; }
+    void setTransform(bool v) { m_transform = v; }
 
     uint16_t getDuration() { return m_duration; }
     void setDuration(uint16_t v) { m_duration = v; }
@@ -79,7 +83,10 @@ private:
 
     bool m_onTop{ false };
     bool m_hideOwner{ false };
+    bool m_transform{ false };
     bool m_canDrawOnUI{ true };
+
+    Outfit m_outfitOwner;
 
     ThingType* m_thingType{ nullptr };
 

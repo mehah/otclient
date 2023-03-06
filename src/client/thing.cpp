@@ -106,7 +106,23 @@ void Thing::attachEffect(const AttachedEffectPtr& obj) {
     }
 
     m_attachedEffects.emplace_back(obj);
-    obj->callLuaField("onAttach", asLuaObject());
+    g_dispatcher.addEvent([effect = obj, self = static_self_cast<Thing>()] {
+        if (effect->isTransform() && self->isCreature()) {
+            const auto& creature = self->static_self_cast<Creature>();
+            effect->m_outfitOwner = creature->getOutfit();
+
+            Outfit outfit = creature->getOutfit();
+            outfit.setCategory(effect->m_thingType->getCategory());
+            if (outfit.isCreature())
+                outfit.setId(effect->m_thingType->getId());
+            else
+                outfit.setAuxId(effect->m_thingType->getId());
+
+            creature->setOutfit(outfit);
+        }
+
+        effect->callLuaField("onAttach", self->asLuaObject());
+    });
 }
 
 bool Thing::detachEffectById(uint16_t id) {
@@ -120,6 +136,10 @@ bool Thing::detachEffectById(uint16_t id) {
 
     if (effect->isHidedOwner())
         --m_hidden;
+
+    if (effect->isTransform() && isCreature()) {
+        static_self_cast<Creature>()->setOutfit(effect->m_outfitOwner);
+    }
 
     effect->callLuaField("onDetach", asLuaObject());
     m_attachedEffects.erase(it);

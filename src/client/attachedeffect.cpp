@@ -47,6 +47,9 @@ AttachedEffectPtr AttachedEffect::create(uint16_t id, uint16_t thingId, ThingCat
 }
 
 void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView) {
+    if (m_transform)
+        return;
+
     const auto& dirControl = m_offsetDirections[m_direction];
     if (dirControl.onTop != isOnTop)
         return;
