@@ -33,10 +33,9 @@ AttachedEffectManager.register(3, 'Angel Light', 50, ThingCategoryEffect, {
     drawOnUI = false
 })
 
-AttachedEffectManager.register(4, 'Transform Fire Devil', 40, ThingCategoryCreature, {
+AttachedEffectManager.register(4, 'Transform', 40, ThingCategoryCreature, {
     transform = true,
     duration = 5000,
-    shader = 'Outfit - Rainbow',
     onAttach = function(effect, owner)
         local e = Effect.create()
         e:setId(7)
