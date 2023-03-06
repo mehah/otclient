@@ -166,7 +166,7 @@ int LuaObject::luaCallLuaField(const std::string_view field, const T&... args)
         self = asLuaObject();
     } catch (std::exception e) {
         g_logger.fine(stdext::format(
-            "luaCallLuaField: error calling '%s', likely called in ctor.", field));
+            "luaCallLuaField: It is not allowed to call the event in the constructor of the class %s.", getClassName()));
         return 0;
     }
 

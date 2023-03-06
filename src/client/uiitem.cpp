@@ -23,7 +23,7 @@
 #include "uiitem.h"
 #include <framework/graphics/fontmanager.h>
 
-UIItem::UIItem() { setDraggable(true); }
+UIItem::UIItem() { setProp(PropDraggable, true, false); }
 
 void UIItem::drawSelf(DrawPoolType drawPane)
 {
