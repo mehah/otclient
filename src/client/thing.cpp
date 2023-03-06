@@ -27,6 +27,7 @@
 #include "thingtypemanager.h"
 #include "tile.h"
 
+#include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
 
 void Thing::setPosition(const Position& position, uint8_t stackPos, bool hasElevation)
@@ -95,6 +96,15 @@ void Thing::attachEffect(const AttachedEffectPtr& obj) {
             obj->m_direction = static_self_cast<Creature>()->getDirection();
     }
 
+    if (obj->isHidedOwner())
+        ++m_hidden;
+
+    if (obj->getDuration() > 0) {
+        g_dispatcher.scheduleEvent([self = static_self_cast<Thing>(), effectId = obj->getId()]() {
+            self->detachEffectById(effectId);
+        }, obj->getDuration());
+    }
+
     m_attachedEffects.emplace_back(obj);
     obj->callLuaField("onAttach", asLuaObject());
 }
@@ -106,7 +116,12 @@ bool Thing::detachEffectById(uint16_t id) {
     if (it == m_attachedEffects.end())
         return false;
 
-    (*it)->callLuaField("onDetach", asLuaObject());
+    const auto& effect = (*it);
+
+    if (effect->isHidedOwner())
+        --m_hidden;
+
+    effect->callLuaField("onDetach", asLuaObject());
     m_attachedEffects.erase(it);
 
     return true;
@@ -126,4 +141,16 @@ AttachedEffectPtr Thing::getAttachedEffectById(uint16_t id) {
         return nullptr;
 
     return *it;
+}
+
+void Thing::drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop)
+{
+    for (const auto& effect : m_attachedEffects) {
+        effect->draw(dest, isOnTop, lightView);
+        if (effect->getLoop() == 0) {
+            g_dispatcher.addEvent([self = static_self_cast<Thing>(), effectId = effect->getId()]() {
+                self->detachEffectById(effectId);
+            });
+        }
+    }
 }

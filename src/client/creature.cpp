@@ -108,71 +108,73 @@ void Creature::internalDraw(Point dest, bool isMarked, const Color& color, Light
     else
         drawAttachedEffect(dest, lightView, false); // On Bottom
 
-    // outfit is a real creature
-    if (m_outfit.isCreature()) {
-        if (m_outfit.hasMount()) {
-            animationPhase = getCurrentAnimationPhase(true);
+    if (!isHided()) {
+        // outfit is a real creature
+        if (m_outfit.isCreature()) {
+            if (m_outfit.hasMount()) {
+                animationPhase = getCurrentAnimationPhase(true);
 
-            dest -= m_mountType->getDisplacement() * g_drawPool.getScaleFactor();
+                dest -= m_mountType->getDisplacement() * g_drawPool.getScaleFactor();
 
-            if (!isMarked && m_mountShader)
-                g_drawPool.setShaderProgram(m_mountShader, true, m_mountShaderAction);
-            m_mountType->draw(dest, 0, m_numPatternX, 0, 0, animationPhase, Otc::DrawThingsAndLights, color);
-            dest += getDisplacement() * g_drawPool.getScaleFactor();
-        }
+                if (!isMarked && m_mountShader)
+                    g_drawPool.setShaderProgram(m_mountShader, true, m_mountShaderAction);
+                m_mountType->draw(dest, 0, m_numPatternX, 0, 0, animationPhase, Otc::DrawThingsAndLights, color);
+                dest += getDisplacement() * g_drawPool.getScaleFactor();
+            }
 
-        animationPhase = getCurrentAnimationPhase();
+            animationPhase = getCurrentAnimationPhase();
 
-        if (!m_jumpOffset.isNull()) {
-            const auto& jumpOffset = m_jumpOffset * g_drawPool.getScaleFactor();
-            dest -= Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
-        }
+            if (!m_jumpOffset.isNull()) {
+                const auto& jumpOffset = m_jumpOffset * g_drawPool.getScaleFactor();
+                dest -= Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
+            }
 
-        const auto& datType = getThingType();
+            const auto& datType = getThingType();
 
-        // yPattern => creature addon
-        for (int yPattern = 0; yPattern < getNumPatternY(); ++yPattern) {
-            // continue if we dont have this addon
-            if (yPattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
-                continue;
+            // yPattern => creature addon
+            for (int yPattern = 0; yPattern < getNumPatternY(); ++yPattern) {
+                // continue if we dont have this addon
+                if (yPattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
+                    continue;
+
+                if (!isMarked && m_shader)
+                    g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
+
+                datType->draw(dest, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, color);
+
+                if (m_drawOutfitColor && !isMarked && getLayers() > 1) {
+                    g_drawPool.setCompositionMode(CompositionMode::MULTIPLY);
+                    datType->draw(dest, SpriteMaskYellow, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, m_outfit.getHeadColor());
+                    datType->draw(dest, SpriteMaskRed, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, m_outfit.getBodyColor());
+                    datType->draw(dest, SpriteMaskGreen, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, m_outfit.getLegsColor());
+                    datType->draw(dest, SpriteMaskBlue, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, m_outfit.getFeetColor());
+                    g_drawPool.resetCompositionMode();
+                }
+            }
+
+            // outfit is a creature imitating an item or the invisible effect
+        } else {
+            int animationPhases = m_thingType->getAnimationPhases();
+            int animateTicks = ITEM_TICKS_PER_FRAME;
+
+            // when creature is an effect we cant render the first and last animation phase,
+            // instead we should loop in the phases between
+            if (m_outfit.isEffect()) {
+                animationPhases = std::max<int>(1, animationPhases - 2);
+                animateTicks = INVISIBLE_TICKS_PER_FRAME;
+            }
+
+            if (animationPhases > 1) {
+                animationPhase = (g_clock.millis() % (static_cast<long long>(animateTicks) * animationPhases)) / animateTicks;
+            }
+
+            if (m_outfit.isEffect())
+                animationPhase = std::min<int>(animationPhase + 1, animationPhases);
 
             if (!isMarked && m_shader)
                 g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
-
-            datType->draw(dest, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, color);
-
-            if (m_drawOutfitColor && !isMarked && getLayers() > 1) {
-                g_drawPool.setCompositionMode(CompositionMode::MULTIPLY);
-                datType->draw(dest, SpriteMaskYellow, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, m_outfit.getHeadColor());
-                datType->draw(dest, SpriteMaskRed, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, m_outfit.getBodyColor());
-                datType->draw(dest, SpriteMaskGreen, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, m_outfit.getLegsColor());
-                datType->draw(dest, SpriteMaskBlue, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, m_outfit.getFeetColor());
-                g_drawPool.resetCompositionMode();
-            }
+            m_thingType->draw(dest - (getDisplacement() * g_drawPool.getScaleFactor()), 0, 0, 0, 0, animationPhase, Otc::DrawThingsAndLights, color);
         }
-
-        // outfit is a creature imitating an item or the invisible effect
-    } else {
-        int animationPhases = m_thingType->getAnimationPhases();
-        int animateTicks = ITEM_TICKS_PER_FRAME;
-
-        // when creature is an effect we cant render the first and last animation phase,
-        // instead we should loop in the phases between
-        if (m_outfit.isEffect()) {
-            animationPhases = std::max<int>(1, animationPhases - 2);
-            animateTicks = INVISIBLE_TICKS_PER_FRAME;
-        }
-
-        if (animationPhases > 1) {
-            animationPhase = (g_clock.millis() % (static_cast<long long>(animateTicks) * animationPhases)) / animateTicks;
-        }
-
-        if (m_outfit.isEffect())
-            animationPhase = std::min<int>(animationPhase + 1, animationPhases);
-
-        if (!isMarked && m_shader)
-            g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
-        m_thingType->draw(dest - (getDisplacement() * g_drawPool.getScaleFactor()), 0, 0, 0, 0, animationPhase, Otc::DrawThingsAndLights, color);
     }
 
     if (isMarked)

@@ -668,6 +668,9 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<AttachedEffect>("setOnTop", &AttachedEffect::setOnTop);
     g_lua.bindClassMemberFunction<AttachedEffect>("setSpeed", &AttachedEffect::setSpeed);
     g_lua.bindClassMemberFunction<AttachedEffect>("setOpacity", &AttachedEffect::setOpacity);
+    g_lua.bindClassMemberFunction<AttachedEffect>("setDuration", &AttachedEffect::setDuration);
+    g_lua.bindClassMemberFunction<AttachedEffect>("setHideOwner", &AttachedEffect::setHideOwner);
+    g_lua.bindClassMemberFunction<AttachedEffect>("setLoop", &AttachedEffect::setLoop);
     g_lua.bindClassMemberFunction<AttachedEffect>("setOffset", &AttachedEffect::setOffset);
     g_lua.bindClassMemberFunction<AttachedEffect>("setDirOffset", &AttachedEffect::setDirOffset);
     g_lua.bindClassMemberFunction<AttachedEffect>("setOnTopByDir", &AttachedEffect::setOnTopByDir);

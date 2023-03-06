@@ -179,6 +179,8 @@ public:
     bool isMarked() { return m_markedColor != Color::white; }
     void setMarkColor(const Color& color) { if (m_markedColor != color) m_markedColor = color; }
 
+    bool isHided() { return m_hidden > 0; }
+
     void attachEffect(const AttachedEffectPtr& obj);
     void clearAttachedEffects();
     bool detachEffectById(uint16_t id);
@@ -187,12 +189,7 @@ public:
     const std::vector<AttachedEffectPtr>& getAttachedEffects() { return m_attachedEffects; };
 
 protected:
-    void drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop) const
-    {
-        for (const auto& effect : m_attachedEffects) {
-            effect->draw(dest, isOnTop, lightView);
-        }
-    }
+    void drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop);
 
     void setAttachedEffectDirection(Otc::Direction dir) const
     {
@@ -201,6 +198,8 @@ protected:
                 effect->m_direction = dir;
         }
     }
+
+    uint8_t m_hidden{ 0 };
 
     uint8_t m_numPatternX{ 0 };
     uint8_t m_numPatternY{ 0 };

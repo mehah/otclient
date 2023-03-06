@@ -54,9 +54,18 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
     if (!m_canDrawOnUI && g_drawPool.getCurrentType() == DrawPoolType::FOREGROUND)
         return;
 
+    const int animation = getCurrentAnimationPhase();
+    if (m_loop > -1 && animation != m_lastAnimation) {
+        m_lastAnimation = animation;
+        if (animation == 0) {
+            --m_loop;
+            g_logger.info(std::to_string(getLoop()));
+        }
+    }
+
     if (m_shader) g_drawPool.setShaderProgram(m_shader, true);
     if (m_opacity < 100) g_drawPool.setOpacity(getOpacity(), true);
-    m_thingType->draw(dest - (dirControl.offset * g_drawPool.getScaleFactor()), 0, m_direction, 0, 0, getCurrentAnimationPhase(), Otc::DrawThingsAndLights, Color::white, lightView);
+    m_thingType->draw(dest - (dirControl.offset * g_drawPool.getScaleFactor()), 0, m_direction, 0, 0, animation, Otc::DrawThingsAndLights, Color::white, lightView);
 }
 
 int AttachedEffect::getCurrentAnimationPhase()

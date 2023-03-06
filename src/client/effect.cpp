@@ -28,7 +28,8 @@
 
 void Effect::drawEffect(const Point& dest, uint32_t flags, int offsetX, int offsetY, LightView* lightView)
 {
-    if (!canDraw()) return;
+    if (!canDraw() || isHided())
+        return;
 
     // It only starts to draw when the first effect as it is about to end.
     if (m_animationTimer.ticksElapsed() < m_timeToStartDrawing)

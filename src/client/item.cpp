@@ -47,7 +47,7 @@ ItemPtr Item::create(int id)
 
 void Item::draw(const Point& dest, uint32_t flags, const Color& c, LightView* lightView)
 {
-    if (!canDraw(m_color))
+    if (!canDraw(m_color) || isHided())
         return;
 
     // determine animation phase
