@@ -109,16 +109,21 @@ void Thing::attachEffect(const AttachedEffectPtr& obj) {
     g_dispatcher.addEvent([effect = obj, self = static_self_cast<Thing>()] {
         if (effect->isTransform() && self->isCreature()) {
             const auto& creature = self->static_self_cast<Creature>();
-            effect->m_outfitOwner = creature->getOutfit();
+            const auto& outfit = creature->getOutfit();
+            if (outfit.isTemp())
+                return;
 
-            Outfit outfit = creature->getOutfit();
-            outfit.setCategory(effect->m_thingType->getCategory());
-            if (outfit.isCreature())
-                outfit.setId(effect->m_thingType->getId());
+            effect->m_outfitOwner = outfit;
+
+            Outfit newOutfit = outfit;
+            newOutfit.setTemp(true);
+            newOutfit.setCategory(effect->m_thingType->getCategory());
+            if (newOutfit.isCreature())
+                newOutfit.setId(effect->m_thingType->getId());
             else
-                outfit.setAuxId(effect->m_thingType->getId());
+                newOutfit.setAuxId(effect->m_thingType->getId());
 
-            creature->setOutfit(outfit);
+            creature->setOutfit(newOutfit);
         }
 
         effect->callLuaField("onAttach", self->asLuaObject());
@@ -137,7 +142,7 @@ bool Thing::detachEffectById(uint16_t id) {
     if (effect->isHidedOwner())
         --m_hidden;
 
-    if (effect->isTransform() && isCreature()) {
+    if (effect->isTransform() && isCreature() && !effect->m_outfitOwner.isInvalid()) {
         static_self_cast<Creature>()->setOutfit(effect->m_outfitOwner);
     }
 
