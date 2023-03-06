@@ -47,3 +47,14 @@ AttachedEffectManager.register(4, 'Transform', 40, ThingCategoryCreature, {
         oldOwner:getTile():addThing(e)
     end
 })
+
+AttachedEffectManager.register(5, 'Lake Monster', 34, ThingCategoryEffect, {
+    hideOwner = true,
+    duration = 1500,
+    -- loop = 1,
+    onDetach = function(effect, oldOwner)
+        local e = Effect.create()
+        e:setId(54)
+        oldOwner:getTile():addThing(e)
+    end
+})
