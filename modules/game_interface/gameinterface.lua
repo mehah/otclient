@@ -250,14 +250,15 @@ function show()
     gameRootPanel:focus()
     gameMapPanel:followCreature(g_game.getLocalPlayer())
 
+    updateStretchShrink()
+    logoutButton:setTooltip(tr('Logout'))
+
     if g_app.isScaled() then
+        setupViewMode(1)
         setupViewMode(2)
     else
         setupViewMode(0)
     end
-
-    updateStretchShrink()
-    logoutButton:setTooltip(tr('Logout'))
 
     addEvent(function()
         if not limitedZoom or g_game.isGM() then
