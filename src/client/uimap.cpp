@@ -60,7 +60,8 @@ void UIMap::drawSelf(DrawPoolType drawPane)
         return;
     }
 
-    m_mapView->updateRect(m_mapRect);
+    const auto& mapSize = g_app.isScaled() ? Rect(0, 0, g_graphics.getViewportSize()) : m_mapRect;
+    m_mapView->updateRect(mapSize);
 
     if (drawPane == DrawPoolType::MAP) {
         m_mapView->draw();
@@ -205,22 +206,18 @@ void UIMap::updateVisibleDimension()
 
 void UIMap::updateMapSize()
 {
-    if (g_app.isScaled())
-        m_mapRect = { 0,0, g_graphics.getViewportSize() };
-    else {
-        const auto& clippingRect = getPaddingRect();
-        Size mapSize;
-        if (m_keepAspectRatio) {
-            const auto& mapRect = clippingRect.expanded(-1);
-            mapSize = { static_cast<int>(m_aspectRatio * m_zoom), m_zoom };
-            mapSize.scale(mapRect.size(), Fw::KeepAspectRatio);
-        } else {
-            mapSize = clippingRect.expanded(-1).size();
-        }
-
-        m_mapRect.resize(mapSize);
-        m_mapRect.moveCenter(clippingRect.center());
+    const auto& clippingRect = getPaddingRect();
+    Size mapSize;
+    if (m_keepAspectRatio) {
+        const auto& mapRect = clippingRect.expanded(-1);
+        mapSize = { static_cast<int>(m_aspectRatio * m_zoom), m_zoom };
+        mapSize.scale(mapRect.size(), Fw::KeepAspectRatio);
+    } else {
+        mapSize = clippingRect.expanded(-1).size();
     }
+
+    m_mapRect.resize(mapSize);
+    m_mapRect.moveCenter(clippingRect.center());
 
     if (!m_keepAspectRatio)
         updateVisibleDimension();
