@@ -248,20 +248,18 @@ void GraphicalApplication::close()
 
 void GraphicalApplication::resize(const Size& size)
 {
-    float scale = getScale();
+    float scale = g_window.getDisplayDensity();
 
     m_onInputEvent = true;
-    g_ui.resize(size * scale);
+    g_ui.resize(size / scale);
     m_onInputEvent = false;
 
     g_mainDispatcher.addEvent([size, scale] {
         g_graphics.resize(size);
         auto* foreGround = g_drawPool.get(DrawPoolType::FOREGROUND);
-        foreGround->getFrameBuffer()->resize(size * scale);
+        foreGround->getFrameBuffer()->resize(size / scale);
         foreGround->repaint();
     });
-
-    g_window.setScale(scale);
 }
 
 void GraphicalApplication::inputEvent(const InputEvent& event)
@@ -269,14 +267,6 @@ void GraphicalApplication::inputEvent(const InputEvent& event)
     m_onInputEvent = true;
     g_ui.inputEvent(event);
     m_onInputEvent = false;
-}
-
-float GraphicalApplication::getScale() const {
-    if (g_platform.isDesktop())
-        return 1.f;
-
-    // need to calculate the desinity of the screen.
-    return .5f;
 }
 
 void GraphicalApplication::repaint() { g_drawPool.get(DrawPoolType::FOREGROUND)->repaint(); }

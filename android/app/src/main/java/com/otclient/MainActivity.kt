@@ -15,6 +15,7 @@ class MainActivity : GameActivity() {
         val binding = ActivityMainBinding.inflate(layoutInflater)
         findViewById<ViewGroup>(contentViewId).addView(binding.root)
         AndroidManager(
+            context = this,
             editText = binding.editText,
         ).apply { nativeInit() }
         hideSystemBars()

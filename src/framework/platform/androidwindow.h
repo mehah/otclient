@@ -94,6 +94,7 @@ class AndroidWindow : public PlatformWindow
     void processTextInput();
     void processFingerDownAndUp();
     void processFingerMotion();
+    void handleInputEvent();
 
     void handleNativeEvents();
     void handleCmd(int32_t cmd);

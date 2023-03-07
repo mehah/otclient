@@ -26,6 +26,7 @@
 #include <framework/core/inputevent.h>
 #include <framework/core/timer.h>
 #include <framework/graphics/declarations.h>
+#include <framework/platform/platformwindow.h>
 
 #include "application.h"
 
@@ -71,7 +72,7 @@ public:
     bool isLoadingAsyncTexture();
     void setLoadingAsyncTexture(bool v);
 
-    bool isScaled() { return getScale() != 1.f; }
+    bool isScaled() { return g_window.getDisplayDensity() != PlatformWindow::DEFAULT_DISPLAY_DENSITY; }
 
     bool isEncrypted() {
 #if ENABLE_ENCRYPTION == 1
@@ -89,7 +90,6 @@ protected:
 
 private:
     bool canDrawTexts() const;
-    float getScale() const;
 
     bool m_onInputEvent{ false };
     bool m_optimize{ true };

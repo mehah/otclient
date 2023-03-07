@@ -42,15 +42,17 @@ public:
     std::string getStringFromJString(jstring);
     std::string getAppBaseDir();
 
+    float getScreenDensity();
+
     void attachToAppMainThread();
 private:
     JNIEnv* getJNIEnv();
 
     android_app* m_app;
-    JavaVM* m_javaVM;
     jobject m_androidManagerJObject;
     jmethodID m_midShowSoftKeyboard;
     jmethodID m_midHideSoftKeyboard;
+    jmethodID m_midGetDisplayDensity;
 };
 
 extern AndroidManager g_androidManager;
