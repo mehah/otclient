@@ -483,6 +483,7 @@ elseif(ANDROID)
 
 		Threads::Threads
 		asio::asio
+		OpenSLES
 		Vorbis::vorbis
 		Vorbis::vorbisfile
 		LibLZMA::LibLZMA
