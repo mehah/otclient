@@ -45,6 +45,10 @@ local executeConfig = function(attachedEffect, config)
             attachedEffect:setHideOwner(config.hideOwner)
         end
 
+        if config.disableWalkAnimation then
+            attachedEffect:setDisableWalkAnimation(config.disableWalkAnimation)
+        end
+
         if x ~= 0 or y ~= 0 then
             attachedEffect:setOffset(x, y)
         end

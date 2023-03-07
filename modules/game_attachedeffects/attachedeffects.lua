@@ -30,10 +30,6 @@ local function onAttach(effect, owner)
     local category, thingId = AttachedEffectManager.getDataThing(owner)
     local config = AttachedEffectManager.getConfig(effect:getId(), category, thingId)
 
-    if owner:isCreature() and config.disableWalkAnimation then
-        owner:setDisableWalkAnimation(true)
-    end
-
     if config.onAttach then
         config.onAttach(effect, owner, config.__onAttach)
     end
@@ -42,10 +38,6 @@ end
 local function onDetach(effect, oldOwner)
     local category, thingId = AttachedEffectManager.getDataThing(oldOwner)
     local config = AttachedEffectManager.getConfig(effect:getId(), category, thingId)
-
-    if oldOwner:isCreature() and config.disableWalkAnimation then
-        oldOwner:setDisableWalkAnimation(false)
-    end
 
     if config.onDetach then
         config.onDetach(effect, oldOwner, config.__onDetach)

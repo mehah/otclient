@@ -191,6 +191,7 @@ public:
 protected:
     void drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop);
 
+    void onDetachEffect(const AttachedEffectPtr& effect);
     void setAttachedEffectDirection(Otc::Direction dir) const
     {
         for (const auto& effect : m_attachedEffects) {

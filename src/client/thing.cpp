@@ -105,6 +105,11 @@ void Thing::attachEffect(const AttachedEffectPtr& obj) {
         }, obj->getDuration());
     }
 
+    if (obj->isDisabledWalkAnimation() && isCreature()) {
+        const auto& creature = static_self_cast<Creature>();
+        creature->setDisableWalkAnimation(true);
+    }
+
     m_attachedEffects.emplace_back(obj);
     g_dispatcher.addEvent([effect = obj, self = static_self_cast<Thing>()] {
         if (effect->isTransform() && self->isCreature()) {
@@ -137,24 +142,33 @@ bool Thing::detachEffectById(uint16_t id) {
     if (it == m_attachedEffects.end())
         return false;
 
-    const auto& effect = (*it);
-
-    if (effect->isHidedOwner())
-        --m_hidden;
-
-    if (effect->isTransform() && isCreature() && !effect->m_outfitOwner.isInvalid()) {
-        static_self_cast<Creature>()->setOutfit(effect->m_outfitOwner);
-    }
-
-    effect->callLuaField("onDetach", asLuaObject());
+    onDetachEffect(*it);
     m_attachedEffects.erase(it);
 
     return true;
 }
 
+void Thing::onDetachEffect(const AttachedEffectPtr& effect) {
+    if (effect->isHidedOwner())
+        --m_hidden;
+
+    if (isCreature()) {
+        const auto& creature = static_self_cast<Creature>();
+
+        if (effect->isDisabledWalkAnimation())
+            creature->setDisableWalkAnimation(false);
+
+        if (effect->isTransform() && !effect->m_outfitOwner.isInvalid()) {
+            creature->setOutfit(effect->m_outfitOwner);
+        }
+    }
+
+    effect->callLuaField("onDetach", asLuaObject());
+}
+
 void Thing::clearAttachedEffects() {
     for (const auto& e : m_attachedEffects)
-        e->callLuaField("onDetach", asLuaObject());
+        onDetachEffect(e);
     m_attachedEffects.clear();
 }
 

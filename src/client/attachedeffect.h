@@ -48,6 +48,9 @@ public:
     bool isTransform() { return m_transform; }
     void setTransform(bool v) { m_transform = v; }
 
+    bool isDisabledWalkAnimation() { return m_disableWalkAnimation; }
+    void setDisableWalkAnimation(bool v) { m_disableWalkAnimation = v; }
+
     uint16_t getDuration() { return m_duration; }
     void setDuration(uint16_t v) { m_duration = v; }
 
@@ -85,6 +88,7 @@ private:
     bool m_hideOwner{ false };
     bool m_transform{ false };
     bool m_canDrawOnUI{ true };
+    bool m_disableWalkAnimation{ false };
 
     Outfit m_outfitOwner;
 
