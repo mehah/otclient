@@ -246,11 +246,10 @@ void GraphicalApplication::close()
     m_onInputEvent = false;
 }
 
+static constexpr bool USE_FRAMEBUFFER = false;
 void GraphicalApplication::resize(const Size& size)
 {
     const float scale = g_window.getDisplayDensity();
-    g_drawPool.get(DrawPoolType::CREATURE_INFORMATION)->setScaleFactor(scale);
-    g_drawPool.get(DrawPoolType::TEXT)->setScaleFactor(scale);
     g_graphics.resize(size);
 
     m_onInputEvent = true;
@@ -258,9 +257,12 @@ void GraphicalApplication::resize(const Size& size)
     m_onInputEvent = false;
 
     g_mainDispatcher.addEvent([size, scale] {
-        auto* foreGround = g_drawPool.get(DrawPoolType::FOREGROUND);
-        foreGround->getFrameBuffer()->resize(size / scale);
-        foreGround->repaint();
+        g_drawPool.get(DrawPoolType::FOREGROUND)->setFramebuffer(size / scale);
+
+        if (USE_FRAMEBUFFER) {
+            g_drawPool.get(DrawPoolType::CREATURE_INFORMATION)->setFramebuffer(size);
+            g_drawPool.get(DrawPoolType::TEXT)->setFramebuffer(size);
+        }
     });
 }
 

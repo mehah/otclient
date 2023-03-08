@@ -32,8 +32,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
 {
     DrawPool* pool = new DrawPool;
     if (type == DrawPoolType::MAP || type == DrawPoolType::FOREGROUND) {
-        pool->m_framebuffer = std::make_shared<FrameBuffer>();
-        pool->m_framebuffer->m_isScene = true;
+        pool->setFramebuffer({});
 
         if (type == DrawPoolType::MAP) {
             pool->m_framebuffer->m_useAlphaWriting = false;
@@ -43,7 +42,6 @@ DrawPool* DrawPool::create(const DrawPoolType type)
         }
     } else {
         pool->m_alwaysGroupDrawings = true; // CREATURE_INFORMATION & TEXT
-        pool->disableUpdateHash();
 
         if (type == DrawPoolType::TEXT) {
             pool->setFPS(FPS60);
@@ -353,4 +351,24 @@ void DrawPool::PoolState::execute() const {
     if (action) action();
     if (texture)
         g_painter->setTexture(texture->create());
+}
+
+void DrawPool::setFramebuffer(const Size& size) {
+    if (!m_framebuffer) {
+        m_updateHash = true;
+        m_framebuffer = std::make_shared<FrameBuffer>();
+        m_framebuffer->m_isScene = true;
+    }
+
+    if (size.isValid() && m_framebuffer->resize(size)) {
+        m_framebuffer->resize(size);
+        m_framebuffer->prepare({}, {});
+        repaint();
+    }
+}
+
+void DrawPool::removeFramebuffer() {
+    m_status.first = 0;
+    m_updateHash = false;
+    m_framebuffer = nullptr;
 }

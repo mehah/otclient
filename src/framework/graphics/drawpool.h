@@ -85,6 +85,9 @@ public:
     void setScaleFactor(float scale) { m_scaleFactor = scale; }
     inline float getScaleFactor() const { return m_scaleFactor; }
 
+    void setFramebuffer(const Size& size);
+    void removeFramebuffer();
+
     void onBeforeDraw(std::function<void()> f) { m_beforeDraw = std::move(f); }
     void onAfterDraw(std::function<void()> f) { m_afterDraw = std::move(f); }
 
@@ -209,15 +212,10 @@ private:
             ++m_depthLevel;
     }
 
-    void disableUpdateHash() {
-        m_status.first = 0;
-        m_updateHash = false;
-    }
-
     bool canRepaint(bool autoUpdateStatus);
 
     bool m_enabled{ true };
-    bool m_updateHash{ true };
+    bool m_updateHash{ false };
     bool m_alwaysGroupDrawings{ false };
 
     uint8_t m_depthLevel{ 0 };

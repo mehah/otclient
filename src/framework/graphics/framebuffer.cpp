@@ -92,7 +92,7 @@ void FrameBuffer::bind()
         g_painter->setTexture(nullptr);
         g_painter->setColor(m_colorClear);
         g_painter->drawCoords(m_screenCoordsBuffer, DrawMode::TRIANGLE_STRIP);
-    } else if (!m_isScene) {
+    } else {
         g_painter->clear(Color::alpha);
     }
 }
