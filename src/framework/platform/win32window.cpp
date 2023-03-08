@@ -745,7 +745,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
             else
                 newMousePos.y = std::min<int32_t>(newMousePos.y, m_size.height());
 
-            newMousePos *= m_displayDensity;
+            newMousePos /= m_displayDensity;
 
             m_inputEvent.mouseMoved = newMousePos - m_inputEvent.mousePos;
             m_inputEvent.mousePos = newMousePos;
