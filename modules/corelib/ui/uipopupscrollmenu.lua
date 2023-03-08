@@ -59,7 +59,7 @@ function UIPopupScrollMenu:display(pos)
     currentMenu = self
 end
 
-function UIPopupScrollMenu:onGeometryChange(oldRect, newRect)
+function UIPopupScrollMenu:onGeometryChange(newRect, oldRect)
     local parent = self:getParent()
     if not parent then
         return

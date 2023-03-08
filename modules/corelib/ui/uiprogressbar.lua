@@ -99,7 +99,7 @@ function UIProgressBar:onStyleApply(name, node)
     end
 end
 
-function UIProgressBar:onGeometryChange(oldRect, newRect)
+function UIProgressBar:onGeometryChange(newRect, oldRect)
     if not self:isOn() then
         self:setHeight(0)
     end

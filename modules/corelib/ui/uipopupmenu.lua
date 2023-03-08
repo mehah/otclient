@@ -40,7 +40,7 @@ function UIPopupMenu:display(pos)
     currentMenu = self
 end
 
-function UIPopupMenu:onGeometryChange(oldRect, newRect)
+function UIPopupMenu:onGeometryChange(newRect, oldRect)
     local parent = self:getParent()
     if not parent then
         return

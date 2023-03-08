@@ -290,15 +290,6 @@ function UIMiniWindow:onFocusChange(focused)
     end
 end
 
-function UIMiniWindow:onHeightChange(height)
-    if not self:isOn() then
-        self:setSettings({
-            height = height
-        })
-    end
-    self:fitOnParent()
-end
-
 function UIMiniWindow:getSettings(name)
     if not self.save then
         return nil

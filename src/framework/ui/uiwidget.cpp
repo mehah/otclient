@@ -1003,9 +1003,9 @@ bool UIWidget::setRect(const Rect& rect)
         g_ui.updateHoveredWidget();
 
     if (oldRect.width() != m_rect.width())
-        callLuaField("onWidthChange", oldRect.width(), m_rect.width());
+        callLuaField("onWidthChange", m_rect.width(), oldRect.width());
     if (oldRect.height() != m_rect.height())
-        callLuaField("onHeightChange", oldRect.height(), m_rect.height());
+        callLuaField("onHeightChange", m_rect.height(), oldRect.height());
 
     callLuaField("onResize", oldRect, m_rect);
     return true;
@@ -1625,7 +1625,7 @@ void UIWidget::onGeometryChange(const Rect& oldRect, const Rect& newRect)
             child->bindRectToParent();
     }
 
-    callLuaField("onGeometryChange", oldRect, newRect);
+    callLuaField("onGeometryChange", newRect, oldRect);
 
     g_app.repaint();
 }
