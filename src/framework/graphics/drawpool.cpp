@@ -280,15 +280,17 @@ bool DrawPool::canRepaint(const bool autoUpdateStatus)
     return canRepaint;
 }
 
-void DrawPool::scale(float x, float y)
+void DrawPool::scale(const Point& p, float factor)
 {
+    translate(-p.x, -p.y);
     const Matrix3 scaleMatrix = {
-              x,   0.0f,  0.0f,
-            0.0f,     y,  0.0f,
+              factor,   0.0f,  0.0f,
+            0.0f,     factor,  0.0f,
             0.0f,  0.0f,  1.0f
     };
 
     m_state.transformMatrix = m_state.transformMatrix * scaleMatrix.transposed();
+    translate(p.x, p.y);
 }
 
 void DrawPool::translate(float x, float y)

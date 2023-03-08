@@ -23,13 +23,14 @@
 #pragma once
 
 #include "declarations.h"
+#include <framework/platform/platformwindow.h>
 
 class CachedText
 {
 public:
     CachedText();
 
-    void draw(const Rect& rect, const Color& color);
+    void draw(const Rect& rect, const Color& color, float scale = PlatformWindow::DEFAULT_DISPLAY_DENSITY);
 
     void wrapText(int maxWidth);
     void setFont(const BitmapFontPtr& font);

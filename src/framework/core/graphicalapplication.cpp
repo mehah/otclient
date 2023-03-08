@@ -248,14 +248,16 @@ void GraphicalApplication::close()
 
 void GraphicalApplication::resize(const Size& size)
 {
-    float scale = g_window.getDisplayDensity();
+    const float scale = g_window.getDisplayDensity();
+    g_drawPool.get(DrawPoolType::CREATURE_INFORMATION)->setScaleFactor(scale);
+    g_drawPool.get(DrawPoolType::TEXT)->setScaleFactor(scale);
+    g_graphics.resize(size);
 
     m_onInputEvent = true;
     g_ui.resize(size / scale);
     m_onInputEvent = false;
 
     g_mainDispatcher.addEvent([size, scale] {
-        g_graphics.resize(size);
         auto* foreGround = g_drawPool.get(DrawPoolType::FOREGROUND);
         foreGround->getFrameBuffer()->resize(size / scale);
         foreGround->repaint();

@@ -195,8 +195,7 @@ private:
 
     void pushTransformMatrix();
     void popTransformMatrix();
-    void scale(float x, float y);
-    void scale(float factor) { scale(factor, factor); }
+    void scale(const Point& p, float factor);
     void translate(float x, float y);
     void translate(const Point& p) { translate(p.x, p.y); }
     void rotate(float angle);
