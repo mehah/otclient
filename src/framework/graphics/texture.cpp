@@ -218,6 +218,7 @@ void Texture::setupTranformMatrix()
     const static Size SIZE256x512(256, 512);
     const static Size SIZE512x1024(512, 1024);
 
+    const static Matrix3 MATRIX11x11_CACHED = toMatrix(11);
     const static Matrix3 MATRIX32x32_CACHED = toMatrix(32);
     const static Matrix3 MATRIX64x64_CACHED = toMatrix(64);
     const static Matrix3 MATRIX128x128_CACHED = toMatrix(128);
@@ -236,7 +237,8 @@ void Texture::setupTranformMatrix()
                               0.0f,                 -1.0f / m_size.height(),                                0.0f,
                               0.0f,                  m_size.height() / static_cast<float>(m_size.height()), 1.0f };
     } else {
-        if (m_size == 32) m_transformMatrix = MATRIX32x32_CACHED;
+        if (m_size == 11) m_transformMatrix = MATRIX11x11_CACHED;
+        else if (m_size == 32) m_transformMatrix = MATRIX32x32_CACHED;
         else if (m_size == 64) m_transformMatrix = MATRIX64x64_CACHED;
         else if (m_size == 128) m_transformMatrix = MATRIX128x128_CACHED;
         else if (m_size == 256) m_transformMatrix = MATRIX256x256_CACHED;
