@@ -256,6 +256,8 @@ void GraphicalApplication::resize(const Size& size)
     g_ui.resize(size / scale);
     m_onInputEvent = false;
 
+    g_drawPool.get(DrawPoolType::TEXT)->setScaleFactor(scale);
+    g_drawPool.get(DrawPoolType::CREATURE_INFORMATION)->setScaleFactor(scale);
     g_mainDispatcher.addEvent([size, scale] {
         g_drawPool.get(DrawPoolType::FOREGROUND)->setFramebuffer(size / scale);
 
