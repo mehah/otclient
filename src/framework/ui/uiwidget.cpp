@@ -35,10 +35,10 @@
 
 UIWidget::UIWidget()
 {
-    setProp(PropEnabled, true, false);
-    setProp(PropVisible, true, false);
-    setProp(PropFocusable, true, false);
-    setProp(PropFirstOnStyle, true, false);
+    setProp(PropEnabled, true);
+    setProp(PropVisible, true);
+    setProp(PropFocusable, true);
+    setProp(PropFirstOnStyle, true);
 
     m_clickTimer.stop();
 
@@ -1396,12 +1396,12 @@ UIWidgetPtr UIWidget::backwardsGetWidgetById(const std::string_view id)
     return widget;
 }
 
-void UIWidget::setProp(FlagProp prop, bool v, bool callEvent)
+void UIWidget::setProp(FlagProp prop, bool v)
 {
     bool lastProp = hasProp(prop);
     if (v) m_flagsProp |= prop; else m_flagsProp &= ~prop;
 
-    if (callEvent && lastProp != v)
+    if (lastProp != v)
         callLuaField("onPropertyChange", prop, v);
 }
 

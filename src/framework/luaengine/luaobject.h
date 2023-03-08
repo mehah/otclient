@@ -159,14 +159,14 @@ template<typename... T>
 int LuaObject::luaCallLuaField(const std::string_view field, const T&... args)
 {
     // we need to gracefully catch a cast exception here in case
-    // this is called from a constructor, this does not need to 
+    // this is called from a constructor, this does not need to
     // blow up, we can just debug log it and exit.
     LuaObjectPtr self;
     try {
         self = asLuaObject();
-    } catch (std::exception e) {
+    } catch (...) {
         g_logger.fine(stdext::format(
-            "luaCallLuaField: It is not allowed to call the event in the constructor of the class %s.", getClassName()));
+            "(%s):luaCallLuaField: Calling lua during object construction is not allowed.", getClassName()));
         return 0;
     }
 
