@@ -253,11 +253,10 @@ function show()
     updateStretchShrink()
     logoutButton:setTooltip(tr('Logout'))
 
+    setupViewMode(0)
     if g_app.isScaled() then
         setupViewMode(1)
         setupViewMode(2)
-    else
-        setupViewMode(0)
     end
 
     addEvent(function()
@@ -268,10 +267,13 @@ function show()
             gameMapPanel:setMaxZoomOut(11)
             gameMapPanel:setLimitVisibleRange(true)
         end
+
     end)
 end
 
 function hide()
+    setupViewMode(0)
+
     disconnect(g_app, {
         onClose = tryExit
     })
@@ -1183,7 +1185,6 @@ function setupViewMode(mode)
         gameRightExtraPanel:setMarginTop(0)
         gameBottomPanel:setImageColor('white')
         modules.client_topmenu.getTopMenu():setImageColor('white')
-        g_game.changeMapAwareRange(18, 14)
     end
 
     if mode == 0 then
@@ -1227,9 +1228,6 @@ function setupViewMode(mode)
         gameMapPanel:setOn(true)
         gameBottomPanel:setImageColor('#ffffff88')
         modules.client_topmenu.getTopMenu():setImageColor('#ffffff66')
-        if not limit then
-            g_game.changeMapAwareRange(24, 20)
-        end
     end
 
     currentViewMode = mode
