@@ -824,7 +824,7 @@ void X11Window::poll()
             case MotionNotify: {
                 m_inputEvent.reset();
                 m_inputEvent.type = Fw::MouseMoveInputEvent;
-                Point newMousePos(event.xbutton.x * m_displayDensity, event.xbutton.y * m_displayDensity);
+                Point newMousePos(event.xbutton.x / m_displayDensity, event.xbutton.y / m_displayDensity);
                 m_inputEvent.mouseMoved = newMousePos - m_inputEvent.mousePos;
                 m_inputEvent.mousePos = newMousePos;
                 if (m_onInputEvent)
