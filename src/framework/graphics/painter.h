@@ -78,7 +78,7 @@ public:
     PainterShaderProgram* getShaderProgram() const { return m_shaderProgram; }
     PainterShaderProgramPtr getReplaceColorShader() const { return m_drawReplaceColorProgram; }
 
-    void setColor(const Color& color) { m_color = color; }
+    void setColor(const Color& color) { if (m_color != color) m_color = color; }
     void setTexture(Texture* texture);
     void setOpacity(float opacity) { m_opacity = opacity; }
     void setClipRect(const Rect& clipRect);
@@ -90,9 +90,9 @@ public:
     void setShaderProgram(const PainterShaderProgramPtr& shaderProgram) { setShaderProgram(shaderProgram.get()); }
     void setCompositionMode(CompositionMode compositionMode);
 
-    void setTextureMatrix(const Matrix3& textureMatrix) { m_textureMatrix = textureMatrix; }
-    void setTransformMatrix(const Matrix3& transformMatrix) { m_transformMatrix = transformMatrix; }
-    void setProjectionMatrix(const Matrix3& projectionMatrix) { m_projectionMatrix = projectionMatrix; }
+    void setTextureMatrix(const Matrix3& matrix) { if (m_textureMatrix != matrix) m_textureMatrix = matrix; }
+    void setTransformMatrix(const Matrix3& matrix) { if (m_transformMatrix != matrix) m_transformMatrix = matrix; }
+    void setProjectionMatrix(const Matrix3& matrix) { if (m_projectionMatrix != matrix) m_projectionMatrix = matrix; }
 
     void resetState();
     void resetBlendEquation() { setBlendEquation(BlendEquation::ADD); }
