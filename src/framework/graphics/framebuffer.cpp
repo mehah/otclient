@@ -92,7 +92,7 @@ void FrameBuffer::bind()
         g_painter->setTexture(nullptr);
         g_painter->setColor(m_colorClear);
         g_painter->drawCoords(m_screenCoordsBuffer, DrawMode::TRIANGLE_STRIP);
-    } else if (!m_isScene) {
+    } else {
         g_painter->clear(Color::alpha);
     }
 }
@@ -131,7 +131,7 @@ void FrameBuffer::internalRelease() const
 void FrameBuffer::prepare(const Rect& dest, const Rect& src, const Color& colorClear)
 {
     const auto& _dest = dest.isValid() ? dest : Rect(0, 0, getSize());
-    const auto& _src = src.isValid() ? src : _dest;
+    const auto& _src = src.isValid() ? src : Rect(0, 0, getSize());
 
     if (m_colorClear != colorClear)
         m_colorClear = colorClear;

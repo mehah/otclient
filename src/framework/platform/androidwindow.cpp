@@ -260,19 +260,18 @@ void AndroidWindow::processFingerDownAndUp() {
 		g_dispatcher.addEvent([this, mouseButton] { m_mouseButtonStates &= ~mouseButton; });
 	}
 
-    Point newMousePos(m_currentEvent.x, m_currentEvent.y);
-    m_inputEvent.mouseMoved = newMousePos - m_inputEvent.mousePos;
-    m_inputEvent.mousePos = newMousePos;
-
-    if(m_onInputEvent)
-        m_onInputEvent(m_inputEvent);
+    handleInputEvent();
 }
 
 void AndroidWindow::processFingerMotion() {
     m_inputEvent.reset();
     m_inputEvent.type = Fw::MouseMoveInputEvent;
 
-    Point newMousePos(m_currentEvent.x, m_currentEvent.y);
+    handleInputEvent();
+}
+
+void AndroidWindow::handleInputEvent() {
+    Point newMousePos(m_currentEvent.x / m_displayDensity, m_currentEvent.y / m_displayDensity);
     m_inputEvent.mouseMoved = newMousePos - m_inputEvent.mousePos;
     m_inputEvent.mousePos = newMousePos;
 
@@ -406,6 +405,7 @@ void AndroidWindow::handleCmd(int32_t cmd) {
                 } else {
                     internalInitGL();
                 }
+                m_displayDensity = g_androidManager.getScreenDensity();
                 m_visible = true;
             } else {
                 m_visible = false;

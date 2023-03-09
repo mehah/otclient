@@ -21,6 +21,7 @@
  */
 
 #include "uimap.h"
+#include <framework/core/graphicalapplication.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
 #include "game.h"
@@ -59,7 +60,8 @@ void UIMap::drawSelf(DrawPoolType drawPane)
         return;
     }
 
-    m_mapView->updateRect(m_mapRect);
+    const auto& mapSize = g_app.isScaled() ? Rect(0, 0, g_graphics.getViewportSize()) : m_mapRect;
+    m_mapView->updateRect(mapSize);
 
     if (drawPane == DrawPoolType::MAP) {
         m_mapView->draw();

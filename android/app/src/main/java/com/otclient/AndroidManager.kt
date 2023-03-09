@@ -7,6 +7,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 
 class AndroidManager(
+    private val context: Context,
     private val editText: FakeEditText,
 ) {
     private val handler = Handler(Looper.getMainLooper())
@@ -31,6 +32,8 @@ class AndroidManager(
             imm.hideSoftInputFromWindow(editText.windowToken, 0)
         }
     }
+
+    fun getDisplayDensity(): Float = context.resources.displayMetrics.density
 
     external fun nativeInit()
 }

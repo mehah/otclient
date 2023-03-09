@@ -28,6 +28,7 @@
 #include "framebuffer.h"
 #include "texture.h"
 #include "framework/core/timer.h"
+#include <framework/platform/platformwindow.h>
 
 #include "../stdext/storage.h"
 
@@ -79,11 +80,16 @@ public:
     bool canRepaint() { return canRepaint(false); }
     void repaint() { m_status.first = 1; }
     void resetState();
+    void scale(float factor);
 
     void optimize(int size);
 
     void setScaleFactor(float scale) { m_scaleFactor = scale; }
     inline float getScaleFactor() const { return m_scaleFactor; }
+    inline bool isScaled() const { return m_scaleFactor != PlatformWindow::DEFAULT_DISPLAY_DENSITY; }
+
+    void setFramebuffer(const Size& size);
+    void removeFramebuffer();
 
     void onBeforeDraw(std::function<void()> f) { m_beforeDraw = std::move(f); }
     void onAfterDraw(std::function<void()> f) { m_afterDraw = std::move(f); }
@@ -195,8 +201,6 @@ private:
 
     void pushTransformMatrix();
     void popTransformMatrix();
-    void scale(float x, float y);
-    void scale(float factor) { scale(factor, factor); }
     void translate(float x, float y);
     void translate(const Point& p) { translate(p.x, p.y); }
     void rotate(float angle);
@@ -210,15 +214,10 @@ private:
             ++m_depthLevel;
     }
 
-    void disableUpdateHash() {
-        m_status.first = 0;
-        m_updateHash = false;
-    }
-
     bool canRepaint(bool autoUpdateStatus);
 
     bool m_enabled{ true };
-    bool m_updateHash{ true };
+    bool m_updateHash{ false };
     bool m_alwaysGroupDrawings{ false };
 
     uint8_t m_depthLevel{ 0 };
@@ -240,6 +239,7 @@ private:
     stdext::map<size_t, DrawObject> m_objectsByhash;
 
     float m_scaleFactor{ 1.f };
+    float m_scale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
 
     FrameBufferPtr m_framebuffer;
 

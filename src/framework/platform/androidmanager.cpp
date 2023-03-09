@@ -38,13 +38,12 @@ void AndroidManager::setAndroidApp(android_app* app) {
 }
 
 void AndroidManager::setAndroidManager(JNIEnv* env, jobject androidManager) {
-    env->GetJavaVM(&m_javaVM);
-    env = getJNIEnv();
-
-    jclass androidManagerJClass = env->GetObjectClass(androidManager);
-    m_androidManagerJObject = env->NewGlobalRef(androidManager);
-    m_midShowSoftKeyboard = env->GetMethodID(androidManagerJClass, "showSoftKeyboard", "()V");
-    m_midHideSoftKeyboard = env->GetMethodID(androidManagerJClass, "hideSoftKeyboard", "()V");
+    JNIEnv* jniEnv = getJNIEnv();
+    jclass androidManagerJClass = jniEnv->GetObjectClass(androidManager);
+    m_androidManagerJObject = jniEnv->NewGlobalRef(androidManager);
+    m_midShowSoftKeyboard = jniEnv->GetMethodID(androidManagerJClass, "showSoftKeyboard", "()V");
+    m_midHideSoftKeyboard = jniEnv->GetMethodID(androidManagerJClass, "hideSoftKeyboard", "()V");
+    m_midGetDisplayDensity = jniEnv->GetMethodID(androidManagerJClass, "getDisplayDensity", "()F");
 }
 
 void AndroidManager::showKeyboardSoft() {
@@ -95,6 +94,12 @@ std::string AndroidManager::getStringFromJString(jstring text) {
     return newText;
 }
 
+float AndroidManager::getScreenDensity() {
+    JNIEnv* jni = getJNIEnv();
+
+    return jni->CallFloatMethod(m_androidManagerJObject, m_midGetDisplayDensity);
+}
+
 void AndroidManager::attachToAppMainThread() {
     getJNIEnv();
 }
@@ -102,7 +107,7 @@ void AndroidManager::attachToAppMainThread() {
 JNIEnv* AndroidManager::getJNIEnv() {
     JNIEnv *env;
 
-    if (m_javaVM->AttachCurrentThread(&env, nullptr) < 0) {
+    if (m_app->activity->vm->AttachCurrentThread(&env, nullptr) < 0) {
         g_logger.fatal("failed to attach current thread");
         return nullptr;
     }

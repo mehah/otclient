@@ -230,29 +230,34 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
     const int cropSizeText = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? getExactSize() : 12;
     const int cropSizeBackGround = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? cropSizeText - nameSize.height() : 0;
 
-    auto backgroundRect = Rect(p.x - (13.5), p.y - cropSizeBackGround, 27, 4);
-    backgroundRect.bind(parentRect);
-
-    auto textRect = Rect(p.x - nameSize.width() / 2.0, p.y - cropSizeText, nameSize);
-    textRect.bind(parentRect);
-
-    // distance them
-    uint8_t offset = 12;
-    if (isLocalPlayer()) {
-        offset *= 2;
-    }
-
-    if (textRect.top() == parentRect.top())
-        backgroundRect.moveTop(textRect.top() + offset);
-    if (backgroundRect.bottom() == parentRect.bottom())
-        textRect.moveTop(backgroundRect.top() - offset);
-
-    // health rect is based on background rect, so no worries
-    Rect healthRect = backgroundRect.expanded(-1);
-    healthRect.setWidth((m_healthPercent / 100.0) * 25);
-
     g_drawPool.select(DrawPoolType::CREATURE_INFORMATION);
     {
+        if (g_drawPool.isScaled()) {
+            g_drawPool.scale(g_drawPool.getScaleFactor());
+            p.scale(g_drawPool.getScaleFactor());
+        }
+
+        auto backgroundRect = Rect(p.x - (13.5), p.y - cropSizeBackGround, 27, 4);
+        backgroundRect.bind(parentRect);
+
+        auto textRect = Rect(p.x - nameSize.width() / 2.0, p.y - cropSizeText, nameSize);
+        textRect.bind(parentRect);
+
+        // distance them
+        uint8_t offset = 12 * g_drawPool.getScaleFactor();
+        if (isLocalPlayer()) {
+            offset *= 2 * g_drawPool.getScaleFactor();
+        }
+
+        if (textRect.top() == parentRect.top())
+            backgroundRect.moveTop(textRect.top() + offset);
+        if (backgroundRect.bottom() == parentRect.bottom())
+            textRect.moveTop(backgroundRect.top() - offset);
+
+        // health rect is based on background rect, so no worries
+        Rect healthRect = backgroundRect.expanded(-1);
+        healthRect.setWidth((m_healthPercent / 100.0) * 25);
+
         if (drawFlags & Otc::DrawBars) {
             g_drawPool.addFilledRect(backgroundRect, Color::black);
             g_drawPool.addFilledRect(healthRect, fillColor);

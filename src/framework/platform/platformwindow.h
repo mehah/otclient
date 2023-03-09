@@ -39,6 +39,8 @@ class PlatformWindow
     using OnInputEventCallback = std::function<void(const InputEvent&)>;
 
 public:
+    static constexpr float DEFAULT_DISPLAY_DENSITY = 1.f;
+
     virtual void init() = 0;
     virtual void terminate() = 0;
 
@@ -70,6 +72,7 @@ public:
 
     int getDisplayWidth() { return getDisplaySize().width(); }
     int getDisplayHeight() { return getDisplaySize().height(); }
+    float getDisplayDensity() const { return m_displayDensity; }
 
     Size getUnmaximizedSize() { return m_unmaximizedSize; }
     Size getSize() { return m_size; }
@@ -128,6 +131,7 @@ protected:
     bool m_fullscreen{ false };
     bool m_maximized{ false };
     bool m_vsync{ false };
+    float m_displayDensity{ DEFAULT_DISPLAY_DENSITY };
 
     std::function<void()> m_onClose;
     OnResizeCallback m_onResize;

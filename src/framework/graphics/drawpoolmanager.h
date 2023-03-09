@@ -74,7 +74,6 @@ public:
 
     void pushTransformMatrix() const { getCurrentPool()->pushTransformMatrix(); }
     void popTransformMatrix() const { getCurrentPool()->popTransformMatrix(); }
-    void scale(float x, float y) const { getCurrentPool()->scale(x, y); }
     void scale(float factor) const { getCurrentPool()->scale(factor); }
     void translate(float x, float y) const { getCurrentPool()->translate(x, y); }
     void translate(const Point& p) const { getCurrentPool()->translate(p); }
@@ -84,6 +83,7 @@ public:
 
     void setScaleFactor(float scale) const { getCurrentPool()->setScaleFactor(scale); }
     inline float getScaleFactor() const { return getCurrentPool()->getScaleFactor(); }
+    inline bool isScaled() const { return getCurrentPool()->isScaled(); }
     inline uint16_t getScaledSpriteSize() const { return m_spriteSize * getScaleFactor(); }
 
     void flush() const { if (getCurrentPool()) getCurrentPool()->flush(); }
