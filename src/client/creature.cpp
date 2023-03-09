@@ -222,25 +222,29 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
         else fillColor = m_informationColor;
     }
 
+    // calculate main rects
+
+    const auto& nameSize = m_name.getTextSize();
+    const int cropSizeText = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? getExactSize() : 12;
+    const int cropSizeBackGround = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? cropSizeText - nameSize.height() : 0;
+
     g_drawPool.select(DrawPoolType::CREATURE_INFORMATION);
     {
-        const float scaleFactor = g_drawPool.getScaleFactor();
+        if (g_drawPool.isScaled()) {
+            g_drawPool.scale(g_drawPool.getScaleFactor());
+            p.scale(g_drawPool.getScaleFactor());
+        }
 
-        // calculate main rects
-        const auto& nameSize = m_name.getTextSize();
-        const int cropSizeText = (ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? getExactSize() : 12) * scaleFactor;
-        const int cropSizeBackGround = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? cropSizeText - (nameSize.height() * scaleFactor) : 0;
-
-        auto backgroundRect = Rect(p.x - (13.5 * scaleFactor), p.y - (cropSizeBackGround * scaleFactor), 27 * scaleFactor, 4 * scaleFactor);
+        auto backgroundRect = Rect(p.x - (13.5), p.y - cropSizeBackGround, 27, 4);
         backgroundRect.bind(parentRect);
 
-        auto textRect = Rect(p.x - (nameSize.width() * scaleFactor) / 2.0, p.y - cropSizeText, nameSize);
+        auto textRect = Rect(p.x - nameSize.width() / 2.0, p.y - cropSizeText, nameSize);
         textRect.bind(parentRect);
 
         // distance them
-        uint8_t offset = (12 * scaleFactor);
+        uint8_t offset = 12;
         if (isLocalPlayer()) {
-            offset *= 2 * scaleFactor;
+            offset *= 2;
         }
 
         if (textRect.top() == parentRect.top())
@@ -249,8 +253,8 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
             textRect.moveTop(backgroundRect.top() - offset);
 
         // health rect is based on background rect, so no worries
-        Rect healthRect = backgroundRect.expanded(-1 * scaleFactor);
-        healthRect.setWidth((m_healthPercent / 100.0) * (25 * scaleFactor));
+        Rect healthRect = backgroundRect.expanded(-1);
+        healthRect.setWidth((m_healthPercent / 100.0) * 25);
 
         if (drawFlags & Otc::DrawBars) {
             g_drawPool.addFilledRect(backgroundRect, Color::black);
@@ -262,9 +266,9 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
 
                     g_drawPool.addFilledRect(backgroundRect, Color::black);
 
-                    Rect manaRect = backgroundRect.expanded(-1 * scaleFactor);
+                    Rect manaRect = backgroundRect.expanded(-1);
                     const double maxMana = player->getMaxMana();
-                    manaRect.setWidth((maxMana ? player->getMana() / maxMana : 1) * (25 * scaleFactor));
+                    manaRect.setWidth((maxMana ? player->getMana() / maxMana : 1) * 25);
 
                     g_drawPool.addFilledRect(manaRect, Color::blue);
                 }
@@ -272,33 +276,23 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
         }
 
         if (drawFlags & Otc::DrawNames) {
-            m_name.draw(textRect, fillColor, scaleFactor);
+            m_name.draw(textRect, fillColor);
         }
 
-        if (m_skull != Otc::SkullNone && m_skullTexture) {
-            const auto& rect = Rect(backgroundRect.x() + ((13.5 + 12) * scaleFactor), backgroundRect.y() + (5 * scaleFactor), m_skullTexture->getSize() * scaleFactor);
-            g_drawPool.addTexturedRect(rect, m_skullTexture);
-        }
+        if (m_skull != Otc::SkullNone && m_skullTexture)
+            g_drawPool.addTexturedPos(m_skullTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5);
 
-        if (m_shield != Otc::ShieldNone && m_shieldTexture && m_showShieldTexture) {
-            const auto& rect = Rect(backgroundRect.x() + (13.5 * scaleFactor), backgroundRect.y() + (5 * scaleFactor), m_shieldTexture->getSize() * scaleFactor);
-            g_drawPool.addTexturedRect(rect, m_shieldTexture);
-        }
+        if (m_shield != Otc::ShieldNone && m_shieldTexture && m_showShieldTexture)
+            g_drawPool.addTexturedPos(m_shieldTexture, backgroundRect.x() + 13.5, backgroundRect.y() + 5);
 
-        if (m_emblem != Otc::EmblemNone && m_emblemTexture) {
-            const auto& rect = Rect(backgroundRect.x() + ((13.5 + 12) * scaleFactor), backgroundRect.y() + (16 * scaleFactor), m_emblemTexture->getSize() * scaleFactor);
-            g_drawPool.addTexturedRect(rect, m_emblemTexture);
-        }
+        if (m_emblem != Otc::EmblemNone && m_emblemTexture)
+            g_drawPool.addTexturedPos(m_emblemTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 16);
 
-        if (m_type != Proto::CreatureTypeUnknown && m_typeTexture) {
-            const auto& rect = Rect(backgroundRect.x() + ((13.5 + 12 + 12) * scaleFactor), backgroundRect.y() + (16 * scaleFactor), m_typeTexture->getSize() * scaleFactor);
-            g_drawPool.addTexturedRect(rect, m_typeTexture);
-        }
+        if (m_type != Proto::CreatureTypeUnknown && m_typeTexture)
+            g_drawPool.addTexturedPos(m_typeTexture, backgroundRect.x() + 13.5 + 12 + 12, backgroundRect.y() + 16);
 
-        if (m_icon != Otc::NpcIconNone && m_iconTexture) {
-            const auto& rect = Rect(backgroundRect.x() + ((13.5 + 12) * scaleFactor), backgroundRect.y() + (5 * scaleFactor), m_iconTexture->getSize() * scaleFactor);
-            g_drawPool.addTexturedRect(rect, m_iconTexture);
-        }
+        if (m_icon != Otc::NpcIconNone && m_iconTexture)
+            g_drawPool.addTexturedPos(m_iconTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5);
     }
     // Go back to use map pool
     g_drawPool.select(DrawPoolType::MAP);

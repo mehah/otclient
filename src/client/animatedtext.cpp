@@ -59,7 +59,7 @@ void AnimatedText::drawText(const Point& dest, const Rect& visibleRect)
             color.setAlpha(1 - (t - t0) / (tf - t0));
         }
 
-        m_cachedText.draw(rect, color, g_drawPool.getScaleFactor());
+        m_cachedText.draw(rect, color);
     }
 }
 

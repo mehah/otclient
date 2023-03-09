@@ -257,6 +257,7 @@ void DrawPool::resetState()
     m_depthLevel = 0;
     m_status.second = 0;
     m_shaderRefreshDelay = 0;
+    m_scale = PlatformWindow::DEFAULT_DISPLAY_DENSITY;
 }
 
 bool DrawPool::canRepaint(const bool autoUpdateStatus)
@@ -278,17 +279,19 @@ bool DrawPool::canRepaint(const bool autoUpdateStatus)
     return canRepaint;
 }
 
-void DrawPool::scale(const Point& p, float factor)
+void DrawPool::scale(float factor)
 {
-    translate(-p.x, -p.y);
+    if (m_scale == factor)
+        return;
+
+    m_scale = factor;
+
     const Matrix3 scaleMatrix = {
               factor,   0.0f,  0.0f,
             0.0f,     factor,  0.0f,
             0.0f,  0.0f,  1.0f
     };
-
     m_state.transformMatrix = m_state.transformMatrix * scaleMatrix.transposed();
-    translate(p.x, p.y);
 }
 
 void DrawPool::translate(float x, float y)

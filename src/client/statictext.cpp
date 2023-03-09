@@ -42,7 +42,7 @@ void StaticText::drawText(const Point& dest, const Rect& parentRect)
 
     // draw only if the real center is not too far from the parent center, or its a yell
     //if(g_map.isAwareOfPosition(m_position) || isYell()) {
-    m_cachedText.draw(boundRect, m_color, g_drawPool.getScaleFactor());
+    m_cachedText.draw(boundRect, m_color);
     //}
 }
 

@@ -28,6 +28,7 @@
 #include "framebuffer.h"
 #include "texture.h"
 #include "framework/core/timer.h"
+#include <framework/platform/platformwindow.h>
 
 #include "../stdext/storage.h"
 
@@ -79,11 +80,13 @@ public:
     bool canRepaint() { return canRepaint(false); }
     void repaint() { m_status.first = 1; }
     void resetState();
+    void scale(float factor);
 
     void optimize(int size);
 
     void setScaleFactor(float scale) { m_scaleFactor = scale; }
     inline float getScaleFactor() const { return m_scaleFactor; }
+    inline bool isScaled() const { return m_scaleFactor != PlatformWindow::DEFAULT_DISPLAY_DENSITY; }
 
     void setFramebuffer(const Size& size);
     void removeFramebuffer();
@@ -198,7 +201,6 @@ private:
 
     void pushTransformMatrix();
     void popTransformMatrix();
-    void scale(const Point& p, float factor);
     void translate(float x, float y);
     void translate(const Point& p) { translate(p.x, p.y); }
     void rotate(float angle);
@@ -237,6 +239,7 @@ private:
     stdext::map<size_t, DrawObject> m_objectsByhash;
 
     float m_scaleFactor{ 1.f };
+    float m_scale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
 
     FrameBufferPtr m_framebuffer;
 

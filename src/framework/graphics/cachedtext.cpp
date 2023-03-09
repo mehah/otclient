@@ -27,7 +27,7 @@
 CachedText::CachedText() : m_font(g_fonts.getDefaultFont()), m_align(Fw::AlignCenter), m_coordsBuffer(std::make_shared<CoordsBuffer>())
 {}
 
-void CachedText::draw(const Rect& rect, const Color& color, float scale)
+void CachedText::draw(const Rect& rect, const Color& color)
 {
     if (!m_font)
         return;
@@ -37,16 +37,7 @@ void CachedText::draw(const Rect& rect, const Color& color, float scale)
         m_font->fillTextCoords(m_coordsBuffer, m_text, m_textSize, m_align, rect, m_glyphsPositions);
     }
 
-    bool isScaled = scale != 1.f;
-    if (isScaled) {
-        g_drawPool.pushTransformMatrix();
-        g_drawPool.scale(rect.topLeft(), scale);
-    }
-
     g_drawPool.addTexturedCoordsBuffer(m_font->getTexture(), m_coordsBuffer, color);
-
-    if (isScaled)
-        g_drawPool.popTransformMatrix();
 }
 
 void CachedText::update()
