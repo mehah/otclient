@@ -275,21 +275,30 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
             m_name.draw(textRect, fillColor, scaleFactor);
         }
 
-        if (m_skull != Otc::SkullNone && m_skullTexture)
-            g_drawPool.addTexturedPos(m_skullTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5);
-
-        if (m_shield != Otc::ShieldNone && m_shieldTexture && m_showShieldTexture)
-            g_drawPool.addTexturedPos(m_shieldTexture, backgroundRect.x() + 13.5, backgroundRect.y() + 5);
-
-        if (m_emblem != Otc::EmblemNone && m_emblemTexture)
-            g_drawPool.addTexturedPos(m_emblemTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 16);
-
-        if (m_type != Proto::CreatureTypeUnknown && m_typeTexture) {
-            g_drawPool.addTexturedRect(Rect(backgroundRect.x() + ((13.5 + 12 + 12) * scaleFactor), backgroundRect.y() + (16 * scaleFactor), m_typeTexture->getSize() * scaleFactor), m_typeTexture);
+        if (m_skull != Otc::SkullNone && m_skullTexture) {
+            const auto& rect = Rect(backgroundRect.x() + ((13.5 + 12) * scaleFactor), backgroundRect.y() + (5 * scaleFactor), m_skullTexture->getSize() * scaleFactor);
+            g_drawPool.addTexturedRect(rect, m_skullTexture);
         }
 
-        if (m_icon != Otc::NpcIconNone && m_iconTexture)
-            g_drawPool.addTexturedPos(m_iconTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5);
+        if (m_shield != Otc::ShieldNone && m_shieldTexture && m_showShieldTexture) {
+            const auto& rect = Rect(backgroundRect.x() + (13.5 * scaleFactor), backgroundRect.y() + (5 * scaleFactor), m_shieldTexture->getSize() * scaleFactor);
+            g_drawPool.addTexturedRect(rect, m_shieldTexture);
+        }
+
+        if (m_emblem != Otc::EmblemNone && m_emblemTexture) {
+            const auto& rect = Rect(backgroundRect.x() + ((13.5 + 12) * scaleFactor), backgroundRect.y() + (16 * scaleFactor), m_emblemTexture->getSize() * scaleFactor);
+            g_drawPool.addTexturedRect(rect, m_emblemTexture);
+        }
+
+        if (m_type != Proto::CreatureTypeUnknown && m_typeTexture) {
+            const auto& rect = Rect(backgroundRect.x() + ((13.5 + 12 + 12) * scaleFactor), backgroundRect.y() + (16 * scaleFactor), m_typeTexture->getSize() * scaleFactor);
+            g_drawPool.addTexturedRect(rect, m_typeTexture);
+        }
+
+        if (m_icon != Otc::NpcIconNone && m_iconTexture) {
+            const auto& rect = Rect(backgroundRect.x() + ((13.5 + 12) * scaleFactor), backgroundRect.y() + (5 * scaleFactor), m_iconTexture->getSize() * scaleFactor);
+            g_drawPool.addTexturedRect(rect, m_iconTexture);
+        }
     }
     // Go back to use map pool
     g_drawPool.select(DrawPoolType::MAP);
