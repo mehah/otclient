@@ -242,9 +242,9 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
         textRect.bind(parentRect);
 
         // distance them
-        uint8_t offset = 12;
+        uint8_t offset = 12 * g_drawPool.getScaleFactor();
         if (isLocalPlayer()) {
-            offset *= 2;
+            offset *= 2 * g_drawPool.getScaleFactor();
         }
 
         if (textRect.top() == parentRect.top())
