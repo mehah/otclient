@@ -166,7 +166,12 @@ end
 
 function whenHealthChange()
     if g_game.isOnline() then
-        local healthPercent = math.floor(g_game.getLocalPlayer():getHealthPercent())
+        -- Fix By TheMaoci ~ if your server doesn't have this properly implemented,
+        -- it will cause alot of unnecessary deaths from players which will be unfair.
+        -- My friend reported me that while he was using his otcv8 and asked for a fix so here you go :)
+        local healthPercent = math.floor(g_game.getLocalPlayer():getHealth() / g_game.getLocalPlayer():getMaxHealth() * 100)
+        -- Old leaved for ppl who have that implemented correctly
+        --local healthPercent = math.floor(g_game.getLocalPlayer():getHealthPercent())
 
         local yhppc = math.floor(imageSizeBroad * (1 - (healthPercent / 100)))
         local restYhppc = imageSizeBroad - yhppc
