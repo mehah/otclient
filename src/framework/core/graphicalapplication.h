@@ -69,6 +69,12 @@ public:
     void setDrawTexts(bool v) { m_drawText = v; }
     bool isDrawingTexts() { return m_drawText; }
 
+    float getCreatureInformationScale();
+    void setCreatureInformationScale(float v);
+
+    float getTextScale();
+    void setTextScale(float v);
+
     bool isLoadingAsyncTexture();
     void setLoadingAsyncTexture(bool v);
 

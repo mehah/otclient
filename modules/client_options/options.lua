@@ -42,7 +42,9 @@ local defaultOptions = {
     drawEffectOnTop = false,
     floorViewMode = 1,
     floorFading = 500,
-    asyncTxtLoading = false
+    asyncTxtLoading = false,
+    creatureInformationScale = 0,
+    textScale = 0
 }
 
 local optionsWindow
@@ -275,6 +277,25 @@ function setOption(key, value, force)
     elseif key == 'floorFading' then
         graphicsPanel:getChildById('floorFadingLabel'):setText(tr('Floor Fading: %s ms', value))
         gameMapPanel:setFloorFading(tonumber(value))
+
+    elseif key == 'creatureInformationScale' then
+        if value == 0 then
+            value = g_window.getDisplayDensity()
+        else
+            value = value / 2
+        end
+        g_app.setCreatureInformationScale(value)
+        generalPanel:getChildById('creatureInformationScaleLabel'):setText(tr('Creature Infromation Scale: %sx', value))
+        value = value * 2
+    elseif key == 'textScale' then
+        if value == 0 then
+            value = g_window.getDisplayDensity()
+        else
+            value = value / 2
+        end
+        g_app.setTextScale(value)
+        generalPanel:getChildById('textScaleLabel'):setText(tr('Text Scale: %sx', value))
+        value = value * 2
     elseif key == 'limitVisibleDimension' then
         gameMapPanel:setLimitVisibleDimension(value)
     elseif key == 'floatingEffect' then

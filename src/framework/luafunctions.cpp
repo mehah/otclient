@@ -277,6 +277,11 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_app", "isEncrypted", &GraphicalApplication::isEncrypted, &g_app);
     g_lua.bindSingletonFunction("g_app", "isScaled", &GraphicalApplication::isScaled, &g_app);
 
+    g_lua.bindSingletonFunction("g_app", "getCreatureInformationScale", &GraphicalApplication::getCreatureInformationScale, &g_app);
+    g_lua.bindSingletonFunction("g_app", "getTextScale", &GraphicalApplication::getTextScale, &g_app);
+    g_lua.bindSingletonFunction("g_app", "setCreatureInformationScale", &GraphicalApplication::setCreatureInformationScale, &g_app);
+    g_lua.bindSingletonFunction("g_app", "setTextScale", &GraphicalApplication::setTextScale, &g_app);
+
     // PlatformWindow
     g_lua.registerSingletonClass("g_window");
     g_lua.bindSingletonFunction("g_window", "move", &PlatformWindow::move, &g_window);
@@ -316,6 +321,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_window", "isFullscreen", &PlatformWindow::isFullscreen, &g_window);
     g_lua.bindSingletonFunction("g_window", "isMaximized", &PlatformWindow::isMaximized, &g_window);
     g_lua.bindSingletonFunction("g_window", "hasFocus", &PlatformWindow::hasFocus, &g_window);
+    g_lua.bindSingletonFunction("g_window", "getDisplayDensity", &PlatformWindow::getDisplayDensity, &g_window);
 
     // Input
     g_lua.registerSingletonClass("g_mouse");
