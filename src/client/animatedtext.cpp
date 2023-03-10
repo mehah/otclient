@@ -41,28 +41,28 @@ void AnimatedText::drawText(const Point& dest, const Rect& visibleRect)
     const float t = m_animationTimer.ticksElapsed();
 
     Point p = dest;
-    p.x += (24 - textSize.width() / 2);
+    p.x += (24.f / g_drawPool.getScaleFactor() - (textSize.width() / 2.f));
     if (g_game.getFeature(Otc::GameDiagonalAnimatedText)) {
         p.x -= (4 * t / tf) + (8 * t * t / tftf);
     }
 
-    p.y += 8 + (-48 * t) / tf;
+    p.y += ((8.f / g_drawPool.getScaleFactor()) + ((-48.f * t) / tf));
     p += m_offset;
 
-    //p.scale(g_drawPool.getScaleFactor());
+    if (!visibleRect.contains({ p, textSize }))
+        return;
 
-    const Rect rect{ p, textSize };
+    p.scale(g_drawPool.getScaleFactor());
 
-    if (visibleRect.contains(rect)) {
-        constexpr float t0 = tf / 1.2;
+    const Rect& rect{ p, textSize };
+    constexpr float t0 = tf / 1.2;
 
-        Color color = m_color;
-        if (t > t0) {
-            color.setAlpha(1 - (t - t0) / (tf - t0));
-        }
-
-        m_cachedText.draw(rect, color);
+    Color color = m_color;
+    if (t > t0) {
+        color.setAlpha(1 - (t - t0) / (tf - t0));
     }
+
+    m_cachedText.draw(rect, color);
 }
 
 void AnimatedText::onAppear()

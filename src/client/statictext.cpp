@@ -37,9 +37,7 @@ void StaticText::drawText(const Point& dest, const Rect& parentRect)
 {
     const auto& textSize = m_cachedText.getTextSize();
 
-    auto dd = (dest - (Point(textSize.width() / 2, textSize.height()) + (Point(20, 5) / g_drawPool.getScaleFactor())));
-
-    auto rect = Rect(dd, textSize);
+    auto rect = Rect((dest - (Point(textSize.width() / 2, textSize.height()) + (Point(20, 5) / g_drawPool.getScaleFactor()))), textSize);
     if (!g_drawPool.isScaled())
         rect.bind(parentRect);
 
