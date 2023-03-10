@@ -32,6 +32,7 @@
 
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>
+#include <framework/core/graphicalapplication.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
 #include <framework/graphics/texturemanager.h>
@@ -232,15 +233,16 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
 
     g_drawPool.select(DrawPoolType::CREATURE_INFORMATION);
     {
-        if (g_drawPool.isScaled()) {
-            g_drawPool.scale(g_drawPool.getScaleFactor());
-            p.scale(g_drawPool.getScaleFactor());
+        bool isScaled = g_app.getCreatureInformationScale() != PlatformWindow::DEFAULT_DISPLAY_DENSITY;
+        if (isScaled) {
+            g_drawPool.scale(g_app.getCreatureInformationScale());
+            p.scale(g_app.getCreatureInformationScale());
         }
 
         auto backgroundRect = Rect(p.x - (13.5), p.y - cropSizeBackGround, 27, 4);
         auto textRect = Rect(p.x - nameSize.width() / 2.0, p.y - cropSizeText, nameSize);
 
-        if (!g_drawPool.isScaled()) {
+        if (!isScaled) {
             backgroundRect.bind(parentRect);
             textRect.bind(parentRect);
         }

@@ -287,18 +287,3 @@ void GraphicalApplication::setLoadingAsyncTexture(bool v) {
     m_loadingAsyncTexture = v;
     g_sprites.reload();
 }
-
-float GraphicalApplication::getCreatureInformationScale() {
-    return g_drawPool.get(DrawPoolType::CREATURE_INFORMATION)->getScaleFactor();
-}
-
-float GraphicalApplication::getTextScale() {
-    return g_drawPool.get(DrawPoolType::TEXT)->getScaleFactor();
-}
-
-void GraphicalApplication::setCreatureInformationScale(float v) {
-    g_drawPool.get(DrawPoolType::CREATURE_INFORMATION)->setScaleFactor(v);
-}
-void GraphicalApplication::setTextScale(float v) {
-    g_drawPool.get(DrawPoolType::TEXT)->setScaleFactor(v);
-}
