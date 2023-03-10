@@ -209,8 +209,8 @@ void MapView::drawFloor()
 void MapView::drawText()
 {
     g_drawPool.use(DrawPoolType::TEXT);
-    g_drawPool.scale(g_drawPool.getScaleFactor());
 
+    g_drawPool.scale(g_app.getStaticTextScale());
     for (const auto& staticText : g_map.getStaticTexts()) {
         if (staticText->getMessageMode() == Otc::MessageNone)
             continue;
@@ -223,9 +223,10 @@ void MapView::drawText()
         p.x *= m_posInfo.horizontalStretchFactor;
         p.y *= m_posInfo.verticalStretchFactor;
         p += m_posInfo.rect.topLeft();
-        staticText->drawText(p.scale(g_drawPool.getScaleFactor()), m_posInfo.rect);
+        staticText->drawText(p.scale(g_app.getStaticTextScale()), m_posInfo.rect);
     }
 
+    g_drawPool.scale(g_app.getAnimatedTextScale());
     for (const auto& animatedText : g_map.getAnimatedTexts()) {
         const auto& pos = animatedText->getPosition();
 
