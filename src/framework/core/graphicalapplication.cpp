@@ -256,9 +256,6 @@ void GraphicalApplication::resize(const Size& size)
     g_ui.resize(size / scale);
     m_onInputEvent = false;
 
-    g_drawPool.get(DrawPoolType::TEXT)->setScaleFactor(scale);
-    g_drawPool.get(DrawPoolType::CREATURE_INFORMATION)->setScaleFactor(scale);
-
     g_mainDispatcher.addEvent([size, scale] {
         g_drawPool.get(DrawPoolType::FOREGROUND)->setFramebuffer(size / scale);
 
@@ -289,4 +286,19 @@ void GraphicalApplication::setLoadingAsyncTexture(bool v) {
 
     m_loadingAsyncTexture = v;
     g_sprites.reload();
+}
+
+float GraphicalApplication::getCreatureInformationScale() {
+    return g_drawPool.get(DrawPoolType::CREATURE_INFORMATION)->getScaleFactor();
+}
+
+float GraphicalApplication::getTextScale() {
+    return g_drawPool.get(DrawPoolType::TEXT)->getScaleFactor();
+}
+
+void GraphicalApplication::setCreatureInformationScale(float v) {
+    g_drawPool.get(DrawPoolType::CREATURE_INFORMATION)->setScaleFactor(v);
+}
+void GraphicalApplication::setTextScale(float v) {
+    g_drawPool.get(DrawPoolType::TEXT)->setScaleFactor(v);
 }

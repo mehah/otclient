@@ -238,10 +238,12 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
         }
 
         auto backgroundRect = Rect(p.x - (13.5), p.y - cropSizeBackGround, 27, 4);
-        backgroundRect.bind(parentRect);
-
         auto textRect = Rect(p.x - nameSize.width() / 2.0, p.y - cropSizeText, nameSize);
-        textRect.bind(parentRect);
+
+        if (!g_drawPool.isScaled()) {
+            backgroundRect.bind(parentRect);
+            textRect.bind(parentRect);
+        }
 
         // distance them
         uint8_t offset = 12 * g_drawPool.getScaleFactor();
