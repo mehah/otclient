@@ -43,10 +43,10 @@ void AnimatedText::drawText(const Point& dest, const Rect& visibleRect)
     Point p = dest;
     p.x += (24.f / g_drawPool.getScaleFactor() - (textSize.width() / 2.f));
     if (g_game.getFeature(Otc::GameDiagonalAnimatedText)) {
-        p.x -= (4 * t / tf) + (8 * t * t / tftf);
+        p.x -= (4 * g_drawPool.getScaleFactor() * t / tf) + (8 * g_drawPool.getScaleFactor() * t * t / tftf);
     }
 
-    p.y += ((8.f / g_drawPool.getScaleFactor()) + ((-48.f * t) / tf));
+    p.y += ((8.f / g_drawPool.getScaleFactor()) + ((-48.f * g_drawPool.getScaleFactor() * t) / tf));
     p += m_offset;
 
     if (!visibleRect.contains({ p, textSize }))
