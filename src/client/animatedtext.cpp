@@ -41,18 +41,18 @@ void AnimatedText::drawText(const Point& dest, const Rect& visibleRect)
     const float t = m_animationTimer.ticksElapsed();
 
     Point p = dest;
-    p.x += (24.f / g_app.getAnimatedTextScale() - (textSize.width() / 2.f));
+    p.x += (24.f / g_drawPool.getScaleFactor() - (textSize.width() / 2.f));
     if (g_game.getFeature(Otc::GameDiagonalAnimatedText)) {
-        p.x -= (4 * g_app.getAnimatedTextScale() * t / tf) + (8 * g_app.getAnimatedTextScale() * t * t / tftf);
+        p.x -= (4 * g_drawPool.getScaleFactor() * t / tf) + (8 * g_drawPool.getScaleFactor() * t * t / tftf);
     }
 
-    p.y += ((8.f / g_app.getAnimatedTextScale()) + ((-48.f * g_app.getAnimatedTextScale() * t) / tf));
+    p.y += ((8.f / g_drawPool.getScaleFactor()) + ((-48.f * g_drawPool.getScaleFactor() * t) / tf));
     p += m_offset;
 
     if (!visibleRect.contains({ p, textSize }))
         return;
 
-    p.scale(g_app.getAnimatedTextScale());
+    p.scale(g_drawPool.getScaleFactor());
 
     const Rect& rect{ p, textSize };
     constexpr float t0 = tf / 1.2;

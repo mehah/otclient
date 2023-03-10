@@ -285,11 +285,13 @@ void DrawPool::scale(float factor)
         return;
 
     m_scale = factor;
-    m_state.transformMatrix = DEFAULT_MATRIX3 * Matrix3{
-      factor,   0.0f,  0.0f,
-        0.0f, factor,  0.0f,
-        0.0f,   0.0f,  1.0f
-    }.transposed();
+
+    const Matrix3 scaleMatrix = {
+              factor,   0.0f,  0.0f,
+            0.0f,     factor,  0.0f,
+            0.0f,  0.0f,  1.0f
+    };
+    m_state.transformMatrix = m_state.transformMatrix * scaleMatrix.transposed();
 }
 
 void DrawPool::translate(float x, float y)

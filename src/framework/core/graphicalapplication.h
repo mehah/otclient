@@ -69,14 +69,11 @@ public:
     void setDrawTexts(bool v) { m_drawText = v; }
     bool isDrawingTexts() { return m_drawText; }
 
-    float getCreatureInformationScale() const { return m_creatureInformationScale; }
-    void setCreatureInformationScale(float v) { m_creatureInformationScale = v; }
+    float getCreatureInformationScale();
+    void setCreatureInformationScale(float v);
 
-    float getAnimatedTextScale() const { return m_animatedTextScale; }
-    void setAnimatedTextScale(float v) { m_animatedTextScale = v; }
-
-    float getStaticTextScale() const { return m_staticTextScale; }
-    void setStaticTextScale(float v) { m_staticTextScale = v; }
+    float getTextScale();
+    void setTextScale(float v);
 
     bool isLoadingAsyncTexture();
     void setLoadingAsyncTexture(bool v);
@@ -106,10 +103,6 @@ private:
     bool m_drawEffectOnTop{ false };
     bool m_drawText{ true };
     bool m_loadingAsyncTexture{ false };
-
-    float m_creatureInformationScale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
-    float m_animatedTextScale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
-    float m_staticTextScale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
 
     AdaptativeFrameCounter m_frameCounter;
 };

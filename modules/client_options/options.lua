@@ -44,8 +44,7 @@ local defaultOptions = {
     floorFading = 500,
     asyncTxtLoading = false,
     creatureInformationScale = 0,
-    staticTextScale = 0,
-    animatedTextScale = 0
+    textScale = 0
 }
 
 local optionsWindow
@@ -278,6 +277,7 @@ function setOption(key, value, force)
     elseif key == 'floorFading' then
         graphicsPanel:getChildById('floorFadingLabel'):setText(tr('Floor Fading: %s ms', value))
         gameMapPanel:setFloorFading(tonumber(value))
+
     elseif key == 'creatureInformationScale' then
         if value == 0 then
             value = g_window.getDisplayDensity()
@@ -288,24 +288,14 @@ function setOption(key, value, force)
         generalPanel:getChildById('creatureInformationScaleLabel'):setText(
             tr('Creature Infromation Scale: %sx', math.max(value + 0.5, 1)))
         value = value * 2
-    elseif key == 'staticTextScale' then
+    elseif key == 'textScale' then
         if value == 0 then
             value = g_window.getDisplayDensity()
         else
             value = value / 2
         end
-        g_app.setStaticTextScale(math.max(value + 0.5, 1))
-        generalPanel:getChildById('staticTextScaleLabel'):setText(tr('Message Scale: %sx', math.max(value + 0.5, 1)))
-        value = value * 2
-    elseif key == 'animatedTextScale' then
-        if value == 0 then
-            value = g_window.getDisplayDensity()
-        else
-            value = value / 2
-        end
-        g_app.setAnimatedTextScale(math.max(value + 0.5, 1))
-        generalPanel:getChildById('animatedTextScaleLabel'):setText(
-            tr('Animated Message Scale: %sx', math.max(value + 0.5, 1)))
+        g_app.setTextScale(math.max(value + 0.5, 1))
+        generalPanel:getChildById('textScaleLabel'):setText(tr('Text Scale: %sx', math.max(value + 0.5, 1)))
         value = value * 2
     elseif key == 'limitVisibleDimension' then
         gameMapPanel:setLimitVisibleDimension(value)

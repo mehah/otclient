@@ -42,6 +42,9 @@ Panel
     anchors.right: parent.right
     anchors.top: prev.bottom
     margin-top: 12
+    @onSetup: |
+      local value = modules.client_options.getOption('creatureInformationScale')
+      self:setText(tr('Creature Infromation Scale: %sx', value))
 
   OptionScrollbar
     id: creatureInformationScale
@@ -53,30 +56,17 @@ Panel
     maximum: 9
 
   Label
-    id: staticTextScaleLabel
+    id: textScaleLabel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
     margin-top: 12
+    @onSetup: |
+      local value = modules.client_options.getOption('textScale')
+      self:setText(tr('Text Scale: %sx', value))
 
   OptionScrollbar
-    id: staticTextScale
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 3
-    minimum: 1
-    maximum: 9
-
-  Label
-    id: animatedTextScaleLabel
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 12
-
-  OptionScrollbar
-    id: animatedTextScale
+    id: textScale
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
