@@ -285,7 +285,8 @@ function setOption(key, value, force)
             value = value / 2
         end
         g_app.setCreatureInformationScale(value)
-        generalPanel:getChildById('creatureInformationScaleLabel'):setText(tr('Creature Infromation Scale: %sx', value))
+        generalPanel:getChildById('creatureInformationScaleLabel'):setText(
+            tr('Creature Infromation Scale: %sx', math.max(value, 1)))
         value = value * 2
     elseif key == 'textScale' then
         if value == 0 then
@@ -293,8 +294,8 @@ function setOption(key, value, force)
         else
             value = value / 2
         end
-        g_app.setTextScale(value)
-        generalPanel:getChildById('textScaleLabel'):setText(tr('Text Scale: %sx', value))
+        g_app.setTextScale(math.max(value, 1))
+        generalPanel:getChildById('textScaleLabel'):setText(tr('Text Scale: %sx', math.max(value, 1)))
         value = value * 2
     elseif key == 'limitVisibleDimension' then
         gameMapPanel:setLimitVisibleDimension(value)

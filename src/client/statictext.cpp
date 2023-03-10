@@ -36,13 +36,16 @@ StaticText::StaticText()
 void StaticText::drawText(const Point& dest, const Rect& parentRect)
 {
     const auto& textSize = m_cachedText.getTextSize();
-    const auto& rect = Rect(dest - Point(textSize.width() / 2, textSize.height()) + Point(20, 5), textSize);
-    Rect boundRect = rect;
-    boundRect.bind(parentRect);
+
+    auto dd = (dest - (Point(textSize.width() / 2, textSize.height()) + (Point(20, 5) / g_drawPool.getScaleFactor())));
+
+    auto rect = Rect(dd, textSize);
+    if (!g_drawPool.isScaled())
+        rect.bind(parentRect);
 
     // draw only if the real center is not too far from the parent center, or its a yell
     //if(g_map.isAwareOfPosition(m_position) || isYell()) {
-    m_cachedText.draw(boundRect, m_color);
+    m_cachedText.draw(rect, m_color);
     //}
 }
 

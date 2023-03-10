@@ -49,6 +49,8 @@ void AnimatedText::drawText(const Point& dest, const Rect& visibleRect)
     p.y += 8 + (-48 * t) / tf;
     p += m_offset;
 
+    //p.scale(g_drawPool.getScaleFactor());
+
     const Rect rect{ p, textSize };
 
     if (visibleRect.contains(rect)) {
