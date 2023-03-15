@@ -226,11 +226,16 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
                 default: return false;
             }
 
-            const auto& lastAppearance = appearances->Get(appearances->size() - 1);
+            // fix for custom asserts, where ids are not sorted.
+            uint32_t lastAppearanceId = 0;
+            for (const auto& appearance : *appearances) {
+                if (appearance.id() > lastAppearanceId)
+                    lastAppearanceId = appearance.id();
+            }
 
             auto& things = m_thingTypes[category];
             things.clear();
-            things.resize(lastAppearance.id() + 1, m_nullThingType);
+            things.resize(lastAppearanceId + 1, m_nullThingType);
 
             for (const auto& appearance : *appearances) {
                 const auto& type = std::make_shared<ThingType>();
