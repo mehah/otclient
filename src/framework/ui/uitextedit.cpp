@@ -56,7 +56,6 @@ void UITextEdit::drawSelf(DrawPoolType drawPane)
     drawImage(m_rect);
     drawIcon(m_rect);
 
-    const int textLength = m_text.length();
     const auto& texture = m_font->getTexture();
     if (!texture)
         return;
@@ -65,6 +64,7 @@ void UITextEdit::drawSelf(DrawPoolType drawPane)
     if (glyphsMustRecache)
         setProp(PropGlyphsMustRecache, false);
 
+    const int textLength = std::min<int>(m_glyphsCoords.size(), m_text.length());
     if (m_color != Color::alpha) {
         if (glyphsMustRecache) {
             m_glyphsTextRectCache.clear();
@@ -657,7 +657,7 @@ void UITextEdit::onFocusChange(bool focused, Fw::FocusReason reason)
     } else if (getProp(PropSelectable))
         clearSelection();
     UIWidget::onFocusChange(focused, reason);
-    }
+}
 
 bool UITextEdit::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepeatTicks)
 {
