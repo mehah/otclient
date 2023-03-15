@@ -702,7 +702,7 @@ void Creature::setOutfit(const Outfit& outfit)
     m_walkAnimationPhase = 0; // might happen when player is walking and outfit is changed.
 
     if (m_outfit.isInvalid())
-        m_outfit.setCategory(ThingCategoryCreature);
+        m_outfit.setCategory(m_outfit.getAuxId() > 0 ? ThingCategoryItem : ThingCategoryCreature);
 
     m_thingType = g_things.getThingType(m_outfit.isCreature() ? m_outfit.getId() : m_outfit.getAuxId(), m_outfit.getCategory()).get();
     m_clientId = m_thingType->getId();
