@@ -828,12 +828,6 @@ function onCreaturePositionChange(creature, newPos, oldPos) -- Update battleButt
                 local mob = v.creature
                 if mob and mob:getPosition() then
                     v:setVisible(canBeSeen(mob))
-
-                    if lastCreatureSelected == mob and not v:isVisible() then
-                        lastCreatureSelected:hideStaticSquare()
-                        lastCreatureSelected = nil
-                    end
-
                 end
             end
             -- battlePanel:getLayout():update()
