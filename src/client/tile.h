@@ -194,6 +194,7 @@ public:
 
     TilePtr asTile() { return static_self_cast<Tile>(); }
 
+    bool checkForDetachableThing();
 private:
     void drawTop(const Point& dest, int flags, bool forceDraw, LightView* lightView = nullptr);
     void drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, bool forceDraw, LightView* lightView = nullptr);
@@ -208,7 +209,6 @@ private:
             setThingFlag(thing);
     }
 
-    bool checkForDetachableThing();
     bool hasThingWithElevation() const { return hasElevation() && m_thingTypeFlag & TileThingType::HAS_THING_WITH_ELEVATION; }
 
     Position m_position;

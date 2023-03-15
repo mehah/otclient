@@ -712,6 +712,9 @@ void Creature::setOutfit(const Outfit& outfit)
         m_numPatternZ = std::min<int>(1, getNumPatternZ() - 1);
     }
 
+    if (const auto& tile = getTile())
+        tile->checkForDetachableThing();
+
     callLuaField("onOutfitChange", m_outfit, oldOutfit);
 }
 
