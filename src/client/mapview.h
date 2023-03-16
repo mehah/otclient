@@ -142,6 +142,8 @@ public:
 
     Position getPosition(const Point& point, const Size& mapSize);
 
+    Position getPosition(const Point& mousePos);
+
     MapViewPtr asMapView() { return static_self_cast<MapView>(); }
 
     void resetLastCamera() { m_lastCameraPosition = {}; }

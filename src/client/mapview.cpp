@@ -255,19 +255,8 @@ void MapView::updateVisibleTiles()
     m_lockedFirstVisibleFloor = m_floorViewMode == LOCKED ? m_posInfo.camera.z : -1;
 
     const uint8_t prevFirstVisibleFloor = m_cachedFirstVisibleFloor;
+
     if (m_lastCameraPosition != m_posInfo.camera) {
-        if (m_mousePosition.isValid()) {
-            const Otc::Direction direction = m_lastCameraPosition.getDirectionFromPosition(m_posInfo.camera);
-            m_mousePosition = m_mousePosition.translatedToDirection(direction);
-
-            if (m_posInfo.camera.z != m_lastCameraPosition.z) {
-                m_mousePosition.z += m_posInfo.camera.z - m_lastCameraPosition.z;
-                m_mousePosition = m_mousePosition.translatedToDirection(direction); // Two steps
-            }
-
-            onMouseMove(m_mousePosition, true);
-        }
-
         if (m_lastCameraPosition.z != m_posInfo.camera.z) {
             onFloorChange(m_posInfo.camera.z, m_lastCameraPosition.z);
         }
@@ -371,6 +360,9 @@ void MapView::updateRect(const Rect& rect) {
         m_posInfo.drawOffset = m_posInfo.srcRect.topLeft();
         m_posInfo.horizontalStretchFactor = rect.width() / static_cast<float>(m_posInfo.srcRect.width());
         m_posInfo.verticalStretchFactor = rect.height() / static_cast<float>(m_posInfo.srcRect.height());
+
+        m_mousePosition = getPosition(g_window.getMousePosition());
+        onMouseMove(m_mousePosition, true);
     }
 
     m_posInfo.camera = getCameraPosition();
@@ -561,16 +553,20 @@ void MapView::followCreature(const CreaturePtr& creature)
     requestUpdateVisibleTiles();
 }
 
-Position MapView::getCameraPosition()
-{
-    return isFollowingCreature() ? m_followingCreature->getPosition() : m_customCameraPosition;
-}
-
 void MapView::setCameraPosition(const Position& pos)
 {
     m_follow = false;
     m_customCameraPosition = pos;
-    requestUpdateVisibleTiles();
+    requestUpdateVisibleTiles();                                \
+}
+
+Position MapView::getPosition(const Point& mousePos)
+{
+    if (!m_posInfo.rect.contains(mousePos))
+        return {};
+
+    const auto& relativeMousePos = mousePos - m_posInfo.rect.topLeft();
+    return getPosition(relativeMousePos, m_posInfo.rect.size());
 }
 
 Position MapView::getPosition(const Point& point, const Size& mapSize)
@@ -820,6 +816,7 @@ void MapView::updateViewportDirectionCache()
     }
 }
 
+Position MapView::getCameraPosition() { return isFollowingCreature() ? m_followingCreature->getPosition() : m_customCameraPosition; }
 std::vector<CreaturePtr> MapView::getSightSpectators(bool multiFloor)
 {
     return g_map.getSpectatorsInRangeEx(getCameraPosition(), multiFloor, m_posInfo.awareRange.left - 1, m_posInfo.awareRange.right - 2, m_posInfo.awareRange.top - 1, m_posInfo.awareRange.bottom - 2);

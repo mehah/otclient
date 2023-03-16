@@ -137,13 +137,8 @@ void UIMap::setKeepAspectRatio(bool enable)
     updateMapSize();
 }
 
-Position UIMap::getPosition(const Point& mousePos)
-{
-    if (!m_mapRect.contains(mousePos))
-        return {};
-
-    const auto& relativeMousePos = mousePos - m_mapRect.topLeft();
-    return m_mapView->getPosition(relativeMousePos, m_mapRect.size());
+Position UIMap::getPosition(const Point& mousePos) {
+    return m_mapView->getPosition(mousePos);
 }
 
 TilePtr UIMap::getTile(const Point& mousePos)
