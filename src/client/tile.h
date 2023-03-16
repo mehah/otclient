@@ -232,7 +232,7 @@ private:
     std::vector<EffectPtr> m_effects;
     std::vector<TilePtr> m_tilesRedraw;
 
-    uint16_t m_highlightThingId{ 0 };
+    ThingPtr m_highlightThing;
 
     TileSelectType m_selectType{ TileSelectType::NONE };
 

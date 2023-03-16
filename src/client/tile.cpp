@@ -35,8 +35,7 @@ Tile::Tile(const Position& position) : m_position(position) {}
 
 void Tile::drawThing(const ThingPtr& thing, const Point& dest, int flags, LightView* lightView)
 {
-    const bool isMarked = m_selectType != TileSelectType::NONE && m_highlightThingId == thing->getThingType()->getId();
-
+    const bool isMarked = m_selectType != TileSelectType::NONE && m_highlightThing == thing;
     thing->setMarkColor(isMarked ? Color::yellow : Color::white);
 
     thing->draw(dest, flags, lightView);
@@ -132,7 +131,7 @@ void Tile::drawTop(const Point& dest, int flags, bool forceDraw, LightView* ligh
 
 void Tile::clean()
 {
-    m_highlightThingId = 0;
+    m_highlightThing = nullptr;
     while (!m_things.empty())
         removeThing(m_things.front());
 
@@ -629,7 +628,7 @@ bool Tile::limitsFloorsView(bool isFreeView)
 bool Tile::checkForDetachableThing()
 {
     if (const auto& creature = getTopCreature()) {
-        m_highlightThingId = creature->getThingType()->getId();
+        m_highlightThing = creature;
         return true;
     }
 
@@ -639,7 +638,7 @@ bool Tile::checkForDetachableThing()
                 continue;
             }
 
-            m_highlightThingId = item->getThingType()->getId();
+            m_highlightThing = item;
             return true;
         }
     }
@@ -648,7 +647,7 @@ bool Tile::checkForDetachableThing()
         for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
             const auto& item = *it;
             if (!item->isOnBottom() || !item->canDraw() || item->isIgnoreLook() || item->isFluidContainer()) continue;
-            m_highlightThingId = item->getThingType()->getId();
+            m_highlightThing = item;
             return true;
         }
     }
@@ -660,7 +659,7 @@ bool Tile::checkForDetachableThing()
             if (!item->canDraw() || item->isIgnoreLook()) continue;
 
             if (item->hasLensHelp()) {
-                m_highlightThingId = item->getThingType()->getId();
+                m_highlightThing = item;
                 return true;
             }
         }
@@ -750,11 +749,8 @@ void Tile::setThingFlag(const ThingPtr& thing)
 void Tile::select(TileSelectType selectType)
 {
     if (selectType == TileSelectType::NO_FILTERED) {
-        if (const auto& topCreature = getTopCreature())
-            m_highlightThingId = topCreature->getThingType()->getId();
-
-        if (!m_highlightThingId)
-            m_highlightThingId = m_things.back()->getThingType()->getId();
+        if (!(m_highlightThing = getTopCreature()))
+            m_highlightThing = m_things.back();
     }
 
     m_selectType = selectType;
