@@ -42,7 +42,7 @@ bool LocalPlayer::canWalk(bool ignoreLock)
         return false;
 
     if (isAutoWalking())
-        return true;
+        return false;
 
     if (m_forceWalk) {
         m_forceWalk = false;

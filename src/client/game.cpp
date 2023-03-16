@@ -549,7 +549,7 @@ bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
     // must cancel auto walking, and wait next try
     if (m_localPlayer->isAutoWalking()) {
         m_protocolGame->sendStop();
-        m_localPlayer->stopAutoWalk();
+        m_localPlayer->autoWalk(m_localPlayer->getPosition().translatedToDirection(direction));
         return false;
     }
 
@@ -582,7 +582,8 @@ bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
     const auto& toPos = m_localPlayer->getPosition().translatedToDirection(direction);
 
     // only do prewalks to walkable tiles (like grounds and not walls)
-    if (const auto& toTile = g_map.getTile(toPos); toTile && toTile->isWalkable()) {
+    const auto& toTile = g_map.getTile(toPos);
+    if (toTile && toTile->isWalkable()) {
         m_localPlayer->preWalk(direction);
     } else {
         // check if can walk to a lower floor
@@ -591,26 +592,22 @@ bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
             if (!pos.down())
                 return false;
 
-            // check walk to another floor (e.g: when above 3 parcels)
-            if (const auto& toTile = g_map.getTile(pos); toTile && toTile->hasElevation(3))
-                return true;
-
-            return false;
+            const auto& toTile = g_map.getTile(pos);
+            return toTile && toTile->hasElevation(3);
         };
 
         // check if can walk to a higher floor
         const auto& canChangeFloorUp = [&]() -> bool {
-            if (const auto& fromTile = m_localPlayer->getTile(); !fromTile || !fromTile->hasElevation(3))
+            const auto& fromTile = m_localPlayer->getTile();
+            if (!fromTile || !fromTile->hasElevation(3))
                 return false;
 
             Position pos = toPos;
             if (!pos.up())
-
-                return false;
-            if (const auto& toTile = g_map.getTile(pos); !toTile || !toTile->isWalkable())
                 return false;
 
-            return true;
+            const auto& toTile = g_map.getTile(pos);
+            return toTile && toTile->isWalkable();
         };
 
         if (!(canChangeFloorDown() || canChangeFloorUp() || !toTile || toTile->isEmpty()))
@@ -622,8 +619,6 @@ bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
     // must cancel follow before any new walk
     if (isFollowing())
         cancelFollow();
-
-    m_localPlayer->stopAutoWalk();
 
     g_lua.callGlobalField("g_game", "onWalk", direction);
 
