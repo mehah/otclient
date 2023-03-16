@@ -37,6 +37,8 @@ struct AwareRange
 
     uint8_t horizontal() const { return left + right + 1; }
     uint8_t vertical() const { return top + bottom + 1; }
+
+    Size dimension() const { return { left * 2 + 1 , top * 2 + 1 }; }
 };
 
 struct MapPosInfo
