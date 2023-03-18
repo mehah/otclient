@@ -445,6 +445,7 @@ void MapView::updateLight()
     Light ambientLight = getCameraPosition().z > SEA_FLOOR ? Light() : g_map.getLight();
     ambientLight.intensity = std::max<uint8_t >(m_minimumAmbientLight * 255, ambientLight.intensity);
     m_lightView->setGlobalLight(ambientLight);
+    m_lightView->setEnabled(isDrawingLights());
 }
 
 void MapView::onTileUpdate(const Position&, const ThingPtr& thing, const Otc::Operation op)
@@ -769,7 +770,7 @@ void MapView::setShader(const std::string_view name, float fadein, float fadeout
 
 void MapView::setDrawLights(bool enable)
 {
-    m_lightView->setEnabled(enable);
+    m_drawingLight = enable;
 
     if (enable) {
         m_lightView->resize(m_drawDimension, m_tileSize);

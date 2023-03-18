@@ -129,7 +129,7 @@ public:
     bool isDrawingHealthBars() const { return m_drawHealthBars; }
 
     void setDrawLights(bool enable);
-    bool isDrawingLights() const { return m_lightView && m_lightView->isEnabled() && m_lightView->isDark(); }
+    bool isDrawingLights() const { return m_drawingLight && m_lightView->isDark(); }
 
     void setLimitVisibleDimension(bool v) { m_limitVisibleDimension = v; }
     bool isLimitedVisibleDimension() const { return m_limitVisibleDimension; }
@@ -290,8 +290,9 @@ private:
     bool m_drawNames{ true };
     bool m_smooth{ true };
     bool m_follow{ true };
-    bool m_fadeFinish{ false };
+    bool m_drawingLight{ true };
 
+    bool m_fadeFinish{ false };
     bool m_autoViewMode{ false };
     bool m_drawViewportEdge{ false };
     bool m_forceDrawViewportEdge{ false };
