@@ -564,7 +564,7 @@ void MapView::setCameraPosition(const Position& pos)
 {
     m_follow = false;
     m_customCameraPosition = pos;
-    requestUpdateVisibleTiles();                                \
+    requestUpdateVisibleTiles();
 }
 
 Position MapView::getPosition(const Point& mousePos)
