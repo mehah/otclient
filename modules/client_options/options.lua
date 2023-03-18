@@ -280,7 +280,7 @@ function setOption(key, value, force)
         gameMapPanel:setFloorFading(tonumber(value))
     elseif key == 'creatureInformationScale' then
         if value == 0 then
-            value = g_window.getDisplayDensity()
+            value = g_window.getDisplayDensity() - 0.5
         else
             value = value / 2
         end
@@ -290,7 +290,7 @@ function setOption(key, value, force)
         value = value * 2
     elseif key == 'staticTextScale' then
         if value == 0 then
-            value = g_window.getDisplayDensity()
+            value = g_window.getDisplayDensity() - 0.5
         else
             value = value / 2
         end
@@ -299,7 +299,7 @@ function setOption(key, value, force)
         value = value * 2
     elseif key == 'animatedTextScale' then
         if value == 0 then
-            value = g_window.getDisplayDensity()
+            value = g_window.getDisplayDensity() - 0.5
         else
             value = value / 2
         end
