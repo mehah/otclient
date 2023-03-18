@@ -39,7 +39,11 @@ public:
     void addLightSource(const Point& pos, const Light& light, float brightness = 1.f);
     void resetShade(const Point& pos);
 
-    void setGlobalLight(const Light& light);
+    void setGlobalLight(const Light& light)
+    {
+        m_isDark = light.intensity < 250;
+        m_globalLightColor = Color::from8bit(light.color, light.intensity / static_cast<float>(UINT8_MAX));
+    }
 
     bool isDark() const { return m_isDark; }
     bool isEnabled() const { return m_pool->isEnabled(); }

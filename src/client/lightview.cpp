@@ -57,6 +57,16 @@ void LightView::resize(const Size& size, const uint16_t tileSize) {
                                       m_pixels[colorIndex + 2], m_pixels[colorIndex + 3]);
         }
     }
+
+    g_drawPool.use(DrawPoolType::LIGHT);
+    g_drawPool.addAction([&] {
+        m_texture->updatePixels(m_pixels.data());
+        g_painter->resetColor();
+        g_painter->resetTransformMatrix();
+        g_painter->setTexture(m_texture.get());
+        g_painter->setCompositionMode(CompositionMode::MULTIPLY);
+        g_painter->drawCoords(m_coords);
+    });
 }
 
 void LightView::addLightSource(const Point& pos, const Light& light, float brightness)
@@ -87,19 +97,8 @@ void LightView::resetShade(const Point& pos)
 
 void LightView::draw(const Rect& dest, const Rect& src)
 {
-    g_drawPool.use(DrawPoolType::LIGHT);
     updateCoords(dest, src);
     updatePixels();
-
-    g_drawPool.addAction([&] {
-        m_texture->updatePixels(m_pixels.data());
-        g_painter->resetColor();
-        g_painter->resetTransformMatrix();
-        g_painter->setTexture(m_texture.get());
-        g_painter->setCompositionMode(CompositionMode::MULTIPLY);
-        g_painter->drawCoords(m_coords);
-    });
-
     m_lights.clear();
     m_tiles.assign(m_mapSize.area(), {});
 }
@@ -142,12 +141,4 @@ void LightView::updatePixels() {
 
     m_hash = m_updatingHash;
     m_updatingHash = 0;
-}
-
-void LightView::setGlobalLight(const Light& light)
-{
-    m_isDark = light.intensity < 250;
-    m_globalLightColor = Color::from8bit(light.color, light.intensity / static_cast<float>(UINT8_MAX));
-
-    m_pool->resetState();
 }
