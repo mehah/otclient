@@ -286,7 +286,7 @@ function setOption(key, value, force)
         end
         g_app.setCreatureInformationScale(math.max(value + 0.5, 1))
         generalPanel:getChildById('creatureInformationScaleLabel'):setText(
-            tr('Creature Infromation Scale: %sx', math.max(value + 0.5, 1)))
+            tr('Creature Information Scale: %sx', math.max(value + 0.5, 1)))
         value = value * 2
     elseif key == 'staticTextScale' then
         if value == 0 then
