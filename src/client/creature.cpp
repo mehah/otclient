@@ -502,7 +502,7 @@ void Creature::updateWalkAnimation()
     int minFootDelay = 20;
     int footAnimDelay = footAnimPhases;
 
-    if (g_game.getFeature(Otc::GameEnhancedAnimations)) {
+    if (g_game.getFeature(Otc::GameEnhancedAnimations) && footAnimPhases > 2) {
         minFootDelay += 10;
         if (footAnimDelay > 1)
             footAnimDelay /= 1.5;
