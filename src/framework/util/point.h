@@ -44,9 +44,11 @@ public:
     TPoint<T> translated(T dx, T dy) const { TPoint<T> point = *this; point.x += dx; point.y += dy; return point; }
 
     TPoint<T> scale(float v) {
-        float factor = (1.f - (1.f / v));
-        x -= x * factor;
-        y -= y * factor;
+        if (v != 1.f) {
+            float factor = (1.f - (1.f / v));
+            x -= x * factor;
+            y -= y * factor;
+        }
         return *this;
     }
 

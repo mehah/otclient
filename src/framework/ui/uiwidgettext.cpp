@@ -89,6 +89,8 @@ void UIWidget::parseTextStyle(const OTMLNodePtr& styleNode)
             setTextOnlyUpperCase(node->value<bool>());
         else if (node->tag() == "font")
             setFont(node->value());
+        else if (node->tag() == "font-scale")
+            m_fontScale = node->value<float>();
     }
 }
 
@@ -100,12 +102,18 @@ void UIWidget::drawText(const Rect& screenCoords)
     if (screenCoords != m_textCachedScreenCoords) {
         m_textCachedScreenCoords = screenCoords;
 
-        auto coords = Rect(screenCoords.topLeft(), screenCoords.bottomRight());
-        coords.translate(m_textOffset);
+        auto textOffset = m_textOffset;
+        textOffset.scale(m_fontScale);
+
+        auto coords = Rect(screenCoords.topLeft().scale(m_fontScale), screenCoords.bottomRight().scale(m_fontScale));
+        coords.translate(textOffset);
+
         m_font->fillTextCoords(m_coordsBuffer, m_text, m_textSize, m_textAlign, coords, m_glyphsPositionsCache);
     }
 
+    g_drawPool.scale(m_fontScale);
     g_drawPool.addTexturedCoordsBuffer(m_font->getTexture(), m_coordsBuffer, m_color);
+    g_drawPool.scale(1.f); // reset scale
 }
 
 void UIWidget::onTextChange(const std::string_view text, const std::string_view oldText)

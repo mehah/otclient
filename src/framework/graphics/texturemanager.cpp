@@ -90,7 +90,7 @@ void TextureManager::liveReload()
     }, 1000);
 }
 
-TexturePtr TextureManager::getTexture(const std::string& fileName)
+TexturePtr TextureManager::getTexture(const std::string& fileName, bool smooth)
 {
     TexturePtr texture;
 
@@ -131,7 +131,7 @@ TexturePtr TextureManager::getTexture(const std::string& fileName)
 
         if (texture) {
             texture->setTime(stdext::time());
-            texture->setSmooth(true);
+            texture->setSmooth(smooth);
             m_textures[filePath] = texture;
         }
     }
