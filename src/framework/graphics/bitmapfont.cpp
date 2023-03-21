@@ -45,7 +45,7 @@ void BitmapFont::load(const OTMLNodePtr& fontNode)
     m_glyphSpacing = fontNode->valueAt("spacing", Size(0));
 
     // load font texture
-    m_texture = g_textures.getTexture(textureFile);
+    m_texture = g_textures.getTexture(textureFile, false);
     if (!m_texture)
         return;
     m_texture->create();
