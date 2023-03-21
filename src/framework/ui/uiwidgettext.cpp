@@ -47,11 +47,14 @@ void UIWidget::updateText()
     if (!m_rect.isValid() || hasProp(PropTextHorizontalAutoResize) || hasProp(PropTextVerticalAutoResize)) {
         Size textBoxSize = m_textSize;
         textBoxSize += Size(m_padding.left + m_padding.right, m_padding.top + m_padding.bottom) + m_textOffset.toSize();
+        textBoxSize *= m_fontScale;
+
         Size size = getSize();
         if (size.width() <= 0 || (hasProp(PropTextHorizontalAutoResize) && !isTextWrap()))
             size.setWidth(textBoxSize.width());
         if (size.height() <= 0 || hasProp(PropTextVerticalAutoResize))
             size.setHeight(textBoxSize.height());
+
         setSize(size);
     }
 
@@ -64,8 +67,7 @@ void UIWidget::resizeToText()
     auto textSize = getTextSize();
     textSize += Size(m_padding.left + m_padding.right, m_padding.top + m_padding.bottom);
     textSize += m_textOffset.toSize();
-
-    setSize(textSize);
+    setSize(textSize * m_fontScale);
 }
 
 void UIWidget::parseTextStyle(const OTMLNodePtr& styleNode)
@@ -90,7 +92,7 @@ void UIWidget::parseTextStyle(const OTMLNodePtr& styleNode)
         else if (node->tag() == "font")
             setFont(node->value());
         else if (node->tag() == "font-scale")
-            m_fontScale = node->value<float>();
+            setFontScale(node->value<float>());
     }
 }
 
