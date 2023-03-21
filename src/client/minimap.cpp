@@ -56,7 +56,7 @@ void MinimapBlock::update()
         for (uint_fast8_t y = 0; y < MMBLOCK_SIZE; ++y) {
             const uint8_t c = getTile(x, y).color;
 
-            Color col = Color::alpha;
+            Color col = Color::black;
             if (c != UINT8_MAX) {
                 col = Color::from8bit(c);
                 shouldDraw = true;
@@ -100,41 +100,43 @@ void Minimap::draw(const Rect& screenRect, const Position& mapCenter, float scal
     if (screenRect.isEmpty())
         return;
 
-    const Rect& mapRect = calcMapRect(screenRect, mapCenter, scale);
-    g_drawPool.addFilledRect(screenRect, color);
-
-    if (MMBLOCK_SIZE * scale <= 1 || !mapCenter.isMapPosition()) {
-        return;
-    }
-
-    const Point& blockOff = getBlockOffset(mapRect.topLeft());
-    const Point& off = Point((mapRect.size() * scale).toPoint() - screenRect.size().toPoint()) / 2;
-    const Point& start = screenRect.topLeft() - (mapRect.topLeft() - blockOff) * scale - off;
-
     const auto& oldClipRect = g_drawPool.getClipRect();
     g_drawPool.setClipRect(screenRect);
-    for (int_fast32_t y = blockOff.y, ys = start.y; ys < screenRect.bottom(); y += MMBLOCK_SIZE, ys += MMBLOCK_SIZE * scale) {
-        if (y < 0 || y >= 65536)
-            continue;
 
-        for (int_fast32_t x = blockOff.x, xs = start.x; xs < screenRect.right(); x += MMBLOCK_SIZE, xs += MMBLOCK_SIZE * scale) {
-            if (x < 0 || x >= 65536)
+    const auto& mapRect = calcMapRect(screenRect, mapCenter, scale);
+    g_drawPool.addFilledRect(screenRect, color);
+
+    if (MMBLOCK_SIZE * scale > 1 && mapCenter.isMapPosition()) {
+        const auto& blockOff = getBlockOffset(mapRect.topLeft());
+        const auto& off = Point((mapRect.size() * scale).toPoint() - screenRect.size().toPoint()) / 2;
+        const auto& start = screenRect.topLeft() - (mapRect.topLeft() - blockOff) * scale - off;
+
+        for (int_fast32_t y = blockOff.y, ys = start.y; ys < screenRect.bottom(); y += MMBLOCK_SIZE, ys += MMBLOCK_SIZE * scale) {
+            if (y < 0 || y >= 65536)
                 continue;
 
-            if (Position blockPos(x, y, mapCenter.z); !hasBlock(blockPos))
-                continue;
+            for (int_fast32_t x = blockOff.x, xs = start.x; xs < screenRect.right(); x += MMBLOCK_SIZE, xs += MMBLOCK_SIZE * scale) {
+                if (x < 0 || x >= 65536)
+                    continue;
 
-            MinimapBlock& block = getBlock(Position(x, y, mapCenter.z));
-            block.update();
+                const auto& pos = Position(x, y, mapCenter.z);
 
-            const TexturePtr& tex = block.getTexture();
-            if (tex) {
-                Rect src(0, 0, MMBLOCK_SIZE, MMBLOCK_SIZE);
-                Rect dest(Point(xs, ys), src.size() * scale);
-                g_drawPool.addTexturedRect(dest, tex, src);
+                if (!hasBlock(pos))
+                    continue;
+
+                auto& block = getBlock(pos);
+                block.update();
+
+                const auto& tex = block.getTexture();
+                if (tex) {
+                    const Rect src(0, 0, MMBLOCK_SIZE, MMBLOCK_SIZE);
+                    const Rect dest(Point(xs, ys), src.size() * scale);
+                    g_drawPool.addTexturedRect(dest, tex, src);
+                }
             }
         }
     }
+
     g_drawPool.setClipRect(oldClipRect);
 }
 
