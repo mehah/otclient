@@ -151,6 +151,8 @@ void GraphicalApplication::run()
                 continue;
             }
 
+            g_particles.poll();
+
             if (foreground->canRepaint())
                 foreCondition.notify_one();
 
@@ -222,7 +224,6 @@ void GraphicalApplication::run()
 void GraphicalApplication::poll()
 {
     Application::poll();
-    g_particles.poll();
 
 #ifdef FRAMEWORK_SOUND
     g_sounds.poll();

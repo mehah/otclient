@@ -1,6 +1,7 @@
 EnterGameWindow < MainWindow
   !text: tr('Enter Game')
   size: 236 298
+  draggable: false
 
 EnterGameButton < Button
   width: 64

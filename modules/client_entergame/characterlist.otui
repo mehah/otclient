@@ -45,6 +45,7 @@ MainWindow
   id: charactersWindow
   !text: tr('Character List')
   visible: false
+  draggable: false
   @onEnter: CharacterList.doLogin()
   @onEscape: CharacterList.hide(true)
   @onSetup: |
