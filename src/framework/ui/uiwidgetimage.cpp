@@ -181,7 +181,7 @@ void UIWidget::setImageSource(const std::string_view source)
         return;
     }
 
-    m_imageTexture = g_textures.getTexture(m_imageSource = source);
+    m_imageTexture = g_textures.getTexture(m_imageSource = source, isImageSmooth());
     if (!m_imageTexture)
         return;
 
