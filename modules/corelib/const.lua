@@ -47,7 +47,8 @@ KeyboardCtrlAltShiftModifier = 7
 MouseNoButton = 0
 MouseLeftButton = 1
 MouseRightButton = 2
-MouseMidButton = 3
+MouseMidButton = 4
+MouseXButton = 8
 
 MouseNoWheel = 0
 MouseWheelUp = 1
