@@ -92,6 +92,7 @@ public:
     }
 
     void repaint();
+    void repaintMap();
 
 protected:
     void resize(const Size& size);

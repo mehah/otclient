@@ -45,6 +45,13 @@ local executeConfig = function(attachedEffect, config)
             attachedEffect:setHideOwner(config.hideOwner)
         end
 
+        if config.size then
+            attachedEffect:setSize({
+                width = config.size[1],
+                height = config.size[2]
+            })
+        end
+
         if config.disableWalkAnimation then
             attachedEffect:setDisableWalkAnimation(config.disableWalkAnimation)
         end
@@ -97,7 +104,13 @@ AttachedEffectManager = {
             return
         end
 
-        local attachedEffect = AttachedEffect.create(effect.id, effect.thingId, effect.thingCategory)
+        local attachedEffect = nil
+        if effect.thingCategory == ThingExternalTexture then
+            attachedEffect = AttachedEffect.createUsingImage(effect.id, effect.thingId)
+        else
+            attachedEffect = AttachedEffect.create(effect.id, effect.thingId, effect.thingCategory)
+        end
+
         executeConfig(attachedEffect, effect.config)
 
         return attachedEffect

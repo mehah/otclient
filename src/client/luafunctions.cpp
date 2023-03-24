@@ -663,6 +663,7 @@ void Client::registerLuaFunctions()
 
     g_lua.registerClass<AttachedEffect>();
     g_lua.bindClassStaticFunction<AttachedEffect>("create", &AttachedEffect::create);
+    g_lua.bindClassStaticFunction<AttachedEffect>("createUsingImage", &AttachedEffect::createUsingImage);
     g_lua.bindClassMemberFunction<AttachedEffect>("getId", &AttachedEffect::getId);
     g_lua.bindClassMemberFunction<AttachedEffect>("getSpeed", &AttachedEffect::getSpeed);
     g_lua.bindClassMemberFunction<AttachedEffect>("setOnTop", &AttachedEffect::setOnTop);
@@ -677,6 +678,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<AttachedEffect>("setDirOffset", &AttachedEffect::setDirOffset);
     g_lua.bindClassMemberFunction<AttachedEffect>("setOnTopByDir", &AttachedEffect::setOnTopByDir);
     g_lua.bindClassMemberFunction<AttachedEffect>("setShader", &AttachedEffect::setShader);
+    g_lua.bindClassMemberFunction<AttachedEffect>("setSize", &AttachedEffect::setSize);
     g_lua.bindClassMemberFunction<AttachedEffect>("canDrawOnUI", &AttachedEffect::canDrawOnUI);
     g_lua.bindClassMemberFunction<AttachedEffect>("setCanDrawOnUI", &AttachedEffect::setCanDrawOnUI);
 

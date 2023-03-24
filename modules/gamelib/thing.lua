@@ -3,6 +3,7 @@ ThingCategoryCreature = 1
 ThingCategoryEffect = 2
 ThingCategoryMissile = 3
 ThingInvalidCategory = 4
+ThingExternalTexture = 5
 ThingLastCategory = ThingInvalidCategory
 
 ThingAttrGround = 0

@@ -102,12 +102,7 @@ void Texture::uploadPixels(const ImagePtr& image, bool buildMipmaps, bool compre
     setupFilters();
 }
 
-void Texture::bind()
-{
-    // must reset painter texture state
-    g_painter->setTexture(this);
-    glBindTexture(GL_TEXTURE_2D, m_id);
-}
+void Texture::bind() { glBindTexture(GL_TEXTURE_2D, m_id); }
 
 void Texture::buildHardwareMipmaps()
 {

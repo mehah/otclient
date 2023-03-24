@@ -29,6 +29,7 @@ class AttachedEffect : public LuaObject
 {
 public:
     static AttachedEffectPtr create(uint16_t id, uint16_t thingId, ThingCategory category);
+    static AttachedEffectPtr createUsingImage(uint16_t id, const std::string_view path, bool smooth = true);
 
     void draw(const Point& /*dest*/, bool /*isOnTop*/, LightView* = nullptr);
 
@@ -42,6 +43,9 @@ public:
     float getOpacity() { return m_opacity / 100.f; }
     void setOpacity(float opacity) { m_opacity = opacity * 100u; }
 
+    Size getSize() { return m_size; }
+    void setSize(const Size& s) { m_size = s; }
+
     bool isHidedOwner() { return m_hideOwner; }
     void setHideOwner(bool v) { m_hideOwner = v; }
 
@@ -54,11 +58,11 @@ public:
     uint16_t getDuration() { return m_duration; }
     void setDuration(uint16_t v) { m_duration = v; }
 
-    uint8_t getLoop() { return m_loop; }
-    void setLoop(uint8_t v) { m_loop = v; }
+    int8_t getLoop();
+    void setLoop(int8_t v);
 
     void setOnTop(bool onTop) { for (auto& control : m_offsetDirections) control.onTop = onTop; }
-    void setOffset(int8_t x, int8_t y) { for (auto& control : m_offsetDirections) control.offset = { x, y }; }
+    void setOffset(int16_t x, int16_t y) { for (auto& control : m_offsetDirections) control.offset = { x, y }; }
     void setOnTopByDir(Otc::Direction direction, bool onTop) { m_offsetDirections[direction].onTop = onTop; }
 
     void setDirOffset(Otc::Direction direction, int8_t x, int8_t y, bool onTop = false) { m_offsetDirections[direction] = { onTop, {x, y} }; }
@@ -103,6 +107,7 @@ private:
     std::array<DirControl, Otc::Direction::West + 1> m_offsetDirections;
 
     PainterShaderProgramPtr m_shader;
+    TexturePtr m_texture;
 
     friend class Thing;
 };

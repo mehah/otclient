@@ -50,7 +50,8 @@ enum ThingCategory : uint8_t
     ThingCategoryEffect,
     ThingCategoryMissile,
     ThingInvalidCategory,
-    ThingLastCategory = ThingInvalidCategory
+    ThingExternalTexture,
+    ThingLastCategory = ThingInvalidCategory,
 };
 
 enum ThingAttr : uint8_t
