@@ -663,6 +663,7 @@ void Client::registerLuaFunctions()
 
     g_lua.registerClass<AttachedEffect>();
     g_lua.bindClassStaticFunction<AttachedEffect>("create", &AttachedEffect::create);
+    g_lua.bindClassStaticFunction<AttachedEffect>("createUsingImage", &AttachedEffect::createUsingImage);
     g_lua.bindClassMemberFunction<AttachedEffect>("getId", &AttachedEffect::getId);
     g_lua.bindClassMemberFunction<AttachedEffect>("getSpeed", &AttachedEffect::getSpeed);
     g_lua.bindClassMemberFunction<AttachedEffect>("setOnTop", &AttachedEffect::setOnTop);

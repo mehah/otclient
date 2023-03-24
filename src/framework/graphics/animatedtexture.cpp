@@ -91,5 +91,7 @@ void AnimatedTexture::update()
 
     m_id = txt->getId();
 
-    g_app.repaint();
+    if (isOnMap())
+        g_app.repaintMap();
+    else g_app.repaint();
 }

@@ -97,7 +97,13 @@ AttachedEffectManager = {
             return
         end
 
-        local attachedEffect = AttachedEffect.create(effect.id, effect.thingId, effect.thingCategory)
+        local attachedEffect = nil
+        if effect.thingCategory == ThingExternalTexture then
+            attachedEffect = AttachedEffect.createUsingImage(effect.id, effect.thingId)
+        else
+            attachedEffect = AttachedEffect.create(effect.id, effect.thingId, effect.thingCategory)
+        end
+
         executeConfig(attachedEffect, effect.config)
 
         return attachedEffect

@@ -36,14 +36,24 @@ public:
     void setSmooth(bool smooth) override;
     void setRepeat(bool repeat) override;
 
+    uint32_t getNumPlays() const { return m_numPlays; }
+    void setNumPlays(uint32_t n) { m_numPlays = n; }
+
+    bool isOnMap() const { return m_onMap; }
+    void setOnMap(bool v) { m_onMap = v; }
+
     void update();
     void restart() { m_animTimer.restart(); m_currentPlay = 0; }
 
     bool isAnimatedTexture() const override { return true; }
+    bool running() const { return m_animTimer.running(); }
 
 private:
     std::vector<TexturePtr> m_frames;
     std::vector<uint16_t> m_framesDelay;
+
+    bool m_onMap{ false };
+
     uint32_t m_currentFrame{ 0 };
     uint32_t m_currentPlay{ 0 };
     uint32_t m_numPlays{ 0 };

@@ -58,3 +58,12 @@ AttachedEffectManager.register(5, 'Lake Monster', 34, ThingCategoryEffect, {
         oldOwner:getTile():addThing(e)
     end
 })
+
+AttachedEffectManager.register(6, 'Pentagram Aura', '/images/game/effects/pentagram', ThingExternalTexture, {
+    offset = {85, 60}
+})
+
+AttachedEffectManager.register(7, 'Thunder', '/images/game/effects/thunder', ThingExternalTexture, {
+    loop = 1,
+    offset = {215, 230}
+})

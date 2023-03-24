@@ -92,7 +92,7 @@ void Thing::setShader(const std::string_view name) { m_shader = g_shaders.getSha
 
 void Thing::attachEffect(const AttachedEffectPtr& obj) {
     if (isCreature()) {
-        if (obj->m_thingType->isCreature() || obj->m_thingType->isMissile())
+        if (obj->m_thingType && (obj->m_thingType->isCreature() || obj->m_thingType->isMissile()))
             obj->m_direction = static_self_cast<Creature>()->getDirection();
     }
 
@@ -112,7 +112,7 @@ void Thing::attachEffect(const AttachedEffectPtr& obj) {
 
     m_attachedEffects.emplace_back(obj);
     g_dispatcher.addEvent([effect = obj, self = static_self_cast<Thing>()] {
-        if (effect->isTransform() && self->isCreature()) {
+        if (effect->isTransform() && self->isCreature() && effect->m_thingType) {
             const auto& creature = self->static_self_cast<Creature>();
             const auto& outfit = creature->getOutfit();
             if (outfit.isTemp())
