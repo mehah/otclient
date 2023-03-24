@@ -86,10 +86,7 @@ void AnimatedTexture::update()
         }
     }
 
-    const auto& txt = m_frames[m_currentFrame];
-    txt->create();
-
-    m_id = txt->getId();
+    m_id = m_frames[m_currentFrame]->create()->getId();
 
     if (isOnMap())
         g_app.repaintMap();
