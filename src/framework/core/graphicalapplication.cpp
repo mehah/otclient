@@ -233,11 +233,9 @@ void GraphicalApplication::poll()
 void GraphicalApplication::mainPoll()
 {
     g_clock.update();
-
-    // poll window input events
+    g_mainDispatcher.poll();
     g_window.poll();
     g_textures.poll();
-    g_mainDispatcher.poll();
 }
 
 void GraphicalApplication::close()

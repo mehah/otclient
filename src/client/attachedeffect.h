@@ -43,6 +43,9 @@ public:
     float getOpacity() { return m_opacity / 100.f; }
     void setOpacity(float opacity) { m_opacity = opacity * 100u; }
 
+    Size getSize() { return m_size; }
+    void setSize(const Size& s) { m_size = s; }
+
     bool isHidedOwner() { return m_hideOwner; }
     void setHideOwner(bool v) { m_hideOwner = v; }
 

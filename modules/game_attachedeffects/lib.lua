@@ -45,6 +45,13 @@ local executeConfig = function(attachedEffect, config)
             attachedEffect:setHideOwner(config.hideOwner)
         end
 
+        if config.size then
+            attachedEffect:setSize({
+                width = config.size[1],
+                height = config.size[2]
+            })
+        end
+
         if config.disableWalkAnimation then
             attachedEffect:setDisableWalkAnimation(config.disableWalkAnimation)
         end

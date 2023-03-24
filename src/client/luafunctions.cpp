@@ -678,6 +678,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<AttachedEffect>("setDirOffset", &AttachedEffect::setDirOffset);
     g_lua.bindClassMemberFunction<AttachedEffect>("setOnTopByDir", &AttachedEffect::setOnTopByDir);
     g_lua.bindClassMemberFunction<AttachedEffect>("setShader", &AttachedEffect::setShader);
+    g_lua.bindClassMemberFunction<AttachedEffect>("setSize", &AttachedEffect::setSize);
     g_lua.bindClassMemberFunction<AttachedEffect>("canDrawOnUI", &AttachedEffect::canDrawOnUI);
     g_lua.bindClassMemberFunction<AttachedEffect>("setCanDrawOnUI", &AttachedEffect::setCanDrawOnUI);
 

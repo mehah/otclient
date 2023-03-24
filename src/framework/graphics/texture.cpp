@@ -21,7 +21,6 @@
  */
 
 #include "texture.h"
-#include "framebuffer.h"
 #include "graphics.h"
 #include "image.h"
 
@@ -104,8 +103,6 @@ void Texture::uploadPixels(const ImagePtr& image, bool buildMipmaps, bool compre
 
 void Texture::bind()
 {
-    // must reset painter texture state
-    g_painter->setTexture(this);
     glBindTexture(GL_TEXTURE_2D, m_id);
 }
 

@@ -91,7 +91,7 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
     const auto& point = dest - (dirControl.offset * g_drawPool.getScaleFactor());
 
     if (m_texture) {
-        g_drawPool.addTexturedRect(Rect(point, m_texture->getSize()), m_texture);
+        g_drawPool.addTexturedRect(Rect(point, m_size.isUnset() ? m_texture->getSize() : m_size), m_texture);
     } else {
         m_thingType->draw(point, 0, m_direction, 0, 0, animation, Otc::DrawThingsAndLights, Color::white, lightView);
     }
