@@ -107,7 +107,7 @@ private:
     std::array<DirControl, Otc::Direction::West + 1> m_offsetDirections;
 
     PainterShaderProgramPtr m_shader;
-    TexturePtr m_texture;
+    AnimatedTexturePtr m_texture;
 
     friend class Thing;
 };

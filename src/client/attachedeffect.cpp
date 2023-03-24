@@ -63,7 +63,7 @@ AttachedEffectPtr AttachedEffect::createUsingImage(uint16_t id, const std::strin
 
     const auto& obj = std::make_shared<AttachedEffect>();
     obj->m_id = id;
-    obj->m_texture = texture;
+    obj->m_texture = animatedTexture;
     return obj;
 }
 
@@ -127,12 +127,12 @@ int AttachedEffect::getCurrentAnimationPhase()
 void AttachedEffect::setShader(const std::string_view name) { m_shader = g_shaders.getShader(name); }
 
 int8_t AttachedEffect::getLoop() {
-    return m_texture ? std::static_pointer_cast<AnimatedTexture>(m_texture)->running() ? -1 : 0 : m_loop;
+    return m_texture ? (m_texture->running() ? -1 : 0) : m_loop;
 }
 
 void AttachedEffect::setLoop(int8_t v) {
     if (m_texture) {
-        std::static_pointer_cast<AnimatedTexture>(m_texture)->setNumPlays(v);
+        m_texture->setNumPlays(v);
         return;
     }
 
