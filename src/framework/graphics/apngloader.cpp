@@ -75,7 +75,7 @@ uint8_t   pal[256][3];
 uint8_t   trns[256];
 uint32_t    palsize, trnssize;
 uint32_t    hasTRNS;
-unsigned short  trns1, trns2, trns3;
+uint16_t  trns1, trns2, trns3;
 
 #ifdef _MSC_VER
 #pragma warning( push )
@@ -91,17 +91,17 @@ uint32_t read32(std::istream& f1)
     return (static_cast<uint32_t>(a) << 24) + (static_cast<uint32_t>(b) << 16) + (static_cast<uint32_t>(c) << 8) + static_cast<uint32_t>(d);
 }
 
-unsigned short read16(std::istream& f1)
+uint16_t read16(std::istream& f1)
 {
     uint8_t a, b;
     f1.read((char*)&a, 1);
     f1.read((char*)&b, 1);
-    return (static_cast<unsigned short>(a) << 8) + static_cast<unsigned short>(b);
+    return (static_cast<uint16_t>(a) << 8) + static_cast<uint16_t>(b);
 }
 
-unsigned short readshort(uint8_t* p)
+uint16_t readshort(uint8_t* p)
 {
-    return (static_cast<unsigned short>(*p) << 8) + static_cast<unsigned short>(*(p + 1));
+    return (static_cast<uint16_t>(*p) << 8) + static_cast<uint16_t>(*(p + 1));
 }
 
 void read_sub_row(uint8_t* row, uint32_t rowbytes, uint32_t bpp)
@@ -433,17 +433,17 @@ void compose6(uint8_t* dst, uint32_t dstbytes, uint8_t* src, uint32_t srcbytes, 
 
 int load_apng(std::stringstream& file, apng_data* apng)
 {
-    uint32_t    i, j;
-    uint32_t    rowbytes;
-    int             imagesize, zbuf_size, zsize, trns_idx;
-    uint32_t    len, chunk/*, crc, seq*/;
-    uint32_t    w, h, w0, h0, x0, y0;
-    uint32_t    frames, loops, first_frame, cur_frame;
-    uint32_t    outrow1, outrow2, outimg1, outimg2;
-    unsigned short  d1, d2;
-    uint8_t   c, dop = PNG_DISPOSE_OP_NONE, bop;
-    uint8_t   channels, depth, pixeldepth, bpp;
-    uint8_t   coltype, compr, filter, interl;
+    uint32_t i, j;
+    uint32_t rowbytes;
+    int      imagesize, zbuf_size, zsize, trns_idx;
+    uint32_t len, chunk/*, crc, seq*/;
+    uint32_t w, h, w0, h0, x0, y0;
+    uint32_t frames, loops, first_frame, cur_frame;
+    uint32_t outrow1, outrow2, outimg1, outimg2;
+    uint16_t d1, d2;
+    uint8_t  c, dop = PNG_DISPOSE_OP_NONE, bop;
+    uint8_t  channels, depth, pixeldepth, bpp;
+    uint8_t  coltype, compr, filter, interl;
     z_stream        zstream;
     memset(apng, 0, sizeof(apng_data));
 
@@ -479,7 +479,7 @@ int load_apng(std::stringstream& file, apng_data* apng)
     uint8_t* pImg2;
     uint8_t* pDst1;
     uint8_t* pDst2;
-    unsigned short* frames_delay;
+    uint16_t* frames_delay;
 
     file.read((char*)sig, 8);
     if (!file.eof() && memcmp(sig, png_sign, 8) == 0) {
@@ -587,7 +587,7 @@ int load_apng(std::stringstream& file, apng_data* apng)
                     frames = read32(file);
                     if (frames_delay)
                         free(frames_delay);
-                    frames_delay = static_cast<unsigned short*>(malloc(frames * sizeof(unsigned short)));
+                    frames_delay = static_cast<uint16_t*>(malloc(frames * sizeof(uint16_t)));
                     loops = read32(file);
                     /*crc = */read32(file);
                     if (pOut1)
