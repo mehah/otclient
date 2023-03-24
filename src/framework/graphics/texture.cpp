@@ -21,6 +21,7 @@
  */
 
 #include "texture.h"
+#include "framebuffer.h"
 #include "graphics.h"
 #include "image.h"
 
@@ -101,10 +102,7 @@ void Texture::uploadPixels(const ImagePtr& image, bool buildMipmaps, bool compre
     setupFilters();
 }
 
-void Texture::bind()
-{
-    glBindTexture(GL_TEXTURE_2D, m_id);
-}
+void Texture::bind() { glBindTexture(GL_TEXTURE_2D, m_id); }
 
 void Texture::buildHardwareMipmaps()
 {
