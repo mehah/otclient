@@ -37,6 +37,7 @@
 #include "player.h"
 #include "protocolgame.h"
 #include "shadermanager.h"
+#include "attachedeffectmanager.h"
 #include "spriteappearances.h"
 #include "spritemanager.h"
 #include "statictext.h"
@@ -358,6 +359,11 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_shaders", "setupMountShader", &ShaderManager::setupMountShader, &g_shaders);
     g_lua.bindSingletonFunction("g_shaders", "addMultiTexture", &ShaderManager::addMultiTexture, &g_shaders);
     g_lua.bindSingletonFunction("g_shaders", "getShader", &ShaderManager::getShader, &g_shaders);
+
+    g_lua.registerSingletonClass("g_attachedEffects");
+    g_lua.bindSingletonFunction("g_attachedEffects", "registerByThing", &AttachedEffectManager::registerByThing, &g_attachedEffects);
+    g_lua.bindSingletonFunction("g_attachedEffects", "registerByImage", &AttachedEffectManager::registerByImage, &g_attachedEffects);
+    g_lua.bindSingletonFunction("g_attachedEffects", "remove", &AttachedEffectManager::remove, &g_attachedEffects);
 
     g_lua.bindGlobalFunction("getOutfitColor", Outfit::getColor);
     g_lua.bindGlobalFunction("getAngleFromPos", Position::getAngleFromPositions);

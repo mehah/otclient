@@ -61,6 +61,9 @@ public:
     int8_t getLoop();
     void setLoop(int8_t v);
 
+    void setName(std::string_view n) { m_name = { n.data() }; }
+    std::string getName() { return m_name; }
+
     void setOnTop(bool onTop) { for (auto& control : m_offsetDirections) control.onTop = onTop; }
     void setOffset(int16_t x, int16_t y) { for (auto& control : m_offsetDirections) control.offset = { x, y }; }
     void setOnTopByDir(Otc::Direction direction, bool onTop) { m_offsetDirections[direction].onTop = onTop; }
@@ -109,5 +112,8 @@ private:
     PainterShaderProgramPtr m_shader;
     AnimatedTexturePtr m_texture;
 
+    std::string m_name;
+
     friend class Thing;
+    friend class AttachedEffectManager;
 };

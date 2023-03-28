@@ -22,48 +22,13 @@
 
 #include "attachedeffect.h"
 #include "shadermanager.h"
-#include "spritemanager.h"
-#include "thingtypemanager.h"
 #include <framework/core/clock.h>
 #include <framework/graphics/animatedtexture.h>
-#include <framework/graphics/texturemanager.h>
 
 AttachedEffectPtr AttachedEffect::clone() const
 {
     auto obj = std::make_shared<AttachedEffect>();
     *(obj.get()) = *this;
-    return obj;
-}
-
-AttachedEffectPtr AttachedEffect::create(uint16_t id, uint16_t thingId, ThingCategory category) {
-    if (!g_things.isValidDatId(thingId, category)) {
-        g_logger.error(stdext::format("AttachedEffect::create(%d): invalid thing with id %d.", id, thingId));
-        return nullptr;
-    }
-
-    const auto& obj = std::make_shared<AttachedEffect>();
-    obj->m_id = id;
-    obj->m_thingType = g_things.getThingType(thingId, category).get();
-    return obj;
-}
-
-AttachedEffectPtr AttachedEffect::createUsingImage(uint16_t id, const std::string_view path, bool smooth) {
-    const auto& texture = g_textures.getTexture(path.data(), smooth);
-    if (!texture)
-        return nullptr;
-
-    if (!texture->isAnimatedTexture()) {
-        g_logger.error(stdext::format("AttachedEffect::createUsingImage(%d): only animated texture is allowed.", id));
-        return nullptr;
-    }
-
-    const auto& animatedTexture = std::static_pointer_cast<AnimatedTexture>(texture);
-    animatedTexture->setOnMap(true);
-    animatedTexture->restart();
-
-    const auto& obj = std::make_shared<AttachedEffect>();
-    obj->m_id = id;
-    obj->m_texture = animatedTexture;
     return obj;
 }
 
@@ -126,10 +91,12 @@ int AttachedEffect::getCurrentAnimationPhase()
 
 void AttachedEffect::setShader(const std::string_view name) { m_shader = g_shaders.getShader(name); }
 
+// TODO: dont use running
 int8_t AttachedEffect::getLoop() {
     return m_texture ? (m_texture->running() ? -1 : 0) : m_loop;
 }
 
+// TODO: dont use setNumPlays
 void AttachedEffect::setLoop(int8_t v) {
     if (m_texture) {
         m_texture->setNumPlays(v);
