@@ -52,7 +52,7 @@ AttachedEffectPtr AttachedEffectManager::getById(uint16_t id) {
 AttachedEffectPtr AttachedEffectManager::registerByThing(uint16_t id, const std::string_view name, uint16_t thingId, ThingCategory category) {
     const auto it = m_effects.find(id);
     if (it != m_effects.end()) {
-        g_logger.error(stdext::format("AttachedEffectManager::registerByThing(%d): has already been registered.", id));
+        g_logger.error(stdext::format("AttachedEffectManager::registerByThing(%d, %s): has already been registered.", id, name));
         return nullptr;
     }
 
@@ -70,7 +70,7 @@ AttachedEffectPtr AttachedEffectManager::registerByThing(uint16_t id, const std:
 AttachedEffectPtr AttachedEffectManager::registerByImage(uint16_t id, const std::string_view name, const std::string_view path, bool smooth) {
     const auto it = m_effects.find(id);
     if (it != m_effects.end()) {
-        g_logger.error(stdext::format("AttachedEffectManager::registerByImage(%d): has already been registered.", id));
+        g_logger.error(stdext::format("AttachedEffectManager::registerByImage(%d, %s): has already been registered.", id, name));
         return nullptr;
     }
 
@@ -79,7 +79,7 @@ AttachedEffectPtr AttachedEffectManager::registerByImage(uint16_t id, const std:
         return nullptr;
 
     if (!texture->isAnimatedTexture()) {
-        g_logger.error(stdext::format("AttachedEffectManager::registerByImage(%d): only animated texture is allowed.", id));
+        g_logger.error(stdext::format("AttachedEffectManager::registerByImage(%d, %s): only animated texture is allowed.", id, name));
         return nullptr;
     }
 
