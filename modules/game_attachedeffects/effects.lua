@@ -1,7 +1,8 @@
 --[[
     register(id, name, thingId, thingType, config)
     config = {
-        speed, disableWalkAnimation, shader,
+        speed, disableWalkAnimation, shader, drawOnUI, opacity
+        duration, loop, transform, hideOwner, size{width, height}
         offset{x, y, onTop}, dirOffset[dir]{x, y, onTop},
         onAttach, onDetach
     }
