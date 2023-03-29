@@ -549,6 +549,9 @@
     <ClCompile Include="..\src\framework\discord\discord.cpp">
       <Filter>Source Files\framework\discord</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\client\attachedeffectmanager.cpp">
+      <Filter>Source Files\client</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\framework\const.h">
@@ -1060,6 +1063,9 @@
     </ClInclude>
     <ClInclude Include="..\src\framework\discord\discord.h">
       <Filter>Header Files\framework\discord</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\attachedeffectmanager.h">
+      <Filter>Header Files\client</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

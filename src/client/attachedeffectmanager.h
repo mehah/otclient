@@ -23,6 +23,7 @@
 #pragma once
 
 #include "declarations.h"
+#include "thingtype.h"
 
 class AttachedEffectManager
 {
@@ -30,7 +31,9 @@ public:
     AttachedEffectPtr registerByThing(uint16_t id, const std::string_view name, uint16_t thingId, ThingCategory category);
     AttachedEffectPtr registerByImage(uint16_t id, const std::string_view name, const std::string_view path, bool smooth);
 
+    AttachedEffectPtr getById(uint16_t id);
     void remove(uint16_t id) { m_effects.erase(id); }
+    void clear() { m_effects.clear(); }
 
 private:
     stdext::map<uint16_t, AttachedEffectPtr> m_effects;

@@ -25,7 +25,7 @@
 #include <framework/core/clock.h>
 #include <framework/graphics/animatedtexture.h>
 
-AttachedEffectPtr AttachedEffect::clone() const
+AttachedEffectPtr AttachedEffect::clone()
 {
     auto obj = std::make_shared<AttachedEffect>();
     *(obj.get()) = *this;
@@ -36,30 +36,35 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
     if (m_transform)
         return;
 
-    const auto& dirControl = m_offsetDirections[m_direction];
-    if (dirControl.onTop != isOnTop)
-        return;
+    if (m_texture != nullptr || m_thingType != nullptr) {
+        const auto& dirControl = m_offsetDirections[m_direction];
+        if (dirControl.onTop != isOnTop)
+            return;
 
-    if (!m_canDrawOnUI && g_drawPool.getCurrentType() == DrawPoolType::FOREGROUND)
-        return;
+        if (!m_canDrawOnUI && g_drawPool.getCurrentType() == DrawPoolType::FOREGROUND)
+            return;
 
-    const int animation = getCurrentAnimationPhase();
-    if (m_loop > -1 && animation != m_lastAnimation) {
-        m_lastAnimation = animation;
-        if (animation == 0)
-            --m_loop;
+        const int animation = getCurrentAnimationPhase();
+        if (m_loop > -1 && animation != m_lastAnimation) {
+            m_lastAnimation = animation;
+            if (animation == 0)
+                --m_loop;
+        }
+
+        if (m_shader) g_drawPool.setShaderProgram(m_shader, true);
+        if (m_opacity < 100) g_drawPool.setOpacity(getOpacity(), true);
+
+        const auto& point = dest - (dirControl.offset * g_drawPool.getScaleFactor());
+
+        if (m_texture) {
+            g_drawPool.addTexturedRect(Rect(point, m_size.isUnset() ? m_texture->getSize() : m_size), m_texture);
+        } else {
+            m_thingType->draw(point, 0, m_direction, 0, 0, animation, Otc::DrawThingsAndLights, Color::white, lightView);
+        }
     }
 
-    if (m_shader) g_drawPool.setShaderProgram(m_shader, true);
-    if (m_opacity < 100) g_drawPool.setOpacity(getOpacity(), true);
-
-    const auto& point = dest - (dirControl.offset * g_drawPool.getScaleFactor());
-
-    if (m_texture) {
-        g_drawPool.addTexturedRect(Rect(point, m_size.isUnset() ? m_texture->getSize() : m_size), m_texture);
-    } else {
-        m_thingType->draw(point, 0, m_direction, 0, 0, animation, Otc::DrawThingsAndLights, Color::white, lightView);
-    }
+    for (const auto& effect : m_effects)
+        effect->draw(dest, isOnTop, lightView);
 }
 
 int AttachedEffect::getCurrentAnimationPhase()

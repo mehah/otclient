@@ -29,6 +29,26 @@
 
 AttachedEffectManager g_attachedEffects;
 
+AttachedEffectPtr AttachedEffectManager::getById(uint16_t id) {
+    const auto it = m_effects.find(id);
+    if (it == m_effects.end()) {
+        g_logger.error(stdext::format("AttachedEffectManager::getById(%d): not found.", id));
+        return nullptr;
+    }
+
+    const auto& obj = (*it).second;
+    if (obj->m_thingId > 0 && obj->m_thingType == nullptr) {
+        if (!g_things.isValidDatId(obj->m_thingId, obj->m_thingCategory)) {
+            g_logger.error(stdext::format("AttachedEffectManager::getById(%d): invalid thing with id %d.", id, obj->m_thingId));
+            return nullptr;
+        }
+
+        obj->m_thingType = g_things.getThingType(obj->m_thingId, obj->m_thingCategory).get();
+    }
+
+    return obj;
+}
+
 AttachedEffectPtr AttachedEffectManager::registerByThing(uint16_t id, const std::string_view name, uint16_t thingId, ThingCategory category) {
     const auto it = m_effects.find(id);
     if (it != m_effects.end()) {
@@ -36,14 +56,11 @@ AttachedEffectPtr AttachedEffectManager::registerByThing(uint16_t id, const std:
         return nullptr;
     }
 
-    if (!g_things.isValidDatId(thingId, category)) {
-        g_logger.error(stdext::format("AttachedEffectManager::registerByThing(%d): invalid thing with id %d.", id, thingId));
-        return nullptr;
-    }
-
     const auto& obj = std::make_shared<AttachedEffect>();
     obj->m_id = id;
-    obj->m_thingType = g_things.getThingType(thingId, category).get();
+    obj->m_thingId = thingId;
+    obj->m_thingCategory = category;
+
     obj->m_name = { name.data() };
 
     m_effects.emplace(id, obj);

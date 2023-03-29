@@ -85,10 +85,19 @@ AttachedEffectManager = {
         return __EFFECTS[id]
     end,
     register = function(id, name, thingId, thingCategory, config)
-        if __EFFECTS[id] ~= nil then
-            g_logger.error('A static effect has already been registered with id(' .. id .. ')')
+        local attachedEffect = nil
+        if thingCategory == ThingExternalTexture then
+            attachedEffect = g_attachedEffects.registerByImage(id, name, thingId)
+        else
+            attachedEffect = g_attachedEffects.registerByThing(id, name, thingId, thingCategory)
+        end
+
+        if attachedEffect == nil then
             return
         end
+
+        executeConfig(attachedEffect, config)
+
         __EFFECTS[id] = {
             id = id,
             name = name,
@@ -96,24 +105,6 @@ AttachedEffectManager = {
             thingCategory = thingCategory,
             config = config
         }
-    end,
-    create = function(id)
-        local effect = __EFFECTS[id]
-        if effect == nil then
-            g_logger.error('Invalid Static Effect ID(' .. id .. ')')
-            return
-        end
-
-        local attachedEffect = nil
-        if effect.thingCategory == ThingExternalTexture then
-            attachedEffect = AttachedEffect.createUsingImage(effect.id, effect.thingId)
-        else
-            attachedEffect = AttachedEffect.create(effect.id, effect.thingId, effect.thingCategory)
-        end
-
-        executeConfig(attachedEffect, effect.config)
-
-        return attachedEffect
     end,
     registerThingConfig = function(category, thingId)
         if __THING_CONFIG[category] == nil then

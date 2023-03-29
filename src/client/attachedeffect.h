@@ -28,14 +28,11 @@
 class AttachedEffect : public LuaObject
 {
 public:
-    static AttachedEffectPtr create(uint16_t id, uint16_t thingId, ThingCategory category);
-    static AttachedEffectPtr createUsingImage(uint16_t id, const std::string_view path, bool smooth = true);
-
     void draw(const Point& /*dest*/, bool /*isOnTop*/, LightView* = nullptr);
 
     uint16_t getId() { return m_id; }
 
-    AttachedEffectPtr clone() const;
+    AttachedEffectPtr clone();
 
     float getSpeed() { return m_speed / 100.f; }
     void setSpeed(float speed) { m_speed = speed * 100u; }
@@ -73,6 +70,8 @@ public:
     void setCanDrawOnUI(bool canDraw) { m_canDrawOnUI = canDraw; }
     bool canDrawOnUI() { return m_canDrawOnUI; }
 
+    void attachEffect(const AttachedEffectPtr& e) { m_effects.emplace_back(e); }
+
 private:
     int getCurrentAnimationPhase();
 
@@ -99,6 +98,9 @@ private:
 
     Outfit m_outfitOwner;
 
+    uint16_t m_thingId{ 0 };
+    ThingCategory m_thingCategory{ ThingInvalidCategory };
+
     ThingType* m_thingType{ nullptr };
 
     Size m_size;
@@ -113,6 +115,8 @@ private:
     AnimatedTexturePtr m_texture;
 
     std::string m_name;
+
+    std::vector<AttachedEffectPtr> m_effects;
 
     friend class Thing;
     friend class AttachedEffectManager;

@@ -2,29 +2,19 @@ controller = Controller:new()
 
 -- uncomment this line to apply an effect on the local player, just for testing purposes.
 --[[controller:onGameStart(function()
-    g_game.getLocalPlayer():attachEffect(AttachedEffectManager.create(1))
-    g_game.getLocalPlayer():attachEffect(AttachedEffectManager.create(2))
-    g_game.getLocalPlayer():attachEffect(AttachedEffectManager.create(4))
-
-    local angelLight1 = AttachedEffectManager.create(3)
-    local angelLight2 = AttachedEffectManager.create(3)
-    local angelLight3 = AttachedEffectManager.create(3)
-    local angelLight4 = AttachedEffectManager.create(3)
-
-    angelLight1:setOffset(-50, 50, true)
-    angelLight2:setOffset(50, 50, true)
-    angelLight3:setOffset(50, -50, true)
-    angelLight4:setOffset(-50, -50, true)
-
-    g_game.getLocalPlayer():attachEffect(angelLight1)
-    g_game.getLocalPlayer():attachEffect(angelLight2)
-    g_game.getLocalPlayer():attachEffect(angelLight3)
-    g_game.getLocalPlayer():attachEffect(angelLight4)
+    g_game.getLocalPlayer():attachEffect(g_attachedEffects.getById(1))
+    g_game.getLocalPlayer():attachEffect(g_attachedEffects.getById(2))
+    g_game.getLocalPlayer():attachEffect(g_attachedEffects.getById(3))
 end)
 
 controller:onGameEnd(function()
     g_game.getLocalPlayer():clearAttachedEffects()
-end)]]
+end)
+]]
+
+controller.onTerminate = function()
+    g_attachedEffects.clear()
+end
 
 local function onAttach(effect, owner)
     local category, thingId = AttachedEffectManager.getDataThing(owner)
