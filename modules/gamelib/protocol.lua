@@ -21,6 +21,7 @@ GameServerOpcodes = {
     -- 51 - 99
 
     -- original tibia ONLY
+    GameServerPassiveCooldown = 94,
     GameServerFullMap = 100,
     GameServerMapTopRow = 101,
     GameServerMapRightRow = 102,
@@ -47,7 +48,7 @@ GameServerOpcodes = {
     GameServerAmbient = 130,
     GameServerGraphicalEffect = 131,
     GameServerTextEffect = 132,
-    GameServerMissleEffect = 133,
+    GameServerMissleEffect = 133, -- Anthem on 13.x
     GameServerMarkCreature = 134,
     GameServerTrappers = 135,
     GameServerCreatureHealth = 140,
