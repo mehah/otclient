@@ -251,10 +251,10 @@ namespace Fw
     enum MouseButton : uint8_t
     {
         MouseNoButton = 0,
-        MouseLeftButton = 1 << 0,
-        MouseRightButton = 1 << 1,
-        MouseMidButton = 1 << 2,
-        MouseXButton = 1 << 3
+        MouseLeftButton,
+        MouseRightButton,
+        MouseMidButton,
+        MouseXButton
     };
 
     enum MouseWheelDirection : uint8_t
