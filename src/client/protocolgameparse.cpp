@@ -33,6 +33,7 @@
 #include "missile.h"
 #include "statictext.h"
 #include "thingtypemanager.h"
+#include "attachedeffectmanager.h"
 #include "tile.h"
 #include "time.h"
 
@@ -513,6 +514,15 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerMarketBrowse:
                     parseMarketBrowse(msg);
                     break;
+
+                case Proto::GameServerAddAttachedEffect:
+                    parseAddAttachedEffect(msg);
+                    break;
+
+                case Proto::GameServerRemoveAttachedEffect:
+                    parseRemoveAttachedEffect(msg);
+                    break;
+
                 default:
                     throw Exception("unhandled opcode %d", opcode);
                     break;
@@ -3582,4 +3592,34 @@ void ProtocolGame::parseMarketBrowse(const InputMessagePtr& msg)
     }
 
     g_lua.callGlobalField("g_game", "onMarketBrowse", intOffers, nameOffers);
+}
+
+void ProtocolGame::parseAddAttachedEffect(const InputMessagePtr& msg) {
+    const uint32_t id = msg->getU32();
+    const uint16_t attachedEffectId = msg->getU16();
+
+    const auto& creature = g_map.getCreatureById(id);
+    if (!creature) {
+        g_logger.traceError(stdext::format("could not get creature with id %d", id));
+        return;
+    }
+
+    const auto& effect = g_attachedEffects.getById(attachedEffectId);
+    if (!effect)
+        return;
+
+    creature->attachEffect(effect);
+}
+
+void ProtocolGame::parseRemoveAttachedEffect(const InputMessagePtr& msg) {
+    const uint32_t id = msg->getU32();
+    const uint16_t attachedEffectId = msg->getU16();
+
+    const auto& creature = g_map.getCreatureById(id);
+    if (!creature) {
+        g_logger.traceError(stdext::format("could not get creature with id %d", id));
+        return;
+    }
+
+    creature->detachEffectById(attachedEffectId);
 }
