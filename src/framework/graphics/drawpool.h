@@ -135,7 +135,7 @@ protected:
     struct DrawObject
     {
         DrawObject(std::function<void()> action) : action(std::move(action)) {}
-        DrawObject(PoolState& state, const CoordsBufferPtr& coordsBuffer) : coords(coordsBuffer), state(std::move(state)) {}
+        DrawObject(PoolState& state) : state(std::move(state)), coords(std::make_unique<CoordsBuffer>()) {}
         DrawObject(const DrawMode drawMode, PoolState& state, DrawMethod& method) :
             drawMode(drawMode), state(std::move(state)) { methods.emplace_back(std::move(method)); }
 
@@ -146,7 +146,7 @@ protected:
         }
 
         DrawMode drawMode{ DrawMode::TRIANGLES };
-        CoordsBufferPtr coords;
+        std::unique_ptr<CoordsBuffer> coords;
         PoolState state;
         std::vector<DrawMethod> methods;
         std::function<void()> action{ nullptr };
@@ -209,7 +209,7 @@ private:
 
     void flush()
     {
-        m_objectsByhash.clear();
+        m_coords.clear();
         if (m_depthLevel < MAX_DRAW_DEPTH)
             ++m_depthLevel;
     }
@@ -236,7 +236,7 @@ private:
     std::vector<Matrix3> m_transformMatrixStack;
     std::vector<DrawObject> m_objects[MAX_DRAW_DEPTH + 1][static_cast<uint8_t>(DrawOrder::LAST)];
 
-    stdext::map<size_t, DrawObject> m_objectsByhash;
+    stdext::map<size_t, CoordsBuffer*> m_coords;
 
     float m_scaleFactor{ 1.f };
     float m_scale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
