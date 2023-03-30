@@ -181,7 +181,11 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                     parseAnimatedText(msg);
                     break;
                 case Proto::GameServerMissleEffect:
-                    parseDistanceMissile(msg);
+                    if (g_game.getFeature(Otc::GameAnthem)) {
+                        parseAnthem(msg);
+                    } else {
+                        parseDistanceMissile(msg);
+                    }
                     break;
                 case Proto::GameServerItemClasses:
                     if (g_game.getClientVersion() >= 1281)
@@ -441,6 +445,9 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerSendShowDescription:
                     parseShowDescription(msg);
                     break;
+                case Proto::GameServerPassiveCooldown:
+                    parsePassiveCooldown(msg);
+                    break;
                 case Proto::GameServerSendClientCheck:
                     parseClientCheck(msg);
                     break;
@@ -557,7 +564,9 @@ void ProtocolGame::parseLogin(const InputMessagePtr& msg) const
 
     if (g_game.getClientVersion() >= 1281) {
         msg->getU8(); // exiva button enabled (bool)
-        msg->getU8(); // Tournament button (bool)
+        if (g_game.getFeature(Otc::GameTournamentPackets)) {
+            msg->getU8(); // Tournament button (bool)
+        }
     }
 
     m_localPlayer->setId(playerId);
@@ -669,8 +678,10 @@ void ProtocolGame::parseCoinBalance(const InputMessagePtr& msg) const
         if (g_game.getClientVersion() >= 1281) {
             const uint32_t auctionCoins = msg->getU32();
             m_localPlayer->setResourceBalance(Otc::RESOURE_COIN_AUCTION, auctionCoins);
-            const uint32_t tournamentCoins = msg->getU32();
-            m_localPlayer->setResourceBalance(Otc::RESOURE_COIN_TOURNAMENT, tournamentCoins);
+            if (g_game.getFeature(Otc::GameTournamentPackets)) {
+                const uint32_t tournamentCoins = msg->getU32();
+                m_localPlayer->setResourceBalance(Otc::RESOURE_COIN_TOURNAMENT, tournamentCoins);
+            }
         }
     }
 }
@@ -1273,6 +1284,21 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
                     g_map.addThing(effect, pos);
                     break;
                 }
+
+                case Otc::MAGIC_EFFECTS_CREATE_SOUND_MAIN_EFFECT: {
+                    msg->getU8(); // Source
+                    msg->getU16(); // Sound ID
+                    break;
+                }
+
+                case Otc::MAGIC_EFFECTS_CREATE_SOUND_SECONDARY_EFFECT: {
+                    msg->getU8(); // ENUM
+                    msg->getU8(); // Source
+                    msg->getU16(); // Sound ID
+                    break;
+                }
+                default:
+                    break;
             }
 
             effectType = msg->getU8();
@@ -1306,6 +1332,14 @@ void ProtocolGame::parseAnimatedText(const InputMessagePtr& msg)
     const uint8_t color = msg->getU8();
     const auto text = msg->getString();
     g_map.addAnimatedText(std::make_shared<AnimatedText>(text, color), position);
+}
+
+void ProtocolGame::parseAnthem(const InputMessagePtr& msg)
+{
+    uint8_t type = msg->getU8();
+	if (type >= 0 && type <= 2) {
+        msg->getU16(); // Anthem id
+    }
 }
 
 void ProtocolGame::parseDistanceMissile(const InputMessagePtr& msg)
@@ -1344,8 +1378,28 @@ void ProtocolGame::parseItemClasses(const InputMessagePtr& msg)
         }
     }
 
-    for (uint8_t i = 1; i <= 11; i++) {
-        msg->getU8(); // Forge values
+    if (g_game.getFeature(Otc::GameDynamicForgeVariables)) {
+        const uint8_t grades = msg->getU8();
+        for (int i = 0; i < grades; i++) {
+            msg->getU8(); // Tier
+            msg->getU8(); // Exalted cores
+        }
+
+        msg->getU8(); // Dust Percent
+        msg->getU8(); // Dust To Sleaver
+        msg->getU8(); // Sliver To Core
+        msg->getU8(); // Dust Percent Upgrade
+        msg->getU16(); // Max Dust
+        msg->getU16(); // Max Dust Cap
+        msg->getU8(); // Dust Fusion
+        msg->getU8(); // Dust Transfer
+        msg->getU8(); // Chance Base
+        msg->getU8(); // Chance Improved
+        msg->getU8(); // Reduce Tier Loss
+    } else {
+        for (uint8_t i = 1; i <= 11; i++) {
+            msg->getU8(); // Forge values
+        }
     }
 }
 
@@ -1540,9 +1594,14 @@ void ProtocolGame::parsePlayerInfo(const InputMessagePtr& msg) const
     }
 
     const uint16_t spellCount = msg->getU16();
-    std::vector<uint8_t> spells;
-    for (int_fast32_t i = 0; i < spellCount; ++i)
-        spells.push_back(msg->getU8()); // spell id
+    std::vector<uint16_t> spells;
+    for (int_fast32_t i = 0; i < spellCount; ++i) {
+        if (g_game.getFeature(Otc::GameUshortSpell)) {
+            spells.push_back(msg->getU16()); // spell id
+        } else {
+            spells.push_back(static_cast<uint16_t>(msg->getU8())); // spell id
+        }
+    }
 
     if (g_game.getClientVersion() >= 1281) {
         msg->getU8(); // is magic shield active (bool)
@@ -1660,8 +1719,13 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg) const
     }
 
     if (g_game.getClientVersion() >= 1281) {
-        msg->getU16();  // remaining mana shield
-        msg->getU16();  // total mana shield
+        if (g_game.getFeature(Otc::GameDoubleHealth)) {
+            msg->getU32();  // remaining mana shield
+            msg->getU32();  // total mana shield
+        } else {
+            msg->getU16();  // remaining mana shield
+            msg->getU16();  // total mana shield
+        }
     }
 
     m_localPlayer->setHealth(health, maxHealth);
@@ -1718,6 +1782,10 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
 
         m_localPlayer->setSkill(static_cast<Otc::Skill>(skill), level, levelPercent);
         m_localPlayer->setBaseSkill(static_cast<Otc::Skill>(skill), baseLevel);
+    }
+
+    if (g_game.getFeature(Otc::GameConcotions)) {
+        msg->getU8();
     }
 
     if (g_game.getFeature(Otc::GameAdditionalSkills)) {
@@ -1781,7 +1849,12 @@ void ProtocolGame::parsePlayerModes(const InputMessagePtr& msg)
 
 void ProtocolGame::parseSpellCooldown(const InputMessagePtr& msg)
 {
-    const uint8_t spellId = msg->getU8();
+    uint16_t spellId = msg->getU8();
+    if (g_game.getFeature(Otc::GameUshortSpell)) {
+        spellId = msg->getU16();
+    } else {
+        spellId = msg->getU8();
+    }
     const uint32_t delay = msg->getU32();
 
     g_lua.callGlobalField("g_game", "onSpellCooldown", spellId, delay);
@@ -2156,8 +2229,11 @@ void ProtocolGame::parseVipAdd(const InputMessagePtr& msg)
     }
     const uint32_t status = msg->getU8();
 
-    if (g_game.getClientVersion() >= 1281) {
-        msg->getU8(); // vip groups
+    if (g_game.getFeature(Otc::GameVipGroups)) {
+        uint8_t size = msg->getU8();
+        for (int i = 0; size; i++) {
+            msg->getU8(); // Group ID
+        }
     }
 
     g_game.processVipAdd(id, name, status, desc, iconId, notifyLogin);
@@ -2176,8 +2252,19 @@ void ProtocolGame::parseVipState(const InputMessagePtr& msg)
 
 void ProtocolGame::parseVipLogout(const InputMessagePtr& msg)
 {
-    const uint32_t id = msg->getU32();
-    g_game.processVipStateChange(id, 0);
+    // On QT client this operation is being processed on the 'parseVipState', now this opcode if for groups
+    if (g_game.getFeature(Otc::GameVipGroups)) {
+        uint8_t size = msg->getU8();
+        for (int i = 0; size; i++) {
+            msg->getU8(); // Group ID
+            msg->getString(); // Group name
+            msg->getU8(); // Can edit group? (bool)
+        }
+        msg->getU8(); // Groups amount left
+    } else {
+        const uint32_t id = msg->getU32();
+        g_game.processVipStateChange(id, 0);
+    }
 }
 
 void ProtocolGame::parseTutorialHint(const InputMessagePtr& msg)
@@ -2972,6 +3059,16 @@ void ProtocolGame::parsePartyAnalyzer(const InputMessagePtr& msg)
         }
     }
 }
+
+void ProtocolGame::parsePassiveCooldown(const InputMessagePtr& msg)
+{
+    msg->getU8(); // Passive id
+    msg->getU8(); // ENUM
+    msg->getU32(); // Timestamp (partial)
+    msg->getU32(); // Timestamp (total)
+    msg->getU8(); // Timer is running? (bool)
+}
+
 void ProtocolGame::parseClientCheck(const InputMessagePtr& msg)
 {
     msg->getU32(); // 1

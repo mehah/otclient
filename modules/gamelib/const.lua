@@ -166,6 +166,12 @@ GameThingCounter = 87
 GameThingClock = 88
 GameThingPodiumItemType = 89
 GameSequencedPackets = 90
+GameUshortSpell = 91
+GameTournamentPackets = 92
+GameDynamicForgeVariables = 93
+GameConcotions = 94
+GameAnthem = 95
+GameVipGroups = 96
 GameLoadSprInsteadProtobuf = 100
 
 TextColors = {
