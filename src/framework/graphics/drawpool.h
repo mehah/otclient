@@ -209,7 +209,7 @@ private:
 
     void flush()
     {
-        m_objectsByhash.clear();
+        m_coords.clear();
         if (m_depthLevel < MAX_DRAW_DEPTH)
             ++m_depthLevel;
     }
@@ -236,7 +236,7 @@ private:
     std::vector<Matrix3> m_transformMatrixStack;
     std::vector<DrawObject> m_objects[MAX_DRAW_DEPTH + 1][static_cast<uint8_t>(DrawOrder::LAST)];
 
-    stdext::map<size_t, DrawObject> m_objectsByhash;
+    stdext::map<size_t, CoordsBufferPtr> m_coords;
 
     float m_scaleFactor{ 1.f };
     float m_scale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };

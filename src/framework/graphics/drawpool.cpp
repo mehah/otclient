@@ -66,13 +66,13 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
     auto& list = m_objects[m_depthLevel][order];
 
     if (m_alwaysGroupDrawings || conductor.agroup) {
-        const auto it = m_objectsByhash.find(state.hash);
+        const auto it = m_coords.find(state.hash);
 
-        const bool bufferFound = it != m_objectsByhash.end();
-        const auto& coords = bufferFound ? it->second.coords : std::make_shared<CoordsBuffer>();
+        const bool bufferFound = it != m_coords.end();
+        const auto& coords = bufferFound ? it->second : std::make_shared<CoordsBuffer>();
 
         if (!bufferFound) {
-            m_objectsByhash.emplace(state.hash, list.emplace_back(state, coords));
+            m_coords.emplace(state.hash, list.emplace_back(state, coords).coords);
         }
 
         if (coordsBuffer)
@@ -252,7 +252,7 @@ void DrawPool::resetState()
             order.clear();
     }
 
-    m_objectsByhash.clear();
+    m_coords.clear();
     m_state = {};
     m_depthLevel = 0;
     m_status.second = 0;
