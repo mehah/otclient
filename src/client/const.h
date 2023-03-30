@@ -518,6 +518,12 @@ namespace Otc
         GameThingClock = 88,
         GameThingPodiumItemType = 89,
         GameSequencedPackets = 90,
+        GameUshortSpell = 91,
+        GameTournamentPackets = 92,
+        GameDynamicForgeVariables = 93,
+        GameConcotions = 94,
+        GameAnthem = 95,
+        GameVipGroups = 96,
 
         //  others
         GameLoadSprInsteadProtobuf = 100,
@@ -532,6 +538,8 @@ namespace Otc
         MAGIC_EFFECTS_CREATE_EFFECT = 3, // needs uint8_t effectid after type
         MAGIC_EFFECTS_CREATE_DISTANCEEFFECT = 4, // needs uint8_t and deltaX(int8_t), deltaY(int8_t) after type
         MAGIC_EFFECTS_CREATE_DISTANCEEFFECT_REVERSED = 5, // needs uint8_t and deltaX(int8_t), deltaY(int8_t) after type
+        MAGIC_EFFECTS_CREATE_SOUND_MAIN_EFFECT = 6, // needs uint16_t after type
+        MAGIC_EFFECTS_CREATE_SOUND_SECONDARY_EFFECT = 7, // needs uint8_t and uint16_t after type
     };
 
     enum PathFindResult : uint8_t

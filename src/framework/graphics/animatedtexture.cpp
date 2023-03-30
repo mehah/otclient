@@ -41,31 +41,41 @@ AnimatedTexture::AnimatedTexture(const Size& size, const std::vector<ImagePtr>& 
 
     m_framesDelay = std::move(framesDelay);
     m_numPlays = numPlays;
-    m_id = m_frames[0]->getId();
     m_animTimer.restart();
+
+    g_mainDispatcher.addEvent([&] {
+        for (const auto& frame : m_frames)
+            frame->create();
+    });
 }
 
 void AnimatedTexture::buildHardwareMipmaps()
 {
     if (getProp(Prop::hasMipMaps)) return;
-    for (const TexturePtr& frame : m_frames)
-        frame->buildHardwareMipmaps();
-
     setProp(Prop::hasMipMaps, true);
+
+    g_mainDispatcher.addEvent([&] {
+        for (const auto& frame : m_frames)
+            frame->buildHardwareMipmaps();
+    });
 }
 
 void AnimatedTexture::setSmooth(bool smooth)
 {
     setProp(Prop::smooth, smooth);
-    for (const TexturePtr& frame : m_frames)
-        frame->setSmooth(smooth);
+    g_mainDispatcher.addEvent([&] {
+        for (const auto& frame : m_frames)
+            frame->setSmooth(smooth);
+    });
 }
 
 void AnimatedTexture::setRepeat(bool repeat)
 {
     setProp(Prop::repeat, repeat);
-    for (const TexturePtr& frame : m_frames)
-        frame->setRepeat(repeat);
+    g_mainDispatcher.addEvent([&] {
+        for (const auto& frame : m_frames)
+            frame->setRepeat(repeat);
+    });
 }
 
 void AnimatedTexture::update()
@@ -86,10 +96,9 @@ void AnimatedTexture::update()
         }
     }
 
-    const auto& txt = m_frames[m_currentFrame];
-    txt->create();
+    m_id = m_frames[m_currentFrame]->getId();
 
-    m_id = txt->getId();
-
-    g_app.repaint();
+    if (isOnMap())
+        g_app.repaintMap();
+    else g_app.repaint();
 }

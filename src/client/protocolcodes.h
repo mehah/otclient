@@ -74,6 +74,7 @@ namespace Proto
         GameServerFloorDescription = 75,
 
         // original tibia ONLY
+        GameServerPassiveCooldown = 94,
         GameServerSendClientCheck = 99,
         GameServerFullMap = 100,
         GameServerMapTopRow = 101,
@@ -101,7 +102,7 @@ namespace Proto
         GameServerAmbient = 130,
         GameServerGraphicalEffect = 131,
         GameServerTextEffect = 132,
-        GameServerMissleEffect = 133,
+        GameServerMissleEffect = 133, // Anthem on 13.x
         GameServerItemClasses = 134,
         GameServerTrappers = 135,
         GameServerCreatureHealth = 140,
