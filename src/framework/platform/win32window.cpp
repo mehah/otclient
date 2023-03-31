@@ -647,7 +647,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
             SetCapture(m_window);
             m_inputEvent.reset(Fw::MousePressInputEvent);
             m_inputEvent.mouseButton = Fw::MouseLeftButton;
-            m_mouseButtonStates |= Fw::MouseLeftButton;
+            m_mouseButtonStates |= 1 << Fw::MouseLeftButton;
             if (m_onInputEvent)
                 m_onInputEvent(m_inputEvent);
             break;
@@ -657,7 +657,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
             SetCapture(nullptr);
             m_inputEvent.reset(Fw::MouseReleaseInputEvent);
             m_inputEvent.mouseButton = Fw::MouseLeftButton;
-            g_dispatcher.addEvent([this] { m_mouseButtonStates &= ~Fw::MouseLeftButton; });
+            g_dispatcher.addEvent([this] { m_mouseButtonStates &= ~(1 << Fw::MouseLeftButton); });
             if (m_onInputEvent)
                 m_onInputEvent(m_inputEvent);
             break;
@@ -667,7 +667,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
             SetCapture(m_window);
             m_inputEvent.reset(Fw::MousePressInputEvent);
             m_inputEvent.mouseButton = Fw::MouseMidButton;
-            m_mouseButtonStates |= Fw::MouseMidButton;
+            m_mouseButtonStates |= 1 << Fw::MouseMidButton;
             if (m_onInputEvent)
                 m_onInputEvent(m_inputEvent);
             break;
@@ -677,7 +677,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
             SetCapture(nullptr);
             m_inputEvent.reset(Fw::MouseReleaseInputEvent);
             m_inputEvent.mouseButton = Fw::MouseMidButton;
-            g_dispatcher.addEvent([this] { m_mouseButtonStates &= ~Fw::MouseMidButton; });
+            g_dispatcher.addEvent([this] { m_mouseButtonStates &= ~(1 << Fw::MouseMidButton); });
             if (m_onInputEvent)
                 m_onInputEvent(m_inputEvent);
             break;
@@ -687,7 +687,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
             SetCapture(m_window);
             m_inputEvent.reset(Fw::MousePressInputEvent);
             m_inputEvent.mouseButton = Fw::MouseRightButton;
-            m_mouseButtonStates |= Fw::MouseRightButton;
+            m_mouseButtonStates |= 1 << Fw::MouseRightButton;
             if (m_onInputEvent)
                 m_onInputEvent(m_inputEvent);
             break;
@@ -697,7 +697,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
             SetCapture(nullptr);
             m_inputEvent.reset(Fw::MouseReleaseInputEvent);
             m_inputEvent.mouseButton = Fw::MouseRightButton;
-            g_dispatcher.addEvent([this] { m_mouseButtonStates &= ~Fw::MouseRightButton; });
+            g_dispatcher.addEvent([this] { m_mouseButtonStates &= ~(1 << Fw::MouseRightButton); });
             if (m_onInputEvent)
                 m_onInputEvent(m_inputEvent);
             break;
@@ -710,7 +710,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
             const uint32_t mouseButton = (Fw::MouseXButton - 1) + GET_XBUTTON_WPARAM(wParam);
             m_inputEvent.reset(Fw::MousePressInputEvent);
             m_inputEvent.mouseButton = static_cast<Fw::MouseButton>(mouseButton);
-            m_mouseButtonStates |= mouseButton;
+            m_mouseButtonStates |= 1 << mouseButton;
             if (m_onInputEvent)
                 m_onInputEvent(m_inputEvent);
 
@@ -723,7 +723,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
             const uint32_t mouseButton = (Fw::MouseXButton - 1) + GET_XBUTTON_WPARAM(wParam);
             m_inputEvent.reset(Fw::MouseReleaseInputEvent);
             m_inputEvent.mouseButton = static_cast<Fw::MouseButton>(mouseButton);
-            g_dispatcher.addEvent([this, mouseButton] { m_mouseButtonStates &= ~mouseButton; });
+            g_dispatcher.addEvent([this, mouseButton] { m_mouseButtonStates &= ~(1 << mouseButton); });
             if (m_onInputEvent)
                 m_onInputEvent(m_inputEvent);
 

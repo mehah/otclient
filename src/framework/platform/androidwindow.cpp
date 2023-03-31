@@ -255,9 +255,9 @@ void AndroidWindow::processFingerDownAndUp() {
     m_inputEvent.type = (isTouchdown) ? Fw::MousePressInputEvent : Fw::MouseReleaseInputEvent;
     m_inputEvent.mouseButton = mouseButton;
 	if(isTouchdown) {
-		m_mouseButtonStates |= mouseButton;
+		m_mouseButtonStates |= 1 << mouseButton;
 	} else {
-		g_dispatcher.addEvent([this, mouseButton] { m_mouseButtonStates &= ~mouseButton; });
+		g_dispatcher.addEvent([this, mouseButton] { m_mouseButtonStates &= ~(1 << mouseButton); });
 	}
 
     handleInputEvent();
