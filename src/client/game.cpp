@@ -1719,6 +1719,7 @@ void Game::setClientVersion(int version)
         enableFeature(Otc::GamePrey);
         enableFeature(Otc::GameThingQuickLoot);
         enableFeature(Otc::GameTournamentPackets);
+        enableFeature(Otc::GameVipGroups);
     }
 
     if (version >= 1260) {
