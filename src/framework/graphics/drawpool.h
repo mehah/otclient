@@ -181,6 +181,7 @@ private:
 
     inline void setFPS(uint16_t fps) { m_refreshDelay = fps; }
 
+    void updateHash(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color);
     PoolState getState(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color);
 
     float getOpacity() const { return m_state.opacity; }
