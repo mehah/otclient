@@ -884,9 +884,6 @@
     <ClInclude Include="..\src\framework\util\crypt.h">
       <Filter>Header Files\framework\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\framework\util\databuffer.h">
-      <Filter>Header Files\framework\util</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\framework\util\matrix.h">
       <Filter>Header Files\framework\util</Filter>
     </ClInclude>
