@@ -2821,6 +2821,10 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
         }
     }
 
+    if (g_game.getFeature(Otc::GameItemShader)) {
+        item->setShader(std::string{ msg->getString() });
+    }
+
     return item;
 }
 

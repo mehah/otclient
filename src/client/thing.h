@@ -163,6 +163,8 @@ public:
     }
 
     void setShader(const std::string_view name);
+    bool hasShader() { return m_shader != nullptr; }
+
     void ungroup() { m_drawConductor.agroup = false; }
 
     virtual void onPositionChange(const Position& /*newPos*/, const Position& /*oldPos*/) {}

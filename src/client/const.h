@@ -521,7 +521,8 @@ namespace Otc
 
         //  others
         GameLoadSprInsteadProtobuf = 100,
-        LastGameFeature = 101
+        GameItemShader = 101,
+        LastGameFeature = 200
     };
 
     enum MagicEffectsType_t : uint8_t
