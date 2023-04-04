@@ -522,6 +522,7 @@ namespace Otc
         //  others
         GameLoadSprInsteadProtobuf = 100,
         GameItemShader = 101,
+        GameCreatureShader = 102,
         LastGameFeature = 200
     };
 

@@ -45,7 +45,7 @@ public:
     uint32_t getU32();
     uint64_t getU64();
     int64_t get64();
-    std::string_view getString();
+    std::string getString();
     double getDouble();
 
     uint8_t peekU8()

@@ -523,6 +523,10 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                     parseRemoveAttachedEffect(msg);
                     break;
 
+                case Proto::GameServerCreatureShader:
+                    parseCreatureShader(msg);
+                    break;
+
                 default:
                     throw Exception("unhandled opcode %d", opcode);
                     break;
@@ -2686,6 +2690,11 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
         if (g_game.getClientVersion() >= 854)
             unpass = msg->getU8();
 
+        std::string shader;
+        if (g_game.getFeature(Otc::GameCreatureShader)) {
+            shader = std::string{ msg->getString() };
+        }
+
         if (creature) {
             creature->setHealthPercent(healthPercent);
             creature->turn(direction);
@@ -2696,6 +2705,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
             creature->setPassable(!unpass);
             creature->setLight(light);
             creature->setMasterId(masterId);
+            creature->setShader(shader);
 
             if (emblem > 0)
                 creature->setEmblem(emblem);
@@ -3626,4 +3636,17 @@ void ProtocolGame::parseRemoveAttachedEffect(const InputMessagePtr& msg) {
     }
 
     creature->detachEffectById(attachedEffectId);
+}
+
+void ProtocolGame::parseCreatureShader(const InputMessagePtr& msg) {
+    const uint32_t id = msg->getU32();
+    const auto& shaderName = std::string{ msg->getString() };
+
+    const auto& creature = g_map.getCreatureById(id);
+    if (!creature) {
+        g_logger.traceError(stdext::format("could not get creature with id %d", id));
+        return;
+    }
+
+    creature->setShader(shaderName);
 }

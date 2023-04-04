@@ -294,6 +294,7 @@ private:
 
     void parseAddAttachedEffect(const InputMessagePtr& msg);
     void parseRemoveAttachedEffect(const InputMessagePtr& msg);
+    void parseCreatureShader(const InputMessagePtr& msg);
 
     MarketOffer readMarketOffer(const InputMessagePtr& msg, uint8_t action, uint16_t var);
 
