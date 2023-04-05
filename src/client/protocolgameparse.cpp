@@ -1351,7 +1351,7 @@ void ProtocolGame::parseAnimatedText(const InputMessagePtr& msg)
 void ProtocolGame::parseAnthem(const InputMessagePtr& msg)
 {
     uint8_t type = msg->getU8();
-	if (type >= 0 && type <= 2) {
+    if (type >= 0 && type <= 2) {
         msg->getU16(); // Anthem id
     }
 }
@@ -2800,6 +2800,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
             creature->setLight(light);
             creature->setMasterId(masterId);
             creature->setShader(shader);
+            creature->clearAttachedEffects();
             for (const auto effectId : attachedEffectList)
                 creature->attachEffect(g_attachedEffects.getById(effectId));
 
