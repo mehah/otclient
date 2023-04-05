@@ -523,6 +523,7 @@ namespace Otc
         GameLoadSprInsteadProtobuf = 100,
         GameItemShader = 101,
         GameCreatureShader = 102,
+        GameCreatureAttachedEffect = 102,
         LastGameFeature = 200
     };
 

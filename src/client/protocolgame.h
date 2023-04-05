@@ -292,8 +292,8 @@ private:
     void parseMarketDetail(const InputMessagePtr& msg);
     void parseMarketBrowse(const InputMessagePtr& msg);
 
-    void parseAddAttachedEffect(const InputMessagePtr& msg);
-    void parseRemoveAttachedEffect(const InputMessagePtr& msg);
+    void parseAttachedEffect(const InputMessagePtr& msg);
+    void parseDetachEffect(const InputMessagePtr& msg);
     void parseCreatureShader(const InputMessagePtr& msg);
 
     MarketOffer readMarketOffer(const InputMessagePtr& msg, uint8_t action, uint16_t var);

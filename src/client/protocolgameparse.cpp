@@ -515,12 +515,12 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                     parseMarketBrowse(msg);
                     break;
 
-                case Proto::GameServerAddAttachedEffect:
-                    parseAddAttachedEffect(msg);
+                case Proto::GameServerAttchedEffect:
+                    parseAttachedEffect(msg);
                     break;
 
-                case Proto::GameServerRemoveAttachedEffect:
-                    parseRemoveAttachedEffect(msg);
+                case Proto::GameServerDetachEffect:
+                    parseDetachEffect(msg);
                     break;
 
                 case Proto::GameServerCreatureShader:
@@ -2695,6 +2695,13 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
             shader = std::string{ msg->getString() };
         }
 
+        std::vector<uint16_t> attachedEffectList;
+        if (g_game.getFeature(Otc::GameCreatureShader)) {
+            uint8_t listSize = msg->getU8();
+            for (int_fast8_t i = -1; ++i < listSize;)
+                attachedEffectList.push_back(msg->getU16());
+        }
+
         if (creature) {
             creature->setHealthPercent(healthPercent);
             creature->turn(direction);
@@ -2706,6 +2713,8 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
             creature->setLight(light);
             creature->setMasterId(masterId);
             creature->setShader(shader);
+            for (const auto effectId : attachedEffectList)
+                creature->attachEffect(g_attachedEffects.getById(effectId));
 
             if (emblem > 0)
                 creature->setEmblem(emblem);
@@ -3608,7 +3617,7 @@ void ProtocolGame::parseMarketBrowse(const InputMessagePtr& msg)
     g_lua.callGlobalField("g_game", "onMarketBrowse", intOffers, nameOffers);
 }
 
-void ProtocolGame::parseAddAttachedEffect(const InputMessagePtr& msg) {
+void ProtocolGame::parseAttachedEffect(const InputMessagePtr& msg) {
     const uint32_t id = msg->getU32();
     const uint16_t attachedEffectId = msg->getU16();
 
@@ -3625,7 +3634,7 @@ void ProtocolGame::parseAddAttachedEffect(const InputMessagePtr& msg) {
     creature->attachEffect(effect);
 }
 
-void ProtocolGame::parseRemoveAttachedEffect(const InputMessagePtr& msg) {
+void ProtocolGame::parseDetachEffect(const InputMessagePtr& msg) {
     const uint32_t id = msg->getU32();
     const uint16_t attachedEffectId = msg->getU16();
 
