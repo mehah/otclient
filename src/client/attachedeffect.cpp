@@ -57,7 +57,7 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
         const auto& point = dest - (dirControl.offset * g_drawPool.getScaleFactor());
 
         if (m_texture) {
-            g_drawPool.addTexturedRect(Rect(point, m_size.isUnset() ? m_texture->getSize() : m_size), m_texture);
+            g_drawPool.addTexturedRect(Rect(point, m_size.isUnset() ? m_texture->getSize() : m_size), m_texture->get(m_frame, m_timer));
         } else {
             m_thingType->draw(point, 0, m_direction, 0, 0, animation, Otc::DrawThingsAndLights, Color::white, lightView);
         }
@@ -70,7 +70,7 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
 int AttachedEffect::getCurrentAnimationPhase()
 {
     if (m_texture)
-        return 0;
+        return m_frame;
 
     const auto* animator = m_thingType->getIdleAnimator();
     if (!animator && m_thingType->isAnimateAlways())
@@ -96,17 +96,3 @@ int AttachedEffect::getCurrentAnimationPhase()
 
 void AttachedEffect::setShader(const std::string_view name) { m_shader = g_shaders.getShader(name); }
 
-// TODO: dont use running
-int8_t AttachedEffect::getLoop() {
-    return m_texture ? (m_texture->running() ? -1 : 0) : m_loop;
-}
-
-// TODO: dont use setNumPlays
-void AttachedEffect::setLoop(int8_t v) {
-    if (m_texture) {
-        m_texture->setNumPlays(v);
-        return;
-    }
-
-    m_loop = v;
-}

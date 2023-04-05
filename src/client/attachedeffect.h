@@ -55,8 +55,8 @@ public:
     uint16_t getDuration() { return m_duration; }
     void setDuration(uint16_t v) { m_duration = v; }
 
-    int8_t getLoop();
-    void setLoop(int8_t v);
+    int8_t getLoop() { return m_loop; }
+    void setLoop(int8_t v) { m_loop = v; }
 
     void setName(std::string_view n) { m_name = { n.data() }; }
     std::string getName() { return m_name; }
@@ -89,6 +89,9 @@ private:
 
     uint16_t m_id{ 0 };
     uint16_t m_duration{ 0 };
+
+    uint32_t m_frame{ 0 };
+    Timer m_timer;
 
     bool m_onTop{ false };
     bool m_hideOwner{ false };
