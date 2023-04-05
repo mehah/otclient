@@ -55,7 +55,7 @@ public:
     void setPremium(bool premium);
     void setRegenerationTime(uint16_t regenerationTime);
     void setOfflineTrainingTime(uint16_t offlineTrainingTime);
-    void setSpells(const std::vector<uint8_t>& spells);
+    void setSpells(const std::vector<uint16_t>& spells);
     void setBlessings(uint16_t blessings);
     void setResourceBalance(Otc::ResourceTypes_t type, uint64_t value);
 
@@ -85,7 +85,7 @@ public:
     uint32_t getMaxHealth() { return m_maxHealth; }
     uint64_t getExperience() { return m_experience; }
 
-    const std::vector<uint8_t>& getSpells() { return m_spells; }
+    const std::vector<uint16_t>& getSpells() { return m_spells; }
     ItemPtr getInventoryItem(Otc::InventorySlot inventory) { return m_inventoryItems[inventory]; }
 
     uint64_t getResourceBalance(Otc::ResourceTypes_t type)
@@ -154,7 +154,7 @@ private:
     ItemPtr m_inventoryItems[Otc::LastInventorySlot];
 
     std::array<Skill, Otc::LastSkill> m_skills;
-    std::vector<uint8_t> m_spells;
+    std::vector<uint16_t> m_spells;
 
     stdext::map<Otc::ResourceTypes_t, uint64_t> m_resourcesBalance;
 

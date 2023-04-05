@@ -752,20 +752,22 @@ void MapView::setShader(const std::string_view name, float fadein, float fadeout
     if (m_shader == shader)
         return;
 
-    if (fadeout > 0.0f && m_shader) {
-        m_nextShader = shader;
-        m_shaderSwitchDone = false;
-    } else {
-        m_shader = shader;
-        m_nextShader = nullptr;
-        m_shaderSwitchDone = true;
-    }
+    g_mainDispatcher.addEvent([=, this] {
+        if (fadeout > 0.0f && m_shader) {
+            m_nextShader = shader;
+            m_shaderSwitchDone = false;
+        } else {
+            m_shader = shader;
+            m_nextShader = nullptr;
+            m_shaderSwitchDone = true;
+        }
 
-    m_fadeTimer.restart();
-    m_fadeInTime = fadein;
-    m_fadeOutTime = fadeout;
+        m_fadeTimer.restart();
+        m_fadeInTime = fadein;
+        m_fadeOutTime = fadeout;
 
-    if (shader) m_shaderPosition = getCameraPosition();
+        if (shader) m_shaderPosition = getCameraPosition();
+    });
 }
 
 void MapView::setDrawLights(bool enable)

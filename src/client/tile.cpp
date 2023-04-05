@@ -627,6 +627,7 @@ bool Tile::limitsFloorsView(bool isFreeView)
 
 bool Tile::checkForDetachableThing()
 {
+    m_highlightThing = nullptr;
     if (const auto& creature = getTopCreature()) {
         m_highlightThing = creature;
         return true;

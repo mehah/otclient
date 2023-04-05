@@ -1718,6 +1718,8 @@ void Game::setClientVersion(int version)
     if (version >= 1200) {
         enableFeature(Otc::GamePrey);
         enableFeature(Otc::GameThingQuickLoot);
+        enableFeature(Otc::GameTournamentPackets);
+        enableFeature(Otc::GameVipGroups);
     }
 
     if (version >= 1260) {
@@ -1745,9 +1747,17 @@ void Game::setClientVersion(int version)
         enableFeature(Otc::GameDoubleShopSellAmount);
     }
 
-    enableFeature(Otc::GameItemShader);
-    enableFeature(Otc::GameCreatureShader);
-    enableFeature(Otc::GameCreatureAttachedEffect);
+    if (version >= 1300) {
+        enableFeature(Otc::GameDoubleHealth);
+        enableFeature(Otc::GameUshortSpell);
+        enableFeature(Otc::GameConcotions);
+        enableFeature(Otc::GameAnthem);
+    }
+
+    if (version >= 1314) {
+        disableFeature(Otc::GameTournamentPackets);
+        enableFeature(Otc::GameDynamicForgeVariables);
+    }
 
     m_clientVersion = version;
 
