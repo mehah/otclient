@@ -173,6 +173,9 @@ GameConcotions = 94
 GameAnthem = 95
 GameVipGroups = 96
 GameLoadSprInsteadProtobuf = 100
+GameItemShader = 101
+GameCreatureShader = 102
+GameCreatureAttachedEffect = 103
 
 TextColors = {
     red = '#f55e5e', -- '#c83200'

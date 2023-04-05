@@ -529,8 +529,8 @@ namespace Otc
         GameLoadSprInsteadProtobuf = 100,
         GameItemShader = 101,
         GameCreatureShader = 102,
-        GameCreatureAttachedEffect = 102,
-        LastGameFeature = 200
+        GameCreatureAttachedEffect = 103,
+        LastGameFeature = 104
     };
 
     enum MagicEffectsType_t : uint8_t
