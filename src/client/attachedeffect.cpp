@@ -29,6 +29,10 @@ AttachedEffectPtr AttachedEffect::clone()
 {
     auto obj = std::make_shared<AttachedEffect>();
     *(obj.get()) = *this;
+
+    obj->m_frame = 0;
+    obj->m_timer.restart();
+
     return obj;
 }
 

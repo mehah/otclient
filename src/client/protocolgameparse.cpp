@@ -2802,7 +2802,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
             creature->setShader(shader);
             creature->clearAttachedEffects();
             for (const auto effectId : attachedEffectList)
-                creature->attachEffect(g_attachedEffects.getById(effectId));
+                creature->attachEffect(g_attachedEffects.getById(effectId)->clone());
 
             if (emblem > 0)
                 creature->setEmblem(emblem);
@@ -3729,7 +3729,7 @@ void ProtocolGame::parseAttachedEffect(const InputMessagePtr& msg) {
     if (!effect)
         return;
 
-    creature->attachEffect(effect);
+    creature->attachEffect(effect->clone());
 }
 
 void ProtocolGame::parseDetachEffect(const InputMessagePtr& msg) {
