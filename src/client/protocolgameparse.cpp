@@ -666,7 +666,7 @@ void ProtocolGame::parseStore(const InputMessagePtr& msg) const
         std::vector<std::string> icons;
         const uint8_t iconCount = msg->getU8();
         for (int_fast32_t j = -1; ++j < iconCount; ) {
-            icons.push_back(std::string{ msg->getString() });
+            icons.push_back(msg->getString());
         }
 
         // If this is a valid category name then
@@ -711,7 +711,7 @@ void ProtocolGame::parseCompleteStorePurchase(const InputMessagePtr& msg) const
     // not used
     msg->getU8();
 
-    const auto message = msg->getString();
+    const auto& message = msg->getString();
     const uint32_t coins = msg->getU32();
     const uint32_t transferableCoins = msg->getU32();
 
@@ -733,7 +733,7 @@ void ProtocolGame::parseStoreTransactionHistory(const InputMessagePtr& msg) cons
         uint16_t time = msg->getU16();
         uint8_t productType = msg->getU8();
         uint32_t coinChange = msg->getU32();
-        const auto productName = msg->getString();
+        const auto& productName = msg->getString();
         g_logger.error(stdext::format("Time %i, type %i, change %i, product name %s", time, productType, coinChange, productName));
     }
 }
@@ -783,7 +783,7 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
 void ProtocolGame::parseStoreError(const InputMessagePtr& msg) const
 {
     const uint8_t errorType = msg->getU8();
-    const auto message = msg->getString();
+    const auto& message = msg->getString();
     g_logger.error(stdext::format("Store Error: %s [%i]", message, errorType));
 }
 
@@ -839,25 +839,25 @@ void ProtocolGame::parseGMActions(const InputMessagePtr& msg)
 
 void ProtocolGame::parseUpdateNeeded(const InputMessagePtr& msg)
 {
-    const auto signature = msg->getString();
+    const auto& signature = msg->getString();
     Game::processUpdateNeeded(signature);
 }
 
 void ProtocolGame::parseLoginError(const InputMessagePtr& msg)
 {
-    const auto error = msg->getString();
+    const auto& error = msg->getString();
     Game::processLoginError(error);
 }
 
 void ProtocolGame::parseLoginAdvice(const InputMessagePtr& msg)
 {
-    const auto message = msg->getString();
+    const auto& message = msg->getString();
     Game::processLoginAdvice(message);
 }
 
 void ProtocolGame::parseLoginWait(const InputMessagePtr& msg)
 {
-    const auto message = msg->getString();
+    const auto& message = msg->getString();
     const uint8_t time = msg->getU8();
 
     Game::processLoginWait(message, time);
@@ -1057,7 +1057,7 @@ void ProtocolGame::parseOpenContainer(const InputMessagePtr& msg)
 {
     const uint8_t containerId = msg->getU8();
     const auto& containerItem = getItem(msg);
-    const auto name = msg->getString();
+    const auto& name = msg->getString();
     const uint8_t capacity = msg->getU8();
     const bool hasParent = msg->getU8() != 0;
 
@@ -1174,7 +1174,7 @@ void ProtocolGame::parseOpenNpcTrade(const InputMessagePtr& msg)
         const auto& item = Item::create(itemId);
         item->setCountOrSubType(count);
 
-        const auto name = msg->getString();
+        const auto& name = msg->getString();
         uint32_t weight = msg->getU32();
         uint32_t buyPrice = msg->getU32();
         uint32_t sellPrice = msg->getU32();
@@ -1344,7 +1344,7 @@ void ProtocolGame::parseAnimatedText(const InputMessagePtr& msg)
 {
     const auto& position = getPosition(msg);
     const uint8_t color = msg->getU8();
-    const auto text = msg->getString();
+    const auto& text = msg->getString();
     g_map.addAnimatedText(std::make_shared<AnimatedText>(text, color), position);
 }
 
@@ -1559,8 +1559,8 @@ void ProtocolGame::parseEditText(const InputMessagePtr& msg)
 
     const uint16_t maxLength = msg->getU16();
 
-    const auto text = msg->getString();
-    const auto writer = msg->getString();
+    const auto& text = msg->getString();
+    const auto& writer = msg->getString();
 
     if (g_game.getClientVersion() >= 1281) {
         msg->getU8(); // suffix
@@ -1577,7 +1577,7 @@ void ProtocolGame::parseEditList(const InputMessagePtr& msg)
 {
     const uint8_t doorId = msg->getU8();
     const uint32_t id = msg->getU32();
-    const auto text = msg->getString();
+    const auto& text = msg->getString();
 
     Game::processEditList(id, doorId, text);
 }
@@ -1943,7 +1943,7 @@ void ProtocolGame::parseTalk(const InputMessagePtr& msg)
             break;
     }
 
-    const auto text = msg->getString();
+    const auto& text = msg->getString();
 
     Game::processTalk(name, level, mode, text, channelId, pos);
 }
@@ -1954,7 +1954,7 @@ void ProtocolGame::parseChannelList(const InputMessagePtr& msg)
     std::vector<std::tuple<int, std::string> > channelList;
     for (int_fast32_t i = 0; i < count; ++i) {
         const uint16_t id = msg->getU16();
-        const auto name = msg->getString();
+        const auto& name = msg->getString();
         channelList.emplace_back(id, name);
     }
 
@@ -1964,7 +1964,7 @@ void ProtocolGame::parseChannelList(const InputMessagePtr& msg)
 void ProtocolGame::parseOpenChannel(const InputMessagePtr& msg)
 {
     const uint16_t channelId = msg->getU16();
-    const auto name = msg->getString();
+    const auto& name = msg->getString();
 
     if (g_game.getFeature(Otc::GameChannelPlayerList)) {
         const uint16_t joinedPlayers = msg->getU16();
@@ -2006,13 +2006,13 @@ void ProtocolGame::parseRuleViolationChannel(const InputMessagePtr& msg)
 
 void ProtocolGame::parseRuleViolationRemove(const InputMessagePtr& msg)
 {
-    const auto name = msg->getString();
+    const auto& name = msg->getString();
     Game::processRuleViolationRemove(name);
 }
 
 void ProtocolGame::parseRuleViolationCancel(const InputMessagePtr& msg)
 {
-    const auto name = msg->getString();
+    const auto& name = msg->getString();
     Game::processRuleViolationCancel(name);
 }
 
@@ -2022,7 +2022,7 @@ void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
 {
     const uint8_t code = msg->getU8();
     const Otc::MessageMode mode = Proto::translateMessageModeFromServer(code);
-    std::string_view text;
+    std::string text;
 
     switch (mode) {
         case Otc::MessageChannelManagement:
@@ -2162,7 +2162,7 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
         const uint16_t outfitCount = g_game.getClientVersion() >= 1281 ? msg->getU16() : msg->getU8();
         for (int_fast32_t i = 0; i < outfitCount; ++i) {
             uint16_t outfitId = msg->getU16();
-            const auto outfitName = msg->getString();
+            const auto& outfitName = msg->getString();
             uint8_t outfitAddons = msg->getU8();
 
             if (g_game.getClientVersion() >= 1281) {
@@ -2191,7 +2191,7 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
         const uint16_t mountCount = g_game.getClientVersion() >= 1281 ? msg->getU16() : msg->getU8();
         for (int_fast32_t i = 0; i < mountCount; ++i) {
             const uint16_t mountId = msg->getU16(); // mount type
-            const auto mountName = msg->getString(); // mount name
+            const auto& mountName = msg->getString(); // mount name
 
             if (g_game.getClientVersion() >= 1281) {
                 msg->getU8(); // mode: 0x00 - available, 0x01 store (requires U32 store offerId)
@@ -2291,7 +2291,7 @@ void ProtocolGame::parseAutomapFlag(const InputMessagePtr& msg)
 {
     const auto& pos = getPosition(msg);
     const uint8_t icon = msg->getU8();
-    const auto description = msg->getString();
+    const auto& description = msg->getString();
 
     bool remove = false;
     if (g_game.getFeature(Otc::GameMinimapRemove))
@@ -2309,7 +2309,7 @@ void ProtocolGame::parseQuestLog(const InputMessagePtr& msg)
     const uint16_t questsCount = msg->getU16();
     for (int_fast32_t i = 0; i < questsCount; ++i) {
         uint16_t id = msg->getU16();
-        const auto name = msg->getString();
+        const auto& name = msg->getString();
         bool completed = msg->getU8();
         questList.emplace_back(id, name, completed);
     }
@@ -2323,8 +2323,8 @@ void ProtocolGame::parseQuestLine(const InputMessagePtr& msg)
     const uint16_t questId = msg->getU16();
     const uint8_t missionCount = msg->getU8();
     for (int_fast32_t i = 0; i < missionCount; ++i) {
-        const auto missionName = msg->getString();
-        const auto missionDescrition = msg->getString();
+        const auto& missionName = msg->getString();
+        const auto& missionDescrition = msg->getString();
         questMissions.emplace_back(missionName, missionDescrition);
     }
 
@@ -2349,7 +2349,7 @@ void ProtocolGame::parseItemInfo(const InputMessagePtr& msg) const
         item->setId(msg->getU16());
         item->setCountOrSubType(msg->getU8());
 
-        const auto desc = msg->getString();
+        const auto& desc = msg->getString();
         list.emplace_back(item, desc);
     }
 
@@ -2369,13 +2369,13 @@ void ProtocolGame::parsePlayerInventory(const InputMessagePtr& msg)
 void ProtocolGame::parseModalDialog(const InputMessagePtr& msg)
 {
     const uint32_t windowId = msg->getU32();
-    const auto title = msg->getString();
-    const auto message = msg->getString();
+    const auto& title = msg->getString();
+    const auto& message = msg->getString();
 
     const uint8_t sizeButtons = msg->getU8();
     std::vector<std::tuple<int, std::string> > buttonList;
     for (int_fast32_t i = 0; i < sizeButtons; ++i) {
-        const auto value = msg->getString();
+        const auto& value = msg->getString();
         uint8_t buttonId = msg->getU8();
         buttonList.emplace_back(buttonId, value);
     }
@@ -2383,7 +2383,7 @@ void ProtocolGame::parseModalDialog(const InputMessagePtr& msg)
     const uint8_t sizeChoices = msg->getU8();
     std::vector<std::tuple<int, std::string> > choiceList;
     for (int_fast32_t i = 0; i < sizeChoices; ++i) {
-        const auto value = msg->getString();
+        const auto& value = msg->getString();
         uint8_t choideId = msg->getU8();
         choiceList.emplace_back(choideId, value);
     }
@@ -2406,7 +2406,7 @@ void ProtocolGame::parseModalDialog(const InputMessagePtr& msg)
 void ProtocolGame::parseExtendedOpcode(const InputMessagePtr& msg)
 {
     const uint8_t opcode = msg->getU8();
-    const auto buffer = msg->getString();
+    const auto& buffer = msg->getString();
 
     if (opcode == 0)
         m_enableSendExtendedOpcode = true;
@@ -2779,7 +2779,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
 
         std::string shader;
         if (g_game.getFeature(Otc::GameCreatureShader)) {
-            shader = std::string{ msg->getString() };
+            shader = msg->getString();
         }
 
         std::vector<uint16_t> attachedEffectList;
@@ -2932,7 +2932,7 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
     }
 
     if (g_game.getFeature(Otc::GameItemShader)) {
-        item->setShader(std::string{ msg->getString() });
+        item->setShader(msg->getString());
     }
 
     return item;
@@ -3326,7 +3326,7 @@ void ProtocolGame::parsePreyTimeLeft(const InputMessagePtr& msg)
 
 PreyMonster ProtocolGame::getPreyMonster(const InputMessagePtr& msg) const
 {
-    const auto& name = std::string{ msg->getString() };
+    const auto& name = msg->getString();
     const auto& outfit = getOutfit(msg, false);
     return { name , outfit };
 }
@@ -3459,7 +3459,7 @@ Imbuement ProtocolGame::getImbuementInfo(const InputMessagePtr& msg)
     const uint8_t itemsSize = msg->getU8(); // items size
     for (uint8_t i = 0; i < itemsSize; i++) {
         const uint16_t id = msg->getU16(); // item client ID
-        const auto& description = std::string{ msg->getString() }; // item name
+        const auto& description = msg->getString(); // item name
         const uint16_t count = msg->getU16(); // count
         const ItemPtr& item = Item::create(id);
         item->setCount(count);
@@ -3581,7 +3581,7 @@ void ProtocolGame::parseMarketDetail(const InputMessagePtr& msg)
         }
     }
 
-    stdext::map<int, std::string_view> descriptions;
+    stdext::map<int, std::string> descriptions;
     Otc::MarketItemDescription lastAttribute = Otc::ITEM_DESC_WEIGHT;
     if (g_game.getClientVersion() >= 1200)
         lastAttribute = Otc::ITEM_DESC_IMBUINGSLOTS;
@@ -3592,7 +3592,7 @@ void ProtocolGame::parseMarketDetail(const InputMessagePtr& msg)
 
     for (int_fast32_t i = Otc::ITEM_DESC_FIRST; i <= lastAttribute; i++) {
         if (msg->peekU16() != 0x00) {
-            const auto sentString = msg->getString();
+            const auto& sentString = msg->getString();
             descriptions.try_emplace(i, sentString);
         } else {
             msg->getU16();
@@ -3672,7 +3672,7 @@ MarketOffer ProtocolGame::readMarketOffer(const InputMessagePtr& msg, uint8_t ac
     if (var == Otc::OLD_MARKETREQUEST_MY_HISTORY || var == Otc::MARKETREQUEST_OWN_HISTORY) {
         state = msg->getU8();
     } else if (var == Otc::OLD_MARKETREQUEST_MY_OFFERS || var == Otc::MARKETREQUEST_OWN_OFFERS) {} else {
-        playerName = std::string{ msg->getString() };
+        playerName = msg->getString();
     }
 
     g_lua.callGlobalField("g_game", "onMarketReadOffer", action, amount, counter, itemId, playerName, price, state, timestamp, var);
@@ -3750,7 +3750,7 @@ void ProtocolGame::parseDetachEffect(const InputMessagePtr& msg) {
 
 void ProtocolGame::parseCreatureShader(const InputMessagePtr& msg) {
     const uint32_t id = msg->getU32();
-    const auto& shaderName = std::string{ msg->getString() };
+    const auto& shaderName = msg->getString();
 
     const auto& creature = g_map.getCreatureById(id);
     if (!creature) {
