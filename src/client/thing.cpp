@@ -88,7 +88,14 @@ int Thing::getStackPos()
     return -1;
 }
 
-void Thing::setShader(const std::string_view name) { m_shader = g_shaders.getShader(name); }
+void Thing::setShader(const std::string_view name) {
+    if (name.empty()) {
+        m_shader = nullptr;
+        return;
+    }
+
+    m_shader = g_shaders.getShader(name.data());
+}
 
 void Thing::attachEffect(const AttachedEffectPtr& obj) {
     if (isCreature()) {

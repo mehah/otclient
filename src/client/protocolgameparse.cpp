@@ -33,6 +33,7 @@
 #include "missile.h"
 #include "statictext.h"
 #include "thingtypemanager.h"
+#include "attachedeffectmanager.h"
 #include "tile.h"
 #include "time.h"
 
@@ -520,6 +521,19 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerMarketBrowse:
                     parseMarketBrowse(msg);
                     break;
+
+                case Proto::GameServerAttchedEffect:
+                    parseAttachedEffect(msg);
+                    break;
+
+                case Proto::GameServerDetachEffect:
+                    parseDetachEffect(msg);
+                    break;
+
+                case Proto::GameServerCreatureShader:
+                    parseCreatureShader(msg);
+                    break;
+
                 default:
                     throw Exception("unhandled opcode %d", opcode);
                     break;
@@ -1337,7 +1351,7 @@ void ProtocolGame::parseAnimatedText(const InputMessagePtr& msg)
 void ProtocolGame::parseAnthem(const InputMessagePtr& msg)
 {
     uint8_t type = msg->getU8();
-	if (type >= 0 && type <= 2) {
+    if (type >= 0 && type <= 2) {
         msg->getU16(); // Anthem id
     }
 }
@@ -2763,6 +2777,18 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
         if (g_game.getClientVersion() >= 854)
             unpass = msg->getU8();
 
+        std::string shader;
+        if (g_game.getFeature(Otc::GameCreatureShader)) {
+            shader = std::string{ msg->getString() };
+        }
+
+        std::vector<uint16_t> attachedEffectList;
+        if (g_game.getFeature(Otc::GameCreatureShader)) {
+            uint8_t listSize = msg->getU8();
+            for (int_fast8_t i = -1; ++i < listSize;)
+                attachedEffectList.push_back(msg->getU16());
+        }
+
         if (creature) {
             creature->setHealthPercent(healthPercent);
             creature->turn(direction);
@@ -2773,6 +2799,10 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
             creature->setPassable(!unpass);
             creature->setLight(light);
             creature->setMasterId(masterId);
+            creature->setShader(shader);
+            creature->clearAttachedEffects();
+            for (const auto effectId : attachedEffectList)
+                creature->attachEffect(g_attachedEffects.getById(effectId)->clone());
 
             if (emblem > 0)
                 creature->setEmblem(emblem);
@@ -2896,6 +2926,10 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
             msg->getU8(); // direction
             msg->getU8(); // visible (bool)
         }
+    }
+
+    if (g_game.getFeature(Otc::GameItemShader)) {
+        item->setShader(std::string{ msg->getString() });
     }
 
     return item;
@@ -3679,4 +3713,47 @@ void ProtocolGame::parseMarketBrowse(const InputMessagePtr& msg)
     }
 
     g_lua.callGlobalField("g_game", "onMarketBrowse", intOffers, nameOffers);
+}
+
+void ProtocolGame::parseAttachedEffect(const InputMessagePtr& msg) {
+    const uint32_t id = msg->getU32();
+    const uint16_t attachedEffectId = msg->getU16();
+
+    const auto& creature = g_map.getCreatureById(id);
+    if (!creature) {
+        g_logger.traceError(stdext::format("could not get creature with id %d", id));
+        return;
+    }
+
+    const auto& effect = g_attachedEffects.getById(attachedEffectId);
+    if (!effect)
+        return;
+
+    creature->attachEffect(effect->clone());
+}
+
+void ProtocolGame::parseDetachEffect(const InputMessagePtr& msg) {
+    const uint32_t id = msg->getU32();
+    const uint16_t attachedEffectId = msg->getU16();
+
+    const auto& creature = g_map.getCreatureById(id);
+    if (!creature) {
+        g_logger.traceError(stdext::format("could not get creature with id %d", id));
+        return;
+    }
+
+    creature->detachEffectById(attachedEffectId);
+}
+
+void ProtocolGame::parseCreatureShader(const InputMessagePtr& msg) {
+    const uint32_t id = msg->getU32();
+    const auto& shaderName = std::string{ msg->getString() };
+
+    const auto& creature = g_map.getCreatureById(id);
+    if (!creature) {
+        g_logger.traceError(stdext::format("could not get creature with id %d", id));
+        return;
+    }
+
+    creature->setShader(shaderName);
 }

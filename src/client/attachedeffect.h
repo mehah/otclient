@@ -28,14 +28,11 @@
 class AttachedEffect : public LuaObject
 {
 public:
-    static AttachedEffectPtr create(uint16_t id, uint16_t thingId, ThingCategory category);
-    static AttachedEffectPtr createUsingImage(uint16_t id, const std::string_view path, bool smooth = true);
-
     void draw(const Point& /*dest*/, bool /*isOnTop*/, LightView* = nullptr);
 
     uint16_t getId() { return m_id; }
 
-    AttachedEffectPtr clone() const;
+    AttachedEffectPtr clone();
 
     float getSpeed() { return m_speed / 100.f; }
     void setSpeed(float speed) { m_speed = speed * 100u; }
@@ -58,8 +55,11 @@ public:
     uint16_t getDuration() { return m_duration; }
     void setDuration(uint16_t v) { m_duration = v; }
 
-    int8_t getLoop();
-    void setLoop(int8_t v);
+    int8_t getLoop() { return m_loop; }
+    void setLoop(int8_t v) { m_loop = v; }
+
+    void setName(std::string_view n) { m_name = { n.data() }; }
+    std::string getName() { return m_name; }
 
     void setOnTop(bool onTop) { for (auto& control : m_offsetDirections) control.onTop = onTop; }
     void setOffset(int16_t x, int16_t y) { for (auto& control : m_offsetDirections) control.offset = { x, y }; }
@@ -69,6 +69,8 @@ public:
     void setShader(const std::string_view name);
     void setCanDrawOnUI(bool canDraw) { m_canDrawOnUI = canDraw; }
     bool canDrawOnUI() { return m_canDrawOnUI; }
+
+    void attachEffect(const AttachedEffectPtr& e) { m_effects.emplace_back(e); }
 
 private:
     int getCurrentAnimationPhase();
@@ -88,6 +90,9 @@ private:
     uint16_t m_id{ 0 };
     uint16_t m_duration{ 0 };
 
+    uint32_t m_frame{ 0 };
+    Timer m_timer;
+
     bool m_onTop{ false };
     bool m_hideOwner{ false };
     bool m_transform{ false };
@@ -95,6 +100,9 @@ private:
     bool m_disableWalkAnimation{ false };
 
     Outfit m_outfitOwner;
+
+    uint16_t m_thingId{ 0 };
+    ThingCategory m_thingCategory{ ThingInvalidCategory };
 
     ThingType* m_thingType{ nullptr };
 
@@ -109,5 +117,10 @@ private:
     PainterShaderProgramPtr m_shader;
     AnimatedTexturePtr m_texture;
 
+    std::string m_name;
+
+    std::vector<AttachedEffectPtr> m_effects;
+
     friend class Thing;
+    friend class AttachedEffectManager;
 };

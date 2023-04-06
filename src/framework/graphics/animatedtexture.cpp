@@ -78,6 +78,18 @@ void AnimatedTexture::setRepeat(bool repeat)
     });
 }
 
+TexturePtr AnimatedTexture::get(uint32_t& frame, Timer& timer) {
+    if (timer.ticksElapsed() >= m_framesDelay[frame]) {
+        timer.restart();
+
+        if (++frame >= m_frames.size()) {
+            frame = 0;
+        }
+    }
+
+    return m_frames[frame];
+}
+
 void AnimatedTexture::update()
 {
     if (!m_animTimer.running())

@@ -80,13 +80,13 @@ int64_t InputMessage::get64()
     return v;
 }
 
-std::string_view InputMessage::getString()
+std::string InputMessage::getString()
 {
     const uint16_t stringLength = getU16();
     checkRead(stringLength);
-    const std::string_view v{ (char*)(m_buffer + m_readPos), stringLength };
+    const char* v = (char*)(m_buffer + m_readPos);
     m_readPos += stringLength;
-    return v;
+    return std::string(v, stringLength);
 }
 
 double InputMessage::getDouble()

@@ -71,6 +71,9 @@ namespace Proto
         // NOTE: add any custom opcodes in this range
         // 51 - 99
         GameServerChangeMapAwareRange = 51,
+        GameServerAttchedEffect = 52,
+        GameServerDetachEffect = 53,
+        GameServerCreatureShader = 54,
         GameServerFloorDescription = 75,
 
         // original tibia ONLY

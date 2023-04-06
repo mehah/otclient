@@ -31,6 +31,8 @@ public:
     AnimatedTexture(const Size& size, const std::vector<ImagePtr>& frames, std::vector<uint16_t> framesDelay, uint16_t numPlays, bool buildMipmaps = false, bool compress = false);
     ~AnimatedTexture() override = default;
 
+    TexturePtr get(uint32_t& frame, Timer& timer);
+
     void buildHardwareMipmaps() override;
 
     void setSmooth(bool smooth) override;

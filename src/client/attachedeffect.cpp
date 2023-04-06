@@ -22,48 +22,17 @@
 
 #include "attachedeffect.h"
 #include "shadermanager.h"
-#include "spritemanager.h"
-#include "thingtypemanager.h"
 #include <framework/core/clock.h>
 #include <framework/graphics/animatedtexture.h>
-#include <framework/graphics/texturemanager.h>
 
-AttachedEffectPtr AttachedEffect::clone() const
+AttachedEffectPtr AttachedEffect::clone()
 {
     auto obj = std::make_shared<AttachedEffect>();
     *(obj.get()) = *this;
-    return obj;
-}
 
-AttachedEffectPtr AttachedEffect::create(uint16_t id, uint16_t thingId, ThingCategory category) {
-    if (!g_things.isValidDatId(thingId, category)) {
-        g_logger.error(stdext::format("AttachedEffect::create(%d): invalid thing with id %d.", id, thingId));
-        return nullptr;
-    }
+    obj->m_frame = 0;
+    obj->m_timer.restart();
 
-    const auto& obj = std::make_shared<AttachedEffect>();
-    obj->m_id = id;
-    obj->m_thingType = g_things.getThingType(thingId, category).get();
-    return obj;
-}
-
-AttachedEffectPtr AttachedEffect::createUsingImage(uint16_t id, const std::string_view path, bool smooth) {
-    const auto& texture = g_textures.getTexture(path.data(), smooth);
-    if (!texture)
-        return nullptr;
-
-    if (!texture->isAnimatedTexture()) {
-        g_logger.error(stdext::format("AttachedEffect::createUsingImage(%d): only animated texture is allowed.", id));
-        return nullptr;
-    }
-
-    const auto& animatedTexture = std::static_pointer_cast<AnimatedTexture>(texture);
-    animatedTexture->setOnMap(true);
-    animatedTexture->restart();
-
-    const auto& obj = std::make_shared<AttachedEffect>();
-    obj->m_id = id;
-    obj->m_texture = animatedTexture;
     return obj;
 }
 
@@ -71,36 +40,41 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
     if (m_transform)
         return;
 
-    const auto& dirControl = m_offsetDirections[m_direction];
-    if (dirControl.onTop != isOnTop)
-        return;
+    if (m_texture != nullptr || m_thingType != nullptr) {
+        const auto& dirControl = m_offsetDirections[m_direction];
+        if (dirControl.onTop != isOnTop)
+            return;
 
-    if (!m_canDrawOnUI && g_drawPool.getCurrentType() == DrawPoolType::FOREGROUND)
-        return;
+        if (!m_canDrawOnUI && g_drawPool.getCurrentType() == DrawPoolType::FOREGROUND)
+            return;
 
-    const int animation = getCurrentAnimationPhase();
-    if (m_loop > -1 && animation != m_lastAnimation) {
-        m_lastAnimation = animation;
-        if (animation == 0)
-            --m_loop;
+        const int animation = getCurrentAnimationPhase();
+        if (m_loop > -1 && animation != m_lastAnimation) {
+            m_lastAnimation = animation;
+            if (animation == 0)
+                --m_loop;
+        }
+
+        if (m_shader) g_drawPool.setShaderProgram(m_shader, true);
+        if (m_opacity < 100) g_drawPool.setOpacity(getOpacity(), true);
+
+        const auto& point = dest - (dirControl.offset * g_drawPool.getScaleFactor());
+
+        if (m_texture) {
+            g_drawPool.addTexturedRect(Rect(point, m_size.isUnset() ? m_texture->getSize() : m_size), m_texture->get(m_frame, m_timer));
+        } else {
+            m_thingType->draw(point, 0, m_direction, 0, 0, animation, Otc::DrawThingsAndLights, Color::white, lightView);
+        }
     }
 
-    if (m_shader) g_drawPool.setShaderProgram(m_shader, true);
-    if (m_opacity < 100) g_drawPool.setOpacity(getOpacity(), true);
-
-    const auto& point = dest - (dirControl.offset * g_drawPool.getScaleFactor());
-
-    if (m_texture) {
-        g_drawPool.addTexturedRect(Rect(point, m_size.isUnset() ? m_texture->getSize() : m_size), m_texture);
-    } else {
-        m_thingType->draw(point, 0, m_direction, 0, 0, animation, Otc::DrawThingsAndLights, Color::white, lightView);
-    }
+    for (const auto& effect : m_effects)
+        effect->draw(dest, isOnTop, lightView);
 }
 
 int AttachedEffect::getCurrentAnimationPhase()
 {
     if (m_texture)
-        return 0;
+        return m_frame;
 
     const auto* animator = m_thingType->getIdleAnimator();
     if (!animator && m_thingType->isAnimateAlways())
@@ -126,15 +100,3 @@ int AttachedEffect::getCurrentAnimationPhase()
 
 void AttachedEffect::setShader(const std::string_view name) { m_shader = g_shaders.getShader(name); }
 
-int8_t AttachedEffect::getLoop() {
-    return m_texture ? (m_texture->running() ? -1 : 0) : m_loop;
-}
-
-void AttachedEffect::setLoop(int8_t v) {
-    if (m_texture) {
-        m_texture->setNumPlays(v);
-        return;
-    }
-
-    m_loop = v;
-}

@@ -37,6 +37,7 @@
 #include "player.h"
 #include "protocolgame.h"
 #include "shadermanager.h"
+#include "attachedeffectmanager.h"
 #include "spriteappearances.h"
 #include "spritemanager.h"
 #include "statictext.h"
@@ -359,6 +360,13 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_shaders", "addMultiTexture", &ShaderManager::addMultiTexture, &g_shaders);
     g_lua.bindSingletonFunction("g_shaders", "getShader", &ShaderManager::getShader, &g_shaders);
 
+    g_lua.registerSingletonClass("g_attachedEffects");
+    g_lua.bindSingletonFunction("g_attachedEffects", "getById", &AttachedEffectManager::getById, &g_attachedEffects);
+    g_lua.bindSingletonFunction("g_attachedEffects", "registerByThing", &AttachedEffectManager::registerByThing, &g_attachedEffects);
+    g_lua.bindSingletonFunction("g_attachedEffects", "registerByImage", &AttachedEffectManager::registerByImage, &g_attachedEffects);
+    g_lua.bindSingletonFunction("g_attachedEffects", "remove", &AttachedEffectManager::remove, &g_attachedEffects);
+    g_lua.bindSingletonFunction("g_attachedEffects", "clear", &AttachedEffectManager::clear, &g_attachedEffects);
+
     g_lua.bindGlobalFunction("getOutfitColor", Outfit::getColor);
     g_lua.bindGlobalFunction("getAngleFromPos", Position::getAngleFromPositions);
     g_lua.bindGlobalFunction("getDirectionFromPos", Position::getDirectionFromPositions);
@@ -662,8 +670,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Missile>("setPath", &Missile::setPath);
 
     g_lua.registerClass<AttachedEffect>();
-    g_lua.bindClassStaticFunction<AttachedEffect>("create", &AttachedEffect::create);
-    g_lua.bindClassStaticFunction<AttachedEffect>("createUsingImage", &AttachedEffect::createUsingImage);
+    g_lua.bindClassMemberFunction<AttachedEffect>("clone", &AttachedEffect::clone);
     g_lua.bindClassMemberFunction<AttachedEffect>("getId", &AttachedEffect::getId);
     g_lua.bindClassMemberFunction<AttachedEffect>("getSpeed", &AttachedEffect::getSpeed);
     g_lua.bindClassMemberFunction<AttachedEffect>("setOnTop", &AttachedEffect::setOnTop);
@@ -681,6 +688,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<AttachedEffect>("setSize", &AttachedEffect::setSize);
     g_lua.bindClassMemberFunction<AttachedEffect>("canDrawOnUI", &AttachedEffect::canDrawOnUI);
     g_lua.bindClassMemberFunction<AttachedEffect>("setCanDrawOnUI", &AttachedEffect::setCanDrawOnUI);
+    g_lua.bindClassMemberFunction<AttachedEffect>("attachEffect", &AttachedEffect::attachEffect);
 
     g_lua.registerClass<StaticText>();
     g_lua.bindClassStaticFunction<StaticText>("create", [] { return std::make_shared<StaticText>(); });
