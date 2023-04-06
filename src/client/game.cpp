@@ -1759,10 +1759,6 @@ void Game::setClientVersion(int version)
         enableFeature(Otc::GameDynamicForgeVariables);
     }
 
-    enableFeature(Otc::GameItemShader);
-    enableFeature(Otc::GameCreatureShader);
-    enableFeature(Otc::GameCreatureAttachedEffect);
-
     m_clientVersion = version;
 
     g_lua.callGlobalField("g_game", "onClientVersionChange", version);
