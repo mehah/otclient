@@ -2801,8 +2801,11 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
             creature->setMasterId(masterId);
             creature->setShader(shader);
             creature->clearAttachedEffects();
-            for (const auto effectId : attachedEffectList)
-                creature->attachEffect(g_attachedEffects.getById(effectId)->clone());
+            for (const auto effectId : attachedEffectList) {
+                const auto& effect = g_attachedEffects.getById(effectId);
+                if (effect)
+                    creature->attachEffect(effect->clone());
+            }
 
             if (emblem > 0)
                 creature->setEmblem(emblem);
