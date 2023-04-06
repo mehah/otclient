@@ -2783,7 +2783,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
         }
 
         std::vector<uint16_t> attachedEffectList;
-        if (g_game.getFeature(Otc::GameCreatureShader)) {
+        if (g_game.getFeature(Otc::GameCreatureAttachedEffect)) {
             uint8_t listSize = msg->getU8();
             for (int_fast8_t i = -1; ++i < listSize;)
                 attachedEffectList.push_back(msg->getU16());
