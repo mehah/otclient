@@ -131,7 +131,7 @@ void FileStream::write(const void* buffer, uint32_t count)
         if (PHYSFS_writeBytes(m_fileHandle, buffer, count) != count)
             throwError("write failed", true);
     } else {
-        m_data.reserve(m_pos + count);
+        m_data.resize(m_pos + count);
         memcpy(&m_data[m_pos], buffer, count);
         m_pos += count;
     }
