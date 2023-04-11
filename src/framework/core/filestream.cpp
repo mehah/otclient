@@ -131,7 +131,7 @@ void FileStream::write(const void* buffer, uint32_t count)
         if (PHYSFS_writeBytes(m_fileHandle, buffer, count) != count)
             throwError("write failed", true);
     } else {
-        m_data.resize(m_pos + count);
+        m_data.grow(m_pos + count);
         memcpy(&m_data[m_pos], buffer, count);
         m_pos += count;
     }
@@ -350,7 +350,7 @@ void FileStream::addU8(uint8_t v)
         if (PHYSFS_writeBytes(m_fileHandle, &v, 1) != 1)
             throwError("write failed", true);
     } else {
-        m_data.push_back(v);
+        m_data.add(v);
         m_pos++;
     }
 }
@@ -361,8 +361,8 @@ void FileStream::addU16(uint16_t v)
         if (PHYSFS_writeULE16(m_fileHandle, v) == 0)
             throwError("write failed", true);
     } else {
-        m_data.reserve(m_pos + 2);
-        stdext::writeULE16(back_inserter(m_data), v);
+        m_data.grow(m_pos + 2);
+        stdext::writeULE16(&m_data[m_pos], v);
         m_pos += 2;
     }
 }
@@ -373,8 +373,8 @@ void FileStream::addU32(uint32_t v)
         if (PHYSFS_writeULE32(m_fileHandle, v) == 0)
             throwError("write failed", true);
     } else {
-        m_data.reserve(m_pos + 4);
-        stdext::writeULE32(back_inserter(m_data), v);
+        m_data.grow(m_pos + 4);
+        stdext::writeULE32(&m_data[m_pos], v);
         m_pos += 4;
     }
 }
@@ -385,8 +385,8 @@ void FileStream::addU64(uint64_t v)
         if (PHYSFS_writeULE64(m_fileHandle, v) == 0)
             throwError("write failed", true);
     } else {
-        m_data.reserve(m_pos + 8);
-        stdext::writeULE64(back_inserter(m_data), v);
+        m_data.grow(m_pos + 8);
+        stdext::writeULE64(&m_data[m_pos], v);
         m_pos += 8;
     }
 }
@@ -397,7 +397,7 @@ void FileStream::add8(int8_t v)
         if (PHYSFS_writeBytes(m_fileHandle, &v, 1) != 1)
             throwError("write failed", true);
     } else {
-        m_data.push_back(v);
+        m_data.add(v);
         m_pos++;
     }
 }
@@ -408,8 +408,8 @@ void FileStream::add16(int16_t v)
         if (PHYSFS_writeSLE16(m_fileHandle, v) == 0)
             throwError("write failed", true);
     } else {
-        m_data.reserve(m_pos + 2);
-        stdext::writeSLE16(back_inserter(m_data), v);
+        m_data.grow(m_pos + 2);
+        stdext::writeSLE16(&m_data[m_pos], v);
         m_pos += 2;
     }
 }
@@ -420,8 +420,8 @@ void FileStream::add32(int32_t v)
         if (PHYSFS_writeSLE32(m_fileHandle, v) == 0)
             throwError("write failed", true);
     } else {
-        m_data.reserve(m_pos + 4);
-        stdext::writeSLE32(back_inserter(m_data), v);
+        m_data.grow(m_pos + 4);
+        stdext::writeSLE32(&m_data[m_pos], v);
         m_pos += 4;
     }
 }
@@ -432,8 +432,8 @@ void FileStream::add64(int64_t v)
         if (PHYSFS_writeSLE64(m_fileHandle, v) == 0)
             throwError("write failed", true);
     } else {
-        m_data.reserve(m_pos + 8);
-        stdext::writeSLE64(back_inserter(m_data), v);
+        m_data.grow(m_pos + 8);
+        stdext::writeSLE64(&m_data[m_pos], v);
         m_pos += 8;
     }
 }

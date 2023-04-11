@@ -24,6 +24,8 @@
 
 #include "declarations.h"
 
+#include <framework/util/databuffer.h>
+
 class SoundBuffer : public std::enable_shared_from_this<SoundBuffer>
 {
 public:
@@ -31,7 +33,7 @@ public:
     ~SoundBuffer();
 
     bool fillBuffer(const SoundFilePtr& soundFile);
-    bool fillBuffer(ALenum sampleFormat, const std::vector<char>& data, int size, int rate) const;
+    bool fillBuffer(ALenum sampleFormat, const DataBuffer<char>& data, int size, int rate) const;
 
     uint32_t getBufferId() const { return m_bufferId; }
 

@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <framework/util/databuffer.h>
 #include "declarations.h"
 
 class BinaryTree
@@ -56,7 +57,7 @@ private:
     void skipNodes();
 
     FileStreamPtr m_fin;
-    std::vector<uint8_t> m_buffer;
+    DataBuffer<uint8_t> m_buffer;
     uint32_t m_pos;
     uint32_t m_startPos;
 };
