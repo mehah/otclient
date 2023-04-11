@@ -545,8 +545,10 @@ void MapView::setAntiAliasingMode(const AntialiasingMode mode)
 {
     m_antiAliasingMode = mode;
 
-    g_drawPool.get(DrawPoolType::MAP)->getFrameBuffer()
-        ->setSmooth(mode != ANTIALIASING_DISABLED);
+    g_mainDispatcher.addEvent([=, this]() {
+        g_drawPool.get(DrawPoolType::MAP)->getFrameBuffer()
+            ->setSmooth(mode != ANTIALIASING_DISABLED);
+    });
 
     updateGeometry(m_visibleDimension);
 }
