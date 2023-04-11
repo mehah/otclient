@@ -24,7 +24,6 @@
 
 #include <framework/core/resourcemanager.h>
 #include <framework/luaengine/luaobject.h>
-#include <framework/util/databuffer.h>
 #include <framework/util/point.h>
 #include "declarations.h"
 
@@ -75,7 +74,7 @@ public:
     void addPos(uint16_t x, uint16_t y, uint8_t z) { addU16(x); addU16(y); addU8(z); }
     void addPoint(const Point& p) { addU8(p.x); addU8(p.y); }
 
-    DataBuffer<uint8_t> m_data;
+    std::vector<uint8_t> m_data;
 
 private:
     void throwError(const std::string_view message, bool physfsError = false) const;

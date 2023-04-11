@@ -30,17 +30,27 @@ namespace stdext
     inline uint32_t readULE32(const uint8_t* addr) { return static_cast<uint32_t>(readULE16(addr + 2)) << 16 | readULE16(addr); }
     inline uint64_t readULE64(const uint8_t* addr) { return static_cast<uint64_t>(readULE32(addr + 4)) << 32 | readULE32(addr); }
 
-    inline void writeULE16(uint8_t* addr, uint16_t value) { addr[1] = value >> 8; addr[0] = static_cast<uint8_t>(value); }
-    inline void writeULE32(uint8_t* addr, uint32_t value) { writeULE16(addr + 2, value >> 16); writeULE16(addr, static_cast<uint16_t>(value)); }
-    inline void writeULE64(uint8_t* addr, uint64_t value) { writeULE32(addr + 4, value >> 32); writeULE32(addr, static_cast<uint32_t>(value)); }
+    template<class OutputIt>
+    inline void writeULE16(OutputIt addr, uint16_t value) { *addr++ = static_cast<uint8_t>(value); *addr++ = value >> 8; }
+
+    template<class OutputIt>
+    inline void writeULE32(OutputIt addr, uint32_t value) { writeULE16(addr, static_cast<uint16_t>(value)); writeULE16(addr, value >> 16); }
+
+    template<class OutputIt>
+    inline void writeULE64(OutputIt addr, uint64_t value) { writeULE32(addr, static_cast<uint32_t>(value)); writeULE32(addr, value >> 32); }
 
     inline int16_t readSLE16(const uint8_t* addr) { return static_cast<int16_t>(addr[1]) << 8 | addr[0]; }
     inline int32_t readSLE32(const uint8_t* addr) { return static_cast<int32_t>(readSLE16(addr + 2)) << 16 | readSLE16(addr); }
     inline int64_t readSLE64(const uint8_t* addr) { return static_cast<int64_t>(readSLE32(addr + 4)) << 32 | readSLE32(addr); }
 
-    inline void writeSLE16(uint8_t* addr, int16_t value) { addr[1] = value >> 8; addr[0] = static_cast<int8_t>(value); }
-    inline void writeSLE32(uint8_t* addr, int32_t value) { writeSLE16(addr + 2, value >> 16); writeSLE16(addr, static_cast<int16_t>(value)); }
-    inline void writeSLE64(uint8_t* addr, int64_t value) { writeSLE32(addr + 4, value >> 32); writeSLE32(addr, static_cast<int32_t>(value)); }
+    template<class OutputIt>
+    inline void writeSLE16(OutputIt addr, int16_t value) { *addr++ = static_cast<int8_t>(value); *addr++ = value >> 8;  }
+
+    template<class OutputIt>
+    inline void writeSLE32(OutputIt addr, int32_t value) { writeSLE16(addr, static_cast<int16_t>(value)); writeSLE16(addr, value >> 16); }
+
+    template<class OutputIt>
+    inline void writeSLE64(OutputIt addr, int64_t value) { writeSLE32(addr, static_cast<int32_t>(value)); writeSLE32(addr, value >> 32); }
 
     uint32_t adler32(const uint8_t* buffer, size_t size);
     int random_range(int min, int max);
