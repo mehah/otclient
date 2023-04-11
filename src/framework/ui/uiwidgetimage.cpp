@@ -71,6 +71,8 @@ void UIWidget::parseImageStyle(const OTMLNodePtr& styleNode)
             setImageBorder(node->value<int>());
         else if (node->tag() == "image-auto-resize")
             setImageAutoResize(node->value<bool>());
+        else if (node->tag() == "image-individual-animation")
+            setImageIndividualAnimation(node->value<bool>());
     }
 }
 
@@ -164,6 +166,9 @@ void UIWidget::drawImage(const Rect& screenCoords)
     //m_imageTexture->setSmooth(m_imageSmooth);
     const bool useRepeated = hasProp(PropImageBordered) || hasProp(PropImageRepeated);
     for (const auto& [dest, src] : m_imageCoordsCache) {
+        const auto& texture = m_imageTexture->isAnimatedTexture() && isImageIndividualAnimation() ?
+            std::static_pointer_cast<AnimatedTexture>(m_imageTexture)->get(m_currentFrame, m_imageAnimatorTimer) : m_imageTexture;
+
         if (useRepeated)
             g_drawPool.addTexturedRepeatedRect(dest, m_imageTexture, src, m_imageColor);
         else
