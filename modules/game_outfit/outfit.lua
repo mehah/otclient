@@ -31,7 +31,10 @@ localPlayerEvent = EventController:new(LocalPlayer, {
         local selectedAddons
         local availableAddons
 
-        outfit = creature:getOutfit()
+        if outfit == nil then
+            outfit = creature:getOutfit()
+        end
+        
         selectedAddons = outfit.addons
         availableAddons = selectedOutfit[3]
 
