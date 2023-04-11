@@ -54,8 +54,8 @@ void BinaryTree::unserialize()
         switch (byte) {
             case static_cast<uint8_t>(Node::START): skipNodes(); break;
             case static_cast<uint8_t>(Node::END): return;
-            case static_cast<uint8_t>(Node::ESCAPE_CHAR): m_buffer.add(m_fin->getU8()); break;
-            default: m_buffer.add(byte); break;
+            case static_cast<uint8_t>(Node::ESCAPE_CHAR): m_buffer.push_back(m_fin->getU8()); break;
+            default: m_buffer.push_back(byte); break;
         }
     }
 }
