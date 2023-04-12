@@ -179,7 +179,6 @@ find_package(LibLZMA REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(asio REQUIRED)
 find_package(Threads REQUIRED)
-find_package(STDUUID CONFIG REQUIRED)
 if(APPLE)
 	# Required for Physfs
 	find_library(FOUNDATION Foundation REQUIRED)
@@ -443,7 +442,6 @@ if(MSVC)
 		${GMP_LIBRARY}
 		${OPENSSL_LIBRARIES}
 		${DBGHELP_LIBRARY}
-		${STDUUID}
 
 		Threads::Threads
 		GLEW::GLEW
@@ -480,7 +478,6 @@ elseif(ANDROID)
 		${GMP_LIBRARY}
 		${OpenAL_LIBRARY}
 		${OPENSSL_LIBRARIES}
-		${STDUUID}
 		${MINIZIP_LIBRARY}
 
 		Threads::Threads
@@ -522,7 +519,6 @@ else()
 		${OGG_LIBRARY}
 		${GMP_LIBRARY}
 		${OPENSSL_LIBRARIES}
-		${STDUUID}
 		${FOUNDATION}
 		${IOKIT}
 
