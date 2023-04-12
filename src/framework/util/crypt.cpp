@@ -166,13 +166,10 @@ std::string Crypt::xorCrypt(const std::string& buffer, const std::string& key)
 
 std::string Crypt::genUUID()
 {
-    std::random_device rd;
-    auto seed_data = std::array<int, std::mt19937::state_size> {};
-    std::generate(std::begin(seed_data), std::end(seed_data), std::ref(rd));
-    std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
-    std::mt19937 generator(seq);
+    UUIDv4::UUIDGenerator<std::mt19937_64> uuidGenerator;
+    UUIDv4::UUID uuid = uuidGenerator.getUUID();
 
-    return to_string(uuids::uuid_random_generator{ generator }());
+    return uuid.str();
 }
 
 bool Crypt::setMachineUUID(std::string uuidstr)
@@ -185,32 +182,28 @@ bool Crypt::setMachineUUID(std::string uuidstr)
     if (uuidstr.length() != 36)
         return false;
 
-    m_machineUUID = uuids::uuid::from_string(uuidstr).value();
+    m_machineUUID = UUIDv4::UUID::fromStrFactory(uuidstr);
 
     return true;
 }
 
 std::string Crypt::getMachineUUID()
 {
-    if (m_machineUUID.is_nil()) {
-        std::random_device rd;
-        auto seed_data = std::array<int, std::mt19937::state_size> {};
-        std::generate(std::begin(seed_data), std::end(seed_data), std::ref(rd));
-        std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
-        std::mt19937 generator(seq);
-
-        m_machineUUID = uuids::uuid_random_generator{ generator }();
+    if (m_machineUUID.str().size() == 0) {
+        UUIDv4::UUIDGenerator<std::mt19937_64> uuidGenerator;
+        m_machineUUID = uuidGenerator.getUUID();
     }
-    return _encrypt(to_string(m_machineUUID), false);
+
+    return _encrypt(m_machineUUID.str(), false);
 }
 
 std::string Crypt::getCryptKey(bool useMachineUUID) const
 {
-    constexpr std::hash<uuids::uuid> uuid_hasher;
-    const uuids::uuid uuid = useMachineUUID ? m_machineUUID : uuids::uuid();
-    const uuids::uuid u = uuids::uuid_name_generator(uuid)
-        (g_app.getCompactName() + g_platform.getCPUName() + g_platform.getOSName() + g_resources.getUserDir());
-    const std::size_t hash = uuid_hasher(u);
+    constexpr std::hash<UUIDv4::UUID> uuid_hasher;
+    const UUIDv4::UUID uuid = useMachineUUID ? m_machineUUID : UUIDv4::UUID();
+    const std::size_t hash = uuid_hasher(
+        uuid.fromStrFactory(g_app.getCompactName() + g_platform.getCPUName() + g_platform.getOSName() + g_resources.getUserDir())
+    );
 
     std::string key;
     key.assign((const char*)&hash, sizeof(hash));

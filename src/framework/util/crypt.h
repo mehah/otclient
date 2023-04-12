@@ -22,8 +22,8 @@
 
 #pragma once
 
+#include "uuid_v4.h"
 #include <string>
-#include <stduuid/uuid.h>
 
 #ifdef USE_GMP
 #include <gmp.h>
@@ -57,7 +57,7 @@ private:
     std::string _decrypt(const std::string& encrypted_string, bool useMachineUUID);
     std::string getCryptKey(bool useMachineUUID) const;
 
-    uuids::uuid m_machineUUID;
+    UUIDv4::UUID m_machineUUID;
 
 #ifdef USE_GMP
     mpz_t m_p, m_q, m_n, m_e, m_d;

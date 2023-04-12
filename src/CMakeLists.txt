@@ -151,6 +151,7 @@ endif()
 
 # Client options
 add_definitions(-DCLIENT)
+add_definitions(-DNOMINMAX)
 # Set bot protection
 if(TOGGLE_BOT_PROTECTION)
 	add_definitions(-DBOT_PROTECTION)

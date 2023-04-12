@@ -13,7 +13,6 @@
     "zlib",
     "liblzma",
     "parallel-hashmap",
-    "stduuid",
     "discord-rpc",
     {
       "name": "luajit",
