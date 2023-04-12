@@ -68,7 +68,7 @@ else()
 endif(TOGGLE_PRE_COMPILED_HEADER)
 
 # AVX (Advanced Vector Extensions) support.
-add_compile_options(-mavx)
+add_compile_options(-mavx2)
 
 set(VERSION "1.0.0")
 
