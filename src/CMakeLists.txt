@@ -67,7 +67,7 @@ else()
 	message(STATUS "Use precompiled header: OFF")
 endif(TOGGLE_PRE_COMPILED_HEADER)
 
-AVX (Advanced Vector Extensions) support.
+# AVX (Advanced Vector Extensions) support.
 add_compile_options(-mavx)
 
 set(VERSION "1.0.0")
