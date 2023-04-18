@@ -31,7 +31,6 @@ AttachedEffectPtr AttachedEffect::clone()
     *(obj.get()) = *this;
 
     obj->m_frame = 0;
-    obj->m_timer.restart();
     obj->m_animationTimer.restart();
 
     return obj;
@@ -62,7 +61,7 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
         const auto& point = dest - (dirControl.offset * g_drawPool.getScaleFactor());
 
         if (m_texture) {
-            g_drawPool.addTexturedRect(Rect(point, m_size.isUnset() ? m_texture->getSize() : m_size), m_texture->get(m_frame, m_timer));
+            g_drawPool.addTexturedRect(Rect(point, m_size.isUnset() ? m_texture->getSize() : m_size), m_texture->get(m_frame, m_animationTimer));
         } else {
             m_thingType->draw(point, 0, m_direction, 0, 0, animation, Otc::DrawThingsAndLights, Color::white, lightView);
         }
