@@ -32,6 +32,7 @@ AttachedEffectPtr AttachedEffect::clone()
 
     obj->m_frame = 0;
     obj->m_timer.restart();
+    obj->m_animationTimer.restart();
 
     return obj;
 }
