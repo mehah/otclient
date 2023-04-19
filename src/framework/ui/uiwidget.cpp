@@ -1867,11 +1867,11 @@ bool UIWidget::propagateOnMouseMove(const Point& mousePos, const Point& mouseMov
 void UIWidget::move(int x, int y) {
     if (!hasProp(PropUpdatingMove)) {
         setProp(PropUpdatingMove, true);
-        g_dispatcher.scheduleEvent([this] {
-            const auto rect = m_rect;
-            m_rect = {}; // force update
-            setRect(rect);
-            setProp(PropUpdatingMove, false);
+        g_dispatcher.scheduleEvent([self = static_self_cast<UIWidget>()] {
+            const auto rect = self->m_rect;
+            self->m_rect = {}; // force update
+            self->setRect(rect);
+            self->setProp(PropUpdatingMove, false);
         }, 30);
     }
 
