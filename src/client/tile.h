@@ -72,17 +72,19 @@ enum TileThingType : uint32_t
     HAS_LIGHT = 1 << 9,
     HAS_TALL_THINGS = 1 << 10,
     HAS_WIDE_THINGS = 1 << 11,
-    HAS_WALL = 1 << 12,
-    HAS_HOOK_EAST = 1 << 13,
-    HAS_HOOK_SOUTH = 1 << 14,
-    HAS_CREATURE = 1 << 15,
-    HAS_COMMON_ITEM = 1 << 16,
-    HAS_TOP_ITEM = 1 << 17,
-    HAS_BOTTOM_ITEM = 1 << 18,
-    HAS_GROUND_BORDER = 1 << 19,
-    HAS_TOP_GROUND_BORDER = 1 << 20,
-    HAS_THING_WITH_ELEVATION = 1 << 21,
-    CORRECT_CORPSE = 1 << 22
+    HAS_TALL_THINGS_2 = 1 << 12,
+    HAS_WIDE_THINGS_2 = 1 << 13,
+    HAS_WALL = 1 << 14,
+    HAS_HOOK_EAST = 1 << 15,
+    HAS_HOOK_SOUTH = 1 << 16,
+    HAS_CREATURE = 1 << 17,
+    HAS_COMMON_ITEM = 1 << 18,
+    HAS_TOP_ITEM = 1 << 19,
+    HAS_BOTTOM_ITEM = 1 << 20,
+    HAS_GROUND_BORDER = 1 << 21,
+    HAS_TOP_GROUND_BORDER = 1 << 22,
+    HAS_THING_WITH_ELEVATION = 1 << 23,
+    CORRECT_CORPSE = 1 << 24
 };
 
 class Tile : public LuaObject
@@ -154,6 +156,8 @@ public:
     bool hasLight() const { return m_thingTypeFlag & TileThingType::HAS_LIGHT; }
     bool hasTallThings() const { return m_thingTypeFlag & TileThingType::HAS_TALL_THINGS; }
     bool hasWideThings() const { return m_thingTypeFlag & TileThingType::HAS_WIDE_THINGS; }
+    bool hasTallThings2() const { return m_thingTypeFlag & TileThingType::HAS_TALL_THINGS_2; }
+    bool hasWideThings2() const { return m_thingTypeFlag & TileThingType::HAS_WIDE_THINGS_2; }
     bool hasWall() const { return m_thingTypeFlag & TileThingType::HAS_WALL; }
 
     bool mustHookSouth() const { return m_thingTypeFlag & TileThingType::HAS_HOOK_SOUTH; }

@@ -717,11 +717,19 @@ void Tile::setThingFlag(const ThingPtr& thing)
     if (!thing->isSingleDimension() || thing->hasElevation() || thing->hasDisplacement())
         m_thingTypeFlag |= TileThingType::NOT_SINGLE_DIMENSION;
 
-    if (thing->getHeight() > 1)
+    if (thing->getHeight() > 1) {
         m_thingTypeFlag |= TileThingType::HAS_TALL_THINGS;
 
-    if (thing->getWidth() > 1)
+        if (thing->getHeight() > 2)
+            m_thingTypeFlag |= TileThingType::HAS_TALL_THINGS_2;
+    }
+
+    if (thing->getWidth() > 1) {
         m_thingTypeFlag |= TileThingType::HAS_WIDE_THINGS;
+
+        if (thing->getWidth() > 2)
+            m_thingTypeFlag |= TileThingType::HAS_WIDE_THINGS_2;
+    }
 
     if (!thing->isItem()) return;
 
@@ -776,9 +784,9 @@ bool Tile::canRender(uint32_t& flags, const Position& cameraPosition, const Awar
     {
         if ((cameraPosition.x - checkPos.x >= viewPort.left) || (checkPos.x - cameraPosition.x == viewPort.right && !hasWideThings() && !hasDisplacement() && !hasThingWithElevation() && m_walkingCreatures.empty()))
             draw = false;
-        else if ((cameraPosition.y - checkPos.y >= viewPort.top) || (checkPos.y - cameraPosition.y == viewPort.bottom && !hasTallThings() && !hasDisplacement() && !hasThingWithElevation() && m_walkingCreatures.empty()))
+        else if ((cameraPosition.y - checkPos.y >= viewPort.top) || (checkPos.y - cameraPosition.y == viewPort.bottom && !hasTallThings() && !hasWideThings2() && !hasDisplacement() && !hasThingWithElevation() && m_walkingCreatures.empty()))
             draw = false;
-        else if ((checkPos.x - cameraPosition.x > viewPort.right && (!hasWideThings() || !hasDisplacement() || !hasThingWithElevation())) || (checkPos.y - cameraPosition.y > viewPort.bottom))
+        else if (((checkPos.x - cameraPosition.x > viewPort.right && (!hasWideThings() || !hasDisplacement() || !hasThingWithElevation())) || (checkPos.y - cameraPosition.y > viewPort.bottom)) && !hasTallThings2())
             draw = false;
     }
 
