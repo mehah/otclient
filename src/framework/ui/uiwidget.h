@@ -188,6 +188,7 @@ public:
     UIWidgetList recursiveGetChildrenByPos(const Point& childPos);
     UIWidgetList recursiveGetChildrenByMarginPos(const Point& childPos);
     UIWidgetList recursiveGetChildrenByState(Fw::WidgetState state);
+    UIWidgetList recursiveGetChildrenByStyleName(const std::string_view styleName);
     UIWidgetPtr backwardsGetWidgetById(const std::string_view id);
 
     void setProp(FlagProp prop, bool v);

@@ -1385,6 +1385,16 @@ UIWidgetList UIWidget::recursiveGetChildrenByState(Fw::WidgetState state)
     return children;
 }
 
+UIWidgetList UIWidget::recursiveGetChildrenByStyleName(const std::string_view styleName)
+{
+    UIWidgetList children;
+    for (const auto& child : m_children) {
+        if (child->getStyleName() == styleName)
+            children.emplace_back(child);
+    }
+    return children;
+}
+
 UIWidgetPtr UIWidget::backwardsGetWidgetById(const std::string_view id)
 {
     UIWidgetPtr widget = getChildById(id);
