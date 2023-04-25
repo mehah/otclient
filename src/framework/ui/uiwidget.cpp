@@ -1370,6 +1370,15 @@ UIWidgetList UIWidget::recursiveGetChildrenByMarginPos(const Point& childPos)
     return children;
 }
 
+UIWidgetPtr UIWidget::getChildByStyleName(const std::string_view styleName) {
+    for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
+        const auto& child = (*it);
+        if (child->getStyleName() == styleName)
+            return child;
+    }
+    return nullptr;
+}
+
 UIWidgetList UIWidget::recursiveGetChildrenByState(Fw::WidgetState state)
 {
     UIWidgetList children;
@@ -1391,6 +1400,10 @@ UIWidgetList UIWidget::recursiveGetChildrenByStyleName(const std::string_view st
     for (const auto& child : m_children) {
         if (child->getStyleName() == styleName)
             children.emplace_back(child);
+
+        const auto& subChildren = child->recursiveGetChildrenByStyleName(styleName);
+        if (!subChildren.empty())
+            children.insert(children.end(), subChildren.begin(), subChildren.end());
     }
     return children;
 }
