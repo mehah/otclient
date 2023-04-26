@@ -32,6 +32,7 @@
 #include <framework/platform/platformwindow.h>
 
 #include "framework/graphics/drawpoolmanager.h"
+#include <client/shadermanager.h>
 
 UIWidget::UIWidget()
 {
@@ -91,6 +92,9 @@ void UIWidget::drawSelf(DrawPoolType drawPane)
     if (drawPane != DrawPoolType::FOREGROUND)
         return;
 
+    if (hasShader())
+        g_drawPool.setShaderProgram(m_shader);
+
     // draw style components in order
     if (m_backgroundColor.aF() > Fw::MIN_ALPHA) {
         Rect backgroundDestRect = m_rect;
@@ -102,6 +106,9 @@ void UIWidget::drawSelf(DrawPoolType drawPane)
     drawIcon(m_rect);
     drawText(m_rect);
     drawBorder(m_rect);
+
+    if (hasShader())
+        g_drawPool.resetShaderProgram();
 }
 
 void UIWidget::drawChildren(const Rect& visibleRect, DrawPoolType drawPane)
@@ -1900,6 +1907,17 @@ void UIWidget::move(int x, int y) {
     }
 
     m_rect = { x, y, getSize() };
+}
+
+void UIWidget::setShader(const std::string_view name) {
+    if (name.empty()) {
+        m_shader = nullptr;
+        return;
+    }
+
+    g_dispatcher.addEvent([this, shader = std::string(name.data())] {
+        m_shader = g_shaders.getShader(shader);
+    });
 }
 
 void UIWidget::repaint() { g_app.repaint(); }
