@@ -71,6 +71,8 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
     for (const auto& node : styleNode->children()) {
         if (node->tag() == "color")
             setColor(node->value<Color>());
+        else if (node->tag() == "shader")
+            setShader(node->value());
         else if (node->tag() == "x")
             setX(node->value<int>());
         else if (node->tag() == "y")

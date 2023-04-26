@@ -21,6 +21,7 @@ Panel
     text: OTCLient Redemption
     font: verdana-11px-rounded
     font-scale: 4
+    shader: Map - Party
 
   UILabel
     id: clientVersionLabel

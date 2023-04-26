@@ -192,11 +192,15 @@ public:
     UIWidgetList recursiveGetChildrenByStyleName(const std::string_view styleName);
     UIWidgetPtr backwardsGetWidgetById(const std::string_view id);
 
+    void setShader(const std::string_view name);
+    bool hasShader() { return m_shader != nullptr; }
+
     void setProp(FlagProp prop, bool v);
     bool hasProp(FlagProp prop) { return (m_flagsProp & prop); }
 private:
     void repaint();
     uint32_t m_flagsProp{ 0 };
+    PainterShaderProgramPtr m_shader;
 
     // state managment
 protected:
