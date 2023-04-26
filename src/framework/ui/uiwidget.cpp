@@ -268,7 +268,8 @@ void UIWidget::removeChild(const UIWidgetPtr& child)
         assert(child->getParent() == static_self_cast<UIWidget>());
         child->setParent(nullptr);
 
-        m_layout->removeWidget(child);
+        if (m_layout)
+            m_layout->removeWidget(child);
 
         // remove access to child via widget.childId
         if (child->hasProp(PropCustomId)) {
