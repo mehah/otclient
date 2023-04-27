@@ -179,6 +179,7 @@ find_package(nlohmann_json REQUIRED)
 find_package(asio REQUIRED)
 find_package(Threads REQUIRED)
 find_package(STDUUID CONFIG REQUIRED)
+find_package(pugixml CONFIG REQUIRED)
 if(APPLE)
 	# Required for Physfs
 	find_library(FOUNDATION Foundation REQUIRED)
@@ -363,10 +364,7 @@ set(SOURCE_FILES
 	framework/ui/uiwidgettext.cpp
 	framework/util/color.cpp
 	framework/util/crypt.cpp
-	framework/xml/tinystr.cpp
-	framework/xml/tinyxml.cpp
-	framework/xml/tinyxmlerror.cpp
-	framework/xml/tinyxmlparser.cpp
+
 	protobuf/appearances.pb.cc
 	main.cpp
 	androidmain.cpp
@@ -450,6 +448,7 @@ if(MSVC)
 		OpenAL::OpenAL
 		LibLZMA::LibLZMA
 		winmm.lib
+		pugixml::pugixml
 	)
 elseif(ANDROID)
 	target_include_directories(${PROJECT_NAME}
@@ -492,6 +491,7 @@ elseif(ANDROID)
 		GLESv3
 		android
 		log
+		pugixml::pugixml
 	)
 else()
 	target_include_directories(${PROJECT_NAME}
@@ -532,6 +532,7 @@ else()
 		Vorbis::vorbis
 		Vorbis::vorbisfile
 		LibLZMA::LibLZMA
+		pugixml::pugixml
 	)
 endif()
 

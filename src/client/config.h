@@ -22,9 +22,12 @@
 
 #pragma once
 
- // GENERAL
+// GENERAL
 #define SPRITE_SIZE 32
 #define ASYNC_DISPATCHER_MAX_THREAD 6
+
+// Editor
+#define FRAMEWORK_EDITOR 0
 
 // APPEARANCES
 #define BYTES_IN_SPRITE_SHEET 384 * 384 * 4
