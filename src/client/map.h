@@ -155,7 +155,7 @@ public:
 
     void addMapView(const MapViewPtr& mapView);
     void removeMapView(const MapViewPtr& mapView);
-    MapViewPtr getMapView(size_t i) { return i + 1 == m_mapViews.size() ? m_mapViews[i] : nullptr; }
+    MapViewPtr getMapView(size_t i) { return i < m_mapViews.size() ? m_mapViews[i] : nullptr; }
 
     void notificateTileUpdate(const Position& pos, const ThingPtr& thing, Otc::Operation operation);
     void notificateCameraMove(const Point& offset) const;
