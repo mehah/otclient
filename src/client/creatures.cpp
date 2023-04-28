@@ -99,20 +99,20 @@ void Spawn::save(pugi::xml_node node)
     node.append_child("radius").append_child(pugi::node_pcdata).set_value(std::to_string(getRadius()).c_str());
 
     for (const auto& [placePos, creature] : m_creatures) {
-        auto* const creatureNode = node.append_child(creature->getRace() == CreatureRaceNpc ? "npc" : "monster");
+        auto creatureNode = node.append_child(creature->getRace() == CreatureRaceNpc ? "npc" : "monster");
 
         if (!creatureNode)
             throw Exception("Spawn::save: Ran out of memory while allocating XML element!  Terminating now.");
 
-        creatureNode->append_attribute("name") = creature->getName().c_str();
-        creatureNode->append_attribute("spawntime") = creature->getSpawnTime();
-        creatureNode->append_attribute("direction") = static_cast<int>(creature->getDirection());
+        creatureNode.append_attribute("name") = creature->getName().c_str();
+        creatureNode.append_attribute("spawntime") = creature->getSpawnTime();
+        creatureNode.append_attribute("direction") = static_cast<int>(creature->getDirection());
 
         assert(placePos.isValid());
 
-        creatureNode->append_attribute("x") = placePos.x - c.x;
-        creatureNode->append_attribute("y") = placePos.y - c.y;
-        creatureNode->append_attribute("z") = placePos.z;
+        creatureNode.append_attribute("x") = placePos.x - c.x;
+        creatureNode.append_attribute("y") = placePos.y - c.y;
+        creatureNode.append_attribute("z") = placePos.z;
     }
 }
 
@@ -269,8 +269,9 @@ void CreatureManager::saveSpawns(const std::string& fileName)
             pair.second->save(elem);
         }
 
-        if (!doc.save_file(("data" + fileName).c_str(), "  ", 2, pugi::format_default))
-            throw Exception("failed to save spawns XML %s: %s", fileName, doc.error_description());
+        if (!doc.save_file(("data" + fileName).c_str(), "\t", pugi::format_default, pugi::encoding_utf8)) {
+            throw Exception("failed to save spawns XML %s", fileName);
+        }
         g_logger.debug("Spawns saved successfully.");
     } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
@@ -280,9 +281,9 @@ void CreatureManager::saveSpawns(const std::string& fileName)
 void CreatureManager::loadCreatureBuffer(const std::string& buffer)
 {
     pugi::xml_document doc;
-    doc.load_string(buffer.c_str());
-    if (doc.status() != pugi::status_ok)
-        throw Exception("cannot load creature buffer: %s", doc.status_description());
+    auto result = doc.load_string(buffer.c_str());
+    if (result.status != pugi::status_ok)
+        throw Exception("cannot load creature buffer: %s", result.description());
 
     pugi::xml_node root = doc.first_child();
 

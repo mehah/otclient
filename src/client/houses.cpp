@@ -27,6 +27,8 @@
 
 #include <framework/core/resourcemanager.h>
 
+#include <pugixml.hpp>
+
 HouseManager g_houses;
 
 House::House(uint32_t hId, const std::string_view name, const Position& pos)
@@ -171,8 +173,9 @@ void HouseManager::save(const std::string& fileName)
             house->save(elem);
         }
 
-        if (!doc.save_file("data" + fileName.c_str()))
-            throw Exception("failed to save houses XML %s: %s", fileName, doc.error_description());
+        if (!doc.save_file(("data" + fileName).c_str(), "\t", pugi::format_default, pugi::encoding_utf8)) {
+            throw Exception("failed to save houses XML %s", fileName);
+        }
     } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
     }
