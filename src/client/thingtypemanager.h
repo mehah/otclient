@@ -27,7 +27,6 @@
 
 #ifdef FRAMEWORK_EDITOR
 #include "itemtype.h"
-#include "framework/xml/tinyxml.h"
 #endif
 
 class ThingTypeManager
@@ -41,7 +40,7 @@ public:
     bool loadAppearances(const std::string& file);
 
 #ifdef FRAMEWORK_EDITOR
-    void parseItemType(uint16_t id, TiXmlElement* elem);
+    void parseItemType(uint16_t id, pugi::xml_node node);
     void loadOtb(const std::string& file);
     void loadXml(const std::string& file);
     void saveDat(const std::string& fileName);

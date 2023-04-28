@@ -15,6 +15,7 @@
     "parallel-hashmap",
     "stduuid",
     "discord-rpc",
+    "pugixml",
     {
       "name": "luajit",
       "platform": "!android"

@@ -46,6 +46,8 @@
 #include <tuple>
 #include <typeinfo>
 #include <vector>
+
 #include <parallel_hashmap/phmap.h>
+#include <pugixml.hpp>
 
 using namespace std::literals;

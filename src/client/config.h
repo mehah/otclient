@@ -22,7 +22,7 @@
 
 #pragma once
 
- // GENERAL
+// GENERAL
 #define SPRITE_SIZE 32
 #define ASYNC_DISPATCHER_MAX_THREAD 6
 
