@@ -74,6 +74,7 @@ namespace Proto
         GameServerAttchedEffect = 52,
         GameServerDetachEffect = 53,
         GameServerCreatureShader = 54,
+        GameServerMapShader = 55,
         GameServerFloorDescription = 75,
 
         // original tibia ONLY

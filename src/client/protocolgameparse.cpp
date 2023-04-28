@@ -534,6 +534,10 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                     parseCreatureShader(msg);
                     break;
 
+                case Proto::GameServerMapShader:
+                    parseMapShader(msg);
+                    break;
+
                 default:
                     throw Exception("unhandled opcode %d", opcode);
                     break;
@@ -3759,4 +3763,12 @@ void ProtocolGame::parseCreatureShader(const InputMessagePtr& msg) {
     }
 
     creature->setShader(shaderName);
+}
+
+void ProtocolGame::parseMapShader(const InputMessagePtr& msg) {
+    const auto& shaderName = msg->getString();
+
+    const auto& mapView = g_map.getMapView(0);
+    if (mapView)
+        mapView->setShader(shaderName, 0.f, 0.f);
 }
