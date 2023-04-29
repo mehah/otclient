@@ -1,7 +1,8 @@
 Controller = {
+    name = nil,
     events = nil,
+    ui = nil,
     externalEvents = nil,
-    widgets = nil,
     keyboardEvents = nil,
     attributes = nil,
     opcodes = nil
@@ -9,9 +10,9 @@ Controller = {
 
 function Controller:new()
     local obj = {
+        name = g_modules.getCurrentModule():getName(),
         events = {},
         externalEvents = {},
-        widgets = {},
         keyboardEvents = {},
         attributes = {},
         opcodes = {}
@@ -22,33 +23,73 @@ function Controller:new()
 end
 
 function Controller:init()
+    if self.dataUI ~= nil and not self.dataUI.onGameStart then
+        self.ui = g_ui.loadUI('/' .. self.name .. '/' .. self.dataUI.name, g_ui.getRootWidget())
+    end
+
     if self.onInit then
         self:onInit()
     end
 
-    local gameEvent = self.events.game
-    if gameEvent then
-        connect(g_game, gameEvent)
-        if gameEvent.onGameStart and g_game.isOnline() then
-            gameEvent.onGameStart()
+    if self.onGameStart then
+        self.__onGameStart = self.onGameStart
+
+        self.onGameStart = function()
+            if self.dataUI ~= nil and self.dataUI.onGameStart then
+                self.ui = g_ui.loadUI('/' .. self.name .. '/' .. self.dataUI.name, g_ui.getRootWidget())
+            end
+
+            if self.__onGameStart ~= nil then
+                self:__onGameStart()
+            end
+
+            for actor, events in pairs(self.events) do
+                connect(actor, events)
+            end
         end
+
+        if g_game.isOnline() then
+            self:onGameStart()
+        end
+
+        self.__onGameStartEvet = function()
+            self:onGameStart()
+        end
+        connect(g_game, {
+            onGameStart = self.__onGameStartEvet
+        })
+    end
+
+    if self.onGameStart then
+        self.__onGameEndEvet = function()
+            self:onGameEnd()
+        end
+        connect(g_game, {
+            onGameEnd = self.__onGameEndEvet
+        })
     end
 
     self:connectExternalEvents()
 end
 
+function Controller:setUI(name, onGameStart)
+    self.dataUI = { name = name, onGameStart = onGameStart or false }
+end
+
 function Controller:terminate()
     if self.onTerminate then
-        self:onTerminate()
+        self:onTerminate(self)
     end
 
-    local gameEvent = self.events.game
-    if gameEvent then
-        disconnect(g_game, gameEvent)
-        if gameEvent.onGameEnd and g_game.isOnline() then
-            gameEvent.onGameEnd()
+    if self.onGameStart then
+        disconnect(g_game, { onGameStart = self.__onGameStartEvet })
+    end
+
+    if self.onGameEnd then
+        if g_game.isOnline() then
+            self:onGameEnd()
         end
-        self.events.game = nil
+        disconnect(g_game, { onGameEnd = self.__onGameEndEvet })
     end
 
     for actor, events in pairs(self.events) do
@@ -65,30 +106,29 @@ function Controller:terminate()
 
     self:disconnectExternalEvents()
 
+    for actor, events in pairs(self.events) do
+        disconnect(actor, events)
+    end
+
+    if self.ui ~= nil then
+        self.ui:destroy()
+    end
+
     self.events = nil
-    self.widgets = nil
+    self.dataUI = nil
+    self.ui = nil
     self.keyboardEvents = nil
     self.attributes = nil
     self.opcodes = nil
     self.externalEvents = nil
+    self.__onGameStartEvet = nil
+    self.__onGameEndEvet = nil
 end
 
-function Controller:gameEvent(name, callback)
-    local gameEvent = self.events.game
-    if not gameEvent then
-        gameEvent = {}
-        self.events.game = gameEvent
-    end
-
-    gameEvent[name] = callback
-end
-
-function Controller:onGameStart(callback)
-    self:gameEvent('onGameStart', callback)
-end
-
-function Controller:onGameEnd(callback)
-    self:gameEvent('onGameEnd', callback)
+function Controller:addEvent(actor, events)
+    local evt = EventController:new(actor, events)
+    table.insert(self.externalEvents, evt)
+    return evt
 end
 
 function Controller:attachExternalEvent(event)
@@ -109,14 +149,6 @@ end
 
 function Controller:registerEvents(actor, events)
     self.events[actor] = events
-end
-
-function Controller:registerWidget(name, widget)
-    self.widgets[name] = widget
-end
-
-function Controller:getWidget(name)
-    return self.widgets[name]
 end
 
 function Controller:connectEvents(actor, events)
