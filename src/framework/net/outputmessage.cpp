@@ -30,7 +30,7 @@ void OutputMessage::reset()
     m_messageSize = 0;
 }
 
-void OutputMessage::setBuffer(const std::string_view buffer)
+void OutputMessage::setBuffer(const std::string& buffer)
 {
     const int len = buffer.size();
     reset();

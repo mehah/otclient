@@ -35,7 +35,7 @@ void ProtocolGame::send(const OutputMessagePtr& outputMessage)
     Protocol::send(outputMessage);
 }
 
-void ProtocolGame::sendExtendedOpcode(uint8_t opcode, const std::string_view buffer)
+void ProtocolGame::sendExtendedOpcode(uint8_t opcode, const std::string& buffer)
 {
     if (m_enableSendExtendedOpcode) {
         const auto& msg = std::make_shared<OutputMessage>();
