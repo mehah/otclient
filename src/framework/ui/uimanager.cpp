@@ -428,6 +428,35 @@ std::string UIManager::getStyleClass(const std::string_view styleName)
     return "";
 }
 
+UIWidgetPtr UIManager::loadUIFromString(const std::string& data, const UIWidgetPtr& parent)
+{
+    try {
+        std::stringstream sstream;
+        sstream.clear(std::ios::goodbit);
+        sstream.write(&data[0], data.length());
+        sstream.seekg(0, std::ios::beg);
+        OTMLDocumentPtr doc = OTMLDocument::parse(sstream, "(string)");
+        UIWidgetPtr widget;
+        for (const OTMLNodePtr& node : doc->children()) {
+            std::string tag = node->tag();
+
+            // import styles in these files too
+            if (tag.find("<") != std::string::npos)
+                importStyleFromOTML(node);
+            else {
+                if (widget)
+                    throw stdext::exception::exception("cannot have multiple main widgets in otui files");
+                widget = createWidgetFromOTML(node, parent);
+            }
+        }
+
+        return widget;
+    } catch (stdext::exception& e) {
+        g_logger.error(stdext::format("failed to load UI from string: %s", e.what()));
+        return nullptr;
+    }
+}
+
 OTMLNodePtr UIManager::findMainWidgetNode(const OTMLDocumentPtr& doc)
 {
     OTMLNodePtr mainNode = nullptr;

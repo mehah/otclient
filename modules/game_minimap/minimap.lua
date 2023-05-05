@@ -25,7 +25,7 @@ local function updateCameraPosition()
 end
 
 local function toggle()
-    local minimapWindow = controller.widgets.minimapWindow
+    minimapWindow = controller.widgets.minimapWindow
 
     if controller.widgets.minimapButton:isOn() then
         minimapWindow:close()
@@ -76,7 +76,7 @@ function controller:onInit()
 
     minimapWindow:setContentMinimumHeight(80)
 
-    local minimapWidget = minimapWindow:recursiveGetChildById('minimap')
+    minimapWidget = minimapWindow:recursiveGetChildById('minimap')
 
     local gameRootPanel = modules.game_interface.getRootPanel()
     self:bindKeyPress('Alt+Left', function()

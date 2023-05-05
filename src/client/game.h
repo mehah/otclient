@@ -360,6 +360,10 @@ public:
     {
         return m_lastSupportedVersion;
     }
+
+    void enableTileThingLuaCallback(bool value) { m_tileThingsLuaCallback = value; }
+    bool isTileThingLuaCallbackEnabled() { return m_tileThingsLuaCallback; }
+
     // market related
     void leaveMarket();
     void browseMarket(uint8_t browseId, uint16_t browseType);
@@ -404,6 +408,8 @@ private:
     uint32_t m_pingSent{ 0 };
     uint32_t m_pingReceived{ 0 };
     uint32_t m_seq{ 0 };
+
+    bool m_tileThingsLuaCallback = false;
 
     stdext::timer m_pingTimer;
     Timer m_dashTimer;

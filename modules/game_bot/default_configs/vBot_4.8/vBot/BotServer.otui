@@ -1,0 +1,202 @@
+BotServerData < Panel
+  size: 340 70
+  image-source: /images/ui/window
+  image-border: 6
+  padding: 3
+
+  Label
+    id: label
+    anchors.top: parent.top
+    anchors.left: parent.left 
+    anchors.right: parent.right
+    text-align: center
+    !text: tr("BotServer Data")
+
+  Label
+    id: label
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-top: 23
+    text-align: center
+    text: Channel Name:
+    margin-left: 6
+
+  TextEdit
+    id: Channel
+    anchors.top: parent.top
+    anchors.left: prev.right
+    margin-top: 20
+    width: 150
+    margin-left: 5
+    text-align: center
+
+  Button
+    id: Random
+    anchors.left: prev.right
+    anchors.top: prev.top
+    anchors.right: parent.right
+    text-align: center
+    text: Randomize
+    margin-left: 6
+    margin-right: 6
+
+  Label
+    id: label
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    margin-left: 6
+    margin-bottom: 4
+    text-align: center
+    text: Status: 
+
+  Label
+    id: ServerStatus
+    anchors.left: prev.right
+    anchors.bottom: parent.bottom
+    margin-left: 10
+    width: 150
+    margin-bottom: 4
+    text-align: left  
+
+  Label
+    id: Participants
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    width: 20
+    margin-right: 8
+    margin-bottom: 4
+    text-align: center
+
+  UIWidget
+    id: Members
+    anchors.right: Participants.left
+    anchors.bottom: parent.bottom
+    size: 80 21
+    text-align: center
+    text: Members:   
+
+FeaturePanel < Panel
+  size: 340 150
+  image-source: /images/ui/panel_flat
+  image-border: 5
+  padding: 3
+
+  Label
+    id: title
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    text-align: center
+    text: Features
+  
+  HorizontalSeparator
+    id: sep
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 2
+
+  BotSwitch
+    id: Feature1
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    margin-left: 3
+    margin-top: 5
+    text: Mana info
+
+  BotSwitch
+    id: Feature2
+    anchors.top: sep.bottom
+    anchors.left: prev.right
+    margin-top: 5
+    margin-left: 5
+    text: MWall info
+
+  BotSwitch
+    id: Feature3
+    anchors.top: sep.bottom
+    anchors.left: prev.right
+    margin-top: 5
+    margin-left: 5
+    text: Send Vocation
+
+  BotSwitch
+    id: Feature4
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    margin-top: 3
+    margin-left: 3
+    text: Outfit Vocation
+
+  BotSwitch
+    id: Feature5
+    anchors.bottom: prev.bottom
+    anchors.left: prev.right
+    margin-top: 3
+    margin-left: 5
+    text: Broadcasts
+
+
+  TextEdit
+    id: broadcastText
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-left: 3
+    margin-bottom: 3
+    margin-right: 80
+
+  Button
+    id: Broadcast
+    anchors.top: prev.top
+    anchors.left: prev.right
+    anchors.right: parent.right
+    margin-right: 3
+    margin-left: 3
+    height: 22
+    text: Broadcast
+
+BotServerWindow < MainWindow
+  !text: tr('BotServer')
+  size: 370 310
+  @onEscape: self:hide()
+
+  BotServerData
+    id: Data
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+
+  FeaturePanel
+    id: Features
+    anchors.top: prev.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 10
+
+  HorizontalSeparator
+    id: separator
+    anchors.right: parent.right
+    anchors.left: parent.left
+    anchors.bottom: closeButton.top
+    margin-bottom: 8    
+
+  Button
+    id: closeButton
+    !text: tr('Close')
+    font: cipsoftFont
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    size: 45 21
+    margin-top: 15
+    margin-right: 5
+
+  BotSwitch
+    id: enabled
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: parent.left
+    margin-left: 5
+    height: 21
+    
+    $!on:
+      text: BotServer: OFF
+
+    $on:
+      text: BotServer: ON

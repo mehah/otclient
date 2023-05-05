@@ -6,6 +6,7 @@ Module
   sandboxed: true
   scripts: [ widgets/uigamemap, widgets/uiitem, gameinterface ]
   load-later:
+    - game_buttons
     - game_prey
     - game_imbuing
     - game_hotkeys
@@ -36,5 +37,7 @@ Module
     - game_unjustifiedpoints
     - game_shaders
     - game_attachedeffects
+    - game_bot
+    - client_profiles
   @onLoad: init()
   @onUnload: terminate()

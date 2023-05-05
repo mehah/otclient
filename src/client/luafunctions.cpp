@@ -46,6 +46,7 @@
 #include "towns.h"
 #include "uicreature.h"
 #include "uiitem.h"
+#include "uigraph.h"
 #include "uimap.h"
 #include "uimapanchorlayout.h"
 #include "uiminimap.h"
@@ -349,6 +350,9 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "isForcingNewWalkingFormula", &Game::isForcingNewWalkingFormula, &g_game);
     g_lua.bindSingletonFunction("g_game", "isUsingProtobuf", &Game::isUsingProtobuf, &g_game);
 
+    g_lua.bindSingletonFunction("g_game", "enableTileThingLuaCallback", &Game::enableTileThingLuaCallback, &g_game);
+    g_lua.bindSingletonFunction("g_game", "isTileThingLuaCallbackEnabled", &Game::isTileThingLuaCallbackEnabled, &g_game);
+
     g_lua.registerSingletonClass("g_shaders");
     g_lua.bindSingletonFunction("g_shaders", "createShader", &ShaderManager::createShader, &g_shaders);
     g_lua.bindSingletonFunction("g_shaders", "createFragmentShader", &ShaderManager::createFragmentShader, &g_shaders);
@@ -538,6 +542,14 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ItemType>("getClientId", &ItemType::getClientId);
     g_lua.bindClassMemberFunction<ItemType>("isWritable", &ItemType::isWritable);
 #endif
+
+    // Clock
+    g_lua.registerSingletonClass("g_clock");
+    g_lua.bindSingletonFunction("g_clock", "micros", &Clock::micros, &g_clock);
+    g_lua.bindSingletonFunction("g_clock", "millis", &Clock::millis, &g_clock);
+    g_lua.bindSingletonFunction("g_clock", "seconds", &Clock::seconds, &g_clock);
+    g_lua.bindSingletonFunction("g_clock", "realMillis", &Clock::realMillis, &g_clock);
+    g_lua.bindSingletonFunction("g_clock", "realMicros", &Clock::realMicros, &g_clock);
 
     g_lua.registerClass<ThingType>();
     g_lua.bindClassStaticFunction<ThingType>("create", [] { return std::make_shared<ThingType>(); });
@@ -805,6 +817,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIItem>("setItemVisible", &UIItem::setItemVisible);
     g_lua.bindClassMemberFunction<UIItem>("setItem", &UIItem::setItem);
     g_lua.bindClassMemberFunction<UIItem>("setVirtual", &UIItem::setVirtual);
+    g_lua.bindClassMemberFunction<UIItem>("setShowCount", &UIItem::setShowCount);
     g_lua.bindClassMemberFunction<UIItem>("clearItem", &UIItem::clearItem);
     g_lua.bindClassMemberFunction<UIItem>("getItemId", &UIItem::getItemId);
     g_lua.bindClassMemberFunction<UIItem>("getItemCount", &UIItem::getItemCount);
@@ -909,6 +922,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassStaticFunction<UIProgressRect>("create", [] { return std::make_shared<UIProgressRect>(); });
     g_lua.bindClassMemberFunction<UIProgressRect>("setPercent", &UIProgressRect::setPercent);
     g_lua.bindClassMemberFunction<UIProgressRect>("getPercent", &UIProgressRect::getPercent);
+    g_lua.registerClass<UIGraph, UIWidget>();
 
     g_lua.registerClass<UIMapAnchorLayout, UIAnchorLayout>();
 }

@@ -1,0 +1,539 @@
+SlotBotItem < BotItem
+  border-width: 0
+  $on:
+    image-source: /images/ui/item
+  $checked:
+    border-width: 1
+    border-color: #FF0000
+
+BossLabel < UIWidget
+  background-color: alpha
+  text-offset: 3 1
+  focusable: true
+  height: 16
+  font: verdana-11px-rounded
+  text-align: left
+
+  $focus:
+    background-color: #00000055
+
+  Button
+    id: remove
+    !text: tr('X')
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    width: 14
+    height: 14
+    margin-right: 15
+    text-align: center
+    text-offset: 0 1
+    tooltip: Remove profile from the list.
+
+ConditionBoxPopupMenu < ComboBoxPopupMenu
+ConditionBoxPopupMenuButton < ComboBoxPopupMenuButton
+ConditionBox < ComboBox
+  @onSetup: |
+    self:addOption("-")
+    self:addOption("and")
+    self:addOption("or")
+
+PreButton < PreviousButton
+  background: #363636
+  height: 15
+
+NexButton < NextButton
+  background: #363636
+  height: 15
+
+CondidionLabel < FlatPanel
+  padding: 1
+  height: 15
+
+  Label
+    id: text
+    anchors.fill: parent
+    text-align: center
+    font: verdana-11px-rounded
+    background: #363636
+
+Rule < UIWidget
+  background-color: alpha
+  text-offset: 18 2
+  focusable: true
+  height: 16
+  text-align: left
+  font: verdana-11px-rounded  
+
+  CheckBox
+    id: enabled
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    width: 15
+    height: 15
+    margin-top: 2
+    margin-left: 3
+    tooltip: Entry enabled/disabled
+
+  $focus:
+    background-color: #00000055
+
+  Button
+    id: remove
+    text: X
+    anchors.right: parent.right
+    margin-right: 15
+    width: 14
+    height: 14
+    text-align: center
+    tooltip: Remove entry
+    anchors.verticalCenter: parent.verticalCenter
+
+  Button
+    id: visible
+    text: V
+    anchors.right: prev.left
+    margin-right: 3
+    width: 14
+    height: 14
+    text-align: center
+    tooltip: Items must be visible
+    anchors.verticalCenter: parent.verticalCenter
+
+
+ConditionPanel < Panel
+  height: 58
+
+  NexButton
+    id: nex
+    anchors.top: parent.top
+    margin-top: 5
+    anchors.right: parent.right
+
+  PreButton
+    id: pre
+    anchors.top: parent.top
+    margin-top: 5
+    anchors.left: parent.left
+
+  CondidionLabel
+    id: description
+    anchors.top: parent.top
+    margin-top: 5
+    anchors.left: prev.right
+    anchors.right: nex.left
+    margin-left: 3
+    margin-right: 3
+
+  SpinBox
+    id: spinbox
+    anchors.top: description.bottom
+    margin-top: 10
+    anchors.horizontalCenter: parent.horizontalCenter
+    width: 100
+    text-align: center
+    minimum: 0
+    maximum: 100
+    step: 1
+    focusable: true
+
+  BotTextEdit
+    id: text
+    anchors.top: description.bottom
+    margin-top: 10
+    anchors.horizontalCenter: parent.horizontalCenter
+    width: 200
+    text-align: center
+
+
+
+ListPanel < FlatPanel
+  size: 270 300
+  padding-left: 10
+  padding-right: 10
+  padding-bottom: 10
+
+  Label
+    id: title
+    anchors.verticalCenter: parent.top
+    anchors.left: parent.left
+    text: Rules List
+    font: verdana-11px-rounded
+    color: #FABD02
+
+  Label
+    id: mainLabel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    margin-top: 10
+    margin-left: 2
+    !text: tr('More important methods come first.')
+    text-align: left
+    font: verdana-11px-rounded
+    color: #aeaeae  
+
+  TextList
+    id: list
+    anchors.fill: parent
+    margin-top: 25
+    margin-bottom: 18
+    vertical-scrollbar: listScrollBar
+    padding: 2
+
+  VerticalScrollBar
+    id: listScrollBar
+    anchors.top: list.top
+    anchors.bottom: list.bottom
+    anchors.right: list.right
+    step: 14
+    pixels-scroll: true
+
+  Button
+    id: up
+    anchors.right: parent.right
+    anchors.top: list.bottom
+    size: 60 17
+    text: Move Up
+    text-align: center
+    font: cipsoftFont
+    margin-top: 5
+    tooltip: Increase priority of selected rule.
+
+  Button
+    id: down
+    anchors.right: prev.left
+    anchors.verticalCenter: prev.verticalCenter
+    size: 60 17
+    margin-right: 5
+    text: Move Down
+    text-align: center
+    font: cipsoftFont
+    tooltip: Decrease priority of selected rule.
+
+InputPanel < FlatPanel
+  size: 270 300
+  padding-left: 10
+  padding-right: 10
+  padding-bottom: 10
+
+  Label
+    id: title
+    anchors.verticalCenter: parent.top
+    anchors.left: parent.left
+    text: Condition Panel
+    font: verdana-11px-rounded
+    color: #FF0000
+
+  Label
+    id: mainLabel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 10
+    text: Equip selected items when:
+    text-align: center
+    font: verdana-11px-rounded
+    color: #aeaeae
+
+  HorizontalSeparator
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 4
+    
+  ConditionPanel
+    id: condition
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: mainLabel.bottom
+    margin-top: 15
+
+  HorizontalSeparator
+    anchors.verticalCenter: next.verticalCenter
+    anchors.left: parent.left
+    anchors.right: parent.right
+
+  ConditionBox
+    id: useSecondCondition
+    anchors.top: condition.bottom
+    margin-top: 10
+    anchors.horizontalCenter: parent.horizontalCenter
+    width: 50
+
+  ConditionPanel
+    id: optionalCondition
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 10
+
+  HorizontalSeparator
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+
+  BotButton
+    id: add
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.bottom: parent.bottom
+    margin-bottom: 10
+    text: Add Rule
+
+EQPanel < FlatPanel
+  size: 160 230
+  padding-left: 10
+  padding-right: 10
+  padding-bottom: 10
+
+  Label
+    id: title
+    anchors.verticalCenter: parent.top
+    anchors.left: parent.left
+    text: Equipment Setup
+    font: verdana-11px-rounded
+    color: #03C04A
+
+  SlotBotItem
+    id: head
+    image-source: /images/game/slots/head
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: prev.bottom
+    margin-top: 15
+    $on:
+      image-source: /images/ui/item
+
+  SlotBotItem
+    id: body
+    image-source: /images/game/slots/body
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: prev.bottom
+    margin-top: 5
+    $on:
+      image-source: /images/ui/item
+
+  SlotBotItem
+    id: legs
+    image-source: /images/game/slots/legs
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: prev.bottom
+    margin-top: 5
+    $on:
+      image-source: /images/ui/item
+
+  SlotBotItem
+    id: feet
+    image-source: /images/game/slots/feet
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: prev.bottom
+    margin-top: 5
+    $on:
+      image-source: /images/ui/item
+
+  SlotBotItem
+    id: neck
+    image-source: /images/game/slots/neck
+    anchors.top: head.top
+    margin-top: 13
+    anchors.right: head.left
+    margin-right: 5
+    $on:
+      image-source: /images/ui/item
+
+  SlotBotItem
+    id: left-hand
+    image-source: /images/game/slots/left-hand
+    anchors.horizontalCenter: prev.horizontalCenter
+    anchors.top: prev.bottom
+    margin-top: 5
+    $on:
+      image-source: /images/ui/item
+
+  SlotBotItem
+    id: finger
+    image-source: /images/game/slots/finger
+    anchors.horizontalCenter: prev.horizontalCenter
+    anchors.top: prev.bottom
+    margin-top: 5
+    $on:
+      image-source: /images/ui/item
+
+  Item
+    id: back
+    image-source: /images/game/slots/back-blessed
+    anchors.top: head.top
+    margin-top: 13
+    anchors.left: head.right
+    margin-left: 5
+    tooltip: Main back container modifications are unavailable.
+
+  SlotBotItem
+    id: right-hand
+    image-source: /images/game/slots/right-hand
+    anchors.horizontalCenter: prev.horizontalCenter
+    anchors.top: prev.bottom
+    margin-top: 5
+    $on:
+      image-source: /images/ui/item
+
+  SlotBotItem
+    id: ammo
+    image-source: /images/game/slots/ammo
+    anchors.horizontalCenter: prev.horizontalCenter
+    anchors.top: prev.bottom
+    margin-top: 5
+
+  BotButton
+    id: cloneEq
+    anchors.top: feet.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 15
+    text: Clone Current EQ
+    font: verdana-11px-rounded
+    tooltip: Copy currently equipped and non-equipped items.
+
+  BotButton
+    id: default
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 3
+    text: Reset fields
+    font: verdana-11px-rounded
+    tooltip: Reset all fields to the blank state
+
+Profile < FlatPanel
+  size: 160 35
+
+  Label
+    id: title
+    anchors.verticalCenter: parent.top
+    anchors.left: parent.left
+    margin-left: 10
+    text: Profile Name
+    font: verdana-11px-rounded
+
+  BotTextEdit
+    id: profileName
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin: 5
+
+BossList < FlatPanel
+  padding-left: 10
+  padding-right: 10
+  padding-bottom: 10
+
+  Label
+    id: title
+    anchors.verticalCenter: parent.top
+    anchors.left: parent.left
+    text: Boss List
+    font: verdana-11px-rounded
+    color: #FABD02
+
+  TextList
+    id: list
+    anchors.fill: parent
+    margin-top: 10
+    margin-bottom: 20
+    vertical-scrollbar: listScrollBar
+    padding: 2
+
+  VerticalScrollBar
+    id: listScrollBar
+    anchors.top: list.top
+    anchors.bottom: list.bottom
+    anchors.right: list.right
+    step: 14
+    pixels-scroll: true
+
+  BotTextEdit
+    id: name
+    anchors.left: list.left
+    anchors.top: list.bottom
+    margin-top: 4
+    anchors.right: next.left
+
+  Button
+    id: add
+    anchors.right: list.right
+    anchors.top: list.bottom
+    margin-top: 3
+    height: 21
+    text: Add Boss
+    text-align: center
+    font: verdana-11px-rounded
+    tooltip: Creature with given name will be considered as boss.
+
+EquipWindow < MainWindow
+  size: 750 350
+  text: Equipment Manager
+  @onEscape: self:hide()
+
+  ListPanel
+    id: listPanel
+    anchors.left: parent.left
+    anchors.top: parent.top
+    anchors.bottom: bottomSep.top
+    margin-bottom: 5
+    margin-left: -2
+    visible: false
+
+  BossList
+    id: bossPanel
+    anchors.fill: prev
+    visible: true
+
+  VerticalSeparator
+    anchors.top: parent.top
+    anchors.bottom: bottomSep.top
+    margin-bottom: 5
+    anchors.left: prev.right
+    margin-left: 10
+  
+  Profile
+    id: profileName
+    anchors.top: parent.top
+    anchors.left: prev.right
+    margin-left: 10
+
+  EQPanel
+    id: setup
+    anchors.left: prev.left
+    anchors.top: prev.bottom
+    anchors.bottom: bottomSep.top
+    margin-bottom: 5
+    margin-top: 10
+
+  InputPanel
+    id: inputPanel
+    anchors.left: prev.right
+    anchors.top: parent.top
+    anchors.bottom: bottomSep.top
+    margin-bottom: 5
+    margin-left: 5
+
+  HorizontalSeparator
+    id: bottomSep
+    anchors.right: parent.right
+    anchors.left: parent.left
+    anchors.bottom: closeButton.top
+    margin-bottom: 8    
+
+  Button
+    id: closeButton
+    !text: tr('Close')
+    font: cipsoftFont
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    size: 45 21  
+
+  Button
+    id: bossList
+    !text: tr('Boss list')
+    font: cipsoftFont
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    size: 65 21

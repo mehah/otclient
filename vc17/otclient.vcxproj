@@ -238,6 +238,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClCompile Include="..\src\client\tile.cpp" />
     <ClCompile Include="..\src\client\towns.cpp" />
     <ClCompile Include="..\src\client\uicreature.cpp" />
+    <ClCompile Include="..\src\client\uigraph.cpp" />
     <ClCompile Include="..\src\client\uiitem.cpp" />
     <ClCompile Include="..\src\client\uimap.cpp" />
     <ClCompile Include="..\src\client\uimapanchorlayout.cpp" />
@@ -268,6 +269,8 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClCompile Include="..\src\framework\graphics\cachedtext.cpp" />
     <ClCompile Include="..\src\framework\graphics\coordsbuffer.cpp" />
     <ClCompile Include="..\src\framework\graphics\drawpoolmanager.cpp" />
+	<ClInclude Include="..\src\framework\graphics\drawcache.cpp" />
+    <ClInclude Include="..\src\framework\graphics\drawqueue.cpp" />
     <ClCompile Include="..\src\framework\graphics\fontmanager.cpp" />
     <ClCompile Include="..\src\framework\graphics\framebuffer.cpp" />
     <ClCompile Include="..\src\framework\graphics\framebuffermanager.cpp" />
@@ -385,6 +388,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\client\tile.h" />
     <ClInclude Include="..\src\client\towns.h" />
     <ClInclude Include="..\src\client\uicreature.h" />
+    <ClInclude Include="..\src\client\uigraph.h"/>
     <ClInclude Include="..\src\client\uiitem.h" />
     <ClInclude Include="..\src\client\uimap.h" />
     <ClInclude Include="..\src\client\uimapanchorlayout.h" />
@@ -421,6 +425,8 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\framework\graphics\coordsbuffer.h" />
     <ClInclude Include="..\src\framework\graphics\declarations.h" />
     <ClInclude Include="..\src\framework\graphics\drawpoolmanager.h" />
+	<ClInclude Include="..\src\framework\graphics\drawcache.h" />
+    <ClInclude Include="..\src\framework\graphics\drawqueue.h" />
     <ClInclude Include="..\src\framework\graphics\fontmanager.h" />
     <ClInclude Include="..\src\framework\graphics\framebuffer.h" />
     <ClInclude Include="..\src\framework\graphics\framebuffermanager.h" />

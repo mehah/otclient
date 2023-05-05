@@ -1,0 +1,254 @@
+MainWindow
+  id: editWindow
+  !text: tr("Config editor & manager")
+  @onEscape: self:hide()
+  size: 550 570
+  $mobile:
+    size: 550 240
+
+  Panel
+    id: manager
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 152
+    
+    Label
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      text-auto-resize: true
+      text-align: center
+      text-wrap: true
+      !text: tr("Config Manager\nYou can use config manager to share configs between different machines, especially smartphones. After you configure your config, you can upload it, then you'll get unique hash code which you can use on diffent machinge (for eg. mobile phone) to download it.")
+      
+    HorizontalSeparator
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 3
+      height: 2
+      
+    Panel
+      id: upload
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.horizontalCenter
+      anchors.bottom: parent.bottom
+      margin-top: 3
+
+      Label
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        text-auto-resize: true
+        text-align: center
+        text-wrap: true
+        !text: tr("Upload config")
+
+      Label
+        anchors.top: prev.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        margin-top: 7
+        text-auto-resize: true
+        text-align: center
+        text-wrap: true
+        !text: tr("Select config to upload")
+
+      ComboBox
+        id: config
+        anchors.top: prev.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        margin-top: 4
+        margin-left: 20
+        margin-right: 20
+        text-offset: 3 0
+        
+      Button
+        id: submit
+        anchors.top: prev.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        !text: tr('Upload config')
+        margin-top: 4
+        margin-left: 40
+        margin-right: 40
+        @onClick: modules.game_bot.uploadConfig()
+        
+    Panel
+      id: download
+      anchors.top: prev.top
+      anchors.left: parent.horizontalCenter
+      anchors.right: parent.right      
+      anchors.bottom: parent.bottom
+
+      Label
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        text-auto-resize: true
+        text-align: center
+        text-wrap: true
+        !text: tr("Download config")
+
+      Label
+        anchors.top: prev.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        margin-top: 7
+        text-auto-resize: true
+        text-align: center
+        text-wrap: true
+        !text: tr("Enter config hash code")
+
+      TextEdit
+        id: config
+        anchors.top: prev.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        margin-top: 4
+        margin-left: 20
+        margin-right: 20
+        
+      Button
+        id: submit
+        anchors.top: prev.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        !text: tr('Download config')
+        margin-top: 4
+        margin-left: 40
+        margin-right: 40
+        @onClick: modules.game_bot.downloadConfig()        
+        
+  HorizontalSeparator
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 3
+    height: 2
+  
+  Panel
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right    
+    margin-top: 5
+    height: 330
+    $mobile:
+      visible: false
+
+    Label
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      text-auto-resize: true
+      text-align: center
+      text-wrap: true
+      !text: tr("Bot configs are stored in:")
+
+    TextEdit
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.top: prev.bottom
+      height: 20
+      width: 400
+      margin-top: 5
+      editable: false
+      !text: g_resources.getWriteDir() .. "bot"
+      text-align: center
+
+    Button
+      id: documentationButton
+      !text: tr('Click here to open bot directory')
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.top: prev.bottom
+      margin-top: 5
+      width: 250
+      @onClick: g_platform.openDir(g_resources.getWriteDir() .. "bot")
+
+    Label
+      margin-top: 5
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      text-auto-resize: true
+      text-align: center
+      text-wrap: true
+      !text: tr("Every directory in bot directory is treated as different config.\nTo create new config just create new directory.")
+
+    Label
+      margin-top: 5
+      anchors.top: prev.bottom
+      anchors.horizontalCenter: parent.horizontalCenter
+      height: 175
+      image-source: configs.png
+      image-fixed-ratio: true
+      image-size: 500 175
+
+    Label
+      margin-top: 3
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      text-auto-resize: true
+      text-align: center
+      text-wrap: true
+      !text: tr("Inside config directory put .lua and .otui files.\nEvery file will be loaded and executed in alphabetical order, .otui first and then .lua.")
+
+    Label
+      margin-top: 3
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      text-auto-resize: true
+      text-align: center
+      text-wrap: true
+      !text: tr("To reload configs just press On and Off in bot window.\nTo learn more about bot click Tutorials button.")
+
+  Button
+    !text: tr('Documentation')
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    width: 118
+    @onClick: g_platform.openUrl("http://otclient.ovh/bot.php?documentation")
+
+  Button
+    !text: tr('Tutorials')
+    anchors.bottom: parent.bottom
+    anchors.left: prev.right
+    margin-left: 5 
+    width: 80
+    @onClick: g_platform.openUrl("http://otclient.ovh/bot.php?tutorials")
+
+  Button
+    !text: tr('Scripts')
+    anchors.bottom: parent.bottom
+    anchors.left: prev.right
+    margin-left: 5 
+    width: 80
+    @onClick: g_platform.openUrl("http://otclient.ovh/bot.php?scripts")
+
+  Button
+    !text: tr('Forum')
+    anchors.bottom: parent.bottom
+    anchors.left: prev.right
+    margin-left: 5 
+    width: 80
+    @onClick: g_platform.openUrl("http://otclient.ovh/bot.php?forum")
+
+  Button
+    !text: tr('Discord')
+    anchors.bottom: parent.bottom
+    anchors.left: prev.right
+    margin-left: 5 
+    width: 80
+    @onClick: g_platform.openUrl("http://otclient.ovh/bot.php?discord")
+  
+  Button
+    id: cancelButton
+    !text: tr('Close')
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    width: 60
+    @onClick: self:getParent():hide()

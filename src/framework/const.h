@@ -291,4 +291,9 @@ namespace Fw
         HiddenState = 1 << 12,
         LastWidgetState = 1 << 13
     };
+     enum DrawPane {
+        ForegroundPane = 1,
+        MapBackgroundPane = 2,
+        MapForegroundPane = 3,
+    };
 }

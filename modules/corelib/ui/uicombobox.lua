@@ -19,6 +19,10 @@ function UIComboBox:clearOptions()
     self:clearText()
 end
 
+function UIComboBox:clear()
+    return self:clearOptions()
+end
+
 function UIComboBox:isOption(text)
     if not self.options then
         return false

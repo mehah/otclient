@@ -1,0 +1,85 @@
+PushMaxWindow < MainWindow
+  !text: tr('Pushmax Settings')
+  size: 200 240
+  @onEscape: self:hide()
+
+  BotLabel
+    id: delayText
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    text-align: center
+
+  HorizontalScrollBar
+    id: delay
+    anchors.left: delayText.left
+    anchors.right: delayText.right
+    anchors.top: delayText.bottom
+    margin-top: 5
+    minimum: 800
+    maximum: 2000
+    step: 10
+
+  Label
+    id: label2
+    anchors.top: delay.bottom
+    anchors.left: parent.horizontalCenter
+    anchors.right: parent.right
+    text-align: center
+    text: Custom WallID
+    margin-top: 5
+
+  Label
+    id: label3
+    anchors.top: delay.bottom
+    anchors.right: parent.horizontalCenter
+    anchors.left: parent.left
+    text-align: center
+    text: VS AntiPush
+    margin-top: 5        
+
+  BotItem
+    id: runeId
+    anchors.horizontalCenter: label3.horizontalCenter
+    anchors.top: label3.bottom
+    margin-top: 5
+
+  BotItem
+    id: mwallId
+    anchors.horizontalCenter: label2.horizontalCenter
+    anchors.top: label2.bottom
+    margin-top: 5
+
+  Label
+    id: label1
+    anchors.top: mwallId.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 10
+    text-align: center
+    text: Hotkey for PUSHMAX
+
+  TextEdit
+    id: hotkey
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: label1.bottom
+    margin-top: 5
+    text-align: center
+
+  HorizontalSeparator
+    id: separator
+    anchors.right: parent.right
+    anchors.left: parent.left
+    anchors.bottom: closeButton.top
+    margin-bottom: 8    
+
+  Button
+    id: closeButton
+    !text: tr('Close')
+    font: cipsoftFont
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    size: 45 21
+    margin-top: 15
+    margin-right: 5    
