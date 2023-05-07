@@ -165,6 +165,13 @@ void Application::close()
         exit();
 }
 
+void Application::restart()
+{
+    g_lua.callGlobalField<bool>("g_app", "onRestart");
+    g_platform.spawnProcess(g_resources.getBinaryPath(), {});
+    exit();
+}
+
 std::string Application::getOs()
 {
 #if defined(WIN32)

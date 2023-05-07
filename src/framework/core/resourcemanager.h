@@ -91,6 +91,8 @@ public:
     void updateExecutable(std::string fileName);
     bool launchCorrect(std::vector<std::string>& args);
 
+    std::string getBinaryPath() { return m_binaryPath.string(); }
+
 protected:
     std::vector<std::string> discoverPath(const std::filesystem::path& path, bool filenameOnly, bool recursive);
 

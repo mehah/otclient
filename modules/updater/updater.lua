@@ -42,8 +42,18 @@ local function initAppWindow()
   g_window.setTitle(g_app.getName())
   g_window.setIcon('/images/clienticon')
 
+
+  g_window.setTitle(g_app.getName())
+  g_window.setIcon('/images/clienticon')
+
   -- poll resize events
   g_window.poll()
+
+  -- generate machine uuid, this is a security measure for storing passwords
+  if not g_crypt.setMachineUUID(g_settings.get('uuid')) then
+      g_settings.set('uuid', g_crypt.getMachineUUID())
+      g_settings.save()
+  end
 end
 
 local function loadModules()
@@ -190,9 +200,7 @@ local function updateFiles(data, keepCurrentFiles)
       end
 
       if restart then
-        g_logger.info("restart")
-        --g_app.exit()
-        -- TODO Restart
+        g_app.restart()
       else
         if reloadModules then
           g_modules.reloadModules()
