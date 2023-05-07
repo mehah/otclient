@@ -1,0 +1,12 @@
+Module
+  name: updater
+  description: Updates client
+  author: otclient@otclient.ovh
+  website: otclient.ovh
+  reloadable: false
+  scripts: [ updater ]
+  dependencies: [ client_locales, client_styles ]
+  @onUnload: Updater.terminate()
+  
+  load-later:
+    - client_background

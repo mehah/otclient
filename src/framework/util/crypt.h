@@ -52,6 +52,8 @@ public:
     bool rsaDecrypt(uint8_t* msg, int size);
     int rsaGetSize();
 
+    std::string crc32(const std::string& decoded_string, bool upperCase);
+
 private:
     std::string _encrypt(const std::string& decrypted_string, bool useMachineUUID);
     std::string _decrypt(const std::string& encrypted_string, bool useMachineUUID);

@@ -29,6 +29,7 @@
 #include <framework/luaengine/luainterface.h>
 #include <framework/platform/platform.h>
 #include <framework/net/protocolhttp.h>
+#include <framework/util/crypt.h>
 
 #include <physfs.h>
 
@@ -38,6 +39,17 @@ void ResourceManager::init(const char* argv0)
 {
     PHYSFS_init(argv0);
     PHYSFS_permitSymbolicLinks(1);
+
+    #if defined(WIN32)
+        char fileName[255];
+        GetModuleFileNameA(NULL, fileName, sizeof(fileName));
+        m_binaryPath = std::filesystem::absolute(fileName).string();
+    #elif defined(ANDROID)
+        // nothing
+    #else
+        m_binaryPath = std::filesystem::absolute(argv0);    
+    #endif
+
 }
 
 void ResourceManager::terminate()
@@ -513,4 +525,69 @@ void ResourceManager::save_string_into_file(const std::string& contents, const s
     datFile.open(name, std::ofstream::binary | std::ofstream::trunc | std::ofstream::out);
     datFile.write(contents.c_str(), contents.size());
     datFile.close();
+}
+
+std::string ResourceManager::fileChecksum(const std::string& path) {
+    static stdext::map<std::string, std::string> cache;
+
+    auto it = cache.find(path);
+    if (it != cache.end())
+        return it->second;
+
+    PHYSFS_File* file = PHYSFS_openRead(path.c_str());
+    if(!file)
+        return "";
+
+    int fileSize = PHYSFS_fileLength(file);
+    std::string buffer(fileSize, 0);
+    PHYSFS_readBytes(file, (void*)&buffer[0], fileSize);
+    PHYSFS_close(file);
+
+    auto checksum = g_crypt.crc32(buffer, false);
+    cache[path] = checksum;
+
+    return checksum;
+}
+
+stdext::map<std::string, std::string> ResourceManager::filesChecksums()
+{
+    stdext::map<std::string, std::string> ret;
+    auto files = listDirectoryFiles("/", true, false, true);
+    g_logger.info(stdext::format("Checking work dir %s total: %d", m_workDir, files.size()));
+    for (auto it = files.rbegin(); it != files.rend(); ++it) {
+        const auto& filePath = *it;
+        PHYSFS_File* file = PHYSFS_openRead(filePath.c_str());
+        if(!file)
+            continue;
+
+        int fileSize = PHYSFS_fileLength(file);
+        std::string buffer(fileSize, 0);
+        PHYSFS_readBytes(file, (void*)&buffer[0], fileSize);
+        PHYSFS_close(file);
+
+        auto checksum = g_crypt.crc32(buffer, false);
+        ret[filePath] = checksum;
+    }
+
+    return ret;
+}
+
+std::string ResourceManager::selfChecksum() {
+#ifdef ANDROID
+    return "";
+#else
+    static std::string checksum;
+    if (!checksum.empty())
+        return checksum;
+
+    std::ifstream file(m_binaryPath, std::ios::binary);
+    if (!file.is_open())
+        return "";
+
+    std::string buffer(std::istreambuf_iterator<char>(file), {});
+    file.close();
+
+    checksum = g_crypt.crc32(buffer, false);
+    return checksum;
+#endif
 }

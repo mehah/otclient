@@ -83,12 +83,18 @@ public:
     void runEncryption(const std::string& password);
     void save_string_into_file(const std::string& contents, const std::string& name);
 
+    std::string fileChecksum(const std::string& path);
+
+    stdext::map<std::string, std::string> filesChecksums();
+    std::string selfChecksum();
+
 protected:
     std::vector<std::string> discoverPath(const std::filesystem::path& path, bool filenameOnly, bool recursive);
 
 private:
     std::string m_workDir;
     std::string m_writeDir;
+    std::string m_binaryPath;
     std::deque<std::string> m_searchPaths;
 };
 

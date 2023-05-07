@@ -33,6 +33,7 @@
 #include <openssl/err.h>
 #include <openssl/rsa.h>
 #endif
+#include <zlib.h>
 
 static constexpr std::string_view base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static inline bool is_base64(uint8_t c) { return (isalnum(c) || (c == '+') || (c == '/')); }
@@ -362,4 +363,16 @@ int Crypt::rsaGetSize()
 #else
     return RSA_size(m_rsa);
 #endif
+}
+
+std::string Crypt::crc32(const std::string& decoded_string, bool upperCase)
+{
+    uint32_t crc = ::crc32(0, Z_NULL, 0);
+    crc = ::crc32(crc, (const Bytef*)decoded_string.c_str(), decoded_string.size());
+    std::string result = stdext::dec_to_hex(crc);
+    if (upperCase)
+        std::transform(result.begin(), result.end(), result.begin(), toupper);
+    else
+        std::transform(result.begin(), result.end(), result.begin(), tolower);
+    return result;
 }
