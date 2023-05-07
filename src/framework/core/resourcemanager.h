@@ -87,7 +87,7 @@ public:
     std::string fileChecksum(const std::string& path);
     stdext::map<std::string, std::string> filesChecksums();
     std::string selfChecksum();
-    void updateFiles(const std::set<std::string>& files, bool reMount);
+    void updateFiles(const std::set<std::string>& files);
     void updateExecutable(std::string fileName);
 
 protected:

@@ -595,7 +595,7 @@ std::string ResourceManager::selfChecksum() {
 #endif
 }
 
-void ResourceManager::updateFiles(const std::set<std::string>& files, bool reMount) {
+void ResourceManager::updateFiles(const std::set<std::string>& files) {
     g_logger.info(stdext::format("Updating client, %i files", files.size()));
 
     setWriteDir(getWorkDir());
