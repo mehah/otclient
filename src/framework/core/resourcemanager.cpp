@@ -598,6 +598,7 @@ std::string ResourceManager::selfChecksum() {
 void ResourceManager::updateFiles(const std::set<std::string>& files) {
     g_logger.info(stdext::format("Updating client, %i files", files.size()));
 
+    const auto& oldWriteDir = getWriteDir();
     setWriteDir(getWorkDir());
     for (auto fileName : files) {
         if (fileName.empty())
@@ -618,7 +619,7 @@ void ResourceManager::updateFiles(const std::set<std::string>& files) {
             g_logger.error(stdext::format("Cannot find file: %s in downloads", fileName));
         }
     }
-    setWriteDir(getWriteDir());
+    setWriteDir(oldWriteDir);
 }
 
 void ResourceManager::updateExecutable(std::string fileName)
@@ -637,6 +638,8 @@ void ResourceManager::updateExecutable(std::string fileName)
     if (!dFile)
         g_logger.fatal(stdext::format("Cannot find executable: %s in downloads", fileName));
 
+    const auto& oldWriteDir = getWriteDir();
+    setWriteDir(getWorkDir());
     std::filesystem::path path(m_binaryPath);
     auto newBinary = path.stem().string() + "-" + std::to_string(time(nullptr)) + path.extension().string();
     g_logger.info(stdext::format("Updating binary file: %s", newBinary));
@@ -645,6 +648,7 @@ void ResourceManager::updateExecutable(std::string fileName)
         return g_logger.fatal(stdext::format("can't open %s for writing: %s", newBinary, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
     PHYSFS_writeBytes(file, dFile->response.data(), dFile->response.size());
     PHYSFS_close(file);
+    setWriteDir(oldWriteDir);
 
     std::filesystem::path newBinaryPath(std::filesystem::u8path(PHYSFS_getWriteDir()));
 #endif
