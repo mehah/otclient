@@ -70,6 +70,8 @@ protected:
     std::string m_appCompactName{ "app" };
     std::string m_startupOptions;
 
+    std::vector<std::string> m_startupArgs;
+
     bool m_running{ false };
     bool m_terminated{ false };
     bool m_stopping{ false };

@@ -54,6 +54,7 @@ g_modules.discoverModules()
 g_modules.autoLoadModules(99)
 g_modules.ensureModuleLoaded('corelib')
 g_modules.ensureModuleLoaded('gamelib')
+g_modules.ensureModuleLoaded("startup")
 
 local function loadModules()
 

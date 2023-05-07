@@ -81,6 +81,7 @@ void Application::init(std::vector<std::string>& args, uint8_t asyncDispatchMaxT
         g_logger.info(stdext::format("Startup options: %s", startupOptions));
 
     m_startupOptions = startupOptions;
+    m_startupArgs = args;
 
     // initialize configs
     g_configs.init();
@@ -168,7 +169,7 @@ void Application::close()
 void Application::restart()
 {
     g_lua.callGlobalField<bool>("g_app", "onRestart");
-    g_platform.spawnProcess(g_resources.getBinaryPath(), {});
+    g_platform.spawnProcess(g_resources.getBinaryPath(), m_startupArgs);
     exit();
 }
 
