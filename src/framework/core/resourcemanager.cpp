@@ -312,8 +312,12 @@ std::list<std::string> ResourceManager::listDirectoryFiles(const std::string& di
 
     for (int i = 0; rc[i] != nullptr; i++) {
         std::string fileOrDir = rc[i];
-        if (fullPath)
-            fileOrDir = path + "/" + fileOrDir;
+        if (fullPath) {
+            if (path != "/")
+                fileOrDir = path + "/" + fileOrDir;
+            else
+                fileOrDir = path + fileOrDir;
+        }
 
         if (recursive && directoryExists("/" + fileOrDir)) {
             const auto& moreFiles = listDirectoryFiles(fileOrDir, fullPath, raw, recursive);
@@ -553,7 +557,6 @@ stdext::map<std::string, std::string> ResourceManager::filesChecksums()
 {
     stdext::map<std::string, std::string> ret;
     auto files = listDirectoryFiles("/", true, false, true);
-    g_logger.info(stdext::format("Checking work dir %s total: %d", m_workDir, files.size()));
     for (auto it = files.rbegin(); it != files.rend(); ++it) {
         const auto& filePath = *it;
         PHYSFS_File* file = PHYSFS_openRead(filePath.c_str());
