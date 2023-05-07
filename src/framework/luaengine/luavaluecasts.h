@@ -28,6 +28,8 @@
 #include <framework/platform/platform.h>
 #include "declarations.h"
 
+#include <set>
+
 template<typename T>
 int push_internal_luavalue(T v);
 
@@ -395,11 +397,40 @@ bool luavalue_cast(int index, std::vector<T>& vec)
 }
 
 template<typename T>
-int push_luavalue(const std::deque<T>& vec)
+int push_luavalue(const std::set<T>& set)
 {
-    g_lua.createTable(vec.size(), 0);
+    g_lua.createTable(set.size(), 0);
     int i = 1;
-    for (const T& v : vec) {
+    for (const T& v : set) {
+        push_internal_luavalue(v);
+        g_lua.rawSeti(i);
+        ++i;
+    }
+    return 1;
+}
+
+template<typename T>
+bool luavalue_cast(int index, std::set<T>& set)
+{
+    if (g_lua.isTable(index)) {
+        g_lua.pushNil();
+        while (g_lua.next(index < 0 ? index - 1 : index)) {
+            T value;
+            if (luavalue_cast(-1, value))
+                set.emplace(value);
+            g_lua.pop();
+        }
+        return true;
+    }
+    return false;
+}
+
+template<typename T>
+int push_luavalue(const std::deque<T>& set)
+{
+    g_lua.createTable(set.size(), 0);
+    int i = 1;
+    for (const T& v : set) {
         push_internal_luavalue(v);
         g_lua.rawSeti(i);
         ++i;

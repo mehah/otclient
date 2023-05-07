@@ -23,6 +23,7 @@
 #pragma once
 
 #include <filesystem>
+#include <set>
 #include "declarations.h"
 
  // @bindsingleton g_resources
@@ -84,9 +85,10 @@ public:
     void save_string_into_file(const std::string& contents, const std::string& name);
 
     std::string fileChecksum(const std::string& path);
-
     stdext::map<std::string, std::string> filesChecksums();
     std::string selfChecksum();
+    void updateFiles(const std::set<std::string>& files, bool reMount);
+    void updateExecutable(std::string fileName);
 
 protected:
     std::vector<std::string> discoverPath(const std::filesystem::path& path, bool filenameOnly, bool recursive);

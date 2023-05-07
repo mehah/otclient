@@ -2,10 +2,6 @@ Updater = { }
 
 Updater.maxRetries = 5
 
---[[
-
-]]--
-
 local updaterWindow
 local loadModulesFunction
 local scheduledEvent
@@ -184,7 +180,7 @@ local function updateFiles(data, keepCurrentFiles)
     scheduledEvent = scheduleEvent(function()
       local restart = binary or (not loadModulesFunction and reloadModules) or forceRestart
       if newFiles then
-        g_resources.updateData(finalFiles, not restart)
+        g_resources.updateFiles(finalFiles, not restart)
       end
       if binary then
         g_resources.updateExecutable(binary)

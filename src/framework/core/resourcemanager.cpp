@@ -594,3 +594,58 @@ std::string ResourceManager::selfChecksum() {
     return checksum;
 #endif
 }
+
+void ResourceManager::updateFiles(const std::set<std::string>& files, bool reMount) {
+    g_logger.info(stdext::format("Updating client, %i files", files.size()));
+
+    for (auto fileName : files) {
+        if (fileName.empty())
+            continue;
+
+        HttpResult_ptr dFile = nullptr;
+        if (fileName.size() > 1 && fileName[0] == '/') {
+            dFile = g_http.getFile(fileName.substr(1));
+        } else {
+            dFile = g_http.getFile(fileName);
+        }
+
+        if (dFile) {
+            if (!writeFileBuffer(fileName, (const uint8_t*)dFile->response.data(), dFile->response.size())) {
+                g_logger.error(stdext::format("Cannot write file: %s", fileName));
+            } else {
+                g_logger.info(stdext::format("Updated file: %s", fileName));
+            }
+        } else {
+            g_logger.error(stdext::format("Cannot find file: %s in downloads", fileName));
+        }
+    }
+}
+
+void ResourceManager::updateExecutable(std::string fileName)
+{
+#if defined(ANDROID) || defined(FREE_VERSION)
+    g_logger.fatal("Executable cannot be updated on android or in free version");
+#else
+    if (fileName.size() <= 2) {
+        g_logger.fatal("Invalid executable name");
+    }
+
+    if (fileName[0] == '/')
+        fileName = fileName.substr(1);
+
+    auto dFile = g_http.getFile(fileName);
+    if (!dFile)
+        g_logger.fatal(stdext::format("Cannot find executable: %s in downloads", fileName));
+
+    std::filesystem::path path(m_binaryPath);
+    auto newBinary = path.stem().string() + "-" + std::to_string(time(nullptr)) + path.extension().string();
+    g_logger.info(stdext::format("Updating binary file: %s", newBinary));
+    PHYSFS_file* file = PHYSFS_openWrite(newBinary.c_str());
+    if (!file)
+        return g_logger.fatal(stdext::format("can't open %s for writing: %s", newBinary, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+    PHYSFS_writeBytes(file, dFile->response.data(), dFile->response.size());
+    PHYSFS_close(file);
+
+    std::filesystem::path newBinaryPath(std::filesystem::u8path(PHYSFS_getWriteDir()));
+#endif
+}
