@@ -598,27 +598,27 @@ std::string ResourceManager::selfChecksum() {
 void ResourceManager::updateFiles(const std::set<std::string>& files, bool reMount) {
     g_logger.info(stdext::format("Updating client, %i files", files.size()));
 
+    setWriteDir(getWorkDir());
     for (auto fileName : files) {
         if (fileName.empty())
             continue;
 
-        HttpResult_ptr dFile = nullptr;
-        if (fileName.size() > 1 && fileName[0] == '/') {
-            dFile = g_http.getFile(fileName.substr(1));
-        } else {
-            dFile = g_http.getFile(fileName);
-        }
+        if (fileName.size() > 1 && fileName[0] == '/')
+            fileName = fileName.substr(1);
+
+        auto dFile = g_http.getFile(fileName);
 
         if (dFile) {
             if (!writeFileBuffer(fileName, (const uint8_t*)dFile->response.data(), dFile->response.size())) {
                 g_logger.error(stdext::format("Cannot write file: %s", fileName));
             } else {
-                g_logger.info(stdext::format("Updated file: %s", fileName));
+                //g_logger.info(stdext::format("Updated file: %s", fileName));
             }
         } else {
             g_logger.error(stdext::format("Cannot find file: %s in downloads", fileName));
         }
     }
+    setWriteDir(getWriteDir());
 }
 
 void ResourceManager::updateExecutable(std::string fileName)

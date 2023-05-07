@@ -8,7 +8,7 @@ local scheduledEvent
 local httpOperationId = 0
 
 local function onLog(level, message, time)
-  if level == LogError then    
+  if level == LogError then
     Updater.error(message)
     g_logger.setOnLog(nil)
   end
@@ -59,7 +59,7 @@ local function downloadFiles(url, files, index, retries, doneCallback)
   end
   local file = entry[1]
   local file_checksum = entry[2]
-  
+
   if retries > 0 then
     updaterWindow.downloadStatus:setText(tr("Downloading (%i retry):\n%s", retries, file))
   else
@@ -67,7 +67,7 @@ local function downloadFiles(url, files, index, retries, doneCallback)
   end
   updaterWindow.downloadProgress:setPercent(0)
   updaterWindow.mainProgress:setPercent(math.floor(100 * index / #files))
-  
+
   httpOperationId = HTTP.download(url .. file, file,
     function (file, checksum, err)
       if not err and checksum ~= file_checksum then
@@ -93,64 +93,62 @@ end
 
 local function updateFiles(data, keepCurrentFiles)
   if not updaterWindow then return end
+
   if type(data) ~= "table" then
     return Updater.error("Invalid data from updater api (not table)")
   end
-  if type(data["error"]) == 'string' and data["error"]:len() > 0 then
-    return Updater.error(data["error"])    
+
+  if type(data.error) == 'string' and data.error:len() > 0 then
+    return Updater.error(data.error)
   end
-  if not data["files"] or type(data["url"]) ~= 'string' or data["url"]:len() < 4 then
+
+  if not data.files or type(data.url) ~= 'string' or data.url:len() < 4 then
     return Updater.error("Invalid data from updater api: " .. json.encode(data, 2))
   end
-  if data["keepFiles"] then
+
+  if data.keepFiles then
     keepCurrentFiles = true
   end
-  
+
   local newFiles = false
   local finalFiles = {}
   local localFiles = g_resources.filesChecksums()
-  print("------Local files------------")
-  for key, value in pairs(localFiles) do
-    g_logger.info(key .. " " .. value .. "\n")
-  end
-  print("------------------")
+
   local toUpdate = {}
+  local toUpdateFiles = {}
   -- keep all files or files from data/things
   for file, checksum in pairs(localFiles) do
     if keepCurrentFiles or string.find(file, "data/things") then
       table.insert(finalFiles, file)
     end
   end
+
   -- update files
-  print("------Updater------------")
-  for file, checksum in pairs(data["files"]) do
-    g_logger.info(file .. " " .. checksum .. "\n")
+  for file, checksum in pairs(data.files) do
     table.insert(finalFiles, file)
     if not localFiles[file] or localFiles[file] ~= checksum then
       table.insert(toUpdate, {file, checksum})
+      table.insert(toUpdateFiles, file)
       newFiles = true
     end
   end
 
   -- update binary
   local binary = nil
-  if type(data["binary"]) == "table" and data["binary"]["file"]:len() > 1 then
+  if type(data.binary) == "table" and data.binary.file:len() > 1 then
     local selfChecksum = g_resources.selfChecksum()
-    if selfChecksum:len() > 0 and selfChecksum ~= data["binary"]["checksum"] then
-      binary = data["binary"]["file"]
-      table.insert(toUpdate, {binary, data["binary"]["checksum"]})
+    if selfChecksum:len() > 0 and selfChecksum ~= data.binary.checksum then
+      binary = data.binary.file
+      table.insert(toUpdate, {binary, data.binary.checksum})
     end
   end
-  print("--------To update----------")
-  for _, value in ipairs(toUpdate) do
-    g_logger.info(value[1] .. " " .. value[2] .. "\n")
-  end
+
   if #toUpdate == 0 then -- nothing to update
     updaterWindow.mainProgress:setPercent(100)
     scheduledEvent = scheduleEvent(Updater.abort, 20)
     return
   end
-  
+
   -- update of some files require full client restart
   local forceRestart = false
   local reloadModules = false
@@ -165,35 +163,40 @@ local function updateFiles(data, keepCurrentFiles)
       end
     end
   end
-  
+
   updaterWindow.status:setText(tr("Updating %i files", #toUpdate))
   updaterWindow.mainProgress:setPercent(0)
   updaterWindow.downloadProgress:setPercent(0)
   updaterWindow.downloadProgress:show()
   updaterWindow.downloadStatus:show()
   updaterWindow.changeUrlButton:hide()
+
   downloadFiles(data["url"], toUpdate, 1, 0, function()
     updaterWindow.status:setText(tr("Updating client (may take few seconds)"))
     updaterWindow.mainProgress:setPercent(100)
     updaterWindow.downloadProgress:hide()
-    updaterWindow.downloadStatus:hide() 
+    updaterWindow.downloadStatus:hide()
     scheduledEvent = scheduleEvent(function()
       local restart = binary or (not loadModulesFunction and reloadModules) or forceRestart
       if newFiles then
-        g_resources.updateFiles(finalFiles, not restart)
+        g_resources.updateFiles(toUpdateFiles, not restart)
       end
+
       if binary then
         g_resources.updateExecutable(binary)
       end
+
       if restart then
-        g_app.restart()
+        g_logger.info("restart")
+        --g_app.exit()
+        -- TODO Restart
       else
         if reloadModules then
           g_modules.reloadModules()
         end
         Updater.abort()
       end
-    end, 100)  
+    end, 100)
   end)
 end
 
@@ -222,12 +225,12 @@ end
 
 function Updater.check(args)
   if updaterWindow then return end
-  
+
   updaterWindow = g_ui.displayUI('updater')
   updaterWindow:show()
   updaterWindow:focus()
-  updaterWindow:raise()  
-  
+  updaterWindow:raise()
+
   local updateData = nil
   local function progressUpdater(value)
     removeEvent(scheduledEvent)
