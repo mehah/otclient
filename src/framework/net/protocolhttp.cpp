@@ -143,7 +143,7 @@ int Http::download(const std::string& url, const std::string& path, int timeout)
                 return;
             }
 
-            auto checksum = g_crypt.crc32(result->response.data(), false);
+            auto checksum = g_crypt.crc32(result->response, false);
             g_dispatcher.addEvent([this, result, path, checksum] {
                 if (result->error.empty()) {
                     if (!path.empty() && path[0] == '/')
