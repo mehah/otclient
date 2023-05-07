@@ -41,9 +41,6 @@ local function initAppWindow()
 
   g_window.setTitle(g_app.getName())
   g_window.setIcon('/images/clienticon')
-
-  -- poll resize events
-  g_window.poll()
 end
 
 local function loadModules()
