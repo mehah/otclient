@@ -43,7 +43,7 @@ void ResourceManager::init(const char* argv0)
     #if defined(WIN32)
         char fileName[255];
         GetModuleFileNameA(NULL, fileName, sizeof(fileName));
-        m_binaryPath = std::filesystem::absolute(fileName).string();
+        m_binaryPath = std::filesystem::absolute(fileName);
     #elif defined(ANDROID)
         // nothing
     #else
@@ -583,7 +583,7 @@ std::string ResourceManager::selfChecksum() {
     if (!checksum.empty())
         return checksum;
 
-    std::ifstream file(m_binaryPath, std::ios::binary);
+    std::ifstream file(m_binaryPath.string(), std::ios::binary);
     if (!file.is_open())
         return "";
 
@@ -651,5 +651,63 @@ void ResourceManager::updateExecutable(std::string fileName)
     setWriteDir(oldWriteDir);
 
     std::filesystem::path newBinaryPath(std::filesystem::u8path(PHYSFS_getWriteDir()));
+#endif
+}
+
+bool ResourceManager::launchCorrect(std::vector<std::string>& args) { // curently works only on windows
+#if (defined(ANDROID) || defined(FREE_VERSION))
+    return false;
+#else
+    auto fileName2 = m_binaryPath.stem().string();
+    fileName2 = stdext::split(fileName2, "-")[0];
+    stdext::tolower(fileName2);
+
+    std::filesystem::path path(m_binaryPath.parent_path());
+    std::error_code ec;
+    auto lastWrite = std::filesystem::last_write_time(m_binaryPath, ec);
+    std::filesystem::path binary = m_binaryPath;
+    for (auto& entry : std::filesystem::directory_iterator(path)) {
+        if (std::filesystem::is_directory(entry.path()))
+            continue;
+
+        auto fileName1 = entry.path().stem().string();
+        fileName1 = stdext::split(fileName1, "-")[0];
+        stdext::tolower(fileName1);
+        if (fileName1 != fileName2)
+            continue;
+
+        if (entry.path().extension() == m_binaryPath.extension()) {
+            std::error_code ec;
+            auto writeTime = std::filesystem::last_write_time(entry.path(), ec);
+            if (!ec && writeTime > lastWrite) {
+                lastWrite = writeTime;
+                binary = entry.path();
+            }
+        }
+    }
+
+    for (auto& entry : std::filesystem::directory_iterator(path)) { // remove old
+        if (std::filesystem::is_directory(entry.path()))
+            continue;
+
+        auto fileName1 = entry.path().stem().string();
+        fileName1 = stdext::split(fileName1, "-")[0];
+        stdext::tolower(fileName1);
+        if (fileName1 != fileName2)
+            continue;
+
+        if (entry.path().extension() == m_binaryPath.extension()) {
+            if (binary == entry.path())
+                continue;
+            std::error_code ec;
+            std::filesystem::remove(entry.path(), ec);
+        }
+    }
+
+    if (binary == m_binaryPath)
+        return false;
+
+    g_platform.spawnProcess(binary.string(), args);
+    return true;
 #endif
 }

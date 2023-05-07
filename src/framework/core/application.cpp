@@ -69,9 +69,6 @@ void Application::init(std::vector<std::string>& args, uint8_t asyncDispatchMaxT
     // setup locale
     std::locale::global(std::locale());
 
-    // process args encoding
-    g_platform.init(args);
-
     g_asyncDispatcher.init(asyncDispatchMaxThreads);
 
     std::string startupOptions;
@@ -87,13 +84,6 @@ void Application::init(std::vector<std::string>& args, uint8_t asyncDispatchMaxT
 
     // initialize configs
     g_configs.init();
-
-    // initialize resources
-#ifdef ANDROID
-    g_resources.init(nullptr);
-#else
-    g_resources.init(args[0].data());
-#endif
 
     // initialize lua
     g_lua.init();

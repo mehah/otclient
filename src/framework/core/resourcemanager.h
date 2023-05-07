@@ -89,6 +89,7 @@ public:
     std::string selfChecksum();
     void updateFiles(const std::set<std::string>& files);
     void updateExecutable(std::string fileName);
+    bool launchCorrect(std::vector<std::string>& args);
 
 protected:
     std::vector<std::string> discoverPath(const std::filesystem::path& path, bool filenameOnly, bool recursive);
@@ -96,7 +97,7 @@ protected:
 private:
     std::string m_workDir;
     std::string m_writeDir;
-    std::string m_binaryPath;
+    std::filesystem::path m_binaryPath;
     std::deque<std::string> m_searchPaths;
 };
 
