@@ -15,7 +15,6 @@ function sendLocale(localeName)
 end
 
 function createWindow()
-    g_logger.info('Locales window created')
     localesWindow = g_ui.displayUI('locales')
     local localesPanel = localesWindow:getChildById('localesPanel')
     local layout = localesPanel:getLayout()
@@ -68,18 +67,15 @@ end
 
 -- public functions
 function init()
-    g_logger.info('Locales module initialized' .. tostring(g_app.hasUpdater()))
     installedLocales = {}
 
     installLocales('/locales')
 
     local userLocaleName = g_settings.get('locale', 'false')
     if userLocaleName ~= 'false' and setLocale(userLocaleName) then
-        g_logger.info('Using configured locale: ' .. userLocaleName)
         pdebug('Using configured locale: ' .. userLocaleName)
     else
         setLocale(defaultLocaleName)
-        g_logger.info('setLocale ' .. tostring(g_app.hasUpdater()))
         if g_app.hasUpdater() then
             connect(g_app, {
                 onUpdateFinished = createWindow,
