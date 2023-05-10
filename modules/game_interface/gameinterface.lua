@@ -37,8 +37,17 @@ function init()
     -- resized to a stable state, otherwise the saved
     -- settings can get overridden by false onGeometryChange
     -- events
+    if g_app.hasUpdater() then
+        connect(g_app, {
+            onUpdateFinished = load,
+        })
+    else
+        connect(g_app, {
+            onRun = load,
+        })
+    end
+
     connect(g_app, {
-        onRun = load,
         onExit = save
     })
 
@@ -198,6 +207,18 @@ end
 
 function terminate()
     hide()
+    if g_app.hasUpdater() then
+        disconnect(g_app, {
+            onUpdateFinished = load,
+        })
+    else
+        disconnect(g_app, {
+            onRun = load,
+        })
+    end
+    disconnect(g_app, {
+        onExit = save,
+    })
 
     hookedMenuOptions = {}
 

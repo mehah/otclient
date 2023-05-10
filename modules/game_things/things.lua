@@ -1,6 +1,5 @@
 filename = nil
 loaded = false
-checkedByUpdater = {}
 
 function init()
     connect(g_game, {

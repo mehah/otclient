@@ -230,8 +230,20 @@ std::string ResourceManager::readFileContents(const std::string& fileName)
     return buffer;
 }
 
-bool ResourceManager::writeFileBuffer(const std::string& fileName, const uint8_t* data, uint32_t size)
+bool ResourceManager::writeFileBuffer(const std::string& fileName, const uint8_t* data, uint32_t size, bool createDirectory)
 {
+    if (createDirectory) {
+        const auto& path = std::filesystem::path(fileName);
+        const auto& dirPath = path.parent_path().string();
+
+        if (!PHYSFS_isDirectory(dirPath.c_str())) {
+            if (!PHYSFS_mkdir(dirPath.c_str())) {
+                g_logger.error(stdext::format("Unable to create write directory '%s': %s", dirPath, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+                return false;
+            }
+        }
+    }
+
     PHYSFS_file* file = PHYSFS_openWrite(fileName.c_str());
     if (!file) {
         g_logger.error(PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
@@ -610,7 +622,7 @@ void ResourceManager::updateFiles(const std::set<std::string>& files) {
         auto dFile = g_http.getFile(fileName);
 
         if (dFile) {
-            if (!writeFileBuffer(fileName, (const uint8_t*)dFile->response.data(), dFile->response.size())) {
+            if (!writeFileBuffer(fileName, (const uint8_t*)dFile->response.data(), dFile->response.size(), true)) {
                 g_logger.error(stdext::format("Cannot write file: %s", fileName));
             } else {
                 //g_logger.info(stdext::format("Updated file: %s", fileName));

@@ -50,7 +50,7 @@ public:
     void readFileStream(const std::string& fileName, std::iostream& out);
     std::string readFileContents(const std::string& fileName);
     // @dontbind
-    bool writeFileBuffer(const std::string& fileName, const uint8_t* data, uint32_t size);
+    bool writeFileBuffer(const std::string& fileName, const uint8_t* data, uint32_t size, bool createDirectory = false);
     bool writeFileContents(const std::string& fileName, const std::string& data);
     // @dontbind
     bool writeFileStream(const std::string& fileName, std::iostream& in);

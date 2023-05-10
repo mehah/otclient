@@ -49,7 +49,14 @@ if(!$cache) { // update cache
         $path = str_replace($dir, '', $file->getPathname());
         $path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
         $checksum = hash_file("crc32b", $file->getPathname());
-        $cache[$path] = ltrim($checksum, '0');
+
+        if ($checksum === true) {
+            $parsed_checksum = ltrim($checksum, '0');
+            if ($parsed_checksum === '') {
+                $parsed_checksum = '0';
+            }
+            $cache[$path] = $parsed_checksum;
+        }
     }
     file_put_contents($cache_file . ".tmp", json_encode($cache));
     rename($cache_file . ".tmp", $cache_file);

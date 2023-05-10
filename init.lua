@@ -16,6 +16,10 @@ Services = {
     updater = "http://localhost/api/updater.php",
 }
 
+g_app.hasUpdater = function()
+    return (Services.updater and Services.updater ~= "" and g_modules.getModule("updater"))
+end
+
 -- setup logger
 g_logger.setLogFile(g_resources.getWorkDir() .. g_app.getCompactName() .. '.log')
 g_logger.info(os.date('== application started at %b %d %Y %X'))
@@ -77,7 +81,7 @@ local function loadModules()
 end
 
 -- run updater, must use data.zip
-if Services.updater and g_modules.getModule("updater") then
+if g_app.hasUpdater() then
   g_modules.ensureModuleLoaded("updater")
   return Updater.init(loadModules)
 end

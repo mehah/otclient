@@ -178,10 +178,10 @@ end
 
 function Updater.terminate()
   loadModulesFunction = nil
-  Updater.abort()
+  Updater.abort(true)
 end
 
-function Updater.abort()
+function Updater.abort(terminate)
   HTTP.cancel(httpOperationId)
   removeEvent(scheduledEvent)
   if updaterWindow then
@@ -189,6 +189,9 @@ function Updater.abort()
     updaterWindow = nil
   end
   loadModules()
+  if not terminate then
+    signalcall(g_app.onUpdateFinished, g_app)
+  end
 end
 
 function Updater.check(args)
