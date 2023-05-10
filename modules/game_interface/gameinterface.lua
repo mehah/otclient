@@ -67,7 +67,7 @@ function init()
     gameLeftPanel = gameRootPanel:getChildById('gameLeftPanel')
     gameBottomPanel = gameRootPanel:getChildById('gameBottomPanel')
 
-    panelsList = {{
+    panelsList = { {
         panel = gameRightPanel,
         checkbox = gameRootPanel:getChildById('gameSelectRightColumn')
     }, {
@@ -76,7 +76,7 @@ function init()
     }, {
         panel = gameLeftPanel,
         checkbox = gameRootPanel:getChildById('gameSelectLeftColumn')
-    }}
+    } }
 
     panelsRadioGroup = UIRadioGroup.create()
     for k, v in pairs(panelsList) do
@@ -95,7 +95,7 @@ function init()
     })
 
     logoutButton = modules.client_topmenu.addLeftButton('logoutButton', tr('Exit'), '/images/topbuttons/logout',
-                                                        tryLogout, true)
+        tryLogout, true)
 
     showTopMenuButton = gameMapPanel:getChildById('showTopMenuButton')
     showTopMenuButton.onClick = function()
@@ -288,7 +288,6 @@ function show()
             gameMapPanel:setMaxZoomOut(11)
             gameMapPanel:setLimitVisibleRange(true)
         end
-
     end)
 end
 
@@ -361,22 +360,22 @@ function tryExit()
     end
 
     exitWindow = displayGeneralBox(tr('Exit'), tr(
-                                       'If you shut down the program, your character might stay in the game.\nClick on \'Logout\' to ensure that you character leaves the game properly.\nClick on \'Exit\' if you want to exit the program without logging out your character.'),
-                                   {
+            'If you shut down the program, your character might stay in the game.\nClick on \'Logout\' to ensure that you character leaves the game properly.\nClick on \'Exit\' if you want to exit the program without logging out your character.'),
         {
-            text = tr('Force Exit'),
-            callback = exitFunc
-        },
-        {
-            text = tr('Logout'),
-            callback = logoutFunc
-        },
-        {
-            text = tr('Cancel'),
-            callback = cancelFunc
-        },
-        anchor = AnchorHorizontalCenter
-    }, logoutFunc, cancelFunc)
+            {
+                text = tr('Force Exit'),
+                callback = exitFunc
+            },
+            {
+                text = tr('Logout'),
+                callback = logoutFunc
+            },
+            {
+                text = tr('Cancel'),
+                callback = cancelFunc
+            },
+            anchor = AnchorHorizontalCenter
+        }, logoutFunc, cancelFunc)
 
     return true
 end
@@ -397,7 +396,7 @@ function tryLogout(prompt)
     local msg, yesCallback
     if not g_game.isConnectionOk() then
         msg =
-            'Your connection is failing, if you logout now your character will be still online, do you want to force logout?'
+        'Your connection is failing, if you logout now your character will be still online, do you want to force logout?'
 
         yesCallback = function()
             g_game.forceLogout()
@@ -764,7 +763,6 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
                     g_game.partyLeave()
                 end)
             end
-
         else
             local localPosition = localPlayer:getPosition()
             if not classic then
@@ -971,7 +969,7 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
             g_game.look(lookThing)
             return true
         elseif lookThing and ((g_mouse.isPressed(MouseLeftButton) and mouseButton == MouseRightButton) or
-            (g_mouse.isPressed(MouseRightButton) and mouseButton == MouseLeftButton)) then
+                (g_mouse.isPressed(MouseRightButton) and mouseButton == MouseLeftButton)) then
             g_game.look(lookThing)
             return true
         elseif useThing and keyboardModifiers == KeyboardCtrlModifier and
@@ -1240,7 +1238,7 @@ function setupViewMode(mode)
         gameLeftPanel:setMarginTop(modules.client_topmenu.getTopMenu():getHeight() - gameLeftPanel:getPaddingTop())
         gameRightPanel:setMarginTop(modules.client_topmenu.getTopMenu():getHeight() - gameRightPanel:getPaddingTop())
         gameRightExtraPanel:setMarginTop(modules.client_topmenu.getTopMenu():getHeight() -
-                                             gameRightExtraPanel:getPaddingTop())
+            gameRightExtraPanel:getPaddingTop())
         gameLeftPanel:setOn(true)
         gameLeftPanel:setVisible(true)
         gameRightPanel:setOn(true)

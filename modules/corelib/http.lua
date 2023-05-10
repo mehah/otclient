@@ -1,11 +1,11 @@
 HTTP = {
-  timeout=60,
-  websocketTimeout=15,
-  agent="Mozilla/5.0",
-  imageId=1000,
-  images={},
-  operations={},
-  enableTimeOut=false, -- only work in read/write
+  timeout = 60,
+  websocketTimeout = 15,
+  agent = "Mozilla/5.0",
+  imageId = 1000,
+  images = {},
+  operations = {},
+  enableTimeOut = false, -- only work in read/write
 }
 
 function HTTP.get(url, callback)
@@ -13,7 +13,7 @@ function HTTP.get(url, callback)
     return error("HTTP.get is not supported")
   end
   local operation = g_http.get(url, HTTP.timeout)
-  HTTP.operations[operation] = {type="get", url=url, callback=callback}  
+  HTTP.operations[operation] = { type = "get", url = url, callback = callback }
   return operation
 end
 
@@ -22,7 +22,7 @@ function HTTP.getJSON(url, callback)
     return error("HTTP.getJSON is not supported")
   end
   local operation = g_http.get(url, HTTP.timeout)
-  HTTP.operations[operation] = {type="get", json=true, url=url, callback=callback}  
+  HTTP.operations[operation] = { type = "get", json = true, url = url, callback = callback }
   return operation
 end
 
@@ -36,7 +36,7 @@ function HTTP.post(url, data, callback)
     is_json = true
   end
   local operation = g_http.post(url, data, HTTP.timeout, is_json)
-  HTTP.operations[operation] = {type="post", url=url, callback=callback}
+  HTTP.operations[operation] = { type = "post", url = url, callback = callback }
   return operation
 end
 
@@ -48,7 +48,7 @@ function HTTP.postJSON(url, data, callback)
     data = json.encode(data)
   end
   local operation = g_http.post(url, data, HTTP.timeout, true)
-  HTTP.operations[operation] = {type="post", json=true, url=url, callback=callback}
+  HTTP.operations[operation] = { type = "post", json = true, url = url, callback = callback }
   return operation
 end
 
@@ -57,7 +57,8 @@ function HTTP.download(url, file, callback, progressCallback)
     return error("HTTP.download is not supported")
   end
   local operation = g_http.download(url, file, HTTP.timeout)
-  HTTP.operations[operation] = {type="download", url=url, file=file, callback=callback, progressCallback=progressCallback}  
+  HTTP.operations[operation] = { type = "download", url = url, file = file, callback = callback,
+    progressCallback = progressCallback }
   return operation
 end
 
@@ -74,7 +75,7 @@ function HTTP.downloadImage(url, callback)
   local file = "autoimage_" .. HTTP.imageId .. ".png"
   HTTP.imageId = HTTP.imageId + 1
   local operation = g_http.download(url, file, HTTP.timeout)
-  HTTP.operations[operation] = {type="image", url=url, file=file, callback=callback}  
+  HTTP.operations[operation] = { type = "image", url = url, file = file, callback = callback }
   return operation
 end
 
@@ -86,11 +87,11 @@ function HTTP.webSocket(url, callbacks, timeout, jsonWebsocket)
     timeout = HTTP.websocketTimeout
   end
   local operation = g_http.ws(url, timeout)
-  HTTP.operations[operation] = {type="ws", json=jsonWebsocket, url=url, callbacks=callbacks}  
+  HTTP.operations[operation] = { type = "ws", json = jsonWebsocket, url = url, callbacks = callbacks }
   return {
     id = operation,
     url = url,
-    close = function() 
+    close = function()
       g_http.wsClose(operation)
     end,
     send = function(message)
@@ -101,11 +102,13 @@ function HTTP.webSocket(url, callbacks, timeout, jsonWebsocket)
     end
   }
 end
+
 HTTP.WebSocket = HTTP.webSocket
 
 function HTTP.webSocketJSON(url, callbacks, timeout)
   return HTTP.webSocket(url, callbacks, timeout, true)
 end
+
 HTTP.WebSocketJSON = HTTP.webSocketJSON
 
 function HTTP.cancel(operationId)
@@ -134,7 +137,7 @@ function HTTP.onGet(operationId, url, err, data)
       if data and data:len() > 0 then
         err = err .. " (" .. data:sub(1, 100) .. ")"
       end
-    end  
+    end
     data = result
   end
   if operation.callback then
@@ -147,7 +150,6 @@ function HTTP.onGetProgress(operationId, url, progress)
   if operation == nil then
     return
   end
-  
 end
 
 function HTTP.onPost(operationId, url, err, data)
@@ -168,7 +170,7 @@ function HTTP.onPost(operationId, url, err, data)
       if data and data:len() > 0 then
         err = err .. " (" .. data:sub(1, 100) .. ")"
       end
-    end  
+    end
     data = result
   end
   if operation.callback then
@@ -196,7 +198,7 @@ function HTTP.onDownload(operationId, url, err, path, checksum)
       if not err then
         HTTP.images[url] = path
       end
-      operation.callback('/downloads/' .. path, err)    
+      operation.callback('/downloads/' .. path, err)
     else
       operation.callback(path, checksum, err)
     end
@@ -244,9 +246,9 @@ function HTTP.onWsMessage(operationId, message)
       if err then
         if operation.callbacks.onError then
           operation.callbacks.onError(err, operationId)
-        end        
+        end
       else
-        operation.callbacks.onMessage(result, operationId)    
+        operation.callbacks.onMessage(result, operationId)
       end
     else
       operation.callbacks.onMessage(message, operationId)
@@ -280,7 +282,7 @@ function HTTP.addCustomHeader(headerTable)
   end
 end
 
-connect(g_http, 
+connect(g_http,
   {
     onGet = HTTP.onGet,
     onGetProgress = HTTP.onGetProgress,

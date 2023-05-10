@@ -92,7 +92,7 @@ void Protocol::recv()
     if (m_connection)
         m_connection->read(2, [capture0 = asProtocol()](auto&& PH1, auto&& PH2) {
         capture0->internalRecvHeader(std::forward<decltype(PH1)>(PH1),
-                                     std::forward<decltype(PH2)>(PH2));
+        std::forward<decltype(PH2)>(PH2));
     });
 }
 
@@ -106,7 +106,7 @@ void Protocol::internalRecvHeader(uint8_t* buffer, uint16_t size)
     if (m_connection)
         m_connection->read(remainingSize, [capture0 = asProtocol()](auto&& PH1, auto&& PH2) {
         capture0->internalRecvData(std::forward<decltype(PH1)>(PH1),
-                                   std::forward<decltype(PH2)>(PH2));
+        std::forward<decltype(PH2)>(PH2));
     });
 }
 

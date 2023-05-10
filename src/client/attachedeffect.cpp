@@ -100,4 +100,3 @@ int AttachedEffect::getCurrentAnimationPhase()
 }
 
 void AttachedEffect::setShader(const std::string_view name) { m_shader = g_shaders.getShader(name); }
-

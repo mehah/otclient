@@ -40,16 +40,15 @@ void ResourceManager::init(const char* argv0)
     PHYSFS_init(argv0);
     PHYSFS_permitSymbolicLinks(1);
 
-    #if defined(WIN32)
-        char fileName[255];
-        GetModuleFileNameA(NULL, fileName, sizeof(fileName));
-        m_binaryPath = std::filesystem::absolute(fileName);
-    #elif defined(ANDROID)
-        // nothing
-    #else
-        m_binaryPath = std::filesystem::absolute(argv0);    
-    #endif
-
+#if defined(WIN32)
+    char fileName[255];
+    GetModuleFileNameA(NULL, fileName, sizeof(fileName));
+    m_binaryPath = std::filesystem::absolute(fileName);
+#elif defined(ANDROID)
+    // nothing
+#else
+    m_binaryPath = std::filesystem::absolute(argv0);
+#endif
 }
 
 void ResourceManager::terminate()
@@ -551,7 +550,7 @@ std::string ResourceManager::fileChecksum(const std::string& path) {
         return it->second;
 
     PHYSFS_File* file = PHYSFS_openRead(path.c_str());
-    if(!file)
+    if (!file)
         return "";
 
     int fileSize = PHYSFS_fileLength(file);
@@ -572,7 +571,7 @@ stdext::map<std::string, std::string> ResourceManager::filesChecksums()
     for (auto it = files.rbegin(); it != files.rend(); ++it) {
         const auto& filePath = *it;
         PHYSFS_File* file = PHYSFS_openRead(filePath.c_str());
-        if(!file)
+        if (!file)
             continue;
 
         int fileSize = PHYSFS_fileLength(file);

@@ -1,4 +1,4 @@
-Updater = { }
+Updater = {}
 
 Updater.maxRetries = 5
 
@@ -40,7 +40,7 @@ local function downloadFiles(url, files, index, retries, doneCallback)
   updaterWindow.mainProgress:setPercent(math.floor(100 * index / #files))
 
   httpOperationId = HTTP.download(url .. file, file,
-    function (file, checksum, err)
+    function(file, checksum, err)
       if not err and checksum ~= file_checksum then
         err = "Invalid checksum of: " .. file .. ".\nShould be " .. file_checksum .. ", is: " .. checksum
       end
@@ -56,7 +56,7 @@ local function downloadFiles(url, files, index, retries, doneCallback)
       end
       downloadFiles(url, files, index + 1, 0, doneCallback)
     end,
-    function (progress, speed)
+    function(progress, speed)
       updaterWindow.downloadProgress:setPercent(progress)
       updaterWindow.downloadProgress:setText(speed .. " kbps")
     end)
@@ -98,7 +98,7 @@ local function updateFiles(data, keepCurrentFiles)
   for file, checksum in pairs(data.files) do
     table.insert(finalFiles, file)
     if not localFiles[file] or localFiles[file] ~= checksum then
-      table.insert(toUpdate, {file, checksum})
+      table.insert(toUpdate, { file, checksum })
       table.insert(toUpdateFiles, file)
       newFiles = true
     end
@@ -110,7 +110,7 @@ local function updateFiles(data, keepCurrentFiles)
     local selfChecksum = g_resources.selfChecksum()
     if selfChecksum:len() > 0 and selfChecksum ~= data.binary.checksum then
       binary = data.binary.file
-      table.insert(toUpdate, {binary, data.binary.checksum})
+      table.insert(toUpdate, { binary, data.binary.checksum })
     end
   end
 
@@ -123,7 +123,7 @@ local function updateFiles(data, keepCurrentFiles)
   -- update of some files require full client restart
   local forceRestart = false
   local reloadModules = false
-  local forceRestartPattern = {"init.lua", "corelib", "updater", "otmod"}
+  local forceRestartPattern = { "init.lua", "corelib", "updater", "otmod" }
   for _, file in ipairs(toUpdate) do
     for __, pattern in ipairs(forceRestartPattern) do
       if string.find(file[1], pattern) then

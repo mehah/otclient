@@ -30,7 +30,8 @@
 class Platform
 {
 public:
-    enum OperatingSystem {
+    enum OperatingSystem
+    {
         OsUnknown,
         Windows,
         Linux,
@@ -39,14 +40,16 @@ public:
         iOS
     };
 
-    enum DeviceType {
+    enum DeviceType
+    {
         DeviceUnknown,
         Desktop,
         Mobile,
         Console
     };
 
-    struct Device {
+    struct Device
+    {
         Device() {}
         Device(DeviceType t, OperatingSystem o) : type(t), os(o) {}
         DeviceType type{ DeviceUnknown };

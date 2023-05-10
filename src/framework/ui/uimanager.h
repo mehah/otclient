@@ -49,7 +49,7 @@ public:
     OTMLNodePtr getStyle(const std::string_view sn);
     std::string getStyleClass(const std::string_view styleName);
     OTMLNodePtr findMainWidgetNode(const OTMLDocumentPtr& doc);
-    
+
     UIWidgetPtr loadUI(const std::string& file, const UIWidgetPtr& parent);
     OTMLNodePtr loadDeviceUI(const std::string& file, Platform::OperatingSystem os);
     OTMLNodePtr loadDeviceUI(const std::string& file, Platform::DeviceType deviceType);
