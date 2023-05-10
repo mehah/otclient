@@ -13,7 +13,7 @@ g_game.setLastSupportedVersion(1291)
 
 -- updater 
 Services = {
-    updater = "http://localhost/api/updater.php",
+    --updater = "http://localhost/api/updater.php",
 }
 
 g_app.hasUpdater = function()
