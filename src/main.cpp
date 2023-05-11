@@ -42,10 +42,19 @@ int main(int argc, const char* argv[])
     g_app.setCompactName("otclient");
     g_app.setOrganizationName("otbr");
 
+    // process args encoding
+    g_platform.init(args);
+
+    // initialize resources
+#ifdef ANDROID
+    g_resources.init(nullptr);
+#else
+    g_resources.init(args[0].data());
+#endif
+
 #if ENABLE_ENCRYPTION == 1 && ENABLE_ENCRYPTION_BUILDER == 1
     if (std::find(args.begin(), args.end(), "--encrypt") != args.end()) {
         g_lua.init();
-        g_resources.init(args[0].data());
         g_resources.runEncryption(args.size() >= 3 ? args[2] : ENCRYPTION_PASSWORD);
         std::cout << "Encryption complete" << std::endl;
 #ifdef WIN32
@@ -54,6 +63,10 @@ int main(int argc, const char* argv[])
         return 0;
     }
 #endif
+
+    if (g_resources.launchCorrect(args)) {
+        return 0; // started other executable
+    }
 
 #if ENABLE_DISCORD_RPC == 1
     g_discord.init();

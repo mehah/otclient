@@ -21,6 +21,7 @@
  */
 
 #include <framework/core/eventdispatcher.h>
+#include <framework/util/crypt.h>
 
 #include <utility>
 
@@ -142,9 +143,7 @@ int Http::download(const std::string& url, const std::string& path, int timeout)
                 return;
             }
 
-            const uint32_t  crc = crc32(0L, Z_NULL, 0);
-            uint32_t checksum = crc32(crc, (const unsigned char*)result->response.c_str(), result->response.size());
-
+            auto checksum = g_crypt.crc32(result->response, false);
             g_dispatcher.addEvent([this, result, path, checksum] {
                 if (result->error.empty()) {
                     if (!path.empty() && path[0] == '/')
@@ -417,6 +416,9 @@ void HttpSession::on_request_sent(const std::error_code& ec, size_t /*bytes_tran
                     header.c_str() + pos + sizeof("Content-Length: ") - 1,
                     nullptr, 10);
                 m_result->size = len - m_response.size();
+            } else {
+                onError("HttpSession error receiving header " + m_url + ": " + "Content-Length not found");
+                return;
             }
 
             asio::async_read(m_socket, m_response,

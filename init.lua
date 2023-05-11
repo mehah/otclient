@@ -11,6 +11,15 @@ g_game.setForceNewWalkingFormula(true)
 -- set latest supported version
 g_game.setLastSupportedVersion(1291)
 
+-- updater 
+Services = {
+    --updater = "http://localhost/api/updater.php",
+}
+
+g_app.hasUpdater = function()
+    return (Services.updater and Services.updater ~= "" and g_modules.getModule("updater"))
+end
+
 -- setup logger
 g_logger.setLogFile(g_resources.getWorkDir() .. g_app.getCompactName() .. '.log')
 g_logger.info(os.date('== application started at %b %d %Y %X'))
@@ -49,20 +58,32 @@ g_modules.discoverModules()
 g_modules.autoLoadModules(99)
 g_modules.ensureModuleLoaded('corelib')
 g_modules.ensureModuleLoaded('gamelib')
+g_modules.ensureModuleLoaded("startup")
 
--- client modules 100-499
-g_modules.autoLoadModules(499)
-g_modules.ensureModuleLoaded('client')
+local function loadModules()
 
--- game modules 500-999
-g_modules.autoLoadModules(999)
-g_modules.ensureModuleLoaded('game_interface')
+    -- client modules 100-499
+    g_modules.autoLoadModules(499)
+    g_modules.ensureModuleLoaded('client')
 
--- mods 1000-9999
-g_modules.autoLoadModules(9999)
+    -- game modules 500-999
+    g_modules.autoLoadModules(999)
+    g_modules.ensureModuleLoaded('game_interface')
 
-local script = '/' .. g_app.getCompactName() .. 'rc.lua'
+    -- mods 1000-9999
+    g_modules.autoLoadModules(9999)
 
-if g_resources.fileExists(script) then
-    dofile(script)
+    local script = '/' .. g_app.getCompactName() .. 'rc.lua'
+
+    if g_resources.fileExists(script) then
+        dofile(script)
+    end
 end
+
+-- run updater, must use data.zip
+if g_app.hasUpdater() then
+  g_modules.ensureModuleLoaded("updater")
+  return Updater.init(loadModules)
+end
+
+loadModules()

@@ -25,7 +25,7 @@
 #include <framework/graphics/paintershaderprogram.h>
 #include "declarations.h"
 
-//@bindsingleton g_shaders
+ //@bindsingleton g_shaders
 class ShaderManager
 {
 public:
