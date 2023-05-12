@@ -138,7 +138,6 @@ public:
     bool isFullHealth() const { return m_healthPercent == 100; }
     bool canBeSeen() { return !isInvisible() || isPlayer(); }
     bool isCreature() override { return true; }
-    bool isParalyzed() const { return m_speed < 10; }
 
     bool isDisabledWalkAnimation() { return m_disableWalkAnimation > 0; }
     void setDisableWalkAnimation(bool v) {
@@ -156,7 +155,6 @@ protected:
     virtual void terminateWalk();
 
     void onPositionChange(const Position& newPos, const Position& oldPos) override;
-    bool mustStabilizeCam() const { return m_stepCache.mustStabilizeCam; }
 
     bool m_walking{ false };
     Point m_walkOffset;
@@ -181,8 +179,6 @@ private:
         uint16_t duration{ 0 };
         uint16_t walkDuration{ 0 };
         uint16_t diagonalDuration{ 0 };
-
-        bool mustStabilizeCam{ false };
 
         uint16_t getDuration(Otc::Direction dir) const { return Position::isDiagonal(dir) ? diagonalDuration : duration; }
     };

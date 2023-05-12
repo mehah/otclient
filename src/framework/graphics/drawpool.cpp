@@ -23,11 +23,6 @@
 #include "drawpool.h"
 #include "framebuffermanager.h"
 
-static constexpr uint16_t
-FPS10 = 1000 / 10,
-FPS20 = 1000 / 20,
-FPS60 = 1000 / 60;
-
 DrawPool* DrawPool::create(const DrawPoolType type)
 {
     DrawPool* pool = new DrawPool;

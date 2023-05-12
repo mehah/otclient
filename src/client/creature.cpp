@@ -508,7 +508,7 @@ void Creature::updateWalkAnimation()
             footAnimDelay /= 1.5;
     }
 
-    const int footDelay = std::max<int>(m_stepCache.getDuration(m_lastStepDirection) / footAnimDelay, minFootDelay);
+    const int footDelay = std::clamp<int>(m_stepCache.getDuration(m_lastStepDirection) / footAnimDelay, minFootDelay, 80);
 
     if (m_footTimer.ticksElapsed() >= footDelay) {
         if (m_walkAnimationPhase == footAnimPhases) m_walkAnimationPhase = 1;
@@ -808,7 +808,7 @@ bool Creature::hasSpeedFormula() { return g_game.getFeature(Otc::GameNewSpeedLaw
 
 uint16_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
 {
-    if (isParalyzed())
+    if (m_speed < 1)
         return 0;
 
     const auto& tilePos = dir == Otc::InvalidDirection ?
@@ -821,7 +821,7 @@ uint16_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
     if (groundSpeed == 0)
         groundSpeed = 150;
 
-    if (m_speed != m_stepCache.speed || groundSpeed != m_stepCache.groundSpeed) {
+    if (groundSpeed != m_stepCache.groundSpeed || m_speed != m_stepCache.speed) {
         m_stepCache.speed = m_speed;
         m_stepCache.groundSpeed = groundSpeed;
 
@@ -835,12 +835,8 @@ uint16_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
             stepDuration = ((stepDuration + serverBeat - 1) / serverBeat) * serverBeat;
         }
 
-        if ((m_stepCache.mustStabilizeCam = (isLocalPlayer() && stepDuration <= 100))) {
-            stepDuration += 10;
-        }
-
-        m_stepCache.duration = stepDuration;
-        m_stepCache.walkDuration = stepDuration / SPRITE_SIZE;
+        m_stepCache.duration = stepDuration + 10;
+        m_stepCache.walkDuration = std::min<int>(stepDuration / SPRITE_SIZE, DrawPool::FPS60);
         m_stepCache.diagonalDuration = stepDuration * (g_game.getClientVersion() > 810 || g_game.isForcingNewWalkingFormula() ? 3 : 2);
     }
 

@@ -30,6 +30,7 @@ class LocalPlayer : public Player
 public:
     void unlockWalk() { m_walkLockExpiration = 0; }
     void lockWalk(uint16_t millis = 250);
+    bool isWalkLocked() { return m_walkLockExpiration != 0 && g_clock.millis() < m_walkLockExpiration; }
     void stopAutoWalk();
 
     bool autoWalk(const Position& destination, bool retry = false);
@@ -107,6 +108,7 @@ public:
     bool isAutoWalking() { return m_autoWalkDestination.isValid(); }
     bool isPremium() { return m_premium; }
     bool isPendingGame() const { return m_pending; }
+    bool isParalyzed() const { return (m_states & Otc::IconParalyze) == Otc::IconParalyze; }
 
     LocalPlayerPtr asLocalPlayer() { return static_self_cast<LocalPlayer>(); }
     bool isLocalPlayer() override { return true; }
@@ -134,8 +136,6 @@ private:
     void cancelWalk(Otc::Direction direction = Otc::InvalidDirection);
 
     bool retryAutoWalk();
-
-    bool m_forceWalk{ false };
 
     // walk related
     Position m_lastPrewalkDestination;
