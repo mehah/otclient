@@ -34,26 +34,14 @@ void LocalPlayer::lockWalk(uint16_t millis)
 bool LocalPlayer::canWalk(bool ignoreLock)
 {
     // paralyzed
-    if (isParalyzed() || isDead())
+    if (isDead())
         return false;
 
     // cannot walk while locked
-    if ((m_walkLockExpiration != 0 && g_clock.millis() < m_walkLockExpiration) && !ignoreLock)
+    if (isWalkLocked() && !ignoreLock)
         return false;
 
-    if (isAutoWalking())
-        return false;
-
-    if (m_forceWalk) {
-        m_forceWalk = false;
-        return true;
-    }
-
-    uint16_t stepDuration = getStepDuration();
-    if (mustStabilizeCam())
-        stepDuration -= 9;
-
-    return m_walkTimer.ticksElapsed() >= std::max<int>(stepDuration, g_game.getPing());
+    return m_walkTimer.ticksElapsed() >= std::max<int>(getStepDuration() - 9, g_game.getPing());
 }
 
 void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
@@ -232,7 +220,7 @@ void LocalPlayer::onPositionChange(const Position& newPos, const Position& oldPo
         autoWalk(m_autoWalkDestination);
 
     if (newPos.z != oldPos.z) {
-        m_forceWalk = true;
+        m_walkTimer.update(-getStepDuration());
     }
 }
 
@@ -243,6 +231,9 @@ void LocalPlayer::setStates(uint32_t states)
 
     const uint32_t oldStates = m_states;
     m_states = states;
+
+    if (isParalyzed())
+        m_walkTimer.update(-getStepDuration());
 
     callLuaField("onStatesChange", states, oldStates);
 }

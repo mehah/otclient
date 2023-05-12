@@ -30,7 +30,7 @@ void InputMessage::reset()
     m_headerPos = MAX_HEADER_SIZE;
 }
 
-void InputMessage::setBuffer(const std::string_view buffer)
+void InputMessage::setBuffer(const std::string& buffer)
 {
     const int len = buffer.size();
     reset();

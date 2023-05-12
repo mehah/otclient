@@ -97,7 +97,7 @@ void Connection::connect(const std::string_view host, uint16_t port, const std::
     const asio::ip::tcp::resolver::query query(host.data(), stdext::unsafe_cast<std::string>(port));
     m_resolver.async_resolve(query, [capture0 = asConnection()](auto&& PH1, auto&& PH2) {
         capture0->onResolve(std::forward<decltype(PH1)>(PH1),
-                            std::forward<decltype(PH2)>(PH2));
+        std::forward<decltype(PH2)>(PH2));
     });
 
     m_readTimer.cancel();

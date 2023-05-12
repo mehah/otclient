@@ -26,3 +26,9 @@ HeadlessWindow < UIWindow
 
 MainWindow < Window
   anchors.centerIn: parent
+  
+StaticWindow < Window
+  draggable: false
+
+StaticMainWindow < StaticWindow
+  anchors.centerIn: parent

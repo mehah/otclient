@@ -757,7 +757,7 @@ void Tile::setThingFlag(const ThingPtr& thing)
 
 void Tile::select(TileSelectType selectType)
 {
-    if (selectType == TileSelectType::NO_FILTERED) {
+    if (selectType == TileSelectType::NO_FILTERED && !isEmpty()) {
         if (!(m_highlightThing = getTopCreature()))
             m_highlightThing = m_things.back();
     }

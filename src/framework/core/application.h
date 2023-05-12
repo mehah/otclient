@@ -37,6 +37,7 @@ public:
     virtual void poll();
     virtual void exit();
     virtual void close();
+    virtual void restart();
 
     void setName(const std::string_view name) { m_appName = name; }
     void setCompactName(const std::string_view name) { m_appCompactName = name; }
@@ -68,6 +69,8 @@ protected:
     std::string m_appName{ "application" };
     std::string m_appCompactName{ "app" };
     std::string m_startupOptions;
+
+    std::vector<std::string> m_startupArgs;
 
     bool m_running{ false };
     bool m_terminated{ false };

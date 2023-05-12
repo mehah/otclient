@@ -69,9 +69,6 @@ void Application::init(std::vector<std::string>& args, uint8_t asyncDispatchMaxT
     // setup locale
     std::locale::global(std::locale());
 
-    // process args encoding
-    g_platform.init(args);
-
     g_asyncDispatcher.init(asyncDispatchMaxThreads);
 
     std::string startupOptions;
@@ -84,16 +81,10 @@ void Application::init(std::vector<std::string>& args, uint8_t asyncDispatchMaxT
         g_logger.info(stdext::format("Startup options: %s", startupOptions));
 
     m_startupOptions = startupOptions;
+    m_startupArgs = args;
 
     // initialize configs
     g_configs.init();
-
-    // initialize resources
-#ifdef ANDROID
-    g_resources.init(nullptr);
-#else
-    g_resources.init(args[0].data());
-#endif
 
     // initialize lua
     g_lua.init();
@@ -173,6 +164,13 @@ void Application::close()
 {
     if (!g_lua.callGlobalField<bool>("g_app", "onClose"))
         exit();
+}
+
+void Application::restart()
+{
+    g_lua.callGlobalField<bool>("g_app", "onRestart");
+    g_platform.spawnProcess(g_resources.getBinaryPath(), m_startupArgs);
+    exit();
 }
 
 std::string Application::getOs()

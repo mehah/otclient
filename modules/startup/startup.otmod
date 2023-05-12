@@ -1,0 +1,10 @@
+Module
+  name: startup
+  description: Setups its main window
+  author: conde2
+  website: conde2
+  reloadable: false
+  sandboxed: true
+  scripts: [ startup ]
+  @onLoad: init()
+  @onUnload: terminate()

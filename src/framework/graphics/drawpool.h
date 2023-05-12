@@ -65,6 +65,10 @@ static const DrawConductor DEFAULT_DRAW_CONDUCTOR;
 class DrawPool
 {
 public:
+    static constexpr uint16_t
+        FPS10 = 1000 / 10,
+        FPS20 = 1000 / 20,
+        FPS60 = 1000 / 60;
 
     void setEnable(bool v) { m_enabled = v; }
 
