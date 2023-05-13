@@ -43,7 +43,7 @@ double Creature::speedC = 0;
 
 Creature::Creature() :m_type(Proto::CreatureTypeUnknown)
 {
-    m_name.setFont(g_fonts.getFont("verdana-11px-rounded"));
+    m_name.setFont(g_fonts.getCreatureNameFont());
     m_name.setAlign(Fw::AlignTopCenter);
 
     // Example of how to send a UniformValue to shader

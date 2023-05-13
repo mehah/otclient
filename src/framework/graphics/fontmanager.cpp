@@ -28,18 +28,14 @@
 
 FontManager g_fonts;
 
-FontManager::FontManager() : m_defaultFont(std::make_shared<BitmapFont>("emptyfont")) {}
+void FontManager::terminate() { clearFonts(); }
 
-void FontManager::terminate()
-{
+void FontManager::clearFonts() {
     m_fonts.clear();
-    m_defaultFont = nullptr;
-}
-
-void FontManager::clearFonts()
-{
-    m_fonts.clear();
-    m_defaultFont = std::make_shared<BitmapFont>("emptyfont");
+    m_creatureNameFont = nullptr;
+    m_animatedTextFont = nullptr;
+    m_staticTextFont = nullptr;
+    m_widgetTextFont = nullptr;
 }
 
 bool FontManager::importFont(const std::string& file)
@@ -63,8 +59,12 @@ bool FontManager::importFont(const std::string& file)
         m_fonts.emplace_back(font);
 
         // set as default if needed
-        if (!m_defaultFont || fontNode->valueAt<bool>("default", false))
-            m_defaultFont = font;
+        if (fontNode->valueAt<bool>("default", false)) {
+            m_creatureNameFont = font;
+            m_animatedTextFont = font;
+            m_staticTextFont = font;
+            m_widgetTextFont = font;
+        }
 
         return true;
     } catch (const stdext::exception& e) {
@@ -92,5 +92,5 @@ BitmapFontPtr FontManager::getFont(const std::string_view fontName)
 
     // when not found, fallback to default font
     g_logger.error(stdext::format("font '%s' not found", fontName));
-    return getDefaultFont();
+    return nullptr;
 }

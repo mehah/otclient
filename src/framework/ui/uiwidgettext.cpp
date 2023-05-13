@@ -28,7 +28,7 @@
 
 void UIWidget::initText()
 {
-    m_font = g_fonts.getDefaultFont();
+    m_font = g_fonts.getWidgetTextFont();
     m_textAlign = Fw::AlignCenter;
     m_coordsBuffer = std::make_shared<CoordsBuffer>();
 }

@@ -29,7 +29,7 @@
 
 StaticText::StaticText()
 {
-    m_cachedText.setFont(g_fonts.getFont("verdana-11px-rounded"));
+    m_cachedText.setFont(g_fonts.getStaticTextFont());
     m_cachedText.setAlign(Fw::AlignCenter);
 }
 
