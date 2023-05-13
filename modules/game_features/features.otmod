@@ -1,0 +1,8 @@
+Module
+  name: game_features
+  description: Manager game features
+  reloadable: false
+  sandboxed: true
+  scripts: [features]
+  @onLoad: controller:init()
+  @onUnload: controller:terminate()
