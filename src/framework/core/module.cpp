@@ -37,6 +37,7 @@ bool Module::load()
     if (!m_supportedDevices.empty() && !hasSupportedDevice(g_platform.getDevice()))
         return true;
 
+    g_modules.m_currentModule = static_self_cast<Module>();
     try {
         // add to package.loaded
         g_lua.getGlobalField("package", "loaded");
@@ -93,6 +94,9 @@ bool Module::load()
         if (m_sandboxed)
             g_lua.resetGlobalEnvironment();
         g_logger.error(stdext::format("Unable to load module '%s': %s", m_name, e.what()));
+
+        g_modules.m_currentModule = nullptr;
+
         return false;
     }
 
@@ -105,6 +109,8 @@ bool Module::load()
         else if (!dep->isLoaded())
             dep->load();
     }
+
+    g_modules.m_currentModule = nullptr;
 
     return true;
 }

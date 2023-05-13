@@ -1,19 +1,64 @@
+local TypeEvent = {
+    MODULE_INIT = 1,
+    GAME_INIT = 2
+}
+
+local function onGameStart(self)
+    if self.dataUI ~= nil and self.dataUI.onGameStart then
+        self.ui = g_ui.loadUI('/' .. self.name .. '/' .. self.dataUI.name, g_ui.getRootWidget())
+    end
+
+    if self.__onGameStart ~= nil then
+        self.currentTypeEvent = TypeEvent.GAME_INIT
+        addEvent(function()
+            self:__onGameStart()
+        end)
+    end
+
+    local eventList = self.events[TypeEvent.GAME_INIT]
+    if eventList ~= nil then
+        for actor, events in pairs(eventList) do
+            connect(actor, events)
+        end
+    end
+end
+
+local function onGameEnd(self)
+    if self.__onGameEnd ~= nil then
+        self:__onGameEnd()
+    end
+
+    local eventList = self.events[TypeEvent.GAME_INIT]
+    if eventList ~= nil then
+        for actor, events in pairs(eventList) do
+            disconnect(actor, events)
+        end
+    end
+
+    if self.dataUI ~= nil and self.dataUI.onGameStart then
+        self.ui:destroy()
+        self.ui = nil
+    end
+end
+
 Controller = {
+    name = nil,
     events = nil,
+    ui = nil,
     externalEvents = nil,
-    widgets = nil,
     keyboardEvents = nil,
-    attributes = nil,
+    attrs = nil,
     opcodes = nil
 }
 
 function Controller:new()
     local obj = {
+        name = g_modules.getCurrentModule():getName(),
+        currentTypeEvent = TypeEvent.MODULE_INIT,
         events = {},
         externalEvents = {},
-        widgets = {},
         keyboardEvents = {},
-        attributes = {},
+        attrs = {},
         opcodes = {}
     }
     setmetatable(obj, self)
@@ -22,19 +67,48 @@ function Controller:new()
 end
 
 function Controller:init()
+    if self.dataUI ~= nil and not self.dataUI.onGameStart then
+        self.ui = g_ui.loadUI('/' .. self.name .. '/' .. self.dataUI.name, g_ui.getRootWidget())
+    end
+
     if self.onInit then
+        self.currentTypeEvent = TypeEvent.MODULE_INIT
         self:onInit()
     end
 
-    local gameEvent = self.events.game
-    if gameEvent then
-        connect(g_game, gameEvent)
-        if gameEvent.onGameStart and g_game.isOnline() then
-            gameEvent.onGameStart()
-        end
+    self.__onGameStart = self.onGameStart
+    self.onGameStart = function()
+        onGameStart(self)
+    end
+    connect(g_game, {
+        onGameStart = self.onGameStart
+    })
+
+    if g_game.isOnline() then
+        self:onGameStart()
     end
 
+    self.__onGameEnd = self.onGameEnd
+    self.onGameEnd = function()
+        onGameEnd(self)
+    end
+
+    connect(g_game, {
+        onGameEnd = self.onGameEnd
+    })
+
     self:connectExternalEvents()
+
+    local eventList = self.events[TypeEvent.MODULE_INIT]
+    if eventList ~= nil then
+        for actor, events in pairs(eventList) do
+            connect(actor, events)
+        end
+    end
+end
+
+function Controller:setUI(name, onGameStart)
+    self.dataUI = { name = name, onGameStart = onGameStart or false }
 end
 
 function Controller:terminate()
@@ -42,17 +116,13 @@ function Controller:terminate()
         self:onTerminate()
     end
 
-    local gameEvent = self.events.game
-    if gameEvent then
-        disconnect(g_game, gameEvent)
-        if gameEvent.onGameEnd and g_game.isOnline() then
-            gameEvent.onGameEnd()
-        end
-        self.events.game = nil
+    if self.onGameStart then
+        disconnect(g_game, { onGameStart = self.onGameStart })
     end
 
-    for actor, events in pairs(self.events) do
-        disconnect(actor, events)
+    if self.onGameEnd then
+        if g_game.isOnline() then self:onGameEnd() end
+        disconnect(g_game, { onGameEnd = self.onGameEnd })
     end
 
     for i, event in pairs(self.keyboardEvents) do
@@ -65,30 +135,32 @@ function Controller:terminate()
 
     self:disconnectExternalEvents()
 
-    self.events = nil
-    self.widgets = nil
-    self.keyboardEvents = nil
-    self.attributes = nil
-    self.opcodes = nil
-    self.externalEvents = nil
-end
-
-function Controller:gameEvent(name, callback)
-    local gameEvent = self.events.game
-    if not gameEvent then
-        gameEvent = {}
-        self.events.game = gameEvent
+    local eventList = self.events[TypeEvent.MODULE_INIT]
+    if eventList ~= nil then
+        for actor, events in pairs(eventList) do
+            disconnect(actor, events)
+        end
     end
 
-    gameEvent[name] = callback
+    if self.ui ~= nil then
+        self.ui:destroy()
+    end
+
+    self.events = nil
+    self.dataUI = nil
+    self.ui = nil
+    self.keyboardEvents = nil
+    self.attrs = nil
+    self.opcodes = nil
+    self.externalEvents = nil
+    self.__onGameStart = nil
+    self.__onGameEnd = nil
 end
 
-function Controller:onGameStart(callback)
-    self:gameEvent('onGameStart', callback)
-end
-
-function Controller:onGameEnd(callback)
-    self:gameEvent('onGameEnd', callback)
+function Controller:addEvent(actor, events)
+    local evt = EventController:new(actor, events)
+    table.insert(self.externalEvents, evt)
+    return evt
 end
 
 function Controller:attachExternalEvent(event)
@@ -108,15 +180,11 @@ function Controller:disconnectExternalEvents()
 end
 
 function Controller:registerEvents(actor, events)
-    self.events[actor] = events
-end
+    if self.events[self.currentTypeEvent] == nil then
+        self.events[self.currentTypeEvent] = {}
+    end
 
-function Controller:registerWidget(name, widget)
-    self.widgets[name] = widget
-end
-
-function Controller:getWidget(name)
-    return self.widgets[name]
+    self.events[self.currentTypeEvent][actor] = events
 end
 
 function Controller:connectEvents(actor, events)
@@ -164,14 +232,6 @@ function Controller:sendExtendedOpcode(opcode, ...)
     if protocol then
         protocol:sendExtendedOpcode(opcode, ...)
     end
-end
-
-function Controller:setAttribute(name, value)
-    self.attributes[name] = value
-end
-
-function Controller:getAttribute(name)
-    return self.attributes[name]
 end
 
 function Controller:bindKeyDown(...)
