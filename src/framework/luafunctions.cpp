@@ -374,7 +374,10 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_fonts", "clearFonts", &FontManager::clearFonts, &g_fonts);
     g_lua.bindSingletonFunction("g_fonts", "importFont", &FontManager::importFont, &g_fonts);
     g_lua.bindSingletonFunction("g_fonts", "fontExists", &FontManager::fontExists, &g_fonts);
-    g_lua.bindSingletonFunction("g_fonts", "setDefaultFont", &FontManager::setDefaultFont, &g_fonts);
+    g_lua.bindSingletonFunction("g_fonts", "setCreatureNameFont", &FontManager::setCreatureNameFont, &g_fonts);
+    g_lua.bindSingletonFunction("g_fonts", "setAnimatedTextFont", &FontManager::setAnimatedTextFont, &g_fonts);
+    g_lua.bindSingletonFunction("g_fonts", "setStaticTextFont", &FontManager::setStaticTextFont, &g_fonts);
+    g_lua.bindSingletonFunction("g_fonts", "setWidgetTextFont", &FontManager::setWidgetTextFont, &g_fonts);
 
     // ParticleManager
     g_lua.registerSingletonClass("g_particles");
