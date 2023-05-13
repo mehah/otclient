@@ -1,7 +1,7 @@
 controller = Controller:new()
 
 -- uncomment this line to apply an effect on the local player, just for testing purposes.
-function controller:onGameStart()
+--[[function controller:onGameStart()
     g_game.getLocalPlayer():attachEffect(g_attachedEffects.getById(1))
     g_game.getLocalPlayer():attachEffect(g_attachedEffects.getById(2))
     g_game.getLocalPlayer():attachEffect(g_attachedEffects.getById(3))
@@ -9,8 +9,7 @@ end
 
 function controller:onGameEnd()
     g_game.getLocalPlayer():clearAttachedEffects()
-end
-
+end]]
 function controller:onTerminate()
     g_attachedEffects.clear()
 end
