@@ -13,7 +13,7 @@ local function updateCameraPosition()
         return
     end
 
-    local minimapWidget = controller.ui:recursiveGetChildById('minimap')
+    local minimapWidget = controller.ui.contentsPanel.minimap
     if minimapWidget:isDragging() then
         return
     end
@@ -26,27 +26,24 @@ local function updateCameraPosition()
 end
 
 local function toggle()
-    local minimapWindow = controller.ui
-
     if minimapButton:isOn() then
-        minimapWindow:close()
+        controller.ui:close()
     else
-        minimapWindow:open()
+        controller.ui:open()
     end
 end
 
 local function toggleFullMap()
-    local minimapWindow = controller.ui
-    local minimapWidget = controller.widgets.minimapWidget
+    local minimapWidget = controller.ui.contentsPanel.minimap
     local zoom;
 
     if minimapWidget.fullMapView then
-        minimapWidget:setParent(minimapWindow:getChildById('contentsPanel'))
+        minimapWidget:setParent(controller.ui.contentsPanel)
         minimapWidget:fill('parent')
-        minimapWindow:show(true)
+        controller.ui:show(true)
         zoom = minimapWidget.zoomMinimap
     else
-        minimapWindow:hide(true)
+        controller.ui:hide(true)
         minimapWidget:setParent(modules.game_interface.getRootPanel())
         minimapWidget:fill('parent')
         zoom = minimapWidget.zoomFullmap
@@ -74,7 +71,7 @@ function controller:onInit()
         '/images/topbuttons/minimap', toggle)
     minimapButton:setOn(true)
 
-    local minimapWidget = self.ui:recursiveGetChildById('minimap')
+    local minimapWidget = self.ui.contentsPanel.minimap
 
     local gameRootPanel = modules.game_interface.getRootPanel()
     self:bindKeyPress('Alt+Left', function()
@@ -119,7 +116,7 @@ function controller:onGameStart()
         loadFnc(minimapFile)
     end
 
-    self.ui:recursiveGetChildById('minimap'):load()
+    self.ui.contentsPanel.minimap:load()
 end
 
 function controller:onGameEnd()
@@ -132,7 +129,7 @@ function controller:onGameEnd()
         g_map.saveOtcm('/minimap_' .. g_game.getClientVersion() .. '.otcm')
     end
 
-    self.ui:recursiveGetChildById('minimap'):save()
+    self.ui.contentsPanel.minimap:save()
 end
 
 function controller:onTerminate()
