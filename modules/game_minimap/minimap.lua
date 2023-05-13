@@ -1,5 +1,6 @@
 local otmm = true
 local oldPos = nil
+local minimapButton = nil
 
 local function updateCameraPosition()
     local player = g_game.getLocalPlayer()
@@ -12,7 +13,7 @@ local function updateCameraPosition()
         return
     end
 
-    local minimapWidget = controller.widgets.minimapWidget
+    local minimapWidget = controller.ui:recursiveGetChildById('minimap')
     if minimapWidget:isDragging() then
         return
     end
@@ -25,9 +26,9 @@ local function updateCameraPosition()
 end
 
 local function toggle()
-    local minimapWindow = controller.widgets.minimapWindow
+    local minimapWindow = controller.ui
 
-    if controller.widgets.minimapButton:isOn() then
+    if minimapButton:isOn() then
         minimapWindow:close()
     else
         minimapWindow:open()
@@ -35,7 +36,7 @@ local function toggle()
 end
 
 local function toggleFullMap()
-    local minimapWindow = controller.widgets.minimapWindow
+    local minimapWindow = controller.ui
     local minimapWidget = controller.widgets.minimapWidget
     local zoom;
 
@@ -52,7 +53,7 @@ local function toggleFullMap()
     end
 
     minimapWidget.fullMapView = not minimapWidget.fullMapView
-    minimapWidget:setAlternativeWidgetsVisible(fullmapView)
+    -- minimapWidget:setAlternativeWidgetsVisible(fullmapView)
 
     local pos = oldPos or minimapWidget:getCameraPosition()
     oldPos = minimapWidget:getCameraPosition()
@@ -65,18 +66,15 @@ local localPlayerEvent = EventController:new(LocalPlayer, {
 })
 
 controller = Controller:new()
+controller:setUI('minimap')
 controller:attachExternalEvent(localPlayerEvent)
 
 function controller:onInit()
-    local minimapButton = modules.client_topmenu.addRightGameToggleButton('minimapButton', tr('Minimap') .. ' (Ctrl+M)',
-                                                                          '/images/topbuttons/minimap', toggle)
+    minimapButton = modules.client_topmenu.addRightGameToggleButton('minimapButton', tr('Minimap') .. ' (Ctrl+M)',
+        '/images/topbuttons/minimap', toggle)
     minimapButton:setOn(true)
 
-    local minimapWindow = g_ui.loadUI('minimap')
-
-    minimapWindow:setContentMinimumHeight(80)
-
-    local minimapWidget = minimapWindow:recursiveGetChildById('minimap')
+    local minimapWidget = self.ui:recursiveGetChildById('minimap')
 
     local gameRootPanel = modules.game_interface.getRootPanel()
     self:bindKeyPress('Alt+Left', function()
@@ -95,15 +93,13 @@ function controller:onInit()
     self:bindKeyDown('Ctrl+M', toggle)
     self:bindKeyDown('Ctrl+Shift+M', toggleFullMap)
 
-    self:registerWidget('minimapButton', minimapButton)
-    self:registerWidget('minimapWindow', minimapWindow)
-    self:registerWidget('minimapWidget', minimapWidget)
-
-    minimapWindow:setup()
+    self.ui:setVisible(false)
+    self.ui:setContentMinimumHeight(80)
+    self.ui:setup()
 end
 
-controller:onGameStart(function()
-    controller.widgets.minimapWindow:setupOnStart() -- load character window configuration
+function controller:onGameStart()
+    self.ui:setupOnStart() -- load character window configuration
 
     -- Load Map
     g_minimap.clean()
@@ -123,12 +119,11 @@ controller:onGameStart(function()
         loadFnc(minimapFile)
     end
 
-    local minimapWidget = controller.widgets.minimapWidget
-    minimapWidget:load()
-end)
+    self.ui:recursiveGetChildById('minimap'):load()
+end
 
-controller:onGameEnd(function()
-    controller.widgets.minimapWindow:setParent(nil, true)
+function controller:onGameEnd()
+    self.ui:setParent(nil, true)
 
     -- Save Map
     if otmm then
@@ -137,17 +132,21 @@ controller:onGameEnd(function()
         g_map.saveOtcm('/minimap_' .. g_game.getClientVersion() .. '.otcm')
     end
 
-    local minimapWidget = controller.widgets.minimapWidget
-    minimapWidget:save()
-end)
+    self.ui:recursiveGetChildById('minimap'):save()
+end
+
+function controller:onTerminate()
+    minimapButton:destroy()
+    minimapButton = nil
+end
 
 function onMiniWindowOpen()
-    controller.widgets.minimapButton:setOn(true)
+    minimapButton:setOn(true)
     localPlayerEvent:connect()
     localPlayerEvent:execute('onPositionChange')
 end
 
 function onMiniWindowClose()
-    controller.widgets.minimapButton:setOn(false)
+    minimapButton:setOn(false)
     localPlayerEvent:disconnect()
 end

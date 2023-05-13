@@ -52,6 +52,7 @@ Controller = {
 function Controller:new()
     local obj = {
         name = g_modules.getCurrentModule():getName(),
+        currentTypeEvent = TypeEvent.MODULE_INIT,
         events = {},
         externalEvents = {},
         keyboardEvents = {},
