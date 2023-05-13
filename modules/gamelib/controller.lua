@@ -10,7 +10,9 @@ local function onGameStart(self)
 
     if self.__onGameStart ~= nil then
         self.currentTypeEvent = TypeEvent.GAME_INIT
-        self:__onGameStart()
+        addEvent(function()
+            self:__onGameStart()
+        end)
     end
 
     local eventList = self.events[TypeEvent.GAME_INIT]
