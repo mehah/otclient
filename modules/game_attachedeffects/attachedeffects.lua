@@ -18,6 +18,10 @@ local function onAttach(effect, owner)
     local category, thingId = AttachedEffectManager.getDataThing(owner)
     local config = AttachedEffectManager.getConfig(effect:getId(), category, thingId)
 
+    if config.isThingConfig then
+        AttachedEffectManager.executeThingConfig(effect, category, thingId)
+    end
+
     if config.onAttach then
         config.onAttach(effect, owner, config.__onAttach)
     end

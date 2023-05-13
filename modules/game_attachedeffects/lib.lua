@@ -77,7 +77,6 @@ local executeConfig = function(attachedEffect, config)
             end
         end
     end
-
 end
 
 AttachedEffectManager = {
@@ -97,6 +96,7 @@ AttachedEffectManager = {
         end
 
         executeConfig(attachedEffect, config)
+        config.isThingConfig = false
 
         __EFFECTS[id] = {
             id = id,
@@ -130,7 +130,7 @@ AttachedEffectManager = {
 
                 thingConfig[id] = __config
 
-                local originalConfig = effect.config
+                __config.isThingConfig = true
                 if config.onAttach then
                     __config.__onAttach = effect.config.onAttach
                 end
