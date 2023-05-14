@@ -8,7 +8,7 @@
 
 ### Based on [edubart/otclient](https://github.com/edubart/otclient) Rev: [2.760](https://github.com/edubart/otclient/commit/fc39ee4adba8e780a2820bfda66fc942d74cedf4)
 
-#### [Note: for those who are with the walking system stuttering...](https://github.com/mehah/otclient/blob/main/modules/client_config/config.lua#L5)
+#### [Note: for those who are with the walking system stuttering...](https://github.com/mehah/otclient/blob/main/data/setup.otml#L18)
 
 ### Features
 
@@ -28,7 +28,6 @@
 - Support for more mouse buttons, for example 4 and 5
 - Module Controller System ([Code example](https://github.com/mehah/otclient/blob/cache-for-all/modules/game_minimap/minimap.lua))
 - Some bugs fixed contained in [edubart/otclient](https://github.com/edubart/otclient)
-- Client Config in [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h)
 - Client 12.85 ~ 12.92, 13.00 ~ 13.14 support (protobuf)
 - Market has been rewritten to work only [Canary](https://github.com/opentibiabr/canary)
 - Async Texture Loading
