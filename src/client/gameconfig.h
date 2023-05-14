@@ -31,8 +31,6 @@
 class GameConfig
 {
 public:
-    GameConfig();
-
     void init();
     void terminate();
 

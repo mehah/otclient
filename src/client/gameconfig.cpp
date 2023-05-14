@@ -27,10 +27,6 @@
 
 GameConfig g_gameConfig;
 
-GameConfig::GameConfig() :
-    m_creatureNameFont(g_fonts.getDefaultFont()), m_animatedTextFont(g_fonts.getDefaultFont()),
-    m_staticTextFont(g_fonts.getDefaultFont()), m_widgetTextFont(g_fonts.getDefaultFont()) {}
-
 void GameConfig::init()
 {
     try {
@@ -45,7 +41,7 @@ void GameConfig::init()
             }
         }
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to read dat otml '%s': %s'", "data/config", e.what()));
+        g_logger.error(stdext::format("Failed to read config otml '%s': %s'", "data/config", e.what()));
     }
 }
 
@@ -63,12 +59,12 @@ void GameConfig::loadFonts() {
     m_widgetTextFont = g_fonts.getFont(m_widgetTextFontName);
 }
 
-void GameConfig::loadGameNode(const OTMLNodePtr& node) {
-    for (const auto& node2 : node->children()) {
+void GameConfig::loadGameNode(const OTMLNodePtr& mainNode) {
+    for (const auto& node : mainNode->children()) {
         if (node->tag() == "sprite-size")
-            m_spriteSize = node->value<uint8_t>();
+            m_spriteSize = node->value<int>();
         else if (node->tag() == "last-supported-version")
-            m_lastSupportedVersion = node->value<uint16_t>();
+            m_lastSupportedVersion = node->value<int>();
         else if (node->tag() == "map")
             loadMapNode(node);
         else if (node->tag() == "tile")
@@ -80,8 +76,8 @@ void GameConfig::loadGameNode(const OTMLNodePtr& node) {
     }
 }
 
-void GameConfig::loadFontNode(const OTMLNodePtr& node) {
-    for (const auto& node2 : node->children()) {
+void GameConfig::loadFontNode(const OTMLNodePtr& mainNode) {
+    for (const auto& node : mainNode->children()) {
         if (node->tag() == "widget")
             m_widgetTextFontName = node->value();
         else if (node->tag() == "static-text")
@@ -94,53 +90,53 @@ void GameConfig::loadFontNode(const OTMLNodePtr& node) {
 }
 
 void GameConfig::loadMapNode(const OTMLNodePtr& node) {
-    for (const auto& node2 : node->children()) {
+    for (const auto& node : node->children()) {
         if (node->tag() == "viewport")
-            m_mapViewPort = node->value<uint8_t>();
+            m_mapViewPort = node->value<Size>();
         else if (node->tag() == "max-z")
-            m_mapMaxZ = node->value<uint8_t>();
+            m_mapMaxZ = node->value<int>();
         else if (node->tag() == "sea-floor")
-            m_mapSeaFloor = node->value<uint8_t>();
+            m_mapSeaFloor = node->value<int>();
         else if (node->tag() == "underground-floor")
-            m_mapUndergroundFloorRange = node->value<uint8_t>();
+            m_mapUndergroundFloorRange = node->value<int>();
         else if (node->tag() == "aware-underground-floor-range")
-            m_mapAwareUndergroundFloorRange = node->value<uint8_t>();
+            m_mapAwareUndergroundFloorRange = node->value<int>();
     }
 }
 
 void GameConfig::loadTileNode(const OTMLNodePtr& node) {
     if (node->tag() == "max-elevation")
-        m_tileMaxElevation = node->value<uint8_t>();
+        m_tileMaxElevation = node->value<int>();
     else if (node->tag() == "max-things")
-        m_tileMaxThings = node->value<uint8_t>();
+        m_tileMaxThings = node->value<int>();
     else if (node->tag() == "transparent-floor-view-range")
-        m_tileTransparentFloorViewRange = node->value<uint8_t>();
+        m_tileTransparentFloorViewRange = node->value<int>();
 }
 
 void GameConfig::loadCreatureNode(const OTMLNodePtr& node) {
     if (node->tag() == "force-new-walking-formula")
         m_forceNewWalkingFormula = node->value<bool>();
     else if (node->tag() == "shield-blink-ticks")
-        m_shieldBlinkTicks = node->value<uint16_t>();
+        m_shieldBlinkTicks = node->value<int>();
     else if (node->tag() == "volatile-square-duration")
-        m_volatileSquareDuration = node->value<uint16_t>();
+        m_volatileSquareDuration = node->value<int>();
     else if (node->tag() == "adjust-creature-information-based-crop-size")
         m_adjustCreatureInformationBasedCropSize = node->value<bool>();
 }
 
 void GameConfig::loadRenderNode(const OTMLNodePtr& node) {
     if (node->tag() == "invisible-ticks-per-frame")
-        m_invisibleTicksPerFrame = node->value<uint16_t>();
+        m_invisibleTicksPerFrame = node->value<int>();
     else if (node->tag() == "item-ticks-per-frame")
-        m_itemTicksPerFrame = node->value<uint16_t>();
+        m_itemTicksPerFrame = node->value<int>();
     else if (node->tag() == "effect-ticks-per-frame")
-        m_effectTicksPerFrame = node->value<uint16_t>();
+        m_effectTicksPerFrame = node->value<int>();
     else if (node->tag() == "missile-ticks-per-frame")
-        m_missileTicksPerFrame = node->value<uint16_t>();
+        m_missileTicksPerFrame = node->value<int>();
     else if (node->tag() == "animated-text-duration")
-        m_animatedTextDuration = node->value<uint16_t>();
+        m_animatedTextDuration = node->value<int>();
     else if (node->tag() == "static-duration-per-character")
-        m_staticDurationPerCharacter = node->value<uint16_t>();
+        m_staticDurationPerCharacter = node->value<int>();
     else if (node->tag() == "min-static-text-duration")
-        m_minStatictextDuration = node->value<uint16_t>();
+        m_minStatictextDuration = node->value<int>();
 };
