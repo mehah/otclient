@@ -106,10 +106,10 @@ private:
     uint16_t m_staticDurationPerCharacter{ 60 };
     uint16_t m_minStatictextDuration{ 3000 };
 
-    std::string m_creatureNameFontName;
-    std::string m_animatedTextFontName;
-    std::string m_staticTextFontName;
-    std::string m_widgetTextFontName;
+    std::string m_creatureNameFontName{ "verdana-11px-rounded" };
+    std::string m_animatedTextFontName{ "verdana-11px-rounded" };
+    std::string m_staticTextFontName{ "verdana-11px-rounded" };
+    std::string m_widgetTextFontName{ "verdana-11px-antialised" };
 
     BitmapFontPtr m_creatureNameFont;
     BitmapFontPtr m_animatedTextFont;

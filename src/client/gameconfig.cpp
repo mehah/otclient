@@ -27,8 +27,13 @@
 
 GameConfig g_gameConfig;
 
+static constexpr bool LOAD_SETUP = true;
+
 void GameConfig::init()
 {
+    if (!LOAD_SETUP)
+        return;
+
     const std::string& fileName = "/data/setup";
 
     try {
