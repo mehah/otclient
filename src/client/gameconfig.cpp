@@ -91,8 +91,8 @@ void GameConfig::loadFontNode(const OTMLNodePtr& mainNode) {
     }
 }
 
-void GameConfig::loadMapNode(const OTMLNodePtr& node) {
-    for (const auto& node : node->children()) {
+void GameConfig::loadMapNode(const OTMLNodePtr& mainNode) {
+    for (const auto& node : mainNode->children()) {
         if (node->tag() == "viewport")
             m_mapViewPort = node->value<Size>();
         else if (node->tag() == "max-z")
@@ -106,39 +106,45 @@ void GameConfig::loadMapNode(const OTMLNodePtr& node) {
     }
 }
 
-void GameConfig::loadTileNode(const OTMLNodePtr& node) {
-    if (node->tag() == "max-elevation")
-        m_tileMaxElevation = node->value<int>();
-    else if (node->tag() == "max-things")
-        m_tileMaxThings = node->value<int>();
-    else if (node->tag() == "transparent-floor-view-range")
-        m_tileTransparentFloorViewRange = node->value<int>();
+void GameConfig::loadTileNode(const OTMLNodePtr& mainNode) {
+    for (const auto& node : mainNode->children()) {
+        if (node->tag() == "max-elevation")
+            m_tileMaxElevation = node->value<int>();
+        else if (node->tag() == "max-things")
+            m_tileMaxThings = node->value<int>();
+        else if (node->tag() == "transparent-floor-view-range")
+            m_tileTransparentFloorViewRange = node->value<int>();
+    }
 }
 
-void GameConfig::loadCreatureNode(const OTMLNodePtr& node) {
-    if (node->tag() == "force-new-walking-formula")
-        m_forceNewWalkingFormula = node->value<bool>();
-    else if (node->tag() == "shield-blink-ticks")
-        m_shieldBlinkTicks = node->value<int>();
-    else if (node->tag() == "volatile-square-duration")
-        m_volatileSquareDuration = node->value<int>();
-    else if (node->tag() == "adjust-creature-information-based-crop-size")
-        m_adjustCreatureInformationBasedCropSize = node->value<bool>();
+void GameConfig::loadCreatureNode(const OTMLNodePtr& mainNode) {
+    for (const auto& node : mainNode->children()) {
+        if (node->tag() == "force-new-walking-formula")
+            m_forceNewWalkingFormula = node->value<bool>();
+        else if (node->tag() == "shield-blink-ticks")
+            m_shieldBlinkTicks = node->value<int>();
+        else if (node->tag() == "volatile-square-duration")
+            m_volatileSquareDuration = node->value<int>();
+        else if (node->tag() == "adjust-creature-information-based-crop-size")
+            m_adjustCreatureInformationBasedCropSize = node->value<bool>();
+    }
 }
 
-void GameConfig::loadRenderNode(const OTMLNodePtr& node) {
-    if (node->tag() == "invisible-ticks-per-frame")
-        m_invisibleTicksPerFrame = node->value<int>();
-    else if (node->tag() == "item-ticks-per-frame")
-        m_itemTicksPerFrame = node->value<int>();
-    else if (node->tag() == "effect-ticks-per-frame")
-        m_effectTicksPerFrame = node->value<int>();
-    else if (node->tag() == "missile-ticks-per-frame")
-        m_missileTicksPerFrame = node->value<int>();
-    else if (node->tag() == "animated-text-duration")
-        m_animatedTextDuration = node->value<int>();
-    else if (node->tag() == "static-duration-per-character")
-        m_staticDurationPerCharacter = node->value<int>();
-    else if (node->tag() == "min-static-text-duration")
-        m_minStatictextDuration = node->value<int>();
+void GameConfig::loadRenderNode(const OTMLNodePtr& mainNode) {
+    for (const auto& node : mainNode->children()) {
+        if (node->tag() == "invisible-ticks-per-frame")
+            m_invisibleTicksPerFrame = node->value<int>();
+        else if (node->tag() == "item-ticks-per-frame")
+            m_itemTicksPerFrame = node->value<int>();
+        else if (node->tag() == "effect-ticks-per-frame")
+            m_effectTicksPerFrame = node->value<int>();
+        else if (node->tag() == "missile-ticks-per-frame")
+            m_missileTicksPerFrame = node->value<int>();
+        else if (node->tag() == "animated-text-duration")
+            m_animatedTextDuration = node->value<int>();
+        else if (node->tag() == "static-duration-per-character")
+            m_staticDurationPerCharacter = node->value<int>();
+        else if (node->tag() == "min-static-text-duration")
+            m_minStatictextDuration = node->value<int>();
+    }
 };
