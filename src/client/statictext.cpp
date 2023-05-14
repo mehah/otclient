@@ -70,7 +70,7 @@ bool StaticText::addMessage(const std::string_view name, Otc::MessageMode mode, 
         m_updateEvent = nullptr;
     }
 
-    int delay = std::max<int>(g_gameConfig.getStaticDurationPerCharacter() * text.length(), g_gameConfig.getStaticDurationPerCharacter());
+    int delay = std::max<int>(g_gameConfig.getStaticDurationPerCharacter() * text.length(), g_gameConfig.getMinStatictextDuration());
     if (isYell())
         delay *= 2;
 

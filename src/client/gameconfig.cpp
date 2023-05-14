@@ -29,8 +29,10 @@ GameConfig g_gameConfig;
 
 void GameConfig::init()
 {
+    const std::string& fileName = "/data/setup";
+
     try {
-        const auto& file = g_resources.guessFilePath("/data/config", "otml");
+        const auto& file = g_resources.guessFilePath(fileName, "otml");
 
         const auto& doc = OTMLDocument::parse(file);
         for (const auto& node : doc->children()) {
@@ -41,7 +43,7 @@ void GameConfig::init()
             }
         }
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to read config otml '%s': %s'", "data/config", e.what()));
+        g_logger.error(stdext::format("Failed to read config otml '%s': %s'", fileName, e.what()));
     }
 }
 
