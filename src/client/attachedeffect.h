@@ -92,7 +92,6 @@ private:
 
     uint32_t m_frame{ 0 };
 
-    bool m_onTop{ false };
     bool m_hideOwner{ false };
     bool m_transform{ false };
     bool m_canDrawOnUI{ true };

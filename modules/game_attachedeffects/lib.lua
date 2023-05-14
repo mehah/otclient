@@ -2,78 +2,81 @@ local __EFFECTS = {}
 local __THING_CONFIG = {}
 
 local executeConfig = function(attachedEffect, config)
+    if not config then
+        return
+    end
+
     local x = 0
     local y = 0
-    local onTop = false
+    local onTop = config.onTop or false
 
-    if config then
-        if config.speed then
-            attachedEffect:setSpeed(config.speed)
-        end
+    if config.speed then
+        attachedEffect:setSpeed(config.speed)
+    end
 
-        if config.offset then
-            x = config.offset[1] or 0
-            y = config.offset[2] or 0
-            onTop = config.offset[3] or false
-        end
+    if config.drawOnUI == false then
+        attachedEffect:setCanDrawOnUI(false)
+    end
 
-        if config.drawOnUI == false then
-            attachedEffect:setCanDrawOnUI(false)
-        end
+    if config.shader then
+        attachedEffect:setShader(config.shader)
+    end
 
-        if config.shader then
-            attachedEffect:setShader(config.shader)
-        end
+    if config.opacity ~= nil and config.opacity < 1.0 then
+        attachedEffect:setOpacity(config.opacity)
+    end
 
-        if config.opacity ~= nil and config.opacity < 1.0 then
-            attachedEffect:setOpacity(config.opacity)
-        end
+    if config.duration ~= nil and config.duration > 0 then
+        attachedEffect:setDuration(config.duration)
+    end
 
-        if config.duration ~= nil and config.duration > 0 then
-            attachedEffect:setDuration(config.duration)
-        end
+    if config.loop ~= nil and config.loop > 0 then
+        attachedEffect:setLoop(config.loop)
+    end
 
-        if config.loop ~= nil and config.loop > 0 then
-            attachedEffect:setLoop(config.loop)
-        end
+    if config.transform then
+        attachedEffect:setTransform(config.transform)
+    end
 
-        if config.transform then
-            attachedEffect:setTransform(config.transform)
-        end
+    if config.hideOwner then
+        attachedEffect:setHideOwner(config.hideOwner)
+    end
 
-        if config.hideOwner then
-            attachedEffect:setHideOwner(config.hideOwner)
-        end
+    if config.size then
+        attachedEffect:setSize({
+            width = config.size[1],
+            height = config.size[2]
+        })
+    end
 
-        if config.size then
-            attachedEffect:setSize({
-                width = config.size[1],
-                height = config.size[2]
-            })
-        end
+    if config.disableWalkAnimation then
+        attachedEffect:setDisableWalkAnimation(config.disableWalkAnimation)
+    end
 
-        if config.disableWalkAnimation then
-            attachedEffect:setDisableWalkAnimation(config.disableWalkAnimation)
-        end
+    if config.offset then
+        x = config.offset[1] or 0
+        y = config.offset[2] or 0
+        onTop = config.offset[3] or onTop
+    end
 
-        if x ~= 0 or y ~= 0 then
-            attachedEffect:setOffset(x, y)
-        end
-        if onTop then
-            attachedEffect:setOnTop(true)
-        end
+    if x ~= 0 or y ~= 0 then
+        attachedEffect:setOffset(x, y)
+    end
 
-        if config.dirOffset then
-            for dir, offset in pairs(config.dirOffset) do
-                local _x = offset[1] or x
-                local _y = offset[2] or y
-                local _onTop = offset[3] or onTop
+    if onTop then
+        attachedEffect:setOnTop(true)
+    end
 
-                if type(x) == 'boolean' then -- onTop Config
-                    attachedEffect:setOnTopByDir(dir, _x)
-                else
-                    attachedEffect:setDirOffset(dir, _x, _y, _onTop)
-                end
+    if config.dirOffset then
+        for dir, offset in pairs(config.dirOffset) do
+            local _x = offset[1] or x
+            local _y = offset[2] or y
+            local _onTop = offset[3] or onTop
+
+            if type(x) == 'boolean' then -- onTop Config
+                attachedEffect:setOnTopByDir(dir, _x)
+            else
+                attachedEffect:setDirOffset(dir, _x, _y, _onTop)
             end
         end
     end
