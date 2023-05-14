@@ -236,13 +236,20 @@ void Module::discover(const OTMLNodePtr& moduleNode)
 
     if (const auto& node = moduleNode->get("scripts")) {
         for (const auto& tmp : node->children()) {
-            auto path = stdext::resolve_path(tmp->value(), node->source());
+            auto path = std::filesystem::path(stdext::resolve_path(tmp->value(), node->source())).replace_extension().string();
 
             if (path.ends_with('*')) {
                 path.pop_back();
-                for (const auto& filePath : g_resources.listDirectoryFiles(path, true, false, true)) {
+                if (path.ends_with('/'))
+                    path.pop_back();
+
+                for (auto filePath : g_resources.listDirectoryFiles(path, true, false, true)) {
                     if (g_resources.isFileType(filePath, "lua")) {
-                        m_scripts.emplace_back(filePath);
+                        filePath = std::filesystem::path(filePath).replace_extension().string();
+
+                        auto foundElement = std::find(m_scripts.begin(), m_scripts.end(), filePath);
+                        if (m_scripts.end() == foundElement)
+                            m_scripts.emplace_back(filePath);
                     }
                 }
             } else
