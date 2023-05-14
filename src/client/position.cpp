@@ -20,43 +20,52 @@
  * THE SOFTWARE.
  */
 
-#include "client.h"
-#include <framework/core/resourcemanager.h>
-#include "game.h"
-#include "map.h"
-#include "minimap.h"
-#include "shadermanager.h"
-#include "spriteappearances.h"
-#include "spritemanager.h"
+#include "position.h"
+#include "gameconfig.h"
 
-Client g_client;
+bool Position::isMapPosition() const { return ((x >= 0) && (y >= 0) && (x < UINT16_MAX) && (y < UINT16_MAX) && (z <= g_gameConfig.getMapMaxZ())); }
 
-void Client::init(std::vector<std::string>& /*args*/)
+bool Position::up(int8_t n)
 {
-    // register needed lua functions
-    registerLuaFunctions();
-
-    g_gameConfig.init();
-    g_map.init();
-    g_minimap.init();
-    g_game.init();
-    g_shaders.init();
-    g_sprites.init();
-    g_spriteAppearances.init();
-    g_things.init();
+    const int8_t nz = z - n;
+    if (nz >= 0 && nz <= g_gameConfig.getMapMaxZ()) {
+        z = nz;
+        return true;
+    }
+    return false;
 }
 
-void Client::terminate()
+bool Position::down(int8_t n)
 {
-#ifdef FRAMEWORK_EDITOR
-    g_creatures.terminate();
-#endif
-    g_game.terminate();
-    g_map.terminate();
-    g_minimap.terminate();
-    g_things.terminate();
-    g_sprites.terminate();
-    g_spriteAppearances.terminate();
-    g_shaders.terminate();
-    g_gameConfig.terminate();
+    const int8_t nz = z + n;
+    if (nz >= 0 && nz <= g_gameConfig.getMapMaxZ()) {
+        z = nz;
+        return true;
+    }
+
+    return false;
+}
+
+bool Position::coveredUp(int8_t n)
+{
+    const int32_t nx = x + n, ny = y + n;
+    const int8_t nz = z - n;
+    if (nx >= 0 && nx <= UINT16_MAX && ny >= 0 && ny <= UINT16_MAX && nz >= 0 && nz <= g_gameConfig.getMapMaxZ()) {
+        x = nx; y = ny; z = nz;
+        return true;
+    }
+
+    return false;
+}
+
+bool Position::coveredDown(int8_t n)
+{
+    const int32_t nx = x - n, ny = y - n;
+    const int8_t nz = z + n;
+    if (nx >= 0 && nx <= UINT16_MAX && ny >= 0 && ny <= UINT16_MAX && nz >= 0 && nz <= g_gameConfig.getMapMaxZ()) {
+        x = nx; y = ny; z = nz;
+        return true;
+    }
+
+    return false;
 }

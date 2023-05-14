@@ -229,10 +229,10 @@ int Item::calculateAnimationPhase()
     if (getIdleAnimator()) return getIdleAnimator()->getPhase();
 
     if (m_async) {
-        return (g_clock.millis() % (ITEM_TICKS_PER_FRAME * getAnimationPhases())) / ITEM_TICKS_PER_FRAME;
+        return (g_clock.millis() % (g_gameConfig.getItemTicksPerFrame() * getAnimationPhases())) / g_gameConfig.getItemTicksPerFrame();
     }
 
-    if (g_clock.millis() - m_lastPhase >= ITEM_TICKS_PER_FRAME) {
+    if (g_clock.millis() - m_lastPhase >= g_gameConfig.getItemTicksPerFrame()) {
         m_phase = (m_phase + 1) % getAnimationPhases();
         m_lastPhase = g_clock.millis();
     }

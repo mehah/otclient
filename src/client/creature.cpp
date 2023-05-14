@@ -43,7 +43,7 @@ double Creature::speedC = 0;
 
 Creature::Creature() :m_type(Proto::CreatureTypeUnknown)
 {
-    m_name.setFont(g_fonts.getCreatureNameFont());
+    m_name.setFont(g_gameConfig.getCreatureNameFont());
     m_name.setAlign(Fw::AlignTopCenter);
 
     // Example of how to send a UniformValue to shader
@@ -72,7 +72,7 @@ void Creature::draw(const Point& dest, uint32_t flags, LightView* lightView)
         }
 
         if (m_showStaticSquare) {
-            g_drawPool.addBoundingRect(Rect(dest + (m_walkOffset - getDisplacement()) * g_drawPool.getScaleFactor(), Size(SPRITE_SIZE * g_drawPool.getScaleFactor())), m_staticSquareColor, std::max<int>(static_cast<int>(2 * g_drawPool.getScaleFactor()), 1));
+            g_drawPool.addBoundingRect(Rect(dest + (m_walkOffset - getDisplacement()) * g_drawPool.getScaleFactor(), Size(g_gameConfig.getSpriteSize() * g_drawPool.getScaleFactor())), m_staticSquareColor, std::max<int>(static_cast<int>(2 * g_drawPool.getScaleFactor()), 1));
         }
 
         const auto& _dest = dest + m_walkOffset * g_drawPool.getScaleFactor();
@@ -86,7 +86,7 @@ void Creature::draw(const Point& dest, uint32_t flags, LightView* lightView)
     if (lightView && flags & Otc::DrawLights) {
         auto light = getLight();
 
-        if (isLocalPlayer() && (g_map.getLight().intensity < 64 || m_position.z > SEA_FLOOR)) {
+        if (isLocalPlayer() && (g_map.getLight().intensity < 64 || m_position.z > g_gameConfig.getMapSeaFloor())) {
             if (light.intensity == 0) {
                 light.intensity = 2;
             } else if (light.color == 0 || light.color > 215) {
@@ -95,7 +95,7 @@ void Creature::draw(const Point& dest, uint32_t flags, LightView* lightView)
         }
 
         if (light.intensity > 0) {
-            lightView->addLightSource(dest + (m_walkOffset + (Point(SPRITE_SIZE / 2))) * g_drawPool.getScaleFactor(), light);
+            lightView->addLightSource(dest + (m_walkOffset + (Point(g_gameConfig.getSpriteSize() / 2))) * g_drawPool.getScaleFactor(), light);
         }
     }
 }
@@ -156,13 +156,13 @@ void Creature::internalDraw(Point dest, bool isMarked, const Color& color, Light
             // outfit is a creature imitating an item or the invisible effect
         } else {
             int animationPhases = m_thingType->getAnimationPhases();
-            int animateTicks = ITEM_TICKS_PER_FRAME;
+            int animateTicks = g_gameConfig.getItemTicksPerFrame();
 
             // when creature is an effect we cant render the first and last animation phase,
             // instead we should loop in the phases between
             if (m_outfit.isEffect()) {
                 animationPhases = std::max<int>(1, animationPhases - 2);
-                animateTicks = INVISIBLE_TICKS_PER_FRAME;
+                animateTicks = g_gameConfig.getInvisibleTicksPerFrame();
             }
 
             if (animationPhases > 1) {
@@ -191,10 +191,10 @@ void Creature::drawOutfit(const Rect& destRect, uint8_t size, const Color& color
 
     uint8_t frameSize = getExactSize();
     if (size > 0)
-        frameSize = std::max<int>(frameSize * (size / 100.f), 2 * SPRITE_SIZE * (size / 100.f));
+        frameSize = std::max<int>(frameSize * (size / 100.f), 2 * g_gameConfig.getSpriteSize() * (size / 100.f));
 
     g_drawPool.bindFrameBuffer(frameSize);
-    internalDraw(Point(frameSize - SPRITE_SIZE) + getDisplacement(), false, color);
+    internalDraw(Point(frameSize - g_gameConfig.getSpriteSize()) + getDisplacement(), false, color);
     g_drawPool.releaseFrameBuffer(destRect);
 }
 
@@ -228,8 +228,8 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
     // calculate main rects
 
     const auto& nameSize = m_name.getTextSize();
-    const int cropSizeText = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? getExactSize() : 12;
-    const int cropSizeBackGround = ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE ? cropSizeText - nameSize.height() : 0;
+    const int cropSizeText = g_gameConfig.isAdjustCreatureInformationBasedCropSize() ? getExactSize() : 12;
+    const int cropSizeBackGround = g_gameConfig.isAdjustCreatureInformationBasedCropSize() ? cropSizeText - nameSize.height() : 0;
 
     g_drawPool.select(DrawPoolType::CREATURE_INFORMATION);
     {
@@ -522,14 +522,14 @@ void Creature::updateWalkOffset(uint8_t totalPixelsWalked)
 {
     m_walkOffset = {};
     if (m_direction == Otc::North || m_direction == Otc::NorthEast || m_direction == Otc::NorthWest)
-        m_walkOffset.y = SPRITE_SIZE - totalPixelsWalked;
+        m_walkOffset.y = g_gameConfig.getSpriteSize() - totalPixelsWalked;
     else if (m_direction == Otc::South || m_direction == Otc::SouthEast || m_direction == Otc::SouthWest)
-        m_walkOffset.y = totalPixelsWalked - SPRITE_SIZE;
+        m_walkOffset.y = totalPixelsWalked - g_gameConfig.getSpriteSize();
 
     if (m_direction == Otc::East || m_direction == Otc::NorthEast || m_direction == Otc::SouthEast)
-        m_walkOffset.x = totalPixelsWalked - SPRITE_SIZE;
+        m_walkOffset.x = totalPixelsWalked - g_gameConfig.getSpriteSize();
     else if (m_direction == Otc::West || m_direction == Otc::NorthWest || m_direction == Otc::SouthWest)
-        m_walkOffset.x = SPRITE_SIZE - totalPixelsWalked;
+        m_walkOffset.x = g_gameConfig.getSpriteSize() - totalPixelsWalked;
 }
 
 void Creature::updateWalkingTile()
@@ -537,13 +537,13 @@ void Creature::updateWalkingTile()
     // determine new walking tile
     TilePtr newWalkingTile;
 
-    const Rect virtualCreatureRect(SPRITE_SIZE + (m_walkOffset.x - getDisplacementX()),
-                                   SPRITE_SIZE + (m_walkOffset.y - getDisplacementY()),
-                                   SPRITE_SIZE, SPRITE_SIZE);
+    const Rect virtualCreatureRect(g_gameConfig.getSpriteSize() + (m_walkOffset.x - getDisplacementX()),
+                                   g_gameConfig.getSpriteSize() + (m_walkOffset.y - getDisplacementY()),
+                                   g_gameConfig.getSpriteSize(), g_gameConfig.getSpriteSize());
 
     for (int xi = -1; xi <= 1 && !newWalkingTile; ++xi) {
         for (int yi = -1; yi <= 1 && !newWalkingTile; ++yi) {
-            Rect virtualTileRect((xi + 1) * SPRITE_SIZE, (yi + 1) * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE);
+            Rect virtualTileRect((xi + 1) * g_gameConfig.getSpriteSize(), (yi + 1) * g_gameConfig.getSpriteSize(), g_gameConfig.getSpriteSize(), g_gameConfig.getSpriteSize());
 
             // only render creatures where bottom right is inside tile rect
             if (virtualTileRect.contains(virtualCreatureRect.bottomRight())) {
@@ -591,9 +591,9 @@ void Creature::nextWalkUpdate()
 
 void Creature::updateWalk(const bool isPreWalking)
 {
-    const float walkTicksPerPixel = getStepDuration(true) / static_cast<float>(SPRITE_SIZE);
+    const float walkTicksPerPixel = getStepDuration(true) / static_cast<float>(g_gameConfig.getSpriteSize());
 
-    const int totalPixelsWalked = std::min<int>(m_walkTimer.ticksElapsed() / walkTicksPerPixel, SPRITE_SIZE);
+    const int totalPixelsWalked = std::min<int>(m_walkTimer.ticksElapsed() / walkTicksPerPixel, g_gameConfig.getSpriteSize());
 
     // needed for paralyze effect
     m_walkedPixels = std::max<int>(m_walkedPixels, totalPixelsWalked);
@@ -602,7 +602,7 @@ void Creature::updateWalk(const bool isPreWalking)
     updateWalkOffset(m_walkedPixels);
     updateWalkingTile();
 
-    if (!isPreWalking && m_walkedPixels == SPRITE_SIZE) {
+    if (!isPreWalking && m_walkedPixels == g_gameConfig.getSpriteSize()) {
         terminateWalk();
     }
 }
@@ -773,7 +773,7 @@ void Creature::setShieldTexture(const std::string& filename, bool blink)
         auto self = static_self_cast<Creature>();
         g_dispatcher.scheduleEvent([self] {
             self->updateShield();
-        }, SHIELD_BLINK_TICKS);
+        }, g_gameConfig.getShieldBlinkTicks());
     }
 
     m_shieldBlink = blink;
@@ -788,7 +788,7 @@ void Creature::addTimedSquare(uint8_t color)
     const auto self = static_self_cast<Creature>();
     g_dispatcher.scheduleEvent([self] {
         self->removeTimedSquare();
-    }, VOLATILE_SQUARE_DURATION);
+    }, g_gameConfig.getVolatileSquareDuration());
 }
 
 void Creature::updateShield()
@@ -799,7 +799,7 @@ void Creature::updateShield()
         auto self = static_self_cast<Creature>();
         g_dispatcher.scheduleEvent([self] {
             self->updateShield();
-        }, SHIELD_BLINK_TICKS);
+        }, g_gameConfig.getShieldBlinkTicks());
     } else if (!m_shieldBlink)
         m_showShieldTexture = true;
 }
@@ -830,14 +830,14 @@ uint16_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
             stepDuration /= m_calculatedStepSpeed;
         } else stepDuration /= m_speed;
 
-        if (g_game.isForcingNewWalkingFormula() || g_game.getClientVersion() >= 860) {
+        if (g_gameConfig.isForcingNewWalkingFormula() || g_game.getClientVersion() >= 860) {
             const int serverBeat = g_game.getServerBeat();
             stepDuration = ((stepDuration + serverBeat - 1) / serverBeat) * serverBeat;
         }
 
         m_stepCache.duration = stepDuration + 10;
-        m_stepCache.walkDuration = std::min<int>(stepDuration / SPRITE_SIZE, DrawPool::FPS60);
-        m_stepCache.diagonalDuration = stepDuration * (g_game.getClientVersion() > 810 || g_game.isForcingNewWalkingFormula() ? 3 : 2);
+        m_stepCache.walkDuration = std::min<int>(stepDuration / g_gameConfig.getSpriteSize(), DrawPool::FPS60);
+        m_stepCache.diagonalDuration = stepDuration * (g_game.getClientVersion() > 810 || g_gameConfig.isForcingNewWalkingFormula() ? 3 : 2);
     }
 
     return ignoreDiagonal ? m_stepCache.duration : m_stepCache.getDuration(m_lastStepDirection);
@@ -929,7 +929,7 @@ int Creature::getExactSize(int layer, int xPattern, int yPattern, int zPattern, 
         exactSize = m_thingType->getExactSize();
     }
 
-    return m_exactSize = std::max<uint8_t>(exactSize, SPRITE_SIZE);
+    return m_exactSize = std::max<uint8_t>(exactSize, g_gameConfig.getSpriteSize());
 }
 
 void Creature::setMountShader(const std::string_view name) { m_mountShader = g_shaders.getShader(name); }

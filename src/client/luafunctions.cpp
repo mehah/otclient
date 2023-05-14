@@ -27,6 +27,7 @@
 #include "creature.h"
 #include "effect.h"
 #include "game.h"
+#include "gameconfig.h"
 #include "item.h"
 #include "localplayer.h"
 #include "luavaluecasts.h"
@@ -333,8 +334,6 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "openStore", &Game::openStore, &g_game);
     g_lua.bindSingletonFunction("g_game", "transferCoins", &Game::transferCoins, &g_game);
     g_lua.bindSingletonFunction("g_game", "openTransactionHistory", &Game::openTransactionHistory, &g_game);
-    g_lua.bindSingletonFunction("g_game", "setLastSupportedVersion", &Game::setLastSupportedVersion, &g_game);
-    g_lua.bindSingletonFunction("g_game", "getLastSupportedVersion", &Game::getLastSupportedVersion, &g_game);
     g_lua.bindSingletonFunction("g_game", "leaveMarket", &Game::leaveMarket, &g_game);
     g_lua.bindSingletonFunction("g_game", "browseMarket", &Game::browseMarket, &g_game);
     g_lua.bindSingletonFunction("g_game", "createMarketOffer", &Game::createMarketOffer, &g_game);
@@ -345,9 +344,10 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "applyImbuement", &Game::applyImbuement, &g_game);
     g_lua.bindSingletonFunction("g_game", "clearImbuement", &Game::clearImbuement, &g_game);
     g_lua.bindSingletonFunction("g_game", "closeImbuingWindow", &Game::closeImbuingWindow, &g_game);
-    g_lua.bindSingletonFunction("g_game", "setForceNewWalkingFormula", &Game::setForceNewWalkingFormula, &g_game);
-    g_lua.bindSingletonFunction("g_game", "isForcingNewWalkingFormula", &Game::isForcingNewWalkingFormula, &g_game);
     g_lua.bindSingletonFunction("g_game", "isUsingProtobuf", &Game::isUsingProtobuf, &g_game);
+
+    g_lua.registerSingletonClass("g_gameConfig");
+    g_lua.bindSingletonFunction("g_gameConfig", "loadFonts", &GameConfig::loadFonts, &g_gameConfig);
 
     g_lua.registerSingletonClass("g_shaders");
     g_lua.bindSingletonFunction("g_shaders", "createShader", &ShaderManager::createShader, &g_shaders);

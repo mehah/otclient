@@ -68,6 +68,10 @@ int main(int argc, const char* argv[])
         return 0; // started other executable
     }
 
+    // find script init.lua and run it
+    if (!g_resources.discoverWorkDir("init.lua"))
+        g_logger.fatal("Unable to find work directory, the application cannot be initialized.");
+
 #if ENABLE_DISCORD_RPC == 1
     g_discord.init();
 #endif
@@ -83,10 +87,6 @@ int main(int argc, const char* argv[])
     // Unzip Android assets/data.zip
     g_androidManager.unZipAssetData();
 #endif
-
-    // find script init.lua and run it
-    if (!g_resources.discoverWorkDir("init.lua"))
-        g_logger.fatal("Unable to find work directory, the application cannot be initialized.");
 
     if (!g_lua.safeRunScript("init.lua"))
         g_logger.fatal("Unable to run script init.lua!");

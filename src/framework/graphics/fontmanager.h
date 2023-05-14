@@ -36,22 +36,12 @@ public:
     bool fontExists(const std::string_view fontName);
     BitmapFontPtr getFont(const std::string_view fontName);
 
-    BitmapFontPtr getCreatureNameFont() { return m_creatureNameFont; }
-    BitmapFontPtr getAnimatedTextFont() { return m_animatedTextFont; }
-    BitmapFontPtr getStaticTextFont() { return m_staticTextFont; }
-    BitmapFontPtr getWidgetTextFont() { return m_widgetTextFont; }
+    BitmapFontPtr getDefaultFont() const { return m_defaultFont; }
 
-    void setCreatureNameFont(const std::string_view fontName) { m_creatureNameFont = getFont(fontName); }
-    void setAnimatedTextFont(const std::string_view fontName) { m_animatedTextFont = getFont(fontName); }
-    void setStaticTextFont(const std::string_view fontName) { m_staticTextFont = getFont(fontName); }
-    void setWidgetTextFont(const std::string_view fontName) { m_widgetTextFont = getFont(fontName); }
 
 private:
     std::vector<BitmapFontPtr> m_fonts;
-    BitmapFontPtr m_creatureNameFont;
-    BitmapFontPtr m_animatedTextFont;
-    BitmapFontPtr m_staticTextFont;
-    BitmapFontPtr m_widgetTextFont;
+    BitmapFontPtr m_defaultFont;
 };
 
 extern FontManager g_fonts;

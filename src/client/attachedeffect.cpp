@@ -22,6 +22,7 @@
 
 #include "attachedeffect.h"
 #include "shadermanager.h"
+#include "gameconfig.h"
 #include <framework/core/clock.h>
 #include <framework/graphics/animatedtexture.h>
 
@@ -86,7 +87,7 @@ int AttachedEffect::getCurrentAnimationPhase()
 
     if (m_thingType->isEffect()) {
         const int lastPhase = m_thingType->getAnimationPhases() - 1;
-        const int phase = std::min<int>(static_cast<int>(m_animationTimer.ticksElapsed() / (EFFECT_TICKS_PER_FRAME / getSpeed())), lastPhase);
+        const int phase = std::min<int>(static_cast<int>(m_animationTimer.ticksElapsed() / (g_gameConfig.getEffectTicksPerFrame() / getSpeed())), lastPhase);
         if (phase == lastPhase) m_animationTimer.restart();
         return phase;
     }

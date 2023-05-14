@@ -1,8 +1,0 @@
-Module
-  name: client_config
-  description: Client Config
-  author: Mehah
-  website: https://github.com/mehah/otclient
-  sandboxed: true
-  scripts: [ config ]
-  @onLoad: init()

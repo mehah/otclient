@@ -2112,11 +2112,11 @@ void ProtocolGame::parseFloorChangeUp(const InputMessagePtr& msg)
     --pos.z;
 
     int skip = 0;
-    if (pos.z == SEA_FLOOR)
-        for (int_fast32_t i = SEA_FLOOR - AWARE_UNDEGROUND_FLOOR_RANGE; i >= 0; --i)
+    if (pos.z == g_gameConfig.getMapSeaFloor())
+        for (int_fast32_t i = g_gameConfig.getMapSeaFloor() - g_gameConfig.getMapAwareUndergroundFloorRange(); i >= 0; --i)
             skip = setFloorDescription(msg, pos.x - range.left, pos.y - range.top, i, range.horizontal(), range.vertical(), 8 - i, skip);
-    else if (pos.z > SEA_FLOOR)
-        setFloorDescription(msg, pos.x - range.left, pos.y - range.top, pos.z - AWARE_UNDEGROUND_FLOOR_RANGE, range.horizontal(), range.vertical(), 3, skip);
+    else if (pos.z > g_gameConfig.getMapSeaFloor())
+        setFloorDescription(msg, pos.x - range.left, pos.y - range.top, pos.z - g_gameConfig.getMapAwareUndergroundFloorRange(), range.horizontal(), range.vertical(), 3, skip);
 
     ++pos.x;
     ++pos.y;
@@ -2131,13 +2131,13 @@ void ProtocolGame::parseFloorChangeDown(const InputMessagePtr& msg)
     ++pos.z;
 
     int skip = 0;
-    if (pos.z == UNDERGROUND_FLOOR) {
+    if (pos.z == g_gameConfig.getMapUndergroundFloorRange()) {
         int j;
         int i;
-        for (i = pos.z, j = -1; i <= pos.z + AWARE_UNDEGROUND_FLOOR_RANGE; ++i, --j)
+        for (i = pos.z, j = -1; i <= pos.z + g_gameConfig.getMapAwareUndergroundFloorRange(); ++i, --j)
             skip = setFloorDescription(msg, pos.x - range.left, pos.y - range.top, i, range.horizontal(), range.vertical(), j, skip);
-    } else if (pos.z > UNDERGROUND_FLOOR && pos.z < MAX_Z - 1)
-        setFloorDescription(msg, pos.x - range.left, pos.y - range.top, pos.z + AWARE_UNDEGROUND_FLOOR_RANGE, range.horizontal(), range.vertical(), -3, skip);
+    } else if (pos.z > g_gameConfig.getMapUndergroundFloorRange() && pos.z < g_gameConfig.getMapMaxZ() - 1)
+        setFloorDescription(msg, pos.x - range.left, pos.y - range.top, pos.z + g_gameConfig.getMapAwareUndergroundFloorRange(), range.horizontal(), range.vertical(), -3, skip);
 
     --pos.x;
     --pos.y;
@@ -2480,12 +2480,12 @@ void ProtocolGame::setMapDescription(const InputMessagePtr& msg, int x, int y, i
     int endz;
     int zstep;
 
-    if (z > SEA_FLOOR) {
-        startz = z - AWARE_UNDEGROUND_FLOOR_RANGE;
-        endz = std::min<int>(z + AWARE_UNDEGROUND_FLOOR_RANGE, MAX_Z);
+    if (z > g_gameConfig.getMapSeaFloor()) {
+        startz = z - g_gameConfig.getMapAwareUndergroundFloorRange();
+        endz = std::min<int>(z + g_gameConfig.getMapAwareUndergroundFloorRange(), g_gameConfig.getMapMaxZ());
         zstep = 1;
     } else {
-        startz = SEA_FLOOR;
+        startz = g_gameConfig.getMapSeaFloor();
         endz = 0;
         zstep = -1;
     }
@@ -2526,7 +2526,7 @@ int ProtocolGame::setTileDescription(const InputMessagePtr& msg, Position positi
             continue;
         }
 
-        if (stackPos > MAX_THINGS)
+        if (stackPos > g_gameConfig.getTileMaxThings())
             g_logger.traceError(stdext::format("too many things, pos=%s, stackpos=%d", stdext::to_string(position), stackPos));
 
         const auto& thing = getThing(msg);

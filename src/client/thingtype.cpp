@@ -127,7 +127,8 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
         const auto& hookDirection = flags.hook();
         if (hookDirection.east()) {
             m_flags |= ThingFlagAttrHookEast;
-        } else if (hookDirection.south()) {
+        }
+        else if (hookDirection.south()) {
             m_flags |= ThingFlagAttrHookSouth;
         }
     }
@@ -283,7 +284,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
         m_animationPhases += std::max<int>(1, spritesPhases.size());
 
         if (const auto& sheet = g_spriteAppearances.getSheetBySpriteId(spriteInfo.sprite_id(0), false)) {
-            m_size = sheet->getSpriteSize() / SPRITE_SIZE;
+            m_size = sheet->getSpriteSize() / g_gameConfig.getSpriteSize();
             sizes.emplace_back(m_size);
         }
 
@@ -376,16 +377,20 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
                 attr = ThingAttrNoMoveAnimation;
             else if (attr == 254) { // Usable
                 attr = ThingAttrUsable;
-            } else if (attr == 35) { // Default Action
+            }
+            else if (attr == 35) { // Default Action
                 attr = ThingAttrDefaultAction;
-            } else if (attr > 16)
+            }
+            else if (attr > 16)
                 attr -= 1;
-        } else if (g_game.getClientVersion() >= 860) {
+        }
+        else if (g_game.getClientVersion() >= 860) {
             /* Default attribute values follow
              * the format of 8.6-9.86.
              * Therefore no changes here.
              */
-        } else if (g_game.getClientVersion() >= 780) {
+        }
+        else if (g_game.getClientVersion() >= 780) {
             /* In 7.80-8.54 all attributes from 8 and higher were
              * incremented by 1 to make space for 8 as
              * "Item Charges" flag.
@@ -396,11 +401,13 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
             }
             if (attr > 8)
                 attr -= 1;
-        } else if (g_game.getClientVersion() >= 755) {
+        }
+        else if (g_game.getClientVersion() >= 755) {
             /* In 7.55-7.72 attributes 23 is "Floor Change". */
             if (attr == 23)
                 attr = ThingAttrFloorChange;
-        } else if (g_game.getClientVersion() >= 740) {
+        }
+        else if (g_game.getClientVersion() >= 740) {
             /* In 7.4-7.5 attribute "Ground Border" did not exist
              * attributes 1-15 have to be adjusted.
              * Several other changes in the format.
@@ -443,47 +450,48 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
         m_flags |= thingAttrToThingFlagAttr(thingAttr);
 
         switch (attr) {
-            case ThingAttrDisplacement:
-            {
-                if (g_game.getClientVersion() >= 755) {
-                    m_displacement.x = fin->getU16();
-                    m_displacement.y = fin->getU16();
-                } else {
-                    m_displacement.x = 8;
-                    m_displacement.y = 8;
-                }
-                break;
+        case ThingAttrDisplacement:
+        {
+            if (g_game.getClientVersion() >= 755) {
+                m_displacement.x = fin->getU16();
+                m_displacement.y = fin->getU16();
             }
-            case ThingAttrLight:
-            {
-                m_light.intensity = fin->getU16();
-                m_light.color = fin->getU16();
-                break;
+            else {
+                m_displacement.x = 8;
+                m_displacement.y = 8;
             }
-            case ThingAttrMarket:
-            {
-                m_market.category = static_cast<ITEM_CATEGORY>(fin->getU16());
-                m_market.tradeAs = fin->getU16();
-                m_market.showAs = fin->getU16();
-                m_market.name = fin->getString();
-                m_market.restrictVocation = fin->getU16();
-                m_market.requiredLevel = fin->getU16();
-                break;
-            }
-            case ThingAttrElevation: m_elevation = fin->getU16(); break;
-            case ThingAttrGround: m_groundSpeed = fin->getU16(); break;
-            case ThingAttrWritable: m_maxTextLength = fin->getU16(); break;
-            case ThingAttrWritableOnce:m_maxTextLength = fin->getU16(); break;
-            case ThingAttrMinimapColor: m_minimapColor = fin->getU16(); break;
-            case ThingAttrCloth: m_clothSlot = fin->getU16(); break;
-            case ThingAttrLensHelp: m_lensHelp = fin->getU16(); break;
-            case ThingAttrDefaultAction: m_defaultAction = static_cast<PLAYER_ACTION>(fin->getU16()); break;
+            break;
+        }
+        case ThingAttrLight:
+        {
+            m_light.intensity = fin->getU16();
+            m_light.color = fin->getU16();
+            break;
+        }
+        case ThingAttrMarket:
+        {
+            m_market.category = static_cast<ITEM_CATEGORY>(fin->getU16());
+            m_market.tradeAs = fin->getU16();
+            m_market.showAs = fin->getU16();
+            m_market.name = fin->getString();
+            m_market.restrictVocation = fin->getU16();
+            m_market.requiredLevel = fin->getU16();
+            break;
+        }
+        case ThingAttrElevation: m_elevation = fin->getU16(); break;
+        case ThingAttrGround: m_groundSpeed = fin->getU16(); break;
+        case ThingAttrWritable: m_maxTextLength = fin->getU16(); break;
+        case ThingAttrWritableOnce:m_maxTextLength = fin->getU16(); break;
+        case ThingAttrMinimapColor: m_minimapColor = fin->getU16(); break;
+        case ThingAttrCloth: m_clothSlot = fin->getU16(); break;
+        case ThingAttrLensHelp: m_lensHelp = fin->getU16(); break;
+        case ThingAttrDefaultAction: m_defaultAction = static_cast<PLAYER_ACTION>(fin->getU16()); break;
         }
     }
 
     if (!done)
         throw Exception("corrupt data (id: %d, category: %d, count: %d, lastAttr: %d)",
-                        m_id, m_category, count, attr);
+            m_id, m_category, count, attr);
 
     const bool hasFrameGroups = category == ThingCategoryCreature && g_game.getFeature(Otc::GameIdleAnimations);
     const uint8_t groupCount = hasFrameGroups ? fin->getU8() : 1;
@@ -620,7 +628,7 @@ void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, i
     const auto& textureOffset = textureData.pos[frameIndex].offsets;
     const auto& textureRect = textureData.pos[frameIndex].rects;
 
-    const Rect screenRect(dest + (textureOffset - m_displacement - (m_size.toPoint() - Point(1)) * SPRITE_SIZE) * g_drawPool.getScaleFactor(), textureRect.size() * g_drawPool.getScaleFactor());
+    const Rect screenRect(dest + (textureOffset - m_displacement - (m_size.toPoint() - Point(1)) * g_gameConfig.getSpriteSize()) * g_drawPool.getScaleFactor(), textureRect.size() * g_drawPool.getScaleFactor());
 
     if (flags & Otc::DrawThings) {
         const auto& newColor = m_opacity < 1.0f ? Color(color, m_opacity) : color;
@@ -662,7 +670,7 @@ TexturePtr ThingType::getTexture(int animationPhase)
             for (int_fast8_t i = -1; ++i < m_animationPhases;)
                 loadTexture(i);
             m_loading = false;
-        });
+            });
     }
 
     return nullptr;
@@ -686,7 +694,7 @@ void ThingType::loadTexture(int animationPhase)
     const bool useCustomImage = animationPhase == 0 && !m_customImage.empty();
     const int indexSize = textureLayers * m_numPatternX * m_numPatternY * m_numPatternZ;
     const auto& textureSize = getBestTextureDimension(m_size.width(), m_size.height(), indexSize);
-    const auto& fullImage = useCustomImage ? Image::load(m_customImage) : std::make_shared<Image>(textureSize * SPRITE_SIZE);
+    const auto& fullImage = useCustomImage ? Image::load(m_customImage) : std::make_shared<Image>(textureSize * g_gameConfig.getSpriteSize());
     const bool protobufSupported = g_game.isUsingProtobuf();
 
     static Color maskColors[] = { Color::red, Color::green, Color::blue, Color::yellow };
@@ -700,7 +708,7 @@ void ThingType::loadTexture(int animationPhase)
                     const int frameIndex = getTextureIndex(l % textureLayers, x, y, z);
 
                     const auto& framePos = Point(frameIndex % (textureSize.width() / m_size.width()) * m_size.width(),
-                                                 frameIndex / (textureSize.width() / m_size.width()) * m_size.height()) * SPRITE_SIZE;
+                        frameIndex / (textureSize.width() / m_size.width()) * m_size.height()) * g_gameConfig.getSpriteSize();
 
                     if (!useCustomImage) {
                         if (protobufSupported) {
@@ -720,7 +728,8 @@ void ThingType::loadTexture(int animationPhase)
                             }
 
                             fullImage->blit(framePos, spriteImage);
-                        } else {
+                        }
+                        else {
                             for (int h = 0; h < m_size.height(); ++h) {
                                 for (int w = 0; w < m_size.width(); ++w) {
                                     const uint32_t spriteIndex = getSpriteIndex(w, h, spriteMask ? 1 : l, x, y, z, animationPhase);
@@ -736,7 +745,7 @@ void ThingType::loadTexture(int animationPhase)
                                             spriteImage->overwriteMask(maskColors[(l - 1)]);
                                         }
 
-                                        const Point& spritePos = Point(m_size.width() - w - 1, m_size.height() - h - 1) * SPRITE_SIZE;
+                                        const Point& spritePos = Point(m_size.width() - w - 1, m_size.height() - h - 1) * g_gameConfig.getSpriteSize();
                                         fullImage->blit(framePos + spritePos, spriteImage);
                                     }
                                 }
@@ -745,9 +754,9 @@ void ThingType::loadTexture(int animationPhase)
                     }
 
                     auto& posData = textureData.pos[frameIndex];
-                    posData.rects = { framePos + Point(m_size.width(), m_size.height()) * SPRITE_SIZE - Point(1), framePos };
-                    for (int fx = framePos.x; fx < framePos.x + m_size.width() * SPRITE_SIZE; ++fx) {
-                        for (int fy = framePos.y; fy < framePos.y + m_size.height() * SPRITE_SIZE; ++fy) {
+                    posData.rects = { framePos + Point(m_size.width(), m_size.height()) * g_gameConfig.getSpriteSize() - Point(1), framePos };
+                    for (int fx = framePos.x; fx < framePos.x + m_size.width() * g_gameConfig.getSpriteSize(); ++fx) {
+                        for (int fy = framePos.y; fy < framePos.y + m_size.height() * g_gameConfig.getSpriteSize(); ++fy) {
                             const uint8_t* p = fullImage->getPixel(fx, fy);
                             if (p[3] == 0x00)
                                 continue;
@@ -759,7 +768,7 @@ void ThingType::loadTexture(int animationPhase)
                         }
                     }
 
-                    posData.originRects = Rect(framePos, Size(m_size.width(), m_size.height()) * SPRITE_SIZE);
+                    posData.originRects = Rect(framePos, Size(m_size.width(), m_size.height()) * g_gameConfig.getSpriteSize());
                     posData.offsets = posData.rects.topLeft() - framePos;
                 }
             }
@@ -788,13 +797,13 @@ Size ThingType::getBestTextureDimension(int w, int h, int count)
     h = k;
 
     const int numSprites = w * h * count;
-    assert(numSprites <= SPRITE_SIZE * SPRITE_SIZE);
-    assert(w <= SPRITE_SIZE);
-    assert(h <= SPRITE_SIZE);
+    assert(numSprites <= g_gameConfig.getSpriteSize() * g_gameConfig.getSpriteSize());
+    assert(w <= g_gameConfig.getSpriteSize());
+    assert(h <= g_gameConfig.getSpriteSize());
 
-    Size bestDimension = { SPRITE_SIZE };
-    for (int i = w; i <= SPRITE_SIZE; i <<= 1) {
-        for (int j = h; j <= SPRITE_SIZE; j <<= 1) {
+    Size bestDimension = { g_gameConfig.getSpriteSize() };
+    for (int i = w; i <= g_gameConfig.getSpriteSize(); i <<= 1) {
+        for (int j = h; j <= g_gameConfig.getSpriteSize(); j <<= 1) {
             Size candidateDimension = { i, j };
             if (candidateDimension.area() < numSprites)
                 continue;
@@ -810,18 +819,18 @@ Size ThingType::getBestTextureDimension(int w, int h, int count)
 uint32_t ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int a) const
 {
     uint32_t index = ((((((a % m_animationPhases)
-                      * m_numPatternZ + z)
-                      * m_numPatternY + y)
-                      * m_numPatternX + x)
-                      * m_layers + l)
-                      * m_size.height() + h)
+        * m_numPatternZ + z)
+        * m_numPatternY + y)
+        * m_numPatternX + x)
+        * m_layers + l)
+        * m_size.height() + h)
         * m_size.width() + w;
 
     if (w == -1 && h == -1) { // protobuf does not use width and height, because sprite image is the exact sprite size, not split by 32x32, so -1 is passed instead
         index = ((((a % m_animationPhases)
-                 * m_numPatternZ + z)
-                 * m_numPatternY + y)
-                 * m_numPatternX + x)
+            * m_numPatternZ + z)
+            * m_numPatternY + y)
+            * m_numPatternX + x)
             * m_layers + l;
     }
 
@@ -832,7 +841,7 @@ uint32_t ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int
 uint32_t ThingType::getTextureIndex(int l, int x, int y, int z) const
 {
     return ((l * m_numPatternZ + z)
-            * m_numPatternY + y)
+        * m_numPatternY + y)
         * m_numPatternX + x;
 }
 
@@ -877,56 +886,58 @@ int ThingType::getExactHeight()
 
 ThingFlagAttr ThingType::thingAttrToThingFlagAttr(ThingAttr attr) {
     switch (attr) {
-        case ThingAttrDisplacement: return ThingFlagAttrDisplacement;
-        case ThingAttrLight: return ThingFlagAttrLight;
-        case ThingAttrElevation: return ThingFlagAttrElevation;
-        case ThingAttrGround: return ThingFlagAttrGround;
-        case ThingAttrWritable: return ThingFlagAttrWritable;
-        case ThingAttrWritableOnce: return ThingFlagAttrWritableOnce;
-        case ThingAttrMinimapColor: return ThingFlagAttrMinimapColor;
-        case ThingAttrCloth: return ThingFlagAttrCloth;
-        case ThingAttrLensHelp: return ThingFlagAttrLensHelp;
-        case ThingAttrDefaultAction: return ThingFlagAttrDefaultAction;
-        case ThingAttrUsable: return ThingFlagAttrUsable;
-        case ThingAttrGroundBorder: return ThingFlagAttrGroundBorder;
-        case ThingAttrOnBottom: return ThingFlagAttrOnBottom;
-        case ThingAttrOnTop: return ThingFlagAttrOnTop;
-        case ThingAttrContainer: return ThingFlagAttrContainer;
-        case ThingAttrStackable: return ThingFlagAttrStackable;
-        case ThingAttrForceUse: return ThingFlagAttrForceUse;
-        case ThingAttrMultiUse: return ThingFlagAttrMultiUse;
-        case ThingAttrChargeable: return ThingFlagAttrChargeable;
-        case ThingAttrFluidContainer: return ThingFlagAttrFluidContainer;
-        case ThingAttrSplash: return ThingFlagAttrSplash;
-        case ThingAttrNotWalkable: return ThingFlagAttrNotWalkable;
-        case ThingAttrNotMoveable: return ThingFlagAttrNotMoveable;
-        case ThingAttrBlockProjectile: return ThingFlagAttrBlockProjectile;
-        case ThingAttrNotPathable: return ThingFlagAttrNotPathable;
-        case ThingAttrPickupable: return ThingFlagAttrPickupable;
-        case ThingAttrHangable: return ThingFlagAttrHangable;
-        case ThingAttrHookSouth: return ThingFlagAttrHookSouth;
-        case ThingAttrHookEast: return ThingFlagAttrHookEast;
-        case ThingAttrRotateable: return ThingFlagAttrRotateable;
-        case ThingAttrDontHide: return ThingFlagAttrDontHide;
-        case ThingAttrTranslucent: return ThingFlagAttrTranslucent;
-        case ThingAttrLyingCorpse: return ThingFlagAttrLyingCorpse;
-        case ThingAttrAnimateAlways: return ThingFlagAttrAnimateAlways;
-        case ThingAttrFullGround: return ThingFlagAttrFullGround;
-        case ThingAttrLook: return ThingFlagAttrLook;
-        case ThingAttrWrapable: return ThingFlagAttrWrapable;
-        case ThingAttrUnwrapable: return ThingFlagAttrUnwrapable;
-        case ThingAttrWearOut: return ThingFlagAttrWearOut;
-        case ThingAttrClockExpire: return ThingFlagAttrClockExpire;
-        case ThingAttrExpire: return ThingFlagAttrExpire;
-        case ThingAttrExpireStop: return ThingFlagAttrExpireStop;
-        case ThingAttrPodium: return ThingFlagAttrPodium;
-        case ThingAttrTopEffect: return ThingFlagAttrTopEffect;
-        case ThingAttrMarket: return ThingFlagAttrMarket;
-        default: break;
+    case ThingAttrDisplacement: return ThingFlagAttrDisplacement;
+    case ThingAttrLight: return ThingFlagAttrLight;
+    case ThingAttrElevation: return ThingFlagAttrElevation;
+    case ThingAttrGround: return ThingFlagAttrGround;
+    case ThingAttrWritable: return ThingFlagAttrWritable;
+    case ThingAttrWritableOnce: return ThingFlagAttrWritableOnce;
+    case ThingAttrMinimapColor: return ThingFlagAttrMinimapColor;
+    case ThingAttrCloth: return ThingFlagAttrCloth;
+    case ThingAttrLensHelp: return ThingFlagAttrLensHelp;
+    case ThingAttrDefaultAction: return ThingFlagAttrDefaultAction;
+    case ThingAttrUsable: return ThingFlagAttrUsable;
+    case ThingAttrGroundBorder: return ThingFlagAttrGroundBorder;
+    case ThingAttrOnBottom: return ThingFlagAttrOnBottom;
+    case ThingAttrOnTop: return ThingFlagAttrOnTop;
+    case ThingAttrContainer: return ThingFlagAttrContainer;
+    case ThingAttrStackable: return ThingFlagAttrStackable;
+    case ThingAttrForceUse: return ThingFlagAttrForceUse;
+    case ThingAttrMultiUse: return ThingFlagAttrMultiUse;
+    case ThingAttrChargeable: return ThingFlagAttrChargeable;
+    case ThingAttrFluidContainer: return ThingFlagAttrFluidContainer;
+    case ThingAttrSplash: return ThingFlagAttrSplash;
+    case ThingAttrNotWalkable: return ThingFlagAttrNotWalkable;
+    case ThingAttrNotMoveable: return ThingFlagAttrNotMoveable;
+    case ThingAttrBlockProjectile: return ThingFlagAttrBlockProjectile;
+    case ThingAttrNotPathable: return ThingFlagAttrNotPathable;
+    case ThingAttrPickupable: return ThingFlagAttrPickupable;
+    case ThingAttrHangable: return ThingFlagAttrHangable;
+    case ThingAttrHookSouth: return ThingFlagAttrHookSouth;
+    case ThingAttrHookEast: return ThingFlagAttrHookEast;
+    case ThingAttrRotateable: return ThingFlagAttrRotateable;
+    case ThingAttrDontHide: return ThingFlagAttrDontHide;
+    case ThingAttrTranslucent: return ThingFlagAttrTranslucent;
+    case ThingAttrLyingCorpse: return ThingFlagAttrLyingCorpse;
+    case ThingAttrAnimateAlways: return ThingFlagAttrAnimateAlways;
+    case ThingAttrFullGround: return ThingFlagAttrFullGround;
+    case ThingAttrLook: return ThingFlagAttrLook;
+    case ThingAttrWrapable: return ThingFlagAttrWrapable;
+    case ThingAttrUnwrapable: return ThingFlagAttrUnwrapable;
+    case ThingAttrWearOut: return ThingFlagAttrWearOut;
+    case ThingAttrClockExpire: return ThingFlagAttrClockExpire;
+    case ThingAttrExpire: return ThingFlagAttrExpire;
+    case ThingAttrExpireStop: return ThingFlagAttrExpireStop;
+    case ThingAttrPodium: return ThingFlagAttrPodium;
+    case ThingAttrTopEffect: return ThingFlagAttrTopEffect;
+    case ThingAttrMarket: return ThingFlagAttrMarket;
+    default: break;
     }
 
     return ThingFlagAttrNone;
 }
+
+bool ThingType::isTall(const bool useRealSize) { return useRealSize ? getRealSize() > g_gameConfig.getSpriteSize() : getHeight() > 1; }
 
 #ifdef FRAMEWORK_EDITOR
 void ThingType::serialize(const FileStreamPtr& fin)
@@ -938,7 +949,8 @@ void ThingType::serialize(const FileStreamPtr& fin)
                 attr = ThingAttrWritable;
             else if (attr >= ThingAttrWritable)
                 attr += 1;
-        } else if (g_game.getClientVersion() >= 1000) {
+        }
+        else if (g_game.getClientVersion() >= 1000) {
             if (attr == ThingAttrNoMoveAnimation)
                 attr = 16;
             else if (attr >= ThingAttrPickupable)
@@ -949,41 +961,41 @@ void ThingType::serialize(const FileStreamPtr& fin)
             continue;
 
         switch (attr) {
-            case ThingAttrDisplacement:
-            {
-                fin->addU16(m_displacement.x);
-                fin->addU16(m_displacement.y);
-                break;
-            }
-            case ThingAttrLight:
-            {
-                fin->addU16(m_light.intensity);
-                fin->addU16(m_light.color);
-                break;
-            }
-            case ThingAttrMarket:
-            {
-                fin->addU16(m_market.category);
-                fin->addU16(m_market.tradeAs);
-                fin->addU16(m_market.showAs);
-                fin->addString(m_market.name);
-                fin->addU16(m_market.restrictVocation);
-                fin->addU16(m_market.requiredLevel);
-                break;
-            }
+        case ThingAttrDisplacement:
+        {
+            fin->addU16(m_displacement.x);
+            fin->addU16(m_displacement.y);
+            break;
+        }
+        case ThingAttrLight:
+        {
+            fin->addU16(m_light.intensity);
+            fin->addU16(m_light.color);
+            break;
+        }
+        case ThingAttrMarket:
+        {
+            fin->addU16(m_market.category);
+            fin->addU16(m_market.tradeAs);
+            fin->addU16(m_market.showAs);
+            fin->addString(m_market.name);
+            fin->addU16(m_market.restrictVocation);
+            fin->addU16(m_market.requiredLevel);
+            break;
+        }
 
-            case ThingAttrElevation: fin->addU16(m_elevation); break;
-            case ThingAttrMinimapColor: fin->add16(m_minimapColor); break;
-            case ThingAttrCloth: fin->add16(m_clothSlot); break;
-            case ThingAttrLensHelp: fin->add16(m_lensHelp); break;
-            case ThingAttrUsable: fin->add16(isUsable()); break;
-            case ThingAttrGround:  fin->add16(isGround()); break;
-            case ThingAttrWritable:   fin->add16(isWritable()); break;
-            case ThingAttrWritableOnce:   fin->add16(isWritableOnce()); break;
-                break;
+        case ThingAttrElevation: fin->addU16(m_elevation); break;
+        case ThingAttrMinimapColor: fin->add16(m_minimapColor); break;
+        case ThingAttrCloth: fin->add16(m_clothSlot); break;
+        case ThingAttrLensHelp: fin->add16(m_lensHelp); break;
+        case ThingAttrUsable: fin->add16(isUsable()); break;
+        case ThingAttrGround:  fin->add16(isGround()); break;
+        case ThingAttrWritable:   fin->add16(isWritable()); break;
+        case ThingAttrWritableOnce:   fin->add16(isWritableOnce()); break;
+            break;
 
-            default:
-                break;
+        default:
+            break;
         }
     }
     fin->addU8(ThingLastAttr);
@@ -1022,7 +1034,7 @@ void ThingType::exportImage(const std::string& fileName)
     if (m_spritesIndex.empty())
         throw Exception("cannot export thingtype without sprites");
 
-    const auto& image = std::make_shared<Image>(Size(SPRITE_SIZE * m_size.width() * m_layers * m_numPatternX, SPRITE_SIZE * m_size.height() * m_animationPhases * m_numPatternY * m_numPatternZ));
+    const auto& image = std::make_shared<Image>(Size(g_gameConfig.getSpriteSize() * m_size.width() * m_layers * m_numPatternX, g_gameConfig.getSpriteSize() * m_size.height() * m_animationPhases * m_numPatternY * m_numPatternZ));
     for (int z = 0; z < m_numPatternZ; ++z) {
         for (int y = 0; y < m_numPatternY; ++y) {
             for (int x = 0; x < m_numPatternX; ++x) {
@@ -1030,9 +1042,9 @@ void ThingType::exportImage(const std::string& fileName)
                     for (int a = 0; a < m_animationPhases; ++a) {
                         for (int w = 0; w < m_size.width(); ++w) {
                             for (int h = 0; h < m_size.height(); ++h) {
-                                image->blit(Point(SPRITE_SIZE * (m_size.width() - w - 1 + m_size.width() * x + m_size.width() * m_numPatternX * l),
-                                            SPRITE_SIZE * (m_size.height() - h - 1 + m_size.height() * y + m_size.height() * m_numPatternY * a + m_size.height() * m_numPatternY * m_animationPhases * z)),
-                                            g_sprites.getSpriteImage(m_spritesIndex[getSpriteIndex(w, h, l, x, y, z, a)]));
+                                image->blit(Point(g_gameConfig.getSpriteSize() * (m_size.width() - w - 1 + m_size.width() * x + m_size.width() * m_numPatternX * l),
+                                    g_gameConfig.getSpriteSize() * (m_size.height() - h - 1 + m_size.height() * y + m_size.height() * m_numPatternY * a + m_size.height() * m_numPatternY * m_animationPhases * z)),
+                                    g_sprites.getSpriteImage(m_spritesIndex[getSpriteIndex(w, h, l, x, y, z, a)]));
                             }
                         }
                     }

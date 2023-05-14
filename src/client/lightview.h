@@ -91,7 +91,7 @@ private:
 
     bool m_isDark{ false };
 
-    uint16_t m_tileSize{ SPRITE_SIZE };
+    uint16_t m_tileSize{ 0 };
     size_t m_hash{ 0 }, m_updatingHash{ 0 };
 
     DrawPool* m_pool{ nullptr };

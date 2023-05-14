@@ -25,17 +25,18 @@
 #include <framework/core/graphicalapplication.h>
 #include "game.h"
 #include "map.h"
+#include "gameconfig.h"
 
 AnimatedText::AnimatedText()
 {
-    m_cachedText.setFont(g_fonts.getAnimatedTextFont());
+    m_cachedText.setFont(g_gameConfig.getAnimatedTextFont());
     m_cachedText.setAlign(Fw::AlignLeft);
 }
 
 void AnimatedText::drawText(const Point& dest, const Rect& visibleRect)
 {
-    constexpr static float tf = ANIMATED_TEXT_DURATION,
-        tftf = ANIMATED_TEXT_DURATION * ANIMATED_TEXT_DURATION;
+    const float tf = g_gameConfig.getAnimatedTextDuration(),
+        tftf = g_gameConfig.getAnimatedTextDuration() * g_gameConfig.getAnimatedTextDuration();
 
     const auto& textSize = m_cachedText.getTextSize();
     const float t = m_animationTimer.ticksElapsed();
@@ -55,7 +56,7 @@ void AnimatedText::drawText(const Point& dest, const Rect& visibleRect)
     p.scale(g_app.getAnimatedTextScale());
 
     const Rect& rect{ p, textSize };
-    constexpr float t0 = tf / 1.2;
+    const float t0 = tf / 1.2;
 
     Color color = m_color;
     if (t > t0) {
@@ -69,7 +70,7 @@ void AnimatedText::onAppear()
 {
     m_animationTimer.restart();
 
-    uint16_t textDuration = ANIMATED_TEXT_DURATION;
+    uint16_t textDuration = g_gameConfig.getAnimatedTextDuration();
     if (g_app.mustOptimize())
         textDuration /= 2;
 
@@ -85,7 +86,7 @@ bool AnimatedText::merge(const AnimatedTextPtr& other)
     if (other->getCachedText().getFont() != m_cachedText.getFont())
         return false;
 
-    if (m_animationTimer.ticksElapsed() > ANIMATED_TEXT_DURATION / 2.5)
+    if (m_animationTimer.ticksElapsed() > g_gameConfig.getAnimatedTextDuration() / 2.5)
         return false;
 
     try {

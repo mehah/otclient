@@ -29,7 +29,7 @@
 
 StaticText::StaticText()
 {
-    m_cachedText.setFont(g_fonts.getStaticTextFont());
+    m_cachedText.setFont(g_gameConfig.getStaticTextFont());
     m_cachedText.setAlign(Fw::AlignCenter);
 }
 
@@ -70,7 +70,7 @@ bool StaticText::addMessage(const std::string_view name, Otc::MessageMode mode, 
         m_updateEvent = nullptr;
     }
 
-    int delay = std::max<int>(STATIC_DURATION_PER_CHARACTER * text.length(), MIN_STATIC_TEXT_DURATION);
+    int delay = std::max<int>(g_gameConfig.getStaticDurationPerCharacter() * text.length(), g_gameConfig.getStaticDurationPerCharacter());
     if (isYell())
         delay *= 2;
 

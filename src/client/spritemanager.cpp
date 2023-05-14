@@ -70,7 +70,8 @@ bool SpriteManager::loadSpr(std::string file)
         m_loaded = true;
         g_lua.callGlobalField("g_sprites", "onLoadSpr", file);
         return true;
-    } catch (const stdext::exception& e) {
+    }
+    catch (const stdext::exception& e) {
         g_logger.error(stdext::format("Failed to load sprites from '%s': %s", file, e.what()));
         return false;
     }
@@ -126,7 +127,8 @@ void SpriteManager::saveSpr(const std::string& fileName)
 
         fin->flush();
         fin->close();
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
     }
 }
@@ -174,7 +176,7 @@ ImagePtr SpriteManager::getSpriteImage(int id, const FileStreamPtr& file) {
 
         const uint16_t pixelDataSize = file->getU16();
 
-        const auto& image = std::make_shared<Image>(Size(SPRITE_SIZE));
+        const auto& image = std::make_shared<Image>(Size(g_gameConfig.getSpriteSize()));
 
         uint8_t* pixels = image->getPixelData();
         int writePos = 0;
@@ -182,11 +184,13 @@ ImagePtr SpriteManager::getSpriteImage(int id, const FileStreamPtr& file) {
         const bool useAlpha = g_game.getFeature(Otc::GameSpritesAlphaChannel);
         const uint8_t channels = useAlpha ? 4 : 3;
         // decompress pixels
-        while (read < pixelDataSize && writePos < SPRITE_DATA_SIZE) {
+        const uint16_t spriteDataSize = g_gameConfig.getSpriteSize() * g_gameConfig.getSpriteSize() * 4;
+
+        while (read < pixelDataSize && writePos < spriteDataSize) {
             const uint16_t transparentPixels = file->getU16();
             const uint16_t coloredPixels = file->getU16();
 
-            for (int i = 0; i < transparentPixels && writePos < SPRITE_DATA_SIZE; ++i) {
+            for (int i = 0; i < transparentPixels && writePos < spriteDataSize; ++i) {
                 pixels[writePos + 0] = 0x00;
                 pixels[writePos + 1] = 0x00;
                 pixels[writePos + 2] = 0x00;
@@ -194,7 +198,7 @@ ImagePtr SpriteManager::getSpriteImage(int id, const FileStreamPtr& file) {
                 writePos += 4;
             }
 
-            for (int i = 0; i < coloredPixels && writePos < SPRITE_DATA_SIZE; ++i) {
+            for (int i = 0; i < coloredPixels && writePos < spriteDataSize; ++i) {
                 pixels[writePos + 0] = file->getU8();
                 pixels[writePos + 1] = file->getU8();
                 pixels[writePos + 2] = file->getU8();
@@ -212,11 +216,11 @@ ImagePtr SpriteManager::getSpriteImage(int id, const FileStreamPtr& file) {
         }
 
         // Error margin for 4 pixel transparent
-        if (!image->hasTransparentPixel() && writePos + 4 < SPRITE_DATA_SIZE)
+        if (!image->hasTransparentPixel() && writePos + 4 < spriteDataSize)
             image->setTransparentPixel(true);
 
         // fill remaining pixels with alpha
-        while (writePos < SPRITE_DATA_SIZE) {
+        while (writePos < spriteDataSize) {
             pixels[writePos + 0] = 0x00;
             pixels[writePos + 1] = 0x00;
             pixels[writePos + 2] = 0x00;
@@ -236,7 +240,8 @@ ImagePtr SpriteManager::getSpriteImage(int id, const FileStreamPtr& file) {
         }
 
         return image;
-    } catch (const stdext::exception& e) {
+    }
+    catch (const stdext::exception& e) {
         g_logger.error(stdext::format("Failed to get sprite id %d: %s", id, e.what()));
         return nullptr;
     }

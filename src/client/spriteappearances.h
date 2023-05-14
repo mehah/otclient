@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "gameconfig.h"
 #include <framework/core/declarations.h>
 #include <framework/graphics/declarations.h>
 #include <framework/luaengine/luaobject.h>
@@ -41,7 +42,7 @@ public:
 
     Size getSpriteSize() const
     {
-        Size size(SPRITE_SIZE, SPRITE_SIZE);
+        Size size(g_gameConfig.getSpriteSize(), g_gameConfig.getSpriteSize());
 
         switch (spriteLayout) {
             case SpriteLayout::ONE_BY_ONE: break;
