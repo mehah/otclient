@@ -85,13 +85,16 @@ void MinimapBlock::updateTile(int x, int y, const MinimapTile& tile)
     m_tiles[getTileIndex(x, y)] = tile;
 }
 
-void Minimap::init() {}
+void Minimap::init() {
+    m_tileBlocks.resize(g_gameConfig.getMapMaxZ() + 1);
+}
+
 void Minimap::terminate() { clean(); }
 
 void Minimap::clean()
 {
     std::scoped_lock lock(m_lock);
-    for (uint_fast8_t i = 0; i <= MAX_Z; ++i)
+    for (uint_fast8_t i = 0; i <= g_gameConfig.getMapMaxZ(); ++i)
         m_tileBlocks[i].clear();
 }
 
@@ -167,7 +170,7 @@ Rect Minimap::getTileRect(const Position& pos, const Rect& screenRect, const Pos
     if (screenRect.isEmpty() || pos.z != mapCenter.z)
         return {};
 
-    const int tileSize = SPRITE_SIZE * scale;
+    const int tileSize = g_gameConfig.getSpriteSize() * scale;
 
     Rect tileRect(0, 0, tileSize, tileSize);
     tileRect.moveCenter(getTilePoint(pos, screenRect, mapCenter, scale));
@@ -195,7 +198,8 @@ void Minimap::updateTile(const Position& pos, const TilePtr& tile)
         if (!tile->isPathable())
             minimapTile.flags |= MinimapTileNotPathable;
         minimapTile.speed = std::min<int>(static_cast<int>(std::ceil(tile->getGroundSpeed() / 10.f)), UINT8_MAX);
-    } else {
+    }
+    else {
         minimapTile.flags |= MinimapTileNotWalkable | MinimapTileNotPathable;
     }
 
@@ -209,7 +213,7 @@ void Minimap::updateTile(const Position& pos, const TilePtr& tile)
 
 const MinimapTile& Minimap::getTile(const Position& pos)
 {
-    if (pos.z <= MAX_Z && hasBlock(pos)) {
+    if (pos.z <= g_gameConfig.getMapMaxZ() && hasBlock(pos)) {
         MinimapBlock& block = getBlock(pos);
         const auto& offsetPos = getBlockOffset(Point(pos.x, pos.y));
         return block.getTile(pos.x - offsetPos.x, pos.y - offsetPos.y);
@@ -221,7 +225,7 @@ std::pair<MinimapBlock_ptr, MinimapTile> Minimap::threadGetTile(const Position& 
 {
     std::scoped_lock lock(m_lock);
 
-    if (pos.z <= MAX_Z && hasBlock(pos)) {
+    if (pos.z <= g_gameConfig.getMapMaxZ() && hasBlock(pos)) {
         const auto& block = m_tileBlocks[pos.z][getBlockIndex(pos)];
         if (block) {
             const auto& offsetPos = getBlockOffset(Point(pos.x, pos.y));
@@ -301,7 +305,8 @@ bool Minimap::loadImage(const std::string& fileName, const Position& topLeft, fl
             }
         }
         return true;
-    } catch (const stdext::exception& e) {
+    }
+    catch (const stdext::exception& e) {
         g_logger.error(stdext::format("failed to load OTMM minimap: %s", e.what()));
         return false;
     }
@@ -330,13 +335,13 @@ bool Minimap::loadOtmm(const std::string& fileName)
         fin->getU32(); // flags
 
         switch (version) {
-            case 1:
-            {
-                fin->getString(); // description
-                break;
-            }
-            default:
-                throw Exception("OTMM version not supported");
+        case 1:
+        {
+            fin->getString(); // description
+            break;
+        }
+        default:
+            throw Exception("OTMM version not supported");
         }
 
         fin->seek(start);
@@ -352,7 +357,7 @@ bool Minimap::loadOtmm(const std::string& fileName)
             pos.z = fin->getU8();
 
             // end of file or file is corrupted
-            if (!pos.isValid() || pos.z >= MAX_Z + 1)
+            if (!pos.isValid() || pos.z >= g_gameConfig.getMapMaxZ() + 1)
                 break;
 
             MinimapBlock& block = getBlock(pos);
@@ -372,7 +377,8 @@ bool Minimap::loadOtmm(const std::string& fileName)
 
         fin->close();
         return true;
-    } catch (const stdext::exception& e) {
+    }
+    catch (const stdext::exception& e) {
         g_logger.error(stdext::format("failed to load OTMM minimap: %s", e.what()));
         return false;
     }
@@ -406,7 +412,7 @@ void Minimap::saveOtmm(const std::string& fileName)
         constexpr uint32_t COMPRESS_LEVEL = 3;
         std::vector<uint8_t> compressBuffer(compressBound(blockSize));
 
-        for (uint_fast8_t z = 0; z <= MAX_Z; ++z) {
+        for (uint_fast8_t z = 0; z <= g_gameConfig.getMapMaxZ(); ++z) {
             for (const auto& [index, block] : m_tileBlocks[z]) {
                 if (!(*block).wasSeen())
                     continue;
@@ -432,7 +438,8 @@ void Minimap::saveOtmm(const std::string& fileName)
         fin->flush();
 
         fin->close();
-    } catch (const stdext::exception& e) {
+    }
+    catch (const stdext::exception& e) {
         g_logger.error(stdext::format("failed to save OTMM minimap: %s", e.what()));
     }
 }

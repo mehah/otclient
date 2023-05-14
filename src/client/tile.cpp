@@ -42,8 +42,8 @@ void Tile::drawThing(const ThingPtr& thing, const Point& dest, int flags, LightV
 
     if (thing->isItem()) {
         m_drawElevation += thing->getElevation();
-        if (m_drawElevation > MAX_ELEVATION)
-            m_drawElevation = MAX_ELEVATION;
+        if (m_drawElevation > g_gameConfig.getTileMaxElevation())
+            m_drawElevation = g_gameConfig.getTileMaxElevation();
     }
 }
 
@@ -94,8 +94,8 @@ void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags,
 
     for (const auto& creature : m_walkingCreatures) {
         const auto& cDest = Point(
-            dest.x + ((creature->getPosition().x - m_position.x) * SPRITE_SIZE - m_drawElevation) * g_drawPool.getScaleFactor(),
-            dest.y + ((creature->getPosition().y - m_position.y) * SPRITE_SIZE - m_drawElevation) * g_drawPool.getScaleFactor()
+            dest.x + ((creature->getPosition().x - m_position.x) * g_gameConfig.getSpriteSize() - m_drawElevation) * g_drawPool.getScaleFactor(),
+            dest.y + ((creature->getPosition().y - m_position.y) * g_gameConfig.getSpriteSize() - m_drawElevation) * g_drawPool.getScaleFactor()
         );
         drawThing(creature, cDest, flags, lightView);
         creature->drawInformation(mapRect, cDest, isCovered, flags);
@@ -236,8 +236,8 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
     setThingFlag(thing);
     checkForDetachableThing();
 
-    if (size > MAX_THINGS)
-        removeThing(m_things[MAX_THINGS]);
+    if (size > g_gameConfig.getTileMaxThings())
+        removeThing(m_things[g_gameConfig.getTileMaxThings()]);
 
     // Do not change if you do not understand what is being done.
     {
@@ -530,7 +530,7 @@ bool Tile::isCompletelyCovered(uint8_t firstFloor, bool resetCache)
         return false;
 
     const uint32_t idChecked = 1 << firstFloor;
-    const uint32_t idState = 1 << (firstFloor + MAX_Z);
+    const uint32_t idState = 1 << (firstFloor + g_gameConfig.getMapMaxZ());
     if ((m_isCompletelyCovered & idChecked) == 0) {
         m_isCompletelyCovered |= idChecked;
         if (g_map.isCompletelyCovered(m_position, firstFloor)) {
@@ -548,7 +548,7 @@ bool Tile::isCovered(int8_t firstFloor)
     if (m_position.z == 0 || m_position.z == firstFloor) return false;
 
     const uint32_t idChecked = 1 << firstFloor;
-    const uint32_t idState = 1 << (firstFloor + MAX_Z);
+    const uint32_t idState = 1 << (firstFloor + g_gameConfig.getMapMaxZ());
 
     if ((m_isCovered & idChecked) == 0) {
         m_isCovered |= idChecked;
@@ -713,7 +713,7 @@ void Tile::setThingFlag(const ThingPtr& thing)
 
     // best option to have something more real, but in some cases as a custom project,
     // the developers are not defining crop size
-    //if(thing->getRealSize() > SPRITE_SIZE)
+    //if(thing->getRealSize() > g_gameConfig.getSpriteSize())
     if (!thing->isSingleDimension() || thing->hasElevation() || thing->hasDisplacement())
         m_thingTypeFlag |= TileThingType::NOT_SINGLE_DIMENSION;
 

@@ -23,6 +23,8 @@
 #include "fontmanager.h"
 #include "texture.h"
 
+#include <client/gameconfig.h>
+
 #include <framework/core/resourcemanager.h>
 #include <framework/otml/otml.h>
 
@@ -32,10 +34,7 @@ void FontManager::terminate() { clearFonts(); }
 
 void FontManager::clearFonts() {
     m_fonts.clear();
-    m_creatureNameFont = nullptr;
-    m_animatedTextFont = nullptr;
-    m_staticTextFont = nullptr;
-    m_widgetTextFont = nullptr;
+    m_defaultFont = nullptr;
 }
 
 bool FontManager::importFont(const std::string& file)
@@ -59,12 +58,8 @@ bool FontManager::importFont(const std::string& file)
         m_fonts.emplace_back(font);
 
         // set as default if needed
-        if (fontNode->valueAt<bool>("default", false)) {
-            m_creatureNameFont = font;
-            m_animatedTextFont = font;
-            m_staticTextFont = font;
-            m_widgetTextFont = font;
-        }
+        if (!m_defaultFont || fontNode->valueAt<bool>("default", false))
+            m_defaultFont = font;
 
         return true;
     } catch (const stdext::exception& e) {
@@ -92,5 +87,5 @@ BitmapFontPtr FontManager::getFont(const std::string_view fontName)
 
     // when not found, fallback to default font
     g_logger.error(stdext::format("font '%s' not found", fontName));
-    return nullptr;
+    return m_defaultFont;
 }

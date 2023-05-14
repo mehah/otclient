@@ -33,7 +33,7 @@ void Missile::drawMissile(const Point& dest, LightView* lightView)
 
     const float fraction = m_animationTimer.ticksElapsed() / m_duration;
     getThingType()->draw(dest + m_delta * fraction * g_drawPool.getScaleFactor(), 0, m_numPatternX, m_numPatternY, 0, 0,
-                         Otc::DrawThings | Otc::DrawLights, Color::white, lightView, m_drawConductor);
+        Otc::DrawThings | Otc::DrawLights, Color::white, lightView, m_drawConductor);
 }
 
 void Missile::setPath(const Position& fromPosition, const Position& toPosition)
@@ -49,8 +49,8 @@ void Missile::setPath(const Position& fromPosition, const Position& toPosition)
 
     m_direction = fromPosition.getDirectionFromPosition(toPosition);
 
-    m_duration = (MISSILE_TICKS_PER_FRAME * 2) * std::sqrt(deltaLength);
-    m_delta *= SPRITE_SIZE;
+    m_duration = (g_gameConfig.getMissileTicksPerFrame() * 2) * std::sqrt(deltaLength);
+    m_delta *= g_gameConfig.getSpriteSize();
     m_animationTimer.restart();
     m_distance = fromPosition.distance(toPosition);
 
@@ -58,28 +58,36 @@ void Missile::setPath(const Position& fromPosition, const Position& toPosition)
         if (m_direction == Otc::NorthWest) {
             m_numPatternX = 0;
             m_numPatternY = 0;
-        } else if (m_direction == Otc::North) {
+        }
+        else if (m_direction == Otc::North) {
             m_numPatternX = 1;
             m_numPatternY = 0;
-        } else if (m_direction == Otc::NorthEast) {
+        }
+        else if (m_direction == Otc::NorthEast) {
             m_numPatternX = 2;
             m_numPatternY = 0;
-        } else if (m_direction == Otc::East) {
+        }
+        else if (m_direction == Otc::East) {
             m_numPatternX = 2;
             m_numPatternY = 1;
-        } else if (m_direction == Otc::SouthEast) {
+        }
+        else if (m_direction == Otc::SouthEast) {
             m_numPatternX = 2;
             m_numPatternY = 2;
-        } else if (m_direction == Otc::South) {
+        }
+        else if (m_direction == Otc::South) {
             m_numPatternX = 1;
             m_numPatternY = 2;
-        } else if (m_direction == Otc::SouthWest) {
+        }
+        else if (m_direction == Otc::SouthWest) {
             m_numPatternX = 0;
             m_numPatternY = 2;
-        } else if (m_direction == Otc::West) {
+        }
+        else if (m_direction == Otc::West) {
             m_numPatternX = 0;
             m_numPatternY = 1;
-        } else {
+        }
+        else {
             m_numPatternX = 1;
             m_numPatternY = 1;
         }

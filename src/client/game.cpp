@@ -1521,7 +1521,7 @@ void Game::setProtocolVersion(int version)
     if (isOnline())
         throw Exception("Unable to change protocol version while online");
 
-    if (version != 0 && (version < 740 || version > m_lastSupportedVersion))
+    if (version != 0 && (version < 740 || version > g_gameConfig.getLastSupportedVersion()))
         throw Exception("Protocol version %d not supported", version);
 
     m_protocolVersion = version;
@@ -1539,7 +1539,7 @@ void Game::setClientVersion(int version)
     if (isOnline())
         throw Exception("Unable to change client version while online");
 
-    if (version != 0 && (version < 740 || version > m_lastSupportedVersion))
+    if (version != 0 && (version < 740 || version > g_gameConfig.getLastSupportedVersion()))
         throw Exception("Client version %d not supported", version);
 
     m_features.reset();

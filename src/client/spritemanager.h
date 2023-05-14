@@ -24,6 +24,7 @@
 
 #include <framework/core/declarations.h>
 #include <framework/graphics/declarations.h>
+#include "gameconfig.h"
 
  //@bindsingleton g_sprites
 class SpriteManager
@@ -48,11 +49,6 @@ public:
 
 private:
     ImagePtr getSpriteImage(int id, const FileStreamPtr& file);
-
-    enum
-    {
-        SPRITE_DATA_SIZE = SPRITE_SIZE * SPRITE_SIZE * 4
-    };
 
     std::string m_lastFileName;
 

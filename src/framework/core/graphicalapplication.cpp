@@ -71,7 +71,7 @@ void GraphicalApplication::init(std::vector<std::string>& args, uint8_t asyncDis
 
     // initialize graphics
     g_graphics.init();
-    g_drawPool.init(SPRITE_SIZE);
+    g_drawPool.init(g_gameConfig.getSpriteSize());
 
     // fire first resize event
     resize(g_window.getSize());

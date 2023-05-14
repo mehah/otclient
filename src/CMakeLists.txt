@@ -236,6 +236,7 @@ set(SOURCE_FILES
 	client/creatures.cpp
 	client/effect.cpp
 	client/game.cpp
+	client/gameconfig.cpp
 	client/houses.cpp
 	client/item.cpp
 	client/itemtype.cpp
@@ -250,6 +251,7 @@ set(SOURCE_FILES
 	client/missile.cpp
 	client/outfit.cpp
 	client/player.cpp
+	client/position.cpp
 	client/protocolcodes.cpp
 	client/protocolgame.cpp
 	client/protocolgameparse.cpp

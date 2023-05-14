@@ -24,6 +24,7 @@
 
 #include <framework/graphics/declarations.h>
 #include "declarations.h"
+#include "gameconfig.h"
 
 constexpr uint8_t MMBLOCK_SIZE = 64;
 constexpr uint8_t OTMM_VERSION = 1;
@@ -127,7 +128,7 @@ private:
         };
     }
     uint32_t getBlockIndex(const Position& pos) { return ((pos.y / MMBLOCK_SIZE) * (65536 / MMBLOCK_SIZE)) + (pos.x / MMBLOCK_SIZE); }
-    stdext::map<uint32_t, MinimapBlock_ptr> m_tileBlocks[MAX_Z + 1];
+    std::vector<stdext::map<uint32_t, MinimapBlock_ptr>> m_tileBlocks;
     std::mutex m_lock;
 };
 

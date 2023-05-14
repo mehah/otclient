@@ -45,7 +45,7 @@ void Effect::drawEffect(const Point& dest, uint32_t flags, int offsetX, int offs
         animationPhase = animator->getPhaseAt(m_animationTimer);
     } else {
         // hack to fix some animation phases duration, currently there is no better solution
-        int ticks = EFFECT_TICKS_PER_FRAME;
+        int ticks = g_gameConfig.getEffectTicksPerFrame();
         if (m_clientId == 33) {
             ticks <<= 2;
         }
@@ -82,7 +82,7 @@ void Effect::onAppear()
 
         m_duration = animator->getTotalDuration();
     } else {
-        m_duration = EFFECT_TICKS_PER_FRAME;
+        m_duration = g_gameConfig.getEffectTicksPerFrame();
 
         // hack to fix some animation phases duration, currently there is no better solution
         if (m_clientId == 33) {
@@ -101,7 +101,7 @@ void Effect::onAppear()
 bool Effect::waitFor(const EffectPtr& effect)
 {
     const ticks_t ticksElapsed = effect->m_animationTimer.ticksElapsed();
-    uint16_t minDuration = getIdleAnimator() ? getIdleAnimator()->getMinDuration() : EFFECT_TICKS_PER_FRAME;
+    uint16_t minDuration = getIdleAnimator() ? getIdleAnimator()->getMinDuration() : g_gameConfig.getEffectTicksPerFrame();
     minDuration = minDuration * std::max<uint8_t>(getAnimationPhases() / 3, 1);
 
     if (ticksElapsed <= minDuration)

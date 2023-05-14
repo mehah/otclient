@@ -24,6 +24,7 @@
 
 #include "animator.h"
 #include "declarations.h"
+#include "gameconfig.h"
 
 #include <variant>
 #include <framework/core/declarations.h>
@@ -314,7 +315,7 @@ public:
     bool isTopGroundBorder() { return isGroundBorder() && !isSingleDimension(); }
     bool isSingleGround() { return isGround() && isSingleDimension(); }
     bool isSingleGroundBorder() { return isGroundBorder() && isSingleDimension(); }
-    bool isTall(const bool useRealSize = false) { return useRealSize ? getRealSize() > SPRITE_SIZE : getHeight() > 1; }
+    bool isTall(const bool useRealSize = false);
     bool isSingleDimension() { return m_size.area() == 1; }
 
     bool isGround() { return (m_flags & ThingFlagAttrGround); }
