@@ -235,8 +235,19 @@ void Module::discover(const OTMLNodePtr& moduleNode)
     }
 
     if (const auto& node = moduleNode->get("scripts")) {
-        for (const auto& tmp : node->children())
-            m_scripts.emplace_back(stdext::resolve_path(tmp->value(), node->source()));
+        for (const auto& tmp : node->children()) {
+            auto path = stdext::resolve_path(tmp->value(), node->source());
+
+            if (path.ends_with('*')) {
+                path.pop_back();
+                for (const auto& filePath : g_resources.listDirectoryFiles(path, true, false, true)) {
+                    if (g_resources.isFileType(filePath, "lua")) {
+                        m_scripts.emplace_back(filePath);
+                    }
+                }
+            } else
+                m_scripts.emplace_back(path);
+        }
     }
 
     if (const auto& node = moduleNode->get("load-later")) {
