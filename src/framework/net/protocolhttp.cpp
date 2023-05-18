@@ -416,9 +416,6 @@ void HttpSession::on_request_sent(const std::error_code& ec, size_t /*bytes_tran
                     header.c_str() + pos + sizeof("Content-Length: ") - 1,
                     nullptr, 10);
                 m_result->size = len - m_response.size();
-            } else {
-                onError("HttpSession error receiving header " + m_url + ": " + "Content-Length not found");
-                return;
             }
 
             asio::async_read(m_socket, m_response,
