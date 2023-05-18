@@ -124,7 +124,7 @@ AttachedEffectManager = {
             set = function(self, id, config)
                 local effect = AttachedEffectManager.get(id)
                 if effect == nil then
-                    g_logger.error('Invalid Static Effect ID(' .. id .. ')')
+                    g_logger.error('Invalid Attached Effect ID(' .. id .. ')')
                     return
                 end
 
