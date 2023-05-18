@@ -294,6 +294,12 @@ private:
     void parseMarketDetail(const InputMessagePtr& msg);
     void parseMarketBrowse(const InputMessagePtr& msg);
 
+    // 13x
+    void parseBosstiaryData(const InputMessagePtr& msg);
+    void parseBosstiarySlots(const InputMessagePtr& msg);
+    void parseBosstiaryCooldownTimer(const InputMessagePtr& msg);
+    void parseBosstiaryEntryChanged(const InputMessagePtr& msg);
+
     void parseAttachedEffect(const InputMessagePtr& msg);
     void parseDetachEffect(const InputMessagePtr& msg);
     void parseCreatureShader(const InputMessagePtr& msg);

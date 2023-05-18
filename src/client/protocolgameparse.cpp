@@ -488,9 +488,13 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerSendRewardHistory:
                     parseRewardHistory(msg);
                     break;
-                case Proto::GameServerSendPreyFreeRerolls:
-                    parsePreyFreeRerolls(msg);
+
+                case Proto::GameServerSendPreyFreeRerolls: // || Proto::GameServerSendBosstiaryEntryChanged
+                    if (g_game.getFeature(Otc::GameBosstiary))
+                        parseBosstiaryEntryChanged(msg);
+                    else parsePreyFreeRerolls(msg);
                     break;
+
                 case Proto::GameServerSendPreyTimeLeft:
                     parsePreyTimeLeft(msg);
                     break;
@@ -520,6 +524,17 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                     break;
                 case Proto::GameServerMarketBrowse:
                     parseMarketBrowse(msg);
+                    break;
+
+                    // 13xx
+                case Proto::GameServerBosstiaryData:
+                    parseBosstiaryData(msg);
+                    break;
+                case Proto::GameServerBosstiarySlots:
+                    parseBosstiarySlots(msg);
+                    break;
+                case Proto::GameServerBosstiaryCooldownTimer:
+                    parseBosstiaryCooldownTimer(msg);
                     break;
 
                 case Proto::GameServerAttchedEffect:
@@ -3720,6 +3735,91 @@ void ProtocolGame::parseMarketBrowse(const InputMessagePtr& msg)
     }
 
     g_lua.callGlobalField("g_game", "onMarketBrowse", intOffers, nameOffers);
+}
+
+// 13x
+void ProtocolGame::parseBosstiaryData(const InputMessagePtr& msg)
+{
+    msg->getU16(); // Number of kills to achieve 'Bane Prowess'
+    msg->getU16(); // Number of kills to achieve 'Bane expertise'
+    msg->getU16(); // Number of kills to achieve 'Base Mastery'
+
+    msg->getU16(); // Number of kills to achieve 'Archfoe Prowess'
+    msg->getU16(); // Number of kills to achieve 'Archfoe Expertise'
+    msg->getU16(); // Number of kills to achieve 'Archfoe Mastery'
+
+    msg->getU16(); // Number of kills to achieve 'Nemesis Prowess'
+    msg->getU16(); // Number of kills to achieve 'Nemesis Expertise'
+    msg->getU16(); // Number of kills to achieve 'Nemesis Mastery'
+
+    msg->getU16(); // Points will receive when reach 'Bane Prowess'
+    msg->getU16(); // Points will receive when reach 'Bane Expertise'
+    msg->getU16(); // Points will receive when reach 'Base Mastery'
+
+    msg->getU16(); // Points will receive when reach 'Archfoe Prowess'
+    msg->getU16(); // Points will receive when reach 'Archfoe Expertise'
+    msg->getU16(); // Points will receive when reach 'Archfoe Mastery'
+
+    msg->getU16(); // Points will receive when reach 'Nemesis Prowess'
+    msg->getU16(); // Points will receive when reach 'Nemesis Expertise'
+    msg->getU16(); // Points will receive when reach 'Nemesis Mastery'
+}
+
+void ProtocolGame::parseBosstiarySlots(const InputMessagePtr& msg) {
+    const auto& getBosstiarySlot = [&]() {
+        msg->getU8(); // Boss Race
+        msg->getU32(); // Kill Count
+        msg->getU16(); // Loot Bonus
+        msg->getU8(); // Kill Bonus
+        msg->getU8(); // Boss Race
+        msg->getU32(); // Remove Price
+        msg->getU8(); // Inactive? (Only true if equal to Boosted Boss)
+    };
+
+    msg->getU32(); // Player Points
+    msg->getU32(); // Total Points next bonus
+    msg->getU16(); // Current Bonus
+    msg->getU16(); // Next Bonus
+
+    const bool isSlotOneUnlocked = msg->getU8();
+    const uint32_t bossIdSlotOne = msg->getU32();
+    if (isSlotOneUnlocked && bossIdSlotOne != 0) {
+        getBosstiarySlot();
+    }
+
+    const bool isSlotTwoUnlocked = msg->getU8();
+    const uint32_t bossIdSlotTwo = msg->getU32();
+    if (isSlotTwoUnlocked && bossIdSlotTwo != 0) {
+        getBosstiarySlot();
+    }
+
+    const bool isTodaySlotUnlocked = msg->getU8();
+    const uint32_t boostedBossId = msg->getU32();
+    if (isTodaySlotUnlocked && boostedBossId != 0) {
+        getBosstiarySlot();
+    }
+
+    const bool bossesUnlocked = msg->getU8();
+    if (bossesUnlocked) {
+        const uint16_t bossesUnlockedSize = msg->getU16();
+
+        for (uint_fast16_t i = 0; i < bossesUnlockedSize; ++i) {
+            msg->getU32(); // bossId
+            msg->getU8(); // bossRace
+        }
+    }
+}
+
+void ProtocolGame::parseBosstiaryCooldownTimer(const InputMessagePtr& msg) {
+    const uint16_t bossesOnTrackerSize = msg->getU16();
+    for (uint_fast16_t i = 0; i < bossesOnTrackerSize; ++i) {
+        msg->getU32(); // bossRaceId
+        msg->getU64(); // Boss cooldown in seconds
+    }
+}
+
+void ProtocolGame::parseBosstiaryEntryChanged(const InputMessagePtr& msg) {
+    msg->getU32(); // bossId
 }
 
 void ProtocolGame::parseAttachedEffect(const InputMessagePtr& msg) {

@@ -175,6 +175,7 @@ GameDynamicForgeVariables = 93
 GameConcotions = 94
 GameAnthem = 95
 GameVipGroups = 96
+GameBosstiary = 97
 GameLoadSprInsteadProtobuf = 100
 GameItemShader = 101
 GameCreatureShader = 102

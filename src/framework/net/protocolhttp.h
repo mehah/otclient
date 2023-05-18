@@ -66,7 +66,7 @@ public:
     HttpSession(asio::io_service& service, const std::string& url, const std::string& agent,
                 const bool& enable_time_out_on_read_write,
                 const stdext::map<std::string, std::string>& custom_header,
-                int timeout, bool isJson, const HttpResult_ptr& result, HttpResult_cb callback) :
+                int timeout, bool isJson, bool checkContentLength, const HttpResult_ptr& result, HttpResult_cb callback) :
         m_service(service),
         m_url(url),
         m_agent(agent),
@@ -74,6 +74,7 @@ public:
         m_custom_header(custom_header),
         m_timeout(timeout),
         m_isJson(isJson),
+        m_checkContentLength(checkContentLength),
         m_result(result),
         m_callback(std::move(callback)),
         m_socket(service),
@@ -95,6 +96,7 @@ private:
     stdext::map<std::string, std::string> m_custom_header;
     int m_timeout;
     bool m_isJson;
+    bool m_checkContentLength;
     HttpResult_ptr m_result;
     HttpResult_cb m_callback;
     asio::ip::tcp::socket m_socket;
@@ -195,7 +197,7 @@ public:
     void terminate();
 
     int get(const std::string& url, int timeout = 5);
-    int post(const std::string& url, const std::string& data, int timeout = 5, bool isJson = false);
+    int post(const std::string& url, const std::string& data, int timeout = 5, bool isJson = false, bool checkContentLength = true);
     int download(const std::string& url, const std::string& path, int timeout = 5);
     int ws(const std::string& url, int timeout = 5);
     bool wsSend(int operationId, const std::string& message);
