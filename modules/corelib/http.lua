@@ -26,7 +26,7 @@ function HTTP.getJSON(url, callback)
   return operation
 end
 
-function HTTP.post(url, data, callback)
+function HTTP.post(url, data, callback, checkContentLength)
   if not g_http or not g_http.post then
     return error("HTTP.post is not supported")
   end
@@ -35,7 +35,12 @@ function HTTP.post(url, data, callback)
     data = json.encode(data)
     is_json = true
   end
-  local operation = g_http.post(url, data, HTTP.timeout, is_json)
+
+  if checkContentLength == nil then
+    checkContentLength = true
+  end
+
+  local operation = g_http.post(url, data, HTTP.timeout, is_json, checkContentLength)
   HTTP.operations[operation] = { type = "post", url = url, callback = callback }
   return operation
 end
@@ -57,8 +62,13 @@ function HTTP.download(url, file, callback, progressCallback)
     return error("HTTP.download is not supported")
   end
   local operation = g_http.download(url, file, HTTP.timeout)
-  HTTP.operations[operation] = { type = "download", url = url, file = file, callback = callback,
-    progressCallback = progressCallback }
+  HTTP.operations[operation] = {
+    type = "download",
+    url = url,
+    file = file,
+    callback = callback,
+    progressCallback = progressCallback
+  }
   return operation
 end
 

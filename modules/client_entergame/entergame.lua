@@ -113,9 +113,9 @@ end
 function EnterGame.init()
     enterGame = g_ui.displayUI('entergame')
     enterGameButton = modules.client_topmenu.addLeftButton('enterGameButton', tr('Login') .. ' (Ctrl + G)',
-                                                           '/images/topbuttons/login', EnterGame.openWindow)
+        '/images/topbuttons/login', EnterGame.openWindow)
     motdButton = modules.client_topmenu.addLeftButton('motdButton', tr('Message of the day'), '/images/topbuttons/motd',
-                                                      EnterGame.displayMotd)
+        EnterGame.displayMotd)
     motdButton:hide()
     g_keyboard.bindKeyDown('Ctrl+G', EnterGame.openWindow)
 
@@ -338,7 +338,7 @@ function EnterGame.tryHttpLogin(clientVersion)
     local onRecv = function(message, err)
         if err then
             onError(nil, 'Bad Request.', 400)
-            return 
+            return
         end
 
         local _, bodyStart = message:find('{')
@@ -390,13 +390,13 @@ function EnterGame.tryHttpLogin(clientVersion)
         onCharacterList(nil, characters, account)
     end
 
-    HTTP.post(G.host .. "/login.php", 
+    HTTP.post(G.host .. "/login.php",
         json.encode({
             email = G.account,
             password = G.password,
             type = 'login'
         }),
-        onRecv
+        onRecv, false
     )
 
     loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to login server...'))
@@ -409,7 +409,7 @@ function EnterGame.tryHttpLogin(clientVersion)
 
     g_game.setClientVersion(clientVersion)
     g_game.setProtocolVersion(g_game.getClientProtocolVersion(clientVersion))
-    g_game.chooseRsa(G.host)        
+    g_game.chooseRsa(G.host)
     if modules.game_things.isLoaded() then
     else
         loadBox:destroy()

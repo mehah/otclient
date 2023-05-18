@@ -79,6 +79,8 @@ namespace Proto
 
         // original tibia ONLY
         GameServerPassiveCooldown = 94,
+        GameServerBosstiaryData = 97,
+        GameServerBosstiarySlots = 98,
         GameServerSendClientCheck = 99,
         GameServerFullMap = 100,
         GameServerMapTopRow = 101,
@@ -155,6 +157,7 @@ namespace Proto
         GameServerRefreshBestiaryTracker = 185,
         GameServerTaskHuntingBasicData = 186,
         GameServerTaskHuntingData = 187,
+        GameServerBosstiaryCooldownTimer = 189,
         GameServerFloorChangeUp = 190,
         GameServerFloorChangeDown = 191,
         GameServerLootContainers = 192,
@@ -178,6 +181,7 @@ namespace Proto
         GameServerSendDailyReward = 228,
         GameServerSendRewardHistory = 229,
         GameServerSendPreyFreeRerolls = 230,
+        GameServerSendBosstiaryEntryChanged = 230,
         GameServerSendPreyTimeLeft = 231,
         GameServerSendPreyData = 232,
         GameServerSendPreyRerollPrice = 233,

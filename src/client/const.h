@@ -524,6 +524,7 @@ namespace Otc
         GameConcotions = 94,
         GameAnthem = 95,
         GameVipGroups = 96,
+        GameBosstiary = 97,
 
         //  others
         GameLoadSprInsteadProtobuf = 100,

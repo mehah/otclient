@@ -199,6 +199,7 @@ controller:registerEvents(g_game, {
 
         if version >= 1290 then
             g_game.enableFeature(GameSequencedPackets);
+            g_game.enableFeature(GameBosstiary);
             g_game.enableFeature(GameThingClock);
             g_game.enableFeature(GameThingCounter);
             g_game.enableFeature(GameThingPodiumItemType);
