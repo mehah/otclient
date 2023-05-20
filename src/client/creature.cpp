@@ -102,8 +102,6 @@ void Creature::draw(const Point& dest, uint32_t flags, LightView* lightView)
 
 void Creature::internalDraw(Point dest, bool isMarked, const Color& color, LightView* lightView)
 {
-    int animationPhase = 0;
-
     if (isMarked)
         g_drawPool.setShaderProgram(g_painter->getReplaceColorShader());
     else
@@ -113,17 +111,14 @@ void Creature::internalDraw(Point dest, bool isMarked, const Color& color, Light
         // outfit is a real creature
         if (m_outfit.isCreature()) {
             if (m_outfit.hasMount()) {
-                animationPhase = getCurrentAnimationPhase(true);
-
                 dest -= m_mountType->getDisplacement() * g_drawPool.getScaleFactor();
 
                 if (!isMarked && m_mountShader)
                     g_drawPool.setShaderProgram(m_mountShader, true, m_mountShaderAction);
-                m_mountType->draw(dest, 0, m_numPatternX, 0, 0, animationPhase, Otc::DrawThingsAndLights, color);
+                m_mountType->draw(dest, 0, m_numPatternX, 0, 0, getCurrentAnimationPhase(true), Otc::DrawThingsAndLights, color);
+
                 dest += getDisplacement() * g_drawPool.getScaleFactor();
             }
-
-            animationPhase = getCurrentAnimationPhase();
 
             if (!m_jumpOffset.isNull()) {
                 const auto& jumpOffset = m_jumpOffset * g_drawPool.getScaleFactor();
@@ -131,15 +126,16 @@ void Creature::internalDraw(Point dest, bool isMarked, const Color& color, Light
             }
 
             const auto& datType = getThingType();
+            const int animationPhase = getCurrentAnimationPhase();
+
+            if (!isMarked && m_shader)
+                g_drawPool.setShaderProgram(m_shader, m_shaderAction);
 
             // yPattern => creature addon
             for (int yPattern = 0; yPattern < getNumPatternY(); ++yPattern) {
                 // continue if we dont have this addon
                 if (yPattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
                     continue;
-
-                if (!isMarked && m_shader)
-                    g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
 
                 datType->draw(dest, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, color);
 
@@ -153,6 +149,9 @@ void Creature::internalDraw(Point dest, bool isMarked, const Color& color, Light
                 }
             }
 
+            if (!isMarked && m_shader)
+                g_drawPool.resetShaderProgram();
+
             // outfit is a creature imitating an item or the invisible effect
         } else {
             int animationPhases = m_thingType->getAnimationPhases();
@@ -165,6 +164,7 @@ void Creature::internalDraw(Point dest, bool isMarked, const Color& color, Light
                 animateTicks = g_gameConfig.getInvisibleTicksPerFrame();
             }
 
+            int animationPhase = 0;
             if (animationPhases > 1) {
                 animationPhase = (g_clock.millis() % (static_cast<long long>(animateTicks) * animationPhases)) / animateTicks;
             }

@@ -38,6 +38,8 @@ enum class SpriteLayout
 class SpriteSheet
 {
 public:
+    static constexpr uint16_t SIZE = 384;
+
     SpriteSheet(int firstId, int lastId, SpriteLayout spriteLayout, const std::string& file) : firstId(firstId), lastId(lastId), spriteLayout(spriteLayout), file(file) {}
 
     Size getSpriteSize() const
@@ -54,6 +56,9 @@ public:
 
         return size;
     }
+
+    // 64 pixel width == 6 columns each 64x or 32 pixels, 12 columns
+    int getColumns() const { return SIZE / getSpriteSize().width(); }
 
     int firstId = 0;
     int lastId = 0;
@@ -76,6 +81,9 @@ public:
     void setSpritesCount(int count) { m_spritesCount = count; }
     int getSpritesCount() const { return m_spritesCount; }
 
+    void setPath(const std::string& path) { m_path = path; }
+    std::string getPath() const { return m_path; }
+
     bool loadSpriteSheet(const SpriteSheetPtr& sheet) const;
     void saveSheetToFileBySprite(int id, const std::string& file);
     void saveSheetToFile(const SpriteSheetPtr& sheet, const std::string& file);
@@ -89,6 +97,7 @@ public:
 private:
     uint32_t m_spritesCount{ 0 };
     std::vector<SpriteSheetPtr> m_sheets;
+    std::string m_path;
 };
 
 extern SpriteAppearances g_spriteAppearances;

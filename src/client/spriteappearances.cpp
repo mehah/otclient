@@ -58,7 +58,11 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const
     std::scoped_lock lock(sheet->m_mutex);
 
     try {
-        const auto& fin = g_resources.openFile(stdext::format("/things/%d/%s", g_game.getClientVersion(), sheet->file));
+        const auto& path = stdext::format("%s%s", g_spriteAppearances.getPath(), sheet->file);
+        if (!g_resources.fileExists(path))
+            return false;
+
+        const auto& fin = g_resources.openFile(path);
         fin->cache();
 
         const auto decompressed = std::make_unique<uint8_t[]>(LZMA_UNCOMPRESSED_SIZE); // uncompressed size, bmp file + 122 bytes header
@@ -132,7 +136,7 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const
         // flip vertically
         for (int y = 0; y < 192; ++y) {
             uint8_t* itr1 = &bufferStart[y * SPRITE_SHEET_WIDTH_BYTES];
-            uint8_t* itr2 = &bufferStart[(384 - y - 1) * SPRITE_SHEET_WIDTH_BYTES];
+            uint8_t* itr2 = &bufferStart[(SpriteSheet::SIZE - y - 1) * SPRITE_SHEET_WIDTH_BYTES];
 
             for (std::size_t x = 0; x < SPRITE_SHEET_WIDTH_BYTES; ++x) {
                 std::swap(*(itr1 + x), *(itr2 + x));
@@ -179,8 +183,8 @@ SpriteSheetPtr SpriteAppearances::getSheetBySpriteId(int id, bool load /* = true
 
     const auto& sheet = *sheetIt;
 
-    if (load)
-        loadSpriteSheet(sheet);
+    if (load && !loadSpriteSheet(sheet))
+        return nullptr;
 
     return sheet;
 }
@@ -199,7 +203,7 @@ ImagePtr SpriteAppearances::getSpriteImage(int id)
         uint8_t* pixelData = image->getPixelData();
 
         const int spriteOffset = id - sheet->firstId;
-        const int allColumns = size.width() == 32 ? 12 : 6; // 64 pixel width == 6 columns each 64x or 32 pixels, 12 columns
+        const int allColumns = sheet->getColumns();
         const int spriteRow = std::floor(static_cast<float>(spriteOffset) / static_cast<float>(allColumns));
         const int spriteColumn = spriteOffset % allColumns;
 
@@ -237,13 +241,13 @@ void SpriteAppearances::saveSpriteToFile(int id, const std::string& file)
 void SpriteAppearances::saveSheetToFileBySprite(int id, const std::string& file)
 {
     if (const auto& sheet = getSheetBySpriteId(id)) {
-        Image image({ 384 }, 4, sheet->data.get());
+        Image image({ SpriteSheet::SIZE }, 4, sheet->data.get());
         image.savePNG(file);
     }
 }
 
 void SpriteAppearances::saveSheetToFile(const SpriteSheetPtr& sheet, const std::string& file)
 {
-    Image image({ 384 }, 4, sheet->data.get());
+    Image image({ SpriteSheet::SIZE }, 4, sheet->data.get());
     image.savePNG(file);
 }

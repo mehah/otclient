@@ -191,7 +191,7 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
         int spritesCount = 0;
         std::string appearancesFile;
 
-        json document = json::parse(g_resources.readFileContents(g_resources.resolvePath(g_resources.guessFilePath(file, "json"))));
+        json document = json::parse(g_resources.readFileContents(g_resources.resolvePath(g_resources.guessFilePath(file + "catalog-content", "json"))));
         for (const auto& obj : document) {
             const auto& type = obj["type"];
             if (type == "appearances") {
@@ -204,10 +204,11 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
         }
 
         g_spriteAppearances.setSpritesCount(spritesCount + 1);
+        g_spriteAppearances.setPath(file);
 
         // load appearances.dat
         std::stringstream fin;
-        g_resources.readFileStream(g_resources.resolvePath(stdext::format("/things/%d/%s", g_game.getClientVersion(), appearancesFile)), fin);
+        g_resources.readFileStream(g_resources.resolvePath(stdext::format("%s%s", file, appearancesFile)), fin);
 
         auto appearancesLib = appearances::Appearances();
         if (!appearancesLib.ParseFromIstream(&fin)) {

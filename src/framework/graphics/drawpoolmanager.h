@@ -61,6 +61,8 @@ public:
     void setClipRect(const Rect& clipRect, bool onlyOnce = false) const { getCurrentPool()->setClipRect(clipRect, onlyOnce); }
     void setBlendEquation(BlendEquation equation, bool onlyOnce = false) const { getCurrentPool()->setBlendEquation(equation, onlyOnce); }
     void setCompositionMode(const CompositionMode mode, bool onlyOnce = false) const { getCurrentPool()->setCompositionMode(mode, onlyOnce); }
+
+    void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, const std::function<void()>& action) const { getCurrentPool()->setShaderProgram(shaderProgram, false, action); }
     void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onlyOnce = false, const std::function<void()>& action = nullptr) const { getCurrentPool()->setShaderProgram(shaderProgram, onlyOnce, action); }
 
     float getOpacity() const { return getCurrentPool()->getOpacity(); }
