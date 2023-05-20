@@ -38,7 +38,6 @@ public:
 
     BitmapFontPtr getDefaultFont() const { return m_defaultFont; }
 
-
 private:
     std::vector<BitmapFontPtr> m_fonts;
     BitmapFontPtr m_defaultFont;

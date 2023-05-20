@@ -198,8 +198,7 @@ void Minimap::updateTile(const Position& pos, const TilePtr& tile)
         if (!tile->isPathable())
             minimapTile.flags |= MinimapTileNotPathable;
         minimapTile.speed = std::min<int>(static_cast<int>(std::ceil(tile->getGroundSpeed() / 10.f)), UINT8_MAX);
-    }
-    else {
+    } else {
         minimapTile.flags |= MinimapTileNotWalkable | MinimapTileNotPathable;
     }
 
@@ -305,8 +304,7 @@ bool Minimap::loadImage(const std::string& fileName, const Position& topLeft, fl
             }
         }
         return true;
-    }
-    catch (const stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("failed to load OTMM minimap: %s", e.what()));
         return false;
     }
@@ -335,13 +333,13 @@ bool Minimap::loadOtmm(const std::string& fileName)
         fin->getU32(); // flags
 
         switch (version) {
-        case 1:
-        {
-            fin->getString(); // description
-            break;
-        }
-        default:
-            throw Exception("OTMM version not supported");
+            case 1:
+            {
+                fin->getString(); // description
+                break;
+            }
+            default:
+                throw Exception("OTMM version not supported");
         }
 
         fin->seek(start);
@@ -377,8 +375,7 @@ bool Minimap::loadOtmm(const std::string& fileName)
 
         fin->close();
         return true;
-    }
-    catch (const stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("failed to load OTMM minimap: %s", e.what()));
         return false;
     }
@@ -438,8 +435,7 @@ void Minimap::saveOtmm(const std::string& fileName)
         fin->flush();
 
         fin->close();
-    }
-    catch (const stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("failed to save OTMM minimap: %s", e.what()));
     }
 }

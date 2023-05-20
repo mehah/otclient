@@ -207,7 +207,8 @@ private:
         void clear() { shades.clear(); tiles.clear(); }
     };
 
-    struct FloorData {
+    struct FloorData
+    {
         MapObject cachedVisibleTiles;
         stdext::timer fadingTimers;
     };

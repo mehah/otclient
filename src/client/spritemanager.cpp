@@ -70,8 +70,7 @@ bool SpriteManager::loadSpr(std::string file)
         m_loaded = true;
         g_lua.callGlobalField("g_sprites", "onLoadSpr", file);
         return true;
-    }
-    catch (const stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("Failed to load sprites from '%s': %s", file, e.what()));
         return false;
     }
@@ -127,8 +126,7 @@ void SpriteManager::saveSpr(const std::string& fileName)
 
         fin->flush();
         fin->close();
-    }
-    catch (const std::exception& e) {
+    } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
     }
 }
@@ -240,8 +238,7 @@ ImagePtr SpriteManager::getSpriteImage(int id, const FileStreamPtr& file) {
         }
 
         return image;
-    }
-    catch (const stdext::exception& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("Failed to get sprite id %d: %s", id, e.what()));
         return nullptr;
     }

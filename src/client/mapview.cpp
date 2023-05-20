@@ -80,12 +80,12 @@ MapView::MapView() : m_pool(g_drawPool.get(DrawPoolType::MAP)), m_lightView(std:
         }
 
         g_painter->setOpacity(fadeOpacity);
-        });
+    });
 
     m_pool->onAfterDraw([] {
         g_painter->resetShaderProgram();
         g_painter->resetOpacity();
-        });
+    });
 
     setVisibleDimension(Size(15, 11));
 }
@@ -200,8 +200,7 @@ void MapView::drawFloor()
                 const auto& crosshairRect = Rect(point, m_tileSize, m_tileSize);
                 g_drawPool.addTexturedRect(crosshairRect, m_crosshairTexture);
             }
-        }
-        else if (m_lastHighlightTile) {
+        } else if (m_lastHighlightTile) {
             m_mousePosition = {}; // Invalidate mousePosition
             m_lastHighlightTile->unselect();
             m_lastHighlightTile = nullptr;
@@ -282,15 +281,13 @@ void MapView::updateVisibleTiles()
         for (int iz = m_cachedLastVisibleFloor; iz >= cachedFirstVisibleFloor; --iz) {
             m_floors[iz].fadingTimers.restart(m_floorFading * 1000);
         }
-    }
-    else if (prevFirstVisibleFloor < m_cachedFirstVisibleFloor) { // hiding new floor
+    } else if (prevFirstVisibleFloor < m_cachedFirstVisibleFloor) { // hiding new floor
         m_fadeType = FadeType::OUT$;
         for (int iz = prevFirstVisibleFloor; iz < m_cachedFirstVisibleFloor; ++iz) {
             const int shift = std::max<int>(0, m_floorFading - m_floors[iz].fadingTimers.elapsed_millis());
             m_floors[iz].fadingTimers.restart(shift * 1000);
         }
-    }
-    else if (prevFirstVisibleFloor > m_cachedFirstVisibleFloor) { // showing floor
+    } else if (prevFirstVisibleFloor > m_cachedFirstVisibleFloor) { // showing floor
         m_fadeType = FadeType::IN$;
         m_fadeFinish = false;
         for (int iz = m_cachedFirstVisibleFloor; iz < prevFirstVisibleFloor; ++iz) {
@@ -411,7 +408,7 @@ void MapView::updateGeometry(const Size& visibleDimension)
     }
     g_mainDispatcher.addEvent([=, this]() {
         m_pool->getFrameBuffer()->resize(bufferSize);
-        });
+    });
 
     const uint8_t left = std::min<uint8_t>(g_map.getAwareRange().left, (m_drawDimension.width() / 2) - 1);
     const uint8_t top = std::min<uint8_t>(g_map.getAwareRange().top, (m_drawDimension.height() / 2) - 1);
@@ -553,7 +550,7 @@ void MapView::setAntiAliasingMode(const AntialiasingMode mode)
     g_mainDispatcher.addEvent([=, this]() {
         g_drawPool.get(DrawPoolType::MAP)->getFrameBuffer()
             ->setSmooth(mode != ANTIALIASING_DISABLED);
-        });
+    });
 
     updateGeometry(m_visibleDimension);
 }
@@ -662,8 +659,7 @@ uint8_t MapView::calcFirstVisibleFloor(bool checkLimitsFloorsView) const
     // return forced first visible floor
     if (m_lockedFirstVisibleFloor != -1) {
         z = m_lockedFirstVisibleFloor;
-    }
-    else {
+    } else {
         // this could happens if the player is not known yet
         if (m_posInfo.camera.isValid()) {
             // if nothing is limiting the view, the first visible floor is 0
@@ -764,8 +760,7 @@ void MapView::setShader(const std::string_view name, float fadein, float fadeout
         if (fadeout > 0.0f && m_shader) {
             m_nextShader = shader;
             m_shaderSwitchDone = false;
-        }
-        else {
+        } else {
             m_shader = shader;
             m_nextShader = nullptr;
             m_shaderSwitchDone = true;
@@ -776,7 +771,7 @@ void MapView::setShader(const std::string_view name, float fadein, float fadeout
         m_fadeOutTime = fadeout;
 
         if (shader) m_shaderPosition = getCameraPosition();
-        });
+    });
 }
 
 void MapView::setDrawLights(bool enable)
@@ -801,35 +796,35 @@ void MapView::updateViewportDirectionCache()
         vp.left = vp.right;
 
         switch (dir) {
-        case Otc::North:
-        case Otc::South:
-            vp.top += 1;
-            vp.bottom += 1;
-            break;
+            case Otc::North:
+            case Otc::South:
+                vp.top += 1;
+                vp.bottom += 1;
+                break;
 
-        case Otc::West:
-        case Otc::East:
-            vp.right += 1;
-            vp.left += 1;
-            break;
+            case Otc::West:
+            case Otc::East:
+                vp.right += 1;
+                vp.left += 1;
+                break;
 
-        case Otc::NorthEast:
-        case Otc::SouthEast:
-        case Otc::NorthWest:
-        case Otc::SouthWest:
-            vp.left += 1;
-            vp.bottom += 1;
-            vp.top += 1;
-            vp.right += 1;
-            break;
+            case Otc::NorthEast:
+            case Otc::SouthEast:
+            case Otc::NorthWest:
+            case Otc::SouthWest:
+                vp.left += 1;
+                vp.bottom += 1;
+                vp.top += 1;
+                vp.right += 1;
+                break;
 
-        case Otc::InvalidDirection:
-            vp.left -= 1;
-            vp.right -= 1;
-            break;
+            case Otc::InvalidDirection:
+                vp.left -= 1;
+                vp.right -= 1;
+                break;
 
-        default:
-            break;
+            default:
+                break;
         }
     }
 }

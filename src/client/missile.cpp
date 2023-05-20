@@ -58,36 +58,28 @@ void Missile::setPath(const Position& fromPosition, const Position& toPosition)
         if (m_direction == Otc::NorthWest) {
             m_numPatternX = 0;
             m_numPatternY = 0;
-        }
-        else if (m_direction == Otc::North) {
+        } else if (m_direction == Otc::North) {
             m_numPatternX = 1;
             m_numPatternY = 0;
-        }
-        else if (m_direction == Otc::NorthEast) {
+        } else if (m_direction == Otc::NorthEast) {
             m_numPatternX = 2;
             m_numPatternY = 0;
-        }
-        else if (m_direction == Otc::East) {
+        } else if (m_direction == Otc::East) {
             m_numPatternX = 2;
             m_numPatternY = 1;
-        }
-        else if (m_direction == Otc::SouthEast) {
+        } else if (m_direction == Otc::SouthEast) {
             m_numPatternX = 2;
             m_numPatternY = 2;
-        }
-        else if (m_direction == Otc::South) {
+        } else if (m_direction == Otc::South) {
             m_numPatternX = 1;
             m_numPatternY = 2;
-        }
-        else if (m_direction == Otc::SouthWest) {
+        } else if (m_direction == Otc::SouthWest) {
             m_numPatternX = 0;
             m_numPatternY = 2;
-        }
-        else if (m_direction == Otc::West) {
+        } else if (m_direction == Otc::West) {
             m_numPatternX = 0;
             m_numPatternY = 1;
-        }
-        else {
+        } else {
             m_numPatternX = 1;
             m_numPatternY = 1;
         }
