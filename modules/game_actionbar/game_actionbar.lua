@@ -928,6 +928,10 @@ function onSpellCooldown(spellId, duration)
     local slot
     for v, k in pairs(actionBarPanel:getChildren()) do
         local spell, profile, spellName = Spells.getSpellByIcon(spellId)
+        if not spell then
+            print('[WARNING] Can not set cooldown on spell with id: ' .. spellId)
+            return true
+        end
         if k.words == spell.words or spell.clientId and spell.clientId == k.itemId then
             slot = k
             local progressRect = slot:recursiveGetChildById('progress' .. spell.id)
