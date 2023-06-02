@@ -1882,7 +1882,7 @@ void ProtocolGame::parsePlayerModes(const InputMessagePtr& msg)
 
 void ProtocolGame::parseSpellCooldown(const InputMessagePtr& msg)
 {
-    uint16_t spellId = msg->getU8();
+    uint16_t spellId;
     if (g_game.getFeature(Otc::GameUshortSpell)) {
         spellId = msg->getU16();
     } else {
