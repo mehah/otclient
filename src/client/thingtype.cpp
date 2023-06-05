@@ -244,19 +244,19 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
     // reverse_addons_south
     // reverse_addons_north
 
-    if (flags.has_wearout() && flags.clip()) {
+    if (flags.has_wearout()) {
         m_flags |= ThingFlagAttrWearOut;
     }
 
-    if (flags.has_clockexpire() && flags.clip()) {
+    if (flags.has_clockexpire()) {
         m_flags |= ThingFlagAttrClockExpire;
     }
 
-    if (flags.has_expire() && flags.clip()) {
+    if (flags.has_expire()) {
         m_flags |= ThingFlagAttrExpire;
     }
 
-    if (flags.has_expirestop() && flags.clip()) {
+    if (flags.has_expirestop()) {
         m_flags |= ThingFlagAttrExpireStop;
     }
 
