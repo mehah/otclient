@@ -47,6 +47,8 @@ int main(int argc, const char* argv[])
 
     // initialize resources
 #ifdef ANDROID
+    // Unzip Android assets/data.zip
+    g_androidManager.unZipAssetData();
     g_resources.init(nullptr);
 #else
     g_resources.init(args[0].data());
@@ -81,11 +83,6 @@ int main(int argc, const char* argv[])
     g_client.init(args);
 #ifdef FRAMEWORK_NET
     g_http.init();
-#endif
-
-#ifdef ANDROID
-    // Unzip Android assets/data.zip
-    g_androidManager.unZipAssetData();
 #endif
 
     if (!g_lua.safeRunScript("init.lua"))
