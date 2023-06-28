@@ -37,11 +37,6 @@ int main(int argc, const char* argv[])
 {
     std::vector<std::string> args(argv, argv + argc);
 
-    // setup application name and version
-    g_app.setName("OTClient - Redemption");
-    g_app.setCompactName("otclient");
-    g_app.setOrganizationName("otbr");
-
     // process args encoding
     g_platform.init(args);
 
@@ -101,4 +96,4 @@ int main(int argc, const char* argv[])
     g_http.terminate();
 #endif
     return 0;
-}
+    }

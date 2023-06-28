@@ -80,12 +80,12 @@ void LightView::addLightSource(const Point& pos, const Light& light, float brigh
     }
     m_lights.emplace_back(pos, light.intensity, light.color, std::min<float>(brightness, g_drawPool.getOpacity()));
 
-    stdext::hash_union(m_updatingHash, pos.hash());
-    stdext::hash_combine(m_updatingHash, light.intensity);
-    stdext::hash_combine(m_updatingHash, light.color);
+    stdext::hash_union(m_updatedHash, pos.hash());
+    stdext::hash_combine(m_updatedHash, light.intensity);
+    stdext::hash_combine(m_updatedHash, light.color);
 
     if (g_drawPool.getOpacity() < 1.f)
-        stdext::hash_combine(m_updatingHash, g_drawPool.getOpacity());
+        stdext::hash_combine(m_updatedHash, g_drawPool.getOpacity());
 }
 
 void LightView::resetShade(const Point& pos)
@@ -120,7 +120,7 @@ void LightView::updateCoords(const Rect& dest, const Rect& src) {
 }
 
 void LightView::updatePixels() {
-    if (m_updatingHash == m_hash)
+    if (m_updatedHash == m_hash)
         return;
 
     const size_t lightSize = m_lights.size();
@@ -139,6 +139,6 @@ void LightView::updatePixels() {
         }
     }
 
-    m_hash = m_updatingHash;
-    m_updatingHash = 0;
+    m_hash = m_updatedHash;
+    m_updatedHash = 0;
 }

@@ -222,7 +222,6 @@ private:
     bool canRepaint(bool autoUpdateStatus);
 
     bool m_enabled{ true };
-    bool m_updateHash{ false };
     bool m_alwaysGroupDrawings{ false };
 
     uint8_t m_depthLevel{ 0 };
