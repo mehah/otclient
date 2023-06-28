@@ -86,7 +86,7 @@ public:
     void resetState();
     void scale(float factor);
 
-    void optimize(int size);
+    void agroup(bool agroup) { m_alwaysGroupDrawings = agroup; }
 
     void setScaleFactor(float scale) { m_scaleFactor = scale; }
     inline float getScaleFactor() const { return m_scaleFactor; }

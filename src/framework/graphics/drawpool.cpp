@@ -328,13 +328,6 @@ void DrawPool::popTransformMatrix()
     m_transformMatrixStack.pop_back();
 }
 
-void DrawPool::optimize(int size) {
-    if (m_type != DrawPoolType::MAP)
-        return;
-
-    m_alwaysGroupDrawings = size > 115; // Max optimization
-}
-
 void DrawPool::PoolState::execute() const {
     g_painter->setColor(color);
     g_painter->setOpacity(opacity);

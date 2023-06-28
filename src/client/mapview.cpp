@@ -376,7 +376,7 @@ void MapView::updateGeometry(const Size& visibleDimension)
 
     size_t maxAwareRange = std::max<size_t>(visibleDimension.width(), visibleDimension.height());
 
-    m_pool->optimize(maxAwareRange);
+    m_pool->agroup(maxAwareRange > 115);
     while (maxAwareRange > 100) {
         maxAwareRange /= 2;
         scaleFactor /= 2;
