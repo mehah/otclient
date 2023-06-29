@@ -36,15 +36,16 @@ void AdaptativeFrameCounter::update()
 
     ++m_fpsCount;
 
+    if (m_fps == m_fpsCount)
+        return;
+
     const uint32_t tickCount = stdext::millis();
     if (tickCount - m_interval <= 1000)
         return;
 
-    if (m_fps != m_fpsCount) {
-        m_fps = m_fpsCount;
-        m_fpsCount = 0;
-        m_interval = tickCount;
+    m_fps = m_fpsCount;
+    m_fpsCount = 0;
+    m_interval = tickCount;
 
-        g_dispatcher.addEvent([this] { g_lua.callGlobalField("g_app", "onFps", getFps()); });
-    }
+    g_dispatcher.addEvent([this] { g_lua.callGlobalField("g_app", "onFps", getFps()); });
 }

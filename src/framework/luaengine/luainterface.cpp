@@ -823,7 +823,7 @@ int LuaInterface::ref() const
 {
     const int ref = luaL_ref(L, LUA_REGISTRYINDEX);
     assert(ref != LUA_NOREF);
-    assert(ref < 2147483647);
+    assert(ref < INT32_MAX);
     return ref;
 }
 
@@ -832,8 +832,7 @@ int LuaInterface::weakRef()
     static int id = 0;
 
     // generates a new id
-    ++id;
-    if (id == 2147483647)
+    if (++id == INT32_MAX)
         id = 0;
 
     // gets weak table
