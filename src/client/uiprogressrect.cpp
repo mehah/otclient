@@ -78,7 +78,12 @@ void UIProgressRect::drawSelf(DrawPoolType drawPane)
 
 void UIProgressRect::setPercent(float percent)
 {
-    m_percent = std::clamp<float>(percent, 0.0, 100.0);
+    percent = std::clamp<float>(percent, 0.f, 100.f);
+    if (m_percent == percent)
+        return;
+
+    m_percent = percent;
+    repaint();
 }
 
 void UIProgressRect::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)

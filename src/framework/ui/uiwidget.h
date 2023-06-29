@@ -198,13 +198,12 @@ public:
     void setProp(FlagProp prop, bool v);
     bool hasProp(FlagProp prop) { return (m_flagsProp & prop); }
 private:
-    void repaint();
     uint32_t m_flagsProp{ 0 };
     PainterShaderProgramPtr m_shader;
 
     // state managment
 protected:
-
+    void repaint();
     bool setState(Fw::WidgetState state, bool on);
     bool hasState(Fw::WidgetState state);
 
