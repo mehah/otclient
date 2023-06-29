@@ -215,7 +215,7 @@ void CreatureManager::loadNpcs(const std::string& folder)
         throw Exception("NPCs folder '%s' was not found.", folder);
 
     const auto& fileList = g_resources.listDirectoryFiles(tmp);
-    for (const std::string& file : fileList)
+    for (const auto& file : fileList)
         loadCreatureBuffer(g_resources.readFileContents(tmp + file));
 }
 
