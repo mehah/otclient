@@ -36,7 +36,7 @@
 class Thing : public LuaObject
 {
 public:
-    virtual void draw(const Point& /*dest*/, uint32_t flags, LightView* /*lightView*/ = nullptr) {}
+    virtual void draw(const Point& /*dest*/, bool drawThings = true, LightView* /*lightView*/ = nullptr) {}
 
     virtual void setId(uint32_t /*id*/) {}
     virtual void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false);

@@ -43,7 +43,8 @@ void UIItem::drawSelf(DrawPoolType drawPane)
         const int exactSize = std::max<int>(g_gameConfig.getSpriteSize(), m_item->getExactSize());
 
         g_drawPool.bindFrameBuffer(exactSize);
-        m_item->draw(Point(exactSize - g_gameConfig.getSpriteSize()) + m_item->getDisplacement(), Otc::DrawThings, m_color);
+        m_item->setColor(m_color);
+        m_item->draw(Point(exactSize - g_gameConfig.getSpriteSize()) + m_item->getDisplacement());
         g_drawPool.releaseFrameBuffer(getPaddingRect());
 
         if (m_font && (m_alwaysShowCount || m_item->isStackable() || m_item->isChargeable()) && m_item->getCountOrSubType() > 1) {

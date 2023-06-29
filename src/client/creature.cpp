@@ -61,12 +61,12 @@ Creature::Creature() :m_type(Proto::CreatureTypeUnknown)
     */
 }
 
-void Creature::draw(const Point& dest, uint32_t flags, LightView* lightView)
+void Creature::draw(const Point& dest, bool drawThings, LightView* lightView)
 {
     if (!canBeSeen() || !canDraw())
         return;
 
-    if (flags & Otc::DrawThings) {
+    if (drawThings) {
         if (m_showTimedSquare) {
             g_drawPool.addBoundingRect(Rect(dest + (m_walkOffset - getDisplacement() + 2) * g_drawPool.getScaleFactor(), Size(28 * g_drawPool.getScaleFactor())), m_timedSquareColor, std::max<int>(static_cast<int>(2 * g_drawPool.getScaleFactor()), 1));
         }
@@ -83,7 +83,7 @@ void Creature::draw(const Point& dest, uint32_t flags, LightView* lightView)
             internalDraw(_dest, true, getMarkedColor());
     }
 
-    if (lightView && flags & Otc::DrawLights) {
+    if (lightView) {
         auto light = getLight();
 
         if (isLocalPlayer() && (g_map.getLight().intensity < 64 || m_position.z > g_gameConfig.getMapSeaFloor())) {
@@ -115,7 +115,7 @@ void Creature::internalDraw(Point dest, bool isMarked, const Color& color, Light
 
                 if (!isMarked && m_mountShader)
                     g_drawPool.setShaderProgram(m_mountShader, true, m_mountShaderAction);
-                m_mountType->draw(dest, 0, m_numPatternX, 0, 0, getCurrentAnimationPhase(true), Otc::DrawThingsAndLights, color);
+                m_mountType->draw(dest, 0, m_numPatternX, 0, 0, getCurrentAnimationPhase(true), color);
 
                 dest += getDisplacement() * g_drawPool.getScaleFactor();
             }
@@ -137,14 +137,14 @@ void Creature::internalDraw(Point dest, bool isMarked, const Color& color, Light
                 if (yPattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
                     continue;
 
-                datType->draw(dest, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, color);
+                datType->draw(dest, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, color);
 
                 if (m_drawOutfitColor && !isMarked && getLayers() > 1) {
                     g_drawPool.setCompositionMode(CompositionMode::MULTIPLY);
-                    datType->draw(dest, SpriteMaskYellow, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, m_outfit.getHeadColor());
-                    datType->draw(dest, SpriteMaskRed, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, m_outfit.getBodyColor());
-                    datType->draw(dest, SpriteMaskGreen, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, m_outfit.getLegsColor());
-                    datType->draw(dest, SpriteMaskBlue, m_numPatternX, yPattern, m_numPatternZ, animationPhase, Otc::DrawThingsAndLights, m_outfit.getFeetColor());
+                    datType->draw(dest, SpriteMaskYellow, m_numPatternX, yPattern, m_numPatternZ, animationPhase, m_outfit.getHeadColor());
+                    datType->draw(dest, SpriteMaskRed, m_numPatternX, yPattern, m_numPatternZ, animationPhase, m_outfit.getBodyColor());
+                    datType->draw(dest, SpriteMaskGreen, m_numPatternX, yPattern, m_numPatternZ, animationPhase, m_outfit.getLegsColor());
+                    datType->draw(dest, SpriteMaskBlue, m_numPatternX, yPattern, m_numPatternZ, animationPhase, m_outfit.getFeetColor());
                     g_drawPool.resetCompositionMode();
                 }
             }
@@ -174,7 +174,7 @@ void Creature::internalDraw(Point dest, bool isMarked, const Color& color, Light
 
             if (!isMarked && m_shader)
                 g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
-            m_thingType->draw(dest - (getDisplacement() * g_drawPool.getScaleFactor()), 0, 0, 0, 0, animationPhase, Otc::DrawThingsAndLights, color);
+            m_thingType->draw(dest - (getDisplacement() * g_drawPool.getScaleFactor()), 0, 0, 0, 0, animationPhase, color);
         }
     }
 

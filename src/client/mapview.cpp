@@ -181,7 +181,7 @@ void MapView::drawFloor()
             }
 
             for (const auto& missile : g_map.getFloorMissiles(z))
-                missile->drawMissile(transformPositionTo2D(missile->getPosition(), cameraPosition), lightView);
+                missile->draw(transformPositionTo2D(missile->getPosition(), cameraPosition), true, lightView);
 
             if (m_shadowFloorIntensity > 0 && z == cameraPosition.z + 1) {
                 g_drawPool.setOpacity(m_shadowFloorIntensity, true);

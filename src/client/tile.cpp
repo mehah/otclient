@@ -38,7 +38,7 @@ void Tile::drawThing(const ThingPtr& thing, const Point& dest, int flags, LightV
     const bool isMarked = m_selectType != TileSelectType::NONE && m_highlightThing == thing;
     thing->setMarkColor(isMarked ? Color::yellow : Color::white);
 
-    thing->draw(dest, flags, lightView);
+    thing->draw(dest, flags & Otc::DrawLights, lightView);
 
     if (thing->isItem()) {
         m_drawElevation += thing->getElevation();
@@ -86,7 +86,7 @@ void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags,
         for (const auto& thing : m_things) {
             if (!thing->isCreature() || thing->static_self_cast<Creature>()->isWalking()) continue;
 
-            const Point& cDest = dest - m_drawElevation * g_drawPool.getScaleFactor();
+            const auto& cDest = dest - m_drawElevation * g_drawPool.getScaleFactor();
             drawThing(thing, cDest, flags, lightView);
             thing->static_self_cast<Creature>()->drawInformation(mapRect, cDest, isCovered, flags);
         }
@@ -107,19 +107,8 @@ void Tile::drawTop(const Point& dest, int flags, bool forceDraw, LightView* ligh
     if (!forceDraw && !m_drawTopAndCreature)
         return;
 
-    if (hasEffect()) {
-        int offsetX = 0,
-            offsetY = 0;
-
-        if (g_game.getFeature(Otc::GameMapOldEffectRendering)) {
-            offsetX = m_position.x - g_map.getCentralPosition().x;
-            offsetY = m_position.y - g_map.getCentralPosition().y;
-        }
-
-        for (const auto& effect : m_effects) {
-            effect->drawEffect(dest - m_drawElevation * g_drawPool.getScaleFactor(), flags, offsetX, offsetY, lightView);
-        }
-    }
+    for (const auto& effect : m_effects)
+        effect->draw(dest - m_drawElevation * g_drawPool.getScaleFactor(), flags & Otc::DrawThings, lightView);
 
     if (hasTopItem()) {
         for (const auto& item : m_things) {

@@ -26,7 +26,7 @@
 #include "game.h"
 #include "map.h"
 
-void Effect::drawEffect(const Point& dest, uint32_t flags, int offsetX, int offsetY, LightView* lightView)
+void Effect::draw(const Point& dest, bool drawThings, LightView* lightView)
 {
     if (!canDraw() || isHided())
         return;
@@ -56,6 +56,9 @@ void Effect::drawEffect(const Point& dest, uint32_t flags, int offsetX, int offs
     int xPattern = m_numPatternX;
     int yPattern = m_numPatternY;
     if (g_game.getFeature(Otc::GameMapOldEffectRendering)) {
+        const int offsetX = m_position.x - g_map.getCentralPosition().x;
+        const int offsetY = m_position.y - g_map.getCentralPosition().y;
+
         xPattern = offsetX % getNumPatternX();
         if (xPattern < 0)
             xPattern += getNumPatternX();
@@ -70,7 +73,7 @@ void Effect::drawEffect(const Point& dest, uint32_t flags, int offsetX, int offs
         m_drawConductor.order = DrawOrder::FOURTH;
     }
 
-    getThingType()->draw(dest, 0, xPattern, yPattern, 0, animationPhase, flags, Color::white, lightView, m_drawConductor);
+    getThingType()->draw(dest, 0, xPattern, yPattern, 0, animationPhase, Color::white, drawThings, lightView, m_drawConductor);
 }
 
 void Effect::onAppear()

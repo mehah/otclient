@@ -51,7 +51,7 @@ public:
     void onAppear() override;
     void onDisappear() override;
 
-    void draw(const Point& dest, uint32_t flags, LightView* lightView = nullptr) override;
+    void draw(const Point& dest, bool drawThings = true, LightView* lightView = nullptr) override;
 
     void internalDraw(Point dest, bool isMarked, const Color& color, LightView* lightView = nullptr);
 
