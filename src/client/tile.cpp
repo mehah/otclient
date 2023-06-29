@@ -38,7 +38,7 @@ void Tile::drawThing(const ThingPtr& thing, const Point& dest, int flags, LightV
     const bool isMarked = m_selectType != TileSelectType::NONE && m_highlightThing == thing;
     thing->setMarkColor(isMarked ? Color::yellow : Color::white);
 
-    thing->draw(dest, flags & Otc::DrawLights, lightView);
+    thing->draw(dest, flags & Otc::DrawThings, lightView);
 
     if (thing->isItem()) {
         m_drawElevation += thing->getElevation();

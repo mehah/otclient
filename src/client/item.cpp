@@ -53,7 +53,7 @@ void Item::draw(const Point& dest, bool drawThings, LightView* lightView)
     // determine animation phase
     const int animationPhase = calculateAnimationPhase();
 
-    internalDraw(animationPhase, dest, m_color, false, drawThings, lightView);
+    internalDraw(animationPhase, dest, m_color, drawThings, false, lightView);
 
     if (isMarked())
         internalDraw(animationPhase, dest, getMarkedColor(), drawThings, true);
