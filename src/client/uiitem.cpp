@@ -67,15 +67,12 @@ void UIItem::drawSelf(DrawPoolType drawPane)
 
 void UIItem::setItemId(int id)
 {
-    if (!m_item && id != 0)
+    if (id == 0)
+        m_item = nullptr;
+    else if (m_item)
+        m_item->setId(id);
+    else
         m_item = Item::create(id);
-    else {
-        // remove item
-        if (id == 0)
-            m_item = nullptr;
-        else
-            m_item->setId(id);
-    }
 }
 
 void UIItem::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)

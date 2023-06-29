@@ -36,7 +36,7 @@ public:
 
     void drawSelf(DrawPoolType drawPane) override;
 
-    void movePixels(int x, int y);
+    void movePixels(int x, int y) { m_mapView->move(x, y); }
     void followCreature(const CreaturePtr& creature) { m_mapView->followCreature(creature); }
     void setCameraPosition(const Position& pos) { m_mapView->setCameraPosition(pos); }
     void setMaxZoomIn(int maxZoomIn) { m_maxZoomIn = maxZoomIn; }
@@ -79,8 +79,8 @@ public:
     MapView::FloorViewMode getFloorViewMode() { return m_mapView->getFloorViewMode(); }
     CreaturePtr getFollowingCreature() { return m_mapView->getFollowingCreature(); }
     Position getCameraPosition() { return m_mapView->getCameraPosition(); }
-    Position getPosition(const Point& mousePos);
-    TilePtr getTile(const Point& mousePos);
+    Position getPosition(const Point& mousePos) { return m_mapView->getPosition(mousePos); }
+    TilePtr getTile(const Point& mousePos) { return m_mapView->getTopTile(getPosition(mousePos)); }
     Size getVisibleDimension() { return m_mapView->getVisibleDimension(); }
 
     int getMaxZoomIn() { return m_maxZoomIn; }

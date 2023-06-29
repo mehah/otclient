@@ -70,11 +70,6 @@ void UIMap::drawSelf(DrawPoolType drawPane)
     }
 }
 
-void UIMap::movePixels(int x, int y)
-{
-    m_mapView->move(x, y);
-}
-
 bool UIMap::setZoom(int zoom)
 {
     m_zoom = std::clamp<int>(zoom, m_maxZoomIn, m_maxZoomOut);
@@ -131,23 +126,10 @@ void UIMap::setVisibleDimension(const Size& visibleDimension)
 
 void UIMap::setKeepAspectRatio(bool enable)
 {
-    m_keepAspectRatio = enable;
-    if (enable)
+    if (m_keepAspectRatio = enable)
         m_aspectRatio = getVisibleDimension().ratio();
+
     updateMapSize();
-}
-
-Position UIMap::getPosition(const Point& mousePos) {
-    return m_mapView->getPosition(mousePos);
-}
-
-TilePtr UIMap::getTile(const Point& mousePos)
-{
-    const Position tilePos = getPosition(mousePos);
-    if (!tilePos.isValid())
-        return nullptr;
-
-    return m_mapView->getTopTile(tilePos);
 }
 
 void UIMap::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
@@ -167,7 +149,7 @@ void UIMap::onGeometryChange(const Rect& oldRect, const Rect& newRect)
 
 bool UIMap::onMouseMove(const Point& mousePos, const Point& mouseMoved)
 {
-    const Position& pos = getPosition(mousePos);
+    const auto& pos = getPosition(mousePos);
     if (!pos.isValid())
         return false;
 

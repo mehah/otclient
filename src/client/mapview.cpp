@@ -733,6 +733,9 @@ uint8_t MapView::calcLastVisibleFloor() const
 
 TilePtr MapView::getTopTile(Position tilePos) const
 {
+    if (!tilePos.isValid())
+        return nullptr;
+
     // we must check every floor, from top to bottom to check for a clickable tile
     if (m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && tilePos.isInRange(m_lastCameraPosition, g_gameConfig.getTileTransparentFloorViewRange(), g_gameConfig.getTileTransparentFloorViewRange()))
         return g_map.getTile(tilePos);

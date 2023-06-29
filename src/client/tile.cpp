@@ -141,10 +141,11 @@ void Tile::addWalkingCreature(const CreaturePtr& creature)
 void Tile::removeWalkingCreature(const CreaturePtr& creature)
 {
     const auto it = std::find(m_walkingCreatures.begin(), m_walkingCreatures.end(), creature);
-    if (it != m_walkingCreatures.end()) {
-        m_walkingCreatures.erase(it);
-        recalculateThingFlag();
-    }
+    if (it == m_walkingCreatures.end())
+        return;
+
+    m_walkingCreatures.erase(it);
+    recalculateThingFlag();
 }
 
 // TODO: Need refactoring
@@ -303,11 +304,6 @@ int Tile::getThingStackPos(const ThingPtr& thing)
     }
 
     return -1;
-}
-
-bool Tile::hasThing(const ThingPtr& thing)
-{
-    return std::find(m_things.begin(), m_things.end(), thing) != m_things.end();
 }
 
 ThingPtr Tile::getTopThing()
@@ -561,12 +557,9 @@ bool Tile::isClickable()
 
         if (thing->isIgnoreLook())
             hasIgnoreLook = true;
-
-        if ((hasGround || hasOnBottom) && !hasIgnoreLook)
-            return true;
     }
 
-    return false;
+    return (hasGround || hasOnBottom) && !hasIgnoreLook;
 }
 
 void Tile::onAddInMapView()
