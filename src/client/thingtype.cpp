@@ -599,7 +599,7 @@ void ThingType::unserializeOtml(const OTMLNodePtr& node)
     }
 }
 
-void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, uint32_t flags, const Color& color, LightView* lightView, const DrawConductor& conductor)
+void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, const Color& color, bool drawThings, LightView* lightView, const DrawConductor& conductor)
 {
     if (m_null)
         return;
@@ -622,16 +622,13 @@ void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, i
 
     const Rect screenRect(dest + (textureOffset - m_displacement - (m_size.toPoint() - Point(1)) * g_gameConfig.getSpriteSize()) * g_drawPool.getScaleFactor(), textureRect.size() * g_drawPool.getScaleFactor());
 
-    if (flags & Otc::DrawThings) {
+    if (drawThings) {
         const auto& newColor = m_opacity < 1.0f ? Color(color, m_opacity) : color;
         g_drawPool.addTexturedRect(screenRect, texture, textureRect, newColor, conductor);
     }
 
-    if (lightView && hasLight() && flags & Otc::DrawLights) {
-        const Light& light = getLight();
-        if (light.intensity > 0) {
-            lightView->addLightSource(screenRect.center(), light);
-        }
+    if (lightView && hasLight()) {
+        lightView->addLightSource(screenRect.center(), m_light);
     }
 }
 

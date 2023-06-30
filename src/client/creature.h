@@ -51,11 +51,10 @@ public:
     void onAppear() override;
     void onDisappear() override;
 
-    void draw(const Point& dest, uint32_t flags, LightView* lightView = nullptr) override;
+    void draw(const Point& dest, bool drawThings = true, LightView* lightView = nullptr) override;
+    void draw(const Rect& destRect, uint8_t size);
 
-    void internalDraw(Point dest, bool isMarked, const Color& color, LightView* lightView = nullptr);
-
-    void drawOutfit(const Rect& destRect, uint8_t size, const Color& color = Color::white);
+    void internalDraw(Point dest, LightView* lightView = nullptr, const Color& color = Color::white);
     void drawInformation(const MapPosInfo& mapRect, const Point& dest, bool useGray, int drawFlags);
 
     void setId(uint32_t id) override { m_id = id; }

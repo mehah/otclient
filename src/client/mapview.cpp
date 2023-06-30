@@ -181,7 +181,7 @@ void MapView::drawFloor()
             }
 
             for (const auto& missile : g_map.getFloorMissiles(z))
-                missile->drawMissile(transformPositionTo2D(missile->getPosition(), cameraPosition), lightView);
+                missile->draw(transformPositionTo2D(missile->getPosition(), cameraPosition), true, lightView);
 
             if (m_shadowFloorIntensity > 0 && z == cameraPosition.z + 1) {
                 g_drawPool.setOpacity(m_shadowFloorIntensity, true);
@@ -376,7 +376,7 @@ void MapView::updateGeometry(const Size& visibleDimension)
 
     size_t maxAwareRange = std::max<size_t>(visibleDimension.width(), visibleDimension.height());
 
-    m_pool->optimize(maxAwareRange);
+    m_pool->agroup(maxAwareRange > 115);
     while (maxAwareRange > 100) {
         maxAwareRange /= 2;
         scaleFactor /= 2;
@@ -484,7 +484,7 @@ void MapView::onMouseMove(const Position& mousePos, const bool /*isVirtualMove*/
 
 void MapView::onKeyRelease(const InputEvent& inputEvent)
 {
-    const bool shiftPressed = inputEvent.keyboardModifiers == Fw::KeyboardShiftModifier;
+    const bool shiftPressed = inputEvent.keyboardModifiers & Fw::KeyboardShiftModifier;
     if (shiftPressed != m_shiftPressed) {
         m_shiftPressed = shiftPressed;
         onMouseMove(m_mousePosition);
@@ -733,6 +733,9 @@ uint8_t MapView::calcLastVisibleFloor() const
 
 TilePtr MapView::getTopTile(Position tilePos) const
 {
+    if (!tilePos.isValid())
+        return nullptr;
+
     // we must check every floor, from top to bottom to check for a clickable tile
     if (m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && tilePos.isInRange(m_lastCameraPosition, g_gameConfig.getTileTransparentFloorViewRange(), g_gameConfig.getTileTransparentFloorViewRange()))
         return g_map.getTile(tilePos);
@@ -740,7 +743,7 @@ TilePtr MapView::getTopTile(Position tilePos) const
     tilePos.coveredUp(tilePos.z - m_cachedFirstVisibleFloor);
     for (uint8_t i = m_cachedFirstVisibleFloor; i <= m_floorMax; ++i) {
         const auto& tile = g_map.getTile(tilePos);
-        if (tile && tile->isClickable())
+        if (tile && (tilePos.z == m_lastCameraPosition.z || tile->isClickable()))
             return tile;
 
         tilePos.coveredDown();

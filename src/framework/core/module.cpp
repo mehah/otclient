@@ -45,7 +45,7 @@ bool Module::load()
         g_lua.setField(m_name);
         g_lua.pop();
 
-        for (const std::string& depName : m_dependencies) {
+        for (const auto& depName : m_dependencies) {
             if (depName == m_name)
                 throw Exception("cannot depend on itself");
 
@@ -63,7 +63,7 @@ bool Module::load()
         if (m_sandboxed)
             g_lua.setGlobalEnvironment(m_sandboxEnv);
 
-        for (const std::string& script : m_scripts) {
+        for (const auto& script : m_scripts) {
             g_lua.loadScript(script);
             g_lua.safeCall(0, 0);
         }
@@ -102,7 +102,7 @@ bool Module::load()
 
     g_modules.updateModuleLoadOrder(asModule());
 
-    for (const std::string& modName : m_loadLaterModules) {
+    for (const auto& modName : m_loadLaterModules) {
         const auto& dep = g_modules.getModule(modName);
         if (!dep)
             g_logger.error(stdext::format("Unable to find module '%s' required by '%s'", modName, m_name));
@@ -175,7 +175,7 @@ bool Module::hasDependency(const std::string_view name, bool recursive)
         return true;
 
     if (recursive) {
-        for (const std::string& depName : m_dependencies) {
+        for (const auto& depName : m_dependencies) {
             if (const auto& dep = g_modules.getModule(depName)) {
                 if (dep->hasDependency(name, true))
                     return true;

@@ -84,7 +84,8 @@ enum TileThingType : uint32_t
     HAS_GROUND_BORDER = 1 << 21,
     HAS_TOP_GROUND_BORDER = 1 << 22,
     HAS_THING_WITH_ELEVATION = 1 << 23,
-    CORRECT_CORPSE = 1 << 24
+    IGNORE_LOOK = 1 << 24,
+    CORRECT_CORPSE = 1 << 25
 };
 
 class Tile : public LuaObject
@@ -104,7 +105,7 @@ public:
     bool removeThing(ThingPtr thing);
     ThingPtr getThing(int stackPos);
     EffectPtr getEffect(uint16_t id) const;
-    bool hasThing(const ThingPtr& thing);
+    bool hasThing(const ThingPtr& thing) { return std::find(m_things.begin(), m_things.end(), thing) != m_things.end(); }
     int getThingStackPos(const ThingPtr& thing);
     ThingPtr getTopThing();
 
@@ -128,8 +129,7 @@ public:
     int getThingCount() { return m_things.size() + m_effects.size(); }
 
     bool isWalkable(bool ignoreCreatures = false);
-    bool isClickable();
-
+    bool isClickable() { return (hasGround() || hasBottomItem()) && !hasIgnoreLook(); }
     bool isPathable() { return (m_thingTypeFlag & TileThingType::NOT_PATHABLE) == 0; }
     bool isFullGround() { return m_thingTypeFlag & TileThingType::FULL_GROUND; }
     bool isFullyOpaque() { return m_thingTypeFlag & TileThingType::IS_OPAQUE; }
@@ -137,8 +137,6 @@ public:
     bool isLookPossible() { return (m_thingTypeFlag & TileThingType::BLOCK_PROJECTTILE) == 0; }
     bool isEmpty() { return m_things.empty(); }
     bool isDrawable() { return !isEmpty() || !m_walkingCreatures.empty() || !m_effects.empty(); }
-    bool hasCreature() { return m_thingTypeFlag & TileThingType::HAS_CREATURE; }
-    bool isTopGround() { return getGround() && getGround()->isTopGround(); }
     bool isCovered(int8_t firstFloor);
     bool isCompletelyCovered(uint8_t firstFloor, bool resetCache);
 
@@ -147,11 +145,15 @@ public:
     bool hasEffect() const { return !m_effects.empty(); }
     bool hasGround() { return (getGround() && getGround()->isSingleGround()) || m_thingTypeFlag & TileThingType::HAS_GROUND_BORDER; };
     bool hasTopGround(bool ignoreBorder = false) { return (getGround() && getGround()->isTopGround()) || (!ignoreBorder && m_thingTypeFlag & TileThingType::HAS_TOP_GROUND_BORDER); }
+
     bool hasSurface() { return hasTopItem() || !m_effects.empty() || m_thingTypeFlag & TileThingType::HAS_BOTTOM_ITEM || m_thingTypeFlag & TileThingType::HAS_COMMON_ITEM || hasCreature() || !m_walkingCreatures.empty() || hasTopGround(); }
+
+    bool hasCreature() { return m_thingTypeFlag & TileThingType::HAS_CREATURE; }
     bool hasTopItem() const { return m_thingTypeFlag & TileThingType::HAS_TOP_ITEM; }
     bool hasCommonItem() const { return m_thingTypeFlag & TileThingType::HAS_COMMON_ITEM; }
     bool hasBottomItem() const { return m_thingTypeFlag & TileThingType::HAS_BOTTOM_ITEM; }
 
+    bool hasIgnoreLook() { return m_thingTypeFlag & TileThingType::IGNORE_LOOK; }
     bool hasDisplacement() const { return m_thingTypeFlag & TileThingType::HAS_DISPLACEMENT; }
     bool hasLight() const { return m_thingTypeFlag & TileThingType::HAS_LIGHT; }
     bool hasTallThings() const { return m_thingTypeFlag & TileThingType::HAS_TALL_THINGS; }

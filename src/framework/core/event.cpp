@@ -22,11 +22,7 @@
 
 #include "event.h"
 
-Event::Event(std::function<void()> callback) :
-    m_callback(std::move(callback)),
-    m_canceled(false),
-    m_executed(false)
-{}
+Event::Event(std::function<void()> callback) : m_callback(std::move(callback)) {}
 
 Event::~Event()
 {

@@ -79,29 +79,33 @@ void Animator::serialize(const FileStreamPtr& fin) const
 
 void Animator::setPhase(int phase)
 {
-    if (m_phase == phase) return;
+    if (m_phase == phase)
+        return;
 
-    if (m_async) {
-        if (phase == AnimPhaseAsync)
-            m_phase = 0;
-        else if (phase == AnimPhaseRandom)
-            m_phase = stdext::random_range(0, m_animationPhases);
-        else if (phase >= 0 && phase < m_animationPhases)
-            m_phase = phase;
-        else
-            m_phase = getStartPhase();
-
-        m_isComplete = false;
-        m_lastPhaseTicks = g_clock.millis();
-        m_currentDuration = getPhaseDuration(phase);
-        m_currentLoop = 0;
-    } else
+    if (!m_async) {
         calculateSynchronous();
+        return;
+    }
+
+    if (phase == AnimPhaseAsync)
+        m_phase = 0;
+    else if (phase == AnimPhaseRandom)
+        m_phase = stdext::random_range(0, m_animationPhases);
+    else if (phase >= 0 && phase < m_animationPhases)
+        m_phase = phase;
+    else
+        m_phase = getStartPhase();
+
+    m_isComplete = false;
+    m_lastPhaseTicks = g_clock.millis();
+    m_currentDuration = getPhaseDuration(phase);
+    m_currentLoop = 0;
 }
 
 int Animator::getPhase()
 {
-    if (const ticks_t ticks = g_clock.millis(); ticks != m_lastPhaseTicks && !m_isComplete) {
+    const ticks_t ticks = g_clock.millis();
+    if (ticks != m_lastPhaseTicks && !m_isComplete) {
         const int elapsedTicks = static_cast<int>(ticks - m_lastPhaseTicks);
         if (elapsedTicks >= m_currentDuration) {
             int phase;
@@ -125,6 +129,7 @@ int Animator::getPhase()
 
         m_lastPhaseTicks = ticks;
     }
+
     return m_phase;
 }
 
@@ -151,10 +156,7 @@ int Animator::getPhaseAt(Timer& timer, float durationFactor) const
 
 int Animator::getStartPhase() const
 {
-    if (m_startPhase > -1)
-        return m_startPhase;
-
-    return stdext::random_range(0, m_animationPhases);
+    return m_startPhase > -1 ? m_startPhase : stdext::random_range(0, m_animationPhases);
 }
 
 void Animator::resetAnimation()

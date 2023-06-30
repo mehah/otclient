@@ -29,6 +29,7 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/apngloader.h>
+#include <framework/graphics/drawpool.h>
 
 #ifdef FRAMEWORK_NET
 #include <framework/net/protocolhttp.h>
@@ -53,9 +54,11 @@ void TextureManager::poll()
 {
     // update only every 16msec, this allows upto 60 fps for animated textures
     static ticks_t lastUpdate = 0;
+
     const ticks_t now = g_clock.millis();
-    if (now - lastUpdate < 16)
+    if (now - lastUpdate < DrawPool::FPS60)
         return;
+
     lastUpdate = now;
 
     std::scoped_lock l(m_mutex);

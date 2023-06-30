@@ -75,14 +75,15 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
         auto& list = m_objects[m_depthLevel][order];
         if (!list.empty()) {
             auto& prevObj = list.back();
-
-            if (!(addNewObj = !(prevObj.state.hash == m_state.hash))) {
+            if (prevObj.state.hash == m_state.hash) {
                 if (!prevObj.coords)
                     prevObj.addMethod(method);
                 else if (coordsBuffer)
                     prevObj.coords->append(coordsBuffer.get());
                 else
                     addCoords(prevObj.coords.get(), method, DrawMode::TRIANGLES);
+
+                addNewObj = false;
             }
         }
 
@@ -164,11 +165,11 @@ void DrawPool::updateHash(const DrawPool::DrawMethod& method, const TexturePtr& 
         if (texture)
             stdext::hash_union(m_state.hash, texture->hash());
 
-        if (m_updateHash)
+        if (hasFrameBuffer())
             stdext::hash_union(m_status.second, m_state.hash);
     }
 
-    if (m_updateHash) { // Method Hash
+    if (hasFrameBuffer()) { // Method Hash
         size_t methodhash = 0;
         if (method.type == DrawPool::DrawMethodType::TRIANGLE) {
             if (!method.a.isNull()) stdext::hash_union(methodhash, method.a.hash());
@@ -327,13 +328,6 @@ void DrawPool::popTransformMatrix()
     m_transformMatrixStack.pop_back();
 }
 
-void DrawPool::optimize(int size) {
-    if (m_type != DrawPoolType::MAP)
-        return;
-
-    m_alwaysGroupDrawings = size > 115; // Max optimization
-}
-
 void DrawPool::PoolState::execute() const {
     g_painter->setColor(color);
     g_painter->setOpacity(opacity);
@@ -349,13 +343,11 @@ void DrawPool::PoolState::execute() const {
 
 void DrawPool::setFramebuffer(const Size& size) {
     if (!m_framebuffer) {
-        m_updateHash = true;
         m_framebuffer = std::make_shared<FrameBuffer>();
         m_framebuffer->m_isScene = true;
     }
 
     if (size.isValid() && m_framebuffer->resize(size)) {
-        m_framebuffer->resize(size);
         m_framebuffer->prepare({}, {});
         repaint();
     }
@@ -363,6 +355,5 @@ void DrawPool::setFramebuffer(const Size& size) {
 
 void DrawPool::removeFramebuffer() {
     m_status.first = 0;
-    m_updateHash = false;
     m_framebuffer = nullptr;
 }

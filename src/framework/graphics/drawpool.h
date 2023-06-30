@@ -86,7 +86,7 @@ public:
     void resetState();
     void scale(float factor);
 
-    void optimize(int size);
+    void agroup(bool agroup) { m_alwaysGroupDrawings = agroup; }
 
     void setScaleFactor(float scale) { m_scaleFactor = scale; }
     inline float getScaleFactor() const { return m_scaleFactor; }
@@ -222,7 +222,6 @@ private:
     bool canRepaint(bool autoUpdateStatus);
 
     bool m_enabled{ true };
-    bool m_updateHash{ false };
     bool m_alwaysGroupDrawings{ false };
 
     uint8_t m_depthLevel{ 0 };

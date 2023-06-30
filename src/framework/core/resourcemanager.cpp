@@ -66,7 +66,7 @@ bool ResourceManager::discoverWorkDir(const std::string& existentFile)
                                     g_resources.getBaseDir() + "../share/" + g_app.getCompactName() + "/" };
 
     bool found = false;
-    for (const std::string& dir : possiblePaths) {
+    for (const auto& dir : possiblePaths) {
         if (!PHYSFS_mount(dir.c_str(), nullptr, 0))
             continue;
 
@@ -125,7 +125,7 @@ bool ResourceManager::addSearchPath(const std::string& path, bool pushFront)
     std::string savePath = path;
     if (!PHYSFS_mount(path.c_str(), nullptr, pushFront ? 0 : 1)) {
         bool found = false;
-        for (const std::string& searchPath : m_searchPaths) {
+        for (const auto& searchPath : m_searchPaths) {
             std::string newPath = searchPath + path;
             if (PHYSFS_mount(newPath.c_str(), nullptr, pushFront ? 0 : 1)) {
                 savePath = newPath;

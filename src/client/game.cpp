@@ -651,7 +651,7 @@ void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& sta
     const Otc::Direction direction = *dirs.begin();
 
     if (const auto& toTile = g_map.getTile(startPos.translatedToDirection(direction))) {
-        if (startPos == m_localPlayer->m_lastPrewalkDestination && toTile->isWalkable() && !m_localPlayer->isWalking() && m_localPlayer->canWalk(true)) {
+        if (startPos == m_localPlayer->m_lastPrewalkDestination && toTile->isWalkable() && m_localPlayer->canWalk(true)) {
             m_localPlayer->preWalk(direction);
         }
     }
