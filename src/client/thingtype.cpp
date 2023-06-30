@@ -628,10 +628,7 @@ void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, i
     }
 
     if (lightView && hasLight()) {
-        const Light& light = getLight();
-        if (light.intensity > 0) {
-            lightView->addLightSource(screenRect.center(), light);
-        }
+        lightView->addLightSource(screenRect.center(), m_light);
     }
 }
 

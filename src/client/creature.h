@@ -53,7 +53,7 @@ public:
 
     void draw(const Point& dest, bool drawThings = true, LightView* lightView = nullptr) override;
 
-    void internalDraw(Point dest, bool isMarked, const Color& color, LightView* lightView = nullptr);
+    void internalDraw(Point dest, LightView* lightView = nullptr, const Color& color = Color::white);
 
     void drawOutfit(const Rect& destRect, uint8_t size, const Color& color = Color::white);
     void drawInformation(const MapPosInfo& mapRect, const Point& dest, bool useGray, int drawFlags);

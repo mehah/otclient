@@ -71,6 +71,9 @@ void LightView::resize(const Size& size, const uint16_t tileSize) {
 
 void LightView::addLightSource(const Point& pos, const Light& light, float brightness)
 {
+    if (light.intensity == 0)
+        return;
+
     if (!m_lights.empty()) {
         auto& prevLight = m_lights.back();
         if (prevLight.pos == pos && prevLight.color == light.color) {

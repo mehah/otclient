@@ -243,4 +243,4 @@ private:
     TileSelectType m_selectType{ TileSelectType::NONE };
 
     bool m_drawTopAndCreature{ true };
-    };
+};
