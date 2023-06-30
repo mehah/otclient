@@ -100,7 +100,7 @@ void Creature::draw(const Point& dest, bool drawThings, LightView* lightView)
     }
 }
 
-void Creature::drawOutfit(const Rect& destRect, uint8_t size, const Color& color)
+void Creature::draw(const Rect& destRect, uint8_t size)
 {
     if (!m_thingType)
         return;
@@ -109,9 +109,12 @@ void Creature::drawOutfit(const Rect& destRect, uint8_t size, const Color& color
     if (size > 0)
         frameSize = std::max<int>(frameSize * (size / 100.f), 2 * g_gameConfig.getSpriteSize() * (size / 100.f));
 
-    g_drawPool.bindFrameBuffer(frameSize);
-    internalDraw(Point(frameSize - g_gameConfig.getSpriteSize()) + getDisplacement(), nullptr, color);
-    g_drawPool.releaseFrameBuffer(destRect);
+    g_drawPool.bindFrameBuffer(frameSize); {
+        const auto& p = Point(frameSize - g_gameConfig.getSpriteSize()) + getDisplacement();
+        internalDraw(p);
+        if (isMarked())
+            internalDraw(p, nullptr, getMarkedColor());
+    } g_drawPool.releaseFrameBuffer(destRect);
 }
 
 void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, bool useGray, int drawFlags)
