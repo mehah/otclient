@@ -35,16 +35,9 @@ Tile::Tile(const Position& position) : m_position(position) {}
 
 void Tile::drawThing(const ThingPtr& thing, const Point& dest, int flags, LightView* lightView)
 {
-    const bool isMarked = m_selectType != TileSelectType::NONE && m_highlightThing == thing;
-    thing->setMarkColor(isMarked ? Color::yellow : Color::white);
-
-    thing->draw(dest, flags & Otc::DrawThings, lightView);
-
-    if (thing->isItem()) {
-        m_drawElevation += thing->getElevation();
-        if (m_drawElevation > g_gameConfig.getTileMaxElevation())
-            m_drawElevation = g_gameConfig.getTileMaxElevation();
-    }
+    thing->draw(dest - m_drawElevation * g_drawPool.getScaleFactor(), flags & Otc::DrawThings, lightView);
+    if (thing->hasElevation())
+        m_drawElevation = std::min<uint8_t>(m_drawElevation + thing->getElevation(), g_gameConfig.getTileMaxElevation());
 }
 
 void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, LightView* lightView)
@@ -56,14 +49,14 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool is
         if (!thing->isGround() && !thing->isGroundBorder() && !thing->isOnBottom())
             break;
 
-        drawThing(thing, dest - m_drawElevation * g_drawPool.getScaleFactor(), flags, lightView);
+        drawThing(thing, dest, flags, lightView);
     }
 
     if (hasCommonItem()) {
         for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
             const auto& item = *it;
             if (!item->isCommon()) continue;
-            drawThing(item, dest - m_drawElevation * g_drawPool.getScaleFactor(), flags, lightView);
+            drawThing(item, dest, flags, lightView);
         }
     }
 
@@ -86,9 +79,8 @@ void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags,
         for (const auto& thing : m_things) {
             if (!thing->isCreature() || thing->static_self_cast<Creature>()->isWalking()) continue;
 
-            const auto& cDest = dest - m_drawElevation * g_drawPool.getScaleFactor();
-            drawThing(thing, cDest, flags, lightView);
-            thing->static_self_cast<Creature>()->drawInformation(mapRect, cDest, isCovered, flags);
+            drawThing(thing, dest, flags, lightView);
+            thing->static_self_cast<Creature>()->drawInformation(mapRect, dest - m_drawElevation * g_drawPool.getScaleFactor(), isCovered, flags);
         }
     }
 
@@ -97,7 +89,7 @@ void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags,
             dest.x + ((creature->getPosition().x - m_position.x) * g_gameConfig.getSpriteSize() - m_drawElevation) * g_drawPool.getScaleFactor(),
             dest.y + ((creature->getPosition().y - m_position.y) * g_gameConfig.getSpriteSize() - m_drawElevation) * g_drawPool.getScaleFactor()
         );
-        drawThing(creature, cDest, flags, lightView);
+        creature->draw(cDest, flags & Otc::DrawThings, lightView);
         creature->drawInformation(mapRect, cDest, isCovered, flags);
     }
 }
@@ -108,12 +100,12 @@ void Tile::drawTop(const Point& dest, int flags, bool forceDraw, LightView* ligh
         return;
 
     for (const auto& effect : m_effects)
-        effect->draw(dest - m_drawElevation * g_drawPool.getScaleFactor(), flags & Otc::DrawThings, lightView);
+        drawThing(effect, dest, flags & Otc::DrawThings, lightView);
 
     if (hasTopItem()) {
         for (const auto& item : m_things) {
             if (!item->isOnTop()) continue;
-            drawThing(item, dest, flags, lightView);
+            item->draw(dest, flags & Otc::DrawThings, lightView);
         }
     }
 }
@@ -544,24 +536,6 @@ bool Tile::isCovered(int8_t firstFloor)
     return (m_isCovered & idState) == idState;
 }
 
-bool Tile::isClickable()
-{
-    bool hasGround = false;
-    bool hasOnBottom = false;
-    bool hasIgnoreLook = false;
-    for (const auto& thing : m_things) {
-        if (thing->isGround())
-            hasGround = true;
-        else if (thing->isOnBottom())
-            hasOnBottom = true;
-
-        if (thing->isIgnoreLook())
-            hasIgnoreLook = true;
-    }
-
-    return (hasGround || hasOnBottom) && !hasIgnoreLook;
-}
-
 void Tile::onAddInMapView()
 {
     m_drawTopAndCreature = true;
@@ -693,6 +667,9 @@ void Tile::setThingFlag(const ThingPtr& thing)
     if (hasElevation())
         m_thingTypeFlag |= TileThingType::HAS_THING_WITH_ELEVATION;
 
+    if (thing->isIgnoreLook())
+        m_thingTypeFlag |= TileThingType::IGNORE_LOOK;
+
     // best option to have something more real, but in some cases as a custom project,
     // the developers are not defining crop size
     //if(thing->getRealSize() > g_gameConfig.getSpriteSize())
@@ -744,11 +721,17 @@ void Tile::select(TileSelectType selectType)
             m_highlightThing = m_things.back();
     }
 
+    if (m_highlightThing)
+        m_highlightThing->setMarkColor(Color::yellow);
+
     m_selectType = selectType;
 }
 
 void Tile::unselect()
 {
+    if (m_highlightThing)
+        m_highlightThing->setMarkColor(Color::white);
+
     if (m_selectType == TileSelectType::NO_FILTERED)
         checkForDetachableThing();
 

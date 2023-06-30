@@ -484,7 +484,7 @@ void MapView::onMouseMove(const Position& mousePos, const bool /*isVirtualMove*/
 
 void MapView::onKeyRelease(const InputEvent& inputEvent)
 {
-    const bool shiftPressed = inputEvent.keyboardModifiers == Fw::KeyboardShiftModifier;
+    const bool shiftPressed = inputEvent.keyboardModifiers & Fw::KeyboardShiftModifier;
     if (shiftPressed != m_shiftPressed) {
         m_shiftPressed = shiftPressed;
         onMouseMove(m_mousePosition);
@@ -743,7 +743,7 @@ TilePtr MapView::getTopTile(Position tilePos) const
     tilePos.coveredUp(tilePos.z - m_cachedFirstVisibleFloor);
     for (uint8_t i = m_cachedFirstVisibleFloor; i <= m_floorMax; ++i) {
         const auto& tile = g_map.getTile(tilePos);
-        if (tile && tile->isClickable())
+        if (tile && (tilePos.z == m_lastCameraPosition.z || tile->isClickable()))
             return tile;
 
         tilePos.coveredDown();
