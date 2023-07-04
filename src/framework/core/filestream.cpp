@@ -26,6 +26,11 @@
 
 #include <physfs.h>
 
+constexpr inline void grow(std::vector<uint8_t>& data, size_t size) {
+    if (size > data.size())
+        data.resize(size);
+}
+
 FileStream::FileStream(std::string name, PHYSFS_File* fileHandle, bool writeable) :
     m_name(std::move(name)),
     m_fileHandle(fileHandle),
@@ -131,7 +136,7 @@ void FileStream::write(const void* buffer, uint32_t count)
         if (PHYSFS_writeBytes(m_fileHandle, buffer, count) != count)
             throwError("write failed", true);
     } else {
-        m_data.resize(m_pos + count);
+        grow(m_data, m_pos + count);
         memcpy(&m_data[m_pos], buffer, count);
         m_pos += count;
     }
@@ -361,8 +366,8 @@ void FileStream::addU16(uint16_t v)
         if (PHYSFS_writeULE16(m_fileHandle, v) == 0)
             throwError("write failed", true);
     } else {
-        m_data.reserve(m_pos + 2);
-        stdext::writeULE16(back_inserter(m_data), v);
+        grow(m_data, m_pos + 2);
+        stdext::writeULE16(&m_data[m_pos], v);
         m_pos += 2;
     }
 }
@@ -373,8 +378,8 @@ void FileStream::addU32(uint32_t v)
         if (PHYSFS_writeULE32(m_fileHandle, v) == 0)
             throwError("write failed", true);
     } else {
-        m_data.reserve(m_pos + 4);
-        stdext::writeULE32(back_inserter(m_data), v);
+        grow(m_data, m_pos + 4);
+        stdext::writeULE32(&m_data[m_pos], v);
         m_pos += 4;
     }
 }
@@ -385,8 +390,8 @@ void FileStream::addU64(uint64_t v)
         if (PHYSFS_writeULE64(m_fileHandle, v) == 0)
             throwError("write failed", true);
     } else {
-        m_data.reserve(m_pos + 8);
-        stdext::writeULE64(back_inserter(m_data), v);
+        grow(m_data, m_pos + 8);
+        stdext::writeULE64(&m_data[m_pos], v);
         m_pos += 8;
     }
 }
@@ -408,8 +413,8 @@ void FileStream::add16(int16_t v)
         if (PHYSFS_writeSLE16(m_fileHandle, v) == 0)
             throwError("write failed", true);
     } else {
-        m_data.reserve(m_pos + 2);
-        stdext::writeSLE16(back_inserter(m_data), v);
+        grow(m_data, m_pos + 2);
+        stdext::writeSLE16(&m_data[m_pos], v);
         m_pos += 2;
     }
 }
@@ -420,8 +425,8 @@ void FileStream::add32(int32_t v)
         if (PHYSFS_writeSLE32(m_fileHandle, v) == 0)
             throwError("write failed", true);
     } else {
-        m_data.reserve(m_pos + 4);
-        stdext::writeSLE32(back_inserter(m_data), v);
+        grow(m_data, m_pos + 4);
+        stdext::writeSLE32(&m_data[m_pos], v);
         m_pos += 4;
     }
 }
@@ -432,8 +437,8 @@ void FileStream::add64(int64_t v)
         if (PHYSFS_writeSLE64(m_fileHandle, v) == 0)
             throwError("write failed", true);
     } else {
-        m_data.reserve(m_pos + 8);
-        stdext::writeSLE64(back_inserter(m_data), v);
+        grow(m_data, m_pos + 8);
+        stdext::writeSLE64(&m_data[m_pos], v);
         m_pos += 8;
     }
 }
