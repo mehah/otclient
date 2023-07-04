@@ -43,8 +43,8 @@ bool SoundBuffer::fillBuffer(const SoundFilePtr& soundFile)
         return false;
     }
 
-    DataBuffer<char> samples(soundFile->getSize());
-    const int read = soundFile->read(&samples[0], soundFile->getSize());
+    std::vector<char> samples(soundFile->getSize());
+    const int read = soundFile->read(samples.data(), soundFile->getSize());
     if (read == 0) {
         g_logger.error(stdext::format("unable to fill audio buffer data for '%s'", soundFile->getName()));
         return false;
@@ -53,9 +53,9 @@ bool SoundBuffer::fillBuffer(const SoundFilePtr& soundFile)
     return fillBuffer(format, samples, samples.size(), soundFile->getRate());
 }
 
-bool SoundBuffer::fillBuffer(ALenum sampleFormat, const DataBuffer<char>& data, int size, int rate) const
+bool SoundBuffer::fillBuffer(ALenum sampleFormat, const std::vector<char>& data, int size, int rate) const
 {
-    alBufferData(m_bufferId, sampleFormat, &data[0], size, rate);
+    alBufferData(m_bufferId, sampleFormat, data.data(), size, rate);
     const ALenum err = alGetError();
     if (err != AL_NO_ERROR) {
         g_logger.error(stdext::format("unable to fill audio buffer data: %s", alGetString(err)));
