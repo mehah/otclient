@@ -26,7 +26,7 @@
 
 #include <physfs.h>
 
-constexpr inline void grow(std::vector<uint8_t>& data, size_t size) {
+inline void grow(std::vector<uint8_t>& data, size_t size) {
     if (size > data.size())
         data.resize(size);
 }
