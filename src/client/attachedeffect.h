@@ -91,9 +91,7 @@ private:
     uint16_t m_duration{ 0 };
 
     uint32_t m_frame{ 0 };
-    Timer m_timer;
 
-    bool m_onTop{ false };
     bool m_hideOwner{ false };
     bool m_transform{ false };
     bool m_canDrawOnUI{ true };

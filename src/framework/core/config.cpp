@@ -90,7 +90,7 @@ void Config::setList(const std::string& key, const std::vector<std::string>& lis
         return;
 
     const auto& child = OTMLNode::create(key, true);
-    for (const std::string& value : list)
+    for (const auto& value : list)
         child->writeIn(value);
     m_confsDoc->addChild(child);
 }

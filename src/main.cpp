@@ -37,15 +37,21 @@ int main(int argc, const char* argv[])
 {
     std::vector<std::string> args(argv, argv + argc);
 
-    // setup application name and version
-    g_app.setName("OTClient - Redemption");
-    g_app.setCompactName("otclient");
-    g_app.setOrganizationName("otbr");
+    // process args encoding
+    g_platform.init(args);
+
+    // initialize resources
+#ifdef ANDROID
+    // Unzip Android assets/data.zip
+    g_androidManager.unZipAssetData();
+    g_resources.init(nullptr);
+#else
+    g_resources.init(args[0].data());
+#endif
 
 #if ENABLE_ENCRYPTION == 1 && ENABLE_ENCRYPTION_BUILDER == 1
     if (std::find(args.begin(), args.end(), "--encrypt") != args.end()) {
         g_lua.init();
-        g_resources.init(args[0].data());
         g_resources.runEncryption(args.size() >= 3 ? args[2] : ENCRYPTION_PASSWORD);
         std::cout << "Encryption complete" << std::endl;
 #ifdef WIN32
@@ -54,6 +60,14 @@ int main(int argc, const char* argv[])
         return 0;
     }
 #endif
+
+    if (g_resources.launchCorrect(args)) {
+        return 0; // started other executable
+    }
+
+    // find script init.lua and run it
+    if (!g_resources.discoverWorkDir("init.lua"))
+        g_logger.fatal("Unable to find work directory, the application cannot be initialized.");
 
 #if ENABLE_DISCORD_RPC == 1
     g_discord.init();
@@ -65,15 +79,6 @@ int main(int argc, const char* argv[])
 #ifdef FRAMEWORK_NET
     g_http.init();
 #endif
-
-#ifdef ANDROID
-    // Unzip Android assets/data.zip
-    g_androidManager.unZipAssetData();
-#endif
-
-    // find script init.lua and run it
-    if (!g_resources.discoverWorkDir("init.lua"))
-        g_logger.fatal("Unable to find work directory, the application cannot be initialized.");
 
     if (!g_lua.safeRunScript("init.lua"))
         g_logger.fatal("Unable to run script init.lua!");
@@ -91,4 +96,4 @@ int main(int argc, const char* argv[])
     g_http.terminate();
 #endif
     return 0;
-}
+    }

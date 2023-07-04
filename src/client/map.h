@@ -155,6 +155,7 @@ public:
 
     void addMapView(const MapViewPtr& mapView);
     void removeMapView(const MapViewPtr& mapView);
+    MapViewPtr getMapView(size_t i) { return i < m_mapViews.size() ? m_mapViews[i] : nullptr; }
 
     void notificateTileUpdate(const Position& pos, const ThingPtr& thing, Otc::Operation operation);
     void notificateCameraMove(const Point& offset) const;
@@ -275,7 +276,7 @@ public:
     Position getCentralPosition() { return m_centralPosition; }
     uint8_t getFirstAwareFloor() const;
     uint8_t getLastAwareFloor() const;
-    const std::vector<MissilePtr>& getFloorMissiles(uint8_t z) { return m_floorMissiles[z]; }
+    const std::vector<MissilePtr>& getFloorMissiles(uint8_t z) { return m_floors[z].missiles; }
 
     std::vector<AnimatedTextPtr> getAnimatedTexts() { return m_animatedTexts; }
     std::vector<StaticTextPtr> getStaticTexts() { return m_staticTexts; }
@@ -290,17 +291,22 @@ public:
     bool isDrawingFloatingEffects() { return m_floatingEffect; }
 
 private:
+    struct FloorData
+    {
+        std::vector<MissilePtr> missiles;
+        stdext::map<uint32_t, TileBlock > tileBlocks;
+    };
+
     void removeUnawareThings();
 
     uint16_t getBlockIndex(const Position& pos) { return ((pos.y / BLOCK_SIZE) * (65536 / BLOCK_SIZE)) + (pos.x / BLOCK_SIZE); }
 
-    std::array<std::vector<MissilePtr>, MAX_Z + 1> m_floorMissiles;
+    std::vector<FloorData> m_floors;
 
     std::vector<AnimatedTextPtr> m_animatedTexts;
     std::vector<StaticTextPtr> m_staticTexts;
     std::vector<MapViewPtr> m_mapViews;
 
-    stdext::map<uint32_t, TileBlock> m_tileBlocks[MAX_Z + 1];
     stdext::map<uint32_t, CreaturePtr> m_knownCreatures;
 
 #ifdef FRAMEWORK_EDITOR

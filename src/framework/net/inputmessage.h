@@ -35,7 +35,7 @@ public:
         MAX_HEADER_SIZE = 8
     };
 
-    void setBuffer(const std::string_view buffer);
+    void setBuffer(const std::string& buffer);
     std::string_view getBuffer() { return std::string_view{ (char*)m_buffer + m_headerPos, m_messageSize }; }
 
     void skipBytes(uint16_t bytes) { m_readPos += bytes; }

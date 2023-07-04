@@ -23,6 +23,7 @@
 #pragma once
 
 #include <filesystem>
+#include <set>
 #include "declarations.h"
 
  // @bindsingleton g_resources
@@ -49,7 +50,7 @@ public:
     void readFileStream(const std::string& fileName, std::iostream& out);
     std::string readFileContents(const std::string& fileName);
     // @dontbind
-    bool writeFileBuffer(const std::string& fileName, const uint8_t* data, uint32_t size);
+    bool writeFileBuffer(const std::string& fileName, const uint8_t* data, uint32_t size, bool createDirectory = false);
     bool writeFileContents(const std::string& fileName, const std::string& data);
     // @dontbind
     bool writeFileStream(const std::string& fileName, std::iostream& in);
@@ -83,12 +84,22 @@ public:
     void runEncryption(const std::string& password);
     void save_string_into_file(const std::string& contents, const std::string& name);
 
+    std::string fileChecksum(const std::string& path);
+    stdext::map<std::string, std::string> filesChecksums();
+    std::string selfChecksum();
+    void updateFiles(const std::set<std::string>& files);
+    void updateExecutable(std::string fileName);
+    bool launchCorrect(std::vector<std::string>& args);
+
+    std::string getBinaryPath() { return m_binaryPath.string(); }
+
 protected:
     std::vector<std::string> discoverPath(const std::filesystem::path& path, bool filenameOnly, bool recursive);
 
 private:
     std::string m_workDir;
     std::string m_writeDir;
+    std::filesystem::path m_binaryPath;
     std::deque<std::string> m_searchPaths;
 };
 

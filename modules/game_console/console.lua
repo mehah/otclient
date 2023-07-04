@@ -228,9 +228,9 @@ function init()
     g_keyboard.bindKeyPress('Shift+Tab', function()
         consoleTabBar:selectPrevTab()
     end, consolePanel)
+    g_keyboard.bindKeyDown('Enter', switchChatOnCall, consolePanel)
     g_keyboard.bindKeyDown('Enter', sendCurrentMessage, consolePanel)
-    g_keyboard.bindKeyDown('Enter', switchChatOnCall)
-    g_keyboard.bindKeyDown('Escape', disableChatOnCall)
+    g_keyboard.bindKeyDown('Escape', disableChatOnCall, consolePanel)
     g_keyboard.bindKeyPress('Ctrl+A', function()
         consoleTextEdit:clearText()
     end, consolePanel)
@@ -345,8 +345,13 @@ function switchChatOnCall()
         return
     end
 
-    if isChatEnabled() and consoleToggleChat:isChecked() or not consoleTextEdit:isVisible() then
-        switchChat(not consoleTextEdit:isVisible())
+    if isChatEnabled() and consoleToggleChat:isChecked() then
+        toggleChat()
+    else
+        local message = consoleTextEdit:getText()
+        if message == '' then
+            toggleChat()
+        end
     end
 end
 
@@ -355,8 +360,8 @@ function disableChatOnCall()
         return
     end
 
-    if consoleToggleChat:isChecked() then
-        switchChat(false)
+    if isChatEnabled() and not consoleToggleChat:isChecked() then
+        toggleChat()
     end
 end
 

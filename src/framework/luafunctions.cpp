@@ -98,6 +98,7 @@ void Application::registerLuaFunctions()
     g_lua.registerSingletonClass("g_app");
     g_lua.bindSingletonFunction("g_app", "setName", &Application::setName, static_cast<Application*>(&g_app));
     g_lua.bindSingletonFunction("g_app", "setCompactName", &Application::setCompactName, static_cast<Application*>(&g_app));
+    g_lua.bindSingletonFunction("g_app", "setOrganizationName", &Application::setOrganizationName, static_cast<Application*>(&g_app));
     g_lua.bindSingletonFunction("g_app", "isRunning", &Application::isRunning, static_cast<Application*>(&g_app));
     g_lua.bindSingletonFunction("g_app", "isStopping", &Application::isStopping, static_cast<Application*>(&g_app));
     g_lua.bindSingletonFunction("g_app", "getName", &Application::getName, static_cast<Application*>(&g_app));
@@ -112,6 +113,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_app", "getOs", &Application::getOs, static_cast<Application*>(&g_app));
     g_lua.bindSingletonFunction("g_app", "getStartupOptions", &Application::getStartupOptions, static_cast<Application*>(&g_app));
     g_lua.bindSingletonFunction("g_app", "exit", &Application::exit, static_cast<Application*>(&g_app));
+    g_lua.bindSingletonFunction("g_app", "restart", &Application::restart, static_cast<Application*>(&g_app));
 
     // Crypt
     g_lua.registerSingletonClass("g_crypt");
@@ -175,6 +177,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_modules", "reloadModules", &ModuleManager::reloadModules, &g_modules);
     g_lua.bindSingletonFunction("g_modules", "getModule", &ModuleManager::getModule, &g_modules);
     g_lua.bindSingletonFunction("g_modules", "getModules", &ModuleManager::getModules, &g_modules);
+    g_lua.bindSingletonFunction("g_modules", "getCurrentModule", &ModuleManager::getCurrentModule, &g_modules);
 
     // EventDispatcher
     g_lua.registerSingletonClass("g_dispatcher");
@@ -207,6 +210,11 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_resources", "makeDir", &ResourceManager::makeDir, &g_resources);
     g_lua.bindSingletonFunction("g_resources", "deleteFile", &ResourceManager::deleteFile, &g_resources);
     g_lua.bindSingletonFunction("g_resources", "resolvePath", &ResourceManager::resolvePath, &g_resources);
+    g_lua.bindSingletonFunction("g_resources", "fileChecksum", &ResourceManager::fileChecksum, &g_resources);
+    g_lua.bindSingletonFunction("g_resources", "filesChecksums", &ResourceManager::filesChecksums, &g_resources);
+    g_lua.bindSingletonFunction("g_resources", "selfChecksum", &ResourceManager::selfChecksum, &g_resources);
+    g_lua.bindSingletonFunction("g_resources", "updateFiles", &ResourceManager::updateFiles, &g_resources);
+    g_lua.bindSingletonFunction("g_resources", "updateExecutable", &ResourceManager::updateExecutable, &g_resources);
 
     // Config
     g_lua.registerClass<Config>();
@@ -367,7 +375,6 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_fonts", "clearFonts", &FontManager::clearFonts, &g_fonts);
     g_lua.bindSingletonFunction("g_fonts", "importFont", &FontManager::importFont, &g_fonts);
     g_lua.bindSingletonFunction("g_fonts", "fontExists", &FontManager::fontExists, &g_fonts);
-    g_lua.bindSingletonFunction("g_fonts", "setDefaultFont", &FontManager::setDefaultFont, &g_fonts);
 
     // ParticleManager
     g_lua.registerSingletonClass("g_particles");
@@ -443,6 +450,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("getChildByPos", &UIWidget::getChildByPos);
     g_lua.bindClassMemberFunction<UIWidget>("getChildByIndex", &UIWidget::getChildByIndex);
     g_lua.bindClassMemberFunction<UIWidget>("getChildByState", &UIWidget::getChildByState);
+    g_lua.bindClassMemberFunction<UIWidget>("getChildByStyleName", &UIWidget::getChildByStyleName);
     g_lua.bindClassMemberFunction<UIWidget>("recursiveGetChildById", &UIWidget::recursiveGetChildById);
     g_lua.bindClassMemberFunction<UIWidget>("recursiveGetChildByPos", &UIWidget::recursiveGetChildByPos);
     g_lua.bindClassMemberFunction<UIWidget>("recursiveGetChildByState", &UIWidget::recursiveGetChildByState);
@@ -450,6 +458,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("recursiveGetChildrenByPos", &UIWidget::recursiveGetChildrenByPos);
     g_lua.bindClassMemberFunction<UIWidget>("recursiveGetChildrenByMarginPos", &UIWidget::recursiveGetChildrenByMarginPos);
     g_lua.bindClassMemberFunction<UIWidget>("recursiveGetChildrenByState", &UIWidget::recursiveGetChildrenByState);
+    g_lua.bindClassMemberFunction<UIWidget>("recursiveGetChildrenByStyleName", &UIWidget::recursiveGetChildrenByStyleName);
     g_lua.bindClassMemberFunction<UIWidget>("backwardsGetWidgetById", &UIWidget::backwardsGetWidgetById);
     g_lua.bindClassMemberFunction<UIWidget>("resize", &UIWidget::resize);
     g_lua.bindClassMemberFunction<UIWidget>("move", &UIWidget::move);
@@ -657,12 +666,14 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("setTextHorizontalAutoResize", &UIWidget::setTextHorizontalAutoResize);
     g_lua.bindClassMemberFunction<UIWidget>("setFont", &UIWidget::setFont);
     g_lua.bindClassMemberFunction<UIWidget>("setFontScale", &UIWidget::setFontScale);
+    g_lua.bindClassMemberFunction<UIWidget>("setShader", &UIWidget::setShader);
     g_lua.bindClassMemberFunction<UIWidget>("getText", &UIWidget::getText);
     g_lua.bindClassMemberFunction<UIWidget>("getDrawText", &UIWidget::getDrawText);
     g_lua.bindClassMemberFunction<UIWidget>("getTextAlign", &UIWidget::getTextAlign);
     g_lua.bindClassMemberFunction<UIWidget>("getTextOffset", &UIWidget::getTextOffset);
     g_lua.bindClassMemberFunction<UIWidget>("getFont", &UIWidget::getFont);
     g_lua.bindClassMemberFunction<UIWidget>("getTextSize", &UIWidget::getTextSize);
+    g_lua.bindClassMemberFunction<UIWidget>("hasShader", &UIWidget::hasShader);
 
     // UILayout
     g_lua.registerClass<UILayout>();

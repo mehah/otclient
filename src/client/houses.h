@@ -61,8 +61,8 @@ public:
     void removeDoorById(uint32_t doorId);
 
 protected:
-    void load(const TiXmlElement* elem);
-    void save(TiXmlElement* elem);
+    void load(const pugi::xml_node& node);
+    void save(pugi::xml_node& node);
 
 private:
     TileMap m_tiles;

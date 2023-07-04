@@ -22,6 +22,7 @@
 
 #include "attachedeffect.h"
 #include "shadermanager.h"
+#include "gameconfig.h"
 #include <framework/core/clock.h>
 #include <framework/graphics/animatedtexture.h>
 
@@ -31,7 +32,7 @@ AttachedEffectPtr AttachedEffect::clone()
     *(obj.get()) = *this;
 
     obj->m_frame = 0;
-    obj->m_timer.restart();
+    obj->m_animationTimer.restart();
 
     return obj;
 }
@@ -61,9 +62,10 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
         const auto& point = dest - (dirControl.offset * g_drawPool.getScaleFactor());
 
         if (m_texture) {
-            g_drawPool.addTexturedRect(Rect(point, m_size.isUnset() ? m_texture->getSize() : m_size), m_texture->get(m_frame, m_timer));
+            const auto& size = (m_size.isUnset() ? m_texture->getSize() : m_size) * g_drawPool.getScaleFactor();
+            g_drawPool.addTexturedRect(Rect(point, size), m_texture->get(m_frame, m_animationTimer));
         } else {
-            m_thingType->draw(point, 0, m_direction, 0, 0, animation, Otc::DrawThingsAndLights, Color::white, lightView);
+            m_thingType->draw(point, 0, m_direction, 0, 0, animation, Color::white, true, lightView);
         }
     }
 
@@ -85,7 +87,7 @@ int AttachedEffect::getCurrentAnimationPhase()
 
     if (m_thingType->isEffect()) {
         const int lastPhase = m_thingType->getAnimationPhases() - 1;
-        const int phase = std::min<int>(static_cast<int>(m_animationTimer.ticksElapsed() / (EFFECT_TICKS_PER_FRAME / getSpeed())), lastPhase);
+        const int phase = std::min<int>(static_cast<int>(m_animationTimer.ticksElapsed() / (g_gameConfig.getEffectTicksPerFrame() / getSpeed())), lastPhase);
         if (phase == lastPhase) m_animationTimer.restart();
         return phase;
     }
@@ -99,4 +101,3 @@ int AttachedEffect::getCurrentAnimationPhase()
 }
 
 void AttachedEffect::setShader(const std::string_view name) { m_shader = g_shaders.getShader(name); }
-

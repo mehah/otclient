@@ -387,18 +387,6 @@
     <ClCompile Include="..\src\framework\util\crypt.cpp">
       <Filter>Source Files\framework\util</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\framework\xml\tinystr.cpp">
-      <Filter>Source Files\framework\xml</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\framework\xml\tinyxml.cpp">
-      <Filter>Source Files\framework\xml</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\framework\xml\tinyxmlerror.cpp">
-      <Filter>Source Files\framework\xml</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\framework\xml\tinyxmlparser.cpp">
-      <Filter>Source Files\framework\xml</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\client\animatedtext.cpp">
       <Filter>Source Files\client</Filter>
     </ClCompile>
@@ -550,6 +538,12 @@
       <Filter>Source Files\framework\discord</Filter>
     </ClCompile>
     <ClCompile Include="..\src\client\attachedeffectmanager.cpp">
+      <Filter>Source Files\client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\client\gameconfig.cpp">
+      <Filter>Source Files\client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\client\position.cpp">
       <Filter>Source Files\client</Filter>
     </ClCompile>
   </ItemGroup>
@@ -896,12 +890,6 @@
     <ClInclude Include="..\src\framework\util\rect.h">
       <Filter>Header Files\framework\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\framework\xml\tinystr.h">
-      <Filter>Header Files\framework\xml</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\framework\xml\tinyxml.h">
-      <Filter>Header Files\framework\xml</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\client\animatedtext.h">
       <Filter>Header Files\client</Filter>
     </ClInclude>
@@ -1065,6 +1053,9 @@
       <Filter>Header Files\framework\discord</Filter>
     </ClInclude>
     <ClInclude Include="..\src\client\attachedeffectmanager.h">
+      <Filter>Header Files\client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\gameconfig.h">
       <Filter>Header Files\client</Filter>
     </ClInclude>
   </ItemGroup>

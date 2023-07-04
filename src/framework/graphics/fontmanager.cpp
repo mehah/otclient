@@ -23,23 +23,18 @@
 #include "fontmanager.h"
 #include "texture.h"
 
+#include <client/gameconfig.h>
+
 #include <framework/core/resourcemanager.h>
 #include <framework/otml/otml.h>
 
 FontManager g_fonts;
 
-FontManager::FontManager() : m_defaultFont(std::make_shared<BitmapFont>("emptyfont")) {}
+void FontManager::terminate() { clearFonts(); }
 
-void FontManager::terminate()
-{
+void FontManager::clearFonts() {
     m_fonts.clear();
     m_defaultFont = nullptr;
-}
-
-void FontManager::clearFonts()
-{
-    m_fonts.clear();
-    m_defaultFont = std::make_shared<BitmapFont>("emptyfont");
 }
 
 bool FontManager::importFont(const std::string& file)
@@ -92,5 +87,5 @@ BitmapFontPtr FontManager::getFont(const std::string_view fontName)
 
     // when not found, fallback to default font
     g_logger.error(stdext::format("font '%s' not found", fontName));
-    return getDefaultFont();
+    return m_defaultFont;
 }

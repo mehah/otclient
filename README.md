@@ -8,13 +8,13 @@
 
 ### Based on [edubart/otclient](https://github.com/edubart/otclient) Rev: [2.760](https://github.com/edubart/otclient/commit/fc39ee4adba8e780a2820bfda66fc942d74cedf4)
 
-#### [Note: for those who are with the walking system stuttering...](https://github.com/mehah/otclient/blob/main/init.lua#L7)
+#### [Note: for those who are with the walking system stuttering...](https://github.com/mehah/otclient/blob/main/data/setup.otml#L18)
 
 ### Features
 
 - C++20
 - Refactored/Optimized Rendering System
-- Auto Reload Module (Set true in [init.lua](https://github.com/mehah/otclient/blob/1026132e3dfa661807a1ff10ced2f4e09f1b7a7d/init.lua#L4) to enable)
+- Auto Reload Module (Set true in [init.lua](https://github.com/mehah/otclient/blob/1026132e3dfa661807a1ff10ced2f4e09f1b7a7d/init.lua#L5) to enable)
 - Attached Effects System (to create aura, wings...) (code sample: [effects.lua](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/effects.lua), [outfit_618.lua](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/configs/outfit_618.lua), [code test](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/attachedeffects.lua#L1))
 - Idle Animation Support
 - Highlight Mouse Target (press shift to select any object)
@@ -28,7 +28,6 @@
 - Support for more mouse buttons, for example 4 and 5
 - Module Controller System ([Code example](https://github.com/mehah/otclient/blob/cache-for-all/modules/game_minimap/minimap.lua))
 - Some bugs fixed contained in [edubart/otclient](https://github.com/edubart/otclient)
-- Client Config in [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h)
 - Client 12.85 ~ 12.92, 13.00 ~ 13.14 support (protobuf)
 - Market has been rewritten to work only [Canary](https://github.com/opentibiabr/canary)
 - Async Texture Loading

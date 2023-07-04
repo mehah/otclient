@@ -1,24 +1,26 @@
 controller = Controller:new()
 
 -- uncomment this line to apply an effect on the local player, just for testing purposes.
---[[controller:onGameStart(function()
+--[[function controller:onGameStart()
     g_game.getLocalPlayer():attachEffect(g_attachedEffects.getById(1))
     g_game.getLocalPlayer():attachEffect(g_attachedEffects.getById(2))
     g_game.getLocalPlayer():attachEffect(g_attachedEffects.getById(3))
-end)
+end
 
-controller:onGameEnd(function()
+function controller:onGameEnd()
     g_game.getLocalPlayer():clearAttachedEffects()
-end)
-]]
-
-controller.onTerminate = function()
+end]]
+function controller:onTerminate()
     g_attachedEffects.clear()
 end
 
 local function onAttach(effect, owner)
     local category, thingId = AttachedEffectManager.getDataThing(owner)
     local config = AttachedEffectManager.getConfig(effect:getId(), category, thingId)
+
+    if config.isThingConfig then
+        AttachedEffectManager.executeThingConfig(effect, category, thingId)
+    end
 
     if config.onAttach then
         config.onAttach(effect, owner, config.__onAttach)

@@ -51,11 +51,10 @@ public:
     void onAppear() override;
     void onDisappear() override;
 
-    void draw(const Point& dest, uint32_t flags, LightView* lightView = nullptr) override;
+    void draw(const Point& dest, bool drawThings = true, LightView* lightView = nullptr) override;
+    void draw(const Rect& destRect, uint8_t size);
 
-    void internalDraw(Point dest, bool isMarked, const Color& color, LightView* lightView = nullptr);
-
-    void drawOutfit(const Rect& destRect, uint8_t size, const Color& color = Color::white);
+    void internalDraw(Point dest, LightView* lightView = nullptr, const Color& color = Color::white);
     void drawInformation(const MapPosInfo& mapRect, const Point& dest, bool useGray, int drawFlags);
 
     void setId(uint32_t id) override { m_id = id; }
@@ -138,7 +137,6 @@ public:
     bool isFullHealth() const { return m_healthPercent == 100; }
     bool canBeSeen() { return !isInvisible() || isPlayer(); }
     bool isCreature() override { return true; }
-    bool isParalyzed() const { return m_speed < 10; }
 
     bool isDisabledWalkAnimation() { return m_disableWalkAnimation > 0; }
     void setDisableWalkAnimation(bool v) {
@@ -156,7 +154,6 @@ protected:
     virtual void terminateWalk();
 
     void onPositionChange(const Position& newPos, const Position& oldPos) override;
-    bool mustStabilizeCam() const { return m_stepCache.mustStabilizeCam; }
 
     bool m_walking{ false };
     Point m_walkOffset;
@@ -181,8 +178,6 @@ private:
         uint16_t duration{ 0 };
         uint16_t walkDuration{ 0 };
         uint16_t diagonalDuration{ 0 };
-
-        bool mustStabilizeCam{ false };
 
         uint16_t getDuration(Otc::Direction dir) const { return Position::isDiagonal(dir) ? diagonalDuration : duration; }
     };

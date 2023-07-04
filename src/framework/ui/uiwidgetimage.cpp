@@ -165,14 +165,15 @@ void UIWidget::drawImage(const Rect& screenCoords)
     // smooth is now enabled by default for all textures
     //m_imageTexture->setSmooth(m_imageSmooth);
     const bool useRepeated = hasProp(PropImageBordered) || hasProp(PropImageRepeated);
-    for (const auto& [dest, src] : m_imageCoordsCache) {
-        const auto& texture = m_imageTexture->isAnimatedTexture() && isImageIndividualAnimation() ?
-            std::static_pointer_cast<AnimatedTexture>(m_imageTexture)->get(m_currentFrame, m_imageAnimatorTimer) : m_imageTexture;
 
+    const auto& texture = m_imageTexture->isAnimatedTexture() && isImageIndividualAnimation() ?
+        std::static_pointer_cast<AnimatedTexture>(m_imageTexture)->get(m_currentFrame, m_imageAnimatorTimer) : m_imageTexture;
+
+    for (const auto& [dest, src] : m_imageCoordsCache) {
         if (useRepeated)
-            g_drawPool.addTexturedRepeatedRect(dest, m_imageTexture, src, m_imageColor);
+            g_drawPool.addTexturedRepeatedRect(dest, texture, src, m_imageColor);
         else
-            g_drawPool.addTexturedRect(dest, m_imageTexture, src, m_imageColor);
+            g_drawPool.addTexturedRect(dest, texture, src, m_imageColor);
     }
 }
 
@@ -190,8 +191,13 @@ void UIWidget::setImageSource(const std::string_view source)
     if (!m_imageTexture)
         return;
 
-    if (m_imageTexture->isAnimatedTexture())
-        std::static_pointer_cast<AnimatedTexture>(m_imageTexture)->restart();
+    if (m_imageTexture->isAnimatedTexture()) {
+        if (isImageIndividualAnimation()) {
+            m_imageAnimatorTimer.restart();
+            m_currentFrame = 0;
+        } else
+            std::static_pointer_cast<AnimatedTexture>(m_imageTexture)->restart();
+    }
 
     if (!m_rect.isValid() || hasProp(PropImageAutoResize)) {
         const auto& imageSize = m_imageTexture->getSize();

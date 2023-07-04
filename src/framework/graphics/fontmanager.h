@@ -28,8 +28,6 @@
 class FontManager
 {
 public:
-    FontManager();
-
     void terminate();
     void clearFonts();
 
@@ -37,9 +35,8 @@ public:
 
     bool fontExists(const std::string_view fontName);
     BitmapFontPtr getFont(const std::string_view fontName);
-    BitmapFontPtr getDefaultFont() { return m_defaultFont; }
 
-    void setDefaultFont(const std::string_view fontName) { m_defaultFont = getFont(fontName); }
+    BitmapFontPtr getDefaultFont() const { return m_defaultFont; }
 
 private:
     std::vector<BitmapFontPtr> m_fonts;

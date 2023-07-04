@@ -39,6 +39,6 @@ public:
 
 protected:
     std::function<void()> m_callback;
-    bool m_canceled;
-    bool m_executed;
+    bool m_canceled{ false };
+    bool m_executed{ false };
 };

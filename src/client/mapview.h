@@ -207,6 +207,12 @@ private:
         void clear() { shades.clear(); tiles.clear(); }
     };
 
+    struct FloorData
+    {
+        MapObject cachedVisibleTiles;
+        stdext::timer fadingTimers;
+    };
+
     struct Crosshair
     {
         bool positionChanged = false;
@@ -235,7 +241,7 @@ private:
     {
         if (!canFloorFade()) return 1.f;
 
-        float fading = std::clamp<float>(static_cast<float>(m_fadingFloorTimers[z].elapsed_millis()) / static_cast<float>(m_floorFading), 0.f, 1.f);
+        float fading = std::clamp<float>(static_cast<float>(m_floors[z].fadingTimers.elapsed_millis()) / static_cast<float>(m_floorFading), 0.f, 1.f);
         if (z < m_cachedFirstVisibleFloor)
             fading = 1.0 - fading;
         return fading;
@@ -252,12 +258,12 @@ private:
     }
 
     int8_t m_lockedFirstVisibleFloor{ -1 };
-    uint8_t m_cachedFirstVisibleFloor{ SEA_FLOOR };
-    uint8_t m_cachedLastVisibleFloor{ SEA_FLOOR };
+    uint8_t m_cachedFirstVisibleFloor{ 0 };
+    uint8_t m_cachedLastVisibleFloor{ 0 };
     uint8_t m_floorMin{ 0 };
     uint8_t m_floorMax{ 0 };
 
-    uint16_t m_tileSize{ SPRITE_SIZE };
+    uint16_t m_tileSize{ 0 };
     uint16_t m_floorFading = 500;
 
     float m_minimumAmbientLight{ 0 };
@@ -303,9 +309,7 @@ private:
 
     AntialiasingMode m_antiAliasingMode{ AntialiasingMode::ANTIALIASING_DISABLED };
 
-    std::array<MapObject, MAX_Z + 1> m_cachedVisibleTiles;
-
-    stdext::timer m_fadingFloorTimers[MAX_Z + 1];
+    std::vector<FloorData> m_floors;
 
     PainterShaderProgramPtr m_shader;
     PainterShaderProgramPtr m_nextShader;

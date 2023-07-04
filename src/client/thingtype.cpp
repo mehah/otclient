@@ -244,19 +244,19 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
     // reverse_addons_south
     // reverse_addons_north
 
-    if (flags.has_wearout() && flags.clip()) {
+    if (flags.has_wearout()) {
         m_flags |= ThingFlagAttrWearOut;
     }
 
-    if (flags.has_clockexpire() && flags.clip()) {
+    if (flags.has_clockexpire()) {
         m_flags |= ThingFlagAttrClockExpire;
     }
 
-    if (flags.has_expire() && flags.clip()) {
+    if (flags.has_expire()) {
         m_flags |= ThingFlagAttrExpire;
     }
 
-    if (flags.has_expirestop() && flags.clip()) {
+    if (flags.has_expirestop()) {
         m_flags |= ThingFlagAttrExpireStop;
     }
 
@@ -283,7 +283,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
         m_animationPhases += std::max<int>(1, spritesPhases.size());
 
         if (const auto& sheet = g_spriteAppearances.getSheetBySpriteId(spriteInfo.sprite_id(0), false)) {
-            m_size = sheet->getSpriteSize() / SPRITE_SIZE;
+            m_size = sheet->getSpriteSize() / g_gameConfig.getSpriteSize();
             sizes.emplace_back(m_size);
         }
 
@@ -483,7 +483,7 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
 
     if (!done)
         throw Exception("corrupt data (id: %d, category: %d, count: %d, lastAttr: %d)",
-                        m_id, m_category, count, attr);
+            m_id, m_category, count, attr);
 
     const bool hasFrameGroups = category == ThingCategoryCreature && g_game.getFeature(Otc::GameIdleAnimations);
     const uint8_t groupCount = hasFrameGroups ? fin->getU8() : 1;
@@ -599,7 +599,7 @@ void ThingType::unserializeOtml(const OTMLNodePtr& node)
     }
 }
 
-void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, uint32_t flags, const Color& color, LightView* lightView, const DrawConductor& conductor)
+void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, const Color& color, bool drawThings, LightView* lightView, const DrawConductor& conductor)
 {
     if (m_null)
         return;
@@ -620,18 +620,15 @@ void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, i
     const auto& textureOffset = textureData.pos[frameIndex].offsets;
     const auto& textureRect = textureData.pos[frameIndex].rects;
 
-    const Rect screenRect(dest + (textureOffset - m_displacement - (m_size.toPoint() - Point(1)) * SPRITE_SIZE) * g_drawPool.getScaleFactor(), textureRect.size() * g_drawPool.getScaleFactor());
+    const Rect screenRect(dest + (textureOffset - m_displacement - (m_size.toPoint() - Point(1)) * g_gameConfig.getSpriteSize()) * g_drawPool.getScaleFactor(), textureRect.size() * g_drawPool.getScaleFactor());
 
-    if (flags & Otc::DrawThings) {
+    if (drawThings) {
         const auto& newColor = m_opacity < 1.0f ? Color(color, m_opacity) : color;
         g_drawPool.addTexturedRect(screenRect, texture, textureRect, newColor, conductor);
     }
 
-    if (lightView && hasLight() && flags & Otc::DrawLights) {
-        const Light& light = getLight();
-        if (light.intensity > 0) {
-            lightView->addLightSource(screenRect.center(), light);
-        }
+    if (lightView && hasLight()) {
+        lightView->addLightSource(screenRect.center(), m_light);
     }
 }
 
@@ -686,7 +683,7 @@ void ThingType::loadTexture(int animationPhase)
     const bool useCustomImage = animationPhase == 0 && !m_customImage.empty();
     const int indexSize = textureLayers * m_numPatternX * m_numPatternY * m_numPatternZ;
     const auto& textureSize = getBestTextureDimension(m_size.width(), m_size.height(), indexSize);
-    const auto& fullImage = useCustomImage ? Image::load(m_customImage) : std::make_shared<Image>(textureSize * SPRITE_SIZE);
+    const auto& fullImage = useCustomImage ? Image::load(m_customImage) : std::make_shared<Image>(textureSize * g_gameConfig.getSpriteSize());
     const bool protobufSupported = g_game.isUsingProtobuf();
 
     static Color maskColors[] = { Color::red, Color::green, Color::blue, Color::yellow };
@@ -700,7 +697,7 @@ void ThingType::loadTexture(int animationPhase)
                     const int frameIndex = getTextureIndex(l % textureLayers, x, y, z);
 
                     const auto& framePos = Point(frameIndex % (textureSize.width() / m_size.width()) * m_size.width(),
-                                                 frameIndex / (textureSize.width() / m_size.width()) * m_size.height()) * SPRITE_SIZE;
+                        frameIndex / (textureSize.width() / m_size.width()) * m_size.height()) * g_gameConfig.getSpriteSize();
 
                     if (!useCustomImage) {
                         if (protobufSupported) {
@@ -736,7 +733,7 @@ void ThingType::loadTexture(int animationPhase)
                                             spriteImage->overwriteMask(maskColors[(l - 1)]);
                                         }
 
-                                        const Point& spritePos = Point(m_size.width() - w - 1, m_size.height() - h - 1) * SPRITE_SIZE;
+                                        const Point& spritePos = Point(m_size.width() - w - 1, m_size.height() - h - 1) * g_gameConfig.getSpriteSize();
                                         fullImage->blit(framePos + spritePos, spriteImage);
                                     }
                                 }
@@ -745,9 +742,9 @@ void ThingType::loadTexture(int animationPhase)
                     }
 
                     auto& posData = textureData.pos[frameIndex];
-                    posData.rects = { framePos + Point(m_size.width(), m_size.height()) * SPRITE_SIZE - Point(1), framePos };
-                    for (int fx = framePos.x; fx < framePos.x + m_size.width() * SPRITE_SIZE; ++fx) {
-                        for (int fy = framePos.y; fy < framePos.y + m_size.height() * SPRITE_SIZE; ++fy) {
+                    posData.rects = { framePos + Point(m_size.width(), m_size.height()) * g_gameConfig.getSpriteSize() - Point(1), framePos };
+                    for (int fx = framePos.x; fx < framePos.x + m_size.width() * g_gameConfig.getSpriteSize(); ++fx) {
+                        for (int fy = framePos.y; fy < framePos.y + m_size.height() * g_gameConfig.getSpriteSize(); ++fy) {
                             const uint8_t* p = fullImage->getPixel(fx, fy);
                             if (p[3] == 0x00)
                                 continue;
@@ -759,7 +756,7 @@ void ThingType::loadTexture(int animationPhase)
                         }
                     }
 
-                    posData.originRects = Rect(framePos, Size(m_size.width(), m_size.height()) * SPRITE_SIZE);
+                    posData.originRects = Rect(framePos, Size(m_size.width(), m_size.height()) * g_gameConfig.getSpriteSize());
                     posData.offsets = posData.rects.topLeft() - framePos;
                 }
             }
@@ -788,13 +785,13 @@ Size ThingType::getBestTextureDimension(int w, int h, int count)
     h = k;
 
     const int numSprites = w * h * count;
-    assert(numSprites <= SPRITE_SIZE * SPRITE_SIZE);
-    assert(w <= SPRITE_SIZE);
-    assert(h <= SPRITE_SIZE);
+    assert(numSprites <= g_gameConfig.getSpriteSize() * g_gameConfig.getSpriteSize());
+    assert(w <= g_gameConfig.getSpriteSize());
+    assert(h <= g_gameConfig.getSpriteSize());
 
-    Size bestDimension = { SPRITE_SIZE };
-    for (int i = w; i <= SPRITE_SIZE; i <<= 1) {
-        for (int j = h; j <= SPRITE_SIZE; j <<= 1) {
+    Size bestDimension = { g_gameConfig.getSpriteSize() };
+    for (int i = w; i <= g_gameConfig.getSpriteSize(); i <<= 1) {
+        for (int j = h; j <= g_gameConfig.getSpriteSize(); j <<= 1) {
             Size candidateDimension = { i, j };
             if (candidateDimension.area() < numSprites)
                 continue;
@@ -814,14 +811,14 @@ uint32_t ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int
                       * m_numPatternY + y)
                       * m_numPatternX + x)
                       * m_layers + l)
-                      * m_size.height() + h)
+        * m_size.height() + h)
         * m_size.width() + w;
 
     if (w == -1 && h == -1) { // protobuf does not use width and height, because sprite image is the exact sprite size, not split by 32x32, so -1 is passed instead
         index = ((((a % m_animationPhases)
                  * m_numPatternZ + z)
                  * m_numPatternY + y)
-                 * m_numPatternX + x)
+            * m_numPatternX + x)
             * m_layers + l;
     }
 
@@ -832,7 +829,7 @@ uint32_t ThingType::getSpriteIndex(int w, int h, int l, int x, int y, int z, int
 uint32_t ThingType::getTextureIndex(int l, int x, int y, int z) const
 {
     return ((l * m_numPatternZ + z)
-            * m_numPatternY + y)
+        * m_numPatternY + y)
         * m_numPatternX + x;
 }
 
@@ -845,9 +842,10 @@ int ThingType::getExactSize(int layer, int xPattern, int yPattern, int zPattern,
         return 0;
 
     const int frameIndex = getTextureIndex(layer, xPattern, yPattern, zPattern);
+    const auto& pos = m_textureData[animationPhase].pos;
 
-    const auto& textureDataPos = m_textureData[animationPhase].pos[frameIndex];
-    const Size& size = textureDataPos.originRects.size() - textureDataPos.offsets.toSize();
+    const auto& textureDataPos = pos[std::min<int>(frameIndex, pos.size() - 1)];
+    const auto& size = textureDataPos.originRects.size() - textureDataPos.offsets.toSize();
     return std::max<int>(size.width(), size.height());
 }
 
@@ -927,6 +925,8 @@ ThingFlagAttr ThingType::thingAttrToThingFlagAttr(ThingAttr attr) {
 
     return ThingFlagAttrNone;
 }
+
+bool ThingType::isTall(const bool useRealSize) { return useRealSize ? getRealSize() > g_gameConfig.getSpriteSize() : getHeight() > 1; }
 
 #ifdef FRAMEWORK_EDITOR
 void ThingType::serialize(const FileStreamPtr& fin)
@@ -1022,7 +1022,7 @@ void ThingType::exportImage(const std::string& fileName)
     if (m_spritesIndex.empty())
         throw Exception("cannot export thingtype without sprites");
 
-    const auto& image = std::make_shared<Image>(Size(SPRITE_SIZE * m_size.width() * m_layers * m_numPatternX, SPRITE_SIZE * m_size.height() * m_animationPhases * m_numPatternY * m_numPatternZ));
+    const auto& image = std::make_shared<Image>(Size(g_gameConfig.getSpriteSize() * m_size.width() * m_layers * m_numPatternX, g_gameConfig.getSpriteSize() * m_size.height() * m_animationPhases * m_numPatternY * m_numPatternZ));
     for (int z = 0; z < m_numPatternZ; ++z) {
         for (int y = 0; y < m_numPatternY; ++y) {
             for (int x = 0; x < m_numPatternX; ++x) {
@@ -1030,9 +1030,9 @@ void ThingType::exportImage(const std::string& fileName)
                     for (int a = 0; a < m_animationPhases; ++a) {
                         for (int w = 0; w < m_size.width(); ++w) {
                             for (int h = 0; h < m_size.height(); ++h) {
-                                image->blit(Point(SPRITE_SIZE * (m_size.width() - w - 1 + m_size.width() * x + m_size.width() * m_numPatternX * l),
-                                            SPRITE_SIZE * (m_size.height() - h - 1 + m_size.height() * y + m_size.height() * m_numPatternY * a + m_size.height() * m_numPatternY * m_animationPhases * z)),
-                                            g_sprites.getSpriteImage(m_spritesIndex[getSpriteIndex(w, h, l, x, y, z, a)]));
+                                image->blit(Point(g_gameConfig.getSpriteSize() * (m_size.width() - w - 1 + m_size.width() * x + m_size.width() * m_numPatternX * l),
+                                            g_gameConfig.getSpriteSize() * (m_size.height() - h - 1 + m_size.height() * y + m_size.height() * m_numPatternY * a + m_size.height() * m_numPatternY * m_animationPhases * z)),
+                                    g_sprites.getSpriteImage(m_spritesIndex[getSpriteIndex(w, h, l, x, y, z, a)]));
                             }
                         }
                     }

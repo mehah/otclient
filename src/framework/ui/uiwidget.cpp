@@ -32,6 +32,7 @@
 #include <framework/platform/platformwindow.h>
 
 #include "framework/graphics/drawpoolmanager.h"
+#include <client/shadermanager.h>
 
 UIWidget::UIWidget()
 {
@@ -91,6 +92,9 @@ void UIWidget::drawSelf(DrawPoolType drawPane)
     if (drawPane != DrawPoolType::FOREGROUND)
         return;
 
+    if (hasShader())
+        g_drawPool.setShaderProgram(m_shader);
+
     // draw style components in order
     if (m_backgroundColor.aF() > Fw::MIN_ALPHA) {
         Rect backgroundDestRect = m_rect;
@@ -102,6 +106,9 @@ void UIWidget::drawSelf(DrawPoolType drawPane)
     drawIcon(m_rect);
     drawText(m_rect);
     drawBorder(m_rect);
+
+    if (hasShader())
+        g_drawPool.resetShaderProgram();
 }
 
 void UIWidget::drawChildren(const Rect& visibleRect, DrawPoolType drawPane)
@@ -268,7 +275,8 @@ void UIWidget::removeChild(const UIWidgetPtr& child)
         assert(child->getParent() == static_self_cast<UIWidget>());
         child->setParent(nullptr);
 
-        m_layout->removeWidget(child);
+        if (m_layout)
+            m_layout->removeWidget(child);
 
         // remove access to child via widget.childId
         if (child->hasProp(PropCustomId)) {
@@ -1370,6 +1378,15 @@ UIWidgetList UIWidget::recursiveGetChildrenByMarginPos(const Point& childPos)
     return children;
 }
 
+UIWidgetPtr UIWidget::getChildByStyleName(const std::string_view styleName) {
+    for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
+        const auto& child = (*it);
+        if (child->getStyleName() == styleName)
+            return child;
+    }
+    return nullptr;
+}
+
 UIWidgetList UIWidget::recursiveGetChildrenByState(Fw::WidgetState state)
 {
     UIWidgetList children;
@@ -1381,6 +1398,20 @@ UIWidgetList UIWidget::recursiveGetChildrenByState(Fw::WidgetState state)
                 children.insert(children.end(), subChildren.begin(), subChildren.end());
             children.emplace_back(child);
         }
+    }
+    return children;
+}
+
+UIWidgetList UIWidget::recursiveGetChildrenByStyleName(const std::string_view styleName)
+{
+    UIWidgetList children;
+    for (const auto& child : m_children) {
+        if (child->getStyleName() == styleName)
+            children.emplace_back(child);
+
+        const auto& subChildren = child->recursiveGetChildrenByStyleName(styleName);
+        if (!subChildren.empty())
+            children.insert(children.end(), subChildren.begin(), subChildren.end());
     }
     return children;
 }
@@ -1867,15 +1898,26 @@ bool UIWidget::propagateOnMouseMove(const Point& mousePos, const Point& mouseMov
 void UIWidget::move(int x, int y) {
     if (!hasProp(PropUpdatingMove)) {
         setProp(PropUpdatingMove, true);
-        g_dispatcher.scheduleEvent([this] {
-            const auto rect = m_rect;
-            m_rect = {}; // force update
-            setRect(rect);
-            setProp(PropUpdatingMove, false);
+        g_dispatcher.scheduleEvent([self = static_self_cast<UIWidget>()] {
+            const auto rect = self->m_rect;
+            self->m_rect = {}; // force update
+            self->setRect(rect);
+            self->setProp(PropUpdatingMove, false);
         }, 30);
     }
 
     m_rect = { x, y, getSize() };
+}
+
+void UIWidget::setShader(const std::string_view name) {
+    if (name.empty()) {
+        m_shader = nullptr;
+        return;
+    }
+
+    g_dispatcher.addEvent([this, shader = std::string(name.data())] {
+        m_shader = g_shaders.getShader(shader);
+    });
 }
 
 void UIWidget::repaint() { g_app.repaint(); }

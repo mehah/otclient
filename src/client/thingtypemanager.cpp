@@ -28,7 +28,6 @@
 #ifdef FRAMEWORK_EDITOR
 #include "itemtype.h"
 #include "creatures.h"
-#include <framework/xml/tinyxml.h>
 #endif
 
 #include <framework/core/eventdispatcher.h>
@@ -192,7 +191,7 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
         int spritesCount = 0;
         std::string appearancesFile;
 
-        json document = json::parse(g_resources.readFileContents(g_resources.resolvePath(g_resources.guessFilePath(file, "json"))));
+        json document = json::parse(g_resources.readFileContents(g_resources.resolvePath(g_resources.guessFilePath(file + "catalog-content", "json"))));
         for (const auto& obj : document) {
             const auto& type = obj["type"];
             if (type == "appearances") {
@@ -205,10 +204,11 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
         }
 
         g_spriteAppearances.setSpritesCount(spritesCount + 1);
+        g_spriteAppearances.setPath(file);
 
         // load appearances.dat
         std::stringstream fin;
-        g_resources.readFileStream(g_resources.resolvePath(stdext::format("/things/%d/%s", g_game.getClientVersion(), appearancesFile)), fin);
+        g_resources.readFileStream(g_resources.resolvePath(stdext::format("%s%s", file, appearancesFile)), fin);
 
         auto appearancesLib = appearances::Appearances();
         if (!appearancesLib.ParseFromIstream(&fin)) {
@@ -279,7 +279,7 @@ ThingTypeList ThingTypeManager::findThingTypeByAttr(ThingAttr attr, ThingCategor
 }
 
 #ifdef FRAMEWORK_EDITOR
-void ThingTypeManager::parseItemType(uint16_t serverId, TiXmlElement* elem)
+void ThingTypeManager::parseItemType(uint16_t serverId, pugi::xml_node node)
 {
     bool s;
     int d;
@@ -301,15 +301,15 @@ void ThingTypeManager::parseItemType(uint16_t serverId, TiXmlElement* elem)
     } else
         itemType = getItemType(serverId);
 
-    itemType->setName(elem->Attribute("name"));
-    for (TiXmlElement* attrib = elem->FirstChildElement(); attrib; attrib = attrib->NextSiblingElement()) {
-        std::string key = attrib->Attribute("key");
+    itemType->setName(node.attribute("name").as_string());
+    for (auto attrib : node.children()) {
+        std::string key = attrib.attribute("key").as_string();
         if (key.empty())
             continue;
 
         stdext::tolower(key);
         if (key == "description")
-            itemType->setDesc(attrib->Attribute("value"));
+            itemType->setDesc(attrib.attribute("value").as_string());
         else if (key == "weapontype")
             itemType->setCategory(ItemCategoryWeapon);
         else if (key == "ammotype")
@@ -319,7 +319,7 @@ void ThingTypeManager::parseItemType(uint16_t serverId, TiXmlElement* elem)
         else if (key == "charges")
             itemType->setCategory(ItemCategoryCharges);
         else if (key == "type") {
-            std::string value = attrib->Attribute("value");
+            std::string value = attrib.attribute("value").as_string();
             stdext::tolower(value);
 
             if (value == "key")
@@ -485,22 +485,22 @@ void ThingTypeManager::loadXml(const std::string& file)
         if (!isOtbLoaded())
             throw Exception("OTB must be loaded before XML");
 
-        TiXmlDocument doc;
-        doc.Parse(g_resources.readFileContents(file).c_str());
-        if (doc.Error())
-            throw Exception("failed to parse '%s': '%s'", file, doc.ErrorDesc());
+        pugi::xml_document doc;
+        pugi::xml_parse_result result = doc.load_file(file.c_str());
+        if (!result)
+            throw Exception("failed to parse '%s': '%s'", file, result.description());
 
-        TiXmlElement* root = doc.FirstChildElement();
-        if (!root || root->ValueTStr() != "items")
+        pugi::xml_node root = doc.child("items");
+        if (root.empty())
             throw Exception("invalid root tag name");
 
-        for (TiXmlElement* element = root->FirstChildElement(); element; element = element->NextSiblingElement()) {
-            if (unlikely(element->ValueTStr() != "item"))
+        for (pugi::xml_node element = root.first_child(); element; element = element.next_sibling()) {
+            if (element.name() != std::string("item"))
                 continue;
 
-            const auto id = element->readType<uint16_t>("id");
+            const auto id = element.attribute("id").as_uint();
             if (id != 0) {
-                std::vector<std::string> s_ids = stdext::split(element->Attribute("id"), ";");
+                std::vector<std::string> s_ids = stdext::split(element.attribute("id").as_string(), ";");
                 for (const std::string& s : s_ids) {
                     std::vector<int32_t> ids = stdext::split<int32_t>(s, "-");
                     if (ids.size() > 1) {
@@ -511,8 +511,8 @@ void ThingTypeManager::loadXml(const std::string& file)
                         parseItemType(atoi(s.c_str()), element);
                 }
             } else {
-                std::vector<int32_t> begin = stdext::split<int32_t>(element->Attribute("fromid"), ";");
-                std::vector<int32_t> end = stdext::split<int32_t>(element->Attribute("toid"), ";");
+                std::vector<int32_t> begin = stdext::split<int32_t>(element.attribute("fromid").as_string(), ";");
+                std::vector<int32_t> end = stdext::split<int32_t>(element.attribute("toid").as_string(), ";");
                 if (begin[0] && begin.size() == end.size()) {
                     const size_t size = begin.size();
                     for (size_t i = 0; i < size; ++i)
@@ -522,13 +522,13 @@ void ThingTypeManager::loadXml(const std::string& file)
             }
         }
 
-        doc.Clear();
         m_xmlLoaded = true;
         g_logger.debug("items.xml read successfully.");
     } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to load '%s' (XML file): %s", file, e.what()));
     }
 }
+
 #endif
 
 /* vim: set ts=4 sw=4 et: */

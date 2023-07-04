@@ -25,7 +25,6 @@
 #ifdef FRAMEWORK_EDITOR
 
 #include <framework/luaengine/luaobject.h>
-#include <framework/xml/tinyxml.h>
 
 #include "declarations.h"
 #include "outfit.h"
@@ -55,8 +54,8 @@ public:
     void clear() { m_creatures.clear(); }
 
 protected:
-    void load(TiXmlElement* node);
-    void save(TiXmlElement* node);
+    void load(pugi::xml_node node);
+    void save(pugi::xml_node node);
 
 private:
     CreatureMap m_creatures;
@@ -127,7 +126,7 @@ public:
     const std::vector<CreatureTypePtr>& getCreatures() { return m_creatures; }
 
 protected:
-    void internalLoadCreatureBuffer(const TiXmlElement* attrib, const CreatureTypePtr& m);
+    void internalLoadCreatureBuffer(const pugi::xml_node attrib, const CreatureTypePtr& m);
 
 private:
     std::vector<CreatureTypePtr> m_creatures;

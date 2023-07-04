@@ -352,14 +352,6 @@ public:
     std::string formatCreatureName(const std::string_view name);
     int findEmptyContainerId();
 
-    void setLastSupportedVersion(int version)
-    {
-        m_lastSupportedVersion = version;
-    }
-    int getLastSupportedVersion()
-    {
-        return m_lastSupportedVersion;
-    }
     // market related
     void leaveMarket();
     void browseMarket(uint8_t browseId, uint16_t browseType);
@@ -376,9 +368,6 @@ public:
     void clearImbuement(uint8_t slot);
     void closeImbuingWindow();
 
-    void setForceNewWalkingFormula(bool v) { m_forceNewWalkingFormula = v; }
-    bool isForcingNewWalkingFormula() { return m_forceNewWalkingFormula; }
-
 protected:
     void enableBotCall() { m_denyBotCall = false; }
     void disableBotCall() { m_denyBotCall = true; }
@@ -394,7 +383,6 @@ private:
     stdext::map<int, ContainerPtr> m_containers;
     stdext::map<int, Vip> m_vips;
 
-    bool m_forceNewWalkingFormula{ false };
     bool m_online{ false };
     bool m_denyBotCall{ false };
     bool m_dead{ false };
@@ -427,7 +415,6 @@ private:
     bool m_connectionFailWarned;
     uint16_t m_protocolVersion{ 0 };
     uint16_t m_clientVersion{ 0 };
-    uint16_t m_lastSupportedVersion{ 1287 };
     uint8_t m_openPvpSituations{ 0 };
     std::string m_clientSignature;
     Otc::OperatingSystem_t m_clientCustomOs{ Otc::CLIENTOS_NONE };

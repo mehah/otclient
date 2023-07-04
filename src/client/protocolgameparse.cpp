@@ -488,9 +488,13 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerSendRewardHistory:
                     parseRewardHistory(msg);
                     break;
-                case Proto::GameServerSendPreyFreeRerolls:
-                    parsePreyFreeRerolls(msg);
+
+                case Proto::GameServerSendPreyFreeRerolls: // || Proto::GameServerSendBosstiaryEntryChanged
+                    if (g_game.getFeature(Otc::GameBosstiary))
+                        parseBosstiaryEntryChanged(msg);
+                    else parsePreyFreeRerolls(msg);
                     break;
+
                 case Proto::GameServerSendPreyTimeLeft:
                     parsePreyTimeLeft(msg);
                     break;
@@ -522,6 +526,17 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                     parseMarketBrowse(msg);
                     break;
 
+                    // 13xx
+                case Proto::GameServerBosstiaryData:
+                    parseBosstiaryData(msg);
+                    break;
+                case Proto::GameServerBosstiarySlots:
+                    parseBosstiarySlots(msg);
+                    break;
+                case Proto::GameServerBosstiaryCooldownTimer:
+                    parseBosstiaryCooldownTimer(msg);
+                    break;
+
                 case Proto::GameServerAttchedEffect:
                     parseAttachedEffect(msg);
                     break;
@@ -532,6 +547,10 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
 
                 case Proto::GameServerCreatureShader:
                     parseCreatureShader(msg);
+                    break;
+
+                case Proto::GameServerMapShader:
+                    parseMapShader(msg);
                     break;
 
                 default:
@@ -1550,7 +1569,7 @@ void ProtocolGame::parseEditText(const InputMessagePtr& msg)
     const uint32_t id = msg->getU32();
 
     uint32_t itemId;
-    if (g_game.getClientVersion() >= 1010) {
+    if (g_game.getClientVersion() >= 1010 || g_game.getFeature(Otc::GameItemShader)) {
         // TODO: processEditText with ItemPtr as parameter
         const auto& item = getItem(msg);
         itemId = item->getId();
@@ -1863,7 +1882,7 @@ void ProtocolGame::parsePlayerModes(const InputMessagePtr& msg)
 
 void ProtocolGame::parseSpellCooldown(const InputMessagePtr& msg)
 {
-    uint16_t spellId = msg->getU8();
+    uint16_t spellId;
     if (g_game.getFeature(Otc::GameUshortSpell)) {
         spellId = msg->getU16();
     } else {
@@ -2108,11 +2127,11 @@ void ProtocolGame::parseFloorChangeUp(const InputMessagePtr& msg)
     --pos.z;
 
     int skip = 0;
-    if (pos.z == SEA_FLOOR)
-        for (int_fast32_t i = SEA_FLOOR - AWARE_UNDEGROUND_FLOOR_RANGE; i >= 0; --i)
+    if (pos.z == g_gameConfig.getMapSeaFloor())
+        for (int_fast32_t i = g_gameConfig.getMapSeaFloor() - g_gameConfig.getMapAwareUndergroundFloorRange(); i >= 0; --i)
             skip = setFloorDescription(msg, pos.x - range.left, pos.y - range.top, i, range.horizontal(), range.vertical(), 8 - i, skip);
-    else if (pos.z > SEA_FLOOR)
-        setFloorDescription(msg, pos.x - range.left, pos.y - range.top, pos.z - AWARE_UNDEGROUND_FLOOR_RANGE, range.horizontal(), range.vertical(), 3, skip);
+    else if (pos.z > g_gameConfig.getMapSeaFloor())
+        setFloorDescription(msg, pos.x - range.left, pos.y - range.top, pos.z - g_gameConfig.getMapAwareUndergroundFloorRange(), range.horizontal(), range.vertical(), 3, skip);
 
     ++pos.x;
     ++pos.y;
@@ -2127,13 +2146,13 @@ void ProtocolGame::parseFloorChangeDown(const InputMessagePtr& msg)
     ++pos.z;
 
     int skip = 0;
-    if (pos.z == UNDERGROUND_FLOOR) {
+    if (pos.z == g_gameConfig.getMapUndergroundFloorRange()) {
         int j;
         int i;
-        for (i = pos.z, j = -1; i <= pos.z + AWARE_UNDEGROUND_FLOOR_RANGE; ++i, --j)
+        for (i = pos.z, j = -1; i <= pos.z + g_gameConfig.getMapAwareUndergroundFloorRange(); ++i, --j)
             skip = setFloorDescription(msg, pos.x - range.left, pos.y - range.top, i, range.horizontal(), range.vertical(), j, skip);
-    } else if (pos.z > UNDERGROUND_FLOOR && pos.z < MAX_Z - 1)
-        setFloorDescription(msg, pos.x - range.left, pos.y - range.top, pos.z + AWARE_UNDEGROUND_FLOOR_RANGE, range.horizontal(), range.vertical(), -3, skip);
+    } else if (pos.z > g_gameConfig.getMapUndergroundFloorRange() && pos.z < g_gameConfig.getMapMaxZ() - 1)
+        setFloorDescription(msg, pos.x - range.left, pos.y - range.top, pos.z + g_gameConfig.getMapAwareUndergroundFloorRange(), range.horizontal(), range.vertical(), -3, skip);
 
     --pos.x;
     --pos.y;
@@ -2476,12 +2495,12 @@ void ProtocolGame::setMapDescription(const InputMessagePtr& msg, int x, int y, i
     int endz;
     int zstep;
 
-    if (z > SEA_FLOOR) {
-        startz = z - AWARE_UNDEGROUND_FLOOR_RANGE;
-        endz = std::min<int>(z + AWARE_UNDEGROUND_FLOOR_RANGE, MAX_Z);
+    if (z > g_gameConfig.getMapSeaFloor()) {
+        startz = z - g_gameConfig.getMapAwareUndergroundFloorRange();
+        endz = std::min<int>(z + g_gameConfig.getMapAwareUndergroundFloorRange(), g_gameConfig.getMapMaxZ());
         zstep = 1;
     } else {
-        startz = SEA_FLOOR;
+        startz = g_gameConfig.getMapSeaFloor();
         endz = 0;
         zstep = -1;
     }
@@ -2522,7 +2541,7 @@ int ProtocolGame::setTileDescription(const InputMessagePtr& msg, Position positi
             continue;
         }
 
-        if (stackPos > MAX_THINGS)
+        if (stackPos > g_gameConfig.getTileMaxThings())
             g_logger.traceError(stdext::format("too many things, pos=%s, stackpos=%d", stdext::to_string(position), stackPos));
 
         const auto& thing = getThing(msg);
@@ -3718,6 +3737,91 @@ void ProtocolGame::parseMarketBrowse(const InputMessagePtr& msg)
     g_lua.callGlobalField("g_game", "onMarketBrowse", intOffers, nameOffers);
 }
 
+// 13x
+void ProtocolGame::parseBosstiaryData(const InputMessagePtr& msg)
+{
+    msg->getU16(); // Number of kills to achieve 'Bane Prowess'
+    msg->getU16(); // Number of kills to achieve 'Bane expertise'
+    msg->getU16(); // Number of kills to achieve 'Base Mastery'
+
+    msg->getU16(); // Number of kills to achieve 'Archfoe Prowess'
+    msg->getU16(); // Number of kills to achieve 'Archfoe Expertise'
+    msg->getU16(); // Number of kills to achieve 'Archfoe Mastery'
+
+    msg->getU16(); // Number of kills to achieve 'Nemesis Prowess'
+    msg->getU16(); // Number of kills to achieve 'Nemesis Expertise'
+    msg->getU16(); // Number of kills to achieve 'Nemesis Mastery'
+
+    msg->getU16(); // Points will receive when reach 'Bane Prowess'
+    msg->getU16(); // Points will receive when reach 'Bane Expertise'
+    msg->getU16(); // Points will receive when reach 'Base Mastery'
+
+    msg->getU16(); // Points will receive when reach 'Archfoe Prowess'
+    msg->getU16(); // Points will receive when reach 'Archfoe Expertise'
+    msg->getU16(); // Points will receive when reach 'Archfoe Mastery'
+
+    msg->getU16(); // Points will receive when reach 'Nemesis Prowess'
+    msg->getU16(); // Points will receive when reach 'Nemesis Expertise'
+    msg->getU16(); // Points will receive when reach 'Nemesis Mastery'
+}
+
+void ProtocolGame::parseBosstiarySlots(const InputMessagePtr& msg) {
+    const auto& getBosstiarySlot = [&]() {
+        msg->getU8(); // Boss Race
+        msg->getU32(); // Kill Count
+        msg->getU16(); // Loot Bonus
+        msg->getU8(); // Kill Bonus
+        msg->getU8(); // Boss Race
+        msg->getU32(); // Remove Price
+        msg->getU8(); // Inactive? (Only true if equal to Boosted Boss)
+    };
+
+    msg->getU32(); // Player Points
+    msg->getU32(); // Total Points next bonus
+    msg->getU16(); // Current Bonus
+    msg->getU16(); // Next Bonus
+
+    const bool isSlotOneUnlocked = msg->getU8();
+    const uint32_t bossIdSlotOne = msg->getU32();
+    if (isSlotOneUnlocked && bossIdSlotOne != 0) {
+        getBosstiarySlot();
+    }
+
+    const bool isSlotTwoUnlocked = msg->getU8();
+    const uint32_t bossIdSlotTwo = msg->getU32();
+    if (isSlotTwoUnlocked && bossIdSlotTwo != 0) {
+        getBosstiarySlot();
+    }
+
+    const bool isTodaySlotUnlocked = msg->getU8();
+    const uint32_t boostedBossId = msg->getU32();
+    if (isTodaySlotUnlocked && boostedBossId != 0) {
+        getBosstiarySlot();
+    }
+
+    const bool bossesUnlocked = msg->getU8();
+    if (bossesUnlocked) {
+        const uint16_t bossesUnlockedSize = msg->getU16();
+
+        for (uint_fast16_t i = 0; i < bossesUnlockedSize; ++i) {
+            msg->getU32(); // bossId
+            msg->getU8(); // bossRace
+        }
+    }
+}
+
+void ProtocolGame::parseBosstiaryCooldownTimer(const InputMessagePtr& msg) {
+    const uint16_t bossesOnTrackerSize = msg->getU16();
+    for (uint_fast16_t i = 0; i < bossesOnTrackerSize; ++i) {
+        msg->getU32(); // bossRaceId
+        msg->getU64(); // Boss cooldown in seconds
+    }
+}
+
+void ProtocolGame::parseBosstiaryEntryChanged(const InputMessagePtr& msg) {
+    msg->getU32(); // bossId
+}
+
 void ProtocolGame::parseAttachedEffect(const InputMessagePtr& msg) {
     const uint32_t id = msg->getU32();
     const uint16_t attachedEffectId = msg->getU16();
@@ -3759,4 +3863,12 @@ void ProtocolGame::parseCreatureShader(const InputMessagePtr& msg) {
     }
 
     creature->setShader(shaderName);
+}
+
+void ProtocolGame::parseMapShader(const InputMessagePtr& msg) {
+    const auto& shaderName = msg->getString();
+
+    const auto& mapView = g_map.getMapView(0);
+    if (mapView)
+        mapView->setShader(shaderName, 0.f, 0.f);
 }

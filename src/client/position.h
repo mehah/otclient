@@ -25,7 +25,6 @@
 #include <framework/const.h>
 #include <framework/stdext/types.h>
 #include <framework/util/point.h>
-#include "config.h"
 #include "const.h"
 
 #include <array>
@@ -190,7 +189,7 @@ public:
 
     Otc::Direction getDirectionFromPosition(const Position& position) const { return getDirectionFromPositions(*this, position); }
 
-    bool isMapPosition() const { return ((x >= 0) && (y >= 0) && (x < UINT16_MAX) && (y < UINT16_MAX) && (z <= MAX_Z)); }
+    bool isMapPosition() const;
     bool isValid() const { return !(x == UINT16_MAX && y == UINT16_MAX && z == UINT8_MAX); }
     double distance(const Position& pos) const { return sqrt(pow<int32_t>(pos.x - x, 2) + pow<int32_t>(pos.y - y, 2)); }
     uint16_t manhattanDistance(const Position& pos) const { return static_cast<uint16_t>(std::abs(pos.x - x) + std::abs(pos.y - y)); }
@@ -252,50 +251,10 @@ public:
     // operator less than for stdext::map
     bool operator<(const Position& other) const { return x < other.x || y < other.y || z < other.z; }
 
-    bool up(int8_t n = 1)
-    {
-        const int8_t nz = z - n;
-        if (nz >= 0 && nz <= MAX_Z) {
-            z = nz;
-            return true;
-        }
-        return false;
-    }
-
-    bool down(int8_t n = 1)
-    {
-        const int8_t nz = z + n;
-        if (nz >= 0 && nz <= MAX_Z) {
-            z = nz;
-            return true;
-        }
-
-        return false;
-    }
-
-    bool coveredUp(int8_t n = 1)
-    {
-        const int32_t nx = x + n, ny = y + n;
-        const int8_t nz = z - n;
-        if (nx >= 0 && nx <= UINT16_MAX && ny >= 0 && ny <= UINT16_MAX && nz >= 0 && nz <= MAX_Z) {
-            x = nx; y = ny; z = nz;
-            return true;
-        }
-
-        return false;
-    }
-
-    bool coveredDown(int8_t n = 1)
-    {
-        const int32_t nx = x - n, ny = y - n;
-        const int8_t nz = z + n;
-        if (nx >= 0 && nx <= UINT16_MAX && ny >= 0 && ny <= UINT16_MAX && nz >= 0 && nz <= MAX_Z) {
-            x = nx; y = ny; z = nz;
-            return true;
-        }
-
-        return false;
-    }
+    bool up(int8_t n = 1);
+    bool down(int8_t n = 1);
+    bool coveredUp(int8_t n = 1);
+    bool coveredDown(int8_t n = 1);
 
     std::string toString() const
     {

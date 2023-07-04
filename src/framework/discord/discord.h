@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include <client/config.h>
+#include <framework/config.h>
 
 #if ENABLE_DISCORD_RPC == 1
 

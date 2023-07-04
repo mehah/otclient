@@ -1,0 +1,36 @@
+game
+  sprite-size: 32
+  last-supported-version: 1316
+  
+  map
+    viewport: 8 6
+    max-z: 15
+    sea-floor: 7
+    underground-floor: 8
+    aware-underground-floor-range: 2
+
+  tile
+    max-elevation: 24
+    max-things: 10
+    transparent-floor-view-range: 2
+
+  creature
+    force-new-walking-formula: true
+    shield-blink-ticks: 500
+    volatile-square-duration: 1000
+    adjust-creature-information-based-crop-size: false
+
+  render
+    invisible-ticks-per-frame: 500
+    item-ticks-per-frame: 500
+    effect-ticks-per-frame: 75
+    missile-ticks-per-frame: 75
+    animated-text-duration: 1000
+    static-duration-per-character: 60
+    min-static-text-duration: 3000
+
+font
+  widget: verdana-11px-antialised
+  static-text: verdana-11px-rounded
+  animated-text: verdana-11px-rounded
+  creature-text: verdana-11px-rounded

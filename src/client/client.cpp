@@ -36,6 +36,7 @@ void Client::init(std::vector<std::string>& /*args*/)
     // register needed lua functions
     registerLuaFunctions();
 
+    g_gameConfig.init();
     g_map.init();
     g_minimap.init();
     g_game.init();
@@ -57,4 +58,5 @@ void Client::terminate()
     g_sprites.terminate();
     g_spriteAppearances.terminate();
     g_shaders.terminate();
+    g_gameConfig.terminate();
 }

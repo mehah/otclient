@@ -32,7 +32,6 @@
 #include <framework/core/filestream.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/ui/uiwidget.h>
-#include <framework/xml/tinyxml.h>
 
 #include "houses.h"
 #include "towns.h"
@@ -308,7 +307,7 @@ void Map::saveOtbm(const std::string& fileName)
                 int pz = -1;
                 bool firstNode = true;
 
-                for (uint8_t z = 0; z <= MAX_Z; ++z) {
+                for (uint8_t z = 0; z <= g_gameConfig.getMapMaxZ(); ++z) {
                     for (const auto& it : m_tileBlocks[z]) {
                         const TileBlock& block = it.second;
                         for (const TilePtr& tile : block.getTiles()) {
@@ -511,7 +510,7 @@ void Map::saveOtcm(const std::string& fileName)
         fin->addU16(start);
         fin->seek(start);
 
-        for (uint8_t z = 0; z <= MAX_Z; ++z) {
+        for (uint8_t z = 0; z <= g_gameConfig.getMapMaxZ(); ++z) {
             for (const auto& it : m_tileBlocks[z]) {
                 const TileBlock& block = it.second;
                 for (const TilePtr& tile : block.getTiles()) {

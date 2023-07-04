@@ -37,6 +37,7 @@ bool Module::load()
     if (!m_supportedDevices.empty() && !hasSupportedDevice(g_platform.getDevice()))
         return true;
 
+    g_modules.m_currentModule = static_self_cast<Module>();
     try {
         // add to package.loaded
         g_lua.getGlobalField("package", "loaded");
@@ -44,7 +45,7 @@ bool Module::load()
         g_lua.setField(m_name);
         g_lua.pop();
 
-        for (const std::string& depName : m_dependencies) {
+        for (const auto& depName : m_dependencies) {
             if (depName == m_name)
                 throw Exception("cannot depend on itself");
 
@@ -62,7 +63,7 @@ bool Module::load()
         if (m_sandboxed)
             g_lua.setGlobalEnvironment(m_sandboxEnv);
 
-        for (const std::string& script : m_scripts) {
+        for (const auto& script : m_scripts) {
             g_lua.loadScript(script);
             g_lua.safeCall(0, 0);
         }
@@ -93,18 +94,23 @@ bool Module::load()
         if (m_sandboxed)
             g_lua.resetGlobalEnvironment();
         g_logger.error(stdext::format("Unable to load module '%s': %s", m_name, e.what()));
+
+        g_modules.m_currentModule = nullptr;
+
         return false;
     }
 
     g_modules.updateModuleLoadOrder(asModule());
 
-    for (const std::string& modName : m_loadLaterModules) {
+    for (const auto& modName : m_loadLaterModules) {
         const auto& dep = g_modules.getModule(modName);
         if (!dep)
             g_logger.error(stdext::format("Unable to find module '%s' required by '%s'", modName, m_name));
         else if (!dep->isLoaded())
             dep->load();
     }
+
+    g_modules.m_currentModule = nullptr;
 
     return true;
 }
@@ -169,7 +175,7 @@ bool Module::hasDependency(const std::string_view name, bool recursive)
         return true;
 
     if (recursive) {
-        for (const std::string& depName : m_dependencies) {
+        for (const auto& depName : m_dependencies) {
             if (const auto& dep = g_modules.getModule(depName)) {
                 if (dep->hasDependency(name, true))
                     return true;
@@ -229,8 +235,26 @@ void Module::discover(const OTMLNodePtr& moduleNode)
     }
 
     if (const auto& node = moduleNode->get("scripts")) {
-        for (const auto& tmp : node->children())
-            m_scripts.emplace_back(stdext::resolve_path(tmp->value(), node->source()));
+        for (const auto& tmp : node->children()) {
+            auto path = std::filesystem::path(stdext::resolve_path(tmp->value(), node->source())).replace_extension().string();
+
+            if (path.ends_with('*')) {
+                path.pop_back();
+                if (path.ends_with('/'))
+                    path.pop_back();
+
+                for (auto filePath : g_resources.listDirectoryFiles(path, true, false, true)) {
+                    if (g_resources.isFileType(filePath, "lua")) {
+                        filePath = std::filesystem::path(filePath).replace_extension().string();
+
+                        auto foundElement = std::find(m_scripts.begin(), m_scripts.end(), filePath);
+                        if (m_scripts.end() == foundElement)
+                            m_scripts.emplace_back(filePath);
+                    }
+                }
+            } else
+                m_scripts.emplace_back(path);
+        }
     }
 
     if (const auto& node = moduleNode->get("load-later")) {

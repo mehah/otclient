@@ -33,7 +33,7 @@ public:
     void login(const std::string_view accountName, const std::string_view accountPassword, const std::string_view host, uint16_t port, const std::string_view characterName, const std::string_view authenticatorToken, const std::string_view sessionKey);
     void send(const OutputMessagePtr& outputMessage) override;
 
-    void sendExtendedOpcode(uint8_t opcode, const std::string_view buffer);
+    void sendExtendedOpcode(uint8_t opcode, const std::string& buffer);
     void sendLoginPacket(uint32_t challengeTimestamp, uint8_t challengeRandom);
     void sendEnterGame();
     void sendLogout();
@@ -294,9 +294,16 @@ private:
     void parseMarketDetail(const InputMessagePtr& msg);
     void parseMarketBrowse(const InputMessagePtr& msg);
 
+    // 13x
+    void parseBosstiaryData(const InputMessagePtr& msg);
+    void parseBosstiarySlots(const InputMessagePtr& msg);
+    void parseBosstiaryCooldownTimer(const InputMessagePtr& msg);
+    void parseBosstiaryEntryChanged(const InputMessagePtr& msg);
+
     void parseAttachedEffect(const InputMessagePtr& msg);
     void parseDetachEffect(const InputMessagePtr& msg);
     void parseCreatureShader(const InputMessagePtr& msg);
+    void parseMapShader(const InputMessagePtr& msg);
 
     MarketOffer readMarketOffer(const InputMessagePtr& msg, uint8_t action, uint16_t var);
 

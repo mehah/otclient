@@ -71,6 +71,8 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
     for (const auto& node : styleNode->children()) {
         if (node->tag() == "color")
             setColor(node->value<Color>());
+        else if (node->tag() == "shader")
+            setShader(node->value());
         else if (node->tag() == "x")
             setX(node->value<int>());
         else if (node->tag() == "y")
@@ -400,7 +402,7 @@ void UIWidget::drawIcon(const Rect& screenCoords) const
 
 void UIWidget::setIcon(const std::string& iconFile)
 {
-    g_mainDispatcher.addEvent([&, iconFile = iconFile]() {
+    g_dispatcher.addEvent([&, iconFile = iconFile]() {
         m_icon = iconFile.empty() ? nullptr : g_textures.getTexture(iconFile);
         if (m_icon && !m_iconClipRect.isValid()) {
             m_iconClipRect = Rect(0, 0, m_icon->getSize());

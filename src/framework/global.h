@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include <client/config.h>
+#include "config.h"
 
 #include "stdext/compiler.h"
 

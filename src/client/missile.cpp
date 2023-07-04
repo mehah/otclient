@@ -26,14 +26,13 @@
 #include "thingtypemanager.h"
 #include "tile.h"
 
-void Missile::drawMissile(const Point& dest, LightView* lightView)
+void Missile::draw(const Point& dest, bool drawThings, LightView* lightView)
 {
     if (!canDraw() || isHided())
         return;
 
     const float fraction = m_animationTimer.ticksElapsed() / m_duration;
-    getThingType()->draw(dest + m_delta * fraction * g_drawPool.getScaleFactor(), 0, m_numPatternX, m_numPatternY, 0, 0,
-                         Otc::DrawThings | Otc::DrawLights, Color::white, lightView, m_drawConductor);
+    getThingType()->draw(dest + m_delta * fraction * g_drawPool.getScaleFactor(), 0, m_numPatternX, m_numPatternY, 0, 0, Color::white, drawThings, lightView, m_drawConductor);
 }
 
 void Missile::setPath(const Position& fromPosition, const Position& toPosition)
@@ -49,8 +48,8 @@ void Missile::setPath(const Position& fromPosition, const Position& toPosition)
 
     m_direction = fromPosition.getDirectionFromPosition(toPosition);
 
-    m_duration = (MISSILE_TICKS_PER_FRAME * 2) * std::sqrt(deltaLength);
-    m_delta *= SPRITE_SIZE;
+    m_duration = (g_gameConfig.getMissileTicksPerFrame() * 2) * std::sqrt(deltaLength);
+    m_delta *= g_gameConfig.getSpriteSize();
     m_animationTimer.restart();
     m_distance = fromPosition.distance(toPosition);
 

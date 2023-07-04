@@ -35,16 +35,9 @@ Tile::Tile(const Position& position) : m_position(position) {}
 
 void Tile::drawThing(const ThingPtr& thing, const Point& dest, int flags, LightView* lightView)
 {
-    const bool isMarked = m_selectType != TileSelectType::NONE && m_highlightThing == thing;
-    thing->setMarkColor(isMarked ? Color::yellow : Color::white);
-
-    thing->draw(dest, flags, lightView);
-
-    if (thing->isItem()) {
-        m_drawElevation += thing->getElevation();
-        if (m_drawElevation > MAX_ELEVATION)
-            m_drawElevation = MAX_ELEVATION;
-    }
+    thing->draw(dest - m_drawElevation * g_drawPool.getScaleFactor(), flags & Otc::DrawThings, lightView);
+    if (thing->hasElevation())
+        m_drawElevation = std::min<uint8_t>(m_drawElevation + thing->getElevation(), g_gameConfig.getTileMaxElevation());
 }
 
 void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, LightView* lightView)
@@ -56,14 +49,14 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool is
         if (!thing->isGround() && !thing->isGroundBorder() && !thing->isOnBottom())
             break;
 
-        drawThing(thing, dest - m_drawElevation * g_drawPool.getScaleFactor(), flags, lightView);
+        drawThing(thing, dest, flags, lightView);
     }
 
     if (hasCommonItem()) {
         for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
             const auto& item = *it;
             if (!item->isCommon()) continue;
-            drawThing(item, dest - m_drawElevation * g_drawPool.getScaleFactor(), flags, lightView);
+            drawThing(item, dest, flags, lightView);
         }
     }
 
@@ -86,18 +79,17 @@ void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags,
         for (const auto& thing : m_things) {
             if (!thing->isCreature() || thing->static_self_cast<Creature>()->isWalking()) continue;
 
-            const Point& cDest = dest - m_drawElevation * g_drawPool.getScaleFactor();
-            drawThing(thing, cDest, flags, lightView);
-            thing->static_self_cast<Creature>()->drawInformation(mapRect, cDest, isCovered, flags);
+            drawThing(thing, dest, flags, lightView);
+            thing->static_self_cast<Creature>()->drawInformation(mapRect, dest - m_drawElevation * g_drawPool.getScaleFactor(), isCovered, flags);
         }
     }
 
     for (const auto& creature : m_walkingCreatures) {
         const auto& cDest = Point(
-            dest.x + ((creature->getPosition().x - m_position.x) * SPRITE_SIZE - m_drawElevation) * g_drawPool.getScaleFactor(),
-            dest.y + ((creature->getPosition().y - m_position.y) * SPRITE_SIZE - m_drawElevation) * g_drawPool.getScaleFactor()
+            dest.x + ((creature->getPosition().x - m_position.x) * g_gameConfig.getSpriteSize() - m_drawElevation) * g_drawPool.getScaleFactor(),
+            dest.y + ((creature->getPosition().y - m_position.y) * g_gameConfig.getSpriteSize() - m_drawElevation) * g_drawPool.getScaleFactor()
         );
-        drawThing(creature, cDest, flags, lightView);
+        creature->draw(cDest, flags & Otc::DrawThings, lightView);
         creature->drawInformation(mapRect, cDest, isCovered, flags);
     }
 }
@@ -107,24 +99,13 @@ void Tile::drawTop(const Point& dest, int flags, bool forceDraw, LightView* ligh
     if (!forceDraw && !m_drawTopAndCreature)
         return;
 
-    if (hasEffect()) {
-        int offsetX = 0,
-            offsetY = 0;
-
-        if (g_game.getFeature(Otc::GameMapOldEffectRendering)) {
-            offsetX = m_position.x - g_map.getCentralPosition().x;
-            offsetY = m_position.y - g_map.getCentralPosition().y;
-        }
-
-        for (const auto& effect : m_effects) {
-            effect->drawEffect(dest - m_drawElevation * g_drawPool.getScaleFactor(), flags, offsetX, offsetY, lightView);
-        }
-    }
+    for (const auto& effect : m_effects)
+        drawThing(effect, dest, flags & Otc::DrawThings, lightView);
 
     if (hasTopItem()) {
         for (const auto& item : m_things) {
             if (!item->isOnTop()) continue;
-            drawThing(item, dest, flags, lightView);
+            item->draw(dest, flags & Otc::DrawThings, lightView);
         }
     }
 }
@@ -152,10 +133,11 @@ void Tile::addWalkingCreature(const CreaturePtr& creature)
 void Tile::removeWalkingCreature(const CreaturePtr& creature)
 {
     const auto it = std::find(m_walkingCreatures.begin(), m_walkingCreatures.end(), creature);
-    if (it != m_walkingCreatures.end()) {
-        m_walkingCreatures.erase(it);
-        recalculateThingFlag();
-    }
+    if (it == m_walkingCreatures.end())
+        return;
+
+    m_walkingCreatures.erase(it);
+    recalculateThingFlag();
 }
 
 // TODO: Need refactoring
@@ -236,8 +218,8 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
     setThingFlag(thing);
     checkForDetachableThing();
 
-    if (size > MAX_THINGS)
-        removeThing(m_things[MAX_THINGS]);
+    if (size > g_gameConfig.getTileMaxThings())
+        removeThing(m_things[g_gameConfig.getTileMaxThings()]);
 
     // Do not change if you do not understand what is being done.
     {
@@ -314,11 +296,6 @@ int Tile::getThingStackPos(const ThingPtr& thing)
     }
 
     return -1;
-}
-
-bool Tile::hasThing(const ThingPtr& thing)
-{
-    return std::find(m_things.begin(), m_things.end(), thing) != m_things.end();
 }
 
 ThingPtr Tile::getTopThing()
@@ -530,7 +507,7 @@ bool Tile::isCompletelyCovered(uint8_t firstFloor, bool resetCache)
         return false;
 
     const uint32_t idChecked = 1 << firstFloor;
-    const uint32_t idState = 1 << (firstFloor + MAX_Z);
+    const uint32_t idState = 1 << (firstFloor + g_gameConfig.getMapMaxZ());
     if ((m_isCompletelyCovered & idChecked) == 0) {
         m_isCompletelyCovered |= idChecked;
         if (g_map.isCompletelyCovered(m_position, firstFloor)) {
@@ -548,7 +525,7 @@ bool Tile::isCovered(int8_t firstFloor)
     if (m_position.z == 0 || m_position.z == firstFloor) return false;
 
     const uint32_t idChecked = 1 << firstFloor;
-    const uint32_t idState = 1 << (firstFloor + MAX_Z);
+    const uint32_t idState = 1 << (firstFloor + g_gameConfig.getMapMaxZ());
 
     if ((m_isCovered & idChecked) == 0) {
         m_isCovered |= idChecked;
@@ -557,27 +534,6 @@ bool Tile::isCovered(int8_t firstFloor)
     }
 
     return (m_isCovered & idState) == idState;
-}
-
-bool Tile::isClickable()
-{
-    bool hasGround = false;
-    bool hasOnBottom = false;
-    bool hasIgnoreLook = false;
-    for (const auto& thing : m_things) {
-        if (thing->isGround())
-            hasGround = true;
-        else if (thing->isOnBottom())
-            hasOnBottom = true;
-
-        if (thing->isIgnoreLook())
-            hasIgnoreLook = true;
-
-        if ((hasGround || hasOnBottom) && !hasIgnoreLook)
-            return true;
-    }
-
-    return false;
 }
 
 void Tile::onAddInMapView()
@@ -711,17 +667,28 @@ void Tile::setThingFlag(const ThingPtr& thing)
     if (hasElevation())
         m_thingTypeFlag |= TileThingType::HAS_THING_WITH_ELEVATION;
 
+    if (thing->isIgnoreLook())
+        m_thingTypeFlag |= TileThingType::IGNORE_LOOK;
+
     // best option to have something more real, but in some cases as a custom project,
     // the developers are not defining crop size
-    //if(thing->getRealSize() > SPRITE_SIZE)
+    //if(thing->getRealSize() > g_gameConfig.getSpriteSize())
     if (!thing->isSingleDimension() || thing->hasElevation() || thing->hasDisplacement())
         m_thingTypeFlag |= TileThingType::NOT_SINGLE_DIMENSION;
 
-    if (thing->getHeight() > 1)
+    if (thing->getHeight() > 1) {
         m_thingTypeFlag |= TileThingType::HAS_TALL_THINGS;
 
-    if (thing->getWidth() > 1)
+        if (thing->getHeight() > 2)
+            m_thingTypeFlag |= TileThingType::HAS_TALL_THINGS_2;
+    }
+
+    if (thing->getWidth() > 1) {
         m_thingTypeFlag |= TileThingType::HAS_WIDE_THINGS;
+
+        if (thing->getWidth() > 2)
+            m_thingTypeFlag |= TileThingType::HAS_WIDE_THINGS_2;
+    }
 
     if (!thing->isItem()) return;
 
@@ -749,16 +716,22 @@ void Tile::setThingFlag(const ThingPtr& thing)
 
 void Tile::select(TileSelectType selectType)
 {
-    if (selectType == TileSelectType::NO_FILTERED) {
+    if (selectType == TileSelectType::NO_FILTERED && !isEmpty()) {
         if (!(m_highlightThing = getTopCreature()))
             m_highlightThing = m_things.back();
     }
+
+    if (m_highlightThing)
+        m_highlightThing->setMarkColor(Color::yellow);
 
     m_selectType = selectType;
 }
 
 void Tile::unselect()
 {
+    if (m_highlightThing)
+        m_highlightThing->setMarkColor(Color::white);
+
     if (m_selectType == TileSelectType::NO_FILTERED)
         checkForDetachableThing();
 
@@ -776,9 +749,9 @@ bool Tile::canRender(uint32_t& flags, const Position& cameraPosition, const Awar
     {
         if ((cameraPosition.x - checkPos.x >= viewPort.left) || (checkPos.x - cameraPosition.x == viewPort.right && !hasWideThings() && !hasDisplacement() && !hasThingWithElevation() && m_walkingCreatures.empty()))
             draw = false;
-        else if ((cameraPosition.y - checkPos.y >= viewPort.top) || (checkPos.y - cameraPosition.y == viewPort.bottom && !hasTallThings() && !hasDisplacement() && !hasThingWithElevation() && m_walkingCreatures.empty()))
+        else if ((cameraPosition.y - checkPos.y >= viewPort.top) || (checkPos.y - cameraPosition.y == viewPort.bottom && !hasTallThings() && !hasWideThings2() && !hasDisplacement() && !hasThingWithElevation() && m_walkingCreatures.empty()))
             draw = false;
-        else if ((checkPos.x - cameraPosition.x > viewPort.right && (!hasWideThings() || !hasDisplacement() || !hasThingWithElevation())) || (checkPos.y - cameraPosition.y > viewPort.bottom))
+        else if (((checkPos.x - cameraPosition.x > viewPort.right && (!hasWideThings() || !hasDisplacement() || !hasThingWithElevation())) || (checkPos.y - cameraPosition.y > viewPort.bottom)) && !hasTallThings2())
             draw = false;
     }
 

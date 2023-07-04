@@ -21,6 +21,7 @@
  */
 
 #include <framework/core/eventdispatcher.h>
+#include <framework/util/crypt.h>
 
 #include <utility>
 
@@ -66,7 +67,7 @@ int Http::get(const std::string& url, int timeout)
         result->operationId = operationId;
         m_operations[operationId] = result;
         const auto& session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
-                                                     false, result, [&](HttpResult_ptr result) {
+                                                     false, true, result, [&](HttpResult_ptr result) {
             bool finished = result->finished;
             g_dispatcher.addEvent([result, finished] {
                 if (!finished) {
@@ -86,7 +87,7 @@ int Http::get(const std::string& url, int timeout)
     return operationId;
 }
 
-int Http::post(const std::string& url, const std::string& data, int timeout, bool isJson)
+int Http::post(const std::string& url, const std::string& data, int timeout, bool isJson, bool checkContentLength)
 {
     if (!timeout) // lua is not working with default values
         timeout = 5;
@@ -96,14 +97,14 @@ int Http::post(const std::string& url, const std::string& data, int timeout, boo
     }
 
     int operationId = m_operationId++;
-    asio::post(m_ios, [&, url, data, timeout, isJson, operationId] {
+    asio::post(m_ios, [&, url, data, timeout, isJson, checkContentLength, operationId] {
         auto result = std::make_shared<HttpResult>();
         result->url = url;
         result->operationId = operationId;
         result->postData = data;
         m_operations[operationId] = result;
         const auto& session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
-                                                     isJson, result, [&](HttpResult_ptr result) {
+                                                     isJson, checkContentLength, result, [&](HttpResult_ptr result) {
             bool finished = result->finished;
             g_dispatcher.addEvent([result, finished] {
                 if (!finished) {
@@ -134,7 +135,7 @@ int Http::download(const std::string& url, const std::string& path, int timeout)
         result->operationId = operationId;
         m_operations[operationId] = result;
         const auto& session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
-                                                     false, result, [&, path](HttpResult_ptr result) {
+                                                     false, true, result, [&, path](HttpResult_ptr result) {
             if (!result->finished) {
                 g_dispatcher.addEvent([result] {
                     g_lua.callGlobalField("g_http", "onDownloadProgress", result->operationId, result->url, result->progress, result->speed);
@@ -142,9 +143,7 @@ int Http::download(const std::string& url, const std::string& path, int timeout)
                 return;
             }
 
-            const uint32_t  crc = crc32(0L, Z_NULL, 0);
-            uint32_t checksum = crc32(crc, (const unsigned char*)result->response.c_str(), result->response.size());
-
+            auto checksum = g_crypt.crc32(result->response, false);
             g_dispatcher.addEvent([this, result, path, checksum] {
                 if (result->error.empty()) {
                     if (!path.empty() && path[0] == '/')
@@ -417,6 +416,9 @@ void HttpSession::on_request_sent(const std::error_code& ec, size_t /*bytes_tran
                     header.c_str() + pos + sizeof("Content-Length: ") - 1,
                     nullptr, 10);
                 m_result->size = len - m_response.size();
+            } else if (m_checkContentLength) {
+                onError("HttpSession error receiving header " + m_url + ": " + "Content-Length not found");
+                return;
             }
 
             asio::async_read(m_socket, m_response,

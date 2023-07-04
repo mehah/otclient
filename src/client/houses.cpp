@@ -27,6 +27,8 @@
 
 #include <framework/core/resourcemanager.h>
 
+#include <pugixml.hpp>
+
 HouseManager g_houses;
 
 House::House(uint32_t hId, const std::string_view name, const Position& pos)
@@ -67,39 +69,39 @@ void House::removeDoorById(uint32_t doorId)
     m_doors[doorId] = nullptr;
 }
 
-void House::load(const TiXmlElement* elem)
+void House::load(const pugi::xml_node& node)
 {
-    std::string name = elem->Attribute("name");
+    std::string name = node.attribute("name").as_string();
     if (name.empty())
         name = stdext::format("Unnamed house #%lu", getId());
 
     setName(name);
-    setRent(elem->readType<uint32_t >("rent"));
-    setSize(elem->readType<uint32_t >("size"));
-    setTownId(elem->readType<uint32_t >("townid"));
-    m_isGuildHall = elem->readType<bool>("guildhall");
+    setRent(node.attribute("rent").as_uint());
+    setSize(node.attribute("size").as_uint());
+    setTownId(node.attribute("townid").as_uint());
+    m_isGuildHall = node.attribute("guildhall").as_bool();
 
     Position entryPos;
-    entryPos.x = elem->readType<int>("entryx");
-    entryPos.y = elem->readType<int>("entryy");
-    entryPos.z = elem->readType<int>("entryz");
+    entryPos.x = node.attribute("entryx").as_int();
+    entryPos.y = node.attribute("entryy").as_int();
+    entryPos.z = node.attribute("entryz").as_int();
     setEntry(entryPos);
 }
 
-void House::save(TiXmlElement* elem)
+void House::save(pugi::xml_node& node)
 {
-    elem->SetAttribute("name", getName());
-    elem->SetAttribute("houseid", getId());
+    node.append_attribute("name").set_value(getName().c_str());
+    node.append_attribute("houseid").set_value(getId());
 
     const Position entry = getEntry();
-    elem->SetAttribute("entryx", entry.x);
-    elem->SetAttribute("entryy", entry.y);
-    elem->SetAttribute("entryz", entry.z);
+    node.append_attribute("entryx").set_value(entry.x);
+    node.append_attribute("entryy").set_value(entry.y);
+    node.append_attribute("entryz").set_value(entry.z);
 
-    elem->SetAttribute("rent", getRent());
-    elem->SetAttribute("townid", getTownId());
-    elem->SetAttribute("size", getSize());
-    elem->SetAttribute("guildhall", m_isGuildHall);
+    node.append_attribute("rent").set_value(getRent());
+    node.append_attribute("townid").set_value(getTownId());
+    node.append_attribute("size").set_value(getSize());
+    node.append_attribute("guildhall").set_value(m_isGuildHall);
 }
 
 HouseManager::HouseManager()
@@ -134,20 +136,15 @@ HousePtr HouseManager::getHouseByName(const std::string_view name)
 void HouseManager::load(const std::string& fileName)
 {
     try {
-        TiXmlDocument doc;
-        doc.Parse(g_resources.readFileContents(fileName).c_str());
-        if (doc.Error())
-            throw Exception("failed to load '%s': %s (House XML)", fileName, doc.ErrorDesc());
+        pugi::xml_document doc;
+        doc.load_string(g_resources.readFileContents(fileName).c_str());
+        pugi::xml_node root = doc.child("houses");
 
-        TiXmlElement* root = doc.FirstChildElement();
-        if (!root || root->ValueTStr() != "houses")
+        if (!root)
             throw Exception("invalid root tag name");
 
-        for (TiXmlElement* elem = root->FirstChildElement(); elem; elem = elem->NextSiblingElement()) {
-            if (elem->ValueTStr() != "house")
-                throw Exception("invalid house tag.");
-
-            const auto houseId = elem->readType<uint32_t >("houseid");
+        for (pugi::xml_node elem = root.child("house"); elem; elem = elem.next_sibling("house")) {
+            const auto houseId = elem.child("houseid").text().as_uint();
             HousePtr house = getHouse(houseId);
             if (!house)
                 house = std::make_shared<House>(houseId), addHouse(house);
@@ -163,23 +160,22 @@ void HouseManager::load(const std::string& fileName)
 void HouseManager::save(const std::string& fileName)
 {
     try {
-        TiXmlDocument doc;
-        doc.SetTabSize(2);
+        pugi::xml_document doc;
+        auto decl = doc.append_child(pugi::node_declaration);
+        decl.append_attribute("version") = "1.0";
+        decl.append_attribute("encoding") = "UTF-8";
+        decl.append_attribute("standalone") = "";
 
-        auto* const decl = new TiXmlDeclaration("1.0", "UTF-8", "");
-        doc.LinkEndChild(decl);
-
-        auto* const root = new TiXmlElement("houses");
-        doc.LinkEndChild(root);
+        auto root = doc.append_child("houses");
 
         for (const auto& house : m_houses) {
-            auto* const elem = new TiXmlElement("house");
+            auto elem = root.append_child("house");
             house->save(elem);
-            root->LinkEndChild(elem);
         }
 
-        if (!doc.SaveFile("data" + fileName))
-            throw Exception("failed to save houses XML %s: %s", fileName, doc.ErrorDesc());
+        if (!doc.save_file(("data" + fileName).c_str(), "\t", pugi::format_default, pugi::encoding_utf8)) {
+            throw Exception("failed to save houses XML %s", fileName);
+        }
     } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
     }
