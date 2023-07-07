@@ -643,8 +643,6 @@ void Creature::terminateWalk(const bool isPreWalking)
     m_walkedPixels = 0;
     m_walkOffset = {};
     m_walking = false;
-
-
 }
 
 void Creature::setHealthPercent(uint8_t healthPercent)
