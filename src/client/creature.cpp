@@ -614,12 +614,6 @@ void Creature::updateWalk()
 
 void Creature::terminateWalk(const bool isPreWalking)
 {
-    // remove any scheduled walk update
-    if (m_walkUpdateEvent) {
-        m_walkUpdateEvent->cancel();
-        m_walkUpdateEvent = nullptr;
-    }
-
     const auto self = static_self_cast<Creature>();
     m_walkFinishAnimEvent = g_dispatcher.scheduleEvent([self] {
         self->m_walkAnimationPhase = 0;
@@ -628,6 +622,12 @@ void Creature::terminateWalk(const bool isPreWalking)
 
     if (isPreWalking)
         return;
+
+    // remove any scheduled walk update
+    if (m_walkUpdateEvent) {
+        m_walkUpdateEvent->cancel();
+        m_walkUpdateEvent = nullptr;
+    }
 
     // now the walk has ended, do any scheduled turn
     if (m_walkTurnDirection != Otc::InvalidDirection) {
