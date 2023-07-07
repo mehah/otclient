@@ -505,6 +505,7 @@ void Creature::updateWalkAnimation()
         return;
 
     int minFootDelay = 20;
+    int maxFootDelay = footAnimPhases > 2 ? 80 : 205;
     int footAnimDelay = footAnimPhases;
 
     if (g_game.getFeature(Otc::GameEnhancedAnimations) && footAnimPhases > 2) {
@@ -513,7 +514,7 @@ void Creature::updateWalkAnimation()
             footAnimDelay /= 1.5;
     }
 
-    const int footDelay = std::clamp<int>(m_stepCache.getDuration(m_lastStepDirection) / footAnimDelay, minFootDelay, 80);
+    const int footDelay = std::clamp<int>(m_stepCache.getDuration(m_lastStepDirection) / footAnimDelay, minFootDelay, maxFootDelay);
 
     if (m_footTimer.ticksElapsed() >= footDelay) {
         if (m_walkAnimationPhase == footAnimPhases) m_walkAnimationPhase = 1;
