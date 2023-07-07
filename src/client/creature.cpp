@@ -607,18 +607,27 @@ void Creature::updateWalk(const bool isPreWalking)
     updateWalkOffset(m_walkedPixels);
     updateWalkingTile();
 
-    if (!isPreWalking && m_walkedPixels == g_gameConfig.getSpriteSize()) {
-        terminateWalk();
+    if (m_walkedPixels == g_gameConfig.getSpriteSize()) {
+        terminateWalk(isPreWalking);
     }
 }
 
-void Creature::terminateWalk()
+void Creature::terminateWalk(const bool isPreWalking)
 {
     // remove any scheduled walk update
     if (m_walkUpdateEvent) {
         m_walkUpdateEvent->cancel();
         m_walkUpdateEvent = nullptr;
     }
+
+    const auto self = static_self_cast<Creature>();
+    m_walkFinishAnimEvent = g_dispatcher.scheduleEvent([self] {
+        self->m_walkAnimationPhase = 0;
+        self->m_walkFinishAnimEvent = nullptr;
+    }, g_game.getServerBeat());
+
+    if (isPreWalking)
+        return;
 
     // now the walk has ended, do any scheduled turn
     if (m_walkTurnDirection != Otc::InvalidDirection) {
@@ -635,11 +644,7 @@ void Creature::terminateWalk()
     m_walkOffset = {};
     m_walking = false;
 
-    const auto self = static_self_cast<Creature>();
-    m_walkFinishAnimEvent = g_dispatcher.scheduleEvent([self] {
-        self->m_walkAnimationPhase = 0;
-        self->m_walkFinishAnimEvent = nullptr;
-    }, g_game.getServerBeat());
+
 }
 
 void Creature::setHealthPercent(uint8_t healthPercent)
