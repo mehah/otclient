@@ -594,7 +594,7 @@ void Creature::nextWalkUpdate()
     }, m_stepCache.walkDuration);
 }
 
-void Creature::updateWalk(const bool isPreWalking)
+void Creature::updateWalk()
 {
     const float walkTicksPerPixel = getStepDuration(true) / static_cast<float>(g_gameConfig.getSpriteSize());
 
@@ -608,7 +608,7 @@ void Creature::updateWalk(const bool isPreWalking)
     updateWalkingTile();
 
     if (m_walkedPixels == g_gameConfig.getSpriteSize()) {
-        terminateWalk(isPreWalking);
+        terminateWalk();
     }
 }
 
