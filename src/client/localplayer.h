@@ -120,7 +120,7 @@ protected:
     void updateWalk(const bool /*isPreWalking*/ = false) override { Creature::updateWalk(m_preWalking); }
     void stopWalk() override;
     void updateWalkOffset(uint8_t totalPixelsWalked) override;
-    void terminateWalk();
+    void terminateWalk() override;
 
     friend class Game;
 

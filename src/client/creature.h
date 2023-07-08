@@ -149,8 +149,8 @@ public:
 protected:
     virtual void updateWalkOffset(uint8_t totalPixelsWalked);
     virtual void updateWalk(bool isPreWalking = false);
+    virtual void terminateWalk();
 
-    void terminateWalk();
     void onDeath();
     void onPositionChange(const Position& newPos, const Position& oldPos) override;
 
