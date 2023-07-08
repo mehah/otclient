@@ -594,7 +594,7 @@ void Creature::nextWalkUpdate()
     }, m_stepCache.walkDuration);
 }
 
-void Creature::updateWalk()
+void Creature::updateWalk(const bool isPreWalking)
 {
     const float walkTicksPerPixel = getStepDuration(true) / static_cast<float>(g_gameConfig.getSpriteSize());
 
@@ -608,21 +608,19 @@ void Creature::updateWalk()
     updateWalkingTile();
 
     if (m_walkedPixels == g_gameConfig.getSpriteSize()) {
-        terminateWalk();
+        if (!isPreWalking)
+            terminateWalk();
+
+        const auto self = static_self_cast<Creature>();
+        m_walkFinishAnimEvent = g_dispatcher.scheduleEvent([self] {
+            self->m_walkAnimationPhase = 0;
+            self->m_walkFinishAnimEvent = nullptr;
+        }, g_game.getServerBeat());
     }
 }
 
-void Creature::terminateWalk(const bool isPreWalking)
+void Creature::terminateWalk()
 {
-    const auto self = static_self_cast<Creature>();
-    m_walkFinishAnimEvent = g_dispatcher.scheduleEvent([self] {
-        self->m_walkAnimationPhase = 0;
-        self->m_walkFinishAnimEvent = nullptr;
-    }, g_game.getServerBeat());
-
-    if (isPreWalking)
-        return;
-
     // remove any scheduled walk update
     if (m_walkUpdateEvent) {
         m_walkUpdateEvent->cancel();
