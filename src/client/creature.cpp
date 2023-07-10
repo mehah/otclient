@@ -615,6 +615,7 @@ void Creature::updateWalk(const bool isPreWalking)
         m_walkFinishAnimEvent = g_dispatcher.scheduleEvent([self] {
             self->m_walkAnimationPhase = 0;
             self->m_walkFinishAnimEvent = nullptr;
+            self->terminateWalk();
         }, g_game.getServerBeat());
     }
 }
