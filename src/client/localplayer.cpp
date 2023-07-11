@@ -204,9 +204,9 @@ void LocalPlayer::updateWalkOffset(uint8_t totalPixelsWalked)
         m_walkOffset.x = -totalPixelsWalked;
 }
 
-void LocalPlayer::terminateWalk()
+void LocalPlayer::terminateWalk(bool onlyResetWalkAni)
 {
-    Creature::terminateWalk();
+    Creature::terminateWalk(onlyResetWalkAni);
     m_preWalking = false;
 }
 

@@ -608,19 +608,21 @@ void Creature::updateWalk(const bool isPreWalking)
     updateWalkingTile();
 
     if (m_walkedPixels == g_gameConfig.getSpriteSize()) {
-        if (!isPreWalking)
-            terminateWalk();
-
-        const auto self = static_self_cast<Creature>();
-        m_walkFinishAnimEvent = g_dispatcher.scheduleEvent([self] {
-            self->m_walkAnimationPhase = 0;
-            self->m_walkFinishAnimEvent = nullptr;
-        }, g_game.getServerBeat());
+        terminateWalk(isPreWalking);
     }
 }
 
-void Creature::terminateWalk()
+void Creature::terminateWalk(bool onlyResetWalkAni)
 {
+    const auto self = static_self_cast<Creature>();
+    m_walkFinishAnimEvent = g_dispatcher.scheduleEvent([self] {
+        self->m_walkAnimationPhase = 0;
+        self->m_walkFinishAnimEvent = nullptr;
+    }, g_game.getServerBeat());
+
+    if (onlyResetWalkAni)
+        return;
+
     // remove any scheduled walk update
     if (m_walkUpdateEvent) {
         m_walkUpdateEvent->cancel();
