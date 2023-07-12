@@ -1,9 +1,6 @@
 -- this is the first file executed when the application starts
 -- we have to load the first modules form here
 
--- set true so that modules are reloaded when modified. (Note: Use only dev mod)
-AUTO_RELOAD_MODULE = false
-
 -- updater
 Services = {
     --updater = "http://localhost/api/updater.php",
@@ -83,3 +80,6 @@ if g_app.hasUpdater() then
 end
 
 loadModules()
+
+-- uncomment the line below so that modules are reloaded when modified. (Note: Use only mod dev)
+-- g_modules.enableAutoReload()

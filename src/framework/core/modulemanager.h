@@ -40,6 +40,7 @@ public:
     ModulePtr getModule(const std::string_view moduleName);
     std::deque<ModulePtr> getModules() { return m_modules; }
     ModulePtr getCurrentModule() { return m_currentModule; }
+    void enableAutoReload();
 
 protected:
     void updateModuleLoadOrder(const ModulePtr& module);
