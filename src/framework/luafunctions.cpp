@@ -178,6 +178,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_modules", "getModule", &ModuleManager::getModule, &g_modules);
     g_lua.bindSingletonFunction("g_modules", "getModules", &ModuleManager::getModules, &g_modules);
     g_lua.bindSingletonFunction("g_modules", "getCurrentModule", &ModuleManager::getCurrentModule, &g_modules);
+    g_lua.bindSingletonFunction("g_modules", "enableAutoReload", &ModuleManager::enableAutoReload, &g_modules);
 
     // EventDispatcher
     g_lua.registerSingletonClass("g_dispatcher");
