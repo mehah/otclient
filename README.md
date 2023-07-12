@@ -14,7 +14,7 @@
 
 - C++20
 - Refactored/Optimized Rendering System
-- Auto Reload Module ([init.lua](https://github.com/mehah/otclient/blob/1026132e3dfa661807a1ff10ced2f4e09f1b7a7d/init.lua#L85))
+- Auto Reload Module ([init.lua](https://github.com/mehah/otclient/blob/main/init.lua#L85))
 - Attached Effects System (to create aura, wings...) (code sample: [effects.lua](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/effects.lua), [outfit_618.lua](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/configs/outfit_618.lua), [code test](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/attachedeffects.lua#L1))
 - Idle Animation Support
 - Highlight Mouse Target (press shift to select any object)
