@@ -60,7 +60,7 @@ end
 
 controller = Controller:new()
 controller:setUI('minimap', modules.game_interface.getRightPanel())
-local localPlayerEvent = controller:addEvent(localPlayerEvent, {
+local localPlayerEvent = controller:addEvent(LocalPlayer, {
     onPositionChange = updateCameraPosition
 })
 
