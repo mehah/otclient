@@ -58,13 +58,11 @@ local function toggleFullMap()
     minimapWidget:setCameraPosition(pos)
 end
 
-local localPlayerEvent = EventController:new(LocalPlayer, {
+controller = Controller:new()
+controller:setUI('minimap', modules.game_interface.getRightPanel())
+local localPlayerEvent = controller:addEvent(localPlayerEvent, {
     onPositionChange = updateCameraPosition
 })
-
-controller = Controller:new()
-controller:setUI('minimap')
-controller:attachExternalEvent(localPlayerEvent)
 
 function controller:onInit()
     minimapButton = modules.client_topmenu.addRightGameToggleButton('minimapButton', tr('Minimap') .. ' (Ctrl+M)',
@@ -90,7 +88,6 @@ function controller:onInit()
     self:bindKeyDown('Ctrl+M', toggle)
     self:bindKeyDown('Ctrl+Shift+M', toggleFullMap)
 
-    self.ui:setVisible(false)
     self.ui:setContentMinimumHeight(80)
     self.ui:setup()
 end

@@ -5,7 +5,7 @@ local TypeEvent = {
 
 local function onGameStart(self)
     if self.dataUI ~= nil and self.dataUI.onGameStart then
-        self.ui = g_ui.loadUI('/' .. self.name .. '/' .. self.dataUI.name, g_ui.getRootWidget())
+        self.ui = g_ui.loadUI('/' .. self.name .. '/' .. self.dataUI.name, self.dataUI.parent)
     end
 
     if self.__onGameStart ~= nil then
@@ -68,7 +68,7 @@ end
 
 function Controller:init()
     if self.dataUI ~= nil and not self.dataUI.onGameStart then
-        self.ui = g_ui.loadUI('/' .. self.name .. '/' .. self.dataUI.name, g_ui.getRootWidget())
+        self.ui = g_ui.loadUI('/' .. self.name .. '/' .. self.dataUI.name, self.dataUI.parent)
     end
 
     if self.onInit then
@@ -107,8 +107,8 @@ function Controller:init()
     end
 end
 
-function Controller:setUI(name, onGameStart)
-    self.dataUI = { name = name, onGameStart = onGameStart or false }
+function Controller:setUI(name, parent, onGameStart)
+    self.dataUI = { name = name, parent = parent or g_ui.getRootWidget(), onGameStart = onGameStart or false }
 end
 
 function Controller:terminate()
