@@ -27,6 +27,7 @@
 #include "game.h"
 #include "spriteappearances.h"
 #include <framework/core/graphicalapplication.h>
+#include "gameconfig.h"
 
 SpriteManager g_sprites;
 
@@ -82,6 +83,9 @@ void SpriteManager::saveSpr(const std::string& fileName)
     if (!m_loaded)
         throw Exception("failed to save, spr is not loaded");
 
+    static constexpr uint32_t SPRITE_SIZE = 32;
+    static constexpr uint32_t SPRITE_DATA_SIZE = SPRITE_SIZE * SPRITE_SIZE * 4;
+
     try {
         const auto& fin = g_resources.createFile(fileName);
         if (!fin)
@@ -97,10 +101,10 @@ void SpriteManager::saveSpr(const std::string& fileName)
 
         const uint32_t offset = fin->tell();
         uint32_t spriteAddress = offset + 4 * m_spritesCount;
-        for (int i = 1; i <= m_spritesCount; ++i)
+        for (uint_fast32_t i = 1; i <= m_spritesCount; ++i)
             fin->addU32(0);
 
-        for (int i = 1; i <= m_spritesCount; ++i) {
+        for (uint_fast32_t i = 1; i <= m_spritesCount; ++i) {
             m_spritesFile->seek((i - 1) * 4 + m_spritesOffset);
             const uint32_t fromAdress = m_spritesFile->getU32();
             if (fromAdress != 0) {
