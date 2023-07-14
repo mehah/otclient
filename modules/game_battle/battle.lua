@@ -310,6 +310,10 @@ end
 function onGameStart()
     battleWindow:setupOnStart() -- load character window configuration
 
+    connect(LocalPlayer, {
+        onPositionChange = onCreaturePositionChange
+    })
+
     -- Temp fix
     scheduleEvent(checkCreatures, 200)
 end
