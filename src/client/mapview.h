@@ -224,7 +224,7 @@ private:
     void updateVisibleTiles();
     void updateRect(const Rect& rect);
     void requestUpdateVisibleTiles() { m_updateVisibleTiles = true; }
-    void requestUpdateMapPosInfo() { m_posInfo.rect = {}; }
+    void requestUpdateMapPosInfo() { m_updateMapPosInfo = true; }
 
     uint8_t calcFirstVisibleFloor(bool checkLimitsFloorsView) const;
     uint8_t calcLastVisibleFloor() const;
@@ -289,6 +289,7 @@ private:
 
     bool m_limitVisibleDimension{ true };
     bool m_updateVisibleTiles{ true };
+    bool m_updateMapPosInfo{ true };
     bool m_resetCoveredCache{ true };
     bool m_shaderSwitchDone{ true };
     bool m_drawHealthBars{ true };

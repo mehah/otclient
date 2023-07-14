@@ -356,7 +356,9 @@ void MapView::updateVisibleTiles()
 }
 
 void MapView::updateRect(const Rect& rect) {
-    if (m_posInfo.rect != rect) {
+    if (m_posInfo.rect != rect || m_updateMapPosInfo) {
+        m_updateMapPosInfo = false;
+
         m_posInfo.rect = rect;
         m_posInfo.srcRect = calcFramebufferSource(rect.size());
         m_posInfo.drawOffset = m_posInfo.srcRect.topLeft();
