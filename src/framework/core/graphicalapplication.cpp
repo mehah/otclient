@@ -145,13 +145,12 @@ void GraphicalApplication::run()
     std::thread t1([&]() {
         while (!m_stopping) {
             poll();
+            g_particles.poll();
 
             if (!g_window.isVisible()) {
                 stdext::millisleep(10);
                 continue;
             }
-
-            g_particles.poll();
 
             if (foreground->canRepaint())
                 foreCondition.notify_one();
