@@ -48,7 +48,7 @@ void UIWidget::updateText()
     if (!m_rect.isValid() || hasProp(PropTextHorizontalAutoResize) || hasProp(PropTextVerticalAutoResize)) {
         Size textBoxSize = m_textSize;
         textBoxSize += Size(m_padding.left + m_padding.right, m_padding.top + m_padding.bottom) + m_textOffset.toSize();
-        textBoxSize *= m_fontScale;
+        textBoxSize *= std::max<float>(m_fontScale, 1.f);
 
         Size size = getSize();
         if (size.width() <= 0 || (hasProp(PropTextHorizontalAutoResize) && !isTextWrap()))
@@ -68,7 +68,7 @@ void UIWidget::resizeToText()
     auto textSize = getTextSize();
     textSize += Size(m_padding.left + m_padding.right, m_padding.top + m_padding.bottom);
     textSize += m_textOffset.toSize();
-    setSize(textSize * m_fontScale);
+    setSize(textSize * std::max<float>(m_fontScale, 1.f));
 }
 
 void UIWidget::parseTextStyle(const OTMLNodePtr& styleNode)

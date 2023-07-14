@@ -555,7 +555,7 @@ public:
     void setTextVerticalAutoResize(bool textAutoResize) { setProp(PropTextVerticalAutoResize, textAutoResize); updateText(); }
     void setTextOnlyUpperCase(bool textOnlyUpperCase) { setProp(PropTextOnlyUpperCase, textOnlyUpperCase); setText(m_text); }
     void setFont(const std::string_view fontName);
-    void setFontScale(float scale) { m_fontScale = scale; m_textCachedScreenCoords = {}; resizeToText(); }
+    void setFontScale(float scale) { m_fontScale = scale; m_textCachedScreenCoords = {}; }
 
     std::string getText() { return m_text; }
     std::string getDrawText() { return m_drawText; }
