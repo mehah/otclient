@@ -308,7 +308,7 @@ void Map::saveOtbm(const std::string& fileName)
                 bool firstNode = true;
 
                 for (uint8_t z = 0; z <= g_gameConfig.getMapMaxZ(); ++z) {
-                    for (const auto& it : m_tileBlocks[z]) {
+                    for (const auto& it : m_floors[z].tileBlocks) {
                         const TileBlock& block = it.second;
                         for (const TilePtr& tile : block.getTiles()) {
                             if (unlikely(!tile || tile->isEmpty()))
@@ -511,7 +511,7 @@ void Map::saveOtcm(const std::string& fileName)
         fin->seek(start);
 
         for (uint8_t z = 0; z <= g_gameConfig.getMapMaxZ(); ++z) {
-            for (const auto& it : m_tileBlocks[z]) {
+            for (const auto& it : m_floors[z].tileBlocks) {
                 const TileBlock& block = it.second;
                 for (const TilePtr& tile : block.getTiles()) {
                     if (!tile || tile->isEmpty())
