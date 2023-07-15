@@ -173,6 +173,7 @@ void GraphicalApplication::run()
 
         foreCondition.notify_one();
         txtCondition.notify_one();
+        notifyLight();
     });
 
     std::thread t2([&]() {
@@ -191,6 +192,17 @@ void GraphicalApplication::run()
             txt->setEnable(canDrawTexts());
             if (mapWidget && txt->isEnabled())
                 mapWidget->drawSelf(DrawPoolType::TEXT);
+
+            return m_stopping;
+        });
+    });
+
+    std::thread t4([&]() {
+        const auto& lightPool = g_drawPool.get(DrawPoolType::LIGHT);
+        std::unique_lock lock(lightPool->getMutex());
+        m_lightCondition.wait(lock, [&]() -> bool {
+            if (mapWidget)
+                mapWidget->drawSelf(DrawPoolType::LIGHT);
 
             return m_stopping;
         });
@@ -215,6 +227,7 @@ void GraphicalApplication::run()
     t1.join();
     t2.join();
     t3.join();
+    t4.join();
 
     m_stopping = false;
     m_running = false;

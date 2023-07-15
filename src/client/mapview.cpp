@@ -112,26 +112,60 @@ void MapView::draw()
         }
     }
 
-    drawFloor();
+    if (isDrawingLights())
+        g_app.notifyLight();
+
+    drawFloors();
 
     // this could happen if the player position is not known yet
-    if (!m_posInfo.camera.isValid()) {
-        return;
-    }
-
-    if (isDrawingLights())
-        m_lightView->draw(m_posInfo.rect, m_posInfo.srcRect);
+    //if (!m_posInfo.camera.isValid())
+    //    return;
 }
 
-void MapView::drawFloor()
+void MapView::drawLights() {
+    if (!isDrawingLights())
+        return;
+
+    const auto& cameraPosition = m_posInfo.camera;
+    const auto& lightView = m_lightView.get();
+    for (int_fast8_t z = m_floorMax; z >= m_floorMin; --z) {
+        const float fadeLevel = getFadeLevel(z);
+        if (fadeLevel == 0.f) break;
+
+        Position _camera = cameraPosition;
+        const bool alwaysTransparent = m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && z < m_cachedFirstVisibleFloor && _camera.coveredUp(cameraPosition.z - z);
+
+        const auto& map = m_floors[z].cachedVisibleTiles;
+
+        if (m_fadeType != FadeType::OUT$ || fadeLevel == 1.f) {
+            for (const auto& tile : map.shades) {
+                if (alwaysTransparent && tile->getPosition().isInRange(_camera, g_gameConfig.getTileTransparentFloorViewRange(), g_gameConfig.getTileTransparentFloorViewRange(), true))
+                    continue;
+
+                m_lightView->resetShade(transformPositionTo2D(tile->getPosition(), cameraPosition));
+            }
+        }
+
+        for (const auto& tile : map.lights) {
+            tile->draw(transformPositionTo2D(tile->getPosition(), cameraPosition), m_posInfo, 0, true, lightView);
+        }
+
+        for (const auto& missile : g_map.getFloorMissiles(z)) {
+            if (missile->hasLight())
+                missile->draw(transformPositionTo2D(missile->getPosition(), cameraPosition), false, lightView);
+        }
+    }
+
+    m_lightView->draw(m_posInfo.rect, m_posInfo.srcRect);
+}
+
+void MapView::drawFloors()
 {
     g_drawPool.use(DrawPoolType::MAP, m_posInfo.rect, m_posInfo.srcRect, Color::black);
     {
         const auto& cameraPosition = m_posInfo.camera;
-        const auto& lightView = isDrawingLights() ? m_lightView.get() : nullptr;
 
         uint32_t flags = Otc::DrawThings;
-        if (lightView) flags |= Otc::DrawLights;
         if (m_drawNames) { flags |= Otc::DrawNames; }
         if (m_drawHealthBars) { flags |= Otc::DrawBars; }
         if (m_drawManaBar) { flags |= Otc::DrawManaBar; }
@@ -146,15 +180,6 @@ void MapView::drawFloor()
             const bool alwaysTransparent = m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && z < m_cachedFirstVisibleFloor && _camera.coveredUp(cameraPosition.z - z);
 
             const auto& map = m_floors[z].cachedVisibleTiles;
-
-            if (m_fadeType != FadeType::OUT$ || fadeLevel == 1.f) {
-                for (const auto& tile : map.shades) {
-                    if (alwaysTransparent && tile->getPosition().isInRange(_camera, g_gameConfig.getTileTransparentFloorViewRange(), g_gameConfig.getTileTransparentFloorViewRange(), true))
-                        continue;
-
-                    m_lightView->resetShade(transformPositionTo2D(tile->getPosition(), cameraPosition));
-                }
-            }
 
             for (const auto& tile : map.tiles) {
                 uint32_t tileFlags = flags;
@@ -174,14 +199,14 @@ void MapView::drawFloor()
                     g_drawPool.setOpacity(inRange ? .16 : .7);
                 }
 
-                tile->draw(transformPositionTo2D(tile->getPosition(), cameraPosition), m_posInfo, tileFlags, isCovered, lightView);
+                tile->draw(transformPositionTo2D(tile->getPosition(), cameraPosition), m_posInfo, tileFlags, isCovered);
 
                 if (alwaysTransparent)
                     g_drawPool.resetOpacity();
             }
 
             for (const auto& missile : g_map.getFloorMissiles(z))
-                missile->draw(transformPositionTo2D(missile->getPosition(), cameraPosition), true, lightView);
+                missile->draw(transformPositionTo2D(missile->getPosition(), cameraPosition), true);
 
             if (m_shadowFloorIntensity > 0 && z == cameraPosition.z + 1) {
                 g_drawPool.setOpacity(m_shadowFloorIntensity, true);
@@ -208,7 +233,7 @@ void MapView::drawFloor()
     }
 }
 
-void MapView::drawText()
+void MapView::drawTexts()
 {
     g_drawPool.use(DrawPoolType::TEXT);
 
@@ -337,10 +362,15 @@ void MapView::updateVisibleTiles()
                         tile->onAddInMapView();
                     }
 
-                    if (isDrawingLights() && tile->canShade())
-                        floor.shades.emplace_back(tile);
+                    if (isDrawingLights()) {
+                        if (tile->canShade())
+                            floor.shades.emplace_back(tile);
 
-                    if (addTile || !floor.shades.empty()) {
+                        if (tile->hasLight())
+                            floor.lights.emplace_back(tile);
+                    }
+
+                    if (addTile || !floor.shades.empty() || !floor.lights.empty()) {
                         if (iz < m_floorMin)
                             m_floorMin = iz;
                         else if (iz > m_floorMax)

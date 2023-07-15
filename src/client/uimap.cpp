@@ -65,8 +65,10 @@ void UIMap::drawSelf(DrawPoolType drawPane)
 
     if (drawPane == DrawPoolType::MAP) {
         m_mapView->draw();
+    } else if (drawPane == DrawPoolType::LIGHT) {
+        m_mapView->drawLights();
     } else if (drawPane == DrawPoolType::TEXT) {
-        m_mapView->drawText();
+        m_mapView->drawTexts();
     }
 }
 

@@ -89,7 +89,7 @@ public:
     MapView();
     ~MapView() override;
     void draw();
-    void drawText();
+    void drawTexts();
 
     // floor visibility related
     uint8_t getLockedFirstVisibleFloor() const { return m_lockedFirstVisibleFloor; }
@@ -204,7 +204,8 @@ private:
     {
         std::vector<TilePtr> shades;
         std::vector<TilePtr> tiles;
-        void clear() { shades.clear(); tiles.clear(); }
+        std::vector<TilePtr> lights;
+        void clear() { shades.clear(); tiles.clear(); lights.clear(); }
     };
 
     struct FloorData
@@ -231,7 +232,8 @@ private:
 
     void updateLight();
     void updateViewportDirectionCache();
-    void drawFloor();
+    void drawFloors();
+    void drawLights();
 
     void updateViewport(const Otc::Direction dir = Otc::InvalidDirection) { m_viewport = m_viewPortDirection[dir]; }
 

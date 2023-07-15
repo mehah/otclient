@@ -83,6 +83,8 @@ public:
 
     bool isScaled() { return g_window.getDisplayDensity() != PlatformWindow::DEFAULT_DISPLAY_DENSITY; }
 
+    void notifyLight() { m_lightCondition.notify_one(); }
+
     bool isEncrypted() {
 #if ENABLE_ENCRYPTION == 1
         return true;
@@ -111,6 +113,8 @@ private:
     float m_creatureInformationScale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
     float m_animatedTextScale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
     float m_staticTextScale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
+
+    std::condition_variable m_lightCondition;
 
     AdaptativeFrameCounter m_frameCounter;
 };
