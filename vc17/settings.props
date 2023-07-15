@@ -10,6 +10,7 @@
         CRASH_HANDLER;
         FRAMEWORK_NET;
         FRAMEWORK_SOUND;
+        FRAMEWORK_EDITOR;
         BUILD_TYPE="RelWithDebInfo";
     </PREPROCESSOR_DEFS>
 
@@ -17,14 +18,14 @@
       advapi32.lib;
 	  crypt32.lib;
 	  dbghelp.lib;
-	  gdi32.lib;	  
+	  gdi32.lib;
 	  discord-rpc.lib;
 	  glew32.lib;
 	  kernel32.lib;
 	  ole32.lib;
 	  physfs-static.lib;
 	  shell32.lib;
-	  user32.lib;	  
+	  user32.lib;
 	  winmm.lib;
 	  libcrypto.lib;
 	  libprotobuf.lib;
@@ -36,9 +37,10 @@
 	  opengl32.lib;
 	  vorbis.lib;
 	  vorbisfile.lib;
+    pugixml.lib;
 	  zlib.lib;
     </OTCLIENT_LIBDEPS>
-    
+
     <OTCLIENT_LIBDEPS_D>
         advapi32.lib;
 		discord-rpc.lib;
@@ -48,10 +50,10 @@
         kernel32.lib;
         lua51.lib;
         ogg.lib;
-		lzma.lib;
-		libssl.lib;
-		libcrypto.lib;
-		libprotobufd.lib;
+        lzma.lib;
+        libssl.lib;
+        libcrypto.lib;
+        libprotobufd.lib;
         opengl32.lib;
         physfs.lib;
         shell32.lib;
@@ -59,8 +61,9 @@
         vorbis.lib;
         vorbisfile.lib;
         winmm.lib;
+        pugixml.lib;
         zlibd.lib;
-        openal32.lib;      
+        openal32.lib;
 	</OTCLIENT_LIBDEPS_D>
   </PropertyGroup>
   <PropertyGroup>
