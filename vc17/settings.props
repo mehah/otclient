@@ -10,7 +10,6 @@
         CRASH_HANDLER;
         FRAMEWORK_NET;
         FRAMEWORK_SOUND;
-        FRAMEWORK_EDITOR;
         BUILD_TYPE="RelWithDebInfo";
     </PREPROCESSOR_DEFS>
 
