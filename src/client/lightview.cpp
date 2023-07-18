@@ -34,9 +34,21 @@ LightView::LightView(const Size& size, const uint16_t tileSize) : m_pool(g_drawP
         m_texture = std::make_shared<Texture>(m_mapSize);
         m_texture->setSmooth(true);
     });
+
+    m_thread = std::thread([&]() {
+        std::unique_lock lock(m_pool->getMutex());
+        m_condition.wait(lock, [&]() -> bool {
+            updatePixels();
+            m_lights.clear();
+            m_tiles.assign(m_mapSize.area(), {});
+            return m_texture == nullptr;
+        });
+    });
 }
 
 void LightView::resize(const Size& size, const uint16_t tileSize) {
+    std::scoped_lock l(m_pool->getMutex());
+
     m_mapSize = size;
     m_tileSize = tileSize;
     m_tiles.resize(size.area());
@@ -101,9 +113,7 @@ void LightView::resetShade(const Point& pos)
 void LightView::draw(const Rect& dest, const Rect& src)
 {
     updateCoords(dest, src);
-    updatePixels();
-    m_lights.clear();
-    m_tiles.assign(m_mapSize.area(), {});
+    m_condition.notify_one();
 }
 
 void LightView::updateCoords(const Rect& dest, const Rect& src) {

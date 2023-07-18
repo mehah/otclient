@@ -3,7 +3,7 @@ game
   last-supported-version: 1316
   
   map
-    viewport: 8 6
+    viewport: 32 24
     max-z: 15
     sea-floor: 7
     underground-floor: 8

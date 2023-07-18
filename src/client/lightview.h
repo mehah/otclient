@@ -26,12 +26,13 @@
 #include <framework/graphics/framebuffer.h>
 #include "declarations.h"
 #include "thingtype.h"
+#include <thread>
 
 class LightView : public LuaObject
 {
 public:
     LightView(const Size& size, const uint16_t tileSize);
-    ~LightView() { m_texture = nullptr; }
+    ~LightView() { m_texture = nullptr; m_condition.notify_one(); m_thread.join(); }
 
     void resize(const Size& size, uint16_t tileSize);
     void draw(const Rect& dest, const Rect& src);
@@ -107,4 +108,7 @@ private:
     std::vector<uint8_t> m_pixels;
     std::vector<TileLight> m_lights;
     std::vector<TileColor> m_tileColors;
+
+    std::condition_variable m_condition;
+    std::thread m_thread;
 };
