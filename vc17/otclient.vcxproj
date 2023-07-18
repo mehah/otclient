@@ -201,6 +201,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\client\animatedtext.cpp" />
+    <ClCompile Include="..\src\client\animatedtext.cpp" />
     <ClCompile Include="..\src\client\animator.cpp" />
     <ClCompile Include="..\src\client\attachedeffect.cpp" />
     <ClCompile Include="..\src\client\attachedeffectmanager.cpp" />
@@ -218,8 +219,8 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClCompile Include="..\src\client\itemtype.cpp" />
     <ClCompile Include="..\src\client\lightview.cpp" />
     <ClCompile Include="..\src\client\localplayer.cpp" />
-    <ClCompile Include="..\src\client\luafunctions.cpp" />
-    <ClCompile Include="..\src\client\luavaluecasts.cpp" />
+    <ClCompile Include="..\src\client\clientluafunctions.cpp" />
+    <ClCompile Include="..\src\client\clientluavaluecasts.cpp" />
     <ClCompile Include="..\src\client\map.cpp" />
     <ClCompile Include="..\src\client\mapio.cpp" />
     <ClCompile Include="..\src\client\mapview.cpp" />
@@ -369,7 +370,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\client\itemtype.h" />
     <ClInclude Include="..\src\client\lightview.h" />
     <ClInclude Include="..\src\client\localplayer.h" />
-    <ClInclude Include="..\src\client\luavaluecasts.h" />
+    <ClInclude Include="..\src\client\clientluavaluecasts.h" />
     <ClInclude Include="..\src\client\map.h" />
     <ClInclude Include="..\src\client\mapview.h" />
     <ClInclude Include="..\src\client\minimap.h" />

@@ -28,7 +28,7 @@
 #include <framework/core/eventdispatcher.h>
 #include "item.h"
 #include "localplayer.h"
-#include "luavaluecasts.h"
+#include "clientluavaluecasts.h"
 #include "map.h"
 #include "missile.h"
 #include "statictext.h"

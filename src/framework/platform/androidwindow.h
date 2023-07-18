@@ -30,7 +30,6 @@
 #include <jni.h>
 #include <EGL/egl.h>
 #include <queue>
-#include <game-activity/native_app_glue/android_native_app_glue.h>
 
 class AndroidWindow : public PlatformWindow
 {

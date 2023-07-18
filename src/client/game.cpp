@@ -26,7 +26,7 @@
 #include "container.h"
 #include "creature.h"
 #include "localplayer.h"
-#include "luavaluecasts.h"
+#include "clientluavaluecasts.h"
 #include "map.h"
 #include "protocolcodes.h"
 #include "protocolgame.h"

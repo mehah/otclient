@@ -152,6 +152,10 @@ void ModuleManager::enableAutoReload() {
     {
         std::string path;
         ticks_t time;
+
+        FileInfo(const std::string& path, ticks_t time)
+            : path(path), time(time) {
+        }
     };
 
     struct ModuleData

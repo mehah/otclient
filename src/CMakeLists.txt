@@ -242,8 +242,8 @@ set(SOURCE_FILES
 	client/itemtype.cpp
 	client/lightview.cpp
 	client/localplayer.cpp
-	client/luafunctions.cpp
-	client/luavaluecasts.cpp
+	client/clientluafunctions.cpp
+	client/clientluavaluecasts.cpp
 	client/map.cpp
 	client/mapio.cpp
 	client/mapview.cpp

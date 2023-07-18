@@ -24,7 +24,7 @@
 #include "game.h"
 #include "lightview.h"
 #include "localplayer.h"
-#include "luavaluecasts.h"
+#include "clientluavaluecasts.h"
 #include "map.h"
 #include "shadermanager.h"
 #include "thingtypemanager.h"
