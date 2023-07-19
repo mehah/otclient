@@ -63,12 +63,8 @@ void DrawPoolManager::draw()
         std::scoped_lock l(map->m_mutex);
         if (drawPool(map)) {
             drawPool(get(DrawPoolType::CREATURE_INFORMATION));
+            drawPool(get(DrawPoolType::LIGHT));
         }
-    }
-
-    const auto& light = get(DrawPoolType::LIGHT); {
-        std::scoped_lock l(light->m_mutex);
-        drawPool(light);
     }
 
     const auto& text = get(DrawPoolType::TEXT); {

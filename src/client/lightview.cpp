@@ -58,7 +58,10 @@ void LightView::resize(const Size& size, const uint16_t tileSize) {
 
     g_drawPool.use(DrawPoolType::LIGHT);
     g_drawPool.addAction([this] {
-        m_texture->updatePixels(m_pixels.data());
+        {
+            std::scoped_lock l(m_pool->getMutex());
+            m_texture->updatePixels(m_pixels.data());
+        }
         g_painter->resetColor();
         g_painter->resetTransformMatrix();
         g_painter->setTexture(m_texture.get());
