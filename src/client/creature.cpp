@@ -608,13 +608,22 @@ void Creature::updateWalk(const bool isPreWalking)
     updateWalkOffset(m_walkedPixels);
     updateWalkingTile();
 
-    if (!isPreWalking && m_walkedPixels == g_gameConfig.getSpriteSize()) {
-        terminateWalk();
+    if (m_walkedPixels == g_gameConfig.getSpriteSize()) {
+        terminateWalk(isPreWalking);
     }
 }
 
-void Creature::terminateWalk()
+void Creature::terminateWalk(bool onlyResetWalkAni)
 {
+    const auto self = static_self_cast<Creature>();
+    m_walkFinishAnimEvent = g_dispatcher.scheduleEvent([self] {
+        self->m_walkAnimationPhase = 0;
+        self->m_walkFinishAnimEvent = nullptr;
+    }, g_game.getServerBeat());
+
+    if (onlyResetWalkAni)
+        return;
+
     // remove any scheduled walk update
     if (m_walkUpdateEvent) {
         m_walkUpdateEvent->cancel();
@@ -635,12 +644,6 @@ void Creature::terminateWalk()
     m_walkedPixels = 0;
     m_walkOffset = {};
     m_walking = false;
-
-    const auto self = static_self_cast<Creature>();
-    m_walkFinishAnimEvent = g_dispatcher.scheduleEvent([self] {
-        self->m_walkAnimationPhase = 0;
-        self->m_walkFinishAnimEvent = nullptr;
-    }, g_game.getServerBeat());
 }
 
 void Creature::setHealthPercent(uint8_t healthPercent)
