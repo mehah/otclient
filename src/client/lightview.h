@@ -43,7 +43,7 @@ public:
     void setGlobalLight(const Light& light)
     {
         m_isDark = light.intensity < 250;
-        m_globalLightColor = Color::from8bit(light.color, light.intensity / static_cast<float>(UINT8_MAX));
+        m_lightData.globalLightColor = Color::from8bit(light.color, light.intensity / static_cast<float>(UINT8_MAX));
     }
 
     bool isDark() const { return m_isDark; }
@@ -59,32 +59,13 @@ private:
         TileLight(const Point& pos, uint8_t intensity, uint8_t color, float brightness) : Light(intensity, color), pos(pos), brightness(brightness) {}
     };
 
-    struct TileColor
+    struct LightData
     {
-        TileColor(Point& pos, size_t& shadeIndex, uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) :
-            pos(std::move(pos)), shadeIndex(shadeIndex), r(r), g(g), b(b), a(a) {}
-
-        Point pos;
-        size_t& shadeIndex;
-
-        void setLight(const Color& color, uint8_t alpha) {
-            r = color.r();
-            g = color.g();
-            b = color.b();
-            a = alpha;
-        }
-
-        void setLight(const Color& color) {
-            r = std::max<int>(r, color.r());
-            g = std::max<int>(g, color.g());
-            b = std::max<int>(b, color.b());
-        }
-
-    private:
-        uint8_t& r;
-        uint8_t& g;
-        uint8_t& b;
-        uint8_t& a;
+        Size mapSize;
+        uint16_t tileSize{ 0 };
+        std::vector<size_t> tiles;
+        std::vector<TileLight> lights;
+        Color globalLightColor{ Color::white };
     };
 
     void updateCoords(const Rect& dest, const Rect& src);
@@ -92,23 +73,17 @@ private:
 
     bool m_isDark{ false };
 
-    uint16_t m_tileSize{ 0 };
     size_t m_hash{ 0 }, m_updatedHash{ 0 };
 
     DrawPool* m_pool{ nullptr };
 
-    Size m_mapSize;
     Rect m_dest, m_src;
-    Color m_globalLightColor{ Color::white };
-
     CoordsBuffer m_coords;
     TexturePtr m_texture;
+    LightData m_lightData, m_threadLightData;
 
-    std::vector<size_t> m_tiles;
-    std::vector<uint8_t> m_pixels;
-    std::vector<TileLight> m_lights;
-    std::vector<TileColor> m_tileColors;
-
-    std::condition_variable m_condition;
     std::thread m_thread;
+    std::condition_variable m_condition;
+
+    std::vector<uint8_t> m_pixels;
 };

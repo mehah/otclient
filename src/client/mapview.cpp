@@ -112,9 +112,6 @@ void MapView::draw()
         }
     }
 
-    if (isDrawingLights())
-        m_lightView->draw(m_posInfo.rect, m_posInfo.srcRect);
-
     drawFloor();
 
     // this could happen if the player position is not known yet
@@ -122,7 +119,8 @@ void MapView::draw()
         return;
     }
 
-
+    if (isDrawingLights())
+        m_lightView->draw(m_posInfo.rect, m_posInfo.srcRect);
 }
 
 void MapView::drawFloor()
