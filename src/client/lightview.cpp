@@ -105,11 +105,7 @@ void LightView::draw(const Rect& dest, const Rect& src)
     if (m_updatedHash != m_hash) {
         m_hash = m_updatedHash;
         m_updatedHash = 0;
-
-        {
-            //std::scoped_lock l(m_mutex);
-            m_threadLightData = m_lightData;
-        }
+        m_threadLightData = m_lightData;
         m_condition.notify_one();
     }
 
