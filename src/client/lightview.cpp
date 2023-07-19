@@ -54,7 +54,6 @@ void LightView::resize(const Size& size, const uint16_t tileSize) {
     if (m_texture)
         m_texture->setupSize(m_lightData.mapSize);
 
-
     g_drawPool.use(DrawPoolType::LIGHT);
     g_drawPool.addAction([this] {
         {

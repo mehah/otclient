@@ -125,7 +125,6 @@ void MapView::draw()
 
 void MapView::drawFloor()
 {
-    std::scoped_lock l(g_drawPool.get(DrawPoolType::LIGHT)->getMutex());
     g_drawPool.use(DrawPoolType::MAP, m_posInfo.rect, m_posInfo.srcRect, Color::black);
     {
         const auto& cameraPosition = m_posInfo.camera;
