@@ -149,7 +149,7 @@ public:
 protected:
     virtual void updateWalkOffset(uint8_t totalPixelsWalked);
     virtual void updateWalk(bool isPreWalking = false);
-    virtual void terminateWalk(bool onlyResetWalkAni = false);
+    virtual void terminateWalk();
 
     void onDeath();
     void onPositionChange(const Position& newPos, const Position& oldPos) override;
@@ -166,6 +166,7 @@ private:
     void updateShield();
     void updateWalkingTile();
     void updateWalkAnimation();
+    void resetWalkAnimationPhase(bool toSchedule = false);
 
     uint16_t getCurrentAnimationPhase(bool mount = false);
 

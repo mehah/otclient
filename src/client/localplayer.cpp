@@ -41,7 +41,7 @@ bool LocalPlayer::canWalk(bool ignoreLock)
     if (isWalkLocked() && !ignoreLock)
         return false;
 
-    return m_walkTimer.ticksElapsed() >= std::max<int>(getStepDuration() - 9, g_game.getPing());
+    return m_walkTimer.ticksElapsed() >= (getStepDuration() - 9);
 }
 
 void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
@@ -204,9 +204,9 @@ void LocalPlayer::updateWalkOffset(uint8_t totalPixelsWalked)
         m_walkOffset.x = -totalPixelsWalked;
 }
 
-void LocalPlayer::terminateWalk(bool onlyResetWalkAni)
+void LocalPlayer::terminateWalk()
 {
-    Creature::terminateWalk(onlyResetWalkAni);
+    Creature::terminateWalk();
     m_preWalking = false;
 }
 
