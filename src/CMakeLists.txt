@@ -11,10 +11,11 @@ option(TOGGLE_FRAMEWORK_EDITOR "Use Editor " OFF)
 option(TOGGLE_DIRECTX "Use DX9 support" OFF)
 option(TOGGLE_BIN_FOLDER "Use build/bin folder for generate compilation files" OFF)
 option(TOGGLE_BOT_PROTECTION "Use bot protection" ON)
-option(TOGGLE_PRE_COMPILED_HEADER "Use precompiled header (speed up compile)" OFF)
 option(DEBUG_LOG "Enable Debug Log" OFF)
 option(ASAN_ENABLED "Build this target with AddressSanitizer" OFF)
 option(BUILD_STATIC_LIBRARY "Build using static libraries" OFF)
+option(TOGGLE_PRE_COMPILED_HEADER "Use precompiled header (speed up compile)" ON)
+option(SPEED_UP_BUILD_UNITY "Compile using build unity for speed up build" ON)
 
 # *****************************************************************************
 # Cmake Features
@@ -31,6 +32,17 @@ set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 # Generate compile_commands.json
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# *****************************************************************************
+# Client
+# *****************************************************************************
+if (MSVC)
+	add_executable(${PROJECT_NAME} "" ../cmake/icon/otcicon.rc)
+elseif(ANDROID)
+	add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+else()
+	add_executable(${PROJECT_NAME} "")
+endif()
 
 # *****************************************************************************
 # Options Code
@@ -64,26 +76,20 @@ endif(TOGGLE_BOT_PROTECTION)
 
 # Set for use precompiled header
 if(TOGGLE_PRE_COMPILED_HEADER)
-	include(cotire)
-	cotire(${PROJECT_NAME})
+	# === PRECOMPILED HEADER ===
+	target_precompile_headers(${PROJECT_NAME} PRIVATE framework/pch.h)
 	message(STATUS "Use precompiled header: ON")
 else()
 	message(STATUS "Use precompiled header: OFF")
 endif(TOGGLE_PRE_COMPILED_HEADER)
 
+# === UNITY BUILD (compile time reducer) ===
+if(SPEED_UP_BUILD_UNITY)
+	set_target_properties(${PROJECT_NAME} PROPERTIES UNITY_BUILD ON)
+	log_option_enabled("Build unity for speed up compilation")
+endif(SPEED_UP_BUILD_UNITY)
 
 set(VERSION "1.0.0")
-
-# *****************************************************************************
-# Client
-# *****************************************************************************
-if (MSVC)
-	add_executable(${PROJECT_NAME} "" ../cmake/icon/otcicon.rc)
-elseif(ANDROID)
-	add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
-else()
-	add_executable(${PROJECT_NAME} "")
-endif()
 
 # *****************************************************************************
 # Build flags
