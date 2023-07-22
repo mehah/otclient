@@ -1,0 +1,58 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    compileSdk 32
+
+    defaultConfig {
+        applicationId "com.github.otclient"
+        minSdk 21
+        targetSdk 32
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        externalNativeBuild {
+            cmake {
+                cppFlags '-std=c++20'
+                arguments "-DVCPKG_TARGET_ANDROID=ON"
+            }
+        }
+        ndk {
+            abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    externalNativeBuild {
+        cmake {
+            path file('../../CMakeLists.txt')
+            version '3.22.1'
+        }
+    }
+    buildFeatures {
+        viewBinding true
+        prefab true
+    }
+    ndkVersion '25.1.8937393'
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.8.0'
+    implementation 'androidx.appcompat:appcompat:1.5.0'
+    implementation 'androidx.games:games-activity:1.2.1'
+    implementation 'com.google.android.material:material:1.6.1'
+}
