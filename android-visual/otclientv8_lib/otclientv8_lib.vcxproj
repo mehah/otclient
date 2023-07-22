@@ -191,7 +191,19 @@
       <LibraryDependencies>%(LibraryDependencies);GLESv2;EGL;atomic</LibraryDependencies>
       <SharedLibrarySearchPath>C:\android\lib64;%(SharedLibrarySearchPath);$(SysrootLink)\usr\lib\$(AndroidHeaderTriple);$(SysrootLink)\usr\lib\$(AndroidHeaderTriple)\$(AndroidAPILevelNumber)</SharedLibrarySearchPath>
       <AdditionalLibraryDirectories>C:\android\lib64;C:\android\android-ndk-r21d\platforms\android-30\arch-arm64\usr\lib;%(AdditionalLibraryDirectories);$(ToolchainPrebuiltPath)\lib\gcc\$(ToolchainName)\$(ToolchainFullVersionName);$(StlLibraryPath)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>C:\android\lib64\libvorbisfile.a;C:\android\lib64\libvorbis.a;C:\android\lib64\libssl.a;C:\android\lib64\libpng.a;C:\android\lib64\libphysfs.a;C:\android\lib64\libopenal.a;C:\android\lib64\libogg.a;C:\android\lib64\libluajit.a;C:\android\lib64\libcrypto.a;C:\android\lib64\libzip.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>
+      C:\android\lib64\libvorbisfile.a;
+      C:\android\lib64\libvorbis.a;
+      C:\android\lib64\libssl.a;
+      C:\android\lib64\libpng.a;
+      C:\android\lib64\libphysfs.a;
+      C:\android\lib64\libopenal.a;
+      C:\android\lib64\libogg.a;
+      C:\android\lib64\libluajit.a;
+      C:\android\lib64\libcrypto.a;
+      C:\android\lib64\libzip.a;
+      C:\android\lib64\liblzma.a;
+      %(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>-lm -lz -latomic</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
@@ -217,7 +229,23 @@
       <LibraryDependencies>%(LibraryDependencies);GLESv2;EGL;atomic</LibraryDependencies>
       <SharedLibrarySearchPath>C:\android\lib64;%(SharedLibrarySearchPath);$(SysrootLink)\usr\lib\$(AndroidHeaderTriple);$(SysrootLink)\usr\lib\$(AndroidHeaderTriple)\$(AndroidAPILevelNumber)</SharedLibrarySearchPath>
       <AdditionalLibraryDirectories>C:\android\lib64;%(AdditionalLibraryDirectories);$(ToolchainPrebuiltPath)\lib\gcc\$(ToolchainName)\$(ToolchainFullVersionName);$(StlLibraryPath)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>C:\android\lib64\libvorbisfile.a;C:\android\lib64\libvorbis.a;C:\android\lib64\libssl.a;C:\android\lib64\libpng.a;C:\android\lib64\libphysfs.a;C:\android\lib64\libopenal.a;C:\android\lib64\libogg.a;C:\android\lib64\libluajit.a;C:\android\lib64\libgame-activity_static.a;C:\android\lib64\libgame-text-input_static.a;C:\android\lib64\libcrypto.a;C:\android\lib64\libzip.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>
+      C:\android\lib64\libvorbisfile.a;
+      C:\android\lib64\libvorbis.a;
+      C:\android\lib64\libssl.a;
+      C:\android\lib64\libpng.a;
+      C:\android\lib64\libphysfs.a;
+      C:\android\lib64\libopenal.a;
+      C:\android\lib64\libogg.a;
+      C:\android\lib64\libluajit.a;
+      C:\android\lib64\libgame-activity_static.a;
+      C:\android\lib64\libgame-text-input_static.a;
+      C:\android\lib64\libcrypto.a;
+      C:\android\lib64\libzip.a;
+      C:\android\lib64\liblzma.so;
+      C:\android\lib64\libprotobuf.so;
+      C:\android\lib64\libprotoc.so;
+      %(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>-lm -lz -latomic</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
@@ -485,9 +513,10 @@
     <ClInclude Include="..\..\src\framework\otml\otmlparser.h" />
     <ClInclude Include="..\..\src\framework\pch.h" />
     <ClInclude Include="..\..\src\framework\platform\crashhandler.h" />
+    <ClInclude Include="..\..\src\framework\platform\androidmanager.h" />
+    <ClInclude Include="..\..\src\framework\platform\androidwindow.h" />
     <ClInclude Include="..\..\src\framework\platform\platform.h" />
     <ClInclude Include="..\..\src\framework\platform\platformwindow.h" />
-    <ClInclude Include="..\..\src\framework\platform\win32window.h" />
     <ClInclude Include="..\..\src\framework\sound\combinedsoundsource.h" />
     <ClInclude Include="..\..\src\framework\sound\declarations.h" />
     <ClInclude Include="..\..\src\framework\sound\oggsoundfile.h" />
@@ -535,6 +564,7 @@
     <ClInclude Include="..\..\src\gitinfo.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\androidmain.cpp" />
     <ClCompile Include="..\..\src\android\dependencies.cpp" />
     <ClCompile Include="..\..\src\android\game-activity\native_app_glue\android_native_app_glue.cpp" />
     <ClCompile Include="..\..\src\android\game-text-input\gametextinput.cpp" />
@@ -647,11 +677,11 @@
     <ClCompile Include="..\..\src\framework\otml\otmlexception.cpp" />
     <ClCompile Include="..\..\src\framework\otml\otmlnode.cpp" />
     <ClCompile Include="..\..\src\framework\otml\otmlparser.cpp" />
+    <ClCompile Include="..\..\src\framework\platform\androidmanager.cpp" />
+    <ClCompile Include="..\..\src\framework\platform\androidwindow.cpp" />
     <ClCompile Include="..\..\src\framework\platform\platform.cpp" />
     <ClCompile Include="..\..\src\framework\platform\platformwindow.cpp" />
-    <ClCompile Include="..\..\src\framework\platform\win32crashhandler.cpp" />
-    <ClCompile Include="..\..\src\framework\platform\win32platform.cpp" />
-    <ClCompile Include="..\..\src\framework\platform\win32window.cpp" />
+    <ClCompile Include="..\..\src\framework\platform\unixplatform.cpp" />
     <ClCompile Include="..\..\src\framework\sound\combinedsoundsource.cpp" />
     <ClCompile Include="..\..\src\framework\sound\oggsoundfile.cpp" />
     <ClCompile Include="..\..\src\framework\sound\soundbuffer.cpp" />

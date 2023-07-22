@@ -24,7 +24,7 @@
 
 #include "androidwindow.h"
 #include "androidmanager.h"
-#include <game-activity/native_app_glue/android_native_app_glue.h>
+#include "android/game-activity/native_app_glue/android_native_app_glue.h"
 #include <framework/core/eventdispatcher.h>
 
 AndroidWindow& g_androidWindow = (AndroidWindow&) g_window;
@@ -344,8 +344,8 @@ void AndroidWindow::initializeAndroidApp(android_app* app) {
         engine->handleCmd(cmd);
     };
 
-    android_app_set_key_event_filter(m_app, NULL);
-    android_app_set_motion_event_filter(m_app, NULL);
+    //android_app_set_key_event_filter(m_app, NULL);
+    //android_app_set_motion_event_filter(m_app, NULL);
 }
 
 void AndroidWindow::onNativeTouch(int actionType,
