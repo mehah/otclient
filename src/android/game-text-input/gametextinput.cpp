@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "game-text-input/gametextinput.h"
+#include "android/game-text-input/gametextinput.h"
 
 #include <android/log.h>
 #include <jni.h>

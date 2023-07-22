@@ -41,13 +41,7 @@ int main(int argc, const char* argv[])
     g_platform.init(args);
 
     // initialize resources
-#ifdef ANDROID
-    // Unzip Android assets/data.zip
-    g_androidManager.unZipAssetData();
-    g_resources.init(nullptr);
-#else
     g_resources.init(args[0].data());
-#endif
 
 #if ENABLE_ENCRYPTION == 1 && ENABLE_ENCRYPTION_BUILDER == 1
     if (std::find(args.begin(), args.end(), "--encrypt") != args.end()) {
@@ -66,8 +60,21 @@ int main(int argc, const char* argv[])
     }
 
     // find script init.lua and run it
-    if (!g_resources.discoverWorkDir("init.lua"))
-        g_logger.fatal("Unable to find work directory, the application cannot be initialized.");
+    g_resources.setupWriteDir(g_app.getName(), g_app.getCompactName());
+    g_resources.setup();
+
+    if (!g_lua.safeRunScript("init.lua")) {
+        if (g_resources.isLoadedFromArchive() && !g_resources.isLoadedFromMemory() &&
+            g_resources.loadDataFromSelf(true)) {
+            g_logger.error("Unable to run script init.lua! Trying to run version from memory.");
+            if (!g_lua.safeRunScript("init.lua")) {
+                g_resources.deleteFile("data.zip"); // remove incorrect data.zip
+                g_logger.fatal("Unable to run script init.lua from binary file!\nTry to run client again.");
+            }
+        } else {
+            g_logger.fatal("Unable to run script init.lua!");
+        }
+    }
 
 #if ENABLE_DISCORD_RPC == 1
     g_discord.init();

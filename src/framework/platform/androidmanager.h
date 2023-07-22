@@ -46,7 +46,6 @@ public:
     float getScreenDensity();
 
     void attachToAppMainThread();
-private:
     JNIEnv* getJNIEnv();
 
     android_app* m_app;

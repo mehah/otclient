@@ -31,14 +31,17 @@ class ResourceManager
 {
 public:
     // @dontbind
-    void init(const char* argv0);
+    void init(const char *argv0);
     // @dontbind
     void terminate();
 
-    bool discoverWorkDir(const std::string& existentFile);
-    bool setupUserWriteDir(const std::string& appWriteDirName);
-    bool setWriteDir(const std::string& writeDir, bool create = false);
+    bool launchCorrect(std::vector<std::string>& args);
+    bool setupWriteDir(const std::string& product, const std::string& app);
+    bool setup();
 
+    bool loadDataFromSelf(bool unmountIfMounted = false);
+
+    bool setWriteDir(const std::string& writeDir, bool create = false);
     bool addSearchPath(const std::string& path, bool pushFront = false);
     bool removeSearchPath(const std::string& path);
     void searchAndAddPackages(const std::string& packagesDir, const std::string& packageExt);
@@ -48,30 +51,37 @@ public:
 
     // @dontbind
     void readFileStream(const std::string& fileName, std::iostream& out);
-    std::string readFileContents(const std::string& fileName);
+    std::string readFileContents(const std::string& fileName, bool safe = false);
+    std::string readFileContentsSafe(const std::string& fileName) { return readFileContents(fileName, true); }
+    bool isFileEncryptedOrCompressed(const std::string& fileName);
     // @dontbind
     bool writeFileBuffer(const std::string& fileName, const uint8_t* data, uint32_t size, bool createDirectory = false);
     bool writeFileContents(const std::string& fileName, const std::string& data);
     // @dontbind
     bool writeFileStream(const std::string& fileName, std::iostream& in);
 
-    // String_view Support
-    FileStreamPtr openFile(const std::string& fileName);
-    FileStreamPtr appendFile(const std::string& fileName) const;
-    FileStreamPtr createFile(const std::string& fileName) const;
+    FileStreamPtr openFile(const std::string& fileName, bool dontCache = false);
+    FileStreamPtr appendFile(const std::string& fileName);
+    FileStreamPtr createFile(const std::string& fileName);
     bool deleteFile(const std::string& fileName);
 
-    bool makeDir(const std::string& directory);
-    std::list<std::string> listDirectoryFiles(const std::string& directoryPath = "", bool fullPath = false, bool raw = false, bool recursive = false);
-    std::vector<std::string> getDirectoryFiles(const std::string& path, bool filenameOnly, bool recursive);
+    bool makeDir(const std::string directory);
+    std::list<std::string> listDirectoryFiles(const std::string & directoryPath = "", bool fullPath = false, bool raw = false, bool recursive = false);
 
     std::string resolvePath(const std::string& path);
+    std::string getWorkDir() { return "/"; }
+#ifdef ANDROID
+    std::string getWriteDir() { return "/"; }
+    std::string getBinaryName() { return "otclient.apk"; }
+#else
+    std::string getWriteDir() { return m_writeDir.string(); }
+    std::string getBinaryName() { return m_binaryPath.filename().string(); }
+#endif
+
     std::string getRealDir(const std::string& path);
     std::string getRealPath(const std::string& path);
     std::string getBaseDir();
     std::string getUserDir();
-    std::string getWriteDir() { return m_writeDir; }
-    std::string getWorkDir() { return m_workDir; }
     std::deque<std::string> getSearchPaths() { return m_searchPaths; }
 
     std::string guessFilePath(const std::string& filename, const std::string& type);
@@ -84,23 +94,46 @@ public:
     void runEncryption(const std::string& password);
     void save_string_into_file(const std::string& contents, const std::string& name);
 
+    bool isLoadedFromArchive() { return m_loadedFromArchive; }
+    bool isLoadedFromMemory() { return m_loadedFromMemory; }
+
     std::string fileChecksum(const std::string& path);
+
     stdext::map<std::string, std::string> filesChecksums();
     std::string selfChecksum();
+
+    std::string readCrashLog(bool txt);
+    void deleteCrashLog();
+
     void updateFiles(const std::set<std::string>& files);
+
     void updateExecutable(std::string fileName);
-    bool launchCorrect(std::vector<std::string>& args);
 
-    std::string getBinaryPath() { return m_binaryPath.string(); }
+    std::string getBinaryPath() { return m_binaryPath.filename().string(); }
 
-protected:
-    std::vector<std::string> discoverPath(const std::filesystem::path& path, bool filenameOnly, bool recursive);
+    std::map<std::string, std::string> decompressArchive(std::string dataOrPath);
+
+    bool decryptBuffer(std::string & buffer);
+
+    void setLayout(std::string layout);
+    std::string getLayout()
+    {
+        return m_layout;
+    }
 
 private:
-    std::string m_workDir;
-    std::string m_writeDir;
-    std::filesystem::path m_binaryPath;
+    bool mountMemoryData(const std::shared_ptr<std::vector<uint8_t>>& data);
+    void unmountMemoryData();
+
+    std::filesystem::path m_binaryPath, m_writeDir;
+
     std::deque<std::string> m_searchPaths;
+
+    bool m_loadedFromMemory = false;
+    bool m_loadedFromArchive = false;
+    std::shared_ptr<std::vector<uint8_t>> m_memoryData;
+    uint32_t m_customEncryption = 0;
+    std::string m_layout;
 };
 
 extern ResourceManager g_resources;

@@ -376,3 +376,29 @@ std::string Crypt::crc32(const std::string& decoded_string, bool upperCase)
         std::transform(result.begin(), result.end(), result.begin(), tolower);
     return result;
 }
+
+#define DELTA 0x9e3779b9
+#define MX (((z>>5^y<<2) + (y>>3^z<<4)) ^ ((sum^y) + (key[(p&3)^e] ^ z)))
+
+void Crypt::bdecrypt(uint8_t* buffer, int len, uint64_t k) {
+    uint32_t const key[4] = { (uint32_t)(k >> 32), (uint32_t)(k & 0xFFFFFFFF), 0xDEADDEAD, 0xB00BEEEF };
+    uint32_t y, z, sum;
+    uint32_t *v = (uint32_t*)buffer;
+    unsigned p, rounds, e;
+    int n = (len - len % 4) / 4;
+    if (n < 2)
+        return;
+    rounds = 6 + 52 / n;
+    sum = rounds * DELTA;
+    y = v[0];
+    do {
+        e = (sum >> 2) & 3;
+        for (p = n - 1; p > 0; p--) {
+            z = v[p - 1];
+            y = v[p] -= MX;
+        }
+        z = v[n - 1];
+        y = v[0] -= MX;
+        sum -= DELTA;
+    } while (--rounds);
+}

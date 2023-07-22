@@ -36,9 +36,9 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-#include "common/gamesdk_common.h"
-#include "game-activity/GameActivityEvents.h"
-#include "game-text-input/gametextinput.h"
+#include "android/common/gamesdk_common.h"
+#include "android/game-activity/GameActivityEvents.h"
+#include "android/game-text-input/gametextinput.h"
 
 #ifdef __cplusplus
 extern "C" {

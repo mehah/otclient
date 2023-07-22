@@ -26,7 +26,7 @@
 #include <jni.h>
 #include <stdint.h>
 
-#include "common/gamesdk_common.h"
+#include "android/common/gamesdk_common.h"
 #include "gamecommon.h"
 
 #ifdef __cplusplus
