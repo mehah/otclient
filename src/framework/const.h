@@ -254,7 +254,10 @@ namespace Fw
         MouseLeftButton,
         MouseRightButton,
         MouseMidButton,
-        MouseXButton
+        MouseXButton,
+        MouseTouch,
+        MouseTouch2,
+        MouseTouch3,
     };
 
     enum MouseWheelDirection : uint8_t

@@ -64,7 +64,8 @@ void Logger::log(Fw::LogLevel level, const std::string_view message)
     std::string outmsg{ std::string{s_logPrefixes[level]} + message.data() };
 
 #ifdef ANDROID
-    __android_log_print(ANDROID_LOG_INFO, "OTClientMobile", "%s", outmsg.c_str());
+    const static int logPriorities[] = { ANDROID_LOG_INFO, ANDROID_LOG_INFO, ANDROID_LOG_WARN, ANDROID_LOG_ERROR, ANDROID_LOG_FATAL };
+    __android_log_print(logPriorities[level], "OTClientMobile", "%s", outmsg.c_str());
 #endif // ANDROID
 
     std::cout << outmsg << std::endl;
@@ -131,6 +132,7 @@ void Logger::fireOldMessages()
 
 void Logger::setLogFile(const std::string_view file)
 {
+#ifndef ANDROID
     std::scoped_lock lock(m_mutex);
 
     m_outFile.open(stdext::utf8_to_latin1(file), std::ios::out | std::ios::app);
@@ -139,4 +141,5 @@ void Logger::setLogFile(const std::string_view file)
         return;
     }
     m_outFile.flush();
+#endif
 }

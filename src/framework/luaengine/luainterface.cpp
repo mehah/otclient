@@ -23,6 +23,12 @@
 #include "luainterface.h"
 #include "luaobject.h"
 
+#if defined(ANDROID)
+#include <luajit/lua.h>
+#include <luajit/lualib.h>
+#include <luajit/lauxlib.h>
+#endif
+
 #include <framework/core/resourcemanager.h>
 
 LuaInterface g_lua;

@@ -37,7 +37,11 @@ X11Window window;
 #include <framework/core/clock.h>
 #include <framework/graphics/image.h>
 
+#ifdef ANDROID
+PlatformWindow& g_window = g_androidWindow;
+#else
 PlatformWindow& g_window = window;
+#endif
 
 int PlatformWindow::loadMouseCursor(const std::string& file, const Point& hotSpot)
 {

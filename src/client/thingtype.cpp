@@ -38,6 +38,7 @@
 
 const static TexturePtr m_textureNull;
 
+#if not defined(ANDROID)
 void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category, const appearances::Appearance& appearance)
 {
     m_null = false;
@@ -349,6 +350,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
 
     prepareTextureLoad(sizes, total_sprites);
 }
+#endif
 
 void ThingType::unserialize(uint16_t clientId, ThingCategory category, const FileStreamPtr& fin)
 {

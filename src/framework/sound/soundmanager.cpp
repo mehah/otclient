@@ -36,10 +36,6 @@ SoundManager g_sounds;
 
 void SoundManager::init()
 {
-#ifdef ANDROID
-    // The alcOpenDevice call needs to be executed on Android main thread
-    g_androidManager.attachToAppMainThread();
-#endif
     m_device = alcOpenDevice(nullptr);
     if (!m_device) {
         g_logger.error("unable to open audio device");

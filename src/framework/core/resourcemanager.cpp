@@ -117,7 +117,7 @@ bool ResourceManager::launchCorrect(std::vector<std::string>& args) { // curentl
 
 bool ResourceManager::setupWriteDir(const std::string& product, const std::string& app) {
 #ifdef ANDROID
-    const char* localDir = g_androidManager.m_app->activity->internalDataPath;
+    const char* localDir = g_androidState->activity->internalDataPath;
 #else
     const char* localDir = PHYSFS_getPrefDir(product.c_str(), app.c_str());
 #endif
@@ -215,7 +215,7 @@ bool ResourceManager::setup()
 bool ResourceManager::loadDataFromSelf(bool unmountIfMounted) {
     std::shared_ptr<std::vector<uint8_t>> data = nullptr;
 #ifdef ANDROID
-    AAsset* file = AAssetManager_open(g_androidManager.m_app->activity->assetManager, "data.zip", AASSET_MODE_BUFFER);
+    AAsset* file = AAssetManager_open(g_androidState->activity->assetManager, "data.zip", AASSET_MODE_BUFFER);
     if (!file)
         g_logger.fatal("Can't open data.zip from assets");
     data = std::make_shared<std::vector<uint8_t>>(AAsset_getLength(file));
@@ -591,7 +591,7 @@ std::string ResourceManager::getRealPath(const std::string& path)
 std::string ResourceManager::getBaseDir()
 {
 #ifdef ANDROID
-    return g_androidManager.getAppBaseDir();
+    return g_androidState->activity->internalDataPath;
 #else
     return PHYSFS_getBaseDir();
 #endif

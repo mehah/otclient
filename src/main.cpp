@@ -25,6 +25,8 @@
 #include <framework/core/resourcemanager.h>
 #include <framework/luaengine/luainterface.h>
 
+#include <framework/core/eventdispatcher.h>
+
 #if ENABLE_DISCORD_RPC == 1
 #include <framework/discord/discord.h>
 #endif
@@ -37,8 +39,10 @@ int main(int argc, const char* argv[])
 {
     std::vector<std::string> args(argv, argv + argc);
 
+    #if not defined(ANDROID)
     // process args encoding
     g_platform.init(args);
+    #endif
 
     // initialize resources
     g_resources.init(args[0].data());
@@ -103,4 +107,44 @@ int main(int argc, const char* argv[])
     g_http.terminate();
 #endif
     return 0;
-    }
+}
+
+
+#ifdef ANDROID
+#include <framework/platform/androidwindow.h>
+
+android_app* g_androidState = nullptr;
+void android_main(struct android_app* state)
+{
+    g_androidState = state;
+
+    state->userData = nullptr;
+    state->onAppCmd = +[](android_app* app, int32_t cmd) -> void {
+       return g_androidWindow.handleCmd(cmd);
+    };
+    state->onInputEvent = +[](android_app* app, AInputEvent* event) -> int32_t {
+        return g_androidWindow.handleInput(event);
+    };
+    state->activity->callbacks->onNativeWindowResized = +[](ANativeActivity* activity, ANativeWindow* window) -> void {
+        g_dispatcher.scheduleEvent([] {
+            g_androidWindow.updateSize();
+        }, 500);
+    };
+    state->activity->callbacks->onContentRectChanged = +[](ANativeActivity* activity, const ARect* rect) -> void {
+        g_dispatcher.scheduleEvent([] {
+            g_androidWindow.updateSize();
+        }, 500);
+    };
+
+    bool terminated = false;
+    g_window.setOnClose([&] {
+        terminated = true;
+    });
+    while(!g_window.isVisible() && !terminated)
+        g_window.poll(); // init window
+    // run app
+    const char* args[] = { "otclientv8.apk" };
+    main(1, args);
+    std::exit(0); // required!
+}
+#endif

@@ -34,7 +34,9 @@
 #include <framework/net/server.h>
 #include <framework/otml/declarations.h>
 
+#if not defined(ANDROID)
 using namespace otclient::protobuf;
+#endif
 
 enum FrameGroupType : uint8_t
 {
@@ -267,7 +269,9 @@ struct Light
 class ThingType : public LuaObject
 {
 public:
+#if not defined(ANDROID)
     void unserializeAppearance(uint16_t clientId, ThingCategory category, const appearances::Appearance& appearance);
+#endif
     void unserialize(uint16_t clientId, ThingCategory category, const FileStreamPtr& fin);
     void unserializeOtml(const OTMLNodePtr& node);
 

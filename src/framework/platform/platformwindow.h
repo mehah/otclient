@@ -59,6 +59,9 @@ public:
     virtual void setMouseCursor(int cursorId) = 0;
     virtual void restoreMouseCursor() = 0;
 
+    virtual void showTextEditor(const std::string& title, const std::string& description, const std::string& text, int flags) {}
+    virtual void handleTextInput(std::string text) {} // for android
+
     virtual void setTitle(const std::string_view title) = 0;
     virtual void setMinimumSize(const Size& minimumSize) = 0;
     virtual void setFullscreen(bool fullscreen) = 0;

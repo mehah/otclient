@@ -7,8 +7,6 @@
 // that are part of the project
 //
 
-#pragma once
-
 #include <jni.h>
 #include <errno.h>
 
@@ -25,7 +23,6 @@
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
 
-#include "android/game-activity/native_app_glue/android_native_app_glue.h"
-#include "android/game-activity/GameActivityEvents.h"
+#include "android_native_app_glue.h"
 
 extern android_app* g_androidState;

@@ -39,12 +39,12 @@
 #include <client/spriteappearances.h>
 #include <client/spritemanager.h>
 
-#include "protobuf/appearances.pb.h"
-
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
+#if not defined(ANDROID)
 using namespace otclient::protobuf;
+#endif
 
 ThingTypeManager g_things;
 
@@ -187,6 +187,7 @@ bool ThingTypeManager::loadOtml(std::string file)
 
 bool ThingTypeManager::loadAppearances(const std::string& file)
 {
+    #if not defined(ANDROID)
     try {
         int spritesCount = 0;
         std::string appearancesFile;
@@ -250,6 +251,7 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
         g_logger.error(stdext::format("Failed to load '%s' (Appearances): %s", file, e.what()));
         return false;
     }
+    #endif
 }
 
 const ThingTypeList& ThingTypeManager::getThingTypes(ThingCategory category)

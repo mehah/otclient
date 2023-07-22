@@ -238,8 +238,6 @@
       C:\android\lib64\libopenal.a;
       C:\android\lib64\libogg.a;
       C:\android\lib64\libluajit.a;
-      C:\android\lib64\libgame-activity_static.a;
-      C:\android\lib64\libgame-text-input_static.a;
       C:\android\lib64\libcrypto.a;
       C:\android\lib64\libzip.a;
       C:\android\lib64\liblzma.so;
@@ -382,15 +380,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\android\game-activity\native_app_glue\android_native_app_glue.h" />
-    <ClInclude Include="..\..\src\android\common\gamesdk_common.h" />
-    <ClInclude Include="..\..\src\android\game-text-input\gamecommon.h" />
-    <ClInclude Include="..\..\src\android\game-text-input\gametextinput.h" />
-    <ClInclude Include="..\..\src\android\memory_advice\memory_advice.h" />
-    <ClInclude Include="..\..\src\android\memory_advice\memory_advice_debug.h" />
-    <ClInclude Include="..\..\src\android\game-activity\GameActivity.h" />
-    <ClInclude Include="..\..\src\android\game-activity\GameActivityEvents.h" />
-    <ClInclude Include="..\..\src\android\game-activity\GameActivityLog.h" />
+    <ClInclude Include="..\..\src\android\android_native_app_glue.h" />
     <ClInclude Include="..\..\src\android\pch.h" />
     <ClInclude Include="..\..\src\client\animatedtext.h" />
     <ClInclude Include="..\..\src\client\animator.h" />
@@ -513,7 +503,6 @@
     <ClInclude Include="..\..\src\framework\otml\otmlparser.h" />
     <ClInclude Include="..\..\src\framework\pch.h" />
     <ClInclude Include="..\..\src\framework\platform\crashhandler.h" />
-    <ClInclude Include="..\..\src\framework\platform\androidmanager.h" />
     <ClInclude Include="..\..\src\framework\platform\androidwindow.h" />
     <ClInclude Include="..\..\src\framework\platform\platform.h" />
     <ClInclude Include="..\..\src\framework\platform\platformwindow.h" />
@@ -564,12 +553,8 @@
     <ClInclude Include="..\..\src\gitinfo.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\androidmain.cpp" />
     <ClCompile Include="..\..\src\android\dependencies.cpp" />
-    <ClCompile Include="..\..\src\android\game-activity\native_app_glue\android_native_app_glue.cpp" />
-    <ClCompile Include="..\..\src\android\game-text-input\gametextinput.cpp" />
-    <ClCompile Include="..\..\src\android\game-activity\GameActivity.cpp" />
-    <ClCompile Include="..\..\src\android\game-activity\GameActivityEvents.cpp" />
+    <ClCompile Include="..\..\src\android\android_native_app_glue.cpp" />
     <ClCompile Include="..\..\src\client\animatedtext.cpp" />
     <ClCompile Include="..\..\src\client\animator.cpp" />
     <ClCompile Include="..\..\src\client\attachedeffect.cpp" />
@@ -677,11 +662,10 @@
     <ClCompile Include="..\..\src\framework\otml\otmlexception.cpp" />
     <ClCompile Include="..\..\src\framework\otml\otmlnode.cpp" />
     <ClCompile Include="..\..\src\framework\otml\otmlparser.cpp" />
-    <ClCompile Include="..\..\src\framework\platform\androidmanager.cpp" />
+    <ClCompile Include="..\..\src\framework\platform\androidplatform.cpp" />
     <ClCompile Include="..\..\src\framework\platform\androidwindow.cpp" />
     <ClCompile Include="..\..\src\framework\platform\platform.cpp" />
     <ClCompile Include="..\..\src\framework\platform\platformwindow.cpp" />
-    <ClCompile Include="..\..\src\framework\platform\unixplatform.cpp" />
     <ClCompile Include="..\..\src\framework\sound\combinedsoundsource.cpp" />
     <ClCompile Include="..\..\src\framework\sound\oggsoundfile.cpp" />
     <ClCompile Include="..\..\src\framework\sound\soundbuffer.cpp" />
@@ -712,7 +696,6 @@
     <ClCompile Include="..\..\src\framework\ui\uiwidgettext.cpp" />
     <ClCompile Include="..\..\src\framework\util\color.cpp" />
     <ClCompile Include="..\..\src\framework\util\crypt.cpp" />
-    <ClCompile Include="..\..\src\protobuf\appearances.pb.cc" />
     <ClCompile Include="..\..\src\main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

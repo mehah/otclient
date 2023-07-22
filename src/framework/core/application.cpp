@@ -168,9 +168,13 @@ void Application::close()
 
 void Application::restart()
 {
+#if not defined(ANDROID)
     g_lua.callGlobalField<bool>("g_app", "onRestart");
     g_platform.spawnProcess(g_resources.getBinaryPath(), m_startupArgs);
     exit();
+#else
+    exit();
+#endif
 }
 
 std::string Application::getOs()
