@@ -30,7 +30,7 @@
 struct PHYSFS_File;
 
 // @bindclass
-class FileStream
+class FileStream : public std::enable_shared_from_this<FileStream>
 {
 public:
     FileStream(std::string name, PHYSFS_File* fileHandle, bool writeable);
