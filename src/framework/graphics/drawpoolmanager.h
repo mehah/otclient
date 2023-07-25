@@ -100,7 +100,7 @@ private:
     void terminate() const;
     void drawObject(const DrawPool::DrawObject& obj);
 
-    bool drawPool(const auto& pool);
+    bool drawPool(const DrawPoolType type);
 
     CoordsBuffer m_coordsBuffer;
     std::array<DrawPool*, static_cast<uint8_t>(DrawPoolType::UNKNOW) + 1> m_pools{};

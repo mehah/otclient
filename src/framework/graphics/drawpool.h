@@ -225,6 +225,7 @@ private:
     bool m_alwaysGroupDrawings{ false };
 
     uint8_t m_depthLevel{ 0 };
+    uint8_t m_drawPos{ 0 };
 
     uint16_t m_refreshDelay{ 0 }, m_shaderRefreshDelay{ 0 };
     uint32_t m_onlyOnceStateFlag{ 0 };
@@ -238,7 +239,7 @@ private:
     std::pair<size_t, size_t> m_status{ 1, 0 };
 
     std::vector<Matrix3> m_transformMatrixStack;
-    std::vector<DrawObject> m_objects[MAX_DRAW_DEPTH + 1][static_cast<uint8_t>(DrawOrder::LAST)];
+    std::vector<DrawObject> m_objects[2][MAX_DRAW_DEPTH + 1][static_cast<uint8_t>(DrawOrder::LAST)];
 
     stdext::map<size_t, CoordsBuffer*> m_coords;
 

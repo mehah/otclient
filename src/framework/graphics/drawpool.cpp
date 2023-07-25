@@ -62,7 +62,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
         auto& coords = m_coords.try_emplace(m_state.hash, nullptr).first->second;
         if (!coords) {
             auto state = getState(method, texture, color);
-            coords = m_objects[m_depthLevel][order].emplace_back(state).coords.get();
+            coords = m_objects[m_drawPos][m_depthLevel][order].emplace_back(state).coords.get();
         }
 
         if (coordsBuffer)
@@ -72,7 +72,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
     } else {
         bool addNewObj = true;
 
-        auto& list = m_objects[m_depthLevel][order];
+        auto& list = m_objects[m_drawPos][m_depthLevel][order];
         if (!list.empty()) {
             auto& prevObj = list.back();
             if (prevObj.state.hash == m_state.hash) {
@@ -241,7 +241,7 @@ void DrawPool::setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bo
 
 void DrawPool::resetState()
 {
-    for (auto& objs : m_objects) {
+    for (auto& objs : m_objects[m_drawPos]) {
         for (auto& order : objs)
             order.clear();
     }

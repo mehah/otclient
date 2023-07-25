@@ -136,6 +136,7 @@ void GraphicalApplication::run()
     const auto& foreground = g_drawPool.get(DrawPoolType::FOREGROUND);
     const auto& txt = g_drawPool.get(DrawPoolType::TEXT);
     const auto& map = g_drawPool.get(DrawPoolType::MAP);
+    const auto& creatureInformation = g_drawPool.get(DrawPoolType::CREATURE_INFORMATION);
 
     std::condition_variable foreCondition, txtCondition;
 
@@ -163,7 +164,7 @@ void GraphicalApplication::run()
                     txtCondition.notify_one();
 
                 {
-                    std::scoped_lock l(map->getMutex());
+                    std::scoped_lock l(map->getMutex(), creatureInformation->getMutex());
                     mapWidget->drawSelf(DrawPoolType::MAP);
                 }
             } else mapWidget = nullptr;
