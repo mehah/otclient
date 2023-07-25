@@ -24,6 +24,7 @@
 
 #ifdef _MSC_VER
 
+#include <winsock2.h>
 #include <Windows.h>
 
 #pragma warning (push)
