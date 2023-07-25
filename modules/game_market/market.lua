@@ -1406,7 +1406,7 @@ function Market.createNewOffer()
         return
     end
 
-    local itemTier = Item.create(spriteId):getClassification() or 0
+    local itemTier = Item.create(spriteId):getClassification()
     g_game.createMarketOffer(type, spriteId, itemTier, amount, piecePrice, anonymous)
     lastCreatedOffer = os.time()
     Market.resetCreateOffer()
