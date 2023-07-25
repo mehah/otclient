@@ -439,6 +439,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Thing>("detachEffectById", &Thing::detachEffectById);
     g_lua.bindClassMemberFunction<Thing>("getAttachedEffectById", &Thing::getAttachedEffectById);
     g_lua.bindClassMemberFunction<Thing>("clearAttachedEffects", &Thing::clearAttachedEffects);
+    g_lua.bindClassMemberFunction<Thing>("getClassification", &Thing::getClassification);
 
 #ifdef FRAMEWORK_EDITOR
     g_lua.registerClass<House>();
@@ -605,7 +606,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ThingType>("isTopEffect", &ThingType::isTopEffect);
     g_lua.bindClassMemberFunction<ThingType>("getSprites", &ThingType::getSprites);
     g_lua.bindClassMemberFunction<ThingType>("hasAttribute", &ThingType::hasAttr);
-    g_lua.bindClassMemberFunction<ThingType>("getUpgradeClassification", &ThingType::getClassification);
+    g_lua.bindClassMemberFunction<ThingType>("getClassification", &ThingType::getClassification);
     g_lua.bindClassMemberFunction<ThingType>("hasWearOut", &ThingType::hasWearOut);
     g_lua.bindClassMemberFunction<ThingType>("hasClockExpire", &ThingType::hasClockExpire);
     g_lua.bindClassMemberFunction<ThingType>("hasExpire", &ThingType::hasExpire);
