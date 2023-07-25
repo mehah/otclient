@@ -29,11 +29,6 @@
 #include <framework/graphics/drawpoolmanager.h>
 
 LightView::LightView(const Size& size, const uint16_t tileSize) : m_pool(g_drawPool.get(DrawPoolType::LIGHT)) {
-    g_mainDispatcher.addEvent([this, size] {
-        m_texture = std::make_shared<Texture>(size);
-        m_texture->setSmooth(true);
-    });
-
     m_thread = std::thread([this]() {
         std::unique_lock lock(m_pool->getMutex());
         m_condition.wait(lock, [this]() -> bool {
@@ -59,14 +54,20 @@ LightView::LightView(const Size& size, const uint16_t tileSize) : m_pool(g_drawP
 void LightView::resize(const Size& size, const uint16_t tileSize) {
     std::scoped_lock l(m_pool->getMutex());
 
+    g_mainDispatcher.addEvent([this, size] {
+        m_texture = std::make_shared<Texture>(size);
+        m_texture->setSmooth(true);
+    });
+
     m_mapSize = size;
     m_tileSize = tileSize;
 
-    for (auto& lightData : m_lightData)
+    for (auto& lightData : m_lightData) {
         lightData.tiles.resize(size.area());
+        lightData.lights.clear();
+    }
 
-    if (m_pixels.size() < 4u * m_mapSize.area())
-        m_pixels.resize(m_mapSize.area() * 4);
+    m_pixels.resize(size.area() * 4);
 
     if (m_texture)
         m_texture->setupSize(m_mapSize);
@@ -113,6 +114,7 @@ void LightView::draw(const Rect& dest, const Rect& src)
         m_hash = m_updatedHash;
         m_updatedHash = 0;
 
+        std::scoped_lock l(m_pool->getMutex());
         if (++m_currentLightData > 1) m_currentLightData = 0;
         m_condition.notify_one();
     }
