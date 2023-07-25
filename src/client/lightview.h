@@ -43,8 +43,9 @@ public:
 
     void setGlobalLight(const Light& light)
     {
+        std::scoped_lock l(m_pool->getMutex());
         m_isDark = light.intensity < 250;
-        m_lightData.globalLightColor = Color::from8bit(light.color, light.intensity / static_cast<float>(UINT8_MAX));
+        m_globalLightColor = Color::from8bit(light.color, light.intensity / static_cast<float>(UINT8_MAX));
     }
 
     bool isDark() const { return m_isDark; }
@@ -62,11 +63,8 @@ private:
 
     struct LightData
     {
-        Size mapSize;
-        uint16_t tileSize{ 0 };
         std::vector<size_t> tiles;
         std::vector<TileLight> lights;
-        Color globalLightColor{ Color::white };
     };
 
     void updateCoords(const Rect& dest, const Rect& src);
@@ -76,12 +74,17 @@ private:
 
     size_t m_hash{ 0 }, m_updatedHash{ 0 };
 
+    Size m_mapSize;
+    uint16_t m_tileSize{ 32 };
+    Color m_globalLightColor{ Color::white };
+
     DrawPool* m_pool{ nullptr };
 
     Rect m_dest, m_src;
     CoordsBuffer m_coords;
     TexturePtr m_texture;
-    LightData m_lightData, m_threadLightData;
+    LightData m_lightData[2];
+    std::atomic_uint8_t m_currentLightData{ 0 };
 
     std::thread m_thread;
     std::condition_variable m_condition;
