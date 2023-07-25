@@ -155,7 +155,7 @@ public:
 
     PLAYER_ACTION getDefaultAction() { return m_thingType->getDefaultAction(); }
 
-    uint16_t getClassification() const { return m_thingType->getClassification(); }
+    uint16_t getClassification() { return m_thingType->getClassification(); }
 
     void canDraw(bool canDraw) { m_canDraw = canDraw; }
     inline bool canDraw(const Color& color = Color::white) const {

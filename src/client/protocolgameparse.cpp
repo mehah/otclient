@@ -3556,10 +3556,6 @@ void ProtocolGame::parseError(const InputMessagePtr& msg)
 void ProtocolGame::parseMarketEnter(const InputMessagePtr& msg)
 {
     const uint8_t offers = msg->getU8();
-    if (const uint16_t depotLocker = msg->peekU16(); depotLocker == 0x00) {
-        return;
-    }
-
     std::vector<std::vector<uint16_t>> depotItems;
     const uint16_t itemsSent = msg->getU16();
     for (int_fast32_t i = 0; i < itemsSent; i++) {
