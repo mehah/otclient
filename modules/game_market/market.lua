@@ -1090,7 +1090,7 @@ function init()
         onMarketDetail = Market.onMarketDetail,
         onMarketReadOffer = Market.onMarketReadOffer,
         onMarketLeave = Market.onMarketLeave,
-        onResourcesBalanceChange = Market.onResourceBalanceChange
+        onResourcesBalanceChange = Market.onResourcesBalanceChange
     })
     connect(g_game, {
         onGameEnd = Market.close
@@ -1114,7 +1114,7 @@ function terminate()
         onMarketDetail = Market.onMarketDetail,
         onMarketReadOffer = Market.onMarketReadOffer,
         onMarketLeave = Market.onMarketLeave,
-        onResourceBalancesChange = Market.onResourceBalanceChange
+        onResourcesBalanceChange = Market.onResourcesBalanceChange
     })
     disconnect(g_game, {
         onGameEnd = Market.close
