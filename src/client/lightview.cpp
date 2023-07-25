@@ -37,6 +37,11 @@ LightView::LightView(const Size& size, const uint16_t tileSize) : m_pool(g_drawP
         });
     });
 
+    g_mainDispatcher.addEvent([this, size] {
+        m_texture = std::make_shared<Texture>(size);
+        m_texture->setSmooth(true);
+    });
+
     g_drawPool.use(DrawPoolType::LIGHT);
     g_drawPool.addAction([this] {
         {
@@ -53,11 +58,6 @@ LightView::LightView(const Size& size, const uint16_t tileSize) : m_pool(g_drawP
 
 void LightView::resize(const Size& size, const uint16_t tileSize) {
     std::scoped_lock l(m_pool->getMutex());
-
-    g_mainDispatcher.addEvent([this, size] {
-        m_texture = std::make_shared<Texture>(size);
-        m_texture->setSmooth(true);
-    });
 
     m_mapSize = size;
     m_tileSize = tileSize;
