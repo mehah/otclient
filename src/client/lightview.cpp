@@ -145,24 +145,28 @@ void LightView::updatePixels() {
 
     const size_t lightSize = lightData.lights.size();
 
-    for (int x = 0; x < m_mapSize.width(); ++x) {
-        for (int y = 0; y < m_mapSize.height(); ++y) {
-            Point pos(x * m_tileSize + m_tileSize / 2, y * m_tileSize + m_tileSize / 2);
-            int index = (y * m_mapSize.width() + x);
-            int colorIndex = index * 4;
+    const int mapWidth = m_mapSize.width();
+    const int mapHeight = m_mapSize.height();
+
+    for (int x = -1; ++x < mapWidth;) {
+        for (int y = -1; ++y < mapHeight;) {
+            const Point pos(x * m_tileSize + m_tileSize / 2, y * m_tileSize + m_tileSize / 2);
+            const int index = (y * mapWidth + x);
+            const int colorIndex = index * 4;
             m_pixels[colorIndex] = m_globalLightColor.r();
             m_pixels[colorIndex + 1] = m_globalLightColor.g();
             m_pixels[colorIndex + 2] = m_globalLightColor.b();
             m_pixels[colorIndex + 3] = 255; // alpha channel
             for (size_t i = lightData.tiles[index]; i < lightSize; ++i) {
                 const auto& light = lightData.lights[i];
-                float distance = std::sqrt((pos.x - light.pos.x) * (pos.x - light.pos.x) +
-                                           (pos.y - light.pos.y) * (pos.y - light.pos.y));
-                distance /= m_tileSize;
+                const float distance = (std::sqrt((pos.x - light.pos.x) * (pos.x - light.pos.x) +
+                                        (pos.y - light.pos.y) * (pos.y - light.pos.y))) / m_tileSize;
+
                 float intensity = (-distance + light.intensity) * 0.2f;
                 if (intensity < 0.01f) continue;
                 if (intensity > 1.0f) intensity = 1.0f;
-                const Color& lightColor = Color::from8bit(light.color) * intensity;
+
+                const auto& lightColor = Color::from8bit(light.color) * intensity;
                 m_pixels[colorIndex] = std::max<int>(m_pixels[colorIndex], lightColor.r());
                 m_pixels[colorIndex + 1] = std::max<int>(m_pixels[colorIndex + 1], lightColor.g());
                 m_pixels[colorIndex + 2] = std::max<int>(m_pixels[colorIndex + 2], lightColor.b());
