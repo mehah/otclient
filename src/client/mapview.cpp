@@ -784,7 +784,11 @@ void MapView::setDrawLights(bool enable)
     m_drawingLight = enable;
 
     if (enable) {
-        m_lightView->resize(m_drawDimension, m_tileSize);
+        Size lightSize = g_map.getAwareRange().dimension();
+        if (m_drawDimension > lightSize)
+            lightSize = m_drawDimension;
+
+        m_lightView->resize(lightSize, m_tileSize);
         requestUpdateVisibleTiles();
     }
 
