@@ -29,17 +29,17 @@
 #include <framework/graphics/drawpoolmanager.h>
 
 LightView::LightView(const Size& size, const uint16_t tileSize) : m_pool(g_drawPool.get(DrawPoolType::LIGHT)) {
-    m_thread = std::thread([this]() {
-        std::unique_lock lock(m_pool->getMutex());
-        m_condition.wait(lock, [this]() -> bool {
-            updatePixels();
-            return m_texture == nullptr;
-        });
-    });
-
     g_mainDispatcher.addEvent([this, size] {
         m_texture = std::make_shared<Texture>(size);
         m_texture->setSmooth(true);
+
+        m_thread = std::thread([this]() {
+            std::unique_lock lock(m_pool->getMutex());
+            m_condition.wait(lock, [this]() -> bool {
+                updatePixels();
+                return m_texture == nullptr;
+            });
+        });
     });
 
     g_drawPool.use(DrawPoolType::LIGHT);
@@ -57,6 +57,9 @@ LightView::LightView(const Size& size, const uint16_t tileSize) : m_pool(g_drawP
 }
 
 void LightView::resize(const Size& size, const uint16_t tileSize) {
+    if (!m_texture || m_mapSize == size && m_tileSize == tileSize)
+        return;
+
     std::scoped_lock l(m_pool->getMutex());
 
     m_mapSize = size;

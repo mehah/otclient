@@ -59,6 +59,7 @@ void DrawPoolManager::draw()
         g_painter->setResolution(m_size, m_transformMatrix);
     }
 
+	m_drawing = true;
     if (drawPool(DrawPoolType::MAP)) {
         drawPool(DrawPoolType::CREATURE_INFORMATION);
         drawPool(DrawPoolType::LIGHT);
@@ -66,6 +67,7 @@ void DrawPoolManager::draw()
     }
 
     drawPool(DrawPoolType::FOREGROUND);
+	 m_drawing = false;
 }
 
 bool DrawPoolManager::drawPool(const DrawPoolType type) {
