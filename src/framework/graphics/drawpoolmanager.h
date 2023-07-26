@@ -92,6 +92,8 @@ public:
 
     DrawPoolType getCurrentType() const { return getCurrentPool()->m_type; }
 
+    bool isDrawing() const { return m_drawing; }
+
 private:
     DrawPool* getCurrentPool() const;
 
@@ -101,6 +103,8 @@ private:
     void drawObject(const DrawPool::DrawObject& obj);
 
     bool drawPool(const auto& pool);
+
+    std::atomic_bool m_drawing{ false };
 
     CoordsBuffer m_coordsBuffer;
     std::array<DrawPool*, static_cast<uint8_t>(DrawPoolType::UNKNOW) + 1> m_pools{};

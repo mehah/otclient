@@ -152,6 +152,11 @@ void GraphicalApplication::run()
                 continue;
             }
 
+            if (g_drawPool.isDrawing()) {
+                stdext::millisleep(1);
+                continue;
+            }
+
             if (foreground->canRepaint())
                 foreCondition.notify_one();
 
@@ -168,7 +173,8 @@ void GraphicalApplication::run()
                 }
             } else mapWidget = nullptr;
 
-            stdext::millisleep(1);
+            if (g_window.vsyncEnabled() || getMaxFps() > 0)
+                stdext::millisleep(1);
         }
 
         foreCondition.notify_one();
