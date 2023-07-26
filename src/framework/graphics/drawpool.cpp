@@ -170,19 +170,16 @@ void DrawPool::updateHash(const DrawPool::DrawMethod& method, const TexturePtr& 
     }
 
     if (hasFrameBuffer()) { // Method Hash
-        size_t methodhash = 0;
         if (method.type == DrawPool::DrawMethodType::TRIANGLE) {
-            if (!method.a.isNull()) stdext::hash_union(methodhash, method.a.hash());
-            if (!method.b.isNull()) stdext::hash_union(methodhash, method.b.hash());
-            if (!method.c.isNull()) stdext::hash_union(methodhash, method.c.hash());
+            if (!method.a.isNull()) stdext::hash_union(m_status.second, method.a.hash());
+            if (!method.b.isNull()) stdext::hash_union(m_status.second, method.b.hash());
+            if (!method.c.isNull()) stdext::hash_union(m_status.second, method.c.hash());
         } else if (method.type == DrawPool::DrawMethodType::BOUNDING_RECT) {
-            if (method.intValue) stdext::hash_combine(methodhash, method.intValue);
+            if (method.intValue) stdext::hash_combine(m_status.second, method.intValue);
         } else {
-            if (method.dest.isValid()) stdext::hash_union(methodhash, method.dest.hash());
-            if (method.src.isValid()) stdext::hash_union(methodhash, method.src.hash());
+            if (method.dest.isValid()) stdext::hash_union(m_status.second, method.dest.hash());
+            if (method.src.isValid()) stdext::hash_union(m_status.second, method.src.hash());
         }
-
-        stdext::hash_union(m_status.second, methodhash);
     }
 }
 
