@@ -408,7 +408,7 @@ void MapView::updateGeometry(const Size& visibleDimension)
 
         m_lightView->resize(lightSize, tileSize);
     }
-    g_mainDispatcher.addEvent([=, this]() {
+    g_mainDispatcher.addEvent([this, bufferSize]() {
         m_pool->getFrameBuffer()->resize(bufferSize);
     });
 
