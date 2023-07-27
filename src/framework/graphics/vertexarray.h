@@ -38,17 +38,16 @@ public:
             delete m_hardwareBuffer;
     }
 
-    void addVertex(float x, float y)
-    {
-        m_buffer.push_back(x);
-        m_buffer.push_back(y);
-    }
-
     void addTriangle(const Point& a, const Point& b, const Point& c)
     {
-        addVertex(a.x, a.y);
-        addVertex(b.x, b.y);
-        addVertex(c.x, c.y);
+        int arr[] = {
+            a.x, a.y,
+            b.x, b.y,
+            c.x, c.y
+        };
+
+        size_t size = sizeof(arr) / sizeof(int);
+        m_buffer.insert(m_buffer.end(), &arr[0], &arr[size]);
     }
 
     void addRect(const Rect& rect)
@@ -58,12 +57,17 @@ public:
         const float bottom = rect.bottom() + 1;
         const float left = rect.left();
 
-        addVertex(left, top);
-        addVertex(right, top);
-        addVertex(left, bottom);
-        addVertex(left, bottom);
-        addVertex(right, top);
-        addVertex(right, bottom);
+        float arr[] = {
+            left, top,
+            right, top,
+            left, bottom,
+            left, bottom,
+            right, top,
+            right, bottom
+        };
+
+        size_t size = sizeof(arr) / sizeof(float);
+        m_buffer.insert(m_buffer.end(), &arr[0], &arr[size]);
     }
 
     void addRect(const RectF& rect)
@@ -73,12 +77,17 @@ public:
         float bottom = rect.bottom() + 1.f;
         float left = rect.left();
 
-        addVertex(left, top);
-        addVertex(right, top);
-        addVertex(left, bottom);
-        addVertex(left, bottom);
-        addVertex(right, top);
-        addVertex(right, bottom);
+        float arr[] = {
+            left, top,
+            right, top,
+            left, bottom,
+            left, bottom,
+            right, top,
+            right, bottom
+        };
+
+        size_t size = sizeof(arr) / sizeof(float);
+        m_buffer.insert(m_buffer.end(), &arr[0], &arr[size]);
     }
 
     void addQuad(const Rect& rect)
@@ -88,10 +97,17 @@ public:
         const float bottom = rect.bottom() + 1;
         const float left = rect.left();
 
-        addVertex(left, top);
-        addVertex(right, top);
-        addVertex(left, bottom);
-        addVertex(right, bottom);
+        float arr[] = {
+            left, top,
+            right, top,
+            left, bottom,
+            left, bottom,
+            right, top,
+            right, bottom
+        };
+
+        size_t size = sizeof(arr) / sizeof(float);
+        m_buffer.insert(m_buffer.end(), &arr[0], &arr[size]);
     }
 
     void addUpsideDownQuad(const Rect& rect)
@@ -101,10 +117,15 @@ public:
         const float bottom = rect.bottom() + 1;
         const float left = rect.left();
 
-        addVertex(left, bottom);
-        addVertex(right, bottom);
-        addVertex(left, top);
-        addVertex(right, top);
+        float arr[] = {
+            left, bottom,
+            right, bottom,
+            left, top,
+            right, top,
+        };
+
+        size_t size = sizeof(arr) / sizeof(float);
+        m_buffer.insert(m_buffer.end(), &arr[0], &arr[size]);
     }
 
     void addUpsideDownRect(const Rect& rect)
@@ -114,12 +135,17 @@ public:
         const float bottom = rect.bottom() + 1;
         const float left = rect.left();
 
-        addVertex(left, bottom);
-        addVertex(right, bottom);
-        addVertex(left, bottom);
-        addVertex(left, top);
-        addVertex(right, bottom);
-        addVertex(right, top);
+        float arr[] = {
+            left, bottom,
+            right, bottom,
+            left, bottom,
+            left, top,
+            right, bottom,
+            right, top
+        };
+
+        size_t size = sizeof(arr) / sizeof(float);
+        m_buffer.insert(m_buffer.end(), &arr[0], &arr[size]);
     }
 
     void append(const VertexArray* buffer)
