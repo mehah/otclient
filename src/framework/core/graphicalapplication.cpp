@@ -173,8 +173,7 @@ void GraphicalApplication::run()
                 }
             } else mapWidget = nullptr;
 
-            if (g_window.vsyncEnabled() || getMaxFps() > 0)
-                stdext::millisleep(1);
+            stdext::millisleep(1);
         }
 
         foreCondition.notify_one();
