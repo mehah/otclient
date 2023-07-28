@@ -3,7 +3,7 @@
 
 -- updater
 Services = {
-    -- updater = "http://localhost/api/updater.php",
+    --updater = "http://localhost/api/updater.php",
 }
 
 g_app.setName("OTClient - Redemption");
@@ -73,13 +73,13 @@ local function loadModules()
     end
 end
 
-loadModules()
-
--- uncomment the line below so that modules are reloaded when modified. (Note: Use only mod dev)
--- g_modules.enableAutoReload()
-
 -- run updater, must use data.zip
 if g_app.hasUpdater() then
     g_modules.ensureModuleLoaded("updater")
     return Updater.init(loadModules)
 end
+
+loadModules()
+
+-- uncomment the line below so that modules are reloaded when modified. (Note: Use only mod dev)
+-- g_modules.enableAutoReload()
