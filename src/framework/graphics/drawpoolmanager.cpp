@@ -59,7 +59,7 @@ void DrawPoolManager::draw()
         g_painter->setResolution(m_size, m_transformMatrix);
     }
 
-    m_drawing = true;
+    // m_drawing = true;
 
     const auto& map = get(DrawPoolType::MAP); {
         std::scoped_lock l(map->m_mutex);
@@ -79,7 +79,7 @@ void DrawPoolManager::draw()
         drawPool(foreground);
     }
 
-    m_drawing = false;
+    // m_drawing = false;
 }
 
 bool DrawPoolManager::drawPool(const auto& pool) {
