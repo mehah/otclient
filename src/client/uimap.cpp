@@ -22,7 +22,6 @@
 
 #include "uimap.h"
 #include <framework/core/graphicalapplication.h>
-#include <framework/core/eventdispatcher.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
 #include "game.h"
