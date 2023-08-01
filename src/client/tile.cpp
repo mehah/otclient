@@ -24,12 +24,14 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
 #include <framework/graphics/drawpoolmanager.h>
+#include <framework/ui/uimanager.h>
 #include <framework/ui/uiwidget.h>
 #include "effect.h"
 #include "game.h"
 #include "item.h"
 #include "lightview.h"
 #include "map.h"
+#include "uimap.h"
 #include "protocolgame.h"
 
 Tile::Tile(const Position& position) : m_position(position) {}
@@ -69,6 +71,7 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool is
 
     drawCreature(dest, mapRect, flags, isCovered, false, lightView);
     drawTop(dest, flags, false, lightView);
+    updateWidget(dest, mapRect);
 }
 
 void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, bool forceDraw, LightView* lightView)
@@ -111,7 +114,7 @@ void Tile::drawTop(const Point& dest, int flags, bool forceDraw, LightView* ligh
     }
 }
 
-void Tile::drawWidget(const Point& dest, const MapPosInfo& mapRect)
+void Tile::updateWidget(const Point& dest, const MapPosInfo& mapRect)
 {
     if (!m_widget)
         return;
@@ -130,19 +133,37 @@ void Tile::drawWidget(const Point& dest, const MapPosInfo& mapRect)
     const auto& rect = Rect(p - Point(widgetRect.width() / 2 - g_gameConfig.getSpriteSize(), widgetRect.height() / 2 - g_gameConfig.getSpriteSize()), widgetRect.width(), widgetRect.height());
 
     m_widget->setRect(rect);
+}
 
-    const auto& oldClipRect = g_drawPool.getClipRect();
-    g_drawPool.setClipRect(mapRect.rect);
-    m_widget->draw(rect, DrawPoolType::FOREGROUND);
-    g_drawPool.setClipRect(oldClipRect);
+void Tile::drawWidget(const Point& dest, const MapPosInfo& mapRect)
+{
+    if (!m_widget)
+        return;
+
+    m_widget->draw(mapRect.rect, DrawPoolType::FOREGROUND);
+}
+
+void Tile::setWidget(const UIWidgetPtr& widget) {
+    removeWidget();
+
+    m_widget = widget;
+    m_widget->setClipping(true);
+    g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
+        g_ui.getMapWidget()->addTileWidget(tile);
+    }, g_game.getServerBeat());
 }
 
 void Tile::removeWidget()
 {
-    if (m_widget) {
-        m_widget->destroy();
-        m_widget = nullptr;
-    }
+    if (!m_widget)
+        return;
+
+    m_widget->destroy();
+    m_widget = nullptr;
+
+    g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
+        g_ui.getMapWidget()->removeTileWidget(tile);
+    }, g_game.getServerBeat());
 }
 
 void Tile::clean()

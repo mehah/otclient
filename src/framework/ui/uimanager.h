@@ -50,6 +50,7 @@ public:
     std::string getStyleClass(const std::string_view styleName);
     OTMLNodePtr findMainWidgetNode(const OTMLDocumentPtr& doc);
 
+    UIMapPtr getMapWidget() const { return m_mapWidget; }
     UIWidgetPtr loadUI(const std::string& file, const UIWidgetPtr& parent);
     OTMLNodePtr loadDeviceUI(const std::string& file, Platform::OperatingSystem os);
     OTMLNodePtr loadDeviceUI(const std::string& file, Platform::DeviceType deviceType);
@@ -79,9 +80,11 @@ protected:
     void onWidgetDestroy(const UIWidgetPtr& widget);
 
     friend class UIWidget;
+    friend class GraphicalApplication;
 
 private:
     UIWidgetPtr m_rootWidget;
+    UIMapPtr m_mapWidget;
     UIWidgetPtr m_mouseReceiver;
     UIWidgetPtr m_keyboardReceiver;
     UIWidgetPtr m_draggingWidget;

@@ -94,6 +94,9 @@ public:
     void setAntiAliasingMode(const MapView::AntialiasingMode mode) { m_mapView->setAntiAliasingMode(mode); }
     void setFloorFading(const uint16_t v) { m_mapView->setFloorFading(v); }
 
+    void addTileWidget(const TilePtr& tile);
+    void removeTileWidget(const TilePtr& tile);
+
 protected:
     void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
     void onGeometryChange(const Rect& oldRect, const Rect& newRect) override;
@@ -103,8 +106,10 @@ private:
     void updateVisibleDimension();
     void updateMapSize();
 
+    std::vector<TilePtr> m_tiles;
     MapViewPtr m_mapView;
     Rect m_mapRect;
+
     float m_aspectRatio;
 
     bool m_keepAspectRatio;

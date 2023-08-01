@@ -117,7 +117,7 @@ public:
 
     bool hasWidget() const { return m_widget != nullptr; }
     void drawWidget(const Point& dest, const MapPosInfo& mapRect);
-    void setWidget(const UIWidgetPtr& widget) { m_widget = widget; }
+    void setWidget(const UIWidgetPtr& widget);
     UIWidgetPtr getWidget() { return m_widget; }
     void removeWidget();
 
@@ -214,6 +214,7 @@ private:
 
     void setThingFlag(const ThingPtr& thing);
 
+    void updateWidget(const Point& dest, const MapPosInfo& mapRect);
     void recalculateThingFlag()
     {
         m_thingTypeFlag = 0;
