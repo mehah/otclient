@@ -24,6 +24,7 @@
 #include <thread>
 #include <client/game.h>
 #include <client/map.h>
+#include <client/uimap.h>
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>
@@ -139,8 +140,6 @@ void GraphicalApplication::run()
 
     std::condition_variable foreCondition, txtCondition;
 
-    UIWidgetPtr mapWidget;
-
     // clang c++20 dont support jthread
     std::thread t1([&]() {
         while (!m_stopping) {
@@ -161,17 +160,17 @@ void GraphicalApplication::run()
                 foreCondition.notify_one();
 
             if (g_game.isOnline()) {
-                if (!mapWidget)
-                    mapWidget = g_ui.getRootWidget()->recursiveGetChildById("gameMapPanel");
+                if (!g_ui.m_mapWidget)
+                    g_ui.m_mapWidget = g_ui.getRootWidget()->recursiveGetChildById("gameMapPanel")->static_self_cast<UIMap>();
 
                 if (txt->canRepaint())
                     txtCondition.notify_one();
 
                 {
                     std::scoped_lock l(map->getMutex());
-                    mapWidget->drawSelf(DrawPoolType::MAP);
+                    g_ui.m_mapWidget->drawSelf(DrawPoolType::MAP);
                 }
-            } else mapWidget = nullptr;
+            } else g_ui.m_mapWidget = nullptr;
 
             stdext::millisleep(1);
         }
@@ -194,8 +193,8 @@ void GraphicalApplication::run()
             g_textDispatcher.poll();
 
             txt->setEnable(canDrawTexts());
-            if (mapWidget && txt->isEnabled())
-                mapWidget->drawSelf(DrawPoolType::TEXT);
+            if (g_ui.m_mapWidget && txt->isEnabled())
+                g_ui.m_mapWidget->drawSelf(DrawPoolType::TEXT);
 
             return m_stopping;
         });

@@ -80,8 +80,8 @@ public:
     UIWidget();
     ~UIWidget() override;
     virtual void drawSelf(DrawPoolType drawPane);
-protected:
     virtual void draw(const Rect& visibleRect, DrawPoolType drawPane);
+protected:
     virtual void drawChildren(const Rect& visibleRect, DrawPoolType drawPane);
 
     friend class UIManager;

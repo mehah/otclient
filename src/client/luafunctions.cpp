@@ -788,6 +788,11 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Tile>("select", &Tile::select);
     g_lua.bindClassMemberFunction<Tile>("unselect", &Tile::unselect);
     g_lua.bindClassMemberFunction<Tile>("isSelected", &Tile::isSelected);
+
+    g_lua.bindClassMemberFunction<Tile>("setWidget", &Tile::setWidget);
+    g_lua.bindClassMemberFunction<Tile>("getWidget", &Tile::getWidget);
+    g_lua.bindClassMemberFunction<Tile>("removeWidget", &Tile::removeWidget);
+
 #ifdef FRAMEWORK_EDITOR
     g_lua.bindClassMemberFunction<Tile>("isHouseTile", &Tile::isHouseTile);
     g_lua.bindClassMemberFunction<Tile>("overwriteMinimapColor", &Tile::overwriteMinimapColor);

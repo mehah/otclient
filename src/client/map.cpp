@@ -519,7 +519,10 @@ void Map::removeUnawareThings()
                         continue;
                     }
 
+                    tile->clean();
+
                     block.remove(pos);
+                    notificateTileUpdate(pos, nullptr, Otc::OPERATION_CLEAN);
                 }
 
                 if (blockEmpty)

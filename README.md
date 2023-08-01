@@ -31,6 +31,7 @@
 - Client 12.85 ~ 12.92, 13.00 ~ 13.14 support (protobuf)
 - Market has been rewritten to work only [Canary](https://github.com/opentibiabr/canary)
 - Async Texture Loading
+- Tile Widget
 
 ##### Community (Features)
 - Mobile Support [@tuliomagalhaes](https://github.com/tuliomagalhaes) & [@BenDol](https://github.com/BenDol)

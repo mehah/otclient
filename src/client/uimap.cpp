@@ -57,6 +57,14 @@ void UIMap::drawSelf(DrawPoolType drawPane)
         g_drawPool.addAction([] {glDisable(GL_BLEND); });
         g_drawPool.addFilledRect(m_mapRect, Color::alpha);
         g_drawPool.addAction([] {glEnable(GL_BLEND); });
+
+        if (m_mapView) {
+            for (const auto& tile : m_tiles) {
+                const auto& dest = m_mapView->transformPositionTo2D(tile->getPosition(), m_mapView->m_lastCameraPosition);
+                tile->drawWidget(dest, m_mapView->m_posInfo);
+            }
+        }
+
         return;
     }
 
@@ -198,6 +206,19 @@ void UIMap::updateMapSize()
 
     if (!m_keepAspectRatio)
         updateVisibleDimension();
+}
+
+void UIMap::addTileWidget(const TilePtr& tile) {
+    std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND)->getMutex());
+    m_tiles.emplace_back(tile);
+}
+void UIMap::removeTileWidget(const TilePtr& tile) {
+    std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND)->getMutex());
+    const auto it = std::find(m_tiles.begin(), m_tiles.end(), tile);
+    if (it == m_tiles.end())
+        return;
+
+    m_tiles.erase(it);
 }
 
 /* vim: set ts=4 sw=4 et: */
