@@ -110,7 +110,6 @@ void Application::deinit()
 
     // disable dispatcher events
     g_dispatcher.shutdown();
-    g_uiMapDispatcher.shutdown();
     g_textDispatcher.shutdown();
     g_mainDispatcher.shutdown();
 }

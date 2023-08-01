@@ -25,7 +25,7 @@
 #include <framework/core/clock.h>
 #include "timer.h"
 
-EventDispatcher g_dispatcher, g_uiMapDispatcher, g_textDispatcher, g_mainDispatcher;
+EventDispatcher g_dispatcher, g_textDispatcher, g_mainDispatcher;
 std::thread::id g_mainThreadId = std::this_thread::get_id();
 
 void EventDispatcher::shutdown()

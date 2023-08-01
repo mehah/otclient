@@ -48,5 +48,5 @@ private:
     std::priority_queue<ScheduledEventPtr, std::deque<ScheduledEventPtr>, ScheduledEvent::Compare> m_scheduledEventList;
 };
 
-extern EventDispatcher g_dispatcher, g_uiMapDispatcher, g_textDispatcher, g_mainDispatcher;
+extern EventDispatcher g_dispatcher, g_textDispatcher, g_mainDispatcher;
 extern std::thread::id g_mainThreadId;
