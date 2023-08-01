@@ -69,7 +69,6 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool is
 
     drawCreature(dest, mapRect, flags, isCovered, false, lightView);
     drawTop(dest, flags, false, lightView);
-    drawWidget(dest, mapRect);
 }
 
 void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, bool forceDraw, LightView* lightView)
@@ -132,12 +131,10 @@ void Tile::drawWidget(const Point& dest, const MapPosInfo& mapRect)
 
     m_widget->setRect(rect);
 
-    g_uiMapDispatcher.addEvent([rect, mapRect, widget = m_widget->static_self_cast<UIWidget>()] {
-        const auto& oldClipRect = g_drawPool.getClipRect();
-        g_drawPool.setClipRect(mapRect.rect);
-        widget->draw(rect, DrawPoolType::FOREGROUND);
-        g_drawPool.setClipRect(oldClipRect);
-    });
+    const auto& oldClipRect = g_drawPool.getClipRect();
+    g_drawPool.setClipRect(mapRect.rect);
+    m_widget->draw(rect, DrawPoolType::FOREGROUND);
+    g_drawPool.setClipRect(oldClipRect);
 }
 
 void Tile::removeWidget()

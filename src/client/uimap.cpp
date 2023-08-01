@@ -58,7 +58,17 @@ void UIMap::drawSelf(DrawPoolType drawPane)
         g_drawPool.addAction([] {glDisable(GL_BLEND); });
         g_drawPool.addFilledRect(m_mapRect, Color::alpha);
         g_drawPool.addAction([] {glEnable(GL_BLEND); });
-        g_uiMapDispatcher.poll();
+
+        if (m_mapView) {
+            for (const auto& tile : g_map.getTiles(m_mapView->m_lastCameraPosition.z)) {
+                if (!tile->hasWidget())
+                    continue;
+
+                const auto& dest = m_mapView->transformPositionTo2D(tile->getPosition(), m_mapView->m_lastCameraPosition);
+                tile->drawWidget(dest, m_mapView->m_posInfo);
+            }
+        }
+
         return;
     }
 

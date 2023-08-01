@@ -115,6 +115,7 @@ public:
     ThingPtr getTopMoveThing();
     ThingPtr getTopMultiUseThing();
 
+    bool hasWidget() const { return m_widget != nullptr; }
     void drawWidget(const Point& dest, const MapPosInfo& mapRect);
     void setWidget(const UIWidgetPtr& widget) { m_widget = widget; }
     UIWidgetPtr getWidget() { return m_widget; }
