@@ -115,6 +115,11 @@ public:
     ThingPtr getTopMoveThing();
     ThingPtr getTopMultiUseThing();
 
+    void drawWidget(const Point& dest, const MapPosInfo& mapRect);
+    void setWidget(const UIWidgetPtr& widget) { m_widget = widget; }
+    UIWidgetPtr getWidget() { return m_widget; }
+    void removeWidget();
+
     int getDrawElevation() { return m_drawElevation; }
     const Position& getPosition() { return m_position; }
     const std::vector<CreaturePtr>& getWalkingCreatures() { return m_walkingCreatures; }
@@ -239,6 +244,7 @@ private:
     std::vector<TilePtr> m_tilesRedraw;
 
     ThingPtr m_highlightThing;
+    UIWidgetPtr m_widget;
 
     TileSelectType m_selectType{ TileSelectType::NONE };
 

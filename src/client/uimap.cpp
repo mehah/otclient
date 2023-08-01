@@ -22,6 +22,7 @@
 
 #include "uimap.h"
 #include <framework/core/graphicalapplication.h>
+#include <framework/core/eventdispatcher.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
 #include "game.h"
@@ -57,6 +58,7 @@ void UIMap::drawSelf(DrawPoolType drawPane)
         g_drawPool.addAction([] {glDisable(GL_BLEND); });
         g_drawPool.addFilledRect(m_mapRect, Color::alpha);
         g_drawPool.addAction([] {glEnable(GL_BLEND); });
+        g_uiMapDispatcher.poll();
         return;
     }
 
