@@ -53,7 +53,12 @@
 - Discord RPC by [@SkullzOTS](https://github.com/SkullzOTS)
   - To enable just go to [config.h](https://github.com/mehah/otclient/blob/main/src/client/config.h), set 1 in ENABLE_DISCORD_RPC and configure the others definitions
   - You can see the step by step in [YouTube](https://www.youtube.com/watch?v=zCHYtRlD58g)
-  
+- Client Updater by [@conde2](https://github.com/conde2)
+  - Paste the API folder in your www folder (https://github.com/mehah/otclient/tree/main/tools/api)
+  - Create a folder called "files" in your www folder and paste init.lua, modules, data, and exe files
+  - Uncomment and change this line (https://github.com/mehah/otclient/blob/main/init.lua#L6)
+- Colored text [@conde2](https://github.com/conde2)
+
 ##### [OTClient V8](https://github.com/OTCv8) (Features)
 - Lighting System
 - Floor Fading
