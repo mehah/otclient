@@ -58,6 +58,7 @@
   - Create a folder called "files" in your www folder and paste init.lua, modules, data, and exe files
   - Uncomment and change this line (https://github.com/mehah/otclient/blob/main/init.lua#L6)
 - Colored text [@conde2](https://github.com/conde2)
+  - ex: widget:setColoredText("{Colored text, #ff00ff} normal text")
 
 ##### [OTClient V8](https://github.com/OTCv8) (Features)
 - Lighting System
