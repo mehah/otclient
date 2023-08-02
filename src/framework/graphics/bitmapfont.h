@@ -52,6 +52,12 @@ public:
                         const Size& textBoxSize, Fw::AlignmentFlag align,
                         const Rect& screenCoords, const std::vector<Point>& glyphsPositions) const;
 
+    void fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPtr>>& colorCoords, const std::string_view text, 
+                        const std::vector<std::pair<int, Color>> textColors,
+                        const Size& textBoxSize, Fw::AlignmentFlag align,
+                        const Rect& screenCoords, const std::vector<Point>& glyphsPositions) const;
+
+
     /// Calculate glyphs positions to use on render, also calculates textBoxSize if wanted
     const std::vector<Point>& calculateGlyphsPositions(const std::string_view text,
                                                        Fw::AlignmentFlag align,
@@ -60,7 +66,7 @@ public:
     /// Simulate render and calculate text size
     Size calculateTextRectSize(const std::string_view text);
 
-    std::string wrapText(const std::string_view text, int maxWidth);
+    std::string wrapText(const std::string_view text, int maxWidth, std::vector<std::pair<int, Color>>* colors = nullptr);
 
     const std::string& getName() { return m_name; }
     int getGlyphHeight() const { return m_glyphHeight; }
@@ -73,6 +79,7 @@ public:
 private:
     /// Calculates each font character by inspecting font bitmap
     void calculateGlyphsWidthsAutomatically(const ImagePtr& image, const Size& glyphSize);
+    void updateColors(std::vector<std::pair<int, Color>>* colors, int pos, int newTextLen);
 
     std::string m_name;
     int m_glyphHeight{ 0 };
