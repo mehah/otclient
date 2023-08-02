@@ -525,6 +525,7 @@ private:
     std::vector<Point> m_glyphsPositionsCache;
     Size m_textSize;
     CoordsBufferPtr m_coordsBuffer;
+    std::vector<std::pair<Color, CoordsBufferPtr>> m_colorCoordsBuffer;
 
 protected:
     virtual void updateText();
@@ -539,6 +540,8 @@ protected:
     Point m_textOffset;
 
     BitmapFontPtr m_font;
+    std::vector<std::pair<int, Color>> m_textColors;
+    std::vector<std::pair<int, Color>> m_drawTextColors;
 
     float m_fontScale{ 1.f };
 
@@ -547,6 +550,7 @@ public:
     void clearText() { setText(""); }
 
     void setText(const std::string_view text, bool dontFireLuaCall = false);
+    void setColoredText(const std::string_view coloredText, bool dontFireLuaCall = false);
     void setTextAlign(Fw::AlignmentFlag align) { m_textAlign = align; updateText(); }
     void setTextOffset(const Point& offset) { m_textOffset = offset; updateText(); }
     void setTextWrap(bool textWrap) { setProp(PropTextWrap, textWrap); updateText(); }
