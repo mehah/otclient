@@ -1055,6 +1055,9 @@
     <ClInclude Include="..\src\client\gameconfig.h">
       <Filter>Header Files\client</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\framework\stdext\uri.h">
+      <Filter>Header Files\framework\stdext</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\src\otcicon.rc">

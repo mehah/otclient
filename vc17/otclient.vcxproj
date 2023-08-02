@@ -501,6 +501,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\framework\stdext\time.h" />
     <ClInclude Include="..\src\framework\stdext\traits.h" />
     <ClInclude Include="..\src\framework\stdext\types.h" />
+    <ClInclude Include="..\src\framework\stdext\uri.h" />
     <ClInclude Include="..\src\framework\ui\declarations.h" />
     <ClInclude Include="..\src\framework\ui\ui.h" />
     <ClInclude Include="..\src\framework\ui\uianchorlayout.h" />
