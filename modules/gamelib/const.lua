@@ -180,6 +180,7 @@ GameLoadSprInsteadProtobuf = 100
 GameItemShader = 101
 GameCreatureShader = 102
 GameCreatureAttachedEffect = 103
+GameCountU16 = 104
 
 TextColors = {
     red = '#f55e5e',    -- '#c83200'
