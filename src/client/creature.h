@@ -146,6 +146,9 @@ public:
         }
     }
 
+    void setTyping(bool typing);
+    bool getTyping() { return m_typing; }
+
 protected:
     virtual void updateWalkOffset(uint8_t totalPixelsWalked);
     virtual void updateWalk(bool isPreWalking = false);
@@ -210,6 +213,7 @@ private:
     TexturePtr m_emblemTexture;
     TexturePtr m_typeTexture;
     TexturePtr m_iconTexture;
+    TexturePtr m_typingIconTexture;
 
     bool m_shieldBlink{ false };
     bool m_passable{ false };
@@ -220,6 +224,7 @@ private:
     bool m_removed{ true };
     bool m_drawOutfitColor{ true };
     bool m_showShieldTexture{ true };
+    bool m_typing{ false };
 
     uint8_t m_disableWalkAnimation{ 0 };
 
