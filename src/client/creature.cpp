@@ -45,6 +45,7 @@ Creature::Creature() :m_type(Proto::CreatureTypeUnknown)
 {
     m_name.setFont(g_gameConfig.getCreatureNameFont());
     m_name.setAlign(Fw::AlignTopCenter);
+    m_typingIconTexture = g_textures.getTexture(g_gameConfig.getTypingIcon());
 
     // Example of how to send a UniformValue to shader
     /*
@@ -218,6 +219,9 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
 
         if (m_icon != Otc::NpcIconNone && m_iconTexture)
             g_drawPool.addTexturedPos(m_iconTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5);
+
+        if (g_gameConfig.drawTyping() && getTyping() && m_typingIconTexture)
+            g_drawPool.addTexturedPos(m_typingIconTexture, p.x + (nameSize.width() / 2.0) + 2, textRect.y() - 4);
     }
     // Go back to use map pool
     g_drawPool.select(DrawPoolType::MAP);
@@ -949,3 +953,8 @@ int Creature::getExactSize(int layer, int xPattern, int yPattern, int zPattern, 
 }
 
 void Creature::setMountShader(const std::string_view name) { m_mountShader = g_shaders.getShader(name); }
+
+void Creature::setTyping(bool typing)
+{
+    m_typing = typing;
+}
