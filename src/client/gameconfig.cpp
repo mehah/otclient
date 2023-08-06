@@ -80,6 +80,10 @@ void GameConfig::loadGameNode(const OTMLNodePtr& mainNode) {
             loadCreatureNode(node);
         else if (node->tag() == "render")
             loadRenderNode(node);
+        else if (node->tag() == "draw-typing")
+            m_drawTyping = node->value<bool>();
+        else if (node->tag() == "typing-icon")
+            m_typingIcon = node->value();
     }
 }
 
