@@ -59,6 +59,8 @@
   - Uncomment and change this line (https://github.com/mehah/otclient/blob/main/init.lua#L6)
 - Colored text [@conde2](https://github.com/conde2)
   - ex: widget:setColoredText("{Colored text, #ff00ff} normal text")
+- Typing Icon by [@SkullzOTS](https://github.com/SkullzOTS)
+  - To enable just go to [setup.otml](https://github.com/mehah/otclient/blob/main/data/setup.otml) and set draw-typing: true
 
 ##### [OTClient V8](https://github.com/OTCv8) (Features)
 - Lighting System
