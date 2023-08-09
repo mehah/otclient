@@ -723,6 +723,14 @@ void ProtocolGame::sendRequestOutfit()
     send(msg);
 }
 
+void ProtocolGame::sendTyping(bool typing)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::GameServerCreatureTyping);
+    msg->addU8(typing);
+    send(msg);
+}
+
 void ProtocolGame::sendChangeOutfit(const Outfit& outfit)
 {
     const auto& msg = std::make_shared<OutputMessage>();
