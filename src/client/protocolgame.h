@@ -99,6 +99,7 @@ public:
     void sendRefreshContainer(int containerId);
     void sendRequestOutfit();
     void sendChangeOutfit(const Outfit& outfit);
+    void sendTyping(bool typing);
     void sendMountStatus(bool mount);
     void sendAddVip(const std::string_view name);
     void sendRemoveVip(uint32_t playerId);
