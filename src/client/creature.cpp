@@ -954,7 +954,16 @@ int Creature::getExactSize(int layer, int xPattern, int yPattern, int zPattern, 
 
 void Creature::setMountShader(const std::string_view name) { m_mountShader = g_shaders.getShader(name); }
 
+void Creature::setTypingIconTexture(const std::string& filename)
+{
+    m_typingIconTexture = g_textures.getTexture(filename);
+}
+
 void Creature::setTyping(bool typing)
 {
     m_typing = typing;
+}
+
+void Creature::sendTyping() {
+    g_game.sendTyping(m_typing);
 }
