@@ -553,6 +553,10 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                     parseMapShader(msg);
                     break;
 
+                case Proto::GameServerCreatureTyping:
+                    parseCreatureTyping(msg);
+                    break;
+
                 default:
                     throw Exception("unhandled opcode %d", opcode);
                     break;
