@@ -531,7 +531,8 @@ namespace Otc
         GameItemShader = 101,
         GameCreatureShader = 102,
         GameCreatureAttachedEffect = 103,
-        LastGameFeature = 104
+        GameCountU16 = 104,
+        LastGameFeature = 105
     };
 
     enum MagicEffectsType_t : uint8_t

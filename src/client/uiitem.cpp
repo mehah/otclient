@@ -49,9 +49,9 @@ void UIItem::drawSelf(DrawPoolType drawPane)
 
         if (m_font && (m_alwaysShowCount || m_item->isStackable() || m_item->isChargeable()) && m_item->getCountOrSubType() > 1) {
             static const Color STACK_COLOR(231, 231, 231);
-
-            const auto& count = std::to_string(m_item->getCountOrSubType());
-            m_font->drawText(count, Rect(m_rect.topLeft(), m_rect.bottomRight() - Point(3, 0)), STACK_COLOR, Fw::AlignBottomRight);
+            const auto& count = m_item->getCountOrSubType();
+            const auto& countText = count < 1000 ? std::to_string(count) : stdext::format("%.0fk", count / 1000.f);
+            m_font->drawText(countText, Rect(m_rect.topLeft(), m_rect.bottomRight() - Point(3, 0)), STACK_COLOR, Fw::AlignBottomRight);
         }
 
 #ifdef FRAMEWORK_EDITOR
