@@ -3879,3 +3879,15 @@ void ProtocolGame::parseMapShader(const InputMessagePtr& msg) {
     if (mapView)
         mapView->setShader(shaderName, 0.f, 0.f);
 }
+
+void ProtocolGame::parseCreatureTyping(const InputMessagePtr& msg)
+{
+    const uint32_t id = msg->getU32();
+    const bool typing = msg->getU8();
+
+    const CreaturePtr creature = g_map.getCreatureById(id);
+    if (creature)
+        creature->setTyping(typing);
+    else
+        g_logger.traceError("could not get creature");
+}
