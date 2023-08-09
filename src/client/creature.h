@@ -147,7 +147,9 @@ public:
     }
 
     void setTyping(bool typing);
+    void sendTyping();
     bool getTyping() { return m_typing; }
+    void setTypingIconTexture(const std::string& filename);
 
 protected:
     virtual void updateWalkOffset(uint8_t totalPixelsWalked);
