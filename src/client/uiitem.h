@@ -55,5 +55,4 @@ protected:
     bool m_showId{ false };
     bool m_itemVisible{ true };
     bool m_alwaysShowCount{ false };
-    std::string m_countText;
 };
