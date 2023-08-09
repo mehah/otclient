@@ -1108,6 +1108,14 @@ void Game::changeOutfit(const Outfit& outfit)
     m_protocolGame->sendChangeOutfit(outfit);
 }
 
+void Game::sendTyping(bool typing)
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendTyping(typing);
+}
+
 void Game::addVip(const std::string_view name)
 {
     if (!canPerformGameAction() || name.empty())
