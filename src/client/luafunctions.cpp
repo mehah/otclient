@@ -533,6 +533,9 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Creature>("setDisableWalkAnimation", &Creature::setDisableWalkAnimation);
     g_lua.bindClassMemberFunction<Creature>("isDisabledWalkAnimation", &Creature::isDisabledWalkAnimation);
     g_lua.bindClassMemberFunction<Creature>("setTyping", &Creature::setTyping);
+    g_lua.bindClassMemberFunction<Creature>("getTyping", &Creature::getTyping);
+    g_lua.bindClassMemberFunction<Creature>("sendTyping", &Creature::sendTyping);
+    g_lua.bindClassMemberFunction<Creature>("setTypingIconTexture", &Creature::setTypingIconTexture);
 
 #ifdef FRAMEWORK_EDITOR
     g_lua.registerClass<ItemType>();
