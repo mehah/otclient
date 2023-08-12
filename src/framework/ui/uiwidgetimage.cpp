@@ -23,10 +23,12 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/graphics/painter.h>
 #include <framework/graphics/animatedtexture.h>
+#include <framework/graphics/image.h>
 #include <framework/graphics/texture.h>
 #include <framework/graphics/texturemanager.h>
 #include "uiwidget.h"
 #include "framework/graphics/drawpoolmanager.h"
+#include <framework/util/crypt.h>
 
 void UIWidget::initImage() {}
 
@@ -35,6 +37,8 @@ void UIWidget::parseImageStyle(const OTMLNodePtr& styleNode)
     for (const auto& node : styleNode->children()) {
         if (node->tag() == "image-source")
             setImageSource(stdext::resolve_path(node->value(), node->source()));
+        else if(node->tag() == "image-source-base64")
+            setImageSourceBase64(node->value());
         else if (node->tag() == "image-offset-x")
             setImageOffsetX(node->value<int>());
         else if (node->tag() == "image-offset-y")
@@ -188,6 +192,45 @@ void UIWidget::setImageSource(const std::string_view source)
     }
 
     m_imageTexture = g_textures.getTexture(m_imageSource = source, isImageSmooth());
+    if (!m_imageTexture)
+        return;
+
+    if (m_imageTexture->isAnimatedTexture()) {
+        if (isImageIndividualAnimation()) {
+            m_imageAnimatorTimer.restart();
+            m_currentFrame = 0;
+        } else
+            std::static_pointer_cast<AnimatedTexture>(m_imageTexture)->restart();
+    }
+
+    if (!m_rect.isValid() || hasProp(PropImageAutoResize)) {
+        const auto& imageSize = m_imageTexture->getSize();
+
+        Size size = getSize();
+        if (size.width() <= 0 || hasProp(PropImageAutoResize))
+            size.setWidth(imageSize.width());
+
+        if (size.height() <= 0 || hasProp(PropImageAutoResize))
+            size.setHeight(imageSize.height());
+
+        setSize(size);
+    }
+}
+
+void UIWidget::setImageSourceBase64(const std::string& source)
+{
+    updateImageCache();
+
+    if (source.empty()) {
+        m_imageTexture = nullptr;
+        m_imageSource = {};
+        return;
+    }
+
+    std::stringstream stream;
+    std::string decoded = g_crypt.base64Decode(source);
+    stream.write(decoded.c_str(), decoded.size());
+    m_imageTexture = g_textures.loadTexture(stream);
     if (!m_imageTexture)
         return;
 
