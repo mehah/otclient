@@ -38,10 +38,9 @@ public:
     void preload(const std::string& fileName, bool smooth = true) { getTexture(fileName, smooth); }
     TexturePtr getTexture(const std::string& fileName, bool smooth = true);
     const TexturePtr& getEmptyTexture() { return m_emptyTexture; }
-
-private:
     TexturePtr loadTexture(std::stringstream& file);
 
+private:
     stdext::map<std::string, TexturePtr> m_textures;
     std::vector<AnimatedTexturePtr> m_animatedTextures;
     TexturePtr m_emptyTexture;
