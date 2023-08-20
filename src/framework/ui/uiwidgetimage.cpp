@@ -36,7 +36,7 @@ void UIWidget::parseImageStyle(const OTMLNodePtr& styleNode)
 {
     for (const auto& node : styleNode->children()) {
         if (node->tag() == "image-source")
-            setImageSource(stdext::resolve_path(node->value(), node->source()), node->value<bool>());
+            setImageSource(stdext::resolve_path(node->value(), node->source()), false);
         else if (node->tag() == "image-offset-x")
             setImageOffsetX(node->value<int>());
         else if (node->tag() == "image-offset-y")
