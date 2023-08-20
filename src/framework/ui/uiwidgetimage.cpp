@@ -192,7 +192,7 @@ void UIWidget::setImageSource(const std::string_view source, bool base64)
     m_imageTexture = g_textures.getTexture(m_imageSource = source, isImageSmooth());
     if (base64) {
         std::stringstream stream;
-        std::string decoded = g_crypt.base64Decode(source);
+        const auto& decoded = g_crypt.base64Decode(source);
         stream.write(decoded.c_str(), decoded.size());
         m_imageTexture = g_textures.loadTexture(stream);
     }
