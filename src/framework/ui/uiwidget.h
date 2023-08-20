@@ -474,7 +474,7 @@ protected:
     EdgeGroup<int> m_imageBorder;
 
 public:
-    void setImageSource(const std::string_view source, bool base64);
+    void setImageSource(const std::string_view source, bool base64 = false);
     void setImageClip(const Rect& clipRect) { m_imageClipRect = clipRect; updateImageCache(); }
     void setImageOffsetX(int x) { m_imageRect.setX(x); updateImageCache(); }
     void setImageOffsetY(int y) { m_imageRect.setY(y); updateImageCache(); }
