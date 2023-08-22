@@ -23,10 +23,12 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/graphics/painter.h>
 #include <framework/graphics/animatedtexture.h>
+#include <framework/graphics/image.h>
 #include <framework/graphics/texture.h>
 #include <framework/graphics/texturemanager.h>
 #include "uiwidget.h"
 #include "framework/graphics/drawpoolmanager.h"
+#include <framework/util/crypt.h>
 
 void UIWidget::initImage() {}
 
@@ -34,7 +36,9 @@ void UIWidget::parseImageStyle(const OTMLNodePtr& styleNode)
 {
     for (const auto& node : styleNode->children()) {
         if (node->tag() == "image-source")
-            setImageSource(stdext::resolve_path(node->value(), node->source()));
+            setImageSource(stdext::resolve_path(node->value(), node->source()), false);
+        else if (node->tag() == "image-source-base64")
+            setImageSource(stdext::resolve_path(node->value(), node->source()), true);
         else if (node->tag() == "image-offset-x")
             setImageOffsetX(node->value<int>());
         else if (node->tag() == "image-offset-y")
@@ -177,7 +181,7 @@ void UIWidget::drawImage(const Rect& screenCoords)
     }
 }
 
-void UIWidget::setImageSource(const std::string_view source)
+void UIWidget::setImageSource(const std::string_view source, bool base64)
 {
     updateImageCache();
 
@@ -187,7 +191,15 @@ void UIWidget::setImageSource(const std::string_view source)
         return;
     }
 
-    m_imageTexture = g_textures.getTexture(m_imageSource = source, isImageSmooth());
+    if (base64) {
+        std::stringstream stream;
+        const auto& decoded = g_crypt.base64Decode(source);
+        stream.write(decoded.c_str(), decoded.size());
+        m_imageTexture = g_textures.loadTexture(stream);
+    } else {
+	m_imageTexture = g_textures.getTexture(m_imageSource = source, isImageSmooth());
+    }
+    
     if (!m_imageTexture)
         return;
 
