@@ -1903,7 +1903,7 @@ void UIWidget::move(int x, int y) {
             self->m_rect = {}; // force update
             self->setRect(rect);
             self->setProp(PropUpdatingMove, false);
-        }, 30);
+        }, 13);
     }
 
     m_rect = { x, y, getSize() };
