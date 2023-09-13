@@ -622,7 +622,7 @@ void ProtocolGame::parseLogin(const InputMessagePtr& msg) const
     Game::processLogin();
 }
 
-void ProtocolGame::parseBugReport(const InputMessagePtr&)
+void ProtocolGame::parseBugReport(const InputMessagePtr& msg)
 {
     const bool canReportBugs = msg->getU8() > 0;
     g_game.setCanReportBugs(canReportBugs);
