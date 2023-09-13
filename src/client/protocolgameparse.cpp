@@ -68,6 +68,9 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                     else
                         parseLogin(msg);
                     break;
+                case Proto::GameServerBugReport:
+                    parseBugReport(msg);
+                    break;
                 case Proto::GameServerGMActions:
                     parseGMActions(msg);
                     break;
@@ -583,7 +586,10 @@ void ProtocolGame::parseLogin(const InputMessagePtr& msg) const
         Creature::speedC = msg->getDouble();
     }
 
-    const bool canReportBugs = msg->getU8();
+    bool canReportBugs = false;
+    if (!g_game.getFeature(Otc::GameDynamicBugReporter)) {
+        canReportBugs = msg->getU8() > 0;
+    }
 
     if (g_game.getClientVersion() >= 1054)
         msg->getU8(); // can change pvp frame option
@@ -614,6 +620,12 @@ void ProtocolGame::parseLogin(const InputMessagePtr& msg) const
     g_game.setCanReportBugs(canReportBugs);
 
     Game::processLogin();
+}
+
+void ProtocolGame::parseBugReport(const InputMessagePtr&)
+{
+    const bool canReportBugs = msg->getU8() > 0;
+    g_game.setCanReportBugs(canReportBugs);
 }
 
 void ProtocolGame::parsePendingGame(const InputMessagePtr&)
@@ -1109,6 +1121,15 @@ void ProtocolGame::parseOpenContainer(const InputMessagePtr& msg)
     for (int_fast32_t i = -1; ++i < itemCount;)
         items[i] = getItem(msg);
 
+    if (g_game.getFeature(Otc::GameContainerFilter)) {
+        msg->getU8();
+        const uint8_t filters = msg->getU8();
+        for (int_fast8_t i = -1; ++i < listSize;) {
+            msg->getU8();
+            msg->getString();
+        }
+    }
+
     g_game.processOpenContainer(containerId, containerItem, name, capacity, hasParent, items, isUnlocked, hasPages, containerSize, firstIndex);
 }
 
@@ -1292,7 +1313,12 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
 
                 case Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT:
                 case Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT_REVERSED: {
-                    const uint8_t shotId = msg->getU8();
+                    uint16_t shotId;
+                    if (g_game.getFeature(Otc::GameEffectU16)) {
+                        shotId = msg->getU16();
+                    } else {
+                        shotId = msg->getU8();
+                    }
                     const int8_t offsetX = static_cast<int8_t>(msg->getU8());
                     const int8_t offsetY = static_cast<int8_t>(msg->getU8());
                     if (!g_things.isValidDatId(shotId, ThingCategoryMissile)) {
@@ -1313,7 +1339,11 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
                 }
 
                 case Otc::MAGIC_EFFECTS_CREATE_EFFECT: {
-                    const uint8_t effectId = msg->getU8();
+                    if (g_game.getFeature(Otc::GameEffectU16)) {
+                        effectId = msg->getU16();
+                    } else {
+                        effectId = msg->getU8();
+                    }
                     if (!g_things.isValidDatId(effectId, ThingCategoryEffect)) {
                         g_logger.traceError(stdext::format("invalid effect id %d", effectId));
                         continue;
@@ -1833,6 +1863,12 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
 
         const uint8_t lastSkill = g_game.getClientVersion() >= 1281 ? Otc::LastSkill : Otc::ManaLeechAmount + 1;
         for (int_fast32_t skill = Otc::CriticalChance; skill < lastSkill; ++skill) {
+            if (!g_game.getFeature(Otc::GameLeechAmount)) {
+                if (skill == Otc::LifeLeechAmount || skill == Otc::ManaLeechAmount) {
+                    continue;
+                }
+            }
+
             const uint16_t level = msg->getU16();
             const uint16_t baseLevel = msg->getU16();
             m_localPlayer->setSkill(static_cast<Otc::Skill>(skill), level, 0);
@@ -1855,6 +1891,8 @@ void ProtocolGame::parsePlayerState(const InputMessagePtr& msg) const
 
     if (g_game.getClientVersion() >= 1281) {
         states = msg->getU32();
+        if (g_game.getFeature(Otc::GamePlayerStateCounter))
+            msg->getU8();
     } else {
         if (g_game.getFeature(Otc::GamePlayerStateU16))
             states = msg->getU16();
@@ -2886,17 +2924,43 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
     }
 
     if (item->isContainer()) {
-        if (g_game.getFeature(Otc::GameThingQuickLoot)) {
-            const bool hasQuickLootFlags = msg->getU8() != 0;
-            if (hasQuickLootFlags) {
-                msg->getU32(); // quick loot flags
+        if (g_game.getFeature(Otc::GameContainerTypes)) {
+            const uint8_t type = msg->getU8();
+            switch (type) {
+                case 0: // Empty
+                    break;
+                case 1: {
+                    if (g_game.getFeature(Otc::GameThingQuickLoot)) {
+                        msg->getU32(); // quick loot flags
+                    }
+                    break;
+                }
+                case 2: {
+                    if (g_game.getFeature(Otc::GameThingQuiver)) {
+                        msg->getU32(); // ammoTotal
+                    }
+                    break;
+                }
+                case 4: // Empty (Loot highlight boolean)
+                    break;
+                default: {
+                    throw Exception("unknown container type %d", type);
+                    break;
+                }
             }
-        }
+        } else {
+            if (g_game.getFeature(Otc::GameThingQuickLoot)) {
+                const bool hasQuickLootFlags = msg->getU8() != 0;
+                if (hasQuickLootFlags) {
+                    msg->getU32(); // quick loot flags
+                }
+            }
 
-        if (g_game.getFeature(Otc::GameThingQuiver)) {
-            const uint8_t hasQuiverAmmoCount = msg->getU8();
-            if (hasQuiverAmmoCount) {
-                msg->getU32(); // ammoTotal
+            if (g_game.getFeature(Otc::GameThingQuiver)) {
+                const uint8_t hasQuiverAmmoCount = msg->getU8();
+                if (hasQuiverAmmoCount) {
+                    msg->getU32(); // ammoTotal
+                }
             }
         }
     }
@@ -2918,6 +2982,12 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
         if (item->hasWearOut()) {
             msg->getU32(); // Item charge (UI)
             msg->getU8(); // Is brand-new
+        }
+    }
+
+    if (g_game.getFeature(Otc::GameWrapKit)) {
+        if (item->isWrapKit()) {
+            msg->getU16();
         }
     }
 
@@ -2982,6 +3052,10 @@ void ProtocolGame::parseShowDescription(const InputMessagePtr& msg)
 
 void ProtocolGame::parseBestiaryTracker(const InputMessagePtr& msg)
 {
+    if (g_game.getFeature(Otc::GameBosstiaryTracker)) {
+        msg->getU8(); // is bestiary boolean
+    }
+
     const uint8_t size = msg->getU8();
     for (uint8_t i = 0; i < size; i++) {
         msg->getU16(); // RaceID
@@ -3613,6 +3687,10 @@ void ProtocolGame::parseMarketDetail(const InputMessagePtr& msg)
         lastAttribute = Otc::ITEM_DESC_LAST;
 
     for (int_fast32_t i = Otc::ITEM_DESC_FIRST; i <= lastAttribute; i++) {
+        if (i == Otc::ITEM_DESC_AUGMENT && !g_game.getFeature(Otc::GameItemAugment)) {
+            continue;
+        }
+
         if (msg->peekU16() != 0x00) {
             const auto& sentString = msg->getString();
             descriptions.try_emplace(i, sentString);

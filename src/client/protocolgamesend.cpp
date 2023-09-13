@@ -914,6 +914,9 @@ void ProtocolGame::sendSeekInContainer(int cid, int index)
     msg->addU8(Proto::ClientSeekInContainer);
     msg->addU8(cid);
     msg->addU16(index);
+    if (g_game.getFeature(Otc::GameContainerFilter)) {
+        msg->addU8(0); // Filter
+    }
     send(msg);
 }
 
