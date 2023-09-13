@@ -229,7 +229,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
     // cyclopediaitem
     // ammo
 
-    if (flags.has_show_off_socket() && flags.show_off_socked()) {
+    if (flags.has_show_off_socket() && flags.show_off_socket()) {
         m_flags |= ThingFlagAttrPodium;
     }
 

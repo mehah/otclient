@@ -1123,7 +1123,7 @@ void ProtocolGame::parseOpenContainer(const InputMessagePtr& msg)
 
     if (g_game.getFeature(Otc::GameContainerFilter)) {
         msg->getU8();
-        const uint8_t filters = msg->getU8();
+        const uint8_t listSize = msg->getU8();
         for (int_fast8_t i = -1; ++i < listSize;) {
             msg->getU8();
             msg->getString();
@@ -1339,6 +1339,7 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
                 }
 
                 case Otc::MAGIC_EFFECTS_CREATE_EFFECT: {
+                    uint16_t effectId;
                     if (g_game.getFeature(Otc::GameEffectU16)) {
                         effectId = msg->getU16();
                     } else {
