@@ -641,6 +641,9 @@ bool Tile::limitsFloorsView(bool isFreeView)
 
 bool Tile::checkForDetachableThing()
 {
+    if (m_highlightThing)
+        m_highlightThing->setMarkColor(Color::white);
+
     m_highlightThing = nullptr;
     if (const auto& creature = getTopCreature()) {
         m_highlightThing = creature;
