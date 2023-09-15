@@ -68,7 +68,10 @@ void Item::internalDraw(int animationPhase, const Point& dest, const Color& colo
         if (m_shader)
             g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
     }
+
     getThingType()->draw(dest, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, color, drawThings, lightView, m_drawConductor);
+    g_drawPool.resetShaderProgram();
+
     if (!isMarked)
         drawAttachedEffect(dest, lightView, true); // On Top
 }
