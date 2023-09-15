@@ -254,7 +254,7 @@ void Creature::internalDraw(Point dest, LightView* lightView, const Color& color
             const int animationPhase = getCurrentAnimationPhase();
 
             if (!isMarked && m_shader)
-                g_drawPool.setShaderProgram(m_shader, m_shaderAction);
+                g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
 
             // yPattern => creature addon
             for (int yPattern = 0; yPattern < getNumPatternY(); ++yPattern) {
@@ -273,9 +273,6 @@ void Creature::internalDraw(Point dest, LightView* lightView, const Color& color
                     g_drawPool.resetCompositionMode();
                 }
             }
-
-            if (!isMarked && m_shader)
-                g_drawPool.resetShaderProgram();
 
             // outfit is a creature imitating an item or the invisible effect
         } else {
