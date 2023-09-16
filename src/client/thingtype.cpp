@@ -229,7 +229,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
     // cyclopediaitem
     // ammo
 
-    if (flags.has_show_off_socket()) {
+    if (flags.has_show_off_socket() && flags.show_off_socket()) {
         m_flags |= ThingFlagAttrPodium;
     }
 
@@ -244,19 +244,23 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
     // reverse_addons_south
     // reverse_addons_north
 
-    if (flags.has_wearout()) {
+    if (flags.has_wearout() && flags.wearout()) {
         m_flags |= ThingFlagAttrWearOut;
     }
 
-    if (flags.has_clockexpire()) {
+    if (flags.has_clockexpire() && flags.clockexpire()) {
         m_flags |= ThingFlagAttrClockExpire;
     }
 
-    if (flags.has_expire()) {
+    if (flags.has_expire() && flags.expire()) {
         m_flags |= ThingFlagAttrExpire;
     }
 
-    if (flags.has_expirestop()) {
+    if (flags.has_expirestop() && flags.expirestop()) {
+        m_flags |= ThingFlagAttrExpireStop;
+    }
+
+    if (flags.has_deco_kit() && flags.deco_kit()) {
         m_flags |= ThingFlagAttrExpireStop;
     }
 
@@ -920,6 +924,7 @@ ThingFlagAttr ThingType::thingAttrToThingFlagAttr(ThingAttr attr) {
         case ThingAttrPodium: return ThingFlagAttrPodium;
         case ThingAttrTopEffect: return ThingFlagAttrTopEffect;
         case ThingAttrMarket: return ThingFlagAttrMarket;
+        case ThingAttrDecoKit: return ThingFlagAttrDecoKit;
         default: break;
     }
 

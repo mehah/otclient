@@ -152,6 +152,7 @@ public:
     bool hasExpire() const { return m_thingType->hasExpire(); }
     bool hasExpireStop() const { return m_thingType->hasExpireStop(); }
     bool hasAnimationPhases() const { return m_thingType->getAnimationPhases() > 1; }
+    bool isDecoKit() const { return m_thingType->isDecoKit(); }
 
     PLAYER_ACTION getDefaultAction() { return m_thingType->getDefaultAction(); }
 

@@ -181,6 +181,15 @@ GameItemShader = 101
 GameCreatureShader = 102
 GameCreatureAttachedEffect = 103
 GameCountU16 = 104
+GameEffectU16 = 105
+GameContainerTypes = 106
+GameBosstiaryTracker = 107
+GamePlayerStateCounter = 108
+GameLeechAmount = 109
+GameItemAugment = 110
+GameDynamicBugReporter = 111
+GameWrapKit = 112
+GameContainerFilter = 113
 
 TextColors = {
     red = '#f55e5e',    -- '#c83200'

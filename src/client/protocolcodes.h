@@ -54,6 +54,7 @@ namespace Proto
         GameServerLoginSuccess = 23,
         GameServerSessionEnd = 24,
         GameServerStoreButtonIndicators = 25, // 1097
+        GameServerBugReport = 26,
         GameServerPingBack = 29,
         GameServerPing = 30,
         GameServerChallenge = 31,
