@@ -144,7 +144,6 @@ void GraphicalApplication::run()
     std::thread t1([&]() {
         while (!m_stopping) {
             poll();
-            g_particles.poll();
 
             if (!g_window.isVisible()) {
                 stdext::millisleep(10);
@@ -231,6 +230,12 @@ void GraphicalApplication::poll()
 #ifdef FRAMEWORK_SOUND
     g_sounds.poll();
 #endif
+
+    g_particles.poll();
+
+    if (!g_window.isVisible()) {
+        g_textDispatcher.poll();
+    }
 }
 
 void GraphicalApplication::mainPoll()
