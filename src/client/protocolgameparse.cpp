@@ -2487,11 +2487,11 @@ void ProtocolGame::parseChangeMapAwareRange(const InputMessagePtr& msg)
     const uint8_t yrange = msg->getU8();
 
     g_map.setAwareRange({
-        .left = static_cast<uint8_t>(xrange / 2 - (xrange + 1) % 2),
-        .top = static_cast<uint8_t>(yrange / 2 - (yrange + 1) % 2),
-        .right = static_cast<uint8_t>(xrange / 2),
-        .bottom = static_cast<uint8_t>(yrange / 2)
-                        });
+        static_cast<uint8_t>(xrange / 2 - (xrange + 1) % 2),
+        static_cast<uint8_t>(yrange / 2 - (yrange + 1) % 2),
+        static_cast<uint8_t>(xrange / 2),
+        static_cast<uint8_t>(yrange / 2)
+    });
 
     g_lua.callGlobalField("g_game", "onMapChangeAwareRange", xrange, yrange);
 }
