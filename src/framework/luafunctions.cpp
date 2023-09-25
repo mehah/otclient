@@ -676,6 +676,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("getFont", &UIWidget::getFont);
     g_lua.bindClassMemberFunction<UIWidget>("getTextSize", &UIWidget::getTextSize);
     g_lua.bindClassMemberFunction<UIWidget>("hasShader", &UIWidget::hasShader);
+    g_lua.bindClassMemberFunction<UIWidget>("setQRCode", &UIWidget::setQRCode);
 
     // UILayout
     g_lua.registerClass<UILayout>();

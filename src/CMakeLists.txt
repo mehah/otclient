@@ -360,6 +360,7 @@ set(SOURCE_FILES
 	framework/stdext/string.cpp
 	framework/stdext/time.cpp
 	framework/stdext/uri.cpp
+	framework/stdext/qrcodegen.cpp
 	framework/ui/uianchorlayout.cpp
 	framework/ui/uiboxlayout.cpp
 	framework/ui/uigridlayout.cpp
