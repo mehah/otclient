@@ -31,6 +31,7 @@ public:
 
     static ImagePtr load(const std::string& file);
     static ImagePtr loadPNG(const std::string& file);
+    static ImagePtr fromQRCode(const std::string& code, int border);
 
     void savePNG(const std::string& fileName);
 

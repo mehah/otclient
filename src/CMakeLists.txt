@@ -376,6 +376,7 @@ set(SOURCE_FILES
 	framework/ui/uiwidgettext.cpp
 	framework/util/color.cpp
 	framework/util/crypt.cpp
+	framework/stdext/qrcodegen.cpp
 
 	protobuf/appearances.pb.cc
 	main.cpp

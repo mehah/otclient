@@ -339,6 +339,9 @@
     <ClCompile Include="..\src\framework\stdext\uri.cpp">
       <Filter>Source Files\framework\stdext</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\framework\stdext\qrcodegen.cpp">
+      <Filter>Source Files\framework\stdext</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\framework\ui\uianchorlayout.cpp">
       <Filter>Source Files\framework\ui</Filter>
     </ClCompile>
@@ -1056,6 +1059,9 @@
       <Filter>Header Files\client</Filter>
     </ClInclude>
     <ClInclude Include="..\src\framework\stdext\uri.h">
+      <Filter>Header Files\framework\stdext</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\stdext\qrcodegen.h">
       <Filter>Header Files\framework\stdext</Filter>
     </ClInclude>
   </ItemGroup>
