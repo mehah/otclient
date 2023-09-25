@@ -360,6 +360,7 @@ set(SOURCE_FILES
 	framework/stdext/string.cpp
 	framework/stdext/time.cpp
 	framework/stdext/uri.cpp
+	framework/stdext/qrcodegen.cpp
 	framework/ui/uianchorlayout.cpp
 	framework/ui/uiboxlayout.cpp
 	framework/ui/uigridlayout.cpp
@@ -376,7 +377,6 @@ set(SOURCE_FILES
 	framework/ui/uiwidgettext.cpp
 	framework/util/color.cpp
 	framework/util/crypt.cpp
-	framework/stdext/qrcodegen.cpp
 
 	protobuf/appearances.pb.cc
 	main.cpp
