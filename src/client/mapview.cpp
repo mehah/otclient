@@ -353,7 +353,7 @@ void MapView::updateVisibleTiles()
 
     m_updateVisibleTiles = false;
     m_resetCoveredCache = false;
-    updateHighlightTile();
+    updateHighlightTile(m_mousePosition);
 }
 
 void MapView::updateRect(const Rect& rect) {
@@ -475,7 +475,7 @@ void MapView::onMouseMove(const Position& mousePos, const bool /*isVirtualMove*/
 {
     { // Highlight Target System
         destroyHighlightTile();
-        updateHighlightTile();
+        updateHighlightTile(mousePos);
     }
 }
 
@@ -849,9 +849,9 @@ void MapView::setCrosshairTexture(const std::string& texturePath)
     m_crosshairTexture = texturePath.empty() ? nullptr : g_textures.getTexture(texturePath);
 }
 
-void MapView::updateHighlightTile() {
+void MapView::updateHighlightTile(const Position& mousePos) {
     if (m_drawHighlightTarget) {
-        if ((m_lastHighlightTile = (m_shiftPressed ? getTopTile(m_mousePosition) : g_map.getTile(m_mousePosition))))
+        if ((m_lastHighlightTile = (m_shiftPressed ? getTopTile(mousePos) : g_map.getTile(mousePos))))
             m_lastHighlightTile->select(m_shiftPressed ? TileSelectType::NO_FILTERED : TileSelectType::FILTERED);
     }
 }

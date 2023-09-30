@@ -233,7 +233,7 @@ private:
     void updateViewportDirectionCache();
     void drawFloor();
 
-    void updateHighlightTile();
+    void updateHighlightTile(const Position& mousePos);
     void destroyHighlightTile();
 
     void updateViewport(const Otc::Direction dir = Otc::InvalidDirection) { m_viewport = m_viewPortDirection[dir]; }
