@@ -233,6 +233,9 @@ private:
     void updateViewportDirectionCache();
     void drawFloor();
 
+    void updateHighlightTile();
+    void destroyHighlightTile();
+
     void updateViewport(const Otc::Direction dir = Otc::InvalidDirection) { m_viewport = m_viewPortDirection[dir]; }
 
     bool canFloorFade() const { return m_floorViewMode == FADE && m_floorFading; }

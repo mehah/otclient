@@ -202,8 +202,7 @@ void MapView::drawFloor()
             }
         } else if (m_lastHighlightTile) {
             m_mousePosition = {}; // Invalidate mousePosition
-            m_lastHighlightTile->unselect();
-            m_lastHighlightTile = nullptr;
+            destroyHighlightTile();
         }
     }
 }
@@ -297,6 +296,7 @@ void MapView::updateVisibleTiles()
     }
 
     m_lastCameraPosition = m_posInfo.camera;
+    destroyHighlightTile();
 
     const bool fadeFinished = getFadeLevel(m_cachedFirstVisibleFloor) == 1.f;
 
@@ -353,6 +353,7 @@ void MapView::updateVisibleTiles()
 
     m_updateVisibleTiles = false;
     m_resetCoveredCache = false;
+    updateHighlightTile();
 }
 
 void MapView::updateRect(const Rect& rect) {
@@ -365,8 +366,9 @@ void MapView::updateRect(const Rect& rect) {
         m_posInfo.horizontalStretchFactor = rect.width() / static_cast<float>(m_posInfo.srcRect.width());
         m_posInfo.verticalStretchFactor = rect.height() / static_cast<float>(m_posInfo.srcRect.height());
 
-        m_mousePosition = getPosition(g_window.getMousePosition());
-        onMouseMove(m_mousePosition, true);
+        const auto& mousePos = getPosition(g_window.getMousePosition());
+        if (mousePos != m_mousePosition)
+            onMouseMove(m_mousePosition = mousePos, true);
     }
 
     m_posInfo.camera = getCameraPosition();
@@ -472,15 +474,8 @@ void MapView::onFadeInFinished()
 void MapView::onMouseMove(const Position& mousePos, const bool /*isVirtualMove*/)
 {
     { // Highlight Target System
-        if (m_lastHighlightTile) {
-            m_lastHighlightTile->unselect();
-            m_lastHighlightTile = nullptr;
-        }
-
-        if (m_drawHighlightTarget) {
-            if ((m_lastHighlightTile = (m_shiftPressed ? getTopTile(mousePos) : g_map.getTile(mousePos))))
-                m_lastHighlightTile->select(m_shiftPressed ? TileSelectType::NO_FILTERED : TileSelectType::FILTERED);
-        }
+        destroyHighlightTile();
+        updateHighlightTile();
     }
 }
 
@@ -852,4 +847,18 @@ std::vector<CreaturePtr> MapView::getSpectators(bool multiFloor)
 void MapView::setCrosshairTexture(const std::string& texturePath)
 {
     m_crosshairTexture = texturePath.empty() ? nullptr : g_textures.getTexture(texturePath);
+}
+
+void MapView::updateHighlightTile() {
+    if (m_drawHighlightTarget) {
+        if ((m_lastHighlightTile = (m_shiftPressed ? getTopTile(m_mousePosition) : g_map.getTile(m_mousePosition))))
+            m_lastHighlightTile->select(m_shiftPressed ? TileSelectType::NO_FILTERED : TileSelectType::FILTERED);
+    }
+}
+
+void MapView::destroyHighlightTile() {
+    if (m_lastHighlightTile) {
+        m_lastHighlightTile->unselect();
+        m_lastHighlightTile = nullptr;
+    }
 }

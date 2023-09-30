@@ -519,7 +519,8 @@ void Map::removeUnawareThings()
                         continue;
                     }
 
-                    tile->clean();
+                    if(!tile->isEmpty())
+                        tile->clean();
 
                     block.remove(pos);
                     notificateTileUpdate(pos, nullptr, Otc::OPERATION_CLEAN);
