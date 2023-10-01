@@ -496,6 +496,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\framework\stdext\hash.h" />
     <ClInclude Include="..\src\framework\stdext\math.h" />
     <ClInclude Include="..\src\framework\stdext\net.h" />
+    <ClInclude Include="..\src\framework\stdext\qrcodegen.h" />
     <ClInclude Include="..\src\framework\stdext\storage.h" />
     <ClInclude Include="..\src\framework\stdext\stdext.h" />
     <ClInclude Include="..\src\framework\stdext\string.h" />
@@ -503,7 +504,6 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\framework\stdext\traits.h" />
     <ClInclude Include="..\src\framework\stdext\types.h" />
     <ClInclude Include="..\src\framework\stdext\uri.h" />
-    <ClCompile Include="..\src\framework\stdext\qrcodegen.h" />
     <ClInclude Include="..\src\framework\ui\declarations.h" />
     <ClInclude Include="..\src\framework\ui\ui.h" />
     <ClInclude Include="..\src\framework\ui\uianchorlayout.h" />
