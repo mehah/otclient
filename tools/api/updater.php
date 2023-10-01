@@ -1,8 +1,8 @@
 <?php
 // CONFIG
-$files_dir = "C:/UniServerZ/www/files";
-$files_url = "http://localhost/files";
-$files_and_dirs = array("init.lua", "data", "modules", "layouts");
+$files_dir = "C:/UniServerZ/www/files"; // Directory where the files are located
+$files_url = "http://localhost/files"; // Url where the client will download the files
+$files_and_dirs = array("init.lua", "data", "modules", "mods");
 $checksum_file = "checksums.txt";
 $checksum_update_interval = 60; // seconds
 $binaries = array(
@@ -50,7 +50,7 @@ if(!$cache) { // update cache
         $path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
         $checksum = hash_file("crc32b", $file->getPathname());
 
-        if ($checksum === true) {
+        if ($checksum === true || $checksum != "") {
             $parsed_checksum = ltrim($checksum, '0');
             if ($parsed_checksum === '') {
                 $parsed_checksum = '0';
