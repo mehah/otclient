@@ -369,6 +369,17 @@ function EnterGame.tryHttpLogin(clientVersion)
             local world = worlds[character.worldid]
             characters[index] = {
                 name = character.name,
+                level = character.level,
+                main = character.ismaincharacter,
+                dailyreward = character.dailyrewardstate,
+                hidden = character.ishidden,
+                vocation = character.vocation,
+                outfitid = character.outfitid,
+                headcolor = character.headcolor,
+                torsocolor = character.torsocolor,
+                legscolor = character.legscolor,
+                detailcolor = character.detailcolor,
+                addonsflags = character.addonsflags,
                 worldName = world.name,
                 worldIp = world.ip,
                 worldPort = world.port,

@@ -1,5 +1,5 @@
 CharacterWidget < UIWidget
-  height: 14
+  height: 64
   background-color: alpha
   &updateOnStates: |
     function(self)
@@ -14,11 +14,80 @@ CharacterWidget < UIWidget
   $focus:
     background-color: #ffffff22
 
+  Creature
+    id: outfitCreatureBox
+    size: 64 64
+    anchors.top: parent.top
+    anchors.left: parent.left
+    padding-left: 10
+    padding-bottom: 5
+    creatureDisplay:setCreature(creature)
+    fixed-creature-size: true
+
   Label
     id: name
     color: #bbbbbb
     anchors.top: parent.top
     anchors.left: parent.left
+    margin-left: 65
+    font: verdana-11px-monochrome
+    text-auto-resize: true
+    background-color: alpha
+    text-offset: 2 0
+
+    $on:
+      color: #ffffff
+
+  Label
+    id: mainCharacter
+    size: 9 8
+    anchors.top: parent.top
+    anchors.left: prev.right
+    margin-left: 6
+    margin-top: 2
+    image-source: /images/game/entergame/maincharacter
+    image-clip: 0 0 9 8
+
+  Label
+    id: statusDailyReward
+    size: 11 19
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-left: 252
+    margin-top: 2
+    image-source: /images/game/entergame/dailyreward_collected
+    image-clip: 0 0 11 19
+
+  Label
+    id: statusHidden
+    size: 11 19
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-left: 267
+    margin-top: 2
+    image-source: /images/game/entergame/hidden
+    image-clip: 0 0 11 19
+
+  Label
+    id: level
+    color: #bbbbbb
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-left: 300
+    font: verdana-11px-monochrome
+    text-auto-resize: true
+    background-color: alpha
+    text-offset: 2 0
+
+    $on:
+      color: #ffffff
+
+  Label
+    id: vocation
+    color: #bbbbbb
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-left: 350
     font: verdana-11px-monochrome
     text-auto-resize: true
     background-color: alpha
@@ -31,12 +100,12 @@ CharacterWidget < UIWidget
     id: worldName
     color: #bbbbbb
     anchors.top: parent.top
-    anchors.right: parent.right
-    margin-right: 5
+    anchors.left: parent.left
+    margin-left: 502
     font: verdana-11px-monochrome
     text-auto-resize: true
     background-color: alpha
-    &baseText: '(%s)'
+    &baseText: '%s'
 
     $on:
       color: #ffffff
@@ -45,30 +114,63 @@ MainWindow
   id: charactersWindow
   !text: tr('Character List')
   visible: false
-  draggable: false
   @onEnter: CharacterList.doLogin()
   @onEscape: CharacterList.hide(true)
   @onSetup: |
     g_keyboard.bindKeyPress('Up', function() self:getChildById('characters'):focusPreviousChild(KeyboardFocusReason) end, self)
     g_keyboard.bindKeyPress('Down', function() self:getChildById('characters'):focusNextChild(KeyboardFocusReason) end, self)
     if g_game.getFeature(GamePreviewState) then
-      self:setSize({width = 350, height = 400})
+      self:setSize({width = 745, height = 430})
     else
       self:setSize({width = 250, height = 248})
     end
 
   TextList
     id: characters
-    background-color: #565656
+    background-color: #404040
     anchors.top: parent.top
     anchors.left: parent.left
     anchors.right: characterListScrollBar.left
     anchors.bottom: accountStatusCaption.top
     margin-bottom: 5
     padding: 1
+    padding-top: 20
     focusable: false
     vertical-scrollbar: characterListScrollBar
     auto-focus: first
+
+  FlatLabel
+    width: 250
+    anchors.left: parent.left
+    anchors.top: characters.top
+    !text: tr('Character') .. ''
+
+  FlatLabel
+    width: 50
+    anchors.left: parent.left
+    anchors.top: characters.top
+    margin-left: 250
+    !text: tr('Status') .. ''
+
+  FlatLabel
+    width: 50
+    anchors.left: parent.left
+    anchors.top: characters.top
+    margin-left: 300
+    !text: tr('Level') .. ''
+
+  FlatLabel
+    width: 150
+    anchors.left: parent.left
+    anchors.top: characters.top
+    margin-left: 350
+    !text: tr('Vocation') .. ''
+
+  FlatLabel
+    width: 201
+    anchors.right: characters.right
+    anchors.top: characters.top
+    !text: tr('World') .. ''
 
   VerticalScrollBar
     id: characterListScrollBar
@@ -79,21 +181,54 @@ MainWindow
     step: 14
     pixels-scroll: true
 
+  VerticalSeparator
+    anchors.left: parent.left
+    anchors.top: parent.top
+    anchors.bottom: prev.bottom
+    margin-left: 249
+
+  VerticalSeparator
+    anchors.left: parent.left
+    anchors.top: parent.top
+    anchors.bottom: prev.bottom
+    margin-left: 299
+
+  VerticalSeparator
+    anchors.left: parent.left
+    anchors.top: parent.top
+    anchors.bottom: prev.bottom
+    margin-left: 349
+
+  VerticalSeparator
+    anchors.left: parent.left
+    anchors.top: parent.top
+    anchors.bottom: prev.bottom
+    margin-left: 499
+
   Label
     id: accountStatusCaption
     !text: tr('Account Status') .. ':'
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.bottom: next.top
-    margin-bottom: 1
+    margin-bottom: 5
+
+  Label
+    id: accountStatusIcon
+    size: 22 20
+    anchors.left: parent.left
+    anchors.bottom: next.bottom
+    image-source: /images/game/entergame/premium
+    image-clip: 0 0 22 20
 
   Label
     id: accountStatusLabel
     !text: tr('Free Account')
     anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.bottom: separator.top
-    margin-bottom: 5
+    anchors.bottom: next.bottom
+    margin-bottom: 15
+    padding-bottom: 2
+    text-offset: 25 0
     text-auto-resize: true
 
     $on:

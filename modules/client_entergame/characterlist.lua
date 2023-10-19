@@ -9,6 +9,7 @@ local waitingWindow
 local updateWaitEvent
 local resendWaitEvent
 local loginEvent
+local outfitCreatureBox
 
 -- private functions
 local function tryLogin(charInfo, tries)
@@ -94,7 +95,18 @@ local function resendWait()
                     worldHost = selected.worldHost,
                     worldPort = selected.worldPort,
                     worldName = selected.worldName,
-                    characterName = selected.characterName
+                    characterName = selected.characterName,
+                    characterLevel = selected.characterLevel,
+                    main = selected.main,
+                    dailyreward = selected.dailyreward,
+                    hidden = selected.hidden,
+                    outfitid = selected.outfitid,
+                    headcolor = selected.headcolor,
+                    torsocolor = selected.torsocolor,
+                    legscolor = selected.legscolor,
+                    detailcolor = selected.detailcolor,
+                    addonsflags = selected.addonsflags,
+                    characterVocation = selected.characterVocation
                 }
                 tryLogin(charInfo)
             end
@@ -255,6 +267,7 @@ function CharacterList.create(characters, account, otui)
 
     characterList:destroyChildren()
     local accountStatusLabel = charactersWindow:getChildById('accountStatusLabel')
+    local accountStatusIcon = charactersWindow:getChildById('accountStatusIcon')
 
     local focusLabel
     for i, characterInfo in ipairs(characters) do
@@ -274,6 +287,35 @@ function CharacterList.create(characters, account, otui)
                     subWidget:setText(text)
                 end
             end
+        end
+
+        local creatureDisplay = widget:getChildById('outfitCreatureBox', characterList)
+        creatureDisplay:setSize("64 64")
+        local creature = Creature.create()
+        local outfit = {type = characterInfo.outfitid, head = characterInfo.headcolor, body = characterInfo.torsocolor, legs = characterInfo.legscolor, feet = characterInfo.detailcolor, addons = characterInfo.addonsflags}
+        creature:setOutfit(outfit)
+        creature:setDirection(2)
+        creatureDisplay:setCreature(creature)
+
+        local mainCharacter = widget:getChildById('mainCharacter', characterList)
+        if characterInfo.main then
+            mainCharacter:setImageSource('/images/game/entergame/maincharacter')
+        else
+            mainCharacter:setImageSource('')
+        end
+
+        local statusDailyReward = widget:getChildById('statusDailyReward', characterList)
+        if characterInfo.dailyreward == 0 then
+            statusDailyReward:setImageSource('/images/game/entergame/dailyreward_collected')
+        else
+            statusDailyReward:setImageSource('/images/game/entergame/dailyreward_notcollected')
+        end
+
+        local statusHidden = widget:getChildById('statusHidden', characterList)
+        if characterInfo.hidden then
+            statusHidden:setImageSource('/images/game/entergame/hidden')
+        else
+            statusHidden:setImageSource('')
         end
 
         -- these are used by login
@@ -313,12 +355,14 @@ function CharacterList.create(characters, account, otui)
 
     if account.subStatus == SubscriptionStatus.Free then
         accountStatusLabel:setText(('%s%s'):format(tr('Free Account'), status))
+        accountStatusIcon:setImageSource('/images/game/entergame/nopremium')
     elseif account.subStatus == SubscriptionStatus.Premium then
         if account.premDays == 0 or account.premDays == 65535 then
             accountStatusLabel:setText(('%s%s'):format(tr('Gratis Premium Account'), status))
         else
             accountStatusLabel:setText(('%s%s'):format(tr('Premium Account (%s) days left', account.premDays), status))
         end
+        accountStatusIcon:setImageSource('/images/game/entergame/premium')
     end
 
     if account.premDays > 0 and account.premDays <= 7 then
