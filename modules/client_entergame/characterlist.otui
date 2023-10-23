@@ -1,5 +1,5 @@
 CharacterWidget < UIWidget
-  height: 64
+  height: 14
   background-color: alpha
   &updateOnStates: |
     function(self)
@@ -9,7 +9,11 @@ CharacterWidget < UIWidget
       end
     end
   @onFocusChange: self:updateOnStates()
-  @onSetup: self:updateOnStates()
+  @onSetup: |
+    self:updateOnStates()
+    if g_game.getFeature(GameEnterGameShowAppearance) then
+      self:setHeight(64)
+    end
 
   $focus:
     background-color: #ffffff22
@@ -23,17 +27,24 @@ CharacterWidget < UIWidget
     padding-bottom: 5
     creatureDisplay:setCreature(creature)
     fixed-creature-size: true
+    @onSetup: |
+      if not(g_game.getFeature(GameEnterGameShowAppearance)) then
+        self:hide()
+      end
 
   Label
     id: name
     color: #bbbbbb
     anchors.top: parent.top
     anchors.left: parent.left
-    margin-left: 65
     font: verdana-11px-monochrome
     text-auto-resize: true
     background-color: alpha
     text-offset: 2 0
+    @onSetup: |
+      if g_game.getFeature(GameEnterGameShowAppearance) then
+        self:setMarginLeft(65)
+      end
 
     $on:
       color: #ffffff
@@ -47,6 +58,10 @@ CharacterWidget < UIWidget
     margin-top: 2
     image-source: /images/game/entergame/maincharacter
     image-clip: 0 0 9 8
+    @onSetup: |
+      if not(g_game.getFeature(GameEnterGameShowAppearance)) then
+        self:hide()
+      end
 
   Label
     id: statusDailyReward
@@ -57,6 +72,10 @@ CharacterWidget < UIWidget
     margin-top: 2
     image-source: /images/game/entergame/dailyreward_collected
     image-clip: 0 0 11 19
+    @onSetup: |
+      if not(g_game.getFeature(GameEnterGameShowAppearance)) then
+        self:hide()
+      end
 
   Label
     id: statusHidden
@@ -67,6 +86,10 @@ CharacterWidget < UIWidget
     margin-top: 2
     image-source: /images/game/entergame/hidden
     image-clip: 0 0 11 19
+    @onSetup: |
+      if not(g_game.getFeature(GameEnterGameShowAppearance)) then
+        self:hide()
+      end
 
   Label
     id: level
@@ -78,6 +101,10 @@ CharacterWidget < UIWidget
     text-auto-resize: true
     background-color: alpha
     text-offset: 2 0
+    @onSetup: |
+      if not(g_game.getFeature(GameEnterGameShowAppearance)) then
+        self:hide()
+      end
 
     $on:
       color: #ffffff
@@ -92,6 +119,10 @@ CharacterWidget < UIWidget
     text-auto-resize: true
     background-color: alpha
     text-offset: 2 0
+    @onSetup: |
+      if not(g_game.getFeature(GameEnterGameShowAppearance)) then
+        self:hide()
+      end
 
     $on:
       color: #ffffff
@@ -100,12 +131,19 @@ CharacterWidget < UIWidget
     id: worldName
     color: #bbbbbb
     anchors.top: parent.top
-    anchors.left: parent.left
-    margin-left: 502
     font: verdana-11px-monochrome
     text-auto-resize: true
     background-color: alpha
-    &baseText: '%s'
+    &baseText: '(%s)'
+    @onSetup: |
+      if g_game.getFeature(GameEnterGameShowAppearance) then
+        self:addAnchor(AnchorLeft, 'parent', AnchorLeft)
+        self:setMarginLeft(502)
+        self.baseText = '%s'
+      else
+        self:addAnchor(AnchorRight, 'parent', AnchorRight)
+        self:setMarginRight(5)
+      end
 
     $on:
       color: #ffffff
@@ -120,7 +158,11 @@ MainWindow
     g_keyboard.bindKeyPress('Up', function() self:getChildById('characters'):focusPreviousChild(KeyboardFocusReason) end, self)
     g_keyboard.bindKeyPress('Down', function() self:getChildById('characters'):focusNextChild(KeyboardFocusReason) end, self)
     if g_game.getFeature(GamePreviewState) then
-      self:setSize({width = 745, height = 430})
+      if g_game.getFeature(GameEnterGameShowAppearance) then
+        self:setSize({width = 745, height = 430})
+      else
+        self:setSize({width = 350, height = 400})
+      end
     else
       self:setSize({width = 250, height = 248})
     end
@@ -134,16 +176,27 @@ MainWindow
     anchors.bottom: accountStatusCaption.top
     margin-bottom: 5
     padding: 1
-    padding-top: 20
     focusable: false
     vertical-scrollbar: characterListScrollBar
     auto-focus: first
+    @onSetup: |
+      if g_game.getFeature(GameEnterGameShowAppearance) then
+        self:setBackgroundColor("#404040")
+        self:setPaddingTop(20)
+      else
+        self:setBackgroundColor("#565656")
+      end
+
 
   FlatLabel
     width: 250
     anchors.left: parent.left
     anchors.top: characters.top
     !text: tr('Character') .. ''
+    @onSetup: |
+      if not(g_game.getFeature(GameEnterGameShowAppearance)) then
+        self:hide()
+      end
 
   FlatLabel
     width: 50
@@ -151,6 +204,10 @@ MainWindow
     anchors.top: characters.top
     margin-left: 250
     !text: tr('Status') .. ''
+    @onSetup: |
+      if not(g_game.getFeature(GameEnterGameShowAppearance)) then
+        self:hide()
+      end
 
   FlatLabel
     width: 50
@@ -158,6 +215,10 @@ MainWindow
     anchors.top: characters.top
     margin-left: 300
     !text: tr('Level') .. ''
+    @onSetup: |
+      if not(g_game.getFeature(GameEnterGameShowAppearance)) then
+        self:hide()
+      end
 
   FlatLabel
     width: 150
@@ -165,12 +226,20 @@ MainWindow
     anchors.top: characters.top
     margin-left: 350
     !text: tr('Vocation') .. ''
+    @onSetup: |
+      if not(g_game.getFeature(GameEnterGameShowAppearance)) then
+        self:hide()
+      end
 
   FlatLabel
     width: 201
     anchors.right: characters.right
     anchors.top: characters.top
     !text: tr('World') .. ''
+    @onSetup: |
+      if not(g_game.getFeature(GameEnterGameShowAppearance)) then
+        self:hide()
+      end
 
   VerticalScrollBar
     id: characterListScrollBar
@@ -186,24 +255,40 @@ MainWindow
     anchors.top: parent.top
     anchors.bottom: prev.bottom
     margin-left: 249
+    @onSetup: |
+      if not(g_game.getFeature(GameEnterGameShowAppearance)) then
+        self:hide()
+      end
 
   VerticalSeparator
     anchors.left: parent.left
     anchors.top: parent.top
     anchors.bottom: prev.bottom
     margin-left: 299
+    @onSetup: |
+      if not(g_game.getFeature(GameEnterGameShowAppearance)) then
+        self:hide()
+      end
 
   VerticalSeparator
     anchors.left: parent.left
     anchors.top: parent.top
     anchors.bottom: prev.bottom
     margin-left: 349
+    @onSetup: |
+      if not(g_game.getFeature(GameEnterGameShowAppearance)) then
+        self:hide()
+      end
 
   VerticalSeparator
     anchors.left: parent.left
     anchors.top: parent.top
     anchors.bottom: prev.bottom
     margin-left: 499
+    @onSetup: |
+      if not(g_game.getFeature(GameEnterGameShowAppearance)) then
+        self:hide()
+      end
 
   Label
     id: accountStatusCaption
@@ -211,7 +296,12 @@ MainWindow
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.bottom: next.top
-    margin-bottom: 5
+    @onSetup: |
+      if g_game.getFeature(GameEnterGameShowAppearance) then
+        self:setMarginBottom(5)
+      else
+        self:setMarginBottom(1)
+      end
 
   Label
     id: accountStatusIcon
@@ -220,16 +310,27 @@ MainWindow
     anchors.bottom: next.bottom
     image-source: /images/game/entergame/premium
     image-clip: 0 0 22 20
+    @onSetup: |
+      if not(g_game.getFeature(GameEnterGameShowAppearance)) then
+        self:hide()
+      end
 
   Label
     id: accountStatusLabel
     !text: tr('Free Account')
     anchors.left: parent.left
-    anchors.bottom: next.bottom
-    margin-bottom: 15
-    padding-bottom: 2
-    text-offset: 25 0
     text-auto-resize: true
+    @onSetup: |
+      if g_game.getFeature(GameEnterGameShowAppearance) then
+        self:setMarginBottom(15)
+        self:setPaddingBottom(2)
+        self:setTextOffset({x = 25, y = 0})
+        self:addAnchor(AnchorBottom, 'next', AnchorBottom)
+      else
+        self:setMarginBottom(5)
+        self:addAnchor(AnchorRight, 'parent', AnchorRight)
+        self:addAnchor(AnchorBottom, 'separator', AnchorTop)
+      end
 
     $on:
       color: #FF0000

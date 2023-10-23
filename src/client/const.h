@@ -541,7 +541,8 @@ namespace Otc
         GameDynamicBugReporter = 111,
         GameWrapKit = 112,
         GameContainerFilter = 113,
-        LastGameFeature = 114
+        GameEnterGameShowAppearance = 114,
+        LastGameFeature = 115
     };
 
     enum MagicEffectsType_t : uint8_t

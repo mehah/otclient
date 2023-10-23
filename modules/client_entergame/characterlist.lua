@@ -267,7 +267,10 @@ function CharacterList.create(characters, account, otui)
 
     characterList:destroyChildren()
     local accountStatusLabel = charactersWindow:getChildById('accountStatusLabel')
-    local accountStatusIcon = charactersWindow:getChildById('accountStatusIcon')
+    local accountStatusIcon = nil
+    if g_game.getFeature(GameEnterGameShowAppearance) then
+        accountStatusIcon = charactersWindow:getChildById('accountStatusIcon')
+    end
 
     local focusLabel
     for i, characterInfo in ipairs(characters) do
@@ -289,33 +292,35 @@ function CharacterList.create(characters, account, otui)
             end
         end
 
-        local creatureDisplay = widget:getChildById('outfitCreatureBox', characterList)
-        creatureDisplay:setSize("64 64")
-        local creature = Creature.create()
-        local outfit = {type = characterInfo.outfitid, head = characterInfo.headcolor, body = characterInfo.torsocolor, legs = characterInfo.legscolor, feet = characterInfo.detailcolor, addons = characterInfo.addonsflags}
-        creature:setOutfit(outfit)
-        creature:setDirection(2)
-        creatureDisplay:setCreature(creature)
+        if g_game.getFeature(GameEnterGameShowAppearance) then
+            local creatureDisplay = widget:getChildById('outfitCreatureBox', characterList)
+            creatureDisplay:setSize("64 64")
+            local creature = Creature.create()
+            local outfit = {type = characterInfo.outfitid, head = characterInfo.headcolor, body = characterInfo.torsocolor, legs = characterInfo.legscolor, feet = characterInfo.detailcolor, addons = characterInfo.addonsflags}
+            creature:setOutfit(outfit)
+            creature:setDirection(2)
+            creatureDisplay:setCreature(creature)
 
-        local mainCharacter = widget:getChildById('mainCharacter', characterList)
-        if characterInfo.main then
-            mainCharacter:setImageSource('/images/game/entergame/maincharacter')
-        else
-            mainCharacter:setImageSource('')
-        end
+            local mainCharacter = widget:getChildById('mainCharacter', characterList)
+            if characterInfo.main then
+                mainCharacter:setImageSource('/images/game/entergame/maincharacter')
+            else
+                mainCharacter:setImageSource('')
+            end
 
-        local statusDailyReward = widget:getChildById('statusDailyReward', characterList)
-        if characterInfo.dailyreward == 0 then
-            statusDailyReward:setImageSource('/images/game/entergame/dailyreward_collected')
-        else
-            statusDailyReward:setImageSource('/images/game/entergame/dailyreward_notcollected')
-        end
+            local statusDailyReward = widget:getChildById('statusDailyReward', characterList)
+            if characterInfo.dailyreward == 0 then
+                statusDailyReward:setImageSource('/images/game/entergame/dailyreward_collected')
+            else
+                statusDailyReward:setImageSource('/images/game/entergame/dailyreward_notcollected')
+            end
 
-        local statusHidden = widget:getChildById('statusHidden', characterList)
-        if characterInfo.hidden then
-            statusHidden:setImageSource('/images/game/entergame/hidden')
-        else
-            statusHidden:setImageSource('')
+            local statusHidden = widget:getChildById('statusHidden', characterList)
+            if characterInfo.hidden then
+                statusHidden:setImageSource('/images/game/entergame/hidden')
+            else
+                statusHidden:setImageSource('')
+            end
         end
 
         -- these are used by login
@@ -355,14 +360,18 @@ function CharacterList.create(characters, account, otui)
 
     if account.subStatus == SubscriptionStatus.Free then
         accountStatusLabel:setText(('%s%s'):format(tr('Free Account'), status))
-        accountStatusIcon:setImageSource('/images/game/entergame/nopremium')
+        if accountStatusIcon ~= nil then
+            accountStatusIcon:setImageSource('/images/game/entergame/nopremium')
+        end
     elseif account.subStatus == SubscriptionStatus.Premium then
         if account.premDays == 0 or account.premDays == 65535 then
             accountStatusLabel:setText(('%s%s'):format(tr('Gratis Premium Account'), status))
         else
             accountStatusLabel:setText(('%s%s'):format(tr('Premium Account (%s) days left', account.premDays), status))
         end
-        accountStatusIcon:setImageSource('/images/game/entergame/premium')
+        if accountStatusIcon ~= nil then
+            accountStatusIcon:setImageSource('/images/game/entergame/premium')
+        end
     end
 
     if account.premDays > 0 and account.premDays <= 7 then
