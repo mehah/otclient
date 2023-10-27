@@ -41,6 +41,7 @@ end
 
 local function onCharacterList(protocol, characters, account, otui)
     -- Try add server to the server list
+    print("Add Server 1")
     ServerList.add(G.host, G.port, g_game.getClientVersion())
 
     -- Save 'Stay logged in' setting
@@ -53,14 +54,14 @@ local function onCharacterList(protocol, characters, account, otui)
         g_settings.set('account', account)
         g_settings.set('password', password)
 
-        ServerList.setServerAccount(G.host, account)
-        ServerList.setServerPassword(G.host, password)
+        ServerList.setServerAccount(G.host .. ':' .. G.port, account)
+        ServerList.setServerPassword(G.host .. ':' .. G.port, password)
 
         g_settings.set('autologin', enterGame:getChildById('autoLoginBox'):isChecked())
     else
         -- reset server list account/password
-        ServerList.setServerAccount(G.host, '')
-        ServerList.setServerPassword(G.host, '')
+        ServerList.setServerAccount(G.host .. ':' .. G.port, '')
+        ServerList.setServerPassword(G.host .. ':' .. G.port, '')
 
         EnterGame.clearAccountFields()
     end
@@ -401,7 +402,7 @@ function EnterGame.tryHttpLogin(clientVersion)
         onCharacterList(nil, characters, account)
     end
 
-    HTTP.post(G.host .. "/login.php",
+    HTTP.post(G.host .. ':' .. G.port .. "/login.php",
         json.encode({
             email = G.account,
             password = G.password,
@@ -452,6 +453,10 @@ function EnterGame.doLogin()
     g_settings.set('client-version', clientVersion)
 
     if clientVersion >= 1281 and G.port ~= 7171 then
+        if G.port == nil or G.port == 0 then
+            G.port = 80
+        end
+
         EnterGame.tryHttpLogin(clientVersion)
     else
         protocolLogin = ProtocolLogin.create()
