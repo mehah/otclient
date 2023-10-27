@@ -179,6 +179,7 @@ controller:registerEvents(g_game, {
             g_game.enableFeature(GameThingQuickLoot);
             g_game.enableFeature(GameTournamentPackets);
             g_game.enableFeature(GameVipGroups);
+            g_game.enableFeature(GameEnterGameShowAppearance);
         end
 
         if version >= 1260 then
