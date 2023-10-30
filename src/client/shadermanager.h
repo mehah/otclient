@@ -50,6 +50,11 @@ public:
     void setupMountShader(const std::string_view name);
 
     void createShader(const std::string_view name);
+    void createShaderNew(const std::string_view name, const std::string_view vertex, const std::string_view fragment, const bool colorMatrix);
+    void createOutfitShader(const std::string& name, std::string vertex, std::string fragment)
+    {
+        return createShaderNew(name, vertex, fragment, true);
+    }
     void createFragmentShader(const std::string_view name, const std::string_view file);
     void createFragmentShaderFromCode(const std::string_view name, const std::string_view code);
 

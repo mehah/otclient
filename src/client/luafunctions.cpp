@@ -351,6 +351,8 @@ void Client::registerLuaFunctions()
 
     g_lua.registerSingletonClass("g_shaders");
     g_lua.bindSingletonFunction("g_shaders", "createShader", &ShaderManager::createShader, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "createShaderNew", &ShaderManager::createShaderNew, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "createOutfitShader", &ShaderManager::createOutfitShader, &g_shaders);
     g_lua.bindSingletonFunction("g_shaders", "createFragmentShader", &ShaderManager::createFragmentShader, &g_shaders);
     g_lua.bindSingletonFunction("g_shaders", "createFragmentShaderFromCode", &ShaderManager::createFragmentShaderFromCode, &g_shaders);
     g_lua.bindSingletonFunction("g_shaders", "setupMapShader", &ShaderManager::setupMapShader, &g_shaders);

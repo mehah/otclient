@@ -65,6 +65,10 @@ OUTFIT_SHADERS = {{
 }, {
     name = 'Outfit - Fragmented',
     frag = 'shaders/fragment/noise.frag'
+}, {
+    name = 'Outfit - Outline RED',
+    vert = 'shaders/fragment/outline_red_vertex',
+    frag = 'shaders/fragment/outline_red_fragment'
 }}
 
 MOUNT_SHADERS = {{
@@ -176,7 +180,11 @@ function init()
 
         if fragmentShaderPath ~= nil then
             --  local shader = g_shaders.createShader()
-            g_shaders.createFragmentShader(opts.name, opts.frag)
+            if (method == 'setupOutfitShader' and opts.vert ~= nil) then 
+                g_shaders.createOutfitShader(opts.name, opts.vert, opts.frag)
+            else
+                g_shaders.createFragmentShader(opts.name, opts.frag)
+            end
 
             if opts.tex1 then
                 g_shaders.addMultiTexture(opts.name, opts.tex1)

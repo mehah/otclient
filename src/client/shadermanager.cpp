@@ -41,6 +41,41 @@ void ShaderManager::createShader(const std::string_view name)
     });
 }
 
+void ShaderManager::createShaderNew(const std::string_view name ,const std::string_view vertex, const std::string_view fragment, const bool colorMatrix)
+{
+    
+    std::string vertexContent, farmentContent;
+    if (vertex.find("\n") == std::string::npos) { // file
+        vertexContent = g_resources.guessFilePath(vertex.data(), "frag");
+        vertexContent = g_resources.readFileContents(vertexContent);
+    }
+    if (fragment.find("\n") == std::string::npos) { // file
+        farmentContent = g_resources.guessFilePath(fragment.data(), "frag");
+        farmentContent = g_resources.readFileContents(farmentContent);
+    }
+
+    g_mainDispatcher.addEvent([&, name = name.data(), vertex = vertexContent, fragment = farmentContent, colorMatrix] {
+        const auto& program = std::make_shared<PainterShaderProgram>();
+
+        if (!program) {
+            return nullptr;
+        }
+        if (!program->addShaderFromSourceCode(ShaderType::VERTEX, vertex))
+            return nullptr;
+        if (!program->addShaderFromSourceCode(ShaderType::FRAGMENT, fragment))
+            return nullptr;
+
+        if (colorMatrix) {
+            program->enableColorMatrix();
+        }
+        if (!program->link()) {
+            return nullptr;
+        }
+        if (program)
+            m_shaders[name] = program;
+    });
+}
+
 void ShaderManager::createFragmentShader(const std::string_view name, const std::string_view file)
 {
     const auto& filePath = g_resources.resolvePath(file.data());

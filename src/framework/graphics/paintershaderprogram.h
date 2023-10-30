@@ -31,17 +31,30 @@ protected:
     {
         VERTEX_ATTR = 0,
         TEXCOORD_ATTR = 1,
+        DEPTH_ATTR = 2,
+        COLOR_ATTR = 3,
+        DEPTH_TEXCOORD_ATTR = 4,
+
+
         PROJECTION_MATRIX_UNIFORM = 0,
         TEXTURE_MATRIX_UNIFORM = 1,
-        COLOR_UNIFORM = 2,
+        TRANSFORM_MATRIX_UNIFORM = 2,
+
         OPACITY_UNIFORM = 3,
-        TIME_UNIFORM = 4,
-        TEX0_UNIFORM = 5,
-        TEX1_UNIFORM = 6,
-        TEX2_UNIFORM = 7,
-        TEX3_UNIFORM = 8,
-        RESOLUTION_UNIFORM = 9,
-        TRANSFORM_MATRIX_UNIFORM = 10
+        COLOR_UNIFORM = 4,
+        TIME_UNIFORM = 5,
+        DEPTH_UNIFORM = 6,
+
+        TEX0_UNIFORM = 7,
+        TEX1_UNIFORM = 8,
+        TEX2_UNIFORM = 9,
+        TEX3_UNIFORM = 10,
+        ATLAS_TEX0_UNIFORM = 11,
+        ATLAS_TEX1_UNIFORM = 12,
+
+        RESOLUTION_UNIFORM = 13,
+        OFFSET_UNIFORM = 14,
+        CENTER_UNIFORM = 15
     };
 
     friend class Painter;
@@ -57,17 +70,29 @@ public:
     void setProjectionMatrix(const Matrix3& projectionMatrix);
     void setTextureMatrix(const Matrix3& textureMatrix);
     void setColor(const Color& color);
+    void setMatrixColor(const Matrix4& colors);
+    void setDepth(float depth);
     void setOpacity(float opacity);
     void setResolution(const Size& resolution);
+    void setOffset(const Point& offset);
+    void setCenter(const Point& center);
     void updateTime();
 
     void addMultiTexture(const std::string& file);
     void bindMultiTextures() const;
+    void clearMultiTextures();
+
+    void enableColorMatrix()
+    {
+        m_useColorMatrix = true;
+    }
 
 private:
     float m_startTime{ 0 };
     float m_opacity{ 1.f };
     float m_time{ 0 };
+    float m_depth{ 0 };
+
 
     Color m_color{ Color::white };
 
@@ -76,6 +101,10 @@ private:
     Matrix3 m_textureMatrix;
 
     Size m_resolution;
+    Point m_offset;
+    Point m_center;
 
     std::vector<TexturePtr> m_multiTextures;
+    bool m_useColorMatrix = false;
+
 };

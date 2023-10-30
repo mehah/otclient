@@ -26,33 +26,61 @@
 #include "texture.h"
 #include "texturemanager.h"
 
-PainterShaderProgram::PainterShaderProgram() :m_startTime(g_clock.seconds()) {}
+PainterShaderProgram::PainterShaderProgram() : ShaderProgram()
+{
+    m_startTime = g_clock.seconds();
+    m_depth = 0;
+    m_color = Color::white;
+    m_time = 0;
+}
 
 void PainterShaderProgram::setupUniforms()
 {
     bindUniformLocation(TRANSFORM_MATRIX_UNIFORM, "u_TransformMatrix");
     bindUniformLocation(PROJECTION_MATRIX_UNIFORM, "u_ProjectionMatrix");
     bindUniformLocation(TEXTURE_MATRIX_UNIFORM, "u_TextureMatrix");
+
     bindUniformLocation(COLOR_UNIFORM, "u_Color");
     bindUniformLocation(OPACITY_UNIFORM, "u_Opacity");
+    bindUniformLocation(DEPTH_UNIFORM, "u_Depth");
     bindUniformLocation(TIME_UNIFORM, "u_Time");
+
+
     bindUniformLocation(TEX0_UNIFORM, "u_Tex0");
     bindUniformLocation(TEX1_UNIFORM, "u_Tex1");
     bindUniformLocation(TEX2_UNIFORM, "u_Tex2");
     bindUniformLocation(TEX3_UNIFORM, "u_Tex3");
+
+    bindUniformLocation(ATLAS_TEX0_UNIFORM, "u_Atlas");
+    bindUniformLocation(ATLAS_TEX1_UNIFORM, "u_Fonts");
+
     bindUniformLocation(RESOLUTION_UNIFORM, "u_Resolution");
+    bindUniformLocation(OFFSET_UNIFORM, "u_Offset");
+    bindUniformLocation(CENTER_UNIFORM, "u_Center");
 
     setUniformValue(TRANSFORM_MATRIX_UNIFORM, m_transformMatrix);
     setUniformValue(PROJECTION_MATRIX_UNIFORM, m_projectionMatrix);
     setUniformValue(TEXTURE_MATRIX_UNIFORM, m_textureMatrix);
-    setUniformValue(COLOR_UNIFORM, m_color);
+
+    if (!m_useColorMatrix) {
+        setUniformValue(COLOR_UNIFORM, m_color);
+    }
+
     setUniformValue(OPACITY_UNIFORM, m_opacity);
     setUniformValue(TIME_UNIFORM, m_time);
+    setUniformValue(DEPTH_UNIFORM, m_depth);
+
     setUniformValue(TEX0_UNIFORM, 0);
     setUniformValue(TEX1_UNIFORM, 1);
     setUniformValue(TEX2_UNIFORM, 2);
     setUniformValue(TEX3_UNIFORM, 3);
+
+    setUniformValue(ATLAS_TEX0_UNIFORM, 6);
+    setUniformValue(ATLAS_TEX1_UNIFORM, 7);
+
     setUniformValue(RESOLUTION_UNIFORM, static_cast<float>(m_resolution.width()), static_cast<float>(m_resolution.height()));
+    setUniformValue(OFFSET_UNIFORM, static_cast<float>(m_offset.x), static_cast<float>(m_offset.y));
+    setUniformValue(CENTER_UNIFORM, static_cast<float>(m_center.x), static_cast<float>(m_center.y));
 }
 
 bool PainterShaderProgram::link()
@@ -60,6 +88,9 @@ bool PainterShaderProgram::link()
     m_startTime = g_clock.seconds();
     bindAttributeLocation(VERTEX_ATTR, "a_Vertex");
     bindAttributeLocation(TEXCOORD_ATTR, "a_TexCoord");
+    bindAttributeLocation(DEPTH_ATTR, "a_Depth");
+    bindAttributeLocation(COLOR_ATTR, "a_Color");
+    bindAttributeLocation(DEPTH_TEXCOORD_ATTR, "a_DepthTexCoord");
     if (!ShaderProgram::link())
         return false;
 
@@ -109,6 +140,27 @@ void PainterShaderProgram::setColor(const Color& color)
     m_color = color;
 }
 
+void PainterShaderProgram::setMatrixColor(const Matrix4& colors)
+{
+    bind();
+    setUniformValue(COLOR_UNIFORM, colors);
+}
+
+#ifdef WITH_DEPTH_BUFFER
+void PainterShaderProgram::setDepth(float depth)
+{
+    if (depth < 0.)
+        depth = 0.;
+
+    if (m_depth == depth)
+        return;
+
+    bind();
+    setUniformValue(DEPTH_UNIFORM, depth);
+    m_depth = depth;
+}
+#endif
+
 void PainterShaderProgram::setOpacity(float opacity)
 {
     if (m_opacity == opacity)
@@ -127,6 +179,26 @@ void PainterShaderProgram::setResolution(const Size& resolution)
     bind();
     setUniformValue(RESOLUTION_UNIFORM, static_cast<float>(resolution.width()), static_cast<float>(resolution.height()));
     m_resolution = resolution;
+}
+
+void PainterShaderProgram::setOffset(const Point& offset)
+{
+    if (m_offset == offset)
+        return;
+
+    bind();
+    m_offset = offset;
+    setUniformValue(OFFSET_UNIFORM, (float)m_offset.x, (float)m_offset.y);
+}
+
+void PainterShaderProgram::setCenter(const Point& center)
+{
+    if (m_center == center)
+        return;
+
+    bind();
+    m_center = center;
+    setUniformValue(CENTER_UNIFORM, (float)m_center.x, (float)m_center.y);
 }
 
 void PainterShaderProgram::updateTime()
@@ -168,4 +240,9 @@ void PainterShaderProgram::bindMultiTextures() const
     }
 
     glActiveTexture(GL_TEXTURE0);
+}
+
+void PainterShaderProgram::clearMultiTextures()
+{
+    m_multiTextures.clear();
 }

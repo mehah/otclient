@@ -52,6 +52,18 @@ enum class BlendEquation
     REVER_SUBTRACT = GL_FUNC_REVERSE_SUBTRACT,
 };
 
+enum class DepthFunc
+{
+    DepthFunc_None,
+    DepthFunc_LESS,
+    DepthFunc_LESS_READ,
+    DepthFunc_LEQUAL,
+    DepthFunc_LEQUAL_READ,
+    DepthFunc_EQUAL,
+    DepthFunc_ALWAYS,
+    DepthFunc_ALWAYS_READ
+};
+
 class Painter
 {
 public:
