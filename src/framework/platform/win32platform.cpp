@@ -22,6 +22,7 @@
 
 #ifdef WIN32
 
+#include <shellapi.h>
 #include <tchar.h>
 #include <framework/stdext/stdext.h>
 

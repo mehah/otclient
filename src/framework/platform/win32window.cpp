@@ -22,6 +22,7 @@
 
 #ifdef WIN32
 
+#include <timeapi.h>
 #include "win32window.h"
 #include <client/map.h>
 #include <framework/core/application.h>
