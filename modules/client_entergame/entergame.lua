@@ -401,7 +401,7 @@ function EnterGame.tryHttpLogin(clientVersion)
         onCharacterList(nil, characters, account)
     end
 
-    HTTP.post(G.host .. ':' .. G.port .. "/login.php",
+    HTTP.post(G.host .. ':' .. G.port,
         json.encode({
             email = G.account,
             password = G.password,
