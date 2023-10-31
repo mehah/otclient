@@ -401,7 +401,8 @@ function EnterGame.tryHttpLogin(clientVersion)
         onCharacterList(nil, characters, account)
     end
 
-    HTTP.post(G.host .. ':' .. G.port,
+    local host, path = G.host:match("([^/]+)/([^/]+)")
+    HTTP.post(host .. ':' .. G.port .. '/' .. path,
         json.encode({
             email = G.account,
             password = G.password,
