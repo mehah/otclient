@@ -86,6 +86,7 @@ MessageTypes = {
     [MessageModes.TutorialHint] = MessageSettings.centerWhite,
     [MessageModes.BeyondLast] = MessageSettings.centerWhite,
     [MessageModes.Report] = MessageSettings.consoleRed,
+    [MessageModes.GameHighlight] = MessageSettings.centerRed,
     [MessageModes.HotkeyUse] = MessageSettings.centerGreen,
     [MessageModes.Attention] = MessageSettings.bottomWhite,
     [MessageModes.BoostedCreature] = MessageSettings.centerWhite,
