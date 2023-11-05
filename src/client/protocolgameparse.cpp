@@ -2408,7 +2408,7 @@ void ProtocolGame::parseChannelEvent(const InputMessagePtr& msg)
 void ProtocolGame::parseItemInfo(const InputMessagePtr& msg) const
 {
     std::vector<std::tuple<ItemPtr, std::string>> list;
-    const uint8_t size = msg->getU8();
+    const int size = msg->getU8();
     for (int_fast32_t i = 0; i < size; ++i) {
         const auto& item = std::make_shared<Item>();
         item->setId(msg->getU16());
