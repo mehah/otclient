@@ -150,7 +150,7 @@ private:
     void internalDraw(int animationPhase, const Point& dest, const Color& color, bool drawThings, bool isMarked, LightView* lightView = nullptr);
     void setConductor();
 
-    uint8_t m_countOrSubType{ 0 };
+    uint16_t m_countOrSubType{ 0 };
 
     Color m_color{ Color::white };
 
