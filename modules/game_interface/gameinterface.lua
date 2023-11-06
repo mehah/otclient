@@ -23,6 +23,7 @@ smartWalkDir = nil
 firstStep = false
 hookedMenuOptions = {}
 lastDirTime = g_clock.millis()
+lastManualWalk = 0
 
 function init()
     g_ui.importStyle('styles/countwindow')
@@ -494,6 +495,8 @@ function smartWalk(dir)
     local dire = smartWalkDir or dir
     g_game.walk(dire, firstStep)
     firstStep = false
+
+    lastManualWalk = g_clock.millis()
     return true
 end
 
@@ -885,6 +888,16 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
                     end, opt.shortcut)
                 end
             end
+        end
+    end
+
+    if not g_game.isEnabledBotProtection() and useThing and useThing:isItem() then
+        menu:addSeparator()
+        local useThingId = useThing:getId()
+        if useThing:getSubType() > 1 then
+            menu:addOption("ID: " .. useThingId .. " SubType: " .. g_window.getClipboardText(), function() end)
+        else
+            menu:addOption("ID: " .. useThingId, function() g_window.setClipboardText(useThingId) end)
         end
     end
 

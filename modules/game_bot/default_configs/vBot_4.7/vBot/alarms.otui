@@ -1,0 +1,181 @@
+AlarmsWindow < MainWindow
+  !text: tr('Alarms')
+  size: 300 280
+  @onEscape: self:hide()
+
+  BotSwitch
+    id: playerAttack
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    text-align: center
+    text: Player Attack
+    !tooltip: tr('Alerts when attacked by player.')
+
+  BotSwitch
+    id: playerDetected
+    anchors.left: parent.left
+    anchors.right: parent.horizontalCenter
+    anchors.top: prev.bottom
+    margin-top: 4
+    text-align: center
+    text: Player Detected
+    !tooltip: tr('Alerts when a player is detected on screen.')
+
+  CheckBox
+    id: playerDetectedLogout
+    anchors.top: playerDetected.top
+    anchors.left: parent.horizontalCenter
+    anchors.right: parent.right
+    margin-top: 3
+    margin-left: 4
+    text: Logout
+    !tooltip: tr('Attempts to logout when a player is detected on screen.')
+
+  BotSwitch
+    id: ignoreFriends
+    anchors.left: parent.left
+    anchors.top: playerDetected.bottom
+    anchors.right: parent.right
+    text-align: center
+    margin-top: 4
+    text: Ignore Friends
+    !tooltip: tr('Player detection alerts will ignore friends.')
+
+  HorizontalSeparator
+    id: sepPlayer
+    anchors.right: parent.right
+    anchors.left: parent.left
+    anchors.top: prev.bottom
+    margin-top: 4
+
+  BotSwitch
+    id: creatureDetected
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: sepPlayer.bottom
+    margin-top: 4
+    text-align: center
+    text: Creature Detected
+    !tooltip: tr('Alerts when a creature is detected on screen.')
+
+  BotSwitch
+    id: warnBoss
+    anchors.left: parent.left
+    anchors.top: prev.bottom
+    anchors.right: parent.horizontalCenter
+    text-align: center
+    margin-top: 5
+    text: Creature Name
+    !tooltip: tr('Alerts when a creature/npc with name is detected on screen. \n eg: Benjamin or [boss] would detect a creature with [boss] in name. \n You can add many examples, just separate them by comma.')
+
+  BotTextEdit
+    id: bossName
+    anchors.left: prev.right
+    margin-left: 4
+    anchors.top: prev.top
+    anchors.right: parent.right
+    margin-top: 1
+    height: 17
+    font: terminus-10px
+
+  HorizontalSeparator
+    id: sepCreature
+    anchors.right: parent.right
+    anchors.left: parent.left
+    anchors.top: prev.bottom
+    margin-top: 4
+
+  BotSwitch
+    id: healthBelow
+    anchors.left: parent.left
+    anchors.top: prev.bottom
+    anchors.right: parent.horizontalCenter
+    text-align: center
+    margin-top: 4
+    text: Health < 50%
+
+  HorizontalScrollBar
+    id: healthValue
+    anchors.left: parent.horizontalCenter
+    anchors.right: parent.right
+    anchors.top: healthBelow.top
+    margin-left: 3
+    margin-top: 2
+    minimum: 1
+    maximum: 100
+    step: 1
+
+  BotSwitch
+    id: manaBelow
+    anchors.left: parent.left
+    anchors.top: healthBelow.bottom
+    anchors.right: parent.horizontalCenter
+    text-align: center
+    margin-top: 4
+    text: Mana < 50%
+
+  HorizontalScrollBar
+    id: manaValue
+    anchors.left: parent.horizontalCenter
+    anchors.right: parent.right
+    anchors.top: manaBelow.top
+    margin-left: 3
+    margin-top: 2
+    minimum: 1
+    maximum: 100
+    step: 1
+
+  HorizontalSeparator
+    id: sepMessages
+    anchors.right: parent.right
+    anchors.left: parent.left
+    anchors.top: prev.bottom
+    margin-top: 4
+
+  BotSwitch
+    id: privateMessage
+    anchors.left: parent.left
+    anchors.top: prev.bottom
+    anchors.right: parent.right
+    text-align: center
+    margin-top: 4
+    text: Private Message
+    !tooltip: tr('Alerts when recieving a private message.')
+
+  BotSwitch
+    id: warnMessage
+    anchors.left: parent.left
+    anchors.top: prev.bottom
+    anchors.right: parent.horizontalCenter
+    text-align: center
+    margin-top: 5
+    text: Message Alert
+    !tooltip: tr('Alerts when players receive a message that contains given part. \n Eg. event - will trigger alert whenever a message with word event appears. \n You can give many examples, just separate them by comma.')
+
+  BotTextEdit
+    id: messageText
+    anchors.left: prev.right
+    margin-left: 4
+    anchors.top: prev.top
+    anchors.right: parent.right
+    margin-top: 1
+    height: 17
+    font: terminus-10px
+
+  HorizontalSeparator
+    id: separator
+    anchors.right: parent.right
+    anchors.left: parent.left
+    anchors.bottom: closeButton.top
+    margin-bottom: 8
+
+  Button
+    id: closeButton
+    !text: tr('Close')
+    font: cipsoftFont
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    size: 45 21
+    margin-top: 15
+    margin-right: 5

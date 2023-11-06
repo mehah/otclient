@@ -1,0 +1,75 @@
+TextEditButtons < Panel
+  id: buttons
+  height: 30
+
+  Button
+    id: ok
+    !text: tr('Ok')
+    anchors.bottom: parent.bottom
+    anchors.right: next.left
+    margin-right: 10
+    width: 60
+
+  Button
+    id: cancel
+    !text: tr('Cancel')
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    width: 60
+
+TextEditWindow < MainWindow
+  id: textedit
+  !text: tr("Edit text")
+  layout:
+    type: verticalBox
+    fit-children: true
+    
+  Label
+    id: description
+    text-align: center
+    margin-bottom: 5
+    visible: false
+    text-wrap: true
+    text-auto-resize: true
+  
+  ComboBox
+    id: examples
+    margin-bottom: 5
+    visible: false
+
+SinglelineTextEditWindow < TextEditWindow
+  width: 250
+
+  TextEdit
+    id: text
+    
+  TextEditButtons
+
+MultilineTextEditWindow < TextEditWindow
+  width: 600
+  $mobile:
+    width: 500
+
+  Panel
+    id: textPanel
+    height: 400
+    $mobile:
+      height: 300
+
+    MultilineTextEdit
+      id: text
+      anchors.fill: parent
+      margin-right: 12
+      text-wrap: true
+      vertical-scrollbar: textScroll
+
+    VerticalScrollBar
+      id: textScroll
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      pixels-scroll: true
+      step: 10
+    
+  TextEditButtons
+

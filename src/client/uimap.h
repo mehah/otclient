@@ -94,8 +94,8 @@ public:
     void setAntiAliasingMode(const MapView::AntialiasingMode mode) { m_mapView->setAntiAliasingMode(mode); }
     void setFloorFading(const uint16_t v) { m_mapView->setFloorFading(v); }
 
-    void addTileWidget(const TilePtr& tile);
-    void removeTileWidget(const TilePtr& tile);
+    void addTile(const TilePtr& tile);
+    void removeTile(const TilePtr& tile);
 
 protected:
     void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;

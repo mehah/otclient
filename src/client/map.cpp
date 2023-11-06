@@ -519,7 +519,7 @@ void Map::removeUnawareThings()
                         continue;
                     }
 
-                    if(!tile->isEmpty())
+                    if (!tile->isEmpty())
                         tile->clean();
 
                     block.remove(pos);
@@ -1061,3 +1061,281 @@ void Map::findPathAsync(const Position& start, const Position& goal, const std::
         g_dispatcher.addEvent(std::bind(callback, ret));
     });
 }
+
+int Map::getMinimapColor(const Position& pos)
+{
+    int color = 0;
+    if (const TilePtr& tile = getTile(pos)) {
+        color = tile->getMinimapColorByte();
+    }
+    if (color == 0) {
+        const MinimapTile& mtile = g_minimap.getTile(pos);
+        color = mtile.color;
+    }
+    return color;
+}
+
+bool Map::isSightClear(const Position& fromPos, const Position& toPos)
+{
+    if (fromPos == toPos) {
+        return true;
+    }
+
+    Position start(fromPos.z > toPos.z ? toPos : fromPos);
+    Position destination(fromPos.z > toPos.z ? fromPos : toPos);
+
+    const int8_t mx = start.x < destination.x ? 1 : start.x == destination.x ? 0 : -1;
+    const int8_t my = start.y < destination.y ? 1 : start.y == destination.y ? 0 : -1;
+
+    int32_t A = destination.y - start.y;
+    int32_t B = start.x - destination.x;
+    int32_t C = -(A * destination.x + B * destination.y);
+
+    while (start.x != destination.x || start.y != destination.y) {
+        int32_t move_hor = std::abs(A * (start.x + mx) + B * (start.y) + C);
+        int32_t move_ver = std::abs(A * (start.x) + B * (start.y + my) + C);
+        int32_t move_cross = std::abs(A * (start.x + mx) + B * (start.y + my) + C);
+
+        if (start.y != destination.y && (start.x == destination.x || move_hor > move_ver || move_hor > move_cross)) {
+            start.y += my;
+        }
+
+        if (start.x != destination.x && (start.y == destination.y || move_ver > move_hor || move_ver > move_cross)) {
+            start.x += mx;
+        }
+
+        auto tile = getTile(Position(start.x, start.y, start.z));
+        if (tile && tile->isLookPossible()) {
+            return false;
+        }
+    }
+
+    while (start.z != destination.z) {
+        auto tile = getTile(Position(start.x, start.y, start.z));
+        if (tile && tile->getThingCount() > 0) {
+            return false;
+        }
+        start.z++;
+    }
+
+    return true;
+}
+
+#ifndef BOT_PROTECTION
+stdext::map<std::string, std::tuple<int, int, int, std::string>> Map::findEveryPath(const Position& start, int maxDistance, const stdext::map<std::string, std::string>& params)
+{
+    // using Dijkstra's algorithm
+    struct LessNode
+    {
+        bool operator()(Node* a, Node* b) const
+        {
+            return b->totalCost < a->totalCost;
+        }
+    };
+
+    stdext::map<std::string, std::string>::const_iterator it;
+    it = params.find("ignoreLastCreature");
+    bool ignoreLastCreature = it != params.end() && it->second != "0" && it->second != "";
+    it = params.find("ignoreCreatures");
+    bool ignoreCreatures = it != params.end() && it->second != "0" && it->second != "";
+    it = params.find("ignoreNonPathable");
+    bool ignoreNonPathable = it != params.end() && it->second != "0" && it->second != "";
+    it = params.find("ignoreNonWalkable");
+    bool ignoreNonWalkable = it != params.end() && it->second != "0" && it->second != "";
+    it = params.find("ignoreStairs");
+    bool ignoreStairs = it != params.end() && it->second != "0" && it->second != "";
+    it = params.find("ignoreCost");
+    bool ignoreCost = it != params.end() && it->second != "0" && it->second != "";
+    it = params.find("allowUnseen");
+    bool allowUnseen = it != params.end() && it->second != "0" && it->second != "";
+    it = params.find("allowOnlyVisibleTiles");
+    bool allowOnlyVisibleTiles = it != params.end() && it->second != "0" && it->second != "";
+    it = params.find("marginMin");
+    bool hasMargin = it != params.end();
+    it = params.find("marginMax");
+    hasMargin = hasMargin || (it != params.end());
+
+    Position destPos;
+    it = params.find("destination");
+    if (it != params.end()) {
+        std::vector<int32_t> pos = stdext::split<int32_t>(it->second, ",");
+        if (pos.size() == 3) {
+            destPos = Position(pos[0], pos[1], pos[2]);
+        }
+    }
+
+    Position maxDistanceFromPos;
+    int maxDistanceFrom = 0;
+    it = params.find("maxDistanceFrom");
+    if (it != params.end()) {
+        std::vector<int32_t> pos = stdext::split<int32_t>(it->second, ",");
+        if (pos.size() == 4) {
+            maxDistanceFromPos = Position(pos[0], pos[1], pos[2]);
+            maxDistanceFrom = pos[3];
+        }
+    }
+
+    stdext::map<std::string, std::tuple<int, int, int, std::string>> ret;
+    std::unordered_map<Position, Node*, Position::Hasher> nodes;
+    std::priority_queue<Node*, std::vector<Node*>, LessNode> searchList;
+
+    Node* initNode = new Node{ 1, 0, start, nullptr, 0, 0 };
+    nodes[start] = initNode;
+    searchList.push(initNode);
+
+    while (!searchList.empty()) {
+        Node* node = searchList.top();
+        searchList.pop();
+        ret[node->pos.toString()] = std::make_tuple(node->totalCost, node->distance,
+                                                    node->prev ? node->prev->pos.getDirectionFromPosition(node->pos) : -1,
+                                                    node->prev ? node->prev->pos.toString() : "");
+        if (node->pos == destPos) {
+            if (hasMargin) {
+                maxDistance = std::min<int>(node->distance + 4, maxDistance);
+            } else {
+                break;
+            }
+        }
+        if (node->distance >= maxDistance)
+            continue;
+        for (int i = -1; i <= 1; ++i) {
+            for (int j = -1; j <= 1; ++j) {
+                if (i == 0 && j == 0)
+                    continue;
+                Position neighbor = node->pos.translated(i, j);
+                if (neighbor.x < 0 || neighbor.y < 0) continue;
+                auto it = nodes.find(neighbor);
+                if (it == nodes.end()) {
+                    bool wasSeen = false;
+                    bool hasCreature = false;
+                    bool isNotWalkable = true;
+                    bool isNotPathable = true;
+                    int mapColor = 0;
+                    int speed = 1000;
+                    if (g_map.isAwareOfPosition(neighbor)) {
+                        if (const TilePtr& tile = getTile(neighbor)) {
+                            wasSeen = true;
+                            hasCreature = tile->hasBlockingCreature();
+                            isNotWalkable = !tile->isWalkable(true);
+                            isNotPathable = !tile->isPathable();
+                            mapColor = tile->getMinimapColorByte();
+                            speed = tile->getGroundSpeed();
+                        }
+                    } else if (!allowOnlyVisibleTiles) {
+                        const MinimapTile& mtile = g_minimap.getTile(neighbor);
+                        wasSeen = mtile.hasFlag(MinimapTileWasSeen);
+                        isNotWalkable = mtile.hasFlag(MinimapTileNotWalkable);
+                        isNotPathable = mtile.hasFlag(MinimapTileNotPathable);
+                        mapColor = mtile.color;
+                        if (isNotWalkable || isNotPathable)
+                            wasSeen = true;
+                        speed = mtile.getSpeed();
+                    }
+                    bool hasStairs = isNotPathable && mapColor >= 210 && mapColor <= 213;
+                    bool hasReachedMaxDistance = maxDistanceFrom && maxDistanceFromPos.isValid() && maxDistanceFromPos.distance(neighbor) > maxDistanceFrom;
+                    if ((!wasSeen && !allowUnseen) || (hasStairs && !ignoreStairs && neighbor != destPos) ||
+                        (isNotPathable && !ignoreNonPathable && neighbor != destPos) || (isNotWalkable && !ignoreNonWalkable) ||
+                        hasReachedMaxDistance) {
+                        it = nodes.emplace(neighbor, nullptr).first;
+                    } else if ((hasCreature && !ignoreCreatures)) {
+                        it = nodes.emplace(neighbor, nullptr).first;
+                        if (ignoreLastCreature) {
+                            ret[neighbor.toString()] = std::make_tuple(node->totalCost + 100, node->distance + 1,
+                                                                       node->pos.getDirectionFromPosition(neighbor),
+                                                                       node->pos.toString());
+                        }
+                    } else {
+                        it = nodes.emplace(neighbor, new Node{ (float)speed, 10000000.0f, neighbor, node, node->distance + 1, wasSeen ? 0 : 1 }).first;
+                    }
+                }
+
+                if (!it->second) {
+                    continue;
+                }
+
+                float diagonal = ((i == 0 || j == 0) ? 1.0f : 3.0f);
+                float cost = it->second->cost * diagonal;
+                if (ignoreCost)
+                    cost = 1;
+                if (node->totalCost + cost < it->second->totalCost) {
+                    it->second->totalCost = node->totalCost + cost;
+                    it->second->prev = node;
+                    if (it->second->unseen)
+                        it->second->unseen = node->unseen + 1;
+                    it->second->distance = node->distance + 1;
+                    searchList.push(it->second);
+                }
+            }
+        }
+    }
+
+    for (auto& node : nodes) {
+        if (node.second)
+            delete node.second;
+    }
+
+    return ret;
+}
+
+std::vector<CreaturePtr> Map::getSpectatorsByPattern(const Position& centerPos, const std::string& pattern, Otc::Direction direction)
+{
+    std::vector<bool> finalPattern(pattern.size(), false);
+    std::vector<CreaturePtr> creatures;
+    int width = 0, height = 0, lineLength = 0, p = 0;
+    for (auto& c : pattern) {
+        lineLength += 1;
+        if (c == '0' || c == '-') {
+            p += 1;
+        } else if (c == '1' || c == '+') {
+            finalPattern[p++] = true;
+        } else if (c == 'N' || c == 'n') {
+            finalPattern[p++] = direction == Otc::North;
+        } else if (c == 'E' || c == 'e') {
+            finalPattern[p++] = direction == Otc::East;
+        } else if (c == 'W' || c == 'w') {
+            finalPattern[p++] = direction == Otc::West;
+        } else if (c == 'S' || c == 's') {
+            finalPattern[p++] = direction == Otc::South;
+        } else {
+            lineLength -= 1;
+            if (lineLength > 1) {
+                if (width == 0)
+                    width = lineLength;
+                if (width != lineLength) {
+                    g_logger.error(stdext::format("Invalid pattern for getSpectatorsByPattern: %s", pattern));
+                    return creatures;
+                }
+                height += 1;
+                lineLength = 0;
+            }
+        }
+    }
+    if (lineLength > 0) {
+        if (width == 0)
+            width = lineLength;
+        if (width != lineLength) {
+            g_logger.error(stdext::format("Invalid pattern for getSpectatorsByPattern: %s", pattern));
+            return creatures;
+        }
+        height += 1;
+    }
+    if (width % 2 != 1 || height % 2 != 1) {
+        g_logger.error(stdext::format("Invalid pattern for getSpectatorsByPattern, width and height should be odd (height: %i width: %i)", height, width));
+        return creatures;
+    }
+
+    p = 0;
+    for (int y = centerPos.y - height / 2, endy = centerPos.y + height / 2; y <= endy; ++y) {
+        for (int x = centerPos.x - width / 2, endx = centerPos.x + width / 2; x <= endx; ++x) {
+            if (!finalPattern[p++])
+                continue;
+            TilePtr tile = getTile(Position(x, y, centerPos.z));
+            if (!tile)
+                continue;
+            auto tileCreatures = tile->getCreatures();
+            creatures.insert(creatures.end(), tileCreatures.rbegin(), tileCreatures.rend());
+        }
+    }
+    return creatures;
+}
+#endif

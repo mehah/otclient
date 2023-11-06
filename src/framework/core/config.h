@@ -46,6 +46,7 @@ public:
     void setNode(const std::string& key, const OTMLNodePtr& node);
     void mergeNode(const std::string& key, const OTMLNodePtr& node);
     OTMLNodePtr getNode(const std::string& key);
+    int getNodeSize(const std::string& key);
 
     bool exists(const std::string& key);
     void remove(const std::string& key);

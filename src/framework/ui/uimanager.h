@@ -52,6 +52,7 @@ public:
 
     UIMapPtr getMapWidget() const { return m_mapWidget; }
     UIWidgetPtr loadUI(const std::string& file, const UIWidgetPtr& parent);
+    UIWidgetPtr loadUIFromString(const std::string& data, const UIWidgetPtr& parent);
     OTMLNodePtr loadDeviceUI(const std::string& file, Platform::OperatingSystem os);
     OTMLNodePtr loadDeviceUI(const std::string& file, Platform::DeviceType deviceType);
     UIWidgetPtr displayUI(const std::string& file) { return loadUI(file, m_rootWidget); }

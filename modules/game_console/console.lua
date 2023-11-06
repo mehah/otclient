@@ -237,7 +237,7 @@ function init()
 
     -- apply buttom functions after loaded
     consoleTabBar:setNavigation(consolePanel:getChildById('prevChannelButton'),
-                                consolePanel:getChildById('nextChannelButton'))
+        consolePanel:getChildById('nextChannelButton'))
     consoleTabBar.onTabChange = onTabChange
 
     -- tibia like hotkeys
@@ -437,6 +437,11 @@ function load()
     loadCommunicationSettings()
 end
 
+function isEnabledWASD()
+    local settings = g_settings.getNode('game_console')
+    return settings.wasdMode
+end
+
 function onTabChange(tabBar, tab)
     if tab == defaultTab or tab == serverTab then
         consolePanel:getChildById('closeChannelButton'):disable()
@@ -531,9 +536,9 @@ function openPlayerReportRuleViolationWindow()
         g_game.talkChannel(MessageModes.RVRChannel, 0, text)
         violationReportTab = addTab(tr('Report Rule') .. '...', true)
         addTabText(tr('Please wait patiently for a gamemaster to reply') .. '.', SpeakTypesSettings.privateRed,
-                   violationReportTab)
+            violationReportTab)
         addTabText(applyMessagePrefixies(g_game.getCharacterName(), 0, text), SpeakTypesSettings.say,
-                   violationReportTab, g_game.getCharacterName())
+            violationReportTab, g_game.getCharacterName())
         violationReportTab.locked = true
         violationWindow:destroy()
         violationWindow = nil
@@ -891,7 +896,7 @@ function getHighlightedText(text)
     local tmpData = {}
 
     repeat
-        local tmp = {string.find(text, '{([^}]+)}', tmpData[#tmpData - 1])}
+        local tmp = { string.find(text, '{([^}]+)}', tmpData[#tmpData - 1]) }
         for _, v in pairs(tmp) do
             table.insert(tmpData, v)
         end
@@ -1314,7 +1319,7 @@ function sendMessage(message, tab)
     end
 
     local findIni, findEnd, chatCommandInitial, chatCommandPrivate, chatCommandEnd, chatCommandMessage = message:find(
-                                                                                                             '([%*%@])(.+)([%*%@])(.*)')
+        '([%*%@])(.+)([%*%@])(.*)')
     if findIni ~= nil and findIni == 1 then -- player used private chat command
         if chatCommandInitial == chatCommandEnd then
             chatCommandPrivateRepeat = false
@@ -1344,7 +1349,7 @@ function sendMessage(message, tab)
     if (channel or tab == defaultTab) and not chatCommandPrivateReady then
         if tab == defaultTab then
             speaktypedesc = chatCommandSayMode or
-                                SayModes[consolePanel:getChildById('sayModeButton').sayMode].speakTypeDesc
+                SayModes[consolePanel:getChildById('sayModeButton').sayMode].speakTypeDesc
             if speaktypedesc ~= 'say' then
                 sayModeChange(2)
             end -- head back to say mode
@@ -1469,7 +1474,6 @@ function onTalk(name, level, mode, message, channelId, creaturePos)
     local localPlayer = g_game.getLocalPlayer()
     if name ~= g_game.getCharacterName() and isUsingIgnoreList() and not (isUsingWhiteList()) or
         (isUsingWhiteList() and not (isWhitelisted(name)) and not (isAllowingVIPs() and localPlayer:hasVip(name))) then
-
         if mode == MessageModes.Yell and isIgnoringYelling() then
             return
         elseif speaktype.private and isIgnoringPrivate() and not isNpcMode then
@@ -1484,9 +1488,9 @@ function onTalk(name, level, mode, message, channelId, creaturePos)
     end
 
     if (mode == MessageModes.Say or mode == MessageModes.Whisper or mode == MessageModes.Yell or mode ==
-        MessageModes.Spell or mode == MessageModes.MonsterSay or mode == MessageModes.MonsterYell or mode ==
-        MessageModes.NpcFrom or mode == MessageModes.BarkLow or mode == MessageModes.BarkLoud or mode ==
-        MessageModes.NpcFromStartBlock) and creaturePos then
+            MessageModes.Spell or mode == MessageModes.MonsterSay or mode == MessageModes.MonsterYell or mode ==
+            MessageModes.NpcFrom or mode == MessageModes.BarkLow or mode == MessageModes.BarkLoud or mode ==
+            MessageModes.NpcFromStartBlock) and creaturePos then
         local staticText = StaticText.create()
         -- Remove curly braces from screen message
         local staticMessage = message
@@ -1543,7 +1547,7 @@ function onTalk(name, level, mode, message, channelId, creaturePos)
         else
             -- server sent a message on a channel that is not open
             pwarning('message in channel id ' .. channelId ..
-                         ' which is unknown, this is a server bug, relogin if you want to see messages in this channel')
+                ' which is unknown, this is a server bug, relogin if you want to see messages in this channel')
         end
     end
 end
@@ -1738,6 +1742,7 @@ end
 function isUsingWhiteList()
     return communicationSettings.useWhiteList
 end
+
 function isIgnored(name)
     return table.find(communicationSettings.ignoredPlayers, name, true)
 end

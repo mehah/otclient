@@ -32,6 +32,7 @@
 #include <framework/util/crypt.h>
 
 #include <physfs.h>
+#include <zip.h>
 
 ResourceManager g_resources;
 
@@ -720,5 +721,126 @@ bool ResourceManager::launchCorrect(std::vector<std::string>& args) { // curentl
 
     g_platform.spawnProcess(binary.string(), args);
     return true;
+#endif
+}
+
+std::string ResourceManager::createArchive(const stdext::map<std::string, std::string>& files)
+{
+#ifdef __EMSCRIPTEN__
+    return "";
+#else
+    if (files.empty()) return "";
+
+    zip_source_t* src;
+    zip_t* za;
+    zip_error_t error;
+    zip_error_init(&error);
+
+    if ((src = zip_source_buffer_create(0, 0, 0, &error)) == NULL)
+        throw Exception(stdext::format("can't create source: %s", zip_error_strerror(&error)));
+    zip_source_keep(src);
+
+    if ((za = zip_open_from_source(src, ZIP_TRUNCATE, &error)) == NULL)
+        throw Exception(stdext::format("can't open zip from source: %s", zip_error_strerror(&error)));
+
+    zip_error_fini(&error);
+
+    for (auto& file : files) {
+        if (file.first.empty() || file.second.empty())
+            continue;
+
+        zip_source_t* s;
+        if ((s = zip_source_buffer(za, file.second.data(), file.second.size(), 0)) == NULL)
+            throw Exception(stdext::format("can't create source buffer: %s", zip_strerror(za)));
+
+        std::string fileName = file.first;
+        if (fileName.size() > 1 && fileName[0] == '/')
+            fileName = fileName.substr(1);
+
+        int fileIndex = zip_file_add(za, fileName.c_str(), s, ZIP_FL_OVERWRITE);
+        if (fileIndex < 0)
+            throw Exception(stdext::format("can't add file %s to zip archive: %s", fileName, zip_strerror(za)));
+        //        if (zip_set_file_compression(za, fileIndex, ZIP_CM_DEFLATE, 1) != 0)
+        //            throw Exception("Can't set file compression level");
+    }
+
+    if (zip_close(za) < 0)
+        throw Exception(stdext::format("can't close zip archive: %s", zip_strerror(za)));
+
+    zip_stat_t zst;
+    if (zip_source_stat(src, &zst) < 0)
+        throw Exception(stdext::format("can't stat source: %s", zip_error_strerror(zip_source_error(src))));
+
+    size_t zipSize = zst.size;
+
+    if (zip_source_open(src) < 0)
+        throw Exception(stdext::format("can't open source: %s", zip_error_strerror(zip_source_error(src))));
+
+    std::string data(zipSize, '\0');
+    if ((zip_uint64_t)zip_source_read(src, data.data(), data.size()) != data.size())
+        throw Exception(stdext::format("can't read data from source: %s", zip_error_strerror(zip_source_error(src))));
+
+    zip_source_close(src);
+    zip_source_free(src);
+
+    return data;
+#endif
+}
+
+stdext::map<std::string, std::string> ResourceManager::decompressArchive(std::string dataOrPath)
+{
+    stdext::map<std::string, std::string> ret;
+#ifdef __EMSCRIPTEN__
+    return ret;
+#else
+    if (dataOrPath.size() < 64) {
+        dataOrPath = readFileContents(dataOrPath);
+    }
+
+    zip_source_t* src;
+    zip_t* za;
+    zip_stat_t file_stat;
+    zip_error_t error;
+    zip_error_init(&error);
+    zip_stat_init(&file_stat);
+
+    if ((src = zip_source_buffer_create(dataOrPath.c_str(), dataOrPath.size(), 0, &error)) == NULL)
+        throw Exception(stdext::format("unpackArchive: can't create source: %s", zip_error_strerror(&error)));
+
+    if ((za = zip_open_from_source(src, ZIP_RDONLY, &error)) == NULL)
+        throw Exception(stdext::format("unpackArchive: can't open zip from source: %s", zip_error_strerror(&error)));
+
+    zip_int64_t entries = zip_get_num_entries(za, 0);
+    for (zip_int64_t entry_idx = 0; entry_idx < entries; entry_idx++) {
+        if (zip_stat_index(za, entry_idx, 0, &file_stat)) {
+            throw Exception(stdext::format("unpackArchive: error stat-ing file at index %i: %s",
+                            (int)(entry_idx), zip_strerror(za)));
+        }
+        if (!(file_stat.valid & ZIP_STAT_NAME)) {
+            g_logger.warning(stdext::format("warning: skipping entry at index %i with invalid name.",
+                             (int)entry_idx));
+            continue;
+        }
+        std::string name(file_stat.name);
+        if (name.empty()) continue;
+        if (name[0] != '/')
+            name = std::string("/") + name;
+        if (name.back() == '/' || file_stat.size == 0) // dir
+            continue;
+        stdext::replace_all(name, "\\", "/");
+
+        zip_file_t* file = zip_fopen_index(za, entry_idx, 0);
+        if (!file)
+            throw Exception(stdext::format("can't open file from zip archive: %s - %s", name, zip_strerror(za)));
+        std::string buffer(file_stat.size, '\0');
+        zip_fread(file, buffer.data(), buffer.size());
+        zip_fclose(file);
+        ret[name] = std::move(buffer);
+    }
+
+    if (zip_close(za) < 0)
+        throw Exception(stdext::format("can't close zip archive: %s", zip_strerror(za)));
+    zip_error_fini(&error);
+    return ret; // success
 #endif
 }

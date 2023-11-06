@@ -1,0 +1,57 @@
+CaveBotConfigPanel < Panel
+  id: cavebotEditor
+  visible: false
+  
+  layout:
+    type: verticalBox
+    fit-children: true
+  
+  HorizontalSeparator
+    margin-top: 5
+
+  Label
+    text-align: center
+    text: CaveBot Config
+    margin-top: 5
+
+CaveBotConfigNumberValuePanel < Panel
+  height: 20
+  margin-top: 5
+  
+  BotTextEdit
+    id: value
+    anchors.right: parent.right
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    margin-right: 5
+    width: 50
+
+  Label
+    id: title
+    anchors.left: parent.left
+    anchors.verticalCenter: prev.verticalCenter
+    margin-left: 5
+
+CaveBotConfigBooleanValuePanel < Panel
+  height: 20
+  margin-top: 5
+  
+  BotSwitch
+    id: value
+    anchors.right: parent.right
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    margin-right: 5
+    width: 50
+    
+    $on:
+      text: On
+      
+    $!on:
+      text: Off
+
+  Label
+    id: title
+    anchors.left: parent.left
+    anchors.verticalCenter: prev.verticalCenter
+    margin-left: 5

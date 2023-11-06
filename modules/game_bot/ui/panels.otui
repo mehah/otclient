@@ -1,0 +1,310 @@
+DualScrollPanel < Panel
+  height: 51
+  margin-top: 3
+      
+  SmallBotSwitch
+    id: title
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    text-align: center
+    
+  HorizontalScrollBar
+    id: scroll1
+    anchors.left: title.left
+    anchors.right: title.horizontalCenter
+    anchors.top: title.bottom
+    margin-right: 2
+    margin-top: 2
+    minimum: 0
+    maximum: 100
+    step: 1
+    &disableScroll: true
+    
+  HorizontalScrollBar
+    id: scroll2
+    anchors.left: title.horizontalCenter
+    anchors.right: title.right
+    anchors.top: prev.top
+    margin-left: 2
+    minimum: 0
+    maximum: 100
+    step: 1
+    &disableScroll: true
+    
+  BotTextEdit
+    id: text
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: scroll1.bottom
+    margin-top: 3
+    margin-left: 2
+    margin-right: 1
+
+SingleScrollItemPanel < Panel
+  height: 45
+  margin-top: 2
+    
+  BotItem
+    id: item
+    anchors.left: parent.left
+    anchors.top: prev.bottom
+    margin-top: 3
+
+  SmallBotSwitch
+    id: title
+    anchors.left: prev.right
+    anchors.right: parent.right
+    anchors.top: prev.top    
+    margin-left: 2
+    text-align: center
+    
+  HorizontalScrollBar
+    id: scroll
+    anchors.left: title.left
+    anchors.right: title.right
+    anchors.top: title.bottom
+    margin-top: 2
+    minimum: 0
+    maximum: 100
+    step: 1
+    &disableScroll: true
+
+DualScrollItemPanel < Panel
+  height: 33
+  margin-top: 3
+    
+  BotItem
+    id: item
+    anchors.left: parent.left
+    anchors.top: prev.bottom
+    margin-top: 3
+
+  SmallBotSwitch
+    id: title
+    anchors.left: prev.right
+    anchors.right: parent.right
+    anchors.top: prev.top    
+    margin-left: 2
+    text-align: center
+    
+  HorizontalScrollBar
+    id: scroll1
+    anchors.left: title.left
+    anchors.right: title.horizontalCenter
+    anchors.top: title.bottom
+    margin-top: 2
+    margin-right: 2
+    minimum: 0
+    maximum: 100
+    step: 1
+    &disableScroll: true
+    
+  HorizontalScrollBar
+    id: scroll2
+    anchors.left: title.horizontalCenter
+    anchors.right: title.right
+    anchors.top: prev.top
+    margin-left: 2
+    minimum: 0
+    maximum: 100
+    step: 1
+    &disableScroll: true
+    
+ItemsRow < Panel
+  height: 33
+  margin-top: 2
+  
+  BotItem
+    id: item1
+    anchors.top: parent.top
+    anchors.left: parent.left
+
+  BotItem
+    id: item2
+    anchors.top: prev.top
+    anchors.left: prev.right
+    margin-left: 2
+
+  BotItem
+    id: item3
+    anchors.top: prev.top
+    anchors.left: prev.right
+    margin-left: 2
+
+  BotItem
+    id: item4
+    anchors.top: prev.top
+    anchors.left: prev.right
+    margin-left: 2
+
+  BotItem
+    id: item5
+    anchors.top: prev.top
+    anchors.left: prev.right
+    margin-left: 2
+    
+ItemsPanel < Panel
+  height: 55
+
+  SmallBotSwitch
+    id: title
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    text-align: center
+  
+  ItemsRow
+    id: items
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    
+    
+ItemAndButtonPanel < Panel
+  height: 40
+      
+  BotItem
+    id: item
+    anchors.left: parent.left
+    anchors.top: parent.top
+    
+  BotSwitch
+    id: title
+    anchors.left: prev.right
+    anchors.right: parent.right
+    anchors.verticalCenter: prev.verticalCenter
+    text-align: center
+    margin-left: 2
+    margin-top: 0   
+    
+ItemAndSlotPanel < Panel
+  height: 40
+      
+  BotItem
+    id: item
+    anchors.left: parent.left
+    anchors.top: parent.top
+    
+  SmallBotSwitch
+    id: title
+    anchors.left: prev.right
+    anchors.right: parent.right
+    anchors.top: prev.top
+    text-align: center
+    margin-left: 2
+    margin-top: 0
+
+  SlotComboBox
+    id: slot
+    anchors.left: prev.left
+    anchors.right: prev.right
+    anchors.top: prev.bottom
+    margin-top: 2
+    height: 20
+    &disableScroll: true
+
+TwoItemsAndSlotPanel < Panel
+  height: 35
+  margin-top: 4
+      
+  BotItem
+    id: item1
+    anchors.left: parent.left
+    anchors.top: parent.top
+    margin-top: 1
+
+  BotItem
+    id: item2
+    anchors.left: prev.right
+    anchors.top: prev.top
+    margin-left: 1
+    
+  SmallBotSwitch
+    id: title
+    anchors.left: prev.right
+    anchors.right: parent.right
+    anchors.top: parent.top
+    text-align: center
+    margin-left: 2
+    margin-top: 0
+
+  SlotComboBox
+    id: slot
+    anchors.left: prev.left
+    anchors.right: prev.right
+    anchors.top: prev.bottom
+    margin-top: 2
+    height: 20
+    &disableScroll: true
+
+DualLabelPanel < Panel
+  height: 20
+  padding: 1
+
+  Label
+    id: left
+    anchors.left: parent.left
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    text-align: left
+    text-wrap: true
+    text-auto-resize: true
+    margin-left: 3
+    font: verdana-11px-rounded
+
+  Label
+    id: right
+    anchors.right: parent.right
+    anchors.left: prev.right
+    margin-left: 2
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    text-align: right
+    text-auto-resize: true
+    margin-right: 3
+    font: verdana-11px-rounded
+
+LabelAndTextEditPanel < Panel
+  height: 20
+  padding: 1
+
+  Label
+    id: left
+    anchors.left: parent.left
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.right: parent.horizontalCenter
+    text-align: center
+    text-wrap: true
+    margin-right: 2
+
+  BotTextEdit
+    id: right
+    anchors.left: prev.right
+    margin-left: 3
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+
+SwitchAndButtonPanel < Panel
+  height: 20
+  padding: 1
+
+  Button
+    id: right
+    anchors.top: parent.top
+    margin-top: 2
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    text-auto-resize: true
+    text-align: center
+
+  BotSwitch
+    id: left
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: prev.left
+    margin-right: 3
+    text-align: center

@@ -1,0 +1,58 @@
+BotConfig < Panel
+  id: botConfig
+  height: 45
+  margin-left: 2
+  margin-right: 2
+
+  ComboBox
+    id: list
+    &menuScroll: true
+    &menuHeight: 450
+    &menuScrollStep: 100
+    &parentWidth: true
+    anchors.top: parent.top
+    anchors.left: parent.left
+    text-offset: 3 0
+    width: 130
+
+  Button
+    id: switch
+    anchors.top: prev.top
+    anchors.left: prev.right
+    anchors.right: parent.right
+    margin-left: 5      
+    $on:
+      text: On
+      color: #00AA00
+      
+    $!on:
+      text: Off
+      color: #FF0000
+
+  Button
+    margin-top: 2
+    id: add
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    text: Add
+    width: 56
+    height: 18
+    text-offet: 0 2
+    
+  Button
+    id: edit
+    anchors.top: prev.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    text: Edit
+    width: 56
+    height: 18
+    text-offet: 0 2
+    
+  Button
+    id: remove
+    anchors.top: prev.top
+    anchors.right: parent.right
+    text: Remove
+    width: 56
+    height: 18
+    text-offet: 0 2

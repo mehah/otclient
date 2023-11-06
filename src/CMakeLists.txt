@@ -278,6 +278,7 @@ set(SOURCE_FILES
 	client/uiminimap.cpp
 	client/uiprogressrect.cpp
 	client/uisprite.cpp
+	client/uigraph.cpp
 	framework/core/adaptativeframecounter.cpp
 	framework/core/application.cpp
 	framework/core/asyncdispatcher.cpp

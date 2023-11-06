@@ -1,0 +1,130 @@
+BotTabBar < TabBar
+  tab-spacing: 1
+  margin-left: 1
+  margin-right: 1
+  height: 20
+  
+  $on:
+    visible: true
+    margin-top: 2
+
+  $!on:
+    visible: false
+    margin-top: -20
+
+BotTabBarPanel < TabBarPanel
+BotTabBarButton < TabBarButton
+  padding: 4
+  padding-right: 5
+  text-horizontal-auto-resize: true
+  $!first:
+    margin-left: 0
+
+MiniWindow
+  id: botWindow
+  !text: tr('Bot')
+  height: 600
+  icon: /images/topbuttons/bot
+  @onClose: modules.game_bot.onMiniWindowClose()
+  &save: true
+  &autoOpen: 10
+
+  MiniWindowContents   
+    ComboBox
+      id: config
+      &menuScroll: true
+      &menuHeight: 450
+      &menuScrollStep: 100
+      &parentWidth: true
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 2
+      margin-left: 2
+      margin-right: 75
+      text-offset: 3 0
+      
+    Button
+      id: editConfig
+      anchors.top: prev.top
+      anchors.left: prev.right
+      anchors.right: parent.right
+      !text: tr('Edit')
+      @onClick: modules.game_bot.edit()
+      margin-left: 3
+      margin-right: 37
+
+    Button
+      id: enableButton
+      anchors.top: prev.top
+      anchors.left: prev.right
+      anchors.right: parent.right
+      margin-left: 3
+      margin-right: 2
+      
+      $on:
+        text: On
+        color: #00AA00
+        
+      $!on:
+        text: Off
+        color: #FF0000
+    
+    Label
+      id: statusLabel
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      text-wrap: true
+      text-auto-resize: true
+      text-align: center
+      !text: tr('Status: waiting')
+      margin-left: 3
+      margin-right: 3
+      
+      $on:
+        margin-top: 3
+      
+      $!on:
+        text:
+        margin-top: -13
+      
+    HorizontalSeparator
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      margin-top: 3
+      margin-left: 2
+      margin-right: 2
+
+    Panel
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      id: messages
+      layout:
+        type: verticalBox
+        fit-children: true
+
+    HorizontalSeparator
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      margin-top: 5
+      margin-left: 2
+      margin-right: 2
+    
+    BotTabBar
+      id: botTabs
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-right: -20
+      
+    Panel
+      id: botPanel
+      margin-top: 2
+      anchors.top: prev.bottom
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right

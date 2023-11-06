@@ -142,6 +142,7 @@ void GraphicalApplication::run()
 
     // clang c++20 dont support jthread
     std::thread t1([&]() {
+        g_eventThreadId = std::this_thread::get_id();
         while (!m_stopping) {
             poll();
 
@@ -191,8 +192,7 @@ void GraphicalApplication::run()
         txtCondition.wait(lock, [&]() -> bool {
             g_textDispatcher.poll();
 
-            txt->setEnable(canDrawTexts());
-            if (g_ui.m_mapWidget && txt->isEnabled())
+            if (g_ui.m_mapWidget)
                 g_ui.m_mapWidget->drawSelf(DrawPoolType::TEXT);
 
             return m_stopping;
