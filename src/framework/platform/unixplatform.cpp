@@ -140,19 +140,27 @@ ticks_t Platform::getFileModificationTime(std::string file)
     return 0;
 }
 
-void Platform::openUrl(std::string url)
+void Platform::openUrl(std::string url, bool now)
 {
     if(url.find("http://") == std::string::npos && url.find("https://") == std::string::npos)
         url.insert(0, "http://");
 
+    const auto& action = [url] {
 #if defined(__APPLE__)
-    system(stdext::format("open %s", url).c_str());
+        system(stdext::format("open %s", url).c_str());
 #else
-    int systemRet = system(stdext::format("xdg-open %s", url).c_str());
-    if(systemRet == -1){
-        return;
-    }
+        int systemRet = system(stdext::format("xdg-open %s", url).c_str());
+        if(systemRet == -1){
+            return;
+        }
 #endif
+    };
+
+    if (now) {
+        action();
+    } else {
+        g_dispatcher.scheduleEvent(action, 50);
+    }
 }
 
 std::string Platform::getCPUName()

@@ -155,12 +155,14 @@ void Platform::openUrl(std::string url, bool now)
     if (url.find("http://") == std::string::npos && url.find("https://") == std::string::npos)
         url.insert(0, "http://");
 
-    if (now) {
+    const auto& action = [url] {
         ShellExecuteW(nullptr, L"open", stdext::utf8_to_utf16(url).data(), nullptr, nullptr, SW_SHOWNORMAL);
+    };
+
+    if (now) {
+        action();
     } else {
-        g_dispatcher.scheduleEvent([url] {
-            ShellExecuteW(NULL, L"open", stdext::utf8_to_utf16(url).c_str(), NULL, NULL, SW_SHOWNORMAL);
-        }, 50);
+        g_dispatcher.scheduleEvent(action, 50);
     }
 }
 
