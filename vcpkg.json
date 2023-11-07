@@ -11,6 +11,7 @@
     "physfs",
     "protobuf",
     "zlib",
+    "libzip",
     "liblzma",
     "parallel-hashmap",
     "stduuid",
