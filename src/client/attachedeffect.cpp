@@ -56,6 +56,10 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
                 --m_loop;
         }
 
+        if (m_frame == 0 && m_loop == 0) {
+            return;
+        }
+
         if (m_shader) g_drawPool.setShaderProgram(m_shader, true);
         if (m_opacity < 100) g_drawPool.setOpacity(getOpacity(), true);
 
@@ -75,8 +79,10 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
 
 int AttachedEffect::getCurrentAnimationPhase()
 {
-    if (m_texture)
+    if (m_texture) {
+        m_texture->get(m_frame, m_animationTimer);
         return m_frame;
+    }
 
     const auto* animator = m_thingType->getIdleAnimator();
     if (!animator && m_thingType->isAnimateAlways())
