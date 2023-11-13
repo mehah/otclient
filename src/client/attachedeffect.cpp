@@ -54,10 +54,9 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
             m_lastAnimation = animation;
             if (animation == 0)
                 --m_loop;
-        }
 
-        if (m_frame == 0 && m_loop == 0) {
-            return;
+            if (m_frame == 0 && m_loop == 0)
+                return;
         }
 
         if (m_shader) g_drawPool.setShaderProgram(m_shader, true);
