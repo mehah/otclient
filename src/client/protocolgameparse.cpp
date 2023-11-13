@@ -41,6 +41,7 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
 {
     int opcode = -1;
     int prevOpcode = -1;
+    bool tryU16opCode = false;
 
     try {
         while (!msg->eof()) {
@@ -557,10 +558,22 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                     break;
 
                 default:
-                    throw Exception("unhandled opcode %d", opcode);
+                    tryU16opCode = true;
                     break;
             }
-            prevOpcode = opcode;
+
+            if(tryU16opCode) {
+                msg->setReadPos(msg->getReadPos() - 1);
+                int opcodeU16 = msg->getU16();
+                switch (opcodeU16) {
+                    default:
+                        throw Exception("unhandled opcodeU8 %d unhandled opcodeU16 %d ", opcode, opcodeU16);
+                        break;
+                }
+                prevOpcode = opcodeU16;
+            } else {
+                prevOpcode = opcode;
+            }
         }
     } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("ProtocolGame parse message exception (%d bytes, %d unread, last opcode is 0x%02x (%d), prev opcode is 0x%02x (%d)): %s"
