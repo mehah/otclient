@@ -98,6 +98,9 @@ void Thing::setShader(const std::string_view name) {
 }
 
 void Thing::attachEffect(const AttachedEffectPtr& obj) {
+    if (!obj)
+        return;
+
     if (isCreature()) {
         if (obj->m_thingType && (obj->m_thingType->isCreature() || obj->m_thingType->isMissile()))
             obj->m_direction = static_self_cast<Creature>()->getDirection();
