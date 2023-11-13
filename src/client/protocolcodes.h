@@ -42,7 +42,7 @@ namespace Proto
         Creature = 99
     };
 
-    enum GameServerOpcodes : uint8_t
+    enum GameServerOpcodes : uint16_t
     {
         GameServerLoginOrPendingState = 10,
         GameServerGMActions = 11,
@@ -209,7 +209,7 @@ namespace Proto
         GameServerStoreCompletePurchase = 254  // 1080
     };
 
-    enum ClientOpcodes : uint8_t
+    enum ClientOpcodes : uint16_t
     {
         ClientEnterAccount = 1,
         ClientPendingGame = 10,
