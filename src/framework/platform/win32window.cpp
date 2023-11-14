@@ -22,14 +22,16 @@
 
 #ifdef WIN32
 
-#include <timeapi.h>
 #include "win32window.h"
 #include <client/map.h>
 #include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/resourcemanager.h>
-
 #include <framework/graphics/image.h>
+
+#ifdef NDEBUG
+#include <timeapi.h>
+#endif
 
 #define HSB_BIT_SET(p, n) (p[(n)/8] |= (128 >>((n)%8)))
 
