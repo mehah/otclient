@@ -48,3 +48,7 @@ SpriteMaskRed = 1
 SpriteMaskGreen = 2
 SpriteMaskBlue = 3
 SpriteMaskYellow = 4
+
+function Thing:isTile()
+  return false
+end

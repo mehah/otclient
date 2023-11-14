@@ -25,6 +25,16 @@
 #include "thingtype.h"
 #include "outfit.h"
 
+enum class AttachedEffectDrawPlace : uint8_t
+{
+    DEFAULT,
+    BEFORE_GROUND,
+    BEFORE_ITEM,
+    BEFORE_CREATURE,
+    BEFORE_EFFECTS,
+    LAST,
+};
+
 class AttachedEffect : public LuaObject
 {
 public:
@@ -72,6 +82,9 @@ public:
 
     void attachEffect(const AttachedEffectPtr& e) { m_effects.emplace_back(e); }
 
+    AttachedEffectDrawPlace getDrawPlace() { return m_drawPlace; }
+    void setDrawPlace(AttachedEffectDrawPlace drawPlace) { m_drawPlace = drawPlace; }
+
 private:
     int getCurrentAnimationPhase();
 
@@ -86,6 +99,7 @@ private:
     uint8_t m_speed{ 100 };
     uint8_t m_opacity{ 100 };
     uint8_t m_lastAnimation{ 0 };
+    AttachedEffectDrawPlace m_drawPlace{ AttachedEffectDrawPlace::DEFAULT };
 
     uint16_t m_id{ 0 };
     uint16_t m_duration{ 0 };

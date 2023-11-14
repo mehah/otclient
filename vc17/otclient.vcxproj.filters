@@ -534,6 +534,9 @@
     <ClCompile Include="..\src\protobuf\appearances.pb.cc">
       <Filter>Source Files\protobuf</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\client\attachableobject.cpp">
+      <Filter>Source Files\client</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\client\attachedeffect.cpp">
       <Filter>Source Files\client</Filter>
     </ClCompile>
@@ -1045,6 +1048,9 @@
     </ClInclude>
     <ClInclude Include="..\src\protobuf\appearances.pb.h">
       <Filter>Header Files\protobuf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\attachableobject.h">
+      <Filter>Header Files\client</Filter>
     </ClInclude>
     <ClInclude Include="..\src\client\attachedeffect.h">
       <Filter>Header Files\client</Filter>

@@ -27,6 +27,7 @@
 #include "effect.h"
 #include "item.h"
 #include "mapview.h"
+#include "attachableobject.h"
 
 #ifdef FRAMEWORK_EDITOR
 enum tileflags_t : uint32_t
@@ -88,10 +89,12 @@ enum TileThingType : uint32_t
     CORRECT_CORPSE = 1 << 25
 };
 
-class Tile : public LuaObject
+class Tile : public AttachableObject
 {
 public:
     Tile(const Position& position);
+
+    LuaObjectPtr attachedObjectToLuaObject() override { return asLuaObject(); }
 
     void onAddInMapView();
     void draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, LightView* lightView = nullptr);

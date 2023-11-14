@@ -234,6 +234,7 @@ endif()
 set(SOURCE_FILES
 	client/animatedtext.cpp
 	client/animator.cpp
+	client/attachableobject.cpp
 	client/attachedeffect.cpp
 	client/attachedeffectmanager.cpp
 	client/client.cpp

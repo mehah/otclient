@@ -30,13 +30,16 @@
 #include "spritemanager.h"
 #include "thingtype.h"
 #include "thingtypemanager.h"
+#include "attachableobject.h"
 
  // @bindclass
 #pragma pack(push,1) // disable memory alignment
-class Thing : public LuaObject
+class Thing : public AttachableObject
 {
 public:
     virtual void draw(const Point& /*dest*/, bool drawThings = true, LightView* /*lightView*/ = nullptr) {}
+
+    LuaObjectPtr attachedObjectToLuaObject() override { return asLuaObject(); }
 
     virtual void setId(uint32_t /*id*/) {}
     virtual void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false);
@@ -182,19 +185,12 @@ public:
     bool isMarked() { return m_markedColor != Color::white; }
     void setMarkColor(const Color& color) { if (m_markedColor != color) m_markedColor = color; }
 
-    bool isHided() { return m_hidden > 0; }
-
-    void attachEffect(const AttachedEffectPtr& obj);
-    void clearAttachedEffects();
-    bool detachEffectById(uint16_t id);
-    AttachedEffectPtr getAttachedEffectById(uint16_t id);
-
-    const std::vector<AttachedEffectPtr>& getAttachedEffects() { return m_attachedEffects; };
+    bool isHided() { return isOwnerHidden(); }
+    void onStartAttachEffect(const AttachedEffectPtr& effect) override;
+    void onDispatcherAttachEffect(const AttachedEffectPtr& effect) override;
+    void onStartDetachEffect(const AttachedEffectPtr& effect) override;
 
 protected:
-    void drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop);
-
-    void onDetachEffect(const AttachedEffectPtr& effect);
     void setAttachedEffectDirection(Otc::Direction dir) const
     {
         for (const auto& effect : m_attachedEffects) {
@@ -202,8 +198,6 @@ protected:
                 effect->m_direction = dir;
         }
     }
-
-    uint8_t m_hidden{ 0 };
 
     uint8_t m_numPatternX{ 0 };
     uint8_t m_numPatternY{ 0 };
@@ -220,8 +214,6 @@ protected:
     // Shader
     PainterShaderProgramPtr m_shader;
     std::function<void()> m_shaderAction{ nullptr };
-
-    std::vector<AttachedEffectPtr> m_attachedEffects;
 
 private:
     bool m_canDraw{ true };

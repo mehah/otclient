@@ -48,6 +48,7 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool is
     m_drawElevation = 0;
     m_lastDrawDest = dest;
 
+    drawAttachedEffect(dest, lightView, false, AttachedEffectDrawPlace::BEFORE_GROUND);
     for (const auto& thing : m_things) {
         if (!thing->isGround() && !thing->isGroundBorder() && !thing->isOnBottom())
             break;
@@ -55,6 +56,7 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool is
         drawThing(thing, dest, flags, lightView);
     }
 
+    drawAttachedEffect(dest, lightView, false, AttachedEffectDrawPlace::BEFORE_ITEM);
     if (hasCommonItem()) {
         for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
             const auto& item = *it;
@@ -63,14 +65,18 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool is
         }
     }
 
+    drawAttachedEffect(dest, lightView, false, AttachedEffectDrawPlace::BEFORE_CREATURE);
     // after we render 2x2 lying corpses, we must redraw previous creatures/ontop above them
     for (const auto& tile : m_tilesRedraw) {
         tile->drawCreature(tile->m_lastDrawDest, mapRect, flags, isCovered, true, lightView);
         tile->drawTop(tile->m_lastDrawDest, flags, true, lightView);
     }
-
     drawCreature(dest, mapRect, flags, isCovered, false, lightView);
+
+    drawAttachedEffect(dest, lightView, false, AttachedEffectDrawPlace::BEFORE_EFFECTS);
     drawTop(dest, flags, false, lightView);
+
+    drawAttachedEffect(dest, lightView, false, AttachedEffectDrawPlace::DEFAULT);
     updateWidget(dest, mapRect);
 }
 
