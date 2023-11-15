@@ -145,7 +145,7 @@ public:
     bool isSingleDimension() { return (m_thingTypeFlag & TileThingType::NOT_SINGLE_DIMENSION) == 0 && m_walkingCreatures.empty(); }
     bool isLookPossible() { return (m_thingTypeFlag & TileThingType::BLOCK_PROJECTTILE) == 0; }
     bool isEmpty() { return m_things.empty(); }
-    bool isDrawable() { return !isEmpty() || !m_walkingCreatures.empty() || !m_effects.empty(); }
+    bool isDrawable() { return !isEmpty() || !m_walkingCreatures.empty() || !m_effects.empty() || !m_attachedEffects.empty(); }
     bool isCovered(int8_t firstFloor);
     bool isCompletelyCovered(uint8_t firstFloor, bool resetCache);
 
@@ -180,7 +180,7 @@ public:
     bool canRender(uint32_t& flags, const Position& cameraPosition, AwareRange viewPort);
     bool canErase()
     {
-        return m_walkingCreatures.empty() && m_effects.empty() && isEmpty() && m_minimapColor == 0
+        return m_walkingCreatures.empty() && m_effects.empty() && isEmpty() && m_minimapColor == 0 && m_attachedEffects.empty()
 #ifdef FRAMEWORK_EDITOR
             && m_flags == 0
 #endif
