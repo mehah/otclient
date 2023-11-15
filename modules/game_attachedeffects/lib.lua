@@ -26,10 +26,10 @@ local executeConfig = function(attachedEffect, config)
         attachedEffect:setOpacity(config.opacity)
     end
 
-    if config.color then
-        attachedEffect:setColor({
-            color = config.color.color or 0,
-            intensity = config.color.intensity or 0
+    if config.light then
+        attachedEffect:setLight({
+            color = config.light.color or 0,
+            intensity = config.light.intensity or 0
         })
     end
 
