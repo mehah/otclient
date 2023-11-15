@@ -25,8 +25,10 @@
 #include <framework/core/resourcemanager.h>
 #include <framework/luaengine/luainterface.h>
 
-#if ENABLE_DISCORD_RPC == 1
-#include <framework/discord/discord.h>
+#ifndef ANDROID
+    #if ENABLE_DISCORD_RPC == 1
+        #include <framework/discord/discord.h>
+    #endif
 #endif
 
 #ifdef FRAMEWORK_NET
@@ -69,8 +71,10 @@ int main(int argc, const char* argv[])
     if (!g_resources.discoverWorkDir("init.lua"))
         g_logger.fatal("Unable to find work directory, the application cannot be initialized.");
 
-#if ENABLE_DISCORD_RPC == 1
-    g_discord.init();
+#ifndef ANDROID
+    #if ENABLE_DISCORD_RPC == 1
+        g_discord.init();
+    #endif
 #endif
 
     // initialize application framework and otclient
