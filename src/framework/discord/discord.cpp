@@ -22,7 +22,7 @@
 
 #ifndef ANDROID
     #if ENABLE_DISCORD_RPC == 1
-	    #include "discord.h"
+        #include "discord.h"
         #include <client/game.h>
         #include <client/localplayer.h>
         #include <framework/core/eventdispatcher.h>
