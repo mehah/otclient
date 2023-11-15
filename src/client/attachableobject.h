@@ -22,12 +22,14 @@
 
 #pragma once
 #include "attachedeffect.h"
+#include <framework/luaengine/luaobject.h>
 
- // @bindclass
-#pragma pack(push,1) // disable memory alignment
 class AttachableObject : public LuaObject
 {
 public:
+    AttachableObject() = default;
+    virtual ~AttachableObject() = default;
+    
     void attachEffect(const AttachedEffectPtr& obj);
     void clearAttachedEffects();
     bool detachEffectById(uint16_t id);
@@ -49,4 +51,3 @@ protected:
     std::vector<AttachedEffectPtr> m_attachedEffects;
     uint8_t m_ownerHidden{ 0 };
 };
-#pragma pack(pop)

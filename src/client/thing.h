@@ -25,7 +25,6 @@
 #include <framework/core/clock.h>
 #include <framework/graphics/drawpool.h>
 #include <framework/luaengine/luaobject.h>
-#include "attachedeffect.h"
 #include "declarations.h"
 #include "spritemanager.h"
 #include "thingtype.h"

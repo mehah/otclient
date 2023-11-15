@@ -21,10 +21,8 @@
  */
 
 #include "attachableobject.h"
-#include "tile.h"
 
 #include <framework/core/eventdispatcher.h>
-#include <framework/core/graphicalapplication.h>
 
 void AttachableObject::attachEffect(const AttachedEffectPtr& obj) {
     if (!obj)
