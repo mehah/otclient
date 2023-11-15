@@ -24,21 +24,19 @@
 
 #include <framework/config.h>
 #ifndef ANDROID
-#if ENABLE_DISCORD_RPC == 1
-
-#include <discord_register.h>
-#include <discord_rpc.h>
-
-class Discord
-{
-public:
-    void init();
-
-private:
-    void update();
-};
-
-extern Discord g_discord;
-
-#endif
+    #if ENABLE_DISCORD_RPC == 1
+        #include <discord_register.h>
+        #include <discord_rpc.h>
+        
+        class Discord
+        {
+        public:
+            void init();
+        
+        private:
+            void update();
+        };
+        
+        extern Discord g_discord;
+    #endif
 #endif
