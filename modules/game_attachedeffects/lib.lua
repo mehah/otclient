@@ -33,6 +33,10 @@ local executeConfig = function(attachedEffect, config)
         })
     end
 
+    if config.drawOrder then
+        attachedEffect:setDrawOrder(config.drawOrder)
+    end
+
     if config.duration ~= nil and config.duration > 0 then
         attachedEffect:setDuration(config.duration)
     end
