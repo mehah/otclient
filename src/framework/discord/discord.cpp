@@ -22,6 +22,7 @@
 
 #include "discord.h"
 
+#ifndef ANDROID
 #if ENABLE_DISCORD_RPC == 1
 #include <client/game.h>
 #include <client/localplayer.h>
@@ -76,4 +77,5 @@ void Discord::update()
     g_dispatcher.scheduleEvent([this] { update(); }, 30000);
 }
 
+#endif
 #endif
