@@ -26,6 +26,13 @@ local executeConfig = function(attachedEffect, config)
         attachedEffect:setOpacity(config.opacity)
     end
 
+    if config.color then
+        attachedEffect:setColor({
+            color = config.color.color or 0,
+            intensity = config.color.intensity or 0
+        })
+    end
+
     if config.duration ~= nil and config.duration > 0 then
         attachedEffect:setDuration(config.duration)
     end

@@ -23,6 +23,8 @@
 #include "attachedeffect.h"
 #include "shadermanager.h"
 #include "gameconfig.h"
+#include "lightview.h"
+
 #include <framework/core/clock.h>
 #include <framework/graphics/animatedtexture.h>
 
@@ -60,12 +62,16 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
         if (m_opacity < 100) g_drawPool.setOpacity(getOpacity(), true);
 
         const auto& point = dest - (dirControl.offset * g_drawPool.getScaleFactor());
+        if (lightView && m_light.intensity > 0)
+            lightView->addLightSource(dest, m_light);
 
         if (m_texture) {
             const auto& size = (m_size.isUnset() ? m_texture->getSize() : m_size) * g_drawPool.getScaleFactor();
-            g_drawPool.addTexturedRect(Rect(point, size), m_texture->get(m_frame, m_animationTimer));
+            const auto& texture = m_texture->get(m_frame, m_animationTimer);
+            const auto& rect = Rect(Point(), texture->getSize());
+            g_drawPool.addTexturedRect(Rect(point, size), texture, rect, Color::white, { .order = getDrawOrder() });
         } else {
-            m_thingType->draw(point, 0, m_direction, 0, 0, animation, Color::white, true, lightView);
+            m_thingType->draw(point, 0, m_direction, 0, 0, animation, Color::white, true, lightView, {.order = getDrawOrder()});
         }
     }
 

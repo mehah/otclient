@@ -45,7 +45,7 @@ public:
     const std::vector<AttachedEffectPtr>& getAttachedEffects() { return m_attachedEffects; };
 
 protected:
-    void drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop, AttachedEffectDrawPlace drawPlace = AttachedEffectDrawPlace::DEFAULT);
+    void drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop);
     void onDetachEffect(const AttachedEffectPtr& effect);
 
     std::vector<AttachedEffectPtr> m_attachedEffects;

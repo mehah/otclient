@@ -84,12 +84,9 @@ AttachedEffectPtr AttachableObject::getAttachedEffectById(uint16_t id) {
     return *it;
 }
 
-void AttachableObject::drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop, AttachedEffectDrawPlace drawPlace)
+void AttachableObject::drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop)
 {
     for (const auto& effect : m_attachedEffects) {
-        if (effect->getDrawPlace() != drawPlace)
-            continue;
-
         effect->draw(dest, isOnTop, lightView);
         if (effect->getLoop() == 0) {
             g_dispatcher.addEvent([self = std::static_pointer_cast<AttachableObject>(shared_from_this()), effectId = effect->getId()]() {
