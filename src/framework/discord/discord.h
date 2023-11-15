@@ -23,7 +23,7 @@
 #pragma once
 
 #include <framework/config.h>
-
+#ifndef ANDROID
 #if ENABLE_DISCORD_RPC == 1
 
 #include <discord_register.h>
@@ -40,4 +40,5 @@ private:
 
 extern Discord g_discord;
 
+#endif
 #endif
