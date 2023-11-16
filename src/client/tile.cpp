@@ -173,7 +173,11 @@ void Tile::removeWidget()
 
 void Tile::clean()
 {
-    if (g_ui.getMapWidget() && (m_widget || m_text || m_timerText)) {
+    if (g_ui.getMapWidget() && (m_widget
+#ifndef BOT_PROTECTION
+        || m_text || m_timerText
+#endif
+        )) {
         g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
             g_ui.getMapWidget()->removeTile(tile);
         }, g_game.getServerBeat());

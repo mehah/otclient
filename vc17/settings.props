@@ -6,6 +6,7 @@
         WIN32;
         _CRT_SECURE_NO_WARNINGS;
         _WIN32_WINNT=0x0501;
+        BOT_PROTECTION;
         CRASH_HANDLER;
         FRAMEWORK_NET;
         FRAMEWORK_SOUND;

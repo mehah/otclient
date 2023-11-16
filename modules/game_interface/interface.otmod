@@ -8,7 +8,6 @@ Module
   load-later:
     - game_prey
     - game_imbuing
-    - game_buttons
     - game_hotkeys
     - game_questlog
     - game_textmessage
@@ -37,7 +36,5 @@ Module
     - game_unjustifiedpoints
     - game_shaders
     - game_attachedeffects
-    - client_profiles
-    - game_bot
   @onLoad: init()
   @onUnload: terminate()

@@ -15,7 +15,7 @@ local defaultOptions = {
     showLevelsInConsole = true,
     showPrivateMessagesInConsole = true,
     showPrivateMessagesOnScreen = true,
-    showLeftPanel = false,
+    showLeftPanel = true,
     showRightExtraPanel = false,
     openMaximized = false,
     backgroundFrameRate = 201,
@@ -96,11 +96,11 @@ function init()
     optionsTabBar:addTab(tr('Audio'), soundPanel, '/images/optionstab/audio')
 
     optionsButton = modules.client_topmenu.addLeftButton('optionsButton', tr('Options'), '/images/topbuttons/options',
-                                                         toggle)
+        toggle)
     audioButton = modules.client_topmenu.addLeftButton('audioButton', tr('Audio'), '/images/topbuttons/audio',
-                                                       function()
-        toggleOption('enableAudio')
-    end)
+        function()
+            toggleOption('enableAudio')
+        end)
 
     addEvent(function()
         setup()
