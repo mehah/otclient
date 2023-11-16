@@ -72,6 +72,7 @@ void DrawPoolManager::draw()
     const auto& text = get(DrawPoolType::TEXT); {
         std::scoped_lock l(text->m_mutex);
         drawPool(text);
+        drawPool(get(DrawPoolType::FOREGROUND_TILE));
     }
 
     const auto& foreground = get(DrawPoolType::FOREGROUND); {

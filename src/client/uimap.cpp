@@ -57,17 +57,18 @@ void UIMap::drawSelf(DrawPoolType drawPane)
         g_drawPool.addAction([] {glDisable(GL_BLEND); });
         g_drawPool.addFilledRect(m_mapRect, Color::alpha);
         g_drawPool.addAction([] {glEnable(GL_BLEND); });
+        return;
+    }
 
-        if (m_mapView) {
-            for (const auto& tile : m_tiles) {
-                const auto& dest = m_mapView->transformPositionTo2D(tile->getPosition(), m_mapView->m_lastCameraPosition);
+    if (m_mapView && drawPane == DrawPoolType::FOREGROUND_TILE) {
+        g_drawPool.use(DrawPoolType::FOREGROUND_TILE);
+        for (const auto& tile : m_tiles) {
+            const auto& dest = m_mapView->transformPositionTo2D(tile->getPosition(), m_mapView->getCameraPosition());
 #ifndef BOT_PROTECTION
-                tile->drawTexts(dest, m_mapView->m_posInfo);
+            tile->drawTexts(dest, m_mapView->m_posInfo);
 #endif
-                tile->drawWidget(dest, m_mapView->m_posInfo);
-            }
+            tile->drawWidget(dest, m_mapView->m_posInfo);
         }
-
         return;
     }
 
