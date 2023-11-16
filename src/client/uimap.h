@@ -96,6 +96,9 @@ public:
 
     void addTile(const TilePtr& tile);
     void removeTile(const TilePtr& tile);
+    void clearTiles() {
+        m_tiles.clear();
+    }
 
 protected:
     void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;

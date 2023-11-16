@@ -281,6 +281,7 @@ function show()
         setupViewMode(2)
     end
 
+    gameMapPanel:clearTiles();
     addEvent(function()
         if not limitedZoom or g_game.isGM() then
             gameMapPanel:setMaxZoomOut(513)
