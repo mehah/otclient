@@ -20,60 +20,60 @@
  * THE SOFTWARE.
  */
 
-#include "discord.h"
-
-#if ENABLE_DISCORD_RPC == 1
-#include <client/game.h>
-#include <client/localplayer.h>
-#include <framework/core/eventdispatcher.h>
-#include <time.h>
-
-const static int64_t EP_TIME = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-
-Discord g_discord;
-
-void Discord::init()
-{
-    DiscordEventHandlers Handle;
-    memset(&Handle, 0, sizeof(Handle));
-    Discord_Initialize(RPC_API_KEY, &Handle, 1, NULL);
-    update();
-}
-
-void Discord::update()
-{
-    std::string info;
-    if (g_game.isOnline()) {
-#if SHOW_CHARACTER_NAME_RPC == 1
-        info = "Name: " + g_game.getCharacterName();
-#endif
-
-#if SHOW_CHARACTER_LEVEL_RPC == 1
-        const auto& level = std::to_string(g_game.getLocalPlayer()->getLevel());
-        info += info.empty() ? "Level: " + level : "[" + level + "]";
-#endif
-
-#if SHOW_CHARACTER_WORLD_RPC == 1
-        if (!info.empty()) info += "\n";
-        info += "World: " + g_game.getWorldName();
-#endif
-    } else {
-        info = std::string{ OFFLINE_RPC_TEXT };
-    }
-
-    if (info.empty())
-        info = "Adjust in config.h";
-
-    DiscordRichPresence discordPresence;
-    memset(&discordPresence, 0, sizeof(discordPresence));
-    discordPresence.state = STATE_RPC_TEXT;
-    discordPresence.details = info.c_str();
-    discordPresence.startTimestamp = EP_TIME;
-    discordPresence.endTimestamp = 0;
-    discordPresence.largeImageKey = RPC_LARGE_IMAGE;
-    discordPresence.largeImageText = RPC_LARGE_TEXT;
-    Discord_UpdatePresence(&discordPresence);
-    g_dispatcher.scheduleEvent([this] { update(); }, 30000);
-}
-
+#ifndef ANDROID
+    #if ENABLE_DISCORD_RPC == 1
+        #include "discord.h"
+        #include <client/game.h>
+        #include <client/localplayer.h>
+        #include <framework/core/eventdispatcher.h>
+        #include <time.h>
+        
+        const static int64_t EP_TIME = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        
+        Discord g_discord;
+        
+        void Discord::init()
+        {
+            DiscordEventHandlers Handle;
+            memset(&Handle, 0, sizeof(Handle));
+            Discord_Initialize(RPC_API_KEY, &Handle, 1, NULL);
+            update();
+        }
+        
+        void Discord::update()
+        {
+            std::string info;
+            if (g_game.isOnline()) {
+        #if SHOW_CHARACTER_NAME_RPC == 1
+                info = "Name: " + g_game.getCharacterName();
+        #endif
+        
+        #if SHOW_CHARACTER_LEVEL_RPC == 1
+                const auto& level = std::to_string(g_game.getLocalPlayer()->getLevel());
+                info += info.empty() ? "Level: " + level : "[" + level + "]";
+        #endif
+        
+        #if SHOW_CHARACTER_WORLD_RPC == 1
+                if (!info.empty()) info += "\n";
+                info += "World: " + g_game.getWorldName();
+        #endif
+            } else {
+                info = std::string{ OFFLINE_RPC_TEXT };
+            }
+        
+            if (info.empty())
+                info = "Adjust in config.h";
+        
+            DiscordRichPresence discordPresence;
+            memset(&discordPresence, 0, sizeof(discordPresence));
+            discordPresence.state = STATE_RPC_TEXT;
+            discordPresence.details = info.c_str();
+            discordPresence.startTimestamp = EP_TIME;
+            discordPresence.endTimestamp = 0;
+            discordPresence.largeImageKey = RPC_LARGE_IMAGE;
+            discordPresence.largeImageText = RPC_LARGE_TEXT;
+            Discord_UpdatePresence(&discordPresence);
+            g_dispatcher.scheduleEvent([this] { update(); }, 30000);
+        }
+    #endif
 #endif
