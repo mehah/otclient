@@ -1,0 +1,60 @@
+BotIcon < UIWidget
+  size: 50 50
+  anchors.horizontalCenter: parent.horizontalCenter
+  anchors.verticalCenter: parent.verticalCenter
+  focusable: false
+  phantom: false
+  draggable: true
+
+  UIItem
+    id: item
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 6
+    virtual: true
+    phantom: true
+    size: 32 32
+
+  UICreature
+    id: creature
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 0
+    size: 48 48
+    phantom: true
+  
+  UIWidget
+    id: status
+    anchors.top: parent.top
+    anchors.left: parent.left
+    size: 18 10
+    color: black
+    font: terminus-10px
+    phantom: true
+
+    $on:
+      text: ON
+      background: green
+
+    $!on:
+      text: OFF
+      background: red
+      
+  UIWidget
+    id: hotkey
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    size: 18 10
+    color: white
+    phantom: true
+    text-align: right
+      
+  UIWidget
+    id: text
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    text-wrap: true
+    text-auto-resize: true
+    phantom: true

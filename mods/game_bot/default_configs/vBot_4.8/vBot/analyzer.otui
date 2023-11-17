@@ -1,0 +1,514 @@
+BossCreaturePanel < Panel
+  height: 38
+
+  UICreature
+    id: creature
+    size: 35 35
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    old-scaling: true
+    margin-left: 3
+
+  Label
+    id: name
+    anchors.left: creature.right
+    margin: 1
+    margin-left: 5
+    margin-top: 4
+    anchors.top: parent.top
+    anchors.bottom: creature.verticalCenter
+    anchors.right: parent.right
+    font: verdana-11px-rounded
+    color: #FFFFFF
+    text: Duke Krule
+
+  Label
+    id: cooldown
+    anchors.left: creature.right
+    margin: 1
+    margin-left: 5
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    anchors.top: creature.verticalCenter
+    font: verdana-11px-rounded
+    text: 19h 20min
+
+
+SearchPanel < TextEdit
+  placeholder: Type to search
+  margin-top: 1
+  @onClick: modules.client_textedit.show(self)
+
+  Button
+    id: clear
+    anchors.right: parent.right
+    margin-right: -2
+    anchors.verticalCenter: parent.verticalCenter
+    size: 18 18
+    text: X
+    @onClick: |
+      self:getParent():setText("")
+
+TrackerItem < Panel
+  height: 40
+
+  BotItem
+    id: item
+    anchors.top: parent.top
+    margin-top: 2
+    anchors.left: parent.left
+    image-source:
+
+  UIWidget
+    id: name
+    anchors.top: prev.top
+    margin-top: 1
+    anchors.bottom: prev.verticalCenter
+    anchors.left: prev.right
+    anchors.right: parent.right
+    margin-left: 5
+    text: Set Item to start track.
+    text-align:left
+    font: verdana-11px-rounded
+    color: #FFFFFF
+
+  UIWidget
+    id: drops
+    anchors.top: prev.bottom
+    margin-top: 3
+    anchors.bottom: Item.bottom
+    anchors.left: prev.left
+    anchors.right: parent.right    
+    font: verdana-11px-rounded
+    text-align:left
+    text: Loot Drops: 0
+    color: #CCCCCC
+
+
+DualLabel < Label
+  height: 15
+  text-offset: 4 0
+  font: verdana-11px-rounded
+  text-align: left
+  width: 50
+
+  Label
+    id: value
+    anchors.right: parent.right
+    margin-right: 4
+    anchors.verticalCenter: parent.verticalCenter
+    width: 200
+    font: verdana-11px-rounded
+    text-align: right
+    text: 0
+
+MemberWidget < Panel
+  height: 85
+  margin-top: 3
+
+  UICreature
+    id: creature
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    size: 28 28
+
+  UIWidget
+    id: name
+    anchors.left: prev.right
+    margin-left: 5
+    anchors.top: parent.top
+    height: 12
+    anchors.right: parent.right
+    text: Player Name
+    font: verdana-11px-rounded
+    text-align: left     
+
+  ProgressBar
+    id: health
+    anchors.left: prev.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 2
+    height: 7
+    background-color: #00c000
+    phantom: false 
+
+  ProgressBar
+    id: mana
+    anchors.left: prev.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    height: 7
+    background-color: #0000FF
+    phantom: false
+
+  DualLabel
+    id: balance
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 5
+    text: Balance:
+
+  DualLabel
+    id: damage
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 2
+    text: Damage:    
+
+  DualLabel
+    id: healing
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 2
+    text: Healing:    
+
+AnalyzerPriceLabel < Label
+  background-color: alpha
+  text-offset: 2 0
+  focusable: true
+  height: 16
+
+  $focus:
+    background-color: #00000055
+
+  Button
+    id: remove
+    !text: tr('x')
+    anchors.right: parent.right
+    margin-right: 15
+    width: 15
+    height: 15
+
+AnalyzerListPanel < Panel
+  padding-left: 4
+  padding-right: 4
+  layout:
+    type: verticalBox
+    fit-children: true
+
+
+ListLabel < Label
+  height: 15
+  font: verdana-11px-rounded
+  text-offset: 15 0
+
+AnalyzerItemsPanel < Panel
+  id: List
+  padding: 2
+  layout:
+    type: grid
+    cell-size: 33 33
+    cell-spacing: 1
+    num-columns: 5
+    fit-children: true
+
+AnalyzerLootItem < UIItem
+  opacity: 0.87
+  height: 37
+  margin-left: 1
+  virtual: true
+  background-color: alpha 
+
+  Label
+    id: count
+    font: verdana-11px-rounded
+    color: white
+    opacity: 0.87
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin-right: 2
+    text-align: right
+    text: 0
+
+AnalyzerGraph < UIGraph
+  height: 140
+  capacity: 400
+  line-width: 1
+  color: red
+  margin-top: 5
+  margin-left: 5
+  margin-right: 5
+  background-color: #383636
+  padding: 5
+  font: verdana-11px-rounded
+  image-source: /images/ui/graph_background
+
+AnalyzerProgressBar < ProgressBar
+  background-color: green
+  height: 5
+  margin-top: 3
+  phantom: false
+  margin-left: 3
+  margin-right: 3
+  border: 1 black
+
+AnalyzerButton < Button
+  height: 22
+  margin-bottom: 2
+  font: verdana-11px-rounded
+  text-offset: 0 4
+
+MainAnalyzerWindow < MiniWindow
+  id: MainAnalyzerWindow
+  text: Analytics Selector
+  height: 293
+  icon: /images/topbuttons/analyzers
+
+  MiniWindowContents
+    padding-left: 5
+    padding-right: 5
+    padding-top: 5
+    layout: verticalBox
+
+    AnalyzerButton
+      id: HuntingAnalyzer
+      text: Hunting Analyzer
+
+    AnalyzerButton
+      id: LootAnalyzer
+      text: Loot Analyzer
+
+    AnalyzerButton
+      id: SupplyAnalyzer
+      text: Supply Analyzer    
+  
+    AnalyzerButton
+      id: ImpactAnalyzer
+      text: Impact Analyzer
+
+    AnalyzerButton
+      id: XPAnalyzer
+      text: XP Analyzer
+
+    AnalyzerButton
+      id: DropTracker
+      text: Drop Tracker
+
+    AnalyzerButton
+      id: Stats
+      text: CaveBot Stats
+      color: #74B73E
+
+    AnalyzerButton
+      id: PartyHunt
+      text: Party Hunt
+      color: #3895D3
+
+    AnalyzerButton
+      id: BossTracker
+      text: Boss Cooldowns
+      color: #df3afb
+
+    AnalyzerButton
+      id: Settings
+      text: Features & Settings
+      color: #FABD02
+
+    AnalyzerButton
+      id: ResetSession
+      text: Reset Session
+      color: #FF0000
+
+HuntingAnalyzer < MiniWindow  
+  id: HuntingAnalyzerWindow
+  text: Hunt Analyzer
+  icon: /images/topbuttons/analyzers
+
+  MiniWindowContents
+    padding-top: 3
+    layout: verticalBox
+
+LootAnalyzer < MiniWindow
+  id: LootAnalyzerWindow    
+  text: Loot Analyzer
+  icon: /images/topbuttons/analyzers
+
+  MiniWindowContents
+    padding-top: 3
+    layout: verticalBox
+
+SupplyAnalyzer < MiniWindow
+  id: SupplyAnalyzerWindow    
+  text: Supply Analyzer
+  icon: /images/topbuttons/analyzers
+
+  MiniWindowContents
+    padding-top: 3
+    layout: verticalBox
+
+ImpactAnalyzer < MiniWindow
+  id: ImpactAnalyzerWindow    
+  text: Impact Analyzer
+  icon: /images/topbuttons/analyzers
+
+  MiniWindowContents
+    padding-top: 3
+    layout: verticalBox
+
+XPAnalyzer < MiniWindow
+  id: XPAnalyzerWindow    
+  text: XP Analyzer
+  height: 150
+  icon: /images/topbuttons/analyzers
+
+  MiniWindowContents
+    padding-top: 3
+    layout: verticalBox
+
+PartyAnalyzerWindow < MiniWindow
+  id: PartyAnalyzerWindow
+  text: Party Hunt
+  height: 200
+  icon: /images/topbuttons/analyzers
+
+  MiniWindowContents
+    padding-left: 3
+    padding-right: 3
+    padding-top: 1
+    layout: verticalBox
+
+DropTracker < MiniWindow
+  id: DropTracker
+  text: Drop Tracker
+  height: 200
+  icon: /images/topbuttons/analyzers
+
+  MiniWindowContents
+    padding-left: 3
+    padding-right: 3
+    padding-top: 1
+    layout: verticalBox
+
+CaveBotStats < MiniWindow
+  id: CaveBotStats
+  text: CaveBot Stats
+  height: 200
+  icon: /images/topbuttons/analyzers
+
+  MiniWindowContents
+    padding-left: 3
+    padding-right: 3
+    padding-top: 1
+    layout: verticalBox
+
+BossTracker < MiniWindow
+  id: BossTracker
+  text: Boss Cooldowns
+  height: 200
+  icon: /images/topbuttons/analyzers
+
+  MiniWindowContents
+    padding-left: 3
+    padding-right: 3
+    padding-top: 1
+    layout: verticalBox
+
+    SearchPanel
+      id: search
+
+FeaturesWindow < MainWindow
+  id: FeaturesWindow
+  size: 250 370
+  padding: 15
+  text: Analyzers Features
+  @onEscape: self:hide()
+
+  TextList
+    id: CustomPrices
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 10
+    padding: 1
+    height: 220
+    vertical-scrollbar: CustomPricesScrollBar
+
+  VerticalScrollBar
+    id: CustomPricesScrollBar
+    anchors.top: CustomPrices.top
+    anchors.bottom: CustomPrices.bottom
+    anchors.right: CustomPrices.right
+    step: 14
+    pixels-scroll: true
+
+  BotItem
+    id: ID
+    anchors.left: CustomPrices.left
+    anchors.top: CustomPrices.bottom
+    margin-top: 5
+
+  SpinBox
+    id: NewPrice
+    anchors.left: prev.right
+    margin-left: 5
+    anchors.verticalCenter: prev.verticalCenter
+    width: 100
+    minimum: 0
+    maximum: 1000000000
+    step: 1
+    text-align: center
+    focusable: true
+
+  Button
+    id: addItem
+    anchors.left: prev.right
+    margin-left: 5
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.right: CustomPrices.right
+    text: Add
+    font: verdana-11px-rounded    
+
+  HorizontalSeparator
+    anchors.left: ID.right
+    margin-left: 5
+    anchors.right: CustomPrices.right
+    anchors.verticalCenter: ID.top
+
+  HorizontalSeparator
+    id: secondSeparator
+    anchors.left: ID.right
+    margin-left: 5
+    anchors.right: CustomPrices.right
+    anchors.bottom: ID.bottom
+
+  BotSwitch
+    id: LootChannel
+    anchors.left: CustomPrices.left
+    anchors.right: parent.horizontalCenter
+    margin-right: 2
+    anchors.top: prev.top
+    margin-top: 20
+    text: Loot Channel
+    font: verdana-11px-rounded   
+
+  BotSwitch
+    id: RarityFrames
+    anchors.left: parent.horizontalCenter
+    margin-left: 2
+    anchors.right: CustomPrices.right
+    anchors.top: secondSeparator.top
+    margin-top: 20
+    text: Rarity Frames
+    font: verdana-11px-rounded   
+
+  HorizontalSeparator
+    anchors.right: parent.right
+    anchors.left: parent.left
+    anchors.bottom: closeButton.top
+    margin-bottom: 8    
+
+  Button
+    id: closeButton
+    !text: tr('Close')
+    font: cipsoftFont
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    size: 45 21
+    margin-top: 15
+    margin-right: 5 

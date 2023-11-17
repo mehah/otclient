@@ -1,0 +1,463 @@
+UturaComboBoxPopupMenu < ComboBoxPopupMenu
+UturaComboBoxPopupMenuButton < ComboBoxPopupMenuButton
+UturaComboBox < ComboBox
+  @onSetup: |
+    self:addOption("Utura")
+    self:addOption("Utura Gran")    
+
+CureConditions < Panel
+  id: Cure
+  image-source: /images/ui/panel_flat
+  image-border: 6
+  padding: 3
+  size: 200 190
+
+  Label
+    id: label1
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-top: 10
+    margin-left: 5
+    text: Poison
+    color: #ffaa00
+    font: verdana-11px-rounded
+
+  Label
+    id: label11
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 40
+    text: Mana:
+    font: verdana-11px-rounded
+
+  TextEdit
+    id: PoisonCost
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 3
+    width: 40
+    font: verdana-11px-rounded
+
+  CheckBox
+    id: CurePoison
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.right: parent.right
+    margin-right: 10
+
+  Label
+    id: label2
+    anchors.left: label1.left
+    anchors.top: label1.bottom
+    margin-top: 10
+    text: Curse
+    color: #ffaa00
+    font: verdana-11px-rounded
+
+  Label
+    id: label22
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 44
+    text: Mana:
+    font: verdana-11px-rounded
+
+  TextEdit
+    id: CurseCost
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 3
+    width: 40
+    font: verdana-11px-rounded
+
+  CheckBox
+    id: CureCurse
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.right: parent.right
+    margin-right: 10
+
+  Label
+    id: label3
+    anchors.left: label2.left
+    anchors.top: label2.bottom
+    margin-top: 10
+    text: Bleed
+    color: #ffaa00
+  font: verdana-11px-rounded
+
+  Label
+    id: label33
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 46
+    text: Mana:
+    font: verdana-11px-rounded
+
+  TextEdit
+    id: BleedCost
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 3
+    width: 40
+    font: verdana-11px-rounded
+
+  CheckBox
+    id: CureBleed
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.right: parent.right
+    margin-right: 10  
+
+  Label
+    id: label4
+    anchors.left: label3.left
+    anchors.top: label3.bottom
+    margin-top: 10
+    text: Burn
+    color: #ffaa00
+    font: verdana-11px-rounded
+
+  Label
+    id: label44
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 50
+    text: Mana:
+    font: verdana-11px-rounded
+
+  TextEdit
+    id: BurnCost
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 3
+    width: 40
+    font: verdana-11px-rounded
+
+  CheckBox
+    id: CureBurn
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.right: parent.right
+    margin-right: 10
+
+  Label
+    id: label5
+    anchors.left: label4.left
+    anchors.top: label4.bottom
+    margin-top: 10
+    text: Electify
+    color: #ffaa00
+    font: verdana-11px-rounded
+
+  Label
+    id: label55
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 33
+    text: Mana:
+    font: verdana-11px-rounded
+
+  TextEdit
+    id: ElectrifyCost
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 3
+    width: 40
+    font: verdana-11px-rounded
+
+  CheckBox
+    id: CureElectrify
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.right: parent.right
+    margin-right: 10
+
+  Label
+    id: label6
+    anchors.left: label5.left
+    anchors.top: label5.bottom
+    margin-top: 10
+    text: Paralyse
+    color: #ffaa00
+    font: verdana-11px-rounded  
+
+  Label
+    id: label66
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 26
+    text: Mana:
+    font: verdana-11px-rounded
+
+  TextEdit
+    id: ParalyseCost
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 3
+    width: 40
+    font: verdana-11px-rounded
+
+  CheckBox
+    id: CureParalyse
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.right: parent.right
+    margin-right: 10
+
+  Label
+    id: label7
+    anchors.left: label6.left
+    anchors.top: label6.bottom
+    margin-top: 10
+    margin-left: 12
+    text: Spell:
+    font: verdana-11px-rounded
+
+  TextEdit
+    id: ParalyseSpell
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 10
+    width: 100 
+    font: verdana-11px-rounded
+
+HoldConditions < Panel
+  id: Hold
+  image-source: /images/ui/panel_flat
+  image-border: 6
+  padding: 3
+  size: 200 190
+
+  Label
+    id: label1
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-top: 10
+    margin-left: 5
+    text: Haste
+    color: #ffaa00
+    font: verdana-11px-rounded  
+
+  Label
+    id: label11
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 44
+    text: Mana:
+    font: verdana-11px-rounded
+
+  TextEdit
+    id: HasteCost
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 3
+    width: 40
+    font: verdana-11px-rounded
+
+  CheckBox
+    id: HoldHaste
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.right: parent.right
+    margin-right: 10
+
+  Label
+    id: label2
+    anchors.left: label1.left
+    anchors.top: label1.bottom
+    margin-top: 10
+    margin-left: 12
+    text: Spell:
+    font: verdana-11px-rounded
+
+  TextEdit
+    id: HasteSpell
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 10
+    width: 100
+    font: verdana-11px-rounded
+
+  Label
+    id: label3
+    anchors.left: label1.left
+    anchors.top: label2.bottom
+    margin-top: 10
+    text: Utana Vid
+    color: #ffaa00
+    font: verdana-11px-rounded
+
+  Label
+    id: label33
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 21
+    text: Mana:
+    font: verdana-11px-rounded
+
+  TextEdit
+    id: UtanaCost
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 3
+    width: 40
+    font: verdana-11px-rounded
+
+  CheckBox
+    id: HoldUtana
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.right: parent.right
+    margin-right: 10
+
+  Label
+    id: label4
+    anchors.left: label3.left
+    anchors.top: label3.bottom
+    margin-top: 10
+    text: Utamo Vita
+    color: #ffaa00
+    font: verdana-11px-rounded
+
+  Label
+    id: label44
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 12
+    text: Mana:
+    font: verdana-11px-rounded
+
+  TextEdit
+    id: UtamoCost
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 3
+    width: 40
+    font: verdana-11px-rounded
+
+  CheckBox
+    id: HoldUtamo
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.right: parent.right
+    margin-right: 10  
+
+  Label
+    id: label5
+    anchors.left: label4.left
+    anchors.top: label4.bottom
+    margin-top: 10
+    text: Recovery
+    color: #ffaa00 
+    font: verdana-11px-rounded 
+
+  Label
+    id: label55
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 20
+    text: Mana:
+    font: verdana-11px-rounded
+
+  TextEdit
+    id: UturaCost
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 3
+    width: 40
+    font: verdana-11px-rounded
+
+  CheckBox
+    id: HoldUtura
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.right: parent.right
+    margin-right: 10
+
+  Label
+    id: label6
+    anchors.left: label5.left
+    anchors.top: label5.bottom
+    margin-top: 10
+    margin-left: 12
+    text: Spell:
+    font: verdana-11px-rounded
+
+  UturaComboBox
+    id: UturaType
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 10
+    width: 100
+    font: verdana-11px-rounded
+
+  CheckBox
+    id: IgnoreInPz
+    anchors.left: label5.left
+    anchors.top: label6.bottom
+    margin-top: 12
+
+  Label
+    anchors.verticalCenter: IgnoreInPz.verticalCenter
+    anchors.left: prev.right
+    margin-top: 3
+    margin-left: 5
+    text: Don't Cast in Protection Zones
+    font: cipsoftFont
+
+  CheckBox
+    id: StopHaste
+    anchors.horizontalCenter: IgnoreInPz.horizontalCenter
+    anchors.top: IgnoreInPz.bottom
+    margin-top: 8
+  
+  Label
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-top: 3
+    margin-left: 5
+    text: Stop Haste if TargetBot Is Active
+    font: cipsoftFont
+
+ConditionsWindow < MainWindow
+  !text: tr('Condition Manager')
+  size: 445 280
+  @onEscape: self:hide()
+
+  CureConditions
+    id: Cure
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-top: 7
+
+  Label
+    id: label
+    anchors.top: parent.top
+    anchors.left: parent.left
+    text: Cure Conditions 
+    color: #88e3dd
+    margin-left: 10
+    font: verdana-11px-rounded
+
+  HoldConditions
+    id: Hold
+    anchors.top: parent.top
+    anchors.right: parent.right
+    margin-top: 7
+
+  Label
+    id: label
+    anchors.top: parent.top
+    anchors.right: parent.right
+    text: Hold Conditions 
+    color: #88e3dd
+    margin-right: 100
+    font: verdana-11px-rounded    
+
+  HorizontalSeparator
+    id: separator
+    anchors.right: parent.right
+    anchors.left: parent.left
+    anchors.bottom: closeButton.top
+    margin-bottom: 8    
+
+  Button
+    id: closeButton
+    !text: tr('Close')
+    font: cipsoftFont
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    size: 45 21
+    margin-top: 15
+    margin-right: 5    

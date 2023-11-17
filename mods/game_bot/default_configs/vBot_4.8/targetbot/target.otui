@@ -1,0 +1,115 @@
+TargetBotEntry < Label
+  background-color: alpha
+  text-offset: 2 0
+  focusable: true
+
+  $focus:
+    background-color: #00000055
+
+TargetBotDualLabel < Panel
+  height: 18
+  margin-left: 3
+  margin-right: 4
+
+  Label
+    id: left
+    anchors.top: parent.top
+    anchors.left: parent.left
+    text-auto-resize: true
+
+  Label
+    id: right
+    anchors.top: parent.top
+    anchors.right: parent.right
+    text-auto-resize: true
+
+TargetBotPanel < Panel
+  layout:
+    type: verticalBox
+    fit-children: true
+
+  HorizontalSeparator
+    margin-top: 2
+    margin-bottom: 5
+
+  TargetBotDualLabel
+    id: status
+  TargetBotDualLabel
+    id: target
+  TargetBotDualLabel
+    id: config
+  TargetBotDualLabel
+    id: danger
+
+  Panel
+    id: listPanel
+    height: 40
+
+    TextList
+      id: list
+      anchors.fill: parent
+      vertical-scrollbar: listScrollbar
+      margin-right: 15
+      focusable: false
+      auto-focus: first
+      
+    VerticalScrollBar
+      id: listScrollbar
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      pixels-scroll: true
+      step: 10
+      
+  BotSwitch
+    id: configButton
+    @onClick: |
+      self:setOn(not self:isOn())
+      self:getParent().listPanel:setHeight(self:isOn() and 100 or 40)
+      self:getParent().editor:setVisible(self:isOn())
+
+    $on:
+      text: Hide target editor
+
+    $!on:
+      text: Show target editor
+  
+  Panel
+    id: editor
+    visible: false
+    layout:
+      type: verticalBox
+      fit-children: true
+
+    Panel
+      id: buttons
+      height: 20
+      margin-top: 2
+
+      Button
+        id: add
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        text: Add
+        width: 56
+
+      Button
+        id: edit
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        text: Edit
+        width: 56
+
+      Button
+        id: remove
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        text: Remove
+        width: 56
+    
+    BotSwitch
+      id: debug
+      text: Show target priority

@@ -1,0 +1,128 @@
+{
+  "hpitem1": {
+    "max": 90,
+    "title": "HP%",
+    "subType": 0,
+    "item": 266,
+    "min": 51,
+    "on": false
+  },
+  "foodItems": [
+    {
+      "id": 3582,
+      "count": 1
+    },
+    {
+      "id": 3577,
+      "count": 1
+    }
+  ],
+  "autoEquip": [
+    {
+      "item1": 3052,
+      "title": "Auto Equip",
+      "item2": 3089,
+      "on": false,
+      "slot": 9
+    },
+    {
+      "item1": 0,
+      "title": "Auto Equip",
+      "item2": 0,
+      "on": false,
+      "slot": 0
+    },
+    {
+      "item1": 0,
+      "title": "Auto Equip",
+      "item2": 0,
+      "on": false,
+      "slot": 0
+    },
+    {
+      "item1": 0,
+      "title": "Auto Equip",
+      "item2": 0,
+      "on": false,
+      "slot": 0
+    }
+  ],
+  "ingame_hotkeys": "singlehotkey(\"f1\", function()\nlocal shaders = {\"stars\", \"gold\", \"rainbow\", \"sweden\", \"brazil\", \"line\", \"3line\", \"circle\", \"outline\"}\nlocal p = 0\nfor i, c in pairs(getSpectators()) do\n    c:setOutfitShader(shaders[1 + p % 10])\n    p = p + 1\nend\nend)\n\nsinglehotkey(\"1\", function()\n  for _, s in ipairs(getSpectators()) do\n    if s:canShoot(3) then\n      info(s:getName())\n    else\n      warn(s:getName())\n    end\n  end\nend)",
+  "healing2": {
+    "max": 50,
+    "title": "HP%",
+    "on": false,
+    "min": 1,
+    "text": "exura vita"
+  },
+  "ingame_macros": "",
+  "hasteSpell": "utani hur",
+  "manaitem2": {
+    "max": 50,
+    "title": "MP%",
+    "subType": 0,
+    "item": 3157,
+    "min": 0,
+    "on": false
+  },
+  "_configs": {
+    "cavebot_configs": {
+      "selected": "test_src",
+      "enabled": false
+    },
+    "targetbot_configs": {
+      "enabled": false,
+      "selected": "config_name"
+    }
+  },
+  "healing1": {
+    "max": 100,
+    "title": "HP%",
+    "on": false,
+    "min": 51,
+    "text": "exura"
+  },
+  "dropItems": [
+    {
+      "id": 283,
+      "count": 1
+    },
+    {
+      "id": 284,
+      "count": 1
+    },
+    {
+      "id": 285,
+      "count": 1
+    }
+  ],
+  "_macros": {
+    "": false
+  },
+  "manaitem1": {
+    "max": 90,
+    "title": "MP%",
+    "subType": 0,
+    "item": 268,
+    "min": 51,
+    "on": false
+  },
+  "hpitem2": {
+    "max": 50,
+    "title": "HP%",
+    "subType": 0,
+    "item": 3160,
+    "min": 0,
+    "on": false
+  },
+  "manaShield": "utamo vita",
+  "autoTradeMessage": "I'm using OTClientV8!",
+  "antiParalyze": "utani hur",
+  "manaTrain": {
+    "max": 100,
+    "title": "MP%",
+    "on": false,
+    "min": 80,
+    "text": "utevo lux"
+  }
+}

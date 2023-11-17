@@ -1,0 +1,88 @@
+BotButton < Button
+  height: 17
+  margin-top: 2
+
+BotSwitch < Button
+  margin-top: 2
+  height: 17
+  image-color: green
+  $!on:
+    image-color: red
+
+SmallBotSwitch < Button
+  margin-top: 2
+  height: 15
+  image-color: green
+  $!on:
+    image-color: red
+    
+BotLabel < Label
+  margin-top: 2
+  height: 15
+  text-auto-resize: true
+  text-align: center
+  text-wrap: true
+    
+BotItem < Item
+  virtual: true
+  &selectable: true
+  &editable: true
+
+BotTextEdit < TextEdit  
+  @onClick: modules.client_textedit.show(self)
+  text-align: center
+  multiline: false
+  focusable: false
+  height: 20
+  
+BotSeparator < HorizontalSeparator
+  margin-top: 5
+  margin-bottom: 3
+
+BotSmallScrollBar < SmallScrollBar
+
+BotPanel < Panel
+  margin-top: 1
+  ScrollablePanel
+    id: content
+    anchors.fill: parent
+    margin-right: 8
+    margin-left: 1
+    margin-bottom: 5
+    vertical-scrollbar: botPanelScroll
+    layout:
+      type: verticalBox
+    $mobile:
+      margin-right: 16
+
+  BotSmallScrollBar
+    id: botPanelScroll
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    
+CaveBotLabel < Label
+  background-color: alpha
+  text-offset: 2 0
+  focusable: true
+
+  $focus:
+    background-color: #00000055
+    
+SlotComboBoxPopupMenu < ComboBoxPopupMenu
+SlotComboBoxPopupMenuButton < ComboBoxPopupMenuButton
+SlotComboBox < ComboBox
+  @onSetup: |
+    self:addOption("Head")
+    self:addOption("Neck")
+    self:addOption("Back")
+    self:addOption("Body")
+    self:addOption("Right")
+    self:addOption("Left")
+    self:addOption("Leg")
+    self:addOption("Feet")
+    self:addOption("Finger")
+    self:addOption("Ammo")
+    self:addOption("Purse")
+
+

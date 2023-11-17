@@ -1,0 +1,58 @@
+CaveBotAction < Label
+  background-color: alpha
+  text-offset: 2 0
+  focusable: true
+
+  $focus:
+    background-color: #00000055
+
+
+CaveBotPanel < Panel
+  layout:
+    type: verticalBox
+    fit-children: true
+
+  HorizontalSeparator
+    margin-top: 2
+    margin-bottom: 5
+    
+  Panel
+    id: listPanel
+    height: 100
+    margin-top: 2
+
+    TextList
+      id: list
+      anchors.fill: parent
+      vertical-scrollbar: listScrollbar
+      margin-right: 15
+      focusable: false
+      auto-focus: first
+      
+    VerticalScrollBar
+      id: listScrollbar
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      pixels-scroll: true
+      step: 10
+    
+  BotSwitch
+    id: showEditor
+    margin-top: 2
+    
+    $on:
+      text: Hide waypoints editor
+      
+    $!on:
+      text: Show waypoints editor
+
+  BotSwitch
+    id: showConfig
+    margin-top: 2
+    
+    $on:
+      text: Hide config
+      
+    $!on:
+      text: Show config
