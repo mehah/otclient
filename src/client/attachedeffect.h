@@ -72,6 +72,11 @@ public:
 
     void attachEffect(const AttachedEffectPtr& e) { m_effects.emplace_back(e); }
 
+    DrawOrder getDrawOrder() { return m_drawOrder; }
+    void setDrawOrder(DrawOrder drawOrder) { m_drawOrder = drawOrder; }
+    const Light& getLight() const { return m_light; }
+    void setLight(const Light& light) { m_light = light; }
+
 private:
     int getCurrentAnimationPhase();
 
@@ -86,6 +91,7 @@ private:
     uint8_t m_speed{ 100 };
     uint8_t m_opacity{ 100 };
     uint8_t m_lastAnimation{ 0 };
+    DrawOrder m_drawOrder{ DrawOrder::FIRST };
 
     uint16_t m_id{ 0 };
     uint16_t m_duration{ 0 };
@@ -98,6 +104,7 @@ private:
     bool m_disableWalkAnimation{ false };
 
     Outfit m_outfitOwner;
+    Light m_light;
 
     uint16_t m_thingId{ 0 };
     ThingCategory m_thingCategory{ ThingInvalidCategory };

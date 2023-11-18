@@ -71,6 +71,7 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool is
 
     drawCreature(dest, mapRect, flags, isCovered, false, lightView);
     drawTop(dest, flags, false, lightView);
+    drawAttachedEffect(dest, lightView, false);
     updateWidget(dest, mapRect);
 }
 

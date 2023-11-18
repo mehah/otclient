@@ -52,6 +52,7 @@
 #include "uiminimap.h"
 #include "uiprogressrect.h"
 #include "uisprite.h"
+#include "attachableobject.h"
 
 #ifdef FRAMEWORK_EDITOR
 #include "houses.h"
@@ -391,7 +392,14 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Container>("getSize", &Container::getSize);
     g_lua.bindClassMemberFunction<Container>("getFirstIndex", &Container::getFirstIndex);
 
-    g_lua.registerClass<Thing>();
+    g_lua.registerClass<AttachableObject>();
+    g_lua.bindClassMemberFunction<AttachableObject>("getAttachedEffects", &AttachableObject::getAttachedEffects);
+    g_lua.bindClassMemberFunction<AttachableObject>("attachEffect", &AttachableObject::attachEffect);
+    g_lua.bindClassMemberFunction<AttachableObject>("detachEffectById", &AttachableObject::detachEffectById);
+    g_lua.bindClassMemberFunction<AttachableObject>("getAttachedEffectById", &AttachableObject::getAttachedEffectById);
+    g_lua.bindClassMemberFunction<AttachableObject>("clearAttachedEffects", &AttachableObject::clearAttachedEffects);
+
+    g_lua.registerClass<Thing, AttachableObject>();
     g_lua.bindClassMemberFunction<Thing>("setId", &Thing::setId);
     g_lua.bindClassMemberFunction<Thing>("setShader", &Thing::setShader);
     g_lua.bindClassMemberFunction<Thing>("setPosition", &Thing::setPosition);
@@ -434,11 +442,6 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Thing>("isTopEffect", &Thing::isTopEffect);
     g_lua.bindClassMemberFunction<Thing>("isLyingCorpse", &Thing::isLyingCorpse);
     g_lua.bindClassMemberFunction<Thing>("getDefaultAction", &Thing::getDefaultAction);
-    g_lua.bindClassMemberFunction<Thing>("getAttachedEffects", &Thing::getAttachedEffects);
-    g_lua.bindClassMemberFunction<Thing>("attachEffect", &Thing::attachEffect);
-    g_lua.bindClassMemberFunction<Thing>("detachEffectById", &Thing::detachEffectById);
-    g_lua.bindClassMemberFunction<Thing>("getAttachedEffectById", &Thing::getAttachedEffectById);
-    g_lua.bindClassMemberFunction<Thing>("clearAttachedEffects", &Thing::clearAttachedEffects);
     g_lua.bindClassMemberFunction<Thing>("getClassification", &Thing::getClassification);
 
 #ifdef FRAMEWORK_EDITOR
@@ -690,6 +693,8 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<AttachedEffect>("canDrawOnUI", &AttachedEffect::canDrawOnUI);
     g_lua.bindClassMemberFunction<AttachedEffect>("setCanDrawOnUI", &AttachedEffect::setCanDrawOnUI);
     g_lua.bindClassMemberFunction<AttachedEffect>("attachEffect", &AttachedEffect::attachEffect);
+    g_lua.bindClassMemberFunction<AttachedEffect>("setDrawOrder", &AttachedEffect::setDrawOrder);
+    g_lua.bindClassMemberFunction<AttachedEffect>("setLight", &AttachedEffect::setLight);
 
     g_lua.registerClass<StaticText>();
     g_lua.bindClassStaticFunction<StaticText>("create", [] { return std::make_shared<StaticText>(); });
@@ -756,7 +761,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<LocalPlayer>("setResourceBalance", &LocalPlayer::setResourceBalance);
     g_lua.bindClassMemberFunction<LocalPlayer>("getTotalMoney", &LocalPlayer::getTotalMoney);
 
-    g_lua.registerClass<Tile>();
+    g_lua.registerClass<Tile, AttachableObject>();
     g_lua.bindClassMemberFunction<Tile>("clean", &Tile::clean);
     g_lua.bindClassMemberFunction<Tile>("addThing", &Tile::addThing);
     g_lua.bindClassMemberFunction<Tile>("getThing", &Tile::getThing);

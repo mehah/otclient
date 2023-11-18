@@ -232,52 +232,6 @@ endif()
 # OTClient source files configuration
 # *****************************************************************************
 set(SOURCE_FILES
-	client/animatedtext.cpp
-	client/animator.cpp
-	client/attachedeffect.cpp
-	client/attachedeffectmanager.cpp
-	client/client.cpp
-	client/container.cpp
-	client/creature.cpp
-	client/creatures.cpp
-	client/effect.cpp
-	client/game.cpp
-	client/gameconfig.cpp
-	client/houses.cpp
-	client/item.cpp
-	client/itemtype.cpp
-	client/lightview.cpp
-	client/localplayer.cpp
-	client/luafunctions.cpp
-	client/luavaluecasts.cpp
-	client/map.cpp
-	client/mapio.cpp
-	client/mapview.cpp
-	client/minimap.cpp
-	client/missile.cpp
-	client/outfit.cpp
-	client/player.cpp
-	client/position.cpp
-	client/protocolcodes.cpp
-	client/protocolgame.cpp
-	client/protocolgameparse.cpp
-	client/protocolgamesend.cpp
-	client/shadermanager.cpp
-	client/spriteappearances.cpp
-	client/spritemanager.cpp
-	client/statictext.cpp
-	client/thing.cpp
-	client/thingtype.cpp
-	client/thingtypemanager.cpp
-	client/tile.cpp
-	client/towns.cpp
-	client/uicreature.cpp
-	client/uiitem.cpp
-	client/uimap.cpp
-	client/uimapanchorlayout.cpp
-	client/uiminimap.cpp
-	client/uiprogressrect.cpp
-	client/uisprite.cpp
 	framework/core/adaptativeframecounter.cpp
 	framework/core/application.cpp
 	framework/core/asyncdispatcher.cpp
@@ -377,6 +331,54 @@ set(SOURCE_FILES
 	framework/ui/uiwidgettext.cpp
 	framework/util/color.cpp
 	framework/util/crypt.cpp
+
+	client/animatedtext.cpp
+	client/animator.cpp
+	client/attachableobject.cpp
+	client/attachedeffect.cpp
+	client/attachedeffectmanager.cpp
+	client/client.cpp
+	client/container.cpp
+	client/creature.cpp
+	client/creatures.cpp
+	client/effect.cpp
+	client/game.cpp
+	client/gameconfig.cpp
+	client/houses.cpp
+	client/item.cpp
+	client/itemtype.cpp
+	client/lightview.cpp
+	client/localplayer.cpp
+	client/luafunctions.cpp
+	client/luavaluecasts.cpp
+	client/map.cpp
+	client/mapio.cpp
+	client/mapview.cpp
+	client/minimap.cpp
+	client/missile.cpp
+	client/outfit.cpp
+	client/player.cpp
+	client/position.cpp
+	client/protocolcodes.cpp
+	client/protocolgame.cpp
+	client/protocolgameparse.cpp
+	client/protocolgamesend.cpp
+	client/shadermanager.cpp
+	client/spriteappearances.cpp
+	client/spritemanager.cpp
+	client/statictext.cpp
+	client/thing.cpp
+	client/thingtype.cpp
+	client/thingtypemanager.cpp
+	client/tile.cpp
+	client/towns.cpp
+	client/uicreature.cpp
+	client/uiitem.cpp
+	client/uimap.cpp
+	client/uimapanchorlayout.cpp
+	client/uiminimap.cpp
+	client/uiprogressrect.cpp
+	client/uisprite.cpp
 
 	protobuf/appearances.pb.cc
 	main.cpp
