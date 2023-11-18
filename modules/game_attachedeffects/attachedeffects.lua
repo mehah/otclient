@@ -5,6 +5,7 @@ controller = Controller:new()
     g_game.getLocalPlayer():attachEffect(g_attachedEffects.getById(1))
     g_game.getLocalPlayer():attachEffect(g_attachedEffects.getById(2))
     g_game.getLocalPlayer():attachEffect(g_attachedEffects.getById(3))
+    g_game.getLocalPlayer():getTile():attachEffect(g_attachedEffects.getById(1))
 end
 
 function controller:onGameEnd()
