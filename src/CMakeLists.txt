@@ -373,6 +373,7 @@ set(SOURCE_FILES
 	client/tile.cpp
 	client/towns.cpp
 	client/uicreature.cpp
+	client/uigraph.cpp
 	client/uiitem.cpp
 	client/uimap.cpp
 	client/uimapanchorlayout.cpp
