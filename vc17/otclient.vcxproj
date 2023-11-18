@@ -209,6 +209,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
   <ItemGroup>
     <ClCompile Include="..\src\client\animatedtext.cpp" />
     <ClCompile Include="..\src\client\animator.cpp" />
+    <ClCompile Include="..\src\client\attachableobject.cpp" />
     <ClCompile Include="..\src\client\attachedeffect.cpp" />
     <ClCompile Include="..\src\client\attachedeffectmanager.cpp" />
     <ClCompile Include="..\src\client\gameconfig.cpp" />
@@ -360,6 +361,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
   <ItemGroup>
     <ClInclude Include="..\src\client\animatedtext.h" />
     <ClInclude Include="..\src\client\animator.h" />
+    <ClInclude Include="..\src\client\attachableobject.h" />
     <ClInclude Include="..\src\client\attachedeffect.h" />
     <ClInclude Include="..\src\client\attachedeffectmanager.h" />
     <ClInclude Include="..\src\client\gameconfig.h" />

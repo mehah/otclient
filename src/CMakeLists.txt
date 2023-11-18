@@ -334,6 +334,7 @@ set(SOURCE_FILES
 
 	client/animatedtext.cpp
 	client/animator.cpp
+	client/attachableobject.cpp
 	client/attachedeffect.cpp
 	client/attachedeffectmanager.cpp
 	client/client.cpp
@@ -378,7 +379,6 @@ set(SOURCE_FILES
 	client/uiminimap.cpp
 	client/uiprogressrect.cpp
 	client/uisprite.cpp
-	client/uigraph.cpp
 
 	protobuf/appearances.pb.cc
 	main.cpp

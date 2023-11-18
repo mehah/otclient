@@ -97,71 +97,40 @@ void Thing::setShader(const std::string_view name) {
     m_shader = g_shaders.getShader(name.data());
 }
 
-void Thing::attachEffect(const AttachedEffectPtr& obj) {
-    if (!obj)
-        return;
-
+void Thing::onStartAttachEffect(const AttachedEffectPtr& effect) {
     if (isCreature()) {
-        if (obj->m_thingType && (obj->m_thingType->isCreature() || obj->m_thingType->isMissile()))
-            obj->m_direction = static_self_cast<Creature>()->getDirection();
-    }
-
-    if (obj->isHidedOwner())
-        ++m_hidden;
-
-    if (obj->getDuration() > 0) {
-        g_dispatcher.scheduleEvent([self = static_self_cast<Thing>(), effectId = obj->getId()]() {
-            self->detachEffectById(effectId);
-        }, obj->getDuration());
-    }
-
-    if (obj->isDisabledWalkAnimation() && isCreature()) {
-        const auto& creature = static_self_cast<Creature>();
-        creature->setDisableWalkAnimation(true);
-    }
-
-    m_attachedEffects.emplace_back(obj);
-    g_dispatcher.addEvent([effect = obj, self = static_self_cast<Thing>()] {
-        if (effect->isTransform() && self->isCreature() && effect->m_thingType) {
-            const auto& creature = self->static_self_cast<Creature>();
-            const auto& outfit = creature->getOutfit();
-            if (outfit.isTemp())
-                return;
-
-            effect->m_outfitOwner = outfit;
-
-            Outfit newOutfit = outfit;
-            newOutfit.setTemp(true);
-            newOutfit.setCategory(effect->m_thingType->getCategory());
-            if (newOutfit.isCreature())
-                newOutfit.setId(effect->m_thingType->getId());
-            else
-                newOutfit.setAuxId(effect->m_thingType->getId());
-
-            creature->setOutfit(newOutfit);
+        if (effect->isDisabledWalkAnimation()) {
+            const auto& creature = static_self_cast<Creature>();
+            creature->setDisableWalkAnimation(true);
         }
 
-        effect->callLuaField("onAttach", self->asLuaObject());
-    });
+        if (effect->m_thingType && (effect->m_thingType->isCreature() || effect->m_thingType->isMissile()))
+            effect->m_direction = static_self_cast<Creature>()->getDirection();
+    }
 }
 
-bool Thing::detachEffectById(uint16_t id) {
-    const auto it = std::find_if(m_attachedEffects.begin(), m_attachedEffects.end(),
-                                 [id](const AttachedEffectPtr& obj) { return obj->getId() == id; });
+void Thing::onDispatcherAttachEffect(const AttachedEffectPtr& effect) {
+    if (effect->isTransform() && isCreature() && effect->m_thingType) {
+        const auto& creature = static_self_cast<Creature>();
+        const auto& outfit = creature->getOutfit();
+        if (outfit.isTemp())
+            return;
 
-    if (it == m_attachedEffects.end())
-        return false;
+        effect->m_outfitOwner = outfit;
 
-    onDetachEffect(*it);
-    m_attachedEffects.erase(it);
+        Outfit newOutfit = outfit;
+        newOutfit.setTemp(true);
+        newOutfit.setCategory(effect->m_thingType->getCategory());
+        if (newOutfit.isCreature())
+            newOutfit.setId(effect->m_thingType->getId());
+        else
+            newOutfit.setAuxId(effect->m_thingType->getId());
 
-    return true;
+        creature->setOutfit(newOutfit);
+    }
 }
 
-void Thing::onDetachEffect(const AttachedEffectPtr& effect) {
-    if (effect->isHidedOwner())
-        --m_hidden;
-
+void Thing::onStartDetachEffect(const AttachedEffectPtr& effect) {
     if (isCreature()) {
         const auto& creature = static_self_cast<Creature>();
 
@@ -170,36 +139,6 @@ void Thing::onDetachEffect(const AttachedEffectPtr& effect) {
 
         if (effect->isTransform() && !effect->m_outfitOwner.isInvalid()) {
             creature->setOutfit(effect->m_outfitOwner);
-        }
-    }
-
-    effect->callLuaField("onDetach", asLuaObject());
-}
-
-void Thing::clearAttachedEffects() {
-    for (const auto& e : m_attachedEffects)
-        onDetachEffect(e);
-    m_attachedEffects.clear();
-}
-
-AttachedEffectPtr Thing::getAttachedEffectById(uint16_t id) {
-    const auto it = std::find_if(m_attachedEffects.begin(), m_attachedEffects.end(),
-                                 [id](const AttachedEffectPtr& obj) { return obj->getId() == id; });
-
-    if (it == m_attachedEffects.end())
-        return nullptr;
-
-    return *it;
-}
-
-void Thing::drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop)
-{
-    for (const auto& effect : m_attachedEffects) {
-        effect->draw(dest, isOnTop, lightView);
-        if (effect->getLoop() == 0) {
-            g_dispatcher.addEvent([self = static_self_cast<Thing>(), effectId = effect->getId()]() {
-                self->detachEffectById(effectId);
-            });
         }
     }
 }
