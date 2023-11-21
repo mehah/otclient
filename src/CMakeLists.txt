@@ -550,6 +550,8 @@ else()
 		Vorbis::vorbisfile
 		LibLZMA::LibLZMA
 		pugixml::pugixml
+		ZLIB::ZLIB
+		libzip::zip
 	)
 endif()
 
