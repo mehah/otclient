@@ -66,7 +66,7 @@ OUTFIT_SHADERS = { {
     name = 'Outfit - Fragmented',
     frag = 'shaders/fragment/noise.frag'
 }, {
-    name = 'outline',
+    name = 'Outfit - Outline',
     useFramebuffer = true,
     frag = 'shaders/fragment/outline.frag'
 } }
