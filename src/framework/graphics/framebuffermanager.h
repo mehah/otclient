@@ -30,9 +30,7 @@ public:
     void init();
     void terminate();
 
-    const FrameBufferPtr& getTemporaryFrameBuffer(const uint8_t index) const {
-        return m_temporaryFramebuffer[index];
-    }
+    const FrameBufferPtr& getTemporaryFrameBuffer(const uint8_t index);
 
 protected:
     std::vector<FrameBufferPtr> m_temporaryFramebuffer;

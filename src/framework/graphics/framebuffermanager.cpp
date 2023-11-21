@@ -27,15 +27,19 @@ FrameBufferManager g_framebuffers;
 
 void FrameBufferManager::init()
 {
-    m_temporaryFramebuffer.reserve(2);
-    for (uint_fast8_t i = 0; i < 2; ++i) {
-        const auto& frame = m_temporaryFramebuffer.emplace_back(std::make_shared<FrameBuffer>());
-        if (i == 0) {
-            frame->setSmooth(false);
-        }
-    };
+    m_temporaryFramebuffer.emplace_back(std::make_shared<FrameBuffer>());
 }
 
 void FrameBufferManager::terminate() {
     m_temporaryFramebuffer.clear();
+}
+
+const FrameBufferPtr& FrameBufferManager::getTemporaryFrameBuffer(const uint8_t index) {
+    if (index < m_temporaryFramebuffer.size()) {
+        return m_temporaryFramebuffer[index];
+    }
+
+    const auto& tempfb = m_temporaryFramebuffer.emplace_back(std::make_shared<FrameBuffer>());
+    tempfb->setSmooth(false);
+    return tempfb;
 }

@@ -228,6 +228,7 @@ private:
     bool m_enabled{ true };
     bool m_alwaysGroupDrawings{ false };
 
+    int8_t m_bindedFramebuffers{ -1 };
     uint8_t m_depthLevel{ 0 };
 
     uint16_t m_refreshDelay{ 0 }, m_shaderRefreshDelay{ 0 };
