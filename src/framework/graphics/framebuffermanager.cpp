@@ -30,8 +30,9 @@ void FrameBufferManager::init()
     m_temporaryFramebuffer.reserve(2);
     for (uint_fast8_t i = 0; i < 2; ++i) {
         const auto& frame = m_temporaryFramebuffer.emplace_back(std::make_shared<FrameBuffer>());
-        if (i == 0)
+        if (i == 0) {
             frame->setSmooth(false);
+        }
     };
 }
 
