@@ -62,6 +62,9 @@
 - QR Code support, with auto generate it from string  [@conde2]
   - qr-code-border: 2
   - qr-code: Hail OTClient Redemption - Conde2 Dev
+  
+##### Sponsored  (Features)
+- Shader with Framebuffer | ([@SkullzOTS](https://github.com/SkullzOTS), [@Mryukiimaru](https://github.com/Mryukiimaru), [@JeanTheOne](https://github.com/JeanTheOne), [@KizaruHere](https://github.com/KizaruHere))
 
 ##### [OTClient V8](https://github.com/OTCv8) (Features)
 - Lighting System
