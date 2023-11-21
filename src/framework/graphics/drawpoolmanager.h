@@ -62,6 +62,7 @@ public:
     void setBlendEquation(BlendEquation equation, bool onlyOnce = false) const { getCurrentPool()->setBlendEquation(equation, onlyOnce); }
     void setCompositionMode(const CompositionMode mode, bool onlyOnce = false) const { getCurrentPool()->setCompositionMode(mode, onlyOnce); }
 
+    bool shaderNeedFramebuffer() const { return getCurrentPool()->m_state.shaderProgram && getCurrentPool()->m_state.shaderProgram->useFramebuffer(); }
     void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, const std::function<void()>& action) const { getCurrentPool()->setShaderProgram(shaderProgram, false, action); }
     void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onlyOnce = false, const std::function<void()>& action = nullptr) const { getCurrentPool()->setShaderProgram(shaderProgram, onlyOnce, action); }
 

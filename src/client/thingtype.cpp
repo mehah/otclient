@@ -603,6 +603,23 @@ void ThingType::unserializeOtml(const OTMLNodePtr& node)
     }
 }
 
+void ThingType::drawWithFrameBuffer(const Point& dest, const TexturePtr& texture, Rect screenRect, const Rect& textureRect, const Color& color, const DrawConductor& conductor) {
+    const int size = static_cast<int>(g_gameConfig.getSpriteSize() * m_size.area() * g_drawPool.getScaleFactor());
+    const auto& p = Point(size / 2);
+    const auto& destDiff = Rect(dest - p, Size{ size });
+
+    g_drawPool.bindFrameBuffer(destDiff.size()); {
+        g_drawPool.resetShaderProgram();
+
+        // Debug
+        // g_drawPool.addBoundingRect(Rect(Point(0), destDiff.size()), Color::red);
+
+        screenRect = Rect(p - (dest - screenRect.topLeft()), screenRect.size());
+        g_drawPool.addTexturedRect(screenRect, texture, textureRect, color, conductor);
+    } g_drawPool.releaseFrameBuffer(destDiff);
+    g_drawPool.resetShaderProgram();
+}
+
 void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, const Color& color, bool drawThings, LightView* lightView, const DrawConductor& conductor)
 {
     if (m_null)
@@ -628,7 +645,11 @@ void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, i
 
     if (drawThings) {
         const auto& newColor = m_opacity < 1.0f ? Color(color, m_opacity) : color;
-        g_drawPool.addTexturedRect(screenRect, texture, textureRect, newColor, conductor);
+
+        if (g_drawPool.shaderNeedFramebuffer())
+            drawWithFrameBuffer(dest, texture, screenRect, textureRect, newColor, conductor);
+        else
+            g_drawPool.addTexturedRect(screenRect, texture, textureRect, newColor, conductor);
     }
 
     if (lightView && hasLight()) {

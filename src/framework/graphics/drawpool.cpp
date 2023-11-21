@@ -385,4 +385,5 @@ void DrawPool::releaseFrameBuffer(const Rect& dest)
         drawState.execute();
         frame->draw(dest);
     });
+    if (hasFrameBuffer() && !dest.isNull()) stdext::hash_union(m_status.second, dest.hash());
 }
