@@ -354,3 +354,36 @@ void DrawPool::removeFramebuffer() {
     m_status.first = 0;
     m_framebuffer = nullptr;
 }
+
+void DrawPool::addAction(const std::function<void()>& action)
+{
+    const uint8_t order = m_type == DrawPoolType::MAP ? DrawOrder::THIRD : DrawOrder::FIRST;
+    m_objects[m_depthLevel][order].emplace_back(action);
+}
+
+void DrawPool::bindFrameBuffer(const Size& size)
+{
+    const uint8_t frameIndex = m_type == DrawPoolType::MAP ? 0 : 1;
+
+    m_oldState = std::move(m_state);
+    m_state = {};
+    addAction([size, frameIndex, drawState = m_state] {
+        drawState.execute();
+        const auto& frame = g_framebuffers.getTemporaryFrameBuffer(frameIndex);
+        frame->resize(size);
+        frame->bind();
+    });
+}
+void DrawPool::releaseFrameBuffer(const Rect& dest)
+{
+    const uint8_t frameIndex = m_type == DrawPoolType::MAP ? 0 : 1;
+
+    m_state = std::move(m_oldState);
+    addAction([dest, frameIndex, drawState = m_state] {
+        const auto& frame = g_framebuffers.getTemporaryFrameBuffer(frameIndex);
+        frame->release();
+        drawState.execute();
+        frame->draw(dest);
+    });
+    if (hasFrameBuffer() && !dest.isNull()) stdext::hash_union(m_status.second, dest.hash());
+}

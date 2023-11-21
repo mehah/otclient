@@ -52,16 +52,17 @@ public:
     void addFilledRect(const Rect& dest, const Color& color = Color::white, const DrawConductor& condutor = DEFAULT_DRAW_CONDUCTOR) const;
     void addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color = Color::white) const;
     void addBoundingRect(const Rect& dest, const Color& color = Color::white, uint16_t innerLineWidth = 1) const;
-    void addAction(const std::function<void()>& action) const;
+    void addAction(const std::function<void()>& action) const { getCurrentPool()->addAction(action); }
 
-    void bindFrameBuffer(const Size& size) const;
-    void releaseFrameBuffer(const Rect& dest) const;
+    void bindFrameBuffer(const Size& size) const { getCurrentPool()->bindFrameBuffer(size); }
+    void releaseFrameBuffer(const Rect& dest) const { getCurrentPool()->releaseFrameBuffer(dest); };
 
     void setOpacity(const float opacity, bool onlyOnce = false) const { getCurrentPool()->setOpacity(opacity, onlyOnce); }
     void setClipRect(const Rect& clipRect, bool onlyOnce = false) const { getCurrentPool()->setClipRect(clipRect, onlyOnce); }
     void setBlendEquation(BlendEquation equation, bool onlyOnce = false) const { getCurrentPool()->setBlendEquation(equation, onlyOnce); }
     void setCompositionMode(const CompositionMode mode, bool onlyOnce = false) const { getCurrentPool()->setCompositionMode(mode, onlyOnce); }
 
+    bool shaderNeedFramebuffer() const { return getCurrentPool()->m_state.shaderProgram && getCurrentPool()->m_state.shaderProgram->useFramebuffer(); }
     void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, const std::function<void()>& action) const { getCurrentPool()->setShaderProgram(shaderProgram, false, action); }
     void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onlyOnce = false, const std::function<void()>& action = nullptr) const { getCurrentPool()->setShaderProgram(shaderProgram, onlyOnce, action); }
 

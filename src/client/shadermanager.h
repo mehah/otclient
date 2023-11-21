@@ -49,9 +49,9 @@ public:
     void setupOutfitShader(const std::string_view name);
     void setupMountShader(const std::string_view name);
 
-    void createShader(const std::string_view name);
-    void createFragmentShader(const std::string_view name, const std::string_view file);
-    void createFragmentShaderFromCode(const std::string_view name, const std::string_view code);
+    void createShader(const std::string_view name, bool useFramebuffer = false);
+    void createFragmentShader(const std::string_view name, const std::string_view file, bool useFramebuffer = false);
+    void createFragmentShaderFromCode(const std::string_view name, const std::string_view code, bool useFramebuffer = false);
 
     void addMultiTexture(const std::string_view name, const std::string_view file);
 

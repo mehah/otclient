@@ -207,34 +207,6 @@ void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, uint
     getCurrentPool()->add(color, nullptr, method);
 }
 
-void DrawPoolManager::addAction(const std::function<void()>& action) const
-{
-    getCurrentPool()->m_objects[0][DrawOrder::FIRST].emplace_back(action);
-}
-
-void DrawPoolManager::bindFrameBuffer(const Size& size) const
-{
-    getCurrentPool()->m_oldState = std::move(getCurrentPool()->m_state);
-    getCurrentPool()->m_state = {};
-
-    g_drawPool.addAction([size, drawState = getCurrentPool()->m_state] {
-        drawState.execute();
-        const auto& frame = g_framebuffers.getTemporaryFrameBuffer();
-        frame->resize(size);
-        frame->bind();
-    });
-}
-void DrawPoolManager::releaseFrameBuffer(const Rect& dest) const
-{
-    getCurrentPool()->m_state = std::move(getCurrentPool()->m_oldState);
-    g_drawPool.addAction([dest, drawState = getCurrentPool()->m_state] {
-        const auto& frame = g_framebuffers.getTemporaryFrameBuffer();
-        frame->release();
-        drawState.execute();
-        frame->draw(dest);
-    });
-}
-
 void DrawPoolManager::use(const DrawPoolType type, const Rect& dest, const Rect& src, const Color& colorClear)
 {
     select(type);
