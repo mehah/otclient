@@ -609,8 +609,6 @@ void ThingType::drawWithFrameBuffer(const Point& dest, const TexturePtr& texture
     const auto& destDiff = Rect(dest - p, Size{ size });
 
     g_drawPool.bindFrameBuffer(destDiff.size()); {
-        g_drawPool.resetShaderProgram();
-
         // Debug
         // g_drawPool.addBoundingRect(Rect(Point(0), destDiff.size()), Color::red);
 

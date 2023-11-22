@@ -377,6 +377,7 @@ void DrawPool::bindFrameBuffer(const Size& size)
 void DrawPool::releaseFrameBuffer(const Rect& dest)
 {
     m_state = std::move(m_oldState);
+    m_oldState = {};
     addAction([dest, frameIndex = m_bindedFramebuffers, drawState = m_state] {
         const auto& frame = g_framebuffers.getTemporaryFrameBuffer(frameIndex);
         frame->release();
