@@ -21,13 +21,25 @@
  */
 
 #include "framebuffermanager.h"
+#include "drawpoolmanager.h"
 
 FrameBufferManager g_framebuffers;
 
 void FrameBufferManager::init()
 {
-    m_temporaryFramebuffer = std::make_shared<FrameBuffer>();
-    m_temporaryFramebuffer->setSmooth(true);
+    m_temporaryFramebuffer.emplace_back(std::make_shared<FrameBuffer>());
 }
 
-void FrameBufferManager::terminate() { m_temporaryFramebuffer = nullptr; }
+void FrameBufferManager::terminate() {
+    m_temporaryFramebuffer.clear();
+}
+
+const FrameBufferPtr& FrameBufferManager::getTemporaryFrameBuffer(const uint8_t index) {
+    if (index < m_temporaryFramebuffer.size()) {
+        return m_temporaryFramebuffer[index];
+    }
+
+    const auto& tempfb = m_temporaryFramebuffer.emplace_back(std::make_shared<FrameBuffer>());
+    tempfb->setSmooth(false);
+    return tempfb;
+}

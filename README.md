@@ -62,13 +62,11 @@
 - QR Code support, with auto generate it from string  [@conde2]
   - qr-code-border: 2
   - qr-code: Hail OTClient Redemption - Conde2 Dev
-- Bot V8 (Sponsored By: [@luanluciano93](https://github.com/luanluciano93), [@SkullzOTS](https://github.com/SkullzOTS), [@kokekanon](https://github.com/kokekanon), [@FranciskoKing](https://github.com/FranciskoKing), [@Kizuno18](https://github.com/Kizuno18))
-  - Is adapted in 85%
-  - To enable it, it is necessary to remove/off the BOT_PROTECTION flag.
-  - [VS Solution](https://github.com/mehah/otclient/blob/68e4e1b94c2041bd235441244156e6477058250c/vc17/settings.props#L9) / [CMAKE](https://github.com/mehah/otclient/blob/68e4e1b94c2041bd235441244156e6477058250c/src/CMakeLists.txt#L13)
+  
+##### Sponsored  (Features)
+- Shader with Framebuffer | ([@SkullzOTS](https://github.com/SkullzOTS), [@Mryukiimaru](https://github.com/Mryukiimaru), [@JeanTheOne](https://github.com/JeanTheOne), [@KizaruHere](https://github.com/KizaruHere))
 
 ##### [OTClient V8](https://github.com/OTCv8) (Features)
-- Bot
 - Lighting System
 - Floor Fading
 - Path Finding

@@ -184,6 +184,10 @@ private:
              DrawMode drawMode = DrawMode::TRIANGLES, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR,
              const CoordsBufferPtr& coordsBuffer = nullptr);
 
+    void addAction(const std::function<void()>& action);
+    void bindFrameBuffer(const Size& size);
+    void releaseFrameBuffer(const Rect& dest);
+
     inline void setFPS(uint16_t fps) { m_refreshDelay = fps; }
 
     void updateHash(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color);
@@ -225,6 +229,7 @@ private:
     bool m_enabled{ true };
     bool m_alwaysGroupDrawings{ false };
 
+    int8_t m_bindedFramebuffers{ -1 };
     uint8_t m_depthLevel{ 0 };
 
     uint16_t m_refreshDelay{ 0 }, m_shaderRefreshDelay{ 0 };

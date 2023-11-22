@@ -32,6 +32,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
         if (type == DrawPoolType::MAP) {
             pool->m_framebuffer->m_useAlphaWriting = false;
             pool->m_framebuffer->disableBlend();
+            pool->m_bindedFramebuffers = 0; // forces to use only framebuffer without smoothing.
         } else if (type == DrawPoolType::FOREGROUND) {
             pool->setFPS(FPS10);
         }
@@ -353,4 +354,36 @@ void DrawPool::setFramebuffer(const Size& size) {
 void DrawPool::removeFramebuffer() {
     m_status.first = 0;
     m_framebuffer = nullptr;
+}
+
+void DrawPool::addAction(const std::function<void()>& action)
+{
+    const uint8_t order = m_type == DrawPoolType::MAP ? DrawOrder::THIRD : DrawOrder::FIRST;
+    m_objects[m_depthLevel][order].emplace_back(action);
+}
+
+void DrawPool::bindFrameBuffer(const Size& size)
+{
+    ++m_bindedFramebuffers;
+    m_oldState = std::move(m_state);
+    m_state = {};
+    addAction([size, frameIndex = m_bindedFramebuffers, drawState = m_state] {
+        drawState.execute();
+        const auto& frame = g_framebuffers.getTemporaryFrameBuffer(frameIndex);
+        frame->resize(size);
+        frame->bind();
+    });
+}
+void DrawPool::releaseFrameBuffer(const Rect& dest)
+{
+    m_state = std::move(m_oldState);
+    m_oldState = {};
+    addAction([dest, frameIndex = m_bindedFramebuffers, drawState = m_state] {
+        const auto& frame = g_framebuffers.getTemporaryFrameBuffer(frameIndex);
+        frame->release();
+        drawState.execute();
+        frame->draw(dest);
+    });
+    if (hasFrameBuffer() && !dest.isNull()) stdext::hash_union(m_status.second, dest.hash());
+    --m_bindedFramebuffers;
 }
