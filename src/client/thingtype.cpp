@@ -604,7 +604,7 @@ void ThingType::unserializeOtml(const OTMLNodePtr& node)
 }
 
 void ThingType::drawWithFrameBuffer(const Point& dest, const TexturePtr& texture, Rect screenRect, const Rect& textureRect, const Color& color, const DrawConductor& conductor) {
-    const int size = static_cast<int>(g_gameConfig.getSpriteSize() * m_size.area() * g_drawPool.getScaleFactor());
+    const int size = static_cast<int>(g_gameConfig.getSpriteSize() * std::max<int>(m_size.area(), 2) * g_drawPool.getScaleFactor());
     const auto& p = Point(size / 2);
     const auto& destDiff = Rect(dest - p, Size{ size });
 
