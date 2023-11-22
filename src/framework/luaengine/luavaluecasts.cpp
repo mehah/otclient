@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-#include <framework/luaengine/luavaluecasts.h>
+#include "luavaluecasts.h"
 #include <framework/otml/otmlnode.h>
 #include "luainterface.h"
 

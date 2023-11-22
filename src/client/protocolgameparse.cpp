@@ -28,7 +28,7 @@
 #include <framework/core/eventdispatcher.h>
 #include "item.h"
 #include "localplayer.h"
-#include "luavaluecasts.h"
+#include "luavaluecasts_client.h"
 #include "map.h"
 #include "missile.h"
 #include "statictext.h"
@@ -564,8 +564,8 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
         }
     } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("ProtocolGame parse message exception (%d bytes, %d unread, last opcode is 0x%02x (%d), prev opcode is 0x%02x (%d)): %s"
-                                      "\nPacket has been saved to packet.log, you can use it to find what was wrong. (Protocol: %i)",
-                                      msg->getMessageSize(), msg->getUnreadSize(), opcode, opcode, prevOpcode, prevOpcode, e.what(), g_game.getProtocolVersion()));
+                       "\nPacket has been saved to packet.log, you can use it to find what was wrong. (Protocol: %i)",
+                       msg->getMessageSize(), msg->getUnreadSize(), opcode, opcode, prevOpcode, prevOpcode, e.what(), g_game.getProtocolVersion()));
 
         std::ofstream packet("packet.log", std::ifstream::app);
         if (!packet.is_open())
