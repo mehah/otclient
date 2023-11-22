@@ -190,7 +190,6 @@ find_package(Threads REQUIRED)
 find_package(STDUUID CONFIG REQUIRED)
 find_package(pugixml CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
-find_package(libzip CONFIG REQUIRED)
 if(APPLE)
 	# Required for Physfs
 	find_library(FOUNDATION Foundation REQUIRED)
@@ -467,7 +466,6 @@ if(MSVC)
 		winmm.lib
 		pugixml::pugixml
 		ZLIB::ZLIB
-		libzip::zip
 	)
 elseif(ANDROID)
 	target_include_directories(${PROJECT_NAME}
@@ -551,7 +549,6 @@ else()
 		LibLZMA::LibLZMA
 		pugixml::pugixml
 		ZLIB::ZLIB
-		libzip::zip
 	)
 endif()
 
