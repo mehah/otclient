@@ -234,6 +234,7 @@ private:
 
     uint16_t m_refreshDelay{ 0 }, m_shaderRefreshDelay{ 0 };
     uint32_t m_onlyOnceStateFlag{ 0 };
+    uint_fast64_t m_lastFramebufferId{ 0 };
 
     PoolState m_state, m_oldState;
 

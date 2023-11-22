@@ -160,8 +160,8 @@ void DrawPool::updateHash(const DrawPool::DrawMethod& method, const TexturePtr& 
         if (m_state.transformMatrix != DEFAULT_MATRIX3)
             stdext::hash_union(m_state.hash, m_state.transformMatrix.hash());
 
-        if (m_bindedFramebuffers > 0)
-            stdext::hash_combine(m_state.hash, m_bindedFramebuffers);
+        if (m_bindedFramebuffers)
+            stdext::hash_combine(m_state.hash, m_lastFramebufferId);
 
         if (color != Color::white)
             stdext::hash_union(m_state.hash, color.hash());
@@ -251,6 +251,7 @@ void DrawPool::resetState()
     m_state = {};
     m_depthLevel = 0;
     m_status.second = 0;
+    m_lastFramebufferId = 0;
     m_shaderRefreshDelay = 0;
     m_scale = PlatformWindow::DEFAULT_DISPLAY_DENSITY;
 }
@@ -368,6 +369,8 @@ void DrawPool::addAction(const std::function<void()>& action)
 void DrawPool::bindFrameBuffer(const Size& size)
 {
     ++m_bindedFramebuffers;
+    ++m_lastFramebufferId;
+
     m_oldState = std::move(m_state);
     m_state = {};
     addAction([size, frameIndex = m_bindedFramebuffers, drawState = m_state] {
