@@ -26,8 +26,6 @@
 #include <framework/graphics/framebuffer.h>
 #include "declarations.h"
 #include "thingtype.h"
-#include <thread>
-#include <condition_variable>
 
 class LightView : public LuaObject
 {
