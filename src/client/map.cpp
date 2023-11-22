@@ -33,6 +33,7 @@
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/graphicalapplication.h>
 #include <framework/core/eventdispatcher.h>
+#include <queue>
 
 #ifdef FRAMEWORK_EDITOR
 #include "houses.h"

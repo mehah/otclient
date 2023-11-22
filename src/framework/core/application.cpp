@@ -70,6 +70,9 @@ void Application::init(std::vector<std::string>& args, uint8_t asyncDispatchMaxT
     std::locale::global(std::locale());
 
     g_asyncDispatcher.init(asyncDispatchMaxThreads);
+    g_dispatcher.init();
+    g_textDispatcher.init();
+    g_mainDispatcher.init();
 
     std::string startupOptions;
     for (uint32_t i = 1; i < args.size(); ++i) {

@@ -51,6 +51,10 @@ public:
         m_condition.notify_all();
     }
 
+    inline auto getNumberOfThreads() const {
+        return m_threads.size();
+    }
+
 protected:
     void exec_loop();
 
