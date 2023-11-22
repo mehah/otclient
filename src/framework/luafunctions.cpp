@@ -410,6 +410,7 @@ void Application::registerLuaFunctions()
     g_lua.registerSingletonClass("g_particles");
     g_lua.bindSingletonFunction("g_particles", "importParticle", &ParticleManager::importParticle, &g_particles);
     g_lua.bindSingletonFunction("g_particles", "getEffectsTypes", &ParticleManager::getEffectsTypes, &g_particles);
+    g_lua.bindSingletonFunction("g_particles", "terminate", &ParticleManager::terminate, &g_particles);
 
     // UIWidget
     g_lua.registerClass<UIWidget>();

@@ -412,6 +412,9 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<AttachableObject>("detachEffectById", &AttachableObject::detachEffectById);
     g_lua.bindClassMemberFunction<AttachableObject>("getAttachedEffectById", &AttachableObject::getAttachedEffectById);
     g_lua.bindClassMemberFunction<AttachableObject>("clearAttachedEffects", &AttachableObject::clearAttachedEffects);
+    g_lua.bindClassMemberFunction<AttachableObject>("attachParticleEffect", &AttachableObject::attachParticleEffect);
+    g_lua.bindClassMemberFunction<AttachableObject>("detachParticleEffectByName", &AttachableObject::detachParticleEffectByName);
+    g_lua.bindClassMemberFunction<AttachableObject>("clearAttachedParticlesEffect", &AttachableObject::clearAttachedParticlesEffect);
 
     g_lua.registerClass<Thing, AttachableObject>();
     g_lua.bindClassMemberFunction<Thing>("setId", &Thing::setId);

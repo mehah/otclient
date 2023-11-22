@@ -313,6 +313,8 @@ void Creature::internalDraw(Point dest, LightView* lightView, const Color& color
         g_drawPool.resetShaderProgram();
     else
         drawAttachedEffect(dest, lightView, true); // On Top
+
+    drawAttachedParticlesEffect(dest);
 }
 
 void Creature::turn(Otc::Direction direction)

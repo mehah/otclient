@@ -44,10 +44,16 @@ public:
 
     const std::vector<AttachedEffectPtr>& getAttachedEffects() { return m_attachedEffects; };
 
+    void attachParticleEffect(const std::string& name);
+    void clearAttachedParticlesEffect();
+    bool detachParticleEffectByName(const std::string& name);
+
 protected:
     void drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop);
     void onDetachEffect(const AttachedEffectPtr& effect);
+    void drawAttachedParticlesEffect(const Point& dest);
 
     std::vector<AttachedEffectPtr> m_attachedEffects;
+    std::vector<ParticleEffectPtr> m_attachedParticles;
     uint8_t m_ownerHidden{ 0 };
 };

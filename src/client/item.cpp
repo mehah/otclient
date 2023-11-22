@@ -74,6 +74,8 @@ void Item::internalDraw(int animationPhase, const Point& dest, const Color& colo
 
     if (!isMarked)
         drawAttachedEffect(dest, lightView, true); // On Top
+
+    drawAttachedParticlesEffect(dest);
 }
 
 void Item::setConductor()

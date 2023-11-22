@@ -21,8 +21,12 @@
  */
 
 #include "attachableobject.h"
+#include <framework/graphics/particlemanager.h>
+#include <framework/graphics/particleeffect.h>
 
 #include <framework/core/eventdispatcher.h>
+
+extern ParticleManager g_particles;
 
 void AttachableObject::attachEffect(const AttachedEffectPtr& obj) {
     if (!obj)
@@ -94,4 +98,47 @@ void AttachableObject::drawAttachedEffect(const Point& dest, LightView* lightVie
             });
         }
     }
+}
+
+void AttachableObject::attachParticleEffect(const std::string& name)
+{
+    const ParticleEffectPtr effect = g_particles.createEffect(name);
+    if (!effect)
+        return;
+
+    m_attachedParticles.emplace_back(effect);
+}
+
+void AttachableObject::clearAttachedParticlesEffect()
+{
+    m_attachedParticles.clear();
+}
+
+bool AttachableObject::detachParticleEffectByName(const std::string& name)
+{
+    auto findFunc = [name](const ParticleEffectPtr& obj) {
+        if (const auto& effectType = obj->getEffectType()) {
+            return effectType->getName() == name;
+        }
+        return false;
+    };
+    const auto it = std::find_if(m_attachedParticles.begin(), m_attachedParticles.end(), findFunc);
+
+    if (it == m_attachedParticles.end())
+        return false;
+
+    m_attachedParticles.erase(it);
+
+    return true;
+}
+
+void AttachableObject::drawAttachedParticlesEffect(const Point& dest)
+{
+    g_drawPool.pushTransformMatrix();
+    g_drawPool.translate(dest);
+
+    for (const auto& effect : m_attachedParticles)
+        effect->render();
+
+    g_drawPool.popTransformMatrix();
 }
