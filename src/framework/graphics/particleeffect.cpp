@@ -47,6 +47,8 @@ void ParticleEffect::load(const ParticleEffectTypePtr& effectType)
             m_systems.emplace_back(system);
         }
     }
+
+    m_effectType = effectType;
 }
 
 void ParticleEffect::render() const

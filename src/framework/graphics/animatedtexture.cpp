@@ -90,6 +90,10 @@ TexturePtr AnimatedTexture::get(uint32_t& frame, Timer& timer) {
     return m_frames[frame];
 }
 
+TexturePtr AnimatedTexture::getCurrentFrame() {
+    return m_frames[m_currentFrame];
+}
+
 void AnimatedTexture::update()
 {
     if (!m_animTimer.running())
