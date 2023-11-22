@@ -21,6 +21,7 @@
  */
 
 #include "eventdispatcher.h"
+#include "asyncdispatcher.h"
 
 #include <framework/core/clock.h>
 #include "timer.h"
@@ -29,64 +30,30 @@ EventDispatcher g_dispatcher, g_textDispatcher, g_mainDispatcher;
 std::thread::id g_mainThreadId = std::this_thread::get_id();
 std::thread::id g_eventThreadId;
 
+void EventDispatcher::init() {
+    m_threads.reserve(g_asyncDispatcher.getNumberOfThreads() + 1);
+    for (uint_fast16_t i = 1; i < m_threads.capacity(); ++i) {
+        m_threads.emplace_back(std::make_unique<ThreadTask>());
+    }
+};
+
 void EventDispatcher::shutdown()
 {
-    while (!m_eventList.empty())
-        poll();
-
-    while (!m_scheduledEventList.empty()) {
-        m_scheduledEventList.top()->cancel();
-        m_scheduledEventList.pop();
+    while (!m_eventList.empty()) {
+        executeEvents();
+        mergeEvents();
     }
+
+    m_scheduledEventList.clear();
 
     m_disabled = true;
 }
 
 void EventDispatcher::poll()
 {
-    {
-        std::scoped_lock l(m_mutex);
-        for (int count = 0, max = m_scheduledEventList.size(); count < max && !m_scheduledEventList.empty(); ++count) {
-            const auto scheduledEvent = m_scheduledEventList.top();
-            if (scheduledEvent->remainingTicks() > 0)
-                break;
-
-            m_scheduledEventList.pop();
-            scheduledEvent->execute();
-
-            if (scheduledEvent->nextCycle())
-                m_scheduledEventList.push(scheduledEvent);
-        }
-    }
-
-    const bool isMainDispatcher = &g_mainDispatcher == this;
-    std::unique_lock ul(m_mutex);
-
-    // execute events list until all events are out, this is needed because some events can schedule new events that would
-    // change the UIWidgets layout, in this case we must execute these new events before we continue rendering,
-    m_pollEventsSize = m_eventList.size();
-    int_fast32_t loops = 0;
-    while (m_pollEventsSize > 0) {
-        if (loops > 50) {
-            static Timer reportTimer;
-            if (reportTimer.running() && reportTimer.ticksElapsed() > 100) {
-                g_logger.error("ATTENTION the event list is not getting empty, this could be caused by some bad code");
-                reportTimer.restart();
-            }
-            break;
-        }
-
-        for (int_fast32_t i = -1; ++i < static_cast<int_fast32_t>(m_pollEventsSize);) {
-            const auto event = m_eventList.front();
-            m_eventList.pop_front();
-            if (isMainDispatcher) ul.unlock();
-            event->execute();
-            if (isMainDispatcher) ul.lock();
-        }
-        m_pollEventsSize = m_eventList.size();
-
-        ++loops;
-    }
+    executeScheduledEvents();
+    executeEvents();
+    mergeEvents();
 }
 
 ScheduledEventPtr EventDispatcher::scheduleEvent(const std::function<void()>& callback, int delay)
@@ -94,11 +61,13 @@ ScheduledEventPtr EventDispatcher::scheduleEvent(const std::function<void()>& ca
     if (m_disabled)
         return std::make_shared<ScheduledEvent>(nullptr, delay, 1);
 
-    std::scoped_lock<std::recursive_mutex> lock(m_mutex);
-
     assert(delay >= 0);
+
     const auto& scheduledEvent = std::make_shared<ScheduledEvent>(callback, delay, 1);
-    m_scheduledEventList.emplace(scheduledEvent);
+    const auto& thread = getThreadTask();
+    std::scoped_lock lock(thread->mutex);
+
+    thread->scheduledEventList.emplace_back(scheduledEvent);
     return scheduledEvent;
 }
 
@@ -107,15 +76,17 @@ ScheduledEventPtr EventDispatcher::cycleEvent(const std::function<void()>& callb
     if (m_disabled)
         return std::make_shared<ScheduledEvent>(nullptr, delay, 0);
 
-    std::scoped_lock<std::recursive_mutex> lock(m_mutex);
-
     assert(delay > 0);
+
     const auto& scheduledEvent = std::make_shared<ScheduledEvent>(callback, delay, 0);
-    m_scheduledEventList.emplace(scheduledEvent);
+    const auto& thread = getThreadTask();
+    std::scoped_lock lock(thread->mutex);
+
+    thread->scheduledEventList.emplace_back(scheduledEvent);
     return scheduledEvent;
 }
 
-EventPtr EventDispatcher::addEvent(const std::function<void()>& callback, bool pushFront)
+EventPtr EventDispatcher::addEvent(const std::function<void()>& callback)
 {
     if (m_disabled)
         return std::make_shared<Event>(nullptr);
@@ -125,15 +96,60 @@ EventPtr EventDispatcher::addEvent(const std::function<void()>& callback, bool p
         return std::make_shared<Event>(nullptr);
     }
 
-    std::scoped_lock<std::recursive_mutex> lock(m_mutex);
-
     const auto& event = std::make_shared<Event>(callback);
-    // front pushing is a way to execute an event before others
-    if (pushFront) {
-        m_eventList.emplace_front(event);
-        // the poll event list only grows when pushing into front
-        ++m_pollEventsSize;
-    } else
-        m_eventList.emplace_back(event);
+
+    const auto& thread = getThreadTask();
+    std::scoped_lock lock(thread->mutex);
+    thread->events.emplace_back(event);
+
     return event;
+}
+
+void EventDispatcher::executeEvents() {
+    if (m_eventList.empty()) {
+        return;
+    }
+
+    for (const auto& event : m_eventList) {
+        event->execute();
+    }
+
+    m_eventList.clear();
+}
+
+void EventDispatcher::executeScheduledEvents() {
+    auto& threadScheduledTasks = getThreadTask()->scheduledEventList;
+
+    auto it = m_scheduledEventList.begin();
+    while (it != m_scheduledEventList.end()) {
+        const auto& scheduledEvent = *it;
+        if (scheduledEvent->remainingTicks() > 0)
+            break;
+
+        scheduledEvent->execute();
+
+        if (scheduledEvent->nextCycle())
+            threadScheduledTasks.emplace_back(scheduledEvent);
+
+        ++it;
+    }
+
+    if (it != m_scheduledEventList.begin()) {
+        m_scheduledEventList.erase(m_scheduledEventList.begin(), it);
+    }
+}
+
+void EventDispatcher::mergeEvents() {
+    for (const auto& thread : m_threads) {
+        std::scoped_lock lock(thread->mutex);
+        if (!thread->events.empty()) {
+            m_eventList.insert(m_eventList.end(), make_move_iterator(thread->events.begin()), make_move_iterator(thread->events.end()));
+            thread->events.clear();
+        }
+
+        if (!thread->scheduledEventList.empty()) {
+            m_scheduledEventList.insert(make_move_iterator(thread->scheduledEventList.begin()), make_move_iterator(thread->scheduledEventList.end()));
+            thread->scheduledEventList.clear();
+        }
+    }
 }

@@ -48,6 +48,7 @@
 #include <vector>
 
 #include <parallel_hashmap/phmap.h>
+#include <parallel_hashmap/btree.h>
 #include <pugixml.hpp>
 
 using namespace std::literals;
