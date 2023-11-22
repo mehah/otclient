@@ -33,7 +33,7 @@ class LightView : public LuaObject
 {
 public:
     LightView(const Size& size, const uint16_t tileSize);
-    ~LightView() { m_texture = nullptr; m_condition.notify_one(); m_thread.join(); }
+    ~LightView() { m_texture = nullptr; }
 
     void resize(const Size& size, uint16_t tileSize);
     void draw(const Rect& dest, const Rect& src);
@@ -85,9 +85,5 @@ private:
     TexturePtr m_texture;
     LightData m_lightData[2];
     std::atomic_uint8_t m_currentLightData{ 0 };
-
-    std::thread m_thread;
-    std::condition_variable m_condition;
-
     std::vector<uint8_t> m_pixels;
 };
