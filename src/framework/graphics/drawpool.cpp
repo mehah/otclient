@@ -160,6 +160,9 @@ void DrawPool::updateHash(const DrawPool::DrawMethod& method, const TexturePtr& 
         if (m_state.transformMatrix != DEFAULT_MATRIX3)
             stdext::hash_union(m_state.hash, m_state.transformMatrix.hash());
 
+        if (m_bindedFramebuffers > 0)
+            stdext::hash_combine(m_state.hash, m_bindedFramebuffers);
+
         if (color != Color::white)
             stdext::hash_union(m_state.hash, color.hash());
 
