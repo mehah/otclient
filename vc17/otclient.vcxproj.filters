@@ -557,6 +557,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\framework\config.h">
+      <Filter>Header Files\framework</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\framework\const.h">
       <Filter>Header Files\framework</Filter>
     </ClInclude>
@@ -1020,9 +1023,6 @@
       <Filter>Header Files\framework\core</Filter>
     </ClInclude>
     <ClInclude Include="..\src\client\animator.h">
-      <Filter>Header Files\client</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\client\config.h">
       <Filter>Header Files\client</Filter>
     </ClInclude>
     <ClInclude Include="..\src\framework\graphics\drawpoolmanager.h">
