@@ -37,7 +37,6 @@
         vorbis.lib;
         vorbisfile.lib;
         pugixml.lib;
-        zip.lib;
         zlib.lib;
     </OTCLIENT_LIBDEPS>
 
@@ -63,7 +62,6 @@
         winmm.lib;
         pugixml.lib;
         zlibd.lib;
-        zip.lib;
         openal32.lib;
     </OTCLIENT_LIBDEPS_D>
   </PropertyGroup>
