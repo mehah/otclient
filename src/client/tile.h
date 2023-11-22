@@ -210,6 +210,17 @@ public:
     TilePtr asTile() { return static_self_cast<Tile>(); }
 
     bool checkForDetachableThing();
+
+#ifndef BOT_PROTECTION
+    void drawTexts(const Point& dest, const MapPosInfo& mapRect);
+    void setText(const std::string& text, Color color);
+    std::string getText();
+    void setTimer(int time, Color color);
+    int getTimer();
+    void setFill(Color color);
+    void resetFill() { m_fill = Color::alpha; }
+    bool canShoot(int distance);
+#endif
 private:
     void drawTop(const Point& dest, int flags, bool forceDraw, LightView* lightView = nullptr);
     void drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, bool forceDraw, LightView* lightView = nullptr);
@@ -254,4 +265,11 @@ private:
     TileSelectType m_selectType{ TileSelectType::NONE };
 
     bool m_drawTopAndCreature{ true };
+
+#ifndef BOT_PROTECTION
+    ticks_t m_timer = 0;
+    StaticTextPtr m_timerText;
+    StaticTextPtr m_text;
+    Color m_fill = Color::alpha;
+#endif
 };

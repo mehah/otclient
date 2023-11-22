@@ -29,6 +29,7 @@
 #include "shadermanager.h"
 #include "thingtypemanager.h"
 #include "tile.h"
+#include "statictext.h"
 
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>
@@ -202,6 +203,14 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
 
         if (drawFlags & Otc::DrawNames) {
             m_name.draw(textRect, fillColor);
+
+#ifndef BOT_PROTECTION
+            if (m_text) {
+                auto extraTextSize = m_text->getTextSize();
+                Rect extraTextRect = Rect(p.x - extraTextSize.width() / 2.0, p.y + 15, extraTextSize);
+                m_text->drawText(extraTextRect.center(), extraTextRect);
+            }
+#endif
         }
 
         if (m_skull != Otc::SkullNone && m_skullTexture)
@@ -946,3 +955,27 @@ int Creature::getExactSize(int layer, int xPattern, int yPattern, int zPattern, 
 }
 
 void Creature::setMountShader(const std::string_view name) { m_mountShader = g_shaders.getShader(name); }
+
+#ifndef BOT_PROTECTION
+void Creature::setText(const std::string& text, const Color& color)
+{
+    if (!m_text) {
+        m_text = std::make_shared<StaticText>();
+    }
+    m_text->setText(text);
+    m_text->setColor(color);
+}
+
+std::string Creature::getText()
+{
+    if (!m_text) {
+        return "";
+    }
+    return m_text->getText();
+}
+
+bool Creature::canShoot(int distance)
+{
+    return getTile() ? getTile()->canShoot(distance) : false;
+}
+#endif

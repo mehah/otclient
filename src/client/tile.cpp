@@ -33,6 +33,8 @@
 #include "map.h"
 #include "uimap.h"
 #include "protocolgame.h"
+#include "statictext.h"
+#include "localplayer.h"
 
 Tile::Tile(const Position& position) : m_position(position) {}
 
@@ -47,6 +49,13 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool is
 {
     m_drawElevation = 0;
     m_lastDrawDest = dest;
+
+#ifndef BOT_PROTECTION
+    if (m_fill != Color::alpha) {
+        g_drawPool.addFilledRect(Rect(dest, Size{ g_gameConfig.getSpriteSize() }), m_fill);
+        return;
+    }
+#endif
 
     for (const auto& thing : m_things) {
         if (!thing->isGround() && !thing->isGroundBorder() && !thing->isOnBottom())
@@ -150,7 +159,7 @@ void Tile::setWidget(const UIWidgetPtr& widget) {
     m_widget = widget;
     m_widget->setClipping(true);
     g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
-        g_ui.getMapWidget()->addTileWidget(tile);
+        g_ui.getMapWidget()->addTile(tile);
     }, g_game.getServerBeat());
 }
 
@@ -161,15 +170,19 @@ void Tile::removeWidget()
 
     m_widget->destroy();
     m_widget = nullptr;
-
-    g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
-        g_ui.getMapWidget()->removeTileWidget(tile);
-    }, g_game.getServerBeat());
 }
 
 void Tile::clean()
 {
-    removeWidget();
+    if (g_ui.getMapWidget() && (m_widget
+#ifndef BOT_PROTECTION
+        || m_text || m_timerText
+#endif
+        )) {
+        g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
+            g_ui.getMapWidget()->removeTile(tile);
+        }, g_game.getServerBeat());
+    }
 
     m_highlightThing = nullptr;
     while (!m_things.empty())
@@ -293,6 +306,9 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
 
     thing->setPosition(m_position, stackPos, hasElev);
     thing->onAppear();
+
+    if (g_game.isTileThingLuaCallbackEnabled())
+        callLuaField("onAddThing", thing);
 }
 
 // TODO: Need refactoring
@@ -323,6 +339,9 @@ bool Tile::removeThing(const ThingPtr thing)
     checkForDetachableThing();
 
     thing->onDisappear();
+
+    if (g_game.isTileThingLuaCallbackEnabled())
+        callLuaField("onRemoveThing", thing);
 
     return true;
 }
@@ -643,7 +662,7 @@ bool Tile::limitsFloorsView(bool isFreeView)
 bool Tile::checkForDetachableThing()
 {
     if (m_highlightThing)
-        m_highlightThing->setMarkColor(Color::white);
+        m_highlightThing->setMarked(Color::white);
 
     m_highlightThing = nullptr;
     if (const auto& creature = getTopCreature()) {
@@ -784,7 +803,7 @@ void Tile::select(TileSelectType selectType)
     }
 
     if (m_highlightThing)
-        m_highlightThing->setMarkColor(Color::yellow);
+        m_highlightThing->setMarked(Color::yellow);
 
     m_selectType = selectType;
 }
@@ -792,7 +811,7 @@ void Tile::select(TileSelectType selectType)
 void Tile::unselect()
 {
     if (m_highlightThing)
-        m_highlightThing->setMarkColor(Color::white);
+        m_highlightThing->setMarked(Color::white);
 
     if (m_selectType == TileSelectType::NO_FILTERED)
         checkForDetachableThing();
@@ -827,3 +846,81 @@ bool Tile::canRender(uint32_t& flags, const Position& cameraPosition, const Awar
 
     return flags > 0;
 }
+
+#ifndef BOT_PROTECTION
+void Tile::drawTexts(const Point& dest, const MapPosInfo& mapRect)
+{
+    Point p = dest - mapRect.drawOffset;
+    p.x *= mapRect.horizontalStretchFactor;
+    p.y *= mapRect.verticalStretchFactor;
+    p += mapRect.rect.topLeft();
+    p.y += 5;
+
+    if (m_timerText && g_clock.millis() < m_timer) {
+        if (m_text && m_text->hasText())
+            p.y -= 8;
+        m_timerText->setText(stdext::format("%.01f", (m_timer - g_clock.millis()) / 1000.));
+        m_timerText->drawText(p, Rect(p.x - 64, p.y - 64, 128, 128));
+        p.y += 16;
+    }
+
+    if (m_text && m_text->hasText()) {
+        m_text->drawText(p, Rect(p.x - 64, p.y - 64, 128, 128));
+    }
+}
+
+void Tile::setText(const std::string& text, Color color)
+{
+    if (!m_text) {
+        m_text = std::make_shared<StaticText>();
+        g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
+            g_ui.getMapWidget()->addTile(tile);
+        }, g_game.getServerBeat());
+    }
+
+    m_text->setText(text);
+    m_text->setColor(color);
+}
+
+std::string Tile::getText()
+{
+    return m_text ? m_text->getText() : "";
+}
+
+void Tile::setTimer(int time, Color color)
+{
+    if (time > 60000) {
+        g_logger.warning("Max tile timer value is 300000 (300s)!");
+        return;
+    }
+    m_timer = time + g_clock.millis();
+    if (!m_timerText) {
+        m_timerText = std::make_shared<StaticText>();
+        g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
+            g_ui.getMapWidget()->addTile(tile);
+        }, g_game.getServerBeat());
+    }
+
+    m_timerText->setColor(color);
+}
+
+int Tile::getTimer()
+{
+    return m_timerText ? std::max<int>(0, m_timer - g_clock.millis()) : 0;
+}
+
+void Tile::setFill(Color color)
+{
+    m_fill = color;
+}
+
+bool Tile::canShoot(int distance)
+{
+    auto player = g_game.getLocalPlayer();
+    if (!player) return false;
+    auto playerPos = player->getPosition();
+    if (distance > 0 && std::max<int>(std::abs(m_position.x - playerPos.x), std::abs(m_position.y - playerPos.y)) > distance)
+        return false;
+    return g_map.isSightClear(playerPos, m_position);
+}
+#endif

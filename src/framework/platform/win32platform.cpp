@@ -22,10 +22,12 @@
 
 #ifdef WIN32
 
-#include "platform.h"
 
-#include <tchar.h>
+#include "platform.h"
 #include <framework/stdext/stdext.h>
+#include <framework/core/eventdispatcher.h>
+#include <tchar.h>
+
 #ifdef NDEBUG
 #include <shellapi.h>
 #endif
@@ -152,11 +154,31 @@ ticks_t Platform::getFileModificationTime(std::string file)
     return uli.QuadPart;
 }
 
-void Platform::openUrl(std::string url)
+void Platform::openUrl(std::string url, bool now)
 {
     if (url.find("http://") == std::string::npos && url.find("https://") == std::string::npos)
         url.insert(0, "http://");
-    ShellExecuteW(nullptr, L"open", stdext::utf8_to_utf16(url).data(), nullptr, nullptr, SW_SHOWNORMAL);
+
+    const auto& action = [url] {
+        ShellExecuteW(nullptr, L"open", stdext::utf8_to_utf16(url).data(), nullptr, nullptr, SW_SHOWNORMAL);
+    };
+
+    if (now) {
+        action();
+    } else {
+        g_dispatcher.scheduleEvent(action, 50);
+    }
+}
+
+void Platform::openDir(std::string path, bool now)
+{
+    if (now) {
+        ShellExecuteW(NULL, L"open", L"explorer.exe", stdext::utf8_to_utf16(path).c_str(), NULL, SW_SHOWNORMAL);
+    } else {
+        g_dispatcher.scheduleEvent([path] {
+            ShellExecuteW(NULL, L"open", L"explorer.exe", stdext::utf8_to_utf16(path).c_str(), NULL, SW_SHOWNORMAL);
+        }, 50);
+    }
 }
 
 std::string Platform::getCPUName()

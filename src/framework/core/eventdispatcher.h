@@ -50,3 +50,4 @@ private:
 
 extern EventDispatcher g_dispatcher, g_textDispatcher, g_mainDispatcher;
 extern std::thread::id g_mainThreadId;
+extern std::thread::id g_eventThreadId;

@@ -14,35 +14,36 @@
     </PREPROCESSOR_DEFS>
 
     <OTCLIENT_LIBDEPS>
-      advapi32.lib;
-	  crypt32.lib;
-	  dbghelp.lib;
-	  gdi32.lib;
-	  discord-rpc.lib;
-	  glew32.lib;
-	  kernel32.lib;
-	  ole32.lib;
-	  physfs-static.lib;
-	  shell32.lib;
-	  user32.lib;
-	  winmm.lib;
-	  libcrypto.lib;
-	  libprotobuf.lib;
-	  libssl.lib;
-	  lua51.lib;
-	  lzma.lib;
-	  ogg.lib;
-	  openal32.lib;
-	  opengl32.lib;
-	  vorbis.lib;
-	  vorbisfile.lib;
-    pugixml.lib;
-	  zlib.lib;
+        advapi32.lib;
+        crypt32.lib;
+        dbghelp.lib;
+        gdi32.lib;
+        discord-rpc.lib;
+        glew32.lib;
+        kernel32.lib;
+        ole32.lib;
+        physfs-static.lib;
+        shell32.lib;
+        user32.lib;
+        winmm.lib;
+        libcrypto.lib;
+        libprotobuf.lib;
+        libssl.lib;
+        lua51.lib;
+        lzma.lib;
+        ogg.lib;
+        openal32.lib;
+        opengl32.lib;
+        vorbis.lib;
+        vorbisfile.lib;
+        pugixml.lib;
+        zip.lib;
+        zlib.lib;
     </OTCLIENT_LIBDEPS>
 
     <OTCLIENT_LIBDEPS_D>
         advapi32.lib;
-		discord-rpc.lib;
+        discord-rpc.lib;
         dbghelp.lib;
         gdi32.lib;
         glew32d.lib;
@@ -62,8 +63,9 @@
         winmm.lib;
         pugixml.lib;
         zlibd.lib;
+        zip.lib;
         openal32.lib;
-	</OTCLIENT_LIBDEPS_D>
+    </OTCLIENT_LIBDEPS_D>
   </PropertyGroup>
   <PropertyGroup>
     <LinkIncremental>false</LinkIncremental>

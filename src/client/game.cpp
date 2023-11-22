@@ -797,6 +797,8 @@ void Game::use(const ThingPtr& thing)
     // some items, e.g. parcel, are not set as containers but they are.
     // always try to use these items in free container slots.
     m_protocolGame->sendUseItem(pos, thing->getId(), thing->getStackPos(), findEmptyContainerId());
+
+    g_lua.callGlobalField("g_game", "onUse", pos, thing->getId(), thing->getStackPos(), 0);
 }
 
 void Game::useInventoryItem(int itemId)
@@ -806,6 +808,8 @@ void Game::useInventoryItem(int itemId)
 
     const auto& pos = Position(0xFFFF, 0, 0); // means that is a item in inventory
     m_protocolGame->sendUseItem(pos, itemId, 0, 0);
+
+    g_lua.callGlobalField("g_game", "onUse", pos, itemId, 0, 0);
 }
 
 void Game::useWith(const ItemPtr& item, const ThingPtr& toThing)
@@ -821,6 +825,8 @@ void Game::useWith(const ItemPtr& item, const ThingPtr& toThing)
         m_protocolGame->sendUseOnCreature(pos, item->getId(), item->getStackPos(), toThing->getId());
     else
         m_protocolGame->sendUseItemWith(pos, item->getId(), item->getStackPos(), toThing->getPosition(), toThing->getId(), toThing->getStackPos());
+
+    g_lua.callGlobalField("g_game", "onUseWith", pos, item->getId(), toThing, item->getStackPos());
 }
 
 void Game::useInventoryItemWith(int itemId, const ThingPtr& toThing)
@@ -833,6 +839,8 @@ void Game::useInventoryItemWith(int itemId, const ThingPtr& toThing)
         m_protocolGame->sendUseOnCreature(pos, itemId, 0, toThing->getId());
     else
         m_protocolGame->sendUseItemWith(pos, itemId, 0, toThing->getPosition(), toThing->getId(), toThing->getStackPos());
+
+    g_lua.callGlobalField("g_game", "onUseWith", pos, itemId, toThing, 0);
 }
 
 ItemPtr Game::findItemInContainers(uint32_t itemId, int subType)

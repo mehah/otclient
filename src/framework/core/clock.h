@@ -33,6 +33,8 @@ public:
     ticks_t micros() { return m_currentMicros; }
     ticks_t millis() { return m_currentMillis; }
     float seconds() { return m_currentSeconds; }
+    ticks_t realMicros();
+    ticks_t realMillis();
 
 private:
     std::atomic<ticks_t> m_currentMicros{ 0 };

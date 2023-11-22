@@ -39,7 +39,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
     } else {
         pool->m_alwaysGroupDrawings = true; // CREATURE_INFORMATION & TEXT
 
-        if (type == DrawPoolType::TEXT) {
+        if (type == DrawPoolType::TEXT || type == DrawPoolType::FOREGROUND_TILE) {
             pool->setFPS(FPS60);
         }
     }

@@ -1,0 +1,151 @@
+PlayerLabel < UIWidget
+  background-color: alpha
+  text-offset: 3 1
+  focusable: true
+  height: 16
+  font: verdana-11px-rounded
+  text-align: left
+
+  $focus:
+    background-color: #00000055
+
+  Button
+    id: remove
+    !text: tr('X')
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    width: 14
+    height: 14
+    margin-right: 15
+    text-align: center
+    text-offset: 0 1
+    tooltip: Remove profile from the list.
+
+SettingCheckBox < CheckBox
+  text-wrap: true
+  text-auto-resize: true
+  margin-top: 3
+  font: verdana-11px-rounded
+
+Settings < FlatPanel
+  padding: 6
+  layout:
+    type: verticalBox
+
+  Label
+    text: Additional Settings
+    text-align: center
+    font: verdana-11px-rounded
+
+  HorizontalSeparator
+
+  SettingCheckBox
+    id: Members
+    margin-top: 6
+    text: Consider group members as friends.
+
+  SettingCheckBox
+    id: Outfit
+    text: Color listed player outfits to red or blue.
+
+  SettingCheckBox
+    id: NeutralsAreEnemy
+    text: Consider every non friend player as enemy.
+
+  SettingCheckBox
+    id: Highlight
+    text: Hightlight listed players in red or blue color.
+
+  SettingCheckBox
+    id: AutoAdd
+    text: Automatically add killed players while cave botting to blacklist.
+
+tPanel < Panel
+  margin: 3
+  padding: 3
+
+  TextList
+    id: list
+    height: 200
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    vertical-scrollbar: listScrollBar
+
+  VerticalScrollBar
+    id: listScrollBar
+    anchors.top: list.top
+    anchors.bottom: list.bottom
+    anchors.right: list.right
+    step: 14
+    pixels-scroll: true
+
+  TextEdit
+    id: name
+    anchors.top: list.bottom
+    margin-top: 3
+    anchors.left: parent.left
+    anchors.right: parent.right
+
+  Button
+    id: add
+    text: Add Player
+    anchors.top: prev.bottom
+    margin-top: 3
+    anchors.left: parent.left
+    anchors.right: parent.right
+    font: verdana-11px-rounded
+
+PlayerListWindow < MainWindow
+  !text: tr('Player List')
+  size: 405 356
+  @onEscape: self:hide()
+
+  TabBar
+    id: tmpTabBar
+    anchors.top: parent.top
+    anchors.left: parent.left
+    width: 180
+
+  FlatPanel
+    id: tmpTabContent
+    anchors.top: tmpTabBar.bottom
+    anchors.left: parent.left
+    width: 180
+    anchors.bottom: separator.top
+    margin-bottom: 5
+
+  VerticalSeparator
+    id: verticalSep
+    anchors.top: parent.top
+    anchors.bottom: separator.top
+    margin-bottom: 5
+    anchors.horizontalCenter: parent.horizontalCenter
+
+  Settings
+    id: settings
+    anchors.left: prev.right
+    anchors.top: parent.top
+    anchors.right: parent.right
+    anchors.bottom: next.top
+    margin: 3
+    margin-left: 6
+    margin-bottom: 4
+
+  HorizontalSeparator
+    id: separator
+    anchors.right: parent.right
+    anchors.left: parent.left
+    anchors.bottom: closeButton.top
+    margin-bottom: 8
+
+  Button
+    id: closeButton
+    !text: tr('Close')
+    font: cipsoftFont
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    size: 45 21
+    margin-top: 15
+    margin-right: 5
+    @onClick: self:getParent():hide()

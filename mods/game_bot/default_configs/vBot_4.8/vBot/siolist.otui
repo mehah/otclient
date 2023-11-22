@@ -1,0 +1,192 @@
+VocationPanel < Panel
+  padding: 3
+  image-source: /images/ui/panel_flat
+  image-border: 6
+  size: 190 55
+
+  Label
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    text-align: center
+    text: for BotServer, Heal only:
+
+  BotSwitch
+    id: ED
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.horizontalCenter
+    text: Druids
+
+  BotSwitch
+    id: MS
+    anchors.bottom: parent.bottom
+    anchors.left: parent.horizontalCenter
+    anchors.right: parent.right
+    text: Sorcerers
+
+  BotSwitch
+    id: EK
+    anchors.bottom: ED.top
+    anchors.left: parent.left
+    anchors.right: parent.horizontalCenter
+    text: Knights
+
+  BotSwitch
+    id: RP
+    anchors.bottom: ED.top
+    anchors.left: parent.horizontalCenter
+    anchors.right: parent.right
+    text: Paladins
+
+
+
+SioListWindow < MainWindow
+  !text: tr('Healer Options')
+  size: 220 360
+  @onEscape: self:hide()
+
+  BotSwitch
+    id: exuraSio
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.horizontalCenter
+    text: Exura Sio
+    margin-right: 2
+
+  BotSwitch
+    id: exuraGranSio
+    anchors.top: parent.top
+    anchors.left: prev.right
+    anchors.right: parent.right
+    text: Exura Gran Sio
+    margin-left: 2
+
+  BotSwitch
+    id: exuraMasRes
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    text: Exura Gran Mas Res
+    margin-top: 3
+
+  BotSwitch
+    id: spell
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    text: Custom Spell
+    margin-top: 3
+    text-align: center
+
+  BotTextEdit
+    id: spellName
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 3
+
+  HorizontalSeparator
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 10
+
+  BotItem
+    id: itemId
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    margin-top: 10
+
+  BotSwitch
+    id: item
+    anchors.top: prev.top
+    anchors.left: prev.right
+    anchors.right: parent.right
+    anchors.bottom: prev.verticalCenter
+    text-align: center
+    text: Item Healing  
+    margin-left: 2
+
+  BotLabel
+    id: distText
+    anchors.top: itemId.verticalCenter
+    anchors.left: itemId.right
+    anchors.right: parent.right
+    anchors.bottom: itemId.bottom
+    text-align: center
+    text: Max Distance
+
+  HorizontalScrollBar
+    id: Distance
+    anchors.left: parent.left
+    anchors.top: itemId.bottom
+    anchors.right: parent.right
+    margin-top: 3
+    minimum: 1
+    maximum: 10
+    step: 1  
+
+  HorizontalSeparator
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 8
+
+  BotLabel
+    id: manaInfo
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    text-align: center
+    margin-top: 5
+
+  HorizontalScrollBar
+    id: minMana
+    anchors.left: spellName.left
+    anchors.right: spellName.right
+    anchors.top: manaInfo.bottom
+    margin-top: 2
+    minimum: 1
+    maximum: 100
+    step: 1
+
+  BotLabel
+    id: friendHp
+    anchors.left: spellName.left
+    anchors.right: spellName.right
+    anchors.top: prev.bottom
+    text-align: center
+    margin-top: 5
+
+  HorizontalScrollBar
+    id: minFriendHp
+    anchors.left: spellName.left
+    anchors.right: spellName.right
+    anchors.top: friendHp.bottom
+    margin-top: 2
+    minimum: 1
+    maximum: 100
+    step: 1  
+
+  VocationPanel
+    id: vocation
+    anchors.top: prev.bottom 
+    margin-top: 6
+
+  HorizontalSeparator
+    id: separator
+    anchors.right: parent.right
+    anchors.left: parent.left
+    anchors.bottom: closeButton.top
+    margin-bottom: 8    
+
+  Button
+    id: closeButton
+    !text: tr('Close')
+    font: cipsoftFont
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    size: 45 21
+    margin-top: 15
+    margin-right: 5    

@@ -1,0 +1,164 @@
+TargetBotCreatureEditorScrollBar < Panel
+  height: 28
+  margin-top: 3
+
+  Label
+    id: text
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    text-align: center
+    
+  HorizontalScrollBar
+    id: scroll
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 3
+    minimum: 0
+    maximum: 10
+    step: 1
+
+TargetBotCreatureEditorTextEdit < Panel
+  height: 40
+  margin-top: 7
+
+  Label
+    id: text
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    text-align: center
+    
+  TextEdit
+    id: textEdit
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 5
+    minimum: 0
+    maximum: 10
+    step: 1
+
+TargetBotCreatureEditorItem < Panel
+  height: 34
+  margin-top: 7
+  margin-left: 25
+  margin-right: 25
+
+  Label
+    id: text
+    anchors.left: parent.left
+    anchors.verticalCenter: next.verticalCenter
+
+  BotItem
+    id: item
+    anchors.top: parent.top
+    anchors.right: parent.right
+
+
+TargetBotCreatureEditorCheckBox < BotSwitch
+  height: 20
+  margin-top: 7
+
+TargetBotCreatureEditorWindow < MainWindow
+  text: TargetBot creature editor
+  width: 500
+  height: 425
+  
+  $mobile:
+    height: 300
+
+  Label
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    text-align: center
+    !text: tr('You can use * (any characters) and ? (any character) in target name')
+
+  Label
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    text-align: center
+    !text: tr('You can also enter multiple targets, separate them by ,')
+  
+  TextEdit
+    id: name
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-left: 90
+    margin-top: 5
+
+  Label
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: parent.left
+    text: Target name:
+
+  VerticalScrollBar
+    id: contentScroll
+    anchors.top: name.bottom
+    anchors.right: parent.right
+    anchors.bottom: help.top
+    step: 28
+    pixels-scroll: true
+    margin-right: -10
+    margin-top: 5
+    margin-bottom: 5
+
+  ScrollablePanel
+    id: content
+    anchors.top: name.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: help.top
+    vertical-scrollbar: contentScroll
+    margin-bottom: 10
+      
+    Panel
+      id: left
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.horizontalCenter
+      margin-top: 5
+      margin-left: 10
+      margin-right: 10
+      layout:
+        type: verticalBox
+        fit-children: true
+
+    Panel
+      id: right
+      anchors.top: parent.top
+      anchors.left: parent.horizontalCenter
+      anchors.right: parent.right
+      margin-top: 5
+      margin-left: 10
+      margin-right: 10
+      layout:
+        type: verticalBox
+        fit-children: true
+  
+  Button
+    id: help
+    !text: tr('Help & Tutorials')
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    width: 150
+    @onClick: g_platform.openUrl("http://bot.otclient.ovh/")
+
+  Button
+    id: ok
+    !text: tr('Ok')
+    anchors.bottom: parent.bottom
+    anchors.right: next.left
+    margin-right: 10
+    width: 60
+
+  Button
+    id: cancel
+    !text: tr('Cancel')
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    width: 60

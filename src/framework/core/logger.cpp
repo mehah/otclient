@@ -48,8 +48,6 @@ namespace
 
 void Logger::log(Fw::LogLevel level, const std::string_view message)
 {
-    std::scoped_lock lock(m_mutex);
-
 #ifdef NDEBUG
     if (level == Fw::LogDebug || level == Fw::LogFine)
         return;
@@ -61,11 +59,20 @@ void Logger::log(Fw::LogLevel level, const std::string_view message)
     if (s_ignoreLogs)
         return;
 
+    if (g_eventThreadId != std::this_thread::get_id()) {
+        g_dispatcher.addEvent([this, level, msg = std::string{ message }] {
+            log(level, msg);
+        });
+        return;
+    }
+
     std::string outmsg{ std::string{s_logPrefixes[level]} + message.data() };
 
 #ifdef ANDROID
     __android_log_print(ANDROID_LOG_INFO, "OTClientMobile", "%s", outmsg.c_str());
 #endif // ANDROID
+
+    std::scoped_lock lock(m_mutex);
 
     std::cout << outmsg << std::endl;
 

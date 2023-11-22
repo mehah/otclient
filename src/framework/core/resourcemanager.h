@@ -90,6 +90,8 @@ public:
     void updateFiles(const std::set<std::string>& files);
     void updateExecutable(std::string fileName);
     bool launchCorrect(std::vector<std::string>& args);
+    std::string createArchive(const stdext::map<std::string, std::string>& files);
+    stdext::map<std::string, std::string> decompressArchive(std::string dataOrPath);
 
     std::string getBinaryPath() { return m_binaryPath.string(); }
 

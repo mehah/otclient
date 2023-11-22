@@ -65,6 +65,11 @@ local function loadModules()
 
     -- mods 1000-9999
     g_modules.autoLoadModules(9999)
+    g_modules.ensureModuleLoaded('client_mods')
+
+    if not g_game.isEnabledBotProtection() then
+        g_modules.ensureModuleLoaded('game_bot')
+    end
 
     local script = '/' .. g_app.getCompactName() .. 'rc.lua'
 

@@ -182,7 +182,7 @@ public:
     }
 
     bool isMarked() { return m_markedColor != Color::white; }
-    void setMarkColor(const Color& color) { if (m_markedColor != color) m_markedColor = color; }
+    void setMarked(const Color& color) { if (m_markedColor != color) m_markedColor = color; }
 
     bool isHided() { return isOwnerHidden(); }
     void onStartAttachEffect(const AttachedEffectPtr& effect) override;
@@ -215,6 +215,10 @@ protected:
     std::function<void()> m_shaderAction{ nullptr };
 
 private:
+    void lua_setMarked(std::string_view color) { setMarked(Color(color)); }
+
     bool m_canDraw{ true };
+
+    friend class Client;
 };
 #pragma pack(pop)

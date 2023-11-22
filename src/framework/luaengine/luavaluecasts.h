@@ -205,6 +205,10 @@ int push_luavalue(const stdext::map<K, V, H>& map);
 template<class K, class V, class H>
 bool luavalue_cast(int index, stdext::map<K, V, H>& map);
 
+// pair
+template<class K, class V>
+bool luavalue_cast(int index, std::pair<K, V>& pair);
+
 // tuple
 template<typename... Args>
 int push_luavalue(const std::tuple<Args...>& tuple);
@@ -478,6 +482,33 @@ bool luavalue_cast(int index, stdext::map<K, V, H>& map)
                 map[key] = value;
             g_lua.pop();
         }
+        return true;
+    }
+    return false;
+}
+
+template<class K, class V>
+bool luavalue_cast(int index, std::pair<K, V>& pair)
+{
+    if (g_lua.isTable(index)) {
+        g_lua.pushNil();
+        if (g_lua.next(index < 0 ? index - 1 : index)) {
+            K value;
+            if (!luavalue_cast(-1, value))
+                pair.first = value;
+            g_lua.pop();
+        } else {
+            return false;
+        }
+        if (g_lua.next(index < 0 ? index - 1 : index)) {
+            V value;
+            if (!luavalue_cast(-1, value))
+                pair.second = value;
+            g_lua.pop();
+        } else {
+            return false;
+        }
+
         return true;
     }
     return false;

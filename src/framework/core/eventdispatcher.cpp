@@ -27,6 +27,7 @@
 
 EventDispatcher g_dispatcher, g_textDispatcher, g_mainDispatcher;
 std::thread::id g_mainThreadId = std::this_thread::get_id();
+std::thread::id g_eventThreadId;
 
 void EventDispatcher::shutdown()
 {

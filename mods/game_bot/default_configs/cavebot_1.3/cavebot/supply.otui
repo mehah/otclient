@@ -1,0 +1,72 @@
+SupplyItem < Panel
+  height: 34
+  
+  BotItem
+    id: item
+    size: 32 32    
+    anchors.left: parent.left
+    anchors.top: parent.top
+    margin-top: 1
+  
+  Panel
+    id: fields
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: prev.right
+    anchors.right: parent.right
+    margin-left: 2
+    margin-right: 2
+    
+    Label
+      id: minLabel
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.horizontalCenter
+      margin-right: 2
+      text-align: center
+      text: "Min"
+
+    Label
+      id: maxLabel
+      anchors.top: parent.top
+      anchors.left: parent.horizontalCenter
+      anchors.right: parent.right
+      margin-left: 2
+      text-align: center
+      text: "Max"
+
+    BotTextEdit
+      id: min
+      anchors.top: minLabel.bottom
+      anchors.left: minLabel.left
+      anchors.right: minLabel.right
+      text-align: center
+      text: 1
+
+    BotTextEdit
+      id: max
+      anchors.top: maxLabel.bottom
+      anchors.left: maxLabel.left
+      anchors.right: maxLabel.right
+      text-align: center
+      text: 100
+
+SupplyItemList < Panel
+  height: 102
+
+  ScrollablePanel
+    id: list
+    anchors.fill: parent
+    vertical-scrollbar: scroll
+    margin-right: 7
+    layout:
+      type: verticalBox
+      cell-height: 34
+
+  BotSmallScrollBar
+    id: scroll
+    anchors.top: prev.top
+    anchors.bottom: prev.bottom
+    anchors.right: parent.right
+    step: 10
+    pixels-scroll: true

@@ -1,0 +1,19 @@
+BotContainer < Panel
+  height: 68
+  
+  ScrollablePanel
+    id: items
+    anchors.fill: parent
+    vertical-scrollbar: scroll
+    layout:
+      type: grid
+      cell-size: 34 34
+      flow: true
+
+  BotSmallScrollBar
+    id: scroll
+    anchors.top: prev.top
+    anchors.bottom: prev.bottom
+    anchors.right: parent.right
+    step: 10
+    pixels-scroll: true

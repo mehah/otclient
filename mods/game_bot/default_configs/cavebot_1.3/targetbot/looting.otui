@@ -1,0 +1,83 @@
+TargetBotLootingPanel < Panel
+  layout:
+    type: verticalBox
+    fit-children: true
+
+  HorizontalSeparator
+    margin-top: 5
+
+  Label
+    margin-top: 5
+    text: Items to loot
+    text-align: center    
+
+  BotContainer
+    id: items
+    margin-top: 3
+  
+  BotSwitch
+    id: everyItem
+    !text: tr("Loot every item")
+    margin-top: 2
+
+  Label
+    margin-top: 5
+    text: Containers for loot
+    text-align: center
+
+  BotContainer
+    id: containers
+    margin-top: 3
+    height: 45
+  
+  Panel
+    id: maxDangerPanel
+    height: 20
+    margin-top: 5
+    
+    BotTextEdit
+      id: value
+      anchors.right: parent.right
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      margin-right: 6
+      width: 80
+
+    Label
+      anchors.left: parent.left
+      anchors.verticalCenter: prev.verticalCenter
+      text: Max. danger:
+      margin-left: 5
+
+  Panel
+    id: minCapacityPanel
+    height: 20
+    margin-top: 3
+    
+    BotTextEdit
+      id: value
+      anchors.right: parent.right
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      margin-right: 6
+      width: 80
+
+    Label
+      anchors.left: parent.left
+      anchors.verticalCenter: prev.verticalCenter
+      text: Min. capacity:
+      margin-left: 5
+
+  Label
+    margin-top: 3
+    margin-left: 20
+    margin-right: 20
+    !text: tr("Drag item or click on any of empty slot")
+    text-align: center
+    text-wrap: true
+    text-auto-resize: true
+
+  BotButton
+    margin-top: 3
+    text: Help & Tutorials
+    @onClick: g_platform.openUrl("http://bot.otclient.ovh/")

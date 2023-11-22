@@ -108,6 +108,7 @@ using ProtocolLoginPtr = std::shared_ptr<ProtocolLogin>;
 // ui
 class UIItem;
 class UICreature;
+class UIGraph;
 class UIMap;
 class UIMinimap;
 class UIProgressRect;
@@ -117,6 +118,7 @@ class UISprite;
 
 using UIItemPtr = std::shared_ptr<UIItem>;
 using UICreaturePtr = std::shared_ptr<UICreature>;
+using UIGraphPtr = std::shared_ptr<UIGraph>;
 using UISpritePtr = std::shared_ptr<UISprite>;
 using UIMapPtr = std::shared_ptr<UIMap>;
 using UIMinimapPtr = std::shared_ptr<UIMinimap>;

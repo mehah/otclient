@@ -30,7 +30,7 @@ void UICreature::drawSelf(DrawPoolType drawPane)
     UIWidget::drawSelf(drawPane);
 
     if (m_creature) {
-        m_creature->setMarkColor(m_imageColor);
+        m_creature->setMarked(m_imageColor);
         m_creature->draw(getPaddingRect(), m_creatureSize);
     }
 }

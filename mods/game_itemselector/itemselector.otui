@@ -1,0 +1,72 @@
+ItemSelectorWindow < MainWindow
+  id: itemSelector
+  size: 260 120
+  !text: tr("Select item")
+    
+  Item
+    id: item
+    virtual: true
+    size: 32 32
+    margin-top: 10
+    anchors.top: parent.top
+    anchors.left: parent.left
+
+  SpinBox
+    id: itemId
+    anchors.top: parent.top
+    anchors.left: prev.right
+    margin-top: 15
+    margin-left: 5
+    padding-left: 5
+    width: 70
+    minimum: 0
+    maximum: 999999
+    focusable: true
+
+  Label
+    anchors.top: parent.top
+    anchors.left: prev.left
+    anchors.right: prev.right
+    text-align: center
+    !text: tr("Item ID")
+
+  SpinBox
+    id: itemCount
+    anchors.top: parent.top
+    anchors.left: prev.right
+    margin-top: 15
+    margin-left: 5
+    padding-left: 5
+    width: 120
+    minimum: 1
+    maximum: 100
+    focusable: true
+
+  Label
+    anchors.top: parent.top
+    anchors.left: prev.left
+    anchors.right: prev.right
+    text-align: center
+    !text: tr("Count / SubType")
+
+  Button
+    id: clearButton
+    !text: tr('Clear')
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    width: 60
+  
+  Button
+    id: okButton
+    !text: tr('Ok')
+    anchors.bottom: parent.bottom
+    anchors.right: next.left
+    margin-right: 10
+    width: 60
+
+  Button
+    id: cancelButton
+    !text: tr('Cancel')
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    width: 60

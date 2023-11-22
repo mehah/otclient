@@ -2,6 +2,10 @@ local otmm = true
 local oldPos = nil
 local minimapButton = nil
 
+-- bot fix
+minimapWidget = nil
+
+
 local function updateCameraPosition()
     local player = g_game.getLocalPlayer()
     if not player then
@@ -69,7 +73,7 @@ function controller:onInit()
         '/images/topbuttons/minimap', toggle)
     minimapButton:setOn(true)
 
-    local minimapWidget = self.ui.contentsPanel.minimap
+    minimapWidget = self.ui.contentsPanel.minimap
 
     local gameRootPanel = modules.game_interface.getRootPanel()
     self:bindKeyPress('Alt+Left', function()

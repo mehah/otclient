@@ -126,6 +126,10 @@ public:
     PointF getJumpOffset() { return m_jumpOffset; }
     Position getLastStepFromPosition() const { return m_lastStepFromPosition; }
     Position getLastStepToPosition() const { return m_lastStepToPosition; }
+    bool isTimedSquareVisible() { return m_showTimedSquare; }
+    Color getTimedSquareColor() { return m_timedSquareColor; }
+    bool isStaticSquareVisible() { return m_showStaticSquare; }
+    Color getStaticSquareColor() { return m_staticSquareColor; }
 
     ticks_t getWalkTicksElapsed() { return m_walkTimer.ticksElapsed(); }
 
@@ -145,6 +149,13 @@ public:
             else --m_disableWalkAnimation;
         }
     }
+
+#ifndef BOT_PROTECTION
+    void setText(const std::string& text, const Color& color);
+    std::string getText();
+    void clearText() { setText("", Color::white); }
+    bool canShoot(int distance);
+#endif
 
 protected:
     virtual void updateWalkOffset(uint8_t totalPixelsWalked);
@@ -259,6 +270,10 @@ private:
     std::function<void()> m_mountShaderAction{ nullptr };
 
     ThingType* m_mountType{ nullptr };
+
+#ifndef BOT_PROTECTION
+    StaticTextPtr m_text;
+#endif
 };
 
 // @bindclass

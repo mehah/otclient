@@ -46,10 +46,11 @@ public:
     void setText(const std::string_view text) { m_cachedText.setText(text); }
     void setOffset(const Point& offset) { m_offset = offset; }
 
-    Color getColor() const { return m_color; }
+    Color getColor() { return m_color; }
     const CachedText& getCachedText() const { return m_cachedText; }
     Point getOffset() { return m_offset; }
     Timer getTimer() const { return m_animationTimer; }
+    std::string getText() { return m_cachedText.getText(); }
 
     bool merge(const AnimatedTextPtr& other);
     Position getPosition() const { return m_position; }

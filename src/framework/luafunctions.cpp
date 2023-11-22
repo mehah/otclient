@@ -56,6 +56,8 @@
 #include <framework/net/server.h>
 #endif
 
+#include <regex>
+
 void Application::registerLuaFunctions()
 {
     // conversion globals
@@ -71,6 +73,26 @@ void Application::registerLuaFunctions()
     g_lua.bindGlobalFunction("stringtoip", [](const std::string_view v) { return stdext::string_to_ip(v); });
     g_lua.bindGlobalFunction("listSubnetAddresses", [](uint32_t a, uint8_t b) { return stdext::listSubnetAddresses(a, b); });
     g_lua.bindGlobalFunction("ucwords", [](std::string s) { return stdext::ucwords(s); });
+    g_lua.bindGlobalFunction("regexMatch", [](std::string s, const std::string& exp) {
+        int limit = 10000;
+        std::vector<std::vector<std::string>> ret;
+        if (s.empty() || exp.empty())
+            return ret;
+        try {
+            std::smatch m;
+            std::regex e(exp, std::regex::ECMAScript);
+            while (std::regex_search(s, m, e)) {
+                ret.push_back(std::vector<std::string>());
+                for (auto x : m)
+                    ret[ret.size() - 1].push_back(x);
+                s = m.suffix().str();
+                if (--limit == 0)
+                    return ret;
+            }
+        } catch (...) {
+        }
+        return ret;
+    });
 
     // Platform
     g_lua.registerSingletonClass("g_platform");
@@ -93,6 +115,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_platform", "isDesktop", &Platform::isDesktop, &g_platform);
     g_lua.bindSingletonFunction("g_platform", "isMobile", &Platform::isMobile, &g_platform);
     g_lua.bindSingletonFunction("g_platform", "isConsole", &Platform::isConsole, &g_platform);
+    g_lua.bindSingletonFunction("g_platform", "openDir", &Platform::openDir, &g_platform);
 
     // Application
     g_lua.registerSingletonClass("g_app");
@@ -131,6 +154,8 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_clock", "micros", &Clock::micros, &g_clock);
     g_lua.bindSingletonFunction("g_clock", "millis", &Clock::millis, &g_clock);
     g_lua.bindSingletonFunction("g_clock", "seconds", &Clock::seconds, &g_clock);
+    g_lua.bindSingletonFunction("g_clock", "realMillis", &Clock::realMillis, &g_clock);
+    g_lua.bindSingletonFunction("g_clock", "realMicros", &Clock::realMicros, &g_clock);
 
     // ConfigManager
     g_lua.registerSingletonClass("g_configs");
@@ -216,6 +241,8 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_resources", "selfChecksum", &ResourceManager::selfChecksum, &g_resources);
     g_lua.bindSingletonFunction("g_resources", "updateFiles", &ResourceManager::updateFiles, &g_resources);
     g_lua.bindSingletonFunction("g_resources", "updateExecutable", &ResourceManager::updateExecutable, &g_resources);
+    g_lua.bindSingletonFunction("g_resources", "createArchive", &ResourceManager::createArchive, &g_resources);
+    g_lua.bindSingletonFunction("g_resources", "decompressArchive", &ResourceManager::decompressArchive, &g_resources);
 
     // Config
     g_lua.registerClass<Config>();
@@ -228,6 +255,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Config>("remove", &Config::remove);
     g_lua.bindClassMemberFunction<Config>("setNode", &Config::setNode);
     g_lua.bindClassMemberFunction<Config>("getNode", &Config::getNode);
+    g_lua.bindClassMemberFunction<Config>("getNodeSize", &Config::getNodeSize);
     g_lua.bindClassMemberFunction<Config>("mergeNode", &Config::mergeNode);
     g_lua.bindClassMemberFunction<Config>("getFileName", &Config::getFileName);
 
@@ -360,6 +388,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_ui", "getStyle", &UIManager::getStyle, &g_ui);
     g_lua.bindSingletonFunction("g_ui", "getStyleClass", &UIManager::getStyleClass, &g_ui);
     g_lua.bindSingletonFunction("g_ui", "loadUI", &UIManager::loadUI, &g_ui);
+    g_lua.bindSingletonFunction("g_ui", "loadUIFromString", &UIManager::loadUIFromString, &g_ui);
     g_lua.bindSingletonFunction("g_ui", "displayUI", &UIManager::displayUI, &g_ui);
     g_lua.bindSingletonFunction("g_ui", "createWidget", &UIManager::createWidget, &g_ui);
     g_lua.bindSingletonFunction("g_ui", "createWidgetFromOTML", &UIManager::createWidgetFromOTML, &g_ui);
@@ -394,6 +423,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("lowerChild", &UIWidget::lowerChild);
     g_lua.bindClassMemberFunction<UIWidget>("raiseChild", &UIWidget::raiseChild);
     g_lua.bindClassMemberFunction<UIWidget>("moveChildToIndex", &UIWidget::moveChildToIndex);
+    g_lua.bindClassMemberFunction<UIWidget>("reorderChildren", &UIWidget::reorderChildren);
     g_lua.bindClassMemberFunction<UIWidget>("lockChild", &UIWidget::lockChild);
     g_lua.bindClassMemberFunction<UIWidget>("unlockChild", &UIWidget::unlockChild);
     g_lua.bindClassMemberFunction<UIWidget>("mergeStyle", &UIWidget::mergeStyle);

@@ -70,7 +70,8 @@ public:
     bool fileExists(std::string file);
     bool removeFile(std::string file);
     ticks_t getFileModificationTime(std::string file);
-    void openUrl(std::string url);
+    void openUrl(std::string url, bool now = false);
+    void openDir(std::string path, bool now = false);
     std::string getCPUName();
     double getTotalSystemMemory();
     std::string getOSName();

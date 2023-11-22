@@ -722,3 +722,11 @@ bool ResourceManager::launchCorrect(std::vector<std::string>& args) { // curentl
     return true;
 #endif
 }
+
+std::string ResourceManager::createArchive(const stdext::map<std::string, std::string>& files)  { return ""; }
+
+stdext::map<std::string, std::string> ResourceManager::decompressArchive(std::string dataOrPath)
+{
+    stdext::map<std::string, std::string> ret;
+    return ret;
+}

@@ -135,6 +135,7 @@ void GraphicalApplication::run()
     g_lua.callGlobalField("g_app", "onRun");
 
     const auto& foreground = g_drawPool.get(DrawPoolType::FOREGROUND);
+    const auto& foreground_tile = g_drawPool.get(DrawPoolType::FOREGROUND_TILE);
     const auto& txt = g_drawPool.get(DrawPoolType::TEXT);
     const auto& map = g_drawPool.get(DrawPoolType::MAP);
 
@@ -142,6 +143,7 @@ void GraphicalApplication::run()
 
     // clang c++20 dont support jthread
     std::thread t1([&]() {
+        g_eventThreadId = std::this_thread::get_id();
         while (!m_stopping) {
             poll();
 
@@ -162,7 +164,7 @@ void GraphicalApplication::run()
                 if (!g_ui.m_mapWidget)
                     g_ui.m_mapWidget = g_ui.getRootWidget()->recursiveGetChildById("gameMapPanel")->static_self_cast<UIMap>();
 
-                if (txt->canRepaint())
+                if (txt->canRepaint() || foreground_tile->canRepaint())
                     txtCondition.notify_one();
 
                 {
@@ -191,9 +193,10 @@ void GraphicalApplication::run()
         txtCondition.wait(lock, [&]() -> bool {
             g_textDispatcher.poll();
 
-            txt->setEnable(canDrawTexts());
-            if (g_ui.m_mapWidget && txt->isEnabled())
+            if (g_ui.m_mapWidget) {
                 g_ui.m_mapWidget->drawSelf(DrawPoolType::TEXT);
+                g_ui.m_mapWidget->drawSelf(DrawPoolType::FOREGROUND_TILE);
+            }
 
             return m_stopping;
         });
