@@ -84,8 +84,8 @@ void DrawPoolManager::drawPool(const DrawPoolType type) {
         return;
 
     if (pool->isStatus(DrawPool::DrawStatus::CAN_REPAINT)) {
-        pool->m_drawStatus.store(DrawPool::DrawStatus::DRAWING);
         std::scoped_lock l(pool->m_mutex);
+        pool->m_drawStatus.store(DrawPool::DrawStatus::DRAWING);
         pool->m_framebuffer->bind();
         for (int_fast8_t i = -1; ++i <= pool->m_depthLevel;) {
             for (const auto& order : pool->m_objects[i])
@@ -199,17 +199,14 @@ void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, uint
 void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void()>& f, const Rect& dest, const Rect& src, const Color& colorClear)
 {
     select(type);
-
-    auto pool = getCurrentPool();
+    const auto pool = getCurrentPool();
 
     if (pool->isStatus(DrawPool::DrawStatus::DRAWING))
         return;
 
+    std::scoped_lock l(pool->m_mutex);
     pool->m_drawStatus.store(DrawPool::DrawStatus::PRE_DRAW);
-
     {
-        std::scoped_lock l(pool->m_mutex);
-
         pool->setEnable(true);
         pool->resetState();
 
