@@ -150,14 +150,8 @@ void GraphicalApplication::run()
                 continue;
             }
 
-            if (g_drawPool.isDrawing()) {
-                stdext::millisleep(1);
-                continue;
-            }
-
             if (foreground->canRepaint()) {
-                g_asyncDispatcher.dispatch([this, &foreground] {
-                    std::scoped_lock l(foreground->getMutex());
+                g_asyncDispatcher.dispatch([] {
                     g_ui.render(DrawPoolType::FOREGROUND);
                 });
             }
@@ -168,9 +162,7 @@ void GraphicalApplication::run()
 
                 if (txt->canRepaint() || foreground_tile->canRepaint()) {
                     g_asyncDispatcher.dispatch([this, &txt] {
-                        std::scoped_lock l(txt->getMutex());
                         g_textDispatcher.poll();
-
                         if (g_ui.m_mapWidget) {
                             g_ui.m_mapWidget->drawSelf(DrawPoolType::TEXT);
                             g_ui.m_mapWidget->drawSelf(DrawPoolType::FOREGROUND_TILE);
@@ -178,10 +170,7 @@ void GraphicalApplication::run()
                     });
                 }
 
-                {
-                    std::scoped_lock l(map->getMutex());
-                    g_ui.m_mapWidget->drawSelf(DrawPoolType::MAP);
-                }
+                g_ui.m_mapWidget->drawSelf(DrawPoolType::MAP);
             } else g_ui.m_mapWidget = nullptr;
 
             stdext::millisleep(1);

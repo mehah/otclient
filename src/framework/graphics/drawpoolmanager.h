@@ -33,8 +33,9 @@ public:
     DrawPool* get(const DrawPoolType type) const { return m_pools[static_cast<uint8_t>(type)]; }
 
     void select(DrawPoolType type);
-    void use(const DrawPoolType type) { use(type, {}, {}); }
-    void use(DrawPoolType type, const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha);
+    void use(const DrawPoolType type) { return preDraw(type, nullptr, {}, {}); }
+    void preDraw(const DrawPoolType type, const std::function<void()>& f) { return preDraw(type, f, {}, {}); }
+    void preDraw(DrawPoolType type, const std::function<void()>& f, const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha);
 
     void addTexturedPoint(const TexturePtr& texture, const Point& point, const Color& color = Color::white) const
     { addTexturedRect(Rect(point, texture->getSize()), texture, color); }
@@ -93,8 +94,6 @@ public:
 
     DrawPoolType getCurrentType() const { return getCurrentPool()->m_type; }
 
-    bool isDrawing() const { return m_drawing.load(); }
-
 private:
     DrawPool* getCurrentPool() const;
 
@@ -104,8 +103,6 @@ private:
     void drawObject(const DrawPool::DrawObject& obj);
 
     bool drawPool(DrawPool* pool);
-
-    std::atomic_bool m_drawing{ false };
 
     CoordsBuffer m_coordsBuffer;
     std::array<DrawPool*, static_cast<uint8_t>(DrawPoolType::UNKNOW) + 1> m_pools{};

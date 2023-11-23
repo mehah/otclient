@@ -99,6 +99,8 @@ public:
     void onBeforeDraw(std::function<void()> f) { m_beforeDraw = std::move(f); }
     void onAfterDraw(std::function<void()> f) { m_afterDraw = std::move(f); }
 
+    void preDraw(const std::function<void()>& f);
+
     std::mutex& getMutex() { return m_mutex; }
 
 protected:

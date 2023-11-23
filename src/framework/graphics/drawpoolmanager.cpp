@@ -57,31 +57,16 @@ void DrawPoolManager::draw()
         g_painter->setResolution(m_size, m_transformMatrix);
     }
 
-    m_drawing.store(true);
-
-    const auto& map = get(DrawPoolType::MAP); {
-        std::scoped_lock l(map->m_mutex);
-        if (drawPool(map)) {
-            drawPool(get(DrawPoolType::CREATURE_INFORMATION));
-            drawPool(get(DrawPoolType::LIGHT));
-        }
+    const auto polls = { DrawPoolType::MAP, DrawPoolType::CREATURE_INFORMATION, DrawPoolType::LIGHT, DrawPoolType::TEXT, DrawPoolType::FOREGROUND_TILE, DrawPoolType::FOREGROUND };
+    for (const auto type : polls) {
+        const auto pool = get(type);
+        drawPool(pool);
     }
-
-    const auto& text = get(DrawPoolType::TEXT); {
-        std::scoped_lock l(text->m_mutex);
-        drawPool(text);
-        drawPool(get(DrawPoolType::FOREGROUND_TILE));
-    }
-
-    const auto& foreground = get(DrawPoolType::FOREGROUND); {
-        std::scoped_lock l(foreground->m_mutex);
-        drawPool(foreground);
-    }
-
-    m_drawing.store(false);
 }
 
 bool DrawPoolManager::drawPool(DrawPool* pool) {
+    std::scoped_lock l(pool->m_mutex);
+
     if (!pool->isEnabled())
         return false;
 
@@ -206,11 +191,13 @@ void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, uint
     getCurrentPool()->add(color, nullptr, method);
 }
 
-void DrawPoolManager::use(const DrawPoolType type, const Rect& dest, const Rect& src, const Color& colorClear)
+void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void()>& f, const Rect& dest, const Rect& src, const Color& colorClear)
 {
     select(type);
 
     auto* currentPoll = getCurrentPool();
+
+    std::scoped_lock l(currentPoll->m_mutex);
 
     currentPoll->setEnable(true);
     currentPoll->resetState();
@@ -223,4 +210,6 @@ void DrawPoolManager::use(const DrawPoolType type, const Rect& dest, const Rect&
             get(DrawPoolType::CREATURE_INFORMATION)->resetState();
         }
     }
+    if (f)
+        f();
 }

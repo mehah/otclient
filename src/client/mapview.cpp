@@ -125,8 +125,7 @@ void MapView::draw()
 
 void MapView::drawFloor()
 {
-    g_drawPool.use(DrawPoolType::MAP, m_posInfo.rect, m_posInfo.srcRect, Color::black);
-    {
+    g_drawPool.preDraw(DrawPoolType::MAP, [this] {
         const auto& cameraPosition = m_posInfo.camera;
         const auto& lightView = isDrawingLights() ? m_lightView.get() : nullptr;
 
@@ -204,42 +203,42 @@ void MapView::drawFloor()
             m_mousePosition = {}; // Invalidate mousePosition
             destroyHighlightTile();
         }
-    }
+    }, m_posInfo.rect, m_posInfo.srcRect, Color::black);
 }
 
 void MapView::drawText()
 {
-    g_drawPool.use(DrawPoolType::TEXT);
+    g_drawPool.preDraw(DrawPoolType::TEXT, [this] {
+        g_drawPool.scale(g_app.getStaticTextScale());
+        for (const auto& staticText : g_map.getStaticTexts()) {
+            if (staticText->getMessageMode() == Otc::MessageNone)
+                continue;
 
-    g_drawPool.scale(g_app.getStaticTextScale());
-    for (const auto& staticText : g_map.getStaticTexts()) {
-        if (staticText->getMessageMode() == Otc::MessageNone)
-            continue;
+            const auto& pos = staticText->getPosition();
+            if (pos.z != m_posInfo.camera.z && staticText->getMessageMode() == Otc::MessageNone)
+                continue;
 
-        const auto& pos = staticText->getPosition();
-        if (pos.z != m_posInfo.camera.z && staticText->getMessageMode() == Otc::MessageNone)
-            continue;
+            Point p = transformPositionTo2D(pos, m_posInfo.camera) - m_posInfo.drawOffset;
+            p.x *= m_posInfo.horizontalStretchFactor;
+            p.y *= m_posInfo.verticalStretchFactor;
+            p += m_posInfo.rect.topLeft();
+            staticText->drawText(p.scale(g_app.getStaticTextScale()), m_posInfo.rect);
+        }
 
-        Point p = transformPositionTo2D(pos, m_posInfo.camera) - m_posInfo.drawOffset;
-        p.x *= m_posInfo.horizontalStretchFactor;
-        p.y *= m_posInfo.verticalStretchFactor;
-        p += m_posInfo.rect.topLeft();
-        staticText->drawText(p.scale(g_app.getStaticTextScale()), m_posInfo.rect);
-    }
+        g_drawPool.scale(g_app.getAnimatedTextScale());
+        for (const auto& animatedText : g_map.getAnimatedTexts()) {
+            const auto& pos = animatedText->getPosition();
 
-    g_drawPool.scale(g_app.getAnimatedTextScale());
-    for (const auto& animatedText : g_map.getAnimatedTexts()) {
-        const auto& pos = animatedText->getPosition();
+            if (pos.z != m_posInfo.camera.z)
+                continue;
 
-        if (pos.z != m_posInfo.camera.z)
-            continue;
-
-        auto p = transformPositionTo2D(pos, m_posInfo.camera) - m_posInfo.drawOffset;
-        p.x *= m_posInfo.horizontalStretchFactor;
-        p.y *= m_posInfo.verticalStretchFactor;
-        p += m_posInfo.rect.topLeft();
-        animatedText->drawText(p, m_posInfo.rect);
-    }
+            auto p = transformPositionTo2D(pos, m_posInfo.camera) - m_posInfo.drawOffset;
+            p.x *= m_posInfo.horizontalStretchFactor;
+            p.y *= m_posInfo.verticalStretchFactor;
+            p += m_posInfo.rect.topLeft();
+            animatedText->drawText(p, m_posInfo.rect);
+        }
+    });
 }
 
 void MapView::updateVisibleTiles()
