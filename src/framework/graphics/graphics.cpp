@@ -24,8 +24,8 @@
 #include "fontmanager.h"
 
 #include <framework/platform/platformwindow.h>
-#include "framebuffermanager.h"
 #include "texturemanager.h"
+#include "painter.h"
 
 Graphics g_graphics;
 
@@ -80,13 +80,11 @@ void Graphics::init()
     g_painter = new Painter;
 
     g_textures.init();
-    g_framebuffers.init();
 }
 
 void Graphics::terminate()
 {
     g_fonts.terminate();
-    g_framebuffers.terminate();
     g_textures.terminate();
 
     delete g_painter;

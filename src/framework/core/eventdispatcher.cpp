@@ -32,7 +32,7 @@ std::thread::id g_eventThreadId;
 
 void EventDispatcher::init() {
     m_threads.reserve(g_asyncDispatcher.getNumberOfThreads() + 1);
-    for (uint_fast16_t i = 1; i < m_threads.capacity(); ++i) {
+    for (uint_fast16_t i = 0, s = m_threads.capacity(); i < s; ++i) {
         m_threads.emplace_back(std::make_unique<ThreadTask>());
     }
 };
