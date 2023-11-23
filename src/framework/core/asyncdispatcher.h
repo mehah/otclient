@@ -55,7 +55,7 @@ public:
 
 private:
     asio::io_context m_ioService;
-    std::vector<std::jthread> m_threads;
+    std::vector<std::thread> m_threads;
     asio::io_context::work m_work{ m_ioService };
 };
 
