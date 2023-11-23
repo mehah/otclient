@@ -21,7 +21,6 @@
  */
 
 #include "drawpool.h"
-#include "framebuffermanager.h"
 
 DrawPool* DrawPool::create(const DrawPoolType type)
 {
@@ -32,9 +31,11 @@ DrawPool* DrawPool::create(const DrawPoolType type)
         if (type == DrawPoolType::MAP) {
             pool->m_framebuffer->m_useAlphaWriting = false;
             pool->m_framebuffer->disableBlend();
-            pool->m_bindedFramebuffers = 0; // forces to use only framebuffer without smoothing.
         } else if (type == DrawPoolType::FOREGROUND) {
             pool->setFPS(FPS10);
+
+            // creates a temporary framebuffer with smoothing.
+            pool->m_temporaryFramebuffers.emplace_back(std::make_shared<FrameBuffer>());
         }
     } else {
         pool->m_alwaysGroupDrawings = true; // CREATURE_INFORMATION & TEXT
@@ -373,9 +374,9 @@ void DrawPool::bindFrameBuffer(const Size& size)
 
     m_oldState = std::move(m_state);
     m_state = {};
-    addAction([size, frameIndex = m_bindedFramebuffers, drawState = m_state] {
+    addAction([this, size, frameIndex = m_bindedFramebuffers, drawState = m_state] {
         drawState.execute();
-        const auto& frame = g_framebuffers.getTemporaryFrameBuffer(frameIndex);
+        const auto& frame = getTemporaryFrameBuffer(frameIndex);
         frame->resize(size);
         frame->bind();
     });
@@ -384,12 +385,22 @@ void DrawPool::releaseFrameBuffer(const Rect& dest)
 {
     m_state = std::move(m_oldState);
     m_oldState = {};
-    addAction([dest, frameIndex = m_bindedFramebuffers, drawState = m_state] {
-        const auto& frame = g_framebuffers.getTemporaryFrameBuffer(frameIndex);
+    addAction([this, dest, frameIndex = m_bindedFramebuffers, drawState = m_state] {
+        const auto& frame = getTemporaryFrameBuffer(frameIndex);
         frame->release();
         drawState.execute();
         frame->draw(dest);
     });
     if (hasFrameBuffer() && !dest.isNull()) stdext::hash_union(m_status.second, dest.hash());
     --m_bindedFramebuffers;
+}
+
+const FrameBufferPtr& DrawPool::getTemporaryFrameBuffer(const uint8_t index) {
+    if (index < m_temporaryFramebuffers.size()) {
+        return m_temporaryFramebuffers[index];
+    }
+
+    const auto& tempfb = m_temporaryFramebuffers.emplace_back(std::make_shared<FrameBuffer>());
+    tempfb->setSmooth(false);
+    return tempfb;
 }

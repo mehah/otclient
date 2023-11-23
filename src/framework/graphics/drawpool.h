@@ -226,10 +226,12 @@ private:
 
     bool canRepaint(bool autoUpdateStatus);
 
+    const FrameBufferPtr& getTemporaryFrameBuffer(const uint8_t index);
+
     bool m_enabled{ true };
     bool m_alwaysGroupDrawings{ false };
 
-    int8_t m_bindedFramebuffers{ -1 };
+    int_fast8_t m_bindedFramebuffers{ -1 };
     uint8_t m_depthLevel{ 0 };
 
     uint16_t m_refreshDelay{ 0 }, m_shaderRefreshDelay{ 0 };
@@ -245,6 +247,7 @@ private:
     std::pair<size_t, size_t> m_status{ 1, 0 };
 
     std::vector<Matrix3> m_transformMatrixStack;
+    std::vector<FrameBufferPtr> m_temporaryFramebuffers;
     std::vector<DrawObject> m_objects[MAX_DRAW_DEPTH + 1][static_cast<uint8_t>(DrawOrder::LAST)];
 
     stdext::map<size_t, CoordsBuffer*> m_coords;
@@ -259,7 +262,7 @@ private:
 
     std::mutex m_mutex;
 
-    friend DrawPoolManager;
+    friend class DrawPoolManager;
 };
 
 extern DrawPoolManager g_drawPool;

@@ -261,7 +261,6 @@ set(SOURCE_FILES
 	framework/graphics/drawpoolmanager.cpp
 	framework/graphics/fontmanager.cpp
 	framework/graphics/framebuffer.cpp
-	framework/graphics/framebuffermanager.cpp
 	framework/graphics/graphics.cpp
 	framework/graphics/hardwarebuffer.cpp
 	framework/graphics/image.cpp
