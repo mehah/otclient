@@ -93,7 +93,7 @@ public:
 
     DrawPoolType getCurrentType() const { return getCurrentPool()->m_type; }
 
-    bool isDrawing() const { return m_drawing; }
+    bool isDrawing() const { return m_drawing.load(); }
 
 private:
     DrawPool* getCurrentPool() const;

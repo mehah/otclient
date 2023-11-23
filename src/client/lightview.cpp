@@ -110,7 +110,6 @@ void LightView::draw(const Rect& dest, const Rect& src)
         m_hash = m_updatedHash;
         m_updatedHash = 0;
 
-        std::scoped_lock l(m_pool->getMutex());
         if (++m_currentLightData > 1) m_currentLightData = 0;
         g_asyncDispatcher.dispatch([this] {
             updatePixels();

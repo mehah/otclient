@@ -456,15 +456,15 @@ void MapView::updateLight()
 
 void MapView::onTileUpdate(const Position& pos, const ThingPtr& thing, const Otc::Operation op)
 {
-    if (m_lastHighlightTile && m_lastHighlightTile->getPosition() == pos && op == Otc::OPERATION_CLEAN)
-        m_lastHighlightTile = nullptr;
+    if (thing && thing->isOpaque() && op == Otc::OPERATION_REMOVE)
+        m_resetCoveredCache = true;
 
-    if (thing) {
-        if (thing->isOpaque() && op == Otc::OPERATION_REMOVE)
-            m_resetCoveredCache = true;
+    if (op == Otc::OPERATION_CLEAN) {
+        if (m_lastHighlightTile && m_lastHighlightTile->getPosition() == pos)
+            m_lastHighlightTile = nullptr;
+
+        requestUpdateVisibleTiles();
     }
-
-    requestUpdateVisibleTiles();
 }
 
 void MapView::onFadeInFinished()

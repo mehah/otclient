@@ -150,10 +150,10 @@ void GraphicalApplication::run()
                 continue;
             }
 
-            /*if (g_drawPool.isDrawing()) {
+            if (g_drawPool.isDrawing()) {
                 stdext::millisleep(1);
                 continue;
-            }*/
+            }
 
             if (foreground->canRepaint()) {
                 g_asyncDispatcher.dispatch([this, &foreground] {
