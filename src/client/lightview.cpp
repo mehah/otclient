@@ -35,14 +35,15 @@ LightView::LightView(const Size& size, const uint16_t tileSize) : m_pool(g_drawP
         m_texture->setSmooth(true);
     });
 
-    g_drawPool.use(DrawPoolType::LIGHT);
-    g_drawPool.addAction([this] {
-        m_texture->updatePixels(m_pixels.data());
-        g_painter->resetColor();
-        g_painter->resetTransformMatrix();
-        g_painter->setTexture(m_texture.get());
-        g_painter->setCompositionMode(CompositionMode::MULTIPLY);
-        g_painter->drawCoords(m_coords);
+    g_drawPool.preDraw(DrawPoolType::LIGHT, [this] {
+        g_drawPool.addAction([this] {
+            m_texture->updatePixels(m_pixels.data());
+            g_painter->resetColor();
+            g_painter->resetTransformMatrix();
+            g_painter->setTexture(m_texture.get());
+            g_painter->setCompositionMode(CompositionMode::MULTIPLY);
+            g_painter->drawCoords(m_coords);
+        });
     });
 }
 
@@ -71,7 +72,7 @@ void LightView::addLightSource(const Point& pos, const Light& light, float brigh
     if (light.intensity == 0)
         return;
 
-    auto& lightData = m_lightData[m_currentLightData];
+    auto& lightData = m_lightData[0];
 
     if (!lightData.lights.empty()) {
         auto& prevLight = lightData.lights.back();
@@ -92,7 +93,7 @@ void LightView::addLightSource(const Point& pos, const Light& light, float brigh
 
 void LightView::resetShade(const Point& pos)
 {
-    auto& lightData = m_lightData[m_currentLightData];
+    auto& lightData = m_lightData[0];
 
     size_t index = (pos.y / m_tileSize) * m_mapSize.width() + (pos.x / m_tileSize);
     if (index >= lightData.tiles.size()) return;
@@ -107,13 +108,14 @@ void LightView::draw(const Rect& dest, const Rect& src)
         m_hash = m_updatedHash;
         m_updatedHash = 0;
 
-        if (++m_currentLightData > 1) m_currentLightData = 0;
+        std::scoped_lock l(m_pool->getMutex());
+        std::swap(m_lightData[0], m_lightData[1]);
         g_asyncDispatcher.dispatch([this] {
             updatePixels();
         });
     }
 
-    auto& lightData = m_lightData[m_currentLightData];
+    auto& lightData = m_lightData[0];
     lightData.lights.clear();
     lightData.tiles.assign(m_mapSize.area(), {});
 }
@@ -121,6 +123,8 @@ void LightView::draw(const Rect& dest, const Rect& src)
 void LightView::updateCoords(const Rect& dest, const Rect& src) {
     if (m_dest == dest && m_src == src)
         return;
+
+    std::scoped_lock l(m_pool->getMutex());
 
     const auto& offset = src.topLeft();
     const auto& size = src.size();
@@ -137,7 +141,7 @@ void LightView::updateCoords(const Rect& dest, const Rect& src) {
 void LightView::updatePixels() {
     std::scoped_lock l(m_pool->getMutex());
 
-    const auto& lightData = m_lightData[m_currentLightData ? 0 : 1];
+    const auto& lightData = m_lightData[1];
 
     const size_t lightSize = lightData.lights.size();
 
