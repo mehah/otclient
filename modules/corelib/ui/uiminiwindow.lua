@@ -14,10 +14,11 @@ function UIMiniWindow:open(dontSave)
     self:setSettings({ closed = false })
   end
 
-  addEvent(function()
-    self:raise()
+  self:raise()
+
+  if self:getParent() then
     self:getParent():saveChildren()
-  end)
+  end
 
   signalcall(self.onOpen, self)
 end
@@ -553,6 +554,16 @@ end
 function UIMiniWindow:getMaximumHeight()
   local resizeBorder = self:getChildById('bottomResizeBorder')
   return resizeBorder:getMaximum()
+end
+
+function UIMiniWindow:modifyMaximumHeight(height)
+  local resizeBorder = self:getChildById('bottomResizeBorder')
+  local newHeight = resizeBorder:getMaximum() + height
+  local curHeight = self:getHeight()
+  resizeBorder:setMaximum(newHeight)
+  if newHeight < curHeight or newHeight - height == curHeight then
+    self:setHeight(newHeight)
+  end
 end
 
 function UIMiniWindow:isResizeable()
