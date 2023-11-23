@@ -454,8 +454,11 @@ void MapView::updateLight()
     m_lightView->setEnabled(isDrawingLights());
 }
 
-void MapView::onTileUpdate(const Position&, const ThingPtr& thing, const Otc::Operation op)
+void MapView::onTileUpdate(const Position& pos, const ThingPtr& thing, const Otc::Operation op)
 {
+    if (m_lastHighlightTile && m_lastHighlightTile->getPosition() == pos && op == Otc::OPERATION_CLEAN)
+        m_lastHighlightTile = nullptr;
+
     if (thing) {
         if (thing->isOpaque() && op == Otc::OPERATION_REMOVE)
             m_resetCoveredCache = true;
