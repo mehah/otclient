@@ -259,7 +259,9 @@ private:
 
     std::vector<Matrix3> m_transformMatrixStack;
     std::vector<FrameBufferPtr> m_temporaryFramebuffers;
+
     std::vector<DrawObject> m_objects[MAX_DRAW_DEPTH + 1][static_cast<uint8_t>(DrawOrder::LAST)];
+    std::vector<DrawObject> m_objectsDraw;
 
     stdext::map<size_t, CoordsBuffer*> m_coords;
 
