@@ -349,7 +349,7 @@ set(SOURCE_FILES
 	client/lightview.cpp
 	client/localplayer.cpp
 	client/luafunctions.cpp
-	client/luavaluecasts.cpp
+	client/luavaluecasts_client.cpp
 	client/map.cpp
 	client/mapio.cpp
 	client/mapview.cpp

@@ -213,6 +213,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClCompile Include="..\src\client\attachedeffect.cpp" />
     <ClCompile Include="..\src\client\attachedeffectmanager.cpp" />
     <ClCompile Include="..\src\client\gameconfig.cpp" />
+    <ClCompile Include="..\src\client\luavaluecasts_client.cpp" />
     <ClCompile Include="..\src\client\position.cpp" />
     <ClCompile Include="..\src\client\spriteappearances.cpp" />
     <ClCompile Include="..\src\client\client.cpp" />
@@ -227,7 +228,6 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClCompile Include="..\src\client\lightview.cpp" />
     <ClCompile Include="..\src\client\localplayer.cpp" />
     <ClCompile Include="..\src\client\luafunctions.cpp" />
-    <ClCompile Include="..\src\client\luavaluecasts.cpp" />
     <ClCompile Include="..\src\client\map.cpp" />
     <ClCompile Include="..\src\client\mapio.cpp" />
     <ClCompile Include="..\src\client\mapview.cpp" />
@@ -364,6 +364,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\client\attachedeffect.h" />
     <ClInclude Include="..\src\client\attachedeffectmanager.h" />
     <ClInclude Include="..\src\client\gameconfig.h" />
+    <ClInclude Include="..\src\client\luavaluecasts_client.h" />
     <ClInclude Include="..\src\client\spriteappearances.h" />
     <ClInclude Include="..\src\client\client.h" />
     <ClInclude Include="..\src\client\const.h" />
@@ -379,7 +380,6 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\client\itemtype.h" />
     <ClInclude Include="..\src\client\lightview.h" />
     <ClInclude Include="..\src\client\localplayer.h" />
-    <ClInclude Include="..\src\client\luavaluecasts.h" />
     <ClInclude Include="..\src\client\map.h" />
     <ClInclude Include="..\src\client\mapview.h" />
     <ClInclude Include="..\src\client\minimap.h" />

@@ -22,7 +22,7 @@
 
 #include "uiminimap.h"
 #include "game.h"
-#include "luavaluecasts.h"
+#include "luavaluecasts_client.h"
 
 #include "minimap.h"
 #include "uimapanchorlayout.h"
