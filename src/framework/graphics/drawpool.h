@@ -184,7 +184,8 @@ private:
     {
         PRE_DRAW,
         DRAWING,
-        DONE
+        PRE_DRAW_DONE,
+        DRAWING_DONE
     };
 
     void add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod& method,
@@ -270,7 +271,7 @@ private:
     std::function<void()> m_beforeDraw;
     std::function<void()> m_afterDraw;
 
-    std::atomic<DrawStatus> m_drawStatus{ DrawStatus::DONE };
+    std::atomic<DrawStatus> m_drawStatus{ DrawStatus::DRAWING_DONE };
     std::mutex m_mutex;
 
     friend class DrawPoolManager;

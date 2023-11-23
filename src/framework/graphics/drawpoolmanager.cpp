@@ -68,6 +68,7 @@ void DrawPoolManager::drawPool(const DrawPoolType type) {
     if (!pool->isEnabled())
         return;
 
+    bool canDraw = false;
     {
         std::scoped_lock l(pool->m_mutex);
         if (!pool->hasFrameBuffer()) {
@@ -76,15 +77,13 @@ void DrawPoolManager::drawPool(const DrawPoolType type) {
             }
             return;
         }
+        canDraw = pool->m_framebuffer->canDraw();
     }
 
-    {
-        std::scoped_lock l(pool->m_mutex);
-        if (!pool->m_framebuffer->canDraw())
-            return;
-    }
+    if (!canDraw)
+        return;
 
-    if (pool->isStatus(DrawPool::DrawStatus::DONE)) {
+    if (pool->isStatus(DrawPool::DrawStatus::PRE_DRAW_DONE)) {
         pool->m_drawStatus.store(DrawPool::DrawStatus::DRAWING);
 
         std::scoped_lock l(pool->m_mutex);
@@ -98,9 +97,7 @@ void DrawPoolManager::drawPool(const DrawPoolType type) {
 
             pool->m_framebuffer->release();
         }
-        pool->m_drawStatus.store(DrawPool::DrawStatus::DONE);
-    } else {
-        g_logger.info("pre-draw");
+        pool->m_drawStatus.store(DrawPool::DrawStatus::DRAWING_DONE);
     }
 
     g_painter->resetState();
@@ -208,8 +205,9 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
 
     auto pool = getCurrentPool();
 
-    if (!pool->isStatus(DrawPool::DrawStatus::DONE))
+    if (!pool->isStatus(DrawPool::DrawStatus::DRAWING_DONE)) {
         return;
+    }
 
     pool->m_drawStatus.store(DrawPool::DrawStatus::PRE_DRAW);
 
@@ -232,5 +230,5 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
             f();
     }
 
-    pool->m_drawStatus.store(DrawPool::DrawStatus::DONE);
+    pool->m_drawStatus.store(DrawPool::DrawStatus::PRE_DRAW_DONE);
 }
