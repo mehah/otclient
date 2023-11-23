@@ -259,6 +259,9 @@ void DrawPool::resetState()
 
 bool DrawPool::canRepaint(const bool autoUpdateStatus)
 {
+    if (isStatus(DrawPool::DrawStatus::DRAWING))
+        return false;
+
     uint16_t refreshDelay = m_refreshDelay;
     if (m_shaderRefreshDelay > 0 && (m_refreshDelay == 0 || m_shaderRefreshDelay < m_refreshDelay))
         refreshDelay = m_shaderRefreshDelay;

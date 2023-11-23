@@ -83,20 +83,17 @@ void DrawPoolManager::drawPool(const DrawPoolType type) {
     if (!canDraw)
         return;
 
-    if (pool->isStatus(DrawPool::DrawStatus::PRE_DRAW_DONE)) {
+    if (pool->isStatus(DrawPool::DrawStatus::CAN_REPAINT)) {
         pool->m_drawStatus.store(DrawPool::DrawStatus::DRAWING);
-
         std::scoped_lock l(pool->m_mutex);
-        if (pool->canRepaint(true)) {
-            pool->m_framebuffer->bind();
-            for (int_fast8_t i = -1; ++i <= pool->m_depthLevel;) {
-                for (const auto& order : pool->m_objects[i])
-                    for (const auto& obj : order)
-                        drawObject(obj);
-            }
-
-            pool->m_framebuffer->release();
+        pool->m_framebuffer->bind();
+        for (int_fast8_t i = -1; ++i <= pool->m_depthLevel;) {
+            for (const auto& order : pool->m_objects[i])
+                for (const auto& obj : order)
+                    drawObject(obj);
         }
+
+        pool->m_framebuffer->release();
         pool->m_drawStatus.store(DrawPool::DrawStatus::DRAWING_DONE);
     }
 
@@ -205,9 +202,8 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
 
     auto pool = getCurrentPool();
 
-    if (!pool->isStatus(DrawPool::DrawStatus::DRAWING_DONE)) {
+    if (pool->isStatus(DrawPool::DrawStatus::DRAWING))
         return;
-    }
 
     pool->m_drawStatus.store(DrawPool::DrawStatus::PRE_DRAW);
 
@@ -230,5 +226,6 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
             f();
     }
 
-    pool->m_drawStatus.store(DrawPool::DrawStatus::PRE_DRAW_DONE);
+    if (pool->canRepaint(true))
+        pool->m_drawStatus.store(DrawPool::DrawStatus::CAN_REPAINT);
 }

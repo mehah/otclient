@@ -183,8 +183,8 @@ private:
     enum class DrawStatus : uint8_t
     {
         PRE_DRAW,
+        CAN_REPAINT,
         DRAWING,
-        PRE_DRAW_DONE,
         DRAWING_DONE
     };
 
