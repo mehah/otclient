@@ -103,7 +103,7 @@ private:
     void terminate() const;
     void drawObject(const DrawPool::DrawObject& obj);
 
-    bool drawPool(const auto& pool);
+    bool drawPool(DrawPool* pool);
 
     std::atomic_bool m_drawing{ false };
 

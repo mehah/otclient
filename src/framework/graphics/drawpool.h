@@ -262,7 +262,7 @@ private:
 
     std::mutex m_mutex;
 
-    friend DrawPoolManager;
+    friend class DrawPoolManager;
 };
 
 extern DrawPoolManager g_drawPool;
