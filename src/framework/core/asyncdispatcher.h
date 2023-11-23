@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include <future>
-#include <list>
+#include <asio.hpp>
+#include <thread>
 
 class AsyncDispatcher
 {
@@ -31,40 +31,32 @@ public:
     void init(uint8_t maxThreads = 0);
     void terminate();
 
-    void spawn_thread();
     void stop();
 
     template<class F>
     std::shared_future<std::invoke_result_t<F>> schedule(const F& task)
     {
-        std::scoped_lock lock(m_mutex);
         const auto& prom = std::make_shared<std::promise<std::invoke_result_t<F>>>();
-        m_tasks.push_back([=] { prom->set_value(task()); });
-        m_condition.notify_all();
+        dispatch([=] { prom->set_value(task()); });
         return std::shared_future<std::invoke_result_t<F>>(prom->get_future());
     }
 
-    void dispatch(const std::function<void()>& f)
+    void dispatch(std::function<void()>&& f)
     {
-        std::scoped_lock lock(m_mutex);
-        m_tasks.push_back(f);
-        m_condition.notify_all();
+        asio::post(m_ioService, [this, f = std::move(f)]() {
+            if (!m_ioService.stopped())
+                f();
+        });
     }
 
     inline auto getNumberOfThreads() const {
         return m_threads.size();
     }
 
-protected:
-    void exec_loop();
-
 private:
-    std::list<std::function<void()>> m_tasks;
-    std::list<std::thread> m_threads;
-    std::mutex m_mutex;
-    std::condition_variable m_condition;
-    bool m_running{ false };
-    uint8_t m_maxThreads{ 6 };
+    asio::io_context m_ioService;
+    std::vector<std::thread> m_threads;
+    asio::io_context::work m_work{ m_ioService };
 };
 
 extern AsyncDispatcher g_asyncDispatcher;

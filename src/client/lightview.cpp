@@ -26,20 +26,13 @@
 #include "spritemanager.h"
 
 #include <framework/core/eventdispatcher.h>
+#include <framework/core/asyncdispatcher.h>
 #include <framework/graphics/drawpoolmanager.h>
 
 LightView::LightView(const Size& size, const uint16_t tileSize) : m_pool(g_drawPool.get(DrawPoolType::LIGHT)) {
     g_mainDispatcher.addEvent([this, size] {
         m_texture = std::make_shared<Texture>(size);
         m_texture->setSmooth(true);
-
-        m_thread = std::thread([this]() {
-            std::unique_lock lock(m_pool->getMutex());
-            m_condition.wait(lock, [this]() -> bool {
-                updatePixels();
-                return m_texture == nullptr;
-            });
-        });
     });
 
     g_drawPool.use(DrawPoolType::LIGHT);
@@ -119,7 +112,9 @@ void LightView::draw(const Rect& dest, const Rect& src)
 
         std::scoped_lock l(m_pool->getMutex());
         if (++m_currentLightData > 1) m_currentLightData = 0;
-        m_condition.notify_one();
+        g_asyncDispatcher.dispatch([this] {
+            updatePixels();
+        });
     }
 
     auto& lightData = m_lightData[m_currentLightData];
@@ -144,6 +139,8 @@ void LightView::updateCoords(const Rect& dest, const Rect& src) {
 }
 
 void LightView::updatePixels() {
+    std::scoped_lock l(m_pool->getMutex());
+
     const auto& lightData = m_lightData[m_currentLightData ? 0 : 1];
 
     const size_t lightSize = lightData.lights.size();

@@ -139,8 +139,6 @@ void GraphicalApplication::run()
     const auto& txt = g_drawPool.get(DrawPoolType::TEXT);
     const auto& map = g_drawPool.get(DrawPoolType::MAP);
 
-    std::condition_variable foreCondition, txtCondition;
-
     // clang c++20 dont support jthread
     std::thread t1([&]() {
         g_eventThreadId = std::this_thread::get_id();
@@ -157,15 +155,28 @@ void GraphicalApplication::run()
                 continue;
             }*/
 
-            if (foreground->canRepaint())
-                foreCondition.notify_one();
+            if (foreground->canRepaint()) {
+                g_asyncDispatcher.dispatch([this, &foreground] {
+                    std::scoped_lock l(foreground->getMutex());
+                    g_ui.render(DrawPoolType::FOREGROUND);
+                });
+            }
 
             if (g_game.isOnline()) {
                 if (!g_ui.m_mapWidget)
                     g_ui.m_mapWidget = g_ui.getRootWidget()->recursiveGetChildById("gameMapPanel")->static_self_cast<UIMap>();
 
-                if (txt->canRepaint() || foreground_tile->canRepaint())
-                    txtCondition.notify_one();
+                if (txt->canRepaint() || foreground_tile->canRepaint()) {
+                    g_asyncDispatcher.dispatch([this, &txt] {
+                        std::scoped_lock l(txt->getMutex());
+                        g_textDispatcher.poll();
+
+                        if (g_ui.m_mapWidget) {
+                            g_ui.m_mapWidget->drawSelf(DrawPoolType::TEXT);
+                            g_ui.m_mapWidget->drawSelf(DrawPoolType::FOREGROUND_TILE);
+                        }
+                    });
+                }
 
                 {
                     std::scoped_lock l(map->getMutex());
@@ -175,31 +186,6 @@ void GraphicalApplication::run()
 
             stdext::millisleep(1);
         }
-
-        foreCondition.notify_one();
-        txtCondition.notify_one();
-    });
-
-    std::thread t2([&]() {
-        std::unique_lock lock(foreground->getMutex());
-        foreCondition.wait(lock, [&]() -> bool {
-            g_ui.render(DrawPoolType::FOREGROUND);
-            return m_stopping;
-        });
-    });
-
-    std::thread t3([&]() {
-        std::unique_lock lock(txt->getMutex());
-        txtCondition.wait(lock, [&]() -> bool {
-            g_textDispatcher.poll();
-
-            if (g_ui.m_mapWidget) {
-                g_ui.m_mapWidget->drawSelf(DrawPoolType::TEXT);
-                g_ui.m_mapWidget->drawSelf(DrawPoolType::FOREGROUND_TILE);
-            }
-
-            return m_stopping;
-        });
     });
 
     m_running = true;
@@ -219,8 +205,6 @@ void GraphicalApplication::run()
     }
 
     t1.join();
-    t2.join();
-    t3.join();
 
     m_stopping = false;
     m_running = false;
