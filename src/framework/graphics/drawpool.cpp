@@ -49,11 +49,6 @@ DrawPool* DrawPool::create(const DrawPoolType type)
     return pool;
 }
 
-void DrawPool::preDraw(const std::function<void()>& f) {
-    std::scoped_lock l(m_mutex);
-    f();
-}
-
 void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod& method,
                    DrawMode drawMode, const DrawConductor& conductor, const CoordsBufferPtr& coordsBuffer)
 {

@@ -112,98 +112,98 @@ void MapView::draw()
         }
     }
 
-    drawFloor();
+    g_drawPool.preDraw(DrawPoolType::MAP, [this] {
+        drawFloor();
 
-    // this could happen if the player position is not known yet
-    if (!m_posInfo.camera.isValid()) {
-        return;
-    }
+        // this could happen if the player position is not known yet
+        if (!m_posInfo.camera.isValid()) {
+            return;
+        }
 
-    if (isDrawingLights())
-        m_lightView->draw(m_posInfo.rect, m_posInfo.srcRect);
+        if (isDrawingLights())
+            m_lightView->draw(m_posInfo.rect, m_posInfo.srcRect);
+    }, m_posInfo.rect, m_posInfo.srcRect, Color::black);
 }
 
 void MapView::drawFloor()
 {
-    g_drawPool.preDraw(DrawPoolType::MAP, [this] {
-        const auto& cameraPosition = m_posInfo.camera;
-        const auto& lightView = isDrawingLights() ? m_lightView.get() : nullptr;
+    const auto& cameraPosition = m_posInfo.camera;
+    const auto& lightView = isDrawingLights() ? m_lightView.get() : nullptr;
 
-        uint32_t flags = Otc::DrawThings;
-        if (lightView) flags |= Otc::DrawLights;
-        if (m_drawNames) { flags |= Otc::DrawNames; }
-        if (m_drawHealthBars) { flags |= Otc::DrawBars; }
-        if (m_drawManaBar) { flags |= Otc::DrawManaBar; }
+    uint32_t flags = Otc::DrawThings;
+    if (lightView) flags |= Otc::DrawLights;
+    if (m_drawNames) { flags |= Otc::DrawNames; }
+    if (m_drawHealthBars) { flags |= Otc::DrawBars; }
+    if (m_drawManaBar) { flags |= Otc::DrawManaBar; }
 
-        for (int_fast8_t z = m_floorMax; z >= m_floorMin; --z) {
-            const float fadeLevel = getFadeLevel(z);
-            if (fadeLevel == 0.f) break;
-            if (fadeLevel < .99f)
-                g_drawPool.setOpacity(fadeLevel);
+    for (int_fast8_t z = m_floorMax; z >= m_floorMin; --z) {
+        const float fadeLevel = getFadeLevel(z);
+        if (fadeLevel == 0.f) break;
+        if (fadeLevel < .99f)
+            g_drawPool.setOpacity(fadeLevel);
 
-            Position _camera = cameraPosition;
-            const bool alwaysTransparent = m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && z < m_cachedFirstVisibleFloor && _camera.coveredUp(cameraPosition.z - z);
+        Position _camera = cameraPosition;
+        const bool alwaysTransparent = m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && z < m_cachedFirstVisibleFloor && _camera.coveredUp(cameraPosition.z - z);
 
-            const auto& map = m_floors[z].cachedVisibleTiles;
+        const auto& map = m_floors[z].cachedVisibleTiles;
 
-            if (m_fadeType != FadeType::OUT$ || fadeLevel == 1.f) {
-                for (const auto& tile : map.shades) {
-                    if (alwaysTransparent && tile->getPosition().isInRange(_camera, g_gameConfig.getTileTransparentFloorViewRange(), g_gameConfig.getTileTransparentFloorViewRange(), true))
-                        continue;
-
-                    m_lightView->resetShade(transformPositionTo2D(tile->getPosition(), cameraPosition));
-                }
-            }
-
-            for (const auto& tile : map.tiles) {
-                uint32_t tileFlags = flags;
-
-                if (!m_drawViewportEdge && !tile->canRender(tileFlags, cameraPosition, m_viewport))
+        if (m_fadeType != FadeType::OUT$ || fadeLevel == 1.f) {
+            for (const auto& tile : map.shades) {
+                if (alwaysTransparent && tile->getPosition().isInRange(_camera, g_gameConfig.getTileTransparentFloorViewRange(), g_gameConfig.getTileTransparentFloorViewRange(), true))
                     continue;
 
-                bool isCovered = false;
-                if (tile->hasCreature()) {
-                    isCovered = tile->isCovered(m_cachedFirstVisibleFloor);
-                }
+                m_lightView->resetShade(transformPositionTo2D(tile->getPosition(), cameraPosition));
+            }
+        }
 
-                if (alwaysTransparent) {
-                    const bool inRange = tile->getPosition().isInRange(_camera, g_gameConfig.getTileTransparentFloorViewRange(), g_gameConfig.getTileTransparentFloorViewRange(), true);
-                    isCovered = isCovered && !inRange;
+        for (const auto& tile : map.tiles) {
+            uint32_t tileFlags = flags;
 
-                    g_drawPool.setOpacity(inRange ? .16 : .7);
-                }
+            if (!m_drawViewportEdge && !tile->canRender(tileFlags, cameraPosition, m_viewport))
+                continue;
 
-                tile->draw(transformPositionTo2D(tile->getPosition(), cameraPosition), m_posInfo, tileFlags, isCovered, lightView);
-
-                if (alwaysTransparent)
-                    g_drawPool.resetOpacity();
+            bool isCovered = false;
+            if (tile->hasCreature()) {
+                isCovered = tile->isCovered(m_cachedFirstVisibleFloor);
             }
 
-            for (const auto& missile : g_map.getFloorMissiles(z))
-                missile->draw(transformPositionTo2D(missile->getPosition(), cameraPosition), true, lightView);
+            if (alwaysTransparent) {
+                const bool inRange = tile->getPosition().isInRange(_camera, g_gameConfig.getTileTransparentFloorViewRange(), g_gameConfig.getTileTransparentFloorViewRange(), true);
+                isCovered = isCovered && !inRange;
 
-            if (m_shadowFloorIntensity > 0 && z == cameraPosition.z + 1) {
-                g_drawPool.setOpacity(m_shadowFloorIntensity, true);
-                g_drawPool.addFilledRect(m_rectDimension, Color::black, m_shadowConductor);
+                g_drawPool.setOpacity(inRange ? .16 : .7);
             }
 
-            if (canFloorFade())
+            tile->draw(transformPositionTo2D(tile->getPosition(), cameraPosition), m_posInfo, tileFlags, isCovered, lightView);
+
+            if (alwaysTransparent)
                 g_drawPool.resetOpacity();
-
-            g_drawPool.flush();
         }
 
-        if (m_posInfo.rect.contains(g_window.getMousePosition())) {
-            if (m_crosshairTexture && m_mousePosition.isValid()) {
-                const auto& point = transformPositionTo2D(m_mousePosition, cameraPosition);
-                const auto& crosshairRect = Rect(point, m_tileSize, m_tileSize);
-                g_drawPool.addTexturedRect(crosshairRect, m_crosshairTexture);
-            }
-        } else if (m_lastHighlightTile) {
-            m_mousePosition = {}; // Invalidate mousePosition
-            destroyHighlightTile();
+        for (const auto& missile : g_map.getFloorMissiles(z))
+            missile->draw(transformPositionTo2D(missile->getPosition(), cameraPosition), true, lightView);
+
+        if (m_shadowFloorIntensity > 0 && z == cameraPosition.z + 1) {
+            g_drawPool.setOpacity(m_shadowFloorIntensity, true);
+            g_drawPool.addFilledRect(m_rectDimension, Color::black, m_shadowConductor);
         }
-    }, m_posInfo.rect, m_posInfo.srcRect, Color::black);
+
+        if (canFloorFade())
+            g_drawPool.resetOpacity();
+
+        g_drawPool.flush();
+    }
+
+    if (m_posInfo.rect.contains(g_window.getMousePosition())) {
+        if (m_crosshairTexture && m_mousePosition.isValid()) {
+            const auto& point = transformPositionTo2D(m_mousePosition, cameraPosition);
+            const auto& crosshairRect = Rect(point, m_tileSize, m_tileSize);
+            g_drawPool.addTexturedRect(crosshairRect, m_crosshairTexture);
+        }
+    } else if (m_lastHighlightTile) {
+        m_mousePosition = {}; // Invalidate mousePosition
+        destroyHighlightTile();
+    }
 }
 
 void MapView::drawText()

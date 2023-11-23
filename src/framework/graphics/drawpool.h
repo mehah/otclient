@@ -99,8 +99,6 @@ public:
     void onBeforeDraw(std::function<void()> f) { m_beforeDraw = std::move(f); }
     void onAfterDraw(std::function<void()> f) { m_afterDraw = std::move(f); }
 
-    void preDraw(const std::function<void()>& f);
-
     std::mutex& getMutex() { return m_mutex; }
 
 protected:
@@ -182,6 +180,13 @@ private:
         STATE_BLEND_EQUATION = 1 << 4,
     };
 
+    enum class DrawStatus : uint8_t
+    {
+        PRE_DRAW,
+        DRAWING,
+        DONE
+    };
+
     void add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod& method,
              DrawMode drawMode = DrawMode::TRIANGLES, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR,
              const CoordsBufferPtr& coordsBuffer = nullptr);
@@ -227,6 +232,9 @@ private:
     }
 
     bool canRepaint(bool autoUpdateStatus);
+    inline bool isStatus(const DrawPool::DrawStatus status) const {
+        return m_drawStatus.load() == status;
+    }
 
     const FrameBufferPtr& getTemporaryFrameBuffer(const uint8_t index);
 
@@ -262,6 +270,7 @@ private:
     std::function<void()> m_beforeDraw;
     std::function<void()> m_afterDraw;
 
+    std::atomic<DrawStatus> m_drawStatus{ DrawStatus::DONE };
     std::mutex m_mutex;
 
     friend class DrawPoolManager;
