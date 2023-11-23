@@ -20,8 +20,6 @@
  * THE SOFTWARE.
  */
 
-#include <algorithm>
-
 #include "asyncdispatcher.h"
 
 AsyncDispatcher g_asyncDispatcher;

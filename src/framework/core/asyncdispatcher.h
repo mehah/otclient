@@ -23,6 +23,7 @@
 #pragma once
 
 #include <asio.hpp>
+#include <thread>
 
 class AsyncDispatcher
 {
