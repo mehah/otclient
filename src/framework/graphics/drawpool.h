@@ -99,7 +99,7 @@ public:
     void onBeforeDraw(std::function<void()> f) { m_beforeDraw = std::move(f); }
     void onAfterDraw(std::function<void()> f) { m_afterDraw = std::move(f); }
 
-    std::mutex& getMutex() { return m_mutex; }
+    std::mutex& getMutex() { return m_mutexDraw; }
 
 protected:
 
@@ -180,14 +180,6 @@ private:
         STATE_BLEND_EQUATION = 1 << 4,
     };
 
-    enum class DrawStatus : uint8_t
-    {
-        PRE_DRAW,
-        CAN_REPAINT,
-        DRAWING,
-        DRAWING_DONE
-    };
-
     void add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod& method,
              DrawMode drawMode = DrawMode::TRIANGLES, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR,
              const CoordsBufferPtr& coordsBuffer = nullptr);
@@ -232,14 +224,22 @@ private:
             ++m_depthLevel;
     }
 
-    bool canRepaint(bool autoUpdateStatus);
-    inline bool isStatus(const DrawPool::DrawStatus status) const {
-        return m_drawStatus.load() == status;
+    inline void swapObjects() {
+        m_objectsDraw.clear();
+        for (int_fast8_t depth = 0; depth <= MAX_DRAW_DEPTH; ++depth) {
+            for (int_fast8_t order = 0; order < static_cast<uint8_t>(DrawOrder::LAST); ++order) {
+                auto& objs = m_objects[depth][order];
+                m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
+            }
+        }
     }
+
+    bool canRepaint(bool autoUpdateStatus);
 
     const FrameBufferPtr& getTemporaryFrameBuffer(const uint8_t index);
 
     bool m_enabled{ true };
+    bool m_repeat{ false };
     bool m_alwaysGroupDrawings{ false };
 
     int_fast8_t m_bindedFramebuffers{ -1 };
@@ -273,8 +273,8 @@ private:
     std::function<void()> m_beforeDraw;
     std::function<void()> m_afterDraw;
 
-    std::atomic<DrawStatus> m_drawStatus{ DrawStatus::DRAWING_DONE };
-    std::mutex m_mutex;
+    std::mutex m_mutexDraw;
+    std::mutex m_mutexPreDraw;
 
     friend class DrawPoolManager;
 };
