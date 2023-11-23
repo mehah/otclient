@@ -22,7 +22,6 @@
 
 #include "drawpoolmanager.h"
 #include "declarations.h"
-#include "painter.h"
 
 thread_local static uint8_t CURRENT_POOL;
 
