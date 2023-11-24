@@ -33,16 +33,16 @@ LightView::LightView(const Size& size, const uint16_t tileSize) : m_pool(g_drawP
     g_mainDispatcher.addEvent([this, size] {
         m_texture = std::make_shared<Texture>(size);
         m_texture->setSmooth(true);
-    });
 
-    g_drawPool.preDraw(DrawPoolType::LIGHT, [this] {
-        g_drawPool.addAction([this] {
-            m_texture->updatePixels(m_pixels.data());
-            g_painter->resetColor();
-            g_painter->resetTransformMatrix();
-            g_painter->setTexture(m_texture.get());
-            g_painter->setCompositionMode(CompositionMode::MULTIPLY);
-            g_painter->drawCoords(m_coords);
+        g_drawPool.preDraw(DrawPoolType::LIGHT, [this] {
+            g_drawPool.addAction([this] {
+                m_texture->updatePixels(m_pixels.data());
+                g_painter->resetColor();
+                g_painter->resetTransformMatrix();
+                g_painter->setTexture(m_texture.get());
+                g_painter->setCompositionMode(CompositionMode::MULTIPLY);
+                g_painter->drawCoords(m_coords);
+            });
         });
     });
 }
