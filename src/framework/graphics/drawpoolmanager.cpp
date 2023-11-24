@@ -79,8 +79,8 @@ void DrawPoolManager::drawPool(const DrawPoolType type) {
     if (!pool->m_framebuffer->canDraw())
         return;
 
-    if (pool->m_repeat) {
-        pool->m_repeat = false;
+    if (pool->m_repaint) {
+        pool->m_repaint = false;
 
         pool->m_framebuffer->bind();
         for (const auto& obj : pool->m_objectsDraw)
@@ -209,7 +209,7 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     if (pool->m_framebuffer) {
         pool->m_framebuffer->prepare(dest, src, colorClear);
 
-        if (pool->m_repeat = pool->canRepaint(true)) {
+        if (pool->m_repaint = pool->canRepaint(true)) {
             pool->swapObjects();
 
             if (type == DrawPoolType::MAP) {

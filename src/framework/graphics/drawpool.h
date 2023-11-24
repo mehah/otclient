@@ -239,7 +239,7 @@ private:
     const FrameBufferPtr& getTemporaryFrameBuffer(const uint8_t index);
 
     bool m_enabled{ true };
-    bool m_repeat{ false };
+    bool m_repaint{ false };
     bool m_alwaysGroupDrawings{ false };
 
     int_fast8_t m_bindedFramebuffers{ -1 };
