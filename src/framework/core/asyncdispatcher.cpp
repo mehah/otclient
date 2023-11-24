@@ -29,7 +29,9 @@ void AsyncDispatcher::init(uint8_t maxThreads)
     if (maxThreads == 0)
         maxThreads = 6;
 
-    int_fast8_t threads = std::clamp<int_fast8_t>(std::thread::hardware_concurrency() - 1, 1, maxThreads);
+    // -1 = Main Thread
+    // 2 = Min Threads
+    int_fast8_t threads = std::clamp<int_fast8_t>(std::thread::hardware_concurrency() - 1, 2, maxThreads);
     while (--threads >= 0)
         m_threads.emplace_back([this] { m_ioService.run(); });
 }
