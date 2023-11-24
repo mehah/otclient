@@ -146,6 +146,7 @@ void GraphicalApplication::run()
             poll();
 
             if (!g_window.isVisible()) {
+                g_textDispatcher.poll();
                 stdext::millisleep(10);
                 continue;
             }
