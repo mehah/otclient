@@ -50,7 +50,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
     return pool;
 }
 
-void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod& method,
+void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod&& method,
                    DrawMode drawMode, const DrawConductor& conductor, const CoordsBufferPtr& coordsBuffer)
 {
     updateHash(method, texture, color);
@@ -64,8 +64,8 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
     if (m_alwaysGroupDrawings || conductor.agroup) {
         auto& coords = m_coords.try_emplace(m_state.hash, nullptr).first->second;
         if (!coords) {
-            auto state = getState(method, texture, color);
-            coords = m_objects[m_depthLevel][order].emplace_back(state).coords.get();
+            auto state = getState(texture, color);
+            coords = m_objects[m_depthLevel][order].emplace_back(std::move(state)).coords.get();
         }
 
         if (coordsBuffer)
@@ -78,9 +78,9 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
         auto& list = m_objects[m_depthLevel][order];
         if (!list.empty()) {
             auto& prevObj = list.back();
-            if (prevObj.state.hash == m_state.hash) {
+            if (prevObj.state == m_state) {
                 if (!prevObj.coords)
-                    prevObj.addMethod(method);
+                    prevObj.addMethod(std::move(method));
                 else if (coordsBuffer)
                     prevObj.coords->append(coordsBuffer.get());
                 else
@@ -91,11 +91,11 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
         }
 
         if (addNewObj) {
-            auto state = getState(method, texture, color);
+            auto state = getState(texture, color);
             if (coordsBuffer) {
-                list.emplace_back(state).coords->append(coordsBuffer.get());
+                list.emplace_back(std::move(state)).coords->append(coordsBuffer.get());
             } else
-                list.emplace_back(drawMode, state, method);
+                list.emplace_back(drawMode, std::move(state), std::move(method));
         }
     }
 
@@ -189,7 +189,7 @@ void DrawPool::updateHash(const DrawPool::DrawMethod& method, const TexturePtr& 
     }
 }
 
-DrawPool::PoolState DrawPool::getState(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color)
+DrawPool::PoolState DrawPool::getState(const TexturePtr& texture, const Color& color)
 {
     return PoolState{
        std::move(m_state.transformMatrix), m_state.opacity,

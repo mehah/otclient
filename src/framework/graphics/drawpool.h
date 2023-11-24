@@ -141,11 +141,11 @@ protected:
     struct DrawObject
     {
         DrawObject(std::function<void()> action) : action(std::move(action)) {}
-        DrawObject(PoolState& state) : state(std::move(state)), coords(std::make_unique<CoordsBuffer>()) {}
-        DrawObject(const DrawMode drawMode, PoolState& state, DrawMethod& method) :
+        DrawObject(PoolState&& state) : state(std::move(state)), coords(std::make_unique<CoordsBuffer>()) {}
+        DrawObject(const DrawMode drawMode, PoolState&& state, DrawMethod&& method) :
             drawMode(drawMode), state(std::move(state)) { methods.emplace_back(std::move(method)); }
 
-        void addMethod(DrawMethod& method)
+        void addMethod(DrawMethod&& method)
         {
             drawMode = DrawMode::TRIANGLES;
             methods.emplace_back(std::move(method));
@@ -181,7 +181,7 @@ private:
         STATE_BLEND_EQUATION = 1 << 4,
     };
 
-    void add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod& method,
+    void add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod&& method,
              DrawMode drawMode = DrawMode::TRIANGLES, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR,
              const CoordsBufferPtr& coordsBuffer = nullptr);
 
@@ -192,7 +192,7 @@ private:
     inline void setFPS(uint16_t fps) { m_refreshDelay = fps; }
 
     void updateHash(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color);
-    PoolState getState(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color);
+    PoolState getState(const TexturePtr& texture, const Color& color);
 
     float getOpacity() const { return m_state.opacity; }
     Rect getClipRect() { return m_state.clipRect; }
