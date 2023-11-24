@@ -29,8 +29,7 @@ void AsyncDispatcher::init(uint8_t maxThreads)
     if (maxThreads == 0)
         maxThreads = 6;
 
-    // -2 = Main Thread and Map Thread
-    int_fast8_t threads = std::clamp<int_fast8_t>(std::thread::hardware_concurrency() - 2, 1, maxThreads);
+    int_fast8_t threads = std::clamp<int_fast8_t>(std::thread::hardware_concurrency() - 1, 1, maxThreads);
     while (--threads >= 0)
         m_threads.emplace_back([this] { m_ioService.run(); });
 }
@@ -45,9 +44,8 @@ void AsyncDispatcher::stop()
 
     m_ioService.stop();
 
-    for (std::size_t i = 0; i < m_threads.size(); i++) {
-        if (m_threads[i].joinable()) {
-            m_threads[i].join();
-        }
+    for (auto& thread : m_threads) {
+        if (thread.joinable())
+            thread.join();
     }
 };

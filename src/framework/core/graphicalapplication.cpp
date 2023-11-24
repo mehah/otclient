@@ -137,10 +137,8 @@ void GraphicalApplication::run()
     const auto& foreground = g_drawPool.get(DrawPoolType::FOREGROUND);
     const auto& foreground_tile = g_drawPool.get(DrawPoolType::FOREGROUND_TILE);
     const auto& txt = g_drawPool.get(DrawPoolType::TEXT);
-    const auto& map = g_drawPool.get(DrawPoolType::MAP);
 
-    // clang c++20 dont support jthread
-    std::thread t1([&]() {
+    g_asyncDispatcher.dispatch([&] {
         g_eventThreadId = std::this_thread::get_id();
         while (!m_stopping) {
             poll();
@@ -193,8 +191,6 @@ void GraphicalApplication::run()
         g_window.swapBuffers();
         m_frameCounter.update();
     }
-
-    t1.join();
 
     m_stopping = false;
     m_running = false;
