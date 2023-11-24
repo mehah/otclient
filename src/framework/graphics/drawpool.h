@@ -29,6 +29,7 @@
 #include "texture.h"
 #include "framework/core/timer.h"
 #include <framework/platform/platformwindow.h>
+#include <framework/core/graphicalapplication.h>
 
 #include "../stdext/storage.h"
 
@@ -235,11 +236,15 @@ private:
     }
 
     bool canRepaint(bool autoUpdateStatus);
+    bool isForcedRepaint() const {
+        return (m_forceRepaint) && (g_window.vsyncEnabled() || g_app.getMaxFps() > 0 || g_app.getTargetFps() > 0);
+    }
 
     const FrameBufferPtr& getTemporaryFrameBuffer(const uint8_t index);
 
     bool m_enabled{ true };
     bool m_repaint{ false };
+    bool m_forceRepaint{ false };
     bool m_alwaysGroupDrawings{ false };
 
     int_fast8_t m_bindedFramebuffers{ -1 };

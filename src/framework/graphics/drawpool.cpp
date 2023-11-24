@@ -31,6 +31,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
         if (type == DrawPoolType::MAP) {
             pool->m_framebuffer->m_useAlphaWriting = false;
             pool->m_framebuffer->disableBlend();
+            pool->m_forceRepaint = true;
         } else if (type == DrawPoolType::FOREGROUND) {
             pool->setFPS(FPS10);
 
@@ -143,11 +144,11 @@ void DrawPool::updateHash(const DrawPool::DrawMethod& method, const TexturePtr& 
     { // State Hash
         m_state.hash = 0;
 
+        if (m_bindedFramebuffers)
+            stdext::hash_combine(m_state.hash, m_lastFramebufferId);
+
         if (m_state.blendEquation != BlendEquation::ADD)
             stdext::hash_combine(m_state.hash, m_state.blendEquation);
-
-        if (m_state.clipRect.isValid())
-            stdext::hash_union(m_state.hash, m_state.clipRect.hash());
 
         if (m_state.compositionMode != CompositionMode::NORMAL)
             stdext::hash_combine(m_state.hash, m_state.compositionMode);
@@ -155,26 +156,26 @@ void DrawPool::updateHash(const DrawPool::DrawMethod& method, const TexturePtr& 
         if (m_state.opacity < 1.f)
             stdext::hash_combine(m_state.hash, m_state.opacity);
 
+        if (m_state.clipRect.isValid())
+            stdext::hash_union(m_state.hash, m_state.clipRect.hash());
+
         if (m_state.shaderProgram)
-            stdext::hash_combine(m_state.hash, m_state.shaderProgram->getProgramId());
+            stdext::hash_union(m_state.hash, m_state.shaderProgram->hash());
 
         if (m_state.transformMatrix != DEFAULT_MATRIX3)
             stdext::hash_union(m_state.hash, m_state.transformMatrix.hash());
-
-        if (m_bindedFramebuffers)
-            stdext::hash_combine(m_state.hash, m_lastFramebufferId);
 
         if (color != Color::white)
             stdext::hash_union(m_state.hash, color.hash());
 
         if (texture)
             stdext::hash_union(m_state.hash, texture->hash());
-
-        if (hasFrameBuffer())
-            stdext::hash_union(m_status.second, m_state.hash);
     }
 
-    if (hasFrameBuffer()) { // Method Hash
+    if (hasFrameBuffer() && !isForcedRepaint()) { // Pool Hash
+        if (m_state.hash)
+            stdext::hash_union(m_status.second, m_state.hash);
+
         if (method.type == DrawPool::DrawMethodType::TRIANGLE) {
             if (!method.a.isNull()) stdext::hash_union(m_status.second, method.a.hash());
             if (!method.b.isNull()) stdext::hash_union(m_status.second, method.b.hash());
@@ -259,6 +260,9 @@ void DrawPool::resetState()
 
 bool DrawPool::canRepaint(const bool autoUpdateStatus)
 {
+    if (isForcedRepaint())
+        return true;
+
     uint16_t refreshDelay = m_refreshDelay;
     if (m_shaderRefreshDelay > 0 && (m_refreshDelay == 0 || m_shaderRefreshDelay < m_refreshDelay))
         refreshDelay = m_shaderRefreshDelay;
