@@ -69,16 +69,14 @@ void DrawPoolManager::drawPool(const DrawPoolType type) {
     if (!pool->isEnabled())
         return;
 
-    bool canDraw = false;
     if (!pool->hasFrameBuffer()) {
         for (const auto& obj : pool->m_objectsDraw) {
             drawObject(obj);
         }
         return;
     }
-    canDraw = pool->m_framebuffer->canDraw();
 
-    if (!canDraw)
+    if (!pool->m_framebuffer->canDraw())
         return;
 
     if (pool->m_repeat) {
@@ -205,19 +203,18 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
         if (f) f();
     }
 
-    std::scoped_lock l(pool->m_mutexDraw);
+    std::scoped_lock l(pool->m_mutexDraw, pool->m_mutexPreDraw);
 
     pool->setEnable(true);
     if (pool->m_framebuffer) {
         pool->m_framebuffer->prepare(dest, src, colorClear);
-    }
 
-    std::scoped_lock lswap(pool->m_mutexPreDraw);
-    if (pool->m_repeat = pool->canRepaint(true)) {
-        pool->swapObjects();
+        if (pool->m_repeat = pool->canRepaint(true)) {
+            pool->swapObjects();
 
-        if (type == DrawPoolType::MAP) {
-            get(DrawPoolType::CREATURE_INFORMATION)->swapObjects();
+            if (type == DrawPoolType::MAP) {
+                get(DrawPoolType::CREATURE_INFORMATION)->swapObjects();
+            }
         }
-    }
+    } else pool->swapObjects();
 }
