@@ -31,7 +31,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
         if (type == DrawPoolType::MAP) {
             pool->m_framebuffer->m_useAlphaWriting = false;
             pool->m_framebuffer->disableBlend();
-            pool->m_forceRepaint = true;
+            pool->m_forceRepaint = false;
         } else if (type == DrawPoolType::FOREGROUND) {
             pool->setFPS(FPS10);
 
@@ -249,9 +249,7 @@ void DrawPool::resetState()
     }
 
     m_coords.clear();
-
     m_state = {};
-    m_depthLevel = 0;
     m_status.second = 0;
     m_lastFramebufferId = 0;
     m_shaderRefreshDelay = 0;
