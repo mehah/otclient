@@ -33,7 +33,7 @@
 
 #include "../stdext/storage.h"
 
-#define MAX_DRAW_DEPTH 15
+#define MAX_DRAW_DEPTH 8 // (15 / 2) + 1
 
 enum class DrawPoolType : uint8_t
 {
@@ -233,8 +233,8 @@ private:
             return false;
 
         m_objectsDraw.clear();
-        for (int_fast8_t depth = 0; depth <= MAX_DRAW_DEPTH; ++depth) {
-            for (int_fast8_t order = 0; order < static_cast<uint8_t>(DrawOrder::LAST); ++order) {
+        for (int_fast8_t depth = -1; ++depth <= m_depthLevel;) {
+            for (int_fast8_t order = -1; ++order < static_cast<uint8_t>(DrawOrder::LAST);) {
                 auto& objs = m_objects[depth][order];
                 m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
             }
