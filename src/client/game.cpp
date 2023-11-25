@@ -166,8 +166,6 @@ void Game::processGameStart()
     m_online = true;
     g_app.resetTargetFps();
 
-    g_window.setVerticalSync(g_window.vsyncEnabled());
-
     // synchronize fight modes with the server
     m_protocolGame->sendChangeFightModes(m_fightMode, m_chaseMode, m_safeFight, m_pvpMode);
 
@@ -195,12 +193,6 @@ void Game::processGameEnd()
 {
     // FPS fixed at 60 for when UI is rendering alone.
     g_app.setTargetFps(60u);
-
-    g_dispatcher.addEvent([vsyncEnabled = g_window.vsyncEnabled()] {
-        g_window.setVerticalSync(vsyncEnabled);
-    });
-
-    g_window.setVerticalSync(false);
 
     m_online = false;
     g_lua.callGlobalField("g_game", "onGameEnd");

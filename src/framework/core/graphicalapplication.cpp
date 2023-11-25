@@ -285,7 +285,6 @@ void GraphicalApplication::repaintMap() { g_drawPool.get(DrawPoolType::MAP)->rep
 void GraphicalApplication::repaint() { g_drawPool.get(DrawPoolType::FOREGROUND)->repaint(); }
 bool GraphicalApplication::canDrawTexts() const { return m_drawText && (!g_map.getStaticTexts().empty() || !g_map.getAnimatedTexts().empty()); }
 
-bool GraphicalApplication::isOnline() const { return g_game.isOnline(); }
 bool GraphicalApplication::isLoadingAsyncTexture() { return m_loadingAsyncTexture || g_game.isUsingProtobuf(); }
 
 void GraphicalApplication::setLoadingAsyncTexture(bool v) {

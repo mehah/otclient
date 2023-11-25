@@ -939,9 +939,6 @@ void WIN32Window::setVerticalSync(bool enable)
 {
     m_vsync = enable;
 
-    if (!g_app.isOnline())
-        return;
-
     g_mainDispatcher.addEvent([this, enable] {
 #ifdef OPENGL_ES
         eglSwapInterval(m_eglDisplay, enable);
