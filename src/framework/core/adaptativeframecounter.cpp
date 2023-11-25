@@ -24,7 +24,7 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/platform/platformwindow.h>
 
-void AdaptativeFrameCounter::update()
+bool AdaptativeFrameCounter::update()
 {
     const uint8_t maxFps = m_targetFps == 0 ? m_maxFps : std::clamp<uint8_t>(m_targetFps, 1, std::max<uint8_t>(m_maxFps, m_targetFps));
     if (maxFps > 0) {
@@ -37,13 +37,15 @@ void AdaptativeFrameCounter::update()
     ++m_fpsCount;
 
     if (m_fps == m_fpsCount)
-        return;
+        return false;
 
     const uint32_t tickCount = stdext::millis();
     if (tickCount - m_interval <= 1000)
-        return;
+        return false;
 
     m_fps = m_fpsCount;
     m_fpsCount = 0;
     m_interval = tickCount;
+
+    return true;
 }

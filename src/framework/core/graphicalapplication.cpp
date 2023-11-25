@@ -139,16 +139,16 @@ void GraphicalApplication::run()
     g_lua.callGlobalField("g_app", "onRun");
 
     AdaptativeFrameCounter frameCounter2;
-    frameCounter2.setTargetFps(0);
+    frameCounter2.setTargetFps(500u);
 
-    const auto& foregroundPaint = [&] {
+    const auto& foreground_paintAsync = [&] {
         g_asyncDispatcher.dispatch([] {
             std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND)->getMutexPreDraw());
             g_ui.render(DrawPoolType::FOREGROUND);
         });
     };
 
-    const auto& txtPaint = [&] {
+    const auto& txt_paintAsync = [&] {
         g_asyncDispatcher.dispatch([&] {
             std::scoped_lock l(g_drawPool.get(DrawPoolType::TEXT)->getMutexPreDraw());
             g_textDispatcher.poll();
@@ -157,6 +157,15 @@ void GraphicalApplication::run()
                 g_ui.m_mapWidget->drawSelf(DrawPoolType::FOREGROUND_TILE);
             }
         });
+    };
+
+    const auto& realFPS = [&] {
+        if (g_window.vsyncEnabled() || getMaxFps() || getTargetFps()) {
+            // get min fps between the two threads
+            return std::min<int>(m_frameCounter.getFps(), frameCounter2.getFps());
+        } else {
+            return std::max<int>(10, getFps() - m_frameCounter.getFpsPercent(frameCounter2.getPercent()));
+        }
     };
 
     g_asyncDispatcher.dispatch([&] {
@@ -170,23 +179,23 @@ void GraphicalApplication::run()
                 continue;
             }
 
-            if (foreground->canRepaint())
-                foregroundPaint();
-
             if (g_game.isOnline()) {
                 if (!g_ui.m_mapWidget)
                     g_ui.m_mapWidget = g_ui.getRootWidget()->recursiveGetChildById("gameMapPanel")->static_self_cast<UIMap>();
 
+                if (foreground->canRepaint())
+                    foreground_paintAsync();
+
                 if (txt->canRepaint())
-                    txtPaint();
+                    txt_paintAsync();
 
                 g_ui.m_mapWidget->drawSelf(DrawPoolType::MAP);
-            } else g_ui.m_mapWidget = nullptr;
+            } else if (foreground->canRepaint()) {
+                g_ui.m_mapWidget = nullptr;
+                g_ui.render(DrawPoolType::FOREGROUND);
+            }
 
             frameCounter2.update();
-
-            if (g_window.vsyncEnabled() || m_frameCounter.getMaxFps() > 0 || m_frameCounter.getTargetFps() > 0)
-                stdext::millisleep(1);
         }
     });
 
@@ -203,11 +212,12 @@ void GraphicalApplication::run()
 
         // update screen pixels
         g_window.swapBuffers();
-        m_frameCounter.update();
 
-        g_dispatcher.addEvent([fps = std::min<uint16_t>(getFps(), frameCounter2.getFps())] {
-            g_lua.callGlobalField("g_app", "onFps", fps);
-        });
+        if (m_frameCounter.update()) {
+            g_dispatcher.addEvent([this, fps = realFPS()] {
+                g_lua.callGlobalField("g_app", "onFps", fps);
+            });
+        }
     }
 
     m_stopping = false;

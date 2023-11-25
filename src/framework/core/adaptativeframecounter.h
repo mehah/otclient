@@ -33,7 +33,7 @@ public:
     AdaptativeFrameCounter() : m_interval(stdext::millis()) { }
 
     void init() { m_timer.restart(); }
-    void update();
+    bool update();
 
     uint16_t getFps() const { return m_fps; }
     uint8_t getMaxFps() const { return m_maxFps; }
@@ -44,11 +44,20 @@ public:
 
     void resetTargetFps() { m_targetFps = 0; }
 
+    float getPercent() const {
+        const auto maxFps = std::clamp<uint8_t>(m_targetFps, 1, std::max<uint8_t>(m_maxFps, m_targetFps));
+        return ((maxFps - m_fps) * 100) / static_cast<float>(m_fps);
+    }
+
+    float getFpsPercent(float percent) const {
+        return getFps() * (percent / 100);
+    }
+
 private:
     uint32_t getMaxPeriod(uint16_t fps) const { return 1000000u / fps; }
 
-    uint8_t m_maxFps{};
-    uint8_t m_targetFps{ 60u };
+    uint16_t m_maxFps{};
+    uint16_t m_targetFps{ 60u };
 
     uint16_t m_fps{};
     uint16_t m_fpsCount{};
