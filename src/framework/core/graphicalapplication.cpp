@@ -121,6 +121,10 @@ void GraphicalApplication::terminate()
 
 void GraphicalApplication::run()
 {
+    const auto& foreground = g_drawPool.get(DrawPoolType::FOREGROUND);
+    const auto& foreground_tile = g_drawPool.get(DrawPoolType::FOREGROUND_TILE);
+    const auto& txt = g_drawPool.get(DrawPoolType::TEXT);
+
     // run the first poll
     mainPoll();
     poll();
@@ -134,12 +138,26 @@ void GraphicalApplication::run()
 
     g_lua.callGlobalField("g_app", "onRun");
 
-    const auto& foreground = g_drawPool.get(DrawPoolType::FOREGROUND);
-    const auto& foreground_tile = g_drawPool.get(DrawPoolType::FOREGROUND_TILE);
-    const auto& txt = g_drawPool.get(DrawPoolType::TEXT);
-
     AdaptativeFrameCounter frameCounter2;
     frameCounter2.setTargetFps(0);
+
+    const auto& foregroundPaint = [&] {
+        g_asyncDispatcher.dispatch([] {
+            std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND)->getMutexPreDraw());
+            g_ui.render(DrawPoolType::FOREGROUND);
+        });
+    };
+
+    const auto& txtPaint = [&] {
+        g_asyncDispatcher.dispatch([&] {
+            std::scoped_lock l(g_drawPool.get(DrawPoolType::TEXT)->getMutexPreDraw());
+            g_textDispatcher.poll();
+            if (g_ui.m_mapWidget) {
+                g_ui.m_mapWidget->drawSelf(DrawPoolType::TEXT);
+                g_ui.m_mapWidget->drawSelf(DrawPoolType::FOREGROUND_TILE);
+            }
+        });
+    };
 
     g_asyncDispatcher.dispatch([&] {
         g_eventThreadId = std::this_thread::get_id();
@@ -152,27 +170,15 @@ void GraphicalApplication::run()
                 continue;
             }
 
-            if (foreground->canRepaint()) {
-                g_asyncDispatcher.dispatch([&foreground] {
-                    std::scoped_lock l(foreground->getMutexPreDraw());
-                    g_ui.render(DrawPoolType::FOREGROUND);
-                });
-            }
+            if (foreground->canRepaint())
+                foregroundPaint();
 
             if (g_game.isOnline()) {
                 if (!g_ui.m_mapWidget)
                     g_ui.m_mapWidget = g_ui.getRootWidget()->recursiveGetChildById("gameMapPanel")->static_self_cast<UIMap>();
 
-                if (txt->canRepaint() || foreground_tile->canRepaint()) {
-                    g_asyncDispatcher.dispatch([this, &txt] {
-                        std::scoped_lock l(txt->getMutexPreDraw());
-                        g_textDispatcher.poll();
-                        if (g_ui.m_mapWidget) {
-                            g_ui.m_mapWidget->drawSelf(DrawPoolType::TEXT);
-                            g_ui.m_mapWidget->drawSelf(DrawPoolType::FOREGROUND_TILE);
-                        }
-                    });
-                }
+                if (txt->canRepaint())
+                    txtPaint();
 
                 g_ui.m_mapWidget->drawSelf(DrawPoolType::MAP);
             } else g_ui.m_mapWidget = nullptr;
