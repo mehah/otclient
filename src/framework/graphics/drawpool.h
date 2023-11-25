@@ -33,8 +33,6 @@
 
 #include "../stdext/storage.h"
 
-#define MAX_DRAW_DEPTH 8 // (15 / 2) + 1
-
 enum class DrawPoolType : uint8_t
 {
     MAP,
@@ -222,25 +220,26 @@ private:
     void flush()
     {
         m_coords.clear();
-        if (m_depthLevel < MAX_DRAW_DEPTH)
-            ++m_depthLevel;
+
+        for (int_fast8_t order = -1; ++order < static_cast<uint8_t>(DrawOrder::LAST);) {
+            auto& objs = m_objects[order];
+            m_objectsFlushed.insert(m_objectsFlushed.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
+            objs.clear();
+        }
     }
 
-    inline bool swapObjects() {
-        std::scoped_lock l(m_mutexDraw, m_mutexPreDraw);
-        m_repaint.store(canRepaint(true));
-        if (!m_repaint)
-            return false;
-
+    inline void releaseObjects() {
         m_objectsDraw.clear();
-        for (int_fast8_t depth = -1; ++depth <= m_depthLevel;) {
-            for (int_fast8_t order = -1; ++order < static_cast<uint8_t>(DrawOrder::LAST);) {
-                auto& objs = m_objects[depth][order];
-                m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
-            }
+        if (!m_objectsFlushed.empty()) {
+            m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(m_objectsFlushed.begin()), make_move_iterator(m_objectsFlushed.end()));
+            m_objectsFlushed.clear();
         }
 
-        return true;
+        for (int_fast8_t order = -1; ++order < static_cast<uint8_t>(DrawOrder::LAST);) {
+            auto& objs = m_objects[order];
+            m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
+            objs.clear();
+        }
     }
 
     bool canRepaint(bool autoUpdateStatus);
@@ -255,7 +254,6 @@ private:
     bool m_alwaysGroupDrawings{ false };
 
     int_fast8_t m_bindedFramebuffers{ -1 };
-    uint8_t m_depthLevel{ 0 };
 
     uint16_t m_refreshDelay{ 0 }, m_shaderRefreshDelay{ 0 };
     uint32_t m_onlyOnceStateFlag{ 0 };
@@ -272,7 +270,8 @@ private:
     std::vector<Matrix3> m_transformMatrixStack;
     std::vector<FrameBufferPtr> m_temporaryFramebuffers;
 
-    std::vector<DrawObject> m_objects[MAX_DRAW_DEPTH + 1][static_cast<uint8_t>(DrawOrder::LAST)];
+    std::vector<DrawObject> m_objects[static_cast<uint8_t>(DrawOrder::LAST)];
+    std::vector<DrawObject> m_objectsFlushed;
     std::vector<DrawObject> m_objectsDraw;
 
     stdext::map<size_t, CoordsBuffer*> m_coords;
