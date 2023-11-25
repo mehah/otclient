@@ -243,9 +243,6 @@ private:
     }
 
     bool canRepaint(bool autoUpdateStatus);
-    bool isForcedRepaint() const {
-        return (m_forceRepaint) && (g_window.vsyncEnabled() || g_app.getMaxFps() > 0 || g_app.getTargetFps() > 0);
-    }
 
     const FrameBufferPtr& getTemporaryFrameBuffer(const uint8_t index);
 

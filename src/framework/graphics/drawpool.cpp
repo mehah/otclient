@@ -31,7 +31,6 @@ DrawPool* DrawPool::create(const DrawPoolType type)
         if (type == DrawPoolType::MAP) {
             pool->m_framebuffer->m_useAlphaWriting = false;
             pool->m_framebuffer->disableBlend();
-            pool->m_forceRepaint = false;
         } else if (type == DrawPoolType::FOREGROUND) {
             pool->setFPS(FPS10);
 
@@ -172,7 +171,7 @@ void DrawPool::updateHash(const DrawPool::DrawMethod& method, const TexturePtr& 
             stdext::hash_union(m_state.hash, texture->hash());
     }
 
-    if (hasFrameBuffer() && !isForcedRepaint()) { // Pool Hash
+    if (hasFrameBuffer()) { // Pool Hash
         if (m_state.hash)
             stdext::hash_union(m_status.second, m_state.hash);
 
@@ -258,7 +257,7 @@ void DrawPool::resetState()
 
 bool DrawPool::canRepaint(const bool autoUpdateStatus)
 {
-    if (!hasFrameBuffer() || isForcedRepaint())
+    if (!hasFrameBuffer())
         return true;
 
     uint16_t refreshDelay = m_refreshDelay;
