@@ -191,6 +191,7 @@ void DrawPoolManager::drawPool(const DrawPoolType type) {
         for (const auto& obj : pool->m_objectsDraw) {
             drawObject(obj);
         }
+        pool->m_repaint = false;
         return;
     }
 
