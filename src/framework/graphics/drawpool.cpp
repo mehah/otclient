@@ -65,7 +65,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
         auto& coords = m_coords.try_emplace(m_state.hash, nullptr).first->second;
         if (!coords) {
             auto state = getState(texture, color);
-            coords = m_objects[order].emplace_back(std::move(state)).coords.get();
+            coords = m_objects[m_depthLevel][order].emplace_back(std::move(state)).coords.get();
         }
 
         if (coordsBuffer)
@@ -75,7 +75,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
     } else {
         bool addNewObj = true;
 
-        auto& list = m_objects[order];
+        auto& list = m_objects[m_depthLevel][order];
         if (!list.empty()) {
             auto& prevObj = list.back();
             if (prevObj.state == m_state) {
@@ -195,7 +195,7 @@ DrawPool::PoolState DrawPool::getState(const TexturePtr& texture, const Color& c
        std::move(m_state.transformMatrix), m_state.opacity,
        m_state.compositionMode, m_state.blendEquation,
        std::move(m_state.clipRect), m_state.shaderProgram,
-       std::move(m_state.action), std::move(const_cast<Color&>(color)), texture, m_state.depthLevel, m_state.hash
+       std::move(m_state.action), std::move(const_cast<Color&>(color)), texture, m_state.hash
     };
 }
 
@@ -245,11 +245,13 @@ void DrawPool::setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bo
 void DrawPool::resetState()
 {
     for (auto& objs : m_objects) {
-        objs.clear();
+        for (auto& order : objs)
+            order.clear();
     }
 
     m_coords.clear();
     m_state = {};
+    m_depthLevel = 0;
     m_status.second = 0;
     m_lastFramebufferId = 0;
     m_shaderRefreshDelay = 0;
@@ -366,7 +368,7 @@ void DrawPool::removeFramebuffer() {
 void DrawPool::addAction(const std::function<void()>& action)
 {
     const uint8_t order = m_type == DrawPoolType::MAP ? DrawOrder::THIRD : DrawOrder::FIRST;
-    m_objects[order].emplace_back(action);
+    m_objects[m_depthLevel][order].emplace_back(action);
 }
 
 void DrawPool::bindFrameBuffer(const Size& size)

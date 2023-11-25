@@ -33,6 +33,8 @@
 
 #include "../stdext/storage.h"
 
+#define MAX_DRAW_DEPTH 15
+
 enum class DrawPoolType : uint8_t
 {
     MAP,
@@ -131,10 +133,9 @@ protected:
         std::function<void()> action{ nullptr };
         Color color{ Color::white };
         TexturePtr texture;
-        size_t depthLevel{ 0 };
         size_t hash{ 0 };
 
-        bool operator==(const PoolState& s2) const { return depthLevel == s2.depthLevel && hash == s2.hash; }
+        bool operator==(const PoolState& s2) const { return hash == s2.hash; }
         void execute() const;
     };
 
@@ -221,7 +222,8 @@ private:
     void flush()
     {
         m_coords.clear();
-        ++m_state.depthLevel;
+        if (m_depthLevel < MAX_DRAW_DEPTH)
+            ++m_depthLevel;
     }
 
     inline bool swapObjects() {
@@ -231,9 +233,11 @@ private:
             return false;
 
         m_objectsDraw.clear();
-        for (int_fast8_t order = 0; order < static_cast<uint8_t>(DrawOrder::LAST); ++order) {
-            auto& objs = m_objects[order];
-            m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
+        for (int_fast8_t depth = 0; depth <= MAX_DRAW_DEPTH; ++depth) {
+            for (int_fast8_t order = 0; order < static_cast<uint8_t>(DrawOrder::LAST); ++order) {
+                auto& objs = m_objects[depth][order];
+                m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
+            }
         }
 
         return true;
@@ -251,6 +255,7 @@ private:
     bool m_alwaysGroupDrawings{ false };
 
     int_fast8_t m_bindedFramebuffers{ -1 };
+    uint8_t m_depthLevel{ 0 };
 
     uint16_t m_refreshDelay{ 0 }, m_shaderRefreshDelay{ 0 };
     uint32_t m_onlyOnceStateFlag{ 0 };
@@ -267,7 +272,7 @@ private:
     std::vector<Matrix3> m_transformMatrixStack;
     std::vector<FrameBufferPtr> m_temporaryFramebuffers;
 
-    std::vector<DrawObject> m_objects[static_cast<uint8_t>(DrawOrder::LAST)];
+    std::vector<DrawObject> m_objects[MAX_DRAW_DEPTH + 1][static_cast<uint8_t>(DrawOrder::LAST)];
     std::vector<DrawObject> m_objectsDraw;
 
     stdext::map<size_t, CoordsBuffer*> m_coords;
