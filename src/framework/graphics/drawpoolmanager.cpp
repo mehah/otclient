@@ -149,9 +149,11 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     select(type);
     const auto pool = getCurrentPool();
 
-    std::scoped_lock lswap(pool->m_mutexPreDraw);
     pool->setEnable(true);
     pool->resetState();
+
+    if (pool->m_repaint.load())
+        return;
 
     // when the selected pool is MAP, reset the creature information state.
     if (type == DrawPoolType::MAP) {
@@ -166,15 +168,13 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     }
     if (f) f();
 
-    if (!pool->m_repaint.load()) {
-        pool->m_repaint.store(pool->canRepaint(true));
-        if (pool->m_repaint) {
-            std::scoped_lock l(pool->m_mutexDraw);
-            pool->releaseObjects();
+    pool->m_repaint.store(pool->canRepaint(true));
+    if (pool->m_repaint) {
+        std::scoped_lock l(pool->m_mutexDraw);
+        pool->releaseObjects();
 
-            if (type == DrawPoolType::MAP) {
-                get(DrawPoolType::CREATURE_INFORMATION)->releaseObjects();
-            }
+        if (type == DrawPoolType::MAP) {
+            get(DrawPoolType::CREATURE_INFORMATION)->releaseObjects();
         }
     }
 }

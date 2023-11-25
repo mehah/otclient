@@ -150,7 +150,8 @@ void GraphicalApplication::run()
             }
 
             if (foreground->canRepaint()) {
-                g_asyncDispatcher.dispatch([] {
+                g_asyncDispatcher.dispatch([&foreground] {
+                    std::scoped_lock l(foreground->getMutexPreDraw());
                     g_ui.render(DrawPoolType::FOREGROUND);
                 });
             }
@@ -161,6 +162,7 @@ void GraphicalApplication::run()
 
                 if (txt->canRepaint() || foreground_tile->canRepaint()) {
                     g_asyncDispatcher.dispatch([this, &txt] {
+                        std::scoped_lock l(txt->getMutexPreDraw());
                         g_textDispatcher.poll();
                         if (g_ui.m_mapWidget) {
                             g_ui.m_mapWidget->drawSelf(DrawPoolType::TEXT);
