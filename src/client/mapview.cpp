@@ -409,8 +409,8 @@ void MapView::updateGeometry(const Size& visibleDimension)
 
         m_lightView->resize(lightSize, tileSize);
     }
+
     g_mainDispatcher.addEvent([this, bufferSize]() {
-        std::scoped_lock l(m_pool->getMutex());
         m_pool->getFrameBuffer()->resize(bufferSize);
     });
 
@@ -548,7 +548,6 @@ void MapView::setAntiAliasingMode(const AntialiasingMode mode)
     m_antiAliasingMode = mode;
 
     g_mainDispatcher.addEvent([=, this]() {
-        std::scoped_lock l(m_pool->getMutex());
         m_pool->getFrameBuffer()->setSmooth(mode != ANTIALIASING_DISABLED);
     });
 

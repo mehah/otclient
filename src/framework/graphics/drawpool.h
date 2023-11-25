@@ -101,6 +101,7 @@ public:
     void onAfterDraw(std::function<void()> f) { m_afterDraw = std::move(f); }
 
     std::mutex& getMutex() { return m_mutexDraw; }
+    std::mutex& getMutexPreDraw() { return m_mutexPreDraw; }
 
 protected:
 
@@ -225,7 +226,12 @@ private:
             ++m_depthLevel;
     }
 
-    inline void swapObjects() {
+    inline bool swapObjects() {
+        std::scoped_lock l(m_mutexDraw, m_mutexPreDraw);
+        m_repaint.store(canRepaint(true));
+        if (!m_repaint)
+            return false;
+
         m_objectsDraw.clear();
         for (int_fast8_t depth = 0; depth <= MAX_DRAW_DEPTH; ++depth) {
             for (int_fast8_t order = 0; order < static_cast<uint8_t>(DrawOrder::LAST); ++order) {
@@ -233,6 +239,8 @@ private:
                 m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
             }
         }
+
+        return true;
     }
 
     bool canRepaint(bool autoUpdateStatus);
@@ -243,7 +251,6 @@ private:
     const FrameBufferPtr& getTemporaryFrameBuffer(const uint8_t index);
 
     bool m_enabled{ true };
-    bool m_repaint{ false };
     bool m_forceRepaint{ false };
     bool m_alwaysGroupDrawings{ false };
 
@@ -278,6 +285,7 @@ private:
     std::function<void()> m_beforeDraw;
     std::function<void()> m_afterDraw;
 
+    std::atomic_bool m_repaint{ false };
     std::mutex m_mutexDraw;
     std::mutex m_mutexPreDraw;
 

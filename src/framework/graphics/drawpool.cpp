@@ -260,7 +260,7 @@ void DrawPool::resetState()
 
 bool DrawPool::canRepaint(const bool autoUpdateStatus)
 {
-    if (isForcedRepaint())
+    if (!hasFrameBuffer() || isForcedRepaint())
         return true;
 
     uint16_t refreshDelay = m_refreshDelay;

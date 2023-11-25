@@ -36,7 +36,11 @@ LightView::LightView(const Size& size, const uint16_t tileSize) : m_pool(g_drawP
 
         g_drawPool.preDraw(DrawPoolType::LIGHT, [this] {
             g_drawPool.addAction([this] {
-                m_texture->updatePixels(m_pixels.data());
+                {
+                    std::scoped_lock l(m_pool->getMutexPreDraw());
+                    m_texture->updatePixels(m_pixels.data());
+                }
+
                 g_painter->resetColor();
                 g_painter->resetTransformMatrix();
                 g_painter->setTexture(m_texture.get());
@@ -69,7 +73,7 @@ void LightView::resize(const Size& size, const uint16_t tileSize) {
 
 void LightView::addLightSource(const Point& pos, const Light& light, float brightness)
 {
-    if (light.intensity == 0)
+    if (!isDark() || light.intensity == 0)
         return;
 
     auto& lightData = m_lightData[0];
@@ -108,7 +112,7 @@ void LightView::draw(const Rect& dest, const Rect& src)
         m_hash = m_updatedHash;
         m_updatedHash = 0;
 
-        std::scoped_lock l(m_pool->getMutex());
+        std::scoped_lock l(m_pool->getMutexPreDraw());
         std::swap(m_lightData[0], m_lightData[1]);
         g_asyncDispatcher.dispatch([this] {
             updatePixels();
@@ -139,7 +143,7 @@ void LightView::updateCoords(const Rect& dest, const Rect& src) {
 }
 
 void LightView::updatePixels() {
-    std::scoped_lock l(m_pool->getMutex());
+    std::scoped_lock l(m_pool->getMutexPreDraw());
 
     const auto& lightData = m_lightData[1];
 
