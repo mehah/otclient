@@ -121,10 +121,6 @@ void GraphicalApplication::terminate()
 
 void GraphicalApplication::run()
 {
-    const auto& foreground = g_drawPool.get(DrawPoolType::FOREGROUND);
-    const auto& foreground_tile = g_drawPool.get(DrawPoolType::FOREGROUND_TILE);
-    const auto& txt = g_drawPool.get(DrawPoolType::TEXT);
-
     // run the first poll
     mainPoll();
     poll();
@@ -170,6 +166,10 @@ void GraphicalApplication::run()
     };
 
     g_asyncDispatcher.dispatch([&] {
+        const auto& foreground = g_drawPool.get(DrawPoolType::FOREGROUND);
+        const auto& foreground_tile = g_drawPool.get(DrawPoolType::FOREGROUND_TILE);
+        const auto& txt = g_drawPool.get(DrawPoolType::TEXT);
+
         g_eventThreadId = std::this_thread::get_id();
         while (!m_stopping) {
             poll();
@@ -285,6 +285,7 @@ void GraphicalApplication::repaintMap() { g_drawPool.get(DrawPoolType::MAP)->rep
 void GraphicalApplication::repaint() { g_drawPool.get(DrawPoolType::FOREGROUND)->repaint(); }
 bool GraphicalApplication::canDrawTexts() const { return m_drawText && (!g_map.getStaticTexts().empty() || !g_map.getAnimatedTexts().empty()); }
 
+bool GraphicalApplication::isOnline() const { return g_game.isOnline(); }
 bool GraphicalApplication::isLoadingAsyncTexture() { return m_loadingAsyncTexture || g_game.isUsingProtobuf(); }
 
 void GraphicalApplication::setLoadingAsyncTexture(bool v) {

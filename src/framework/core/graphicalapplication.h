@@ -50,6 +50,7 @@ public:
 
     void resetTargetFps() { m_frameCounter.resetTargetFps(); }
 
+    bool isOnline() const;
     bool isOnInputEvent() { return m_onInputEvent; }
     bool mustOptimize() {
 #ifdef NDEBUG

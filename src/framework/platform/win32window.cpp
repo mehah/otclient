@@ -25,6 +25,7 @@
 #include "win32window.h"
 #include <client/map.h>
 #include <framework/core/application.h>
+#include <framework/core/graphicalapplication.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/image.h>
@@ -936,8 +937,12 @@ void WIN32Window::setFullscreen(bool fullscreen)
 
 void WIN32Window::setVerticalSync(bool enable)
 {
+    m_vsync = enable;
+
+    if (!g_app.isOnline())
+        return;
+
     g_mainDispatcher.addEvent([this, enable] {
-        m_vsync = enable;
 #ifdef OPENGL_ES
         eglSwapInterval(m_eglDisplay, enable);
 #else
