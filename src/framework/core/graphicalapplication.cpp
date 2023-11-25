@@ -165,7 +165,8 @@ void GraphicalApplication::run()
             return std::min<int>(m_frameCounter.getFps(), frameCounter2.getFps());
         }
 
-        return std::max<int>(10, getFps() - m_frameCounter.getFpsPercent(frameCounter2.getPercent()));
+        return getFps() < frameCounter2.getFps() ? getFps() :
+            std::max<int>(10, getFps() - m_frameCounter.getFpsPercent(frameCounter2.getPercent()));
     };
 
     g_asyncDispatcher.dispatch([&] {
@@ -174,7 +175,6 @@ void GraphicalApplication::run()
             poll();
 
             if (!g_window.isVisible()) {
-                g_textDispatcher.poll();
                 stdext::millisleep(10);
                 continue;
             }
