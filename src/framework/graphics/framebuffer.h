@@ -43,7 +43,7 @@ public:
     bool isValid() const { return m_texture != nullptr; }
     bool canDraw() const {
         std::scoped_lock l(m_mutex);
-        return m_coordsBuffer.getVertexCount() > 0;
+        return m_texture && m_coordsBuffer.getVertexCount() > 0;
     }
     TexturePtr getTexture() const { return m_texture; }
     Size getSize() const { return m_texture->getSize(); }
