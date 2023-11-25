@@ -36,8 +36,8 @@ public:
     bool update();
 
     uint16_t getFps() const { return m_fps; }
-    uint8_t getMaxFps() const { return m_maxFps; }
-    uint8_t getTargetFps() const { return m_targetFps; }
+    uint16_t getMaxFps() const { return m_maxFps; }
+    uint16_t getTargetFps() const { return m_targetFps; }
 
     void setMaxFps(const uint16_t max) { m_maxFps = max; }
     void setTargetFps(const uint16_t target) { m_targetFps = target; }
@@ -45,8 +45,8 @@ public:
     void resetTargetFps() { m_targetFps = 0; }
 
     float getPercent() const {
-        const auto maxFps = std::clamp<uint8_t>(m_targetFps, 1, std::max<uint8_t>(m_maxFps, m_targetFps));
-        return ((maxFps - m_fps) * 100) / static_cast<float>(m_fps);
+        const float maxFps = std::clamp<uint16_t>(m_targetFps, 1, std::max<uint16_t>(m_maxFps, m_targetFps));
+        return ((maxFps - m_fps) / maxFps) * 100.f;
     }
 
     float getFpsPercent(float percent) const {

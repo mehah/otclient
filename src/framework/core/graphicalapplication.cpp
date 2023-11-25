@@ -163,9 +163,9 @@ void GraphicalApplication::run()
         if (g_window.vsyncEnabled() || getMaxFps() || getTargetFps()) {
             // get min fps between the two threads
             return std::min<int>(m_frameCounter.getFps(), frameCounter2.getFps());
-        } else {
-            return std::max<int>(10, getFps() - m_frameCounter.getFpsPercent(frameCounter2.getPercent()));
         }
+
+        return std::max<int>(10, getFps() - m_frameCounter.getFpsPercent(frameCounter2.getPercent()));
     };
 
     g_asyncDispatcher.dispatch([&] {

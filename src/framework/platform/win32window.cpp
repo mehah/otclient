@@ -936,8 +936,11 @@ void WIN32Window::setFullscreen(bool fullscreen)
 
 void WIN32Window::setVerticalSync(bool enable)
 {
-    g_mainDispatcher.addEvent([&, enable] {
-        m_vsync = enable;
+    if (m_vsync == enable)
+        return;
+
+    m_vsync = enable;
+    g_mainDispatcher.addEvent([this, enable] {
 #ifdef OPENGL_ES
         eglSwapInterval(m_eglDisplay, enable);
 #else
@@ -950,7 +953,7 @@ void WIN32Window::setVerticalSync(bool enable)
 
         wglSwapInterval(enable);
 #endif
-    });
+});
 }
 
 void WIN32Window::setIcon(const std::string& file)
