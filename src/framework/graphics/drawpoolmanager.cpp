@@ -160,15 +160,18 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
         get(DrawPoolType::CREATURE_INFORMATION)->resetState();
     }
 
+    if (pool->m_framebuffer) {
+        addAction([=, this] {
+            pool->m_framebuffer->prepare(dest, src, colorClear);
+        });
+        pool->flush();
+    }
+
     if (f) f();
 
     pool->m_repaint.store(pool->canRepaint(true));
     if (pool->m_repaint) {
         std::scoped_lock l(pool->m_mutexDraw);
-        if (pool->m_framebuffer) {
-            pool->m_framebuffer->prepare(dest, src, colorClear);
-        }
-
         pool->releaseObjects();
 
         if (type == DrawPoolType::MAP) {
@@ -193,6 +196,7 @@ void DrawPoolManager::drawPool(const DrawPoolType type) {
 
     if (pool->m_repaint.load()) {
         std::scoped_lock l(pool->m_mutexDraw);
+        pool->m_objectsDraw.front().action();
         pool->m_framebuffer->bind(); {
             for (const auto& obj : pool->m_objectsDraw)
                 drawObject(obj);

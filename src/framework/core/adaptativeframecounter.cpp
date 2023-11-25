@@ -46,6 +46,4 @@ void AdaptativeFrameCounter::update()
     m_fps = m_fpsCount;
     m_fpsCount = 0;
     m_interval = tickCount;
-
-    g_dispatcher.addEvent([this] { g_lua.callGlobalField("g_app", "onFps", getFps()); });
 }

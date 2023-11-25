@@ -138,6 +138,9 @@ void GraphicalApplication::run()
     const auto& foreground_tile = g_drawPool.get(DrawPoolType::FOREGROUND_TILE);
     const auto& txt = g_drawPool.get(DrawPoolType::TEXT);
 
+    AdaptativeFrameCounter frameCounter2;
+    frameCounter2.setTargetFps(0);
+
     g_asyncDispatcher.dispatch([&] {
         g_eventThreadId = std::this_thread::get_id();
         while (!m_stopping) {
@@ -174,7 +177,10 @@ void GraphicalApplication::run()
                 g_ui.m_mapWidget->drawSelf(DrawPoolType::MAP);
             } else g_ui.m_mapWidget = nullptr;
 
-            stdext::millisleep(1);
+            frameCounter2.update();
+
+            if (g_window.vsyncEnabled() || m_frameCounter.getMaxFps() > 0 || m_frameCounter.getTargetFps() > 0)
+                stdext::millisleep(1);
         }
     });
 
@@ -192,6 +198,10 @@ void GraphicalApplication::run()
         // update screen pixels
         g_window.swapBuffers();
         m_frameCounter.update();
+
+        g_dispatcher.addEvent([fps = std::min<uint16_t>(getFps(), frameCounter2.getFps())] {
+            g_lua.callGlobalField("g_app", "onFps", fps);
+        });
     }
 
     m_stopping = false;
