@@ -149,7 +149,8 @@ void GraphicalApplication::run()
 
         if (foregroundMap->canRepaint()) {
             g_asyncDispatcher.dispatch([&] {
-                g_ui.m_mapWidget->drawSelf(DrawPoolType::FOREGROUND_MAP);
+                if (g_ui.m_mapWidget)
+                    g_ui.m_mapWidget->drawSelf(DrawPoolType::FOREGROUND_MAP);
             });
         }
     };
