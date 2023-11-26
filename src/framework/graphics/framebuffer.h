@@ -42,7 +42,6 @@ public:
     bool resize(const Size& size);
     bool isValid() const { return m_texture != nullptr; }
     bool canDraw() const {
-        std::scoped_lock l(m_mutex);
         return m_texture && m_coordsBuffer.getVertexCount() > 0;
     }
     TexturePtr getTexture() const { return m_texture; }
@@ -85,6 +84,4 @@ private:
 
     CoordsBuffer m_coordsBuffer;
     CoordsBuffer m_screenCoordsBuffer;
-
-    mutable std::shared_mutex m_mutex;
 };

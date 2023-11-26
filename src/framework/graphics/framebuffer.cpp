@@ -88,7 +88,6 @@ void FrameBuffer::bind()
     g_painter->setResolution(getSize(), m_textureMatrix);
     g_painter->setAlphaWriting(m_useAlphaWriting);
 
-    std::scoped_lock l(m_mutex);
     if (m_colorClear != Color::alpha) {
         g_painter->setTexture(nullptr);
         g_painter->setColor(m_colorClear);
@@ -133,8 +132,6 @@ void FrameBuffer::prepare(const Rect& dest, const Rect& src, const Color& colorC
 {
     const auto& _dest = dest.isValid() ? dest : Rect(0, 0, getSize());
     const auto& _src = src.isValid() ? src : Rect(0, 0, getSize());
-
-    std::unique_lock l(m_mutex);
 
     if (m_colorClear != colorClear)
         m_colorClear = colorClear;
