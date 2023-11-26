@@ -116,20 +116,15 @@ void MapView::draw(const Rect& rect)
         }
     }
 
-    g_drawPool.preDraw(DrawPoolType::MAP, [this, &rect] {
-        updateRect(rect);
-        registerEvents();
+    drawFloor();
 
-        drawFloor();
+    // this could happen if the player position is not known yet
+    if (!m_posInfo.camera.isValid()) {
+        return;
+    }
 
-        // this could happen if the player position is not known yet
-        if (!m_posInfo.camera.isValid()) {
-            return;
-        }
-
-        if (isDrawingLights())
-            m_lightView->draw(m_posInfo.rect, m_posInfo.srcRect);
-    }, m_posInfo.rect, m_posInfo.srcRect, Color::black);
+    if (isDrawingLights())
+        m_lightView->draw(m_posInfo.rect, m_posInfo.srcRect);
 }
 
 void MapView::drawFloor()
@@ -215,43 +210,41 @@ void MapView::drawFloor()
 
 void MapView::drawText(const Rect& rect)
 {
-    g_drawPool.preDraw(DrawPoolType::TEXT, [this, &rect] {
-        const auto& camera = getCameraPosition();
-        const auto& srcRect = calcFramebufferSource(rect.size());
-        const auto& drawOffset = srcRect.topLeft();
-        const auto& horizontalStretchFactor = rect.width() / static_cast<float>(srcRect.width());
-        const auto& verticalStretchFactor = rect.height() / static_cast<float>(srcRect.height());
+    const auto& camera = getCameraPosition();
+    const auto& srcRect = calcFramebufferSource(rect.size());
+    const auto& drawOffset = srcRect.topLeft();
+    const auto& horizontalStretchFactor = rect.width() / static_cast<float>(srcRect.width());
+    const auto& verticalStretchFactor = rect.height() / static_cast<float>(srcRect.height());
 
-        g_drawPool.scale(g_app.getStaticTextScale());
-        for (const auto& staticText : g_map.getStaticTexts()) {
-            if (staticText->getMessageMode() == Otc::MessageNone)
-                continue;
+    g_drawPool.scale(g_app.getStaticTextScale());
+    for (const auto& staticText : g_map.getStaticTexts()) {
+        if (staticText->getMessageMode() == Otc::MessageNone)
+            continue;
 
-            const auto& pos = staticText->getPosition();
-            if (pos.z != camera.z && staticText->getMessageMode() == Otc::MessageNone)
-                continue;
+        const auto& pos = staticText->getPosition();
+        if (pos.z != camera.z && staticText->getMessageMode() == Otc::MessageNone)
+            continue;
 
-            Point p = transformPositionTo2D(pos, camera) - drawOffset;
-            p.x *= horizontalStretchFactor;
-            p.y *= verticalStretchFactor;
-            p += rect.topLeft();
-            staticText->drawText(p.scale(g_app.getStaticTextScale()), rect);
-        }
+        Point p = transformPositionTo2D(pos, camera) - drawOffset;
+        p.x *= horizontalStretchFactor;
+        p.y *= verticalStretchFactor;
+        p += rect.topLeft();
+        staticText->drawText(p.scale(g_app.getStaticTextScale()), rect);
+    }
 
-        g_drawPool.scale(g_app.getAnimatedTextScale());
-        for (const auto& animatedText : g_map.getAnimatedTexts()) {
-            const auto& pos = animatedText->getPosition();
+    g_drawPool.scale(g_app.getAnimatedTextScale());
+    for (const auto& animatedText : g_map.getAnimatedTexts()) {
+        const auto& pos = animatedText->getPosition();
 
-            if (pos.z != camera.z)
-                continue;
+        if (pos.z != camera.z)
+            continue;
 
-            auto p = transformPositionTo2D(pos, camera) - drawOffset;
-            p.x *= horizontalStretchFactor;
-            p.y *= verticalStretchFactor;
-            p += rect.topLeft();
-            animatedText->drawText(p, rect);
-        }
-    });
+        auto p = transformPositionTo2D(pos, camera) - drawOffset;
+        p.x *= horizontalStretchFactor;
+        p.y *= verticalStretchFactor;
+        p += rect.topLeft();
+        animatedText->drawText(p, rect);
+    }
 }
 
 void MapView::updateVisibleTiles()

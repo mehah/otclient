@@ -139,19 +139,14 @@ void GraphicalApplication::run()
 
     const auto& foreground_paintAsync = [&] {
         g_asyncDispatcher.dispatch([] {
-            std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND)->getMutexPreDraw());
             g_ui.render(DrawPoolType::FOREGROUND);
         });
     };
 
     const auto& txt_paintAsync = [&] {
         g_asyncDispatcher.dispatch([&] {
-            std::scoped_lock l(g_drawPool.get(DrawPoolType::TEXT)->getMutexPreDraw());
-            g_textDispatcher.poll();
-            if (g_ui.m_mapWidget) {
-                g_ui.m_mapWidget->drawSelf(DrawPoolType::TEXT);
-                g_ui.m_mapWidget->drawSelf(DrawPoolType::FOREGROUND_TILE);
-            }
+            g_ui.m_mapWidget->drawSelf(DrawPoolType::TEXT);
+            g_ui.m_mapWidget->drawSelf(DrawPoolType::FOREGROUND_TILE);
         });
     };
 

@@ -21,6 +21,7 @@
  */
 
 #include "uimap.h"
+#include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
@@ -74,12 +75,21 @@ void UIMap::drawSelf(DrawPoolType drawPane)
         return;
     }
 
-    const auto& mapSize = g_app.isScaled() ? Rect(0, 0, g_graphics.getViewportSize()) : m_mapRect;
+    const auto& mapRect = g_app.isScaled() ? Rect(0, 0, g_graphics.getViewportSize()) : m_mapRect;
 
     if (drawPane == DrawPoolType::MAP) {
-        m_mapView->draw(mapSize);
+        std::scoped_lock l(g_drawPool.get(DrawPoolType::MAP)->getMutexPreDraw());
+        m_mapView->updateRect(mapRect);
+        g_drawPool.preDraw(DrawPoolType::MAP, [this, &mapRect] {
+            m_mapView->registerEvents();
+            m_mapView->draw(mapRect);
+        }, m_mapView->m_posInfo.rect, m_mapView->m_posInfo.srcRect, Color::black);
     } else if (drawPane == DrawPoolType::TEXT) {
-        m_mapView->drawText(mapSize);
+        std::scoped_lock l(g_drawPool.get(DrawPoolType::TEXT)->getMutexPreDraw());
+        g_textDispatcher.poll();
+        g_drawPool.preDraw(DrawPoolType::TEXT, [this, &mapRect] {
+            m_mapView->drawText(mapRect);
+        });
     }
 }
 
