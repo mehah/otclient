@@ -219,26 +219,25 @@ private:
     void flush()
     {
         m_coords.clear();
-
-        for (int_fast8_t order = -1; ++order < static_cast<uint8_t>(DrawOrder::LAST);) {
-            auto& objs = m_objects[order];
+        for (auto& objs : m_objects) {
             m_objectsFlushed.insert(m_objectsFlushed.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
             objs.clear();
         }
     }
 
-    void release() {
+    void release(bool draw = true) {
         m_objectsDraw.clear();
-        if (!m_objectsFlushed.empty()) {
-            m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(m_objectsFlushed.begin()), make_move_iterator(m_objectsFlushed.end()));
-            m_objectsFlushed.clear();
+        if (draw) {
+            if (!m_objectsFlushed.empty())
+                m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(m_objectsFlushed.begin()), make_move_iterator(m_objectsFlushed.end()));
+
+            for (auto& objs : m_objects) {
+                m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
+                objs.clear();
+            }
         }
 
-        for (int_fast8_t order = -1; ++order < static_cast<uint8_t>(DrawOrder::LAST);) {
-            auto& objs = m_objects[order];
-            m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
-            objs.clear();
-        }
+        m_objectsFlushed.clear();
     }
 
     bool canRepaint(bool autoUpdateStatus);

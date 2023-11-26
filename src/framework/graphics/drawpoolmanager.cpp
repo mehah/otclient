@@ -167,12 +167,10 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     if (pool->hasFrameBuffer())
         pool->m_framebuffer->prepare(dest, src, colorClear);
 
-    if (pool->m_repaint = pool->canRepaint(true)) {
-        pool->release();
+    pool->release(pool->m_repaint = pool->canRepaint(true));
 
-        if (type == DrawPoolType::MAP) {
-            get(DrawPoolType::CREATURE_INFORMATION)->release();
-        }
+    if (type == DrawPoolType::MAP) {
+        get(DrawPoolType::CREATURE_INFORMATION)->release();
     }
 }
 
