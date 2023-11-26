@@ -243,11 +243,11 @@ void DrawPool::setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bo
 
 void DrawPool::resetState()
 {
-    for (auto& objs : m_objects) {
+    for (auto& objs : m_objects)
         objs.clear();
-    }
-
+    m_objectsFlushed.clear();
     m_coords.clear();
+
     m_state = {};
     m_status.second = 0;
     m_lastFramebufferId = 0;
