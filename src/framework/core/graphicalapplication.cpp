@@ -137,17 +137,14 @@ void GraphicalApplication::run()
     std::condition_variable foregroundUICondition, foregroundMapCondition;
 
     AdaptativeFrameCounter frameCounter2;
-    frameCounter2.setTargetFps(500u);
 
     const auto& realFPS = [&] {
-        if (g_window.vsyncEnabled() || getMaxFps() || getTargetFps()) {
-            // get min fps between the two threads
-            return std::min<int>(m_frameCounter.getFps(), frameCounter2.getFps());
-        }
+        if (g_window.vsyncEnabled() || getMaxFps() || getTargetFps())
+            frameCounter2.setTargetFps(500u);
+        else frameCounter2.resetTargetFps();
 
-        return getFps() < frameCounter2.getFps() ? getFps() :
-            // adjusts the main FPS according to the secondary FPS percentage.
-            std::max<int>(10, getFps() - m_frameCounter.getFpsPercent(frameCounter2.getPercent()));
+        // get min fps between the two threads
+        return std::min<int>(m_frameCounter.getFps(), frameCounter2.getFps());
     };
 
     const auto& drawForeground = [&] {
