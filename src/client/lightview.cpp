@@ -33,21 +33,6 @@ LightView::LightView(const Size& size, const uint16_t tileSize) : m_pool(g_drawP
     g_mainDispatcher.addEvent([this, size] {
         m_texture = std::make_shared<Texture>(size);
         m_texture->setSmooth(true);
-
-        g_drawPool.preDraw(DrawPoolType::LIGHT, [this] {
-            g_drawPool.addAction([this] {
-                {
-                    std::scoped_lock l(m_pool->getMutexPreDraw());
-                    m_texture->updatePixels(m_pixels.data());
-                }
-
-                g_painter->resetColor();
-                g_painter->resetTransformMatrix();
-                g_painter->setTexture(m_texture.get());
-                g_painter->setCompositionMode(CompositionMode::MULTIPLY);
-                g_painter->drawCoords(m_coords);
-            });
-        });
     });
 }
 
@@ -106,8 +91,6 @@ void LightView::resetShade(const Point& pos)
 
 void LightView::draw(const Rect& dest, const Rect& src)
 {
-    updateCoords(dest, src);
-
     if (m_updatedHash != m_hash) {
         m_hash = m_updatedHash;
         m_updatedHash = 0;
@@ -122,13 +105,28 @@ void LightView::draw(const Rect& dest, const Rect& src)
     auto& lightData = m_lightData[0];
     lightData.lights.clear();
     lightData.tiles.assign(m_mapSize.area(), {});
+
+    g_drawPool.preDraw(DrawPoolType::LIGHT, [this, &dest, &src] {
+        g_drawPool.addAction([=, this] {
+            updateCoords(dest, src);
+
+            {
+                std::scoped_lock l(m_pool->getMutexPreDraw());
+                m_texture->updatePixels(m_pixels.data());
+            }
+
+            g_painter->resetColor();
+            g_painter->resetTransformMatrix();
+            g_painter->setTexture(m_texture.get());
+            g_painter->setCompositionMode(CompositionMode::MULTIPLY);
+            g_painter->drawCoords(m_coords);
+        });
+    });
 }
 
 void LightView::updateCoords(const Rect& dest, const Rect& src) {
     if (m_dest == dest && m_src == src)
         return;
-
-    std::scoped_lock l(m_pool->getMutex());
 
     const auto& offset = src.topLeft();
     const auto& size = src.size();
