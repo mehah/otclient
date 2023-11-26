@@ -75,12 +75,11 @@ void UIMap::drawSelf(DrawPoolType drawPane)
     }
 
     const auto& mapSize = g_app.isScaled() ? Rect(0, 0, g_graphics.getViewportSize()) : m_mapRect;
-    m_mapView->updateRect(mapSize);
 
     if (drawPane == DrawPoolType::MAP) {
-        m_mapView->draw();
+        m_mapView->draw(mapSize);
     } else if (drawPane == DrawPoolType::TEXT) {
-        m_mapView->drawText();
+        m_mapView->drawText(mapSize);
     }
 }
 

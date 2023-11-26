@@ -46,7 +46,19 @@ MapView::MapView() : m_pool(g_drawPool.get(DrawPoolType::MAP)), m_lightView(std:
 {
     m_floors.resize(g_gameConfig.getMapMaxZ() + 1);
 
-    m_pool->onBeforeDraw([this] {
+    setVisibleDimension(Size(15, 11));
+}
+
+MapView::~MapView()
+{
+#ifndef NDEBUG
+    assert(!g_app.isTerminated());
+#endif
+    m_lightView = nullptr;
+}
+
+void MapView::registerEvents() {
+    m_pool->onBeforeDraw([this, camera = m_posInfo.camera, srcRect = m_posInfo.srcRect] {
         float fadeOpacity = 1.f;
         if (!m_shaderSwitchDone && m_fadeOutTime > 0) {
             fadeOpacity = 1.f - (m_fadeTimer.timeElapsed() / m_fadeOutTime);
@@ -62,15 +74,15 @@ MapView::MapView() : m_pool(g_drawPool.get(DrawPoolType::MAP)), m_lightView(std:
             fadeOpacity = std::min<float>(m_fadeTimer.timeElapsed() / m_fadeInTime, 1.f);
 
         if (m_shader) {
-            const auto& center = m_posInfo.srcRect.center();
-            const auto& globalCoord = Point(m_posInfo.camera.x - m_drawDimension.width() / 2, -(m_posInfo.camera.y - m_drawDimension.height() / 2)) * m_tileSize;
+            const auto& center = srcRect.center();
+            const auto& globalCoord = Point(camera.x - m_drawDimension.width() / 2, -(camera.y - m_drawDimension.height() / 2)) * m_tileSize;
 
             m_shader->bind();
             m_shader->setUniformValue(ShaderManager::MAP_CENTER_COORD, center.x / static_cast<float>(m_rectDimension.width()), 1.f - center.y / static_cast<float>(m_rectDimension.height()));
             m_shader->setUniformValue(ShaderManager::MAP_GLOBAL_COORD, globalCoord.x / static_cast<float>(m_rectDimension.height()), globalCoord.y / static_cast<float>(m_rectDimension.height()));
             m_shader->setUniformValue(ShaderManager::MAP_ZOOM, m_pool->getScaleFactor());
 
-            Point last = transformPositionTo2D(m_posInfo.camera, m_shaderPosition);
+            Point last = transformPositionTo2D(camera, m_shaderPosition);
             //Reverse vertical axis.
             last.y = -last.y;
 
@@ -86,19 +98,9 @@ MapView::MapView() : m_pool(g_drawPool.get(DrawPoolType::MAP)), m_lightView(std:
         g_painter->resetShaderProgram();
         g_painter->resetOpacity();
     });
-
-    setVisibleDimension(Size(15, 11));
 }
 
-MapView::~MapView()
-{
-#ifndef NDEBUG
-    assert(!g_app.isTerminated());
-#endif
-    m_lightView = nullptr;
-}
-
-void MapView::draw()
+void MapView::draw(const Rect& rect)
 {
     // update visible tiles cache when needed
     if (m_updateVisibleTiles)
@@ -112,7 +114,10 @@ void MapView::draw()
         }
     }
 
-    g_drawPool.preDraw(DrawPoolType::MAP, [this] {
+    g_drawPool.preDraw(DrawPoolType::MAP, [this, &rect] {
+        updateRect(rect);
+        registerEvents();
+
         drawFloor();
 
         // this could happen if the player position is not known yet
@@ -206,37 +211,43 @@ void MapView::drawFloor()
     }
 }
 
-void MapView::drawText()
+void MapView::drawText(const Rect& rect)
 {
-    g_drawPool.preDraw(DrawPoolType::TEXT, [this] {
+    g_drawPool.preDraw(DrawPoolType::TEXT, [this, &rect] {
+        const auto& camera = getCameraPosition();
+        const auto& srcRect = calcFramebufferSource(rect.size());
+        const auto& drawOffset = srcRect.topLeft();
+        const auto& horizontalStretchFactor = rect.width() / static_cast<float>(srcRect.width());
+        const auto& verticalStretchFactor = rect.height() / static_cast<float>(srcRect.height());
+
         g_drawPool.scale(g_app.getStaticTextScale());
         for (const auto& staticText : g_map.getStaticTexts()) {
             if (staticText->getMessageMode() == Otc::MessageNone)
                 continue;
 
             const auto& pos = staticText->getPosition();
-            if (pos.z != m_posInfo.camera.z && staticText->getMessageMode() == Otc::MessageNone)
+            if (pos.z != camera.z && staticText->getMessageMode() == Otc::MessageNone)
                 continue;
 
-            Point p = transformPositionTo2D(pos, m_posInfo.camera) - m_posInfo.drawOffset;
-            p.x *= m_posInfo.horizontalStretchFactor;
-            p.y *= m_posInfo.verticalStretchFactor;
-            p += m_posInfo.rect.topLeft();
-            staticText->drawText(p.scale(g_app.getStaticTextScale()), m_posInfo.rect);
+            Point p = transformPositionTo2D(pos, camera) - drawOffset;
+            p.x *= horizontalStretchFactor;
+            p.y *= verticalStretchFactor;
+            p += rect.topLeft();
+            staticText->drawText(p.scale(g_app.getStaticTextScale()), rect);
         }
 
         g_drawPool.scale(g_app.getAnimatedTextScale());
         for (const auto& animatedText : g_map.getAnimatedTexts()) {
             const auto& pos = animatedText->getPosition();
 
-            if (pos.z != m_posInfo.camera.z)
+            if (pos.z != camera.z)
                 continue;
 
-            auto p = transformPositionTo2D(pos, m_posInfo.camera) - m_posInfo.drawOffset;
-            p.x *= m_posInfo.horizontalStretchFactor;
-            p.y *= m_posInfo.verticalStretchFactor;
-            p += m_posInfo.rect.topLeft();
-            animatedText->drawText(p, m_posInfo.rect);
+            auto p = transformPositionTo2D(pos, camera) - drawOffset;
+            p.x *= horizontalStretchFactor;
+            p.y *= verticalStretchFactor;
+            p += rect.topLeft();
+            animatedText->drawText(p, rect);
         }
     });
 }

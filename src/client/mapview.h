@@ -88,8 +88,8 @@ public:
 
     MapView();
     ~MapView() override;
-    void draw();
-    void drawText();
+    void draw(const Rect& rect);
+    void drawText(const Rect& rect);
 
     // floor visibility related
     uint8_t getLockedFirstVisibleFloor() const { return m_lockedFirstVisibleFloor; }
@@ -220,23 +220,24 @@ private:
         TexturePtr texture;
     };
 
+    void updateHighlightTile(const Position& mousePos);
+    void destroyHighlightTile();
+
+    void updateLight();
+    void updateViewportDirectionCache();
     void updateGeometry(const Size& visibleDimension);
     void updateVisibleTiles();
     void updateRect(const Rect& rect);
+    void updateViewport(const Otc::Direction dir = Otc::InvalidDirection) { m_viewport = m_viewPortDirection[dir]; }
     void requestUpdateVisibleTiles() { m_updateVisibleTiles = true; }
     void requestUpdateMapPosInfo() { m_updateMapPosInfo = true; }
+
+    void registerEvents();
 
     uint8_t calcFirstVisibleFloor(bool checkLimitsFloorsView) const;
     uint8_t calcLastVisibleFloor() const;
 
-    void updateLight();
-    void updateViewportDirectionCache();
     void drawFloor();
-
-    void updateHighlightTile(const Position& mousePos);
-    void destroyHighlightTile();
-
-    void updateViewport(const Otc::Direction dir = Otc::InvalidDirection) { m_viewport = m_viewPortDirection[dir]; }
 
     bool canFloorFade() const { return m_floorViewMode == FADE && m_floorFading; }
 
