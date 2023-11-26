@@ -165,8 +165,8 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     std::scoped_lock l(pool->m_mutexDraw);
     if (pool->m_framebuffer)
         pool->m_framebuffer->prepare(dest, src, colorClear);
-    pool->m_repaint.store(pool->canRepaint(true));
-    if (pool->m_repaint) {
+
+    if (pool->m_repaint = pool->canRepaint(true)) {
         pool->releaseObjects();
 
         if (type == DrawPoolType::MAP) {
@@ -182,10 +182,10 @@ void DrawPoolManager::drawPool(const DrawPoolType type) {
         return;
 
     if (!pool->hasFrameBuffer()) {
+        pool->m_repaint.store(false);
         for (const auto& obj : pool->m_objectsDraw) {
             drawObject(obj);
         }
-        pool->m_repaint = false;
         return;
     }
 
@@ -194,12 +194,12 @@ void DrawPoolManager::drawPool(const DrawPoolType type) {
     if (!pool->m_framebuffer->canDraw())
         return;
 
-    if (pool->m_repaint.load()) {
+    if (pool->m_repaint) {
+        pool->m_repaint.store(false);
         pool->m_framebuffer->bind(); {
             for (const auto& obj : pool->m_objectsDraw)
                 drawObject(obj);
         }pool->m_framebuffer->release();
-        pool->m_repaint.store(false);
     }
 
     g_painter->resetState();
