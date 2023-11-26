@@ -58,45 +58,47 @@ MapView::~MapView()
 }
 
 void MapView::registerEvents() {
-    m_pool->onBeforeDraw([this, camera = m_posInfo.camera, srcRect = m_posInfo.srcRect] {
-        float fadeOpacity = 1.f;
-        if (!m_shaderSwitchDone && m_fadeOutTime > 0) {
-            fadeOpacity = 1.f - (m_fadeTimer.timeElapsed() / m_fadeOutTime);
-            if (fadeOpacity < 0.f) {
-                m_shader = m_nextShader;
-                m_nextShader = nullptr;
-                m_shaderSwitchDone = true;
-                m_fadeTimer.restart();
+    g_drawPool.addAction([this, camera = m_posInfo.camera, srcRect = m_posInfo.srcRect] {
+        m_pool->onBeforeDraw([=, this] {
+            float fadeOpacity = 1.f;
+            if (!m_shaderSwitchDone && m_fadeOutTime > 0) {
+                fadeOpacity = 1.f - (m_fadeTimer.timeElapsed() / m_fadeOutTime);
+                if (fadeOpacity < 0.f) {
+                    m_shader = m_nextShader;
+                    m_nextShader = nullptr;
+                    m_shaderSwitchDone = true;
+                    m_fadeTimer.restart();
+                }
             }
-        }
 
-        if (m_shaderSwitchDone && m_shader && m_fadeInTime > 0)
-            fadeOpacity = std::min<float>(m_fadeTimer.timeElapsed() / m_fadeInTime, 1.f);
+            if (m_shaderSwitchDone && m_shader && m_fadeInTime > 0)
+                fadeOpacity = std::min<float>(m_fadeTimer.timeElapsed() / m_fadeInTime, 1.f);
 
-        if (m_shader) {
-            const auto& center = srcRect.center();
-            const auto& globalCoord = Point(camera.x - m_drawDimension.width() / 2, -(camera.y - m_drawDimension.height() / 2)) * m_tileSize;
+            if (m_shader) {
+                const auto& center = srcRect.center();
+                const auto& globalCoord = Point(camera.x - m_drawDimension.width() / 2, -(camera.y - m_drawDimension.height() / 2)) * m_tileSize;
 
-            m_shader->bind();
-            m_shader->setUniformValue(ShaderManager::MAP_CENTER_COORD, center.x / static_cast<float>(m_rectDimension.width()), 1.f - center.y / static_cast<float>(m_rectDimension.height()));
-            m_shader->setUniformValue(ShaderManager::MAP_GLOBAL_COORD, globalCoord.x / static_cast<float>(m_rectDimension.height()), globalCoord.y / static_cast<float>(m_rectDimension.height()));
-            m_shader->setUniformValue(ShaderManager::MAP_ZOOM, m_pool->getScaleFactor());
+                m_shader->bind();
+                m_shader->setUniformValue(ShaderManager::MAP_CENTER_COORD, center.x / static_cast<float>(m_rectDimension.width()), 1.f - center.y / static_cast<float>(m_rectDimension.height()));
+                m_shader->setUniformValue(ShaderManager::MAP_GLOBAL_COORD, globalCoord.x / static_cast<float>(m_rectDimension.height()), globalCoord.y / static_cast<float>(m_rectDimension.height()));
+                m_shader->setUniformValue(ShaderManager::MAP_ZOOM, m_pool->getScaleFactor());
 
-            Point last = transformPositionTo2D(camera, m_shaderPosition);
-            //Reverse vertical axis.
-            last.y = -last.y;
+                Point last = transformPositionTo2D(camera, m_shaderPosition);
+                //Reverse vertical axis.
+                last.y = -last.y;
 
-            m_shader->setUniformValue(ShaderManager::MAP_WALKOFFSET, last.x / static_cast<float>(m_rectDimension.width()), last.y / static_cast<float>(m_rectDimension.height()));
+                m_shader->setUniformValue(ShaderManager::MAP_WALKOFFSET, last.x / static_cast<float>(m_rectDimension.width()), last.y / static_cast<float>(m_rectDimension.height()));
 
-            g_painter->setShaderProgram(m_shader);
-        }
+                g_painter->setShaderProgram(m_shader);
+            }
 
-        g_painter->setOpacity(fadeOpacity);
-    });
+            g_painter->setOpacity(fadeOpacity);
+        });
 
-    m_pool->onAfterDraw([] {
-        g_painter->resetShaderProgram();
-        g_painter->resetOpacity();
+        m_pool->onAfterDraw([] {
+            g_painter->resetShaderProgram();
+            g_painter->resetOpacity();
+        });
     });
 }
 
