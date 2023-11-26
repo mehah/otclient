@@ -63,7 +63,6 @@ void UIMap::drawSelf(DrawPoolType drawPane)
 
     const auto& mapRect = g_app.isScaled() ? Rect(0, 0, g_graphics.getViewportSize()) : m_mapRect;
 
-    std::scoped_lock l(g_drawPool.get(drawPane)->getMutexPreDraw());
     if (drawPane == DrawPoolType::MAP) {
         m_mapView->updateRect(mapRect);
         g_drawPool.preDraw(drawPane, [this, &mapRect] {
