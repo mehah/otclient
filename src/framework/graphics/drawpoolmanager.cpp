@@ -152,7 +152,6 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     if (pool->hasFrameBuffer() && pool->m_repaint.load())
         return;
 
-    pool->setEnable(true);
     pool->resetState();
 
     // when the selected pool is MAP, reset the creature information state.
@@ -163,6 +162,8 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     if (f) f();
 
     std::scoped_lock l(pool->m_mutexDraw);
+
+    pool->setEnable(true);
     if (pool->hasFrameBuffer())
         pool->m_framebuffer->prepare(dest, src, colorClear);
 
@@ -178,6 +179,8 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
 void DrawPoolManager::drawPool(const DrawPoolType type) {
     const auto pool = get(type);
 
+    std::scoped_lock l(pool->m_mutexDraw);
+
     if (!pool->isEnabled())
         return;
 
@@ -187,8 +190,6 @@ void DrawPoolManager::drawPool(const DrawPoolType type) {
         }
         return;
     }
-
-    std::scoped_lock l(pool->m_mutexDraw);
 
     if (!pool->m_framebuffer->canDraw())
         return;
