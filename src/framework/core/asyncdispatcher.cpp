@@ -26,12 +26,20 @@ AsyncDispatcher g_asyncDispatcher;
 
 void AsyncDispatcher::init(uint8_t maxThreads)
 {
+    /*
+    * -1 = Graphic
+    *  1 = Foreground UI
+    *  2 = Foreground MAP
+    *  3 = Map and (Connection, Particle and Sound) Pool
+    *  4 = Extra, ex: pathfinder
+    */
+    const uint8_t minThreads = 4;
+
     if (maxThreads == 0)
         maxThreads = 6;
 
-    // -1 = Main Thread
     // 2 = Min Threads
-    int_fast8_t threads = std::clamp<int_fast8_t>(std::thread::hardware_concurrency() - 1, 2, maxThreads);
+    int_fast8_t threads = std::clamp<int_fast8_t>(std::thread::hardware_concurrency() - 1, minThreads, maxThreads);
     while (--threads >= 0)
         m_threads.emplace_back([this] { m_ioService.run(); });
 }
