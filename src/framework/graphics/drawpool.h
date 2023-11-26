@@ -228,7 +228,7 @@ private:
         }
     }
 
-    inline void releaseObjects() {
+    void release() {
         m_objectsDraw.clear();
         if (!m_objectsFlushed.empty()) {
             m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(m_objectsFlushed.begin()), make_move_iterator(m_objectsFlushed.end()));
@@ -247,7 +247,6 @@ private:
     const FrameBufferPtr& getTemporaryFrameBuffer(const uint8_t index);
 
     bool m_enabled{ true };
-    bool m_forceRepaint{ false };
     bool m_alwaysGroupDrawings{ false };
 
     int_fast8_t m_bindedFramebuffers{ -1 };

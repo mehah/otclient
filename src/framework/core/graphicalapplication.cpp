@@ -162,6 +162,7 @@ void GraphicalApplication::run()
         }
 
         return getFps() < frameCounter2.getFps() ? getFps() :
+            // adjusts the main FPS according to the secondary FPS percentage.
             std::max<int>(10, getFps() - m_frameCounter.getFpsPercent(frameCounter2.getPercent()));
     };
 
