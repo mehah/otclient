@@ -208,7 +208,7 @@ void MapView::drawFloor()
     }
 }
 
-void MapView::drawText(const Rect& rect)
+void MapView::drawForeground(const Rect& rect)
 {
     const auto& camera = getCameraPosition();
     const auto& srcRect = calcFramebufferSource(rect.size());
@@ -244,6 +244,21 @@ void MapView::drawText(const Rect& rect)
         p.y *= verticalStretchFactor;
         p += rect.topLeft();
         animatedText->drawText(p, rect);
+    }
+
+    g_drawPool.scale(1.f);
+    for (const auto& tile : m_foregroundTiles) {
+        const auto& dest = transformPositionTo2D(tile->getPosition(), camera);
+#ifndef BOT_PROTECTION
+        Point p = dest - drawOffset;
+        p.x *= horizontalStretchFactor;
+        p.y *= verticalStretchFactor;
+        p += rect.topLeft();
+        p.y += 5;
+
+        tile->drawTexts(p);
+#endif
+        tile->drawWidget(dest, rect);
     }
 }
 
@@ -869,4 +884,19 @@ void MapView::destroyHighlightTile() {
         m_lastHighlightTile->unselect();
         m_lastHighlightTile = nullptr;
     }
+}
+
+void MapView::addForegroundTile(const TilePtr& tile) {
+    std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->getMutex());
+
+    if (std::find(m_foregroundTiles.begin(), m_foregroundTiles.end(), tile) == m_foregroundTiles.end())
+        m_foregroundTiles.emplace_back(tile);
+}
+void MapView::removeForegroundTile(const TilePtr& tile) {
+    std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->getMutex());
+    const auto it = std::find(m_foregroundTiles.begin(), m_foregroundTiles.end(), tile);
+    if (it == m_foregroundTiles.end())
+        return;
+
+    m_foregroundTiles.erase(it);
 }

@@ -89,7 +89,7 @@ public:
     MapView();
     ~MapView() override;
     void draw(const Rect& rect);
-    void drawText(const Rect& rect);
+    void drawForeground(const Rect& rect);
 
     // floor visibility related
     uint8_t getLockedFirstVisibleFloor() const { return m_lockedFirstVisibleFloor; }
@@ -180,6 +180,9 @@ public:
 
     PainterShaderProgramPtr getNextShader() { return m_nextShader; }
     bool isSwitchingShader() { return !m_shaderSwitchDone; }
+
+    void addForegroundTile(const TilePtr& tile);
+    void removeForegroundTile(const TilePtr& tile);
 
 protected:
     void onGlobalLightChange(const Light& light);
@@ -315,6 +318,7 @@ private:
     AntialiasingMode m_antiAliasingMode{ AntialiasingMode::ANTIALIASING_DISABLED };
 
     std::vector<FloorData> m_floors;
+    std::vector<TilePtr> m_foregroundTiles;
 
     PainterShaderProgramPtr m_shader;
     PainterShaderProgramPtr m_nextShader;

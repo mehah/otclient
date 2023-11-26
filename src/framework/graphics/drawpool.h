@@ -38,8 +38,7 @@ enum class DrawPoolType : uint8_t
     MAP,
     CREATURE_INFORMATION,
     LIGHT,
-    TEXT,
-    FOREGROUND_TILE,
+    FOREGROUND_MAP,
     FOREGROUND,
     UNKNOW
 };

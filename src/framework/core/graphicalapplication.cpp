@@ -137,17 +137,21 @@ void GraphicalApplication::run()
     AdaptativeFrameCounter frameCounter2;
     frameCounter2.setTargetFps(500u);
 
-    const auto& foreground_paintAsync = [&] {
-        g_asyncDispatcher.dispatch([] {
-            g_ui.render(DrawPoolType::FOREGROUND);
-        });
-    };
+    const auto& drawForeground = [&] {
+        const auto& foreground = g_drawPool.get(DrawPoolType::FOREGROUND);
+        const auto& foregroundMap = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
 
-    const auto& txt_paintAsync = [&] {
-        g_asyncDispatcher.dispatch([&] {
-            g_ui.m_mapWidget->drawSelf(DrawPoolType::TEXT);
-            g_ui.m_mapWidget->drawSelf(DrawPoolType::FOREGROUND_TILE);
-        });
+        if (foreground->canRepaint()) {
+            g_asyncDispatcher.dispatch([] {
+                g_ui.render(DrawPoolType::FOREGROUND);
+            });
+        }
+
+        if (foregroundMap->canRepaint()) {
+            g_asyncDispatcher.dispatch([&] {
+                g_ui.m_mapWidget->drawSelf(DrawPoolType::FOREGROUND_MAP);
+            });
+        }
     };
 
     const auto& realFPS = [&] {
@@ -163,8 +167,6 @@ void GraphicalApplication::run()
 
     g_asyncDispatcher.dispatch([&] {
         const auto& foreground = g_drawPool.get(DrawPoolType::FOREGROUND);
-        const auto& foreground_tile = g_drawPool.get(DrawPoolType::FOREGROUND_TILE);
-        const auto& txt = g_drawPool.get(DrawPoolType::TEXT);
 
         g_eventThreadId = std::this_thread::get_id();
         while (!m_stopping) {
@@ -179,11 +181,7 @@ void GraphicalApplication::run()
                 if (!g_ui.m_mapWidget)
                     g_ui.m_mapWidget = g_ui.getRootWidget()->recursiveGetChildById("gameMapPanel")->static_self_cast<UIMap>();
 
-                if (foreground->canRepaint())
-                    foreground_paintAsync();
-
-                if (txt->canRepaint())
-                    txt_paintAsync();
+                drawForeground();
 
                 g_ui.m_mapWidget->drawSelf(DrawPoolType::MAP);
             } else if (foreground->canRepaint()) {
@@ -265,7 +263,7 @@ void GraphicalApplication::resize(const Size& size)
 
         if (USE_FRAMEBUFFER) {
             g_drawPool.get(DrawPoolType::CREATURE_INFORMATION)->setFramebuffer(size);
-            g_drawPool.get(DrawPoolType::TEXT)->setFramebuffer(size);
+            g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->setFramebuffer(size);
         }
     });
 }
