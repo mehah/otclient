@@ -28,7 +28,7 @@
 - Support for more mouse buttons, for example 4 and 5
 - Module Controller System ([Code example](https://github.com/mehah/otclient/blob/cache-for-all/modules/game_minimap/minimap.lua))
 - Some bugs fixed contained in [edubart/otclient](https://github.com/edubart/otclient)
-- Client 12.85 ~ 12.92, 13.00 ~ 13.14 support (protobuf)
+- Client 12.85 ~ 12.92, 13.00 ~ 13.21 support (protobuf)
 - Market has been rewritten to work only [Canary](https://github.com/opentibiabr/canary)
 - Async Texture Loading
 - Tile Widget
