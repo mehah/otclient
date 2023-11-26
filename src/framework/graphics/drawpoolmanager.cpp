@@ -149,29 +149,24 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     select(type);
     const auto pool = getCurrentPool();
 
-    pool->setEnable(true);
-    pool->resetState();
-
     if (pool->m_repaint.load())
         return;
+
+    pool->setEnable(true);
+    pool->resetState();
 
     // when the selected pool is MAP, reset the creature information state.
     if (type == DrawPoolType::MAP) {
         get(DrawPoolType::CREATURE_INFORMATION)->resetState();
     }
 
-    if (pool->m_framebuffer) {
-        addAction([=, this] {
-            pool->m_framebuffer->prepare(dest, src, colorClear);
-        });
-        pool->flush();
-    }
-
     if (f) f();
 
+    std::scoped_lock l(pool->m_mutexDraw);
+    if (pool->m_framebuffer)
+        pool->m_framebuffer->prepare(dest, src, colorClear);
     pool->m_repaint.store(pool->canRepaint(true));
     if (pool->m_repaint) {
-        std::scoped_lock l(pool->m_mutexDraw);
         pool->releaseObjects();
 
         if (type == DrawPoolType::MAP) {
@@ -187,7 +182,6 @@ void DrawPoolManager::drawPool(const DrawPoolType type) {
         return;
 
     if (!pool->hasFrameBuffer()) {
-        std::scoped_lock l(pool->m_mutexDraw);
         for (const auto& obj : pool->m_objectsDraw) {
             drawObject(obj);
         }
@@ -195,18 +189,18 @@ void DrawPoolManager::drawPool(const DrawPoolType type) {
         return;
     }
 
+    std::scoped_lock l(pool->m_mutexDraw);
+
+    if (!pool->m_framebuffer->canDraw())
+        return;
+
     if (pool->m_repaint.load()) {
-        std::scoped_lock l(pool->m_mutexDraw);
-        pool->m_objectsDraw.front().action();
         pool->m_framebuffer->bind(); {
             for (const auto& obj : pool->m_objectsDraw)
                 drawObject(obj);
         }pool->m_framebuffer->release();
         pool->m_repaint.store(false);
     }
-
-    if (!pool->m_framebuffer->canDraw())
-        return;
 
     g_painter->resetState();
 
