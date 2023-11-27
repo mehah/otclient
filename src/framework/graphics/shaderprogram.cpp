@@ -24,6 +24,7 @@
 #include "graphics.h"
 
 #include <framework/core/application.h>
+#include <framework/stdext/hash.h>
 
 uint32_t ShaderProgram::m_currentProgram = 0;
 
@@ -48,6 +49,7 @@ bool ShaderProgram::addShader(const ShaderPtr& shader)
     glAttachShader(m_programId, shader->getShaderId());
     m_linked = false;
     m_shaders.emplace_back(shader);
+    m_hash = stdext::hash_int(m_programId);
     return true;
 }
 
@@ -80,6 +82,7 @@ void ShaderProgram::removeShader(const ShaderPtr& shader)
     glDetachShader(m_programId, shader->getShaderId());
     m_shaders.erase(it);
     m_linked = false;
+    m_hash = 0;
 }
 
 void ShaderProgram::removeAllShaders()

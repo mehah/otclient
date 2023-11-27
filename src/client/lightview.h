@@ -82,6 +82,5 @@ private:
     CoordsBuffer m_coords;
     TexturePtr m_texture;
     LightData m_lightData[2];
-    std::atomic_uint8_t m_currentLightData{ 0 };
     std::vector<uint8_t> m_pixels;
 };
