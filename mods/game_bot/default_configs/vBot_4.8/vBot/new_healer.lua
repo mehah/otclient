@@ -20,7 +20,7 @@ Panel
     margin-left: 3
     height: 17
     text: Setup
-      
+
 ]])
 ui:setId(panelName)
 
@@ -125,17 +125,17 @@ customList.addPanel.add.onClick = function()
       name = name .. " " .. capitalFistLetter(word)
     end
 
-    if not health then    
+    if not health then
         clearFields()
         return warn("[Friend Healer] Please enter health percent value!")
     end
 
-    if name:len() == 0 or name:lower() == "friend name" then   
+    if name:len() == 0 or name:lower() == "friend name" then
         clearFields()
         return warn("[Friend Healer] Please enter friend name to be added!")
     end
 
-    if config.customPlayers[name] or config.customPlayers[name:lower()] then 
+    if config.customPlayers[name] or config.customPlayers[name:lower()] then
         clearFields()
         return warn("[Friend Healer] Player already added to custom list.")
     else
@@ -274,8 +274,6 @@ for i, setting in ipairs(config.settings) do
     end
 end
 
-
-
 -- priority and toggles
 local function setCrementalButtons()
     for i, child in ipairs(priority.list:getChildren()) do
@@ -316,14 +314,14 @@ for i, action in ipairs(config.priorities) do
         action.enabled = not action.enabled
         widget:setColor(action.enabled and "#98BF64" or "#dfdfdf")
         widget.enabled:setChecked(action.enabled)
-        validate(widget, 1)  
+        validate(widget, 1)
     end
     if action.custom then
         widget.onDoubleClick = function()
             local window = modules.client_textedit.show(widget, {title = "Custom Spell", description = "Enter below formula for a custom healing spell"})
-            schedule(50, function() 
+            schedule(50, function()
               window:raise()
-              window:focus() 
+              window:focus()
             end)
         end
         widget.onTextChange = function(widget,text)
@@ -377,13 +375,13 @@ local function friendHealerAction(spec, targetsInRange)
 end
 
 local function isCandidate(spec)
-    if spec:isLocalPlayer() or not spec:isPlayer() then 
-        return nil 
+    if spec:isLocalPlayer() or not spec:isPlayer() then
+        return nil
     end
     if not spec:canShoot() then
         return false
     end
-    
+
     local curHp = spec:getHealthPercent()
     if curHp == 100 or (config.customPlayers[name] and curHp > config.customPlayers[name]) then
         return false
@@ -428,7 +426,7 @@ macro(100, function()
     local healTarget = {creature=nil, hp=100}
     local inMasResRange = 0
 
-    -- check basic 
+    -- check basic
     if hppercent() <= minHp or manapercent() <= minMp then return end
 
     -- get all spectators

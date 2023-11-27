@@ -71,7 +71,7 @@ targetbotMacro = macro(100, function()
   if highestPriorityParams and not isInPz() then
     ui.target.right:setText(highestPriorityParams.creature:getName())
     ui.config.right:setText(highestPriorityParams.config.name)
-    TargetBot.Creature.attack(highestPriorityParams, targets, looting)    
+    TargetBot.Creature.attack(highestPriorityParams, targets, looting)
     if lootingStatus:len() > 0 then
       TargetBot.setStatus("Attack & " .. lootingStatus)
     elseif cavebotAllowance > now then
@@ -79,7 +79,7 @@ targetbotMacro = macro(100, function()
     else
       TargetBot.setStatus("Attacking")
       if not lureEnabled then
-        TargetBot.setStatus("Attacking (luring off)")      
+        TargetBot.setStatus("Attacking (luring off)")
       end
     end
     TargetBot.walk()
@@ -104,7 +104,7 @@ end)
 config = Config.setup("targetbot_configs", configWidget, "json", function(name, enabled, data)
   if not data then
     ui.status.right:setText("Off")
-    return targetbotMacro.setOff() 
+    return targetbotMacro.setOff()
   end
   TargetBot.Creature.resetConfigs()
   for _, value in ipairs(data["targeting"] or {}) do
@@ -173,14 +173,14 @@ TargetBot.isOff = function()
 end
 
 TargetBot.setOn = function(val)
-  if val == false then  
+  if val == false then
     return TargetBot.setOff(true)
   end
   config.setOn()
 end
 
 TargetBot.setOff = function(val)
-  if val == false then  
+  if val == false then
     return TargetBot.setOn(true)
   end
   config.setOff()
@@ -210,7 +210,6 @@ end
 TargetBot.enableLuring = function()
   lureEnabled = true
 end
-
 
 -- attacks
 local lastSpell = 0
@@ -272,7 +271,7 @@ TargetBot.useAttackItem = function(item, subType, target, delay)
     if g_game.getClientVersion() < 780 then
       local tmpItem = g_game.findPlayerItem(item, subType)
       if not tmpItem then return end
-      g_game.useWith(tmpItem, target, subType) -- using item from bp  
+      g_game.useWith(tmpItem, target, subType) -- using item from bp
     else
       g_game.useInventoryItemWith(item, target, subType) -- hotkey
     end

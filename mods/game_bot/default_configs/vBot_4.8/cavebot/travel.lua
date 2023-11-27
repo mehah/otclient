@@ -17,9 +17,9 @@ CaveBot.Extensions.Travel.setup = function()
     end
 
     local npc = getCreatureByName(npcName)
-    if not npc then 
+    if not npc then
       print("CaveBot[Travel]: NPC not found, can't travel")
-     return false 
+     return false
     end
 
     if not CaveBot.ReachNPC(npcName) then

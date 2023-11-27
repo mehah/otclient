@@ -62,7 +62,7 @@ Rule < UIWidget
   focusable: true
   height: 16
   text-align: left
-  font: verdana-11px-rounded  
+  font: verdana-11px-rounded
 
   CheckBox
     id: enabled
@@ -98,7 +98,6 @@ Rule < UIWidget
     text-align: center
     tooltip: Items must be visible
     anchors.verticalCenter: parent.verticalCenter
-
 
 ConditionPanel < Panel
   height: 58
@@ -144,8 +143,6 @@ ConditionPanel < Panel
     width: 200
     text-align: center
 
-
-
 ListPanel < FlatPanel
   size: 270 300
   padding-left: 10
@@ -170,7 +167,7 @@ ListPanel < FlatPanel
     !text: tr('More important methods come first.')
     text-align: left
     font: verdana-11px-rounded
-    color: #aeaeae  
+    color: #aeaeae
 
   TextList
     id: list
@@ -240,7 +237,7 @@ InputPanel < FlatPanel
     anchors.right: parent.right
     anchors.top: prev.bottom
     margin-top: 4
-    
+
   ConditionPanel
     id: condition
     anchors.left: parent.left
@@ -492,7 +489,7 @@ EquipWindow < MainWindow
     margin-bottom: 5
     anchors.left: prev.right
     margin-left: 10
-  
+
   Profile
     id: profileName
     anchors.top: parent.top
@@ -520,7 +517,7 @@ EquipWindow < MainWindow
     anchors.right: parent.right
     anchors.left: parent.left
     anchors.bottom: closeButton.top
-    margin-bottom: 8    
+    margin-bottom: 8
 
   Button
     id: closeButton
@@ -528,7 +525,7 @@ EquipWindow < MainWindow
     font: cipsoftFont
     anchors.right: parent.right
     anchors.bottom: parent.bottom
-    size: 45 21  
+    size: 45 21
 
   Button
     id: bossList

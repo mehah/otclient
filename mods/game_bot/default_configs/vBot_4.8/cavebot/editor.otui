@@ -1,18 +1,17 @@
 CaveBotEditorButton < Button
 
-
 CaveBotEditorPanel < Panel
   id: cavebotEditor
   visible: false
   layout:
     type: verticalBox
     fit-children: true
-  
+
   Label
     id: pos
     text-align: center
     text: -
-    
+
   Panel
     id: buttons
     margin-top: 2
