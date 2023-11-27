@@ -108,13 +108,12 @@ void LightView::draw(const Rect& dest, const Rect& src)
 
     g_drawPool.preDraw(DrawPoolType::LIGHT, [this, dest, src] {
         g_drawPool.addAction([=, this] {
-            updateCoords(dest, src);
-
             {
                 std::scoped_lock l(m_pool->getMutexPreDraw());
                 m_texture->updatePixels(m_pixels.data());
             }
 
+            updateCoords(dest, src);
             g_painter->resetColor();
             g_painter->resetTransformMatrix();
             g_painter->setTexture(m_texture.get());
