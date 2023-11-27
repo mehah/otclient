@@ -40,7 +40,7 @@ public:
     uint16_t getTargetFps() const { return m_targetFps; }
 
     void setMaxFps(const uint16_t max) { m_maxFps = max; }
-    void setTargetFps(const uint16_t target) { m_targetFps = target; }
+    void setTargetFps(const uint16_t target) { if (m_targetFps != target) m_targetFps = target; }
 
     void resetTargetFps() { m_targetFps = 0; }
 
