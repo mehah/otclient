@@ -94,8 +94,8 @@ public:
     void setFramebuffer(const Size& size);
     void removeFramebuffer();
 
-    void onBeforeDraw(std::function<void()> f) { m_beforeDraw = std::move(f); }
-    void onAfterDraw(std::function<void()> f) { m_afterDraw = std::move(f); }
+    void onBeforeDraw(std::function<void()>&& f) { m_beforeDraw = std::move(f); }
+    void onAfterDraw(std::function<void()>&& f) { m_afterDraw = std::move(f); }
 
     std::mutex& getMutex() { return m_mutexDraw; }
     std::mutex& getMutexPreDraw() { return m_mutexPreDraw; }

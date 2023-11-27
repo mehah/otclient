@@ -1127,7 +1127,7 @@ bool Map::isSightClear(const Position& fromPos, const Position& toPos)
 }
 
 #ifndef BOT_PROTECTION
-stdext::map<std::string, std::tuple<int, int, int, std::string>> Map::findEveryPath(const Position& start, int maxDistance, const stdext::map<std::string, std::string>& params)
+std::map<std::string, std::tuple<int, int, int, std::string>> Map::findEveryPath(const Position& start, int maxDistance, const std::map<std::string, std::string>& params)
 {
     // using Dijkstra's algorithm
     struct LessNode
@@ -1138,7 +1138,7 @@ stdext::map<std::string, std::tuple<int, int, int, std::string>> Map::findEveryP
         }
     };
 
-    stdext::map<std::string, std::string>::const_iterator it;
+    std::map<std::string, std::string>::const_iterator it;
     it = params.find("ignoreLastCreature");
     bool ignoreLastCreature = it != params.end() && it->second != "0" && it->second != "";
     it = params.find("ignoreCreatures");
@@ -1180,7 +1180,7 @@ stdext::map<std::string, std::tuple<int, int, int, std::string>> Map::findEveryP
         }
     }
 
-    stdext::map<std::string, std::tuple<int, int, int, std::string>> ret;
+    std::map<std::string, std::tuple<int, int, int, std::string>> ret;
     std::unordered_map<Position, Node*, Position::Hasher> nodes;
     std::priority_queue<Node*, std::vector<Node*>, LessNode> searchList;
 
