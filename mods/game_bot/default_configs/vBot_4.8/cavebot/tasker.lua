@@ -77,7 +77,7 @@ CaveBot.Extensions.Tasker.setup = function()
             dataValidationFailed()
         end
     end
-    
+
     -- let's cover markers now
     if marker == 1 then -- starting task
         CaveBot.Conversation("hi", "task", taskName, "yes")
@@ -133,17 +133,17 @@ CaveBot.Extensions.Tasker.setup = function()
       - task name in gryzzly adams: medusae
       - monster count: 500
       - monster name to track: medusa
-      - optional, monster name 2: 
-  2. check status, 
+      - optional, monster name 2:
+  2. check status,
       to be used on refill to decide whether to go back or spawn or go give task back
       parameters:
       - scenario for extension: 2
       - label if task in progress: skipTask
-      - label if task done: taskDone  
+      - label if task done: taskDone
   3. report task,
       parameters:
       - scenario for extension: 3
-  
+
   Strong suggestion, almost mandatory - USE POS CHECK to verify position! this module will only check if there is ANY npc in range!
 
   when begin remove all the text and leave just a single string of parameters

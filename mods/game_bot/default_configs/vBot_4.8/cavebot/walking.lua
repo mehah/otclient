@@ -28,13 +28,13 @@ CaveBot.doWalking = function()
     CaveBot.delay(CaveBot.Config.get("walkDelay") + player:getStepDuration(false, dir))
     return true
   end
-  return false  
+  return false
 end
 
 -- called when player position has been changed (step has been confirmed by server)
 onPlayerPositionChange(function(newPos, oldPos)
   if not oldPos or not newPos then return end
-  
+
   local dirs = {{NorthWest, North, NorthEast}, {West, 8, East}, {SouthWest, South, SouthEast}}
   local dir = dirs[newPos.y - oldPos.y + 2]
   if dir then
@@ -50,7 +50,7 @@ onPlayerPositionChange(function(newPos, oldPos)
     CaveBot.delay(CaveBot.Config.get("ping") + player:getStepDuration(false, dir) + 150)
     return
   end
-  
+
   if expectedDirs[1] ~= dir then
     if CaveBot.Config.get("mapClick") then
       CaveBot.delay(CaveBot.Config.get("walkDelay") + player:getStepDuration(false, dir))
@@ -59,8 +59,8 @@ onPlayerPositionChange(function(newPos, oldPos)
     end
     return
   end
-  
-  table.remove(expectedDirs, 1)  
+
+  table.remove(expectedDirs, 1)
   if CaveBot.Config.get("mapClick") and #expectedDirs > 0 then
     CaveBot.delay(CaveBot.Config.get("mapClickDelay") + player:getStepDuration(false, dir))
   end
@@ -72,7 +72,7 @@ CaveBot.walkTo = function(dest, maxDist, params)
     return false
   end
   local dir = path[1]
-  
+
   if CaveBot.Config.get("mapClick") then
     local ret = autoWalk(path)
     if ret then
@@ -82,9 +82,9 @@ CaveBot.walkTo = function(dest, maxDist, params)
     end
     return ret
   end
-  
+
   g_game.walk(dir, false)
-  isWalking = true    
+  isWalking = true
   walkPath = path
   walkPathIter = 2
   expectedDirs = { dir }

@@ -8,7 +8,7 @@ ExtrasScrollBar < Panel
     anchors.right: parent.right
     anchors.top: parent.top
     text-align: center
-    
+
   HorizontalScrollBar
     id: scroll
     anchors.left: parent.left
@@ -29,7 +29,7 @@ ExtrasTextEdit < Panel
     anchors.right: parent.right
     anchors.top: parent.top
     text-align: center
-    
+
   TextEdit
     id: textEdit
     anchors.left: parent.left
@@ -101,7 +101,7 @@ ExtrasWindow < MainWindow
     anchors.bottom: separator.top
     vertical-scrollbar: contentScroll
     margin-bottom: 10
-      
+
     Panel
       id: left
       anchors.top: parent.top
@@ -146,7 +146,7 @@ ExtrasWindow < MainWindow
     maximum: 600
     margin-left: 3
     margin-right: 3
-    background: #ffffff88    
+    background: #ffffff88
 
   Button
     id: closeButton

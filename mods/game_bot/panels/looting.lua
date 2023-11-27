@@ -6,7 +6,7 @@ Panels.Looting = function(parent)
 Panel
   id: looting
   height: 180
-  
+
   BotLabel
     anchors.top: parent.top
     anchors.left: parent.left
@@ -27,7 +27,7 @@ Panel
     anchors.left: prev.right
     anchors.right: parent.right
     margin-left: 5
-      
+
   Button
     margin-top: 1
     id: add
@@ -52,7 +52,7 @@ Panel
     text: Remove
     width: 60
     height: 17
-  
+
   ScrollablePanel
     id: items
     anchors.top: prev.bottom
@@ -89,16 +89,16 @@ Panel
     anchors.right: parent.right
     height: 33
     margin-top: 2
-    
+
 ]], parent)
-  
+
   local lootContainers = { ui.containers.item1, ui.containers.item2, ui.containers.item3, ui.containers.item4, ui.containers.item5 }
 
   if type(context.storage.looting) ~= "table" then
     context.storage.looting = {}
   end
   if type(context.storage.looting.configs) ~= "table" then
-    context.storage.looting.configs = {}  
+    context.storage.looting.configs = {}
   end
 
   local getConfigName = function(config)
@@ -119,7 +119,7 @@ Panel
     if not context.storage.looting.activeConfig or not context.storage.looting.configs[context.storage.looting.activeConfig] then
       return
     end
-    
+
     local tmpItems = {}
     local tmpContainers = {}
     local focusIndex = 0
@@ -144,15 +144,15 @@ Panel
       if widget:getItemId() >= 100 then
         if tmpContainers[widget:getItemId()] == nil then
           tmpContainers[widget:getItemId()] = 1 -- remove duplicates
-          newConfig = newConfig .. "\ncontainer:" .. widget:getItemId()    
+          newConfig = newConfig .. "\ncontainer:" .. widget:getItemId()
         end
       end
     end
-    
+
     context.storage.looting.configs[context.storage.looting.activeConfig] = newConfig
     refreshConfig(focusIndex)
   end
-  
+
   local parseConfig = function(config)
     items = {}
     itemsByKey = {}
@@ -182,7 +182,7 @@ Panel
     if itemsToShow < 10 then
       itemsToShow = 10
     end
-    
+
     for i=1,itemsToShow do
       local widget = g_ui.createWidget("BotItem", ui.items)
       local itemId = 0
@@ -192,7 +192,7 @@ Panel
       widget:setItemId(itemId)
       widget.onItemChange = createNewConfig
     end
-    
+
     for i, widget in ipairs(lootContainers) do
         widget:setItemId(0)
     end
@@ -207,7 +207,7 @@ Panel
       widget.onItemChange = createNewConfig
     end
   end
-  
+
   local ignoreOnOptionChange = true
   refreshConfig = function(focusIndex)
     ignoreOnOptionChange = true
@@ -218,7 +218,7 @@ Panel
       ui.enableButton:setText("Off")
       ui.enableButton:setColor('#FF0000FF')
     end
-        
+
     ui.config:clear()
     for i, config in ipairs(context.storage.looting.configs) do
       local name = getConfigName(config)
@@ -227,28 +227,28 @@ Panel
       end
       ui.config:addOption(name)
     end
-    
+
     if (not context.storage.looting.activeConfig or context.storage.looting.activeConfig == 0) and #context.storage.looting.configs > 0 then
        context.storage.looting.activeConfig = 1
     end
-    
+
     ui.items:destroyChildren()
     for i, widget in ipairs(lootContainers) do
       widget.onItemChange = nil
       widget:setItemId(0)
       widget:setItemCount(0)
     end
-    
+
     if context.storage.looting.activeConfig and context.storage.looting.configs[context.storage.looting.activeConfig] then
       ui.config:setCurrentIndex(context.storage.looting.activeConfig)
       parseConfig(context.storage.looting.configs[context.storage.looting.activeConfig])
     end
-    
+
     context.saveConfig()
     if focusIndex and focusIndex > 0 and ui.items:getChildByIndex(focusIndex) then
       ui.items:focusChild(ui.items:getChildByIndex(focusIndex))
     end
-    
+
     ignoreOnOptionChange = false
   end
 
@@ -362,7 +362,7 @@ Panel
         break
       end
     end
-    
+
     -- found item to loot
     if foundItem then
       -- find backpack for it, first backpack with same items
@@ -415,7 +415,7 @@ Panel
       return
     end
     local delay = 1
-    for i=2,#nextContainers do 
+    for i=2,#nextContainers do
       -- if more than 1 container, open them in new window
       context.schedule(delay, function()
         g_game.open(nextContainers[i], nil)
@@ -428,4 +428,3 @@ Panel
     context.delay(150 + delay)
   end)
 end
-

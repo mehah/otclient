@@ -2,7 +2,7 @@ ItemSelectorWindow < MainWindow
   id: itemSelector
   size: 260 120
   !text: tr("Select item")
-    
+
   Item
     id: item
     virtual: true
@@ -55,7 +55,7 @@ ItemSelectorWindow < MainWindow
     anchors.bottom: parent.bottom
     anchors.left: parent.left
     width: 60
-  
+
   Button
     id: okButton
     !text: tr('Ok')

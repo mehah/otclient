@@ -92,7 +92,7 @@ CaveBot.Extensions.StandLure.setup = function()
             if not pathWithoutMonsters then
                 reset()
                 warn("[Rush Lure] No possible path to reach position, skipping.")
-                return false -- spot is unreachable 
+                return false -- spot is unreachable
             elseif pathWithoutMonsters and not pathWithMonsters then
               local foundMonster = false
               for i, dir in ipairs(pathWithoutMonsters) do
@@ -101,7 +101,7 @@ CaveBot.Extensions.StandLure.setup = function()
                 nextPos.x = nextPos.x + dirs[1]
                 nextPos.y = nextPos.y + dirs[2]
 
-            
+
                 local tile = g_map.getTile(nextPos)
                 if tile then
                     if tile:hasCreature() then
@@ -109,7 +109,7 @@ CaveBot.Extensions.StandLure.setup = function()
                         local hppc = creature:getHealthPercent()
                         if creature:isMonster() and (hppc and hppc > 0) and (oldTibia or creature:getType() < 3) then
                             -- real blocking creature can not meet those conditions - ie. it could be player, so just in case check if the next creature is reachable
-                            local path = findPath(playerPos, creature:getPosition(), 7, { ignoreNonPathable = true, precision = 1 }) 
+                            local path = findPath(playerPos, creature:getPosition(), 7, { ignoreNonPathable = true, precision = 1 })
                             if path then
                                 creature:setMarked('#00FF00')
                                 if g_game.getAttackingCreature() ~= creature then
@@ -124,7 +124,7 @@ CaveBot.Extensions.StandLure.setup = function()
                     end
                 end
               end
-          
+
               if not g_game.getAttackingCreature() then
                 reset()
                 warn("[Rush Lure] No path, no blocking monster, skipping.")
@@ -178,7 +178,7 @@ schedule(5, function() -- delay because cavebot.lua is loaded after this file
             elseif enable == false then
                 TargetBot.setOff()
             end
-            
+
             enable = nil -- reset
             next = false
         end
