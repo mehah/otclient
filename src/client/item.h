@@ -147,7 +147,7 @@ public:
 #endif
 
 private:
-    void internalDraw(int animationPhase, const Point& dest, const Color& color, bool drawThings, bool isMarked, LightView* lightView = nullptr);
+    void internalDraw(int animationPhase, const Point& dest, const Color& color, bool drawThings, bool replaceColorShader, LightView* lightView = nullptr);
     void setConductor();
 
     uint16_t m_countOrSubType{ 0 };

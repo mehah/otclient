@@ -460,6 +460,8 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Thing>("isLyingCorpse", &Thing::isLyingCorpse);
     g_lua.bindClassMemberFunction<Thing>("getDefaultAction", &Thing::getDefaultAction);
     g_lua.bindClassMemberFunction<Thing>("getClassification", &Thing::getClassification);
+    g_lua.bindClassMemberFunction<Thing>("setHighlight", &Thing::lua_setHighlight);
+    g_lua.bindClassMemberFunction<Thing>("isHighlighted", &Thing::isHighlighted);
 
 #ifdef FRAMEWORK_EDITOR
     g_lua.registerClass<House>();
