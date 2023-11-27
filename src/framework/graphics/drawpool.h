@@ -40,7 +40,7 @@ enum class DrawPoolType : uint8_t
     LIGHT,
     FOREGROUND_MAP,
     FOREGROUND,
-    UNKNOW
+    LAST
 };
 
 enum DrawOrder : uint8_t
@@ -255,7 +255,7 @@ private:
 
     PoolState m_state, m_oldState;
 
-    DrawPoolType m_type{ DrawPoolType::UNKNOW };
+    DrawPoolType m_type{ DrawPoolType::LAST };
 
     Timer m_refreshTimer;
 

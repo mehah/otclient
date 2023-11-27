@@ -33,7 +33,7 @@ void DrawPoolManager::init(uint16_t spriteSize)
         m_spriteSize = spriteSize;
 
     // Create Pools
-    for (int8_t i = -1; ++i <= static_cast<uint8_t>(DrawPoolType::UNKNOW);) {
+    for (int8_t i = -1; ++i < static_cast<uint8_t>(DrawPoolType::LAST);) {
         m_pools[i] = DrawPool::create(static_cast<DrawPoolType>(i));
     }
 }
@@ -41,7 +41,7 @@ void DrawPoolManager::init(uint16_t spriteSize)
 void DrawPoolManager::terminate() const
 {
     // Destroy Pools
-    for (int_fast8_t i = -1; ++i <= static_cast<uint8_t>(DrawPoolType::UNKNOW);) {
+    for (int_fast8_t i = -1; ++i < static_cast<uint8_t>(DrawPoolType::LAST);) {
         delete m_pools[i];
     }
 }
@@ -57,8 +57,16 @@ void DrawPoolManager::draw()
         g_painter->setResolution(m_size, m_transformMatrix);
     }
 
-    for (int_fast8_t i = -1; ++i < static_cast<uint8_t>(DrawPoolType::UNKNOW);)
-        drawPool(static_cast<DrawPoolType>(i));
+    for (auto pool : m_pools) {
+        if (pool->getType() == DrawPoolType::CREATURE_INFORMATION)
+            continue;
+
+        std::scoped_lock l(pool->m_mutexDraw);
+        drawPool(pool);
+
+        if (pool->getType() == DrawPoolType::MAP)
+            drawPool(get(DrawPoolType::CREATURE_INFORMATION));
+    }
 }
 
 void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)
@@ -174,11 +182,7 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     }
 }
 
-void DrawPoolManager::drawPool(const DrawPoolType type) {
-    const auto pool = get(type);
-
-    std::scoped_lock l(pool->m_mutexDraw);
-
+void DrawPoolManager::drawPool(DrawPool* pool) {
     if (!pool->isEnabled())
         return;
 
