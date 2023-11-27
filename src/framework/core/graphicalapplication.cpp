@@ -82,7 +82,8 @@ void GraphicalApplication::init(std::vector<std::string>& args, uint8_t asyncDis
     g_sounds.init();
 #endif
 
-    m_frameCounter.init();
+    m_mapProcessFrameCounter.init();
+    m_graphicFrameCounter.init();
 }
 
 void GraphicalApplication::deinit()
@@ -136,18 +137,9 @@ void GraphicalApplication::run()
 
     std::condition_variable foregroundUICondition, foregroundMapCondition;
 
-    AdaptativeFrameCounter frameCounter2;
-    frameCounter2.setTargetFps(500u); // The secondary thread is limited to 500 fps.
-
     const auto& realFPS = [&] {
-        if (g_window.vsyncEnabled() || getMaxFps() || getTargetFps()) {
-            // get min fps between the two threads
-            return std::min<int>(m_frameCounter.getFps(), frameCounter2.getFps());
-        }
-
-        return getFps() < frameCounter2.getFps() ? getFps() :
-            // adjusts the main FPS according to the secondary FPS percentage.
-            std::max<int>(10, getFps() - m_frameCounter.getFpsPercent(frameCounter2.getPercent()));
+        m_mapProcessFrameCounter.setTargetFps(g_window.vsyncEnabled() || getMaxFps() || getTargetFps() ? 500u : 999u);
+        return std::min<int>(m_graphicFrameCounter.getFps(), m_mapProcessFrameCounter.getFps());
     };
 
     const auto& drawForeground = [&] {
@@ -206,7 +198,7 @@ void GraphicalApplication::run()
                 g_ui.m_mapWidget->drawSelf(DrawPoolType::MAP);
             } else g_ui.m_mapWidget = nullptr;
 
-            frameCounter2.update();
+            m_mapProcessFrameCounter.update();
         }
 
         foregroundUICondition.notify_one();
@@ -227,7 +219,7 @@ void GraphicalApplication::run()
         // update screen pixels
         g_window.swapBuffers();
 
-        if (m_frameCounter.update()) {
+        if (m_graphicFrameCounter.update()) {
             g_dispatcher.addEvent([this, fps = realFPS()] {
                 g_lua.callGlobalField("g_app", "onFps", fps);
             });
