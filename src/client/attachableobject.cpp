@@ -25,6 +25,7 @@
 #include <framework/graphics/particleeffect.h>
 
 #include <framework/core/eventdispatcher.h>
+#include <framework/ui/uiwidget.h>
 
 extern ParticleManager g_particles;
 
@@ -141,4 +142,64 @@ void AttachableObject::drawAttachedParticlesEffect(const Point& dest)
         effect->render();
 
     g_drawPool.popTransformMatrix();
+}
+
+void AttachableObject::updateAndAttachParticlesEffects(std::vector<std::string>& newElements) {
+    std::vector<std::string> toRemove;
+    
+    for (const auto& effect : m_attachedParticles) {
+        auto findPos = std::find(newElements.begin(), newElements.end(), effect->getEffectType()->getName());
+        if (findPos == newElements.end())
+            toRemove.emplace_back(effect->getEffectType()->getName());
+        else 
+            newElements.erase(findPos);
+    }
+
+    for (const auto& name : toRemove)
+        detachParticleEffectByName(name);
+
+    for (const auto& name : newElements)
+        attachParticleEffect(name);
+}
+
+
+void AttachableObject::attachWidget(const UIWidgetPtr& widget) {
+    if (!widget)
+        return;
+
+    m_attachedWidgets.emplace_back(widget);
+}
+
+bool AttachableObject::detachWidgetById(const std::string& id) {
+    const auto it = std::find_if(m_attachedWidgets.begin(), m_attachedWidgets.end(),
+                                 [id](const UIWidgetPtr& obj) { return obj->getId() == id; });
+
+    if (it == m_attachedWidgets.end())
+        return false;
+
+    m_attachedWidgets.erase(it);
+    return true;
+}
+
+bool AttachableObject::detachWidget(const UIWidgetPtr& widget) {
+    const auto it = std::remove(m_attachedWidgets.begin(), m_attachedWidgets.end(), widget);
+    if (it == m_attachedWidgets.end())
+        return false;
+
+    m_attachedWidgets.erase(it);
+    return true;
+}
+
+void AttachableObject::clearAttachedWidgets() {
+    m_attachedWidgets.clear();
+}
+
+UIWidgetPtr AttachableObject::getAttachedWidgetById(const std::string& id) {
+    const auto it = std::find_if(m_attachedWidgets.begin(), m_attachedWidgets.end(),
+                                 [id](const UIWidgetPtr& obj) { return obj->getId() == id; });
+
+    if (it == m_attachedWidgets.end())
+        return nullptr;
+
+    return *it;
 }
