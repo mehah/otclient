@@ -197,6 +197,8 @@ void DrawPoolManager::drawPool(DrawPool* pool) {
         return;
 
     if (pool->m_repaint) {
+        pool->m_repaint.store(false);
+
         pool->m_framebuffer->bind();
         for (const auto& obj : pool->m_objectsDraw)
             drawObject(obj);
@@ -208,6 +210,4 @@ void DrawPoolManager::drawPool(DrawPool* pool) {
     if (pool->m_beforeDraw) pool->m_beforeDraw();
     pool->m_framebuffer->draw();
     if (pool->m_afterDraw) pool->m_afterDraw();
-
-    pool->m_repaint.store(false);
 }
