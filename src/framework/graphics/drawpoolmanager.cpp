@@ -57,15 +57,17 @@ void DrawPoolManager::draw()
         g_painter->setResolution(m_size, m_transformMatrix);
     }
 
-    for (auto pool : m_pools) {
-        if (pool->getType() == DrawPoolType::CREATURE_INFORMATION)
-            continue;
+    constexpr DrawPoolType pools[] = { DrawPoolType::MAP, DrawPoolType::FOREGROUND_MAP, DrawPoolType::FOREGROUND };
+    for (const auto type : pools) {
+        auto pool = get(type);
 
         std::scoped_lock l(pool->m_mutexDraw);
         drawPool(pool);
 
-        if (pool->getType() == DrawPoolType::MAP)
+        if (pool->getType() == DrawPoolType::MAP) {
             drawPool(get(DrawPoolType::CREATURE_INFORMATION));
+            drawPool(get(DrawPoolType::LIGHT));
+        }
     }
 }
 
