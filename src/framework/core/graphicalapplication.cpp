@@ -188,8 +188,6 @@ void GraphicalApplication::run()
 
     // THREAD - POOL & MAP
     g_asyncDispatcher.dispatch([&] {
-        const auto& foreground = g_drawPool.get(DrawPoolType::FOREGROUND);
-
         g_eventThreadId = std::this_thread::get_id();
         while (!m_stopping) {
             poll();
