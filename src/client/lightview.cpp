@@ -106,7 +106,7 @@ void LightView::draw(const Rect& dest, const Rect& src)
     lightData.lights.clear();
     lightData.tiles.assign(m_mapSize.area(), {});
 
-    g_drawPool.preDraw(DrawPoolType::LIGHT, [this, &dest, &src] {
+    g_drawPool.preDraw(DrawPoolType::LIGHT, [this, dest, src] {
         g_drawPool.addAction([=, this] {
             updateCoords(dest, src);
 
