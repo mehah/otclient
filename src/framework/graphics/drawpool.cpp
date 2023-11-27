@@ -21,7 +21,6 @@
  */
 
 #include "drawpool.h"
-#include "framebuffermanager.h"
 
 DrawPool* DrawPool::create(const DrawPoolType type)
 {
@@ -34,11 +33,14 @@ DrawPool* DrawPool::create(const DrawPoolType type)
             pool->m_framebuffer->disableBlend();
         } else if (type == DrawPoolType::FOREGROUND) {
             pool->setFPS(FPS10);
+
+            // creates a temporary framebuffer with smoothing.
+            pool->m_temporaryFramebuffers.emplace_back(std::make_shared<FrameBuffer>());
         }
     } else {
         pool->m_alwaysGroupDrawings = true; // CREATURE_INFORMATION & TEXT
 
-        if (type == DrawPoolType::TEXT) {
+        if (type == DrawPoolType::FOREGROUND_MAP) {
             pool->setFPS(FPS60);
         }
     }
@@ -47,7 +49,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
     return pool;
 }
 
-void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod& method,
+void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod&& method,
                    DrawMode drawMode, const DrawConductor& conductor, const CoordsBufferPtr& coordsBuffer)
 {
     updateHash(method, texture, color);
@@ -61,8 +63,8 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
     if (m_alwaysGroupDrawings || conductor.agroup) {
         auto& coords = m_coords.try_emplace(m_state.hash, nullptr).first->second;
         if (!coords) {
-            auto state = getState(method, texture, color);
-            coords = m_objects[m_drawPos][m_depthLevel][order].emplace_back(state).coords.get();
+            auto state = getState(texture, color);
+            coords = m_objects[order].emplace_back(std::move(state)).coords.get();
         }
 
         if (coordsBuffer)
@@ -72,12 +74,12 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
     } else {
         bool addNewObj = true;
 
-        auto& list = m_objects[m_drawPos][m_depthLevel][order];
+        auto& list = m_objects[order];
         if (!list.empty()) {
             auto& prevObj = list.back();
-            if (prevObj.state.hash == m_state.hash) {
+            if (prevObj.state == m_state) {
                 if (!prevObj.coords)
-                    prevObj.addMethod(method);
+                    prevObj.addMethod(std::move(method));
                 else if (coordsBuffer)
                     prevObj.coords->append(coordsBuffer.get());
                 else
@@ -88,11 +90,11 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
         }
 
         if (addNewObj) {
-            auto state = getState(method, texture, color);
+            auto state = getState(texture, color);
             if (coordsBuffer) {
-                list.emplace_back(state).coords->append(coordsBuffer.get());
+                list.emplace_back(std::move(state)).coords->append(coordsBuffer.get());
             } else
-                list.emplace_back(drawMode, state, method);
+                list.emplace_back(drawMode, std::move(state), std::move(method));
         }
     }
 
@@ -141,11 +143,11 @@ void DrawPool::updateHash(const DrawPool::DrawMethod& method, const TexturePtr& 
     { // State Hash
         m_state.hash = 0;
 
+        if (m_bindedFramebuffers)
+            stdext::hash_combine(m_state.hash, m_lastFramebufferId);
+
         if (m_state.blendEquation != BlendEquation::ADD)
             stdext::hash_combine(m_state.hash, m_state.blendEquation);
-
-        if (m_state.clipRect.isValid())
-            stdext::hash_union(m_state.hash, m_state.clipRect.hash());
 
         if (m_state.compositionMode != CompositionMode::NORMAL)
             stdext::hash_combine(m_state.hash, m_state.compositionMode);
@@ -153,8 +155,11 @@ void DrawPool::updateHash(const DrawPool::DrawMethod& method, const TexturePtr& 
         if (m_state.opacity < 1.f)
             stdext::hash_combine(m_state.hash, m_state.opacity);
 
+        if (m_state.clipRect.isValid())
+            stdext::hash_union(m_state.hash, m_state.clipRect.hash());
+
         if (m_state.shaderProgram)
-            stdext::hash_combine(m_state.hash, m_state.shaderProgram->getProgramId());
+            stdext::hash_union(m_state.hash, m_state.shaderProgram->hash());
 
         if (m_state.transformMatrix != DEFAULT_MATRIX3)
             stdext::hash_union(m_state.hash, m_state.transformMatrix.hash());
@@ -164,12 +169,12 @@ void DrawPool::updateHash(const DrawPool::DrawMethod& method, const TexturePtr& 
 
         if (texture)
             stdext::hash_union(m_state.hash, texture->hash());
-
-        if (hasFrameBuffer())
-            stdext::hash_union(m_status.second, m_state.hash);
     }
 
-    if (hasFrameBuffer()) { // Method Hash
+    if (hasFrameBuffer()) { // Pool Hash
+        if (m_state.hash)
+            stdext::hash_union(m_status.second, m_state.hash);
+
         if (method.type == DrawPool::DrawMethodType::TRIANGLE) {
             if (!method.a.isNull()) stdext::hash_union(m_status.second, method.a.hash());
             if (!method.b.isNull()) stdext::hash_union(m_status.second, method.b.hash());
@@ -183,7 +188,7 @@ void DrawPool::updateHash(const DrawPool::DrawMethod& method, const TexturePtr& 
     }
 }
 
-DrawPool::PoolState DrawPool::getState(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color)
+DrawPool::PoolState DrawPool::getState(const TexturePtr& texture, const Color& color)
 {
     return PoolState{
        std::move(m_state.transformMatrix), m_state.opacity,
@@ -238,21 +243,23 @@ void DrawPool::setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bo
 
 void DrawPool::resetState()
 {
-    for (auto& objs : m_objects[m_drawPos]) {
-        for (auto& order : objs)
-            order.clear();
-    }
-
+    for (auto& objs : m_objects)
+        objs.clear();
+    m_objectsFlushed.clear();
     m_coords.clear();
+
     m_state = {};
-    m_depthLevel = 0;
     m_status.second = 0;
+    m_lastFramebufferId = 0;
     m_shaderRefreshDelay = 0;
     m_scale = PlatformWindow::DEFAULT_DISPLAY_DENSITY;
 }
 
 bool DrawPool::canRepaint(const bool autoUpdateStatus)
 {
+    if (!hasFrameBuffer())
+        return true;
+
     uint16_t refreshDelay = m_refreshDelay;
     if (m_shaderRefreshDelay > 0 && (m_refreshDelay == 0 || m_shaderRefreshDelay < m_refreshDelay))
         refreshDelay = m_shaderRefreshDelay;
@@ -353,4 +360,48 @@ void DrawPool::setFramebuffer(const Size& size) {
 void DrawPool::removeFramebuffer() {
     m_status.first = 0;
     m_framebuffer = nullptr;
+}
+
+void DrawPool::addAction(const std::function<void()>& action)
+{
+    const uint8_t order = m_type == DrawPoolType::MAP ? DrawOrder::THIRD : DrawOrder::FIRST;
+    m_objects[order].emplace_back(action);
+}
+
+void DrawPool::bindFrameBuffer(const Size& size)
+{
+    ++m_bindedFramebuffers;
+    ++m_lastFramebufferId;
+
+    m_oldState = std::move(m_state);
+    m_state = {};
+    addAction([this, size, frameIndex = m_bindedFramebuffers, drawState = m_state] {
+        drawState.execute();
+        const auto& frame = getTemporaryFrameBuffer(frameIndex);
+        frame->resize(size);
+        frame->bind();
+    });
+}
+void DrawPool::releaseFrameBuffer(const Rect& dest)
+{
+    m_state = std::move(m_oldState);
+    m_oldState = {};
+    addAction([this, dest, frameIndex = m_bindedFramebuffers, drawState = m_state] {
+        const auto& frame = getTemporaryFrameBuffer(frameIndex);
+        frame->release();
+        drawState.execute();
+        frame->draw(dest);
+    });
+    if (hasFrameBuffer() && !dest.isNull()) stdext::hash_union(m_status.second, dest.hash());
+    --m_bindedFramebuffers;
+}
+
+const FrameBufferPtr& DrawPool::getTemporaryFrameBuffer(const uint8_t index) {
+    if (index < m_temporaryFramebuffers.size()) {
+        return m_temporaryFramebuffers[index];
+    }
+
+    const auto& tempfb = m_temporaryFramebuffers.emplace_back(std::make_shared<FrameBuffer>());
+    tempfb->setSmooth(false);
+    return tempfb;
 }
