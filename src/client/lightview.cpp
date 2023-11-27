@@ -102,10 +102,6 @@ void LightView::draw(const Rect& dest, const Rect& src)
         });
     }
 
-    auto& lightData = m_lightData[0];
-    lightData.lights.clear();
-    lightData.tiles.assign(m_mapSize.area(), {});
-
     g_drawPool.preDraw(DrawPoolType::LIGHT, [this, dest, src] {
         g_drawPool.addAction([=, this] {
             {
@@ -121,6 +117,10 @@ void LightView::draw(const Rect& dest, const Rect& src)
             g_painter->drawCoords(m_coords);
         });
     });
+
+    auto& lightData = m_lightData[0];
+    lightData.lights.clear();
+    lightData.tiles.assign(m_mapSize.area(), {});
 }
 
 void LightView::updateCoords(const Rect& dest, const Rect& src) {
