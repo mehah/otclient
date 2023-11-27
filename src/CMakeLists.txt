@@ -190,6 +190,8 @@ find_package(asio REQUIRED)
 find_package(Threads REQUIRED)
 find_package(STDUUID CONFIG REQUIRED)
 find_package(pugixml CONFIG REQUIRED)
+find_package(ZLIB REQUIRED)
+find_package(httplib CONFIG REQUIRED)
 if(APPLE)
 	# Required for Physfs
 	find_library(FOUNDATION Foundation REQUIRED)
@@ -288,6 +290,7 @@ set(SOURCE_FILES
 	framework/net/outputmessage.cpp
 	framework/net/protocol.cpp
 	framework/net/protocolhttp.cpp
+	framework/net/httplogin.cpp
 	framework/net/server.cpp
 	framework/otml//otmldocument.cpp
 	framework/otml//otmlemitter.cpp
@@ -516,11 +519,11 @@ else()
 		${CMAKE_THREAD_LIBS_INIT}
 		${Protobuf_INCLUDE_DIRS}
 		${GMP_INCLUDE_DIR}
-		${OPENSSL_INCLUDE_DIR}
 		${PHYSFS_INCLUDE_DIR}
 		${GLEW_INCLUDE_DIR}
 		${PARALLEL_HASHMAP_INCLUDE_DIRS}
 		${NLOHMANN_JSON_INCLUDE_DIR}
+		${OPENSSL_INCLUDE_DIR}
 	)
 	target_link_libraries(${PROJECT_NAME}
 		PRIVATE
@@ -535,10 +538,12 @@ else()
 		${DirectX_LIBRARIES}
 		${OGG_LIBRARY}
 		${GMP_LIBRARY}
-		${OPENSSL_LIBRARIES}
 		${STDUUID}
 		${FOUNDATION}
 		${IOKIT}
+    ${OPENSSL_LIBRARY}
+    ${OPENSSL_CRYPTO_LIBRARY}
+    ${HTTPLIB_LIBRARY}
 
 		Threads::Threads
 		X11::X11
@@ -548,6 +553,10 @@ else()
 		Vorbis::vorbisfile
 		LibLZMA::LibLZMA
 		pugixml::pugixml
+		ZLIB::ZLIB
+    OpenSSL::SSL
+    OpenSSL::Crypto
+    httplib::httplib
 	)
 endif()
 

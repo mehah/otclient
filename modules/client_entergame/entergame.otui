@@ -1,6 +1,6 @@
 EnterGameWindow < MainWindow
   !text: tr('Enter Game')
-  size: 236 298
+  size: 236 316
   draggable: false
 
 EnterGameButton < Button
@@ -178,6 +178,16 @@ EnterGameWindow
     enabled: false
     !text: tr('Auto login')
     !tooltip: tr('Open charlist automatically when starting client')
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 2
+
+  CheckBox
+    id: unsafeLoginBox
+    enabled: true
+    !text: tr('Unsafe login')
+    !tooltip: tr('If login fails using SSL try without it(raw data)')
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom

@@ -129,6 +129,7 @@ function EnterGame.init()
     local port = g_settings.get('port')
     local stayLogged = g_settings.getBoolean('staylogged')
     local autologin = g_settings.getBoolean('autologin')
+    local unsafeLogin = g_settings.getBoolean('unsafeLogin')
     local clientVersion = g_settings.getInteger('client-version')
     if clientVersion == 0 then
         clientVersion = 1074
@@ -145,6 +146,7 @@ function EnterGame.init()
     enterGame:getChildById('serverPortTextEdit'):setText(port)
     enterGame:getChildById('autoLoginBox'):setChecked(autologin)
     enterGame:getChildById('stayLoggedBox'):setChecked(stayLogged)
+    enterGame:getChildById('unsafeLoginBox'):setChecked(unsafeLogin)
 
     local installedClients = {}
     local installed_qty = 0
@@ -333,100 +335,7 @@ function EnterGame.onClientVersionChange(comboBox, text, data)
     EnterGame.toggleStayLoggedBox(clientVersion)
 end
 
-function EnterGame.tryHttpLogin(clientVersion)
-    -- http login server
-    local onRecv = function(message, err)
-        if err then
-            onError(nil, 'Bad Request.', 400)
-            return
-        end
-
-        local _, bodyStart = message:find('{')
-        local _, bodyEnd = message:find('.*}')
-        if not bodyStart or not bodyEnd then
-            onError(nil, 'Bad Request.', 400)
-            return
-        end
-
-        local response = json.decode(message:sub(bodyStart, bodyEnd))
-        if response.errorMessage then
-            onError(nil, response.errorMessage, response.errorCode)
-            return
-        end
-
-        local worlds = {}
-        for _, world in ipairs(response.playdata.worlds) do
-            worlds[world.id] = {
-                name = world.name,
-                ip = world.externaladdress,
-                port = world.externalport,
-                previewState = world.previewstate == 1
-            }
-        end
-
-        local characters = {}
-        for index, character in ipairs(response.playdata.characters) do
-            local world = worlds[character.worldid]
-            characters[index] = {
-                name = character.name,
-                level = character.level,
-                main = character.ismaincharacter,
-                dailyreward = character.dailyrewardstate,
-                hidden = character.ishidden,
-                vocation = character.vocation,
-                outfitid = character.outfitid,
-                headcolor = character.headcolor,
-                torsocolor = character.torsocolor,
-                legscolor = character.legscolor,
-                detailcolor = character.detailcolor,
-                addonsflags = character.addonsflags,
-                worldName = world.name,
-                worldIp = world.ip,
-                worldPort = world.port,
-                previewState = world.previewstate
-            }
-        end
-
-        local premiumUntil = tonumber(response.session.premiumuntil)
-
-        local account = {
-            status = '',
-            premDays = math.floor((premiumUntil - os.time()) / 86400),
-            subStatus = premiumUntil > os.time() and SubscriptionStatus.Premium or SubscriptionStatus.Free
-        }
-
-        -- set session key
-        G.sessionKey = response.session.sessionkey
-
-        onCharacterList(nil, characters, account)
-    end
-
-    local host, path = G.host:match("([^/]+)/([^/].*)")
-    local url = G.host
-
-    if G.port ~= nil and path ~= nil then
-      url = host .. ':' .. G.port .. '/' .. path
-    elseif path ~= nil then
-      url = host .. '/' .. path
-    end
-
-    HTTP.post(url,
-        json.encode({
-            email = G.account,
-            password = G.password,
-            type = 'login'
-        }),
-        onRecv, false
-    )
-
-    loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to login server...'))
-    connect(loadBox, {
-        onCancel = function(msgbox)
-            loadBox = nil
-            EnterGame.show()
-        end
-    })
-
+function EnterGame.tryHttpLogin(clientVersion, unsafeLogin)
     g_game.setClientVersion(clientVersion)
     g_game.setProtocolVersion(g_game.getClientProtocolVersion(clientVersion))
     g_game.chooseRsa(G.host)
@@ -436,6 +345,107 @@ function EnterGame.tryHttpLogin(clientVersion)
         loadBox = nil
         EnterGame.show()
     end
+
+    local host, path = G.host:match("([^/]+)/([^/].*)")
+    local url = G.host
+
+    if G.port == nil then
+        G.port = 0
+    end
+
+    if path == nil then
+        path = ""
+    else
+        path = '/' .. path
+    end
+
+    loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to login server...'))
+    connect(loadBox, {
+        onCancel = function(msgbox)
+            loadBox = nil
+            G.requestId = 0
+            EnterGame.show()
+        end
+    })
+
+    math.randomseed(os.time())
+    G.requestId = math.random(1)
+
+    local http = LoginHttp.create()
+    http:httpLogin(host, path, G.port, G.account, G.password, G.requestId, unsafeLogin)
+end
+
+function printTable(t)
+    for k, v in pairs(t) do
+        if type(v) == "table" then
+            print(string.format("%q: {", k))
+            printTable(v)
+            print("}")
+        else
+            print(string.format("%q:", k) .. tostring(v) .. ",")
+        end
+    end
+end
+
+function EnterGame.loginSuccess(requestId, jsonSession, jsonWorlds, jsonCharacters)
+    if (G.requestId ~= requestId) then
+        return
+    end
+
+  local worlds = {}
+    for _, world in ipairs(json.decode(jsonWorlds)) do
+        worlds[world.id] = {
+            name = world.name,
+            ip = world.externaladdress,
+            port = world.externalport,
+            previewState = world.previewstate == 1
+        }
+    end
+
+  local characters = {}
+    for index, character in ipairs(json.decode(jsonCharacters)) do
+        local world = worlds[character.worldid]
+        characters[index] = {
+            name = character.name,
+            level = character.level,
+            main = character.ismaincharacter,
+            dailyreward = character.dailyrewardstate,
+            hidden = character.ishidden,
+            vocation = character.vocation,
+            outfitid = character.outfitid,
+            headcolor = character.headcolor,
+            torsocolor = character.torsocolor,
+            legscolor = character.legscolor,
+            detailcolor = character.detailcolor,
+            addonsflags = character.addonsflags,
+            worldName = world.name,
+            worldIp = world.ip,
+            worldPort = world.port,
+            previewState = world.previewstate
+        }
+    end
+
+  local session = json.decode(jsonSession)
+
+  local premiumUntil = tonumber(session.premiumuntil)
+
+  local account = {
+      status = '',
+      premDays = math.floor((premiumUntil - os.time()) / 86400),
+      subStatus = premiumUntil > os.time() and SubscriptionStatus.Premium or SubscriptionStatus.Free
+  }
+
+  -- set session key
+  G.sessionKey = session.sessionkey
+
+  onCharacterList(nil, characters, account)
+end
+
+function EnterGame.loginFailed(requestId, msg, result)
+  if (G.requestId ~= requestId) then
+    return
+  end
+  onError(nil, msg, result)
 end
 
 function EnterGame.doLogin()
@@ -446,6 +456,7 @@ function EnterGame.doLogin()
     G.host = enterGame:getChildById('serverHostTextEdit'):getText()
     G.port = tonumber(enterGame:getChildById('serverPortTextEdit'):getText())
     local clientVersion = tonumber(clientBox:getText())
+    local unsafeLogin = enterGame:getChildById('unsafeLoginBox'):isChecked()
     EnterGame.hide()
 
     if g_game.isOnline() then
@@ -462,10 +473,10 @@ function EnterGame.doLogin()
 
     if clientVersion >= 1281 and G.port ~= 7171 then
         if G.port == 0 then
-            G.port = 80
+            G.port = 443
         end
 
-        EnterGame.tryHttpLogin(clientVersion)
+        EnterGame.tryHttpLogin(clientVersion, unsafeLogin)
     else
         protocolLogin = ProtocolLogin.create()
         protocolLogin.onLoginError = onError

@@ -559,6 +559,19 @@ void WebsocketSession::start()
     });
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 void WebsocketSession::on_resolve(const std::error_code& ec, asio::ip::tcp::resolver::iterator iterator)
 {
     if (ec) {
