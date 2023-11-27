@@ -28,9 +28,9 @@ void AsyncDispatcher::init(uint8_t maxThreads)
 {
     /*
     * -1 = Graphic
-    *  1 = Foreground UI
-    *  2 = Foreground MAP
-    *  3 = Map and (Connection, Particle and Sound) Pool
+    *  1 = Map and (Connection, Particle and Sound) Pool
+    *  2 = Foreground UI
+    *  3 = Foreground MAP
     *  4 = Extra, ex: pathfinder and lighting system
     */
     const uint8_t minThreads = 4;

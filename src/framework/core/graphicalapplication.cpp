@@ -137,7 +137,7 @@ void GraphicalApplication::run()
     std::condition_variable foregroundUICondition, foregroundMapCondition;
 
     AdaptativeFrameCounter frameCounter2;
-    frameCounter2.setTargetFps(500u);
+    frameCounter2.setTargetFps(500u); // The secondary thread is limited to 500 fps.
 
     const auto& realFPS = [&] {
         if (g_window.vsyncEnabled() || getMaxFps() || getTargetFps()) {
