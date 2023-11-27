@@ -33,7 +33,7 @@ void DrawPoolManager::init(uint16_t spriteSize)
         m_spriteSize = spriteSize;
 
     // Create Pools
-    for (int8_t i = -1; ++i <= static_cast<uint8_t>(DrawPoolType::UNKNOW);) {
+    for (int8_t i = -1; ++i < static_cast<uint8_t>(DrawPoolType::LAST);) {
         m_pools[i] = DrawPool::create(static_cast<DrawPoolType>(i));
     }
 }
@@ -41,7 +41,7 @@ void DrawPoolManager::init(uint16_t spriteSize)
 void DrawPoolManager::terminate() const
 {
     // Destroy Pools
-    for (int_fast8_t i = -1; ++i <= static_cast<uint8_t>(DrawPoolType::UNKNOW);) {
+    for (int_fast8_t i = -1; ++i < static_cast<uint8_t>(DrawPoolType::LAST);) {
         delete m_pools[i];
     }
 }
@@ -57,62 +57,16 @@ void DrawPoolManager::draw()
         g_painter->setResolution(m_size, m_transformMatrix);
     }
 
-    // m_drawing = true;
+    for (auto pool : m_pools) {
+        if (pool->getType() == DrawPoolType::CREATURE_INFORMATION)
+            continue;
 
-    const auto& map = get(DrawPoolType::MAP); {
-        std::scoped_lock l(map->m_mutex);
-        if (drawPool(map)) {
+        std::scoped_lock l(pool->m_mutexDraw);
+        drawPool(pool);
+
+        if (pool->getType() == DrawPoolType::MAP)
             drawPool(get(DrawPoolType::CREATURE_INFORMATION));
-            drawPool(get(DrawPoolType::LIGHT));
-        }
     }
-
-    const auto& text = get(DrawPoolType::TEXT); {
-        std::scoped_lock l(text->m_mutex);
-        drawPool(text);
-        drawPool(get(DrawPoolType::FOREGROUND_TILE));
-    }
-
-    const auto& foreground = get(DrawPoolType::FOREGROUND); {
-        std::scoped_lock l(foreground->m_mutex);
-        drawPool(foreground);
-    }
-
-    // m_drawing = false;
-}
-
-bool DrawPoolManager::drawPool(DrawPool* pool) {
-    if (!pool->isEnabled())
-        return false;
-
-    if (!pool->hasFrameBuffer()) {
-        for (const auto& obj : pool->m_objects[0][DrawOrder::FIRST]) {
-            drawObject(obj);
-        }
-        return true;
-    }
-
-    if (!pool->m_framebuffer->canDraw())
-        return false;
-
-    if (pool->canRepaint(true)) {
-        pool->m_framebuffer->bind();
-        for (int_fast8_t i = -1; ++i <= pool->m_depthLevel;) {
-            for (const auto& order : pool->m_objects[i])
-                for (const auto& obj : order)
-                    drawObject(obj);
-        }
-
-        pool->m_framebuffer->release();
-    }
-
-    g_painter->resetState();
-
-    if (pool->m_beforeDraw) pool->m_beforeDraw();
-    pool->m_framebuffer->draw();
-    if (pool->m_afterDraw) pool->m_afterDraw();
-
-    return true;
 }
 
 void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)
@@ -135,8 +89,7 @@ void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)
 
 void DrawPoolManager::addTexturedCoordsBuffer(const TexturePtr& texture, const CoordsBufferPtr& coords, const Color& color) const
 {
-    DrawPool::DrawMethod method;
-    getCurrentPool()->add(color, texture, method, DrawMode::TRIANGLE_STRIP, DEFAULT_DRAW_CONDUCTOR, coords);
+    getCurrentPool()->add(color, texture, DrawPool::DrawMethod{}, DrawMode::TRIANGLE_STRIP, DEFAULT_DRAW_CONDUCTOR, coords);
 }
 
 void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const DrawConductor& condutor) const
@@ -144,12 +97,10 @@ void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& textur
     if (dest.isEmpty() || src.isEmpty())
         return;
 
-    DrawPool::DrawMethod method{
+    getCurrentPool()->add(color, texture, DrawPool::DrawMethod{
         .type = DrawPool::DrawMethodType::RECT,
         .dest = dest, .src = src
-    };
-
-    getCurrentPool()->add(color, texture, method, DrawMode::TRIANGLE_STRIP, condutor);
+    }, DrawMode::TRIANGLE_STRIP, condutor);
 }
 
 void DrawPoolManager::addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color) const
@@ -157,9 +108,7 @@ void DrawPoolManager::addUpsideDownTexturedRect(const Rect& dest, const TextureP
     if (dest.isEmpty() || src.isEmpty())
         return;
 
-    DrawPool::DrawMethod method{ DrawPool::DrawMethodType::UPSIDEDOWN_RECT, dest, src };
-
-    getCurrentPool()->add(color, texture, method, DrawMode::TRIANGLE_STRIP);
+    getCurrentPool()->add(color, texture, DrawPool::DrawMethod{ DrawPool::DrawMethodType::UPSIDEDOWN_RECT, dest, src }, DrawMode::TRIANGLE_STRIP);
 }
 
 void DrawPoolManager::addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color) const
@@ -167,9 +116,7 @@ void DrawPoolManager::addTexturedRepeatedRect(const Rect& dest, const TexturePtr
     if (dest.isEmpty() || src.isEmpty())
         return;
 
-    DrawPool::DrawMethod method{ DrawPool::DrawMethodType::REPEATED_RECT, dest, src };
-
-    getCurrentPool()->add(color, texture, method);
+    getCurrentPool()->add(color, texture, DrawPool::DrawMethod{ DrawPool::DrawMethodType::REPEATED_RECT, dest, src });
 }
 
 void DrawPoolManager::addFilledRect(const Rect& dest, const Color& color, const DrawConductor& condutor) const
@@ -177,9 +124,7 @@ void DrawPoolManager::addFilledRect(const Rect& dest, const Color& color, const 
     if (dest.isEmpty())
         return;
 
-    DrawPool::DrawMethod method{ DrawPool::DrawMethodType::RECT, dest };
-
-    getCurrentPool()->add(color, nullptr, method, DrawMode::TRIANGLES, condutor);
+    getCurrentPool()->add(color, nullptr, DrawPool::DrawMethod{ DrawPool::DrawMethodType::RECT, dest }, DrawMode::TRIANGLES, condutor);
 }
 
 void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color) const
@@ -187,9 +132,12 @@ void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Po
     if (a == b || a == c || b == c)
         return;
 
-    DrawPool::DrawMethod method{ .type = DrawPool::DrawMethodType::TRIANGLE, .a = a, .b = b, .c = c };
-
-    getCurrentPool()->add(color, nullptr, method);
+    getCurrentPool()->add(color, nullptr, DrawPool::DrawMethod{
+            .type = DrawPool::DrawMethodType::TRIANGLE,
+            .a = a,
+            .b = b,
+            .c = c
+     });
 }
 
 void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, uint16_t innerLineWidth) const
@@ -197,30 +145,69 @@ void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, uint
     if (dest.isEmpty() || innerLineWidth == 0)
         return;
 
-    DrawPool::DrawMethod method{
+    getCurrentPool()->add(color, nullptr, DrawPool::DrawMethod{
         .type = DrawPool::DrawMethodType::BOUNDING_RECT,
         .dest = dest,
         .intValue = innerLineWidth
-    };
-
-    getCurrentPool()->add(color, nullptr, method);
+    });
 }
 
-void DrawPoolManager::use(const DrawPoolType type, const Rect& dest, const Rect& src, const Color& colorClear)
+void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void()>& f, const Rect& dest, const Rect& src, const Color& colorClear)
 {
     select(type);
+    const auto pool = getCurrentPool();
 
-    auto* currentPoll = getCurrentPool();
+    if (pool->hasFrameBuffer() && pool->m_repaint.load())
+        return;
 
-    currentPoll->setEnable(true);
-    currentPoll->resetState();
+    pool->resetState();
 
-    if (currentPoll->hasFrameBuffer()) {
-        currentPoll->m_framebuffer->prepare(dest, src, colorClear);
-
-        // when the selected pool is MAP, reset the creature information state.
-        if (type == DrawPoolType::MAP) {
-            get(DrawPoolType::CREATURE_INFORMATION)->resetState();
-        }
+    // when the selected pool is MAP, reset the creature information state.
+    if (type == DrawPoolType::MAP) {
+        get(DrawPoolType::CREATURE_INFORMATION)->resetState();
     }
+
+    if (f) f();
+
+    std::scoped_lock l(pool->m_mutexDraw);
+
+    pool->setEnable(true);
+    if (pool->hasFrameBuffer())
+        pool->m_framebuffer->prepare(dest, src, colorClear);
+
+    pool->release(pool->m_repaint = pool->canRepaint(true));
+
+    if (type == DrawPoolType::MAP) {
+        get(DrawPoolType::CREATURE_INFORMATION)->release();
+    }
+}
+
+void DrawPoolManager::drawPool(DrawPool* pool) {
+    if (!pool->isEnabled())
+        return;
+
+    if (!pool->hasFrameBuffer()) {
+        for (const auto& obj : pool->m_objectsDraw) {
+            drawObject(obj);
+        }
+        return;
+    }
+
+    if (!pool->m_framebuffer->canDraw())
+        return;
+
+    if (pool->m_repaint) {
+        pool->m_repaint.store(false);
+
+        pool->m_framebuffer->bind();
+        for (const auto& obj : pool->m_objectsDraw)
+            drawObject(obj);
+        pool->m_framebuffer->release();
+    }
+
+    g_painter->resetState();
+
+    if (pool->m_beforeDraw) pool->m_beforeDraw();
+    pool->m_framebuffer->draw();
+    if (pool->m_afterDraw) pool->m_afterDraw();
 }

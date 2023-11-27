@@ -119,7 +119,7 @@ public:
     ThingPtr getTopMultiUseThing();
 
     bool hasWidget() const { return m_widget != nullptr; }
-    void drawWidget(const Point& dest, const MapPosInfo& mapRect);
+    void drawWidget(const Point& dest, const Rect& rect);
     void setWidget(const UIWidgetPtr& widget);
     UIWidgetPtr getWidget() { return m_widget; }
     void removeWidget();
@@ -212,7 +212,7 @@ public:
     bool checkForDetachableThing();
 
 #ifndef BOT_PROTECTION
-    void drawTexts(const Point& dest, const MapPosInfo& mapRect);
+    void drawTexts(Point dest);
     void setText(const std::string& text, Color color);
     std::string getText();
     void setTimer(int time, Color color);

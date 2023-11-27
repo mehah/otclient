@@ -152,51 +152,55 @@ void Map::addStaticText(const StaticTextPtr& txt, const Position& pos) {
     if (!g_app.isDrawingTexts())
         return;
 
-    for (const auto& other : m_staticTexts) {
-        // try to combine messages
-        if (other->getPosition() == pos && other->addMessage(txt->getName(), txt->getMessageMode(), txt->getFirstMessage())) {
-            return;
+    g_textDispatcher.addEvent([=, this] {
+        for (const auto& other : m_staticTexts) {
+            // try to combine messages
+            if (other->getPosition() == pos && other->addMessage(txt->getName(), txt->getMessageMode(), txt->getFirstMessage())) {
+                return;
+            }
         }
-    }
 
-    txt->setPosition(pos);
-    m_staticTexts.emplace_back(txt);
+        txt->setPosition(pos);
+        m_staticTexts.emplace_back(txt);
+    });
 }
 
 void Map::addAnimatedText(const AnimatedTextPtr& txt, const Position& pos) {
     if (!g_app.isDrawingTexts())
         return;
 
-    // this code will stack animated texts of the same color
-    AnimatedTextPtr prevAnimatedText;
+    g_textDispatcher.addEvent([=, this] {
+        // this code will stack animated texts of the same color
+        AnimatedTextPtr prevAnimatedText;
 
-    bool merged = false;
-    for (const auto& other : m_animatedTexts) {
-        if (other->getPosition() == pos) {
-            prevAnimatedText = other;
-            if (other->merge(txt)) {
-                merged = true;
-                break;
+        bool merged = false;
+        for (const auto& other : m_animatedTexts) {
+            if (other->getPosition() == pos) {
+                prevAnimatedText = other;
+                if (other->merge(txt)) {
+                    merged = true;
+                    break;
+                }
             }
         }
-    }
 
-    if (!merged) {
-        if (prevAnimatedText) {
-            Point offset = prevAnimatedText->getOffset();
-            if (const float t = prevAnimatedText->getTimer().ticksElapsed();
-                t < g_gameConfig.getAnimatedTextDuration() / 4.0) { // didnt move 12 pixels
-                const int32_t y = 12 - 48 * t / static_cast<float>(g_gameConfig.getAnimatedTextDuration());
-                offset += Point(0, y);
+        if (!merged) {
+            if (prevAnimatedText) {
+                Point offset = prevAnimatedText->getOffset();
+                if (const float t = prevAnimatedText->getTimer().ticksElapsed();
+                    t < g_gameConfig.getAnimatedTextDuration() / 4.0) { // didnt move 12 pixels
+                    const int32_t y = 12 - 48 * t / static_cast<float>(g_gameConfig.getAnimatedTextDuration());
+                    offset += Point(0, y);
+                }
+                offset.y = std::min<int32_t>(offset.y, 12);
+                txt->setOffset(offset);
             }
-            offset.y = std::min<int32_t>(offset.y, 12);
-            txt->setOffset(offset);
+            m_animatedTexts.emplace_back(txt);
         }
-        m_animatedTexts.emplace_back(txt);
-    }
 
-    txt->setPosition(pos);
-    txt->onAppear();
+        txt->setPosition(pos);
+        txt->onAppear();
+    });
 }
 
 ThingPtr Map::getThing(const Position& pos, int16_t stackPos)

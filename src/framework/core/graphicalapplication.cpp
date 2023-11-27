@@ -134,13 +134,60 @@ void GraphicalApplication::run()
 
     g_lua.callGlobalField("g_app", "onRun");
 
-    const auto& foreground = g_drawPool.get(DrawPoolType::FOREGROUND);
-    const auto& foreground_tile = g_drawPool.get(DrawPoolType::FOREGROUND_TILE);
-    const auto& txt = g_drawPool.get(DrawPoolType::TEXT);
-    const auto& map = g_drawPool.get(DrawPoolType::MAP);
+    std::condition_variable foregroundUICondition, foregroundMapCondition;
 
-    // clang c++20 dont support jthread
-    std::thread t1([&]() {
+    AdaptativeFrameCounter frameCounter2;
+    frameCounter2.setTargetFps(500u); // The secondary thread is limited to 500 fps.
+
+    const auto& realFPS = [&] {
+        if (g_window.vsyncEnabled() || getMaxFps() || getTargetFps()) {
+            // get min fps between the two threads
+            return std::min<int>(m_frameCounter.getFps(), frameCounter2.getFps());
+        }
+
+        return getFps() < frameCounter2.getFps() ? getFps() :
+            // adjusts the main FPS according to the secondary FPS percentage.
+            std::max<int>(10, getFps() - m_frameCounter.getFpsPercent(frameCounter2.getPercent()));
+    };
+
+    const auto& drawForeground = [&] {
+        const auto& foregroundUI = g_drawPool.get(DrawPoolType::FOREGROUND);
+        const auto& foregroundMap = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
+
+        if (foregroundUI->canRepaint()) {
+            if (g_game.isOnline())
+                foregroundUICondition.notify_one();
+            else
+                g_ui.render(DrawPoolType::FOREGROUND);
+        }
+
+        if (g_game.isOnline() && foregroundMap->canRepaint())
+            foregroundMapCondition.notify_one();
+    };
+
+    // THREAD - FOREGROUND UI
+    g_asyncDispatcher.dispatch([this, &condition = foregroundUICondition] {
+        const auto& pool = g_drawPool.get(DrawPoolType::FOREGROUND);
+        std::unique_lock lock(pool->getMutexPreDraw());
+        condition.wait(lock, [this]() -> bool {
+            g_ui.render(DrawPoolType::FOREGROUND);
+            return m_stopping;
+        });
+    });
+
+    // THREAD - FOREGROUND MAP
+    g_asyncDispatcher.dispatch([this, &condition = foregroundMapCondition] {
+        const auto& pool = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
+        std::unique_lock lock(pool->getMutexPreDraw());
+        condition.wait(lock, [this]() -> bool {
+            if (g_ui.m_mapWidget)
+                g_ui.m_mapWidget->drawSelf(DrawPoolType::FOREGROUND_MAP);
+            return m_stopping;
+        });
+    });
+
+    // THREAD - POOL & MAP
+    g_asyncDispatcher.dispatch([&] {
         g_eventThreadId = std::this_thread::get_id();
         while (!m_stopping) {
             poll();
@@ -150,42 +197,20 @@ void GraphicalApplication::run()
                 continue;
             }
 
-            /*if (g_drawPool.isDrawing()) {
-                stdext::millisleep(1);
-                continue;
-            }*/
-
-            if (foreground->canRepaint()) {
-                g_asyncDispatcher.dispatch([this, &foreground] {
-                    std::scoped_lock l(foreground->getMutex());
-                    g_ui.render(DrawPoolType::FOREGROUND);
-                });
-            }
+            drawForeground();
 
             if (g_game.isOnline()) {
                 if (!g_ui.m_mapWidget)
                     g_ui.m_mapWidget = g_ui.getRootWidget()->recursiveGetChildById("gameMapPanel")->static_self_cast<UIMap>();
 
-                if (txt->canRepaint() || foreground_tile->canRepaint()) {
-                    g_asyncDispatcher.dispatch([this, &txt] {
-                        std::scoped_lock l(txt->getMutex());
-                        g_textDispatcher.poll();
-
-                        if (g_ui.m_mapWidget) {
-                            g_ui.m_mapWidget->drawSelf(DrawPoolType::TEXT);
-                            g_ui.m_mapWidget->drawSelf(DrawPoolType::FOREGROUND_TILE);
-                        }
-                    });
-                }
-
-                {
-                    std::scoped_lock l(map->getMutex());
-                    g_ui.m_mapWidget->drawSelf(DrawPoolType::MAP);
-                }
+                g_ui.m_mapWidget->drawSelf(DrawPoolType::MAP);
             } else g_ui.m_mapWidget = nullptr;
 
-            stdext::millisleep(1);
+            frameCounter2.update();
         }
+
+        foregroundUICondition.notify_one();
+        foregroundMapCondition.notify_one();
     });
 
     m_running = true;
@@ -201,10 +226,13 @@ void GraphicalApplication::run()
 
         // update screen pixels
         g_window.swapBuffers();
-        m_frameCounter.update();
-    }
 
-    t1.join();
+        if (m_frameCounter.update()) {
+            g_dispatcher.addEvent([this, fps = realFPS()] {
+                g_lua.callGlobalField("g_app", "onFps", fps);
+            });
+        }
+    }
 
     m_stopping = false;
     m_running = false;
@@ -255,7 +283,7 @@ void GraphicalApplication::resize(const Size& size)
 
         if (USE_FRAMEBUFFER) {
             g_drawPool.get(DrawPoolType::CREATURE_INFORMATION)->setFramebuffer(size);
-            g_drawPool.get(DrawPoolType::TEXT)->setFramebuffer(size);
+            g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->setFramebuffer(size);
         }
     });
 }
