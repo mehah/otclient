@@ -137,9 +137,9 @@ void GraphicalApplication::run()
 
     std::condition_variable foregroundUICondition, foregroundMapCondition;
 
-    const auto& realFPS = [&] {
+    const auto& FPS = [&] {
         m_mapProcessFrameCounter.setTargetFps(g_window.vsyncEnabled() || getMaxFps() || getTargetFps() ? 500u : 999u);
-        return std::min<int>(m_graphicFrameCounter.getFps(), m_mapProcessFrameCounter.getFps());
+        return m_graphicFrameCounter.getFps();
     };
 
     const auto& drawForeground = [&] {
@@ -220,7 +220,7 @@ void GraphicalApplication::run()
         g_window.swapBuffers();
 
         if (m_graphicFrameCounter.update()) {
-            g_dispatcher.addEvent([this, fps = realFPS()] {
+            g_dispatcher.addEvent([this, fps = FPS()] {
                 g_lua.callGlobalField("g_app", "onFps", fps);
             });
         }
