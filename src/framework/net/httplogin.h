@@ -30,7 +30,7 @@ public:
   LoginHttp();
 
   void startHttpLogin(const std::string &host, const std::string &path,
-                      u_int16_t port, const std::string &email,
+                      uint16_t port, const std::string &email,
                       const std::string &password);
 
   void Logger(const auto &req, const auto &res);
@@ -44,7 +44,7 @@ public:
   bool parseJsonResponse(const std::string &body);
 
   void httpLogin(const std::string &host, const std::string &path,
-                 u_int16_t port, const std::string &email,
+                 uint16_t port, const std::string &email,
                  const std::string &password, int request_id, bool unsafeLogin);
 
   httplib::Result loginHttpsJson(const std::string &host,
@@ -53,7 +53,7 @@ public:
                                  const std::string &password);
 
   httplib::Result loginHttpJson(const std::string &host,
-                                const std::string &path, u_int16_t port,
+                                const std::string &path, uint16_t port,
                                 const std::string &email,
                                 const std::string &password);
 
