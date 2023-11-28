@@ -35,6 +35,10 @@
 #include <framework/net/protocolhttp.h>
 #endif
 
+#ifdef ANDROID
+extern "C" {
+#endif
+
 int main(int argc, const char* argv[])
 {
     std::vector<std::string> args(argv, argv + argc);
@@ -101,3 +105,6 @@ int main(int argc, const char* argv[])
 #endif
     return 0;
     }
+#ifdef ANDROID
+}
+#endif
