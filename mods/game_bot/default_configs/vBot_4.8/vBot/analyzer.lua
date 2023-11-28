@@ -138,9 +138,9 @@ end
 
 local toggleAnalyzer = function(window)
     if window:isVisible() then
-        window:hide()
+        window:close()
     else
-        window:show()
+        window:open()
     end
 end
 
