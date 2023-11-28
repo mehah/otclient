@@ -215,7 +215,7 @@ void UIMap::updateMapSize()
 void UIMap::addTile(const TilePtr& tile) {
     std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND)->getMutex());
 
-    if (std::ranges::find(m_tiles, tile) == m_tiles.end())
+    if (std::find(m_tiles.begin(), m_tiles.end(), tile) == m_tiles.end())
         m_tiles.emplace_back(tile);
 }
 void UIMap::removeTile(const TilePtr& tile) {

@@ -182,6 +182,7 @@ add_definitions(-D"BUILD_REVISION=\\\"${BUILD_REVISION}\\\"")
 # *****************************************************************************
 find_package(OpenSSL QUIET)
 find_package(PhysFS REQUIRED)
+find_package(ZLIB REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(LibLZMA REQUIRED)
 find_package(nlohmann_json REQUIRED)
@@ -189,7 +190,6 @@ find_package(asio REQUIRED)
 find_package(Threads REQUIRED)
 find_package(STDUUID CONFIG REQUIRED)
 find_package(pugixml CONFIG REQUIRED)
-find_package(ZLIB REQUIRED)
 if(APPLE)
 	# Required for Physfs
 	find_library(FOUNDATION Foundation REQUIRED)
@@ -464,7 +464,6 @@ if(MSVC)
 		LibLZMA::LibLZMA
 		winmm.lib
 		pugixml::pugixml
-		ZLIB::ZLIB
 	)
 elseif(ANDROID)
 	target_include_directories(${PROJECT_NAME}
@@ -486,6 +485,7 @@ elseif(ANDROID)
 		${LUA_LIBRARY}
 		${LUAJIT_LIBRARY}
 		${PHYSFS_LIBRARY}
+		${ZLIB_LIBRARY}
 		${PROTOBUF_LIBRARY}
 		${NLOHMANN_JSON_LIBRARY}
 		${EGL_LIBRARY}
@@ -526,6 +526,7 @@ else()
 		PRIVATE
 		${LUAJIT_LIBRARY}
 		${PHYSFS_LIBRARY}
+		${ZLIB_LIBRARY}
 		${PROTOBUF_LIBRARY}
 		${NLOHMANN_JSON_LIBRARY}
 		${GLEW_LIBRARY}
@@ -547,7 +548,6 @@ else()
 		Vorbis::vorbisfile
 		LibLZMA::LibLZMA
 		pugixml::pugixml
-		ZLIB::ZLIB
 	)
 endif()
 
