@@ -74,10 +74,10 @@ void Item::internalDraw(int animationPhase, const Point& dest, const Color& colo
     getThingType()->draw(dest, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, color, drawThings, lightView, m_drawConductor);
     g_drawPool.resetShaderProgram();
 
-    if (!replaceColorShader)
+    if (!replaceColorShader) {
         drawAttachedEffect(dest, lightView, true); // On Top
-
-    drawAttachedParticlesEffect(dest);
+        drawAttachedParticlesEffect(dest);
+    }
 }
 
 void Item::setConductor()
