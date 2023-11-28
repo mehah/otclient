@@ -1,6 +1,6 @@
---[[
+--[[ 
     Configs for modules
-    Based on Kondrah storage method
+    Based on Kondrah storage method  
 --]]
 local configName = modules.game_bot.contentsPanel.config:getCurrentOption().text
 
@@ -29,8 +29,8 @@ local suppliesFile = "/bot/" .. configName .. "/vBot_configs/profile_".. profile
 
 --healbot
 if g_resources.fileExists(healBotFile) then
-    local status, result = pcall(function()
-      return json.decode(g_resources.readFileContents(healBotFile))
+    local status, result = pcall(function() 
+      return json.decode(g_resources.readFileContents(healBotFile)) 
     end)
     if not status then
       return onError("Error while reading config file (" .. healBotFile .. "). To fix this problem you can delete HealBot.json. Details: " .. result)
@@ -40,8 +40,8 @@ end
 
 --attackbot
 if g_resources.fileExists(attackBotFile) then
-    local status, result = pcall(function()
-      return json.decode(g_resources.readFileContents(attackBotFile))
+    local status, result = pcall(function() 
+      return json.decode(g_resources.readFileContents(attackBotFile)) 
     end)
     if not status then
       return onError("Error while reading config file (" .. attackBotFile .. "). To fix this problem you can delete HealBot.json. Details: " .. result)
@@ -51,8 +51,8 @@ end
 
 --supplies
 if g_resources.fileExists(suppliesFile) then
-    local status, result = pcall(function()
-      return json.decode(g_resources.readFileContents(suppliesFile))
+    local status, result = pcall(function() 
+      return json.decode(g_resources.readFileContents(suppliesFile)) 
     end)
     if not status then
       return onError("Error while reading config file (" .. suppliesFile .. "). To fix this problem you can delete HealBot.json. Details: " .. result)
@@ -65,7 +65,7 @@ function vBotConfigSave(file)
   --- heal
   --- atk
   --- supply
-  local configFile
+  local configFile 
   local configTable
   if not file then return end
   file = file:lower()
@@ -82,13 +82,13 @@ function vBotConfigSave(file)
     return
   end
 
-  local status, result = pcall(function()
-    return json.encode(configTable, 2)
+  local status, result = pcall(function() 
+    return json.encode(configTable, 2) 
   end)
   if not status then
     return onError("Error while saving config. it won't be saved. Details: " .. result)
   end
-
+  
   if result:len() > 100 * 1024 * 1024 then
     return onError("config file is too big, above 100MB, it won't be saved")
   end

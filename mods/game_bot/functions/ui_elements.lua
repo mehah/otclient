@@ -11,6 +11,7 @@ UI.Button = function(text, callback, parent)
   return widget
 end
 
+
 UI.Config = function(parent)
   return UI.createWidget("BotConfig", parent)
 end
@@ -61,7 +62,7 @@ UI.Container = function(callback, unique, parent, widget)
     for i = 1, itemsToShow do
       local widget = g_ui.createWidget("BotItem", widget.items)
       if type(items[i]) == 'number' then
-        items[i] = {id=items[i], count=1}
+        items[i] = { id = items[i], count = 1 }
       end
       if type(items[i]) == 'table' then
         widget:setItem(Item.create(items[i].id, items[i].count))
@@ -79,7 +80,7 @@ UI.Container = function(callback, unique, parent, widget)
     for i, child in ipairs(widget.items:getChildren()) do
       if child:getItemId() >= 100 then
         if not duplicates[child:getItemId()] or not unique then
-          table.insert(items, {id=child:getItemId(), count=child:getItemCountOrSubType()})
+          table.insert(items, { id = child:getItemId(), count = child:getItemCount() })
           duplicates[child:getItemId()] = true
         end
       end
@@ -124,7 +125,7 @@ UI.DualScrollPanel = function(params, callback, parent) -- callback = function(w
     end
   end
 
-  local update  = function(dontSignal)
+  local update             = function(dontSignal)
     widget.title:setText("" .. params.min .. "% <= " .. params.title .. " <= " .. params.max .. "%")
     if callback and not dontSignal then
       callback(widget, params)
@@ -180,7 +181,7 @@ UI.DualScrollItemPanel = function(params, callback, parent) -- callback = functi
     end
   end
 
-  local update  = function(dontSignal)
+  local update             = function(dontSignal)
     widget.title:setText("" .. params.min .. "% <= " .. params.title .. " <= " .. params.max .. "%")
     if callback and not dontSignal then
       callback(widget, params)
@@ -293,7 +294,7 @@ UI.DualLabel = function(left, right, params, parent)
   widget.right:setText(right)
   widget:setHeight(params.height)
   if widget.left:getWidth() > params.maxWidth then
-      widget.left:setWidth(params.maxWidth)
+    widget.left:setWidth(params.maxWidth)
   end
   return widget
 end
@@ -324,7 +325,7 @@ UI.LabelAndTextEdit = function(params, callback, parent)
   widget.right.onTextChange = function(widget, text)
     params.right = text
     if callback then
-        callback(widget, params)
+      callback(widget, params)
     end
   end
 
@@ -370,20 +371,20 @@ UI.SwitchAndButton = function(params, callbackSwitch, callbackButton, callback, 
     params.on = not params.on
     widget.left:setOn(params.on)
     if callback then
-        callback(widget, params)
+      callback(widget, params)
     end
     if callbackSwitch then
-        callbackSwitch()
+      callbackSwitch()
     else
-        warn("callback not set!")
+      warn("callback not set!")
     end
   end
 
   widget.right.onClick = function()
     if callbackButton then
-        callbackButton()
+      callbackButton()
     else
-        warn("callback not set!")
+      warn("callback not set!")
     end
   end
 

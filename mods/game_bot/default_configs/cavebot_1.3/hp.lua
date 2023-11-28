@@ -21,7 +21,7 @@ for _, healingInfo in ipairs({storage.healing1, storage.healing2}) do
   local healingmacro = macro(20, function()
     local hp = player:getHealthPercent()
     if healingInfo.max >= hp and hp >= healingInfo.min then
-      if TargetBot then
+      if TargetBot then 
         TargetBot.saySpell(healingInfo.text) -- sync spell with targetbot if available
       else
         say(healingInfo.text)
@@ -30,7 +30,7 @@ for _, healingInfo in ipairs({storage.healing1, storage.healing2}) do
   end)
   healingmacro.setOn(healingInfo.on)
 
-  UI.DualScrollPanel(healingInfo, function(widget, newParams)
+  UI.DualScrollPanel(healingInfo, function(widget, newParams) 
     healingInfo = newParams
     healingmacro.setOn(healingInfo.on)
   end)
@@ -57,7 +57,7 @@ for i, healingInfo in ipairs({storage.hpitem1, storage.hpitem2, storage.manaitem
   local healingmacro = macro(20, function()
     local hp = i <= 2 and player:getHealthPercent() or math.min(100, math.floor(100 * (player:getMana() / player:getMaxMana())))
     if healingInfo.max >= hp and hp >= healingInfo.min then
-      if TargetBot then
+      if TargetBot then 
         TargetBot.useItem(healingInfo.item, healingInfo.subType, player) -- sync spell with targetbot if available
       else
         local thing = g_things.getThingType(healingInfo.item)
@@ -71,7 +71,7 @@ for i, healingInfo in ipairs({storage.hpitem1, storage.hpitem2, storage.manaitem
   end)
   healingmacro.setOn(healingInfo.on)
 
-  UI.DualScrollItemPanel(healingInfo, function(widget, newParams)
+  UI.DualScrollItemPanel(healingInfo, function(widget, newParams) 
     healingInfo = newParams
     healingmacro.setOn(healingInfo.on and healingInfo.item > 100)
   end)
@@ -89,9 +89,9 @@ UI.TextEdit(storage.manaShield or "utamo vita", function(widget, newText)
 end)
 
 local lastManaShield = 0
-macro(20, "mana shield", function()
+macro(20, "mana shield", function() 
   if hasManaShield() or lastManaShield + 90000 > now then return end
-  if TargetBot then
+  if TargetBot then 
     TargetBot.saySpell(storage.manaShield) -- sync spell with targetbot if available
   else
     say(storage.manaShield)
@@ -103,9 +103,9 @@ UI.TextEdit(storage.hasteSpell or "utani hur", function(widget, newText)
   storage.hasteSpell = newText
 end)
 
-macro(500, "haste", function()
+macro(500, "haste", function() 
   if hasHaste() then return end
-  if TargetBot then
+  if TargetBot then 
     TargetBot.saySpell(storage.hasteSpell) -- sync spell with targetbot if available
   else
     say(storage.hasteSpell)
@@ -117,9 +117,9 @@ UI.TextEdit(storage.antiParalyze or "utani hur", function(widget, newText)
   storage.antiParalyze = newText
 end)
 
-macro(100, "anti paralyze", function()
+macro(100, "anti paralyze", function() 
   if not isParalyzed() then return end
-  if TargetBot then
+  if TargetBot then 
     TargetBot.saySpell(storage.antiParalyze) -- sync spell with targetbot if available
   else
     say(storage.antiParalyze)
@@ -181,7 +181,7 @@ macro(250, function()
           for __, item in ipairs(container:getItems()) do
             if item:getId() == autoEquip.item1 or item:getId() == autoEquip.item2 then
               g_game.move(item, {x=65535, y=autoEquip.slot, z=0}, item:getCount())
-              delay(1000) -- don't call it too often
+              delay(1000) -- don't call it too often      
               return
             end
           end

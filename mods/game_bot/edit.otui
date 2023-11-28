@@ -12,7 +12,7 @@ MainWindow
     anchors.left: parent.left
     anchors.right: parent.right
     height: 152
-
+    
     Label
       anchors.top: parent.top
       anchors.left: parent.left
@@ -21,14 +21,14 @@ MainWindow
       text-align: center
       text-wrap: true
       !text: tr("Config Manager\nYou can use config manager to share configs between different machines, especially smartphones. After you configure your config, you can upload it, then you'll get unique hash code which you can use on diffent machinge (for eg. mobile phone) to download it.")
-
+      
     HorizontalSeparator
       anchors.top: prev.bottom
       anchors.left: parent.left
       anchors.right: parent.right
       margin-top: 3
       height: 2
-
+      
     Panel
       id: upload
       anchors.top: prev.bottom
@@ -65,7 +65,7 @@ MainWindow
         margin-left: 20
         margin-right: 20
         text-offset: 3 0
-
+        
       Button
         id: submit
         anchors.top: prev.bottom
@@ -76,12 +76,12 @@ MainWindow
         margin-left: 40
         margin-right: 40
         @onClick: modules.game_bot.uploadConfig()
-
+        
     Panel
       id: download
       anchors.top: prev.top
       anchors.left: parent.horizontalCenter
-      anchors.right: parent.right
+      anchors.right: parent.right      
       anchors.bottom: parent.bottom
 
       Label
@@ -111,7 +111,7 @@ MainWindow
         margin-top: 4
         margin-left: 20
         margin-right: 20
-
+        
       Button
         id: submit
         anchors.top: prev.bottom
@@ -121,19 +121,19 @@ MainWindow
         margin-top: 4
         margin-left: 40
         margin-right: 40
-        @onClick: modules.game_bot.downloadConfig()
-
+        @onClick: modules.game_bot.downloadConfig()        
+        
   HorizontalSeparator
     anchors.top: prev.bottom
     anchors.left: parent.left
     anchors.right: parent.right
     margin-top: 3
     height: 2
-
+  
   Panel
     anchors.top: prev.bottom
     anchors.left: parent.left
-    anchors.right: parent.right
+    anchors.right: parent.right    
     margin-top: 5
     height: 330
     $mobile:
@@ -217,7 +217,7 @@ MainWindow
     !text: tr('Tutorials')
     anchors.bottom: parent.bottom
     anchors.left: prev.right
-    margin-left: 5
+    margin-left: 5 
     width: 80
     @onClick: g_platform.openUrl("http://otclient.ovh/bot.php?tutorials")
 
@@ -225,7 +225,7 @@ MainWindow
     !text: tr('Scripts')
     anchors.bottom: parent.bottom
     anchors.left: prev.right
-    margin-left: 5
+    margin-left: 5 
     width: 80
     @onClick: g_platform.openUrl("http://otclient.ovh/bot.php?scripts")
 
@@ -233,7 +233,7 @@ MainWindow
     !text: tr('Forum')
     anchors.bottom: parent.bottom
     anchors.left: prev.right
-    margin-left: 5
+    margin-left: 5 
     width: 80
     @onClick: g_platform.openUrl("http://otclient.ovh/bot.php?forum")
 
@@ -241,10 +241,10 @@ MainWindow
     !text: tr('Discord')
     anchors.bottom: parent.bottom
     anchors.left: prev.right
-    margin-left: 5
+    margin-left: 5 
     width: 80
     @onClick: g_platform.openUrl("http://otclient.ovh/bot.php?discord")
-
+  
   Button
     id: cancelButton
     !text: tr('Close')

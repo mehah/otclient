@@ -564,9 +564,9 @@ std::string ResourceManager::fileChecksum(const std::string& path) {
     return checksum;
 }
 
-stdext::map<std::string, std::string> ResourceManager::filesChecksums()
+std::unordered_map<std::string, std::string> ResourceManager::filesChecksums()
 {
-    stdext::map<std::string, std::string> ret;
+    std::unordered_map<std::string, std::string> ret;
     auto files = listDirectoryFiles("/", true, false, true);
     for (auto it = files.rbegin(); it != files.rend(); ++it) {
         const auto& filePath = *it;
@@ -723,10 +723,10 @@ bool ResourceManager::launchCorrect(std::vector<std::string>& args) { // curentl
 #endif
 }
 
-std::string ResourceManager::createArchive(const stdext::map<std::string, std::string>& files)  { return ""; }
+std::string ResourceManager::createArchive(const std::unordered_map<std::string, std::string>& files) { return ""; }
 
-stdext::map<std::string, std::string> ResourceManager::decompressArchive(std::string dataOrPath)
+std::unordered_map<std::string, std::string> ResourceManager::decompressArchive(std::string dataOrPath)
 {
-    stdext::map<std::string, std::string> ret;
+    std::unordered_map<std::string, std::string> ret;
     return ret;
 }

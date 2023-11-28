@@ -5,7 +5,7 @@ TargetBot.Creature.attack = function(params, targets, isLooting) -- params {conf
 
   local config = params.config
   local creature = params.creature
-
+  
   if g_game.getAttackingCreature() ~= creature then
     g_game.attack(creature)
   end
@@ -66,7 +66,7 @@ end
 TargetBot.Creature.walk = function(creature, config, targets)
   local cpos = creature:getPosition()
   local pos = player:getPosition()
-
+  
   local isTrapped = true
   local pos = player:getPosition()
   local dirs = {{-1,1}, {0,1}, {1,1}, {-1, 0}, {1, 0}, {-1, -1}, {0, -1}, {1, -1}}
@@ -76,7 +76,7 @@ TargetBot.Creature.walk = function(creature, config, targets)
       isTrapped = false
     end
   end
-
+  
   -- luring
   if TargetBot.canLure() and (config.lure or config.lureCavebot) and not (config.chase and creature:getHealthPercent() < 30) and not isTrapped then
     local monsters = 0

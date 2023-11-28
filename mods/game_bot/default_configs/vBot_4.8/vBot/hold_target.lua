@@ -21,10 +21,10 @@ macro(100, "Hold Target", function()
         for i, spec in ipairs(getSpectators()) do
             local sameFloor = spec:getPosition().z == posz()
             local oldTarget = spec:getId() == targetID
-
+            
             if sameFloor and oldTarget then
                 attack(spec)
             end
         end
     end
-end)
+end) 

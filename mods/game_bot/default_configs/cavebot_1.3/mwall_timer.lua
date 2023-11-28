@@ -21,9 +21,9 @@ onAddThing(function(tile, thing)
   else
     return
   end
-
+  
   local pos = tile:getPosition().x .. "," .. tile:getPosition().y .. "," .. tile:getPosition().z
-  if not activeTimers[pos] or activeTimers[pos] < now then
+  if not activeTimers[pos] or activeTimers[pos] < now then    
     activeTimers[pos] = now + timer
   end
   tile:setTimer(activeTimers[pos] - now)
@@ -37,5 +37,5 @@ onRemoveThing(function(tile, thing)
     local pos = tile:getPosition().x .. "," .. tile:getPosition().y .. "," .. tile:getPosition().z
     activeTimers[pos] = nil
     tile:setTimer(0)
-  end
+  end  
 end)

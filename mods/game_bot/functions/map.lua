@@ -24,11 +24,11 @@ context.getSpectators = function(param1, param2)
     direction = param1:getDirection()
     param1 = param2
   end
-
+  
   if type(param1) == 'string' then
-    return g_map.getSpectatorsByPattern(pos, param1, direction)
+    return g_map.getSpectatorsByPattern(pos, param1, direction)  
   end
-
+  
   local multifloor = false
   if type(param1) == 'boolean' and param1 == true then
     multifloor = true
@@ -97,7 +97,7 @@ context.findAllPaths = function(start, maxDist, params)
     if value == nil or value == false then
       params[key] = 0
     elseif value == true then
-      params[key] = 1
+      params[key] = 1    
     end
   end
   if type(params['maxDistanceFrom']) == 'table' then
@@ -120,7 +120,7 @@ context.translateAllPathsToPath = function(paths, destPos)
   if type(destPos) ~= 'string' then
     destPosStr = destPos.x .. "," .. destPos.y .. "," .. destPos.z
   end
-
+  
   while destPosStr:len() > 0 do
     local node = paths[destPosStr]
     if not node then
@@ -139,6 +139,7 @@ context.translateAllPathsToPath = function(paths, destPos)
   return directions
 end
 context.translateEveryPathToPath = context.translateAllPathsToPath
+
 
 context.findPath = function(startPos, destPos, maxDist, params)
   --[[
@@ -172,7 +173,7 @@ context.findPath = function(startPos, destPos, maxDist, params)
   local marginMax = params.marginMax or params.maxMargin
   if type(marginMin) == 'number' and type(marginMax) == 'number' then
     local bestCandidate = nil
-    local bestCandidatePos = nil
+    local bestCandidatePos = nil    
     for x = -marginMax, marginMax do
       for y = -marginMax, marginMax do
         if math.abs(x) >= marginMin or math.abs(y) >= marginMin then
@@ -181,17 +182,17 @@ context.findPath = function(startPos, destPos, maxDist, params)
           if node and (not bestCandidate or bestCandidate[1] > node[1]) then
             bestCandidate = node
             bestCandidatePos = dest
-          end
+          end          
         end
       end
     end
     if bestCandidate then
-      return context.translateAllPathsToPath(paths, bestCandidatePos)
+      return context.translateAllPathsToPath(paths, bestCandidatePos)      
     end
     return
   end
 
-  if not paths[destPosStr] then
+  if not paths[destPosStr] then  
     local precision = params.precision
     if type(precision) == 'number' then
       for p = 1, precision do
@@ -208,19 +209,19 @@ context.findPath = function(startPos, destPos, maxDist, params)
           end
         end
         if bestCandidate then
-          return context.translateAllPathsToPath(paths, bestCandidatePos)
+          return context.translateAllPathsToPath(paths, bestCandidatePos)      
         end
       end
     end
     return nil
   end
-
+  
   return context.translateAllPathsToPath(paths, destPos)
 end
 context.getPath = context.findPath
 
 -- also works as autoWalk(dirs) where dirs is a list eg.: {1,2,3,0,1,1,2,}
-context.autoWalk = function(destination, maxDist, params)
+context.autoWalk = function(destination, maxDist, params) 
   if type(destination) == "table" and table.isList(destination) and not maxDist and not params then
     g_game.autoWalk(destination, {x=0,y=0,z=0})
     return true

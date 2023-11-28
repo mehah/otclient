@@ -17,7 +17,7 @@ context.macro = function(timeout, name, hotkey, callback, parent)
   elseif type(hotkey) == 'function' then
     parent = callback
     callback = hotkey
-    hotkey = ""
+    hotkey = ""    
   elseif type(callback) ~= 'function' then
     error("Invalid callback for macro: " .. tostring(callback))
   end
@@ -29,22 +29,22 @@ context.macro = function(timeout, name, hotkey, callback, parent)
   end
   if not parent then
     parent = context.panel
-  end
+  end  
   if hotkey:len() > 0 then
     hotkey = retranslateKeyComboDesc(hotkey)
   end
-
+  
   -- min timeout is 50, to avoid lags
   if timeout < 50 then
     timeout = 50
   end
-
+  
   table.insert(context._macros, {
     enabled = false,
     name = name,
     timeout = timeout,
     lastExecution = context.now + math.random(0, 100),
-    hotkey = hotkey,
+    hotkey = hotkey,    
   })
   local macro = context._macros[#context._macros]
 
@@ -87,7 +87,7 @@ context.macro = function(timeout, name, hotkey, callback, parent)
       macro.icon.setOn(false)
     end
   end
-
+    
   if name:len() > 0 then
     -- creature switch
     local text = name
@@ -103,13 +103,13 @@ context.macro = function(timeout, name, hotkey, callback, parent)
   else
     macro.enabled = true -- unnamed macros are enabled by default
   end
-
+      
   local desc = "lua"
   local info = debug.getinfo(2, "Sl")
   if info then
     desc = info.short_src .. ":" .. info.currentline
   end
-
+  
   macro.callback = function(macro)
     if not macro.delay or macro.delay < context.now then
       context._currentExecution = macro
@@ -119,7 +119,7 @@ context.macro = function(timeout, name, hotkey, callback, parent)
       if executionTime > 100 then
         context.warning("Slow macro (" .. executionTime .. "ms): " .. macro.name .. " - " .. desc)
       end
-      context._currentExecution = nil
+      context._currentExecution = nil    
       return true
     end
   end
@@ -156,7 +156,7 @@ context.hotkey = function(keys, name, callback, parent, single)
     switch = switch,
     single = single
   }
-
+  
   local desc = "lua"
   local info = debug.getinfo(2, "Sl")
   if info then
@@ -166,7 +166,7 @@ context.hotkey = function(keys, name, callback, parent, single)
   local hotkeyData = context._hotkeys[keys]
   hotkeyData.callback = function()
     if not hotkeyData.delay or hotkeyData.delay < context.now then
-      context._currentExecution = hotkeyData
+      context._currentExecution = hotkeyData       
       local start = g_clock.realMillis()
       callback()
       local executionTime = g_clock.realMillis() - start
@@ -189,8 +189,8 @@ context.singlehotkey = function(keys, name, callback, parent)
     callback = name
     name = ""
   end
-  return context.hotkey(keys, name, callback, parent, true)
-end
+  return context.hotkey(keys, name, callback, parent, true) 
+end  
 
 -- schedule(timeout, callback)
 context.schedule = function(timeout, callback)

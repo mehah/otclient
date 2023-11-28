@@ -44,18 +44,19 @@ ui.alerts.onClick = function()
   window:focus()
 end
 
-local widgets =
+local widgets = 
 {
-  "AlarmCheckBox",
-  "AlarmCheckBoxAndSpinBox",
+  "AlarmCheckBox", 
+  "AlarmCheckBoxAndSpinBox", 
   "AlarmCheckBoxAndTextEdit"
 }
 
-local parents =
+local parents = 
 {
-  window.list,
+  window.list, 
   window.settingsList
 }
+
 
 -- type
 addAlarm = function(id, title, defaultValue, alarmType, parent, tooltip)
@@ -125,7 +126,7 @@ local function alarm(file, windowText)
     lastCall = now + 4000 -- alarm.ogg length is 6s
   end
 
-
+  
   if modules.game_bot.g_app.getOs() == "windows" and config.flashClient.enabled then
     g_window.flash()
   end
@@ -175,7 +176,7 @@ onTalk(function(name, level, mode, text, channelId, pos)
 end)
 
 -- health & mana
-macro(100, function()
+macro(100, function() 
   if not config.enabled then return end
   if config.lowHealth.enabled then
     if hppercent() < config.lowHealth.value then
@@ -196,7 +197,7 @@ macro(100, function()
         return alarm("/sounds/magnum.ogg", "Creature Detected!")
       end
 
-      if spec:isPlayer() then
+      if spec:isPlayer() then 
         if spec:isTimedSquareVisible() and config.playerAttack.enabled then
           return alarm("/sounds/Player_Attack.ogg", "Player Attack!")
         end
@@ -208,7 +209,7 @@ macro(100, function()
       if config.creatureName.enabled then
         local name = spec:getName():lower()
         local fragments = string.split(config.creatureName.value, ",")
-
+        
         for i=1,#fragments do
           local frag = fragments[i]:trim():lower()
 

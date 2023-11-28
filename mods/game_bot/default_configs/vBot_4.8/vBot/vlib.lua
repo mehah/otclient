@@ -14,7 +14,7 @@ function logInfo(text)
     text = tostring(text)
     local start = timestamp.." [vBot]: "
 
-    return modules.client_terminal.addLine(start..text, "orange")
+    return modules.client_terminal.addLine(start..text, "orange") 
 end
 
 -- scripts / functions
@@ -30,7 +30,7 @@ function relogOnCharacter(charName)
     local characters = g_ui.getRootWidget().charactersWindow.characters
     for index, child in ipairs(characters:getChildren()) do
         local name = child:getChildren()[1]:getText()
-
+    
         if name:lower():find(charName:lower()) then
             child:focus()
             schedule(100, modules.client_entergame.CharacterList.doLogin)
@@ -109,7 +109,7 @@ function getFirstNumberInText(text)
 end
 
 -- function to search if item of given ID can be found on certain tile
--- first argument is always ID
+-- first argument is always ID 
 -- the rest of aguments can be:
 -- - tile
 -- - position
@@ -242,7 +242,7 @@ end)
 
 -- [[ canCast and cast functions ]] --
 -- callback connected to cast and canCast function
--- detects if a given spell was in fact casted based on player's text messages
+-- detects if a given spell was in fact casted based on player's text messages 
 -- Cast text and message text must match
 -- checks only spells inserted in SpellCastTable by function cast
 SpellCastTable = {}
@@ -402,7 +402,7 @@ onUseWith(function(pos, itemId, target, subType)
     if pos.x < 65000 then isUsingTime = now + 1000 end
 end)
 
--- returns first word in string
+-- returns first word in string 
 function string.starts(String, Start)
     return string.sub(String, 1, string.len(Start)) == Start
 end
@@ -764,7 +764,7 @@ function itemAmount(id)
 end
 
 -- self explanatory
--- a is item to use on
+-- a is item to use on 
 -- b is item to use a on
 function useOnInvertoryItem(a, b)
     local item = findItem(b)

@@ -53,7 +53,7 @@ CaveBot.Extensions.InWithdraw.setup = function()
 		local destination
 		for i, container in pairs(getContainers()) do
 			if container:getCapacity() > #container:getItems() and not string.find(container:getName():lower(), "quiver") and not string.find(container:getName():lower(), "depot") and not string.find(container:getName():lower(), "loot") and not string.find(container:getName():lower(), "inbox") then
-				destination = container
+				destination = container 
 			end
 		end
 

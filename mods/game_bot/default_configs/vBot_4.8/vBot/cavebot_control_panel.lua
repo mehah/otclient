@@ -8,7 +8,7 @@ CaveBotControlPanel < Panel
     fit-children: true
 
   HorizontalSeparator
-
+  
   Label
     text-align: center
     text: CaveBot Control Panel
@@ -16,7 +16,7 @@ CaveBotControlPanel < Panel
     margin-top: 3
 
   HorizontalSeparator
-
+    
   Panel
     id: buttons
     margin-top: 2

@@ -4,6 +4,9 @@ VERSION = "1.3"
 UI.Label("Config version: " .. VERSION)
 
 UI.Separator()
+
+
+
 UI.Separator()
 
 UI.Button("Discord", function()

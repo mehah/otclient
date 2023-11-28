@@ -19,9 +19,9 @@ CaveBot.Extensions.SellAll.setup = function()
 
     local npcName = val[1]
     local npc = getCreatureByName(npcName)
-    if not npc then
+    if not npc then 
       print("CaveBot[SellAll]: NPC not found! skipping")
-      return false
+      return false 
     end
 
     if retries > 10 then
@@ -30,7 +30,7 @@ CaveBot.Extensions.SellAll.setup = function()
     end
 
     if freecap() == sellAllCap then
-      sellAllCap = 0
+      sellAllCap = 0 
       print("CaveBot[SellAll]: Sold everything, proceeding")
       return true
     end
@@ -57,7 +57,7 @@ CaveBot.Extensions.SellAll.setup = function()
     end
 
     table.dump(val)
-
+    
     modules.game_npctrade.sellAll(wait, val)
     if wait then
       print("CaveBot[SellAll]: Sold All with delay")

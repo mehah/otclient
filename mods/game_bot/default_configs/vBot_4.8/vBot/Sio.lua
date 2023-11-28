@@ -20,7 +20,7 @@ Panel
     margin-left: 3
     height: 17
     text: Setup
-
+      
   ]], parent)
   ui:setId(panelName)
 
@@ -74,42 +74,42 @@ Panel
       config.customSpell = not config.customSpell
       widget:setOn(config.customSpell)
     end
-    sioListWindow.item:setOn(config.itemHeal)
+    sioListWindow.item:setOn(config.itemHeal)  
     sioListWindow.item.onClick = function(widget)
       config.itemHeal = not config.itemHeal
       widget:setOn(config.itemHeal)
     end
-    sioListWindow.exuraSio:setOn(config.exuraSio)
+    sioListWindow.exuraSio:setOn(config.exuraSio)  
     sioListWindow.exuraSio.onClick = function(widget)
       config.exuraSio = not config.exuraSio
       widget:setOn(config.exuraSio)
-    end
-    sioListWindow.exuraGranSio:setOn(config.exuraGranSio)
+    end 
+    sioListWindow.exuraGranSio:setOn(config.exuraGranSio)  
     sioListWindow.exuraGranSio.onClick = function(widget)
       config.exuraGranSio = not config.exuraGranSio
       widget:setOn(config.exuraGranSio)
     end
-    sioListWindow.exuraMasRes:setOn(config.exuraMasRes)
+    sioListWindow.exuraMasRes:setOn(config.exuraMasRes)  
     sioListWindow.exuraMasRes.onClick = function(widget)
       config.exuraMasRes = not config.exuraMasRes
       widget:setOn(config.exuraMasRes)
     end
-    sioListWindow.vocation.ED:setOn(config.healEd)
+    sioListWindow.vocation.ED:setOn(config.healEd)  
     sioListWindow.vocation.ED.onClick = function(widget)
       config.healEd = not config.healEd
       widget:setOn(config.healEd)
     end
-    sioListWindow.vocation.MS:setOn(config.healMs)
+    sioListWindow.vocation.MS:setOn(config.healMs)  
     sioListWindow.vocation.MS.onClick = function(widget)
       config.healMs = not config.healMs
       widget:setOn(config.healMs)
     end
-    sioListWindow.vocation.EK:setOn(config.healEk)
+    sioListWindow.vocation.EK:setOn(config.healEk)  
     sioListWindow.vocation.EK.onClick = function(widget)
       config.healEk = not config.healEk
       widget:setOn(config.healEk)
     end
-    sioListWindow.vocation.RP:setOn(config.healRp)
+    sioListWindow.vocation.RP:setOn(config.healRp)  
     sioListWindow.vocation.RP.onClick = function(widget)
       config.healRp = not config.healRp
       widget:setOn(config.healRp)
@@ -120,7 +120,7 @@ Panel
       sioListWindow.manaInfo:setText("Minimum Mana >= " .. config.minMana .. "%")
     end
     local updateFriendHpText = function()
-      sioListWindow.friendHp:setText("Heal Friend Below " .. config.minFriendHp .. "% hp")
+      sioListWindow.friendHp:setText("Heal Friend Below " .. config.minFriendHp .. "% hp")  
     end
     local updateDistanceText = function()
       sioListWindow.distText:setText("Max Distance: " .. config.distance)
@@ -167,7 +167,7 @@ Panel
 
     local voc = vBot.BotServerMembers[name]
     if not voc then return true end
-
+    
     if voc == 11 then voc = 1
     elseif voc == 12 then voc = 2
     elseif voc == 13 then voc = 3
@@ -246,7 +246,7 @@ Panel
           end
         end
       end
-    end
+    end 
 
   end)
 addSeparator()

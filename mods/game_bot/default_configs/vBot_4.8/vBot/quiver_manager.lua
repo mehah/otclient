@@ -12,7 +12,7 @@ if voc() == 2 or voc() == 12 then
     onContainerClose(function(container)
         hold = false
     end)
-
+    
     onAddItem(function(container, slot, item, oldItem)
         hold = false
     end)
@@ -24,6 +24,8 @@ if voc() == 2 or voc() == 12 then
     onContainerUpdateItem(function(container, slot, item, oldItem)
         hold = false
     end)
+
+
 
     local function manageQuiver(isBowEquipped, quiverContainer)
         local ammo = isBowEquipped and arrows or bolts

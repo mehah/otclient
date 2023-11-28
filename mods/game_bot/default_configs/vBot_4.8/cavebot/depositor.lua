@@ -91,13 +91,13 @@ CaveBot.Extensions.Depositor.setup = function()
 		end
 
 		-- next check retries
-		if retries > 400 then
+		if retries > 400 then 
 			print("CaveBot[Depositor]: Depositor actions limit reached, proceeding")
 			resetCache()
-			return true
+			return true 
 		end
 
-		-- reaching and opening depot
+		-- reaching and opening depot 
 		if not CaveBot.ReachAndOpenDepot() then
 			return "retry"
 		end

@@ -6,18 +6,18 @@ UI.Button("Ingame script editor", function(newText)
       reload()
     end)
   end)
-
+  
   UI.Separator()
-
+  
   for _, scripts in pairs({storage.ingame_hotkeys}) do
     if type(scripts) == "string" and scripts:len() > 3 then
       local status, result = pcall(function()
         assert(load(scripts, "ingame_editor"))()
       end)
-      if not status then
+      if not status then 
         error("Ingame edior error:\n" .. result)
       end
     end
   end
-
+  
   UI.Separator()

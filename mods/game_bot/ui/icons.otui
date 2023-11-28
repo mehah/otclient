@@ -22,7 +22,7 @@ BotIcon < UIWidget
     margin-top: 0
     size: 48 48
     phantom: true
-
+  
   UIWidget
     id: status
     anchors.top: parent.top
@@ -39,7 +39,7 @@ BotIcon < UIWidget
     $!on:
       text: OFF
       background: red
-
+      
   UIWidget
     id: hotkey
     anchors.top: parent.top
@@ -49,7 +49,7 @@ BotIcon < UIWidget
     color: white
     phantom: true
     text-align: right
-
+      
   UIWidget
     id: text
     anchors.bottom: parent.bottom

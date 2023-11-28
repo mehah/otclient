@@ -289,6 +289,7 @@ Panel
     ignoreOnOptionChange = false
   end
 
+
   ui.config.onOptionChange = function(widget)
     if not ignoreOnOptionChange then
       context.storage.cavebot.activeConfig = widget.currentIndex
@@ -593,6 +594,7 @@ Panel
       lastOpenedContainer = context.now + container:getItemsCount() * 100
     end
   end)
+
 
   context.macro(250, function()
     if not context.storage.cavebot.enabled then

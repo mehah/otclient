@@ -25,7 +25,7 @@ macro(250, function()
           for __, item in ipairs(container:getItems()) do
             if item:getId() == autoEquip.item1 or item:getId() == autoEquip.item2 then
               g_game.move(item, {x=65535, y=autoEquip.slot, z=0}, item:getCount())
-              delay(1000) -- don't call it too often
+              delay(1000) -- don't call it too often      
               return
             end
           end

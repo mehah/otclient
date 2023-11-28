@@ -85,7 +85,7 @@ AlarmsWindow < MainWindow
     margin-top: 10
     padding: 5
     padding-left: 10
-    layout:
+    layout: 
       type: verticalBox
       fit-children: true
 
@@ -122,7 +122,7 @@ AlarmsWindow < MainWindow
     maximum: 600
     margin-left: 3
     margin-right: 3
-    background: #ffffff88
+    background: #ffffff88  
 
   Button
     id: closeButton

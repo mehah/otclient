@@ -8,7 +8,7 @@ TargetBotCreatureEditorScrollBar < Panel
     anchors.right: parent.right
     anchors.top: parent.top
     text-align: center
-
+    
   HorizontalScrollBar
     id: scroll
     anchors.left: parent.left
@@ -29,7 +29,7 @@ TargetBotCreatureEditorTextEdit < Panel
     anchors.right: parent.right
     anchors.top: parent.top
     text-align: center
-
+    
   TextEdit
     id: textEdit
     anchors.left: parent.left
@@ -56,6 +56,7 @@ TargetBotCreatureEditorItem < Panel
     anchors.top: parent.top
     anchors.right: parent.right
 
+
 TargetBotCreatureEditorCheckBox < BotSwitch
   height: 20
   margin-top: 7
@@ -64,7 +65,7 @@ TargetBotCreatureEditorWindow < MainWindow
   text: TargetBot creature editor
   width: 500
   height: 630
-
+  
   $mobile:
     height: 300
 
@@ -81,7 +82,7 @@ TargetBotCreatureEditorWindow < MainWindow
     anchors.top: prev.bottom
     text-align: center
     !text: tr('You can also enter multiple targets, separate them by ,')
-
+  
   TextEdit
     id: name
     anchors.top: prev.bottom
@@ -114,7 +115,7 @@ TargetBotCreatureEditorWindow < MainWindow
     anchors.bottom: help.top
     vertical-scrollbar: contentScroll
     margin-bottom: 10
-
+      
     Panel
       id: left
       anchors.top: parent.top
@@ -138,7 +139,7 @@ TargetBotCreatureEditorWindow < MainWindow
       layout:
         type: verticalBox
         fit-children: true
-
+  
   Button
     id: help
     !text: tr('Help & Tutorials')

@@ -330,6 +330,7 @@ end
 
 local lstBPs
 
+
 local openContainer = function(id)
     local t = {getRight(), getLeft(), getAmmo()} -- if more slots needed then add them here
     for i=1,#t do
@@ -652,6 +653,7 @@ local mainLoop = macro(150, function(macro)
     end
     macro:setOff()
 end)
+
 
 onContainerOpen(function(container, previousContainer)
     mainLoop:setOn()

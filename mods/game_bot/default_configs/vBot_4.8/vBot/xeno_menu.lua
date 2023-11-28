@@ -9,19 +9,19 @@ modules.game_interface.gameRootPanel.onMouseRelease = function(widget, mousePos,
             menu:addOption('HealBot', HealBot.show, "OTCv8")
             menu:addOption('Conditions', Conditions.show, "OTCv8")
             menu:addSeparator()
-            menu:addOption('CaveBot', function()
-                if CaveBot.isOn() then
-                    CaveBot.setOff()
-                else
-                    CaveBot.setOn()
-                end
+            menu:addOption('CaveBot', function() 
+                if CaveBot.isOn() then 
+                    CaveBot.setOff() 
+                else 
+                    CaveBot.setOn() 
+                end 
             end, CaveBot.isOn() and "ON " or "OFF ")
-            menu:addOption('TargetBot', function()
-                if TargetBot.isOn() then
-                    TargetBot.setOff()
-                else
-                    TargetBot.setOn()
-                end
+            menu:addOption('TargetBot', function() 
+                if TargetBot.isOn() then 
+                    TargetBot.setOff() 
+                else 
+                    TargetBot.setOn() 
+                end 
             end, TargetBot.isOn() and "ON " or "OFF ")
             menu:display(mousePos)
             return true

@@ -43,7 +43,7 @@ Panel
     text: 2
     margin-left: 4
     size: 17 17
-
+    
   Button
     id: 3
     anchors.verticalCenter: prev.verticalCenter
@@ -58,8 +58,8 @@ Panel
     anchors.left: prev.right
     text: 4
     margin-left: 4
-    size: 17 17
-
+    size: 17 17 
+    
   Button
     id: 5
     anchors.verticalCenter: prev.verticalCenter
@@ -67,7 +67,7 @@ Panel
     text: 5
     margin-left: 4
     size: 17 17
-
+    
   Label
     id: name
     anchors.verticalCenter: prev.verticalCenter
@@ -146,7 +146,7 @@ if not HealBotConfig[healPanelName] or not HealBotConfig[healPanelName][1] or #H
   }
 end
 
-if not HealBotConfig.currentHealBotProfile or HealBotConfig.currentHealBotProfile == 0 or HealBotConfig.currentHealBotProfile > 5 then
+if not HealBotConfig.currentHealBotProfile or HealBotConfig.currentHealBotProfile == 0 or HealBotConfig.currentHealBotProfile > 5 then 
   HealBotConfig.currentHealBotProfile = 1
 end
 
@@ -344,7 +344,7 @@ if rootWidget then
   end
 
   healWindow.healer.spells.addSpell.onClick = function(widget)
-
+ 
     local spellFormula = healWindow.healer.spells.spellFormula:getText():trim()
     local manaCost = tonumber(healWindow.healer.spells.manaCost:getText())
     local spellTrigger = tonumber(healWindow.healer.spells.spellValue:getText())
@@ -353,19 +353,19 @@ if rootWidget then
     local source
     local equasion
 
-    if not manaCost then
-      warn("HealBot: incorrect mana cost value!")
+    if not manaCost then  
+      warn("HealBot: incorrect mana cost value!")       
       healWindow.healer.spells.spellFormula:setText('')
       healWindow.healer.spells.spellValue:setText('')
-      healWindow.healer.spells.manaCost:setText('')
-      return
+      healWindow.healer.spells.manaCost:setText('') 
+      return 
     end
-    if not spellTrigger then
-      warn("HealBot: incorrect condition value!")
+    if not spellTrigger then  
+      warn("HealBot: incorrect condition value!") 
       healWindow.healer.spells.spellFormula:setText('')
       healWindow.healer.spells.spellValue:setText('')
       healWindow.healer.spells.manaCost:setText('')
-      return
+      return 
     end
 
     if spellSource == "Current Mana" then
@@ -379,7 +379,7 @@ if rootWidget then
     else
       source = "burst"
     end
-
+    
     if spellEquasion == "Above" then
       equasion = ">"
     elseif spellEquasion == "Below" then
@@ -400,7 +400,7 @@ if rootWidget then
   end
 
   healWindow.healer.items.addItem.onClick = function(widget)
-
+ 
     local id = healWindow.healer.items.itemId:getItemId()
     local trigger = tonumber(healWindow.healer.items.itemValue:getText())
     local src = healWindow.healer.items.itemSource:getCurrentOption().text
@@ -426,7 +426,7 @@ if rootWidget then
     else
       source = "burst"
     end
-
+    
     if eq == "Above" then
       equasion = ">"
     elseif eq == "Below" then
@@ -497,6 +497,7 @@ if rootWidget then
     resetSettings()
     loadSettings()
   end
+
 
   -- public functions
   HealBot = {} -- global table
@@ -593,7 +594,7 @@ macro(100, function()
           elseif entry.sign == "<" and mana() <= entry.value then
             say(entry.spell)
             return
-          end
+          end    
         elseif entry.origin == "burst" then
           if entry.sign == "=" and burstDamageValue() == entry.value then
             say(entry.spell)
@@ -604,7 +605,7 @@ macro(100, function()
           elseif entry.sign == "<" and burstDamageValue() <= entry.value then
             say(entry.spell)
             return
-          end
+          end    
         end
       else
         somethingIsOnCooldown = true
@@ -612,7 +613,7 @@ macro(100, function()
     end
   end
   if not somethingIsOnCooldown then
-    standBySpells = true
+    standBySpells = true 
   end
 end)
 
@@ -681,7 +682,7 @@ macro(100, function()
         elseif entry.sign == "<" and mana() <= entry.value then
           g_game.useInventoryItemWith(entry.item, player)
           return
-        end
+        end   
       elseif entry.origin == "burst" then
         if entry.sign == "=" and burstDamageValue() == entry.value then
           g_game.useInventoryItemWith(entry.item, player)
@@ -692,7 +693,7 @@ macro(100, function()
         elseif entry.sign == "<" and burstDamageValue() <= entry.value then
           g_game.useInventoryItemWith(entry.item, player)
           return
-        end
+        end   
       end
     end
   end

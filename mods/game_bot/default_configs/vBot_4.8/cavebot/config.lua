@@ -8,13 +8,13 @@ CaveBot.Config.setup = function()
   CaveBot.Config.ui = UI.createWidget("CaveBotConfigPanel")
   local ui = CaveBot.Config.ui
   local add = CaveBot.Config.add
-
+  
   add("ping", "Server ping", 100)
   add("walkDelay", "Walk delay", 10)
   add("mapClick", "Use map click", false)
   add("mapClickDelay", "Map click delay", 100)
-  add("ignoreFields", "Ignore fields", false)
-  add("skipBlocked", "Skip blocked path", false)
+  add("ignoreFields", "Ignore fields", false)  
+  add("skipBlocked", "Skip blocked path", false)  
   add("useDelay", "Delay after use", 400)
 end
 
@@ -46,7 +46,7 @@ CaveBot.Config.add = function(id, title, defaultValue)
   if CaveBot.Config.values[id] then
     return warn("Duplicated config key: " .. id)
   end
-
+    
   local panel
   local setter -- sets value
   if type(defaultValue) == "number" then
@@ -78,11 +78,11 @@ CaveBot.Config.add = function(id, title, defaultValue)
       CaveBot.save()
     end
   else
-    return warn("Invalid default value of config for key " .. id .. ", should be number or boolean")
+    return warn("Invalid default value of config for key " .. id .. ", should be number or boolean")      
   end
-
+  
   panel.title:setText(tr(title) .. ":")
-
+  
   CaveBot.Config.value_setters[id] = setter
   CaveBot.Config.values[id] = defaultValue
   CaveBot.Config.default_values[id] = defaultValue

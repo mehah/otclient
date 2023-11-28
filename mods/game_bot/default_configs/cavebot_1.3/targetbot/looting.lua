@@ -11,7 +11,7 @@ local dontSave = false
 TargetBot.Looting.setup = function()
   ui = UI.createWidget("TargetBotLootingPanel")
   UI.Container(TargetBot.Looting.onItemsUpdate, true, nil, ui.items)
-  UI.Container(TargetBot.Looting.onContainersUpdate, true, nil, ui.containers)
+  UI.Container(TargetBot.Looting.onContainersUpdate, true, nil, ui.containers) 
   ui.everyItem.onClick = function()
     ui.everyItem:setOn(not ui.everyItem:isOn())
     TargetBot.save()
@@ -241,11 +241,11 @@ TargetBot.Looting.lootContainer = function(lootContainers, container)
       return
     end
   end
-
+  
   -- looting finished, remove container from list
   container.lootContainer = false
   g_game.close(container)
-  table.remove(TargetBot.Looting.list, 1)
+  table.remove(TargetBot.Looting.list, 1) 
 end
 
 TargetBot.Looting.lootItem = function(lootContainers, item)

@@ -13,7 +13,7 @@ macro(1000, "Exchange money", function()
         if item:getCount() == 100 then
           for m, moneyId in ipairs(storage.moneyItems) do
             if item:getId() == moneyId.id then
-              return g_game.use(item)
+              return g_game.use(item)            
             end
           end
         end
@@ -35,11 +35,11 @@ macro(60000, "Send message on trade", function()
   if not trade then
     trade = getChannelId("trade")
   end
-  if trade and storage.autoTradeMessage:len() > 0 then
+  if trade and storage.autoTradeMessage:len() > 0 then    
     sayChannel(trade, storage.autoTradeMessage)
   end
 end)
-UI.TextEdit(storage.autoTradeMessage or "I'm using OTClientV8!", function(widget, text)
+UI.TextEdit(storage.autoTradeMessage or "I'm using OTClientV8!", function(widget, text)    
   storage.autoTradeMessage = text
 end)
 

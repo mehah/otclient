@@ -1,14 +1,14 @@
 DualScrollPanel < Panel
   height: 51
   margin-top: 3
-
+      
   SmallBotSwitch
     id: title
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: parent.top
     text-align: center
-
+    
   HorizontalScrollBar
     id: scroll1
     anchors.left: title.left
@@ -20,7 +20,7 @@ DualScrollPanel < Panel
     maximum: 100
     step: 1
     &disableScroll: true
-
+    
   HorizontalScrollBar
     id: scroll2
     anchors.left: title.horizontalCenter
@@ -31,7 +31,7 @@ DualScrollPanel < Panel
     maximum: 100
     step: 1
     &disableScroll: true
-
+    
   BotTextEdit
     id: text
     anchors.left: parent.left
@@ -44,7 +44,7 @@ DualScrollPanel < Panel
 SingleScrollItemPanel < Panel
   height: 45
   margin-top: 2
-
+    
   BotItem
     id: item
     anchors.left: parent.left
@@ -55,10 +55,10 @@ SingleScrollItemPanel < Panel
     id: title
     anchors.left: prev.right
     anchors.right: parent.right
-    anchors.top: prev.top
+    anchors.top: prev.top    
     margin-left: 2
     text-align: center
-
+    
   HorizontalScrollBar
     id: scroll
     anchors.left: title.left
@@ -73,7 +73,7 @@ SingleScrollItemPanel < Panel
 DualScrollItemPanel < Panel
   height: 33
   margin-top: 3
-
+    
   BotItem
     id: item
     anchors.left: parent.left
@@ -84,10 +84,10 @@ DualScrollItemPanel < Panel
     id: title
     anchors.left: prev.right
     anchors.right: parent.right
-    anchors.top: prev.top
+    anchors.top: prev.top    
     margin-left: 2
     text-align: center
-
+    
   HorizontalScrollBar
     id: scroll1
     anchors.left: title.left
@@ -99,7 +99,7 @@ DualScrollItemPanel < Panel
     maximum: 100
     step: 1
     &disableScroll: true
-
+    
   HorizontalScrollBar
     id: scroll2
     anchors.left: title.horizontalCenter
@@ -110,11 +110,11 @@ DualScrollItemPanel < Panel
     maximum: 100
     step: 1
     &disableScroll: true
-
+    
 ItemsRow < Panel
   height: 33
   margin-top: 2
-
+  
   BotItem
     id: item1
     anchors.top: parent.top
@@ -143,7 +143,7 @@ ItemsRow < Panel
     anchors.top: prev.top
     anchors.left: prev.right
     margin-left: 2
-
+    
 ItemsPanel < Panel
   height: 55
 
@@ -153,21 +153,22 @@ ItemsPanel < Panel
     anchors.right: parent.right
     anchors.top: parent.top
     text-align: center
-
+  
   ItemsRow
     id: items
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-
+    
+    
 ItemAndButtonPanel < Panel
   height: 40
-
+      
   BotItem
     id: item
     anchors.left: parent.left
     anchors.top: parent.top
-
+    
   BotSwitch
     id: title
     anchors.left: prev.right
@@ -175,16 +176,16 @@ ItemAndButtonPanel < Panel
     anchors.verticalCenter: prev.verticalCenter
     text-align: center
     margin-left: 2
-    margin-top: 0
-
+    margin-top: 0   
+    
 ItemAndSlotPanel < Panel
   height: 40
-
+      
   BotItem
     id: item
     anchors.left: parent.left
     anchors.top: parent.top
-
+    
   SmallBotSwitch
     id: title
     anchors.left: prev.right
@@ -206,7 +207,7 @@ ItemAndSlotPanel < Panel
 TwoItemsAndSlotPanel < Panel
   height: 35
   margin-top: 4
-
+      
   BotItem
     id: item1
     anchors.left: parent.left
@@ -218,7 +219,7 @@ TwoItemsAndSlotPanel < Panel
     anchors.left: prev.right
     anchors.top: prev.top
     margin-left: 1
-
+    
   SmallBotSwitch
     id: title
     anchors.left: prev.right

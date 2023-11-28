@@ -27,18 +27,18 @@ Panels.AttackLeaderTarget = function(parent)
     end
   end)
   context.macro(50, "Attack leader's target", nil, function()
-    if toAttack and context.storage.attackLeader:len() > 0 and toAttack ~= g_game.getAttackingCreature() then
+    if toAttack and context.storage.attackLeader:len() > 0 and toAttack ~= g_game.getAttackingCreature() then    
       g_game.attack(toAttack)
       toAttack = nil
     end
   end, parent)
-  context.addTextEdit("attackLeader", context.storage.attackLeader or "player name", function(widget, text)
+  context.addTextEdit("attackLeader", context.storage.attackLeader or "player name", function(widget, text)    
     context.storage.attackLeader = text
-  end, parent)
+  end, parent)  
 end
 
 
-Panels.LimitFloor = function(parent)
+Panels.LimitFloor = function(parent)  
   context.onPlayerPositionChange(function(pos)
     if context.storage.limitFloor then
       local gameMapPanel = modules.game_interface.getMapPanel()
@@ -56,7 +56,7 @@ Panels.LimitFloor = function(parent)
       if context.storage.limitFloor then
         gameMapPanel:lockVisibleFloor(context.posz())
       else
-        gameMapPanel:unlockVisibleFloor()
+        gameMapPanel:unlockVisibleFloor()      
       end
     end
   end, parent)
@@ -67,8 +67,8 @@ Panels.AntiPush = function(parent)
   if not parent then
     parent = context.panel
   end
-
-  local panelName = "antiPushPanel"
+  
+  local panelName = "antiPushPanel"  
   local ui = g_ui.createWidget("ItemsPanel", parent)
   ui:setId(panelName)
 
@@ -82,7 +82,7 @@ Panels.AntiPush = function(parent)
     context.storage[panelName].enabled = not context.storage[panelName].enabled
     widget:setOn(context.storage[panelName].enabled)
   end
-
+  
   if type(context.storage[panelName].items) ~= 'table' then
     context.storage[panelName].items = {3031, 3035, 0, 0, 0}
   end
@@ -91,10 +91,10 @@ Panels.AntiPush = function(parent)
     ui.items:getChildByIndex(i).onItemChange = function(widget)
       context.storage[panelName].items[i] = widget:getItemId()
     end
-    ui.items:getChildByIndex(i):setItemId(context.storage[panelName].items[i])
+    ui.items:getChildByIndex(i):setItemId(context.storage[panelName].items[i])    
   end
-
-  context.macro(100, function()
+  
+  context.macro(100, function()    
     if not context.storage[panelName].enabled then
       return
     end
@@ -106,7 +106,7 @@ Panels.AntiPush = function(parent)
     if topItem and topItem:isStackable() then
       topItem = topItem:getId()
     else
-      topItem = 0
+      topItem = 0    
     end
     local candidates = {}
     for i, item in pairs(context.storage[panelName].items) do

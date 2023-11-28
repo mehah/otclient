@@ -4,14 +4,14 @@ local context = G.botContext
 -- IT'S ONLY HERE FOR BACKWARD COMPATIBILITY, MAY BE REMOVED IN THE FUTURE
 
 context.createWidget = function(name, parent)
-  if parent == nil then
+  if parent == nil then      
     parent = context.panel
   end
   g_ui.createWidget(name, parent)
 end
 
 context.setupUI = function(otml, parent)
-  if parent == nil then
+  if parent == nil then      
     parent = context.panel
   end
   local widget = g_ui.loadUIFromString(otml, parent)
@@ -34,7 +34,7 @@ context.addTab = function(name)
   if tab then -- return existing tab
     return tab.tabPanel.content
   end
-
+  
   local smallTabs = #(context.tabs.tabs) >= 5
   local newTab = context.tabs:addTab(name, g_ui.createWidget('BotPanel')).tabPanel.content
   context.tabs:setOn(true)
@@ -43,7 +43,7 @@ context.addTab = function(name)
       tab:setFont('small-9px')
     end
   end
-
+  
   return newTab
 end
 context.getTab = context.addTab
@@ -72,7 +72,7 @@ context.addButton = function(id, text, onClickCallback, parent)
   button:setId(id)
   button:setText(text)
   button.onClick = onClickCallback
-  return button
+  return button    
 end
 
 context.addLabel = function(id, text, parent)
@@ -82,7 +82,7 @@ context.addLabel = function(id, text, parent)
   local label = g_ui.createWidget('BotLabel', parent)
   label:setId(id)
   label:setText(text)
-  return label
+  return label    
 end
 
 context.addTextEdit = function(id, text, onTextChangeCallback, parent)
@@ -93,7 +93,7 @@ context.addTextEdit = function(id, text, onTextChangeCallback, parent)
   widget:setId(id)
   widget.onTextChange = onTextChangeCallback
   widget:setText(text)
-  return widget
+  return widget    
 end
 
 context.addSeparator = function(id, parent)
@@ -102,7 +102,7 @@ context.addSeparator = function(id, parent)
   end
   local separator = g_ui.createWidget('BotSeparator', parent)
   separator:setId(id)
-  return separator
+  return separator    
 end
 
 context._addMacroSwitch = function(name, keys, parent)

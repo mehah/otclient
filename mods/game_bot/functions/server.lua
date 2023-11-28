@@ -60,7 +60,7 @@ context.BotServer.init = function(name, channel)
       context.BotServer._websocket = nil
       context.BotServer.ping = 0
       context.BotServer.init(name, channel)
-    end
+    end    
   }, context.BotServer.timeout)
   context._websockets[context.BotServer._websocket.id] = 1
   context.BotServer._websocket.send({type="init", name=name, channel=channel, lastMessage=context.BotServer._lastMessageId})

@@ -3,7 +3,7 @@ BotTabBar < TabBar
   margin-left: 1
   margin-right: 1
   height: 20
-
+  
   $on:
     visible: true
     margin-top: 2
@@ -29,7 +29,7 @@ MiniWindow
   &save: true
   &autoOpen: 10
 
-  MiniWindowContents
+  MiniWindowContents   
     ComboBox
       id: config
       &menuScroll: true
@@ -43,7 +43,7 @@ MiniWindow
       margin-left: 2
       margin-right: 75
       text-offset: 3 0
-
+      
     Button
       id: editConfig
       anchors.top: prev.top
@@ -61,15 +61,15 @@ MiniWindow
       anchors.right: parent.right
       margin-left: 3
       margin-right: 2
-
+      
       $on:
         text: On
         color: #00AA00
-
+        
       $!on:
         text: Off
         color: #FF0000
-
+    
     Label
       id: statusLabel
       anchors.top: prev.bottom
@@ -81,14 +81,14 @@ MiniWindow
       !text: tr('Status: waiting')
       margin-left: 3
       margin-right: 3
-
+      
       $on:
         margin-top: 3
-
+      
       $!on:
         text:
         margin-top: -13
-
+      
     HorizontalSeparator
       anchors.left: parent.left
       anchors.right: parent.right
@@ -113,14 +113,14 @@ MiniWindow
       margin-top: 5
       margin-left: 2
       margin-right: 2
-
+    
     BotTabBar
       id: botTabs
       anchors.top: prev.bottom
       anchors.left: parent.left
       anchors.right: parent.right
       margin-right: -20
-
+      
     Panel
       id: botPanel
       margin-top: 2

@@ -233,6 +233,7 @@ if true then
   end
 end
 
+
 addCheckBox("timers", "MW & WG Timers", true, rightPanel, "Show times for Magic Walls and Wild Growths.")
 if true then
   local activeTimers = {}
@@ -271,6 +272,7 @@ if true then
   end)
 end
 
+
 addCheckBox("antiKick", "Anti - Kick", true, rightPanel, "Turn every 10 minutes to prevent kick.")
 if true then
   macro(600 * 1000, function()
@@ -280,6 +282,7 @@ if true then
     schedule(50, function() turn(dir) end)
   end)
 end
+
 
 addCheckBox("stake", "Skin Monsters", false, leftPanel, "Automatically skin & stake corpses when cavebot is enabled")
 if true then
@@ -312,6 +315,7 @@ if true then
   end)
 end
 
+
 addCheckBox("oberon", "Auto Reply Oberon", true, rightPanel, "Auto reply to Grand Master Oberon talk minigame.")
 if true then
   onTalk(function(name, level, mode, text, channelId, pos)
@@ -339,6 +343,7 @@ if true then
     end
   end)
 end
+
 
 addCheckBox("autoOpenDoors", "Auto Open Doors", true, rightPanel, "Open doors when trying to step on them.")
 if true then
@@ -387,6 +392,7 @@ if true then
   end)
 end
 
+
 addCheckBox("bless", "Buy bless at login", true, rightPanel, "Say !bless at login.")
 if true then
   local blessed = false
@@ -413,6 +419,7 @@ if true then
   end
 end
 
+
 addCheckBox("reUse", "Keep Crosshair", false, rightPanel, "Keep crosshair after using with item")
 if true then
   local excluded = { 268, 237, 238, 23373, 266, 236, 239, 7643, 23375, 7642, 23374, 5908, 5942 }
@@ -428,6 +435,7 @@ if true then
     end
   end)
 end
+
 
 addCheckBox("suppliesControl", "TargetBot off if low supply", false, leftPanel,
   "Turn off TargetBot if either one of supply amount is below 50% of minimum.")

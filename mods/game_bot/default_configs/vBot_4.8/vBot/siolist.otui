@@ -39,6 +39,8 @@ VocationPanel < Panel
     anchors.right: parent.right
     text: Paladins
 
+
+
 SioListWindow < MainWindow
   !text: tr('Healer Options')
   size: 220 360
@@ -103,7 +105,7 @@ SioListWindow < MainWindow
     anchors.right: parent.right
     anchors.bottom: prev.verticalCenter
     text-align: center
-    text: Item Healing
+    text: Item Healing  
     margin-left: 2
 
   BotLabel
@@ -123,7 +125,7 @@ SioListWindow < MainWindow
     margin-top: 3
     minimum: 1
     maximum: 10
-    step: 1
+    step: 1  
 
   HorizontalSeparator
     anchors.top: prev.bottom
@@ -165,11 +167,11 @@ SioListWindow < MainWindow
     margin-top: 2
     minimum: 1
     maximum: 100
-    step: 1
+    step: 1  
 
   VocationPanel
     id: vocation
-    anchors.top: prev.bottom
+    anchors.top: prev.bottom 
     margin-top: 6
 
   HorizontalSeparator
@@ -177,7 +179,7 @@ SioListWindow < MainWindow
     anchors.right: parent.right
     anchors.left: parent.left
     anchors.bottom: closeButton.top
-    margin-bottom: 8
+    margin-bottom: 8    
 
   Button
     id: closeButton
@@ -187,4 +189,4 @@ SioListWindow < MainWindow
     anchors.bottom: parent.bottom
     size: 45 21
     margin-top: 15
-    margin-right: 5
+    margin-right: 5    

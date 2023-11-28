@@ -4,7 +4,7 @@ context.NPC = {}
 
 context.NPC.talk = function(text)
   if g_game.getClientVersion() >= 810 then
-    g_game.talkChannel(11, 0, text)
+    g_game.talkChannel(11, 0, text) 
   else
     return context.say(text)
   end
@@ -29,7 +29,7 @@ context.NPC.getSellItems = function()
       name = item.name,
       subType = item.ptr:getSubType(),
       weight = item.weight / 100,
-      price = item.price
+      price = item.price 
     })
   end
   return items
@@ -46,7 +46,7 @@ context.NPC.getBuyItems = function()
       name = item.name,
       subType = item.ptr:getSubType(),
       weight = item.weight / 100,
-      price = item.price
+      price = item.price 
     })
   end
   return items

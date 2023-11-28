@@ -49,7 +49,7 @@ end
 
 function setProfileOption(index)
   local currentProfile = g_settings.getNumber('profile')
-  currentProfile = tostring(currentProfile)
+  currentProfile = tostring(currentProfile) 
   index = tostring(index)
 
   if currentProfile ~= index then
@@ -114,7 +114,7 @@ function onProfileChange(offline)
 
   local currentProfile = g_settings.getNumber('profile')
   local index = g_game.getCharacterName()
-
+  
   if index then
     settings[index] = currentProfile
     save()

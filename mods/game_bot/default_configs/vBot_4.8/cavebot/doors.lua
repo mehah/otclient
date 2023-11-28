@@ -17,7 +17,7 @@ CaveBot.Extensions.OpenDoors.setup = function()
       return false -- tried 5 times, can't open
     end
 
-    pos = {x=tonumber(pos[1]), y=tonumber(pos[2]), z=tonumber(pos[3])}
+    pos = {x=tonumber(pos[1]), y=tonumber(pos[2]), z=tonumber(pos[3])}  
 
     local doorTile
     if not doorTile then
@@ -31,7 +31,7 @@ CaveBot.Extensions.OpenDoors.setup = function()
     if not doorTile then
       return false
     end
-
+  
     if not doorTile:isWalkable() then
       if not key then
         use(doorTile:getTopUseThing())

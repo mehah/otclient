@@ -81,7 +81,7 @@ local slotWidgets = {eqPanel.head, eqPanel.body, eqPanel.legs, eqPanel.feet, eqP
 
 local function setCondition(first, n)
     local widget
-    local spinBox
+    local spinBox 
     local textEdit
 
     if first then
@@ -260,7 +260,7 @@ listPanel.up.onClick = function(widget)
 end
 
 listPanel.down.onClick = function(widget)
-    local focused = listPanel.list:getFocusedChild()
+    local focused = listPanel.list:getFocusedChild()    
     local n = listPanel.list:getChildIndex(focused)
     local t = config.rules
 
@@ -277,12 +277,12 @@ eqPanel.cloneEq.onClick = function(widget)
     eqPanel.head:setItemId(getHead() and getHead():getId() or 0)
     eqPanel.body:setItemId(getBody() and getBody():getId() or 0)
     eqPanel.legs:setItemId(getLeg() and getLeg():getId() or 0)
-    eqPanel.feet:setItemId(getFeet() and getFeet():getId() or 0)
-    eqPanel.neck:setItemId(getNeck() and getNeck():getId() or 0)
+    eqPanel.feet:setItemId(getFeet() and getFeet():getId() or 0)  
+    eqPanel.neck:setItemId(getNeck() and getNeck():getId() or 0)   
     eqPanel["left-hand"]:setItemId(getLeft() and getLeft():getId() or 0)
     eqPanel["right-hand"]:setItemId(getRight() and getRight():getId() or 0)
-    eqPanel.finger:setItemId(getFinger() and getFinger():getId() or 0)
-    eqPanel.ammo:setItemId(getAmmo() and getAmmo():getId() or 0)
+    eqPanel.finger:setItemId(getFinger() and getFinger():getId() or 0)    
+    eqPanel.ammo:setItemId(getAmmo() and getAmmo():getId() or 0)    
 end
 
 eqPanel.default.onClick = resetFields
@@ -355,7 +355,7 @@ local function setupPreview(display, data)
                 widget:setItemId(0)
             else
                 widget:setChecked(false)
-                widget:setItemId(value)
+                widget:setItemId(value)       
             end
         end
     end
@@ -501,7 +501,7 @@ inputPanel.add.onClick = function(widget)
     end
 
     local ruleData = {
-        name = profileName,
+        name = profileName, 
         data = t,
         enabled = true,
         visible = true,
@@ -562,7 +562,7 @@ bossPanel.add.onClick = function()
     widget.remove.onClick = function()
         table.remove(config.bosses, table.find(config.bosses, name))
         widget:destroy()
-    end
+    end    
 
     table.insert(config.bosses, name)
     bossPanel.name:setText('')
@@ -685,6 +685,7 @@ local function equipItem(id, slot)
         slot = 5
     end
 
+
     if g_game.getClientVersion() >= 910 then
         -- new tibia
         return g_game.equipItemId(id)
@@ -694,6 +695,7 @@ local function equipItem(id, slot)
         return moveToSlot(item, slot)
     end
 end
+
 
 local function markChild(child)
     if mainWindow:isVisible() then
@@ -705,6 +707,7 @@ local function markChild(child)
         widget:setColor('green')
     end
 end
+
 
 local missingItem = false
 local lastRule = false
@@ -733,13 +736,14 @@ EquipManager = macro(50, function()
 
                 -- reset executed rule
 
+
                 -- first check unequip
                 if unequipItem(rule.data) == true then
                     delay(200)
                     return
                 end
 
-                -- equiploop
+                -- equiploop 
                 for slot, item in ipairs(rule.data) do
                     if type(item) == "number" and item > 100 then
                         if not isEquipped(item) then
@@ -764,6 +768,8 @@ EquipManager = macro(50, function()
                 -- even if nothing was done, exit function to hold rule
                 return
             end
+
+
         end
     end
 end)

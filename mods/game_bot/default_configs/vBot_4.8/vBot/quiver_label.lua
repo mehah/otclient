@@ -15,6 +15,7 @@ Label
   text:
 ]], quiverSlot)
 
+
 function getQuiverAmount()
     -- old tibia
     if g_game.getClientVersion() < 1000 then return end
@@ -43,7 +44,7 @@ end)
 onContainerClose(function(container)
     getQuiverAmount()
 end)
-
+  
 onAddItem(function(container, slot, item, oldItem)
     getQuiverAmount()
 end)

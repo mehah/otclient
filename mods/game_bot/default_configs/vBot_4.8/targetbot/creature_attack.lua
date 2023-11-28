@@ -1,5 +1,5 @@
 local targetBotLure = false
-local targetCount = 0
+local targetCount = 0 
 local delayValue = 0
 local lureMax = 0
 local anchorPosition = nil
@@ -54,7 +54,7 @@ TargetBot.Creature.attack = function(params, targets, isLooting) -- params {conf
 
   local config = params.config
   local creature = params.creature
-
+  
   if g_game.getAttackingCreature() ~= creature then
     g_game.attack(creature)
   end
@@ -115,7 +115,7 @@ end
 TargetBot.Creature.walk = function(creature, config, targets)
   local cpos = creature:getPosition()
   local pos = player:getPosition()
-
+  
   local isTrapped = true
   local pos = player:getPosition()
   local dirs = {{-1,1}, {0,1}, {1,1}, {-1, 0}, {1, 0}, {-1, -1}, {0, -1}, {1, -1}}
@@ -213,9 +213,9 @@ TargetBot.Creature.walk = function(creature, config, targets)
     elseif diffx == -1 and diffy == 1 then
       candidates = {{x=pos.x-1, y=pos.y, z=pos.z}, {x=pos.x, y=pos.y-1, z=pos.z}}
     elseif diffx == -1 and diffy == -1 then
-      candidates = {{x=pos.x, y=pos.y-1, z=pos.z}, {x=pos.x-1, y=pos.y, z=pos.z}}
+      candidates = {{x=pos.x, y=pos.y-1, z=pos.z}, {x=pos.x-1, y=pos.y, z=pos.z}} 
     elseif diffx == 1 and diffy == -1 then
-      candidates = {{x=pos.x, y=pos.y-1, z=pos.z}, {x=pos.x+1, y=pos.y, z=pos.z}}
+      candidates = {{x=pos.x, y=pos.y-1, z=pos.z}, {x=pos.x+1, y=pos.y, z=pos.z}}       
     else
       local dir = player:getDirection()
       if diffx == 1 and dir ~= 1 then turn(1)

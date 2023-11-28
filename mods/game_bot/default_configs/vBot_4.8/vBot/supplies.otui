@@ -43,7 +43,7 @@ ItemPanel < Panel
     id: min
     anchors.left: prev.right
     anchors.bottom: parent.bottom
-
+  
   SupplySpinBox
     id: max
     anchors.left: prev.right
@@ -53,7 +53,7 @@ ItemPanel < Panel
     id: avg
     anchors.left: prev.right
     anchors.bottom: parent.bottom
-    width: 50
+    width: 50    
 
   UIWidget
     anchors.left: min.left
@@ -120,7 +120,7 @@ SuppliesWindow < MainWindow
     margin-top: 5
     margin-left: 10
     text: No Soft
-    tooltip: Go refill if there's no more active soft boots.
+    tooltip: Go refill if there's no more active soft boots.     
 
   BotSwitch
     id: capSwitch
@@ -180,7 +180,7 @@ SuppliesWindow < MainWindow
     anchors.right: prev.right
     anchors.bottom: bottomSep.top
     margin-bottom: 25
-
+  
   BotButton
     id: newProfile
     anchors.left: prev.left
@@ -222,7 +222,7 @@ SuppliesWindow < MainWindow
     anchors.right: parent.right
     anchors.bottom: parent.bottom
     size: 45 21
-    margin-top: 15
+    margin-top: 15   
     tooltip: Close supplies window and save settings.
     @onClick: self:getParent():hide()
 

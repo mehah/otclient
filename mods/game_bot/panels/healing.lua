@@ -9,7 +9,7 @@ Panels.Haste = function(parent)
       end
     end
   end, parent)
-  context.addTextEdit("autoHasteText", context.storage.autoHasteText or "utani hur", function(widget, text)
+  context.addTextEdit("autoHasteText", context.storage.autoHasteText or "utani hur", function(widget, text)    
     context.storage.autoHasteText = text
   end, parent)
 end
@@ -31,26 +31,27 @@ Panels.AntiParalyze = function(parent)
       context.saySpell(context.storage.autoAntiParalyzeText, 750)
     end
   end, parent)
-  context.addTextEdit("autoAntiParalyzeText", context.storage.autoAntiParalyzeText or "utani hur", function(widget, text)
+  context.addTextEdit("autoAntiParalyzeText", context.storage.autoAntiParalyzeText or "utani hur", function(widget, text)    
     context.storage.autoAntiParalyzeText = text
   end, parent)
 end
+
 
 Panels.Health = function(parent)
   if not parent then
     parent = context.panel
   end
-
+  
   local panelName = "autoHealthPanel"
   local panelId = 1
   while parent:getChildById(panelName .. panelId) do
     panelId = panelId + 1
   end
   panelName = panelName .. panelId
-
+  
   local ui = g_ui.createWidget("DualScrollPanel", parent)
   ui:setId(panelName)
-
+  
   if not context.storage[panelName] then
     context.storage[panelName] = {
       item = 266,
@@ -67,14 +68,14 @@ Panels.Health = function(parent)
   end
 
   ui.text.onTextChange = function(widget, text)
-    context.storage[panelName].text = text
+    context.storage[panelName].text = text    
   end
   ui.text:setText(context.storage[panelName].text or "exura")
-
+  
   local updateText = function()
-    ui.title:setText("" .. context.storage[panelName].min .. "% <= hp <= " .. context.storage[panelName].max .. "%")
+    ui.title:setText("" .. context.storage[panelName].min .. "% <= hp <= " .. context.storage[panelName].max .. "%")  
   end
-
+  
   ui.scroll1.onValueChange = function(scroll, value)
     context.storage[panelName].min = value
     updateText()
@@ -86,7 +87,7 @@ Panels.Health = function(parent)
 
   ui.scroll1:setValue(context.storage[panelName].min)
   ui.scroll2:setValue(context.storage[panelName].max)
-
+  
   context.macro(25, function()
     if context.storage[panelName].enabled and context.storage[panelName].text:len() > 0 and context.storage[panelName].min <= context.hppercent() and context.hppercent() <= context.storage[panelName].max then
       if context.saySpell(context.storage[panelName].text, 500) then
@@ -100,17 +101,17 @@ Panels.HealthItem = function(parent)
   if not parent then
     parent = context.panel
   end
-
+  
   local panelName = "autoHealthItemPanel"
   local panelId = 1
   while parent:getChildById(panelName .. panelId) do
     panelId = panelId + 1
   end
   panelName = panelName .. panelId
-
+  
   local ui = g_ui.createWidget("DualScrollItemPanel", parent)
   ui:setId(panelName)
-
+  
   if not context.storage[panelName] then
     context.storage[panelName] = {
       item = 266,
@@ -129,11 +130,11 @@ Panels.HealthItem = function(parent)
     context.storage[panelName].item = widget:getItemId()
   end
   ui.item:setItemId(context.storage[panelName].item)
-
+  
   local updateText = function()
-    ui.title:setText("" .. (context.storage[panelName].min or "") .. "% <= hp <= " .. (context.storage[panelName].max or "") .. "%")
+    ui.title:setText("" .. (context.storage[panelName].min or "") .. "% <= hp <= " .. (context.storage[panelName].max or "") .. "%")  
   end
-
+  
   ui.scroll1.onValueChange = function(scroll, value)
     context.storage[panelName].min = value
     updateText()
@@ -145,7 +146,7 @@ Panels.HealthItem = function(parent)
 
   ui.scroll1:setValue(context.storage[panelName].min)
   ui.scroll2:setValue(context.storage[panelName].max)
-
+  
   context.macro(25, function()
     if context.storage[panelName].enabled and context.storage[panelName].item >= 100 and context.storage[panelName].min <= context.hppercent() and context.hppercent() <= context.storage[panelName].max then
       if context.useRune(context.storage[panelName].item, context.player, 500) then
@@ -159,17 +160,17 @@ Panels.Mana = function(parent)
   if not parent then
     parent = context.panel
   end
-
+  
   local panelName = "autoManaItemPanel"
   local panelId = 1
   while parent:getChildById(panelName .. panelId) do
     panelId = panelId + 1
   end
   panelName = panelName .. panelId
-
+  
   local ui = g_ui.createWidget("DualScrollItemPanel", parent)
   ui:setId(panelName)
-
+  
   if not context.storage[panelName] then
     context.storage[panelName] = {
       item = 268,
@@ -188,11 +189,11 @@ Panels.Mana = function(parent)
     context.storage[panelName].item = widget:getItemId()
   end
   ui.item:setItemId(context.storage[panelName].item)
-
+  
   local updateText = function()
-    ui.title:setText("" .. (context.storage[panelName].min or "") .. "% <= mana <= " .. (context.storage[panelName].max or "") .. "%")
+    ui.title:setText("" .. (context.storage[panelName].min or "") .. "% <= mana <= " .. (context.storage[panelName].max or "") .. "%")  
   end
-
+  
   ui.scroll1.onValueChange = function(scroll, value)
     context.storage[panelName].min = value
     updateText()
@@ -204,7 +205,7 @@ Panels.Mana = function(parent)
 
   ui.scroll1:setValue(context.storage[panelName].min)
   ui.scroll2:setValue(context.storage[panelName].max)
-
+  
   context.macro(25, function()
     if context.storage[panelName].enabled and context.storage[panelName].item >= 100 and context.storage[panelName].min <= context.manapercent() and context.manapercent() <= context.storage[panelName].max then
       if context.useRune(context.storage[panelName].item, context.player, 500) then
@@ -219,17 +220,17 @@ Panels.Equip = function(parent)
   if not parent then
     parent = context.panel
   end
-
+  
   local panelName = "autoEquipItem"
   local panelId = 1
   while parent:getChildById(panelName .. panelId) do
     panelId = panelId + 1
   end
   panelName = panelName .. panelId
-
+  
   local ui = g_ui.createWidget("TwoItemsAndSlotPanel", parent)
   ui:setId(panelName)
-
+  
   if not context.storage[panelName] then
     context.storage[panelName] = {}
     if panelId == 1 then
@@ -238,24 +239,24 @@ Panels.Equip = function(parent)
       context.storage[panelName].slot = 9
     end
   end
-
+  
   ui.title:setText("Auto equip")
   ui.title:setOn(context.storage[panelName].enabled)
   ui.title.onClick = function(widget)
     context.storage[panelName].enabled = not context.storage[panelName].enabled
     widget:setOn(context.storage[panelName].enabled)
   end
-
+  
   ui.item1:setItemId(context.storage[panelName].item1 or 0)
   ui.item1.onItemChange = function(widget)
     context.storage[panelName].item1 = widget:getItemId()
   end
-
+  
   ui.item2:setItemId(context.storage[panelName].item2 or 0)
   ui.item2.onItemChange = function(widget)
     context.storage[panelName].item2 = widget:getItemId()
   end
-
+  
   if not context.storage[panelName].slot then
     context.storage[panelName].slot = 1
   end
@@ -263,7 +264,7 @@ Panels.Equip = function(parent)
   ui.slot.onOptionChange = function(widget)
     context.storage[panelName].slot = widget.currentIndex
   end
-
+  
   context.macro(250, function()
     if context.storage[panelName].enabled and context.storage[panelName].slot > 0 then
       local item1 = context.storage[panelName].item1 or 0
@@ -293,14 +294,14 @@ Panels.Eating = function(parent)
   if not parent then
     parent = context.panel
   end
-
+  
   local panelName = "autoEatingPanel"
   local panelId = 1
   while parent:getChildById(panelName .. panelId) do
     panelId = panelId + 1
   end
   panelName = panelName .. panelId
-
+  
   local ui = g_ui.createWidget("ItemsPanel", parent)
   ui:setId(panelName)
 
@@ -314,7 +315,7 @@ Panels.Eating = function(parent)
     context.storage[panelName].enabled = not context.storage[panelName].enabled
     widget:setOn(context.storage[panelName].enabled)
   end
-
+  
   if type(context.storage[panelName].items) ~= 'table' then
     context.storage[panelName].items = {3725, 0, 0, 0, 0}
   end
@@ -323,10 +324,10 @@ Panels.Eating = function(parent)
     ui.items:getChildByIndex(i).onItemChange = function(widget)
       context.storage[panelName].items[i] = widget:getItemId()
     end
-    ui.items:getChildByIndex(i):setItemId(context.storage[panelName].items[i])
+    ui.items:getChildByIndex(i):setItemId(context.storage[panelName].items[i])    
   end
-
-  context.macro(15000, function()
+  
+  context.macro(15000, function()    
     if not context.storage[panelName].enabled then
       return
     end
@@ -338,7 +339,8 @@ Panels.Eating = function(parent)
     end
     if #candidates == 0 then
       return
-    end
+    end    
     context.use(candidates[math.random(1, #candidates)])
   end)
 end
+

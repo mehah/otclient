@@ -33,6 +33,7 @@ BossCreaturePanel < Panel
     font: verdana-11px-rounded
     text: 19h 20min
 
+
 SearchPanel < TextEdit
   placeholder: Type to search
   margin-top: 1
@@ -77,11 +78,12 @@ TrackerItem < Panel
     margin-top: 3
     anchors.bottom: Item.bottom
     anchors.left: prev.left
-    anchors.right: parent.right
+    anchors.right: parent.right    
     font: verdana-11px-rounded
     text-align:left
     text: Loot Drops: 0
     color: #CCCCCC
+
 
 DualLabel < Label
   height: 15
@@ -120,7 +122,7 @@ MemberWidget < Panel
     anchors.right: parent.right
     text: Player Name
     font: verdana-11px-rounded
-    text-align: left
+    text-align: left     
 
   ProgressBar
     id: health
@@ -130,7 +132,7 @@ MemberWidget < Panel
     margin-top: 2
     height: 7
     background-color: #00c000
-    phantom: false
+    phantom: false 
 
   ProgressBar
     id: mana
@@ -155,7 +157,7 @@ MemberWidget < Panel
     anchors.left: parent.left
     anchors.right: parent.right
     margin-top: 2
-    text: Damage:
+    text: Damage:    
 
   DualLabel
     id: healing
@@ -163,7 +165,7 @@ MemberWidget < Panel
     anchors.left: parent.left
     anchors.right: parent.right
     margin-top: 2
-    text: Healing:
+    text: Healing:    
 
 AnalyzerPriceLabel < Label
   background-color: alpha
@@ -189,6 +191,7 @@ AnalyzerListPanel < Panel
     type: verticalBox
     fit-children: true
 
+
 ListLabel < Label
   height: 15
   font: verdana-11px-rounded
@@ -209,7 +212,7 @@ AnalyzerLootItem < UIItem
   height: 37
   margin-left: 1
   virtual: true
-  background-color: alpha
+  background-color: alpha 
 
   Label
     id: count
@@ -273,8 +276,8 @@ MainAnalyzerWindow < MiniWindow
 
     AnalyzerButton
       id: SupplyAnalyzer
-      text: Supply Analyzer
-
+      text: Supply Analyzer    
+  
     AnalyzerButton
       id: ImpactAnalyzer
       text: Impact Analyzer
@@ -312,7 +315,7 @@ MainAnalyzerWindow < MiniWindow
       text: Reset Session
       color: #FF0000
 
-HuntingAnalyzer < MiniWindow
+HuntingAnalyzer < MiniWindow  
   id: HuntingAnalyzerWindow
   text: Hunt Analyzer
   icon: /images/topbuttons/analyzers
@@ -322,7 +325,7 @@ HuntingAnalyzer < MiniWindow
     layout: verticalBox
 
 LootAnalyzer < MiniWindow
-  id: LootAnalyzerWindow
+  id: LootAnalyzerWindow    
   text: Loot Analyzer
   icon: /images/topbuttons/analyzers
 
@@ -331,7 +334,7 @@ LootAnalyzer < MiniWindow
     layout: verticalBox
 
 SupplyAnalyzer < MiniWindow
-  id: SupplyAnalyzerWindow
+  id: SupplyAnalyzerWindow    
   text: Supply Analyzer
   icon: /images/topbuttons/analyzers
 
@@ -340,7 +343,7 @@ SupplyAnalyzer < MiniWindow
     layout: verticalBox
 
 ImpactAnalyzer < MiniWindow
-  id: ImpactAnalyzerWindow
+  id: ImpactAnalyzerWindow    
   text: Impact Analyzer
   icon: /images/topbuttons/analyzers
 
@@ -349,7 +352,7 @@ ImpactAnalyzer < MiniWindow
     layout: verticalBox
 
 XPAnalyzer < MiniWindow
-  id: XPAnalyzerWindow
+  id: XPAnalyzerWindow    
   text: XP Analyzer
   height: 150
   icon: /images/topbuttons/analyzers
@@ -459,7 +462,7 @@ FeaturesWindow < MainWindow
     anchors.verticalCenter: prev.verticalCenter
     anchors.right: CustomPrices.right
     text: Add
-    font: verdana-11px-rounded
+    font: verdana-11px-rounded    
 
   HorizontalSeparator
     anchors.left: ID.right
@@ -482,7 +485,7 @@ FeaturesWindow < MainWindow
     anchors.top: prev.top
     margin-top: 20
     text: Loot Channel
-    font: verdana-11px-rounded
+    font: verdana-11px-rounded   
 
   BotSwitch
     id: RarityFrames
@@ -492,13 +495,13 @@ FeaturesWindow < MainWindow
     anchors.top: secondSeparator.top
     margin-top: 20
     text: Rarity Frames
-    font: verdana-11px-rounded
+    font: verdana-11px-rounded   
 
   HorizontalSeparator
     anchors.right: parent.right
     anchors.left: parent.left
     anchors.bottom: closeButton.top
-    margin-bottom: 8
+    margin-bottom: 8    
 
   Button
     id: closeButton
@@ -508,4 +511,4 @@ FeaturesWindow < MainWindow
     anchors.bottom: parent.bottom
     size: 45 21
     margin-top: 15
-    margin-right: 5
+    margin-right: 5 

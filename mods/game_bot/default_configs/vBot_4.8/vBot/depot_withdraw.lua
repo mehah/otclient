@@ -24,7 +24,7 @@ function reopenLootContainer()
 end
 
 macro(50, "Depot Withdraw", function()
-
+  
   -- set the containers
   if not potionsContainer or not runesContainer or not ammoContainer then
     for i, container in pairs(getContainers()) do
@@ -34,7 +34,7 @@ macro(50, "Depot Withdraw", function()
         depotContainer = container
       elseif string.find(container:getName(), "your inbox") then
         mailContainer = container
-      end
+      end 
     end
   end
 
@@ -47,9 +47,10 @@ macro(50, "Depot Withdraw", function()
     end
   end
 
+
 if playerContainer and freecap() >= 200 then
   local time = 500
-    if depotContainer then
+    if depotContainer then 
       for i, container in pairs(getContainers()) do
         if string.find(container:getName(), "Depot") then
           for j, item in pairs(container:getItems()) do
@@ -60,7 +61,7 @@ if playerContainer and freecap() >= 200 then
       end
     end
 
-    if mailContainer then
+    if mailContainer then 
       for i, container in pairs(getContainers()) do
         if string.find(container:getName(), "your inbox") then
           for j, item in pairs(container:getItems()) do

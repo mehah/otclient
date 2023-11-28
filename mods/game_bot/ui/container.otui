@@ -1,6 +1,6 @@
 BotContainer < Panel
   height: 68
-
+  
   ScrollablePanel
     id: items
     anchors.fill: parent

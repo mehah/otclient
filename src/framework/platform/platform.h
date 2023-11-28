@@ -90,8 +90,8 @@ public:
 private:
     Device m_device{ Device(Desktop, Windows) };
 
-    static stdext::map<Platform::DeviceType, std::string> m_deviceShortNames;
-    static stdext::map<Platform::OperatingSystem, std::string> m_osShortNames;
+    static std::unordered_map<Platform::DeviceType, std::string> m_deviceShortNames;
+    static std::unordered_map<Platform::OperatingSystem, std::string> m_osShortNames;
 };
 
 extern Platform g_platform;

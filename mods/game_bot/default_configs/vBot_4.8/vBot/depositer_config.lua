@@ -2,7 +2,7 @@ setDefaultTab("Cave")
 local panelName = "specialDeposit"
 local depositerPanel
 
-UI.Button("Stashing Settings", function()
+UI.Button("Stashing Settings", function()  
     depositerPanel:show()
     depositerPanel:raise()
     depositerPanel:focus()
@@ -26,7 +26,7 @@ end
 
 depositerPanel:setHeight(config.height or 380)
 depositerPanel.onGeometryChange = function(widget, old, new)
-    if old.height == 0 then return end
+    if old.height == 0 then return end  
     config.height = new.height
 end
 
@@ -70,14 +70,14 @@ local function refreshEntries()
             panel.name:setText(Item.create(entry.id):getMarketData().name)
             if entry.index == 0 then
                 local window = modules.client_textedit.show(panel.slot, {
-                    title = "Set depot for "..panel.name:getText(),
+                    title = "Set depot for "..panel.name:getText(), 
                     description = "Select depot to which item should be stashed, choose between 3 and 17",
                     validation = [[^([3-9]|1[0-7])$]]
                 })
                 window.text:setText(entry.index)
-                schedule(50, function()
+                schedule(50, function() 
                   window:raise()
-                  window:focus()
+                  window:focus() 
                 end)
             end
         end
@@ -88,14 +88,14 @@ local function refreshEntries()
       panel.slot:setTooltip("Click to set stashing destination.")
       panel.slot.onClick = function(widget)
         local window = modules.client_textedit.show(widget, {
-            title = "Set depot for "..panel.name:getText(),
+            title = "Set depot for "..panel.name:getText(), 
             description = "Select depot to which item should be stashed, choose between 3 and 17",
             validation = [[^([3-9]|1[0-7])$]]
         })
         window.text:setText(entry.index)
-        schedule(50, function()
+        schedule(50, function() 
           window:raise()
-          window:focus()
+          window:focus() 
         end)
       end
       panel.slot.onTextChange = function(widget, text)

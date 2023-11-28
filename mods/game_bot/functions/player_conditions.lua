@@ -2,7 +2,7 @@ local context = G.botContext
 
 for i, state in ipairs(PlayerStates) do
   context[state] = state
-end
+end  
 
 context.hasCondition = function(condition) return bit.band(context.player:getStates(), condition) > 0 end
 

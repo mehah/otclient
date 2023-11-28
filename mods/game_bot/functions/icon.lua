@@ -28,7 +28,7 @@ context.addIcon = function(id, options, callback)
   if type(context.storage._icons[id]) ~= "table" then
     context.storage._icons[id] = {}
   end
-  local config = context.storage._icons[id]
+  local config = context.storage._icons[id]  
   local widget = g_ui.createWidget("BotIcon", panel)
   widget.botWidget = true
   widget.botIcon = true
@@ -53,7 +53,7 @@ context.addIcon = function(id, options, callback)
       widget.item:setShowCount(false)
     end
   end
-
+  
   if options.outfit then
     widget.creature:setOutfit(options.outfit)
   end
@@ -67,7 +67,7 @@ context.addIcon = function(id, options, callback)
     end
     widget.status:setOn(config.enabled)
   end
-
+  
   if options.text then
     if options.switchable ~= false then
       widget.status:hide()
@@ -77,9 +77,9 @@ context.addIcon = function(id, options, callback)
         widget.text:setColor('red')
       end
     end
-    widget.text:setText(options.text)
+    widget.text:setText(options.text)    
   end
-
+  
   widget.setOn = function(val)
     widget.status:setOn(val)
     if widget.status:isOn() then
@@ -87,9 +87,9 @@ context.addIcon = function(id, options, callback)
     else
       widget.text:setColor('red')
     end
-    config.enabled = widget.status:isOn()
+    config.enabled = widget.status:isOn()  
   end
-
+  
   widget.onClick = function(widget)
     if options.switchable ~= false then
       widget.setOn(not widget.status:isOn())
@@ -98,10 +98,10 @@ context.addIcon = function(id, options, callback)
         return
       end
     end
-
+      
     callback(widget, widget.status:isOn())
   end
-
+  
   if options.hotkey then
     widget.hotkey:setText(options.hotkey)
     context.hotkey(options.hotkey, "", function()
@@ -136,7 +136,7 @@ context.addIcon = function(id, options, callback)
       local y = widget:getY() - parentRect.y
       local width = parentRect.width - widget:getWidth()
       local height = parentRect.height - widget:getHeight()
-
+      
       config.x = math.min(1, math.max(0, x / width))
       config.y = math.min(1, math.max(0, y / height))
 
@@ -159,17 +159,17 @@ context.addIcon = function(id, options, callback)
   end
 
   if options.phantom ~= true then
-    widget.onMouseRelease = function()
-      return true
+    widget.onMouseRelease = function() 
+      return true 
     end
   end
-
-  if options.switchable ~= false then
+  
+  if options.switchable ~= false then 
     if type(callback) == 'table' then
       callback.setOn(config.enabled)
       callback.icon = widget
     else
-      callback(widget, widget.status:isOn())
+      callback(widget, widget.status:isOn())    
     end
   end
   return widget

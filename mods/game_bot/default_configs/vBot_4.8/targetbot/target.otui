@@ -52,7 +52,7 @@ TargetBotPanel < Panel
       margin-right: 15
       focusable: false
       auto-focus: first
-
+      
     VerticalScrollBar
       id: listScrollbar
       anchors.top: parent.top
@@ -60,7 +60,7 @@ TargetBotPanel < Panel
       anchors.right: parent.right
       pixels-scroll: true
       step: 10
-
+      
   BotSwitch
     id: configButton
     @onClick: |
@@ -73,7 +73,7 @@ TargetBotPanel < Panel
 
     $!on:
       text: Show target editor
-
+  
   Panel
     id: editor
     visible: false
@@ -109,7 +109,7 @@ TargetBotPanel < Panel
         anchors.right: parent.right
         text: Remove
         width: 56
-
+    
     BotSwitch
       id: debug
       text: Show target priority

@@ -20,11 +20,11 @@ BotConfig < Panel
     anchors.top: prev.top
     anchors.left: prev.right
     anchors.right: parent.right
-    margin-left: 5
+    margin-left: 5      
     $on:
       text: On
       color: #00AA00
-
+      
     $!on:
       text: Off
       color: #FF0000
@@ -38,7 +38,7 @@ BotConfig < Panel
     width: 56
     height: 18
     text-offet: 0 2
-
+    
   Button
     id: edit
     anchors.top: prev.top
@@ -47,7 +47,7 @@ BotConfig < Panel
     width: 56
     height: 18
     text-offet: 0 2
-
+    
   Button
     id: remove
     anchors.top: prev.top

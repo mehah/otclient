@@ -36,7 +36,7 @@ CaveBot.Extensions.Imbuing.setup = function()
     EquipManager.setOff()
 
     if value == 'name' then
-      local imbuData = AutoImbueTable[player:getName()]
+      local imbuData = AutoImbueTable[player:getName()]      
       for id, imbues in pairs(imbuData) do
         table.insert(ids, id)
       end
@@ -49,7 +49,7 @@ CaveBot.Extensions.Imbuing.setup = function()
         end
       end
     end
-
+ 
     -- all items imbued, can proceed
     if currentIndex > #ids then
       warn("CaveBot[Imbuing] used shrine on all items, proceeding")
@@ -78,7 +78,7 @@ CaveBot.Extensions.Imbuing.setup = function()
 
     currentId = ids[currentIndex]
     item = findItem(currentId)
-
+    
     -- maybe equipped? try to take off
     if not item then
       -- did try before, still not found so item is unavailable

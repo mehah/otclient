@@ -2,6 +2,7 @@ CaveBot.Actions = {}
 vBot.lastLabel = ""
 local oldTibia = g_game.getClientVersion() < 960
 local nextTile = nil
+
 local noPath = 0
 
 -- antistuck f()
@@ -96,7 +97,7 @@ local function breakFurniture(destPos)
     useWith(3197, thing)
     return true
   end
-
+  
   return false
 end
 
@@ -125,7 +126,7 @@ local function pathfinder()
       local profile = CaveBot.getCurrentProfile()
       local config = getConfigFromName()
       local newProfile = profile == '#Unibase' and config or '#Unibase'
-
+      
       CaveBot.setCurrentProfile(newProfile)
     end
   end
@@ -174,11 +175,11 @@ CaveBot.editAction = function(widget, action, value)
   if not raction then
     return warn("Invalid cavebot action: " .. action)
   end
-
+  
   if not widget.action or not widget.value then
-    return warn("Invalid cavebot action widget, has missing action or value")
+    return warn("Invalid cavebot action widget, has missing action or value")  
   end
-
+  
   widget:setText(action .. ":" .. value:split("\n")[1])
   widget.action = action
   widget.value = value
@@ -196,7 +197,7 @@ prev is a true when previuos action was executed succesfully, false otherwise
 it must return true if executed correctly, false otherwise
 it can also return string "retry", then the function will be called again in 20 ms
 ]]--
-CaveBot.registerAction = function(action, color, callback)
+CaveBot.registerAction = function(action, color, callback) 
   action = action:lower()
   if CaveBot.Actions[action] then
     return warn("Duplicated acction: " .. action)
@@ -213,7 +214,7 @@ CaveBot.registerAction("label", "yellow", function(value, retries, prev)
 end)
 
 CaveBot.registerAction("gotolabel", "#FFFF55", function(value, retries, prev)
-  return CaveBot.gotoLabel(value)
+  return CaveBot.gotoLabel(value) 
 end)
 
 CaveBot.registerAction("delay", "#AAAAAA", function(value, retries, prev)
@@ -236,7 +237,7 @@ CaveBot.registerAction("delay", "#AAAAAA", function(value, retries, prev)
     end
     final = final or val
 
-    CaveBot.delay(final)
+    CaveBot.delay(final) 
     return "retry"
   end
   return true
@@ -266,13 +267,13 @@ CaveBot.registerAction("function", "red", function(value, retries, prev)
   for extension, callbacks in pairs(CaveBot.Extensions) do
     prefix = prefix .. "local " .. extension .. " = CaveBot.Extensions." .. extension .. "\n"
   end
-  local status, result = pcall(function()
+  local status, result = pcall(function() 
     return assert(load(prefix .. value, "cavebot_function"))()
   end)
   if not status then
     warn("warn in cavebot function:\n" .. result)
     return false
-  end
+  end  
   return result
 end)
 
@@ -286,7 +287,7 @@ CaveBot.registerAction("goto", "green", function(value, retries, prev)
   -- reset pathfinder
   nextPosF = nil
   nextPos = nil
-
+  
   if CaveBot.Config.get("mapClick") then
     if retries >= 5 then
       noPath = noPath + 1
@@ -298,20 +299,20 @@ CaveBot.registerAction("goto", "green", function(value, retries, prev)
       noPath = noPath + 1
       pathfinder()
       return false -- tried 100 times, can't get there
-    end
+    end  
   end
 
   local precision = tonumber(pos[1][5])
-  pos = {x=tonumber(pos[1][2]), y=tonumber(pos[1][3]), z=tonumber(pos[1][4])}
+  pos = {x=tonumber(pos[1][2]), y=tonumber(pos[1][3]), z=tonumber(pos[1][4])}  
   local playerPos = player:getPosition()
-  if pos.z ~= playerPos.z then
+  if pos.z ~= playerPos.z then 
     noPath = noPath + 1
     pathfinder()
     return false -- different floor
   end
 
   local maxDist = storage.extras.gotoMaxDistance or 40
-
+  
   if math.abs(pos.x-playerPos.x) + math.abs(pos.y-playerPos.y) > maxDist then
     noPath = noPath + 1
     pathfinder()
@@ -320,7 +321,7 @@ CaveBot.registerAction("goto", "green", function(value, retries, prev)
 
   local minimapColor = g_map.getMinimapColor(pos)
   local stairs = (minimapColor >= 210 and minimapColor <= 213)
-
+  
   if stairs then
     if math.abs(pos.x-playerPos.x) == 0 and math.abs(pos.y-playerPos.y) <= 0 then
       noPath = 0
@@ -352,7 +353,7 @@ CaveBot.registerAction("goto", "green", function(value, retries, prev)
       nextPos = nextPos or playerPos
       nextPos.x = nextPos.x + dirs[1]
       nextPos.y = nextPos.y + dirs[2]
-
+  
       local tile = g_map.getTile(nextPos)
       if tile then
           if tile:hasCreature() then
@@ -360,7 +361,7 @@ CaveBot.registerAction("goto", "green", function(value, retries, prev)
               local hppc = creature:getHealthPercent()
               if creature:isMonster() and (hppc and hppc > 0) and (oldTibia or creature:getType() < 3) then
                   -- real blocking creature can not meet those conditions - ie. it could be player, so just in case check if the next creature is reachable
-                  local path = findPath(playerPos, creature:getPosition(), 7, { ignoreNonPathable = true, precision = 1 })
+                  local path = findPath(playerPos, creature:getPosition(), 7, { ignoreNonPathable = true, precision = 1 }) 
                   if path then
                       foundMonster = true
                       if g_game.getAttackingCreature() ~= creature then
@@ -385,17 +386,17 @@ CaveBot.registerAction("goto", "green", function(value, retries, prev)
       return false -- no other way
     end
   end
-
+  
   -- try to find path, don't ignore creatures, don't ignore fields
   if not CaveBot.Config.get("ignoreFields") and CaveBot.walkTo(pos, 40) then
     return "retry"
   end
-
+  
   -- try to find path, don't ignore creatures, ignore fields
   if CaveBot.walkTo(pos, maxDist, { ignoreNonPathable = true, allowUnseen = true, allowOnlyVisibleTiles = false }) then
     return "retry"
   end
-
+  
   if retries >= 3 then
     -- try to lower precision, find something close to final position
     local precison = retries - 1
@@ -404,15 +405,15 @@ CaveBot.registerAction("goto", "green", function(value, retries, prev)
     end
     if CaveBot.walkTo(pos, 50, { ignoreNonPathable = true, precision = precison, allowUnseen = true, allowOnlyVisibleTiles = false }) then
       return "retry"
-    end
+    end    
   end
-
+  
   if not CaveBot.Config.get("mapClick") and retries >= 5 then
     noPath = noPath + 1
     pathfinder()
     return false
   end
-
+  
   if CaveBot.Config.get("skipBlocked") then
     noPath = noPath + 1
     pathfinder()
@@ -436,9 +437,9 @@ CaveBot.registerAction("use", "#FFB272", function(value, retries, prev)
     return true
   end
 
-  pos = {x=tonumber(pos[1][2]), y=tonumber(pos[1][3]), z=tonumber(pos[1][4])}
+  pos = {x=tonumber(pos[1][2]), y=tonumber(pos[1][3]), z=tonumber(pos[1][4])}  
   local playerPos = player:getPosition()
-  if pos.z ~= playerPos.z then
+  if pos.z ~= playerPos.z then 
     return false -- different floor
   end
 
@@ -473,9 +474,9 @@ CaveBot.registerAction("usewith", "#EEB292", function(value, retries, prev)
   end
 
   local itemid = tonumber(pos[1][2])
-  pos = {x=tonumber(pos[1][3]), y=tonumber(pos[1][4]), z=tonumber(pos[1][5])}
+  pos = {x=tonumber(pos[1][3]), y=tonumber(pos[1][4]), z=tonumber(pos[1][5])}  
   local playerPos = player:getPosition()
-  if pos.z ~= playerPos.z then
+  if pos.z ~= playerPos.z then 
     return false -- different floor
   end
 
@@ -502,7 +503,6 @@ CaveBot.registerAction("say", "#FF55FF", function(value, retries, prev)
   say(value)
   return true
 end)
-
 CaveBot.registerAction("npcsay", "#FF55FF", function(value, retries, prev)
   NPC.say(value)
   return true
