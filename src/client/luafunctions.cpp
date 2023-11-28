@@ -665,7 +665,6 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Item>("isFluidContainer", &Item::isFluidContainer);
     g_lua.bindClassMemberFunction<Item>("getMarketData", &Item::getMarketData);
     g_lua.bindClassMemberFunction<Item>("getClothSlot", &Item::getClothSlot);
-    g_lua.bindClassMemberFunction<Item>("getCountOrSubType", &Item::getCountOrSubType);
     g_lua.bindClassMemberFunction<Item>("hasWearOut", &ThingType::hasWearOut);
     g_lua.bindClassMemberFunction<Item>("hasClockExpire", &ThingType::hasClockExpire);
     g_lua.bindClassMemberFunction<Item>("hasExpire", &ThingType::hasExpire);

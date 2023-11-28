@@ -23,9 +23,9 @@ UI.Container = function(callback, unique, parent, widget)
   if not widget then
     widget = UI.createWidget("BotContainer", parent)
   end
-  
+
   local oldItems = {}
-  
+
   local updateItems = function()
     local items = widget:getItems()
 
@@ -38,10 +38,10 @@ UI.Container = function(callback, unique, parent, widget)
       end
       if oldItems[i].id ~= item.id or oldItems[i].count ~= item.count then
         somethingNew = true
-        break      
+        break
       end
     end
-    
+
     if somethingNew then
       oldItems = items
       callback(widget, items)
@@ -49,7 +49,7 @@ UI.Container = function(callback, unique, parent, widget)
 
     widget:setItems(items)
   end
-  
+
   widget.setItems = function(self, items)
     if type(self) == 'table' then
       items = self
@@ -59,10 +59,10 @@ UI.Container = function(callback, unique, parent, widget)
       itemsToShow = itemsToShow + 5 - itemsToShow % 5
     end
     widget.items:destroyChildren()
-    for i = 1, itemsToShow do 
+    for i = 1, itemsToShow do
       local widget = g_ui.createWidget("BotItem", widget.items)
       if type(items[i]) == 'number' then
-        items[i] = {id=items[i], count=1}
+        items[i] = { id = items[i], count = 1 }
       end
       if type(items[i]) == 'table' then
         widget:setItem(Item.create(items[i].id, items[i].count))
@@ -73,23 +73,23 @@ UI.Container = function(callback, unique, parent, widget)
       child.onItemChange = updateItems
     end
   end
-  
+
   widget.getItems = function()
     local items = {}
     local duplicates = {}
     for i, child in ipairs(widget.items:getChildren()) do
       if child:getItemId() >= 100 then
         if not duplicates[child:getItemId()] or not unique then
-          table.insert(items, {id=child:getItemId(), count=child:getCountOrSubType()})
+          table.insert(items, { id = child:getItemId(), count = child:getItemCount() })
           duplicates[child:getItemId()] = true
         end
       end
     end
     return items
   end
-  
+
   widget:setItems({})
-  
+
   return widget
 end
 
@@ -105,7 +105,7 @@ UI.DualScrollPanel = function(params, callback, parent) -- callback = function(w
   params.text = params.text or ""
   params.min = params.min or 20
   params.max = params.max or 80
-  
+
   local widget = UI.createWidget('DualScrollPanel', parent)
 
   widget.title:setOn(params.on)
@@ -124,14 +124,14 @@ UI.DualScrollPanel = function(params, callback, parent) -- callback = function(w
       callback(widget, params)
     end
   end
-  
-  local update  = function(dontSignal)
-    widget.title:setText("" .. params.min .. "% <= " .. params.title .. " <= " .. params.max .. "%")  
+
+  local update             = function(dontSignal)
+    widget.title:setText("" .. params.min .. "% <= " .. params.title .. " <= " .. params.max .. "%")
     if callback and not dontSignal then
       callback(widget, params)
     end
   end
-  
+
   widget.scroll1:setValue(params.min)
   widget.scroll2:setValue(params.max)
 
@@ -160,7 +160,7 @@ UI.DualScrollItemPanel = function(params, callback, parent) -- callback = functi
   params.subType = params.subType or 0
   params.min = params.min or 20
   params.max = params.max or 80
-  
+
   local widget = UI.createWidget('DualScrollItemPanel', parent)
 
   widget.title:setOn(params.on)
@@ -180,14 +180,14 @@ UI.DualScrollItemPanel = function(params, callback, parent) -- callback = functi
       callback(widget, params)
     end
   end
-  
-  local update  = function(dontSignal)
-    widget.title:setText("" .. params.min .. "% <= " .. params.title .. " <= " .. params.max .. "%")  
+
+  local update             = function(dontSignal)
+    widget.title:setText("" .. params.min .. "% <= " .. params.title .. " <= " .. params.max .. "%")
     if callback and not dontSignal then
       callback(widget, params)
     end
   end
-  
+
   widget.scroll1:setValue(params.min)
   widget.scroll2:setValue(params.max)
 
@@ -205,19 +205,19 @@ end
 UI.Label = function(text, parent)
   local label = UI.createWidget('BotLabel', parent)
   label:setText(text)
-  return label    
+  return label
 end
 
 UI.Separator = function(parent)
   local separator = UI.createWidget('BotSeparator', parent)
-  return separator    
+  return separator
 end
 
 UI.TextEdit = function(text, callback, parent)
   local widget = UI.createWidget('BotTextEdit', parent)
   widget.onTextChange = callback
   widget:setText(text)
-  return widget    
+  return widget
 end
 
 UI.TwoItemsAndSlotPanel = function(params, callback, parent)
@@ -232,9 +232,9 @@ UI.TwoItemsAndSlotPanel = function(params, callback, parent)
   params.item1 = params.item1 or 0
   params.item2 = params.item2 or 0
   params.slot = params.slot or 1
-  
+
   local widget = UI.createWidget("TwoItemsAndSlotPanel", parent)
-    
+
   widget.title:setText(params.title)
   widget.title:setOn(params.on)
   widget.title.onClick = function()
@@ -244,7 +244,7 @@ UI.TwoItemsAndSlotPanel = function(params, callback, parent)
       callback(widget, params)
     end
   end
-  
+
   widget.slot:setCurrentIndex(params.slot)
   widget.slot.onOptionChange = function()
     params.slot = widget.slot.currentIndex
@@ -252,7 +252,7 @@ UI.TwoItemsAndSlotPanel = function(params, callback, parent)
       callback(widget, params)
     end
   end
-  
+
   widget.item1:setItemId(params.item1)
   widget.item1.onItemChange = function()
     params.item1 = widget.item1:getItemId()
@@ -260,15 +260,15 @@ UI.TwoItemsAndSlotPanel = function(params, callback, parent)
       callback(widget, params)
     end
   end
- 
+
   widget.item2:setItemId(params.item2)
   widget.item2.onItemChange = function()
     params.item2 = widget.item2:getItemId()
     if callback then
       callback(widget, params)
     end
-  end 
-  
+  end
+
   return widget
 end
 
@@ -294,7 +294,7 @@ UI.DualLabel = function(left, right, params, parent)
   widget.right:setText(right)
   widget:setHeight(params.height)
   if widget.left:getWidth() > params.maxWidth then
-      widget.left:setWidth(params.maxWidth)
+    widget.left:setWidth(params.maxWidth)
   end
   return widget
 end
@@ -325,14 +325,14 @@ UI.LabelAndTextEdit = function(params, callback, parent)
   widget.right.onTextChange = function(widget, text)
     params.right = text
     if callback then
-        callback(widget, params)
+      callback(widget, params)
     end
   end
 
   --[[example:
 
       storage.testParams = storage.testParams or {left = "hotkey", right = "F5"}
-      UI.LabelAndTextEdit(storage.testParams, function(widget, newParams) 
+      UI.LabelAndTextEdit(storage.testParams, function(widget, newParams)
           storage.testParams = newParams
       end)
 
@@ -371,20 +371,20 @@ UI.SwitchAndButton = function(params, callbackSwitch, callbackButton, callback, 
     params.on = not params.on
     widget.left:setOn(params.on)
     if callback then
-        callback(widget, params)
+      callback(widget, params)
     end
     if callbackSwitch then
-        callbackSwitch()
+      callbackSwitch()
     else
-        warn("callback not set!")
+      warn("callback not set!")
     end
   end
 
   widget.right.onClick = function()
     if callbackButton then
-        callbackButton()
+      callbackButton()
     else
-        warn("callback not set!")
+      warn("callback not set!")
     end
   end
 
@@ -392,9 +392,9 @@ UI.SwitchAndButton = function(params, callbackSwitch, callbackButton, callback, 
     if type(storage.test1) ~= "table" then
         storage.test1 = storage.test1 or {on = false, left = "new script", right = "config"}
     end
-    
+
     UI.SwitchAndButton(storage.test1, test, test, function(widget, newParams)
-        storage.test1 = newParams 
+        storage.test1 = newParams
     end)
   ]]
   return widget
