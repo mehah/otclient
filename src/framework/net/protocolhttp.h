@@ -65,7 +65,7 @@ public:
 
     HttpSession(asio::io_service& service, const std::string& url, const std::string& agent,
                 const bool& enable_time_out_on_read_write,
-                const std::unordered_map<std::string, std::string>& custom_header,
+                const stdext::map<std::string, std::string>& custom_header,
                 int timeout, bool isJson, bool checkContentLength, const HttpResult_ptr& result, HttpResult_cb callback) :
         m_service(service),
         m_url(url),
@@ -93,7 +93,7 @@ private:
     std::string m_url;
     std::string m_agent;
     bool m_enable_time_out_on_read_write;
-    std::unordered_map<std::string, std::string> m_custom_header;
+    stdext::map<std::string, std::string> m_custom_header;
     int m_timeout;
     bool m_isJson;
     bool m_checkContentLength;
@@ -204,7 +204,7 @@ public:
     bool wsClose(int operationId);
     bool cancel(int id);
 
-    const std::unordered_map<std::string, HttpResult_ptr>& downloads() const { return m_downloads; }
+    const stdext::map<std::string, HttpResult_ptr>& downloads() const { return m_downloads; }
 
     void clearDownloads() { m_downloads.clear(); }
 
@@ -231,11 +231,11 @@ private:
     std::thread m_thread;
     asio::io_context m_ios{};
     asio::executor_work_guard<asio::io_context::executor_type> m_guard;
-    std::unordered_map<int, HttpResult_ptr> m_operations;
-    std::unordered_map<int, std::shared_ptr<WebsocketSession>> m_websockets;
-    std::unordered_map<std::string, HttpResult_ptr> m_downloads;
+    stdext::map<int, HttpResult_ptr> m_operations;
+    stdext::map<int, std::shared_ptr<WebsocketSession>> m_websockets;
+    stdext::map<std::string, HttpResult_ptr> m_downloads;
     std::string m_userAgent = "Mozilla/5.0";
-    std::unordered_map<std::string, std::string> m_custom_header;
+    stdext::map<std::string, std::string> m_custom_header;
 };
 
 extern Http g_http;

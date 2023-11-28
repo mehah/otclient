@@ -109,13 +109,11 @@ public:
 
     bool isLinked() const { return m_linked; }
     uint32_t getProgramId() const { return m_programId; }
-    size_t hash() const { return m_hash; }
     ShaderList getShaders() { return m_shaders; }
 
 private:
     bool m_linked{ false };
     uint32_t m_programId;
-    size_t m_hash{ 0 };
     static uint32_t m_currentProgram;
     ShaderList m_shaders;
     std::array<int, MAX_UNIFORM_LOCATIONS> m_uniformLocations{ };

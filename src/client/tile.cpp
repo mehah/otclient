@@ -146,12 +146,12 @@ void Tile::updateWidget(const Point& dest, const MapPosInfo& mapRect)
     m_widget->setRect(rect);
 }
 
-void Tile::drawWidget(const Point& dest, const Rect& rect)
+void Tile::drawWidget(const Point& dest, const MapPosInfo& mapRect)
 {
     if (!m_widget)
         return;
 
-    m_widget->draw(rect, DrawPoolType::FOREGROUND);
+    m_widget->draw(mapRect.rect, DrawPoolType::FOREGROUND);
 }
 
 void Tile::setWidget(const UIWidgetPtr& widget) {
@@ -160,7 +160,7 @@ void Tile::setWidget(const UIWidgetPtr& widget) {
     m_widget = widget;
     m_widget->setClipping(true);
     g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
-        g_ui.getMapWidget()->getMapView()->addForegroundTile(tile);
+        g_ui.getMapWidget()->addTile(tile);
     }, g_game.getServerBeat());
 }
 
@@ -181,7 +181,7 @@ void Tile::clean()
 #endif
         )) {
         g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
-            g_ui.getMapWidget()->getMapView()->removeForegroundTile(tile);
+            g_ui.getMapWidget()->removeTile(tile);
         }, g_game.getServerBeat());
     }
 
@@ -849,18 +849,24 @@ bool Tile::canRender(uint32_t& flags, const Position& cameraPosition, const Awar
 }
 
 #ifndef BOT_PROTECTION
-void Tile::drawTexts(Point dest)
+void Tile::drawTexts(const Point& dest, const MapPosInfo& mapRect)
 {
+    Point p = dest - mapRect.drawOffset;
+    p.x *= mapRect.horizontalStretchFactor;
+    p.y *= mapRect.verticalStretchFactor;
+    p += mapRect.rect.topLeft();
+    p.y += 5;
+
     if (m_timerText && g_clock.millis() < m_timer) {
         if (m_text && m_text->hasText())
-            dest.y -= 8;
+            p.y -= 8;
         m_timerText->setText(stdext::format("%.01f", (m_timer - g_clock.millis()) / 1000.));
-        m_timerText->drawText(dest, Rect(dest.x - 64, dest.y - 64, 128, 128));
-        dest.y += 16;
+        m_timerText->drawText(p, Rect(p.x - 64, p.y - 64, 128, 128));
+        p.y += 16;
     }
 
     if (m_text && m_text->hasText()) {
-        m_text->drawText(dest, Rect(dest.x - 64, dest.y - 64, 128, 128));
+        m_text->drawText(p, Rect(p.x - 64, p.y - 64, 128, 128));
     }
 }
 
@@ -869,7 +875,7 @@ void Tile::setText(const std::string& text, Color color)
     if (!m_text) {
         m_text = std::make_shared<StaticText>();
         g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
-            g_ui.getMapWidget()->getMapView()->addForegroundTile(tile);
+            g_ui.getMapWidget()->addTile(tile);
         }, g_game.getServerBeat());
     }
 
@@ -892,7 +898,7 @@ void Tile::setTimer(int time, Color color)
     if (!m_timerText) {
         m_timerText = std::make_shared<StaticText>();
         g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
-            g_ui.getMapWidget()->getMapView()->addForegroundTile(tile);
+            g_ui.getMapWidget()->addTile(tile);
         }, g_game.getServerBeat());
     }
 

@@ -58,9 +58,9 @@ private:
     ALCdevice* m_device{};
     ALCcontext* m_context{};
 
-    std::unordered_map<StreamSoundSourcePtr, std::shared_future<SoundFilePtr>> m_streamFiles;
-    std::unordered_map<std::string, SoundBufferPtr> m_buffers;
-    std::unordered_map<int, SoundChannelPtr> m_channels;
+    stdext::map<StreamSoundSourcePtr, std::shared_future<SoundFilePtr>> m_streamFiles;
+    stdext::map<std::string, SoundBufferPtr> m_buffers;
+    stdext::map<int, SoundChannelPtr> m_channels;
 
     std::vector<SoundSourcePtr> m_sources;
     bool m_audioEnabled{ true };

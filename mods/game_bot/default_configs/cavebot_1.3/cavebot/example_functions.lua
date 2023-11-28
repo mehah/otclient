@@ -23,8 +23,8 @@ return true
 addExampleFunction("buy 200 mana potion from npc Eryn", [[
 --buy 200 mana potions
 local npc = getCreatureByName("Eryn")
-if not npc then 
-  return false 
+if not npc then
+  return false
 end
 if retries > 10 then
   return false

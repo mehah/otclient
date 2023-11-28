@@ -41,7 +41,7 @@ public:
     TexturePtr loadTexture(std::stringstream& file);
 
 private:
-    std::unordered_map<std::string, TexturePtr> m_textures;
+    stdext::map<std::string, TexturePtr> m_textures;
     std::vector<AnimatedTexturePtr> m_animatedTextures;
     TexturePtr m_emptyTexture;
     ScheduledEventPtr m_liveReloadEvent;

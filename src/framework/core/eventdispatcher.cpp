@@ -51,8 +51,8 @@ void EventDispatcher::shutdown()
 
 void EventDispatcher::poll()
 {
-    executeEvents();
     executeScheduledEvents();
+    executeEvents();
     mergeEvents();
 }
 
@@ -63,9 +63,12 @@ ScheduledEventPtr EventDispatcher::scheduleEvent(const std::function<void()>& ca
 
     assert(delay >= 0);
 
+    const auto& scheduledEvent = std::make_shared<ScheduledEvent>(callback, delay, 1);
     const auto& thread = getThreadTask();
     std::scoped_lock lock(thread->mutex);
-    return thread->scheduledEventList.emplace_back(std::make_shared<ScheduledEvent>(callback, delay, 1));
+
+    thread->scheduledEventList.emplace_back(scheduledEvent);
+    return scheduledEvent;
 }
 
 ScheduledEventPtr EventDispatcher::cycleEvent(const std::function<void()>& callback, int delay)
@@ -75,9 +78,12 @@ ScheduledEventPtr EventDispatcher::cycleEvent(const std::function<void()>& callb
 
     assert(delay > 0);
 
+    const auto& scheduledEvent = std::make_shared<ScheduledEvent>(callback, delay, 0);
     const auto& thread = getThreadTask();
     std::scoped_lock lock(thread->mutex);
-    return thread->scheduledEventList.emplace_back(std::make_shared<ScheduledEvent>(callback, delay, 0));
+
+    thread->scheduledEventList.emplace_back(scheduledEvent);
+    return scheduledEvent;
 }
 
 EventPtr EventDispatcher::addEvent(const std::function<void()>& callback)
@@ -90,9 +96,13 @@ EventPtr EventDispatcher::addEvent(const std::function<void()>& callback)
         return std::make_shared<Event>(nullptr);
     }
 
+    const auto& event = std::make_shared<Event>(callback);
+
     const auto& thread = getThreadTask();
     std::scoped_lock lock(thread->mutex);
-    return thread->events.emplace_back(std::make_shared<Event>(callback));
+    thread->events.emplace_back(event);
+
+    return event;
 }
 
 void EventDispatcher::executeEvents() {
@@ -103,6 +113,7 @@ void EventDispatcher::executeEvents() {
     for (const auto& event : m_eventList) {
         event->execute();
     }
+
     m_eventList.clear();
 }
 

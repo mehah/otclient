@@ -82,8 +82,6 @@ void Creature::draw(const Point& dest, bool drawThings, LightView* lightView)
 
         if (isMarked())
             internalDraw(_dest, nullptr, getMarkedColor());
-        else if (isHighlighted())
-            internalDraw(_dest, nullptr, getHighlightColor());
     }
 
     if (lightView) {
@@ -117,9 +115,6 @@ void Creature::draw(const Rect& destRect, uint8_t size)
         internalDraw(p);
         if (isMarked())
             internalDraw(p, nullptr, getMarkedColor());
-        else if (isHighlighted())
-            internalDraw(p, nullptr, getHighlightColor());
-
     } g_drawPool.releaseFrameBuffer(destRect);
 }
 
@@ -239,8 +234,9 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
 
 void Creature::internalDraw(Point dest, LightView* lightView, const Color& color)
 {
-    bool replaceColorShader = color != Color::white;
-    if (replaceColorShader)
+    bool isMarked = color != Color::white;
+
+    if (isMarked)
         g_drawPool.setShaderProgram(g_painter->getReplaceColorShader());
     else
         drawAttachedEffect(dest, lightView, false); // On Bottom
@@ -251,7 +247,7 @@ void Creature::internalDraw(Point dest, LightView* lightView, const Color& color
             if (m_outfit.hasMount()) {
                 dest -= m_mountType->getDisplacement() * g_drawPool.getScaleFactor();
 
-                if (!replaceColorShader && m_mountShader)
+                if (!isMarked && m_mountShader)
                     g_drawPool.setShaderProgram(m_mountShader, true, m_mountShaderAction);
                 m_mountType->draw(dest, 0, m_numPatternX, 0, 0, getCurrentAnimationPhase(true), color);
 
@@ -266,7 +262,7 @@ void Creature::internalDraw(Point dest, LightView* lightView, const Color& color
             const auto& datType = getThingType();
             const int animationPhase = getCurrentAnimationPhase();
 
-            if (!replaceColorShader && m_shader)
+            if (!isMarked && m_shader)
                 g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
 
             // yPattern => creature addon
@@ -277,7 +273,7 @@ void Creature::internalDraw(Point dest, LightView* lightView, const Color& color
 
                 datType->draw(dest, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, color);
 
-                if (m_drawOutfitColor && !replaceColorShader && getLayers() > 1) {
+                if (m_drawOutfitColor && !isMarked && getLayers() > 1) {
                     g_drawPool.setCompositionMode(CompositionMode::MULTIPLY);
                     datType->draw(dest, SpriteMaskYellow, m_numPatternX, yPattern, m_numPatternZ, animationPhase, m_outfit.getHeadColor());
                     datType->draw(dest, SpriteMaskRed, m_numPatternX, yPattern, m_numPatternZ, animationPhase, m_outfit.getBodyColor());
@@ -307,13 +303,13 @@ void Creature::internalDraw(Point dest, LightView* lightView, const Color& color
             if (m_outfit.isEffect())
                 animationPhase = std::min<int>(animationPhase + 1, animationPhases);
 
-            if (!replaceColorShader && m_shader)
+            if (!isMarked && m_shader)
                 g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
             m_thingType->draw(dest - (getDisplacement() * g_drawPool.getScaleFactor()), 0, 0, 0, 0, animationPhase, color);
         }
     }
 
-    if (replaceColorShader)
+    if (isMarked)
         g_drawPool.resetShaderProgram();
     else
         drawAttachedEffect(dest, lightView, true); // On Top

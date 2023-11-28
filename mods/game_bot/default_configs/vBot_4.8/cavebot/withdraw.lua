@@ -16,7 +16,7 @@ CaveBot.Extensions.Withdraw.setup = function()
 
 		-- validation for correct values
 		if not id or not amount then
-			print("CaveBot[Withdraw]: incorrect id or amount! skipping") 
+			print("CaveBot[Withdraw]: incorrect id or amount! skipping")
 			return false
 		end
 

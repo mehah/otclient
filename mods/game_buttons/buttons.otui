@@ -3,4 +3,3 @@ GameButtonsWindow
   &save: true
   !text: tr("Buttons")
   icon: /images/topbuttons/buttons
-

@@ -1,13 +1,13 @@
 SupplyItem < Panel
   height: 34
-  
+
   BotItem
     id: item
-    size: 32 32    
+    size: 32 32
     anchors.left: parent.left
     anchors.top: parent.top
     margin-top: 1
-  
+
   Panel
     id: fields
     anchors.top: parent.top
@@ -16,7 +16,7 @@ SupplyItem < Panel
     anchors.right: parent.right
     margin-left: 2
     margin-right: 2
-    
+
     Label
       id: minLabel
       anchors.top: parent.top

@@ -55,12 +55,12 @@ local patterns = {
   -- absolute
   {
     "Adjacent (exori, exori gran)",
-    "3x3 Wave (vis hur, tera hur)", 
+    "3x3 Wave (vis hur, tera hur)",
     "Small Area (mas san, exori mas)",
     "Medium Area (mas flam, mas frigo)",
     "Large Area (mas vis, mas tera)",
-    "Short Beam (vis lux)", 
-    "Large Beam (gran vis lux)", 
+    "Short Beam (vis lux)",
+    "Large Beam (gran vis lux)",
     "Sweep (exori min)", -- 8
     "Small Wave (gran frigo hur)",
     "Big Wave (flam hur, frigo hur)",
@@ -72,9 +72,9 @@ local patterns = {
 local spellPatterns = {
   {}, -- blank, wont be used
   -- Area Runes,
-  { 
+  {
     {     -- cross
-     [[ 
+     [[
       010
       111
       010
@@ -504,7 +504,7 @@ local posW = ek and [[
 ]]
 
 -- AttackBotConfig
--- create blank profiles 
+-- create blank profiles
 if not AttackBotConfig[panelName] or not AttackBotConfig[panelName][1] or #AttackBotConfig[panelName] ~= 5 then
   AttackBotConfig[panelName] = {
     [1] = {
@@ -584,8 +584,8 @@ if not AttackBotConfig[panelName] or not AttackBotConfig[panelName][1] or #Attac
     },
   }
 end
-  
-if not AttackBotConfig.currentBotProfile or AttackBotConfig.currentBotProfile == 0 or AttackBotConfig.currentBotProfile > 5 then 
+
+if not AttackBotConfig.currentBotProfile or AttackBotConfig.currentBotProfile == 0 or AttackBotConfig.currentBotProfile > 5 then
   AttackBotConfig.currentBotProfile = 1
 end
 
@@ -600,7 +600,7 @@ end
 setActiveProfile()
 
 if not currentSettings.AntiRsRange then
-  currentSettings.AntiRsRange = 5 
+  currentSettings.AntiRsRange = 5
 end
 
 local setProfileName = function()
@@ -613,7 +613,7 @@ ui.title.onClick = function(widget)
   widget:setOn(currentSettings.enabled)
   vBotConfigSave("atk")
 end
-  
+
 ui.settings.onClick = function(widget)
   mainWindow:show()
   mainWindow:raise()
@@ -687,7 +687,7 @@ end
     end
     panel.nextCategory.onClick = function()
       if category == #categories then
-        category = 1 
+        category = 1
       else
         category = category + 1
       end
@@ -708,7 +708,7 @@ end
     panel.previousRange.onClick = function()
       local t = patterns[patternCategory]
       if pattern == 1 then
-        pattern = #t 
+        pattern = #t
       else
         pattern = pattern - 1
       end
@@ -717,7 +717,7 @@ end
     panel.nextRange.onClick = function()
       local t = patterns[patternCategory]
       if pattern == #t then
-        pattern = 1 
+        pattern = 1
       else
         pattern = pattern + 1
       end
@@ -781,7 +781,6 @@ end
         end
       end
     end
-
 
     -- refreshing values
     function refreshAttacks()
@@ -928,7 +927,6 @@ end
     currentSettings.AntiRsRange = value
   end
 
-
    -- window elements
   mainWindow.closeButton.onClick = function()
     showSettings = false
@@ -1009,31 +1007,31 @@ end
 
     -- public functions
     AttackBot = {} -- global table
-  
+
     AttackBot.isOn = function()
       return currentSettings.enabled
     end
-    
+
     AttackBot.isOff = function()
       return not currentSettings.enabled
     end
-    
+
     AttackBot.setOff = function()
       currentSettings.enabled = false
       ui.title:setOn(currentSettings.enabled)
       vBotConfigSave("atk")
     end
-    
+
     AttackBot.setOn = function()
       currentSettings.enabled = true
       ui.title:setOn(currentSettings.enabled)
       vBotConfigSave("atk")
     end
-    
+
     AttackBot.getActiveProfile = function()
       return AttackBotConfig.currentBotProfile -- returns number 1-5
     end
-  
+
     AttackBot.setActiveProfile = function(n)
       if not n or not tonumber(n) or n < 1 or n > 5 then
         return error("[AttackBot] wrong profile parameter! should be 1 to 5 is " .. n)
@@ -1049,14 +1047,12 @@ end
       mainWindow:focus()
     end
 
-
 -- otui covered, now support functions
 function getPattern(category, pattern, safe)
   safe = safe and 2 or 1
 
   return spellPatterns[category][pattern][safe]
 end
-
 
 function getMonstersInArea(category, posOrCreature, pattern, minHp, maxHp, safePattern, monsterNamesTable)
   -- monsterNamesTable can be nil
@@ -1074,7 +1070,7 @@ function getMonstersInArea(category, posOrCreature, pattern, minHp, maxHp, safeP
         return 0
       end
     end
-  end 
+  end
 
   if category == 1 or category == 3 or category == 4 then
     if category == 1 or category == 3 then
@@ -1128,7 +1124,7 @@ function executeAttackBotAction(categoryOrPos, idOrFormula, cooldown)
   cooldown = cooldown or 0
   if categoryOrPos == 4 or categoryOrPos == 5 or categoryOrPos == 1 then
     cast(idOrFormula, cooldown)
-  elseif categoryOrPos == 3 then 
+  elseif categoryOrPos == 3 then
     useWith(idOrFormula, target())
   end
 end
@@ -1200,7 +1196,7 @@ macro(100, function()
     local entry = child.params
     local attackData = entry.itemId > 100 and entry.itemId or entry.spell
     if entry.enabled and manapercent() >= entry.mana then
-      if (type(attackData) == "string" and canCast(entry.spell, not currentSettings.ignoreMana, not currentSettings.Cooldown)) or (entry.itemId > 100 and (not currentSettings.Visible or findItem(entry.itemId))) then 
+      if (type(attackData) == "string" and canCast(entry.spell, not currentSettings.ignoreMana, not currentSettings.Cooldown)) or (entry.itemId > 100 and (not currentSettings.Visible or findItem(entry.itemId))) then
         -- first PVP scenario
         if currentSettings.pvpMode and target():getHealthPercent() >= entry.minHp and target():getHealthPercent() <= entry.maxHp and target():canShoot() then
           if entry.category == 2 then

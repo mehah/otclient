@@ -14,12 +14,12 @@ context.callback = function(callbackType, callback)
   if info then
     desc = info.short_src .. ":" .. info.currentline
   end
-  
+
   local callbackData = {}
   table.insert(context._callbacks[callbackType], function(...)
     if not callbackData.delay or callbackData.delay < context.now then
       local prevExecution = context._currentExecution
-      context._currentExecution = callbackData       
+      context._currentExecution = callbackData
       local start = g_clock.realMillis()
       callback(...)
       local executionTime = g_clock.realMillis() - start
@@ -46,42 +46,42 @@ context.callback = function(callbackType, callback)
 end
 
 -- onKeyDown(callback) -- callback = function(keys)
-context.onKeyDown = function(callback) 
+context.onKeyDown = function(callback)
   return context.callback("onKeyDown", callback)
 end
 
 -- onKeyPress(callback) -- callback = function(keys)
-context.onKeyPress = function(callback) 
+context.onKeyPress = function(callback)
   return context.callback("onKeyPress", callback)
 end
 
 -- onKeyUp(callback) -- callback = function(keys)
-context.onKeyUp = function(callback) 
+context.onKeyUp = function(callback)
   return context.callback("onKeyUp", callback)
 end
 
 -- onTalk(callback) -- callback = function(name, level, mode, text, channelId, pos)
-context.onTalk = function(callback) 
+context.onTalk = function(callback)
   return context.callback("onTalk", callback)
 end
 
 -- onTextMessage(callback) -- callback = function(mode, text)
-context.onTextMessage = function(callback) 
+context.onTextMessage = function(callback)
   return context.callback("onTextMessage", callback)
 end
 
 -- onLoginAdvice(callback) -- callback = function(message)
-context.onLoginAdvice = function(callback) 
+context.onLoginAdvice = function(callback)
   return context.callback("onLoginAdvice", callback)
 end
 
 -- onAddThing(callback) -- callback = function(tile, thing)
-context.onAddThing = function(callback) 
+context.onAddThing = function(callback)
   return context.callback("onAddThing", callback)
 end
 
 -- onRemoveThing(callback) -- callback = function(tile, thing)
-context.onRemoveThing = function(callback) 
+context.onRemoveThing = function(callback)
   return context.callback("onRemoveThing", callback)
 end
 

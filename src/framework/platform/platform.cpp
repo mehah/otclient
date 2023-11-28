@@ -24,13 +24,13 @@
 
 Platform g_platform;
 
-std::unordered_map<Platform::DeviceType, std::string> Platform::m_deviceShortNames = {
+stdext::map<Platform::DeviceType, std::string> Platform::m_deviceShortNames = {
     {Platform::Desktop, "desktop"},
     {Platform::Mobile,  "mobile"},
     {Platform::Console, "console"},
 };
 
-std::unordered_map<Platform::OperatingSystem, std::string> Platform::m_osShortNames = {
+stdext::map<Platform::OperatingSystem, std::string> Platform::m_osShortNames = {
     {Platform::Windows, "windows"},
     {Platform::Linux,   "linux"},
     {Platform::macOS,   "macos"},

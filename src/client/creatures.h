@@ -130,7 +130,7 @@ protected:
 
 private:
     std::vector<CreatureTypePtr> m_creatures;
-    std::unordered_map<Position, SpawnPtr, Position::Hasher> m_spawns;
+    stdext::map<Position, SpawnPtr, Position::Hasher> m_spawns;
     bool m_loaded{ false };
     bool m_spawnLoaded{ false };
     CreatureTypePtr m_nullCreature;

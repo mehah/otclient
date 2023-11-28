@@ -19,13 +19,13 @@ CaveBot.Editor.registerAction = function(action, text, params)
     CaveBot.Editor.Actions[action] = params
     color = raction.color
   end
-  
+
   local button = UI.createWidget('CaveBotEditorButton', CaveBot.Editor.ui.buttons)
   button:setText(text)
   if color then
     button:setColor(color)
   end
-  button.onClick = function()    
+  button.onClick = function()
     if type(params) == 'function' then
       params()
       return
@@ -79,12 +79,12 @@ CaveBot.Editor.setup = function()
     action:destroy()
     CaveBot.save()
   end)
-    
+
   registerAction("label", {
     value="labelName",
     title="Label",
     description="Add label",
-    multiline=false   
+    multiline=false
   })
   registerAction("delay", {
     value="500",
@@ -97,7 +97,7 @@ CaveBot.Editor.setup = function()
     value="labelName",
     title="Go to label",
     description="Go to label",
-    multiline=false   
+    multiline=false
   })
   registerAction("goto", "go to", {
     value=function() return posx() .. "," .. posy() .. "," .. posz() end,
@@ -110,8 +110,8 @@ CaveBot.Editor.setup = function()
     value=function() return posx() .. "," .. posy() .. "," .. posz() end,
     title="Use",
     description="Use item from position (x,y,z) or from inventory (itemId)",
-    multiline=false   
-  }) 
+    multiline=false
+  })
   registerAction("usewith", "use with", {
     value=function() return "itemId," .. posx() .. "," .. posy() .. "," .. posz() end,
     title="Use with",
@@ -123,8 +123,8 @@ CaveBot.Editor.setup = function()
     value="text",
     title="Say",
     description="Enter text to say",
-    multiline=false   
-  }) 
+    multiline=false
+  })
   registerAction("function", {
     title="Edit bot function",
     multiline=true,
@@ -132,7 +132,7 @@ CaveBot.Editor.setup = function()
     examples=CaveBot.Editor.ExampleFunctions,
     width=650
   })
-  
+
   ui.autoRecording.onClick = function()
     if ui.autoRecording:isOn() then
       CaveBot.Recorder.disable()
@@ -140,12 +140,12 @@ CaveBot.Editor.setup = function()
       CaveBot.Recorder.enable()
     end
   end
-  
+
   -- callbacks
   onPlayerPositionChange(function(pos)
-    ui.pos:setText("Position: " .. pos.x .. ", " .. pos.y .. ", " .. pos.z) 
+    ui.pos:setText("Position: " .. pos.x .. ", " .. pos.y .. ", " .. pos.z)
   end)
-  ui.pos:setText("Position: " .. posx() .. ", " .. posy() .. ", " .. posz()) 
+  ui.pos:setText("Position: " .. posx() .. ", " .. posy() .. ", " .. posz())
 end
 
 CaveBot.Editor.show = function()
@@ -170,5 +170,5 @@ CaveBot.Editor.edit = function(action, value, callback) -- callback = function(a
 
   UI.EditorWindow(value, params, function(newText)
     callback(action, newText)
-  end)   
+  end)
 end

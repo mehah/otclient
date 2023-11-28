@@ -24,9 +24,9 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/platform/platformwindow.h>
 
-bool AdaptativeFrameCounter::update()
+void AdaptativeFrameCounter::update()
 {
-    const auto maxFps = m_targetFps == 0 ? m_maxFps : std::clamp<uint16_t>(m_targetFps, 1, std::max<uint16_t>(m_maxFps, m_targetFps));
+    const uint8_t maxFps = m_targetFps == 0 ? m_maxFps : std::clamp<uint8_t>(m_targetFps, 1, std::max<uint8_t>(m_maxFps, m_targetFps));
     if (maxFps > 0) {
         const int32_t sleepPeriod = (getMaxPeriod(maxFps) - 1000) - m_timer.elapsed_micros();
         if (sleepPeriod > 0) stdext::microsleep(sleepPeriod);
@@ -37,15 +37,15 @@ bool AdaptativeFrameCounter::update()
     ++m_fpsCount;
 
     if (m_fps == m_fpsCount)
-        return false;
+        return;
 
     const uint32_t tickCount = stdext::millis();
     if (tickCount - m_interval <= 1000)
-        return false;
+        return;
 
     m_fps = m_fpsCount;
     m_fpsCount = 0;
     m_interval = tickCount;
 
-    return true;
+    g_dispatcher.addEvent([this] { g_lua.callGlobalField("g_app", "onFps", getFps()); });
 }

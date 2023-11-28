@@ -29,18 +29,20 @@
 #include "texture.h"
 #include "framework/core/timer.h"
 #include <framework/platform/platformwindow.h>
-#include <framework/core/graphicalapplication.h>
 
 #include "../stdext/storage.h"
+
+#define MAX_DRAW_DEPTH 15
 
 enum class DrawPoolType : uint8_t
 {
     MAP,
     CREATURE_INFORMATION,
     LIGHT,
-    FOREGROUND_MAP,
+    TEXT,
+    FOREGROUND_TILE,
     FOREGROUND,
-    LAST
+    UNKNOW
 };
 
 enum DrawOrder : uint8_t
@@ -94,11 +96,10 @@ public:
     void setFramebuffer(const Size& size);
     void removeFramebuffer();
 
-    void onBeforeDraw(std::function<void()>&& f) { m_beforeDraw = std::move(f); }
-    void onAfterDraw(std::function<void()>&& f) { m_afterDraw = std::move(f); }
+    void onBeforeDraw(std::function<void()> f) { m_beforeDraw = std::move(f); }
+    void onAfterDraw(std::function<void()> f) { m_afterDraw = std::move(f); }
 
-    std::mutex& getMutex() { return m_mutexDraw; }
-    std::mutex& getMutexPreDraw() { return m_mutexPreDraw; }
+    std::mutex& getMutex() { return m_mutex; }
 
 protected:
 
@@ -139,11 +140,11 @@ protected:
     struct DrawObject
     {
         DrawObject(std::function<void()> action) : action(std::move(action)) {}
-        DrawObject(PoolState&& state) : state(std::move(state)), coords(std::make_unique<CoordsBuffer>()) {}
-        DrawObject(const DrawMode drawMode, PoolState&& state, DrawMethod&& method) :
+        DrawObject(PoolState& state) : state(std::move(state)), coords(std::make_unique<CoordsBuffer>()) {}
+        DrawObject(const DrawMode drawMode, PoolState& state, DrawMethod& method) :
             drawMode(drawMode), state(std::move(state)) { methods.emplace_back(std::move(method)); }
 
-        void addMethod(DrawMethod&& method)
+        void addMethod(DrawMethod& method)
         {
             drawMode = DrawMode::TRIANGLES;
             methods.emplace_back(std::move(method));
@@ -179,7 +180,7 @@ private:
         STATE_BLEND_EQUATION = 1 << 4,
     };
 
-    void add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod&& method,
+    void add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod& method,
              DrawMode drawMode = DrawMode::TRIANGLES, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR,
              const CoordsBufferPtr& coordsBuffer = nullptr);
 
@@ -190,7 +191,7 @@ private:
     inline void setFPS(uint16_t fps) { m_refreshDelay = fps; }
 
     void updateHash(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color);
-    PoolState getState(const TexturePtr& texture, const Color& color);
+    PoolState getState(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color);
 
     float getOpacity() const { return m_state.opacity; }
     Rect getClipRect() { return m_state.clipRect; }
@@ -219,25 +220,8 @@ private:
     void flush()
     {
         m_coords.clear();
-        for (auto& objs : m_objects) {
-            m_objectsFlushed.insert(m_objectsFlushed.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
-            objs.clear();
-        }
-    }
-
-    void release(bool draw = true) {
-        m_objectsDraw.clear();
-        if (draw) {
-            if (!m_objectsFlushed.empty())
-                m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(m_objectsFlushed.begin()), make_move_iterator(m_objectsFlushed.end()));
-
-            for (auto& objs : m_objects) {
-                m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
-                objs.clear();
-            }
-        }
-
-        m_objectsFlushed.clear();
+        if (m_depthLevel < MAX_DRAW_DEPTH)
+            ++m_depthLevel;
     }
 
     bool canRepaint(bool autoUpdateStatus);
@@ -248,6 +232,7 @@ private:
     bool m_alwaysGroupDrawings{ false };
 
     int_fast8_t m_bindedFramebuffers{ -1 };
+    uint8_t m_depthLevel{ 0 };
 
     uint16_t m_refreshDelay{ 0 }, m_shaderRefreshDelay{ 0 };
     uint32_t m_onlyOnceStateFlag{ 0 };
@@ -255,7 +240,7 @@ private:
 
     PoolState m_state, m_oldState;
 
-    DrawPoolType m_type{ DrawPoolType::LAST };
+    DrawPoolType m_type{ DrawPoolType::UNKNOW };
 
     Timer m_refreshTimer;
 
@@ -263,10 +248,7 @@ private:
 
     std::vector<Matrix3> m_transformMatrixStack;
     std::vector<FrameBufferPtr> m_temporaryFramebuffers;
-
-    std::vector<DrawObject> m_objects[static_cast<uint8_t>(DrawOrder::LAST)];
-    std::vector<DrawObject> m_objectsFlushed;
-    std::vector<DrawObject> m_objectsDraw;
+    std::vector<DrawObject> m_objects[MAX_DRAW_DEPTH + 1][static_cast<uint8_t>(DrawOrder::LAST)];
 
     stdext::map<size_t, CoordsBuffer*> m_coords;
 
@@ -278,9 +260,7 @@ private:
     std::function<void()> m_beforeDraw;
     std::function<void()> m_afterDraw;
 
-    std::atomic_bool m_repaint{ false };
-    std::mutex m_mutexDraw;
-    std::mutex m_mutexPreDraw;
+    std::mutex m_mutex;
 
     friend class DrawPoolManager;
 };

@@ -57,13 +57,11 @@ void Item::draw(const Point& dest, bool drawThings, LightView* lightView)
 
     if (isMarked())
         internalDraw(animationPhase, dest, getMarkedColor(), drawThings, true);
-    else if (isHighlighted())
-        internalDraw(animationPhase, dest, getHighlightColor(), drawThings, true);
 }
 
-void Item::internalDraw(int animationPhase, const Point& dest, const Color& color, bool drawThings, bool replaceColorShader, LightView* lightView)
+void Item::internalDraw(int animationPhase, const Point& dest, const Color& color, bool drawThings, bool isMarked, LightView* lightView)
 {
-    if (replaceColorShader)
+    if (isMarked)
         g_drawPool.setShaderProgram(g_painter->getReplaceColorShader(), true);
     else {
         drawAttachedEffect(dest, lightView, false); // On Bottom
@@ -74,7 +72,7 @@ void Item::internalDraw(int animationPhase, const Point& dest, const Color& colo
     getThingType()->draw(dest, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, color, drawThings, lightView, m_drawConductor);
     g_drawPool.resetShaderProgram();
 
-    if (!replaceColorShader)
+    if (!isMarked)
         drawAttachedEffect(dest, lightView, true); // On Top
 
     drawAttachedParticlesEffect(dest);

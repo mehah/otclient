@@ -15,8 +15,6 @@
 local link = "https://www.gunzodus.net/character/show/"
 local spacing = "_"
 
-
-
 -- do not edit below
 setDefaultTab("Main")
 local tabs = {"Friends", "Enemies", "BlackList"}
@@ -59,7 +57,7 @@ local refreshStatus = function()
             specOutfit.feet = 88
             if storage.BOTserver.outfit then
               local voc = vBot.BotServerMembers[spec:getName()]
-              specOutfit.addons = 3 
+              specOutfit.addons = 3
               if voc == 1 then
                 specOutfit.type = 131
               elseif voc == 2 then
@@ -89,10 +87,10 @@ refreshStatus()
 
 local checkStatus = function(creature)
     if not creature:isPlayer() or creature:isLocalPlayer() then return end
-  
+
     local specName = creature:getName()
     local specOutfit = creature:getOutfit()
-  
+
     if isFriend(specName) then
       if config.highlight then
         creature:setMarked('#0000FF')
@@ -104,7 +102,7 @@ local checkStatus = function(creature)
         specOutfit.feet = 88
         if storage.BOTserver.outfit then
           local voc = vBot.BotServerMembers[creature:getName()]
-          specOutfit.addons = 3 
+          specOutfit.addons = 3
           if voc == 1 then
             specOutfit.type = 131
           elseif voc == 2 then
@@ -131,13 +129,12 @@ local checkStatus = function(creature)
     end
 end
 
-
 rootWidget = g_ui.getRootWidget()
 if rootWidget then
     local ListWindow = UI.createWindow('PlayerListWindow', rootWidget)
     ListWindow:hide()
 
-    UI.Button("Player Lists", function() 
+    UI.Button("Player Lists", function()
         ListWindow:show()
         ListWindow:raise()
         ListWindow:focus()
@@ -229,7 +226,7 @@ if rootWidget then
         tabButton.onStyleApply = function(widget)
             if TabBar:getCurrentTab() == widget then
                 widget:setColor(colors[v])
-            end 
+            end
         end
 
         -- callbacks
@@ -341,7 +338,7 @@ end)
 onCreatureAppear(function(creature)
     checkStatus(creature)
   end)
-  
+
 onPlayerPositionChange(function(x,y)
   if x.z ~= y.z then
     schedule(20, function()

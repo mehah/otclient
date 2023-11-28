@@ -184,17 +184,6 @@ public:
     bool isMarked() { return m_markedColor != Color::white; }
     void setMarked(const Color& color) { if (m_markedColor != color) m_markedColor = color; }
 
-    const Color& getHighlightColor() {
-        if (m_highlightColor == Color::white)
-            return Color::white;
-
-        m_highlightColor.setAlpha(0.1f + std::abs(500 - g_clock.millis() % 1000) / 1000.0f);
-        return m_highlightColor;
-    }
-
-    bool isHighlighted() { return m_highlightColor != Color::white; }
-    void setHighlight(const Color& color) { if (m_highlightColor != color) m_highlightColor = color; }
-
     bool isHided() { return isOwnerHidden(); }
     void onStartAttachEffect(const AttachedEffectPtr& effect) override;
     void onDispatcherAttachEffect(const AttachedEffectPtr& effect) override;
@@ -220,7 +209,6 @@ protected:
     DrawConductor m_drawConductor{ false, DrawOrder::THIRD };
 
     Color m_markedColor{ Color::white };
-    Color m_highlightColor{ Color::white };
 
     // Shader
     PainterShaderProgramPtr m_shader;
@@ -228,7 +216,6 @@ protected:
 
 private:
     void lua_setMarked(std::string_view color) { setMarked(Color(color)); }
-    void lua_setHighlight(std::string_view color) { setHighlight(Color(color)); }
 
     bool m_canDraw{ true };
 

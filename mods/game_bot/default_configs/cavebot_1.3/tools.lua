@@ -22,7 +22,7 @@ for _, scripts in ipairs({storage.ingame_macros, storage.ingame_hotkeys}) do
     local status, result = pcall(function()
       assert(load(scripts, "ingame_editor"))()
     end)
-    if not status then 
+    if not status then
       error("Ingame edior error:\n" .. result)
     end
   end
@@ -44,7 +44,7 @@ macro(1000, "Exchange money", function()
         if item:getCount() == 100 then
           for m, moneyId in ipairs(moneyIds) do
             if item:getId() == moneyId then
-              return g_game.use(item)            
+              return g_game.use(item)
             end
           end
         end
@@ -124,7 +124,7 @@ local manatrainmacro = macro(1000, function()
 end)
 manatrainmacro.setOn(storage.manaTrain.on)
 
-UI.DualScrollPanel(storage.manaTrain, function(widget, newParams) 
+UI.DualScrollPanel(storage.manaTrain, function(widget, newParams)
   storage.manaTrain = newParams
   manatrainmacro.setOn(storage.manaTrain.on)
 end)
@@ -136,11 +136,11 @@ macro(60000, "Send message on trade", function()
   if not trade then
     trade = getChannelId("trade")
   end
-  if trade and storage.autoTradeMessage:len() > 0 then    
+  if trade and storage.autoTradeMessage:len() > 0 then
     sayChannel(trade, storage.autoTradeMessage)
   end
 end)
-UI.TextEdit(storage.autoTradeMessage or "I'm using OTClientV8!", function(widget, text)    
+UI.TextEdit(storage.autoTradeMessage or "I'm using OTClientV8!", function(widget, text)
   storage.autoTradeMessage = text
 end)
 

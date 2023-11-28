@@ -24,7 +24,7 @@ function UIItem:onDrop(widget, mousePos, forced)
 
   local item = widget.currentDragThing
   if not item or not item:isItem() then return false end
-
+  
   if self.selectable then
     if item:isPickupable() then
       self:setItem(Item.create(item:getId(), item:getCountOrSubType()))
@@ -60,7 +60,7 @@ end
 
 function UIItem:onHoverChange(hovered)
   UIWidget.onHoverChange(self, hovered)
-
+    
   if self:isVirtual() or not self:isDraggable() then return end
 
   local draggingWidget = g_ui.getDraggingWidget()
@@ -89,8 +89,8 @@ function UIItem:onMouseRelease(mousePosition, mouseButton)
   if not item or not self:containsPoint(mousePosition) then return false end
 
   if modules.client_options.getOption('classicControl') and not g_app.isMobile() and
-      ((g_mouse.isPressed(MouseLeftButton) and mouseButton == MouseRightButton) or
-        (g_mouse.isPressed(MouseRightButton) and mouseButton == MouseLeftButton)) then
+     ((g_mouse.isPressed(MouseLeftButton) and mouseButton == MouseRightButton) or
+      (g_mouse.isPressed(MouseRightButton) and mouseButton == MouseLeftButton)) then
     g_game.look(item)
     self.cancelNextRelease = true
     return true
@@ -105,7 +105,7 @@ function UIItem:canAcceptDrop(widget, mousePos)
   if not widget or not widget.currentDragThing then return false end
 
   local children = rootWidget:recursiveGetChildrenByPos(mousePos)
-  for i = 1, #children do
+  for i=1,#children do
     local child = children[i]
     if child == self then
       return true

@@ -142,4 +142,4 @@ protected:
     PainterShaderProgramPtr m_drawReplaceColorProgram;
 };
 
-extern std::unique_ptr<Painter> g_painter;
+extern Painter* g_painter;

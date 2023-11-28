@@ -41,14 +41,14 @@ public:
     void mainPoll();
     void close() override;
 
-    void setMaxFps(uint16_t maxFps) { m_graphicFrameCounter.setMaxFps(maxFps); }
-    void setTargetFps(uint16_t targetFps) { m_graphicFrameCounter.setTargetFps(targetFps); }
+    void setMaxFps(uint16_t maxFps) { m_frameCounter.setMaxFps(maxFps); }
+    void setTargetFps(uint16_t targetFps) { m_frameCounter.setTargetFps(targetFps); }
 
-    uint16_t getFps() { return m_graphicFrameCounter.getFps(); }
-    uint8_t getMaxFps() { return m_graphicFrameCounter.getMaxFps(); }
-    uint8_t getTargetFps() { return m_graphicFrameCounter.getTargetFps(); }
+    uint16_t getFps() { return m_frameCounter.getFps(); }
+    uint8_t getMaxFps() { return m_frameCounter.getMaxFps(); }
+    uint8_t getTargetFps() { return m_frameCounter.getTargetFps(); }
 
-    void resetTargetFps() { m_graphicFrameCounter.resetTargetFps(); }
+    void resetTargetFps() { m_frameCounter.resetTargetFps(); }
 
     bool isOnInputEvent() { return m_onInputEvent; }
     bool mustOptimize() {
@@ -112,8 +112,7 @@ private:
     float m_animatedTextScale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
     float m_staticTextScale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
 
-    AdaptativeFrameCounter m_mapProcessFrameCounter;
-    AdaptativeFrameCounter m_graphicFrameCounter;
+    AdaptativeFrameCounter m_frameCounter;
 };
 
 extern GraphicalApplication g_app;

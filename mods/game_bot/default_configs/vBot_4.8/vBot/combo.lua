@@ -100,7 +100,7 @@ if rootWidget then
   comboWindow.server.targetServerLeaderToggle.onClick = function(widget)
     config.serverLeaderTarget = not config.serverLeaderTarget
     widget:setOn(config.serverLeaderTarget)
-  end  
+  end
 
   -- buttons
   comboWindow.closeButton.onClick = function(widget)
@@ -136,38 +136,38 @@ if rootWidget then
   comboWindow.trigger.onCastToggle.onClick = function(widget)
     config.onCastEnabled = not config.onCastEnabled
     widget:setChecked(config.onCastEnabled)
-  end  
+  end
 
   comboWindow.actions.followLeaderToggle:setChecked(config.followLeaderEnabled)
   comboWindow.actions.followLeaderToggle.onClick = function(widget)
     config.followLeaderEnabled = not config.followLeaderEnabled
     widget:setChecked(config.followLeaderEnabled)
   end
-  
+
   comboWindow.actions.attackLeaderTargetToggle:setChecked(config.attackLeaderTargetEnabled)
   comboWindow.actions.attackLeaderTargetToggle.onClick = function(widget)
     config.attackLeaderTargetEnabled = not config.attackLeaderTargetEnabled
     widget:setChecked(config.attackLeaderTargetEnabled)
-  end 
-  
+  end
+
   comboWindow.actions.attackSpellToggle:setChecked(config.attackSpellEnabled)
   comboWindow.actions.attackSpellToggle.onClick = function(widget)
     config.attackSpellEnabled = not config.attackSpellEnabled
     widget:setChecked(config.attackSpellEnabled)
   end
-  
+
   comboWindow.actions.attackItemToggle:setChecked(config.attackItemEnabled)
   comboWindow.actions.attackItemToggle.onClick = function(widget)
     config.attackItemEnabled = not config.attackItemEnabled
     widget:setChecked(config.attackItemEnabled)
   end
-  
+
   -- text edits
   comboWindow.trigger.onSayLeader:setText(config.sayLeader)
   comboWindow.trigger.onSayLeader.onTextChange = function(widget, text)
     config.sayLeader = text
   end
-  
+
   comboWindow.trigger.onShootLeader:setText(config.shootLeader)
   comboWindow.trigger.onShootLeader.onTextChange = function(widget, text)
     config.shootLeader = text
@@ -182,7 +182,7 @@ if rootWidget then
   comboWindow.trigger.onSayPhrase.onTextChange = function(widget, text)
     config.sayPhrase = text
   end
-  
+
   comboWindow.actions.attackSpell:setText(config.spell)
   comboWindow.actions.attackSpell.onTextChange = function(widget, text)
     config.spell = text
@@ -191,7 +191,7 @@ if rootWidget then
   comboWindow.server.botServerLeader:setText(config.serverLeader)
   comboWindow.server.botServerLeader.onTextChange = function(widget, text)
     config.serverLeader = text
-  end  
+  end
 end
 
 -- bot server
@@ -215,8 +215,8 @@ macro(10, function()
 end)
 
 comboWindow.server.partyButton.onClick = function(widget)
-  if config.serverEnabled and config.enabled then 
-    if config.serverLeader:len() > 0 and storage.BotServerChannel:len() > 0 then 
+  if config.serverEnabled and config.enabled then
+    if config.serverLeader:len() > 0 and storage.BotServerChannel:len() > 0 then
       talkPrivate(config.serverLeader, "request invite " .. storage.BotServerChannel)
     else
       error("Request failed. Lack of data.")
@@ -266,7 +266,7 @@ onTalk(function(name, level, mode, text, channelId, pos)
       end
     end
   end
-  -- [[ End of Frosty's Code ]] -- 
+  -- [[ End of Frosty's Code ]] --
   if config.enabled and config.enabled then
     if name:lower() == config.sayLeader:lower() and string.find(text, config.sayPhrase) and config.onSayEnabled then
       startCombo = true
@@ -302,7 +302,7 @@ onTalk(function(name, level, mode, text, channelId, pos)
 end)
 
 onMissle(function(missle)
-  if config.enabled and config.onShootEnabled then 
+  if config.enabled and config.onShootEnabled then
     if not config.shootLeader or config.shootLeader:len() == 0 then
       return
     end
@@ -329,7 +329,7 @@ onMissle(function(missle)
       end
       if config.attackSpellEnabled and config.spell:len() > 1 then
         say(config.spell)
-      end 
+      end
     end
   end
 end)
@@ -348,7 +348,6 @@ macro(10, function()
     end
   end
 end)
-
 
 local toFollow
 local toFollowPos = {}

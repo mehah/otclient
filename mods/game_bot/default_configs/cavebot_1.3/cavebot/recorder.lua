@@ -11,7 +11,7 @@ local function setup()
   end
 
   onPlayerPositionChange(function(newPos, oldPos)
-    if CaveBot.isOn() or not isEnabled then return end    
+    if CaveBot.isOn() or not isEnabled then return end
     if not lastPos then
       -- first step
       addPosition(oldPos)
@@ -23,15 +23,15 @@ local function setup()
       addPosition(newPos)
     end
   end)
-  
+
   onUse(function(pos, itemId, stackPos, subType)
     if CaveBot.isOn() or not isEnabled then return end
-    if pos.x ~= 0xFFFF then 
+    if pos.x ~= 0xFFFF then
       lastPos = pos
       CaveBot.addAction("use", pos.x .. "," .. pos.y .. "," .. pos.z, true)
     end
   end)
-  
+
   onUseWith(function(pos, itemId, target, subType)
     if CaveBot.isOn() or not isEnabled then return end
     if not target:isItem() then return end
