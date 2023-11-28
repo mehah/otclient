@@ -17,7 +17,7 @@ TargetBot.walk = function()
   local dist = math.max(math.abs(pos.x-dest.x), math.abs(pos.y-dest.y))
   if params.precision and params.precision >= dist then return end
   if params.marginMin and params.marginMax then
-    if dist >= params.marginMin and dist <= params.marginMax then 
+    if dist >= params.marginMin and dist <= params.marginMax then
       return
     end
   end

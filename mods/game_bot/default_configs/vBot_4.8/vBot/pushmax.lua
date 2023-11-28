@@ -84,12 +84,11 @@ if rootWidget then
   pushWindow.hotkey:setText(config.pushMaxKey)
 end
 
-
 -- variables for config
 local fieldTable = {2118, 105, 2122}
 local cleanTile = nil
 
--- scripts 
+-- scripts
 
 local targetTile
 local pushTarget
@@ -251,9 +250,9 @@ macro(50, function()
     local tilePos = targetTile:getPosition()
     local targetPos = pushTarget:getPosition()
     if not isOk(tilePos,targetPos) then return end
-    
+
     local tileOfTarget = g_map.getTile(targetPos)
-    
+
     if not targetTile:isWalkable() then
       local topThing = targetTile:getTopUseThing():getId()
       if topThing == 2129 or topThing == 2130 or topThing == customMwall then

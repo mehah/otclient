@@ -984,7 +984,7 @@ void UIWidget::setLayout(const UILayoutPtr& layout)
 bool UIWidget::setRect(const Rect& rect)
 {
     Rect clampedRect = rect;
-    if (!m_minSize.isEmpty() || !m_maxSize.isEmpty()) {
+    if (m_minSize.width() != -1 || m_minSize.height() != -1 || m_maxSize.width() != -1 || m_maxSize.height() != -1) {
         Size minSize, maxSize;
         minSize.setWidth(m_minSize.width() >= 0 ? m_minSize.width() : 0);
         minSize.setHeight(m_minSize.height() >= 0 ? m_minSize.height() : 0);

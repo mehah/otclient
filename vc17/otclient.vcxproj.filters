@@ -429,9 +429,6 @@
     <ClCompile Include="..\src\client\luafunctions.cpp">
       <Filter>Source Files\client</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\client\luavaluecasts.cpp">
-      <Filter>Source Files\client</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\client\map.cpp">
       <Filter>Source Files\client</Filter>
     </ClCompile>
@@ -553,6 +550,9 @@
       <Filter>Source Files\client</Filter>
     </ClCompile>
     <ClCompile Include="..\src\client\uigraph.cpp">
+      <Filter>Source Files\client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\client\luavaluecasts_client.cpp">
       <Filter>Source Files\client</Filter>
     </ClCompile>
   </ItemGroup>
@@ -944,9 +944,6 @@
     <ClInclude Include="..\src\client\localplayer.h">
       <Filter>Header Files\client</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\client\luavaluecasts.h">
-      <Filter>Header Files\client</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\client\map.h">
       <Filter>Header Files\client</Filter>
     </ClInclude>
@@ -1074,6 +1071,9 @@
       <Filter>Header Files\framework\stdext</Filter>
     </ClInclude>
     <ClInclude Include="..\src\client\uigraph.h">
+      <Filter>Header Files\client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\luavaluecasts_client.h">
       <Filter>Header Files\client</Filter>
     </ClInclude>
   </ItemGroup>

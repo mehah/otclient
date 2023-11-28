@@ -9,12 +9,12 @@ TargetBotLootingPanel < Panel
   Label
     margin-top: 5
     text: Items to loot
-    text-align: center    
+    text-align: center
 
   BotContainer
     id: items
     margin-top: 3
-  
+
   BotSwitch
     id: everyItem
     !text: tr("Loot every item")
@@ -29,12 +29,12 @@ TargetBotLootingPanel < Panel
     id: containers
     margin-top: 3
     height: 45
-  
+
   Panel
     id: maxDangerPanel
     height: 20
     margin-top: 5
-    
+
     BotTextEdit
       id: value
       anchors.right: parent.right
@@ -53,7 +53,7 @@ TargetBotLootingPanel < Panel
     id: minCapacityPanel
     height: 20
     margin-top: 3
-    
+
     BotTextEdit
       id: value
       anchors.right: parent.right

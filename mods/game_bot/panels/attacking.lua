@@ -664,7 +664,6 @@ Panel
     ignoreOnOptionChange = false
   end
 
-
   ui.config.onOptionChange = function(widget)
     if not ignoreOnOptionChange then
       context.storage.attacking.activeConfig = widget.currentIndex
@@ -720,7 +719,6 @@ Panel
         anchor = AnchorHorizontalCenter
       }, removeConfig, closeWindow)
   end
-
 
   ui.mAdd.onClick = function()
     if not context.storage.attacking.activeConfig or not context.storage.attacking.configs[context.storage.attacking.activeConfig] then

@@ -23,7 +23,7 @@ TextEditWindow < MainWindow
   layout:
     type: verticalBox
     fit-children: true
-    
+
   Label
     id: description
     text-align: center
@@ -31,7 +31,7 @@ TextEditWindow < MainWindow
     visible: false
     text-wrap: true
     text-auto-resize: true
-  
+
   ComboBox
     id: examples
     margin-bottom: 5
@@ -42,7 +42,7 @@ SinglelineTextEditWindow < TextEditWindow
 
   TextEdit
     id: text
-    
+
   TextEditButtons
 
 MultilineTextEditWindow < TextEditWindow
@@ -70,6 +70,5 @@ MultilineTextEditWindow < TextEditWindow
       anchors.right: parent.right
       pixels-scroll: true
       step: 10
-    
-  TextEditButtons
 
+  TextEditButtons

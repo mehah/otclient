@@ -261,7 +261,6 @@ set(SOURCE_FILES
 	framework/graphics/drawpoolmanager.cpp
 	framework/graphics/fontmanager.cpp
 	framework/graphics/framebuffer.cpp
-	framework/graphics/framebuffermanager.cpp
 	framework/graphics/graphics.cpp
 	framework/graphics/hardwarebuffer.cpp
 	framework/graphics/image.cpp
@@ -350,7 +349,7 @@ set(SOURCE_FILES
 	client/lightview.cpp
 	client/localplayer.cpp
 	client/luafunctions.cpp
-	client/luavaluecasts.cpp
+	client/luavaluecasts_client.cpp
 	client/map.cpp
 	client/mapio.cpp
 	client/mapview.cpp

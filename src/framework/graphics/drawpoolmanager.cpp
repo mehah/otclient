@@ -22,8 +22,6 @@
 
 #include "drawpoolmanager.h"
 #include "declarations.h"
-#include "painter.h"
-#include <framework/graphics/framebuffermanager.h>
 
 thread_local static uint8_t CURRENT_POOL;
 
@@ -83,7 +81,7 @@ void DrawPoolManager::draw()
     // m_drawing = false;
 }
 
-bool DrawPoolManager::drawPool(const auto& pool) {
+bool DrawPoolManager::drawPool(DrawPool* pool) {
     if (!pool->isEnabled())
         return false;
 

@@ -20,9 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "luavaluecasts.h"
-#include <framework/otml/otmlnode.h>
 #include "luainterface.h"
+#include <framework/otml/otmlnode.h>
 
  // bool
 int push_luavalue(bool b)

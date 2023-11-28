@@ -27,7 +27,7 @@ function show(itemWidget)
     destroyWindow()
   end
   local window = g_ui.createWidget('ItemSelectorWindow', rootWidget)
-  
+
   local destroy = function()
     window:destroy()
     if window == activeWindow then
@@ -43,27 +43,27 @@ function show(itemWidget)
     window.item:setItemCount(0)
     doneFunc()
   end
-  
+
   window.clearButton.onClick = clearFunc
   window.okButton.onClick = doneFunc
   window.cancelButton.onClick = destroy
   window.onEnter = doneFunc
   window.onEscape = destroy
-  
+
   window.item:setItem(Item.create(itemWidget:getItemId(), itemWidget:getItemCount()))
-  
+
   window.itemId:setValue(itemWidget:getItemId())
   if itemWidget:getItemCount() > 1 then
     window.itemCount:setValue(itemWidget:getItemCount())
   end
-  
+
   window.itemId.onValueChange = function(widget, value)
     window.item:setItemId(value)
   end
   window.itemCount.onValueChange = function(widget, value)
     window.item:setItemCount(value)
   end
-  
+
   activeWindow = window
   activeWindow:raise()
   activeWindow:focus()

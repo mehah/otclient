@@ -8,7 +8,6 @@ CaveBot.Extensions.ClearTile.setup = function()
     local stand = false
     local pPos = player:getPosition()
 
-
     for i, value in ipairs(data) do
       value = value:lower():trim()
       if value == "stand" then
@@ -17,7 +16,6 @@ CaveBot.Extensions.ClearTile.setup = function()
         doors = true
       end
     end
-
 
     if not #pos == 3 then
       warn("CaveBot[ClearTile]: invalid value. It should be position (x,y,z), is: " .. value)
@@ -77,7 +75,7 @@ CaveBot.Extensions.ClearTile.setup = function()
         print("CaveBot[ClearTile]: moving item... " .. item:getId().. " from tile")
         g_game.move(item, pPos, item:getCount())
         return "retry"
-      end   
+      end
     end
 
     -- player
