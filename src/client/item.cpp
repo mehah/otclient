@@ -59,6 +59,8 @@ void Item::draw(const Point& dest, bool drawThings, LightView* lightView)
         internalDraw(animationPhase, dest, getMarkedColor(), drawThings, true);
     else if (isHighlighted())
         internalDraw(animationPhase, dest, getHighlightColor(), drawThings, true);
+    
+    m_lastDrawDest = dest;
 }
 
 void Item::internalDraw(int animationPhase, const Point& dest, const Color& color, bool drawThings, bool replaceColorShader, LightView* lightView)
@@ -271,6 +273,8 @@ void Item::setId(uint32_t id)
     }
     */
 }
+
+void Item::setLuaNetworkTable(const std::string& table) {  callLuaField("onLuaNetworkTableChange", m_luaNetworkTable = table); }
 
 #ifdef FRAMEWORK_EDITOR
 

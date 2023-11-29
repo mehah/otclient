@@ -258,7 +258,6 @@ void MapView::drawForeground(const Rect& rect)
 
         tile->drawTexts(p);
 #endif
-        tile->drawWidget(dest, rect);
     }
 }
 

@@ -24,6 +24,8 @@
 #include "attachedeffect.h"
 #include <framework/luaengine/luaobject.h>
 
+struct MapPosInfo;
+
 class AttachableObject : public LuaObject
 {
 public:
@@ -50,6 +52,7 @@ public:
     void updateAndAttachParticlesEffects(std::vector<std::string>& newElements);
 
     const std::vector<UIWidgetPtr>& getAttachedWidgets() { return m_attachedWidgets; };
+    bool hasAttachedWidgets() { return !m_attachedWidgets.empty(); };
     void attachWidget(const UIWidgetPtr& widget);
     void clearAttachedWidgets();
     bool detachWidgetById(const std::string& id);
@@ -60,7 +63,7 @@ protected:
     void drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop);
     void onDetachEffect(const AttachedEffectPtr& effect);
     void drawAttachedParticlesEffect(const Point& dest);
-    //void drawAttachedWidgets(const Point& dest, const MapPosInfo& mapRect);
+    void updateAttachedWidgets(const Point& dest, const MapPosInfo& mapRect);
 
     std::vector<AttachedEffectPtr> m_attachedEffects;
     std::vector<ParticleEffectPtr> m_attachedParticles;

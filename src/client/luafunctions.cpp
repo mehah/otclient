@@ -832,10 +832,6 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Tile>("unselect", &Tile::unselect);
     g_lua.bindClassMemberFunction<Tile>("isSelected", &Tile::isSelected);
 
-    g_lua.bindClassMemberFunction<Tile>("setWidget", &Tile::setWidget);
-    g_lua.bindClassMemberFunction<Tile>("getWidget", &Tile::getWidget);
-    g_lua.bindClassMemberFunction<Tile>("removeWidget", &Tile::removeWidget);
-
 #ifndef BOT_PROTECTION
     g_lua.bindClassMemberFunction<Tile>("setText", &Tile::setText);
     g_lua.bindClassMemberFunction<Tile>("getText", &Tile::getText);
