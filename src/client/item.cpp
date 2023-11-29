@@ -274,8 +274,6 @@ void Item::setId(uint32_t id)
     */
 }
 
-void Item::setLuaNetworkTable(const std::string& table) {  callLuaField("onLuaNetworkTableChange", m_luaNetworkTable = table); }
-
 #ifdef FRAMEWORK_EDITOR
 
 std::string Item::getName()
