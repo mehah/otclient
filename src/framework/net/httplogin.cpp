@@ -64,7 +64,7 @@ void LoginHttp::Logger(const auto &req, const auto &res) {
 }
 
 void LoginHttp::startHttpLogin(const std::string &host, const std::string &path,
-                               u_int16_t port, const std::string &email,
+                               uint16_t port, const std::string &email,
                                const std::string &password) {
 
   httplib::SSLClient cli(host, port);
@@ -95,7 +95,7 @@ std::string LoginHttp::getWorldList() { return this->worlds; }
 std::string LoginHttp::getSession() { return this->session; }
 
 void LoginHttp::httpLogin(const std::string &host, const std::string &path,
-                          u_int16_t port, const std::string &email,
+                          uint16_t port, const std::string &email,
                           const std::string &password, int request_id,
                           bool unsafeLogin) {
 
@@ -134,7 +134,7 @@ void LoginHttp::httpLogin(const std::string &host, const std::string &path,
 
 httplib::Result LoginHttp::loginHttpsJson(const std::string &host,
                                           const std::string &path,
-                                          u_int16_t port,
+                                          uint16_t port,
                                           const std::string &email,
                                           const std::string &password) {
   httplib::SSLClient client(host, port);
