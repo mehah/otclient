@@ -11,7 +11,6 @@ UI.Button = function(text, callback, parent)
   return widget
 end
 
-
 UI.Config = function(parent)
   return UI.createWidget("BotConfig", parent)
 end
@@ -125,7 +124,7 @@ UI.DualScrollPanel = function(params, callback, parent) -- callback = function(w
     end
   end
 
-  local update             = function(dontSignal)
+  local update = function(dontSignal)
     widget.title:setText("" .. params.min .. "% <= " .. params.title .. " <= " .. params.max .. "%")
     if callback and not dontSignal then
       callback(widget, params)
@@ -181,7 +180,7 @@ UI.DualScrollItemPanel = function(params, callback, parent) -- callback = functi
     end
   end
 
-  local update             = function(dontSignal)
+  local update = function(dontSignal)
     widget.title:setText("" .. params.min .. "% <= " .. params.title .. " <= " .. params.max .. "%")
     if callback and not dontSignal then
       callback(widget, params)

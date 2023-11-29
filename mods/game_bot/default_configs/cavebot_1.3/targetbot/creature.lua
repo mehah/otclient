@@ -1,4 +1,3 @@
-
 TargetBot.Creature = {}
 TargetBot.Creature.configsCache = {}
 TargetBot.Creature.cached = 0
@@ -25,7 +24,7 @@ TargetBot.Creature.addConfig = function(config, focus)
       if config.regex:len() > 0 then
         config.regex = config.regex .. "|"
       end
-      config.regex = config.regex .. "^" .. part:trim():lower():gsub("%*", ".*"):gsub("%?", ".?") .. "$"    
+      config.regex = config.regex .. "^" .. part:trim():lower():gsub("%*", ".*"):gsub("%?", ".?") .. "$"
     end
   end
 
@@ -64,7 +63,7 @@ TargetBot.Creature.getConfigs = function(creature)
       table.insert(configs, config.value)
     end
   end
-  if TargetBot.Creature.cached > 1000 then 
+  if TargetBot.Creature.cached > 1000 then
     TargetBot.Creature.resetConfigsCache() -- too big cache size, reset
   end
   TargetBot.Creature.configsCache[name] = configs -- add to cache

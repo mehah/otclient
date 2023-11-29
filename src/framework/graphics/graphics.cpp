@@ -84,6 +84,7 @@ void Graphics::init()
 
 void Graphics::terminate()
 {
+    g_painter = nullptr;
     g_fonts.terminate();
     g_textures.terminate();
 

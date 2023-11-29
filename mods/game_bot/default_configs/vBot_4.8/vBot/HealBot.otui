@@ -48,7 +48,7 @@ SpellEntry < Label
     margin-right: 15
     text-offset: 1 0
     width: 15
-    height: 15   
+    height: 15
 
 ItemEntry < Label
   background-color: alpha
@@ -84,7 +84,7 @@ ItemEntry < Label
     margin-right: 15
     text-offset: 1 0
     width: 15
-    height: 15               
+    height: 15
 
 SpellHealing < FlatPanel
   size: 490 130
@@ -120,13 +120,13 @@ SpellHealing < FlatPanel
     anchors.top: whenSpell.bottom
     text: Is
     margin-top: 9
-    margin-left: 7 
+    margin-left: 7
     font: verdana-11px-rounded
 
   SpellConditionBox
     id: spellCondition
     anchors.left: spellSource.left
-    anchors.top: spellSource.bottom   
+    anchors.top: spellSource.bottom
     marin-top: 15
     width: 80
     font: verdana-11px-rounded
@@ -143,7 +143,7 @@ SpellHealing < FlatPanel
     id: castSpell
     anchors.left: isSpell.left
     anchors.top: isSpell.bottom
-    text: Cast  
+    text: Cast
     margin-top: 9
     font: verdana-11px-rounded
 
@@ -166,7 +166,7 @@ SpellHealing < FlatPanel
     id: manaCost
     anchors.left: spellFormula.left
     anchors.top: spellFormula.bottom
-    width: 40 
+    width: 40
     font: verdana-11px-rounded
 
   TextList
@@ -176,7 +176,7 @@ SpellHealing < FlatPanel
     anchors.top: parent.top
     padding: 1
     padding-top: 2
-    width: 270  
+    width: 270
     margin-bottom: 7
     margin-left: 7
     margin-top: 10
@@ -214,7 +214,7 @@ SpellHealing < FlatPanel
     margin-right: 5
     text: Move Down
     size: 55 17
-    font: cipsoftFont  
+    font: cipsoftFont
 
 ItemHealing < FlatPanel
   size: 490 120
@@ -250,13 +250,13 @@ ItemHealing < FlatPanel
     anchors.top: whenItem.bottom
     text: Is
     margin-top: 9
-    margin-left: 7 
+    margin-left: 7
     font: verdana-11px-rounded
 
   SpellConditionBox
     id: itemCondition
     anchors.left: itemSource.left
-    anchors.top: itemSource.bottom   
+    anchors.top: itemSource.bottom
     marin-top: 15
     width: 80
     font: verdana-11px-rounded
@@ -273,7 +273,7 @@ ItemHealing < FlatPanel
     id: useItem
     anchors.left: isItem.left
     anchors.top: isItem.bottom
-    text: Use  
+    text: Use
     margin-top: 15
     font: verdana-11px-rounded
 
@@ -289,7 +289,7 @@ ItemHealing < FlatPanel
     anchors.top: parent.top
     padding: 1
     padding-top: 2
-    width: 270  
+    width: 270
     margin-top: 10
     margin-bottom: 7
     margin-left: 8
@@ -362,7 +362,7 @@ HealBotSettingsPanel < Panel
       text: Additional Settings
       text-align: center
       font: verdana-11px-rounded
-      
+
     HorizontalSeparator
 
     SettingCheckBox
@@ -431,7 +431,7 @@ HealBotSettingsPanel < Panel
       anchors.top: prev.bottom
       margin-top: 3
       anchors.left: parent.left
-      anchors.right: parent.right     
+      anchors.right: parent.right
 
     Button
       id: ResetSettings
@@ -454,7 +454,7 @@ HealWindow < MainWindow
     !text: tr('More important methods come first (Example: Exura gran above Exura)')
     text-align: left
     font: verdana-11px-rounded
-    color: #aeaeae  
+    color: #aeaeae
 
   HealerPanel
     id: healer
@@ -472,7 +472,7 @@ HealWindow < MainWindow
     anchors.right: parent.right
     anchors.left: parent.left
     anchors.bottom: closeButton.top
-    margin-bottom: 8    
+    margin-bottom: 8
 
   Button
     id: closeButton

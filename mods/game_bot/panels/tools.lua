@@ -7,11 +7,11 @@ Panels.TradeMessage = function(parent)
     if not trade then
       trade = context.getChannelId("trade")
     end
-    if context.storage.autoTradeMessage:len() > 0 and trade then    
+    if context.storage.autoTradeMessage:len() > 0 and trade then
       context.sayChannel(trade, context.storage.autoTradeMessage)
     end
   end, parent)
-  context.addTextEdit("autoTradeMessage", context.storage.autoTradeMessage or "I'm using OTClientV8 - https://github.com/OTCv8/otclientv8", function(widget, text)    
+  context.addTextEdit("autoTradeMessage", context.storage.autoTradeMessage or "I'm using OTClientV8 - https://github.com/OTCv8/otclientv8", function(widget, text)
     context.storage.autoTradeMessage = text
   end, parent)
 end

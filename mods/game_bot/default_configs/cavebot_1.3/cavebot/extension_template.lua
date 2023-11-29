@@ -28,7 +28,7 @@ CaveBot.Extensions.Example.setup = function()
     title="Say hello",
     description="Says hello x times",
     validation="[0-9]{1,5}" -- regex, optional
-  })  
+  })
 end
 
 -- called when cavebot config changes, configData is a table but it can also be nil

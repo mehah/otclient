@@ -3,14 +3,14 @@ AttackComboBoxPopupMenuButton < ComboBoxPopupMenuButton
 AttackComboBox < ComboBox
   @onSetup: |
     self:addOption("LEADER TARGET")
-    self:addOption("COMMAND TARGET")    
+    self:addOption("COMMAND TARGET")
 
 FollowComboBoxPopupMenu < ComboBoxPopupMenu
 FollowComboBoxPopupMenuButton < ComboBoxPopupMenuButton
 FollowComboBox < ComboBox
   @onSetup: |
     self:addOption("LEADER TARGET")
-    self:addOption("SERVER LEADER TARGET")    
+    self:addOption("SERVER LEADER TARGET")
     self:addOption("LEADER")
     self:addOption("SERVER LEADER")
 
@@ -35,7 +35,7 @@ ComboTrigger < Panel
     anchors.left: triggerLabel1.right
     anchors.top: triggerLabel1.top
     text: Leader:
-    margin-left: 35  
+    margin-left: 35
 
   TextEdit
     id: onSayLeader
@@ -75,14 +75,14 @@ ComboTrigger < Panel
     anchors.top: triggerLabel1.bottom
     text: On Shoot
     margin-top: 5
-    color: #ffaa00  
+    color: #ffaa00
 
   Label
     id: leaderLabel1
     anchors.left: triggerLabel2.right
     anchors.top: triggerLabel2.top
     text: Leader:
-    margin-left: 24  
+    margin-left: 24
 
   TextEdit
     id: onShootLeader
@@ -92,7 +92,7 @@ ComboTrigger < Panel
     anchors.right: onSayPhrase.right
     margin-left: 5
     width: 120
-    font: cipsoftFont  
+    font: cipsoftFont
 
   CheckBox
     id: onShootToggle
@@ -107,14 +107,14 @@ ComboTrigger < Panel
     anchors.top: triggerLabel2.bottom
     text: On Cast
     margin-top: 5
-    color: #ffaa00  
+    color: #ffaa00
 
   Label
     id: leaderLabel2
     anchors.left: triggerLabel3.right
     anchors.top: triggerLabel3.top
     text: Leader:
-    margin-left: 32  
+    margin-left: 32
 
   TextEdit
     id: onCastLeader
@@ -124,14 +124,14 @@ ComboTrigger < Panel
     anchors.right: onSayPhrase.right
     margin-left: 5
     width: 120
-    font: cipsoftFont  
+    font: cipsoftFont
 
   CheckBox
     id: onCastToggle
     anchors.left: onCastLeader.right
     anchors.top: onCastLeader.top
     margin-top: 1
-    margin-left: 5    
+    margin-left: 5
 
 ComboActions < Panel
   id: actions
@@ -148,23 +148,23 @@ ComboActions < Panel
     margin-top: 5
     margin-left: 3
     height: 15
-    color: #ffaa00    
+    color: #ffaa00
 
   FollowComboBox
     id: followLeader
     anchors.left: prev.right
-    anchors.top: prev.top 
-    margin-left: 7 
+    anchors.top: prev.top
+    margin-left: 7
     height: 15
     width: 145
-    font: cipsoftFont    
+    font: cipsoftFont
 
   CheckBox
     id: followLeaderToggle
     anchors.left: followLeader.right
     anchors.top: followLeader.top
     margin-top: 2
-    margin-left: 5    
+    margin-left: 5
 
   Label
     id: label2
@@ -177,8 +177,8 @@ ComboActions < Panel
   AttackComboBox
     id: attackLeaderTarget
     anchors.left: prev.right
-    anchors.top: prev.top 
-    margin-left: 5 
+    anchors.top: prev.top
+    margin-left: 5
     height: 15
     width: 145
     font: cipsoftFont
@@ -201,9 +201,9 @@ ComboActions < Panel
   TextEdit
     id: attackSpell
     anchors.left: prev.right
-    anchors.top: prev.top 
+    anchors.top: prev.top
     anchors.right: attackLeaderTarget.right
-    margin-left: 17 
+    margin-left: 17
     height: 15
     width: 145
     font: cipsoftFont
@@ -213,7 +213,7 @@ ComboActions < Panel
     anchors.left: attackSpell.right
     anchors.top: attackSpell.top
     margin-top: 2
-    margin-left: 5  
+    margin-left: 5
 
   Label
     id: label4
@@ -231,7 +231,7 @@ ComboActions < Panel
 
   CheckBox
     id: attackItemToggle
-    anchors.left: prev.right 
+    anchors.left: prev.right
     anchors.verticalCenter: prev.verticalCenter
     margin-left: 5
 
@@ -246,12 +246,12 @@ ComboActions < Panel
     text-wrap: true
     multiline: true
 
-BotServer < Panel 
+BotServer < Panel
   id: server
   image-source: /images/ui/panel_flat
   image-border: 6
   padding: 3
-  size: 220 100 
+  size: 220 100
 
   Label
     id: labelX
@@ -259,9 +259,9 @@ BotServer < Panel
     anchors.top: parent.top
     text: Leader:
     height: 15
-    color: #ffaa00 
+    color: #ffaa00
     margin-left: 3
-    margin-top: 5 
+    margin-top: 5
 
   TextEdit
     id: botServerLeader
@@ -312,7 +312,7 @@ BotServer < Panel
     height: 30
     margin-left: 3
     margin-right: 3
-    text: Triggers  
+    text: Triggers
 
 ComboWindow < MainWindow
   !text: tr('Combo Options')
@@ -333,7 +333,7 @@ ComboWindow < MainWindow
     text: Combo Trigger
     color: #ff7700
 
-  ComboActions    
+  ComboActions
     id: actions
     anchors.top: trigger.bottom
     anchors.left: trigger.left
@@ -346,13 +346,13 @@ ComboWindow < MainWindow
     margin-left: 10
     margin-top: 85
     text: Combo Actions
-    color: #ff7700   
+    color: #ff7700
 
-  BotServer    
+  BotServer
     id: server
     anchors.top: actions.top
     anchors.left: actions.right
-    margin-left: 10 
+    margin-left: 10
 
   Label
     id: title
@@ -368,7 +368,7 @@ ComboWindow < MainWindow
     anchors.right: parent.right
     anchors.left: parent.left
     anchors.bottom: closeButton.top
-    margin-bottom: 8    
+    margin-bottom: 8
 
   Button
     id: closeButton
