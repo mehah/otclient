@@ -58,9 +58,12 @@ void DrawPoolManager::draw()
     }
 
     auto map = get(DrawPoolType::MAP);
-    if (drawPool(map)) {
-        drawPool(DrawPoolType::CREATURE_INFORMATION);
-        drawPool(DrawPoolType::LIGHT);
+    {
+        std::scoped_lock l(map->getMutex());
+        if (drawPool(map)) {
+            drawPool(DrawPoolType::CREATURE_INFORMATION);
+            drawPool(DrawPoolType::LIGHT);
+        }
     }
 
     drawPool(DrawPoolType::FOREGROUND_MAP);
