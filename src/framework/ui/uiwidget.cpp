@@ -134,7 +134,10 @@ void UIWidget::drawChildren(const Rect& visibleRect, DrawPoolType drawPane)
 
         // debug draw box
         if (g_ui.isDrawingDebugBoxes() && drawPane == DrawPoolType::FOREGROUND) {
-            g_drawPool.addBoundingRect(child->getRect(), Color::green);
+            if(child->isFocused())
+                g_drawPool.addBoundingRect(child->getRect(), Color::yellow);
+            else
+                g_drawPool.addBoundingRect(child->getRect(), Color::green);
         }
 
         g_drawPool.setOpacity(oldOpacity);
@@ -424,6 +427,9 @@ void UIWidget::lowerChild(const UIWidgetPtr& child)
         return;
 
     if (!child)
+        return;
+
+    if (m_children.front() == child)
         return;
 
     // remove and push child again
@@ -1015,22 +1021,24 @@ bool UIWidget::setRect(const Rect& rect)
         auto self = static_self_cast<UIWidget>();
         g_dispatcher.addEvent([self, oldRect] {
             self->setProp(PropUpdateEventScheduled, false);
-            if (oldRect != self->getRect())
-                self->onGeometryChange(oldRect, self->getRect());
+            const auto& rect = self->getRect();
+            if (oldRect != rect) {
+                // update hovered widget when moved behind mouse area
+                if (self->containsPoint(g_window.getMousePosition()))
+                    g_ui.updateHoveredWidget();
+
+                if (oldRect.width() != rect.width())
+                    self->callLuaField("onWidthChange", rect.width(), oldRect.width());
+                if (oldRect.height() != rect.height())
+                    self->callLuaField("onHeightChange", rect.height(), oldRect.height());
+
+                self->callLuaField("onResize", oldRect, rect);
+                self->onGeometryChange(oldRect, rect);
+            }
         });
         setProp(PropUpdateEventScheduled, true);
     }
 
-    // update hovered widget when moved behind mouse area
-    if (containsPoint(g_window.getMousePosition()))
-        g_ui.updateHoveredWidget();
-
-    if (oldRect.width() != m_rect.width())
-        callLuaField("onWidthChange", m_rect.width(), oldRect.width());
-    if (oldRect.height() != m_rect.height())
-        callLuaField("onHeightChange", m_rect.height(), oldRect.height());
-
-    callLuaField("onResize", oldRect, m_rect);
     return true;
 }
 
@@ -1911,14 +1919,17 @@ bool UIWidget::propagateOnMouseMove(const Point& mousePos, const Point& mouseMov
 }
 
 void UIWidget::move(int x, int y) {
+    if (getX() == x && getY() == y)
+        return;
+
     if (!hasProp(PropUpdatingMove)) {
         setProp(PropUpdatingMove, true);
-        g_dispatcher.scheduleEvent([self = static_self_cast<UIWidget>()] {
+        g_dispatcher.addEvent([self = static_self_cast<UIWidget>()] {
             const auto rect = self->m_rect;
             self->m_rect = {}; // force update
             self->setRect(rect);
             self->setProp(PropUpdatingMove, false);
-        }, 8);
+        });
     }
 
     m_rect = { x, y, getSize() };
