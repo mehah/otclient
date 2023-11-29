@@ -41,6 +41,7 @@ end
 
 local function onCharacterList(protocol, characters, account, otui)
     -- Try add server to the server list
+    print("Add Server 1")
     ServerList.add(G.host, G.port, g_game.getClientVersion())
 
     -- Save 'Stay logged in' setting
@@ -53,14 +54,14 @@ local function onCharacterList(protocol, characters, account, otui)
         g_settings.set('account', account)
         g_settings.set('password', password)
 
-        ServerList.setServerAccount(G.host, account)
-        ServerList.setServerPassword(G.host, password)
+        ServerList.setServerAccount(G.host .. ':' .. G.port, account)
+        ServerList.setServerPassword(G.host .. ':' .. G.port, password)
 
         g_settings.set('autologin', enterGame:getChildById('autoLoginBox'):isChecked())
     else
         -- reset server list account/password
-        ServerList.setServerAccount(G.host, '')
-        ServerList.setServerPassword(G.host, '')
+        ServerList.setServerAccount(G.host .. ':' .. G.port, '')
+        ServerList.setServerPassword(G.host .. ':' .. G.port, '')
 
         EnterGame.clearAccountFields()
     end
