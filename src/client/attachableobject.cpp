@@ -154,12 +154,12 @@ void AttachableObject::drawAttachedParticlesEffect(const Point& dest)
 
 void AttachableObject::updateAndAttachParticlesEffects(std::vector<std::string>& newElements) {
     std::vector<std::string> toRemove;
-    
+
     for (const auto& effect : m_attachedParticles) {
         auto findPos = std::find(newElements.begin(), newElements.end(), effect->getEffectType()->getName());
         if (findPos == newElements.end())
             toRemove.emplace_back(effect->getEffectType()->getName());
-        else 
+        else
             newElements.erase(findPos);
     }
 
@@ -169,7 +169,6 @@ void AttachableObject::updateAndAttachParticlesEffects(std::vector<std::string>&
     for (const auto& name : newElements)
         attachParticleEffect(name);
 }
-
 
 void AttachableObject::attachWidget(const UIWidgetPtr& widget) {
     if (!widget)
@@ -222,7 +221,7 @@ bool AttachableObject::detachWidget(const UIWidgetPtr& widget) {
 void AttachableObject::clearAttachedWidgets() {
     // keep the same behavior as detachWidget
     auto oldList = std::move(m_attachedWidgets);
-    m_attachedWidgets.clear(); 
+    m_attachedWidgets.clear();
 
     for (const auto& widget : oldList) {
         widget->setAttached(false);
@@ -242,7 +241,7 @@ UIWidgetPtr AttachableObject::getAttachedWidgetById(const std::string& id) {
 }
 
 void AttachableObject::updateAttachedWidgets(const Point& dest, const MapPosInfo& mapRect)
-{   
+{
     if (m_attachedWidgets.empty())
         return;
 
@@ -270,7 +269,7 @@ void AttachableObject::updateAttachedWidgets(const Point& dest, const MapPosInfo
         const auto& rect = Rect(p, widgetRect.width(), widgetRect.height());
 
         widget->setRect(rect);
-        widget->draw(mapRect.rect, DrawPoolType::FOREGROUND_MAP_WIDGETS);
+        widget->draw(mapRect.rect, DrawPoolType::FOREGROUND);
     }
 
     for (const auto& widget : toRemove)
