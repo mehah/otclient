@@ -166,7 +166,7 @@ httplib::Result LoginHttp::loginHttpsJson(const std::string &host,
 
 httplib::Result LoginHttp::loginHttpJson(const std::string &host,
                                          const std::string &path,
-                                         u_int16_t port,
+                                         uint16_t port,
                                          const std::string &email,
                                          const std::string &password) {
   httplib::Client client(host, port);

@@ -24,6 +24,7 @@
 
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #include <httplib.h>
+#include <framework/luaengine/luaobject.h>
 
 class LoginHttp : public LuaObject {
 public:
@@ -48,7 +49,7 @@ public:
                  const std::string &password, int request_id, bool unsafeLogin);
 
   httplib::Result loginHttpsJson(const std::string &host,
-                                 const std::string &path, u_int16_t port,
+                                 const std::string &path, uint16_t port,
                                  const std::string &email,
                                  const std::string &password);
 
