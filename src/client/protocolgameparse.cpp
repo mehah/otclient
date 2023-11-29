@@ -3585,7 +3585,7 @@ void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
     }
 
     const uint8_t slot = msg->getU8(); // slot id
-    stdext::map<int, std::tuple<Imbuement, int, int>> activeSlots;
+    std::unordered_map<int, std::tuple<Imbuement, int, int>> activeSlots;
     for (uint8_t i = 0; i < slot; i++) {
         const uint8_t firstByte = msg->getU8();
         if (firstByte == 0x01) {
@@ -3658,7 +3658,7 @@ void ProtocolGame::parseMarketEnterOld(const InputMessagePtr& msg)
     const uint8_t offers = msg->getU8();
     const uint16_t itemsSent = msg->getU16();
 
-    stdext::map<uint16_t, uint16_t> depotItems;
+    std::unordered_map<uint16_t, uint16_t> depotItems;
     for (int_fast32_t i = 0; i < itemsSent; i++) {
         const uint16_t itemId = msg->getU16();
         const uint16_t count = msg->getU16();
@@ -3678,7 +3678,7 @@ void ProtocolGame::parseMarketDetail(const InputMessagePtr& msg)
         }
     }
 
-    stdext::map<int, std::string> descriptions;
+    std::unordered_map<int, std::string> descriptions;
     Otc::MarketItemDescription lastAttribute = Otc::ITEM_DESC_WEIGHT;
     if (g_game.getClientVersion() >= 1200)
         lastAttribute = Otc::ITEM_DESC_IMBUINGSLOTS;

@@ -83,5 +83,5 @@ public:
 protected:
     bool internalUpdate() override;
     virtual bool updateWidget(const UIWidgetPtr& widget, const UIAnchorGroupPtr& anchorGroup, UIWidgetPtr first = nullptr);
-    stdext::map<UIWidgetPtr, UIAnchorGroupPtr> m_anchorsGroups;
+    std::unordered_map<UIWidgetPtr, UIAnchorGroupPtr> m_anchorsGroups;
 };

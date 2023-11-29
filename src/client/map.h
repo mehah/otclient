@@ -291,7 +291,7 @@ public:
     bool isDrawingFloatingEffects() { return m_floatingEffect; }
 
 #ifndef BOT_PROTECTION
-    stdext::map<std::string, std::tuple<int, int, int, std::string>> findEveryPath(const Position& start, int maxDistance, const stdext::map<std::string, std::string>& params);
+    std::map<std::string, std::tuple<int, int, int, std::string>> findEveryPath(const Position& start, int maxDistance, const std::map<std::string, std::string>& params);
     std::vector<CreaturePtr> getSpectatorsByPattern(const Position& centerPos, const std::string& pattern, Otc::Direction direction);
 #endif
 
@@ -302,7 +302,7 @@ private:
     struct FloorData
     {
         std::vector<MissilePtr> missiles;
-        stdext::map<uint32_t, TileBlock > tileBlocks;
+        std::unordered_map<uint32_t, TileBlock > tileBlocks;
     };
 
     void removeUnawareThings();
@@ -315,11 +315,11 @@ private:
     std::vector<StaticTextPtr> m_staticTexts;
     std::vector<MapViewPtr> m_mapViews;
 
-    stdext::map<uint32_t, CreaturePtr> m_knownCreatures;
+    std::unordered_map<uint32_t, CreaturePtr> m_knownCreatures;
 
 #ifdef FRAMEWORK_EDITOR
-    stdext::map<Position, std::string, Position::Hasher> m_waypoints;
-    stdext::map<uint32_t, Color> m_zoneColors;
+    std::unordered_map<Position, std::string, Position::Hasher> m_waypoints;
+    std::unordered_map<uint32_t, Color> m_zoneColors;
 
     std::string m_houseFile;
     std::string m_spawnFile;

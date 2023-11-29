@@ -95,17 +95,17 @@ void Connection::connect(const std::string_view host, uint16_t port, const std::
     m_connectCallback = connectCallback;
 
     const asio::ip::tcp::resolver::query query(host.data(), stdext::unsafe_cast<std::string>(port));
-    m_resolver.async_resolve(query, [capture0 = asConnection()](auto&& PH1, auto&& PH2) {
-        capture0->onResolve(std::forward<decltype(PH1)>(PH1),
-        std::forward<decltype(PH2)>(PH2));
+    m_resolver.async_resolve(query, [this](auto&& error, auto&& endpointIterator) {
+       onResolve(std::move(error), std::move(endpointIterator));
     });
 
     m_readTimer.cancel();
-    m_readTimer.expires_from_now(asio::chrono::seconds(static_cast<uint32_t>(READ_TIMEOUT)));
-    m_readTimer.async_wait([capture0 = asConnection()](auto&& PH1) {
-        capture0->onTimeout(std::forward<decltype(PH1)>(PH1));
+    m_readTimer.expires_after(std::chrono::seconds(static_cast<uint32_t>(READ_TIMEOUT)));
+    m_readTimer.async_wait([this](auto&& error) {
+        onTimeout(std::move(error));
     });
 }
+
 
 void Connection::internal_connect(const asio::ip::basic_resolver<asio::ip::tcp>::iterator& endpointIterator)
 {

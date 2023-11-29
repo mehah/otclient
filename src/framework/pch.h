@@ -46,6 +46,8 @@
 #include <tuple>
 #include <typeinfo>
 #include <vector>
+#include <unordered_map>
+#include <map>
 
 #include <parallel_hashmap/phmap.h>
 #include <parallel_hashmap/btree.h>
