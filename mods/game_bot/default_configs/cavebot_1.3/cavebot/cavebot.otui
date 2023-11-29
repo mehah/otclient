@@ -6,7 +6,6 @@ CaveBotAction < Label
   $focus:
     background-color: #00000055
 
-
 CaveBotPanel < Panel
   layout:
     type: verticalBox
@@ -15,7 +14,7 @@ CaveBotPanel < Panel
   HorizontalSeparator
     margin-top: 2
     margin-bottom: 5
-    
+
   Panel
     id: listPanel
     height: 100
@@ -28,7 +27,7 @@ CaveBotPanel < Panel
       margin-right: 15
       focusable: false
       auto-focus: first
-      
+
     VerticalScrollBar
       id: listScrollbar
       anchors.top: parent.top
@@ -36,23 +35,23 @@ CaveBotPanel < Panel
       anchors.right: parent.right
       pixels-scroll: true
       step: 10
-    
+
   BotSwitch
     id: showEditor
     margin-top: 2
-    
+
     $on:
       text: Hide waypoints editor
-      
+
     $!on:
       text: Show waypoints editor
 
   BotSwitch
     id: showConfig
     margin-top: 2
-    
+
     $on:
       text: Hide config
-      
+
     $!on:
       text: Show config

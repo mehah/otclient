@@ -78,7 +78,7 @@ AttackBotBotPanel < Panel
     text: 2
     margin-left: 4
     size: 17 17
-    
+
   Button
     id: 3
     anchors.verticalCenter: prev.verticalCenter
@@ -93,8 +93,8 @@ AttackBotBotPanel < Panel
     anchors.left: prev.right
     text: 4
     margin-left: 4
-    size: 17 17 
-    
+    size: 17 17
+
   Button
     id: 5
     anchors.verticalCenter: prev.verticalCenter
@@ -102,7 +102,7 @@ AttackBotBotPanel < Panel
     text: 5
     margin-left: 4
     size: 17 17
-    
+
   Label
     id: name
     anchors.verticalCenter: prev.verticalCenter
@@ -263,7 +263,7 @@ AttackBotPanel < Panel
     text-align: center
     text: Mana%:
     font: verdana-11px-rounded
-  
+
   SpinBox
     id: manaPercent
     anchors.verticalCenter: prev.verticalCenter
@@ -280,7 +280,7 @@ AttackBotPanel < Panel
     anchors.left: prev.right
     margin-left: 7
     anchors.verticalCenter: prev.verticalCenter
-    text: Creatures: 
+    text: Creatures:
     font: verdana-11px-rounded
 
   SpinBox
@@ -306,7 +306,7 @@ AttackBotPanel < Panel
     anchors.left: prev.right
     margin-left: 7
     anchors.verticalCenter: prev.verticalCenter
-    text: HP: 
+    text: HP:
     font: verdana-11px-rounded
 
   SpinBox
@@ -325,7 +325,7 @@ AttackBotPanel < Panel
     anchors.left: prev.right
     margin-left: 4
     anchors.verticalCenter: prev.verticalCenter
-    text: - 
+    text: -
     font: verdana-11px-rounded
 
   SpinBox
@@ -344,7 +344,7 @@ AttackBotPanel < Panel
     anchors.left: prev.right
     margin-left: 7
     anchors.verticalCenter: prev.verticalCenter
-    text: CD: 
+    text: CD:
     font: verdana-11px-rounded
 
   SpinBox
@@ -380,7 +380,7 @@ AttackBotPanel < Panel
     text: Move Down
     text-align: center
     font: cipsoftFont
-  
+
   Button
     id: addEntry
     anchors.right: parent.right
@@ -449,7 +449,7 @@ SettingsPanel < Panel
     text-align: center
     text: Reset Settings
 
-  CheckBox 
+  CheckBox
     id: IgnoreMana
     anchors.top: parent.top
     anchors.left: parent.left
@@ -477,7 +477,7 @@ SettingsPanel < Panel
     width: 30
     minimum: 1
     maximum: 10
-    focusable: true 
+    focusable: true
     margin-left: 5
 
   CheckBox
@@ -546,7 +546,7 @@ SettingsPanel < Panel
     width: 50
     minimum: 1
     maximum: 10
-    focusable: true 
+    focusable: true
     margin-left: 5
 
 AttackBotWindow < MainWindow
@@ -565,7 +565,7 @@ AttackBotWindow < MainWindow
     !text: tr('More important methods come first (Example: Exori gran above Exori)')
     text-align: left
     font: verdana-11px-rounded
-    color: #aeaeae  
+    color: #aeaeae
 
   SettingsPanel
     id: settingsPanel
@@ -589,7 +589,7 @@ AttackBotWindow < MainWindow
     margin-top: 10
     anchors.left: parent.left
     margin-left: 2
-    visible: false    
+    visible: false
 
   Label
     id: shooterLabel
@@ -599,11 +599,11 @@ AttackBotWindow < MainWindow
     text: Spell Shooter
     color: #fe4400
     font: verdana-11px-rounded
-    visible: false    
+    visible: false
 
   HorizontalSeparator
     anchors.left: parent.left
-    anchors.right: parent.right 
+    anchors.right: parent.right
     anchors.bottom: closeButton.top
     margin-bottom: 10
 

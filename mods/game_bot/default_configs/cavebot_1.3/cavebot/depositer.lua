@@ -11,7 +11,7 @@ end
 -- called when cavebot config changes, configData is a table but it can be nil
 CaveBot.Extensions.Depositer.onConfigChange = function(configName, isEnabled, configData)
   if not configData then return end
-  
+
 end
 
 -- called when cavebot is saving config, should return table or nil

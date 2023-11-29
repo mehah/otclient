@@ -20,7 +20,7 @@ Panel
     margin-left: 3
     height: 17
     text: Setup
-      
+
   ]])
   ui:setId(panelName)
 
@@ -63,20 +63,17 @@ Panel
     widget:setOn(config.enabled)
     vBotConfigSave("heal")
   end
-  
+
   ui.conditionList.onClick = function(widget)
     conditionsWindow:show()
     conditionsWindow:raise()
     conditionsWindow:focus()
   end
 
-
-
   local rootWidget = g_ui.getRootWidget()
   if rootWidget then
     conditionsWindow = UI.createWindow('ConditionsWindow', rootWidget)
     conditionsWindow:hide()
-    
 
     conditionsWindow.onVisibilityChange = function(widget, visible)
       if not visible then
@@ -123,22 +120,22 @@ Panel
     conditionsWindow.Hold.HasteSpell:setText(config.hasteSpell)
     conditionsWindow.Hold.HasteSpell.onTextChange = function(widget, text)
       config.hasteSpell = text
-    end 
-    
+    end
+
     conditionsWindow.Hold.HasteCost:setText(config.hasteCost)
     conditionsWindow.Hold.HasteCost.onTextChange = function(widget, text)
       config.hasteCost = tonumber(text)
     end
-    
+
     conditionsWindow.Hold.UtamoCost:setText(config.utamoCost)
     conditionsWindow.Hold.UtamoCost.onTextChange = function(widget, text)
       config.utamoCost = tonumber(text)
-    end   
-    
+    end
+
     conditionsWindow.Hold.UtanaCost:setText(config.utanaCost)
     conditionsWindow.Hold.UtanaCost.onTextChange = function(widget, text)
       config.utanaCost = tonumber(text)
-    end 
+    end
 
     conditionsWindow.Hold.UturaCost:setText(config.uturaCost)
     conditionsWindow.Hold.UturaCost.onTextChange = function(widget, text)
@@ -157,7 +154,7 @@ Panel
       config.curePoison = not config.curePoison
       widget:setChecked(config.curePoison)
     end
-    
+
     conditionsWindow.Cure.CureCurse:setChecked(config.cureCurse)
     conditionsWindow.Cure.CureCurse.onClick = function(widget)
       config.cureCurse = not config.cureCurse
@@ -241,11 +238,11 @@ Panel
   macro(500, function()
     if not config.enabled or modules.game_cooldown.isGroupCooldownIconActive(2) then return end
     if hppercent() > 95 then
-      if config.curePoison and mana() >= config.poisonCost and isPoisioned() then say("exana pox") 
-      elseif config.cureCurse and mana() >= config.curseCost and isCursed() then say("exana mort") 
+      if config.curePoison and mana() >= config.poisonCost and isPoisioned() then say("exana pox")
+      elseif config.cureCurse and mana() >= config.curseCost and isCursed() then say("exana mort")
       elseif config.cureBleed and mana() >= config.bleedCost and isBleeding() then say("exana kor")
-      elseif config.cureBurn and mana() >= config.burnCost and isBurning() then say("exana flam") 
-      elseif config.cureElectrify and mana() >= config.electrifyCost and isEnergized() then say("exana vis") 
+      elseif config.cureBurn and mana() >= config.burnCost and isBurning() then say("exana flam")
+      elseif config.cureElectrify and mana() >= config.electrifyCost and isEnergized() then say("exana vis")
       end
     end
     if (not config.ignoreInPz or not isInPz()) and config.holdUtura and mana() >= config.uturaCost and canCast(config.uturaType) and hppercent() < 90 then say(config.uturaType)

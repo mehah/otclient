@@ -15,26 +15,26 @@ SmallBotSwitch < Button
   image-color: green
   $!on:
     image-color: red
-    
+
 BotLabel < Label
   margin-top: 2
   height: 15
   text-auto-resize: true
   text-align: center
   text-wrap: true
-    
+
 BotItem < Item
   virtual: true
   &selectable: true
   &editable: true
 
-BotTextEdit < TextEdit  
+BotTextEdit < TextEdit
   @onClick: modules.client_textedit.show(self)
   text-align: center
   multiline: false
   focusable: false
   height: 20
-  
+
 BotSeparator < HorizontalSeparator
   margin-top: 5
   margin-bottom: 3
@@ -60,7 +60,7 @@ BotPanel < Panel
     anchors.top: parent.top
     anchors.bottom: parent.bottom
     anchors.right: parent.right
-    
+
 CaveBotLabel < Label
   background-color: alpha
   text-offset: 2 0
@@ -68,7 +68,7 @@ CaveBotLabel < Label
 
   $focus:
     background-color: #00000055
-    
+
 SlotComboBoxPopupMenu < ComboBoxPopupMenu
 SlotComboBoxPopupMenuButton < ComboBoxPopupMenuButton
 SlotComboBox < ComboBox
@@ -84,5 +84,3 @@ SlotComboBox < ComboBox
     self:addOption("Finger")
     self:addOption("Ammo")
     self:addOption("Purse")
-
-

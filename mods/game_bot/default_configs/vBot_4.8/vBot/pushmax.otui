@@ -36,7 +36,7 @@ PushMaxWindow < MainWindow
     anchors.left: parent.left
     text-align: center
     text: VS AntiPush
-    margin-top: 5        
+    margin-top: 5
 
   BotItem
     id: runeId
@@ -72,7 +72,7 @@ PushMaxWindow < MainWindow
     anchors.right: parent.right
     anchors.left: parent.left
     anchors.bottom: closeButton.top
-    margin-bottom: 8    
+    margin-bottom: 8
 
   Button
     id: closeButton
@@ -82,4 +82,4 @@ PushMaxWindow < MainWindow
     anchors.bottom: parent.bottom
     size: 45 21
     margin-top: 15
-    margin-right: 5    
+    margin-right: 5

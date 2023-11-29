@@ -7,7 +7,7 @@ BotServerData < Panel
   Label
     id: label
     anchors.top: parent.top
-    anchors.left: parent.left 
+    anchors.left: parent.left
     anchors.right: parent.right
     text-align: center
     !text: tr("BotServer Data")
@@ -47,7 +47,7 @@ BotServerData < Panel
     margin-left: 6
     margin-bottom: 4
     text-align: center
-    text: Status: 
+    text: Status:
 
   Label
     id: ServerStatus
@@ -56,7 +56,7 @@ BotServerData < Panel
     margin-left: 10
     width: 150
     margin-bottom: 4
-    text-align: left  
+    text-align: left
 
   Label
     id: Participants
@@ -73,7 +73,7 @@ BotServerData < Panel
     anchors.bottom: parent.bottom
     size: 80 21
     text-align: center
-    text: Members:   
+    text: Members:
 
 FeaturePanel < Panel
   size: 340 150
@@ -87,7 +87,7 @@ FeaturePanel < Panel
     anchors.horizontalCenter: parent.horizontalCenter
     text-align: center
     text: Features
-  
+
   HorizontalSeparator
     id: sep
     anchors.top: prev.bottom
@@ -135,7 +135,6 @@ FeaturePanel < Panel
     margin-left: 5
     text: Broadcasts
 
-
   TextEdit
     id: broadcastText
     anchors.bottom: parent.bottom
@@ -176,7 +175,7 @@ BotServerWindow < MainWindow
     anchors.right: parent.right
     anchors.left: parent.left
     anchors.bottom: closeButton.top
-    margin-bottom: 8    
+    margin-bottom: 8
 
   Button
     id: closeButton
@@ -194,7 +193,7 @@ BotServerWindow < MainWindow
     anchors.left: parent.left
     margin-left: 5
     height: 21
-    
+
     $!on:
       text: BotServer: OFF
 

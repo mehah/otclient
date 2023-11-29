@@ -6,21 +6,21 @@ CaveBot.Extensions.BuySupplies.setup = function()
 
     local val = string.split(value, ",")
     local waitVal
-    if #val == 0 or #val > 2 then 
+    if #val == 0 or #val > 2 then
       warn("CaveBot[BuySupplies]: incorrect BuySupplies value")
-      return false 
+      return false
     elseif #val == 2 then
       waitVal = tonumber(val[2]:trim())
     end
 
     local npcName = val[1]:trim()
     local npc = getCreatureByName(npcName)
-    if not npc then 
+    if not npc then
       print("CaveBot[BuySupplies]: NPC not found")
-      return false 
+      return false
     end
-    
-    if not waitVal and #val == 2 then 
+
+    if not waitVal and #val == 2 then
       warn("CaveBot[BuySupplies]: incorrect delay values!")
     elseif waitVal and #val == 2 then
       delay(waitVal)

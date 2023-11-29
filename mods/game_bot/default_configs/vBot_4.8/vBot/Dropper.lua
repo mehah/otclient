@@ -25,7 +25,7 @@ Panel
 local edit = setupUI([[
 Panel
   height: 150
-    
+
   Label
     anchors.top: parent.top
     anchors.left: parent.left
@@ -69,7 +69,7 @@ Panel
     anchors.top: prev.bottom
     anchors.left: parent.left
     anchors.right: parent.right
-    height: 32   
+    height: 32
 ]])
 edit:hide()
 
@@ -102,22 +102,22 @@ end
 
 UI.Container(function()
     config.trashItems = edit.TrashItems:getItems()
-    end, true, nil, edit.TrashItems) 
+    end, true, nil, edit.TrashItems)
 edit.TrashItems:setItems(config.trashItems)
 
 UI.Container(function()
     config.useItems = edit.UseItems:getItems()
-    end, true, nil, edit.UseItems) 
+    end, true, nil, edit.UseItems)
 edit.UseItems:setItems(config.useItems)
 
 UI.Container(function()
     config.capItems = edit.CapItems:getItems()
-    end, true, nil, edit.CapItems) 
+    end, true, nil, edit.CapItems)
 edit.CapItems:setItems(config.capItems)
 
 local function properTable(t)
     local r = {}
-  
+
     for _, entry in pairs(t) do
       table.insert(r, entry.id)
     end

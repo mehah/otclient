@@ -21,20 +21,20 @@ local configManagerUrl = "http://otclient.ovh/configs.php"
 
 function init()
   dofile("executor")
-  
+
   g_ui.importStyle("ui/basic.otui")
   g_ui.importStyle("ui/panels.otui")
   g_ui.importStyle("ui/config.otui")
   g_ui.importStyle("ui/icons.otui")
   g_ui.importStyle("ui/container.otui")
-  
-  connect(g_game, { 
-    onGameStart = online, 
-    onGameEnd = offline, 
+
+  connect(g_game, {
+    onGameStart = online,
+    onGameEnd = offline,
   })
-  
-  initCallbacks()  
-  
+
+  initCallbacks()
+
   botButton = modules.client_topmenu.addRightGameToggleButton('botButton', tr('Bot'), '/images/topbuttons/bot', toggle, false, 99999)
   botButton:setOn(false)
   botButton:hide()
@@ -46,13 +46,13 @@ function init()
   configList = contentsPanel.config
   enableButton = contentsPanel.enableButton
   statusLabel = contentsPanel.statusLabel
-  botMessages = contentsPanel.messages 
+  botMessages = contentsPanel.messages
   botTabs = contentsPanel.botTabs
-  botTabs:setContentWidget(contentsPanel.botPanel)  
-  
+  botTabs:setContentWidget(contentsPanel.botPanel)
+
   editWindow = g_ui.displayUI('edit')
   editWindow:hide()
-    
+
   if g_game.isOnline() then
     clear()
     online()
@@ -63,16 +63,16 @@ function terminate()
   save()
   clear()
 
-  disconnect(g_game, { 
-    onGameStart = online, 
-    onGameEnd = offline, 
+  disconnect(g_game, {
+    onGameStart = online,
+    onGameEnd = offline,
   })
-  
+
   terminateCallbacks()
   editWindow:destroy()
 
   botWindow:destroy()
-  botButton:destroy()   
+  botButton:destroy()
 end
 
 function clear()
@@ -82,12 +82,12 @@ function clear()
   -- optimization, callback is not used when not needed
   g_game.enableTileThingLuaCallback(false)
 
-  botTabs:clearTabs()  
+  botTabs:clearTabs()
   botTabs:setOn(false)
-  
+
   botMessages:destroyChildren()
   botMessages:updateLayout()
-  
+
   for i, socket in pairs(botWebSockets) do
     g_http.cancel(socket)
     botWebSockets[i] = nil
@@ -110,23 +110,22 @@ function clear()
       end
     end
   end
-  
+
   local gameMapPanel = modules.game_interface.getMapPanel()
   if gameMapPanel then
-    gameMapPanel:unlockVisibleFloor()   
+    gameMapPanel:unlockVisibleFloor()
   end
-  
+
   if g_sounds then
     g_sounds.getChannel(SoundChannels.Bot):stop()
-  end  
+  end
 end
-
 
 function refresh()
   if not g_game.isOnline() then return end
   save()
   clear()
-  
+
   -- create bot dir
   if not g_resources.directoryExists("/bot") then
     g_resources.makeDir("/bot")
@@ -134,16 +133,16 @@ function refresh()
       return onError("Can't create bot directory in " .. g_resources.getWriteDir())
     end
   end
-  
+
   -- get list of configs
   createDefaultConfigs()
-  local configs = g_resources.listDirectoryFiles("/bot", false, false)  
-  
+  local configs = g_resources.listDirectoryFiles("/bot", false, false)
+
   -- clean
   configList.onOptionChange = nil
   enableButton.onClick = nil
-  configList:clearOptions()  
-     
+  configList:clearOptions()
+
   -- select active config based on settings
   local settings = g_settings.getNode('bot') or {}
   local index = g_game.getCharacterName() .. "_" .. g_game.getClientVersion()
@@ -152,10 +151,10 @@ function refresh()
       enabled=false,
       config=""
     }
-  end  
-  
+  end
+
   -- init list and buttons
-  for i=1,#configs do 
+  for i=1,#configs do
     configList:addOption(configs[i])
   end
   configList:setCurrentOption(settings[index].config)
@@ -163,34 +162,34 @@ function refresh()
     settings[index].config = configList:getCurrentOption().text
     settings[index].enabled = false
   end
-  
+
   enableButton:setOn(settings[index].enabled)
-  
+
   configList.onOptionChange = function(widget)
     settings[index].config = widget:getCurrentOption().text
     g_settings.setNode('bot', settings)
     g_settings.save()
     refresh()
   end
-  
+
   enableButton.onClick = function(widget)
     settings[index].enabled = not settings[index].enabled
     g_settings.setNode('bot', settings)
     g_settings.save()
-    refresh()    
+    refresh()
   end
-  
+
   if not g_game.isOnline() or not settings[index].enabled then
     statusLabel:setOn(true)
     statusLabel:setText("Status: disabled\nPress off button to enable")
     return
   end
-  
+
   local configName = settings[index].config
 
   -- storage
   botStorage = {}
-  
+
   local path = "/bot/" .. configName .. "/storage/"
   if not g_resources.directoryExists(path) then
     g_resources.makeDir(path)
@@ -198,8 +197,8 @@ function refresh()
 
   botStorageFile = path.."profile_" .. g_settings.getNumber('profile') .. ".json"
   if g_resources.fileExists(botStorageFile) then
-    local status, result = pcall(function() 
-      return json.decode(g_resources.readFileContents(botStorageFile)) 
+    local status, result = pcall(function()
+      return json.decode(g_resources.readFileContents(botStorageFile))
     end)
     if not status then
       return onError("Error while reading storage (" .. botStorageFile .. "). To fix this problem you can delete storage.json. Details: " .. result)
@@ -208,13 +207,13 @@ function refresh()
   end
 
   -- run script
-  local status, result = pcall(function() 
+  local status, result = pcall(function()
     return executeBot(configName, botStorage, botTabs, message, save, refresh, botWebSockets) end
   )
   if not status then
     return onError(result)
   end
-  
+
   statusLabel:setOn(false)
   botExecutor = result
   check()
@@ -224,24 +223,24 @@ function save()
   if not botExecutor then
     return
   end
-  
+
   local settings = g_settings.getNode('bot') or {}
   local index = g_game.getCharacterName() .. "_" .. g_game.getClientVersion()
   if settings[index] == nil then
     return
   end
-  
-  local status, result = pcall(function() 
-    return json.encode(botStorage, 2) 
+
+  local status, result = pcall(function()
+    return json.encode(botStorage, 2)
   end)
   if not status then
     return onError("Error while saving bot storage. Storage won't be saved. Details: " .. result)
   end
-  
+
   if result:len() > 100 * 1024 * 1024 then
     return onError("Storage file is too big, above 100MB, it won't be saved")
   end
-  
+
   g_resources.writeFileContents(botStorageFile, result)
 end
 
@@ -280,13 +279,13 @@ function onError(message)
 end
 
 function edit()
-  local configs = g_resources.listDirectoryFiles("/bot", false, false)  
-  editWindow.manager.upload.config:clearOptions()  
-  for i=1,#configs do 
+  local configs = g_resources.listDirectoryFiles("/bot", false, false)
+  editWindow.manager.upload.config:clearOptions()
+  for i=1,#configs do
     editWindow.manager.upload.config:addOption(configs[i])
   end
   editWindow.manager.download.config:setText("")
-  
+
   editWindow:show()
   editWindow:focus()
   editWindow:raise()
@@ -317,7 +316,7 @@ function createDefaultConfigs()
             local contents = g_resources.fileExists(file) and g_resources.readFileContents(file) or ""
             if contents:len() > 0 then
               g_resources.writeFileContents("/bot/" .. config_name .. "/" .. baseName .. "/" .. baseName2, contents)
-            end  
+            end
           end
         else
           local contents = g_resources.fileExists(file) and g_resources.readFileContents(file) or ""
@@ -339,24 +338,24 @@ function uploadConfig()
   if archive:len() > 1024 * 1024 then
       return displayErrorBox(tr("Config upload failed"), tr("Config %s is too big, maximum size is 1024KB. Now it has %s KB.", config, math.floor(archive:len() / 1024)))
   end
-  
+
   local infoBox = displayInfoBox(tr("Uploading config"), tr("Uploading config %s. Please wait.", config))
-  
+
   HTTP.postJSON(configManagerUrl .. "?config=" .. config:gsub("%s+", "_"), archive, function(data, err)
     if infoBox then
       infoBox:destroy()
     end
-    if err or data["error"] then      
+    if err or data["error"] then
       return displayErrorBox(tr("Config upload failed"), tr("Error while upload config %s:\n%s", config, err or data["error"]))
     end
     displayInfoBox(tr("Succesful config upload"), tr("Config %s has been uploaded.\n%s", config, data["message"]))
-  end)  
+  end)
 end
 
 function downloadConfig()
   local hash = editWindow.manager.download.config:getText()
   if hash:len() == 0 then
-      return displayErrorBox(tr("Config download error"), tr("Enter correct config hash"))  
+      return displayErrorBox(tr("Config download error"), tr("Enter correct config hash"))
   end
   local infoBox = displayInfoBox(tr("Downloading config"), tr("Downloading config with hash %s. Please wait.", hash))
   HTTP.download(configManagerUrl .. "?hash=" .. hash, hash .. ".zip", function(path, checksum, err)
@@ -364,7 +363,7 @@ function downloadConfig()
       infoBox:destroy()
     end
     if err then
-      return displayErrorBox(tr("Config download error"), tr("Config with hash %s cannot be downloaded", hash))      
+      return displayErrorBox(tr("Config download error"), tr("Config with hash %s cannot be downloaded", hash))
     end
     modules.client_textedit.show("", {
       title="Enter name for downloaded config",
@@ -408,7 +407,7 @@ function decompressConfig(configName, archive)
   if not g_resources.directoryExists("/bot/" .. configName) then
     return onError("Can't create /bot/" .. configName .. " directory in " .. g_resources.getWriteDir())
   end
-  
+
   for file, contents in pairs(files) do
     local split = file:split("/")
     split[#split] = nil -- remove file name
@@ -435,15 +434,15 @@ function message(category, msg)
     widget:setColor("red")
     g_logger.error("[BOT] " .. msg)
   elseif category == 'warn' then
-    widget:setText(msg)        
+    widget:setText(msg)
     widget:setColor("yellow")
     g_logger.warning("[BOT] " .. msg)
   elseif category == 'info' then
-    widget:setText(msg)        
+    widget:setText(msg)
     widget:setColor("white")
     g_logger.info("[BOT] " .. msg)
   end
-  
+
   if botMessages:getChildCount() > 5 then
     botMessages:getFirstChild():destroy()
   end
@@ -456,15 +455,15 @@ function check()
   end
 
   checkEvent = scheduleEvent(check, 10)
-  
-  local status, result = pcall(function() 
-    return botExecutor.script() 
+
+  local status, result = pcall(function()
+    return botExecutor.script()
   end)
-  if not status then  
+  if not status then
     botExecutor = nil -- critical
     return onError(result)
-  end 
-  
+  end
+
   -- remove old messages
   local widget = botMessages:getFirstChild()
   if widget and widget.added + 5000 < g_clock.millis() then
@@ -477,10 +476,10 @@ function initCallbacks()
   connect(rootWidget, {
     onKeyDown = botKeyDown,
     onKeyUp = botKeyUp,
-    onKeyPress = botKeyPress 
+    onKeyPress = botKeyPress
   })
 
-  connect(g_game, { 
+  connect(g_game, {
     onTalk = botOnTalk,
     onTextMessage = botOnTextMessage,
     onLoginAdvice = botOnLoginAdvice,
@@ -499,10 +498,10 @@ function initCallbacks()
     onSpellCooldown = botSpellCooldown,
     onSpellGroupCooldown = botGroupSpellCooldown
   })
-  
+
   connect(Tile, {
     onAddThing = botAddThing,
-    onRemoveThing = botRemoveThing 
+    onRemoveThing = botRemoveThing
   })
 
   connect(Creature, {
@@ -513,7 +512,7 @@ function initCallbacks()
     onTurn = botCreatureTurn,
     onWalk = botCreatureWalk,
   })
-  
+
   connect(LocalPlayer, {
     onPositionChange = botCreaturePositionChange,
     onHealthPercentChange = botCraetureHealthPercentChange,
@@ -523,7 +522,7 @@ function initCallbacks()
     onStatesChange = botStatesChange,
     onInventoryChange = botInventoryChange
   })
-  
+
   connect(Container, {
     onOpen = botContainerOpen,
     onClose = botContainerClose,
@@ -531,8 +530,8 @@ function initCallbacks()
     onAddItem = botContainerAddItem,
     onRemoveItem = botContainerRemoveItem,
   })
-  
-  connect(g_map, { 
+
+  connect(g_map, {
     onMissle = botOnMissle,
     onAnimatedText = botOnAnimatedText,
     onStaticText = botOnStaticText
@@ -543,10 +542,10 @@ function terminateCallbacks()
   disconnect(rootWidget, {
     onKeyDown = botKeyDown,
     onKeyUp = botKeyUp,
-    onKeyPress = botKeyPress 
+    onKeyPress = botKeyPress
   })
-                        
-  disconnect(g_game, { 
+
+  disconnect(g_game, {
     onTalk = botOnTalk,
     onTextMessage = botOnTextMessage,
     onLoginAdvice = botOnLoginAdvice,
@@ -563,10 +562,10 @@ function terminateCallbacks()
     onSpellCooldown = botSpellCooldown,
     onSpellGroupCooldown = botGroupSpellCooldown
   })
-  
+
   disconnect(Tile, {
     onAddThing = botAddThing,
-    onRemoveThing = botRemoveThing 
+    onRemoveThing = botRemoveThing
   })
 
   disconnect(Creature, {
@@ -576,8 +575,8 @@ function terminateCallbacks()
     onHealthPercentChange = botCraetureHealthPercentChange,
     onTurn = botCreatureTurn,
     onWalk = botCreatureWalk,
-  })  
-  
+  })
+
   disconnect(LocalPlayer, {
     onPositionChange = botCreaturePositionChange,
     onHealthPercentChange = botCraetureHealthPercentChange,
@@ -587,16 +586,16 @@ function terminateCallbacks()
     onStatesChange = botStatesChange,
     onInventoryChange = botInventoryChange
   })
-  
+
   disconnect(Container, {
     onOpen = botContainerOpen,
     onClose = botContainerClose,
     onUpdateItem = botContainerUpdateItem,
-    onAddItem = botContainerAddItem, 
+    onAddItem = botContainerAddItem,
     onRemoveItem = botContainerRemoveItem
   })
-  
-  disconnect(g_map, { 
+
+  disconnect(g_map, {
     onMissle = botOnMissle,
     onAnimatedText = botOnAnimatedText,
     onStaticText = botOnStaticText
@@ -605,7 +604,7 @@ end
 
 function safeBotCall(func)
   local status, result = pcall(func)
-  if not status then    
+  if not status then
     onError(result)
   end
 end
