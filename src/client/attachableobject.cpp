@@ -260,7 +260,7 @@ void AttachableObject::updateAttachedWidgets(const Point& dest, const MapPosInfo
         Point p = dest - mapRect.drawOffset;
         p.x *= mapRect.horizontalStretchFactor;
         p.y *= mapRect.verticalStretchFactor;
-        //p += mapRect.rect.topLeft();
+        p += mapRect.rect.topLeft();
 
         p.x += widget->getMarginLeft();
         p.x -= widget->getMarginRight();
