@@ -98,6 +98,13 @@ void Application::deinit()
 {
     g_lua.callGlobalField("g_app", "onTerminate");
 
+    g_asyncDispatcher.terminate();
+
+    // disable dispatcher events
+    g_dispatcher.shutdown();
+    g_textDispatcher.shutdown();
+    g_mainDispatcher.shutdown();
+
     // run modules unload events
     g_modules.unloadModules();
     g_modules.clear();
@@ -108,13 +115,6 @@ void Application::deinit()
     // poll remaining events
     poll();
     Application::poll();
-
-    g_asyncDispatcher.terminate();
-
-    // disable dispatcher events
-    g_dispatcher.shutdown();
-    g_textDispatcher.shutdown();
-    g_mainDispatcher.shutdown();
 }
 
 void Application::terminate()
