@@ -57,8 +57,7 @@ void DrawPoolManager::draw()
         g_painter->setResolution(m_size, m_transformMatrix);
     }
 
-    auto map = get(DrawPoolType::MAP);
-    {
+    auto map = get(DrawPoolType::MAP); {
         std::scoped_lock l(map->getMutex());
         if (drawPool(map)) {
             drawPool(DrawPoolType::CREATURE_INFORMATION);
