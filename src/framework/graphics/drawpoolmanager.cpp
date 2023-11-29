@@ -21,6 +21,7 @@
  */
 
 #include "drawpoolmanager.h"
+#include "drawpool.h"
 #include "declarations.h"
 
 thread_local static uint8_t CURRENT_POOL;
@@ -172,6 +173,7 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     // when the selected pool is MAP, reset the creature information state.
     if (type == DrawPoolType::MAP) {
         get(DrawPoolType::CREATURE_INFORMATION)->resetState();
+        get(DrawPoolType::FOREGROUND_MAP_WIDGETS)->resetState();
     }
 
     if (f) f();
@@ -186,6 +188,7 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
 
     if (type == DrawPoolType::MAP) {
         get(DrawPoolType::CREATURE_INFORMATION)->release();
+        get(DrawPoolType::FOREGROUND_MAP_WIDGETS)->release();
     }
 }
 

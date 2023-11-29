@@ -184,7 +184,6 @@ void AttachableObject::attachWidget(const UIWidgetPtr& widget) {
         return;
     }
 
-    widget->setParent(mapWidget);
     widget->setDraggable(false);
     widget->setAttached(true);
     m_attachedWidgets.emplace_back(widget);
@@ -271,6 +270,7 @@ void AttachableObject::updateAttachedWidgets(const Point& dest, const MapPosInfo
         const auto& rect = Rect(p, widgetRect.width(), widgetRect.height());
 
         widget->setRect(rect);
+        widget->draw(mapRect.rect, DrawPoolType::FOREGROUND_MAP_WIDGETS);
     }
 
     for (const auto& widget : toRemove)

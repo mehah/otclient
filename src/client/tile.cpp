@@ -130,9 +130,14 @@ void Tile::drawTop(const Point& dest, int flags, bool forceDraw, LightView* ligh
     }
 }
 
-void Tile::updateWidgets(const MapPosInfo& rect)
+void Tile::updateWidgets(const MapPosInfo& mapRect)
 {
-    updateAttachedWidgets(m_lastDrawDest, rect);
+    g_drawPool.select(DrawPoolType::FOREGROUND_MAP_WIDGETS);
+    {
+        updateAttachedWidgets(m_lastDrawDest, mapRect);
+    }
+    // Go back to use map pool
+    g_drawPool.select(DrawPoolType::MAP);
 }
 
 void Tile::clean()

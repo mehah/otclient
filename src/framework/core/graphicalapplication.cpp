@@ -276,6 +276,7 @@ void GraphicalApplication::resize(const Size& size)
         if (USE_FRAMEBUFFER) {
             g_drawPool.get(DrawPoolType::CREATURE_INFORMATION)->setFramebuffer(size);
             g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->setFramebuffer(size);
+            g_drawPool.get(DrawPoolType::FOREGROUND_MAP_WIDGETS)->setFramebuffer(size);
         }
     });
 }
