@@ -41,7 +41,6 @@ end
 
 local function onCharacterList(protocol, characters, account, otui)
     -- Try add server to the server list
-    print("Add Server 1")
     ServerList.add(G.host, G.port, g_game.getClientVersion())
 
     -- Save 'Stay logged in' setting
