@@ -247,6 +247,7 @@ void DrawPool::resetState()
         objs.clear();
     m_objectsFlushed.clear();
     m_coords.clear();
+    m_parameters.clear();
 
     m_state = {};
     m_status.second = 0;

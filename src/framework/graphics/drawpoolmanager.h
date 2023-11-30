@@ -89,6 +89,14 @@ public:
     inline bool isScaled() const { return getCurrentPool()->isScaled(); }
     inline uint16_t getScaledSpriteSize() const { return m_spriteSize * getScaleFactor(); }
 
+    template<typename T>
+    void setParameter(std::string_view name, T&& value) { getCurrentPool()->setParameter(name, value); }
+    void removeParameter(std::string_view name) { getCurrentPool()->removeParameter(name); }
+
+    template<typename T>
+    T getParameter(std::string_view name) { return getCurrentPool()->getParameter<T>(name); }
+    bool containsParameter(std::string_view name) { return getCurrentPool()->containsParameter(name); }
+
     void flush() const { if (getCurrentPool()) getCurrentPool()->flush(); }
 
     DrawPoolType getCurrentType() const { return getCurrentPool()->m_type; }

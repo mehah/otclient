@@ -217,6 +217,28 @@ private:
     void rotate(float x, float y, float angle);
     void rotate(const Point& p, float angle) { rotate(p.x, p.y, angle); }
 
+    template<typename T>
+    void setParameter(std::string_view name, T&& value) {
+        m_parameters.emplace(name, value);
+    }
+    template<typename T>
+    T getParameter(std::string_view name) {
+        auto it = m_parameters.find(name);
+        if (it != m_parameters.end()) {
+            return std::any_cast<T>(it->second);
+        }
+
+        return T();
+    }
+    bool containsParameter(std::string_view name) {
+        return m_parameters.contains(name);
+    }
+    void removeParameter(std::string_view name) {
+        const auto& it = m_parameters.find(name);
+        if (it != m_parameters.end())
+            m_parameters.erase(it);
+    }
+
     void flush()
     {
         m_coords.clear();
@@ -270,6 +292,7 @@ private:
     std::vector<DrawObject> m_objectsDraw;
 
     stdext::map<size_t, CoordsBuffer*> m_coords;
+    stdext::map<std::string_view, std::any> m_parameters;
 
     float m_scaleFactor{ 1.f };
     float m_scale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
