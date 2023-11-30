@@ -369,10 +369,13 @@ void DrawPool::addAction(const std::function<void()>& action)
     m_objects[order].emplace_back(action);
 }
 
-void DrawPool::bindFrameBuffer(const Size& size)
+void DrawPool::bindFrameBuffer(const Size& size, const Color& color)
 {
     ++m_bindedFramebuffers;
     ++m_lastFramebufferId;
+
+    if (color != Color::white)
+        m_state.color = color;
 
     m_oldState = std::move(m_state);
     m_state = {};

@@ -185,7 +185,7 @@ private:
              const CoordsBufferPtr& coordsBuffer = nullptr);
 
     void addAction(const std::function<void()>& action);
-    void bindFrameBuffer(const Size& size);
+    void bindFrameBuffer(const Size& size, const Color& color = Color::white);
     void releaseFrameBuffer(const Rect& dest);
 
     inline void setFPS(uint16_t fps) { m_refreshDelay = fps; }

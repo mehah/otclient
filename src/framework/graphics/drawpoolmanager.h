@@ -54,7 +54,7 @@ public:
     void addBoundingRect(const Rect& dest, const Color& color = Color::white, uint16_t innerLineWidth = 1) const;
     void addAction(const std::function<void()>& action) const { getCurrentPool()->addAction(action); }
 
-    void bindFrameBuffer(const Size& size) const { getCurrentPool()->bindFrameBuffer(size); }
+    void bindFrameBuffer(const Size& size, const Color& color = Color::white) const { getCurrentPool()->bindFrameBuffer(size, color); }
     void releaseFrameBuffer(const Rect& dest) const { getCurrentPool()->releaseFrameBuffer(dest); };
 
     void setOpacity(const float opacity, bool onlyOnce = false) const { getCurrentPool()->setOpacity(opacity, onlyOnce); }
