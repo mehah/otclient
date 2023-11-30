@@ -37,6 +37,7 @@ class Thing : public AttachableObject
 {
 public:
     virtual void draw(const Point& /*dest*/, bool drawThings = true, LightView* /*lightView*/ = nullptr) {}
+    void drawWidgets(const MapPosInfo& mapRect);
 
     LuaObjectPtr attachedObjectToLuaObject() override { return asLuaObject(); }
 
@@ -221,6 +222,8 @@ protected:
 
     Color m_markedColor{ Color::white };
     Color m_highlightColor{ Color::white };
+
+    Point m_lastDrawDest;
 
     // Shader
     PainterShaderProgramPtr m_shader;

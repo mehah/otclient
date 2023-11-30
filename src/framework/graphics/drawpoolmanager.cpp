@@ -21,6 +21,7 @@
  */
 
 #include "drawpoolmanager.h"
+#include "drawpool.h"
 #include "declarations.h"
 
 thread_local static uint8_t CURRENT_POOL;
@@ -57,16 +58,23 @@ void DrawPoolManager::draw()
         g_painter->setResolution(m_size, m_transformMatrix);
     }
 
-    for (auto pool : m_pools) {
-        if (pool->getType() == DrawPoolType::CREATURE_INFORMATION)
-            continue;
-
-        std::scoped_lock l(pool->m_mutexDraw);
-        drawPool(pool);
-
-        if (pool->getType() == DrawPoolType::MAP)
-            drawPool(get(DrawPoolType::CREATURE_INFORMATION));
+    auto map = get(DrawPoolType::MAP); {
+        std::scoped_lock l(map->getMutex());
+        if (drawPool(map)) {
+            drawPool(DrawPoolType::CREATURE_INFORMATION);
+            drawPool(DrawPoolType::LIGHT);
+        }
     }
+
+    drawPool(DrawPoolType::FOREGROUND_MAP);
+
+    {
+        auto mapWidget = get(DrawPoolType::FOREGROUND_MAP_WIDGETS);
+        std::scoped_lock l(map->getMutex(), mapWidget->getMutex());
+        drawPool(mapWidget);
+    }
+
+    drawPool(DrawPoolType::FOREGROUND);
 }
 
 void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)
@@ -165,6 +173,7 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     // when the selected pool is MAP, reset the creature information state.
     if (type == DrawPoolType::MAP) {
         get(DrawPoolType::CREATURE_INFORMATION)->resetState();
+        get(DrawPoolType::FOREGROUND_MAP_WIDGETS)->resetState();
     }
 
     if (f) f();
@@ -179,22 +188,29 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
 
     if (type == DrawPoolType::MAP) {
         get(DrawPoolType::CREATURE_INFORMATION)->release();
+        get(DrawPoolType::FOREGROUND_MAP_WIDGETS)->release();
     }
 }
 
-void DrawPoolManager::drawPool(DrawPool* pool) {
+bool DrawPoolManager::drawPool(const DrawPoolType type) {
+    auto pool = get(type);
+    std::scoped_lock l(pool->m_mutexDraw);
+    return drawPool(pool);
+}
+
+bool DrawPoolManager::drawPool(DrawPool* pool) {
     if (!pool->isEnabled())
-        return;
+        return false;
 
     if (!pool->hasFrameBuffer()) {
         for (const auto& obj : pool->m_objectsDraw) {
             drawObject(obj);
         }
-        return;
+        return true;
     }
 
     if (!pool->m_framebuffer->canDraw())
-        return;
+        return  false;
 
     if (pool->m_repaint) {
         pool->m_repaint.store(false);
@@ -210,4 +226,6 @@ void DrawPoolManager::drawPool(DrawPool* pool) {
     if (pool->m_beforeDraw) pool->m_beforeDraw();
     pool->m_framebuffer->draw();
     if (pool->m_afterDraw) pool->m_afterDraw();
+
+    return true;
 }

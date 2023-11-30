@@ -25,6 +25,15 @@
 #include <framework/graphics/particleeffect.h>
 
 #include <framework/core/eventdispatcher.h>
+#include <framework/ui/uiwidget.h>
+#include <framework/core/eventdispatcher.h>
+#include <framework/ui/uimanager.h>
+
+#include "game.h"
+#include "mapview.h"
+#include "tile.h"
+#include "uimap.h"
+#include "mapview.h"
 
 extern ParticleManager g_particles;
 
@@ -141,4 +150,133 @@ void AttachableObject::drawAttachedParticlesEffect(const Point& dest)
         effect->render();
 
     g_drawPool.popTransformMatrix();
+}
+
+void AttachableObject::updateAndAttachParticlesEffects(std::vector<std::string>& newElements) {
+    std::vector<std::string> toRemove;
+
+    for (const auto& effect : m_attachedParticles) {
+        auto findPos = std::find(newElements.begin(), newElements.end(), effect->getEffectType()->getName());
+        if (findPos == newElements.end())
+            toRemove.emplace_back(effect->getEffectType()->getName());
+        else
+            newElements.erase(findPos);
+    }
+
+    for (const auto& name : toRemove)
+        detachParticleEffectByName(name);
+
+    for (const auto& name : newElements)
+        attachParticleEffect(name);
+}
+
+void AttachableObject::attachWidget(const UIWidgetPtr& widget) {
+    if (!widget)
+        return;
+
+    const auto& mapWidget = g_ui.getMapWidget();
+    if (!mapWidget)
+        return;
+
+    if (widget->isAttached()) {
+        g_logger.error(stdext::format("Failed to attach widget %s, this widget is already attached to other object.", widget->getId()));
+        return;
+    }
+
+    widget->setDraggable(false);
+    widget->setAttached(true);
+    m_attachedWidgets.emplace_back(widget);
+    widget->callLuaField("onAttached", asLuaObject());
+}
+
+bool AttachableObject::detachWidgetById(const std::string& id) {
+    const auto it = std::find_if(m_attachedWidgets.begin(), m_attachedWidgets.end(),
+                                 [id](const UIWidgetPtr& obj) { return obj->getId() == id; });
+
+    if (it == m_attachedWidgets.end())
+        return false;
+
+    const auto widget = (*it);
+    m_attachedWidgets.erase(it);
+
+    widget->setAttached(false);
+    widget->setVisible(false);
+    widget->callLuaField("onDetached", asLuaObject());
+    return true;
+}
+
+bool AttachableObject::detachWidget(const UIWidgetPtr& widget) {
+    const auto it = std::remove(m_attachedWidgets.begin(), m_attachedWidgets.end(), widget);
+    if (it == m_attachedWidgets.end())
+        return false;
+
+    m_attachedWidgets.erase(it);
+
+    widget->setAttached(false);
+    widget->setVisible(false);
+    widget->callLuaField("onDetached", asLuaObject());
+    return true;
+}
+
+void AttachableObject::clearAttachedWidgets() {
+    // keep the same behavior as detachWidget
+    auto oldList = std::move(m_attachedWidgets);
+    m_attachedWidgets.clear();
+
+    for (const auto& widget : oldList) {
+        widget->setAttached(false);
+        widget->setVisible(false);
+        widget->callLuaField("onDetached", asLuaObject());
+    }
+}
+
+UIWidgetPtr AttachableObject::getAttachedWidgetById(const std::string& id) {
+    const auto it = std::find_if(m_attachedWidgets.begin(), m_attachedWidgets.end(),
+                                 [id](const UIWidgetPtr& obj) { return obj->getId() == id; });
+
+    if (it == m_attachedWidgets.end())
+        return nullptr;
+
+    return *it;
+}
+
+void AttachableObject::drawAttachedWidgets(const Point& dest, const MapPosInfo& mapRect)
+{
+    if (m_attachedWidgets.empty())
+        return;
+
+    g_drawPool.select(DrawPoolType::FOREGROUND_MAP_WIDGETS);
+    {
+        std::vector<UIWidgetPtr> toRemove;
+        for (const auto& widget : m_attachedWidgets) {
+            if (widget->isDestroyed()) {
+                toRemove.emplace_back(widget);
+                continue;
+            }
+
+            if (!widget->isVisible())
+                continue;
+
+            Point p = dest - mapRect.drawOffset;
+            p.x *= mapRect.horizontalStretchFactor;
+            p.y *= mapRect.verticalStretchFactor;
+            p += mapRect.rect.topLeft();
+
+            p.x += widget->getMarginLeft();
+            p.x -= widget->getMarginRight();
+            p.y += widget->getMarginTop();
+            p.y -= widget->getMarginBottom();
+
+            const auto& widgetRect = widget->getRect();
+            const auto& rect = Rect(p, widgetRect.width(), widgetRect.height());
+
+            widget->setRect(rect);
+            widget->draw(mapRect.rect, DrawPoolType::FOREGROUND);
+        }
+
+        for (const auto& widget : toRemove)
+            detachWidget(widget);
+    }
+    // Go back to use map pool
+    g_drawPool.select(DrawPoolType::MAP);
 }

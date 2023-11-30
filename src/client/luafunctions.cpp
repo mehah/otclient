@@ -415,6 +415,11 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<AttachableObject>("attachParticleEffect", &AttachableObject::attachParticleEffect);
     g_lua.bindClassMemberFunction<AttachableObject>("detachParticleEffectByName", &AttachableObject::detachParticleEffectByName);
     g_lua.bindClassMemberFunction<AttachableObject>("clearAttachedParticlesEffect", &AttachableObject::clearAttachedParticlesEffect);
+    g_lua.bindClassMemberFunction<AttachableObject>("getAttachedWidgets", &AttachableObject::getAttachedWidgets);
+    g_lua.bindClassMemberFunction<AttachableObject>("attachWidget", &AttachableObject::attachWidget);
+    g_lua.bindClassMemberFunction<AttachableObject>("detachWidget", &AttachableObject::detachWidget);
+    g_lua.bindClassMemberFunction<AttachableObject>("detachWidgetById", &AttachableObject::detachWidgetById);
+    g_lua.bindClassMemberFunction<AttachableObject>("getAttachedWidgetById", &AttachableObject::getAttachedWidgetById);
 
     g_lua.registerClass<Thing, AttachableObject>();
     g_lua.bindClassMemberFunction<Thing>("setId", &Thing::setId);
@@ -826,10 +831,6 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Tile>("select", &Tile::select);
     g_lua.bindClassMemberFunction<Tile>("unselect", &Tile::unselect);
     g_lua.bindClassMemberFunction<Tile>("isSelected", &Tile::isSelected);
-
-    g_lua.bindClassMemberFunction<Tile>("setWidget", &Tile::setWidget);
-    g_lua.bindClassMemberFunction<Tile>("getWidget", &Tile::getWidget);
-    g_lua.bindClassMemberFunction<Tile>("removeWidget", &Tile::removeWidget);
 
 #ifndef BOT_PROTECTION
     g_lua.bindClassMemberFunction<Tile>("setText", &Tile::setText);

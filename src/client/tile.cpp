@@ -82,7 +82,12 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool is
     drawTop(dest, flags, false, lightView);
     drawAttachedEffect(dest, lightView, false);
     drawAttachedParticlesEffect(dest);
-    updateWidget(dest, mapRect);
+
+    for (const auto& thing : m_things) {
+        thing->drawWidgets(mapRect);
+    }
+    
+    drawWidgets(mapRect);
 }
 
 void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, bool forceDraw, LightView* lightView)
@@ -125,64 +130,25 @@ void Tile::drawTop(const Point& dest, int flags, bool forceDraw, LightView* ligh
     }
 }
 
-void Tile::updateWidget(const Point& dest, const MapPosInfo& mapRect)
+void Tile::drawWidgets(const MapPosInfo& mapRect)
 {
-    if (!m_widget)
-        return;
-
-    Point p = dest - mapRect.drawOffset;
-    p.x *= mapRect.horizontalStretchFactor;
-    p.y *= mapRect.verticalStretchFactor;
-    p += mapRect.rect.topLeft();
-
-    p.x += m_widget->getMarginLeft();
-    p.x -= m_widget->getMarginRight();
-    p.y += m_widget->getMarginTop();
-    p.y -= m_widget->getMarginBottom();
-
-    const auto& widgetRect = m_widget->getRect();
-    const auto& rect = Rect(p - Point(widgetRect.width() / 2 - g_gameConfig.getSpriteSize(), widgetRect.height() / 2 - g_gameConfig.getSpriteSize()), widgetRect.width(), widgetRect.height());
-
-    m_widget->setRect(rect);
-}
-
-void Tile::drawWidget(const Point& dest, const Rect& rect)
-{
-    if (!m_widget)
-        return;
-
-    m_widget->draw(rect, DrawPoolType::FOREGROUND);
-}
-
-void Tile::setWidget(const UIWidgetPtr& widget) {
-    removeWidget();
-
-    m_widget = widget;
-    m_widget->setClipping(true);
-    g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
-        g_ui.getMapWidget()->getMapView()->addForegroundTile(tile);
-    }, g_game.getServerBeat());
-}
-
-void Tile::removeWidget()
-{
-    if (!m_widget)
-        return;
-
-    m_widget->destroy();
-    m_widget = nullptr;
+    drawAttachedWidgets(m_lastDrawDest, mapRect);
 }
 
 void Tile::clean()
 {
-    if (g_ui.getMapWidget() && (m_widget
+    if (g_ui.getMapWidget()
 #ifndef BOT_PROTECTION
-        || m_text || m_timerText
+        && (m_text || m_timerText)
 #endif
-        )) {
+        ) {
         g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
             g_ui.getMapWidget()->getMapView()->removeForegroundTile(tile);
         }, g_game.getServerBeat());
+    }
+
+    if (hasAttachedWidgets()) {
+        clearAttachedWidgets();
     }
 
     m_highlightThing = nullptr;

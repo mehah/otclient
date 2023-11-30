@@ -40,6 +40,7 @@ enum class DrawPoolType : uint8_t
     LIGHT,
     FOREGROUND_MAP,
     FOREGROUND,
+    FOREGROUND_MAP_WIDGETS,
     LAST
 };
 
