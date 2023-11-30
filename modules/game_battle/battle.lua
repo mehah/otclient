@@ -61,9 +61,7 @@ local function disconnecting(gameEvent)
     return true
 end
 
-local testWidget
 function init() -- Initiating the module (load)
-    testWidget = g_ui.loadUI('test')
     g_ui.importStyle('battlebutton')
     battleButton = modules.client_topmenu.addRightGameToggleButton('battleButton', tr('Battle') .. ' (Ctrl+B)',
         '/images/topbuttons/battle', toggle)
@@ -1081,21 +1079,4 @@ function terminate() -- Terminating the Module (unload)
         onGameStart = onGameStart
     })
     disconnecting()
-end
-
--- test code remove later
-function doTest()
-    -- modules.game_battle.doTest()
-    local player = g_game.getLocalPlayer()
-    if not player then
-        return
-    end
-
-    local tile = player:getTile()
-    if not tile then
-        return
-    end
-
-    tile:attachWidget(testWidget)
-    testWidget:show()
 end

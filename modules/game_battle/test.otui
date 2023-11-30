@@ -1,9 +1,0 @@
-UIWidget
-  id: testWidget
-  size: 150 50
-  visible: true
-  image-source: /images/ui/miniwindow
-  image-border: 15
-  margin-right: 15
-  margin-top: 10
-  padding: 10
