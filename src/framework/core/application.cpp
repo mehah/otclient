@@ -29,6 +29,7 @@
 #include <framework/luaengine/luainterface.h>
 #include <framework/platform/crashhandler.h>
 #include <framework/platform/platform.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include "asyncdispatcher.h"
 
 #include <gitinfo.h>
@@ -147,7 +148,10 @@ void Application::poll()
     Connection::poll();
 #endif
 
-    g_dispatcher.poll();
+    {
+        std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND)->getMutexPreDraw());
+        g_dispatcher.poll();
+    }
 
     // poll connection again to flush pending write
 #ifdef FRAMEWORK_NET
