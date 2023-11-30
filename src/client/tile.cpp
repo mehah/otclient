@@ -167,8 +167,8 @@ void Tile::clean()
 #endif
         ) {
         g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
-            if (g_client.getMapWidget())
-                g_client.getMapWidget()->getMapView()->removeForegroundTile(tile);
+            if (g_ui.getMapWidget())
+                g_ui.getMapWidget()->getMapView()->removeForegroundTile(tile);
         }, g_game.getServerBeat());
     }
 
