@@ -603,17 +603,16 @@ void ThingType::unserializeOtml(const OTMLNodePtr& node)
     }
 }
 
-void ThingType::drawWithFrameBuffer(const Point& dest, const TexturePtr& texture, Rect screenRect, const Rect& textureRect, const Color& color, const DrawConductor& conductor) {
+void ThingType::drawWithFrameBuffer(const TexturePtr& texture, const Rect& screenRect, const Rect& textureRect, const Color& color, const DrawConductor& conductor) {
     const int size = static_cast<int>(g_gameConfig.getSpriteSize() * std::max<int>(m_size.area(), 2) * g_drawPool.getScaleFactor());
-    const auto& p = Point(size / 2);
-    const auto& destDiff = Rect(dest - p, Size{ size });
+    const auto& p = (Point(size) - screenRect.size().toPoint()) / 2;
+    const auto& destDiff = Rect(screenRect.topLeft() - p, Size{ size });
 
     g_drawPool.bindFrameBuffer(destDiff.size()); {
         // Debug
-        // g_drawPool.addBoundingRect(Rect(Point(0), destDiff.size()), Color::red);
+         // g_drawPool.addBoundingRect(Rect(Point(0), destDiff.size()), Color::red);
 
-        screenRect = Rect(p - (dest - screenRect.topLeft()), screenRect.size());
-        g_drawPool.addTexturedRect(screenRect, texture, textureRect, color, conductor);
+        g_drawPool.addTexturedRect(Rect(p, screenRect.size()), texture, textureRect, color, conductor);
     } g_drawPool.releaseFrameBuffer(destDiff);
     g_drawPool.resetShaderProgram();
 }
@@ -645,7 +644,7 @@ void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, i
         const auto& newColor = m_opacity < 1.0f ? Color(color, m_opacity) : color;
 
         if (g_drawPool.shaderNeedFramebuffer())
-            drawWithFrameBuffer(dest, texture, screenRect, textureRect, newColor, conductor);
+            drawWithFrameBuffer(texture, screenRect, textureRect, newColor, conductor);
         else
             g_drawPool.addTexturedRect(screenRect, texture, textureRect, newColor, conductor);
     }
