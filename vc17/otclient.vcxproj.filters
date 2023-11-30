@@ -554,6 +554,8 @@
     </ClCompile>
     <ClCompile Include="..\src\framework\ui\uiqrcode.cpp">
       <Filter>Source Files\framework\ui</Filter>
+    <ClCompile Include="..\src\framework\net\httplogin.cpp">
+      <Filter>Source Files\framework\net</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1075,6 +1077,8 @@
     </ClInclude>
     <ClInclude Include="..\src\framework\ui\uiqrcode.h">
       <Filter>Header Files\framework\ui</Filter>
+    <ClInclude Include="..\src\framework\net\httplogin.h">
+      <Filter>Header Files\framework\net</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
