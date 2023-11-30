@@ -14,7 +14,7 @@
 
 - C++20
 - Refactored/Optimized Rendering System
-- Auto Reload Module ([init.lua](https://github.com/mehah/otclient/blob/main/init.lua#L85))
+- Auto Reload Module ([init.lua](https://github.com/mehah/otclient/blob/main/init.lua#L90))
 - Attached Effects System (to create aura, wings...) (code sample: [effects.lua](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/effects.lua), [outfit_618.lua](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/configs/outfit_618.lua), [code test](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/attachedeffects.lua#L1))
 - Idle Animation Support
 - Highlight Mouse Target (press shift to select any object)
@@ -62,6 +62,9 @@
 - QR Code support, with auto generate it from string  [@conde2]
   - qr-code-border: 2
   - qr-code: Hail OTClient Redemption - Conde2 Dev
+- Smooth Walk Elevation Feature by [@SkullzOTS](https://github.com/SkullzOTS)
+  - View Feature: [Gyazo](https://i.gyazo.com/af0ed0f15a9e4d67bd4d0b2847bd6be7.gif)
+  - To enable just go to [modules/game_features/features.lua](https://github.com/mehah/otclient/blob/main/modules/game_features/features.lua#L5), and uncomment line 5 (g_game.enableFeature(GameSmoothWalkElevation)).
   
 ##### Sponsored  (Features)
 - Shader with Framebuffer | ([@SkullzOTS](https://github.com/SkullzOTS), [@Mryukiimaru](https://github.com/Mryukiimaru), [@JeanTheOne](https://github.com/JeanTheOne), [@KizaruHere](https://github.com/KizaruHere))
