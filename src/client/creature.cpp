@@ -119,7 +119,6 @@ void Creature::draw(const Rect& destRect, uint8_t size)
             internalDraw(p, nullptr, getMarkedColor());
         else if (isHighlighted())
             internalDraw(p, nullptr, getHighlightColor());
-
     } g_drawPool.releaseFrameBuffer(destRect);
 }
 
@@ -266,15 +265,14 @@ void Creature::internalDraw(Point dest, LightView* lightView, const Color& color
             const auto& datType = getThingType();
             const int animationPhase = getCurrentAnimationPhase();
 
-            if (!replaceColorShader && m_shader)
-                g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
-
             // yPattern => creature addon
             for (int yPattern = 0; yPattern < getNumPatternY(); ++yPattern) {
                 // continue if we dont have this addon
                 if (yPattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
                     continue;
 
+                if (!replaceColorShader && m_shader)
+                    g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
                 datType->draw(dest, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, color);
 
                 if (m_drawOutfitColor && !replaceColorShader && getLayers() > 1) {
