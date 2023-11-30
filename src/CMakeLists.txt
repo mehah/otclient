@@ -289,11 +289,11 @@ set(SOURCE_FILES
 	framework/net/protocol.cpp
 	framework/net/protocolhttp.cpp
 	framework/net/server.cpp
-	framework/otml//otmldocument.cpp
-	framework/otml//otmlemitter.cpp
-	framework/otml//otmlexception.cpp
-	framework/otml//otmlnode.cpp
-	framework/otml//otmlparser.cpp
+	framework/otml/otmldocument.cpp
+	framework/otml/otmlemitter.cpp
+	framework/otml/otmlexception.cpp
+	framework/otml/otmlnode.cpp
+	framework/otml/otmlparser.cpp
 	framework/platform/androidgameactivity.cpp
 	framework/platform/androidmanager.cpp
 	framework/platform/androidmanager.h
@@ -508,7 +508,7 @@ elseif(ANDROID)
 		log
 		pugixml::pugixml
 	)
-else()
+else() # Linux
 	target_include_directories(${PROJECT_NAME}
 		PRIVATE
 		${CMAKE_SOURCE_DIR}/src
@@ -549,6 +549,14 @@ else()
 		LibLZMA::LibLZMA
 		pugixml::pugixml
 	)
+
+	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+		target_compile_options(${PROJECT_NAME}
+			PRIVATE
+				-Wall -Wextra -Wpedantic
+		)
+	endif()
+
 endif()
 
 # *****************************************************************************
