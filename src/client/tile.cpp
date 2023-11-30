@@ -90,6 +90,26 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool is
     drawWidgets(mapRect);
 }
 
+int getSmoothedElevation(const CreaturePtr& creature, int currentElevation, float factor) {
+    Position fromPos = creature->getLastStepFromPosition();
+    Position toPos = creature->getLastStepToPosition();
+    TilePtr fromTile = g_map.getTile(fromPos);
+    TilePtr toTile = g_map.getTile(toPos);
+
+    if (!fromTile || !toTile) {
+        return currentElevation;
+    }
+
+    int fromElevation = fromTile->getDrawElevation();
+    int toElevation = toTile->getDrawElevation();
+
+    if (fromElevation != toElevation) {
+        return (fromElevation + factor * (toElevation - fromElevation));
+    }
+
+    return currentElevation;
+}
+
 void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, bool forceDraw, LightView* lightView)
 {
     if (!forceDraw && !m_drawTopAndCreature)
@@ -105,10 +125,24 @@ void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags,
     }
 
     for (const auto& creature : m_walkingCreatures) {
-        const auto& cDest = Point(
-            dest.x + ((creature->getPosition().x - m_position.x) * g_gameConfig.getSpriteSize() - m_drawElevation) * g_drawPool.getScaleFactor(),
-            dest.y + ((creature->getPosition().y - m_position.y) * g_gameConfig.getSpriteSize() - m_drawElevation) * g_drawPool.getScaleFactor()
-        );
+        float stepDuration = creature->getStepDuration();
+        float elapsedTime = creature->getWalkTicksElapsed();
+        float factor = (std::max)(0.0f, (std::min)(elapsedTime / stepDuration, 1.0f));
+        int smoothedElevation = getSmoothedElevation(creature, m_drawElevation, factor);
+        Point cDest;
+
+        if (g_game.getFeature(Otc::GameSmoothWalkElevation)) {
+            cDest = Point(
+                dest.x + ((creature->getPosition().x - m_position.x) * g_gameConfig.getSpriteSize() - smoothedElevation) * g_drawPool.getScaleFactor(),
+                dest.y + ((creature->getPosition().y - m_position.y) * g_gameConfig.getSpriteSize() - smoothedElevation) * g_drawPool.getScaleFactor()
+            );
+        } else {
+            cDest = Point(
+                dest.x + ((creature->getPosition().x - m_position.x) * g_gameConfig.getSpriteSize() - m_drawElevation) * g_drawPool.getScaleFactor(),
+                dest.y + ((creature->getPosition().y - m_position.y) * g_gameConfig.getSpriteSize() - m_drawElevation) * g_drawPool.getScaleFactor()
+            );
+        }
+
         creature->draw(cDest, flags & Otc::DrawThings, lightView);
         creature->drawInformation(mapRect, cDest, isCovered, flags);
     }
