@@ -58,19 +58,23 @@ void DrawPoolManager::draw()
         g_painter->setResolution(m_size, m_transformMatrix);
     }
 
-    constexpr std::array<DrawPoolType, 5> pools = {
-        DrawPoolType::MAP , DrawPoolType::LIGHT, DrawPoolType::FOREGROUND_MAP,
-        DrawPoolType::FOREGROUND_MAP_WIDGETS, DrawPoolType::FOREGROUND
-    };
-
-    for (const auto type : pools) {
-        auto pool = get(type);
-        std::scoped_lock l(pool->getMutex());
-        drawPool(pool);
-        if (type == DrawPoolType::MAP) {
+    auto map = get(DrawPoolType::MAP); {
+        std::scoped_lock l(map->getMutex());
+        if (drawPool(map)) {
             drawPool(DrawPoolType::CREATURE_INFORMATION);
+            drawPool(DrawPoolType::LIGHT);
         }
     }
+
+    drawPool(DrawPoolType::FOREGROUND_MAP);
+
+    {
+        auto mapWidget = get(DrawPoolType::FOREGROUND_MAP_WIDGETS);
+        std::scoped_lock l(map->getMutex(), mapWidget->getMutex());
+        drawPool(mapWidget);
+    }
+
+    drawPool(DrawPoolType::FOREGROUND);
 }
 
 void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)
