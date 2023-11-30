@@ -84,10 +84,10 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool is
     drawAttachedParticlesEffect(dest);
 
     for (const auto& thing : m_things) {
-        thing->updateWidgets(mapRect);
+        thing->drawWidgets(mapRect);
     }
     
-    updateWidgets(mapRect);
+    drawWidgets(mapRect);
 }
 
 void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, bool forceDraw, LightView* lightView)
@@ -130,14 +130,9 @@ void Tile::drawTop(const Point& dest, int flags, bool forceDraw, LightView* ligh
     }
 }
 
-void Tile::updateWidgets(const MapPosInfo& mapRect)
+void Tile::drawWidgets(const MapPosInfo& mapRect)
 {
-    g_drawPool.select(DrawPoolType::FOREGROUND_MAP_WIDGETS);
-    {
-        updateAttachedWidgets(m_lastDrawDest, mapRect);
-    }
-    // Go back to use map pool
-    g_drawPool.select(DrawPoolType::MAP);
+    drawAttachedWidgets(m_lastDrawDest, mapRect);
 }
 
 void Tile::clean()

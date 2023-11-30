@@ -37,7 +37,7 @@ class Thing : public AttachableObject
 {
 public:
     virtual void draw(const Point& /*dest*/, bool drawThings = true, LightView* /*lightView*/ = nullptr) {}
-    void updateWidgets(const MapPosInfo& mapRect);
+    void drawWidgets(const MapPosInfo& mapRect);
 
     LuaObjectPtr attachedObjectToLuaObject() override { return asLuaObject(); }
 

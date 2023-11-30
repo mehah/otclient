@@ -98,7 +98,7 @@ public:
 
     void onAddInMapView();
     void draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, LightView* lightView = nullptr);
-    void updateWidgets(const MapPosInfo& rect);
+    void drawWidgets(const MapPosInfo& rect);
 
     void clean();
 

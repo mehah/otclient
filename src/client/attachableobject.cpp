@@ -240,38 +240,43 @@ UIWidgetPtr AttachableObject::getAttachedWidgetById(const std::string& id) {
     return *it;
 }
 
-void AttachableObject::updateAttachedWidgets(const Point& dest, const MapPosInfo& mapRect)
+void AttachableObject::drawAttachedWidgets(const Point& dest, const MapPosInfo& mapRect)
 {
     if (m_attachedWidgets.empty())
         return;
 
-    std::vector<UIWidgetPtr> toRemove;
-    for (const auto& widget : m_attachedWidgets) {
-        if (widget->isDestroyed()) {
-            toRemove.emplace_back(widget);
-            continue;
+    g_drawPool.select(DrawPoolType::FOREGROUND_MAP_WIDGETS);
+    {
+        std::vector<UIWidgetPtr> toRemove;
+        for (const auto& widget : m_attachedWidgets) {
+            if (widget->isDestroyed()) {
+                toRemove.emplace_back(widget);
+                continue;
+            }
+
+            if (!widget->isVisible())
+                continue;
+
+            Point p = dest - mapRect.drawOffset;
+            p.x *= mapRect.horizontalStretchFactor;
+            p.y *= mapRect.verticalStretchFactor;
+            p += mapRect.rect.topLeft();
+
+            p.x += widget->getMarginLeft();
+            p.x -= widget->getMarginRight();
+            p.y += widget->getMarginTop();
+            p.y -= widget->getMarginBottom();
+
+            const auto& widgetRect = widget->getRect();
+            const auto& rect = Rect(p, widgetRect.width(), widgetRect.height());
+
+            widget->setRect(rect);
+            widget->draw(mapRect.rect, DrawPoolType::FOREGROUND);
         }
 
-        if (!widget->isVisible())
-            continue;
-
-        Point p = dest - mapRect.drawOffset;
-        p.x *= mapRect.horizontalStretchFactor;
-        p.y *= mapRect.verticalStretchFactor;
-        p += mapRect.rect.topLeft();
-
-        p.x += widget->getMarginLeft();
-        p.x -= widget->getMarginRight();
-        p.y += widget->getMarginTop();
-        p.y -= widget->getMarginBottom();
-
-        const auto& widgetRect = widget->getRect();
-        const auto& rect = Rect(p, widgetRect.width(), widgetRect.height());
-
-        widget->setRect(rect);
-        widget->draw(mapRect.rect, DrawPoolType::FOREGROUND);
+        for (const auto& widget : toRemove)
+            detachWidget(widget);
     }
-
-    for (const auto& widget : toRemove)
-        detachWidget(widget);
+    // Go back to use map pool
+    g_drawPool.select(DrawPoolType::MAP);
 }

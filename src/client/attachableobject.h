@@ -63,7 +63,7 @@ protected:
     void drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop);
     void onDetachEffect(const AttachedEffectPtr& effect);
     void drawAttachedParticlesEffect(const Point& dest);
-    void updateAttachedWidgets(const Point& dest, const MapPosInfo& mapRect);
+    void drawAttachedWidgets(const Point& dest, const MapPosInfo& mapRect);
 
     std::vector<AttachedEffectPtr> m_attachedEffects;
     std::vector<ParticleEffectPtr> m_attachedParticles;

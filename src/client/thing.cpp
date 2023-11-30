@@ -143,11 +143,6 @@ void Thing::onStartDetachEffect(const AttachedEffectPtr& effect) {
     }
 }
 
-void Thing::updateWidgets(const MapPosInfo& mapRect) {
-    g_drawPool.select(DrawPoolType::FOREGROUND_MAP_WIDGETS);
-    {
-        updateAttachedWidgets(m_lastDrawDest, mapRect);
-    }
-    // Go back to use map pool
-    g_drawPool.select(DrawPoolType::MAP);
+void Thing::drawWidgets(const MapPosInfo& mapRect) {
+    drawAttachedWidgets(m_lastDrawDest, mapRect);
 }
