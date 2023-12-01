@@ -99,11 +99,15 @@ void Application::deinit()
 {
     g_lua.callGlobalField("g_app", "onTerminate");
 
+    // poll remaining events
+    poll();
+    Application::poll();
+
     g_asyncDispatcher.terminate();
 
     // disable dispatcher events
-    g_dispatcher.shutdown();
     g_textDispatcher.shutdown();
+    g_dispatcher.shutdown();         
     g_mainDispatcher.shutdown();
 
     // run modules unload events
@@ -112,10 +116,6 @@ void Application::deinit()
 
     // release remaining lua object references
     g_lua.collectGarbage();
-
-    // poll remaining events
-    poll();
-    Application::poll();
 }
 
 void Application::terminate()

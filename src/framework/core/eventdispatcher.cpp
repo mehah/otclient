@@ -39,10 +39,10 @@ void EventDispatcher::init() {
 
 void EventDispatcher::shutdown()
 {
-    while (!m_eventList.empty()) {
+    do {
         executeEvents();
         mergeEvents();
-    }
+    } while (!m_eventList.empty());
 
     m_scheduledEventList.clear();
 
