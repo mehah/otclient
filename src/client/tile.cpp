@@ -90,6 +90,22 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool is
     drawWidgets(mapRect);
 }
 
+int getSmoothedElevation(const CreaturePtr& creature, int currentElevation, float factor) {
+    const auto& fromPos = creature->getLastStepFromPosition();
+    const auto& toPos = creature->getLastStepToPosition();
+    const auto& fromTile = g_map.getTile(fromPos);
+    const auto& toTile = g_map.getTile(toPos);
+
+    if (!fromTile || !toTile) {
+        return currentElevation;
+    }
+
+    const int fromElevation = fromTile->getDrawElevation();
+    const int toElevation = toTile->getDrawElevation();
+
+    return fromElevation != toElevation ? fromElevation + factor * (toElevation - fromElevation) : currentElevation;
+}
+
 void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, bool forceDraw, LightView* lightView)
 {
     if (!forceDraw && !m_drawTopAndCreature)
@@ -105,10 +121,17 @@ void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags,
     }
 
     for (const auto& creature : m_walkingCreatures) {
+        int elevation = m_drawElevation;
+        if (g_game.getFeature(Otc::GameSmoothWalkElevation)) {
+            const float factor = std::clamp<float>(creature->getWalkTicksElapsed() / static_cast<float>(creature->getStepDuration()), .0f, 1.f);
+            elevation = getSmoothedElevation(creature, elevation, factor);
+        }
+
         const auto& cDest = Point(
-            dest.x + ((creature->getPosition().x - m_position.x) * g_gameConfig.getSpriteSize() - m_drawElevation) * g_drawPool.getScaleFactor(),
-            dest.y + ((creature->getPosition().y - m_position.y) * g_gameConfig.getSpriteSize() - m_drawElevation) * g_drawPool.getScaleFactor()
+            dest.x + ((creature->getPosition().x - m_position.x) * g_gameConfig.getSpriteSize() - elevation) * g_drawPool.getScaleFactor(),
+            dest.y + ((creature->getPosition().y - m_position.y) * g_gameConfig.getSpriteSize() - elevation) * g_drawPool.getScaleFactor()
         );
+
         creature->draw(cDest, flags & Otc::DrawThings, lightView);
         creature->drawInformation(mapRect, cDest, isCovered, flags);
     }
@@ -145,7 +168,7 @@ void Tile::clean()
         g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
             if (g_ui.getMapWidget())
                 g_ui.getMapWidget()->getMapView()->removeForegroundTile(tile);
-            }, g_game.getServerBeat());
+        }, g_game.getServerBeat());
     }
 
     if (hasAttachedWidgets()) {
@@ -162,7 +185,7 @@ void Tile::clean()
 #ifdef FRAMEWORK_EDITOR
     m_flags = 0;
 #endif
-}
+        }
 
 void Tile::addWalkingCreature(const CreaturePtr& creature)
 {
@@ -198,8 +221,7 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
 
             if (mustOptimize && newEffect->getSize() > prevEffect->getSize()) {
                 prevEffect->canDraw(false);
-            }
-            else if (mustOptimize || newEffect->getId() == prevEffect->getId()) {
+            } else if (mustOptimize || newEffect->getId() == prevEffect->getId()) {
                 if (!newEffect->waitFor(prevEffect))
                     return;
             }
@@ -248,8 +270,7 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
             if ((append && otherPriority > priority) || (!append && otherPriority >= priority))
                 break;
         }
-    }
-    else if (stackPos > static_cast<int>(size))
+    } else if (stackPos > static_cast<int>(size))
         stackPos = size;
 
     m_things.insert(m_things.begin() + stackPos, thing);
@@ -840,7 +861,7 @@ void Tile::setText(const std::string& text, Color color)
         g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
             if (g_ui.getMapWidget())
                 g_ui.getMapWidget()->getMapView()->addForegroundTile(tile);
-            }, g_game.getServerBeat());
+        }, g_game.getServerBeat());
     }
 
     m_text->setText(text);
@@ -864,7 +885,7 @@ void Tile::setTimer(int time, Color color)
         g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
             if (g_ui.getMapWidget())
                 g_ui.getMapWidget()->getMapView()->addForegroundTile(tile);
-            }, g_game.getServerBeat());
+        }, g_game.getServerBeat());
     }
 
     m_timerText->setColor(color);
