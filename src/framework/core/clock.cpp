@@ -30,3 +30,6 @@ void Clock::update()
     m_currentMillis = m_currentMicros / 1000;
     m_currentSeconds = m_currentMicros / 1000000.0f;
 }
+
+ticks_t Clock::realMicros() { return stdext::micros(); }
+ticks_t Clock::realMillis(){  return stdext::millis(); }

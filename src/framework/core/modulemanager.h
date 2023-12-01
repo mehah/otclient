@@ -41,6 +41,7 @@ public:
     std::deque<ModulePtr> getModules() { return m_modules; }
     ModulePtr getCurrentModule() { return m_currentModule; }
     void enableAutoReload();
+    bool isAutoReloadEnabled() const { return m_reloadEnable; }
 
 protected:
     void updateModuleLoadOrder(const ModulePtr& module);
@@ -51,6 +52,8 @@ private:
     std::deque<ModulePtr> m_modules;
     std::multimap<int, ModulePtr> m_autoLoadModules;
     ModulePtr m_currentModule;
+
+    bool m_reloadEnable{ false };
 };
 
 extern ModuleManager g_modules;

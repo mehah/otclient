@@ -44,7 +44,7 @@ public:
     {
         bool operator() (const ScheduledEventPtr& a, const ScheduledEventPtr& b) const
         {
-            return b->ticks() < a->ticks();
+            return b->ticks() > a->ticks();
         }
     };
 

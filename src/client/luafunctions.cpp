@@ -30,7 +30,7 @@
 #include "gameconfig.h"
 #include "item.h"
 #include "localplayer.h"
-#include "luavaluecasts.h"
+#include "luavaluecasts_client.h"
 #include "map.h"
 #include "minimap.h"
 #include "missile.h"
@@ -52,6 +52,8 @@
 #include "uiminimap.h"
 #include "uiprogressrect.h"
 #include "uisprite.h"
+#include "uigraph.h"
+#include "attachableobject.h"
 
 #ifdef FRAMEWORK_EDITOR
 #include "houses.h"
@@ -143,6 +145,8 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_map", "getCreatureById", &Map::getCreatureById, &g_map);
     g_lua.bindSingletonFunction("g_map", "removeCreatureById", &Map::removeCreatureById, &g_map);
     g_lua.bindSingletonFunction("g_map", "getSpectators", &Map::getSpectators, &g_map);
+    g_lua.bindSingletonFunction("g_map", "getSpectatorsInRange", &Map::getSpectatorsInRange, &g_map);
+    g_lua.bindSingletonFunction("g_map", "getSpectatorsInRangeEx", &Map::getSpectatorsInRangeEx, &g_map);
     g_lua.bindSingletonFunction("g_map", "findPath", &Map::findPath, &g_map);
     g_lua.bindSingletonFunction("g_map", "createTile", &Map::createTile, &g_map);
     g_lua.bindSingletonFunction("g_map", "setWidth", &Map::setWidth, &g_map);
@@ -179,6 +183,14 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_map", "findItemsById", &Map::findItemsById, &g_map);
     g_lua.bindSingletonFunction("g_map", "setFloatingEffect", &Map::setFloatingEffect, &g_map);
     g_lua.bindSingletonFunction("g_map", "isDrawingFloatingEffects", &Map::isDrawingFloatingEffects, &g_map);
+
+    g_lua.bindSingletonFunction("g_map", "getMinimapColor", &Map::getMinimapColor, &g_map);
+    g_lua.bindSingletonFunction("g_map", "isSightClear", &Map::isSightClear, &g_map);
+
+#ifndef BOT_PROTECTION
+    g_lua.bindSingletonFunction("g_map", "findEveryPath", &Map::findEveryPath, &g_map);
+    g_lua.bindSingletonFunction("g_map", "getSpectatorsByPattern", &Map::getSpectatorsByPattern, &g_map);
+#endif
 
     g_lua.registerSingletonClass("g_minimap");
     g_lua.bindSingletonFunction("g_minimap", "clean", &Minimap::clean, &g_minimap);
@@ -345,6 +357,9 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "clearImbuement", &Game::clearImbuement, &g_game);
     g_lua.bindSingletonFunction("g_game", "closeImbuingWindow", &Game::closeImbuingWindow, &g_game);
     g_lua.bindSingletonFunction("g_game", "isUsingProtobuf", &Game::isUsingProtobuf, &g_game);
+    g_lua.bindSingletonFunction("g_game", "enableTileThingLuaCallback", &Game::enableTileThingLuaCallback, &g_game);
+    g_lua.bindSingletonFunction("g_game", "isTileThingLuaCallbackEnabled", &Game::isTileThingLuaCallbackEnabled, &g_game);
+    g_lua.bindSingletonFunction("g_game", "isEnabledBotProtection", &Game::isEnabledBotProtection, &g_game);
 
     g_lua.registerSingletonClass("g_gameConfig");
     g_lua.bindSingletonFunction("g_gameConfig", "loadFonts", &GameConfig::loadFonts, &g_gameConfig);
@@ -391,11 +406,26 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Container>("getSize", &Container::getSize);
     g_lua.bindClassMemberFunction<Container>("getFirstIndex", &Container::getFirstIndex);
 
-    g_lua.registerClass<Thing>();
+    g_lua.registerClass<AttachableObject>();
+    g_lua.bindClassMemberFunction<AttachableObject>("getAttachedEffects", &AttachableObject::getAttachedEffects);
+    g_lua.bindClassMemberFunction<AttachableObject>("attachEffect", &AttachableObject::attachEffect);
+    g_lua.bindClassMemberFunction<AttachableObject>("detachEffectById", &AttachableObject::detachEffectById);
+    g_lua.bindClassMemberFunction<AttachableObject>("getAttachedEffectById", &AttachableObject::getAttachedEffectById);
+    g_lua.bindClassMemberFunction<AttachableObject>("clearAttachedEffects", &AttachableObject::clearAttachedEffects);
+    g_lua.bindClassMemberFunction<AttachableObject>("attachParticleEffect", &AttachableObject::attachParticleEffect);
+    g_lua.bindClassMemberFunction<AttachableObject>("detachParticleEffectByName", &AttachableObject::detachParticleEffectByName);
+    g_lua.bindClassMemberFunction<AttachableObject>("clearAttachedParticlesEffect", &AttachableObject::clearAttachedParticlesEffect);
+    g_lua.bindClassMemberFunction<AttachableObject>("getAttachedWidgets", &AttachableObject::getAttachedWidgets);
+    g_lua.bindClassMemberFunction<AttachableObject>("attachWidget", &AttachableObject::attachWidget);
+    g_lua.bindClassMemberFunction<AttachableObject>("detachWidget", &AttachableObject::detachWidget);
+    g_lua.bindClassMemberFunction<AttachableObject>("detachWidgetById", &AttachableObject::detachWidgetById);
+    g_lua.bindClassMemberFunction<AttachableObject>("getAttachedWidgetById", &AttachableObject::getAttachedWidgetById);
+
+    g_lua.registerClass<Thing, AttachableObject>();
     g_lua.bindClassMemberFunction<Thing>("setId", &Thing::setId);
     g_lua.bindClassMemberFunction<Thing>("setShader", &Thing::setShader);
     g_lua.bindClassMemberFunction<Thing>("setPosition", &Thing::setPosition);
-    g_lua.bindClassMemberFunction<Thing>("setMarkColor", &Thing::setMarkColor);
+    g_lua.bindClassMemberFunction<Thing>("setMarked", &Thing::lua_setMarked);
     g_lua.bindClassMemberFunction<Thing>("isMarked", &Thing::isMarked);
     g_lua.bindClassMemberFunction<Thing>("getId", &Thing::getId);
     g_lua.bindClassMemberFunction<Thing>("getTile", &Thing::getTile);
@@ -434,12 +464,9 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Thing>("isTopEffect", &Thing::isTopEffect);
     g_lua.bindClassMemberFunction<Thing>("isLyingCorpse", &Thing::isLyingCorpse);
     g_lua.bindClassMemberFunction<Thing>("getDefaultAction", &Thing::getDefaultAction);
-    g_lua.bindClassMemberFunction<Thing>("getAttachedEffects", &Thing::getAttachedEffects);
-    g_lua.bindClassMemberFunction<Thing>("attachEffect", &Thing::attachEffect);
-    g_lua.bindClassMemberFunction<Thing>("detachEffectById", &Thing::detachEffectById);
-    g_lua.bindClassMemberFunction<Thing>("getAttachedEffectById", &Thing::getAttachedEffectById);
-    g_lua.bindClassMemberFunction<Thing>("clearAttachedEffects", &Thing::clearAttachedEffects);
     g_lua.bindClassMemberFunction<Thing>("getClassification", &Thing::getClassification);
+    g_lua.bindClassMemberFunction<Thing>("setHighlight", &Thing::lua_setHighlight);
+    g_lua.bindClassMemberFunction<Thing>("isHighlighted", &Thing::isHighlighted);
 
 #ifdef FRAMEWORK_EDITOR
     g_lua.registerClass<House>();
@@ -532,6 +559,17 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Creature>("setDrawOutfitColor", &Creature::setDrawOutfitColor);
     g_lua.bindClassMemberFunction<Creature>("setDisableWalkAnimation", &Creature::setDisableWalkAnimation);
     g_lua.bindClassMemberFunction<Creature>("isDisabledWalkAnimation", &Creature::isDisabledWalkAnimation);
+    g_lua.bindClassMemberFunction<Creature>("isTimedSquareVisible", &Creature::isTimedSquareVisible);
+    g_lua.bindClassMemberFunction<Creature>("getTimedSquareColor", &Creature::getTimedSquareColor);
+    g_lua.bindClassMemberFunction<Creature>("isStaticSquareVisible", &Creature::isStaticSquareVisible);
+    g_lua.bindClassMemberFunction<Creature>("getStaticSquareColor", &Creature::getStaticSquareColor);
+
+#ifndef BOT_PROTECTION
+    g_lua.bindClassMemberFunction<Creature>("setText", &Creature::setText);
+    g_lua.bindClassMemberFunction<Creature>("getText", &Creature::getText);
+    g_lua.bindClassMemberFunction<Creature>("clearText", &Creature::clearText);
+    g_lua.bindClassMemberFunction<Creature>("canShoot", &Creature::canShoot);
+#endif
 
 #ifdef FRAMEWORK_EDITOR
     g_lua.registerClass<ItemType>();
@@ -690,6 +728,8 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<AttachedEffect>("canDrawOnUI", &AttachedEffect::canDrawOnUI);
     g_lua.bindClassMemberFunction<AttachedEffect>("setCanDrawOnUI", &AttachedEffect::setCanDrawOnUI);
     g_lua.bindClassMemberFunction<AttachedEffect>("attachEffect", &AttachedEffect::attachEffect);
+    g_lua.bindClassMemberFunction<AttachedEffect>("setDrawOrder", &AttachedEffect::setDrawOrder);
+    g_lua.bindClassMemberFunction<AttachedEffect>("setLight", &AttachedEffect::setLight);
 
     g_lua.registerClass<StaticText>();
     g_lua.bindClassStaticFunction<StaticText>("create", [] { return std::make_shared<StaticText>(); });
@@ -700,6 +740,9 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<StaticText>("getColor", &StaticText::getColor);
 
     g_lua.registerClass<AnimatedText>();
+    g_lua.bindClassMemberFunction<AnimatedText>("getText", &AnimatedText::getText);
+    g_lua.bindClassMemberFunction<AnimatedText>("getOffset", &AnimatedText::getOffset);
+    g_lua.bindClassMemberFunction<AnimatedText>("getColor", &AnimatedText::getColor);
 
     g_lua.registerClass<Player, Creature>();
     g_lua.registerClass<Npc, Creature>();
@@ -756,7 +799,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<LocalPlayer>("setResourceBalance", &LocalPlayer::setResourceBalance);
     g_lua.bindClassMemberFunction<LocalPlayer>("getTotalMoney", &LocalPlayer::getTotalMoney);
 
-    g_lua.registerClass<Tile>();
+    g_lua.registerClass<Tile, AttachableObject>();
     g_lua.bindClassMemberFunction<Tile>("clean", &Tile::clean);
     g_lua.bindClassMemberFunction<Tile>("addThing", &Tile::addThing);
     g_lua.bindClassMemberFunction<Tile>("getThing", &Tile::getThing);
@@ -789,9 +832,14 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Tile>("unselect", &Tile::unselect);
     g_lua.bindClassMemberFunction<Tile>("isSelected", &Tile::isSelected);
 
-    g_lua.bindClassMemberFunction<Tile>("setWidget", &Tile::setWidget);
-    g_lua.bindClassMemberFunction<Tile>("getWidget", &Tile::getWidget);
-    g_lua.bindClassMemberFunction<Tile>("removeWidget", &Tile::removeWidget);
+#ifndef BOT_PROTECTION
+    g_lua.bindClassMemberFunction<Tile>("setText", &Tile::setText);
+    g_lua.bindClassMemberFunction<Tile>("getText", &Tile::getText);
+    g_lua.bindClassMemberFunction<Tile>("setTimer", &Tile::setTimer);
+    g_lua.bindClassMemberFunction<Tile>("getTimer", &Tile::getTimer);
+    g_lua.bindClassMemberFunction<Tile>("setFill", &Tile::setFill);
+    g_lua.bindClassMemberFunction<Tile>("canShoot", &Tile::canShoot);
+#endif
 
 #ifdef FRAMEWORK_EDITOR
     g_lua.bindClassMemberFunction<Tile>("isHouseTile", &Tile::isHouseTile);
@@ -811,6 +859,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIItem>("setItemVisible", &UIItem::setItemVisible);
     g_lua.bindClassMemberFunction<UIItem>("setItem", &UIItem::setItem);
     g_lua.bindClassMemberFunction<UIItem>("setVirtual", &UIItem::setVirtual);
+    g_lua.bindClassMemberFunction<UIItem>("setShowCount", &UIItem::setShowCount);
     g_lua.bindClassMemberFunction<UIItem>("clearItem", &UIItem::clearItem);
     g_lua.bindClassMemberFunction<UIItem>("getItemId", &UIItem::getItemId);
     g_lua.bindClassMemberFunction<UIItem>("getItemCount", &UIItem::getItemCount);
@@ -888,6 +937,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIMap>("setDrawHighlightTarget", &UIMap::setDrawHighlightTarget);
     g_lua.bindClassMemberFunction<UIMap>("setAntiAliasingMode", &UIMap::setAntiAliasingMode);
     g_lua.bindClassMemberFunction<UIMap>("setFloorFading", &UIMap::setFloorFading);
+    g_lua.bindClassMemberFunction<UIMap>("clearTiles", &UIMap::clearTiles);
 
     g_lua.registerClass<UIMinimap, UIWidget>();
     g_lua.bindClassStaticFunction<UIMinimap>("create", [] { return std::make_shared<UIMinimap>(); });
@@ -915,6 +965,15 @@ void Client::registerLuaFunctions()
     g_lua.bindClassStaticFunction<UIProgressRect>("create", [] { return std::make_shared<UIProgressRect>(); });
     g_lua.bindClassMemberFunction<UIProgressRect>("setPercent", &UIProgressRect::setPercent);
     g_lua.bindClassMemberFunction<UIProgressRect>("getPercent", &UIProgressRect::getPercent);
+
+    g_lua.registerClass<UIGraph, UIWidget>();
+    g_lua.bindClassStaticFunction<UIGraph>("create", [] { return UIGraphPtr(new UIGraph); });
+    g_lua.bindClassMemberFunction<UIGraph>("addValue", &UIGraph::addValue);
+    g_lua.bindClassMemberFunction<UIGraph>("clear", &UIGraph::clear);
+    g_lua.bindClassMemberFunction<UIGraph>("setLineWidth", &UIGraph::setLineWidth);
+    g_lua.bindClassMemberFunction<UIGraph>("setCapacity", &UIGraph::setCapacity);
+    g_lua.bindClassMemberFunction<UIGraph>("setTitle", &UIGraph::setTitle);
+    g_lua.bindClassMemberFunction<UIGraph>("setShowLabels", &UIGraph::setShowLabels);
 
     g_lua.registerClass<UIMapAnchorLayout, UIAnchorLayout>();
 }

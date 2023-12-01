@@ -191,6 +191,7 @@ GameDynamicBugReporter = 111
 GameWrapKit = 112
 GameContainerFilter = 113
 GameEnterGameShowAppearance = 114
+GameSmoothWalkElevation = 115
 
 TextColors = {
     red = '#f55e5e',    -- '#c83200'

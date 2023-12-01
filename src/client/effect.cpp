@@ -119,7 +119,7 @@ bool Effect::waitFor(const EffectPtr& effect)
 void Effect::setId(uint32_t id)
 {
     if (!g_things.isValidDatId(id, ThingCategoryEffect))
-        id = 0;
+        return;
 
     m_clientId = id;
     m_thingType = g_things.getThingType(id, ThingCategoryEffect).get();
@@ -127,6 +127,9 @@ void Effect::setId(uint32_t id)
 
 void Effect::setPosition(const Position& position, uint8_t stackPos, bool hasElevation)
 {
+    if (m_clientId == 0)
+        return;
+
     Thing::setPosition(position, stackPos, hasElevation);
 
     m_numPatternX = m_position.x % getNumPatternX();

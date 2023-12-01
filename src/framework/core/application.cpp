@@ -29,6 +29,7 @@
 #include <framework/luaengine/luainterface.h>
 #include <framework/platform/crashhandler.h>
 #include <framework/platform/platform.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include "asyncdispatcher.h"
 
 #include <gitinfo.h>
@@ -70,6 +71,9 @@ void Application::init(std::vector<std::string>& args, uint8_t asyncDispatchMaxT
     std::locale::global(std::locale());
 
     g_asyncDispatcher.init(asyncDispatchMaxThreads);
+    g_dispatcher.init();
+    g_textDispatcher.init();
+    g_mainDispatcher.init();
 
     std::string startupOptions;
     for (uint32_t i = 1; i < args.size(); ++i) {
@@ -95,6 +99,13 @@ void Application::deinit()
 {
     g_lua.callGlobalField("g_app", "onTerminate");
 
+    g_asyncDispatcher.terminate();
+
+    // disable dispatcher events
+    g_dispatcher.shutdown();
+    g_textDispatcher.shutdown();
+    g_mainDispatcher.shutdown();
+
     // run modules unload events
     g_modules.unloadModules();
     g_modules.clear();
@@ -105,13 +116,6 @@ void Application::deinit()
     // poll remaining events
     poll();
     Application::poll();
-
-    g_asyncDispatcher.terminate();
-
-    // disable dispatcher events
-    g_dispatcher.shutdown();
-    g_textDispatcher.shutdown();
-    g_mainDispatcher.shutdown();
 }
 
 void Application::terminate()
@@ -144,7 +148,10 @@ void Application::poll()
     Connection::poll();
 #endif
 
-    g_dispatcher.poll();
+    {
+        std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND)->getMutexPreDraw());
+        g_dispatcher.poll();
+    }
 
     // poll connection again to flush pending write
 #ifdef FRAMEWORK_NET

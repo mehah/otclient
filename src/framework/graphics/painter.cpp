@@ -27,7 +27,7 @@
 
 #include "shader/shadersources.h"
 
-Painter* g_painter = nullptr;
+std::unique_ptr<Painter> g_painter = nullptr;
 
 /**
    * Painter using OpenGL 2.0 programmable rendering pipeline,

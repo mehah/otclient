@@ -23,6 +23,8 @@
 #include "particle.h"
 #include "drawpoolmanager.h"
 
+#include <framework/graphics/animatedtexture.h>
+
 void Particle::render() const
 {
     if (!m_texture) {
@@ -31,6 +33,12 @@ void Particle::render() const
     }
 
     g_drawPool.setCompositionMode(m_compositionMode, true);
+    if (m_animatedTexture) {
+        const auto& frame = m_animatedTexture->getCurrentFrame();
+        if (frame)
+            g_drawPool.addTexturedRect(m_rect, frame, m_color);
+        return;
+    }
     g_drawPool.addTexturedRect(m_rect, m_texture, m_color);
 }
 
@@ -41,6 +49,9 @@ void Particle::update(float elapsedTime)
         m_finished = true;
         return;
     }
+
+    if (m_animatedTexture)
+        m_animatedTexture->update();
 
     updateColor();
     updateSize();

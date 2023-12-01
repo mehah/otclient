@@ -141,12 +141,10 @@ void ModuleManager::updateModuleLoadOrder(const ModulePtr& module)
 }
 
 void ModuleManager::enableAutoReload() {
-    static bool reloadEnable = false;
-
-    if (reloadEnable)
+    if (m_reloadEnable)
         return;
 
-    reloadEnable = true;
+    m_reloadEnable = true;
 
     struct FileInfo
     {
@@ -171,7 +169,10 @@ void ModuleManager::enableAutoReload() {
         for (const auto& path : g_resources.listDirectoryFiles("/" + module->getName(), true, false, true)) {
             ticks_t time = g_resources.getFileTime(path);
             if (time > 0) {
-                data.files.emplace_back(std::make_shared<FileInfo>(path, time));
+                auto fileInfo = std::make_shared<FileInfo>();
+                fileInfo->path = path;
+                fileInfo->time = time;
+                data.files.emplace_back(fileInfo);
                 hasFile = true;
             }
         }

@@ -134,7 +134,10 @@ void UIWidget::drawChildren(const Rect& visibleRect, DrawPoolType drawPane)
 
         // debug draw box
         if (g_ui.isDrawingDebugBoxes() && drawPane == DrawPoolType::FOREGROUND) {
-            g_drawPool.addBoundingRect(child->getRect(), Color::green);
+            if(child->isFocused())
+                g_drawPool.addBoundingRect(child->getRect(), Color::yellow);
+            else
+                g_drawPool.addBoundingRect(child->getRect(), Color::green);
         }
 
         g_drawPool.setOpacity(oldOpacity);
@@ -426,6 +429,9 @@ void UIWidget::lowerChild(const UIWidgetPtr& child)
     if (!child)
         return;
 
+    if (m_children.front() == child)
+        return;
+
     // remove and push child again
     const auto it = std::find(m_children.begin(), m_children.end(), child);
     if (it == m_children.end()) {
@@ -502,6 +508,21 @@ void UIWidget::moveChildToIndex(const UIWidgetPtr& child, int index)
         child->m_childIndex = index;
         for (size_t i = index; i < childrenSize; ++i)
             m_children[i]->m_childIndex = i + 1;
+    }
+
+    updateChildrenIndexStates();
+    updateLayout();
+}
+
+void UIWidget::reorderChildren(const std::vector<UIWidgetPtr>& childrens) {
+    if (m_children.size() != childrens.size()) {
+        g_logger.error("Invalid parameter for reorderChildren");
+        return;
+    }
+
+    m_children.clear();
+    for (size_t i = 0; i < childrens.size(); ++i) {
+        m_children.push_back(childrens[i]);
     }
 
     updateChildrenIndexStates();
@@ -969,7 +990,7 @@ void UIWidget::setLayout(const UILayoutPtr& layout)
 bool UIWidget::setRect(const Rect& rect)
 {
     Rect clampedRect = rect;
-    if (!m_minSize.isEmpty() || !m_maxSize.isEmpty()) {
+    if (m_minSize.width() != -1 || m_minSize.height() != -1 || m_maxSize.width() != -1 || m_maxSize.height() != -1) {
         Size minSize, maxSize;
         minSize.setWidth(m_minSize.width() >= 0 ? m_minSize.width() : 0);
         minSize.setHeight(m_minSize.height() >= 0 ? m_minSize.height() : 0);
@@ -1000,22 +1021,24 @@ bool UIWidget::setRect(const Rect& rect)
         auto self = static_self_cast<UIWidget>();
         g_dispatcher.addEvent([self, oldRect] {
             self->setProp(PropUpdateEventScheduled, false);
-            if (oldRect != self->getRect())
-                self->onGeometryChange(oldRect, self->getRect());
+            const auto& rect = self->getRect();
+            if (oldRect != rect) {
+                // update hovered widget when moved behind mouse area
+                if (self->containsPoint(g_window.getMousePosition()))
+                    g_ui.updateHoveredWidget();
+
+                if (oldRect.width() != rect.width())
+                    self->callLuaField("onWidthChange", rect.width(), oldRect.width());
+                if (oldRect.height() != rect.height())
+                    self->callLuaField("onHeightChange", rect.height(), oldRect.height());
+
+                self->callLuaField("onResize", oldRect, rect);
+                self->onGeometryChange(oldRect, rect);
+            }
         });
         setProp(PropUpdateEventScheduled, true);
     }
 
-    // update hovered widget when moved behind mouse area
-    if (containsPoint(g_window.getMousePosition()))
-        g_ui.updateHoveredWidget();
-
-    if (oldRect.width() != m_rect.width())
-        callLuaField("onWidthChange", m_rect.width(), oldRect.width());
-    if (oldRect.height() != m_rect.height())
-        callLuaField("onHeightChange", m_rect.height(), oldRect.height());
-
-    callLuaField("onResize", oldRect, m_rect);
     return true;
 }
 
@@ -1896,14 +1919,17 @@ bool UIWidget::propagateOnMouseMove(const Point& mousePos, const Point& mouseMov
 }
 
 void UIWidget::move(int x, int y) {
+    if (getX() == x && getY() == y)
+        return;
+
     if (!hasProp(PropUpdatingMove)) {
         setProp(PropUpdatingMove, true);
-        g_dispatcher.scheduleEvent([self = static_self_cast<UIWidget>()] {
+        g_dispatcher.addEvent([self = static_self_cast<UIWidget>()] {
             const auto rect = self->m_rect;
             self->m_rect = {}; // force update
             self->setRect(rect);
             self->setProp(PropUpdatingMove, false);
-        }, 13);
+        });
     }
 
     m_rect = { x, y, getSize() };

@@ -1,0 +1,10 @@
+Module
+  name: client_mods
+  description: Mod loader
+  author: OTClient Team
+  website: https://github.com/mehah/otclient
+  sandboxed: true
+  load-later:
+    - client_profiles
+    - game_buttons
+    - game_itemselector

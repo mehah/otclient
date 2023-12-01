@@ -51,6 +51,9 @@ public:
     void render() const;
     void update();
 
+    const ParticleEffectTypePtr& getEffectType() { return m_effectType; }
+
 private:
     std::vector<ParticleSystemPtr> m_systems;
+    ParticleEffectTypePtr m_effectType;
 };

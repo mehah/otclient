@@ -84,8 +84,8 @@ using SpawnPtr = std::shared_ptr<Spawn>;
 
 using HouseList = std::list<HousePtr>;
 using TownList = std::list<TownPtr>;
-using CreatureMap = stdext::map<Position, CreatureTypePtr, Position::Hasher>;
-using SpawnMap = stdext::map<Position, SpawnPtr, Position::Hasher>;
+using CreatureMap = std::unordered_map<Position, CreatureTypePtr, Position::Hasher>;
+using SpawnMap = std::unordered_map<Position, SpawnPtr, Position::Hasher>;
 #endif
 
 using ThingList = std::vector<ThingPtr>;
@@ -95,7 +95,6 @@ using ItemTypeList = std::vector<ItemTypePtr>;
 using TileList = std::list<TilePtr>;
 using ItemVector = std::vector<ItemPtr>;
 
-using ItemMap = stdext::map<Position, ItemPtr, Position::Hasher>;
 using TileMap = stdext::map<Position, TilePtr, Position::Hasher>;
 
 // net
@@ -108,6 +107,7 @@ using ProtocolLoginPtr = std::shared_ptr<ProtocolLogin>;
 // ui
 class UIItem;
 class UICreature;
+class UIGraph;
 class UIMap;
 class UIMinimap;
 class UIProgressRect;
@@ -117,6 +117,7 @@ class UISprite;
 
 using UIItemPtr = std::shared_ptr<UIItem>;
 using UICreaturePtr = std::shared_ptr<UICreature>;
+using UIGraphPtr = std::shared_ptr<UIGraph>;
 using UISpritePtr = std::shared_ptr<UISprite>;
 using UIMapPtr = std::shared_ptr<UIMap>;
 using UIMinimapPtr = std::shared_ptr<UIMinimap>;

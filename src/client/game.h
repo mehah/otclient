@@ -321,6 +321,13 @@ public:
 
     bool canPerformGameAction() const;
     bool checkBotProtection() const;
+    bool isEnabledBotProtection() {
+#ifdef BOT_PROTECTION
+        return true;
+#else
+        return false;
+#endif
+    }
 
     bool isOnline() { return m_online; }
     bool isLogging() { return !m_online && m_protocolGame; }
@@ -368,6 +375,9 @@ public:
     void clearImbuement(uint8_t slot);
     void closeImbuingWindow();
 
+    void enableTileThingLuaCallback(bool value) { m_tileThingsLuaCallback = value; }
+    bool isTileThingLuaCallbackEnabled() { return m_tileThingsLuaCallback; }
+
 protected:
     void enableBotCall() { m_denyBotCall = false; }
     void disableBotCall() { m_denyBotCall = true; }
@@ -383,6 +393,7 @@ private:
     stdext::map<int, ContainerPtr> m_containers;
     stdext::map<int, Vip> m_vips;
 
+    bool m_tileThingsLuaCallback{ false };
     bool m_online{ false };
     bool m_denyBotCall{ false };
     bool m_dead{ false };

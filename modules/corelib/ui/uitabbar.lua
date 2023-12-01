@@ -181,3 +181,9 @@ function UITabBar:getTabsPanel()
         return tab.tabPanel
     end)
 end
+
+function UITabBar:clearTabs()
+    while #self.tabs > 0 do
+        self:removeTab(self.tabs[#self.tabs])
+    end
+end
