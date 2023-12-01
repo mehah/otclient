@@ -9,8 +9,7 @@ on:
       - main
 
 env:
-  CMAKE_BUILD_PARALLEL_LEVEL: 2
-  MAKEFLAGS: '-j 2'
+  VCPKG_ENABLE_METRICS: 1
 
 jobs:
   job:
@@ -33,7 +32,7 @@ jobs:
         uses: actions/checkout@main
 
       - name: Install Linux Dependencies
-        run: > 
+        run: >
           sudo apt-get update && sudo apt-get install ccache libglew-dev libx11-dev linux-headers-$(uname -r)
 
       - name: Switch to gcc-11
@@ -41,14 +40,6 @@ jobs:
           sudo apt install gcc-11 g++-11
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 100 --slave /usr/bin/g++ g++ /usr/bin/g++-11 --slave /usr/bin/gcov gcov /usr/bin/gcov-12
           sudo update-alternatives --set gcc /usr/bin/gcc-11
-
-      - name: CCache
-        uses: hendrikmuhs/ccache-action@main
-        with:
-          max-size: "1G"
-          key: ccache-${{ matrix.os }}-${{ matrix.buildtype }}
-          restore-keys: |
-            ccache-${{ matrix.os }}
 
       - name: Restore artifacts and install vcpkg
         id: vcpkg-step
@@ -60,7 +51,6 @@ jobs:
       - name: Get vcpkg commit id from vcpkg.json
         uses: lukka/run-vcpkg@main
         with:
-          vcpkgGitURL: "https://github.com/microsoft/vcpkg.git"
           vcpkgGitCommitId: ${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}
 
       - name: Get latest CMake and ninja
@@ -73,6 +63,7 @@ jobs:
           buildPreset: ${{ matrix.buildtype }}
 
       - name: Create and Upload Artifact
+        if: ${{ github.event_name != 'pull_request' }}
         uses: actions/upload-artifact@main
         with:
           name: otclient-${{ matrix.buildtype }}-${{ github.sha }}
