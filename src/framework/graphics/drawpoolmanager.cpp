@@ -69,9 +69,8 @@ void DrawPoolManager::draw()
     drawPool(DrawPoolType::FOREGROUND_MAP);
 
     {
-        auto mapWidget = get(DrawPoolType::FOREGROUND_MAP_WIDGETS);
-        std::scoped_lock l(map->getMutex(), mapWidget->getMutex());
-        drawPool(mapWidget);
+        std::scoped_lock l(map->getMutex());
+        drawPool(DrawPoolType::FOREGROUND_MAP_WIDGETS);
     }
 
     drawPool(DrawPoolType::FOREGROUND);
