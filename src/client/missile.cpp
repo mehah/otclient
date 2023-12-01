@@ -26,14 +26,13 @@
 #include "thingtypemanager.h"
 #include "tile.h"
 
-void Missile::drawMissile(const Point& dest, LightView* lightView)
+void Missile::draw(const Point& dest, bool drawThings, LightView* lightView)
 {
     if (!canDraw() || isHided())
         return;
 
     const float fraction = m_animationTimer.ticksElapsed() / m_duration;
-    getThingType()->draw(dest + m_delta * fraction * g_drawPool.getScaleFactor(), 0, m_numPatternX, m_numPatternY, 0, 0,
-        Otc::DrawThings | Otc::DrawLights, Color::white, lightView, m_drawConductor);
+    getThingType()->draw(dest + m_delta * fraction * g_drawPool.getScaleFactor(), 0, m_numPatternX, m_numPatternY, 0, 0, Color::white, drawThings, lightView, m_drawConductor);
 }
 
 void Missile::setPath(const Position& fromPosition, const Position& toPosition)

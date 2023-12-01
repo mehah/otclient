@@ -41,6 +41,7 @@ public:
 
     void setGlobalLight(const Light& light)
     {
+        std::scoped_lock l(m_pool->getMutex());
         m_isDark = light.intensity < 250;
         m_globalLightColor = Color::from8bit(light.color, light.intensity / static_cast<float>(UINT8_MAX));
     }
@@ -58,32 +59,10 @@ private:
         TileLight(const Point& pos, uint8_t intensity, uint8_t color, float brightness) : Light(intensity, color), pos(pos), brightness(brightness) {}
     };
 
-    struct TileColor
+    struct LightData
     {
-        TileColor(Point& pos, size_t& shadeIndex, uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) :
-            pos(std::move(pos)), shadeIndex(shadeIndex), r(r), g(g), b(b), a(a) {}
-
-        Point pos;
-        size_t& shadeIndex;
-
-        void setLight(const Color& color, uint8_t alpha) {
-            r = color.r();
-            g = color.g();
-            b = color.b();
-            a = alpha;
-        }
-
-        void setLight(const Color& color) {
-            r = std::max<int>(r, color.r());
-            g = std::max<int>(g, color.g());
-            b = std::max<int>(b, color.b());
-        }
-
-    private:
-        uint8_t& r;
-        uint8_t& g;
-        uint8_t& b;
-        uint8_t& a;
+        std::vector<size_t> tiles;
+        std::vector<TileLight> lights;
     };
 
     void updateCoords(const Rect& dest, const Rect& src);
@@ -91,20 +70,17 @@ private:
 
     bool m_isDark{ false };
 
-    uint16_t m_tileSize{ 0 };
-    size_t m_hash{ 0 }, m_updatingHash{ 0 };
+    size_t m_hash{ 0 }, m_updatedHash{ 0 };
+
+    Size m_mapSize;
+    uint16_t m_tileSize{ 32 };
+    Color m_globalLightColor{ Color::white };
 
     DrawPool* m_pool{ nullptr };
 
-    Size m_mapSize;
     Rect m_dest, m_src;
-    Color m_globalLightColor{ Color::white };
-
     CoordsBuffer m_coords;
     TexturePtr m_texture;
-
-    std::vector<size_t> m_tiles;
+    LightData m_lightData[2];
     std::vector<uint8_t> m_pixels;
-    std::vector<TileLight> m_lights;
-    std::vector<TileColor> m_tileColors;
 };

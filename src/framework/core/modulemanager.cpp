@@ -24,6 +24,7 @@
 #include "resourcemanager.h"
 
 #include <framework/core/application.h>
+#include <framework/core/eventdispatcher.h>
 #include <framework/otml/otml.h>
 
 ModuleManager g_modules;
@@ -137,4 +138,71 @@ void ModuleManager::updateModuleLoadOrder(const ModulePtr& module)
         m_modules.emplace_front(module);
     else
         m_modules.emplace_back(module);
+}
+
+void ModuleManager::enableAutoReload() {
+    if (m_reloadEnable)
+        return;
+
+    m_reloadEnable = true;
+
+    struct FileInfo
+    {
+        std::string path;
+        ticks_t time;
+    };
+
+    struct ModuleData
+    {
+        ModulePtr ref;
+        std::vector<std::shared_ptr<FileInfo>> files;
+    };
+
+    std::vector<ModuleData> modules;
+    for (const auto& module : getModules()) {
+        if (!module->isReloadable() || !module->canReload())
+            continue;
+
+        ModuleData data = { module };
+
+        bool hasFile = false;
+        for (const auto& path : g_resources.listDirectoryFiles("/" + module->getName(), true, false, true)) {
+            ticks_t time = g_resources.getFileTime(path);
+            if (time > 0) {
+                auto fileInfo = std::make_shared<FileInfo>();
+                fileInfo->path = path;
+                fileInfo->time = time;
+                data.files.emplace_back(fileInfo);
+                hasFile = true;
+            }
+        }
+
+        if (!hasFile) {
+            g_logger.warning("ERROR: unable to find any file for module(" + module->getName() + ")");
+            continue;
+        }
+
+        modules.emplace_back(data);
+    }
+
+    g_dispatcher.cycleEvent([modules] {
+        for (auto& module : modules) {
+            bool reload = false;
+
+            for (auto& file : module.files) {
+                const ticks_t newTime = g_resources.getFileTime(file->path);
+
+                if (newTime > file->time) {
+                    file->time = newTime;
+                    reload = true;
+                    break;
+                }
+            }
+
+            if (reload) {
+                g_logger.info("Reloading " + module.ref->getName());
+                module.ref->reload();
+            }
+        }
+    }, 750);
 }

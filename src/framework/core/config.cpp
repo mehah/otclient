@@ -90,7 +90,7 @@ void Config::setList(const std::string& key, const std::vector<std::string>& lis
         return;
 
     const auto& child = OTMLNode::create(key, true);
-    for (const std::string& value : list)
+    for (const auto& value : list)
         child->writeIn(value);
     m_confsDoc->addChild(child);
 }
@@ -141,6 +141,14 @@ void Config::mergeNode(const std::string& key, const OTMLNodePtr& node)
 OTMLNodePtr Config::getNode(const std::string& key)
 {
     return m_confsDoc->get(key);
+}
+
+int Config::getNodeSize(const std::string& key)
+{
+    auto node = m_confsDoc->get(key);
+    if (node)
+        return node->size();
+    return 0;
 }
 
 bool Config::isLoaded() const

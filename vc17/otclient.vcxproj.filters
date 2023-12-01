@@ -339,6 +339,9 @@
     <ClCompile Include="..\src\framework\stdext\uri.cpp">
       <Filter>Source Files\framework\stdext</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\framework\stdext\qrcodegen.cpp">
+      <Filter>Source Files\framework\stdext</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\framework\ui\uianchorlayout.cpp">
       <Filter>Source Files\framework\ui</Filter>
     </ClCompile>
@@ -424,9 +427,6 @@
       <Filter>Source Files\client</Filter>
     </ClCompile>
     <ClCompile Include="..\src\client\luafunctions.cpp">
-      <Filter>Source Files\client</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\client\luavaluecasts.cpp">
       <Filter>Source Files\client</Filter>
     </ClCompile>
     <ClCompile Include="..\src\client\map.cpp">
@@ -531,6 +531,9 @@
     <ClCompile Include="..\src\protobuf\appearances.pb.cc">
       <Filter>Source Files\protobuf</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\client\attachableobject.cpp">
+      <Filter>Source Files\client</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\client\attachedeffect.cpp">
       <Filter>Source Files\client</Filter>
     </ClCompile>
@@ -546,8 +549,17 @@
     <ClCompile Include="..\src\client\position.cpp">
       <Filter>Source Files\client</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\client\uigraph.cpp">
+      <Filter>Source Files\client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\client\luavaluecasts_client.cpp">
+      <Filter>Source Files\client</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\framework\config.h">
+      <Filter>Header Files\framework</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\framework\const.h">
       <Filter>Header Files\framework</Filter>
     </ClInclude>
@@ -878,9 +890,6 @@
     <ClInclude Include="..\src\framework\util\crypt.h">
       <Filter>Header Files\framework\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\framework\util\databuffer.h">
-      <Filter>Header Files\framework\util</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\framework\util\matrix.h">
       <Filter>Header Files\framework\util</Filter>
     </ClInclude>
@@ -933,9 +942,6 @@
       <Filter>Header Files\client</Filter>
     </ClInclude>
     <ClInclude Include="..\src\client\localplayer.h">
-      <Filter>Header Files\client</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\client\luavaluecasts.h">
       <Filter>Header Files\client</Filter>
     </ClInclude>
     <ClInclude Include="..\src\client\map.h">
@@ -1016,9 +1022,6 @@
     <ClInclude Include="..\src\client\animator.h">
       <Filter>Header Files\client</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\client\config.h">
-      <Filter>Header Files\client</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\framework\graphics\drawpoolmanager.h">
       <Filter>Header Files\framework\graphics</Filter>
     </ClInclude>
@@ -1046,6 +1049,9 @@
     <ClInclude Include="..\src\protobuf\appearances.pb.h">
       <Filter>Header Files\protobuf</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\client\attachableobject.h">
+      <Filter>Header Files\client</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\client\attachedeffect.h">
       <Filter>Header Files\client</Filter>
     </ClInclude>
@@ -1056,6 +1062,18 @@
       <Filter>Header Files\client</Filter>
     </ClInclude>
     <ClInclude Include="..\src\client\gameconfig.h">
+      <Filter>Header Files\client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\stdext\uri.h">
+      <Filter>Header Files\framework\stdext</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\stdext\qrcodegen.h">
+      <Filter>Header Files\framework\stdext</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\uigraph.h">
+      <Filter>Header Files\client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\luavaluecasts_client.h">
       <Filter>Header Files\client</Filter>
     </ClInclude>
   </ItemGroup>

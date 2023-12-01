@@ -531,7 +531,19 @@ namespace Otc
         GameItemShader = 101,
         GameCreatureShader = 102,
         GameCreatureAttachedEffect = 103,
-        LastGameFeature = 104
+        GameCountU16 = 104,
+        GameEffectU16 = 105,
+        GameContainerTypes = 106,
+        GameBosstiaryTracker = 107,
+        GamePlayerStateCounter = 108,
+        GameLeechAmount = 109,
+        GameItemAugment = 110,
+        GameDynamicBugReporter = 111,
+        GameWrapKit = 112,
+        GameContainerFilter = 113,
+        GameEnterGameShowAppearance = 114,
+        GameSmoothWalkElevation = 115,
+        LastGameFeature = 116
     };
 
     enum MagicEffectsType_t : uint8_t
@@ -667,13 +679,14 @@ namespace Otc
         ITEM_DESC_CHARGES = 13,
         ITEM_DESC_WEAPONTYPE = 14,
         ITEM_DESC_WEIGHT = 15,
-        ITEM_DESC_IMBUINGSLOTS = 16,
-        ITEM_DESC_MAGICSHIELD = 17,
-        ITEM_DESC_CLEAVE = 18,
-        ITEM_DESC_REFLECTION = 19,
-        ITEM_DESC_PERFECT = 20,
-        ITEM_DESC_UPGRADECLASS = 21,
-        ITEM_DESC_CURRENTTIER = 22,
+        ITEM_DESC_AUGMENT = 16,
+        ITEM_DESC_IMBUINGSLOTS = 17,
+        ITEM_DESC_MAGICSHIELD = 18,
+        ITEM_DESC_CLEAVE = 19,
+        ITEM_DESC_REFLECTION = 20,
+        ITEM_DESC_PERFECT = 21,
+        ITEM_DESC_UPGRADECLASS = 22,
+        ITEM_DESC_CURRENTTIER = 23,
 
         ITEM_DESC_FIRST = ITEM_DESC_ARMOR,
         ITEM_DESC_LAST = ITEM_DESC_CURRENTTIER,

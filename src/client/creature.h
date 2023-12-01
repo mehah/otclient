@@ -51,11 +51,10 @@ public:
     void onAppear() override;
     void onDisappear() override;
 
-    void draw(const Point& dest, uint32_t flags, LightView* lightView = nullptr) override;
+    void draw(const Point& dest, bool drawThings = true, LightView* lightView = nullptr) override;
+    void draw(const Rect& destRect, uint8_t size);
 
-    void internalDraw(Point dest, bool isMarked, const Color& color, LightView* lightView = nullptr);
-
-    void drawOutfit(const Rect& destRect, uint8_t size, const Color& color = Color::white);
+    void internalDraw(Point dest, LightView* lightView = nullptr, const Color& color = Color::white);
     void drawInformation(const MapPosInfo& mapRect, const Point& dest, bool useGray, int drawFlags);
 
     void setId(uint32_t id) override { m_id = id; }
@@ -127,6 +126,10 @@ public:
     PointF getJumpOffset() { return m_jumpOffset; }
     Position getLastStepFromPosition() const { return m_lastStepFromPosition; }
     Position getLastStepToPosition() const { return m_lastStepToPosition; }
+    bool isTimedSquareVisible() { return m_showTimedSquare; }
+    Color getTimedSquareColor() { return m_timedSquareColor; }
+    bool isStaticSquareVisible() { return m_showStaticSquare; }
+    Color getStaticSquareColor() { return m_staticSquareColor; }
 
     ticks_t getWalkTicksElapsed() { return m_walkTimer.ticksElapsed(); }
 
@@ -147,13 +150,19 @@ public:
         }
     }
 
-protected:
+#ifndef BOT_PROTECTION
+    void setText(const std::string& text, const Color& color);
+    std::string getText();
+    void clearText() { setText("", Color::white); }
+    bool canShoot(int distance);
+#endif
 
-    virtual void onDeath();
+protected:
     virtual void updateWalkOffset(uint8_t totalPixelsWalked);
     virtual void updateWalk(bool isPreWalking = false);
     virtual void terminateWalk();
 
+    void onDeath();
     void onPositionChange(const Position& newPos, const Position& oldPos) override;
 
     bool m_walking{ false };
@@ -168,6 +177,7 @@ private:
     void updateShield();
     void updateWalkingTile();
     void updateWalkAnimation();
+    void resetWalkAnimationPhase(bool toSchedule = false);
 
     uint16_t getCurrentAnimationPhase(bool mount = false);
 
@@ -260,6 +270,10 @@ private:
     std::function<void()> m_mountShaderAction{ nullptr };
 
     ThingType* m_mountType{ nullptr };
+
+#ifndef BOT_PROTECTION
+    StaticTextPtr m_text;
+#endif
 };
 
 // @bindclass

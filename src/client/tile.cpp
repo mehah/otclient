@@ -24,27 +24,25 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
 #include <framework/graphics/drawpoolmanager.h>
+#include <framework/ui/uimanager.h>
+#include <framework/ui/uiwidget.h>
 #include "effect.h"
 #include "game.h"
 #include "item.h"
 #include "lightview.h"
 #include "map.h"
+#include "uimap.h"
 #include "protocolgame.h"
+#include "statictext.h"
+#include "localplayer.h"
 
 Tile::Tile(const Position& position) : m_position(position) {}
 
 void Tile::drawThing(const ThingPtr& thing, const Point& dest, int flags, LightView* lightView)
 {
-    const bool isMarked = m_selectType != TileSelectType::NONE && m_highlightThing == thing;
-    thing->setMarkColor(isMarked ? Color::yellow : Color::white);
-
-    thing->draw(dest, flags, lightView);
-
-    if (thing->isItem()) {
-        m_drawElevation += thing->getElevation();
-        if (m_drawElevation > g_gameConfig.getTileMaxElevation())
-            m_drawElevation = g_gameConfig.getTileMaxElevation();
-    }
+    thing->draw(dest - m_drawElevation * g_drawPool.getScaleFactor(), flags & Otc::DrawThings, lightView);
+    if (thing->hasElevation())
+        m_drawElevation = std::min<uint8_t>(m_drawElevation + thing->getElevation(), g_gameConfig.getTileMaxElevation());
 }
 
 void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, LightView* lightView)
@@ -52,18 +50,25 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool is
     m_drawElevation = 0;
     m_lastDrawDest = dest;
 
+#ifndef BOT_PROTECTION
+    if (m_fill != Color::alpha) {
+        g_drawPool.addFilledRect(Rect(dest, Size{ g_gameConfig.getSpriteSize() }), m_fill);
+        return;
+    }
+#endif
+
     for (const auto& thing : m_things) {
         if (!thing->isGround() && !thing->isGroundBorder() && !thing->isOnBottom())
             break;
 
-        drawThing(thing, dest - m_drawElevation * g_drawPool.getScaleFactor(), flags, lightView);
+        drawThing(thing, dest, flags, lightView);
     }
 
     if (hasCommonItem()) {
         for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
             const auto& item = *it;
             if (!item->isCommon()) continue;
-            drawThing(item, dest - m_drawElevation * g_drawPool.getScaleFactor(), flags, lightView);
+            drawThing(item, dest, flags, lightView);
         }
     }
 
@@ -75,6 +80,30 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool is
 
     drawCreature(dest, mapRect, flags, isCovered, false, lightView);
     drawTop(dest, flags, false, lightView);
+    drawAttachedEffect(dest, lightView, false);
+    drawAttachedParticlesEffect(dest);
+
+    for (const auto& thing : m_things) {
+        thing->drawWidgets(mapRect);
+    }
+
+    drawWidgets(mapRect);
+}
+
+int getSmoothedElevation(const CreaturePtr& creature, int currentElevation, float factor) {
+    const auto& fromPos = creature->getLastStepFromPosition();
+    const auto& toPos = creature->getLastStepToPosition();
+    const auto& fromTile = g_map.getTile(fromPos);
+    const auto& toTile = g_map.getTile(toPos);
+
+    if (!fromTile || !toTile) {
+        return currentElevation;
+    }
+
+    const int fromElevation = fromTile->getDrawElevation();
+    const int toElevation = toTile->getDrawElevation();
+
+    return fromElevation != toElevation ? fromElevation + factor * (toElevation - fromElevation) : currentElevation;
 }
 
 void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, bool forceDraw, LightView* lightView)
@@ -86,18 +115,24 @@ void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags,
         for (const auto& thing : m_things) {
             if (!thing->isCreature() || thing->static_self_cast<Creature>()->isWalking()) continue;
 
-            const Point& cDest = dest - m_drawElevation * g_drawPool.getScaleFactor();
-            drawThing(thing, cDest, flags, lightView);
-            thing->static_self_cast<Creature>()->drawInformation(mapRect, cDest, isCovered, flags);
+            drawThing(thing, dest, flags, lightView);
+            thing->static_self_cast<Creature>()->drawInformation(mapRect, dest - m_drawElevation * g_drawPool.getScaleFactor(), isCovered, flags);
         }
     }
 
     for (const auto& creature : m_walkingCreatures) {
+        int elevation = m_drawElevation;
+        if (g_game.getFeature(Otc::GameSmoothWalkElevation)) {
+            const float factor = std::clamp<float>(creature->getWalkTicksElapsed() / static_cast<float>(creature->getStepDuration()), .0f, 1.f);
+            elevation = getSmoothedElevation(creature, elevation, factor);
+        }
+
         const auto& cDest = Point(
-            dest.x + ((creature->getPosition().x - m_position.x) * g_gameConfig.getSpriteSize() - m_drawElevation) * g_drawPool.getScaleFactor(),
-            dest.y + ((creature->getPosition().y - m_position.y) * g_gameConfig.getSpriteSize() - m_drawElevation) * g_drawPool.getScaleFactor()
+            dest.x + ((creature->getPosition().x - m_position.x) * g_gameConfig.getSpriteSize() - elevation) * g_drawPool.getScaleFactor(),
+            dest.y + ((creature->getPosition().y - m_position.y) * g_gameConfig.getSpriteSize() - elevation) * g_drawPool.getScaleFactor()
         );
-        drawThing(creature, cDest, flags, lightView);
+
+        creature->draw(cDest, flags & Otc::DrawThings, lightView);
         creature->drawInformation(mapRect, cDest, isCovered, flags);
     }
 }
@@ -107,30 +142,39 @@ void Tile::drawTop(const Point& dest, int flags, bool forceDraw, LightView* ligh
     if (!forceDraw && !m_drawTopAndCreature)
         return;
 
-    if (hasEffect()) {
-        int offsetX = 0,
-            offsetY = 0;
-
-        if (g_game.getFeature(Otc::GameMapOldEffectRendering)) {
-            offsetX = m_position.x - g_map.getCentralPosition().x;
-            offsetY = m_position.y - g_map.getCentralPosition().y;
-        }
-
-        for (const auto& effect : m_effects) {
-            effect->drawEffect(dest - m_drawElevation * g_drawPool.getScaleFactor(), flags, offsetX, offsetY, lightView);
-        }
-    }
+    for (const auto& effect : m_effects)
+        drawThing(effect, dest, flags & Otc::DrawThings, lightView);
 
     if (hasTopItem()) {
         for (const auto& item : m_things) {
             if (!item->isOnTop()) continue;
-            drawThing(item, dest, flags, lightView);
+            item->draw(dest, flags & Otc::DrawThings, lightView);
         }
     }
 }
 
+void Tile::drawWidgets(const MapPosInfo& mapRect)
+{
+    drawAttachedWidgets(m_lastDrawDest, mapRect);
+}
+
 void Tile::clean()
 {
+    if (g_ui.getMapWidget()
+#ifndef BOT_PROTECTION
+        && (m_text || m_timerText)
+#endif
+        ) {
+        g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
+            if (g_ui.getMapWidget())
+                g_ui.getMapWidget()->getMapView()->removeForegroundTile(tile);
+        }, g_game.getServerBeat());
+    }
+
+    if (hasAttachedWidgets()) {
+        clearAttachedWidgets();
+    }
+
     m_highlightThing = nullptr;
     while (!m_things.empty())
         removeThing(m_things.front());
@@ -141,7 +185,7 @@ void Tile::clean()
 #ifdef FRAMEWORK_EDITOR
     m_flags = 0;
 #endif
-}
+        }
 
 void Tile::addWalkingCreature(const CreaturePtr& creature)
 {
@@ -152,10 +196,11 @@ void Tile::addWalkingCreature(const CreaturePtr& creature)
 void Tile::removeWalkingCreature(const CreaturePtr& creature)
 {
     const auto it = std::find(m_walkingCreatures.begin(), m_walkingCreatures.end(), creature);
-    if (it != m_walkingCreatures.end()) {
-        m_walkingCreatures.erase(it);
-        recalculateThingFlag();
-    }
+    if (it == m_walkingCreatures.end())
+        return;
+
+    m_walkingCreatures.erase(it);
+    recalculateThingFlag();
 }
 
 // TODO: Need refactoring
@@ -252,6 +297,9 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
 
     thing->setPosition(m_position, stackPos, hasElev);
     thing->onAppear();
+
+    if (g_game.isTileThingLuaCallbackEnabled())
+        callLuaField("onAddThing", thing);
 }
 
 // TODO: Need refactoring
@@ -282,6 +330,9 @@ bool Tile::removeThing(const ThingPtr thing)
     checkForDetachableThing();
 
     thing->onDisappear();
+
+    if (g_game.isTileThingLuaCallbackEnabled())
+        callLuaField("onRemoveThing", thing);
 
     return true;
 }
@@ -314,11 +365,6 @@ int Tile::getThingStackPos(const ThingPtr& thing)
     }
 
     return -1;
-}
-
-bool Tile::hasThing(const ThingPtr& thing)
-{
-    return std::find(m_things.begin(), m_things.end(), thing) != m_things.end();
 }
 
 ThingPtr Tile::getTopThing()
@@ -559,27 +605,6 @@ bool Tile::isCovered(int8_t firstFloor)
     return (m_isCovered & idState) == idState;
 }
 
-bool Tile::isClickable()
-{
-    bool hasGround = false;
-    bool hasOnBottom = false;
-    bool hasIgnoreLook = false;
-    for (const auto& thing : m_things) {
-        if (thing->isGround())
-            hasGround = true;
-        else if (thing->isOnBottom())
-            hasOnBottom = true;
-
-        if (thing->isIgnoreLook())
-            hasIgnoreLook = true;
-
-        if ((hasGround || hasOnBottom) && !hasIgnoreLook)
-            return true;
-    }
-
-    return false;
-}
-
 void Tile::onAddInMapView()
 {
     m_drawTopAndCreature = true;
@@ -627,6 +652,9 @@ bool Tile::limitsFloorsView(bool isFreeView)
 
 bool Tile::checkForDetachableThing()
 {
+    if (m_highlightThing)
+        m_highlightThing->setMarked(Color::white);
+
     m_highlightThing = nullptr;
     if (const auto& creature = getTopCreature()) {
         m_highlightThing = creature;
@@ -711,6 +739,9 @@ void Tile::setThingFlag(const ThingPtr& thing)
     if (hasElevation())
         m_thingTypeFlag |= TileThingType::HAS_THING_WITH_ELEVATION;
 
+    if (thing->isIgnoreLook())
+        m_thingTypeFlag |= TileThingType::IGNORE_LOOK;
+
     // best option to have something more real, but in some cases as a custom project,
     // the developers are not defining crop size
     //if(thing->getRealSize() > g_gameConfig.getSpriteSize())
@@ -762,11 +793,17 @@ void Tile::select(TileSelectType selectType)
             m_highlightThing = m_things.back();
     }
 
+    if (m_highlightThing)
+        m_highlightThing->setMarked(Color::yellow);
+
     m_selectType = selectType;
 }
 
 void Tile::unselect()
 {
+    if (m_highlightThing)
+        m_highlightThing->setMarked(Color::white);
+
     if (m_selectType == TileSelectType::NO_FILTERED)
         checkForDetachableThing();
 
@@ -800,3 +837,77 @@ bool Tile::canRender(uint32_t& flags, const Position& cameraPosition, const Awar
 
     return flags > 0;
 }
+
+#ifndef BOT_PROTECTION
+void Tile::drawTexts(Point dest)
+{
+    if (m_timerText && g_clock.millis() < m_timer) {
+        if (m_text && m_text->hasText())
+            dest.y -= 8;
+        m_timerText->setText(stdext::format("%.01f", (m_timer - g_clock.millis()) / 1000.));
+        m_timerText->drawText(dest, Rect(dest.x - 64, dest.y - 64, 128, 128));
+        dest.y += 16;
+    }
+
+    if (m_text && m_text->hasText()) {
+        m_text->drawText(dest, Rect(dest.x - 64, dest.y - 64, 128, 128));
+    }
+}
+
+void Tile::setText(const std::string& text, Color color)
+{
+    if (!m_text) {
+        m_text = std::make_shared<StaticText>();
+        g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
+            if (g_ui.getMapWidget())
+                g_ui.getMapWidget()->getMapView()->addForegroundTile(tile);
+        }, g_game.getServerBeat());
+    }
+
+    m_text->setText(text);
+    m_text->setColor(color);
+}
+
+std::string Tile::getText()
+{
+    return m_text ? m_text->getText() : "";
+}
+
+void Tile::setTimer(int time, Color color)
+{
+    if (time > 60000) {
+        g_logger.warning("Max tile timer value is 300000 (300s)!");
+        return;
+    }
+    m_timer = time + g_clock.millis();
+    if (!m_timerText) {
+        m_timerText = std::make_shared<StaticText>();
+        g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
+            if (g_ui.getMapWidget())
+                g_ui.getMapWidget()->getMapView()->addForegroundTile(tile);
+        }, g_game.getServerBeat());
+    }
+
+    m_timerText->setColor(color);
+}
+
+int Tile::getTimer()
+{
+    return m_timerText ? std::max<int>(0, m_timer - g_clock.millis()) : 0;
+}
+
+void Tile::setFill(Color color)
+{
+    m_fill = color;
+}
+
+bool Tile::canShoot(int distance)
+{
+    auto player = g_game.getLocalPlayer();
+    if (!player) return false;
+    auto playerPos = player->getPosition();
+    if (distance > 0 && std::max<int>(std::abs(m_position.x - playerPos.x), std::abs(m_position.y - playerPos.y)) > distance)
+        return false;
+    return g_map.isSightClear(playerPos, m_position);
+}
+#endif

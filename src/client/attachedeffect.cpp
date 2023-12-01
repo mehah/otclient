@@ -23,6 +23,8 @@
 #include "attachedeffect.h"
 #include "shadermanager.h"
 #include "gameconfig.h"
+#include "lightview.h"
+
 #include <framework/core/clock.h>
 #include <framework/graphics/animatedtexture.h>
 
@@ -52,20 +54,24 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
         const int animation = getCurrentAnimationPhase();
         if (m_loop > -1 && animation != m_lastAnimation) {
             m_lastAnimation = animation;
-            if (animation == 0)
-                --m_loop;
+            if (animation == 0 && --m_loop == 0)
+                return;
         }
 
         if (m_shader) g_drawPool.setShaderProgram(m_shader, true);
         if (m_opacity < 100) g_drawPool.setOpacity(getOpacity(), true);
 
         const auto& point = dest - (dirControl.offset * g_drawPool.getScaleFactor());
+        if (lightView && m_light.intensity > 0)
+            lightView->addLightSource(dest, m_light);
 
         if (m_texture) {
             const auto& size = (m_size.isUnset() ? m_texture->getSize() : m_size) * g_drawPool.getScaleFactor();
-            g_drawPool.addTexturedRect(Rect(point, size), m_texture->get(m_frame, m_animationTimer));
+            const auto& texture = m_texture->get(m_frame, m_animationTimer);
+            const auto& rect = Rect(Point(), texture->getSize());
+            g_drawPool.addTexturedRect(Rect(point, size), texture, rect, Color::white, { .order = getDrawOrder() });
         } else {
-            m_thingType->draw(point, 0, m_direction, 0, 0, animation, Otc::DrawThingsAndLights, Color::white, lightView);
+            m_thingType->draw(point, 0, m_direction, 0, 0, animation, Color::white, true, lightView, {.order = getDrawOrder()});
         }
     }
 
@@ -75,8 +81,10 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
 
 int AttachedEffect::getCurrentAnimationPhase()
 {
-    if (m_texture)
+    if (m_texture) {
+        m_texture->get(m_frame, m_animationTimer);
         return m_frame;
+    }
 
     const auto* animator = m_thingType->getIdleAnimator();
     if (!animator && m_thingType->isAnimateAlways())

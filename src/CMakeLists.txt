@@ -11,10 +11,11 @@ option(TOGGLE_FRAMEWORK_EDITOR "Use Editor " OFF)
 option(TOGGLE_DIRECTX "Use DX9 support" OFF)
 option(TOGGLE_BIN_FOLDER "Use build/bin folder for generate compilation files" OFF)
 option(TOGGLE_BOT_PROTECTION "Use bot protection" ON)
-option(TOGGLE_PRE_COMPILED_HEADER "Use precompiled header (speed up compile)" OFF)
 option(DEBUG_LOG "Enable Debug Log" OFF)
 option(ASAN_ENABLED "Build this target with AddressSanitizer" OFF)
 option(BUILD_STATIC_LIBRARY "Build using static libraries" OFF)
+option(TOGGLE_PRE_COMPILED_HEADER "Use precompiled header (speed up compile)" ON)
+option(SPEED_UP_BUILD_UNITY "Compile using build unity for speed up build" ON)
 
 # *****************************************************************************
 # Cmake Features
@@ -31,6 +32,17 @@ set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 # Generate compile_commands.json
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# *****************************************************************************
+# Client
+# *****************************************************************************
+if (MSVC)
+	add_executable(${PROJECT_NAME} "" ../cmake/icon/otcicon.rc)
+elseif(ANDROID)
+	add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+else()
+	add_executable(${PROJECT_NAME} "")
+endif()
 
 # *****************************************************************************
 # Options Code
@@ -64,26 +76,20 @@ endif(TOGGLE_BOT_PROTECTION)
 
 # Set for use precompiled header
 if(TOGGLE_PRE_COMPILED_HEADER)
-	include(cotire)
-	cotire(${PROJECT_NAME})
+	# === PRECOMPILED HEADER ===
+	target_precompile_headers(${PROJECT_NAME} PRIVATE framework/pch.h)
 	message(STATUS "Use precompiled header: ON")
 else()
 	message(STATUS "Use precompiled header: OFF")
 endif(TOGGLE_PRE_COMPILED_HEADER)
 
+# === UNITY BUILD (compile time reducer) ===
+if(SPEED_UP_BUILD_UNITY)
+	set_target_properties(${PROJECT_NAME} PROPERTIES UNITY_BUILD ON)
+	log_option_enabled("Build unity for speed up compilation")
+endif(SPEED_UP_BUILD_UNITY)
 
 set(VERSION "1.0.0")
-
-# *****************************************************************************
-# Client
-# *****************************************************************************
-if (MSVC)
-	add_executable(${PROJECT_NAME} "" ../cmake/icon/otcicon.rc)
-elseif(ANDROID)
-	add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
-else()
-	add_executable(${PROJECT_NAME} "")
-endif()
 
 # *****************************************************************************
 # Build flags
@@ -226,52 +232,6 @@ endif()
 # OTClient source files configuration
 # *****************************************************************************
 set(SOURCE_FILES
-	client/animatedtext.cpp
-	client/animator.cpp
-	client/attachedeffect.cpp
-	client/attachedeffectmanager.cpp
-	client/client.cpp
-	client/container.cpp
-	client/creature.cpp
-	client/creatures.cpp
-	client/effect.cpp
-	client/game.cpp
-	client/gameconfig.cpp
-	client/houses.cpp
-	client/item.cpp
-	client/itemtype.cpp
-	client/lightview.cpp
-	client/localplayer.cpp
-	client/luafunctions.cpp
-	client/luavaluecasts.cpp
-	client/map.cpp
-	client/mapio.cpp
-	client/mapview.cpp
-	client/minimap.cpp
-	client/missile.cpp
-	client/outfit.cpp
-	client/player.cpp
-	client/position.cpp
-	client/protocolcodes.cpp
-	client/protocolgame.cpp
-	client/protocolgameparse.cpp
-	client/protocolgamesend.cpp
-	client/shadermanager.cpp
-	client/spriteappearances.cpp
-	client/spritemanager.cpp
-	client/statictext.cpp
-	client/thing.cpp
-	client/thingtype.cpp
-	client/thingtypemanager.cpp
-	client/tile.cpp
-	client/towns.cpp
-	client/uicreature.cpp
-	client/uiitem.cpp
-	client/uimap.cpp
-	client/uimapanchorlayout.cpp
-	client/uiminimap.cpp
-	client/uiprogressrect.cpp
-	client/uisprite.cpp
 	framework/core/adaptativeframecounter.cpp
 	framework/core/application.cpp
 	framework/core/asyncdispatcher.cpp
@@ -301,7 +261,6 @@ set(SOURCE_FILES
 	framework/graphics/drawpoolmanager.cpp
 	framework/graphics/fontmanager.cpp
 	framework/graphics/framebuffer.cpp
-	framework/graphics/framebuffermanager.cpp
 	framework/graphics/graphics.cpp
 	framework/graphics/hardwarebuffer.cpp
 	framework/graphics/image.cpp
@@ -354,6 +313,7 @@ set(SOURCE_FILES
 	framework/stdext/string.cpp
 	framework/stdext/time.cpp
 	framework/stdext/uri.cpp
+	framework/stdext/qrcodegen.cpp
 	framework/ui/uianchorlayout.cpp
 	framework/ui/uiboxlayout.cpp
 	framework/ui/uigridlayout.cpp
@@ -370,6 +330,55 @@ set(SOURCE_FILES
 	framework/ui/uiwidgettext.cpp
 	framework/util/color.cpp
 	framework/util/crypt.cpp
+
+	client/animatedtext.cpp
+	client/animator.cpp
+	client/attachableobject.cpp
+	client/attachedeffect.cpp
+	client/attachedeffectmanager.cpp
+	client/client.cpp
+	client/container.cpp
+	client/creature.cpp
+	client/creatures.cpp
+	client/effect.cpp
+	client/game.cpp
+	client/gameconfig.cpp
+	client/houses.cpp
+	client/item.cpp
+	client/itemtype.cpp
+	client/lightview.cpp
+	client/localplayer.cpp
+	client/luafunctions.cpp
+	client/luavaluecasts_client.cpp
+	client/map.cpp
+	client/mapio.cpp
+	client/mapview.cpp
+	client/minimap.cpp
+	client/missile.cpp
+	client/outfit.cpp
+	client/player.cpp
+	client/position.cpp
+	client/protocolcodes.cpp
+	client/protocolgame.cpp
+	client/protocolgameparse.cpp
+	client/protocolgamesend.cpp
+	client/shadermanager.cpp
+	client/spriteappearances.cpp
+	client/spritemanager.cpp
+	client/statictext.cpp
+	client/thing.cpp
+	client/thingtype.cpp
+	client/thingtypemanager.cpp
+	client/tile.cpp
+	client/towns.cpp
+	client/uicreature.cpp
+	client/uigraph.cpp
+	client/uiitem.cpp
+	client/uimap.cpp
+	client/uimapanchorlayout.cpp
+	client/uiminimap.cpp
+	client/uiprogressrect.cpp
+	client/uisprite.cpp
 
 	protobuf/appearances.pb.cc
 	main.cpp

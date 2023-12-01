@@ -24,8 +24,6 @@
 #include "soundbuffer.h"
 #include "soundfile.h"
 
-#include <framework/util/databuffer.h>
-
 StreamSoundSource::StreamSoundSource()
 {
     for (auto& buffer : m_buffers)
@@ -133,7 +131,7 @@ bool StreamSoundSource::fillBufferAndQueue(uint32_t buffer)
         return false;
 
     // fill buffer
-    static DataBuffer<char> bufferData(2 * STREAM_FRAGMENT_SIZE);
+    static std::vector<char> bufferData(2 * STREAM_FRAGMENT_SIZE);
     ALenum format = m_soundFile->getSampleFormat();
 
     int maxRead = STREAM_FRAGMENT_SIZE;
@@ -142,7 +140,7 @@ bool StreamSoundSource::fillBufferAndQueue(uint32_t buffer)
 
     int bytesRead = 0;
     do {
-        bytesRead += m_soundFile->read(&bufferData[bytesRead], maxRead - bytesRead);
+        bytesRead += m_soundFile->read(reinterpret_cast<void*>(bufferData.data() + bytesRead), maxRead - bytesRead);
 
         // end of sound file
         if (bytesRead < maxRead) {
@@ -160,14 +158,14 @@ bool StreamSoundSource::fillBufferAndQueue(uint32_t buffer)
             if (format == AL_FORMAT_STEREO16) {
                 assert(bytesRead % 2 == 0);
                 bytesRead /= 2;
-                auto* const data = (uint16_t*)bufferData.data();
+                auto* const data = reinterpret_cast<uint16_t*>(bufferData.data());
                 for (int i = 0; i < bytesRead / 2; ++i)
                     data[i] = data[2 * i + (m_downMix == DownMixLeft ? 0 : 1)];
                 format = AL_FORMAT_MONO16;
             }
         }
 
-        alBufferData(buffer, format, &bufferData[0], bytesRead, m_soundFile->getRate());
+        alBufferData(buffer, format, bufferData.data(), bytesRead, m_soundFile->getRate());
         ALenum err = alGetError();
         if (err != AL_NO_ERROR)
             g_logger.error(stdext::format("unable to refill audio buffer for '%s': %s", m_soundFile->getName(), alGetString(err)));

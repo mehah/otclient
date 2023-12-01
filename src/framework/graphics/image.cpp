@@ -27,6 +27,9 @@
 #include <framework/graphics/apngloader.h>
 
 #include "framework/stdext/math.h"
+#include "framework/stdext/qrcodegen.h"
+
+using namespace qrcodegen;
 
 Image::Image(const Size& size, int bpp, uint8_t* pixels) : m_size(size), m_bpp(bpp)
 {
@@ -242,4 +245,27 @@ void Image::reverseChannels()
     for (uint8_t* itr = pixelData; itr < pixelData + m_pixels.size(); itr += m_bpp) {
         std::swap(*(itr + 0), *(itr + 2));
     }
+}
+
+ImagePtr Image::fromQRCode(const std::string& code, int border)
+{
+    try
+    {
+        QrCode qrCode = QrCode::encodeText(code.c_str(), QrCode::Ecc::MEDIUM);
+
+        const auto size = qrCode.getSize();
+        ImagePtr image(new Image(Size(size + border * 2, size + border * 2)));
+
+        for (int x = 0; x < size + border * 2; ++x) {
+            for (int y = 0; y < size + border * 2; ++y) {
+                image->setPixel(x, y, qrCode.getModule(x - border, y - border) ? Color::black : Color::white);
+            }
+        }
+
+        return image;
+    } catch (const std::exception& e) {
+        g_logger.error(stdext::format("Failed to encode qr-code: '%s': %s", code, e.what()));
+    }
+
+    return {};
 }

@@ -76,17 +76,13 @@ class Item : public Thing
 public:
     static ItemPtr create(int id);
 
-    void draw(const Point& dest, uint32_t flags, const Color& color, LightView* lightView = nullptr);
-    void draw(const Point& dest, uint32_t flags, LightView* lightView = nullptr) override {
-        draw(dest, flags, Color::white, lightView);
-    };
-
+    void draw(const Point& dest, bool drawThings = true, LightView* lightView = nullptr) override;
     void setId(uint32_t id) override;
 
     void setCountOrSubType(int value) { m_countOrSubType = value; updatePatterns(); }
     void setCount(int count) { m_countOrSubType = count; updatePatterns(); }
     void setSubType(int subType) { m_countOrSubType = subType; updatePatterns(); }
-    void setColor(const Color& c) { m_color = c; }
+    void setColor(const Color& c) { if (m_color != c) m_color = c; }
     void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false) override;
 
     int getCountOrSubType() const { return m_countOrSubType; }
@@ -151,10 +147,10 @@ public:
 #endif
 
 private:
-    void internalDraw(int animationPhase, const Point& dest, const Color& color, bool isMarked, uint32_t flags, LightView* lightView = nullptr);
+    void internalDraw(int animationPhase, const Point& dest, const Color& color, bool drawThings, bool replaceColorShader, LightView* lightView = nullptr);
     void setConductor();
 
-    uint8_t m_countOrSubType{ 0 };
+    uint16_t m_countOrSubType{ 0 };
 
     Color m_color{ Color::white };
 

@@ -229,7 +229,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
     // cyclopediaitem
     // ammo
 
-    if (flags.has_show_off_socket()) {
+    if (flags.has_show_off_socket() && flags.show_off_socket()) {
         m_flags |= ThingFlagAttrPodium;
     }
 
@@ -244,19 +244,23 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
     // reverse_addons_south
     // reverse_addons_north
 
-    if (flags.has_wearout()) {
+    if (flags.has_wearout() && flags.wearout()) {
         m_flags |= ThingFlagAttrWearOut;
     }
 
-    if (flags.has_clockexpire()) {
+    if (flags.has_clockexpire() && flags.clockexpire()) {
         m_flags |= ThingFlagAttrClockExpire;
     }
 
-    if (flags.has_expire()) {
+    if (flags.has_expire() && flags.expire()) {
         m_flags |= ThingFlagAttrExpire;
     }
 
-    if (flags.has_expirestop()) {
+    if (flags.has_expirestop() && flags.expirestop()) {
+        m_flags |= ThingFlagAttrExpireStop;
+    }
+
+    if (flags.has_deco_kit() && flags.deco_kit()) {
         m_flags |= ThingFlagAttrExpireStop;
     }
 
@@ -599,7 +603,21 @@ void ThingType::unserializeOtml(const OTMLNodePtr& node)
     }
 }
 
-void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, uint32_t flags, const Color& color, LightView* lightView, const DrawConductor& conductor)
+void ThingType::drawWithFrameBuffer(const TexturePtr& texture, const Rect& screenRect, const Rect& textureRect, const Color& color, const DrawConductor& conductor) {
+    const int size = static_cast<int>(g_gameConfig.getSpriteSize() * std::max<int>(m_size.area(), 2) * g_drawPool.getScaleFactor());
+    const auto& p = (Point(size) - screenRect.size().toPoint()) / 2;
+    const auto& destDiff = Rect(screenRect.topLeft() - p, Size{ size });
+
+    g_drawPool.bindFrameBuffer(destDiff.size()); {
+        // Debug
+         // g_drawPool.addBoundingRect(Rect(Point(0), destDiff.size()), Color::red);
+
+        g_drawPool.addTexturedRect(Rect(p, screenRect.size()), texture, textureRect, color, conductor);
+    } g_drawPool.releaseFrameBuffer(destDiff);
+    g_drawPool.resetShaderProgram();
+}
+
+void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, const Color& color, bool drawThings, LightView* lightView, const DrawConductor& conductor)
 {
     if (m_null)
         return;
@@ -622,16 +640,17 @@ void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, i
 
     const Rect screenRect(dest + (textureOffset - m_displacement - (m_size.toPoint() - Point(1)) * g_gameConfig.getSpriteSize()) * g_drawPool.getScaleFactor(), textureRect.size() * g_drawPool.getScaleFactor());
 
-    if (flags & Otc::DrawThings) {
+    if (drawThings) {
         const auto& newColor = m_opacity < 1.0f ? Color(color, m_opacity) : color;
-        g_drawPool.addTexturedRect(screenRect, texture, textureRect, newColor, conductor);
+
+        if (g_drawPool.shaderNeedFramebuffer())
+            drawWithFrameBuffer(texture, screenRect, textureRect, newColor, conductor);
+        else
+            g_drawPool.addTexturedRect(screenRect, texture, textureRect, newColor, conductor);
     }
 
-    if (lightView && hasLight() && flags & Otc::DrawLights) {
-        const Light& light = getLight();
-        if (light.intensity > 0) {
-            lightView->addLightSource(screenRect.center(), light);
-        }
+    if (lightView && hasLight()) {
+        lightView->addLightSource(screenRect.center(), m_light);
     }
 }
 
@@ -923,6 +942,7 @@ ThingFlagAttr ThingType::thingAttrToThingFlagAttr(ThingAttr attr) {
         case ThingAttrPodium: return ThingFlagAttrPodium;
         case ThingAttrTopEffect: return ThingFlagAttrTopEffect;
         case ThingAttrMarket: return ThingFlagAttrMarket;
+        case ThingAttrDecoKit: return ThingFlagAttrDecoKit;
         default: break;
     }
 

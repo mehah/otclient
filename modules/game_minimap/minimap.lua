@@ -2,6 +2,10 @@ local otmm = true
 local oldPos = nil
 local minimapButton = nil
 
+-- bot fix
+minimapWidget = nil
+
+
 local function updateCameraPosition()
     local player = g_game.getLocalPlayer()
     if not player then
@@ -58,20 +62,18 @@ local function toggleFullMap()
     minimapWidget:setCameraPosition(pos)
 end
 
-local localPlayerEvent = EventController:new(LocalPlayer, {
+controller = Controller:new()
+controller:setUI('minimap', modules.game_interface.getRightPanel())
+local localPlayerEvent = controller:addEvent(LocalPlayer, {
     onPositionChange = updateCameraPosition
 })
-
-controller = Controller:new()
-controller:setUI('minimap')
-controller:attachExternalEvent(localPlayerEvent)
 
 function controller:onInit()
     minimapButton = modules.client_topmenu.addRightGameToggleButton('minimapButton', tr('Minimap') .. ' (Ctrl+M)',
         '/images/topbuttons/minimap', toggle)
     minimapButton:setOn(true)
 
-    local minimapWidget = self.ui.contentsPanel.minimap
+    minimapWidget = self.ui.contentsPanel.minimap
 
     local gameRootPanel = modules.game_interface.getRootPanel()
     self:bindKeyPress('Alt+Left', function()
@@ -90,7 +92,6 @@ function controller:onInit()
     self:bindKeyDown('Ctrl+M', toggle)
     self:bindKeyDown('Ctrl+Shift+M', toggleFullMap)
 
-    self.ui:setVisible(false)
     self.ui:setContentMinimumHeight(80)
     self.ui:setup()
 end

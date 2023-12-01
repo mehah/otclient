@@ -23,10 +23,12 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/graphics/painter.h>
 #include <framework/graphics/animatedtexture.h>
+#include <framework/graphics/image.h>
 #include <framework/graphics/texture.h>
 #include <framework/graphics/texturemanager.h>
 #include "uiwidget.h"
 #include "framework/graphics/drawpoolmanager.h"
+#include <framework/util/crypt.h>
 
 void UIWidget::initImage() {}
 
@@ -34,7 +36,9 @@ void UIWidget::parseImageStyle(const OTMLNodePtr& styleNode)
 {
     for (const auto& node : styleNode->children()) {
         if (node->tag() == "image-source")
-            setImageSource(stdext::resolve_path(node->value(), node->source()));
+            setImageSource(stdext::resolve_path(node->value(), node->source()), false);
+        else if (node->tag() == "image-source-base64")
+            setImageSource(stdext::resolve_path(node->value(), node->source()), true);
         else if (node->tag() == "image-offset-x")
             setImageOffsetX(node->value<int>());
         else if (node->tag() == "image-offset-y")
@@ -73,6 +77,10 @@ void UIWidget::parseImageStyle(const OTMLNodePtr& styleNode)
             setImageAutoResize(node->value<bool>());
         else if (node->tag() == "image-individual-animation")
             setImageIndividualAnimation(node->value<bool>());
+        else if (node->tag() == "qr-code")
+            setQRCode(node->value(), getQrCodeBorder());
+        else if (node->tag() == "qr-code-border")
+            setQRCodeBorder(node->value<int>());
     }
 }
 
@@ -177,7 +185,7 @@ void UIWidget::drawImage(const Rect& screenCoords)
     }
 }
 
-void UIWidget::setImageSource(const std::string_view source)
+void UIWidget::setImageSource(const std::string_view source, bool base64)
 {
     updateImageCache();
 
@@ -187,7 +195,15 @@ void UIWidget::setImageSource(const std::string_view source)
         return;
     }
 
-    m_imageTexture = g_textures.getTexture(m_imageSource = source, isImageSmooth());
+    if (base64) {
+        std::stringstream stream;
+        const auto& decoded = g_crypt.base64Decode(source);
+        stream.write(decoded.c_str(), decoded.size());
+        m_imageTexture = g_textures.loadTexture(stream);
+    } else {
+	m_imageTexture = g_textures.getTexture(m_imageSource = source, isImageSmooth());
+    }
+    
     if (!m_imageTexture)
         return;
 
@@ -200,6 +216,31 @@ void UIWidget::setImageSource(const std::string_view source)
     }
 
     if (!m_rect.isValid() || hasProp(PropImageAutoResize)) {
+        const auto& imageSize = m_imageTexture->getSize();
+
+        Size size = getSize();
+        if (size.width() <= 0 || hasProp(PropImageAutoResize))
+            size.setWidth(imageSize.width());
+
+        if (size.height() <= 0 || hasProp(PropImageAutoResize))
+            size.setHeight(imageSize.height());
+
+        setSize(size);
+    }
+}
+
+void UIWidget::setQRCode(const std::string& code, int border)
+{
+    if (code.empty()) {
+        m_imageTexture = nullptr;
+        m_qrCode = {};
+        return;
+    }
+
+    m_qrCode = code;
+    m_imageTexture = TexturePtr(new Texture(Image::fromQRCode(code, border)));
+
+    if (m_imageTexture && (!m_rect.isValid() || isImageAutoResize())) {
         const auto& imageSize = m_imageTexture->getSize();
 
         Size size = getSize();

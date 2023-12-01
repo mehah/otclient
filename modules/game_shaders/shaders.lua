@@ -1,5 +1,5 @@
 HOTKEY = 'Ctrl+Y'
-MAP_SHADERS = {{
+MAP_SHADERS = { {
     name = 'Map - Default',
     frag = nil
 }, {
@@ -47,9 +47,9 @@ MAP_SHADERS = {{
 }, {
     name = 'Map - Noise',
     frag = 'shaders/fragment/noise.frag'
-}}
+} }
 
-OUTFIT_SHADERS = {{
+OUTFIT_SHADERS = { {
     name = 'Outfit - Default',
     frag = nil
 }, {
@@ -65,15 +65,19 @@ OUTFIT_SHADERS = {{
 }, {
     name = 'Outfit - Fragmented',
     frag = 'shaders/fragment/noise.frag'
-}}
+}, {
+    name = 'Outfit - Outline',
+    useFramebuffer = true,
+    frag = 'shaders/fragment/outline.frag'
+} }
 
-MOUNT_SHADERS = {{
+MOUNT_SHADERS = { {
     name = 'Mount - Default',
     frag = nil
 }, {
     name = 'Mount - Rainbow',
     frag = 'shaders/fragment/party.frag'
-}}
+} }
 
 -- Fix for texture offset drawing, adding walking offsets.
 local dirs = {
@@ -172,11 +176,10 @@ function init()
 
     local registerShader = function(opts, method)
         local fragmentShaderPath = resolvepath(opts.frag)
-        local vertexShaderPath = resolvepath(opts.frag ~= nil and opts.vert or 'shaders/core/vertex/default.vert')
 
         if fragmentShaderPath ~= nil then
             --  local shader = g_shaders.createShader()
-            g_shaders.createFragmentShader(opts.name, opts.frag)
+            g_shaders.createFragmentShader(opts.name, opts.frag, opts.useFramebuffer or false)
 
             if opts.tex1 then
                 g_shaders.addMultiTexture(opts.name, opts.tex1)

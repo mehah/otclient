@@ -25,28 +25,31 @@
 #include <framework/core/resourcemanager.h>
 #include <framework/luaengine/luainterface.h>
 
-#if ENABLE_DISCORD_RPC == 1
-#include <framework/discord/discord.h>
+#ifndef ANDROID
+    #if ENABLE_DISCORD_RPC == 1
+        #include <framework/discord/discord.h>
+    #endif
 #endif
 
 #ifdef FRAMEWORK_NET
 #include <framework/net/protocolhttp.h>
 #endif
 
+#ifdef ANDROID
+extern "C" {
+#endif
+
 int main(int argc, const char* argv[])
 {
     std::vector<std::string> args(argv, argv + argc);
-
-    // setup application name and version
-    g_app.setName("OTClient - Redemption");
-    g_app.setCompactName("otclient");
-    g_app.setOrganizationName("otbr");
 
     // process args encoding
     g_platform.init(args);
 
     // initialize resources
 #ifdef ANDROID
+    // Unzip Android assets/data.zip
+    g_androidManager.unZipAssetData();
     g_resources.init(nullptr);
 #else
     g_resources.init(args[0].data());
@@ -72,8 +75,10 @@ int main(int argc, const char* argv[])
     if (!g_resources.discoverWorkDir("init.lua"))
         g_logger.fatal("Unable to find work directory, the application cannot be initialized.");
 
-#if ENABLE_DISCORD_RPC == 1
-    g_discord.init();
+#ifndef ANDROID
+    #if ENABLE_DISCORD_RPC == 1
+        g_discord.init();
+    #endif
 #endif
 
     // initialize application framework and otclient
@@ -81,11 +86,6 @@ int main(int argc, const char* argv[])
     g_client.init(args);
 #ifdef FRAMEWORK_NET
     g_http.init();
-#endif
-
-#ifdef ANDROID
-    // Unzip Android assets/data.zip
-    g_androidManager.unZipAssetData();
 #endif
 
     if (!g_lua.safeRunScript("init.lua"))
@@ -104,4 +104,7 @@ int main(int argc, const char* argv[])
     g_http.terminate();
 #endif
     return 0;
+    }
+#ifdef ANDROID
 }
+#endif

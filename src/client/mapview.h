@@ -88,8 +88,8 @@ public:
 
     MapView();
     ~MapView() override;
-    void draw();
-    void drawText();
+    void draw(const Rect& rect);
+    void drawForeground(const Rect& rect);
 
     // floor visibility related
     uint8_t getLockedFirstVisibleFloor() const { return m_lockedFirstVisibleFloor; }
@@ -181,6 +181,9 @@ public:
     PainterShaderProgramPtr getNextShader() { return m_nextShader; }
     bool isSwitchingShader() { return !m_shaderSwitchDone; }
 
+    void addForegroundTile(const TilePtr& tile);
+    void removeForegroundTile(const TilePtr& tile);
+
 protected:
     void onGlobalLightChange(const Light& light);
     void onFloorChange(uint8_t floor, uint8_t previousFloor);
@@ -220,20 +223,24 @@ private:
         TexturePtr texture;
     };
 
+    void updateHighlightTile(const Position& mousePos);
+    void destroyHighlightTile();
+
+    void updateLight();
+    void updateViewportDirectionCache();
     void updateGeometry(const Size& visibleDimension);
     void updateVisibleTiles();
     void updateRect(const Rect& rect);
+    void updateViewport(const Otc::Direction dir = Otc::InvalidDirection) { m_viewport = m_viewPortDirection[dir]; }
     void requestUpdateVisibleTiles() { m_updateVisibleTiles = true; }
-    void requestUpdateMapPosInfo() { m_posInfo.rect = {}; }
+    void requestUpdateMapPosInfo() { m_updateMapPosInfo = true; }
+
+    void registerEvents();
 
     uint8_t calcFirstVisibleFloor(bool checkLimitsFloorsView) const;
     uint8_t calcLastVisibleFloor() const;
 
-    void updateLight();
-    void updateViewportDirectionCache();
     void drawFloor();
-
-    void updateViewport(const Otc::Direction dir = Otc::InvalidDirection) { m_viewport = m_viewPortDirection[dir]; }
 
     bool canFloorFade() const { return m_floorViewMode == FADE && m_floorFading; }
 
@@ -289,6 +296,7 @@ private:
 
     bool m_limitVisibleDimension{ true };
     bool m_updateVisibleTiles{ true };
+    bool m_updateMapPosInfo{ true };
     bool m_resetCoveredCache{ true };
     bool m_shaderSwitchDone{ true };
     bool m_drawHealthBars{ true };
@@ -310,6 +318,7 @@ private:
     AntialiasingMode m_antiAliasingMode{ AntialiasingMode::ANTIALIASING_DISABLED };
 
     std::vector<FloorData> m_floors;
+    std::vector<TilePtr> m_foregroundTiles;
 
     PainterShaderProgramPtr m_shader;
     PainterShaderProgramPtr m_nextShader;

@@ -109,7 +109,7 @@ std::string Crypt::base64Encode(const std::string& decoded_string)
     return ret;
 }
 
-std::string Crypt::base64Decode(const std::string& encoded_string)
+std::string Crypt::base64Decode(const std::string_view& encoded_string)
 {
     int len = encoded_string.size();
     int i = 0;

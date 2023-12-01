@@ -369,6 +369,17 @@ function EnterGame.tryHttpLogin(clientVersion)
             local world = worlds[character.worldid]
             characters[index] = {
                 name = character.name,
+                level = character.level,
+                main = character.ismaincharacter,
+                dailyreward = character.dailyrewardstate,
+                hidden = character.ishidden,
+                vocation = character.vocation,
+                outfitid = character.outfitid,
+                headcolor = character.headcolor,
+                torsocolor = character.torsocolor,
+                legscolor = character.legscolor,
+                detailcolor = character.detailcolor,
+                addonsflags = character.addonsflags,
                 worldName = world.name,
                 worldIp = world.ip,
                 worldPort = world.port,
@@ -390,7 +401,16 @@ function EnterGame.tryHttpLogin(clientVersion)
         onCharacterList(nil, characters, account)
     end
 
-    HTTP.post(G.host .. "/login.php",
+    local host, path = G.host:match("([^/]+)/([^/].*)")
+    local url = G.host
+
+    if G.port ~= nil and path ~= nil then
+      url = host .. ':' .. G.port .. '/' .. path
+    elseif path ~= nil then
+      url = host .. '/' .. path
+    end
+
+    HTTP.post(url,
         json.encode({
             email = G.account,
             password = G.password,
@@ -441,6 +461,10 @@ function EnterGame.doLogin()
     g_settings.set('client-version', clientVersion)
 
     if clientVersion >= 1281 and G.port ~= 7171 then
+        if G.port == 0 then
+            G.port = 80
+        end
+
         EnterGame.tryHttpLogin(clientVersion)
     else
         protocolLogin = ProtocolLogin.create()

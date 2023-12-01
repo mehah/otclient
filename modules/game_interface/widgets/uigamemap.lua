@@ -77,7 +77,13 @@ function UIGameMap:onMousePress()
     end
 end
 
-function UIGameMap:onMouseMove()
+function UIGameMap:onMouseMove(mousePos, mouseMoved)
+    self.mousePos = mousePos
+    return false
+end
+
+function UIGameMap:onDragMove(mousePos, mouseMoved)
+    self.mousePos = mousePos
     return false
 end
 
@@ -120,7 +126,7 @@ function UIGameMap:onMouseRelease(mousePosition, mouseButton)
     end
 
     local ret = modules.game_interface.processMouseAction(mousePosition, mouseButton, autoWalkPos, lookThing, useThing,
-                                                          creatureThing, attackCreature)
+        creatureThing, attackCreature)
     if ret then
         self.allowNextRelease = false
     end

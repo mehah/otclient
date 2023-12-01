@@ -67,7 +67,7 @@ public:
     float gF() const { return m_g; }
     float rF() const { return m_r; }
 
-    uint32_t rgba() const { return static_cast<uint32_t>(a() | b() << 8 | g() << 16 | r() << 24); }
+    uint32_t rgba() const { return static_cast<uint32_t>(a() << 24 | b() << 16 | g() << 8 | r()); }
     size_t hash() const { return m_hash; }
 
     void setRed(const int r) { m_r = static_cast<uint8_t>(r) / 255.f; update(); }

@@ -1,13 +1,14 @@
 -- this is the first file executed when the application starts
 -- we have to load the first modules form here
 
--- set true so that modules are reloaded when modified. (Note: Use only dev mod)
-AUTO_RELOAD_MODULE = false
-
 -- updater
 Services = {
     --updater = "http://localhost/api/updater.php",
 }
+
+g_app.setName("OTClient - Redemption");
+g_app.setCompactName("otclient");
+g_app.setOrganizationName("otcr");
 
 g_app.hasUpdater = function()
     return (Services.updater and Services.updater ~= "" and g_modules.getModule("updater"))
@@ -64,6 +65,11 @@ local function loadModules()
 
     -- mods 1000-9999
     g_modules.autoLoadModules(9999)
+    g_modules.ensureModuleLoaded('client_mods')
+
+    if not g_game.isEnabledBotProtection() then
+        g_modules.ensureModuleLoaded('game_bot')
+    end
 
     local script = '/' .. g_app.getCompactName() .. 'rc.lua'
 
@@ -79,3 +85,6 @@ if g_app.hasUpdater() then
 end
 
 loadModules()
+
+-- uncomment the line below so that modules are reloaded when modified. (Note: Use only mod dev)
+-- g_modules.enableAutoReload()

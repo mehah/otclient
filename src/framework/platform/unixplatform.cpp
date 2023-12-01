@@ -27,6 +27,7 @@
 #include <fstream>
 #include <unistd.h>
 #include <framework/stdext/stdext.h>
+#include <framework/core/eventdispatcher.h>
 
 #include <sys/stat.h>
 
@@ -140,19 +141,38 @@ ticks_t Platform::getFileModificationTime(std::string file)
     return 0;
 }
 
-void Platform::openUrl(std::string url)
+void Platform::openUrl(std::string url, bool now)
 {
     if(url.find("http://") == std::string::npos && url.find("https://") == std::string::npos)
         url.insert(0, "http://");
 
+    const auto& action = [url] {
 #if defined(__APPLE__)
-    system(stdext::format("open %s", url).c_str());
+        system(stdext::format("open %s", url).c_str());
 #else
-    int systemRet = system(stdext::format("xdg-open %s", url).c_str());
-    if(systemRet == -1){
-        return;
-    }
+        int systemRet = system(stdext::format("xdg-open %s", url).c_str());
+        if(systemRet == -1){
+            return;
+        }
 #endif
+    };
+
+    if (now) {
+        action();
+    } else {
+        g_dispatcher.scheduleEvent(action, 50);
+    }
+}
+
+void Platform::openDir(std::string path, bool now)
+{
+    if(now) {
+        system(stdext::format("xdg-open %s", path).c_str());
+    } else {
+        g_dispatcher.scheduleEvent([path] {
+            system(stdext::format("xdg-open %s", path).c_str());
+        }, 50);
+    }
 }
 
 std::string Platform::getCPUName()

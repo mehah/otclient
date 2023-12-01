@@ -4,6 +4,7 @@
         speed, disableWalkAnimation, shader, drawOnUI, opacity
         duration, loop, transform, hideOwner, size{width, height}
         offset{x, y, onTop}, dirOffset[dir]{x, y, onTop},
+        light { color, intensity}, drawOrder(only for tiles),
         onAttach, onDetach
     }
 ]] --

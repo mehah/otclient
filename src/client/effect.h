@@ -30,8 +30,7 @@
 class Effect : public Thing
 {
 public:
-    void drawEffect(const Point& dest, uint32_t flags, int offsetX, int offsetY, LightView* lightView = nullptr);
-
+    void draw(const Point& /*dest*/, bool drawThings = true, LightView* /*lightView*/ = nullptr) override;
     void setId(uint32_t id) override;
     void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false) override;
 

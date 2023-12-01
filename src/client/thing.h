@@ -25,18 +25,21 @@
 #include <framework/core/clock.h>
 #include <framework/graphics/drawpool.h>
 #include <framework/luaengine/luaobject.h>
-#include "attachedeffect.h"
 #include "declarations.h"
 #include "spritemanager.h"
 #include "thingtype.h"
 #include "thingtypemanager.h"
+#include "attachableobject.h"
 
  // @bindclass
 #pragma pack(push,1) // disable memory alignment
-class Thing : public LuaObject
+class Thing : public AttachableObject
 {
 public:
-    virtual void draw(const Point& /*dest*/, uint32_t flags, LightView* /*lightView*/ = nullptr) {}
+    virtual void draw(const Point& /*dest*/, bool drawThings = true, LightView* /*lightView*/ = nullptr) {}
+    void drawWidgets(const MapPosInfo& mapRect);
+
+    LuaObjectPtr attachedObjectToLuaObject() override { return asLuaObject(); }
 
     virtual void setId(uint32_t /*id*/) {}
     virtual void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false);
@@ -152,10 +155,11 @@ public:
     bool hasExpire() const { return m_thingType->hasExpire(); }
     bool hasExpireStop() const { return m_thingType->hasExpireStop(); }
     bool hasAnimationPhases() const { return m_thingType->getAnimationPhases() > 1; }
+    bool isDecoKit() const { return m_thingType->isDecoKit(); }
 
     PLAYER_ACTION getDefaultAction() { return m_thingType->getDefaultAction(); }
 
-    uint16_t getClassification() const { return m_thingType->getClassification(); }
+    uint16_t getClassification() { return m_thingType->getClassification(); }
 
     void canDraw(bool canDraw) { m_canDraw = canDraw; }
     inline bool canDraw(const Color& color = Color::white) const {
@@ -179,21 +183,25 @@ public:
     }
 
     bool isMarked() { return m_markedColor != Color::white; }
-    void setMarkColor(const Color& color) { if (m_markedColor != color) m_markedColor = color; }
+    void setMarked(const Color& color) { if (m_markedColor != color) m_markedColor = color; }
 
-    bool isHided() { return m_hidden > 0; }
+    const Color& getHighlightColor() {
+        if (m_highlightColor == Color::white)
+            return Color::white;
 
-    void attachEffect(const AttachedEffectPtr& obj);
-    void clearAttachedEffects();
-    bool detachEffectById(uint16_t id);
-    AttachedEffectPtr getAttachedEffectById(uint16_t id);
+        m_highlightColor.setAlpha(0.1f + std::abs(500 - g_clock.millis() % 1000) / 1000.0f);
+        return m_highlightColor;
+    }
 
-    const std::vector<AttachedEffectPtr>& getAttachedEffects() { return m_attachedEffects; };
+    bool isHighlighted() { return m_highlightColor != Color::white; }
+    void setHighlight(const Color& color) { if (m_highlightColor != color) m_highlightColor = color; }
+
+    bool isHided() { return isOwnerHidden(); }
+    void onStartAttachEffect(const AttachedEffectPtr& effect) override;
+    void onDispatcherAttachEffect(const AttachedEffectPtr& effect) override;
+    void onStartDetachEffect(const AttachedEffectPtr& effect) override;
 
 protected:
-    void drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop);
-
-    void onDetachEffect(const AttachedEffectPtr& effect);
     void setAttachedEffectDirection(Otc::Direction dir) const
     {
         for (const auto& effect : m_attachedEffects) {
@@ -201,8 +209,6 @@ protected:
                 effect->m_direction = dir;
         }
     }
-
-    uint8_t m_hidden{ 0 };
 
     uint8_t m_numPatternX{ 0 };
     uint8_t m_numPatternY{ 0 };
@@ -215,14 +221,20 @@ protected:
     DrawConductor m_drawConductor{ false, DrawOrder::THIRD };
 
     Color m_markedColor{ Color::white };
+    Color m_highlightColor{ Color::white };
+
+    Point m_lastDrawDest;
 
     // Shader
     PainterShaderProgramPtr m_shader;
     std::function<void()> m_shaderAction{ nullptr };
 
-    std::vector<AttachedEffectPtr> m_attachedEffects;
-
 private:
+    void lua_setMarked(std::string_view color) { setMarked(Color(color)); }
+    void lua_setHighlight(std::string_view color) { setHighlight(Color(color)); }
+
     bool m_canDraw{ true };
+
+    friend class Client;
 };
 #pragma pack(pop)

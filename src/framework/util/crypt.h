@@ -38,7 +38,7 @@ public:
     ~Crypt();
 
     std::string base64Encode(const std::string& decoded_string);
-    std::string base64Decode(const std::string& encoded_string);
+    std::string base64Decode(const std::string_view& encoded_string);
     std::string xorCrypt(const std::string& buffer, const std::string& key);
     std::string encrypt(const std::string& decrypted_string) { return _encrypt(decrypted_string, true); }
     std::string decrypt(const std::string& encrypted_string) { return _decrypt(encrypted_string, true); }

@@ -43,14 +43,15 @@ void UIItem::drawSelf(DrawPoolType drawPane)
         const int exactSize = std::max<int>(g_gameConfig.getSpriteSize(), m_item->getExactSize());
 
         g_drawPool.bindFrameBuffer(exactSize);
-        m_item->draw(Point(exactSize - g_gameConfig.getSpriteSize()) + m_item->getDisplacement(), Otc::DrawThings, m_color);
+        m_item->setColor(m_color);
+        m_item->draw(Point(exactSize - g_gameConfig.getSpriteSize()) + m_item->getDisplacement());
         g_drawPool.releaseFrameBuffer(getPaddingRect());
 
         if (m_font && (m_alwaysShowCount || m_item->isStackable() || m_item->isChargeable()) && m_item->getCountOrSubType() > 1) {
             static const Color STACK_COLOR(231, 231, 231);
-
-            const auto& count = std::to_string(m_item->getCountOrSubType());
-            m_font->drawText(count, Rect(m_rect.topLeft(), m_rect.bottomRight() - Point(3, 0)), STACK_COLOR, Fw::AlignBottomRight);
+            const auto& count = m_item->getCountOrSubType();
+            const auto& countText = count < 1000 ? std::to_string(count) : stdext::format("%.0fk", count / 1000.f);
+            m_font->drawText(countText, Rect(m_rect.topLeft(), m_rect.bottomRight() - Point(3, 0)), STACK_COLOR, Fw::AlignBottomRight);
         }
 
 #ifdef FRAMEWORK_EDITOR
@@ -66,15 +67,12 @@ void UIItem::drawSelf(DrawPoolType drawPane)
 
 void UIItem::setItemId(int id)
 {
-    if (!m_item && id != 0)
+    if (id == 0)
+        m_item = nullptr;
+    else if (m_item)
+        m_item->setId(id);
+    else
         m_item = Item::create(id);
-    else {
-        // remove item
-        if (id == 0)
-            m_item = nullptr;
-        else
-            m_item->setId(id);
-    }
 }
 
 void UIItem::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)

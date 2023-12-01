@@ -80,8 +80,8 @@ public:
     UIWidget();
     ~UIWidget() override;
     virtual void drawSelf(DrawPoolType drawPane);
-protected:
     virtual void draw(const Rect& visibleRect, DrawPoolType drawPane);
+protected:
     virtual void drawChildren(const Rect& visibleRect, DrawPoolType drawPane);
 
     friend class UIManager;
@@ -107,6 +107,8 @@ protected:
     Fw::FocusReason m_lastFocusReason{ Fw::ActiveFocusReason };
     Fw::AutoFocusPolicy m_autoFocusPolicy{ Fw::AutoFocusLast };
 
+    bool m_attached { false };
+
     friend class UIGridLayout;
     friend class UIHorizontalLayout;
     friend class UIVerticalLayout;
@@ -121,6 +123,7 @@ public:
     void lowerChild(const UIWidgetPtr& child);
     void raiseChild(const UIWidgetPtr& child);
     void moveChildToIndex(const UIWidgetPtr& child, int index);
+    void reorderChildren(const std::vector<UIWidgetPtr>& childrens);
     void lockChild(const UIWidgetPtr& child);
     void unlockChild(const UIWidgetPtr& child);
     void mergeStyle(const OTMLNodePtr& styleNode);
@@ -197,14 +200,17 @@ public:
 
     void setProp(FlagProp prop, bool v);
     bool hasProp(FlagProp prop) { return (m_flagsProp & prop); }
+
+    bool isAttached() { return m_attached; }
+    void setAttached(bool attached) { m_attached = attached; }
+
 private:
-    void repaint();
     uint32_t m_flagsProp{ 0 };
     PainterShaderProgramPtr m_shader;
 
     // state managment
 protected:
-
+    void repaint();
     bool setState(Fw::WidgetState state, bool on);
     bool hasState(Fw::WidgetState state);
 
@@ -445,6 +451,7 @@ public:
     int getPaddingRight() { return m_padding.right; }
     int getPaddingBottom() { return m_padding.bottom; }
     int getPaddingLeft() { return m_padding.left; }
+    Size getPaddingSize() { return Size(m_padding.left + m_padding.right, m_padding.top + m_padding.bottom); }
     float getOpacity() { return m_opacity; }
     float getRotation() { return m_rotation; }
 
@@ -463,6 +470,7 @@ private:
 protected:
     void drawImage(const Rect& screenCoords);
     std::string m_imageSource;
+    std::string m_qrCode;
 
     TexturePtr m_imageTexture;
     Rect m_imageClipRect;
@@ -471,11 +479,12 @@ protected:
     Point m_iconOffset;
     Timer m_imageAnimatorTimer;
     uint32_t m_currentFrame{ 0 };
+    uint32_t m_qrCodeBorder{ 1 };
 
     EdgeGroup<int> m_imageBorder;
 
 public:
-    void setImageSource(const std::string_view source);
+    void setImageSource(const std::string_view source, bool base64);
     void setImageClip(const Rect& clipRect) { m_imageClipRect = clipRect; updateImageCache(); }
     void setImageOffsetX(int x) { m_imageRect.setX(x); updateImageCache(); }
     void setImageOffsetY(int y) { m_imageRect.setY(y); updateImageCache(); }
@@ -495,6 +504,8 @@ public:
     void setImageBorderBottom(int border) { m_imageBorder.bottom = border; configureBorderImage(); }
     void setImageBorderLeft(int border) { m_imageBorder.left = border; configureBorderImage(); }
     void setImageBorder(int border) { m_imageBorder.set(border); configureBorderImage(); }
+    void setQRCode(const std::string& code, int border);
+    void setQRCodeBorder(int border) { m_qrCodeBorder = border; setQRCode(m_qrCode, border); }
 
     std::string getImageSource() { return m_imageSource; }
     Rect getImageClip() { return m_imageClipRect; }
@@ -516,6 +527,7 @@ public:
     int getImageBorderLeft() { return m_imageBorder.left; }
     int getImageTextureWidth() { return m_imageTexture ? m_imageTexture->getWidth() : 0; }
     int getImageTextureHeight() { return m_imageTexture ? m_imageTexture->getHeight() : 0; }
+    int getQrCodeBorder() { return m_qrCodeBorder; }
 
     // text related
 private:
@@ -526,6 +538,7 @@ private:
     std::vector<Point> m_glyphsPositionsCache;
     Size m_textSize;
     CoordsBufferPtr m_coordsBuffer;
+    std::vector<std::pair<Color, CoordsBufferPtr>> m_colorCoordsBuffer;
 
 protected:
     virtual void updateText();
@@ -540,6 +553,8 @@ protected:
     Point m_textOffset;
 
     BitmapFontPtr m_font;
+    std::vector<std::pair<int, Color>> m_textColors;
+    std::vector<std::pair<int, Color>> m_drawTextColors;
 
     float m_fontScale{ 1.f };
 
@@ -548,6 +563,7 @@ public:
     void clearText() { setText(""); }
 
     void setText(const std::string_view text, bool dontFireLuaCall = false);
+    void setColoredText(const std::string_view coloredText, bool dontFireLuaCall = false);
     void setTextAlign(Fw::AlignmentFlag align) { m_textAlign = align; updateText(); }
     void setTextOffset(const Point& offset) { m_textOffset = offset; updateText(); }
     void setTextWrap(bool textWrap) { setProp(PropTextWrap, textWrap); updateText(); }
@@ -556,7 +572,7 @@ public:
     void setTextVerticalAutoResize(bool textAutoResize) { setProp(PropTextVerticalAutoResize, textAutoResize); updateText(); }
     void setTextOnlyUpperCase(bool textOnlyUpperCase) { setProp(PropTextOnlyUpperCase, textOnlyUpperCase); setText(m_text); }
     void setFont(const std::string_view fontName);
-    void setFontScale(float scale) { m_fontScale = scale; m_textCachedScreenCoords = {}; resizeToText(); }
+    void setFontScale(float scale) { m_fontScale = scale; m_textCachedScreenCoords = {}; updateText(); }
 
     std::string getText() { return m_text; }
     std::string getDrawText() { return m_drawText; }

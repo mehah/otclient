@@ -64,7 +64,17 @@ public:
     void addMultiTexture(const std::string& file);
     void bindMultiTextures() const;
 
+    void setUseFramebuffer(bool v) {
+        m_useFramebuffer = v;
+    }
+
+    bool useFramebuffer() const {
+        return m_useFramebuffer;
+    }
+
 private:
+    bool m_useFramebuffer{ false };
+
     float m_startTime{ 0 };
     float m_opacity{ 1.f };
     float m_time{ 0 };

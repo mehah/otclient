@@ -21,6 +21,7 @@
  */
 
 #include "uimap.h"
+#include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
@@ -60,19 +61,20 @@ void UIMap::drawSelf(DrawPoolType drawPane)
         return;
     }
 
-    const auto& mapSize = g_app.isScaled() ? Rect(0, 0, g_graphics.getViewportSize()) : m_mapRect;
-    m_mapView->updateRect(mapSize);
+    const auto& mapRect = g_app.isScaled() ? Rect(0, 0, g_graphics.getViewportSize()) : m_mapRect;
 
     if (drawPane == DrawPoolType::MAP) {
-        m_mapView->draw();
-    } else if (drawPane == DrawPoolType::TEXT) {
-        m_mapView->drawText();
+        m_mapView->updateRect(mapRect);
+        g_drawPool.preDraw(drawPane, [this, &mapRect] {
+            m_mapView->registerEvents();
+            m_mapView->draw(mapRect);
+        }, m_mapView->m_posInfo.rect, m_mapView->m_posInfo.srcRect, Color::black);
+    } else if (drawPane == DrawPoolType::FOREGROUND_MAP) {
+        g_textDispatcher.poll();
+        g_drawPool.preDraw(drawPane, [this, &mapRect] {
+            m_mapView->drawForeground(mapRect);
+        });
     }
-}
-
-void UIMap::movePixels(int x, int y)
-{
-    m_mapView->move(x, y);
 }
 
 bool UIMap::setZoom(int zoom)
@@ -131,23 +133,10 @@ void UIMap::setVisibleDimension(const Size& visibleDimension)
 
 void UIMap::setKeepAspectRatio(bool enable)
 {
-    m_keepAspectRatio = enable;
-    if (enable)
+    if (m_keepAspectRatio = enable)
         m_aspectRatio = getVisibleDimension().ratio();
+
     updateMapSize();
-}
-
-Position UIMap::getPosition(const Point& mousePos) {
-    return m_mapView->getPosition(mousePos);
-}
-
-TilePtr UIMap::getTile(const Point& mousePos)
-{
-    const Position tilePos = getPosition(mousePos);
-    if (!tilePos.isValid())
-        return nullptr;
-
-    return m_mapView->getTopTile(tilePos);
 }
 
 void UIMap::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
@@ -167,7 +156,7 @@ void UIMap::onGeometryChange(const Rect& oldRect, const Rect& newRect)
 
 bool UIMap::onMouseMove(const Point& mousePos, const Point& mouseMoved)
 {
-    const Position& pos = getPosition(mousePos);
+    const auto& pos = getPosition(mousePos);
     if (!pos.isValid())
         return false;
 

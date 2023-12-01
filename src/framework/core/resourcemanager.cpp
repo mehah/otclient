@@ -66,7 +66,7 @@ bool ResourceManager::discoverWorkDir(const std::string& existentFile)
                                     g_resources.getBaseDir() + "../share/" + g_app.getCompactName() + "/" };
 
     bool found = false;
-    for (const std::string& dir : possiblePaths) {
+    for (const auto& dir : possiblePaths) {
         if (!PHYSFS_mount(dir.c_str(), nullptr, 0))
             continue;
 
@@ -125,7 +125,7 @@ bool ResourceManager::addSearchPath(const std::string& path, bool pushFront)
     std::string savePath = path;
     if (!PHYSFS_mount(path.c_str(), nullptr, pushFront ? 0 : 1)) {
         bool found = false;
-        for (const std::string& searchPath : m_searchPaths) {
+        for (const auto& searchPath : m_searchPaths) {
             std::string newPath = searchPath + path;
             if (PHYSFS_mount(newPath.c_str(), nullptr, pushFront ? 0 : 1)) {
                 savePath = newPath;
@@ -564,9 +564,9 @@ std::string ResourceManager::fileChecksum(const std::string& path) {
     return checksum;
 }
 
-stdext::map<std::string, std::string> ResourceManager::filesChecksums()
+std::unordered_map<std::string, std::string> ResourceManager::filesChecksums()
 {
-    stdext::map<std::string, std::string> ret;
+    std::unordered_map<std::string, std::string> ret;
     auto files = listDirectoryFiles("/", true, false, true);
     for (auto it = files.rbegin(); it != files.rend(); ++it) {
         const auto& filePath = *it;
@@ -721,4 +721,12 @@ bool ResourceManager::launchCorrect(std::vector<std::string>& args) { // curentl
     g_platform.spawnProcess(binary.string(), args);
     return true;
 #endif
+}
+
+std::string ResourceManager::createArchive(const std::unordered_map<std::string, std::string>& files) { return ""; }
+
+std::unordered_map<std::string, std::string> ResourceManager::decompressArchive(std::string dataOrPath)
+{
+    std::unordered_map<std::string, std::string> ret;
+    return ret;
 }

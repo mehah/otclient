@@ -176,6 +176,7 @@ message AppearanceFlags {
 	optional bool clockexpire = 54;
 	optional bool expire = 55;
 	optional bool expirestop = 56;
+	optional bool deco_kit = 57;
 }
 
 message AppearanceFlagUpgradeClassification {
