@@ -51,9 +51,9 @@ void EventDispatcher::shutdown()
 
 void EventDispatcher::poll()
 {
+    mergeEvents();
     executeEvents();
     executeScheduledEvents();
-    mergeEvents();
 }
 
 ScheduledEventPtr EventDispatcher::scheduleEvent(const std::function<void()>& callback, int delay)
