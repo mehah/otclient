@@ -72,6 +72,8 @@
   - Is adapted in 85%
   - To enable it, it is necessary to remove/off the BOT_PROTECTION flag.
   - [VS Solution](https://github.com/mehah/otclient/blob/68e4e1b94c2041bd235441244156e6477058250c/vc17/settings.props#L9) / [CMAKE](https://github.com/mehah/otclient/blob/68e4e1b94c2041bd235441244156e6477058250c/src/CMakeLists.txt#L13)
+  - NOTE: BE AWARE THAT THERE ARE SERIOUS PROBLEMS, SUCH AS MEMORY LEAKS.
+
 
 ##### [OTClient V8](https://github.com/OTCv8) (Features)
 - Lighting System
