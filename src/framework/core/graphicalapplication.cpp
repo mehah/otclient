@@ -185,7 +185,6 @@ void GraphicalApplication::run()
             poll();
 
             if (!g_window.isVisible()) {
-                m_mapProcessFrameCounter.update();
                 stdext::millisleep(10);
                 continue;
             }
@@ -211,7 +210,6 @@ void GraphicalApplication::run()
         mainPoll();
 
         if (!g_window.isVisible()) {
-            m_graphicFrameCounter.update();
             stdext::millisleep(10);
             continue;
         }
