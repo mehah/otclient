@@ -36,8 +36,11 @@ public:
     void terminate();
     static void registerLuaFunctions();
 
-    bool drawForgroundTile(DrawPool* forgroundTilePool, DrawPool* textPool, DrawPool* mapPool) override;
+    void drawMap() override;
+    void drawForgroundMap() override;
 
+    bool canDraw(DrawPoolType type) const override;
+    bool canDrawUI() const override;
     bool canDrawTexts() const override;
     bool isLoadingAsyncTexture() override;
     bool isUsingProtobuf() override;

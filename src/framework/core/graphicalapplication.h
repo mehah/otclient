@@ -33,8 +33,11 @@
 class ApplicationDrawEvents
 {
 protected:
-    virtual bool drawForgroundTile(DrawPool* forgroundTilePool, DrawPool* textPool, DrawPool* mapPool) = 0;
+    virtual void drawMap() = 0;
+    virtual void drawForgroundMap() = 0;
 
+    virtual bool canDraw(DrawPoolType type) const = 0;
+    virtual bool canDrawUI() const = 0;
     virtual bool canDrawTexts() const = 0;
     virtual bool isLoadingAsyncTexture() = 0;
     virtual bool isUsingProtobuf() = 0;

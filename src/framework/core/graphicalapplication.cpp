@@ -147,13 +147,13 @@ void GraphicalApplication::run()
         const auto& foregroundMap = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
 
         if (foregroundUI->canRepaint()) {
-            if (g_game.isOnline())
+            if (m_drawEvents && m_drawEvents->canDrawUI())
                 foregroundUICondition.notify_one();
             else
                 g_ui.render(DrawPoolType::FOREGROUND);
         }
 
-        if (g_game.isOnline() && foregroundMap->canRepaint())
+        if (m_drawEvents && m_drawEvents->canDraw(DrawPoolType::FOREGROUND_MAP) && foregroundMap->canRepaint())
             foregroundMapCondition.notify_one();
     };
 
@@ -172,8 +172,8 @@ void GraphicalApplication::run()
         const auto& pool = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
         std::unique_lock lock(pool->getMutexPreDraw());
         condition.wait(lock, [this]() -> bool {
-            if (g_ui.m_mapWidget)
-                g_ui.m_mapWidget->drawSelf(DrawPoolType::FOREGROUND_MAP);
+            if (m_drawEvents)
+                m_drawEvents->drawForgroundMap();
             return m_stopping;
         });
     });
@@ -193,7 +193,7 @@ void GraphicalApplication::run()
             drawForeground();
 
             if (m_drawEvents)
-                m_drawEvents->drawForgroundTile(foreground_tile, txt, map);
+                m_drawEvents->drawMap();
 
             m_mapProcessFrameCounter.update();
         }

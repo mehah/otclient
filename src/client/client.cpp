@@ -66,32 +66,35 @@ void Client::terminate()
     g_gameConfig.terminate();
 }
 
-bool Client::drawForgroundTile(DrawPool* forgroundTilePool, DrawPool* textPool, DrawPool* mapPool)
+void Client::drawMap()
 {
     if (g_game.isOnline()) {
         if (!m_mapWidget)
             m_mapWidget = g_ui.getRootWidget()->recursiveGetChildById("gameMapPanel")->static_self_cast<UIMap>();
 
-        if (textPool->canRepaint() || forgroundTilePool->canRepaint()) {
-            g_asyncDispatcher.dispatch([this, &textPool] {
-                std::scoped_lock l(textPool->getMutex());
-                g_textDispatcher.poll();
+        m_mapWidget->drawSelf(DrawPoolType::MAP);
+    } else m_mapWidget = nullptr;
+}
 
-                if (m_mapWidget) {
-                    m_mapWidget->drawSelf(DrawPoolType::TEXT);
-                    m_mapWidget->drawSelf(DrawPoolType::FOREGROUND_TILE);
-                }
-            });
-        }
+void Client::drawForgroundMap()
+{
+    if (m_mapWidget)
+        m_mapWidget->drawSelf(DrawPoolType::FOREGROUND_MAP);
+}
 
-        {
-            std::scoped_lock l(mapPool->getMutex());
-            m_mapWidget->drawSelf(DrawPoolType::MAP);
-        }
+bool Client::canDraw(DrawPoolType type) const
+{
+    switch (type) {
+        case DrawPoolType::FOREGROUND_MAP:
+            return g_game.isOnline();
+        default:
+            return false;
     }
-    else m_mapWidget = nullptr;
+}
 
-    return true;
+bool Client::canDrawUI() const
+{
+    return g_game.isOnline();
 }
 
 bool Client::canDrawTexts() const
