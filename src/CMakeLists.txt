@@ -277,6 +277,7 @@ set(SOURCE_FILES
 	framework/graphics/shaderprogram.cpp
 	framework/graphics/texture.cpp
 	framework/graphics/texturemanager.cpp
+	framework/graphics/shadermanager.cpp
 	framework/input/mouse.cpp
 	framework/luaengine/luaexception.cpp
 	framework/luaengine/luainterface.cpp
@@ -328,6 +329,7 @@ set(SOURCE_FILES
 	framework/ui/uiwidgetbasestyle.cpp
 	framework/ui/uiwidgetimage.cpp
 	framework/ui/uiwidgettext.cpp
+	framework/ui/uiqrcode.cpp
 	framework/util/color.cpp
 	framework/util/crypt.cpp
 
@@ -362,7 +364,6 @@ set(SOURCE_FILES
 	client/protocolgame.cpp
 	client/protocolgameparse.cpp
 	client/protocolgamesend.cpp
-	client/shadermanager.cpp
 	client/spriteappearances.cpp
 	client/spritemanager.cpp
 	client/statictext.cpp
