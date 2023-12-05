@@ -99,7 +99,8 @@ int main(int argc, const char* argv[])
 #endif
 
     // initialize application framework and otclient
-    g_app.init(args, new GraphicalApplicationContext(ASYNC_DISPATCHER_MAX_THREAD, g_gameConfig.getSpriteSize(), &g_client));
+    g_app.init(args, new GraphicalApplicationContext(
+        (uint8_t)ASYNC_DISPATCHER_MAX_THREAD, g_gameConfig.getSpriteSize(), ApplicationDrawEventsPtr(&g_client)));
     g_client.init(args);
 #ifdef FRAMEWORK_NET
     g_http.init();

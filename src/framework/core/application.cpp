@@ -57,17 +57,9 @@ void exitSignalHandler(int sig)
     }
 }
 
-Application::~Application()
-{
-    if (m_context) {
-        delete m_context;
-        m_context = nullptr;
-    }
-}
-
 void Application::init(std::vector<std::string>& args, ApplicationContext* context)
 {
-    m_context = context;
+    m_context = std::unique_ptr<ApplicationContext>(context);
 
     // capture exit signals
     signal(SIGTERM, exitSignalHandler);
