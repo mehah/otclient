@@ -24,6 +24,7 @@
 
 #include <string>
 #include <vector>
+#include <framework/core/inputevent.h>
 #include <framework/stdext/types.h>
 #include <framework/stdext/storage.h>
 
@@ -83,6 +84,7 @@ public:
     std::string getDeviceShortName(DeviceType type = DeviceUnknown);
     std::string getOsShortName(OperatingSystem os = OsUnknown);
     std::string traceback(const std::string_view where, int level = 1, int maxDepth = 32);
+    void addKeyListener(std::function<void(const InputEvent&)> listener) {}
 
     static Platform::DeviceType getDeviceTypeByName(std::string shortName);
     static Platform::OperatingSystem getOsByName(std::string shortName);
