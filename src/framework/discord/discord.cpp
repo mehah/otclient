@@ -24,8 +24,6 @@
 
 #ifndef ANDROID
     #if ENABLE_DISCORD_RPC == 1
-        #include <client/game.h>
-        #include <client/localplayer.h>
         #include <framework/core/eventdispatcher.h>
         #include <time.h>
         
@@ -33,8 +31,10 @@
         
         Discord g_discord;
         
-        void Discord::init()
+        void Discord::init(std::function<bool()>& canUpdate, std::function<void(std::string&)>& onUpdate)
         {
+            m_canUpdate = canUpdate;
+            m_onUpdate = onUpdate;
             DiscordEventHandlers Handle;
             memset(&Handle, 0, sizeof(Handle));
             Discord_Initialize(RPC_API_KEY, &Handle, 1, NULL);
@@ -44,20 +44,8 @@
         void Discord::update()
         {
             std::string info;
-            if (g_game.isOnline()) {
-        #if SHOW_CHARACTER_NAME_RPC == 1
-                info = "Name: " + g_game.getCharacterName();
-        #endif
-        
-        #if SHOW_CHARACTER_LEVEL_RPC == 1
-                const auto& level = std::to_string(g_game.getLocalPlayer()->getLevel());
-                info += info.empty() ? "Level: " + level : "[" + level + "]";
-        #endif
-        
-        #if SHOW_CHARACTER_WORLD_RPC == 1
-                if (!info.empty()) info += "\n";
-                info += "World: " + g_game.getWorldName();
-        #endif
+            if (m_canUpdate()) {
+                m_onUpdate(info);
             } else {
                 info = std::string{ OFFLINE_RPC_TEXT };
             }

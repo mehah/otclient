@@ -100,6 +100,8 @@ public:
     void setOnResize(const OnResizeCallback& onResize) { m_onResize = onResize; }
     void setOnInputEvent(const OnInputEventCallback& onInputEvent) { m_onInputEvent = onInputEvent; }
 
+    void addKeyListener(std::function<void(const InputEvent&)> listener) { m_keyListeners.push_back(listener); }
+
 protected:
     virtual int internalLoadMouseCursor(const ImagePtr& image, const Point& hotSpot) = 0;
 
@@ -136,6 +138,8 @@ protected:
     std::function<void()> m_onClose;
     OnResizeCallback m_onResize;
     OnInputEventCallback m_onInputEvent;
+
+    std::vector<std::function<void(const InputEvent&)>> m_keyListeners;
 };
 
 extern PlatformWindow& g_window;

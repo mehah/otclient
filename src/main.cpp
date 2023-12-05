@@ -21,6 +21,8 @@
  */
 
 #include <client/client.h>
+#include <client/game.h>
+#include <client/localplayer.h>
 #include <client/gameconfig.h>
 #include <framework/core/application.h>
 #include <framework/core/resourcemanager.h>
@@ -74,7 +76,21 @@ int main(int argc, const char* argv[])
 
 #ifndef ANDROID
     #if ENABLE_DISCORD_RPC == 1
-        g_discord.init();
+    g_discord.init([]() -> bool {
+        return g_game.isOnline();
+    }, [](std::string& info) {
+#if SHOW_CHARACTER_NAME_RPC == 1
+        info = "Name: " + g_game.getCharacterName();
+#endif
+#if SHOW_CHARACTER_LEVEL_RPC == 1
+        const auto& level = std::to_string(g_game.getLocalPlayer()->getLevel());
+        info += info.empty() ? "Level: " + level : "[" + level + "]";
+#endif
+#if SHOW_CHARACTER_WORLD_RPC == 1
+        if (!info.empty()) info += "\n";
+        info += "World: " + g_game.getWorldName();
+#endif
+    });
     #endif
 #endif
 
