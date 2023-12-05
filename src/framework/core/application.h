@@ -23,6 +23,7 @@
 #pragma once
 
 #include <framework/global.h>
+#include <framework/graphics/declarations.h>
 
 class ApplicationContext
 {
@@ -40,7 +41,7 @@ protected:
 class Application
 {
 public:
-    virtual ~Application();
+    virtual ~Application() = default;
 
     virtual void init(std::vector<std::string>& args, ApplicationContext* context);
     virtual void deinit();
@@ -88,7 +89,7 @@ protected:
     bool m_terminated{ false };
     bool m_stopping{ false };
 
-    ApplicationContext* m_context;
+    std::unique_ptr<ApplicationContext> m_context;
 };
 
 #include "graphicalapplication.h"

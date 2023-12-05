@@ -829,7 +829,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UITextEdit>("isShiftNavigation", &UITextEdit::isShiftNavigation);
     g_lua.bindClassMemberFunction<UITextEdit>("isMultiline", &UITextEdit::isMultiline);
 
-    // UITextEdit
+    // UIQrCode
     g_lua.registerClass<UIQrCode, UIWidget>();
     g_lua.bindClassStaticFunction<UIQrCode>("create", [] { return std::make_shared<UIQrCode>(); });
     g_lua.bindClassMemberFunction<UIQrCode>("getCode", &UIQrCode::getCode);

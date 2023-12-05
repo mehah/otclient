@@ -46,21 +46,21 @@ protected:
 class GraphicalApplicationContext : public ApplicationContext
 {
 public:
-    GraphicalApplicationContext(uint8_t asyncDispatchMaxThreads, uint16_t spriteSize, ApplicationDrawEvents* drawEvents) :
+    GraphicalApplicationContext(uint8_t asyncDispatchMaxThreads, uint8_t spriteSize, ApplicationDrawEventsPtr drawEvents) :
         ApplicationContext(asyncDispatchMaxThreads), 
         m_spriteSize(spriteSize),
         m_drawEvents(drawEvents)
     {}
 
-    void setSpriteSize(uint16_t size) { m_spriteSize = size; }
-    uint16_t getSpriteSize() { return m_spriteSize; }
+    void setSpriteSize(uint8_t size) { m_spriteSize = size; }
+    uint8_t getSpriteSize() { return m_spriteSize; }
 
-    void setDrawEvents(ApplicationDrawEvents* drawEvents) { m_drawEvents = drawEvents; }
-    ApplicationDrawEvents* getDrawEvents() { return m_drawEvents; }
+    void setDrawEvents(ApplicationDrawEventsPtr drawEvents) { m_drawEvents = drawEvents; }
+    ApplicationDrawEventsPtr getDrawEvents() { return m_drawEvents; }
 
 protected:
-    uint16_t m_spriteSize;
-    ApplicationDrawEvents* m_drawEvents;
+    uint8_t m_spriteSize;
+    ApplicationDrawEventsPtr m_drawEvents;
 };
 
 class GraphicalApplication : public Application
@@ -127,7 +127,7 @@ public:
     void repaint();
     void repaintMap();
 
-    void setDrawEvents(ApplicationDrawEvents* drawEvents) { m_drawEvents = drawEvents; }
+    void setDrawEvents(const ApplicationDrawEventsPtr& drawEvents) { m_drawEvents = drawEvents; }
 
 protected:
     void resize(const Size& size);
@@ -149,7 +149,7 @@ private:
 
     AdaptativeFrameCounter m_frameCounter;
 
-    ApplicationDrawEvents* m_drawEvents;
+    ApplicationDrawEventsPtr m_drawEvents;
 };
 
 extern GraphicalApplication g_app;
