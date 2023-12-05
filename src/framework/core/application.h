@@ -24,13 +24,25 @@
 
 #include <framework/global.h>
 
+class ApplicationContext
+{
+public:
+    ApplicationContext(uint8_t asyncDispatchMaxThreads) : m_asyncDispatchMaxThreads(asyncDispatchMaxThreads) {}
+
+    void setAsyncDispatchMaxThreads(uint8_t maxThreads) { m_asyncDispatchMaxThreads = maxThreads; }
+    uint8_t getAsyncDispatchMaxThreads() { return m_asyncDispatchMaxThreads; }
+
+protected:
+    uint8_t m_asyncDispatchMaxThreads;
+};
+
  //@bindsingleton g_app
 class Application
 {
 public:
-    virtual ~Application() = default;
+    virtual ~Application();
 
-    virtual void init(std::vector<std::string>& args, uint8_t asyncDispatchMaxThreads = 0);
+    virtual void init(std::vector<std::string>& args, ApplicationContext* context);
     virtual void deinit();
     virtual void terminate();
     virtual void run() = 0;
@@ -75,6 +87,8 @@ protected:
     bool m_running{ false };
     bool m_terminated{ false };
     bool m_stopping{ false };
+
+    ApplicationContext* m_context;
 };
 
 #include "graphicalapplication.h"

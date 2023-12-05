@@ -463,7 +463,6 @@ private:
 protected:
     void drawImage(const Rect& screenCoords);
     std::string m_imageSource;
-    std::string m_qrCode;
 
     TexturePtr m_imageTexture;
     Rect m_imageClipRect;
@@ -472,8 +471,7 @@ protected:
     Point m_iconOffset;
     Timer m_imageAnimatorTimer;
     uint32_t m_currentFrame{ 0 };
-    uint32_t m_qrCodeBorder{ 1 };
-
+    
     EdgeGroup<int> m_imageBorder;
 
 public:
@@ -497,8 +495,6 @@ public:
     void setImageBorderBottom(int border) { m_imageBorder.bottom = border; configureBorderImage(); }
     void setImageBorderLeft(int border) { m_imageBorder.left = border; configureBorderImage(); }
     void setImageBorder(int border) { m_imageBorder.set(border); configureBorderImage(); }
-    void setQRCode(const std::string& code, int border);
-    void setQRCodeBorder(int border) { m_qrCodeBorder = border; setQRCode(m_qrCode, border); }
 
     std::string getImageSource() { return m_imageSource; }
     Rect getImageClip() { return m_imageClipRect; }
@@ -520,7 +516,6 @@ public:
     int getImageBorderLeft() { return m_imageBorder.left; }
     int getImageTextureWidth() { return m_imageTexture ? m_imageTexture->getWidth() : 0; }
     int getImageTextureHeight() { return m_imageTexture ? m_imageTexture->getHeight() : 0; }
-    int getQrCodeBorder() { return m_qrCodeBorder; }
 
     // text related
 private:
@@ -574,4 +569,8 @@ public:
     bool isTextWrap() { return hasProp(PropTextWrap); }
     std::string getFont() { return m_font->getName(); }
     Size getTextSize() { return m_textSize; }
+
+    // custom style
+protected:
+    virtual void parseCustomStyle(const OTMLNodePtr& styleNode) {};
 };

@@ -38,6 +38,7 @@
 #include "framework/graphics/fontmanager.h"
 #include "framework/graphics/graphics.h"
 #include "framework/graphics/particlemanager.h"
+#include "framework/graphics/shadermanager.h"
 #include "framework/input/mouse.h"
 #include "framework/platform/platformwindow.h"
 #include "framework/ui/ui.h"
@@ -243,6 +244,18 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_resources", "updateExecutable", &ResourceManager::updateExecutable, &g_resources);
     g_lua.bindSingletonFunction("g_resources", "createArchive", &ResourceManager::createArchive, &g_resources);
     g_lua.bindSingletonFunction("g_resources", "decompressArchive", &ResourceManager::decompressArchive, &g_resources);
+
+    // ShaderManager
+    g_lua.registerSingletonClass("g_shaders");
+    g_lua.bindSingletonFunction("g_shaders", "createShader", &ShaderManager::createShader, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "createFragmentShader", &ShaderManager::createFragmentShader, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "createFragmentShaderFromCode", &ShaderManager::createFragmentShaderFromCode, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "setupMapShader", &ShaderManager::setupMapShader, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "setupItemShader", &ShaderManager::setupItemShader, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "setupOutfitShader", &ShaderManager::setupOutfitShader, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "setupMountShader", &ShaderManager::setupMountShader, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "addMultiTexture", &ShaderManager::addMultiTexture, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "getShader", &ShaderManager::getShader, &g_shaders);
 
     // Config
     g_lua.registerClass<Config>();
@@ -707,7 +720,6 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("getFont", &UIWidget::getFont);
     g_lua.bindClassMemberFunction<UIWidget>("getTextSize", &UIWidget::getTextSize);
     g_lua.bindClassMemberFunction<UIWidget>("hasShader", &UIWidget::hasShader);
-    g_lua.bindClassMemberFunction<UIWidget>("setQRCode", &UIWidget::setQRCode);
 
     // UILayout
     g_lua.registerClass<UILayout>();
@@ -816,6 +828,14 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UITextEdit>("isTextHidden", &UITextEdit::isTextHidden);
     g_lua.bindClassMemberFunction<UITextEdit>("isShiftNavigation", &UITextEdit::isShiftNavigation);
     g_lua.bindClassMemberFunction<UITextEdit>("isMultiline", &UITextEdit::isMultiline);
+
+    // UITextEdit
+    g_lua.registerClass<UIQrCode, UIWidget>();
+    g_lua.bindClassStaticFunction<UIQrCode>("create", [] { return std::make_shared<UIQrCode>(); });
+    g_lua.bindClassMemberFunction<UIQrCode>("getCode", &UIQrCode::getCode);
+    g_lua.bindClassMemberFunction<UIQrCode>("getCodeBorder", &UIQrCode::getCodeBorder);
+    g_lua.bindClassMemberFunction<UIQrCode>("setCode", &UIQrCode::setCode);
+    g_lua.bindClassMemberFunction<UIQrCode>("setCodeBorder", &UIQrCode::setCodeBorder);
 
     // Shader
     g_lua.registerClass<ShaderProgram>();

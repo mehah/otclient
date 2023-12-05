@@ -20,32 +20,43 @@
  * THE SOFTWARE.
  */
 
-#pragma once
+#include "uiqrcode.h"
 
-#include "bitmapfont.h"
+#include <framework/graphics/image.h>
 
- //@bindsingleton g_fonts
-class FontManager
+void UIQrCode::parseCustomStyle(const OTMLNodePtr& styleNode)
 {
-public:
-    void terminate();
-    void clearFonts();
+    UIWidget::parseCustomStyle(styleNode);
 
-    bool importFont(const std::string& file);
+    for (const auto& node : styleNode->children()) {
+        if (node->tag() == "code")
+            setCode(node->value(), getCodeBorder());
+        else if (node->tag() == "code-border")
+            setCodeBorder(node->value<int>());
+    }
+}
 
-    bool fontExists(const std::string_view fontName);
-    BitmapFontPtr getFont(const std::string_view fontName);
+void UIQrCode::setCode(const std::string& code, int border)
+{
+    if (code.empty()) {
+        m_imageTexture = nullptr;
+        m_qrCode = {};
+        return;
+    }
 
-    BitmapFontPtr getDefaultFont() const { return m_defaultFont; }
-    BitmapFontPtr getDefaultWidgetFont() const { return m_defaultWidgetFont; }
+    m_qrCode = code;
+    m_imageTexture = TexturePtr(new Texture(Image::fromQRCode(code, border)));
 
-    void setDefaultFont(const BitmapFontPtr& font) { m_defaultFont = font; }
-    void setDefaultWidgetFont(const BitmapFontPtr& font) { m_defaultWidgetFont = font; }
+    if (m_imageTexture && (!m_rect.isValid() || isImageAutoResize())) {
+        const auto& imageSize = m_imageTexture->getSize();
 
-private:
-    std::vector<BitmapFontPtr> m_fonts;
-    BitmapFontPtr m_defaultFont;
-    BitmapFontPtr m_defaultWidgetFont;
-};
+        Size size = getSize();
+        if (size.width() <= 0 || hasProp(PropImageAutoResize))
+            size.setWidth(imageSize.width());
 
-extern FontManager g_fonts;
+        if (size.height() <= 0 || hasProp(PropImageAutoResize))
+            size.setHeight(imageSize.height());
+
+        setSize(size);
+    }
+}

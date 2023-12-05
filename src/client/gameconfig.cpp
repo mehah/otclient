@@ -64,6 +64,9 @@ void GameConfig::loadFonts() {
     m_animatedTextFont = g_fonts.getFont(m_animatedTextFontName);
     m_staticTextFont = g_fonts.getFont(m_staticTextFontName);
     m_widgetTextFont = g_fonts.getFont(m_widgetTextFontName);
+
+    if (m_widgetTextFont)
+        g_fonts.setDefaultWidgetFont(m_widgetTextFont);
 }
 
 void GameConfig::loadGameNode(const OTMLNodePtr& mainNode) {

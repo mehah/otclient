@@ -26,7 +26,6 @@
 #include "localplayer.h"
 #include "luavaluecasts_client.h"
 #include "map.h"
-#include "shadermanager.h"
 #include "thingtypemanager.h"
 #include "tile.h"
 #include "statictext.h"
@@ -37,6 +36,7 @@
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
 #include <framework/graphics/texturemanager.h>
+#include <framework/graphics/shadermanager.h>
 
 double Creature::speedA = 0;
 double Creature::speedB = 0;

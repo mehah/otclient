@@ -22,9 +22,6 @@
 
 #include "graphicalapplication.h"
 #include <thread>
-#include <client/game.h>
-#include <client/map.h>
-#include <client/uimap.h>
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>
@@ -45,9 +42,12 @@
 
 GraphicalApplication g_app;
 
-void GraphicalApplication::init(std::vector<std::string>& args, uint8_t asyncDispatchMaxThreads)
+void GraphicalApplication::init(std::vector<std::string>& args, ApplicationContext* context)
 {
-    Application::init(args, asyncDispatchMaxThreads);
+    Application::init(args, context);
+
+    GraphicalApplicationContext* graphicalContext = static_cast<GraphicalApplicationContext*>(context);
+    setDrawEvents(graphicalContext->getDrawEvents());
 
     // setup platform window
     g_window.init();
@@ -72,7 +72,7 @@ void GraphicalApplication::init(std::vector<std::string>& args, uint8_t asyncDis
 
     // initialize graphics
     g_graphics.init();
-    g_drawPool.init(g_gameConfig.getSpriteSize());
+    g_drawPool.init(graphicalContext->getSpriteSize());
 
     // fire first resize event
     resize(g_window.getSize());
@@ -162,27 +162,8 @@ void GraphicalApplication::run()
                 });
             }
 
-            if (g_game.isOnline()) {
-                if (!g_ui.m_mapWidget)
-                    g_ui.m_mapWidget = g_ui.getRootWidget()->recursiveGetChildById("gameMapPanel")->static_self_cast<UIMap>();
-
-                if (txt->canRepaint() || foreground_tile->canRepaint()) {
-                    g_asyncDispatcher.dispatch([this, &txt] {
-                        std::scoped_lock l(txt->getMutex());
-                        g_textDispatcher.poll();
-
-                        if (g_ui.m_mapWidget) {
-                            g_ui.m_mapWidget->drawSelf(DrawPoolType::TEXT);
-                            g_ui.m_mapWidget->drawSelf(DrawPoolType::FOREGROUND_TILE);
-                        }
-                    });
-                }
-
-                {
-                    std::scoped_lock l(map->getMutex());
-                    g_ui.m_mapWidget->drawSelf(DrawPoolType::MAP);
-                }
-            } else g_ui.m_mapWidget = nullptr;
+            if (m_drawEvents)
+                m_drawEvents->drawForgroundTile(foreground_tile, txt, map);
 
             stdext::millisleep(1);
         }
@@ -269,16 +250,17 @@ void GraphicalApplication::inputEvent(const InputEvent& event)
 
 void GraphicalApplication::repaintMap() { g_drawPool.get(DrawPoolType::MAP)->repaint(); }
 void GraphicalApplication::repaint() { g_drawPool.get(DrawPoolType::FOREGROUND)->repaint(); }
-bool GraphicalApplication::canDrawTexts() const { return m_drawText && (!g_map.getStaticTexts().empty() || !g_map.getAnimatedTexts().empty()); }
-
-bool GraphicalApplication::isLoadingAsyncTexture() { return m_loadingAsyncTexture || g_game.isUsingProtobuf(); }
+bool GraphicalApplication::canDrawTexts() const { return m_drawText && (!m_drawEvents || m_drawEvents->canDrawTexts()); }
+bool GraphicalApplication::isLoadingAsyncTexture() { return m_loadingAsyncTexture || (m_drawEvents && m_drawEvents->isLoadingAsyncTexture()); }
 
 void GraphicalApplication::setLoadingAsyncTexture(bool v) {
-    if (g_game.isUsingProtobuf())
+    if (m_drawEvents && m_drawEvents->isUsingProtobuf())
         v = true;
     else if (isEncrypted())
         v = false;
 
     m_loadingAsyncTexture = v;
-    g_sprites.reload();
+
+    if (m_drawEvents)
+        m_drawEvents->setLoadingAsyncTexture(v);
 }

@@ -23,12 +23,12 @@
 #include "thing.h"
 #include "game.h"
 #include "map.h"
-#include "shadermanager.h"
 #include "thingtypemanager.h"
 #include "tile.h"
 
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
+#include <framework/graphics/shadermanager.h>
 
 void Thing::setPosition(const Position& position, uint8_t stackPos, bool hasElevation)
 {

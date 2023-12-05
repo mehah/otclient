@@ -289,6 +289,7 @@ void UIManager::onWidgetDestroy(const UIWidgetPtr& widget)
     if (m_draggingWidget == widget)
         updateDraggingWidget(nullptr);
 
+    // Avoid the garbage collector
     if (!g_modules.isAutoReloadEnabled())
         return;
 

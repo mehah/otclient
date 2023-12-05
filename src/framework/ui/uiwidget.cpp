@@ -30,9 +30,8 @@
 #include <framework/luaengine/luainterface.h>
 #include <framework/otml/otmlnode.h>
 #include <framework/platform/platformwindow.h>
-
 #include "framework/graphics/drawpoolmanager.h"
-#include <client/shadermanager.h>
+#include "framework/graphics/shadermanager.h"
 
 UIWidget::UIWidget()
 {
@@ -149,7 +148,7 @@ void UIWidget::addChild(const UIWidgetPtr& child)
     }
 
     if (child->isDestroyed()) {
-        g_logger.traceWarning("attemp to add a destroyed child into a UIWidget");
+        g_logger.traceWarning("attempt to add a destroyed child into a UIWidget");
         return;
     }
 
@@ -1656,6 +1655,7 @@ void UIWidget::onStyleApply(const std::string_view, const OTMLNodePtr& styleNode
     parseBaseStyle(styleNode);
     parseImageStyle(styleNode);
     parseTextStyle(styleNode);
+    parseCustomStyle(styleNode);
 
     g_app.repaint();
 }

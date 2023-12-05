@@ -56,8 +56,18 @@ void exitSignalHandler(int sig)
     }
 }
 
-void Application::init(std::vector<std::string>& args, uint8_t asyncDispatchMaxThreads)
+Application::~Application()
 {
+    if (m_context) {
+        delete m_context;
+        m_context = nullptr;
+    }
+}
+
+void Application::init(std::vector<std::string>& args, ApplicationContext* context)
+{
+    m_context = context;
+
     // capture exit signals
     signal(SIGTERM, exitSignalHandler);
     signal(SIGINT, exitSignalHandler);
@@ -69,7 +79,7 @@ void Application::init(std::vector<std::string>& args, uint8_t asyncDispatchMaxT
     // setup locale
     std::locale::global(std::locale());
 
-    g_asyncDispatcher.init(asyncDispatchMaxThreads);
+    g_asyncDispatcher.init(context->getAsyncDispatchMaxThreads());
     g_dispatcher.init();
     g_textDispatcher.init();
     g_mainDispatcher.init();

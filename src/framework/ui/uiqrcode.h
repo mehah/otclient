@@ -22,30 +22,24 @@
 
 #pragma once
 
-#include "bitmapfont.h"
+#include "declarations.h"
 
- //@bindsingleton g_fonts
-class FontManager
+#include "uiwidget.h"
+
+// @bindclass
+class UIQrCode : public UIWidget
 {
 public:
-    void terminate();
-    void clearFonts();
+    void setCode(const std::string& code, int border);
+    void setCodeBorder(int border) { m_qrCodeBorder = border; setCode(m_qrCode, border); }
 
-    bool importFont(const std::string& file);
-
-    bool fontExists(const std::string_view fontName);
-    BitmapFontPtr getFont(const std::string_view fontName);
-
-    BitmapFontPtr getDefaultFont() const { return m_defaultFont; }
-    BitmapFontPtr getDefaultWidgetFont() const { return m_defaultWidgetFont; }
-
-    void setDefaultFont(const BitmapFontPtr& font) { m_defaultFont = font; }
-    void setDefaultWidgetFont(const BitmapFontPtr& font) { m_defaultWidgetFont = font; }
+    std::string getCode() { return m_qrCode; }
+    int getCodeBorder() { return m_qrCodeBorder; }
 
 private:
-    std::vector<BitmapFontPtr> m_fonts;
-    BitmapFontPtr m_defaultFont;
-    BitmapFontPtr m_defaultWidgetFont;
-};
+    void parseCustomStyle(const OTMLNodePtr& styleNode) override;
 
-extern FontManager g_fonts;
+protected:
+    std::string m_qrCode;
+    uint32_t m_qrCodeBorder{ 1 };
+};

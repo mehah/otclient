@@ -36,7 +36,10 @@ void UIWidget::parseImageStyle(const OTMLNodePtr& styleNode)
 {
     for (const auto& node : styleNode->children()) {
         if (node->tag() == "image-source")
-            setImageSource(stdext::resolve_path(node->value(), node->source()), false);
+            if (node->value() == "none")
+                setImageSource("", false);
+            else
+                setImageSource(stdext::resolve_path(node->value(), node->source()), false);
         else if (node->tag() == "image-source-base64")
             setImageSource(stdext::resolve_path(node->value(), node->source()), true);
         else if (node->tag() == "image-offset-x")
@@ -77,10 +80,6 @@ void UIWidget::parseImageStyle(const OTMLNodePtr& styleNode)
             setImageAutoResize(node->value<bool>());
         else if (node->tag() == "image-individual-animation")
             setImageIndividualAnimation(node->value<bool>());
-        else if (node->tag() == "qr-code")
-            setQRCode(node->value(), getQrCodeBorder());
-        else if (node->tag() == "qr-code-border")
-            setQRCodeBorder(node->value<int>());
     }
 }
 
@@ -216,31 +215,6 @@ void UIWidget::setImageSource(const std::string_view source, bool base64)
     }
 
     if (!m_rect.isValid() || hasProp(PropImageAutoResize)) {
-        const auto& imageSize = m_imageTexture->getSize();
-
-        Size size = getSize();
-        if (size.width() <= 0 || hasProp(PropImageAutoResize))
-            size.setWidth(imageSize.width());
-
-        if (size.height() <= 0 || hasProp(PropImageAutoResize))
-            size.setHeight(imageSize.height());
-
-        setSize(size);
-    }
-}
-
-void UIWidget::setQRCode(const std::string& code, int border)
-{
-    if (code.empty()) {
-        m_imageTexture = nullptr;
-        m_qrCode = {};
-        return;
-    }
-
-    m_qrCode = code;
-    m_imageTexture = TexturePtr(new Texture(Image::fromQRCode(code, border)));
-
-    if (m_imageTexture && (!m_rect.isValid() || isImageAutoResize())) {
         const auto& imageSize = m_imageTexture->getSize();
 
         Size size = getSize();

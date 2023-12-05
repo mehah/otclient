@@ -26,6 +26,7 @@
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/ui/uimanager.h>
 #include <framework/ui/uiwidget.h>
+#include "client.h"
 #include "effect.h"
 #include "game.h"
 #include "item.h"
@@ -160,7 +161,7 @@ void Tile::setWidget(const UIWidgetPtr& widget) {
     m_widget = widget;
     m_widget->setClipping(true);
     g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
-        g_ui.getMapWidget()->addTile(tile);
+        g_client.getMapWidget()->addTile(tile);
     }, g_game.getServerBeat());
 }
 
@@ -175,13 +176,13 @@ void Tile::removeWidget()
 
 void Tile::clean()
 {
-    if (g_ui.getMapWidget() && (m_widget
+    if (g_client.getMapWidget() && (m_widget
 #ifndef BOT_PROTECTION
         || m_text || m_timerText
 #endif
         )) {
         g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
-            g_ui.getMapWidget()->removeTile(tile);
+            g_client.getMapWidget()->removeTile(tile);
         }, g_game.getServerBeat());
     }
 

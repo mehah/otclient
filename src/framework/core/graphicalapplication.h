@@ -30,10 +30,43 @@
 
 #include "application.h"
 
+class ApplicationDrawEvents
+{
+protected:
+    virtual bool drawForgroundTile(DrawPool* forgroundTilePool, DrawPool* textPool, DrawPool* mapPool) = 0;
+
+    virtual bool canDrawTexts() const = 0;
+    virtual bool isLoadingAsyncTexture() = 0;
+    virtual bool isUsingProtobuf() = 0;
+    virtual void setLoadingAsyncTexture(bool loadingAsync) = 0;
+
+    friend class GraphicalApplication;
+};
+
+class GraphicalApplicationContext : public ApplicationContext
+{
+public:
+    GraphicalApplicationContext(uint8_t asyncDispatchMaxThreads, uint16_t spriteSize, ApplicationDrawEvents* drawEvents) :
+        ApplicationContext(asyncDispatchMaxThreads), 
+        m_spriteSize(spriteSize),
+        m_drawEvents(drawEvents)
+    {}
+
+    void setSpriteSize(uint16_t size) { m_spriteSize = size; }
+    uint16_t getSpriteSize() { return m_spriteSize; }
+
+    void setDrawEvents(ApplicationDrawEvents* drawEvents) { m_drawEvents = drawEvents; }
+    ApplicationDrawEvents* getDrawEvents() { return m_drawEvents; }
+
+protected:
+    uint16_t m_spriteSize;
+    ApplicationDrawEvents* m_drawEvents;
+};
+
 class GraphicalApplication : public Application
 {
 public:
-    void init(std::vector<std::string>& args, uint8_t asyncDispatchMaxThreads = 0) override;
+    void init(std::vector<std::string>& args, ApplicationContext* context) override;
     void deinit() override;
     void terminate() override;
     void run() override;
@@ -94,6 +127,8 @@ public:
     void repaint();
     void repaintMap();
 
+    void setDrawEvents(ApplicationDrawEvents* drawEvents) { m_drawEvents = drawEvents; }
+
 protected:
     void resize(const Size& size);
     void inputEvent(const InputEvent& event);
@@ -113,6 +148,8 @@ private:
     float m_staticTextScale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
 
     AdaptativeFrameCounter m_frameCounter;
+
+    ApplicationDrawEvents* m_drawEvents;
 };
 
 extern GraphicalApplication g_app;

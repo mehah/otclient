@@ -21,13 +21,18 @@
  */
 
 #include "client.h"
-#include <framework/core/resourcemanager.h>
 #include "game.h"
 #include "map.h"
+#include "uimap.h"
 #include "minimap.h"
-#include "shadermanager.h"
 #include "spriteappearances.h"
 #include "spritemanager.h"
+
+#include <framework/ui/ui.h>
+#include <framework/core/eventdispatcher.h>
+#include <framework/core/asyncdispatcher.h>
+#include <framework/core/resourcemanager.h>
+#include <framework/graphics/shadermanager.h>
 
 Client g_client;
 
@@ -59,4 +64,52 @@ void Client::terminate()
     g_spriteAppearances.terminate();
     g_shaders.terminate();
     g_gameConfig.terminate();
+}
+
+bool Client::drawForgroundTile(DrawPool* forgroundTilePool, DrawPool* textPool, DrawPool* mapPool)
+{
+    if (g_game.isOnline()) {
+        if (!m_mapWidget)
+            m_mapWidget = g_ui.getRootWidget()->recursiveGetChildById("gameMapPanel")->static_self_cast<UIMap>();
+
+        if (textPool->canRepaint() || forgroundTilePool->canRepaint()) {
+            g_asyncDispatcher.dispatch([this, &textPool] {
+                std::scoped_lock l(textPool->getMutex());
+                g_textDispatcher.poll();
+
+                if (m_mapWidget) {
+                    m_mapWidget->drawSelf(DrawPoolType::TEXT);
+                    m_mapWidget->drawSelf(DrawPoolType::FOREGROUND_TILE);
+                }
+            });
+        }
+
+        {
+            std::scoped_lock l(mapPool->getMutex());
+            m_mapWidget->drawSelf(DrawPoolType::MAP);
+        }
+    }
+    else m_mapWidget = nullptr;
+
+    return true;
+}
+
+bool Client::canDrawTexts() const
+{
+    return !g_map.getStaticTexts().empty() || !g_map.getAnimatedTexts().empty();
+}
+
+bool Client::isLoadingAsyncTexture()
+{
+    return g_game.isUsingProtobuf();
+}
+
+bool Client::isUsingProtobuf()
+{
+    return g_game.isUsingProtobuf();
+}
+
+void Client::setLoadingAsyncTexture(bool loadingAsync)
+{
+    g_sprites.reload();
 }

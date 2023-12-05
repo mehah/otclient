@@ -21,6 +21,7 @@
  */
 
 #include <client/client.h>
+#include <client/gameconfig.h>
 #include <framework/core/application.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/luaengine/luainterface.h>
@@ -78,7 +79,7 @@ int main(int argc, const char* argv[])
 #endif
 
     // initialize application framework and otclient
-    g_app.init(args, ASYNC_DISPATCHER_MAX_THREAD);
+    g_app.init(args, new GraphicalApplicationContext(ASYNC_DISPATCHER_MAX_THREAD, g_gameConfig.getSpriteSize(), &g_client));
     g_client.init(args);
 #ifdef FRAMEWORK_NET
     g_http.init();
@@ -94,10 +95,10 @@ int main(int argc, const char* argv[])
     g_app.deinit();
 
     // terminate everything and free memory
-    Client::terminate();
+    g_client.terminate();
     g_app.terminate();
 #ifdef FRAMEWORK_NET
     g_http.terminate();
 #endif
     return 0;
-    }
+}
