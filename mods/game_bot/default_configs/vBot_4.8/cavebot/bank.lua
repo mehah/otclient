@@ -43,9 +43,9 @@ CaveBot.Extensions.Bank.setup = function()
     end
 
     local npc = getCreatureByName(npcName)
-    if not npc then 
+    if not npc then
       print("CaveBot[Bank]: NPC not found, skipping")
-     return false 
+     return false
     end
 
     if not CaveBot.ReachNPC(npcName) then
@@ -83,7 +83,6 @@ CaveBot.Extensions.Bank.setup = function()
   description="action type(withdraw/deposit/transfer), NPC name, (if withdraw: amount|if transfer: name, balance left)",
  })
 end
-
 
 onTalk(function(name, level, mode, text, channelId, pos)
   if mode == 51 and text:find("Your account balance is") then

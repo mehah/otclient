@@ -205,6 +205,18 @@ int push_luavalue(const stdext::map<K, V, H>& map);
 template<class K, class V, class H>
 bool luavalue_cast(int index, stdext::map<K, V, H>& map);
 
+template<class K, class V, class H>
+int push_luavalue(const std::map<K, V, H>& map);
+
+template<class K, class V, class H>
+bool luavalue_cast(int index, std::map<K, V, H>& map);
+
+template<class K, class V, class H>
+int push_luavalue(const std::unordered_map<K, V, H>& map);
+
+template<class K, class V, class H>
+bool luavalue_cast(int index, std::unordered_map<K, V, H>& map);
+
 // pair
 template<class K, class V>
 bool luavalue_cast(int index, std::pair<K, V>& pair);
@@ -472,6 +484,64 @@ int push_luavalue(const stdext::map<K, V, H>& map)
 
 template<class K, class V, class H>
 bool luavalue_cast(int index, stdext::map<K, V, H>& map)
+{
+    if (g_lua.isTable(index)) {
+        g_lua.pushNil();
+        while (g_lua.next(index < 0 ? index - 1 : index)) {
+            K key;
+            V value;
+            if (luavalue_cast(-1, value) && luavalue_cast(-2, key))
+                map[key] = value;
+            g_lua.pop();
+        }
+        return true;
+    }
+    return false;
+}
+
+template<class K, class V, class H>
+int push_luavalue(const std::map<K, V, H>& map)
+{
+    g_lua.newTable();
+    for (const auto& [key, value] : map) {
+        push_internal_luavalue(key);
+        push_internal_luavalue(value);
+        g_lua.rawSet();
+    }
+    return 1;
+}
+
+template<class K, class V, class H>
+bool luavalue_cast(int index, std::map<K, V, H>& map)
+{
+    if (g_lua.isTable(index)) {
+        g_lua.pushNil();
+        while (g_lua.next(index < 0 ? index - 1 : index)) {
+            K key;
+            V value;
+            if (luavalue_cast(-1, value) && luavalue_cast(-2, key))
+                map[key] = value;
+            g_lua.pop();
+        }
+        return true;
+    }
+    return false;
+}
+
+template<class K, class V, class H>
+int push_luavalue(const std::unordered_map<K, V, H>& map)
+{
+    g_lua.newTable();
+    for (const auto& [key, value] : map) {
+        push_internal_luavalue(key);
+        push_internal_luavalue(value);
+        g_lua.rawSet();
+    }
+    return 1;
+}
+
+template<class K, class V, class H>
+bool luavalue_cast(int index, std::unordered_map<K, V, H>& map)
 {
     if (g_lua.isTable(index)) {
         g_lua.pushNil();

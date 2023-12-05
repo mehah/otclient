@@ -24,7 +24,7 @@ local LOCKER_ACCESSTILE_MODIFIERS = {
 
 local function CaveBotConfigParse()
 	local name = storage["_configs"]["targetbot_configs"]["selected"]
-    if not name then 
+    if not name then
         return warn("[vBot] Please create a new TargetBot config and reset bot")
     end
 	local file = configDir .. "/targetbot_configs/" .. name .. ".json"
@@ -86,7 +86,6 @@ function CaveBot.GetLootItems()
 
     return returnTable
 end
-
 
 --- Checks whether player has any visible items to be stashed
 -- @return boolean
@@ -234,7 +233,7 @@ end
 -- @return void(acion) or boolean
 function CaveBot.ReachNPC(name)
     name = name:lower()
-    
+
     local npc = nil
     for i, spec in pairs(getSpectators()) do
         if spec:isNpc() and spec:getName():lower() == name then
@@ -409,8 +408,8 @@ end
 -- Combined for shorthand usage.
 -- @return boolean whether succeed to reach and open depot
 function CaveBot.ReachAndOpenDepot()
-    if CaveBot.ReachDepot() and CaveBot.OpenDepotChest() then 
-        return true 
+    if CaveBot.ReachDepot() and CaveBot.OpenDepotChest() then
+        return true
     end
     return false
 end
@@ -419,8 +418,8 @@ end
 -- Combined for shorthand usage.
 -- @return boolean whether succeed to reach and open depot
 function CaveBot.ReachAndOpenInbox()
-    if CaveBot.ReachDepot() and CaveBot.OpenInbox() then 
-        return true 
+    if CaveBot.ReachDepot() and CaveBot.OpenInbox() then
+        return true
     end
     return false
 end
@@ -472,8 +471,8 @@ function CaveBot.WithdrawItem(id, amount, fromDepot, destination)
         end
     end
 
-    if itemCount >= amount then 
-        return true 
+    if itemCount >= amount then
+        return true
     end
 
     local toMove = amount - itemCount

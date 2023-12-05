@@ -28,18 +28,18 @@ cavebotMacro = macro(20, function()
     CaveBot.resetWalking()
     return -- target bot or looting is working, wait
   end
-  
+
   if CaveBot.doWalking() then
     return -- executing walking
   end
-  
+
   local actions = ui.list:getChildCount()
   if actions == 0 then return end
   local currentAction = ui.list:getFocusedChild()
   if not currentAction then
     currentAction = ui.list:getFirstChild()
   end
-  local action = CaveBot.Actions[currentAction.action]  
+  local action = CaveBot.Actions[currentAction.action]
   local value = currentAction.value
   local retry = false
   if action then
@@ -59,15 +59,15 @@ cavebotMacro = macro(20, function()
       end
     else
       error("Error while executing cavebot action (" .. currentAction.action .. "):\n" .. result)
-    end    
+    end
   else
     error("Invalid cavebot action: " .. currentAction.action)
   end
-  
+
   if retry then
     return
   end
-  
+
   if currentAction ~= ui.list:getFocusedChild() then
     -- focused child can change durring action, get it again and reset state
     currentAction = ui.list:getFocusedChild() or ui.list:getFirstChild()
@@ -87,13 +87,13 @@ config = Config.setup("cavebot_configs", configWidget, "cfg", function(name, ena
   if enabled and CaveBot.Recorder.isOn() then
     CaveBot.Recorder.disable()
     CaveBot.setOff()
-    return    
+    return
   end
 
   local currentActionIndex = ui.list:getChildIndex(ui.list:getFocusedChild())
   ui.list:destroyChildren()
   if not data then return cavebotMacro.setOff() end
-  
+
   local cavebotConfig = nil
   for k,v in ipairs(data) do
     if type(v) == "table" and #v == 2 then
@@ -126,17 +126,17 @@ config = Config.setup("cavebot_configs", configWidget, "cfg", function(name, ena
   end
 
   CaveBot.Config.onConfigChange(name, enabled, cavebotConfig)
-  
+
   actionRetries = 0
   CaveBot.resetWalking()
   prevActionResult = true
   cavebotMacro.setOn(enabled)
   cavebotMacro.delay = nil
-  if lastConfig == name then 
+  if lastConfig == name then
     -- restore focused child on the action list
     ui.list:focusChild(ui.list:getChildByIndex(currentActionIndex))
   end
-  lastConfig = name  
+  lastConfig = name
 end)
 
 -- ui callbacks
@@ -172,14 +172,14 @@ CaveBot.isOff = function()
 end
 
 CaveBot.setOn = function(val)
-  if val == false then  
+  if val == false then
     return CaveBot.setOff(true)
   end
   config.setOn()
 end
 
 CaveBot.setOff = function(val)
-  if val == false then  
+  if val == false then
     return CaveBot.setOn(true)
   end
   config.setOff()
@@ -192,7 +192,7 @@ end
 CaveBot.gotoLabel = function(label)
   label = label:lower()
   for index, child in ipairs(ui.list:getChildren()) do
-    if child.action == "label" and child.value:lower() == label then    
+    if child.action == "label" and child.value:lower() == label then
       ui.list:focusChild(child)
       return true
     end
@@ -205,11 +205,11 @@ CaveBot.save = function()
   for index, child in ipairs(ui.list:getChildren()) do
     table.insert(data, {child.action, child.value})
   end
-  
+
   if CaveBot.Config then
     table.insert(data, {"config", json.encode(CaveBot.Config.save())})
   end
-  
+
   local extension_data = {}
   for extension, callbacks in pairs(CaveBot.Extensions) do
     if callbacks.onSave then

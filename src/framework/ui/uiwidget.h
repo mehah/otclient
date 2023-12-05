@@ -107,6 +107,8 @@ protected:
     Fw::FocusReason m_lastFocusReason{ Fw::ActiveFocusReason };
     Fw::AutoFocusPolicy m_autoFocusPolicy{ Fw::AutoFocusLast };
 
+    bool m_attached { false };
+
     friend class UIGridLayout;
     friend class UIHorizontalLayout;
     friend class UIVerticalLayout;
@@ -198,6 +200,10 @@ public:
 
     void setProp(FlagProp prop, bool v);
     bool hasProp(FlagProp prop) { return (m_flagsProp & prop); }
+
+    bool isAttached() { return m_attached; }
+    void setAttached(bool attached) { m_attached = attached; }
+
 private:
     uint32_t m_flagsProp{ 0 };
     PainterShaderProgramPtr m_shader;
@@ -445,6 +451,7 @@ public:
     int getPaddingRight() { return m_padding.right; }
     int getPaddingBottom() { return m_padding.bottom; }
     int getPaddingLeft() { return m_padding.left; }
+    Size getPaddingSize() { return Size(m_padding.left + m_padding.right, m_padding.top + m_padding.bottom); }
     float getOpacity() { return m_opacity; }
     float getRotation() { return m_rotation; }
 

@@ -14,7 +14,7 @@
 
 - C++20
 - Refactored/Optimized Rendering System
-- Auto Reload Module ([init.lua](https://github.com/mehah/otclient/blob/main/init.lua#L85))
+- Auto Reload Module ([init.lua](https://github.com/mehah/otclient/blob/main/init.lua#L90))
 - Attached Effects System (to create aura, wings...) (code sample: [effects.lua](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/effects.lua), [outfit_618.lua](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/configs/outfit_618.lua), [code test](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/attachedeffects.lua#L1))
 - Idle Animation Support
 - Highlight Mouse Target (press shift to select any object)
@@ -28,7 +28,7 @@
 - Support for more mouse buttons, for example 4 and 5
 - Module Controller System ([Code example](https://github.com/mehah/otclient/blob/cache-for-all/modules/game_minimap/minimap.lua))
 - Some bugs fixed contained in [edubart/otclient](https://github.com/edubart/otclient)
-- Client 12.85 ~ 12.92, 13.00 ~ 13.14 support (protobuf)
+- Client 12.85 ~ 12.92, 13.00 ~ 13.21 support (protobuf)
 - Market has been rewritten to work only [Canary](https://github.com/opentibiabr/canary)
 - Async Texture Loading
 - Tile Widget
@@ -62,6 +62,9 @@
 - QR Code support, with auto generate it from string  [@conde2]
   - qr-code-border: 2
   - qr-code: Hail OTClient Redemption - Conde2 Dev
+- Smooth Walk Elevation Feature by [@SkullzOTS](https://github.com/SkullzOTS)
+  - View Feature: [Gyazo](https://i.gyazo.com/af0ed0f15a9e4d67bd4d0b2847bd6be7.gif)
+  - To enable just go to [modules/game_features/features.lua](https://github.com/mehah/otclient/blob/main/modules/game_features/features.lua#L5), and uncomment line 5 (g_game.enableFeature(GameSmoothWalkElevation)).
   
 ##### Sponsored  (Features)
 - Shader with Framebuffer | ([@SkullzOTS](https://github.com/SkullzOTS), [@Mryukiimaru](https://github.com/Mryukiimaru), [@JeanTheOne](https://github.com/JeanTheOne), [@KizaruHere](https://github.com/KizaruHere))
@@ -69,6 +72,8 @@
   - Is adapted in 85%
   - To enable it, it is necessary to remove/off the BOT_PROTECTION flag.
   - [VS Solution](https://github.com/mehah/otclient/blob/68e4e1b94c2041bd235441244156e6477058250c/vc17/settings.props#L9) / [CMAKE](https://github.com/mehah/otclient/blob/68e4e1b94c2041bd235441244156e6477058250c/src/CMakeLists.txt#L13)
+  - NOTE: BE AWARE THAT THERE ARE SERIOUS PROBLEMS, SUCH AS MEMORY LEAKS.
+
 
 ##### [OTClient V8](https://github.com/OTCv8) (Features)
 - Lighting System

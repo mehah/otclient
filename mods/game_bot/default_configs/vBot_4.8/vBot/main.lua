@@ -8,7 +8,7 @@ storage.checkVersion = storage.checkVersion or 0
 if os.time() > storage.checkVersion + (12 * 60 * 60) then
 
     storage.checkVersion = os.time()
-    
+
     HTTP.get("https://raw.githubusercontent.com/Vithrax/vBot/main/vBot/version.txt", function(data, err)
         if err then
           warn("[vBot updater]: Unable to check version:\n" .. err)
@@ -29,12 +29,12 @@ schedule(5000, function()
 
     if not available then return end
     if currentVersion ~= version then
-        
+
         UI.Separator()
         UI.Label("New vBot is available for download! v"..currentVersion)
         UI.Button("Go to vBot GitHub Page", function() g_platform.openUrl("https://github.com/Vithrax/vBot") end)
         UI.Separator()
-        
+
     end
 
 end)

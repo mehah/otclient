@@ -5,7 +5,7 @@ CaveBot.Extensions.DWithdraw.setup = function()
 		local capLimit
 		local data = string.split(value, ",")
 		if retries > 600 then
-			print("CaveBot[DepotWithdraw]: actions limit reached, proceeding") 
+			print("CaveBot[DepotWithdraw]: actions limit reached, proceeding")
 			return false
 		end
 		local destContainer
@@ -24,7 +24,6 @@ CaveBot.Extensions.DWithdraw.setup = function()
 			capLimit = tonumber(data[4]:trim())
 		end
 
-
 		-- cap check
 		if freecap() < (capLimit or 200) then
 			for i, container in ipairs(getContainers()) do
@@ -32,8 +31,8 @@ CaveBot.Extensions.DWithdraw.setup = function()
 					g_game.close(container)
 				end
 			end
-			print("CaveBot[DepotWithdraw]: cap limit reached, proceeding") 
-			return false 
+			print("CaveBot[DepotWithdraw]: cap limit reached, proceeding")
+			return false
 		end
 
 		-- containers
@@ -46,7 +45,7 @@ CaveBot.Extensions.DWithdraw.setup = function()
 			end
 		end
 
-		if not destContainer then 
+		if not destContainer then
 			print("CaveBot[DepotWithdraw]: container not found!")
 			return false
 		end

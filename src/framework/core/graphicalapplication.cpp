@@ -82,7 +82,8 @@ void GraphicalApplication::init(std::vector<std::string>& args, ApplicationConte
     g_sounds.init();
 #endif
 
-    m_frameCounter.init();
+    m_mapProcessFrameCounter.init();
+    m_graphicFrameCounter.init();
 }
 
 void GraphicalApplication::deinit()
@@ -134,39 +135,71 @@ void GraphicalApplication::run()
 
     g_lua.callGlobalField("g_app", "onRun");
 
-    const auto& foreground = g_drawPool.get(DrawPoolType::FOREGROUND);
-    const auto& foreground_tile = g_drawPool.get(DrawPoolType::FOREGROUND_TILE);
-    const auto& txt = g_drawPool.get(DrawPoolType::TEXT);
-    const auto& map = g_drawPool.get(DrawPoolType::MAP);
+    std::condition_variable foregroundUICondition, foregroundMapCondition;
 
-    // clang c++20 dont support jthread
-    std::thread t1([&]() {
+    const auto& FPS = [&] {
+        m_mapProcessFrameCounter.setTargetFps(g_window.vsyncEnabled() || getMaxFps() || getTargetFps() ? 500u : 999u);
+        return m_graphicFrameCounter.getFps();
+    };
+
+    const auto& drawForeground = [&] {
+        const auto& foregroundUI = g_drawPool.get(DrawPoolType::FOREGROUND);
+        const auto& foregroundMap = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
+
+        if (foregroundUI->canRepaint()) {
+            if (g_game.isOnline())
+                foregroundUICondition.notify_one();
+            else
+                g_ui.render(DrawPoolType::FOREGROUND);
+        }
+
+        if (g_game.isOnline() && foregroundMap->canRepaint())
+            foregroundMapCondition.notify_one();
+    };
+
+    // THREAD - FOREGROUND UI
+    g_asyncDispatcher.dispatch([this, &condition = foregroundUICondition] {
+        const auto& pool = g_drawPool.get(DrawPoolType::FOREGROUND);
+        std::unique_lock lock(pool->getMutexPreDraw());
+        condition.wait(lock, [this]() -> bool {
+            g_ui.render(DrawPoolType::FOREGROUND);
+            return m_stopping;
+        });
+    });
+
+    // THREAD - FOREGROUND MAP
+    g_asyncDispatcher.dispatch([this, &condition = foregroundMapCondition] {
+        const auto& pool = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
+        std::unique_lock lock(pool->getMutexPreDraw());
+        condition.wait(lock, [this]() -> bool {
+            if (g_ui.m_mapWidget)
+                g_ui.m_mapWidget->drawSelf(DrawPoolType::FOREGROUND_MAP);
+            return m_stopping;
+        });
+    });
+
+    // THREAD - POOL & MAP
+    g_asyncDispatcher.dispatch([&] {
         g_eventThreadId = std::this_thread::get_id();
         while (!m_stopping) {
             poll();
 
             if (!g_window.isVisible()) {
+                m_mapProcessFrameCounter.update();
                 stdext::millisleep(10);
                 continue;
             }
 
-            /*if (g_drawPool.isDrawing()) {
-                stdext::millisleep(1);
-                continue;
-            }*/
-
-            if (foreground->canRepaint()) {
-                g_asyncDispatcher.dispatch([this, &foreground] {
-                    std::scoped_lock l(foreground->getMutex());
-                    g_ui.render(DrawPoolType::FOREGROUND);
-                });
-            }
+            drawForeground();
 
             if (m_drawEvents)
                 m_drawEvents->drawForgroundTile(foreground_tile, txt, map);
 
-            stdext::millisleep(1);
+            m_mapProcessFrameCounter.update();
         }
+
+        foregroundUICondition.notify_one();
+        foregroundMapCondition.notify_one();
     });
 
     m_running = true;
@@ -174,6 +207,7 @@ void GraphicalApplication::run()
         mainPoll();
 
         if (!g_window.isVisible()) {
+            m_graphicFrameCounter.update();
             stdext::millisleep(10);
             continue;
         }
@@ -182,10 +216,13 @@ void GraphicalApplication::run()
 
         // update screen pixels
         g_window.swapBuffers();
-        m_frameCounter.update();
-    }
 
-    t1.join();
+        if (m_graphicFrameCounter.update()) {
+            g_dispatcher.addEvent([this, fps = FPS()] {
+                g_lua.callGlobalField("g_app", "onFps", fps);
+            });
+        }
+    }
 
     m_stopping = false;
     m_running = false;
@@ -236,7 +273,8 @@ void GraphicalApplication::resize(const Size& size)
 
         if (USE_FRAMEBUFFER) {
             g_drawPool.get(DrawPoolType::CREATURE_INFORMATION)->setFramebuffer(size);
-            g_drawPool.get(DrawPoolType::TEXT)->setFramebuffer(size);
+            g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->setFramebuffer(size);
+            g_drawPool.get(DrawPoolType::FOREGROUND_MAP_WIDGETS)->setFramebuffer(size);
         }
     });
 }

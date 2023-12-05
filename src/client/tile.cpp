@@ -83,7 +83,28 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool is
     drawTop(dest, flags, false, lightView);
     drawAttachedEffect(dest, lightView, false);
     drawAttachedParticlesEffect(dest);
-    updateWidget(dest, mapRect);
+
+    for (const auto& thing : m_things) {
+        thing->drawWidgets(mapRect);
+    }
+
+    drawWidgets(mapRect);
+}
+
+int getSmoothedElevation(const CreaturePtr& creature, int currentElevation, float factor) {
+    const auto& fromPos = creature->getLastStepFromPosition();
+    const auto& toPos = creature->getLastStepToPosition();
+    const auto& fromTile = g_map.getTile(fromPos);
+    const auto& toTile = g_map.getTile(toPos);
+
+    if (!fromTile || !toTile) {
+        return currentElevation;
+    }
+
+    const int fromElevation = fromTile->getDrawElevation();
+    const int toElevation = toTile->getDrawElevation();
+
+    return fromElevation != toElevation ? fromElevation + factor * (toElevation - fromElevation) : currentElevation;
 }
 
 void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, bool forceDraw, LightView* lightView)
@@ -101,10 +122,17 @@ void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags,
     }
 
     for (const auto& creature : m_walkingCreatures) {
+        int elevation = m_drawElevation;
+        if (g_game.getFeature(Otc::GameSmoothWalkElevation)) {
+            const float factor = std::clamp<float>(creature->getWalkTicksElapsed() / static_cast<float>(creature->getStepDuration()), .0f, 1.f);
+            elevation = getSmoothedElevation(creature, elevation, factor);
+        }
+
         const auto& cDest = Point(
-            dest.x + ((creature->getPosition().x - m_position.x) * g_gameConfig.getSpriteSize() - m_drawElevation) * g_drawPool.getScaleFactor(),
-            dest.y + ((creature->getPosition().y - m_position.y) * g_gameConfig.getSpriteSize() - m_drawElevation) * g_drawPool.getScaleFactor()
+            dest.x + ((creature->getPosition().x - m_position.x) * g_gameConfig.getSpriteSize() - elevation) * g_drawPool.getScaleFactor(),
+            dest.y + ((creature->getPosition().y - m_position.y) * g_gameConfig.getSpriteSize() - elevation) * g_drawPool.getScaleFactor()
         );
+
         creature->draw(cDest, flags & Otc::DrawThings, lightView);
         creature->drawInformation(mapRect, cDest, isCovered, flags);
     }
@@ -126,64 +154,26 @@ void Tile::drawTop(const Point& dest, int flags, bool forceDraw, LightView* ligh
     }
 }
 
-void Tile::updateWidget(const Point& dest, const MapPosInfo& mapRect)
+void Tile::drawWidgets(const MapPosInfo& mapRect)
 {
-    if (!m_widget)
-        return;
-
-    Point p = dest - mapRect.drawOffset;
-    p.x *= mapRect.horizontalStretchFactor;
-    p.y *= mapRect.verticalStretchFactor;
-    p += mapRect.rect.topLeft();
-
-    p.x += m_widget->getMarginLeft();
-    p.x -= m_widget->getMarginRight();
-    p.y += m_widget->getMarginTop();
-    p.y -= m_widget->getMarginBottom();
-
-    const auto& widgetRect = m_widget->getRect();
-    const auto& rect = Rect(p - Point(widgetRect.width() / 2 - g_gameConfig.getSpriteSize(), widgetRect.height() / 2 - g_gameConfig.getSpriteSize()), widgetRect.width(), widgetRect.height());
-
-    m_widget->setRect(rect);
-}
-
-void Tile::drawWidget(const Point& dest, const MapPosInfo& mapRect)
-{
-    if (!m_widget)
-        return;
-
-    m_widget->draw(mapRect.rect, DrawPoolType::FOREGROUND);
-}
-
-void Tile::setWidget(const UIWidgetPtr& widget) {
-    removeWidget();
-
-    m_widget = widget;
-    m_widget->setClipping(true);
-    g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
-        g_client.getMapWidget()->addTile(tile);
-    }, g_game.getServerBeat());
-}
-
-void Tile::removeWidget()
-{
-    if (!m_widget)
-        return;
-
-    m_widget->destroy();
-    m_widget = nullptr;
+    drawAttachedWidgets(m_lastDrawDest, mapRect);
 }
 
 void Tile::clean()
 {
-    if (g_client.getMapWidget() && (m_widget
+    if (g_client.getMapWidget()
 #ifndef BOT_PROTECTION
-        || m_text || m_timerText
+        && (m_text || m_timerText)
 #endif
-        )) {
+        ) {
         g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
-            g_client.getMapWidget()->removeTile(tile);
+            if (g_client.getMapWidget())
+                g_client.getMapWidget()->getMapView()->removeForegroundTile(tile);
         }, g_game.getServerBeat());
+    }
+
+    if (hasAttachedWidgets()) {
+        clearAttachedWidgets();
     }
 
     m_highlightThing = nullptr;
@@ -196,7 +186,7 @@ void Tile::clean()
 #ifdef FRAMEWORK_EDITOR
     m_flags = 0;
 #endif
-}
+        }
 
 void Tile::addWalkingCreature(const CreaturePtr& creature)
 {
@@ -850,24 +840,18 @@ bool Tile::canRender(uint32_t& flags, const Position& cameraPosition, const Awar
 }
 
 #ifndef BOT_PROTECTION
-void Tile::drawTexts(const Point& dest, const MapPosInfo& mapRect)
+void Tile::drawTexts(Point dest)
 {
-    Point p = dest - mapRect.drawOffset;
-    p.x *= mapRect.horizontalStretchFactor;
-    p.y *= mapRect.verticalStretchFactor;
-    p += mapRect.rect.topLeft();
-    p.y += 5;
-
     if (m_timerText && g_clock.millis() < m_timer) {
         if (m_text && m_text->hasText())
-            p.y -= 8;
+            dest.y -= 8;
         m_timerText->setText(stdext::format("%.01f", (m_timer - g_clock.millis()) / 1000.));
-        m_timerText->drawText(p, Rect(p.x - 64, p.y - 64, 128, 128));
-        p.y += 16;
+        m_timerText->drawText(dest, Rect(dest.x - 64, dest.y - 64, 128, 128));
+        dest.y += 16;
     }
 
     if (m_text && m_text->hasText()) {
-        m_text->drawText(p, Rect(p.x - 64, p.y - 64, 128, 128));
+        m_text->drawText(dest, Rect(dest.x - 64, dest.y - 64, 128, 128));
     }
 }
 
@@ -876,7 +860,8 @@ void Tile::setText(const std::string& text, Color color)
     if (!m_text) {
         m_text = std::make_shared<StaticText>();
         g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
-            g_ui.getMapWidget()->addTile(tile);
+            if (g_ui.getMapWidget())
+                g_ui.getMapWidget()->getMapView()->addForegroundTile(tile);
         }, g_game.getServerBeat());
     }
 
@@ -899,7 +884,8 @@ void Tile::setTimer(int time, Color color)
     if (!m_timerText) {
         m_timerText = std::make_shared<StaticText>();
         g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
-            g_ui.getMapWidget()->addTile(tile);
+            if (g_ui.getMapWidget())
+                g_ui.getMapWidget()->getMapView()->addForegroundTile(tile);
         }, g_game.getServerBeat());
     }
 

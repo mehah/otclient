@@ -68,7 +68,7 @@ TargetBot.Creature.edit = function(config, callback) -- callback = function(newC
       if newConfig.regex:len() > 0 then
         newConfig.regex = newConfig.regex .. "|"
       end
-      newConfig.regex = newConfig.regex .. "^" .. part:trim():lower():gsub("%*", ".*"):gsub("%?", ".?") .. "$"    
+      newConfig.regex = newConfig.regex .. "^" .. part:trim():lower():gsub("%*", ".*"):gsub("%?", ".?") .. "$"
     end
 
     editor:destroy()

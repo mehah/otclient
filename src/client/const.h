@@ -542,7 +542,8 @@ namespace Otc
         GameWrapKit = 112,
         GameContainerFilter = 113,
         GameEnterGameShowAppearance = 114,
-        LastGameFeature = 115
+        GameSmoothWalkElevation = 115,
+        LastGameFeature = 116
     };
 
     enum MagicEffectsType_t : uint8_t

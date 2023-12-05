@@ -21,6 +21,7 @@
  */
 
 #include "uimap.h"
+#include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
@@ -60,25 +61,19 @@ void UIMap::drawSelf(DrawPoolType drawPane)
         return;
     }
 
-    if (m_mapView && drawPane == DrawPoolType::FOREGROUND_TILE) {
-        g_drawPool.use(DrawPoolType::FOREGROUND_TILE);
-        for (const auto& tile : m_tiles) {
-            const auto& dest = m_mapView->transformPositionTo2D(tile->getPosition(), m_mapView->getCameraPosition());
-#ifndef BOT_PROTECTION
-            tile->drawTexts(dest, m_mapView->m_posInfo);
-#endif
-            tile->drawWidget(dest, m_mapView->m_posInfo);
-        }
-        return;
-    }
-
-    const auto& mapSize = g_app.isScaled() ? Rect(0, 0, g_graphics.getViewportSize()) : m_mapRect;
-    m_mapView->updateRect(mapSize);
+    const auto& mapRect = g_app.isScaled() ? Rect(0, 0, g_graphics.getViewportSize()) : m_mapRect;
 
     if (drawPane == DrawPoolType::MAP) {
-        m_mapView->draw();
-    } else if (drawPane == DrawPoolType::TEXT) {
-        m_mapView->drawText();
+        m_mapView->updateRect(mapRect);
+        g_drawPool.preDraw(drawPane, [this, &mapRect] {
+            m_mapView->registerEvents();
+            m_mapView->draw(mapRect);
+        }, m_mapView->m_posInfo.rect, m_mapView->m_posInfo.srcRect, Color::black);
+    } else if (drawPane == DrawPoolType::FOREGROUND_MAP) {
+        g_textDispatcher.poll();
+        g_drawPool.preDraw(drawPane, [this, &mapRect] {
+            m_mapView->drawForeground(mapRect);
+        });
     }
 }
 
@@ -210,21 +205,6 @@ void UIMap::updateMapSize()
 
     if (!m_keepAspectRatio)
         updateVisibleDimension();
-}
-
-void UIMap::addTile(const TilePtr& tile) {
-    std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND)->getMutex());
-
-    if (std::ranges::find(m_tiles, tile) == m_tiles.end())
-        m_tiles.emplace_back(tile);
-}
-void UIMap::removeTile(const TilePtr& tile) {
-    std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND)->getMutex());
-    const auto it = std::find(m_tiles.begin(), m_tiles.end(), tile);
-    if (it == m_tiles.end())
-        return;
-
-    m_tiles.erase(it);
 }
 
 /* vim: set ts=4 sw=4 et: */

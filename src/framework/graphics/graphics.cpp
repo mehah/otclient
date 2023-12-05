@@ -77,18 +77,16 @@ void Graphics::init()
 
     m_ok = true;
 
-    g_painter = new Painter;
+    g_painter = std::make_unique<Painter>();
 
     g_textures.init();
 }
 
 void Graphics::terminate()
 {
+    g_painter = nullptr;
     g_fonts.terminate();
     g_textures.terminate();
-
-    delete g_painter;
-    g_painter = nullptr;
 
     m_ok = false;
 }

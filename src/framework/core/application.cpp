@@ -29,6 +29,7 @@
 #include <framework/luaengine/luainterface.h>
 #include <framework/platform/crashhandler.h>
 #include <framework/platform/platform.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include "asyncdispatcher.h"
 
 #include <gitinfo.h>
@@ -108,13 +109,6 @@ void Application::deinit()
 {
     g_lua.callGlobalField("g_app", "onTerminate");
 
-    // run modules unload events
-    g_modules.unloadModules();
-    g_modules.clear();
-
-    // release remaining lua object references
-    g_lua.collectGarbage();
-
     // poll remaining events
     poll();
     Application::poll();
@@ -122,9 +116,16 @@ void Application::deinit()
     g_asyncDispatcher.terminate();
 
     // disable dispatcher events
-    g_dispatcher.shutdown();
     g_textDispatcher.shutdown();
+    g_dispatcher.shutdown();         
     g_mainDispatcher.shutdown();
+
+    // run modules unload events
+    g_modules.unloadModules();
+    g_modules.clear();
+
+    // release remaining lua object references
+    g_lua.collectGarbage();
 }
 
 void Application::terminate()
@@ -157,7 +158,10 @@ void Application::poll()
     Connection::poll();
 #endif
 
-    g_dispatcher.poll();
+    {
+        std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND)->getMutexPreDraw());
+        g_dispatcher.poll();
+    }
 
     // poll connection again to flush pending write
 #ifdef FRAMEWORK_NET

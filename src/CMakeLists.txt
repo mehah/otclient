@@ -182,6 +182,7 @@ add_definitions(-D"BUILD_REVISION=\\\"${BUILD_REVISION}\\\"")
 # *****************************************************************************
 find_package(OpenSSL QUIET)
 find_package(PhysFS REQUIRED)
+find_package(ZLIB REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(LibLZMA REQUIRED)
 find_package(nlohmann_json REQUIRED)
@@ -189,7 +190,6 @@ find_package(asio REQUIRED)
 find_package(Threads REQUIRED)
 find_package(STDUUID CONFIG REQUIRED)
 find_package(pugixml CONFIG REQUIRED)
-find_package(ZLIB REQUIRED)
 if(APPLE)
 	# Required for Physfs
 	find_library(FOUNDATION Foundation REQUIRED)
@@ -289,11 +289,11 @@ set(SOURCE_FILES
 	framework/net/protocol.cpp
 	framework/net/protocolhttp.cpp
 	framework/net/server.cpp
-	framework/otml//otmldocument.cpp
-	framework/otml//otmlemitter.cpp
-	framework/otml//otmlexception.cpp
-	framework/otml//otmlnode.cpp
-	framework/otml//otmlparser.cpp
+	framework/otml/otmldocument.cpp
+	framework/otml/otmlemitter.cpp
+	framework/otml/otmlexception.cpp
+	framework/otml/otmlnode.cpp
+	framework/otml/otmlparser.cpp
 	framework/platform/androidgameactivity.cpp
 	framework/platform/androidmanager.cpp
 	framework/platform/androidmanager.h
@@ -464,7 +464,6 @@ if(MSVC)
 		LibLZMA::LibLZMA
 		winmm.lib
 		pugixml::pugixml
-		ZLIB::ZLIB
 	)
 elseif(ANDROID)
 	target_include_directories(${PROJECT_NAME}
@@ -486,6 +485,7 @@ elseif(ANDROID)
 		${LUA_LIBRARY}
 		${LUAJIT_LIBRARY}
 		${PHYSFS_LIBRARY}
+		${ZLIB_LIBRARY}
 		${PROTOBUF_LIBRARY}
 		${NLOHMANN_JSON_LIBRARY}
 		${EGL_LIBRARY}
@@ -508,7 +508,7 @@ elseif(ANDROID)
 		log
 		pugixml::pugixml
 	)
-else()
+else() # Linux
 	target_include_directories(${PROJECT_NAME}
 		PRIVATE
 		${CMAKE_SOURCE_DIR}/src
@@ -526,6 +526,7 @@ else()
 		PRIVATE
 		${LUAJIT_LIBRARY}
 		${PHYSFS_LIBRARY}
+		${ZLIB_LIBRARY}
 		${PROTOBUF_LIBRARY}
 		${NLOHMANN_JSON_LIBRARY}
 		${GLEW_LIBRARY}
@@ -547,8 +548,15 @@ else()
 		Vorbis::vorbisfile
 		LibLZMA::LibLZMA
 		pugixml::pugixml
-		ZLIB::ZLIB
 	)
+
+	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+		target_compile_options(${PROJECT_NAME}
+			PRIVATE
+				-Wall -Wextra -Wpedantic
+		)
+	endif()
+
 endif()
 
 # *****************************************************************************
