@@ -45,7 +45,7 @@ public:
     bool isLoadingAsyncTexture() override;
     bool isUsingProtobuf() override;
 
-    void setLoadingAsyncTexture(bool loadingAsync) override;
+    void onLoadingAsyncTextureChanged(bool loadingAsync) override;
 
     UIMapPtr getMapWidget() { return m_mapWidget; }
 

@@ -308,5 +308,5 @@ void GraphicalApplication::setLoadingAsyncTexture(bool v) {
     m_loadingAsyncTexture = v;
 
     if (m_drawEvents)
-        m_drawEvents->setLoadingAsyncTexture(v);
+        m_drawEvents->onLoadingAsyncTextureChanged(v);
 }

@@ -43,7 +43,7 @@ protected:
     virtual bool canDrawTexts() const = 0;
     virtual bool isLoadingAsyncTexture() = 0;
     virtual bool isUsingProtobuf() = 0;
-    virtual void setLoadingAsyncTexture(bool loadingAsync) = 0;
+    virtual void onLoadingAsyncTextureChanged(bool loadingAsync) = 0;
 
     friend class GraphicalApplication;
 };

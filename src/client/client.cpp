@@ -112,7 +112,7 @@ bool Client::isUsingProtobuf()
     return g_game.isUsingProtobuf();
 }
 
-void Client::setLoadingAsyncTexture(bool loadingAsync)
+void Client::onLoadingAsyncTextureChanged(bool loadingAsync)
 {
     g_sprites.reload();
 }
