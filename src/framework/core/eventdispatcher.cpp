@@ -71,7 +71,6 @@ void EventDispatcher::startEvent(const ScheduledEventPtr& event)
     thread->scheduledEventList.emplace_back(event);
 }
 
-
 ScheduledEventPtr EventDispatcher::scheduleEvent(const std::function<void()>& callback, int delay)
 {
     if (m_disabled)

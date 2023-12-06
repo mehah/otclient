@@ -30,8 +30,6 @@
 #include <framework/core/timer.h>
 #include <framework/platform/platformwindow.h>
 
-
-
 class ApplicationDrawEvents
 {
 protected:

@@ -86,9 +86,8 @@ bool Module::load()
 
         m_loaded = true;
 
-        ticks_t now = stdext::millis();
-        float loadTime = (now - startTime) / 1000.0;
-        g_logger.debug(stdext::format("Loaded module '%s' (%s)", m_name, stdext::format("%.2fs", loadTime)));
+        g_logger.debug(stdext::format("Loaded module '%s' (%s)", m_name, 
+                       stdext::format("%.2fs", (stdext::millis() - startTime) / 1000.0)));
     } catch (const stdext::exception& e) {
         // remove from package.loaded
         g_lua.getGlobalField("package", "loaded");

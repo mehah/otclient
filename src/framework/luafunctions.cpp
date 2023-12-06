@@ -27,7 +27,6 @@
 #include <framework/core/module.h>
 #include <framework/core/modulemanager.h>
 #include <framework/core/resourcemanager.h>
-
 #include <framework/luaengine/luainterface.h>
 #include <framework/platform/platform.h>
 #include <framework/stdext/net.h>
