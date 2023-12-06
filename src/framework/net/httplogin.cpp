@@ -97,13 +97,13 @@ std::string LoginHttp::getSession() { return this->session; }
 void LoginHttp::httpLogin(const std::string &host, const std::string &path,
                           uint16_t port, const std::string &email,
                           const std::string &password, int request_id,
-                          bool unsafeLogin) {
+                          bool httpLogin) {
 
   g_asyncDispatcher.dispatch(
-      [this, host, path, port, email, password, request_id, unsafeLogin] {
+      [this, host, path, port, email, password, request_id, httpLogin] {
         httplib::Result result =
             this->loginHttpsJson(host, path, port, email, password);
-        if (unsafeLogin && (!result || result->status != Success)) {
+        if (httpLogin && (!result || result->status != Success)) {
           result = loginHttpJson(host, path, port, email, password);
         }
 

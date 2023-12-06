@@ -184,10 +184,10 @@ EnterGameWindow
     margin-top: 2
 
   CheckBox
-    id: unsafeLoginBox
+    id: httpLoginBox
     enabled: true
-    !text: tr('Unsafe login')
-    !tooltip: tr('If login fails using SSL try without it(raw data)')
+    !text: tr('Enable HTTP login')
+    !tooltip: tr('If login fails using HTTPS (encrypted) try with HTTP (unencrypted)')
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom

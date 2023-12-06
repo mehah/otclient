@@ -96,7 +96,7 @@ CharacterWidget < UIWidget
     color: #bbbbbb
     anchors.top: parent.top
     anchors.left: parent.left
-    margin-left: 300
+    margin-left: 350
     font: verdana-11px-monochrome
     text-auto-resize: true
     background-color: alpha
@@ -114,7 +114,7 @@ CharacterWidget < UIWidget
     color: #bbbbbb
     anchors.top: parent.top
     anchors.left: parent.left
-    margin-left: 350
+    margin-left: 400
     font: verdana-11px-monochrome
     text-auto-resize: true
     background-color: alpha
@@ -199,7 +199,7 @@ MainWindow
       end
 
   FlatLabel
-    width: 50
+    width: 100
     anchors.left: parent.left
     anchors.top: characters.top
     margin-left: 250
@@ -213,7 +213,7 @@ MainWindow
     width: 50
     anchors.left: parent.left
     anchors.top: characters.top
-    margin-left: 300
+    margin-left: 350
     !text: tr('Level') .. ''
     @onSetup: |
       if not(g_game.getFeature(GameEnterGameShowAppearance)) then
@@ -224,7 +224,7 @@ MainWindow
     width: 150
     anchors.left: parent.left
     anchors.top: characters.top
-    margin-left: 350
+    margin-left: 400
     !text: tr('Vocation') .. ''
     @onSetup: |
       if not(g_game.getFeature(GameEnterGameShowAppearance)) then
@@ -232,9 +232,10 @@ MainWindow
       end
 
   FlatLabel
-    width: 201
+    width: 200
     anchors.right: characters.right
     anchors.top: characters.top
+    margin-left: 550
     !text: tr('World') .. ''
     @onSetup: |
       if not(g_game.getFeature(GameEnterGameShowAppearance)) then
@@ -264,16 +265,6 @@ MainWindow
     anchors.left: parent.left
     anchors.top: parent.top
     anchors.bottom: prev.bottom
-    margin-left: 299
-    @onSetup: |
-      if not(g_game.getFeature(GameEnterGameShowAppearance)) then
-        self:hide()
-      end
-
-  VerticalSeparator
-    anchors.left: parent.left
-    anchors.top: parent.top
-    anchors.bottom: prev.bottom
     margin-left: 349
     @onSetup: |
       if not(g_game.getFeature(GameEnterGameShowAppearance)) then
@@ -284,7 +275,17 @@ MainWindow
     anchors.left: parent.left
     anchors.top: parent.top
     anchors.bottom: prev.bottom
-    margin-left: 499
+    margin-left: 399
+    @onSetup: |
+      if not(g_game.getFeature(GameEnterGameShowAppearance)) then
+        self:hide()
+      end
+
+  VerticalSeparator
+    anchors.left: parent.left
+    anchors.top: parent.top
+    anchors.bottom: prev.bottom
+    margin-left: 500
     @onSetup: |
       if not(g_game.getFeature(GameEnterGameShowAppearance)) then
         self:hide()

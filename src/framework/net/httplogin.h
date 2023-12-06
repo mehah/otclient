@@ -46,7 +46,7 @@ public:
 
   void httpLogin(const std::string &host, const std::string &path,
                  uint16_t port, const std::string &email,
-                 const std::string &password, int request_id, bool unsafeLogin);
+                 const std::string &password, int request_id, bool httpLogin);
 
   httplib::Result loginHttpsJson(const std::string &host,
                                  const std::string &path, uint16_t port,

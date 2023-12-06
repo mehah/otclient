@@ -129,7 +129,7 @@ function EnterGame.init()
     local port = g_settings.get('port')
     local stayLogged = g_settings.getBoolean('staylogged')
     local autologin = g_settings.getBoolean('autologin')
-    local unsafeLogin = g_settings.getBoolean('unsafeLogin')
+    local httpLogin = g_settings.getBoolean('httpLogin')
     local clientVersion = g_settings.getInteger('client-version')
     if clientVersion == 0 then
         clientVersion = 1074
@@ -146,7 +146,7 @@ function EnterGame.init()
     enterGame:getChildById('serverPortTextEdit'):setText(port)
     enterGame:getChildById('autoLoginBox'):setChecked(autologin)
     enterGame:getChildById('stayLoggedBox'):setChecked(stayLogged)
-    enterGame:getChildById('unsafeLoginBox'):setChecked(unsafeLogin)
+    enterGame:getChildById('httpLoginBox'):setChecked(httpLogin)
 
     local installedClients = {}
     local installed_qty = 0
@@ -335,7 +335,7 @@ function EnterGame.onClientVersionChange(comboBox, text, data)
     EnterGame.toggleStayLoggedBox(clientVersion)
 end
 
-function EnterGame.tryHttpLogin(clientVersion, unsafeLogin)
+function EnterGame.tryHttpLogin(clientVersion, httpLogin)
     g_game.setClientVersion(clientVersion)
     g_game.setProtocolVersion(g_game.getClientProtocolVersion(clientVersion))
     g_game.chooseRsa(G.host)
@@ -372,7 +372,7 @@ function EnterGame.tryHttpLogin(clientVersion, unsafeLogin)
     G.requestId = math.random(1)
 
     local http = LoginHttp.create()
-    http:httpLogin(host, path, G.port, G.account, G.password, G.requestId, unsafeLogin)
+    http:httpLogin(host, path, G.port, G.account, G.password, G.requestId, httpLogin)
 end
 
 function printTable(t)
@@ -456,7 +456,7 @@ function EnterGame.doLogin()
     G.host = enterGame:getChildById('serverHostTextEdit'):getText()
     G.port = tonumber(enterGame:getChildById('serverPortTextEdit'):getText())
     local clientVersion = tonumber(clientBox:getText())
-    local unsafeLogin = enterGame:getChildById('unsafeLoginBox'):isChecked()
+    local httpLogin = enterGame:getChildById('httpLoginBox'):isChecked()
     EnterGame.hide()
 
     if g_game.isOnline() then
@@ -476,7 +476,7 @@ function EnterGame.doLogin()
             G.port = 443
         end
 
-        EnterGame.tryHttpLogin(clientVersion, unsafeLogin)
+        EnterGame.tryHttpLogin(clientVersion, httpLogin)
     else
         protocolLogin = ProtocolLogin.create()
         protocolLogin.onLoginError = onError
