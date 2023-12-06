@@ -27,14 +27,15 @@
 #include <framework/core/module.h>
 #include <framework/core/modulemanager.h>
 #include <framework/core/resourcemanager.h>
-#include <framework/graphics/texturemanager.h>
+
 #include <framework/luaengine/luainterface.h>
 #include <framework/platform/platform.h>
 #include <framework/stdext/net.h>
 #include <framework/util/crypt.h>
 
-#include "graphics/particleeffect.h"
-
+#ifdef FRAMEWORK_GRAPHICS
+#include "framework/graphics/particleeffect.h"
+#include "framework/graphics/texturemanager.h"
 #include "framework/graphics/fontmanager.h"
 #include "framework/graphics/graphics.h"
 #include "framework/graphics/particlemanager.h"
@@ -42,6 +43,7 @@
 #include "framework/input/mouse.h"
 #include "framework/platform/platformwindow.h"
 #include "framework/ui/ui.h"
+#endif
 
 #ifdef FRAMEWORK_SOUND
 #include <framework/sound/combinedsoundsource.h>
@@ -233,6 +235,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_resources", "writeFileContents", &ResourceManager::writeFileContents, &g_resources);
     g_lua.bindSingletonFunction("g_resources", "guessFilePath", &ResourceManager::guessFilePath, &g_resources);
     g_lua.bindSingletonFunction("g_resources", "isFileType", &ResourceManager::isFileType, &g_resources);
+    g_lua.bindSingletonFunction("g_resources", "getFileName", &ResourceManager::getFileName, &g_resources);
     g_lua.bindSingletonFunction("g_resources", "getFileTime", &ResourceManager::getFileTime, &g_resources);
     g_lua.bindSingletonFunction("g_resources", "makeDir", &ResourceManager::makeDir, &g_resources);
     g_lua.bindSingletonFunction("g_resources", "deleteFile", &ResourceManager::deleteFile, &g_resources);
@@ -244,18 +247,6 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_resources", "updateExecutable", &ResourceManager::updateExecutable, &g_resources);
     g_lua.bindSingletonFunction("g_resources", "createArchive", &ResourceManager::createArchive, &g_resources);
     g_lua.bindSingletonFunction("g_resources", "decompressArchive", &ResourceManager::decompressArchive, &g_resources);
-
-    // ShaderManager
-    g_lua.registerSingletonClass("g_shaders");
-    g_lua.bindSingletonFunction("g_shaders", "createShader", &ShaderManager::createShader, &g_shaders);
-    g_lua.bindSingletonFunction("g_shaders", "createFragmentShader", &ShaderManager::createFragmentShader, &g_shaders);
-    g_lua.bindSingletonFunction("g_shaders", "createFragmentShaderFromCode", &ShaderManager::createFragmentShaderFromCode, &g_shaders);
-    g_lua.bindSingletonFunction("g_shaders", "setupMapShader", &ShaderManager::setupMapShader, &g_shaders);
-    g_lua.bindSingletonFunction("g_shaders", "setupItemShader", &ShaderManager::setupItemShader, &g_shaders);
-    g_lua.bindSingletonFunction("g_shaders", "setupOutfitShader", &ShaderManager::setupOutfitShader, &g_shaders);
-    g_lua.bindSingletonFunction("g_shaders", "setupMountShader", &ShaderManager::setupMountShader, &g_shaders);
-    g_lua.bindSingletonFunction("g_shaders", "addMultiTexture", &ShaderManager::addMultiTexture, &g_shaders);
-    g_lua.bindSingletonFunction("g_shaders", "getShader", &ShaderManager::getShader, &g_shaders);
 
     // Config
     g_lua.registerClass<Config>();
@@ -269,6 +260,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Config>("setNode", &Config::setNode);
     g_lua.bindClassMemberFunction<Config>("getNode", &Config::getNode);
     g_lua.bindClassMemberFunction<Config>("getNodeSize", &Config::getNodeSize);
+    g_lua.bindClassMemberFunction<Config>("getNodeOrDefault", &Config::getNodeOrDefault);
     g_lua.bindClassMemberFunction<Config>("mergeNode", &Config::mergeNode);
     g_lua.bindClassMemberFunction<Config>("getFileName", &Config::getFileName);
 
@@ -307,6 +299,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ScheduledEvent>("cyclesExecuted", &ScheduledEvent::cyclesExecuted);
     g_lua.bindClassMemberFunction<ScheduledEvent>("maxCycles", &ScheduledEvent::maxCycles);
 
+#ifdef FRAMEWORK_GRAPHICS
     // GraphicalApplication
     g_lua.bindSingletonFunction("g_app", "isOnInputEvent", &GraphicalApplication::isOnInputEvent, &g_app);
 
@@ -425,6 +418,18 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_particles", "getEffectsTypes", &ParticleManager::getEffectsTypes, &g_particles);
     g_lua.bindSingletonFunction("g_particles", "terminate", &ParticleManager::terminate, &g_particles);
 
+    // ShaderManager
+    g_lua.registerSingletonClass("g_shaders");
+    g_lua.bindSingletonFunction("g_shaders", "createShader", &ShaderManager::createShader, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "createFragmentShader", &ShaderManager::createFragmentShader, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "createFragmentShaderFromCode", &ShaderManager::createFragmentShaderFromCode, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "setupMapShader", &ShaderManager::setupMapShader, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "setupItemShader", &ShaderManager::setupItemShader, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "setupOutfitShader", &ShaderManager::setupOutfitShader, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "setupMountShader", &ShaderManager::setupMountShader, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "addMultiTexture", &ShaderManager::addMultiTexture, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "getShader", &ShaderManager::getShader, &g_shaders);
+
     // UIWidget
     g_lua.registerClass<UIWidget>();
     g_lua.bindClassStaticFunction<UIWidget>("create", [] { return std::make_shared<UIWidget>(); });
@@ -461,6 +466,9 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("bindRectToParent", &UIWidget::bindRectToParent);
     g_lua.bindClassMemberFunction<UIWidget>("destroy", &UIWidget::destroy);
     g_lua.bindClassMemberFunction<UIWidget>("destroyChildren", &UIWidget::destroyChildren);
+    g_lua.bindClassMemberFunction<UIWidget>("removeChildren", &UIWidget::removeChildren);
+    g_lua.bindClassMemberFunction<UIWidget>("hideChildren", &UIWidget::hideChildren);
+    g_lua.bindClassMemberFunction<UIWidget>("showChildren", &UIWidget::showChildren);
     g_lua.bindClassMemberFunction<UIWidget>("setId", &UIWidget::setId);
     g_lua.bindClassMemberFunction<UIWidget>("setParent", &UIWidget::setParent);
     g_lua.bindClassMemberFunction<UIWidget>("setLayout", &UIWidget::setLayout);
@@ -534,14 +542,19 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("isFixedSize", &UIWidget::isFixedSize);
     g_lua.bindClassMemberFunction<UIWidget>("isClipping", &UIWidget::isClipping);
     g_lua.bindClassMemberFunction<UIWidget>("isDestroyed", &UIWidget::isDestroyed);
+    g_lua.bindClassMemberFunction<UIWidget>("isFirstOnStyle", &UIWidget::isFirstOnStyle);
     g_lua.bindClassMemberFunction<UIWidget>("isTextWrap", &UIWidget::isTextWrap);
     g_lua.bindClassMemberFunction<UIWidget>("hasChildren", &UIWidget::hasChildren);
     g_lua.bindClassMemberFunction<UIWidget>("containsMarginPoint", &UIWidget::containsMarginPoint);
     g_lua.bindClassMemberFunction<UIWidget>("containsPaddingPoint", &UIWidget::containsPaddingPoint);
     g_lua.bindClassMemberFunction<UIWidget>("containsPoint", &UIWidget::containsPoint);
+    g_lua.bindClassMemberFunction<UIWidget>("intersects", &UIWidget::intersects);
+    g_lua.bindClassMemberFunction<UIWidget>("intersectsMargin", &UIWidget::intersectsMargin);
+    g_lua.bindClassMemberFunction<UIWidget>("intersectsPadding", &UIWidget::intersectsPadding);
     g_lua.bindClassMemberFunction<UIWidget>("getId", &UIWidget::getId);
     g_lua.bindClassMemberFunction<UIWidget>("getParent", &UIWidget::getParent);
     g_lua.bindClassMemberFunction<UIWidget>("getFocusedChild", &UIWidget::getFocusedChild);
+    g_lua.bindClassMemberFunction<UIWidget>("getHoveredChild", &UIWidget::getHoveredChild);
     g_lua.bindClassMemberFunction<UIWidget>("getChildren", &UIWidget::getChildren);
     g_lua.bindClassMemberFunction<UIWidget>("getFirstChild", &UIWidget::getFirstChild);
     g_lua.bindClassMemberFunction<UIWidget>("getLastChild", &UIWidget::getLastChild);
@@ -615,6 +628,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("getX", &UIWidget::getX);
     g_lua.bindClassMemberFunction<UIWidget>("getY", &UIWidget::getY);
     g_lua.bindClassMemberFunction<UIWidget>("getPosition", &UIWidget::getPosition);
+    g_lua.bindClassMemberFunction<UIWidget>("getCenter", &UIWidget::getCenter);
     g_lua.bindClassMemberFunction<UIWidget>("getWidth", &UIWidget::getWidth);
     g_lua.bindClassMemberFunction<UIWidget>("getHeight", &UIWidget::getHeight);
     g_lua.bindClassMemberFunction<UIWidget>("getSize", &UIWidget::getSize);
@@ -852,6 +866,7 @@ void Application::registerLuaFunctions()
     g_lua.registerClass<UIParticles, UIWidget>();
     g_lua.bindClassStaticFunction<UIParticles>("create", [] { return std::make_shared<UIParticles>(); });
     g_lua.bindClassMemberFunction<UIParticles>("addEffect", &UIParticles::addEffect);
+#endif
 
 #ifdef FRAMEWORK_NET
     // Server

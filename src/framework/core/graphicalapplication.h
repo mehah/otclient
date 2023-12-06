@@ -22,13 +22,15 @@
 
 #pragma once
 
+#include "application.h"
+
+#include <framework/graphics/declarations.h>
 #include <framework/core/adaptativeframecounter.h>
 #include <framework/core/inputevent.h>
 #include <framework/core/timer.h>
-#include <framework/graphics/declarations.h>
 #include <framework/platform/platformwindow.h>
 
-#include "application.h"
+
 
 class ApplicationDrawEvents
 {
@@ -74,6 +76,7 @@ public:
     void terminate() override;
     void run() override;
     void poll() override;
+    void dispatchPoll() override;
     void mainPoll();
     void close() override;
 

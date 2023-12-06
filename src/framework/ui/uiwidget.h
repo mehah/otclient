@@ -148,6 +148,9 @@ public:
     void bindRectToParent();
     void destroy();
     void destroyChildren();
+    void removeChildren();
+    void hideChildren();
+    void showChildren();
 
     void setId(const std::string_view id);
     void setParent(const UIWidgetPtr& parent);
@@ -172,15 +175,15 @@ public:
     bool isAnchored();
     bool isChildLocked(const UIWidgetPtr& child);
     bool hasChild(const UIWidgetPtr& child);
-    int getChildIndex(const UIWidgetPtr& child) { return child && child->getParent().get() == this ? child->m_childIndex : -1; }
+    int getChildIndex(const UIWidgetPtr& child = nullptr) { return child ? (child->getParent().get() == this ? child->m_childIndex : -1) : m_childIndex; }
     Rect getPaddingRect();
     Rect getMarginRect();
     Rect getChildrenRect();
     UIAnchorLayoutPtr getAnchoredLayout();
     UIWidgetPtr getRootParent();
-    UIWidgetPtr getChildAfter(const UIWidgetPtr& relativeChild);
-    UIWidgetPtr getChildBefore(const UIWidgetPtr& relativeChild);
-    UIWidgetPtr getChildById(const std::string_view childId);
+    UIWidgetPtr getChildAfter(const UIWidgetPtr& relativeChild, bool visibleOnly = false);
+    UIWidgetPtr getChildBefore(const UIWidgetPtr& relativeChild, bool visibleOnly = false);
+    UIWidgetPtr getChildById(const std::string_view& childId, bool visibleOnly = false);
     UIWidgetPtr getChildByPos(const Point& childPos);
     UIWidgetPtr getChildByIndex(int index);
     UIWidgetPtr getChildByState(Fw::WidgetState state);
@@ -233,6 +236,8 @@ protected:
     virtual void onChildFocusChange(const UIWidgetPtr& focusedChild, const UIWidgetPtr& unfocusedChild, Fw::FocusReason reason);
     virtual void onHoverChange(bool hovered);
     virtual void onVisibilityChange(bool visible);
+    virtual void onAdopted(const UIWidgetPtr& parent);
+    virtual void onAbandoned(const UIWidgetPtr& parent);
     virtual bool onDragEnter(const Point& mousePos);
     virtual bool onDragLeave(UIWidgetPtr droppedWidget, const Point& mousePos);
     virtual bool onDragMove(const Point& mousePos, const Point& mouseMoved);
@@ -271,7 +276,7 @@ public:
     bool isEnabled() { return !hasState(Fw::DisabledState); }
     bool isDisabled() { return hasState(Fw::DisabledState); }
     bool isFocused() { return hasState(Fw::FocusState); }
-    bool isHovered() { return hasState(Fw::HoverState); }
+    bool isHovered(bool orChildHovered = false) { return hasState(Fw::HoverState) || (orChildHovered && getHoveredChild() != nullptr); }
     bool isPressed() { return hasState(Fw::PressedState); }
     bool isFirst() { return hasState(Fw::FirstState); }
     bool isMiddle() { return hasState(Fw::MiddleState); }
@@ -290,6 +295,7 @@ public:
     bool isFixedSize() { return hasProp(PropFixedSize); }
     bool isClipping() { return hasProp(PropClipping); }
     bool isDestroyed() { return hasProp(PropDestroyed); }
+    bool isFirstOnStyle() { return hasProp(PropFirstOnStyle); }
 
     bool isFirstChild() { return m_parent && m_childIndex == 1; }
     bool isLastChild() { return m_parent && m_childIndex == m_parent->m_children.size(); }
@@ -299,10 +305,14 @@ public:
     bool containsMarginPoint(const Point& point) { return getMarginRect().contains(point); }
     bool containsPaddingPoint(const Point& point) { return getPaddingRect().contains(point); }
     bool containsPoint(const Point& point) { return m_rect.contains(point); }
+    bool intersects(const Rect rect) { return m_rect.intersects(rect); }
+    bool intersectsMargin(const Rect rect) { return getMarginRect().intersects(rect); }
+    bool intersectsPadding(const Rect rect) { return getPaddingRect().intersects(rect); }
 
     std::string getId() { return m_id; }
     UIWidgetPtr getParent() { return m_parent; }
     UIWidgetPtr getFocusedChild() { return m_focusedChild; }
+    UIWidgetPtr getHoveredChild();
     UIWidgetList getChildren() { return m_children; }
     UIWidgetPtr getFirstChild() { return getChildByIndex(1); }
     UIWidgetPtr getLastChild() { return getChildByIndex(-1); }
@@ -406,6 +416,7 @@ public:
     int getX() { return m_rect.x(); }
     int getY() { return m_rect.y(); }
     Point getPosition() { return m_rect.topLeft(); }
+    Point getCenter() { return m_rect.center(); }
     int getWidth() { return m_rect.width(); }
     int getHeight() { return m_rect.height(); }
     Size getSize() { return m_rect.size(); }

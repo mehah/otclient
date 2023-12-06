@@ -21,7 +21,7 @@
  */
 
 #include "graphicalapplication.h"
-#include <thread>
+
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>
@@ -39,6 +39,8 @@
 #ifdef FRAMEWORK_SOUND
 #include <framework/sound/soundmanager.h>
 #endif
+
+#include <thread>
 
 GraphicalApplication g_app;
 
@@ -241,6 +243,12 @@ void GraphicalApplication::poll()
     if (!g_window.isVisible()) {
         g_textDispatcher.poll();
     }
+}
+
+void GraphicalApplication::dispatchPoll()
+{
+    std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND)->getMutexPreDraw());
+    Application::dispatchPoll();
 }
 
 void GraphicalApplication::mainPoll()

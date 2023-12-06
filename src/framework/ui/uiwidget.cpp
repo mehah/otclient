@@ -194,6 +194,10 @@ void UIWidget::addChild(const UIWidgetPtr& child)
     }
 
     g_ui.onWidgetAppear(child);
+    child->callLuaField("onAddChild", this);
+
+    if (getRootParent() == g_ui.getRootWidget())
+        child->onAdopted(static_self_cast<UIWidget>());
 }
 
 void UIWidget::insertChild(size_t index, const UIWidgetPtr& child)
@@ -246,6 +250,10 @@ void UIWidget::insertChild(size_t index, const UIWidgetPtr& child)
     updateChildrenIndexStates();
 
     g_ui.onWidgetAppear(child);
+    callLuaField("onInsertChild", child);
+
+    if (getRootParent() == g_ui.getRootWidget())
+        child->onAdopted(static_self_cast<UIWidget>());
 }
 
 void UIWidget::removeChild(const UIWidgetPtr& child)
@@ -296,6 +304,8 @@ void UIWidget::removeChild(const UIWidgetPtr& child)
             focusPreviousChild(Fw::ActiveFocusReason, true);
 
         g_ui.onWidgetDisappear(child);
+        callLuaField("onRemoveChild", child);
+        child->onAbandoned(static_self_cast<UIWidget>());
     } else
         g_logger.traceError("attempt to remove an unknown child from a UIWidget");
 }
@@ -602,6 +612,24 @@ void UIWidget::unlockChild(const UIWidgetPtr& child)
     if (lockedChild) {
         if (lockedChild->isFocusable())
             focusChild(lockedChild, Fw::ActiveFocusReason);
+    }
+}
+
+void UIWidget::onAdopted(const UIWidgetPtr& parent)
+{
+    callLuaField("onAdopted", parent);
+
+    for (const UIWidgetPtr& child : m_children) {
+        child->onAdopted(static_self_cast<UIWidget>());
+    }
+}
+
+void UIWidget::onAbandoned(const UIWidgetPtr& parent)
+{
+    callLuaField("onAbandoned", parent);
+
+    for (const UIWidgetPtr& child : m_children) {
+        child->onAbandoned(static_self_cast<UIWidget>());
     }
 }
 
@@ -913,6 +941,34 @@ void UIWidget::destroyChildren()
 
     if (layout)
         layout->enableUpdates();
+}
+
+void UIWidget::removeChildren()
+{
+    UILayoutPtr layout = getLayout();
+    if (layout)
+        layout->disableUpdates();
+
+    m_focusedChild = nullptr;
+    m_lockedChildren.clear();
+    while (!m_children.empty()) {
+        removeChild(m_children.front());
+    }
+
+    if (layout)
+        layout->enableUpdates();
+}
+
+void UIWidget::hideChildren()
+{
+    for (auto& child : m_children)
+        child->hide();
+}
+
+void UIWidget::showChildren()
+{
+    for (auto& child : m_children)
+        child->show();
 }
 
 void UIWidget::setId(const std::string_view id)
@@ -1247,22 +1303,32 @@ UIWidgetPtr UIWidget::getRootParent()
     return static_self_cast<UIWidget>();
 }
 
-UIWidgetPtr UIWidget::getChildAfter(const UIWidgetPtr& relativeChild)
+UIWidgetPtr UIWidget::getChildAfter(const UIWidgetPtr& relativeChild, bool visibleOnly)
 {
-    return relativeChild->m_childIndex == m_children.size() ?
-        nullptr : m_children[relativeChild->m_childIndex];
+    auto it = std::find(m_children.begin(), m_children.end(), relativeChild);
+    if (it != m_children.end() && ++it != m_children.end()) {
+        if (!visibleOnly || (*it)->isExplicitlyVisible())
+            return *it;
+    }
+    return nullptr;
 }
 
-UIWidgetPtr UIWidget::getChildBefore(const UIWidgetPtr& relativeChild)
+UIWidgetPtr UIWidget::getChildBefore(const UIWidgetPtr& relativeChild, bool visibleOnly)
 {
-    return relativeChild->m_childIndex <= 1 ? nullptr : m_children[relativeChild->m_childIndex - 2];
+    auto it = std::find(m_children.rbegin(), m_children.rend(), relativeChild);
+    if (it != m_children.rend() && ++it != m_children.rend()) {
+        if (!visibleOnly || (*it)->isExplicitlyVisible())
+            return *it;
+    }
+    return nullptr;
 }
 
-UIWidgetPtr UIWidget::getChildById(const std::string_view childId)
+UIWidgetPtr UIWidget::getChildById(const std::string_view& childId, bool visibleOnly)
 {
-    if (const auto it = m_childrenById.find(childId); it != m_childrenById.end())
-        return it->second;
-
+    for (const UIWidgetPtr& child : m_children) {
+        if (child->getId() == childId && (!visibleOnly || child->isExplicitlyVisible()))
+            return child;
+    }
     return nullptr;
 }
 
@@ -1702,6 +1768,9 @@ void UIWidget::onChildFocusChange(const UIWidgetPtr& focusedChild, const UIWidge
 void UIWidget::onHoverChange(bool hovered)
 {
     callLuaField("onHoverChange", hovered);
+
+    if (hovered)
+        callLuaField("onHovered");
 }
 
 void UIWidget::onVisibilityChange(bool visible)
@@ -1789,6 +1858,18 @@ bool UIWidget::onClick(const Point& mousePos)
 bool UIWidget::onDoubleClick(const Point& mousePos)
 {
     return callLuaField<bool>("onDoubleClick", mousePos);
+}
+
+UIWidgetPtr UIWidget::getHoveredChild() 
+{
+    for (const UIWidgetPtr& child : m_children) {
+        if (child->isHovered())
+            return child;
+
+        const auto& hovered = child->getHoveredChild();
+        if (hovered) return hovered;
+    }
+    return nullptr;
 }
 
 bool UIWidget::propagateOnKeyText(const std::string_view keyText)

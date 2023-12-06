@@ -81,6 +81,8 @@ void GameConfig::loadGameNode(const OTMLNodePtr& mainNode) {
             loadTileNode(node);
         else if (node->tag() == "creature")
             loadCreatureNode(node);
+        else if (node->tag() == "player")
+            loadPlayerNode(node);
         else if (node->tag() == "render")
             loadRenderNode(node);
     }
@@ -135,6 +137,15 @@ void GameConfig::loadCreatureNode(const OTMLNodePtr& mainNode) {
             m_volatileSquareDuration = node->value<int>();
         else if (node->tag() == "adjust-creature-information-based-crop-size")
             m_adjustCreatureInformationBasedCropSize = node->value<bool>();
+        else if (node->tag() == "diagonal-walk-speed")
+            m_creatureDiagonalWalkSpeed = node->value<double>();
+    }
+}
+
+void GameConfig::loadPlayerNode(const OTMLNodePtr& mainNode) {
+    for (const auto& node : mainNode->children()) {
+        if (node->tag() == "diagonal-walk-speed")
+            m_playerDiagonalWalkSpeed = node->value<double>();
     }
 }
 

@@ -91,7 +91,7 @@ void ProtocolGame::sendLoginPacket(uint32_t challengeTimestamp, uint8_t challeng
         if (g_game.getFeature(Otc::GameAccountNames))
             msg->addString(m_accountName);
         else
-            msg->addU32(stdext::from_string<uint32_t >(m_accountName));
+            msg->addU32(stdext::from_string<uint32_t>(m_accountName));
 
         msg->addString(m_characterName);
         msg->addString(m_accountPassword);

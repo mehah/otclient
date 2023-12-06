@@ -28,7 +28,10 @@
 
 #include <framework/luaengine/luainterface.h>
 #include <framework/platform/platform.h>
+
+#ifdef FRAMEWORK_GRAPHICS
 #include <framework/platform/platformwindow.h>
+#endif
 
 #ifdef ANDROID
 #include <android/log.h>
@@ -93,7 +96,9 @@ void Logger::log(Fw::LogLevel level, const std::string_view message)
     }
 
     if (level == Fw::LogFatal) {
+#ifdef FRAMEWORK_GRAPHICS
         g_window.displayFatalError(message);
+#endif
         s_ignoreLogs = true;
 
         // NOTE: Threads must finish before the process can exit.

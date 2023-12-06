@@ -60,6 +60,9 @@ public:
     uint16_t getStaticDurationPerCharacter() const { return m_staticDurationPerCharacter; }
     uint16_t getMinStatictextDuration() const { return m_minStatictextDuration; }
 
+    double getPlayerDiagonalWalkSpeed() const { return m_playerDiagonalWalkSpeed; }
+    double getCreatureDiagonalWalkSpeed() const { return m_creatureDiagonalWalkSpeed; }
+
     BitmapFontPtr getCreatureNameFont()  const { return m_creatureNameFont; }
     BitmapFontPtr getAnimatedTextFont()  const { return m_animatedTextFont; }
     BitmapFontPtr getStaticTextFont()  const { return m_staticTextFont; }
@@ -73,6 +76,7 @@ private:
     void loadMapNode(const OTMLNodePtr& node);
     void loadTileNode(const OTMLNodePtr& node);
     void loadCreatureNode(const OTMLNodePtr& node);
+    void loadPlayerNode(const OTMLNodePtr& node);
     void loadRenderNode(const OTMLNodePtr& node);
 
     // Game
@@ -96,6 +100,10 @@ private:
     bool m_adjustCreatureInformationBasedCropSize{ false };
     uint16_t m_shieldBlinkTicks{ 500 };
     uint16_t m_volatileSquareDuration{ 1000 };
+    double m_creatureDiagonalWalkSpeed{ 3 };
+
+    // Player
+    double m_playerDiagonalWalkSpeed{ 3 };
 
     // Render
     uint16_t m_invisibleTicksPerFrame{ 500 };

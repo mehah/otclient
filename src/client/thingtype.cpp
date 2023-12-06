@@ -610,7 +610,7 @@ void ThingType::drawWithFrameBuffer(const TexturePtr& texture, const Rect& scree
 
     g_drawPool.bindFrameBuffer(destDiff.size()); {
         // Debug
-         // g_drawPool.addBoundingRect(Rect(Point(0), destDiff.size()), Color::red);
+        // g_drawPool.addBoundingRect(Rect(Point(0), destDiff.size()), Color::red);
 
         g_drawPool.addTexturedRect(Rect(p, screenRect.size()), texture, textureRect, color, conductor);
     } g_drawPool.releaseFrameBuffer(destDiff);

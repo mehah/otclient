@@ -48,6 +48,7 @@ public:
     virtual void terminate();
     virtual void run() = 0;
     virtual void poll();
+    virtual void dispatchPoll();
     virtual void exit();
     virtual void close();
     virtual void restart();
@@ -92,4 +93,8 @@ protected:
     std::unique_ptr<ApplicationContext> m_context;
 };
 
+#ifdef FRAMEWORK_GRAPHICS
 #include "graphicalapplication.h"
+#else
+#include "consoleapplication.h"
+#endif

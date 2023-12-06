@@ -93,7 +93,7 @@ void OTMLParser::parseLine(std::string line)
         return;
 
     // skip comments
-    if (line.starts_with("//"))
+    if (line.starts_with("//") || line.starts_with("#"))
         return;
 
     // a depth above, change current parent to the previous added node

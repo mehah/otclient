@@ -21,7 +21,7 @@
  */
 
 #include "application.h"
-#include <csignal>
+
 #include <framework/core/configmanager.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/modulemanager.h>
@@ -32,6 +32,7 @@
 #include <framework/graphics/drawpoolmanager.h>
 #include "asyncdispatcher.h"
 
+#include <csignal>
 #include <gitinfo.h>
 
 #define ADD_QUOTES_HELPER(s) #s
@@ -150,10 +151,7 @@ void Application::poll()
     Connection::poll();
 #endif
 
-    {
-        std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND)->getMutexPreDraw());
-        g_dispatcher.poll();
-    }
+    dispatchPoll();
 
     // poll connection again to flush pending write
 #ifdef FRAMEWORK_NET
@@ -161,6 +159,11 @@ void Application::poll()
 #endif
 
     g_clock.update();
+}
+
+void Application::dispatchPoll()
+{
+    g_dispatcher.poll();
 }
 
 void Application::exit()

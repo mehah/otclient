@@ -37,6 +37,8 @@ bool Module::load()
     if (!m_supportedDevices.empty() && !hasSupportedDevice(g_platform.getDevice()))
         return true;
 
+    ticks_t startTime = stdext::millis();
+
     g_modules.m_currentModule = static_self_cast<Module>();
     try {
         // add to package.loaded
@@ -83,7 +85,10 @@ bool Module::load()
             g_lua.resetGlobalEnvironment();
 
         m_loaded = true;
-        g_logger.debug(stdext::format("Loaded module '%s'", m_name));
+
+        ticks_t now = stdext::millis();
+        float loadTime = (now - startTime) / 1000.0;
+        g_logger.debug(stdext::format("Loaded module '%s' (%s)", m_name, stdext::format("%.2fs", loadTime)));
     } catch (const stdext::exception& e) {
         // remove from package.loaded
         g_lua.getGlobalField("package", "loaded");

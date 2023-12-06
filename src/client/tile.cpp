@@ -186,7 +186,7 @@ void Tile::clean()
 #ifdef FRAMEWORK_EDITOR
     m_flags = 0;
 #endif
-        }
+}
 
 void Tile::addWalkingCreature(const CreaturePtr& creature)
 {
