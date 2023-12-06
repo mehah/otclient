@@ -44,6 +44,7 @@ public:
     void init();
     void terminate();
 
+    // TODO: Move these setup methods to a ClientShaderManager
     void setupMapShader(const std::string_view name);
     void setupItemShader(const std::string_view name);
     void setupOutfitShader(const std::string_view name);
