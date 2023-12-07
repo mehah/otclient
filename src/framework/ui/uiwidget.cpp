@@ -194,10 +194,6 @@ void UIWidget::addChild(const UIWidgetPtr& child)
     }
 
     g_ui.onWidgetAppear(child);
-    child->callLuaField("onAddChild", this);
-
-    if (getRootParent() == g_ui.getRootWidget())
-        child->onAdopted(static_self_cast<UIWidget>());
 }
 
 void UIWidget::insertChild(size_t index, const UIWidgetPtr& child)
@@ -250,10 +246,6 @@ void UIWidget::insertChild(size_t index, const UIWidgetPtr& child)
     updateChildrenIndexStates();
 
     g_ui.onWidgetAppear(child);
-    callLuaField("onInsertChild", child);
-
-    if (getRootParent() == g_ui.getRootWidget())
-        child->onAdopted(static_self_cast<UIWidget>());
 }
 
 void UIWidget::removeChild(const UIWidgetPtr& child)
@@ -304,8 +296,6 @@ void UIWidget::removeChild(const UIWidgetPtr& child)
             focusPreviousChild(Fw::ActiveFocusReason, true);
 
         g_ui.onWidgetDisappear(child);
-        callLuaField("onRemoveChild", child);
-        child->onAbandoned(static_self_cast<UIWidget>());
     } else
         g_logger.traceError("attempt to remove an unknown child from a UIWidget");
 }
@@ -612,24 +602,6 @@ void UIWidget::unlockChild(const UIWidgetPtr& child)
     if (lockedChild) {
         if (lockedChild->isFocusable())
             focusChild(lockedChild, Fw::ActiveFocusReason);
-    }
-}
-
-void UIWidget::onAdopted(const UIWidgetPtr& parent)
-{
-    callLuaField("onAdopted", parent);
-
-    for (const UIWidgetPtr& child : m_children) {
-        child->onAdopted(static_self_cast<UIWidget>());
-    }
-}
-
-void UIWidget::onAbandoned(const UIWidgetPtr& parent)
-{
-    callLuaField("onAbandoned", parent);
-
-    for (const UIWidgetPtr& child : m_children) {
-        child->onAbandoned(static_self_cast<UIWidget>());
     }
 }
 
@@ -1758,9 +1730,6 @@ void UIWidget::onChildFocusChange(const UIWidgetPtr& focusedChild, const UIWidge
 void UIWidget::onHoverChange(bool hovered)
 {
     callLuaField("onHoverChange", hovered);
-
-    if (hovered)
-        callLuaField("onHovered");
 }
 
 void UIWidget::onVisibilityChange(bool visible)

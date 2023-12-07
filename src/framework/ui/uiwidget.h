@@ -181,9 +181,9 @@ public:
     Rect getChildrenRect();
     UIAnchorLayoutPtr getAnchoredLayout();
     UIWidgetPtr getRootParent();
-    UIWidgetPtr getChildAfter(const UIWidgetPtr& relativeChild, bool visibleOnly = false);
-    UIWidgetPtr getChildBefore(const UIWidgetPtr& relativeChild, bool visibleOnly = false);
-    UIWidgetPtr getChildById(const std::string_view& childId, bool visibleOnly = false);
+    UIWidgetPtr getChildAfter(const UIWidgetPtr& relativeChild);
+    UIWidgetPtr getChildBefore(const UIWidgetPtr& relativeChild);
+    UIWidgetPtr getChildById(const std::string_view childId);
     UIWidgetPtr getChildByPos(const Point& childPos);
     UIWidgetPtr getChildByIndex(int index);
     UIWidgetPtr getChildByState(Fw::WidgetState state);
@@ -236,8 +236,6 @@ protected:
     virtual void onChildFocusChange(const UIWidgetPtr& focusedChild, const UIWidgetPtr& unfocusedChild, Fw::FocusReason reason);
     virtual void onHoverChange(bool hovered);
     virtual void onVisibilityChange(bool visible);
-    virtual void onAdopted(const UIWidgetPtr& parent);
-    virtual void onAbandoned(const UIWidgetPtr& parent);
     virtual bool onDragEnter(const Point& mousePos);
     virtual bool onDragLeave(UIWidgetPtr droppedWidget, const Point& mousePos);
     virtual bool onDragMove(const Point& mousePos, const Point& mouseMoved);
