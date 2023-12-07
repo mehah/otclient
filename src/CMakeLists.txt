@@ -236,7 +236,6 @@ endif()
 # OTClient source files configuration
 # *****************************************************************************
 set(SOURCE_FILES
-	framework/core/adaptativeframecounter.cpp
 	framework/core/application.cpp
 	framework/core/asyncdispatcher.cpp
 	framework/core/binarytree.cpp
@@ -246,7 +245,6 @@ set(SOURCE_FILES
 	framework/core/event.cpp
 	framework/core/eventdispatcher.cpp
 	framework/core/filestream.cpp
-	framework/core/graphicalapplication.cpp
 	framework/core/logger.cpp
 	framework/core/module.cpp
 	framework/core/modulemanager.cpp
@@ -256,7 +254,6 @@ set(SOURCE_FILES
 	framework/core/unzipper.h
 	framework/core/timer.cpp
 	framework/discord/discord.cpp
-	framework/input/mouse.cpp
 	framework/luaengine/luaexception.cpp
 	framework/luaengine/luainterface.cpp
 	framework/luaengine/luaobject.cpp
@@ -284,8 +281,6 @@ set(SOURCE_FILES
 	framework/platform/unixplatform.cpp
 	framework/platform/win32crashhandler.cpp
 	framework/platform/win32platform.cpp
-	framework/platform/win32window.cpp
-	framework/platform/x11window.cpp
 	framework/stdext/demangle.cpp
 	framework/stdext/math.cpp
 	framework/stdext/net.cpp
@@ -293,21 +288,6 @@ set(SOURCE_FILES
 	framework/stdext/time.cpp
 	framework/stdext/uri.cpp
 	framework/stdext/qrcodegen.cpp
-	framework/ui/uianchorlayout.cpp
-	framework/ui/uiboxlayout.cpp
-	framework/ui/uigridlayout.cpp
-	framework/ui/uihorizontallayout.cpp
-	framework/ui/uilayout.cpp
-	framework/ui/uimanager.cpp
-	framework/ui/uiparticles.cpp
-	framework/ui/uitextedit.cpp
-	framework/ui/uitranslator.cpp
-	framework/ui/uiverticallayout.cpp
-	framework/ui/uiwidget.cpp
-	framework/ui/uiwidgetbasestyle.cpp
-	framework/ui/uiwidgetimage.cpp
-	framework/ui/uiwidgettext.cpp
-	framework/ui/uiqrcode.cpp
 	framework/util/color.cpp
 	framework/util/crypt.cpp
 
@@ -366,6 +346,9 @@ set(SOURCE_FILES
 
 if (TOGGLE_FRAMEWORK_GRAPHICS)
 	set(SOURCE_FILES ${SOURCE_FILES}
+		framework/core/adaptativeframecounter.cpp
+		framework/core/graphicalapplication.cpp
+		framework/input/mouse.cpp
 		framework/graphics/animatedtexture.cpp
 		framework/graphics/apngloader.cpp
 		framework/graphics/bitmapfont.cpp
@@ -392,6 +375,23 @@ if (TOGGLE_FRAMEWORK_GRAPHICS)
 		framework/graphics/texture.cpp
 		framework/graphics/texturemanager.cpp
 		framework/graphics/shadermanager.cpp
+		framework/platform/win32window.cpp
+		framework/platform/x11window.cpp
+		framework/ui/uianchorlayout.cpp
+		framework/ui/uiboxlayout.cpp
+		framework/ui/uigridlayout.cpp
+		framework/ui/uihorizontallayout.cpp
+		framework/ui/uilayout.cpp
+		framework/ui/uimanager.cpp
+		framework/ui/uiparticles.cpp
+		framework/ui/uitextedit.cpp
+		framework/ui/uitranslator.cpp
+		framework/ui/uiverticallayout.cpp
+		framework/ui/uiwidget.cpp
+		framework/ui/uiwidgetbasestyle.cpp
+		framework/ui/uiwidgetimage.cpp
+		framework/ui/uiwidgettext.cpp
+		framework/ui/uiqrcode.cpp
 	)
 endif()
 
