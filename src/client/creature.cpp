@@ -329,6 +329,7 @@ void Creature::internalDraw(Point dest, LightView* lightView, const Color& color
     if (replaceColorShader)
         g_drawPool.resetShaderProgram();
     else {
+        m_lastDrawDest = dest;
         drawAttachedEffect(dest, lightView, true); // On Top
         drawAttachedParticlesEffect(dest);
     }
