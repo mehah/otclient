@@ -1821,14 +1821,8 @@ bool UIWidget::onDoubleClick(const Point& mousePos)
 
 UIWidgetPtr UIWidget::getHoveredChild() 
 {
-    for (const UIWidgetPtr& child : m_children) {
-        if (child->isHovered())
-            return child;
-
-        const auto& hovered = child->getHoveredChild();
-        if (hovered) return hovered;
-    }
-    return nullptr;
+    const auto& hovered = g_ui.getHoveredWidget();
+    return hovered ? getChildById(hovered->getId()) : nullptr;
 }
 
 bool UIWidget::propagateOnKeyText(const std::string_view keyText)
