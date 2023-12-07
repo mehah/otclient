@@ -274,7 +274,8 @@ public:
     bool isEnabled() { return !hasState(Fw::DisabledState); }
     bool isDisabled() { return hasState(Fw::DisabledState); }
     bool isFocused() { return hasState(Fw::FocusState); }
-    bool isHovered(bool orChildHovered = false) { return hasState(Fw::HoverState) || (orChildHovered && getHoveredChild() != nullptr); }
+    bool isHovered(bool orChild = false) { return hasState(Fw::HoverState) || (orChild && isChildHovered()); }
+    bool isChildHovered() { return getHoveredChild() != nullptr; }
     bool isPressed() { return hasState(Fw::PressedState); }
     bool isFirst() { return hasState(Fw::FirstState); }
     bool isMiddle() { return hasState(Fw::MiddleState); }

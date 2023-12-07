@@ -259,7 +259,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Config>("setNode", &Config::setNode);
     g_lua.bindClassMemberFunction<Config>("getNode", &Config::getNode);
     g_lua.bindClassMemberFunction<Config>("getNodeSize", &Config::getNodeSize);
-    g_lua.bindClassMemberFunction<Config>("getNodeOrDefault", &Config::getNodeOrDefault);
+    g_lua.bindClassMemberFunction<Config>("getOrCreateNode", &Config::getOrCreateNode);
     g_lua.bindClassMemberFunction<Config>("mergeNode", &Config::mergeNode);
     g_lua.bindClassMemberFunction<Config>("getFileName", &Config::getFileName);
 
@@ -524,6 +524,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("isDisabled", &UIWidget::isDisabled);
     g_lua.bindClassMemberFunction<UIWidget>("isFocused", &UIWidget::isFocused);
     g_lua.bindClassMemberFunction<UIWidget>("isHovered", &UIWidget::isHovered);
+    g_lua.bindClassMemberFunction<UIWidget>("isChildHovered", &UIWidget::isChildHovered);
     g_lua.bindClassMemberFunction<UIWidget>("isPressed", &UIWidget::isPressed);
     g_lua.bindClassMemberFunction<UIWidget>("isFirst", &UIWidget::isFirst);
     g_lua.bindClassMemberFunction<UIWidget>("isMiddle", &UIWidget::isMiddle);

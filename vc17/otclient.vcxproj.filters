@@ -550,10 +550,10 @@
       <Filter>Source Files\client</Filter>
     </ClCompile>
     <ClCompile Include="..\src\framework\graphics\shadermanager.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\framework\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\src\framework\ui\uiqrcode.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\framework\ui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1071,10 +1071,10 @@
       <Filter>Header Files\client</Filter>
     </ClInclude>
     <ClInclude Include="..\src\framework\graphics\shadermanager.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\framework\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\src\framework\ui\uiqrcode.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\framework\ui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
