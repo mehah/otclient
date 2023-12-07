@@ -1303,32 +1303,22 @@ UIWidgetPtr UIWidget::getRootParent()
     return static_self_cast<UIWidget>();
 }
 
-UIWidgetPtr UIWidget::getChildAfter(const UIWidgetPtr& relativeChild, bool visibleOnly)
+UIWidgetPtr UIWidget::getChildAfter(const UIWidgetPtr& relativeChild)
 {
-    auto it = std::find(m_children.begin(), m_children.end(), relativeChild);
-    if (it != m_children.end() && ++it != m_children.end()) {
-        if (!visibleOnly || (*it)->isExplicitlyVisible())
-            return *it;
-    }
-    return nullptr;
+    return relativeChild->m_childIndex == m_children.size() ?
+        nullptr : m_children[relativeChild->m_childIndex];
 }
 
-UIWidgetPtr UIWidget::getChildBefore(const UIWidgetPtr& relativeChild, bool visibleOnly)
+UIWidgetPtr UIWidget::getChildBefore(const UIWidgetPtr& relativeChild)
 {
-    auto it = std::find(m_children.rbegin(), m_children.rend(), relativeChild);
-    if (it != m_children.rend() && ++it != m_children.rend()) {
-        if (!visibleOnly || (*it)->isExplicitlyVisible())
-            return *it;
-    }
-    return nullptr;
+    return relativeChild->m_childIndex <= 1 ? nullptr : m_children[relativeChild->m_childIndex - 2];
 }
 
-UIWidgetPtr UIWidget::getChildById(const std::string_view& childId, bool visibleOnly)
+UIWidgetPtr UIWidget::getChildById(const std::string_view childId)
 {
-    for (const UIWidgetPtr& child : m_children) {
-        if (child->getId() == childId && (!visibleOnly || child->isExplicitlyVisible()))
-            return child;
-    }
+    if (const auto it = m_childrenById.find(childId); it != m_childrenById.end())
+        return it->second;
+
     return nullptr;
 }
 
