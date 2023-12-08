@@ -54,6 +54,7 @@ void EventDispatcher::poll()
     mergeEvents();
     executeEvents();
     executeScheduledEvents();
+    executeDeferEvents();
 }
 
 void EventDispatcher::startEvent(const ScheduledEventPtr& event)
@@ -110,15 +111,40 @@ EventPtr EventDispatcher::addEvent(const std::function<void()>& callback)
     return thread->events.emplace_back(std::make_shared<Event>(callback));
 }
 
+void EventDispatcher::deferEvent(const std::function<void()>& callback) {
+    if (m_disabled)
+        return;
+
+    const auto& thread = getThreadTask();
+    std::scoped_lock lock(thread->mutex);
+    thread->deferEvents.emplace_back(std::make_shared<Event>(callback));
+}
+
 void EventDispatcher::executeEvents() {
     if (m_eventList.empty()) {
         return;
     }
 
-    for (const auto& event : m_eventList) {
+    for (const auto& event : m_eventList)
         event->execute();
-    }
+
     m_eventList.clear();
+}
+
+void EventDispatcher::executeDeferEvents() {
+    do {
+        for (const auto& event : m_deferEventList)
+            event->execute();
+        m_deferEventList.clear();
+
+        for (const auto& thread : m_threads) {
+            std::scoped_lock lock(thread->mutex);
+            if (!thread->deferEvents.empty()) {
+                m_deferEventList.insert(m_deferEventList.end(), make_move_iterator(thread->deferEvents.begin()), make_move_iterator(thread->deferEvents.end()));
+                thread->deferEvents.clear();
+            }
+        }
+    } while (!m_deferEventList.empty());
 }
 
 void EventDispatcher::executeScheduledEvents() {

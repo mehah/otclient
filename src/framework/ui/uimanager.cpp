@@ -259,7 +259,7 @@ void UIManager::updateHoveredWidget(bool now)
         func();
     else {
         m_hoverUpdateScheduled = true;
-        g_dispatcher.addEvent(func);
+        g_dispatcher.deferEvent(func);
     }
 }
 

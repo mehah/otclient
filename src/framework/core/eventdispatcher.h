@@ -40,6 +40,7 @@ public:
     void poll();
 
     EventPtr addEvent(const std::function<void()>& callback);
+    void deferEvent(const std::function<void()>& callback);
     ScheduledEventPtr scheduleEvent(const std::function<void()>& callback, int delay);
     ScheduledEventPtr cycleEvent(const std::function<void()>& callback, int delay);
 
@@ -48,6 +49,7 @@ public:
 private:
     inline void mergeEvents();
     inline void executeEvents();
+    inline void executeDeferEvents();
     inline void executeScheduledEvents();
 
     const auto& getThreadTask() const {
@@ -78,6 +80,7 @@ private:
         }
 
         std::vector<EventPtr> events;
+        std::vector<EventPtr> deferEvents;
         std::vector<ScheduledEventPtr> scheduledEventList;
         std::mutex mutex;
     };
@@ -85,6 +88,7 @@ private:
 
     // Main Events
     std::vector<EventPtr> m_eventList;
+    std::vector<EventPtr> m_deferEventList;
     phmap::btree_multiset<ScheduledEventPtr, ScheduledEvent::Compare> m_scheduledEventList;
 };
 

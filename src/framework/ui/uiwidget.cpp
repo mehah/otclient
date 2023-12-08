@@ -133,7 +133,7 @@ void UIWidget::drawChildren(const Rect& visibleRect, DrawPoolType drawPane)
 
         // debug draw box
         if (g_ui.isDrawingDebugBoxes() && drawPane == DrawPoolType::FOREGROUND) {
-            if(child->isFocused())
+            if (child->isFocused())
                 g_drawPool.addBoundingRect(child->getRect(), Color::yellow);
             else
                 g_drawPool.addBoundingRect(child->getRect(), Color::green);
@@ -1046,7 +1046,7 @@ bool UIWidget::setRect(const Rect& rect)
     // avoid massive update events
     if (!hasProp(PropUpdateEventScheduled)) {
         auto self = static_self_cast<UIWidget>();
-        g_dispatcher.addEvent([self, oldRect] {
+        g_dispatcher.deferEvent([self, oldRect] {
             self->setProp(PropUpdateEventScheduled, false);
             const auto& rect = self->getRect();
             if (oldRect != rect) {
@@ -1625,7 +1625,7 @@ void UIWidget::updateStyle()
 
     if (hasProp(PropLoadingStyle) && !hasProp(PropUpdateStyleScheduled)) {
         UIWidgetPtr self = static_self_cast<UIWidget>();
-        g_dispatcher.addEvent([self] {
+        g_dispatcher.deferEvent([self] {
             self->setProp(PropUpdateStyleScheduled, false);
             self->updateStyle();
         });
@@ -1819,7 +1819,7 @@ bool UIWidget::onDoubleClick(const Point& mousePos)
     return callLuaField<bool>("onDoubleClick", mousePos);
 }
 
-UIWidgetPtr UIWidget::getHoveredChild() 
+UIWidgetPtr UIWidget::getHoveredChild()
 {
     const auto& hovered = g_ui.getHoveredWidget();
     return hovered ? getChildById(hovered->getId()) : nullptr;
@@ -1958,7 +1958,7 @@ void UIWidget::move(int x, int y) {
 
     if (!hasProp(PropUpdatingMove)) {
         setProp(PropUpdatingMove, true);
-        g_dispatcher.addEvent([self = static_self_cast<UIWidget>()] {
+        g_dispatcher.deferEvent([self = static_self_cast<UIWidget>()] {
             const auto rect = self->m_rect;
             self->m_rect = {}; // force update
             self->setRect(rect);
