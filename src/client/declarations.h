@@ -49,6 +49,7 @@ class ThingType;
 class ItemType;
 class TileBlock;
 class AttachedEffect;
+class AttachableObject;
 
 #ifdef FRAMEWORK_EDITOR
 class House;

@@ -98,7 +98,6 @@ public:
 
     void onAddInMapView();
     void draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, LightView* lightView = nullptr);
-    void drawWidgets(const MapPosInfo& rect);
 
     void clean();
 
@@ -233,7 +232,6 @@ private:
     bool hasThingWithElevation() const { return hasElevation() && m_thingTypeFlag & TileThingType::HAS_THING_WITH_ELEVATION; }
 
     Position m_position;
-    Point m_lastDrawDest;
 
     uint8_t m_drawElevation{ 0 };
     uint8_t m_minimapColor{ 0 };

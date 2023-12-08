@@ -186,7 +186,7 @@ void AttachableObject::attachWidget(const UIWidgetPtr& widget) {
 
     widget->setDraggable(false);
     m_attachedWidgets.emplace_back(widget);
-    g_map.addAttachedWidgetToObject(widget, shared_from_this());
+    g_map.addAttachedWidgetToObject(widget, std::static_pointer_cast<AttachableObject>(shared_from_this()));
     widget->callLuaField("onAttached", asLuaObject());
 }
 
@@ -234,45 +234,4 @@ UIWidgetPtr AttachableObject::getAttachedWidgetById(const std::string& id) {
         return nullptr;
 
     return *it;
-}
-
-void AttachableObject::drawAttachedWidgets(const Point& dest, const MapPosInfo& mapRect)
-{
-    if (m_attachedWidgets.empty())
-        return;
-
-    g_drawPool.select(DrawPoolType::FOREGROUND_MAP_WIDGETS);
-    {
-        std::vector<UIWidgetPtr> toRemove;
-        for (const auto& widget : m_attachedWidgets) {
-            if (widget->isDestroyed()) {
-                toRemove.emplace_back(widget);
-                continue;
-            }
-
-            if (!widget->isVisible())
-                continue;
-
-            Point p = dest - mapRect.drawOffset;
-            p.x *= mapRect.horizontalStretchFactor;
-            p.y *= mapRect.verticalStretchFactor;
-            p += mapRect.rect.topLeft();
-
-            p.x += widget->getMarginLeft();
-            p.x -= widget->getMarginRight();
-            p.y += widget->getMarginTop();
-            p.y -= widget->getMarginBottom();
-
-            const auto& widgetRect = widget->getRect();
-            const auto& rect = Rect(p, widgetRect.width(), widgetRect.height());
-
-            widget->setRect(rect);
-            widget->draw(mapRect.rect, DrawPoolType::FOREGROUND);
-        }
-
-        for (const auto& widget : toRemove)
-            detachWidget(widget);
-    }
-    // Go back to use map pool
-    g_drawPool.select(DrawPoolType::MAP);
 }

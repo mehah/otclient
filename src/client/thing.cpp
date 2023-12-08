@@ -142,7 +142,3 @@ void Thing::onStartDetachEffect(const AttachedEffectPtr& effect) {
         }
     }
 }
-
-void Thing::drawWidgets(const MapPosInfo& mapRect) {
-    drawAttachedWidgets(m_lastDrawDest, mapRect);
-}

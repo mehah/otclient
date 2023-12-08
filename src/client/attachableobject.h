@@ -31,6 +31,8 @@ class AttachableObject : public LuaObject
 public:
     AttachableObject() = default;
     virtual ~AttachableObject() = default;
+
+    Point getLastDrawDest() { return m_lastDrawDest; }
     
     void attachEffect(const AttachedEffectPtr& obj);
     void clearAttachedEffects();
@@ -64,10 +66,10 @@ protected:
     void drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop);
     void onDetachEffect(const AttachedEffectPtr& effect);
     void drawAttachedParticlesEffect(const Point& dest);
-    void drawAttachedWidgets(const Point& dest, const MapPosInfo& mapRect);
 
     std::vector<AttachedEffectPtr> m_attachedEffects;
     std::vector<ParticleEffectPtr> m_attachedParticles;
     std::vector<UIWidgetPtr> m_attachedWidgets;
     uint8_t m_ownerHidden{ 0 };
+    Point m_lastDrawDest;
 };

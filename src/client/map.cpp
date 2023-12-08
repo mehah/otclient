@@ -33,6 +33,7 @@
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/graphicalapplication.h>
 #include <framework/core/eventdispatcher.h>
+#include <framework/ui/uiwidget.h>
 #include <queue>
 
 #ifdef FRAMEWORK_EDITOR
@@ -1130,6 +1131,71 @@ bool Map::isSightClear(const Position& fromPos, const Position& toPos)
     return true;
 }
 
+
+bool Map::isWidgetAttached(const UIWidgetPtr& widget) const {
+    return m_attachedObjectWidgetMap.find(widget) != m_attachedObjectWidgetMap.end();
+}
+
+void Map::addAttachedWidgetToObject(const UIWidgetPtr& widget, const AttachableObjectPtr& object) {
+    std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->getMutexPreDraw());
+    if (isWidgetAttached(widget))
+        return;
+
+    m_attachedObjectWidgetMap.emplace(widget, object);    
+}
+
+bool Map::removeAttachedWidgetFromObject(const UIWidgetPtr& widget) {
+    std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->getMutexPreDraw());
+
+    // remove elemnt form unordered map
+    const auto it = m_attachedObjectWidgetMap.find(widget);
+    if (it == m_attachedObjectWidgetMap.end())
+        return false;
+    
+    m_attachedObjectWidgetMap.erase(it);
+    return true;
+}
+
+void Map::drawAttachedWidgets(const MapPosInfo& mapRect)
+{
+    if (m_attachedObjectWidgetMap.empty())
+        return;
+
+    std::vector<AttachableObjectPtr> toRemove;
+    for (auto [widget, object] : m_attachedObjectWidgetMap) {
+
+        if (widget->isDestroyed()) {
+            toRemove.emplace_back(object);
+            //object->removeAttachedWidget(widget); // Should we remove this widget from object?
+            continue;
+        }
+
+        if (!widget->isVisible())
+            continue;
+
+        Point dest = object->getLastDrawDest();
+        Point p = dest - mapRect.drawOffset;
+        p.x *= mapRect.horizontalStretchFactor;
+        p.y *= mapRect.verticalStretchFactor;
+        p += mapRect.rect.topLeft();
+
+        p.x += widget->getMarginLeft();
+        p.x -= widget->getMarginRight();
+        p.y += widget->getMarginTop();
+        p.y -= widget->getMarginBottom();
+
+        const auto& widgetRect = widget->getRect();
+        const auto& rect = Rect(p, widgetRect.width(), widgetRect.height());
+
+        widget->setRect(rect);
+        widget->draw(mapRect.rect, DrawPoolType::FOREGROUND);
+    }
+
+    // for (const auto& widget : toRemove)
+    //     removeAttachedWidgetFromObject(widget);
+}
+
+
 #ifndef BOT_PROTECTION
 std::map<std::string, std::tuple<int, int, int, std::string>> Map::findEveryPath(const Position& start, int maxDistance, const std::map<std::string, std::string>& params)
 {
@@ -1347,29 +1413,4 @@ std::vector<CreaturePtr> Map::getSpectatorsByPattern(const Position& centerPos, 
     }
     return creatures;
 }
-
-bool Map::isWidgetAttached(const UIWidgetPtr& widget) const {
-    return m_attachedObjectWidgetMap.find(widget) != m_attachedObjectWidgetMap.end();
-}
-
-void Map::addAttachedWidgetToObject(const UIWidgetPtr& widget, const AttachableObjectPtr& object) {
-    std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->getMutexPreDraw());
-    if (isWidgetAttached(widget))
-        return;
-
-    m_attachedObjectWidgetMap.emplace(widget, object);    
-}
-
-bool Map::removeAttachedWidgetFromObject(const UIWidgetPtr& widget) {
-    std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->getMutexPreDraw());
-
-    // remove elemnt form unordered map
-    const auto it = m_attachedObjectWidgetMap.find(widget);
-    if (it == m_attachedObjectWidgetMap.end())
-        return false;
-    
-    m_attachedObjectWidgetMap.erase(it);
-    return true;
-}
-
 #endif
