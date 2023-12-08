@@ -182,7 +182,7 @@ void GraphicalApplication::run()
 
     // THREAD - POOL & MAP
     g_asyncDispatcher.dispatch([&] {
-        g_eventThreadId = std::this_thread::get_id();
+        g_eventThreadId = EventDispatcher::getThreadId();
         while (!m_stopping) {
             poll();
 
