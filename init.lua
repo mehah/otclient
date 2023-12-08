@@ -24,6 +24,14 @@ g_logger.info(g_app.getName() .. ' ' .. g_app.getVersion() .. ' rev ' .. g_app.g
     g_app.getBuildCommit() .. ') built on ' .. g_app.getBuildDate() .. ' for arch ' ..
     g_app.getBuildArch())
 
+-- setup lua debugger
+if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
+  require("lldebugger").start()
+  g_logger.debug("Started LUA debugger.")
+else
+  g_logger.debug("LUA debugger not started (not launched with VSCode local-lua).")
+end
+
 -- add data directory to the search path
 if not g_resources.addSearchPath(g_resources.getWorkDir() .. 'data', true) then
     g_logger.fatal('Unable to add data directory to the search path.')
