@@ -179,10 +179,10 @@ void AttachableObject::attachWidget(const UIWidgetPtr& widget) {
     if (!widget || isWidgetAttached(widget))
         return;
 
-    if (!g_map.isWidgetAttached(widget)) {
+    if (g_map.isWidgetAttached(widget)) {
         g_logger.error(stdext::format("Failed to attach widget %s, this widget is already attached to map.", widget->getId()));
         return;
-    }    
+    }
 
     widget->setDraggable(false);
     m_attachedWidgets.emplace_back(widget);
