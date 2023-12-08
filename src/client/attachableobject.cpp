@@ -38,7 +38,8 @@
 
 extern ParticleManager g_particles;
 
-void AttachableObject::attachEffect(const AttachedEffectPtr& obj) {
+void AttachableObject::attachEffect(const AttachedEffectPtr& obj)
+{
     if (!obj)
         return;
 
@@ -60,7 +61,8 @@ void AttachableObject::attachEffect(const AttachedEffectPtr& obj) {
     });
 }
 
-bool AttachableObject::detachEffectById(uint16_t id) {
+bool AttachableObject::detachEffectById(uint16_t id)
+{
     const auto it = std::find_if(m_attachedEffects.begin(), m_attachedEffects.end(),
                                  [id](const AttachedEffectPtr& obj) { return obj->getId() == id; });
 
@@ -73,7 +75,8 @@ bool AttachableObject::detachEffectById(uint16_t id) {
     return true;
 }
 
-void AttachableObject::onDetachEffect(const AttachedEffectPtr& effect) {
+void AttachableObject::onDetachEffect(const AttachedEffectPtr& effect)
+{
     if (effect->isHidedOwner())
         --m_ownerHidden;
 
@@ -82,13 +85,39 @@ void AttachableObject::onDetachEffect(const AttachedEffectPtr& effect) {
     effect->callLuaField("onDetach", attachedObjectToLuaObject());
 }
 
-void AttachableObject::clearAttachedEffects() {
+void AttachableObject::clearAttachedEffects()
+{
     for (const auto& e : m_attachedEffects)
         onDetachEffect(e);
     m_attachedEffects.clear();
 }
 
-AttachedEffectPtr AttachableObject::getAttachedEffectById(uint16_t id) {
+void AttachableObject::clearTemporaryAttachedEffects()
+{
+    m_attachedEffects.erase(std::remove_if(m_attachedEffects.begin(), m_attachedEffects.end(),
+        [&](const AttachedEffectPtr& obj) {
+            if (!obj->isPermanent()) {
+                onDetachEffect(obj);
+                return true;
+            }
+            return false;
+        }), m_attachedEffects.end());
+}
+
+void AttachableObject::clearPermanentAttachedEffects()
+{
+    m_attachedEffects.erase(std::remove_if(m_attachedEffects.begin(), m_attachedEffects.end(),
+        [&](const AttachedEffectPtr& obj) {
+            if (obj->isPermanent()) {
+                onDetachEffect(obj);
+                return true;
+            }
+            return false;
+        }), m_attachedEffects.end());
+}
+
+AttachedEffectPtr AttachableObject::getAttachedEffectById(uint16_t id)
+{
     const auto it = std::find_if(m_attachedEffects.begin(), m_attachedEffects.end(),
                                  [id](const AttachedEffectPtr& obj) { return obj->getId() == id; });
 
@@ -153,7 +182,8 @@ void AttachableObject::drawAttachedParticlesEffect(const Point& dest)
     g_drawPool.popTransformMatrix();
 }
 
-void AttachableObject::updateAndAttachParticlesEffects(std::vector<std::string>& newElements) {
+void AttachableObject::updateAndAttachParticlesEffects(std::vector<std::string>& newElements)
+{
     std::vector<std::string> toRemove;
 
     for (const auto& effect : m_attachedParticles) {
@@ -171,7 +201,8 @@ void AttachableObject::updateAndAttachParticlesEffects(std::vector<std::string>&
         attachParticleEffect(name);
 }
 
-void AttachableObject::attachWidget(const UIWidgetPtr& widget) {
+void AttachableObject::attachWidget(const UIWidgetPtr& widget)
+{
     if (!widget)
         return;
 
@@ -190,7 +221,8 @@ void AttachableObject::attachWidget(const UIWidgetPtr& widget) {
     widget->callLuaField("onAttached", asLuaObject());
 }
 
-bool AttachableObject::detachWidgetById(const std::string& id) {
+bool AttachableObject::detachWidgetById(const std::string& id)
+{
     const auto it = std::find_if(m_attachedWidgets.begin(), m_attachedWidgets.end(),
                                  [id](const UIWidgetPtr& obj) { return obj->getId() == id; });
 
@@ -206,7 +238,8 @@ bool AttachableObject::detachWidgetById(const std::string& id) {
     return true;
 }
 
-bool AttachableObject::detachWidget(const UIWidgetPtr& widget) {
+bool AttachableObject::detachWidget(const UIWidgetPtr& widget)
+{
     const auto it = std::remove(m_attachedWidgets.begin(), m_attachedWidgets.end(), widget);
     if (it == m_attachedWidgets.end())
         return false;
@@ -219,7 +252,8 @@ bool AttachableObject::detachWidget(const UIWidgetPtr& widget) {
     return true;
 }
 
-void AttachableObject::clearAttachedWidgets() {
+void AttachableObject::clearAttachedWidgets()
+{
     // keep the same behavior as detachWidget
     auto oldList = std::move(m_attachedWidgets);
     m_attachedWidgets.clear();
@@ -231,7 +265,8 @@ void AttachableObject::clearAttachedWidgets() {
     }
 }
 
-UIWidgetPtr AttachableObject::getAttachedWidgetById(const std::string& id) {
+UIWidgetPtr AttachableObject::getAttachedWidgetById(const std::string& id)
+{
     const auto it = std::find_if(m_attachedWidgets.begin(), m_attachedWidgets.end(),
                                  [id](const UIWidgetPtr& obj) { return obj->getId() == id; });
 

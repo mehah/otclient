@@ -979,6 +979,44 @@ int Creature::getExactSize(int layer, int xPattern, int yPattern, int zPattern, 
 
 void Creature::setMountShader(const std::string_view name) { m_mountShader = g_shaders.getShader(name); }
 
+void Creature::onStartAttachEffect(const AttachedEffectPtr& effect) {
+    if (effect->isDisabledWalkAnimation()) {
+        setDisableWalkAnimation(true);
+    }
+
+    if (effect->m_thingType && (effect->m_thingType->isCreature() || effect->m_thingType->isMissile()))
+        effect->m_direction = getDirection();
+}
+
+void Creature::onDispatcherAttachEffect(const AttachedEffectPtr& effect) {
+    if (effect->isTransform() && effect->m_thingType) {
+        const auto& outfit = getOutfit();
+        if (outfit.isTemp())
+            return;
+
+        effect->m_outfitOwner = outfit;
+
+        Outfit newOutfit = outfit;
+        newOutfit.setTemp(true);
+        newOutfit.setCategory(effect->m_thingType->getCategory());
+        if (newOutfit.isCreature())
+            newOutfit.setId(effect->m_thingType->getId());
+        else
+            newOutfit.setAuxId(effect->m_thingType->getId());
+
+        setOutfit(newOutfit);
+    }
+}
+
+void Creature::onStartDetachEffect(const AttachedEffectPtr& effect) {
+    if (effect->isDisabledWalkAnimation())
+        setDisableWalkAnimation(false);
+
+    if (effect->isTransform() && !effect->m_outfitOwner.isInvalid()) {
+        setOutfit(effect->m_outfitOwner);
+    }
+}
+
 #ifndef BOT_PROTECTION
 void Creature::setText(const std::string& text, const Color& color)
 {

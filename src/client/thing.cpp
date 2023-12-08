@@ -97,52 +97,6 @@ void Thing::setShader(const std::string_view name) {
     m_shader = g_shaders.getShader(name.data());
 }
 
-void Thing::onStartAttachEffect(const AttachedEffectPtr& effect) {
-    if (isCreature()) {
-        if (effect->isDisabledWalkAnimation()) {
-            const auto& creature = static_self_cast<Creature>();
-            creature->setDisableWalkAnimation(true);
-        }
-
-        if (effect->m_thingType && (effect->m_thingType->isCreature() || effect->m_thingType->isMissile()))
-            effect->m_direction = static_self_cast<Creature>()->getDirection();
-    }
-}
-
-void Thing::onDispatcherAttachEffect(const AttachedEffectPtr& effect) {
-    if (effect->isTransform() && isCreature() && effect->m_thingType) {
-        const auto& creature = static_self_cast<Creature>();
-        const auto& outfit = creature->getOutfit();
-        if (outfit.isTemp())
-            return;
-
-        effect->m_outfitOwner = outfit;
-
-        Outfit newOutfit = outfit;
-        newOutfit.setTemp(true);
-        newOutfit.setCategory(effect->m_thingType->getCategory());
-        if (newOutfit.isCreature())
-            newOutfit.setId(effect->m_thingType->getId());
-        else
-            newOutfit.setAuxId(effect->m_thingType->getId());
-
-        creature->setOutfit(newOutfit);
-    }
-}
-
-void Thing::onStartDetachEffect(const AttachedEffectPtr& effect) {
-    if (isCreature()) {
-        const auto& creature = static_self_cast<Creature>();
-
-        if (effect->isDisabledWalkAnimation())
-            creature->setDisableWalkAnimation(false);
-
-        if (effect->isTransform() && !effect->m_outfitOwner.isInvalid()) {
-            creature->setOutfit(effect->m_outfitOwner);
-        }
-    }
-}
-
 void Thing::drawWidgets(const MapPosInfo& mapRect) {
     drawAttachedWidgets(m_lastDrawDest, mapRect);
 }
