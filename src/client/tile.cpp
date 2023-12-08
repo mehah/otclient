@@ -860,8 +860,8 @@ void Tile::setText(const std::string& text, Color color)
     if (!m_text) {
         m_text = std::make_shared<StaticText>();
         g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
-            if (g_ui.getMapWidget())
-                g_ui.getMapWidget()->getMapView()->addForegroundTile(tile);
+            if (g_client.getMapWidget())
+                g_client.getMapWidget()->getMapView()->addForegroundTile(tile);
         }, g_game.getServerBeat());
     }
 
@@ -884,8 +884,8 @@ void Tile::setTimer(int time, Color color)
     if (!m_timerText) {
         m_timerText = std::make_shared<StaticText>();
         g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
-            if (g_ui.getMapWidget())
-                g_ui.getMapWidget()->getMapView()->addForegroundTile(tile);
+            if (g_client.getMapWidget())
+                g_client.getMapWidget()->getMapView()->addForegroundTile(tile);
         }, g_game.getServerBeat());
     }
 
