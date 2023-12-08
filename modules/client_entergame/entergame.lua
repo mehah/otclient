@@ -39,12 +39,13 @@ local function onSessionKey(protocol, sessionKey)
     G.sessionKey = sessionKey
 end
 
-local function onCharacterList(protocol, characters, account, otui)
+local function onCharacterList(protocol, characters, account, httpLogin, otui)
     -- Try add server to the server list
-    ServerList.add(G.host, G.port, g_game.getClientVersion())
+    ServerList.add(G.host, G.port, g_game.getClientVersion(), enterGame:getChildById('stayLoggedBox'):isChecked())
 
     -- Save 'Stay logged in' setting
     g_settings.set('staylogged', enterGame:getChildById('stayLoggedBox'):isChecked())
+    g_settings.set('httpLogin', enterGame:getChildById('httpLoginBox'):isChecked())
 
     if enterGame:getChildById('rememberPasswordBox'):isChecked() then
         local account = g_crypt.encrypt(G.account)
@@ -263,6 +264,10 @@ function EnterGame.setPassword(password)
     enterGame:getChildById('accountPasswordTextEdit'):setText(password)
 end
 
+function EnterGame.setHttpLogin(httpLogin)
+  enterGame:getChildById('httpLoginBox'):setChecked(#httpLogin > 0)
+end
+
 function EnterGame.clearAccountFields()
     enterGame:getChildById('accountNameTextEdit'):clearText()
     enterGame:getChildById('accountPasswordTextEdit'):clearText()
@@ -350,7 +355,12 @@ function EnterGame.tryHttpLogin(clientVersion, httpLogin)
     local url = G.host
 
     if G.port == nil then
-        G.port = 0
+        isHttps, _ = string.find(host, "https")
+        if isHttps ~= nil then
+            G.port = 443
+        else  -- http
+            G.port = 80
+        end
     end
 
     if path == nil then
@@ -359,7 +369,7 @@ function EnterGame.tryHttpLogin(clientVersion, httpLogin)
         path = '/' .. path
     end
 
-    loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to login server...'))
+    loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to login server...\nServer: [%s]', host .. ":" .. tostring(G.port) .. path ))
     connect(loadBox, {
         onCancel = function(msgbox)
             loadBox = nil
@@ -472,10 +482,6 @@ function EnterGame.doLogin()
     g_settings.set('client-version', clientVersion)
 
     if clientVersion >= 1281 and G.port ~= 7171 then
-        if G.port == 0 then
-            G.port = 443
-        end
-
         EnterGame.tryHttpLogin(clientVersion, httpLogin)
     else
         protocolLogin = ProtocolLogin.create()
