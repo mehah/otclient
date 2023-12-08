@@ -53,6 +53,7 @@ public:
 
     const std::vector<UIWidgetPtr>& getAttachedWidgets() { return m_attachedWidgets; };
     bool hasAttachedWidgets() { return !m_attachedWidgets.empty(); };
+    bool isWidgetAttached(const UIWidgetPtr& widget);
     void attachWidget(const UIWidgetPtr& widget);
     void clearAttachedWidgets();
     bool detachWidgetById(const std::string& id);

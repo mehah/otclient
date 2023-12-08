@@ -31,10 +31,9 @@
 
 #include "client.h"
 #include "game.h"
-#include "mapview.h"
+#include "map.h"
 #include "tile.h"
 #include "uimap.h"
-#include "mapview.h"
 
 extern ParticleManager g_particles;
 
@@ -171,22 +170,23 @@ void AttachableObject::updateAndAttachParticlesEffects(std::vector<std::string>&
         attachParticleEffect(name);
 }
 
+bool AttachableObject::isWidgetAttached(const UIWidgetPtr& widget) {
+    return std::find_if(m_attachedWidgets.begin(), m_attachedWidgets.end(),
+                        [widget](const UIWidgetPtr& obj) { return obj == widget; }) != m_attachedWidgets.end();
+}
+
 void AttachableObject::attachWidget(const UIWidgetPtr& widget) {
-    if (!widget)
+    if (!widget || isWidgetAttached(widget))
         return;
 
-    const auto& mapWidget = g_client.getMapWidget();
-    if (!mapWidget)
+    if (!g_map.isWidgetAttached(widget)) {
+        g_logger.error(stdext::format("Failed to attach widget %s, this widget is already attached to map.", widget->getId()));
         return;
-
-    if (widget->isAttached()) {
-        g_logger.error(stdext::format("Failed to attach widget %s, this widget is already attached to other object.", widget->getId()));
-        return;
-    }
+    }    
 
     widget->setDraggable(false);
-    widget->setAttached(true);
     m_attachedWidgets.emplace_back(widget);
+    g_map.addAttachedWidgetToObject(widget, shared_from_this());
     widget->callLuaField("onAttached", asLuaObject());
 }
 
@@ -199,9 +199,7 @@ bool AttachableObject::detachWidgetById(const std::string& id) {
 
     const auto widget = (*it);
     m_attachedWidgets.erase(it);
-
-    widget->setAttached(false);
-    widget->setVisible(false);
+    g_map.removeAttachedWidgetFromObject(widget);
     widget->callLuaField("onDetached", asLuaObject());
     return true;
 }
@@ -212,9 +210,7 @@ bool AttachableObject::detachWidget(const UIWidgetPtr& widget) {
         return false;
 
     m_attachedWidgets.erase(it);
-
-    widget->setAttached(false);
-    widget->setVisible(false);
+    g_map.removeAttachedWidgetFromObject(widget);
     widget->callLuaField("onDetached", asLuaObject());
     return true;
 }
@@ -225,8 +221,7 @@ void AttachableObject::clearAttachedWidgets() {
     m_attachedWidgets.clear();
 
     for (const auto& widget : oldList) {
-        widget->setAttached(false);
-        widget->setVisible(false);
+        g_map.removeAttachedWidgetFromObject(widget);
         widget->callLuaField("onDetached", asLuaObject());
     }
 }

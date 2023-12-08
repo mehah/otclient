@@ -75,6 +75,7 @@ using StaticTextPtr = std::shared_ptr<StaticText>;
 using ThingTypePtr = std::shared_ptr<ThingType>;
 using ItemTypePtr = std::shared_ptr<ItemType>;
 using AttachedEffectPtr = std::shared_ptr<AttachedEffect>;
+using AttachableObjectPtr = std::shared_ptr<AttachableObject>;
 
 #ifdef FRAMEWORK_EDITOR
 using HousePtr = std::shared_ptr<House>;

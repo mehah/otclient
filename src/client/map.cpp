@@ -1347,4 +1347,29 @@ std::vector<CreaturePtr> Map::getSpectatorsByPattern(const Position& centerPos, 
     }
     return creatures;
 }
+
+bool Map::isWidgetAttached(const UIWidgetPtr& widget) const {
+    return m_attachedObjectWidgetMap.find(widget) != m_attachedObjectWidgetMap.end();
+}
+
+void Map::addAttachedWidgetToObject(const UIWidgetPtr& widget, const AttachableObjectPtr& object) {
+    std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->getMutexPreDraw());
+    if (isWidgetAttached(widget))
+        return;
+
+    m_attachedObjectWidgetMap.emplace(widget, object);    
+}
+
+bool Map::removeAttachedWidgetFromObject(const UIWidgetPtr& widget) {
+    std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->getMutexPreDraw());
+
+    // remove elemnt form unordered map
+    const auto it = m_attachedObjectWidgetMap.find(widget);
+    if (it == m_attachedObjectWidgetMap.end())
+        return false;
+    
+    m_attachedObjectWidgetMap.erase(it);
+    return true;
+}
+
 #endif
