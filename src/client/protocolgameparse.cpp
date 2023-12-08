@@ -2865,7 +2865,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
             creature->setLight(light);
             creature->setMasterId(masterId);
             creature->setShader(shader);
-            creature->clearAttachedEffects();
+            creature->clearTemporaryAttachedEffects();
             for (const auto effectId : attachedEffectList) {
                 const auto& effect = g_attachedEffects.getById(effectId);
                 if (effect)

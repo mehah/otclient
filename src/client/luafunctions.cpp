@@ -707,6 +707,8 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<AttachedEffect>("setDuration", &AttachedEffect::setDuration);
     g_lua.bindClassMemberFunction<AttachedEffect>("setHideOwner", &AttachedEffect::setHideOwner);
     g_lua.bindClassMemberFunction<AttachedEffect>("setLoop", &AttachedEffect::setLoop);
+    g_lua.bindClassMemberFunction<AttachedEffect>("setPermanent", &AttachedEffect::setPermanent);
+    g_lua.bindClassMemberFunction<AttachedEffect>("isPermanent", &AttachedEffect::isPermanent);
     g_lua.bindClassMemberFunction<AttachedEffect>("setTransform", &AttachedEffect::setTransform);
     g_lua.bindClassMemberFunction<AttachedEffect>("setOffset", &AttachedEffect::setOffset);
     g_lua.bindClassMemberFunction<AttachedEffect>("setDirOffset", &AttachedEffect::setDirOffset);

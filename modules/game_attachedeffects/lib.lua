@@ -45,6 +45,8 @@ local executeConfig = function(attachedEffect, config)
         attachedEffect:setLoop(config.loop)
     end
 
+    attachedEffect:setPermanent(type(config.permanent) ~= "boolean" or config.permanent)
+
     if config.transform then
         attachedEffect:setTransform(config.transform)
     end
