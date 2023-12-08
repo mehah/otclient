@@ -138,6 +138,7 @@ void GraphicalApplication::run()
     g_lua.callGlobalField("g_app", "onRun");
 
     std::condition_variable foregroundUICondition, foregroundMapCondition;
+    std::atomic_bool mapThreadStopping = false;
 
     const auto& FPS = [&] {
         m_mapProcessFrameCounter.setTargetFps(g_window.vsyncEnabled() || getMaxFps() || getTargetFps() ? 500u : 999u);
@@ -201,6 +202,8 @@ void GraphicalApplication::run()
 
         foregroundUICondition.notify_one();
         foregroundMapCondition.notify_one();
+        mapThreadStopping.store(true);
+        mapThreadStopping.notify_one();
     });
 
     m_running = true;
@@ -224,8 +227,9 @@ void GraphicalApplication::run()
         }
     }
 
-    m_stopping = false;
+    mapThreadStopping.wait(false);
     m_running = false;
+    m_stopping = false;
 }
 
 void GraphicalApplication::poll()

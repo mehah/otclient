@@ -33,6 +33,7 @@ void FontManager::terminate() { clearFonts(); }
 void FontManager::clearFonts() {
     m_fonts.clear();
     m_defaultFont = nullptr;
+    m_defaultWidgetFont = nullptr;
 }
 
 bool FontManager::importFont(const std::string& file)
