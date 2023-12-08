@@ -62,7 +62,7 @@ void Logger::log(Fw::LogLevel level, const std::string_view message)
     if (s_ignoreLogs)
         return;
 
-    if (g_eventThreadId != std::this_thread::get_id()) {
+    if (g_eventThreadId > -1 && g_eventThreadId != EventDispatcher::getThreadId()) {
         g_dispatcher.addEvent([this, level, msg = std::string{ message }] {
             log(level, msg);
         });
@@ -110,7 +110,7 @@ void Logger::log(Fw::LogLevel level, const std::string_view message)
 
 void Logger::logFunc(Fw::LogLevel level, const std::string_view message, const std::string_view prettyFunction)
 {
-    if (g_eventThreadId != std::this_thread::get_id()) {
+    if (g_eventThreadId > -1 && g_eventThreadId != EventDispatcher::getThreadId()) {
         g_dispatcher.addEvent([this, level, msg = std::string{ message }, prettyFunction = std::string{ prettyFunction }] {
             logFunc(level, msg, prettyFunction);
         });

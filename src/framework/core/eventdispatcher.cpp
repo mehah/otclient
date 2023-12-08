@@ -27,8 +27,8 @@
 #include "timer.h"
 
 EventDispatcher g_dispatcher, g_textDispatcher, g_mainDispatcher;
-std::thread::id g_mainThreadId = std::this_thread::get_id();
-std::thread::id g_eventThreadId;
+int16_t g_mainThreadId = EventDispatcher::getThreadId();
+int16_t g_eventThreadId = -1;
 
 void EventDispatcher::init() {
     m_threads.reserve(g_asyncDispatcher.getNumberOfThreads() + 1);
@@ -45,6 +45,8 @@ void EventDispatcher::shutdown()
     } while (!m_eventList.empty());
 
     m_scheduledEventList.clear();
+    m_deferEventList.clear();
+    m_threads.clear();
 
     m_disabled = true;
 }
@@ -54,6 +56,7 @@ void EventDispatcher::poll()
     mergeEvents();
     executeEvents();
     executeScheduledEvents();
+    executeDeferEvents();
 }
 
 void EventDispatcher::startEvent(const ScheduledEventPtr& event)
@@ -100,7 +103,7 @@ EventPtr EventDispatcher::addEvent(const std::function<void()>& callback)
     if (m_disabled)
         return std::make_shared<Event>(nullptr);
 
-    if (&g_mainDispatcher == this && g_mainThreadId == std::this_thread::get_id()) {
+    if (&g_mainDispatcher == this && g_mainThreadId == getThreadId()) {
         callback();
         return std::make_shared<Event>(nullptr);
     }
@@ -110,15 +113,40 @@ EventPtr EventDispatcher::addEvent(const std::function<void()>& callback)
     return thread->events.emplace_back(std::make_shared<Event>(callback));
 }
 
+void EventDispatcher::deferEvent(const std::function<void()>& callback) {
+    if (m_disabled)
+        return;
+
+    const auto& thread = getThreadTask();
+    std::scoped_lock lock(thread->mutex);
+    thread->deferEvents.emplace_back(callback);
+}
+
 void EventDispatcher::executeEvents() {
     if (m_eventList.empty()) {
         return;
     }
 
-    for (const auto& event : m_eventList) {
+    for (const auto& event : m_eventList)
         event->execute();
-    }
+
     m_eventList.clear();
+}
+
+void EventDispatcher::executeDeferEvents() {
+    do {
+        for (auto& event : m_deferEventList)
+            event.execute();
+        m_deferEventList.clear();
+
+        for (const auto& thread : m_threads) {
+            std::scoped_lock lock(thread->mutex);
+            if (!thread->deferEvents.empty()) {
+                m_deferEventList.insert(m_deferEventList.end(), make_move_iterator(thread->deferEvents.begin()), make_move_iterator(thread->deferEvents.end()));
+                thread->deferEvents.clear();
+            }
+        }
+    } while (!m_deferEventList.empty());
 }
 
 void EventDispatcher::executeScheduledEvents() {

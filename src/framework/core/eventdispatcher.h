@@ -40,19 +40,11 @@ public:
     void poll();
 
     EventPtr addEvent(const std::function<void()>& callback);
+    void deferEvent(const std::function<void()>& callback);
     ScheduledEventPtr scheduleEvent(const std::function<void()>& callback, int delay);
     ScheduledEventPtr cycleEvent(const std::function<void()>& callback, int delay);
 
     void startEvent(const ScheduledEventPtr& event);
-
-private:
-    inline void mergeEvents();
-    inline void executeEvents();
-    inline void executeScheduledEvents();
-
-    const auto& getThreadTask() const {
-        return m_threads[getThreadId()];
-    }
 
     static int16_t getThreadId() {
         static std::atomic_int16_t lastId = -1;
@@ -66,6 +58,16 @@ private:
         return id;
     };
 
+private:
+    inline void mergeEvents();
+    inline void executeEvents();
+    inline void executeDeferEvents();
+    inline void executeScheduledEvents();
+
+    const auto& getThreadTask() const {
+        return m_threads[getThreadId()];
+    }
+
     size_t m_pollEventsSize{};
     bool m_disabled{ false };
 
@@ -78,6 +80,7 @@ private:
         }
 
         std::vector<EventPtr> events;
+        std::vector<Event> deferEvents;
         std::vector<ScheduledEventPtr> scheduledEventList;
         std::mutex mutex;
     };
@@ -85,9 +88,10 @@ private:
 
     // Main Events
     std::vector<EventPtr> m_eventList;
+    std::vector<Event> m_deferEventList;
     phmap::btree_multiset<ScheduledEventPtr, ScheduledEvent::Compare> m_scheduledEventList;
 };
 
 extern EventDispatcher g_dispatcher, g_textDispatcher, g_mainDispatcher;
-extern std::thread::id g_mainThreadId;
-extern std::thread::id g_eventThreadId;
+extern int16_t g_mainThreadId;
+extern int16_t g_eventThreadId;
