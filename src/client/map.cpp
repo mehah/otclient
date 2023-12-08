@@ -1156,10 +1156,16 @@ bool Map::removeAttachedWidgetFromObject(const UIWidgetPtr& widget) {
     return true;
 }
 
-void Map::drawAttachedWidgets(const MapPosInfo& mapRect)
+void Map::drawAttachedWidgets(const MapViewPtr& mapView, const Rect& rect)
 {
     if (m_attachedObjectWidgetMap.empty())
         return;
+
+    const auto& srcRect = mapView->calcFramebufferSource(rect.size());
+    const auto& drawOffset = srcRect.topLeft();
+    const auto& horizontalStretchFactor = rect.width() / static_cast<float>(srcRect.width());
+    const auto& verticalStretchFactor = rect.height() / static_cast<float>(srcRect.height());
+    const auto& camera = mapView->getCameraPosition();
 
     std::vector<AttachableObjectPtr> toRemove;
     for (auto [widget, object] : m_attachedObjectWidgetMap) {
@@ -1173,11 +1179,19 @@ void Map::drawAttachedWidgets(const MapPosInfo& mapRect)
         if (!widget->isVisible())
             continue;
 
-        Point dest = object->getLastDrawDest();
-        Point p = dest - mapRect.drawOffset;
-        p.x *= mapRect.horizontalStretchFactor;
-        p.y *= mapRect.verticalStretchFactor;
-        p += mapRect.rect.topLeft();
+        Position pos;
+        if (object->isTile()) {
+            const auto& tile = object->static_self_cast<Tile>();
+            pos = tile->getPosition();
+        } else if (object->isThing()) {
+            const auto& thing = object->static_self_cast<Thing>();
+            pos = thing->getPosition();
+        }
+
+        Point p = mapView->transformPositionTo2D(pos, camera) - drawOffset;
+        p.x *= horizontalStretchFactor;
+        p.y *= verticalStretchFactor;
+        p += rect.topLeft();
 
         p.x += widget->getMarginLeft();
         p.x -= widget->getMarginRight();
@@ -1185,10 +1199,10 @@ void Map::drawAttachedWidgets(const MapPosInfo& mapRect)
         p.y -= widget->getMarginBottom();
 
         const auto& widgetRect = widget->getRect();
-        const auto& rect = Rect(p, widgetRect.width(), widgetRect.height());
+        const auto& newWidgetRect = Rect(p, widgetRect.width(), widgetRect.height());
 
-        widget->setRect(rect);
-        widget->draw(mapRect.rect, DrawPoolType::FOREGROUND);
+        widget->setRect(newWidgetRect);
+        widget->draw(srcRect, DrawPoolType::FOREGROUND);
     }
 
     // for (const auto& widget : toRemove)

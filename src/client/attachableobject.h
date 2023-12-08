@@ -24,22 +24,21 @@
 #include "attachedeffect.h"
 #include <framework/luaengine/luaobject.h>
 
-struct MapPosInfo;
-
 class AttachableObject : public LuaObject
 {
 public:
     AttachableObject() = default;
     virtual ~AttachableObject() = default;
 
-    Point getLastDrawDest() { return m_lastDrawDest; }
-    
+    virtual LuaObjectPtr attachedObjectToLuaObject() = 0;
+    virtual bool isTile() { return false; }
+    virtual bool isThing() { return false; }
+
     void attachEffect(const AttachedEffectPtr& obj);
     void clearAttachedEffects();
     bool detachEffectById(uint16_t id);
     AttachedEffectPtr getAttachedEffectById(uint16_t id);
 
-    virtual LuaObjectPtr attachedObjectToLuaObject() = 0;
     virtual void onStartAttachEffect(const AttachedEffectPtr& effect) { };
     virtual void onDispatcherAttachEffect(const AttachedEffectPtr& effect) { };
     virtual void onStartDetachEffect(const AttachedEffectPtr& effect) { };
@@ -71,5 +70,4 @@ protected:
     std::vector<ParticleEffectPtr> m_attachedParticles;
     std::vector<UIWidgetPtr> m_attachedWidgets;
     uint8_t m_ownerHidden{ 0 };
-    Point m_lastDrawDest;
 };

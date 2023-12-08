@@ -54,17 +54,15 @@ void UIMap::drawSelf(DrawPoolType drawPane)
     UIWidget::drawSelf(drawPane);
 
     const auto& mapRect = g_app.isScaled() ? Rect(0, 0, g_graphics.getViewportSize()) : m_mapRect;
-
     if (drawPane == DrawPoolType::FOREGROUND) {
         g_drawPool.addBoundingRect(m_mapRect.expanded(1), Color::black);
         g_drawPool.addAction([] {glDisable(GL_BLEND); });
         g_drawPool.addFilledRect(m_mapRect, Color::alpha);
         g_drawPool.addAction([] {glEnable(GL_BLEND); });
 
-        g_map.drawAttachedWidgets(m_mapView->m_posInfo);
+        g_map.drawAttachedWidgets(m_mapView, mapRect);
         return;
     }
-
 
     if (drawPane == DrawPoolType::MAP) {
         m_mapView->updateRect(mapRect);
@@ -78,6 +76,7 @@ void UIMap::drawSelf(DrawPoolType drawPane)
             m_mapView->drawForeground(mapRect);
         });
     }
+
 }
 
 bool UIMap::setZoom(int zoom)
