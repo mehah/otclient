@@ -21,10 +21,7 @@
  */
 
 #include "graphicalapplication.h"
-#include <thread>
-#include <client/game.h>
-#include <client/map.h>
-#include <client/uimap.h>
+
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>
@@ -43,11 +40,16 @@
 #include <framework/sound/soundmanager.h>
 #endif
 
+#include <thread>
+
 GraphicalApplication g_app;
 
-void GraphicalApplication::init(std::vector<std::string>& args, uint8_t asyncDispatchMaxThreads)
+void GraphicalApplication::init(std::vector<std::string>& args, ApplicationContext* context)
 {
-    Application::init(args, asyncDispatchMaxThreads);
+    Application::init(args, context);
+
+    GraphicalApplicationContext* graphicalContext = static_cast<GraphicalApplicationContext*>(context);
+    setDrawEvents(graphicalContext->getDrawEvents());
 
     // setup platform window
     g_window.init();
@@ -72,7 +74,7 @@ void GraphicalApplication::init(std::vector<std::string>& args, uint8_t asyncDis
 
     // initialize graphics
     g_graphics.init();
-    g_drawPool.init(g_gameConfig.getSpriteSize());
+    g_drawPool.init(graphicalContext->getSpriteSize());
 
     // fire first resize event
     resize(g_window.getSize());
@@ -147,13 +149,13 @@ void GraphicalApplication::run()
         const auto& foregroundMap = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
 
         if (foregroundUI->canRepaint()) {
-            if (g_game.isOnline())
+            if (m_drawEvents && m_drawEvents->canDrawUI())
                 foregroundUICondition.notify_one();
             else
                 g_ui.render(DrawPoolType::FOREGROUND);
         }
 
-        if (g_game.isOnline() && foregroundMap->canRepaint())
+        if (m_drawEvents && m_drawEvents->canDraw(DrawPoolType::FOREGROUND_MAP) && foregroundMap->canRepaint())
             foregroundMapCondition.notify_one();
     };
 
@@ -172,8 +174,8 @@ void GraphicalApplication::run()
         const auto& pool = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
         std::unique_lock lock(pool->getMutexPreDraw());
         condition.wait(lock, [this]() -> bool {
-            if (g_ui.m_mapWidget)
-                g_ui.m_mapWidget->drawSelf(DrawPoolType::FOREGROUND_MAP);
+            if (m_drawEvents)
+                m_drawEvents->drawForgroundMap();
             return m_stopping;
         });
     });
@@ -192,12 +194,8 @@ void GraphicalApplication::run()
 
             drawForeground();
 
-            if (g_game.isOnline()) {
-                if (!g_ui.m_mapWidget)
-                    g_ui.m_mapWidget = g_ui.getRootWidget()->recursiveGetChildById("gameMapPanel")->static_self_cast<UIMap>();
-
-                g_ui.m_mapWidget->drawSelf(DrawPoolType::MAP);
-            } else g_ui.m_mapWidget = nullptr;
+            if (m_drawEvents)
+                m_drawEvents->drawMap();
 
             m_mapProcessFrameCounter.update();
         }
@@ -247,6 +245,12 @@ void GraphicalApplication::poll()
     }
 }
 
+void GraphicalApplication::dispatchPoll()
+{
+    std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND)->getMutexPreDraw());
+    Application::dispatchPoll();
+}
+
 void GraphicalApplication::mainPoll()
 {
     g_clock.update();
@@ -292,16 +296,17 @@ void GraphicalApplication::inputEvent(const InputEvent& event)
 
 void GraphicalApplication::repaintMap() { g_drawPool.get(DrawPoolType::MAP)->repaint(); }
 void GraphicalApplication::repaint() { g_drawPool.get(DrawPoolType::FOREGROUND)->repaint(); }
-bool GraphicalApplication::canDrawTexts() const { return m_drawText && (!g_map.getStaticTexts().empty() || !g_map.getAnimatedTexts().empty()); }
-
-bool GraphicalApplication::isLoadingAsyncTexture() { return m_loadingAsyncTexture || g_game.isUsingProtobuf(); }
+bool GraphicalApplication::canDrawTexts() const { return m_drawText && (!m_drawEvents || m_drawEvents->canDrawTexts()); }
+bool GraphicalApplication::isLoadingAsyncTexture() { return m_loadingAsyncTexture || (m_drawEvents && m_drawEvents->isLoadingAsyncTexture()); }
 
 void GraphicalApplication::setLoadingAsyncTexture(bool v) {
-    if (g_game.isUsingProtobuf())
+    if (m_drawEvents && m_drawEvents->isUsingProtobuf())
         v = true;
     else if (isEncrypted())
         v = false;
 
     m_loadingAsyncTexture = v;
-    g_sprites.reload();
+
+    if (m_drawEvents)
+        m_drawEvents->onLoadingAsyncTextureChanged(v);
 }

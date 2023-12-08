@@ -30,9 +30,8 @@
 #include <framework/luaengine/luainterface.h>
 #include <framework/otml/otmlnode.h>
 #include <framework/platform/platformwindow.h>
-
 #include "framework/graphics/drawpoolmanager.h"
-#include <client/shadermanager.h>
+#include "framework/graphics/shadermanager.h"
 
 UIWidget::UIWidget()
 {
@@ -152,7 +151,7 @@ void UIWidget::addChild(const UIWidgetPtr& child)
     }
 
     if (child->isDestroyed()) {
-        g_logger.traceWarning("attemp to add a destroyed child into a UIWidget");
+        g_logger.traceWarning("attempt to add a destroyed child into a UIWidget");
         return;
     }
 
@@ -916,6 +915,34 @@ void UIWidget::destroyChildren()
         layout->enableUpdates();
 }
 
+void UIWidget::removeChildren()
+{
+    UILayoutPtr layout = getLayout();
+    if (layout)
+        layout->disableUpdates();
+
+    m_focusedChild = nullptr;
+    m_lockedChildren.clear();
+    while (!m_children.empty()) {
+        removeChild(m_children.front());
+    }
+
+    if (layout)
+        layout->enableUpdates();
+}
+
+void UIWidget::hideChildren()
+{
+    for (auto& child : m_children)
+        child->hide();
+}
+
+void UIWidget::showChildren()
+{
+    for (auto& child : m_children)
+        child->show();
+}
+
 void UIWidget::setId(const std::string_view id)
 {
     if (id == m_id)
@@ -1664,6 +1691,7 @@ void UIWidget::onStyleApply(const std::string_view, const OTMLNodePtr& styleNode
     parseBaseStyle(styleNode);
     parseImageStyle(styleNode);
     parseTextStyle(styleNode);
+    parseCustomStyle(styleNode);
 
     g_app.repaint();
 }
@@ -1789,6 +1817,12 @@ bool UIWidget::onClick(const Point& mousePos)
 bool UIWidget::onDoubleClick(const Point& mousePos)
 {
     return callLuaField<bool>("onDoubleClick", mousePos);
+}
+
+UIWidgetPtr UIWidget::getHoveredChild() 
+{
+    const auto& hovered = g_ui.getHoveredWidget();
+    return hovered ? getChildById(hovered->getId()) : nullptr;
 }
 
 bool UIWidget::propagateOnKeyText(const std::string_view keyText)

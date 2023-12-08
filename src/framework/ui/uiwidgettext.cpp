@@ -23,14 +23,13 @@
 #include <framework/core/graphicalapplication.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/fontmanager.h>
-#include <client/gameconfig.h>
 #include <regex>
 #include "uitranslator.h"
 #include "uiwidget.h"
 
 void UIWidget::initText()
 {
-    m_font = g_gameConfig.getWidgetTextFont();
+    m_font = g_fonts.getDefaultWidgetFont();
     m_textAlign = Fw::AlignCenter;
     m_coordsBuffer = std::make_shared<CoordsBuffer>();
 }

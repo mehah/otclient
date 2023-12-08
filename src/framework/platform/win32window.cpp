@@ -23,9 +23,7 @@
 #ifdef WIN32
 
 #include "win32window.h"
-#include <client/map.h>
 #include <framework/core/application.h>
-#include <framework/core/graphicalapplication.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/image.h>
@@ -582,7 +580,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
         m_inputEvent.keyboardModifiers |= Fw::KeyboardAltModifier;
 #endif
 
-    bool notificateMapKeyEvent = false;
+    bool signalKeyEvent = false;
     switch (uMsg) {
         case WM_SETCURSOR:
         {
@@ -621,19 +619,19 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
         }
         case WM_KEYDOWN:
         {
-            notificateMapKeyEvent = true;
+            signalKeyEvent = true;
             processKeyDown(retranslateVirtualKey(wParam, lParam));
             break;
         }
         case WM_KEYUP:
         {
-            notificateMapKeyEvent = true;
+            signalKeyEvent = true;
             processKeyUp(retranslateVirtualKey(wParam, lParam));
             break;
         }
         case WM_SYSKEYUP:
         {
-            notificateMapKeyEvent = true;
+            signalKeyEvent = true;
             processKeyUp(retranslateVirtualKey(wParam, lParam));
             break;
         }
@@ -642,7 +640,7 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
             if (wParam == VK_F4 && m_inputEvent.keyboardModifiers & Fw::KeyboardAltModifier)
                 return DefWindowProc(hWnd, uMsg, wParam, lParam);
 
-            notificateMapKeyEvent = true;
+            signalKeyEvent = true;
             processKeyDown(retranslateVirtualKey(wParam, lParam));
             break;
         }
@@ -817,8 +815,9 @@ LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM 
             return DefWindowProc(hWnd, uMsg, wParam, lParam);
     }
 
-    if (m_inputEvent.keyboardModifiers || notificateMapKeyEvent) {
-        g_map.notificateKeyRelease(m_inputEvent);
+    if (m_inputEvent.keyboardModifiers || signalKeyEvent) {
+        for (auto& keyListener : m_keyListeners)
+            keyListener(m_inputEvent);
     }
 
     return 0;

@@ -24,12 +24,33 @@
 
 #include "global.h"
 
-class Client
+#include "uimap.h"
+
+#include <framework/graphics/declarations.h>
+#include <framework/core/graphicalapplication.h>
+
+class Client : public ApplicationDrawEvents
 {
 public:
-    static void init(std::vector<std::string>& args);
-    static void terminate();
+    void init(std::vector<std::string>& args);
+    void terminate();
     static void registerLuaFunctions();
+
+    void drawMap() override;
+    void drawForgroundMap() override;
+
+    bool canDraw(DrawPoolType type) const override;
+    bool canDrawUI() const override;
+    bool canDrawTexts() const override;
+    bool isLoadingAsyncTexture() override;
+    bool isUsingProtobuf() override;
+
+    void onLoadingAsyncTextureChanged(bool loadingAsync) override;
+
+    UIMapPtr getMapWidget() { return m_mapWidget; }
+
+private:
+    UIMapPtr m_mapWidget;
 };
 
 extern Client g_client;

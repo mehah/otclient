@@ -21,12 +21,12 @@
  */
 
 #include "attachedeffect.h"
-#include "shadermanager.h"
 #include "gameconfig.h"
 #include "lightview.h"
 
 #include <framework/core/clock.h>
 #include <framework/graphics/animatedtexture.h>
+#include <framework/graphics/shadermanager.h>
 
 AttachedEffectPtr AttachedEffect::clone()
 {

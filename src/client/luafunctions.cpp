@@ -37,7 +37,6 @@
 #include "outfit.h"
 #include "player.h"
 #include "protocolgame.h"
-#include "shadermanager.h"
 #include "attachedeffectmanager.h"
 #include "spriteappearances.h"
 #include "spritemanager.h"
@@ -364,17 +363,6 @@ void Client::registerLuaFunctions()
     g_lua.registerSingletonClass("g_gameConfig");
     g_lua.bindSingletonFunction("g_gameConfig", "loadFonts", &GameConfig::loadFonts, &g_gameConfig);
 
-    g_lua.registerSingletonClass("g_shaders");
-    g_lua.bindSingletonFunction("g_shaders", "createShader", &ShaderManager::createShader, &g_shaders);
-    g_lua.bindSingletonFunction("g_shaders", "createFragmentShader", &ShaderManager::createFragmentShader, &g_shaders);
-    g_lua.bindSingletonFunction("g_shaders", "createFragmentShaderFromCode", &ShaderManager::createFragmentShaderFromCode, &g_shaders);
-    g_lua.bindSingletonFunction("g_shaders", "setupMapShader", &ShaderManager::setupMapShader, &g_shaders);
-    g_lua.bindSingletonFunction("g_shaders", "setupItemShader", &ShaderManager::setupItemShader, &g_shaders);
-    g_lua.bindSingletonFunction("g_shaders", "setupOutfitShader", &ShaderManager::setupOutfitShader, &g_shaders);
-    g_lua.bindSingletonFunction("g_shaders", "setupMountShader", &ShaderManager::setupMountShader, &g_shaders);
-    g_lua.bindSingletonFunction("g_shaders", "addMultiTexture", &ShaderManager::addMultiTexture, &g_shaders);
-    g_lua.bindSingletonFunction("g_shaders", "getShader", &ShaderManager::getShader, &g_shaders);
-
     g_lua.registerSingletonClass("g_attachedEffects");
     g_lua.bindSingletonFunction("g_attachedEffects", "getById", &AttachedEffectManager::getById, &g_attachedEffects);
     g_lua.bindSingletonFunction("g_attachedEffects", "registerByThing", &AttachedEffectManager::registerByThing, &g_attachedEffects);
@@ -657,12 +645,12 @@ void Client::registerLuaFunctions()
 
     g_lua.registerClass<Item, Thing>();
     g_lua.bindClassStaticFunction<Item>("create", &Item::create);
-
     g_lua.bindClassMemberFunction<Item>("clone", &Item::clone);
 
     g_lua.bindClassMemberFunction<Item>("setCount", &Item::setCount);
     g_lua.bindClassMemberFunction<Item>("getCount", &Item::getCount);
     g_lua.bindClassMemberFunction<Item>("getSubType", &Item::getSubType);
+    g_lua.bindClassMemberFunction<Item>("getCountOrSubType", &Item::getCountOrSubType);
     g_lua.bindClassMemberFunction<Item>("getId", &Item::getId);
 
     g_lua.bindClassMemberFunction<Item>("isStackable", &Item::isStackable);

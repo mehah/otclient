@@ -24,8 +24,13 @@
 
 #include "types.h"
 
+#include <random>
+
 namespace stdext
 {
+    inline bool is_power_of_two(size_t v) { return ((v != 0) && !(v & (v - 1))); }
+    inline size_t to_power_of_two(size_t v) { if (v == 0) return 0; size_t r = 1; while (r < v && r != 0xffffffff) r <<= 1; return r; }
+
     inline uint16_t readULE16(const uint8_t* addr) { return static_cast<uint16_t>(addr[1]) << 8 | addr[0]; }
     inline uint32_t readULE32(const uint8_t* addr) { return static_cast<uint32_t>(readULE16(addr + 2)) << 16 | readULE16(addr); }
     inline uint64_t readULE64(const uint8_t* addr) { return static_cast<uint64_t>(readULE32(addr + 4)) << 32 | readULE32(addr); }
@@ -45,4 +50,9 @@ namespace stdext
     uint32_t adler32(const uint8_t* buffer, size_t size);
     int random_range(int min, int max);
     float random_range(float min, float max);
+    int32_t normal_random(int32_t minNumber, int32_t maxNumber);
+    bool random_bool(double probability = 0.5);
+    std::mt19937& random_gen();
+
+    inline static uint32_t circularShift(int bits, uint32_t value) { return (value << bits) | (value >> (32 - bits)); }
 }

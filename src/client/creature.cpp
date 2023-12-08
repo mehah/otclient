@@ -26,7 +26,6 @@
 #include "localplayer.h"
 #include "luavaluecasts_client.h"
 #include "map.h"
-#include "shadermanager.h"
 #include "thingtypemanager.h"
 #include "tile.h"
 #include "statictext.h"
@@ -37,6 +36,7 @@
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
 #include <framework/graphics/texturemanager.h>
+#include <framework/graphics/shadermanager.h>
 
 double Creature::speedA = 0;
 double Creature::speedB = 0;
@@ -878,7 +878,10 @@ uint16_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
 
         m_stepCache.duration = stepDuration + 10;
         m_stepCache.walkDuration = std::min<int>(stepDuration / g_gameConfig.getSpriteSize(), DrawPool::FPS60);
-        m_stepCache.diagonalDuration = stepDuration * (g_game.getClientVersion() > 810 || g_gameConfig.isForcingNewWalkingFormula() ? 3 : 2);
+        m_stepCache.diagonalDuration = stepDuration * 
+            (g_game.getClientVersion() > 810 || g_gameConfig.isForcingNewWalkingFormula() 
+                ? (isPlayer() ? g_gameConfig.getPlayerDiagonalWalkSpeed() : g_gameConfig.getCreatureDiagonalWalkSpeed())
+                : 2);
     }
 
     return ignoreDiagonal ? m_stepCache.duration : m_stepCache.getDuration(m_lastStepDirection);

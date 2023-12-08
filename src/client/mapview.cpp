@@ -28,7 +28,6 @@
 #include "lightview.h"
 #include "map.h"
 #include "missile.h"
-#include "shadermanager.h"
 #include "statictext.h"
 #include "tile.h"
 
@@ -37,9 +36,8 @@
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
-
 #include "framework/graphics/texturemanager.h"
-
+#include <framework/graphics/shadermanager.h>
 #include <framework/platform/platformwindow.h>
 
 MapView::MapView() : m_pool(g_drawPool.get(DrawPoolType::MAP)), m_lightView(std::make_shared<LightView>(Size(), g_gameConfig.getSpriteSize()))

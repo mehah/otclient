@@ -20,6 +20,7 @@
  * THE SOFTWARE.
  */
 
+#include "math.h"
 #include <climits>
 #include <cmath>
 #include <random>
@@ -61,5 +62,31 @@ namespace stdext
         static std::mt19937 gen(rd());
         static std::uniform_real_distribution<float> dis(0.0, 1.0);
         return min + (max - min) * dis(gen);
+    }
+
+    std::mt19937& random_gen()
+    {
+	    static std::random_device rd;
+	    static std::mt19937 generator(rd());
+	    return generator;
+    }
+
+    bool random_bool(double probability)
+    {
+	    static std::bernoulli_distribution booleanRand;
+	    return booleanRand(random_gen(), std::bernoulli_distribution::param_type(probability));
+    }
+
+    int32_t normal_random(int32_t minNumber, int32_t maxNumber)
+    {
+        static std::normal_distribution<float> normalRand(0.5f, 0.25f);
+
+        float v;
+        do {
+            v = normalRand(stdext::random_gen());
+        } while (v < 0.0 || v > 1.0);
+
+        auto&& [a, b] = std::minmax(minNumber, maxNumber);
+        return a + std::lround(v * (b - a));
     }
 }

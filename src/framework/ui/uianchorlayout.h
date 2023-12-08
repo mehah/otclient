@@ -26,7 +26,7 @@
 
 #include "uilayout.h"
 
-class UIAnchor :public std::enable_shared_from_this<UIAnchor>
+class UIAnchor : public std::enable_shared_from_this<UIAnchor>
 {
 public:
     virtual ~UIAnchor() {} // fix clang warning

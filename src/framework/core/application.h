@@ -23,6 +23,19 @@
 #pragma once
 
 #include <framework/global.h>
+#include <framework/graphics/declarations.h>
+
+class ApplicationContext
+{
+public:
+    ApplicationContext(uint8_t asyncDispatchMaxThreads) : m_asyncDispatchMaxThreads(asyncDispatchMaxThreads) {}
+
+    void setAsyncDispatchMaxThreads(uint8_t maxThreads) { m_asyncDispatchMaxThreads = maxThreads; }
+    uint8_t getAsyncDispatchMaxThreads() { return m_asyncDispatchMaxThreads; }
+
+protected:
+    uint8_t m_asyncDispatchMaxThreads;
+};
 
  //@bindsingleton g_app
 class Application
@@ -30,11 +43,12 @@ class Application
 public:
     virtual ~Application() = default;
 
-    virtual void init(std::vector<std::string>& args, uint8_t asyncDispatchMaxThreads = 0);
+    virtual void init(std::vector<std::string>& args, ApplicationContext* context);
     virtual void deinit();
     virtual void terminate();
     virtual void run() = 0;
     virtual void poll();
+    virtual void dispatchPoll();
     virtual void exit();
     virtual void close();
     virtual void restart();
@@ -75,6 +89,12 @@ protected:
     bool m_running{ false };
     bool m_terminated{ false };
     bool m_stopping{ false };
+
+    std::unique_ptr<ApplicationContext> m_context;
 };
 
+#ifdef FRAMEWORK_GRAPHICS
 #include "graphicalapplication.h"
+#else
+#include "consoleapplication.h"
+#endif

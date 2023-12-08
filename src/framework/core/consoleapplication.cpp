@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2013 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,37 +20,54 @@
  * THE SOFTWARE.
  */
 
-#pragma once
 
-#include "clock.h"
-#include "event.h"
+#include "consoleapplication.h"
+#include <framework/core/clock.h>
+#include <framework/luaengine/luainterface.h>
+#include <framework/core/eventdispatcher.h>
+#include <framework/core/asyncdispatcher.h>
+#include <framework/stdext/time.h>
 
- // @bindclass
-class ScheduledEvent : public Event
+#include <iostream>
+
+#ifdef FW_NET
+#include <framework/net/connection.h>
+#endif
+
+ConsoleApplication g_app;
+
+void ConsoleApplication::run()
 {
-public:
-    ScheduledEvent(const std::function<void()>& callback, int delay, int maxCycles = 0);
-    void execute() override;
-    void postpone() { m_ticks = g_clock.millis() + m_delay; }
-    bool nextCycle();
+    // run the first poll
+    mainPoll();
+    poll();
 
-    int ticks() { return m_ticks; }
-    int remainingTicks() { return m_ticks - g_clock.millis(); }
-    int delay() { return m_delay; }
-    int cyclesExecuted() { return m_cyclesExecuted; }
-    int maxCycles() { return m_maxCycles; }
+    g_lua.callGlobalField("g_app", "onRun");
 
-    struct Compare
-    {
-        bool operator() (const ScheduledEventPtr& a, const ScheduledEventPtr& b) const
-        {
-            return b->ticks() > a->ticks();
+    // clang c++20 dont support jthread
+    std::thread t1([&]() {
+        while (!m_stopping) {
+            poll();
+
+            stdext::millisleep(1);
         }
-    };
+    });
 
-private:
-    ticks_t m_ticks;
-    int m_delay;
-    int m_maxCycles;
-    int m_cyclesExecuted{ 0 };
-};
+    m_running = true;
+    while (!m_stopping) {
+        mainPoll();
+    }
+
+    t1.join();
+
+    m_stopping = false;
+    m_running = false;
+}
+
+void ConsoleApplication::mainPoll()
+{
+    g_clock.update();
+
+    // poll window input events
+    g_mainDispatcher.poll();
+}

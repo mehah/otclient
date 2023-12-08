@@ -76,6 +76,7 @@ public:
 
     std::string guessFilePath(const std::string& filename, const std::string& type);
     bool isFileType(const std::string& filename, const std::string& type);
+    std::string getFileName(const std::string& filePath);
     ticks_t getFileTime(const std::string& filename);
 
     std::string encrypt(const std::string& data, const std::string& password);

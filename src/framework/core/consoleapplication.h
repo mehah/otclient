@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2013 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,35 +22,25 @@
 
 #pragma once
 
-#include "clock.h"
-#include "event.h"
+#include "application.h"
 
- // @bindclass
-class ScheduledEvent : public Event
+class ConsoleApplicationContext : public ApplicationContext
 {
 public:
-    ScheduledEvent(const std::function<void()>& callback, int delay, int maxCycles = 0);
-    void execute() override;
-    void postpone() { m_ticks = g_clock.millis() + m_delay; }
-    bool nextCycle();
+    ConsoleApplicationContext(uint8_t asyncDispatchMaxThreads) : 
+        ApplicationContext(asyncDispatchMaxThreads)
+    {}
 
-    int ticks() { return m_ticks; }
-    int remainingTicks() { return m_ticks - g_clock.millis(); }
-    int delay() { return m_delay; }
-    int cyclesExecuted() { return m_cyclesExecuted; }
-    int maxCycles() { return m_maxCycles; }
-
-    struct Compare
-    {
-        bool operator() (const ScheduledEventPtr& a, const ScheduledEventPtr& b) const
-        {
-            return b->ticks() > a->ticks();
-        }
-    };
-
-private:
-    ticks_t m_ticks;
-    int m_delay;
-    int m_maxCycles;
-    int m_cyclesExecuted{ 0 };
+protected:
+    // reserved
 };
+
+class ConsoleApplication : public Application
+{
+public:
+    void run() override;
+
+    void mainPoll();
+};
+
+extern ConsoleApplication g_app;

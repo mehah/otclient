@@ -4,6 +4,7 @@ project(otclient)
 # *****************************************************************************
 # Options
 # *****************************************************************************
+option(TOGGLE_FRAMEWORK_GRAPHICS "Use Graphics " ON)
 option(TOGGLE_FRAMEWORK_SOUND "Use SOUND " ON)
 option(TOGGLE_FRAMEWORK_XML "Use XML " ON)
 option(TOGGLE_FRAMEWORK_NET "Use NET " ON)
@@ -50,6 +51,9 @@ endif()
 
 # Define Framework options for use in compilation
 set(FRAMEWORK_DEFINITIONS "")
+if (TOGGLE_FRAMEWORK_GRAPHICS)
+	set(FRAMEWORK_DEFINITIONS ${FRAMEWORK_DEFINITIONS} -DFRAMEWORK_GRAPHICS)
+endif()
 if (TOGGLE_FRAMEWORK_SOUND)
 	set(FRAMEWORK_DEFINITIONS ${FRAMEWORK_DEFINITIONS} -DFRAMEWORK_SOUND)
 endif()
@@ -232,7 +236,6 @@ endif()
 # OTClient source files configuration
 # *****************************************************************************
 set(SOURCE_FILES
-	framework/core/adaptativeframecounter.cpp
 	framework/core/application.cpp
 	framework/core/asyncdispatcher.cpp
 	framework/core/binarytree.cpp
@@ -242,7 +245,6 @@ set(SOURCE_FILES
 	framework/core/event.cpp
 	framework/core/eventdispatcher.cpp
 	framework/core/filestream.cpp
-	framework/core/graphicalapplication.cpp
 	framework/core/logger.cpp
 	framework/core/module.cpp
 	framework/core/modulemanager.cpp
@@ -252,32 +254,6 @@ set(SOURCE_FILES
 	framework/core/unzipper.h
 	framework/core/timer.cpp
 	framework/discord/discord.cpp
-	framework/graphics/animatedtexture.cpp
-	framework/graphics/apngloader.cpp
-	framework/graphics/bitmapfont.cpp
-	framework/graphics/cachedtext.cpp
-	framework/graphics/coordsbuffer.cpp
-	framework/graphics/drawpool.cpp
-	framework/graphics/drawpoolmanager.cpp
-	framework/graphics/fontmanager.cpp
-	framework/graphics/framebuffer.cpp
-	framework/graphics/graphics.cpp
-	framework/graphics/hardwarebuffer.cpp
-	framework/graphics/image.cpp
-	framework/graphics/painter.cpp
-	framework/graphics/paintershaderprogram.cpp
-	framework/graphics/particle.cpp
-	framework/graphics/particleaffector.cpp
-	framework/graphics/particleeffect.cpp
-	framework/graphics/particleemitter.cpp
-	framework/graphics/particlemanager.cpp
-	framework/graphics/particlesystem.cpp
-	framework/graphics/particletype.cpp
-	framework/graphics/shader.cpp
-	framework/graphics/shaderprogram.cpp
-	framework/graphics/texture.cpp
-	framework/graphics/texturemanager.cpp
-	framework/input/mouse.cpp
 	framework/luaengine/luaexception.cpp
 	framework/luaengine/luainterface.cpp
 	framework/luaengine/luaobject.cpp
@@ -305,8 +281,6 @@ set(SOURCE_FILES
 	framework/platform/unixplatform.cpp
 	framework/platform/win32crashhandler.cpp
 	framework/platform/win32platform.cpp
-	framework/platform/win32window.cpp
-	framework/platform/x11window.cpp
 	framework/stdext/demangle.cpp
 	framework/stdext/math.cpp
 	framework/stdext/net.cpp
@@ -314,20 +288,6 @@ set(SOURCE_FILES
 	framework/stdext/time.cpp
 	framework/stdext/uri.cpp
 	framework/stdext/qrcodegen.cpp
-	framework/ui/uianchorlayout.cpp
-	framework/ui/uiboxlayout.cpp
-	framework/ui/uigridlayout.cpp
-	framework/ui/uihorizontallayout.cpp
-	framework/ui/uilayout.cpp
-	framework/ui/uimanager.cpp
-	framework/ui/uiparticles.cpp
-	framework/ui/uitextedit.cpp
-	framework/ui/uitranslator.cpp
-	framework/ui/uiverticallayout.cpp
-	framework/ui/uiwidget.cpp
-	framework/ui/uiwidgetbasestyle.cpp
-	framework/ui/uiwidgetimage.cpp
-	framework/ui/uiwidgettext.cpp
 	framework/util/color.cpp
 	framework/util/crypt.cpp
 
@@ -362,7 +322,6 @@ set(SOURCE_FILES
 	client/protocolgame.cpp
 	client/protocolgameparse.cpp
 	client/protocolgamesend.cpp
-	client/shadermanager.cpp
 	client/spriteappearances.cpp
 	client/spritemanager.cpp
 	client/statictext.cpp
@@ -384,6 +343,57 @@ set(SOURCE_FILES
 	main.cpp
 	androidmain.cpp
 )
+
+if (TOGGLE_FRAMEWORK_GRAPHICS)
+	set(SOURCE_FILES ${SOURCE_FILES}
+		framework/core/adaptativeframecounter.cpp
+		framework/core/graphicalapplication.cpp
+		framework/input/mouse.cpp
+		framework/graphics/animatedtexture.cpp
+		framework/graphics/apngloader.cpp
+		framework/graphics/bitmapfont.cpp
+		framework/graphics/cachedtext.cpp
+		framework/graphics/coordsbuffer.cpp
+		framework/graphics/drawpool.cpp
+		framework/graphics/drawpoolmanager.cpp
+		framework/graphics/fontmanager.cpp
+		framework/graphics/framebuffer.cpp
+		framework/graphics/graphics.cpp
+		framework/graphics/hardwarebuffer.cpp
+		framework/graphics/image.cpp
+		framework/graphics/painter.cpp
+		framework/graphics/paintershaderprogram.cpp
+		framework/graphics/particle.cpp
+		framework/graphics/particleaffector.cpp
+		framework/graphics/particleeffect.cpp
+		framework/graphics/particleemitter.cpp
+		framework/graphics/particlemanager.cpp
+		framework/graphics/particlesystem.cpp
+		framework/graphics/particletype.cpp
+		framework/graphics/shader.cpp
+		framework/graphics/shaderprogram.cpp
+		framework/graphics/texture.cpp
+		framework/graphics/texturemanager.cpp
+		framework/graphics/shadermanager.cpp
+		framework/platform/win32window.cpp
+		framework/platform/x11window.cpp
+		framework/ui/uianchorlayout.cpp
+		framework/ui/uiboxlayout.cpp
+		framework/ui/uigridlayout.cpp
+		framework/ui/uihorizontallayout.cpp
+		framework/ui/uilayout.cpp
+		framework/ui/uimanager.cpp
+		framework/ui/uiparticles.cpp
+		framework/ui/uitextedit.cpp
+		framework/ui/uitranslator.cpp
+		framework/ui/uiverticallayout.cpp
+		framework/ui/uiwidget.cpp
+		framework/ui/uiwidgetbasestyle.cpp
+		framework/ui/uiwidgetimage.cpp
+		framework/ui/uiwidgettext.cpp
+		framework/ui/uiqrcode.cpp
+	)
+endif()
 
 if (TOGGLE_FRAMEWORK_SOUND)
 	set(SOURCE_FILES ${SOURCE_FILES}

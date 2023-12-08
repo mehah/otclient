@@ -439,6 +439,11 @@ bool ResourceManager::isFileType(const std::string& filename, const std::string&
     return false;
 }
 
+std::string ResourceManager::getFileName(const std::string& filePath)
+{
+    return std::filesystem::path(filePath).filename().string();
+}
+
 ticks_t ResourceManager::getFileTime(const std::string& filename)
 {
     return g_platform.getFileModificationTime(getRealPath(filename));

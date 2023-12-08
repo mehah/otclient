@@ -21,7 +21,7 @@
  */
 
 #include "application.h"
-#include <csignal>
+
 #include <framework/core/configmanager.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/modulemanager.h>
@@ -32,6 +32,7 @@
 #include <framework/graphics/drawpoolmanager.h>
 #include "asyncdispatcher.h"
 
+#include <csignal>
 #include <gitinfo.h>
 
 #define ADD_QUOTES_HELPER(s) #s
@@ -57,8 +58,10 @@ void exitSignalHandler(int sig)
     }
 }
 
-void Application::init(std::vector<std::string>& args, uint8_t asyncDispatchMaxThreads)
+void Application::init(std::vector<std::string>& args, ApplicationContext* context)
 {
+    m_context = std::unique_ptr<ApplicationContext>(context);
+
     // capture exit signals
     signal(SIGTERM, exitSignalHandler);
     signal(SIGINT, exitSignalHandler);
@@ -70,7 +73,7 @@ void Application::init(std::vector<std::string>& args, uint8_t asyncDispatchMaxT
     // setup locale
     std::locale::global(std::locale());
 
-    g_asyncDispatcher.init(asyncDispatchMaxThreads);
+    g_asyncDispatcher.init(context->getAsyncDispatchMaxThreads());
     g_dispatcher.init();
     g_textDispatcher.init();
     g_mainDispatcher.init();
@@ -148,10 +151,7 @@ void Application::poll()
     Connection::poll();
 #endif
 
-    {
-        std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND)->getMutexPreDraw());
-        g_dispatcher.poll();
-    }
+    dispatchPoll();
 
     // poll connection again to flush pending write
 #ifdef FRAMEWORK_NET
@@ -159,6 +159,11 @@ void Application::poll()
 #endif
 
     g_clock.update();
+}
+
+void Application::dispatchPoll()
+{
+    g_dispatcher.poll();
 }
 
 void Application::exit()

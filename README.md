@@ -60,8 +60,9 @@
 - Colored text [@conde2](https://github.com/conde2)
   - widget:setColoredText("{Colored text, #ff00ff} normal text")
 - QR Code support, with auto generate it from string  [@conde2]
-  - qr-code-border: 2
-  - qr-code: Hail OTClient Redemption - Conde2 Dev
+  - UIQrCode: 
+    - code-border: 2
+    - code: Hail OTClient Redemption - Conde2 Dev
 - Smooth Walk Elevation Feature by [@SkullzOTS](https://github.com/SkullzOTS)
   - View Feature: [Gyazo](https://i.gyazo.com/af0ed0f15a9e4d67bd4d0b2847bd6be7.gif)
   - To enable just go to [modules/game_features/features.lua](https://github.com/mehah/otclient/blob/main/modules/game_features/features.lua#L5), and uncomment line 5 (g_game.enableFeature(GameSmoothWalkElevation)).

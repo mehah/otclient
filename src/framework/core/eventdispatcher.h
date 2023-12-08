@@ -43,6 +43,8 @@ public:
     ScheduledEventPtr scheduleEvent(const std::function<void()>& callback, int delay);
     ScheduledEventPtr cycleEvent(const std::function<void()>& callback, int delay);
 
+    void startEvent(const ScheduledEventPtr& event);
+
 private:
     inline void mergeEvents();
     inline void executeEvents();

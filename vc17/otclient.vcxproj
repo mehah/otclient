@@ -213,11 +213,11 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClCompile Include="..\src\client\attachableobject.cpp" />
     <ClCompile Include="..\src\client\attachedeffect.cpp" />
     <ClCompile Include="..\src\client\attachedeffectmanager.cpp" />
+    <ClCompile Include="..\src\client\client.cpp" />
     <ClCompile Include="..\src\client\gameconfig.cpp" />
     <ClCompile Include="..\src\client\luavaluecasts_client.cpp" />
     <ClCompile Include="..\src\client\position.cpp" />
     <ClCompile Include="..\src\client\spriteappearances.cpp" />
-    <ClCompile Include="..\src\client\client.cpp" />
     <ClCompile Include="..\src\client\container.cpp" />
     <ClCompile Include="..\src\client\creature.cpp" />
     <ClCompile Include="..\src\client\creatures.cpp" />
@@ -240,7 +240,6 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClCompile Include="..\src\client\protocolgame.cpp" />
     <ClCompile Include="..\src\client\protocolgameparse.cpp" />
     <ClCompile Include="..\src\client\protocolgamesend.cpp" />
-    <ClCompile Include="..\src\client\shadermanager.cpp" />
     <ClCompile Include="..\src\client\spritemanager.cpp" />
     <ClCompile Include="..\src\client\statictext.cpp" />
     <ClCompile Include="..\src\client\thing.cpp" />
@@ -296,6 +295,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClCompile Include="..\src\framework\graphics\particletype.cpp" />
     <ClCompile Include="..\src\framework\graphics\drawpool.cpp" />
     <ClCompile Include="..\src\framework\graphics\shader.cpp" />
+    <ClCompile Include="..\src\framework\graphics\shadermanager.cpp" />
     <ClCompile Include="..\src\framework\graphics\shaderprogram.cpp" />
     <ClCompile Include="..\src\framework\graphics\texture.cpp" />
     <ClCompile Include="..\src\framework\graphics\texturemanager.cpp" />
@@ -346,6 +346,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClCompile Include="..\src\framework\ui\uilayout.cpp" />
     <ClCompile Include="..\src\framework\ui\uimanager.cpp" />
     <ClCompile Include="..\src\framework\ui\uiparticles.cpp" />
+    <ClCompile Include="..\src\framework\ui\uiqrcode.cpp" />
     <ClCompile Include="..\src\framework\ui\uitextedit.cpp" />
     <ClCompile Include="..\src\framework\ui\uitranslator.cpp" />
     <ClCompile Include="..\src\framework\ui\uiverticallayout.cpp" />
@@ -390,7 +391,6 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\client\position.h" />
     <ClInclude Include="..\src\client\protocolcodes.h" />
     <ClInclude Include="..\src\client\protocolgame.h" />
-    <ClInclude Include="..\src\client\shadermanager.h" />
     <ClInclude Include="..\src\client\spritemanager.h" />
     <ClInclude Include="..\src\client\statictext.h" />
     <ClInclude Include="..\src\client\thing.h" />
@@ -442,6 +442,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\framework\graphics\graphics.h" />
     <ClInclude Include="..\src\framework\graphics\hardwarebuffer.h" />
     <ClInclude Include="..\src\framework\graphics\image.h" />
+    <ClInclude Include="..\src\framework\graphics\shadermanager.h" />
     <ClInclude Include="..\src\framework\graphics\shader\shadersources.h" />
     <ClInclude Include="..\src\framework\graphics\painter.h" />
     <ClInclude Include="..\src\framework\graphics\paintershaderprogram.h" />
@@ -519,6 +520,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\framework\ui\uilayout.h" />
     <ClInclude Include="..\src\framework\ui\uimanager.h" />
     <ClInclude Include="..\src\framework\ui\uiparticles.h" />
+    <ClInclude Include="..\src\framework\ui\uiqrcode.h" />
     <ClInclude Include="..\src\framework\ui\uitextedit.h" />
     <ClInclude Include="..\src\framework\ui\uitranslator.h" />
     <ClInclude Include="..\src\framework\ui\uiverticallayout.h" />

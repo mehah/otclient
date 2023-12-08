@@ -46,6 +46,10 @@ Map g_map;
 
 void Map::init()
 {
+    g_platform.addKeyListener([&](const InputEvent& inputEvent) {
+        notificateKeyRelease(inputEvent);
+    });
+
     m_floors.resize(g_gameConfig.getMapMaxZ() + 1);
 
     resetAwareRange();

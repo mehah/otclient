@@ -56,6 +56,21 @@ void EventDispatcher::poll()
     executeScheduledEvents();
 }
 
+void EventDispatcher::startEvent(const ScheduledEventPtr& event)
+{
+    if (m_disabled)
+        return;
+
+    if (!event) {
+        g_logger.error("EventDispatcher::startEvent called with null event");
+        return;
+    }
+
+    const auto& thread = getThreadTask();
+    std::scoped_lock lock(thread->mutex);
+    thread->scheduledEventList.emplace_back(event);
+}
+
 ScheduledEventPtr EventDispatcher::scheduleEvent(const std::function<void()>& callback, int delay)
 {
     if (m_disabled)

@@ -26,6 +26,7 @@
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/ui/uimanager.h>
 #include <framework/ui/uiwidget.h>
+#include "client.h"
 #include "effect.h"
 #include "game.h"
 #include "item.h"
@@ -160,14 +161,14 @@ void Tile::drawWidgets(const MapPosInfo& mapRect)
 
 void Tile::clean()
 {
-    if (g_ui.getMapWidget()
+    if (g_client.getMapWidget()
 #ifndef BOT_PROTECTION
         && (m_text || m_timerText)
 #endif
         ) {
         g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
-            if (g_ui.getMapWidget())
-                g_ui.getMapWidget()->getMapView()->removeForegroundTile(tile);
+            if (g_client.getMapWidget())
+                g_client.getMapWidget()->getMapView()->removeForegroundTile(tile);
         }, g_game.getServerBeat());
     }
 
@@ -185,7 +186,7 @@ void Tile::clean()
 #ifdef FRAMEWORK_EDITOR
     m_flags = 0;
 #endif
-        }
+}
 
 void Tile::addWalkingCreature(const CreaturePtr& creature)
 {

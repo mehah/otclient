@@ -22,22 +22,59 @@
 
 #pragma once
 
+#include "application.h"
+
+#include <framework/graphics/declarations.h>
 #include <framework/core/adaptativeframecounter.h>
 #include <framework/core/inputevent.h>
 #include <framework/core/timer.h>
-#include <framework/graphics/declarations.h>
 #include <framework/platform/platformwindow.h>
 
-#include "application.h"
+class ApplicationDrawEvents
+{
+protected:
+    virtual void drawMap() = 0;
+    virtual void drawForgroundMap() = 0;
+
+    virtual bool canDraw(DrawPoolType type) const = 0;
+    virtual bool canDrawUI() const = 0;
+    virtual bool canDrawTexts() const = 0;
+    virtual bool isLoadingAsyncTexture() = 0;
+    virtual bool isUsingProtobuf() = 0;
+    virtual void onLoadingAsyncTextureChanged(bool loadingAsync) = 0;
+
+    friend class GraphicalApplication;
+};
+
+class GraphicalApplicationContext : public ApplicationContext
+{
+public:
+    GraphicalApplicationContext(uint8_t asyncDispatchMaxThreads, uint8_t spriteSize, ApplicationDrawEventsPtr drawEvents) :
+        ApplicationContext(asyncDispatchMaxThreads), 
+        m_spriteSize(spriteSize),
+        m_drawEvents(drawEvents)
+    {}
+
+    void setSpriteSize(uint8_t size) { m_spriteSize = size; }
+    uint8_t getSpriteSize() { return m_spriteSize; }
+
+    void setDrawEvents(ApplicationDrawEventsPtr drawEvents) { m_drawEvents = drawEvents; }
+    ApplicationDrawEventsPtr getDrawEvents() { return m_drawEvents; }
+
+protected:
+    uint8_t m_spriteSize;
+    ApplicationDrawEventsPtr m_drawEvents;
+};
 
 class GraphicalApplication : public Application
 {
 public:
-    void init(std::vector<std::string>& args, uint8_t asyncDispatchMaxThreads = 0) override;
+    void init(std::vector<std::string>& args, ApplicationContext* context) override;
     void deinit() override;
     void terminate() override;
     void run() override;
     void poll() override;
+    void dispatchPoll() override;
     void mainPoll();
     void close() override;
 
@@ -94,6 +131,8 @@ public:
     void repaint();
     void repaintMap();
 
+    void setDrawEvents(const ApplicationDrawEventsPtr& drawEvents) { m_drawEvents = drawEvents; }
+
 protected:
     void resize(const Size& size);
     void inputEvent(const InputEvent& event);
@@ -114,6 +153,8 @@ private:
 
     AdaptativeFrameCounter m_mapProcessFrameCounter;
     AdaptativeFrameCounter m_graphicFrameCounter;
+
+    ApplicationDrawEventsPtr m_drawEvents;
 };
 
 extern GraphicalApplication g_app;

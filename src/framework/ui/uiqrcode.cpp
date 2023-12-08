@@ -20,37 +20,43 @@
  * THE SOFTWARE.
  */
 
-#pragma once
+#include "uiqrcode.h"
 
-#include "clock.h"
-#include "event.h"
+#include <framework/graphics/image.h>
 
- // @bindclass
-class ScheduledEvent : public Event
+void UIQrCode::parseCustomStyle(const OTMLNodePtr& styleNode)
 {
-public:
-    ScheduledEvent(const std::function<void()>& callback, int delay, int maxCycles = 0);
-    void execute() override;
-    void postpone() { m_ticks = g_clock.millis() + m_delay; }
-    bool nextCycle();
+    UIWidget::parseCustomStyle(styleNode);
 
-    int ticks() { return m_ticks; }
-    int remainingTicks() { return m_ticks - g_clock.millis(); }
-    int delay() { return m_delay; }
-    int cyclesExecuted() { return m_cyclesExecuted; }
-    int maxCycles() { return m_maxCycles; }
+    for (const auto& node : styleNode->children()) {
+        if (node->tag() == "code")
+            setCode(node->value(), getCodeBorder());
+        else if (node->tag() == "code-border")
+            setCodeBorder(node->value<int>());
+    }
+}
 
-    struct Compare
-    {
-        bool operator() (const ScheduledEventPtr& a, const ScheduledEventPtr& b) const
-        {
-            return b->ticks() > a->ticks();
-        }
-    };
+void UIQrCode::setCode(const std::string& code, int border)
+{
+    if (code.empty()) {
+        m_imageTexture = nullptr;
+        m_qrCode = {};
+        return;
+    }
 
-private:
-    ticks_t m_ticks;
-    int m_delay;
-    int m_maxCycles;
-    int m_cyclesExecuted{ 0 };
-};
+    m_qrCode = code;
+    m_imageTexture = TexturePtr(new Texture(Image::fromQRCode(code, border)));
+
+    if (m_imageTexture && (!m_rect.isValid() || isImageAutoResize())) {
+        const auto& imageSize = m_imageTexture->getSize();
+
+        Size size = getSize();
+        if (size.width() <= 0 || hasProp(PropImageAutoResize))
+            size.setWidth(imageSize.width());
+
+        if (size.height() <= 0 || hasProp(PropImageAutoResize))
+            size.setHeight(imageSize.height());
+
+        setSize(size);
+    }
+}

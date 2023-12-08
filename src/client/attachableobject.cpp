@@ -29,6 +29,7 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/ui/uimanager.h>
 
+#include "client.h"
 #include "game.h"
 #include "mapview.h"
 #include "tile.h"
@@ -174,7 +175,7 @@ void AttachableObject::attachWidget(const UIWidgetPtr& widget) {
     if (!widget)
         return;
 
-    const auto& mapWidget = g_ui.getMapWidget();
+    const auto& mapWidget = g_client.getMapWidget();
     if (!mapWidget)
         return;
 
