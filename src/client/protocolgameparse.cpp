@@ -2868,8 +2868,11 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
             creature->clearTemporaryAttachedEffects();
             for (const auto effectId : attachedEffectList) {
                 const auto& effect = g_attachedEffects.getById(effectId);
-                if (effect)
-                    creature->attachEffect(effect->clone());
+                if (effect) {
+                    auto clonedEffect = effect->clone();
+                    clonedEffect->setPermanent(false);
+                    creature->attachEffect(clonedEffect);
+                }
             }
 
             if (emblem > 0)
