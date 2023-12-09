@@ -69,7 +69,8 @@ enum FlagProp : uint32_t
     PropImageRepeated = 1 << 20,
     PropImageSmooth = 1 << 21,
     PropImageAutoResize = 1 << 22,
-    propImageIndividualAnimation = 1 << 23
+    propImageIndividualAnimation = 1 << 23,
+    popDisableUpdateTemporarily = 1 << 24
 };
 
 // @bindclass
@@ -107,7 +108,7 @@ protected:
     Fw::FocusReason m_lastFocusReason{ Fw::ActiveFocusReason };
     Fw::AutoFocusPolicy m_autoFocusPolicy{ Fw::AutoFocusLast };
 
-    bool m_attached { false };
+    bool m_attached{ false };
 
     friend class UIGridLayout;
     friend class UIHorizontalLayout;
@@ -206,6 +207,8 @@ public:
 
     bool isAttached() { return m_attached; }
     void setAttached(bool attached) { m_attached = attached; }
+
+    void disableUpdateTemporarily();
 
 private:
     uint32_t m_flagsProp{ 0 };
@@ -488,7 +491,7 @@ protected:
     Point m_iconOffset;
     Timer m_imageAnimatorTimer;
     uint32_t m_currentFrame{ 0 };
-    
+
     EdgeGroup<int> m_imageBorder;
 
 public:
