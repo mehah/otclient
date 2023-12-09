@@ -314,8 +314,8 @@ public:
     int getLensHelp() { return m_lensHelp; }
     int getClothSlot() { return m_clothSlot; }
 
-    bool isTopGround() { return isGround() && !isSingleDimension(); }
-    bool isTopGroundBorder() { return isGroundBorder() && !isSingleDimension(); }
+    bool isTopGround() { return isGround() && m_size.dimension() == 4; }
+    bool isTopGroundBorder() { return isGroundBorder() && m_size.dimension() == 4; }
     bool isSingleGround() { return isGround() && isSingleDimension(); }
     bool isSingleGroundBorder() { return isGroundBorder() && isSingleDimension(); }
     bool isTall(const bool useRealSize = false);
