@@ -1982,14 +1982,14 @@ void UIWidget::setShader(const std::string_view name) {
 
 void UIWidget::repaint() { g_app.repaint(); }
 void UIWidget::disableUpdateTemporarily() {
-    if (hasProp(popDisableUpdateTemporarily) || !m_layout)
+    if (hasProp(propDisableUpdateTemporarily) || !m_layout)
         return;
 
-    setProp(popDisableUpdateTemporarily, true);
+    setProp(propDisableUpdateTemporarily, true);
     m_layout->disableUpdates();
     g_dispatcher.deferEvent([self = static_self_cast<UIWidget>()] {
         self->m_layout->enableUpdates();
         self->m_layout->update();
-        self->setProp(popDisableUpdateTemporarily, false);
+        self->setProp(propDisableUpdateTemporarily, false);
     });
 }
