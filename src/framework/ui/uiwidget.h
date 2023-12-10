@@ -69,8 +69,8 @@ enum FlagProp : uint32_t
     PropImageRepeated = 1 << 20,
     PropImageSmooth = 1 << 21,
     PropImageAutoResize = 1 << 22,
-    propImageIndividualAnimation = 1 << 23,
-    propDisableUpdateTemporarily = 1 << 24
+    PropImageIndividualAnimation = 1 << 23,
+    PropDisableUpdateTemporarily = 1 << 24
 };
 
 // @bindclass
@@ -509,7 +509,7 @@ public:
     void setImageRepeated(bool repeated) { setProp(PropImageRepeated, repeated); updateImageCache(); }
     void setImageSmooth(bool smooth) { setProp(PropImageSmooth, smooth); }
     void setImageAutoResize(bool autoResize) { setProp(PropImageAutoResize, autoResize); }
-    void setImageIndividualAnimation(bool v) { setProp(propImageIndividualAnimation, v); }
+    void setImageIndividualAnimation(bool v) { setProp(PropImageIndividualAnimation, v); }
     void setImageBorderTop(int border) { m_imageBorder.top = border; configureBorderImage(); }
     void setImageBorderRight(int border) { m_imageBorder.right = border; configureBorderImage(); }
     void setImageBorderBottom(int border) { m_imageBorder.bottom = border; configureBorderImage(); }
@@ -529,7 +529,7 @@ public:
     bool isImageFixedRatio() { return hasProp(PropImageFixedRatio); }
     bool isImageSmooth() { return hasProp(PropImageSmooth); }
     bool isImageAutoResize() { return hasProp(PropImageAutoResize); }
-    bool isImageIndividualAnimation() { return hasProp(propImageIndividualAnimation); }
+    bool isImageIndividualAnimation() { return hasProp(PropImageIndividualAnimation); }
     int getImageBorderTop() { return m_imageBorder.top; }
     int getImageBorderRight() { return m_imageBorder.right; }
     int getImageBorderBottom() { return m_imageBorder.bottom; }
