@@ -115,6 +115,12 @@ public:
     float getStaticTextScale() const { return m_staticTextScale; }
     void setStaticTextScale(float v) { m_staticTextScale = v; }
 
+    float getAlphaEffect() const { return m_alphaEffect; }
+    void setAlphaEffect(float v) { m_alphaEffect = v; }
+
+    float getAlphaMissile() const { return m_alphaMissile; }
+    void setAlphaMissile(float v) { m_alphaMissile = v; }
+
     bool isLoadingAsyncTexture();
     void setLoadingAsyncTexture(bool v);
 
@@ -150,6 +156,8 @@ private:
     float m_creatureInformationScale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
     float m_animatedTextScale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
     float m_staticTextScale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
+    float m_alphaEffect{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
+    float m_alphaMissile{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
 
     AdaptativeFrameCounter m_mapProcessFrameCounter;
     AdaptativeFrameCounter m_graphicFrameCounter;

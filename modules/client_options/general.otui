@@ -83,6 +83,40 @@ Panel
     margin-top: 3
     minimum: 1
     maximum: 9
+    
+  Label
+    id: setAlphaEffectLabel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 12
+
+
+  OptionScrollbar
+    id: setAlphaEffectScroll
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 3
+    minimum: 10
+    maximum: 100
+
+  Label
+    id: setAlphaMissileLabel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 12
+
+
+  OptionScrollbar
+    id: setAlphaMissileScroll
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 3
+    minimum: 10
+    maximum: 100
 
   Label
     id: chooseCrosshairLabel

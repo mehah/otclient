@@ -45,7 +45,9 @@ local defaultOptions = {
     asyncTxtLoading = false,
     creatureInformationScale = 0,
     staticTextScale = 0,
-    animatedTextScale = 0
+    animatedTextScale = 0,
+    setAlphaEffectScroll = 100 ,
+    setAlphaMissileScroll = 100 ,
 }
 
 local optionsWindow
@@ -352,6 +354,13 @@ function setOption(key, value, force)
         local fadeMode = value == 1
         graphicsPanel:getChildById('floorFading'):setEnabled(fadeMode)
         graphicsPanel:getChildById('floorFadingLabel'):setEnabled(fadeMode)
+        
+    elseif key == 'setAlphaEffectScroll' then
+        g_app.setAlphaEffect(value/100)
+        generalPanel:getChildById('setAlphaEffectLabel'):setText(tr('Opacity effect: %s%%', value))
+    elseif key == 'setAlphaMissileScroll' then
+        g_app.setAlphaMissile(value/100)
+        generalPanel:getChildById('setAlphaMissileLabel'):setText(tr('Opacity Missile: %s%%', value))
     end
 
     -- change value for keybind updates
