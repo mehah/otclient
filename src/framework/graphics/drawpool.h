@@ -60,7 +60,7 @@ struct DrawConductor
     uint8_t order{ DrawOrder::FIRST };
 };
 
-static const DrawConductor DEFAULT_DRAW_CONDUCTOR;
+constexpr DrawConductor DEFAULT_DRAW_CONDUCTOR;
 
 class DrawPool
 {
