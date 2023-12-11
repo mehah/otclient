@@ -356,10 +356,10 @@ function setOption(key, value, force)
         graphicsPanel:getChildById('floorFadingLabel'):setEnabled(fadeMode)
         
     elseif key == 'setEffectAlphaScroll' then
-        g_app.setEffectAlpha(value/100)
+        g_client.setEffectAlpha(value/100)
         generalPanel:getChildById('setEffectAlphaLabel'):setText(tr('Opacity effect: %s%%', value))
     elseif key == 'setMissileAlphaScroll' then
-        g_app.setMissileAlpha(value/100)
+        g_client.setMissileAlpha(value/100)
         generalPanel:getChildById('setMissileAlphaLabel'):setText(tr('Opacity Missile: %s%%', value))
     end
 
