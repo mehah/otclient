@@ -357,7 +357,7 @@ function setOption(key, value, force)
         
     elseif key == 'setEffectAlphaScroll' then
         g_client.setEffectAlpha(value/100)
-        generalPanel:getChildById('setEffectAlphaLabel'):setText(tr('Opacity effect: %s%%', value))
+        generalPanel:getChildById('setEffectAlphaLabel'):setText(tr('Opacity Effect: %s%%', value))
     elseif key == 'setMissileAlphaScroll' then
         g_client.setMissileAlpha(value/100)
         generalPanel:getChildById('setMissileAlphaLabel'):setText(tr('Opacity Missile: %s%%', value))
