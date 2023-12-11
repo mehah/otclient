@@ -115,7 +115,6 @@ public:
     float getStaticTextScale() const { return m_staticTextScale; }
     void setStaticTextScale(float v) { m_staticTextScale = v; }
 
-
     bool isLoadingAsyncTexture();
     void setLoadingAsyncTexture(bool v);
 
