@@ -74,7 +74,7 @@ void Effect::draw(const Point& dest, bool drawThings, LightView* lightView)
     }
 
     Color tmpColor = Color::white;
-    tmpColor.setAlpha(static_cast<float>(g_app.getAlphaEffect()));
+    tmpColor.setAlpha(static_cast<float>(g_app.getEffectAlpha()));
     getThingType()->draw(dest, 0, xPattern, yPattern, 0, animationPhase, tmpColor, drawThings, lightView, m_drawConductor);
 }
 

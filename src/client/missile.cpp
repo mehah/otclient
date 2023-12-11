@@ -34,7 +34,7 @@ void Missile::draw(const Point& dest, bool drawThings, LightView* lightView)
 
     const float fraction = m_animationTimer.ticksElapsed() / m_duration;
     Color tmpColor = Color::white;
-    tmpColor.setAlpha(static_cast<float>(g_app.getAlphaMissile()));
+    tmpColor.setAlpha(static_cast<float>(g_app.getMissileAlpha()));
     getThingType()->draw(dest + m_delta * fraction * g_drawPool.getScaleFactor(), 0, m_numPatternX, m_numPatternY, 0, 0, tmpColor, drawThings, lightView, m_drawConductor);
 }
 

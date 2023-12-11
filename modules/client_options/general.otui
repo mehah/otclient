@@ -85,7 +85,7 @@ Panel
     maximum: 9
     
   Label
-    id: setAlphaEffectLabel
+    id: setEffectAlphaLabel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
@@ -93,7 +93,7 @@ Panel
 
 
   OptionScrollbar
-    id: setAlphaEffectScroll
+    id: setEffectAlphaScroll
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
@@ -102,7 +102,7 @@ Panel
     maximum: 100
 
   Label
-    id: setAlphaMissileLabel
+    id: setMissileAlphaLabel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
@@ -110,7 +110,7 @@ Panel
 
 
   OptionScrollbar
-    id: setAlphaMissileScroll
+    id: setMissileAlphaScroll
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
