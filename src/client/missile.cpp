@@ -34,7 +34,7 @@ void Missile::draw(const Point& dest, bool drawThings, LightView* lightView)
 
     const float fraction = m_animationTimer.ticksElapsed() / m_duration;
 
-    if (g_client.getMissileAlpha() < 1.f)
+    if (drawThings && g_client.getMissileAlpha() < 1.f)
         g_drawPool.setOpacity(g_client.getMissileAlpha(), true);
     getThingType()->draw(dest + m_delta * fraction * g_drawPool.getScaleFactor(), 0, m_numPatternX, m_numPatternY, 0, 0, Color::white, drawThings, lightView, m_drawConductor);
 }
