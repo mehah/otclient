@@ -31,7 +31,7 @@
 #include <framework/platform/platform.h>
 #include <framework/stdext/net.h>
 #include <framework/util/crypt.h>
-
+#include <client/client.h>
 
 #ifdef FRAMEWORK_GRAPHICS
 #include "framework/graphics/particleeffect.h"
@@ -324,6 +324,10 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_app", "setAnimatedTextScale", &GraphicalApplication::setAnimatedTextScale, &g_app);
     g_lua.bindSingletonFunction("g_app", "setStaticTextScale", &GraphicalApplication::setStaticTextScale, &g_app);
     
+    // Client
+    g_lua.registerSingletonClass("g_client");
+    g_lua.bindSingletonFunction("g_client", "setEffectAlpha", &Client::setEffectAlpha, &g_client);
+    g_lua.bindSingletonFunction("g_client", "setMissileAlpha", &Client::setMissileAlpha, &g_client);
 
     // PlatformWindow
     g_lua.registerSingletonClass("g_window");
