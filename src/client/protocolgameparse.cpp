@@ -2932,29 +2932,27 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
 
     if (item->isContainer()) {
         if (g_game.getFeature(Otc::GameContainerTypes)) {
-            const uint8_t type = msg->getU8();
-            switch (type) {
-                case 0: // Empty
-                    break;
-                case 1: {
-                    if (g_game.getFeature(Otc::GameThingQuickLoot)) {
-                        msg->getU32(); // quick loot flags
-                    }
-                    break;
-                }
-                case 2: {
-                    if (g_game.getFeature(Otc::GameThingQuiver)) {
-                        msg->getU32(); // ammoTotal
-                    }
-                    break;
-                }
-                case 4: // Empty (Loot highlight boolean)
-                    break;
-                default: {
-                    throw Exception("unknown container type %d", type);
-                    break;
-                }
+            // container flags
+            // 1: quick loot, 2: quiver, 4: unlooted corpse
+            const uint8_t containerFlags = msg->getU8();
+
+            // quick loot categories
+            if ((containerFlags & 1) != 0) {
+                msg->getU32();
             }
+
+            // quover ammo count
+            if ((containerFlags & 2) != 0) {
+                msg->getU32();
+            }
+
+            // corpse not looted yet
+            /*
+            if ((containerFlags & 4) != 0) {
+                // this flag has no bytes to parse
+                // draw effect 252 on top of the tile
+            }
+            */
         } else {
             if (g_game.getFeature(Otc::GameThingQuickLoot)) {
                 const bool hasQuickLootFlags = msg->getU8() != 0;
