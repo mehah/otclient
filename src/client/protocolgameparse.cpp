@@ -3380,37 +3380,57 @@ void ProtocolGame::parseOpenRewardWall(const InputMessagePtr& msg)
     // TODO: implement open reward wall usage
 }
 
+namespace {
+    void parseRewardDay(const InputMessagePtr& msg) {
+        uint8_t redeemMode = msg->getU8(); // reward type
+        if (redeemMode == 1) {
+            // select x items from the list
+            msg->getU8(); // items to select
+
+            uint8_t itemListSize = msg->getU8();
+            for (uint8_t listIndex = 0; listIndex < itemListSize; ++listIndex) {
+                msg->getU16(); // Item ID
+                msg->getString(); // Item name
+                msg->getU32(); // Item weight
+            }
+        } else if (redeemMode == 2) {
+            // no choice, click to redeem all
+
+            uint8_t itemListSize = msg->getU8();
+            for (uint8_t listIndex = 0; listIndex < itemListSize; ++listIndex) {
+                uint8_t bundleType = msg->getU8(); // type of reward
+                switch (bundleType) {
+                    case 1: {
+                        // Items
+                        msg->getU16(); // Item ID
+                        msg->getString(); // Item name
+                        msg->getU8(); // Item Count
+                        break;
+                    }
+                    case 2: {
+                        // Prey Wildcards
+                        msg->getU8(); // Prey Wildcards Count
+                        break;
+                    }
+                    case 3: {
+                        // XP Boost
+                        msg->getU16(); // XP Boost Minutes
+                        break;
+                    }
+                    default:
+                        // Invalid type
+                        break;
+                }
+            }
+        }        
+    }
+}
 void ProtocolGame::parseDailyReward(const InputMessagePtr& msg)
 {
     const uint8_t days = msg->getU8(); // Reward count (7 days)
     for (uint8_t day = 1; day <= days; day++) {
-        // Free account
-        msg->getU8(); // type
-        msg->getU8(); // Items to pick
-        uint8_t size = msg->getU8();
-        if (day == 1 || day == 2 || day == 4 || day == 6) {
-            for (uint8_t i = 0; i < size; i++) {
-                msg->getU16(); // Item ID
-                msg->getString(); // Item name
-                msg->getU32(); // Item weight
-            }
-        } else {
-            msg->getU16(); // Amount
-        }
-
-        // Premium account
-        msg->getU8(); // type
-        msg->getU8(); // Items to pick
-        size = msg->getU8();
-        if (day == 1 || day == 2 || day == 4 || day == 6) {
-            for (uint8_t i = 0; i < size; i++) {
-                msg->getU16(); // Item ID
-                msg->getString(); // Item name
-                msg->getU32(); // Item weight
-            }
-        } else {
-            msg->getU16(); // Amount
-        }
+        parseRewardDay(msg); // Free account
+        parseRewardDay(msg); // Premium account
     }
 
     const uint8_t bonus = msg->getU8();
@@ -3419,7 +3439,7 @@ void ProtocolGame::parseDailyReward(const InputMessagePtr& msg)
         msg->getU8(); // Bonus ID
     }
 
-    msg->getU8(); // Unknown
+    msg->getU8(); // max unlockable "dragons" for free accounts
     // TODO: implement daily reward usage
 }
 
