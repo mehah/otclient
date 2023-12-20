@@ -3314,10 +3314,10 @@ void ProtocolGame::parseItemsPrice(const InputMessagePtr& msg)
         const uint16_t itemId = msg->getU16(); // item client id
         if (g_game.getClientVersion() >= 1281) {
             const auto& item = Item::create(itemId);
-            if (item->getId() == 0)
-                throw Exception("unable to create item with invalid id %d", itemId);
 
-            if (item->getClassification() > 0) {
+            // note: vanilla client allows made-up client ids
+            // their classification is assumed as 0
+            if (item->getId() != 0 && item->getClassification() > 0) {
                 msg->getU8();
             }
             msg->getU64(); // price
