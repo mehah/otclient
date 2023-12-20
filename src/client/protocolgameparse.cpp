@@ -2941,7 +2941,7 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
                 msg->getU32();
             }
 
-            // quover ammo count
+            // quiver ammo count
             if ((containerFlags & 2) != 0) {
                 msg->getU32();
             }
