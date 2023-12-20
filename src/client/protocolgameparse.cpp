@@ -449,6 +449,9 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerSendShowDescription:
                     parseShowDescription(msg);
                     break;
+                case Proto::GameServerImbuementDurations:
+                    parseImbuementDurations(msg);
+                    break;
                 case Proto::GameServerPassiveCooldown:
                     parsePassiveCooldown(msg);
                     break;
@@ -3197,6 +3200,28 @@ void ProtocolGame::parsePartyAnalyzer(const InputMessagePtr& msg)
         for (uint8_t i = 0; i < names; i++) {
             msg->getU32(); // MemberID
             msg->getString(); // Member name
+        }
+    }
+}
+
+void ProtocolGame::parseImbuementDurations(const InputMessagePtr& msg)
+{
+    uint8_t itemListSize = msg->getU8(); // amount of items to display
+
+    for (uint8_t itemIndex = 0; itemIndex < itemListSize; ++itemIndex) {
+        msg->getU8(); // item slot id
+        getItem(msg); // imbued item
+        uint8_t imbuingSlotCount = msg->getU8(); // total amount of imbuing slots on item
+
+        for (uint8_t imbuIndex = 0; imbuIndex < imbuingSlotCount; ++imbuIndex) {
+            bool slotImbued = msg->getU8(); // 0 - empty, 1 - imbued
+
+            if (slotImbued) {
+                msg->getString(); // imbuement name
+                msg->getU16(); // imbuement icon id
+                msg->getU32(); // imbuement duration (NOTE: this is a SIGNED 32-bit variable)
+                msg->getU8(); // decaystate: 0 - paused, 1 - decaying
+            }
         }
     }
 }
