@@ -103,8 +103,6 @@ function controller:onGameStart()
     self.ui:setupOnStart() -- load character window configuration
 
     -- Load Map
-    g_minimap.clean()
-
     local minimapFile = '/minimap'
     local loadFnc = nil
 
@@ -134,6 +132,8 @@ function controller:onGameEnd()
     end
 
     self.ui.contentsPanel.minimap:save()
+
+    g_minimap.clean()
 end
 
 function controller:onTerminate()
