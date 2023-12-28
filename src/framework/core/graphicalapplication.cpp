@@ -139,6 +139,7 @@ void GraphicalApplication::run()
 
     std::condition_variable foregroundUICondition, foregroundMapCondition;
     std::atomic_bool mapThreadStopping = false;
+    std::atomic_uint8_t threadsOppeneds = 0;
 
     const auto& FPS = [&] {
         m_mapProcessFrameCounter.setTargetFps(g_window.vsyncEnabled() || getMaxFps() || getTargetFps() ? 500u : 999u);
@@ -160,29 +161,48 @@ void GraphicalApplication::run()
             foregroundMapCondition.notify_one();
     };
 
+    const auto& stopThread = [&]() {
+        threadsOppeneds.fetch_sub(1);
+        if (threadsOppeneds.load() == 0) {
+            mapThreadStopping.store(true);
+            mapThreadStopping.notify_one();
+        }
+    };
+
     // THREAD - FOREGROUND UI
-    g_asyncDispatcher.dispatch([this, &condition = foregroundUICondition] {
+    g_asyncDispatcher.dispatch([&] {
+        threadsOppeneds.fetch_add(1);
+
         const auto& pool = g_drawPool.get(DrawPoolType::FOREGROUND);
         std::unique_lock lock(pool->getMutexPreDraw());
-        condition.wait(lock, [this]() -> bool {
-            g_ui.render(DrawPoolType::FOREGROUND);
+        foregroundUICondition.wait(lock, [this]() -> bool {
+            if (m_drawEvents && m_drawEvents->canDrawUI())
+                g_ui.render(DrawPoolType::FOREGROUND);
             return m_stopping;
         });
+
+        stopThread();
     });
 
     // THREAD - FOREGROUND MAP
-    g_asyncDispatcher.dispatch([this, &condition = foregroundMapCondition] {
+    g_asyncDispatcher.dispatch([&] {
+        threadsOppeneds.fetch_add(1);
+
         const auto& pool = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
         std::unique_lock lock(pool->getMutexPreDraw());
-        condition.wait(lock, [this]() -> bool {
+        foregroundMapCondition.wait(lock, [this]() -> bool {
             if (m_drawEvents)
                 m_drawEvents->drawForgroundMap();
             return m_stopping;
         });
+
+        stopThread();
     });
 
     // THREAD - POOL & MAP
     g_asyncDispatcher.dispatch([&] {
+        threadsOppeneds.fetch_add(1);
+
         g_eventThreadId = EventDispatcher::getThreadId();
         while (!m_stopping) {
             poll();
@@ -202,8 +222,8 @@ void GraphicalApplication::run()
 
         foregroundUICondition.notify_one();
         foregroundMapCondition.notify_one();
-        mapThreadStopping.store(true);
-        mapThreadStopping.notify_one();
+
+        stopThread();
     });
 
     m_running = true;
