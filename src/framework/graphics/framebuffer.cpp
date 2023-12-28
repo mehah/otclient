@@ -43,8 +43,11 @@ FrameBuffer::~FrameBuffer()
 #ifndef NDEBUG
     assert(!g_app.isTerminated());
 #endif
-    if (g_graphics.ok() && m_fbo != 0)
-        glDeleteFramebuffers(1, &m_fbo);
+    if (g_graphics.ok() && m_fbo != 0) {
+        g_mainDispatcher.addEvent([id = m_fbo]() {
+            glDeleteFramebuffers(1, &id);
+        });
+    }
 }
 
 bool FrameBuffer::resize(const Size& size)
