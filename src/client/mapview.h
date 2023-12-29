@@ -313,6 +313,7 @@ private:
     bool m_forceDrawViewportEdge{ false };
     bool m_drawHighlightTarget{ false };
     bool m_shiftPressed{ false };
+    bool m_updateCreatures{ false };
 
     FadeType m_fadeType{ FadeType::NONE$ };
 
@@ -320,6 +321,7 @@ private:
 
     std::vector<FloorData> m_floors;
     std::vector<TilePtr> m_foregroundTiles;
+    std::vector<CreaturePtr> m_cachedFloorVisibleCreatures;
 
     PainterShaderProgramPtr m_shader;
     PainterShaderProgramPtr m_nextShader;

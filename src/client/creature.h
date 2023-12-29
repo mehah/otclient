@@ -120,6 +120,8 @@ public:
     uint32_t getMasterId() { return m_masterId; }
     std::string getName() { return m_name.getText(); }
 
+    Point getDrawOffset();
+
     Otc::Direction getDirection() { return m_direction; }
     Outfit getOutfit() { return m_outfit; }
     const Light& getLight() const override;

@@ -134,9 +134,6 @@ void MapView::drawFloor()
 
     uint32_t flags = Otc::DrawThings;
     if (lightView) flags |= Otc::DrawLights;
-    if (m_drawNames) { flags |= Otc::DrawNames; }
-    if (m_drawHealthBars) { flags |= Otc::DrawBars; }
-    if (m_drawManaBar) { flags |= Otc::DrawManaBar; }
 
     for (int_fast8_t z = m_floorMax; z >= m_floorMin; --z) {
         const float fadeLevel = getFadeLevel(z);
@@ -211,6 +208,25 @@ void MapView::drawFloor()
 void MapView::drawForeground(const Rect& rect)
 {
     const auto& camera = m_posInfo.camera;
+
+    g_drawPool.select(DrawPoolType::CREATURE_INFORMATION); {
+        g_drawPool.scale(g_app.getCreatureInformationScale());
+
+        if (m_updateCreatures)
+            m_cachedFloorVisibleCreatures = g_map.getSightSpectators(camera, false);
+
+        uint32_t flags = Otc::DrawThings;
+        if (m_drawNames) { flags |= Otc::DrawNames; }
+        if (m_drawHealthBars) { flags |= Otc::DrawBars; }
+        if (m_drawManaBar) { flags |= Otc::DrawManaBar; }
+
+        for (const auto& creature : m_cachedFloorVisibleCreatures) {
+            creature->drawInformation(m_posInfo, transformPositionTo2D(creature->getPosition(), camera), creature->getTile()->isCovered(m_cachedFirstVisibleFloor), flags);
+        }
+
+        // Go back to use foreground map pool
+        g_drawPool.select(DrawPoolType::FOREGROUND_MAP);
+    }
 
     g_drawPool.scale(g_app.getStaticTextScale());
     for (const auto& staticText : g_map.getStaticTexts()) {
@@ -480,6 +496,10 @@ void MapView::onTileUpdate(const Position& pos, const ThingPtr& thing, const Otc
             m_lastHighlightTile = nullptr;
 
         requestUpdateVisibleTiles();
+    }
+
+    if (thing && thing->isCreature()) {
+        m_updateCreatures = true;
     }
 }
 

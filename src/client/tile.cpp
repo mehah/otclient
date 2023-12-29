@@ -117,7 +117,6 @@ void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags,
             if (!thing->isCreature() || thing->static_self_cast<Creature>()->isWalking()) continue;
 
             drawThing(thing, dest, flags, lightView);
-            thing->static_self_cast<Creature>()->drawInformation(mapRect, dest - m_drawElevation * g_drawPool.getScaleFactor(), isCovered, flags);
         }
     }
 
@@ -134,7 +133,6 @@ void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags,
         );
 
         creature->draw(cDest, flags & Otc::DrawThings, lightView);
-        creature->drawInformation(mapRect, cDest, isCovered, flags);
     }
 }
 
@@ -170,7 +168,7 @@ void Tile::clean()
             if (g_client.getMapWidget())
                 g_client.getMapWidget()->getMapView()->removeForegroundTile(tile);
         }, g_game.getServerBeat());
-    }
+}
 
     if (hasAttachedWidgets()) {
         clearAttachedWidgets();
