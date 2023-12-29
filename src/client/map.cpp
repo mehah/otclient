@@ -1160,8 +1160,6 @@ void Map::updateAttachedWidgets(const MapViewPtr& mapView)
     if (m_attachedObjectWidgetMap.empty())
         return;
 
-    const auto& camera = mapView->getCameraPosition();
-
     std::vector<AttachableObjectPtr> toRemove;
     for (const auto& [widget, object] : m_attachedObjectWidgetMap) {
         if (widget->isDestroyed()) {
@@ -1182,7 +1180,10 @@ void Map::updateAttachedWidgets(const MapViewPtr& mapView)
             pos = thing->getPosition();
         }
 
-        Point p = mapView->transformPositionTo2D(pos, camera) - mapView->m_posInfo.drawOffset;
+        if (!pos.isValid())
+            continue;
+
+        Point p = mapView->transformPositionTo2D(pos) - mapView->m_posInfo.drawOffset;
 
         if (object->isThing() && object->static_self_cast<Thing>()->isCreature()) {
             const auto& creature = object->static_self_cast<Thing>()->static_self_cast<Creature>();
