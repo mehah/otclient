@@ -212,6 +212,9 @@ void GraphicalApplication::run()
                 continue;
             }
 
+            if (m_drawEvents)
+                m_drawEvents->preLoad();
+
             drawForeground();
 
             if (m_drawEvents)

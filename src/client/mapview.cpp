@@ -100,8 +100,7 @@ void MapView::registerEvents() {
     });
 }
 
-void MapView::draw(const Rect& rect)
-{
+void MapView::preLoad() {
     // update visible tiles cache when needed
     if (m_updateVisibleTiles)
         updateVisibleTiles();
@@ -113,7 +112,10 @@ void MapView::draw(const Rect& rect)
             m_fadeFinish = true;
         }
     }
+}
 
+void MapView::draw(const Rect& rect)
+{
     drawFloor();
 
     // this could happen if the player position is not known yet
@@ -208,11 +210,7 @@ void MapView::drawFloor()
 
 void MapView::drawForeground(const Rect& rect)
 {
-    const auto& camera = getCameraPosition();
-    const auto& srcRect = calcFramebufferSource(rect.size());
-    const auto& drawOffset = srcRect.topLeft();
-    const auto& horizontalStretchFactor = rect.width() / static_cast<float>(srcRect.width());
-    const auto& verticalStretchFactor = rect.height() / static_cast<float>(srcRect.height());
+    const auto& camera = m_posInfo.camera;
 
     g_drawPool.scale(g_app.getStaticTextScale());
     for (const auto& staticText : g_map.getStaticTexts()) {
@@ -223,9 +221,9 @@ void MapView::drawForeground(const Rect& rect)
         if (pos.z != camera.z && staticText->getMessageMode() == Otc::MessageNone)
             continue;
 
-        Point p = transformPositionTo2D(pos, camera) - drawOffset;
-        p.x *= horizontalStretchFactor;
-        p.y *= verticalStretchFactor;
+        Point p = transformPositionTo2D(pos, camera) - m_posInfo.drawOffset;
+        p.x *= m_posInfo.horizontalStretchFactor;
+        p.y *= m_posInfo.verticalStretchFactor;
         p += rect.topLeft();
         staticText->drawText(p.scale(g_app.getStaticTextScale()), rect);
     }
@@ -237,9 +235,9 @@ void MapView::drawForeground(const Rect& rect)
         if (pos.z != camera.z)
             continue;
 
-        auto p = transformPositionTo2D(pos, camera) - drawOffset;
-        p.x *= horizontalStretchFactor;
-        p.y *= verticalStretchFactor;
+        auto p = transformPositionTo2D(pos, camera) - m_posInfo.drawOffset;
+        p.x *= m_posInfo.horizontalStretchFactor;
+        p.y *= m_posInfo.verticalStretchFactor;
         p += rect.topLeft();
         animatedText->drawText(p, rect);
     }
@@ -248,9 +246,9 @@ void MapView::drawForeground(const Rect& rect)
     for (const auto& tile : m_foregroundTiles) {
         const auto& dest = transformPositionTo2D(tile->getPosition(), camera);
 #ifndef BOT_PROTECTION
-        Point p = dest - drawOffset;
-        p.x *= horizontalStretchFactor;
-        p.y *= verticalStretchFactor;
+        Point p = dest - m_posInfo.drawOffset;
+        p.x *= m_posInfo.horizontalStretchFactor;
+        p.y *= m_posInfo.verticalStretchFactor;
         p += rect.topLeft();
         p.y += 5;
 
