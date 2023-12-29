@@ -120,7 +120,8 @@ public:
     uint32_t getMasterId() { return m_masterId; }
     std::string getName() { return m_name.getText(); }
 
-    Point getDrawOffset();
+    Point getDrawOffset() { return Point(-1, -1) * getDrawElevation() + m_walkOffset; }
+    int getDrawElevation();
 
     Otc::Direction getDirection() { return m_direction; }
     Outfit getOutfit() { return m_outfit; }

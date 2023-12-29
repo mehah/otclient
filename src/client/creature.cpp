@@ -131,12 +131,11 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
     if (isDead() || !canBeSeen() || !(drawFlags & Otc::DrawCreatureInfo) || !mapRect.isInRange(m_position))
         return;
 
-    const auto& jumpOffset = m_jumpOffset * g_drawPool.getScaleFactor();
     const auto& parentRect = mapRect.rect;
     const auto& creatureOffset = Point(16 - getDisplacementX(), -getDisplacementY() - 2) + getDrawOffset();
 
     Point p = dest - mapRect.drawOffset;
-    p += creatureOffset * g_drawPool.getScaleFactor() - Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
+    p += (creatureOffset - Point(std::round(m_jumpOffset.x), std::round(m_jumpOffset.y))) * mapRect.scaleFactor;
     p.x *= mapRect.horizontalStretchFactor;
     p.y *= mapRect.verticalStretchFactor;
     p += parentRect.topLeft();
@@ -169,10 +168,11 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
     }
 
     // distance them
-    uint8_t offset = 12 * g_drawPool.getScaleFactor();
-    if (isLocalPlayer()) {
-        offset *= 2 * g_drawPool.getScaleFactor();
-    }
+    uint8_t offset = 12;
+    if (isLocalPlayer())
+        offset *= 2;
+
+    offset *= mapRect.scaleFactor;
 
     if (textRect.top() == parentRect.top())
         backgroundRect.moveTop(textRect.top() + offset);
@@ -840,17 +840,35 @@ void Creature::updateShield()
         m_showShieldTexture = true;
 }
 
-Point Creature::getDrawOffset()
-{
-    Point drawOffset;
-    if (m_walking) {
-        if (m_walkingTile)
-            drawOffset -= Point(1, 1) * m_walkingTile->getDrawElevation();
-        drawOffset += m_walkOffset;
-    } else if (const auto& tile = getTile())
-        drawOffset -= Point(1, 1) * tile->getDrawElevation();
+int getSmoothedElevation(const Creature* creature, int currentElevation, float factor) {
+    const auto& fromPos = creature->getLastStepFromPosition();
+    const auto& toPos = creature->getLastStepToPosition();
+    const auto& fromTile = g_map.getTile(fromPos);
+    const auto& toTile = g_map.getTile(toPos);
 
-    return drawOffset;
+    if (!fromTile || !toTile) {
+        return currentElevation;
+    }
+
+    const int fromElevation = fromTile->getDrawElevation();
+    const int toElevation = toTile->getDrawElevation();
+
+    return fromElevation != toElevation ? fromElevation + factor * (toElevation - fromElevation) : currentElevation;
+}
+
+int Creature::getDrawElevation() {
+    int elevation = 0;
+    if (m_walking) {
+        elevation = m_walkingTile->getDrawElevation();
+
+        if (g_game.getFeature(Otc::GameSmoothWalkElevation)) {
+            const float factor = std::clamp<float>(getWalkTicksElapsed() / static_cast<float>(m_stepCache.getDuration(m_lastStepDirection)), .0f, 1.f);
+            elevation = getSmoothedElevation(this, elevation, factor);
+        }
+    } else if (const auto& tile = getTile())
+        elevation = tile->getDrawElevation();
+
+    return elevation;
 }
 
 bool Creature::hasSpeedFormula() { return g_game.getFeature(Otc::GameNewSpeedLaw) && speedA != 0 && speedB != 0 && speedC != 0; }
