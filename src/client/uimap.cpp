@@ -59,8 +59,6 @@ void UIMap::drawSelf(DrawPoolType drawPane)
         g_drawPool.addAction([] {glDisable(GL_BLEND); });
         g_drawPool.addFilledRect(m_mapRect, Color::alpha);
         g_drawPool.addAction([] {glEnable(GL_BLEND); });
-
-        g_map.drawAttachedWidgets(m_mapView, mapRect);
         return;
     }
 
@@ -75,7 +73,6 @@ void UIMap::drawSelf(DrawPoolType drawPane)
             m_mapView->drawForeground(mapRect);
         });
     }
-
 }
 
 void UIMap::updateMapRect() {

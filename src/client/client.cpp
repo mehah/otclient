@@ -68,8 +68,8 @@ void Client::terminate()
 
 void Client::preLoad() {
     if (m_mapWidget) {
-        m_mapWidget->getMapView()->preLoad();
         m_mapWidget->updateMapRect();
+        m_mapWidget->getMapView()->preLoad();
     }
 }
 

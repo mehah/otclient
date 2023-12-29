@@ -220,7 +220,7 @@ public:
     bool isWidgetAttached(const UIWidgetPtr& widget) const;
     void addAttachedWidgetToObject(const UIWidgetPtr& widget, const AttachableObjectPtr& object);
     bool removeAttachedWidgetFromObject(const UIWidgetPtr& widget);
-    void drawAttachedWidgets(const MapViewPtr& mapView, const Rect& rect);
+    void updateAttachedWidgets(const MapViewPtr& mapView);
 
     void colorizeThing(const ThingPtr& thing, const Color& color);
     void removeThingColor(const ThingPtr& thing);

@@ -94,25 +94,25 @@ void AttachableObject::clearAttachedEffects()
 void AttachableObject::clearTemporaryAttachedEffects()
 {
     m_attachedEffects.erase(std::remove_if(m_attachedEffects.begin(), m_attachedEffects.end(),
-        [&](const AttachedEffectPtr& obj) {
-            if (!obj->isPermanent()) {
-                onDetachEffect(obj);
-                return true;
-            }
-            return false;
-        }), m_attachedEffects.end());
+                            [&](const AttachedEffectPtr& obj) {
+        if (!obj->isPermanent()) {
+            onDetachEffect(obj);
+            return true;
+        }
+        return false;
+    }), m_attachedEffects.end());
 }
 
 void AttachableObject::clearPermanentAttachedEffects()
 {
     m_attachedEffects.erase(std::remove_if(m_attachedEffects.begin(), m_attachedEffects.end(),
-        [&](const AttachedEffectPtr& obj) {
-            if (obj->isPermanent()) {
-                onDetachEffect(obj);
-                return true;
-            }
-            return false;
-        }), m_attachedEffects.end());
+                            [&](const AttachedEffectPtr& obj) {
+        if (obj->isPermanent()) {
+            onDetachEffect(obj);
+            return true;
+        }
+        return false;
+    }), m_attachedEffects.end());
 }
 
 AttachedEffectPtr AttachableObject::getAttachedEffectById(uint16_t id)
@@ -215,6 +215,7 @@ void AttachableObject::attachWidget(const UIWidgetPtr& widget) {
     }
 
     widget->setDraggable(false);
+    widget->setParent(g_client.getMapWidget());
     m_attachedWidgets.emplace_back(widget);
     g_map.addAttachedWidgetToObject(widget, std::static_pointer_cast<AttachableObject>(shared_from_this()));
     widget->callLuaField("onAttached", asLuaObject());

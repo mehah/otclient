@@ -1131,7 +1131,6 @@ bool Map::isSightClear(const Position& fromPos, const Position& toPos)
     return true;
 }
 
-
 bool Map::isWidgetAttached(const UIWidgetPtr& widget) const {
     return m_attachedObjectWidgetMap.find(widget) != m_attachedObjectWidgetMap.end();
 }
@@ -1141,7 +1140,7 @@ void Map::addAttachedWidgetToObject(const UIWidgetPtr& widget, const AttachableO
     if (isWidgetAttached(widget))
         return;
 
-    m_attachedObjectWidgetMap.emplace(widget, object);    
+    m_attachedObjectWidgetMap.emplace(widget, object);
 }
 
 bool Map::removeAttachedWidgetFromObject(const UIWidgetPtr& widget) {
@@ -1151,25 +1150,20 @@ bool Map::removeAttachedWidgetFromObject(const UIWidgetPtr& widget) {
     const auto it = m_attachedObjectWidgetMap.find(widget);
     if (it == m_attachedObjectWidgetMap.end())
         return false;
-    
+
     m_attachedObjectWidgetMap.erase(it);
     return true;
 }
 
-void Map::drawAttachedWidgets(const MapViewPtr& mapView, const Rect& rect)
+void Map::updateAttachedWidgets(const MapViewPtr& mapView)
 {
     if (m_attachedObjectWidgetMap.empty())
         return;
 
-    const auto& srcRect = mapView->calcFramebufferSource(rect.size());
-    const auto& drawOffset = srcRect.topLeft();
-    const auto& horizontalStretchFactor = rect.width() / static_cast<float>(srcRect.width());
-    const auto& verticalStretchFactor = rect.height() / static_cast<float>(srcRect.height());
     const auto& camera = mapView->getCameraPosition();
 
     std::vector<AttachableObjectPtr> toRemove;
-    for (auto [widget, object] : m_attachedObjectWidgetMap) {
-
+    for (const auto& [widget, object] : m_attachedObjectWidgetMap) {
         if (widget->isDestroyed()) {
             toRemove.emplace_back(object);
             //object->removeAttachedWidget(widget); // Should we remove this widget from object?
@@ -1188,10 +1182,18 @@ void Map::drawAttachedWidgets(const MapViewPtr& mapView, const Rect& rect)
             pos = thing->getPosition();
         }
 
-        Point p = mapView->transformPositionTo2D(pos, camera) - drawOffset;
-        p.x *= horizontalStretchFactor;
-        p.y *= verticalStretchFactor;
-        p += rect.topLeft();
+        Point p = mapView->transformPositionTo2D(pos, camera) - mapView->m_posInfo.drawOffset;
+
+        if (object->isThing() && object->static_self_cast<Thing>()->isCreature()) {
+            const auto& creature = object->static_self_cast<Thing>()->static_self_cast<Creature>();
+            const auto& jumpOffset = creature->getJumpOffset() * g_drawPool.getScaleFactor();
+            const auto& creatureOffset = Point(16 - creature->getDisplacementX(), -creature->getDisplacementY() - 2) + creature->getWalkOffset();
+            p += creatureOffset * g_drawPool.getScaleFactor() - Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
+        }
+
+        p.x *= mapView->m_posInfo.horizontalStretchFactor;
+        p.y *= mapView->m_posInfo.verticalStretchFactor;
+        p += mapView->m_posInfo.rect.topLeft();
 
         p.x += widget->getMarginLeft();
         p.x -= widget->getMarginRight();
@@ -1202,13 +1204,11 @@ void Map::drawAttachedWidgets(const MapViewPtr& mapView, const Rect& rect)
         const auto& newWidgetRect = Rect(p, widgetRect.width(), widgetRect.height());
 
         widget->setRect(newWidgetRect);
-        widget->draw(srcRect, DrawPoolType::FOREGROUND);
     }
 
     // for (const auto& widget : toRemove)
     //     removeAttachedWidgetFromObject(widget);
 }
-
 
 #ifndef BOT_PROTECTION
 std::map<std::string, std::tuple<int, int, int, std::string>> Map::findEveryPath(const Position& start, int maxDistance, const std::map<std::string, std::string>& params)

@@ -197,6 +197,9 @@ public:
     void setHighlight(const Color& color) { if (m_highlightColor != color) m_highlightColor = color; }
 
     bool isHided() { return isOwnerHidden(); }
+    void onStartAttachEffect(const AttachedEffectPtr& effect) override;
+    void onDispatcherAttachEffect(const AttachedEffectPtr& effect) override;
+    void onStartDetachEffect(const AttachedEffectPtr& effect) override;
 
 protected:
     void setAttachedEffectDirection(Otc::Direction dir) const
