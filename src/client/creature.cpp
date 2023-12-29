@@ -131,12 +131,11 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
     if (isDead() || !canBeSeen() || !(drawFlags & Otc::DrawCreatureInfo) || !mapRect.isInRange(m_position))
         return;
 
-    const auto& jumpOffset = m_jumpOffset * g_drawPool.getScaleFactor();
     const auto& parentRect = mapRect.rect;
-    const auto& creatureOffset = Point(16 - getDisplacementX(), -getDisplacementY() - 2) + m_walkOffset;
+    const auto& creatureOffset = Point(16 - getDisplacementX(), -getDisplacementY() - 2) + getDrawOffset();
 
     Point p = dest - mapRect.drawOffset;
-    p += creatureOffset * g_drawPool.getScaleFactor() - Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
+    p += (creatureOffset - Point(std::round(m_jumpOffset.x), std::round(m_jumpOffset.y))) * mapRect.scaleFactor;
     p.x *= mapRect.horizontalStretchFactor;
     p.y *= mapRect.verticalStretchFactor;
     p += parentRect.topLeft();
@@ -155,85 +154,80 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
     const int cropSizeText = g_gameConfig.isAdjustCreatureInformationBasedCropSize() ? getExactSize() : 12;
     const int cropSizeBackGround = g_gameConfig.isAdjustCreatureInformationBasedCropSize() ? cropSizeText - nameSize.height() : 0;
 
-    g_drawPool.select(DrawPoolType::CREATURE_INFORMATION);
-    {
-        bool isScaled = g_app.getCreatureInformationScale() != PlatformWindow::DEFAULT_DISPLAY_DENSITY;
-        if (isScaled) {
-            g_drawPool.scale(g_app.getCreatureInformationScale());
-            p.scale(g_app.getCreatureInformationScale());
-        }
+    bool isScaled = g_app.getCreatureInformationScale() != PlatformWindow::DEFAULT_DISPLAY_DENSITY;
+    if (isScaled) {
+        p.scale(g_app.getCreatureInformationScale());
+    }
 
-        auto backgroundRect = Rect(p.x - (13.5), p.y - cropSizeBackGround, 27, 4);
-        auto textRect = Rect(p.x - nameSize.width() / 2.0, p.y - cropSizeText, nameSize);
+    auto backgroundRect = Rect(p.x - (13.5), p.y - cropSizeBackGround, 27, 4);
+    auto textRect = Rect(p.x - nameSize.width() / 2.0, p.y - cropSizeText, nameSize);
 
-        if (!isScaled) {
-            backgroundRect.bind(parentRect);
-            textRect.bind(parentRect);
-        }
+    if (!isScaled) {
+        backgroundRect.bind(parentRect);
+        textRect.bind(parentRect);
+    }
 
-        // distance them
-        uint8_t offset = 12 * g_drawPool.getScaleFactor();
-        if (isLocalPlayer()) {
-            offset *= 2 * g_drawPool.getScaleFactor();
-        }
+    // distance them
+    uint8_t offset = 12;
+    if (isLocalPlayer())
+        offset *= 2;
 
-        if (textRect.top() == parentRect.top())
-            backgroundRect.moveTop(textRect.top() + offset);
-        if (backgroundRect.bottom() == parentRect.bottom())
-            textRect.moveTop(backgroundRect.top() - offset);
+    offset *= mapRect.scaleFactor;
 
-        // health rect is based on background rect, so no worries
-        Rect healthRect = backgroundRect.expanded(-1);
-        healthRect.setWidth((m_healthPercent / 100.0) * 25);
+    if (textRect.top() == parentRect.top())
+        backgroundRect.moveTop(textRect.top() + offset);
+    if (backgroundRect.bottom() == parentRect.bottom())
+        textRect.moveTop(backgroundRect.top() - offset);
 
-        if (drawFlags & Otc::DrawBars) {
-            g_drawPool.addFilledRect(backgroundRect, Color::black);
-            g_drawPool.addFilledRect(healthRect, fillColor);
+    // health rect is based on background rect, so no worries
+    Rect healthRect = backgroundRect.expanded(-1);
+    healthRect.setWidth((m_healthPercent / 100.0) * 25);
 
-            if (drawFlags & Otc::DrawManaBar && isLocalPlayer()) {
-                if (const auto& player = g_game.getLocalPlayer()) {
-                    backgroundRect.moveTop(backgroundRect.bottom());
+    if (drawFlags & Otc::DrawBars) {
+        g_drawPool.addFilledRect(backgroundRect, Color::black);
+        g_drawPool.addFilledRect(healthRect, fillColor);
 
-                    g_drawPool.addFilledRect(backgroundRect, Color::black);
+        if (drawFlags & Otc::DrawManaBar && isLocalPlayer()) {
+            if (const auto& player = g_game.getLocalPlayer()) {
+                backgroundRect.moveTop(backgroundRect.bottom());
 
-                    Rect manaRect = backgroundRect.expanded(-1);
-                    const double maxMana = player->getMaxMana();
-                    manaRect.setWidth((maxMana ? player->getMana() / maxMana : 1) * 25);
+                g_drawPool.addFilledRect(backgroundRect, Color::black);
 
-                    g_drawPool.addFilledRect(manaRect, Color::blue);
-                }
+                Rect manaRect = backgroundRect.expanded(-1);
+                const double maxMana = player->getMaxMana();
+                manaRect.setWidth((maxMana ? player->getMana() / maxMana : 1) * 25);
+
+                g_drawPool.addFilledRect(manaRect, Color::blue);
             }
         }
+    }
 
-        if (drawFlags & Otc::DrawNames) {
-            m_name.draw(textRect, fillColor);
+    if (drawFlags & Otc::DrawNames) {
+        m_name.draw(textRect, fillColor);
 
 #ifndef BOT_PROTECTION
-            if (m_text) {
-                auto extraTextSize = m_text->getTextSize();
-                Rect extraTextRect = Rect(p.x - extraTextSize.width() / 2.0, p.y + 15, extraTextSize);
-                m_text->drawText(extraTextRect.center(), extraTextRect);
-            }
-#endif
+        if (m_text) {
+            auto extraTextSize = m_text->getTextSize();
+            Rect extraTextRect = Rect(p.x - extraTextSize.width() / 2.0, p.y + 15, extraTextSize);
+            m_text->drawText(extraTextRect.center(), extraTextRect);
         }
-
-        if (m_skull != Otc::SkullNone && m_skullTexture)
-            g_drawPool.addTexturedPos(m_skullTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5);
-
-        if (m_shield != Otc::ShieldNone && m_shieldTexture && m_showShieldTexture)
-            g_drawPool.addTexturedPos(m_shieldTexture, backgroundRect.x() + 13.5, backgroundRect.y() + 5);
-
-        if (m_emblem != Otc::EmblemNone && m_emblemTexture)
-            g_drawPool.addTexturedPos(m_emblemTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 16);
-
-        if (m_type != Proto::CreatureTypeUnknown && m_typeTexture)
-            g_drawPool.addTexturedPos(m_typeTexture, backgroundRect.x() + 13.5 + 12 + 12, backgroundRect.y() + 16);
-
-        if (m_icon != Otc::NpcIconNone && m_iconTexture)
-            g_drawPool.addTexturedPos(m_iconTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5);
+#endif
     }
-    // Go back to use map pool
-    g_drawPool.select(DrawPoolType::MAP);
+
+    if (m_skull != Otc::SkullNone && m_skullTexture)
+        g_drawPool.addTexturedPos(m_skullTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5);
+
+    if (m_shield != Otc::ShieldNone && m_shieldTexture && m_showShieldTexture)
+        g_drawPool.addTexturedPos(m_shieldTexture, backgroundRect.x() + 13.5, backgroundRect.y() + 5);
+
+    if (m_emblem != Otc::EmblemNone && m_emblemTexture)
+        g_drawPool.addTexturedPos(m_emblemTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 16);
+
+    if (m_type != Proto::CreatureTypeUnknown && m_typeTexture)
+        g_drawPool.addTexturedPos(m_typeTexture, backgroundRect.x() + 13.5 + 12 + 12, backgroundRect.y() + 16);
+
+    if (m_icon != Otc::NpcIconNone && m_iconTexture)
+        g_drawPool.addTexturedPos(m_iconTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5);
 }
 
 void Creature::internalDraw(Point dest, LightView* lightView, const Color& color)
@@ -846,6 +840,37 @@ void Creature::updateShield()
         m_showShieldTexture = true;
 }
 
+int getSmoothedElevation(const Creature* creature, int currentElevation, float factor) {
+    const auto& fromPos = creature->getLastStepFromPosition();
+    const auto& toPos = creature->getLastStepToPosition();
+    const auto& fromTile = g_map.getTile(fromPos);
+    const auto& toTile = g_map.getTile(toPos);
+
+    if (!fromTile || !toTile) {
+        return currentElevation;
+    }
+
+    const int fromElevation = fromTile->getDrawElevation();
+    const int toElevation = toTile->getDrawElevation();
+
+    return fromElevation != toElevation ? fromElevation + factor * (toElevation - fromElevation) : currentElevation;
+}
+
+int Creature::getDrawElevation() {
+    int elevation = 0;
+    if (m_walking) {
+        elevation = m_walkingTile->getDrawElevation();
+
+        if (g_game.getFeature(Otc::GameSmoothWalkElevation)) {
+            const float factor = std::clamp<float>(getWalkTicksElapsed() / static_cast<float>(m_stepCache.getDuration(m_lastStepDirection)), .0f, 1.f);
+            elevation = getSmoothedElevation(this, elevation, factor);
+        }
+    } else if (const auto& tile = getTile())
+        elevation = tile->getDrawElevation();
+
+    return elevation;
+}
+
 bool Creature::hasSpeedFormula() { return g_game.getFeature(Otc::GameNewSpeedLaw) && speedA != 0 && speedB != 0 && speedC != 0; }
 
 uint16_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
@@ -879,8 +904,8 @@ uint16_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
 
         m_stepCache.duration = stepDuration + 10;
         m_stepCache.walkDuration = std::min<int>(stepDuration / g_gameConfig.getSpriteSize(), DrawPool::FPS60);
-        m_stepCache.diagonalDuration = stepDuration * 
-            (g_game.getClientVersion() > 810 || g_gameConfig.isForcingNewWalkingFormula() 
+        m_stepCache.diagonalDuration = stepDuration *
+            (g_game.getClientVersion() > 810 || g_gameConfig.isForcingNewWalkingFormula()
                 ? (isPlayer() ? g_gameConfig.getPlayerDiagonalWalkSpeed() : g_gameConfig.getCreatureDiagonalWalkSpeed())
                 : 2);
     }

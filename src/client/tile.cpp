@@ -46,7 +46,7 @@ void Tile::drawThing(const ThingPtr& thing, const Point& dest, int flags, LightV
         m_drawElevation = std::min<uint8_t>(m_drawElevation + thing->getElevation(), g_gameConfig.getTileMaxElevation());
 }
 
-void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, LightView* lightView)
+void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, LightView* lightView)
 {
     m_drawElevation = 0;
     m_lastDrawDest = dest;
@@ -75,11 +75,11 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool is
 
     // after we render 2x2 lying corpses, we must redraw previous creatures/ontop above them
     for (const auto& tile : m_tilesRedraw) {
-        tile->drawCreature(tile->m_lastDrawDest, mapRect, flags, isCovered, true, lightView);
+        tile->drawCreature(tile->m_lastDrawDest, mapRect, flags, true, lightView);
         tile->drawTop(tile->m_lastDrawDest, flags, true, lightView);
     }
 
-    drawCreature(dest, mapRect, flags, isCovered, false, lightView);
+    drawCreature(dest, mapRect, flags, false, lightView);
     drawTop(dest, flags, false, lightView);
     drawAttachedEffect(dest, lightView, false);
     drawAttachedParticlesEffect(dest);
@@ -91,23 +91,7 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool is
     drawWidgets(mapRect);
 }
 
-int getSmoothedElevation(const CreaturePtr& creature, int currentElevation, float factor) {
-    const auto& fromPos = creature->getLastStepFromPosition();
-    const auto& toPos = creature->getLastStepToPosition();
-    const auto& fromTile = g_map.getTile(fromPos);
-    const auto& toTile = g_map.getTile(toPos);
-
-    if (!fromTile || !toTile) {
-        return currentElevation;
-    }
-
-    const int fromElevation = fromTile->getDrawElevation();
-    const int toElevation = toTile->getDrawElevation();
-
-    return fromElevation != toElevation ? fromElevation + factor * (toElevation - fromElevation) : currentElevation;
-}
-
-void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, bool forceDraw, LightView* lightView)
+void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags, bool forceDraw, LightView* lightView)
 {
     if (!forceDraw && !m_drawTopAndCreature)
         return;
@@ -117,24 +101,16 @@ void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags,
             if (!thing->isCreature() || thing->static_self_cast<Creature>()->isWalking()) continue;
 
             drawThing(thing, dest, flags, lightView);
-            thing->static_self_cast<Creature>()->drawInformation(mapRect, dest - m_drawElevation * g_drawPool.getScaleFactor(), isCovered, flags);
         }
     }
 
     for (const auto& creature : m_walkingCreatures) {
-        int elevation = m_drawElevation;
-        if (g_game.getFeature(Otc::GameSmoothWalkElevation)) {
-            const float factor = std::clamp<float>(creature->getWalkTicksElapsed() / static_cast<float>(creature->getStepDuration()), .0f, 1.f);
-            elevation = getSmoothedElevation(creature, elevation, factor);
-        }
-
         const auto& cDest = Point(
-            dest.x + ((creature->getPosition().x - m_position.x) * g_gameConfig.getSpriteSize() - elevation) * g_drawPool.getScaleFactor(),
-            dest.y + ((creature->getPosition().y - m_position.y) * g_gameConfig.getSpriteSize() - elevation) * g_drawPool.getScaleFactor()
+            dest.x + ((creature->getPosition().x - m_position.x) * g_gameConfig.getSpriteSize() - creature->getDrawElevation()) * g_drawPool.getScaleFactor(),
+            dest.y + ((creature->getPosition().y - m_position.y) * g_gameConfig.getSpriteSize() - creature->getDrawElevation()) * g_drawPool.getScaleFactor()
         );
 
         creature->draw(cDest, flags & Otc::DrawThings, lightView);
-        creature->drawInformation(mapRect, cDest, isCovered, flags);
     }
 }
 
