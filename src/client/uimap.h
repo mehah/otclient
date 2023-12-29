@@ -98,6 +98,8 @@ public:
         m_mapView->m_foregroundTiles.clear();
     }
 
+    void updateMapRect();
+
 protected:
     void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
     void onGeometryChange(const Rect& oldRect, const Rect& newRect) override;

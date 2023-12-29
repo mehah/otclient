@@ -33,6 +33,7 @@
 class ApplicationDrawEvents
 {
 protected:
+    virtual void preLoad() = 0;
     virtual void drawMap() = 0;
     virtual void drawForgroundMap() = 0;
 
@@ -50,7 +51,7 @@ class GraphicalApplicationContext : public ApplicationContext
 {
 public:
     GraphicalApplicationContext(uint8_t asyncDispatchMaxThreads, uint8_t spriteSize, ApplicationDrawEventsPtr drawEvents) :
-        ApplicationContext(asyncDispatchMaxThreads), 
+        ApplicationContext(asyncDispatchMaxThreads),
         m_spriteSize(spriteSize),
         m_drawEvents(drawEvents)
     {}
@@ -94,7 +95,7 @@ public:
 #else
         return false;
 #endif
-    }
+}
     bool isForcedEffectOptimization() { return m_forceEffectOptimization; }
 
     void optimize(const bool optimize) { m_optimize = optimize; }

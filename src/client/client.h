@@ -36,6 +36,7 @@ public:
     void terminate();
     static void registerLuaFunctions();
 
+    void preLoad() override;
     void drawMap() override;
     void drawForgroundMap() override;
 

@@ -66,6 +66,13 @@ void Client::terminate()
     g_gameConfig.terminate();
 }
 
+void Client::preLoad() {
+    if (m_mapWidget) {
+        m_mapWidget->getMapView()->preLoad();
+        m_mapWidget->updateMapRect();
+    }
+}
+
 void Client::drawMap()
 {
     if (g_game.isOnline()) {
