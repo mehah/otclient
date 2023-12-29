@@ -179,9 +179,6 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     if (type == DrawPoolType::FOREGROUND_MAP)
         get(DrawPoolType::CREATURE_INFORMATION)->resetState();
 
-    if (type == DrawPoolType::MAP)
-        get(DrawPoolType::FOREGROUND_MAP_WIDGETS)->resetState();
-
     if (f) f();
 
     std::scoped_lock l(pool->m_mutexDraw);
@@ -194,9 +191,6 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
 
     if (type == DrawPoolType::FOREGROUND_MAP)
         get(DrawPoolType::CREATURE_INFORMATION)->release();
-
-    if (type == DrawPoolType::MAP)
-        get(DrawPoolType::FOREGROUND_MAP_WIDGETS)->release();
 }
 
 bool DrawPoolManager::drawPool(const DrawPoolType type) {
