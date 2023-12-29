@@ -79,6 +79,10 @@ public:
     void setPassable(bool passable) { m_passable = passable; }
     void setMountShader(const std::string_view name);
 
+    void onStartAttachEffect(const AttachedEffectPtr& effect) override;
+    void onDispatcherAttachEffect(const AttachedEffectPtr& effect) override;
+    void onStartDetachEffect(const AttachedEffectPtr& effect) override;
+
     void addTimedSquare(uint8_t color);
     void removeTimedSquare() { m_showTimedSquare = false; }
     void showStaticSquare(const Color& color) { m_showStaticSquare = true; m_staticSquareColor = color; }

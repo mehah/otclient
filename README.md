@@ -66,6 +66,7 @@
 - Smooth Walk Elevation Feature by [@SkullzOTS](https://github.com/SkullzOTS)
   - View Feature: [Gyazo](https://i.gyazo.com/af0ed0f15a9e4d67bd4d0b2847bd6be7.gif)
   - To enable just go to [modules/game_features/features.lua](https://github.com/mehah/otclient/blob/main/modules/game_features/features.lua#L5), and uncomment line 5 (g_game.enableFeature(GameSmoothWalkElevation)).
+- Lua Debugger for VSCode [see wiki](https://github.com/mehah/otclient/wiki/Lua-Debugging-(VSCode)) [@BenDol](https://github.com/BenDol)
   
 ##### Sponsored  (Features)
 - Shader with Framebuffer | ([@SkullzOTS](https://github.com/SkullzOTS), [@Mryukiimaru](https://github.com/Mryukiimaru), [@JeanTheOne](https://github.com/JeanTheOne), [@KizaruHere](https://github.com/KizaruHere))

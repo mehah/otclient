@@ -363,6 +363,10 @@ void Client::registerLuaFunctions()
     g_lua.registerSingletonClass("g_gameConfig");
     g_lua.bindSingletonFunction("g_gameConfig", "loadFonts", &GameConfig::loadFonts, &g_gameConfig);
 
+    g_lua.registerSingletonClass("g_client");
+    g_lua.bindSingletonFunction("g_client", "setEffectAlpha", &Client::setEffectAlpha, &g_client);
+    g_lua.bindSingletonFunction("g_client", "setMissileAlpha", &Client::setMissileAlpha, &g_client);
+
     g_lua.registerSingletonClass("g_attachedEffects");
     g_lua.bindSingletonFunction("g_attachedEffects", "getById", &AttachedEffectManager::getById, &g_attachedEffects);
     g_lua.bindSingletonFunction("g_attachedEffects", "registerByThing", &AttachedEffectManager::registerByThing, &g_attachedEffects);
@@ -707,6 +711,8 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<AttachedEffect>("setDuration", &AttachedEffect::setDuration);
     g_lua.bindClassMemberFunction<AttachedEffect>("setHideOwner", &AttachedEffect::setHideOwner);
     g_lua.bindClassMemberFunction<AttachedEffect>("setLoop", &AttachedEffect::setLoop);
+    g_lua.bindClassMemberFunction<AttachedEffect>("setPermanent", &AttachedEffect::setPermanent);
+    g_lua.bindClassMemberFunction<AttachedEffect>("isPermanent", &AttachedEffect::isPermanent);
     g_lua.bindClassMemberFunction<AttachedEffect>("setTransform", &AttachedEffect::setTransform);
     g_lua.bindClassMemberFunction<AttachedEffect>("setOffset", &AttachedEffect::setOffset);
     g_lua.bindClassMemberFunction<AttachedEffect>("setDirOffset", &AttachedEffect::setDirOffset);

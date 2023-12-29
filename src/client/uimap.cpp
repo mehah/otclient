@@ -65,7 +65,6 @@ void UIMap::drawSelf(DrawPoolType drawPane)
     }
 
     if (drawPane == DrawPoolType::MAP) {
-        m_mapView->updateRect(mapRect);
         g_drawPool.preDraw(drawPane, [this, &mapRect] {
             m_mapView->registerEvents();
             m_mapView->draw(mapRect);
@@ -77,6 +76,11 @@ void UIMap::drawSelf(DrawPoolType drawPane)
         });
     }
 
+}
+
+void UIMap::updateMapRect() {
+    const auto& mapRect = g_app.isScaled() ? Rect(0, 0, g_graphics.getViewportSize()) : m_mapRect;
+    m_mapView->updateRect(mapRect);
 }
 
 bool UIMap::setZoom(int zoom)

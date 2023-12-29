@@ -52,6 +52,9 @@ public:
     bool isDisabledWalkAnimation() { return m_disableWalkAnimation; }
     void setDisableWalkAnimation(bool v) { m_disableWalkAnimation = v; }
 
+    bool isPermanent() { return m_permanent; }
+    void setPermanent(bool permanent) { m_permanent = permanent; }
+
     uint16_t getDuration() { return m_duration; }
     void setDuration(uint16_t v) { m_duration = v; }
 
@@ -102,6 +105,7 @@ private:
     bool m_transform{ false };
     bool m_canDrawOnUI{ true };
     bool m_disableWalkAnimation{ false };
+    bool m_permanent{ false };
 
     Outfit m_outfitOwner;
     Light m_light;
@@ -127,5 +131,6 @@ private:
     std::vector<AttachedEffectPtr> m_effects;
 
     friend class Thing;
+    friend class Creature;
     friend class AttachedEffectManager;
 };

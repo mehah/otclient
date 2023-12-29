@@ -108,8 +108,8 @@ UIWidget
     anchors.bottom: parent.bottom
     relative-margin: bottom
     margin-bottom: 172
-    @canUpdateMargin: function(self, newMargin) if modules.client_options.getOption('dontStretchShrink') then return self:getMarginBottom() end return math.max(math.min(newMargin, self:getParent():getHeight() - 300), 100) end
-    @onGeometryChange: function(self) self:setMarginBottom(math.min(math.max(self:getParent():getHeight() - 300, 100), self:getMarginBottom())) end
+    @canUpdateMargin: function(self, newMargin) if modules.client_options.getOption('dontStretchShrink') then return self:getMarginBottom() end return math.max(math.min(newMargin, self:getParent():getHeight() - 300), 162) end
+    @onGeometryChange: function(self) self:setMarginBottom(math.min(math.max(self:getParent():getHeight() - 300, 162), self:getMarginBottom())) end
 
   UIWidget
     id: mouseGrabber
