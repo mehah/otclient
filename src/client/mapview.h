@@ -91,6 +91,7 @@ public:
     ~MapView() override;
     void draw(const Rect& rect);
     void drawForeground(const Rect& rect);
+    void drawCreatureInformation();
     void preLoad();
 
     // floor visibility related
@@ -257,6 +258,10 @@ private:
     }
 
     Rect calcFramebufferSource(const Size& destSize);
+
+    Point transformPositionTo2D(const Position& position) const {
+        return transformPositionTo2D(position, m_posInfo.camera);
+    }
 
     Point transformPositionTo2D(const Position& position, const Position& relativePosition) const
     {
