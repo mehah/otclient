@@ -98,7 +98,7 @@ public:
     bool isTile() override { return true; }
 
     void onAddInMapView();
-    void draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, LightView* lightView = nullptr);
+    void draw(const Point& dest, const MapPosInfo& mapRect, int flags, LightView* lightView = nullptr);
 
     void clean();
 
@@ -218,7 +218,7 @@ public:
 #endif
 private:
     void drawTop(const Point& dest, int flags, bool forceDraw, LightView* lightView = nullptr);
-    void drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, bool forceDraw, LightView* lightView = nullptr);
+    void drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags, bool forceDraw, LightView* lightView = nullptr);
     void drawThing(const ThingPtr& thing, const Point& dest, int flags, LightView* lightView);
 
     void setThingFlag(const ThingPtr& thing);

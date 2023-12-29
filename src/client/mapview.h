@@ -48,6 +48,7 @@ struct MapPosInfo
     Point drawOffset;
     float horizontalStretchFactor;
     float verticalStretchFactor;
+    float scaleFactor;
 
     bool isInRange(const Position& pos, bool ignoreZ = false) const
     {
@@ -90,6 +91,7 @@ public:
     ~MapView() override;
     void draw(const Rect& rect);
     void drawForeground(const Rect& rect);
+    void drawCreatureInformation();
     void preLoad();
 
     // floor visibility related
@@ -257,6 +259,10 @@ private:
 
     Rect calcFramebufferSource(const Size& destSize);
 
+    Point transformPositionTo2D(const Position& position) const {
+        return transformPositionTo2D(position, m_posInfo.camera);
+    }
+
     Point transformPositionTo2D(const Position& position, const Position& relativePosition) const
     {
         return {
@@ -313,6 +319,7 @@ private:
     bool m_forceDrawViewportEdge{ false };
     bool m_drawHighlightTarget{ false };
     bool m_shiftPressed{ false };
+    bool m_updateCreatures{ false };
 
     FadeType m_fadeType{ FadeType::NONE$ };
 
@@ -320,6 +327,7 @@ private:
 
     std::vector<FloorData> m_floors;
     std::vector<TilePtr> m_foregroundTiles;
+    std::vector<CreaturePtr> m_cachedFloorVisibleCreatures;
 
     PainterShaderProgramPtr m_shader;
     PainterShaderProgramPtr m_nextShader;
