@@ -578,19 +578,19 @@ void Creature::updateWalkingTile()
         }
     }
 
-    if (newWalkingTile == m_walkingTile) return;
+    const auto& walkingTile = getWalkingTile();
+
+    if (newWalkingTile == walkingTile) return;
 
     const auto& self = static_self_cast<Creature>();
 
-    if (m_walkingTile)
-        m_walkingTile->removeWalkingCreature(self);
+    if (walkingTile)
+        walkingTile->removeWalkingCreature(self);
 
     if (newWalkingTile) {
         newWalkingTile->addWalkingCreature(self);
         g_map.notificateTileUpdate(newWalkingTile->getPosition(), self, Otc::OPERATION_CLEAN);
     }
-
-    m_walkingTile = newWalkingTile;
 }
 
 void Creature::nextWalkUpdate()
@@ -648,9 +648,8 @@ void Creature::terminateWalk()
         m_walkTurnDirection = Otc::InvalidDirection;
     }
 
-    if (m_walkingTile) {
-        m_walkingTile->removeWalkingCreature(static_self_cast<Creature>());
-        m_walkingTile = nullptr;
+    if (const auto& tile = getWalkingTile()) {
+        tile->removeWalkingCreature(static_self_cast<Creature>());
     }
 
     m_walkedPixels = 0;
@@ -840,6 +839,8 @@ void Creature::updateShield()
         m_showShieldTexture = true;
 }
 
+const TilePtr& Creature::getWalkingTile() { return g_map.getTile(m_lastStepToPosition); }
+
 int getSmoothedElevation(const Creature* creature, int currentElevation, float factor) {
     const auto& fromPos = creature->getLastStepFromPosition();
     const auto& toPos = creature->getLastStepToPosition();
@@ -857,16 +858,16 @@ int getSmoothedElevation(const Creature* creature, int currentElevation, float f
 }
 
 int Creature::getDrawElevation() {
+    const auto tile = m_walking ? getWalkingTile() : getTile();
     int elevation = 0;
-    if (m_walkingTile) {
-        elevation = m_walkingTile->getDrawElevation();
 
-        if (g_game.getFeature(Otc::GameSmoothWalkElevation)) {
+    if (tile) {
+        elevation = tile->getDrawElevation();
+        if (m_walking && g_game.getFeature(Otc::GameSmoothWalkElevation)) {
             const float factor = std::clamp<float>(getWalkTicksElapsed() / static_cast<float>(m_stepCache.getDuration(m_lastStepDirection)), .0f, 1.f);
             elevation = getSmoothedElevation(this, elevation, factor);
         }
-    } else if (const auto& tile = getTile())
-        elevation = tile->getDrawElevation();
+    }
 
     return elevation;
 }
