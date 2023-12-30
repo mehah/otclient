@@ -858,7 +858,7 @@ int getSmoothedElevation(const Creature* creature, int currentElevation, float f
 
 int Creature::getDrawElevation() {
     int elevation = 0;
-    if (m_walking) {
+    if (m_walkingTile) {
         elevation = m_walkingTile->getDrawElevation();
 
         if (g_game.getFeature(Otc::GameSmoothWalkElevation)) {
