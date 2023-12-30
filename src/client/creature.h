@@ -140,8 +140,6 @@ public:
 
     ticks_t getWalkTicksElapsed() { return m_walkTimer.ticksElapsed(); }
 
-    const TilePtr& getWalkingTile();
-
     bool isPassable() const { return m_passable; }
     bool isWalking() { return m_walking; }
     bool isRemoved() { return m_removed; }
@@ -261,6 +259,8 @@ private:
 
     Timer m_footTimer;
     Timer m_outfitColorTimer;
+
+    TilePtr m_walkingTile;
 
     Position m_lastStepFromPosition;
     Position m_lastStepToPosition;
