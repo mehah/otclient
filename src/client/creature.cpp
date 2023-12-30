@@ -858,10 +858,9 @@ int getSmoothedElevation(const Creature* creature, int currentElevation, float f
 }
 
 int Creature::getDrawElevation() {
-    const auto tile = m_walking ? getWalkingTile() : getTile();
     int elevation = 0;
 
-    if (tile) {
+    if (const auto tile = m_walking ? getWalkingTile() : getTile()) {
         elevation = tile->getDrawElevation();
         if (m_walking && g_game.getFeature(Otc::GameSmoothWalkElevation)) {
             const float factor = std::clamp<float>(getWalkTicksElapsed() / static_cast<float>(m_stepCache.getDuration(m_lastStepDirection)), .0f, 1.f);
