@@ -214,7 +214,11 @@ void MapView::drawCreatureInformation() {
     const bool alwaysTransparent = m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && _camera.coveredUp(m_posInfo.camera.z - m_floorMin);
 
     for (const auto& creature : m_cachedFloorVisibleCreatures) {
-        bool isCovered = creature->getTile()->isCovered(alwaysTransparent ? m_floorMin : m_cachedFirstVisibleFloor);
+        const auto& tile = creature->getTile();
+        if (!tile)
+            continue;
+
+        bool isCovered = tile->isCovered(alwaysTransparent ? m_floorMin : m_cachedFirstVisibleFloor);
         if (alwaysTransparent && isCovered) {
             const bool inRange = creature->getPosition().isInRange(m_posInfo.camera, g_gameConfig.getTileTransparentFloorViewRange(), g_gameConfig.getTileTransparentFloorViewRange(), true);
             isCovered = !inRange;
@@ -271,7 +275,7 @@ void MapView::drawForeground(const Rect& rect)
 
         tile->drawTexts(p);
 #endif
-    }
+}
 
     drawCreatureInformation();
 }
