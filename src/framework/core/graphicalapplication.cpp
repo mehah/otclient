@@ -272,7 +272,9 @@ void GraphicalApplication::poll()
 
 void GraphicalApplication::dispatchPoll()
 {
-    std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND)->getMutexPreDraw());
+    std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND)->getMutexPreDraw(),
+                       g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->getMutexPreDraw());
+
     Application::dispatchPoll();
 }
 
