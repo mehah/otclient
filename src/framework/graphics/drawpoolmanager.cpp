@@ -58,16 +58,9 @@ void DrawPoolManager::draw()
         g_painter->setResolution(m_size, m_transformMatrix);
     }
 
-    auto foregroundMap = get(DrawPoolType::FOREGROUND_MAP);
-
-    drawPool(DrawPoolType::MAP);
-    {
-        std::scoped_lock l(foregroundMap->getMutex());
-        drawPool(DrawPoolType::CREATURE_INFORMATION);
-    }
-    drawPool(DrawPoolType::LIGHT);
-    drawPool(DrawPoolType::FOREGROUND_MAP);
-    drawPool(DrawPoolType::FOREGROUND);
+    constexpr std::array<DrawPoolType, 5> pools = { DrawPoolType::MAP , DrawPoolType::CREATURE_INFORMATION, DrawPoolType::LIGHT, DrawPoolType::FOREGROUND_MAP,DrawPoolType::FOREGROUND };
+    for (const auto type : pools)
+        drawPool(type);
 }
 
 void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)
@@ -175,10 +168,6 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
 
     pool->resetState();
 
-    // when the selected pool is FOREGROUND_MAP, reset the creature information state.
-    if (type == DrawPoolType::FOREGROUND_MAP)
-        get(DrawPoolType::CREATURE_INFORMATION)->resetState();
-
     if (type == DrawPoolType::MAP)
         get(DrawPoolType::FOREGROUND_MAP_WIDGETS)->resetState();
 
@@ -191,9 +180,6 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
         pool->m_framebuffer->prepare(dest, src, colorClear);
 
     pool->release(pool->m_repaint = pool->canRepaint(true));
-
-    if (type == DrawPoolType::FOREGROUND_MAP)
-        get(DrawPoolType::CREATURE_INFORMATION)->release();
 
     if (type == DrawPoolType::MAP)
         get(DrawPoolType::FOREGROUND_MAP_WIDGETS)->release();

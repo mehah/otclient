@@ -38,8 +38,6 @@ protected:
     virtual void drawForgroundMap() = 0;
 
     virtual bool canDraw(DrawPoolType type) const = 0;
-    virtual bool canDrawUI() const = 0;
-    virtual bool canDrawTexts() const = 0;
     virtual bool isLoadingAsyncTexture() = 0;
     virtual bool isUsingProtobuf() = 0;
     virtual void onLoadingAsyncTextureChanged(bool loadingAsync) = 0;
@@ -138,8 +136,6 @@ protected:
     void inputEvent(const InputEvent& event);
 
 private:
-    bool canDrawTexts() const;
-
     bool m_onInputEvent{ false };
     bool m_optimize{ true };
     bool m_forceEffectOptimization{ false };
