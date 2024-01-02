@@ -403,7 +403,6 @@ void MapView::updateRect(const Rect& rect) {
         m_posInfo.drawOffset = m_posInfo.srcRect.topLeft();
         m_posInfo.horizontalStretchFactor = rect.width() / static_cast<float>(m_posInfo.srcRect.width());
         m_posInfo.verticalStretchFactor = rect.height() / static_cast<float>(m_posInfo.srcRect.height());
-        m_posInfo.scaleFactor = g_drawPool.getScaleFactor();
 
         const auto& mousePos = getPosition(g_window.getMousePosition());
         if (mousePos != m_mousePosition)
@@ -426,6 +425,8 @@ void MapView::updateGeometry(const Size& visibleDimension)
     }
 
     m_pool->setScaleFactor(scaleFactor);
+
+    m_posInfo.scaleFactor = scaleFactor;
 
     const uint16_t tileSize = g_gameConfig.getSpriteSize() * m_pool->getScaleFactor();
     const auto& drawDimension = visibleDimension + 3;

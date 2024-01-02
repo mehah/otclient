@@ -168,11 +168,10 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
     }
 
     // distance them
-    uint8_t offset = 12;
-    if (isLocalPlayer())
-        offset *= 2;
-
-    offset *= mapRect.scaleFactor;
+    uint8_t offset = 12 * mapRect.scaleFactor;
+    if (isLocalPlayer()) {
+        offset *= 2 * mapRect.scaleFactor;
+    }
 
     if (textRect.top() == parentRect.top())
         backgroundRect.moveTop(textRect.top() + offset);
