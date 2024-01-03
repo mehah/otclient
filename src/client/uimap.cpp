@@ -67,6 +67,11 @@ void UIMap::drawSelf(DrawPoolType drawPane)
             m_mapView->registerEvents();
             m_mapView->draw(mapRect);
         }, m_mapView->m_posInfo.rect, m_mapView->m_posInfo.srcRect, Color::black);
+    } else if (drawPane == DrawPoolType::CREATURE_INFORMATION) {
+        std::scoped_lock l(g_drawPool.get(drawPane)->getMutexPreDraw());
+        g_drawPool.preDraw(drawPane, [this] {
+            m_mapView->drawCreatureInformation();
+        });
     } else if (drawPane == DrawPoolType::FOREGROUND_MAP) {
         g_textDispatcher.poll();
         g_drawPool.preDraw(drawPane, [this, &mapRect] {

@@ -151,7 +151,7 @@ void GraphicalApplication::run()
         const auto& foregroundMap = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
 
         if (foregroundUI->canRepaint()) {
-            if (m_drawEvents && m_drawEvents->canDrawUI())
+            if (m_drawEvents && m_drawEvents->canDraw(DrawPoolType::FOREGROUND))
                 foregroundUICondition.notify_one();
             else
                 g_ui.render(DrawPoolType::FOREGROUND);
@@ -176,7 +176,7 @@ void GraphicalApplication::run()
         const auto& pool = g_drawPool.get(DrawPoolType::FOREGROUND);
         std::unique_lock lock(pool->getMutexPreDraw());
         foregroundUICondition.wait(lock, [this]() -> bool {
-            if (m_drawEvents && m_drawEvents->canDrawUI())
+            if (m_drawEvents && m_drawEvents->canDraw(DrawPoolType::FOREGROUND))
                 g_ui.render(DrawPoolType::FOREGROUND);
             return m_stopping;
         });
@@ -313,7 +313,6 @@ void GraphicalApplication::inputEvent(const InputEvent& event)
 
 void GraphicalApplication::repaintMap() { g_drawPool.get(DrawPoolType::MAP)->repaint(); }
 void GraphicalApplication::repaint() { g_drawPool.get(DrawPoolType::FOREGROUND)->repaint(); }
-bool GraphicalApplication::canDrawTexts() const { return m_drawText && (!m_drawEvents || m_drawEvents->canDrawTexts()); }
 bool GraphicalApplication::isLoadingAsyncTexture() { return m_loadingAsyncTexture || (m_drawEvents && m_drawEvents->isLoadingAsyncTexture()); }
 
 void GraphicalApplication::setLoadingAsyncTexture(bool v) {

@@ -201,11 +201,7 @@ void MapView::drawFloor()
 }
 
 void MapView::drawCreatureInformation() {
-    g_drawPool.select(DrawPoolType::CREATURE_INFORMATION);
     g_drawPool.scale(g_app.getCreatureInformationScale());
-
-    if (m_updateCreatures)
-        m_cachedFloorVisibleCreatures = g_map.getSightSpectators(m_posInfo.camera, false);
 
     uint32_t flags = Otc::DrawThings;
     if (m_drawNames) { flags |= Otc::DrawNames; }
@@ -215,9 +211,9 @@ void MapView::drawCreatureInformation() {
     Position _camera = m_posInfo.camera;
     const bool alwaysTransparent = m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && _camera.coveredUp(m_posInfo.camera.z - m_floorMin);
 
-    for (const auto& creature : m_cachedFloorVisibleCreatures) {
+    for (const auto& [uid, creature] : g_map.getCreatures()) {
         const auto& tile = creature->getTile();
-        if (!tile)
+        if (!tile || !m_posInfo.isInRange(creature->getPosition()))
             continue;
 
         bool isCovered = tile->isCovered(alwaysTransparent ? m_floorMin : m_cachedFirstVisibleFloor);
@@ -228,9 +224,6 @@ void MapView::drawCreatureInformation() {
 
         creature->drawInformation(m_posInfo, transformPositionTo2D(creature->getPosition()), isCovered, flags);
     }
-
-    // Go back to use foreground map pool
-    g_drawPool.select(DrawPoolType::FOREGROUND_MAP);
 }
 
 void MapView::drawForeground(const Rect& rect)
@@ -277,9 +270,7 @@ void MapView::drawForeground(const Rect& rect)
 
         tile->drawTexts(p);
 #endif
-}
-
-    drawCreatureInformation();
+    }
 }
 
 void MapView::updateVisibleTiles()
@@ -507,10 +498,6 @@ void MapView::onTileUpdate(const Position& pos, const ThingPtr& thing, const Otc
             m_lastHighlightTile = nullptr;
 
         requestUpdateVisibleTiles();
-    }
-
-    if (thing && thing->isCreature()) {
-        m_updateCreatures = true;
     }
 }
 

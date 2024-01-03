@@ -85,28 +85,23 @@ void Client::drawMap()
 
 void Client::drawForgroundMap()
 {
-    if (m_mapWidget)
+    if (m_mapWidget) {
+        m_mapWidget->drawSelf(DrawPoolType::CREATURE_INFORMATION);
         m_mapWidget->drawSelf(DrawPoolType::FOREGROUND_MAP);
+    }
 }
 
 bool Client::canDraw(DrawPoolType type) const
 {
     switch (type) {
+        case DrawPoolType::CREATURE_INFORMATION:
+        case DrawPoolType::FOREGROUND:
         case DrawPoolType::FOREGROUND_MAP:
             return g_game.isOnline();
+
         default:
             return false;
     }
-}
-
-bool Client::canDrawUI() const
-{
-    return g_game.isOnline();
-}
-
-bool Client::canDrawTexts() const
-{
-    return !g_map.getStaticTexts().empty() || !g_map.getAnimatedTexts().empty();
 }
 
 bool Client::isLoadingAsyncTexture()

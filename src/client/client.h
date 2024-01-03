@@ -41,8 +41,6 @@ public:
     void drawForgroundMap() override;
 
     bool canDraw(DrawPoolType type) const override;
-    bool canDrawUI() const override;
-    bool canDrawTexts() const override;
     bool isLoadingAsyncTexture() override;
     bool isUsingProtobuf() override;
 

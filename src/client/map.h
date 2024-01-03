@@ -303,6 +303,8 @@ public:
     int getMinimapColor(const Position& pos);
     bool isSightClear(const Position& fromPos, const Position& toPos);
 
+    const auto& getCreatures() const { return m_knownCreatures; }
+
 private:
     struct FloorData
     {
