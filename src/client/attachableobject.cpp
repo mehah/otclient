@@ -37,6 +37,13 @@
 
 extern ParticleManager g_particles;
 
+AttachableObject::~AttachableObject()
+{
+    clearAttachedEffects();
+    clearAttachedParticlesEffect();
+    clearAttachedWidgets();
+}
+
 void AttachableObject::attachEffect(const AttachedEffectPtr& obj)
 {
     if (!obj)
@@ -219,6 +226,9 @@ void AttachableObject::attachWidget(const UIWidgetPtr& widget) {
     m_attachedWidgets.emplace_back(widget);
     g_map.addAttachedWidgetToObject(widget, std::static_pointer_cast<AttachableObject>(shared_from_this()));
     widget->callLuaField("onAttached", asLuaObject());
+    widget->addOnDestroyCallback("attached-widget-destroy", [this, widget]() {
+        detachWidget(widget);
+    });
 }
 
 bool AttachableObject::detachWidgetById(const std::string& id)
@@ -232,6 +242,7 @@ bool AttachableObject::detachWidgetById(const std::string& id)
     const auto widget = (*it);
     m_attachedWidgets.erase(it);
     g_map.removeAttachedWidgetFromObject(widget);
+    widget->removeOnDestroyCallback("attached-widget-destroy");
     widget->callLuaField("onDetached", asLuaObject());
     return true;
 }
@@ -244,6 +255,7 @@ bool AttachableObject::detachWidget(const UIWidgetPtr& widget)
 
     m_attachedWidgets.erase(it);
     g_map.removeAttachedWidgetFromObject(widget);
+    widget->removeOnDestroyCallback("attached-widget-destroy");
     widget->callLuaField("onDetached", asLuaObject());
     return true;
 }
@@ -256,6 +268,7 @@ void AttachableObject::clearAttachedWidgets()
 
     for (const auto& widget : oldList) {
         g_map.removeAttachedWidgetFromObject(widget);
+        widget->removeOnDestroyCallback("attached-widget-destroy");
         widget->callLuaField("onDetached", asLuaObject());
     }
 }

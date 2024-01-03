@@ -28,7 +28,7 @@ class AttachableObject : public LuaObject
 {
 public:
     AttachableObject() = default;
-    virtual ~AttachableObject() = default;
+    virtual ~AttachableObject();
 
     virtual LuaObjectPtr attachedObjectToLuaObject() = 0;
     virtual bool isTile() { return false; }

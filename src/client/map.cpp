@@ -1154,14 +1154,8 @@ bool Map::removeAttachedWidgetFromObject(const UIWidgetPtr& widget) {
 
 void Map::updateAttachedWidgets(const MapViewPtr& mapView)
 {
-    if (m_attachedObjectWidgetMap.empty())
-        return;
-
-    std::vector<AttachableObjectPtr> toRemove;
     for (const auto& [widget, object] : m_attachedObjectWidgetMap) {
         if (widget->isDestroyed()) {
-            toRemove.emplace_back(object);
-            //object->removeAttachedWidget(widget); // Should we remove this widget from object?
             continue;
         }
 
@@ -1203,9 +1197,6 @@ void Map::updateAttachedWidgets(const MapViewPtr& mapView)
 
         widget->setRect(newWidgetRect);
     }
-
-    // for (const auto& widget : toRemove)
-    //     removeAttachedWidgetFromObject(widget);
 }
 
 #ifndef BOT_PROTECTION
