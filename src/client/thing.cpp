@@ -97,6 +97,3 @@ void Thing::setShader(const std::string_view name) {
     m_shader = g_shaders.getShader(name.data());
 }
 
-void Thing::drawWidgets(const MapPosInfo& mapRect) {
-    drawAttachedWidgets(m_lastDrawDest, mapRect);
-}

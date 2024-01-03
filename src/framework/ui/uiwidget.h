@@ -103,12 +103,11 @@ protected:
     OTMLNodePtr m_style;
 
     stdext::map<std::string, UIWidgetPtr> m_childrenById;
+    std::unordered_map<std::string, std::function<void()>> m_onDestroyCallbacks;
 
     Timer m_clickTimer;
     Fw::FocusReason m_lastFocusReason{ Fw::ActiveFocusReason };
     Fw::AutoFocusPolicy m_autoFocusPolicy{ Fw::AutoFocusLast };
-
-    bool m_attached{ false };
 
     friend class UIGridLayout;
     friend class UIHorizontalLayout;
@@ -205,10 +204,9 @@ public:
     void setProp(FlagProp prop, bool v);
     bool hasProp(FlagProp prop) { return (m_flagsProp & prop); }
 
-    bool isAttached() { return m_attached; }
-    void setAttached(bool attached) { m_attached = attached; }
-
     void disableUpdateTemporarily();
+    void addOnDestroyCallback(const std::string& id, const std::function<void()>&& callback);
+    void removeOnDestroyCallback(const std::string&);
 
 private:
     uint32_t m_flagsProp{ 0 };

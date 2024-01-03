@@ -859,11 +859,16 @@ void UIWidget::internalDestroy()
         child->internalDestroy();
     m_children.clear();
 
+    for (const auto& [id, destroyCallback] : m_onDestroyCallbacks)
+        destroyCallback();
+    m_onDestroyCallbacks.clear();
+
     callLuaField("onDestroy");
 
     releaseLuaFieldsTable();
 
     g_ui.onWidgetDestroy(static_self_cast<UIWidget>());
+
 }
 
 void UIWidget::destroy()
@@ -1992,4 +1997,16 @@ void UIWidget::disableUpdateTemporarily() {
         self->m_layout->update();
         self->setProp(PropDisableUpdateTemporarily, false);
     });
+}
+
+void UIWidget::addOnDestroyCallback(const std::string& id, const std::function<void()>&& callback)
+{
+    m_onDestroyCallbacks.emplace(id, callback);
+}
+
+void UIWidget::removeOnDestroyCallback(const std::string& id)
+{
+    auto it = m_onDestroyCallbacks.find(id);
+    if (it != m_onDestroyCallbacks.end())
+        m_onDestroyCallbacks.erase(it);
 }

@@ -168,9 +168,6 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
 
     pool->resetState();
 
-    if (type == DrawPoolType::MAP)
-        get(DrawPoolType::FOREGROUND_MAP_WIDGETS)->resetState();
-
     if (f) f();
 
     std::scoped_lock l(pool->m_mutexDraw);
@@ -180,9 +177,6 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
         pool->m_framebuffer->prepare(dest, src, colorClear);
 
     pool->release(pool->m_repaint = pool->canRepaint(true));
-
-    if (type == DrawPoolType::MAP)
-        get(DrawPoolType::FOREGROUND_MAP_WIDGETS)->release();
 }
 
 bool DrawPoolManager::drawPool(const DrawPoolType type) {

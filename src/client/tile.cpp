@@ -83,12 +83,6 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, LightVi
     drawTop(dest, flags, false, lightView);
     drawAttachedEffect(dest, lightView, false);
     drawAttachedParticlesEffect(dest);
-
-    for (const auto& thing : m_things) {
-        thing->drawWidgets(mapRect);
-    }
-
-    drawWidgets(mapRect);
 }
 
 void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags, bool forceDraw, LightView* lightView)
@@ -128,11 +122,6 @@ void Tile::drawTop(const Point& dest, int flags, bool forceDraw, LightView* ligh
             item->draw(dest, flags & Otc::DrawThings, lightView);
         }
     }
-}
-
-void Tile::drawWidgets(const MapPosInfo& mapRect)
-{
-    drawAttachedWidgets(m_lastDrawDest, mapRect);
 }
 
 void Tile::clean()

@@ -24,14 +24,16 @@
 #include "attachedeffect.h"
 #include <framework/luaengine/luaobject.h>
 
-struct MapPosInfo;
-
 class AttachableObject : public LuaObject
 {
 public:
     AttachableObject() = default;
-    virtual ~AttachableObject() = default;
-    
+    virtual ~AttachableObject();
+
+    virtual LuaObjectPtr attachedObjectToLuaObject() = 0;
+    virtual bool isTile() { return false; }
+    virtual bool isThing() { return false; }
+
     void attachEffect(const AttachedEffectPtr& obj);
     void clearAttachedEffects();
     void clearTemporaryAttachedEffects();
@@ -39,7 +41,6 @@ public:
     bool detachEffectById(uint16_t id);
     AttachedEffectPtr getAttachedEffectById(uint16_t id);
 
-    virtual LuaObjectPtr attachedObjectToLuaObject() = 0;
     virtual void onStartAttachEffect(const AttachedEffectPtr& effect) { };
     virtual void onDispatcherAttachEffect(const AttachedEffectPtr& effect) { };
     virtual void onStartDetachEffect(const AttachedEffectPtr& effect) { };
@@ -55,6 +56,7 @@ public:
 
     const std::vector<UIWidgetPtr>& getAttachedWidgets() { return m_attachedWidgets; };
     bool hasAttachedWidgets() { return !m_attachedWidgets.empty(); };
+    bool isWidgetAttached(const UIWidgetPtr& widget);
     void attachWidget(const UIWidgetPtr& widget);
     void clearAttachedWidgets();
     bool detachWidgetById(const std::string& id);
@@ -65,7 +67,6 @@ protected:
     void drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop);
     void onDetachEffect(const AttachedEffectPtr& effect);
     void drawAttachedParticlesEffect(const Point& dest);
-    void drawAttachedWidgets(const Point& dest, const MapPosInfo& mapRect);
 
     std::vector<AttachedEffectPtr> m_attachedEffects;
     std::vector<ParticleEffectPtr> m_attachedParticles;

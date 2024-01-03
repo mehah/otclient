@@ -53,6 +53,7 @@ void UIMap::drawSelf(DrawPoolType drawPane)
 {
     UIWidget::drawSelf(drawPane);
 
+    const auto& mapRect = g_app.isScaled() ? Rect(0, 0, g_graphics.getViewportSize()) : m_mapRect;
     if (drawPane == DrawPoolType::FOREGROUND) {
         g_drawPool.addBoundingRect(m_mapRect.expanded(1), Color::black);
         g_drawPool.addAction([] {glDisable(GL_BLEND); });
@@ -60,8 +61,6 @@ void UIMap::drawSelf(DrawPoolType drawPane)
         g_drawPool.addAction([] {glEnable(GL_BLEND); });
         return;
     }
-
-    const auto& mapRect = g_app.isScaled() ? Rect(0, 0, g_graphics.getViewportSize()) : m_mapRect;
 
     if (drawPane == DrawPoolType::MAP) {
         g_drawPool.preDraw(drawPane, [this, &mapRect] {

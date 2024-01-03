@@ -31,12 +31,18 @@
 
 #include "client.h"
 #include "game.h"
-#include "mapview.h"
+#include "map.h"
 #include "tile.h"
 #include "uimap.h"
-#include "mapview.h"
 
 extern ParticleManager g_particles;
+
+AttachableObject::~AttachableObject()
+{
+    clearAttachedEffects();
+    clearAttachedParticlesEffect();
+    clearAttachedWidgets();
+}
 
 void AttachableObject::attachEffect(const AttachedEffectPtr& obj)
 {
@@ -95,25 +101,25 @@ void AttachableObject::clearAttachedEffects()
 void AttachableObject::clearTemporaryAttachedEffects()
 {
     m_attachedEffects.erase(std::remove_if(m_attachedEffects.begin(), m_attachedEffects.end(),
-        [&](const AttachedEffectPtr& obj) {
-            if (!obj->isPermanent()) {
-                onDetachEffect(obj);
-                return true;
-            }
-            return false;
-        }), m_attachedEffects.end());
+                            [&](const AttachedEffectPtr& obj) {
+        if (!obj->isPermanent()) {
+            onDetachEffect(obj);
+            return true;
+        }
+        return false;
+    }), m_attachedEffects.end());
 }
 
 void AttachableObject::clearPermanentAttachedEffects()
 {
     m_attachedEffects.erase(std::remove_if(m_attachedEffects.begin(), m_attachedEffects.end(),
-        [&](const AttachedEffectPtr& obj) {
-            if (obj->isPermanent()) {
-                onDetachEffect(obj);
-                return true;
-            }
-            return false;
-        }), m_attachedEffects.end());
+                            [&](const AttachedEffectPtr& obj) {
+        if (obj->isPermanent()) {
+            onDetachEffect(obj);
+            return true;
+        }
+        return false;
+    }), m_attachedEffects.end());
 }
 
 AttachedEffectPtr AttachableObject::getAttachedEffectById(uint16_t id)
@@ -201,24 +207,28 @@ void AttachableObject::updateAndAttachParticlesEffects(std::vector<std::string>&
         attachParticleEffect(name);
 }
 
-void AttachableObject::attachWidget(const UIWidgetPtr& widget)
-{
-    if (!widget)
+bool AttachableObject::isWidgetAttached(const UIWidgetPtr& widget) {
+    return std::find_if(m_attachedWidgets.begin(), m_attachedWidgets.end(),
+                        [widget](const UIWidgetPtr& obj) { return obj == widget; }) != m_attachedWidgets.end();
+}
+
+void AttachableObject::attachWidget(const UIWidgetPtr& widget) {
+    if (!widget || isWidgetAttached(widget))
         return;
 
-    const auto& mapWidget = g_client.getMapWidget();
-    if (!mapWidget)
-        return;
-
-    if (widget->isAttached()) {
-        g_logger.error(stdext::format("Failed to attach widget %s, this widget is already attached to other object.", widget->getId()));
+    if (g_map.isWidgetAttached(widget)) {
+        g_logger.error(stdext::format("Failed to attach widget %s, this widget is already attached to map.", widget->getId()));
         return;
     }
 
     widget->setDraggable(false);
-    widget->setAttached(true);
+    widget->setParent(g_client.getMapWidget());
     m_attachedWidgets.emplace_back(widget);
+    g_map.addAttachedWidgetToObject(widget, std::static_pointer_cast<AttachableObject>(shared_from_this()));
     widget->callLuaField("onAttached", asLuaObject());
+    widget->addOnDestroyCallback("attached-widget-destroy", [this, widget]() {
+        detachWidget(widget);
+    });
 }
 
 bool AttachableObject::detachWidgetById(const std::string& id)
@@ -231,9 +241,8 @@ bool AttachableObject::detachWidgetById(const std::string& id)
 
     const auto widget = (*it);
     m_attachedWidgets.erase(it);
-
-    widget->setAttached(false);
-    widget->setVisible(false);
+    g_map.removeAttachedWidgetFromObject(widget);
+    widget->removeOnDestroyCallback("attached-widget-destroy");
     widget->callLuaField("onDetached", asLuaObject());
     return true;
 }
@@ -245,9 +254,8 @@ bool AttachableObject::detachWidget(const UIWidgetPtr& widget)
         return false;
 
     m_attachedWidgets.erase(it);
-
-    widget->setAttached(false);
-    widget->setVisible(false);
+    g_map.removeAttachedWidgetFromObject(widget);
+    widget->removeOnDestroyCallback("attached-widget-destroy");
     widget->callLuaField("onDetached", asLuaObject());
     return true;
 }
@@ -259,8 +267,8 @@ void AttachableObject::clearAttachedWidgets()
     m_attachedWidgets.clear();
 
     for (const auto& widget : oldList) {
-        widget->setAttached(false);
-        widget->setVisible(false);
+        g_map.removeAttachedWidgetFromObject(widget);
+        widget->removeOnDestroyCallback("attached-widget-destroy");
         widget->callLuaField("onDetached", asLuaObject());
     }
 }
@@ -274,45 +282,4 @@ UIWidgetPtr AttachableObject::getAttachedWidgetById(const std::string& id)
         return nullptr;
 
     return *it;
-}
-
-void AttachableObject::drawAttachedWidgets(const Point& dest, const MapPosInfo& mapRect)
-{
-    if (m_attachedWidgets.empty())
-        return;
-
-    g_drawPool.select(DrawPoolType::FOREGROUND_MAP_WIDGETS);
-    {
-        std::vector<UIWidgetPtr> toRemove;
-        for (const auto& widget : m_attachedWidgets) {
-            if (widget->isDestroyed()) {
-                toRemove.emplace_back(widget);
-                continue;
-            }
-
-            if (!widget->isVisible())
-                continue;
-
-            Point p = dest - mapRect.drawOffset;
-            p.x *= mapRect.horizontalStretchFactor;
-            p.y *= mapRect.verticalStretchFactor;
-            p += mapRect.rect.topLeft();
-
-            p.x += widget->getMarginLeft();
-            p.x -= widget->getMarginRight();
-            p.y += widget->getMarginTop();
-            p.y -= widget->getMarginBottom();
-
-            const auto& widgetRect = widget->getRect();
-            const auto& rect = Rect(p, widgetRect.width(), widgetRect.height());
-
-            widget->setRect(rect);
-            widget->draw(mapRect.rect, DrawPoolType::FOREGROUND);
-        }
-
-        for (const auto& widget : toRemove)
-            detachWidget(widget);
-    }
-    // Go back to use map pool
-    g_drawPool.select(DrawPoolType::MAP);
 }

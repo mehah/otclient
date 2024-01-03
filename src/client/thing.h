@@ -37,9 +37,9 @@ class Thing : public AttachableObject
 {
 public:
     virtual void draw(const Point& /*dest*/, bool drawThings = true, LightView* /*lightView*/ = nullptr) {}
-    void drawWidgets(const MapPosInfo& mapRect);
 
     LuaObjectPtr attachedObjectToLuaObject() override { return asLuaObject(); }
+    bool isThing() override { return true; }
 
     virtual void setId(uint32_t /*id*/) {}
     virtual void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false);
@@ -219,8 +219,6 @@ protected:
 
     Color m_markedColor{ Color::white };
     Color m_highlightColor{ Color::white };
-
-    Point m_lastDrawDest;
 
     // Shader
     PainterShaderProgramPtr m_shader;
