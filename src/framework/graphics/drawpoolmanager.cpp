@@ -58,9 +58,9 @@ void DrawPoolManager::draw()
         g_painter->setResolution(m_size, m_transformMatrix);
     }
 
-    constexpr std::array<DrawPoolType, 5> pools = { DrawPoolType::MAP , DrawPoolType::CREATURE_INFORMATION, DrawPoolType::LIGHT, DrawPoolType::FOREGROUND_MAP,DrawPoolType::FOREGROUND };
-    for (const auto type : pools)
-        drawPool(type);
+    for (int8_t i = -1; ++i < static_cast<uint8_t>(DrawPoolType::LAST);) {
+        drawPool(static_cast<DrawPoolType>(i));
+    }
 }
 
 void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)
