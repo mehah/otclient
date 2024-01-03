@@ -1136,7 +1136,6 @@ bool Map::isWidgetAttached(const UIWidgetPtr& widget) const {
 }
 
 void Map::addAttachedWidgetToObject(const UIWidgetPtr& widget, const AttachableObjectPtr& object) {
-    std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->getMutexPreDraw());
     if (isWidgetAttached(widget))
         return;
 
@@ -1144,8 +1143,6 @@ void Map::addAttachedWidgetToObject(const UIWidgetPtr& widget, const AttachableO
 }
 
 bool Map::removeAttachedWidgetFromObject(const UIWidgetPtr& widget) {
-    std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->getMutexPreDraw());
-
     // remove elemnt form unordered map
     const auto it = m_attachedObjectWidgetMap.find(widget);
     if (it == m_attachedObjectWidgetMap.end())
