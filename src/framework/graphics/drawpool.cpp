@@ -38,7 +38,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
             pool->m_temporaryFramebuffers.emplace_back(std::make_shared<FrameBuffer>());
         }
     } else {
-        pool->m_alwaysGroupDrawings = type != DrawPoolType::FOREGROUND_MAP_WIDGETS; // CREATURE_INFORMATION & TEXT
+        pool->m_alwaysGroupDrawings = true; // CREATURE_INFORMATION & TEXT
 
         if (type == DrawPoolType::FOREGROUND_MAP) {
             pool->setFPS(FPS60);

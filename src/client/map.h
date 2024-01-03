@@ -217,6 +217,11 @@ public:
     void addAnimatedText(const AnimatedTextPtr& txt, const Position& pos);
     bool removeAnimatedText(const AnimatedTextPtr& txt);
 
+    bool isWidgetAttached(const UIWidgetPtr& widget) const;
+    void addAttachedWidgetToObject(const UIWidgetPtr& widget, const AttachableObjectPtr& object);
+    bool removeAttachedWidgetFromObject(const UIWidgetPtr& widget);
+    void updateAttachedWidgets(const MapViewPtr& mapView);
+
     void colorizeThing(const ThingPtr& thing, const Color& color);
     void removeThingColor(const ThingPtr& thing);
 
@@ -316,6 +321,8 @@ private:
     std::vector<MapViewPtr> m_mapViews;
 
     std::unordered_map<uint32_t, CreaturePtr> m_knownCreatures;
+
+    std::unordered_map<UIWidgetPtr, AttachableObjectPtr> m_attachedObjectWidgetMap;
 
 #ifdef FRAMEWORK_EDITOR
     std::unordered_map<Position, std::string, Position::Hasher> m_waypoints;

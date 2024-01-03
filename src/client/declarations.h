@@ -49,6 +49,7 @@ class ThingType;
 class ItemType;
 class TileBlock;
 class AttachedEffect;
+class AttachableObject;
 
 #ifdef FRAMEWORK_EDITOR
 class House;
@@ -75,6 +76,7 @@ using StaticTextPtr = std::shared_ptr<StaticText>;
 using ThingTypePtr = std::shared_ptr<ThingType>;
 using ItemTypePtr = std::shared_ptr<ItemType>;
 using AttachedEffectPtr = std::shared_ptr<AttachedEffect>;
+using AttachableObjectPtr = std::shared_ptr<AttachableObject>;
 
 #ifdef FRAMEWORK_EDITOR
 using HousePtr = std::shared_ptr<House>;

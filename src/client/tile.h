@@ -95,10 +95,10 @@ public:
     Tile(const Position& position);
 
     LuaObjectPtr attachedObjectToLuaObject() override { return asLuaObject(); }
+    bool isTile() override { return true; }
 
     void onAddInMapView();
     void draw(const Point& dest, const MapPosInfo& mapRect, int flags, LightView* lightView = nullptr);
-    void drawWidgets(const MapPosInfo& rect);
 
     void clean();
 

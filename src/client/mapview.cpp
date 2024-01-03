@@ -112,6 +112,8 @@ void MapView::preLoad() {
             m_fadeFinish = true;
         }
     }
+
+    g_map.updateAttachedWidgets(static_self_cast<MapView>());
 }
 
 void MapView::draw(const Rect& rect)

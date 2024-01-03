@@ -33,6 +33,7 @@
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/graphicalapplication.h>
 #include <framework/core/eventdispatcher.h>
+#include <framework/ui/uiwidget.h>
 #include <queue>
 
 #ifdef FRAMEWORK_EDITOR
@@ -1128,6 +1129,74 @@ bool Map::isSightClear(const Position& fromPos, const Position& toPos)
     }
 
     return true;
+}
+
+bool Map::isWidgetAttached(const UIWidgetPtr& widget) const {
+    return m_attachedObjectWidgetMap.find(widget) != m_attachedObjectWidgetMap.end();
+}
+
+void Map::addAttachedWidgetToObject(const UIWidgetPtr& widget, const AttachableObjectPtr& object) {
+    if (isWidgetAttached(widget))
+        return;
+
+    m_attachedObjectWidgetMap.emplace(widget, object);
+}
+
+bool Map::removeAttachedWidgetFromObject(const UIWidgetPtr& widget) {
+    // remove elemnt form unordered map
+    const auto it = m_attachedObjectWidgetMap.find(widget);
+    if (it == m_attachedObjectWidgetMap.end())
+        return false;
+
+    m_attachedObjectWidgetMap.erase(it);
+    return true;
+}
+
+void Map::updateAttachedWidgets(const MapViewPtr& mapView)
+{
+    for (const auto& [widget, object] : m_attachedObjectWidgetMap) {
+        if (widget->isDestroyed()) {
+            continue;
+        }
+
+        if (!widget->isVisible())
+            continue;
+
+        Position pos;
+        if (object->isTile()) {
+            const auto& tile = object->static_self_cast<Tile>();
+            pos = tile->getPosition();
+        } else if (object->isThing()) {
+            const auto& thing = object->static_self_cast<Thing>();
+            pos = thing->getPosition();
+        }
+
+        if (!pos.isValid())
+            continue;
+
+        Point p = mapView->transformPositionTo2D(pos) - mapView->m_posInfo.drawOffset;
+
+        if (object->isThing() && object->static_self_cast<Thing>()->isCreature()) {
+            const auto& creature = object->static_self_cast<Thing>()->static_self_cast<Creature>();
+            const auto& jumpOffset = creature->getJumpOffset() * g_drawPool.getScaleFactor();
+            const auto& creatureOffset = Point(16 - creature->getDisplacementX(), -creature->getDisplacementY() - 2) + creature->getWalkOffset();
+            p += creatureOffset * g_drawPool.getScaleFactor() - Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
+        }
+
+        p.x *= mapView->m_posInfo.horizontalStretchFactor;
+        p.y *= mapView->m_posInfo.verticalStretchFactor;
+        p += mapView->m_posInfo.rect.topLeft();
+
+        p.x += widget->getMarginLeft();
+        p.x -= widget->getMarginRight();
+        p.y += widget->getMarginTop();
+        p.y -= widget->getMarginBottom();
+
+        const auto& widgetRect = widget->getRect();
+        const auto& newWidgetRect = Rect(p, widgetRect.width(), widgetRect.height());
+
+        widget->setRect(newWidgetRect);
+    }
 }
 
 #ifndef BOT_PROTECTION
