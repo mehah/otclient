@@ -269,13 +269,6 @@ void GraphicalApplication::poll()
         g_textDispatcher.poll();
     }
 }
-
-void GraphicalApplication::dispatchPoll()
-{
-    std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND)->getMutexPreDraw());
-    Application::dispatchPoll();
-}
-
 void GraphicalApplication::mainPoll()
 {
     g_clock.update();

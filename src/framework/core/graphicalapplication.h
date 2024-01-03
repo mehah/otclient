@@ -75,7 +75,6 @@ public:
     void terminate() override;
     void run() override;
     void poll() override;
-    void dispatchPoll() override;
     void mainPoll();
     void close() override;
 
@@ -95,7 +94,7 @@ public:
 #else
         return false;
 #endif
-}
+    }
     bool isForcedEffectOptimization() { return m_forceEffectOptimization; }
 
     void optimize(const bool optimize) { m_optimize = optimize; }

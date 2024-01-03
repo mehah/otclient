@@ -216,7 +216,11 @@ void MapView::drawCreatureInformation() {
     const bool alwaysTransparent = m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && _camera.coveredUp(m_posInfo.camera.z - m_floorMin);
 
     for (const auto& creature : m_cachedFloorVisibleCreatures) {
-        bool isCovered = creature->getTile()->isCovered(alwaysTransparent ? m_floorMin : m_cachedFirstVisibleFloor);
+        const auto& tile = creature->getTile();
+        if (!tile)
+            continue;
+
+        bool isCovered = tile->isCovered(alwaysTransparent ? m_floorMin : m_cachedFirstVisibleFloor);
         if (alwaysTransparent && isCovered) {
             const bool inRange = creature->getPosition().isInRange(m_posInfo.camera, g_gameConfig.getTileTransparentFloorViewRange(), g_gameConfig.getTileTransparentFloorViewRange(), true);
             isCovered = !inRange;
@@ -273,7 +277,7 @@ void MapView::drawForeground(const Rect& rect)
 
         tile->drawTexts(p);
 #endif
-    }
+}
 
     drawCreatureInformation();
 }
@@ -401,7 +405,6 @@ void MapView::updateRect(const Rect& rect) {
         m_posInfo.drawOffset = m_posInfo.srcRect.topLeft();
         m_posInfo.horizontalStretchFactor = rect.width() / static_cast<float>(m_posInfo.srcRect.width());
         m_posInfo.verticalStretchFactor = rect.height() / static_cast<float>(m_posInfo.srcRect.height());
-        m_posInfo.scaleFactor = g_drawPool.getScaleFactor();
 
         const auto& mousePos = getPosition(g_window.getMousePosition());
         if (mousePos != m_mousePosition)
@@ -424,6 +427,8 @@ void MapView::updateGeometry(const Size& visibleDimension)
     }
 
     m_pool->setScaleFactor(scaleFactor);
+
+    m_posInfo.scaleFactor = scaleFactor;
 
     const uint16_t tileSize = g_gameConfig.getSpriteSize() * m_pool->getScaleFactor();
     const auto& drawDimension = visibleDimension + 3;

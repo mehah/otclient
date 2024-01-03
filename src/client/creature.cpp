@@ -168,11 +168,10 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
     }
 
     // distance them
-    uint8_t offset = 12;
-    if (isLocalPlayer())
-        offset *= 2;
-
-    offset *= mapRect.scaleFactor;
+    uint8_t offset = 12 * mapRect.scaleFactor;
+    if (isLocalPlayer()) {
+        offset *= 2 * mapRect.scaleFactor;
+    }
 
     if (textRect.top() == parentRect.top())
         backgroundRect.moveTop(textRect.top() + offset);
@@ -857,7 +856,7 @@ int getSmoothedElevation(const Creature* creature, int currentElevation, float f
 
 int Creature::getDrawElevation() {
     int elevation = 0;
-    if (m_walking) {
+    if (m_walkingTile) {
         elevation = m_walkingTile->getDrawElevation();
 
         if (g_game.getFeature(Otc::GameSmoothWalkElevation)) {

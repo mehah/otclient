@@ -37,7 +37,7 @@ protected:
     uint8_t m_asyncDispatchMaxThreads;
 };
 
- //@bindsingleton g_app
+//@bindsingleton g_app
 class Application
 {
 public:
@@ -48,7 +48,6 @@ public:
     virtual void terminate();
     virtual void run() = 0;
     virtual void poll();
-    virtual void dispatchPoll();
     virtual void exit();
     virtual void close();
     virtual void restart();
