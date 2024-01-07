@@ -43,6 +43,8 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
     m_null = false;
     m_id = clientId;
     m_category = category;
+    m_name = appearance.name();
+    m_description = appearance.description();
 
     const appearances::AppearanceFlags& flags = appearance.flags();
 
@@ -196,7 +198,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
         m_market.category = static_cast<ITEM_CATEGORY>(flags.market().category());
         m_market.tradeAs = flags.market().trade_as_object_id();
         m_market.showAs = flags.market().show_as_object_id();
-        m_market.name = flags.market().name();
+        m_market.name = m_name;
 
         for (const int32_t voc : flags.market().restrict_to_profession()) {
             m_market.restrictVocation |= voc;

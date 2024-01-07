@@ -393,6 +393,9 @@ public:
     int getExactHeight();
     TexturePtr getTexture(int animationPhase);
 
+    std::string getName() { return m_name; }
+    std::string getDescription() { return m_description; }
+
 private:
     static ThingFlagAttr thingAttrToThingFlagAttr(ThingAttr attr);
     static Size getBestTextureDimension(int w, int h, int count);
@@ -462,4 +465,7 @@ private:
     std::atomic_bool m_loading;
 
     Timer m_lastTimeUsage;
+
+    std::string m_name;
+    std::string m_description;
 };

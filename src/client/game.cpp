@@ -1684,3 +1684,10 @@ void Game::closeImbuingWindow()
         return;
     m_protocolGame->sendCloseImbuingWindow();
 }
+
+void Game::stashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos)
+{
+    if (!canPerformGameAction())
+        return;
+    m_protocolGame->sendStashWithdraw(itemId, count, stackpos);
+}
