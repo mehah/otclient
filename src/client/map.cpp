@@ -1115,7 +1115,7 @@ bool Map::isSightClear(const Position& fromPos, const Position& toPos)
         }
 
         auto tile = getTile(Position(start.x, start.y, start.z));
-        if (tile && tile->isLookPossible()) {
+        if (tile && !tile->isLookPossible()) {
             return false;
         }
     }
