@@ -414,8 +414,9 @@ ThingPtr Tile::getTopUseThing()
             return thing;
     }
 
-    for (const auto& thing : m_things) {
-        if (!thing->isGround() && !thing->isCreature() && !thing->isSplash())
+    for (uint i = m_things.size() - 1; i > 0; --i) {
+        ThingPtr thing = m_things[i];
+        if (!thing->isSplash() && !thing->isCreature())
             return thing;
     }
 
