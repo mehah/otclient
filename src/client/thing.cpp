@@ -42,6 +42,10 @@ void Thing::setPosition(const Position& position, uint8_t stackPos, bool hasElev
 
 int Thing::getStackPriority()
 {
+    // Bug fix for old versions
+    if (g_game.getClientVersion() <= 800 && isSplash())
+        return STACK_PRIORITY::GROUND;
+	
     if (isGround())
         return STACK_PRIORITY::GROUND;
 

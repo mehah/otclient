@@ -224,7 +224,7 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
         if (stackPos == -2)
             append = true;
         else {
-            append = priority <= 3;
+            append = (priority <= 3);
 
             // newer protocols does not store creatures in reverse order
             if (g_game.getClientVersion() >= 854 && priority == 4)
@@ -415,7 +415,7 @@ ThingPtr Tile::getTopUseThing()
     }
 
     for (const auto& thing : m_things) {
-        if (!thing->isGround() && !thing->isGroundBorder() && !thing->isCreature() && !thing->isSplash())
+        if (!thing->isGround() && !thing->isCreature() && !thing->isSplash())
             return thing;
     }
 
