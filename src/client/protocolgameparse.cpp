@@ -1243,12 +1243,12 @@ void ProtocolGame::parsePlayerGoods(const InputMessagePtr& msg) const
     if (g_game.getClientVersion() >= 1281) {
         money = m_localPlayer->getResourceBalance(Otc::RESOURCE_BANK_BALANCE) + m_localPlayer->getResourceBalance(Otc::RESOURCE_GOLD_EQUIPPED);
     } else {
-	    if (g_game.getClientVersion() >= 973) {
-			money = msg->getU64();
-		} else {
-			money = msg->getU32();
-		}
-	}
+        if (g_game.getClientVersion() >= 973) {
+            money = msg->getU64();
+        } else {
+            money = msg->getU32();
+        }
+    }
 
     const uint8_t size = msg->getU8();
     for (int_fast32_t i = -1; ++i < size;) {
