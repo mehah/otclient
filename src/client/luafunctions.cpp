@@ -362,6 +362,7 @@ void Client::registerLuaFunctions()
 
     g_lua.registerSingletonClass("g_gameConfig");
     g_lua.bindSingletonFunction("g_gameConfig", "loadFonts", &GameConfig::loadFonts, &g_gameConfig);
+    g_lua.bindSingletonFunction("g_gameConfig", "getSpriteSize", &GameConfig::getSpriteSize, &g_gameConfig);
 
     g_lua.registerSingletonClass("g_client");
     g_lua.bindSingletonFunction("g_client", "setEffectAlpha", &Client::setEffectAlpha, &g_client);
@@ -401,6 +402,7 @@ void Client::registerLuaFunctions()
     g_lua.registerClass<AttachableObject>();
     g_lua.bindClassMemberFunction<AttachableObject>("getAttachedEffects", &AttachableObject::getAttachedEffects);
     g_lua.bindClassMemberFunction<AttachableObject>("attachEffect", &AttachableObject::attachEffect);
+    g_lua.bindClassMemberFunction<AttachableObject>("detachEffect", &AttachableObject::detachEffect);
     g_lua.bindClassMemberFunction<AttachableObject>("detachEffectById", &AttachableObject::detachEffectById);
     g_lua.bindClassMemberFunction<AttachableObject>("getAttachedEffectById", &AttachableObject::getAttachedEffectById);
     g_lua.bindClassMemberFunction<AttachableObject>("clearAttachedEffects", &AttachableObject::clearAttachedEffects);
@@ -701,6 +703,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Missile>("setPath", &Missile::setPath);
 
     g_lua.registerClass<AttachedEffect>();
+    g_lua.bindClassStaticFunction<AttachedEffect>("create", &AttachedEffect::create);
     g_lua.bindClassMemberFunction<AttachedEffect>("clone", &AttachedEffect::clone);
     g_lua.bindClassMemberFunction<AttachedEffect>("getId", &AttachedEffect::getId);
     g_lua.bindClassMemberFunction<AttachedEffect>("getSpeed", &AttachedEffect::getSpeed);
@@ -709,6 +712,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<AttachedEffect>("setDisableWalkAnimation", &AttachedEffect::setDisableWalkAnimation);
     g_lua.bindClassMemberFunction<AttachedEffect>("setOpacity", &AttachedEffect::setOpacity);
     g_lua.bindClassMemberFunction<AttachedEffect>("setDuration", &AttachedEffect::setDuration);
+    g_lua.bindClassMemberFunction<AttachedEffect>("getDuration", &AttachedEffect::getDuration);
     g_lua.bindClassMemberFunction<AttachedEffect>("setHideOwner", &AttachedEffect::setHideOwner);
     g_lua.bindClassMemberFunction<AttachedEffect>("setLoop", &AttachedEffect::setLoop);
     g_lua.bindClassMemberFunction<AttachedEffect>("setPermanent", &AttachedEffect::setPermanent);
@@ -724,6 +728,9 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<AttachedEffect>("attachEffect", &AttachedEffect::attachEffect);
     g_lua.bindClassMemberFunction<AttachedEffect>("setDrawOrder", &AttachedEffect::setDrawOrder);
     g_lua.bindClassMemberFunction<AttachedEffect>("setLight", &AttachedEffect::setLight);
+    g_lua.bindClassMemberFunction<AttachedEffect>("setDirection", &AttachedEffect::setDirection);
+    g_lua.bindClassMemberFunction<AttachedEffect>("getDirection", &AttachedEffect::getDirection);
+    g_lua.bindClassMemberFunction<AttachedEffect>("move", &AttachedEffect::move);
 
     g_lua.registerClass<StaticText>();
     g_lua.bindClassStaticFunction<StaticText>("create", [] { return std::make_shared<StaticText>(); });

@@ -55,8 +55,8 @@ void AttachableObject::attachEffect(const AttachedEffectPtr& obj)
         ++m_ownerHidden;
 
     if (obj->getDuration() > 0) {
-        g_dispatcher.scheduleEvent([self = std::static_pointer_cast<AttachableObject>(shared_from_this()), effectId = obj->getId()]() {
-            self->detachEffectById(effectId);
+        g_dispatcher.scheduleEvent([self = std::static_pointer_cast<AttachableObject>(shared_from_this()), effect = obj]() {
+            self->detachEffect(effect);
         }, obj->getDuration());
     }
 
@@ -65,6 +65,18 @@ void AttachableObject::attachEffect(const AttachedEffectPtr& obj)
         self->onDispatcherAttachEffect(effect);
         effect->callLuaField("onAttach", self->attachedObjectToLuaObject());
     });
+}
+
+bool AttachableObject::detachEffect(const AttachedEffectPtr& obj) {
+    const auto it = std::find(m_attachedEffects.begin(), m_attachedEffects.end(), obj);
+
+    if (it == m_attachedEffects.end())
+        return false;
+
+    onDetachEffect(*it);
+    m_attachedEffects.erase(it);
+
+    return true;
 }
 
 bool AttachableObject::detachEffectById(uint16_t id)
@@ -138,8 +150,8 @@ void AttachableObject::drawAttachedEffect(const Point& dest, LightView* lightVie
     for (const auto& effect : m_attachedEffects) {
         effect->draw(dest, isOnTop, lightView);
         if (effect->getLoop() == 0) {
-            g_dispatcher.addEvent([self = std::static_pointer_cast<AttachableObject>(shared_from_this()), effectId = effect->getId()]() {
-                self->detachEffectById(effectId);
+            g_dispatcher.addEvent([self = std::static_pointer_cast<AttachableObject>(shared_from_this()), effect]() {
+                self->detachEffect(effect);
             });
         }
     }

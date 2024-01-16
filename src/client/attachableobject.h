@@ -39,6 +39,7 @@ public:
     void clearTemporaryAttachedEffects();
     void clearPermanentAttachedEffects();
     bool detachEffectById(uint16_t id);
+    bool detachEffect(const AttachedEffectPtr& obj);
     AttachedEffectPtr getAttachedEffectById(uint16_t id);
 
     virtual void onStartAttachEffect(const AttachedEffectPtr& effect) { };

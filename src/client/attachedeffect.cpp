@@ -28,6 +28,19 @@
 #include <framework/graphics/animatedtexture.h>
 #include <framework/graphics/shadermanager.h>
 
+AttachedEffectPtr AttachedEffect::create(uint16_t thingId, ThingCategory category) {
+    if (!g_things.isValidDatId(thingId, category)) {
+        g_logger.error(stdext::format("AttachedEffectManager::getInstance(%d, %d): invalid thing with id or category.", thingId, static_cast<uint8_t>(category)));
+        return nullptr;
+    }
+
+    const auto& obj = std::make_shared<AttachedEffect>();
+    obj->m_thingId = thingId;
+    obj->m_thingCategory = category;
+    obj->m_thingType = g_things.getThingType(obj->m_thingId, obj->m_thingCategory).get();
+    return obj;
+}
+
 AttachedEffectPtr AttachedEffect::clone()
 {
     auto obj = std::make_shared<AttachedEffect>();
@@ -61,7 +74,12 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
         if (m_shader) g_drawPool.setShaderProgram(m_shader, true);
         if (m_opacity < 100) g_drawPool.setOpacity(getOpacity(), true);
 
-        const auto& point = dest - (dirControl.offset * g_drawPool.getScaleFactor());
+        auto point = dest - (dirControl.offset * g_drawPool.getScaleFactor());
+        if (!m_toPoint.isNull()) {
+            const float fraction = std::min<float>(m_animationTimer.ticksElapsed() / static_cast<float>(m_duration), 1.f);
+            point += m_toPoint * fraction * g_drawPool.getScaleFactor();
+        }
+
         if (lightView && m_light.intensity > 0)
             lightView->addLightSource(dest, m_light);
 
@@ -71,7 +89,7 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
             const auto& rect = Rect(Point(), texture->getSize());
             g_drawPool.addTexturedRect(Rect(point, size), texture, rect, Color::white, { .order = getDrawOrder() });
         } else {
-            m_thingType->draw(point, 0, m_direction, 0, 0, animation, Color::white, true, lightView, {.order = getDrawOrder()});
+            m_thingType->draw(point, 0, m_direction, 0, 0, animation, Color::white, true, lightView, { .order = getDrawOrder() });
         }
     }
 
@@ -109,3 +127,8 @@ int AttachedEffect::getCurrentAnimationPhase()
 }
 
 void AttachedEffect::setShader(const std::string_view name) { m_shader = g_shaders.getShader(name); }
+
+void AttachedEffect::move(const Position& fromPosition, const Position& toPosition) {
+    m_toPoint = Point(toPosition.x - fromPosition.x, toPosition.y - fromPosition.y) * g_gameConfig.getSpriteSize();
+    m_animationTimer.restart();
+}
