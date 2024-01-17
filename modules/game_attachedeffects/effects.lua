@@ -115,7 +115,7 @@ AttachedEffectManager.register(10, 'Dynamic Effect', 0, 0, {
         missile:setDuration(effect:getDuration())
         missile:setDirection(5)
         missile:setOffset(spriteSize * length, 0)
-        missile:setBounce(10, 500)
+        missile:setBounce(0, 10, 500)
         missile:move(Position.translated(owner:getPosition(), -length, 0), owner:getPosition())
         effect:attachEffect(missile)
 
@@ -123,7 +123,7 @@ AttachedEffectManager.register(10, 'Dynamic Effect', 0, 0, {
         missile:setDuration(effect:getDuration())
         missile:setDirection(3)
         missile:setOffset(-(spriteSize * length), 0)
-        missile:setBounce(10, 500)
+        missile:setBounce(0, 10, 500)
         missile:move(Position.translated(owner:getPosition(), length, 0), owner:getPosition())
 
         effect:attachEffect(missile)
