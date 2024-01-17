@@ -36,5 +36,7 @@ Module
     - game_unjustifiedpoints
     - game_shaders
     - game_attachedeffects
+    - game_joystick
+    - game_walk
   @onLoad: init()
   @onUnload: terminate()
