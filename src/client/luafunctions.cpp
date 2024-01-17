@@ -557,6 +557,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Creature>("getTimedSquareColor", &Creature::getTimedSquareColor);
     g_lua.bindClassMemberFunction<Creature>("isStaticSquareVisible", &Creature::isStaticSquareVisible);
     g_lua.bindClassMemberFunction<Creature>("getStaticSquareColor", &Creature::getStaticSquareColor);
+    g_lua.bindClassMemberFunction<Creature>("setBounce", &Creature::setBounce);
 
 #ifndef BOT_PROTECTION
     g_lua.bindClassMemberFunction<Creature>("setText", &Creature::setText);
@@ -728,6 +729,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<AttachedEffect>("attachEffect", &AttachedEffect::attachEffect);
     g_lua.bindClassMemberFunction<AttachedEffect>("setDrawOrder", &AttachedEffect::setDrawOrder);
     g_lua.bindClassMemberFunction<AttachedEffect>("setLight", &AttachedEffect::setLight);
+    g_lua.bindClassMemberFunction<AttachedEffect>("setBounce", &AttachedEffect::setBounce);
     g_lua.bindClassMemberFunction<AttachedEffect>("setDirection", &AttachedEffect::setDirection);
     g_lua.bindClassMemberFunction<AttachedEffect>("getDirection", &AttachedEffect::getDirection);
     g_lua.bindClassMemberFunction<AttachedEffect>("move", &AttachedEffect::move);

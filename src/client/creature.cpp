@@ -253,6 +253,10 @@ void Creature::internalDraw(Point dest, LightView* lightView, const Color& color
             if (!m_jumpOffset.isNull()) {
                 const auto& jumpOffset = m_jumpOffset * g_drawPool.getScaleFactor();
                 dest -= Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
+            } else if (m_bounce.height > 0 && m_bounce.speed > 0) {
+                const auto minHeight = m_bounce.minHeight * g_drawPool.getScaleFactor();
+                const auto height = m_bounce.height * g_drawPool.getScaleFactor();
+                dest -= (minHeight * 1.f) + std::abs((m_bounce.speed / 2) - g_clock.millis() % m_bounce.speed) / (m_bounce.speed * 1.f) * height;
             }
 
             const auto& datType = getThingType();

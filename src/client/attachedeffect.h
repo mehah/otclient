@@ -69,6 +69,7 @@ public:
     Otc::Direction getDirection() { return m_direction; }
     void setDirection(const Otc::Direction dir) { m_direction = std::min<Otc::Direction>(dir, Otc::NorthWest); }
 
+    void setBounce(uint8_t minHeight, uint8_t height, uint16_t speed) { m_bounce = { minHeight, height , speed }; }
     void setOnTop(bool onTop) { for (auto& control : m_offsetDirections) control.onTop = onTop; }
     void setOffset(int16_t x, int16_t y) { for (auto& control : m_offsetDirections) control.offset = { x, y }; }
     void setOnTopByDir(Otc::Direction direction, bool onTop) { m_offsetDirections[direction].onTop = onTop; }
@@ -129,6 +130,13 @@ private:
     Otc::Direction m_direction{ Otc::North };
 
     std::array<DirControl, Otc::Direction::NorthWest + 1> m_offsetDirections;
+
+    struct
+    {
+        uint8_t minHeight{ 0 };
+        uint8_t height{ 0 };
+        uint16_t speed{ 0 };
+    } m_bounce;
 
     PainterShaderProgramPtr m_shader;
     AnimatedTexturePtr m_texture;

@@ -5,6 +5,7 @@
         duration, loop, transform, hideOwner, size{width, height}
         offset{x, y, onTop}, dirOffset[dir]{x, y, onTop},
         light { color, intensity}, drawOrder(only for tiles),
+        bounce{minHeight, height, speed}
         onAttach, onDetach
     }
 ]]
@@ -28,7 +29,14 @@ AttachedEffectManager.register(2, 'Bat Wings', 307, ThingCategoryCreature, {
         [East] = { 5, -5 },
         [South] = { -5, 0 },
         [West] = { -10, -5, true }
-    }
+    },
+    onAttach = function(effect, owner)
+        owner:setBounce(0, 10, 1000)
+        effect:setBounce(0, 10, 1000)
+    end,
+    onDetach = function(effect, oldOwner)
+        oldOwner:setBounce(0, 0)
+    end
 })
 
 AttachedEffectManager.register(3, 'Angel Light', 50, ThingCategoryEffect, {
@@ -98,7 +106,7 @@ AttachedEffectManager.register(9, 'Thunder', '/images/game/effects/thunder', Thi
 })
 
 AttachedEffectManager.register(10, 'Dynamic Effect', 0, 0, {
-    duration = 250,
+    duration = 500,
     onAttach = function(effect, owner)
         local spriteSize = g_gameConfig.getSpriteSize()
         local length = 3
@@ -107,6 +115,7 @@ AttachedEffectManager.register(10, 'Dynamic Effect', 0, 0, {
         missile:setDuration(effect:getDuration())
         missile:setDirection(5)
         missile:setOffset(spriteSize * length, 0)
+        missile:setBounce(10, 500)
         missile:move(Position.translated(owner:getPosition(), -length, 0), owner:getPosition())
         effect:attachEffect(missile)
 
@@ -114,6 +123,7 @@ AttachedEffectManager.register(10, 'Dynamic Effect', 0, 0, {
         missile:setDuration(effect:getDuration())
         missile:setDirection(3)
         missile:setOffset(-(spriteSize * length), 0)
+        missile:setBounce(10, 500)
         missile:move(Position.translated(owner:getPosition(), length, 0), owner:getPosition())
 
         effect:attachEffect(missile)
@@ -123,4 +133,10 @@ AttachedEffectManager.register(10, 'Dynamic Effect', 0, 0, {
         e:setId(50)
         oldOwner:getTile():addThing(e)
     end
+})
+
+AttachedEffectManager.register(11, 'Bat', 307, ThingCategoryCreature, {
+    speed = 0.5,
+    offset = { 0, 0 },
+    bounce = { 20, 20, 2000 }
 })

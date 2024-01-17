@@ -80,6 +80,12 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
             point += m_toPoint * fraction * g_drawPool.getScaleFactor();
         }
 
+        if (m_bounce.height > 0 && m_bounce.speed > 0) {
+            const auto minHeight = m_bounce.minHeight * g_drawPool.getScaleFactor();
+            const auto height = m_bounce.height * g_drawPool.getScaleFactor();
+            point -= (minHeight * 1.f) + std::abs((m_bounce.speed / 2) - g_clock.millis() % m_bounce.speed) / (m_bounce.speed * 1.f) * height;
+        }
+
         if (lightView && m_light.intensity > 0)
             lightView->addLightSource(dest, m_light);
 
