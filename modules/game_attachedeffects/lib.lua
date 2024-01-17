@@ -37,6 +37,10 @@ local executeConfig = function(attachedEffect, config)
         attachedEffect:setDrawOrder(config.drawOrder)
     end
 
+    if config.bounce then
+        attachedEffect:setBounce(config.bounce[1], config.bounce[2], config.bounce[3] or 1000)
+    end
+
     if config.duration ~= nil and config.duration > 0 then
         attachedEffect:setDuration(config.duration)
     end

@@ -34,7 +34,7 @@ public:
     void init();
     void terminate();
 
-    uint8_t getSpriteSize()  const { return m_spriteSize; }
+    uint8_t getSpriteSize() { return m_spriteSize; }
     uint16_t getLastSupportedVersion() const { return m_lastSupportedVersion; }
 
     Size getMapViewPort() const { return m_mapViewPort; }

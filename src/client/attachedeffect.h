@@ -28,6 +28,8 @@
 class AttachedEffect : public LuaObject
 {
 public:
+    static AttachedEffectPtr create(uint16_t thingId, ThingCategory category);
+
     void draw(const Point& /*dest*/, bool /*isOnTop*/, LightView* = nullptr);
 
     uint16_t getId() { return m_id; }
@@ -64,6 +66,10 @@ public:
     void setName(std::string_view n) { m_name = { n.data() }; }
     std::string getName() { return m_name; }
 
+    Otc::Direction getDirection() { return m_direction; }
+    void setDirection(const Otc::Direction dir) { m_direction = std::min<Otc::Direction>(dir, Otc::NorthWest); }
+
+    void setBounce(uint8_t minHeight, uint8_t height, uint16_t speed) { m_bounce = { minHeight, height , speed }; }
     void setOnTop(bool onTop) { for (auto& control : m_offsetDirections) control.onTop = onTop; }
     void setOffset(int16_t x, int16_t y) { for (auto& control : m_offsetDirections) control.offset = { x, y }; }
     void setOnTopByDir(Otc::Direction direction, bool onTop) { m_offsetDirections[direction].onTop = onTop; }
@@ -72,6 +78,8 @@ public:
     void setShader(const std::string_view name);
     void setCanDrawOnUI(bool canDraw) { m_canDrawOnUI = canDraw; }
     bool canDrawOnUI() { return m_canDrawOnUI; }
+
+    void move(const Position& fromPosition, const Position& toPosition);
 
     void attachEffect(const AttachedEffectPtr& e) { m_effects.emplace_back(e); }
 
@@ -121,7 +129,14 @@ private:
 
     Otc::Direction m_direction{ Otc::North };
 
-    std::array<DirControl, Otc::Direction::West + 1> m_offsetDirections;
+    std::array<DirControl, Otc::Direction::NorthWest + 1> m_offsetDirections;
+
+    struct
+    {
+        uint8_t minHeight{ 0 };
+        uint8_t height{ 0 };
+        uint16_t speed{ 0 };
+    } m_bounce;
 
     PainterShaderProgramPtr m_shader;
     AnimatedTexturePtr m_texture;
@@ -129,6 +144,8 @@ private:
     std::string m_name;
 
     std::vector<AttachedEffectPtr> m_effects;
+
+    Point m_toPoint;
 
     friend class Thing;
     friend class Creature;

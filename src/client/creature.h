@@ -157,6 +157,8 @@ public:
         }
     }
 
+    void setBounce(uint8_t minHeight, uint8_t height, uint16_t speed) { m_bounce = { minHeight, height , speed }; }
+
 #ifndef BOT_PROTECTION
     void setText(const std::string& text, const Color& color);
     std::string getText();
@@ -271,6 +273,13 @@ private:
     float m_jumpDuration{ 0 };
     PointF m_jumpOffset;
     Timer m_jumpTimer;
+
+    struct
+    {
+        uint8_t minHeight{ 0 };
+        uint8_t height{ 0 };
+        uint16_t speed{ 0 };
+    } m_bounce;
 
     // Mount Shader
     PainterShaderProgramPtr m_mountShader;
