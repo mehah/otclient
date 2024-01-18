@@ -299,10 +299,10 @@ local function unbindMovingKeys()
     gameWalk.unbindWalkKey('C')
     gameWalk.unbindWalkKey('Z')
 
-    gameInterface.unbindTurnKey('Ctrl+W')
-    gameInterface.unbindTurnKey('Ctrl+D')
-    gameInterface.unbindTurnKey('Ctrl+S')
-    gameInterface.unbindTurnKey('Ctrl+A')
+    gameWalk.unbindTurnKey('Ctrl+W')
+    gameWalk.unbindTurnKey('Ctrl+D')
+    gameWalk.unbindTurnKey('Ctrl+S')
+    gameWalk.unbindTurnKey('Ctrl+A')
 end
 
 local function bindMovingKeys()
