@@ -188,7 +188,7 @@ void MapView::drawFloor()
         g_drawPool.flush();
     }
 
-    if (m_posInfo.rect.contains(g_window.getMousePosition())) {
+    if (m_posInfo.rect.contains(g_window.getMousePosition() * g_window.getDisplayDensity())) {
         if (m_crosshairTexture && m_mousePosition.isValid()) {
             const auto& point = transformPositionTo2D(m_mousePosition);
             const auto& crosshairRect = Rect(point, m_tileSize, m_tileSize);
@@ -397,7 +397,7 @@ void MapView::updateRect(const Rect& rect) {
         m_posInfo.horizontalStretchFactor = rect.width() / static_cast<float>(m_posInfo.srcRect.width());
         m_posInfo.verticalStretchFactor = rect.height() / static_cast<float>(m_posInfo.srcRect.height());
 
-        const auto& mousePos = getPosition(g_window.getMousePosition());
+        const auto& mousePos = getPosition(g_window.getMousePosition() * g_window.getDisplayDensity());
         if (mousePos != m_mousePosition)
             onMouseMove(m_mousePosition = mousePos, true);
     }
