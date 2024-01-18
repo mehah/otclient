@@ -775,8 +775,12 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
 
     if g_platform.isMobile() then
         if mouseButton == MouseRightButton then
-          createThingMenu(menuPosition, lookThing, useThing, creatureThing)
-          return true      
+            createThingMenu(menuPosition, lookThing, useThing, creatureThing)
+            return true      
+        end
+        if not autoWalkPos and useThing then
+            createThingMenu(menuPosition, lookThing, useThing, creatureThing)      
+            return true
         end
     elseif not modules.client_options.getOption('classicControl') then
         if keyboardModifiers == KeyboardNoModifier and mouseButton == MouseRightButton then
