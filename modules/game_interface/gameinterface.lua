@@ -505,7 +505,7 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
     menu:setGameMenu(true)
 
     local classic = modules.client_options.getOption('classicControl')
-	local mobile = g_platform.isMobile()
+    local mobile = g_platform.isMobile()
     local shortcut = nil
 
     if not classic and not mobile then
