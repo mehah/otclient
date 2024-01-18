@@ -288,16 +288,16 @@ function updateChatMode()
 end
 
 local function unbindMovingKeys()
-    local gameInterface = modules.game_interface
-    gameInterface.unbindWalkKey('W')
-    gameInterface.unbindWalkKey('D')
-    gameInterface.unbindWalkKey('S')
-    gameInterface.unbindWalkKey('A')
+    local gameWalk = modules.game_walk
+    gameWalk.unbindWalkKey('W')
+    gameWalk.unbindWalkKey('D')
+    gameWalk.unbindWalkKey('S')
+    gameWalk.unbindWalkKey('A')
 
-    gameInterface.unbindWalkKey('E')
-    gameInterface.unbindWalkKey('Q')
-    gameInterface.unbindWalkKey('C')
-    gameInterface.unbindWalkKey('Z')
+    gameWalk.unbindWalkKey('E')
+    gameWalk.unbindWalkKey('Q')
+    gameWalk.unbindWalkKey('C')
+    gameWalk.unbindWalkKey('Z')
 
     gameInterface.unbindTurnKey('Ctrl+W')
     gameInterface.unbindTurnKey('Ctrl+D')
@@ -306,21 +306,21 @@ local function unbindMovingKeys()
 end
 
 local function bindMovingKeys()
-    local gameInterface = modules.game_interface
-    gameInterface.bindWalkKey('W', North)
-    gameInterface.bindWalkKey('D', East)
-    gameInterface.bindWalkKey('S', South)
-    gameInterface.bindWalkKey('A', West)
+    local gameWalk = modules.game_walk
+    gameWalk.bindWalkKey('W', North)
+    gameWalk.bindWalkKey('D', East)
+    gameWalk.bindWalkKey('S', South)
+    gameWalk.bindWalkKey('A', West)
 
-    gameInterface.bindWalkKey('E', NorthEast)
-    gameInterface.bindWalkKey('Q', NorthWest)
-    gameInterface.bindWalkKey('C', SouthEast)
-    gameInterface.bindWalkKey('Z', SouthWest)
+    gameWalk.bindWalkKey('E', NorthEast)
+    gameWalk.bindWalkKey('Q', NorthWest)
+    gameWalk.bindWalkKey('C', SouthEast)
+    gameWalk.bindWalkKey('Z', SouthWest)
 
-    gameInterface.bindTurnKey('Ctrl+W', North)
-    gameInterface.bindTurnKey('Ctrl+D', East)
-    gameInterface.bindTurnKey('Ctrl+S', South)
-    gameInterface.bindTurnKey('Ctrl+A', West)
+    gameWalk.bindTurnKey('Ctrl+W', North)
+    gameWalk.bindTurnKey('Ctrl+D', East)
+    gameWalk.bindTurnKey('Ctrl+S', South)
+    gameWalk.bindTurnKey('Ctrl+A', West)
 end
 
 function switchChat(enabled)
