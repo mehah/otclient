@@ -164,7 +164,7 @@ void UIMap::onGeometryChange(const Rect& oldRect, const Rect& newRect)
 
 bool UIMap::onMouseMove(const Point& mousePos, const Point& mouseMoved)
 {
-    const auto& pos = getPosition(mousePos);
+    const auto& pos = getPosition(mousePos * g_window.getDisplayDensity());
     if (!pos.isValid())
         return false;
 
@@ -173,7 +173,22 @@ bool UIMap::onMouseMove(const Point& mousePos, const Point& mouseMoved)
         m_mapView->setLastMousePosition(pos);
     }
 
-    return UIWidget::onMouseMove(mousePos, mouseMoved);
+    return UIWidget::onMouseMove(mousePos * g_window.getDisplayDensity(), mouseMoved * g_window.getDisplayDensity());
+}
+
+bool UIMap::onMousePress(const Point& mousePos, Fw::MouseButton button)
+{
+    return UIWidget::onMousePress(mousePos * g_window.getDisplayDensity(), button);
+}
+
+bool UIMap::onMouseRelease(const Point& mousePos, Fw::MouseButton button)
+{
+    return UIWidget::onMouseRelease(mousePos * g_window.getDisplayDensity(), button);
+}
+
+bool UIMap::onMouseWheel(const Point& mousePos, Fw::MouseWheelDirection direction)
+{
+    return UIWidget::onMouseWheel(mousePos * g_window.getDisplayDensity(), direction);
 }
 
 void UIMap::updateVisibleDimension()
