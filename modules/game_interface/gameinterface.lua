@@ -505,9 +505,10 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
     menu:setGameMenu(true)
 
     local classic = modules.client_options.getOption('classicControl')
+	local mobile = g_platform.isMobile()
     local shortcut = nil
 
-    if not classic then
+    if not classic and not mobile then
         shortcut = '(Shift)'
     else
         shortcut = nil
@@ -518,7 +519,7 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
         end, shortcut)
     end
 
-    if not classic then
+    if not classic and not mobile then
         shortcut = '(Ctrl)'
     else
         shortcut = nil
@@ -633,7 +634,7 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
             end
         else
             local localPosition = localPlayer:getPosition()
-            if not classic then
+            if not classic and not mobile then
                 shortcut = '(Alt)'
             else
                 shortcut = nil
@@ -772,7 +773,12 @@ end
 function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, useThing, creatureThing, attackCreature)
     local keyboardModifiers = g_keyboard.getModifiers()
 
-    if not modules.client_options.getOption('classicControl') then
+    if g_platform.isMobile() then
+        if mouseButton == MouseRightButton then
+          createThingMenu(menuPosition, lookThing, useThing, creatureThing)
+          return true      
+        end
+    elseif not modules.client_options.getOption('classicControl') then
         if keyboardModifiers == KeyboardNoModifier and mouseButton == MouseRightButton then
             createThingMenu(menuPosition, lookThing, useThing, creatureThing)
             return true
