@@ -1483,14 +1483,16 @@ UIWidgetPtr UIWidget::backwardsGetWidgetById(const std::string_view id)
 
 void UIWidget::setProp(FlagProp prop, bool v, bool callEvent)
 {
-    bool lastProp = hasProp(prop);
-    if (v) m_flagsProp |= prop; else m_flagsProp &= ~prop;
-
     // Note: Be aware that setProp is called many times, there will be a cost,
     // so only call this event if it is really necessary.
     // callEvent = false by default
-    if (callEvent && lastProp != v)
-        callLuaField("onPropertyChange", prop, v);
+    if (callEvent) {
+        const bool lastProp = hasProp(prop);
+        if (lastProp != v)
+            callLuaField("onPropertyChange", prop, v, lastProp);
+    }
+
+    if (v) m_flagsProp |= prop; else m_flagsProp &= ~prop;
 }
 
 bool UIWidget::setState(Fw::WidgetState state, bool on)
