@@ -3162,11 +3162,14 @@ void ProtocolGame::parseLootContainers(const InputMessagePtr& msg)
 void ProtocolGame::parseSupplyStash(const InputMessagePtr& msg)
 {
     const uint16_t size = msg->getU16();
+    std::vector<std::vector<uint32_t>> stashItems;
     for (int_fast32_t i = 0; i < size; ++i) {
-        msg->getU16(); // item id
-        msg->getU32(); // unknown
+        uint16_t itemId = msg->getU16();
+        uint32_t amount = msg->getU32();
+        stashItems.push_back({ itemId, amount });
     }
     msg->getU16(); // available slots?
+    g_lua.callGlobalField("g_game", "onSupplyStashEnter", stashItems);
 }
 
 void ProtocolGame::parseSpecialContainer(const InputMessagePtr& msg)

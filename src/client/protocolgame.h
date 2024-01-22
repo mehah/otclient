@@ -129,6 +129,7 @@ public:
     void sendApplyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm);
     void sendClearImbuement(uint8_t slot);
     void sendCloseImbuingWindow();
+    void sendStashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos);
 
     // otclient only
     void sendChangeMapAwareRange(int xrange, int yrange);

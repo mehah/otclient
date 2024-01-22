@@ -36,5 +36,6 @@ Module
     - game_unjustifiedpoints
     - game_shaders
     - game_attachedeffects
+    - game_stash
   @onLoad: init()
   @onUnload: terminate()

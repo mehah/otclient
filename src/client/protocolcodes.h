@@ -218,6 +218,7 @@ namespace Proto
         ClientLeaveGame = 20,
         ClientPing = 29,
         ClientPingBack = 30,
+        ClientUseStash = 40,
 
         // all in game opcodes must be equal or greater than 50
         ClientFirstGameOpcode = 50,
