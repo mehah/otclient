@@ -133,7 +133,7 @@ public:
     int getThingCount() { return m_things.size() + m_effects.size(); }
 
     bool isWalkable(bool ignoreCreatures = false);
-    bool isClickable() { return (hasGround() || hasBottomItem()) && !hasIgnoreLook(); }
+    bool isClickable();
     bool isPathable() { return (m_thingTypeFlag & TileThingType::NOT_PATHABLE) == 0; }
     bool isFullGround() { return m_thingTypeFlag & TileThingType::FULL_GROUND; }
     bool isFullyOpaque() { return m_thingTypeFlag & TileThingType::IS_OPAQUE; }
