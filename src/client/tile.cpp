@@ -572,6 +572,27 @@ bool Tile::isCovered(int8_t firstFloor)
     return (m_isCovered & idState) == idState;
 }
 
+bool Tile::isClickable()
+{
+    bool hasGround = false;
+    bool hasOnBottom = false;
+    bool hasIgnoreLook = false;
+    for (const auto& thing : m_things) {
+        if (thing->isGround())
+            hasGround = true;
+        else if (thing->isOnBottom())
+            hasOnBottom = true;
+
+        if (thing->isIgnoreLook())
+            hasIgnoreLook = true;
+
+        if ((hasGround || hasOnBottom) && !hasIgnoreLook)
+            return true;
+    }
+
+    return false;
+}
+
 void Tile::onAddInMapView()
 {
     m_drawTopAndCreature = true;
