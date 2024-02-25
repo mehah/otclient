@@ -776,10 +776,8 @@ void Tile::setThingFlag(const ThingPtr& thing)
 
 void Tile::select(TileSelectType selectType)
 {
-    if (selectType == TileSelectType::NO_FILTERED && !isEmpty()) {
-        if (!(m_highlightThing = getTopCreature()))
-            checkForDetachableThing();
-    }
+    if (selectType == TileSelectType::NO_FILTERED && !isEmpty())
+        checkForDetachableThing();
 
     if (m_highlightThing)
         m_highlightThing->setMarked(Color::yellow);
