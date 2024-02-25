@@ -25,7 +25,7 @@ game
     diagonal-walk-speed: 3
 
   render
-    invisible-ticks-per-frame: 500
+    invisible-ticks-per-frame: 75
     item-ticks-per-frame: 500
     effect-ticks-per-frame: 75
     missile-ticks-per-frame: 75
