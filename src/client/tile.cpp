@@ -651,7 +651,7 @@ bool Tile::checkForDetachableThing()
 
     if (hasCommonItem()) {
         for (const auto& item : m_things) {
-            if ((!item->isCommon() || !item->canDraw() || item->isIgnoreLook() || item->isCloth()) && (!item->isUsable()) && (!item->hasLight())) {
+            if ((!item->isCommon() || !item->canDraw() || item->isIgnoreLook()) && (!item->isUsable()) && (!item->hasLight())) {
                 continue;
             }
 
@@ -778,7 +778,7 @@ void Tile::select(TileSelectType selectType)
 {
     if (selectType == TileSelectType::NO_FILTERED && !isEmpty()) {
         if (!(m_highlightThing = getTopCreature()))
-            m_highlightThing = m_things.back();
+            checkForDetachableThing();
     }
 
     if (m_highlightThing)
