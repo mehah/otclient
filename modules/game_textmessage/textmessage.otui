@@ -16,7 +16,7 @@ Panel
     layout:
       type: verticalBox
       fit-children: true
-    width: 360
+    width: 255
     anchors.centerIn: parent
 
     TextMessageLabel
