@@ -776,8 +776,25 @@ void Tile::setThingFlag(const ThingPtr& thing)
 
 void Tile::select(TileSelectType selectType)
 {
-    if (selectType == TileSelectType::NO_FILTERED && !isEmpty())
-        checkForDetachableThing();
+    if (selectType == TileSelectType::NO_FILTERED && !isEmpty()) {
+        if (const auto& creature = getTopCreature()) {
+            m_highlightThing = creature;
+        } else if (hasCommonItem()) {
+            for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
+                const auto& item = *it;
+                if (item->isCommon()) {
+                    m_highlightThing = item;
+                    break;
+                }
+            }
+        } else if (hasBottomItem()) for (const auto& thing : m_things) {
+            if (thing->isOnBottom()) {
+                m_highlightThing = thing;
+                break;
+            }
+        } else
+            m_highlightThing = m_things.back();
+    }
 
     if (m_highlightThing)
         m_highlightThing->setMarked(Color::yellow);
