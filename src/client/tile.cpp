@@ -638,7 +638,7 @@ bool Tile::limitsFloorsView(bool isFreeView)
     return firstThing && !firstThing->isDontHide() && (firstThing->isGround() || (isFreeView ? firstThing->isOnBottom() : firstThing->isOnBottom() && firstThing->blockProjectile()));
 }
 
-bool Tile::checkForDetachableThing()
+bool Tile::checkForDetachableThing(const TileSelectType selectType)
 {
     if (m_highlightThing)
         m_highlightThing->setMarked(Color::white);
@@ -649,11 +649,16 @@ bool Tile::checkForDetachableThing()
         return true;
     }
 
+    const bool isFiltered = selectType != TileSelectType::NO_FILTERED;
+
     if (hasCommonItem()) {
         for (const auto& item : m_things) {
-            if ((!item->isCommon() || !item->canDraw() || item->isIgnoreLook()) && (!item->isUsable()) && (!item->hasLight())) {
+            if (!item->isCommon() || !item->canDraw()) {
                 continue;
             }
+
+            if (isFiltered && item->isIgnoreLook() && !item->isUsable() && !item->hasLight())
+                continue;
 
             m_highlightThing = item;
             return true;
@@ -663,7 +668,11 @@ bool Tile::checkForDetachableThing()
     if (hasBottomItem()) {
         for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
             const auto& item = *it;
-            if (!item->isOnBottom() || !item->canDraw() || item->isIgnoreLook() || item->isFluidContainer()) continue;
+            if (!item->isOnBottom() || !item->canDraw()) continue;
+
+            if (isFiltered && (item->isIgnoreLook() || item->isFluidContainer()))
+                continue;
+
             m_highlightThing = item;
             return true;
         }
@@ -673,13 +682,19 @@ bool Tile::checkForDetachableThing()
         for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
             const auto& item = *it;
             if (!item->isOnTop()) break;
-            if (!item->canDraw() || item->isIgnoreLook()) continue;
+            if (!item->canDraw()) continue;
 
-            if (item->hasLensHelp()) {
-                m_highlightThing = item;
-                return true;
-            }
+            if (isFiltered && (item->isIgnoreLook() || !item->hasLensHelp()))
+                continue;
+
+            m_highlightThing = item;
+            return true;
         }
+    }
+
+    if (!isFiltered) {
+        m_highlightThing = m_things.back();
+        return true;
     }
 
     return false;
@@ -777,23 +792,7 @@ void Tile::setThingFlag(const ThingPtr& thing)
 void Tile::select(TileSelectType selectType)
 {
     if (selectType == TileSelectType::NO_FILTERED && !isEmpty()) {
-        if (const auto& creature = getTopCreature()) {
-            m_highlightThing = creature;
-        } else if (hasCommonItem()) {
-            for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
-                const auto& item = *it;
-                if (item->isCommon()) {
-                    m_highlightThing = item;
-                    break;
-                }
-            }
-        } else if (hasBottomItem()) for (const auto& thing : m_things) {
-            if (thing->isOnBottom()) {
-                m_highlightThing = thing;
-                break;
-            }
-        } else
-            m_highlightThing = m_things.back();
+        checkForDetachableThing(selectType);
     }
 
     if (m_highlightThing)
