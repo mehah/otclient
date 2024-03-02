@@ -14,8 +14,6 @@ function UIMiniWindow:open(dontSave)
     self:setSettings({ closed = false })
   end
 
-  self:raise()
-
   if self:getParent() then
     self:getParent():saveChildren()
   end
