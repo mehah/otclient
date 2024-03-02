@@ -204,7 +204,7 @@ public:
 
     TilePtr asTile() { return static_self_cast<Tile>(); }
 
-    bool checkForDetachableThing();
+    bool checkForDetachableThing(const TileSelectType selectType = TileSelectType::FILTERED);
 
 #ifndef BOT_PROTECTION
     void drawTexts(Point dest);
