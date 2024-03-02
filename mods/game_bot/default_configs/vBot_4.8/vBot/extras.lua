@@ -585,7 +585,7 @@ if true then
         guild = guild:sub(1, 10) -- change to proper (last) values
         guild = guild .. "..."
       end
-      local voc
+      local voc = "?"
       if text:lower():find("sorcerer") then
         voc = "MS"
       elseif text:lower():find("druid") then
