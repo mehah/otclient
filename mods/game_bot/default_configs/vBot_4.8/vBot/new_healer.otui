@@ -106,7 +106,7 @@ PriorityEntry < ToolTipLabel
     tooltip: Decrease Priority
 
 TargetSettings < Panel
-  size: 280 125
+  size: 280 135
   padding: 3
   image-source: /images/ui/window
   image-border: 6
@@ -131,7 +131,7 @@ TargetSettings < Panel
     anchors.verticalCenter: prev.verticalCenter
 
 Groups < FlatPanel
-  size: 150 90
+  size: 150 105
   padding: 3
   padding-top: 5
 
@@ -176,7 +176,7 @@ Groups < FlatPanel
       text: BotServer Members
 
 Vocations < FlatPanel
-  size: 100 90
+  size: 100 105
   padding: 3
   padding-top: 5
 
