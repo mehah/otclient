@@ -80,9 +80,8 @@ int main(int argc, const char* argv[])
 
 #ifndef ANDROID
     #if ENABLE_DISCORD_RPC == 1
-    g_discord.init([]() -> bool {
-        return g_game.isOnline();
-    }, [](std::string& info) {
+    std::function<bool()> canUpdate = []() -> bool { return g_game.isOnline(); };
+    std::function<void(std::string&)> onUpdate = [](std::string& info) {
 #if SHOW_CHARACTER_NAME_RPC == 1
         info = "Name: " + g_game.getCharacterName();
 #endif
@@ -94,7 +93,8 @@ int main(int argc, const char* argv[])
         if (!info.empty()) info += "\n";
         info += "World: " + g_game.getWorldName();
 #endif
-    });
+    };
+    g_discord.init(canUpdate, onUpdate);
     #endif
 #endif
 

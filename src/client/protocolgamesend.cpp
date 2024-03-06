@@ -1114,3 +1114,14 @@ void ProtocolGame::sendCloseImbuingWindow()
     msg->addU8(Proto::ClientCloseImbuingWindow);
     send(msg);
 }
+
+void ProtocolGame::sendStashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientUseStash);
+    msg->addU8(Otc::Supply_Stash_Actions_t::SUPPLY_STASH_ACTION_WITHDRAW);
+    msg->addU16(itemId);
+    msg->addU32(count);
+    msg->addU8(stackpos);
+    send(msg);
+}

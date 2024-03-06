@@ -110,7 +110,7 @@ void Application::deinit()
 
     // disable dispatcher events
     g_textDispatcher.shutdown();
-    g_dispatcher.shutdown();         
+    g_dispatcher.shutdown();
     g_mainDispatcher.shutdown();
 
     // run modules unload events
@@ -145,13 +145,17 @@ void Application::terminate()
 
 void Application::poll()
 {
+    std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->getMutexPreDraw());
     g_clock.update();
 
 #ifdef FRAMEWORK_NET
     Connection::poll();
 #endif
 
-    dispatchPoll();
+    {
+        std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND)->getMutexPreDraw());
+        g_dispatcher.poll();
+    }
 
     // poll connection again to flush pending write
 #ifdef FRAMEWORK_NET
@@ -159,11 +163,6 @@ void Application::poll()
 #endif
 
     g_clock.update();
-}
-
-void Application::dispatchPoll()
-{
-    g_dispatcher.poll();
 }
 
 void Application::exit()

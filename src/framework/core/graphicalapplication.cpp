@@ -138,6 +138,8 @@ void GraphicalApplication::run()
     g_lua.callGlobalField("g_app", "onRun");
 
     std::condition_variable foregroundUICondition, foregroundMapCondition;
+    std::atomic_bool mapThreadStopping = false;
+    std::atomic_uint8_t threadsOppeneds = 0;
 
     const auto& FPS = [&] {
         m_mapProcessFrameCounter.setTargetFps(g_window.vsyncEnabled() || getMaxFps() || getTargetFps() ? 500u : 999u);
@@ -149,7 +151,7 @@ void GraphicalApplication::run()
         const auto& foregroundMap = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
 
         if (foregroundUI->canRepaint()) {
-            if (m_drawEvents && m_drawEvents->canDrawUI())
+            if (m_drawEvents && m_drawEvents->canDraw(DrawPoolType::FOREGROUND))
                 foregroundUICondition.notify_one();
             else
                 g_ui.render(DrawPoolType::FOREGROUND);
@@ -159,38 +161,59 @@ void GraphicalApplication::run()
             foregroundMapCondition.notify_one();
     };
 
+    const auto& stopThread = [&]() {
+        threadsOppeneds.fetch_sub(1);
+        if (threadsOppeneds.load() == 0) {
+            mapThreadStopping.store(true);
+            mapThreadStopping.notify_one();
+        }
+    };
+
     // THREAD - FOREGROUND UI
-    g_asyncDispatcher.dispatch([this, &condition = foregroundUICondition] {
+    g_asyncDispatcher.dispatch([&] {
+        threadsOppeneds.fetch_add(1);
+
         const auto& pool = g_drawPool.get(DrawPoolType::FOREGROUND);
         std::unique_lock lock(pool->getMutexPreDraw());
-        condition.wait(lock, [this]() -> bool {
-            g_ui.render(DrawPoolType::FOREGROUND);
+        foregroundUICondition.wait(lock, [this]() -> bool {
+            if (m_drawEvents && m_drawEvents->canDraw(DrawPoolType::FOREGROUND))
+                g_ui.render(DrawPoolType::FOREGROUND);
             return m_stopping;
         });
+
+        stopThread();
     });
 
     // THREAD - FOREGROUND MAP
-    g_asyncDispatcher.dispatch([this, &condition = foregroundMapCondition] {
+    g_asyncDispatcher.dispatch([&] {
+        threadsOppeneds.fetch_add(1);
+
         const auto& pool = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
         std::unique_lock lock(pool->getMutexPreDraw());
-        condition.wait(lock, [this]() -> bool {
+        foregroundMapCondition.wait(lock, [this]() -> bool {
             if (m_drawEvents)
                 m_drawEvents->drawForgroundMap();
             return m_stopping;
         });
+
+        stopThread();
     });
 
     // THREAD - POOL & MAP
     g_asyncDispatcher.dispatch([&] {
-        g_eventThreadId = std::this_thread::get_id();
+        threadsOppeneds.fetch_add(1);
+
+        g_eventThreadId = EventDispatcher::getThreadId();
         while (!m_stopping) {
             poll();
 
             if (!g_window.isVisible()) {
-                m_mapProcessFrameCounter.update();
                 stdext::millisleep(10);
                 continue;
             }
+
+            if (m_drawEvents)
+                m_drawEvents->preLoad();
 
             drawForeground();
 
@@ -202,6 +225,8 @@ void GraphicalApplication::run()
 
         foregroundUICondition.notify_one();
         foregroundMapCondition.notify_one();
+
+        stopThread();
     });
 
     m_running = true;
@@ -209,7 +234,6 @@ void GraphicalApplication::run()
         mainPoll();
 
         if (!g_window.isVisible()) {
-            m_graphicFrameCounter.update();
             stdext::millisleep(10);
             continue;
         }
@@ -226,8 +250,9 @@ void GraphicalApplication::run()
         }
     }
 
-    m_stopping = false;
+    mapThreadStopping.wait(false);
     m_running = false;
+    m_stopping = false;
 }
 
 void GraphicalApplication::poll()
@@ -244,13 +269,6 @@ void GraphicalApplication::poll()
         g_textDispatcher.poll();
     }
 }
-
-void GraphicalApplication::dispatchPoll()
-{
-    std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND)->getMutexPreDraw());
-    Application::dispatchPoll();
-}
-
 void GraphicalApplication::mainPoll()
 {
     g_clock.update();
@@ -282,7 +300,6 @@ void GraphicalApplication::resize(const Size& size)
         if (USE_FRAMEBUFFER) {
             g_drawPool.get(DrawPoolType::CREATURE_INFORMATION)->setFramebuffer(size);
             g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->setFramebuffer(size);
-            g_drawPool.get(DrawPoolType::FOREGROUND_MAP_WIDGETS)->setFramebuffer(size);
         }
     });
 }
@@ -296,7 +313,6 @@ void GraphicalApplication::inputEvent(const InputEvent& event)
 
 void GraphicalApplication::repaintMap() { g_drawPool.get(DrawPoolType::MAP)->repaint(); }
 void GraphicalApplication::repaint() { g_drawPool.get(DrawPoolType::FOREGROUND)->repaint(); }
-bool GraphicalApplication::canDrawTexts() const { return m_drawText && (!m_drawEvents || m_drawEvents->canDrawTexts()); }
 bool GraphicalApplication::isLoadingAsyncTexture() { return m_loadingAsyncTexture || (m_drawEvents && m_drawEvents->isLoadingAsyncTexture()); }
 
 void GraphicalApplication::setLoadingAsyncTexture(bool v) {
