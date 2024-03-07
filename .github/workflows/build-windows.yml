@@ -68,7 +68,7 @@ jobs:
           name: otclient-${{ matrix.buildtype }}-${{ github.sha }}
           path: |
             ${{ github.workspace }}/otclient.exe
-            
+
       - name: Create and Upload Artifact (dlls)
         uses: actions/upload-artifact@main
         with:

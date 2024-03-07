@@ -309,6 +309,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     </ClCompile>
     <ClCompile Include="..\src\framework\luafunctions.cpp" />
     <ClCompile Include="..\src\framework\net\connection.cpp" />
+    <ClCompile Include="..\src\framework\net\httplogin.cpp" />
     <ClCompile Include="..\src\framework\net\inputmessage.cpp" />
     <ClCompile Include="..\src\framework\net\outputmessage.cpp" />
     <ClCompile Include="..\src\framework\net\protocol.cpp" />
@@ -468,6 +469,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\framework\luaengine\luavaluecasts.h" />
     <ClInclude Include="..\src\framework\net\connection.h" />
     <ClInclude Include="..\src\framework\net\declarations.h" />
+    <ClInclude Include="..\src\framework\net\httplogin.h" />
     <ClInclude Include="..\src\framework\net\inputmessage.h" />
     <ClInclude Include="..\src\framework\net\outputmessage.h" />
     <ClInclude Include="..\src\framework\net\protocol.h" />
