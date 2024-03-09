@@ -2144,7 +2144,6 @@ void ProtocolGame::parseTalk(const InputMessagePtr& msg)
         case Otc::MessageBarkLoud:
         case Otc::MessageSpell:
         case Otc::MessageNpcFromStartBlock:
-        case Otc::MessagePotion:
             pos = getPosition(msg);
             break;
         case Otc::MessageChannel:
@@ -2309,7 +2308,7 @@ void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
         case Otc::MessageExpOthers:
         {
             const auto& pos = getPosition(msg);
-            const uint64_t = msg->getU64();
+            const uint64_t value = msg->getU64();
             const uint8_t color = msg->getU8();
             text = msg->getString();
 
