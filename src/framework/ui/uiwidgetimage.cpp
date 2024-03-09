@@ -205,7 +205,7 @@ void UIWidget::setImageSource(const std::string_view source, bool base64)
         stream.write(decoded.c_str(), decoded.size());
         m_imageTexture = g_textures.loadTexture(stream);
     } else {
-	    m_imageTexture = g_textures.getTexture(m_imageSource = source, isImageSmooth());
+        m_imageTexture = g_textures.getTexture(m_imageSource = source, isImageSmooth());
     }
     
     if (!m_imageTexture)

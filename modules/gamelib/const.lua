@@ -263,7 +263,7 @@ MessageModes = {
     -- 12x
     Attention = 52,
     BoostedCreature = 53,
-    OfflineTrainning = 54,
+    OfflineTraining = 54,
     Transaction = 55,
     Potion = 56,
 

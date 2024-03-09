@@ -194,6 +194,7 @@ private:
     void parseContainerAddItem(const InputMessagePtr& msg);
     void parseContainerUpdateItem(const InputMessagePtr& msg);
     void parseContainerRemoveItem(const InputMessagePtr& msg);
+    void parseItemDetail(const InputMessagePtr& msg);
     void parseAddInventoryItem(const InputMessagePtr& msg);
     void parseRemoveInventoryItem(const InputMessagePtr& msg);
     void parseOpenNpcTrade(const InputMessagePtr& msg);
@@ -207,6 +208,7 @@ private:
     void parseItemClasses(const InputMessagePtr& msg);
     void parseCreatureMark(const InputMessagePtr& msg);
     void parseTrappers(const InputMessagePtr& msg);
+    void parseCreatureData(const InputMessagePtr& msg);
     void parseCreatureHealth(const InputMessagePtr& msg);
     void parseCreatureLight(const InputMessagePtr& msg);
     void parseCreatureOutfit(const InputMessagePtr& msg) const;

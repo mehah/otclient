@@ -343,7 +343,7 @@ namespace Otc
         // 12x
         MessageAttention = 52,
         MessageBoostedCreature = 53,
-        MessageOfflineTrainning = 54,
+        MessageOfflineTraining = 54,
         MessageTransaction = 55,
         MessagePotion = 56,
         LastMessage = 57,

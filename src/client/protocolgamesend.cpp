@@ -299,6 +299,14 @@ void ProtocolGame::sendEquipItem(int itemId, int countOrSubType)
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientEquipItem);
     msg->addU16(itemId);
+    if (g_game.getClientVersion() > 1332) {
+        const auto& item = Item::create(itemId);
+
+        if (item->getId() != 0 && item->getClassification() > 0) {
+            msg->addU8(0);
+        }
+    }
+
     if (g_game.getFeature(Otc::GameCountU16))
         msg->addU16(countOrSubType);
     else
@@ -345,6 +353,8 @@ void ProtocolGame::sendBuyItem(int itemId, int subType, int amount, bool ignoreC
         msg->addU8(amount);
     msg->addU8(ignoreCapacity ? 0x01 : 0x00);
     msg->addU8(buyWithBackpack ? 0x01 : 0x00);
+    if (g_game.getClientVersion() > 1332)
+        msg->addU8(0);
     send(msg);
 }
 

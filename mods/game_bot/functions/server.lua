@@ -70,6 +70,7 @@ context.BotServer.terminate = function()
   if context.BotServer._websocket then
     context.BotServer._websocket:close()
     context.BotServer._websocket = nil
+    context.BotServer._callbacks = {}
   end
 end
 

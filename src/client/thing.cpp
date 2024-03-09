@@ -45,7 +45,7 @@ int Thing::getStackPriority()
     // Bug fix for old versions
     if (g_game.getClientVersion() <= 800 && isSplash())
         return STACK_PRIORITY::GROUND;
-	
+    
     if (isGround())
         return STACK_PRIORITY::GROUND;
 

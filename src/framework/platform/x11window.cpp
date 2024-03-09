@@ -783,17 +783,17 @@ void X11Window::poll()
                         case Button1:
                             m_inputEvent.mouseButton = Fw::MouseLeftButton;
                             if (event.type == ButtonPress) { m_mouseButtonStates |= 1 << Fw::MouseLeftButton; }
-							else { g_dispatcher.addEvent([this] { m_mouseButtonStates &= ~(1 << Fw::MouseLeftButton); }); }
+                            else { g_dispatcher.addEvent([this] { m_mouseButtonStates &= ~(1 << Fw::MouseLeftButton); }); }
                             break;
                         case Button3:
                             m_inputEvent.mouseButton = Fw::MouseRightButton;
                             if (event.type == ButtonPress) { m_mouseButtonStates |= 1 << Fw::MouseRightButton; }
-							else { g_dispatcher.addEvent([this] { m_mouseButtonStates &= ~(1 << Fw::MouseRightButton); }); }
+                            else { g_dispatcher.addEvent([this] { m_mouseButtonStates &= ~(1 << Fw::MouseRightButton); }); }
                             break;
                         case Button2:
                             m_inputEvent.mouseButton = Fw::MouseMidButton;
                             if (event.type == ButtonPress) { m_mouseButtonStates |= 1 << Fw::MouseMidButton; }
-							else { g_dispatcher.addEvent([this] { m_mouseButtonStates &= ~(1 << Fw::MouseMidButton); }); }
+                            else { g_dispatcher.addEvent([this] { m_mouseButtonStates &= ~(1 << Fw::MouseMidButton); }); }
                             break;
                         case Button4:
                             if (event.type == ButtonPress) {

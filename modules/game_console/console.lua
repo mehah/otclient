@@ -103,12 +103,16 @@ SpeakTypes = {
     [MessageModes.RVRContinue] = SpeakTypesSettings.rvrContinue,
     [MessageModes.RVRAnswer] = SpeakTypesSettings.rvrAnswerFrom,
     [MessageModes.NpcFromStartBlock] = SpeakTypesSettings.privateNpcToPlayer,
+    [MessageModes.Attention] = SpeakTypesSettings.broadcast,
+    [MessageModes.BoostedCreature] = SpeakTypesSettings.none,
+    [MessageModes.OfflineTraining] = SpeakTypesSettings.none,
+    [MessageModes.Transaction] = SpeakTypesSettings.broadcast,
+    [MessageModes.Potion] = SpeakTypesSettings.monsterSay,
 
     -- ignored types
     [MessageModes.Spell] = SpeakTypesSettings.none,
     [MessageModes.BarkLow] = SpeakTypesSettings.none,
     [MessageModes.BarkLoud] = SpeakTypesSettings.none,
-    [MessageModes.Potion] = SpeakTypesSettings.none
 }
 
 SayModes = {
@@ -1489,7 +1493,7 @@ function onTalk(name, level, mode, message, channelId, creaturePos)
     if (mode == MessageModes.Say or mode == MessageModes.Whisper or mode == MessageModes.Yell or mode ==
             MessageModes.Spell or mode == MessageModes.MonsterSay or mode == MessageModes.MonsterYell or mode ==
             MessageModes.NpcFrom or mode == MessageModes.BarkLow or mode == MessageModes.BarkLoud or mode ==
-            MessageModes.NpcFromStartBlock) and creaturePos then
+            MessageModes.NpcFromStartBlock) or mode == MessageModes.Potion and creaturePos then
         local staticText = StaticText.create()
         -- Remove curly braces from screen message
         local staticMessage = message

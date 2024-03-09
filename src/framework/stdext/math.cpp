@@ -66,15 +66,15 @@ namespace stdext
 
     std::mt19937& random_gen()
     {
-	    static std::random_device rd;
-	    static std::mt19937 generator(rd());
-	    return generator;
+        static std::random_device rd;
+        static std::mt19937 generator(rd());
+        return generator;
     }
 
     bool random_bool(double probability)
     {
-	    static std::bernoulli_distribution booleanRand;
-	    return booleanRand(random_gen(), std::bernoulli_distribution::param_type(probability));
+        static std::bernoulli_distribution booleanRand;
+        return booleanRand(random_gen(), std::bernoulli_distribution::param_type(probability));
     }
 
     int32_t normal_random(int32_t minNumber, int32_t maxNumber)

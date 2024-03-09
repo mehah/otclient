@@ -25,6 +25,9 @@ buyTab = nil
 sellTab = nil
 initialized = false
 
+local playerBalanceAttr = 0
+local playerMoneyAttr = 0
+
 showWeight = true
 buyWithBackpack = nil
 ignoreCapacity = nil
@@ -83,6 +86,7 @@ function init()
         onGameEnd = hide,
         onOpenNpcTrade = onOpenNpcTrade,
         onCloseNpcTrade = onCloseNpcTrade,
+        onResourceBalance = onResourceBalance,
         onPlayerGoods = onPlayerGoods
     })
 
@@ -102,6 +106,7 @@ function terminate()
         onGameEnd = hide,
         onOpenNpcTrade = onOpenNpcTrade,
         onCloseNpcTrade = onCloseNpcTrade,
+        onResourceBalance = onResourceBalance,
         onPlayerGoods = onPlayerGoods
     })
 
@@ -446,9 +451,20 @@ function onCloseNpcTrade()
     hide()
 end
 
-function onPlayerGoods(money, items)
-    playerMoney = money
+function onResourceBalance(type, amount)
+    if (type == 0) then
+        playerMoneyAttr = amount
+    elseif (type == 1) then
+        playerBalanceAttr = amount
+    else
+        return
+    end
 
+    playerMoney = playerMoneyAttr + playerBalanceAttr
+    refreshPlayerGoods()
+end
+
+function onPlayerGoods(money, items) 
     playerItems = {}
     for key, item in pairs(items) do
         local id = item[1]:getId()
