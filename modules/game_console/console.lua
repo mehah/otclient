@@ -1493,7 +1493,7 @@ function onTalk(name, level, mode, message, channelId, creaturePos)
     if (mode == MessageModes.Say or mode == MessageModes.Whisper or mode == MessageModes.Yell or mode ==
             MessageModes.Spell or mode == MessageModes.MonsterSay or mode == MessageModes.MonsterYell or mode ==
             MessageModes.NpcFrom or mode == MessageModes.BarkLow or mode == MessageModes.BarkLoud or mode ==
-            MessageModes.NpcFromStartBlock) or mode == MessageModes.Potion and creaturePos then
+            MessageModes.NpcFromStartBlock or mode == MessageModes.Potion) and creaturePos then
         local staticText = StaticText.create()
         -- Remove curly braces from screen message
         local staticMessage = message
