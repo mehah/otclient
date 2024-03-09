@@ -81,7 +81,7 @@ private:
 
     // Game
     uint8_t m_spriteSize{ 32 };
-    uint16_t m_lastSupportedVersion{ 1321 };
+    uint16_t m_lastSupportedVersion{ 1332 };
 
     // Map
     Size m_mapViewPort{ 8,6 };
