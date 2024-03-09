@@ -1,7 +1,7 @@
 local taskPointStorage = 5151 -- which player storage holds task points.
 
 local configTasks = {
-    [1] = { 
+    [1] = {
     nameOfTheTask = "Rat",  -- same as target name e.g. rat / Rat (doesnt matter, the name will be lowered later anyway)
     looktype = { type = 21 },
     killsRequired = 25,
@@ -10,7 +10,7 @@ local configTasks = {
         pointsReward = 0, -- NOT the id, its the amount of points, if no point reward then delete this line/ dont write at all.
     }
     },
-    [2] = { 
+    [2] = {
     nameOfTheTask = "Cave Rat",  -- same as target name e.g. rat / Rat (doesnt matter, the name will be lowered later anyway)
     looktype = { type = 56 },
     killsRequired = 25,
@@ -19,8 +19,8 @@ local configTasks = {
         pointsReward = 50, -- NOT the id, its the amount of points, if no point reward then delete this line/ dont write at all.
     }
     },
-    [3] = { 
-    nameOfTheTask = "Snake", 
+    [3] = {
+    nameOfTheTask = "Snake",
     looktype = { type = 28 },
     killsRequired = 25,
     rewards = {
@@ -28,16 +28,16 @@ local configTasks = {
         -- no functionality: itemRewards = {26447, 26408, 26430}
     }
     },
-    [4] = { 
-    nameOfTheTask = "Scorpion", 
-    looktype = { type = 43 }, 
+    [4] = {
+    nameOfTheTask = "Scorpion",
+    looktype = { type = 43 },
     killsRequired = 25,
     rewards = {
         expReward = 2000,
         -- no functionality: itemRewards = {26447, 26408, 26430}
     }
     },
-    [5] = { 
+    [5] = {
     nameOfTheTask = "Amazon",
     looktype = { type = 137, feet = 115, addons = 0, legs = 95, auxType = 7399, head = 113, body = 120 },
     killsRequired = 150,
@@ -46,9 +46,9 @@ local configTasks = {
         -- no functionality: itemRewards = {26447, 26408, 26430}
     }
     },
-    [6] = { 
+    [6] = {
     nameOfTheTask = "Valkyrie",
-    looktype = { type = 139, feet = 96, addons = 0, legs = 76, auxType = 7399, head = 113, body = 38 }, 
+    looktype = { type = 139, feet = 96, addons = 0, legs = 76, auxType = 7399, head = 113, body = 38 },
     killsRequired = 150,
     rewards = {
         expReward = 8000,
@@ -68,7 +68,7 @@ TaskSystem = {
         if (#TaskSystem.list > 0) then
             return true
         end
-        
+
         for i = 1, #configTasks do
             table.insert(TaskSystem.list, {
                 id = i,

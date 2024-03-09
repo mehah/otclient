@@ -40,7 +40,7 @@ void UIWidget::parseImageStyle(const OTMLNodePtr& styleNode)
             if (split.size() == 0) split.push_back("none");
             bool base64 = split.size() > 1 && split[0] == "base64";
             auto& value = split.size() > 1 ? split[1] : split[0];
-            
+
             if (value == "" || value == "none") {
                 setImageSource("", base64);
             } else {
@@ -207,7 +207,7 @@ void UIWidget::setImageSource(const std::string_view source, bool base64)
     } else {
         m_imageTexture = g_textures.getTexture(m_imageSource = source, isImageSmooth());
     }
-    
+
     if (!m_imageTexture)
         return;
 

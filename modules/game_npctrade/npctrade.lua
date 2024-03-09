@@ -464,7 +464,7 @@ function onResourceBalance(type, amount)
     refreshPlayerGoods()
 end
 
-function onPlayerGoods(money, items) 
+function onPlayerGoods(money, items)
     playerItems = {}
     for key, item in pairs(items) do
         local id = item[1]:getId()
