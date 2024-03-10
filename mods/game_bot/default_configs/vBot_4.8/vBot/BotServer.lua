@@ -59,6 +59,7 @@ if rootWidget then
       if BotServer._websocket then
         BotServer.terminate()
       end
+	  BotServer.resetReconnect()
       botServerWindow.Data.ServerStatus:setText("DISCONNECTED")
       ui.botServer:setColor('#E3242B')
       botServerWindow.Data.ServerStatus:setColor('#E3242B')
