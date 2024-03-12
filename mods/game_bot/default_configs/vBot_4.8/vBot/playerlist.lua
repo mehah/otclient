@@ -43,7 +43,7 @@ local function clearCachedPlayers()
 end
 
 local refreshStatus = function()
-if g_game.getLocalPlayer():getHealthPercent() <= 0 then return end
+if g_game.getLocalPlayer():isDead() then return end
     for _, spec in ipairs(getSpectators()) do
       if spec:isPlayer() and not spec:isLocalPlayer() then
         if config.outfits then
@@ -87,7 +87,7 @@ end
 refreshStatus()
 
 local checkStatus = function(creature)
-    if not creature:isPlayer() or creature:isLocalPlayer() or g_game.getLocalPlayer():getHealthPercent() <=  0 then return end
+    if not creature:isPlayer() or creature:isLocalPlayer() or g_game.getLocalPlayer():isDead() then return end
 
     local specName = creature:getName()
     local specOutfit = creature:getOutfit()

@@ -45,7 +45,7 @@ jobs:
           $json=Get-Content vcpkg.json -Raw | ConvertFrom-Json
           $vcpkgCommitId=$json.'builtin-baseline'
           Write-Host "vcpkg commit ID: $vcpkgCommitId"
-          echo "::set-output name=vcpkgGitCommitId::$vcpkgCommitId"
+          echo "vcpkgGitCommitId=$vcpkgCommitId" >> "$GITHUB_OUTPUT"
 
       - name: Get vcpkg commit id from vcpkg.json
         uses: lukka/run-vcpkg@main
@@ -65,14 +65,14 @@ jobs:
       - name: Create and Upload Artifact (exe)
         uses: actions/upload-artifact@main
         with:
-          name: otclient-${{ matrix.buildtype }}-${{ github.sha }}
+          name: otclient-${{ matrix.os }}-${{ matrix.buildtype }}-${{ github.sha }}
           path: |
             ${{ github.workspace }}/otclient.exe
-            
+
       - name: Create and Upload Artifact (dlls)
         uses: actions/upload-artifact@main
         with:
-          name: otclient-${{ matrix.buildtype }}-${{ github.sha }}
+          name: otclient-dlls-${{ matrix.os }}-${{ matrix.buildtype }}-${{ github.sha }}
           path: |
             ${{ github.workspace }}/*.dll
 
