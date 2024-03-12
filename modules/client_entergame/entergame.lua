@@ -357,7 +357,7 @@ function EnterGame.tryHttpLogin(clientVersion, httpLogin)
   local url = G.host
 
   if G.port == nil then
-    isHttps, _ = string.find(host, "https")
+    isHttps, _ = string.find(G.host, "https")
     if isHttps ~= nil then
       G.port = 443
     else     -- http
