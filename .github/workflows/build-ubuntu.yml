@@ -46,7 +46,7 @@ jobs:
         run: |
           vcpkgCommitId=$(grep '.builtin-baseline' vcpkg.json | awk -F: '{print $2}' | tr -d '," ')
           echo "vcpkg commit ID: $vcpkgCommitId"
-          echo "::set-output name=vcpkgGitCommitId::$vcpkgCommitId"
+          echo "vcpkgGitCommitId=$vcpkgCommitId" >> "$GITHUB_OUTPUT"
 
       - name: Get vcpkg commit id from vcpkg.json
         uses: lukka/run-vcpkg@main
@@ -66,6 +66,6 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         uses: actions/upload-artifact@main
         with:
-          name: otclient-${{ matrix.buildtype }}-${{ github.sha }}
+          name: otclient-${{ matrix.os }}-${{ matrix.buildtype }}-${{ github.sha }}
           path: |
             ${{ github.workspace }}/otclient

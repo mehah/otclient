@@ -18,7 +18,7 @@ function AddServer.add()
     local port = addServerWindow:getChildById('port'):getText()
     local protocol = addServerWindow:getChildById('protocol'):getCurrentOption().text
 
-    local added, error = ServerList.add(host, port, protocol)
+    local added, error = ServerList.add(host, port, protocol, false)
     if not added then
         displayErrorBox(tr('Error'), tr(error))
     else

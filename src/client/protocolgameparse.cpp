@@ -1240,13 +1240,14 @@ void ProtocolGame::parsePlayerGoods(const InputMessagePtr& msg) const
 
     // 12.x NOTE: this u64 is parsed only, because TFS stil sends it, we use resource balance in this protocol
     uint64_t money = 0;
-    if (g_game.getClientVersion() >= 973)
-        money = msg->getU64();
-    else
-        money = msg->getU32();
-
     if (g_game.getClientVersion() >= 1281) {
         money = m_localPlayer->getResourceBalance(Otc::RESOURCE_BANK_BALANCE) + m_localPlayer->getResourceBalance(Otc::RESOURCE_GOLD_EQUIPPED);
+    } else {
+        if (g_game.getClientVersion() >= 973) {
+            money = msg->getU64();
+        } else {
+            money = msg->getU32();
+        }
     }
 
     const uint8_t size = msg->getU8();
