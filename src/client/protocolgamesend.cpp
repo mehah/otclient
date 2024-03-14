@@ -91,7 +91,7 @@ void ProtocolGame::sendLoginPacket(uint32_t challengeTimestamp, uint8_t challeng
         if (g_game.getFeature(Otc::GameAccountNames))
             msg->addString(m_accountName);
         else
-            msg->addU32(stdext::from_string<uint32_t >(m_accountName));
+            msg->addU32(stdext::from_string<uint32_t>(m_accountName));
 
         msg->addString(m_characterName);
         msg->addString(m_accountPassword);
@@ -493,12 +493,12 @@ void ProtocolGame::sendEditList(uint32_t id, int doorId, const std::string_view 
     send(msg);
 }
 
-void ProtocolGame::sendLook(const Position& position, int thingId, int stackpos)
+void ProtocolGame::sendLook(const Position& position, int itemId, int stackpos)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientLook);
     addPosition(msg, position);
-    msg->addU16(thingId);
+    msg->addU16(itemId);
     msg->addU8(stackpos);
     send(msg);
 }
@@ -1112,5 +1112,16 @@ void ProtocolGame::sendCloseImbuingWindow()
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientCloseImbuingWindow);
+    send(msg);
+}
+
+void ProtocolGame::sendStashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientUseStash);
+    msg->addU8(Otc::Supply_Stash_Actions_t::SUPPLY_STASH_ACTION_WITHDRAW);
+    msg->addU16(itemId);
+    msg->addU32(count);
+    msg->addU8(stackpos);
     send(msg);
 }

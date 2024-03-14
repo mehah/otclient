@@ -25,6 +25,7 @@
 #include <framework/core/graphicalapplication.h>
 #include "game.h"
 #include "map.h"
+#include <client/client.h>
 
 void Effect::draw(const Point& dest, bool drawThings, LightView* lightView)
 {
@@ -73,6 +74,8 @@ void Effect::draw(const Point& dest, bool drawThings, LightView* lightView)
         m_drawConductor.order = DrawOrder::FOURTH;
     }
 
+    if (drawThings &&  g_client.getEffectAlpha() < 1.f)
+        g_drawPool.setOpacity(g_client.getEffectAlpha(), true);
     getThingType()->draw(dest, 0, xPattern, yPattern, 0, animationPhase, Color::white, drawThings, lightView, m_drawConductor);
 }
 

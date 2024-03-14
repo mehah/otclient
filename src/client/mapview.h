@@ -48,6 +48,7 @@ struct MapPosInfo
     Point drawOffset;
     float horizontalStretchFactor;
     float verticalStretchFactor;
+    float scaleFactor;
 
     bool isInRange(const Position& pos, bool ignoreZ = false) const
     {
@@ -90,6 +91,8 @@ public:
     ~MapView() override;
     void draw(const Rect& rect);
     void drawForeground(const Rect& rect);
+    void drawCreatureInformation();
+    void preLoad();
 
     // floor visibility related
     uint8_t getLockedFirstVisibleFloor() const { return m_lockedFirstVisibleFloor; }
@@ -255,6 +258,10 @@ private:
     }
 
     Rect calcFramebufferSource(const Size& destSize);
+
+    Point transformPositionTo2D(const Position& position) const {
+        return transformPositionTo2D(position, m_posInfo.camera);
+    }
 
     Point transformPositionTo2D(const Position& position, const Position& relativePosition) const
     {

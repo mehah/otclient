@@ -95,10 +95,10 @@ public:
     Tile(const Position& position);
 
     LuaObjectPtr attachedObjectToLuaObject() override { return asLuaObject(); }
+    bool isTile() override { return true; }
 
     void onAddInMapView();
-    void draw(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, LightView* lightView = nullptr);
-    void drawWidgets(const MapPosInfo& rect);
+    void draw(const Point& dest, const MapPosInfo& mapRect, int flags, LightView* lightView = nullptr);
 
     void clean();
 
@@ -133,7 +133,7 @@ public:
     int getThingCount() { return m_things.size() + m_effects.size(); }
 
     bool isWalkable(bool ignoreCreatures = false);
-    bool isClickable() { return (hasGround() || hasBottomItem()) && !hasIgnoreLook(); }
+    bool isClickable();
     bool isPathable() { return (m_thingTypeFlag & TileThingType::NOT_PATHABLE) == 0; }
     bool isFullGround() { return m_thingTypeFlag & TileThingType::FULL_GROUND; }
     bool isFullyOpaque() { return m_thingTypeFlag & TileThingType::IS_OPAQUE; }
@@ -204,7 +204,7 @@ public:
 
     TilePtr asTile() { return static_self_cast<Tile>(); }
 
-    bool checkForDetachableThing();
+    bool checkForDetachableThing(const TileSelectType selectType = TileSelectType::FILTERED);
 
 #ifndef BOT_PROTECTION
     void drawTexts(Point dest);
@@ -218,7 +218,7 @@ public:
 #endif
 private:
     void drawTop(const Point& dest, int flags, bool forceDraw, LightView* lightView = nullptr);
-    void drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags, bool isCovered, bool forceDraw, LightView* lightView = nullptr);
+    void drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags, bool forceDraw, LightView* lightView = nullptr);
     void drawThing(const ThingPtr& thing, const Point& dest, int flags, LightView* lightView);
 
     void setThingFlag(const ThingPtr& thing);

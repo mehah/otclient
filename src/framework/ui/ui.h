@@ -31,3 +31,4 @@
 #include "uitextedit.h"
 #include "uiverticallayout.h"
 #include "uiwidget.h"
+#include "uiqrcode.h"

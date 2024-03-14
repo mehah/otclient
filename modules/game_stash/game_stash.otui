@@ -1,0 +1,149 @@
+StashWindow < MainWindow
+  id: stashWindow
+  !text: tr('Supply Stash')
+  size: 700 530
+
+  @onEscape: onSupplyStashClose()
+
+  // Main Panel Window
+
+  Panel
+    id: supraPanel
+    width: 164
+    height: 25
+    anchors.top: parent.top
+    anchors.left: parent.left
+
+  Panel
+    id: mainTabContent
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    padding: 3
+    border-width: 1
+    border-color: #000000
+    margin-bottom: 20
+
+    VerticalScrollBar
+      id: itemsPanelListScrollBar
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      step: 28
+      pixels-scroll: true
+
+    ScrollablePanel
+      id: itemsPanel
+      anchors.left: parent.left
+      anchors.right: prev.left
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      vertical-scrollbar: itemsPanelListScrollBar
+      layout:
+        type: grid
+        cell-size: 36 36
+        flow: true
+        auto-spacing: true
+
+  Panel
+    id: findSupply
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    width: 164
+    height: 25
+    Label
+      !text: tr('Find') .. ':'
+      anchors.top: parent.top
+      anchors.left: parent.left
+      width: 30
+      font: verdana-11px-rounded
+      text-offset: 0 2
+
+    TextEdit
+      id: searchEdit
+      anchors.verticalCenter: prev.verticalCenter
+      anchors.left: prev.right
+      margin-left: 3
+      width: 113
+      @onTextChange: renderItems()
+
+  Button
+    id: closeButton
+    !text: tr('Close')
+    anchors.top: mainTabContent.bottom
+    anchors.horizontalCenter: mainTabContent.horizontalCenter
+    margin-top: 5
+    width: 110
+    @onClick: onSupplyStashClose()
+
+StashItemBox < UICheckBox
+  id: itemBox
+  border-width: 1
+  border-color: #000000
+  color: #aaaaaa
+  text-align: center
+
+  Item
+    id: item
+    phantom: true
+    virtual: true
+    text-offset: 0 22
+    text-align: right
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin: 1
+
+  $checked:
+    border-color: #ffffff
+
+  $hover !checked:
+    border-color: #aaaaaa
+
+  $disabled:
+    image-color: #ffffff88
+    color: #aaaaaa88
+
+StashSelectAmount < MainWindow
+  id: stashSelectAmount
+  !text: tr('Stash Withdraw')
+  size: 196 90
+
+  Item
+    id: item
+    anchors.left: parent.left
+    anchors.top: parent.top
+    margin-top: 2
+    margin-left: -4
+    focusable: false
+    virtual: true
+
+  HorizontalScrollBar
+    id: countScrollBar
+    anchors.left: prev.right
+    anchors.right: parent.right
+    anchors.top: prev.top
+    margin-left: 10
+    margin-top: -2
+    focusable: false
+
+  Button
+    id: buttonCancel
+    !text: tr('Cancel')
+    height: 20
+    anchors.left: countScrollBar.horizontalCenter
+    anchors.right: countScrollBar.right
+    anchors.top: countScrollBar.bottom
+    margin-top: 7
+    focusable: false
+
+  Button
+    id: buttonOk
+    !text: tr('Ok')
+    height: 20
+    anchors.right: countScrollBar.horizontalCenter
+    anchors.left: countScrollBar.left
+    anchors.top: countScrollBar.bottom
+    margin-top: 7
+    margin-right: 6
+    focusable: false

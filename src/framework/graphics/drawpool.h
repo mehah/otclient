@@ -40,7 +40,6 @@ enum class DrawPoolType : uint8_t
     LIGHT,
     FOREGROUND_MAP,
     FOREGROUND,
-    FOREGROUND_MAP_WIDGETS,
     LAST
 };
 
@@ -60,7 +59,7 @@ struct DrawConductor
     uint8_t order{ DrawOrder::FIRST };
 };
 
-static const DrawConductor DEFAULT_DRAW_CONDUCTOR;
+constexpr DrawConductor DEFAULT_DRAW_CONDUCTOR;
 
 class DrawPool
 {
@@ -261,6 +260,27 @@ private:
         }
 
         m_objectsFlushed.clear();
+    }
+
+    void resetOnlyOnceParameters() {
+        if (m_onlyOnceStateFlag > 0) { // Only Once State
+            if (m_onlyOnceStateFlag & STATE_OPACITY)
+                resetOpacity();
+
+            if (m_onlyOnceStateFlag & STATE_BLEND_EQUATION)
+                resetBlendEquation();
+
+            if (m_onlyOnceStateFlag & STATE_CLIP_RECT)
+                resetClipRect();
+
+            if (m_onlyOnceStateFlag & STATE_COMPOSITE_MODE)
+                resetCompositionMode();
+
+            if (m_onlyOnceStateFlag & STATE_SHADER_PROGRAM)
+                resetShaderProgram();
+
+            m_onlyOnceStateFlag = 0;
+        }
     }
 
     bool canRepaint(bool autoUpdateStatus);

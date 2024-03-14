@@ -93,7 +93,6 @@ function UIMiniWindowContainer:fitAll(noRemoveChild)
 
   -- close widgets
   for i = 1, #removeChildren do
-    print(removeChildren[i]:getId())
     if removeChildren[i].forceOpen then
       removeChildren[i]:minimize(true)
     else

@@ -19,9 +19,13 @@ game
     shield-blink-ticks: 500
     volatile-square-duration: 1000
     adjust-creature-information-based-crop-size: false
+    diagonal-walk-speed: 3
+
+  player
+    diagonal-walk-speed: 3
 
   render
-    invisible-ticks-per-frame: 500
+    invisible-ticks-per-frame: 75
     item-ticks-per-frame: 500
     effect-ticks-per-frame: 75
     missile-ticks-per-frame: 75

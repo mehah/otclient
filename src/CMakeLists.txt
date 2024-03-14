@@ -4,6 +4,7 @@ project(otclient)
 # *****************************************************************************
 # Options
 # *****************************************************************************
+option(TOGGLE_FRAMEWORK_GRAPHICS "Use Graphics " ON)
 option(TOGGLE_FRAMEWORK_SOUND "Use SOUND " ON)
 option(TOGGLE_FRAMEWORK_XML "Use XML " ON)
 option(TOGGLE_FRAMEWORK_NET "Use NET " ON)
@@ -50,6 +51,9 @@ endif()
 
 # Define Framework options for use in compilation
 set(FRAMEWORK_DEFINITIONS "")
+if (TOGGLE_FRAMEWORK_GRAPHICS)
+	set(FRAMEWORK_DEFINITIONS ${FRAMEWORK_DEFINITIONS} -DFRAMEWORK_GRAPHICS)
+endif()
 if (TOGGLE_FRAMEWORK_SOUND)
 	set(FRAMEWORK_DEFINITIONS ${FRAMEWORK_DEFINITIONS} -DFRAMEWORK_SOUND)
 endif()
@@ -115,26 +119,26 @@ endif()
 
 # === ASAN ===
 if(ASAN_ENABLED)
-  log_option_enabled("asan")
+	log_option_enabled("asan")
 
-  if(MSVC)
+	if(MSVC)
 	target_compile_options(${PROJECT_NAME} PUBLIC /fsanitize=address)
-  else()
+	else()
 	target_compile_options(${PROJECT_NAME} PUBLIC -fsanitize=address)
 	target_link_options(${PROJECT_NAME} PUBLIC -fsanitize=address)
-  endif()
+	endif()
 else()
-  log_option_disabled("asan")
+	log_option_disabled("asan")
 endif()
 
 
 # === DEBUG LOG ===
 # cmake -DDEBUG_LOG=ON ..
 if(CMAKE_BUILD_TYPE MATCHES Debug)
-  target_compile_definitions(${PROJECT_NAME} PRIVATE -DDEBUG_LOG=ON )
-  log_option_enabled("DEBUG LOG")
-  else()
-  log_option_disabled("DEBUG LOG")
+	target_compile_definitions(${PROJECT_NAME} PRIVATE -DDEBUG_LOG=ON )
+	log_option_enabled("DEBUG LOG")
+	else()
+	log_option_disabled("DEBUG LOG")
 endif(CMAKE_BUILD_TYPE MATCHES Debug)
 
 # *****************************************************************************
@@ -190,6 +194,8 @@ find_package(asio REQUIRED)
 find_package(Threads REQUIRED)
 find_package(STDUUID CONFIG REQUIRED)
 find_package(pugixml CONFIG REQUIRED)
+find_package(ZLIB REQUIRED)
+find_package(httplib CONFIG REQUIRED)
 if(APPLE)
 	# Required for Physfs
 	find_library(FOUNDATION Foundation REQUIRED)
@@ -232,7 +238,6 @@ endif()
 # OTClient source files configuration
 # *****************************************************************************
 set(SOURCE_FILES
-	framework/core/adaptativeframecounter.cpp
 	framework/core/application.cpp
 	framework/core/asyncdispatcher.cpp
 	framework/core/binarytree.cpp
@@ -242,7 +247,6 @@ set(SOURCE_FILES
 	framework/core/event.cpp
 	framework/core/eventdispatcher.cpp
 	framework/core/filestream.cpp
-	framework/core/graphicalapplication.cpp
 	framework/core/logger.cpp
 	framework/core/module.cpp
 	framework/core/modulemanager.cpp
@@ -252,32 +256,6 @@ set(SOURCE_FILES
 	framework/core/unzipper.h
 	framework/core/timer.cpp
 	framework/discord/discord.cpp
-	framework/graphics/animatedtexture.cpp
-	framework/graphics/apngloader.cpp
-	framework/graphics/bitmapfont.cpp
-	framework/graphics/cachedtext.cpp
-	framework/graphics/coordsbuffer.cpp
-	framework/graphics/drawpool.cpp
-	framework/graphics/drawpoolmanager.cpp
-	framework/graphics/fontmanager.cpp
-	framework/graphics/framebuffer.cpp
-	framework/graphics/graphics.cpp
-	framework/graphics/hardwarebuffer.cpp
-	framework/graphics/image.cpp
-	framework/graphics/painter.cpp
-	framework/graphics/paintershaderprogram.cpp
-	framework/graphics/particle.cpp
-	framework/graphics/particleaffector.cpp
-	framework/graphics/particleeffect.cpp
-	framework/graphics/particleemitter.cpp
-	framework/graphics/particlemanager.cpp
-	framework/graphics/particlesystem.cpp
-	framework/graphics/particletype.cpp
-	framework/graphics/shader.cpp
-	framework/graphics/shaderprogram.cpp
-	framework/graphics/texture.cpp
-	framework/graphics/texturemanager.cpp
-	framework/input/mouse.cpp
 	framework/luaengine/luaexception.cpp
 	framework/luaengine/luainterface.cpp
 	framework/luaengine/luaobject.cpp
@@ -288,12 +266,13 @@ set(SOURCE_FILES
 	framework/net/outputmessage.cpp
 	framework/net/protocol.cpp
 	framework/net/protocolhttp.cpp
+	framework/net/httplogin.cpp
 	framework/net/server.cpp
-	framework/otml//otmldocument.cpp
-	framework/otml//otmlemitter.cpp
-	framework/otml//otmlexception.cpp
-	framework/otml//otmlnode.cpp
-	framework/otml//otmlparser.cpp
+	framework/otml/otmldocument.cpp
+	framework/otml/otmlemitter.cpp
+	framework/otml/otmlexception.cpp
+	framework/otml/otmlnode.cpp
+	framework/otml/otmlparser.cpp
 	framework/platform/androidgameactivity.cpp
 	framework/platform/androidmanager.cpp
 	framework/platform/androidmanager.h
@@ -305,8 +284,6 @@ set(SOURCE_FILES
 	framework/platform/unixplatform.cpp
 	framework/platform/win32crashhandler.cpp
 	framework/platform/win32platform.cpp
-	framework/platform/win32window.cpp
-	framework/platform/x11window.cpp
 	framework/stdext/demangle.cpp
 	framework/stdext/math.cpp
 	framework/stdext/net.cpp
@@ -314,20 +291,6 @@ set(SOURCE_FILES
 	framework/stdext/time.cpp
 	framework/stdext/uri.cpp
 	framework/stdext/qrcodegen.cpp
-	framework/ui/uianchorlayout.cpp
-	framework/ui/uiboxlayout.cpp
-	framework/ui/uigridlayout.cpp
-	framework/ui/uihorizontallayout.cpp
-	framework/ui/uilayout.cpp
-	framework/ui/uimanager.cpp
-	framework/ui/uiparticles.cpp
-	framework/ui/uitextedit.cpp
-	framework/ui/uitranslator.cpp
-	framework/ui/uiverticallayout.cpp
-	framework/ui/uiwidget.cpp
-	framework/ui/uiwidgetbasestyle.cpp
-	framework/ui/uiwidgetimage.cpp
-	framework/ui/uiwidgettext.cpp
 	framework/util/color.cpp
 	framework/util/crypt.cpp
 
@@ -362,7 +325,6 @@ set(SOURCE_FILES
 	client/protocolgame.cpp
 	client/protocolgameparse.cpp
 	client/protocolgamesend.cpp
-	client/shadermanager.cpp
 	client/spriteappearances.cpp
 	client/spritemanager.cpp
 	client/statictext.cpp
@@ -385,6 +347,57 @@ set(SOURCE_FILES
 	androidmain.cpp
 )
 
+if (TOGGLE_FRAMEWORK_GRAPHICS)
+	set(SOURCE_FILES ${SOURCE_FILES}
+		framework/core/adaptativeframecounter.cpp
+		framework/core/graphicalapplication.cpp
+		framework/input/mouse.cpp
+		framework/graphics/animatedtexture.cpp
+		framework/graphics/apngloader.cpp
+		framework/graphics/bitmapfont.cpp
+		framework/graphics/cachedtext.cpp
+		framework/graphics/coordsbuffer.cpp
+		framework/graphics/drawpool.cpp
+		framework/graphics/drawpoolmanager.cpp
+		framework/graphics/fontmanager.cpp
+		framework/graphics/framebuffer.cpp
+		framework/graphics/graphics.cpp
+		framework/graphics/hardwarebuffer.cpp
+		framework/graphics/image.cpp
+		framework/graphics/painter.cpp
+		framework/graphics/paintershaderprogram.cpp
+		framework/graphics/particle.cpp
+		framework/graphics/particleaffector.cpp
+		framework/graphics/particleeffect.cpp
+		framework/graphics/particleemitter.cpp
+		framework/graphics/particlemanager.cpp
+		framework/graphics/particlesystem.cpp
+		framework/graphics/particletype.cpp
+		framework/graphics/shader.cpp
+		framework/graphics/shaderprogram.cpp
+		framework/graphics/texture.cpp
+		framework/graphics/texturemanager.cpp
+		framework/graphics/shadermanager.cpp
+		framework/platform/win32window.cpp
+		framework/platform/x11window.cpp
+		framework/ui/uianchorlayout.cpp
+		framework/ui/uiboxlayout.cpp
+		framework/ui/uigridlayout.cpp
+		framework/ui/uihorizontallayout.cpp
+		framework/ui/uilayout.cpp
+		framework/ui/uimanager.cpp
+		framework/ui/uiparticles.cpp
+		framework/ui/uitextedit.cpp
+		framework/ui/uitranslator.cpp
+		framework/ui/uiverticallayout.cpp
+		framework/ui/uiwidget.cpp
+		framework/ui/uiwidgetbasestyle.cpp
+		framework/ui/uiwidgetimage.cpp
+		framework/ui/uiwidgettext.cpp
+		framework/ui/uiqrcode.cpp
+	)
+endif()
+
 if (TOGGLE_FRAMEWORK_SOUND)
 	set(SOURCE_FILES ${SOURCE_FILES}
 		framework/sound/combinedsoundsource.cpp
@@ -404,6 +417,13 @@ target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES})
 # Includes and librarys
 # *****************************************************************************
 if(MSVC)
+
+	# Set variables to have Windows Vista Value so httplib will build 'inet_pton'
+	target_compile_definitions(${PROJECT_NAME}
+		PRIVATE
+		NTDDI_VERSION=0x06000000
+		_WIN32_WINNT=0x0600
+	)
 
 	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 		string(REPLACE "/Zi" "/Z7" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
@@ -508,7 +528,7 @@ elseif(ANDROID)
 		log
 		pugixml::pugixml
 	)
-else()
+else() # Linux
 	target_include_directories(${PROJECT_NAME}
 		PRIVATE
 		${CMAKE_SOURCE_DIR}/src
@@ -516,11 +536,11 @@ else()
 		${CMAKE_THREAD_LIBS_INIT}
 		${Protobuf_INCLUDE_DIRS}
 		${GMP_INCLUDE_DIR}
-		${OPENSSL_INCLUDE_DIR}
 		${PHYSFS_INCLUDE_DIR}
 		${GLEW_INCLUDE_DIR}
 		${PARALLEL_HASHMAP_INCLUDE_DIRS}
 		${NLOHMANN_JSON_INCLUDE_DIR}
+		${OPENSSL_INCLUDE_DIR}
 	)
 	target_link_libraries(${PROJECT_NAME}
 		PRIVATE
@@ -535,10 +555,12 @@ else()
 		${DirectX_LIBRARIES}
 		${OGG_LIBRARY}
 		${GMP_LIBRARY}
-		${OPENSSL_LIBRARIES}
 		${STDUUID}
 		${FOUNDATION}
 		${IOKIT}
+		${OPENSSL_LIBRARY}
+		${OPENSSL_CRYPTO_LIBRARY}
+		${HTTPLIB_LIBRARY}
 
 		Threads::Threads
 		X11::X11
@@ -548,7 +570,19 @@ else()
 		Vorbis::vorbisfile
 		LibLZMA::LibLZMA
 		pugixml::pugixml
+		ZLIB::ZLIB
+		OpenSSL::SSL
+		OpenSSL::Crypto
+		httplib::httplib
 	)
+
+	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+		target_compile_options(${PROJECT_NAME}
+			PRIVATE
+				-Wall -Wextra -Wpedantic
+		)
+	endif()
+
 endif()
 
 # *****************************************************************************

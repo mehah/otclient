@@ -34,8 +34,7 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/filestream.h>
 #include <framework/core/graphicalapplication.h>
-
-#include "shadermanager.h"
+#include <framework/graphics/shadermanager.h>
 
 ItemPtr Item::create(int id)
 {
@@ -59,8 +58,6 @@ void Item::draw(const Point& dest, bool drawThings, LightView* lightView)
         internalDraw(animationPhase, dest, getMarkedColor(), drawThings, true);
     else if (isHighlighted())
         internalDraw(animationPhase, dest, getHighlightColor(), drawThings, true);
-    
-    m_lastDrawDest = dest;
 }
 
 void Item::internalDraw(int animationPhase, const Point& dest, const Color& color, bool drawThings, bool replaceColorShader, LightView* lightView)

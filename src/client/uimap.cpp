@@ -31,7 +31,7 @@
 
 UIMap::UIMap()
 {
-    setProp(PropDraggable, true);
+    setProp(PropDraggable, true, false);
     m_keepAspectRatio = true;
     m_limitVisibleRange = false;
     m_maxZoomIn = 3;
@@ -53,6 +53,7 @@ void UIMap::drawSelf(DrawPoolType drawPane)
 {
     UIWidget::drawSelf(drawPane);
 
+    const auto& mapRect = g_app.isScaled() ? Rect(0, 0, g_graphics.getViewportSize()) : m_mapRect;
     if (drawPane == DrawPoolType::FOREGROUND) {
         g_drawPool.addBoundingRect(m_mapRect.expanded(1), Color::black);
         g_drawPool.addAction([] {glDisable(GL_BLEND); });
@@ -61,20 +62,27 @@ void UIMap::drawSelf(DrawPoolType drawPane)
         return;
     }
 
-    const auto& mapRect = g_app.isScaled() ? Rect(0, 0, g_graphics.getViewportSize()) : m_mapRect;
-
     if (drawPane == DrawPoolType::MAP) {
-        m_mapView->updateRect(mapRect);
         g_drawPool.preDraw(drawPane, [this, &mapRect] {
             m_mapView->registerEvents();
             m_mapView->draw(mapRect);
         }, m_mapView->m_posInfo.rect, m_mapView->m_posInfo.srcRect, Color::black);
+    } else if (drawPane == DrawPoolType::CREATURE_INFORMATION) {
+        std::scoped_lock l(g_drawPool.get(drawPane)->getMutexPreDraw());
+        g_drawPool.preDraw(drawPane, [this] {
+            m_mapView->drawCreatureInformation();
+        });
     } else if (drawPane == DrawPoolType::FOREGROUND_MAP) {
         g_textDispatcher.poll();
         g_drawPool.preDraw(drawPane, [this, &mapRect] {
             m_mapView->drawForeground(mapRect);
         });
     }
+}
+
+void UIMap::updateMapRect() {
+    const auto& mapRect = g_app.isScaled() ? Rect(0, 0, g_graphics.getViewportSize()) : m_mapRect;
+    m_mapView->updateRect(mapRect);
 }
 
 bool UIMap::setZoom(int zoom)

@@ -314,8 +314,8 @@ public:
     int getLensHelp() { return m_lensHelp; }
     int getClothSlot() { return m_clothSlot; }
 
-    bool isTopGround() { return isGround() && !isSingleDimension(); }
-    bool isTopGroundBorder() { return isGroundBorder() && !isSingleDimension(); }
+    bool isTopGround() { return isGround() && m_size.dimension() == 4; }
+    bool isTopGroundBorder() { return isGroundBorder() && m_size.dimension() == 4; }
     bool isSingleGround() { return isGround() && isSingleDimension(); }
     bool isSingleGroundBorder() { return isGroundBorder() && isSingleDimension(); }
     bool isTall(const bool useRealSize = false);
@@ -393,6 +393,9 @@ public:
     int getExactHeight();
     TexturePtr getTexture(int animationPhase);
 
+    std::string getName() { return m_name; }
+    std::string getDescription() { return m_description; }
+
 private:
     static ThingFlagAttr thingAttrToThingFlagAttr(ThingAttr attr);
     static Size getBestTextureDimension(int w, int h, int count);
@@ -462,4 +465,7 @@ private:
     std::atomic_bool m_loading;
 
     Timer m_lastTimeUsage;
+
+    std::string m_name;
+    std::string m_description;
 };

@@ -378,6 +378,8 @@ public:
     void enableTileThingLuaCallback(bool value) { m_tileThingsLuaCallback = value; }
     bool isTileThingLuaCallbackEnabled() { return m_tileThingsLuaCallback; }
 
+    void stashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos);
+
 protected:
     void enableBotCall() { m_denyBotCall = false; }
     void disableBotCall() { m_denyBotCall = true; }

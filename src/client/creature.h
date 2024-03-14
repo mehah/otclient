@@ -79,6 +79,10 @@ public:
     void setPassable(bool passable) { m_passable = passable; }
     void setMountShader(const std::string_view name);
 
+    void onStartAttachEffect(const AttachedEffectPtr& effect) override;
+    void onDispatcherAttachEffect(const AttachedEffectPtr& effect) override;
+    void onStartDetachEffect(const AttachedEffectPtr& effect) override;
+
     void addTimedSquare(uint8_t color);
     void removeTimedSquare() { m_showTimedSquare = false; }
     void showStaticSquare(const Color& color) { m_showStaticSquare = true; m_staticSquareColor = color; }
@@ -116,6 +120,9 @@ public:
     uint32_t getMasterId() { return m_masterId; }
     std::string getName() { return m_name.getText(); }
 
+    Point getDrawOffset() { return Point(-1, -1) * getDrawElevation() + m_walkOffset; }
+    int getDrawElevation();
+
     Otc::Direction getDirection() { return m_direction; }
     Outfit getOutfit() { return m_outfit; }
     const Light& getLight() const override;
@@ -149,6 +156,8 @@ public:
             else --m_disableWalkAnimation;
         }
     }
+
+    void setBounce(uint8_t minHeight, uint8_t height, uint16_t speed) { m_bounce = { minHeight, height , speed }; }
 
 #ifndef BOT_PROTECTION
     void setText(const std::string& text, const Color& color);
@@ -264,6 +273,13 @@ private:
     float m_jumpDuration{ 0 };
     PointF m_jumpOffset;
     Timer m_jumpTimer;
+
+    struct
+    {
+        uint8_t minHeight{ 0 };
+        uint8_t height{ 0 };
+        uint16_t speed{ 0 };
+    } m_bounce;
 
     // Mount Shader
     PainterShaderProgramPtr m_mountShader;

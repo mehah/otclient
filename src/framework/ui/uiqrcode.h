@@ -22,44 +22,24 @@
 
 #pragma once
 
-#include <framework/graphics/paintershaderprogram.h>
 #include "declarations.h"
 
- //@bindsingleton g_shaders
-class ShaderManager
+#include "uiwidget.h"
+
+// @bindclass
+class UIQrCode : public UIWidget
 {
 public:
-    enum
-    {
-        ITEM_ID_UNIFORM = 10,
-        OUTFIT_ID_UNIFORM = 11,
-        MOUNT_ID_UNIFORM = 12,
-        SHADER_ID_UNIFORM = 13,
-        MAP_ZOOM = 14,
-        MAP_WALKOFFSET = 15,
-        MAP_CENTER_COORD = 16,
-        MAP_GLOBAL_COORD = 17,
-    };
+    void setCode(const std::string& code, int border);
+    void setCodeBorder(int border) { m_qrCodeBorder = border; setCode(m_qrCode, border); }
 
-    void init();
-    void terminate();
-
-    void setupMapShader(const std::string_view name);
-    void setupItemShader(const std::string_view name);
-    void setupOutfitShader(const std::string_view name);
-    void setupMountShader(const std::string_view name);
-
-    void createShader(const std::string_view name, bool useFramebuffer = false);
-    void createFragmentShader(const std::string_view name, const std::string_view file, bool useFramebuffer = false);
-    void createFragmentShaderFromCode(const std::string_view name, const std::string_view code, bool useFramebuffer = false);
-
-    void addMultiTexture(const std::string_view name, const std::string_view file);
-
-    PainterShaderProgramPtr getShader(const std::string_view name);
+    std::string getCode() { return m_qrCode; }
+    int getCodeBorder() { return m_qrCodeBorder; }
 
 private:
+    void parseCustomStyle(const OTMLNodePtr& styleNode) override;
 
-    stdext::map<std::string, PainterShaderProgramPtr> m_shaders;
+protected:
+    std::string m_qrCode;
+    uint32_t m_qrCodeBorder{ 1 };
 };
-
-extern ShaderManager g_shaders;

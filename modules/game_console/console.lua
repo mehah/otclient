@@ -438,8 +438,7 @@ function load()
 end
 
 function isEnabledWASD()
-    local settings = g_settings.getNode('game_console')
-    return settings.wasdMode
+    return consoleToggleChat:isChecked()
 end
 
 function onTabChange(tabBar, tab)

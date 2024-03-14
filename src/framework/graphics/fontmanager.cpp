@@ -23,8 +23,6 @@
 #include "fontmanager.h"
 #include "texture.h"
 
-#include <client/gameconfig.h>
-
 #include <framework/core/resourcemanager.h>
 #include <framework/otml/otml.h>
 
@@ -35,6 +33,7 @@ void FontManager::terminate() { clearFonts(); }
 void FontManager::clearFonts() {
     m_fonts.clear();
     m_defaultFont = nullptr;
+    m_defaultWidgetFont = nullptr;
 }
 
 bool FontManager::importFont(const std::string& file)
@@ -60,6 +59,8 @@ bool FontManager::importFont(const std::string& file)
         // set as default if needed
         if (!m_defaultFont || fontNode->valueAt<bool>("default", false))
             m_defaultFont = font;
+        else if (!m_defaultWidgetFont || fontNode->valueAt<bool>("widget-default", false))
+            m_defaultWidgetFont = font;
 
         return true;
     } catch (const stdext::exception& e) {

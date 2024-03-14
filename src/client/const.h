@@ -715,4 +715,12 @@ namespace Otc
         OFFER_STATE_ACCEPTED = 3,
         OFFER_STATE_ACCEPTEDEX = 255
     };
+
+    enum Supply_Stash_Actions_t : uint8_t
+    {
+        SUPPLY_STASH_ACTION_STOW_ITEM = 0,
+        SUPPLY_STASH_ACTION_STOW_CONTAINER = 1,
+        SUPPLY_STASH_ACTION_STOW_STACK = 2,
+        SUPPLY_STASH_ACTION_WITHDRAW = 3
+    };
 }

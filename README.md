@@ -60,11 +60,13 @@
 - Colored text [@conde2](https://github.com/conde2)
   - widget:setColoredText("{Colored text, #ff00ff} normal text")
 - QR Code support, with auto generate it from string  [@conde2]
-  - qr-code-border: 2
-  - qr-code: Hail OTClient Redemption - Conde2 Dev
+  - UIQrCode: 
+    - code-border: 2
+    - code: Hail OTClient Redemption - Conde2 Dev
 - Smooth Walk Elevation Feature by [@SkullzOTS](https://github.com/SkullzOTS)
   - View Feature: [Gyazo](https://i.gyazo.com/af0ed0f15a9e4d67bd4d0b2847bd6be7.gif)
   - To enable just go to [modules/game_features/features.lua](https://github.com/mehah/otclient/blob/main/modules/game_features/features.lua#L5), and uncomment line 5 (g_game.enableFeature(GameSmoothWalkElevation)).
+- Lua Debugger for VSCode [see wiki](https://github.com/mehah/otclient/wiki/Lua-Debugging-(VSCode)) [@BenDol](https://github.com/BenDol)
   
 ##### Sponsored  (Features)
 - Shader with Framebuffer | ([@SkullzOTS](https://github.com/SkullzOTS), [@Mryukiimaru](https://github.com/Mryukiimaru), [@JeanTheOne](https://github.com/JeanTheOne), [@KizaruHere](https://github.com/KizaruHere))
@@ -72,6 +74,7 @@
   - Is adapted in 85%
   - To enable it, it is necessary to remove/off the BOT_PROTECTION flag.
   - [VS Solution](https://github.com/mehah/otclient/blob/68e4e1b94c2041bd235441244156e6477058250c/vc17/settings.props#L9) / [CMAKE](https://github.com/mehah/otclient/blob/68e4e1b94c2041bd235441244156e6477058250c/src/CMakeLists.txt#L13)
+
 
 ##### [OTClient V8](https://github.com/OTCv8) (Features)
 - Lighting System

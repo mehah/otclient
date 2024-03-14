@@ -22,7 +22,6 @@
 
 #ifdef WIN32
 
-
 #include "platform.h"
 #include <framework/stdext/stdext.h>
 #include <framework/core/eventdispatcher.h>

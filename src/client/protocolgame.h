@@ -72,7 +72,7 @@ public:
     void sendUpContainer(int containerId);
     void sendEditText(uint32_t id, const std::string_view text);
     void sendEditList(uint32_t id, int doorId, const std::string_view text);
-    void sendLook(const Position& position, int thingId, int stackpos);
+    void sendLook(const Position& position, int itemId, int stackpos);
     void sendLookCreature(uint32_t creatureId);
     void sendTalk(Otc::MessageMode mode, int channelId, const std::string_view receiver, const std::string_view message);
     void sendRequestChannels();
@@ -129,6 +129,7 @@ public:
     void sendApplyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm);
     void sendClearImbuement(uint8_t slot);
     void sendCloseImbuingWindow();
+    void sendStashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos);
 
     // otclient only
     void sendChangeMapAwareRange(int xrange, int yrange);
@@ -269,6 +270,7 @@ private:
     void parseSupplyStash(const InputMessagePtr& msg);
     void parseSpecialContainer(const InputMessagePtr& msg);
     void parsePartyAnalyzer(const InputMessagePtr& msg);
+    void parseImbuementDurations(const InputMessagePtr& msg);
     void parsePassiveCooldown(const InputMessagePtr& msg);
     void parseClientCheck(const InputMessagePtr& msg);
     void parseGameNews(const InputMessagePtr& msg);

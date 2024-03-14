@@ -30,16 +30,15 @@
 #include <framework/luaengine/luainterface.h>
 #include <framework/otml/otmlnode.h>
 #include <framework/platform/platformwindow.h>
-
 #include "framework/graphics/drawpoolmanager.h"
-#include <client/shadermanager.h>
+#include "framework/graphics/shadermanager.h"
 
 UIWidget::UIWidget()
 {
-    setProp(PropEnabled, true);
-    setProp(PropVisible, true);
-    setProp(PropFocusable, true);
-    setProp(PropFirstOnStyle, true);
+    setProp(PropEnabled, true, false);
+    setProp(PropVisible, true, false);
+    setProp(PropFocusable, true, false);
+    setProp(PropFirstOnStyle, true, false);
 
     m_clickTimer.stop();
 
@@ -134,7 +133,7 @@ void UIWidget::drawChildren(const Rect& visibleRect, DrawPoolType drawPane)
 
         // debug draw box
         if (g_ui.isDrawingDebugBoxes() && drawPane == DrawPoolType::FOREGROUND) {
-            if(child->isFocused())
+            if (child->isFocused())
                 g_drawPool.addBoundingRect(child->getRect(), Color::yellow);
             else
                 g_drawPool.addBoundingRect(child->getRect(), Color::green);
@@ -152,7 +151,7 @@ void UIWidget::addChild(const UIWidgetPtr& child)
     }
 
     if (child->isDestroyed()) {
-        g_logger.traceWarning("attemp to add a destroyed child into a UIWidget");
+        g_logger.traceWarning("attempt to add a destroyed child into a UIWidget");
         return;
     }
 
@@ -860,6 +859,10 @@ void UIWidget::internalDestroy()
         child->internalDestroy();
     m_children.clear();
 
+    for (const auto& [id, destroyCallback] : m_onDestroyCallbacks)
+        destroyCallback();
+    m_onDestroyCallbacks.clear();
+
     callLuaField("onDestroy");
 
     releaseLuaFieldsTable();
@@ -914,6 +917,34 @@ void UIWidget::destroyChildren()
 
     if (layout)
         layout->enableUpdates();
+}
+
+void UIWidget::removeChildren()
+{
+    UILayoutPtr layout = getLayout();
+    if (layout)
+        layout->disableUpdates();
+
+    m_focusedChild = nullptr;
+    m_lockedChildren.clear();
+    while (!m_children.empty()) {
+        removeChild(m_children.front());
+    }
+
+    if (layout)
+        layout->enableUpdates();
+}
+
+void UIWidget::hideChildren()
+{
+    for (auto& child : m_children)
+        child->hide();
+}
+
+void UIWidget::showChildren()
+{
+    for (auto& child : m_children)
+        child->show();
 }
 
 void UIWidget::setId(const std::string_view id)
@@ -1019,7 +1050,7 @@ bool UIWidget::setRect(const Rect& rect)
     // avoid massive update events
     if (!hasProp(PropUpdateEventScheduled)) {
         auto self = static_self_cast<UIWidget>();
-        g_dispatcher.addEvent([self, oldRect] {
+        g_dispatcher.deferEvent([self, oldRect] {
             self->setProp(PropUpdateEventScheduled, false);
             const auto& rect = self->getRect();
             if (oldRect != rect) {
@@ -1450,13 +1481,18 @@ UIWidgetPtr UIWidget::backwardsGetWidgetById(const std::string_view id)
     return widget;
 }
 
-void UIWidget::setProp(FlagProp prop, bool v)
+void UIWidget::setProp(FlagProp prop, bool v, bool callEvent)
 {
-    bool lastProp = hasProp(prop);
-    if (v) m_flagsProp |= prop; else m_flagsProp &= ~prop;
+    // Note: Be aware that setProp is called many times, there will be a cost,
+    // so only call this event if it is really necessary.
+    // callEvent = false by default
+    if (callEvent) {
+        const bool lastProp = hasProp(prop);
+        if (lastProp != v)
+            callLuaField("onPropertyChange", prop, v, lastProp);
+    }
 
-    if (lastProp != v)
-        callLuaField("onPropertyChange", prop, v);
+    if (v) m_flagsProp |= prop; else m_flagsProp &= ~prop;
 }
 
 bool UIWidget::setState(Fw::WidgetState state, bool on)
@@ -1598,7 +1634,7 @@ void UIWidget::updateStyle()
 
     if (hasProp(PropLoadingStyle) && !hasProp(PropUpdateStyleScheduled)) {
         UIWidgetPtr self = static_self_cast<UIWidget>();
-        g_dispatcher.addEvent([self] {
+        g_dispatcher.deferEvent([self] {
             self->setProp(PropUpdateStyleScheduled, false);
             self->updateStyle();
         });
@@ -1664,6 +1700,7 @@ void UIWidget::onStyleApply(const std::string_view, const OTMLNodePtr& styleNode
     parseBaseStyle(styleNode);
     parseImageStyle(styleNode);
     parseTextStyle(styleNode);
+    parseCustomStyle(styleNode);
 
     g_app.repaint();
 }
@@ -1789,6 +1826,12 @@ bool UIWidget::onClick(const Point& mousePos)
 bool UIWidget::onDoubleClick(const Point& mousePos)
 {
     return callLuaField<bool>("onDoubleClick", mousePos);
+}
+
+UIWidgetPtr UIWidget::getHoveredChild()
+{
+    const auto& hovered = g_ui.getHoveredWidget();
+    return hovered ? getChildById(hovered->getId()) : nullptr;
 }
 
 bool UIWidget::propagateOnKeyText(const std::string_view keyText)
@@ -1924,7 +1967,7 @@ void UIWidget::move(int x, int y) {
 
     if (!hasProp(PropUpdatingMove)) {
         setProp(PropUpdatingMove, true);
-        g_dispatcher.addEvent([self = static_self_cast<UIWidget>()] {
+        g_dispatcher.deferEvent([self = static_self_cast<UIWidget>()] {
             const auto rect = self->m_rect;
             self->m_rect = {}; // force update
             self->setRect(rect);
@@ -1947,3 +1990,27 @@ void UIWidget::setShader(const std::string_view name) {
 }
 
 void UIWidget::repaint() { g_app.repaint(); }
+void UIWidget::disableUpdateTemporarily() {
+    if (hasProp(PropDisableUpdateTemporarily) || !m_layout)
+        return;
+
+    setProp(PropDisableUpdateTemporarily, true);
+    m_layout->disableUpdates();
+    g_dispatcher.deferEvent([self = static_self_cast<UIWidget>()] {
+        self->m_layout->enableUpdates();
+        self->m_layout->update();
+        self->setProp(PropDisableUpdateTemporarily, false);
+    });
+}
+
+void UIWidget::addOnDestroyCallback(const std::string& id, const std::function<void()>&& callback)
+{
+    m_onDestroyCallbacks.emplace(id, callback);
+}
+
+void UIWidget::removeOnDestroyCallback(const std::string& id)
+{
+    auto it = m_onDestroyCallbacks.find(id);
+    if (it != m_onDestroyCallbacks.end())
+        m_onDestroyCallbacks.erase(it);
+}

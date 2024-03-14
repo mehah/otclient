@@ -38,9 +38,7 @@ class UIAnchor;
 class UIAnchorGroup;
 class UIAnchorLayout;
 class UIParticles;
-class UIMap;
 
-using UIMapPtr = std::shared_ptr<UIMap>;
 using UIWidgetPtr = std::shared_ptr<UIWidget>;
 using UIParticlesPtr = std::shared_ptr<UIParticles>;
 using UITextEditPtr = std::shared_ptr<UITextEdit>;

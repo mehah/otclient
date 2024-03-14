@@ -58,23 +58,9 @@ void DrawPoolManager::draw()
         g_painter->setResolution(m_size, m_transformMatrix);
     }
 
-    auto map = get(DrawPoolType::MAP); {
-        std::scoped_lock l(map->getMutex());
-        if (drawPool(map)) {
-            drawPool(DrawPoolType::CREATURE_INFORMATION);
-            drawPool(DrawPoolType::LIGHT);
-        }
+    for (int8_t i = -1; ++i < static_cast<uint8_t>(DrawPoolType::LAST);) {
+        drawPool(static_cast<DrawPoolType>(i));
     }
-
-    drawPool(DrawPoolType::FOREGROUND_MAP);
-
-    {
-        auto mapWidget = get(DrawPoolType::FOREGROUND_MAP_WIDGETS);
-        std::scoped_lock l(map->getMutex(), mapWidget->getMutex());
-        drawPool(mapWidget);
-    }
-
-    drawPool(DrawPoolType::FOREGROUND);
 }
 
 void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)
@@ -102,8 +88,10 @@ void DrawPoolManager::addTexturedCoordsBuffer(const TexturePtr& texture, const C
 
 void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const DrawConductor& condutor) const
 {
-    if (dest.isEmpty() || src.isEmpty())
+    if (dest.isEmpty() || src.isEmpty()) {
+        getCurrentPool()->resetOnlyOnceParameters();
         return;
+    }
 
     getCurrentPool()->add(color, texture, DrawPool::DrawMethod{
         .type = DrawPool::DrawMethodType::RECT,
@@ -113,32 +101,40 @@ void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& textur
 
 void DrawPoolManager::addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color) const
 {
-    if (dest.isEmpty() || src.isEmpty())
+    if (dest.isEmpty() || src.isEmpty()) {
+        getCurrentPool()->resetOnlyOnceParameters();
         return;
+    }
 
     getCurrentPool()->add(color, texture, DrawPool::DrawMethod{ DrawPool::DrawMethodType::UPSIDEDOWN_RECT, dest, src }, DrawMode::TRIANGLE_STRIP);
 }
 
 void DrawPoolManager::addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color) const
 {
-    if (dest.isEmpty() || src.isEmpty())
+    if (dest.isEmpty() || src.isEmpty()) {
+        getCurrentPool()->resetOnlyOnceParameters();
         return;
+    }
 
     getCurrentPool()->add(color, texture, DrawPool::DrawMethod{ DrawPool::DrawMethodType::REPEATED_RECT, dest, src });
 }
 
 void DrawPoolManager::addFilledRect(const Rect& dest, const Color& color, const DrawConductor& condutor) const
 {
-    if (dest.isEmpty())
+    if (dest.isEmpty()) {
+        getCurrentPool()->resetOnlyOnceParameters();
         return;
+    }
 
     getCurrentPool()->add(color, nullptr, DrawPool::DrawMethod{ DrawPool::DrawMethodType::RECT, dest }, DrawMode::TRIANGLES, condutor);
 }
 
 void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color) const
 {
-    if (a == b || a == c || b == c)
+    if (a == b || a == c || b == c) {
+        getCurrentPool()->resetOnlyOnceParameters();
         return;
+    }
 
     getCurrentPool()->add(color, nullptr, DrawPool::DrawMethod{
             .type = DrawPool::DrawMethodType::TRIANGLE,
@@ -150,8 +146,10 @@ void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Po
 
 void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, uint16_t innerLineWidth) const
 {
-    if (dest.isEmpty() || innerLineWidth == 0)
+    if (dest.isEmpty() || innerLineWidth == 0) {
+        getCurrentPool()->resetOnlyOnceParameters();
         return;
+    }
 
     getCurrentPool()->add(color, nullptr, DrawPool::DrawMethod{
         .type = DrawPool::DrawMethodType::BOUNDING_RECT,
@@ -170,12 +168,6 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
 
     pool->resetState();
 
-    // when the selected pool is MAP, reset the creature information state.
-    if (type == DrawPoolType::MAP) {
-        get(DrawPoolType::CREATURE_INFORMATION)->resetState();
-        get(DrawPoolType::FOREGROUND_MAP_WIDGETS)->resetState();
-    }
-
     if (f) f();
 
     std::scoped_lock l(pool->m_mutexDraw);
@@ -185,11 +177,6 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
         pool->m_framebuffer->prepare(dest, src, colorClear);
 
     pool->release(pool->m_repaint = pool->canRepaint(true));
-
-    if (type == DrawPoolType::MAP) {
-        get(DrawPoolType::CREATURE_INFORMATION)->release();
-        get(DrawPoolType::FOREGROUND_MAP_WIDGETS)->release();
-    }
 }
 
 bool DrawPoolManager::drawPool(const DrawPoolType type) {
