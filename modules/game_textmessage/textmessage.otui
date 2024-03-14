@@ -32,7 +32,7 @@ Panel
     anchors.bottom: centerTextMessagePanel.top
     anchors.horizontalCenter: parent.horizontalCenter
     text-auto-resize: false
-    width: 275
+    width: 255
 
   TextMessageLabel
     id: statusLabel
