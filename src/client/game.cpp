@@ -739,9 +739,10 @@ void Game::look(const ThingPtr& thing, bool isBattleList)
 
     if (thing->isCreature() && isBattleList && m_protocolVersion >= 961)
         m_protocolGame->sendLookCreature(thing->getId());
-    else
-        int itemId = thing->isCreature() ? 99 : thing->getId();
+    else {
+        const int itemId = thing->isCreature() ? 99 : thing->getId();
         m_protocolGame->sendLook(thing->getPosition(), itemId, thing->getStackPos());
+    }
 }
 
 void Game::move(const ThingPtr& thing, const Position& toPos, int count)
