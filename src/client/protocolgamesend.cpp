@@ -493,12 +493,12 @@ void ProtocolGame::sendEditList(uint32_t id, int doorId, const std::string_view 
     send(msg);
 }
 
-void ProtocolGame::sendLook(const Position& position, int thingId, int stackpos)
+void ProtocolGame::sendLook(const Position& position, int itemId, int stackpos)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientLook);
     addPosition(msg, position);
-    msg->addU16(thingId);
+    msg->addU16(itemId);
     msg->addU8(stackpos);
     send(msg);
 }
