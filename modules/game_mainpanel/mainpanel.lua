@@ -1,7 +1,7 @@
 function init()
     mapController:init()
-    inventoryController:init()
     healthManaController:init()
+    inventoryController:init()
     optionsController:init()
 end
 
@@ -50,7 +50,6 @@ end
 
 -- @ Options
 local optionsShrink = false
-
 local function refreshOptionsSizes()
     if optionsShrink then
         optionsController.ui:setOn(false)
@@ -63,6 +62,7 @@ local function refreshOptionsSizes()
     end
     reloadMainPanelSizes()
 end
+
 local function createButton(id, description, image, callback, special, front)
     local panel
     if special then
@@ -103,28 +103,31 @@ optionsController = Controller:new()
 optionsController:setUI('mainoptionspanel', modules.game_interface.getMainRightPanel())
 
 function optionsController:onInit()
-
 end
+
 function optionsController:onTerminate()
-
 end
+
 function optionsController:onGameStart()
     optionsShrink = g_settings.getBoolean('mainpanel_shrink_options')
     refreshOptionsSizes()
     modules.game_interface.setupOptionsMainButton()
     modules.client_options.setupOptionsMainButton()
 end
-function optionsController:onGameEnd()
 
+function optionsController:onGameEnd()
 end
+
 function changeOptionsSize()
     optionsShrink = not optionsShrink
     g_settings.set('mainpanel_shrink_options', optionsShrink)
     refreshOptionsSizes()
 end
+
 function addToggleButton(id, description, image, callback, front)
     return createButton(id, description, image, callback, false, front)
 end
+
 function addSpecialToggleButton(id, description, image, callback, front)
     return createButton(id, description, image, callback, true, front)
 end
@@ -146,22 +149,24 @@ end
 
 healthManaController = Controller:new()
 healthManaController:setUI('mainhealthmanapanel', modules.game_interface.getMainRightPanel())
+
 local healthManaControllerEvents = healthManaController:addEvent(LocalPlayer, {
     onHealthChange = healthManaEvent,
     onManaChange = healthManaEvent,
 })
 
 function healthManaController:onInit()
-
 end
+
 function healthManaController:onTerminate()
-
 end
+
 function healthManaController:onGameStart()
     healthManaControllerEvents:connect()
     healthManaControllerEvents:execute('onHealthChange')
     healthManaControllerEvents:execute('onManaChange')
 end
+
 function healthManaController:onGameEnd()
     healthManaControllerEvents:disconnect()
 end
@@ -169,7 +174,6 @@ end
 
 -- @ Inventory
 local inventoryShrink = false
-
 local function getInventoryUi()
     if inventoryShrink then
         return inventoryController.ui.offPanel
@@ -177,13 +181,15 @@ local function getInventoryUi()
 
     return inventoryController.ui.onPanel
 end
+
 local function walkEvent()
     if modules.client_options.getOption('autoChaseOverride') then
         if g_game.isAttacking() and g_game.getChaseMode() == ChaseOpponent then
-            selectPosture('stand')
+            selectPosture('follow', true)
         end
     end
 end
+
 local function combatEvent()
     if g_game.getChaseMode() == ChaseOpponent then
         selectPosture('follow', true)
@@ -201,6 +207,7 @@ local function combatEvent()
 
     selectPvp(g_game.getPVPMode() == PVPRedFist, true)
 end
+
 local function inventoryEvent(player, slot, item, oldItem)
     if inventoryShrink then
         return
@@ -250,6 +257,7 @@ local function inventoryEvent(player, slot, item, oldItem)
     slotPanel.item:setWidth(34)
     slotPanel.item:setHeight(34)
 end
+
 local function refreshInventory()
     if inventoryShrink then
         return
@@ -264,6 +272,7 @@ local function refreshInventory()
         end
     end
 end
+
 local function refreshInventorySizes()
     if inventoryShrink then
         inventoryController.ui:setOn(false)
@@ -282,6 +291,7 @@ end
 
 inventoryController = Controller:new()
 inventoryController:setUI('maininventorypanel', modules.game_interface.getMainRightPanel())
+
 local inventoryControllerEvents = inventoryController:addEvent(LocalPlayer, {
     onWalk = walkEvent,
     onAutoWalk = walkEvent,
@@ -295,9 +305,10 @@ local inventoryControllerEvents = inventoryController:addEvent(LocalPlayer, {
 function inventoryController:onInit()
     refreshInventory()
 end
-function inventoryController:onTerminate()
 
+function inventoryController:onTerminate()
 end
+
 function inventoryController:onGameStart()
     inventoryControllerEvents:connect()
     inventoryControllerEvents:execute('onWalk')
@@ -312,9 +323,11 @@ function inventoryController:onGameStart()
     refreshInventorySizes()
     refreshInventory()
 end
+
 function inventoryController:onGameEnd()
     inventoryControllerEvents:disconnect()
 end
+
 function selectPosture(key, ignoreUpdate)
     local ui = getInventoryUi()
     if key == 'stand' then
@@ -331,6 +344,7 @@ function selectPosture(key, ignoreUpdate)
         end
     end
 end
+
 function selectCombat(combat, ignoreUpdate)
     local ui = getInventoryUi()
     if combat == 'attack' then
@@ -356,6 +370,7 @@ function selectCombat(combat, ignoreUpdate)
         end
     end
 end
+
 function selectPvp(pvp, ignoreUpdate)
     local ui = getInventoryUi()
     if pvp then
@@ -370,6 +385,7 @@ function selectPvp(pvp, ignoreUpdate)
         end
     end
 end
+
 function changeInventorySize()
     inventoryShrink = not inventoryShrink
     g_settings.set('mainpanel_shrink_inventory', inventoryShrink)
@@ -421,6 +437,7 @@ end
 
 mapController = Controller:new()
 mapController:setUI('mainmappanel', modules.game_interface.getMainRightPanel())
+
 local mapControllerEvents = mapController:addEvent(LocalPlayer, {
     onPositionChange = onPositionChange
 })
@@ -471,8 +488,8 @@ function onChangeWorldTime(hour, minute)
         mapController.ui.rosePanel.ambients.main:setImageClip(position .. ' 0 ' .. mainWidth .. ' 31')
         mapController.ui.rosePanel.ambients.main:show()
     end
-
 end
+
 function mapController:onInit()
     mapControllerEvents:connect()
     mapControllerEvents:execute('onPositionChange')
@@ -487,6 +504,7 @@ function mapController:onInit()
         onChangeWorldTime = onChangeWorldTime
     })
 end
+
 function mapController:onGameStart()
     -- Load Map
     g_minimap.clean()
@@ -508,6 +526,7 @@ function mapController:onGameStart()
 
     self.ui.minimapBorder.minimap:load()
 end
+
 function mapController:onGameEnd()
     -- Save Map
     if otmm then
@@ -518,15 +537,19 @@ function mapController:onGameEnd()
 
     self.ui.minimapBorder.minimap:save()
 end
+
 function mapController:onTerminate()
     mapControllerEvents:disconnect()
 end
+
 function zoomIn()
     mapController.ui.minimapBorder.minimap:zoomIn()
 end
+
 function zoomOut()
     mapController.ui.minimapBorder.minimap:zoomOut()
 end
+
 function fullscreen()
     local minimapWidget = mapController.ui.minimapBorder.minimap
     if not minimapWidget then
@@ -561,6 +584,7 @@ function fullscreen()
     minimapWidget:setZoom(zoom)
     minimapWidget:setCameraPosition(pos)
 end
+
 function upLayer()
     if virtualFloor == 0 then
         return
@@ -570,6 +594,7 @@ function upLayer()
     virtualFloor = virtualFloor - 1
     refreshVirtualFloors()
 end
+
 function downLayer()
     if virtualFloor == 15 then
         return
@@ -579,6 +604,7 @@ function downLayer()
     virtualFloor = virtualFloor + 1
     refreshVirtualFloors()
 end
+
 function onClickRoseButton(dir)
     if dir == 'north' then
         mapController.ui.minimapBorder.minimap:move(0, 1)
@@ -598,6 +624,7 @@ function onClickRoseButton(dir)
         mapController.ui.minimapBorder.minimap:move(1, 1)
     end
 end
+
 function resetMap()
     mapController.ui.minimapBorder.minimap:reset()
     local player = g_game.getLocalPlayer()
