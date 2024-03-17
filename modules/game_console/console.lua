@@ -282,8 +282,10 @@ function toggleChat()
     consoleToggleChat.isChecked = not consoleToggleChat.isChecked
     if consoleToggleChat.isChecked then
         consoleToggleChat:setText(tr('Chat Off'))
+        consoleToggleChat.isChecked = true
     else
         consoleToggleChat:setText(tr('Chat On'))
+        consoleToggleChat.isChecked = false
     end
 end
 
@@ -358,6 +360,8 @@ function switchChatOnCall()
             toggleChat()
         end
     end
+
+    updateChatMode()
 end
 
 function disableChatOnCall()
@@ -2022,4 +2026,9 @@ function onChannelEvent(channelId, name, type)
             addTabText(fmt:format(name), SpeakTypesSettings.channelOrange, tab)
         end
     end
+end
+
+-- bot funtion
+function isEnabledWASD()
+    return consoleToggleChat:isChecked()
 end
