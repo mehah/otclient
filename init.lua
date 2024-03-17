@@ -3,12 +3,12 @@
 
 -- updater
 Services = {
-    --updater = "http://localhost/api/updater.php",
-    --status = "http://localhost/api/status.php",
-    --websites = "http://localhost/?subtopic=accountmanagement",
+    --updater = "http://localhost/api/updater.php", ./updater
+    --status = "http://localhost/api/status.php", ./client_entergame | ./client_topmenu
+    --websites = "http://localhost/?subtopic=accountmanagement", ./client_entergame "Forgot password and/or email"
 }
 --[[ ClientHost ={
-    ip = "marlboro-war.net",
+    ip = "127.0.0.1",
     port= 7171,
     version = 860
 } ]]
