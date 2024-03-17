@@ -1,3 +1,25 @@
+EnterGameWindow < MainWindow
+  !text: tr('Enter Game')
+  size: 236 316
+  draggable: false
+
+EnterGameButton < Button
+  width: 64
+
+ServerListButton < UIButton
+  size: 17 17
+  image-source: /images/topbuttons/minimap
+  image-color: #ffffffff
+
+  $hover !disabled:
+    image-color: #ffffff99
+
+  $pressed:
+    image-color: #ffffff44
+
+  $disabled:
+    image-color: #ffffff55
+
 MiniQtWindow
   id: enterGame
   &authenticatorEnabled: false
@@ -6,12 +28,12 @@ MiniQtWindow
   &stayLoggedBoxHeight: 24
   anchors.horizontalCenter: parent.horizontalCenter
   anchors.verticalCenter: parent.verticalCenter
-  size: 280 178
+  size: 280 400
   draggable: false
   @onEnter: EnterGame.doLogin()
 
   Label
-    !text: tr('Journey Onwards')
+    !text: tr('Enter Game')
     font: verdana-11px-antialised
     text-offset: 0 2
     text-align: top
@@ -23,7 +45,7 @@ MiniQtWindow
 
   Label
     id: emailLabel
-    !text: tr('Email:')
+    !text: tr('Acc Name:') 
     anchors.left: parent.left
     anchors.top: parent.top
     margin-left: 20
@@ -51,7 +73,9 @@ MiniQtWindow
     anchors.right: accountPasswordTextEdit.right
     anchors.verticalCenter: emailLabel.verticalCenter
     anchors.left: accountPasswordTextEdit.left
- 
+
+// Check box remember email 
+
   QtCheckBox
     id: rememberEmailBox
     !text: tr('Remember Email')
@@ -78,12 +102,59 @@ MiniQtWindow
 
   Label
     !text: tr('Forgot password and/or email')
+    id: Forgot_password_email
     font: verdana-11px-monochrome-underline
     anchors.left: rememberEmailBox.left
     anchors.right: parent.right
     anchors.top: rememberEmailBox.bottom
     opacity: 0.8
     margin-top: 5
+
+  MenuLabel
+    id: authenticatorTokenLabel
+    !text: tr('Authenticator Token')
+    anchors.left: passwordLabel.left
+    anchors.right: parent.right
+    anchors.top: Forgot_password_email.bottom
+    margin-top: 10
+    opacity: 0.8
+    text-auto-resize: true
+
+
+
+    $on:
+
+      margin-top: 8
+  TextEdit
+    id: authenticatorTokenTextEdit
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-right: 15
+    margin-left: 20
+    margin-top: 10
+    max-length: 8
+
+    $on:
+
+      margin-top: 2
+
+  CheckBox
+    id: stayLoggedBox
+    !text: tr('Stay logged during session')
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 6
+    margin-right: 15
+    margin-left: 20
+
+
+    $on:
+
+      margin-top: 8
+
+
 
   HorizontalSeparator
     anchors.left: passwordLabel.left
@@ -93,11 +164,105 @@ MiniQtWindow
     height: 1
     margin-top: 10
 
+  MenuLabel
+    id: serverLabel
+    !text: tr('Server')
+    anchors.left: prev.left
+    anchors.top: prev.bottom
+    margin-top: 8
+    text-auto-resize: true
+
+  ServerListButton
+    id: serverListButton
+    !tooltip: tr('Server list')
+    anchors.right: parent.right
+    anchors.top: serverLabel.bottom
+    margin-top: 3
+    margin-right: 14
+    @onClick: ServerList.show()
+
+  TextEdit
+    id: serverHostTextEdit
+    !tooltip: tr('Make sure that your client uses\nthe correct game client version')
+    anchors.left: parent.left
+    anchors.right: serverListButton.left
+    anchors.top: serverLabel.bottom
+    margin-top: 2
+    margin-right: 10
+    margin-left: 20
+
+  MenuLabel
+    id: clientLabel
+    !text: tr('Client Version')
+    anchors.left: parent.left
+    anchors.top: serverHostTextEdit.bottom
+    text-auto-resize: true
+    margin-left: 20
+    margin-top: 8
+
+  ComboBox
+    id: clientComboBox
+    anchors.left: parent.left
+    anchors.right: parent.horizontalCenter
+    anchors.top: clientLabel.bottom
+    margin-top: 2
+    margin-right: 3
+    width: 90
+    menu-scroll: true
+    menu-height: 125
+    menu-scroll-step: 25
+    margin-left: 20
+
+  MenuLabel
+    id: portLabel
+    !text: tr('Port')
+    anchors.left: serverPortTextEdit.left
+    anchors.top: serverHostTextEdit.bottom
+    margin-top: 8
+    text-auto-resize: true
+
+  TextEdit
+    id: serverPortTextEdit
+    text: 7171
+    anchors.right: parent.right
+    anchors.left: parent.horizontalCenter
+    anchors.top: clientComboBox.top
+    margin-right: 15
+    margin-left: 20
+
+  CheckBox
+    id: autoLoginBox
+    enabled: false
+    !text: tr('Auto login')
+    !tooltip: tr('Open charlist automatically when starting client')
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 10
+    margin-left: 20
+  CheckBox
+    id: httpLoginBox
+    enabled: true
+    !text: tr('Enable HTTP login')
+    !tooltip: tr('If login fails using HTTPS (encrypted) try with HTTP (unencrypted)')
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 2
+    margin-left: 20
+
+  HorizontalSeparator
+    anchors.left: httpLoginBox.left
+    anchors.right: serverPortTextEdit.right
+    anchors.top: prev.bottom
+    margin-top: 6
+
   QtButton
     !text: tr('Login')
     anchors.right: prev.right
     anchors.top: prev.bottom
     margin-top: 10
+    margin-right: 14
     size: 86 20
     @onClick: EnterGame.doLogin()
 
@@ -106,3 +271,4 @@ MiniQtWindow
     anchors.left: passwordLabel.left
     anchors.top: prev.top
     size: 109 20
+

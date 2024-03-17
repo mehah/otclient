@@ -1,0 +1,2 @@
+GameButtonsWindow < MiniWindow
+  height: 26

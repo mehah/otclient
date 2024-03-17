@@ -4,7 +4,14 @@
 -- updater
 Services = {
     --updater = "http://localhost/api/updater.php",
+   -- status = "http://localhost/api/status.php",
+    
 }
+--[[ ClientHost ={
+    ip = "marlboro-war.net",
+    port= 7171,
+    version = 860
+} ]]
 
 g_app.setName("OTClient - Redemption");
 g_app.setCompactName("otclient");
