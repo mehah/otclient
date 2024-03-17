@@ -20,44 +20,37 @@ ServerListButton < UIButton
   $disabled:
     image-color: #ffffff55
 
-MiniQtWindow
+EnterGameWindow
   id: enterGame
   &authenticatorEnabled: false
   &authenticatorHeight: 44
   &stayLoggedBoxEnabled: false
   &stayLoggedBoxHeight: 24
-  anchors.horizontalCenter: parent.horizontalCenter
-  anchors.verticalCenter: parent.verticalCenter
-  size: 280 400
-  draggable: false
+  size: 280 302
   @onEnter: EnterGame.doLogin()
+  @onSetup: |
+    if g_game.getFeature(GameEnterGameShowAppearance) then
+      self:setText("Journey Onwards")
+    end
 
-  Label
-    !text: tr('Enter Game')
-    font: verdana-11px-antialised
-    text-offset: 0 2
-    text-align: top
-    anchors.top: parent.top
-    anchors.bottom: parent.bottom
-    anchors.left: parent.left
-    anchors.right: parent.right
-    opacity: 0.5
 
   Label
     id: emailLabel
     !text: tr('Acc Name:') 
     anchors.left: parent.left
     anchors.top: parent.top
-    margin-left: 20
-    margin-top: 33
-    opacity: 0.8
 
+    opacity: 0.8
+    @onSetup: |
+      if g_game.getFeature(GameEnterGameShowAppearance) then
+        self:setText("Email:")
+      end
   Label
     id: passwordLabel
     !text: tr('Password:')
     anchors.left: emailLabel.left
     anchors.top: emailLabel.bottom
-    margin-top: 20
+    margin-top: 10
     opacity: 0.8
 
   HiddenTextQtEdit
@@ -65,7 +58,7 @@ MiniQtWindow
     anchors.right: parent.right
     anchors.left: passwordLabel.right
     anchors.verticalCenter: passwordLabel.verticalCenter
-    margin-right: 15
+
     margin-left: 5
 
   HiddenTextQtToggleEdit
@@ -79,13 +72,16 @@ MiniQtWindow
   QtCheckBox
     id: rememberEmailBox
     !text: tr('Remember Email')
+    !tooltip: tr('Remember account and password when starts client')
     anchors.left: passwordLabel.left
     anchors.right: parent.right
     anchors.top: accountPasswordTextEdit.bottom
     margin-top: 10
     opacity: 0.8
-    @onCheckChange: self:getParent():getChildById('rememberEmailTip'):setOn(self:isChecked())
-
+    @onCheckChange: | 
+      self:getParent():getChildById('autoLoginBox'):setEnabled(self:isChecked())
+      self:getParent():getChildById('rememberEmailTip'):setOn(self:isChecked())
+      
   UIWidget
     id: rememberEmailTip
     image-source: /images/icons/show_gui_help_grey
@@ -109,34 +105,41 @@ MiniQtWindow
     anchors.top: rememberEmailBox.bottom
     opacity: 0.8
     margin-top: 5
+    @onClick: g_platform.openUrl(Services.websites)
+    @onSetup: | 
+      if Services and Services.websites then
+        self:setVisible(true)
+      else
+        self:setVisible(false)
+        self:hide()
+
+
+      end
 
   MenuLabel
     id: authenticatorTokenLabel
     !text: tr('Authenticator Token')
-    anchors.left: passwordLabel.left
-    anchors.right: parent.right
-    anchors.top: Forgot_password_email.bottom
-    margin-top: 10
-    opacity: 0.8
+    anchors.left: prev.left
+    anchors.top: prev.bottom
     text-auto-resize: true
-
-
+    margin-top: -12
+    visible: false
 
     $on:
-
+      visible: true
       margin-top: 8
+
   TextEdit
     id: authenticatorTokenTextEdit
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-right: 15
-    margin-left: 20
-    margin-top: 10
+    margin-top: -22
+    visible: false
     max-length: 8
 
     $on:
-
+      visible: true
       margin-top: 2
 
   CheckBox
@@ -146,23 +149,18 @@ MiniQtWindow
     anchors.right: parent.right
     anchors.top: prev.bottom
     margin-top: 6
-    margin-right: 15
-    margin-left: 20
-
+    margin-top: -16
+    visible: false
 
     $on:
-
+      visible: true
       margin-top: 8
 
-
-
   HorizontalSeparator
-    anchors.left: passwordLabel.left
-    anchors.right: accountPasswordTextEdit.right
+    anchors.left: parent.left
+    anchors.right: parent.right
     anchors.top: prev.bottom
-    image-source: /images/ui/horizontal_line_bright
-    height: 1
-    margin-top: 10
+    margin-top: 8
 
   MenuLabel
     id: serverLabel
@@ -178,7 +176,6 @@ MiniQtWindow
     anchors.right: parent.right
     anchors.top: serverLabel.bottom
     margin-top: 3
-    margin-right: 14
     @onClick: ServerList.show()
 
   TextEdit
@@ -188,8 +185,7 @@ MiniQtWindow
     anchors.right: serverListButton.left
     anchors.top: serverLabel.bottom
     margin-top: 2
-    margin-right: 10
-    margin-left: 20
+    margin-right: 4
 
   MenuLabel
     id: clientLabel
@@ -197,7 +193,7 @@ MiniQtWindow
     anchors.left: parent.left
     anchors.top: serverHostTextEdit.bottom
     text-auto-resize: true
-    margin-left: 20
+    margin-right: 10
     margin-top: 8
 
   ComboBox
@@ -211,7 +207,6 @@ MiniQtWindow
     menu-scroll: true
     menu-height: 125
     menu-scroll-step: 25
-    margin-left: 20
 
   MenuLabel
     id: portLabel
@@ -227,10 +222,13 @@ MiniQtWindow
     anchors.right: parent.right
     anchors.left: parent.horizontalCenter
     anchors.top: clientComboBox.top
-    margin-right: 15
-    margin-left: 20
+    margin-left: 3
 
-  CheckBox
+
+
+
+
+  QtCheckBox
     id: autoLoginBox
     enabled: false
     !text: tr('Auto login')
@@ -238,9 +236,9 @@ MiniQtWindow
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 10
-    margin-left: 20
-  CheckBox
+    margin-top: 2
+
+  QtCheckBox
     id: httpLoginBox
     enabled: true
     !text: tr('Enable HTTP login')
@@ -249,26 +247,42 @@ MiniQtWindow
     anchors.right: parent.right
     anchors.top: prev.bottom
     margin-top: 2
-    margin-left: 20
 
   HorizontalSeparator
-    anchors.left: httpLoginBox.left
-    anchors.right: serverPortTextEdit.right
+    anchors.left: parent.left
+    anchors.right: parent.right
     anchors.top: prev.bottom
     margin-top: 6
 
   QtButton
     !text: tr('Login')
-    anchors.right: prev.right
+    anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 10
-    margin-right: 14
+    margin-top: 9
     size: 86 20
     @onClick: EnterGame.doLogin()
 
   QtButton
     !text: tr('Create New Account')
-    anchors.left: passwordLabel.left
-    anchors.top: prev.top
+    anchors.left: parent.left
+    anchors.top: prev.bottom
+    margin-top: -17
     size: 109 20
+    @onClick: g_platform.openUrl(Services.websites)
+
+    @onSetup: | 
+      if Services and Services.websites then
+        self:setVisible(true)
+      else
+        self:setVisible(false)
+      end
+
+  Label
+    id: serverInfoLabel
+    font: verdana-11px-rounded
+    anchors.top: prev.top
+    anchors.left: parent.left
+    margin-top: 5
+    color: green
+    text-auto-resize: true
 
