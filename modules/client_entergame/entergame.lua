@@ -3,8 +3,12 @@ EnterGame = {}
 -- private variables
 local loadBox
 local enterGame
+local motdWindow
+
+local enterGameButton
 local clientBox
 local protocolLogin
+local motdEnabled = true
 
 -- private functions
 local function onError(protocol, message, errorCode)
@@ -21,6 +25,12 @@ local function onError(protocol, message, errorCode)
     connect(errorBox, {
         onOk = EnterGame.show
     })
+end
+
+local function onMotd(protocol, motd)
+    G.motdNumber = tonumber(motd:sub(0, motd:find('\n')))
+    G.motdMessage = motd:sub(motd:find('\n') + 1, #motd)
+
 end
 
 local function onSessionKey(protocol, sessionKey)
@@ -52,6 +62,7 @@ local function onCharacterList(protocol, characters, account, otui)
         -- reset server list account/password
         ServerList.setServerAccount(G.host, '')
         ServerList.setServerPassword(G.host, '')
+
         EnterGame.clearAccountFields()
     end
 
@@ -68,6 +79,21 @@ local function onCharacterList(protocol, characters, account, otui)
 
     CharacterList.create(characters, account, otui)
     CharacterList.show()
+
+    if motdEnabled then
+        local lastMotdNumber = g_settings.getNumber('motd')
+        if G.motdNumber and G.motdNumber ~= lastMotdNumber then
+            g_settings.set('motd', G.motdNumber)
+            motdWindow = displayInfoBox(tr('Message of the day'), G.motdMessage)
+            connect(motdWindow, {
+                onOk = function()
+                    CharacterList.show()
+                    motdWindow = nil
+                end
+            })
+            CharacterList.hide()
+        end
+    end
 end
 
 local function onUpdateNeeded(protocol, signature)
@@ -91,6 +117,8 @@ function EnterGame.init()
     enterGame = g_ui.displayUI('entergame')
     g_keyboard.bindKeyDown('Ctrl+G', EnterGame.openWindow)
 
+
+
     local account = g_settings.get('account')
     local password = g_settings.get('password')
     local host = g_settings.get('host')
@@ -113,7 +141,7 @@ function EnterGame.init()
     enterGame:getChildById('serverHostTextEdit'):setText(host)
     enterGame:getChildById('serverPortTextEdit'):setText(port)
     enterGame:getChildById('autoLoginBox'):setChecked(autologin)
-
+    enterGame:getChildById('stayLoggedBox'):setChecked(stayLogged)
     enterGame:getChildById('httpLoginBox'):setChecked(httpLogin)
 
     local installedClients = {}
@@ -171,6 +199,7 @@ end
 
 function EnterGame.firstShow()
     EnterGame.show()
+
     local account = g_crypt.decrypt(g_settings.get('account'))
     local password = g_crypt.decrypt(g_settings.get('password'))
     local host = g_settings.get('host')
@@ -194,6 +223,10 @@ end
 
 function EnterGame.terminate()
     g_keyboard.unbindKeyDown('Ctrl+G')
+
+    disconnect(clientBox, {
+        onOptionChange = EnterGame.onClientVersionChange
+    })
     disconnect(g_game, {
         onGameStart = EnterGame.hidePanels
     })
@@ -203,6 +236,12 @@ function EnterGame.terminate()
 
     enterGame:destroy()
     enterGame = nil
+    clientBox = nil
+    if motdWindow then
+        motdWindow:destroy()
+        motdWindow = nil
+    end
+
     if loadBox then
         loadBox:destroy()
         loadBox = nil
@@ -335,6 +374,7 @@ function EnterGame.setPassword(password)
     local password = g_crypt.decrypt(password)
     enterGame:getChildById('accountPasswordTextEdit'):setText(password)
 end
+
 function EnterGame.setHttpLogin(httpLogin)
     enterGame:getChildById('httpLoginBox'):setChecked(#httpLogin > 0)
 end
@@ -469,97 +509,65 @@ function printTable(t)
     end
 end
 
-function EnterGame.tryHttpLogin(clientVersion)
-    -- http login server
-    local onRecv = function(message, err)
-        if err then
-            onError(nil, 'Bad Request.', 400)
-            return
-        end
+function EnterGame.loginSuccess(requestId, jsonSession, jsonWorlds, jsonCharacters)
+    if (G.requestId ~= requestId) then
+        return
+    end
 
-        local _, bodyStart = message:find('{')
-        local _, bodyEnd = message:find('.*}')
-        if not bodyStart or not bodyEnd then
-            onError(nil, 'Bad Request.', 400)
-            return
-        end
-
-        local response = json.decode(message:sub(bodyStart, bodyEnd))
-        if response.errorMessage then
-            onError(nil, response.errorMessage, response.errorCode)
-            return
-        end
-
-        local worlds = {}
-        for _, world in ipairs(response.playdata.worlds) do
-            worlds[world.id] = {
-                name = world.name,
-                ip = world.externaladdress,
-                port = world.externalport,
-                previewState = world.previewstate == 1
-            }
-        end
-
-        local characters = {}
-        for index, character in ipairs(response.playdata.characters) do
-            local world = worlds[character.worldid]
-            characters[index] = {
-                name = character.name,
-                level = character.level,
-                main = character.ismaincharacter,
-                dailyreward = character.dailyrewardstate,
-                hidden = character.ishidden,
-                vocation = character.vocation,
-                outfitid = character.outfitid,
-                headcolor = character.headcolor,
-                torsocolor = character.torsocolor,
-                legscolor = character.legscolor,
-                detailcolor = character.detailcolor,
-                addonsflags = character.addonsflags,
-                worldName = world.name,
-                worldIp = world.ip,
-                worldPort = world.port,
-                previewState = world.previewstate
-            }
-        end
-
-        local premiumUntil = tonumber(response.session.premiumuntil)
-
-        local account = {
-            status = '',
-            premDays = math.floor((premiumUntil - os.time()) / 86400),
-            subStatus = premiumUntil > os.time() and SubscriptionStatus.Premium or SubscriptionStatus.Free
+    local worlds = {}
+    for _, world in ipairs(json.decode(jsonWorlds)) do
+        worlds[world.id] = {
+            name = world.name,
+            ip = world.externaladdress,
+            port = world.externalport,
+            previewState = world.previewstate == 1
         }
-
-        -- set session key
-        G.sessionKey = response.session.sessionkey
-
-        onCharacterList(nil, characters, account)
     end
 
-    HTTP.post(G.host, json.encode({
-        email = G.account,
-        password = G.password,
-        type = 'login'
-    }), onRecv, false)
-
-    loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to login server...'))
-    connect(loadBox, {
-        onCancel = function(msgbox)
-            loadBox = nil
-            EnterGame.show()
-        end
-    })
-
-    g_game.setClientVersion(clientVersion)
-    g_game.setProtocolVersion(g_game.getClientProtocolVersion(clientVersion))
-    g_game.chooseRsa(G.host)
-    if modules.game_things.isLoaded() then
-    else
-        loadBox:destroy()
-        loadBox = nil
-        EnterGame.show()
+    local characters = {}
+    for index, character in ipairs(json.decode(jsonCharacters)) do
+        local world = worlds[character.worldid]
+        characters[index] = {
+            name = character.name,
+            level = character.level,
+            main = character.ismaincharacter,
+            dailyreward = character.dailyrewardstate,
+            hidden = character.ishidden,
+            vocation = character.vocation,
+            outfitid = character.outfitid,
+            headcolor = character.headcolor,
+            torsocolor = character.torsocolor,
+            legscolor = character.legscolor,
+            detailcolor = character.detailcolor,
+            addonsflags = character.addonsflags,
+            worldName = world.name,
+            worldIp = world.ip,
+            worldPort = world.port,
+            previewState = world.previewstate
+        }
     end
+
+    local session = json.decode(jsonSession)
+
+    local premiumUntil = tonumber(session.premiumuntil)
+
+    local account = {
+        status = '',
+        premDays = math.floor((premiumUntil - os.time()) / 86400),
+        subStatus = premiumUntil > os.time() and SubscriptionStatus.Premium or SubscriptionStatus.Free
+    }
+
+    -- set session key
+    G.sessionKey = session.sessionkey
+
+    onCharacterList(nil, characters, account)
+end
+
+function EnterGame.loginFailed(requestId, msg, result)
+    if (G.requestId ~= requestId) then
+        return
+    end
+    onError(nil, msg, result)
 end
 
 function EnterGame.doLogin()
@@ -586,10 +594,11 @@ function EnterGame.doLogin()
     g_settings.set('client-version', clientVersion)
 
     if clientVersion >= 1281 and G.port ~= 7171 then
-        EnterGame.tryHttpLogin(clientVersion)
+        EnterGame.tryHttpLogin(clientVersion, httpLogin)
     else
         protocolLogin = ProtocolLogin.create()
         protocolLogin.onLoginError = onError
+        protocolLogin.onMotd = onMotd
         protocolLogin.onSessionKey = onSessionKey
         protocolLogin.onCharacterList = onCharacterList
         protocolLogin.onUpdateNeeded = onUpdateNeeded
@@ -616,6 +625,16 @@ function EnterGame.doLogin()
         end
     end
 end
+
+function EnterGame.displayMotd()
+    if not motdWindow then
+        motdWindow = displayInfoBox(tr('Message of the day'), G.motdMessage)
+        motdWindow.onOk = function()
+            motdWindow = nil
+        end
+    end
+end
+
 function EnterGame.setDefaultServer(host, port, protocol)
     local hostTextEdit = enterGame:getChildById('serverHostTextEdit')
     local portTextEdit = enterGame:getChildById('serverPortTextEdit')
@@ -676,15 +695,25 @@ function EnterGame.setUniqueServer(host, port, protocol, windowWidth, windowHeig
     serverListButton:setHeight(0)
     serverListButton:setWidth(0)
 
-    local rememberPasswordBox = enterGame:getChildById('rememberPasswordBox')
-    rememberPasswordBox:setMarginTop(-8)
+    local rememberEmailBox = enterGame:getChildById('rememberEmailBox')
+    rememberEmailBox:setMarginTop(5)
 
     if not windowWidth then
-        windowWidth = 236
+        windowWidth = 380
     end
     enterGame:setWidth(windowWidth)
     if not windowHeight then
-        windowHeight = 210
+        windowHeight = 200
     end
     enterGame:setHeight(windowHeight)
+end
+
+function EnterGame.setServerInfo(message)
+    local label = enterGame:getChildById('serverInfoLabel')
+    label:setText(message)
+end
+
+function EnterGame.disableMotd()
+    motdEnabled = false
+
 end

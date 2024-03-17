@@ -4,8 +4,8 @@
 -- updater
 Services = {
     --updater = "http://localhost/api/updater.php",
-   -- status = "http://localhost/api/status.php",
-    
+    --status = "http://localhost/api/status.php",
+    --websites = "http://localhost/?subtopic=accountmanagement",
 }
 --[[ ClientHost ={
     ip = "marlboro-war.net",
