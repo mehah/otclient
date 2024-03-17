@@ -18,7 +18,7 @@ function reloadMainPanelSizes()
     local main = modules.game_interface.getMainRightPanel()
     local rightPanel = modules.game_interface.getRightPanel()
 
-    if not(main) or not(rightPanel) then
+    if not (main) or not (rightPanel) then
         return
     end
 
@@ -138,17 +138,19 @@ local function healthManaEvent()
     end
 
     healthManaController.ui.health.text:setText(player:getHealth())
-    healthManaController.ui.health.current:setWidth(math.max(12, math.ceil((healthManaController.ui.health.total:getWidth() * player:getHealth()) / player:getMaxHealth())))
+    healthManaController.ui.health.current:setWidth(math.max(12, math.ceil(
+        (healthManaController.ui.health.total:getWidth() * player:getHealth()) / player:getMaxHealth())))
 
     healthManaController.ui.mana.text:setText(player:getMana())
-    healthManaController.ui.mana.current:setWidth(math.max(12, math.ceil((healthManaController.ui.mana.total:getWidth() * player:getMana()) / player:getMaxMana())))
+    healthManaController.ui.mana.current:setWidth(math.max(12, math.ceil(
+        (healthManaController.ui.mana.total:getWidth() * player:getMana()) / player:getMaxMana())))
 end
 
 healthManaController = Controller:new()
 healthManaController:setUI('mainhealthmanapanel', modules.game_interface.getMainRightPanel())
 local healthManaControllerEvents = healthManaController:addEvent(LocalPlayer, {
     onHealthChange = healthManaEvent,
-    onManaChange = healthManaEvent,
+    onManaChange = healthManaEvent
 })
 
 function healthManaController:onInit()
@@ -264,6 +266,35 @@ local function refreshInventory()
         end
     end
 end
+
+local function onSoulChange(localPlayer, soul)
+    if not soul then
+        return
+    end
+    local ui = getInventoryUi()
+    ui.soulPanel.soul:setText(soul)
+
+end
+
+local function onFreeCapacityChange(player, freeCapacity)
+
+    if not freeCapacity then
+        return
+    end
+    if freeCapacity > 99 then
+        freeCapacity = math.floor(freeCapacity * 10) / 10
+    end
+    if freeCapacity > 999 then
+        freeCapacity = math.floor(freeCapacity)
+    end
+    if freeCapacity > 99999 then
+        freeCapacity = math.min(9999, math.floor(freeCapacity / 1000)) .. "k"
+    end
+    local ui = getInventoryUi()
+    ui.capacityPanel.capacity:setText(freeCapacity)
+
+end
+
 local function refreshInventorySizes()
     if inventoryShrink then
         inventoryController.ui:setOn(false)
@@ -289,14 +320,17 @@ local inventoryControllerEvents = inventoryController:addEvent(LocalPlayer, {
     onChaseModeChange = combatEvent,
     onSafeFightChange = combatEvent,
     onPVPModeChange = combatEvent,
-    onInventoryChange = inventoryEvent
+    onInventoryChange = inventoryEvent,
+    onSoulChange = onSoulChange,
+    onFreeCapacityChange = onFreeCapacityChange
+
 })
 
 function inventoryController:onInit()
     refreshInventory()
 end
 function inventoryController:onTerminate()
-
+    --- importan
 end
 function inventoryController:onGameStart()
     inventoryControllerEvents:connect()
@@ -307,6 +341,9 @@ function inventoryController:onGameStart()
     inventoryControllerEvents:execute('onSafeFightChange')
     inventoryControllerEvents:execute('onPVPModeChange')
     inventoryControllerEvents:execute('onInventoryChange')
+
+    inventoryControllerEvents:execute('onSoulChange')
+    inventoryControllerEvents:execute('onFreeCapacityChange')
 
     inventoryShrink = g_settings.getBoolean('mainpanel_shrink_inventory')
     refreshInventorySizes()
@@ -359,12 +396,14 @@ end
 function selectPvp(pvp, ignoreUpdate)
     local ui = getInventoryUi()
     if pvp then
-        ui.pvp:setImageClip(ui.pvp.imageClipCheckedX .. ' ' .. ui.pvp.imageClipCheckedY .. ' ' .. ui.pvp.imageClipWidth .. ' 20')
+        ui.pvp:setImageClip(
+            ui.pvp.imageClipCheckedX .. ' ' .. ui.pvp.imageClipCheckedY .. ' ' .. ui.pvp.imageClipWidth .. ' 20')
         if not ignoreUpdate then
             g_game.setPVPMode(PVPRedFist)
         end
     else
-        ui.pvp:setImageClip(ui.pvp.imageClipUncheckedX .. ' ' .. ui.pvp.imageClipUncheckedY .. ' ' .. ui.pvp.imageClipWidth .. ' 20')
+        ui.pvp:setImageClip(ui.pvp.imageClipUncheckedX .. ' ' .. ui.pvp.imageClipUncheckedY .. ' ' ..
+                                ui.pvp.imageClipWidth .. ' 20')
         if not ignoreUpdate then
             g_game.setPVPMode(PVPWhiteHand)
         end
@@ -378,7 +417,7 @@ function changeInventorySize()
 end
 -- @ End of Inventory
 
---@ Minimap
+-- @ Minimap
 local otmm = true
 local oldPos = nil
 local fullscreenWidget
@@ -405,7 +444,7 @@ local function onPositionChange()
     end
 
     local minimapWidget = mapController.ui.minimapBorder.minimap
-    if not(minimapWidget) or minimapWidget:isDragging() then
+    if not (minimapWidget) or minimapWidget:isDragging() then
         return
     end
 
@@ -606,4 +645,4 @@ function resetMap()
         refreshVirtualFloors()
     end
 end
---@ End of Minimap
+-- @ End of Minimap
