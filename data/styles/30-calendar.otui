@@ -1,0 +1,261 @@
+BordedMiniWidget < UIWidget
+  UIWidget
+    height: 2
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    background-color: #2a2a2aff
+    phantom: true
+
+  UIWidget
+    height: 3
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    background-color: #646464ff
+    phantom: true
+
+  UIWidget
+    width: 3
+    anchors.top: parent.top
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    background-color: #646464ff
+    phantom: true
+
+  UIWidget
+    width: 2
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    background-color: #2a2a2aff
+    phantom: true
+
+CalendarEvent < UIWidget
+  height: 14
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin-top: 4
+
+  Label
+    id: text
+    text-alignt: left
+    text-offset: 2 0
+    anchors.fill: parent
+    opacity: 0.85
+    phantom: true
+
+CalendarDay < UICalendar
+  phantom: true
+
+  UIWidget
+    id: fill
+    anchors.fill: parent
+    background-color: #484848ff
+    phantom: true
+
+    $on:
+      background-color: #484848ff
+
+    $!on:
+      background-color: #414141ff
+
+  UIWidget
+    height: 2
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    background-color: #646464ff
+    phantom: true
+
+  UIWidget
+    height: 1
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    background-color: #2a2a2aff
+    phantom: true
+
+  UIWidget
+    width: 1
+    anchors.top: parent.top
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    background-color: #2a2a2aff
+    phantom: true
+
+  UIWidget
+    id: brightColumn
+    width: 2
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    background-color: #646464ff
+    phantom: true
+
+  UIWidget
+    id: dayAndSeason
+    size: 36 15
+    anchors.left: parent.left
+    anchors.top: parent.top
+    phantom: true
+
+    $on:
+      height: 15
+
+    $!on:
+      height: 0
+
+    Label
+      id: day
+      anchors:top: parent.top
+      anchors.left: parent.left
+      height: 15
+      text-align: topleft
+      text-offset: 5 3
+      opacity: 0.75
+      phantom: true
+
+      $on:
+        height: 15
+
+      $!on:
+        height: 0
+        width: 1
+
+    UIWidget
+      id: season
+      size: 11 11
+      phantom: true
+      anchors.top: parent.top
+      anchors.left: day.right
+      image-source: /images/icons/icon_seasonalevent
+      margin-left: 6
+      margin-top: 5
+      opacity: 0
+
+      $on:
+        height: 11
+        opacity: 1
+
+      $!on:
+        height: 0
+        opacity: 0
+
+  UIWidget
+    id: content
+    margin-left: 2
+    margin-right: 1
+    margin-bottom: 1
+    margin-top: 3
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    anchors.top: prev.bottom
+    opacity: 1
+    phantom: true
+
+CalendarTopMark < UICalendar
+  height: 14
+  text-align: top
+  text-offset: 0 -2
+  background-color: #363636ff
+
+  UIWidget
+    height: 1
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    background-color: #2a2a2aff
+
+  UIWidget
+    height: 1
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    background-color: #2a2a2aff
+
+  UIWidget
+    width: 1
+    anchors.top: parent.top
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    background-color: #2a2a2aff
+
+  UIWidget
+    id: brightColumn
+    width: 2
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    background-color: #646464ff
+    opacity: 1
+    $on:
+      opacity: 1
+
+    $!on:
+      opacity: 0
+
+CalendarWeekDays < UICalendar
+  anchors.top: parent.top
+  anchors.left: parent.left
+  height: 433
+
+  CalendarTopMark
+    id: week
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+
+  CalendarDay
+    id: line0
+    &dayOfTheWeek: '99'
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    height: 69
+
+  CalendarDay
+    id: line1
+    &dayOfTheWeek: '99'
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    height: 69
+    margin-top: 1
+
+  CalendarDay
+    id: line2
+    &dayOfTheWeek: '99'
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    height: 69
+    margin-top: 1
+
+  CalendarDay
+    id: line3
+    &dayOfTheWeek: '99'
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    height: 69
+    margin-top: 1
+
+  CalendarDay
+    id: line4
+    &dayOfTheWeek: '99'
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    height: 69
+    margin-top: 1
+
+  CalendarDay
+    id: line5
+    &dayOfTheWeek: '99'
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    height: 69
+    margin-top: 1
