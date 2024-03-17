@@ -13,10 +13,6 @@ function UIComboBox.create()
     return combobox
 end
 
-function UIComboBox:clear()
-    return self:clearOptions()
-end
-
 function UIComboBox:clearOptions()
     self.options = {}
     self.currentIndex = -1

@@ -40,9 +40,3 @@ function importResources(dir, type, device)
     end
     return files
 end
-
-function reloadParticles()
-    g_particles.terminate()
-    local device = g_platform.getDevice()
-    importResources("particles", "otps", device)
-end

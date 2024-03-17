@@ -488,7 +488,7 @@ function doKeyCombo(keyCombo)
         elseif hotKey.action == HOTKEY_ACTION_ATTACK_PREV then
             modules.game_battle.attackNext(true)
         elseif hotKey.action == HOTKEY_ACTION_TOGGLE_CHASE then
-            modules.game_combatcontrols.toggleChaseMode()
+            modules.game_mainpanel.selectPosture('follow')
         end
 
     elseif hotKey.itemId == nil then

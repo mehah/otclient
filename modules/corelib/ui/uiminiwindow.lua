@@ -9,11 +9,13 @@ end
 
 function UIMiniWindow:open(dontSave)
     self:setVisible(true)
+
     if not dontSave then
         self:setSettings({
             closed = false
         })
     end
+
     signalcall(self.onOpen, self)
 end
 
@@ -69,29 +71,29 @@ function UIMiniWindow:maximize(dontSave)
         parent:fitAll(self)
     end
 
-    signalcall(self.onMaximize, self)							 
+    signalcall(self.onMaximize, self)
 end
 
 function UIMiniWindow:setup()
-    self:getChildById('closeButton').onClick = function()		
-        self:close()				 
+    self:getChildById('closeButton').onClick = function()
+        self:close()
     end
-	
-    self:getChildById('minimizeButton').onClick = function()
 
+    self:getChildById('minimizeButton').onClick = function()
         if self:isOn() then
             self:maximize()
         else
             self:minimize()
         end
     end
+
     self:getChildById('miniwindowTopBar').onDoubleClick = function()
         if self:isOn() then
             self:maximize()
         else
             self:minimize()
         end
-    end				
+    end
 end
 
 function UIMiniWindow:setupOnStart()
@@ -102,6 +104,7 @@ function UIMiniWindow:setupOnStart()
 
     local oldParent = self:getParent()
     local newParentSet = false
+
     local settings = g_settings.getNode('CharMiniWindows')
 
     if not settings then
@@ -117,7 +120,6 @@ function UIMiniWindow:setupOnStart()
             g_settings.setNode('CharMiniWindows', settings)
             break
         end
-		 
     end
 
     local selfSettings = settings[char][self:getId()]
@@ -133,7 +135,6 @@ function UIMiniWindow:setupOnStart()
                     self:setParent(parent, true)
                     self:setPosition(topoint(selfSettings.position))
                     newParentSet = true
-		  
                 end
             end
         end
@@ -156,7 +157,6 @@ function UIMiniWindow:setupOnStart()
             self:open(true)
         end
     end
-	 
 
     local newParent = self:getParent()
 
@@ -194,6 +194,8 @@ function UIMiniWindow:onDragEnter(mousePos)
     end
 
     if parent:getClassName() == 'UIMiniWindowContainer' then
+        self.oldParentDrag = parent
+        self.oldParentDragIndex = parent:getChildIndex(self)
         local containerParent = parent:getParent()
         parent:removeChild(self)
         containerParent:addChild(self)
@@ -220,6 +222,14 @@ function UIMiniWindow:onDragLeave(droppedWidget, mousePos)
     end
 
     self:saveParent(self:getParent())
+    if self.moveOnlyToMain or droppedWidget.onlyPhantomDrop then
+        if not(droppedWidget) or (self.moveOnlyToMain and not(droppedWidget.onlyPhantomDrop)) or (not(self.moveOnlyToMain) and droppedWidget.onlyPhantomDrop) then
+            local virtualParent = self:getParent()
+            virtualParent:removeChild(self)
+            self.oldParentDrag:insertChild(self.oldParentDragIndex, self)
+            self.movedWidget = nil
+        end
+    end
 end
 
 function UIMiniWindow:onDragMove(mousePos, mouseMoved)
@@ -260,7 +270,6 @@ function UIMiniWindow:onDragMove(mousePos, mouseMoved)
             break
         end
     end
-	 
 
     if not overAnyWidget and self.movedWidget then
         self.setMovedChildMargin(self.movedOldMargin or 0)
@@ -316,7 +325,6 @@ function UIMiniWindow:getSettings(name)
             return selfSettings[name]
         end
     end
-	 
     return nil
 end
 
@@ -387,7 +395,6 @@ function UIMiniWindow:saveParent(parent)
             self:saveParentPosition(parent:getId(), self:getPosition())
         end
     end
-	 
 end
 
 function UIMiniWindow:saveParentPosition(parentId, position)
@@ -482,5 +489,8 @@ end
 
 function UIMiniWindow:isResizeable()
     local resizeBorder = self:getChildById('bottomResizeBorder')
+    if not resizeBorder then
+        return false
+    end
     return resizeBorder:isExplicitlyVisible() and resizeBorder:isEnabled()
 end

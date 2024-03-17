@@ -15,7 +15,8 @@ local defaultOptions = {
     showLevelsInConsole = true,
     showPrivateMessagesInConsole = true,
     showPrivateMessagesOnScreen = true,
-    showLeftPanel = true,
+    showLeftPanel = false,
+    showLeftExtraPanel = false,
     showRightExtraPanel = false,
     openMaximized = false,
     backgroundFrameRate = 201,
@@ -46,8 +47,7 @@ local defaultOptions = {
     creatureInformationScale = 0,
     staticTextScale = 0,
     animatedTextScale = 0,
-    setEffectAlphaScroll = 100 ,
-    setMissileAlphaScroll = 100 ,
+    showOutfitsOnList = true
 }
 
 local optionsWindow
@@ -60,6 +60,7 @@ local consolePanel
 local graphicsPanel
 local soundPanel
 local audioButton
+local optionsButtons
 
 local crosshairCombobox
 local antialiasingModeCombobox
@@ -83,26 +84,26 @@ function init()
     g_keyboard.bindKeyDown('Ctrl+N', toggleDisplays)
 
     generalPanel = g_ui.loadUI('general')
-    optionsTabBar:addTab(tr('General'), generalPanel, '/images/optionstab/game')
+    optionsTabBar:addTab(tr('Options'), generalPanel, '/images/icons/icon_options')
 
     controlPanel = g_ui.loadUI('control')
-    optionsTabBar:addTab(tr('Control'), controlPanel, '/images/optionstab/controls')
+    optionsTabBar:addTab(tr('Controls'), controlPanel, '/images/icons/icon_controls')
 
     consolePanel = g_ui.loadUI('console')
-    optionsTabBar:addTab(tr('Console'), consolePanel, '/images/optionstab/console')
+    optionsTabBar:addTab(tr('Interface'), consolePanel, '/images/icons/icon_interface')
 
     graphicsPanel = g_ui.loadUI('graphics')
-    optionsTabBar:addTab(tr('Graphics'), graphicsPanel, '/images/optionstab/graphics')
+    optionsTabBar:addTab(tr('Graphics'), graphicsPanel, '/images/icons/icon_graphics')
 
     soundPanel = g_ui.loadUI('audio')
-    optionsTabBar:addTab(tr('Audio'), soundPanel, '/images/optionstab/audio')
+    optionsTabBar:addTab(tr('Sound'), soundPanel, '/images/icons/icon_sound')
 
-    optionsButton = modules.client_topmenu.addLeftButton('optionsButton', tr('Options'), '/images/topbuttons/options',
-        toggle)
-    audioButton = modules.client_topmenu.addLeftButton('audioButton', tr('Audio'), '/images/topbuttons/audio',
-        function()
-            toggleOption('enableAudio')
-        end)
+    optionsButton = modules.client_topmenu.addTopRightToggleButton('optionsButton', tr('Options'), '/images/topbuttons/button_options',
+                                                         toggle)
+    audioButton = modules.client_topmenu.addTopRightToggleButton('audioButton', tr('Audio'), '/images/topbuttons/button_mute_up',
+                                                       function()
+        toggleOption('enableAudio')
+    end)
 
     addEvent(function()
         setup()
@@ -115,6 +116,15 @@ function terminate()
     optionsWindow:destroy()
     optionsButton:destroy()
     audioButton:destroy()
+end
+
+function setupOptionsMainButton()
+    if optionsButtons then
+        return
+    end
+
+    optionsButtons = modules.game_mainpanel.addSpecialToggleButton('optionsMainButton', tr('Options'),
+                                                                   '/images/options/button_options', toggle)
 end
 
 function setupComboBox()
@@ -209,10 +219,24 @@ function setOption(key, value, force)
         return
     end
 
+    if not modules.game_interface then
+        return
+    end
+
     local gameMapPanel = modules.game_interface.getMapPanel()
 
     if key == 'vsync' then
         g_window.setVerticalSync(value)
+    elseif key == 'showOutfitsOnList' then
+        CharacterList.updateCharactersAppearances(value)
+    elseif key == 'distFromCenScrollbar' then
+        local bar = modules.game_healthcircle.optionPanel:recursiveGetChildById('distFromCenScrollbar')
+        bar:setText(tr('Distance: %s', bar:recursiveGetChildById('valueBar'):getValue()))
+        modules.game_healthcircle.setDistanceFromCenter(bar:recursiveGetChildById('valueBar'):getValue())
+    elseif key == 'opacityScrollbar' then
+        local bar = modules.game_healthcircle.optionPanel:recursiveGetChildById('opacityScrollbar')
+        bar:setText(tr('Opacity: %s', bar:recursiveGetChildById('valueBar'):getValue() / 100))
+        modules.game_healthcircle.setCircleOpacity(bar:recursiveGetChildById('valueBar'):getValue() / 100)
     elseif key == 'showFps' then
         modules.client_topmenu.setFpsVisible(value)
     elseif key == 'optimizeFps' then
@@ -225,7 +249,7 @@ function setOption(key, value, force)
         if g_game.isUsingProtobuf() then
             value = true
         elseif g_app.isEncrypted() then
-            local asyncWidget = graphicsPanel:getChildById('asyncTxtLoading')
+            local asyncWidget = generalPanel:recursiveGetChildById('asyncTxtLoading')
             asyncWidget:setEnabled(false)
             asyncWidget:setChecked(false)
             return
@@ -241,9 +265,9 @@ function setOption(key, value, force)
             g_sounds.setAudioEnabled(value)
         end
         if value then
-            audioButton:setIcon('/images/topbuttons/audio')
+            audioButton:setIcon('/images/topbuttons/button_mute_up')
         else
-            audioButton:setIcon('/images/topbuttons/audio_mute')
+            audioButton:setIcon('/images/topbuttons/button_mute_pressed')
         end
     elseif key == 'enableMusicSound' then
         if g_sounds then
@@ -253,9 +277,11 @@ function setOption(key, value, force)
         if g_sounds then
             g_sounds.getChannel(SoundChannels.Music):setGain(value / 100)
         end
-        soundPanel:getChildById('musicSoundVolumeLabel'):setText(tr('Music volume: %d', value))
+        soundPanel:recursiveGetChildById('musicSoundVolume'):setText(tr('Music volume: %d', value))
     elseif key == 'showLeftPanel' then
         modules.game_interface.getLeftPanel():setOn(value)
+    elseif key == 'showLeftExtraPanel' then
+        modules.game_interface.getLeftExtraPanel():setOn(value)
     elseif key == 'showRightExtraPanel' then
         modules.game_interface.getRightExtraPanel():setOn(value)
     elseif key == 'backgroundFrameRate' then
@@ -264,21 +290,21 @@ function setOption(key, value, force)
             text = 'max'
             v = 0
         end
-        graphicsPanel:getChildById('backgroundFrameRateLabel'):setText(tr('Game framerate limit: %s', text))
+        graphicsPanel:recursiveGetChildById('backgroundFrameRate'):setText(tr('Game framerate limit: %s', text))
         g_app.setMaxFps(v)
     elseif key == 'enableLights' then
         gameMapPanel:setDrawLights(value and options['ambientLight'] < 100)
-        graphicsPanel:getChildById('ambientLight'):setEnabled(value)
-        graphicsPanel:getChildById('ambientLightLabel'):setEnabled(value)
+        graphicsPanel:recursiveGetChildById('ambientLight'):setEnabled(value)
+        graphicsPanel:recursiveGetChildById('ambientLight'):setEnabled(value)
     elseif key == 'ambientLight' then
-        graphicsPanel:getChildById('ambientLightLabel'):setText(tr('Ambient light: %s%%', value))
+        graphicsPanel:recursiveGetChildById('ambientLight'):setText(string.format('Ambient light: %s%%', value))
         gameMapPanel:setMinimumAmbientLight(value / 100)
         gameMapPanel:setDrawLights(options['enableLights'])
     elseif key == 'shadowFloorIntensity' then
-        graphicsPanel:getChildById('shadowFloorIntensityLevel'):setText(tr('Shadow floor Intensity: %s%%', value))
+        graphicsPanel:recursiveGetChildById('shadowFloorIntensity'):setText(string.format('Shadow floor Intensity: %s%%', value))
         gameMapPanel:setShadowFloorIntensity(1 - (value / 100))
     elseif key == 'floorFading' then
-        graphicsPanel:getChildById('floorFadingLabel'):setText(tr('Floor Fading: %s ms', value))
+        graphicsPanel:recursiveGetChildById('floorFading'):setText(string.format('Floor Fading: %s ms', value))
         gameMapPanel:setFloorFading(tonumber(value))
     elseif key == 'creatureInformationScale' then
         if value == 0 then
@@ -287,8 +313,7 @@ function setOption(key, value, force)
             value = value / 2
         end
         g_app.setCreatureInformationScale(math.max(value + 0.5, 1))
-        generalPanel:getChildById('creatureInformationScaleLabel'):setText(
-            tr('Creature Information Scale: %sx', math.max(value + 0.5, 1)))
+        consolePanel:recursiveGetChildById('creatureInformationScale'):setText(string.format('Creature Information Scale: %sx', math.max(value + 0.5, 1)))
         value = value * 2
     elseif key == 'staticTextScale' then
         if value == 0 then
@@ -297,7 +322,7 @@ function setOption(key, value, force)
             value = value / 2
         end
         g_app.setStaticTextScale(math.max(value + 0.5, 1))
-        generalPanel:getChildById('staticTextScaleLabel'):setText(tr('Message Scale: %sx', math.max(value + 0.5, 1)))
+        consolePanel:recursiveGetChildById('staticTextScale'):setText(string.format('Message Scale: %sx', math.max(value + 0.5, 1)))
         value = value * 2
     elseif key == 'animatedTextScale' then
         if value == 0 then
@@ -306,7 +331,7 @@ function setOption(key, value, force)
             value = value / 2
         end
         g_app.setAnimatedTextScale(math.max(value + 0.5, 1))
-        generalPanel:getChildById('animatedTextScaleLabel'):setText(
+        consolePanel:recursiveGetChildById('animatedTextScale'):setText(
             tr('Animated Message Scale: %sx', math.max(value + 0.5, 1)))
         value = value * 2
     elseif key == 'limitVisibleDimension' then
@@ -328,9 +353,9 @@ function setOption(key, value, force)
     elseif key == 'preciseControl' then
         g_game.setScheduleLastWalk(not value)
     elseif key == 'turnDelay' then
-        controlPanel:getChildById('turnDelayLabel'):setText(tr('Turn delay: %sms', value))
+        controlPanel:recursiveGetChildById('turnDelay'):setText(string.format('Turn delay: %sms', value))
     elseif key == 'hotkeyDelay' then
-        controlPanel:getChildById('hotkeyDelayLabel'):setText(tr('Hotkey delay: %sms', value))
+        controlPanel:recursiveGetChildById('hotkeyDelay'):setText(string.format('Hotkey delay: %sms', value))
     elseif key == 'crosshair' then
         local crossPath = '/images/game/crosshair/'
         local newValue = value
@@ -352,15 +377,7 @@ function setOption(key, value, force)
         floorViewModeCombobox:setCurrentOptionByData(value, true)
 
         local fadeMode = value == 1
-        graphicsPanel:getChildById('floorFading'):setEnabled(fadeMode)
-        graphicsPanel:getChildById('floorFadingLabel'):setEnabled(fadeMode)
-        
-    elseif key == 'setEffectAlphaScroll' then
-        g_client.setEffectAlpha(value/100)
-        generalPanel:getChildById('setEffectAlphaLabel'):setText(tr('Opacity Effect: %s%%', value))
-    elseif key == 'setMissileAlphaScroll' then
-        g_client.setMissileAlpha(value/100)
-        generalPanel:getChildById('setMissileAlphaLabel'):setText(tr('Opacity Missile: %s%%', value))
+        graphicsPanel:recursiveGetChildById('floorFading'):setEnabled(fadeMode)
     end
 
     -- change value for keybind updates
@@ -371,6 +388,8 @@ function setOption(key, value, force)
                 widget:setChecked(value)
             elseif widget:getStyle().__class == 'UIScrollBar' then
                 widget:setValue(value)
+            elseif widget:recursiveGetChildById('valueBar') then
+                widget:recursiveGetChildById('valueBar'):setValue(value)
             end
             break
         end

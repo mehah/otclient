@@ -26,7 +26,7 @@ local function getKeyCode(key)
     end
 end
 
-function retranslateKeyComboDesc(keyComboDesc)
+local function retranslateKeyComboDesc(keyComboDesc)
     if keyComboDesc == nil then
         error('Unable to translate key combo \'' .. keyComboDesc .. '\'')
     end

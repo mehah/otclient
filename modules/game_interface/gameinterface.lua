@@ -2,15 +2,19 @@ WALK_STEPS_RETRY = 10
 
 gameRootPanel = nil
 gameMapPanel = nil
+gameMainRightPanel = nil
 gameRightPanel = nil
 gameRightExtraPanel = nil
 gameLeftPanel = nil
+gameLeftExtraPanel = nil
 gameSelectedPanel = nil
 panelsList = {}
 panelsRadioGroup = nil
+gameTopPanel = nil
 gameBottomPanel = nil
 showTopMenuButton = nil
 logoutButton = nil
+logOutMainButton = nil
 mouseGrabberWidget = nil
 countWindow = nil
 logoutWindow = nil
@@ -21,9 +25,12 @@ currentViewMode = 0
 smartWalkDirs = {}
 smartWalkDir = nil
 firstStep = false
+leftIncreaseSidePanels = nil
+leftDecreaseSidePanels = nil
+rightIncreaseSidePanels = nil
+rightDecreaseSidePanels = nil
 hookedMenuOptions = {}
 lastDirTime = g_clock.millis()
-lastManualWalk = 0
 
 function init()
     g_ui.importStyle('styles/countwindow')
@@ -63,39 +70,35 @@ function init()
 
     bottomSplitter = gameRootPanel:getChildById('bottomSplitter')
     gameMapPanel = gameRootPanel:getChildById('gameMapPanel')
+    gameMainRightPanel = gameRootPanel:getChildById('gameMainRightPanel')
     gameRightPanel = gameRootPanel:getChildById('gameRightPanel')
     gameRightExtraPanel = gameRootPanel:getChildById('gameRightExtraPanel')
+    gameLeftExtraPanel = gameRootPanel:getChildById('gameLeftExtraPanel')
     gameLeftPanel = gameRootPanel:getChildById('gameLeftPanel')
     gameBottomPanel = gameRootPanel:getChildById('gameBottomPanel')
+    gameTopPanel = gameRootPanel:getChildById('gameTopPanel')
+
+    leftIncreaseSidePanels = gameRootPanel:getChildById('leftIncreaseSidePanels')
+    leftDecreaseSidePanels = gameRootPanel:getChildById('leftDecreaseSidePanels')
+    rightIncreaseSidePanels = gameRootPanel:getChildById('rightIncreaseSidePanels')
+    rightDecreaseSidePanels = gameRootPanel:getChildById('rightDecreaseSidePanels')
+
+    leftIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showLeftExtraPanel'))
+    leftDecreaseSidePanels:setEnabled(modules.client_options.getOption('showLeftPanel'))
+    rightIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showRightExtraPanel'))
+    rightDecreaseSidePanels:setEnabled(modules.client_options.getOption('showRightExtraPanel'))
 
     panelsList = { {
-        panel = gameRightPanel,
-        checkbox = gameRootPanel:getChildById('gameSelectRightColumn')
+        panel = gameRightPanel
     }, {
-        panel = gameRightExtraPanel,
-        checkbox = gameRootPanel:getChildById('gameSelectRightExtraColumn')
+        panel = gameRightExtraPanel
     }, {
-        panel = gameLeftPanel,
-        checkbox = gameRootPanel:getChildById('gameSelectLeftColumn')
+        panel = gameLeftPanel
+    },{
+        panel = gameLeftExtraPanel
     } }
 
-    panelsRadioGroup = UIRadioGroup.create()
-    for k, v in pairs(panelsList) do
-        panelsRadioGroup:addWidget(v.checkbox)
-        connect(v.checkbox, {
-            onCheckChange = onSelectPanel
-        })
-    end
-    panelsRadioGroup:selectWidget(panelsList[1].checkbox)
-
-    connect(gameLeftPanel, {
-        onVisibilityChange = onExtraPanelVisibilityChange
-    })
-    connect(gameRightExtraPanel, {
-        onVisibilityChange = onExtraPanelVisibilityChange
-    })
-
-    logoutButton = modules.client_topmenu.addLeftButton('logoutButton', tr('Exit'), '/images/topbuttons/logout',
+    logoutButton = modules.client_topmenu.addTopRightToggleButton('logoutButton', tr('Exit'), '/images/topbuttons/logout',
         tryLogout, true)
 
     showTopMenuButton = gameMapPanel:getChildById('showTopMenuButton')
@@ -108,21 +111,12 @@ function init()
     if g_game.isOnline() then
         show()
     end
-end
 
-function onSelectPanel(self, checked)
-    if checked then
-        for k, v in pairs(panelsList) do
-            if v.checkbox == self then
-                gameSelectedPanel = v.panel
-                break
-            end
-        end
-    end
+    StatsBar.init()
 end
 
 function bindKeys()
-    gameRootPanel:setAutoRepeatDelay(200)
+    gameRootPanel:setAutoRepeatDelay(50)
 
     bindWalkKey('Up', North)
     bindWalkKey('Right', East)
@@ -207,6 +201,8 @@ function unbindTurnKey(key)
 end
 
 function terminate()
+    StatsBar.terminate()
+
     hide()
     if g_app.hasUpdater() then
         disconnect(g_app, {
@@ -231,19 +227,6 @@ function terminate()
         onLoginAdvice = onLoginAdvice
     })
 
-    disconnect(gameLeftPanel, {
-        onVisibilityChange = onExtraPanelVisibilityChange
-    })
-    disconnect(gameRightExtraPanel, {
-        onVisibilityChange = onExtraPanelVisibilityChange
-    })
-
-    for k, v in pairs(panelsList) do
-        disconnect(v.checkbox, {
-            onCheckChange = onSelectPanel
-        })
-    end
-
     logoutButton:destroy()
     gameRootPanel:destroy()
 end
@@ -257,6 +240,11 @@ function onGameStart()
     else
         g_game.disableFeature(GameForceFirstAutoWalkStep)
     end
+
+    leftIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showLeftExtraPanel'))
+    leftDecreaseSidePanels:setEnabled(modules.client_options.getOption('showLeftPanel'))
+    rightIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showRightExtraPanel'))
+    rightDecreaseSidePanels:setEnabled(modules.client_options.getOption('showRightExtraPanel'))
 end
 
 function onGameEnd()
@@ -281,7 +269,6 @@ function show()
         setupViewMode(2)
     end
 
-    gameMapPanel:clearTiles();
     addEvent(function()
         if not limitedZoom or g_game.isGM() then
             gameMapPanel:setMaxZoomOut(513)
@@ -496,8 +483,6 @@ function smartWalk(dir)
     local dire = smartWalkDir or dir
     g_game.walk(dire, firstStep)
     firstStep = false
-
-    lastManualWalk = g_clock.millis()
     return true
 end
 
@@ -892,16 +877,6 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
         end
     end
 
-    if not g_game.isEnabledBotProtection() and useThing and useThing:isItem() then
-        menu:addSeparator()
-        local useThingId = useThing:getId()
-        if useThing:getSubType() > 1 then
-            menu:addOption("ID: " .. useThingId .. " SubType: " .. g_window.getClipboardText(), function() end)
-        else
-            menu:addOption("ID: " .. useThingId, function() g_window.setClipboardText(useThingId) end)
-        end
-    end
-
     menu:display(menuPosition)
 end
 
@@ -1121,12 +1096,20 @@ function getRightPanel()
     return gameRightPanel
 end
 
+function getMainRightPanel()
+    return gameMainRightPanel
+end
+
 function getLeftPanel()
     return gameLeftPanel
 end
 
 function getRightExtraPanel()
     return gameRightExtraPanel
+end
+
+function getLeftExtraPanel()
+    return gameLeftExtraPanel
 end
 
 function getSelectedPanel()
@@ -1142,7 +1125,7 @@ function getShowTopMenuButton()
 end
 
 function findContentPanelAvailable(child, minContentHeight)
-    if gameSelectedPanel:isVisible() and gameSelectedPanel:fits(child, minContentHeight, 0) >= 0 then
+    if gameSelectedPanel and gameSelectedPanel:isVisible() and gameSelectedPanel:fits(child, minContentHeight, 0) >= 0 then
         return gameSelectedPanel
     end
 
@@ -1155,44 +1138,6 @@ function findContentPanelAvailable(child, minContentHeight)
     return gameSelectedPanel
 end
 
-function onExtraPanelVisibilityChange(extraPanel, visible)
-    if not visible then
-        -- move children to right panel
-        if g_game.isOnline() then
-            local children = extraPanel:getChildren()
-            for i = 1, #children do
-                children[i]:setParent(gameRightPanel)
-            end
-        end
-
-        -- unselect hiding panel
-        if extraPanel == getSelectedPanel() then
-            panelsRadioGroup:selectWidget(panelsList[1].checkbox)
-        end
-
-        -- hide checkbox of hidden panel
-        for k, v in pairs(panelsList) do
-            if v.panel == extraPanel then
-                v.checkbox:setVisible(false)
-            end
-        end
-
-        -- if there is only the right panel visible, hide its checkbox too
-        if not gameRightExtraPanel:isVisible() and not gameLeftPanel:isVisible() then
-            panelsList[1].checkbox:setVisible(false)
-        end
-    else
-        -- this means that, besided the right panel, there is another panel visible
-        -- so we'll enable the checkboxes from the one at right, and the one being shown
-        for k, v in pairs(panelsList) do
-            if v.panel == extraPanel then
-                v.checkbox:setVisible(true)
-            end
-        end
-        panelsList[1].checkbox:setVisible(true)
-    end
-end
-
 function nextViewMode()
     setupViewMode((currentViewMode + 1) % 3)
 end
@@ -1202,6 +1147,11 @@ function setupViewMode(mode)
         return
     end
 
+    leftIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showLeftExtraPanel'))
+    leftDecreaseSidePanels:setEnabled(modules.client_options.getOption('showLeftPanel'))
+    rightIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showRightExtraPanel'))
+    rightDecreaseSidePanels:setEnabled(modules.client_options.getOption('showRightExtraPanel'))
+
     if currentViewMode == 2 then
         gameMapPanel:addAnchor(AnchorLeft, 'gameLeftPanel', AnchorRight)
         gameMapPanel:addAnchor(AnchorRight, 'gameRightPanel', AnchorLeft)
@@ -1210,12 +1160,15 @@ function setupViewMode(mode)
         gameRootPanel:addAnchor(AnchorTop, 'topMenu', AnchorBottom)
         gameLeftPanel:setOn(modules.client_options.getOption('showLeftPanel'))
         gameRightExtraPanel:setOn(modules.client_options.getOption('showRightExtraPanel'))
+        gameLeftExtraPanel:setOn(modules.client_options.getOption('showLeftExtraPanel'))
         gameLeftPanel:setImageColor('white')
         gameRightPanel:setImageColor('white')
         gameRightExtraPanel:setImageColor('white')
+        gameLeftExtraPanel:setImageColor('white')
         gameLeftPanel:setMarginTop(0)
         gameRightPanel:setMarginTop(0)
         gameRightExtraPanel:setMarginTop(0)
+        gameLeftExtraPanel:setMarginTop(0)
         gameBottomPanel:setImageColor('white')
         modules.client_topmenu.getTopMenu():setImageColor('white')
     end
@@ -1249,15 +1202,20 @@ function setupViewMode(mode)
         gameLeftPanel:setImageColor('alpha')
         gameRightPanel:setImageColor('alpha')
         gameRightExtraPanel:setImageColor('alpha')
+        gameLeftExtraPanel:setImageColor('alpha')
         gameLeftPanel:setMarginTop(modules.client_topmenu.getTopMenu():getHeight() - gameLeftPanel:getPaddingTop())
         gameRightPanel:setMarginTop(modules.client_topmenu.getTopMenu():getHeight() - gameRightPanel:getPaddingTop())
         gameRightExtraPanel:setMarginTop(modules.client_topmenu.getTopMenu():getHeight() -
             gameRightExtraPanel:getPaddingTop())
+        gameLeftExtraPanel:setMarginTop(modules.client_topmenu.getTopMenu():getHeight() -
+            gameLeftExtraPanel:getPaddingTop())
         gameLeftPanel:setOn(true)
         gameLeftPanel:setVisible(true)
         gameRightPanel:setOn(true)
         gameRightExtraPanel:setOn(true)
         gameRightExtraPanel:setVisible(true)
+        gameLeftExtraPanel:setOn(true)
+        gameLeftExtraPanel:setVisible(true)
         gameMapPanel:setOn(true)
         gameBottomPanel:setImageColor('#ffffff88')
         modules.client_topmenu.getTopMenu():setImageColor('#ffffff66')
@@ -1268,4 +1226,65 @@ end
 
 function limitZoom()
     limitedZoom = true
+end
+
+function getGameTopStatsBar()
+    return gameTopPanel
+end
+
+function getGameMapPanel()
+    return gameMapPanel
+end
+
+function setStatsBarOption(dimension, placement)
+    StatsBar.setStatsBarOption(dimension, placement)
+end
+
+function onIncreaseLeftPanels()
+    leftDecreaseSidePanels:setEnabled(true)
+    if not modules.client_options.getOption('showLeftPanel') then
+        modules.client_options.setOption('showLeftPanel', true)
+        return
+    end
+
+    if not modules.client_options.getOption('showLeftExtraPanel') then
+        modules.client_options.setOption('showLeftExtraPanel', true)
+        leftIncreaseSidePanels:setEnabled(false)
+        return
+    end
+end
+
+function onDecreaseLeftPanels()
+    leftIncreaseSidePanels:setEnabled(true)
+    if modules.client_options.getOption('showLeftExtraPanel') then
+        modules.client_options.setOption('showLeftExtraPanel', false)
+        return
+    end
+
+    if modules.client_options.getOption('showLeftPanel') then
+        modules.client_options.setOption('showLeftPanel', false)
+        leftDecreaseSidePanels:setEnabled(false)
+        return
+    end
+end
+
+function onIncreaseRightPanels()
+    rightIncreaseSidePanels:setEnabled(false)
+    rightDecreaseSidePanels:setEnabled(true)
+    modules.client_options.setOption('showRightExtraPanel', true)
+end
+
+function onDecreaseRightPanels()
+    rightIncreaseSidePanels:setEnabled(true)
+    rightDecreaseSidePanels:setEnabled(false)
+    modules.client_options.setOption('showRightExtraPanel', false)
+end
+
+function setupOptionsMainButton()
+    if logOutMainButton then
+        return
+    end
+
+    logOutMainButton = modules.game_mainpanel.addSpecialToggleButton('logoutButton', tr('Exit'), '/images/options/button_logout',
+    tryLogout, true)
 end

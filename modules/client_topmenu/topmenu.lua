@@ -1,9 +1,17 @@
 -- private variables
 local topMenu
-local leftButtonsPanel
 local rightButtonsPanel
 local leftGameButtonsPanel
 local rightGameButtonsPanel
+local topLeftTogglesPanel
+local topLeftButtonsPanel
+local topLeftOnlinePlayersLabel
+local topLeftTwitchViewersLabel
+local topLeftTwitchStreamersLabel
+local topLeftYoutubeViewersLabel
+local topLeftYoutubeStreamersLabel
+local fpsLabel
+local pingLabel
 
 local lastSyncValue = -1
 local fpsEvent = nil
@@ -16,7 +24,7 @@ local function addButton(id, description, icon, callback, panel, toggle, front)
     if toggle then
         class = 'TopToggleButton'
     else
-        class = 'TopButton'
+        class = 'Button'
     end
 
     local button = panel:getChildById(id)
@@ -30,7 +38,11 @@ local function addButton(id, description, icon, callback, panel, toggle, front)
     end
     button:setId(id)
     button:setTooltip(description)
-    button:setIcon(resolvepath(icon, 3))
+    if toggle then
+        button:setIcon(resolvepath(icon, 3))
+    else
+        button:setText(description)
+    end
     button.onMouseRelease = function(widget, mousePos, mouseButton)
         if widget:containsPoint(mousePos) and mouseButton ~= MouseMidButton then
             callback()
@@ -53,12 +65,20 @@ function init()
 
     topMenu = g_ui.displayUI('topmenu')
 
-    leftButtonsPanel = topMenu:getChildById('leftButtonsPanel')
+    topLeftButtonsPanel = topMenu:getChildById('topLeftButtonsPanel')
+    topLeftTogglesPanel = topMenu:getChildById('topLeftTogglesPanel')
     rightButtonsPanel = topMenu:getChildById('rightButtonsPanel')
     leftGameButtonsPanel = topMenu:getChildById('leftGameButtonsPanel')
     rightGameButtonsPanel = topMenu:getChildById('rightGameButtonsPanel')
     pingLabel = topMenu:getChildById('pingLabel')
     fpsLabel = topMenu:getChildById('fpsLabel')
+
+    topLeftOnlinePlayersLabel = topMenu:recursiveGetChildById('topLeftOnlinePlayersLabel')
+    topLeftTwitchViewersLabel = topMenu:recursiveGetChildById('topLeftTwitchViewersLabel')
+    topLeftTwitchStreamersLabel = topMenu:recursiveGetChildById('topLeftTwitchStreamersLabel')
+    topLeftYoutubeViewersLabel = topMenu:recursiveGetChildById('topLeftYoutubeViewersLabel')
+    topLeftYoutubeStreamersLabel = topMenu:recursiveGetChildById('topLeftYoutubeStreamersLabel')
+
 
     g_keyboard.bindKeyDown('Ctrl+Shift+T', toggle)
 
@@ -78,6 +98,16 @@ function terminate()
     })
 
     topMenu:destroy()
+end
+
+function hide()
+    topMenu:hide()
+end
+
+function show()
+    topMenu:show()
+    topMenu:raise()
+    topMenu:focus()
 end
 
 function online()
@@ -170,12 +200,28 @@ function setFpsVisible(enable)
     fpsLabel:setVisible(enable)
 end
 
-function addLeftButton(id, description, icon, callback, front)
-    return addButton(id, description, icon, callback, leftButtonsPanel, false, front)
+function addTopRightRegularButton(id, description, icon, callback, front)
+    return addButton(id, description, icon, callback, topLeftButtonsPanel, false, front)
 end
 
-function addLeftToggleButton(id, description, icon, callback, front)
-    return addButton(id, description, icon, callback, leftButtonsPanel, true, front)
+function addTopRightToggleButton(id, description, icon, callback, front)
+    return addButton(id, description, icon, callback, topLeftTogglesPanel, true, front)
+end
+
+function setPlayersOnline(value)
+    topLeftOnlinePlayersLabel:setText(value .. " " .. tr('players online'))
+end
+function setTwitchStreams(value)
+    topLeftTwitchStreamersLabel:setText(value)
+end
+function setTwitchViewers(value)
+    topLeftTwitchViewersLabel:setText(value)
+end
+function setYoutubeStreams(value)
+    topLeftYoutubeStreamersLabel:setText(value)
+end
+function setYoutubeViewers(value)
+    topLeftYoutubeViewersLabel:setText(value)
 end
 
 function addRightButton(id, description, icon, callback, front)
@@ -228,13 +274,9 @@ function toggle()
 
     if menu:isVisible() then
         menu:hide()
-        modules.client_background.getBackground():addAnchor(AnchorTop, 'parent', AnchorTop)
         modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'parent', AnchorTop)
-        modules.game_interface.getShowTopMenuButton():show()
     else
         menu:show()
-        modules.client_background.getBackground():addAnchor(AnchorTop, 'topMenu', AnchorBottom)
         modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'topMenu', AnchorBottom)
-        modules.game_interface.getShowTopMenuButton():hide()
     end
 end

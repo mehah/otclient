@@ -1,216 +1,108 @@
-EnterGameWindow < MainWindow
-  !text: tr('Enter Game')
-  size: 236 316
-  draggable: false
-
-EnterGameButton < Button
-  width: 64
-
-ServerListButton < UIButton
-  size: 17 17
-  image-source: /images/topbuttons/minimap
-  image-color: #ffffffff
-
-  $hover !disabled:
-    image-color: #ffffff99
-
-  $pressed:
-    image-color: #ffffff44
-
-  $disabled:
-    image-color: #ffffff55
-
-EnterGameWindow
+MiniQtWindow
   id: enterGame
   &authenticatorEnabled: false
   &authenticatorHeight: 44
   &stayLoggedBoxEnabled: false
   &stayLoggedBoxHeight: 24
+  anchors.horizontalCenter: parent.horizontalCenter
+  anchors.verticalCenter: parent.verticalCenter
+  size: 280 178
+  draggable: false
   @onEnter: EnterGame.doLogin()
 
-  MenuLabel
-    !text: tr('Account name')
-    anchors.left: parent.left
+  Label
+    !text: tr('Journey Onwards')
+    font: verdana-11px-antialised
+    text-offset: 0 2
+    text-align: top
     anchors.top: parent.top
-    text-auto-resize: true
-
-  PasswordTextEdit
-    id: accountNameTextEdit
+    anchors.bottom: parent.bottom
     anchors.left: parent.left
     anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 2
-
-  MenuLabel
-    !text: tr('Password')
-    anchors.left: prev.left
-    anchors.top: prev.bottom
-    margin-top: 8
-    text-auto-resize: true
-
-  PasswordTextEdit
-    id: accountPasswordTextEdit
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 2
-
-  MenuLabel
-    id: authenticatorTokenLabel
-    !text: tr('Authenticator Token')
-    anchors.left: prev.left
-    anchors.top: prev.bottom
-    text-auto-resize: true
-    margin-top: -12
-    visible: false
-
-    $on:
-      visible: true
-      margin-top: 8
-
-  TextEdit
-    id: authenticatorTokenTextEdit
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: -22
-    visible: false
-    max-length: 8
-
-    $on:
-      visible: true
-      margin-top: 2
-
-  CheckBox
-    id: stayLoggedBox
-    !text: tr('Stay logged during session')
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 6
-    margin-top: -16
-    visible: false
-
-    $on:
-      visible: true
-      margin-top: 8
-
-  HorizontalSeparator
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 8
-
-  MenuLabel
-    id: serverLabel
-    !text: tr('Server')
-    anchors.left: prev.left
-    anchors.top: prev.bottom
-    margin-top: 8
-    text-auto-resize: true
-
-  ServerListButton
-    id: serverListButton
-    !tooltip: tr('Server list')
-    anchors.right: parent.right
-    anchors.top: serverLabel.bottom
-    margin-top: 3
-    @onClick: ServerList.show()
-
-  TextEdit
-    id: serverHostTextEdit
-    !tooltip: tr('Make sure that your client uses\nthe correct game client version')
-    anchors.left: parent.left
-    anchors.right: serverListButton.left
-    anchors.top: serverLabel.bottom
-    margin-top: 2
-    margin-right: 4
-
-  MenuLabel
-    id: clientLabel
-    !text: tr('Client Version')
-    anchors.left: parent.left
-    anchors.top: serverHostTextEdit.bottom
-    text-auto-resize: true
-    margin-right: 10
-    margin-top: 8
-
-  ComboBox
-    id: clientComboBox
-    anchors.left: parent.left
-    anchors.right: parent.horizontalCenter
-    anchors.top: clientLabel.bottom
-    margin-top: 2
-    margin-right: 3
-    width: 90
-    menu-scroll: true
-    menu-height: 125
-    menu-scroll-step: 25
-
-  MenuLabel
-    id: portLabel
-    !text: tr('Port')
-    anchors.left: serverPortTextEdit.left
-    anchors.top: serverHostTextEdit.bottom
-    margin-top: 8
-    text-auto-resize: true
-
-  TextEdit
-    id: serverPortTextEdit
-    text: 7171
-    anchors.right: parent.right
-    anchors.left: parent.horizontalCenter
-    anchors.top: clientComboBox.top
-    margin-left: 3
-
-  CheckBox
-    id: rememberPasswordBox
-    !text: tr('Remember password')
-    !tooltip: tr('Remember account and password when starts client')
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 10
-    @onCheckChange: self:getParent():getChildById('autoLoginBox'):setEnabled(self:isChecked())
-
-  CheckBox
-    id: autoLoginBox
-    enabled: false
-    !text: tr('Auto login')
-    !tooltip: tr('Open charlist automatically when starting client')
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 2
-
-  CheckBox
-    id: httpLoginBox
-    enabled: true
-    !text: tr('Enable HTTP login')
-    !tooltip: tr('If login fails using HTTPS (encrypted) try with HTTP (unencrypted)')
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 2
-
-  HorizontalSeparator
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 6
-
-  EnterGameButton
-    !text: tr('Ok')
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 4
-    @onClick: EnterGame.doLogin()
+    opacity: 0.5
 
   Label
-    id: serverInfoLabel
-    font: verdana-11px-rounded
-    anchors.top: prev.top
+    id: emailLabel
+    !text: tr('Email:')
     anchors.left: parent.left
+    anchors.top: parent.top
+    margin-left: 20
+    margin-top: 33
+    opacity: 0.8
+
+  Label
+    id: passwordLabel
+    !text: tr('Password:')
+    anchors.left: emailLabel.left
+    anchors.top: emailLabel.bottom
+    margin-top: 20
+    opacity: 0.8
+
+  HiddenTextQtEdit
+    id: accountPasswordTextEdit
+    anchors.right: parent.right
+    anchors.left: passwordLabel.right
+    anchors.verticalCenter: passwordLabel.verticalCenter
+    margin-right: 15
+    margin-left: 5
+
+  HiddenTextQtToggleEdit
+    id: accountNameTextEdit
+    anchors.right: accountPasswordTextEdit.right
+    anchors.verticalCenter: emailLabel.verticalCenter
+    anchors.left: accountPasswordTextEdit.left
+ 
+  QtCheckBox
+    id: rememberEmailBox
+    !text: tr('Remember Email')
+    anchors.left: passwordLabel.left
+    anchors.right: parent.right
+    anchors.top: accountPasswordTextEdit.bottom
+    margin-top: 10
+    opacity: 0.8
+    @onCheckChange: self:getParent():getChildById('rememberEmailTip'):setOn(self:isChecked())
+
+  UIWidget
+    id: rememberEmailTip
+    image-source: /images/icons/show_gui_help_grey
+    !specialtooltip: 'Be aware that your email address will be stored on your configuration file "config.otml" if you activate this option.'
+    anchors.right: accountNameTextEdit.right
+    anchors.verticalCenter: rememberEmailBox.verticalCenter
+    visible: false
+
+    $on:
+      visible: true
+
+    $!on:
+      visible: false
+
+  Label
+    !text: tr('Forgot password and/or email')
+    font: verdana-11px-monochrome-underline
+    anchors.left: rememberEmailBox.left
+    anchors.right: parent.right
+    anchors.top: rememberEmailBox.bottom
+    opacity: 0.8
     margin-top: 5
-    color: green
-    text-auto-resize: true
+
+  HorizontalSeparator
+    anchors.left: passwordLabel.left
+    anchors.right: accountPasswordTextEdit.right
+    anchors.top: prev.bottom
+    image-source: /images/ui/horizontal_line_bright
+    height: 1
+    margin-top: 10
+
+  QtButton
+    !text: tr('Login')
+    anchors.right: prev.right
+    anchors.top: prev.bottom
+    margin-top: 10
+    size: 86 20
+    @onClick: EnterGame.doLogin()
+
+  QtButton
+    !text: tr('Create New Account')
+    anchors.left: passwordLabel.left
+    anchors.top: prev.top
+    size: 109 20

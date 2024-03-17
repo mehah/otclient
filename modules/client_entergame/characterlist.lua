@@ -9,7 +9,7 @@ local waitingWindow
 local updateWaitEvent
 local resendWaitEvent
 local loginEvent
-local outfitCreatureBox
+local showOutfitsCheckbox
 
 -- private functions
 local function tryLogin(charInfo, tries)
@@ -265,63 +265,83 @@ function CharacterList.create(characters, account, otui)
     G.characters = characters
     G.characterAccount = account
 
+    showOutfitsCheckbox = charactersWindow:recursiveGetChildById('showOutfitsOnList')
+    if g_settings.getBoolean('showOutfitsOnList') ~= showOutfitsCheckbox:isChecked() then
+        showOutfitsCheckbox:setChecked(g_settings.getBoolean('showOutfitsOnList'))
+    end
     characterList:destroyChildren()
     local accountStatusLabel = charactersWindow:getChildById('accountStatusLabel')
-    local accountStatusIcon = nil
-    if g_game.getFeature(GameEnterGameShowAppearance) then
-        accountStatusIcon = charactersWindow:getChildById('accountStatusIcon')
-    end
 
     local focusLabel
+    local grade = 'alpha'
     for i, characterInfo in ipairs(characters) do
         local widget = g_ui.createWidget('CharacterWidget', characterList)
+        if grade == 'alpha' then
+            grade = '#484848ff'
+        else
+            grade = 'alpha'
+        end
+        widget.backgroundGradeColor = grade
+        widget:setBackgroundColor(grade)
+        widget.characterInfo = characterInfo
+        widget.creature = widget:recursiveGetChildById('creature')
+        widget.creatureBorder = widget.creature:getParent()
         for key, value in pairs(characterInfo) do
-            local subWidget = widget:getChildById(key)
-            if subWidget then
-                if key == 'outfit' then -- it's an exception
-                    subWidget:setOutfit(value)
+            local child
+
+            -- Texts
+            if key == 'name' then
+                child = widget:getChildById('appearance')
+            elseif key == 'level' then
+                child = widget:getChildById('level')
+            elseif key == 'vocation' then
+                child = widget:getChildById('vocation')
+            elseif key == 'worldName' then
+                child = widget:getChildById('world')
+            end
+            if child then
+                if key ~= 'name' then
+                    child:getChildById('brightColumn'):setOn(true)
                 else
-                    local text = value
-                    if subWidget.baseText and subWidget.baseTranslate then
-                        text = tr(subWidget.baseText, text)
-                    elseif subWidget.baseText then
-                        text = string.format(subWidget.baseText, text)
-                    end
-                    subWidget:setText(text)
+                    child:getChildById('brightColumn'):setOn(false)
                 end
+                child.info = child:getChildById('info')
+                child.info:setText(value)
+                goto continue
             end
+
+            -- Specials
+            if key == 'dailyreward' then
+                child = widget:getChildById('status')
+                child:getChildById('brightColumn'):setOn(true)
+                child.info = child:getChildById('info')
+                child.info:setText("")
+                child.icon = child:getChildById('daily')
+                if value == 0 then
+                    child.icon:setImageSource('/images/game/entergame/dailyreward_collected')
+                    child.icon:setSpecialToolTip('Either you have already collected your daily reward or you have not reached main continent yet.')
+                elseif value == 1 then
+                    child.icon:setImageSource('/images/game/entergame/dailyreward_notcollected')
+                    child.icon:setSpecialToolTip('Your daily reward has not been collected, yet.')
+                else
+                    child.icon:setImageSource('/images/game/entergame/dailyreward_deactivated')
+                    child.icon:setSpecialToolTip('Daily rewards are deactivated on this gameworld.')
+                end
+                goto continue
+            elseif key == 'main' then
+                child = widget:getChildById('status')
+                child:getChildById('brightColumn'):setOn(true)
+                child.info = child:getChildById('info')
+                child.info:setText("")
+                goto continue
+            end
+
+
+            ::continue::
         end
 
-        if g_game.getFeature(GameEnterGameShowAppearance) then
-            local creatureDisplay = widget:getChildById('outfitCreatureBox', characterList)
-            creatureDisplay:setSize("64 64")
-            local creature = Creature.create()
-            local outfit = {type = characterInfo.outfitid, head = characterInfo.headcolor, body = characterInfo.torsocolor, legs = characterInfo.legscolor, feet = characterInfo.detailcolor, addons = characterInfo.addonsflags}
-            creature:setOutfit(outfit)
-            creature:setDirection(2)
-            creatureDisplay:setCreature(creature)
-
-            local mainCharacter = widget:getChildById('mainCharacter', characterList)
-            if characterInfo.main then
-                mainCharacter:setImageSource('/images/game/entergame/maincharacter')
-            else
-                mainCharacter:setImageSource('')
-            end
-
-            local statusDailyReward = widget:getChildById('statusDailyReward', characterList)
-            if characterInfo.dailyreward == 0 then
-                statusDailyReward:setImageSource('/images/game/entergame/dailyreward_collected')
-            else
-                statusDailyReward:setImageSource('/images/game/entergame/dailyreward_notcollected')
-            end
-
-            local statusHidden = widget:getChildById('statusHidden', characterList)
-            if characterInfo.hidden then
-                statusHidden:setImageSource('/images/game/entergame/hidden')
-            else
-                statusHidden:setImageSource('')
-            end
-        end
+        -- Appearances
+        CharacterList.updateCharactersAppearance(widget, characterInfo, g_settings.getBoolean('showOutfitsOnList'))
 
         -- these are used by login
         widget.characterName = characterInfo.name
@@ -360,17 +380,11 @@ function CharacterList.create(characters, account, otui)
 
     if account.subStatus == SubscriptionStatus.Free then
         accountStatusLabel:setText(('%s%s'):format(tr('Free Account'), status))
-        if accountStatusIcon ~= nil then
-            accountStatusIcon:setImageSource('/images/game/entergame/nopremium')
-        end
     elseif account.subStatus == SubscriptionStatus.Premium then
-        if account.premDays == 0 or account.premDays == 65535 then
+        if account.premDays == 0 or account.premDays >= 100 then
             accountStatusLabel:setText(('%s%s'):format(tr('Gratis Premium Account'), status))
         else
             accountStatusLabel:setText(('%s%s'):format(tr('Premium Account (%s) days left', account.premDays), status))
-        end
-        if accountStatusIcon ~= nil then
-            accountStatusIcon:setImageSource('/images/game/entergame/premium')
         end
     end
 
@@ -467,4 +481,65 @@ function CharacterList.cancelWait()
 
     CharacterList.destroyLoadBox()
     CharacterList.showAgain()
+end
+
+function CharacterList.updateCharactersAppearance(widget, character, showOutfits)
+    if not showOutfits then
+        widget.creature:hide()
+        widget.creatureBorder:hide()
+        widget.creatureBorder:setWidth(0)
+        widget.creatureBorder:setHeight(0)
+        widget.creatureBorder:setMarginLeft(0)
+        widget.creatureBorder:setMarginTop(0)
+        widget:setHeight(30)
+        return
+    end
+
+    widget.creature:show()
+    widget.creatureBorder:show()
+    widget.creatureBorder:setWidth(64)
+    widget.creatureBorder:setHeight(64)
+    widget.creatureBorder:setMarginLeft(5)
+    widget.creatureBorder:setMarginTop(3)
+    widget:setHeight(66)
+
+    local outfit = {
+        type = character.outfitid,
+        auxType = 0,
+        addons = character.addonsflags,
+        head = character.headcolor,
+        body = character.torsocolor,
+        legs = character.legscolor,
+        feet = character.detailcolor
+    }
+    widget.creature:setOutfit(outfit)
+
+    local type = g_things.getThingType(outfit.type, ThingCategoryCreature)
+    if type then
+        widget.creature:setMarginRight(type:getDisplacementX() * 2)
+        widget.creature:setMarginBottom(type:getDisplacementY() * 1.5)
+    end
+end
+
+function CharacterList.updateCharactersAppearances(showOutfits)
+    if showOutfitsCheckbox and showOutfits ~= showOutfitsCheckbox:isChecked() then
+        showOutfitsCheckbox:setChecked(showOutfits)
+    end
+
+    if not(characterList) or #(characterList:getChildren()) == 0 then
+        return
+    end
+
+    for _, widget in ipairs(characterList:getChildren()) do
+        if not widget.characterInfo then
+            break
+        end
+
+        if not(widget.creature) or not(widget.creatureBorder) then
+            widget.creature = widget:recursiveGetChildById('creature')
+            widget.creatureBorder = widget.creature:getParent()
+        end
+
+        CharacterList.updateCharactersAppearance(widget, widget.characterInfo, showOutfits)
+    end
 end

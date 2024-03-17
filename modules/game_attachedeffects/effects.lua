@@ -5,11 +5,9 @@
         duration, loop, transform, hideOwner, size{width, height}
         offset{x, y, onTop}, dirOffset[dir]{x, y, onTop},
         light { color, intensity}, drawOrder(only for tiles),
-        bounce{minHeight, height, speed}
         onAttach, onDetach
     }
-]]
---
+]] --
 AttachedEffectManager.register(1, 'Spoke Lighting', 12, ThingCategoryEffect, {
     speed = 0.5,
     onAttach = function(effect, owner)
@@ -25,18 +23,11 @@ AttachedEffectManager.register(2, 'Bat Wings', 307, ThingCategoryCreature, {
     disableWalkAnimation = true,
     shader = 'Outfit - Rainbow',
     dirOffset = {
-        [North] = { 0, -10, true },
-        [East] = { 5, -5 },
-        [South] = { -5, 0 },
-        [West] = { -10, -5, true }
-    },
-    onAttach = function(effect, owner)
-        owner:setBounce(0, 10, 1000)
-        effect:setBounce(0, 10, 1000)
-    end,
-    onDetach = function(effect, oldOwner)
-        oldOwner:setBounce(0, 0)
-    end
+        [North] = {0, -10, true},
+        [East] = {5, -5},
+        [South] = {-5, 0},
+        [West] = {-10, -5, true}
+    }
 })
 
 AttachedEffectManager.register(3, 'Angel Light', 50, ThingCategoryEffect, {
@@ -91,52 +82,16 @@ AttachedEffectManager.register(6, 'Lake Monster', 34, ThingCategoryEffect, {
 })
 
 AttachedEffectManager.register(7, 'Pentagram Aura', '/images/game/effects/pentagram', ThingExternalTexture, {
-    size = { 128, 128 },
-    offset = { 50, 45 }
+    size = {128, 128},
+    offset = {50, 45}
 })
 
 AttachedEffectManager.register(8, 'Ki', '/images/game/effects/ki', ThingExternalTexture, {
-    size = { 140, 110 },
-    offset = { 60, 75, true }
+    size = {140, 110},
+    offset = {60, 75, true}
 })
 
 AttachedEffectManager.register(9, 'Thunder', '/images/game/effects/thunder', ThingExternalTexture, {
     loop = 1,
-    offset = { 215, 230 }
-})
-
-AttachedEffectManager.register(10, 'Dynamic Effect', 0, 0, {
-    duration = 500,
-    onAttach = function(effect, owner)
-        local spriteSize = g_gameConfig.getSpriteSize()
-        local length = 3
-
-        local missile = AttachedEffect.create(38, ThingCategoryMissile)
-        missile:setDuration(effect:getDuration())
-        missile:setDirection(5)
-        missile:setOffset(spriteSize * length, 0)
-        missile:setBounce(0, 10, 500)
-        missile:move(Position.translated(owner:getPosition(), -length, 0), owner:getPosition())
-        effect:attachEffect(missile)
-
-        missile = AttachedEffect.create(38, ThingCategoryMissile)
-        missile:setDuration(effect:getDuration())
-        missile:setDirection(3)
-        missile:setOffset(-(spriteSize * length), 0)
-        missile:setBounce(0, 10, 500)
-        missile:move(Position.translated(owner:getPosition(), length, 0), owner:getPosition())
-
-        effect:attachEffect(missile)
-    end,
-    onDetach = function(effect, oldOwner)
-        local e = Effect.create()
-        e:setId(50)
-        oldOwner:getTile():addThing(e)
-    end
-})
-
-AttachedEffectManager.register(11, 'Bat', 307, ThingCategoryCreature, {
-    speed = 0.5,
-    offset = { 0, 0 },
-    bounce = { 20, 20, 2000 }
+    offset = {215, 230}
 })

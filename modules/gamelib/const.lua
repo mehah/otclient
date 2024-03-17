@@ -191,7 +191,11 @@ GameDynamicBugReporter = 111
 GameWrapKit = 112
 GameContainerFilter = 113
 GameEnterGameShowAppearance = 114
-GameSmoothWalkElevation = 115
+GameWingsAndAura = 115
+GameWingOffset = 116
+GameDrawAuraOnTop = 117
+GameAuraFrontAndBack = 118
+GameBigAurasCenter = 119
 
 TextColors = {
     red = '#f55e5e',    -- '#c83200'
