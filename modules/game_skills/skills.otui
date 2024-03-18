@@ -120,58 +120,74 @@ MiniWindow
 
     SkillButton
       id: magiclevel
+      image-source: /images/ui/Skills/Magic
+      image-size: 11 11
       SkillNameLabel
-        !text: tr('Magic Level')
+        !text: tr('      Magic Level')
       SkillValueLabel
       SkillPercentPanel
         background-color: red
 
     SkillButton
       id: skillId0
+      image-source: /images/ui/Skills/Fist
+      image-size: 12 12
       SkillNameLabel
-        !text: tr('Fist Fighting')
+        !text: tr('      Fist Fighting')
       SkillValueLabel
       SkillPercentPanel
 
     SkillButton
       id: skillId1
+      image-source: /images/ui/Skills/Club
+      image-size: 11 13
       SkillNameLabel
-        !text: tr('Club Fighting')
+        !text: tr('      Club Fighting')
       SkillValueLabel
       SkillPercentPanel
 
     SkillButton
       id: skillId2
+      image-source: /images/ui/Skills/Sword
+      image-size: 11 13
       SkillNameLabel
-        !text: tr('Sword Fighting')
+        !text: tr('      Sword Fighting')
       SkillValueLabel
       SkillPercentPanel
 
     SkillButton
       id: skillId3
+      image-source: /images/ui/Skills/Axe
+      image-size: 12 12
       SkillNameLabel
-        !text: tr('Axe Fighting')
+        !text: tr('      Axe Fighting')
       SkillValueLabel
       SkillPercentPanel
 
     SkillButton
       id: skillId4
+      image-source: /images/ui/Skills/Distance
+      image-size: 12 12
       SkillNameLabel
-        !text: tr('Distance Fighting')
+        !text: tr('      Distance Fighting')
       SkillValueLabel
       SkillPercentPanel
 
     SkillButton
       id: skillId5
+      image-source: /images/ui/Skills/Shielding
+      image-size: 11 11
       SkillNameLabel
-        !text: tr('Shielding')
+        !text: tr('      Shielding')
       SkillValueLabel
       SkillPercentPanel
 
     SkillButton
       id: skillId6
+      image-source: /images/ui/Skills/Fishing
+      image-size: 12 12
       SkillNameLabel
-        !text: tr('Fishing')
+        !text: tr('      Fishing')
       SkillValueLabel
       SkillPercentPanel
 
