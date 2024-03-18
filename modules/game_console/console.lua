@@ -2030,5 +2030,5 @@ end
 
 -- bot funtion
 function isEnabledWASD()
-    return consoleToggleChat:isChecked()
+    return consoleToggleChat.isChecked
 end

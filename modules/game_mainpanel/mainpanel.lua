@@ -141,12 +141,10 @@ local function healthManaEvent()
     end
 
     healthManaController.ui.health.text:setText(player:getHealth())
-    healthManaController.ui.health.current:setWidth(math.max(12, math.ceil(
-        (healthManaController.ui.health.total:getWidth() * player:getHealth()) / player:getMaxHealth())))
+    healthManaController.ui.health.current:setWidth(math.max(12, math.ceil((healthManaController.ui.health.total:getWidth() * player:getHealth()) / player:getMaxHealth())))
 
     healthManaController.ui.mana.text:setText(player:getMana())
-    healthManaController.ui.mana.current:setWidth(math.max(12, math.ceil(
-        (healthManaController.ui.mana.total:getWidth() * player:getMana()) / player:getMaxMana())))
+    healthManaController.ui.mana.current:setWidth(math.max(12, math.ceil((healthManaController.ui.mana.total:getWidth() * player:getMana()) / player:getMaxMana())))
 end
 
 healthManaController = Controller:new()
@@ -187,7 +185,7 @@ end
 local function walkEvent()
     if modules.client_options.getOption('autoChaseOverride') then
         if g_game.isAttacking() and g_game.getChaseMode() == ChaseOpponent then
-            selectPosture('follow', true)
+            selectPosture('stand', true)
         end
     end
 end
@@ -298,7 +296,6 @@ local function onFreeCapacityChange(player, freeCapacity)
     end
     local ui = getInventoryUi()
     ui.capacityPanel.capacity:setText(freeCapacity)
-
 end
 
 local function refreshInventorySizes()
@@ -329,8 +326,7 @@ local inventoryControllerEvents = inventoryController:addEvent(LocalPlayer, {
     onPVPModeChange = combatEvent,
     onInventoryChange = inventoryEvent,
     onSoulChange = onSoulChange,
-    onFreeCapacityChange = onFreeCapacityChange
-
+    onFreeCapacityChange = onFreeCapacityChange 
 })
 
 function inventoryController:onInit()
@@ -350,10 +346,8 @@ function inventoryController:onGameStart()
     inventoryControllerEvents:execute('onSafeFightChange')
     inventoryControllerEvents:execute('onPVPModeChange')
     inventoryControllerEvents:execute('onInventoryChange')
-
     inventoryControllerEvents:execute('onSoulChange')
     inventoryControllerEvents:execute('onFreeCapacityChange')
-
     inventoryShrink = g_settings.getBoolean('mainpanel_shrink_inventory')
     refreshInventorySizes()
     refreshInventory()
