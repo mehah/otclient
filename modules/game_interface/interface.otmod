@@ -33,6 +33,7 @@ Module
     - game_unjustifiedpoints
     - game_shaders
     - game_attachedeffects
+    - game_stash
     - game_healthcircle
   @onLoad: init()
   @onUnload: terminate()

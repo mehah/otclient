@@ -71,16 +71,20 @@ EnterGameWindow
 
   QtCheckBox
     id: rememberEmailBox
-    !text: tr('Remember Email')
+    !text: tr('Remember password')
     !tooltip: tr('Remember account and password when starts client')
     anchors.left: passwordLabel.left
     anchors.right: parent.right
     anchors.top: accountPasswordTextEdit.bottom
     margin-top: 10
     opacity: 0.8
-    @onCheckChange: | 
+    @onCheckChange: |
       self:getParent():getChildById('autoLoginBox'):setEnabled(self:isChecked())
       self:getParent():getChildById('rememberEmailTip'):setOn(self:isChecked())
+    @onSetup: |
+      if g_game.getFeature(GameEnterGameShowAppearance) then
+        self:setText("Remember Email:")
+      end	  
       
   UIWidget
     id: rememberEmailTip
@@ -107,14 +111,12 @@ EnterGameWindow
     margin-top: 5
     @onClick: g_platform.openUrl(Services.websites)
     @onSetup: | 
-      if Services and Services.websites then
-        self:setVisible(true)
-      else
-        self:setVisible(false)
-        self:hide()
-
-
-      end
+        if Services and Services.websites then
+            self:setVisible(true)
+        else
+            self:setVisible(false)
+            self:hide()
+        end
 
   MenuLabel
     id: authenticatorTokenLabel
@@ -223,10 +225,6 @@ EnterGameWindow
     anchors.left: parent.horizontalCenter
     anchors.top: clientComboBox.top
     margin-left: 3
-
-
-
-
 
   QtCheckBox
     id: autoLoginBox

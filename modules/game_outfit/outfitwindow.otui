@@ -18,7 +18,7 @@ MainWindow
     margin-top: 15
     margin-left: 22
     padding: 4 4 4 4
-    creature-size: 80z
+    creature-size: 80
 
   Label
     id: outfitName
