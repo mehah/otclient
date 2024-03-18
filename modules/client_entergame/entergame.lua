@@ -343,6 +343,9 @@ function EnterGame.postShowOff()
 end
 
 function EnterGame.show()
+    if  g_game.isOnline() then -- fix login quickly error (http post)
+        return
+    end 
     if loadBox then
         return
     end
