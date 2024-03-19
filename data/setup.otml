@@ -26,7 +26,7 @@ game
 
   render
     invisible-ticks-per-frame: 75
-    item-ticks-per-frame: 500
+    item-ticks-per-frame: 75
     effect-ticks-per-frame: 75
     missile-ticks-per-frame: 75
     animated-text-duration: 1000
