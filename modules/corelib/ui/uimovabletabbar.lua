@@ -39,7 +39,8 @@ local function updateNavigation(tabBar)
     if tabBar.nextNavigation then
         if tabBar.nextNavigation.dynamicNavigation ~= nil and tabBar.nextNavigation.dynamicNavigation > 0 then
             local fitsOnBar = math.floor(tabBar:getWidth() / tabBar.nextNavigation.dynamicNavigation)
-            if #tabBar.tabs >= fitsOnBar and (#tabBar.postTabs > 0 or table.find(tabBar.tabs, tabBar.currentTab) ~= #tabBar.tabs) then
+            if #tabBar.tabs >= fitsOnBar and
+                (#tabBar.postTabs > 0 or table.find(tabBar.tabs, tabBar.currentTab) ~= #tabBar.tabs) then
                 tabBar.nextNavigation:enable()
             else
                 tabBar.nextNavigation:disable()
@@ -348,6 +349,12 @@ function UIMoveableTabBar:onStyleApply(styleName, styleNode)
     end
     if styleNode['tab-spacing'] then
         self:setTabSpacing(styleNode['tab-spacing'])
+    end
+end
+
+function UIMoveableTabBar:clearTabs()
+    while #self.tabs > 0 do
+        self:removeTab(self.tabs[#self.tabs])
     end
 end
 

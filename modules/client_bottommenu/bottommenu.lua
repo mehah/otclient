@@ -465,8 +465,9 @@ function onClickOnNextCalendar()
 end
 
 function Booster_creature(data)
-
-    creature_boosted:setOutfit(data.creature)
-    boss_boosted:setOutfit(data.boss)
-
+    if modules.game_things.isLoaded() then
+        -- note: is better image *
+        creature_boosted:setOutfit(data.creature)
+        boss_boosted:setOutfit(data.boss)
+    end
 end

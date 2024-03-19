@@ -15,3 +15,10 @@ function UILabel:setValue(value)
         scrollBar:setValue(value)
     end
 end
+
+function UILabel:setValue(value)
+    local scrollBar = self:recursiveGetChildById('valueBar')
+    if scrollBar then
+        scrollBar:setValue(value)
+    end
+end
