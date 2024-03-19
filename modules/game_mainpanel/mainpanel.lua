@@ -404,7 +404,7 @@ local function toggleIcon(bitChanged)
     end
 end
 
-local function onStatesChange(localPlayer, now, old)
+function onStatesChange(localPlayer, now, old)
     if now == old then
         return
     end
