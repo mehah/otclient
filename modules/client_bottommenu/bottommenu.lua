@@ -1,4 +1,3 @@
-
 local bottomMenu
 local calendarWindow
 local activeScheduleEvent
@@ -15,6 +14,9 @@ local eventSchedulerCalendar
 local eventSchedulerCalendarYearIndex
 local eventSchedulerCalendarMonth
 
+local boostedWindow
+local creature_boosted
+local boss_boosted
 function init()
     g_ui.importStyle('calendar')
     bottomMenu = g_ui.displayUI('bottommenu')
@@ -33,6 +35,10 @@ function init()
     upcomingScheduleEvent:recursiveGetChildById('fill'):setOn(false)
     eventSchedulerCalendarYearIndex = 1
     eventSchedulerCalendarMonth = tonumber(os.date("%m"))
+
+    boostedWindow = bottomMenu:recursiveGetChildById('boostedWindow')
+    creature_boosted = boostedWindow:recursiveGetChildById('creature')
+    boss_boosted = boostedWindow:recursiveGetChildById('boss')
 end
 
 function terminate()
@@ -55,13 +61,13 @@ function show()
     bottomMenu:focus()
 end
 
---@ Store showoff
+-- @ Store showoff
 function setShowOffData(data)
     local widget = g_ui.createWidget('ShowOffWidget', showOffWindow)
     local image = widget:recursiveGetChildById('image')
 
     if data.image and data.image:sub(1, 4):lower() == "http" then
-        HTTP.downloadImage(data.image, function(path, err) 
+        HTTP.downloadImage(data.image, function(path, err)
             if err then
                 g_logger.warning("HTTP error: " .. err .. " - " .. data.image)
                 return
@@ -78,7 +84,7 @@ function setShowOffData(data)
     description:setText(tr(data.description))
 end
 
---@ Calendar/Events scheduler
+-- @ Calendar/Events scheduler
 function onClickOnCalendar()
     if eventSchedulerYears == nil or #eventSchedulerYears == 0 then
         return
@@ -149,13 +155,15 @@ function reloadEventsSchedulerCurrentPage()
             local amountsLeft = weekOffset
             local i = #previousDays
             while (amountsLeft > 0) do
-                local widget = getCalendarEventWidgetByDay(i, previousMonth, tonumber(os.date("%Y", os.time())) + (previousYearIndex - 1), weekOffset, 0)
+                local widget = getCalendarEventWidgetByDay(i, previousMonth, tonumber(os.date("%Y", os.time())) +
+                    (previousYearIndex - 1), weekOffset, 0)
                 if widget then
                     widget:clearEvents()
                     widget.dayOfTheWeek = i
                     widget:recursiveGetChildById('dayAndSeason'):setOn(true)
                     widget:recursiveGetChildById('day'):setText(i)
-                    widget:recursiveGetChildById('day'):setWidth(string.len(widget:recursiveGetChildById('day'):getText()) * 10)
+                    widget:recursiveGetChildById('day'):setWidth(string.len(
+                        widget:recursiveGetChildById('day'):getText()) * 10)
                     widget:recursiveGetChildById('fill'):setOn(false)
                     for _, event in ipairs(previousDays[i]) do
                         widget:addScheduleEvent(event, false, nil)
@@ -197,13 +205,15 @@ function reloadEventsSchedulerCurrentPage()
             if forceLine == 4 and amountsLeft == 7 then
                 forceLine = 5
             end
-            local widget = getCalendarEventWidgetByDay(i, nextMonth, tonumber(os.date("%Y", os.time())) + (nextYearIndex - 1), nextWeekOffset, forceLine)
+            local widget = getCalendarEventWidgetByDay(i, nextMonth,
+                tonumber(os.date("%Y", os.time())) + (nextYearIndex - 1), nextWeekOffset, forceLine)
             if widget then
                 widget:clearEvents()
                 widget.dayOfTheWeek = i
                 widget:recursiveGetChildById('dayAndSeason'):setOn(true)
                 widget:recursiveGetChildById('day'):setText(i)
-                widget:recursiveGetChildById('day'):setWidth(string.len(widget:recursiveGetChildById('day'):getText()) * 10)
+                widget:recursiveGetChildById('day'):setWidth(
+                    string.len(widget:recursiveGetChildById('day'):getText()) * 10)
                 widget:recursiveGetChildById('fill'):setOn(false)
                 for _, event in ipairs(nextDays[i]) do
                     widget:addScheduleEvent(event, false, nil)
@@ -229,7 +239,11 @@ function reloadEventsSchedulerCurrentPage()
         end
     end
 
-    calendarCurrentMonth:setText(os.date("%B", os.time{year = 2023, month = eventSchedulerCalendarMonth, day = 1}) .. " " .. (tonumber(os.date("%Y", os.time())) + (eventSchedulerCalendarYearIndex - 1)))
+    calendarCurrentMonth:setText(os.date("%B", os.time {
+        year = 2023,
+        month = eventSchedulerCalendarMonth,
+        day = 1
+    }) .. " " .. (tonumber(os.date("%Y", os.time())) + (eventSchedulerCalendarYearIndex - 1)))
 end
 
 function reloadEventsSchedulerCalender()
@@ -397,7 +411,11 @@ function getDayOfWeek(day, month, year)
     if not month then
         month = eventSchedulerCalendarMonth
     end
-    local timestamp = os.time{year = year, month = month, day = day}
+    local timestamp = os.time {
+        year = year,
+        month = month,
+        day = day
+    }
     local weekday = tonumber(os.date("%w", timestamp))
     -- 0: Sunday
     -- 6: Saturday
@@ -444,4 +462,11 @@ function onClickOnNextCalendar()
     end
 
     reloadEventsSchedulerCurrentPage()
+end
+
+function Booster_creature(data)
+
+    creature_boosted:setOutfit(data.creature)
+    boss_boosted:setOutfit(data.boss)
+
 end

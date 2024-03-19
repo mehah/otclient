@@ -144,7 +144,7 @@ Panel
       anchors.right: parent.right
       opacity: 0.5
 
-    UIWidget
+    Panel
       anchors.top: parent.top
       anchors.left: parent.left
       margin-left: 12
@@ -152,18 +152,20 @@ Panel
       size: 64 64
       image-source: /images/ui/panel_flat
 
-      UICreature
+      Creature
         id: creature
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
 
     Label
       !text: tr('Creature')
+      id: borrar
       anchors.horizontalCenter: prev.horizontalCenter
       anchors.top: prev.bottom
       margin-top: 3
 
-    UIWidget
+    Panel
+      id:borraresto
       anchors.top: parent.top
       anchors.right: parent.right
       margin-right: 12
@@ -171,7 +173,7 @@ Panel
       size: 64 64
       image-source: /images/ui/panel_flat
 
-      UICreature
+      Creature
         id: boss
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
