@@ -120,7 +120,7 @@ function UIGameMap:onMouseRelease(mousePosition, mouseButton)
     end
 
     local ret = modules.game_interface.processMouseAction(mousePosition, mouseButton, autoWalkPos, lookThing, useThing,
-                                                          creatureThing, attackCreature)
+        creatureThing, attackCreature)
     if ret then
         self.allowNextRelease = false
     end

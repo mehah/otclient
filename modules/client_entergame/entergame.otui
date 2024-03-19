@@ -45,6 +45,7 @@ EnterGameWindow
       if g_game.getFeature(GameEnterGameShowAppearance) then
         self:setText("Email:")
       end
+      
   Label
     id: passwordLabel
     !text: tr('Password:')
@@ -53,21 +54,18 @@ EnterGameWindow
     margin-top: 10
     opacity: 0.8
 
-  HiddenTextQtEdit
-    id: accountPasswordTextEdit
-    anchors.right: parent.right
-    anchors.left: passwordLabel.right
-    anchors.verticalCenter: passwordLabel.verticalCenter
-
-    margin-left: 5
-
   HiddenTextQtToggleEdit
     id: accountNameTextEdit
     anchors.right: accountPasswordTextEdit.right
     anchors.verticalCenter: emailLabel.verticalCenter
     anchors.left: accountPasswordTextEdit.left
-
-// Check box remember email 
+    
+  HiddenTextQtEdit
+    id: accountPasswordTextEdit
+    anchors.right: parent.right
+    anchors.left: passwordLabel.right
+    anchors.verticalCenter: passwordLabel.verticalCenter
+    margin-left: 5
 
   QtCheckBox
     id: rememberEmailBox

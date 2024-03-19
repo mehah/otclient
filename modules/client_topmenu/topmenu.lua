@@ -6,13 +6,16 @@ local rightGameButtonsPanel
 local topLeftTogglesPanel
 local topLeftButtonsPanel
 local topLeftOnlinePlayersLabel
-local topLeftTwitchViewersLabel
-local topLeftTwitchStreamersLabel
+
+local topLeftDiscordStreamersLabel
 local topLeftYoutubeViewersLabel
 local topLeftYoutubeStreamersLabel
 local fpsLabel
 local pingLabel
-
+local topLeftYoutubeLink
+local topLeftDiscordLink
+local url_discord = ""
+local url_youtube = ""
 local lastSyncValue = -1
 local fpsEvent = nil
 local fpsMin = -1;
@@ -74,11 +77,13 @@ function init()
     fpsLabel = topMenu:getChildById('fpsLabel')
 
     topLeftOnlinePlayersLabel = topMenu:recursiveGetChildById('topLeftOnlinePlayersLabel')
-    topLeftTwitchViewersLabel = topMenu:recursiveGetChildById('topLeftTwitchViewersLabel')
-    topLeftTwitchStreamersLabel = topMenu:recursiveGetChildById('topLeftTwitchStreamersLabel')
+
+    topLeftDiscordStreamersLabel = topMenu:recursiveGetChildById('topLeftDiscordStreamersLabel')
     topLeftYoutubeViewersLabel = topMenu:recursiveGetChildById('topLeftYoutubeViewersLabel')
     topLeftYoutubeStreamersLabel = topMenu:recursiveGetChildById('topLeftYoutubeStreamersLabel')
 
+    topLeftYoutubeLink = topMenu:recursiveGetChildById('youtubeIcon')
+    topLeftDiscordLink = topMenu:recursiveGetChildById('discordIcon')
 
     g_keyboard.bindKeyDown('Ctrl+Shift+T', toggle)
 
@@ -211,17 +216,37 @@ end
 function setPlayersOnline(value)
     topLeftOnlinePlayersLabel:setText(value .. " " .. tr('players online'))
 end
-function setTwitchStreams(value)
-    topLeftTwitchStreamersLabel:setText(value)
+function setDiscordStreams(value)
+    topLeftDiscordStreamersLabel:setText(value)
 end
-function setTwitchViewers(value)
-    topLeftTwitchViewersLabel:setText(value)
-end
+
 function setYoutubeStreams(value)
     topLeftYoutubeStreamersLabel:setText(value)
 end
 function setYoutubeViewers(value)
     topLeftYoutubeViewersLabel:setText(value)
+end
+
+function setLinkYoutube(value)
+
+    url_youtube = value
+    topLeftYoutubeLink.onClick = function()
+        if url_youtube then
+            g_platform.openUrl(url_youtube)
+        end
+    end
+
+end
+
+function setLinkDiscord(value)
+
+    url_discord = value
+    topLeftDiscordLink.onClick = function()
+        if url_discord then
+            g_platform.openUrl(url_discord)
+        end
+    end
+
 end
 
 function addRightButton(id, description, icon, callback, front)

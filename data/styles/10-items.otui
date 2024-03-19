@@ -172,6 +172,8 @@ MainInventoryItem < UIWidget
   UIItem
     id: item
     anchors.centerIn: parent
-    border-color: white
     size: 34 34
     padding: 1
+    font: verdana-11px-rounded
+    border-color: white
+    color: white

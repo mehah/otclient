@@ -1,0 +1,27 @@
+Particle
+  name: creature_particle
+
+  duration: 0.9
+  min-position-radius: 0
+  max-position-radius: 30
+  velocity: 10
+  min-velocity-angle: 30
+  max-velocity-angle: 55
+  colors: #FFFFFF00 #fa8c0f #05050500
+  colors-stops: 0 0.80 1
+  size: 20 20
+  texture: /particles/particle2
+  composition-mode: normal
+
+Effect
+  name: creature-effect
+  description: Effect for creatures
+
+  System
+    position: 0 0
+
+    Emitter
+      position: 16 16
+      burst-rate: 25
+      burst-count: 1
+      particle-type: creature_particle

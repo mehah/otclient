@@ -10,7 +10,6 @@ function init()
         g_game.requestQuestLog()
     end)
 
-
     connect(g_game, {
         onQuestLog = onGameQuestLog,
         onQuestLine = onGameQuestLine,

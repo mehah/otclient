@@ -29,7 +29,7 @@ end
 
 function ServerList.load()
     for host, server in pairs(servers) do
-        ServerList.add(host, server.port, server.protocol, true)
+        ServerList.add(host, server.port, server.protocol, httpLogin, true)
     end
 end
 
@@ -41,18 +41,21 @@ function ServerList.select()
             EnterGame.setDefaultServer(selected:getId(), server.port, server.protocol)
             EnterGame.setAccountName(server.account)
             EnterGame.setPassword(server.password)
+            EnterGame.setHttpLogin(server.httpLogin)
             ServerList.hide()
         end
     end
 end
 
-function ServerList.add(host, port, protocol, load)
+function ServerList.add(host, port, protocol, httpLogin, load)
     if not host or not port or not protocol then
         return false, 'Failed to load settings'
     elseif not load and servers[host] then
         return false, 'Server already exists'
     elseif host == '' or port == '' then
         return false, 'Required fields are missing'
+    elseif httpLogin == nil then
+      httpLogin = false
     end
     local widget = g_ui.createWidget('ServerWidget', serverTextList)
     widget:setId(host)
@@ -62,7 +65,8 @@ function ServerList.add(host, port, protocol, load)
             port = port,
             protocol = protocol,
             account = '',
-            password = ''
+            password = '',
+            httpLogin = httpLogin
         }
     end
 

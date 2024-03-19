@@ -349,6 +349,7 @@ end
 
 local function onSoulChange(localPlayer, soul)
     local ui = getInventoryUi()
+
     if not localPlayer then
         return
     end
@@ -357,9 +358,14 @@ local function onSoulChange(localPlayer, soul)
     end
 
     ui.soulPanel.soul:setText(soul)
+
 end
 
-function onFreeCapacityChange(player, freeCapacity)
+local function onFreeCapacityChange(player, freeCapacity)
+    if not player then
+        return
+    end
+
     if not freeCapacity then
         return
     end
@@ -374,20 +380,22 @@ function onFreeCapacityChange(player, freeCapacity)
     end
     local ui = getInventoryUi()
     ui.capacityPanel.capacity:setText(freeCapacity)
-end
 
-function loadIcon(bitChanged)
+end
+local function loadIcon(bitChanged)
     local icon = g_ui.createWidget('ConditionWidget', getInventoryUi().icons)
     icon:setId(Icons[bitChanged].id)
     icon:setImageSource(Icons[bitChanged].path)
     icon:setTooltip(Icons[bitChanged].tooltip)
+
     return icon
 end
 
-function toggleIcon(bitChanged)
+local function toggleIcon(bitChanged)
     local content = getInventoryUi().icons
 
     local icon = content:getChildById(Icons[bitChanged].id)
+
     if icon then
         icon:destroy()
     else
@@ -413,8 +421,7 @@ function onStatesChange(localPlayer, now, old)
         end
     end
 end
-
-function refreshInventory_panel()
+local function refreshInventory_panel()
     if inventoryShrink then
         return
     end
@@ -431,10 +438,10 @@ function refreshInventory_panel()
         onSoulChange(player, player:getSoul())
         onFreeCapacityChange(player, player:getFreeCapacity())
         onStatesChange(player, player:getStates(), 0)
+
     end
 end
-
-function refreshInventorySizes()
+local function refreshInventorySizes()
     if inventoryShrink then
         inventoryController.ui:setOn(false)
         inventoryController.ui.onPanel:hide()
@@ -468,10 +475,12 @@ local inventoryControllerEvents = inventoryController:addEvent(LocalPlayer, {
 
 function inventoryController:onInit()
     refreshInventory_panel()
+
 end
 
 function inventoryController:onTerminate()
     --- important
+
 end
 
 function inventoryController:onGameStart()
@@ -493,6 +502,7 @@ end
 
 function inventoryController:onGameEnd()
     inventoryControllerEvents:disconnect()
+
 end
 
 function selectPosture(key, ignoreUpdate)
@@ -801,5 +811,12 @@ function resetMap()
         virtualFloor = player:getPosition().z
         refreshVirtualFloors()
     end
+end
+
+
+function getMiniMapUi()
+
+
+    return mapController.ui.minimapBorder.minimap
 end
 -- @ End of Minimap

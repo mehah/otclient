@@ -36,8 +36,8 @@ local luaFiles = {
   "ingame_editor",
   "Dropper",
   "Containers",
-  "quiver_manager",
-  "quiver_label",
+ -- "quiver_manager", -- need fix inventoryWindow
+  --"quiver_label", -- need fix inventoryWindow
   "tools",
   "antiRs",
   "depot_withdraw",

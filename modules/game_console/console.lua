@@ -237,7 +237,7 @@ function init()
 
     -- apply buttom functions after loaded
     consoleTabBar:setNavigation(consolePanel:getChildById('prevChannelButton'),
-                                consolePanel:getChildById('nextChannelButton'))
+        consolePanel:getChildById('nextChannelButton'))
     consoleTabBar.onTabChange = onTabChange
 
     -- tibia like hotkeys
@@ -451,6 +451,10 @@ function load()
     loadCommunicationSettings()
 end
 
+function isEnabledWASD()
+    return consoleToggleChat.isChecked --note: testing required
+end
+
 function onTabChange(tabBar, tab)
     if tab == defaultTab or tab == serverTab then
         consolePanel:getChildById('closeChannelButton'):disable()
@@ -556,9 +560,9 @@ function openPlayerReportRuleViolationWindow()
         g_game.talkChannel(MessageModes.RVRChannel, 0, text)
         violationReportTab = addTab(tr('Report Rule') .. '...', true)
         addTabText(tr('Please wait patiently for a gamemaster to reply') .. '.', SpeakTypesSettings.privateRed,
-                   violationReportTab)
+            violationReportTab)
         addTabText(applyMessagePrefixies(g_game.getCharacterName(), 0, text), SpeakTypesSettings.say,
-                   violationReportTab, g_game.getCharacterName())
+            violationReportTab, g_game.getCharacterName())
         violationReportTab.locked = true
         violationWindow:destroy()
         violationWindow = nil
@@ -571,7 +575,7 @@ function addTab(name, focus)
         if not focus then
             focus = true
         end
-    else 
+    else
         tab = consoleTabBar:addTab(name, nil, processChannelTabMenu)
     end
     if focus then
@@ -965,7 +969,7 @@ function addTabText(text, speaktype, tab, creatureName)
     label:setId('consoleLabel' .. consoleBuffer:getChildCount())
     label:setText(text)
     label:setColor(speaktype.color)
-    --consoleTabBar:blinkTab(tab)
+    -- consoleTabBar:blinkTab(tab)
     if consoleTabBar:getCurrentTab() ~= tab then
         changeNewNessageColor(tab)
     end
@@ -1367,7 +1371,7 @@ function sendMessage(message, tab)
     end
 
     local findIni, findEnd, chatCommandInitial, chatCommandPrivate, chatCommandEnd, chatCommandMessage = message:find(
-                                                                                                             '([%*%@])(.+)([%*%@])(.*)')
+        '([%*%@])(.+)([%*%@])(.*)')
     if findIni ~= nil and findIni == 1 then -- player used private chat command
         if chatCommandInitial == chatCommandEnd then
             chatCommandPrivateRepeat = false
@@ -1522,7 +1526,6 @@ function onTalk(name, level, mode, message, channelId, creaturePos)
     local localPlayer = g_game.getLocalPlayer()
     if name ~= g_game.getCharacterName() and isUsingIgnoreList() and not (isUsingWhiteList()) or
         (isUsingWhiteList() and not (isWhitelisted(name)) and not (isAllowingVIPs() and localPlayer:hasVip(name))) then
-
         if mode == MessageModes.Yell and isIgnoringYelling() then
             return
         elseif speaktype.private and isIgnoringPrivate() and not isNpcMode then
@@ -1791,6 +1794,7 @@ end
 function isUsingWhiteList()
     return communicationSettings.useWhiteList
 end
+
 function isIgnored(name)
     return table.find(communicationSettings.ignoredPlayers, name, true)
 end
@@ -2026,9 +2030,4 @@ function onChannelEvent(channelId, name, type)
             addTabText(fmt:format(name), SpeakTypesSettings.channelOrange, tab)
         end
     end
-end
-
--- bot funtion
-function isEnabledWASD()
-    return consoleToggleChat.isChecked
 end

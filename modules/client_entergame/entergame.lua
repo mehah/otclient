@@ -117,8 +117,6 @@ function EnterGame.init()
     enterGame = g_ui.displayUI('entergame')
     g_keyboard.bindKeyDown('Ctrl+G', EnterGame.openWindow)
 
-
-
     local account = g_settings.get('account')
     local password = g_settings.get('password')
     local host = g_settings.get('host')
@@ -217,6 +215,8 @@ function EnterGame.firstShow()
         EnterGame.postCacheInfo()
         EnterGame.postEventScheduler()
         EnterGame.postShowOff()
+        EnterGame.postShowCreatureBoost()
+
     end
 
 end
@@ -255,15 +255,16 @@ end
 
 function EnterGame.postCacheInfo()
     local onRecvInfo = function(message, err)
+
         if err then
-            onError(nil, 'Bad Request.', 400)
+            onError(nil, 'Bad Request. Game_entergame postCacheInfo1 ', 400)
             return
         end
 
         local _, bodyStart = message:find('{')
         local _, bodyEnd = message:find('.*}')
         if not bodyStart or not bodyEnd then
-            onError(nil, 'Bad Request.', 400)
+            onError(nil, 'Bad Request.Game_entergame postCacheInfo2', 400)
             return
         end
 
@@ -274,10 +275,12 @@ function EnterGame.postCacheInfo()
         end
 
         modules.client_topmenu.setPlayersOnline(response.playersonline)
-        modules.client_topmenu.setTwitchStreams(response.twitchstreams)
-        modules.client_topmenu.setTwitchViewers(response.twitchviewer)
+        modules.client_topmenu.setDiscordStreams(response.discord_online)
         modules.client_topmenu.setYoutubeStreams(response.gamingyoutubestreams)
         modules.client_topmenu.setYoutubeViewers(response.gamingyoutubeviewer)
+        modules.client_topmenu.setLinkYoutube(response.youtube_link)
+        modules.client_topmenu.setLinkDiscord(response.discord_link)
+
     end
 
     HTTP.post(Services.status, json.encode({
@@ -288,14 +291,14 @@ end
 function EnterGame.postEventScheduler()
     local onRecvInfo = function(message, err)
         if err then
-            onError(nil, 'Bad Request.', 400)
+            onError(nil, 'Bad Request. Game_entergame postEventScheduler1', 400)
             return
         end
 
         local _, bodyStart = message:find('{')
         local _, bodyEnd = message:find('.*}')
         if not bodyStart or not bodyEnd then
-            onError(nil, 'Bad Request.', 400)
+            onError(nil, 'Bad Request. Game_entergame postEventScheduler2', 400)
             return
         end
 
@@ -309,7 +312,7 @@ function EnterGame.postEventScheduler()
         modules.client_bottommenu.setEventsSchedulerCalender(response.eventlist)
     end
 
-    HTTP.post(Services.ClientHost, json.encode({
+    HTTP.post(Services.status, json.encode({
         type = 'eventschedule'
     }), onRecvInfo, false)
 end
@@ -317,14 +320,14 @@ end
 function EnterGame.postShowOff()
     local onRecvInfo = function(message, err)
         if err then
-            onError(nil, 'Bad Request.', 400)
+            onError(nil, 'Bad Request. 1 Game_entergame postShowOff', 400)
             return
         end
 
         local _, bodyStart = message:find('{')
         local _, bodyEnd = message:find('.*}')
         if not bodyStart or not bodyEnd then
-            onError(nil, 'Bad Request.', 400)
+            onError(nil, 'Bad Request. 2 Game_entergame postShowOff', 400)
             return
         end
 
@@ -342,10 +345,38 @@ function EnterGame.postShowOff()
     }), onRecvInfo, false)
 end
 
+function EnterGame.postShowCreatureBoost()
+    local onRecvInfo = function(message, err)
+        if err then
+            onError(nil, 'Bad Request. 1 Game_entergame postShowCreatureBoost', 400)
+            return
+        end
+
+        local _, bodyStart = message:find('{')
+        local _, bodyEnd = message:find('.*}')
+        if not bodyStart or not bodyEnd then
+            onError(nil, 'Bad Request. 2 Game_entergame postShowCreatureBoost', 400)
+            return
+        end
+
+        local response = json.decode(message:sub(bodyStart, bodyEnd))
+        if response.errorMessage then
+            onError(nil, response.errorMessage, response.errorCode)
+            return
+        end
+
+        modules.client_bottommenu.Booster_creature(response)
+    end
+
+    HTTP.post(Services.status, json.encode({
+        type = 'Creatureboost'
+    }), onRecvInfo, false)
+end
+
 function EnterGame.show()
-    if  g_game.isOnline() then -- fix login quickly error (http post)
+    if g_game.isOnline() or CharacterList.isVisible() then -- fix login quickly error (http post)
         return
-    end 
+    end
     if loadBox then
         return
     end

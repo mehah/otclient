@@ -40,45 +40,29 @@ TopMenuPanel
       width: 150
 
   UIWidget
-    id: topLeftTwitch
+    id: topLeftDiscord
     anchors.verticalCenter: parent.verticalCenter
     anchors.left: parent.left
     margin-left: 10
     size: 110 32
 
-    Panel
-      id: twitchIcon
-      image-source: /images/icons/icon_twitch
+    UIWidget
+      id: discordIcon
+      image-source: /images/icons/icon_discord
       anchors.verticalCenter: parent.verticalCenter
       anchors.left: parent.left
-      size: 47 16
+      size: 30 34
 
     Panel
       image-source: /images/icons/icon_streamers
       anchors.top: parent.top
       anchors.left: prev.right
       margin-left: 5
-      margin-top: 5
+      margin-top: 11
       size: 11 7
 
     Label
-      id: topLeftTwitchStreamersLabel
-      !text: '-'
-      anchors.left: prev.right
-      margin-left: 5
-      anchors.verticalCenter: prev.verticalCenter
-      width: 50
-
-    Panel
-      image-source: /images/icons/icon_viewers
-      anchors.bottom: parent.bottom
-      anchors.left: twitchIcon.right
-      margin-left: 5
-      margin-bottom: 7
-      size: 11 7
-
-    Label
-      id: topLeftTwitchViewersLabel
+      id: topLeftDiscordStreamersLabel
       !text: '-'
       anchors.left: prev.right
       margin-left: 5
@@ -88,11 +72,11 @@ TopMenuPanel
   UIWidget
     id: topLeftYoutube
     anchors.verticalCenter: parent.verticalCenter
-    anchors.left: topLeftTwitch.right
+    anchors.left: topLeftDiscord.right
     margin-left: 10
     size: 100 32
 
-    Panel
+    UIWidget
       id: youtubeIcon
       image-source: /images/icons/icon_youtube
       anchors.verticalCenter: parent.verticalCenter

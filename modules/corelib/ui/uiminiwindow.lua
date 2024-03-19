@@ -9,13 +9,11 @@ end
 
 function UIMiniWindow:open(dontSave)
     self:setVisible(true)
-
     if not dontSave then
         self:setSettings({
             closed = false
         })
     end
-
     signalcall(self.onOpen, self)
 end
 
@@ -80,13 +78,13 @@ function UIMiniWindow:setup()
     end
 
     self:getChildById('minimizeButton').onClick = function()
+
         if self:isOn() then
             self:maximize()
         else
             self:minimize()
         end
     end
-
     self:getChildById('miniwindowTopBar').onDoubleClick = function()
         if self:isOn() then
             self:maximize()
@@ -104,7 +102,6 @@ function UIMiniWindow:setupOnStart()
 
     local oldParent = self:getParent()
     local newParentSet = false
-
     local settings = g_settings.getNode('CharMiniWindows')
 
     if not settings then
@@ -120,6 +117,7 @@ function UIMiniWindow:setupOnStart()
             g_settings.setNode('CharMiniWindows', settings)
             break
         end
+
     end
 
     local selfSettings = settings[char][self:getId()]
@@ -135,6 +133,7 @@ function UIMiniWindow:setupOnStart()
                     self:setParent(parent, true)
                     self:setPosition(topoint(selfSettings.position))
                     newParentSet = true
+
                 end
             end
         end
@@ -223,7 +222,8 @@ function UIMiniWindow:onDragLeave(droppedWidget, mousePos)
 
     self:saveParent(self:getParent())
     if self.moveOnlyToMain or droppedWidget.onlyPhantomDrop then
-        if not(droppedWidget) or (self.moveOnlyToMain and not(droppedWidget.onlyPhantomDrop)) or (not(self.moveOnlyToMain) and droppedWidget.onlyPhantomDrop) then
+        if not (droppedWidget) or (self.moveOnlyToMain and not (droppedWidget.onlyPhantomDrop)) or
+            (not (self.moveOnlyToMain) and droppedWidget.onlyPhantomDrop) then
             local virtualParent = self:getParent()
             virtualParent:removeChild(self)
             self.oldParentDrag:insertChild(self.oldParentDragIndex, self)
@@ -325,6 +325,7 @@ function UIMiniWindow:getSettings(name)
             return selfSettings[name]
         end
     end
+
     return nil
 end
 
@@ -395,6 +396,7 @@ function UIMiniWindow:saveParent(parent)
             self:saveParentPosition(parent:getId(), self:getPosition())
         end
     end
+
 end
 
 function UIMiniWindow:saveParentPosition(parentId, position)
