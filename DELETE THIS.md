@@ -15,17 +15,17 @@
 0 % = not reviewed yet
 
 
-se necesita incorporar alguien que sepa de php . photoshop
-creo que hay un bug en client serverlist
+we need to incorporate someone who knows php . photoshop
+I think there is a bug in client serverlist
 
-bot hay que mejorar el ancho del widget.
-obtener el slot5 quiero
+bot widget width needs to be improved.
+get the slot5 i want to
 
 ![](https://geps.dev/progress/0) client
 
 ![](https://geps.dev/progress/0) client_background
 
-![](https://geps.dev/progress/0) client_bottommenu
+![](https://geps.dev/progress/80) client_bottommenu
 
 ![](https://geps.dev/progress/90) client_entergame 
 
@@ -33,13 +33,13 @@ obtener el slot5 quiero
 
 ![](https://geps.dev/progress/0) client_options   
 
-![](https://geps.dev/progress/100) client_serverlist
+![](https://geps.dev/progress/90) client_serverlist
 
 ![](https://geps.dev/progress/0) client_styles    
 
 ![](https://geps.dev/progress/0) client_terminal  
 
-![](https://geps.dev/progress/0) client_topmenu
+![](https://geps.dev/progress/90) client_topmenu
 
 
 ![](https://geps.dev/progress/0) corelib
@@ -133,8 +133,8 @@ obtener el slot5 quiero
 ### client_bottommenu
 - Status: Incomplete
 - Bugs: 
-    - [ ] Issue 
-    - [ ] Issue 
+    - [x] Issue : http post support #6
+    - [ ] Issue : miss fix outfit boosted
 
 ### client_entergame 
 - Status: Incomplete
@@ -159,7 +159,7 @@ obtener el slot5 quiero
 ### client_serverlist
 - Status: Incomplete
 - Bugs: 
-    - [ ] Issue 
+    - [ ] Issue : Bug in main repo mehah
     - [ ] Issue 
 
 ### client_styles    
@@ -177,8 +177,8 @@ obtener el slot5 quiero
 ### client_topmenu
 - Status: Incomplete
 - Bugs: 
-    - [ ] Issue 
-    - [ ] Issue 
+    - [x] Issue : http post support #6
+    - [ ] Issue : miss "manager account", "manager clients"
 
 ### corelib
 - Status: Incomplete
@@ -220,8 +220,8 @@ obtener el slot5 quiero
 - Status: Incomplete
 - Bugs: 
     - [ ] Issue : preventing the cursor from appearing when starting to write.
-    - [ ] Issue : Fix enter for  enable WASD 
-    - [x] Issue :add "isEnabledWASD" missing funcion bot
+    - [x] Issue : Fix enter for  enable WASD 
+    - [x] Issue :add "isEnabledWASD" missing funcion bot #6
 
 ### game_containers
 - Status: Incomplete
@@ -270,12 +270,14 @@ obtener el slot5 quiero
 - Bugs: 
     - [x] Issue : Cap, soul not work
     - [x] Issue : Inventary , hide icons "bless" in old protocol
-    - [ ] Issue :  Conditions icons are not coded
+    - [x] Issue :  Conditions icons are not coded
     - [x] Issue :  When you attack and chase mode is follow, there's error in terminal (need auto Chase option turned on)
     - [ ] Issue :  fix function inventoryController:onTerminate()
+    - [ ] Issue :  Hide icon "bless" in minize panel
+
 
 **NOTE:  **
--  correct the version of the if function
+-  correct the version of the if function "bless"
 
 ### game_market
 - Status: Incomplete
@@ -298,7 +300,7 @@ obtener el slot5 quiero
 ### game_outfit
 - Status: Incomplete
 - Bugs: 
-    - [ ] Issue 
+    - [ ] Issue : compatibility with v8
     - [ ] Issue 
 
 ### game_playerdeath
@@ -349,6 +351,7 @@ obtener el slot5 quiero
     - [ ] Issue : Ico game skills like clipsof
     - [ ] Issue 
 - **Notes: NEED FIX LOCATION ICONS AND SIZE**
+
 ### game_spelllist
 - Status: Incomplete
 - Bugs: 
