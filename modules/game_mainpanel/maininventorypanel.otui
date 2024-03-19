@@ -1,3 +1,8 @@
+ConditionWidget < UIWidget
+  size: 18 18
+
+  $!first:
+    margin-left: 2
 PhantomMiniWindow
   id: maininventorypanel
   draggable: true
@@ -170,13 +175,19 @@ PhantomMiniWindow
         g_game.stop()
         g_game.getLocalPlayer():stopAutoWalk()
 
-    StatsBarDarkBackground
+    Panel
       id: icons
+      size: 108 18
+      padding: 2
+
+      image-source: /images/ui/containerslot
+      image-border: 3
       anchors.left: changeSize.left
       anchors.right: backpack.right
       anchors.bottom: parent.bottom
       anchors.top: stop.top
-      phantom: false
+      layout:
+        type: horizontalBox
 
     MainInventoryItem
       id: amulet

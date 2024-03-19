@@ -1,3 +1,90 @@
+local Icons = {}
+Icons[PlayerStates.Poison] = {
+    tooltip = tr('You are poisoned'),
+    path = '/images/game/states/poisoned',
+    id = 'condition_poisoned'
+}
+Icons[PlayerStates.Burn] = {
+    tooltip = tr('You are burning'),
+    path = '/images/game/states/burning',
+    id = 'condition_burning'
+}
+Icons[PlayerStates.Energy] = {
+    tooltip = tr('You are electrified'),
+    path = '/images/game/states/electrified',
+    id = 'condition_electrified'
+}
+Icons[PlayerStates.Drunk] = {
+    tooltip = tr('You are drunk'),
+    path = '/images/game/states/drunk',
+    id = 'condition_drunk'
+}
+Icons[PlayerStates.ManaShield] = {
+    tooltip = tr('You are protected by a magic shield'),
+    path = '/images/game/states/magic_shield',
+    id = 'condition_magic_shield'
+}
+Icons[PlayerStates.Paralyze] = {
+    tooltip = tr('You are paralysed'),
+    path = '/images/game/states/slowed',
+    id = 'condition_slowed'
+}
+Icons[PlayerStates.Haste] = {
+    tooltip = tr('You are hasted'),
+    path = '/images/game/states/haste',
+    id = 'condition_haste'
+}
+Icons[PlayerStates.Swords] = {
+    tooltip = tr('You may not logout during a fight'),
+    path = '/images/game/states/logout_block',
+    id = 'condition_logout_block'
+}
+Icons[PlayerStates.Drowning] = {
+    tooltip = tr('You are drowning'),
+    path = '/images/game/states/drowning',
+    id = 'condition_drowning'
+}
+Icons[PlayerStates.Freezing] = {
+    tooltip = tr('You are freezing'),
+    path = '/images/game/states/freezing',
+    id = 'condition_freezing'
+}
+Icons[PlayerStates.Dazzled] = {
+    tooltip = tr('You are dazzled'),
+    path = '/images/game/states/dazzled',
+    id = 'condition_dazzled'
+}
+Icons[PlayerStates.Cursed] = {
+    tooltip = tr('You are cursed'),
+    path = '/images/game/states/cursed',
+    id = 'condition_cursed'
+}
+Icons[PlayerStates.PartyBuff] = {
+    tooltip = tr('You are strengthened'),
+    path = '/images/game/states/strengthened',
+    id = 'condition_strengthened'
+}
+Icons[PlayerStates.PzBlock] = {
+    tooltip = tr('You may not logout or enter a protection zone'),
+    path = '/images/game/states/protection_zone_block',
+    id = 'condition_protection_zone_block'
+}
+Icons[PlayerStates.Pz] = {
+    tooltip = tr('You are within a protection zone'),
+    path = '/images/game/states/protection_zone',
+    id = 'condition_protection_zone'
+}
+Icons[PlayerStates.Bleeding] = {
+    tooltip = tr('You are bleeding'),
+    path = '/images/game/states/bleeding',
+    id = 'condition_bleeding'
+}
+Icons[PlayerStates.Hungry] = {
+    tooltip = tr('You are hungry'),
+    path = '/images/game/states/hungry',
+    id = 'condition_hungry'
+}
+
 function init()
     mapController:init()
     healthManaController:init()
@@ -141,10 +228,12 @@ local function healthManaEvent()
     end
 
     healthManaController.ui.health.text:setText(player:getHealth())
-    healthManaController.ui.health.current:setWidth(math.max(12, math.ceil((healthManaController.ui.health.total:getWidth() * player:getHealth()) / player:getMaxHealth())))
+    healthManaController.ui.health.current:setWidth(math.max(12, math.ceil(
+        (healthManaController.ui.health.total:getWidth() * player:getHealth()) / player:getMaxHealth())))
 
     healthManaController.ui.mana.text:setText(player:getMana())
-    healthManaController.ui.mana.current:setWidth(math.max(12, math.ceil((healthManaController.ui.mana.total:getWidth() * player:getMana()) / player:getMaxMana())))
+    healthManaController.ui.mana.current:setWidth(math.max(12, math.ceil(
+        (healthManaController.ui.mana.total:getWidth() * player:getMana()) / player:getMaxMana())))
 end
 
 healthManaController = Controller:new()
@@ -258,30 +347,19 @@ local function inventoryEvent(player, slot, item, oldItem)
     slotPanel.item:setHeight(34)
 end
 
-local function refreshInventory()
-    if inventoryShrink then
+local function onSoulChange(localPlayer, soul)
+    local ui = getInventoryUi()
+    if not localPlayer then
         return
     end
-
-    local player = g_game.getLocalPlayer()
-    for i = InventorySlotFirst, InventorySlotPurse do
-        if g_game.isOnline() then
-            inventoryEvent(player, i, player:getInventoryItem(i))
-        else
-            inventoryEvent(player, i, nil)
-        end
-    end
-end
-
-local function onSoulChange(localPlayer, soul)
     if not soul then
         return
     end
-    local ui = getInventoryUi()
+
     ui.soulPanel.soul:setText(soul)
 end
 
-local function onFreeCapacityChange(player, freeCapacity)
+function onFreeCapacityChange(player, freeCapacity)
     if not freeCapacity then
         return
     end
@@ -298,7 +376,65 @@ local function onFreeCapacityChange(player, freeCapacity)
     ui.capacityPanel.capacity:setText(freeCapacity)
 end
 
-local function refreshInventorySizes()
+function loadIcon(bitChanged)
+    local icon = g_ui.createWidget('ConditionWidget', getInventoryUi().icons)
+    icon:setId(Icons[bitChanged].id)
+    icon:setImageSource(Icons[bitChanged].path)
+    icon:setTooltip(Icons[bitChanged].tooltip)
+    return icon
+end
+
+function toggleIcon(bitChanged)
+    local content = getInventoryUi().icons
+
+    local icon = content:getChildById(Icons[bitChanged].id)
+    if icon then
+        icon:destroy()
+    else
+        icon = loadIcon(bitChanged)
+        icon:setParent(content)
+    end
+end
+
+function onStatesChange(localPlayer, now, old)
+    if now == old then
+        return
+    end
+
+    local bitsChanged = bit.bxor(now, old)
+    for i = 1, 32 do
+        local pow = math.pow(2, i - 1)
+        if pow > bitsChanged then
+            break
+        end
+        local bitChanged = bit.band(bitsChanged, pow)
+        if bitChanged ~= 0 then
+            toggleIcon(bitChanged)
+        end
+    end
+end
+
+function refreshInventory_panel()
+    if inventoryShrink then
+        return
+    end
+
+    local player = g_game.getLocalPlayer()
+    for i = InventorySlotFirst, InventorySlotPurse do
+        if g_game.isOnline() then
+            inventoryEvent(player, i, player:getInventoryItem(i))
+        else
+            inventoryEvent(player, i, nil)
+        end
+    end
+    if player and g_game.isOnline() then
+        onSoulChange(player, player:getSoul())
+        onFreeCapacityChange(player, player:getFreeCapacity())
+        onStatesChange(player, player:getStates(), 0)
+    end
+end
+
+function refreshInventorySizes()
     if inventoryShrink then
         inventoryController.ui:setOn(false)
         inventoryController.ui.onPanel:hide()
@@ -307,7 +443,7 @@ local function refreshInventorySizes()
         inventoryController.ui:setOn(true)
         inventoryController.ui.onPanel:show()
         inventoryController.ui.offPanel:hide()
-        refreshInventory()
+        refreshInventory_panel()
     end
     combatEvent()
     walkEvent()
@@ -326,11 +462,12 @@ local inventoryControllerEvents = inventoryController:addEvent(LocalPlayer, {
     onPVPModeChange = combatEvent,
     onInventoryChange = inventoryEvent,
     onSoulChange = onSoulChange,
-    onFreeCapacityChange = onFreeCapacityChange 
+    onFreeCapacityChange = onFreeCapacityChange,
+    onStatesChange = onStatesChange
 })
 
 function inventoryController:onInit()
-    refreshInventory()
+    refreshInventory_panel()
 end
 
 function inventoryController:onTerminate()
@@ -348,9 +485,10 @@ function inventoryController:onGameStart()
     inventoryControllerEvents:execute('onInventoryChange')
     inventoryControllerEvents:execute('onSoulChange')
     inventoryControllerEvents:execute('onFreeCapacityChange')
+    inventoryControllerEvents:execute('onStatesChange')
     inventoryShrink = g_settings.getBoolean('mainpanel_shrink_inventory')
     refreshInventorySizes()
-    refreshInventory()
+    refreshInventory_panel()
 end
 
 function inventoryController:onGameEnd()
