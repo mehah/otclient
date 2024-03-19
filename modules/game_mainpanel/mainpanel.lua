@@ -359,7 +359,7 @@ local function onSoulChange(localPlayer, soul)
     ui.soulPanel.soul:setText(soul)
 end
 
-function onFreeCapacityChange(player, freeCapacity)
+local function onFreeCapacityChange(player, freeCapacity)
     if not freeCapacity then
         return
     end
@@ -376,7 +376,7 @@ function onFreeCapacityChange(player, freeCapacity)
     ui.capacityPanel.capacity:setText(freeCapacity)
 end
 
-function loadIcon(bitChanged)
+local function loadIcon(bitChanged)
     local icon = g_ui.createWidget('ConditionWidget', getInventoryUi().icons)
     icon:setId(Icons[bitChanged].id)
     icon:setImageSource(Icons[bitChanged].path)
@@ -384,7 +384,7 @@ function loadIcon(bitChanged)
     return icon
 end
 
-function toggleIcon(bitChanged)
+local function toggleIcon(bitChanged)
     local content = getInventoryUi().icons
 
     local icon = content:getChildById(Icons[bitChanged].id)
@@ -396,7 +396,7 @@ function toggleIcon(bitChanged)
     end
 end
 
-function onStatesChange(localPlayer, now, old)
+local function onStatesChange(localPlayer, now, old)
     if now == old then
         return
     end
@@ -414,7 +414,7 @@ function onStatesChange(localPlayer, now, old)
     end
 end
 
-function refreshInventory_panel()
+local function refreshInventory_panel()
     if inventoryShrink then
         return
     end
@@ -434,7 +434,7 @@ function refreshInventory_panel()
     end
 end
 
-function refreshInventorySizes()
+local function refreshInventorySizes()
     if inventoryShrink then
         inventoryController.ui:setOn(false)
         inventoryController.ui.onPanel:hide()
