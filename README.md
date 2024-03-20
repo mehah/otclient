@@ -1,172 +1,531 @@
-# OTCLient - Redemption
-[![Discord Shield](https://discordapp.com/api/guilds/888062548082061433/widget.png?style=shield)](https://discord.gg/HZN8yJJSyC)
-[![Build - Ubuntu](https://github.com/mehah/otclient/actions/workflows/build-ubuntu.yml/badge.svg)](https://github.com/mehah/otclient/actions/workflows/build-ubuntu.yml)
-[![Build - Windows](https://github.com/mehah/otclient/actions/workflows/build-windows.yml/badge.svg)](https://github.com/mehah/otclient/actions/workflows/build-windows.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+# New Layout OTC Client
 
-#### :heart:  If you are interested in supporting the project, go to this [link](https://www.paypal.com/donate/?business=CV9D5JF8E46LY&no_recurring=0&item_name=Thank+you+very+much+for+your+donation.&currency_code=BRL), any value is great help, thank you.
+> [!CAUTION]
+> Game_inventario, game_interface, client_topmenu
 
-### Based on [edubart/otclient](https://github.com/edubart/otclient) Rev: [2.760](https://github.com/edubart/otclient/commit/fc39ee4adba8e780a2820bfda66fc942d74cedf4)
+> [!IMPORTANT]  
+> TEST : extended view , BOT and server +10
 
-#### [Note: for those who are with the walking system stuttering...](https://github.com/mehah/otclient/blob/main/data/setup.otml#L18)
+## Overall Status
 
-### Features
+![](https://geps.dev/progress/100) = compatibility terminated
+ 
+![](https://geps.dev/progress/99) = unmodified,  test require
 
-- C++20
-- Refactored/Optimized Rendering System
-- Auto Reload Module ([init.lua](https://github.com/mehah/otclient/blob/main/init.lua#L90))
-- Attached Effects System (to create aura, wings...) (code sample: [effects.lua](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/effects.lua), [outfit_618.lua](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/configs/outfit_618.lua), [code test](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/attachedeffects.lua#L1))
-- Idle Animation Support
-- Highlight Mouse Target (press shift to select any object)
-- Crosshair
-- Floor Shadowing
-- Floor View Mode (Normal, Fade, Locked, Always, Always with transparency)
-- Anti-Aliasing Mode Options (Note: Smooth Retro will consume a little more GPU)
-- Floating Effects Option
-- Optimized Terminal
-- Refactored Walk System
-- Support for more mouse buttons, for example 4 and 5
-- Module Controller System ([Code example](https://github.com/mehah/otclient/blob/cache-for-all/modules/game_minimap/minimap.lua))
-- Some bugs fixed contained in [edubart/otclient](https://github.com/edubart/otclient)
-- Client 12.85 ~ 12.92, 13.00 ~ 13.21 support (protobuf)
-- Market has been rewritten to work only [Canary](https://github.com/opentibiabr/canary)
-- Async Texture Loading
-- Tile Widget
-
-##### Community (Features)
-- Mobile Support [@tuliomagalhaes](https://github.com/tuliomagalhaes) & [@BenDol](https://github.com/BenDol)
-- Support Tibia 12.85/protobuf by [@Nekiro](https://github.com/nekiro)
-- Support Discord RPC by [@SkullzOTS](https://github.com/SkullzOTS) (Doesn't work with CMAKE)
-- Action Bar by [@DipSet](https://github.com/Dip-Set1)
-- Access to widget children via widget.childId by [@Hugo0x1337](https://github.com/Hugo0x1337)
-- Shader System Fix (CTRL + Y) by [@FreshyPeshy](https://github.com/FreshyPeshy)
-- Refactored Battle Module by [@andersonfaaria](https://github.com/andersonfaaria)
-- Health&Mana Circle by [@EgzoT](https://github.com/EgzoT), [@GustavoBlaze](https://github.com/GustavoBlaze), [@Tekadon58](https://github.com/Tekadon58) ([GITHUB Project](https://github.com/EgzoT/-OTClient-Mod-health_and_mana_circle))
-- Tibia Theme 1.2 by Zews ([Forum Thread](https://otland.net/threads/otc-tibia-theme-v1-2.230988/))
-- Add option ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE in [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h) by [@SkullzOTS](https://github.com/SkullzOTS)
-- Encryption System by [@Mrpox](https://github.com/Mrpox) (Note: This implementation is unsafe)
-  - To enable just go to [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h), set 1 in ENABLE_ENCRYPTION and change password on ENCRYPTION_PASSWORD
-  - To enable Encrypting by "--encrypt" change ENABLE_ENCRYPTION_BUILDER to 1 (by [@TheMaoci](https://github.com/TheMaoci)). This allows to remove code of creating encrypted files off the production build
-  - To generate an encryption, just run the client with flag "--encrypt SET_YOUR_PASSWORD_HERE" and don't forget to change the password.
-  - you can also skip adding password to --encrypt command it automatically will be taken from [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h) file (by [@TheMaoci](https://github.com/TheMaoci))
-- Support HTTP/HTTPS/WS/WSS. by [@alfuveam](https://github.com/alfuveam)
-- Discord RPC by [@SkullzOTS](https://github.com/SkullzOTS)
-  - To enable just go to [config.h](https://github.com/mehah/otclient/blob/main/src/client/config.h), set 1 in ENABLE_DISCORD_RPC and configure the others definitions
-  - You can see the step by step in [YouTube](https://www.youtube.com/watch?v=zCHYtRlD58g)
-- Client Updater by [@conde2](https://github.com/conde2)
-  - Paste the API folder in your www folder (https://github.com/mehah/otclient/tree/main/tools/api)
-  - Create a folder called "files" in your www folder and paste init.lua, modules, data, and exe files
-  - Uncomment and change this line (https://github.com/mehah/otclient/blob/main/init.lua#L6)
-- Colored text [@conde2](https://github.com/conde2)
-  - widget:setColoredText("{Colored text, #ff00ff} normal text")
-- QR Code support, with auto generate it from string  [@conde2]
-  - UIQrCode: 
-    - code-border: 2
-    - code: Hail OTClient Redemption - Conde2 Dev
-- Smooth Walk Elevation Feature by [@SkullzOTS](https://github.com/SkullzOTS)
-  - View Feature: [Gyazo](https://i.gyazo.com/af0ed0f15a9e4d67bd4d0b2847bd6be7.gif)
-  - To enable just go to [modules/game_features/features.lua](https://github.com/mehah/otclient/blob/main/modules/game_features/features.lua#L5), and uncomment line 5 (g_game.enableFeature(GameSmoothWalkElevation)).
-- Lua Debugger for VSCode [see wiki](https://github.com/mehah/otclient/wiki/Lua-Debugging-(VSCode)) [@BenDol](https://github.com/BenDol)
-  
-##### Sponsored  (Features)
-- Shader with Framebuffer | ([@SkullzOTS](https://github.com/SkullzOTS), [@Mryukiimaru](https://github.com/Mryukiimaru), [@JeanTheOne](https://github.com/JeanTheOne), [@KizaruHere](https://github.com/KizaruHere))
-- Bot V8 | ([@luanluciano93](https://github.com/luanluciano93), [@SkullzOTS](https://github.com/SkullzOTS), [@kokekanon](https://github.com/kokekanon), [@FranciskoKing](https://github.com/FranciskoKing), [@Kizuno18](https://github.com/Kizuno18))
-  - Is adapted in 85%
-  - To enable it, it is necessary to remove/off the BOT_PROTECTION flag.
-  - [VS Solution](https://github.com/mehah/otclient/blob/68e4e1b94c2041bd235441244156e6477058250c/vc17/settings.props#L9) / [CMAKE](https://github.com/mehah/otclient/blob/68e4e1b94c2041bd235441244156e6477058250c/src/CMakeLists.txt#L13)
+![](https://geps.dev/progress/0) = not reviewed yet
 
 
-##### [OTClient V8](https://github.com/OTCv8) (Features)
-- Lighting System
-- Floor Fading
-- Path Finding
-<h2>
 
-```diff
-- Want to help? Just open a PR.
-```
+----------------------------------------------------------------
+## ./modules
 
-   </h2>
+![](https://geps.dev/progress/99) client `--unmodified, test required`
 
-### What is otclient?
+![](https://geps.dev/progress/99) client_background `--unmodified, test required`
 
-Otclient is an alternative Tibia client for usage with otserv. It aims to be complete and flexible,
-for that it uses LUA scripting for all game interface functionality and configurations files with a syntax
-similar to CSS for the client interface design. Otclient works with a modular system, this means
-that each functionality is a separated module, giving the possibility to users modify and customize
-anything easily. Users can also create new mods and extend game interface for their own purposes.
-Otclient is written in C++20 and heavily scripted in lua.
+![](https://geps.dev/progress/80) client_bottommenu
 
-For a server to connect to, you can build your own with the [forgottenserver](https://github.com/otland/forgottenserver)
-or [canary](https://github.com/opentibiabr/canary).
+![](https://geps.dev/progress/90) client_entergame
 
-## The Mobile Project
-This is a fork of edubart's otclient. The objective of this fork it's to develop a runnable otclient on mobiles devices.
+![](https://geps.dev/progress/99) client_locales `--unmodified, test required`
 
-Tasks that need to do:
-- [X] Compile on Android devices
-- [ ] Compile on Apple devices
-- [ ] Adapt the UI reusing the existing lua code
+![](https://geps.dev/progress/0) client_options
 
-Current compiling tutorials:
-* [Compiling for Android](https://github.com/mehah/otclient/wiki/Compiling-on-Android)
+![](https://geps.dev/progress/90) client_serverlist
 
-### Where do I download?
+![](https://geps.dev/progress/99) client_styles `--unmodified, test required`
 
-Compiled for Windows can be found here (but can be outdated):
+![](https://geps.dev/progress/99) client_terminal `--unmodified, test required`
 
-- [Windows Builds](https://github.com/mehah/otclient/releases)
+![](https://geps.dev/progress/90) client_topmenu 
 
-**NOTE:** You will need to download spr/dat files on your own and place them in `data/things/VERSION/` (i.e: `data/things/1098/Tibia.spr`)
+![](https://geps.dev/progress/0) corelib
 
-### Features
+![](https://geps.dev/progress/0) gamelib
 
-Beyond of it's flexibility with scripts, otclient comes with tons of other features that make possible
-the creation of new client side stuff in otserv that was not possible before. These include,
-sound system, graphics effects with shaders, modules/addons system, animated textures,
-styleable user interface, transparency, multi language, in game lua terminal, an OpenGL 2.0 ES engine that make possible
-to port to mobile platforms. Otclient is also flexible enough to
-create tibia tools like map editors just using scripts, because it wasn't designed to be just a
-client, instead otclient was designed to be a combination of a framework and tibia APIs.
+![](https://geps.dev/progress/0) game_actionbar
 
-### Compiling
+![](https://geps.dev/progress/99) game_attachedeffects `--unmodified, test required`
 
-[If you are interested in compiling this project, just go to the wiki.](https://github.com/mehah/otclient/wiki)
+![](https://geps.dev/progress/90) game_battle
 
-### Build and run with Docker
+![](https://geps.dev/progress/99) game_bugreport `--unmodified, test required`
 
-To build the image:
+![](https://geps.dev/progress/0) game_console
 
-```sh
-docker build -t mehah/otclient .
-```
+![](https://geps.dev/progress/99) game_containers `--unmodified, test required`
 
-To run the built image:
+![](https://geps.dev/progress/99) game_cooldown `--unmodified, test required`
 
-```sh
-# Disable access control for the X server.
-xhost +
+![](https://geps.dev/progress/99) game_features
 
-# Run the container image with the required bindings to the host devices and volumes.
-docker run -it --rm \
-  --env DISPLAY \
-  --volume /tmp/.X11-unix:/tmp/.X11-unix \
-  --device /dev/dri \
-  --device /dev/snd mehah/otclient /bin/bash
+![](https://geps.dev/progress/0) game_healthcircle
 
-# Enable access control for the X server.
-xhost -
-```
+![](https://geps.dev/progress/0) game_hotkeys
 
-### Need help?
+![](https://geps.dev/progress/99) game_imbuing `--unmodified, test required`
 
-Try to ask questions in [discord](https://discord.gg/HZN8yJJSyC)
+![](https://geps.dev/progress/0) game_interface
 
-### Bugs
+![](https://geps.dev/progress/10) game_mainpanel
 
-Have found a bug? Please create an issue in our [bug tracker](https://github.com/mehah/otclient/issues)
+![](https://geps.dev/progress/99) game_market `--unmodified, test required`
 
-### License
+![](https://geps.dev/progress/99) game_modaldialog `--unmodified, test required`
 
-Otclient is made available under the MIT License, thus this means that you are free
-to do whatever you want, commercial, non-commercial, closed or open.
+![](https://geps.dev/progress/0) game_npctrade `--unmodified, test required`
+
+![](https://geps.dev/progress/0) game_outfit `--unmodified, test required`
+
+![](https://geps.dev/progress/0) game_playerdeath `--unmodified, test required`
+
+![](https://geps.dev/progress/0) game_playermount `--unmodified, test required`
+
+![](https://geps.dev/progress/0) game_playertrade `--unmodified, test required`
+
+![](https://geps.dev/progress/0) game_prey **1
+
+![](https://geps.dev/progress/99) game_questlog `--unmodified, test required`
+
+![](https://geps.dev/progress/0) game_ruleviolation `--unmodified, test required`
+
+![](https://geps.dev/progress/0) game_shaders `--unmodified, test required`
+
+![](https://geps.dev/progress/90) game_skills
+
+![](https://geps.dev/progress/99) game_spelllist `--unmodified, test required`
+
+![](https://geps.dev/progress/99) game_stash `--unmodified, test required`
+
+![](https://geps.dev/progress/99) game_tasks `--unmodified, test required`
+
+![](https://geps.dev/progress/0) game_textmessage
+
+![](https://geps.dev/progress/99) game_textwindow `--unmodified, test required`
+
+![](https://geps.dev/progress/99) game_things `--unmodified, test required`
+
+![](https://geps.dev/progress/99) game_unjustifiedpoints `--unmodified, test required` **1
+
+![](https://geps.dev/progress/99) game_viplist `--unmodified, test required` **1
+
+![](https://geps.dev/progress/99) startup
+
+![](https://geps.dev/progress/99) updater `--unmodified, test required`
+
+## Detailed Module Analysis
+
+### client
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### client_background
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### client_bottommenu
+
+- Status: Incomplete
+- Bugs:
+  - [x] Issue : http post support #6
+  - [ ] Issue : miss fix outfit boosted
+
+### client_entergame
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Incorrect Tab(key) order.
+  - [ ] MOTD
+  - [ ] Test v13
+  - [x] bug login quickly unfinished http post
+
+### client_locales
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### client_options
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### client_serverlist
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue : Bug in main repo mehah
+  - [ ] Issue
+
+### client_styles
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### client_terminal
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### client_topmenu
+
+- Status: Incomplete
+- Bugs:
+  - [x] Issue : http post support #6
+  - [ ] Issue : miss "manager account", "manager clients"
+
+### corelib
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### gamelib
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_actionbar
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_attachedeffects
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_battle
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_bugreport
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_console
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue : preventing the cursor from appearing when starting to write.
+  - [x] Issue : Fix enter for enable WASD
+  - [x] Issue :add "isEnabledWASD" missing funcion bot #6
+
+### game_containers
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_cooldown
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_features
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_healthcircle
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_hotkeys
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_imbuing
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_interface
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_mainpanel
+
+- Status: Incomplete
+- Bugs:
+  - [x] Issue : Cap, soul not work
+  - [x] Issue : Inventary , hide icons "bless" in old protocol
+  - [x] Issue : Conditions icons are not coded
+  - [x] Issue : When you attack and chase mode is follow, there's error in terminal (need auto Chase option turned on)
+  - [ ] Issue : fix function inventoryController:onTerminate()
+  - [ ] Issue : Hide icon "bless" in minize panel
+
+**NOTE: **
+
+- correct the version of the if function "bless"
+
+### game_market
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_modaldialog
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_npctrade
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_outfit
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue : compatibility with v8
+  - [ ] Issue
+
+### game_playerdeath
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_playermount
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_playertrade
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_prey
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_questlog
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_ruleviolation
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_shaders
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_skills
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue : Ico game skills like clipsof
+  - [ ] Issue
+- **Notes: NEED FIX LOCATION ICONS AND SIZE**
+
+### game_spelllist
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_stash
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_tasks
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_textmessage
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_textwindow
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_things
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_unjustifiedpoints
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### game_viplist
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### startup
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+### updater
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue
+  - [ ] Issue
+
+
+## MOD
+![](https://geps.dev/progress/90) 
+----------------------------------------------------------------
+### ./Mod/bot
+
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue: Fix width mini windows
+  - [ ] Issue: get the slot5 requested by quiver_label and quiver_manager
+
+
+
+## Data
+
+----------------------------------------------------------------
+### ./data/images
+![](https://geps.dev/progress/80) 
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue: Fix Bot icon top menu
+  - [ ] Issue fix: icons state 
+  - [ ] close , minimize , scroll ico
+
+### ./data/Style
+![](https://geps.dev/progress/0) 
+- Status: Incomplete
+- Bugs:
+  - [ ] Issue: 
+  - [ ] Issue
+
+
+
+
+
+
+----------------------------------------------------------------
+
+### FAQ
+
+## what is game_mainpanel ? 
+![image](https://github.com/Nottinghster/otclient/assets/114332266/01f7493e-de73-4a03-9c75-5c25f3f1493a)
+
+Une inventory , minimap, combat control
+
+## what is client_bottommenu ?
+
+
+
+![image](https://github.com/Nottinghster/otclient/assets/114332266/19928bf5-76d5-4cfd-a43a-8514a024daf6)
+
+> note test in : uniServer Z php version 82
+## client_topmenu
+
+New function
+
+    modules.client_topmenu.addRightGameToggleButton
+to
+    
+    modules.game_mainpanel.addToggleButton
+
+![image](https://github.com/Nottinghster/otclient/assets/114332266/2891f3fe-524d-4cae-8bd3-272e1607b1d6)
+
+----------------------------------------------------------------
+
+**1 study that does that
+
+![image](https://github.com/Nottinghster/otclient/assets/114332266/6c665c6e-3533-4956-bd2c-3d670f886cd5)
+
+
+
+-------------------    
+Note: I think there is a bug in client_serverlist main repo
