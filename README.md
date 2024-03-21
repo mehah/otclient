@@ -1,12 +1,46 @@
 # New Layout OTC Client
+New layout based on tibia 13
 
-> [!CAUTION]
-> Game_inventario, game_interface, client_topmenu
+## Screenshots
+![image](https://github.com/Nottinghster/otclient/assets/114332266/e15b7533-4a85-44f9-b9f9-9c0430411332)
+![image](https://github.com/Nottinghster/otclient/assets/114332266/a591a4c2-0604-4427-aea1-6394b245ea8f)
 
-> [!IMPORTANT]  
-> TEST : extended view , BOT and server +10
+
+
+## Features
+
+- Layout tibia 13
+- Calendar 
+- Outfit windows 13 soon
+-  ...
+
+
+## Current bugs
+  - [ ] **Game_mainpanel.** compatibility with extended view #7
+  - [ ] **Game_entergame** MOTD old protocol
+  - [ ] **Game_entergame** problems with token label when no cache, (first open client)
+  - [ ] **Game_topmenu** missing Boton  "manager account", "manager clients"
+  - [ ] **game_Console** preventing the cursor from appearing when starting to write.
+  - [ ] **Game_mainpanel** fix function inventoryController:onTerminate()
+  - [ ] **Game_mainpanel** Hide icon "bless" in minize panel for old protocole
+  - [ ] **Game_mainpanel**  Inventario fix ico state
+  - [ ] **Game_outfit**  SOON
+  - [ ] **Game_mainpanel** (inventary) Fix Ico game skills like clipsof
+  - [ ] **Game_bot** Fix width mini windows bot
+  - [ ] **Game_bot** get the slot5 requested by quiver_label and quiver_manager
+  - [ ] **Game_topMenu** (onStatesChange) icons state 
+  - [ ] **Game_mainpanel** Missing UI of tibia 13 ( close , minimize , scroll)
+  - [ ] **Characterlist** Add checkbox "show outift" button
+  - [ ] **Client_bottom** default information if array services is not enabled
+
 
 ## Overall Status
+
+
+
+<details>
+<summary>Overall Status</summary>
+
 
 ![](https://geps.dev/progress/100) = compatibility terminated
  
@@ -112,9 +146,14 @@
 ![](https://geps.dev/progress/99) startup
 
 ![](https://geps.dev/progress/99) updater `--unmodified, test required`
+</details>
+
+
 
 ## Detailed Module Analysis
 
+
+<details>
 ### client
 
 - Status: Incomplete
@@ -488,27 +527,33 @@
   - [ ] Issue
 
 
+</details>
 
 
 
 
-----------------------------------------------------------------
+## FAQ
 
-### FAQ
-
-## what is game_mainpanel ? 
+### **what is game_mainpanel ? **
 ![image](https://github.com/Nottinghster/otclient/assets/114332266/01f7493e-de73-4a03-9c75-5c25f3f1493a)
 
 Une inventory , minimap, combat control
 
-## what is client_bottommenu ?
+### **where is minimap ?**
 
+game_mainpanel LXX
 
+### **where is inventary ?**
+
+game_mainpanel LXX
+
+### **what is client_bottommenu ?**
 
 ![image](https://github.com/Nottinghster/otclient/assets/114332266/19928bf5-76d5-4cfd-a43a-8514a024daf6)
 
+
 > note test in : uniServer Z php version 82
-## client_topmenu
+### **client_topmenu**
 
 New function
 
@@ -519,13 +564,21 @@ to
 
 ![image](https://github.com/Nottinghster/otclient/assets/114332266/2891f3fe-524d-4cae-8bd3-272e1607b1d6)
 
+
+### **why is this not displayed ?**
+![image](https://github.com/Nottinghster/otclient/assets/114332266/d1104f03-1726-4c25-9698-84c465369514)
+![image](https://github.com/Nottinghster/otclient/assets/114332266/3fdad239-963c-4464-a811-3cfde41b8938)
+![image](https://github.com/Nottinghster/otclient/assets/114332266/532cd93e-f589-4f3e-ac58-94d45c4fcd58)
+
+
+activate the array "Services" in init.lua
+put this ./otclient/tools/api/status.php
+in your
+C:/UniServerZ/www/api/
+
 ----------------------------------------------------------------
 
-**1 study that does that
 
-![image](https://github.com/Nottinghster/otclient/assets/114332266/6c665c6e-3533-4956-bd2c-3d670f886cd5)
+## Author
 
-
-
--------------------    
-Note: I think there is a bug in client_serverlist main repo
+- @  marcosvf132
