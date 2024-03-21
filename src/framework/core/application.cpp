@@ -145,7 +145,8 @@ void Application::terminate()
 
 void Application::poll()
 {
-    std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->getMutexPreDraw());
+    std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->getMutexPreDraw(), g_drawPool.get(DrawPoolType::CREATURE_INFORMATION)->getMutexPreDraw());
+
     g_clock.update();
 
 #ifdef FRAMEWORK_NET
