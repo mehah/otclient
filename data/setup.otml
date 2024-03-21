@@ -1,6 +1,6 @@
 game
   sprite-size: 32
-  last-supported-version: 1321
+  last-supported-version: 1332
   
   map
     viewport: 8 6
