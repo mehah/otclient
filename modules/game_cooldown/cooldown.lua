@@ -58,14 +58,17 @@ end
 function loadIcon(iconId)
     local spell, profile, spellName = Spells.getSpellByIcon(iconId)
     if not spellName then
+        print('[WARNING] loadIcon: empty spellName for tfs spell id: ' .. iconId)
         return
     end
     if not profile then
+        print('[WARNING] loadIcon: empty profile for tfs spell id: ' .. iconId)
         return
     end
 
     clientIconId = Spells.getClientId(spellName)
     if not clientIconId then
+        print('[WARNING] loadIcon: empty clientIconId for tfs spell id: ' .. iconId)
         return
     end
 
@@ -80,6 +83,7 @@ function loadIcon(iconId)
         icon:setImageSource(spellSettings.iconFile)
         icon:setImageClip(Spells.getImageClip(clientIconId, profile))
     else
+        print('[WARNING] loadIcon: empty spell icon for tfs spell id: ' .. iconId)
         icon = nil
     end
     return icon
@@ -187,6 +191,7 @@ end
 function onSpellCooldown(iconId, duration)
     local icon = loadIcon(iconId)
     if not icon then
+        print('[WARNING] Can not load cooldown icon on spell with id: ' .. iconId)
         return
     end
     icon:setParent(cooldownPanel)

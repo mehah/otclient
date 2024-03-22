@@ -7,23 +7,25 @@ SpelllistSettings = {
         },
         spellListWidth = 210,
         spellWindowWidth = 550,
-        spellOrder = {'Animate Dead', 'Annihilation', 'Avalanche', 'Berserk', 'Blood Rage', 'Brutal Strike',
-                      'Cancel Invisibility', 'Challenge', 'Chameleon', 'Charge', 'Conjure Arrow', 'Conjure Bolt',
-                      'Conjure Explosive Arrow', 'Conjure Piercing Bolt', 'Conjure Poisoned Arrow',
-                      'Conjure Power Bolt', 'Conjure Sniper Arrow', 'Convince Creature', 'Creature Illusion',
-                      'Cure Bleeding', 'Cure Burning', 'Cure Curse', 'Cure Electrification', 'Cure Poison',
-                      'Cure Poison Rune', 'Curse', 'Death Strike', 'Desintegrate', 'Destroy Field', 'Divine Caldera',
-                      'Divine Healing', 'Divine Missile', 'Electrify', 'Enchant Party', 'Enchant Spear',
-                      'Enchant Staff', 'Energy Beam', 'Energy Field', 'Energy Strike', 'Energy Wall', 'Energy Wave',
-                      'Energybomb', 'Envenom', 'Eternal Winter', 'Ethereal Spear', 'Explosion', 'Fierce Berserk',
-                      'Find Person', 'Fire Field', 'Fire Wall', 'Fire Wave', 'Fireball', 'Firebomb', 'Flame Strike',
-                      'Food', 'Front Sweep', 'Great Energy Beam', 'Great Fireball', 'Great Light', 'Groundshaker',
-                      'Haste', 'Heal Friend', 'Heal Party', 'Heavy Magic Missile', 'Hells Core', 'Holy Flash',
-                      'Holy Missile', 'Ice Strike', 'Ice Wave', 'Icicle', 'Ignite', 'Inflict Wound', 'Intense Healing',
-                      'Intense Healing Rune', 'Intense Recovery', 'Intense Wound Cleansing', 'Invisibility', 'Levitate',
-                      'Light', 'Light Healing', 'Light Magic Missile', 'Lightning', 'Magic Rope', 'Magic Shield',
-                      'Magic Wall', 'Mass Healing', 'Paralyze', 'Physical Strike', 'Poison Bomb', 'Poison Field',
-                      'Poison Wall', 'Protect Party', 'Protector', 'Rage of the Skies', 'Recovery', 'Salvation',
+        spellOrder = {'Animate Dead', 'Annihilation', "Apprentice's Strike", 'Arrow Call', 'Avalanche', 'Berserk',
+                      'Blood Rage', 'Bruise Bane', 'Brutal Strike', 'Buzz', 'Cancel Invisibility', 'Challenge',
+                      'Chameleon', 'Charge', 'Chill Out', 'Conjure Arrow', 'Conjure Bolt', 'Conjure Explosive Arrow',
+                      'Conjure Piercing Bolt', 'Conjure Poisoned Arrow', 'Conjure Power Bolt', 'Conjure Sniper Arrow',
+                      'Convince Creature', 'Creature Illusion', 'Cure Bleeding', 'Cure Burning', 'Cure Curse',
+                      'Cure Electrification', 'Cure Poison', 'Cure Poison Rune', 'Curse', 'Death Strike',
+                      'Desintegrate', 'Destroy Field', 'Divine Caldera', 'Divine Healing', 'Divine Missile',
+                      'Electrify', 'Enchant Party', 'Enchant Spear', 'Enchant Staff', 'Energy Beam', 'Energy Field',
+                      'Energy Strike', 'Energy Wall', 'Energy Wave', 'Energybomb', 'Envenom', 'Eternal Winter',
+                      'Ethereal Spear', 'Explosion', 'Fierce Berserk', 'Find Person', 'Fire Field', 'Fire Wall',
+                      'Fire Wave', 'Fireball', 'Firebomb', 'Flame Strike', 'Food', 'Front Sweep', 'Great Energy Beam',
+                      'Great Fireball', 'Great Light', 'Groundshaker', 'Haste', 'Heal Friend', 'Heal Party',
+                      'Heavy Magic Missile', 'Hells Core', 'Holy Flash', 'Holy Missile', 'Ice Strike', 'Ice Wave',
+                      'Icicle', 'Ignite', 'Inflict Wound', 'Intense Healing', 'Intense Healing Rune', 'Intense Recovery',
+                      'Intense Wound Cleansing', 'Invisibility', 'Levitate', 'Light', 'Light Healing',
+                      'Light Magic Missile', 'Lightning', 'Magic Patch', 'Magic Rope', 'Magic Shield', 'Magic Wall',
+                      'Mass Healing', 'Mud Attack', 'Paralyze', 'Physical Strike', 'Poison Bomb', 'Poison Field',
+                      'Poison Wall', 'Practise Fire Wave', 'Practise Healing', 'Practise Magic Missile', 'Protect Party',
+                      'Protector', 'Rage of the Skies', 'Recovery', 'Salvation', 'Scorch',
                       'Sharpshooter', 'Soulfire', 'Stalagmite', 'Stone Shower', 'Strong Energy Strike',
                       'Strong Ethereal Spear', 'Strong Flame Strike', 'Strong Haste', 'Strong Ice Strike',
                       'Strong Ice Wave', 'Strong Terra Strike', 'Sudden Death', 'Summon Creature', 'Swift Foot',
@@ -110,7 +112,8 @@ SpellInfo = {
             level = 90,
             soul = 0,
             group = {
-                [1] = 4000
+                [1] = 4000,
+                [7] = 30000
             },
             parameter = false,
             vocations = {1, 5}
@@ -159,7 +162,8 @@ SpellInfo = {
             level = 100,
             soul = 0,
             group = {
-                [1] = 4000
+                [1] = 4000,
+                [7] = 30000
             },
             parameter = false,
             vocations = {1, 5}
@@ -255,7 +259,8 @@ SpellInfo = {
             level = 29,
             soul = 0,
             group = {
-                [1] = 2000
+                [1] = 2000,
+                [8] = 2000
             },
             parameter = false,
             vocations = {1, 5}
@@ -448,7 +453,8 @@ SpellInfo = {
             level = 55,
             soul = 0,
             group = {
-                [1] = 4000
+                [1] = 4000,
+                [6] = 40000
             },
             parameter = false,
             vocations = {1, 5}
@@ -480,7 +486,8 @@ SpellInfo = {
             level = 60,
             soul = 0,
             group = {
-                [1] = 4000
+                [1] = 4000,
+                [6] = 40000
             },
             parameter = false,
             vocations = {1, 5}
@@ -560,7 +567,8 @@ SpellInfo = {
             level = 60,
             soul = 0,
             group = {
-                [1] = 4000
+                [1] = 4000,
+                [6] = 40000
             },
             parameter = false,
             vocations = {2, 6}
@@ -609,7 +617,8 @@ SpellInfo = {
             level = 100,
             soul = 0,
             group = {
-                [1] = 4000
+                [1] = 4000,
+                [7] = 30000
             },
             parameter = false,
             vocations = {2, 6}
@@ -706,7 +715,8 @@ SpellInfo = {
             level = 90,
             soul = 0,
             group = {
-                [1] = 4000
+                [1] = 4000,
+                [7] = 30000
             },
             parameter = false,
             vocations = {2, 6}
@@ -738,7 +748,8 @@ SpellInfo = {
             level = 55,
             soul = 0,
             group = {
-                [1] = 4000
+                [1] = 4000,
+                [6] = 40000
             },
             parameter = false,
             vocations = {2, 6}
@@ -1138,8 +1149,8 @@ SpellInfo = {
             level = 55,
             soul = 0,
             group = {
-                [1] = 10000,
-                [3] = 2000
+                [3] = 2000,
+                [6] = 10000
             },
             parameter = false,
             vocations = {3, 7}
@@ -1251,8 +1262,8 @@ SpellInfo = {
             level = 60,
             soul = 0,
             group = {
-                [2] = 10000,
-                [3] = 10000
+                [3] = 2000,
+                [6] = 10000
             },
             parameter = false,
             vocations = {3, 7}
@@ -1268,8 +1279,8 @@ SpellInfo = {
             level = 55,
             soul = 0,
             group = {
-                [1] = 10000,
-                [3] = 2000
+                [3] = 2000,
+                [6] = 2000
             },
             parameter = false,
             vocations = {4, 8}
@@ -1285,7 +1296,8 @@ SpellInfo = {
             level = 60,
             soul = 0,
             group = {
-                [3] = 2000
+                [3] = 2000,
+                [6] = 2000
             },
             parameter = false,
             vocations = {4, 8}
@@ -2057,7 +2069,610 @@ SpellInfo = {
             },
             parameter = false,
             vocations = {3, 7}
-        }
+        },
+
+    -- fixed spells from OTCv8, version 11.40.5
+        ['Summon Paladin Familiar'] = {
+            id = 195,
+            words = 'utevo gran res sac',
+            exhaustion = 1800000,
+            premium = true,
+            type = 'Instant',
+            icon = 'summonpaladinfamiliar',
+            mana = 2000,
+            level = 200,
+            soul = 0,
+            group = {
+                [3] = 2000
+            },
+            vocations = {3, 7}
+        },
+        ['Summon Knight Familiar'] = {
+            id = 194,
+            words = 'utevo gran res eq',
+            exhaustion = 1800000,
+            premium = true,
+            type = 'Instant',
+            icon = 'summonknightfamiliar',
+            mana = 1000,
+            level = 200,
+            soul = 0,
+            group = {
+                [3] = 2000
+            },
+            vocations = {4, 8}
+        },
+        ['Summon Druid Familiar'] = {
+            id = 197,
+            words = 'utevo gran res dru',
+            exhaustion = 1800000,
+            premium = true,
+            type = 'Instant',
+            icon = 'summondruidfamiliar',
+            mana = 3000,
+            level = 200,
+            soul = 0,
+            group = {
+                [3] = 2000
+            },
+            vocations = {2, 6}
+        },
+        ['Summon Sorcerer Familiar'] = {
+            id = 196,
+            words = 'utevo gran res ven',
+            exhaustion = 1800000,
+            premium = true,
+            type = 'Instant',
+            icon = 'summonsorcererfamiliar',
+            mana = 3000,
+            level = 200,
+            soul = 0,
+            group = {
+                [3] = 2000
+            },
+            vocations = {1, 5}
+        },
+        ['Chivalrous Challenge'] = {
+            id = 237,
+            words = "exeta amp res",
+            exhaustion = 2000,
+            premium = true,
+            type = 'Instant',
+            icon = 'chivalrouschallange',
+            mana = 80,
+            level = 150,
+            soul = 0,
+            group = {
+                [3] = 2000
+            },
+            vocations = {4, 8}
+        },
+        ['Fair Wound Cleansing'] = {
+            id = 239,
+            words = 'exura med ico',
+            exhaustion = 1000,
+            premium = true,
+            type = 'Instant',
+            icon = 'fairwoundcleansing',
+            mana = 90,
+            level = 300,
+            soul = 0,
+            group = {
+                [2] = 1000
+            },
+            vocations = {4, 8}
+        },
+        ['Conjure Wand of Darkness'] = {
+            id = 92,
+            words = 'exevo gran mort',
+            exhaustion = 1800000,
+            premium = true,
+            type = 'Conjure',
+            icon = 'conjurewandofdarkness',
+            mana = 250,
+            level = 41,
+            soul = 0,
+            group = {
+                [3] = 2000
+            },
+            vocations = {5}
+        },
+        ['Expose Weakness'] = {
+            id = 243,
+            words = 'exori moe',
+            exhaustion = 12000,
+            premium = true,
+            type = 'Instant',
+            icon = 'exposeweakness',
+            mana = 400,
+            level = 275,
+            soul = 0,
+            group = {
+                [3] = 2000,
+                [5] = 12000
+            },
+            vocations = {1, 5}
+        },
+        ['Sap Strenght'] = {
+            id = 244,
+            words = 'exori kor',
+            exhaustion = 12000,
+            premium = true,
+            type = 'Instant',
+            icon = 'sapstrenght',
+            mana = 300,
+            level = 175,
+            soul = 0,
+            group = {
+                [3] = 2000,
+                [5] = 12000
+            },
+            vocations = {1, 5}
+        },
+        ['Great Fire Wave'] = {
+            id = 240,
+            words = 'exevo gran flam hur',
+            exhaustion = 4000,
+            premium = true,
+            type = 'Instant',
+            icon = 'greatfirewave',
+            mana = 120,
+            level = 38,
+            soul = 0,
+            group = {
+                [1] = 2000
+            },
+            vocations = {1, 5}
+        },
+        ['Restoration'] = {
+            id = 241,
+            words = "exura max vita",
+            exhaustion = 6000,
+            premium = true,
+            type = 'Instant',
+            icon = 'restoration',
+            mana = 260,
+            level = 300,
+            soul = 0,
+            group = {
+                [2] = 1000
+            },
+            vocations = {1, 2, 5, 6}
+        },
+        ["Nature's Embrace"] = {
+            id = 242,
+            words = 'exura gran sio',
+            exhaustion = 60000,
+            premium = true,
+            type = 'Instant',
+            icon = 'naturesembrace',
+            mana = 400,
+            level = 275,
+            soul = 0,
+            group = {
+                [2] = 1000
+            },
+            vocations = {2, 6},
+            parameter = true
+        },
+        ['Divine Dazzle'] = {
+            id = 238,
+            words = 'exana amp res',
+            exhaustion = 16000,
+            premium = true,
+            type = 'Instant',
+            icon = 'divinedazzle',
+            mana = 80,
+            level = 250,
+            soul = 0,
+            group = {
+                [3] = 2000
+            },
+            vocations = {7}
+        },
+    -- /fixed spells from OTCv8, version 11.40.5
+
+    -- spells from version 9.80
+        ["Practise Healing"] = {
+            id = 166,
+            words = 'exura dis',
+            exhaustion = 1000,
+            premium = false,
+            type = 'Instant',
+            icon = 'practisehealing',
+            mana = 5,
+            level = 1,
+            soul = 0,
+            group = {
+                [2] = 1000
+            },
+            vocations = {0}
+        },
+        ["Practise Fire Wave"] = {
+            id = 167,
+            words = 'exevo dis flam hur',
+            exhaustion = 4000,
+            premium = false,
+            type = 'Instant',
+            icon = 'practisefirewave',
+            mana = 5,
+            level = 1,
+            soul = 0,
+            group = {
+                [1] = 2000
+            },
+            vocations = {0}
+        },
+        ["Practise Magic Missile"] = {
+            id = 168,
+            words = 'adori dis min vis',
+            exhaustion = 2000,
+            premium = false,
+            type = 'Conjure',
+            icon = 'practisemagicmissile',
+            mana = 5,
+            level = 1,
+            soul = 0,
+            group = {
+                [3] = 2000
+            },
+            vocations = {0}
+        },
+        ["Apprentice's Strike"] = {
+            id = 169,
+            words = 'exori min flam',
+            exhaustion = 2000,
+            premium = false,
+            type = 'Instant',
+            icon = 'apprenticesstrike',
+            mana = 6,
+            level = 8,
+            soul = 0,
+            group = {
+                [1] = 2000
+            },
+            vocations = {1, 2, 5, 6}
+        },
+ 
+    -- /spells from version 9.80
+
+    -- spells from version 10.55
+        ["Mud Attack"] = {
+            id = 172,
+            words = 'exori infir tera',
+            exhaustion = 2000,
+            premium = false,
+            type = 'Instant',
+            icon = 'mudattack',
+            mana = 6,
+            level = 1,
+            soul = 0,
+            group = {
+                [1] = 2000
+            },
+            vocations = {2, 6}
+        },
+        ["Chill Out"] = {
+            id = 173,
+            words = 'exevo infir frigo hur',
+            exhaustion = 4000,
+            premium = false,
+            type = 'Instant',
+            icon = 'chillout',
+            mana = 8,
+            level = 1,
+            soul = 0,
+            group = {
+                [1] = 2000
+            },
+            vocations = {2, 6}
+        },
+        ["Magic Patch"] = {
+            id = 174,
+            words = 'exura infir',
+            exhaustion = 1000,
+            premium = false,
+            type = 'Instant',
+            icon = 'magicpatch',
+            mana = 6,
+            level = 1,
+            soul = 0,
+            group = {
+                [2] = 1000
+            },
+            vocations = {1,2, 3, 5, 6, 7}
+        },
+        ["Bruise Bane"] = {
+            id = 175,
+            words = 'exura infir ico',
+            exhaustion = 1000,
+            premium = false,
+            type = 'Instant',
+            icon = 'bruisebane',
+            mana = 10,
+            level = 1,
+            soul = 0,
+            group = {
+                [2] = 1000
+            },
+            vocations = {4, 8}
+        },
+        ["Arrow Call"] = {
+            id = 176,
+            words = 'exevo infir con',
+            exhaustion = 2000,
+            premium = false,
+            type = 'Conjure',
+            icon = 'arrowcall',
+            mana = 10,
+            level = 1,
+            soul = 0,
+            group = {
+                [3] = 2000
+            },
+            vocations = {3, 7}
+        },
+        ["Buzz"] = {
+            id = 177,
+            words = 'exori infir vis',
+            exhaustion = 2000,
+            premium = false,
+            type = 'Instant',
+            icon = 'buzz',
+            mana = 6,
+            level = 1,
+            soul = 0,
+            group = {
+                [1] = 2000
+            },
+            vocations = {1, 5}
+        },
+        ["Scorch"] = {
+            id = 178,
+            words = 'exevo infir flam hur',
+            exhaustion = 4000,
+            premium = false,
+            type = 'Instant',
+            icon = 'scorch',
+            mana = 8,
+            level = 1,
+            soul = 0,
+            group = {
+                [1] = 2000
+            },
+            vocations = {1, 5}
+        },
+    -- /spells from version 10.55
+
+
+    -- spells from version 11.40.5.409 - removed in new version
+        ["Conjure Diamond Arrow"] = {
+            id = 192,
+            words = 'exevo gran con hur',
+            exhaustion = 600000,
+            premium = true,
+            type = 'Conjure',
+            icon = 'conjurediamondarrow',
+            mana = 1000,
+            level = 150,
+            soul = 0,
+            group = {
+                [3] = 2000
+--                conjure = 600000
+            },
+            vocations = {7}
+        },
+        ["Conjure Spectral Bolt"] = {
+            id = 193,
+            words = 'exevo gran con vis',
+            exhaustion = 600000,
+            premium = true,
+            type = 'Conjure',
+            icon = 'conjurespectralbolt',
+            mana = 1000,
+            level = 150,
+            soul = 0,
+            group = {
+                [3] = 2000
+--                conjure = 600000
+            },
+            vocations = {7}
+        },
+ 
+    -- /spells from version 11.40.5.409 - removed in new version
+
+    -- spells from version 12.80.11430
+        ["Find Fiend"] = {
+            id = 20,
+            words = 'exiva moe res',
+            exhaustion = 2000,
+            premium = false,
+            type = 'Instant',
+            icon = 'findfiend',
+            mana = 20,
+            level = 25,
+            soul = 0,
+            group = {
+                [3] = 2000
+            },
+            vocations = {1, 2, 3, 4, 5, 6, 7, 8}
+        },
+    -- /spells from version 12.80.11430
+
+    -- spells from version 13.10.12852
+--[[
+        -- adjust tfs id
+        ["Avatar of Light"] = {
+            id = __TFS_ID__, -- fix me
+            words = 'uteta res ven',
+            exhaustion = 7200000,
+            premium = true,
+            type = 'Instant',
+            icon = 'avataroflight',
+            mana = 1500,
+            level = 300,
+            soul = 0,
+            group = {
+                [3] = 2000
+            },
+            vocations = {7}
+        },
+        ["Avatar of Nature"] = {
+            id = __TFS_ID__, -- fix me
+            words = 'uteta res dru',
+            exhaustion = 7200000,
+            premium = true,
+            type = 'Instant',
+            icon = 'avatarofnature',
+            mana = 2200,
+            level = 300,
+            soul = 0,
+            group = {
+                [3] = 2000
+            },
+            vocations = {6}
+        },
+        ["Avatar of Steel"] = {
+            id = __TFS_ID__, -- fix me
+            words = 'uteta res eq',
+            exhaustion = 7200000,
+            premium = true,
+            type = 'Instant',
+            icon = 'avatarofsteel',
+            mana = 800,
+            level = 300,
+            soul = 0,
+            group = {
+                [3] = 2000
+            },
+            vocations = {8}
+        },
+        ["Avatar of Storm"] = {
+            id = __TFS_ID__, -- fix me
+            words = 'uteta res ven',
+            exhaustion = 7200000,
+            premium = true,
+            type = 'Instant',
+            icon = 'avatarofstorm',
+            mana = 2200,
+            level = 300,
+            soul = 0,
+            group = {
+                [3] = 2000
+            },
+            vocations = {5}
+        },
+        ["Divine Empowerment"] = {
+            id = __TFS_ID__, -- fix me
+            words = 'utevo grav san',
+            exhaustion = 32000,
+            premium = true,
+            type = 'Instant',
+            icon = 'divineempowerment',
+            mana = 500,
+            level = 300,
+            soul = 0,
+            group = {
+                [3] = 2000
+            },
+            vocations = {7}
+        },
+        ["Divine Grenade"] = {
+            id = __TFS_ID__, -- fix me
+            words = 'exevo tempo mas san',
+            exhaustion = 26000,
+            premium = true,
+            type = 'Instant',
+            icon = 'divinegrenade',
+            mana = 160,
+            level = 300,
+            soul = 0,
+            group = {
+                [1] = 2000
+            },
+            vocations = {7}
+        },
+        ["Executioner's Throw"] = {
+            id = __TFS_ID__, -- fix me
+            words = 'exori amp kor',
+            exhaustion = 18000,
+            premium = true,
+            type = 'Instant',
+            icon = 'executionersthrow',
+            mana = 225,
+            level = 300,
+            soul = 0,
+            group = {
+                [1] = 2000
+            },
+            vocations = {8}
+        },
+        ["Gift of Life"] = {
+            id = __TFS_ID__, -- fix me
+            words = '? ? ?', -- there is no words
+            exhaustion = 108000000,
+            premium = true,
+            type = 'Instant',
+            icon = 'giftoflife',
+            mana = 0,
+            level = 300,
+            soul = 0,
+            group = {
+                [2] = 0
+            },
+            vocations = {5, 6, 7, 8}
+        },
+        ["Great Death Beam"] = {
+            id = __TFS_ID__, -- fix me
+            words = 'exevo max mort',
+            exhaustion = 10000,
+            premium = true,
+            type = 'Instant',
+            icon = 'greatdeathbeam',
+            mana = 140,
+            level = 300,
+            soul = 0,
+            group = {
+                [1] = 2000,
+                [8] = 6000
+            },
+            vocations = {5}
+        },
+        ["Ice Burst"] = {
+            id = __TFS_ID__, -- fix me
+            words = 'exevo ulus frigo',
+            exhaustion = 22000,
+            premium = true,
+            type = 'Instant',
+            icon = 'iceburst',
+            mana = 230,
+            level = 300,
+            soul = 0,
+            group = {
+                [1] = 2000,
+                [9] = 6000
+            },
+            vocations = {6}
+        },
+        ["Terra Burst"] = {
+            id = __TFS_ID__, -- fix me
+            words = 'exevo ulus tera',
+            exhaustion = 22000,
+            premium = true,
+            type = 'Instant',
+            icon = 'terraburst',
+            mana = 230,
+            level = 300,
+            soul = 0,
+            group = {
+                [1] = 2000,
+                [9] = 6000
+            },
+            vocations = {6}
+        },
+    -- /spells from version 13.10.12852
+]]
+
     } --[[,
   ['Custom'] = {
     ['Chain Lighting'] =           {id = 1, words = 'exori chain vis',        description = 'Chained attack pattern lightning strike.',                     exhaustion = 2000,  premium = false, type = 'Instant', icon = 1,  mana = 650,  level = 90, soul = 0, group = {[1] = 2000}, vocations = {5}},
@@ -2074,6 +2689,52 @@ SpellInfo = {
 -- ['const_name'] =       {client_id, TFS_id}
 -- Conversion from TFS icon id to the id used by client (icons.png order)
 SpellIcons = {
+--[[
+    ['terraburst'] = {164, __TFS_ID__},
+    ['iceburst'] = {163, __TFS_ID__},
+    ['greatdeathbeam'] = {162, __TFS_ID__},
+    ['giftoflife'] = {161, __TFS_ID__},
+    ['executionersthrow'] = {160, __TFS_ID__},
+    ['divinegrenade'] = {159, __TFS_ID__},
+    ['divineempowerment'] = {158, __TFS_ID__},
+    ['avatarofstorm'] = {157, __TFS_ID__},
+    ['avatarofsteel'] = {156, __TFS_ID__},
+    ['avatarofnature'] = {155, __TFS_ID__},
+    ['avataroflight'] = {154, __TFS_ID__},
+]]
+    ['conjurewandofdarkness'] = {133, 92},
+    ['findfiend'] = {153, 20},
+
+    ['sapstrenght'] = {135, 244},
+    ['exposeweakness'] = {134, 243},
+    ["naturesembrace"] = {138, 242},
+    ['restoration'] = {137, 241},
+    ['greatfirewave'] = {136, 240},
+    ['fairwoundcleansing'] = {132, 239},
+    ['divinedazzle'] = {139, 238},
+    ['chivalrouschallange'] = {131, 237},
+
+    ['summondruidfamiliar'] = {129, 197},
+    ['summonsorcererfamiliar'] = {130, 196},
+    ['summonpaladinfamiliar'] = {127, 195},
+    ['summonknightfamiliar'] = {128, 194},
+
+    ['conjurespectralbolt'] = {152, 193},
+    ['conjurediamondarrow'] = {151, 192},
+
+    ['scorch'] = {150, 178},
+    ['buzz'] = {149, 177},
+    ['arrowcall'] = {148, 176},
+    ['bruisebane'] = {147, 175},
+    ['magicpatch'] = {146, 174},
+    ['chillout'] = {145, 173},
+    ['mudattack'] = {144, 172},
+
+    ['apprenticesstrike'] = {143, 169},
+    ['practisemagicmissile'] = {142, 168},
+    ['practisefirewave'] = {141, 167},
+    ['practisehealing'] = {140, 166},
+
     ['intenserecovery'] = {16, 160},
     ['recovery'] = {15, 159},
     ['intensewoundcleansing'] = {4, 158},
@@ -2214,6 +2875,7 @@ SpellIcons = {
 }
 
 VocationNames = {
+    [0] = 'None',
     [1] = 'Sorcerer',
     [2] = 'Druid',
     [3] = 'Paladin',
@@ -2228,7 +2890,12 @@ SpellGroups = {
     [1] = 'Attack',
     [2] = 'Healing',
     [3] = 'Support',
-    [4] = 'Special'
+    [4] = 'Special',
+    [5] = 'Crippling',
+    [6] = 'Focus',
+    [7] = 'Ultimate Strikes',
+    [8] = 'Great Beams',
+    [9] = 'Bursts of Nature'
 }
 
 Spells = {}
