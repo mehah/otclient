@@ -131,8 +131,11 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
     if (isDead() || !canBeSeen() || !(drawFlags & Otc::DrawCreatureInfo) || !mapRect.isInRange(m_position))
         return;
 
+    const auto displacementX = g_game.getFeature(Otc::GameNegativeOffset) ? 0 : getDisplacementX();
+    const auto displacementY = g_game.getFeature(Otc::GameNegativeOffset) ? 0 : getDisplacementY();
+
     const auto& parentRect = mapRect.rect;
-    const auto& creatureOffset = Point(16 - getDisplacementX(), -getDisplacementY() - 2) + getDrawOffset();
+    const auto& creatureOffset = Point(16 - displacementX, -displacementY - 2) + getDrawOffset();
 
     Point p = dest - mapRect.drawOffset;
     p += (creatureOffset - Point(std::round(m_jumpOffset.x), std::round(m_jumpOffset.y))) * mapRect.scaleFactor;
@@ -565,8 +568,11 @@ void Creature::updateWalkingTile()
     // determine new walking tile
     TilePtr newWalkingTile;
 
-    const Rect virtualCreatureRect(g_gameConfig.getSpriteSize() + (m_walkOffset.x - getDisplacementX()),
-        g_gameConfig.getSpriteSize() + (m_walkOffset.y - getDisplacementY()),
+    const auto displacementX = g_game.getFeature(Otc::GameNegativeOffset) ? 0 : getDisplacementX();
+    const auto displacementY = g_game.getFeature(Otc::GameNegativeOffset) ? 0 : getDisplacementY();
+
+    const Rect virtualCreatureRect(g_gameConfig.getSpriteSize() + (m_walkOffset.x - displacementX),
+        g_gameConfig.getSpriteSize() + (m_walkOffset.y - displacementY),
         g_gameConfig.getSpriteSize(), g_gameConfig.getSpriteSize());
 
     for (int xi = -1; xi <= 1 && !newWalkingTile; ++xi) {
