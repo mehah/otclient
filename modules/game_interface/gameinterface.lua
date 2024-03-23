@@ -90,14 +90,27 @@ function init()
     rightDecreaseSidePanels:setEnabled(modules.client_options.getOption('showRightExtraPanel'))
 
     panelsList = { {
-        panel = gameRightPanel
+        panel = gameRightPanel,
+        checkbox = gameRootPanel:getChildById('gameSelectRightColumn')
     }, {
-        panel = gameRightExtraPanel
+        panel = gameRightExtraPanel,
+        checkbox = gameRootPanel:getChildById('gameSelectRightExtraColumn')
     }, {
-        panel = gameLeftPanel
+        panel = gameLeftPanel,
+        checkbox = gameRootPanel:getChildById('gameSelectLeftColumn')
     },{
-        panel = gameLeftExtraPanel
+        panel = gameLeftExtraPanel,
+        checkbox = gameRootPanel:getChildById('gameSelectLeftExtraColumn')
     } }
+
+    panelsRadioGroup = UIRadioGroup.create()
+    for k, v in pairs(panelsList) do
+        panelsRadioGroup:addWidget(v.checkbox)
+        connect(v.checkbox, {
+            onCheckChange = onSelectPanel
+        })
+    end
+    panelsRadioGroup:selectWidget(panelsList[1].checkbox)
 
     logoutButton = modules.client_topmenu.addTopRightToggleButton('logoutButton', tr('Exit'), '/images/topbuttons/logout',
         tryLogout, true)
@@ -228,6 +241,12 @@ function terminate()
         onLoginAdvice = onLoginAdvice
     })
 
+    for k, v in pairs(panelsList) do
+        disconnect(v.checkbox, {
+            onCheckChange = onSelectPanel
+        })
+    end
+    
     logoutButton:destroy()
     gameRootPanel:destroy()
 end
@@ -1095,7 +1114,16 @@ function moveStackableItem(item, toPos)
 
     modules.game_hotkeys.enableHotkeys(false)
 end
-
+function onSelectPanel(self, checked)
+    if checked then
+        for k, v in pairs(panelsList) do
+            if v.checkbox == self then
+                gameSelectedPanel = v.panel
+                break
+            end
+        end
+    end
+end
 function getRootPanel()
     return gameRootPanel
 end

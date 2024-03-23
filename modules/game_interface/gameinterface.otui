@@ -119,6 +119,26 @@ UIWidget
       width: 0
       visible: false
 
+  SelectColumnButton
+    id: gameSelectLeftColumn
+    anchors.right: gameLeftPanel.right
+    anchors.bottom: gameLeftPanel.bottom
+
+  SelectColumnButton
+    id: gameSelectRightColumn
+    anchors.right: gameRightPanel.right
+    anchors.bottom: gameRightPanel.bottom
+
+  SelectColumnButton
+    id: gameSelectRightExtraColumn
+    anchors.right: gameRightExtraPanel.right
+    anchors.bottom: gameRightExtraPanel.bottom
+    
+  SelectColumnButton
+    id: gameSelectLeftExtraColumn
+    anchors.right: gameLeftExtraPanel.right
+    anchors.bottom: gameLeftExtraPanel.bottom
+
   Splitter
     id: bottomSplitter
     anchors.left: gameLeftExtraPanel.right
