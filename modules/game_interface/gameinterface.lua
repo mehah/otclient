@@ -1163,6 +1163,13 @@ end
 function getShowTopMenuButton()
     return showTopMenuButton
 end
+function getGameTopStatsBar()
+    return gameTopPanel
+end
+
+function getGameMapPanel()
+    return gameMapPanel
+end
 
 function findContentPanelAvailable(child, minContentHeight)
     if gameSelectedPanel and gameSelectedPanel:isVisible() and gameSelectedPanel:fits(child, minContentHeight, 0) >= 0 then
@@ -1268,13 +1275,6 @@ function limitZoom()
     limitedZoom = true
 end
 
-function getGameTopStatsBar()
-    return gameTopPanel
-end
-
-function getGameMapPanel()
-    return gameMapPanel
-end
 
 function setStatsBarOption(dimension, placement)
     StatsBar.setStatsBarOption(dimension, placement)
