@@ -1,56 +1,58 @@
 # New Layout OTC Client
+
 New layout based on tibia 13
 
+## Demo
+
+https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
+
 ## Screenshots
+
 ![image](https://github.com/Nottinghster/otclient/assets/114332266/e15b7533-4a85-44f9-b9f9-9c0430411332)
 ![image](https://github.com/Nottinghster/otclient/assets/114332266/a591a4c2-0604-4427-aea1-6394b245ea8f)
-
-
 
 ## Features
 
 - Layout tibia 13
-- Calendar 
+- Calendar
 - Outfit windows 13 soon
--  ...
-
+- ...
 
 ## Current bugs
-  - [ ] **Game_mainpanel.** compatibility with extended view #7
-  - [ ] **Game_entergame** MOTD old protocol
-  - [ ] **Game_entergame** problems with token label when no cache, (first open client)
-  - [ ] **Game_topmenu** missing Boton  "manager account", "manager clients"
-  - [ ] **game_Console** preventing the cursor from appearing when starting to write.
-  - [ ] **Game_mainpanel** fix function inventoryController:onTerminate()
-  - [ ] **Game_mainpanel** Hide icon "bless" in minize panel for old protocole
-  - [ ] **Game_mainpanel**  Inventario fix ico state
-  - [ ] **Game_outfit**  SOON
-  - [ ] **Game_mainpanel** (inventary) Fix Ico game skills like clipsof
-  - [ ] **Game_bot** Fix width mini windows bot
-  - [ ] **Game_bot** get the slot5 requested by quiver_label and quiver_manager
-  - [ ] **Game_topMenu** (onStatesChange) icons state 
-  - [ ] **Game_mainpanel** Missing UI of tibia 13 ( close , minimize , scroll)
-  - [ ] **Characterlist** Add checkbox "show outift" button
-  - [ ] **Client_bottom** default information if array services is not enabled
 
+- [x] **Game_topmenu.** fix: Fps and ping
+- [x] **Game_Console** fix: preventing the text cursor from appearing when starting to write.
+- [ ] **Game_mainpanel.** compatibility with extended view #7
+- [ ] **Game_entergame** MOTD old protocol
+- [ ] **Game_entergame** problems with token label when no cache, (first open client)
+- [ ] **Game_topmenu** missing Boton "manager account", "manager clients"
+- [ ] **Game_mainpanel** fix function inventoryController:onTerminate()
+- [ ] **Game_mainpanel** Hide icon "bless" in minize panel for old protocole
+- [ ] **Game_mainpanel** Inventario fix ico state
+- [ ] **Game_outfit** of tibia 13 SOON
+- [ ] **Game_mainpanel** (inventary) Fix Ico game skills like clipsof
+- [ ] **Game_bot** Fix width mini windows bot
+- [ ] **Game_bot** get the slot5 requested by quiver_label and quiver_manager
+- [ ] **Game_topMenu** (onStatesChange) icons state
+- [ ] **Game_mainpanel** Missing UI of tibia 13 ( close , minimize , scroll)
+- [ ] **Characterlist** Add checkbox "show outift" button
+- [ ] **Client_bottom** default information if array services is not enabled
+- [ ] **game_containers** Panel nil L161
+- [ ] **corelib/ui/uiminiwindows** "droppedWidget" nil L224
 
 ## Overall Status
-
-
 
 <details>
 <summary>Overall Status</summary>
 
-
 ![](https://geps.dev/progress/100) = compatibility terminated
- 
-![](https://geps.dev/progress/99) = unmodified,  test require
+
+![](https://geps.dev/progress/99) = unmodified, test require
 
 ![](https://geps.dev/progress/0) = not reviewed yet
 
+---
 
-
-----------------------------------------------------------------
 ## ./modules
 
 ![](https://geps.dev/progress/99) client `--unmodified, test required`
@@ -71,7 +73,7 @@ New layout based on tibia 13
 
 ![](https://geps.dev/progress/99) client_terminal `--unmodified, test required`
 
-![](https://geps.dev/progress/90) client_topmenu 
+![](https://geps.dev/progress/90) client_topmenu
 
 ![](https://geps.dev/progress/0) corelib
 
@@ -117,7 +119,7 @@ New layout based on tibia 13
 
 ![](https://geps.dev/progress/0) game_playertrade `--unmodified, test required`
 
-![](https://geps.dev/progress/0) game_prey **1
+![](https://geps.dev/progress/0) game_prey \*\*1
 
 ![](https://geps.dev/progress/99) game_questlog `--unmodified, test required`
 
@@ -139,19 +141,17 @@ New layout based on tibia 13
 
 ![](https://geps.dev/progress/99) game_things `--unmodified, test required`
 
-![](https://geps.dev/progress/99) game_unjustifiedpoints `--unmodified, test required` **1
+![](https://geps.dev/progress/99) game_unjustifiedpoints `--unmodified, test required` \*\*1
 
-![](https://geps.dev/progress/99) game_viplist `--unmodified, test required` **1
+![](https://geps.dev/progress/99) game_viplist `--unmodified, test required` \*\*1
 
 ![](https://geps.dev/progress/99) startup
 
 ![](https://geps.dev/progress/99) updater `--unmodified, test required`
+
 </details>
 
-
-
 ## Detailed Module Analysis
-
 
 <details>
 ### client
@@ -495,10 +495,10 @@ New layout based on tibia 13
   - [ ] Issue
   - [ ] Issue
 
-
 ## MOD
-![](https://geps.dev/progress/90) 
-----------------------------------------------------------------
+
+## ![](https://geps.dev/progress/90)
+
 ### ./Mod/bot
 
 - Status: Incomplete
@@ -506,79 +506,83 @@ New layout based on tibia 13
   - [ ] Issue: Fix width mini windows
   - [ ] Issue: get the slot5 requested by quiver_label and quiver_manager
 
-
-
 ## Data
 
-----------------------------------------------------------------
+---
+
 ### ./data/images
-![](https://geps.dev/progress/80) 
+
+![](https://geps.dev/progress/80)
+
 - Status: Incomplete
 - Bugs:
   - [ ] Issue: Fix Bot icon top menu
-  - [ ] Issue fix: icons state 
+  - [ ] Issue fix: icons state
   - [ ] close , minimize , scroll ico
 
 ### ./data/Style
-![](https://geps.dev/progress/0) 
+
+![](https://geps.dev/progress/0)
+
 - Status: Incomplete
 - Bugs:
-  - [ ] Issue: 
+  - [ ] Issue:
   - [ ] Issue
-
 
 </details>
 
-
-
-
 ## FAQ
 
-### **what is game_mainpanel ? **
+### **1.- what is game_mainpanel ?**
+
 ![image](https://github.com/Nottinghster/otclient/assets/114332266/01f7493e-de73-4a03-9c75-5c25f3f1493a)
 
-Une inventory , minimap, combat control
+union inventory , minimap, combat control
 
-### **where is minimap ?**
-
-game_mainpanel LXX
-
-### **where is inventary ?**
+### **2.- where is minimap ?**
 
 game_mainpanel LXX
 
-### **what is client_bottommenu ?**
+### **3.-where is inventary ?**
+
+game_mainpanel LXX
+
+### **4.- what is client_bottommenu ?**
 
 ![image](https://github.com/Nottinghster/otclient/assets/114332266/19928bf5-76d5-4cfd-a43a-8514a024daf6)
 
-
 > note test in : uniServer Z php version 82
-### **client_topmenu**
 
-New function
+### **5.- I have problems with bottons of my custom modules**
+
+old function
 
     modules.client_topmenu.addRightGameToggleButton
-to
-    
+
+new function
+
     modules.game_mainpanel.addToggleButton
 
 ![image](https://github.com/Nottinghster/otclient/assets/114332266/2891f3fe-524d-4cae-8bd3-272e1607b1d6)
 
+### **6.- why is this not displayed ?**
 
-### **why is this not displayed ?**
 ![image](https://github.com/Nottinghster/otclient/assets/114332266/d1104f03-1726-4c25-9698-84c465369514)
 ![image](https://github.com/Nottinghster/otclient/assets/114332266/3fdad239-963c-4464-a811-3cfde41b8938)
 ![image](https://github.com/Nottinghster/otclient/assets/114332266/532cd93e-f589-4f3e-ac58-94d45c4fcd58)
 
+activate the array "Services.status" in init.lua
 
-activate the array "Services" in init.lua
-put this ./otclient/tools/api/status.php
+and put this
+
+`./otclient/tools/api/status.php`
+
 in your
-C:/UniServerZ/www/api/
 
-----------------------------------------------------------------
+`C:/UniServerZ/www/api/`
 
+---
 
 ## Author
 
-- @  marcosvf132
+- @ marcosvf132
