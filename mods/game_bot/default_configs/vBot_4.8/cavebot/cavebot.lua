@@ -255,12 +255,12 @@ end
 
 function rpairs(t)
   test()
-	return function(t, i)
-		i = i - 1
-		if i ~= 0 then
-			return i, t[i]
-		end
-	end, t, #t + 1
+    return function(t, i)
+        i = i - 1
+        if i ~= 0 then
+            return i, t[i]
+        end
+    end, t, #t + 1
 end
 
 CaveBot.gotoFirstPreviousReachableWaypoint = function()

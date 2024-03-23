@@ -99,6 +99,7 @@ namespace Proto
         GameServerCreateContainer = 112,
         GameServerChangeInContainer = 113,
         GameServerDeleteInContainer = 114,
+        GameServerItemDetail = 118,
         GameServerSetInventory = 120,
         GameServerDeleteInventory = 121,
         GameServerOpenNpcTrade = 122,
@@ -113,6 +114,7 @@ namespace Proto
         GameServerMissleEffect = 133, // Anthem on 13.x
         GameServerItemClasses = 134,
         GameServerTrappers = 135,
+        GameServerCreatureData = 139,
         GameServerCreatureHealth = 140,
         GameServerCreatureLight = 141,
         GameServerCreatureOutfit = 142,

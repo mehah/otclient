@@ -82,7 +82,7 @@ namespace Proto
             messageModesMap[Otc::MessageBeyondLast] = 44;
             messageModesMap[Otc::MessageAttention] = 48;
             messageModesMap[Otc::MessageBoostedCreature] = 49;
-            messageModesMap[Otc::MessageOfflineTrainning] = 50;
+            messageModesMap[Otc::MessageOfflineTraining] = 50;
             messageModesMap[Otc::MessageTransaction] = 51;
             messageModesMap[Otc::MessagePotion] = 52;
         } else if (version >= 1041) {
