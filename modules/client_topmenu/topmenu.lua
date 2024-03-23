@@ -302,6 +302,6 @@ function toggle()
         modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'parent', AnchorTop)
     else
         menu:show()
-        modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'topMenu', AnchorBottom)
+        modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'topMenu', AnchorTop)
     end
 end
