@@ -99,6 +99,7 @@ public:
     void sendRefreshContainer(int containerId);
     void sendRequestOutfit();
     void sendChangeOutfit(const Outfit& outfit);
+    void sendTyping(bool typing);
     void sendMountStatus(bool mount);
     void sendAddVip(const std::string_view name);
     void sendRemoveVip(uint32_t playerId);
@@ -180,6 +181,7 @@ private:
     void parseDeath(const InputMessagePtr& msg);
     void parseFloorDescription(const InputMessagePtr& msg);
     void parseMapDescription(const InputMessagePtr& msg);
+    void parseCreatureTyping(const InputMessagePtr& msg);
     void parseMapMoveNorth(const InputMessagePtr& msg);
     void parseMapMoveEast(const InputMessagePtr& msg);
     void parseMapMoveSouth(const InputMessagePtr& msg);

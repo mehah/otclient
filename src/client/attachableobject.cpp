@@ -39,9 +39,9 @@ extern ParticleManager g_particles;
 
 AttachableObject::~AttachableObject()
 {
-    clearAttachedEffects();
+    clearAttachedEffects(false);
     clearAttachedParticlesEffect();
-    clearAttachedWidgets();
+    clearAttachedWidgets(false);
 }
 
 void AttachableObject::attachEffect(const AttachedEffectPtr& obj)
@@ -93,20 +93,21 @@ bool AttachableObject::detachEffectById(uint16_t id)
     return true;
 }
 
-void AttachableObject::onDetachEffect(const AttachedEffectPtr& effect)
+void AttachableObject::onDetachEffect(const AttachedEffectPtr& effect, bool callEvent)
 {
     if (effect->isHidedOwner())
         --m_ownerHidden;
 
     onStartDetachEffect(effect);
 
-    effect->callLuaField("onDetach", attachedObjectToLuaObject());
+    if (callEvent)
+        effect->callLuaField("onDetach", attachedObjectToLuaObject());
 }
 
-void AttachableObject::clearAttachedEffects()
+void AttachableObject::clearAttachedEffects(bool callEvent)
 {
     for (const auto& e : m_attachedEffects)
-        onDetachEffect(e);
+        onDetachEffect(e, callEvent);
     m_attachedEffects.clear();
 }
 
@@ -272,7 +273,7 @@ bool AttachableObject::detachWidget(const UIWidgetPtr& widget)
     return true;
 }
 
-void AttachableObject::clearAttachedWidgets()
+void AttachableObject::clearAttachedWidgets(bool callEvent)
 {
     // keep the same behavior as detachWidget
     auto oldList = std::move(m_attachedWidgets);
@@ -281,7 +282,9 @@ void AttachableObject::clearAttachedWidgets()
     for (const auto& widget : oldList) {
         g_map.removeAttachedWidgetFromObject(widget);
         widget->removeOnDestroyCallback("attached-widget-destroy");
-        widget->callLuaField("onDetached", asLuaObject());
+
+        if (callEvent)
+            widget->callLuaField("onDetached", asLuaObject());
     }
 }
 

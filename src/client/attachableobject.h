@@ -35,7 +35,7 @@ public:
     virtual bool isThing() { return false; }
 
     void attachEffect(const AttachedEffectPtr& obj);
-    void clearAttachedEffects();
+    void clearAttachedEffects(bool callEvent = true);
     void clearTemporaryAttachedEffects();
     void clearPermanentAttachedEffects();
     bool detachEffectById(uint16_t id);
@@ -59,14 +59,14 @@ public:
     bool hasAttachedWidgets() { return !m_attachedWidgets.empty(); };
     bool isWidgetAttached(const UIWidgetPtr& widget);
     void attachWidget(const UIWidgetPtr& widget);
-    void clearAttachedWidgets();
+    void clearAttachedWidgets(bool callEvent = true);
     bool detachWidgetById(const std::string& id);
     bool detachWidget(const UIWidgetPtr& widget);
     UIWidgetPtr getAttachedWidgetById(const std::string& id);
 
 protected:
     void drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop);
-    void onDetachEffect(const AttachedEffectPtr& effect);
+    void onDetachEffect(const AttachedEffectPtr& effect, bool callEvent = true);
     void drawAttachedParticlesEffect(const Point& dest);
 
     std::vector<AttachedEffectPtr> m_attachedEffects;
