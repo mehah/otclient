@@ -84,7 +84,7 @@ Panel
     image-border: 3
     anchors.fill: parent
     margin-top: 16
-
+    focusable: false
   Panel
     id: consoleContentPanel
     anchors.top: parent.top

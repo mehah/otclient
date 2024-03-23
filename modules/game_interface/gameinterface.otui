@@ -24,6 +24,7 @@ GameBottomPanel < Panel
     anchors.top: parent.top
     margin-top: -6
     height: 5
+    focusable: false
 
 GameMapPanel < UIGameMap
   padding: 4
@@ -140,7 +141,7 @@ UIWidget
     anchors.left: gameLeftExtraPanel.right
     anchors.right: gameRightExtraPanel.left
     anchors.top: parent.top
-
+    focusable: false
   Button
     id: leftIncreaseSidePanels
     anchors.left: gameLeftExtraPanel.right
