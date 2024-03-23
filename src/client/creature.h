@@ -157,6 +157,10 @@ public:
         }
     }
 
+    void setTyping(bool typing);
+    void sendTyping();
+    bool getTyping() { return m_typing; }
+    void setTypingIconTexture(const std::string& filename);
     void setBounce(uint8_t minHeight, uint8_t height, uint16_t speed) { m_bounce = { minHeight, height , speed }; }
 
 #ifndef BOT_PROTECTION
@@ -230,6 +234,7 @@ private:
     TexturePtr m_emblemTexture;
     TexturePtr m_typeTexture;
     TexturePtr m_iconTexture;
+    TexturePtr m_typingIconTexture;
 
     bool m_shieldBlink{ false };
     bool m_passable{ false };
@@ -240,6 +245,7 @@ private:
     bool m_removed{ true };
     bool m_drawOutfitColor{ true };
     bool m_showShieldTexture{ true };
+    bool m_typing{ false };
 
     uint8_t m_disableWalkAnimation{ 0 };
 

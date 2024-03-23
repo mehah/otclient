@@ -559,6 +559,10 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Creature>("isStaticSquareVisible", &Creature::isStaticSquareVisible);
     g_lua.bindClassMemberFunction<Creature>("getStaticSquareColor", &Creature::getStaticSquareColor);
     g_lua.bindClassMemberFunction<Creature>("setBounce", &Creature::setBounce);
+    g_lua.bindClassMemberFunction<Creature>("setTyping", &Creature::setTyping);
+    g_lua.bindClassMemberFunction<Creature>("getTyping", &Creature::getTyping);
+    g_lua.bindClassMemberFunction<Creature>("sendTyping", &Creature::sendTyping);
+    g_lua.bindClassMemberFunction<Creature>("setTypingIconTexture", &Creature::setTypingIconTexture);
 
 #ifndef BOT_PROTECTION
     g_lua.bindClassMemberFunction<Creature>("setText", &Creature::setText);
