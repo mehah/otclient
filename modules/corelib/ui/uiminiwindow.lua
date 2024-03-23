@@ -221,7 +221,9 @@ function UIMiniWindow:onDragLeave(droppedWidget, mousePos)
     end
 
     self:saveParent(self:getParent())
-    if self.moveOnlyToMain or droppedWidget.onlyPhantomDrop then
+
+-- Note: It seems to prevent the minimap, inventory, and health widgets from moving off the interface panel.
+    if self.moveOnlyToMain or droppedWidget and droppedWidget.onlyPhantomDrop then
         if not (droppedWidget) or (self.moveOnlyToMain and not (droppedWidget.onlyPhantomDrop)) or
             (not (self.moveOnlyToMain) and droppedWidget.onlyPhantomDrop) then
             local virtualParent = self:getParent()

@@ -20,8 +20,10 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 
 ## Current bugs
 
-- [x] **Game_topmenu.** fix: Fps and ping
-- [x] **Game_Console** fix: preventing the text cursor from appearing when starting to write.
+- [x] **Game_topmenu.** fix: Fps and ping https://github.com/Nottinghster/otclient/pull/8
+- [x] **Game_Console** fix: preventing the text cursor from appearing when starting to write. https://github.com/Nottinghster/otclient/commit/87becf4e2fcc7f7c494f87fae4f0d4b426f68749
+- [x] **corelib/ui/uiminiwindows** "droppedWidget" nil L224 https://github.com/Nottinghster/otclient/issues/11
+- [x]  **game_containers** Panel nil L161 https://github.com/Nottinghster/otclient/issues/10
 - [ ] **Game_mainpanel.** compatibility with extended view #7
 - [ ] **Game_entergame** MOTD old protocol
 - [ ] **Game_entergame** problems with token label when no cache, (first open client)
@@ -37,8 +39,8 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 - [ ] **Game_mainpanel** Missing UI of tibia 13 ( close , minimize , scroll)
 - [ ] **Characterlist** Add checkbox "show outift" button
 - [ ] **Client_bottom** default information if array services is not enabled
-- [ ] **game_containers** Panel nil L161
-- [ ] **corelib/ui/uiminiwindows** "droppedWidget" nil L224
+
+
 
 ## Overall Status
 
