@@ -78,7 +78,7 @@ context.BotServer.init = function(name, channel)
       end
       if context.BotServer._wasConnected then
         context.warn("BotServer disconnected")
-		HTTP.cancel(socketId)
+        HTTP.cancel(socketId)
       end
       context.BotServer._wasConnected = false
       context.BotServer._websocket = nil
@@ -94,7 +94,7 @@ context.BotServer.terminate = function()
   if context.BotServer._websocket then
     context.BotServer._websocket:close()
     context.BotServer._websocket = nil
-	context.BotServer._callbacks = {}
+    context.BotServer._callbacks = {}
   end
 end
 

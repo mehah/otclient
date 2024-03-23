@@ -9,43 +9,43 @@ ui.list = ui.listPanel.list -- shortcut
 CaveBot.actionList = ui.list
 
 if CaveBot.Editor then
-  CaveBot.Editor.setup()
+    CaveBot.Editor.setup()
 end
 if CaveBot.Config then
-  CaveBot.Config.setup()
+    CaveBot.Config.setup()
 end
 for extension, callbacks in pairs(CaveBot.Extensions) do
-  if callbacks.setup then
-    callbacks.setup()
-  end
+    if callbacks.setup then
+        callbacks.setup()
+    end
 end
 
 -- main loop, controlled by config
 local actionRetries = 0
 local prevActionResult = true
 cavebotMacro = macro(20, function()
-  if TargetBot and TargetBot.isActive() and not TargetBot.isCaveBotActionAllowed() then
-    CaveBot.resetWalking()
-    return -- target bot or looting is working, wait
-  end
+    if TargetBot and TargetBot.isActive() and not TargetBot.isCaveBotActionAllowed() then
+        CaveBot.resetWalking()
+        return -- target bot or looting is working, wait
+    end
 
-  if CaveBot.doWalking() then
-    return -- executing walking3
-  end
+    if CaveBot.doWalking() then
+        return -- executing walking3
+    end
 
-  local actions = ui.list:getChildCount()
-  if actions == 0 then return end
-  local currentAction = ui.list:getFocusedChild()
-  if not currentAction then
-    currentAction = ui.list:getFirstChild()
-  end
-  local action = CaveBot.Actions[currentAction.action]
-  local value = currentAction.value
-  local retry = false
-  if action then
+    local actions = ui.list:getChildCount()
+    if actions == 0 then return end
+    local currentAction = ui.list:getFocusedChild()
+    if not currentAction then
+        currentAction = ui.list:getFirstChild()
+    end
+    local action = CaveBot.Actions[currentAction.action]
+    local value = currentAction.value
+    local retry = false
+    if action then
     local status, result = pcall(function()
-      CaveBot.resetWalking()
-      return action.callback(value, actionRetries, prevActionResult)
+        CaveBot.resetWalking()
+        return action.callback(value, actionRetries, prevActionResult)
     end)
     if status then
       if result == "retry" then
@@ -254,13 +254,13 @@ local function reverseTable(t, max)
 end
 
 function rpairs(t)
-  test()
-	return function(t, i)
-		i = i - 1
-		if i ~= 0 then
-			return i, t[i]
-		end
-	end, t, #t + 1
+    test()
+    return function(t, i)
+        i = i - 1
+        if i ~= 0 then
+            return i, t[i]
+        end
+    end, t, #t + 1
 end
 
 CaveBot.gotoFirstPreviousReachableWaypoint = function()

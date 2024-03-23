@@ -69,14 +69,14 @@ function UIMiniWindow:maximize(dontSave)
         parent:fitAll(self)
     end
 
-    signalcall(self.onMaximize, self)							 
+    signalcall(self.onMaximize, self)
 end
 
 function UIMiniWindow:setup()
-    self:getChildById('closeButton').onClick = function()		
-        self:close()				 
+    self:getChildById('closeButton').onClick = function()
+        self:close()
     end
-	
+
     self:getChildById('minimizeButton').onClick = function()
 
         if self:isOn() then
@@ -91,7 +91,7 @@ function UIMiniWindow:setup()
         else
             self:minimize()
         end
-    end				
+    end
 end
 
 function UIMiniWindow:setupOnStart()
@@ -117,7 +117,7 @@ function UIMiniWindow:setupOnStart()
             g_settings.setNode('CharMiniWindows', settings)
             break
         end
-		 
+
     end
 
     local selfSettings = settings[char][self:getId()]
@@ -133,7 +133,7 @@ function UIMiniWindow:setupOnStart()
                     self:setParent(parent, true)
                     self:setPosition(topoint(selfSettings.position))
                     newParentSet = true
-		  
+
                 end
             end
         end
@@ -156,7 +156,7 @@ function UIMiniWindow:setupOnStart()
             self:open(true)
         end
     end
-	 
+
 
     local newParent = self:getParent()
 
@@ -260,7 +260,7 @@ function UIMiniWindow:onDragMove(mousePos, mouseMoved)
             break
         end
     end
-	 
+
 
     if not overAnyWidget and self.movedWidget then
         self.setMovedChildMargin(self.movedOldMargin or 0)
@@ -316,7 +316,7 @@ function UIMiniWindow:getSettings(name)
             return selfSettings[name]
         end
     end
-	 
+
     return nil
 end
 
@@ -387,7 +387,7 @@ function UIMiniWindow:saveParent(parent)
             self:saveParentPosition(parent:getId(), self:getPosition())
         end
     end
-	 
+
 end
 
 function UIMiniWindow:saveParentPosition(parentId, position)
