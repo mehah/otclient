@@ -1,3 +1,38 @@
+PingWidget < UIWidget
+  UIWidget
+    id: panelPingFps
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 110
+    focusable: false
+    UIWidget
+      id:imgPing
+      image-source: /images/ui/up
+      anchors.left: parent.left
+      anchors.top: prev.bottom
+      focusable: false
+    Label
+      id: lblping
+      height: 12
+      width: 33
+      margin-left: 2
+      anchors.left: Img_ping.right
+      text-horizontal-auto-resize: true
+      text-auto-resize: true
+      focusable: false
+      font: verdana-11px-rounded
+    Label
+      id: lblfps
+      height: 12
+      anchors.left: lblping.left
+      anchors.top: prev.bottom
+      text-horizontal-auto-resize: true
+      text-auto-resize: true
+      text-align: center
+      focusable: false
+      font: verdana-11px-rounded
+      
 TopMenuPanel 
   id: topMenu
   anchors.top: parent.top
