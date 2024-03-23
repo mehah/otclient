@@ -20,7 +20,12 @@ local lastSyncValue = -1
 local fpsEvent = nil
 local fpsMin = -1;
 local fpsMax = -1;
-
+local pingPanel
+local MainPingPanel
+local mainFpsPanel
+local fpsPanel2
+local PingWidget
+local pingImg
 -- private functions
 local function addButton(id, description, icon, callback, panel, toggle, front)
     local class
@@ -103,6 +108,11 @@ function terminate()
     })
 
     topMenu:destroy()
+    if PingWidget then
+        PingWidget:destroy()
+        PingWidget = nil
+    end
+
 end
 
 function hide()
@@ -126,6 +136,21 @@ function online()
             pingLabel:hide()
         end
     end)
+    if PingWidget then
+        return
+    end
+
+    PingWidget = g_ui.loadUI("pingFps", modules.game_interface.getMapPanel())
+
+    MainPingPanel = g_ui.createWidget("testPingPanel", PingWidget:getChildByIndex(1))
+    MainPingPanel.setId(MainPingPanel, "ping")
+    pingImg = MainPingPanel.getChildByIndex(MainPingPanel, 1)
+    pingPanel = MainPingPanel.getChildByIndex(MainPingPanel, 2)
+
+    mainFpsPanel = g_ui.createWidget("testPingPanel", PingWidget:getChildByIndex(2))
+    mainFpsPanel.setId(mainFpsPanel, "fps")
+    fpsPanel2 = mainFpsPanel.getChildByIndex(mainFpsPanel, 2)
+
 end
 
 function offline()
@@ -135,74 +160,103 @@ function offline()
 end
 
 function updateFps(fps)
-    if not fpsLabel:isVisible() then
-        return
+    if fpsLabel:isVisible() then --for the time being retained for the extended view
+        local text = 'FPS ' .. fps
+        if g_game.isOnline() then
+            local vsync = modules.client_options.getOption('vsync')
+            if fpsEvent == nil and lastSyncValue ~= vsync then
+                fpsEvent = scheduleEvent(function()
+                    fpsMin = -1
+                    lastSyncValue = vsync
+                    fpsEvent = nil
+                end, 2000)
+            end
+
+            if fpsMin == -1 then
+                fpsMin = fps
+                fpsMax = fps
+            end
+
+            if fps > fpsMax then
+                fpsMax = fps
+            end
+
+            if fps < fpsMin then
+                fpsMin = fps
+            end
+
+            local midFps = math.floor((fpsMin + fpsMax) / 2)
+            fpsLabel:setTooltip('Min: ' .. fpsMin .. '\nMid: ' .. midFps .. '\nMax: ' .. fpsMax)
+        else
+            fpsLabel:removeTooltip()
+        end
+        fpsLabel:setText(text)
     end
 
-    text = 'FPS: ' .. fps
-
-    if g_game.isOnline() then
-        local vsync = modules.client_options.getOption('vsync')
-        if fpsEvent == nil and lastSyncValue ~= vsync then
-            fpsEvent = scheduleEvent(function()
-                fpsMin = -1
-                lastSyncValue = vsync
-                fpsEvent = nil
-            end, 2000)
-        end
-
-        if fpsMin == -1 then
-            fpsMin = fps
-            fpsMax = fps
-        end
-
-        if fps > fpsMax then
-            fpsMax = fps
-        end
-
-        if fps < fpsMin then
-            fpsMin = fps
-        end
-
-        local midFps = math.floor((fpsMin + fpsMax) / 2)
-        fpsLabel:setTooltip('Min: ' .. fpsMin .. '\nMid: ' .. midFps .. '\nMax: ' .. fpsMax)
-    else
-        fpsLabel:removeTooltip()
+    local text = fps .. ' fps'
+    if g_game.isOnline() and fpsPanel2 then
+        fpsPanel2:setText(text)
     end
 
-    fpsLabel:setText(text)
 end
 
 function updatePing(ping)
-    if not pingLabel:isVisible() then
-        return
-    end
+    if pingLabel:isVisible() then --for the time being retained for the extended view
 
-    local text = 'Ping: '
-    local color
-    if ping < 0 then
-        text = text .. '??'
-        color = 'yellow'
-    else
-        text = text .. ping .. ' ms'
-        if ping >= 500 then
-            color = 'red'
-        elseif ping >= 250 then
+        local text = 'Ping: '
+        local color
+        if ping < 0 then
+            text = text .. '??'
             color = 'yellow'
         else
-            color = 'green'
+            text = text .. ping .. ' ms'
+            if ping >= 500 then
+                color = 'red'
+            elseif ping >= 250 then
+                color = 'yellow'
+            else
+                color = 'green'
+            end
         end
+        pingLabel:setColor(color)
+        pingLabel:setText(text)
     end
-    pingLabel:setColor(color)
-    pingLabel:setText(text)
+    if pingPanel:isVisible() then
+
+        local text
+        local imagen
+        if ping < 0 then
+            text = 'High lag (??)'
+            imagen = nil
+        elseif ping >= 500 then
+            text = 'High lag (' .. ping .. ' ms)'
+            imagen = '/images/ui/high_ping'
+        elseif ping >= 250 then
+            text = 'Medium lag (' .. ping .. ' ms)'
+            imagen = '/images/ui/medium_ping'
+        else
+            text = 'Low lag (' .. ping .. ' ms)'
+            imagen = '/images/ui/low_ping'
+        end
+
+        pingImg:setImageSource(imagen)
+        pingPanel:setText(text)
+    end
 end
 
 function setPingVisible(enable)
     pingLabel:setVisible(enable)
+    if pingPanel then
+        pingPanel:setVisible(enable)
+        pingImg:setVisible(enable)
+    end
 end
 
 function setFpsVisible(enable)
     fpsLabel:setVisible(enable)
+    if fpsPanel2 then
+        fpsPanel2:setVisible(enable)
+    end
 end
 
 function addTopRightRegularButton(id, description, icon, callback, front)
@@ -302,6 +356,6 @@ function toggle()
         modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'parent', AnchorTop)
     else
         menu:show()
-        modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'topMenu', AnchorBottom)
+        modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'topMenu', AnchorTop)
     end
 end
