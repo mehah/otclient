@@ -577,6 +577,9 @@ function EnterGame.setUniqueServer(host, port, protocol, windowWidth, windowHeig
   local clientLabel = enterGame:getChildById('clientLabel')
   clientLabel:setVisible(false)
   clientLabel:setHeight(0)
+  local httpLoginBox = enterGame:getChildById('httpLoginBox')
+  httpLoginBox:setVisible(false)
+  httpLoginBox:setHeight(0)
 
   local serverListButton = enterGame:getChildById('serverListButton')
   serverListButton:setVisible(false)

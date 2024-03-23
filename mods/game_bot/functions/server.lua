@@ -8,6 +8,24 @@ context.BotServer._callbacks = {}
 context.BotServer._lastMessageId = 0
 context.BotServer._wasConnected = true -- show first warning
 
+context.BotServer.stopReconnect = false
+context.BotServer.reconnectAttempts = 0
+context.BotServer.maxReconnectAttempts = 5
+context.BotServer.reconnectDelay = 2000
+
+local function tryReconnect(name, channel)
+  if not context.BotServer.stopReconnect and context.BotServer.reconnectAttempts < context.BotServer.maxReconnectAttempts then
+    context.BotServer.reconnectAttempts = context.BotServer.reconnectAttempts + 1
+    local delay = context.BotServer.reconnectDelay * (2 ^ (context.BotServer.reconnectAttempts - 1))
+    scheduleEvent(function()
+      context.BotServer.init(name, channel)
+    end, delay)
+  else
+    context.BotServer.stopReconnect = false
+    context.BotServer.reconnectAttempts = 0
+  end
+end
+
 context.BotServer.init = function(name, channel)
   if not channel or not name or channel:len() < 1 or name:len() < 1 then
     return context.error("Invalid params for BotServer.init")
@@ -16,6 +34,11 @@ context.BotServer.init = function(name, channel)
     return context.error("BotServer is already initialized")
   end
   context.BotServer._websocket = HTTP.WebSocketJSON(context.BotServer.url, {
+    onOpen = function()
+      context.BotServer._wasConnected = true
+      context.BotServer.reconnectAttempts = 0
+      context.warn("BotServer connected.")
+    end,
     onMessage = function(message, socketId)
       if not context._websockets[socketId] then
         return g_http.cancel(socketId)
@@ -55,11 +78,12 @@ context.BotServer.init = function(name, channel)
       end
       if context.BotServer._wasConnected then
         context.warn("BotServer disconnected")
+		HTTP.cancel(socketId)
       end
       context.BotServer._wasConnected = false
       context.BotServer._websocket = nil
       context.BotServer.ping = 0
-      context.BotServer.init(name, channel)
+      tryReconnect(name, channel)
     end
   }, context.BotServer.timeout)
   context._websockets[context.BotServer._websocket.id] = 1
@@ -70,7 +94,7 @@ context.BotServer.terminate = function()
   if context.BotServer._websocket then
     context.BotServer._websocket:close()
     context.BotServer._websocket = nil
-    context.BotServer._callbacks = {}
+	context.BotServer._callbacks = {}
   end
 end
 
@@ -89,4 +113,16 @@ context.BotServer.send = function(topic, message)
     return context.error("BotServer is not initialized")
   end
   context.BotServer._websocket.send({type="message", topic=topic, message=message})
+end
+
+context.BotServer.isConnected = function()
+  return context.BotServer._wasConnected and context.BotServer._websocket ~= nil
+end
+
+context.BotServer.hasListen = function(topic)
+  return context.BotServer._callbacks and context.BotServer._callbacks[topic] ~= nil
+end
+
+context.BotServer.resetReconnect = function()
+  context.BotServer.stopReconnect = true
 end

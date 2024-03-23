@@ -1178,8 +1178,12 @@ void Map::updateAttachedWidgets(const MapViewPtr& mapView)
 
         if (object->isThing() && object->static_self_cast<Thing>()->isCreature()) {
             const auto& creature = object->static_self_cast<Thing>()->static_self_cast<Creature>();
+
+            const auto displacementX = g_game.getFeature(Otc::GameNegativeOffset) ? 0 : creature->getDisplacementX();
+            const auto displacementY = g_game.getFeature(Otc::GameNegativeOffset) ? 0 : creature->getDisplacementY();
+
             const auto& jumpOffset = creature->getJumpOffset() * g_drawPool.getScaleFactor();
-            const auto& creatureOffset = Point(16 - creature->getDisplacementX(), -creature->getDisplacementY() - 2) + creature->getWalkOffset();
+            const auto& creatureOffset = Point(16 - displacementX, -displacementY - 2) + creature->getWalkOffset();
             p += creatureOffset * g_drawPool.getScaleFactor() - Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
         }
 

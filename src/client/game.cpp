@@ -739,8 +739,10 @@ void Game::look(const ThingPtr& thing, bool isBattleList)
 
     if (thing->isCreature() && isBattleList && m_protocolVersion >= 961)
         m_protocolGame->sendLookCreature(thing->getId());
-    else
-        m_protocolGame->sendLook(thing->getPosition(), thing->getId(), thing->getStackPos());
+    else {
+        const int thingId = thing->isCreature() ? Proto::Creature : thing->getId();
+        m_protocolGame->sendLook(thing->getPosition(), thingId, thing->getStackPos());
+    }
 }
 
 void Game::move(const ThingPtr& thing, const Position& toPos, int count)
@@ -751,13 +753,8 @@ void Game::move(const ThingPtr& thing, const Position& toPos, int count)
     if (!canPerformGameAction() || !thing || thing->getPosition() == toPos)
         return;
 
-    uint32_t id = thing->getId();
-    if (thing->isCreature()) {
-        CreaturePtr creature = thing->static_self_cast<Creature>();
-        id = Proto::Creature;
-    }
-
-    m_protocolGame->sendMove(thing->getPosition(), id, thing->getStackPos(), toPos, count);
+    const auto thingId = thing->isCreature() ? Proto::Creature : thing->getId();
+    m_protocolGame->sendMove(thing->getPosition(), thingId, thing->getStackPos(), toPos, count);
 }
 
 void Game::moveToParentContainer(const ThingPtr& thing, int count)
@@ -765,7 +762,7 @@ void Game::moveToParentContainer(const ThingPtr& thing, int count)
     if (!canPerformGameAction() || !thing || count <= 0)
         return;
 
-    const Position position = thing->getPosition();
+    const auto& position = thing->getPosition();
     move(thing, Position(position.x, position.y, 254), count);
 }
 
