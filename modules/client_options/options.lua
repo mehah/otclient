@@ -15,7 +15,7 @@ local defaultOptions = {
     showLevelsInConsole = true,
     showPrivateMessagesInConsole = true,
     showPrivateMessagesOnScreen = true,
-    showLeftPanel = false,
+    showLeftPanel = true,
     showRightExtraPanel = false,
     openMaximized = false,
     backgroundFrameRate = 201,
@@ -45,7 +45,9 @@ local defaultOptions = {
     asyncTxtLoading = false,
     creatureInformationScale = 0,
     staticTextScale = 0,
-    animatedTextScale = 0
+    animatedTextScale = 0,
+    setEffectAlphaScroll = 100 ,
+    setMissileAlphaScroll = 100 ,
 }
 
 local optionsWindow
@@ -96,11 +98,11 @@ function init()
     optionsTabBar:addTab(tr('Audio'), soundPanel, '/images/optionstab/audio')
 
     optionsButton = modules.client_topmenu.addLeftButton('optionsButton', tr('Options'), '/images/topbuttons/options',
-                                                         toggle)
+        toggle)
     audioButton = modules.client_topmenu.addLeftButton('audioButton', tr('Audio'), '/images/topbuttons/audio',
-                                                       function()
-        toggleOption('enableAudio')
-    end)
+        function()
+            toggleOption('enableAudio')
+        end)
 
     addEvent(function()
         setup()
@@ -352,6 +354,13 @@ function setOption(key, value, force)
         local fadeMode = value == 1
         graphicsPanel:getChildById('floorFading'):setEnabled(fadeMode)
         graphicsPanel:getChildById('floorFadingLabel'):setEnabled(fadeMode)
+        
+    elseif key == 'setEffectAlphaScroll' then
+        g_client.setEffectAlpha(value/100)
+        generalPanel:getChildById('setEffectAlphaLabel'):setText(tr('Opacity Effect: %s%%', value))
+    elseif key == 'setMissileAlphaScroll' then
+        g_client.setMissileAlpha(value/100)
+        generalPanel:getChildById('setMissileAlphaLabel'):setText(tr('Opacity Missile: %s%%', value))
     end
 
     -- change value for keybind updates

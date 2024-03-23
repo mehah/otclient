@@ -54,6 +54,7 @@ namespace Proto
         GameServerLoginSuccess = 23,
         GameServerSessionEnd = 24,
         GameServerStoreButtonIndicators = 25, // 1097
+        GameServerBugReport = 26,
         GameServerPingBack = 29,
         GameServerPing = 30,
         GameServerChallenge = 31,
@@ -79,6 +80,7 @@ namespace Proto
         GameServerFloorDescription = 75,
 
         // original tibia ONLY
+        GameServerImbuementDurations = 93,
         GameServerPassiveCooldown = 94,
         GameServerBosstiaryData = 97,
         GameServerBosstiarySlots = 98,
@@ -217,6 +219,7 @@ namespace Proto
         ClientLeaveGame = 20,
         ClientPing = 29,
         ClientPingBack = 30,
+        ClientUseStash = 40,
 
         // all in game opcodes must be equal or greater than 50
         ClientFirstGameOpcode = 50,

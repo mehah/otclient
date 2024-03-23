@@ -97,7 +97,9 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "DEBUG_LOG": "ON",
-        "ASAN_ENABLED": "ON"
+        "ASAN_ENABLED": "OFF",
+        "TOGGLE_PRE_COMPILED_HEADER": "OFF",
+        "SPEED_UP_BUILD_UNITY": "OFF"
       }
     }
   ],

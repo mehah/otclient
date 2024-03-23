@@ -22,7 +22,7 @@
 
 #pragma once
 
- // common C headers
+// common C headers
 #include <cassert>
 #include <cmath>
 #include <cstddef>
@@ -46,8 +46,11 @@
 #include <tuple>
 #include <typeinfo>
 #include <vector>
+#include <unordered_map>
+#include <map>
 
 #include <parallel_hashmap/phmap.h>
+#include <parallel_hashmap/btree.h>
 #include <pugixml.hpp>
 
 using namespace std::literals;

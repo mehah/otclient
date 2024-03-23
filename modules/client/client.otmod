@@ -14,6 +14,7 @@ Module
     - client_locales
     - client_topmenu
     - client_background
+    - client_textedit
     - client_options
     - client_entergame
     - client_terminal

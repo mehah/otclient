@@ -37,10 +37,15 @@ public:
     BitmapFontPtr getFont(const std::string_view fontName);
 
     BitmapFontPtr getDefaultFont() const { return m_defaultFont; }
+    BitmapFontPtr getDefaultWidgetFont() const { return m_defaultWidgetFont; }
+
+    void setDefaultFont(const BitmapFontPtr& font) { m_defaultFont = font; }
+    void setDefaultWidgetFont(const BitmapFontPtr& font) { m_defaultWidgetFont = font; }
 
 private:
     std::vector<BitmapFontPtr> m_fonts;
     BitmapFontPtr m_defaultFont;
+    BitmapFontPtr m_defaultWidgetFont;
 };
 
 extern FontManager g_fonts;

@@ -223,7 +223,8 @@ PROTOBUF_CONSTEXPR AppearanceFlags::AppearanceFlags(
   , /*decltype(_impl_.wearout_)*/false
   , /*decltype(_impl_.clockexpire_)*/false
   , /*decltype(_impl_.expire_)*/false
-  , /*decltype(_impl_.expirestop_)*/false} {}
+  , /*decltype(_impl_.expirestop_)*/false
+  , /*decltype(_impl_.deco_kit_)*/false} {}
 struct AppearanceFlagsDefaultTypeInternal {
   PROTOBUF_CONSTEXPR AppearanceFlagsDefaultTypeInternal()
       : _instance(::_pbi::ConstantInitialized{}) {}
@@ -681,6 +682,7 @@ const uint32_t TableStruct_appearances_2eproto::offsets[] PROTOBUF_SECTION_VARIA
   PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.clockexpire_),
   PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.expire_),
   PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.expirestop_),
+  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.deco_kit_),
   0,
   15,
   16,
@@ -737,6 +739,7 @@ const uint32_t TableStruct_appearances_2eproto::offsets[] PROTOBUF_SECTION_VARIA
   52,
   53,
   54,
+  55,
   PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagUpgradeClassification, _impl_._has_bits_),
   PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagUpgradeClassification, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -919,24 +922,24 @@ static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protode
   { 70, 85, -1, sizeof(::otclient::protobuf::appearances::SpriteInfo)},
   { 94, 103, -1, sizeof(::otclient::protobuf::appearances::FrameGroup)},
   { 106, 117, -1, sizeof(::otclient::protobuf::appearances::Appearance)},
-  { 122, 184, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlags)},
-  { 240, 247, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagUpgradeClassification)},
-  { 248, 255, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagBank)},
-  { 256, 263, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagWrite)},
-  { 264, 271, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagWriteOnce)},
-  { 272, 280, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagLight)},
-  { 282, 289, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagHeight)},
-  { 290, 298, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagShift)},
-  { 300, 307, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagClothes)},
-  { 308, 315, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagDefaultAction)},
-  { 316, 328, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagMarket)},
-  { 334, 346, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagNPC)},
-  { 352, 359, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagAutomap)},
-  { 360, 368, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagHook)},
-  { 370, 377, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagLenshelp)},
-  { 378, 385, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagChangedToExpire)},
-  { 386, 393, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagCyclopedia)},
-  { 394, 406, -1, sizeof(::otclient::protobuf::appearances::SpecialMeaningAppearanceIds)},
+  { 122, 185, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlags)},
+  { 242, 249, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagUpgradeClassification)},
+  { 250, 257, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagBank)},
+  { 258, 265, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagWrite)},
+  { 266, 273, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagWriteOnce)},
+  { 274, 282, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagLight)},
+  { 284, 291, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagHeight)},
+  { 292, 300, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagShift)},
+  { 302, 309, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagClothes)},
+  { 310, 317, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagDefaultAction)},
+  { 318, 330, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagMarket)},
+  { 336, 348, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagNPC)},
+  { 354, 361, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagAutomap)},
+  { 362, 370, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagHook)},
+  { 372, 379, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagLenshelp)},
+  { 380, 387, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagChangedToExpire)},
+  { 388, 395, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagCyclopedia)},
+  { 396, 408, -1, sizeof(::otclient::protobuf::appearances::SpecialMeaningAppearanceIds)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -1006,7 +1009,7 @@ const char descriptor_table_protodef_appearances_2eproto[] PROTOBUF_SECTION_VARI
   "obuf.appearances.FrameGroup\022=\n\005flags\030\003 \001"
   "(\0132..otclient.protobuf.appearances.Appea"
   "ranceFlags\022\014\n\004name\030\004 \001(\t\022\023\n\013description\030"
-  "\005 \001(\t\"\275\017\n\017AppearanceFlags\022\?\n\004bank\030\001 \001(\0132"
+  "\005 \001(\t\"\317\017\n\017AppearanceFlags\022\?\n\004bank\030\001 \001(\0132"
   "1.otclient.protobuf.appearances.Appearan"
   "ceFlagBank\022\014\n\004clip\030\002 \001(\010\022\016\n\006bottom\030\003 \001(\010"
   "\022\013\n\003top\030\004 \001(\010\022\021\n\tcontainer\030\005 \001(\010\022\022\n\ncumu"
@@ -1055,82 +1058,83 @@ const char descriptor_table_protodef_appearances_2eproto[] PROTOBUF_SECTION_VARI
   "dons_west\0302 \001(\010\022\034\n\024reverse_addons_south\030"
   "3 \001(\010\022\034\n\024reverse_addons_north\0304 \001(\010\022\017\n\007w"
   "earout\0305 \001(\010\022\023\n\013clockexpire\0306 \001(\010\022\016\n\006exp"
-  "ire\0307 \001(\010\022\022\n\nexpirestop\0308 \001(\010\"E\n#Appeara"
-  "nceFlagUpgradeClassification\022\036\n\026upgrade_"
-  "classification\030\001 \001(\r\"\'\n\022AppearanceFlagBa"
-  "nk\022\021\n\twaypoints\030\001 \001(\r\".\n\023AppearanceFlagW"
-  "rite\022\027\n\017max_text_length\030\001 \001(\r\"7\n\027Appeara"
-  "nceFlagWriteOnce\022\034\n\024max_text_length_once"
-  "\030\001 \001(\r\"8\n\023AppearanceFlagLight\022\022\n\nbrightn"
-  "ess\030\001 \001(\r\022\r\n\005color\030\002 \001(\r\")\n\024AppearanceFl"
-  "agHeight\022\021\n\televation\030\001 \001(\r\"+\n\023Appearanc"
-  "eFlagShift\022\t\n\001x\030\001 \001(\r\022\t\n\001y\030\002 \001(\r\"%\n\025Appe"
-  "aranceFlagClothes\022\014\n\004slot\030\001 \001(\r\"[\n\033Appea"
-  "ranceFlagDefaultAction\022<\n\006action\030\001 \001(\0162,"
-  ".otclient.protobuf.appearances.PLAYER_AC"
-  "TION\"\204\002\n\024AppearanceFlagMarket\022>\n\010categor"
-  "y\030\001 \001(\0162,.otclient.protobuf.appearances."
-  "ITEM_CATEGORY\022\032\n\022trade_as_object_id\030\002 \001("
-  "\r\022\031\n\021show_as_object_id\030\003 \001(\r\022\014\n\004name\030\004 \001"
-  "(\t\022P\n\026restrict_to_profession\030\005 \003(\01620.otc"
-  "lient.protobuf.appearances.PLAYER_PROFES"
-  "SION\022\025\n\rminimum_level\030\006 \001(\r\"\245\001\n\021Appearan"
-  "ceFlagNPC\022\014\n\004name\030\001 \001(\t\022\020\n\010location\030\002 \001("
-  "\t\022\022\n\nsale_price\030\003 \001(\r\022\021\n\tbuy_price\030\004 \001(\r"
-  "\022\037\n\027currency_object_type_id\030\005 \001(\r\022(\n cur"
-  "rency_quest_flag_display_name\030\006 \001(\t\"&\n\025A"
-  "ppearanceFlagAutomap\022\r\n\005color\030\001 \001(\r\"\205\001\n\022"
-  "AppearanceFlagHook\0227\n\005south\030\001 \001(\0162(.otcl"
-  "ient.protobuf.appearances.HOOK_TYPE\0226\n\004e"
-  "ast\030\002 \001(\0162(.otclient.protobuf.appearance"
-  "s.HOOK_TYPE\"$\n\026AppearanceFlagLenshelp\022\n\n"
-  "\002id\030\001 \001(\r\"=\n\035AppearanceFlagChangedToExpi"
-  "re\022\034\n\024former_object_typeid\030\001 \001(\r\"3\n\030Appe"
-  "aranceFlagCyclopedia\022\027\n\017cyclopedia_type\030"
-  "\001 \001(\r\"\261\001\n\033SpecialMeaningAppearanceIds\022\024\n"
-  "\014gold_coin_id\030\001 \001(\r\022\030\n\020platinum_coin_id\030"
-  "\002 \001(\r\022\027\n\017crystal_coin_id\030\003 \001(\r\022\025\n\rtibia_"
-  "coin_id\030\004 \001(\r\022\031\n\021stamped_letter_id\030\005 \001(\r"
-  "\022\027\n\017supply_stash_id\030\006 \001(\r*\224\001\n\rPLAYER_ACT"
-  "ION\022\026\n\022PLAYER_ACTION_NONE\020\000\022\026\n\022PLAYER_AC"
-  "TION_LOOK\020\001\022\025\n\021PLAYER_ACTION_USE\020\002\022\026\n\022PL"
-  "AYER_ACTION_OPEN\020\003\022$\n PLAYER_ACTION_AUTO"
-  "WALK_HIGHLIGHT\020\004*\263\005\n\rITEM_CATEGORY\022\030\n\024IT"
-  "EM_CATEGORY_ARMORS\020\001\022\031\n\025ITEM_CATEGORY_AM"
-  "ULETS\020\002\022\027\n\023ITEM_CATEGORY_BOOTS\020\003\022\034\n\030ITEM"
-  "_CATEGORY_CONTAINERS\020\004\022\034\n\030ITEM_CATEGORY_"
-  "DECORATION\020\005\022\026\n\022ITEM_CATEGORY_FOOD\020\006\022\036\n\032"
-  "ITEM_CATEGORY_HELMETS_HATS\020\007\022\026\n\022ITEM_CAT"
-  "EGORY_LEGS\020\010\022\030\n\024ITEM_CATEGORY_OTHERS\020\t\022\031"
-  "\n\025ITEM_CATEGORY_POTIONS\020\n\022\027\n\023ITEM_CATEGO"
-  "RY_RINGS\020\013\022\027\n\023ITEM_CATEGORY_RUNES\020\014\022\031\n\025I"
-  "TEM_CATEGORY_SHIELDS\020\r\022\027\n\023ITEM_CATEGORY_"
-  "TOOLS\020\016\022\033\n\027ITEM_CATEGORY_VALUABLES\020\017\022\034\n\030"
-  "ITEM_CATEGORY_AMMUNITION\020\020\022\026\n\022ITEM_CATEG"
-  "ORY_AXES\020\021\022\027\n\023ITEM_CATEGORY_CLUBS\020\022\022\"\n\036I"
-  "TEM_CATEGORY_DISTANCE_WEAPONS\020\023\022\030\n\024ITEM_"
-  "CATEGORY_SWORDS\020\024\022\034\n\030ITEM_CATEGORY_WANDS"
-  "_RODS\020\025\022!\n\035ITEM_CATEGORY_PREMIUM_SCROLLS"
-  "\020\026\022\035\n\031ITEM_CATEGORY_TIBIA_COINS\020\027\022#\n\037ITE"
-  "M_CATEGORY_CREATURE_PRODUCTS\020\030*\355\001\n\021PLAYE"
-  "R_PROFESSION\022\"\n\025PLAYER_PROFESSION_ANY\020\377\377"
-  "\377\377\377\377\377\377\377\001\022\032\n\026PLAYER_PROFESSION_NONE\020\000\022\034\n\030"
-  "PLAYER_PROFESSION_KNIGHT\020\001\022\035\n\031PLAYER_PRO"
-  "FESSION_PALADIN\020\002\022\036\n\032PLAYER_PROFESSION_S"
-  "ORCERER\020\003\022\033\n\027PLAYER_PROFESSION_DRUID\020\004\022\036"
-  "\n\032PLAYER_PROFESSION_PROMOTED\020\n*\203\001\n\023ANIMA"
-  "TION_LOOP_TYPE\022)\n\034ANIMATION_LOOP_TYPE_PI"
-  "NGPONG\020\377\377\377\377\377\377\377\377\377\001\022 \n\034ANIMATION_LOOP_TYPE"
-  "_INFINITE\020\000\022\037\n\033ANIMATION_LOOP_TYPE_COUNT"
-  "ED\020\001*4\n\tHOOK_TYPE\022\023\n\017HOOK_TYPE_SOUTH\020\001\022\022"
-  "\n\016HOOK_TYPE_EAST\020\002*\201\001\n\021FIXED_FRAME_GROUP"
-  "\022!\n\035FIXED_FRAME_GROUP_OUTFIT_IDLE\020\000\022#\n\037F"
-  "IXED_FRAME_GROUP_OUTFIT_MOVING\020\001\022$\n FIXE"
-  "D_FRAME_GROUP_OBJECT_INITIAL\020\002"
+  "ire\0307 \001(\010\022\022\n\nexpirestop\0308 \001(\010\022\020\n\010deco_ki"
+  "t\0309 \001(\010\"E\n#AppearanceFlagUpgradeClassifi"
+  "cation\022\036\n\026upgrade_classification\030\001 \001(\r\"\'"
+  "\n\022AppearanceFlagBank\022\021\n\twaypoints\030\001 \001(\r\""
+  ".\n\023AppearanceFlagWrite\022\027\n\017max_text_lengt"
+  "h\030\001 \001(\r\"7\n\027AppearanceFlagWriteOnce\022\034\n\024ma"
+  "x_text_length_once\030\001 \001(\r\"8\n\023AppearanceFl"
+  "agLight\022\022\n\nbrightness\030\001 \001(\r\022\r\n\005color\030\002 \001"
+  "(\r\")\n\024AppearanceFlagHeight\022\021\n\televation\030"
+  "\001 \001(\r\"+\n\023AppearanceFlagShift\022\t\n\001x\030\001 \001(\r\022"
+  "\t\n\001y\030\002 \001(\r\"%\n\025AppearanceFlagClothes\022\014\n\004s"
+  "lot\030\001 \001(\r\"[\n\033AppearanceFlagDefaultAction"
+  "\022<\n\006action\030\001 \001(\0162,.otclient.protobuf.app"
+  "earances.PLAYER_ACTION\"\204\002\n\024AppearanceFla"
+  "gMarket\022>\n\010category\030\001 \001(\0162,.otclient.pro"
+  "tobuf.appearances.ITEM_CATEGORY\022\032\n\022trade"
+  "_as_object_id\030\002 \001(\r\022\031\n\021show_as_object_id"
+  "\030\003 \001(\r\022\014\n\004name\030\004 \001(\t\022P\n\026restrict_to_prof"
+  "ession\030\005 \003(\01620.otclient.protobuf.appeara"
+  "nces.PLAYER_PROFESSION\022\025\n\rminimum_level\030"
+  "\006 \001(\r\"\245\001\n\021AppearanceFlagNPC\022\014\n\004name\030\001 \001("
+  "\t\022\020\n\010location\030\002 \001(\t\022\022\n\nsale_price\030\003 \001(\r\022"
+  "\021\n\tbuy_price\030\004 \001(\r\022\037\n\027currency_object_ty"
+  "pe_id\030\005 \001(\r\022(\n currency_quest_flag_displ"
+  "ay_name\030\006 \001(\t\"&\n\025AppearanceFlagAutomap\022\r"
+  "\n\005color\030\001 \001(\r\"\205\001\n\022AppearanceFlagHook\0227\n\005"
+  "south\030\001 \001(\0162(.otclient.protobuf.appearan"
+  "ces.HOOK_TYPE\0226\n\004east\030\002 \001(\0162(.otclient.p"
+  "rotobuf.appearances.HOOK_TYPE\"$\n\026Appeara"
+  "nceFlagLenshelp\022\n\n\002id\030\001 \001(\r\"=\n\035Appearanc"
+  "eFlagChangedToExpire\022\034\n\024former_object_ty"
+  "peid\030\001 \001(\r\"3\n\030AppearanceFlagCyclopedia\022\027"
+  "\n\017cyclopedia_type\030\001 \001(\r\"\261\001\n\033SpecialMeani"
+  "ngAppearanceIds\022\024\n\014gold_coin_id\030\001 \001(\r\022\030\n"
+  "\020platinum_coin_id\030\002 \001(\r\022\027\n\017crystal_coin_"
+  "id\030\003 \001(\r\022\025\n\rtibia_coin_id\030\004 \001(\r\022\031\n\021stamp"
+  "ed_letter_id\030\005 \001(\r\022\027\n\017supply_stash_id\030\006 "
+  "\001(\r*\224\001\n\rPLAYER_ACTION\022\026\n\022PLAYER_ACTION_N"
+  "ONE\020\000\022\026\n\022PLAYER_ACTION_LOOK\020\001\022\025\n\021PLAYER_"
+  "ACTION_USE\020\002\022\026\n\022PLAYER_ACTION_OPEN\020\003\022$\n "
+  "PLAYER_ACTION_AUTOWALK_HIGHLIGHT\020\004*\263\005\n\rI"
+  "TEM_CATEGORY\022\030\n\024ITEM_CATEGORY_ARMORS\020\001\022\031"
+  "\n\025ITEM_CATEGORY_AMULETS\020\002\022\027\n\023ITEM_CATEGO"
+  "RY_BOOTS\020\003\022\034\n\030ITEM_CATEGORY_CONTAINERS\020\004"
+  "\022\034\n\030ITEM_CATEGORY_DECORATION\020\005\022\026\n\022ITEM_C"
+  "ATEGORY_FOOD\020\006\022\036\n\032ITEM_CATEGORY_HELMETS_"
+  "HATS\020\007\022\026\n\022ITEM_CATEGORY_LEGS\020\010\022\030\n\024ITEM_C"
+  "ATEGORY_OTHERS\020\t\022\031\n\025ITEM_CATEGORY_POTION"
+  "S\020\n\022\027\n\023ITEM_CATEGORY_RINGS\020\013\022\027\n\023ITEM_CAT"
+  "EGORY_RUNES\020\014\022\031\n\025ITEM_CATEGORY_SHIELDS\020\r"
+  "\022\027\n\023ITEM_CATEGORY_TOOLS\020\016\022\033\n\027ITEM_CATEGO"
+  "RY_VALUABLES\020\017\022\034\n\030ITEM_CATEGORY_AMMUNITI"
+  "ON\020\020\022\026\n\022ITEM_CATEGORY_AXES\020\021\022\027\n\023ITEM_CAT"
+  "EGORY_CLUBS\020\022\022\"\n\036ITEM_CATEGORY_DISTANCE_"
+  "WEAPONS\020\023\022\030\n\024ITEM_CATEGORY_SWORDS\020\024\022\034\n\030I"
+  "TEM_CATEGORY_WANDS_RODS\020\025\022!\n\035ITEM_CATEGO"
+  "RY_PREMIUM_SCROLLS\020\026\022\035\n\031ITEM_CATEGORY_TI"
+  "BIA_COINS\020\027\022#\n\037ITEM_CATEGORY_CREATURE_PR"
+  "ODUCTS\020\030*\355\001\n\021PLAYER_PROFESSION\022\"\n\025PLAYER"
+  "_PROFESSION_ANY\020\377\377\377\377\377\377\377\377\377\001\022\032\n\026PLAYER_PRO"
+  "FESSION_NONE\020\000\022\034\n\030PLAYER_PROFESSION_KNIG"
+  "HT\020\001\022\035\n\031PLAYER_PROFESSION_PALADIN\020\002\022\036\n\032P"
+  "LAYER_PROFESSION_SORCERER\020\003\022\033\n\027PLAYER_PR"
+  "OFESSION_DRUID\020\004\022\036\n\032PLAYER_PROFESSION_PR"
+  "OMOTED\020\n*\203\001\n\023ANIMATION_LOOP_TYPE\022)\n\034ANIM"
+  "ATION_LOOP_TYPE_PINGPONG\020\377\377\377\377\377\377\377\377\377\001\022 \n\034A"
+  "NIMATION_LOOP_TYPE_INFINITE\020\000\022\037\n\033ANIMATI"
+  "ON_LOOP_TYPE_COUNTED\020\001*4\n\tHOOK_TYPE\022\023\n\017H"
+  "OOK_TYPE_SOUTH\020\001\022\022\n\016HOOK_TYPE_EAST\020\002*\201\001\n"
+  "\021FIXED_FRAME_GROUP\022!\n\035FIXED_FRAME_GROUP_"
+  "OUTFIT_IDLE\020\000\022#\n\037FIXED_FRAME_GROUP_OUTFI"
+  "T_MOVING\020\001\022$\n FIXED_FRAME_GROUP_OBJECT_I"
+  "NITIAL\020\002"
   ;
 static ::_pbi::once_flag descriptor_table_appearances_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_appearances_2eproto = {
-    false, false, 6310, descriptor_table_protodef_appearances_2eproto,
+    false, false, 6328, descriptor_table_protodef_appearances_2eproto,
     "appearances.proto",
     &descriptor_table_appearances_2eproto_once, nullptr, 0, 26,
     schemas, file_default_instances, TableStruct_appearances_2eproto::offsets,
@@ -4098,6 +4102,9 @@ class AppearanceFlags::_Internal {
   static void set_has_expirestop(HasBits* has_bits) {
     (*has_bits)[1] |= 4194304u;
   }
+  static void set_has_deco_kit(HasBits* has_bits) {
+    (*has_bits)[1] |= 8388608u;
+  }
 };
 
 const ::otclient::protobuf::appearances::AppearanceFlagBank&
@@ -4227,7 +4234,8 @@ AppearanceFlags::AppearanceFlags(const AppearanceFlags& from)
     , decltype(_impl_.wearout_){}
     , decltype(_impl_.clockexpire_){}
     , decltype(_impl_.expire_){}
-    , decltype(_impl_.expirestop_){}};
+    , decltype(_impl_.expirestop_){}
+    , decltype(_impl_.deco_kit_){}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   if (from._internal_has_bank()) {
@@ -4276,8 +4284,8 @@ AppearanceFlags::AppearanceFlags(const AppearanceFlags& from)
     _this->_impl_.upgradeclassification_ = new ::otclient::protobuf::appearances::AppearanceFlagUpgradeClassification(*from._impl_.upgradeclassification_);
   }
   ::memcpy(&_impl_.clip_, &from._impl_.clip_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.expirestop_) -
-    reinterpret_cast<char*>(&_impl_.clip_)) + sizeof(_impl_.expirestop_));
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.deco_kit_) -
+    reinterpret_cast<char*>(&_impl_.clip_)) + sizeof(_impl_.deco_kit_));
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlags)
 }
 
@@ -4344,6 +4352,7 @@ inline void AppearanceFlags::SharedCtor(
     , decltype(_impl_.clockexpire_){false}
     , decltype(_impl_.expire_){false}
     , decltype(_impl_.expirestop_){false}
+    , decltype(_impl_.deco_kit_){false}
   };
 }
 
@@ -4474,10 +4483,10 @@ void AppearanceFlags::Clear() {
         reinterpret_cast<char*>(&_impl_.reverse_addons_east_) -
         reinterpret_cast<char*>(&_impl_.unwrap_)) + sizeof(_impl_.reverse_addons_east_));
   }
-  if (cached_has_bits & 0x007f0000u) {
+  if (cached_has_bits & 0x00ff0000u) {
     ::memset(&_impl_.reverse_addons_west_, 0, static_cast<size_t>(
-        reinterpret_cast<char*>(&_impl_.expirestop_) -
-        reinterpret_cast<char*>(&_impl_.reverse_addons_west_)) + sizeof(_impl_.expirestop_));
+        reinterpret_cast<char*>(&_impl_.deco_kit_) -
+        reinterpret_cast<char*>(&_impl_.reverse_addons_west_)) + sizeof(_impl_.deco_kit_));
   }
   _impl_._has_bits_.Clear();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
@@ -4982,6 +4991,15 @@ const char* AppearanceFlags::_InternalParse(const char* ptr, ::_pbi::ParseContex
         } else
           goto handle_unusual;
         continue;
+      // optional bool deco_kit = 57;
+      case 57:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 200)) {
+          _Internal::set_has_deco_kit(&_impl_._has_bits_);
+          _impl_.deco_kit_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
       default:
         goto handle_unusual;
     }  // switch
@@ -5380,6 +5398,12 @@ uint8_t* AppearanceFlags::_InternalSerialize(
     target = ::_pbi::WireFormatLite::WriteBoolToArray(56, this->_internal_expirestop(), target);
   }
 
+  // optional bool deco_kit = 57;
+  if (cached_has_bits & 0x00800000u) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(57, this->_internal_deco_kit(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -5687,7 +5711,7 @@ size_t AppearanceFlags::ByteSizeLong() const {
     }
 
   }
-  if (cached_has_bits & 0x007f0000u) {
+  if (cached_has_bits & 0x00ff0000u) {
     // optional bool reverse_addons_west = 50;
     if (cached_has_bits & 0x00010000u) {
       total_size += 2 + 1;
@@ -5720,6 +5744,11 @@ size_t AppearanceFlags::ByteSizeLong() const {
 
     // optional bool expirestop = 56;
     if (cached_has_bits & 0x00400000u) {
+      total_size += 2 + 1;
+    }
+
+    // optional bool deco_kit = 57;
+    if (cached_has_bits & 0x00800000u) {
       total_size += 2 + 1;
     }
 
@@ -5921,7 +5950,7 @@ void AppearanceFlags::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const 
     }
     _this->_impl_._has_bits_[1] |= cached_has_bits;
   }
-  if (cached_has_bits & 0x007f0000u) {
+  if (cached_has_bits & 0x00ff0000u) {
     if (cached_has_bits & 0x00010000u) {
       _this->_impl_.reverse_addons_west_ = from._impl_.reverse_addons_west_;
     }
@@ -5942,6 +5971,9 @@ void AppearanceFlags::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const 
     }
     if (cached_has_bits & 0x00400000u) {
       _this->_impl_.expirestop_ = from._impl_.expirestop_;
+    }
+    if (cached_has_bits & 0x00800000u) {
+      _this->_impl_.deco_kit_ = from._impl_.deco_kit_;
     }
     _this->_impl_._has_bits_[1] |= cached_has_bits;
   }
@@ -5966,8 +5998,8 @@ void AppearanceFlags::InternalSwap(AppearanceFlags* other) {
   swap(_impl_._has_bits_[1], other->_impl_._has_bits_[1]);
   _impl_.npcsaledata_.InternalSwap(&other->_impl_.npcsaledata_);
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.expirestop_)
-      + sizeof(AppearanceFlags::_impl_.expirestop_)
+      PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.deco_kit_)
+      + sizeof(AppearanceFlags::_impl_.deco_kit_)
       - PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.bank_)>(
           reinterpret_cast<char*>(&_impl_.bank_),
           reinterpret_cast<char*>(&other->_impl_.bank_));

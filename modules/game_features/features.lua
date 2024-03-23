@@ -1,7 +1,10 @@
 controller = Controller:new()
 controller:registerEvents(g_game, {
     onClientVersionChange = function(version)
-        g_game.enableFeature(GameFormatCreatureName);
+        -- g_game.enableFeature(GameKeepUnawareTiles)
+        -- g_game.enableFeature(GameSmoothWalkElevation)
+        -- g_game.enableFeature(GameNegativeOffset)
+        g_game.enableFeature(GameFormatCreatureName)
 
         if version >= 750 then
             g_game.enableFeature(GameSoul);
@@ -171,6 +174,7 @@ controller:registerEvents(g_game, {
 
         if version >= 1094 then
             g_game.enableFeature(GameAdditionalSkills);
+            g_game.enableFeature(GameLeechAmount);
         end
 
         if version >= 1200 then
@@ -178,6 +182,7 @@ controller:registerEvents(g_game, {
             g_game.enableFeature(GameThingQuickLoot);
             g_game.enableFeature(GameTournamentPackets);
             g_game.enableFeature(GameVipGroups);
+            g_game.enableFeature(GameEnterGameShowAppearance);
         end
 
         if version >= 1260 then
@@ -216,6 +221,21 @@ controller:registerEvents(g_game, {
         if version >= 1314 then
             g_game.disableFeature(GameTournamentPackets);
             g_game.enableFeature(GameDynamicForgeVariables);
+        end
+
+        if version >= 1320 then
+            g_game.enableFeature(GameEffectU16);
+            g_game.enableFeature(GameContainerTypes);
+            g_game.enableFeature(GameBosstiaryTracker);
+            g_game.enableFeature(GamePlayerStateCounter);
+            g_game.disableFeature(GameLeechAmount);
+            g_game.enableFeature(GameItemAugment);
+            g_game.enableFeature(GameDynamicBugReporter);
+        end
+
+        if version >= 1321 then
+            g_game.enableFeature(GameWrapKit);
+            g_game.enableFeature(GameContainerFilter);
         end
     end
 })

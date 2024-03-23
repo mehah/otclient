@@ -24,12 +24,40 @@
 
 #include "global.h"
 
-class Client
+#include "uimap.h"
+
+#include <framework/graphics/declarations.h>
+#include <framework/core/graphicalapplication.h>
+
+class Client : public ApplicationDrawEvents
 {
 public:
-    static void init(std::vector<std::string>& args);
-    static void terminate();
+    void init(std::vector<std::string>& args);
+    void terminate();
     static void registerLuaFunctions();
+
+    void preLoad() override;
+    void drawMap() override;
+    void drawForgroundMap() override;
+
+    bool canDraw(DrawPoolType type) const override;
+    bool isLoadingAsyncTexture() override;
+    bool isUsingProtobuf() override;
+
+    void onLoadingAsyncTextureChanged(bool loadingAsync) override;
+
+    UIMapPtr getMapWidget() { return m_mapWidget; }
+
+    float getEffectAlpha() const { return m_effectAlpha; }
+    void setEffectAlpha(float v) { m_effectAlpha = v; }
+
+    float getMissileAlpha() const { return m_missileAlpha; }
+    void setMissileAlpha(float v) { m_missileAlpha = v; }
+
+private:
+    UIMapPtr m_mapWidget;
+    float m_effectAlpha{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
+    float m_missileAlpha{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
 };
 
 extern Client g_client;

@@ -101,6 +101,7 @@ enum ThingAttr : uint8_t
     ThingAttrExpire = 41,
     ThingAttrExpireStop = 42,
     ThingAttrPodium = 43,
+    ThingAttrDecoKit = 44,
 
     // additional
     ThingAttrOpacity = 100,
@@ -160,7 +161,8 @@ enum ThingFlagAttr :uint64_t
     ThingFlagAttrExpireStop = static_cast<uint64_t>(1) << 41,
     ThingFlagAttrPodium = static_cast<uint64_t>(1) << 42,
     ThingFlagAttrTopEffect = static_cast<uint64_t>(1) << 43,
-    ThingFlagAttrDefaultAction = static_cast<uint64_t>(1) << 44
+    ThingFlagAttrDefaultAction = static_cast<uint64_t>(1) << 44,
+    ThingFlagAttrDecoKit = static_cast<uint64_t>(1) << 45
 };
 
 enum STACK_PRIORITY : uint8_t
@@ -277,6 +279,7 @@ public:
 #endif
 
     void draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, const Color& color, bool drawThings = true, LightView* lightView = nullptr, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR);
+    void drawWithFrameBuffer(const TexturePtr& texture, const Rect& screenRect, const Rect& textureRect, const Color& color, const DrawConductor& conductor);
 
     uint16_t getId() { return m_id; }
     ThingCategory getCategory() { return m_category; }
@@ -311,8 +314,8 @@ public:
     int getLensHelp() { return m_lensHelp; }
     int getClothSlot() { return m_clothSlot; }
 
-    bool isTopGround() { return isGround() && !isSingleDimension(); }
-    bool isTopGroundBorder() { return isGroundBorder() && !isSingleDimension(); }
+    bool isTopGround() { return isGround() && m_size.dimension() == 4; }
+    bool isTopGroundBorder() { return isGroundBorder() && m_size.dimension() == 4; }
     bool isSingleGround() { return isGround() && isSingleDimension(); }
     bool isSingleGroundBorder() { return isGroundBorder() && isSingleDimension(); }
     bool isTall(const bool useRealSize = false);
@@ -364,6 +367,7 @@ public:
     bool isTopEffect() { return (m_flags & ThingFlagAttrTopEffect); }
     bool hasAction() { return (m_flags & ThingFlagAttrDefaultAction); }
     bool isOpaque() { if (m_opaque == -1) getTexture(0); return m_opaque == 1; }
+    bool isDecoKit() { return (m_flags & ThingFlagAttrDecoKit); }
 
     bool isItem() const { return m_category == ThingCategoryItem; }
     bool isEffect() const { return m_category == ThingCategoryEffect; }
@@ -388,6 +392,9 @@ public:
     void setPathable(bool var);
     int getExactHeight();
     TexturePtr getTexture(int animationPhase);
+
+    std::string getName() { return m_name; }
+    std::string getDescription() { return m_description; }
 
 private:
     static ThingFlagAttr thingAttrToThingFlagAttr(ThingAttr attr);
@@ -458,4 +465,7 @@ private:
     std::atomic_bool m_loading;
 
     Timer m_lastTimeUsage;
+
+    std::string m_name;
+    std::string m_description;
 };

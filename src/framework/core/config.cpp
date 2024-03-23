@@ -143,6 +143,25 @@ OTMLNodePtr Config::getNode(const std::string& key)
     return m_confsDoc->get(key);
 }
 
+int Config::getNodeSize(const std::string& key)
+{
+    auto node = m_confsDoc->get(key);
+    if (node)
+        return node->size();
+    return 0;
+}
+
+OTMLNodePtr Config::getOrCreateNode(const std::string& key, const OTMLNodePtr& ifNotExists)
+{
+    OTMLNodePtr node = m_confsDoc->get(key);
+    if (!node && ifNotExists != nullptr) {
+        setNode(key, ifNotExists);
+        node = ifNotExists;
+        save();
+    }
+    return node;
+}
+
 bool Config::isLoaded() const
 {
     return !m_fileName.empty() && m_confsDoc;

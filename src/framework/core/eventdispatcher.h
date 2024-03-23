@@ -25,28 +25,73 @@
 #include "clock.h"
 #include "scheduledevent.h"
 
-#include <queue>
 #include <thread>
 
  // @bindsingleton g_dispatcher
 class EventDispatcher
 {
 public:
+    EventDispatcher() {
+        m_threads.emplace_back(std::make_unique<ThreadTask>());
+    }
+
+    void init();
     void shutdown();
     void poll();
 
-    EventPtr addEvent(const std::function<void()>& callback, bool pushFront = false);
+    EventPtr addEvent(const std::function<void()>& callback);
+    void deferEvent(const std::function<void()>& callback);
     ScheduledEventPtr scheduleEvent(const std::function<void()>& callback, int delay);
     ScheduledEventPtr cycleEvent(const std::function<void()>& callback, int delay);
 
+    void startEvent(const ScheduledEventPtr& event);
+
+    static int16_t getThreadId() {
+        static std::atomic_int16_t lastId = -1;
+        thread_local static int16_t id = -1;
+
+        if (id == -1) {
+            lastId.fetch_add(1);
+            id = lastId.load();
+        }
+
+        return id;
+    };
+
 private:
+    inline void mergeEvents();
+    inline void executeEvents();
+    inline void executeDeferEvents();
+    inline void executeScheduledEvents();
+
+    const auto& getThreadTask() const {
+        return m_threads[getThreadId()];
+    }
+
     size_t m_pollEventsSize{};
     bool m_disabled{ false };
 
-    std::recursive_mutex m_mutex;
-    std::deque<EventPtr> m_eventList;
-    std::priority_queue<ScheduledEventPtr, std::deque<ScheduledEventPtr>, ScheduledEvent::Compare> m_scheduledEventList;
+    // Thread Events
+    struct ThreadTask
+    {
+        ThreadTask() {
+            events.reserve(2000);
+            scheduledEventList.reserve(2000);
+        }
+
+        std::vector<EventPtr> events;
+        std::vector<Event> deferEvents;
+        std::vector<ScheduledEventPtr> scheduledEventList;
+        std::mutex mutex;
+    };
+    std::vector<std::unique_ptr<ThreadTask>> m_threads;
+
+    // Main Events
+    std::vector<EventPtr> m_eventList;
+    std::vector<Event> m_deferEventList;
+    phmap::btree_multiset<ScheduledEventPtr, ScheduledEvent::Compare> m_scheduledEventList;
 };
 
 extern EventDispatcher g_dispatcher, g_textDispatcher, g_mainDispatcher;
-extern std::thread::id g_mainThreadId;
+extern int16_t g_mainThreadId;
+extern int16_t g_eventThreadId;

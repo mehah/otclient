@@ -32,20 +32,22 @@ ShaderManager g_shaders;
 void ShaderManager::init() { PainterShaderProgram::release(); }
 void ShaderManager::terminate() { m_shaders.clear(); }
 
-void ShaderManager::createShader(const std::string_view name)
+void ShaderManager::createShader(const std::string_view name, bool useFramebuffer)
 {
-    g_mainDispatcher.addEvent([&, name = name.data()] {
+    g_mainDispatcher.addEvent([this, name = name.data(), useFramebuffer] {
         const auto& shader = std::make_shared<PainterShaderProgram>();
+        shader->setUseFramebuffer(useFramebuffer);
         m_shaders[name] = shader;
         return shader;
     });
 }
 
-void ShaderManager::createFragmentShader(const std::string_view name, const std::string_view file)
+void ShaderManager::createFragmentShader(const std::string_view name, const std::string_view file, bool useFramebuffer)
 {
     const auto& filePath = g_resources.resolvePath(file.data());
-    g_mainDispatcher.addEvent([&, name = name.data(), filePath] {
+    g_mainDispatcher.addEvent([this, name = name.data(), filePath, useFramebuffer] {
         const auto& shader = std::make_shared<PainterShaderProgram>();
+        shader->setUseFramebuffer(useFramebuffer);
         if (!shader)
             return;
 
@@ -66,10 +68,11 @@ void ShaderManager::createFragmentShader(const std::string_view name, const std:
     });
 }
 
-void ShaderManager::createFragmentShaderFromCode(const std::string_view name, const std::string_view code)
+void ShaderManager::createFragmentShaderFromCode(const std::string_view name, const std::string_view code, bool useFramebuffer)
 {
-    g_mainDispatcher.addEvent([&, name = name.data(), code = code.data()] {
+    g_mainDispatcher.addEvent([this, name = name.data(), code = code.data(), useFramebuffer] {
         const auto& shader = std::make_shared<PainterShaderProgram>();
+        shader->setUseFramebuffer(useFramebuffer);
         if (!shader)
             return;
 

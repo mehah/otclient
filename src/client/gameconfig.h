@@ -34,7 +34,7 @@ public:
     void init();
     void terminate();
 
-    uint8_t getSpriteSize()  const { return m_spriteSize; }
+    uint8_t getSpriteSize() { return m_spriteSize; }
     uint16_t getLastSupportedVersion() const { return m_lastSupportedVersion; }
     bool drawTyping() const { return m_drawTyping; }
     std::string getTypingIcon() const { return m_typingIcon; }
@@ -62,6 +62,9 @@ public:
     uint16_t getStaticDurationPerCharacter() const { return m_staticDurationPerCharacter; }
     uint16_t getMinStatictextDuration() const { return m_minStatictextDuration; }
 
+    double getPlayerDiagonalWalkSpeed() const { return m_playerDiagonalWalkSpeed; }
+    double getCreatureDiagonalWalkSpeed() const { return m_creatureDiagonalWalkSpeed; }
+
     BitmapFontPtr getCreatureNameFont()  const { return m_creatureNameFont; }
     BitmapFontPtr getAnimatedTextFont()  const { return m_animatedTextFont; }
     BitmapFontPtr getStaticTextFont()  const { return m_staticTextFont; }
@@ -75,11 +78,12 @@ private:
     void loadMapNode(const OTMLNodePtr& node);
     void loadTileNode(const OTMLNodePtr& node);
     void loadCreatureNode(const OTMLNodePtr& node);
+    void loadPlayerNode(const OTMLNodePtr& node);
     void loadRenderNode(const OTMLNodePtr& node);
 
     // Game
     uint8_t m_spriteSize{ 32 };
-    uint16_t m_lastSupportedVersion{ 1291 };
+    uint16_t m_lastSupportedVersion{ 1321 };
     bool m_drawTyping{ false };
     std::string m_typingIcon{ "/images/game/console/typing" };
 
@@ -100,6 +104,10 @@ private:
     bool m_adjustCreatureInformationBasedCropSize{ false };
     uint16_t m_shieldBlinkTicks{ 500 };
     uint16_t m_volatileSquareDuration{ 1000 };
+    double m_creatureDiagonalWalkSpeed{ 3 };
+
+    // Player
+    double m_playerDiagonalWalkSpeed{ 3 };
 
     // Render
     uint16_t m_invisibleTicksPerFrame{ 500 };

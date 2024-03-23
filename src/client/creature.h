@@ -79,6 +79,10 @@ public:
     void setPassable(bool passable) { m_passable = passable; }
     void setMountShader(const std::string_view name);
 
+    void onStartAttachEffect(const AttachedEffectPtr& effect) override;
+    void onDispatcherAttachEffect(const AttachedEffectPtr& effect) override;
+    void onStartDetachEffect(const AttachedEffectPtr& effect) override;
+
     void addTimedSquare(uint8_t color);
     void removeTimedSquare() { m_showTimedSquare = false; }
     void showStaticSquare(const Color& color) { m_showStaticSquare = true; m_staticSquareColor = color; }
@@ -116,6 +120,9 @@ public:
     uint32_t getMasterId() { return m_masterId; }
     std::string getName() { return m_name.getText(); }
 
+    Point getDrawOffset() { return Point(-1, -1) * getDrawElevation() + m_walkOffset; }
+    int getDrawElevation();
+
     Otc::Direction getDirection() { return m_direction; }
     Outfit getOutfit() { return m_outfit; }
     const Light& getLight() const override;
@@ -126,6 +133,10 @@ public:
     PointF getJumpOffset() { return m_jumpOffset; }
     Position getLastStepFromPosition() const { return m_lastStepFromPosition; }
     Position getLastStepToPosition() const { return m_lastStepToPosition; }
+    bool isTimedSquareVisible() { return m_showTimedSquare; }
+    Color getTimedSquareColor() { return m_timedSquareColor; }
+    bool isStaticSquareVisible() { return m_showStaticSquare; }
+    Color getStaticSquareColor() { return m_staticSquareColor; }
 
     ticks_t getWalkTicksElapsed() { return m_walkTimer.ticksElapsed(); }
 
@@ -150,6 +161,14 @@ public:
     void sendTyping();
     bool getTyping() { return m_typing; }
     void setTypingIconTexture(const std::string& filename);
+    void setBounce(uint8_t minHeight, uint8_t height, uint16_t speed) { m_bounce = { minHeight, height , speed }; }
+
+#ifndef BOT_PROTECTION
+    void setText(const std::string& text, const Color& color);
+    std::string getText();
+    void clearText() { setText("", Color::white); }
+    bool canShoot(int distance);
+#endif
 
 protected:
     virtual void updateWalkOffset(uint8_t totalPixelsWalked);
@@ -261,11 +280,22 @@ private:
     PointF m_jumpOffset;
     Timer m_jumpTimer;
 
+    struct
+    {
+        uint8_t minHeight{ 0 };
+        uint8_t height{ 0 };
+        uint16_t speed{ 0 };
+    } m_bounce;
+
     // Mount Shader
     PainterShaderProgramPtr m_mountShader;
     std::function<void()> m_mountShaderAction{ nullptr };
 
     ThingType* m_mountType{ nullptr };
+
+#ifndef BOT_PROTECTION
+    StaticTextPtr m_text;
+#endif
 };
 
 // @bindclass

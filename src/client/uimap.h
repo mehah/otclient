@@ -93,9 +93,12 @@ public:
     void setDrawHighlightTarget(const bool enable) { m_mapView->setDrawHighlightTarget(enable); }
     void setAntiAliasingMode(const MapView::AntialiasingMode mode) { m_mapView->setAntiAliasingMode(mode); }
     void setFloorFading(const uint16_t v) { m_mapView->setFloorFading(v); }
+    MapViewPtr getMapView() const { return m_mapView; }
+    void clearTiles() {
+        m_mapView->m_foregroundTiles.clear();
+    }
 
-    void addTileWidget(const TilePtr& tile);
-    void removeTileWidget(const TilePtr& tile);
+    void updateMapRect();
 
 protected:
     void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
@@ -106,7 +109,6 @@ private:
     void updateVisibleDimension();
     void updateMapSize();
 
-    std::vector<TilePtr> m_tiles;
     MapViewPtr m_mapView;
     Rect m_mapRect;
 

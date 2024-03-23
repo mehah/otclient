@@ -42,11 +42,6 @@ AnimatedTexture::AnimatedTexture(const Size& size, const std::vector<ImagePtr>& 
     m_framesDelay = std::move(framesDelay);
     m_numPlays = numPlays;
     m_animTimer.restart();
-
-    g_mainDispatcher.addEvent([&] {
-        for (const auto& frame : m_frames)
-            frame->create();
-    });
 }
 
 void AnimatedTexture::buildHardwareMipmaps()
@@ -90,6 +85,19 @@ TexturePtr AnimatedTexture::get(uint32_t& frame, Timer& timer) {
     return m_frames[frame];
 }
 
+TexturePtr AnimatedTexture::getCurrentFrame() {
+    return m_frames[m_currentFrame];
+}
+
+Texture* AnimatedTexture::create() {
+    if (getCurrentFrame()->isEmpty()) {
+        for (const auto& frame : m_frames)
+            frame->create();
+    }
+
+    return this;
+}
+
 void AnimatedTexture::update()
 {
     if (!m_animTimer.running())
@@ -108,7 +116,7 @@ void AnimatedTexture::update()
         }
     }
 
-    m_id = m_frames[m_currentFrame]->getId();
+    m_id = getCurrentFrame()->getId();
 
     if (isOnMap())
         g_app.repaintMap();

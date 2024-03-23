@@ -29,19 +29,18 @@
 #include "texture.h"
 #include "framework/core/timer.h"
 #include <framework/platform/platformwindow.h>
+#include <framework/core/graphicalapplication.h>
 
 #include "../stdext/storage.h"
-
-#define MAX_DRAW_DEPTH 15
 
 enum class DrawPoolType : uint8_t
 {
     MAP,
     CREATURE_INFORMATION,
     LIGHT,
-    TEXT,
+    FOREGROUND_MAP,
     FOREGROUND,
-    UNKNOW
+    LAST
 };
 
 enum DrawOrder : uint8_t
@@ -60,7 +59,7 @@ struct DrawConductor
     uint8_t order{ DrawOrder::FIRST };
 };
 
-static const DrawConductor DEFAULT_DRAW_CONDUCTOR;
+constexpr DrawConductor DEFAULT_DRAW_CONDUCTOR;
 
 class DrawPool
 {
@@ -95,10 +94,11 @@ public:
     void setFramebuffer(const Size& size);
     void removeFramebuffer();
 
-    void onBeforeDraw(std::function<void()> f) { m_beforeDraw = std::move(f); }
-    void onAfterDraw(std::function<void()> f) { m_afterDraw = std::move(f); }
+    void onBeforeDraw(std::function<void()>&& f) { m_beforeDraw = std::move(f); }
+    void onAfterDraw(std::function<void()>&& f) { m_afterDraw = std::move(f); }
 
-    std::mutex& getMutex() { return m_mutex; }
+    std::mutex& getMutex() { return m_mutexDraw; }
+    std::mutex& getMutexPreDraw() { return m_mutexPreDraw; }
 
 protected:
 
@@ -139,11 +139,11 @@ protected:
     struct DrawObject
     {
         DrawObject(std::function<void()> action) : action(std::move(action)) {}
-        DrawObject(PoolState& state) : state(std::move(state)), coords(std::make_unique<CoordsBuffer>()) {}
-        DrawObject(const DrawMode drawMode, PoolState& state, DrawMethod& method) :
+        DrawObject(PoolState&& state) : state(std::move(state)), coords(std::make_unique<CoordsBuffer>()) {}
+        DrawObject(const DrawMode drawMode, PoolState&& state, DrawMethod&& method) :
             drawMode(drawMode), state(std::move(state)) { methods.emplace_back(std::move(method)); }
 
-        void addMethod(DrawMethod& method)
+        void addMethod(DrawMethod&& method)
         {
             drawMode = DrawMode::TRIANGLES;
             methods.emplace_back(std::move(method));
@@ -179,14 +179,18 @@ private:
         STATE_BLEND_EQUATION = 1 << 4,
     };
 
-    void add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod& method,
+    void add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod&& method,
              DrawMode drawMode = DrawMode::TRIANGLES, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR,
              const CoordsBufferPtr& coordsBuffer = nullptr);
+
+    void addAction(const std::function<void()>& action);
+    void bindFrameBuffer(const Size& size, const Color& color = Color::white);
+    void releaseFrameBuffer(const Rect& dest);
 
     inline void setFPS(uint16_t fps) { m_refreshDelay = fps; }
 
     void updateHash(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color);
-    PoolState getState(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color);
+    PoolState getState(const TexturePtr& texture, const Color& color);
 
     float getOpacity() const { return m_state.opacity; }
     Rect getClipRect() { return m_state.clipRect; }
@@ -212,35 +216,103 @@ private:
     void rotate(float x, float y, float angle);
     void rotate(const Point& p, float angle) { rotate(p.x, p.y, angle); }
 
+    template<typename T>
+    void setParameter(std::string_view name, T&& value) {
+        m_parameters.emplace(name, value);
+    }
+    template<typename T>
+    T getParameter(std::string_view name) {
+        auto it = m_parameters.find(name);
+        if (it != m_parameters.end()) {
+            return std::any_cast<T>(it->second);
+        }
+
+        return T();
+    }
+    bool containsParameter(std::string_view name) {
+        return m_parameters.contains(name);
+    }
+    void removeParameter(std::string_view name) {
+        const auto& it = m_parameters.find(name);
+        if (it != m_parameters.end())
+            m_parameters.erase(it);
+    }
+
     void flush()
     {
         m_coords.clear();
-        if (m_depthLevel < MAX_DRAW_DEPTH)
-            ++m_depthLevel;
+        for (auto& objs : m_objects) {
+            m_objectsFlushed.insert(m_objectsFlushed.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
+            objs.clear();
+        }
+    }
+
+    void release(bool draw = true) {
+        m_objectsDraw.clear();
+        if (draw) {
+            if (!m_objectsFlushed.empty())
+                m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(m_objectsFlushed.begin()), make_move_iterator(m_objectsFlushed.end()));
+
+            for (auto& objs : m_objects) {
+                m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
+                objs.clear();
+            }
+        }
+
+        m_objectsFlushed.clear();
+    }
+
+    void resetOnlyOnceParameters() {
+        if (m_onlyOnceStateFlag > 0) { // Only Once State
+            if (m_onlyOnceStateFlag & STATE_OPACITY)
+                resetOpacity();
+
+            if (m_onlyOnceStateFlag & STATE_BLEND_EQUATION)
+                resetBlendEquation();
+
+            if (m_onlyOnceStateFlag & STATE_CLIP_RECT)
+                resetClipRect();
+
+            if (m_onlyOnceStateFlag & STATE_COMPOSITE_MODE)
+                resetCompositionMode();
+
+            if (m_onlyOnceStateFlag & STATE_SHADER_PROGRAM)
+                resetShaderProgram();
+
+            m_onlyOnceStateFlag = 0;
+        }
     }
 
     bool canRepaint(bool autoUpdateStatus);
 
+    const FrameBufferPtr& getTemporaryFrameBuffer(const uint8_t index);
+
     bool m_enabled{ true };
     bool m_alwaysGroupDrawings{ false };
 
-    uint8_t m_depthLevel{ 0 };
+    int_fast8_t m_bindedFramebuffers{ -1 };
 
     uint16_t m_refreshDelay{ 0 }, m_shaderRefreshDelay{ 0 };
     uint32_t m_onlyOnceStateFlag{ 0 };
+    uint_fast64_t m_lastFramebufferId{ 0 };
 
     PoolState m_state, m_oldState;
 
-    DrawPoolType m_type{ DrawPoolType::UNKNOW };
+    DrawPoolType m_type{ DrawPoolType::LAST };
 
     Timer m_refreshTimer;
 
     std::pair<size_t, size_t> m_status{ 1, 0 };
 
     std::vector<Matrix3> m_transformMatrixStack;
-    std::vector<DrawObject> m_objects[MAX_DRAW_DEPTH + 1][static_cast<uint8_t>(DrawOrder::LAST)];
+    std::vector<FrameBufferPtr> m_temporaryFramebuffers;
+
+    std::vector<DrawObject> m_objects[static_cast<uint8_t>(DrawOrder::LAST)];
+    std::vector<DrawObject> m_objectsFlushed;
+    std::vector<DrawObject> m_objectsDraw;
 
     stdext::map<size_t, CoordsBuffer*> m_coords;
+    stdext::map<std::string_view, std::any> m_parameters;
 
     float m_scaleFactor{ 1.f };
     float m_scale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
@@ -250,9 +322,11 @@ private:
     std::function<void()> m_beforeDraw;
     std::function<void()> m_afterDraw;
 
-    std::mutex m_mutex;
+    std::atomic_bool m_repaint{ false };
+    std::mutex m_mutexDraw;
+    std::mutex m_mutexPreDraw;
 
-    friend DrawPoolManager;
+    friend class DrawPoolManager;
 };
 
 extern DrawPoolManager g_drawPool;

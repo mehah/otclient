@@ -2,6 +2,9 @@ local otmm = true
 local oldPos = nil
 local minimapButton = nil
 
+-- bot fix
+minimapWidget = nil
+
 local function updateCameraPosition()
     local player = g_game.getLocalPlayer()
     if not player then
@@ -34,7 +37,11 @@ local function toggle()
 end
 
 local function toggleFullMap()
+    local rootPanel = modules.game_interface.getRootPanel()
     local minimapWidget = controller.ui.contentsPanel.minimap
+    if not minimapWidget then
+        minimapWidget = rootPanel.minimap
+    end
     local zoom;
 
     if minimapWidget.fullMapView then
@@ -44,7 +51,7 @@ local function toggleFullMap()
         zoom = minimapWidget.zoomMinimap
     else
         controller.ui:hide(true)
-        minimapWidget:setParent(modules.game_interface.getRootPanel())
+        minimapWidget:setParent(rootPanel)
         minimapWidget:fill('parent')
         zoom = minimapWidget.zoomFullmap
     end
@@ -69,7 +76,7 @@ function controller:onInit()
         '/images/topbuttons/minimap', toggle)
     minimapButton:setOn(true)
 
-    local minimapWidget = self.ui.contentsPanel.minimap
+    minimapWidget = self.ui.contentsPanel.minimap
 
     local gameRootPanel = modules.game_interface.getRootPanel()
     self:bindKeyPress('Alt+Left', function()
@@ -96,8 +103,6 @@ function controller:onGameStart()
     self.ui:setupOnStart() -- load character window configuration
 
     -- Load Map
-    g_minimap.clean()
-
     local minimapFile = '/minimap'
     local loadFnc = nil
 
@@ -127,6 +132,8 @@ function controller:onGameEnd()
     end
 
     self.ui.contentsPanel.minimap:save()
+
+    g_minimap.clean()
 end
 
 function controller:onTerminate()

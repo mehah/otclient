@@ -359,8 +359,11 @@ void UITextEdit::setSelection(int start, int end)
 
 void UITextEdit::setTextHidden(bool hidden)
 {
+    if (getProp(PropTextHidden) == hidden)
+        return;
+
     setProp(PropTextHidden, hidden);
-    update(true);
+    updateText();
 }
 
 void UITextEdit::setTextVirtualOffset(const Point& offset)

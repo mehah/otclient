@@ -69,7 +69,8 @@ enum FlagProp : uint32_t
     PropImageRepeated = 1 << 20,
     PropImageSmooth = 1 << 21,
     PropImageAutoResize = 1 << 22,
-    propImageIndividualAnimation = 1 << 23
+    PropImageIndividualAnimation = 1 << 23,
+    PropDisableUpdateTemporarily = 1 << 24
 };
 
 // @bindclass
@@ -102,6 +103,7 @@ protected:
     OTMLNodePtr m_style;
 
     stdext::map<std::string, UIWidgetPtr> m_childrenById;
+    std::unordered_map<std::string, std::function<void()>> m_onDestroyCallbacks;
 
     Timer m_clickTimer;
     Fw::FocusReason m_lastFocusReason{ Fw::ActiveFocusReason };
@@ -121,6 +123,7 @@ public:
     void lowerChild(const UIWidgetPtr& child);
     void raiseChild(const UIWidgetPtr& child);
     void moveChildToIndex(const UIWidgetPtr& child, int index);
+    void reorderChildren(const std::vector<UIWidgetPtr>& childrens);
     void lockChild(const UIWidgetPtr& child);
     void unlockChild(const UIWidgetPtr& child);
     void mergeStyle(const OTMLNodePtr& styleNode);
@@ -145,6 +148,9 @@ public:
     void bindRectToParent();
     void destroy();
     void destroyChildren();
+    void removeChildren();
+    void hideChildren();
+    void showChildren();
 
     void setId(const std::string_view id);
     void setParent(const UIWidgetPtr& parent);
@@ -169,7 +175,7 @@ public:
     bool isAnchored();
     bool isChildLocked(const UIWidgetPtr& child);
     bool hasChild(const UIWidgetPtr& child);
-    int getChildIndex(const UIWidgetPtr& child) { return child && child->getParent().get() == this ? child->m_childIndex : -1; }
+    int getChildIndex(const UIWidgetPtr& child = nullptr) { return child ? (child->getParent().get() == this ? child->m_childIndex : -1) : m_childIndex; }
     Rect getPaddingRect();
     Rect getMarginRect();
     Rect getChildrenRect();
@@ -195,8 +201,13 @@ public:
     void setShader(const std::string_view name);
     bool hasShader() { return m_shader != nullptr; }
 
-    void setProp(FlagProp prop, bool v);
+    void setProp(FlagProp prop, bool v, bool callEvent = false);
     bool hasProp(FlagProp prop) { return (m_flagsProp & prop); }
+
+    void disableUpdateTemporarily();
+    void addOnDestroyCallback(const std::string& id, const std::function<void()>&& callback);
+    void removeOnDestroyCallback(const std::string&);
+
 private:
     uint32_t m_flagsProp{ 0 };
     PainterShaderProgramPtr m_shader;
@@ -264,7 +275,8 @@ public:
     bool isEnabled() { return !hasState(Fw::DisabledState); }
     bool isDisabled() { return hasState(Fw::DisabledState); }
     bool isFocused() { return hasState(Fw::FocusState); }
-    bool isHovered() { return hasState(Fw::HoverState); }
+    bool isHovered(bool orChild = false) { return hasState(Fw::HoverState) || (orChild && isChildHovered()); }
+    bool isChildHovered() { return getHoveredChild() != nullptr; }
     bool isPressed() { return hasState(Fw::PressedState); }
     bool isFirst() { return hasState(Fw::FirstState); }
     bool isMiddle() { return hasState(Fw::MiddleState); }
@@ -283,6 +295,7 @@ public:
     bool isFixedSize() { return hasProp(PropFixedSize); }
     bool isClipping() { return hasProp(PropClipping); }
     bool isDestroyed() { return hasProp(PropDestroyed); }
+    bool isFirstOnStyle() { return hasProp(PropFirstOnStyle); }
 
     bool isFirstChild() { return m_parent && m_childIndex == 1; }
     bool isLastChild() { return m_parent && m_childIndex == m_parent->m_children.size(); }
@@ -292,10 +305,14 @@ public:
     bool containsMarginPoint(const Point& point) { return getMarginRect().contains(point); }
     bool containsPaddingPoint(const Point& point) { return getPaddingRect().contains(point); }
     bool containsPoint(const Point& point) { return m_rect.contains(point); }
+    bool intersects(const Rect rect) { return m_rect.intersects(rect); }
+    bool intersectsMargin(const Rect rect) { return getMarginRect().intersects(rect); }
+    bool intersectsPadding(const Rect rect) { return getPaddingRect().intersects(rect); }
 
     std::string getId() { return m_id; }
     UIWidgetPtr getParent() { return m_parent; }
     UIWidgetPtr getFocusedChild() { return m_focusedChild; }
+    UIWidgetPtr getHoveredChild();
     UIWidgetList getChildren() { return m_children; }
     UIWidgetPtr getFirstChild() { return getChildByIndex(1); }
     UIWidgetPtr getLastChild() { return getChildByIndex(-1); }
@@ -399,6 +416,7 @@ public:
     int getX() { return m_rect.x(); }
     int getY() { return m_rect.y(); }
     Point getPosition() { return m_rect.topLeft(); }
+    Point getCenter() { return m_rect.center(); }
     int getWidth() { return m_rect.width(); }
     int getHeight() { return m_rect.height(); }
     Size getSize() { return m_rect.size(); }
@@ -444,6 +462,7 @@ public:
     int getPaddingRight() { return m_padding.right; }
     int getPaddingBottom() { return m_padding.bottom; }
     int getPaddingLeft() { return m_padding.left; }
+    Size getPaddingSize() { return Size(m_padding.left + m_padding.right, m_padding.top + m_padding.bottom); }
     float getOpacity() { return m_opacity; }
     float getRotation() { return m_rotation; }
 
@@ -474,7 +493,7 @@ protected:
     EdgeGroup<int> m_imageBorder;
 
 public:
-    void setImageSource(const std::string_view source);
+    void setImageSource(const std::string_view source, bool base64);
     void setImageClip(const Rect& clipRect) { m_imageClipRect = clipRect; updateImageCache(); }
     void setImageOffsetX(int x) { m_imageRect.setX(x); updateImageCache(); }
     void setImageOffsetY(int y) { m_imageRect.setY(y); updateImageCache(); }
@@ -488,7 +507,7 @@ public:
     void setImageRepeated(bool repeated) { setProp(PropImageRepeated, repeated); updateImageCache(); }
     void setImageSmooth(bool smooth) { setProp(PropImageSmooth, smooth); }
     void setImageAutoResize(bool autoResize) { setProp(PropImageAutoResize, autoResize); }
-    void setImageIndividualAnimation(bool v) { setProp(propImageIndividualAnimation, v); }
+    void setImageIndividualAnimation(bool v) { setProp(PropImageIndividualAnimation, v); }
     void setImageBorderTop(int border) { m_imageBorder.top = border; configureBorderImage(); }
     void setImageBorderRight(int border) { m_imageBorder.right = border; configureBorderImage(); }
     void setImageBorderBottom(int border) { m_imageBorder.bottom = border; configureBorderImage(); }
@@ -508,7 +527,7 @@ public:
     bool isImageFixedRatio() { return hasProp(PropImageFixedRatio); }
     bool isImageSmooth() { return hasProp(PropImageSmooth); }
     bool isImageAutoResize() { return hasProp(PropImageAutoResize); }
-    bool isImageIndividualAnimation() { return hasProp(propImageIndividualAnimation); }
+    bool isImageIndividualAnimation() { return hasProp(PropImageIndividualAnimation); }
     int getImageBorderTop() { return m_imageBorder.top; }
     int getImageBorderRight() { return m_imageBorder.right; }
     int getImageBorderBottom() { return m_imageBorder.bottom; }
@@ -568,4 +587,8 @@ public:
     bool isTextWrap() { return hasProp(PropTextWrap); }
     std::string getFont() { return m_font->getName(); }
     Size getTextSize() { return m_textSize; }
+
+    // custom style
+protected:
+    virtual void parseCustomStyle(const OTMLNodePtr& styleNode) {};
 };

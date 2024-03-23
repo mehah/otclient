@@ -24,11 +24,11 @@
 #include "game.h"
 #include "lightview.h"
 #include "localplayer.h"
-#include "luavaluecasts.h"
+#include "luavaluecasts_client.h"
 #include "map.h"
-#include "shadermanager.h"
 #include "thingtypemanager.h"
 #include "tile.h"
+#include "statictext.h"
 
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>
@@ -36,6 +36,7 @@
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
 #include <framework/graphics/texturemanager.h>
+#include <framework/graphics/shadermanager.h>
 
 double Creature::speedA = 0;
 double Creature::speedB = 0;
@@ -82,6 +83,8 @@ void Creature::draw(const Point& dest, bool drawThings, LightView* lightView)
 
         if (isMarked())
             internalDraw(_dest, nullptr, getMarkedColor());
+        else if (isHighlighted())
+            internalDraw(_dest, nullptr, getHighlightColor());
     }
 
     if (lightView) {
@@ -115,6 +118,8 @@ void Creature::draw(const Rect& destRect, uint8_t size)
         internalDraw(p);
         if (isMarked())
             internalDraw(p, nullptr, getMarkedColor());
+        else if (isHighlighted())
+            internalDraw(p, nullptr, getHighlightColor());
     } g_drawPool.releaseFrameBuffer(destRect);
 }
 
@@ -127,12 +132,14 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
     if (isDead() || !canBeSeen() || !(drawFlags & Otc::DrawCreatureInfo) || !mapRect.isInRange(m_position))
         return;
 
-    const auto& jumpOffset = m_jumpOffset * g_drawPool.getScaleFactor();
+    const auto displacementX = g_game.getFeature(Otc::GameNegativeOffset) ? 0 : getDisplacementX();
+    const auto displacementY = g_game.getFeature(Otc::GameNegativeOffset) ? 0 : getDisplacementY();
+
     const auto& parentRect = mapRect.rect;
-    const auto& creatureOffset = Point(16 - getDisplacementX(), -getDisplacementY() - 2) + m_walkOffset;
+    const auto& creatureOffset = Point(16 - displacementX, -displacementY - 2) + getDrawOffset();
 
     Point p = dest - mapRect.drawOffset;
-    p += creatureOffset * g_drawPool.getScaleFactor() - Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
+    p += (creatureOffset - Point(std::round(m_jumpOffset.x), std::round(m_jumpOffset.y))) * mapRect.scaleFactor;
     p.x *= mapRect.horizontalStretchFactor;
     p.y *= mapRect.verticalStretchFactor;
     p += parentRect.topLeft();
@@ -151,87 +158,88 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
     const int cropSizeText = g_gameConfig.isAdjustCreatureInformationBasedCropSize() ? getExactSize() : 12;
     const int cropSizeBackGround = g_gameConfig.isAdjustCreatureInformationBasedCropSize() ? cropSizeText - nameSize.height() : 0;
 
-    g_drawPool.select(DrawPoolType::CREATURE_INFORMATION);
-    {
-        bool isScaled = g_app.getCreatureInformationScale() != PlatformWindow::DEFAULT_DISPLAY_DENSITY;
-        if (isScaled) {
-            g_drawPool.scale(g_app.getCreatureInformationScale());
-            p.scale(g_app.getCreatureInformationScale());
-        }
+    bool isScaled = g_app.getCreatureInformationScale() != PlatformWindow::DEFAULT_DISPLAY_DENSITY;
+    if (isScaled) {
+        p.scale(g_app.getCreatureInformationScale());
+    }
 
-        auto backgroundRect = Rect(p.x - (13.5), p.y - cropSizeBackGround, 27, 4);
-        auto textRect = Rect(p.x - nameSize.width() / 2.0, p.y - cropSizeText, nameSize);
+    auto backgroundRect = Rect(p.x - (13.5), p.y - cropSizeBackGround, 27, 4);
+    auto textRect = Rect(p.x - nameSize.width() / 2.0, p.y - cropSizeText, nameSize);
 
-        if (!isScaled) {
-            backgroundRect.bind(parentRect);
-            textRect.bind(parentRect);
-        }
+    if (!isScaled) {
+        backgroundRect.bind(parentRect);
+        textRect.bind(parentRect);
+    }
 
-        // distance them
-        uint8_t offset = 12 * g_drawPool.getScaleFactor();
-        if (isLocalPlayer()) {
-            offset *= 2 * g_drawPool.getScaleFactor();
-        }
+    // distance them
+    uint8_t offset = 12 * mapRect.scaleFactor;
+    if (isLocalPlayer()) {
+        offset *= 2 * mapRect.scaleFactor;
+    }
 
-        if (textRect.top() == parentRect.top())
-            backgroundRect.moveTop(textRect.top() + offset);
-        if (backgroundRect.bottom() == parentRect.bottom())
-            textRect.moveTop(backgroundRect.top() - offset);
+    if (textRect.top() == parentRect.top())
+        backgroundRect.moveTop(textRect.top() + offset);
+    if (backgroundRect.bottom() == parentRect.bottom())
+        textRect.moveTop(backgroundRect.top() - offset);
 
-        // health rect is based on background rect, so no worries
-        Rect healthRect = backgroundRect.expanded(-1);
-        healthRect.setWidth((m_healthPercent / 100.0) * 25);
+    // health rect is based on background rect, so no worries
+    Rect healthRect = backgroundRect.expanded(-1);
+    healthRect.setWidth((m_healthPercent / 100.0) * 25);
 
-        if (drawFlags & Otc::DrawBars) {
-            g_drawPool.addFilledRect(backgroundRect, Color::black);
-            g_drawPool.addFilledRect(healthRect, fillColor);
+    if (drawFlags & Otc::DrawBars) {
+        g_drawPool.addFilledRect(backgroundRect, Color::black);
+        g_drawPool.addFilledRect(healthRect, fillColor);
 
-            if (drawFlags & Otc::DrawManaBar && isLocalPlayer()) {
-                if (const auto& player = g_game.getLocalPlayer()) {
-                    backgroundRect.moveTop(backgroundRect.bottom());
+        if (drawFlags & Otc::DrawManaBar && isLocalPlayer()) {
+            if (const auto& player = g_game.getLocalPlayer()) {
+                backgroundRect.moveTop(backgroundRect.bottom());
 
-                    g_drawPool.addFilledRect(backgroundRect, Color::black);
+                g_drawPool.addFilledRect(backgroundRect, Color::black);
 
-                    Rect manaRect = backgroundRect.expanded(-1);
-                    const double maxMana = player->getMaxMana();
-                    manaRect.setWidth((maxMana ? player->getMana() / maxMana : 1) * 25);
+                Rect manaRect = backgroundRect.expanded(-1);
+                const double maxMana = player->getMaxMana();
+                manaRect.setWidth((maxMana ? player->getMana() / maxMana : 1) * 25);
 
-                    g_drawPool.addFilledRect(manaRect, Color::blue);
-                }
+                g_drawPool.addFilledRect(manaRect, Color::blue);
             }
         }
-
-        if (drawFlags & Otc::DrawNames) {
-            m_name.draw(textRect, fillColor);
-        }
-
-        if (m_skull != Otc::SkullNone && m_skullTexture)
-            g_drawPool.addTexturedPos(m_skullTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5);
-
-        if (m_shield != Otc::ShieldNone && m_shieldTexture && m_showShieldTexture)
-            g_drawPool.addTexturedPos(m_shieldTexture, backgroundRect.x() + 13.5, backgroundRect.y() + 5);
-
-        if (m_emblem != Otc::EmblemNone && m_emblemTexture)
-            g_drawPool.addTexturedPos(m_emblemTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 16);
-
-        if (m_type != Proto::CreatureTypeUnknown && m_typeTexture)
-            g_drawPool.addTexturedPos(m_typeTexture, backgroundRect.x() + 13.5 + 12 + 12, backgroundRect.y() + 16);
-
-        if (m_icon != Otc::NpcIconNone && m_iconTexture)
-            g_drawPool.addTexturedPos(m_iconTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5);
-
-        if (g_gameConfig.drawTyping() && getTyping() && m_typingIconTexture)
-            g_drawPool.addTexturedPos(m_typingIconTexture, p.x + (nameSize.width() / 2.0) + 2, textRect.y() - 4);
     }
-    // Go back to use map pool
-    g_drawPool.select(DrawPoolType::MAP);
+
+    if (drawFlags & Otc::DrawNames) {
+        m_name.draw(textRect, fillColor);
+
+#ifndef BOT_PROTECTION
+        if (m_text) {
+            auto extraTextSize = m_text->getTextSize();
+            Rect extraTextRect = Rect(p.x - extraTextSize.width() / 2.0, p.y + 15, extraTextSize);
+            m_text->drawText(extraTextRect.center(), extraTextRect);
+        }
+#endif
+    }
+
+    if (m_skull != Otc::SkullNone && m_skullTexture)
+        g_drawPool.addTexturedPos(m_skullTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5);
+
+    if (m_shield != Otc::ShieldNone && m_shieldTexture && m_showShieldTexture)
+        g_drawPool.addTexturedPos(m_shieldTexture, backgroundRect.x() + 13.5, backgroundRect.y() + 5);
+
+    if (m_emblem != Otc::EmblemNone && m_emblemTexture)
+        g_drawPool.addTexturedPos(m_emblemTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 16);
+
+    if (m_type != Proto::CreatureTypeUnknown && m_typeTexture)
+        g_drawPool.addTexturedPos(m_typeTexture, backgroundRect.x() + 13.5 + 12 + 12, backgroundRect.y() + 16);
+
+    if (m_icon != Otc::NpcIconNone && m_iconTexture)
+        g_drawPool.addTexturedPos(m_iconTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5);
+
+    if (g_gameConfig.drawTyping() && getTyping() && m_typingIconTexture)
+        g_drawPool.addTexturedPos(m_typingIconTexture, p.x + (nameSize.width() / 2.0) + 2, textRect.y() - 4);
 }
 
 void Creature::internalDraw(Point dest, LightView* lightView, const Color& color)
 {
-    bool isMarked = color != Color::white;
-
-    if (isMarked)
+    bool replaceColorShader = color != Color::white;
+    if (replaceColorShader)
         g_drawPool.setShaderProgram(g_painter->getReplaceColorShader());
     else
         drawAttachedEffect(dest, lightView, false); // On Bottom
@@ -242,7 +250,7 @@ void Creature::internalDraw(Point dest, LightView* lightView, const Color& color
             if (m_outfit.hasMount()) {
                 dest -= m_mountType->getDisplacement() * g_drawPool.getScaleFactor();
 
-                if (!isMarked && m_mountShader)
+                if (!replaceColorShader && m_mountShader)
                     g_drawPool.setShaderProgram(m_mountShader, true, m_mountShaderAction);
                 m_mountType->draw(dest, 0, m_numPatternX, 0, 0, getCurrentAnimationPhase(true), color);
 
@@ -252,34 +260,49 @@ void Creature::internalDraw(Point dest, LightView* lightView, const Color& color
             if (!m_jumpOffset.isNull()) {
                 const auto& jumpOffset = m_jumpOffset * g_drawPool.getScaleFactor();
                 dest -= Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
+            } else if (m_bounce.height > 0 && m_bounce.speed > 0) {
+                const auto minHeight = m_bounce.minHeight * g_drawPool.getScaleFactor();
+                const auto height = m_bounce.height * g_drawPool.getScaleFactor();
+                dest -= (minHeight * 1.f) + std::abs((m_bounce.speed / 2) - g_clock.millis() % m_bounce.speed) / (m_bounce.speed * 1.f) * height;
             }
 
             const auto& datType = getThingType();
             const int animationPhase = getCurrentAnimationPhase();
+            const bool useFramebuffer = !replaceColorShader && m_shader && m_shader->useFramebuffer();
 
-            if (!isMarked && m_shader)
-                g_drawPool.setShaderProgram(m_shader, m_shaderAction);
+            const auto& drawCreature = [&](const Point& dest) {
+                // yPattern => creature addon
+                for (int yPattern = 0; yPattern < getNumPatternY(); ++yPattern) {
+                    // continue if we dont have this addon
+                    if (yPattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
+                        continue;
 
-            // yPattern => creature addon
-            for (int yPattern = 0; yPattern < getNumPatternY(); ++yPattern) {
-                // continue if we dont have this addon
-                if (yPattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
-                    continue;
+                    if (!replaceColorShader && m_shader && !useFramebuffer)
+                        g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
+                    datType->draw(dest, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, color);
 
-                datType->draw(dest, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, color);
-
-                if (m_drawOutfitColor && !isMarked && getLayers() > 1) {
-                    g_drawPool.setCompositionMode(CompositionMode::MULTIPLY);
-                    datType->draw(dest, SpriteMaskYellow, m_numPatternX, yPattern, m_numPatternZ, animationPhase, m_outfit.getHeadColor());
-                    datType->draw(dest, SpriteMaskRed, m_numPatternX, yPattern, m_numPatternZ, animationPhase, m_outfit.getBodyColor());
-                    datType->draw(dest, SpriteMaskGreen, m_numPatternX, yPattern, m_numPatternZ, animationPhase, m_outfit.getLegsColor());
-                    datType->draw(dest, SpriteMaskBlue, m_numPatternX, yPattern, m_numPatternZ, animationPhase, m_outfit.getFeetColor());
-                    g_drawPool.resetCompositionMode();
+                    if (m_drawOutfitColor && !replaceColorShader && getLayers() > 1) {
+                        g_drawPool.setCompositionMode(CompositionMode::MULTIPLY);
+                        datType->draw(dest, SpriteMaskYellow, m_numPatternX, yPattern, m_numPatternZ, animationPhase, m_outfit.getHeadColor());
+                        datType->draw(dest, SpriteMaskRed, m_numPatternX, yPattern, m_numPatternZ, animationPhase, m_outfit.getBodyColor());
+                        datType->draw(dest, SpriteMaskGreen, m_numPatternX, yPattern, m_numPatternZ, animationPhase, m_outfit.getLegsColor());
+                        datType->draw(dest, SpriteMaskBlue, m_numPatternX, yPattern, m_numPatternZ, animationPhase, m_outfit.getFeetColor());
+                        g_drawPool.resetCompositionMode();
+                    }
                 }
-            }
+            };
 
-            if (!isMarked && m_shader)
+            if (useFramebuffer) {
+                const int size = static_cast<int>(g_gameConfig.getSpriteSize() * std::max<int>(datType->getSize().area(), 2) * g_drawPool.getScaleFactor());
+                const auto& p = (Point(size) - Point(datType->getExactHeight())) / 2;
+                const auto& destFB = Rect(dest - p, Size{ size });
+
+                g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
+                g_drawPool.bindFrameBuffer(destFB.size());
+                drawCreature(p);
+                g_drawPool.releaseFrameBuffer(destFB);
                 g_drawPool.resetShaderProgram();
+            } else drawCreature(dest);
 
             // outfit is a creature imitating an item or the invisible effect
         } else {
@@ -301,16 +324,18 @@ void Creature::internalDraw(Point dest, LightView* lightView, const Color& color
             if (m_outfit.isEffect())
                 animationPhase = std::min<int>(animationPhase + 1, animationPhases);
 
-            if (!isMarked && m_shader)
+            if (!replaceColorShader && m_shader)
                 g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
             m_thingType->draw(dest - (getDisplacement() * g_drawPool.getScaleFactor()), 0, 0, 0, 0, animationPhase, color);
         }
     }
 
-    if (isMarked)
+    if (replaceColorShader)
         g_drawPool.resetShaderProgram();
-    else
+    else {
         drawAttachedEffect(dest, lightView, true); // On Top
+        drawAttachedParticlesEffect(dest);
+    }
 }
 
 void Creature::turn(Otc::Direction direction)
@@ -547,9 +572,12 @@ void Creature::updateWalkingTile()
     // determine new walking tile
     TilePtr newWalkingTile;
 
-    const Rect virtualCreatureRect(g_gameConfig.getSpriteSize() + (m_walkOffset.x - getDisplacementX()),
-                                   g_gameConfig.getSpriteSize() + (m_walkOffset.y - getDisplacementY()),
-                                   g_gameConfig.getSpriteSize(), g_gameConfig.getSpriteSize());
+    const auto displacementX = g_game.getFeature(Otc::GameNegativeOffset) ? 0 : getDisplacementX();
+    const auto displacementY = g_game.getFeature(Otc::GameNegativeOffset) ? 0 : getDisplacementY();
+
+    const Rect virtualCreatureRect(g_gameConfig.getSpriteSize() + (m_walkOffset.x - displacementX),
+        g_gameConfig.getSpriteSize() + (m_walkOffset.y - displacementY),
+        g_gameConfig.getSpriteSize(), g_gameConfig.getSpriteSize());
 
     for (int xi = -1; xi <= 1 && !newWalkingTile; ++xi) {
         for (int yi = -1; yi <= 1 && !newWalkingTile; ++yi) {
@@ -824,6 +852,37 @@ void Creature::updateShield()
         m_showShieldTexture = true;
 }
 
+int getSmoothedElevation(const Creature* creature, int currentElevation, float factor) {
+    const auto& fromPos = creature->getLastStepFromPosition();
+    const auto& toPos = creature->getLastStepToPosition();
+    const auto& fromTile = g_map.getTile(fromPos);
+    const auto& toTile = g_map.getTile(toPos);
+
+    if (!fromTile || !toTile) {
+        return currentElevation;
+    }
+
+    const int fromElevation = fromTile->getDrawElevation();
+    const int toElevation = toTile->getDrawElevation();
+
+    return fromElevation != toElevation ? fromElevation + factor * (toElevation - fromElevation) : currentElevation;
+}
+
+int Creature::getDrawElevation() {
+    int elevation = 0;
+    if (m_walkingTile) {
+        elevation = m_walkingTile->getDrawElevation();
+
+        if (g_game.getFeature(Otc::GameSmoothWalkElevation)) {
+            const float factor = std::clamp<float>(getWalkTicksElapsed() / static_cast<float>(m_stepCache.getDuration(m_lastStepDirection)), .0f, 1.f);
+            elevation = getSmoothedElevation(this, elevation, factor);
+        }
+    } else if (const auto& tile = getTile())
+        elevation = tile->getDrawElevation();
+
+    return elevation;
+}
+
 bool Creature::hasSpeedFormula() { return g_game.getFeature(Otc::GameNewSpeedLaw) && speedA != 0 && speedB != 0 && speedC != 0; }
 
 uint16_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
@@ -857,7 +916,10 @@ uint16_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
 
         m_stepCache.duration = stepDuration + 10;
         m_stepCache.walkDuration = std::min<int>(stepDuration / g_gameConfig.getSpriteSize(), DrawPool::FPS60);
-        m_stepCache.diagonalDuration = stepDuration * (g_game.getClientVersion() > 810 || g_gameConfig.isForcingNewWalkingFormula() ? 3 : 2);
+        m_stepCache.diagonalDuration = stepDuration *
+            (g_game.getClientVersion() > 810 || g_gameConfig.isForcingNewWalkingFormula()
+                ? (isPlayer() ? g_gameConfig.getPlayerDiagonalWalkSpeed() : g_gameConfig.getCreatureDiagonalWalkSpeed())
+                : 2);
     }
 
     return ignoreDiagonal ? m_stepCache.duration : m_stepCache.getDuration(m_lastStepDirection);
@@ -967,3 +1029,65 @@ void Creature::setTyping(bool typing)
 void Creature::sendTyping() {
     g_game.sendTyping(m_typing);
 }
+
+void Creature::onStartAttachEffect(const AttachedEffectPtr& effect) {
+    if (effect->isDisabledWalkAnimation()) {
+        setDisableWalkAnimation(true);
+    }
+
+    if (effect->m_thingType && (effect->m_thingType->isCreature() || effect->m_thingType->isMissile()))
+        effect->m_direction = getDirection();
+}
+
+void Creature::onDispatcherAttachEffect(const AttachedEffectPtr& effect) {
+    if (effect->isTransform() && effect->m_thingType) {
+        const auto& outfit = getOutfit();
+        if (outfit.isTemp())
+            return;
+
+        effect->m_outfitOwner = outfit;
+
+        Outfit newOutfit = outfit;
+        newOutfit.setTemp(true);
+        newOutfit.setCategory(effect->m_thingType->getCategory());
+        if (newOutfit.isCreature())
+            newOutfit.setId(effect->m_thingType->getId());
+        else
+            newOutfit.setAuxId(effect->m_thingType->getId());
+
+        setOutfit(newOutfit);
+    }
+}
+
+void Creature::onStartDetachEffect(const AttachedEffectPtr& effect) {
+    if (effect->isDisabledWalkAnimation())
+        setDisableWalkAnimation(false);
+
+    if (effect->isTransform() && !effect->m_outfitOwner.isInvalid()) {
+        setOutfit(effect->m_outfitOwner);
+    }
+}
+
+#ifndef BOT_PROTECTION
+void Creature::setText(const std::string& text, const Color& color)
+{
+    if (!m_text) {
+        m_text = std::make_shared<StaticText>();
+    }
+    m_text->setText(text);
+    m_text->setColor(color);
+}
+
+std::string Creature::getText()
+{
+    if (!m_text) {
+        return "";
+    }
+    return m_text->getText();
+}
+
+bool Creature::canShoot(int distance)
+{
+    return getTile() ? getTile()->canShoot(distance) : false;
+}
+#endif

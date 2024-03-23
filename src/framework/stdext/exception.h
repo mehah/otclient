@@ -38,7 +38,7 @@ namespace stdext
         template<typename... Args>
         exception(std::string_view what, const Args&... args) : m_what(stdext::format({ what }, args...)) {}
 
-        ~exception() noexcept override = default;;
+        ~exception() noexcept override = default;
         const char* what() const noexcept override { return m_what.data(); }
     protected:
         std::string m_what;

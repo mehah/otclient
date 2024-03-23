@@ -31,6 +31,7 @@ public:
 
     static ImagePtr load(const std::string& file);
     static ImagePtr loadPNG(const std::string& file);
+    static ImagePtr fromQRCode(const std::string& code, int border);
 
     void savePNG(const std::string& fileName);
 
@@ -38,13 +39,22 @@ public:
     void overwrite(const Color& color);
     void blit(const Point& dest, const ImagePtr& other);
     void paste(const ImagePtr& other);
-    void resize(const Size& size) { m_pixels.resize((m_size = size).area() * static_cast<size_t>(m_bpp), 0); }
+    void resize(const Size& size) {
+        if (m_size == size)
+            return;
+
+        m_pixels.resize((m_size = size).area() * static_cast<size_t>(m_bpp), 0);
+    }
     bool nextMipmap();
 
     void flipVertically();
     void reverseChannels(); // argb -> bgra or bgra -> argb
 
-    void setPixel(int x, int y, const uint8_t* pixel) { memcpy(&m_pixels[static_cast<size_t>(y * m_size.width() + x) * m_bpp], pixel, m_bpp); }
+    void setPixel(int x, int y, const uint8_t* pixel) {
+        const auto index = static_cast<size_t>(y * m_size.width() + x) * m_bpp;
+        if (index < m_pixels.size())
+            memcpy(&m_pixels[index], pixel, m_bpp);
+    }
     void setPixel(int x, int y, const Color& color) { setPixel(x, y, Color(color.rgba()).rgba()); }
     void setPixel(int x, int y, uint32_t rgba) { setPixel(x, y, reinterpret_cast<uint8_t*>(&rgba)); }
 

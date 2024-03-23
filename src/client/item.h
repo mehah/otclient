@@ -85,7 +85,7 @@ public:
     void setColor(const Color& c) { if (m_color != c) m_color = c; }
     void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false) override;
 
-    int getCountOrSubType() const { return m_countOrSubType; }
+    int getCountOrSubType() { return m_countOrSubType; }
     int getSubType();
     int getCount() { return isStackable() ? m_countOrSubType : 1; }
 
@@ -147,10 +147,10 @@ public:
 #endif
 
 private:
-    void internalDraw(int animationPhase, const Point& dest, const Color& color, bool drawThings, bool isMarked, LightView* lightView = nullptr);
+    void internalDraw(int animationPhase, const Point& dest, const Color& color, bool drawThings, bool replaceColorShader, LightView* lightView = nullptr);
     void setConductor();
 
-    uint8_t m_countOrSubType{ 0 };
+    uint16_t m_countOrSubType{ 0 };
 
     Color m_color{ Color::white };
 

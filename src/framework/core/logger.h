@@ -66,7 +66,6 @@ private:
     std::deque<LogMessage> m_logMessages;
     OnLogCallback m_onLog;
     std::ofstream m_outFile;
-    std::recursive_mutex m_mutex;
     Fw::LogLevel m_level{ Fw::LogDebug };
 };
 

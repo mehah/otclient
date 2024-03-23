@@ -23,21 +23,26 @@
 #pragma once
 
 #include <framework/config.h>
+#include <functional>
+#include <string>
 
-#if ENABLE_DISCORD_RPC == 1
+#ifndef ANDROID
+    #if ENABLE_DISCORD_RPC == 1
+        #include <discord_register.h>
+        #include <discord_rpc.h>
+        
+        class Discord
+        {
+        public:
+            void init(std::function<bool()>& canUpdate, std::function<void(std::string&)>& onUpdate);
+        
+        private:
+            void update();
 
-#include <discord_register.h>
-#include <discord_rpc.h>
-
-class Discord
-{
-public:
-    void init();
-
-private:
-    void update();
-};
-
-extern Discord g_discord;
-
+            std::function<bool()> m_canUpdate;
+            std::function<void(std::string&)> m_onUpdate;
+        };
+        
+        extern Discord g_discord;
+    #endif
 #endif

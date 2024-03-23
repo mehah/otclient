@@ -28,7 +28,10 @@
 
 #include <framework/luaengine/luainterface.h>
 #include <framework/platform/platform.h>
+
+#ifdef FRAMEWORK_GRAPHICS
 #include <framework/platform/platformwindow.h>
+#endif
 
 #ifdef ANDROID
 #include <android/log.h>
@@ -48,8 +51,6 @@ namespace
 
 void Logger::log(Fw::LogLevel level, const std::string_view message)
 {
-    std::scoped_lock lock(m_mutex);
-
 #ifdef NDEBUG
     if (level == Fw::LogDebug || level == Fw::LogFine)
         return;
@@ -60,6 +61,13 @@ void Logger::log(Fw::LogLevel level, const std::string_view message)
 
     if (s_ignoreLogs)
         return;
+
+    if (g_eventThreadId > -1 && g_eventThreadId != EventDispatcher::getThreadId()) {
+        g_dispatcher.addEvent([this, level, msg = std::string{ message }] {
+            log(level, msg);
+        });
+        return;
+    }
 
     std::string outmsg{ std::string{s_logPrefixes[level]} + message.data() };
 
@@ -88,7 +96,9 @@ void Logger::log(Fw::LogLevel level, const std::string_view message)
     }
 
     if (level == Fw::LogFatal) {
+#ifdef FRAMEWORK_GRAPHICS
         g_window.displayFatalError(message);
+#endif
         s_ignoreLogs = true;
 
         // NOTE: Threads must finish before the process can exit.
@@ -100,7 +110,12 @@ void Logger::log(Fw::LogLevel level, const std::string_view message)
 
 void Logger::logFunc(Fw::LogLevel level, const std::string_view message, const std::string_view prettyFunction)
 {
-    std::scoped_lock lock(m_mutex);
+    if (g_eventThreadId > -1 && g_eventThreadId != EventDispatcher::getThreadId()) {
+        g_dispatcher.addEvent([this, level, msg = std::string{ message }, prettyFunction = std::string{ prettyFunction }] {
+            logFunc(level, msg, prettyFunction);
+        });
+        return;
+    }
 
     auto fncName = prettyFunction.substr(0, prettyFunction.find_first_of('('));
     if (fncName.find_last_of(' ') != std::string::npos)
@@ -120,8 +135,6 @@ void Logger::logFunc(Fw::LogLevel level, const std::string_view message, const s
 
 void Logger::fireOldMessages()
 {
-    std::scoped_lock lock(m_mutex);
-
     if (m_onLog) {
         for (const LogMessage& logMessage : m_logMessages) {
             m_onLog(logMessage.level, logMessage.message, logMessage.when);
@@ -131,8 +144,6 @@ void Logger::fireOldMessages()
 
 void Logger::setLogFile(const std::string_view file)
 {
-    std::scoped_lock lock(m_mutex);
-
     m_outFile.open(stdext::utf8_to_latin1(file), std::ios::out | std::ios::app);
     if (!m_outFile.is_open() || !m_outFile.good()) {
         g_logger.error(stdext::format("Unable to save log to '%s'", file));

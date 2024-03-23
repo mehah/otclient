@@ -20,61 +20,42 @@
  * THE SOFTWARE.
  */
 
-#include <algorithm>
-
 #include "asyncdispatcher.h"
 
 AsyncDispatcher g_asyncDispatcher;
 
 void AsyncDispatcher::init(uint8_t maxThreads)
 {
-    if (maxThreads != 0)
-        m_maxThreads = maxThreads;
+    /*
+    * -1 = Graphic
+    *  1 = Map and (Connection, Particle and Sound) Pool
+    *  2 = Foreground UI
+    *  3 = Foreground MAP
+    *  4 = Extra, ex: pathfinder and lighting system
+    */
+    const uint8_t minThreads = 4;
 
-    // -2 = Main Thread and Map Thread
-    int_fast8_t threads = std::clamp<int_fast8_t>(std::thread::hardware_concurrency() - 2, 1, m_maxThreads);
-    for (; --threads >= 0;)
-        spawn_thread();
+    if (maxThreads == 0)
+        maxThreads = 6;
+
+    // 2 = Min Threads
+    int_fast8_t threads = std::clamp<int_fast8_t>(std::thread::hardware_concurrency() - 1, minThreads, maxThreads);
+    while (--threads >= 0)
+        m_threads.emplace_back([this] { m_ioService.run(); });
 }
 
-void AsyncDispatcher::terminate()
-{
-    stop();
-    m_tasks.clear();
-}
-
-void AsyncDispatcher::spawn_thread()
-{
-    m_running = true;
-    m_threads.emplace_back([this] { exec_loop(); });
-}
+void AsyncDispatcher::terminate() { stop(); }
 
 void AsyncDispatcher::stop()
 {
-    m_mutex.lock();
-    m_running = false;
-    m_condition.notify_all();
-    m_mutex.unlock();
-    for (std::thread& thread : m_threads)
-        thread.join();
-    m_threads.clear();
-};
-
-void AsyncDispatcher::exec_loop()
-{
-    std::unique_lock lock(m_mutex);
-    while (true) {
-        while (m_tasks.empty() && m_running)
-            m_condition.wait(lock);
-
-        if (!m_running)
-            return;
-
-        std::function<void()> task = m_tasks.front();
-        m_tasks.pop_front();
-
-        lock.unlock();
-        task();
-        lock.lock();
+    if (m_ioService.stopped()) {
+        return;
     }
-}
+
+    m_ioService.stop();
+
+    for (auto& thread : m_threads) {
+        if (thread.joinable())
+            thread.join();
+    }
+};

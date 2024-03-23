@@ -29,7 +29,7 @@
 class ScheduledEvent : public Event
 {
 public:
-    ScheduledEvent(const std::function<void()>& callback, int delay, int maxCycles);
+    ScheduledEvent(const std::function<void()>& callback, int delay, int maxCycles = 0);
     void execute() override;
     void postpone() { m_ticks = g_clock.millis() + m_delay; }
     bool nextCycle();
@@ -44,7 +44,7 @@ public:
     {
         bool operator() (const ScheduledEventPtr& a, const ScheduledEventPtr& b) const
         {
-            return b->ticks() < a->ticks();
+            return b->ticks() > a->ticks();
         }
     };
 

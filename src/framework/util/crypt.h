@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include "../global.h"
+
 #include <string>
 #include <stduuid/uuid.h>
 
@@ -38,7 +40,7 @@ public:
     ~Crypt();
 
     std::string base64Encode(const std::string& decoded_string);
-    std::string base64Decode(const std::string& encoded_string);
+    std::string base64Decode(const std::string_view& encoded_string);
     std::string xorCrypt(const std::string& buffer, const std::string& key);
     std::string encrypt(const std::string& decrypted_string) { return _encrypt(decrypted_string, true); }
     std::string decrypt(const std::string& encrypted_string) { return _decrypt(encrypted_string, true); }
@@ -53,6 +55,10 @@ public:
     int rsaGetSize();
 
     std::string crc32(const std::string& decoded_string, bool upperCase);
+    std::string sha1Encrpyt(const std::string& input);
+
+protected:
+    void sha1Block(uint8_t* block, uint32_t* H);
 
 private:
     std::string _encrypt(const std::string& decrypted_string, bool useMachineUUID);

@@ -29,13 +29,13 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
-    <EnableUnitySupport>false</EnableUnitySupport>
+    <EnableUnitySupport>true</EnableUnitySupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
-    <EnableUnitySupport>false</EnableUnitySupport>
+    <EnableUnitySupport>true</EnableUnitySupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -104,7 +104,7 @@
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
-    <VcpkgAutoLink>false</VcpkgAutoLink>
+    <VcpkgAutoLink>true</VcpkgAutoLink>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <VcpkgTriplet>x86-windows</VcpkgTriplet>
@@ -121,6 +121,7 @@
       <AdditionalIncludeDirectories>$(VcpkgRoot)\installed\$(VcpkgTriplet)\include\luajit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <DisableSpecificWarnings>4244;4251;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <WarningLevel>Level4</WarningLevel>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -141,6 +142,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
       <AdditionalIncludeDirectories>$(VcpkgRoot)\installed\$(VcpkgTriplet)\include\luajit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <DisableSpecificWarnings>4244;4251;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <CombineFilesOnlyFromTheSameFolder>true</CombineFilesOnlyFromTheSameFolder>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -164,6 +166,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
       <LanguageStandard_C>Default</LanguageStandard_C>
       <DisableSpecificWarnings>4244;4251;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <WarningLevel>Level4</WarningLevel>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -191,6 +194,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
       <LanguageStandard_C>Default</LanguageStandard_C>
       <DisableSpecificWarnings>4244;4251;4996;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -206,12 +210,14 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
   <ItemGroup>
     <ClCompile Include="..\src\client\animatedtext.cpp" />
     <ClCompile Include="..\src\client\animator.cpp" />
+    <ClCompile Include="..\src\client\attachableobject.cpp" />
     <ClCompile Include="..\src\client\attachedeffect.cpp" />
     <ClCompile Include="..\src\client\attachedeffectmanager.cpp" />
+    <ClCompile Include="..\src\client\client.cpp" />
     <ClCompile Include="..\src\client\gameconfig.cpp" />
+    <ClCompile Include="..\src\client\luavaluecasts_client.cpp" />
     <ClCompile Include="..\src\client\position.cpp" />
     <ClCompile Include="..\src\client\spriteappearances.cpp" />
-    <ClCompile Include="..\src\client\client.cpp" />
     <ClCompile Include="..\src\client\container.cpp" />
     <ClCompile Include="..\src\client\creature.cpp" />
     <ClCompile Include="..\src\client\creatures.cpp" />
@@ -223,7 +229,6 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClCompile Include="..\src\client\lightview.cpp" />
     <ClCompile Include="..\src\client\localplayer.cpp" />
     <ClCompile Include="..\src\client\luafunctions.cpp" />
-    <ClCompile Include="..\src\client\luavaluecasts.cpp" />
     <ClCompile Include="..\src\client\map.cpp" />
     <ClCompile Include="..\src\client\mapio.cpp" />
     <ClCompile Include="..\src\client\mapview.cpp" />
@@ -235,7 +240,6 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClCompile Include="..\src\client\protocolgame.cpp" />
     <ClCompile Include="..\src\client\protocolgameparse.cpp" />
     <ClCompile Include="..\src\client\protocolgamesend.cpp" />
-    <ClCompile Include="..\src\client\shadermanager.cpp" />
     <ClCompile Include="..\src\client\spritemanager.cpp" />
     <ClCompile Include="..\src\client\statictext.cpp" />
     <ClCompile Include="..\src\client\thing.cpp" />
@@ -244,6 +248,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClCompile Include="..\src\client\tile.cpp" />
     <ClCompile Include="..\src\client\towns.cpp" />
     <ClCompile Include="..\src\client\uicreature.cpp" />
+    <ClCompile Include="..\src\client\uigraph.cpp" />
     <ClCompile Include="..\src\client\uiitem.cpp" />
     <ClCompile Include="..\src\client\uimap.cpp" />
     <ClCompile Include="..\src\client\uimapanchorlayout.cpp" />
@@ -276,7 +281,6 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClCompile Include="..\src\framework\graphics\drawpoolmanager.cpp" />
     <ClCompile Include="..\src\framework\graphics\fontmanager.cpp" />
     <ClCompile Include="..\src\framework\graphics\framebuffer.cpp" />
-    <ClCompile Include="..\src\framework\graphics\framebuffermanager.cpp" />
     <ClCompile Include="..\src\framework\graphics\graphics.cpp" />
     <ClCompile Include="..\src\framework\graphics\hardwarebuffer.cpp" />
     <ClCompile Include="..\src\framework\graphics\image.cpp" />
@@ -291,6 +295,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClCompile Include="..\src\framework\graphics\particletype.cpp" />
     <ClCompile Include="..\src\framework\graphics\drawpool.cpp" />
     <ClCompile Include="..\src\framework\graphics\shader.cpp" />
+    <ClCompile Include="..\src\framework\graphics\shadermanager.cpp" />
     <ClCompile Include="..\src\framework\graphics\shaderprogram.cpp" />
     <ClCompile Include="..\src\framework\graphics\texture.cpp" />
     <ClCompile Include="..\src\framework\graphics\texturemanager.cpp" />
@@ -304,6 +309,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     </ClCompile>
     <ClCompile Include="..\src\framework\luafunctions.cpp" />
     <ClCompile Include="..\src\framework\net\connection.cpp" />
+    <ClCompile Include="..\src\framework\net\httplogin.cpp" />
     <ClCompile Include="..\src\framework\net\inputmessage.cpp" />
     <ClCompile Include="..\src\framework\net\outputmessage.cpp" />
     <ClCompile Include="..\src\framework\net\protocol.cpp" />
@@ -333,6 +339,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClCompile Include="..\src\framework\stdext\string.cpp" />
     <ClCompile Include="..\src\framework\stdext\time.cpp" />
     <ClCompile Include="..\src\framework\stdext\uri.cpp" />
+    <ClCompile Include="..\src\framework\stdext\qrcodegen.cpp" />
     <ClCompile Include="..\src\framework\ui\uianchorlayout.cpp" />
     <ClCompile Include="..\src\framework\ui\uiboxlayout.cpp" />
     <ClCompile Include="..\src\framework\ui\uigridlayout.cpp" />
@@ -340,6 +347,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClCompile Include="..\src\framework\ui\uilayout.cpp" />
     <ClCompile Include="..\src\framework\ui\uimanager.cpp" />
     <ClCompile Include="..\src\framework\ui\uiparticles.cpp" />
+    <ClCompile Include="..\src\framework\ui\uiqrcode.cpp" />
     <ClCompile Include="..\src\framework\ui\uitextedit.cpp" />
     <ClCompile Include="..\src\framework\ui\uitranslator.cpp" />
     <ClCompile Include="..\src\framework\ui\uiverticallayout.cpp" />
@@ -355,9 +363,11 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
   <ItemGroup>
     <ClInclude Include="..\src\client\animatedtext.h" />
     <ClInclude Include="..\src\client\animator.h" />
+    <ClInclude Include="..\src\client\attachableobject.h" />
     <ClInclude Include="..\src\client\attachedeffect.h" />
     <ClInclude Include="..\src\client\attachedeffectmanager.h" />
     <ClInclude Include="..\src\client\gameconfig.h" />
+    <ClInclude Include="..\src\client\luavaluecasts_client.h" />
     <ClInclude Include="..\src\client\spriteappearances.h" />
     <ClInclude Include="..\src\client\client.h" />
     <ClInclude Include="..\src\client\const.h" />
@@ -373,7 +383,6 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\client\itemtype.h" />
     <ClInclude Include="..\src\client\lightview.h" />
     <ClInclude Include="..\src\client\localplayer.h" />
-    <ClInclude Include="..\src\client\luavaluecasts.h" />
     <ClInclude Include="..\src\client\map.h" />
     <ClInclude Include="..\src\client\mapview.h" />
     <ClInclude Include="..\src\client\minimap.h" />
@@ -383,7 +392,6 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\client\position.h" />
     <ClInclude Include="..\src\client\protocolcodes.h" />
     <ClInclude Include="..\src\client\protocolgame.h" />
-    <ClInclude Include="..\src\client\shadermanager.h" />
     <ClInclude Include="..\src\client\spritemanager.h" />
     <ClInclude Include="..\src\client\statictext.h" />
     <ClInclude Include="..\src\client\thing.h" />
@@ -392,13 +400,14 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\client\tile.h" />
     <ClInclude Include="..\src\client\towns.h" />
     <ClInclude Include="..\src\client\uicreature.h" />
+    <ClInclude Include="..\src\client\uigraph.h" />
     <ClInclude Include="..\src\client\uiitem.h" />
     <ClInclude Include="..\src\client\uimap.h" />
     <ClInclude Include="..\src\client\uimapanchorlayout.h" />
     <ClInclude Include="..\src\client\uiminimap.h" />
     <ClInclude Include="..\src\client\uiprogressrect.h" />
     <ClInclude Include="..\src\client\uisprite.h" />
-    <ClInclude Include="..\src\client\config.h" />
+    <ClInclude Include="..\src\framework\config.h" />
     <ClInclude Include="..\src\framework\const.h" />
     <ClInclude Include="..\src\framework\core\adaptativeframecounter.h" />
     <ClInclude Include="..\src\framework\core\application.h" />
@@ -430,11 +439,11 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\framework\graphics\drawpoolmanager.h" />
     <ClInclude Include="..\src\framework\graphics\fontmanager.h" />
     <ClInclude Include="..\src\framework\graphics\framebuffer.h" />
-    <ClInclude Include="..\src\framework\graphics\framebuffermanager.h" />
     <ClInclude Include="..\src\framework\graphics\glutil.h" />
     <ClInclude Include="..\src\framework\graphics\graphics.h" />
     <ClInclude Include="..\src\framework\graphics\hardwarebuffer.h" />
     <ClInclude Include="..\src\framework\graphics\image.h" />
+    <ClInclude Include="..\src\framework\graphics\shadermanager.h" />
     <ClInclude Include="..\src\framework\graphics\shader\shadersources.h" />
     <ClInclude Include="..\src\framework\graphics\painter.h" />
     <ClInclude Include="..\src\framework\graphics\paintershaderprogram.h" />
@@ -460,6 +469,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\framework\luaengine\luavaluecasts.h" />
     <ClInclude Include="..\src\framework\net\connection.h" />
     <ClInclude Include="..\src\framework\net\declarations.h" />
+    <ClInclude Include="..\src\framework\net\httplogin.h" />
     <ClInclude Include="..\src\framework\net\inputmessage.h" />
     <ClInclude Include="..\src\framework\net\outputmessage.h" />
     <ClInclude Include="..\src\framework\net\protocol.h" />
@@ -495,6 +505,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\framework\stdext\hash.h" />
     <ClInclude Include="..\src\framework\stdext\math.h" />
     <ClInclude Include="..\src\framework\stdext\net.h" />
+    <ClInclude Include="..\src\framework\stdext\qrcodegen.h" />
     <ClInclude Include="..\src\framework\stdext\storage.h" />
     <ClInclude Include="..\src\framework\stdext\stdext.h" />
     <ClInclude Include="..\src\framework\stdext\string.h" />
@@ -511,6 +522,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\framework\ui\uilayout.h" />
     <ClInclude Include="..\src\framework\ui\uimanager.h" />
     <ClInclude Include="..\src\framework\ui\uiparticles.h" />
+    <ClInclude Include="..\src\framework\ui\uiqrcode.h" />
     <ClInclude Include="..\src\framework\ui\uitextedit.h" />
     <ClInclude Include="..\src\framework\ui\uitranslator.h" />
     <ClInclude Include="..\src\framework\ui\uiverticallayout.h" />

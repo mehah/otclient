@@ -26,7 +26,7 @@
 #include "container.h"
 #include "creature.h"
 #include "localplayer.h"
-#include "luavaluecasts.h"
+#include "luavaluecasts_client.h"
 #include "map.h"
 #include "protocolcodes.h"
 #include "protocolgame.h"
@@ -739,8 +739,10 @@ void Game::look(const ThingPtr& thing, bool isBattleList)
 
     if (thing->isCreature() && isBattleList && m_protocolVersion >= 961)
         m_protocolGame->sendLookCreature(thing->getId());
-    else
-        m_protocolGame->sendLook(thing->getPosition(), thing->getId(), thing->getStackPos());
+    else {
+        const int thingId = thing->isCreature() ? Proto::Creature : thing->getId();
+        m_protocolGame->sendLook(thing->getPosition(), thingId, thing->getStackPos());
+    }
 }
 
 void Game::move(const ThingPtr& thing, const Position& toPos, int count)
@@ -751,13 +753,8 @@ void Game::move(const ThingPtr& thing, const Position& toPos, int count)
     if (!canPerformGameAction() || !thing || thing->getPosition() == toPos)
         return;
 
-    uint32_t id = thing->getId();
-    if (thing->isCreature()) {
-        CreaturePtr creature = thing->static_self_cast<Creature>();
-        id = Proto::Creature;
-    }
-
-    m_protocolGame->sendMove(thing->getPosition(), id, thing->getStackPos(), toPos, count);
+    const auto thingId = thing->isCreature() ? Proto::Creature : thing->getId();
+    m_protocolGame->sendMove(thing->getPosition(), thingId, thing->getStackPos(), toPos, count);
 }
 
 void Game::moveToParentContainer(const ThingPtr& thing, int count)
@@ -765,7 +762,7 @@ void Game::moveToParentContainer(const ThingPtr& thing, int count)
     if (!canPerformGameAction() || !thing || count <= 0)
         return;
 
-    const Position position = thing->getPosition();
+    const auto& position = thing->getPosition();
     move(thing, Position(position.x, position.y, 254), count);
 }
 
@@ -797,6 +794,8 @@ void Game::use(const ThingPtr& thing)
     // some items, e.g. parcel, are not set as containers but they are.
     // always try to use these items in free container slots.
     m_protocolGame->sendUseItem(pos, thing->getId(), thing->getStackPos(), findEmptyContainerId());
+
+    g_lua.callGlobalField("g_game", "onUse", pos, thing->getId(), thing->getStackPos(), 0);
 }
 
 void Game::useInventoryItem(int itemId)
@@ -806,6 +805,8 @@ void Game::useInventoryItem(int itemId)
 
     const auto& pos = Position(0xFFFF, 0, 0); // means that is a item in inventory
     m_protocolGame->sendUseItem(pos, itemId, 0, 0);
+
+    g_lua.callGlobalField("g_game", "onUse", pos, itemId, 0, 0);
 }
 
 void Game::useWith(const ItemPtr& item, const ThingPtr& toThing)
@@ -821,6 +822,8 @@ void Game::useWith(const ItemPtr& item, const ThingPtr& toThing)
         m_protocolGame->sendUseOnCreature(pos, item->getId(), item->getStackPos(), toThing->getId());
     else
         m_protocolGame->sendUseItemWith(pos, item->getId(), item->getStackPos(), toThing->getPosition(), toThing->getId(), toThing->getStackPos());
+
+    g_lua.callGlobalField("g_game", "onUseWith", pos, item->getId(), toThing, item->getStackPos());
 }
 
 void Game::useInventoryItemWith(int itemId, const ThingPtr& toThing)
@@ -833,6 +836,8 @@ void Game::useInventoryItemWith(int itemId, const ThingPtr& toThing)
         m_protocolGame->sendUseOnCreature(pos, itemId, 0, toThing->getId());
     else
         m_protocolGame->sendUseItemWith(pos, itemId, 0, toThing->getPosition(), toThing->getId(), toThing->getStackPos());
+
+    g_lua.callGlobalField("g_game", "onUseWith", pos, itemId, toThing, 0);
 }
 
 ItemPtr Game::findItemInContainers(uint32_t itemId, int subType)
@@ -1683,4 +1688,11 @@ void Game::closeImbuingWindow()
     if (!canPerformGameAction())
         return;
     m_protocolGame->sendCloseImbuingWindow();
+}
+
+void Game::stashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos)
+{
+    if (!canPerformGameAction())
+        return;
+    m_protocolGame->sendStashWithdraw(itemId, count, stackpos);
 }

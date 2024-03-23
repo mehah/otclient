@@ -3,19 +3,20 @@
   "version-string": "1.0.0",
   "dependencies": [
     "asio",
+    "cpp-httplib",
+    "discord-rpc",
+    "liblzma",
     "libogg",
     "libvorbis",
     "nlohmann-json",
     "openal-soft",
     "openssl",
+    "parallel-hashmap",
     "physfs",
     "protobuf",
-    "zlib",
-    "liblzma",
-    "parallel-hashmap",
-    "stduuid",
-    "discord-rpc",
     "pugixml",
+    "stduuid",
+    "zlib",
     {
       "name": "luajit",
       "platform": "!android"
@@ -29,5 +30,5 @@
       "platform": "windows | osx"
     }
   ],
-  "builtin-baseline":"6ba86f3584f98aa16944408341f7c8e363c3356b"
+  "builtin-baseline":"13c3c0fcc203d179f4443fe48d252e3ff220cbeb"
 }

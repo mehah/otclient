@@ -19,6 +19,7 @@ Module
     dofile 'textmessages'
     dofile 'thing'
     dofile 'spells'
+    dofile 'tile'
 
     dofile 'eventcontroller'
     dofile 'controller'

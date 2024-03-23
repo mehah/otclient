@@ -26,6 +26,21 @@ local executeConfig = function(attachedEffect, config)
         attachedEffect:setOpacity(config.opacity)
     end
 
+    if config.light then
+        attachedEffect:setLight({
+            color = config.light.color or 0,
+            intensity = config.light.intensity or 0
+        })
+    end
+
+    if config.drawOrder then
+        attachedEffect:setDrawOrder(config.drawOrder)
+    end
+
+    if config.bounce then
+        attachedEffect:setBounce(config.bounce[1], config.bounce[2], config.bounce[3] or 1000)
+    end
+
     if config.duration ~= nil and config.duration > 0 then
         attachedEffect:setDuration(config.duration)
     end
@@ -33,6 +48,8 @@ local executeConfig = function(attachedEffect, config)
     if config.loop ~= nil and config.loop > 0 then
         attachedEffect:setLoop(config.loop)
     end
+
+    attachedEffect:setPermanent(type(config.permanent) ~= "boolean" or config.permanent)
 
     if config.transform then
         attachedEffect:setTransform(config.transform)

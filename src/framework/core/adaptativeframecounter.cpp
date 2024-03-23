@@ -23,13 +23,15 @@
 #include "adaptativeframecounter.h"
 #include <framework/core/eventdispatcher.h>
 #include <framework/platform/platformwindow.h>
+#include <framework/graphics/drawpool.h>
 
-void AdaptativeFrameCounter::update()
+bool AdaptativeFrameCounter::update()
 {
-    const uint8_t maxFps = m_targetFps == 0 ? m_maxFps : std::clamp<uint8_t>(m_targetFps, 1, std::max<uint8_t>(m_maxFps, m_targetFps));
+    const auto maxFps = m_targetFps == 0 ? m_maxFps : std::clamp<uint16_t>(m_targetFps, 1, std::max<uint16_t>(m_maxFps, m_targetFps));
     if (maxFps > 0) {
         const int32_t sleepPeriod = (getMaxPeriod(maxFps) - 1000) - m_timer.elapsed_micros();
-        if (sleepPeriod > 0) stdext::microsleep(sleepPeriod);
+        if (sleepPeriod > 0)
+            stdext::microsleep(std::min<int32_t>(sleepPeriod, DrawPool::FPS10 * 1000));
     }
 
     m_timer.restart();
@@ -37,15 +39,15 @@ void AdaptativeFrameCounter::update()
     ++m_fpsCount;
 
     if (m_fps == m_fpsCount)
-        return;
+        return false;
 
     const uint32_t tickCount = stdext::millis();
     if (tickCount - m_interval <= 1000)
-        return;
+        return false;
 
     m_fps = m_fpsCount;
     m_fpsCount = 0;
     m_interval = tickCount;
 
-    g_dispatcher.addEvent([this] { g_lua.callGlobalField("g_app", "onFps", getFps()); });
+    return true;
 }

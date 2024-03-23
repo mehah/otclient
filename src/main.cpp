@@ -21,16 +21,25 @@
  */
 
 #include <client/client.h>
+#include <client/game.h>
+#include <client/localplayer.h>
+#include <client/gameconfig.h>
 #include <framework/core/application.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/luaengine/luainterface.h>
 
-#if ENABLE_DISCORD_RPC == 1
-#include <framework/discord/discord.h>
+#ifndef ANDROID
+    #if ENABLE_DISCORD_RPC == 1
+        #include <framework/discord/discord.h>
+    #endif
 #endif
 
 #ifdef FRAMEWORK_NET
 #include <framework/net/protocolhttp.h>
+#endif
+
+#ifdef ANDROID
+extern "C" {
 #endif
 
 int main(int argc, const char* argv[])
@@ -69,12 +78,29 @@ int main(int argc, const char* argv[])
     if (!g_resources.discoverWorkDir("init.lua"))
         g_logger.fatal("Unable to find work directory, the application cannot be initialized.");
 
-#if ENABLE_DISCORD_RPC == 1
-    g_discord.init();
+#ifndef ANDROID
+    #if ENABLE_DISCORD_RPC == 1
+    std::function<bool()> canUpdate = []() -> bool { return g_game.isOnline(); };
+    std::function<void(std::string&)> onUpdate = [](std::string& info) {
+#if SHOW_CHARACTER_NAME_RPC == 1
+        info = "Name: " + g_game.getCharacterName();
+#endif
+#if SHOW_CHARACTER_LEVEL_RPC == 1
+        const auto& level = std::to_string(g_game.getLocalPlayer()->getLevel());
+        info += info.empty() ? "Level: " + level : "[" + level + "]";
+#endif
+#if SHOW_CHARACTER_WORLD_RPC == 1
+        if (!info.empty()) info += "\n";
+        info += "World: " + g_game.getWorldName();
+#endif
+    };
+    g_discord.init(canUpdate, onUpdate);
+    #endif
 #endif
 
     // initialize application framework and otclient
-    g_app.init(args, ASYNC_DISPATCHER_MAX_THREAD);
+    g_app.init(args, new GraphicalApplicationContext(
+        (uint8_t)ASYNC_DISPATCHER_MAX_THREAD, g_gameConfig.getSpriteSize(), ApplicationDrawEventsPtr(&g_client)));
     g_client.init(args);
 #ifdef FRAMEWORK_NET
     g_http.init();
@@ -90,10 +116,13 @@ int main(int argc, const char* argv[])
     g_app.deinit();
 
     // terminate everything and free memory
-    Client::terminate();
+    g_client.terminate();
     g_app.terminate();
 #ifdef FRAMEWORK_NET
     g_http.terminate();
 #endif
     return 0;
-    }
+}
+#ifdef ANDROID
+}
+#endif

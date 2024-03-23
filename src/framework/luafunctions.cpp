@@ -27,20 +27,22 @@
 #include <framework/core/module.h>
 #include <framework/core/modulemanager.h>
 #include <framework/core/resourcemanager.h>
-#include <framework/graphics/texturemanager.h>
 #include <framework/luaengine/luainterface.h>
 #include <framework/platform/platform.h>
 #include <framework/stdext/net.h>
 #include <framework/util/crypt.h>
 
-#include "graphics/particleeffect.h"
-
+#ifdef FRAMEWORK_GRAPHICS
+#include "framework/graphics/particleeffect.h"
+#include "framework/graphics/texturemanager.h"
 #include "framework/graphics/fontmanager.h"
 #include "framework/graphics/graphics.h"
 #include "framework/graphics/particlemanager.h"
+#include "framework/graphics/shadermanager.h"
 #include "framework/input/mouse.h"
 #include "framework/platform/platformwindow.h"
 #include "framework/ui/ui.h"
+#endif
 
 #ifdef FRAMEWORK_SOUND
 #include <framework/sound/combinedsoundsource.h>
@@ -53,8 +55,11 @@
 #ifdef FRAMEWORK_NET
 #include <framework/net/protocol.h>
 #include <framework/net/protocolhttp.h>
+#include <framework/net/httplogin.h>
 #include <framework/net/server.h>
 #endif
+
+#include <regex>
 
 void Application::registerLuaFunctions()
 {
@@ -71,6 +76,26 @@ void Application::registerLuaFunctions()
     g_lua.bindGlobalFunction("stringtoip", [](const std::string_view v) { return stdext::string_to_ip(v); });
     g_lua.bindGlobalFunction("listSubnetAddresses", [](uint32_t a, uint8_t b) { return stdext::listSubnetAddresses(a, b); });
     g_lua.bindGlobalFunction("ucwords", [](std::string s) { return stdext::ucwords(s); });
+    g_lua.bindGlobalFunction("regexMatch", [](std::string s, const std::string& exp) {
+        int limit = 10000;
+        std::vector<std::vector<std::string>> ret;
+        if (s.empty() || exp.empty())
+            return ret;
+        try {
+            std::smatch m;
+            std::regex e(exp, std::regex::ECMAScript);
+            while (std::regex_search(s, m, e)) {
+                ret.push_back(std::vector<std::string>());
+                for (auto x : m)
+                    ret[ret.size() - 1].push_back(x);
+                s = m.suffix().str();
+                if (--limit == 0)
+                    return ret;
+            }
+        } catch (...) {
+        }
+        return ret;
+    });
 
     // Platform
     g_lua.registerSingletonClass("g_platform");
@@ -93,6 +118,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_platform", "isDesktop", &Platform::isDesktop, &g_platform);
     g_lua.bindSingletonFunction("g_platform", "isMobile", &Platform::isMobile, &g_platform);
     g_lua.bindSingletonFunction("g_platform", "isConsole", &Platform::isConsole, &g_platform);
+    g_lua.bindSingletonFunction("g_platform", "openDir", &Platform::openDir, &g_platform);
 
     // Application
     g_lua.registerSingletonClass("g_app");
@@ -131,6 +157,8 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_clock", "micros", &Clock::micros, &g_clock);
     g_lua.bindSingletonFunction("g_clock", "millis", &Clock::millis, &g_clock);
     g_lua.bindSingletonFunction("g_clock", "seconds", &Clock::seconds, &g_clock);
+    g_lua.bindSingletonFunction("g_clock", "realMillis", &Clock::realMillis, &g_clock);
+    g_lua.bindSingletonFunction("g_clock", "realMicros", &Clock::realMicros, &g_clock);
 
     // ConfigManager
     g_lua.registerSingletonClass("g_configs");
@@ -155,6 +183,12 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_logger", "setLevel", &Logger::setLevel, &g_logger);
     g_lua.bindSingletonFunction("g_logger", "getLevel", &Logger::getLevel, &g_logger);
 
+    // Login Http
+    g_lua.registerClass<LoginHttp>();
+    g_lua.bindClassStaticFunction<LoginHttp>("create", [] { return std::make_shared<LoginHttp>(); });
+    g_lua.bindClassMemberFunction<LoginHttp>("httpLogin", &LoginHttp::httpLogin);
+
+    // Http
     g_lua.registerSingletonClass("g_http");
     g_lua.bindSingletonFunction("g_http", "setUserAgent", &Http::setUserAgent, &g_http);
     g_lua.bindSingletonFunction("g_http", "setEnableTimeOutOnReadWrite", &Http::setEnableTimeOutOnReadWrite, &g_http);
@@ -207,6 +241,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_resources", "writeFileContents", &ResourceManager::writeFileContents, &g_resources);
     g_lua.bindSingletonFunction("g_resources", "guessFilePath", &ResourceManager::guessFilePath, &g_resources);
     g_lua.bindSingletonFunction("g_resources", "isFileType", &ResourceManager::isFileType, &g_resources);
+    g_lua.bindSingletonFunction("g_resources", "getFileName", &ResourceManager::getFileName, &g_resources);
     g_lua.bindSingletonFunction("g_resources", "getFileTime", &ResourceManager::getFileTime, &g_resources);
     g_lua.bindSingletonFunction("g_resources", "makeDir", &ResourceManager::makeDir, &g_resources);
     g_lua.bindSingletonFunction("g_resources", "deleteFile", &ResourceManager::deleteFile, &g_resources);
@@ -216,6 +251,8 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_resources", "selfChecksum", &ResourceManager::selfChecksum, &g_resources);
     g_lua.bindSingletonFunction("g_resources", "updateFiles", &ResourceManager::updateFiles, &g_resources);
     g_lua.bindSingletonFunction("g_resources", "updateExecutable", &ResourceManager::updateExecutable, &g_resources);
+    g_lua.bindSingletonFunction("g_resources", "createArchive", &ResourceManager::createArchive, &g_resources);
+    g_lua.bindSingletonFunction("g_resources", "decompressArchive", &ResourceManager::decompressArchive, &g_resources);
 
     // Config
     g_lua.registerClass<Config>();
@@ -228,6 +265,8 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Config>("remove", &Config::remove);
     g_lua.bindClassMemberFunction<Config>("setNode", &Config::setNode);
     g_lua.bindClassMemberFunction<Config>("getNode", &Config::getNode);
+    g_lua.bindClassMemberFunction<Config>("getNodeSize", &Config::getNodeSize);
+    g_lua.bindClassMemberFunction<Config>("getOrCreateNode", &Config::getOrCreateNode);
     g_lua.bindClassMemberFunction<Config>("mergeNode", &Config::mergeNode);
     g_lua.bindClassMemberFunction<Config>("getFileName", &Config::getFileName);
 
@@ -266,6 +305,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ScheduledEvent>("cyclesExecuted", &ScheduledEvent::cyclesExecuted);
     g_lua.bindClassMemberFunction<ScheduledEvent>("maxCycles", &ScheduledEvent::maxCycles);
 
+#ifdef FRAMEWORK_GRAPHICS
     // GraphicalApplication
     g_lua.bindSingletonFunction("g_app", "isOnInputEvent", &GraphicalApplication::isOnInputEvent, &g_app);
 
@@ -289,7 +329,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_app", "setCreatureInformationScale", &GraphicalApplication::setCreatureInformationScale, &g_app);
     g_lua.bindSingletonFunction("g_app", "setAnimatedTextScale", &GraphicalApplication::setAnimatedTextScale, &g_app);
     g_lua.bindSingletonFunction("g_app", "setStaticTextScale", &GraphicalApplication::setStaticTextScale, &g_app);
-
+    
     // PlatformWindow
     g_lua.registerSingletonClass("g_window");
     g_lua.bindSingletonFunction("g_window", "move", &PlatformWindow::move, &g_window);
@@ -360,6 +400,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_ui", "getStyle", &UIManager::getStyle, &g_ui);
     g_lua.bindSingletonFunction("g_ui", "getStyleClass", &UIManager::getStyleClass, &g_ui);
     g_lua.bindSingletonFunction("g_ui", "loadUI", &UIManager::loadUI, &g_ui);
+    g_lua.bindSingletonFunction("g_ui", "loadUIFromString", &UIManager::loadUIFromString, &g_ui);
     g_lua.bindSingletonFunction("g_ui", "displayUI", &UIManager::displayUI, &g_ui);
     g_lua.bindSingletonFunction("g_ui", "createWidget", &UIManager::createWidget, &g_ui);
     g_lua.bindSingletonFunction("g_ui", "createWidgetFromOTML", &UIManager::createWidgetFromOTML, &g_ui);
@@ -381,6 +422,19 @@ void Application::registerLuaFunctions()
     g_lua.registerSingletonClass("g_particles");
     g_lua.bindSingletonFunction("g_particles", "importParticle", &ParticleManager::importParticle, &g_particles);
     g_lua.bindSingletonFunction("g_particles", "getEffectsTypes", &ParticleManager::getEffectsTypes, &g_particles);
+    g_lua.bindSingletonFunction("g_particles", "terminate", &ParticleManager::terminate, &g_particles);
+
+    // ShaderManager
+    g_lua.registerSingletonClass("g_shaders");
+    g_lua.bindSingletonFunction("g_shaders", "createShader", &ShaderManager::createShader, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "createFragmentShader", &ShaderManager::createFragmentShader, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "createFragmentShaderFromCode", &ShaderManager::createFragmentShaderFromCode, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "setupMapShader", &ShaderManager::setupMapShader, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "setupItemShader", &ShaderManager::setupItemShader, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "setupOutfitShader", &ShaderManager::setupOutfitShader, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "setupMountShader", &ShaderManager::setupMountShader, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "addMultiTexture", &ShaderManager::addMultiTexture, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "getShader", &ShaderManager::getShader, &g_shaders);
 
     // UIWidget
     g_lua.registerClass<UIWidget>();
@@ -394,6 +448,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("lowerChild", &UIWidget::lowerChild);
     g_lua.bindClassMemberFunction<UIWidget>("raiseChild", &UIWidget::raiseChild);
     g_lua.bindClassMemberFunction<UIWidget>("moveChildToIndex", &UIWidget::moveChildToIndex);
+    g_lua.bindClassMemberFunction<UIWidget>("reorderChildren", &UIWidget::reorderChildren);
     g_lua.bindClassMemberFunction<UIWidget>("lockChild", &UIWidget::lockChild);
     g_lua.bindClassMemberFunction<UIWidget>("unlockChild", &UIWidget::unlockChild);
     g_lua.bindClassMemberFunction<UIWidget>("mergeStyle", &UIWidget::mergeStyle);
@@ -417,6 +472,9 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("bindRectToParent", &UIWidget::bindRectToParent);
     g_lua.bindClassMemberFunction<UIWidget>("destroy", &UIWidget::destroy);
     g_lua.bindClassMemberFunction<UIWidget>("destroyChildren", &UIWidget::destroyChildren);
+    g_lua.bindClassMemberFunction<UIWidget>("removeChildren", &UIWidget::removeChildren);
+    g_lua.bindClassMemberFunction<UIWidget>("hideChildren", &UIWidget::hideChildren);
+    g_lua.bindClassMemberFunction<UIWidget>("showChildren", &UIWidget::showChildren);
     g_lua.bindClassMemberFunction<UIWidget>("setId", &UIWidget::setId);
     g_lua.bindClassMemberFunction<UIWidget>("setParent", &UIWidget::setParent);
     g_lua.bindClassMemberFunction<UIWidget>("setLayout", &UIWidget::setLayout);
@@ -473,6 +531,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("isDisabled", &UIWidget::isDisabled);
     g_lua.bindClassMemberFunction<UIWidget>("isFocused", &UIWidget::isFocused);
     g_lua.bindClassMemberFunction<UIWidget>("isHovered", &UIWidget::isHovered);
+    g_lua.bindClassMemberFunction<UIWidget>("isChildHovered", &UIWidget::isChildHovered);
     g_lua.bindClassMemberFunction<UIWidget>("isPressed", &UIWidget::isPressed);
     g_lua.bindClassMemberFunction<UIWidget>("isFirst", &UIWidget::isFirst);
     g_lua.bindClassMemberFunction<UIWidget>("isMiddle", &UIWidget::isMiddle);
@@ -490,14 +549,19 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("isFixedSize", &UIWidget::isFixedSize);
     g_lua.bindClassMemberFunction<UIWidget>("isClipping", &UIWidget::isClipping);
     g_lua.bindClassMemberFunction<UIWidget>("isDestroyed", &UIWidget::isDestroyed);
+    g_lua.bindClassMemberFunction<UIWidget>("isFirstOnStyle", &UIWidget::isFirstOnStyle);
     g_lua.bindClassMemberFunction<UIWidget>("isTextWrap", &UIWidget::isTextWrap);
     g_lua.bindClassMemberFunction<UIWidget>("hasChildren", &UIWidget::hasChildren);
     g_lua.bindClassMemberFunction<UIWidget>("containsMarginPoint", &UIWidget::containsMarginPoint);
     g_lua.bindClassMemberFunction<UIWidget>("containsPaddingPoint", &UIWidget::containsPaddingPoint);
     g_lua.bindClassMemberFunction<UIWidget>("containsPoint", &UIWidget::containsPoint);
+    g_lua.bindClassMemberFunction<UIWidget>("intersects", &UIWidget::intersects);
+    g_lua.bindClassMemberFunction<UIWidget>("intersectsMargin", &UIWidget::intersectsMargin);
+    g_lua.bindClassMemberFunction<UIWidget>("intersectsPadding", &UIWidget::intersectsPadding);
     g_lua.bindClassMemberFunction<UIWidget>("getId", &UIWidget::getId);
     g_lua.bindClassMemberFunction<UIWidget>("getParent", &UIWidget::getParent);
     g_lua.bindClassMemberFunction<UIWidget>("getFocusedChild", &UIWidget::getFocusedChild);
+    g_lua.bindClassMemberFunction<UIWidget>("getHoveredChild", &UIWidget::getHoveredChild);
     g_lua.bindClassMemberFunction<UIWidget>("getChildren", &UIWidget::getChildren);
     g_lua.bindClassMemberFunction<UIWidget>("getFirstChild", &UIWidget::getFirstChild);
     g_lua.bindClassMemberFunction<UIWidget>("getLastChild", &UIWidget::getLastChild);
@@ -571,6 +635,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("getX", &UIWidget::getX);
     g_lua.bindClassMemberFunction<UIWidget>("getY", &UIWidget::getY);
     g_lua.bindClassMemberFunction<UIWidget>("getPosition", &UIWidget::getPosition);
+    g_lua.bindClassMemberFunction<UIWidget>("getCenter", &UIWidget::getCenter);
     g_lua.bindClassMemberFunction<UIWidget>("getWidth", &UIWidget::getWidth);
     g_lua.bindClassMemberFunction<UIWidget>("getHeight", &UIWidget::getHeight);
     g_lua.bindClassMemberFunction<UIWidget>("getSize", &UIWidget::getSize);
@@ -676,6 +741,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("getFont", &UIWidget::getFont);
     g_lua.bindClassMemberFunction<UIWidget>("getTextSize", &UIWidget::getTextSize);
     g_lua.bindClassMemberFunction<UIWidget>("hasShader", &UIWidget::hasShader);
+    g_lua.bindClassMemberFunction<UIWidget>("disableUpdateTemporarily", &UIWidget::disableUpdateTemporarily);
 
     // UILayout
     g_lua.registerClass<UILayout>();
@@ -785,6 +851,14 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UITextEdit>("isShiftNavigation", &UITextEdit::isShiftNavigation);
     g_lua.bindClassMemberFunction<UITextEdit>("isMultiline", &UITextEdit::isMultiline);
 
+    // UIQrCode
+    g_lua.registerClass<UIQrCode, UIWidget>();
+    g_lua.bindClassStaticFunction<UIQrCode>("create", [] { return std::make_shared<UIQrCode>(); });
+    g_lua.bindClassMemberFunction<UIQrCode>("getCode", &UIQrCode::getCode);
+    g_lua.bindClassMemberFunction<UIQrCode>("getCodeBorder", &UIQrCode::getCodeBorder);
+    g_lua.bindClassMemberFunction<UIQrCode>("setCode", &UIQrCode::setCode);
+    g_lua.bindClassMemberFunction<UIQrCode>("setCodeBorder", &UIQrCode::setCodeBorder);
+
     // Shader
     g_lua.registerClass<ShaderProgram>();
     g_lua.registerClass<PainterShaderProgram>();
@@ -800,6 +874,7 @@ void Application::registerLuaFunctions()
     g_lua.registerClass<UIParticles, UIWidget>();
     g_lua.bindClassStaticFunction<UIParticles>("create", [] { return std::make_shared<UIParticles>(); });
     g_lua.bindClassMemberFunction<UIParticles>("addEffect", &UIParticles::addEffect);
+#endif
 
 #ifdef FRAMEWORK_NET
     // Server

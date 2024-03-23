@@ -198,8 +198,8 @@ function table.collect(t, func)
 end
 
 function table.insertall(t, s)
-    for k,v in pairs(s) do
-      table.insert(t,v)
+    for k, v in pairs(s) do
+        table.insert(t, v)
     end
     return res
 end
@@ -213,4 +213,100 @@ function table.equals(t, comp)
         end
     end
     return true
+end
+
+function table.equal(t1, t2, ignore_mt)
+    local ty1 = type(t1)
+    local ty2 = type(t2)
+    if ty1 ~= ty2 then return false end
+    -- non-table types can be directly compared
+    if ty1 ~= 'table' and ty2 ~= 'table' then return t1 == t2 end
+    -- as well as tables which have the metamethod __eq
+    local mt = getmetatable(t1)
+    if not ignore_mt and mt and mt.__eq then return t1 == t2 end
+    for k1, v1 in pairs(t1) do
+        local v2 = t2[k1]
+        if v2 == nil or not table.equal(v1, v2) then return false end
+    end
+    for k2, v2 in pairs(t2) do
+        local v1 = t1[k2]
+        if v1 == nil or not table.equal(v1, v2) then return false end
+    end
+    return true
+end
+
+function table.isList(t)
+    local size = #t
+    return table.size(t) == size and size > 0
+end
+
+function table.isStringList(t)
+    if not table.isList(t) then return false end
+    for k, v in ipairs(t) do
+        if type(v) ~= 'string' then
+            return false
+        end
+    end
+    return true
+end
+
+function table.isStringPairList(t)
+    if not table.isList(t) then return false end
+    for k, v in ipairs(t) do
+        if type(v) ~= 'table' or #v ~= 2 or type(v[1]) ~= 'string' or type(v[2]) ~= 'string' then
+            return false
+        end
+    end
+    return true
+end
+
+function table.encodeStringPairList(t)
+    local ret = ""
+    for k, v in ipairs(t) do
+        if v[2]:find("\n") then
+            ret = ret .. v[1] .. ":[[\n" .. v[2] .. "\n]]\n"
+        else
+            ret = ret .. v[1] .. ":" .. v[2] .. "\n"
+        end
+    end
+    return ret
+end
+
+function table.decodeStringPairList(l)
+    local ret = {}
+    local r = regexMatch(l, "(?:^|\\n)([^:^\n]{1,20}):?(.*)(?:$|\\n)")
+    local multiline = ""
+    local multilineKey = ""
+    local multilineActive = false
+    for k, v in ipairs(r) do
+        if multilineActive then
+            local endPos = v[1]:find("%]%]")
+            if endPos then
+                if endPos > 1 then
+                    table.insert(ret, { multilineKey, multiline .. "\n" .. v[1]:sub(1, endPos - 1) })
+                else
+                    table.insert(ret, { multilineKey, multiline })
+                end
+                multilineActive = false
+                multiline = ""
+                multilineKey = ""
+            else
+                if multiline:len() == 0 then
+                    multiline = v[1]
+                else
+                    multiline = multiline .. "\n" .. v[1]
+                end
+            end
+        else
+            local bracketPos = v[3]:find("%[%[")
+            if bracketPos == 1 then -- multiline begin
+                multiline = v[3]:sub(bracketPos + 2)
+                multilineActive = true
+                multilineKey = v[2]
+            elseif v[2]:len() > 0 and v[3]:len() > 0 then
+                table.insert(ret, { v[2], v[3] })
+            end
+        end
+    end
+    return ret
 end

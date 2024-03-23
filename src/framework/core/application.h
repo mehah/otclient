@@ -23,14 +23,27 @@
 #pragma once
 
 #include <framework/global.h>
+#include <framework/graphics/declarations.h>
 
- //@bindsingleton g_app
+class ApplicationContext
+{
+public:
+    ApplicationContext(uint8_t asyncDispatchMaxThreads) : m_asyncDispatchMaxThreads(asyncDispatchMaxThreads) {}
+
+    void setAsyncDispatchMaxThreads(uint8_t maxThreads) { m_asyncDispatchMaxThreads = maxThreads; }
+    uint8_t getAsyncDispatchMaxThreads() { return m_asyncDispatchMaxThreads; }
+
+protected:
+    uint8_t m_asyncDispatchMaxThreads;
+};
+
+//@bindsingleton g_app
 class Application
 {
 public:
     virtual ~Application() = default;
 
-    virtual void init(std::vector<std::string>& args, uint8_t asyncDispatchMaxThreads = 0);
+    virtual void init(std::vector<std::string>& args, ApplicationContext* context);
     virtual void deinit();
     virtual void terminate();
     virtual void run() = 0;
@@ -67,7 +80,7 @@ protected:
     std::string m_charset{ "cp1252" };
     std::string m_organizationName{ "otbr" };
     std::string m_appName{ "OTClient - Redemption" };
-    std::string m_appCompactName{ "otclient" };
+    std::string m_appCompactName{ "otcr" };
     std::string m_startupOptions;
 
     std::vector<std::string> m_startupArgs;
@@ -75,6 +88,12 @@ protected:
     bool m_running{ false };
     bool m_terminated{ false };
     bool m_stopping{ false };
+
+    std::unique_ptr<ApplicationContext> m_context;
 };
 
+#ifdef FRAMEWORK_GRAPHICS
 #include "graphicalapplication.h"
+#else
+#include "consoleapplication.h"
+#endif

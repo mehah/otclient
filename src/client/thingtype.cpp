@@ -43,6 +43,8 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
     m_null = false;
     m_id = clientId;
     m_category = category;
+    m_name = appearance.name();
+    m_description = appearance.description();
 
     const appearances::AppearanceFlags& flags = appearance.flags();
 
@@ -196,7 +198,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
         m_market.category = static_cast<ITEM_CATEGORY>(flags.market().category());
         m_market.tradeAs = flags.market().trade_as_object_id();
         m_market.showAs = flags.market().show_as_object_id();
-        m_market.name = flags.market().name();
+        m_market.name = m_name;
 
         for (const int32_t voc : flags.market().restrict_to_profession()) {
             m_market.restrictVocation |= voc;
@@ -229,7 +231,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
     // cyclopediaitem
     // ammo
 
-    if (flags.has_show_off_socket()) {
+    if (flags.has_show_off_socket() && flags.show_off_socket()) {
         m_flags |= ThingFlagAttrPodium;
     }
 
@@ -244,19 +246,23 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
     // reverse_addons_south
     // reverse_addons_north
 
-    if (flags.has_wearout()) {
+    if (flags.has_wearout() && flags.wearout()) {
         m_flags |= ThingFlagAttrWearOut;
     }
 
-    if (flags.has_clockexpire()) {
+    if (flags.has_clockexpire() && flags.clockexpire()) {
         m_flags |= ThingFlagAttrClockExpire;
     }
 
-    if (flags.has_expire()) {
+    if (flags.has_expire() && flags.expire()) {
         m_flags |= ThingFlagAttrExpire;
     }
 
-    if (flags.has_expirestop()) {
+    if (flags.has_expirestop() && flags.expirestop()) {
+        m_flags |= ThingFlagAttrExpireStop;
+    }
+
+    if (flags.has_deco_kit() && flags.deco_kit()) {
         m_flags |= ThingFlagAttrExpireStop;
     }
 
@@ -446,8 +452,13 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
             case ThingAttrDisplacement:
             {
                 if (g_game.getClientVersion() >= 755) {
-                    m_displacement.x = fin->getU16();
-                    m_displacement.y = fin->getU16();
+                    if (g_game.getFeature(Otc::GameNegativeOffset)) {
+                        m_displacement.x = fin->get16();
+                        m_displacement.y = fin->get16();
+                    } else {
+                        m_displacement.x = fin->getU16();
+                        m_displacement.y = fin->getU16();
+                    }
                 } else {
                     m_displacement.x = 8;
                     m_displacement.y = 8;
@@ -599,6 +610,20 @@ void ThingType::unserializeOtml(const OTMLNodePtr& node)
     }
 }
 
+void ThingType::drawWithFrameBuffer(const TexturePtr& texture, const Rect& screenRect, const Rect& textureRect, const Color& color, const DrawConductor& conductor) {
+    const int size = static_cast<int>(g_gameConfig.getSpriteSize() * std::max<int>(m_size.area(), 2) * g_drawPool.getScaleFactor());
+    const auto& p = (Point(size) - screenRect.size().toPoint()) / 2;
+    const auto& destDiff = Rect(screenRect.topLeft() - p, Size{ size });
+
+    g_drawPool.bindFrameBuffer(destDiff.size()); {
+        // Debug
+        // g_drawPool.addBoundingRect(Rect(Point(0), destDiff.size()), Color::red);
+
+        g_drawPool.addTexturedRect(Rect(p, screenRect.size()), texture, textureRect, color, conductor);
+    } g_drawPool.releaseFrameBuffer(destDiff);
+    g_drawPool.resetShaderProgram();
+}
+
 void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, const Color& color, bool drawThings, LightView* lightView, const DrawConductor& conductor)
 {
     if (m_null)
@@ -624,7 +649,11 @@ void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, i
 
     if (drawThings) {
         const auto& newColor = m_opacity < 1.0f ? Color(color, m_opacity) : color;
-        g_drawPool.addTexturedRect(screenRect, texture, textureRect, newColor, conductor);
+
+        if (g_drawPool.shaderNeedFramebuffer())
+            drawWithFrameBuffer(texture, screenRect, textureRect, newColor, conductor);
+        else
+            g_drawPool.addTexturedRect(screenRect, texture, textureRect, newColor, conductor);
     }
 
     if (lightView && hasLight()) {
@@ -920,6 +949,7 @@ ThingFlagAttr ThingType::thingAttrToThingFlagAttr(ThingAttr attr) {
         case ThingAttrPodium: return ThingFlagAttrPodium;
         case ThingAttrTopEffect: return ThingFlagAttrTopEffect;
         case ThingAttrMarket: return ThingFlagAttrMarket;
+        case ThingAttrDecoKit: return ThingFlagAttrDecoKit;
         default: break;
     }
 

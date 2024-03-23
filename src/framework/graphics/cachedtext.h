@@ -38,6 +38,7 @@ public:
 
     Size getTextSize() const { return m_textSize; }
     std::string getText() const { return m_text; }
+    bool hasText() const { return !m_text.empty(); }
     BitmapFontPtr getFont() const { return m_font; }
     Fw::AlignmentFlag getAlign() const { return m_align; }
 

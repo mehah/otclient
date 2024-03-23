@@ -26,7 +26,7 @@
 
 #include "uilayout.h"
 
-class UIAnchor :public std::enable_shared_from_this<UIAnchor>
+class UIAnchor : public std::enable_shared_from_this<UIAnchor>
 {
 public:
     virtual ~UIAnchor() {} // fix clang warning
@@ -83,5 +83,5 @@ public:
 protected:
     bool internalUpdate() override;
     virtual bool updateWidget(const UIWidgetPtr& widget, const UIAnchorGroupPtr& anchorGroup, UIWidgetPtr first = nullptr);
-    stdext::map<UIWidgetPtr, UIAnchorGroupPtr> m_anchorsGroups;
+    std::unordered_map<UIWidgetPtr, UIAnchorGroupPtr> m_anchorsGroups;
 };

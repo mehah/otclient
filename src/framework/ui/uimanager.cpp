@@ -29,6 +29,7 @@
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/otml/otml.h>
 #include <framework/platform/platformwindow.h>
+#include <framework/core/modulemanager.h>
 
 UIManager g_ui;
 
@@ -58,8 +59,12 @@ void UIManager::terminate()
 
 void UIManager::render(DrawPoolType drawPane) const
 {
-    if (drawPane == DrawPoolType::FOREGROUND)
-        g_drawPool.use(DrawPoolType::FOREGROUND, { 0,0, g_graphics.getViewportSize() }, {});
+    if (drawPane == DrawPoolType::FOREGROUND) {
+        g_drawPool.preDraw(DrawPoolType::FOREGROUND, [this, drawPane] {
+            m_rootWidget->draw(m_rootWidget->getRect(), drawPane);
+        }, { 0,0, g_graphics.getViewportSize() }, {});
+        return;
+    }
 
     m_rootWidget->draw(m_rootWidget->getRect(), drawPane);
 }
@@ -254,7 +259,7 @@ void UIManager::updateHoveredWidget(bool now)
         func();
     else {
         m_hoverUpdateScheduled = true;
-        g_dispatcher.addEvent(func);
+        g_dispatcher.deferEvent(func);
     }
 }
 
@@ -287,6 +292,10 @@ void UIManager::onWidgetDestroy(const UIWidgetPtr& widget)
 
     if (m_draggingWidget == widget)
         updateDraggingWidget(nullptr);
+
+    // Avoid the garbage collector
+    if (!g_modules.isAutoReloadEnabled())
+        return;
 
     if (widget == m_rootWidget || !m_rootWidget)
         return;
@@ -515,6 +524,35 @@ UIWidgetPtr UIManager::loadUI(const std::string& file, const UIWidgetPtr& parent
         return createWidgetFromOTML(widgetNode, parent);
     } catch (stdext::exception& e) {
         g_logger.error(stdext::format("failed to load UI from '%s': %s", file, e.what()));
+        return nullptr;
+    }
+}
+
+UIWidgetPtr UIManager::loadUIFromString(const std::string& data, const UIWidgetPtr& parent)
+{
+    try {
+        std::stringstream sstream;
+        sstream.clear(std::ios::goodbit);
+        sstream.write(&data[0], data.length());
+        sstream.seekg(0, std::ios::beg);
+        OTMLDocumentPtr doc = OTMLDocument::parse(sstream, "(string)");
+        UIWidgetPtr widget;
+        for (const OTMLNodePtr& node : doc->children()) {
+            std::string tag = node->tag();
+
+            // import styles in these files too
+            if (tag.find("<") != std::string::npos)
+                importStyleFromOTML(node);
+            else {
+                if (widget)
+                    throw Exception("cannot have multiple main widgets in otui files");
+                widget = createWidgetFromOTML(node, parent);
+            }
+        }
+
+        return widget;
+    } catch (stdext::exception& e) {
+        g_logger.error(stdext::format("failed to load UI from string: %s", e.what()));
         return nullptr;
     }
 }

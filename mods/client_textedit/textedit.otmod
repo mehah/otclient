@@ -1,0 +1,9 @@
+Module
+  name: client_textedit
+  description: Shows window which allows to edit text
+  author: OTClientV8
+  website: https://github.com/OTCv8/otclientv8
+  sandboxed: true
+  scripts: [ textedit ]
+  @onLoad: init()
+  @onUnload: terminate()
