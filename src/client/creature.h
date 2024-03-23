@@ -78,6 +78,7 @@ public:
     void setIconTexture(const std::string& filename);
     void setPassable(bool passable) { m_passable = passable; }
     void setMountShader(const std::string_view name);
+    void setStaticWalking(uint16_t v);
 
     void onStartAttachEffect(const AttachedEffectPtr& effect) override;
     void onDispatcherAttachEffect(const AttachedEffectPtr& effect) override;
@@ -225,6 +226,7 @@ private:
     uint16_t m_calculatedStepSpeed{ 0 };
     uint16_t m_speed{ 0 };
     uint16_t m_baseSpeed{ 0 };
+    uint16_t m_walkingAnimationSpeed{ 0 };
 
     uint32_t m_id{ 0 };
     uint32_t m_masterId{ 0 };

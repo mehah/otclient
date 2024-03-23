@@ -543,7 +543,8 @@ void Creature::updateWalkAnimation()
             footAnimDelay /= 1.5;
     }
 
-    const int footDelay = std::clamp<int>(m_stepCache.getDuration(m_lastStepDirection) / footAnimDelay, minFootDelay, maxFootDelay);
+    const auto walkSpeed = m_walkingAnimationSpeed > 0 ? m_walkingAnimationSpeed : m_stepCache.getDuration(m_lastStepDirection);
+    const int footDelay = std::clamp<int>(walkSpeed / footAnimDelay, minFootDelay, maxFootDelay);
 
     if (m_footTimer.ticksElapsed() >= footDelay) {
         if (m_walkAnimationPhase == footAnimPhases) m_walkAnimationPhase = 1;
@@ -972,10 +973,9 @@ const Light& Creature::getLight() const
 
 uint16_t Creature::getCurrentAnimationPhase(const bool mount)
 {
-    const auto& thingType = mount ? m_mountType : getThingType();
+    const auto thingType = mount ? m_mountType : getThingType();
 
-    auto* idleAnimator = thingType->getIdleAnimator();
-    if (idleAnimator) {
+    if (const auto idleAnimator = thingType->getIdleAnimator()) {
         if (m_walkAnimationPhase == 0) return idleAnimator->getPhase();
         return m_walkAnimationPhase + idleAnimator->getAnimationPhases() - 1;
     }
@@ -1066,6 +1066,25 @@ void Creature::onStartDetachEffect(const AttachedEffectPtr& effect) {
     if (effect->isTransform() && !effect->m_outfitOwner.isInvalid()) {
         setOutfit(effect->m_outfitOwner);
     }
+}
+
+void Creature::setStaticWalking(uint16_t v) {
+    if (m_walkUpdateEvent) {
+        m_walkUpdateEvent->cancel();
+        m_walkUpdateEvent = nullptr;
+    }
+
+    m_walkingAnimationSpeed = v;
+
+    if (v == 0)
+        return;
+
+    m_walkUpdateEvent = g_dispatcher.cycleEvent([self = static_self_cast<Creature>()] {
+        self->updateWalkAnimation();
+        if (self.use_count() == 1) {
+            self->m_walkUpdateEvent->cancel();
+        }
+    }, std::min<int>(v / g_gameConfig.getSpriteSize(), DrawPool::FPS60));
 }
 
 #ifndef BOT_PROTECTION
