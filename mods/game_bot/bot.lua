@@ -255,6 +255,7 @@ function toggle()
   else
     botWindow:open()
     botButton:setOn(true)
+    modules.game_interface.checkAndOpenLeftPanel()
   end
 end
 

@@ -1328,3 +1328,12 @@ function setupOptionsMainButton()
     logOutMainButton = modules.game_mainpanel.addSpecialToggleButton('logoutButton', tr('Exit'), '/images/options/button_logout',
     tryLogout, true)
 end
+
+function checkAndOpenLeftPanel()
+    leftDecreaseSidePanels:setEnabled(true)
+  if not modules.client_options.getOption('showLeftPanel') then
+
+      modules.client_options.setOption('showLeftPanel', true)
+      return
+  end
+end
