@@ -27,7 +27,7 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 - [x]  **game_containers** Panel nil L161 https://github.com/Nottinghster/otclient/issues/9
 - [x] **Game_bot** Fix width mini windows bot
 - [ ] **Game_mainpanel.** compatibility with extended view #7
-- [ ] **Game_entergame** MOTD old protocol
+- [x] **Game_entergame** MOTD old protocol
 - [ ] **Game_entergame** problems with token label when no cache, (first open client)
 - [ ] **Game_topmenu** missing Boton "manager account", "manager clients"
 - [ ] **Game_mainpanel** fix function inventoryController:onTerminate()
