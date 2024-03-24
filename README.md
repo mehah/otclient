@@ -25,6 +25,7 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 
 - [x] **corelib/ui/uiminiwindows** "droppedWidget" nil L224 https://github.com/Nottinghster/otclient/issues/10
 - [x]  **game_containers** Panel nil L161 https://github.com/Nottinghster/otclient/issues/9
+- [x] **Game_bot** Fix width mini windows bot
 - [ ] **Game_mainpanel.** compatibility with extended view #7
 - [ ] **Game_entergame** MOTD old protocol
 - [ ] **Game_entergame** problems with token label when no cache, (first open client)
@@ -34,7 +35,7 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 - [ ] **Game_mainpanel** Inventario fix ico state
 - [ ] **Game_outfit** of tibia 13 SOON
 - [ ] **Game_mainpanel** (inventary) Fix Ico game skills like clipsof
-- [ ] **Game_bot** Fix width mini windows bot
+
 - [ ] **Game_bot** get the slot5 requested by quiver_label and quiver_manager
 - [ ] **Game_topMenu** (onStatesChange) icons state
 - [ ] **Game_mainpanel** Missing UI of tibia 13 ( close , minimize , scroll)
