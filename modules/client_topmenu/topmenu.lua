@@ -194,7 +194,7 @@ function updateFps(fps)
     end
 
     local text = fps .. ' fps'
-    if g_game.isOnline() and fpsPanel2 then
+    if g_game.isOnline() and fpsPanel2 and fpsPanel2:isVisible() then
         fpsPanel2:setText(text)
     end
 
@@ -221,7 +221,7 @@ function updatePing(ping)
         pingLabel:setColor(color)
         pingLabel:setText(text)
     end
-    if pingPanel:isVisible() then
+    if pingPanel and pingPanel:isVisible() then
 
         local text
         local imagen
