@@ -1,7 +1,6 @@
 testPingPanel < UIWidget
   size: 50 50
   padding: 3
-  image-source: /images/buffs/background
   focusable: false
   pingImg
   pingFpsLabel
