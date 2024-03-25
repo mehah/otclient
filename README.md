@@ -9,7 +9,8 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 ## Screenshots
 
 ![image](https://github.com/Nottinghster/otclient/assets/114332266/e15b7533-4a85-44f9-b9f9-9c0430411332)
-![image](https://github.com/Nottinghster/otclient/assets/114332266/a591a4c2-0604-4427-aea1-6394b245ea8f)
+![meho](https://github.com/Nottinghster/otclient/assets/114332266/69f564f6-14b4-43f5-af35-c84ce26edfee)
+
 
 ## Features
 
@@ -22,27 +23,29 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 
 - [x] **Game_topmenu.** fix: Fps and ping https://github.com/Nottinghster/otclient/pull/8
 - [x] **Game_Console** fix: preventing the text cursor from appearing when starting to write.  [87becf4](https://github.com/Nottinghster/otclient/commit/87becf4e2fcc7f7c494f87fae4f0d4b426f68749)
-
 - [x] **corelib/ui/uiminiwindows** "droppedWidget" nil L224 https://github.com/Nottinghster/otclient/issues/10
 - [x]  **game_containers** Panel nil L161 https://github.com/Nottinghster/otclient/issues/9
-- [x] **Game_bot** Fix width mini windows bot
-- [ ] **Game_mainpanel.** compatibility with extended view #7
+- [x] **Game_bot** Fix width mini windows bot [ad52ef0](https://github.com/Nottinghster/otclient/commit/ad52ef06dad02afc8276e3508fbe864dfb0cc38b)
 - [x] **Game_entergame** MOTD old protocol
+- [x] **Game_mainpanel** fix: combat control  chase. [#12](https://github.com/Nottinghster/otclient/pull/12)
+- [x] **Game_topMenu** (onStatesChange) icons state [a350e7c](https://github.com/Nottinghster/otclient/commit/a350e7cc36dbf907675d57f2037ef86810482a62)
+- [ ] **Game_mainpanel.** compatibility with extended view #7
 - [ ] **Game_entergame** problems with token label when no cache, (first open client)
 - [ ] **Game_topmenu** missing Boton "manager account", "manager clients"
 - [ ] **Game_mainpanel** fix function inventoryController:onTerminate()
 - [ ] **Game_mainpanel** Hide icon "bless" in minize panel for old protocole
 - [ ] **Game_mainpanel** Inventario fix ico state
 - [ ] **Game_outfit** of tibia 13 SOON
-- [ ] **Game_mainpanel** (inventary) Fix Ico game skills like clipsof
-
+- [ ] **game_skills** (inventary) Fix Ico location like clipsof
 - [ ] **Game_bot** get the slot5 requested by quiver_label and quiver_manager
-- [ ] **Game_topMenu** (onStatesChange) icons state
 - [ ] **Game_mainpanel** Missing UI of tibia 13 ( close , minimize , scroll)
 - [ ] **Characterlist** Add checkbox "show outift" button
 - [ ] **Client_bottom** default information if array services is not enabled
 
 
+## Contributing
+
+We need people to test in versions higher than 8.6  and another who is skilled with PHP 
 
 ## Overall Status
 
@@ -585,7 +588,31 @@ in your
 
 `C:/UniServerZ/www/api/`
 
----
+
+
+
+### **7.- where do I edit this?**
+![image](https://github.com/Nottinghster/otclient/assets/114332266/346fb845-7441-45c2-ac49-f11b2bf8535a)
+
+.\otclient\data\styles\30-statsbar.otui
+
+.\otclient\modules\game_interface\widgets\statsbar.lua
+
+### **7.5.-How do I hide top menu?**
+![image](https://github.com/Nottinghster/otclient/assets/114332266/ceca0186-f65b-448b-ab72-ab4cef368f46)
+
+### **8.- Where is the array Icons?**
+
+
+```
+Icons[PlayerStates.Poison] = {
+    tooltip = tr('You are poisoned'),
+    path = '/images/game/states/poisoned',
+    id = 'condition_poisoned'
+}
+```
+
+.\otclient\modules\gamelib\player.lua
 
 ## Author
 
