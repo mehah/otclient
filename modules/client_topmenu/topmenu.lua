@@ -146,11 +146,21 @@ function online()
     MainPingPanel.setId(MainPingPanel, "ping")
     pingImg = MainPingPanel.getChildByIndex(MainPingPanel, 1)
     pingPanel = MainPingPanel.getChildByIndex(MainPingPanel, 2)
-
+    if modules.client_options.getOption('showPing') then
+        pingImg:setVisible(true)
+        pingPanel:setVisible(true)
+    else
+        pingImg:setVisible(false)
+        pingPanel:setVisible(true)
+    end
     mainFpsPanel = g_ui.createWidget("testPingPanel", PingWidget:getChildByIndex(2))
     mainFpsPanel.setId(mainFpsPanel, "fps")
     fpsPanel2 = mainFpsPanel.getChildByIndex(mainFpsPanel, 2)
-
+    if modules.client_options.getOption('showFps') then
+        fpsPanel2:setVisible(true)
+    else
+        fpsPanel2:setVisible(false)
+    end
 end
 
 function offline()
@@ -194,14 +204,16 @@ function updateFps(fps)
     end
 
     local text = fps .. ' fps'
-    if g_game.isOnline() and fpsPanel2 and fpsPanel2:isVisible() then
-        fpsPanel2:setText(text)
+    if fpsPanel2 and fpsPanel2:isVisible() then
+        if g_game.isOnline() then
+            fpsPanel2:setText(text)
+        end
     end
 
 end
 
 function updatePing(ping)
-    if pingLabel:isVisible() then --for the time being retained for the extended view
+    if pingLabel:isVisible() then -- for the time being retained for the extended view
 
         local text = 'Ping: '
         local color
