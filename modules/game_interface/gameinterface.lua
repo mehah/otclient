@@ -1012,6 +1012,10 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
 
     if autoWalkPos and keyboardModifiers == KeyboardNoModifier and mouseButton == MouseLeftButton then
         player:autoWalk(autoWalkPos)
+        if g_game.isAttacking() and g_game.getChaseMode() == ChaseOpponent then
+            g_game.setChaseMode(DontChase)
+            return true
+        end
         return true
     end
 

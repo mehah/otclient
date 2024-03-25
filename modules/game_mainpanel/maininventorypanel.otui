@@ -1,3 +1,18 @@
+
+StandModeBox < UICheckBox
+  size: 20 20
+  image-source: /images/inventory/buttons_general
+  image-clip: 0 0 20 20
+  $checked:
+    image-clip: 20 0 20 20
+ChaseModeBox < UICheckBox
+  size: 20 20
+  image-source: /images/inventory/buttons_general
+  image-clip: 0 20 20 20
+  $checked:
+    image-clip: 20 20 20 20
+
+
 ConditionWidget < UIWidget
   size: 18 18
 
@@ -50,39 +65,21 @@ PhantomMiniWindow
       $pressed !disabled:
         image-clip: 12 0 12 12
 
-    TopToggleButton
+    StandModeBox
       id: standPosture
-      image-source: /images/inventory/buttons_general
-      image-clip: 0 0 20 20
       anchors.right: parent.right
       anchors.top: changeSize.top
       margin-right: 7
       size: 20 20
-      @onClick: |
-        selectPosture('stand')
 
-      $pressed !disabled:
-        image-clip: 20 0 20 20
 
-      $disabled:
-        image-clip: 20 0 20 20
-
-    TopToggleButton
+    ChaseModeBox
       id: followPosture
       image-source: /images/inventory/buttons_general
-      image-clip: 0 20 20 20
       anchors.right: standPosture.right
       anchors.top: standPosture.bottom
       margin-top: 4
-      size: 20 20
-      @onClick: |
-        selectPosture('follow')
 
-      $pressed !disabled:
-        image-clip: 20 20 20 20
-
-      $disabled:
-        image-clip: 20 20 20 20
 
     UIWidget
       id: expert
@@ -428,39 +425,19 @@ PhantomMiniWindow
       $disabled:
         image-clip: 20 80 20 20
 
-    TopToggleButton
+    StandModeBox
       id: standPosture
-      image-source: /images/inventory/buttons_general
-      image-clip: 0 0 20 20
       anchors.left: attack.left
       anchors.top: attack.bottom
       margin-top: 4
-      size: 20 20
-      @onClick: |
-        selectPosture('stand')
 
-      $pressed !disabled:
-        image-clip: 20 0 20 20
 
-      $disabled:
-        image-clip: 20 0 20 20
-
-    TopToggleButton
+    ChaseModeBox
       id: followPosture
-      image-source: /images/inventory/buttons_general
-      image-clip: 0 20 20 20
       anchors.left: standPosture.right
       anchors.top: standPosture.top
       margin-left: 1
-      size: 20 20
-      @onClick: |
-        selectPosture('follow')
 
-      $pressed !disabled:
-        image-clip: 20 20 20 20
-
-      $disabled:
-        image-clip: 20 20 20 20
 
     UIWidget
       id: pvp

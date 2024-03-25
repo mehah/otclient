@@ -98,7 +98,8 @@ function terminate()
     healthManaController:terminate()
     optionsController:terminate()
 end
-
+local standModeBox
+local chaseModeBox
 local optionsAmount = 0
 local specialsAmount = 0
 function reloadMainPanelSizes()
@@ -280,10 +281,11 @@ local function walkEvent()
 end
 
 local function combatEvent()
-    if g_game.getChaseMode() == ChaseOpponent then
-        selectPosture('follow', true)
+    local chaseMode = g_game.getChaseMode()
+    if chaseMode == 1 then
+       chaseModeRadioGroup:selectWidget(chaseModeBox, true)
     else
-        selectPosture('stand', true)
+       chaseModeRadioGroup:selectWidget(standModeBox, true)
     end
 
     if g_game.getFightMode() == FightOffensive then
@@ -456,45 +458,71 @@ local function refreshInventorySizes()
     walkEvent()
     reloadMainPanelSizes()
 end
+function onSetChaseMode(self, selectedChaseModeButton)
+
+    if selectedChaseModeButton == nil then return end
+      local buttonId = selectedChaseModeButton:getId()
+    local chaseMode
+    
+    if buttonId == 'followPosture' then
+      chaseMode = ChaseOpponent
+    else --standModeBox
+      chaseMode = DontChase
+    end
+    
+    g_game.setChaseMode(chaseMode)
+  end
 
 inventoryController = Controller:new()
 inventoryController:setUI('maininventorypanel', modules.game_interface.getMainRightPanel())
 
 local inventoryControllerEvents = inventoryController:addEvent(LocalPlayer, {
+
+    onInventoryChange = inventoryEvent,
+    onSoulChange = onSoulChange,
+    onFreeCapacityChange = onFreeCapacityChange,
+    onStatesChange = onStatesChange
+})
+local inventoryControllerEvents_game = inventoryController:addEvent(g_game, {
+
     onWalk = walkEvent,
     onAutoWalk = walkEvent,
     onFightModeChange = combatEvent,
     onChaseModeChange = combatEvent,
     onSafeFightChange = combatEvent,
     onPVPModeChange = combatEvent,
-    onInventoryChange = inventoryEvent,
-    onSoulChange = onSoulChange,
-    onFreeCapacityChange = onFreeCapacityChange,
-    onStatesChange = onStatesChange
-})
 
+})
 function inventoryController:onInit()
     refreshInventory_panel()
-
+    local ui = getInventoryUi()
+    standModeBox = ui.standPosture
+    chaseModeBox =  ui.followPosture
+    chaseModeRadioGroup = UIRadioGroup.create()
+    chaseModeRadioGroup:addWidget(standModeBox)
+    chaseModeRadioGroup:addWidget(chaseModeBox)
+    connect(chaseModeRadioGroup, { onSelectionChange = onSetChaseMode })
 end
 
 function inventoryController:onTerminate()
-    --- important
 
 end
 
 function inventoryController:onGameStart()
     inventoryControllerEvents:connect()
-    inventoryControllerEvents:execute('onWalk')
-    inventoryControllerEvents:execute('onAutoWalk')
-    inventoryControllerEvents:execute('onFightModeChange')
-    inventoryControllerEvents:execute('onChaseModeChange')
-    inventoryControllerEvents:execute('onSafeFightChange')
-    inventoryControllerEvents:execute('onPVPModeChange')
     inventoryControllerEvents:execute('onInventoryChange')
     inventoryControllerEvents:execute('onSoulChange')
     inventoryControllerEvents:execute('onFreeCapacityChange')
     inventoryControllerEvents:execute('onStatesChange')
+
+    inventoryControllerEvents_game:connect()
+    inventoryControllerEvents_game:execute('onWalk')
+    inventoryControllerEvents_game:execute('onAutoWalk')
+    inventoryControllerEvents_game:execute('onFightModeChange')
+    inventoryControllerEvents_game:execute('onChaseModeChange')
+    inventoryControllerEvents_game:execute('onSafeFightChange')
+    inventoryControllerEvents_game:execute('onPVPModeChange')
+
     inventoryShrink = g_settings.getBoolean('mainpanel_shrink_inventory')
     refreshInventorySizes()
     refreshInventory_panel()
@@ -502,7 +530,7 @@ end
 
 function inventoryController:onGameEnd()
     inventoryControllerEvents:disconnect()
-
+    inventoryControllerEvents_game:disconnect()
 end
 
 function selectPosture(key, ignoreUpdate)
