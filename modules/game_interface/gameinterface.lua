@@ -1337,3 +1337,7 @@ function checkAndOpenLeftPanel()
       return
   end
 end
+
+function getStateTopPanel()
+ return StatsBar.getCurrentStatsBar().icons
+end

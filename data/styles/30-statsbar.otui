@@ -319,12 +319,16 @@ TopStatsBarLargeOnTop < UIWidget
   StatsBarTopWithShrink
     anchors.fill: parent
 
-  StatsBarDarkBackground
+  Panel
     id: icons
+    image-border: 3
+    image-source: /images/ui/containerslot
     anchors.top: parent.top
     anchors.horizontalCenter: parent.horizontalCenter
     margin-top: 5
     size: 53 27
+    layout:
+      type: horizontalBox
 
   StatsBarUp
     id: health
@@ -401,11 +405,15 @@ TopStatsBarParallelOnTop < UIWidget
     margin-right: 12
     height: 0
 
-  StatsBarDarkBackground
+  Panel
     id: icons
+    image-border: 3
+    image-source: /images/ui/containerslot
     anchors.top: skills.bottom
     anchors.horizontalCenter: parent.horizontalCenter
     size: 103 14
+    layout:
+      type: horizontalBox
 
 TopStatsBarDefaultOnTop < UIWidget
   StatsBarTopWithShrink
@@ -448,22 +456,30 @@ TopStatsBarDefaultOnTop < UIWidget
     margin-right: 12
     height: 0
 
-  StatsBarDarkBackground
+  Panel
     id: icons
+    image-border: 3
+    image-source: /images/ui/containerslot
     anchors.top: skills.bottom
     anchors.horizontalCenter: parent.horizontalCenter
     size: 103 14
+    layout:
+      type: horizontalBox
 
 TopStatsBarCompactOnTop < UIWidget
   StatsBarTopWithShrink
     anchors.fill: parent
 
-  StatsBarDarkBackground
+  Panel
     id: icons
+    image-border: 3
+    image-source: /images/ui/containerslot
     anchors.top: parent.top
     anchors.horizontalCenter: parent.horizontalCenter
     margin-top: 5
     size: 53 14
+    layout:
+      type: horizontalBox
 
   StatsBarUp
     id: health
