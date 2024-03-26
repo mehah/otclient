@@ -26,6 +26,8 @@ local mainFpsPanel
 local fpsPanel2
 local PingWidget
 local pingImg
+
+local managerAccountsButton
 -- private functions
 local function addButton(id, description, icon, callback, panel, toggle, front)
     local class
@@ -91,7 +93,10 @@ function init()
     topLeftDiscordLink = topMenu:recursiveGetChildById('discordIcon')
 
     g_keyboard.bindKeyDown('Ctrl+Shift+T', toggle)
-
+if Services.websites then
+    managerAccountsButton = modules.client_topmenu.addTopRightRegularButton('hotkeysButton', tr('Manage Account'),
+                                                             nil, openManagerAccounts)
+end
     if g_game.isOnline() then
         online()
     end
@@ -111,6 +116,10 @@ function terminate()
     if PingWidget then
         PingWidget:destroy()
         PingWidget = nil
+    end
+    if managerAccountsButton then
+        managerAccountsButton:destroy()
+        managerAccountsButton = nil
     end
 
 end
@@ -370,4 +379,12 @@ function toggle()
         menu:show()
         modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'topMenu', AnchorTop)
     end
+end
+
+
+function openManagerAccounts()
+    if Services.websites then
+        g_platform.openUrl(Services.websites)
+    end
+
 end
