@@ -93,7 +93,10 @@ PhantomMiniWindow
       phantom: false
       margin-top: 4
       size: 20 20
-
+      @onSetup: |
+        if g_game.getClientVersion() < 1080 then -- g_game.getFeature(GamePVPMode) ?
+          self:hide()
+        end
     UIWidget
       id: pvp
       image-source: /images/inventory/buttons_general
@@ -487,6 +490,10 @@ PhantomMiniWindow
       anchors.bottom: soulAndCapacity.bottom
       phantom: false
       size: 12 12
+      @onSetup: |
+        if g_game.getClientVersion() < 1080 then -- g_game.getFeature(GamePVPMode) ?
+          self:hide()
+        end
 
     Button
       id: blessings
@@ -516,7 +523,7 @@ PhantomMiniWindow
       image-border: 3
       layout:
         type: horizontalBox
-        
+
     TopToggleButton
       id: stop
       !text: tr('Stop')
