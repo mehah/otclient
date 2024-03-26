@@ -8,20 +8,17 @@ local currentStats = {
 local skillsLineHeight = 20
 local skillsTuples = {
     {skill = nil,               key = 'experience', icon = '/images/icons/icon_experience',  placement = 'center',   order = 0,  name = "Level"},
-
     {skill = nil,               key = 'magic',      icon = '/images/icons/icon_magic',       placement = 'left',     order = 1,  name = "Magic Level"},
     {skill = Skill.Axe,         key = 'axe',        icon = '/images/icons/icon_axe',         placement = 'right',    order = 1,  name = "Axe Fighting Skill"},
-
     {skill = Skill.Club,        key = 'club',       icon = '/images/icons/icon_club',        placement = 'left',     order = 2,  name = "Club Fighting Skill"},
     {skill = Skill.Distance,    key = 'distance',   icon = '/images/icons/icon_distance',    placement = 'right',    order = 2,  name = "Distance Fighting Skill"},
-
     {skill = Skill.Fist,        key = 'fist',       icon = '/images/icons/icon_fist',        placement = 'left',     order = 3,  name = "Fist Fighting Skill"},
     {skill = Skill.Shielding,   key = 'shielding',  icon = '/images/icons/icon_shielding',   placement = 'right',    order = 3,  name = "Shielding Fighting Skill"},
-
     {skill = Skill.Sword,       key = 'sword',      icon = '/images/icons/icon_sword',       placement = 'left',     order = 4,  name = "Sword Fighting Skill"},
     {skill = Skill.Fishing,     key = 'fishing',    icon = '/images/icons/icon_fishing',     placement = 'right',    order = 4,  name = "Fishing Fighting Skill"},
 }
 StatsBar = {}
+
 local function reloadSkillsTab(skills, parent)
     local player = g_game.getLocalPlayer()
     if not player then

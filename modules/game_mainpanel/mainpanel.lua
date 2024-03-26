@@ -262,7 +262,6 @@ end
 
 local function onSoulChange(localPlayer, soul)
     local ui = getInventoryUi()
-
     if not localPlayer then
         return
     end
@@ -271,7 +270,6 @@ local function onSoulChange(localPlayer, soul)
     end
 
     ui.soulPanel.soul:setText(soul)
-
 end
 
 local function onFreeCapacityChange(player, freeCapacity)
@@ -284,16 +282,13 @@ local function onFreeCapacityChange(player, freeCapacity)
     end
     if freeCapacity > 99 then
         freeCapacity = math.floor(freeCapacity * 10) / 10
-    end
-    if freeCapacity > 999 then
+    elseif freeCapacity > 999 then
         freeCapacity = math.floor(freeCapacity)
-    end
-    if freeCapacity > 99999 then
+    elseif freeCapacity > 99999 then
         freeCapacity = math.min(9999, math.floor(freeCapacity / 1000)) .. "k"
     end
     local ui = getInventoryUi()
     ui.capacityPanel.capacity:setText(freeCapacity)
-
 end
 
 local function loadIcon(bitChanged, widget)
@@ -301,15 +296,12 @@ local function loadIcon(bitChanged, widget)
     icon:setId(Icons[bitChanged].id)
     icon:setImageSource(Icons[bitChanged].path)
     icon:setTooltip(Icons[bitChanged].tooltip)
-
     return icon
 end
 
 local function toggleIcon(bitChanged, widget)
     local icon = widget:getChildById(Icons[bitChanged].id)
-
     if icon then
-
         icon:destroy()
     else
         icon = loadIcon(bitChanged, widget)
@@ -334,12 +326,11 @@ function onStatesChange(localPlayer, now, old)
         end
         local bitChanged = bit.band(bitsChanged, pow)
         if bitChanged ~= 0 then
-
             toggleIcon(bitChanged, getInventoryUi().icons)
-
         end
     end
 end
+
 local function refreshInventory_panel()
     if inventoryShrink then
         return
@@ -357,9 +348,9 @@ local function refreshInventory_panel()
         onSoulChange(player, player:getSoul())
         onFreeCapacityChange(player, player:getFreeCapacity())
         onStatesChange(player, player:getStates(), 0)
-
     end
 end
+
 local function refreshInventorySizes()
     if inventoryShrink then
         inventoryController.ui:setOn(false)
@@ -394,12 +385,10 @@ local inventoryControllerEvents = inventoryController:addEvent(LocalPlayer, {
 
 function inventoryController:onInit()
     refreshInventory_panel()
-
 end
 
 function inventoryController:onTerminate()
     --- important
-
 end
 
 function inventoryController:onGameStart()
@@ -421,7 +410,6 @@ end
 
 function inventoryController:onGameEnd()
     inventoryControllerEvents:disconnect()
-
 end
 
 function selectPosture(key, ignoreUpdate)
@@ -507,6 +495,7 @@ local function refreshVirtualFloors()
     mapController.ui.layersPanel.layersMark:setMarginTop(((virtualFloor + 1) * 4) - 3)
     mapController.ui.layersPanel.automapLayers:setImageClip((virtualFloor * 14) .. ' 0 14 67')
 end
+
 local function onPositionChange()
     local player = g_game.getLocalPlayer()
     if not player then
@@ -528,7 +517,6 @@ local function onPositionChange()
     end
 
     minimapWidget:setCrossPosition(pos)
-
     virtualFloor = pos.z
     refreshVirtualFloors()
 end
@@ -733,7 +721,6 @@ function resetMap()
 end
 
 function getMiniMapUi()
-
     return mapController.ui.minimapBorder.minimap
 end
 -- @ End of Minimap
