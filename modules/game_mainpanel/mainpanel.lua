@@ -295,6 +295,7 @@ local function onFreeCapacityChange(player, freeCapacity)
     ui.capacityPanel.capacity:setText(freeCapacity)
 
 end
+
 local function loadIcon(bitChanged, widget)
     local icon = g_ui.createWidget('ConditionWidget', widget)
     icon:setId(Icons[bitChanged].id)
@@ -305,19 +306,21 @@ local function loadIcon(bitChanged, widget)
 end
 
 local function toggleIcon(bitChanged, widget)
-    local content = widget
-    local icon = content:getChildById(Icons[bitChanged].id)
+    local icon = widget:getChildById(Icons[bitChanged].id)
 
     if icon then
+
         icon:destroy()
     else
         icon = loadIcon(bitChanged, widget)
-        icon:setParent(content)
+        icon:setParent(widget)
     end
 end
+
 function getIconsPanel()
     return getInventoryUi().icons
 end
+
 function onStatesChange(localPlayer, now, old)
     if now == old then
         return
@@ -331,10 +334,9 @@ function onStatesChange(localPlayer, now, old)
         end
         local bitChanged = bit.band(bitsChanged, pow)
         if bitChanged ~= 0 then
-            if modules.game_interface.getStateTopPanel() then
-                toggleIcon(bitChanged, modules.game_interface.getStateTopPanel())
-            end
+
             toggleIcon(bitChanged, getInventoryUi().icons)
+
         end
     end
 end
@@ -730,9 +732,7 @@ function resetMap()
     end
 end
 
-
 function getMiniMapUi()
-
 
     return mapController.ui.minimapBorder.minimap
 end
