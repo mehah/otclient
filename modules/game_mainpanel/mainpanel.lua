@@ -291,21 +291,37 @@ local function onFreeCapacityChange(player, freeCapacity)
     ui.capacityPanel.capacity:setText(freeCapacity)
 end
 
-local function loadIcon(bitChanged, widget)
-    local icon = g_ui.createWidget('ConditionWidget', widget)
+local function loadIcon(bitChanged, parent)
+    local icon = g_ui.createWidget('ConditionWidget', parent)
     icon:setId(Icons[bitChanged].id)
     icon:setImageSource(Icons[bitChanged].path)
     icon:setTooltip(Icons[bitChanged].tooltip)
     return icon
 end
 
-local function toggleIcon(bitChanged, widget)
-    local icon = widget:getChildById(Icons[bitChanged].id)
-    if icon then
-        icon:destroy()
+local function toggleIcon(bitChanged)
+--[[
+    The logic needs improvement.
+    There are two icons, one for the minimized inventory
+    and one for the unminimized inventory. 
+    
+    ]]
+    local offPanel = inventoryController.ui.offPanel.icons
+    local onPanel = inventoryController.ui.onPanel.icons
+    
+    local icon1 = offPanel:getChildById(Icons[bitChanged].id)
+    local icon2 = onPanel:getChildById(Icons[bitChanged].id)
+    
+    if icon1 then
+        icon1:destroy()
     else
-        icon = loadIcon(bitChanged, widget)
-        icon:setParent(widget)
+        icon1 = loadIcon(bitChanged, offPanel)
+    end
+    
+    if icon2 then
+        icon2:destroy()
+    else
+        icon2 = loadIcon(bitChanged, onPanel)
     end
 end
 
@@ -326,7 +342,8 @@ function onStatesChange(localPlayer, now, old)
         end
         local bitChanged = bit.band(bitsChanged, pow)
         if bitChanged ~= 0 then
-            toggleIcon(bitChanged, getInventoryUi().icons)
+            toggleIcon(bitChanged)
+
         end
     end
 end
@@ -473,7 +490,13 @@ function selectPvp(pvp, ignoreUpdate)
 end
 
 function changeInventorySize()
+    if not inventoryShrink then
+        inventoryController.ui.onPanel.icons:destroyChildren()
+        else
+            inventoryController.ui.offPanel.icons:destroyChildren()
+        end
     inventoryShrink = not inventoryShrink
+
     g_settings.set('mainpanel_shrink_inventory', inventoryShrink)
     refreshInventorySizes()
     reloadMainPanelSizes()

@@ -505,14 +505,18 @@ PhantomMiniWindow
       $pressed !disabled:
         image-clip: 12 0 12 12
 
-    StatsBarDarkBackground
+    Panel
       id: icons
       anchors.left: soulAndCapacity.left
       anchors.right: pvp.right
       anchors.bottom: parent.bottom
       anchors.top: blessings.top
       phantom: false
-
+      image-source: /images/ui/containerslot
+      image-border: 3
+      layout:
+        type: horizontalBox
+        
     TopToggleButton
       id: stop
       !text: tr('Stop')
