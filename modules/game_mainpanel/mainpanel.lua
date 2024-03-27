@@ -1,90 +1,3 @@
-local Icons = {}
-Icons[PlayerStates.Poison] = {
-    tooltip = tr('You are poisoned'),
-    path = '/images/game/states/poisoned',
-    id = 'condition_poisoned'
-}
-Icons[PlayerStates.Burn] = {
-    tooltip = tr('You are burning'),
-    path = '/images/game/states/burning',
-    id = 'condition_burning'
-}
-Icons[PlayerStates.Energy] = {
-    tooltip = tr('You are electrified'),
-    path = '/images/game/states/electrified',
-    id = 'condition_electrified'
-}
-Icons[PlayerStates.Drunk] = {
-    tooltip = tr('You are drunk'),
-    path = '/images/game/states/drunk',
-    id = 'condition_drunk'
-}
-Icons[PlayerStates.ManaShield] = {
-    tooltip = tr('You are protected by a magic shield'),
-    path = '/images/game/states/magic_shield',
-    id = 'condition_magic_shield'
-}
-Icons[PlayerStates.Paralyze] = {
-    tooltip = tr('You are paralysed'),
-    path = '/images/game/states/slowed',
-    id = 'condition_slowed'
-}
-Icons[PlayerStates.Haste] = {
-    tooltip = tr('You are hasted'),
-    path = '/images/game/states/haste',
-    id = 'condition_haste'
-}
-Icons[PlayerStates.Swords] = {
-    tooltip = tr('You may not logout during a fight'),
-    path = '/images/game/states/logout_block',
-    id = 'condition_logout_block'
-}
-Icons[PlayerStates.Drowning] = {
-    tooltip = tr('You are drowning'),
-    path = '/images/game/states/drowning',
-    id = 'condition_drowning'
-}
-Icons[PlayerStates.Freezing] = {
-    tooltip = tr('You are freezing'),
-    path = '/images/game/states/freezing',
-    id = 'condition_freezing'
-}
-Icons[PlayerStates.Dazzled] = {
-    tooltip = tr('You are dazzled'),
-    path = '/images/game/states/dazzled',
-    id = 'condition_dazzled'
-}
-Icons[PlayerStates.Cursed] = {
-    tooltip = tr('You are cursed'),
-    path = '/images/game/states/cursed',
-    id = 'condition_cursed'
-}
-Icons[PlayerStates.PartyBuff] = {
-    tooltip = tr('You are strengthened'),
-    path = '/images/game/states/strengthened',
-    id = 'condition_strengthened'
-}
-Icons[PlayerStates.PzBlock] = {
-    tooltip = tr('You may not logout or enter a protection zone'),
-    path = '/images/game/states/protection_zone_block',
-    id = 'condition_protection_zone_block'
-}
-Icons[PlayerStates.Pz] = {
-    tooltip = tr('You are within a protection zone'),
-    path = '/images/game/states/protection_zone',
-    id = 'condition_protection_zone'
-}
-Icons[PlayerStates.Bleeding] = {
-    tooltip = tr('You are bleeding'),
-    path = '/images/game/states/bleeding',
-    id = 'condition_bleeding'
-}
-Icons[PlayerStates.Hungry] = {
-    tooltip = tr('You are hungry'),
-    path = '/images/game/states/hungry',
-    id = 'condition_hungry'
-}
-
 function init()
     mapController:init()
     healthManaController:init()
@@ -351,7 +264,6 @@ end
 
 local function onSoulChange(localPlayer, soul)
     local ui = getInventoryUi()
-
     if not localPlayer then
         return
     end
@@ -360,7 +272,6 @@ local function onSoulChange(localPlayer, soul)
     end
 
     ui.soulPanel.soul:setText(soul)
-
 end
 
 local function onFreeCapacityChange(player, freeCapacity)
@@ -373,37 +284,51 @@ local function onFreeCapacityChange(player, freeCapacity)
     end
     if freeCapacity > 99 then
         freeCapacity = math.floor(freeCapacity * 10) / 10
-    end
-    if freeCapacity > 999 then
+    elseif freeCapacity > 999 then
         freeCapacity = math.floor(freeCapacity)
-    end
-    if freeCapacity > 99999 then
+    elseif freeCapacity > 99999 then
         freeCapacity = math.min(9999, math.floor(freeCapacity / 1000)) .. "k"
     end
     local ui = getInventoryUi()
     ui.capacityPanel.capacity:setText(freeCapacity)
-
 end
-local function loadIcon(bitChanged)
-    local icon = g_ui.createWidget('ConditionWidget', getInventoryUi().icons)
+
+local function loadIcon(bitChanged, parent)
+    local icon = g_ui.createWidget('ConditionWidget', parent)
     icon:setId(Icons[bitChanged].id)
     icon:setImageSource(Icons[bitChanged].path)
     icon:setTooltip(Icons[bitChanged].tooltip)
-
     return icon
 end
 
 local function toggleIcon(bitChanged)
-    local content = getInventoryUi().icons
-
-    local icon = content:getChildById(Icons[bitChanged].id)
-
-    if icon then
-        icon:destroy()
+--[[
+    The logic needs improvement.
+    There are two icons, one for the minimized inventory
+    and one for the unminimized inventory. 
+    
+    ]]
+    local offPanel = inventoryController.ui.offPanel.icons
+    local onPanel = inventoryController.ui.onPanel.icons
+    
+    local icon1 = offPanel:getChildById(Icons[bitChanged].id)
+    local icon2 = onPanel:getChildById(Icons[bitChanged].id)
+    
+    if icon1 then
+        icon1:destroy()
     else
-        icon = loadIcon(bitChanged)
-        icon:setParent(content)
+        icon1 = loadIcon(bitChanged, offPanel)
     end
+    
+    if icon2 then
+        icon2:destroy()
+    else
+        icon2 = loadIcon(bitChanged, onPanel)
+    end
+end
+
+function getIconsPanel()
+    return getInventoryUi().icons
 end
 
 function onStatesChange(localPlayer, now, old)
@@ -420,9 +345,11 @@ function onStatesChange(localPlayer, now, old)
         local bitChanged = bit.band(bitsChanged, pow)
         if bitChanged ~= 0 then
             toggleIcon(bitChanged)
+
         end
     end
 end
+
 local function refreshInventory_panel()
     if inventoryShrink then
         return
@@ -440,9 +367,9 @@ local function refreshInventory_panel()
         onSoulChange(player, player:getSoul())
         onFreeCapacityChange(player, player:getFreeCapacity())
         onStatesChange(player, player:getStates(), 0)
-
     end
 end
+
 local function refreshInventorySizes()
     if inventoryShrink then
         inventoryController.ui:setOn(false)
@@ -495,17 +422,10 @@ local inventoryControllerEvents_game = inventoryController:addEvent(g_game, {
 })
 function inventoryController:onInit()
     refreshInventory_panel()
-    local ui = getInventoryUi()
-    standModeBox = ui.standPosture
-    chaseModeBox =  ui.followPosture
-    chaseModeRadioGroup = UIRadioGroup.create()
-    chaseModeRadioGroup:addWidget(standModeBox)
-    chaseModeRadioGroup:addWidget(chaseModeBox)
-    connect(chaseModeRadioGroup, { onSelectionChange = onSetChaseMode })
 end
 
 function inventoryController:onTerminate()
-
+    --- important
 end
 
 function inventoryController:onGameStart()
@@ -530,7 +450,6 @@ end
 
 function inventoryController:onGameEnd()
     inventoryControllerEvents:disconnect()
-    inventoryControllerEvents_game:disconnect()
 end
 
 function selectPosture(key, ignoreUpdate)
@@ -594,7 +513,13 @@ function selectPvp(pvp, ignoreUpdate)
 end
 
 function changeInventorySize()
+    if not inventoryShrink then
+        inventoryController.ui.onPanel.icons:destroyChildren()
+        else
+            inventoryController.ui.offPanel.icons:destroyChildren()
+        end
     inventoryShrink = not inventoryShrink
+
     g_settings.set('mainpanel_shrink_inventory', inventoryShrink)
     refreshInventorySizes()
     reloadMainPanelSizes()
@@ -616,6 +541,7 @@ local function refreshVirtualFloors()
     mapController.ui.layersPanel.layersMark:setMarginTop(((virtualFloor + 1) * 4) - 3)
     mapController.ui.layersPanel.automapLayers:setImageClip((virtualFloor * 14) .. ' 0 14 67')
 end
+
 local function onPositionChange()
     local player = g_game.getLocalPlayer()
     if not player then
@@ -637,7 +563,6 @@ local function onPositionChange()
     end
 
     minimapWidget:setCrossPosition(pos)
-
     virtualFloor = pos.z
     refreshVirtualFloors()
 end
@@ -841,10 +766,7 @@ function resetMap()
     end
 end
 
-
 function getMiniMapUi()
-
-
     return mapController.ui.minimapBorder.minimap
 end
 -- @ End of Minimap

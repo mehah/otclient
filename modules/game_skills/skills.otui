@@ -120,7 +120,7 @@ MiniWindow
 
     SkillButton
       id: magiclevel
-      image-source: /images/ui/Skills/Magic
+      image-source: /images/icons/icon_magic
       image-size: 11 11
       SkillNameLabel
         !text: tr('      Magic Level')
@@ -130,7 +130,7 @@ MiniWindow
 
     SkillButton
       id: skillId0
-      image-source: /images/ui/Skills/Fist
+      image-source: /images/icons/icon_fist
       image-size: 12 12
       SkillNameLabel
         !text: tr('      Fist Fighting')
@@ -139,7 +139,7 @@ MiniWindow
 
     SkillButton
       id: skillId1
-      image-source: /images/ui/Skills/Club
+      image-source: /images/icons/icon_club
       image-size: 11 13
       SkillNameLabel
         !text: tr('      Club Fighting')
@@ -148,7 +148,7 @@ MiniWindow
 
     SkillButton
       id: skillId2
-      image-source: /images/ui/Skills/Sword
+      image-source: /images/icons/icon_sword
       image-size: 11 13
       SkillNameLabel
         !text: tr('      Sword Fighting')
@@ -157,7 +157,7 @@ MiniWindow
 
     SkillButton
       id: skillId3
-      image-source: /images/ui/Skills/Axe
+      image-source: /images/icons/icon_axe
       image-size: 12 12
       SkillNameLabel
         !text: tr('      Axe Fighting')
@@ -166,7 +166,7 @@ MiniWindow
 
     SkillButton
       id: skillId4
-      image-source: /images/ui/Skills/Distance
+      image-source: /images/icons/icon_distance
       image-size: 12 12
       SkillNameLabel
         !text: tr('      Distance Fighting')
@@ -175,7 +175,7 @@ MiniWindow
 
     SkillButton
       id: skillId5
-      image-source: /images/ui/Skills/Shielding
+      image-source: /images/icons/icon_shielding
       image-size: 11 11
       SkillNameLabel
         !text: tr('      Shielding')
@@ -184,7 +184,7 @@ MiniWindow
 
     SkillButton
       id: skillId6
-      image-source: /images/ui/Skills/Fishing
+      image-source: /images/icons/icon_fishing
       image-size: 12 12
       SkillNameLabel
         !text: tr('      Fishing')

@@ -8,20 +8,15 @@ local currentStats = {
 local skillsLineHeight = 20
 local skillsTuples = {
     {skill = nil,               key = 'experience', icon = '/images/icons/icon_experience',  placement = 'center',   order = 0,  name = "Level"},
-
     {skill = nil,               key = 'magic',      icon = '/images/icons/icon_magic',       placement = 'left',     order = 1,  name = "Magic Level"},
     {skill = Skill.Axe,         key = 'axe',        icon = '/images/icons/icon_axe',         placement = 'right',    order = 1,  name = "Axe Fighting Skill"},
-
     {skill = Skill.Club,        key = 'club',       icon = '/images/icons/icon_club',        placement = 'left',     order = 2,  name = "Club Fighting Skill"},
     {skill = Skill.Distance,    key = 'distance',   icon = '/images/icons/icon_distance',    placement = 'right',    order = 2,  name = "Distance Fighting Skill"},
-
     {skill = Skill.Fist,        key = 'fist',       icon = '/images/icons/icon_fist',        placement = 'left',     order = 3,  name = "Fist Fighting Skill"},
     {skill = Skill.Shielding,   key = 'shielding',  icon = '/images/icons/icon_shielding',   placement = 'right',    order = 3,  name = "Shielding Fighting Skill"},
-
     {skill = Skill.Sword,       key = 'sword',      icon = '/images/icons/icon_sword',       placement = 'left',     order = 4,  name = "Sword Fighting Skill"},
     {skill = Skill.Fishing,     key = 'fishing',    icon = '/images/icons/icon_fishing',     placement = 'right',    order = 4,  name = "Fishing Fighting Skill"},
 }
-
 StatsBar = {}
 
 local function reloadSkillsTab(skills, parent)
@@ -143,6 +138,61 @@ function StatsBar.reloadCurrentStatsBarQuickInfo()
 
     bar.health:setValue(player:getHealth(), player:getMaxHealth())
     bar.mana:setValue(player:getMana(), player:getMaxMana())
+
+end
+
+local function loadIcon(bitChanged)
+    local icon = g_ui.createWidget('ConditionWidget', StatsBar.getCurrentStatsBar().icons)
+    icon:setId(Icons[bitChanged].id)
+    icon:setImageSource(Icons[bitChanged].path)
+    icon:setTooltip(Icons[bitChanged].tooltip)
+
+    return icon
+end
+
+local function toggleIcon(bitChanged)
+    local content = StatsBar.getCurrentStatsBar().icons
+
+    local icon = content:getChildById(Icons[bitChanged].id)
+
+    if icon then
+        icon:destroy()
+    else
+        icon = loadIcon(bitChanged)
+        icon:setParent(content)
+    end
+end
+
+function StatsBar.reloadCurrentStatsBarQuickInfo_state(localPlayer, now, old)
+    local player = g_game.getLocalPlayer()
+    if not player then
+
+        return
+    end
+
+    local bar = StatsBar.getCurrentStatsBar()
+    if not bar then
+
+        return
+    end
+
+    if now == old then
+
+        return
+    end
+
+    local bitsChanged = bit.bxor(now, old)
+    for i = 1, 32 do
+        local pow = math.pow(2, i - 1)
+        if pow > bitsChanged then
+            break
+        end
+        local bitChanged = bit.band(bitsChanged, pow)
+        if bitChanged ~= 0 then
+            toggleIcon(bitChanged)
+            -- toggleIcon(bitChanged,modules.game_mainpanel.getIconsPanel())
+        end
+    end
 end
 
 function StatsBar.reloadCurrentStatsBarDeepInfo()
@@ -174,6 +224,7 @@ function StatsBar.reloadCurrentStatsBarDeepInfo()
 end
 
 function StatsBar.hideAll()
+
     statsBar.largeOnTop.skills:destroyChildren()
     statsBar.largeOnTop.skills:setHeight(0)
     statsBar.largeOnTop:setHeight(0)
@@ -199,7 +250,8 @@ function StatsBar.hideAll()
         dimension = 'hide',
         placement = 'hide'
     }
-    --modules.game_healthcircle.setTopBarOption(currentStats.dimension, currentStats.placement)
+
+    -- modules.game_healthcircle.setTopBarOption(currentStats.dimension, currentStats.placement)
 end
 
 local function constructLargeOnTop()
@@ -220,6 +272,7 @@ local function constructLargeOnTop()
 
     reloadSkillsTab(statsBar.largeOnTop.skills, statsBar.largeOnTop)
     StatsBar.reloadCurrentStatsBarQuickInfo()
+
     modules.game_healthcircle.setTopBarOption(currentStats.dimension, currentStats.placement)
     return true
 end
@@ -242,6 +295,7 @@ local function constructParallelOnTop()
 
     reloadSkillsTab(statsBar.parallelOnTop.skills, statsBar.parallelOnTop)
     StatsBar.reloadCurrentStatsBarQuickInfo()
+
     modules.game_healthcircle.setTopBarOption(currentStats.dimension, currentStats.placement)
     return true
 end
@@ -264,6 +318,7 @@ local function constructDefaultOnTop()
 
     reloadSkillsTab(statsBar.defaultOnTop.skills, statsBar.defaultOnTop)
     StatsBar.reloadCurrentStatsBarQuickInfo()
+
     modules.game_healthcircle.setTopBarOption(currentStats.dimension, currentStats.placement)
     return true
 end
@@ -286,6 +341,7 @@ local function constructCompactOnTop()
 
     reloadSkillsTab(statsBar.compactOnTop.skills, statsBar.compactOnTop)
     StatsBar.reloadCurrentStatsBarQuickInfo()
+
     modules.game_healthcircle.setTopBarOption(currentStats.dimension, currentStats.placement)
     return true
 end
@@ -295,28 +351,28 @@ local function openDropMenu(mousePos)
     menu:setGameMenu(true)
 
     local current = StatsBar.getCurrentStatsBar()
-    if not(current) or current:getId() ~= 'compactOnTop' then
+    if not (current) or current:getId() ~= 'compactOnTop' then
         menu:addOption(tr('Switch to Compact Style'), function()
             StatsBar.hideAll()
             constructCompactOnTop()
         end)
     end
 
-    if not(current) or current:getId() ~= 'defaultOnTop' then
+    if not (current) or current:getId() ~= 'defaultOnTop' then
         menu:addOption(tr('Switch to Default Style'), function()
             StatsBar.hideAll()
             constructDefaultOnTop()
         end)
     end
 
-    if not(current) or current:getId() ~= 'largeOnTop' then
+    if not (current) or current:getId() ~= 'largeOnTop' then
         menu:addOption(tr('Switch to Large Style'), function()
             StatsBar.hideAll()
             constructLargeOnTop()
         end)
     end
 
-    if not(current) or current:getId() ~= 'parallelOnTop' then
+    if not (current) or current:getId() ~= 'parallelOnTop' then
         menu:addOption(tr('Switch to Parallel Style'), function()
             StatsBar.hideAll()
             constructParallelOnTop()
@@ -359,6 +415,11 @@ local function onStatsMousePress(tab, mousePos, mouseButton)
 end
 
 function StatsBar.reloadCurrentTab()
+    local player = g_game.getLocalPlayer()
+    if player and g_game.isOnline() then
+        StatsBar.reloadCurrentStatsBarQuickInfo_state(player, player:getStates(), 0)
+
+    end
     if currentStats.placement == 'top' then
         if currentStats.dimension == 'large' then
             return constructLargeOnTop()
@@ -378,15 +439,21 @@ function StatsBar.setStatsBarOption(dimension, placement)
         dimension = dimension,
         placement = placement
     }
-    StatsBar.reloadCurrentTab()
     g_settings.set('top_statsbar_dimension', currentStats.dimension)
     g_settings.set('top_statsbar_placement', currentStats.placement)
+
+    if dimension ~= "hide" then
+        StatsBar.getCurrentStatsBar().icons:destroyChildren()
+        StatsBar.reloadCurrentTab()
+    end
+
 end
 
 function StatsBar.OnGameEnd()
     g_settings.set('top_statsbar_dimension', currentStats.dimension)
     g_settings.set('top_statsbar_placement', currentStats.placement)
     StatsBar.hideAll()
+
 end
 
 function StatsBar.OnGameStart()
@@ -395,7 +462,8 @@ function StatsBar.OnGameStart()
         placement = g_settings.getString('top_statsbar_placement')
     }
 
-    if not(currentStats.dimension) or not(currentStats.placement) or currentStats.dimension == '' or currentStats.placement == '' then
+    if not (currentStats.dimension) or not (currentStats.placement) or currentStats.dimension == '' or
+        currentStats.placement == '' then
         currentStats = {
             dimension = 'default',
             placement = 'top'
@@ -403,6 +471,7 @@ function StatsBar.OnGameStart()
     end
     StatsBar.reloadCurrentTab()
     modules.game_healthcircle.setTopBarOption(currentStats.dimension, currentStats.placement)
+
 end
 
 function StatsBar.init()
@@ -425,7 +494,9 @@ function StatsBar.init()
         onMagicLevelChange = StatsBar.reloadCurrentStatsBarDeepInfo,
         onBaseMagicLevelChange = StatsBar.reloadCurrentStatsBarDeepInfo,
         onSkillChange = StatsBar.reloadCurrentStatsBarDeepInfo,
-        onBaseSkillChange = StatsBar.reloadCurrentStatsBarDeepInfo
+        onBaseSkillChange = StatsBar.reloadCurrentStatsBarDeepInfo,
+        onStatesChange = StatsBar.reloadCurrentStatsBarQuickInfo_state
+
     })
     connect(g_game, {
         onGameStart = StatsBar.OnGameStart,
@@ -442,7 +513,8 @@ function StatsBar.terminate()
         onMagicLevelChange = StatsBar.reloadCurrentStatsBarDeepInfo,
         onBaseMagicLevelChange = StatsBar.reloadCurrentStatsBarDeepInfo,
         onSkillChange = StatsBar.reloadCurrentStatsBarDeepInfo,
-        onBaseSkillChange = StatsBar.reloadCurrentStatsBarDeepInfo
+        onBaseSkillChange = StatsBar.reloadCurrentStatsBarDeepInfo,
+        onStatesChange = StatsBar.reloadCurrentStatsBarQuickInfo_state
     })
     disconnect(g_game, {
         onGameStart = StatsBar.OnGameStart

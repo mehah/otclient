@@ -7,11 +7,6 @@ Services = {
     --status = "http://localhost/api/status.php", --./client_entergame | ./client_topmenu
     --websites = "http://localhost/?subtopic=accountmanagement", --./client_entergame "Forgot password and/or email"
 }
---[[ ClientHost ={
-    ip = "127.0.0.1",
-    port= 7171,
-    version = 860
-} ]]
 
 g_app.setName("OTClient - Redemption");
 g_app.setCompactName("otclient");
