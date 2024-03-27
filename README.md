@@ -618,6 +618,24 @@ Icons[PlayerStates.Poison] = {
 
 .\otclient\modules\gamelib\player.lua
 
+
+## info
+I know there are errors in naming regarding the location, but it's RETROCOMPATIBILITY, and it's also beta.
+| Function | Image |
+|-----------|-----------|
+| addLeftButton    | ![image](https://github.com/Nottinghster/otclient/assets/114332266/2e3a8188-5be8-429e-8ee4-1139acf91c55)   |
+| addLeftToggleButton    | ![image](https://github.com/Nottinghster/otclient/assets/114332266/ce18e5c0-8ee3-4db0-b1cd-7bcd709fe2aa)   |
+| addRightButton    | ![image](https://github.com/Nottinghster/otclient/assets/114332266/0ce9d9d0-98eb-4ae4-8cae-af26edcef055)  |
+| addRightToggleButton    |![image](https://github.com/Nottinghster/otclient/assets/114332266/6b16c163-1a9a-4a6e-859a-66a350840219)   |
+| addLeftGameButton    | ![image](https://github.com/Nottinghster/otclient/assets/114332266/0f029efd-76a6-4b98-9392-6fc312588c08)   |
+| addLeftGameToggleButton    | ![image](https://github.com/Nottinghster/otclient/assets/114332266/beb6d11a-9216-4d95-8246-2a2b72d9dd9d)   |
+| addRightGameButton    | ![image](https://github.com/Nottinghster/otclient/assets/114332266/c834060d-0675-4aae-a231-f527ff371693)   |
+| addRightGameToggleButton    | ![image](https://github.com/Nottinghster/otclient/assets/114332266/f221ccfb-3843-4c6a-a570-d70eb02628c9)   |
+| addTopRightRegularButton    | ![image](https://github.com/Nottinghster/otclient/assets/114332266/e2adffb1-ed38-402b-acc4-1ad1d1a2db16)   |
+| addTopRightToggleButton   | ![image](https://github.com/Nottinghster/otclient/assets/114332266/12e3acc9-b61a-457a-b857-b5bfb5179436)  |
+
+
+
 ## Author
 
 - @ marcosvf132
