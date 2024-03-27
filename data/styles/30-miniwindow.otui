@@ -66,6 +66,31 @@ MiniWindow < UIMiniWindow
     $on pressed:
       image-clip: 14 28 14 14
 
+
+  UIButton
+    id: lockButton
+    anchors.top: minimizeButton.top
+    anchors.right: minimizeButton.left
+    margin-right: 2
+    size: 14 14
+    image-source: /images/ui/miniwindow_buttons
+    image-clip: 98 0 14 14
+
+    $hover:
+      image-clip: 98 14 14 14
+
+    $pressed:
+      image-clip: 98 28 14 14
+
+    $on:
+      image-clip: 84 0 14 14
+
+    $on hover:
+      image-clip: 84 14 14 14
+
+    $on pressed:
+      image-clip: 84 28 14 14
+
   VerticalScrollBar
     id: miniwindowScrollBar
     anchors.top: parent.top

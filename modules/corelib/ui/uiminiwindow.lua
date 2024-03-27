@@ -85,6 +85,16 @@ function UIMiniWindow:setup()
             self:minimize()
         end
     end
+
+    self:getChildById('lockButton').onClick = function()
+
+        if self:isDraggable() then
+            self:lock()
+        else
+            self:unlock()
+        end
+    end
+
     self:getChildById('miniwindowTopBar').onDoubleClick = function()
         if self:isOn() then
             self:maximize()
@@ -222,7 +232,7 @@ function UIMiniWindow:onDragLeave(droppedWidget, mousePos)
 
     self:saveParent(self:getParent())
 
--- Note: It seems to prevent the minimap, inventory, and health widgets from moving off the interface panel.
+    -- Note: It seems to prevent the minimap, inventory, and health widgets from moving off the interface panel.
     if self.moveOnlyToMain or droppedWidget and droppedWidget.onlyPhantomDrop then
         if not (droppedWidget) or (self.moveOnlyToMain and not (droppedWidget.onlyPhantomDrop)) or
             (not (self.moveOnlyToMain) and droppedWidget.onlyPhantomDrop) then
@@ -497,4 +507,33 @@ function UIMiniWindow:isResizeable()
         return false
     end
     return resizeBorder:isExplicitlyVisible() and resizeBorder:isEnabled()
+end
+
+function UIMiniWindow:lock(dontSave)
+    local lockButton = self:getChildById('lockButton')
+    if lockButton then
+        lockButton:setOn(true)
+    end
+    self:setDraggable(false)
+    if not dontsave then
+        self:setSettings({
+            locked = true
+        })
+    end
+
+    signalcall(self.onLockChange, self)
+end
+
+function UIMiniWindow:unlock(dontSave)
+    local lockButton = self:getChildById('lockButton')
+    if lockButton then
+        lockButton:setOn(false)
+    end
+    self:setDraggable(true)
+    if not dontsave then
+        self:setSettings({
+            locked = false
+        })
+    end
+    signalcall(self.onLockChange, self)
 end
