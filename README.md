@@ -9,7 +9,9 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 ## Screenshots
 
 ![image](https://github.com/Nottinghster/otclient/assets/114332266/e15b7533-4a85-44f9-b9f9-9c0430411332)
-![meho](https://github.com/Nottinghster/otclient/assets/114332266/69f564f6-14b4-43f5-af35-c84ce26edfee)
+![image](https://github.com/Nottinghster/otclient/assets/114332266/5ec61647-1099-4511-aca5-a351d4cc4f93)
+
+
 
 
 ## Features
@@ -17,7 +19,8 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 - Layout tibia 13
 - Calendar
 - Outfit windows 13 soon
-- ...
+- Cooldown spell on top of the game_console like tibia 13
+- ....
 
 ## Current bugs
 **solved**
@@ -32,24 +35,21 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 - [x] **Game_topmenu** missing Boton "manager account", "manager clients" [919444b](https://github.com/Nottinghster/otclient/commit/919444b6cecadbbad2d48a54a445079d17e83561)
 - [x] **Game_mainpanel** Inventario fix ico state [ed9af33](https://github.com/Nottinghster/otclient/commit/ed9af33a6ed41f10e698d7017939e21bc5eedda6)
 - [x] **Game_mainpanel** Hide icon "expert pvp modes" in minize panel for old protocole [2e6b171](https://github.com/Nottinghster/otclient/commit/2e6b17196a6112202ce0969aea0f8697f8f4db8e)
-
+- [x] **data\images** Missing UI of tibia 13 ( close , minimize , scroll) [a94aebc](https://github.com/Nottinghster/otclient/commit/a94aebc730c36a34f44261918512596d337aa8d5)
 ------------
 **in process**
-- [ ] **Game_mainpanel.** compatibility with extended view #7
+- [ ] **Miniwindows**
 - [ ] **Game_entergame** problems with token label when no cache, (first open client)
+- [ ] **Game_mainpanel.** compatibility with extended view #7
 - [ ] **Game_mainpanel** fix function inventoryController:onTerminate()
 - [ ] **Game_outfit** of tibia 13 SOON
 - [ ] **game_skills** Fix Ico location like clipsof
 - [ ] **Game_bot** get the slot5 requested by quiver_label and quiver_manager
-- [ ] **data\images** Missing UI of tibia 13 ( close , minimize , scroll)
-- [ ] **Characterlist** Add checkbox "show outift" button
 - [ ] **Client_bottom** default information if array services is not enabled
-- [ ] **Miniwindows**
-- [ ] font similar to tibia 13
+- [ ] font similar to tibia 13 (Verdana10px bold ? )
 
-## Contributing
 
-We need people to test in versions higher than 8.6  and another who is skilled with PHP 
+
 
 ## Overall Status
 
@@ -621,6 +621,7 @@ Icons[PlayerStates.Poison] = {
 
 ## info
 I know there are errors in naming regarding the location, but it's RETROCOMPATIBILITY, and it's also beta.
+There are some duplicates and others that need to have their names changed.
 | Function | Image |
 |-----------|-----------|
 | addLeftButton    | ![image](https://github.com/Nottinghster/otclient/assets/114332266/2e3a8188-5be8-429e-8ee4-1139acf91c55)   |
@@ -639,3 +640,9 @@ I know there are errors in naming regarding the location, but it's RETROCOMPATIB
 ## Author
 
 - @ marcosvf132
+
+## Contributing
+
+We need people to test in versions higher than 8.6  and another who is skilled with PHP 
+
+![429529469_10161745299305712_3655895523259386066_n](https://github.com/Nottinghster/otclient/assets/114332266/8ad690f2-b10c-49c5-93a2-7fe89b944101)
