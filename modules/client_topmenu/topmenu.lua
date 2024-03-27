@@ -1,7 +1,7 @@
 -- private variables
 local topMenu
 local rightButtonsPanel
-local leftGameButtonsPanel
+local leftButtonsPanel
 local rightGameButtonsPanel
 local topLeftTogglesPanel
 local topLeftButtonsPanel
@@ -78,7 +78,7 @@ function init()
     topLeftButtonsPanel = topMenu:getChildById('topLeftButtonsPanel')
     topLeftTogglesPanel = topMenu:getChildById('topLeftTogglesPanel')
     rightButtonsPanel = topMenu:getChildById('rightButtonsPanel')
-    leftGameButtonsPanel = topMenu:getChildById('leftGameButtonsPanel')
+    leftButtonsPanel = topMenu:getChildById('leftButtonsPanel')
     rightGameButtonsPanel = topMenu:getChildById('rightGameButtonsPanel')
     pingLabel = topMenu:getChildById('pingLabel')
     fpsLabel = topMenu:getChildById('fpsLabel')
@@ -93,10 +93,10 @@ function init()
     topLeftDiscordLink = topMenu:recursiveGetChildById('discordIcon')
 
     g_keyboard.bindKeyDown('Ctrl+Shift+T', toggle)
-if Services.websites then
-    managerAccountsButton = modules.client_topmenu.addTopRightRegularButton('hotkeysButton', tr('Manage Account'),
-                                                             nil, openManagerAccounts)
-end
+    if Services.websites then
+        managerAccountsButton = modules.client_topmenu.addTopRightRegularButton('hotkeysButton', tr('Manage Account'),
+            nil, openManagerAccounts)
+    end
     if g_game.isOnline() then
         online()
     end
@@ -191,7 +191,7 @@ function offline()
 end
 
 function updateFps(fps)
-    if fpsLabel:isVisible() then --for the time being retained for the extended view
+    if fpsLabel:isVisible() then -- for the time being retained for the extended view
         local text = 'FPS ' .. fps
         if g_game.isOnline() then
             local vsync = modules.client_options.getOption('vsync')
@@ -292,14 +292,6 @@ function setFpsVisible(enable)
     end
 end
 
-function addTopRightRegularButton(id, description, icon, callback, front)
-    return addButton(id, description, icon, callback, topLeftButtonsPanel, false, front)
-end
-
-function addTopRightToggleButton(id, description, icon, callback, front)
-    return addButton(id, description, icon, callback, topLeftTogglesPanel, true, front)
-end
-
 function setPlayersOnline(value)
     topLeftOnlinePlayersLabel:setText(value .. " " .. tr('players online'))
 end
@@ -336,8 +328,16 @@ function setLinkDiscord(value)
 
 end
 
+function addLeftButton(id, description, icon, callback, front)
+    return addButton(id, description, icon, callback, leftButtonsPanel, false, front)
+end
+
+function addLeftToggleButton(id, description, icon, callback, front)
+    return addButton(id, description, icon, callback, leftButtonsPanel, true, front)
+end
+
 function addRightButton(id, description, icon, callback, front)
-    return addButton(id, description, icon, callback, rightButtonsPanel, false, front)
+    return addButton(id, description, icon, callback, topLeftTogglesPanel, false, front)
 end
 
 function addRightToggleButton(id, description, icon, callback, front)
@@ -345,28 +345,70 @@ function addRightToggleButton(id, description, icon, callback, front)
 end
 
 function addLeftGameButton(id, description, icon, callback, front)
-    return addButton(id, description, icon, callback, leftGameButtonsPanel, false, front)
+    if not g_modules.getModule("game_mainpanel"):isLoaded() then
+        -- Temp fix. game_mainpanel is not loaded if called from a client_XXX.
+        scheduleEvent(function()
+            return modules.game_mainpanel.addSpecialToggleButton(id, description, icon, callback, front)
+        end, 100)
+    else
+        return modules.game_mainpanel.addSpecialToggleButton(id, description, icon, callback, front)
+
+    end
 end
 
 function addLeftGameToggleButton(id, description, icon, callback, front)
-    return addButton(id, description, icon, callback, leftGameButtonsPanel, true, front)
+    if not g_modules.getModule("game_mainpanel"):isLoaded() then
+        -- Temp fix. game_mainpanel is not loaded if called from a client_XXX.
+        scheduleEvent(function()
+            return modules.game_mainpanel.addSpecialToggleButton(id, description, icon, callback, front)
+        end, 100)
+    else
+        return modules.game_mainpanel.addSpecialToggleButton(id, description, icon, callback, front)
+
+    end
+    --   return addButton(id, description, icon, callback, leftButtonsPanel, true, front)
 end
 
 function addRightGameButton(id, description, icon, callback, front)
-    return addButton(id, description, icon, callback, rightGameButtonsPanel, false, front)
+    if not g_modules.getModule("game_mainpanel"):isLoaded() then
+        -- Temp fix. game_mainpanel is not loaded if called from a client_XXX.
+        scheduleEvent(function()
+            return modules.game_mainpanel.addToggleButton(id, description, icon, callback, front)
+        end, 100)
+    else
+        return modules.game_mainpanel.addToggleButton(id, description, icon, callback, front)
+
+    end
 end
 
 function addRightGameToggleButton(id, description, icon, callback, front)
-    return addButton(id, description, icon, callback, rightGameButtonsPanel, true, front)
+    if not g_modules.getModule("game_mainpanel"):isLoaded() then
+        -- Temp fix. game_mainpanel is not loaded if called from a client_XXX.
+        scheduleEvent(function()
+            return modules.game_mainpanel.addToggleButton(id, description, icon, callback, front)
+        end, 100)
+    else
+        return modules.game_mainpanel.addToggleButton(id, description, icon, callback, front)
+
+    end
+
+end
+
+function addTopRightRegularButton(id, description, icon, callback, front)
+    return addButton(id, description, icon, callback, topLeftButtonsPanel, false, front)
+end
+
+function addTopRightToggleButton(id, description, icon, callback, front)
+    return addButton(id, description, icon, callback, topLeftTogglesPanel, true, front)
 end
 
 function showGameButtons()
-    leftGameButtonsPanel:show()
+
     rightGameButtonsPanel:show()
 end
 
 function hideGameButtons()
-    leftGameButtonsPanel:hide()
+
     rightGameButtonsPanel:hide()
 end
 
@@ -392,7 +434,6 @@ function toggle()
         modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'topMenu', AnchorTop)
     end
 end
-
 
 function openManagerAccounts()
     if Services.websites then

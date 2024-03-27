@@ -151,18 +151,18 @@ TopMenuPanel
       width: 50
 
   TopMenuButtonsPanel
-    id: leftGameButtonsPanel
+    id: leftButtonsPanel
     anchors.top: parent.top
     anchors.bottom: parent.bottom
     anchors.left: prev.right
-    visible: false
+
 
   TopMenuFrameCounterLabel
     id: fpsLabel
     phantom: false
     text-auto-resize: true
     anchors.top: parent.top
-    anchors.left: leftGameButtonsPanel.right
+    anchors.left: leftButtonsPanel.right
 
   TopMenuPingLabel
     color: white
