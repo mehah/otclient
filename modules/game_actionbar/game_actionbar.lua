@@ -37,12 +37,8 @@ function init()
     mouseGrabberWidget:setFocusable(false)
     mouseGrabberWidget.onMouseRelease = onChooseItemMouseRelease
 
-    local console = modules.game_console.consolePanel
-    if console then
-        console:addAnchor(AnchorTop, actionBar:getId(), AnchorBottom)
-    end
-
     if g_game.isOnline() then
+
         addEvent(function()
             setupActionBar()
             loadActionBar()
@@ -97,7 +93,20 @@ function terminate()
     end
 end
 
+
 function online()
+
+    if g_game.getFeature(GameSpellList) then
+        local console = modules.game_cooldown.cooldownWindow
+        if console then
+            console:addAnchor(AnchorTop, actionBar:getId(), AnchorBottom)
+        end
+    else
+        local console = modules.game_console.consolePanel
+        if console then
+            console:addAnchor(AnchorTop, actionBar:getId(), AnchorBottom)
+        end
+    end
     actionBarPanel:destroyChildren()
     addEvent(function()
         setupActionBar()
@@ -1113,4 +1122,8 @@ end
 
 function setLocked(v)
     isLocked = v
+end
+
+function getPanelActionbar()
+    return actionBar
 end
