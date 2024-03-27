@@ -141,8 +141,16 @@ function online()
         if modules.client_options.getOption('showPing') and
             (g_game.getFeature(GameClientPing) or g_game.getFeature(GameExtendedClientPing)) then
             pingLabel:show()
+            if pingPanel then
+                pingPanel:show()
+                pingImg:show()
+            end
         else
             pingLabel:hide()
+            if pingPanel then
+                pingPanel:hide()
+                pingImg:hide()
+            end
         end
     end)
     if PingWidget then
@@ -175,6 +183,10 @@ end
 function offline()
     hideGameButtons()
     pingLabel:hide()
+    if pingPanel then
+        pingPanel:hide()
+        pingImg:hide()
+    end
     fpsMin = -1
 end
 
