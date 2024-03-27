@@ -15,6 +15,7 @@ local standModeBox
 local chaseModeBox
 local optionsAmount = 0
 local specialsAmount = 0
+local chaseModeRadioGroup
 function reloadMainPanelSizes()
     local main = modules.game_interface.getMainRightPanel()
     local rightPanel = modules.game_interface.getRightPanel()
@@ -196,9 +197,9 @@ end
 local function combatEvent()
     local chaseMode = g_game.getChaseMode()
     if chaseMode == 1 then
-       chaseModeRadioGroup:selectWidget(chaseModeBox, true)
+        chaseModeRadioGroup:selectWidget(chaseModeBox, true)
     else
-       chaseModeRadioGroup:selectWidget(standModeBox, true)
+        chaseModeRadioGroup:selectWidget(standModeBox, true)
     end
 
     if g_game.getFightMode() == FightOffensive then
@@ -302,7 +303,7 @@ local function loadIcon(bitChanged, parent)
 end
 
 local function toggleIcon(bitChanged)
---[[
+    --[[
     The logic needs improvement.
     There are two icons, one for the minimized inventory
     and one for the unminimized inventory. 
@@ -310,16 +311,16 @@ local function toggleIcon(bitChanged)
     ]]
     local offPanel = inventoryController.ui.offPanel.icons
     local onPanel = inventoryController.ui.onPanel.icons
-    
+
     local icon1 = offPanel:getChildById(Icons[bitChanged].id)
     local icon2 = onPanel:getChildById(Icons[bitChanged].id)
-    
+
     if icon1 then
         icon1:destroy()
     else
         icon1 = loadIcon(bitChanged, offPanel)
     end
-    
+
     if icon2 then
         icon2:destroy()
     else
@@ -387,18 +388,20 @@ local function refreshInventorySizes()
 end
 function onSetChaseMode(self, selectedChaseModeButton)
 
-    if selectedChaseModeButton == nil then return end
-      local buttonId = selectedChaseModeButton:getId()
-    local chaseMode
-    
-    if buttonId == 'followPosture' then
-      chaseMode = ChaseOpponent
-    else --standModeBox
-      chaseMode = DontChase
+    if selectedChaseModeButton == nil then
+        return
     end
-    
+    local buttonId = selectedChaseModeButton:getId()
+    local chaseMode
+
+    if buttonId == 'followPosture' then
+        chaseMode = ChaseOpponent
+    else -- standModeBox
+        chaseMode = DontChase
+    end
+
     g_game.setChaseMode(chaseMode)
-  end
+end
 
 inventoryController = Controller:new()
 inventoryController:setUI('maininventorypanel', modules.game_interface.getMainRightPanel())
@@ -417,11 +420,20 @@ local inventoryControllerEvents_game = inventoryController:addEvent(g_game, {
     onFightModeChange = combatEvent,
     onChaseModeChange = combatEvent,
     onSafeFightChange = combatEvent,
-    onPVPModeChange = combatEvent,
+    onPVPModeChange = combatEvent
 
 })
 function inventoryController:onInit()
     refreshInventory_panel()
+    local ui = getInventoryUi()
+    standModeBox = ui.standPosture
+    chaseModeBox = ui.followPosture
+    chaseModeRadioGroup = UIRadioGroup.create()
+    chaseModeRadioGroup:addWidget(standModeBox)
+    chaseModeRadioGroup:addWidget(chaseModeBox)
+    connect(chaseModeRadioGroup, {
+        onSelectionChange = onSetChaseMode
+    })
 end
 
 function inventoryController:onTerminate()
@@ -450,6 +462,7 @@ end
 
 function inventoryController:onGameEnd()
     inventoryControllerEvents:disconnect()
+    inventoryControllerEvents_game:disconnect()
 end
 
 function selectPosture(key, ignoreUpdate)
@@ -515,9 +528,9 @@ end
 function changeInventorySize()
     if not inventoryShrink then
         inventoryController.ui.onPanel.icons:destroyChildren()
-        else
-            inventoryController.ui.offPanel.icons:destroyChildren()
-        end
+    else
+        inventoryController.ui.offPanel.icons:destroyChildren()
+    end
     inventoryShrink = not inventoryShrink
 
     g_settings.set('mainpanel_shrink_inventory', inventoryShrink)
