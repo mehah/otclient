@@ -14,7 +14,7 @@ ChaseModeBox < UICheckBox
 
 
 ConditionWidget < UIWidget
-  size: 18 18
+  size: 10 10
 
   $!first:
     margin-left: 2

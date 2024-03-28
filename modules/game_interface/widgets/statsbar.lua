@@ -146,13 +146,12 @@ local function loadIcon(bitChanged)
     icon:setId(Icons[bitChanged].id)
     icon:setImageSource(Icons[bitChanged].path)
     icon:setTooltip(Icons[bitChanged].tooltip)
-
+    icon:setImageSize({width = 9, height = 9})
     return icon
 end
 
 local function toggleIcon(bitChanged)
     local content = StatsBar.getCurrentStatsBar().icons
-
     local icon = content:getChildById(Icons[bitChanged].id)
 
     if icon then
@@ -190,7 +189,6 @@ function StatsBar.reloadCurrentStatsBarQuickInfo_state(localPlayer, now, old)
         local bitChanged = bit.band(bitsChanged, pow)
         if bitChanged ~= 0 then
             toggleIcon(bitChanged)
-            -- toggleIcon(bitChanged,modules.game_mainpanel.getIconsPanel())
         end
     end
 end

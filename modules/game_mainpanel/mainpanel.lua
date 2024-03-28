@@ -299,6 +299,7 @@ local function loadIcon(bitChanged, parent)
     icon:setId(Icons[bitChanged].id)
     icon:setImageSource(Icons[bitChanged].path)
     icon:setTooltip(Icons[bitChanged].tooltip)
+    icon:setImageSize({width = 9, height = 9})
     return icon
 end
 

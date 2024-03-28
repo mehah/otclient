@@ -121,9 +121,9 @@ MiniWindow
     SkillButton
       id: magiclevel
       image-source: /images/icons/icon_magic
-      image-size: 11 11
+      image-size: 9 9
       SkillNameLabel
-        !text: tr('      Magic Level')
+        !text: tr('     Magic Level')
       SkillValueLabel
       SkillPercentPanel
         background-color: red
@@ -131,63 +131,63 @@ MiniWindow
     SkillButton
       id: skillId0
       image-source: /images/icons/icon_fist
-      image-size: 12 12
+      image-size: 9 9
       SkillNameLabel
-        !text: tr('      Fist Fighting')
+        !text: tr('     Fist Fighting')
       SkillValueLabel
       SkillPercentPanel
 
     SkillButton
       id: skillId1
       image-source: /images/icons/icon_club
-      image-size: 11 13
+      image-size: 9 9
       SkillNameLabel
-        !text: tr('      Club Fighting')
+        !text: tr('     Club Fighting')
       SkillValueLabel
       SkillPercentPanel
 
     SkillButton
       id: skillId2
       image-source: /images/icons/icon_sword
-      image-size: 11 13
+      image-size: 9 9
       SkillNameLabel
-        !text: tr('      Sword Fighting')
+        !text: tr('     Sword Fighting')
       SkillValueLabel
       SkillPercentPanel
 
     SkillButton
       id: skillId3
       image-source: /images/icons/icon_axe
-      image-size: 12 12
+      image-size: 9 9
       SkillNameLabel
-        !text: tr('      Axe Fighting')
+        !text: tr('     Axe Fighting')
       SkillValueLabel
       SkillPercentPanel
 
     SkillButton
       id: skillId4
       image-source: /images/icons/icon_distance
-      image-size: 12 12
+      image-size: 9 9
       SkillNameLabel
-        !text: tr('      Distance Fighting')
+        !text: tr('     Distance Fighting')
       SkillValueLabel
       SkillPercentPanel
 
     SkillButton
       id: skillId5
       image-source: /images/icons/icon_shielding
-      image-size: 11 11
+      image-size: 9 9
       SkillNameLabel
-        !text: tr('      Shielding')
+        !text: tr('     Shielding')
       SkillValueLabel
       SkillPercentPanel
 
     SkillButton
       id: skillId6
       image-source: /images/icons/icon_fishing
-      image-size: 12 12
+      image-size: 9 9
       SkillNameLabel
-        !text: tr('      Fishing')
+        !text: tr('     Fishing')
       SkillValueLabel
       SkillPercentPanel
 
