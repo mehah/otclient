@@ -147,6 +147,7 @@ local function loadIcon(bitChanged)
     icon:setImageSource(Icons[bitChanged].path)
     icon:setTooltip(Icons[bitChanged].tooltip)
     icon:setImageSize({width = 9, height = 9})
+    icon:setMarginTop(5)
     return icon
 end
 
@@ -442,6 +443,10 @@ function StatsBar.setStatsBarOption(dimension, placement)
 
     if dimension ~= "hide" then
         StatsBar.getCurrentStatsBar().icons:destroyChildren()
+        local icon = g_ui.createWidget('ConditionWidget', StatsBar.getCurrentStatsBar().icons)
+        icon:setImageSource('/images/ui/blank')
+        icon:setImageSize({width = 1, height = 1})
+        icon:setMarginRight(-7)
         StatsBar.reloadCurrentTab()
     end
 
