@@ -37,10 +37,10 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 - [x] **Game_mainpanel** Hide icon "expert pvp modes" in minize panel for old protocole [2e6b171](https://github.com/Nottinghster/otclient/commit/2e6b17196a6112202ce0969aea0f8697f8f4db8e)
 - [x] **data\images** Missing UI of tibia 13 ( close , minimize , scroll) [a94aebc](https://github.com/Nottinghster/otclient/commit/a94aebc730c36a34f44261918512596d337aa8d5)
 - [x] **game_skills** Fix Ico location like clipsof [2ab0361](https://github.com/Nottinghster/otclient/commit/2ab03612d15a9ca4cc1f1db146e395d6d835d2e2)
+- [x] **Game_entergame** problems with token label when no cache, (first open client) [3da57e3](https://github.com/Nottinghster/otclient/commit/3da57e364b10a89339decb2f20c6556e33db919a)
 ------------
 **in process**
 - [ ] **Miniwindows**
-- [ ] **Game_entergame** problems with token label when no cache, (first open client)
 - [ ] **Game_mainpanel.** compatibility with extended view #7
 - [ ] **Game_mainpanel** fix function inventoryController:onTerminate()
 - [ ] **Game_outfit** of tibia 13 SOON
@@ -98,7 +98,7 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 
 ![](https://geps.dev/progress/99) game_bugreport `--unmodified, test required`
 
-![](https://geps.dev/progress/0) game_console
+![](https://geps.dev/progress/100) game_console
 
 ![](https://geps.dev/progress/99) game_containers `--unmodified, test required`
 
@@ -190,8 +190,8 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 
 - Status: Incomplete
 - Bugs:
-  - [ ] Incorrect Tab(key) order.
-  - [ ] MOTD
+  - [x] Incorrect Tab(key) order.
+  - [x] MOTD
   - [ ] Test v13
   - [x] bug login quickly unfinished http post
 
@@ -281,9 +281,9 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 
 ### game_console
 
-- Status: Incomplete
+- Status: Completed
 - Bugs:
-  - [ ] Issue : preventing the cursor from appearing when starting to write.
+  - [x] Issue : preventing the cursor from appearing when starting to write.
   - [x] Issue : Fix enter for enable WASD
   - [x] Issue :add "isEnabledWASD" missing funcion bot #6
 
@@ -345,7 +345,7 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
   - [x] Issue : Conditions icons are not coded
   - [x] Issue : When you attack and chase mode is follow, there's error in terminal (need auto Chase option turned on)
   - [ ] Issue : fix function inventoryController:onTerminate()
-  - [ ] Issue : Hide icon "bless" in minize panel
+  - [x] Issue : Hide icon "bless" in minize panel
 
 **NOTE: **
 
