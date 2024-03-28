@@ -138,7 +138,7 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 
 ![](https://geps.dev/progress/0) game_shaders `--unmodified, test required`
 
-![](https://geps.dev/progress/90) game_skills
+![](https://geps.dev/progress/100) game_skills
 
 ![](https://geps.dev/progress/99) game_spelllist `--unmodified, test required`
 
@@ -432,9 +432,7 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 
 - Status: Incomplete
 - Bugs:
-  - [ ] Issue : Ico game skills like clipsof
-  - [ ] Issue
-- **Notes: NEED FIX LOCATION ICONS AND SIZE**
+  - [x] Issue : Ico game skills like clipsof
 
 ### game_spelllist
 
