@@ -36,6 +36,7 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 - [x] **Game_mainpanel** Inventario fix ico state [ed9af33](https://github.com/Nottinghster/otclient/commit/ed9af33a6ed41f10e698d7017939e21bc5eedda6)
 - [x] **Game_mainpanel** Hide icon "expert pvp modes" in minize panel for old protocole [2e6b171](https://github.com/Nottinghster/otclient/commit/2e6b17196a6112202ce0969aea0f8697f8f4db8e)
 - [x] **data\images** Missing UI of tibia 13 ( close , minimize , scroll) [a94aebc](https://github.com/Nottinghster/otclient/commit/a94aebc730c36a34f44261918512596d337aa8d5)
+- [x] **game_skills** Fix Ico location like clipsof [2ab0361](https://github.com/Nottinghster/otclient/commit/2ab03612d15a9ca4cc1f1db146e395d6d835d2e2)
 ------------
 **in process**
 - [ ] **Miniwindows**
@@ -43,7 +44,6 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 - [ ] **Game_mainpanel.** compatibility with extended view #7
 - [ ] **Game_mainpanel** fix function inventoryController:onTerminate()
 - [ ] **Game_outfit** of tibia 13 SOON
-- [ ] **game_skills** Fix Ico location like clipsof
 - [ ] **Game_bot** get the slot5 requested by quiver_label and quiver_manager
 - [ ] **Client_bottom** default information if array services is not enabled
 - [ ] font similar to tibia 13 (Verdana10px bold ? )
