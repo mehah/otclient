@@ -86,13 +86,7 @@ function terminate()
         })
     end
 
-    local console = modules.game_console.consolePanel
-    if console then
-        console:removeAnchor(AnchorTop)
-        console:fill('parent')
-    end
 end
-
 
 function online()
 

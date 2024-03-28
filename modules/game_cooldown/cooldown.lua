@@ -147,7 +147,7 @@ end
 
 function offline()
     if g_game.getFeature(GameSpellList) then
-        cooldownWindow:setParent(nil, true)
+        --cooldownWindow:setParent(nil, true)
     end
 end
 
