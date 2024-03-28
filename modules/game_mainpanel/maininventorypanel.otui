@@ -369,7 +369,7 @@ PhantomMiniWindow
 
       Label
         id: soul
-        !text: '0'
+        !text: '100000'
         font: cipsoftFont
         text-align: center
         anchors.horizontalCenter: parent.horizontalCenter

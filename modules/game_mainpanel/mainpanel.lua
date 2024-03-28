@@ -272,7 +272,14 @@ local function onSoulChange(localPlayer, soul)
         return
     end
 
-    ui.soulPanel.soul:setText(soul)
+    if ui.soulPanel and ui.soulPanel.soul then
+        ui.soulPanel.soul:setText(soul)
+    end
+
+    if ui.soulAndCapacity and ui.soulAndCapacity.soul then
+        ui.soulAndCapacity.soul:setText(soul)
+    end
+
 end
 
 local function onFreeCapacityChange(player, freeCapacity)
@@ -291,7 +298,12 @@ local function onFreeCapacityChange(player, freeCapacity)
         freeCapacity = math.min(9999, math.floor(freeCapacity / 1000)) .. "k"
     end
     local ui = getInventoryUi()
-    ui.capacityPanel.capacity:setText(freeCapacity)
+    if ui.capacityPanel and ui.capacityPanel.capacity then
+        ui.capacityPanel.capacity:setText(freeCapacity)
+    end
+    if ui.soulAndCapacity and ui.soulAndCapacity.capacity then
+        ui.soulAndCapacity.capacity:setText(freeCapacity)
+    end
 end
 
 local function loadIcon(bitChanged, parent)
@@ -537,6 +549,12 @@ function changeInventorySize()
     g_settings.set('mainpanel_shrink_inventory', inventoryShrink)
     refreshInventorySizes()
     reloadMainPanelSizes()
+    local player = g_game.getLocalPlayer()
+    if player and g_game.isOnline() then
+
+        onFreeCapacityChange(player, player:getFreeCapacity())
+        onSoulChange(player, player:getSoul())
+    end
 end
 -- @ End of Inventory
 
