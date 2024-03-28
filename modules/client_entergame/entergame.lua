@@ -126,7 +126,7 @@ function EnterGame.init()
     local httpLogin = g_settings.getBoolean('httpLogin')
     local clientVersion = g_settings.getInteger('client-version')
     if clientVersion == 0 then
-        clientVersion = 1074
+        clientVersion = 860
     end
 
     if port == nil or port == 0 then
