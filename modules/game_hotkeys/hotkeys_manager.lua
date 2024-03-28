@@ -34,7 +34,7 @@ HotkeyColors = {
 
 hotkeysManagerLoaded = false
 hotkeysWindow = nil
-hotkeysButton = nil
+
 currentHotkeyLabel = nil
 currentItemPreview = nil
 itemWidget = nil
@@ -62,8 +62,7 @@ lastHotkeyTime = g_clock.millis()
 
 -- public functions
 function init()
-    hotkeysButton = modules.client_topmenu.addLeftGameButton('hotkeysButton', tr('Hotkeys') .. ' (Ctrl+K)',
-                                                             '/images/topbuttons/hotkeys', toggle)
+
     g_keyboard.bindKeyDown('Ctrl+K', toggle)
     hotkeysWindow = g_ui.displayUI('hotkeys_manager')
     hotkeysWindow:setVisible(false)
@@ -132,10 +131,10 @@ function terminate()
     unload()
 
     hotkeysWindow:destroy()
-    hotkeysButton:destroy()
+
     mouseGrabberWidget:destroy()
     hotkeysWindow = nil
-    hotkeysButton = nil
+
     hotkeyActionCombo = nil
     hotKeyTextLabel = nil
     hotkeyText = nil
