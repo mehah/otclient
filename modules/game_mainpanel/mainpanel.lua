@@ -7,15 +7,17 @@ end
 
 function terminate()
     mapController:terminate()
-    inventoryController:terminate()
     healthManaController:terminate()
+    inventoryController:terminate()
     optionsController:terminate()
 end
+
 local standModeBox
 local chaseModeBox
 local optionsAmount = 0
 local specialsAmount = 0
 local chaseModeRadioGroup
+
 function reloadMainPanelSizes()
     local main = modules.game_interface.getMainRightPanel()
     local rightPanel = modules.game_interface.getRightPanel()
