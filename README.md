@@ -36,7 +36,7 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 - [x] **Game_mainpanel** Inventario fix ico state [ed9af33](https://github.com/Nottinghster/otclient/commit/ed9af33a6ed41f10e698d7017939e21bc5eedda6)
 - [x] **Game_mainpanel** Hide icon "expert pvp modes" in minize panel for old protocole [2e6b171](https://github.com/Nottinghster/otclient/commit/2e6b17196a6112202ce0969aea0f8697f8f4db8e)
 - [x] **data\images** Missing UI of tibia 13 ( close , minimize , scroll) [a94aebc](https://github.com/Nottinghster/otclient/commit/a94aebc730c36a34f44261918512596d337aa8d5)
-- [x] **game_skills** Fix Ico location like clipsof [2ab0361](https://github.com/Nottinghster/otclient/commit/2ab03612d15a9ca4cc1f1db146e395d6d835d2e2)
+- [x] **game_skills** Fix Ico location like clipsof [2ab0361](https://github.com/Nottinghster/otclient/commit/2ab03612d15a9ca4cc1f1db146e395d6d835d2e2) - [4611fe2](https://github.com/Nottinghster/otclient/commit/4611fe28bb0ecaa7b3d0cb5a4c9576e2d91a6223) - [51f99e8](https://github.com/Nottinghster/otclient/commit/51f99e8fec86b9026a1071d58b4197650b5783c5)
 - [x] **Game_entergame** problems with token label when no cache, (first open client) [3da57e3](https://github.com/Nottinghster/otclient/commit/3da57e364b10a89339decb2f20c6556e33db919a)
 ------------
 **in process**
