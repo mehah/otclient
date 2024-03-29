@@ -52,7 +52,7 @@ Panel
 
     Label
       id: showOffWindowText
-      !text: tr('Store')
+      !text: tr('Random Hit')
       font: verdana-11px-antialised
       text-offset: 0 2
       text-align: top
@@ -156,16 +156,19 @@ Panel
         id: creature
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
+      UIWidget
+        id: creature2
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        visible: false
 
     Label
       !text: tr('Creature')
-      id: borrar
       anchors.horizontalCenter: prev.horizontalCenter
       anchors.top: prev.bottom
       margin-top: 3
 
     Panel
-      id:borraresto
       anchors.top: parent.top
       anchors.right: parent.right
       margin-right: 12
@@ -177,6 +180,11 @@ Panel
         id: boss
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
+      UIWidget
+        id: boss2
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        visible: false
 
     Label
       !text: tr('Boss')

@@ -17,6 +17,11 @@ local eventSchedulerCalendarMonth
 local boostedWindow
 local creature_boosted
 local boss_boosted
+
+local default_info = {
+    [1] = {image = "images/randomhit", Title = "Random hit 1", creature1="images/boost_monster1",creature2= "images/boost_monster2",description = "The customisable status bar includes big health and mana bars and can be placed on the bottom, the top or on the side of your game windows\n\n -\t\t https://github.com/mehah/otclient/wiki "},
+  --  [2] = {image = "image of label", Title = "title", creature1="images of creature",creature2= "images of boos",description = "text in label see tutorial :  https://github.com/mehah/otclient/wiki"},
+}
 function init()
     g_ui.importStyle('calendar')
     bottomMenu = g_ui.displayUI('bottommenu')
@@ -39,6 +44,29 @@ function init()
     boostedWindow = bottomMenu:recursiveGetChildById('boostedWindow')
     creature_boosted = boostedWindow:recursiveGetChildById('creature')
     boss_boosted = boostedWindow:recursiveGetChildById('boss')
+
+    if not Services.status and default_info then
+        local widget = g_ui.createWidget('ShowOffWidget', showOffWindow)
+        local description = widget:recursiveGetChildById('description')
+        local image = widget:recursiveGetChildById('image')
+
+        math.randomseed(os.time())
+        local randomIndex = math.random(1, #default_info)
+        local randomItem = default_info[randomIndex]
+        showOffWindow.title:setText(tr(randomItem.Title))
+        image:setImageSource(randomItem.image)
+        description:setText(tr(randomItem.description))
+        creature_boosted:setVisible(false)
+        boss_boosted:setVisible(false)
+
+        local creature2 = boostedWindow:recursiveGetChildById('creature2')
+        local boss2 = boostedWindow:recursiveGetChildById('boss2')
+
+        creature2:setImageSource(randomItem.creature1)    
+        creature2:setVisible(true) 
+        boss2:setImageSource(randomItem.creature2)
+        boss2:setVisible(true)
+    end
 end
 
 function terminate()

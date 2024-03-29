@@ -38,16 +38,21 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 - [x] **data\images** Missing UI of tibia 13 ( close , minimize , scroll) [a94aebc](https://github.com/Nottinghster/otclient/commit/a94aebc730c36a34f44261918512596d337aa8d5)
 - [x] **game_skills** Fix Ico location like clipsof [2ab0361](https://github.com/Nottinghster/otclient/commit/2ab03612d15a9ca4cc1f1db146e395d6d835d2e2) - [4611fe2](https://github.com/Nottinghster/otclient/commit/4611fe28bb0ecaa7b3d0cb5a4c9576e2d91a6223) - [51f99e8](https://github.com/Nottinghster/otclient/commit/51f99e8fec86b9026a1071d58b4197650b5783c5)
 - [x] **Game_entergame** problems with token label when no cache, (first open client) [3da57e3](https://github.com/Nottinghster/otclient/commit/3da57e364b10a89339decb2f20c6556e33db919a)
+- [x] **Client_bottom** default information if array services is not enabled
 ------------
 **in process**
-- [ ] **Miniwindows**
 - [ ] **Game_mainpanel.** compatibility with extended view #7
 - [ ] **Game_mainpanel** fix function inventoryController:onTerminate()
 - [ ] **Game_outfit** of tibia 13 SOON
 - [ ] **Game_bot** get the slot5 requested by quiver_label and quiver_manager
-- [ ] **Client_bottom** default information if array services is not enabled
-- [ ] font similar to tibia 13 (Verdana10px bold ? )
-
+- [ ] **data/styles/** Using a unique font similar to Tibia 13 (i think is Verdana10px bold ? )
+- [ ] **Game_mainpanel**  To make use of the store button. (button below the inventory)
+- [ ] **data/styles/** Using the vertical and horizontal scrollbars of Tibia 13. 
+- [ ] Adapt the v8 game_actionbar with vertical and horizontal panels. (closer to Tibia 13), with options in client_options.
+- [ ] **game_mainPanel** Create a function in C++ of **g_game onChangeWorldTime** for minimap.
+- [ ] check if there are duplicated functions, or even clean some codes
+     - data/styles/ .otui (unused UI)
+     - 
 
 
 
