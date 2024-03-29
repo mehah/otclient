@@ -20,7 +20,8 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 - Calendar
 - Outfit windows 13 soon
 - Cooldown spell on top of the game_console like tibia 13
-- ....
+- game_shop of v8 compatible with attachEffect and shader
+
 
 ## Current bugs
 **solved**
@@ -39,6 +40,7 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 - [x] **game_skills** Fix Ico location like clipsof [2ab0361](https://github.com/Nottinghster/otclient/commit/2ab03612d15a9ca4cc1f1db146e395d6d835d2e2) - [4611fe2](https://github.com/Nottinghster/otclient/commit/4611fe28bb0ecaa7b3d0cb5a4c9576e2d91a6223) - [51f99e8](https://github.com/Nottinghster/otclient/commit/51f99e8fec86b9026a1071d58b4197650b5783c5)
 - [x] **Game_entergame** problems with token label when no cache, (first open client) [3da57e3](https://github.com/Nottinghster/otclient/commit/3da57e364b10a89339decb2f20c6556e33db919a)
 - [x] **Client_bottom** default information if array services is not enabled [25d0e45](https://github.com/Nottinghster/otclient/commit/25d0e4526a41228e3391d9a7706c18b645b3219c)
+- [x]  **Game_mainpanel**  To make use of the store button. (button below the inventory) [b52f153](https://github.com/Nottinghster/otclient/commit/b52f15386c3a1fbca2b5760ae6aae0bcef0e5a47) - [ae44616](https://github.com/Nottinghster/otclient/commit/ae44616702a181e89dad9e04ca61b627d6d1ad46) - [0b38a12](https://github.com/Nottinghster/otclient/commit/0b38a12438d5d2cebb6529d4de023c049d29f247)
 ------------
 **in process**
 - [ ] **Game_mainpanel.** compatibility with extended view  [#7](https://github.com/Nottinghster/otclient/issues/7)
@@ -46,7 +48,7 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 - [ ] **Game_outfit** of tibia 13 SOON
 - [ ] **Game_bot** get the slot5 requested by quiver_label and quiver_manager
 - [ ] **data/styles/** Using a unique font similar to Tibia 13 (i think is Verdana10px bold ? )
-- [ ] **Game_mainpanel**  To make use of the store button. (button below the inventory)
+
 - [ ] **data/styles/** Using the vertical and horizontal scrollbars of Tibia 13. ![image](https://github.com/Nottinghster/otclient/assets/114332266/623f01c9-41cf-4763-88e5-449cf7127f5e)
 - [ ] Adapt the v8 game_actionbar with vertical and horizontal panels. (closer to Tibia 13), with options in client_options.
 - [ ] **game_mainPanel** Create a function in C++ of **g_game onChangeWorldTime** for minimap.
