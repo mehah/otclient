@@ -2931,29 +2931,42 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
         msg->getU8(); // mark
     }
 
-    if (item->isStackable() || item->isFluidContainer() || item->isSplash() || item->isChargeable()) {
+    if (item->isStackable()) {
         item->setCountOrSubType(g_game.getFeature(Otc::GameCountU16) ? msg->getU16() : msg->getU8());
+    }
+
+    if (item->isFluidContainer() || item->isSplash() || item->isChargeable()) {
+        item->setCountOrSubType(g_game.getFeature(Otc::GameCountU16) ? msg->getU16() : msg->getU8());
+    }
+
+    if (g_game.getFeature(Otc::GameItemAnimationPhase)) {
+        if (item->getAnimationPhases() > 1) {
+            // 0x00 => automatic phase
+            // 0xFE => random phase
+            // 0xFF => async phase
+            msg->getU8();
+            //item->setPhase(msg->getU8());
+        }
     }
 
     if (item->isContainer()) {
         if (g_game.getFeature(Otc::GameContainerTypes)) {
             // container flags
-            // 1: quick loot, 2: quiver, 4: unlooted corpse
-            const uint8_t containerFlags = msg->getU8();
+            // 9: quick loot, 2: quiver, 4: unlooted corpse
+            const uint8_t containerType = msg->getU8();
 
-            // quick loot categories
-            if ((containerFlags & 1) != 0) {
-                msg->getU32();
-            }
-
-            // quiver ammo count
-            if ((containerFlags & 2) != 0) {
-                msg->getU32();
+			if (containerType == 9) {
+				// quick loot categories
+				msg->getU32();
+				msg->getU32();
+			} else if (containerType == 2) {
+				// quiver ammo count
+				msg->getU32();
             }
 
             // corpse not looted yet
             /*
-            if ((containerFlags & 4) != 0) {
+            if ((containerType & 4) != 0) {
                 // this flag has no bytes to parse
                 // draw effect 252 on top of the tile
             }
@@ -2972,42 +2985,6 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
                     msg->getU32(); // ammoTotal
                 }
             }
-        }
-    }
-
-    if (g_game.getFeature(Otc::GameThingUpgradeClassification)) {
-        if (item->getClassification() != 0) {
-            msg->getU8(); // Item tier
-        }
-    }
-
-    if (g_game.getFeature(Otc::GameThingClock)) {
-        if (item->hasClockExpire() || item->hasExpire() || item->hasExpireStop()) {
-            msg->getU32(); // Item duration (UI)
-            msg->getU8(); // Is brand-new
-        }
-    }
-
-    if (g_game.getFeature(Otc::GameThingCounter)) {
-        if (item->hasWearOut()) {
-            msg->getU32(); // Item charge (UI)
-            msg->getU8(); // Is brand-new
-        }
-    }
-
-    if (g_game.getFeature(Otc::GameWrapKit)) {
-        if (item->isDecoKit()) {
-            msg->getU16();
-        }
-    }
-
-    if (g_game.getFeature(Otc::GameItemAnimationPhase)) {
-        if (item->getAnimationPhases() > 1) {
-            // 0x00 => automatic phase
-            // 0xFE => random phase
-            // 0xFF => async phase
-            msg->getU8();
-            //item->setPhase(msg->getU8());
         }
     }
 
@@ -3034,6 +3011,32 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
 
             msg->getU8(); // direction
             msg->getU8(); // visible (bool)
+        }
+    }
+
+    if (g_game.getFeature(Otc::GameThingUpgradeClassification)) {
+        if (item->getClassification() != 0) {
+            msg->getU8(); // Item tier
+        }
+    }
+
+    if (g_game.getFeature(Otc::GameThingClock)) {
+        if (item->hasClockExpire() || item->hasExpire() || item->hasExpireStop()) {
+            msg->getU32(); // Item duration (UI)
+            msg->getU8(); // Is brand-new
+        }
+    }
+
+    if (g_game.getFeature(Otc::GameThingCounter)) {
+        if (item->hasWearOut()) {
+            msg->getU32(); // Item charge (UI)
+            msg->getU8(); // Is brand-new
+        }
+    }
+
+    if (g_game.getFeature(Otc::GameWrapKit)) {
+        if (item->isDecoKit()) {
+            msg->getU16();
         }
     }
 
@@ -3159,8 +3162,9 @@ void ProtocolGame::parseLootContainers(const InputMessagePtr& msg)
     msg->getU8(); // quickLootFallbackToMainContainer ? 1 : 0
     const uint8_t containers = msg->getU8();
     for (int_fast32_t i = 0; i < containers; ++i) {
-        msg->getU8(); // id?
-        msg->getU16();
+		msg->getU8(); // category
+		msg->getU16(); // lootContainerId
+        msg->getU16(); // obtainContainerId
     }
 }
 
