@@ -554,7 +554,7 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 
 ### **1.- what is game_mainpanel ?**
 
-![image](https://github.com/Nottinghster/otclient/assets/114332266/01f7493e-de73-4a03-9c75-5c25f3f1493a)
+![image](https://cdn.discordapp.com/attachments/1188251464603283526/1223263276834492536/image.png?ex=661937b4&is=6606c2b4&hm=2d8e6da381b083cb1c153220a7e7847fbddcb4a8876f8006367dcbb1c1746d09&)
 
 union inventory , minimap, combat control
 
