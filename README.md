@@ -24,12 +24,12 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 
 ## Current bugs
 **solved**
+- [x] **Game_entergame** MOTD old protocol
 - [x] **Game_topmenu.** fix: Fps and ping https://github.com/Nottinghster/otclient/pull/8
 - [x] **Game_Console** fix: preventing the text cursor from appearing when starting to write.  [87becf4](https://github.com/Nottinghster/otclient/commit/87becf4e2fcc7f7c494f87fae4f0d4b426f68749)
 - [x] **corelib/ui/uiminiwindows** "droppedWidget" nil L224 https://github.com/Nottinghster/otclient/issues/10
 - [x]  **game_containers** Panel nil L161 https://github.com/Nottinghster/otclient/issues/9
 - [x] **Game_bot** Fix width mini windows bot [ad52ef0](https://github.com/Nottinghster/otclient/commit/ad52ef06dad02afc8276e3508fbe864dfb0cc38b)
-- [x] **Game_entergame** MOTD old protocol
 - [x] **Game_mainpanel** fix: combat control  chase. [#12](https://github.com/Nottinghster/otclient/pull/12)
 - [x] **Game_topMenu** (onStatesChange) icons state [a350e7c](https://github.com/Nottinghster/otclient/commit/a350e7cc36dbf907675d57f2037ef86810482a62)
 - [x] **Game_topmenu** missing Boton "manager account", "manager clients" [919444b](https://github.com/Nottinghster/otclient/commit/919444b6cecadbbad2d48a54a445079d17e83561)
@@ -38,21 +38,22 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 - [x] **data\images** Missing UI of tibia 13 ( close , minimize , scroll) [a94aebc](https://github.com/Nottinghster/otclient/commit/a94aebc730c36a34f44261918512596d337aa8d5)
 - [x] **game_skills** Fix Ico location like clipsof [2ab0361](https://github.com/Nottinghster/otclient/commit/2ab03612d15a9ca4cc1f1db146e395d6d835d2e2) - [4611fe2](https://github.com/Nottinghster/otclient/commit/4611fe28bb0ecaa7b3d0cb5a4c9576e2d91a6223) - [51f99e8](https://github.com/Nottinghster/otclient/commit/51f99e8fec86b9026a1071d58b4197650b5783c5)
 - [x] **Game_entergame** problems with token label when no cache, (first open client) [3da57e3](https://github.com/Nottinghster/otclient/commit/3da57e364b10a89339decb2f20c6556e33db919a)
-- [x] **Client_bottom** default information if array services is not enabled
+- [x] **Client_bottom** default information if array services is not enabled [25d0e45](https://github.com/Nottinghster/otclient/commit/25d0e4526a41228e3391d9a7706c18b645b3219c)
 ------------
 **in process**
-- [ ] **Game_mainpanel.** compatibility with extended view #7
+- [ ] **Game_mainpanel.** compatibility with extended view  [#7](https://github.com/Nottinghster/otclient/issues/7)
 - [ ] **Game_mainpanel** fix function inventoryController:onTerminate()
 - [ ] **Game_outfit** of tibia 13 SOON
 - [ ] **Game_bot** get the slot5 requested by quiver_label and quiver_manager
 - [ ] **data/styles/** Using a unique font similar to Tibia 13 (i think is Verdana10px bold ? )
 - [ ] **Game_mainpanel**  To make use of the store button. (button below the inventory)
-- [ ] **data/styles/** Using the vertical and horizontal scrollbars of Tibia 13. 
+- [ ] **data/styles/** Using the vertical and horizontal scrollbars of Tibia 13. ![image](https://github.com/Nottinghster/otclient/assets/114332266/623f01c9-41cf-4763-88e5-449cf7127f5e)
 - [ ] Adapt the v8 game_actionbar with vertical and horizontal panels. (closer to Tibia 13), with options in client_options.
 - [ ] **game_mainPanel** Create a function in C++ of **g_game onChangeWorldTime** for minimap.
+- [ ] **statsbar** if you set to "hide" , close and open the client. the "compact" statsbar is displayed.( "hide" style bar is not saved)
 - [ ] check if there are duplicated functions, or even clean some codes
      - data/styles/ .otui (unused UI)
-     - 
+     - topmenu//Mainpanel incorrectly named functions and some of them repeated
 
 
 
@@ -627,17 +628,20 @@ I know there are errors in naming regarding the location, but it's RETROCOMPATIB
 There are some duplicates and others that need to have their names changed.
 | Function | Image |
 |-----------|-----------|
-| addLeftButton    | ![image](https://github.com/Nottinghster/otclient/assets/114332266/2e3a8188-5be8-429e-8ee4-1139acf91c55)   |
-| addLeftToggleButton    | ![image](https://github.com/Nottinghster/otclient/assets/114332266/ce18e5c0-8ee3-4db0-b1cd-7bcd709fe2aa)   |
-| addRightButton    | ![image](https://github.com/Nottinghster/otclient/assets/114332266/0ce9d9d0-98eb-4ae4-8cae-af26edcef055)  |
-| addRightToggleButton    |![image](https://github.com/Nottinghster/otclient/assets/114332266/6b16c163-1a9a-4a6e-859a-66a350840219)   |
-| addLeftGameButton    | ![image](https://github.com/Nottinghster/otclient/assets/114332266/0f029efd-76a6-4b98-9392-6fc312588c08)   |
-| addLeftGameToggleButton    | ![image](https://github.com/Nottinghster/otclient/assets/114332266/beb6d11a-9216-4d95-8246-2a2b72d9dd9d)   |
-| addRightGameButton    | ![image](https://github.com/Nottinghster/otclient/assets/114332266/c834060d-0675-4aae-a231-f527ff371693)   |
-| addRightGameToggleButton    | ![image](https://github.com/Nottinghster/otclient/assets/114332266/f221ccfb-3843-4c6a-a570-d70eb02628c9)   |
-| addTopRightRegularButton    | ![image](https://github.com/Nottinghster/otclient/assets/114332266/e2adffb1-ed38-402b-acc4-1ad1d1a2db16)   |
-| addTopRightToggleButton   | ![image](https://github.com/Nottinghster/otclient/assets/114332266/12e3acc9-b61a-457a-b857-b5bfb5179436)  |
+| addLeftButton    | ![image](https://github.com/Nottinghster/otclient/assets/114332266/117ed15b-6d40-4e17-911b-f54129c1bc93)   |
+| addLeftToggleButton  (icon)  | ![image](https://github.com/Nottinghster/otclient/assets/114332266/606f5ec0-409d-4dfa-bb38-e57e6b4b0fd8)   |
+| addRightButton  **  | ![image](https://github.com/Nottinghster/otclient/assets/114332266/92161803-e743-4b4a-898d-8cffc74d2f5d)  |
+| addRightToggleButton(icon)  **  |![image](https://github.com/Nottinghster/otclient/assets/114332266/228089b8-f0c2-49fa-8398-42e82492b612)  |
+| addTopRightRegularButton **   | ![image](https://github.com/Nottinghster/otclient/assets/114332266/50103b0f-819e-4eda-8efe-34caa29fec98)  |
+| addTopRightToggleButton (icons)**  | ![image](https://github.com/Nottinghster/otclient/assets/114332266/37e7f3a8-3486-40ef-bbb0-f6b71ccd8e57)  |
+| addLeftGameButton  ***  | ![image](https://github.com/Nottinghster/otclient/assets/114332266/eb6666c8-2597-448f-915c-0190db706bbc)   |
+| addLeftGameToggleButton  ***  |![image](https://github.com/Nottinghster/otclient/assets/114332266/a8eb6714-cf9c-4d76-81a4-ed9547402d08)  |
+| addRightGameButton  ***  | ![image](https://github.com/Nottinghster/otclient/assets/114332266/c7bab85c-86f2-4ead-b23f-b141723729ba)  |
+| addRightGameToggleButton ** *  | ![image](https://github.com/Nottinghster/otclient/assets/114332266/af39b255-7afb-4142-8ed5-c143ac6f6237)  |
 
+**is intended to eliminate 2
+
+*** for backward compatibility, it is retained
 
 
 ## Author
