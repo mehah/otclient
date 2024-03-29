@@ -35,5 +35,6 @@ Module
     - game_attachedeffects
     - game_stash
     - game_healthcircle
+    - game_shop
   @onLoad: init()
   @onUnload: terminate()
