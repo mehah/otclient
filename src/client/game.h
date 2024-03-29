@@ -222,6 +222,8 @@ public:
     void requestOutfit();
     void changeOutfit(const Outfit& outfit);
 
+    void sendTyping(bool typing);
+
     // vip related
     void addVip(const std::string_view name);
     void removeVip(int playerId);

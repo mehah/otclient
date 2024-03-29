@@ -46,6 +46,7 @@ Creature::Creature() :m_type(Proto::CreatureTypeUnknown)
 {
     m_name.setFont(g_gameConfig.getCreatureNameFont());
     m_name.setAlign(Fw::AlignTopCenter);
+    m_typingIconTexture = g_textures.getTexture(g_gameConfig.getTypingIcon());
 
     // Example of how to send a UniformValue to shader
     /*
@@ -131,8 +132,11 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
     if (isDead() || !canBeSeen() || !(drawFlags & Otc::DrawCreatureInfo) || !mapRect.isInRange(m_position))
         return;
 
+    const auto displacementX = g_game.getFeature(Otc::GameNegativeOffset) ? 0 : getDisplacementX();
+    const auto displacementY = g_game.getFeature(Otc::GameNegativeOffset) ? 0 : getDisplacementY();
+
     const auto& parentRect = mapRect.rect;
-    const auto& creatureOffset = Point(16 - getDisplacementX(), -getDisplacementY() - 2) + getDrawOffset();
+    const auto& creatureOffset = Point(16 - displacementX, -displacementY - 2) + getDrawOffset();
 
     Point p = dest - mapRect.drawOffset;
     p += (creatureOffset - Point(std::round(m_jumpOffset.x), std::round(m_jumpOffset.y))) * mapRect.scaleFactor;
@@ -227,6 +231,9 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
 
     if (m_icon != Otc::NpcIconNone && m_iconTexture)
         g_drawPool.addTexturedPos(m_iconTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5);
+
+    if (g_gameConfig.drawTyping() && getTyping() && m_typingIconTexture)
+        g_drawPool.addTexturedPos(m_typingIconTexture, p.x + (nameSize.width() / 2.0) + 2, textRect.y() - 4);
 }
 
 void Creature::internalDraw(Point dest, LightView* lightView, const Color& color)
@@ -536,7 +543,8 @@ void Creature::updateWalkAnimation()
             footAnimDelay /= 1.5;
     }
 
-    const int footDelay = std::clamp<int>(m_stepCache.getDuration(m_lastStepDirection) / footAnimDelay, minFootDelay, maxFootDelay);
+    const auto walkSpeed = m_walkingAnimationSpeed > 0 ? m_walkingAnimationSpeed : m_stepCache.getDuration(m_lastStepDirection);
+    const int footDelay = std::clamp<int>(walkSpeed / footAnimDelay, minFootDelay, maxFootDelay);
 
     if (m_footTimer.ticksElapsed() >= footDelay) {
         if (m_walkAnimationPhase == footAnimPhases) m_walkAnimationPhase = 1;
@@ -565,8 +573,11 @@ void Creature::updateWalkingTile()
     // determine new walking tile
     TilePtr newWalkingTile;
 
-    const Rect virtualCreatureRect(g_gameConfig.getSpriteSize() + (m_walkOffset.x - getDisplacementX()),
-        g_gameConfig.getSpriteSize() + (m_walkOffset.y - getDisplacementY()),
+    const auto displacementX = g_game.getFeature(Otc::GameNegativeOffset) ? 0 : getDisplacementX();
+    const auto displacementY = g_game.getFeature(Otc::GameNegativeOffset) ? 0 : getDisplacementY();
+
+    const Rect virtualCreatureRect(g_gameConfig.getSpriteSize() + (m_walkOffset.x - displacementX),
+        g_gameConfig.getSpriteSize() + (m_walkOffset.y - displacementY),
         g_gameConfig.getSpriteSize(), g_gameConfig.getSpriteSize());
 
     for (int xi = -1; xi <= 1 && !newWalkingTile; ++xi) {
@@ -962,10 +973,9 @@ const Light& Creature::getLight() const
 
 uint16_t Creature::getCurrentAnimationPhase(const bool mount)
 {
-    const auto& thingType = mount ? m_mountType : getThingType();
+    const auto thingType = mount ? m_mountType : getThingType();
 
-    auto* idleAnimator = thingType->getIdleAnimator();
-    if (idleAnimator) {
+    if (const auto idleAnimator = thingType->getIdleAnimator()) {
         if (m_walkAnimationPhase == 0) return idleAnimator->getPhase();
         return m_walkAnimationPhase + idleAnimator->getAnimationPhases() - 1;
     }
@@ -1006,6 +1016,20 @@ int Creature::getExactSize(int layer, int xPattern, int yPattern, int zPattern, 
 
 void Creature::setMountShader(const std::string_view name) { m_mountShader = g_shaders.getShader(name); }
 
+void Creature::setTypingIconTexture(const std::string& filename)
+{
+    m_typingIconTexture = g_textures.getTexture(filename);
+}
+
+void Creature::setTyping(bool typing)
+{
+    m_typing = typing;
+}
+
+void Creature::sendTyping() {
+    g_game.sendTyping(m_typing);
+}
+
 void Creature::onStartAttachEffect(const AttachedEffectPtr& effect) {
     if (effect->isDisabledWalkAnimation()) {
         setDisableWalkAnimation(true);
@@ -1042,6 +1066,25 @@ void Creature::onStartDetachEffect(const AttachedEffectPtr& effect) {
     if (effect->isTransform() && !effect->m_outfitOwner.isInvalid()) {
         setOutfit(effect->m_outfitOwner);
     }
+}
+
+void Creature::setStaticWalking(uint16_t v) {
+    if (m_walkUpdateEvent) {
+        m_walkUpdateEvent->cancel();
+        m_walkUpdateEvent = nullptr;
+    }
+
+    m_walkingAnimationSpeed = v;
+
+    if (v == 0)
+        return;
+
+    m_walkUpdateEvent = g_dispatcher.cycleEvent([self = static_self_cast<Creature>()] {
+        self->updateWalkAnimation();
+        if (self.use_count() == 1) {
+            self->m_walkUpdateEvent->cancel();
+        }
+    }, std::min<int>(v / g_gameConfig.getSpriteSize(), DrawPool::FPS60));
 }
 
 #ifndef BOT_PROTECTION

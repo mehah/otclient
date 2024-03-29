@@ -36,6 +36,8 @@ public:
 
     uint8_t getSpriteSize() { return m_spriteSize; }
     uint16_t getLastSupportedVersion() const { return m_lastSupportedVersion; }
+    bool drawTyping() const { return m_drawTyping; }
+    std::string getTypingIcon() const { return m_typingIcon; }
 
     Size getMapViewPort() const { return m_mapViewPort; }
     uint8_t getMapMaxZ() const { return m_mapMaxZ; }
@@ -82,6 +84,8 @@ private:
     // Game
     uint8_t m_spriteSize{ 32 };
     uint16_t m_lastSupportedVersion{ 1332 };
+    bool m_drawTyping{ false };
+    std::string m_typingIcon{ "/images/game/console/typing" };
 
     // Map
     Size m_mapViewPort{ 8,6 };
