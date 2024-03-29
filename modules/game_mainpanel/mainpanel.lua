@@ -24,7 +24,7 @@ function reloadMainPanelSizes()
     local main = modules.game_interface.getMainRightPanel()
     local rightPanel = modules.game_interface.getRightPanel()
 
-    if not (main) or not (rightPanel) then
+    if not main or not rightPanel then
         return
     end
 
@@ -37,25 +37,26 @@ function reloadMainPanelSizes()
 
                 if panel:getId() == 'mainoptionspanel' and panel:isOn() then
                     local currentOptionsAmount = math.ceil(optionsAmount / 5)
-                    local currentSpecialsAmount = math.ceil(specialsAmount / 2)
-                    local currentStoreAmount = math.ceil(storeAmount / 1)
                     local optionsHeight = (currentOptionsAmount * 28) + 3
+                    local currentSpecialsAmount = math.ceil(specialsAmount / 2)
                     local specialsHeight = (currentSpecialsAmount * 28) + 3
-                    local storeHeight = (currentStoreAmount * 20) + 3
-                    panel.onPanel.options:setHeight(optionsHeight)
-                    panel.onPanel.specials:setHeight(specialsHeight)
-                    panel.onPanel.store:setHeight(storeHeight)
-                    local maxPanelHeight = math.max(optionsHeight, specialsHeight, storeHeight)
-                    panel:setHeight(panel:getHeight() + maxPanelHeight)
 
-                    if storeAmount < 2 then
-                        height = height + maxPanelHeight
-                    else
-                        height = height + maxPanelHeight + 15
+                    local maxPanelHeight = math.max(optionsHeight, specialsHeight)
+
+                    if storeAmount > 1 then
+                        local currentStoreAmount = math.ceil(storeAmount / 1)
+                        local storeHeight = (currentStoreAmount * 20) + 3
+                        panel.onPanel.store:setHeight(storeHeight)
+                        maxPanelHeight = math.max(maxPanelHeight, storeHeight)
                     end
 
-                end
+                    panel:setHeight(panel:getHeight() + maxPanelHeight)
 
+                    height = height + maxPanelHeight
+                    if storeAmount >= 2 then
+                        height = height + 15
+                    end
+                end
             else
                 panel:setHeight(0)
             end
