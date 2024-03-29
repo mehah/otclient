@@ -366,7 +366,6 @@ function addLeftGameToggleButton(id, description, icon, callback, front)
         return modules.game_mainpanel.addSpecialToggleButton(id, description, icon, callback, front)
 
     end
-    --   return addButton(id, description, icon, callback, leftButtonsPanel, true, front)
 end
 
 function addRightGameButton(id, description, icon, callback, front)

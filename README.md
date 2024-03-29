@@ -51,6 +51,8 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 - [ ] Adapt the v8 game_actionbar with vertical and horizontal panels. (closer to Tibia 13), with options in client_options.
 - [ ] **game_mainPanel** Create a function in C++ of **g_game onChangeWorldTime** for minimap.
 - [ ] **statsbar** if you set to "hide" , close and open the client. the "compact" statsbar is displayed.( "hide" style bar is not saved)
+- [ ] **game_shader** offset panel combobox of shader because collides with the ping
+- [ ] **.otui** many of the windows are not draggable
 - [ ] check if there are duplicated functions, or even clean some codes
      - data/styles/ .otui (unused UI)
      - topmenu//Mainpanel incorrectly named functions and some of them repeated
@@ -637,8 +639,8 @@ There are some duplicates and others that need to have their names changed.
 | addLeftGameButton  ***  | ![image](https://github.com/Nottinghster/otclient/assets/114332266/eb6666c8-2597-448f-915c-0190db706bbc)   |
 | addLeftGameToggleButton  ***  |![image](https://github.com/Nottinghster/otclient/assets/114332266/a8eb6714-cf9c-4d76-81a4-ed9547402d08)  |
 | addRightGameButton  ***  | ![image](https://github.com/Nottinghster/otclient/assets/114332266/c7bab85c-86f2-4ead-b23f-b141723729ba)  |
-| addRightGameToggleButton ** *  | ![image](https://github.com/Nottinghster/otclient/assets/114332266/af39b255-7afb-4142-8ed5-c143ac6f6237)  |
-
+| addRightGameToggleButton ***  | ![image](https://github.com/Nottinghster/otclient/assets/114332266/af39b255-7afb-4142-8ed5-c143ac6f6237)  |
+| addStoreButton | ![image](https://github.com/Nottinghster/otclient/assets/114332266/e597d6a6-740e-470b-801c-edf3ebce2168)  |
 **is intended to eliminate 2
 
 *** for backward compatibility, it is retained

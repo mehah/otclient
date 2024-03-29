@@ -10,15 +10,19 @@ PhantomMiniWindow
     margin-top: 8
     phantom: true
 
-    Button
+    UIWidget
       id: store
-      image-source: /images/options/store_large
+
       image-clip: 0 0 108 20
       anchors.top: parent.top
       anchors.left: parent.left
-      margin-left: 8
-      size: 108 20
 
+      size: 108 20
+      layout:
+        type: verticalBox
+        cell-size: 108 20
+        cell-spacing: 2
+        flow: true
       $pressed !disabled:
         image-clip: 0 20 108 20
 
@@ -40,15 +44,21 @@ PhantomMiniWindow
     margin-top: 8
     phantom: true
 
-    Button
+    UIWidget
       id: store
-      image-source: /images/options/store_large
+
       image-clip: 0 0 108 20
       anchors.top: parent.top
       anchors.left: parent.left
       margin-left: 8
       size: 108 20
-
+      phantom: true
+      layout:
+        type: verticalBox
+        cell-size: 108 20
+        cell-spacing: 2
+        flow: true
+		
       $pressed !disabled:
         image-clip: 0 20 108 20
 

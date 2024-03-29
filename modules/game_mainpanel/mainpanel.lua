@@ -16,6 +16,8 @@ local standModeBox
 local chaseModeBox
 local optionsAmount = 0
 local specialsAmount = 0
+local storeAmount = 0
+
 local chaseModeRadioGroup
 
 function reloadMainPanelSizes()
@@ -36,12 +38,24 @@ function reloadMainPanelSizes()
                 if panel:getId() == 'mainoptionspanel' and panel:isOn() then
                     local currentOptionsAmount = math.ceil(optionsAmount / 5)
                     local currentSpecialsAmount = math.ceil(specialsAmount / 2)
-                    local buttonsHeight = (math.max(currentOptionsAmount, currentSpecialsAmount) * 28) + 3
-                    panel.onPanel.options:setHeight(buttonsHeight)
-                    panel.onPanel.specials:setHeight(buttonsHeight)
-                    panel:setHeight(panel:getHeight() + buttonsHeight)
-                    height = height + buttonsHeight
+                    local currentStoreAmount = math.ceil(storeAmount / 1)
+                    local optionsHeight = (currentOptionsAmount * 28) + 3
+                    local specialsHeight = (currentSpecialsAmount * 28) + 3
+                    local storeHeight = (currentStoreAmount * 20) + 3
+                    panel.onPanel.options:setHeight(optionsHeight)
+                    panel.onPanel.specials:setHeight(specialsHeight)
+                    panel.onPanel.store:setHeight(storeHeight)
+                    local maxPanelHeight = math.max(optionsHeight, specialsHeight, storeHeight)
+                    panel:setHeight(panel:getHeight() + maxPanelHeight)
+
+                    if storeAmount < 2 then
+                        height = height + maxPanelHeight
+                    else
+                        height = height + maxPanelHeight + 15
+                    end
+
                 end
+
             else
                 panel:setHeight(0)
             end
@@ -65,6 +79,35 @@ local function refreshOptionsSizes()
         optionsController.ui.offPanel:hide()
     end
     reloadMainPanelSizes()
+end
+
+local function createButton_large(id, description, image, callback, special, front)
+    -- fast version
+    local panel = optionsController.ui.onPanel.store
+
+    storeAmount = storeAmount + 1
+
+    local button = panel:getChildById(id)
+    if not button then
+        button = g_ui.createWidget('largeToggleButton')
+        if front then
+            panel:insertChild(1, button)
+        else
+            panel:addChild(button)
+        end
+    end
+    button:setId(id)
+    button:setTooltip(description)
+    button:setImageSource(image)
+    button:setImageClip('0 0 108 20')
+    button.onMouseRelease = function(widget, mousePos, mouseButton)
+        if widget:containsPoint(mousePos) and mouseButton ~= MouseMidButton then
+            callback()
+            return true
+        end
+    end
+
+    return button
 end
 
 local function createButton(id, description, image, callback, special, front)
@@ -134,6 +177,11 @@ end
 
 function addSpecialToggleButton(id, description, image, callback, front)
     return createButton(id, description, image, callback, true, front)
+end
+
+function addStoreButton(id, description, image, callback, front)
+    -- fast version
+    return createButton_large(id, description, image, callback, true, front)
 end
 -- @ End of Options
 
