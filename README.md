@@ -9,8 +9,8 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 ## Screenshots
 
 ![image](https://github.com/Nottinghster/otclient/assets/114332266/e15b7533-4a85-44f9-b9f9-9c0430411332)
-![image](https://github.com/Nottinghster/otclient/assets/114332266/5ec61647-1099-4511-aca5-a351d4cc4f93)
-
+![1](https://github.com/Nottinghster/otclient/assets/7372287/2b722f7e-b2b6-44f8-9893-9c6a1a77ee69)
+![GIF 29-03-2024 11-16-44](https://github.com/Nottinghster/otclient/assets/7372287/b7160f27-57c8-428f-a06e-d9e0610699af)
 
 
 
