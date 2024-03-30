@@ -2931,11 +2931,7 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
         msg->getU8(); // mark
     }
 
-    if (item->isStackable()) {
-        item->setCountOrSubType(g_game.getFeature(Otc::GameCountU16) ? msg->getU16() : msg->getU8());
-    }
-
-    if (item->isFluidContainer() || item->isSplash() || item->isChargeable()) {
+    if (item->isStackable() || item->isFluidContainer() || item->isSplash() || item->isChargeable()) {
         item->setCountOrSubType(g_game.getFeature(Otc::GameCountU16) ? msg->getU16() : msg->getU8());
     }
 
