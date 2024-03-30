@@ -11,6 +11,7 @@ $requestType = $data->type;
 // TOP MENU function EnterGame.postCacheInfo()
 
 if ($requestType === 'cacheinfo') {
+    if (version_compare(phpversion(), '8.2', '>=')) {
     try {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, "https://otarchive.com/server/62cde2f41770eac22ec6ad19");
@@ -43,6 +44,12 @@ if ($requestType === 'cacheinfo') {
         }
         $playersOnline = $matches[1];
     } catch(Exception $e) {}
+} else {
+ 
+    $playersOnline = 0;
+}
+
+
     $online_discord = 0;
     try {
         $online_discord = json_decode(file_get_contents("https://discordapp.com/api/guilds/628769144925585428/widget.json"))->presence_count;
@@ -101,9 +108,9 @@ elseif ($requestType === 'showoff') {
 
 
     $response = array(
-        "image" => "https://raw.githubusercontent.com/mehah/otclient/main/data/images/clienticon.png", // URL de la imagen
-        "title" => "OTClient - Redemption", // Título del dato
-        "description" => "Otclient is an alternative Tibia client for usage with otserv. It aims to be complete and flexible, for that it uses LUA scripting for all game interface functionality and configurations files with a syntax similar to CSS for the client interface design." // Descripción del dato
+        "image" => "https://raw.githubusercontent.com/mehah/otclient/main/data/images/clienticon.png",
+        "title" => "OTClient - Redemption", 
+        "description" => "Otclient is an alternative Tibia client for usage with otserv. It aims to be complete and flexible, for that it uses LUA scripting for all game interface functionality and configurations files with a syntax similar to CSS for the client interface design." 
     );
     echo json_encode($response);
 
@@ -123,7 +130,7 @@ elseif ($requestType === 'showoff') {
     );
     echo json_encode($response);
 } else {
-    http_response_code(500); 
+    http_response_code(504); 
 }
 ?>
 

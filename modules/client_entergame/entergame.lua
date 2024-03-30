@@ -257,20 +257,23 @@ function EnterGame.postCacheInfo()
     local onRecvInfo = function(message, err)
 
         if err then
-            onError(nil, 'Bad Request. Game_entergame postCacheInfo1 ', 400)
+            --onError(nil, 'Bad Request. Game_entergame postCacheInfo1 ', 400)
+            g_logger.warning("[Webscraping] " .. "Bad Request. Game_entergame postCacheInfo1")
             return
         end
 
         local _, bodyStart = message:find('{')
         local _, bodyEnd = message:find('.*}')
         if not bodyStart or not bodyEnd then
-            onError(nil, 'Bad Request.Game_entergame postCacheInfo2', 400)
+            g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postCacheInfo2")
+            --onError(nil, 'Bad Request.Game_entergame postCacheInfo2', 400)
             return
         end
 
         local response = json.decode(message:sub(bodyStart, bodyEnd))
         if response.errorMessage then
-            onError(nil, response.errorMessage, response.errorCode)
+            g_logger.warning("[Webscraping] " .. response.errorMessage, response.errorCode)
+           -- onError(nil, response.errorMessage, response.errorCode)
             return
         end
 
@@ -291,20 +294,23 @@ end
 function EnterGame.postEventScheduler()
     local onRecvInfo = function(message, err)
         if err then
-            onError(nil, 'Bad Request. Game_entergame postEventScheduler1', 400)
+            --onError(nil, 'Bad Request. Game_entergame postEventScheduler1', 400)
+            g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postEventScheduler1")
             return
         end
 
         local _, bodyStart = message:find('{')
         local _, bodyEnd = message:find('.*}')
         if not bodyStart or not bodyEnd then
-            onError(nil, 'Bad Request. Game_entergame postEventScheduler2', 400)
+           -- onError(nil, 'Bad Request. Game_entergame postEventScheduler2', 400)
+            g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postEventScheduler2")
             return
         end
 
         local response = json.decode(message:sub(bodyStart, bodyEnd))
         if response.errorMessage then
-            onError(nil, response.errorMessage, response.errorCode)
+           -- onError(nil, response.errorMessage, response.errorCode)
+           g_logger.warning("[Webscraping] " .. "response.errorMessage,response.errorCode")
             return
         end
 
@@ -320,20 +326,23 @@ end
 function EnterGame.postShowOff()
     local onRecvInfo = function(message, err)
         if err then
-            onError(nil, 'Bad Request. 1 Game_entergame postShowOff', 400)
+          --  onError(nil, 'Bad Request. 1 Game_entergame postShowOff', 400)
+          g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postShowOff")
             return
         end
 
         local _, bodyStart = message:find('{')
         local _, bodyEnd = message:find('.*}')
         if not bodyStart or not bodyEnd then
-            onError(nil, 'Bad Request. 2 Game_entergame postShowOff', 400)
+           -- onError(nil, 'Bad Request. 2 Game_entergame postShowOff', 400)
+           g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postShowOff")
             return
         end
 
         local response = json.decode(message:sub(bodyStart, bodyEnd))
         if response.errorMessage then
-            onError(nil, response.errorMessage, response.errorCode)
+           -- onError(nil, response.errorMessage, response.errorCode)
+           g_logger.warning("[Webscraping] " .. response.errorMessage, response.errorCode)
             return
         end
 
@@ -348,20 +357,23 @@ end
 function EnterGame.postShowCreatureBoost()
     local onRecvInfo = function(message, err)
         if err then
-            onError(nil, 'Bad Request. 1 Game_entergame postShowCreatureBoost', 400)
+           -- onError(nil, 'Bad Request. 1 Game_entergame postShowCreatureBoost', 400)
+            g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postShowCreatureBoost1")
             return
         end
 
         local _, bodyStart = message:find('{')
         local _, bodyEnd = message:find('.*}')
         if not bodyStart or not bodyEnd then
-            onError(nil, 'Bad Request. 2 Game_entergame postShowCreatureBoost', 400)
+            g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postShowCreatureBoost2")
+           -- onError(nil, 'Bad Request. 2 Game_entergame postShowCreatureBoost', 400)
             return
         end
 
         local response = json.decode(message:sub(bodyStart, bodyEnd))
         if response.errorMessage then
-            onError(nil, response.errorMessage, response.errorCode)
+            g_logger.warning("[Webscraping] " .. response.errorMessage, response.errorCode)
+            --onError(nil, response.errorMessage, response.errorCode)
             return
         end
 
