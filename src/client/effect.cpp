@@ -54,12 +54,16 @@ void Effect::draw(const Point& dest, bool drawThings, LightView* lightView)
         animationPhase = std::min<int>(static_cast<int>(m_animationTimer.ticksElapsed() / ticks), getAnimationPhases() - 1);
     }
 
-    int xPattern = m_numPatternX;
-    int yPattern = m_numPatternY;
-    if (g_game.getFeature(Otc::GameMapOldEffectRendering)) {
-        const int offsetX = m_position.x - g_map.getCentralPosition().x;
-        const int offsetY = m_position.y - g_map.getCentralPosition().y;
+    const int offsetX = m_position.x - g_map.getCentralPosition().x;
+    const int offsetY = m_position.y - g_map.getCentralPosition().y;
 
+    int xPattern = unsigned(offsetX) % getNumPatternX();
+    xPattern = 1 - xPattern - getNumPatternX();
+    if (xPattern < 0) xPattern += getNumPatternX();
+
+    int yPattern = unsigned(offsetY) % getNumPatternY();
+
+    if (g_game.getFeature(Otc::GameMapOldEffectRendering)) {
         xPattern = offsetX % getNumPatternX();
         if (xPattern < 0)
             xPattern += getNumPatternX();
