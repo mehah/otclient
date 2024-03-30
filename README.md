@@ -604,7 +604,11 @@ in your
 `C:/UniServerZ/www/api/`
 
 
+if not work try ,active **curl**:
 
+![image](https://github.com/Nottinghster/otclient/assets/114332266/99ad2ce7-d70f-47f4-aa19-083140fb5814)
+
+![image](https://github.com/Nottinghster/otclient/assets/114332266/84349388-a458-4eb5-b1d6-cce5693cfd5a)
 
 ### **7.- where do I edit this?**
 ![image](https://github.com/Nottinghster/otclient/assets/114332266/346fb845-7441-45c2-ac49-f11b2bf8535a)
