@@ -112,6 +112,19 @@ local function onUpdateNeeded(protocol, signature)
     end
 end
 
+local function update_label_text()
+    if enterGame:getChildById('clientComboBox') and tonumber(enterGame:getChildById('clientComboBox'):getText()) > 1080 then
+        enterGame:setText("Journey Onwards")
+        enterGame:getChildById('emailLabel'):setText("Email:")
+        enterGame:getChildById('rememberEmailBox'):setText("Remember Email:")
+    else
+        enterGame:setText("Enter Game")
+        enterGame:getChildById('emailLabel'):setText("Acc Name:")
+        enterGame:getChildById('rememberEmailBox'):setText("Remember password:")
+    end
+
+end
+
 -- public functions
 function EnterGame.init()
     enterGame = g_ui.displayUI('entergame')
@@ -164,12 +177,28 @@ function EnterGame.init()
         end
     end
     clientBox:setCurrentOption(clientVersion)
-
-    EnterGame.toggleAuthenticatorToken(clientVersion, true)
-    EnterGame.toggleStayLoggedBox(clientVersion, true)
     connect(clientBox, {
         onOptionChange = EnterGame.onClientVersionChange
     })
+
+    if Servers_init then
+
+        if table.size(Servers_init) == 1 then
+       
+            local host_init, values_init = next(Servers_init)
+            EnterGame.setUniqueServer(host_init, values_init.port, values_init.protocol)
+            EnterGame.setHttpLogin(values_init.httpLogin)
+        elseif (host == nil or host == "") then
+            local host_init, values_init = next(Servers_init)
+            EnterGame.setDefaultServer(host_init, values_init.port, values_init.protocol)
+            EnterGame.setHttpLogin(values_init.httpLogin)
+
+        end
+    else
+        EnterGame.toggleAuthenticatorToken(clientVersion, true)
+        EnterGame.toggleStayLoggedBox(clientVersion, true)
+    end
+    update_label_text()
 
     enterGame:hide()
 
@@ -257,7 +286,7 @@ function EnterGame.postCacheInfo()
     local onRecvInfo = function(message, err)
 
         if err then
-            --onError(nil, 'Bad Request. Game_entergame postCacheInfo1 ', 400)
+            -- onError(nil, 'Bad Request. Game_entergame postCacheInfo1 ', 400)
             g_logger.warning("[Webscraping] " .. "Bad Request. Game_entergame postCacheInfo1")
             return
         end
@@ -266,14 +295,14 @@ function EnterGame.postCacheInfo()
         local _, bodyEnd = message:find('.*}')
         if not bodyStart or not bodyEnd then
             g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postCacheInfo2")
-            --onError(nil, 'Bad Request.Game_entergame postCacheInfo2', 400)
+            -- onError(nil, 'Bad Request.Game_entergame postCacheInfo2', 400)
             return
         end
 
         local response = json.decode(message:sub(bodyStart, bodyEnd))
         if response.errorMessage then
             g_logger.warning("[Webscraping] " .. response.errorMessage, response.errorCode)
-           -- onError(nil, response.errorMessage, response.errorCode)
+            -- onError(nil, response.errorMessage, response.errorCode)
             return
         end
 
@@ -294,7 +323,7 @@ end
 function EnterGame.postEventScheduler()
     local onRecvInfo = function(message, err)
         if err then
-            --onError(nil, 'Bad Request. Game_entergame postEventScheduler1', 400)
+            -- onError(nil, 'Bad Request. Game_entergame postEventScheduler1', 400)
             g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postEventScheduler1")
             return
         end
@@ -302,15 +331,15 @@ function EnterGame.postEventScheduler()
         local _, bodyStart = message:find('{')
         local _, bodyEnd = message:find('.*}')
         if not bodyStart or not bodyEnd then
-           -- onError(nil, 'Bad Request. Game_entergame postEventScheduler2', 400)
+            -- onError(nil, 'Bad Request. Game_entergame postEventScheduler2', 400)
             g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postEventScheduler2")
             return
         end
 
         local response = json.decode(message:sub(bodyStart, bodyEnd))
         if response.errorMessage then
-           -- onError(nil, response.errorMessage, response.errorCode)
-           g_logger.warning("[Webscraping] " .. "response.errorMessage,response.errorCode")
+            -- onError(nil, response.errorMessage, response.errorCode)
+            g_logger.warning("[Webscraping] " .. "response.errorMessage,response.errorCode")
             return
         end
 
@@ -326,23 +355,23 @@ end
 function EnterGame.postShowOff()
     local onRecvInfo = function(message, err)
         if err then
-          --  onError(nil, 'Bad Request. 1 Game_entergame postShowOff', 400)
-          g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postShowOff")
+            --  onError(nil, 'Bad Request. 1 Game_entergame postShowOff', 400)
+            g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postShowOff")
             return
         end
 
         local _, bodyStart = message:find('{')
         local _, bodyEnd = message:find('.*}')
         if not bodyStart or not bodyEnd then
-           -- onError(nil, 'Bad Request. 2 Game_entergame postShowOff', 400)
-           g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postShowOff")
+            -- onError(nil, 'Bad Request. 2 Game_entergame postShowOff', 400)
+            g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postShowOff")
             return
         end
 
         local response = json.decode(message:sub(bodyStart, bodyEnd))
         if response.errorMessage then
-           -- onError(nil, response.errorMessage, response.errorCode)
-           g_logger.warning("[Webscraping] " .. response.errorMessage, response.errorCode)
+            -- onError(nil, response.errorMessage, response.errorCode)
+            g_logger.warning("[Webscraping] " .. response.errorMessage, response.errorCode)
             return
         end
 
@@ -357,7 +386,7 @@ end
 function EnterGame.postShowCreatureBoost()
     local onRecvInfo = function(message, err)
         if err then
-           -- onError(nil, 'Bad Request. 1 Game_entergame postShowCreatureBoost', 400)
+            -- onError(nil, 'Bad Request. 1 Game_entergame postShowCreatureBoost', 400)
             g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postShowCreatureBoost1")
             return
         end
@@ -366,14 +395,14 @@ function EnterGame.postShowCreatureBoost()
         local _, bodyEnd = message:find('.*}')
         if not bodyStart or not bodyEnd then
             g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postShowCreatureBoost2")
-           -- onError(nil, 'Bad Request. 2 Game_entergame postShowCreatureBoost', 400)
+            -- onError(nil, 'Bad Request. 2 Game_entergame postShowCreatureBoost', 400)
             return
         end
 
         local response = json.decode(message:sub(bodyStart, bodyEnd))
         if response.errorMessage then
             g_logger.warning("[Webscraping] " .. response.errorMessage, response.errorCode)
-            --onError(nil, response.errorMessage, response.errorCode)
+            -- onError(nil, response.errorMessage, response.errorCode)
             return
         end
 
@@ -440,6 +469,9 @@ function EnterGame.clearAccountFields()
 end
 
 function EnterGame.toggleAuthenticatorToken(clientVersion, init)
+    if not enterGame.disableToken then
+        return
+    end
     local enabled = (clientVersion >= 1072)
     if enabled == enterGame.authenticatorEnabled then
         return
@@ -469,6 +501,9 @@ function EnterGame.toggleAuthenticatorToken(clientVersion, init)
 end
 
 function EnterGame.toggleStayLoggedBox(clientVersion, init)
+if not enterGame.disableToken then
+    return
+end
     local enabled = (clientVersion >= 1074)
     if enabled == enterGame.stayLoggedBoxEnabled then
         return
@@ -500,6 +535,7 @@ function EnterGame.onClientVersionChange(comboBox, text, data)
     local clientVersion = tonumber(text)
     EnterGame.toggleAuthenticatorToken(clientVersion)
     EnterGame.toggleStayLoggedBox(clientVersion)
+    update_label_text()
 end
 
 function EnterGame.tryHttpLogin(clientVersion, httpLogin)
@@ -728,7 +764,7 @@ function EnterGame.setUniqueServer(host, port, protocol, windowWidth, windowHeig
     stayLoggedBox:setChecked(false)
     stayLoggedBox:setOn(false)
 
-    clientBox:setCurrentOption(protocol)
+    clientBox:setCurrentOption(tonumber(protocol))
     clientBox:setVisible(false)
     clientBox:setHeight(0)
 
@@ -758,9 +794,11 @@ function EnterGame.setUniqueServer(host, port, protocol, windowWidth, windowHeig
     end
     enterGame:setWidth(windowWidth)
     if not windowHeight then
-        windowHeight = 200
+        windowHeight = 210
     end
+
     enterGame:setHeight(windowHeight)
+    enterGame.disableToken = true
 end
 
 function EnterGame.setServerInfo(message)
