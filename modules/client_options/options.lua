@@ -68,6 +68,10 @@ local crosshairCombobox
 local antialiasingModeCombobox
 local floorViewModeCombobox
 
+-- @ Note: kokekanon delete this, before the murge
+local repareEvent
+local executedRepair = false
+-- @
 function init()
     for k, v in pairs(defaultOptions) do
         g_settings.setDefault(k, v)
@@ -118,6 +122,12 @@ function terminate()
     optionsWindow:destroy()
     optionsButton:destroy()
     audioButton:destroy()
+    -- @ Note: kokekanon delete this, before the murge
+    if repareEvent then
+        removeEvent(repareEvent)
+        repareEvent = nil
+    end
+    -- @ 
 end
 
 function setupOptionsMainButton()
@@ -426,3 +436,22 @@ end
 function addButton(name, func, icon)
     optionsTabBar:addButton(name, func, icon)
 end
+
+-- @ Note: kokekanon delete this, before the murge
+function repairClient()
+    if executedRepair then
+        return
+    end
+
+    g_settings.clearCache()
+--[[     if repareEvent then
+        removeEvent(repareEvent)
+        repareEvent = nil
+    end ]]
+    repareEvent = scheduleEvent(function()
+        g_app.restart()
+    end, 1000)
+
+    executedRepair = true
+end
+-- @

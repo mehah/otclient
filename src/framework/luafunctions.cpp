@@ -269,7 +269,9 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Config>("getOrCreateNode", &Config::getOrCreateNode);
     g_lua.bindClassMemberFunction<Config>("mergeNode", &Config::mergeNode);
     g_lua.bindClassMemberFunction<Config>("getFileName", &Config::getFileName);
-
+    // NOTE kokekanon : DELETE THIS only for testing purposes
+    g_lua.bindClassMemberFunction<Config>("clearCache", &Config::clear2);
+    //
     // Module
     g_lua.registerClass<Module>();
     g_lua.bindClassMemberFunction<Module>("load", &Module::load);
