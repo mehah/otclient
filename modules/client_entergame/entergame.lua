@@ -267,7 +267,11 @@ function EnterGame.setPassword(password)
 end
 
 function EnterGame.setHttpLogin(httpLogin)
-  enterGame:getChildById('httpLoginBox'):setChecked(#httpLogin > 0)
+    if type(httpLogin) == "boolean" then
+        enterGame:getChildById('httpLoginBox'):setChecked(httpLogin)
+    else
+        enterGame:getChildById('httpLoginBox'):setChecked(#httpLogin > 0)
+    end
 end
 
 function EnterGame.clearAccountFields()
