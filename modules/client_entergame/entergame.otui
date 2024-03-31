@@ -1,7 +1,7 @@
 EnterGameWindow < MainWindow
   !text: tr('Enter Game')
   size: 236 316
-  draggable: false
+
 
 EnterGameButton < Button
   width: 64
@@ -26,12 +26,10 @@ EnterGameWindow
   &authenticatorHeight: 44
   &stayLoggedBoxEnabled: false
   &stayLoggedBoxHeight: 24
+  &disableToken : false
   size: 280 302
   @onEnter: EnterGame.doLogin()
-  @onSetup: |
-    if g_game.getFeature(GameEnterGameShowAppearance) then
-      self:setText("Journey Onwards")
-    end
+
 
 
   Label
@@ -41,10 +39,7 @@ EnterGameWindow
     anchors.top: parent.top
 
     opacity: 0.8
-    @onSetup: |
-      if g_game.getFeature(GameEnterGameShowAppearance) then
-        self:setText("Email:")
-      end
+
       
   Label
     id: passwordLabel
@@ -79,11 +74,7 @@ EnterGameWindow
     @onCheckChange: |
       self:getParent():getChildById('autoLoginBox'):setEnabled(self:isChecked())
       self:getParent():getChildById('rememberEmailTip'):setOn(self:isChecked())
-    @onSetup: |
-      if g_game.getFeature(GameEnterGameShowAppearance) then
-        self:setText("Remember Email:")
-      end	  
-      
+
   UIWidget
     id: rememberEmailTip
     image-source: /images/icons/show_gui_help_grey
@@ -142,7 +133,7 @@ EnterGameWindow
       visible: true
       margin-top: 2
 
-  CheckBox
+  QtCheckBox
     id: stayLoggedBox
     !text: tr('Stay logged during session')
     anchors.left: parent.left
