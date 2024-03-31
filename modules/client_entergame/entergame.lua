@@ -422,7 +422,12 @@ function EnterGame.setPassword(password)
 end
 
 function EnterGame.setHttpLogin(httpLogin)
-    enterGame:getChildById('httpLoginBox'):setChecked(#httpLogin > 0)
+    -- NOTE: kokekanon -> temporary solution https://github.com/mehah/otclient/pull/647#issuecomment-2010499773
+    if type(httpLogin) == "boolean" then
+        enterGame:getChildById('httpLoginBox'):setChecked(httpLogin)
+    else
+        enterGame:getChildById('httpLoginBox'):setChecked(#httpLogin > 0)
+    end
 end
 
 function EnterGame.clearAccountFields()
@@ -525,9 +530,13 @@ function EnterGame.tryHttpLogin(clientVersion, httpLogin)
     else
         path = '/' .. path
     end
+    if not host then
+        loadBox = displayCancelBox(tr('Please wait'), tr('ERROR , try adding \n- ip/login.php \n- Enable HTTP login'))
+    else
+        loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to login server...\nServer: [%s]',
+            host .. ":" .. tostring(G.port) .. path))
+    end
 
-    loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to login server...\nServer: [%s]',
-        host .. ":" .. tostring(G.port) .. path))
     connect(loadBox, {
         onCancel = function(msgbox)
             loadBox = nil
