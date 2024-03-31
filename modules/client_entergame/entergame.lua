@@ -498,7 +498,13 @@ function EnterGame.doLogin()
     protocolLogin.onCharacterList = onCharacterList
     protocolLogin.onUpdateNeeded = onUpdateNeeded
 
-    loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to login server...'))
+    if not host then
+        loadBox = displayCancelBox(tr('Please wait'), tr('ERROR , try adding \n- ip/login.php \n- Enable HTTP login'))
+    else
+        loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to login server...\nServer: [%s]',
+            host .. ":" .. tostring(G.port) .. path))
+    end
+    
     connect(loadBox, {
       onCancel = function(msgbox)
         loadBox = nil
