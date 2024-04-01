@@ -43,9 +43,9 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 - [x]  **Game_mainpanel**  To make use of the store button. (button below the inventory) [b52f153](https://github.com/Nottinghster/otclient/commit/b52f15386c3a1fbca2b5760ae6aae0bcef0e5a47) - [ae44616](https://github.com/Nottinghster/otclient/commit/ae44616702a181e89dad9e04ca61b627d6d1ad46) - [0b38a12](https://github.com/Nottinghster/otclient/commit/0b38a12438d5d2cebb6529d4de023c049d29f247)
 - [x] **game_shader** offset panel combobox of shader because collides with the ping []()
 - [x] **game_container** container like tibia 13. [71ee1a8](https://github.com/Nottinghster/otclient/commit/71ee1a8bdf25ab713656fd3ad28673d094f22a0c)
+- [x] **Statsbar//Game_mainpanel** Bug states onStatesChange bug [f82f2f0](https://github.com/Nottinghster/otclient/commit/f82f2f0df58c6944714a3670429e1d99ee1fc1b2)
 ------------
 **in process**
-- [ ] **Statsbar//Game_mainpanel** Bug states onStatesChange bug
 - [ ] **Game_mainpanel//minimap** bug: minimap .white cross out of bounds [#15](https://github.com/Nottinghster/otclient/issues/15)
 - [ ] **Game_mainpanel//game_interface** incorrect g_game.getClientVersion() .lua .otui [#13](https://github.com/Nottinghster/otclient/issues/13)
 - [ ] **Game_mainpanel//game_interface mode(2)** compatibility with extended view  [#7](https://github.com/Nottinghster/otclient/issues/7)
