@@ -136,7 +136,7 @@ function setupOptionsMainButton()
     end
 
     optionsButtons = modules.game_mainpanel.addSpecialToggleButton('optionsMainButton', tr('Options'),
-                                                                   '/images/options/button_options', toggle)
+                                                                   '/images/options/button_options', toggle,true)
 end
 
 function setupComboBox()

@@ -1330,7 +1330,7 @@ function setupOptionsMainButton()
     end
 
     logOutMainButton = modules.game_mainpanel.addSpecialToggleButton('logoutButton', tr('Exit'), '/images/options/button_logout',
-    tryLogout, true)
+    tryLogout)
 end
 
 function checkAndOpenLeftPanel()
