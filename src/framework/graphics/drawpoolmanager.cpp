@@ -163,7 +163,7 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     select(type);
     const auto pool = getCurrentPool();
 
-    if (pool->hasFrameBuffer() && pool->m_repaint.load())
+    if (pool->m_repaint.load())
         return;
 
     pool->resetState();
@@ -190,6 +190,8 @@ bool DrawPoolManager::drawPool(DrawPool* pool) {
         return false;
 
     if (!pool->hasFrameBuffer()) {
+        pool->m_repaint.store(false);
+
         for (const auto& obj : pool->m_objectsDraw) {
             drawObject(obj);
         }
