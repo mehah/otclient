@@ -448,7 +448,8 @@ function inventoryController:onInit()
 end
 
 function inventoryController:onTerminate()
-    --- important
+    inventoryControllerEvents:disconnect()
+    inventoryControllerEvents_game:disconnect()
 end
 
 function inventoryController:onGameStart()

@@ -193,18 +193,10 @@ end
 function StatsBar.reloadCurrentStatsBarQuickInfo_state(localPlayer, now, old)
     local player = g_game.getLocalPlayer()
     if not player then
-
         return
     end
 
-											 
-				   
-
-			  
-	   
-
     if now == old then
-
         return
     end
 
@@ -440,12 +432,7 @@ local function onStatsMousePress(tab, mousePos, mouseButton)
     end
 end
 
-function StatsBar.reloadCurrentTab()
-										  
-										
-																					
-
-	   
+function StatsBar.reloadCurrentTab() 
     if currentStats.placement == 'top' then
         if currentStats.dimension == 'large' then
             return constructLargeOnTop()
@@ -468,12 +455,7 @@ function StatsBar.setStatsBarOption(dimension, placement)
     g_settings.set('top_statsbar_dimension', currentStats.dimension)
     g_settings.set('top_statsbar_placement', currentStats.placement)
 
-    if dimension ~= "hide" then
-															 
-																							  
-											   
-												  
-							   
+    if dimension ~= "hide" then 
         StatsBar.reloadCurrentTab()
     end
 
@@ -482,7 +464,7 @@ end
 function StatsBar.OnGameEnd()
     g_settings.set('top_statsbar_dimension', currentStats.dimension)
     g_settings.set('top_statsbar_placement', currentStats.placement)
-														 
+
     StatsBar.hideAll()
 
     modules.game_mainpanel.getIconsPanelOn():destroyChildren()
