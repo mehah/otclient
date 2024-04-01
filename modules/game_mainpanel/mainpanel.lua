@@ -341,12 +341,12 @@ local function onFreeCapacityChange(player, freeCapacity)
     if not freeCapacity then
         return
     end
-    if freeCapacity > 99 then
-        freeCapacity = math.floor(freeCapacity * 10) / 10
+    if freeCapacity > 99999 then
+        freeCapacity = math.min(9999, math.floor(freeCapacity / 1000)) .. "k"
     elseif freeCapacity > 999 then
         freeCapacity = math.floor(freeCapacity)
-    elseif freeCapacity > 99999 then
-        freeCapacity = math.min(9999, math.floor(freeCapacity / 1000)) .. "k"
+    elseif freeCapacity > 99 then
+        freeCapacity = math.floor(freeCapacity * 10) / 10
     end
     local ui = getInventoryUi()
     if ui.capacityPanel and ui.capacityPanel.capacity then
@@ -365,11 +365,16 @@ function getIconsPanelOff()
 end
 
 local function refreshInventory_panel()
+    local player = g_game.getLocalPlayer()
+    if player then
+        onSoulChange(player, player:getSoul())
+        onFreeCapacityChange(player, player:getFreeCapacity())
+    end
     if inventoryShrink then
         return
     end
 
-    local player = g_game.getLocalPlayer()
+
     for i = InventorySlotFirst, InventorySlotPurse do
         if g_game.isOnline() then
             inventoryEvent(player, i, player:getInventoryItem(i))
@@ -377,10 +382,7 @@ local function refreshInventory_panel()
             inventoryEvent(player, i, nil)
         end
     end
-    if player and g_game.isOnline() then
-        onSoulChange(player, player:getSoul())
-        onFreeCapacityChange(player, player:getFreeCapacity())
-    end
+
 end
 
 local function refreshInventorySizes()
