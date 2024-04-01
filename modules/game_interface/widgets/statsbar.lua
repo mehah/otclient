@@ -17,7 +17,20 @@ local skillsTuples = {
     {skill = Skill.Sword,       key = 'sword',      icon = '/images/icons/icon_sword',       placement = 'left',     order = 4,  name = "Sword Fighting Skill"},
     {skill = Skill.Fishing,     key = 'fishing',    icon = '/images/icons/icon_fishing',     placement = 'right',    order = 4,  name = "Fishing Fighting Skill"},
 }
+
 StatsBar = {}
+local function createBlankIcon()
+    local statsBarConfigs = {statsBar.largeOnTop, statsBar.parallelOnTop, statsBar.defaultOnTop, statsBar.compactOnTop}
+    for _, statsBarConfig in ipairs(statsBarConfigs) do
+        local icon = g_ui.createWidget('ConditionWidget', statsBarConfig.icons)
+        icon:setImageSource('/images/ui/blank')
+        icon:setImageSize({
+            width = 1,
+            height = 1
+        })
+        icon:setMarginRight(-7)
+    end
+end
 
 local function reloadSkillsTab(skills, parent)
     local player = g_game.getLocalPlayer()
@@ -141,25 +154,39 @@ function StatsBar.reloadCurrentStatsBarQuickInfo()
 
 end
 
-local function loadIcon(bitChanged)
-    local icon = g_ui.createWidget('ConditionWidget', StatsBar.getCurrentStatsBar().icons)
+local function loadIcon(bitChanged, content, topmenu)
+    local icon = g_ui.createWidget('ConditionWidget', content)
     icon:setId(Icons[bitChanged].id)
     icon:setImageSource(Icons[bitChanged].path)
     icon:setTooltip(Icons[bitChanged].tooltip)
-    icon:setImageSize({width = 9, height = 9})
-    icon:setMarginTop(5)
+    icon:setImageSize({
+        width = 9,
+        height = 9
+    })
+    if topmenu then
+        icon:setMarginTop(5)
+    end
     return icon
 end
 
 local function toggleIcon(bitChanged)
-    local content = StatsBar.getCurrentStatsBar().icons
-    local icon = content:getChildById(Icons[bitChanged].id)
+    local contents = {
+        {content = statsBar.largeOnTop.icons,loadIconTransparent = true},
+        {content = statsBar.parallelOnTop.icons,loadIconTransparent = true}, 
+        {content = statsBar.defaultOnTop.icons,loadIconTransparent = true}, 
+        {content = statsBar.compactOnTop.icons, loadIconTransparent = true}, 
+        {content = modules.game_mainpanel.getIconsPanelOff()},
+        {content = modules.game_mainpanel.getIconsPanelOn()}
+    }
 
-    if icon then
-        icon:destroy()
-    else
-        icon = loadIcon(bitChanged)
-        icon:setParent(content)
+    for _, contentData in ipairs(contents) do
+        local icon = contentData.content:getChildById(Icons[bitChanged].id)
+        if icon then
+            icon:destroy()
+        else
+            icon = loadIcon(bitChanged, contentData.content, contentData.loadIconTransparent)
+            icon:setParent(contentData.content)
+        end
     end
 end
 
@@ -170,11 +197,11 @@ function StatsBar.reloadCurrentStatsBarQuickInfo_state(localPlayer, now, old)
         return
     end
 
-    local bar = StatsBar.getCurrentStatsBar()
-    if not bar then
+											 
+				   
 
-        return
-    end
+			  
+	   
 
     if now == old then
 
@@ -414,11 +441,11 @@ local function onStatsMousePress(tab, mousePos, mouseButton)
 end
 
 function StatsBar.reloadCurrentTab()
-    local player = g_game.getLocalPlayer()
-    if player and g_game.isOnline() then
-        StatsBar.reloadCurrentStatsBarQuickInfo_state(player, player:getStates(), 0)
+										  
+										
+																					
 
-    end
+	   
     if currentStats.placement == 'top' then
         if currentStats.dimension == 'large' then
             return constructLargeOnTop()
@@ -442,11 +469,11 @@ function StatsBar.setStatsBarOption(dimension, placement)
     g_settings.set('top_statsbar_placement', currentStats.placement)
 
     if dimension ~= "hide" then
-        StatsBar.getCurrentStatsBar().icons:destroyChildren()
-        local icon = g_ui.createWidget('ConditionWidget', StatsBar.getCurrentStatsBar().icons)
-        icon:setImageSource('/images/ui/blank')
-        icon:setImageSize({width = 1, height = 1})
-        icon:setMarginRight(-7)
+															 
+																							  
+											   
+												  
+							   
         StatsBar.reloadCurrentTab()
     end
 
@@ -455,8 +482,16 @@ end
 function StatsBar.OnGameEnd()
     g_settings.set('top_statsbar_dimension', currentStats.dimension)
     g_settings.set('top_statsbar_placement', currentStats.placement)
+														 
     StatsBar.hideAll()
 
+    modules.game_mainpanel.getIconsPanelOn():destroyChildren()
+    modules.game_mainpanel.getIconsPanelOff():destroyChildren()
+
+    statsBar.largeOnTop.icons:destroyChildren()
+    statsBar.parallelOnTop.icons:destroyChildren()
+    statsBar.defaultOnTop.icons:destroyChildren()
+    statsBar.compactOnTop.icons:destroyChildren()
 end
 
 function StatsBar.OnGameStart()
@@ -472,6 +507,8 @@ function StatsBar.OnGameStart()
             placement = 'top'
         }
     end
+
+    createBlankIcon()
     StatsBar.reloadCurrentTab()
     modules.game_healthcircle.setTopBarOption(currentStats.dimension, currentStats.placement)
 
@@ -520,7 +557,8 @@ function StatsBar.terminate()
         onStatesChange = StatsBar.reloadCurrentStatsBarQuickInfo_state
     })
     disconnect(g_game, {
-        onGameStart = StatsBar.OnGameStart
+        onGameStart = StatsBar.OnGameStart,
+        OnGameEnd = StatsBar.OnGameEnd
     })
     statsBar:destroy()
 end

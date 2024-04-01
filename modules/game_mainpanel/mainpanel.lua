@@ -357,62 +357,11 @@ local function onFreeCapacityChange(player, freeCapacity)
     end
 end
 
-local function loadIcon(bitChanged, parent)
-    local icon = g_ui.createWidget('ConditionWidget', parent)
-    icon:setId(Icons[bitChanged].id)
-    icon:setImageSource(Icons[bitChanged].path)
-    icon:setTooltip(Icons[bitChanged].tooltip)
-    icon:setImageSize({width = 9, height = 9})
-    return icon
+function getIconsPanelOn()
+    return inventoryController.ui.onPanel.icons
 end
-
-local function toggleIcon(bitChanged)
-    --[[
-    The logic needs improvement.
-    There are two icons, one for the minimized inventory
-    and one for the unminimized inventory. 
-    
-    ]]
-    local offPanel = inventoryController.ui.offPanel.icons
-    local onPanel = inventoryController.ui.onPanel.icons
-
-    local icon1 = offPanel:getChildById(Icons[bitChanged].id)
-    local icon2 = onPanel:getChildById(Icons[bitChanged].id)
-
-    if icon1 then
-        icon1:destroy()
-    else
-        icon1 = loadIcon(bitChanged, offPanel)
-    end
-
-    if icon2 then
-        icon2:destroy()
-    else
-        icon2 = loadIcon(bitChanged, onPanel)
-    end
-end
-
-function getIconsPanel()
-    return getInventoryUi().icons
-end
-
-function onStatesChange(localPlayer, now, old)
-    if now == old then
-        return
-    end
-
-    local bitsChanged = bit.bxor(now, old)
-    for i = 1, 32 do
-        local pow = math.pow(2, i - 1)
-        if pow > bitsChanged then
-            break
-        end
-        local bitChanged = bit.band(bitsChanged, pow)
-        if bitChanged ~= 0 then
-            toggleIcon(bitChanged)
-
-        end
-    end
+function getIconsPanelOff()
+    return inventoryController.ui.offPanel.icons
 end
 
 local function refreshInventory_panel()
@@ -431,7 +380,6 @@ local function refreshInventory_panel()
     if player and g_game.isOnline() then
         onSoulChange(player, player:getSoul())
         onFreeCapacityChange(player, player:getFreeCapacity())
-        onStatesChange(player, player:getStates(), 0)
     end
 end
 
@@ -474,8 +422,7 @@ local inventoryControllerEvents = inventoryController:addEvent(LocalPlayer, {
 
     onInventoryChange = inventoryEvent,
     onSoulChange = onSoulChange,
-    onFreeCapacityChange = onFreeCapacityChange,
-    onStatesChange = onStatesChange
+    onFreeCapacityChange = onFreeCapacityChange
 })
 local inventoryControllerEvents_game = inventoryController:addEvent(g_game, {
 
@@ -509,7 +456,6 @@ function inventoryController:onGameStart()
     inventoryControllerEvents:execute('onInventoryChange')
     inventoryControllerEvents:execute('onSoulChange')
     inventoryControllerEvents:execute('onFreeCapacityChange')
-    inventoryControllerEvents:execute('onStatesChange')
 
     inventoryControllerEvents_game:connect()
     inventoryControllerEvents_game:execute('onWalk')
@@ -590,11 +536,6 @@ function selectPvp(pvp, ignoreUpdate)
 end
 
 function changeInventorySize()
-    if not inventoryShrink then
-        inventoryController.ui.onPanel.icons:destroyChildren()
-    else
-        inventoryController.ui.offPanel.icons:destroyChildren()
-    end
     inventoryShrink = not inventoryShrink
 
     g_settings.set('mainpanel_shrink_inventory', inventoryShrink)
