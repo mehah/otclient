@@ -1300,10 +1300,15 @@ void ProtocolGame::parseCloseTrade(const InputMessagePtr&) { Game::processCloseT
 
 void ProtocolGame::parseWorldLight(const InputMessagePtr& msg)
 {
-    uint8_t intensity = msg->getU8();
-    uint8_t color = msg->getU8();
+    const auto& oldLight = g_map.getLight();
+
+    const auto intensity = msg->getU8();
+    const auto color = msg->getU8();
 
     g_map.setLight({ intensity , color });
+
+    if (oldLight.color != color || oldLight.intensity != intensity)
+        g_lua.callGlobalField("g_game", "onWorldLightChange", g_map.getLight(), oldLight);
 }
 
 void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
@@ -3428,7 +3433,7 @@ namespace {
                         break;
                 }
             }
-        }        
+        }
     }
 }
 void ProtocolGame::parseDailyReward(const InputMessagePtr& msg)
