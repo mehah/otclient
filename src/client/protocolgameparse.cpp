@@ -692,8 +692,12 @@ void ProtocolGame::parseResourceBalance(const InputMessagePtr& msg) const
 
 void ProtocolGame::parseWorldTime(const InputMessagePtr& msg)
 {
-    msg->getU8(); // hour
-    msg->getU8(); // min
+
+    const auto hour = msg->getU8();
+    const auto min = msg->getU8();
+// note: needs mehah approval
+    g_lua.callGlobalField("g_game", "onChangeWorldTime", hour, min);
+//
 }
 
 void ProtocolGame::parseStore(const InputMessagePtr& msg) const

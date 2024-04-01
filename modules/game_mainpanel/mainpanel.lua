@@ -601,7 +601,7 @@ local mapControllerEvents = mapController:addEvent(LocalPlayer, {
 
 function onChangeWorldTime(hour, minute)
     currentDayTime = {
-        h = hour,
+        h = hour % 24,
         m = minute
     }
 
@@ -697,6 +697,9 @@ end
 
 function mapController:onTerminate()
     mapControllerEvents:disconnect()
+    disconnect(g_game, {
+        onChangeWorldTime = onChangeWorldTime
+    })
 end
 
 function zoomIn()

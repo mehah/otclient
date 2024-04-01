@@ -634,6 +634,19 @@ Icons[PlayerStates.Poison] = {
 .\otclient\modules\gamelib\player.lua
 
 
+# 9 .- why does the time not work on the mini map?
+
+![image](https://github.com/Nottinghster/otclient/assets/114332266/dd15198b-28ea-433e-841e-5a917f766e09) ![image](https://github.com/Nottinghster/otclient/assets/114332266/3f5e1b3b-130d-436a-8072-6d989a001e4f)
+
+check these functions on your server
+
+old tfs: void ProtocolGame::sendWorldTime()
+
+new tfs : function Player.sendWorldTime(self, time)
+
+Canary: void ProtocolGame::sendTibiaTime(int32_t time)
+
+
 ## info
 I know there are errors in naming regarding the location, but it's RETROCOMPATIBILITY, and it's also beta.
 There are some duplicates and others that need to have their names changed.
