@@ -33,7 +33,7 @@ public:
     DrawPool* get(const DrawPoolType type) const { return m_pools[static_cast<uint8_t>(type)]; }
 
     void select(DrawPoolType type);
-    void preDraw(const DrawPoolType type, const std::function<void()>& f) { return preDraw(type, f, {}, {}); }
+    void preDraw(const DrawPoolType type, const std::function<void()>& f) { preDraw(type, f, {}, {}); }
     void preDraw(DrawPoolType type, const std::function<void()>& f, const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha);
 
     void addTexturedPoint(const TexturePtr& texture, const Point& point, const Color& color = Color::white) const
