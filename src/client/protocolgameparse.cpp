@@ -2974,13 +2974,13 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
             // 9: quick loot, 2: quiver, 4: unlooted corpse
             const uint8_t containerType = msg->getU8();
 
-			if (containerType == 9) {
-				// quick loot categories
-				msg->getU32();
-				msg->getU32();
-			} else if (containerType == 2) {
-				// quiver ammo count
-				msg->getU32();
+            if (containerType == 9) {
+                // quick loot categories
+                msg->getU32();
+                msg->getU32();
+            } else if (containerType == 2) {
+                // quiver ammo count
+                msg->getU32();
             }
 
             // corpse not looted yet
@@ -3181,8 +3181,8 @@ void ProtocolGame::parseLootContainers(const InputMessagePtr& msg)
     msg->getU8(); // quickLootFallbackToMainContainer ? 1 : 0
     const uint8_t containers = msg->getU8();
     for (int_fast32_t i = 0; i < containers; ++i) {
-		msg->getU8(); // category
-		msg->getU16(); // lootContainerId
+        msg->getU8(); // category
+        msg->getU16(); // lootContainerId
         msg->getU16(); // obtainContainerId
     }
 }
