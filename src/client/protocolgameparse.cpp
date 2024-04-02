@@ -2151,7 +2151,7 @@ void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
         case Otc::MessageExpOthers:
         {
             const auto& pos = getPosition(msg);
-            const uint64_t value = g_game.getClientVersion() >= 1281 ? msg->getU64() : msg->getU32();
+            const uint64_t value = g_game.getClientVersion() >= 1332 ? msg->getU64() : msg->getU32();
             const uint8_t color = msg->getU8();
             text = msg->getString();
 
