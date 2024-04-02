@@ -2146,12 +2146,21 @@ void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
         }
         case Otc::MessageHeal:
         case Otc::MessageMana:
-        case Otc::MessageExp:
         case Otc::MessageHealOthers:
-        case Otc::MessageExpOthers:
         {
             const auto& pos = getPosition(msg);
             const uint32_t value = msg->getU32();
+            const uint8_t color = msg->getU8();
+            text = msg->getString();
+
+            g_map.addAnimatedText(std::make_shared<AnimatedText>(std::to_string(value), color), pos);
+            break;
+        }
+        case Otc::MessageExp:
+        case Otc::MessageExpOthers:
+        {
+            const auto& pos = getPosition(msg);
+            const uint64_t value = g_game.getClientVersion() >= 1281 ? msg->getU64() : msg->getU32();
             const uint8_t color = msg->getU8();
             text = msg->getString();
 
@@ -2248,7 +2257,10 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
             uint8_t outfitAddons = msg->getU8();
 
             if (g_game.getClientVersion() >= 1281) {
-                msg->getU8(); // mode: 0x00 - available, 0x01 store (requires U32 store offerId), 0x02 golden outfit tooltip (hardcoded)
+                const uint8_t outfitMode = msg->getU8(); // mode: 0x00 - available, 0x01 store (requires U32 store offerId), 0x02 golden outfit tooltip (hardcoded)
+                if (outfitMode == 1) {
+                    msg->getU32();
+                }
             }
 
             outfitList.emplace_back(outfitId, outfitName, outfitAddons);
@@ -2276,7 +2288,10 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
             const auto& mountName = msg->getString(); // mount name
 
             if (g_game.getClientVersion() >= 1281) {
-                msg->getU8(); // mode: 0x00 - available, 0x01 store (requires U32 store offerId)
+                const uint8_t mountMode = msg->getU8(); // mode: 0x00 - available, 0x01 store (requires U32 store offerId)
+                if (mountMode == 1) {
+                    msg->getU32();
+                }
             }
 
             mountList.emplace_back(mountId, mountName);
@@ -2284,11 +2299,15 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
     }
 
     if (g_game.getClientVersion() >= 1281) {
-        msg->getU16(); // familiars.size()
-        // size > 0
-        // U16 looktype
-        // String name
-        // 0x00 // mode: 0x00 - available, 0x01 store (requires U32 store offerId)
+        const uint16_t familiarCount = msg->getU16();
+        for (int_fast32_t i = 0; i < familiarCount; ++i) {
+            msg->getU16(); // familiar lookType
+            msg->getString(); // familiar name
+            const uint8_t familiarMode = msg->getU8(); // 0x00 // mode: 0x00 - available, 0x01 store (requires U32 store offerId)
+            if (familiarMode == 1) {
+                msg->getU32();
+            }
+        }
 
         msg->getU8(); //Try outfit mode (?)
         msg->getU8(); // mounted
@@ -2960,13 +2979,13 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
             // 9: quick loot, 2: quiver, 4: unlooted corpse
             const uint8_t containerType = msg->getU8();
 
-			if (containerType == 9) {
-				// quick loot categories
-				msg->getU32();
-				msg->getU32();
-			} else if (containerType == 2) {
-				// quiver ammo count
-				msg->getU32();
+            if (containerType == 9) {
+                // quick loot categories
+                msg->getU32();
+                msg->getU32();
+            } else if (containerType == 2) {
+                // quiver ammo count
+                msg->getU32();
             }
 
             // corpse not looted yet
@@ -3167,8 +3186,8 @@ void ProtocolGame::parseLootContainers(const InputMessagePtr& msg)
     msg->getU8(); // quickLootFallbackToMainContainer ? 1 : 0
     const uint8_t containers = msg->getU8();
     for (int_fast32_t i = 0; i < containers; ++i) {
-		msg->getU8(); // category
-		msg->getU16(); // lootContainerId
+        msg->getU8(); // category
+        msg->getU16(); // lootContainerId
         msg->getU16(); // obtainContainerId
     }
 }
