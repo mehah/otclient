@@ -4,6 +4,7 @@ IconInformation < UIWidget
   margin-left: 2
 
 UIWidget
+  id: creatureInformation
   size: 32 32
 
   UILabel
@@ -15,8 +16,8 @@ UIWidget
 
   ProgressBar
     id: lifeBar
-    width: 30
-    height: 2
+    width: 40
+    height: 4
     anchors.top: prev.bottom
     anchors.left: parent.left
     anchors.HorizontalCenter: parent.HorizontalCenter
@@ -25,8 +26,8 @@ UIWidget
     id: manaBar
     visible: false
     background-color: blue
-    width: 30
-    height: 2
+    width: 40
+    height: 4
     margin-top: 2
     anchors.top: prev.bottom
     anchors.left: parent.left

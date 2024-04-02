@@ -11,7 +11,6 @@ local NPC_COLOR = '#66CCFF'
 
 local function onCreate(creature)
     local widget = g_ui.loadUI('creatureinformation')
-
     widget:setMarginLeft(-widget:getWidth() / 1.5)
     widget:setMarginTop(-widget:getHeight() / 2)
 
@@ -73,6 +72,7 @@ local function setIcon(creature, id, getIconPath)
 
     local infoWidget = creature:getWidgetInformation()
     local icon = g_ui.createWidget('IconInformation', infoWidget)
+    icon:setId('icon' .. infoWidget:getChildCount())
     icon:setImageSource(path)
 end
 
@@ -99,7 +99,7 @@ end
 controller = Controller:new()
 
 function controller:onGameStart()
-    local player = g_game.getLocalPlayer()
+    --[[local player = g_game.getLocalPlayer()
     onCreate(player)
     onHealthPercentChange(player, player:getHealthPercent(), player:getHealthPercent())
     onChangeName(player, player:getName())
@@ -108,7 +108,7 @@ function controller:onGameStart()
     onIconChange(player, 1)
     onSkullChange(player, 1)
     onShieldChange(player, 1)
-    onEmblemChange(player, 1)
+    onEmblemChange(player, 1)]]
 end
 
 controller:addEvent(LocalPlayer, {

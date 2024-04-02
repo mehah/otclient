@@ -39,7 +39,7 @@ public:
     bool hasText() { return m_cachedText.hasText(); }
 
     Otc::MessageMode getMessageMode() const { return m_mode; }
-    std::string getFirstMessage() { return m_messages[0].first; }
+    std::string getFirstMessage() { return m_messages.empty() ? "" : m_messages[0].first; }
 
     bool isYell() const { return m_mode == Otc::MessageYell || m_mode == Otc::MessageMonsterYell || m_mode == Otc::MessageBarkLoud; }
 

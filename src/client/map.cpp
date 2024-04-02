@@ -119,6 +119,9 @@ void Map::clean()
 
 void Map::cleanDynamicThings()
 {
+    for (const auto& mapview : m_mapViews)
+        mapview->followCreature(nullptr);
+
     for (const auto& [widget, object] : m_attachedObjectWidgetMap)
         widget->destroy();
 
@@ -1204,6 +1207,7 @@ void Map::updateAttachedWidgets(const MapViewPtr& mapView)
         const auto& widgetRect = widget->getRect();
         const auto& newWidgetRect = Rect(p, widgetRect.width(), widgetRect.height());
 
+        widget->disableUpdateTemporarily();
         widget->setRect(newWidgetRect);
     }
 }

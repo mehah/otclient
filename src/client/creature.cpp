@@ -228,9 +228,9 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
             auto extraTextSize = m_text->getTextSize();
             Rect extraTextRect = Rect(p.x - extraTextSize.width() / 2.0, p.y + 15, extraTextSize);
             m_text->drawText(extraTextRect.center(), extraTextRect);
-    }
+        }
 #endif
-}
+    }
 
     if (m_skull != Otc::SkullNone && m_skullTexture)
         g_drawPool.addTexturedPos(m_skullTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5);
@@ -1106,7 +1106,7 @@ void Creature::setWidgetInformation(const UIWidgetPtr& info) {
     if (m_widgetInformation == info)
         return;
 
-    if (m_widgetInformation) {
+    if (m_widgetInformation && !m_widgetInformation->isDestroyed()) {
         m_widgetInformation->destroy();
         g_map.removeAttachedWidgetFromObject(m_widgetInformation);
     }
