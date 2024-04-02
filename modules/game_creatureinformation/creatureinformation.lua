@@ -11,6 +11,11 @@ local NPC_COLOR = '#66CCFF'
 
 local function onCreate(creature)
     local widget = g_ui.loadUI('creatureinformation')
+
+    -- Fix rendering order
+    widget.lifeBar:setImageDrawOrder(2)
+    widget.manaBar:setImageDrawOrder(2)
+
     widget:setMarginLeft(-widget:getWidth() / 1.5)
     widget:setMarginTop(-widget:getHeight() / 2)
 
