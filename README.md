@@ -45,7 +45,8 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 - [x] **game_container** container like tibia 13. [71ee1a8](https://github.com/Nottinghster/otclient/commit/71ee1a8bdf25ab713656fd3ad28673d094f22a0c)
 - [x] **Statsbar//Game_mainpanel** Bug states onStatesChange bug [f82f2f0](https://github.com/Nottinghster/otclient/commit/f82f2f0df58c6944714a3670429e1d99ee1fc1b2)
 - [x] **game_mainPanel//minimap** Create a function in C++ of **g_game onChangeWorldTime** for minimap. [a8b55ea](https://github.com/Nottinghster/otclient/commit/a8b55ea748c9be7abadb5936b36399d7961598eb)
-- [x] **game_interface//statsbar** if you set to "hide" , close and open the client. the "compact" statsbar is displayed.( "hide" style bar is not saved)
+- [x] **game_interface//statsbar** if you set to "hide" , close and open the client. the "compact" statsbar is displayed.( "hide" style bar is not saved) [83cde71](https://github.com/Nottinghster/otclient/commit/83cde710bd4ab34792569f528fe1609489563a79)
+- [x] **Game_bot** get the slot5 requested by quiver_label and quiver_manager
 ------------
 **in process**
 - [ ] **Game_mainpanel//minimap** bug: minimap .white cross out of bounds [#15](https://github.com/Nottinghster/otclient/issues/15)
@@ -53,11 +54,9 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 - [ ] **Game_mainpanel//game_interface mode(2)** compatibility with extended view  [#7](https://github.com/Nottinghster/otclient/issues/7)
 - [ ] **Game_mainpanel//inventary** fix function inventoryController:onTerminate()
 - [ ] **Game_outfit** of tibia 13 SOON
-- [ ] **Game_bot** get the slot5 requested by quiver_label and quiver_manager
 - [ ] **data/styles/** Using a unique font similar to Tibia 13 (i think is Verdana10px bold ? )
 - [ ] **data/styles/** Using the vertical and horizontal scrollbars of Tibia 13. ![image](https://github.com/Nottinghster/otclient/assets/114332266/623f01c9-41cf-4763-88e5-449cf7127f5e)
 - [ ] **game_actionbar** Adapt the v8 game_actionbar with vertical and horizontal panels. (closer to Tibia 13), with options in client_options.
-
 - [ ] **.otui** Some of the windows are not draggable (client_options)
 - [ ] check if there are duplicated functions, or even clean some codes
      - data/styles/ .otui (unused UI)

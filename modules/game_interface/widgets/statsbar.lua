@@ -450,7 +450,7 @@ end
 function StatsBar.setStatsBarOption(dimension, placement)
     StatsBar.hideAll()
     if firstCall then
-        if g_settings.getString('top_statsbar_dimension') or g_settings.getString('top_statsbar_dimension') ~= "" then
+        if g_settings.getString('top_statsbar_dimension') and g_settings.getString('top_statsbar_dimension') ~= "" then
             dimension = g_settings.getString('top_statsbar_dimension')
         else
             dimension = "compact"

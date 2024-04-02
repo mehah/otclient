@@ -57,11 +57,7 @@ PhantomMiniWindow
       anchors.left: changeSize.right
       margin-left: 3
       size: 12 12
-// help with correct version plis
-      @onSetup: |
-        if g_game.getClientVersion() < 1080 then 
-          self:hide()
-        end
+      
       $pressed !disabled:
         image-clip: 12 0 12 12
 
@@ -90,10 +86,7 @@ PhantomMiniWindow
       phantom: false
       margin-top: 4
       size: 20 20
-      @onSetup: |
-        if g_game.getClientVersion() < 1080 then -- g_game.getFeature(GamePVPMode) ?
-          self:hide()
-        end
+
     UIWidget
       id: pvp
       image-source: /images/inventory/buttons_general
@@ -467,10 +460,6 @@ PhantomMiniWindow
       anchors.bottom: soulAndCapacity.bottom
       phantom: false
       size: 12 12
-      @onSetup: |
-        if g_game.getClientVersion() < 1080 then -- g_game.getFeature(GamePVPMode) ?
-          self:hide()
-        end
 
     Button
       id: blessings
@@ -480,11 +469,6 @@ PhantomMiniWindow
       anchors.left: changeSize.left
       margin-top: 3
       size: 12 12
-// help with correct version plis
-      @onSetup: |
-        if g_game.getClientVersion() < 1080 then
-          self:hide()
-        end
 
       $pressed !disabled:
         image-clip: 12 0 12 12

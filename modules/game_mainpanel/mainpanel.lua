@@ -471,6 +471,15 @@ function inventoryController:onGameStart()
     inventoryShrink = g_settings.getBoolean('mainpanel_shrink_inventory')
     refreshInventorySizes()
     refreshInventory_panel()
+    -- @ note: need correct version
+    if g_game.getClientVersion() < 1080 then
+
+        inventoryController.ui.offPanel.blessings:hide()
+        inventoryController.ui.offPanel.expert:hide()
+        inventoryController.ui.onPanel.blessings:hide()
+        inventoryController.ui.onPanel.expert:hide()
+    end
+    -- @
 end
 
 function inventoryController:onGameEnd()
@@ -551,6 +560,11 @@ function changeInventorySize()
         onSoulChange(player, player:getSoul())
     end
 end
+
+function getSlot5()
+    return inventoryController.ui.offPanel.shield
+end
+
 -- @ End of Inventory
 
 -- @ Minimap
