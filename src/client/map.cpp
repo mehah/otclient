@@ -119,6 +119,11 @@ void Map::clean()
 
 void Map::cleanDynamicThings()
 {
+    for (const auto& [widget, object] : m_attachedObjectWidgetMap)
+        widget->destroy();
+
+    m_attachedObjectWidgetMap.clear();
+
     for (const auto& [uid, creature] : m_knownCreatures) {
         removeThing(creature);
     }
@@ -128,7 +133,6 @@ void Map::cleanDynamicThings()
         m_floors[i].missiles.clear();
 
     cleanTexts();
-    m_attachedObjectWidgetMap.clear();
 }
 
 void Map::addThing(const ThingPtr& thing, const Position& pos, int16_t stackPos)
