@@ -1863,10 +1863,6 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
         m_localPlayer->setBaseSkill(static_cast<Otc::Skill>(skill), baseLevel);
     }
 
-    if (g_game.getFeature(Otc::GameConcotions)) {
-        msg->getU8();
-    }
-
     if (g_game.getFeature(Otc::GameAdditionalSkills)) {
         // Critical, Life Leech, Mana Leech, Dodge, Fatal, Momentum have no level percent, nor loyalty bonus
 
@@ -1883,6 +1879,10 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
             m_localPlayer->setSkill(static_cast<Otc::Skill>(skill), level, 0);
             m_localPlayer->setBaseSkill(static_cast<Otc::Skill>(skill), baseLevel);
         }
+    }
+
+    if (g_game.getFeature(Otc::GameConcotions)) {
+        msg->getU8();
     }
 
     if (g_game.getClientVersion() >= 1281) {
