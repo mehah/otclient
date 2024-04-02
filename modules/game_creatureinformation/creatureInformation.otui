@@ -1,0 +1,33 @@
+IconInformation < UIWidget
+  anchors.top: prev.top
+  anchors.left: prev.right
+  margin-left: 2
+
+UIWidget
+  size: 32 32
+
+  UILabel
+    id: name
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.HorizontalCenter: parent.HorizontalCenter
+    !font: g_gameConfig.getCreatureNameFontName()
+
+  ProgressBar
+    id: lifeBar
+    width: 30
+    height: 2
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.HorizontalCenter: parent.HorizontalCenter
+
+  ProgressBar
+    id: manaBar
+    visible: false
+    background-color: blue
+    width: 30
+    height: 2
+    margin-top: 2
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.HorizontalCenter: parent.HorizontalCenter

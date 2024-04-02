@@ -128,6 +128,7 @@ void Map::cleanDynamicThings()
         m_floors[i].missiles.clear();
 
     cleanTexts();
+    m_attachedObjectWidgetMap.clear();
 }
 
 void Map::addThing(const ThingPtr& thing, const Position& pos, int16_t stackPos)
@@ -1183,7 +1184,7 @@ void Map::updateAttachedWidgets(const MapViewPtr& mapView)
             const auto displacementY = g_game.getFeature(Otc::GameNegativeOffset) ? 0 : creature->getDisplacementY();
 
             const auto& jumpOffset = creature->getJumpOffset() * g_drawPool.getScaleFactor();
-            const auto& creatureOffset = Point(16 - displacementX, -displacementY - 2) + creature->getWalkOffset();
+            const auto& creatureOffset = Point(16 - displacementX, -displacementY - 2) + creature->getDrawOffset();
             p += creatureOffset * g_drawPool.getScaleFactor() - Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
         }
 

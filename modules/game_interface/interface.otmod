@@ -37,5 +37,6 @@ Module
     - game_shaders
     - game_attachedeffects
     - game_stash
+    - game_creatureinformation
   @onLoad: init()
   @onUnload: terminate()

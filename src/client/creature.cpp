@@ -37,6 +37,7 @@
 #include <framework/graphics/graphics.h>
 #include <framework/graphics/texturemanager.h>
 #include <framework/graphics/shadermanager.h>
+#include <framework/ui/uiwidget.h>
 
 double Creature::speedA = 0;
 double Creature::speedB = 0;
@@ -61,6 +62,14 @@ Creature::Creature() :m_type(Proto::CreatureTypeUnknown)
         m_mountShader->setUniformValue(ShaderManager::MOUNT_ID_UNIFORM, m_outfit.getMount());
     };
     */
+}
+
+Creature::~Creature() {
+    setWidgetInformation(nullptr);
+}
+
+void Creature::onCreate() {
+    callLuaField("onCreate");
 }
 
 void Creature::draw(const Point& dest, bool drawThings, LightView* lightView)
@@ -131,6 +140,12 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
 
     if (isDead() || !canBeSeen() || !(drawFlags & Otc::DrawCreatureInfo) || !mapRect.isInRange(m_position))
         return;
+
+    if (g_gameConfig.isDrawingInformationByWidget()) {
+        if (m_widgetInformation)
+            m_widgetInformation->draw(mapRect.rect, DrawPoolType::FOREGROUND);
+        return;
+    }
 
     const auto displacementX = g_game.getFeature(Otc::GameNegativeOffset) ? 0 : getDisplacementX();
     const auto displacementY = g_game.getFeature(Otc::GameNegativeOffset) ? 0 : getDisplacementY();
@@ -213,9 +228,9 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
             auto extraTextSize = m_text->getTextSize();
             Rect extraTextRect = Rect(p.x - extraTextSize.width() / 2.0, p.y + 15, extraTextSize);
             m_text->drawText(extraTextRect.center(), extraTextRect);
-        }
-#endif
     }
+#endif
+}
 
     if (m_skull != Otc::SkullNone && m_skullTexture)
         g_drawPool.addTexturedPos(m_skullTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5);
@@ -1085,6 +1100,33 @@ void Creature::setStaticWalking(uint16_t v) {
             self->m_walkUpdateEvent->cancel();
         }
     }, std::min<int>(v / g_gameConfig.getSpriteSize(), DrawPool::FPS60));
+}
+
+void Creature::setWidgetInformation(const UIWidgetPtr& info) {
+    if (m_widgetInformation == info)
+        return;
+
+    if (m_widgetInformation) {
+        m_widgetInformation->destroy();
+        g_map.removeAttachedWidgetFromObject(m_widgetInformation);
+    }
+
+    m_widgetInformation = info;
+
+    if (!info)
+        return;
+
+    info->setDraggable(false);
+    g_map.addAttachedWidgetToObject(info, std::static_pointer_cast<AttachableObject>(shared_from_this()));
+}
+
+void Creature::setName(const std::string_view name) {
+    if (name == m_name.getText())
+        return;
+
+    const auto& oldName = m_name.getText();
+    m_name.setText(name);
+    callLuaField("onChangeName", name, oldName);
 }
 
 #ifndef BOT_PROTECTION
