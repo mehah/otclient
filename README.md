@@ -47,12 +47,12 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 - [x] **game_mainPanel//minimap** Create a function in C++ of **g_game onChangeWorldTime** for minimap. [a8b55ea](https://github.com/Nottinghster/otclient/commit/a8b55ea748c9be7abadb5936b36399d7961598eb)
 - [x] **game_interface//statsbar** if you set to "hide" , close and open the client. the "compact" statsbar is displayed.( "hide" style bar is not saved) [83cde71](https://github.com/Nottinghster/otclient/commit/83cde710bd4ab34792569f528fe1609489563a79)
 - [x] **Game_bot** get the slot5 requested by quiver_label and quiver_manager
+- [x] **Game_mainpanel//game_interface** incorrect g_game.getClientVersion() .lua .otui [#13](https://github.com/Nottinghster/otclient/issues/13) - [170a089](https://github.com/Nottinghster/otclient/commit/170a089e3aa1ee806ef1299c4b10ab3508a8c9a9)
+- [x] **Game_mainpanel//inventary** fix function inventoryController:onTerminate() - [53fcbb4](https://github.com/Nottinghster/otclient/commit/53fcbb4c065df0b2c0a16c47bf79e99e86b0493d#diff-9c2eaf0f9aece4afc40f30e75559dc5113cb3ddc75ecf66ddd5ce7d17a0935d5)
 ------------
 **in process**
 - [ ] **Game_mainpanel//minimap** bug: minimap .white cross out of bounds [#15](https://github.com/Nottinghster/otclient/issues/15)
-- [ ] **Game_mainpanel//game_interface** incorrect g_game.getClientVersion() .lua .otui [#13](https://github.com/Nottinghster/otclient/issues/13)
 - [ ] **Game_mainpanel//game_interface mode(2)** compatibility with extended view  [#7](https://github.com/Nottinghster/otclient/issues/7)
-- [ ] **Game_mainpanel//inventary** fix function inventoryController:onTerminate()
 - [ ] **Game_outfit** of tibia 13 SOON
 - [ ] **data/styles/** Using a unique font similar to Tibia 13 (i think is Verdana10px bold ? )
 - [ ] **data/styles/** Using the vertical and horizontal scrollbars of Tibia 13. ![image](https://github.com/Nottinghster/otclient/assets/114332266/623f01c9-41cf-4763-88e5-449cf7127f5e)
