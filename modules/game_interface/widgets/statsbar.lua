@@ -1,4 +1,5 @@
 local statsBar
+local firstCall = true
 
 local currentStats = {
     dimension = 'hide',
@@ -432,7 +433,7 @@ local function onStatsMousePress(tab, mousePos, mouseButton)
     end
 end
 
-function StatsBar.reloadCurrentTab() 
+function StatsBar.reloadCurrentTab()
     if currentStats.placement == 'top' then
         if currentStats.dimension == 'large' then
             return constructLargeOnTop()
@@ -448,6 +449,16 @@ end
 
 function StatsBar.setStatsBarOption(dimension, placement)
     StatsBar.hideAll()
+    if firstCall then
+        if g_settings.getString('top_statsbar_dimension') or g_settings.getString('top_statsbar_dimension') ~= "" then
+            dimension = g_settings.getString('top_statsbar_dimension')
+        else
+            dimension = "compact"
+        end
+
+        firstCall = false
+    end
+
     currentStats = {
         dimension = dimension,
         placement = placement
@@ -455,7 +466,7 @@ function StatsBar.setStatsBarOption(dimension, placement)
     g_settings.set('top_statsbar_dimension', currentStats.dimension)
     g_settings.set('top_statsbar_placement', currentStats.placement)
 
-    if dimension ~= "hide" then 
+    if dimension ~= "hide" then
         StatsBar.reloadCurrentTab()
     end
 
