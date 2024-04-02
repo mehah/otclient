@@ -2295,7 +2295,7 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
             msg->getU16(); // familiar lookType
             msg->getString(); // familiar name
             const uint8_t familiarMode = msg->getU8(); // 0x00 // mode: 0x00 - available, 0x01 store (requires U32 store offerId)
-            if (mountMode == 1) {
+            if (familiarMode == 1) {
                 msg->getU32();
             }
         }
