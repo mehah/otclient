@@ -125,9 +125,9 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 
 ![](https://geps.dev/progress/99) game_imbuing `--unmodified, test required`
 
-![](https://geps.dev/progress/0) game_interface
+![](https://geps.dev/progress/80) game_interface
 
-![](https://geps.dev/progress/10) game_mainpanel
+![](https://geps.dev/progress/80) game_mainpanel
 
 ![](https://geps.dev/progress/99) game_market `--unmodified, test required`
 
@@ -143,7 +143,7 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 
 ![](https://geps.dev/progress/0) game_playertrade `--unmodified, test required`
 
-![](https://geps.dev/progress/0) game_prey \*\*1
+![](https://geps.dev/progress/0) game_prey \*\*
 
 ![](https://geps.dev/progress/99) game_questlog `--unmodified, test required`
 
@@ -165,9 +165,9 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 
 ![](https://geps.dev/progress/99) game_things `--unmodified, test required`
 
-![](https://geps.dev/progress/99) game_unjustifiedpoints `--unmodified, test required` \*\*1
+![](https://geps.dev/progress/99) game_unjustifiedpoints `--unmodified, test required` \*\*
 
-![](https://geps.dev/progress/99) game_viplist `--unmodified, test required` \*\*1
+![](https://geps.dev/progress/99) game_viplist `--unmodified, test required` \*\*
 
 ![](https://geps.dev/progress/99) startup
 
@@ -351,18 +351,14 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 
 ### game_mainpanel
 
-- Status: Incomplete
+- Status: Completed
 - Bugs:
   - [x] Issue : Cap, soul not work
   - [x] Issue : Inventary , hide icons "bless" in old protocol
   - [x] Issue : Conditions icons are not coded
   - [x] Issue : When you attack and chase mode is follow, there's error in terminal (need auto Chase option turned on)
-  - [ ] Issue : fix function inventoryController:onTerminate()
+  - [x] Issue : fix function inventoryController:onTerminate()
   - [x] Issue : Hide icon "bless" in minize panel
-
-**NOTE: **
-
-- correct the version of the if function "bless"
 
 ### game_market
 
@@ -443,7 +439,7 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 
 ### game_skills
 
-- Status: Incomplete
+- Status: Completed
 - Bugs:
   - [x] Issue : Ico game skills like clipsof
 
@@ -519,14 +515,14 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 
 ## MOD
 
-## ![](https://geps.dev/progress/90)
+## ![](https://geps.dev/progress/100)
 
 ### ./Mod/bot
 
-- Status: Incomplete
+- Status: Completed
 - Bugs:
-  - [ ] Issue: Fix width mini windows
-  - [ ] Issue: get the slot5 requested by quiver_label and quiver_manager
+  - [x] Issue: Fix width mini windows
+  - [x] Issue: get the slot5 requested by quiver_label and quiver_manager
 
 ## Data
 
@@ -534,13 +530,13 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 
 ### ./data/images
 
-![](https://geps.dev/progress/80)
+![](https://geps.dev/progress/100)
 
-- Status: Incomplete
+- Status: Completed
 - Bugs:
-  - [ ] Issue: Fix Bot icon top menu
-  - [ ] Issue fix: icons state
-  - [ ] close , minimize , scroll ico
+  - [x] Issue: Fix Bot icon top menu
+  - [x] Issue fix: icons state
+  - [x] close , minimize , scroll ico
 
 ### ./data/Style
 
