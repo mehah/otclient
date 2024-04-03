@@ -58,7 +58,7 @@ public:
     void draw(const Rect& destRect, uint8_t size);
 
     void internalDraw(Point dest, LightView* lightView = nullptr, const Color& color = Color::white);
-    void drawInformation(const MapPosInfo& mapRect, const Point& dest, bool useGray, int drawFlags);
+    void drawInformation(const MapPosInfo& mapRect, const Point& dest, int drawFlags);
 
     void setId(uint32_t id) override { m_id = id; }
     void setMasterId(uint32_t id) { m_masterId = id; }
@@ -153,6 +153,8 @@ public:
     bool canBeSeen() { return !isInvisible() || isPlayer(); }
     bool isCreature() override { return true; }
     bool isCovered() { return m_isCovered; }
+
+    void setCovered(bool covered);
 
     bool isDisabledWalkAnimation() { return m_disableWalkAnimation > 0; }
     void setDisableWalkAnimation(bool v) {

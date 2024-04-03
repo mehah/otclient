@@ -114,6 +114,22 @@ void MapView::preLoad() {
     }
 
     g_map.updateAttachedWidgets(static_self_cast<MapView>());
+
+    Position _camera = m_posInfo.camera;
+    const bool alwaysTransparent = m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && _camera.coveredUp(m_posInfo.camera.z - m_floorMin);
+    for (const auto& [uid, creature] : g_map.getCreatures()) {
+        const auto& tile = creature->getTile();
+        if (!tile || !m_posInfo.isInRange(creature->getPosition()))
+            continue;
+
+        bool isCovered = tile->isCovered(alwaysTransparent ? m_floorMin : m_cachedFirstVisibleFloor);
+        if (alwaysTransparent && isCovered) {
+            const bool inRange = creature->getPosition().isInRange(m_posInfo.camera, g_gameConfig.getTileTransparentFloorViewRange(), g_gameConfig.getTileTransparentFloorViewRange(), true);
+            isCovered = !inRange;
+        }
+
+        creature->setCovered(isCovered);
+    }
 }
 
 void MapView::draw(const Rect& rect)
@@ -208,21 +224,12 @@ void MapView::drawCreatureInformation() {
     if (m_drawHealthBars) { flags |= Otc::DrawBars; }
     if (m_drawManaBar) { flags |= Otc::DrawManaBar; }
 
-    Position _camera = m_posInfo.camera;
-    const bool alwaysTransparent = m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && _camera.coveredUp(m_posInfo.camera.z - m_floorMin);
-
     for (const auto& [uid, creature] : g_map.getCreatures()) {
         const auto& tile = creature->getTile();
         if (!tile || !m_posInfo.isInRange(creature->getPosition()))
             continue;
 
-        bool isCovered = tile->isCovered(alwaysTransparent ? m_floorMin : m_cachedFirstVisibleFloor);
-        if (alwaysTransparent && isCovered) {
-            const bool inRange = creature->getPosition().isInRange(m_posInfo.camera, g_gameConfig.getTileTransparentFloorViewRange(), g_gameConfig.getTileTransparentFloorViewRange(), true);
-            isCovered = !inRange;
-        }
-
-        creature->drawInformation(m_posInfo, transformPositionTo2D(creature->getPosition()), isCovered, flags);
+        creature->drawInformation(m_posInfo, transformPositionTo2D(creature->getPosition()), flags);
     }
 }
 
@@ -385,7 +392,7 @@ void MapView::updateVisibleTiles()
     m_updateVisibleTiles = false;
     m_resetCoveredCache = false;
     updateHighlightTile(m_mousePosition);
-}
+    }
 
 void MapView::updateRect(const Rect& rect) {
     if (m_posInfo.rect != rect || m_updateMapPosInfo) {
