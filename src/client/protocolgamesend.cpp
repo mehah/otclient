@@ -1026,14 +1026,17 @@ void ProtocolGame::sendMarketLeave()
     send(msg);
 }
 
-void ProtocolGame::sendMarketBrowse(uint8_t browseId, uint16_t browseType)
+void ProtocolGame::sendMarketBrowse(uint8_t browseId, uint16_t browseItemId, uint8_t browseItemTier)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientMarketBrowse);
     if (g_game.getClientVersion() >= 1251) {
         msg->addU8(browseId);
-        if (browseType > 0) {
-            msg->addU16(browseType);
+        if (browseId > 2) {
+            msg->addU16(browseItemId);
+            if (tier > 0) {
+                msg->addU8(browseItemTier);
+            }
         }
     } else {
         msg->addU16(browseType);
