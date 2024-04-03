@@ -6,7 +6,7 @@ end
 
 g_logger.warning("Creature Information By Widget is enabled. (performance may be depreciated)");
 
-local devMode = true
+local devMode = false
 local debug = false
 
 local COVERED_COLOR = '#606060'
@@ -15,8 +15,6 @@ local NPC_COLOR = '#66CCFF'
 local function onCreate(creature)
     local widget = g_ui.loadUI('creatureinformation')
 
-    widget.manaBar:setVisible(creature:isLocalPlayer())
-
     if debug then
         widget:setBorderColor('red')
         widget:setBorderWidth(2)
@@ -24,10 +22,13 @@ local function onCreate(creature)
         widget.icons:setBorderWidth(2)
     end
 
+    widget.manaBar:setVisible(creature:isLocalPlayer())
+
     creature:setWidgetInformation(widget)
 end
 
 local function onHealthPercentChange(creature, healthPercent, oldHealthPercent)
+    local gameMapPanel = modules.game_interface.getMapPanel()
     local widget = creature:getWidgetInformation()
     local color = nil
 
@@ -48,25 +49,32 @@ local function onHealthPercentChange(creature, healthPercent, oldHealthPercent)
     widget.name:setColor(color)
     widget.lifeBar:setPercent(healthPercent)
     widget.lifeBar:setBackgroundColor(color)
+    widget.lifeBar:setVisible(gameMapPanel:isDrawingHealthBars())
 end
 
 local function onManaChange(player, mana, maxMana, oldMana, oldMaxMana)
+    local gameMapPanel = modules.game_interface.getMapPanel()
     local widget = player:getWidgetInformation()
+
     if player:getMaxMana() > 1 then
         widget.manaBar:setPercent((mana / maxMana) * 100)
     else
         widget.manaBar:setPercent(1)
     end
+
+    widget.manaBar:setVisible(gameMapPanel:isDrawingManaBar())
 end
 
 local function onChangeName(creature, name, oldName)
+    local gameMapPanel = modules.game_interface.getMapPanel()
     local infoWidget = creature:getWidgetInformation()
-
-    infoWidget.name:setText(name)
 
     if g_game.getFeature(GameBlueNpcNameColor) and creature:isNpc() and creature:isFullHealth() then
         infoWidget.name:setColor(NPC_COLOR)
     end
+
+    infoWidget.name:setText(name)
+    infoWidget.name:setVisible(gameMapPanel:isDrawingNames())
 end
 
 local function onCovered(creature, isCovered, oldIsCovered)
@@ -110,6 +118,7 @@ local function setIcon(creature, id, getIconPath, typeIcon)
 
     local infoWidget = creature:getWidgetInformation()
     local oldIcon = infoWidget.icons[typeIcon]
+
     if oldIcon then
         local index = oldIcon:getChildIndex()
         oldIcon:destroy()
@@ -120,8 +129,8 @@ local function setIcon(creature, id, getIconPath, typeIcon)
     end
 
     local hasChildren = infoWidget.icons:hasChildren()
-
     local path, blink = getIconPath(id)
+
     if path == nil then
         if not hasChildren then
             infoWidget.icons:setVisible(false)
@@ -156,10 +165,24 @@ local creatureEvents = {
     onEmblemChange = function(creature, id) setIcon(creature, id, getEmblemImagePath, 'emblem') end,
 };
 
+function toggleInformation()
+    local localPlayer = g_game.getLocalPlayer()
+    if not localPlayer then return end
+
+    local gameMapPanel = modules.game_interface.getMapPanel()
+
+    localPlayer:getWidgetInformation().manaBar:setVisible(gameMapPanel:isDrawingManaBar())
+
+    local spectators = modules.game_interface.getMapPanel():getSpectators()
+    for _, creature in ipairs(spectators) do
+        creature:getWidgetInformation().name:setVisible(gameMapPanel:isDrawingNames())
+        creature:getWidgetInformation().lifeBar:setVisible(gameMapPanel:isDrawingHealthBars())
+    end
+end
+
 controller = Controller:new()
 controller:addEvent(Creature, creatureEvents)
 controller:addEvent(LocalPlayer, { onManaChange = onManaChange })
-
 
 if devMode then
     function controller:onGameStart()
