@@ -1034,12 +1034,12 @@ void ProtocolGame::sendMarketBrowse(uint8_t browseId, uint16_t browseItemId, uin
         msg->addU8(browseId);
         if (browseId > 2) {
             msg->addU16(browseItemId);
-            if (tier > 0) {
+            if (g_game.getClientVersion() > 1310) {
                 msg->addU8(browseItemTier);
             }
         }
     } else {
-        msg->addU16(browseType);
+        msg->addU16(browseId);
     }
     send(msg);
 }
