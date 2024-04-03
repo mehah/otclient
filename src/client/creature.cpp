@@ -817,11 +817,11 @@ void Creature::setBaseSpeed(uint16_t baseSpeed)
     callLuaField("onBaseSpeedChange", baseSpeed, oldBaseSpeed);
 }
 
-void Creature::setType(uint8_t type) { callLuaField("onTypeChange", m_type = type); }
-void Creature::setIcon(uint8_t icon) { callLuaField("onIconChange", m_icon = icon); }
-void Creature::setSkull(uint8_t skull) { callLuaField("onSkullChange", m_skull = skull); }
-void Creature::setShield(uint8_t shield) { callLuaField("onShieldChange", m_shield = shield); }
-void Creature::setEmblem(uint8_t emblem) { callLuaField("onEmblemChange", m_emblem = emblem); }
+void Creature::setType(uint8_t v) { if (m_type != v) callLuaField("onTypeChange", m_type = v); }
+void Creature::setIcon(uint8_t v) { if (m_icon != v) callLuaField("onIconChange", m_icon = v); }
+void Creature::setSkull(uint8_t v) { if (m_skull != v) callLuaField("onSkullChange", m_skull = v); }
+void Creature::setShield(uint8_t v) { if (m_shield != v) callLuaField("onShieldChange", m_shield = v); }
+void Creature::setEmblem(uint8_t v) { if (m_emblem != v) callLuaField("onEmblemChange", m_emblem = v); }
 
 void Creature::setTypeTexture(const std::string& filename) { m_typeTexture = g_textures.getTexture(filename); }
 void Creature::setIconTexture(const std::string& filename) { m_iconTexture = g_textures.getTexture(filename); }

@@ -6,7 +6,7 @@ end
 
 g_logger.warning("Creature Information By Widget is enabled. (performance may be depreciated)");
 
-local debug = false
+local debug = true
 local COVERED_COLOR = '#606060'
 local NPC_COLOR = '#66CCFF'
 
@@ -16,6 +16,8 @@ local function onCreate(creature)
     if debug then
         widget:setBorderColor('red')
         widget:setBorderWidth(2)
+        widget.icons:setBorderColor('yellow')
+        widget.icons:setBorderWidth(2)
     end
 
     -- Fix rendering order
@@ -99,33 +101,47 @@ local function onOutfitChange(creature, outfit, oldOutfit)
     infoWidget:setMarginTop(-cropSize)
 end
 
-local function setIcon(creature, id, getIconPath)
-    local path, blink = getIconPath(id)
-
+local function setIcon(creature, id, getIconPath, typeIcon)
     local infoWidget = creature:getWidgetInformation()
-    local icon = g_ui.createWidget('IconInformation', infoWidget)
-    icon:setId('icon' .. infoWidget:getChildCount())
+    local oldIcon = infoWidget.icons[typeIcon]
+    if oldIcon then
+        oldIcon:destroy()
+    end
+
+    local path, blink = getIconPath(id)
+    if path == nil then
+        return
+    end
+
+    local hasChildren = infoWidget.icons:hasChildren()
+    local icon = g_ui.createWidget('IconInformation', infoWidget.icons)
+    icon:setId(typeIcon)
     icon:setImageSource(path)
+
+    if not hasChildren then
+        icon:addAnchor(AnchorTop, 'parent', AnchorTop)
+        icon:addAnchor(AnchorLeft, 'parent', AnchorLeft)
+    end
 end
 
 local function onTypeChange(creature, id)
-    setIcon(creature, id, getTypeImagePath)
+    setIcon(creature, id, getTypeImagePath, 'type')
 end
 
 local function onIconChange(creature, id)
-    setIcon(creature, id, getIconImagePath)
+    setIcon(creature, id, getIconImagePath, 'icon')
 end
 
 local function onSkullChange(creature, id)
-    setIcon(creature, id, getSkullImagePath)
+    setIcon(creature, id, getSkullImagePath, 'skull')
 end
 
 local function onShieldChange(creature, id)
-    setIcon(creature, id, getShieldImagePathAndBlink)
+    setIcon(creature, id, getShieldImagePathAndBlink, 'shield')
 end
 
 local function onEmblemChange(creature, id)
-    setIcon(creature, id, getEmblemImagePath)
+    setIcon(creature, id, getEmblemImagePath, 'emblem')
 end
 
 controller = Controller:new()

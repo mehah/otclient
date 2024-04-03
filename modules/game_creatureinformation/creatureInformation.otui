@@ -32,3 +32,9 @@ UIWidget
     anchors.top: prev.bottom
     anchors.left: parent.left
     anchors.HorizontalCenter: parent.HorizontalCenter
+
+  UIWidget
+    id: icons
+    size: 128 32
+    anchors.top: lifeBar.bottom
+    anchors.left: lifeBar.right
