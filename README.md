@@ -35,7 +35,7 @@
 - Creature Information By UIWidget
   - to enable: [setup.otml](https://github.com/mehah/otclient/blob/e2c5199e52bd86f573c9bb582d7548cfe7a8b026/data/setup.otml#L20)
   - To style: [modules/game_creatureinformation](https://github.com/mehah/otclient/tree/main/modules/game_creatureinformation)
-  - Note: There is a performance degradation compared to direct programming with Draw Pool, by about ~20% depending on the occasion.
+  - Note: There is a performance degradation compared to direct programming with Draw Pool, by about ~20%, testing was performed with 60 monsters attacking each other.
 
 ##### Community (Features)
 - Mobile Support [@tuliomagalhaes](https://github.com/tuliomagalhaes) & [@BenDol](https://github.com/BenDol)
