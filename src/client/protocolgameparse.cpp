@@ -2753,24 +2753,29 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
                     // fixes a bug server side bug where GameInit is not sent and local player id is unknown
                     (creatureType == Proto::CreatureTypePlayer && !m_localPlayer->getId() && name == m_localPlayer->getName())) {
                     creature = m_localPlayer;
-                } else switch (creatureType) {
-                    case Proto::CreatureTypePlayer:
-                        creature = std::make_shared<Player>();
-                        break;
+                } else {
+                    switch (creatureType) {
+                        case Proto::CreatureTypePlayer:
+                            creature = std::make_shared<Player>();
+                            break;
 
-                    case Proto::CreatureTypeNpc:
-                        creature = std::make_shared<Npc>();
-                        break;
+                        case Proto::CreatureTypeNpc:
+                            creature = std::make_shared<Npc>();
+                            break;
 
-                    case Proto::CreatureTypeHidden:
-                    case Proto::CreatureTypeMonster:
-                    case Proto::CreatureTypeSummonOwn:
-                    case Proto::CreatureTypeSummonOther:
-                        creature = std::make_shared<Monster>();
-                        break;
+                        case Proto::CreatureTypeHidden:
+                        case Proto::CreatureTypeMonster:
+                        case Proto::CreatureTypeSummonOwn:
+                        case Proto::CreatureTypeSummonOther:
+                            creature = std::make_shared<Monster>();
+                            break;
 
-                    default:
-                        g_logger.traceError("creature type is invalid");
+                        default:
+                            g_logger.traceError("creature type is invalid");
+                    }
+
+                    if (creature)
+                        creature->onCreate();
                 }
             }
 

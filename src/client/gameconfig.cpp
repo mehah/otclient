@@ -143,6 +143,8 @@ void GameConfig::loadCreatureNode(const OTMLNodePtr& mainNode) {
             m_adjustCreatureInformationBasedCropSize = node->value<bool>();
         else if (node->tag() == "diagonal-walk-speed")
             m_creatureDiagonalWalkSpeed = node->value<double>();
+        else if (node->tag() == "draw-information-by-widget-beta")
+            m_drawInformationByWidget = node->value<bool>();
     }
 }
 

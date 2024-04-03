@@ -32,6 +32,7 @@
 #include <framework/otml/otmlnode.h>
 
 #include "framework/graphics/texture.h"
+#include "framework/graphics/drawpool.h"
 
 template<typename T = int>
 struct EdgeGroup
@@ -208,9 +209,21 @@ public:
     void addOnDestroyCallback(const std::string& id, const std::function<void()>&& callback);
     void removeOnDestroyCallback(const std::string&);
 
+    void setBackgroundDrawOrder(uint8_t order) { m_backgroundDrawConductor.order = std::min<uint8_t>(order, DrawOrder::LAST - 1); }
+    void setImageDrawOrder(uint8_t order) { m_imageDrawConductor.order = std::min<uint8_t>(order, DrawOrder::LAST - 1); }
+    void setIconDrawOrder(uint8_t order) { m_iconDrawConductor.order = std::min<uint8_t>(order, DrawOrder::LAST - 1); }
+    void setTextDrawOrder(uint8_t order) { m_textDrawConductor.order = std::min<uint8_t>(order, DrawOrder::LAST - 1); }
+    void setBorderDrawOrder(uint8_t order) { m_borderDrawConductor.order = std::min<uint8_t>(order, DrawOrder::LAST - 1); }
+
 private:
     uint32_t m_flagsProp{ 0 };
     PainterShaderProgramPtr m_shader;
+
+    DrawConductor m_backgroundDrawConductor;
+    DrawConductor m_imageDrawConductor;
+    DrawConductor m_iconDrawConductor;
+    DrawConductor m_textDrawConductor;
+    DrawConductor m_borderDrawConductor;
 
     // state managment
 protected:

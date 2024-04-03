@@ -42,6 +42,8 @@ Panel
     anchors.right: parent.right
     anchors.top: prev.bottom
     margin-top: 12
+    !enabled: g_gameConfig.isDrawingInformationByWidget() == false
+
 
   OptionScrollbar
     id: creatureInformationScale
@@ -51,6 +53,7 @@ Panel
     margin-top: 3
     minimum: 1
     maximum: 9
+    !enabled: g_gameConfig.isDrawingInformationByWidget() == false
 
   Label
     id: staticTextScaleLabel
