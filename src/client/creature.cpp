@@ -1135,7 +1135,10 @@ void Creature::setCovered(bool covered) {
 
     const auto oldCovered = m_isCovered;
     m_isCovered = covered;
-    callLuaField("onCovered", covered, oldCovered);
+
+    g_dispatcher.addEvent([self = static_self_cast<Creature>(), covered, oldCovered] {
+        self->callLuaField("onCovered", covered, oldCovered);
+    });
 }
 
 #ifndef BOT_PROTECTION
