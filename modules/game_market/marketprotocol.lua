@@ -78,8 +78,8 @@ function MarketProtocol.sendMarketBrowse(browseId, browseItemId, browseItemTier)
 end
 
 function MarketProtocol.sendMarketBrowseMyOffers()
-    MarketProtocol.sendMarketBrowse(MarketRequest.MyOffers, 0)
+    MarketProtocol.sendMarketBrowse(MarketRequest.MyOffers, 0, 0)
 end
 function MarketProtocol.sendMarketBrowseOfferHistory()
-    MarketProtocol.sendMarketBrowse(MarketRequest.MyHistory, 0)
+    MarketProtocol.sendMarketBrowse(MarketRequest.MyHistory, 0, 0)
 end
