@@ -1886,6 +1886,13 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
     }
 
     if (g_game.getClientVersion() >= 1281) {
+        // forge skill stats
+        const uint8_t slots = g_game.getClientVersion() >= 1332 ? 4 : 3; // 1281: CONST_SLOT_LEFT, CONST_SLOT_ARMOR, CONST_SLOT_HEAD, 1332: CONST_SLOT_LEGS
+        for (int_fast32_t i = 0; i < slots; ++i) {
+            msg->getU16(); // skill
+            msg->getU16(); // skill
+        }
+
         // bonus cap
         const uint32_t capacity = msg->getU32(); // base + bonus capacity
         msg->getU32(); // base capacity
