@@ -92,13 +92,9 @@ local function onOutfitChange(creature, outfit, oldOutfit)
         return
     end
 
-    local cropSize = 0
-
     if g_gameConfig.isAdjustCreatureInformationBasedCropSize() then
-        cropSize = creature:getExactSize()
+        infoWidget:setMarginTop(-creature:getExactSize())
     end
-
-    infoWidget:setMarginTop(-cropSize)
 end
 
 local function setIcon(creature, id, getIconPath, typeIcon)
@@ -108,12 +104,16 @@ local function setIcon(creature, id, getIconPath, typeIcon)
         oldIcon:destroy()
     end
 
+    local hasChildren = infoWidget.icons:hasChildren()
+
     local path, blink = getIconPath(id)
     if path == nil then
+        if not hasChildren then
+            infoWidget.icons:setVisible(false)
+        end
         return
     end
 
-    local hasChildren = infoWidget.icons:hasChildren()
     local icon = g_ui.createWidget('IconInformation', infoWidget.icons)
     icon:setId(typeIcon)
     icon:setImageSource(path)
@@ -121,6 +121,7 @@ local function setIcon(creature, id, getIconPath, typeIcon)
     if not hasChildren then
         icon:addAnchor(AnchorTop, 'parent', AnchorTop)
         icon:addAnchor(AnchorLeft, 'parent', AnchorLeft)
+        infoWidget.icons:setVisible(true)
     end
 end
 

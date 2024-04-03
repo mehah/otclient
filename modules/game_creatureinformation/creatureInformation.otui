@@ -36,5 +36,6 @@ UIWidget
   UIWidget
     id: icons
     size: 128 32
+    visible: false
     anchors.top: lifeBar.bottom
     anchors.left: lifeBar.right
