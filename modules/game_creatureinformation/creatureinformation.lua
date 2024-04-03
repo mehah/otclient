@@ -71,8 +71,16 @@ local function onChangeName(creature, name, oldName)
 
     if g_game.getFeature(GameBlueNpcNameColor) and creature:isNpc() and creature:isFullHealth() then
         infoWidget.name:setColor(NPC_COLOR)
+    end
+end
+
+local function onCovered(creature, isCovered, oldIsCovered)
+    local infoWidget = creature:getWidgetInformation()
+    if isCovered then
+        infoWidget.name:setColor(COVERED_COLOR)
+        infoWidget.lifeBar:setBackgroundColor(COVERED_COLOR)
     else
-        --widget.name:setColor(NPC_COLOR)
+        onHealthPercentChange(creature, creature:getHealthPercent(), creature:getHealthPercent())
     end
 end
 
@@ -142,6 +150,7 @@ controller:addEvent(LocalPlayer, {
 controller:addEvent(Creature, {
     onCreate = onCreate,
     onOutfitChange = onOutfitChange,
+    onCovered = onCovered,
     onHealthPercentChange = onHealthPercentChange,
     onChangeName = onChangeName,
     onTypeChange = onTypeChange,

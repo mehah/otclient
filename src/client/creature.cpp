@@ -132,7 +132,7 @@ void Creature::draw(const Rect& destRect, uint8_t size)
     } g_drawPool.releaseFrameBuffer(destRect);
 }
 
-void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, bool useGray, int drawFlags)
+void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, bool isCovered, int drawFlags)
 {
     static const Color
         DEFAULT_COLOR(96, 96, 96),
@@ -142,6 +142,13 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
         return;
 
     if (g_gameConfig.isDrawingInformationByWidget()) {
+        // retirar do drawInformation
+        if (isCovered != m_isCovered) {
+            const auto oldCovered = m_isCovered;
+            m_isCovered = isCovered;
+            callLuaField("onCovered", isCovered, oldCovered);
+        }
+
         if (m_widgetInformation)
             m_widgetInformation->draw(mapRect.rect, DrawPoolType::FOREGROUND);
         return;
@@ -161,7 +168,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, boo
 
     auto fillColor = DEFAULT_COLOR;
 
-    if (!useGray) {
+    if (!isCovered) {
         if (g_game.getFeature(Otc::GameBlueNpcNameColor) && isNpc() && isFullHealth())
             fillColor = NPC_COLOR;
         else fillColor = m_informationColor;

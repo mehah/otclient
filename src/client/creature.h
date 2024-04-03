@@ -152,6 +152,7 @@ public:
     bool isFullHealth() { return m_healthPercent == 100; }
     bool canBeSeen() { return !isInvisible() || isPlayer(); }
     bool isCreature() override { return true; }
+    bool isCovered() { return m_isCovered; }
 
     bool isDisabledWalkAnimation() { return m_disableWalkAnimation > 0; }
     void setDisableWalkAnimation(bool v) {
@@ -254,6 +255,7 @@ private:
     bool m_drawOutfitColor{ true };
     bool m_showShieldTexture{ true };
     bool m_typing{ false };
+    bool m_isCovered{ false };
 
     uint8_t m_disableWalkAnimation{ 0 };
 
