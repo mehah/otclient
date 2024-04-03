@@ -90,11 +90,33 @@ local function onOutfitChange(creature, outfit, oldOutfit)
     end
 end
 
+local function blinkIcon(icon, ticks)
+    if icon:isDestroyed() then
+        return
+    end
+
+    icon:setVisible(not icon:isVisible())
+
+    scheduleEvent(function()
+        blinkIcon(icon, ticks)
+    end, ticks)
+end
+
 local function setIcon(creature, id, getIconPath, typeIcon)
+    local setParentAnchor = function(w)
+        w:addAnchor(AnchorTop, 'parent', AnchorTop)
+        w:addAnchor(AnchorLeft, 'parent', AnchorLeft)
+    end
+
     local infoWidget = creature:getWidgetInformation()
     local oldIcon = infoWidget.icons[typeIcon]
     if oldIcon then
+        local index = oldIcon:getChildIndex()
         oldIcon:destroy()
+
+        if index == 1 and infoWidget.icons:hasChildren() then
+            setParentAnchor(infoWidget.icons:getChildByIndex(index))
+        end
     end
 
     local hasChildren = infoWidget.icons:hasChildren()
@@ -112,9 +134,12 @@ local function setIcon(creature, id, getIconPath, typeIcon)
     icon:setImageSource(path)
 
     if not hasChildren then
-        icon:addAnchor(AnchorTop, 'parent', AnchorTop)
-        icon:addAnchor(AnchorLeft, 'parent', AnchorLeft)
+        setParentAnchor(icon)
         infoWidget.icons:setVisible(true)
+    end
+
+    if blink then
+        blinkIcon(icon, g_gameConfig.getShieldBlinkTicks())
     end
 end
 

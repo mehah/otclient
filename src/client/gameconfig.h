@@ -52,7 +52,7 @@ public:
     bool isDrawingInformationByWidget() { return m_drawInformationByWidget; }
     bool isForcingNewWalkingFormula() const { return m_forceNewWalkingFormula; }
     bool isAdjustCreatureInformationBasedCropSize() { return m_adjustCreatureInformationBasedCropSize; }
-    uint16_t getShieldBlinkTicks() const { return m_shieldBlinkTicks; }
+    uint16_t getShieldBlinkTicks() { return m_shieldBlinkTicks; }
     uint16_t getVolatileSquareDuration() const { return m_volatileSquareDuration; }
 
     uint16_t getInvisibleTicksPerFrame() const { return m_invisibleTicksPerFrame; }
