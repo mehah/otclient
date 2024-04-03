@@ -6,7 +6,9 @@ end
 
 g_logger.warning("Creature Information By Widget is enabled. (performance may be depreciated)");
 
-local debug = true
+local devMode = true
+local debug = false
+
 local COVERED_COLOR = '#606060'
 local NPC_COLOR = '#66CCFF'
 
@@ -19,13 +21,6 @@ local function onCreate(creature)
         widget.icons:setBorderColor('yellow')
         widget.icons:setBorderWidth(2)
     end
-
-    -- Fix rendering order
-    widget.lifeBar:setImageDrawOrder(2)
-    widget.manaBar:setImageDrawOrder(2)
-
-    widget:setMarginLeft(-widget:getWidth() / 1.5)
-    widget:setMarginTop(-widget:getHeight() / 2)
 
     if creature:isLocalPlayer() then
         widget.manaBar:setVisible(true)
@@ -125,54 +120,45 @@ local function setIcon(creature, id, getIconPath, typeIcon)
     end
 end
 
-local function onTypeChange(creature, id)
-    setIcon(creature, id, getTypeImagePath, 'type')
-end
-
-local function onIconChange(creature, id)
-    setIcon(creature, id, getIconImagePath, 'icon')
-end
-
-local function onSkullChange(creature, id)
-    setIcon(creature, id, getSkullImagePath, 'skull')
-end
-
-local function onShieldChange(creature, id)
-    setIcon(creature, id, getShieldImagePathAndBlink, 'shield')
-end
-
-local function onEmblemChange(creature, id)
-    setIcon(creature, id, getEmblemImagePath, 'emblem')
-end
-
-controller = Controller:new()
-
-function controller:onGameStart()
-    --[[local player = g_game.getLocalPlayer()
-    onCreate(player)
-    onHealthPercentChange(player, player:getHealthPercent(), player:getHealthPercent())
-    onChangeName(player, player:getName())
-    onManaChange(player, player:getMana(), player:getMaxMana(), player:getMana(), player:getMaxMana())
-    onTypeChange(player, 3)
-    onIconChange(player, 1)
-    onSkullChange(player, 1)
-    onShieldChange(player, 1)
-    onEmblemChange(player, 1)]]
-end
-
-controller:addEvent(LocalPlayer, {
-    onManaChange = onManaChange
-})
-
-controller:addEvent(Creature, {
+local creatureEvents = {
     onCreate = onCreate,
     onOutfitChange = onOutfitChange,
     onCovered = onCovered,
     onHealthPercentChange = onHealthPercentChange,
     onChangeName = onChangeName,
-    onTypeChange = onTypeChange,
-    onIconChange = onIconChange,
-    onSkullChange = onSkullChange,
-    onShieldChange = onShieldChange,
-    onEmblemChange = onEmblemChange,
-})
+    onTypeChange = function(creature, id) setIcon(creature, id, getTypeImagePath, 'type') end,
+    onIconChange = function(creature, id) setIcon(creature, id, getIconImagePath, 'icon') end,
+    onSkullChange = function(creature, id) setIcon(creature, id, getSkullImagePath, 'skull') end,
+    onShieldChange = function(creature, id) setIcon(creature, id, getSkullImagePath, 'skull') end,
+    onEmblemChange = function(creature, id) setIcon(creature, id, getEmblemImagePath, 'emblem') end,
+};
+
+controller = Controller:new()
+controller:addEvent(Creature, creatureEvents)
+controller:addEvent(LocalPlayer, { onManaChange = onManaChange })
+
+
+if devMode then
+    function controller:onGameStart()
+        local spectators = modules.game_interface.getMapPanel():getSpectators()
+        for _, creature in ipairs(spectators) do
+            onCreate(creature)
+
+            if creature:isLocalPlayer() then
+                onManaChange(creature, creature:getMana(), creature:getMaxMana(), creature:getMana(),
+                    creature:getMaxMana())
+            end
+
+            onOutfitChange(creature, creature:getOutfit())
+            onCovered(creature, creature:isCovered())
+            onHealthPercentChange(creature, creature:getHealthPercent(), creature:getHealthPercent())
+            onChangeName(creature, creature:getName())
+
+            creatureEvents.onTypeChange(creature, creature:getType())
+            creatureEvents.onIconChange(creature, creature:getIcon())
+            creatureEvents.onSkullChange(creature, creature:getSkull())
+            creatureEvents.onShieldChange(creature, creature:getShield())
+            creatureEvents.onEmblemChange(creature, creature:getEmblem())
+        end
+    end
+end

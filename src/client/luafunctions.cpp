@@ -575,6 +575,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Creature>("getWidgetInformation", &Creature::getWidgetInformation);
     g_lua.bindClassMemberFunction<Creature>("setWidgetInformation", &Creature::setWidgetInformation);
     g_lua.bindClassMemberFunction<Creature>("isFullHealth", &Creature::isFullHealth);
+    g_lua.bindClassMemberFunction<Creature>("isCovered", &Creature::isCovered);
 
 #ifndef BOT_PROTECTION
     g_lua.bindClassMemberFunction<Creature>("setText", &Creature::setText);

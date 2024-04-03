@@ -69,7 +69,17 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
     }
     // load styles used by all widgets
     for (const auto& node : styleNode->children()) {
-        if (node->tag() == "color")
+        if (node->tag() == "background-draw-order")
+            setBackgroundDrawOrder(node->value<int>());
+        else if (node->tag() == "border-draw-order")
+            setBorderDrawOrder(node->value<int>());
+        else if (node->tag() == "icon-draw-order")
+            setIconDrawOrder(node->value<int>());
+        else if (node->tag() == "image-draw-order")
+            setImageDrawOrder(node->value<int>());
+        else if (node->tag() == "text-draw-order")
+            setTextDrawOrder(node->value<int>());
+        else if (node->tag() == "color")
             setColor(node->value<Color>());
         else if (node->tag() == "shader")
             setShader(node->value());

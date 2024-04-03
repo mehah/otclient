@@ -209,11 +209,11 @@ public:
     void addOnDestroyCallback(const std::string& id, const std::function<void()>&& callback);
     void removeOnDestroyCallback(const std::string&);
 
-    void setBackgroundDrawOrder(uint8_t order) { m_backgroundDrawConductor.order = order; }
-    void setImageDrawOrder(uint8_t order) { m_imageDrawConductor.order = order; }
-    void setIconDrawOrder(uint8_t order) { m_iconDrawConductor.order = order; }
-    void setTextDrawOrder(uint8_t order) { m_textDrawConductor.order = order; }
-    void setBorderDrawOrder(uint8_t order) { m_borderDrawConductor.order = order; }
+    void setBackgroundDrawOrder(uint8_t order) { m_backgroundDrawConductor.order = std::min<uint8_t>(order, DrawOrder::LAST - 1); }
+    void setImageDrawOrder(uint8_t order) { m_imageDrawConductor.order = std::min<uint8_t>(order, DrawOrder::LAST - 1); }
+    void setIconDrawOrder(uint8_t order) { m_iconDrawConductor.order = std::min<uint8_t>(order, DrawOrder::LAST - 1); }
+    void setTextDrawOrder(uint8_t order) { m_textDrawConductor.order = std::min<uint8_t>(order, DrawOrder::LAST - 1); }
+    void setBorderDrawOrder(uint8_t order) { m_borderDrawConductor.order = std::min<uint8_t>(order, DrawOrder::LAST - 1); }
 
 private:
     uint32_t m_flagsProp{ 0 };

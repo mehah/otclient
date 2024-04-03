@@ -5,8 +5,10 @@ IconInformation < UIWidget
 
 UIWidget
   id: creatureInformation
-  size: 32 32
-
+  $size: 32 32
+  !margin-left: math.floor(-32/ 1.5)
+  !margin-top: math.floor(-32 / 2)
+  
   UILabel
     id: name
     anchors.top: parent.top
@@ -18,6 +20,7 @@ UIWidget
     id: lifeBar
     width: 40
     height: 4
+    image-draw-order: 2
     anchors.top: prev.bottom
     anchors.left: parent.left
     anchors.HorizontalCenter: parent.HorizontalCenter
@@ -29,6 +32,7 @@ UIWidget
     width: 40
     height: 4
     margin-top: 2
+    image-draw-order: 2
     anchors.top: prev.bottom
     anchors.left: parent.left
     anchors.HorizontalCenter: parent.HorizontalCenter
