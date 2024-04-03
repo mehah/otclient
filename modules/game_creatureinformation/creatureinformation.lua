@@ -15,15 +15,13 @@ local NPC_COLOR = '#66CCFF'
 local function onCreate(creature)
     local widget = g_ui.loadUI('creatureinformation')
 
+    widget.manaBar:setVisible(creature:isLocalPlayer())
+
     if debug then
         widget:setBorderColor('red')
         widget:setBorderWidth(2)
         widget.icons:setBorderColor('yellow')
         widget.icons:setBorderWidth(2)
-    end
-
-    if creature:isLocalPlayer() then
-        widget.manaBar:setVisible(true)
     end
 
     creature:setWidgetInformation(widget)
@@ -77,7 +75,7 @@ local function onCovered(creature, isCovered, oldIsCovered)
         infoWidget.name:setColor(COVERED_COLOR)
         infoWidget.lifeBar:setBackgroundColor(COVERED_COLOR)
     else
-        onHealthPercentChange(creature, creature:getHealthPercent(), creature:getHealthPercent())
+        onHealthPercentChange(creature, creature:getHealthPercent())
     end
 end
 
@@ -129,7 +127,7 @@ local creatureEvents = {
     onTypeChange = function(creature, id) setIcon(creature, id, getTypeImagePath, 'type') end,
     onIconChange = function(creature, id) setIcon(creature, id, getIconImagePath, 'icon') end,
     onSkullChange = function(creature, id) setIcon(creature, id, getSkullImagePath, 'skull') end,
-    onShieldChange = function(creature, id) setIcon(creature, id, getSkullImagePath, 'skull') end,
+    onShieldChange = function(creature, id) setIcon(creature, id, getShieldImagePathAndBlink, 'shield') end,
     onEmblemChange = function(creature, id) setIcon(creature, id, getEmblemImagePath, 'emblem') end,
 };
 
