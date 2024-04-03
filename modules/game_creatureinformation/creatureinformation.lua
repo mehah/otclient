@@ -6,11 +6,17 @@ end
 
 g_logger.warning("Creature Information By Widget is enabled. (performance may be depreciated)");
 
+local debug = false
 local COVERED_COLOR = '#606060'
 local NPC_COLOR = '#66CCFF'
 
 local function onCreate(creature)
     local widget = g_ui.loadUI('creatureinformation')
+
+    if debug then
+        widget:setBorderColor('red')
+        widget:setBorderWidth(2)
+    end
 
     -- Fix rendering order
     widget.lifeBar:setImageDrawOrder(2)
@@ -18,8 +24,6 @@ local function onCreate(creature)
 
     widget:setMarginLeft(-widget:getWidth() / 1.5)
     widget:setMarginTop(-widget:getHeight() / 2)
-
-    local nameSize = widget.name:getTextSize();
 
     if creature:isLocalPlayer() then
         widget.manaBar:setVisible(true)
@@ -72,6 +76,21 @@ local function onChangeName(creature, name, oldName)
     end
 end
 
+local function onOutfitChange(creature, outfit, oldOutfit)
+    local infoWidget = creature:getWidgetInformation()
+    if not infoWidget then
+        return
+    end
+
+    local cropSize = 0
+
+    if g_gameConfig.isAdjustCreatureInformationBasedCropSize() then
+        cropSize = creature:getExactSize()
+    end
+
+    infoWidget:setMarginTop(-cropSize)
+end
+
 local function setIcon(creature, id, getIconPath)
     local path, blink = getIconPath(id)
 
@@ -122,6 +141,7 @@ controller:addEvent(LocalPlayer, {
 
 controller:addEvent(Creature, {
     onCreate = onCreate,
+    onOutfitChange = onOutfitChange,
     onHealthPercentChange = onHealthPercentChange,
     onChangeName = onChangeName,
     onTypeChange = onTypeChange,
