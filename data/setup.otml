@@ -17,7 +17,7 @@ game
     transparent-floor-view-range: 2
 
   creature
-    draw-information-by-widget-beta: true
+    draw-information-by-widget-beta: false
     force-new-walking-formula: true
     shield-blink-ticks: 500
     volatile-square-duration: 1000
