@@ -18,10 +18,9 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 
 - Layout tibia 13
 - Calendar
-- Outfit windows 13 soon
 - Cooldown spell on top of the game_console like tibia 13
 - game_shop of v8 compatible with attachEffect and shader
-
+- Outfit windows v8 is the most similar to tibia 13 compatible with attachEffect , shader 
 
 ## Current bugs
 **solved**
@@ -49,17 +48,19 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 - [x] **Game_bot** get the slot5 requested by quiver_label and quiver_manager
 - [x] **Game_mainpanel//game_interface** incorrect g_game.getClientVersion() .lua .otui [#13](https://github.com/Nottinghster/otclient/issues/13) - [170a089](https://github.com/Nottinghster/otclient/commit/170a089e3aa1ee806ef1299c4b10ab3508a8c9a9)
 - [x] **Game_mainpanel//inventary** fix function inventoryController:onTerminate() - [53fcbb4](https://github.com/Nottinghster/otclient/commit/53fcbb4c065df0b2c0a16c47bf79e99e86b0493d#diff-9c2eaf0f9aece4afc40f30e75559dc5113cb3ddc75ecf66ddd5ce7d17a0935d5)
+- [x] **Game_outfit** v8 is the most similar to tibia 13 compatible with attachEffect , shader (no test yet title and health bars) [#25](https://github.com/Nottinghster/otclient/pull/25)
 ------------
 **in process**
 - [ ] **Game_mainpanel//minimap** bug: minimap .white cross out of bounds [#15](https://github.com/Nottinghster/otclient/issues/15)
 - [ ] **Game_mainpanel//game_interface mode(2)** compatibility with extended view  [#7](https://github.com/Nottinghster/otclient/issues/7)
-- [ ] **Game_outfit** of tibia 13 SOON
 - [ ] **data/styles/** Using a unique font similar to Tibia 13 (i think is Verdana10px bold ? )
 - [ ] **data/styles/** Using the vertical and horizontal scrollbars of Tibia 13. ![image](https://github.com/Nottinghster/otclient/assets/114332266/623f01c9-41cf-4763-88e5-449cf7127f5e)
 - [ ] **game_actionbar** Adapt the v8 game_actionbar with vertical and horizontal panels. (closer to Tibia 13), with options in client_options.
+- [ ] **github** revert all commits of "feat: compatibility with 13.32"
 - [ ] **.otui** Some of the windows are not draggable (client_options)
 - [ ] check if there are duplicated functions, or even clean some codes
      - data/styles/ .otui (unused UI)
+     - game_outfit rename functions, use local functions to obtain a widget
      - topmenu/Mainpanel incorrectly named functions and some of them repeated
 
 

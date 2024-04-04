@@ -36,5 +36,6 @@ Module
     - game_stash
     - game_healthcircle
     - game_shop
+    - game_outfit_old
   @onLoad: init()
   @onUnload: terminate()
