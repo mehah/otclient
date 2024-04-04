@@ -338,7 +338,14 @@ function create(player, outfitList, creatureMount, mountList, creatureFamiliar, 
     ServerData = {
         currentOutfit = currentOutfit,
         outfits = outfitList,
-        mounts = mountList
+        mounts = mountList,
+--[[         wings = wingsList,
+        auras = auraList,
+        shaders = shaderList,
+        healthBars = barsList,
+        title = titleList,
+        effects = effectsList, ]]
+
     }
 
     window = g_ui.displayUI("outfitwindow")
@@ -516,7 +523,7 @@ function destroy()
             auras = {},
             shaders = {},
             healthBars = {},
-            manaBars = {},
+            effects = {},
             title = {}
         }
 
