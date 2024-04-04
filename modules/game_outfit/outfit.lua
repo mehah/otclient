@@ -46,6 +46,7 @@ local lastSelectWings = "None"
 local lastSelectEffects = "None"
 local lastSelectShader = "Outfit - Default"
 local lastSelectTitle = "None"
+
 local function attachEffectIfValid(UICreature, value)
     local creature = UICreature:getCreature()
     if type(value) == "number" and value > 0 then
@@ -138,13 +139,14 @@ end
 local AppearanceData = {"preset", "outfit", "mount", "wings", "aura", "effects", "shader", "healthBar", "title"}
 
 function init()
+
     if opcodeSystem.enable then
 
         ProtocolGame.registerExtendedOpcode(opcodeSystem.id, function(protocol, opcode, buffer)
             local status, json_data = pcall(json.decode, buffer)
 
             if not status then
-                g_logger.error("[Crafting] JSON error: " .. data)
+                g_logger.error("[Crafting] JSON error: " .. buffer)
                 return false
             end
 
@@ -155,28 +157,6 @@ function init()
             ServerData.effects = json_data.effect
             ServerData.title = json_data.title
 
-            local checks = {{window.preview.options.showWings, ServerData.wings},
-                            {window.preview.options.showAura, ServerData.auras},
-                            {window.preview.options.showShader, ServerData.shaders},
-                            {window.preview.options.showBars, ServerData.healthBars},
-                            {window.preview.options.showEffects, ServerData.effects},
-                            {window.preview.options.showTitle, ServerData.title},
-
-                            {window.appearance.settings.wings, ServerData.wings},
-                            {window.appearance.settings.aura, ServerData.auras},
-                            {window.appearance.settings.shader, ServerData.shaders},
-                            {window.appearance.settings.healthBar, ServerData.healthBars},
-                            {window.appearance.settings.effects, ServerData.effects},
-                            {window.appearance.settings.title, ServerData.title}}
-
-            for _, check in ipairs(checks) do
-                local widget, data = check[1], check[2]
-                if not table.empty(data) then
-                    widget:setVisible(true)
-                else
-                    widget:setVisible(false)
-                end
-            end
         end)
     end
     connect(g_game, {
@@ -349,6 +329,29 @@ function create(player, outfitList, creatureMount, mountList, creatureFamiliar, 
     }
 
     window = g_ui.displayUI("outfitwindow")
+
+    local checks = {{window.preview.options.showWings, ServerData.wings},
+                    {window.preview.options.showAura, ServerData.auras},
+                    {window.preview.options.showShader, ServerData.shaders},
+                    {window.preview.options.showBars, ServerData.healthBars},
+                    {window.preview.options.showEffects, ServerData.effects},
+                    {window.preview.options.showTitle, ServerData.title},
+
+                    {window.appearance.settings.wings, ServerData.wings},
+                    {window.appearance.settings.aura, ServerData.auras},
+                    {window.appearance.settings.shader, ServerData.shaders},
+                    {window.appearance.settings.healthBar, ServerData.healthBars},
+                    {window.appearance.settings.effects, ServerData.effects},
+                    {window.appearance.settings.title, ServerData.title}}
+
+    for _, check in ipairs(checks) do
+        local widget, data = check[1], check[2]
+        if not table.empty(data) then
+            widget:setVisible(true)
+        else
+            widget:setVisible(false)
+        end
+    end
 
     floor = window.preview.panel.floor
     for i = 1, floorTiles * floorTiles do
@@ -1142,6 +1145,7 @@ function onAuraSelect(list, focusedChild, unfocusedChild, reason)
             deselectPreset()
             updateAppearanceText("aura", modules.game_attachedeffects.getName(lastSelectAura))
         else
+            lastSelectAura = "None"
             updateAppearanceText("aura", "None")
         end
     end
@@ -1166,6 +1170,7 @@ function onWingsSelect(list, focusedChild, unfocusedChild, reason)
             deselectPreset()
             updateAppearanceText("wings", modules.game_attachedeffects.getName(wingsType))
         else
+            lastSelectWings = "None"
             updateAppearanceText("wings", "None")
         end
     end
@@ -1176,8 +1181,12 @@ function onShaderSelect(list, focusedChild, unfocusedChild, reason)
         local shaderType = focusedChild:getId()
         if shaderType ~= "None" then
             previewCreature:getCreature():setShader(shaderType)
+            lastSelectShader = shaderType
+        else
+            previewCreature:getCreature():setShader("Outfit - Default")
+            lastSelectShader = "Outfit - Default"
         end
-        lastSelectShader = shaderType
+
         updatePreview()
 
         deselectPreset()
@@ -1225,6 +1234,7 @@ function onEffectBarSelect(list, focusedChild, unfocusedChild, reason)
             updateAppearanceText("effects", modules.game_attachedeffects.getName(lastSelectEffects))
         else
             updateAppearanceText("effects", "None")
+            lastSelectEffects = "None"
         end
     end
 end
@@ -1237,15 +1247,18 @@ function onTitleSelect(list, focusedChild, unfocusedChild, reason)
     if focusedChild then
         local titleType = tostring(focusedChild:getId())
 
-        if titleType > 0 then
+        if titleType ~= "None" then
             previewCreature:getCreature():setTitle(titleType, "verdana-11px-rounded", "#0000ff")
+            lastSelectTitle = titleType
+        else
+            lastSelectTitle = "None"
+            previewCreature:getCreature():clearTitle()
         end
 
         updatePreview()
         deselectPreset()
         updateAppearanceText("title", focusedChild.name:getText())
 
-        lastSelectTitle = titleType
     end
 end
 
