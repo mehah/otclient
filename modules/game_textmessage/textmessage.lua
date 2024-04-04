@@ -73,11 +73,11 @@ MessageTypes = {
     [MessageModes.DamageReceived] = MessageSettings.status,
     [MessageModes.Heal] = MessageSettings.status,
     [MessageModes.Exp] = MessageSettings.status,
+    [MessageModes.Potion] = MessageSettings.status,
 
     [MessageModes.DamageOthers] = MessageSettings.none,
     [MessageModes.HealOthers] = MessageSettings.none,
     [MessageModes.ExpOthers] = MessageSettings.none,
-    [MessageModes.Potion] = MessageSettings.none,
 
     [MessageModes.TradeNpc] = MessageSettings.centerWhite,
     [MessageModes.Guild] = MessageSettings.centerWhite,
@@ -90,7 +90,7 @@ MessageTypes = {
     [MessageModes.HotkeyUse] = MessageSettings.centerGreen,
     [MessageModes.Attention] = MessageSettings.bottomWhite,
     [MessageModes.BoostedCreature] = MessageSettings.centerWhite,
-    [MessageModes.OfflineTrainning] = MessageSettings.centerWhite,
+    [MessageModes.OfflineTraining] = MessageSettings.centerWhite,
     [MessageModes.Transaction] = MessageSettings.centerWhite,
 
     [254] = MessageSettings.private
