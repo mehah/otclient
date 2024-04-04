@@ -329,6 +329,7 @@ function create(player, outfitList, creatureMount, mountList, creatureFamiliar, 
     }
 
     window = g_ui.displayUI("outfitwindow")
+    ServerData.auras = {7, 8} -- note: DELETE THIS, IS FOR TEST
 
     local checks = {{window.preview.options.showWings, ServerData.wings},
                     {window.preview.options.showAura, ServerData.auras},
