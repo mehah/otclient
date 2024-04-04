@@ -1,5 +1,5 @@
 local opcodeSystem = {
-    enable = true,
+    enable = false,
     id = 213
 }
 
