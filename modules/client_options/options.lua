@@ -307,7 +307,6 @@ function setOption(key, value, force)
     elseif key == 'enableLights' then
         gameMapPanel:setDrawLights(value and options['ambientLight'] < 100)
         graphicsPanel:recursiveGetChildById('ambientLight'):setEnabled(value)
-        graphicsPanel:recursiveGetChildById('ambientLight'):setEnabled(value)
     elseif key == 'ambientLight' then
         graphicsPanel:recursiveGetChildById('ambientLight'):setText(string.format('Ambient light: %s%%', value))
         gameMapPanel:setMinimumAmbientLight(value / 100)
