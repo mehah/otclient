@@ -364,6 +364,14 @@ void Client::registerLuaFunctions()
     g_lua.registerSingletonClass("g_gameConfig");
     g_lua.bindSingletonFunction("g_gameConfig", "loadFonts", &GameConfig::loadFonts, &g_gameConfig);
     g_lua.bindSingletonFunction("g_gameConfig", "getSpriteSize", &GameConfig::getSpriteSize, &g_gameConfig);
+    g_lua.bindSingletonFunction("g_gameConfig", "isDrawingInformationByWidget", &GameConfig::isDrawingInformationByWidget, &g_gameConfig);
+    g_lua.bindSingletonFunction("g_gameConfig", "isAdjustCreatureInformationBasedCropSize", &GameConfig::isAdjustCreatureInformationBasedCropSize, &g_gameConfig);
+
+    g_lua.bindSingletonFunction("g_gameConfig", "getShieldBlinkTicks", &GameConfig::getShieldBlinkTicks, &g_gameConfig);
+    g_lua.bindSingletonFunction("g_gameConfig", "getCreatureNameFontName", &GameConfig::getCreatureNameFontName, &g_gameConfig);
+    g_lua.bindSingletonFunction("g_gameConfig", "getAnimatedTextFontName", &GameConfig::getAnimatedTextFontName, &g_gameConfig);
+    g_lua.bindSingletonFunction("g_gameConfig", "getStaticTextFontName", &GameConfig::getStaticTextFontName, &g_gameConfig);
+    g_lua.bindSingletonFunction("g_gameConfig", "getWidgetTextFontName", &GameConfig::getWidgetTextFontName, &g_gameConfig);
 
     g_lua.registerSingletonClass("g_client");
     g_lua.bindSingletonFunction("g_client", "setEffectAlpha", &Client::setEffectAlpha, &g_client);
@@ -462,6 +470,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Thing>("getClassification", &Thing::getClassification);
     g_lua.bindClassMemberFunction<Thing>("setHighlight", &Thing::lua_setHighlight);
     g_lua.bindClassMemberFunction<Thing>("isHighlighted", &Thing::isHighlighted);
+    g_lua.bindClassMemberFunction<Thing>("getExactSize", &Thing::getExactSize);
 
 #ifdef FRAMEWORK_EDITOR
     g_lua.registerClass<House>();
@@ -564,6 +573,10 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Creature>("getTyping", &Creature::getTyping);
     g_lua.bindClassMemberFunction<Creature>("sendTyping", &Creature::sendTyping);
     g_lua.bindClassMemberFunction<Creature>("setTypingIconTexture", &Creature::setTypingIconTexture);
+    g_lua.bindClassMemberFunction<Creature>("getWidgetInformation", &Creature::getWidgetInformation);
+    g_lua.bindClassMemberFunction<Creature>("setWidgetInformation", &Creature::setWidgetInformation);
+    g_lua.bindClassMemberFunction<Creature>("isFullHealth", &Creature::isFullHealth);
+    g_lua.bindClassMemberFunction<Creature>("isCovered", &Creature::isCovered);
 
 #ifndef BOT_PROTECTION
     g_lua.bindClassMemberFunction<Creature>("setText", &Creature::setText);
@@ -842,6 +855,8 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Tile>("select", &Tile::select);
     g_lua.bindClassMemberFunction<Tile>("unselect", &Tile::unselect);
     g_lua.bindClassMemberFunction<Tile>("isSelected", &Tile::isSelected);
+    g_lua.bindClassMemberFunction<Tile>("isCovered", &Tile::isCovered);
+    g_lua.bindClassMemberFunction<Tile>("isCompletelyCovered", &Tile::isCompletelyCovered);
 
 #ifndef BOT_PROTECTION
     g_lua.bindClassMemberFunction<Tile>("setText", &Tile::setText);

@@ -81,9 +81,9 @@ void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)
     g_painter->drawCoords(coords, obj.drawMode);
 }
 
-void DrawPoolManager::addTexturedCoordsBuffer(const TexturePtr& texture, const CoordsBufferPtr& coords, const Color& color) const
+void DrawPoolManager::addTexturedCoordsBuffer(const TexturePtr& texture, const CoordsBufferPtr& coords, const Color& color, const DrawConductor& condutor) const
 {
-    getCurrentPool()->add(color, texture, DrawPool::DrawMethod{}, DrawMode::TRIANGLE_STRIP, DEFAULT_DRAW_CONDUCTOR, coords);
+    getCurrentPool()->add(color, texture, DrawPool::DrawMethod{}, DrawMode::TRIANGLE_STRIP, condutor, coords);
 }
 
 void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const DrawConductor& condutor) const
@@ -99,24 +99,24 @@ void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& textur
     }, DrawMode::TRIANGLE_STRIP, condutor);
 }
 
-void DrawPoolManager::addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color) const
+void DrawPoolManager::addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const DrawConductor& condutor) const
 {
     if (dest.isEmpty() || src.isEmpty()) {
         getCurrentPool()->resetOnlyOnceParameters();
         return;
     }
 
-    getCurrentPool()->add(color, texture, DrawPool::DrawMethod{ DrawPool::DrawMethodType::UPSIDEDOWN_RECT, dest, src }, DrawMode::TRIANGLE_STRIP);
+    getCurrentPool()->add(color, texture, DrawPool::DrawMethod{ DrawPool::DrawMethodType::UPSIDEDOWN_RECT, dest, src }, DrawMode::TRIANGLE_STRIP, condutor);
 }
 
-void DrawPoolManager::addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color) const
+void DrawPoolManager::addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const DrawConductor& condutor) const
 {
     if (dest.isEmpty() || src.isEmpty()) {
         getCurrentPool()->resetOnlyOnceParameters();
         return;
     }
 
-    getCurrentPool()->add(color, texture, DrawPool::DrawMethod{ DrawPool::DrawMethodType::REPEATED_RECT, dest, src });
+    getCurrentPool()->add(color, texture, DrawPool::DrawMethod{ DrawPool::DrawMethodType::REPEATED_RECT, dest, src }, DrawMode::TRIANGLES, condutor);
 }
 
 void DrawPoolManager::addFilledRect(const Rect& dest, const Color& color, const DrawConductor& condutor) const
@@ -129,7 +129,7 @@ void DrawPoolManager::addFilledRect(const Rect& dest, const Color& color, const 
     getCurrentPool()->add(color, nullptr, DrawPool::DrawMethod{ DrawPool::DrawMethodType::RECT, dest }, DrawMode::TRIANGLES, condutor);
 }
 
-void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color) const
+void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color, const DrawConductor& condutor) const
 {
     if (a == b || a == c || b == c) {
         getCurrentPool()->resetOnlyOnceParameters();
@@ -141,10 +141,10 @@ void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Po
             .a = a,
             .b = b,
             .c = c
-     });
+     }, DrawMode::TRIANGLES, condutor);
 }
 
-void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, uint16_t innerLineWidth) const
+void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, uint16_t innerLineWidth, const DrawConductor& condutor) const
 {
     if (dest.isEmpty() || innerLineWidth == 0) {
         getCurrentPool()->resetOnlyOnceParameters();
@@ -155,7 +155,7 @@ void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, uint
         .type = DrawPool::DrawMethodType::BOUNDING_RECT,
         .dest = dest,
         .intValue = innerLineWidth
-    });
+    }, DrawMode::TRIANGLES, condutor);
 }
 
 void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void()>& f, const Rect& dest, const Rect& src, const Color& colorClear)
