@@ -894,6 +894,8 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UICreature>("setCreatureSize", &UICreature::setCreatureSize);
     g_lua.bindClassMemberFunction<UICreature>("getCreature", &UICreature::getCreature);
     g_lua.bindClassMemberFunction<UICreature>("getCreatureSize", &UICreature::getCreatureSize);
+    // note: check function
+    g_lua.bindClassMemberFunction<UICreature>("getDirection", &UICreature::getDirection);
 
     g_lua.registerClass<UIMap, UIWidget>();
     g_lua.bindClassStaticFunction<UIMap>("create", [] { return std::make_shared<UIMap>(); });
