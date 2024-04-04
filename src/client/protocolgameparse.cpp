@@ -2957,11 +2957,7 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
         msg->getU8(); // mark
     }
 
-    if (item->isStackable()) {
-        item->setCountOrSubType(g_game.getFeature(Otc::GameCountU16) ? msg->getU16() : msg->getU8());
-    }
-
-    if (item->isFluidContainer() || item->isSplash() || item->isChargeable()) {
+    if (item->isStackable() || item->isFluidContainer() || item->isSplash() || item->isChargeable()) {
         item->setCountOrSubType(g_game.getFeature(Otc::GameCountU16) ? msg->getU16() : msg->getU8());
     }
 
@@ -2988,6 +2984,8 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
             } else if (containerType == 2) {
                 // quiver ammo count
                 msg->getU32();
+            } else if (containerType == 0) {
+                msg->getU8();
             }
 
             // corpse not looted yet
@@ -3035,8 +3033,8 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
                 msg->getU8(); // lookFeet
             }
 
-            msg->getU8(); // direction
-            msg->getU8(); // visible (bool)
+            msg->getU8(); // look direction
+            msg->getU8(); // podium visible (bool)
         }
     }
 
