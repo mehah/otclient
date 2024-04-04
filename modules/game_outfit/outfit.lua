@@ -338,8 +338,8 @@ function create(player, outfitList, creatureMount, mountList, creatureFamiliar, 
     ServerData = {
         currentOutfit = currentOutfit,
         outfits = outfitList,
-        mounts = mountList,
---[[         wings = wingsList,
+        mounts = mountList
+        --[[         wings = wingsList,
         auras = auraList,
         shaders = shaderList,
         healthBars = barsList,
@@ -507,9 +507,10 @@ function destroy()
         showTitleCheck = nil
         colorBoxes = {}
         currentColorBox = nil
-
-        -- appearanceGroup:destroy()
-        -- appearanceGroup = nil
+        if appearanceGroup then
+            appearanceGroup:destroy()
+            appearanceGroup = nil
+        end
         colorModeGroup:destroy()
         colorModeGroup = nil
         colorBoxGroup:destroy()
@@ -569,7 +570,7 @@ function newPreset()
     presetWidget.title:setText("New Preset")
     local outfitCopy = table.copy(tempOutfit)
     presetWidget.creature:setOutfit(outfitCopy)
-  --  presetWidget.creature:setCenter(true)
+    --  presetWidget.creature:setCenter(true)
 
     settings.presets[presetId] = {
         title = "New Preset",
