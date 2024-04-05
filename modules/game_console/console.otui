@@ -233,6 +233,7 @@ Panel
     shift-navigation: true
     max-length: 255
     height: 18
+    @onTextChange: onTextChange(self:getText())
 
   TopToggleButton
     id: toggleChat
