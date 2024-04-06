@@ -210,6 +210,7 @@ void MapView::drawCreatureInformation() {
 
     Position _camera = m_posInfo.camera;
     const bool alwaysTransparent = m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && _camera.coveredUp(m_posInfo.camera.z - m_floorMin);
+
     for (const auto& [uid, creature] : g_map.getCreatures()) {
         const auto& tile = creature->getTile();
         if (!tile || !m_posInfo.isInRange(creature->getPosition()))
@@ -221,9 +222,7 @@ void MapView::drawCreatureInformation() {
             isCovered = !inRange;
         }
 
-        creature->setCovered(isCovered);
-
-        creature->drawInformation(m_posInfo, transformPositionTo2D(creature->getPosition()), flags);
+        creature->drawInformation(m_posInfo, transformPositionTo2D(creature->getPosition()), isCovered, flags);
     }
 }
 

@@ -105,8 +105,8 @@ function init()
     spelllistWindow = g_ui.displayUI('spelllist', modules.game_interface.getRightPanel())
     spelllistWindow:hide()
 
-    spelllistButton = modules.game_mainpanel.addToggleButton('spelllistButton', tr('Spell List'),
-                                                                      '/images/options/button_spells', toggle)
+    spelllistButton = modules.client_topmenu.addRightGameToggleButton('spelllistButton', tr('Spell List'),
+                                                                      '/images/topbuttons/spelllist', toggle)
     spelllistButton:setOn(false)
 
     nameValueLabel = spelllistWindow:getChildById('labelNameValue')

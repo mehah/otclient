@@ -507,7 +507,6 @@ void Game::loginWorld(const std::string_view account, const std::string_view pas
     resetGameStates();
 
     m_localPlayer = std::make_shared<LocalPlayer>();
-    m_localPlayer->onCreate();
     m_localPlayer->setName(characterName);
 
     m_protocolGame = std::make_shared<ProtocolGame>();

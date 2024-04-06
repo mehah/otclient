@@ -119,14 +119,6 @@ void Map::clean()
 
 void Map::cleanDynamicThings()
 {
-    for (const auto& mapview : m_mapViews)
-        mapview->followCreature(nullptr);
-
-    for (const auto& [widget, object] : m_attachedObjectWidgetMap)
-        widget->destroy();
-
-    m_attachedObjectWidgetMap.clear();
-
     for (const auto& [uid, creature] : m_knownCreatures) {
         removeThing(creature);
     }
@@ -1191,7 +1183,7 @@ void Map::updateAttachedWidgets(const MapViewPtr& mapView)
             const auto displacementY = g_game.getFeature(Otc::GameNegativeOffset) ? 0 : creature->getDisplacementY();
 
             const auto& jumpOffset = creature->getJumpOffset() * g_drawPool.getScaleFactor();
-            const auto& creatureOffset = Point(16 - displacementX, -displacementY - 2) + creature->getDrawOffset();
+            const auto& creatureOffset = Point(16 - displacementX, -displacementY - 2) + creature->getWalkOffset();
             p += creatureOffset * g_drawPool.getScaleFactor() - Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
         }
 
@@ -1207,7 +1199,6 @@ void Map::updateAttachedWidgets(const MapViewPtr& mapView)
         const auto& widgetRect = widget->getRect();
         const auto& newWidgetRect = Rect(p, widgetRect.width(), widgetRect.height());
 
-        widget->disableUpdateTemporarily();
         widget->setRect(newWidgetRect);
     }
 }

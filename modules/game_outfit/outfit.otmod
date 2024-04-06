@@ -1,9 +1,9 @@
 Module
   name: game_outfit
   description: Change local player outfit
-  author: Oen44
-  website: https://discord.gg/DUkqbedmgP
+  author: baxnie, edubart
+  website: https://github.com/edubart/otclient
   sandboxed: true
   scripts: [ outfit ]
-  @onLoad: init()
-  @onUnload: terminate()
+  @onLoad: controller:init()
+  @onUnload: controller:terminate()

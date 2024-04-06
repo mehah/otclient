@@ -1,4 +1,4 @@
-MiniPanel2 < Panel
+MiniPanel < Panel
   text-offset: 0 3
   text-align: top
   image-source: /images/ui/minipanel
@@ -88,7 +88,7 @@ MainWindow
   @onEnter: modules.game_tasks.toggleWindow()
   @onEscape: modules.game_tasks.toggleWindow()
 
-  MiniPanel2
+  MiniPanel
     id: listSearch
     anchors.top: parent.top
     anchors.left: parent.left

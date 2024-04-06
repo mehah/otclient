@@ -82,7 +82,6 @@ Minimap < UIMinimap
     @onClick: self:getParent():zoomOut()
 
   MinimapResetButton
-    id: resetButton
     @onClick: self:getParent():reset()
 
 

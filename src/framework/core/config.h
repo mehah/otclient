@@ -37,9 +37,7 @@ public:
     bool unload();
     bool save();
     void clear() const;
-    // NOTE kokekanon : DELETE THIS only for testing purposes
-    void clear2();
-    //
+
     void setValue(const std::string& key, const std::string& value);
     void setList(const std::string& key, const std::vector<std::string>& list);
     std::string getValue(const std::string& key);

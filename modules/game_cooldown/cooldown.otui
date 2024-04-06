@@ -5,6 +5,12 @@ SpellGroupIcon < UIWidget
   focusable: false
   margin-top: 3
 
+SecondarySpellGroupIcon < UIWidget
+  size: 22 22
+  image-size: 22 22
+  image-source: /images/game/spells/cooldowns
+  focusable: false
+  margin-top: 28
 
 SpellIcon < UIWidget
   size: 24 24
@@ -22,16 +28,16 @@ SpellProgressRect < UIProgressRect
 GroupCooldownParticles < UIParticles
   effect: groupcooldown-effect
 
-Panel
+MiniWindow
   id: cooldownWindow
-  !text: tr('')
-  size: 220 28
-  anchors.top: parent.top
-  anchors.left: parent.left
-  anchors.right: parent.right
-  Panel
-    id:contentsPanel2
-    anchors.fill: parent
+  !text: tr('Spell Cooldowns')
+  height: 110
+  icon: /images/topbuttons/cooldowns
+  @onOpen: modules.game_cooldown.onMiniWindowOpen()
+  @onClose: modules.game_cooldown.onMiniWindowClose()
+  &save: true
+
+  MiniWindowContents
     SpellGroupIcon
       id: groupIconAttack
       image-clip: 0 0 20 20
@@ -74,12 +80,12 @@ Panel
       anchors.fill: groupIconSupport
       !tooltip: tr('Support')
 
-    SpellGroupIcon
+    SecondarySpellGroupIcon
       id: groupIconSpecial
       image-clip: 60 0 20 20
       anchors.top: parent.top
-      anchors.left: groupIconSupport.right
-      margin-left: 3
+      anchors.left: parent.left
+      margin-left: 2
       $on:
         image-clip: 60 20 20 20
 
@@ -88,7 +94,7 @@ Panel
       anchors.fill: groupIconSpecial
       !tooltip: tr('Special')
 
-    SpellGroupIcon
+    SecondarySpellGroupIcon
       id: groupIconCrippling
       image-clip: 80 0 20 20
       anchors.top: parent.top
@@ -102,7 +108,7 @@ Panel
       anchors.fill: groupIconCrippling
       !tooltip: tr('Crippling')
 
-    SpellGroupIcon
+    SecondarySpellGroupIcon
       id: groupIconFocus
       image-clip: 100 0 20 20
       anchors.top: parent.top
@@ -116,7 +122,7 @@ Panel
       anchors.fill: groupIconFocus
       !tooltip: tr('Focus')
 
-    SpellGroupIcon
+    SecondarySpellGroupIcon
       id: groupIconUltimateStrike
       image-clip: 120 0 20 20
       anchors.top: parent.top
@@ -130,7 +136,7 @@ Panel
       anchors.fill: groupIconUltimateStrike
       !tooltip: tr('Ultimate Strike')
 
-    SpellGroupIcon
+    SecondarySpellGroupIcon
       id: groupIconGreatBeams
       image-clip: 140 0 20 20
       anchors.top: parent.top
@@ -144,7 +150,7 @@ Panel
       anchors.fill: groupIconGreatBeams
       !tooltip: tr('Great Beams')
 
-    SpellGroupIcon
+    SecondarySpellGroupIcon
       id: groupIconBurstOfNature
       image-clip: 160 0 20 20
       anchors.top: parent.top
@@ -162,10 +168,10 @@ Panel
       id: cooldownPanel
       layout:
         type: horizontalBox
-
+      height: 30
       margin-top: 3
       padding: 3
       anchors.top: groupIconSpecial.bottom
       anchors.left: parent.left
       anchors.right: parent.right
-
+      background-color: #00000022

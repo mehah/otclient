@@ -37,7 +37,6 @@
 #include <framework/graphics/graphics.h>
 #include <framework/graphics/texturemanager.h>
 #include <framework/graphics/shadermanager.h>
-#include <framework/ui/uiwidget.h>
 
 double Creature::speedA = 0;
 double Creature::speedB = 0;
@@ -62,14 +61,6 @@ Creature::Creature() :m_type(Proto::CreatureTypeUnknown)
         m_mountShader->setUniformValue(ShaderManager::MOUNT_ID_UNIFORM, m_outfit.getMount());
     };
     */
-}
-
-Creature::~Creature() {
-    setWidgetInformation(nullptr);
-}
-
-void Creature::onCreate() {
-    callLuaField("onCreate");
 }
 
 void Creature::draw(const Point& dest, bool drawThings, LightView* lightView)
@@ -132,7 +123,7 @@ void Creature::draw(const Rect& destRect, uint8_t size)
     } g_drawPool.releaseFrameBuffer(destRect);
 }
 
-void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, int drawFlags)
+void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, bool useGray, int drawFlags)
 {
     static const Color
         DEFAULT_COLOR(96, 96, 96),
@@ -140,12 +131,6 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, int
 
     if (isDead() || !canBeSeen() || !(drawFlags & Otc::DrawCreatureInfo) || !mapRect.isInRange(m_position))
         return;
-
-    if (g_gameConfig.isDrawingInformationByWidget()) {
-        if (m_widgetInformation)
-            m_widgetInformation->draw(mapRect.rect, DrawPoolType::FOREGROUND);
-        return;
-    }
 
     const auto displacementX = g_game.getFeature(Otc::GameNegativeOffset) ? 0 : getDisplacementX();
     const auto displacementY = g_game.getFeature(Otc::GameNegativeOffset) ? 0 : getDisplacementY();
@@ -161,7 +146,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, int
 
     auto fillColor = DEFAULT_COLOR;
 
-    if (!isCovered()) {
+    if (!useGray) {
         if (g_game.getFeature(Otc::GameBlueNpcNameColor) && isNpc() && isFullHealth())
             fillColor = NPC_COLOR;
         else fillColor = m_informationColor;
@@ -817,11 +802,11 @@ void Creature::setBaseSpeed(uint16_t baseSpeed)
     callLuaField("onBaseSpeedChange", baseSpeed, oldBaseSpeed);
 }
 
-void Creature::setType(uint8_t v) { if (m_type != v) callLuaField("onTypeChange", m_type = v); }
-void Creature::setIcon(uint8_t v) { if (m_icon != v) callLuaField("onIconChange", m_icon = v); }
-void Creature::setSkull(uint8_t v) { if (m_skull != v) callLuaField("onSkullChange", m_skull = v); }
-void Creature::setShield(uint8_t v) { if (m_shield != v) callLuaField("onShieldChange", m_shield = v); }
-void Creature::setEmblem(uint8_t v) { if (m_emblem != v) callLuaField("onEmblemChange", m_emblem = v); }
+void Creature::setType(uint8_t type) { callLuaField("onTypeChange", m_type = type); }
+void Creature::setIcon(uint8_t icon) { callLuaField("onIconChange", m_icon = icon); }
+void Creature::setSkull(uint8_t skull) { callLuaField("onSkullChange", m_skull = skull); }
+void Creature::setShield(uint8_t shield) { callLuaField("onShieldChange", m_shield = shield); }
+void Creature::setEmblem(uint8_t emblem) { callLuaField("onEmblemChange", m_emblem = emblem); }
 
 void Creature::setTypeTexture(const std::string& filename) { m_typeTexture = g_textures.getTexture(filename); }
 void Creature::setIconTexture(const std::string& filename) { m_iconTexture = g_textures.getTexture(filename); }
@@ -1100,45 +1085,6 @@ void Creature::setStaticWalking(uint16_t v) {
             self->m_walkUpdateEvent->cancel();
         }
     }, std::min<int>(v / g_gameConfig.getSpriteSize(), DrawPool::FPS60));
-}
-
-void Creature::setWidgetInformation(const UIWidgetPtr& info) {
-    if (m_widgetInformation == info)
-        return;
-
-    if (m_widgetInformation && !m_widgetInformation->isDestroyed()) {
-        m_widgetInformation->destroy();
-        g_map.removeAttachedWidgetFromObject(m_widgetInformation);
-    }
-
-    m_widgetInformation = info;
-
-    if (!info)
-        return;
-
-    info->setDraggable(false);
-    g_map.addAttachedWidgetToObject(info, std::static_pointer_cast<AttachableObject>(shared_from_this()));
-}
-
-void Creature::setName(const std::string_view name) {
-    if (name == m_name.getText())
-        return;
-
-    const auto& oldName = m_name.getText();
-    m_name.setText(name);
-    callLuaField("onChangeName", name, oldName);
-}
-
-void Creature::setCovered(bool covered) {
-    if (m_isCovered == covered)
-        return;
-
-    const auto oldCovered = m_isCovered;
-    m_isCovered = covered;
-
-    g_dispatcher.addEvent([self = static_self_cast<Creature>(), covered, oldCovered] {
-        self->callLuaField("onCovered", covered, oldCovered);
-    });
 }
 
 #ifndef BOT_PROTECTION

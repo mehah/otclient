@@ -23,31 +23,11 @@ SkillValueLabel < GameLabel
   anchors.bottom: parent.bottom
   anchors.left: prev.left
 
-ImageSkill < UIWidget
-  id: Img
-  size: 9 9
-  width: 9
-  margin-top: 13
-  anchors.left: parent.left
-  anchors.top: parent.top
-  phantom: false
-
-RedPercentPanel < ProgressBar
-  id: percent
-  background-color: red
-  height: 5
-  margin-top: 15
-  anchors.left: parent.left
-  anchors.right: parent.right
-  anchors.top: parent.top
-  phantom: false
-
 SkillPercentPanel < ProgressBar
   id: percent
   background-color: green
   height: 5
   margin-top: 15
-  margin-left: 15
   anchors.left: parent.left
   anchors.right: parent.right
   anchors.top: parent.top
@@ -80,7 +60,8 @@ MiniWindow
       SkillNameLabel
         !text: tr('Level')
       SkillValueLabel
-      RedPercentPanel
+      SkillPercentPanel
+        background-color: red
 
     SkillButton
       id: health
@@ -128,47 +109,35 @@ MiniWindow
       SkillNameLabel
         !text: tr('Stamina')
       SkillValueLabel
-      RedPercentPanel
+      SkillPercentPanel
 
     SkillButton
       id: offlineTraining
       SkillNameLabel
         !text: tr('Offline Training')
       SkillValueLabel
-      RedPercentPanel
+      SkillPercentPanel
 
     SkillButton
       id: magiclevel
       SkillNameLabel
         !text: tr('Magic Level')
       SkillValueLabel
-      ImageSkill
-        image-source: /images/icons/icon_magic
-        image-size: 9 9
       SkillPercentPanel
         background-color: red
 
     SkillButton
       id: skillId0
-
-
       SkillNameLabel
         !text: tr('Fist Fighting')
       SkillValueLabel
-      ImageSkill
-        image-source: /images/icons/icon_fist
-        image-size: 9 9
       SkillPercentPanel
 
     SkillButton
       id: skillId1
-
       SkillNameLabel
         !text: tr('Club Fighting')
       SkillValueLabel
-      ImageSkill
-        image-source: /images/icons/icon_club
-        image-size: 9 9
       SkillPercentPanel
 
     SkillButton
@@ -176,9 +145,6 @@ MiniWindow
       SkillNameLabel
         !text: tr('Sword Fighting')
       SkillValueLabel
-      ImageSkill
-        image-source: /images/icons/icon_sword
-        image-size: 9 9
       SkillPercentPanel
 
     SkillButton
@@ -186,9 +152,6 @@ MiniWindow
       SkillNameLabel
         !text: tr('Axe Fighting')
       SkillValueLabel
-      ImageSkill
-        image-source: /images/icons/icon_axe
-        image-size: 9 9
       SkillPercentPanel
 
     SkillButton
@@ -196,9 +159,6 @@ MiniWindow
       SkillNameLabel
         !text: tr('Distance Fighting')
       SkillValueLabel
-      ImageSkill
-        image-source: /images/icons/icon_distance
-        image-size: 9 9
       SkillPercentPanel
 
     SkillButton
@@ -206,9 +166,6 @@ MiniWindow
       SkillNameLabel
         !text: tr('Shielding')
       SkillValueLabel
-      ImageSkill
-        image-source: /images/icons/icon_shielding
-        image-size: 9 9
       SkillPercentPanel
 
     SkillButton
@@ -216,9 +173,6 @@ MiniWindow
       SkillNameLabel
         !text: tr('Fishing')
       SkillValueLabel
-      ImageSkill
-        image-source: /images/icons/icon_fishing
-        image-size: 9 9
       SkillPercentPanel
 
     SmallSkillButton

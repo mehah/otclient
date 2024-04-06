@@ -269,9 +269,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Config>("getOrCreateNode", &Config::getOrCreateNode);
     g_lua.bindClassMemberFunction<Config>("mergeNode", &Config::mergeNode);
     g_lua.bindClassMemberFunction<Config>("getFileName", &Config::getFileName);
-    // NOTE kokekanon : DELETE THIS only for testing purposes
-    g_lua.bindClassMemberFunction<Config>("clearCache", &Config::clear2);
-    //
+
     // Module
     g_lua.registerClass<Module>();
     g_lua.bindClassMemberFunction<Module>("load", &Module::load);
@@ -331,7 +329,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_app", "setCreatureInformationScale", &GraphicalApplication::setCreatureInformationScale, &g_app);
     g_lua.bindSingletonFunction("g_app", "setAnimatedTextScale", &GraphicalApplication::setAnimatedTextScale, &g_app);
     g_lua.bindSingletonFunction("g_app", "setStaticTextScale", &GraphicalApplication::setStaticTextScale, &g_app);
-
+    
     // PlatformWindow
     g_lua.registerSingletonClass("g_window");
     g_lua.bindSingletonFunction("g_window", "move", &PlatformWindow::move, &g_window);
@@ -744,12 +742,6 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("getTextSize", &UIWidget::getTextSize);
     g_lua.bindClassMemberFunction<UIWidget>("hasShader", &UIWidget::hasShader);
     g_lua.bindClassMemberFunction<UIWidget>("disableUpdateTemporarily", &UIWidget::disableUpdateTemporarily);
-
-    g_lua.bindClassMemberFunction<UIWidget>("setBackgroundDrawOrder", &UIWidget::setBackgroundDrawOrder);
-    g_lua.bindClassMemberFunction<UIWidget>("setImageDrawOrder", &UIWidget::setImageDrawOrder);
-    g_lua.bindClassMemberFunction<UIWidget>("setIconDrawOrder", &UIWidget::setIconDrawOrder);
-    g_lua.bindClassMemberFunction<UIWidget>("setTextDrawOrder", &UIWidget::setTextDrawOrder);
-    g_lua.bindClassMemberFunction<UIWidget>("setBorderDrawOrder", &UIWidget::setBorderDrawOrder);
 
     // UILayout
     g_lua.registerClass<UILayout>();

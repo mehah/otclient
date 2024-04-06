@@ -5,8 +5,8 @@ function init()
     g_ui.importStyle('questlogwindow')
     g_ui.importStyle('questlinewindow')
 
-    questLogButton = modules.game_mainpanel.addToggleButton('questLogButton', tr('Quest Log'),
-                                                              '/images/options/button_questlog', function()
+    questLogButton = modules.client_topmenu.addLeftGameButton('questLogButton', tr('Quest Log'),
+                                                              '/images/topbuttons/questlog', function()
         g_game.requestQuestLog()
     end)
 

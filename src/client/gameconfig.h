@@ -49,10 +49,9 @@ public:
     uint8_t getTileMaxThings() const { return m_tileMaxThings; }
     uint8_t getTileTransparentFloorViewRange() const { return m_tileTransparentFloorViewRange; }
 
-    bool isDrawingInformationByWidget() { return m_drawInformationByWidget; }
     bool isForcingNewWalkingFormula() const { return m_forceNewWalkingFormula; }
-    bool isAdjustCreatureInformationBasedCropSize() { return m_adjustCreatureInformationBasedCropSize; }
-    uint16_t getShieldBlinkTicks() { return m_shieldBlinkTicks; }
+    bool isAdjustCreatureInformationBasedCropSize() const { return m_adjustCreatureInformationBasedCropSize; }
+    uint16_t getShieldBlinkTicks() const { return m_shieldBlinkTicks; }
     uint16_t getVolatileSquareDuration() const { return m_volatileSquareDuration; }
 
     uint16_t getInvisibleTicksPerFrame() const { return m_invisibleTicksPerFrame; }
@@ -70,11 +69,6 @@ public:
     BitmapFontPtr getAnimatedTextFont()  const { return m_animatedTextFont; }
     BitmapFontPtr getStaticTextFont()  const { return m_staticTextFont; }
     BitmapFontPtr getWidgetTextFont()  const { return m_widgetTextFont; }
-
-    std::string getCreatureNameFontName() { return m_creatureNameFont->getName(); }
-    std::string getAnimatedTextFontName() { return m_animatedTextFont->getName(); }
-    std::string getStaticTextFontName() { return m_staticTextFont->getName(); }
-    std::string getWidgetTextFontName() { return m_widgetTextFont->getName(); }
 
     void loadFonts();
 
@@ -106,7 +100,6 @@ private:
     uint8_t m_tileTransparentFloorViewRange{ 2 };
 
     // Creature
-    bool m_drawInformationByWidget{ false };
     bool m_forceNewWalkingFormula{ true };
     bool m_adjustCreatureInformationBasedCropSize{ false };
     uint16_t m_shieldBlinkTicks{ 500 };

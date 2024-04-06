@@ -1,4 +1,4 @@
-local minimap = modules.game_mainpanel.getMiniMapUi()
+local minimap = modules.game_minimap.minimapWidget
 
 minimap.onMouseRelease = function(widget,pos,button)
   if not minimap.allowNextRelease then return true end

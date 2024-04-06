@@ -40,13 +40,14 @@ void UIWidget::parseImageStyle(const OTMLNodePtr& styleNode)
             if (split.size() == 0) split.push_back("none");
             bool base64 = split.size() > 1 && split[0] == "base64";
             auto& value = split.size() > 1 ? split[1] : split[0];
-
+            
             if (value == "" || value == "none") {
                 setImageSource("", base64);
             } else {
                 setImageSource(stdext::resolve_path(value, node->source()), base64);
             }
-        } else if (node->tag() == "image-offset-x")
+        }
+        else if (node->tag() == "image-offset-x")
             setImageOffsetX(node->value<int>());
         else if (node->tag() == "image-offset-y")
             setImageOffsetY(node->value<int>());
@@ -182,9 +183,9 @@ void UIWidget::drawImage(const Rect& screenCoords)
 
     for (const auto& [dest, src] : m_imageCoordsCache) {
         if (useRepeated)
-            g_drawPool.addTexturedRepeatedRect(dest, texture, src, m_imageColor, m_imageDrawConductor);
+            g_drawPool.addTexturedRepeatedRect(dest, texture, src, m_imageColor);
         else
-            g_drawPool.addTexturedRect(dest, texture, src, m_imageColor, m_imageDrawConductor);
+            g_drawPool.addTexturedRect(dest, texture, src, m_imageColor);
     }
 }
 
@@ -204,9 +205,9 @@ void UIWidget::setImageSource(const std::string_view source, bool base64)
         stream.write(decoded.c_str(), decoded.size());
         m_imageTexture = g_textures.loadTexture(stream);
     } else {
-        m_imageTexture = g_textures.getTexture(m_imageSource = source, isImageSmooth());
+	    m_imageTexture = g_textures.getTexture(m_imageSource = source, isImageSmooth());
     }
-
+    
     if (!m_imageTexture)
         return;
 

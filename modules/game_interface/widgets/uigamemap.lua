@@ -77,7 +77,13 @@ function UIGameMap:onMousePress()
     end
 end
 
-function UIGameMap:onMouseMove()
+function UIGameMap:onMouseMove(mousePos, mouseMoved)
+    self.mousePos = mousePos
+    return false
+end
+
+function UIGameMap:onDragMove(mousePos, mouseMoved)
+    self.mousePos = mousePos
     return false
 end
 

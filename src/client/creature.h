@@ -45,11 +45,8 @@ public:
     static double speedC;
 
     Creature();
-    ~Creature();
 
     static bool hasSpeedFormula();
-
-    void onCreate();
 
     void onAppear() override;
     void onDisappear() override;
@@ -58,11 +55,11 @@ public:
     void draw(const Rect& destRect, uint8_t size);
 
     void internalDraw(Point dest, LightView* lightView = nullptr, const Color& color = Color::white);
-    void drawInformation(const MapPosInfo& mapRect, const Point& dest, int drawFlags);
+    void drawInformation(const MapPosInfo& mapRect, const Point& dest, bool useGray, int drawFlags);
 
     void setId(uint32_t id) override { m_id = id; }
     void setMasterId(uint32_t id) { m_masterId = id; }
-    void setName(const std::string_view name);
+    void setName(const std::string_view name) { m_name.setText(name); }
     void setHealthPercent(uint8_t healthPercent);
     void setDirection(Otc::Direction direction);
     void setOutfit(const Outfit& outfit);
@@ -149,12 +146,9 @@ public:
     bool isRemoved() { return m_removed; }
     bool isInvisible() { return m_outfit.isEffect() && m_outfit.getAuxId() == 13; }
     bool isDead() { return m_healthPercent <= 0; }
-    bool isFullHealth() { return m_healthPercent == 100; }
+    bool isFullHealth() const { return m_healthPercent == 100; }
     bool canBeSeen() { return !isInvisible() || isPlayer(); }
     bool isCreature() override { return true; }
-    bool isCovered() { return m_isCovered; }
-
-    void setCovered(bool covered);
 
     bool isDisabledWalkAnimation() { return m_disableWalkAnimation > 0; }
     void setDisableWalkAnimation(bool v) {
@@ -169,9 +163,6 @@ public:
     bool getTyping() { return m_typing; }
     void setTypingIconTexture(const std::string& filename);
     void setBounce(uint8_t minHeight, uint8_t height, uint16_t speed) { m_bounce = { minHeight, height , speed }; }
-
-    void setWidgetInformation(const UIWidgetPtr& info);
-    UIWidgetPtr getWidgetInformation() { return m_widgetInformation; }
 
 #ifndef BOT_PROTECTION
     void setText(const std::string& text, const Color& color);
@@ -257,7 +248,6 @@ private:
     bool m_drawOutfitColor{ true };
     bool m_showShieldTexture{ true };
     bool m_typing{ false };
-    bool m_isCovered{ false };
 
     uint8_t m_disableWalkAnimation{ 0 };
 
@@ -304,8 +294,6 @@ private:
     std::function<void()> m_mountShaderAction{ nullptr };
 
     ThingType* m_mountType{ nullptr };
-
-    UIWidgetPtr m_widgetInformation;
 
 #ifndef BOT_PROTECTION
     StaticTextPtr m_text;

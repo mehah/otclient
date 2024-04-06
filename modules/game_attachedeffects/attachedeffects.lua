@@ -53,24 +53,3 @@ controller:attachExternalEvent(EventController:new(AttachedEffect, {
     onAttach = onAttach,
     onDetach = onDetach
 }))
-
--- @ note: sorry, I couldn't find any other way to do it
-function getCategory(id)
-    return AttachedEffectManager.get(id).thingCategory
-end
-
-function getTexture(id)
-    if AttachedEffectManager.get(id).thingCategory == 5 then
-        return AttachedEffectManager.get(id).thingId
-    end
-end
-
-function getName(id)
-    if type(id) == "number" then
-        return AttachedEffectManager.get(id).name
-    else
-        return "None"
-    end
-
-end
--- @

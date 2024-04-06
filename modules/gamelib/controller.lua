@@ -234,45 +234,26 @@ function Controller:sendExtendedOpcode(opcode, ...)
     end
 end
 
-function Controller:bindKeyDown(key, ...)
+function Controller:bindKeyDown(...)
     table.insert(self.keyboardEvents, {
         name = 'KeyDown',
-        key = key,
         args = ...
     })
-    g_keyboard.bindKeyDown(key, ...)
+    g_keyboard.bindKeyDown(...)
 end
 
-function Controller:unbindKeyDown(key, ...)
-    for index, entry in pairs(self.keyboardEvents) do
-        if entry.key == key then
-            table.remove(self.keyboardEvents, index)
-            break
-        end
-    end
-
-    table.insert(self.keyboardEvents, {
-        name = 'KeyDown',
-        key = key,
-        args = ...
-    })
-    g_keyboard.unbindKeyDown(key, ...)
-end
-
-function Controller:bindKeyUp(key, ...)
+function Controller:bindKeyUp(...)
     table.insert(self.keyboardEvents, {
         name = 'KeyUp',
-        key = key,
         args = ...
     })
-    g_keyboard.bindKeyUp(key, ...)
+    g_keyboard.bindKeyUp(...)
 end
 
-function Controller:bindKeyPress(key, ...)
+function Controller:bindKeyPress(...)
     table.insert(self.keyboardEvents, {
         name = 'KeyPress',
-        key = key,
         args = ...
     })
-    g_keyboard.bindKeyPress(key, ...)
+    g_keyboard.bindKeyPress(...)
 end

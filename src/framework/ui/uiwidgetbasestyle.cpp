@@ -69,17 +69,7 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
     }
     // load styles used by all widgets
     for (const auto& node : styleNode->children()) {
-        if (node->tag() == "background-draw-order")
-            setBackgroundDrawOrder(node->value<int>());
-        else if (node->tag() == "border-draw-order")
-            setBorderDrawOrder(node->value<int>());
-        else if (node->tag() == "icon-draw-order")
-            setIconDrawOrder(node->value<int>());
-        else if (node->tag() == "image-draw-order")
-            setImageDrawOrder(node->value<int>());
-        else if (node->tag() == "text-draw-order")
-            setTextDrawOrder(node->value<int>());
-        else if (node->tag() == "color")
+        if (node->tag() == "color")
             setColor(node->value<Color>());
         else if (node->tag() == "shader")
             setShader(node->value());
@@ -360,7 +350,7 @@ void UIWidget::drawBackground(const Rect& screenCoords) const
         drawRect.translate(m_backgroundRect.topLeft());
         if (m_backgroundRect.isValid())
             drawRect.resize(m_backgroundRect.size());
-        g_drawPool.addFilledRect(drawRect, m_backgroundColor, m_backgroundDrawConductor);
+        g_drawPool.addFilledRect(drawRect, m_backgroundColor);
     }
 }
 
@@ -369,22 +359,22 @@ void UIWidget::drawBorder(const Rect& screenCoords) const
     // top
     if (m_borderWidth.top > 0) {
         const Rect borderRect(screenCoords.topLeft(), screenCoords.width(), m_borderWidth.top);
-        g_drawPool.addFilledRect(borderRect, m_borderColor.top, m_borderDrawConductor);
+        g_drawPool.addFilledRect(borderRect, m_borderColor.top);
     }
     // right
     if (m_borderWidth.right > 0) {
         const Rect borderRect(screenCoords.topRight() - Point(m_borderWidth.right - 1, 0), m_borderWidth.right, screenCoords.height());
-        g_drawPool.addFilledRect(borderRect, m_borderColor.right, m_borderDrawConductor);
+        g_drawPool.addFilledRect(borderRect, m_borderColor.right);
     }
     // bottom
     if (m_borderWidth.bottom > 0) {
         const Rect borderRect(screenCoords.bottomLeft() - Point(0, m_borderWidth.bottom - 1), screenCoords.width(), m_borderWidth.bottom);
-        g_drawPool.addFilledRect(borderRect, m_borderColor.bottom, m_borderDrawConductor);
+        g_drawPool.addFilledRect(borderRect, m_borderColor.bottom);
     }
     // left
     if (m_borderWidth.left > 0) {
         const Rect borderRect(screenCoords.topLeft(), m_borderWidth.left, screenCoords.height());
-        g_drawPool.addFilledRect(borderRect, m_borderColor.left, m_borderDrawConductor);
+        g_drawPool.addFilledRect(borderRect, m_borderColor.left);
     }
 }
 
@@ -407,7 +397,7 @@ void UIWidget::drawIcon(const Rect& screenCoords) const
             drawRect.alignIn(screenCoords, m_iconAlign);
     }
     drawRect.translate(m_iconOffset);
-    g_drawPool.addTexturedRect(drawRect, m_icon, m_iconClipRect, m_iconColor, m_iconDrawConductor);
+    g_drawPool.addTexturedRect(drawRect, m_icon, m_iconClipRect, m_iconColor);
 }
 
 void UIWidget::setIcon(const std::string& iconFile)
