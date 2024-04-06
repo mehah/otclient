@@ -17,6 +17,7 @@ game
     transparent-floor-view-range: 2
 
   creature
+    draw-information-by-widget-beta: false
     force-new-walking-formula: true
     shield-blink-ticks: 500
     volatile-square-duration: 1000
@@ -28,7 +29,7 @@ game
 
   render
     invisible-ticks-per-frame: 75
-    item-ticks-per-frame: 500
+    item-ticks-per-frame: 75
     effect-ticks-per-frame: 75
     missile-ticks-per-frame: 75
     animated-text-duration: 1000

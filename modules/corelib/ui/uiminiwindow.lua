@@ -69,14 +69,14 @@ function UIMiniWindow:maximize(dontSave)
         parent:fitAll(self)
     end
 
-    signalcall(self.onMaximize, self)							 
+    signalcall(self.onMaximize, self)
 end
 
 function UIMiniWindow:setup()
-    self:getChildById('closeButton').onClick = function()		
-        self:close()				 
+    self:getChildById('closeButton').onClick = function()
+        self:close()
     end
-	
+
     self:getChildById('minimizeButton').onClick = function()
 
         if self:isOn() then
@@ -85,13 +85,23 @@ function UIMiniWindow:setup()
             self:minimize()
         end
     end
+
+    self:getChildById('lockButton').onClick = function()
+
+        if self:isDraggable() then
+            self:lock()
+        else
+            self:unlock()
+        end
+    end
+
     self:getChildById('miniwindowTopBar').onDoubleClick = function()
         if self:isOn() then
             self:maximize()
         else
             self:minimize()
         end
-    end				
+    end
 end
 
 function UIMiniWindow:setupOnStart()
@@ -117,7 +127,7 @@ function UIMiniWindow:setupOnStart()
             g_settings.setNode('CharMiniWindows', settings)
             break
         end
-		 
+
     end
 
     local selfSettings = settings[char][self:getId()]
@@ -133,7 +143,7 @@ function UIMiniWindow:setupOnStart()
                     self:setParent(parent, true)
                     self:setPosition(topoint(selfSettings.position))
                     newParentSet = true
-		  
+
                 end
             end
         end
@@ -156,7 +166,6 @@ function UIMiniWindow:setupOnStart()
             self:open(true)
         end
     end
-	 
 
     local newParent = self:getParent()
 
@@ -194,6 +203,8 @@ function UIMiniWindow:onDragEnter(mousePos)
     end
 
     if parent:getClassName() == 'UIMiniWindowContainer' then
+        self.oldParentDrag = parent
+        self.oldParentDragIndex = parent:getChildIndex(self)
         local containerParent = parent:getParent()
         parent:removeChild(self)
         containerParent:addChild(self)
@@ -220,6 +231,17 @@ function UIMiniWindow:onDragLeave(droppedWidget, mousePos)
     end
 
     self:saveParent(self:getParent())
+
+    -- Note: It seems to prevent the minimap, inventory, and health widgets from moving off the interface panel.
+    if self.moveOnlyToMain or droppedWidget and droppedWidget.onlyPhantomDrop then
+        if not (droppedWidget) or (self.moveOnlyToMain and not (droppedWidget.onlyPhantomDrop)) or
+            (not (self.moveOnlyToMain) and droppedWidget.onlyPhantomDrop) then
+            local virtualParent = self:getParent()
+            virtualParent:removeChild(self)
+            self.oldParentDrag:insertChild(self.oldParentDragIndex, self)
+            self.movedWidget = nil
+        end
+    end
 end
 
 function UIMiniWindow:onDragMove(mousePos, mouseMoved)
@@ -260,7 +282,6 @@ function UIMiniWindow:onDragMove(mousePos, mouseMoved)
             break
         end
     end
-	 
 
     if not overAnyWidget and self.movedWidget then
         self.setMovedChildMargin(self.movedOldMargin or 0)
@@ -316,7 +337,7 @@ function UIMiniWindow:getSettings(name)
             return selfSettings[name]
         end
     end
-	 
+
     return nil
 end
 
@@ -387,7 +408,7 @@ function UIMiniWindow:saveParent(parent)
             self:saveParentPosition(parent:getId(), self:getPosition())
         end
     end
-	 
+
 end
 
 function UIMiniWindow:saveParentPosition(parentId, position)
@@ -482,5 +503,37 @@ end
 
 function UIMiniWindow:isResizeable()
     local resizeBorder = self:getChildById('bottomResizeBorder')
+    if not resizeBorder then
+        return false
+    end
     return resizeBorder:isExplicitlyVisible() and resizeBorder:isEnabled()
+end
+
+function UIMiniWindow:lock(dontSave)
+    local lockButton = self:getChildById('lockButton')
+    if lockButton then
+        lockButton:setOn(true)
+    end
+    self:setDraggable(false)
+    if not dontsave then
+        self:setSettings({
+            locked = true
+        })
+    end
+
+    signalcall(self.onLockChange, self)
+end
+
+function UIMiniWindow:unlock(dontSave)
+    local lockButton = self:getChildById('lockButton')
+    if lockButton then
+        lockButton:setOn(false)
+    end
+    self:setDraggable(true)
+    if not dontsave then
+        self:setSettings({
+            locked = false
+        })
+    end
+    signalcall(self.onLockChange, self)
 end

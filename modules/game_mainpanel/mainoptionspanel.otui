@@ -1,0 +1,119 @@
+PhantomMiniWindow
+  id: mainoptionspanel
+  height: 28
+  &panelHeight: 28
+  on: true
+
+  UIWidget
+    id: offPanel
+    anchors.fill: parent
+    margin-top: 8
+    phantom: true
+
+    UIWidget
+      id: store
+
+      image-clip: 0 0 108 20
+      anchors.top: parent.top
+      anchors.left: parent.left
+
+      size: 108 20
+      layout:
+        type: verticalBox
+        cell-size: 108 20
+        cell-spacing: 2
+        flow: true
+      $pressed !disabled:
+        image-clip: 0 20 108 20
+
+    Button
+      size: 44 20
+      image-source: /images/options/button_enlarge
+      image-clip: 0 0 44 20
+      anchors.top: parent.top
+      anchors.right: parent.right
+      margin-right: 8
+      @onClick: changeOptionsSize()
+
+      $pressed !disabled:
+        image-clip: 0 20 44 20
+
+  UIWidget
+    id: onPanel
+    anchors.fill: parent
+    margin-top: 8
+    phantom: true
+
+    UIWidget
+      id: store
+
+      image-clip: 0 0 108 20
+      anchors.top: parent.top
+      anchors.left: parent.left
+      margin-left: 8
+      size: 108 20
+      phantom: true
+      layout:
+        type: verticalBox
+        cell-size: 108 20
+        cell-spacing: 2
+        flow: true
+		
+      $pressed !disabled:
+        image-clip: 0 20 108 20
+
+    Button
+      id: resizer
+      size: 44 20
+      image-source: /images/options/button_shrink
+      image-clip: 0 0 44 20
+      anchors.top: parent.top
+      anchors.right: parent.right
+      margin-right: 8
+      @onClick: changeOptionsSize()
+
+      $pressed !disabled:
+        image-clip: 0 20 44 20
+
+    UIWidget
+      id: options
+      anchors.left: store.left
+      anchors.right: store.right
+      anchors.top: store.bottom
+      anchors.bottom: parent.bottom
+      margin-top: 6
+      margin-left: 0
+      margin-right: 0
+      margin-bottom: 0
+      phantom: true
+      layout:
+        type: grid
+        cell-size: 20 20
+        cell-spacing: 2
+        flow: true
+
+    UIWidget
+      image-source: /images/ui/vertical_line_bright
+      anchors.top: options.top
+      anchors.bottom: options.bottom
+      anchors.left: store.right
+      margin-left: 5
+      phantom: true
+      width: 1
+
+    UIWidget
+      id: specials
+      anchors.left: resizer.left
+      anchors.right: resizer.right
+      anchors.top: options.top
+      anchors.bottom: parent.bottom
+      margin-top: 0
+      margin-left: 0
+      margin-right: 0
+      margin-bottom: 0
+      phantom: true
+      layout:
+        type: grid
+        cell-size: 20 20
+        cell-spacing: 2
+        flow: true

@@ -145,6 +145,7 @@ function init()
     g_keyboard.bindKeyDown(HOTKEY, toggle)
 
     shadersPanel = g_ui.createWidget('ShadersPanel', modules.game_interface.getMapPanel())
+    shadersPanel:setMarginTop(80)
     shadersPanel:hide()
 
     local mapComboBox = shadersPanel:getChildById('mapComboBox')

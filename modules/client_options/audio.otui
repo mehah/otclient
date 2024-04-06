@@ -1,28 +1,34 @@
 Panel
-  OptionCheckBox
-    id: enableAudio
-    !text: tr('Enable audio')
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    height: 22
 
-  OptionCheckBox
-    id: enableMusicSound
-    !text: tr('Enable music sound')
+    OptionCheckBox
+      id: enableAudio
+      !text: tr('Enable audio')
 
-  Label
-    id: musicSoundVolumeLabel
-    !text: tr('Music volume: %d', 100)
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 6
-    @onSetup: |
-      local value = modules.client_options.getOption('musicSoundVolume')
-      self:setText(tr('Music volume: %d', value))
+    margin-top: 7
+    height: 44
+  
+    OptionCheckBox
+      id: enableMusicSound
+      !text: tr('Enable music sound')
 
-  OptionScrollbar
-    id: musicSoundVolume
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 3
-    minimum: 0
-    maximum: 100
+    OptionScaleScroll
+      id: musicSoundVolume
+      margin-top: 5
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      &minimumScrollValue: 1
+      &maximumScrollValue: 100
+      &scrollSize: 21
+      @onSetup: |
+        local value = modules.client_options.getOption('musicSoundVolume')
+        self:setText(tr('Music volume: %d', value))

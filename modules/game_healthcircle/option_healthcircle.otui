@@ -1,105 +1,155 @@
 Panel
-  OptionCheckBox
-    id: healthCheckBox
-    !text: tr('Health circle')
-    !tooltip: tr('On health circle')
-    @onCheckChange: |
-      if self:isChecked() then
-        modules.game_healthcircle.setHealthCircle(true)
-      else
-        modules.game_healthcircle.setHealthCircle(false)
-      end
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    height: 22
 
-  OptionCheckBox
-    id: manaCheckBox
-    !text: tr('Mana circle')
-    !tooltip: tr('On mana circle')
-    @onCheckChange: |
-      if self:isChecked() then
-        modules.game_healthcircle.setManaCircle(true)
-      else
-        modules.game_healthcircle.setManaCircle(false)
-      end
+    OptionCheckBoxMarked
+      id: healthCheckBox
+      !text: tr('Health circle')
+      !tooltip: tr('Show health red circle.')
+      @onCheckChange: |
+        if self:isChecked() then
+          modules.game_healthcircle.setHealthCircle(true)
+        else
+          modules.game_healthcircle.setHealthCircle(false)
+        end
 
-  OptionCheckBox
-    id: experienceCheckBox
-    !text: tr('Experience circle')
-    !tooltip: tr('On experience circle')
-    @onCheckChange: |
-      if self:isChecked() then
-        modules.game_healthcircle.setExpCircle(true)
-      else
-        modules.game_healthcircle.setExpCircle(false)
-      end
-
-  OptionCheckBox
-    id: skillCheckBox
-    !text: tr('Skill circle')
-    !tooltip: tr('On skill circle')
-    @onCheckChange: |
-      if self:isChecked() then
-        modules.game_healthcircle.setSkillCircle(true)
-      else
-        modules.game_healthcircle.setSkillCircle(false)
-      end
-
-  Label
-    id: chooseSkillLabel
-    !text: tr('Skill:')
-    !tooltip: tr('Choose skill to show in skill circle.')
-    phantom: false
-    anchors.left: prev.left
-    anchors.top: prev.bottom
-    margin-top: 13
-
-  ComboBox
-    id: chooseSkillComboBox
-    width: 120
-    anchors.left: prev.right
-    anchors.top: prev.top
-    margin-top: -4
-    margin-left: 5
-    mouse-scroll: false
-    @onTextChange: modules.game_healthcircle.setSkillType(self:getCurrentOption().data)
-
-  Label
-    id: distFromCenLabel
-    phantom: false
-    !tooltip: tr('Set distance from center.')
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 8
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBoxMarked
+      id: manaCheckBox
+      !text: tr('Mana circle')
+      !tooltip: tr('Show mana blue circle.')
+      @onCheckChange: |
+        if self:isChecked() then
+          modules.game_healthcircle.setManaCircle(true)
+        else
+          modules.game_healthcircle.setManaCircle(false)
+        end
 
-  OptionScrollbar
-    id: distFromCenScrollbar
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 3
-    minimum: 0
-    maximum: 100
-    @onValueChange: |
-      modules.game_healthcircle.optionPanel:recursiveGetChildById('distFromCenLabel'):setText(tr('Distance: %s', self:getValue()))
-      modules.game_healthcircle.setDistanceFromCenter(self:getValue())
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBoxMarked
+      id: experienceCheckBox
+      !text: tr('Experience circle')
+      !tooltip: tr('Show experience yellow circle.')
+      @onCheckChange: |
+        if self:isChecked() then
+          modules.game_healthcircle.setExpCircle(true)
+        else
+          modules.game_healthcircle.setExpCircle(false)
+        end
 
-  Label
-    id: opacityLabel
-    phantom: false
-    !tooltip: tr('Set circle opacity.')
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: distFromCenScrollbar.bottom
-    margin-top: 8
-
-  OptionScrollbar
-    id: opacityScrollbar
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 5
-    minimum: 0
-    maximum: 100
-    @onValueChange: |
-      modules.game_healthcircle.optionPanel:recursiveGetChildById('opacityLabel'):setText(tr('Opacity: %s', self:getValue() / 100))
-      modules.game_healthcircle.setCircleOpacity(self:getValue() / 100)
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBoxMarked
+      id: skillCheckBox
+      !text: tr('Skill circle')
+      !tooltip: tr('Show skill purple circle.')
+      @onCheckChange: |
+        if self:isChecked() then
+          modules.game_healthcircle.setSkillCircle(true)
+        else
+          modules.game_healthcircle.setSkillCircle(false)
+        end
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 32
+  
+    Label
+      !text: tr('Skill:')
+      anchors.left: parent.left
+      margin-left: 18
+      color: #c0c0c0ff
+      anchors.verticalCenter: parent.verticalCenter
+
+    QtComboBox
+      id: chooseSkillComboBox
+      width: 120
+      margin-left: 10
+      anchors.verticalCenter: prev.verticalCenter
+      anchors.left: prev.right
+      mouse-scroll: false
+      @onTextChange: modules.game_healthcircle.setSkillType(self:getCurrentOption().data)
+
+    UIWidget
+      !tooltip: tr('Choose skill to show in skill circle.')
+      image-source: /images/icons/show_gui_help_grey
+      size: 12 12
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-right: 3
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+
+    OptionScaleScrollMarked
+      id: distFromCenScrollbar
+      !text: tr('Distance from center' .. ':')
+      !tooltip: tr('Set distance from center.')
+      anchors.fill: parent
+      &minimumScrollValue: 0
+      &maximumScrollValue: 100
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+
+    OptionScaleScrollMarked
+      id: opacityScrollbar
+      !text: tr('Opacity' .. ':')
+      !tooltip: tr('Set circle opacity.')
+      anchors.fill: parent
+      &minimumScrollValue: 0
+      &maximumScrollValue: 100
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 32
+  
+    Label
+      !text: tr('Top Bar Style:')
+      anchors.left: parent.left
+      margin-left: 18
+      color: #c0c0c0ff
+      anchors.verticalCenter: parent.verticalCenter
+
+    QtComboBox
+      id: chooseTopBarDimension
+      width: 120
+      margin-left: 10
+      anchors.verticalCenter: prev.verticalCenter
+      anchors.left: prev.right
+      mouse-scroll: false
+      @onTextChange: modules.game_interface.setStatsBarOption(self:getCurrentOption().data, 'top')

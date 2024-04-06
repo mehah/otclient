@@ -1,28 +1,168 @@
-TopMenuPanel
+PingWidget < UIWidget
+  UIWidget
+    id: panelPingFps
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 110
+    focusable: false
+    UIWidget
+      id:imgPing
+      image-source: /images/ui/up
+      anchors.left: parent.left
+      anchors.top: prev.bottom
+      focusable: false
+    Label
+      id: lblping
+      height: 12
+      width: 33
+      margin-left: 2
+      anchors.left: Img_ping.right
+      text-horizontal-auto-resize: true
+      text-auto-resize: true
+      focusable: false
+      font: verdana-11px-rounded
+    Label
+      id: lblfps
+      height: 12
+      anchors.left: lblping.left
+      anchors.top: prev.bottom
+      text-horizontal-auto-resize: true
+      text-auto-resize: true
+      text-align: center
+      focusable: false
+      font: verdana-11px-rounded
+      
+TopMenuPanel 
   id: topMenu
   anchors.top: parent.top
-  anchors.left: parent.left
-  anchors.right: parent.right
+  anchors.horizontalCenter: parent.horizontalCenter
+  width: 1020
+  height: 32
+  image-source: /images/ui/top_bar_login
+
+  TopMenuButtonsPanel
+    id: topLeftTogglesPanel
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+
+  TopMenuButtonsPanel
+    id: topLeftButtonsPanel
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.right: topLeftTogglesPanel.left
+    margin-left: 5
+
+  UIWidget
+    id: topLeftOnlinePlayers
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.horizontalCenter: parent.horizontalCenter
+    size: 100 32
+
+    Panel
+      image-source: /images/icons/icon_players
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: parent.left
+      size: 11 14
+
+    Label
+      id: topLeftOnlinePlayersLabel
+      !text: '- ' .. tr('players online')
+      anchors.left: prev.right
+      margin-left: 5
+      anchors.verticalCenter: prev.verticalCenter
+      width: 150
+
+  UIWidget
+    id: topLeftDiscord
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    margin-left: 10
+    size: 110 32
+
+    UIWidget
+      id: discordIcon
+      image-source: /images/icons/icon_discord
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: parent.left
+      size: 30 34
+
+    Panel
+      image-source: /images/icons/icon_streamers
+      anchors.top: parent.top
+      anchors.left: prev.right
+      margin-left: 5
+      margin-top: 11
+      size: 11 7
+
+    Label
+      id: topLeftDiscordStreamersLabel
+      !text: '-'
+      anchors.left: prev.right
+      margin-left: 5
+      anchors.verticalCenter: prev.verticalCenter
+      width: 50
+
+  UIWidget
+    id: topLeftYoutube
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: topLeftDiscord.right
+    margin-left: 10
+    size: 100 32
+
+    UIWidget
+      id: youtubeIcon
+      image-source: /images/icons/icon_youtube
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: parent.left
+      size: 71 16
+
+    Panel
+      image-source: /images/icons/icon_streamers
+      anchors.top: parent.top
+      anchors.left: prev.right
+      margin-left: 5
+      margin-top: 5
+      size: 11 7
+
+    Label
+      id: topLeftYoutubeStreamersLabel
+      !text: '-'
+      anchors.left: prev.right
+      margin-left: 5
+      anchors.verticalCenter: prev.verticalCenter
+      width: 50
+
+    Panel
+      image-source: /images/icons/icon_viewers
+      anchors.bottom: parent.bottom
+      anchors.left: youtubeIcon.right
+      margin-left: 5
+      margin-bottom: 7
+      size: 11 7
+
+    Label
+      id: topLeftYoutubeViewersLabel
+      !text: '-'
+      anchors.left: prev.right
+      margin-left: 5
+      anchors.verticalCenter: prev.verticalCenter
+      width: 50
 
   TopMenuButtonsPanel
     id: leftButtonsPanel
     anchors.top: parent.top
     anchors.bottom: parent.bottom
-    anchors.left: parent.left
-
-  TopMenuButtonsPanel
-    id: leftGameButtonsPanel
-    anchors.top: parent.top
-    anchors.bottom: parent.bottom
     anchors.left: prev.right
-    visible: false
+
 
   TopMenuFrameCounterLabel
     id: fpsLabel
     phantom: false
     text-auto-resize: true
     anchors.top: parent.top
-    anchors.left: leftGameButtonsPanel.right
+    anchors.left: leftButtonsPanel.right
 
   TopMenuPingLabel
     color: white

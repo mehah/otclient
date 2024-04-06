@@ -4,6 +4,7 @@ HOTKEY_USEONTARGET = 2
 HOTKEY_USEWITH = 3
 
 local maxSlots = 60
+local isLocked = false
 actionBar = nil
 actionBarPanel = nil
 bottomPanel = nil
@@ -36,12 +37,8 @@ function init()
     mouseGrabberWidget:setFocusable(false)
     mouseGrabberWidget.onMouseRelease = onChooseItemMouseRelease
 
-    local console = modules.game_console.consolePanel
-    if console then
-        console:addAnchor(AnchorTop, actionBar:getId(), AnchorBottom)
-    end
-
     if g_game.isOnline() then
+
         addEvent(function()
             setupActionBar()
             loadActionBar()
@@ -89,14 +86,21 @@ function terminate()
         })
     end
 
-    local console = modules.game_console.consolePanel
-    if console then
-        console:removeAnchor(AnchorTop)
-        console:fill('parent')
-    end
 end
 
 function online()
+
+    if g_game.getFeature(GameSpellList) then
+        local console = modules.game_cooldown.cooldownWindow
+        if console then
+            console:addAnchor(AnchorTop, actionBar:getId(), AnchorBottom)
+        end
+    else
+        local console = modules.game_console.consolePanel
+        if console then
+            console:addAnchor(AnchorTop, actionBar:getId(), AnchorBottom)
+        end
+    end
     actionBarPanel:destroyChildren()
     addEvent(function()
         setupActionBar()
@@ -148,6 +152,10 @@ function copySlot(fromSlotId, toSlotId, visible)
 end
 
 function onDropFunc(slotId)
+    if isLocked then
+        return
+    end
+
     if slotReassign then
         local fromSlotId = slotToEdit
         local toSlotId = slotId
@@ -194,12 +202,14 @@ function setupActionBar()
         g_mouse.bindPress(slot, function()
             createMenu('slot' .. i)
         end, MouseRightButton)
-        g_mouse.bindOnDrop(slot, function()
-            if slotToEdit == 'slot' .. i then
-                slotReassign = 'slot' .. i
-            end
-            onDropFunc('slot' .. i)
-        end)
+        if not isLocked then
+            g_mouse.bindOnDrop(slot, function()
+                if slotToEdit == 'slot' .. i then
+                    slotReassign = 'slot' .. i
+                end
+                onDropFunc('slot' .. i)
+            end)
+        end
         if i == 1 then
             slot:addAnchor(AnchorLeft, 'parent', AnchorLeft)
         end
@@ -553,6 +563,10 @@ function onChooseItemMouseRelease(self, mousePosition, mouseButton)
 end
 
 function onChooseItemByDrag(self, mousePosition, item)
+    if isLocked then
+        return
+    end
+
     if item and item:getPosition().x == 65535 and slotToEdit then
         openObjectAssignWindow()
         objectAssignWindow:getChildById('previewItem'):setItemId(item:getId())
@@ -624,6 +638,22 @@ function unbindHotkeys()
 end
 
 function setupHotkeys()
+    local horizontalScroll = actionBar:getChildById('horizontalScroll')
+    if horizontalScroll:getValue() == horizontalScroll:getMaximum() then
+        actionBar:getChildById('nextButton'):setEnabled(false)
+        actionBar:getChildById('nextSkipButton'):setEnabled(false)
+    else
+        actionBar:getChildById('nextButton'):setEnabled(true)
+        actionBar:getChildById('nextSkipButton'):setEnabled(true)
+    end
+    if horizontalScroll:getValue() == horizontalScroll:getMinimum() then
+        actionBar:getChildById('prevButton'):setEnabled(false)
+        actionBar:getChildById('prevSkipButton'):setEnabled(false)
+    else
+        actionBar:getChildById('prevButton'):setEnabled(true)
+        actionBar:getChildById('prevSkipButton'):setEnabled(true)
+    end
+
     unbindHotkeys()
     for v, slot in pairs(actionBarPanel:getChildren()) do
         slot.onMouseRelease = function()
@@ -1044,4 +1074,50 @@ function showSpell(spellListLabel)
         spellListLabel:setHeight(spellListLabel.defaultHeight)
         spellListLabel:show()
     end
+end
+
+function onDecrementHorizontalScroll(value)
+    if value == 999 then
+        value = math.floor(actionBarPanel:getWidth() / 36) * 36
+    end
+
+    actionBar:getChildById('nextButton'):setEnabled(true)
+    actionBar:getChildById('nextSkipButton'):setEnabled(true)
+    local horizontalScroll = actionBar:getChildById('horizontalScroll')
+    if (horizontalScroll:getValue() - value) <= horizontalScroll:getMinimum() then
+        actionBar:getChildById('prevButton'):setEnabled(false)
+        actionBar:getChildById('prevSkipButton'):setEnabled(false)
+    else
+        actionBar:getChildById('prevButton'):setEnabled(true)
+        actionBar:getChildById('prevSkipButton'):setEnabled(true)
+    end
+
+    horizontalScroll:decrement(value)
+end
+
+function onIncrementHorizontalScroll(value)
+    if value == 999 then
+        value = math.floor(actionBarPanel:getWidth() / 36) * 36
+    end
+
+    actionBar:getChildById('prevButton'):setEnabled(true)
+    actionBar:getChildById('prevSkipButton'):setEnabled(true)
+    local horizontalScroll = actionBar:getChildById('horizontalScroll')
+    if (horizontalScroll:getValue() + value) >= horizontalScroll:getMaximum() then
+        actionBar:getChildById('nextButton'):setEnabled(false)
+        actionBar:getChildById('nextSkipButton'):setEnabled(false)
+    else
+        actionBar:getChildById('nextButton'):setEnabled(true)
+        actionBar:getChildById('nextSkipButton'):setEnabled(true)
+    end
+
+    horizontalScroll:increment(value)
+end
+
+function setLocked(v)
+    isLocked = v
+end
+
+function getPanelActionbar()
+    return actionBar
 end

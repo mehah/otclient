@@ -40,6 +40,9 @@ function UIItem:onDrop(widget, mousePos)
     local itemPos = item:getPosition()
     local itemTile = item:getTile()
     local toPos = self.position
+    if not(toPos) and self:getParent() and self:getParent().slotPosition then
+        toPos = self:getParent().slotPosition
+    end
     if not itemPos or not toPos then
         local pressedWidget = g_ui.getPressedWidget()
         local rootWidget = g_ui.getRootWidget()
