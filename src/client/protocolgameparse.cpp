@@ -3615,8 +3615,8 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
 void ProtocolGame::parsePreyRerollPrice(const InputMessagePtr& msg)
 {
     const uint32_t price = msg->getU32(); // prey reroll price
-    const uint8_t wildcard = 0; // prey bonus reroll price
-    const uint8_t directly = 0; // prey selection list price
+    uint8_t wildcard = 0; // prey bonus reroll price
+    uint8_t directly = 0; // prey selection list price
 
     if (g_game.getProtocolVersion() >= 1230) {
         wildcard = msg->getU8();
