@@ -1,0 +1,9 @@
+Module
+  name: client_bottommenu
+  description: Create the bottom menu
+  author: marcosvf132
+  website: https://github.com/edubart/otclient
+  scripts: [ bottommenu ]
+  sandboxed: true
+  @onLoad: init()
+  @onUnload: terminate()

@@ -1,15 +1,60 @@
-MessageBoxLabel < Label
-  id: messageBoxLabel
-  anchors.horizontalCenter: parent.horizontalCenter
-  anchors.top: parent.top
-  text-wrap: true
-  text-auto-resize: true
+MessageBoxWindow < UIMessageBox
+  icon-rect: 4 4 16 16
+  size: 246 116
+  image-source: /images/ui/window_new
+  image-border: 4
+  image-border-top: 16
+  image-border-bottom: 4
+  &minimizedHeight: 17
+  anchors.centerIn: parent
+  draggable: false
 
-MessageBoxButtonHolder < UIWidget
-  id: buttonHolder
-  margin-top: 10
-  anchors.bottom: parent.bottom
+  $on:
+    image-border-bottom: 2
 
-MessageBoxButton < Button
-  margin-left: 10
-  width: 80
+  UIWidget
+    id: miniwindowTopBar
+    anchors.top: parent.top
+    anchors.right: parent.right
+    anchors.left: parent.left
+    margin-right: 3
+    margin-left: 3
+    margin-top: 2
+    height: 18
+    phantom: true
+
+  Label
+    id: title
+    font: verdana-11px-antialised
+    text-offset: 0 2
+    text-align: top
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    opacity: 0.5
+
+  Label
+    id: content
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: parent.top
+    text-wrap: true
+    text-auto-resize: true
+    color: #c0c0c0ff
+    margin-top: 32
+
+  HorizontalSeparator
+    anchors.left: content.left
+    anchors.right: content.right
+    anchors.top: content.bottom
+    image-source: /images/ui/horizontal_line_bright
+    height: 1
+    margin-top: 10
+
+  UIWidget
+    id: holder
+    anchors.right: prev.right
+    anchors.left: prev.left
+    anchors.top: prev.bottom
+    anchors.bottom: parent.bottom
+    margin-top: 12

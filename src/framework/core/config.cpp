@@ -70,7 +70,12 @@ void Config::clear() const
 {
     m_confsDoc->clear();
 }
-
+// NOTE kokekanon : DELETE THIS only for testing purposes
+void Config::clear2()
+{
+   return m_confsDoc->clear();
+}
+//
 void Config::setValue(const std::string& key, const std::string& value)
 {
     if (value.empty()) {

@@ -197,7 +197,7 @@ if analyzerButton then
 end
 
 --button
-analyzerButton = modules.client_topmenu.addRightGameToggleButton('botAnalyzersButton', 'vBot Analyzers', '/images/topbuttons/analyzers', toggle, false, 999999)
+analyzerButton = modules.game_mainpanel.addToggleButton('botAnalyzersButton', 'vBot Analyzers', '/images/options/analyzers', toggle, false, 999999)
 analyzerButton:setOn(false)
 
 --toggles window

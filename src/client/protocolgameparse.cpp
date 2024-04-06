@@ -692,8 +692,12 @@ void ProtocolGame::parseResourceBalance(const InputMessagePtr& msg) const
 
 void ProtocolGame::parseWorldTime(const InputMessagePtr& msg)
 {
-    msg->getU8(); // hour
-    msg->getU8(); // min
+
+    const auto hour = msg->getU8();
+    const auto min = msg->getU8();
+// note: needs mehah approval
+    g_lua.callGlobalField("g_game", "onChangeWorldTime", hour, min);
+//
 }
 
 void ProtocolGame::parseStore(const InputMessagePtr& msg) const
@@ -1300,10 +1304,15 @@ void ProtocolGame::parseCloseTrade(const InputMessagePtr&) { Game::processCloseT
 
 void ProtocolGame::parseWorldLight(const InputMessagePtr& msg)
 {
-    uint8_t intensity = msg->getU8();
-    uint8_t color = msg->getU8();
+    const auto& oldLight = g_map.getLight();
+
+    const auto intensity = msg->getU8();
+    const auto color = msg->getU8();
 
     g_map.setLight({ intensity , color });
+
+    if (oldLight.color != color || oldLight.intensity != intensity)
+        g_lua.callGlobalField("g_game", "onWorldLightChange", g_map.getLight(), oldLight);
 }
 
 void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
@@ -2774,24 +2783,29 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
                     // fixes a bug server side bug where GameInit is not sent and local player id is unknown
                     (creatureType == Proto::CreatureTypePlayer && !m_localPlayer->getId() && name == m_localPlayer->getName())) {
                     creature = m_localPlayer;
-                } else switch (creatureType) {
-                    case Proto::CreatureTypePlayer:
-                        creature = std::make_shared<Player>();
-                        break;
+                } else {
+                    switch (creatureType) {
+                        case Proto::CreatureTypePlayer:
+                            creature = std::make_shared<Player>();
+                            break;
 
-                    case Proto::CreatureTypeNpc:
-                        creature = std::make_shared<Npc>();
-                        break;
+                        case Proto::CreatureTypeNpc:
+                            creature = std::make_shared<Npc>();
+                            break;
 
-                    case Proto::CreatureTypeHidden:
-                    case Proto::CreatureTypeMonster:
-                    case Proto::CreatureTypeSummonOwn:
-                    case Proto::CreatureTypeSummonOther:
-                        creature = std::make_shared<Monster>();
-                        break;
+                        case Proto::CreatureTypeHidden:
+                        case Proto::CreatureTypeMonster:
+                        case Proto::CreatureTypeSummonOwn:
+                        case Proto::CreatureTypeSummonOther:
+                            creature = std::make_shared<Monster>();
+                            break;
 
-                    default:
-                        g_logger.traceError("creature type is invalid");
+                        default:
+                            g_logger.traceError("creature type is invalid");
+                    }
+
+                    if (creature)
+                        creature->onCreate();
                 }
             }
 

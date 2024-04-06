@@ -35,7 +35,7 @@ function init()
 
   initCallbacks()
 
-  botButton = modules.client_topmenu.addRightGameToggleButton('botButton', tr('Bot'), '/images/topbuttons/bot', toggle, false, 99999)
+  botButton = modules.game_mainpanel.addToggleButton('botButton', tr('Bot'), '/images/options/bot', toggle, false, 99999)
   botButton:setOn(false)
   botButton:hide()
 
@@ -255,6 +255,10 @@ function toggle()
   else
     botWindow:open()
     botButton:setOn(true)
+    local interface = modules.game_interface
+    local left = interface:getLeftPanel()
+    left:setWidth(190)
+    modules.game_interface.checkAndOpenLeftPanel()
   end
 end
 

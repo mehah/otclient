@@ -1,16 +1,17 @@
 TextEdit < UITextEdit
   font: verdana-11px-antialised
-  color: #272727
+  color: #f4f4f4ff
   size: 86 22
   text-offset: 0 4
   opacity: 1
   padding: 4
+  padding-bottom: 1
   image-source: /images/ui/textedit
   image-border: 1
-  selection-color: #272727
-  selection-background-color: #cccccc
+  selection-color: #ffffffff
+  selection-background-color: #808080ff
   $disabled:
-    color: #27272788
+    color: #c0c0c0ff
     opacity: 0.5
 
 PasswordTextEdit < TextEdit
@@ -18,3 +19,82 @@ PasswordTextEdit < TextEdit
 
 MultilineTextEdit < TextEdit
   multiline: true
+
+TextQtEdit < UITextEdit
+  font: verdana-11px-antialised
+  color: #c0c0c0ff
+  size: 86 22
+  text-offset: 0 4
+  opacity: 1
+  padding: 4
+  background-color: #363636ff
+  selection-color: #ffffffff
+  selection-background-color: #808080ff
+  change-cursor-image: false
+
+  UIWidget
+    image-source: /images/ui/vertical_line_dark
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    margin-top: -4
+    margin-bottom: -4
+    margin-left: -4
+    phantom: true
+    width: 1
+
+  UIWidget
+    image-source: /images/ui/horizontal_line_dark
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: -4
+    margin-left: -4
+    margin-right: -4
+    phantom: true
+    height: 1
+
+  UIWidget
+    image-source: /images/ui/vertical_line_bright
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    margin-top: -4
+    margin-bottom: -4
+    margin-right: -4
+    phantom: true
+    width: 1
+
+  UIWidget
+    image-source: /images/ui/horizontal_line_bright
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-bottom: -4
+    margin-left: -4
+    margin-right: -4
+    phantom: true
+    height: 1
+
+HiddenTextQtEdit < TextQtEdit
+  text-hidden: true
+
+HiddenTextQtToggleEdit < TextQtEdit
+  text-hidden: true
+
+  UICheckBox
+    size: 19 20
+    anchors.right: parent.right
+    margin-right: -2
+    anchors.verticalCenter: parent.verticalCenter
+    image-rect: 0 0 19 20
+    image-source: /images/ui/hide_eye
+    @onCheckChange: |
+      self:getParent():setTextHidden(not self:isChecked())
+      self:getParent():setTextWrap(false)
+
+    $!checked:
+      image-clip: 0 0 19 20
+
+    $checked:
+      image-clip: 0 20 19 20

@@ -163,12 +163,12 @@ end
 function check()
     if g_game.getFeature(GamePrey) then
         if not preyButton then
-            preyButton = modules.client_topmenu.addRightGameToggleButton('preyButton', tr('Prey Dialog'),
-                                                                         '/images/topbuttons/prey_window', toggle)
+            preyButton = modules.game_mainpanel.addToggleButton('preyButton', tr('Prey Dialog'),
+                                                                         '/images/options/button_preydialog', toggle)
         end
         if not preyTrackerButton then
-            preyTrackerButton = modules.client_topmenu.addRightGameToggleButton('preyTrackerButton', tr('Prey Tracker'),
-                                                                                '/images/topbuttons/prey', toggleTracker)
+            preyTrackerButton = modules.game_mainpanel.addToggleButton('preyTrackerButton', tr('Prey Tracker'),
+                                                                                '/images/options/button_prey', toggleTracker)
         end
     elseif preyButton then
         preyButton:destroy()
@@ -180,6 +180,14 @@ function toggleTracker()
     if preyTracker:isVisible() then
         preyTracker:hide()
     else
+        if not preyTracker:getParent() then
+            local panel = modules.game_interface.findContentPanelAvailable(preyTracker, preyTracker:getMinimumHeight())
+            if not panel then
+                return
+            end
+
+            panel:addChild(preyTracker)
+        end
         preyTracker:show()
     end
 end
