@@ -676,50 +676,105 @@ We need people to test in versions higher than 8.6  and another who is skilled w
 
 ![429529469_10161745299305712_3655895523259386066_n](https://github.com/Nottinghster/otclient/assets/114332266/8ad690f2-b10c-49c5-93a2-7fe89b944101)
 
-# example code
+### Example Feature
 
-test
-<table>
-  <tr>
-    <th>Feature</th>
-    <th>Code</th>
-    <th>Gif</th>
-  </tr>
- 
-  <tr>
-    <td>Creature Attach effect</td>
-    <td><pre><code class="lua">
-local tile = g_map.getTile(g_game.getLocalPlayer():getPosition())
-local widget = g_ui.createWidget('Panel')
-widget:setSize({width = 90,height = 22})
-widget:setText("OTC Redemption")
-widget:setFont("terminus-10px")
-widget:setBackgroundColor('#111111cc')
-widget:setMarginBottom(40)
-tile:attachWidget(widget)
-</code></pre></td>
-    <td><img src="https://media.discordapp.net/attachments/888067068207960094/1199169100581175337/putconsole.gif?ex=662713c1&is=66149ec1&hm=9032f65c8ac5fe90691cb030158a1e3f13e392d27014fb35963d4a317eafb8bb&=" alt="image"></td>
-  </tr>
-  <tr>
-    <td>QR</td>
-    <td><pre><code class="lua">
-UIWidget
+<table style="border-collapse: collapse; width: 100%;" border="1">
+  <tbody>
+    <tr>
+      <td style="width: 50%; ">
+        <strong><center> Feature</center></strong>
+      </td>
+      <td style="width: 50%;"><center><strong> Gif</strong></center></td>
+    </tr>
+    <tr>
+      <td style="width: 50%;">
+        <pre><code class="lua"><p><strong>Attach Effect</strong></p>
+local player = g_game.getLocalPlayer()
+player:attachEffect(
+  g_attachedEffects.getById(2)
+  )
+</code></pre>
+      </td>
+      <td style="width: 50%;"><img style="max-width: 100%; height: auto;" src="https://github.com/Nottinghster/otclient/assets/114332266/782e0fcf-b1cf-451e-b102-d7e7943bd50b" /></td>
+    </tr>
+    <tr>
+      <td style="width: 50%;">
+        <strong><p>QR</p></strong>
+        <pre><code class="lua">UIWidget
   size: 200 200
   anchors.centerIn: parent
   qr-code: mehah
   qr-code-border: 2
-</code></pre></td>
-    <td><img src="https://github.com/Nottinghster/otclient/assets/114332266/a9ea3ce9-2a02-4b39-9b5f-7308db16e710" alt="image"></td>
-  </tr>
-  <tr>
-    <td>Reload module</td>
-    <td><pre><code class="lua">g_modules.enableAutoReload()</code></pre></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>Shader</td>
-    <td></td>
-    <td></td>
-  </tr>
+</code></pre>
+      </td>
+      <td style="width: 50%;"><img style="max-width: 100%; height: auto;" src="https://github.com/Nottinghster/otclient/assets/114332266/a9ea3ce9-2a02-4b39-9b5f-7308db16e710" /></td>
+    </tr>
+    <tr>
+      <td style="width: 50%;">
+        <p>Reload module</p>
+        <pre><code class="lua">g_modules.enableAutoReload()
+</code></pre>
+      </td>
+      <td style="width: 50%;"><video src="https://github.com/Nottinghster/otclient/assets/114332266/bdd01687-1671-4150-8354-10a9c340c480" width="640" height="360" controls></video></td>
+    </tr>
+    <tr>
+      <td style="width: 50%;">
+        <strong><p>Shaders</p></strong>
+item :
+        <pre><code class="lua">local item = ItemWidget:getItem()
+item:setShader("Outfit - Outline")
+</code></pre>
+Player :
+  <pre><code class="lua">local player= g_game.getLocalPlayer()
+player:setShader("Outfit - Outline")
+</code></pre>
+Map :
+<pre><code class="lua">local map = modules.game_interface.getMapPanel()
+map:setShader('Map - Party')
+</code></pre>
+      </td>
+      <td style="width: 50%;"><img style="max-width: 100%; height: auto;" src="https://github.com/Nottinghster/otclient/assets/114332266/021119e2-d6e7-41e1-8a83-d07efcce452b" /></br>
+      <img style="max-width: 100%; height: auto;" src="https://github.com/kokekanon/otclient.readme/assets/114332266/e1f2e593-d87d-4ec3-9e72-7e478a3acdba" /></td>
+    </tr>
+    <tr>
+      <td style="width: 50%;">
+       <strong> <p>Discord RPC</p></strong>
+        <pre><code>- To enable just go to
+  set 1 in ENABLE_DISCORD_RPC 
+  and configure the others definitions
+</code></pre>
+      </td>
+      <td style="width: 50%;"><img style="max-width: 100%; height: auto;" src="https://github.com/Nottinghster/otclient/assets/114332266/cd93e5e6-4e2a-4dd2-b66b-6e28408363d6" /></td>
+    </tr>
+    <tr>
+      <td style="width: 50%;">
+       <strong> <p>Typing Icon</strong></p>
+        <pre><code>
+To enable just go to setup.otml 
+and set draw-typing: true
+</code></pre>
+      </td>
+      <td style="width: 50%;"><img style="max-width: 100%; height: auto;" src="https://github.com/Nottinghster/otclient/assets/114332266/3e7c00bb-94ea-458f-9b07-43b622c8253c" /></td>
+    </tr>
+    <tr>
+      <td style="width: 50%;">
+       <strong> <p>Colored text</p></strong>
+        <pre><code class="lua">
+widget:setColoredText("
+{" .. variable .. ", #C6122E} / 
+{Colored text, #ff00ff} normal text")
+</code></pre>
+      </td>
+      <td style="width: 50%;"><img style="max-width: 100%; height: auto;" src="https://github.com/Nottinghster/otclient/assets/114332266/9ea52de2-c193-4951-9454-ddc58685c65c" /></td>
+    </tr>
+    <tr>
+      <td style="width: 50%;">
+        <p><strong>Smooth Walk Elevation</strong></p>
+        Enable on <p><a href="https://github.com/mehah/otclient/blob/main/modules/game_features/features.lua#L5">game_features</a></p>
+        <pre><code class="lua">
+g_game.enableFeature(GameSmoothWalkElevation)</td>
+</code></pre>
+      <td style="width: 50%;"><img style="max-width: 100%; height: auto;" src="https://github.com/Nottinghster/otclient/assets/114332266/208bd4e4-3a76-4e2f-960e-7761d0fb7aed" /></td>
+    </tr>
+  </tbody>
 </table>
-
