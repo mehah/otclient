@@ -83,7 +83,7 @@ MiniQtWindow
     anchors.left: parent.left
     margin-left: 16
     margin-top: 29
-    size: 128 442
+    size: 128 453
 
   QtPanel
     id: optionsTabContent

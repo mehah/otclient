@@ -42,8 +42,20 @@ Panel
     height: 22
   
     OptionCheckBox
-      id: shoenableLightswFps
+      id: enableLights
       !text: tr('Enable lights')
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: drawEffectOnTop
+      !text: tr('Draw Effect On Top')
+      !tooltip: tr('Draw effect after drawing the entire floor.')
 
   SmallReversedQtPanel
     anchors.left: parent.left
