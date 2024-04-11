@@ -326,7 +326,7 @@ TopStatsBarLargeOnTop < UIWidget
     anchors.top: parent.top
     anchors.horizontalCenter: parent.horizontalCenter
     margin-top: 5
-    size: 53 27
+    size: 75 27
     layout:
       type: horizontalBox
 
