@@ -3626,15 +3626,19 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
 
 void ProtocolGame::parsePreyRerollPrice(const InputMessagePtr& msg)
 {
-    const uint32_t price = msg->getU32(); //reroll price
-    const uint8_t wildcard = msg->getU8(); // wildcard
-    const uint8_t directly = msg->getU8(); // selectCreatureDirectly price (5 in tibia)
-    if (g_game.getProtocolVersion() >= 1230) { // prey task
-        msg->getU32();
-        msg->getU32();
-        msg->getU8();
-        msg->getU8();
+    const uint32_t price = msg->getU32(); // prey reroll price
+    uint8_t wildcard = 0; // prey bonus reroll price
+    uint8_t directly = 0; // prey selection list price
+
+    if (g_game.getProtocolVersion() >= 1230) {
+        wildcard = msg->getU8();
+        directly = msg->getU8();
+        msg->getU32(); // task hunting reroll price
+        msg->getU32(); // task hunting reroll price
+        msg->getU8(); // task hunting selection list price
+        msg->getU8(); // task hunting bonus reroll price
     }
+
     g_lua.callGlobalField("g_game", "onPreyRerollPrice", price, wildcard, directly);
 }
 
