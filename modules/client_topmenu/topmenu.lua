@@ -344,50 +344,50 @@ function addRightToggleButton(id, description, icon, callback, front)
     return addButton(id, description, icon, callback, rightButtonsPanel, true, front)
 end
 
-function addLeftGameButton(id, description, icon, callback, front)
+function addLeftGameButton(id, description, icon, callback, front,index)
     if not g_modules.getModule("game_mainpanel"):isLoaded() then
         -- Temp fix. game_mainpanel is not loaded if called from a client_XXX.
         scheduleEvent(function()
-            return modules.game_mainpanel.addSpecialToggleButton(id, description, icon, callback, front)
+            return modules.game_mainpanel.addSpecialToggleButton(id, description, icon, callback, front,index)
         end, 100)
     else
-        return modules.game_mainpanel.addSpecialToggleButton(id, description, icon, callback, front)
+        return modules.game_mainpanel.addSpecialToggleButton(id, description, icon, callback, front,index)
 
     end
 end
 
-function addLeftGameToggleButton(id, description, icon, callback, front)
+function addLeftGameToggleButton(id, description, icon, callback, front,index)
     if not g_modules.getModule("game_mainpanel"):isLoaded() then
         -- Temp fix. game_mainpanel is not loaded if called from a client_XXX.
         scheduleEvent(function()
-            return modules.game_mainpanel.addSpecialToggleButton(id, description, icon, callback, front)
+            return modules.game_mainpanel.addSpecialToggleButton(id, description, icon, callback, front,index)
         end, 100)
     else
-        return modules.game_mainpanel.addSpecialToggleButton(id, description, icon, callback, front)
+        return modules.game_mainpanel.addSpecialToggleButton(id, description, icon, callback, front,index)
 
     end
 end
 
-function addRightGameButton(id, description, icon, callback, front)
+function addRightGameButton(id, description, icon, callback, front,index)
     if not g_modules.getModule("game_mainpanel"):isLoaded() then
         -- Temp fix. game_mainpanel is not loaded if called from a client_XXX.
         scheduleEvent(function()
-            return modules.game_mainpanel.addToggleButton(id, description, icon, callback, front)
+            return modules.game_mainpanel.addToggleButton(id, description, icon, callback, front,index)
         end, 100)
     else
-        return modules.game_mainpanel.addToggleButton(id, description, icon, callback, front)
+        return modules.game_mainpanel.addToggleButton(id, description, icon, callback, front,index)
 
     end
 end
 
-function addRightGameToggleButton(id, description, icon, callback, front)
+function addRightGameToggleButton(id, description, icon, callback, front,index)
     if not g_modules.getModule("game_mainpanel"):isLoaded() then
         -- Temp fix. game_mainpanel is not loaded if called from a client_XXX.
         scheduleEvent(function()
-            return modules.game_mainpanel.addToggleButton(id, description, icon, callback, front)
+            return modules.game_mainpanel.addToggleButton(id, description, icon, callback, front,index)
         end, 100)
     else
-        return modules.game_mainpanel.addToggleButton(id, description, icon, callback, front)
+        return modules.game_mainpanel.addToggleButton(id, description, icon, callback, front,index)
 
     end
 

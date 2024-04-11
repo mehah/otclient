@@ -8,7 +8,7 @@ function init()
     questLogButton = modules.game_mainpanel.addToggleButton('questLogButton', tr('Quest Log'),
                                                               '/images/options/button_questlog', function()
         g_game.requestQuestLog()
-    end)
+    end,false,1000)
 
     connect(g_game, {
         onQuestLog = onGameQuestLog,

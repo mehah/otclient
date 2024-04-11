@@ -111,7 +111,7 @@ local function createButton_large(id, description, image, callback, special, fro
     return button
 end
 
-local function createButton(id, description, image, callback, special, front)
+local function createButton(id, description, image, callback, special, front, index)
     local panel
     if special then
         panel = optionsController.ui.onPanel.specials
@@ -142,6 +142,9 @@ local function createButton(id, description, image, callback, special, front)
             return true
         end
     end
+    if not button.index and type(index) == 'number' then
+        button.index = index or 1000
+    end
 
     refreshOptionsSizes()
     return button
@@ -161,6 +164,12 @@ function optionsController:onGameStart()
     refreshOptionsSizes()
     modules.game_interface.setupOptionsMainButton()
     modules.client_options.setupOptionsMainButton()
+    local getOptionsPanel = optionsController.ui.onPanel.options
+    local children = getOptionsPanel:getChildren()
+    table.sort(children, function(a, b)
+        return (a.index or 1000) < (b.index or 1000)
+    end)
+    getOptionsPanel:reorderChildren(children)
 end
 
 function optionsController:onGameEnd()
@@ -172,12 +181,12 @@ function changeOptionsSize()
     refreshOptionsSizes()
 end
 
-function addToggleButton(id, description, image, callback, front)
-    return createButton(id, description, image, callback, false, front)
+function addToggleButton(id, description, image, callback, front, index)
+    return createButton(id, description, image, callback, false, front, index)
 end
 
-function addSpecialToggleButton(id, description, image, callback, front)
-    return createButton(id, description, image, callback, true, front)
+function addSpecialToggleButton(id, description, image, callback, front, index)
+    return createButton(id, description, image, callback, true, front, index)
 end
 
 function addStoreButton(id, description, image, callback, front)
@@ -374,7 +383,6 @@ local function refreshInventory_panel()
         return
     end
 
-
     for i = InventorySlotFirst, InventorySlotPurse do
         if g_game.isOnline() then
             inventoryEvent(player, i, player:getInventoryItem(i))
@@ -471,7 +479,7 @@ function inventoryController:onGameStart()
     inventoryShrink = g_settings.getBoolean('mainpanel_shrink_inventory')
     refreshInventorySizes()
     refreshInventory_panel()
-	
+
     if g_game.getClientVersion() < 1000 then
         inventoryController.ui.offPanel.blessings:hide()
         inventoryController.ui.offPanel.expert:hide()
