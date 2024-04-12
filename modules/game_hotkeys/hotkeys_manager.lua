@@ -59,6 +59,7 @@ boundCombosCallback = {}
 hotkeysList = {}
 disableHotkeysCount = 0
 lastHotkeyTime = g_clock.millis()
+local hotkeysWindowButton = nil 
 
 -- public functions
 function init()
@@ -66,6 +67,7 @@ function init()
     g_keyboard.bindKeyDown('Ctrl+K', toggle)
     hotkeysWindow = g_ui.displayUI('hotkeys_manager')
     hotkeysWindow:setVisible(false)
+    hotkeysWindowButton = modules.client_topmenu.addRightGameToggleButton('hotkeysWindowButton', tr('Hotkeys'), '/images/options/hotkeys', toggle)
 
     currentHotkeys = hotkeysWindow:getChildById('currentHotkeys')
     currentItemPreview = hotkeysWindow:getChildById('itemPreview')
@@ -149,6 +151,7 @@ function terminate()
     useOnTarget = nil
     useWith = nil
     currentHotkeys = nil
+    hotkeysWindowButton = nil
 end
 
 function configure(savePerServer, savePerCharacter)
