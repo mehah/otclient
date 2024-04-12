@@ -59,6 +59,7 @@ boundCombosCallback = {}
 hotkeysList = {}
 disableHotkeysCount = 0
 lastHotkeyTime = g_clock.millis()
+local hotkeysWindowButton = nil 
 
 -- public functions
 function init()
@@ -150,6 +151,7 @@ function terminate()
     useOnTarget = nil
     useWith = nil
     currentHotkeys = nil
+    hotkeysWindowButton = nil
 end
 
 function configure(savePerServer, savePerCharacter)
