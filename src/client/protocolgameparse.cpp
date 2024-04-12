@@ -3051,6 +3051,10 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
         item->setShader(msg->getString());
     }
 
+    if (g_game.getFeature(Otc::GameItemTooltipV8)) {
+        item->setTooltip(msg->getString());
+    }
+
     return item;
 }
 

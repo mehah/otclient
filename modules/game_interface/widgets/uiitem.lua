@@ -105,6 +105,15 @@ function UIItem:onHoverChange(hovered)
             draggingWidget.hoveredWho = nil
         end
     end
+
+    if g_game.getFeature(GameItemTooltipV8) then
+        local tooltip = nil
+        if self:getItem() and self:getItem():getTooltip():len() > 0 then
+            tooltip = self:getItem():getTooltip()
+        end
+        self:setTooltip(tooltip)
+    end
+    
 end
 
 function UIItem:onMouseRelease(mousePosition, mouseButton)

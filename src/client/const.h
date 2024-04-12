@@ -544,7 +544,8 @@ namespace Otc
         GameEnterGameShowAppearance = 114,
         GameSmoothWalkElevation = 115,
         GameNegativeOffset = 116,
-        LastGameFeature = 117
+        GameItemTooltipV8 = 117,
+        LastGameFeature = 118
     };
 
     enum MagicEffectsType_t : uint8_t
