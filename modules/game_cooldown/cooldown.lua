@@ -21,7 +21,7 @@ function init()
     })
 
     cooldownButton = modules.game_mainpanel.addToggleButton('cooldownButton', tr('Cooldowns'),
-        '/images/options/cooldowns', toggle,false,5)
+        '/images/options/cooldowns', toggle, false, 5)
 
     cooldownButton:setOn(true)
 

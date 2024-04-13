@@ -15,7 +15,7 @@ function init()
     g_keyboard.bindKeyDown('Ctrl+P', toggle)
 
     vipButton = modules.game_mainpanel.addToggleButton('vipListButton', tr('VIP List') .. ' (Ctrl+P)',
-                                                                '/images/options/button_vip', toggle,false,3)
+                                                                '/images/options/button_vip', toggle, false, 3)
     vipButton:setOn(true)
     vipWindow = g_ui.loadUI('viplist')
 

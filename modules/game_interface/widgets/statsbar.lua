@@ -29,7 +29,7 @@ local function createBlankIcon()
             width = 1,
             height = 1
         })
-        icon:setMarginRight(-7)
+        icon:setMarginRight(-10)
     end
 end
 

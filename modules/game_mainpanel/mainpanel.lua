@@ -574,6 +574,7 @@ end
 -- @ End of Inventory
 
 -- @ Minimap
+local minimapWidget = nil -- bot fix
 local otmm = true
 local oldPos = nil
 local fullscreenWidget
