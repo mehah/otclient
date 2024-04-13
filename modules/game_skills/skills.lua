@@ -350,8 +350,10 @@ end
 
 function onSkillButtonClick(button)
     local percentBar = button:getChildById('percent')
-    if percentBar then
+    local skillIcon = button:getChildById('icon')
+    if percentBar and skillIcon then
         showPercentBar(button, not percentBar:isVisible())
+        skillIcon:setVisible(skillIcon:isVisible())
 
         local char = g_game.getCharacterName()
         if percentBar:isVisible() then
@@ -366,8 +368,10 @@ end
 
 function showPercentBar(button, show)
     local percentBar = button:getChildById('percent')
-    if percentBar then
+    local skillIcon = button:getChildById('icon')
+    if percentBar and skillIcon then
         percentBar:setVisible(show)
+        skillIcon:setVisible(show)
         if show then
             button:setHeight(21)
         else

@@ -24,7 +24,7 @@ SkillValueLabel < GameLabel
   anchors.left: prev.left
 
 ImageSkill < UIWidget
-  id: Img
+  id: icon
   size: 9 9
   width: 9
   margin-top: 13
@@ -150,8 +150,6 @@ MiniWindow
 
     SkillButton
       id: skillId0
-
-
       SkillNameLabel
         !text: tr('Fist Fighting')
       SkillValueLabel
@@ -162,7 +160,6 @@ MiniWindow
 
     SkillButton
       id: skillId1
-
       SkillNameLabel
         !text: tr('Club Fighting')
       SkillValueLabel
