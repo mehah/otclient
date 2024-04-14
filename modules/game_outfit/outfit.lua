@@ -211,7 +211,7 @@ function onShowFloorChange(checkBox, checked)
         local delay = 50
         periodicalEvent(function()
             if movementCheck:isChecked() then
-                local direction = previewCreature:getDirection() -- previewCreature:getDirection()
+                local direction = previewCreature:getDirection()
                 if direction == Directions.North then
                     local newMargin = floor:getMarginTop() + 8
                     floor:setMarginTop(newMargin)

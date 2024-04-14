@@ -1356,17 +1356,3 @@ function checkAndOpenLeftPanel()
       return
   end
 end
-
-function getStateTopPanel()
-    local stats_bar = StatsBar.getCurrentStatsBar()
-    if not stats_bar then
-        return
-    end
-    
-    local panel_icono = stats_bar.icons
-    if not panel_icono then
-        return
-    end
-    
-    return panel_icono
-end

@@ -50,7 +50,7 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 - [x] **Game_mainpanel//minimap** bug: minimap .white cross out of bounds [#15](https://github.com/Nottinghster/otclient/issues/15) - [6644075](https://github.com/Nottinghster/otclient/commit/6644075a65913e2abed981b4dd1c376178ffa74a)
 ------------
 **in process**
-- [ ] **Sources//game_outfit** compatibility with extended view  [#35](https://github.com/Nottinghster/otclient/issues/35)
+- [ ] **Sources//game_outfit** outfit not centralized in outfit window (crops)  [#35](https://github.com/Nottinghster/otclient/issues/35)
 - [ ] **data/styles/** Using a unique font similar to Tibia 13 (i think is Verdana10px bold ? )
 - [ ] **data/styles/** Using the vertical and horizontal scrollbars of Tibia 13. ![image](https://github.com/Nottinghster/otclient/assets/114332266/623f01c9-41cf-4763-88e5-449cf7127f5e)
 - [ ] **game_actionbar** Adapt the v8 game_actionbar with vertical and horizontal panels. (closer to Tibia 13), with options in client_options.
