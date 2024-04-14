@@ -127,7 +127,10 @@ protected:
 
     // outfit
     void processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<int, std::string, int> >& outfitList,
-                                 const std::vector<std::tuple<int, std::string> >& mountList);
+                                 const std::vector<std::tuple<int, std::string> >& mountList,
+                                 const std::vector<std::tuple<int, std::string> >& wingsList,
+                                 const std::vector<std::tuple<int, std::string> >& aurasList,
+                                 const std::vector<std::tuple<int, std::string> >& effectsList);
 
     // npc trade
     static void processOpenNpcTrade(const std::vector<std::tuple<ItemPtr, std::string, int, int, int> >& items);

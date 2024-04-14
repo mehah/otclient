@@ -103,7 +103,7 @@ local function showSelectionList(data, tempValue, tempField, onSelectCallback)
             local Category = modules.game_attachedeffects.getCategory(itemData)
             if Category == 1 then
                 button.outfit:setOutfit({
-                    type = itemData
+                    type = modules.game_attachedeffects.thingId(itemData)
                 })
             elseif Category == 2 then
                 button.outfit:setOutfit(previewCreature:getCreature():getOutfit())
@@ -113,9 +113,10 @@ local function showSelectionList(data, tempValue, tempField, onSelectCallback)
                 button.outfit:setImageSource(modules.game_attachedeffects.getTexture(itemData))
             end
 
-            button.name:setText(tostring(itemData))
+            button.name:setText(modules.game_attachedeffects.getName(itemData))
             if tempValue == itemData then
-                focused = tostring(itemData)
+
+                focused = (itemData)
             end
         end
     end
@@ -134,6 +135,21 @@ local function showSelectionList(data, tempValue, tempField, onSelectCallback)
     window.listSearch:show()
 end
 
+local function arrayCompatibility(array)
+    local array_compatibility = {}
+
+    if array == nil or type(array) == "number" or type(array) == "string" or next(array) == nil then
+        return array_compatibility
+    end
+    for i, v in ipairs(array) do
+        if type(v) == "table" then
+            table.insert(array_compatibility, v[1])
+        else
+            table.insert(array_compatibility, v)
+        end
+    end
+    return array_compatibility
+end
 -- @ 
 
 local AppearanceData = {"preset", "outfit", "mount", "wings", "aura", "effects", "shader", "healthBar", "title"}
@@ -298,9 +314,9 @@ local PreviewOptions = {
     ["showEffects"] = onShowEffectsChange
     -- @ 
 }
--- function create(player, outfitList, creatureMount, mountList, creatureFamiliar, familiarList,wingsList,auraList,shaderList,barsList,titleList,effectsList)
 
-function create(player, outfitList, creatureMount, mountList, creatureFamiliar, familiarList)
+function create(player, outfitList, creatureMount, mountList, wingsList, auraList, effectsList)
+
     if ignoreNextOutfitWindow and g_clock.millis() < ignoreNextOutfitWindow + 1000 then
         return
     end
@@ -318,18 +334,19 @@ function create(player, outfitList, creatureMount, mountList, creatureFamiliar, 
     ServerData = {
         currentOutfit = currentOutfit,
         outfits = outfitList,
-        mounts = mountList
-        --[[         wings = wingsList,
+        mounts = mountList,
+        wings = wingsList,
         auras = auraList,
+        effects = effectsList
+        --[[
         shaders = shaderList,
         healthBars = barsList,
         title = titleList,
-        effects = effectsList, ]]
+ ]]
 
     }
 
     window = g_ui.displayUI("outfitwindow")
-    ServerData.auras = {7, 8} -- note: DELETE THIS, IS FOR TEST
 
     local checks = {{window.preview.options.showWings, ServerData.wings},
                     {window.preview.options.showAura, ServerData.auras},
@@ -349,6 +366,7 @@ function create(player, outfitList, creatureMount, mountList, creatureFamiliar, 
         local widget, data = check[1], check[2]
         if not table.empty(data) then
             widget:setVisible(true)
+
         else
             widget:setVisible(false)
         end
@@ -536,6 +554,9 @@ function destroy()
         settings = {}
         window:destroy()
         window = nil
+        lastSelectAura = "None"
+        lastSelectWings = "None"
+        lastSelectEffects = "None"
     end
 end
 
@@ -716,12 +737,12 @@ function onAppearanceChange(widget, selectedWidget)
         showMounts()
         -- numbers
     elseif id == "aura" then
-        showSelectionList(ServerData.auras, tempOutfit.aura, "aura", onAuraSelect)
+        showSelectionList(arrayCompatibility(ServerData.auras), tempOutfit.aura, "aura", onAuraSelect)
     elseif id == "wings" then
-        showSelectionList(ServerData.wings, tempOutfit.wings, "wings", onWingsSelect)
+        showSelectionList(arrayCompatibility(ServerData.wings), tempOutfit.wings, "wings", onWingsSelect)
 
     elseif id == "effects" then
-        showSelectionList(ServerData.effects, tempOutfit.effects, "effects", onEffectBarSelect)
+        showSelectionList(arrayCompatibility(ServerData.effects), tempOutfit.effects, "effects", onEffectBarSelect)
         -- strings 
     elseif id == "shader" then
         showShaders()
@@ -1142,11 +1163,13 @@ function onAuraSelect(list, focusedChild, unfocusedChild, reason)
         if auraType and auraType > 0 then
             previewCreature:getCreature():attachEffect(g_attachedEffects.getById(auraType))
             lastSelectAura = auraType
+            tempOutfit.auras = auraType
             updatePreview()
             deselectPreset()
             updateAppearanceText("aura", modules.game_attachedeffects.getName(lastSelectAura))
         else
             lastSelectAura = "None"
+            tempOutfit.auras = 0
             updateAppearanceText("aura", "None")
         end
     end
@@ -1167,11 +1190,13 @@ function onWingsSelect(list, focusedChild, unfocusedChild, reason)
         if wingsType and wingsType > 0 then
             previewCreature:getCreature():attachEffect(g_attachedEffects.getById(wingsType))
             lastSelectWings = wingsType
+            tempOutfit.wings = wingsType
             updatePreview()
             deselectPreset()
             updateAppearanceText("wings", modules.game_attachedeffects.getName(wingsType))
         else
             lastSelectWings = "None"
+            tempOutfit.wings = 0
             updateAppearanceText("wings", "None")
         end
     end
@@ -1230,12 +1255,14 @@ function onEffectBarSelect(list, focusedChild, unfocusedChild, reason)
         if barType and barType > 0 then
             previewCreature:getCreature():attachEffect(g_attachedEffects.getById(barType))
             lastSelectEffects = barType
+            tempOutfit.effects = barType
             updatePreview()
             deselectPreset()
             updateAppearanceText("effects", modules.game_attachedeffects.getName(lastSelectEffects))
         else
             updateAppearanceText("effects", "None")
             lastSelectEffects = "None"
+            tempOutfit.effects = 0
         end
     end
 end

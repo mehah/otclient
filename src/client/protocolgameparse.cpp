@@ -2305,6 +2305,32 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
         }
     }
 
+    std::vector<std::tuple<int, std::string> > wingList;
+    std::vector<std::tuple<int, std::string> > auraList;
+    std::vector<std::tuple<int, std::string> > effectList;
+   if (g_game.getFeature(Otc::GameWingsAurasEffects)) {
+        int wingCount = msg->getU8();
+        for (int i = 0; i < wingCount; ++i) {
+            int wingId = msg->getU16();
+            std::string wingName = msg->getString();
+            wingList.push_back(std::make_tuple(wingId, wingName));
+        }
+        int auraCount = msg->getU8();
+        for (int i = 0; i < auraCount; ++i) {
+            int auraId = msg->getU16();
+            std::string auraName = msg->getString();
+            auraList.push_back(std::make_tuple(auraId, auraName));
+        }
+        int effectCount = msg->getU8();
+        for (int i = 0; i < effectCount; ++i) {
+            int effectId = msg->getU16();
+            std::string effectName = msg->getString();
+            effectList.push_back(std::make_tuple(effectId, effectName));
+        }
+
+  }
+
+
     if (g_game.getClientVersion() >= 1281) {
         const uint16_t familiarCount = msg->getU16();
         for (int_fast32_t i = 0; i < familiarCount; ++i) {
@@ -2321,7 +2347,7 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
         msg->getU8(); // randomize mount (bool)
     }
 
-    g_game.processOpenOutfitWindow(currentOutfit, outfitList, mountList);
+    g_game.processOpenOutfitWindow(currentOutfit, outfitList, mountList, wingList, auraList, effectList);
 }
 
 void ProtocolGame::parseKillTracker(const InputMessagePtr& msg)
@@ -2693,8 +2719,18 @@ Outfit ProtocolGame::getOutfit(const InputMessagePtr& msg, bool parseMount/* = t
             msg->getU8(); //feet
         }
         outfit.setMount(mount);
-    }
 
+    }
+    if (g_game.getFeature(Otc::GameWingsAurasEffects)) {
+        const uint16_t wings = msg->getU16();
+        outfit.setWing(wings);
+
+        const uint16_t auras = msg->getU16();
+        outfit.setAura(auras);
+
+        const uint16_t effects = msg->getU16();
+        outfit.setEffect(effects);
+    }
     return outfit;
 }
 

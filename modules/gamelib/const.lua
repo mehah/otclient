@@ -193,6 +193,8 @@ GameContainerFilter = 113
 GameEnterGameShowAppearance = 114
 GameSmoothWalkElevation = 115
 GameNegativeOffset = 116
+GameItemTooltipV8 = 117 
+GameWingsAurasEffects = 118 -- note: change to 117 if not approved GameItemTooltipV8
 
 TextColors = {
     red = '#f55e5e',    -- '#c83200'
