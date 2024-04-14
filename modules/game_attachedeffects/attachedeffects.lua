@@ -11,6 +11,7 @@ end
 function controller:onGameEnd()
     g_game.getLocalPlayer():clearAttachedEffects()
 end]]
+
 function controller:onTerminate()
     g_attachedEffects.clear()
 end
@@ -73,6 +74,7 @@ function getName(id)
     end
 
 end
+
 function thingId(id)
     if type(id) == "number" then
         return AttachedEffectManager.get(id).thingId
