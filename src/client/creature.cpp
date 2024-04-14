@@ -776,6 +776,13 @@ void Creature::setOutfit(const Outfit& outfit)
         m_numPatternZ = std::min<int>(1, getNumPatternZ() - 1);
     }
 
+    if ((g_game.getFeature(Otc::GameWingsAurasEffects))) {
+        m_outfit.setWing(0);
+        m_outfit.setAura(0);
+        m_outfit.setEffect(0);
+    
+    }
+
     if (const auto& tile = getTile())
         tile->checkForDetachableThing();
 

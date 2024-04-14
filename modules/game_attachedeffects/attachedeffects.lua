@@ -73,4 +73,11 @@ function getName(id)
     end
 
 end
+function thingId(id)
+    if type(id) == "number" then
+        return AttachedEffectManager.get(id).thingId
+    else
+        return "None"
+    end
+end
 -- @

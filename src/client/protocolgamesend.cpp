@@ -776,6 +776,11 @@ void ProtocolGame::sendChangeOutfit(const Outfit& outfit)
         msg->addU16(0x00); //familiars
         msg->addU8(0x00); //randomizeMount
     }
+    if (g_game.getFeature(Otc::GameWingsAurasEffects)) {
+        msg->addU16(outfit.getWing());  // wings
+        msg->addU16(outfit.getAura());  // auras
+        msg->addU16(outfit.getEffect()); // effects
+    }
 
     send(msg);
 }
