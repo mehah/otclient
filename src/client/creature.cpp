@@ -1103,8 +1103,10 @@ void Creature::setStaticWalking(uint16_t v) {
 
     m_walkingAnimationSpeed = v;
 
-    if (v == 0)
+    if (v == 0) {
+        m_walkAnimationPhase = 0;
         return;
+    }
 
     m_walkUpdateEvent = g_dispatcher.cycleEvent([self = static_self_cast<Creature>()] {
         self->updateWalkAnimation();
