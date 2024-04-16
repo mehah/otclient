@@ -37,6 +37,10 @@ public:
     CreaturePtr getCreature() { return m_creature; }
     uint8_t getCreatureSize() { return m_creatureSize; }
     void setCreatureSize(uint8_t size) { m_creatureSize = size; }
+
+    void setCenter(bool v) { m_center = v; }
+    bool isCentered() { return m_center; }
+
     /*
     // @ note:
     this did not work:
@@ -45,7 +49,7 @@ public:
     in game_outfit
     function updatePreview()
         local direction = previewCreature:getDirection()
-        
+
     plan b:
     */
     Otc::Direction getDirection() {
@@ -54,7 +58,6 @@ public:
         } else {
             return Otc::InvalidDirection;
         }
-
     }
     // @
 protected:
@@ -62,4 +65,5 @@ protected:
     Outfit getOutfit() { if (!m_creature) setOutfit({}); return m_creature->getOutfit(); }
     CreaturePtr m_creature;
     uint8_t m_creatureSize{ 0 };
+    bool m_center{ false };
 };

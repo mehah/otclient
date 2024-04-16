@@ -55,7 +55,7 @@ public:
     void onDisappear() override;
 
     void draw(const Point& dest, bool drawThings = true, LightView* lightView = nullptr) override;
-    void draw(const Rect& destRect, uint8_t size);
+    void draw(const Rect& destRect, uint8_t size, bool center = false);
 
     void internalDraw(Point dest, LightView* lightView = nullptr, const Color& color = Color::white);
     void drawInformation(const MapPosInfo& mapRect, const Point& dest, int drawFlags);

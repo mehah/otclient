@@ -113,7 +113,7 @@ void Creature::draw(const Point& dest, bool drawThings, LightView* lightView)
     }
 }
 
-void Creature::draw(const Rect& destRect, uint8_t size)
+void Creature::draw(const Rect& destRect, uint8_t size, bool center)
 {
     if (!m_thingType)
         return;
@@ -123,7 +123,10 @@ void Creature::draw(const Rect& destRect, uint8_t size)
         frameSize = std::max<int>(frameSize * (size / 100.f), 2 * g_gameConfig.getSpriteSize() * (size / 100.f));
 
     g_drawPool.bindFrameBuffer(frameSize); {
-        const auto& p = Point(frameSize - g_gameConfig.getSpriteSize()) + getDisplacement();
+        auto p = Point(frameSize - g_gameConfig.getSpriteSize()) + getDisplacement();
+        if (center)
+            p /= 2;
+
         internalDraw(p);
         if (isMarked())
             internalDraw(p, nullptr, getMarkedColor());
@@ -737,7 +740,9 @@ void Creature::setHealthPercent(uint8_t healthPercent)
 
 void Creature::setDirection(Otc::Direction direction)
 {
-    assert(direction != Otc::InvalidDirection);
+    if (direction == Otc::InvalidDirection)
+        return;
+
     m_direction = direction;
 
     // xPattern => creature direction
@@ -781,7 +786,6 @@ void Creature::setOutfit(const Outfit& outfit)
         m_outfit.setAura(0);
         m_outfit.setEffect(0);
         m_outfit.setShader("Outfit - Default");
-    
     }
 
     if (const auto& tile = getTile())
