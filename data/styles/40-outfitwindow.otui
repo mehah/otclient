@@ -291,7 +291,7 @@ OutfitWindow < MainWindow
       UICreature
         id: creature
         anchors.centerIn: parent
-        size: 128 128
+        size: 256 256
       
       Panel
         id: bars

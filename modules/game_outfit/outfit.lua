@@ -377,7 +377,7 @@ function create(player, outfitList, creatureMount, mountList, wingsList, auraLis
     end
 
     previewCreature = window.preview.panel.creature
-    previewCreature:setCreatureSize(108)
+    previewCreature:setCreatureSize(200)
     previewCreature:setCenter(true)
     -- previewCreature:setBorderColor('red')
     -- previewCreature:setBorderWidth(2)
