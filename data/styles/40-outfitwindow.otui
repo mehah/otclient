@@ -292,15 +292,6 @@ OutfitWindow < MainWindow
         id: creature
         anchors.centerIn: parent
         size: 128 128
-        margin-right: 32
-        margin-bottom: 32
-    
-        //creature-offset-x : 22
-        //creature-offset-y : 0
-
-
-
-
       
       Panel
         id: bars

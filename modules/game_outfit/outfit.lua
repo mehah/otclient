@@ -108,14 +108,12 @@ local function showSelectionList(data, tempValue, tempField, onSelectCallback)
             elseif Category == 2 then
                 button.outfit:setOutfit(previewCreature:getCreature():getOutfit())
                 button.outfit:getCreature():attachEffect(g_attachedEffects.getById(itemData))
-
             elseif Category == 5 then
                 button.outfit:setImageSource(modules.game_attachedeffects.getTexture(itemData))
             end
 
             button.name:setText(modules.game_attachedeffects.getName(itemData))
             if tempValue == itemData then
-
                 focused = (itemData)
             end
         end
@@ -151,14 +149,12 @@ local function arrayCompatibility(array)
     end
     return array_compatibility
 end
--- @ 
+-- @
 
-local AppearanceData = {"preset", "outfit", "mount", "wings", "aura", "effects", "shader", "healthBar", "title"}
+local AppearanceData = { "preset", "outfit", "mount", "wings", "aura", "effects", "shader", "healthBar", "title" }
 
 function init()
-
     if opcodeSystem.enable then
-
         ProtocolGame.registerExtendedOpcode(opcodeSystem.id, function(protocol, opcode, buffer)
             local status, json_data = pcall(json.decode, buffer)
 
@@ -173,7 +169,6 @@ function init()
             ServerData.healthBars = json_data.HealthBar
             ServerData.effects = json_data.effect
             ServerData.title = json_data.title
-
         end)
     end
     connect(g_game, {
@@ -194,7 +189,6 @@ function terminate()
 end
 
 function onMovementChange(checkBox, checked)
-
     if checked == true then
         previewCreature:getCreature():setStaticWalking(1000)
     else
@@ -297,11 +291,13 @@ function onShowBarsChange(checkBox, checked)
     settings.showBars = checked
     updatePreview()
 end
+
 function onShowEffectsChange(checkBox, checked)
     settings.effects = checked
     updatePreview()
 end
--- @ 
+
+-- @
 local PreviewOptions = {
     ["showFloor"] = onShowFloorChange,
     ["showOutfit"] = onShowOutfitChange,
@@ -313,11 +309,10 @@ local PreviewOptions = {
     ["showBars"] = onShowBarsChange,
     ["showTitle"] = onShowTitleChange,
     ["showEffects"] = onShowEffectsChange
-    -- @ 
+    -- @
 }
 
 function create(player, outfitList, creatureMount, mountList, wingsList, auraList, effectsList, shaderList)
-
     if ignoreNextOutfitWindow and g_clock.millis() < ignoreNextOutfitWindow + 1000 then
         return
     end
@@ -348,25 +343,24 @@ function create(player, outfitList, creatureMount, mountList, wingsList, auraLis
 
     window = g_ui.displayUI("outfitwindow")
 
-    local checks = {{window.preview.options.showWings, ServerData.wings},
-                    {window.preview.options.showAura, ServerData.auras},
-                    {window.preview.options.showShader, ServerData.shaders},
-                    {window.preview.options.showBars, ServerData.healthBars},
-                    {window.preview.options.showEffects, ServerData.effects},
-                    {window.preview.options.showTitle, ServerData.title},
+    local checks = { { window.preview.options.showWings, ServerData.wings },
+        { window.preview.options.showAura,      ServerData.auras },
+        { window.preview.options.showShader,    ServerData.shaders },
+        { window.preview.options.showBars,      ServerData.healthBars },
+        { window.preview.options.showEffects,   ServerData.effects },
+        { window.preview.options.showTitle,     ServerData.title },
 
-                    {window.appearance.settings.wings, ServerData.wings},
-                    {window.appearance.settings.aura, ServerData.auras},
-                    {window.appearance.settings.shader, ServerData.shaders},
-                    {window.appearance.settings.healthBar, ServerData.healthBars},
-                    {window.appearance.settings.effects, ServerData.effects},
-                    {window.appearance.settings.title, ServerData.title}}
+        { window.appearance.settings.wings,     ServerData.wings },
+        { window.appearance.settings.aura,      ServerData.auras },
+        { window.appearance.settings.shader,    ServerData.shaders },
+        { window.appearance.settings.healthBar, ServerData.healthBars },
+        { window.appearance.settings.effects,   ServerData.effects },
+        { window.appearance.settings.title,     ServerData.title } }
 
     for _, check in ipairs(checks) do
         local widget, data = check[1], check[2]
         if not table.empty(data) then
             widget:setVisible(true)
-
         else
             widget:setVisible(false)
         end
@@ -384,6 +378,10 @@ function create(player, outfitList, creatureMount, mountList, wingsList, auraLis
 
     previewCreature = window.preview.panel.creature
     previewCreature:setCreatureSize(108)
+    previewCreature:setCenter(true)
+    -- previewCreature:setBorderColor('red')
+    -- previewCreature:setBorderWidth(2)
+
     if settings.currentPreset == nil then
         loadDefaultSettings()
         print("game_outfit error funtion loadSettings()")
@@ -515,7 +513,6 @@ end
 
 function destroy()
     if window then
-
         floor = nil
         movementCheck = nil
         showFloorCheck = nil
@@ -684,8 +681,7 @@ function savePreset()
     if lastSelectTitle ~= "None" then
         window.presetsList[presetId].creature:getCreature():setTitle(lastSelectTitle, "verdana-11px-rounded", "#0000ff")
     end
-    -- @ 
-
+    -- @
 end
 
 function renamePreset()
@@ -741,10 +737,9 @@ function onAppearanceChange(widget, selectedWidget)
         showSelectionList(arrayCompatibility(ServerData.auras), tempOutfit.aura, "aura", onAuraSelect)
     elseif id == "wings" then
         showSelectionList(arrayCompatibility(ServerData.wings), tempOutfit.wings, "wings", onWingsSelect)
-
     elseif id == "effects" then
         showSelectionList(arrayCompatibility(ServerData.effects), tempOutfit.effects, "effects", onEffectBarSelect)
-        -- strings 
+        -- strings
     elseif id == "shader" then
         showShaders()
     elseif id == "healthBar" then
@@ -761,7 +756,6 @@ function showPresets()
 
     local focused = nil
     if window.presetsList:getChildCount() == 0 and settings.presets then
-
         for presetId, preset in ipairs(settings.presets) do
             local presetWidget = g_ui.createWidget("PresetButton", window.presetsList)
             presetWidget:setId(presetId)
@@ -775,7 +769,7 @@ function showPresets()
             if preset.shader ~= "None" then
                 presetWidget.creature:getCreature():setShader(preset.shader)
             end
-            -- @ 
+            -- @
             if presetId == settings.currentPreset then
                 focused = presetId
             end
@@ -920,7 +914,6 @@ function showShaders()
 
     if ServerData.shaders and #ServerData.shaders > 0 then
         for _, shaderData in ipairs(ServerData.shaders) do
-
             local button = g_ui.createWidget("SelectionButton", window.selectionList)
             button:setId(shaderData[2])
 
@@ -1107,10 +1100,9 @@ function onPresetSelect(list, focusedChild, unfocusedChild, reason)
         if not settings.showShader or preset.shader == "None" then
             previewCreature:getCreature():setShader("Outfit - Default")
         else
-
             previewCreature:getCreature():setShader(preset.shader)
         end
-        -- @ 
+        -- @
     end
 end
 
@@ -1149,6 +1141,7 @@ function onMountSelect(list, focusedChild, unfocusedChild, reason)
         updateAppearanceText("mount", focusedChild.name:getText())
     end
 end
+
 -- Esta variable mantiene el ID del último aura seleccionado
 
 function onAuraSelect(list, focusedChild, unfocusedChild, reason)
@@ -1222,7 +1215,6 @@ function onShaderSelect(list, focusedChild, unfocusedChild, reason)
         deselectPreset()
 
         updateAppearanceText("shader", focusedChild.name:getText())
-
     end
 end
 
@@ -1290,7 +1282,6 @@ function onTitleSelect(list, focusedChild, unfocusedChild, reason)
         updatePreview()
         deselectPreset()
         updateAppearanceText("title", focusedChild.name:getText())
-
     end
 end
 
@@ -1309,7 +1300,6 @@ function updateAppearanceTexts(outfit)
         if key == "type" then
             newKey = "outfits"
             appKey = "outfit"
-
         end
         local dataTable = ServerData[newKey]
         if dataTable then
@@ -1381,14 +1371,14 @@ end
 function updatePreview()
     local direction = previewCreature:getDirection()
 
-    --[[     
-    without c++    
+    --[[
+    without c++
     g_lua.bindClassMemberFunction<UICreature>("getDirection", &UICreature::getDirection);
 
     local direction = previewCreature:getCreature():getDirection()  -> Not work
     local direction= previewCreature:getDirection()  ->not work
-    print(g_game.getLocalPlayer():getCreature():getDirection()) -> 
-    
+    print(g_game.getLocalPlayer():getCreature():getDirection()) ->
+
     ]]
 
     local previewOutfit = table.copy(tempOutfit)
@@ -1447,7 +1437,6 @@ function updatePreview()
         else
             window.preview.panel.bars:setMarginTop(30)
             window.preview.panel.bars:setMarginLeft(15)
-
         end
         local name = g_game.getCharacterName()
         window.preview.panel.bars.name:setText(name)
@@ -1455,7 +1444,6 @@ function updatePreview()
             window.preview.panel.bars.name:setHeight(14)
         else
             window.preview.panel.bars.name:setHeight(11)
-
         end
         window.preview.panel.bars.name:setMarginLeft(-43)
 
@@ -1588,7 +1576,6 @@ function loadDefaultSettings()
 end
 
 function sendAction(action, data)
-
     local protocolGame = g_game.getProtocolGame()
 
     if data == nil then
@@ -1630,5 +1617,4 @@ function accept()
         })
     end
     destroy()
-
 end
