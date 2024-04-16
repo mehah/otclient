@@ -406,7 +406,8 @@ void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vecto
                                    const std::vector<std::tuple<int, std::string> >& mountList,
                                    const std::vector<std::tuple<int, std::string> >& wingsList,
                                    const std::vector<std::tuple<int, std::string> >& aurasList,
-                                   const std::vector<std::tuple<int, std::string> >& effectList)
+                                   const std::vector<std::tuple<int, std::string> >& effectList,
+                                   const std::vector<std::tuple<int, std::string>>& shaderList)
 {
     // create virtual creature outfit
     const auto& virtualOutfitCreature = std::make_shared<Creature>();
@@ -427,7 +428,7 @@ void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vecto
         virtualMountCreature->setOutfit(mountOutfit);
     }
 
-    g_lua.callGlobalField("g_game", "onOpenOutfitWindow", virtualOutfitCreature, outfitList, virtualMountCreature, mountList, wingsList, aurasList, effectList);
+    g_lua.callGlobalField("g_game", "onOpenOutfitWindow", virtualOutfitCreature, outfitList, virtualMountCreature, mountList, wingsList, aurasList, effectList, shaderList);
 }
 
 void Game::processOpenNpcTrade(const std::vector<std::tuple<ItemPtr, std::string, int, int, int> >& items)

@@ -136,6 +136,7 @@ local function showSelectionList(data, tempValue, tempField, onSelectCallback)
 end
 
 local function arrayCompatibility(array)
+    --- temporary fix for the opcode system
     local array_compatibility = {}
 
     if array == nil or type(array) == "number" or type(array) == "string" or next(array) == nil then
@@ -315,7 +316,7 @@ local PreviewOptions = {
     -- @ 
 }
 
-function create(player, outfitList, creatureMount, mountList, wingsList, auraList, effectsList)
+function create(player, outfitList, creatureMount, mountList, wingsList, auraList, effectsList, shaderList)
 
     if ignoreNextOutfitWindow and g_clock.millis() < ignoreNextOutfitWindow + 1000 then
         return
@@ -326,7 +327,7 @@ function create(player, outfitList, creatureMount, mountList, wingsList, auraLis
     end
 
     if currentOutfit.shader == "" then
-        currentOutfit.shader = "outfit_default"
+        currentOutfit.shader = "Outfit - Default"
     end
 
     loadSettings()
@@ -337,12 +338,11 @@ function create(player, outfitList, creatureMount, mountList, wingsList, auraLis
         mounts = mountList,
         wings = wingsList,
         auras = auraList,
-        effects = effectsList
+        effects = effectsList,
+        shaders = shaderList
         --[[
-        shaders = shaderList,
         healthBars = barsList,
-        title = titleList,
- ]]
+        title = titleList]]
 
     }
 
@@ -557,6 +557,7 @@ function destroy()
         lastSelectAura = "None"
         lastSelectWings = "None"
         lastSelectEffects = "None"
+        lastSelectShader = "None"
     end
 end
 
@@ -815,7 +816,7 @@ function showOutfits()
         outfit.mount = 0
         outfit.aura = 0
         outfit.wings = 0
-        outfit.shader = "outfit_default"
+        outfit.shader = "Outfit - Default"
         outfit.healthBar = 0
         outfit.effects = 0
         button.outfit:setOutfit(outfit)
@@ -904,7 +905,7 @@ function showShaders()
     local focused = nil
     do
         local button = g_ui.createWidget("SelectionButton", window.selectionList)
-        button:setId("outfit_default")
+        button:setId("Outfit - Default")
 
         button.outfit:setOutfit({
             type = tempOutfit.type,
@@ -916,21 +917,22 @@ function showShaders()
             focused = "Outfit - Default"
         end
     end
+
     if ServerData.shaders and #ServerData.shaders > 0 then
         for _, shaderData in ipairs(ServerData.shaders) do
 
             local button = g_ui.createWidget("SelectionButton", window.selectionList)
-            button:setId(shaderData)
+            button:setId(shaderData[2])
 
             button.outfit:setOutfit({
                 type = tempOutfit.type,
                 addons = tempOutfit.addons
 
             })
-            button.outfit:getCreature():setShader(shaderData)
-            button.name:setText(shaderData)
-            if tempOutfit.shader == shaderData then
-                focused = shaderData
+            button.outfit:getCreature():setShader(shaderData[2])
+            button.name:setText(shaderData[2])
+            if tempOutfit.shader == shaderData[2] then
+                focused = shaderData[2]
             end
         end
     end
@@ -1208,9 +1210,11 @@ function onShaderSelect(list, focusedChild, unfocusedChild, reason)
         if shaderType ~= "None" then
             previewCreature:getCreature():setShader(shaderType)
             lastSelectShader = shaderType
+            tempOutfit.shaders = shaderType
         else
             previewCreature:getCreature():setShader("Outfit - Default")
             lastSelectShader = "Outfit - Default"
+            tempOutfit.shaders = "Outfit - Default"
         end
 
         updatePreview()
@@ -1383,7 +1387,7 @@ function updatePreview()
 
     local direction = previewCreature:getCreature():getDirection()  -> Not work
     local direction= previewCreature:getDirection()  ->not work
-    print(g_game.getLocalPlayer():getCreature():getDirection()) -> work wtf 
+    print(g_game.getLocalPlayer():getCreature():getDirection()) -> 
     
     ]]
 
@@ -1567,16 +1571,16 @@ end
 
 function loadDefaultSettings()
     settings = {
-        movement = false,
+        movement = true,
         showFloor = true,
         showOutfit = true,
-        showMount = false,
-        showWings = false,
-        showAura = false,
-        showShader = false,
+        showMount = true,
+        showWings = true,
+        showAura = true,
+        showShader = true,
         showBars = true,
-        showTitle = false,
-        showEffects = false,
+        showTitle = true,
+        showEffects = true,
         presets = {},
         currentPreset = 0
     }

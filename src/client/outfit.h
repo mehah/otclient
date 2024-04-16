@@ -42,6 +42,7 @@ public:
     void setWing(uint16_t Wing) { m_wing = Wing; }
     void setAura(uint16_t Aura) { m_aura = Aura; }
     void setEffect(uint16_t Effect) { m_effect = Effect; }
+    void setShader(const std::string& shader) { m_shader = shader; }
 
     void setHead(uint8_t head);
     void setBody(uint8_t body);
@@ -60,6 +61,7 @@ public:
     uint16_t getWing() const { return m_wing; }
     uint16_t getAura() const { return m_aura; }
     uint16_t getEffect() const { return m_effect; }
+    std::string getShader() const { return m_shader; }
 
     uint8_t getHead() const { return m_head; }
     uint8_t getBody() const { return m_body; }
@@ -94,7 +96,8 @@ public:
             m_mount == other.m_mount &&
             m_wing == other.m_wing &&
             m_aura == other.m_aura &&
-            m_effect == other.m_effect;
+            m_effect == other.m_effect &&
+            m_shader == other.m_shader;
     }
     bool operator!=(const Outfit& other) const { return !(*this == other); }
 
@@ -109,6 +112,7 @@ private:
     uint16_t m_wing{ 0 };
     uint16_t m_aura{ 0 };
     uint16_t m_effect{ 0 };
+    std::string m_shader;
 
     uint8_t m_head{ 0 };
     uint8_t m_body{ 0 };

@@ -2308,7 +2308,8 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
     std::vector<std::tuple<int, std::string> > wingList;
     std::vector<std::tuple<int, std::string> > auraList;
     std::vector<std::tuple<int, std::string> > effectList;
-   if (g_game.getFeature(Otc::GameWingsAurasEffects)) {
+    std::vector<std::tuple<int, std::string> > shaderList;
+   if (g_game.getFeature(Otc::GameWingsAurasEffectsShader)) {
         int wingCount = msg->getU8();
         for (int i = 0; i < wingCount; ++i) {
             int wingId = msg->getU16();
@@ -2326,6 +2327,12 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
             int effectId = msg->getU16();
             std::string effectName = msg->getString();
             effectList.push_back(std::make_tuple(effectId, effectName));
+        }
+        int shaderCount = msg->getU8();
+        for (int i = 0; i < shaderCount; ++i) {
+            int shaderId = msg->getU16();
+            std::string shaderName = msg->getString();
+            shaderList.push_back(std::make_tuple(shaderId, shaderName));
         }
 
   }
@@ -2347,7 +2354,7 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
         msg->getU8(); // randomize mount (bool)
     }
 
-    g_game.processOpenOutfitWindow(currentOutfit, outfitList, mountList, wingList, auraList, effectList);
+    g_game.processOpenOutfitWindow(currentOutfit, outfitList, mountList, wingList, auraList, effectList, shaderList);
 }
 
 void ProtocolGame::parseKillTracker(const InputMessagePtr& msg)
@@ -2721,7 +2728,7 @@ Outfit ProtocolGame::getOutfit(const InputMessagePtr& msg, bool parseMount/* = t
         outfit.setMount(mount);
 
     }
-    if (g_game.getFeature(Otc::GameWingsAurasEffects)) {
+    if (g_game.getFeature(Otc::GameWingsAurasEffectsShader)) {
         const uint16_t wings = msg->getU16();
         outfit.setWing(wings);
 
@@ -2730,6 +2737,8 @@ Outfit ProtocolGame::getOutfit(const InputMessagePtr& msg, bool parseMount/* = t
 
         const uint16_t effects = msg->getU16();
         outfit.setEffect(effects);
+        outfit.setShader(msg->getString());
+
     }
     return outfit;
 }
