@@ -375,9 +375,14 @@ function EnterGame.tryHttpLogin(clientVersion, httpLogin)
     path = '/' .. path
   end
 
-  loadBox = displayCancelBox(tr('Please wait'),
-    tr('Connecting to login server...\nServer: [%s]', host .. ":" .. tostring(G.port) .. path))
-  connect(loadBox, {
+  if not host then
+    loadBox = displayCancelBox(tr('Please wait'), tr('ERROR , try adding \n- ip/login.php \n- Enable HTTP login'))
+  else
+    loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to login server...\nServer: [%s]',
+        host .. ":" .. tostring(G.port) .. path))
+  end
+  
+    connect(loadBox, {
     onCancel = function(msgbox)
       loadBox = nil
       G.requestId = 0
@@ -498,12 +503,7 @@ function EnterGame.doLogin()
     protocolLogin.onCharacterList = onCharacterList
     protocolLogin.onUpdateNeeded = onUpdateNeeded
 
-    if not host then
-        loadBox = displayCancelBox(tr('Please wait'), tr('ERROR , try adding \n- ip/login.php \n- Enable HTTP login'))
-    else
-        loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to login server...\nServer: [%s]',
-            host .. ":" .. tostring(G.port) .. path))
-    end
+    loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to login server...'))
     
     connect(loadBox, {
       onCancel = function(msgbox)
