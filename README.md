@@ -48,9 +48,9 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 - [x] **Game_mainpanel//inventary** fix function inventoryController:onTerminate() - [53fcbb4](https://github.com/Nottinghster/otclient/commit/53fcbb4c065df0b2c0a16c47bf79e99e86b0493d#diff-9c2eaf0f9aece4afc40f30e75559dc5113cb3ddc75ecf66ddd5ce7d17a0935d5)
 - [x] **Game_outfit** v8 is the most similar to tibia 13 compatible with attachEffect , shader (no test yet title and health bars) [#25](https://github.com/Nottinghster/otclient/pull/25)
 - [x] **Game_mainpanel//minimap** bug: minimap .white cross out of bounds [#15](https://github.com/Nottinghster/otclient/issues/15) - [6644075](https://github.com/Nottinghster/otclient/commit/6644075a65913e2abed981b4dd1c376178ffa74a)
+- [x] **Sources//game_outfit** outfit not centralized in outfit window (crops)  [#35](https://github.com/Nottinghster/otclient/issues/35) - [307fe15](https://github.com/Nottinghster/otclient/commit/307fe1575fed2e768a388faf7df6aa50e1254fb5)
 ------------
 **in process**
-- [ ] **Sources//game_outfit** outfit not centralized in outfit window (crops)  [#35](https://github.com/Nottinghster/otclient/issues/35)
 - [ ] **data/styles/** Using a unique font similar to Tibia 13 (i think is Verdana10px bold ? )
 - [ ] **data/styles/** Using the vertical and horizontal scrollbars of Tibia 13. ![image](https://github.com/Nottinghster/otclient/assets/114332266/623f01c9-41cf-4763-88e5-449cf7127f5e)
 - [ ] **game_actionbar** Adapt the v8 game_actionbar with vertical and horizontal panels. (closer to Tibia 13), with options in client_options.
