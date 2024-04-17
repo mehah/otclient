@@ -35,7 +35,7 @@ public:
     virtual bool isThing() { return false; }
 
     void attachEffect(const AttachedEffectPtr& obj);
-    void clearAttachedEffects(bool callEvent = true);
+    void clearAttachedEffects(bool ignoreLuaEvent = false);
     void clearTemporaryAttachedEffects();
     void clearPermanentAttachedEffects();
     bool detachEffectById(uint16_t id);

@@ -39,7 +39,7 @@ extern ParticleManager g_particles;
 
 AttachableObject::~AttachableObject()
 {
-    clearAttachedEffects(false);
+    clearAttachedEffects(true);
     clearAttachedParticlesEffect();
     clearAttachedWidgets(false);
 }
@@ -104,10 +104,10 @@ void AttachableObject::onDetachEffect(const AttachedEffectPtr& effect, bool call
         effect->callLuaField("onDetach", attachedObjectToLuaObject());
 }
 
-void AttachableObject::clearAttachedEffects(bool callEvent)
+void AttachableObject::clearAttachedEffects(bool ignoreLuaEvent)
 {
     for (const auto& e : m_attachedEffects)
-        onDetachEffect(e, callEvent);
+        onDetachEffect(e, !ignoreLuaEvent);
     m_attachedEffects.clear();
 }
 
