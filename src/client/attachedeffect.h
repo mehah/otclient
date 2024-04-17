@@ -126,6 +126,7 @@ private:
     Size m_size;
 
     Timer m_animationTimer;
+    Timer m_bounceTimer;
 
     Otc::Direction m_direction{ Otc::North };
 

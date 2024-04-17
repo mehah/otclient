@@ -48,6 +48,7 @@ AttachedEffectPtr AttachedEffect::clone()
 
     obj->m_frame = 0;
     obj->m_animationTimer.restart();
+    obj->m_bounceTimer.restart();
 
     return obj;
 }
@@ -83,7 +84,8 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
         if (m_bounce.height > 0 && m_bounce.speed > 0) {
             const auto minHeight = m_bounce.minHeight * g_drawPool.getScaleFactor();
             const auto height = m_bounce.height * g_drawPool.getScaleFactor();
-            point -= (minHeight * 1.f) + std::abs((m_bounce.speed / 2) - g_clock.millis() % m_bounce.speed) / (m_bounce.speed * 1.f) * height;
+            const auto pixel = minHeight + (height - std::abs(height - static_cast<int>(m_bounceTimer.ticksElapsed() / (m_bounce.speed / 100.f)) % static_cast<int>(height * 2)));
+            point -= pixel;
         }
 
         if (lightView && m_light.intensity > 0)
