@@ -352,8 +352,10 @@ function EnterGame.tryHttpLogin(clientVersion, httpLogin)
   g_game.chooseRsa(G.host)
   if modules.game_things.isLoaded() then
   else
-    loadBox:destroy()
-    loadBox = nil
+    if loadBox then
+      loadBox:destroy()
+      loadBox = nil
+    end
     EnterGame.show()
   end
 
