@@ -1,9 +1,0 @@
-Module
-  name: game_outfit_old
-  description: Change local player outfit
-  author: baxnie, edubart
-  website: https://github.com/edubart/otclient
-  sandboxed: true
-  scripts: [ outfit ]
-  @onLoad: controller:init()
-  @onUnload: controller:terminate()

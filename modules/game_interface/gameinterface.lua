@@ -737,23 +737,8 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
         if creatureThing:isLocalPlayer() then
             menu:addOption(tr(g_game.getClientVersion() >= 1000 and "Customise Character" or "Set Outfit"), function()
                 g_game.requestOutfit()
-
-                -- @ note: delete this
-                scheduleEvent(function()
-                    modules.game_outfit_old.destroy()
-                end, 200)
-         
-
-            end) -- <-- this not
-            menu:addOption(tr(g_game.getClientVersion() >= 1000 and "Customise Character OLD module" or "Set Outfit OLD module"), function()
-                g_game.requestOutfit()
-                scheduleEvent(function()
-                    modules.game_outfit.destroy()
-                end, 200)
-      
-
             end)
-            -- @
+			
             if g_game.getFeature(GamePrey) then
                 menu:addOption(tr('Prey Dialog'), function()
                     modules.game_prey.show()
