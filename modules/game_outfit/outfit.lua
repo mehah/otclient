@@ -289,19 +289,16 @@ function onShowEffectsChange(checkBox, checked)
     updatePreview()
 end
 
--- @
 local PreviewOptions = {
     ["showFloor"] = onShowFloorChange,
     ["showOutfit"] = onShowOutfitChange,
     ["showMount"] = onShowMountChange,
-    -- @ attacheseffect
     ["showWings"] = onShowWingsChange,
     ["showAura"] = onShowAuraChange,
     ["showShader"] = onShowShaderChange,
     ["showBars"] = onShowBarsChange,
     ["showTitle"] = onShowTitleChange,
     ["showEffects"] = onShowEffectsChange
-    -- @
 }
 
 function create(player, outfitList, creatureMount, mountList, wingsList, auraList, effectsList, shaderList)
@@ -774,7 +771,6 @@ function showPresets()
             presetWidget:setId(presetId)
             presetWidget.title:setText(preset.title)
             presetWidget.creature:setOutfit(preset.outfit)
-            -- @ attacheseffect
 
             attachEffectIfValid(presetWidget.creature, preset.auras)
             attachEffectIfValid(presetWidget.creature, preset.effects)
@@ -799,7 +795,7 @@ function showPresets()
                 presetWidget.creature:getCreature():setShader(preset.shaders)
                 lastSelectShader = preset.shaders
             end
-            -- @
+
             if presetId == settings.currentPreset then
                 focused = presetId
 
@@ -1137,7 +1133,7 @@ function onPresetSelect(list, focusedChild, unfocusedChild, reason)
         else
             previewCreature:getCreature():setShader(preset.shaders)
         end
-        -- @
+
         tempOutfit.wings = preset.wings
         tempOutfit.auras = preset.auras
         tempOutfit.shaders = preset.shaders

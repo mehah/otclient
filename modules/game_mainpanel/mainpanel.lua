@@ -190,7 +190,6 @@ function addSpecialToggleButton(id, description, image, callback, front, index)
 end
 
 function addStoreButton(id, description, image, callback, front)
-    -- fast version
     return createButton_large(id, description, image, callback, true, front)
 end
 -- @ End of Options

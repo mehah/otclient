@@ -102,15 +102,3 @@ Panel
     margin-top: 12
 
     size: 120 20
-
-// @ Note: kokekanon delete this, before the murge
-  QtButton
-    id: repair_client
-    !text: tr('Repair client')
-    anchors.top: hotkeyDelay_label.bottom
-    anchors.left: hotkeysButton.right
-    margin-top: 12
-    margin-left: 12
-    size: 120 20
-    @onClick: repairClient()
-// @
