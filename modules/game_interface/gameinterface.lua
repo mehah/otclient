@@ -1298,15 +1298,40 @@ function onIncreaseLeftPanels()
     end
 end
 
+-- @ note: temporal fix
+local function movePanel(mainpanel)
+    for i, widget in pairs(mainpanel:getChildren()) do
+        if widget then
+
+            widget:close()
+
+            local panel = modules.game_interface.findContentPanelAvailable(widget, widget:getMinimumHeight())
+            if not panel then
+                return
+            end
+            if not panel:hasChild(widget) then
+                panel:addChild(widget)
+                widget:open()
+            else
+                print("game_interface fx onDecreaseXXXXPanels = prevent error : attempt to add a child again into a UIWidget")
+            end
+
+        end
+    end
+end
+-- @
+
 function onDecreaseLeftPanels()
     leftIncreaseSidePanels:setEnabled(true)
     if modules.client_options.getOption('showLeftExtraPanel') then
         modules.client_options.setOption('showLeftExtraPanel', false)
+        movePanel(gameLeftExtraPanel)
         return
     end
 
     if modules.client_options.getOption('showLeftPanel') then
         modules.client_options.setOption('showLeftPanel', false)
+        movePanel(gameLeftPanel)
         leftDecreaseSidePanels:setEnabled(false)
         return
     end
@@ -1321,6 +1346,7 @@ end
 function onDecreaseRightPanels()
     rightIncreaseSidePanels:setEnabled(true)
     rightDecreaseSidePanels:setEnabled(false)
+    movePanel(gameRightExtraPanel)
     modules.client_options.setOption('showRightExtraPanel', false)
 end
 
