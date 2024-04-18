@@ -384,7 +384,7 @@ function EnterGame.tryHttpLogin(clientVersion, httpLogin)
         host .. ":" .. tostring(G.port) .. path))
   end
   
-    connect(loadBox, {
+  connect(loadBox, {
     onCancel = function(msgbox)
       loadBox = nil
       G.requestId = 0
