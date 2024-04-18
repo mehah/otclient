@@ -451,7 +451,6 @@ function EnterGame.setPassword(password)
 end
 
 function EnterGame.setHttpLogin(httpLogin)
-    -- NOTE: kokekanon -> temporary solution https://github.com/mehah/otclient/pull/647#issuecomment-2010499773
     if type(httpLogin) == "boolean" then
         enterGame:getChildById('httpLoginBox'):setChecked(httpLogin)
     else

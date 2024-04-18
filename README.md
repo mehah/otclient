@@ -51,6 +51,7 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 - [x] **Sources//game_outfit** outfit not centralized in outfit window (crops)  [#35](https://github.com/Nottinghster/otclient/issues/35) - [307fe15](https://github.com/Nottinghster/otclient/commit/307fe1575fed2e768a388faf7df6aa50e1254fb5)
 ------------
 **in process**
+- [ ] **Game_mainpanel//game_interface** mode(2) Fix extended view [#7](https://github.com/Nottinghster/otclient/issues/7)
 - [ ] **data/styles/** Using a unique font similar to Tibia 13 (i think is Verdana10px bold ? )
 - [ ] **data/styles/** Using the vertical and horizontal scrollbars of Tibia 13. ![image](https://github.com/Nottinghster/otclient/assets/114332266/623f01c9-41cf-4763-88e5-449cf7127f5e)
 - [ ] **game_actionbar** Adapt the v8 game_actionbar with vertical and horizontal panels. (closer to Tibia 13), with options in client_options.
@@ -65,7 +66,8 @@ https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 
 ### **1.- what is game_mainpanel ?**
 
-![image](https://cdn.discordapp.com/attachments/1188251464603283526/1223263276834492536/image.png?ex=661937b4&is=6606c2b4&hm=2d8e6da381b083cb1c153220a7e7847fbddcb4a8876f8006367dcbb1c1746d09&)
+![Screenshot_49](https://github.com/Nottinghster/otclient/assets/114332266/07fcc104-7c8b-44a5-958c-d10d0c2a9e29)
+
 
 union inventory , minimap, combat control
 
