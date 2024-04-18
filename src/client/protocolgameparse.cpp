@@ -3039,7 +3039,9 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
             if (containerType == 9) {
                 // quick loot categories
                 msg->getU32();
-                msg->getU32();
+                if (g_game.getClientVersion() >= 1332) {
+                    msg->getU32();
+                }
             } else if (containerType == 2) {
                 // quiver ammo count
                 msg->getU32();
