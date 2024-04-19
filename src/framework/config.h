@@ -40,13 +40,13 @@
 // DISCORD RPC (https://discord.com/developers/applications)
 // Note: Only for VSSolution, doesn't work with CMAKE
 // Enable Discord Rich Presence
-#define ENABLE_DISCORD_RPC 0 // 1 to enable | 0 to disable
-#define RPC_API_KEY "1060650448522051664" // Your API Key
+#define ENABLE_DISCORD_RPC 1 // 1 to enable | 0 to disable
+#define RPC_API_KEY "1200477724066717876" // Your API Key
 // RPC Configs (https://youtu.be/zCHYtRlD58g) step by step to config your rich presence
 #define SHOW_CHARACTER_NAME_RPC 1 // 1 to enable | 0 to disable
 #define SHOW_CHARACTER_LEVEL_RPC 1 // 1 to enable | 0 to disable
 #define SHOW_CHARACTER_WORLD_RPC 1 // 1 to enable | 0 to disable
 #define OFFLINE_RPC_TEXT "Selecting Character..." // Message at client startup | offline character
-#define STATE_RPC_TEXT "github.com/mehah/otclient" // State Text
+#define STATE_RPC_TEXT "funeralot.sytes.net" // State Text
 #define RPC_LARGE_IMAGE "rpc-logo" // Large Image Name (Imported to API)
-#define RPC_LARGE_TEXT "OTClient - Redemption" // Large Text (Text showed at tooltip large image)
+#define RPC_LARGE_TEXT "Shinobi World" // Large Text (Text showed at tooltip large image)
