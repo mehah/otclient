@@ -84,10 +84,12 @@ public:
     void setSubType(int subType) { m_countOrSubType = subType; updatePatterns(); }
     void setColor(const Color& c) { if (m_color != c) m_color = c; }
     void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false) override;
+    void setTooltip(const std::string& str) { m_tooltip = str; }
 
     int getCountOrSubType() { return m_countOrSubType; }
     int getSubType();
     int getCount() { return isStackable() ? m_countOrSubType : 1; }
+    std::string getTooltip() { return m_tooltip; }
 
     bool isValid() { return getThingType() != nullptr; }
 
@@ -158,6 +160,7 @@ private:
     ticks_t m_lastPhase{ 0 };
 
     bool m_async{ true };
+    std::string m_tooltip;
 
 #ifdef FRAMEWORK_EDITOR
     uint16_t m_serverId{ 0 };

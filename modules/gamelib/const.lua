@@ -193,6 +193,7 @@ GameContainerFilter = 113
 GameEnterGameShowAppearance = 114
 GameSmoothWalkElevation = 115
 GameNegativeOffset = 116
+GameItemTooltipV8 = 117
 
 TextColors = {
     red = '#f55e5e',    -- '#c83200'
