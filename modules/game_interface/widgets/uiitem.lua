@@ -107,7 +107,7 @@ function UIItem:onHoverChange(hovered)
     end
 
     if g_game.getFeature(GameItemTooltipV8) then
-        local tooltip = nil
+        local tooltip = ""
         local function splitTextIntoLines(text, maxLineLength)
             local words = {}
             for word in text:gmatch("%S+") do
@@ -131,8 +131,10 @@ function UIItem:onHoverChange(hovered)
 
         if self:getItem() and self:getItem():getTooltip():len() > 0 then
             tooltip = splitTextIntoLines(self:getItem():getTooltip(), 80) 
+            if tooltip then
+                self:setTooltip(tooltip)
+            end
         end
-        self:setTooltip(tooltip)
     end
     
 end
