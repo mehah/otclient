@@ -108,6 +108,38 @@ function UIItem:onHoverChange(hovered)
             draggingWidget.hoveredWho = nil
         end
     end
+
+    if g_game.getFeature(GameItemTooltipV8) then
+        local tooltip = ""
+        local function splitTextIntoLines(text, maxLineLength)
+            local words = {}
+            for word in text:gmatch("%S+") do
+                table.insert(words, word)
+            end
+        
+            local lines = {}
+            local currentLine = words[1]
+            for i = 2, #words do
+                if currentLine:len() + 1 + words[i]:len() > maxLineLength then
+                    table.insert(lines, currentLine)
+                    currentLine = words[i]
+                else
+                    currentLine = currentLine .. " " .. words[i]
+                end
+            end
+            table.insert(lines, currentLine)
+        
+            return table.concat(lines, "\n")
+        end
+
+        if self:getItem() and self:getItem():getTooltip():len() > 0 then
+            tooltip = splitTextIntoLines(self:getItem():getTooltip(), 80) 
+            if tooltip then
+                self:setTooltip(tooltip)
+            end
+        end
+    end
+    
 end
 
 function UIItem:onMouseRelease(mousePosition, mouseButton)
