@@ -862,34 +862,20 @@ uint32_t ThingType::getTextureIndex(int l, int x, int y, int z) const
         * m_numPatternX + x;
 }
 
-int ThingType::getExactSize(int /*layer*/, int /*xPattern*/, int /*yPattern*/, int /*zPattern*/, int /*animationPhase*/)
+int ThingType::getExactSize(int layer, int xPattern, int yPattern, int zPattern, int animationPhase)
 {
     if (m_null)
         return 0;
 
-    int maxSize = 0;
-    for (int currentAnimationPhase = 0; currentAnimationPhase < m_animationPhases; ++currentAnimationPhase) {
-        if (!getTexture(currentAnimationPhase))
-            continue;
+    if (!getTexture(animationPhase)) // we must calculate it anyway.
+        return 0;
 
-        for (int currentLayer = 0; currentLayer < m_layers; ++currentLayer) {
-            for (int currentXPattern = 0; currentXPattern < m_numPatternX; ++currentXPattern) {
-                for (int currentYPattern = 0; currentYPattern < m_numPatternY; ++currentYPattern) {
-                    for (int currentZPattern = 0; currentZPattern < m_numPatternZ; ++currentZPattern) {
-                        const int frameIndex = getTextureIndex(currentLayer, currentXPattern, currentYPattern, currentZPattern);
-                        const auto& pos = m_textureData[currentAnimationPhase].pos;
+    const int frameIndex = getTextureIndex(layer, xPattern, yPattern, zPattern);
+    const auto& pos = m_textureData[animationPhase].pos;
 
-                        const auto& textureDataPos = pos[std::min<int>(frameIndex, pos.size() - 1)];
-                        const auto& size = textureDataPos.originRects.size() - textureDataPos.offsets.toSize();
-                        int frameSize = std::max<int>(size.width(), size.height());
-
-                        maxSize = (std::max)(maxSize, frameSize);
-                    }
-                }
-            }
-        }
-    }
-    return maxSize;
+    const auto& textureDataPos = pos[std::min<int>(frameIndex, pos.size() - 1)];
+    const auto& size = textureDataPos.originRects.size() - textureDataPos.offsets.toSize();
+    return std::max<int>(size.width(), size.height());
 }
 
 void ThingType::setPathable(bool var)

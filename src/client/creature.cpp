@@ -1017,28 +1017,28 @@ uint16_t Creature::getCurrentAnimationPhase(const bool mount)
 
 int Creature::getExactSize(int layer, int xPattern, int yPattern, int zPattern, int animationPhase)
 {
-    if (m_exactSize > 0) {
+    if (m_exactSize > 0)
         return m_exactSize;
-    }
 
-    uint8_t exactSize;
-
+    uint8_t exactSize = 0;
     if (m_outfit.isCreature()) {
-        int numAnimationPhases = getAnimationPhases();
-        int numLayers = getLayers();
-        int numPatternX = getNumPatternX();
-        int numPatternY = getNumPatternY();
-        int numPatternZ = getNumPatternZ();
+        const int numPatternY = getNumPatternY();
+        const int layers = getLayers();
 
         zPattern = m_outfit.hasMount() ? 1 : 0;
 
-        exactSize = m_thingType->getExactSize(numAnimationPhases, numLayers, numPatternX, numPatternY, numPatternZ);
+        for (yPattern = 0; yPattern < numPatternY; ++yPattern) {
+            if (yPattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
+                continue;
+
+            for (int layer = 0; layer < layers; ++layer)
+                exactSize = std::max<int>(exactSize, Thing::getExactSize(layer, 0, yPattern, zPattern, 0));
+        }
     } else {
         exactSize = m_thingType->getExactSize();
     }
 
-    m_exactSize = std::max<uint8_t>(exactSize, g_gameConfig.getSpriteSize());
-    return m_exactSize;
+    return m_exactSize = std::max<uint8_t>(exactSize, g_gameConfig.getSpriteSize());
 }
 
 void Creature::setMountShader(const std::string_view name) { m_mountShader = g_shaders.getShader(name); }
