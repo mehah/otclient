@@ -119,7 +119,7 @@ function terminate()
 end
 
 function calculateVisibleTime(text)
-    return math.max(#text * 100, 4000)
+    return math.max(#text * 50, 4000)
 end
 
 function displayMessage(mode, text)
