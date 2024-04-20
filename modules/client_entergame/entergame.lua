@@ -352,8 +352,10 @@ function EnterGame.tryHttpLogin(clientVersion, httpLogin)
   g_game.chooseRsa(G.host)
   if modules.game_things.isLoaded() then
   else
-    loadBox:destroy()
-    loadBox = nil
+    if loadBox then
+      loadBox:destroy()
+      loadBox = nil
+    end
     EnterGame.show()
   end
 
@@ -375,8 +377,13 @@ function EnterGame.tryHttpLogin(clientVersion, httpLogin)
     path = '/' .. path
   end
 
-  loadBox = displayCancelBox(tr('Please wait'),
-    tr('Connecting to login server...\nServer: [%s]', host .. ":" .. tostring(G.port) .. path))
+  if not host then
+    loadBox = displayCancelBox(tr('Please wait'), tr('ERROR , try adding \n- ip/login.php \n- Enable HTTP login'))
+  else
+    loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to login server...\nServer: [%s]',
+        host .. ":" .. tostring(G.port) .. path))
+  end
+  
   connect(loadBox, {
     onCancel = function(msgbox)
       loadBox = nil
@@ -498,12 +505,7 @@ function EnterGame.doLogin()
     protocolLogin.onCharacterList = onCharacterList
     protocolLogin.onUpdateNeeded = onUpdateNeeded
 
-    if not host then
-        loadBox = displayCancelBox(tr('Please wait'), tr('ERROR , try adding \n- ip/login.php \n- Enable HTTP login'))
-    else
-        loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to login server...\nServer: [%s]',
-            host .. ":" .. tostring(G.port) .. path))
-    end
+    loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to login server...'))
     
     connect(loadBox, {
       onCancel = function(msgbox)
