@@ -1298,28 +1298,23 @@ function onIncreaseLeftPanels()
     end
 end
 
--- @ note: temporal fix
 local function movePanel(mainpanel)
-    for i, widget in pairs(mainpanel:getChildren()) do
+    for _, widget in pairs(mainpanel:getChildren()) do
         if widget then
-
-            widget:close()
-
-            local panel = modules.game_interface.findContentPanelAvailable(widget, widget:getMinimumHeight())
-            if not panel then
-                return
-            end
-            if not panel:hasChild(widget) then
-                panel:addChild(widget)
-                widget:open()
+            local panel = modules.game_interface.findContentPanelAvailable(widget, widget:getMinimumHeight())      
+            if panel then
+                if not panel:hasChild(widget) then
+                    widget:close()
+                    panel:addChild(widget)
+                else
+                    print("Error: Attempt to add a widget that already exists in the target panel")
+                end
             else
-                print("game_interface fx onDecreaseXXXXPanels = prevent error : attempt to add a child again into a UIWidget")
+                print("Warning: No suitable panel found for widget, unable to move")
             end
-
         end
     end
 end
--- @
 
 function onDecreaseLeftPanels()
     leftIncreaseSidePanels:setEnabled(true)
