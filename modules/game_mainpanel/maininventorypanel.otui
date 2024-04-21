@@ -5,6 +5,7 @@ StandModeBox < UICheckBox
   image-clip: 0 0 20 20
   $checked:
     image-clip: 20 0 20 20
+
 ChaseModeBox < UICheckBox
   size: 20 20
   image-source: /images/inventory/buttons_general
@@ -12,12 +13,12 @@ ChaseModeBox < UICheckBox
   $checked:
     image-clip: 20 20 20 20
 
-
 ConditionWidget < UIWidget
   size: 10 10
 
   $!first:
     margin-left: 2
+
 PhantomMiniWindow
   id: maininventorypanel
   draggable: true
@@ -68,14 +69,12 @@ PhantomMiniWindow
       margin-right: 7
       size: 20 20
 
-
     ChaseModeBox
       id: followPosture
       image-source: /images/inventory/buttons_general
       anchors.right: standPosture.right
       anchors.top: standPosture.bottom
       margin-top: 4
-
 
     UIWidget
       id: expert
@@ -101,7 +100,6 @@ PhantomMiniWindow
       margin-top: 4
       phantom: false
       size: 44 21
-
 
     TopToggleButton
       id: attack
@@ -432,7 +430,6 @@ PhantomMiniWindow
       anchors.left: standPosture.right
       anchors.top: standPosture.top
       margin-left: 1
-
 
     UIWidget
       id: pvp

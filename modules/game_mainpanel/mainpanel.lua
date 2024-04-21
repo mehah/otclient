@@ -40,7 +40,6 @@ function reloadMainPanelSizes()
                     local optionsHeight = (currentOptionsAmount * 28) + 3
                     local currentSpecialsAmount = math.ceil(specialsAmount / 2)
                     local specialsHeight = (currentSpecialsAmount * 28) + 3
-
                     local maxPanelHeight = math.max(optionsHeight, specialsHeight)
 
                     if storeAmount > 1 then
@@ -51,7 +50,6 @@ function reloadMainPanelSizes()
                     end
 
                     panel:setHeight(panel:getHeight() + maxPanelHeight)
-
                     height = height + maxPanelHeight
                     if storeAmount >= 2 then
                         height = height + 15
@@ -268,8 +266,10 @@ local function combatEvent()
     elseif g_game.getFightMode() == FightDefensive then
         selectCombat('defense', true)
     end
-
-   -- selectPvp(g_game.getPVPMode() == PVPRedFist, true)
+   
+   if g_game.getFeature(GamePVPMode) then
+       selectPvp(g_game.getPVPMode() == PVPRedFist, true)
+    end
 end
 
 local function inventoryEvent(player, slot, item, oldItem)
@@ -368,6 +368,7 @@ end
 function getIconsPanelOn()
     return inventoryController.ui.onPanel.icons
 end
+
 function getIconsPanelOff()
     return inventoryController.ui.offPanel.icons
 end
@@ -407,8 +408,8 @@ local function refreshInventorySizes()
     walkEvent()
     reloadMainPanelSizes()
 end
-function onSetChaseMode(self, selectedChaseModeButton)
 
+function onSetChaseMode(self, selectedChaseModeButton)
     if selectedChaseModeButton == nil then
         return
     end
@@ -425,18 +426,14 @@ function onSetChaseMode(self, selectedChaseModeButton)
 end
 
 function onSetSafeFight(self, checked)
-
     local ui = getInventoryUi()
     if ui.pvp:getImageClip().y == 100 then
         ui.pvp:setImageClip(
             ui.pvp.imageClipCheckedX .. ' ' .. ui.pvp.imageClipCheckedY .. ' ' .. ui.pvp.imageClipWidth .. ' 20')
-
     else
         ui.pvp:setImageClip(ui.pvp.imageClipUncheckedX .. ' ' .. ui.pvp.imageClipUncheckedY .. ' ' ..
                                 ui.pvp.imageClipWidth .. ' 20')
-
     end
-
     g_game.setSafeFight(not checked)
     if not checked then
         g_game.cancelAttack()
@@ -447,21 +444,20 @@ inventoryController = Controller:new()
 inventoryController:setUI('maininventorypanel', modules.game_interface.getMainRightPanel())
 
 local inventoryControllerEvents = inventoryController:addEvent(LocalPlayer, {
-
     onInventoryChange = inventoryEvent,
     onSoulChange = onSoulChange,
     onFreeCapacityChange = onFreeCapacityChange
 })
-local inventoryControllerEvents_game = inventoryController:addEvent(g_game, {
 
+local inventoryControllerEvents_game = inventoryController:addEvent(g_game, {
     onWalk = walkEvent,
     onAutoWalk = walkEvent,
     onFightModeChange = combatEvent,
     onChaseModeChange = combatEvent,
     onSafeFightChange = combatEvent,
     onPVPModeChange = combatEvent
-
 })
+
 function inventoryController:onInit()
     refreshInventory_panel()
     local ui = getInventoryUi()
@@ -473,7 +469,6 @@ function inventoryController:onInit()
     connect(chaseModeRadioGroup, {
         onSelectionChange = onSetChaseMode
     })
-
     connect(inventoryController.ui.onPanel.pvp, {
         onCheckChange = onSetSafeFight
     })
@@ -559,26 +554,27 @@ function selectCombat(combat, ignoreUpdate)
     end
 end
 
---[[ function selectPvp(pvp, ignoreUpdate)
-    local ui = getInventoryUi()
-    if pvp then
-        ui.pvp:setImageClip(
-            ui.pvp.imageClipCheckedX .. ' ' .. ui.pvp.imageClipCheckedY .. ' ' .. ui.pvp.imageClipWidth .. ' 20')
-        if not ignoreUpdate then
-            g_game.setPVPMode(PVPRedFist)
-        end
-    else
-        ui.pvp:setImageClip(ui.pvp.imageClipUncheckedX .. ' ' .. ui.pvp.imageClipUncheckedY .. ' ' ..
-                                ui.pvp.imageClipWidth .. ' 20')
-        if not ignoreUpdate then
-            g_game.setPVPMode(PVPWhiteHand)
+if g_game.getFeature(GamePVPMode) then
+    function selectPvp(pvp, ignoreUpdate)
+        local ui = getInventoryUi()
+        if pvp then
+            ui.pvp:setImageClip(
+                ui.pvp.imageClipCheckedX .. ' ' .. ui.pvp.imageClipCheckedY .. ' ' .. ui.pvp.imageClipWidth .. ' 20')
+            if not ignoreUpdate then
+                g_game.setPVPMode(PVPRedFist)
+            end
+        else
+            ui.pvp:setImageClip(ui.pvp.imageClipUncheckedX .. ' ' .. ui.pvp.imageClipUncheckedY .. ' ' ..
+                                    ui.pvp.imageClipWidth .. ' 20')
+            if not ignoreUpdate then
+                g_game.setPVPMode(PVPWhiteHand)
+            end
         end
     end
-end ]]
+end
 
 function changeInventorySize()
     inventoryShrink = not inventoryShrink
-
     g_settings.set('mainpanel_shrink_inventory', inventoryShrink)
     refreshInventorySizes()
     reloadMainPanelSizes()
