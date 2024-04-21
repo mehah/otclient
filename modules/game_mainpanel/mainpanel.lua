@@ -436,7 +436,11 @@ function onSetSafeFight(self, checked)
                                 ui.pvp.imageClipWidth .. ' 20')
 
     end
+
     g_game.setSafeFight(not checked)
+    if not checked then
+        g_game.cancelAttack()
+    end
 end
 
 inventoryController = Controller:new()
