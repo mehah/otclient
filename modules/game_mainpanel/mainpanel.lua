@@ -267,9 +267,7 @@ local function combatEvent()
         selectCombat('defense', true)
     end
    
-   if g_game.getFeature(GamePVPMode) then
-       selectPvp(g_game.getPVPMode() == PVPRedFist, true)
-    end
+    selectPvp(g_game.getPVPMode() == PVPRedFist, true)
 end
 
 local function inventoryEvent(player, slot, item, oldItem)
@@ -425,21 +423,6 @@ function onSetChaseMode(self, selectedChaseModeButton)
     g_game.setChaseMode(chaseMode)
 end
 
-function onSetSafeFight(self, checked)
-    local ui = getInventoryUi()
-    if ui.pvp:getImageClip().y == 100 then
-        ui.pvp:setImageClip(
-            ui.pvp.imageClipCheckedX .. ' ' .. ui.pvp.imageClipCheckedY .. ' ' .. ui.pvp.imageClipWidth .. ' 20')
-    else
-        ui.pvp:setImageClip(ui.pvp.imageClipUncheckedX .. ' ' .. ui.pvp.imageClipUncheckedY .. ' ' ..
-                                ui.pvp.imageClipWidth .. ' 20')
-    end
-    g_game.setSafeFight(not checked)
-    if not checked then
-        g_game.cancelAttack()
-    end
-end
-
 inventoryController = Controller:new()
 inventoryController:setUI('maininventorypanel', modules.game_interface.getMainRightPanel())
 
@@ -469,10 +452,6 @@ function inventoryController:onInit()
     connect(chaseModeRadioGroup, {
         onSelectionChange = onSetChaseMode
     })
-    connect(inventoryController.ui.onPanel.pvp, {
-        onCheckChange = onSetSafeFight
-    })
-
 end
 
 function inventoryController:onTerminate()
@@ -554,21 +533,19 @@ function selectCombat(combat, ignoreUpdate)
     end
 end
 
-if g_game.getFeature(GamePVPMode) then
-    function selectPvp(pvp, ignoreUpdate)
-        local ui = getInventoryUi()
-        if pvp then
-            ui.pvp:setImageClip(
-                ui.pvp.imageClipCheckedX .. ' ' .. ui.pvp.imageClipCheckedY .. ' ' .. ui.pvp.imageClipWidth .. ' 20')
-            if not ignoreUpdate then
-                g_game.setPVPMode(PVPRedFist)
-            end
-        else
-            ui.pvp:setImageClip(ui.pvp.imageClipUncheckedX .. ' ' .. ui.pvp.imageClipUncheckedY .. ' ' ..
-                                    ui.pvp.imageClipWidth .. ' 20')
-            if not ignoreUpdate then
-                g_game.setPVPMode(PVPWhiteHand)
-            end
+function selectPvp(pvp, ignoreUpdate)
+    local ui = getInventoryUi()
+    if pvp then
+        ui.pvp:setImageClip(
+            ui.pvp.imageClipCheckedX .. ' ' .. ui.pvp.imageClipCheckedY .. ' ' .. ui.pvp.imageClipWidth .. ' 20')
+        if not ignoreUpdate then
+            g_game.setPVPMode(PVPRedFist)
+        end
+    else
+        ui.pvp:setImageClip(ui.pvp.imageClipUncheckedX .. ' ' .. ui.pvp.imageClipUncheckedY .. ' ' ..
+                                ui.pvp.imageClipWidth .. ' 20')
+        if not ignoreUpdate then
+            g_game.setPVPMode(PVPWhiteHand)
         end
     end
 end
