@@ -167,16 +167,16 @@ function EnterGame.init()
     clientBox = enterGame:getChildById('clientComboBox')
 
     for _, proto in pairs(g_game.getSupportedClients()) do
-        local proto_str = tostring(proto)
-        if installedClients[proto_str] or amountInstalledClients == 0 then
-            installedClients[proto_str] = nil
+        local protoStr = tostring(proto)
+        if installedClients[protoStr] or amountInstalledClients == 0 then
+            installedClients[protoStr] = nil
             clientBox:addOption(proto)
         end
     end
 
-    for proto_str, status in pairs(installedClients) do
+    for protoStr, status in pairs(installedClients) do
         if status then
-            print(string.format('Warning: %s recognized as an installed client, but not supported.', proto_str))
+            print(string.format('Warning: %s recognized as an installed client, but not supported.', protoStr))
         end
     end
 
@@ -200,6 +200,7 @@ function EnterGame.init()
         EnterGame.toggleAuthenticatorToken(clientVersion, true)
         EnterGame.toggleStayLoggedBox(clientVersion, true)
     end
+
     updateLabelText()
 
     enterGame:hide()
