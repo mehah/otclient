@@ -4,7 +4,6 @@ EnterGame = {}
 local loadBox
 local enterGame
 local motdWindow
-
 local enterGameButton
 local clientBox
 local protocolLogin
@@ -30,7 +29,6 @@ end
 local function onMotd(protocol, motd)
     G.motdNumber = tonumber(motd:sub(0, motd:find('\n')))
     G.motdMessage = motd:sub(motd:find('\n') + 1, #motd)
-
 end
 
 local function onSessionKey(protocol, sessionKey)
@@ -97,8 +95,10 @@ local function onCharacterList(protocol, characters, account, otui)
 end
 
 local function onUpdateNeeded(protocol, signature)
-    loadBox:destroy()
-    loadBox = nil
+    if loadBox then
+        loadBox:destroy()
+        loadBox = nil
+    end
 
     if EnterGame.updateFunc then
         local continueFunc = EnterGame.show
@@ -112,7 +112,7 @@ local function onUpdateNeeded(protocol, signature)
     end
 end
 
-local function update_label_text()
+local function updateLabelText()
     if enterGame:getChildById('clientComboBox') and tonumber(enterGame:getChildById('clientComboBox'):getText()) > 1080 then
         enterGame:setText("Journey Onwards")
         enterGame:getChildById('emailLabel'):setText("Email:")
@@ -122,7 +122,6 @@ local function update_label_text()
         enterGame:getChildById('emailLabel'):setText("Acc Name:")
         enterGame:getChildById('rememberEmailBox'):setText("Remember password:")
     end
-
 end
 
 -- public functions
@@ -138,11 +137,12 @@ function EnterGame.init()
     local autologin = g_settings.getBoolean('autologin')
     local httpLogin = g_settings.getBoolean('httpLogin')
     local clientVersion = g_settings.getInteger('client-version')
-    if clientVersion == 0 then
+
+    if not clientVersion or clientVersion == 0 then
         clientVersion = 860
     end
 
-    if port == nil or port == 0 then
+    if not port or port == 0 then
         port = 7171
     end
 
@@ -156,55 +156,58 @@ function EnterGame.init()
     enterGame:getChildById('httpLoginBox'):setChecked(httpLogin)
 
     local installedClients = {}
-    local installed_qty = 0
+    local amountInstalledClients = 0
     for _, dirItem in ipairs(g_resources.listDirectoryFiles('/data/things/')) do
-        if tonumber(dirItem) ~= nil then
+        if tonumber(dirItem) then
             installedClients[dirItem] = true
-            installed_qty = installed_qty + 1
+            amountInstalledClients = amountInstalledClients + 1
         end
     end
+
     clientBox = enterGame:getChildById('clientComboBox')
+
     for _, proto in pairs(g_game.getSupportedClients()) do
         local proto_str = tostring(proto)
-        if installedClients[proto_str] or installed_qty == 0 then
+        if installedClients[proto_str] or amountInstalledClients == 0 then
             installedClients[proto_str] = nil
             clientBox:addOption(proto)
         end
     end
+
     for proto_str, status in pairs(installedClients) do
-        if status == true then
+        if status then
             print(string.format('Warning: %s recognized as an installed client, but not supported.', proto_str))
         end
     end
+
     clientBox:setCurrentOption(clientVersion)
+
     connect(clientBox, {
         onOptionChange = EnterGame.onClientVersionChange
     })
 
     if Servers_init then
-
         if table.size(Servers_init) == 1 then
-       
-            local host_init, values_init = next(Servers_init)
-            EnterGame.setUniqueServer(host_init, values_init.port, values_init.protocol)
-            EnterGame.setHttpLogin(values_init.httpLogin)
-        elseif (host == nil or host == "") then
-            local host_init, values_init = next(Servers_init)
-            EnterGame.setDefaultServer(host_init, values_init.port, values_init.protocol)
-            EnterGame.setHttpLogin(values_init.httpLogin)
-
+            local hostInit, valuesInit = next(Servers_init)
+            EnterGame.setUniqueServer(hostInit, valuesInit.port, valuesInit.protocol)
+            EnterGame.setHttpLogin(valuesInit.httpLogin)
+        elseif not host or host == "" then
+            local hostInit, valuesInit = next(Servers_init)
+            EnterGame.setDefaultServer(hostInit, valuesInit.port, valuesInit.protocol)
+            EnterGame.setHttpLogin(valuesInit.httpLogin)
         end
     else
         EnterGame.toggleAuthenticatorToken(clientVersion, true)
         EnterGame.toggleStayLoggedBox(clientVersion, true)
     end
-    update_label_text()
+    updateLabelText()
 
     enterGame:hide()
 
     connect(g_game, {
         onGameStart = EnterGame.hidePanels
     })
+
     connect(g_game, {
         onGameEnd = EnterGame.showPanels
     })
@@ -245,9 +248,7 @@ function EnterGame.firstShow()
         EnterGame.postEventScheduler()
         EnterGame.postShowOff()
         EnterGame.postShowCreatureBoost()
-
     end
-
 end
 
 function EnterGame.terminate()
@@ -263,9 +264,15 @@ function EnterGame.terminate()
         onGameEnd = EnterGame.showPanels
     })
 
-    enterGame:destroy()
-    enterGame = nil
-    clientBox = nil
+    if enterGame then
+        enterGame:destroy()
+        enterGame = nil
+    end
+
+    if clientBox then
+	    clientBox = nil
+    end
+
     if motdWindow then
         motdWindow:destroy()
         motdWindow = nil
@@ -275,10 +282,12 @@ function EnterGame.terminate()
         loadBox:destroy()
         loadBox = nil
     end
+
     if protocolLogin then
         protocolLogin:cancelLogin()
         protocolLogin = nil
     end
+
     EnterGame = nil
 end
 
@@ -418,9 +427,11 @@ function EnterGame.show()
     if g_game.isOnline() or CharacterList.isVisible() then -- fix login quickly error (http post)
         return
     end
+
     if loadBox then
         return
     end
+
     enterGame:show()
     enterGame:raise()
     enterGame:focus()
@@ -471,6 +482,7 @@ function EnterGame.toggleAuthenticatorToken(clientVersion, init)
     if not enterGame.disableToken then
         return
     end
+
     local enabled = (clientVersion >= 1072)
     if enabled == enterGame.authenticatorEnabled then
         return
@@ -494,15 +506,15 @@ function EnterGame.toggleAuthenticatorToken(clientVersion, init)
         enterGame:setY(newY)
         enterGame:bindRectToParent()
     end
-    enterGame:setHeight(newHeight)
 
+    enterGame:setHeight(newHeight)
     enterGame.authenticatorEnabled = enabled
 end
 
 function EnterGame.toggleStayLoggedBox(clientVersion, init)
-if not enterGame.disableToken then
-    return
-end
+    if not enterGame.disableToken then
+        return
+    end
     local enabled = (clientVersion >= 1074)
     if enabled == enterGame.stayLoggedBoxEnabled then
         return
@@ -525,8 +537,8 @@ end
         enterGame:setY(newY)
         enterGame:bindRectToParent()
     end
-    enterGame:setHeight(newHeight)
 
+    enterGame:setHeight(newHeight)
     enterGame.stayLoggedBoxEnabled = enabled
 end
 
@@ -534,37 +546,40 @@ function EnterGame.onClientVersionChange(comboBox, text, data)
     local clientVersion = tonumber(text)
     EnterGame.toggleAuthenticatorToken(clientVersion)
     EnterGame.toggleStayLoggedBox(clientVersion)
-    update_label_text()
+    updateLabelText()
 end
 
 function EnterGame.tryHttpLogin(clientVersion, httpLogin)
     g_game.setClientVersion(clientVersion)
     g_game.setProtocolVersion(g_game.getClientProtocolVersion(clientVersion))
     g_game.chooseRsa(G.host)
-    if modules.game_things.isLoaded() then
-    else
-        loadBox:destroy()
-        loadBox = nil
-        EnterGame.show()
+
+    if not modules.game_things.isLoaded() then
+        if loadBox then
+            loadBox:destroy()
+            loadBox = nil
+        end
+        return EnterGame.show()
     end
 
     local host, path = G.host:match("([^/]+)/([^/].*)")
     local url = G.host
 
-    if G.port == nil then
-        isHttps, _ = string.find(host, "https")
-        if isHttps ~= nil then
+    if not G.port then
+        local isHttps, _ = string.find(host, "https")
+        if not isHttps then
             G.port = 443
         else -- http
             G.port = 80
         end
     end
 
-    if path == nil then
+    if not path then
         path = ""
     else
         path = '/' .. path
     end
+
     if not host then
         loadBox = displayCancelBox(tr('Please wait'), tr('ERROR , try adding \n- ip/login.php \n- Enable HTTP login'))
     else
@@ -600,7 +615,7 @@ function printTable(t)
 end
 
 function EnterGame.loginSuccess(requestId, jsonSession, jsonWorlds, jsonCharacters)
-    if (G.requestId ~= requestId) then
+    if G.requestId ~= requestId then
         return
     end
 
@@ -654,7 +669,7 @@ function EnterGame.loginSuccess(requestId, jsonSession, jsonWorlds, jsonCharacte
 end
 
 function EnterGame.loginFailed(requestId, msg, result)
-    if (G.requestId ~= requestId) then
+    if G.requestId ~= requestId then
         return
     end
     onError(nil, msg, result)
@@ -709,9 +724,11 @@ function EnterGame.doLogin()
         if modules.game_things.isLoaded() then
             protocolLogin:login(G.host, G.port, G.account, G.password, G.authenticatorToken, G.stayLogged)
         else
-            loadBox:destroy()
-            loadBox = nil
-            EnterGame.show()
+            if loadBox then
+                loadBox:destroy()
+                loadBox = nil
+            end
+            return EnterGame.show()
         end
     end
 end
@@ -748,6 +765,7 @@ function EnterGame.setUniqueServer(host, port, protocol, windowWidth, windowHeig
     hostTextEdit:setText(host)
     hostTextEdit:setVisible(false)
     hostTextEdit:setHeight(0)
+
     local portTextEdit = enterGame:getChildById('serverPortTextEdit')
     portTextEdit:setText(port)
     portTextEdit:setVisible(false)
@@ -770,12 +788,15 @@ function EnterGame.setUniqueServer(host, port, protocol, windowWidth, windowHeig
     local serverLabel = enterGame:getChildById('serverLabel')
     serverLabel:setVisible(false)
     serverLabel:setHeight(0)
+
     local portLabel = enterGame:getChildById('portLabel')
     portLabel:setVisible(false)
     portLabel:setHeight(0)
+
     local clientLabel = enterGame:getChildById('clientLabel')
     clientLabel:setVisible(false)
     clientLabel:setHeight(0)
+
     local httpLoginBox = enterGame:getChildById('httpLoginBox')
     httpLoginBox:setVisible(false)
     httpLoginBox:setHeight(0)
@@ -807,5 +828,4 @@ end
 
 function EnterGame.disableMotd()
     motdEnabled = false
-
 end
