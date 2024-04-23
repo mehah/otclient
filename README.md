@@ -1,178 +1,292 @@
-# OTCLient - Redemption
-[![Discord Shield](https://discordapp.com/api/guilds/888062548082061433/widget.png?style=shield)](https://discord.gg/HZN8yJJSyC)
-[![Build - Ubuntu](https://github.com/mehah/otclient/actions/workflows/build-ubuntu.yml/badge.svg)](https://github.com/mehah/otclient/actions/workflows/build-ubuntu.yml)
-[![Build - Windows](https://github.com/mehah/otclient/actions/workflows/build-windows.yml/badge.svg)](https://github.com/mehah/otclient/actions/workflows/build-windows.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+# New Layout OTC Client
 
-#### :heart:  If you are interested in supporting the project, go to this [link](https://www.paypal.com/donate/?business=CV9D5JF8E46LY&no_recurring=0&item_name=Thank+you+very+much+for+your+donation.&currency_code=BRL), any value is great help, thank you.
+New layout based on tibia 13
 
-### Based on [edubart/otclient](https://github.com/edubart/otclient) Rev: [2.760](https://github.com/edubart/otclient/commit/fc39ee4adba8e780a2820bfda66fc942d74cedf4)
+## Demo
 
-#### [Note: for those who are with the walking system stuttering...](https://github.com/mehah/otclient/blob/main/data/setup.otml#L18)
+https://github.com/Nottinghster/otclient/releases/tag/3.X.NewLayout
 
-### Features
+## Screenshots
 
-- C++20
-- Refactored/Optimized Rendering System
-- Auto Reload Module ([init.lua](https://github.com/mehah/otclient/blob/main/init.lua#L90))
-- Attached Effects System (to create aura, wings...) (code sample: [effects.lua](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/effects.lua), [outfit_618.lua](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/configs/outfit_618.lua), [code test](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/attachedeffects.lua#L1))
-- Idle Animation Support
-- Highlight Mouse Target (press shift to select any object)
-- Crosshair
-- Floor Shadowing
-- Floor View Mode (Normal, Fade, Locked, Always, Always with transparency)
-- Anti-Aliasing Mode Options (Note: Smooth Retro will consume a little more GPU)
-- Floating Effects Option
-- Optimized Terminal
-- Refactored Walk System
-- Support for more mouse buttons, for example 4 and 5
-- Module Controller System ([Code example](https://github.com/mehah/otclient/blob/cache-for-all/modules/game_minimap/minimap.lua))
-- Some bugs fixed contained in [edubart/otclient](https://github.com/edubart/otclient)
-- Client 12.85 ~ 12.92, 13.00 ~ 13.21 support (protobuf)
-- Market has been rewritten to work only [Canary](https://github.com/opentibiabr/canary)
-- Async Texture Loading
-- Tile Widget
-- Creature Information By UIWidget
-  - to enable: [setup.otml](https://github.com/mehah/otclient/blob/e2c5199e52bd86f573c9bb582d7548cfe7a8b026/data/setup.otml#L20)
-  - To style: [modules/game_creatureinformation](https://github.com/mehah/otclient/tree/main/modules/game_creatureinformation)
-  - Note: There is a performance degradation compared to direct programming with Draw Pool, by about ~20%, testing was performed with 60 monsters attacking each other.
+![image](https://github.com/Nottinghster/otclient/assets/114332266/e15b7533-4a85-44f9-b9f9-9c0430411332)
+![1](https://github.com/Nottinghster/otclient/assets/7372287/2b722f7e-b2b6-44f8-9893-9c6a1a77ee69)
+![GIF 29-03-2024 11-16-44](https://github.com/Nottinghster/otclient/assets/7372287/b7160f27-57c8-428f-a06e-d9e0610699af)
 
-##### Community (Features)
-- Mobile Support [@tuliomagalhaes](https://github.com/tuliomagalhaes) & [@BenDol](https://github.com/BenDol)
-- Support Tibia 12.85/protobuf by [@Nekiro](https://github.com/nekiro)
-- Support Discord RPC by [@SkullzOTS](https://github.com/SkullzOTS) (Doesn't work with CMAKE)
-- Action Bar by [@DipSet](https://github.com/Dip-Set1)
-- Access to widget children via widget.childId by [@Hugo0x1337](https://github.com/Hugo0x1337)
-- Shader System Fix (CTRL + Y) by [@FreshyPeshy](https://github.com/FreshyPeshy)
-- Refactored Battle Module by [@andersonfaaria](https://github.com/andersonfaaria)
-- Health&Mana Circle by [@EgzoT](https://github.com/EgzoT), [@GustavoBlaze](https://github.com/GustavoBlaze), [@Tekadon58](https://github.com/Tekadon58) ([GITHUB Project](https://github.com/EgzoT/-OTClient-Mod-health_and_mana_circle))
-- Tibia Theme 1.2 by Zews ([Forum Thread](https://otland.net/threads/otc-tibia-theme-v1-2.230988/))
-- Add option ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE in [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h) by [@SkullzOTS](https://github.com/SkullzOTS)
-- Encryption System by [@Mrpox](https://github.com/Mrpox) (Note: This implementation is unsafe)
-  - To enable just go to [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h), set 1 in ENABLE_ENCRYPTION and change password on ENCRYPTION_PASSWORD
-  - To enable Encrypting by "--encrypt" change ENABLE_ENCRYPTION_BUILDER to 1 (by [@TheMaoci](https://github.com/TheMaoci)). This allows to remove code of creating encrypted files off the production build
-  - To generate an encryption, just run the client with flag "--encrypt SET_YOUR_PASSWORD_HERE" and don't forget to change the password.
-  - you can also skip adding password to --encrypt command it automatically will be taken from [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h) file (by [@TheMaoci](https://github.com/TheMaoci))
-- Support HTTP/HTTPS/WS/WSS. by [@alfuveam](https://github.com/alfuveam)
-- Discord RPC by [@SkullzOTS](https://github.com/SkullzOTS)
-  - To enable just go to [config.h](https://github.com/mehah/otclient/blob/main/src/client/config.h), set 1 in ENABLE_DISCORD_RPC and configure the others definitions
-  - You can see the step by step in [YouTube](https://www.youtube.com/watch?v=zCHYtRlD58g)
-- Client Updater by [@conde2](https://github.com/conde2)
-  - Paste the API folder in your www folder (https://github.com/mehah/otclient/tree/main/tools/api)
-  - Create a folder called "files" in your www folder and paste init.lua, modules, data, and exe files
-  - Uncomment and change this line (https://github.com/mehah/otclient/blob/main/init.lua#L6)
-- Colored text [@conde2](https://github.com/conde2)
-  - widget:setColoredText("{Colored text, #ff00ff} normal text")
-- QR Code support, with auto generate it from string  [@conde2]
-  - UIQrCode: 
-    - code-border: 2
-    - code: Hail OTClient Redemption - Conde2 Dev
-- Typing Icon by [@SkullzOTS](https://github.com/SkullzOTS)
-  - To enable just go to [setup.otml](https://github.com/mehah/otclient/blob/main/data/setup.otml) and set draw-typing: true
-- Smooth Walk Elevation Feature by [@SkullzOTS](https://github.com/SkullzOTS)
-  - View Feature: [Gyazo](https://i.gyazo.com/af0ed0f15a9e4d67bd4d0b2847bd6be7.gif)
-  - To enable just go to [modules/game_features/features.lua](https://github.com/mehah/otclient/blob/main/modules/game_features/features.lua#L5), and uncomment line 5 (g_game.enableFeature(GameSmoothWalkElevation)).
-- Lua Debugger for VSCode [see wiki](https://github.com/mehah/otclient/wiki/Lua-Debugging-(VSCode)) [@BenDol](https://github.com/BenDol)
-  
-##### Sponsored  (Features)
-- Shader with Framebuffer | ([@SkullzOTS](https://github.com/SkullzOTS), [@Mryukiimaru](https://github.com/Mryukiimaru), [@JeanTheOne](https://github.com/JeanTheOne), [@KizaruHere](https://github.com/KizaruHere))
-- Bot V8 | ([@luanluciano93](https://github.com/luanluciano93), [@SkullzOTS](https://github.com/SkullzOTS), [@kokekanon](https://github.com/kokekanon), [@FranciskoKing](https://github.com/FranciskoKing), [@Kizuno18](https://github.com/Kizuno18))
-  - Is adapted in 85%
-  - To enable it, it is necessary to remove/off the BOT_PROTECTION flag.
-  - [VS Solution](https://github.com/mehah/otclient/blob/68e4e1b94c2041bd235441244156e6477058250c/vc17/settings.props#L9) / [CMAKE](https://github.com/mehah/otclient/blob/68e4e1b94c2041bd235441244156e6477058250c/src/CMakeLists.txt#L13)
+## Features
+
+- Layout tibia 13
+- Calendar
+- Cooldown spell on top of the game_console like tibia 13
+- game_shop of v8 compatible with attachEffect and shader
+- Outfit windows v8 is the most similar to tibia 13 compatible with attachEffect , shader 
+
+## Current bugs
+**solved**
+- [x] **Game_entergame** MOTD old protocol
+- [x] **Game_topmenu.** fix: Fps and ping https://github.com/Nottinghster/otclient/pull/8
+- [x] **Game_Console** fix: preventing the text cursor from appearing when starting to write.  [87becf4](https://github.com/Nottinghster/otclient/commit/87becf4e2fcc7f7c494f87fae4f0d4b426f68749)
+- [x] **Corelib/ui/uiminiwindows** "droppedWidget" nil L224 https://github.com/Nottinghster/otclient/issues/10
+- [x] **Game_containers** Panel nil L161 https://github.com/Nottinghster/otclient/issues/9
+- [x] **Game_bot** Fix width mini windows bot [ad52ef0](https://github.com/Nottinghster/otclient/commit/ad52ef06dad02afc8276e3508fbe864dfb0cc38b)
+- [x] **Game_mainpanel** fix: combat control  chase. [#12](https://github.com/Nottinghster/otclient/pull/12)
+- [x] **Game_topMenu** (onStatesChange) icons state [a350e7c](https://github.com/Nottinghster/otclient/commit/a350e7cc36dbf907675d57f2037ef86810482a62)
+- [x] **Game_topmenu** missing Boton "manager account", "manager clients" [919444b](https://github.com/Nottinghster/otclient/commit/919444b6cecadbbad2d48a54a445079d17e83561)
+- [x] **Game_mainpanel** Inventario fix ico state [ed9af33](https://github.com/Nottinghster/otclient/commit/ed9af33a6ed41f10e698d7017939e21bc5eedda6)
+- [x] **Game_mainpanel** Hide icon "expert pvp modes" in minize panel for old protocole [2e6b171](https://github.com/Nottinghster/otclient/commit/2e6b17196a6112202ce0969aea0f8697f8f4db8e)
+- [x] **Data\images** Missing UI of tibia 13 ( close , minimize , scroll) [a94aebc](https://github.com/Nottinghster/otclient/commit/a94aebc730c36a34f44261918512596d337aa8d5)
+- [x] **Game_skills** Fix Ico location like clipsof [2ab0361](https://github.com/Nottinghster/otclient/commit/2ab03612d15a9ca4cc1f1db146e395d6d835d2e2) - [4611fe2](https://github.com/Nottinghster/otclient/commit/4611fe28bb0ecaa7b3d0cb5a4c9576e2d91a6223) - [51f99e8](https://github.com/Nottinghster/otclient/commit/51f99e8fec86b9026a1071d58b4197650b5783c5)
+- [x] **Game_entergame** problems with token label when no cache, (first open client) [3da57e3](https://github.com/Nottinghster/otclient/commit/3da57e364b10a89339decb2f20c6556e33db919a)
+- [x] **Client_bottom** default information if array services is not enabled [25d0e45](https://github.com/Nottinghster/otclient/commit/25d0e4526a41228e3391d9a7706c18b645b3219c)
+- [x] **Game_mainpanel**  To make use of the store button. (button below the inventory) [b52f153](https://github.com/Nottinghster/otclient/commit/b52f15386c3a1fbca2b5760ae6aae0bcef0e5a47) - [ae44616](https://github.com/Nottinghster/otclient/commit/ae44616702a181e89dad9e04ca61b627d6d1ad46) - [0b38a12](https://github.com/Nottinghster/otclient/commit/0b38a12438d5d2cebb6529d4de023c049d29f247)
+- [x] **Game_shader** offset panel combobox of shader because collides with the ping []()
+- [x] **Game_container** container like tibia 13. [71ee1a8](https://github.com/Nottinghster/otclient/commit/71ee1a8bdf25ab713656fd3ad28673d094f22a0c)
+- [x] **Statsbar//Game_mainpanel** Bug states onStatesChange bug [f82f2f0](https://github.com/Nottinghster/otclient/commit/f82f2f0df58c6944714a3670429e1d99ee1fc1b2)
+- [x] **Game_mainPanel//minimap** Create a function in C++ of **g_game onChangeWorldTime** for minimap. [a8b55ea](https://github.com/Nottinghster/otclient/commit/a8b55ea748c9be7abadb5936b36399d7961598eb)
+- [x] **Game_interface//statsbar** if you set to "hide" , close and open the client. the "compact" statsbar is displayed.( "hide" style bar is not saved) [83cde71](https://github.com/Nottinghster/otclient/commit/83cde710bd4ab34792569f528fe1609489563a79)
+- [x] **Game_bot** get the slot5 requested by quiver_label and quiver_manager
+- [x] **Game_mainpanel//game_interface** incorrect g_game.getClientVersion() .lua .otui [#13](https://github.com/Nottinghster/otclient/issues/13) - [170a089](https://github.com/Nottinghster/otclient/commit/170a089e3aa1ee806ef1299c4b10ab3508a8c9a9)
+- [x] **Game_mainpanel//inventary** fix function inventoryController:onTerminate() - [53fcbb4](https://github.com/Nottinghster/otclient/commit/53fcbb4c065df0b2c0a16c47bf79e99e86b0493d#diff-9c2eaf0f9aece4afc40f30e75559dc5113cb3ddc75ecf66ddd5ce7d17a0935d5)
+- [x] **Game_outfit** v8 is the most similar to tibia 13 compatible with attachEffect , shader (no test yet title and health bars) [#25](https://github.com/Nottinghster/otclient/pull/25)
+- [x] **Game_mainpanel//minimap** bug: minimap .white cross out of bounds [#15](https://github.com/Nottinghster/otclient/issues/15) - [6644075](https://github.com/Nottinghster/otclient/commit/6644075a65913e2abed981b4dd1c376178ffa74a)
+- [x] **Sources//game_outfit** outfit not centralized in outfit window (crops)  [#35](https://github.com/Nottinghster/otclient/issues/35) - [307fe15](https://github.com/Nottinghster/otclient/commit/307fe1575fed2e768a388faf7df6aa50e1254fb5)
+------------
+**in process**
+- [ ] **Game_mainpanel//game_interface** mode(2) Fix extended view [#7](https://github.com/Nottinghster/otclient/issues/7)
+- [ ] **data/styles/** Using a unique font similar to Tibia 13 (i think is Verdana10px bold ? )
+- [ ] **data/styles/** Using the vertical and horizontal scrollbars of Tibia 13. ![image](https://github.com/Nottinghster/otclient/assets/114332266/623f01c9-41cf-4763-88e5-449cf7127f5e)
+- [ ] **game_actionbar** Adapt the v8 game_actionbar with vertical and horizontal panels. (closer to Tibia 13), with options in client_options.
+- [ ] **github** revert all commits of "feat: compatibility with 13.32"
+- [ ] **.otui** Some of the windows are not draggable (client_options)
+- [ ] check if there are duplicated functions, or even clean some codes
+     - data/styles/ .otui (unused UI)
+     - game_outfit rename functions, use local functions to obtain a widget
+     - topmenu/Mainpanel incorrectly named functions and some of them repeated
+
+## FAQ
+
+### **1.- what is game_mainpanel ?**
+
+![Screenshot_49](https://github.com/Nottinghster/otclient/assets/114332266/07fcc104-7c8b-44a5-958c-d10d0c2a9e29)
 
 
-##### [OTClient V8](https://github.com/OTCv8) (Features)
-- Lighting System
-- Floor Fading
-- Path Finding
-<h2>
+union inventory , minimap, combat control
 
-```diff
-- Want to help? Just open a PR.
+### **2.- where is minimap ?**
+
+game_mainpanel LXX
+
+### **3.-where is inventary ?**
+
+game_mainpanel LXX
+
+### **4.- what is client_bottommenu ?**
+
+![image](https://github.com/Nottinghster/otclient/assets/114332266/19928bf5-76d5-4cfd-a43a-8514a024daf6)
+
+> note test in : uniServer Z php version 82
+
+### **5.- I have problems with bottons of my custom modules**
+
+old function
+
+    modules.client_topmenu.addRightGameToggleButton
+
+new function
+
+    modules.game_mainpanel.addToggleButton
+
+![image](https://github.com/Nottinghster/otclient/assets/114332266/2891f3fe-524d-4cae-8bd3-272e1607b1d6)
+
+### **6.- why is this not displayed ?**
+
+![image](https://github.com/Nottinghster/otclient/assets/114332266/d1104f03-1726-4c25-9698-84c465369514)
+![image](https://github.com/Nottinghster/otclient/assets/114332266/3fdad239-963c-4464-a811-3cfde41b8938)
+![image](https://github.com/Nottinghster/otclient/assets/114332266/532cd93e-f589-4f3e-ac58-94d45c4fcd58)
+
+activate the array "Services.status" in init.lua
+
+and put this
+
+`./otclient/tools/api/status.php`
+
+in your
+
+`C:/UniServerZ/www/api/`
+
+
+if not work try ,active **curl**:
+
+![image](https://github.com/Nottinghster/otclient/assets/114332266/99ad2ce7-d70f-47f4-aa19-083140fb5814)
+
+![image](https://github.com/Nottinghster/otclient/assets/114332266/84349388-a458-4eb5-b1d6-cce5693cfd5a)
+
+### **7.- where do I edit this?**
+![image](https://github.com/Nottinghster/otclient/assets/114332266/346fb845-7441-45c2-ac49-f11b2bf8535a)
+
+.\otclient\data\styles\30-statsbar.otui
+
+.\otclient\modules\game_interface\widgets\statsbar.lua
+
+### **7.5.-How do I hide top menu?**
+![image](https://github.com/Nottinghster/otclient/assets/114332266/ceca0186-f65b-448b-ab72-ab4cef368f46)
+
+### **8.- Where is the array Icons?**
+
+
+```
+Icons[PlayerStates.Poison] = {
+    tooltip = tr('You are poisoned'),
+    path = '/images/game/states/poisoned',
+    id = 'condition_poisoned'
+}
 ```
 
-   </h2>
+.\otclient\modules\gamelib\player.lua
 
-### What is otclient?
 
-Otclient is an alternative Tibia client for usage with otserv. It aims to be complete and flexible,
-for that it uses LUA scripting for all game interface functionality and configurations files with a syntax
-similar to CSS for the client interface design. Otclient works with a modular system, this means
-that each functionality is a separated module, giving the possibility to users modify and customize
-anything easily. Users can also create new mods and extend game interface for their own purposes.
-Otclient is written in C++20 and heavily scripted in lua.
+# 9 .- why does the time not work on the mini map?
 
-For a server to connect to, you can build your own with the [forgottenserver](https://github.com/otland/forgottenserver)
-or [canary](https://github.com/opentibiabr/canary).
+![image](https://github.com/Nottinghster/otclient/assets/114332266/dd15198b-28ea-433e-841e-5a917f766e09) ![image](https://github.com/Nottinghster/otclient/assets/114332266/3f5e1b3b-130d-436a-8072-6d989a001e4f)
 
-## The Mobile Project
-This is a fork of edubart's otclient. The objective of this fork it's to develop a runnable otclient on mobiles devices.
+check these functions on your server
 
-Tasks that need to do:
-- [X] Compile on Android devices
-- [ ] Compile on Apple devices
-- [ ] Adapt the UI reusing the existing lua code
+old tfs: void ProtocolGame::sendWorldTime()
 
-Current compiling tutorials:
-* [Compiling for Android](https://github.com/mehah/otclient/wiki/Compiling-on-Android)
+new tfs : function Player.sendWorldTime(self, time)
 
-### Where do I download?
+Canary: void ProtocolGame::sendTibiaTime(int32_t time)
 
-Compiled for Windows can be found here (but can be outdated):
 
-- [Windows Builds](https://github.com/mehah/otclient/releases)
+## info
+I know there are errors in naming regarding the location, but it's RETROCOMPATIBILITY, and it's also beta.
+There are some duplicates and others that need to have their names changed.
+| Function | Image |
+|-----------|-----------|
+| addLeftButton    | ![image](https://github.com/Nottinghster/otclient/assets/114332266/117ed15b-6d40-4e17-911b-f54129c1bc93)   |
+| addLeftToggleButton  (icon)  | ![image](https://github.com/Nottinghster/otclient/assets/114332266/606f5ec0-409d-4dfa-bb38-e57e6b4b0fd8)   |
+| addRightButton  **  | ![image](https://github.com/Nottinghster/otclient/assets/114332266/92161803-e743-4b4a-898d-8cffc74d2f5d)  |
+| addRightToggleButton(icon)  **  |![image](https://github.com/Nottinghster/otclient/assets/114332266/228089b8-f0c2-49fa-8398-42e82492b612)  |
+| addTopRightRegularButton **   | ![image](https://github.com/Nottinghster/otclient/assets/114332266/50103b0f-819e-4eda-8efe-34caa29fec98)  |
+| addTopRightToggleButton (icons)**  | ![image](https://github.com/Nottinghster/otclient/assets/114332266/37e7f3a8-3486-40ef-bbb0-f6b71ccd8e57)  |
+| addLeftGameButton  ***  | ![image](https://github.com/Nottinghster/otclient/assets/114332266/eb6666c8-2597-448f-915c-0190db706bbc)   |
+| addLeftGameToggleButton  ***  |![image](https://github.com/Nottinghster/otclient/assets/114332266/a8eb6714-cf9c-4d76-81a4-ed9547402d08)  |
+| addRightGameButton  ***  | ![image](https://github.com/Nottinghster/otclient/assets/114332266/c7bab85c-86f2-4ead-b23f-b141723729ba)  |
+| addRightGameToggleButton ***  | ![image](https://github.com/Nottinghster/otclient/assets/114332266/af39b255-7afb-4142-8ed5-c143ac6f6237)  |
+| addStoreButton | ![image](https://github.com/Nottinghster/otclient/assets/114332266/e597d6a6-740e-470b-801c-edf3ebce2168)  |
 
-**NOTE:** You will need to download spr/dat files on your own and place them in `data/things/VERSION/` (i.e: `data/things/1098/Tibia.spr`)
+**is intended to eliminate 2
+*** for backward compatibility, it is retained
 
-### Features
 
-Beyond of it's flexibility with scripts, otclient comes with tons of other features that make possible
-the creation of new client side stuff in otserv that was not possible before. These include,
-sound system, graphics effects with shaders, modules/addons system, animated textures,
-styleable user interface, transparency, multi language, in game lua terminal, an OpenGL 2.0 ES engine that make possible
-to port to mobile platforms. Otclient is also flexible enough to
-create tibia tools like map editors just using scripts, because it wasn't designed to be just a
-client, instead otclient was designed to be a combination of a framework and tibia APIs.
+## Author
 
-### Compiling
+- @ marcosvf132
 
-[If you are interested in compiling this project, just go to the wiki.](https://github.com/mehah/otclient/wiki)
+## Contributing
 
-### Build and run with Docker
+We need people to test in versions higher than 8.6  and another who is skilled with PHP 
 
-To build the image:
+![429529469_10161745299305712_3655895523259386066_n](https://github.com/Nottinghster/otclient/assets/114332266/8ad690f2-b10c-49c5-93a2-7fe89b944101)
 
-```sh
-docker build -t mehah/otclient .
-```
+### Example Feature
 
-To run the built image:
-
-```sh
-# Disable access control for the X server.
-xhost +
-
-# Run the container image with the required bindings to the host devices and volumes.
-docker run -it --rm \
-  --env DISPLAY \
-  --volume /tmp/.X11-unix:/tmp/.X11-unix \
-  --device /dev/dri \
-  --device /dev/snd mehah/otclient /bin/bash
-
-# Enable access control for the X server.
-xhost -
-```
-
-### Need help?
-
-Try to ask questions in [discord](https://discord.gg/HZN8yJJSyC)
-
-### Bugs
-
-Have found a bug? Please create an issue in our [bug tracker](https://github.com/mehah/otclient/issues)
-
-### License
-
-Otclient is made available under the MIT License, thus this means that you are free
-to do whatever you want, commercial, non-commercial, closed or open.
+<table style="border-collapse: collapse; width: 100%;" border="1">
+  <tbody>
+    <tr>
+      <td style="width: 50%; ">
+        <strong><center> Feature</center></strong>
+      </td>
+      <td style="width: 50%;"><center><strong> Gif</strong></center></td>
+    </tr>
+    <tr>
+      <td style="width: 50%;">
+        <pre><code class="lua"><p><strong>Attach Effect</strong></p>
+local player = g_game.getLocalPlayer()
+player:attachEffect(
+  g_attachedEffects.getById(2)
+  )
+</code></pre>
+      </td>
+      <td style="width: 50%;"><img style="max-width: 100%; height: auto;" src="https://github.com/Nottinghster/otclient/assets/114332266/782e0fcf-b1cf-451e-b102-d7e7943bd50b" /></td>
+    </tr>
+    <tr>
+      <td style="width: 50%;">
+        <strong><p>QR</p></strong>
+        <pre><code class="lua">UIWidget
+  size: 200 200
+  anchors.centerIn: parent
+  qr-code: mehah
+  qr-code-border: 2
+</code></pre>
+      </td>
+      <td style="width: 50%;"><img style="max-width: 100%; height: auto;" src="https://github.com/Nottinghster/otclient/assets/114332266/a9ea3ce9-2a02-4b39-9b5f-7308db16e710" /></td>
+    </tr>
+    <tr>
+      <td style="width: 50%;">
+        <p>Reload module</p>
+        <pre><code class="lua">g_modules.enableAutoReload()
+</code></pre>
+      </td>
+      <td style="width: 50%;"><video src="https://github.com/Nottinghster/otclient/assets/114332266/bdd01687-1671-4150-8354-10a9c340c480" width="640" height="360" controls></video></td>
+    </tr>
+    <tr>
+      <td style="width: 50%;">
+        <strong><p>Shaders</p></strong>
+item :
+        <pre><code class="lua">local item = ItemWidget:getItem()
+item:setShader("Outfit - Outline")
+</code></pre>
+Player :
+  <pre><code class="lua">local player= g_game.getLocalPlayer()
+player:setShader("Outfit - Outline")
+</code></pre>
+Map :
+<pre><code class="lua">local map = modules.game_interface.getMapPanel()
+map:setShader('Map - Party')
+</code></pre>
+      </td>
+      <td style="width: 50%;"><img style="max-width: 100%; height: auto;" src="https://github.com/Nottinghster/otclient/assets/114332266/021119e2-d6e7-41e1-8a83-d07efcce452b" /></br>
+      <img style="max-width: 100%; height: auto;" src="https://github.com/kokekanon/otclient.readme/assets/114332266/e1f2e593-d87d-4ec3-9e72-7e478a3acdba" /></td>
+    </tr>
+    <tr>
+      <td style="width: 50%;">
+       <strong> <p>Discord RPC</p></strong>
+        <pre><code>- To enable just go to
+  set 1 in ENABLE_DISCORD_RPC 
+  and configure the others definitions
+</code></pre>
+      </td>
+      <td style="width: 50%;"><img style="max-width: 100%; height: auto;" src="https://github.com/Nottinghster/otclient/assets/114332266/cd93e5e6-4e2a-4dd2-b66b-6e28408363d6" /></td>
+    </tr>
+    <tr>
+      <td style="width: 50%;">
+       <strong> <p>Typing Icon</strong></p>
+        <pre><code>
+To enable just go to setup.otml 
+and set draw-typing: true
+</code></pre>
+      </td>
+      <td style="width: 50%;"><img style="max-width: 100%; height: auto;" src="https://github.com/Nottinghster/otclient/assets/114332266/3e7c00bb-94ea-458f-9b07-43b622c8253c" /></td>
+    </tr>
+    <tr>
+      <td style="width: 50%;">
+       <strong> <p>Colored text</p></strong>
+        <pre><code class="lua">
+widget:setColoredText("
+{" .. variable .. ", #C6122E} / 
+{Colored text, #ff00ff} normal text")
+</code></pre>
+      </td>
+      <td style="width: 50%;"><img style="max-width: 100%; height: auto;" src="https://github.com/Nottinghster/otclient/assets/114332266/9ea52de2-c193-4951-9454-ddc58685c65c" /></td>
+    </tr>
+    <tr>
+      <td style="width: 50%;">
+        <p><strong>Smooth Walk Elevation</strong></p>
+        Enable on <p><a href="https://github.com/mehah/otclient/blob/main/modules/game_features/features.lua#L5">game_features</a></p>
+        <pre><code class="lua">
+g_game.enableFeature(GameSmoothWalkElevation)</td>
+</code></pre>
+      <td style="width: 50%;"><img style="max-width: 100%; height: auto;" src="https://github.com/Nottinghster/otclient/assets/114332266/208bd4e4-3a76-4e2f-960e-7761d0fb7aed" /></td>
+    </tr>
+  </tbody>
+</table>

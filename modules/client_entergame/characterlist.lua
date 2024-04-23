@@ -468,3 +468,26 @@ function CharacterList.cancelWait()
     CharacterList.destroyLoadBox()
     CharacterList.showAgain()
 end
+
+function CharacterList.updateCharactersAppearances(showOutfits)
+    if showOutfitsCheckbox and showOutfits ~= showOutfitsCheckbox:isChecked() then
+        showOutfitsCheckbox:setChecked(showOutfits)
+    end
+
+    if not(characterList) or #(characterList:getChildren()) == 0 then
+        return
+    end
+
+    for _, widget in ipairs(characterList:getChildren()) do
+        if not widget.characterInfo then
+            break
+        end
+
+        if not(widget.creature) or not(widget.creatureBorder) then
+            widget.creature = widget:recursiveGetChildById('creature')
+            widget.creatureBorder = widget.creature:getParent()
+        end
+
+        CharacterList.updateCharactersAppearance(widget, widget.characterInfo, showOutfits)
+    end
+end

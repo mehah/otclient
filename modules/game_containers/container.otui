@@ -60,8 +60,9 @@ ContainerWindow < MiniWindow
       anchors.right: parent.right
 
   MiniWindowContents
-    padding-right: 0
+    padding-left: 5
     layout:
       type: grid
       cell-size: 34 34
+      cell-spacing: 3
       flow: true

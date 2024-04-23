@@ -692,8 +692,12 @@ void ProtocolGame::parseResourceBalance(const InputMessagePtr& msg) const
 
 void ProtocolGame::parseWorldTime(const InputMessagePtr& msg)
 {
-    msg->getU8(); // hour
-    msg->getU8(); // min
+
+    const auto hour = msg->getU8();
+    const auto min = msg->getU8();
+// note: needs mehah approval
+    g_lua.callGlobalField("g_game", "onChangeWorldTime", hour, min);
+//
 }
 
 void ProtocolGame::parseStore(const InputMessagePtr& msg) const
@@ -1888,10 +1892,6 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
         m_localPlayer->setBaseSkill(static_cast<Otc::Skill>(skill), baseLevel);
     }
 
-    if (g_game.getFeature(Otc::GameConcotions)) {
-        msg->getU8();
-    }
-
     if (g_game.getFeature(Otc::GameAdditionalSkills)) {
         // Critical, Life Leech, Mana Leech, Dodge, Fatal, Momentum have no level percent, nor loyalty bonus
 
@@ -1910,7 +1910,18 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
         }
     }
 
+    if (g_game.getFeature(Otc::GameConcotions)) {
+        msg->getU8();
+    }
+
     if (g_game.getClientVersion() >= 1281) {
+        // forge skill stats
+        const uint8_t slots = g_game.getClientVersion() >= 1332 ? 4 : 3; // 1281: CONST_SLOT_LEFT, CONST_SLOT_ARMOR, CONST_SLOT_HEAD, 1332: CONST_SLOT_LEGS
+        for (int_fast32_t i = 0; i < slots; ++i) {
+            msg->getU16(); // skill
+            msg->getU16(); // skill
+        }
+
         // bonus cap
         const uint32_t capacity = msg->getU32(); // base + bonus capacity
         msg->getU32(); // base capacity
@@ -2162,12 +2173,21 @@ void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
         }
         case Otc::MessageHeal:
         case Otc::MessageMana:
-        case Otc::MessageExp:
         case Otc::MessageHealOthers:
-        case Otc::MessageExpOthers:
         {
             const auto& pos = getPosition(msg);
             const uint32_t value = msg->getU32();
+            const uint8_t color = msg->getU8();
+            text = msg->getString();
+
+            g_map.addAnimatedText(std::make_shared<AnimatedText>(std::to_string(value), color), pos);
+            break;
+        }
+        case Otc::MessageExp:
+        case Otc::MessageExpOthers:
+        {
+            const auto& pos = getPosition(msg);
+            const uint64_t value = g_game.getClientVersion() >= 1332 ? msg->getU64() : msg->getU32();
             const uint8_t color = msg->getU8();
             text = msg->getString();
 
@@ -2264,7 +2284,10 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
             uint8_t outfitAddons = msg->getU8();
 
             if (g_game.getClientVersion() >= 1281) {
-                msg->getU8(); // mode: 0x00 - available, 0x01 store (requires U32 store offerId), 0x02 golden outfit tooltip (hardcoded)
+                const uint8_t outfitMode = msg->getU8(); // mode: 0x00 - available, 0x01 store (requires U32 store offerId), 0x02 golden outfit tooltip (hardcoded)
+                if (outfitMode == 1) {
+                    msg->getU32();
+                }
             }
 
             outfitList.emplace_back(outfitId, outfitName, outfitAddons);
@@ -2292,26 +2315,66 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
             const auto& mountName = msg->getString(); // mount name
 
             if (g_game.getClientVersion() >= 1281) {
-                msg->getU8(); // mode: 0x00 - available, 0x01 store (requires U32 store offerId)
+                const uint8_t mountMode = msg->getU8(); // mode: 0x00 - available, 0x01 store (requires U32 store offerId)
+                if (mountMode == 1) {
+                    msg->getU32();
+                }
             }
 
             mountList.emplace_back(mountId, mountName);
         }
     }
 
+    std::vector<std::tuple<int, std::string> > wingList;
+    std::vector<std::tuple<int, std::string> > auraList;
+    std::vector<std::tuple<int, std::string> > effectList;
+    std::vector<std::tuple<int, std::string> > shaderList;
+   if (g_game.getFeature(Otc::GameWingsAurasEffectsShader)) {
+        int wingCount = msg->getU8();
+        for (int i = 0; i < wingCount; ++i) {
+            int wingId = msg->getU16();
+            std::string wingName = msg->getString();
+            wingList.push_back(std::make_tuple(wingId, wingName));
+        }
+        int auraCount = msg->getU8();
+        for (int i = 0; i < auraCount; ++i) {
+            int auraId = msg->getU16();
+            std::string auraName = msg->getString();
+            auraList.push_back(std::make_tuple(auraId, auraName));
+        }
+        int effectCount = msg->getU8();
+        for (int i = 0; i < effectCount; ++i) {
+            int effectId = msg->getU16();
+            std::string effectName = msg->getString();
+            effectList.push_back(std::make_tuple(effectId, effectName));
+        }
+        int shaderCount = msg->getU8();
+        for (int i = 0; i < shaderCount; ++i) {
+            int shaderId = msg->getU16();
+            std::string shaderName = msg->getString();
+            shaderList.push_back(std::make_tuple(shaderId, shaderName));
+        }
+
+  }
+
+
     if (g_game.getClientVersion() >= 1281) {
-        msg->getU16(); // familiars.size()
-        // size > 0
-        // U16 looktype
-        // String name
-        // 0x00 // mode: 0x00 - available, 0x01 store (requires U32 store offerId)
+        const uint16_t familiarCount = msg->getU16();
+        for (int_fast32_t i = 0; i < familiarCount; ++i) {
+            msg->getU16(); // familiar lookType
+            msg->getString(); // familiar name
+            const uint8_t familiarMode = msg->getU8(); // 0x00 // mode: 0x00 - available, 0x01 store (requires U32 store offerId)
+            if (familiarMode == 1) {
+                msg->getU32();
+            }
+        }
 
         msg->getU8(); //Try outfit mode (?)
         msg->getU8(); // mounted
         msg->getU8(); // randomize mount (bool)
     }
 
-    g_game.processOpenOutfitWindow(currentOutfit, outfitList, mountList);
+    g_game.processOpenOutfitWindow(currentOutfit, outfitList, mountList, wingList, auraList, effectList, shaderList);
 }
 
 void ProtocolGame::parseKillTracker(const InputMessagePtr& msg)
@@ -2683,8 +2746,20 @@ Outfit ProtocolGame::getOutfit(const InputMessagePtr& msg, bool parseMount/* = t
             msg->getU8(); //feet
         }
         outfit.setMount(mount);
-    }
 
+    }
+    if (g_game.getFeature(Otc::GameWingsAurasEffectsShader)) {
+        const uint16_t wings = msg->getU16();
+        outfit.setWing(wings);
+
+        const uint16_t auras = msg->getU16();
+        outfit.setAura(auras);
+
+        const uint16_t effects = msg->getU16();
+        outfit.setEffect(effects);
+        outfit.setShader(msg->getString());
+
+    }
     return outfit;
 }
 
@@ -2965,25 +3040,36 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
         item->setCountOrSubType(g_game.getFeature(Otc::GameCountU16) ? msg->getU16() : msg->getU8());
     }
 
+    if (g_game.getFeature(Otc::GameItemAnimationPhase)) {
+        if (item->getAnimationPhases() > 1) {
+            // 0x00 => automatic phase
+            // 0xFE => random phase
+            // 0xFF => async phase
+            msg->getU8();
+            //item->setPhase(msg->getU8());
+        }
+    }
+
     if (item->isContainer()) {
         if (g_game.getFeature(Otc::GameContainerTypes)) {
             // container flags
-            // 1: quick loot, 2: quiver, 4: unlooted corpse
-            const uint8_t containerFlags = msg->getU8();
+            // 9: quick loot, 2: quiver, 4: unlooted corpse
+            const uint8_t containerType = msg->getU8();
 
-            // quick loot categories
-            if ((containerFlags & 1) != 0) {
+            if (containerType == 9) {
+                // quick loot categories
                 msg->getU32();
-            }
-
-            // quiver ammo count
-            if ((containerFlags & 2) != 0) {
+                if (g_game.getClientVersion() >= 1332) {
+                    msg->getU32();
+                }
+            } else if (containerType == 2) {
+                // quiver ammo count
                 msg->getU32();
             }
 
             // corpse not looted yet
             /*
-            if ((containerFlags & 4) != 0) {
+            if ((containerType & 4) != 0) {
                 // this flag has no bytes to parse
                 // draw effect 252 on top of the tile
             }
@@ -3002,42 +3088,6 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
                     msg->getU32(); // ammoTotal
                 }
             }
-        }
-    }
-
-    if (g_game.getFeature(Otc::GameThingUpgradeClassification)) {
-        if (item->getClassification() != 0) {
-            msg->getU8(); // Item tier
-        }
-    }
-
-    if (g_game.getFeature(Otc::GameThingClock)) {
-        if (item->hasClockExpire() || item->hasExpire() || item->hasExpireStop()) {
-            msg->getU32(); // Item duration (UI)
-            msg->getU8(); // Is brand-new
-        }
-    }
-
-    if (g_game.getFeature(Otc::GameThingCounter)) {
-        if (item->hasWearOut()) {
-            msg->getU32(); // Item charge (UI)
-            msg->getU8(); // Is brand-new
-        }
-    }
-
-    if (g_game.getFeature(Otc::GameWrapKit)) {
-        if (item->isDecoKit()) {
-            msg->getU16();
-        }
-    }
-
-    if (g_game.getFeature(Otc::GameItemAnimationPhase)) {
-        if (item->getAnimationPhases() > 1) {
-            // 0x00 => automatic phase
-            // 0xFE => random phase
-            // 0xFF => async phase
-            msg->getU8();
-            //item->setPhase(msg->getU8());
         }
     }
 
@@ -3064,6 +3114,32 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
 
             msg->getU8(); // direction
             msg->getU8(); // visible (bool)
+        }
+    }
+
+    if (g_game.getFeature(Otc::GameThingUpgradeClassification)) {
+        if (item->getClassification() != 0) {
+            msg->getU8(); // Item tier
+        }
+    }
+
+    if (g_game.getFeature(Otc::GameThingClock)) {
+        if (item->hasClockExpire() || item->hasExpire() || item->hasExpireStop()) {
+            msg->getU32(); // Item duration (UI)
+            msg->getU8(); // Is brand-new
+        }
+    }
+
+    if (g_game.getFeature(Otc::GameThingCounter)) {
+        if (item->hasWearOut()) {
+            msg->getU32(); // Item charge (UI)
+            msg->getU8(); // Is brand-new
+        }
+    }
+
+    if (g_game.getFeature(Otc::GameWrapKit)) {
+        if (item->isDecoKit()) {
+            msg->getU16();
         }
     }
 
@@ -3193,8 +3269,9 @@ void ProtocolGame::parseLootContainers(const InputMessagePtr& msg)
     msg->getU8(); // quickLootFallbackToMainContainer ? 1 : 0
     const uint8_t containers = msg->getU8();
     for (int_fast32_t i = 0; i < containers; ++i) {
-        msg->getU8(); // id?
-        msg->getU16();
+        msg->getU8(); // category
+        msg->getU16(); // lootContainerId
+        msg->getU16(); // obtainContainerId
     }
 }
 
@@ -3620,15 +3697,19 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
 
 void ProtocolGame::parsePreyRerollPrice(const InputMessagePtr& msg)
 {
-    const uint32_t price = msg->getU32(); //reroll price
-    const uint8_t wildcard = msg->getU8(); // wildcard
-    const uint8_t directly = msg->getU8(); // selectCreatureDirectly price (5 in tibia)
-    if (g_game.getProtocolVersion() >= 1230) { // prey task
-        msg->getU32();
-        msg->getU32();
-        msg->getU8();
-        msg->getU8();
+    const uint32_t price = msg->getU32(); // prey reroll price
+    uint8_t wildcard = 0; // prey bonus reroll price
+    uint8_t directly = 0; // prey selection list price
+
+    if (g_game.getProtocolVersion() >= 1230) {
+        wildcard = msg->getU8();
+        directly = msg->getU8();
+        msg->getU32(); // task hunting reroll price
+        msg->getU32(); // task hunting reroll price
+        msg->getU8(); // task hunting selection list price
+        msg->getU8(); // task hunting bonus reroll price
     }
+
     g_lua.callGlobalField("g_game", "onPreyRerollPrice", price, wildcard, directly);
 }
 

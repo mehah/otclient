@@ -33,6 +33,10 @@ local function calcValues(self)
     local px = math.max(proportion * pxrange, 6)
     px = px - px % 2 + 1
 
+    if self.scrollSize and self:getParent() and self:getParent().scrollSize then
+        px = math.max(self:getParent().scrollSize, 14)
+    end
+
     local offset = 0
     if range == 0 or self.value == self.minimum then
         if self.orientation == 'vertical' then
@@ -125,6 +129,7 @@ function UIScrollBar.create()
     scrollbar.showValue = false
     scrollbar.symbol = nil
     scrollbar.mouseScroll = true
+    scrollbar.scrollSize = nil
     return scrollbar
 end
 
@@ -145,6 +150,15 @@ function UIScrollBar:onSetup()
     end)
 
     updateSlider(self)
+
+    if self:getParent() then
+        if self:getParent().minimumScrollValue then
+            self:setMinimum(self:getParent().minimumScrollValue)
+        end
+        if self:getParent().maximumScrollValue then
+            self:setMaximum(self:getParent().maximumScrollValue)
+        end
+    end
 end
 
 function UIScrollBar:onStyleApply(styleName, styleNode)
@@ -167,6 +181,8 @@ function UIScrollBar:onStyleApply(styleName, styleNode)
             self.symbol = value
         elseif name == 'mouse-scroll' then
             self.mouseScroll = value
+        elseif name == 'parent-scroll' then
+            self.scrollSize = value
         end
     end
 end

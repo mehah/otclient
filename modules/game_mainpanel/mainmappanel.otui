@@ -1,0 +1,252 @@
+PhantomMiniWindow
+  id: mainmappanel
+  draggable: true
+  phantom: false
+  &panelHeight: 116
+  height: 116
+
+  UIWidget
+    id: minimapBorder
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-top: 5
+    margin-left: 8
+    size: 108 111
+    image-source: /images/ui/1pixel_down_frame
+
+    Minimap
+      id: minimap
+      anchors.fill: parent
+      margin: 1
+
+  UIWidget
+    id: layersPanel
+    size: 20 68
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    margin-right: 7
+
+    UIWidget
+      id: automapLayers
+      image-source: /images/automap/automap_indicator_maplayers
+      anchors.left: parent.left
+      anchors.bottom: parent.bottom
+      image-clip: 98 0 14 67
+      size: 14 67
+
+    UIWidget
+      image-source: /images/ui/vertical_line_dark
+      margin-left: 2
+      margin-top: 4
+      margin-bottom: 4
+      anchors.left: automapLayers.right
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      width: 1
+
+    UIWidget
+      id: layersMark
+      anchors.left: prev.right
+      anchors.top: automapLayers.top
+      image-source: /images/automap/automap_indicator_slider_left
+      margin-top: 28
+
+    Button
+      image-source: /images/automap/automap_phantom
+      anchors.left: automapLayers.left
+      anchors.right: automapLayers.right
+      anchors.top: automapLayers.top
+      anchors.bottom: automapLayers.verticalCenter
+      @onClick: upLayer()
+
+    Button
+      image-source: /images/automap/automap_phantom
+      anchors.left: automapLayers.left
+      anchors.right: automapLayers.right
+      anchors.top: automapLayers.verticalCenter
+      anchors.bottom: automapLayers.bottom
+      @onClick: downLayer()
+
+  Button
+    id: fullMap
+    image-source: /images/automap/automap_buttons
+    image-clip: 0 0 20 20
+    anchors.right: layersPanel.left
+    anchors.bottom: minimapBorder.bottom
+    margin-right: 4
+    size: 20 20
+    @onClick: fullscreen()
+
+    $pressed !disabled:
+      image-clip: 20 0 20 20
+
+  Button
+    id: zoomIn
+    image-source: /images/automap/automap_buttons
+    image-clip: 0 40 20 20
+    anchors.right: fullMap.right
+    anchors.bottom: fullMap.top
+    margin-bottom: 2
+    size: 20 20
+    @onClick: zoomIn()
+
+    $pressed !disabled:
+      image-clip: 20 40 20 20
+
+  Button
+    id: zoomOut
+    image-source: /images/automap/automap_buttons
+    image-clip: 0 20 20 20
+    anchors.right: fullMap.right
+    anchors.bottom: zoomIn.top
+    margin-bottom: 2
+    size: 20 20
+    @onClick: zoomOut()
+
+    $pressed !disabled:
+      image-clip: 20 20 20 20
+
+  UIWidget
+    id: rosePanel
+    anchors.top: minimapBorder.top
+    anchors.right: layersPanel.right
+    size: 43 43
+
+    UIWidget
+      id: ambients
+      anchors.centerIn: parent
+      size: 31 31
+
+      UIWidget
+        id: main
+        image-source: /images/automap/timedisplay_scroll
+        anchors.left: parent.left
+        anchors.top: parent.top
+        image-clip: 100 0 24 31
+        size: 24 31
+
+      UIWidget
+        id: secondary
+        image-source: /images/automap/timedisplay_scroll
+        anchors.left: main.right
+        anchors.top: parent.top
+        image-clip: 0 0 7 31
+        size: 7 31
+
+      Button
+        image-source: /images/automap/automap_phantom
+        anchors.fill: parent
+        @onClick: resetMap()
+
+    UIWidget
+      id: rose
+      anchors.fill: parent
+      image-source: /images/automap/automap_rose
+      image-clip: 0 0 43 43
+      phantom: true
+
+    Button
+      image-source: /images/automap/automap_rose
+      image-clip: 14 0 15 8
+      anchors.left: parent.left
+      anchors.top: parent.top
+      margin-left: 14
+      size: 15 8
+      @onClick: |
+        onClickRoseButton('north')
+
+      $pressed !disabled:
+        image-clip: 57 0 15 8
+
+    Button
+      image-source: /images/automap/automap_rose
+      image-clip: 28 0 15 15
+      anchors.left: parent.left
+      anchors.top: parent.top
+      margin-left: 28
+      size: 15 15
+      @onClick: |
+        onClickRoseButton('north-east')
+
+      $pressed !disabled:
+        image-clip: 114 0 15 15
+
+    Button
+      image-source: /images/automap/automap_rose
+      image-clip: 35 14 8 15
+      anchors.left: parent.left
+      anchors.top: parent.top
+      margin-left: 35
+      margin-top: 14
+      size: 8 15
+      @onClick: |
+        onClickRoseButton('east')
+
+      $pressed !disabled:
+        image-clip: 164 14 8 15  
+
+    Button
+      image-source: /images/automap/automap_rose
+      image-clip: 28 28 15 15
+      anchors.left: parent.left
+      anchors.top: parent.top
+      margin-left: 28
+      margin-top: 28
+      size: 15 15
+      @onClick: |
+        onClickRoseButton('south-east')
+
+      $pressed !disabled:
+        image-clip: 200 28 15 15
+
+    Button
+      image-source: /images/automap/automap_rose
+      image-clip: 14 35 15 8
+      anchors.left: parent.left
+      anchors.top: parent.top
+      margin-left: 14
+      margin-top: 35
+      size: 15 8
+      @onClick: |
+        onClickRoseButton('south')
+
+      $pressed !disabled:
+        image-clip: 229 35 15 8
+
+    Button
+      image-source: /images/automap/automap_rose
+      image-clip: 0 28 15 15
+      anchors.left: parent.left
+      anchors.top: parent.top
+      margin-top: 28
+      size: 15 15
+      @onClick: |
+        onClickRoseButton('south-west')
+
+      $pressed !disabled:
+        image-clip: 258 28 15 15
+
+    Button
+      image-source: /images/automap/automap_rose
+      image-clip: 0 14 8 15
+      anchors.left: parent.left
+      anchors.top: parent.top
+      margin-top: 14
+      size: 8 15
+      @onClick: |
+        onClickRoseButton('west')
+
+      $pressed !disabled:
+        image-clip: 301 14 8 15
+
+    Button
+      image-source: /images/automap/automap_rose
+      image-clip: 0 0 15 15
+      anchors.left: parent.left
+      anchors.top: parent.top
+      size: 15 15
+      @onClick: |
+        onClickRoseButton('north-west')
+
+      $pressed !disabled:
+        image-clip: 344 0 15 15

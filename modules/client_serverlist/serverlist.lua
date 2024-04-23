@@ -10,8 +10,18 @@ local servers = {}
 function ServerList.init()
     serverListWindow = g_ui.displayUI('serverlist')
     serverTextList = serverListWindow:getChildById('serverList')
-
+    local processedServers = {}
     servers = g_settings.getNode('ServerList') or {}
+    if Servers_init then
+        for key, value in pairs(Servers_init) do
+            if not servers[key] then
+                servers[key] = value
+                if not processedServers[key] then
+                    processedServers[key] = true
+                end
+            end
+        end
+    end
     if servers then
         ServerList.load()
     end
@@ -55,7 +65,7 @@ function ServerList.add(host, port, protocol, httpLogin, load)
     elseif host == '' or port == '' then
         return false, 'Required fields are missing'
     elseif httpLogin == nil then
-      httpLogin = false
+        httpLogin = false
     end
     local widget = g_ui.createWidget('ServerWidget', serverTextList)
     widget:setId(host)

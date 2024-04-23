@@ -1,0 +1,543 @@
+StatsBarDarkBackground < UIWidget
+  UIWidget
+    anchors.fill: parent
+    image-source: /images/ui/containerslot
+    image-border: 3
+
+StatsHorizontalBarGrade < UIWidget
+  UIWidget
+    id: grade_border_1
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    background-color: #ffffffff
+    height: 1
+    visible: false
+    phantom: false
+
+  UIWidget
+    id: grade_border_2
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    background-color: #ffffffff
+    height: 1
+    visible: false
+    phantom: false
+
+  UIWidget
+    id: grade_border_3
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.top: parent.top
+    background-color: #ffffffff
+    width: 1
+    visible: false
+    phantom: false
+
+  UIWidget
+    id: grade_border_4
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    anchors.top: parent.top
+    background-color: #ffffffff
+    width: 1
+    visible: false
+    phantom: false
+
+  UIWidget
+    id: grade_left_1
+    anchors.left: parent.left
+    anchors.top: parent.top
+    image-source: /images/bars/marker_top
+    size: 7 11
+    visible: false
+    phantom: false
+
+  UIWidget
+    id: grade_left_2
+    anchors.left: parent.left
+    anchors.top: parent.top
+    image-source: /images/bars/marker_top
+    size: 7 11
+    visible: false
+    phantom: false
+
+  UIWidget
+    id: grade_right_1
+    anchors.right: parent.right
+    anchors.top: parent.top
+    image-source: /images/bars/marker_top
+    size: 7 11
+    visible: false
+    phantom: false
+
+  UIWidget
+    id: grade_right_2
+    anchors.right: parent.right
+    anchors.top: parent.top
+    image-source: /images/bars/marker_top
+    size: 7 11
+    visible: false
+    phantom: false
+
+StatsVerticalLeftBarGrade < UIWidget
+  UIWidget
+    id: grade_border_1
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    background-color: #ffffffff
+    height: 1
+    visible: false
+    phantom: false
+
+  UIWidget
+    id: grade_border_2
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    background-color: #ffffffff
+    height: 1
+    visible: false
+    phantom: false
+
+  UIWidget
+    id: grade_border_3
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.top: parent.top
+    background-color: #ffffffff
+    width: 1
+    visible: false
+    phantom: false
+
+  UIWidget
+    id: grade_border_4
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    anchors.top: parent.top
+    background-color: #ffffffff
+    width: 1
+    visible: false
+    phantom: false
+
+  UIWidget
+    id: grade_top_1
+    anchors.left: parent.left
+    anchors.top: parent.top
+    image-source: /images/bars/marker_left
+    size: 11 7
+    visible: false
+    phantom: false
+
+  UIWidget
+    id: grade_top_2
+    anchors.left: parent.left
+    anchors.top: parent.top
+    image-source: /images/bars/marker_left
+    size: 11 7
+    visible: false
+    phantom: false
+
+  UIWidget
+    id: grade_bottom_1
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    image-source: /images/bars/marker_left
+    size: 11 7
+    visible: false
+    phantom: false
+
+  UIWidget
+    id: grade_bottom_2
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    image-source: /images/bars/marker_left
+    size: 11 7
+    visible: false
+    phantom: false
+
+StatsBarUp < UIStatsBar
+  StatsBarDarkBackground
+    anchors.fill: parent
+    phantom: true
+
+  UIWidget
+    id: bar
+    width: 1
+    anchors.left: parent.left
+    anchors.top: parent.top
+    anchors.bottom: parente.bottom
+    margin: 1
+    image-repeated: true
+
+  StatsHorizontalBarGrade
+    id: horizontalGrade
+    anchors.fill: parent
+    visible: false
+
+  Label
+    id: text
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.horizontalCenter: parent.horizontalCenter
+    text-align: center
+    visible: false
+    !text: '9999999999/9999999999'
+
+StatsBarTopWithShrink < UIWidget
+  UIWidget
+    anchors.fill: parent
+    image-source: /images/ui/background
+    image-repeated: true
+
+  UIWidget
+    anchors.right: rightIncreaseSidePanels.left
+    anchors.left: leftIncreaseSidePanels.right
+    anchors.top: parent.top
+    height: 2
+    background-color: white
+    opacity: 0.35
+
+  UIWidget
+    anchors.right: rightIncreaseSidePanels.left
+    anchors.top: parent.top
+    anchors.bottom: rightDecreaseSidePanels.bottom
+    margin-bottom: -2
+    margin-top: 2
+    width: 2
+    background-color: black
+    opacity: 0.35
+
+  UIWidget
+    anchors.right: parent.right
+    anchors.left: prev.left
+    anchors.top: rightDecreaseSidePanels.bottom
+    height: 2
+    background-color: white
+    opacity: 0.35
+
+  UIWidget
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    anchors.bottom: parent.bottom
+    width: 2
+    background-color: black
+    opacity: 0.35
+
+  UIWidget
+    anchors.right: parent.right
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    margin-left: 2
+    margin-right: 2
+    height: 2
+    background-color: black
+    opacity: 0.35
+
+  UIWidget
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.top: leftDecreaseSidePanels.bottom
+    width: 1
+    background-color: white
+    opacity: 0.35
+
+  UIWidget
+    anchors.left: parent.left
+    anchors.top: leftDecreaseSidePanels.bottom
+    anchors.right: leftDecreaseSidePanels.right
+    margin-left: 1
+    height: 1
+    background-color: white
+    opacity: 0.35
+
+  UIWidget
+    anchors.left: leftDecreaseSidePanels.right
+    anchors.bottom: leftDecreaseSidePanels.bottom
+    anchors.top: parent.top
+    margin-top: 2
+    width: 2
+    background-color: black
+    opacity: 0.35
+
+  UIWidget
+    id: leftIncreaseSidePanels
+    anchors.left: parent.left
+    anchors.top: parent.top
+    size: 9 27
+
+  UIWidget
+    id: leftDecreaseSidePanels
+    anchors.left: parent.left
+    anchors.top: leftIncreaseSidePanels.bottom
+    size: 9 27
+
+  UIWidget
+    id: rightIncreaseSidePanels
+    anchors.right: parent.right
+    anchors.top: parent.top
+    size: 9 27
+
+  UIWidget
+    id: rightDecreaseSidePanels
+    anchors.right: parent.right
+    anchors.top: rightIncreaseSidePanels.bottom
+    size: 9 27
+
+TopStatsSkillElement < UIWidget
+  height: 20
+
+  Label
+    id: level
+    !text: '99999'
+    color: #c0c0c0ff
+    text-align: right
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 10
+
+  UIWidget
+    id: icon
+    size: 9 9
+    anchors.verticalCenter: level.verticalCenter
+    anchors.left: level.right
+    margin-left: 7
+
+  StatsBarUp
+    id: bar
+    anchors.verticalCenter: level.verticalCenter
+    anchors.left: icon.right
+    anchors.right: parent.right
+    !statsbar-size: 'tiny'
+    !statsbar-orientation: 'horizontal'
+    statsbar-text: true
+    margin-left: 5
+    height: 7
+
+TopStatsBarLargeOnTop < UIWidget
+  StatsBarTopWithShrink
+    anchors.fill: parent
+
+  Panel
+    id: icons
+    image-border: 3
+    image-source: /images/ui/containerslot
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 5
+    size: 75 27
+    layout:
+      type: horizontalBox
+
+  StatsBarUp
+    id: health
+    anchors.top: icons.top
+    anchors.left: parent.left
+    anchors.right: icons.left
+    !statsbar-type: 'health'
+    !statsbar-size: 'large'
+    !statsbar-orientation: 'horizontal'
+    statsbar-text: true
+    margin-left: 15
+    margin-right: 7
+    height: 27
+
+  StatsBarUp
+    id: mana
+    anchors.top: icons.top
+    anchors.right: parent.right
+    anchors.left: icons.right
+    !statsbar-type: 'mana'
+    !statsbar-size: 'large'
+    !statsbar-orientation: 'horizontal'
+    statsbar-text: true
+    margin-right: 15
+    margin-left: 7
+    height: 27
+
+  Panel
+    id: skills
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: icons.bottom
+    margin-top: 6
+    margin-left: 12
+    margin-right: 12
+    height: 0
+
+TopStatsBarParallelOnTop < UIWidget
+  StatsBarTopWithShrink
+    anchors.fill: parent
+
+  StatsBarUp
+    id: health
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    !statsbar-type: 'health'
+    !statsbar-size: 'small'
+    !statsbar-orientation: 'horizontal'
+    statsbar-text: true
+    margin-left: 12
+    margin-right: 12
+    margin-top: 5
+    height: 14
+
+  StatsBarUp
+    id: mana
+    anchors.top: health.bottom
+    anchors.left: health.left
+    anchors.right: health.right
+    !statsbar-type: 'mana'
+    !statsbar-size: 'small'
+    !statsbar-orientation: 'horizontal'
+    statsbar-text: true
+    margin-top: 5
+    height: 14
+
+  Panel
+    id: skills
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: mana.bottom
+    margin-left: 12
+    margin-right: 12
+    height: 0
+
+  Panel
+    id: icons
+    image-border: 3
+    image-source: /images/ui/containerslot
+    anchors.top: skills.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    size: 103 14
+    layout:
+      type: horizontalBox
+
+TopStatsBarDefaultOnTop < UIWidget
+  StatsBarTopWithShrink
+    anchors.fill: parent
+
+  StatsBarUp
+    id: health
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.horizontalCenter
+    !statsbar-type: 'health'
+    !statsbar-size: 'small'
+    !statsbar-orientation: 'horizontal'
+    statsbar-text: true
+    margin-left: 12
+    margin-right: 5
+    margin-top: 5
+    height: 14
+
+  StatsBarUp
+    id: mana
+    anchors.top: parent.top
+    anchors.right: parent.right
+    anchors.left: parent.horizontalCenter
+    !statsbar-type: 'mana'
+    !statsbar-size: 'small'
+    !statsbar-orientation: 'horizontal'
+    statsbar-text: true
+    margin-right: 12
+    margin-left: 5
+    margin-top: 5
+    height: 14
+
+  Panel
+    id: skills
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: mana.bottom
+    margin-left: 12
+    margin-right: 12
+    height: 0
+
+  Panel
+    id: icons
+    image-border: 3
+    image-source: /images/ui/containerslot
+    anchors.top: skills.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    size: 103 14
+    layout:
+      type: horizontalBox
+
+TopStatsBarCompactOnTop < UIWidget
+  StatsBarTopWithShrink
+    anchors.fill: parent
+
+  Panel
+    id: icons
+    image-border: 3
+    image-source: /images/ui/containerslot
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 5
+    size: 53 14
+    layout:
+      type: horizontalBox
+
+  StatsBarUp
+    id: health
+    anchors.top: icons.top
+    anchors.left: parent.left
+    anchors.right: icons.left
+    !statsbar-type: 'health'
+    !statsbar-size: 'small'
+    !statsbar-orientation: 'horizontal'
+    statsbar-text: true
+    margin-left: 15
+    margin-right: 7
+    height: 14
+
+  StatsBarUp
+    id: mana
+    anchors.top: icons.top
+    anchors.right: parent.right
+    anchors.left: icons.right
+    !statsbar-type: 'mana'
+    !statsbar-size: 'small'
+    !statsbar-orientation: 'horizontal'
+    statsbar-text: true
+    margin-right: 15
+    margin-left: 7
+    height: 14
+
+  Panel
+    id: skills
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: icons.bottom
+    margin-top: 6
+    margin-left: 12
+    margin-right: 12
+    height: 0
+
+TopStatsBar < UIWidget
+  TopStatsBarLargeOnTop
+    id: largeOnTop
+    anchors.fill: parent
+    visible: false
+    phantom: true
+
+  TopStatsBarParallelOnTop
+    id: parallelOnTop
+    anchors.fill: parent
+    visible: false
+    phantom: true
+
+  TopStatsBarDefaultOnTop
+    id: defaultOnTop
+    anchors.fill: parent
+    visible: false
+    phantom: true
+
+  TopStatsBarCompactOnTop
+    id: compactOnTop
+    anchors.fill: parent
+    visible: false
+    phantom: true

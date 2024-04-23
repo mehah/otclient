@@ -1,6 +1,6 @@
 game
   sprite-size: 32
-  last-supported-version: 1321
+  last-supported-version: 1332
   draw-typing: false
   typing-icon: /images/game/console/typing
   
@@ -29,7 +29,7 @@ game
 
   render
     invisible-ticks-per-frame: 75
-    item-ticks-per-frame: 500
+    item-ticks-per-frame: 75
     effect-ticks-per-frame: 75
     missile-ticks-per-frame: 75
     animated-text-duration: 1000
