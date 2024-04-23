@@ -545,6 +545,7 @@ namespace Otc
         GameSmoothWalkElevation = 115,
         GameNegativeOffset = 116,
         GameItemTooltipV8 = 117,
+        GameForgeConvergence = 118,
         LastGameFeature = 118
     };
 

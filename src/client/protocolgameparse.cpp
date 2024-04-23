@@ -1451,12 +1451,12 @@ void ProtocolGame::parseDistanceMissile(const InputMessagePtr& msg)
 void ProtocolGame::parseItemClasses(const InputMessagePtr& msg)
 {
     const uint8_t classSize = msg->getU8();
-    for (uint8_t i = 0; i < classSize; i++) {
+    for (int_fast8_t i = 0; i < classSize; i++) {
         msg->getU8(); // class id
 
         // tiers
         const uint8_t tiersSize = msg->getU8();
-        for (uint8_t j = 0; j < tiersSize; j++) {
+        for (int_fast8_t j = 0; j < tiersSize; j++) {
             msg->getU8(); // tier id
             msg->getU64(); // upgrade cost
         }
@@ -1464,9 +1464,23 @@ void ProtocolGame::parseItemClasses(const InputMessagePtr& msg)
 
     if (g_game.getFeature(Otc::GameDynamicForgeVariables)) {
         const uint8_t grades = msg->getU8();
-        for (int i = 0; i < grades; i++) {
+        for (int_fast8_t i = 0; i < grades; i++) {
             msg->getU8(); // Tier
             msg->getU8(); // Exalted cores
+        }
+
+        if (g_game.getFeature(Otc::GameForgeConvergence)) {
+            const uint8_t convergenceFusionSize = msg->getU8();
+            for (int_fast8_t i = 0; i < convergenceFusionSize; i++) {
+                msg->getU8(); // tier id
+                msg->getU64(); // upgrade cost
+            }
+
+            const uint8_t convergenceTransferSize = msg->getU8();
+            for (int_fast8_t i = 0; i < convergenceTransferSize; i++) {
+                msg->getU8(); // tier id
+                msg->getU64(); // upgrade cost
+            }
         }
 
         msg->getU8(); // Dust Percent
@@ -1476,12 +1490,18 @@ void ProtocolGame::parseItemClasses(const InputMessagePtr& msg)
         msg->getU16(); // Max Dust
         msg->getU16(); // Max Dust Cap
         msg->getU8(); // Dust Fusion
+        if (g_game.getFeature(Otc::GameForgeConvergence)) {
+            msg->getU8(); // Convergence Fusion
+        }
         msg->getU8(); // Dust Transfer
+        if (g_game.getFeature(Otc::GameForgeConvergence)) {
+            msg->getU8(); // Convergence Transfer
+        }
         msg->getU8(); // Chance Base
         msg->getU8(); // Chance Improved
         msg->getU8(); // Reduce Tier Loss
     } else {
-        for (uint8_t i = 1; i <= 11; i++) {
+        for (int_fast8_t i = 1; i <= 11; i++) {
             msg->getU8(); // Forge values
         }
     }
