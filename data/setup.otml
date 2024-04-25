@@ -5,7 +5,7 @@ game
   typing-icon: /images/game/console/typing
   
   map
-    viewport: 8 6
+    viewport: 12 12
     max-z: 15
     sea-floor: 7
     underground-floor: 8
