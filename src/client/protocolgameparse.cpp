@@ -424,7 +424,7 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerChangeMapAwareRange:
                     parseChangeMapAwareRange(msg);
                     break;
-                    // 12x
+                // 12x
                 case Proto::GameServerLootContainers:
                     parseLootContainers(msg);
                     break;
@@ -1129,11 +1129,18 @@ void ProtocolGame::parseOpenContainer(const InputMessagePtr& msg)
         items[i] = getItem(msg);
 
     if (g_game.getFeature(Otc::GameContainerFilter)) {
-        msg->getU8();
-        const uint8_t listSize = msg->getU8();
-        for (int_fast8_t i = -1; ++i < listSize;) {
+        // Check if container is store inbox id
+        if (containerId == 23396) {
             msg->getU8();
-            msg->getString();
+            const uint8_t listSize = msg->getU8();
+            for (int_fast8_t i = -1; ++i < listSize;) {
+                msg->getU8();
+                msg->getString();
+            }
+        } else {
+            // Parse store inbox category empty
+            msg->getU8();
+            msg->getU8();
         }
     }
 
@@ -1469,14 +1476,36 @@ void ProtocolGame::parseItemClasses(const InputMessagePtr& msg)
             msg->getU8(); // Exalted cores
         }
 
+        if (g_game.getClientVersion() >= 1332) {
+            // Convergence fusion prices per tier
+            auto totalConvergenceFusion = msg->getU8(); // total size count
+            for (int i = 0; i < totalConvergenceFusion; i++) {
+                msg->getU8(); // Tier
+                msg->getU64(); // Price
+            }
+
+            // Convergence transfer prices per tier
+            auto totalConvergenceTransfer = msg->getU8(); // total size count
+            for (int i = 0; i < totalConvergenceTransfer; i++) {
+                msg->getU8(); // Tier
+                msg->getU64(); // Price
+            }
+        }
+
         msg->getU8(); // Dust Percent
         msg->getU8(); // Dust To Sleaver
         msg->getU8(); // Sliver To Core
         msg->getU8(); // Dust Percent Upgrade
         msg->getU16(); // Max Dust
         msg->getU16(); // Max Dust Cap
-        msg->getU8(); // Dust Fusion
-        msg->getU8(); // Dust Transfer
+        msg->getU8(); // Dust normal fusion
+        if (g_game.getClientVersion() >= 1332) {
+            msg->getU8(); // Dust convergence fusion
+        }
+        msg->getU8(); // Dust normal transfer
+        if (g_game.getClientVersion() >= 1332) {
+            msg->getU8(); // Dust convergence transfer
+        }
         msg->getU8(); // Chance Base
         msg->getU8(); // Chance Improved
         msg->getU8(); // Reduce Tier Loss
@@ -1868,10 +1897,6 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
         m_localPlayer->setBaseSkill(static_cast<Otc::Skill>(skill), baseLevel);
     }
 
-    if (g_game.getFeature(Otc::GameConcotions)) {
-        msg->getU8();
-    }
-
     if (g_game.getFeature(Otc::GameAdditionalSkills)) {
         // Critical, Life Leech, Mana Leech, Dodge, Fatal, Momentum have no level percent, nor loyalty bonus
 
@@ -1891,6 +1916,21 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
     }
 
     if (g_game.getClientVersion() >= 1281) {
+        if (g_game.getClientVersion() >= 1310) {
+            msg->getU8(); // concoctions ?
+        }
+        std::vector<Otc::InventorySlot> slots {
+            Otc::InventorySlot::InventorySlotLeft,
+            Otc::InventorySlot::InventorySlotRight,
+            Otc::InventorySlot::InventorySlotHead,
+            Otc::InventorySlot::InventorySlotLegs
+        };
+
+        for (const auto &slot : slots) {
+            msg->getU16();
+            msg->getU16();
+        }
+
         // bonus cap
         const uint32_t capacity = msg->getU32(); // base + bonus capacity
         msg->getU32(); // base capacity
@@ -1906,7 +1946,7 @@ void ProtocolGame::parsePlayerState(const InputMessagePtr& msg) const
     if (g_game.getClientVersion() >= 1281) {
         states = msg->getU32();
         if (g_game.getFeature(Otc::GamePlayerStateCounter))
-            msg->getU8();
+            msg->getU8(); // icons counter
     } else {
         if (g_game.getFeature(Otc::GamePlayerStateU16))
             states = msg->getU16();
@@ -2102,6 +2142,7 @@ void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
     const Otc::MessageMode mode = Proto::translateMessageModeFromServer(code);
     std::string text;
 
+    g_logger.debug(stdext::format("code: %d, mode: %d", code, mode));
     switch (mode) {
         case Otc::MessageChannelManagement:
             msg->getU16(); // channelId
@@ -2141,13 +2182,55 @@ void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
             break;
         }
         case Otc::MessageHeal:
+        {
+            if (g_game.getClientVersion() >= 1332) {
+                const auto& pos = getPosition(msg);
+                const uint32_t value = msg->getU32();
+                const uint8_t color = msg->getU8();
+                text = msg->getString();
+                g_map.addAnimatedText(std::make_shared<AnimatedText>(std::to_string(value), color), pos);
+            }
+            break;
+
+        }
         case Otc::MessageMana:
         case Otc::MessageExp:
+        {
+
+            const auto& pos = getPosition(msg);
+            uint64_t value = 0;
+            if (g_game.getClientVersion() > 1321) {
+                value = msg->getU64();
+            } else {
+                value = msg->getU32();
+            }
+            const uint8_t color = msg->getU8();
+            text = msg->getString();
+
+            g_map.addAnimatedText(std::make_shared<AnimatedText>(std::to_string(value), color), pos);
+            break;
+        }
         case Otc::MessageHealOthers:
+        {
+            if (g_game.getClientVersion() >= 1332) {
+                const auto& pos = getPosition(msg);
+                const uint32_t value = msg->getU32();
+                const uint8_t color = msg->getU8();
+                text = msg->getString();
+                g_map.addAnimatedText(std::make_shared<AnimatedText>(std::to_string(value), color), pos);
+            }
+            break;
+
+        }
         case Otc::MessageExpOthers:
         {
             const auto& pos = getPosition(msg);
-            const uint32_t value = msg->getU32();
+            uint64_t value;
+            if (g_game.getClientVersion() > 1321) {
+                value = msg->getU64();
+            } else {
+                value = msg->getU32();
+            }
             const uint8_t color = msg->getU8();
             text = msg->getString();
 
@@ -2158,8 +2241,11 @@ void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
             throw Exception("unknown message mode %d", mode);
             break;
         default:
-            text = msg->getString();
             break;
+    }
+
+    if (text.empty()) {
+        text = msg->getString();
     }
 
     Game::processTextMessage(mode, text);
@@ -2953,7 +3039,12 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
 
             // quick loot categories
             if ((containerFlags & 1) != 0) {
+                // loot container flags
                 msg->getU32();
+                if (g_game.getClientVersion() >= 1332) {
+                    // obtain container flags
+                    msg->getU32();
+                }
             }
 
             // quiver ammo count
@@ -3173,8 +3264,11 @@ void ProtocolGame::parseLootContainers(const InputMessagePtr& msg)
     msg->getU8(); // quickLootFallbackToMainContainer ? 1 : 0
     const uint8_t containers = msg->getU8();
     for (int_fast32_t i = 0; i < containers; ++i) {
-        msg->getU8(); // id?
-        msg->getU16();
+        msg->getU8(); // category type
+        msg->getU16(); // loot container
+        if (g_game.getClientVersion() >= 1332) {
+            msg->getU16(); // obtainer container
+        }
     }
 }
 
