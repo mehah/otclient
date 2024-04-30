@@ -972,7 +972,7 @@ function onSpellGroupCooldown(groupId, duration)
             end
         end
         if spell then
-            if table.contains(spell.group, groupId) then
+            if spell.group[groupId] ~= nil then
                 local continue = false
                 if not cooldown[spell.id] or cooldown[spell.id] and cooldown[spell.id] < duration then
                     local oldProgressBar = k:recursiveGetChildById('progress' .. spell.id)
