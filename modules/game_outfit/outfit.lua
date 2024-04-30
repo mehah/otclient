@@ -843,6 +843,12 @@ function showOutfits()
         outfit.healthBar = 0
         outfit.effects = 0
         button.outfit:setOutfit(outfit)
+        
+        local thingType = g_things.getThingType(outfit.type, ThingCategoryCreature)
+        button.outfit:setPadding(-8)
+        button.outfit:setCreatureSize(thingType:getRealSize() + 32)
+        --button.outfit:setBorderColor('red')
+        --button.outfit:setBorderWidth(2)
 
         button.name:setText(outfitData[2])
         if tempOutfit.type == outfitData[1] then
@@ -888,6 +894,10 @@ function showMounts()
         button.outfit:setOutfit({
             type = mountData[1]
         })
+
+        local thingType = g_things.getThingType(mountData[1], ThingCategoryCreature)
+        button.outfit:setPadding(-8)
+        button.outfit:setCreatureSize(thingType:getRealSize() + 32)
 
         button.name:setText(mountData[2])
         if tempOutfit.mount == mountData[1] then
