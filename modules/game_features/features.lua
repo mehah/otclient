@@ -239,5 +239,9 @@ controller:registerEvents(g_game, {
             g_game.enableFeature(GameWrapKit);
             g_game.enableFeature(GameContainerFilter);
         end
+
+        if version >= 1332 then
+            g_game.enableFeature(GameForgeConvergence);
+        end
     end
 })
