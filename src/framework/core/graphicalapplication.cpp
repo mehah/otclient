@@ -137,18 +137,37 @@ void GraphicalApplication::run()
 
     g_lua.callGlobalField("g_app", "onRun");
 
-    std::atomic_bool mapThreadStopping = false;
+    const auto& uiPool = g_drawPool.get(DrawPoolType::FOREGROUND);
+    const auto& fgMapPool = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
 
     const auto& FPS = [&] {
         m_mapProcessFrameCounter.setTargetFps(g_window.vsyncEnabled() || getMaxFps() || getTargetFps() ? 500u : 999u);
         return m_graphicFrameCounter.getFps();
     };
 
-    // THREAD - POOL & MAP
-    g_asyncDispatcher.detach_task([&] {
-        const auto& foregroundUI = g_drawPool.get(DrawPoolType::FOREGROUND);
-        const auto& foregroundMap = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
+    std::condition_variable uiCond, fgMapCond;
+    BS::multi_future<void> threads;
 
+    // THREAD - FOREGROUND UI
+    threads.emplace_back(g_asyncDispatcher.submit_task([&] {
+        std::unique_lock lock(uiPool->getMutexPreDraw());
+        uiCond.wait(lock, [this]() {
+            g_ui.render(DrawPoolType::FOREGROUND);
+            return m_stopping;
+        });
+    }));
+
+    // THREAD - FOREGROUND MAP
+    threads.emplace_back(g_asyncDispatcher.submit_task([&] {
+        std::unique_lock lock(fgMapPool->getMutexPreDraw());
+        fgMapCond.wait(lock, [this]() -> bool {
+            m_drawEvents->drawForgroundMap();
+            return m_stopping;
+        });
+    }));
+
+    // THREAD - POOL & MAP
+    threads.emplace_back(g_asyncDispatcher.submit_task([&] {
         g_eventThreadId = EventDispatcher::getThreadId();
         while (!m_stopping) {
             poll();
@@ -159,7 +178,7 @@ void GraphicalApplication::run()
             }
 
             if (!m_drawEvents || !m_drawEvents->canDraw(DrawPoolType::MAP)) {
-                if (foregroundUI->canRepaint())
+                if (uiPool->canRepaint())
                     g_ui.render(DrawPoolType::FOREGROUND);
                 m_mapProcessFrameCounter.update();
                 continue;
@@ -167,25 +186,23 @@ void GraphicalApplication::run()
 
             m_drawEvents->preLoad();
 
-            BS::multi_future<void> foreground_threads;
-            foreground_threads.reserve(2);
+            if (uiPool->canRepaint())
+                uiCond.notify_one();
 
-            if (foregroundUI->canRepaint())
-                foreground_threads.emplace_back(g_asyncDispatcher.submit_task([this] { g_ui.render(DrawPoolType::FOREGROUND); }));
-
-            if (foregroundMap->canRepaint())
-                foreground_threads.emplace_back(g_asyncDispatcher.submit_task([this] { m_drawEvents->drawForgroundMap(); }));
+            if (fgMapPool->canRepaint())
+                fgMapCond.notify_one();
 
             m_drawEvents->drawMap();
 
-            foreground_threads.wait();
+            // Wait UI and FGMap
+            std::scoped_lock l(uiPool->getMutexPreDraw(), fgMapPool->getMutexPreDraw());
 
             m_mapProcessFrameCounter.update();
         }
 
-        mapThreadStopping.store(true);
-        mapThreadStopping.notify_one();
-    });
+        uiCond.notify_one();
+        fgMapCond.notify_one();
+    }));
 
     m_running = true;
     while (!m_stopping) {
@@ -208,7 +225,7 @@ void GraphicalApplication::run()
         }
     }
 
-    mapThreadStopping.wait(false);
+    threads.wait();
     m_running = false;
     m_stopping = false;
 }
