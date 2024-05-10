@@ -159,7 +159,8 @@ void GraphicalApplication::run()
             }
 
             if (!m_drawEvents || !m_drawEvents->canDraw(DrawPoolType::MAP)) {
-                g_ui.render(DrawPoolType::FOREGROUND);
+                if (foregroundUI->canRepaint())
+                    g_ui.render(DrawPoolType::FOREGROUND);
                 m_mapProcessFrameCounter.update();
                 continue;
             }
