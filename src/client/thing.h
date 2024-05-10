@@ -222,7 +222,6 @@ protected:
 
     // Shader
     PainterShaderProgramPtr m_shader;
-    std::function<void()> m_shaderAction{ nullptr };
 
 private:
     void lua_setMarked(std::string_view color) { setMarked(Color(color)); }

@@ -301,7 +301,6 @@ private:
 
     // Mount Shader
     PainterShaderProgramPtr m_mountShader;
-    std::function<void()> m_mountShaderAction{ nullptr };
 
     ThingType* m_mountType{ nullptr };
 

@@ -65,9 +65,15 @@ void Item::internalDraw(int animationPhase, const Point& dest, const Color& colo
     if (replaceColorShader)
         g_drawPool.setShaderProgram(g_painter->getReplaceColorShader(), true);
     else {
+        // Example of how to send a UniformValue to shader
+        /*const auto& shaderAction = [=]()-> void {
+            m_shader->bind();
+            m_shader->setUniformValue(ShaderManager::ITEM_ID_UNIFORM, static_cast<int>(getId()));
+        };*/
+
         drawAttachedEffect(dest, lightView, false); // On Bottom
         if (m_shader)
-            g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
+            g_drawPool.setShaderProgram(m_shader, true/*, shaderAction*/);
     }
 
     getThingType()->draw(dest, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, color, drawThings, lightView, m_drawConductor);
@@ -261,12 +267,6 @@ void Item::setId(uint32_t id)
     /*
     if (isMarketable()) {
         m_shader = g_shaders.getShader("Outfit - Rainbow");
-
-        // Example of how to send a UniformValue to shader
-        m_shaderAction = [=]()-> void {
-            m_shader->bind();
-            m_shader->setUniformValue(ShaderManager::ITEM_ID_UNIFORM, static_cast<int>(id));
-        };
     }
     */
 }

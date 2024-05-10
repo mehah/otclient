@@ -48,20 +48,6 @@ Creature::Creature() :m_type(Proto::CreatureTypeUnknown)
     m_name.setFont(g_gameConfig.getCreatureNameFont());
     m_name.setAlign(Fw::AlignTopCenter);
     m_typingIconTexture = g_textures.getTexture(g_gameConfig.getTypingIcon());
-
-    // Example of how to send a UniformValue to shader
-    /*
-    m_shaderAction = [this]()-> void {
-        const int id = m_outfit.isCreature() ? m_outfit.getId() : m_outfit.getAuxId();
-        m_shader->bind();
-        m_shader->setUniformValue(ShaderManager::OUTFIT_ID_UNIFORM, id);
-    };
-
-    m_mountShaderAction = [this]()-> void {
-        m_mountShader->bind();
-        m_mountShader->setUniformValue(ShaderManager::MOUNT_ID_UNIFORM, m_outfit.getMount());
-    };
-    */
 }
 
 Creature::~Creature() {
@@ -253,6 +239,13 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, int
 
 void Creature::internalDraw(Point dest, LightView* lightView, const Color& color)
 {
+    // Example of how to send a UniformValue to shader
+    /*const auto& shaderAction = [this]()-> void {
+        const int id = m_outfit.isCreature() ? m_outfit.getId() : m_outfit.getAuxId();
+        m_shader->bind();
+        m_shader->setUniformValue(ShaderManager::OUTFIT_ID_UNIFORM, id);
+    };*/
+
     bool replaceColorShader = color != Color::white;
     if (replaceColorShader)
         g_drawPool.setShaderProgram(g_painter->getReplaceColorShader());
@@ -265,8 +258,12 @@ void Creature::internalDraw(Point dest, LightView* lightView, const Color& color
             if (m_outfit.hasMount()) {
                 dest -= m_mountType->getDisplacement() * g_drawPool.getScaleFactor();
 
-                if (!replaceColorShader && m_mountShader)
-                    g_drawPool.setShaderProgram(m_mountShader, true, m_mountShaderAction);
+                if (!replaceColorShader && m_mountShader) {
+                    g_drawPool.setShaderProgram(m_mountShader, true/*, [this]()-> void {
+                        m_mountShader->bind();
+                        m_mountShader->setUniformValue(ShaderManager::MOUNT_ID_UNIFORM, m_outfit.getMount());
+                    }*/);
+                }
                 m_mountType->draw(dest, 0, m_numPatternX, 0, 0, getCurrentAnimationPhase(true), color);
 
                 dest += getDisplacement() * g_drawPool.getScaleFactor();
@@ -292,8 +289,10 @@ void Creature::internalDraw(Point dest, LightView* lightView, const Color& color
                     if (yPattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
                         continue;
 
-                    if (!replaceColorShader && m_shader && !useFramebuffer)
-                        g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
+                    if (!replaceColorShader && m_shader && !useFramebuffer) {
+                        g_drawPool.setShaderProgram(m_shader, true/*, shaderAction*/);
+                    }
+
                     datType->draw(dest, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, color);
 
                     if (m_drawOutfitColor && !replaceColorShader && getLayers() > 1) {
@@ -312,7 +311,8 @@ void Creature::internalDraw(Point dest, LightView* lightView, const Color& color
                 const auto& p = (Point(size) - Point(datType->getExactHeight())) / 2;
                 const auto& destFB = Rect(dest - p, Size{ size });
 
-                g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
+                g_drawPool.setShaderProgram(m_shader, true/*, shaderAction*/);
+
                 g_drawPool.bindFrameBuffer(destFB.size());
                 drawCreature(p);
                 g_drawPool.releaseFrameBuffer(destFB);
@@ -340,7 +340,7 @@ void Creature::internalDraw(Point dest, LightView* lightView, const Color& color
                 animationPhase = std::min<int>(animationPhase + 1, animationPhases);
 
             if (!replaceColorShader && m_shader)
-                g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
+                g_drawPool.setShaderProgram(m_shader, true/*, shaderAction*/);
             m_thingType->draw(dest - (getDisplacement() * g_drawPool.getScaleFactor()), 0, 0, 0, 0, animationPhase, color);
         }
     }
