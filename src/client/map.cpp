@@ -1156,6 +1156,8 @@ bool Map::removeAttachedWidgetFromObject(const UIWidgetPtr& widget) {
     if (it == m_attachedObjectWidgetMap.end())
         return false;
 
+    widget->destroy();
+
     m_attachedObjectWidgetMap.erase(it);
     return true;
 }

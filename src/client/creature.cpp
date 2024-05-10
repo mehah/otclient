@@ -1111,7 +1111,6 @@ void Creature::setWidgetInformation(const UIWidgetPtr& info) {
         return;
 
     if (m_widgetInformation && !m_widgetInformation->isDestroyed()) {
-        m_widgetInformation->destroy();
         g_map.removeAttachedWidgetFromObject(m_widgetInformation);
     }
 
