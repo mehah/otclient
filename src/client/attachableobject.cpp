@@ -192,6 +192,9 @@ bool AttachableObject::detachParticleEffectByName(const std::string& name)
 
 void AttachableObject::drawAttachedParticlesEffect(const Point& dest)
 {
+    if (m_attachedParticles.empty())
+        return;
+
     g_drawPool.pushTransformMatrix();
     g_drawPool.translate(dest);
 
