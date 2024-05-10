@@ -32,7 +32,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
             pool->m_framebuffer->m_useAlphaWriting = false;
             pool->m_framebuffer->disableBlend();
         } else if (type == DrawPoolType::FOREGROUND) {
-            pool->setFPS(FPS10);
+            pool->setFPS(10);
 
             // creates a temporary framebuffer with smoothing.
             pool->m_temporaryFramebuffers.emplace_back(std::make_shared<FrameBuffer>());
@@ -41,7 +41,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
         pool->m_alwaysGroupDrawings = true; // CREATURE_INFORMATION & TEXT
 
         if (type == DrawPoolType::FOREGROUND_MAP) {
-            pool->setFPS(10);
+            pool->setFPS(100);
         }
     }
 
