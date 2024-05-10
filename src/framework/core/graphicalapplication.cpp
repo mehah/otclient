@@ -146,6 +146,9 @@ void GraphicalApplication::run()
 
     // THREAD - POOL & MAP
     g_asyncDispatcher.detach_task([&] {
+        const auto& foregroundUI = g_drawPool.get(DrawPoolType::FOREGROUND);
+        const auto& foregroundMap = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
+
         g_eventThreadId = EventDispatcher::getThreadId();
         while (!m_stopping) {
             poll();
@@ -163,14 +166,18 @@ void GraphicalApplication::run()
 
             m_drawEvents->preLoad();
 
-            const auto& foregroundThread = g_asyncDispatcher.submit_loop(0u, 2u, [this](const size_t i) {
-                if (i == 0) g_ui.render(DrawPoolType::FOREGROUND);
-                else m_drawEvents->drawForgroundMap();
-            });
+            BS::multi_future<void> foreground_threads;
+            foreground_threads.reserve(2);
+
+            if (foregroundUI->canRepaint())
+                foreground_threads.emplace_back(g_asyncDispatcher.submit_task([this] { g_ui.render(DrawPoolType::FOREGROUND); }));
+
+            if (foregroundMap->canRepaint())
+                foreground_threads.emplace_back(g_asyncDispatcher.submit_task([this] { m_drawEvents->drawForgroundMap(); }));
 
             m_drawEvents->drawMap();
 
-            foregroundThread.wait();
+            foreground_threads.wait();
 
             m_mapProcessFrameCounter.update();
         }
