@@ -260,7 +260,6 @@ void Item::setId(uint32_t id)
 #endif
 
     m_clientId = id;
-    m_thingType = g_things.getThingType(m_clientId, ThingCategoryItem).get();
     setConductor();
 
     // Shader example on only items that can be marketed.

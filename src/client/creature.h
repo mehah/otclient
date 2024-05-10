@@ -185,6 +185,9 @@ protected:
     virtual void updateWalk(bool isPreWalking = false);
     virtual void terminateWalk();
 
+    virtual ThingType* getThingType() override;
+    ThingType* getMountThingType() const;
+
     void onDeath();
     void onPositionChange(const Position& newPos, const Position& oldPos) override;
 
@@ -301,8 +304,6 @@ private:
 
     // Mount Shader
     PainterShaderProgramPtr m_mountShader;
-
-    ThingType* m_mountType{ nullptr };
 
     UIWidgetPtr m_widgetInformation;
 
