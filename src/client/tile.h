@@ -123,14 +123,13 @@ public:
     const Position& getPosition() { return m_position; }
     const std::vector<CreaturePtr>& getWalkingCreatures() { return m_walkingCreatures; }
     const std::vector<ThingPtr>& getThings() { return m_things; }
-    const std::vector<EffectPtr>& getEffects() { return m_effects; }
     std::vector<CreaturePtr> getCreatures();
 
     std::vector<ItemPtr> getItems();
     ItemPtr getGround() { const auto& ground = getThing(0); return ground && ground->isGround() ? ground->static_self_cast<Item>() : nullptr; }
     int getGroundSpeed();
     uint8_t getMinimapColorByte();
-    int getThingCount() { return m_things.size() + m_effects.size(); }
+    int getThingCount() { return m_things.size(); }
 
     bool isWalkable(bool ignoreCreatures = false);
     bool isClickable();
@@ -140,17 +139,15 @@ public:
     bool isSingleDimension() { return (m_thingTypeFlag & TileThingType::NOT_SINGLE_DIMENSION) == 0 && m_walkingCreatures.empty(); }
     bool isLookPossible() { return (m_thingTypeFlag & TileThingType::BLOCK_PROJECTTILE) == 0; }
     bool isEmpty() { return m_things.empty(); }
-    bool isDrawable() { return !isEmpty() || !m_walkingCreatures.empty() || !m_effects.empty() || !m_attachedEffects.empty(); }
+    bool isDrawable() { return !isEmpty() || !m_walkingCreatures.empty() || hasEffect() || !m_attachedEffects.empty(); }
     bool isCovered(int8_t firstFloor);
     bool isCompletelyCovered(uint8_t firstFloor, bool resetCache);
 
     bool hasBlockingCreature() const;
 
-    bool hasEffect() const { return !m_effects.empty(); }
+    bool hasEffect() const { return m_effects && !m_effects->empty(); }
     bool hasGround() { return (getGround() && getGround()->isSingleGround()) || m_thingTypeFlag & TileThingType::HAS_GROUND_BORDER; };
     bool hasTopGround(bool ignoreBorder = false) { return (getGround() && getGround()->isTopGround()) || (!ignoreBorder && m_thingTypeFlag & TileThingType::HAS_TOP_GROUND_BORDER); }
-
-    bool hasSurface() { return hasTopItem() || !m_effects.empty() || m_thingTypeFlag & TileThingType::HAS_BOTTOM_ITEM || m_thingTypeFlag & TileThingType::HAS_COMMON_ITEM || hasCreature() || !m_walkingCreatures.empty() || hasTopGround(); }
 
     bool hasCreature() { return m_thingTypeFlag & TileThingType::HAS_CREATURE; }
     bool hasTopItem() const { return m_thingTypeFlag & TileThingType::HAS_TOP_ITEM; }
@@ -175,7 +172,7 @@ public:
     bool canRender(uint32_t& flags, const Position& cameraPosition, AwareRange viewPort);
     bool canErase()
     {
-        return m_walkingCreatures.empty() && m_effects.empty() && isEmpty() && m_minimapColor == 0 && m_attachedEffects.empty()
+        return !isDrawable() && m_minimapColor == 0
 #ifdef FRAMEWORK_EDITOR
             && m_flags == 0
 #endif
@@ -250,8 +247,9 @@ private:
 
     std::vector<CreaturePtr> m_walkingCreatures;
     std::vector<ThingPtr> m_things;
-    std::vector<EffectPtr> m_effects;
-    std::vector<TilePtr> m_tilesRedraw;
+
+    std::unique_ptr<std::vector<EffectPtr>> m_effects;
+    std::unique_ptr<std::vector<TilePtr>> m_tilesRedraw;
 
     ThingPtr m_highlightThing;
 
