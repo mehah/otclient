@@ -65,7 +65,6 @@ public:
     virtual bool isPlayer() { return false; }
     virtual bool isLocalPlayer() { return false; }
 
-    ThingType* getThingType() const { return getThingType(); }
     Animator* getAnimator() const { return getThingType()->getAnimator(); }
     Animator* getIdleAnimator() const { return getThingType()->getIdleAnimator(); }
 
@@ -199,7 +198,7 @@ public:
     bool isHided() { return isOwnerHidden(); }
 
 protected:
-    virtual ThingType* getThingType();
+    virtual ThingType* getThingType() const = 0;
 
     void setAttachedEffectDirection(Otc::Direction dir) const
     {

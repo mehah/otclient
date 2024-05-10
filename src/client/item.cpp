@@ -270,6 +270,10 @@ void Item::setId(uint32_t id)
     */
 }
 
+ThingType* Item::getThingType() const {
+    return g_things.getThingType(m_clientId, ThingCategoryItem).get();
+}
+
 #ifdef FRAMEWORK_EDITOR
 
 std::string Item::getName()

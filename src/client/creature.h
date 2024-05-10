@@ -185,7 +185,7 @@ protected:
     virtual void updateWalk(bool isPreWalking = false);
     virtual void terminateWalk();
 
-    virtual ThingType* getThingType() override;
+    ThingType* getThingType() const override;
     ThingType* getMountThingType() const;
 
     void onDeath();

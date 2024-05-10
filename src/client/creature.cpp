@@ -982,7 +982,7 @@ const Light& Creature::getLight() const
     return m_light.color > 0 && m_light.intensity >= light.intensity ? m_light : light;
 }
 
-ThingType* Creature::getThingType() {
+ThingType* Creature::getThingType() const {
     return g_things.getThingType(m_outfit.isCreature() ? m_outfit.getId() : m_outfit.getAuxId(), m_outfit.getCategory()).get();
 }
 

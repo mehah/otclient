@@ -100,18 +100,3 @@ void Thing::setShader(const std::string_view name) {
 
     m_shader = g_shaders.getShader(name.data());
 }
-
-ThingType* Thing::getThingType() {
-    if (m_clientId == 0)
-        return nullptr;
-
-    ThingCategory category = ThingCategoryItem;
-    if (isMissile())
-        category = ThingCategoryMissile;
-    else if (isEffect())
-        category = ThingCategoryEffect;
-    else if (isCreature())
-        category = ThingCategoryCreature;
-
-    return g_things.getThingType(m_clientId, ThingCategoryMissile).get();
-}

@@ -141,3 +141,7 @@ void Effect::setPosition(const Position& position, uint8_t stackPos, bool hasEle
     m_numPatternX = m_position.x % getNumPatternX();
     m_numPatternY = m_position.y % getNumPatternY();
 }
+
+ThingType* Effect::getThingType() const {
+    return g_things.getThingType(m_clientId, ThingCategoryEffect).get();
+}
