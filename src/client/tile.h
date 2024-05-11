@@ -235,12 +235,18 @@ private:
         }
     }
 
-    Position m_position;
-    Point m_lastDrawDest;
+    std::vector<CreaturePtr> m_walkingCreatures;
+    std::vector<ThingPtr> m_things;
 
-    uint8_t m_drawElevation{ 0 };
-    uint8_t m_minimapColor{ 0 };
-    uint8_t m_elevation{ 0 };
+    std::unique_ptr<std::vector<EffectPtr>> m_effects;
+    std::unique_ptr<std::vector<TilePtr>> m_tilesRedraw;
+
+#ifndef BOT_PROTECTION
+    StaticTextPtr m_timerText;
+    StaticTextPtr m_text;
+    Color m_fill = Color::alpha;
+    ticks_t m_timer = 0;
+#endif
 
     uint32_t m_isCompletelyCovered{ 0 };
     uint32_t m_isCovered{ 0 };
@@ -251,22 +257,16 @@ private:
     uint32_t m_flags{ 0 };
 #endif
 
-    std::vector<CreaturePtr> m_walkingCreatures;
-    std::vector<ThingPtr> m_things;
+    Position m_position;
+    Point m_lastDrawDest;
 
-    std::unique_ptr<std::vector<EffectPtr>> m_effects;
-    std::unique_ptr<std::vector<TilePtr>> m_tilesRedraw;
+    uint8_t m_drawElevation{ 0 };
+    uint8_t m_minimapColor{ 0 };
+    uint8_t m_elevation{ 0 };
 
     int8_t m_highlightThingStackPos = -1;
 
     TileSelectType m_selectType{ TileSelectType::NONE };
 
     bool m_drawTopAndCreature{ true };
-
-#ifndef BOT_PROTECTION
-    ticks_t m_timer = 0;
-    StaticTextPtr m_timerText;
-    StaticTextPtr m_text;
-    Color m_fill = Color::alpha;
-#endif
 };
