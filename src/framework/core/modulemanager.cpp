@@ -25,6 +25,7 @@
 
 #include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>
+#include <framework/core/asyncdispatcher.h>
 #include <framework/otml/otml.h>
 
 ModuleManager g_modules;
@@ -185,7 +186,9 @@ void ModuleManager::enableAutoReload() {
         modules.emplace_back(data);
     }
 
-    g_dispatcher.cycleEvent([modules] {
+    static std::atomic_bool processing{ false };
+
+    auto action = [modules] {
         for (auto& module : modules) {
             bool reload = false;
 
@@ -200,9 +203,22 @@ void ModuleManager::enableAutoReload() {
             }
 
             if (reload) {
-                g_logger.info("Reloading " + module.ref->getName());
-                module.ref->reload();
+                g_dispatcher.addEvent([module = module.ref] {
+                    g_logger.info("Reloading " + module->getName());
+                    module->reload();
+                });
+                break;
             }
         }
-    }, 750);
+
+        processing.store(false);
+    };
+
+    g_dispatcher.cycleEvent([action = std::move(action)] {
+        if (processing.load())
+            return;
+
+        processing.store(true);
+        g_asyncDispatcher.detach_task(action);
+    }, 500);
 }
