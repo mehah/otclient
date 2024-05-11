@@ -46,7 +46,10 @@ protected:
 private:
     Timer m_animationTimer;
     Point m_delta;
-    uint8_t m_distance{ 0 };
+
     float m_duration{ 0.f };
+
     Otc::Direction m_direction{ Otc::InvalidDirection };
+
+    uint8_t m_distance{ 0 };
 };

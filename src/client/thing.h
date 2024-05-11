@@ -210,18 +210,18 @@ protected:
         }
     }
 
-    int8_t m_stackPos{ -1 };
-    uint8_t m_numPatternX{ 0 };
-    uint8_t m_numPatternY{ 0 };
-    uint8_t m_numPatternZ{ 0 };
-
-    uint16_t m_clientId{ 0 };
+    Color m_markedColor{ Color::white };
+    Color m_highlightColor{ Color::white };
 
     Position m_position;
     DrawConductor m_drawConductor{ false, DrawOrder::THIRD };
 
-    Color m_markedColor{ Color::white };
-    Color m_highlightColor{ Color::white };
+    uint16_t m_clientId{ 0 };
+
+    int8_t m_stackPos{ -1 };
+    uint8_t m_numPatternX{ 0 };
+    uint8_t m_numPatternY{ 0 };
+    uint8_t m_numPatternZ{ 0 };
 
     // Shader
     uint8_t m_shaderId{ 0 };
