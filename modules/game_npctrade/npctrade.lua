@@ -359,7 +359,8 @@ function refreshTradeItems()
         itemWidget.onMouseRelease = itemPopup
 
         radioItems:addWidget(itemBox)
-    Extend
+    end
+    
     layout:update()
 end
 
