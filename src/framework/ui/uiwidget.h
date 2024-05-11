@@ -70,7 +70,8 @@ enum FlagProp : uint32_t
     PropImageRepeated = 1 << 20,
     PropImageSmooth = 1 << 21,
     PropImageAutoResize = 1 << 22,
-    PropImageIndividualAnimation = 1 << 23
+    PropImageIndividualAnimation = 1 << 23,
+    PropUpdateChildrenIndexStates = 1 << 24
 };
 
 // @bindclass

@@ -1603,12 +1603,20 @@ void UIWidget::updateChildrenIndexStates()
     if (isDestroyed())
         return;
 
-    for (const auto& child : m_children) {
-        child->updateState(Fw::FirstState);
-        child->updateState(Fw::MiddleState);
-        child->updateState(Fw::LastState);
-        child->updateState(Fw::AlternateState);
-    }
+    if (hasProp(PropUpdateChildrenIndexStates))
+        return;
+
+    setProp(PropUpdateChildrenIndexStates, true);
+
+    g_dispatcher.deferEvent([self = static_self_cast<UIWidget>()] {
+        for (const auto& child : self->m_children) {
+            child->updateState(Fw::FirstState);
+            child->updateState(Fw::MiddleState);
+            child->updateState(Fw::LastState);
+            child->updateState(Fw::AlternateState);
+        }
+        self->setProp(PropUpdateChildrenIndexStates, false);
+    });
 }
 
 void UIWidget::updateStyle()
