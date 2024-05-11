@@ -258,8 +258,8 @@ void Creature::internalDraw(Point dest, LightView* lightView, const Color& color
             if (m_outfit.hasMount()) {
                 dest -= getMountThingType()->getDisplacement() * g_drawPool.getScaleFactor();
 
-                if (!replaceColorShader && m_mountShader) {
-                    g_drawPool.setShaderProgram(m_mountShader, true/*, [this]()-> void {
+                if (!replaceColorShader && hasMountShader()) {
+                    g_drawPool.setShaderProgram(g_shaders.getShaderById(m_mountShaderId), true/*, [this]()-> void {
                         m_mountShader->bind();
                         m_mountShader->setUniformValue(ShaderManager::MOUNT_ID_UNIFORM, m_outfit.getMount());
                     }*/);
@@ -280,7 +280,7 @@ void Creature::internalDraw(Point dest, LightView* lightView, const Color& color
 
             const auto& datType = getThingType();
             const int animationPhase = getCurrentAnimationPhase();
-            const bool useFramebuffer = !replaceColorShader && m_shader && m_shader->useFramebuffer();
+            const bool useFramebuffer = !replaceColorShader && hasShader() && g_shaders.getShaderById(m_shaderId)->useFramebuffer();
 
             const auto& drawCreature = [&](const Point& dest) {
                 // yPattern => creature addon
@@ -289,8 +289,8 @@ void Creature::internalDraw(Point dest, LightView* lightView, const Color& color
                     if (yPattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
                         continue;
 
-                    if (!replaceColorShader && m_shader && !useFramebuffer) {
-                        g_drawPool.setShaderProgram(m_shader, true/*, shaderAction*/);
+                    if (!replaceColorShader && hasShader() && !useFramebuffer) {
+                        g_drawPool.setShaderProgram(g_shaders.getShaderById(m_shaderId), true/*, shaderAction*/);
                     }
 
                     datType->draw(dest, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, color);
@@ -311,7 +311,7 @@ void Creature::internalDraw(Point dest, LightView* lightView, const Color& color
                 const auto& p = (Point(size) - Point(datType->getExactHeight())) / 2;
                 const auto& destFB = Rect(dest - p, Size{ size });
 
-                g_drawPool.setShaderProgram(m_shader, true/*, shaderAction*/);
+                g_drawPool.setShaderProgram(g_shaders.getShaderById(m_shaderId), true/*, shaderAction*/);
 
                 g_drawPool.bindFrameBuffer(destFB.size());
                 drawCreature(p);
@@ -339,8 +339,8 @@ void Creature::internalDraw(Point dest, LightView* lightView, const Color& color
             if (m_outfit.isEffect())
                 animationPhase = std::min<int>(animationPhase + 1, animationPhases);
 
-            if (!replaceColorShader && m_shader)
-                g_drawPool.setShaderProgram(m_shader, true/*, shaderAction*/);
+            if (!replaceColorShader && hasShader())
+                g_drawPool.setShaderProgram(g_shaders.getShaderById(m_shaderId), true/*, shaderAction*/);
             getThingType()->draw(dest - (getDisplacement() * g_drawPool.getScaleFactor()), 0, 0, 0, 0, animationPhase, color);
         }
     }
@@ -1033,7 +1033,14 @@ int Creature::getExactSize(int layer, int xPattern, int yPattern, int zPattern, 
     return m_exactSize = std::max<uint8_t>(exactSize, g_gameConfig.getSpriteSize());
 }
 
-void Creature::setMountShader(const std::string_view name) { m_mountShader = g_shaders.getShader(name); }
+void Creature::setMountShader(const std::string_view name) {
+    m_mountShaderId = 0;
+    if (name.empty())
+        return;
+
+    if (const auto& shader = g_shaders.getShader(name))
+        m_mountShaderId = shader->getId();
+}
 
 void Creature::setTypingIconTexture(const std::string& filename)
 {

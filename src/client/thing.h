@@ -166,7 +166,7 @@ public:
     }
 
     void setShader(const std::string_view name);
-    bool hasShader() { return m_shader != nullptr; }
+    bool hasShader() { return m_shaderId > 0; }
 
     void ungroup() { m_drawConductor.agroup = false; }
 
@@ -224,7 +224,7 @@ protected:
     Color m_highlightColor{ Color::white };
 
     // Shader
-    PainterShaderProgramPtr m_shader;
+    uint8_t m_shaderId{ 0 };
 
 private:
     void lua_setMarked(std::string_view color) { setMarked(Color(color)); }

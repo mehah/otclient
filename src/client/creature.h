@@ -131,6 +131,7 @@ public:
     Outfit getOutfit() { return m_outfit; }
     const Light& getLight() const override;
     bool hasLight() const override { return Thing::hasLight() || getLight().intensity > 0; }
+    bool hasMountShader() const { return m_mountShaderId > 0; }
 
     Point getDisplacement() const override;
     Point getWalkOffset() { return m_walkOffset; }
@@ -303,7 +304,7 @@ private:
     } m_bounce;
 
     // Mount Shader
-    PainterShaderProgramPtr m_mountShader;
+    uint8_t m_mountShaderId{ 0 };
 
     UIWidgetPtr m_widgetInformation;
 

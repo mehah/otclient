@@ -93,10 +93,10 @@ int Thing::getStackPos()
 }
 
 void Thing::setShader(const std::string_view name) {
-    if (name.empty()) {
-        m_shader = nullptr;
+    m_shaderId = 0;
+    if (name.empty())
         return;
-    }
 
-    m_shader = g_shaders.getShader(name.data());
+    if (const auto& shader = g_shaders.getShader(name))
+        m_shaderId = shader->getId();
 }

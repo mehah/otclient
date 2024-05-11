@@ -217,6 +217,7 @@ function terminate()
     g_keyboard.unbindKeyDown(HOTKEY)
     shadersPanel:destroy()
     shadersPanel = nil
+    g_shaders.clear()
 end
 
 function toggle()

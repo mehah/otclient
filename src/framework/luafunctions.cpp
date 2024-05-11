@@ -435,6 +435,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_shaders", "setupMountShader", &ShaderManager::setupMountShader, &g_shaders);
     g_lua.bindSingletonFunction("g_shaders", "addMultiTexture", &ShaderManager::addMultiTexture, &g_shaders);
     g_lua.bindSingletonFunction("g_shaders", "getShader", &ShaderManager::getShader, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "clear", &ShaderManager::clear, &g_shaders);
 
     // UIWidget
     g_lua.registerClass<UIWidget>();

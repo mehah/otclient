@@ -31,14 +31,26 @@
 ShaderManager g_shaders;
 
 void ShaderManager::init() { PainterShaderProgram::release(); }
-void ShaderManager::terminate() { m_shaders.clear(); }
+void ShaderManager::terminate() { clear(); }
+
+void ShaderManager::clear() {
+    m_shaders.clear();
+    m_shadersVector.clear();
+}
+
+void ShaderManager::putShader(std::string name, const PainterShaderProgramPtr& shader) {
+    if (m_shaders.try_emplace(std::move(name), shader).second) {
+        m_shadersVector.emplace_back(shader);
+        shader->m_id = m_shadersVector.size();
+    }
+}
 
 void ShaderManager::createShader(const std::string_view name, bool useFramebuffer)
 {
     g_mainDispatcher.addEvent([this, name = name.data(), useFramebuffer] {
         const auto& shader = std::make_shared<PainterShaderProgram>();
         shader->setUseFramebuffer(useFramebuffer);
-        m_shaders[name] = shader;
+        putShader(name, shader);
         return shader;
     });
 }
@@ -65,7 +77,7 @@ void ShaderManager::createFragmentShader(const std::string_view name, const std:
             return;
         }
 
-        m_shaders[name] = shader;
+        putShader(name, shader);
     });
 }
 
@@ -88,7 +100,7 @@ void ShaderManager::createFragmentShaderFromCode(const std::string_view name, co
             return;
         }
 
-        m_shaders[name] = shader;
+        putShader(name, shader);
     });
 }
 
