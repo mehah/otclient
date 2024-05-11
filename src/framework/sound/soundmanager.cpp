@@ -246,7 +246,7 @@ SoundSourcePtr SoundManager::createSoundSource(const std::string& filename)
             streamSource->setRelative(true);
             streamSource->setPosition(Point(-128, 0));
             combinedSource->addSource(streamSource);
-            m_streamFiles[streamSource] = g_asyncDispatcher.schedule([=]() -> SoundFilePtr {
+            m_streamFiles[streamSource] = g_asyncDispatcher.submit_task([=]() -> SoundFilePtr {
                 stdext::timer a;
                 try {
                     return SoundFile::loadSoundFile(filename);
@@ -261,7 +261,7 @@ SoundSourcePtr SoundManager::createSoundSource(const std::string& filename)
             streamSource->setRelative(true);
             streamSource->setPosition(Point(128, 0));
             combinedSource->addSource(streamSource);
-            m_streamFiles[streamSource] = g_asyncDispatcher.schedule([=]() -> SoundFilePtr {
+            m_streamFiles[streamSource] = g_asyncDispatcher.submit_task([=]() -> SoundFilePtr {
                 try {
                     return SoundFile::loadSoundFile(filename);
                 } catch (std::exception& e) {
