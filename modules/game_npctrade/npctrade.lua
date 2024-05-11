@@ -326,7 +326,6 @@ end
 
 function refreshTradeItems()
     local layout = itemsPanel:getLayout()
-    layout:disableUpdates()
 
     clearSelectedItem()
 
@@ -360,9 +359,7 @@ function refreshTradeItems()
         itemWidget.onMouseRelease = itemPopup
 
         radioItems:addWidget(itemBox)
-    end
-
-    layout:enableUpdates()
+    Extend
     layout:update()
 end
 

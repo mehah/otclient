@@ -732,7 +732,7 @@ void UIWidget::updateLayout()
     // children can affect the parent layout
     if (const auto& parent = getParent()) {
         if (const auto& parentLayout = parent->getLayout())
-            parentLayout->updateLater();
+            parentLayout->update();
     }
 }
 
@@ -889,8 +889,6 @@ void UIWidget::destroy()
 void UIWidget::destroyChildren()
 {
     const auto& layout = getLayout();
-    if (layout)
-        layout->disableUpdates();
 
     m_focusedChild = nullptr;
     m_lockedChildren.clear();
@@ -914,25 +912,17 @@ void UIWidget::destroyChildren()
             }
         }
     }
-
-    if (layout)
-        layout->enableUpdates();
 }
 
 void UIWidget::removeChildren()
 {
     UILayoutPtr layout = getLayout();
-    if (layout)
-        layout->disableUpdates();
 
     m_focusedChild = nullptr;
     m_lockedChildren.clear();
     while (!m_children.empty()) {
         removeChild(m_children.front());
     }
-
-    if (layout)
-        layout->enableUpdates();
 }
 
 void UIWidget::hideChildren()
@@ -996,11 +986,7 @@ void UIWidget::setLayout(const UILayoutPtr& layout)
     if (!layout)
         throw Exception("attempt to set a nil layout to a widget");
 
-    if (m_layout)
-        m_layout->disableUpdates();
-
     layout->setParent(static_self_cast<UIWidget>());
-    layout->disableUpdates();
 
     for (const auto& child : m_children) {
         if (m_layout)
@@ -1009,12 +995,10 @@ void UIWidget::setLayout(const UILayoutPtr& layout)
     }
 
     if (m_layout) {
-        m_layout->enableUpdates();
         m_layout->setParent(nullptr);
         m_layout->update();
     }
 
-    layout->enableUpdates();
     m_layout = layout;
 }
 
@@ -1990,20 +1974,6 @@ void UIWidget::setShader(const std::string_view name) {
 }
 
 void UIWidget::repaint() { g_app.repaint(); }
-void UIWidget::disableUpdateTemporarily() {
-    if (hasProp(PropDisableUpdateTemporarily) || !m_layout)
-        return;
-
-    setProp(PropDisableUpdateTemporarily, true);
-    m_layout->disableUpdates();
-    g_dispatcher.deferEvent([self = static_self_cast<UIWidget>()] {
-        if (self->m_layout) {
-            self->m_layout->enableUpdates();
-            self->m_layout->update();
-        }
-        self->setProp(PropDisableUpdateTemporarily, false);
-    });
-}
 
 void UIWidget::addOnDestroyCallback(const std::string& id, const std::function<void()>&& callback)
 {
