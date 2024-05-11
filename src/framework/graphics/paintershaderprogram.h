@@ -51,6 +51,10 @@ protected:
 public:
     PainterShaderProgram();
 
+    uint8_t getId() const {
+        return m_id;
+    }
+
     bool link() override;
 
     void setTransformMatrix(const Matrix3& transformMatrix);
@@ -73,6 +77,8 @@ public:
     }
 
 private:
+    uint8_t m_id;
+
     bool m_useFramebuffer{ false };
 
     float m_startTime{ 0 };
@@ -88,4 +94,6 @@ private:
     Size m_resolution;
 
     std::vector<TexturePtr> m_multiTextures;
+
+    friend class ShaderManager;
 };

@@ -1074,7 +1074,7 @@ void Map::findPathAsync(const Position& start, const Position& goal, const std::
         }
     }
 
-    g_asyncDispatcher.dispatch([=] {
+    g_asyncDispatcher.detach_task([=] {
         const auto ret = g_map.newFindPath(start, goal, visibleNodes);
         g_dispatcher.addEvent(std::bind(callback, ret));
     });
@@ -1156,6 +1156,8 @@ bool Map::removeAttachedWidgetFromObject(const UIWidgetPtr& widget) {
     if (it == m_attachedObjectWidgetMap.end())
         return false;
 
+    widget->destroy();
+
     m_attachedObjectWidgetMap.erase(it);
     return true;
 }
@@ -1207,7 +1209,6 @@ void Map::updateAttachedWidgets(const MapViewPtr& mapView)
         const auto& widgetRect = widget->getRect();
         const auto& newWidgetRect = Rect(p, widgetRect.width(), widgetRect.height());
 
-        widget->disableUpdateTemporarily();
         widget->setRect(newWidgetRect);
     }
 }

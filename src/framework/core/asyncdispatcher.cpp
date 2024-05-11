@@ -22,10 +22,10 @@
 
 #include "asyncdispatcher.h"
 
-AsyncDispatcher g_asyncDispatcher;
+uint8_t getThreadCount() {
+    static constexpr auto MAX_THREADS = 6u;
+    static constexpr auto MIN_THREADS = 3u;
 
-void AsyncDispatcher::init(uint8_t maxThreads)
-{
     /*
     * -1 = Graphic
     *  1 = Map and (Connection, Particle and Sound) Pool
@@ -33,29 +33,7 @@ void AsyncDispatcher::init(uint8_t maxThreads)
     *  3 = Foreground MAP
     *  4 = Extra, ex: pathfinder and lighting system
     */
-    const uint8_t minThreads = 4;
-
-    if (maxThreads == 0)
-        maxThreads = 6;
-
-    // 2 = Min Threads
-    int_fast8_t threads = std::clamp<int_fast8_t>(std::thread::hardware_concurrency() - 1, minThreads, maxThreads);
-    while (--threads >= 0)
-        m_threads.emplace_back([this] { m_ioService.run(); });
+    return std::clamp<int_fast8_t>(std::thread::hardware_concurrency() - 1, MIN_THREADS, MAX_THREADS);
 }
 
-void AsyncDispatcher::terminate() { stop(); }
-
-void AsyncDispatcher::stop()
-{
-    if (m_ioService.stopped()) {
-        return;
-    }
-
-    m_ioService.stop();
-
-    for (auto& thread : m_threads) {
-        if (thread.joinable())
-            thread.join();
-    }
-};
+BS::thread_pool g_asyncDispatcher{ getThreadCount() };
