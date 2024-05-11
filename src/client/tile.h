@@ -229,6 +229,11 @@ private:
     }
 
     bool hasThingWithElevation() const { return hasElevation() && m_thingTypeFlag & TileThingType::HAS_THING_WITH_ELEVATION; }
+    void markHighlightedThing(const Color& color) {
+        if (m_highlightThingStackPos > -1 && m_highlightThingStackPos < m_things.size()) {
+            m_things[m_highlightThingStackPos]->setMarked(color);
+        }
+    }
 
     Position m_position;
     Point m_lastDrawDest;

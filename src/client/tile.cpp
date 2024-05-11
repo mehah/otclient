@@ -667,8 +667,7 @@ bool Tile::limitsFloorsView(bool isFreeView)
 
 bool Tile::checkForDetachableThing(const TileSelectType selectType)
 {
-    if (m_highlightThingStackPos > -1)
-        m_things[m_highlightThingStackPos]->setMarked(Color::white);
+    markHighlightedThing(Color::white);
 
     m_highlightThingStackPos = -1;
     if (const auto& creature = getTopCreature()) {
@@ -822,16 +821,14 @@ void Tile::select(TileSelectType selectType)
         checkForDetachableThing(selectType);
     }
 
-    if (m_highlightThingStackPos > -1)
-        m_things[m_highlightThingStackPos]->setMarked(Color::yellow);
+    markHighlightedThing(Color::yellow);
 
     m_selectType = selectType;
 }
 
 void Tile::unselect()
 {
-    if (m_highlightThingStackPos > -1)
-        m_things[m_highlightThingStackPos]->setMarked(Color::white);
+    markHighlightedThing(Color::white);
 
     if (m_selectType == TileSelectType::NO_FILTERED)
         checkForDetachableThing();
