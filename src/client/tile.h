@@ -214,6 +214,7 @@ public:
     bool canShoot(int distance);
 #endif
 private:
+    void updateThingStackPos();
     void drawTop(const Point& dest, int flags, bool forceDraw, LightView* lightView = nullptr);
     void drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags, bool forceDraw, LightView* lightView = nullptr);
     void drawThing(const ThingPtr& thing, const Point& dest, int flags, LightView* lightView);
@@ -251,7 +252,7 @@ private:
     std::unique_ptr<std::vector<EffectPtr>> m_effects;
     std::unique_ptr<std::vector<TilePtr>> m_tilesRedraw;
 
-    ThingPtr m_highlightThing;
+    int8_t m_highlightThingStackPos = -1;
 
     TileSelectType m_selectType{ TileSelectType::NONE };
 

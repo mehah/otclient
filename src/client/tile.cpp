@@ -145,7 +145,7 @@ void Tile::clean()
         clearAttachedWidgets();
     }
 
-    m_highlightThing = nullptr;
+    m_highlightThingStackPos = -1;
     while (!m_things.empty())
         removeThing(m_things.front());
 
@@ -172,6 +172,12 @@ void Tile::removeWalkingCreature(const CreaturePtr& creature)
 
     m_walkingCreatures.erase(it);
     recalculateThingFlag();
+}
+
+void Tile::updateThingStackPos() {
+    for (int stackpos = -1, s = m_things.size(); ++stackpos < s;) {
+        m_things[stackpos]->m_stackPos = stackpos;
+    }
 }
 
 // TODO: Need refactoring
@@ -253,10 +259,12 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
     const bool hasElev = hasElevation();
 
     setThingFlag(thing);
-    checkForDetachableThing();
 
     if (size > g_gameConfig.getTileMaxThings())
         removeThing(m_things[g_gameConfig.getTileMaxThings()]);
+
+    updateThingStackPos();
+    checkForDetachableThing();
 
     // Do not change if you do not understand what is being done.
     {
@@ -297,10 +305,15 @@ bool Tile::removeThing(const ThingPtr thing)
 
     m_things.erase(it);
 
+    m_highlightThingStackPos = -1;
+    thing->m_stackPos = -1;
+    thing->setMarked(Color::white);
+
     recalculateThingFlag();
     if (thing->hasElevation())
         --m_elevation;
 
+    updateThingStackPos();
     checkForDetachableThing();
 
     thing->onDisappear();
@@ -654,12 +667,12 @@ bool Tile::limitsFloorsView(bool isFreeView)
 
 bool Tile::checkForDetachableThing(const TileSelectType selectType)
 {
-    if (m_highlightThing)
-        m_highlightThing->setMarked(Color::white);
+    if (m_highlightThingStackPos > -1)
+        m_things[m_highlightThingStackPos]->setMarked(Color::white);
 
-    m_highlightThing = nullptr;
+    m_highlightThingStackPos = -1;
     if (const auto& creature = getTopCreature()) {
-        m_highlightThing = creature;
+        m_highlightThingStackPos = creature->getStackPos();
         return true;
     }
 
@@ -674,7 +687,7 @@ bool Tile::checkForDetachableThing(const TileSelectType selectType)
             if (isFiltered && item->isIgnoreLook() && !item->isUsable() && !item->hasLight())
                 continue;
 
-            m_highlightThing = item;
+            m_highlightThingStackPos = item->getStackPos();
             return true;
         }
     }
@@ -687,7 +700,7 @@ bool Tile::checkForDetachableThing(const TileSelectType selectType)
             if (isFiltered && (item->isIgnoreLook() || item->isFluidContainer()))
                 continue;
 
-            m_highlightThing = item;
+            m_highlightThingStackPos = item->getStackPos();
             return true;
         }
     }
@@ -701,13 +714,13 @@ bool Tile::checkForDetachableThing(const TileSelectType selectType)
             if (isFiltered && (item->isIgnoreLook() || !item->hasLensHelp()))
                 continue;
 
-            m_highlightThing = item;
+            m_highlightThingStackPos = item->getStackPos();
             return true;
         }
     }
 
     if (!isFiltered) {
-        m_highlightThing = m_things.back();
+        m_highlightThingStackPos = m_things.size() - 1;
         return true;
     }
 
@@ -809,16 +822,16 @@ void Tile::select(TileSelectType selectType)
         checkForDetachableThing(selectType);
     }
 
-    if (m_highlightThing)
-        m_highlightThing->setMarked(Color::yellow);
+    if (m_highlightThingStackPos > -1)
+        m_things[m_highlightThingStackPos]->setMarked(Color::yellow);
 
     m_selectType = selectType;
 }
 
 void Tile::unselect()
 {
-    if (m_highlightThing)
-        m_highlightThing->setMarked(Color::white);
+    if (m_highlightThingStackPos > -1)
+        m_things[m_highlightThingStackPos]->setMarked(Color::white);
 
     if (m_selectType == TileSelectType::NO_FILTERED)
         checkForDetachableThing();

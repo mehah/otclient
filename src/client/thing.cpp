@@ -85,8 +85,8 @@ int Thing::getStackPos()
     if (m_position.x == UINT16_MAX && isItem()) // is inside a container
         return m_position.z;
 
-    if (const TilePtr& tile = getTile())
-        return tile->getThingStackPos(static_self_cast<Thing>());
+    if (m_stackPos >= 0)
+        return m_stackPos;
 
     g_logger.traceError("got a thing with invalid stackpos");
     return -1;

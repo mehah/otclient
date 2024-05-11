@@ -208,6 +208,7 @@ protected:
         }
     }
 
+    int8_t m_stackPos{ -1 };
     uint8_t m_numPatternX{ 0 };
     uint8_t m_numPatternY{ 0 };
     uint8_t m_numPatternZ{ 0 };
@@ -230,5 +231,6 @@ private:
     bool m_canDraw{ true };
 
     friend class Client;
+    friend class Tile;
 };
 #pragma pack(pop)
