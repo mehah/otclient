@@ -116,6 +116,16 @@ ItemPtr Item::clone()
 {
     auto item = std::make_shared<Item>();
     *(item.get()) = *this;
+
+    if (item->m_data) {
+        item->m_data = nullptr;
+
+        // Copy Vector
+        item->getData()->attachedEffects = m_data->attachedEffects;
+        item->getData()->attachedParticles = m_data->attachedParticles;
+        item->getData()->attachedWidgets = m_data->attachedWidgets;
+    }
+
     return item;
 }
 

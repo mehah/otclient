@@ -139,7 +139,7 @@ public:
     bool isSingleDimension() { return (m_thingTypeFlag & TileThingType::NOT_SINGLE_DIMENSION) == 0 && m_walkingCreatures.empty(); }
     bool isLookPossible() { return (m_thingTypeFlag & TileThingType::BLOCK_PROJECTTILE) == 0; }
     bool isEmpty() { return m_things.empty(); }
-    bool isDrawable() { return !isEmpty() || !m_walkingCreatures.empty() || hasEffect() || !m_attachedEffects.empty(); }
+    bool isDrawable() { return !isEmpty() || !m_walkingCreatures.empty() || hasEffect() || hasAttachedEffects(); }
     bool isCovered(int8_t firstFloor);
     bool isCompletelyCovered(uint8_t firstFloor, bool resetCache);
 
