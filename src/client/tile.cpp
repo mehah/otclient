@@ -669,9 +669,15 @@ bool Tile::checkForDetachableThing(const TileSelectType selectType)
 {
     markHighlightedThing(Color::white);
 
+    const auto& markIfYouNeed = [&] {
+        if (m_selectType == TileSelectType::NONE) return;
+        markHighlightedThing(Color::yellow);
+    };
+
     m_highlightThingStackPos = -1;
     if (const auto& creature = getTopCreature()) {
         m_highlightThingStackPos = creature->getStackPos();
+        markIfYouNeed();
         return true;
     }
 
@@ -687,6 +693,7 @@ bool Tile::checkForDetachableThing(const TileSelectType selectType)
                 continue;
 
             m_highlightThingStackPos = item->getStackPos();
+            markIfYouNeed();
             return true;
         }
     }
@@ -700,6 +707,7 @@ bool Tile::checkForDetachableThing(const TileSelectType selectType)
                 continue;
 
             m_highlightThingStackPos = item->getStackPos();
+            markIfYouNeed();
             return true;
         }
     }
@@ -714,12 +722,14 @@ bool Tile::checkForDetachableThing(const TileSelectType selectType)
                 continue;
 
             m_highlightThingStackPos = item->getStackPos();
+            markIfYouNeed();
             return true;
         }
     }
 
     if (!isFiltered) {
         m_highlightThingStackPos = m_things.size() - 1;
+        markIfYouNeed();
         return true;
     }
 
@@ -817,23 +827,23 @@ void Tile::setThingFlag(const ThingPtr& thing)
 
 void Tile::select(TileSelectType selectType)
 {
+    m_selectType = selectType;
+
     if (selectType == TileSelectType::NO_FILTERED && !isEmpty()) {
         checkForDetachableThing(selectType);
     }
 
     markHighlightedThing(Color::yellow);
-
-    m_selectType = selectType;
 }
 
 void Tile::unselect()
 {
+    m_selectType = TileSelectType::NONE;
+
     markHighlightedThing(Color::white);
 
     if (m_selectType == TileSelectType::NO_FILTERED)
         checkForDetachableThing();
-
-    m_selectType = TileSelectType::NONE;
 }
 
 bool Tile::canRender(uint32_t& flags, const Position& cameraPosition, const AwareRange viewPort)
