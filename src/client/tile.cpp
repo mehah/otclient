@@ -65,6 +65,8 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, LightVi
         drawThing(thing, dest, flags, lightView);
     }
 
+    drawAttachedEffect(dest, lightView, false);
+
     if (hasCommonItem()) {
         for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
             const auto& item = *it;
@@ -83,7 +85,7 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, LightVi
 
     drawCreature(dest, mapRect, flags, false, lightView);
     drawTop(dest, flags, false, lightView);
-    drawAttachedEffect(dest, lightView, false);
+    drawAttachedEffect(dest, lightView, true);
     drawAttachedParticlesEffect(dest);
 }
 
