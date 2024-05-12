@@ -157,7 +157,9 @@ void Game::processPendingGame()
 
 void Game::processEnterGame()
 {
-    m_localPlayer->setPendingGame(false);
+    g_dispatcher.addEvent([localPlayer = m_localPlayer] {
+        localPlayer->setPendingGame(false);
+    });
     g_lua.callGlobalField("g_game", "onEnterGame");
 }
 

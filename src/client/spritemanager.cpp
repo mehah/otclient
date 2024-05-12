@@ -22,6 +22,8 @@
 
 #include "spritemanager.h"
 #include <framework/core/filestream.h>
+#include <framework/core/asyncdispatcher.h>
+#include <framework/core/eventdispatcher.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/image.h>
 #include "game.h"
@@ -31,7 +33,7 @@
 
 SpriteManager g_sprites;
 
-void SpriteManager::init() { }
+void SpriteManager::init() {}
 void SpriteManager::terminate() { unload(); }
 
 void SpriteManager::reload() {
@@ -41,12 +43,15 @@ void SpriteManager::reload() {
     if (m_lastFileName.empty())
         return;
 
-    if (m_spritesFile)
-        m_spritesFile->close();
+    load();
+}
 
-    m_spritesFile = g_resources.openFile(m_lastFileName);
-    if (!g_app.isLoadingAsyncTexture())
-        m_spritesFile->cache();
+void SpriteManager::load() {
+    m_spritesFiles.resize(g_asyncDispatcher.get_thread_count());
+    if (g_app.isLoadingAsyncTexture()) {
+        for (auto& file : m_spritesFiles)
+            file = std::make_unique<FileStream_m>(g_resources.openFile(m_lastFileName));
+    } else (m_spritesFiles[0] = std::make_unique<FileStream_m>(g_resources.openFile(m_lastFileName)))->file->cache();
 }
 
 bool SpriteManager::loadSpr(std::string file)
@@ -56,18 +61,16 @@ bool SpriteManager::loadSpr(std::string file)
     m_loaded = false;
     try {
         m_lastFileName = g_resources.guessFilePath(file, "spr");
-        m_spritesFile = g_resources.openFile(m_lastFileName);
-
-        if (!g_app.isLoadingAsyncTexture())
-            m_spritesFile->cache();
+        load();
 
         if (g_app.isEncrypted()) {
-            ResourceManager::decrypt(m_spritesFile->m_data.data(), m_spritesFile->m_data.size());
+            ResourceManager::decrypt(getSpriteFile()->m_data.data(), getSpriteFile()->m_data.size());
         }
 
-        m_signature = m_spritesFile->getU32();
-        m_spritesCount = g_game.getFeature(Otc::GameSpritesU32) ? m_spritesFile->getU32() : m_spritesFile->getU16();
-        m_spritesOffset = m_spritesFile->tell();
+        m_signature = getSpriteFile()->getU32();
+        m_spritesCount = g_game.getFeature(Otc::GameSpritesU32) ? getSpriteFile()->getU32() : getSpriteFile()->getU16();
+        m_spritesOffset = getSpriteFile()->tell();
+
         m_loaded = true;
         g_lua.callGlobalField("g_sprites", "onLoadSpr", file);
         return true;
@@ -105,22 +108,22 @@ void SpriteManager::saveSpr(const std::string& fileName)
             fin->addU32(0);
 
         for (uint_fast32_t i = 1; i <= m_spritesCount; ++i) {
-            m_spritesFile->seek((i - 1) * 4 + m_spritesOffset);
-            const uint32_t fromAdress = m_spritesFile->getU32();
+            getSpriteFile()->seek((i - 1) * 4 + m_spritesOffset);
+            const uint32_t fromAdress = getSpriteFile()->getU32();
             if (fromAdress != 0) {
                 fin->seek(offset + (i - 1) * 4);
                 fin->addU32(spriteAddress);
                 fin->seek(spriteAddress);
 
-                m_spritesFile->seek(fromAdress);
-                fin->addU8(m_spritesFile->getU8());
-                fin->addU8(m_spritesFile->getU8());
-                fin->addU8(m_spritesFile->getU8());
+                getSpriteFile()->seek(fromAdress);
+                fin->addU8(getSpriteFile()->getU8());
+                fin->addU8(getSpriteFile()->getU8());
+                fin->addU8(getSpriteFile()->getU8());
 
-                const uint16_t dataSize = m_spritesFile->getU16();
+                const uint16_t dataSize = getSpriteFile()->getU16();
                 fin->addU16(dataSize);
                 char spriteData[SPRITE_DATA_SIZE];
-                m_spritesFile->read(spriteData, dataSize);
+                getSpriteFile()->read(spriteData, dataSize);
                 fin->write(spriteData, dataSize);
 
                 spriteAddress = fin->tell();
@@ -140,7 +143,7 @@ void SpriteManager::unload()
 {
     m_spritesCount = 0;
     m_signature = 0;
-    m_spritesFile = nullptr;
+    m_spritesFiles.clear();
 }
 
 ImagePtr SpriteManager::getSpriteImage(int id)
@@ -149,11 +152,20 @@ ImagePtr SpriteManager::getSpriteImage(int id)
         return g_spriteAppearances.getSpriteImage(id);
     }
 
-    if (g_app.isLoadingAsyncTexture())
-        return getSpriteImage(id, g_resources.openFile(m_lastFileName));
+    const auto threadId = g_app.isLoadingAsyncTexture() ? g_dispatcher.getThreadId() : 0;
+    if (const auto& sf = m_spritesFiles[threadId]) {
+        thread_local static int lastThreadId = -1;
 
-    std::scoped_lock l(m_mutex);
-    return getSpriteImage(id, m_spritesFile);
+        if (lastThreadId != threadId) {
+            g_logger.info(std::to_string(threadId));
+            lastThreadId = threadId;
+        }
+
+        std::scoped_lock l(sf->mutex);
+        return getSpriteImage(id, sf->file);
+    }
+
+    return nullptr;
 }
 
 ImagePtr SpriteManager::getSpriteImage(int id, const FileStreamPtr& file) {
