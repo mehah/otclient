@@ -37,7 +37,6 @@ AttachedEffectPtr AttachedEffect::create(uint16_t thingId, ThingCategory categor
     const auto& obj = std::make_shared<AttachedEffect>();
     obj->m_thingId = thingId;
     obj->m_thingCategory = category;
-    obj->m_thingType = g_things.getThingType(obj->m_thingId, obj->m_thingCategory).get();
     return obj;
 }
 
@@ -57,7 +56,7 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
     if (m_transform)
         return;
 
-    if (m_texture != nullptr || m_thingType != nullptr) {
+    if (m_texture != nullptr || getThingType() != nullptr) {
         const auto& dirControl = m_offsetDirections[m_direction];
         if (dirControl.onTop != isOnTop)
             return;
@@ -97,7 +96,7 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
             const auto& rect = Rect(Point(), texture->getSize());
             g_drawPool.addTexturedRect(Rect(point, size), texture, rect, Color::white, { .order = getDrawOrder() });
         } else {
-            m_thingType->draw(point, 0, m_direction, 0, 0, animation, Color::white, true, lightView, { .order = getDrawOrder() });
+            getThingType()->draw(point, 0, m_direction, 0, 0, animation, Color::white, true, lightView, { .order = getDrawOrder() });
         }
     }
 
@@ -112,23 +111,25 @@ int AttachedEffect::getCurrentAnimationPhase()
         return m_frame;
     }
 
-    const auto* animator = m_thingType->getIdleAnimator();
-    if (!animator && m_thingType->isAnimateAlways())
-        animator = m_thingType->getAnimator();
+    const auto thingTye = getThingType();
+
+    const auto* animator = thingTye->getIdleAnimator();
+    if (!animator && thingTye->isAnimateAlways())
+        animator = thingTye->getAnimator();
 
     if (animator)
         return animator->getPhaseAt(m_animationTimer, getSpeed());
 
-    if (m_thingType->isEffect()) {
-        const int lastPhase = m_thingType->getAnimationPhases() - 1;
+    if (thingTye->isEffect()) {
+        const int lastPhase = thingTye->getAnimationPhases() - 1;
         const int phase = std::min<int>(static_cast<int>(m_animationTimer.ticksElapsed() / (g_gameConfig.getEffectTicksPerFrame() / getSpeed())), lastPhase);
         if (phase == lastPhase) m_animationTimer.restart();
         return phase;
     }
 
-    if (m_thingType->isCreature() && m_thingType->isAnimateAlways()) {
-        const int ticksPerFrame = std::round(1000 / m_thingType->getAnimationPhases()) / getSpeed();
-        return (g_clock.millis() % (static_cast<long long>(ticksPerFrame) * m_thingType->getAnimationPhases())) / ticksPerFrame;
+    if (thingTye->isCreature() && thingTye->isAnimateAlways()) {
+        const int ticksPerFrame = std::round(1000 / thingTye->getAnimationPhases()) / getSpeed();
+        return (g_clock.millis() % (static_cast<long long>(ticksPerFrame) * thingTye->getAnimationPhases())) / ticksPerFrame;
     }
 
     return 0;
@@ -139,4 +140,8 @@ void AttachedEffect::setShader(const std::string_view name) { m_shader = g_shade
 void AttachedEffect::move(const Position& fromPosition, const Position& toPosition) {
     m_toPoint = Point(toPosition.x - fromPosition.x, toPosition.y - fromPosition.y) * g_gameConfig.getSpriteSize();
     m_animationTimer.restart();
+}
+
+ThingType* AttachedEffect::getThingType() const {
+    return m_thingId > 0 ? g_things.getThingType(m_thingId, m_thingCategory).get() : nullptr;
 }

@@ -65,9 +65,15 @@ void Item::internalDraw(int animationPhase, const Point& dest, const Color& colo
     if (replaceColorShader)
         g_drawPool.setShaderProgram(g_painter->getReplaceColorShader(), true);
     else {
+        // Example of how to send a UniformValue to shader
+        /*const auto& shaderAction = [=]()-> void {
+            m_shader->bind();
+            m_shader->setUniformValue(ShaderManager::ITEM_ID_UNIFORM, static_cast<int>(getId()));
+        };*/
+
         drawAttachedEffect(dest, lightView, false); // On Bottom
-        if (m_shader)
-            g_drawPool.setShaderProgram(m_shader, true, m_shaderAction);
+        if (hasShader())
+            g_drawPool.setShaderProgram(g_shaders.getShaderById(m_shaderId), true/*, shaderAction*/);
     }
 
     getThingType()->draw(dest, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, color, drawThings, lightView, m_drawConductor);
@@ -110,6 +116,16 @@ ItemPtr Item::clone()
 {
     auto item = std::make_shared<Item>();
     *(item.get()) = *this;
+
+    if (item->m_data) {
+        item->m_data = nullptr;
+
+        // Copy Vector
+        item->getData()->attachedEffects = m_data->attachedEffects;
+        item->getData()->attachedParticles = m_data->attachedParticles;
+        item->getData()->attachedWidgets = m_data->attachedWidgets;
+    }
+
     return item;
 }
 
@@ -254,21 +270,18 @@ void Item::setId(uint32_t id)
 #endif
 
     m_clientId = id;
-    m_thingType = g_things.getThingType(m_clientId, ThingCategoryItem).get();
     setConductor();
 
     // Shader example on only items that can be marketed.
     /*
     if (isMarketable()) {
         m_shader = g_shaders.getShader("Outfit - Rainbow");
-
-        // Example of how to send a UniformValue to shader
-        m_shaderAction = [=]()-> void {
-            m_shader->bind();
-            m_shader->setUniformValue(ShaderManager::ITEM_ID_UNIFORM, static_cast<int>(id));
-        };
     }
     */
+}
+
+ThingType* Item::getThingType() const {
+    return g_things.getThingType(m_clientId, ThingCategoryItem).get();
 }
 
 #ifdef FRAMEWORK_EDITOR

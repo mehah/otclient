@@ -173,10 +173,12 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     std::scoped_lock l(pool->m_mutexDraw);
 
     pool->setEnable(true);
-    if (pool->hasFrameBuffer())
+    if (pool->hasFrameBuffer()) {
         pool->m_framebuffer->prepare(dest, src, colorClear);
+        pool->m_repaint = pool->canRepaint(true);
+    } else pool->m_repaint = true;
 
-    pool->release(pool->m_repaint = pool->canRepaint(true));
+    pool->release(pool->m_repaint);
 }
 
 bool DrawPoolManager::drawPool(const DrawPoolType type) {

@@ -187,7 +187,7 @@ private:
     void bindFrameBuffer(const Size& size, const Color& color = Color::white);
     void releaseFrameBuffer(const Rect& dest);
 
-    inline void setFPS(uint16_t fps) { m_refreshDelay = fps; }
+    inline void setFPS(uint16_t fps) { m_refreshDelay = 1000 / fps; }
 
     void updateHash(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color);
     PoolState getState(const TexturePtr& texture, const Color& color);

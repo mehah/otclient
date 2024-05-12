@@ -326,7 +326,6 @@ end
 
 function refreshTradeItems()
     local layout = itemsPanel:getLayout()
-    layout:disableUpdates()
 
     clearSelectedItem()
 
@@ -361,8 +360,7 @@ function refreshTradeItems()
 
         radioItems:addWidget(itemBox)
     end
-
-    layout:enableUpdates()
+    
     layout:update()
 end
 

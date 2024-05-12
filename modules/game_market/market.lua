@@ -1246,7 +1246,6 @@ function Market.refreshItemsWidget(selectItem)
     itemsPanel = browsePanel:recursiveGetChildById('itemsPanel')
 
     local layout = itemsPanel:getLayout()
-    layout:disableUpdates()
 
     Market.clearSelectedItem()
     itemsPanel:destroyChildren()
@@ -1284,7 +1283,6 @@ function Market.refreshItemsWidget(selectItem)
         radioItemSet:selectWidget(select, false)
     end
 
-    layout:enableUpdates()
     layout:update()
 end
 

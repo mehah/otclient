@@ -48,8 +48,8 @@ protected:
 class GraphicalApplicationContext : public ApplicationContext
 {
 public:
-    GraphicalApplicationContext(uint8_t asyncDispatchMaxThreads, uint8_t spriteSize, ApplicationDrawEventsPtr drawEvents) :
-        ApplicationContext(asyncDispatchMaxThreads),
+    GraphicalApplicationContext(uint8_t spriteSize, ApplicationDrawEventsPtr drawEvents) :
+        ApplicationContext(),
         m_spriteSize(spriteSize),
         m_drawEvents(drawEvents)
     {}

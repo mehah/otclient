@@ -149,6 +149,8 @@ public:
 #endif
 
 private:
+    ThingType* getThingType() const override;
+
     void internalDraw(int animationPhase, const Point& dest, const Color& color, bool drawThings, bool replaceColorShader, LightView* lightView = nullptr);
     void setConductor();
 

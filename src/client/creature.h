@@ -131,6 +131,7 @@ public:
     Outfit getOutfit() { return m_outfit; }
     const Light& getLight() const override;
     bool hasLight() const override { return Thing::hasLight() || getLight().intensity > 0; }
+    bool hasMountShader() const { return m_mountShaderId > 0; }
 
     Point getDisplacement() const override;
     Point getWalkOffset() { return m_walkOffset; }
@@ -185,6 +186,9 @@ protected:
     virtual void updateWalk(bool isPreWalking = false);
     virtual void terminateWalk();
 
+    ThingType* getThingType() const override;
+    ThingType* getMountThingType() const;
+
     void onDeath();
     void onPositionChange(const Position& newPos, const Position& oldPos) override;
 
@@ -216,8 +220,60 @@ private:
         uint16_t getDuration(Otc::Direction dir) const { return Position::isDiagonal(dir) ? diagonalDuration : duration; }
     };
 
+    UIWidgetPtr m_widgetInformation;
+
+    TilePtr m_walkingTile;
+
+    TexturePtr m_skullTexture;
+    TexturePtr m_shieldTexture;
+    TexturePtr m_emblemTexture;
+    TexturePtr m_typeTexture;
+    TexturePtr m_iconTexture;
+    TexturePtr m_typingIconTexture;
+
+    ScheduledEventPtr m_walkUpdateEvent;
+    ScheduledEventPtr m_walkFinishAnimEvent;
+    ScheduledEventPtr m_outfitColorUpdateEvent;
+
+    EventPtr m_disappearEvent;
+
+    CachedText m_name;
+    CachedStep m_stepCache;
+
+    Position m_lastStepFromPosition;
+    Position m_lastStepToPosition;
+    Position m_oldPosition;
+
+    Timer m_footTimer;
+    Timer m_outfitColorTimer;
+
     Outfit m_outfit;
     Light m_light;
+
+    Color m_timedSquareColor{ Color::white };
+    Color m_staticSquareColor{ Color::white };
+    Color m_informationColor{ Color::white };
+
+    struct
+    {
+        uint8_t minHeight{ 0 };
+        uint8_t height{ 0 };
+        uint16_t speed{ 0 };
+    } m_bounce;
+
+    // jump related
+    Timer m_jumpTimer;
+    PointF m_jumpOffset;
+    float m_jumpHeight{ 0 };
+    float m_jumpDuration{ 0 };
+
+    uint32_t m_id{ 0 };
+    uint32_t m_masterId{ 0 };
+
+    uint16_t m_calculatedStepSpeed{ 0 };
+    uint16_t m_speed{ 0 };
+    uint16_t m_baseSpeed{ 0 };
+    uint16_t m_walkingAnimationSpeed{ 0 };
 
     uint8_t m_type;
     uint8_t m_healthPercent{ 101 };
@@ -232,20 +288,13 @@ private:
 
     uint8_t m_exactSize{ 0 };
 
-    uint16_t m_calculatedStepSpeed{ 0 };
-    uint16_t m_speed{ 0 };
-    uint16_t m_baseSpeed{ 0 };
-    uint16_t m_walkingAnimationSpeed{ 0 };
+    uint8_t m_disableWalkAnimation{ 0 };
 
-    uint32_t m_id{ 0 };
-    uint32_t m_masterId{ 0 };
+    // Mount Shader
+    uint8_t m_mountShaderId{ 0 };
 
-    TexturePtr m_skullTexture;
-    TexturePtr m_shieldTexture;
-    TexturePtr m_emblemTexture;
-    TexturePtr m_typeTexture;
-    TexturePtr m_iconTexture;
-    TexturePtr m_typingIconTexture;
+    Otc::Direction m_walkTurnDirection{ Otc::InvalidDirection };
+    Otc::Direction m_lastStepDirection{ Otc::InvalidDirection };
 
     bool m_shieldBlink{ false };
     bool m_passable{ false };
@@ -258,54 +307,6 @@ private:
     bool m_showShieldTexture{ true };
     bool m_typing{ false };
     bool m_isCovered{ false };
-
-    uint8_t m_disableWalkAnimation{ 0 };
-
-    Color m_timedSquareColor{ Color::white };
-    Color m_staticSquareColor{ Color::white };
-    Color m_informationColor{ Color::white };
-
-    CachedText m_name;
-    CachedStep m_stepCache;
-
-    ScheduledEventPtr m_walkUpdateEvent;
-    ScheduledEventPtr m_walkFinishAnimEvent;
-    ScheduledEventPtr m_outfitColorUpdateEvent;
-
-    EventPtr m_disappearEvent;
-
-    Otc::Direction m_walkTurnDirection{ Otc::InvalidDirection };
-    Otc::Direction m_lastStepDirection{ Otc::InvalidDirection };
-
-    Timer m_footTimer;
-    Timer m_outfitColorTimer;
-
-    TilePtr m_walkingTile;
-
-    Position m_lastStepFromPosition;
-    Position m_lastStepToPosition;
-    Position m_oldPosition;
-
-    // jump related
-    float m_jumpHeight{ 0 };
-    float m_jumpDuration{ 0 };
-    PointF m_jumpOffset;
-    Timer m_jumpTimer;
-
-    struct
-    {
-        uint8_t minHeight{ 0 };
-        uint8_t height{ 0 };
-        uint16_t speed{ 0 };
-    } m_bounce;
-
-    // Mount Shader
-    PainterShaderProgramPtr m_mountShader;
-    std::function<void()> m_mountShaderAction{ nullptr };
-
-    ThingType* m_mountType{ nullptr };
-
-    UIWidgetPtr m_widgetInformation;
 
 #ifndef BOT_PROTECTION
     StaticTextPtr m_text;

@@ -98,5 +98,8 @@ void Missile::setId(uint32_t id)
         id = 0;
 
     m_clientId = id;
-    m_thingType = g_things.getThingType(id, ThingCategoryMissile).get();
+}
+
+ThingType* Missile::getThingType() const {
+    return g_things.getThingType(m_clientId, ThingCategoryMissile).get();
 }

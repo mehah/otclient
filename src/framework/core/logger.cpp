@@ -101,9 +101,6 @@ void Logger::log(Fw::LogLevel level, const std::string_view message)
 #endif
         s_ignoreLogs = true;
 
-        // NOTE: Threads must finish before the process can exit.
-        g_asyncDispatcher.terminate();
-
         exit(-1);
     }
 }

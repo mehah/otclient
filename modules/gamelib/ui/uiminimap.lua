@@ -178,7 +178,6 @@ end
 
 function UIMinimap:setAlternativeWidgetsVisible(show)
     local layout = self:getLayout()
-    layout:disableUpdates()
     for _, widget in pairs(self.alternatives) do
         if show then
             self:insertChild(1, widget)
@@ -187,7 +186,6 @@ function UIMinimap:setAlternativeWidgetsVisible(show)
             self:removeChild(widget)
         end
     end
-    layout:enableUpdates()
     layout:update()
 end
 

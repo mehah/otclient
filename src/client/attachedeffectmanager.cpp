@@ -37,13 +37,9 @@ AttachedEffectPtr AttachedEffectManager::getById(uint16_t id) {
     }
 
     const auto& obj = (*it).second;
-    if (obj->m_thingId > 0 && obj->m_thingType == nullptr) {
-        if (!g_things.isValidDatId(obj->m_thingId, obj->m_thingCategory)) {
-            g_logger.error(stdext::format("AttachedEffectManager::getById(%d): invalid thing with id %d.", id, obj->m_thingId));
-            return nullptr;
-        }
-
-        obj->m_thingType = g_things.getThingType(obj->m_thingId, obj->m_thingCategory).get();
+    if (obj->m_thingId > 0 && !g_things.isValidDatId(obj->m_thingId, obj->m_thingCategory)) {
+        g_logger.error(stdext::format("AttachedEffectManager::getById(%d): invalid thing with id %d.", id, obj->m_thingId));
+        return nullptr;
     }
 
     return obj;

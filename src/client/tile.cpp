@@ -65,6 +65,8 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, LightVi
         drawThing(thing, dest, flags, lightView);
     }
 
+    drawAttachedEffect(dest, lightView, false);
+
     if (hasCommonItem()) {
         for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
             const auto& item = *it;
@@ -74,14 +76,16 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, LightVi
     }
 
     // after we render 2x2 lying corpses, we must redraw previous creatures/ontop above them
-    for (const auto& tile : m_tilesRedraw) {
-        tile->drawCreature(tile->m_lastDrawDest, mapRect, flags, true, lightView);
-        tile->drawTop(tile->m_lastDrawDest, flags, true, lightView);
+    if (m_tilesRedraw) {
+        for (const auto& tile : *m_tilesRedraw) {
+            tile->drawCreature(tile->m_lastDrawDest, mapRect, flags, true, lightView);
+            tile->drawTop(tile->m_lastDrawDest, flags, true, lightView);
+        }
     }
 
     drawCreature(dest, mapRect, flags, false, lightView);
     drawTop(dest, flags, false, lightView);
-    drawAttachedEffect(dest, lightView, false);
+    drawAttachedEffect(dest, lightView, true);
     drawAttachedParticlesEffect(dest);
 }
 
@@ -113,8 +117,10 @@ void Tile::drawTop(const Point& dest, int flags, bool forceDraw, LightView* ligh
     if (!forceDraw && !m_drawTopAndCreature)
         return;
 
-    for (const auto& effect : m_effects)
-        drawThing(effect, dest, flags & Otc::DrawThings, lightView);
+    if (m_effects) {
+        for (const auto& effect : *m_effects)
+            drawThing(effect, dest, flags & Otc::DrawThings, lightView);
+    }
 
     if (hasTopItem()) {
         for (const auto& item : m_things) {
@@ -141,11 +147,12 @@ void Tile::clean()
         clearAttachedWidgets();
     }
 
-    m_highlightThing = nullptr;
+    m_highlightThingStackPos = -1;
     while (!m_things.empty())
         removeThing(m_things.front());
 
-    m_tilesRedraw.clear();
+    m_tilesRedraw = nullptr;
+
     m_thingTypeFlag = 0;
 
 #ifdef FRAMEWORK_EDITOR
@@ -169,6 +176,12 @@ void Tile::removeWalkingCreature(const CreaturePtr& creature)
     recalculateThingFlag();
 }
 
+void Tile::updateThingStackPos() {
+    for (int stackpos = -1, s = m_things.size(); ++stackpos < s;) {
+        m_things[stackpos]->m_stackPos = stackpos;
+    }
+}
+
 // TODO: Need refactoring
 // Redo Stack Position System
 void Tile::addThing(const ThingPtr& thing, int stackPos)
@@ -177,11 +190,14 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
         return;
 
     if (thing->isEffect()) {
+        if (!m_effects)
+            m_effects = std::make_unique<std::vector<EffectPtr>>();
+
         const auto& newEffect = thing->static_self_cast<Effect>();
 
         const bool mustOptimize = g_app.mustOptimize() || g_app.isForcedEffectOptimization();
 
-        for (const auto& prevEffect : m_effects) {
+        for (const auto& prevEffect : *m_effects) {
             if (!prevEffect->canDraw())
                 continue;
 
@@ -194,9 +210,9 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
         }
 
         if (newEffect->isTopEffect())
-            m_effects.insert(m_effects.begin(), newEffect);
+            m_effects->insert(m_effects->begin(), newEffect);
         else
-            m_effects.emplace_back(newEffect);
+            m_effects->emplace_back(newEffect);
 
         setThingFlag(thing);
 
@@ -245,10 +261,12 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
     const bool hasElev = hasElevation();
 
     setThingFlag(thing);
-    checkForDetachableThing();
 
     if (size > g_gameConfig.getTileMaxThings())
         removeThing(m_things[g_gameConfig.getTileMaxThings()]);
+
+    updateThingStackPos();
+    checkForDetachableThing();
 
     // Do not change if you do not understand what is being done.
     {
@@ -273,13 +291,13 @@ bool Tile::removeThing(const ThingPtr thing)
 {
     if (!thing) return false;
 
-    if (thing->isEffect()) {
+    if (m_effects && thing->isEffect()) {
         const auto& effect = thing->static_self_cast<Effect>();
-        const auto it = std::find(m_effects.begin(), m_effects.end(), effect);
-        if (it == m_effects.end())
+        const auto it = std::find(m_effects->begin(), m_effects->end(), effect);
+        if (it == m_effects->end())
             return false;
 
-        m_effects.erase(it);
+        m_effects->erase(it);
         return true;
     }
 
@@ -289,10 +307,15 @@ bool Tile::removeThing(const ThingPtr thing)
 
     m_things.erase(it);
 
+    m_highlightThingStackPos = -1;
+    thing->m_stackPos = -1;
+    thing->setMarked(Color::white);
+
     recalculateThingFlag();
     if (thing->hasElevation())
         --m_elevation;
 
+    updateThingStackPos();
     checkForDetachableThing();
 
     thing->onDisappear();
@@ -359,9 +382,11 @@ std::vector<ItemPtr> Tile::getItems()
 
 EffectPtr Tile::getEffect(uint16_t id) const
 {
-    for (const auto& effect : m_effects)
-        if (effect->getId() == id)
-            return effect;
+    if (m_effects) {
+        for (const auto& effect : *m_effects)
+            if (effect->getId() == id)
+                return effect;
+    }
 
     return nullptr;
 }
@@ -596,9 +621,13 @@ bool Tile::isClickable()
 void Tile::onAddInMapView()
 {
     m_drawTopAndCreature = true;
-    m_tilesRedraw.clear();
+    if (m_tilesRedraw)
+        m_tilesRedraw->clear();
 
     if (m_thingTypeFlag & TileThingType::CORRECT_CORPSE) {
+        if (!m_tilesRedraw)
+            m_tilesRedraw = std::make_unique<std::vector<TilePtr>>();
+
         uint8_t redrawPreviousTopW = 0,
             redrawPreviousTopH = 0;
 
@@ -616,7 +645,7 @@ void Tile::onAddInMapView()
 
                 if (const auto& tile = g_map.getTile(m_position.translated(x, y))) {
                     tile->m_drawTopAndCreature = false;
-                    m_tilesRedraw.emplace_back(tile);
+                    m_tilesRedraw->emplace_back(tile);
                 }
             }
         }
@@ -640,12 +669,17 @@ bool Tile::limitsFloorsView(bool isFreeView)
 
 bool Tile::checkForDetachableThing(const TileSelectType selectType)
 {
-    if (m_highlightThing)
-        m_highlightThing->setMarked(Color::white);
+    markHighlightedThing(Color::white);
 
-    m_highlightThing = nullptr;
+    const auto& markIfYouNeed = [&] {
+        if (m_selectType == TileSelectType::NONE) return;
+        markHighlightedThing(Color::yellow);
+    };
+
+    m_highlightThingStackPos = -1;
     if (const auto& creature = getTopCreature()) {
-        m_highlightThing = creature;
+        m_highlightThingStackPos = creature->getStackPos();
+        markIfYouNeed();
         return true;
     }
 
@@ -660,7 +694,8 @@ bool Tile::checkForDetachableThing(const TileSelectType selectType)
             if (isFiltered && item->isIgnoreLook() && !item->isUsable() && !item->hasLight())
                 continue;
 
-            m_highlightThing = item;
+            m_highlightThingStackPos = item->getStackPos();
+            markIfYouNeed();
             return true;
         }
     }
@@ -673,7 +708,8 @@ bool Tile::checkForDetachableThing(const TileSelectType selectType)
             if (isFiltered && (item->isIgnoreLook() || item->isFluidContainer()))
                 continue;
 
-            m_highlightThing = item;
+            m_highlightThingStackPos = item->getStackPos();
+            markIfYouNeed();
             return true;
         }
     }
@@ -687,13 +723,15 @@ bool Tile::checkForDetachableThing(const TileSelectType selectType)
             if (isFiltered && (item->isIgnoreLook() || !item->hasLensHelp()))
                 continue;
 
-            m_highlightThing = item;
+            m_highlightThingStackPos = item->getStackPos();
+            markIfYouNeed();
             return true;
         }
     }
 
     if (!isFiltered) {
-        m_highlightThing = m_things.back();
+        m_highlightThingStackPos = m_things.size() - 1;
+        markIfYouNeed();
         return true;
     }
 
@@ -791,25 +829,23 @@ void Tile::setThingFlag(const ThingPtr& thing)
 
 void Tile::select(TileSelectType selectType)
 {
+    m_selectType = selectType;
+
     if (selectType == TileSelectType::NO_FILTERED && !isEmpty()) {
         checkForDetachableThing(selectType);
     }
 
-    if (m_highlightThing)
-        m_highlightThing->setMarked(Color::yellow);
-
-    m_selectType = selectType;
+    markHighlightedThing(Color::yellow);
 }
 
 void Tile::unselect()
 {
-    if (m_highlightThing)
-        m_highlightThing->setMarked(Color::white);
+    m_selectType = TileSelectType::NONE;
+
+    markHighlightedThing(Color::white);
 
     if (m_selectType == TileSelectType::NO_FILTERED)
         checkForDetachableThing();
-
-    m_selectType = TileSelectType::NONE;
 }
 
 bool Tile::canRender(uint32_t& flags, const Position& cameraPosition, const AwareRange viewPort)
