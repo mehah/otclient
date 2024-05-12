@@ -73,7 +73,6 @@ void Application::init(std::vector<std::string>& args, ApplicationContext* conte
     // setup locale
     std::locale::global(std::locale());
 
-    g_asyncDispatcher.init(context->getAsyncDispatchMaxThreads());
     g_dispatcher.init();
     g_textDispatcher.init();
     g_mainDispatcher.init();
@@ -105,8 +104,6 @@ void Application::deinit()
     // poll remaining events
     poll();
     Application::poll();
-
-    g_asyncDispatcher.terminate();
 
     // disable dispatcher events
     g_textDispatcher.shutdown();
@@ -145,18 +142,13 @@ void Application::terminate()
 
 void Application::poll()
 {
-    std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->getMutexPreDraw(), g_drawPool.get(DrawPoolType::CREATURE_INFORMATION)->getMutexPreDraw());
-
     g_clock.update();
 
 #ifdef FRAMEWORK_NET
     Connection::poll();
 #endif
 
-    {
-        std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND)->getMutexPreDraw());
-        g_dispatcher.poll();
-    }
+    g_dispatcher.poll();
 
     // poll connection again to flush pending write
 #ifdef FRAMEWORK_NET

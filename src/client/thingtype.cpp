@@ -26,6 +26,7 @@
 #include "map.h"
 #include "spriteappearances.h"
 #include "spritemanager.h"
+#include "localplayer.h"
 
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/asyncdispatcher.h>
@@ -684,11 +685,16 @@ TexturePtr ThingType::getTexture(int animationPhase)
 
     if (!m_loading) {
         m_loading = true;
-        g_asyncDispatcher.dispatch([this] {
+
+        auto action = [this] {
             for (int_fast8_t i = -1; ++i < m_animationPhases;)
                 loadTexture(i);
             m_loading = false;
-        });
+        };
+
+        if (g_game.getLocalPlayer() && g_game.getLocalPlayer()->isPendingGame())
+            g_dispatcher.asyncEvent(std::move(action));
+        else g_asyncDispatcher.detach_task(std::move(action));
     }
 
     return nullptr;

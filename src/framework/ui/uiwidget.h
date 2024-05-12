@@ -71,7 +71,7 @@ enum FlagProp : uint32_t
     PropImageSmooth = 1 << 21,
     PropImageAutoResize = 1 << 22,
     PropImageIndividualAnimation = 1 << 23,
-    PropDisableUpdateTemporarily = 1 << 24
+    PropUpdateChildrenIndexStates = 1 << 24
 };
 
 // @bindclass
@@ -205,7 +205,6 @@ public:
     void setProp(FlagProp prop, bool v, bool callEvent = false);
     bool hasProp(FlagProp prop) { return (m_flagsProp & prop); }
 
-    void disableUpdateTemporarily();
     void addOnDestroyCallback(const std::string& id, const std::function<void()>&& callback);
     void removeOnDestroyCallback(const std::string&);
 

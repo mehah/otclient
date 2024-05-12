@@ -97,7 +97,7 @@ void LightView::draw(const Rect& dest, const Rect& src)
 
         std::scoped_lock l(m_pool->getMutexPreDraw());
         std::swap(m_lightData[0], m_lightData[1]);
-        g_asyncDispatcher.dispatch([this] {
+        g_asyncDispatcher.detach_task([this] {
             updatePixels();
         });
     }

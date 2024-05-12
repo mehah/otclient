@@ -45,7 +45,7 @@ int Thing::getStackPriority()
     // Bug fix for old versions
     if (g_game.getClientVersion() <= 800 && isSplash())
         return STACK_PRIORITY::GROUND;
-	
+
     if (isGround())
         return STACK_PRIORITY::GROUND;
 
@@ -85,19 +85,18 @@ int Thing::getStackPos()
     if (m_position.x == UINT16_MAX && isItem()) // is inside a container
         return m_position.z;
 
-    if (const TilePtr& tile = getTile())
-        return tile->getThingStackPos(static_self_cast<Thing>());
+    if (m_stackPos >= 0)
+        return m_stackPos;
 
     g_logger.traceError("got a thing with invalid stackpos");
     return -1;
 }
 
 void Thing::setShader(const std::string_view name) {
-    if (name.empty()) {
-        m_shader = nullptr;
+    m_shaderId = 0;
+    if (name.empty())
         return;
-    }
 
-    m_shader = g_shaders.getShader(name.data());
+    if (const auto& shader = g_shaders.getShader(name))
+        m_shaderId = shader->getId();
 }
-

@@ -88,6 +88,8 @@ public:
     const Light& getLight() const { return m_light; }
     void setLight(const Light& light) { m_light = light; }
 
+    ThingType* getThingType() const;
+
 private:
     int getCurrentAnimationPhase();
 
@@ -120,8 +122,6 @@ private:
 
     uint16_t m_thingId{ 0 };
     ThingCategory m_thingCategory{ ThingInvalidCategory };
-
-    ThingType* m_thingType{ nullptr };
 
     Size m_size;
 

@@ -41,6 +41,7 @@ public:
 
 protected:
     void onAppear() override;
+    ThingType* getThingType() const override;
 
 private:
     Timer m_animationTimer;

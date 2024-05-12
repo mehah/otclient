@@ -78,7 +78,7 @@ void Effect::draw(const Point& dest, bool drawThings, LightView* lightView)
         m_drawConductor.order = DrawOrder::FOURTH;
     }
 
-    if (drawThings &&  g_client.getEffectAlpha() < 1.f)
+    if (drawThings && g_client.getEffectAlpha() < 1.f)
         g_drawPool.setOpacity(g_client.getEffectAlpha(), true);
     getThingType()->draw(dest, 0, xPattern, yPattern, 0, animationPhase, Color::white, drawThings, lightView, m_drawConductor);
 }
@@ -129,7 +129,6 @@ void Effect::setId(uint32_t id)
         return;
 
     m_clientId = id;
-    m_thingType = g_things.getThingType(id, ThingCategoryEffect).get();
 }
 
 void Effect::setPosition(const Position& position, uint8_t stackPos, bool hasElevation)
@@ -141,4 +140,8 @@ void Effect::setPosition(const Position& position, uint8_t stackPos, bool hasEle
 
     m_numPatternX = m_position.x % getNumPatternX();
     m_numPatternY = m_position.y % getNumPatternY();
+}
+
+ThingType* Effect::getThingType() const {
+    return g_things.getThingType(m_clientId, ThingCategoryEffect).get();
 }

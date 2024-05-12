@@ -22,41 +22,6 @@
 
 #pragma once
 
-#include <asio.hpp>
-#include <thread>
+#include <framework/util/BS_thread_pool.hpp>
 
-class AsyncDispatcher
-{
-public:
-    void init(uint8_t maxThreads = 0);
-    void terminate();
-
-    void stop();
-
-    template<class F>
-    std::shared_future<std::invoke_result_t<F>> schedule(const F& task)
-    {
-        const auto& prom = std::make_shared<std::promise<std::invoke_result_t<F>>>();
-        dispatch([=] { prom->set_value(task()); });
-        return std::shared_future<std::invoke_result_t<F>>(prom->get_future());
-    }
-
-    void dispatch(std::function<void()>&& f)
-    {
-        asio::post(m_ioService, [this, f = std::move(f)]() {
-            if (!m_ioService.stopped())
-                f();
-        });
-    }
-
-    inline auto getNumberOfThreads() const {
-        return m_threads.size();
-    }
-
-private:
-    asio::io_context m_ioService;
-    std::vector<std::thread> m_threads;
-    asio::io_context::work m_work{ m_ioService };
-};
-
-extern AsyncDispatcher g_asyncDispatcher;
+extern BS::thread_pool g_asyncDispatcher;
