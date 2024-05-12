@@ -154,13 +154,6 @@ ImagePtr SpriteManager::getSpriteImage(int id)
 
     const auto threadId = g_app.isLoadingAsyncTexture() ? g_dispatcher.getThreadId() : 0;
     if (const auto& sf = m_spritesFiles[threadId]) {
-        thread_local static int lastThreadId = -1;
-
-        if (lastThreadId != threadId) {
-            g_logger.info(std::to_string(threadId));
-            lastThreadId = threadId;
-        }
-
         std::scoped_lock l(sf->mutex);
         return getSpriteImage(id, sf->file);
     }
