@@ -48,6 +48,17 @@ public:
     bool isLoaded() { return m_loaded; }
 
 private:
+    struct FileStream_m
+    {
+        FileStreamPtr file;
+        std::mutex mutex;
+    };
+
+    void load();
+    FileStreamPtr getSpriteFile() const {
+        return m_spritesFiles[0]->file;
+    }
+
     ImagePtr getSpriteImage(int id, const FileStreamPtr& file);
 
     std::string m_lastFileName;
@@ -57,8 +68,7 @@ private:
     uint32_t m_spritesCount{ 0 };
     uint32_t m_spritesOffset{ 0 };
 
-    FileStreamPtr m_spritesFile;
-    std::mutex m_mutex;
+    std::vector<std::unique_ptr<FileStream_m>> m_spritesFiles;
 };
 
 extern SpriteManager g_sprites;

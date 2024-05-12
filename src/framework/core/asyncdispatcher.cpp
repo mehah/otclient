@@ -23,17 +23,18 @@
 #include "asyncdispatcher.h"
 
 uint8_t getThreadCount() {
-    static constexpr auto MAX_THREADS = 6u;
-    static constexpr auto MIN_THREADS = 3u;
-
     /*
-    * -1 = Graphic
-    *  1 = Map and (Connection, Particle and Sound) Pool
-    *  2 = Foreground UI
-    *  3 = Foreground MAP
-    *  4 = Extra, ex: pathfinder and lighting system
+    * -1 = Graphic (Main Thread)
+    * 1 = Map and (Connection, Particle and Sound) Pool
+    * 2 = Foreground UI
+    * 3 = Foreground MAP
+    * 4 = Extra (pathfinder, lighting system, async texture loading)
     */
-    return std::clamp<int_fast8_t>(std::thread::hardware_concurrency() - 1, MIN_THREADS, MAX_THREADS);
+
+    static constexpr auto MIN_THREADS = 4u;
+    static constexpr auto MAX_THREADS = 12u;
+
+    return std::clamp<int_fast8_t>(std::thread::hardware_concurrency() + 1, MIN_THREADS, MAX_THREADS);
 }
 
 BS::thread_pool g_asyncDispatcher{ getThreadCount() };

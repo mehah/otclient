@@ -57,6 +57,7 @@ void EventDispatcher::poll()
     executeEvents();
     executeScheduledEvents();
     executeDeferEvents();
+    executeAsyncEvents();
 }
 
 void EventDispatcher::startEvent(const ScheduledEventPtr& event)
@@ -113,6 +114,15 @@ EventPtr EventDispatcher::addEvent(const std::function<void()>& callback)
     return thread->events.emplace_back(std::make_shared<Event>(callback));
 }
 
+void EventDispatcher::asyncEvent(std::function<void()>&& callback) {
+    if (m_disabled)
+        return;
+
+    const auto& thread = getThreadTask();
+    std::scoped_lock lock(thread->mutex);
+    thread->asyncEvents.emplace_back(std::move(callback));
+}
+
 void EventDispatcher::deferEvent(const std::function<void()>& callback) {
     if (m_disabled)
         return;
@@ -131,6 +141,45 @@ void EventDispatcher::executeEvents() {
         event->execute();
 
     m_eventList.clear();
+}
+
+std::vector<std::pair<uint64_t, uint64_t>> generatePartition(size_t size) {
+    if (size == 0)
+        return {};
+
+    static const int threads = g_asyncDispatcher.get_thread_count();
+    std::vector<std::pair<uint64_t, uint64_t>> list;
+    list.reserve(threads);
+
+    const auto size_per_block = std::ceil(size / static_cast<float>(threads));
+    for (uint_fast64_t i = 0; i < size; i += size_per_block)
+        list.emplace_back(i, std::min<uint64_t >(size, i + size_per_block));
+
+    return list;
+}
+
+void EventDispatcher::executeAsyncEvents() {
+    if (m_asyncEventList.empty())
+        return;
+
+    const auto& partitions = generatePartition(m_asyncEventList.size());
+
+    BS::multi_future<void> retFuture;
+
+    if (partitions.size() > 1) {
+        const auto min = partitions[1].first;
+        const auto max = partitions[partitions.size() - 1].second;
+        retFuture = g_asyncDispatcher.submit_loop(min, max, [&](const unsigned int i) {  m_asyncEventList[i].execute();  });
+    }
+
+    const auto& [min, max] = partitions[0];
+    for (uint_fast64_t i = min; i < max; ++i)
+        m_asyncEventList[i].execute();
+
+    if (partitions.size() > 1)
+        retFuture.wait();
+
+    m_asyncEventList.clear();
 }
 
 void EventDispatcher::executeDeferEvents() {
@@ -177,6 +226,11 @@ void EventDispatcher::mergeEvents() {
         if (!thread->events.empty()) {
             m_eventList.insert(m_eventList.end(), make_move_iterator(thread->events.begin()), make_move_iterator(thread->events.end()));
             thread->events.clear();
+        }
+
+        if (!thread->asyncEvents.empty()) {
+            m_asyncEventList.insert(m_asyncEventList.end(), make_move_iterator(thread->asyncEvents.begin()), make_move_iterator(thread->asyncEvents.end()));
+            thread->asyncEvents.clear();
         }
 
         if (!thread->scheduledEventList.empty()) {
