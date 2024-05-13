@@ -152,7 +152,8 @@ void GraphicalApplication::run()
     threads.emplace_back(g_asyncDispatcher.submit_task([&] {
         std::unique_lock lock(uiPool->getMutexPreDraw());
         uiCond.wait(lock, [this]() {
-            g_ui.render(DrawPoolType::FOREGROUND);
+            if (m_drawEvents->canDraw(DrawPoolType::MAP))
+                g_ui.render(DrawPoolType::FOREGROUND);
             return m_stopping;
         });
     }));
@@ -161,7 +162,8 @@ void GraphicalApplication::run()
     threads.emplace_back(g_asyncDispatcher.submit_task([&] {
         std::unique_lock lock(fgMapPool->getMutexPreDraw());
         fgMapCond.wait(lock, [this]() -> bool {
-            m_drawEvents->drawForgroundMap();
+            if (m_drawEvents->canDraw(DrawPoolType::MAP))
+                m_drawEvents->drawForgroundMap();
             return m_stopping;
         });
     }));
