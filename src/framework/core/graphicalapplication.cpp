@@ -152,7 +152,8 @@ void GraphicalApplication::run()
     threads.emplace_back(g_asyncDispatcher.submit_task([&] {
         std::unique_lock lock(uiPool->getMutexPreDraw());
         uiCond.wait(lock, [this]() {
-            g_ui.render(DrawPoolType::FOREGROUND);
+            if (m_drawEvents->canDraw(DrawPoolType::MAP))
+                g_ui.render(DrawPoolType::FOREGROUND);
             return m_stopping;
         });
     }));
@@ -161,7 +162,8 @@ void GraphicalApplication::run()
     threads.emplace_back(g_asyncDispatcher.submit_task([&] {
         std::unique_lock lock(fgMapPool->getMutexPreDraw());
         fgMapCond.wait(lock, [this]() -> bool {
-            m_drawEvents->drawForgroundMap();
+            if (m_drawEvents->canDraw(DrawPoolType::MAP))
+                m_drawEvents->drawForgroundMap();
             return m_stopping;
         });
     }));
@@ -177,7 +179,7 @@ void GraphicalApplication::run()
                 continue;
             }
 
-            if (!m_drawEvents || !m_drawEvents->canDraw(DrawPoolType::MAP)) {
+            if (!m_drawEvents->canDraw(DrawPoolType::MAP)) {
                 if (uiPool->canRepaint())
                     g_ui.render(DrawPoolType::FOREGROUND);
                 m_mapProcessFrameCounter.update();
@@ -189,7 +191,7 @@ void GraphicalApplication::run()
             if (uiPool->canRepaint())
                 uiCond.notify_one();
 
-            if (fgMapPool->canRepaint())
+            if (m_drawEvents->isMovingCamera() || fgMapPool->canRepaint())
                 fgMapCond.notify_one();
 
             m_drawEvents->drawMap();
@@ -232,6 +234,8 @@ void GraphicalApplication::run()
 
 void GraphicalApplication::poll()
 {
+    m_drawEvents->poll();
+
     Application::poll();
 
 #ifdef FRAMEWORK_SOUND

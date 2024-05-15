@@ -25,10 +25,18 @@
 
 #include <framework/core/eventdispatcher.h>
 
-void UILayout::update()
+void UILayout::update(bool now)
 {
-    if (!m_parentWidget)
+    if (m_updating || !m_parentWidget)
         return;
+
+    if (now) {
+        m_updating = true;
+        internalUpdate();
+        m_parentWidget->onLayoutUpdate();
+        m_updating = false;
+        return;
+    }
 
     if (m_updateDeferred)
         return;

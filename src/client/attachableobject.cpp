@@ -278,17 +278,20 @@ bool AttachableObject::detachWidgetById(const std::string& id)
     return true;
 }
 
-bool AttachableObject::detachWidget(const UIWidgetPtr& widget)
+bool AttachableObject::detachWidget(const UIWidgetPtr widget)
 {
     if (!hasAttachedWidgets()) return false;
+
     const auto it = std::remove(m_data->attachedWidgets.begin(), m_data->attachedWidgets.end(), widget);
     if (it == m_data->attachedWidgets.end())
         return false;
 
-    m_data->attachedWidgets.erase(it);
-    g_map.removeAttachedWidgetFromObject(widget);
     widget->removeOnDestroyCallback("attached-widget-destroy");
     widget->callLuaField("onDetached", asLuaObject());
+
+    g_map.removeAttachedWidgetFromObject(widget);
+    m_data->attachedWidgets.erase(it);
+
     return true;
 }
 

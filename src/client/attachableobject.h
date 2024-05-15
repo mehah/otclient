@@ -67,7 +67,7 @@ public:
     void attachWidget(const UIWidgetPtr& widget);
     void clearAttachedWidgets(bool callEvent = true);
     bool detachWidgetById(const std::string& id);
-    bool detachWidget(const UIWidgetPtr& widget);
+    bool detachWidget(const UIWidgetPtr widget);
     UIWidgetPtr getAttachedWidgetById(const std::string& id);
 
 protected:
