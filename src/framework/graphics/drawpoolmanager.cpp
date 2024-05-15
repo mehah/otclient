@@ -220,7 +220,7 @@ bool DrawPoolManager::drawPool(DrawPool* pool) {
     return true;
 }
 
-void DrawPoolManager::wait() {
+void DrawPoolManager::wait() const {
     std::scoped_lock l(
         get(DrawPoolType::FOREGROUND)->getMutexPreDraw(),
         get(DrawPoolType::FOREGROUND_MAP)->getMutexPreDraw(),
