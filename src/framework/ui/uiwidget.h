@@ -135,7 +135,7 @@ public:
     void centerIn(const std::string_view hookedWidgetId);
     void breakAnchors();
     void updateParentLayout();
-    void updateLayout();
+    void updateLayout(bool now = false);
     void lock();
     void unlock();
     void focus();

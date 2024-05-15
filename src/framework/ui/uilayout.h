@@ -34,7 +34,7 @@ class UILayout : public LuaObject
 public:
     UILayout(UIWidgetPtr parentWidget) : m_parentWidget(std::move(parentWidget)) { }
 
-    void update();
+    void update(bool now = false);
 
     virtual void applyStyle(const OTMLNodePtr& /*styleNode*/) {}
     virtual void addWidget(const UIWidgetPtr& /*widget*/) {}
@@ -53,5 +53,7 @@ protected:
     virtual bool internalUpdate() { return false; }
 
     bool m_updateDeferred{ false };
+    bool m_updating{ false };
+
     UIWidgetPtr m_parentWidget;
 };

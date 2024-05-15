@@ -716,18 +716,18 @@ void UIWidget::updateParentLayout()
         return;
 
     if (const auto& parent = getParent())
-        parent->updateLayout();
+        parent->updateLayout(true);
     else
-        updateLayout();
+        updateLayout(true);
 }
 
-void UIWidget::updateLayout()
+void UIWidget::updateLayout(bool now)
 {
     if (isDestroyed())
         return;
 
     if (m_layout)
-        m_layout->update();
+        m_layout->update(now);
 
     // children can affect the parent layout
     if (const auto& parent = getParent()) {
@@ -1029,7 +1029,7 @@ bool UIWidget::setRect(const Rect& rect)
     m_rect = clampedRect;
 
     // updates own layout
-    updateLayout();
+    updateLayout(g_drawPool.getCurrentType() == DrawPoolType::FOREGROUND);
 
     // avoid massive update events
     if (!hasProp(PropUpdateEventScheduled)) {
@@ -1990,6 +1990,9 @@ void UIWidget::addOnDestroyCallback(const std::string& id, const std::function<v
 
 void UIWidget::removeOnDestroyCallback(const std::string& id)
 {
+    if (hasProp(PropDestroyed))
+        return;
+
     auto it = m_onDestroyCallbacks.find(id);
     if (it != m_onDestroyCallbacks.end())
         m_onDestroyCallbacks.erase(it);
