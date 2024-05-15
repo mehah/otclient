@@ -3016,37 +3016,41 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
 
     if (item->isContainer()) {
         if (g_game.getFeature(Otc::GameContainerTypes)) {
-            // container type // 9: quick loot, 2: quiver, 4: unlooted corpse
-            const uint8_t containerType = msg->getU8();
-
-            if (containerType == 9) {
-                msg->getU32(); // quick loot categories
-                if (g_game.getClientVersion() >= 1332) {
-					msg->getU32();
-                }
-            } else if (containerType == 2) {
-                msg->getU32(); // quiver ammo count
+            const uint8_t containerType = msg->getU8(); // container type
+            switch (containerType) {
+                case 2: // Content Counter
+                    msg->getU32(); // ammo total
+                    break;
+                case 4: // Loot Highlight
+                    break;
+                case 9: // Manager
+                    msg->getU32(); // loot flags
+                    if (g_game.getClientVersion() >= 1332) {
+                        msg->getU32(); // obtain flags
+                    }
+                    break;
+                case 11: // Quiver Loot
+                    msg->getU32(); // loot flags
+                    msg->getU32(); // ammo total
+                    if (g_game.getClientVersion() >= 1332) {
+                        msg->getU32(); // obtain flags
+                    }
+                    break;
+                default:
+                    break;
             }
-
-            // corpse not looted yet
-            /*
-            elseif (containerType == 4) {
-                // this flag has no bytes to parse
-                // draw effect 252 on top of the tile
-            }
-            */
         } else {
             if (g_game.getFeature(Otc::GameThingQuickLoot)) {
                 const bool hasQuickLootFlags = msg->getU8() != 0;
                 if (hasQuickLootFlags) {
-                    msg->getU32(); // quick loot flags
+                    msg->getU32(); // loot flags
                 }
             }
 
             if (g_game.getFeature(Otc::GameThingQuiver)) {
                 const uint8_t hasQuiverAmmoCount = msg->getU8();
                 if (hasQuiverAmmoCount) {
-                    msg->getU32(); // ammoTotal
+                    msg->getU32(); // ammo total
                 }
             }
         }
