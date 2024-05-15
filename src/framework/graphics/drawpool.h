@@ -81,7 +81,7 @@ public:
     FrameBufferPtr getFrameBuffer() const { return m_framebuffer; }
 
     bool canRepaint() { return canRepaint(false); }
-    void repaint() { m_status.first = 1; }
+    void repaint() { m_status.first = 1; m_refreshTimer.update(-1000); }
     void resetState();
     void scale(float factor);
 
@@ -99,6 +99,10 @@ public:
 
     std::mutex& getMutex() { return m_mutexDraw; }
     std::mutex& getMutexPreDraw() { return m_mutexPreDraw; }
+
+    bool isDrawing() const {
+        return m_repaint;
+    }
 
 protected:
 
@@ -247,9 +251,9 @@ private:
         }
     }
 
-    void release(bool draw = true) {
+    void release(bool flush = true) {
         m_objectsDraw.clear();
-        if (draw) {
+        if (flush) {
             if (!m_objectsFlushed.empty())
                 m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(m_objectsFlushed.begin()), make_move_iterator(m_objectsFlushed.end()));
 

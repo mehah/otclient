@@ -156,7 +156,7 @@ public:
     void setId(const std::string_view id);
     void setParent(const UIWidgetPtr& parent);
     void setLayout(const UILayoutPtr& layout);
-    bool setRect(const Rect& rect);
+    bool setRect(const Rect& rect, const bool updateNow = true);
     void setStyle(const std::string_view styleName);
     void setStyleFromNode(const OTMLNodePtr& styleNode);
     void setEnabled(bool enabled);

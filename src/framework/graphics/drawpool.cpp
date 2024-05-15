@@ -40,7 +40,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
     } else {
         pool->m_alwaysGroupDrawings = true; // CREATURE_INFORMATION & TEXT
 
-        if (type == DrawPoolType::FOREGROUND_MAP) {
+        if (type == DrawPoolType::FOREGROUND_MAP || type == DrawPoolType::CREATURE_INFORMATION) {
             pool->setFPS(60);
         }
     }
@@ -241,18 +241,18 @@ void DrawPool::resetState()
 
 bool DrawPool::canRepaint(const bool autoUpdateStatus)
 {
+    if (m_repaint)
+        return false;
+
     uint16_t refreshDelay = m_refreshDelay;
     if (m_shaderRefreshDelay > 0 && (m_refreshDelay == 0 || m_shaderRefreshDelay < m_refreshDelay))
         refreshDelay = m_shaderRefreshDelay;
 
     const bool canRepaint = (hasFrameBuffer() && m_status.first != m_status.second) || (refreshDelay > 0 && m_refreshTimer.ticksElapsed() >= refreshDelay);
 
-    if (canRepaint) {
-        if (static_cast<bool>(m_refreshDelay) != autoUpdateStatus)
-            m_refreshTimer.restart();
-
-        if (autoUpdateStatus)
-            m_status.first = m_status.second;
+    if (canRepaint && autoUpdateStatus) {
+        m_status.first = m_status.second;
+        m_refreshTimer.restart();
     }
 
     return canRepaint;

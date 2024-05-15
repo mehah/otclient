@@ -296,7 +296,8 @@ void UIWidget::removeChild(const UIWidgetPtr& child)
             focusPreviousChild(Fw::ActiveFocusReason, true);
 
         g_ui.onWidgetDisappear(child);
-    } else
+    }
+    else
         g_logger.traceError("attempt to remove an unknown child from a UIWidget");
 }
 
@@ -359,7 +360,8 @@ void UIWidget::focusNextChild(Fw::FocusReason reason, bool rotate)
                 break;
             }
         }
-    } else {
+    }
+    else {
         auto it = m_children.begin();
         if (m_focusedChild)
             it = std::find(m_children.begin(), m_children.end(), m_focusedChild);
@@ -402,7 +404,8 @@ void UIWidget::focusPreviousChild(Fw::FocusReason reason, bool rotate)
                 break;
             }
         }
-    } else {
+    }
+    else {
         auto it = m_children.rbegin();
         if (m_focusedChild)
             it = std::find(m_children.rbegin(), m_children.rend(), m_focusedChild);
@@ -647,13 +650,14 @@ void UIWidget::applyStyle(const OTMLNodePtr& styleNode)
             const auto& parent = getParent();
             if (isFocusable() && isExplicitlyVisible() && isExplicitlyEnabled() &&
                 parent && ((!parent->getFocusedChild() && parent->getAutoFocusPolicy() == Fw::AutoFocusFirst) ||
-                parent->getAutoFocusPolicy() == Fw::AutoFocusLast)) {
+                    parent->getAutoFocusPolicy() == Fw::AutoFocusLast)) {
                 focus();
             }
         }
 
         setProp(PropFirstOnStyle, false);
-    } catch (stdext::exception& e) {
+    }
+    catch (stdext::exception& e) {
         g_logger.traceError(stdext::format("failed to apply style to widget '%s': %s", m_id, e.what()));
     }
     setProp(PropLoadingStyle, false);
@@ -683,7 +687,8 @@ void UIWidget::centerIn(const std::string_view hookedWidgetId)
     if (const auto& anchorLayout = getAnchoredLayout()) {
         anchorLayout->addAnchor(static_self_cast<UIWidget>(), Fw::AnchorHorizontalCenter, hookedWidgetId, Fw::AnchorHorizontalCenter);
         anchorLayout->addAnchor(static_self_cast<UIWidget>(), Fw::AnchorVerticalCenter, hookedWidgetId, Fw::AnchorVerticalCenter);
-    } else
+    }
+    else
         g_logger.traceError(stdext::format("cannot add anchors to widget '%s': the parent doesn't use anchors layout", m_id));
 }
 
@@ -697,7 +702,8 @@ void UIWidget::fill(const std::string_view hookedWidgetId)
         anchorLayout->addAnchor(static_self_cast<UIWidget>(), Fw::AnchorRight, hookedWidgetId, Fw::AnchorRight);
         anchorLayout->addAnchor(static_self_cast<UIWidget>(), Fw::AnchorTop, hookedWidgetId, Fw::AnchorTop);
         anchorLayout->addAnchor(static_self_cast<UIWidget>(), Fw::AnchorBottom, hookedWidgetId, Fw::AnchorBottom);
-    } else
+    }
+    else
         g_logger.traceError(stdext::format("cannot add anchors to widget '%s': the parent doesn't use anchors layout", m_id));
 }
 
@@ -1002,7 +1008,7 @@ void UIWidget::setLayout(const UILayoutPtr& layout)
     m_layout = layout;
 }
 
-bool UIWidget::setRect(const Rect& rect)
+bool UIWidget::setRect(const Rect& rect, const bool updateNow)
 {
     Rect clampedRect = rect;
     if (m_minSize.width() != -1 || m_minSize.height() != -1 || m_maxSize.width() != -1 || m_maxSize.height() != -1) {
@@ -1029,7 +1035,7 @@ bool UIWidget::setRect(const Rect& rect)
     m_rect = clampedRect;
 
     // updates own layout
-    updateLayout(g_drawPool.getCurrentType() == DrawPoolType::FOREGROUND);
+    updateLayout(updateNow);
 
     // avoid massive update events
     if (!hasProp(PropUpdateEventScheduled)) {
@@ -1050,7 +1056,7 @@ bool UIWidget::setRect(const Rect& rect)
                 self->callLuaField("onResize", oldRect, rect);
                 self->onGeometryChange(oldRect, rect);
             }
-        });
+            });
         setProp(PropUpdateEventScheduled, true);
     }
 
@@ -1138,7 +1144,8 @@ void UIWidget::setFocusable(bool focusable)
     if (const auto& parent = getParent()) {
         if (!focusable && isFocused()) {
             parent->focusPreviousChild(Fw::ActiveFocusReason, true);
-        } else if (focusable && !parent->getFocusedChild() && parent->getAutoFocusPolicy() != Fw::AutoFocusNone) {
+        }
+        else if (focusable && !parent->getFocusedChild() && parent->getAutoFocusPolicy() != Fw::AutoFocusNone) {
             focus();
         }
     }
@@ -1515,61 +1522,61 @@ void UIWidget::updateState(Fw::WidgetState state)
     bool updateChildren = false;
 
     switch (state) {
-        case Fw::FirstState: { newStatus = isFirstChild(); break; }
-        case Fw::MiddleState: { newStatus = isMiddleChild(); break; }
-        case Fw::LastState: { newStatus = isLastChild(); break; }
-        case Fw::AlternateState: { newStatus = (getParent() && (getParent()->getChildIndex(static_self_cast<UIWidget>()) % 2) == 1); break; }
-        case Fw::FocusState: { newStatus = (getParent() && getParent()->getFocusedChild() == static_self_cast<UIWidget>()); break; }
-        case Fw::HoverState: { newStatus = (g_ui.getHoveredWidget() == static_self_cast<UIWidget>() && isEnabled()); break; }
-        case Fw::PressedState: { newStatus = (g_ui.getPressedWidget() == static_self_cast<UIWidget>()); break; }
-        case Fw::DraggingState: { newStatus = (g_ui.getDraggingWidget() == static_self_cast<UIWidget>()); break; }
-        case Fw::ActiveState:
-        {
-            UIWidgetPtr widget = static_self_cast<UIWidget>();
-            UIWidgetPtr parent;
-            do {
-                parent = widget->getParent();
-                if (!widget->isExplicitlyEnabled() ||
-                    ((parent && parent->getFocusedChild() != widget))) {
-                    newStatus = false;
-                    break;
-                }
-            } while ((widget = parent));
+    case Fw::FirstState: { newStatus = isFirstChild(); break; }
+    case Fw::MiddleState: { newStatus = isMiddleChild(); break; }
+    case Fw::LastState: { newStatus = isLastChild(); break; }
+    case Fw::AlternateState: { newStatus = (getParent() && (getParent()->getChildIndex(static_self_cast<UIWidget>()) % 2) == 1); break; }
+    case Fw::FocusState: { newStatus = (getParent() && getParent()->getFocusedChild() == static_self_cast<UIWidget>()); break; }
+    case Fw::HoverState: { newStatus = (g_ui.getHoveredWidget() == static_self_cast<UIWidget>() && isEnabled()); break; }
+    case Fw::PressedState: { newStatus = (g_ui.getPressedWidget() == static_self_cast<UIWidget>()); break; }
+    case Fw::DraggingState: { newStatus = (g_ui.getDraggingWidget() == static_self_cast<UIWidget>()); break; }
+    case Fw::ActiveState:
+    {
+        UIWidgetPtr widget = static_self_cast<UIWidget>();
+        UIWidgetPtr parent;
+        do {
+            parent = widget->getParent();
+            if (!widget->isExplicitlyEnabled() ||
+                ((parent && parent->getFocusedChild() != widget))) {
+                newStatus = false;
+                break;
+            }
+        } while ((widget = parent));
 
-            updateChildren = newStatus != oldStatus;
-            break;
-        }
-        case Fw::DisabledState:
-        {
-            bool enabled = true;
-            UIWidgetPtr widget = static_self_cast<UIWidget>();
-            do {
-                if (!widget->isExplicitlyEnabled()) {
-                    enabled = false;
-                    break;
-                }
-            } while ((widget = widget->getParent()));
-            newStatus = !enabled;
-            updateChildren = newStatus != oldStatus;
-            break;
-        }
-        case Fw::HiddenState:
-        {
-            bool visible = true;
-            UIWidgetPtr widget = static_self_cast<UIWidget>();
-            do {
-                if (!widget->isExplicitlyVisible()) {
-                    visible = false;
-                    break;
-                }
-            } while ((widget = widget->getParent()));
-            newStatus = !visible;
-            updateChildren = newStatus != oldStatus;
-            break;
-        }
+        updateChildren = newStatus != oldStatus;
+        break;
+    }
+    case Fw::DisabledState:
+    {
+        bool enabled = true;
+        UIWidgetPtr widget = static_self_cast<UIWidget>();
+        do {
+            if (!widget->isExplicitlyEnabled()) {
+                enabled = false;
+                break;
+            }
+        } while ((widget = widget->getParent()));
+        newStatus = !enabled;
+        updateChildren = newStatus != oldStatus;
+        break;
+    }
+    case Fw::HiddenState:
+    {
+        bool visible = true;
+        UIWidgetPtr widget = static_self_cast<UIWidget>();
+        do {
+            if (!widget->isExplicitlyVisible()) {
+                visible = false;
+                break;
+            }
+        } while ((widget = widget->getParent()));
+        newStatus = !visible;
+        updateChildren = newStatus != oldStatus;
+        break;
+    }
 
-        default:
-            return;
+    default:
+        return;
     }
 
     if (updateChildren) {
@@ -1583,7 +1590,8 @@ void UIWidget::updateState(Fw::WidgetState state)
         // disabled widgets cannot have hover state
         if (state == Fw::DisabledState && !newStatus && isHovered()) {
             g_ui.updateHoveredWidget();
-        } else if (state == Fw::HiddenState) {
+        }
+        else if (state == Fw::HiddenState) {
             onVisibilityChange(!newStatus);
         }
     }
@@ -1616,7 +1624,7 @@ void UIWidget::updateChildrenIndexStates()
             child->updateState(Fw::AlternateState);
         }
         self->setProp(PropUpdateChildrenIndexStates, false);
-    });
+        });
 }
 
 void UIWidget::updateStyle()
@@ -1629,7 +1637,7 @@ void UIWidget::updateStyle()
         g_dispatcher.deferEvent([self] {
             self->setProp(PropUpdateStyleScheduled, false);
             self->updateStyle();
-        });
+            });
         setProp(PropUpdateStyleScheduled, true);
         return;
     }
@@ -1694,7 +1702,7 @@ void UIWidget::onStyleApply(const std::string_view, const OTMLNodePtr& styleNode
     parseTextStyle(styleNode);
     parseCustomStyle(styleNode);
 
-    g_app.repaint();
+    repaint();
 }
 
 void UIWidget::onGeometryChange(const Rect& oldRect, const Rect& newRect)
@@ -1710,7 +1718,7 @@ void UIWidget::onGeometryChange(const Rect& oldRect, const Rect& newRect)
 
     callLuaField("onGeometryChange", newRect, oldRect);
 
-    g_app.repaint();
+    repaint();
 }
 
 void UIWidget::onLayoutUpdate()
@@ -1787,7 +1795,8 @@ bool UIWidget::onMousePress(const Point& mousePos, Fw::MouseButton button)
             if (onDoubleClick(mousePos))
                 return true;
             m_clickTimer.stop();
-        } else
+        }
+        else
             m_clickTimer.restart();
         m_lastClickPosition = mousePos;
     }
@@ -1964,7 +1973,7 @@ void UIWidget::move(int x, int y) {
             self->m_rect = {}; // force update
             self->setRect(rect);
             self->setProp(PropUpdatingMove, false);
-        });
+            });
     }
 
     m_rect = { x, y, getSize() };
@@ -1978,10 +1987,10 @@ void UIWidget::setShader(const std::string_view name) {
 
     g_dispatcher.addEvent([this, shader = std::string(name.data())] {
         m_shader = g_shaders.getShader(shader);
-    });
+        });
 }
 
-void UIWidget::repaint() { g_app.repaint(); }
+void UIWidget::repaint() { g_drawPool.repaint(DrawPoolType::FOREGROUND); }
 
 void UIWidget::addOnDestroyCallback(const std::string& id, const std::function<void()>&& callback)
 {

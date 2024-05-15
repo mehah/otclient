@@ -68,10 +68,6 @@ void Client::terminate()
     g_gameConfig.terminate();
 }
 
-void Client::poll() {
-    m_movingCamera = false;
-}
-
 void Client::preLoad() {
     if (m_mapWidget) {
         m_mapWidget->updateMapRect();
