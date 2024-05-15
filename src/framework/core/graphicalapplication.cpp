@@ -179,7 +179,7 @@ void GraphicalApplication::run()
                 continue;
             }
 
-            if (!m_drawEvents || !m_drawEvents->canDraw(DrawPoolType::MAP)) {
+            if (!m_drawEvents->canDraw(DrawPoolType::MAP)) {
                 if (uiPool->canRepaint())
                     g_ui.render(DrawPoolType::FOREGROUND);
                 m_mapProcessFrameCounter.update();
@@ -191,7 +191,7 @@ void GraphicalApplication::run()
             if (uiPool->canRepaint())
                 uiCond.notify_one();
 
-            if (fgMapPool->canRepaint())
+            if (m_drawEvents->isMovingCamera() || fgMapPool->canRepaint())
                 fgMapCond.notify_one();
 
             m_drawEvents->drawMap();
@@ -234,6 +234,8 @@ void GraphicalApplication::run()
 
 void GraphicalApplication::poll()
 {
+    m_drawEvents->poll();
+
     Application::poll();
 
 #ifdef FRAMEWORK_SOUND
