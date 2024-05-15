@@ -546,7 +546,8 @@ namespace Otc
         GameNegativeOffset = 116,
         GameItemTooltipV8 = 117,
         GameForgeConvergence = 118,
-        LastGameFeature = 119
+
+        LastGameFeature,
     };
 
     enum MagicEffectsType_t : uint8_t
