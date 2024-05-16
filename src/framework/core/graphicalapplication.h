@@ -33,12 +33,10 @@
 class ApplicationDrawEvents
 {
 protected:
-    virtual void poll() = 0;
     virtual void preLoad() = 0;
     virtual void drawMap() = 0;
     virtual void drawForgroundMap() = 0;
 
-    virtual bool isMovingCamera() const = 0;
     virtual bool canDraw(DrawPoolType type) const = 0;
     virtual bool isLoadingAsyncTexture() = 0;
     virtual bool isUsingProtobuf() = 0;
@@ -127,9 +125,6 @@ public:
         return false;
 #endif
     }
-
-    void repaint();
-    void repaintMap();
 
     void setDrawEvents(const ApplicationDrawEventsPtr& drawEvents) { m_drawEvents = drawEvents; }
 

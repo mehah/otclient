@@ -24,7 +24,7 @@
 #include "graphics.h"
 
 #include <framework/core/eventdispatcher.h>
-#include <framework/core/graphicalapplication.h>
+#include <framework/graphics/drawpoolmanager.h>
 
 #include <utility>
 
@@ -119,6 +119,6 @@ void AnimatedTexture::update()
     m_id = getCurrentFrame()->getId();
 
     if (isOnMap())
-        g_app.repaintMap();
-    else g_app.repaint();
+        g_drawPool.repaint(DrawPoolType::MAP);
+    else g_drawPool.repaint(DrawPoolType::FOREGROUND);
 }
