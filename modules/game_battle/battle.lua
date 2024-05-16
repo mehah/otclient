@@ -272,6 +272,8 @@ local function swap(index, newIndex) -- Swap indexes of a given table
 end
 
 local function correctBattleButtons(sortOrder) -- Update battleButton index based upon our binary tree
+    battlePanel:disableUpdateTemporarily()
+
     local sortOrder = sortOrder or getSortOrder()
 
     local start = sortOrder == 'A' and 1 or #binaryTree
@@ -392,6 +394,8 @@ end
 
 -- Initially checking creatures
 function checkCreatures() -- Function that initially populates our tree once the module is initialized
+    battlePanel:disableUpdateTemporarily()
+
     eventOnCheckCreature = nil
 
     if not battlePanel or not g_game.isOnline() then
@@ -791,6 +795,8 @@ function updateCreatureEmblem(creature, emblemId) -- Update emblem
 end
 
 function onCreaturePositionChange(creature, newPos, oldPos) -- Update battleButton once you or monsters move
+    battlePanel:disableUpdateTemporarily()
+
     local localPlayer = g_game.getLocalPlayer()
     if not localPlayer then
         return false

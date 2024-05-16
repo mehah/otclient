@@ -742,6 +742,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("getFont", &UIWidget::getFont);
     g_lua.bindClassMemberFunction<UIWidget>("getTextSize", &UIWidget::getTextSize);
     g_lua.bindClassMemberFunction<UIWidget>("hasShader", &UIWidget::hasShader);
+    g_lua.bindClassMemberFunction<UIWidget>("disableUpdateTemporarily", &UIWidget::disableUpdateTemporarily);
 
     g_lua.bindClassMemberFunction<UIWidget>("setBackgroundDrawOrder", &UIWidget::setBackgroundDrawOrder);
     g_lua.bindClassMemberFunction<UIWidget>("setImageDrawOrder", &UIWidget::setImageDrawOrder);
@@ -752,11 +753,16 @@ void Application::registerLuaFunctions()
     // UILayout
     g_lua.registerClass<UILayout>();
     g_lua.bindClassMemberFunction<UILayout>("update", &UILayout::update);
+    g_lua.bindClassMemberFunction<UILayout>("updateLater", &UILayout::updateLater);
     g_lua.bindClassMemberFunction<UILayout>("applyStyle", &UILayout::applyStyle);
     g_lua.bindClassMemberFunction<UILayout>("addWidget", &UILayout::addWidget);
     g_lua.bindClassMemberFunction<UILayout>("removeWidget", &UILayout::removeWidget);
+    g_lua.bindClassMemberFunction<UILayout>("disableUpdates", &UILayout::disableUpdates);
+    g_lua.bindClassMemberFunction<UILayout>("enableUpdates", &UILayout::enableUpdates);
     g_lua.bindClassMemberFunction<UILayout>("setParent", &UILayout::setParent);
     g_lua.bindClassMemberFunction<UILayout>("getParentWidget", &UILayout::getParentWidget);
+    g_lua.bindClassMemberFunction<UILayout>("isUpdateDisabled", &UILayout::isUpdateDisabled);
+    g_lua.bindClassMemberFunction<UILayout>("isUpdating", &UILayout::isUpdating);
     g_lua.bindClassMemberFunction<UILayout>("isUIAnchorLayout", &UILayout::isUIAnchorLayout);
     g_lua.bindClassMemberFunction<UILayout>("isUIBoxLayout", &UILayout::isUIBoxLayout);
     g_lua.bindClassMemberFunction<UILayout>("isUIHorizontalLayout", &UILayout::isUIHorizontalLayout);

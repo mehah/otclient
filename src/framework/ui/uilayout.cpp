@@ -25,28 +25,48 @@
 
 #include <framework/core/eventdispatcher.h>
 
-void UILayout::update(bool now)
+void UILayout::update()
 {
-    if (m_updating || !m_parentWidget)
+    //logTraceCounter();
+    if (!m_parentWidget)
         return;
 
-    if (now) {
-        m_updating = true;
-        internalUpdate();
-        m_parentWidget->onLayoutUpdate();
-        m_updating = false;
+    /*
+    UIWidgetPtr parent = parentWidget;
+    do {
+        UILayoutPtr ownerLayout = parent->getLayout();
+        if(ownerLayout && ownerLayout->isUpdateDisabled())
+            return;
+        parent = parent->getParent();
+    } while(parent);
+    */
+
+    if (m_updateDisabled)
+        return;
+
+    if (m_updating) {
+        updateLater();
         return;
     }
 
-    if (m_updateDeferred)
+    m_updating = true;
+    internalUpdate();
+    m_parentWidget->onLayoutUpdate();
+    m_updating = false;
+}
+
+void UILayout::updateLater()
+{
+    if (m_updateDisabled || m_updateScheduled)
         return;
 
-    m_updateDeferred = true;
+    if (!getParentWidget())
+        return;
 
-    g_dispatcher.deferEvent([self = static_self_cast<UILayout>()] {
-        self->internalUpdate();
-        if (self->m_parentWidget)
-            self->m_parentWidget->onLayoutUpdate();
-        self->m_updateDeferred = false;
+    auto self = static_self_cast<UILayout>();
+    g_dispatcher.deferEvent([self] {
+        self->m_updateScheduled = false;
+        self->update();
     });
+    m_updateScheduled = true;
 }

@@ -71,7 +71,8 @@ enum FlagProp : uint32_t
     PropImageSmooth = 1 << 21,
     PropImageAutoResize = 1 << 22,
     PropImageIndividualAnimation = 1 << 23,
-    PropUpdateChildrenIndexStates = 1 << 24
+    PropUpdateChildrenIndexStates = 1 << 24,
+    PropDisableUpdateTemporarily = 1 << 25
 };
 
 // @bindclass
@@ -135,7 +136,7 @@ public:
     void centerIn(const std::string_view hookedWidgetId);
     void breakAnchors();
     void updateParentLayout();
-    void updateLayout(bool now = false);
+    void updateLayout();
     void lock();
     void unlock();
     void focus();
@@ -205,6 +206,7 @@ public:
     void setProp(FlagProp prop, bool v, bool callEvent = false);
     bool hasProp(FlagProp prop) { return (m_flagsProp & prop); }
 
+    void disableUpdateTemporarily();
     void addOnDestroyCallback(const std::string& id, const std::function<void()>&& callback);
     void removeOnDestroyCallback(const std::string&);
 
