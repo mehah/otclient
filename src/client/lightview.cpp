@@ -70,14 +70,19 @@ void LightView::addLightSource(const Point& pos, const Light& light, float brigh
             return;
         }
     }
+
     lightData.lights.emplace_back(pos, light.intensity, light.color, std::min<float>(brightness, g_drawPool.getOpacity()));
 
-    stdext::hash_union(m_updatedHash, pos.hash());
-    stdext::hash_combine(m_updatedHash, light.intensity);
-    stdext::hash_combine(m_updatedHash, light.color);
+    size_t hash = 0;
+
+    stdext::hash_union(hash, pos.hash());
+    stdext::hash_combine(hash, light.intensity);
+    stdext::hash_combine(hash, light.color);
 
     if (g_drawPool.getOpacity() < 1.f)
-        stdext::hash_combine(m_updatedHash, g_drawPool.getOpacity());
+        stdext::hash_combine(hash, g_drawPool.getOpacity());
+
+    m_objectHashs.emplace(hash);
 }
 
 void LightView::resetShade(const Point& pos)
@@ -91,9 +96,15 @@ void LightView::resetShade(const Point& pos)
 
 void LightView::draw(const Rect& dest, const Rect& src)
 {
-    if (m_updatedHash != m_hash) {
-        m_hash = m_updatedHash;
-        m_updatedHash = 0;
+    size_t lightingHash = 0;
+
+    stdext::hash_union(lightingHash, dest.hash());
+    stdext::hash_union(lightingHash, src.hash());
+    for (const auto hash : m_objectHashs)
+        stdext::hash_union(lightingHash, hash);
+
+    if (lightingHash != m_hash) {
+        m_hash = lightingHash;
 
         std::scoped_lock l(m_pool->getMutexPreDraw());
         std::swap(m_lightData[0], m_lightData[1]);
@@ -118,6 +129,8 @@ void LightView::draw(const Rect& dest, const Rect& src)
             g_painter->drawCoords(m_coords);
         });
     });
+
+    m_objectHashs.clear();
 
     auto& lightData = m_lightData[0];
     lightData.lights.clear();
