@@ -52,7 +52,8 @@ DrawPool* DrawPool::create(const DrawPoolType type)
 void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod&& method,
                    DrawMode drawMode, const DrawConductor& conductor, const CoordsBufferPtr& coordsBuffer)
 {
-    updateHash(method, texture, color);
+    if (!updateHash(method, texture, color, coordsBuffer != nullptr))
+        return;
 
     uint8_t order = conductor.order;
     if (m_type == DrawPoolType::FOREGROUND)
@@ -122,7 +123,7 @@ void DrawPool::addCoords(CoordsBuffer* buffer, const DrawMethod& method, DrawMod
     }
 }
 
-void DrawPool::updateHash(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color) {
+bool DrawPool::updateHash(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color, const bool hasCoord) {
     { // State Hash
         m_state.hash = 0;
 
@@ -155,20 +156,27 @@ void DrawPool::updateHash(const DrawPool::DrawMethod& method, const TexturePtr& 
     }
 
     if (hasFrameBuffer()) { // Pool Hash
-        if (m_state.hash)
-            stdext::hash_union(m_status.second, m_state.hash);
+        size_t hash = m_state.hash;
 
         if (method.type == DrawPool::DrawMethodType::TRIANGLE) {
-            if (!method.a.isNull()) stdext::hash_union(m_status.second, method.a.hash());
-            if (!method.b.isNull()) stdext::hash_union(m_status.second, method.b.hash());
-            if (!method.c.isNull()) stdext::hash_union(m_status.second, method.c.hash());
+            if (!method.a.isNull()) stdext::hash_union(hash, method.a.hash());
+            if (!method.b.isNull()) stdext::hash_union(hash, method.b.hash());
+            if (!method.c.isNull()) stdext::hash_union(hash, method.c.hash());
         } else if (method.type == DrawPool::DrawMethodType::BOUNDING_RECT) {
-            if (method.intValue) stdext::hash_combine(m_status.second, method.intValue);
+            if (method.intValue) stdext::hash_combine(hash, method.intValue);
         } else {
-            if (method.dest.isValid()) stdext::hash_union(m_status.second, method.dest.hash());
-            if (method.src.isValid()) stdext::hash_union(m_status.second, method.src.hash());
+            if (method.dest.isValid()) stdext::hash_union(hash, method.dest.hash());
+            if (method.src.isValid()) stdext::hash_union(hash, method.src.hash());
         }
+
+        // check to skip the next drawing that is the same as the previous one.
+        if (!hasCoord && m_lastObjectHash == hash)
+            return false;
+
+        m_objectHashs.emplace(m_lastObjectHash = hash);
     }
+
+    return true;
 }
 
 DrawPool::PoolState DrawPool::getState(const TexturePtr& texture, const Color& color)
@@ -232,6 +240,7 @@ void DrawPool::resetState()
     m_coords.clear();
     m_parameters.clear();
 
+    m_objectHashs.clear();
     m_state = {};
     m_status.second = 0;
     m_lastFramebufferId = 0;
@@ -376,7 +385,8 @@ void DrawPool::releaseFrameBuffer(const Rect& dest)
         drawState.execute();
         frame->draw(dest);
     });
-    if (hasFrameBuffer() && !dest.isNull()) stdext::hash_union(m_status.second, dest.hash());
+
+    if (hasFrameBuffer() && !dest.isNull()) m_objectHashs.emplace(dest.hash());
     --m_bindedFramebuffers;
 }
 

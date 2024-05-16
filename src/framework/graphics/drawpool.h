@@ -32,6 +32,7 @@
 #include <framework/core/graphicalapplication.h>
 
 #include "../stdext/storage.h"
+#include <unordered_set>
 
 enum class DrawPoolType : uint8_t
 {
@@ -193,7 +194,7 @@ private:
 
     inline void setFPS(uint16_t fps) { m_refreshDelay = 1000 / fps; }
 
-    void updateHash(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color);
+    bool updateHash(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color, const bool hasCoord);
     PoolState getState(const TexturePtr& texture, const Color& color);
 
     float getOpacity() const { return m_state.opacity; }
@@ -307,6 +308,8 @@ private:
     Timer m_refreshTimer;
 
     std::pair<size_t, size_t> m_status{ 1, 0 };
+    std::unordered_set<size_t> m_objectHashs;
+    size_t m_lastObjectHash{ 0 };
 
     std::vector<Matrix3> m_transformMatrixStack;
     std::vector<FrameBufferPtr> m_temporaryFramebuffers;

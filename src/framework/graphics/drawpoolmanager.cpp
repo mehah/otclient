@@ -175,6 +175,9 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     pool->setEnable(true);
     if (pool->hasFrameBuffer()) {
         pool->m_framebuffer->prepare(dest, src, colorClear);
+
+        for (const auto hash : pool->m_objectHashs)
+            stdext::hash_union(pool->m_status.second, hash);
     }
 
     pool->release(pool->m_repaint = pool->canRepaint(true));
