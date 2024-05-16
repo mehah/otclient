@@ -52,7 +52,8 @@ DrawPool* DrawPool::create(const DrawPoolType type)
 void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod&& method,
                    DrawMode drawMode, const DrawConductor& conductor, const CoordsBufferPtr& coordsBuffer)
 {
-    updateHash(method, texture, color);
+    if (!updateHash(method, texture, color, coordsBuffer != nullptr))
+        return;
 
     uint8_t order = conductor.order;
     if (m_type == DrawPoolType::FOREGROUND)
@@ -122,7 +123,7 @@ void DrawPool::addCoords(CoordsBuffer* buffer, const DrawMethod& method, DrawMod
     }
 }
 
-void DrawPool::updateHash(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color) {
+bool DrawPool::updateHash(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color, const bool hasCoord) {
     { // State Hash
         m_state.hash = 0;
 
@@ -171,8 +172,14 @@ void DrawPool::updateHash(const DrawPool::DrawMethod& method, const TexturePtr& 
             if (method.src.isValid()) stdext::hash_union(hash, method.src.hash());
         }
 
-        m_hash.emplace(hash);
+        // check to skip the next drawing that is the same as the previous one.
+        if (!hasCoord && m_lastObjectHash == hash)
+            return false;
+
+        m_objectHashs.emplace(m_lastObjectHash = hash);
     }
+
+    return true;
 }
 
 DrawPool::PoolState DrawPool::getState(const TexturePtr& texture, const Color& color)
@@ -236,7 +243,7 @@ void DrawPool::resetState()
     m_coords.clear();
     m_parameters.clear();
 
-    m_hash.clear();
+    m_objectHashs.clear();
     m_state = {};
     m_status.second = 0;
     m_lastFramebufferId = 0;
@@ -381,7 +388,8 @@ void DrawPool::releaseFrameBuffer(const Rect& dest)
         drawState.execute();
         frame->draw(dest);
     });
-    if (hasFrameBuffer() && !dest.isNull()) m_hash.emplace(dest.hash());
+
+    if (hasFrameBuffer() && !dest.isNull()) m_objectHashs.emplace(dest.hash());
     --m_bindedFramebuffers;
 }
 
