@@ -63,7 +63,7 @@ void UIWidget::updateText()
     }
 
     m_textCachedScreenCoords = {};
-    g_app.repaint();
+    repaint();
 }
 
 void UIWidget::resizeToText()

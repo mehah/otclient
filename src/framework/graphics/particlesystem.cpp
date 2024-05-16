@@ -22,7 +22,7 @@
 
 #include "particlesystem.h"
 #include <framework/core/clock.h>
-#include <framework/core/graphicalapplication.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include "particle.h"
 #include "particleaffector.h"
 
@@ -116,5 +116,5 @@ void ParticleSystem::update()
         }
     }
 
-    g_app.repaint();
+    g_drawPool.repaint(DrawPoolType::FOREGROUND);
 }

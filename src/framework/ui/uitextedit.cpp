@@ -318,7 +318,7 @@ void UITextEdit::update(bool focusCursor)
     if (fireAreaUpdate)
         onTextAreaUpdate(m_textVirtualOffset, m_textVirtualSize, m_textTotalSize);
 
-    g_app.repaint();
+    repaint();
 }
 
 void UITextEdit::setCursorPos(int pos)
@@ -354,7 +354,7 @@ void UITextEdit::setSelection(int start, int end)
     m_selectionEnd = std::clamp<int>(end, 0, static_cast<int>(m_text.length()));
     recacheGlyphs();
 
-    g_app.repaint();
+    repaint();
 }
 
 void UITextEdit::setTextHidden(bool hidden)
@@ -449,7 +449,7 @@ void UITextEdit::removeCharacter(bool right)
 void UITextEdit::blinkCursor()
 {
     m_cursorTicks = g_clock.millis();
-    g_app.repaint();
+    repaint();
 }
 
 void UITextEdit::del(bool right)

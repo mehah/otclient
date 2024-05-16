@@ -36,7 +36,6 @@ public:
     void terminate();
     static void registerLuaFunctions();
 
-    void poll() override;
     void preLoad() override;
     void drawMap() override;
     void drawForgroundMap() override;
@@ -55,19 +54,10 @@ public:
     float getMissileAlpha() const { return m_missileAlpha; }
     void setMissileAlpha(float v) { m_missileAlpha = v; }
 
-    bool isMovingCamera() const override {
-        return m_movingCamera;
-    }
-
-    void setMovingCamera(bool v) {
-        m_movingCamera = v;
-    }
-
 private:
     UIMapPtr m_mapWidget;
     float m_effectAlpha{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
     float m_missileAlpha{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
-    bool m_movingCamera = false;
 };
 
 extern Client g_client;

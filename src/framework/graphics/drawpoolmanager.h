@@ -101,6 +101,10 @@ public:
 
     DrawPoolType getCurrentType() const { return getCurrentPool()->m_type; }
 
+    inline void repaint(const DrawPoolType drawPool) const {
+        get(drawPool)->repaint();
+    }
+
 private:
     DrawPool* getCurrentPool() const;
 
@@ -108,6 +112,7 @@ private:
     void init(uint16_t spriteSize);
     void terminate() const;
     void drawObject(const DrawPool::DrawObject& obj);
+    void wait() const;
 
     bool drawPool(const DrawPoolType type);
     bool drawPool(DrawPool* pool);

@@ -191,13 +191,12 @@ void GraphicalApplication::run()
             if (uiPool->canRepaint())
                 uiCond.notify_one();
 
-            if (m_drawEvents->isMovingCamera() || fgMapPool->canRepaint())
+            if (fgMapPool->canRepaint())
                 fgMapCond.notify_one();
 
             m_drawEvents->drawMap();
 
-            // Wait UI and FGMap
-            std::scoped_lock l(uiPool->getMutexPreDraw(), fgMapPool->getMutexPreDraw());
+            g_drawPool.wait();
 
             m_mapProcessFrameCounter.update();
         }
@@ -234,8 +233,6 @@ void GraphicalApplication::run()
 
 void GraphicalApplication::poll()
 {
-    m_drawEvents->poll();
-
     Application::poll();
 
 #ifdef FRAMEWORK_SOUND
@@ -290,8 +287,6 @@ void GraphicalApplication::inputEvent(const InputEvent& event)
     m_onInputEvent = false;
 }
 
-void GraphicalApplication::repaintMap() { g_drawPool.get(DrawPoolType::MAP)->repaint(); }
-void GraphicalApplication::repaint() { g_drawPool.get(DrawPoolType::FOREGROUND)->repaint(); }
 bool GraphicalApplication::isLoadingAsyncTexture() { return m_loadingAsyncTexture || (m_drawEvents && m_drawEvents->isLoadingAsyncTexture()); }
 
 void GraphicalApplication::setLoadingAsyncTexture(bool v) {

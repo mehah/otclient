@@ -471,7 +471,8 @@ void MapView::onCameraMove(const Point& /*offset*/)
         updateViewport(m_followingCreature->isWalking() ? m_followingCreature->getDirection() : Otc::InvalidDirection);
     }
 
-    g_client.setMovingCamera(true);
+    g_drawPool.repaint(DrawPoolType::FOREGROUND_MAP);
+    g_drawPool.repaint(DrawPoolType::CREATURE_INFORMATION);
 }
 
 void MapView::onFloorChange(const uint8_t /*floor*/, const uint8_t /*previousFloor*/)
