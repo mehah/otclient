@@ -248,7 +248,7 @@ bool DrawPool::canRepaint(const bool autoUpdateStatus)
     if (m_shaderRefreshDelay > 0 && (m_refreshDelay == 0 || m_shaderRefreshDelay < m_refreshDelay))
         refreshDelay = m_shaderRefreshDelay;
 
-    const bool canRepaint = (hasFrameBuffer() && m_status.first != m_status.second) || (refreshDelay > 0 && m_refreshTimer.ticksElapsed() >= refreshDelay);
+    const bool canRepaint = m_status.first != m_status.second || (refreshDelay > 0 && m_refreshTimer.ticksElapsed() >= refreshDelay);
 
     if (canRepaint && autoUpdateStatus) {
         m_status.first = m_status.second;
