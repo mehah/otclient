@@ -1872,7 +1872,7 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
         m_localPlayer->setBaseMagicLevel(baseMagicLevel);
     }
 
-    for (auto skill = Otc::Fist; skill <= Otc::Fishing; ++skill) {
+    for (int_fast32_t skill = Otc::Fist; skill <= Otc::Fishing; ++skill) {
         uint16_t level;
 
         if (g_game.getFeature(Otc::GameDoubleSkills))
@@ -1906,7 +1906,7 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
         // Critical, Life Leech, Mana Leech, Dodge, Fatal, Momentum have no level percent, nor loyalty bonus
 
         const uint8_t lastSkill = g_game.getClientVersion() >= 1281 ? Otc::LastSkill : Otc::ManaLeechAmount + 1;
-        for (auto skill = Otc::CriticalChance; skill < lastSkill; ++skill) {
+        for (int_fast32_t skill = Otc::CriticalChance; skill < lastSkill; ++skill) {
             if (!g_game.getFeature(Otc::GameLeechAmount)) {
                 if (skill == Otc::LifeLeechAmount || skill == Otc::ManaLeechAmount) {
                     continue;
@@ -3828,7 +3828,7 @@ void ProtocolGame::parseMarketDetail(const InputMessagePtr& msg)
     if (g_game.getClientVersion() >= 1282)
         lastAttribute = Otc::ITEM_DESC_LAST;
 
-    for (auto i = Otc::ITEM_DESC_FIRST; i <= lastAttribute; i++) {
+    for (int_fast32_t i = Otc::ITEM_DESC_FIRST; i <= lastAttribute; i++) {
         if (i == Otc::ITEM_DESC_AUGMENT && !g_game.getFeature(Otc::GameItemAugment)) {
             continue;
         }
