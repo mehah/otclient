@@ -156,10 +156,7 @@ bool DrawPool::updateHash(const DrawPool::DrawMethod& method, const TexturePtr& 
     }
 
     if (hasFrameBuffer()) { // Pool Hash
-        size_t hash = 0;
-
-        if (m_state.hash)
-            stdext::hash_union(hash, m_state.hash);
+        size_t hash = m_state.hash;
 
         if (method.type == DrawPool::DrawMethodType::TRIANGLE) {
             if (!method.a.isNull()) stdext::hash_union(hash, method.a.hash());
