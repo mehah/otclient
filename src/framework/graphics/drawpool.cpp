@@ -155,19 +155,23 @@ void DrawPool::updateHash(const DrawPool::DrawMethod& method, const TexturePtr& 
     }
 
     if (hasFrameBuffer()) { // Pool Hash
+        size_t hash = 0;
+
         if (m_state.hash)
-            stdext::hash_union(m_status.second, m_state.hash);
+            stdext::hash_union(hash, m_state.hash);
 
         if (method.type == DrawPool::DrawMethodType::TRIANGLE) {
-            if (!method.a.isNull()) stdext::hash_union(m_status.second, method.a.hash());
-            if (!method.b.isNull()) stdext::hash_union(m_status.second, method.b.hash());
-            if (!method.c.isNull()) stdext::hash_union(m_status.second, method.c.hash());
+            if (!method.a.isNull()) stdext::hash_union(hash, method.a.hash());
+            if (!method.b.isNull()) stdext::hash_union(hash, method.b.hash());
+            if (!method.c.isNull()) stdext::hash_union(hash, method.c.hash());
         } else if (method.type == DrawPool::DrawMethodType::BOUNDING_RECT) {
-            if (method.intValue) stdext::hash_combine(m_status.second, method.intValue);
+            if (method.intValue) stdext::hash_combine(hash, method.intValue);
         } else {
-            if (method.dest.isValid()) stdext::hash_union(m_status.second, method.dest.hash());
-            if (method.src.isValid()) stdext::hash_union(m_status.second, method.src.hash());
+            if (method.dest.isValid()) stdext::hash_union(hash, method.dest.hash());
+            if (method.src.isValid()) stdext::hash_union(hash, method.src.hash());
         }
+
+        m_hash.emplace(hash);
     }
 }
 
@@ -232,6 +236,7 @@ void DrawPool::resetState()
     m_coords.clear();
     m_parameters.clear();
 
+    m_hash.clear();
     m_state = {};
     m_status.second = 0;
     m_lastFramebufferId = 0;
@@ -376,7 +381,7 @@ void DrawPool::releaseFrameBuffer(const Rect& dest)
         drawState.execute();
         frame->draw(dest);
     });
-    if (hasFrameBuffer() && !dest.isNull()) stdext::hash_union(m_status.second, dest.hash());
+    if (hasFrameBuffer() && !dest.isNull()) m_hash.emplace(dest.hash());
     --m_bindedFramebuffers;
 }
 

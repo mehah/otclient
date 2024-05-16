@@ -32,6 +32,7 @@
 #include <framework/core/graphicalapplication.h>
 
 #include "../stdext/storage.h"
+#include <unordered_set>
 
 enum class DrawPoolType : uint8_t
 {
@@ -307,6 +308,8 @@ private:
     Timer m_refreshTimer;
 
     std::pair<size_t, size_t> m_status{ 1, 0 };
+
+    std::unordered_set<size_t> m_hash;
 
     std::vector<Matrix3> m_transformMatrixStack;
     std::vector<FrameBufferPtr> m_temporaryFramebuffers;
