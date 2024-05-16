@@ -102,6 +102,7 @@ void LightView::draw(const Rect& dest, const Rect& src)
         });
     }
 
+    m_pool->repaint();
     g_drawPool.preDraw(DrawPoolType::LIGHT, [this, &dest, &src] {
         g_drawPool.addAction([=, this] {
             {
