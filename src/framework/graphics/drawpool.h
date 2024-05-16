@@ -81,7 +81,7 @@ public:
     FrameBufferPtr getFrameBuffer() const { return m_framebuffer; }
 
     bool canRepaint() { return canRepaint(false); }
-    void repaint() { m_status.first = 1; }
+    void repaint() { m_status.first = 1; m_refreshTimer.update(-1000); }
     void resetState();
     void scale(float factor);
 
