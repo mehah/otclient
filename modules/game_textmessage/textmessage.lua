@@ -53,6 +53,7 @@ MessageSettings = {
         color = TextColors.white,
         consoleTab = 'Loot',
         screenTarget = 'highCenterLabel',
+        consoleOption = 'showInfoMessagesInConsole'
     }
 }
 
