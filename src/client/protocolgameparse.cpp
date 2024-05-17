@@ -1903,10 +1903,8 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
     }
 
     if (g_game.getFeature(Otc::GameAdditionalSkills)) {
-        // Critical, Life Leech, Mana Leech, Dodge, Fatal, Momentum have no level percent, nor loyalty bonus
-
-        const uint8_t lastSkill = g_game.getClientVersion() >= 1281 ? Otc::LastSkill : Otc::ManaLeechAmount + 1;
-        for (int_fast32_t skill = Otc::CriticalChance; skill < lastSkill; ++skill) {
+        // Critical, Life Leech, Mana Leech
+        for (int_fast32_t skill = Otc::CriticalChance; skill <= Otc::ManaLeechAmount; ++skill) {
             if (!g_game.getFeature(Otc::GameLeechAmount)) {
                 if (skill == Otc::LifeLeechAmount || skill == Otc::ManaLeechAmount) {
                     continue;
@@ -1926,10 +1924,12 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
 
     if (g_game.getClientVersion() >= 1281) {
         // forge skill stats
-        const uint8_t slots = g_game.getClientVersion() >= 1332 ? 4 : 3; // 1281: CONST_SLOT_LEFT, CONST_SLOT_ARMOR, CONST_SLOT_HEAD, 1332: CONST_SLOT_LEGS
-        for (auto i = 0; i < slots; ++i) {
-            msg->getU16(); // skill
-            msg->getU16(); // skill
+        const uint8_t lastSkill = g_game.getClientVersion() >= 1332 ? Otc::LastSkill : Otc::Momentum + 1;
+        for (int_fast32_t skill = Otc::Fatal; skill < lastSkill; ++skill) {
+            const uint16_t level = msg->getU16();
+            const uint16_t baseLevel = msg->getU16();
+            m_localPlayer->setSkill(static_cast<Otc::Skill>(skill), level, 0);
+            m_localPlayer->setBaseSkill(static_cast<Otc::Skill>(skill), baseLevel);
         }
 
         // bonus cap
