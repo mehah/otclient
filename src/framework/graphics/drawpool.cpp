@@ -170,10 +170,10 @@ bool DrawPool::updateHash(const DrawPool::DrawMethod& method, const TexturePtr& 
         }
 
         // check to skip the next drawing that is the same as the previous one.
-        if (!hasCoord && m_lastObjectHash == hash)
+        if (!hasCoord && m_hashCtrl.isLast(hash))
             return false;
 
-        m_objectHashs.emplace(m_lastObjectHash = hash);
+        m_hashCtrl.put(hash);
     }
 
     return true;
@@ -236,19 +236,20 @@ void DrawPool::resetState()
 {
     for (auto& objs : m_objects)
         objs.clear();
-    m_objectsFlushed.clear();
+
     m_coords.clear();
     m_parameters.clear();
+    m_objectsFlushed.clear();
 
-    m_objectHashs.clear();
+    m_hashCtrl.reset();
+
     m_state = {};
-    m_status.second = 0;
     m_lastFramebufferId = 0;
     m_shaderRefreshDelay = 0;
     m_scale = PlatformWindow::DEFAULT_DISPLAY_DENSITY;
 }
 
-bool DrawPool::canRepaint(const bool autoUpdateStatus)
+bool DrawPool::canRepaint()
 {
     if (m_repaint)
         return false;
@@ -257,12 +258,7 @@ bool DrawPool::canRepaint(const bool autoUpdateStatus)
     if (m_shaderRefreshDelay > 0 && (m_refreshDelay == 0 || m_shaderRefreshDelay < m_refreshDelay))
         refreshDelay = m_shaderRefreshDelay;
 
-    const bool canRepaint = m_status.first != m_status.second || (refreshDelay > 0 && m_refreshTimer.ticksElapsed() >= refreshDelay);
-
-    if (canRepaint && autoUpdateStatus) {
-        m_status.first = m_status.second;
-        m_refreshTimer.restart();
-    }
+    const bool canRepaint = m_hashCtrl.wasModified() || (refreshDelay > 0 && m_refreshTimer.ticksElapsed() >= refreshDelay);
 
     return canRepaint;
 }
@@ -348,7 +344,7 @@ void DrawPool::setFramebuffer(const Size& size) {
 }
 
 void DrawPool::removeFramebuffer() {
-    m_status.first = 0;
+    m_hashCtrl.reset();
     m_framebuffer = nullptr;
 }
 
@@ -386,7 +382,7 @@ void DrawPool::releaseFrameBuffer(const Rect& dest)
         frame->draw(dest);
     });
 
-    if (hasFrameBuffer() && !dest.isNull()) m_objectHashs.emplace(dest.hash());
+    if (hasFrameBuffer() && !dest.isNull()) m_hashCtrl.put(dest.hash());
     --m_bindedFramebuffers;
 }
 

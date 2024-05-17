@@ -45,10 +45,6 @@ void Missile::setPath(const Position& fromPosition, const Position& toPosition)
     m_delta = Point(toPosition.x - fromPosition.x, toPosition.y - fromPosition.y);
 
     const float deltaLength = m_delta.length();
-    if (deltaLength == 0) {
-        g_map.removeThing(asMissile());
-        return;
-    }
 
     m_direction = fromPosition.getDirectionFromPosition(toPosition);
 

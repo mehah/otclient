@@ -54,6 +54,47 @@ enum DrawOrder : uint8_t
     LAST
 };
 
+struct DrawHashController
+{
+    bool put(size_t hash) {
+        return m_hashs.emplace(m_lastObjectHash = hash).second;
+    }
+
+    bool isLast(const size_t hash) const {
+        return m_lastObjectHash == hash;
+    }
+
+    void update() {
+        if (m_hashs.empty()) return;
+
+        m_currentHash = 0;
+        for (const auto hash : m_hashs)
+            stdext::hash_union(m_currentHash, hash);
+        m_hashs.clear();
+    }
+
+    void forceUpdate() {
+        m_currentHash = 1;
+    }
+
+    bool wasModified() const {
+        return m_currentHash != m_lastHash;
+    }
+
+    void reset() {
+        m_hashs.clear();
+        m_lastHash = m_currentHash;
+        m_lastObjectHash = 0;
+    }
+
+private:
+    std::unordered_set<size_t> m_hashs;
+
+    size_t m_lastHash{ 0 };
+    size_t m_currentHash{ 0 };
+    size_t m_lastObjectHash{ 0 };
+};
+
 struct DrawConductor
 {
     bool agroup{ false };
@@ -81,8 +122,8 @@ public:
     bool hasFrameBuffer() const { return m_framebuffer != nullptr; }
     FrameBufferPtr getFrameBuffer() const { return m_framebuffer; }
 
-    bool canRepaint() { return canRepaint(false); }
-    void repaint() { m_status.first = 1; m_refreshTimer.update(-1000); }
+    bool canRepaint();
+    void repaint() { m_hashCtrl.forceUpdate(); m_refreshTimer.update(-1000); }
     void resetState();
     void scale(float factor);
 
@@ -103,6 +144,10 @@ public:
 
     bool isDrawing() const {
         return m_repaint;
+    }
+
+    auto& getHashController() {
+        return m_hashCtrl;
     }
 
 protected:
@@ -288,8 +333,6 @@ private:
         }
     }
 
-    bool canRepaint(bool autoUpdateStatus);
-
     const FrameBufferPtr& getTemporaryFrameBuffer(const uint8_t index);
 
     bool m_enabled{ true };
@@ -307,9 +350,7 @@ private:
 
     Timer m_refreshTimer;
 
-    std::pair<size_t, size_t> m_status{ 1, 0 };
-    std::unordered_set<size_t> m_objectHashs;
-    size_t m_lastObjectHash{ 0 };
+    DrawHashController m_hashCtrl;
 
     std::vector<Matrix3> m_transformMatrixStack;
     std::vector<FrameBufferPtr> m_temporaryFramebuffers;

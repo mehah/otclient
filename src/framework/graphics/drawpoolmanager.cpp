@@ -158,7 +158,7 @@ void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, uint
     }, DrawMode::TRIANGLES, condutor);
 }
 
-void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void()>& f, const Rect& dest, const Rect& src, const Color& colorClear)
+void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void()>& f, const Rect& dest, const Rect& src, const Color& colorClear, const bool alwaysDraw)
 {
     select(type);
     const auto pool = getCurrentPool();
@@ -170,17 +170,21 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
 
     if (f) f();
 
+    if (!alwaysDraw)
+        pool->m_hashCtrl.update();
+
     std::scoped_lock l(pool->m_mutexDraw);
 
     pool->setEnable(true);
-    if (pool->hasFrameBuffer()) {
+
+    if (pool->hasFrameBuffer())
         pool->m_framebuffer->prepare(dest, src, colorClear);
 
-        for (const auto hash : pool->m_objectHashs)
-            stdext::hash_union(pool->m_status.second, hash);
-    }
+    pool->release(pool->m_repaint = alwaysDraw || pool->canRepaint());
 
-    pool->release(pool->m_repaint = pool->canRepaint(true));
+    if (pool->m_repaint) {
+        pool->m_refreshTimer.restart();
+    }
 }
 
 bool DrawPoolManager::drawPool(const DrawPoolType type) {
