@@ -196,16 +196,15 @@ GameNegativeOffset = 116
 GameItemTooltipV8 = 117
 
 TextColors = {
-    red = '#f55e5e',    -- '#c83200'
-    orange = '#f36500', -- '#c87832'
-    yellow = '#ffff00', -- '#e6c832'
-    green = '#00EB00',  -- '#3fbe32'
-    lightblue = '#5ff7f7',
-    blue = '#9f9dfd',
-    -- blue1     = '#6e50dc',
-    -- blue2     = '#3264c8',
-    -- blue3     = '#0096c8',
-    white = '#ffffff' -- '#bebebe'
+    blue = '#9F9DFD',
+    green = '#00EB00',
+    grey= '#A9A9A9',
+    lightblue = '#5FF7F7',
+    orange = '#F36500',
+    purple = '#BA55D3',
+    red = '#F55E5E',
+    white = '#FFFFFF',
+    yellow = '#FFFF00'
 }
 
 MessageModes = {
