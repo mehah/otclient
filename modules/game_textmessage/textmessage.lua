@@ -135,7 +135,6 @@ local function applyColorLootMessage(text)
             if color then
                 return "{" .. itemName .. ", " .. color .. "}"
             end
-            return itemName
         end
         return itemName
     end
