@@ -144,6 +144,7 @@ namespace Otc
         Fatal,
         Dodge,
         Momentum,
+        Transcendence,
         LastSkill
     };
 
