@@ -141,7 +141,7 @@ void GraphicalApplication::run()
     const auto& fgMapPool = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
 
     const auto& FPS = [&] {
-        m_mapProcessFrameCounter.setTargetFps(g_window.vsyncEnabled() || getMaxFps() || getTargetFps() ? 500u : 999u);
+        m_mapProcessFrameCounter.setTargetFps(g_window.vsyncEnabled() || getMaxFps() || getTargetFps() ? 500u : 0u);
         return m_graphicFrameCounter.getFps();
     };
 

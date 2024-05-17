@@ -1216,6 +1216,7 @@ void Map::updateAttachedWidgets(const MapViewPtr& mapView)
         const auto& widgetRect = widget->getRect();
         const auto& newWidgetRect = Rect(p, widgetRect.width(), widgetRect.height());
 
+        widget->disableUpdateTemporarily();
         widget->setRect(newWidgetRect, false);
     }
 }
