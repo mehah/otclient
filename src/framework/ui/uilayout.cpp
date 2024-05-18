@@ -27,18 +27,46 @@
 
 void UILayout::update()
 {
+    //logTraceCounter();
     if (!m_parentWidget)
         return;
 
-    if (m_updateDeferred)
+    /*
+    UIWidgetPtr parent = parentWidget;
+    do {
+        UILayoutPtr ownerLayout = parent->getLayout();
+        if(ownerLayout && ownerLayout->isUpdateDisabled())
+            return;
+        parent = parent->getParent();
+    } while(parent);
+    */
+
+    if (m_updateDisabled)
         return;
 
-    m_updateDeferred = true;
+    if (m_updating) {
+        updateLater();
+        return;
+    }
 
-    g_dispatcher.deferEvent([self = static_self_cast<UILayout>()] {
-        self->internalUpdate();
-        if (self->m_parentWidget)
-            self->m_parentWidget->onLayoutUpdate();
-        self->m_updateDeferred = false;
+    m_updating = true;
+    internalUpdate();
+    m_parentWidget->onLayoutUpdate();
+    m_updating = false;
+}
+
+void UILayout::updateLater()
+{
+    if (m_updateDisabled || m_updateScheduled)
+        return;
+
+    if (!getParentWidget())
+        return;
+
+    auto self = static_self_cast<UILayout>();
+    g_dispatcher.deferEvent([self] {
+        self->m_updateScheduled = false;
+        self->update();
     });
+    m_updateScheduled = true;
 }

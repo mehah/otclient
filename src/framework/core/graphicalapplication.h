@@ -126,9 +126,6 @@ public:
 #endif
     }
 
-    void repaint();
-    void repaintMap();
-
     void setDrawEvents(const ApplicationDrawEventsPtr& drawEvents) { m_drawEvents = drawEvents; }
 
 protected:
@@ -138,7 +135,7 @@ protected:
 private:
     bool m_onInputEvent{ false };
     bool m_optimize{ true };
-    bool m_forceEffectOptimization{ false };
+    bool m_forceEffectOptimization{ true };
     bool m_drawEffectOnTop{ false };
     bool m_drawText{ true };
     bool m_loadingAsyncTexture{ false };

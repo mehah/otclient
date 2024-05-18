@@ -35,13 +35,19 @@ public:
     UILayout(UIWidgetPtr parentWidget) : m_parentWidget(std::move(parentWidget)) { }
 
     void update();
+    void updateLater();
 
     virtual void applyStyle(const OTMLNodePtr& /*styleNode*/) {}
     virtual void addWidget(const UIWidgetPtr& /*widget*/) {}
     virtual void removeWidget(const UIWidgetPtr& /*widget*/) {}
+    void disableUpdates() { ++m_updateDisabled; }
+    void enableUpdates() { m_updateDisabled = std::max<int>(m_updateDisabled - 1, 0); }
 
     void setParent(UIWidgetPtr parentWidget) { m_parentWidget = std::move(parentWidget); }
     UIWidgetPtr getParentWidget() { return m_parentWidget; }
+
+    bool isUpdateDisabled() { return m_updateDisabled > 0; }
+    bool isUpdating() { return m_updating; }
 
     virtual bool isUIAnchorLayout() { return false; }
     virtual bool isUIBoxLayout() { return false; }
@@ -52,6 +58,8 @@ public:
 protected:
     virtual bool internalUpdate() { return false; }
 
-    bool m_updateDeferred{ false };
+    uint8_t m_updateDisabled{ 0 };
+    bool m_updating{ false };
+    bool m_updateScheduled{ false };
     UIWidgetPtr m_parentWidget;
 };

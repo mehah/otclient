@@ -32,6 +32,7 @@
 #include <framework/core/graphicalapplication.h>
 
 #include "../stdext/storage.h"
+#include <unordered_set>
 
 enum class DrawPoolType : uint8_t
 {
@@ -81,7 +82,7 @@ public:
     FrameBufferPtr getFrameBuffer() const { return m_framebuffer; }
 
     bool canRepaint() { return canRepaint(false); }
-    void repaint() { m_status.first = 1; }
+    void repaint() { m_status.first = 1; m_refreshTimer.update(-1000); }
     void resetState();
     void scale(float factor);
 
@@ -99,6 +100,10 @@ public:
 
     std::mutex& getMutex() { return m_mutexDraw; }
     std::mutex& getMutexPreDraw() { return m_mutexPreDraw; }
+
+    bool isDrawing() const {
+        return m_repaint;
+    }
 
 protected:
 
@@ -189,7 +194,7 @@ private:
 
     inline void setFPS(uint16_t fps) { m_refreshDelay = 1000 / fps; }
 
-    void updateHash(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color);
+    bool updateHash(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color, const bool hasCoord);
     PoolState getState(const TexturePtr& texture, const Color& color);
 
     float getOpacity() const { return m_state.opacity; }
@@ -247,9 +252,9 @@ private:
         }
     }
 
-    void release(bool draw = true) {
+    void release(bool flush = true) {
         m_objectsDraw.clear();
-        if (draw) {
+        if (flush) {
             if (!m_objectsFlushed.empty())
                 m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(m_objectsFlushed.begin()), make_move_iterator(m_objectsFlushed.end()));
 
@@ -303,6 +308,8 @@ private:
     Timer m_refreshTimer;
 
     std::pair<size_t, size_t> m_status{ 1, 0 };
+    std::unordered_set<size_t> m_objectHashs;
+    size_t m_lastObjectHash{ 0 };
 
     std::vector<Matrix3> m_transformMatrixStack;
     std::vector<FrameBufferPtr> m_temporaryFramebuffers;

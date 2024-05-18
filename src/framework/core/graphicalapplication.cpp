@@ -141,7 +141,7 @@ void GraphicalApplication::run()
     const auto& fgMapPool = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
 
     const auto& FPS = [&] {
-        m_mapProcessFrameCounter.setTargetFps(g_window.vsyncEnabled() || getMaxFps() || getTargetFps() ? 500u : 999u);
+        m_mapProcessFrameCounter.setTargetFps(g_window.vsyncEnabled() || getMaxFps() || getTargetFps() ? 500u : 0u);
         return m_graphicFrameCounter.getFps();
     };
 
@@ -152,7 +152,8 @@ void GraphicalApplication::run()
     threads.emplace_back(g_asyncDispatcher.submit_task([&] {
         std::unique_lock lock(uiPool->getMutexPreDraw());
         uiCond.wait(lock, [this]() {
-            g_ui.render(DrawPoolType::FOREGROUND);
+            if (m_drawEvents->canDraw(DrawPoolType::MAP))
+                g_ui.render(DrawPoolType::FOREGROUND);
             return m_stopping;
         });
     }));
@@ -161,7 +162,8 @@ void GraphicalApplication::run()
     threads.emplace_back(g_asyncDispatcher.submit_task([&] {
         std::unique_lock lock(fgMapPool->getMutexPreDraw());
         fgMapCond.wait(lock, [this]() -> bool {
-            m_drawEvents->drawForgroundMap();
+            if (m_drawEvents->canDraw(DrawPoolType::MAP))
+                m_drawEvents->drawForgroundMap();
             return m_stopping;
         });
     }));
@@ -177,7 +179,7 @@ void GraphicalApplication::run()
                 continue;
             }
 
-            if (!m_drawEvents || !m_drawEvents->canDraw(DrawPoolType::MAP)) {
+            if (!m_drawEvents->canDraw(DrawPoolType::MAP)) {
                 if (uiPool->canRepaint())
                     g_ui.render(DrawPoolType::FOREGROUND);
                 m_mapProcessFrameCounter.update();
@@ -194,8 +196,7 @@ void GraphicalApplication::run()
 
             m_drawEvents->drawMap();
 
-            // Wait UI and FGMap
-            std::scoped_lock l(uiPool->getMutexPreDraw(), fgMapPool->getMutexPreDraw());
+            g_drawPool.wait();
 
             m_mapProcessFrameCounter.update();
         }
@@ -286,8 +287,6 @@ void GraphicalApplication::inputEvent(const InputEvent& event)
     m_onInputEvent = false;
 }
 
-void GraphicalApplication::repaintMap() { g_drawPool.get(DrawPoolType::MAP)->repaint(); }
-void GraphicalApplication::repaint() { g_drawPool.get(DrawPoolType::FOREGROUND)->repaint(); }
 bool GraphicalApplication::isLoadingAsyncTexture() { return m_loadingAsyncTexture || (m_drawEvents && m_drawEvents->isLoadingAsyncTexture()); }
 
 void GraphicalApplication::setLoadingAsyncTexture(bool v) {

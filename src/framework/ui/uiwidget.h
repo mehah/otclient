@@ -71,7 +71,8 @@ enum FlagProp : uint32_t
     PropImageSmooth = 1 << 21,
     PropImageAutoResize = 1 << 22,
     PropImageIndividualAnimation = 1 << 23,
-    PropUpdateChildrenIndexStates = 1 << 24
+    PropUpdateChildrenIndexStates = 1 << 24,
+    PropDisableUpdateTemporarily = 1 << 25
 };
 
 // @bindclass
@@ -156,7 +157,7 @@ public:
     void setId(const std::string_view id);
     void setParent(const UIWidgetPtr& parent);
     void setLayout(const UILayoutPtr& layout);
-    bool setRect(const Rect& rect);
+    bool setRect(const Rect& rect, const bool updateNow = true);
     void setStyle(const std::string_view styleName);
     void setStyleFromNode(const OTMLNodePtr& styleNode);
     void setEnabled(bool enabled);
@@ -205,6 +206,7 @@ public:
     void setProp(FlagProp prop, bool v, bool callEvent = false);
     bool hasProp(FlagProp prop) { return (m_flagsProp & prop); }
 
+    void disableUpdateTemporarily();
     void addOnDestroyCallback(const std::string& id, const std::function<void()>&& callback);
     void removeOnDestroyCallback(const std::string&);
 

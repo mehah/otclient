@@ -122,14 +122,20 @@ void Map::cleanDynamicThings()
     for (const auto& mapview : m_mapViews)
         mapview->followCreature(nullptr);
 
+    std::vector<UIWidgetPtr> widgets;
+    widgets.reserve(m_attachedObjectWidgetMap.size());
+
+    // we pass the widget to a vector, as destroy() removes the element in m_attachedObjectWidgetMap
+    // and thus ends up having a conflict when removing the widget while it is reading.
     for (const auto& [widget, object] : m_attachedObjectWidgetMap)
+        widgets.emplace_back(widget);
+
+    for (const auto& widget : widgets)
         widget->destroy();
 
-    m_attachedObjectWidgetMap.clear();
-
-    for (const auto& [uid, creature] : m_knownCreatures) {
+    for (const auto& [uid, creature] : m_knownCreatures)
         removeThing(creature);
-    }
+
     m_knownCreatures.clear();
 
     for (int_fast8_t i = -1; ++i <= g_gameConfig.getMapMaxZ();)
@@ -1156,7 +1162,8 @@ bool Map::removeAttachedWidgetFromObject(const UIWidgetPtr& widget) {
     if (it == m_attachedObjectWidgetMap.end())
         return false;
 
-    widget->destroy();
+    if (!widget->isDestroyed())
+        widget->destroy();
 
     m_attachedObjectWidgetMap.erase(it);
     return true;
@@ -1209,7 +1216,8 @@ void Map::updateAttachedWidgets(const MapViewPtr& mapView)
         const auto& widgetRect = widget->getRect();
         const auto& newWidgetRect = Rect(p, widgetRect.width(), widgetRect.height());
 
-        widget->setRect(newWidgetRect);
+        widget->disableUpdateTemporarily();
+        widget->setRect(newWidgetRect, false);
     }
 }
 

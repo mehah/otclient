@@ -70,7 +70,7 @@ private:
 
     bool m_isDark{ false };
 
-    size_t m_hash{ 0 }, m_updatedHash{ 0 };
+    size_t m_hash{ 0 };
 
     Size m_mapSize;
     uint16_t m_tileSize{ 32 };
@@ -83,4 +83,5 @@ private:
     TexturePtr m_texture;
     LightData m_lightData[2];
     std::vector<uint8_t> m_pixels;
+    std::unordered_set<size_t> m_objectHashs;
 };
