@@ -57,7 +57,11 @@ enum DrawOrder : uint8_t
 struct DrawHashController
 {
     bool put(size_t hash) {
-        return m_hashs.emplace(m_lastObjectHash = hash).second;
+        if (m_agroup)
+            return m_hashs.emplace(m_lastObjectHash = hash).second;
+
+        stdext::hash_union(m_currentHash, hash);
+        return true;
     }
 
     bool isLast(const size_t hash) const {
@@ -65,7 +69,7 @@ struct DrawHashController
     }
 
     void update() {
-        if (m_hashs.empty()) return;
+        if (!m_agroup || m_hashs.empty()) return;
 
         m_currentHash = 0;
         for (const auto hash : m_hashs)
@@ -87,12 +91,18 @@ struct DrawHashController
         m_lastObjectHash = 0;
     }
 
+    void agroup(bool v) {
+        m_agroup = v;
+    }
+
 private:
     std::unordered_set<size_t> m_hashs;
 
     size_t m_lastHash{ 0 };
     size_t m_currentHash{ 0 };
     size_t m_lastObjectHash{ 0 };
+
+    bool m_agroup{ true };
 };
 
 struct DrawConductor

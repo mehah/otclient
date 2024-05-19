@@ -34,6 +34,8 @@ LightView::LightView(const Size& size, const uint16_t tileSize) : m_pool(g_drawP
         m_texture = std::make_shared<Texture>(size);
         m_texture->setSmooth(true);
     });
+
+    // m_pool->getHashController().agroup(false);
 }
 
 void LightView::resize(const Size& size, const uint16_t tileSize) {
