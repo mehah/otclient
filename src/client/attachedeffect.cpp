@@ -52,7 +52,7 @@ AttachedEffectPtr AttachedEffect::clone()
     return obj;
 }
 
-void AttachedEffect::draw(const Point& dest, bool isOnTop, const LightViewPtr& lightView) {
+void AttachedEffect::draw(const Point& dest, bool isOnTop, const LightViewPtr& lightView, const bool drawThing) {
     if (m_transform)
         return;
 
@@ -91,24 +91,28 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, const LightViewPtr& l
             lightView->addLightSource(dest, m_light);
 
         if (m_texture) {
-            const auto& size = (m_size.isUnset() ? m_texture->getSize() : m_size) * g_drawPool.getScaleFactor();
-            const auto& texture = m_texture->get(m_frame, m_animationTimer);
-            const auto& rect = Rect(Point(), texture->getSize());
-            g_drawPool.addTexturedRect(Rect(point, size), texture, rect, Color::white, { .order = getDrawOrder() });
+            if (drawThing) {
+                const auto& size = (m_size.isUnset() ? m_texture->getSize() : m_size) * g_drawPool.getScaleFactor();
+                const auto& texture = m_texture->get(m_frame, m_animationTimer);
+                const auto& rect = Rect(Point(), texture->getSize());
+                g_drawPool.addTexturedRect(Rect(point, size), texture, rect, Color::white, { .order = getDrawOrder() });
+            }
         } else {
-            getThingType()->draw(point, 0, m_direction, 0, 0, animation, Color::white, true, lightView, { .order = getDrawOrder() });
+            getThingType()->draw(point, 0, m_direction, 0, 0, animation, Color::white, drawThing, lightView, { .order = getDrawOrder() });
         }
     }
 
-    for (const auto& effect : m_effects)
-        effect->draw(dest, isOnTop, lightView);
+    if (drawThing) {
+        for (const auto& effect : m_effects)
+            effect->draw(dest, isOnTop, lightView);
+    }
 }
 
 void AttachedEffect::drawLight(const Point& dest, const LightViewPtr& lightView) {
     if (!lightView) return;
 
-    if (m_light.intensity > 0)
-        lightView->addLightSource(dest, m_light);
+    const auto& dirControl = m_offsetDirections[m_direction];
+    draw(dest, dirControl.onTop, lightView, false);
 
     for (const auto& effect : m_effects)
         effect->drawLight(dest, lightView);

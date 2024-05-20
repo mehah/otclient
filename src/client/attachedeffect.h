@@ -30,7 +30,7 @@ class AttachedEffect : public LuaObject
 public:
     static AttachedEffectPtr create(uint16_t thingId, ThingCategory category);
 
-    void draw(const Point& /*dest*/, bool /*isOnTop*/, const LightViewPtr & = nullptr);
+    void draw(const Point& /*dest*/, bool /*isOnTop*/, const LightViewPtr & = nullptr, const bool drawThing = true);
     void drawLight(const Point& /*dest*/, const LightViewPtr&);
 
     uint16_t getId() { return m_id; }
@@ -92,6 +92,7 @@ public:
     ThingType* getThingType() const;
 
 private:
+    Point getPoint() const;
     int getCurrentAnimationPhase();
 
     struct DirControl
