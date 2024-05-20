@@ -137,16 +137,27 @@ void GraphicalApplication::run()
 
     g_lua.callGlobalField("g_app", "onRun");
 
-    const auto& uiPool = g_drawPool.get(DrawPoolType::FOREGROUND);
-    const auto& fgMapPool = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
+    const auto uiPool = g_drawPool.get(DrawPoolType::FOREGROUND);
+    const auto lightPool = g_drawPool.get(DrawPoolType::LIGHT);
+    const auto fgMapPool = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
 
     const auto& FPS = [&] {
         m_mapProcessFrameCounter.setTargetFps(g_window.vsyncEnabled() || getMaxFps() || getTargetFps() ? 500u : 0u);
         return m_graphicFrameCounter.getFps();
     };
 
-    std::condition_variable uiCond, fgMapCond;
+    std::condition_variable uiCond, fgMapCond, lightCond;
     BS::multi_future<void> threads;
+
+    // THREAD - FOREGROUND UI
+    threads.emplace_back(g_asyncDispatcher.submit_task([&] {
+        std::unique_lock lock(lightPool->getMutexPreDraw());
+        lightCond.wait(lock, [this]() {
+            if (m_drawEvents->canDraw(DrawPoolType::MAP))
+                g_ui.render(DrawPoolType::LIGHT);
+            return m_stopping;
+        });
+    }));
 
     // THREAD - FOREGROUND UI
     threads.emplace_back(g_asyncDispatcher.submit_task([&] {
@@ -191,6 +202,9 @@ void GraphicalApplication::run()
             if (uiPool->canRepaint())
                 uiCond.notify_one();
 
+            if (lightPool->canRepaint())
+                lightCond.notify_one();
+
             if (fgMapPool->canRepaint())
                 fgMapCond.notify_one();
 
@@ -203,6 +217,7 @@ void GraphicalApplication::run()
 
         uiCond.notify_one();
         fgMapCond.notify_one();
+        lightCond.notify_one();
     }));
 
     m_running = true;

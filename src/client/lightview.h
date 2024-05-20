@@ -79,6 +79,6 @@ private:
     Rect m_dest, m_src;
     CoordsBuffer m_coords;
     TexturePtr m_texture;
-    LightData m_lightData[2];
+    LightData m_lightData;
     std::vector<uint8_t> m_pixels;
 };

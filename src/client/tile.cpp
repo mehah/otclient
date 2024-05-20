@@ -89,6 +89,11 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, LightVi
     drawAttachedParticlesEffect(dest);
 }
 
+void Tile::drawLight(const Point& dest, const MapPosInfo& mapRect, int flags, LightView* lightView) {
+    for (const auto& thing : m_things)
+        drawThing(thing, dest, 0, lightView);
+}
+
 void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags, bool forceDraw, LightView* lightView)
 {
     if (!forceDraw && !m_drawTopAndCreature)

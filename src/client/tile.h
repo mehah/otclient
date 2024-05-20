@@ -99,6 +99,7 @@ public:
 
     void onAddInMapView();
     void draw(const Point& dest, const MapPosInfo& mapRect, int flags, LightView* lightView = nullptr);
+    void drawLight(const Point& dest, const MapPosInfo& mapRect, int flags, LightView* lightView);
 
     void clean();
 

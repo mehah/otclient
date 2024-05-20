@@ -99,6 +99,7 @@ bool Client::canDraw(DrawPoolType type) const
         case DrawPoolType::FOREGROUND:
             return true;
 
+        case DrawPoolType::LIGHT:
         case DrawPoolType::MAP:
         case DrawPoolType::CREATURE_INFORMATION:
         case DrawPoolType::FOREGROUND_MAP:
