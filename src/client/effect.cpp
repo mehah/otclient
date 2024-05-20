@@ -73,13 +73,16 @@ void Effect::draw(const Point& dest, bool drawThings, LightView* lightView)
             yPattern += getNumPatternY();
     }
 
-    if (g_app.isDrawingEffectsOnTop() && !m_drawConductor.agroup) {
-        m_drawConductor.agroup = true;
-        m_drawConductor.order = DrawOrder::FOURTH;
+    if (g_drawPool.getCurrentType() == DrawPoolType::MAP) {
+        if (g_app.isDrawingEffectsOnTop() && !m_drawConductor.agroup) {
+            m_drawConductor.agroup = true;
+            m_drawConductor.order = DrawOrder::FOURTH;
+        }
+
+        if (drawThings && g_client.getEffectAlpha() < 1.f)
+            g_drawPool.setOpacity(g_client.getEffectAlpha(), true);
     }
 
-    if (drawThings && g_client.getEffectAlpha() < 1.f)
-        g_drawPool.setOpacity(g_client.getEffectAlpha(), true);
     getThingType()->draw(dest, 0, xPattern, yPattern, 0, animationPhase, Color::white, drawThings, lightView, m_drawConductor);
 }
 

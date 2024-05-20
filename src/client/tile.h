@@ -99,7 +99,7 @@ public:
 
     void onAddInMapView();
     void draw(const Point& dest, const MapPosInfo& mapRect, int flags, LightView* lightView = nullptr);
-    void drawLight(const Point& dest, const MapPosInfo& mapRect, int flags, LightView* lightView);
+    void drawLight(const Point& dest, LightView* lightView);
 
     void clean();
 
@@ -120,7 +120,7 @@ public:
     ThingPtr getTopMoveThing();
     ThingPtr getTopMultiUseThing();
 
-    int getDrawElevation() { return m_drawElevation; }
+    int getDrawElevation() const { return m_drawElevation; }
     const Position& getPosition() { return m_position; }
     const std::vector<CreaturePtr>& getWalkingCreatures() { return m_walkingCreatures; }
     const std::vector<ThingPtr>& getThings() { return m_things; }
@@ -216,9 +216,8 @@ public:
 #endif
 private:
     void updateThingStackPos();
-    void drawTop(const Point& dest, int flags, bool forceDraw, LightView* lightView = nullptr);
-    void drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags, bool forceDraw, LightView* lightView = nullptr);
-    void drawThing(const ThingPtr& thing, const Point& dest, int flags, LightView* lightView);
+    void drawTop(const Point& dest, int flags, bool forceDraw);
+    void drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags, bool forceDraw);
 
     void setThingFlag(const ThingPtr& thing);
 

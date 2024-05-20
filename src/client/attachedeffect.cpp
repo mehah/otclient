@@ -104,6 +104,16 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
         effect->draw(dest, isOnTop, lightView);
 }
 
+void AttachedEffect::drawLight(const Point& dest, LightView* lightView) {
+    if (!lightView) return;
+
+    if (m_light.intensity > 0)
+        lightView->addLightSource(dest, m_light);
+
+    for (const auto& effect : m_effects)
+        effect->drawLight(dest, lightView);
+}
+
 int AttachedEffect::getCurrentAnimationPhase()
 {
     if (m_texture) {

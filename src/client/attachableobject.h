@@ -79,6 +79,8 @@ protected:
     };
 
     void drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop);
+    void drawAttachedLightEffect(const Point& dest, LightView* lightView);
+
     void onDetachEffect(const AttachedEffectPtr& effect, bool callEvent = true);
     void drawAttachedParticlesEffect(const Point& dest);
 

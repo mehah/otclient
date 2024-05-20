@@ -165,6 +165,12 @@ void AttachableObject::drawAttachedEffect(const Point& dest, LightView* lightVie
     }
 }
 
+void AttachableObject::drawAttachedLightEffect(const Point& dest, LightView* lightView) {
+    if (!hasAttachedEffects()) return;
+    for (const auto& effect : m_data->attachedEffects)
+        effect->drawLight(dest, lightView);
+}
+
 void AttachableObject::attachParticleEffect(const std::string& name)
 {
     const ParticleEffectPtr effect = g_particles.createEffect(name);

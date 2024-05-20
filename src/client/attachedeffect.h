@@ -31,6 +31,7 @@ public:
     static AttachedEffectPtr create(uint16_t thingId, ThingCategory category);
 
     void draw(const Point& /*dest*/, bool /*isOnTop*/, LightView* = nullptr);
+    void drawLight(const Point& /*dest*/, LightView*);
 
     uint16_t getId() { return m_id; }
 

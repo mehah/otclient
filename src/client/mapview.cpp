@@ -41,7 +41,7 @@
 #include <framework/graphics/shadermanager.h>
 #include <framework/platform/platformwindow.h>
 
-MapView::MapView() : m_pool(g_drawPool.get(DrawPoolType::MAP)), m_lightView(std::make_shared<LightView>(Size(), g_gameConfig.getSpriteSize()))
+MapView::MapView() : m_pool(g_drawPool.get(DrawPoolType::MAP)), m_lightView(std::make_unique<LightView>(Size(), g_gameConfig.getSpriteSize()))
 {
     m_floors.resize(g_gameConfig.getMapMaxZ() + 1);
 
@@ -53,7 +53,6 @@ MapView::~MapView()
 #ifndef NDEBUG
     assert(!g_app.isTerminated());
 #endif
-    m_lightView = nullptr;
 }
 
 void MapView::registerEvents() {
@@ -184,9 +183,6 @@ void MapView::drawFloor()
 
 void MapView::drawLights() {
     const auto& cameraPosition = m_posInfo.camera;
-    const auto& lightView = isDrawingLights() ? m_lightView.get() : nullptr;
-
-    uint32_t flags = Otc::DrawLights;
 
     for (int_fast8_t z = m_floorMax; z >= m_floorMin; --z) {
         const float fadeLevel = getFadeLevel(z);
@@ -206,12 +202,11 @@ void MapView::drawLights() {
             }
         }
 
-        for (const auto& tile : map.tiles) {
-            tile->drawLight(transformPositionTo2D(tile->getPosition()), m_posInfo, Otc::DrawLights, lightView);
-        }
+        for (const auto& tile : map.tiles)
+            tile->drawLight(transformPositionTo2D(tile->getPosition()), m_lightView.get());
 
         for (const auto& missile : g_map.getFloorMissiles(z))
-            missile->draw(transformPositionTo2D(missile->getPosition()), false, lightView);
+            missile->draw(transformPositionTo2D(missile->getPosition()), false, m_lightView.get());
     }
 }
 

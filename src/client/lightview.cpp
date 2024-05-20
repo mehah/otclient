@@ -37,7 +37,11 @@ LightView::LightView(const Size& size, const uint16_t tileSize) : m_pool(g_drawP
 
     g_drawPool.preDraw(DrawPoolType::LIGHT, [this] {
         g_drawPool.addAction([this] {
-            m_texture->updatePixels(m_pixels.data());
+            if (m_pixelUpdated) {
+                m_texture->updatePixels(m_pixels.data());
+                m_pixelUpdated = false;
+            }
+
             g_painter->setCompositionMode(CompositionMode::MULTIPLY);
             g_painter->resetTransformMatrix();
             g_painter->resetColor();
@@ -160,4 +164,6 @@ void LightView::updatePixels() {
             }
         }
     }
+
+    m_pixelUpdated = true;
 }

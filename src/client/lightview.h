@@ -69,6 +69,7 @@ private:
     void updatePixels();
 
     bool m_isDark{ false };
+    bool m_pixelUpdated{ false };
 
     Size m_mapSize;
     uint16_t m_tileSize{ 32 };
