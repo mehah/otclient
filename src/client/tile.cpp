@@ -260,6 +260,8 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
     } else if (stackPos > static_cast<int>(size))
         stackPos = size;
 
+    markHighlightedThing(Color::white);
+
     m_things.insert(m_things.begin() + stackPos, thing);
 
     // get the elevation status before analyze the new item.
@@ -269,9 +271,6 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
 
     if (size > g_gameConfig.getTileMaxThings())
         removeThing(m_things[g_gameConfig.getTileMaxThings()]);
-
-    updateThingStackPos();
-    checkForDetachableThing();
 
     // Do not change if you do not understand what is being done.
     {
@@ -286,6 +285,9 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
 
     thing->setPosition(m_position, stackPos, hasElev);
     thing->onAppear();
+
+    updateThingStackPos();
+    checkForDetachableThing();
 
     if (g_game.isTileThingLuaCallbackEnabled())
         callLuaField("onAddThing", thing);
@@ -309,6 +311,8 @@ bool Tile::removeThing(const ThingPtr thing)
     const auto it = std::find(m_things.begin(), m_things.end(), thing);
     if (it == m_things.end())
         return false;
+
+    markHighlightedThing(Color::white);
 
     m_things.erase(it);
 
@@ -674,8 +678,6 @@ bool Tile::limitsFloorsView(bool isFreeView)
 
 bool Tile::checkForDetachableThing(const TileSelectType selectType)
 {
-    markHighlightedThing(Color::white);
-
     const auto& markIfYouNeed = [&] {
         if (m_selectType == TileSelectType::NONE) return;
         markHighlightedThing(Color::yellow);
