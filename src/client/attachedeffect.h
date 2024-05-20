@@ -92,7 +92,6 @@ public:
     ThingType* getThingType() const;
 
 private:
-    Point getPoint() const;
     int getCurrentAnimationPhase();
 
     struct DirControl
