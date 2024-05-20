@@ -27,7 +27,7 @@
 #include "tile.h"
 #include <client/client.h>
 
-void Missile::draw(const Point& dest, bool drawThings, LightView* lightView)
+void Missile::draw(const Point& dest, bool drawThings, const LightViewPtr& lightView)
 {
     if (!canDraw() || isHided())
         return;

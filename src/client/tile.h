@@ -98,8 +98,8 @@ public:
     bool isTile() override { return true; }
 
     void onAddInMapView();
-    void draw(const Point& dest, const MapPosInfo& mapRect, int flags, LightView* lightView = nullptr);
-    void drawLight(const Point& dest, LightView* lightView);
+    void draw(const Point& dest, const MapPosInfo& mapRect, int flags, const LightViewPtr& lightView = nullptr);
+    void drawLight(const Point& dest, const LightViewPtr& lightView);
 
     void clean();
 

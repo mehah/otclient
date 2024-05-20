@@ -44,7 +44,7 @@ ItemPtr Item::create(int id)
     return item;
 }
 
-void Item::draw(const Point& dest, bool drawThings, LightView* lightView)
+void Item::draw(const Point& dest, bool drawThings, const LightViewPtr& lightView)
 {
     if (!canDraw(m_color) || isHided())
         return;
@@ -60,7 +60,7 @@ void Item::draw(const Point& dest, bool drawThings, LightView* lightView)
         internalDraw(animationPhase, dest, getHighlightColor(), drawThings, true);
 }
 
-void Item::internalDraw(int animationPhase, const Point& dest, const Color& color, bool drawThings, bool replaceColorShader, LightView* lightView)
+void Item::internalDraw(int animationPhase, const Point& dest, const Color& color, bool drawThings, bool replaceColorShader, const LightViewPtr& lightView)
 {
     if (replaceColorShader)
         g_drawPool.setShaderProgram(g_painter->getReplaceColorShader(), true);
@@ -85,7 +85,7 @@ void Item::internalDraw(int animationPhase, const Point& dest, const Color& colo
     }
 }
 
-void Item::drawLight(const Point& dest, LightView* lightView) {
+void Item::drawLight(const Point& dest, const LightViewPtr& lightView) {
     if (!lightView) return;
     getThingType()->draw(dest, 0, m_numPatternX, m_numPatternY, m_numPatternZ, 0, Color::white, false, lightView);
     drawAttachedLightEffect(dest, lightView);

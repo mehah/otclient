@@ -39,10 +39,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
         }
     } else {
         pool->m_alwaysGroupDrawings = true; // CREATURE_INFORMATION & TEXT
-
-        if (type == DrawPoolType::FOREGROUND_MAP || type == DrawPoolType::CREATURE_INFORMATION || type == DrawPoolType::LIGHT) {
-            pool->setFPS(60);
-        }
+        pool->setFPS(60);
     }
 
     pool->m_type = type;

@@ -34,21 +34,6 @@ LightView::LightView(const Size& size, const uint16_t tileSize) : m_pool(g_drawP
         m_texture = std::make_shared<Texture>(size);
         m_texture->setSmooth(true);
     });
-
-    g_drawPool.preDraw(DrawPoolType::LIGHT, [this] {
-        g_drawPool.addAction([this] {
-            if (m_pixelUpdated) {
-                m_texture->updatePixels(m_pixels.data());
-                m_pixelUpdated = false;
-            }
-
-            g_painter->setCompositionMode(CompositionMode::MULTIPLY);
-            g_painter->resetTransformMatrix();
-            g_painter->resetColor();
-            g_painter->setTexture(m_texture.get());
-            g_painter->drawCoords(m_coords);
-        });
-    }, true);
 }
 
 void LightView::resize(const Size& size, const uint16_t tileSize) {
@@ -104,12 +89,31 @@ void LightView::resetShade(const Point& pos)
 
 void LightView::draw(const Rect& dest, const Rect& src)
 {
-    updateCoords(dest, src);
+    bool pixelUpdated = false;
 
+    m_pool->getHashController().put(src.hash());
+    m_pool->getHashController().put(m_globalLightColor.hash());
     m_pool->getHashController().update();
-    if (m_pool->getHashController().wasModified())
+    if (m_pool->getHashController().wasModified()) {
         updatePixels();
+        pixelUpdated = true;
+    }
     m_pool->getHashController().reset();
+
+    g_drawPool.preDraw(DrawPoolType::LIGHT, [this, &dest, &src, pixelUpdated] {
+        g_drawPool.addAction([=, this] {
+            if (pixelUpdated) {
+                m_texture->updatePixels(m_pixels.data());
+            }
+
+            updateCoords(dest, src);
+            g_painter->setCompositionMode(CompositionMode::MULTIPLY);
+            g_painter->resetTransformMatrix();
+            g_painter->resetColor();
+            g_painter->setTexture(m_texture.get());
+            g_painter->drawCoords(m_coords);
+        });
+    }, true);
 
     m_lightData.lights.clear();
     m_lightData.tiles.assign(m_mapSize.area(), {});
@@ -164,6 +168,4 @@ void LightView::updatePixels() {
             }
         }
     }
-
-    m_pixelUpdated = true;
 }

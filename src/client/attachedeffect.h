@@ -30,8 +30,8 @@ class AttachedEffect : public LuaObject
 public:
     static AttachedEffectPtr create(uint16_t thingId, ThingCategory category);
 
-    void draw(const Point& /*dest*/, bool /*isOnTop*/, LightView* = nullptr);
-    void drawLight(const Point& /*dest*/, LightView*);
+    void draw(const Point& /*dest*/, bool /*isOnTop*/, const LightViewPtr & = nullptr);
+    void drawLight(const Point& /*dest*/, const LightViewPtr&);
 
     uint16_t getId() { return m_id; }
 

@@ -203,10 +203,10 @@ void MapView::drawLights() {
         }
 
         for (const auto& tile : map.tiles)
-            tile->drawLight(transformPositionTo2D(tile->getPosition()), m_lightView.get());
+            tile->drawLight(transformPositionTo2D(tile->getPosition()), m_lightView);
 
         for (const auto& missile : g_map.getFloorMissiles(z))
-            missile->draw(transformPositionTo2D(missile->getPosition()), false, m_lightView.get());
+            missile->draw(transformPositionTo2D(missile->getPosition()), false, m_lightView);
     }
 }
 
@@ -479,9 +479,6 @@ void MapView::onCameraMove(const Point& /*offset*/)
     if (isFollowingCreature()) {
         updateViewport(m_followingCreature->isWalking() ? m_followingCreature->getDirection() : Otc::InvalidDirection);
     }
-
-    g_drawPool.repaint(DrawPoolType::FOREGROUND_MAP);
-    g_drawPool.repaint(DrawPoolType::CREATURE_INFORMATION);
 }
 
 void MapView::onFloorChange(const uint8_t /*floor*/, const uint8_t /*previousFloor*/)

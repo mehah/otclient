@@ -76,8 +76,8 @@ class Item : public Thing
 public:
     static ItemPtr create(int id);
 
-    void draw(const Point& dest, bool drawThings = true, LightView* lightView = nullptr) override;
-    void drawLight(const Point& dest, LightView* lightView) override;
+    void draw(const Point& dest, bool drawThings = true, const LightViewPtr& lightView = nullptr) override;
+    void drawLight(const Point& dest, const LightViewPtr& lightView) override;
 
     void setId(uint32_t id) override;
 
@@ -153,7 +153,7 @@ public:
 private:
     ThingType* getThingType() const override;
 
-    void internalDraw(int animationPhase, const Point& dest, const Color& color, bool drawThings, bool replaceColorShader, LightView* lightView = nullptr);
+    void internalDraw(int animationPhase, const Point& dest, const Color& color, bool drawThings, bool replaceColorShader, const LightViewPtr& lightView = nullptr);
     void setConductor();
 
     uint16_t m_countOrSubType{ 0 };

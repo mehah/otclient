@@ -27,7 +27,7 @@
 #include "map.h"
 #include <client/client.h>
 
-void Effect::draw(const Point& dest, bool drawThings, LightView* lightView)
+void Effect::draw(const Point& dest, bool drawThings, const LightViewPtr& lightView)
 {
     if (!canDraw() || isHided())
         return;

@@ -52,7 +52,7 @@ AttachedEffectPtr AttachedEffect::clone()
     return obj;
 }
 
-void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView) {
+void AttachedEffect::draw(const Point& dest, bool isOnTop, const LightViewPtr& lightView) {
     if (m_transform)
         return;
 
@@ -104,7 +104,7 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, LightView* lightView)
         effect->draw(dest, isOnTop, lightView);
 }
 
-void AttachedEffect::drawLight(const Point& dest, LightView* lightView) {
+void AttachedEffect::drawLight(const Point& dest, const LightViewPtr& lightView) {
     if (!lightView) return;
 
     if (m_light.intensity > 0)

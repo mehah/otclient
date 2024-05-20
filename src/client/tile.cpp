@@ -44,13 +44,13 @@ void updateElevation(const ThingPtr& thing, uint8_t& drawElevation) {
         drawElevation = std::min<uint8_t>(drawElevation + thing->getElevation(), g_gameConfig.getTileMaxElevation());
 }
 
-void drawThing(const ThingPtr& thing, const Point& dest, int flags, uint8_t& drawElevation, LightView* lightView = nullptr)
+void drawThing(const ThingPtr& thing, const Point& dest, int flags, uint8_t& drawElevation, const LightViewPtr& lightView = nullptr)
 {
     thing->draw(dest - drawElevation * g_drawPool.getScaleFactor(), flags & Otc::DrawThings, lightView);
     updateElevation(thing, drawElevation);
 }
 
-void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, LightView* lightView)
+void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, const LightViewPtr& lightView)
 {
     m_drawElevation = 0;
     m_lastDrawDest = dest;
@@ -93,7 +93,7 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, LightVi
     drawAttachedParticlesEffect(dest);
 }
 
-void Tile::drawLight(const Point& dest, LightView* lightView) {
+void Tile::drawLight(const Point& dest, const LightViewPtr& lightView) {
     uint8_t drawElevation = 0;
 
     for (const auto& thing : m_things) {
