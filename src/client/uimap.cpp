@@ -65,7 +65,7 @@ void UIMap::drawSelf(DrawPoolType drawPane)
     if (drawPane == DrawPoolType::MAP) {
         g_drawPool.preDraw(drawPane, [this, &mapRect] {
             m_mapView->registerEvents();
-            m_mapView->draw(mapRect);
+            m_mapView->drawFloor();
         }, m_mapView->m_posInfo.rect, m_mapView->m_posInfo.srcRect, Color::black);
     } else if (drawPane == DrawPoolType::LIGHT) {
         g_drawPool.preDraw(drawPane, [this] {
@@ -146,7 +146,8 @@ void UIMap::setVisibleDimension(const Size& visibleDimension)
 
 void UIMap::setKeepAspectRatio(bool enable)
 {
-    if (m_keepAspectRatio = enable)
+    m_keepAspectRatio = enable;
+    if (enable)
         m_aspectRatio = getVisibleDimension().ratio();
 
     updateMapSize();

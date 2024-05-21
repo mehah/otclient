@@ -89,7 +89,6 @@ public:
 
     MapView();
     ~MapView() override;
-    void draw(const Rect& rect);
     void drawForeground(const Rect& rect);
     void drawCreatureInformation();
     void preLoad();

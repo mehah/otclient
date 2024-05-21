@@ -254,7 +254,7 @@ void BitmapFont::fillTextCoords(const CoordsBufferPtr& coords, const std::string
     }
 }
 
-void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPtr>>& colorCoords, const std::string_view text, 
+void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPtr>>& colorCoords, const std::string_view text,
                         const std::vector<std::pair<int, Color>> textColors,
                         const Size& textBoxSize, Fw::AlignmentFlag align,
                         const Rect& screenCoords, const std::vector<Point>& glyphsPositions) const
@@ -267,7 +267,7 @@ void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPt
 
     const int textLenght = text.length();
     const int textColorsSize = textColors.size();
-    
+
     std::map<uint32_t, CoordsBufferPtr> colorCoordsMap;
     uint32_t curColorRgba;
     int32_t nextColorIndex = 0;
@@ -291,7 +291,7 @@ void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPt
 
             coords = colorCoordsMap[curColorRgba];
         }
-    
+
         const int glyph = static_cast<uint8_t>(text[i]);
 
         // skip invalid glyphs
@@ -354,8 +354,8 @@ void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPt
         coords->addRect(glyphScreenCoords, glyphTextureCoords);
     }
 
-    for (auto& [rgba, coords] : colorCoordsMap) {
-        colorCoords.emplace_back(Color(rgba), coords);
+    for (auto& [rgba, crds] : colorCoordsMap) {
+        colorCoords.emplace_back(Color(rgba), crds);
     }
 }
 

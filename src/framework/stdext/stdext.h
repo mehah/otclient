@@ -32,7 +32,6 @@
 #include "cast.h"
 #include "compiler.h"
 #include "demangle.h"
-#include "dumper.h"
 #include "format.h"
 #include "hash.h"
 #include "math.h"
