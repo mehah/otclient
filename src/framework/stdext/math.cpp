@@ -21,6 +21,7 @@
  */
 
 #include "math.h"
+#include <algorithm>
 #include <climits>
 #include <cmath>
 #include <random>
