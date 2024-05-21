@@ -83,7 +83,6 @@ void Map::notificateKeyRelease(const InputEvent& inputEvent) const
 
 void Map::notificateCameraMove(const Point& offset) const
 {
-    g_drawPool.repaint(DrawPoolType::LIGHT);
     g_drawPool.repaint(DrawPoolType::FOREGROUND_MAP);
     g_drawPool.repaint(DrawPoolType::CREATURE_INFORMATION);
 
