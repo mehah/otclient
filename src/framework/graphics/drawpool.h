@@ -199,9 +199,9 @@ protected:
     struct DrawObject
     {
         DrawObject(std::function<void()> action) : action(std::move(action)) {}
-        DrawObject(PoolState&& state) : state(std::move(state)), coords(std::make_unique<CoordsBuffer>()) {}
+        DrawObject(PoolState&& state) : coords(std::make_unique<CoordsBuffer>()), state(std::move(state)) {}
         DrawObject(const DrawMode drawMode, PoolState&& state, DrawMethod&& method) :
-            drawMode(drawMode), state(std::move(state)) { methods.emplace_back(std::move(method)); }
+            state(std::move(state)), drawMode(drawMode) { methods.emplace_back(std::move(method)); }
 
         void addMethod(DrawMethod&& method)
         {
@@ -209,11 +209,12 @@ protected:
             methods.emplace_back(std::move(method));
         }
 
-        DrawMode drawMode{ DrawMode::TRIANGLES };
-        std::unique_ptr<CoordsBuffer> coords;
-        PoolState state;
         std::vector<DrawMethod> methods;
         std::function<void()> action{ nullptr };
+        std::unique_ptr<CoordsBuffer> coords;
+
+        PoolState state;
+        DrawMode drawMode{ DrawMode::TRIANGLES };
     };
 
     struct DrawObjectState

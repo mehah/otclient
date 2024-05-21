@@ -196,7 +196,7 @@ void UIWidget::addChild(const UIWidgetPtr& child)
     g_ui.onWidgetAppear(child);
 }
 
-void UIWidget::insertChild(size_t index, const UIWidgetPtr& child)
+void UIWidget::insertChild(int32_t index, const UIWidgetPtr& child)
 {
     if (!child) {
         g_logger.traceWarning("attempt to insert a null child into a UIWidget");
@@ -208,7 +208,7 @@ void UIWidget::insertChild(size_t index, const UIWidgetPtr& child)
         return;
     }
 
-    const size_t childrenSize = m_children.size();
+    const int32_t childrenSize = m_children.size();
 
     index = index <= 0 ? (childrenSize + index) : index - 1;
 
@@ -228,7 +228,7 @@ void UIWidget::insertChild(size_t index, const UIWidgetPtr& child)
 
     { // cache index
         child->m_childIndex = index + 1;
-        for (size_t i = child->m_childIndex; i < childrenSize; ++i)
+        for (auto i = child->m_childIndex; i < childrenSize; ++i)
             m_children[i]->m_childIndex = i + 1;
     }
 
@@ -1018,7 +1018,7 @@ void UIWidget::setLayout(const UILayoutPtr& layout)
     m_layout = layout;
 }
 
-bool UIWidget::setRect(const Rect& rect, const bool updateNow)
+bool UIWidget::setRect(const Rect& rect)
 {
     Rect clampedRect = rect;
     if (m_minSize.width() != -1 || m_minSize.height() != -1 || m_maxSize.width() != -1 || m_maxSize.height() != -1) {
@@ -1281,7 +1281,7 @@ UIWidgetPtr UIWidget::getRootParent()
 
 UIWidgetPtr UIWidget::getChildAfter(const UIWidgetPtr& relativeChild)
 {
-    return relativeChild->m_childIndex == m_children.size() ?
+    return relativeChild->m_childIndex == static_cast<int32_t>(m_children.size()) ?
         nullptr : m_children[relativeChild->m_childIndex];
 }
 
@@ -1339,8 +1339,8 @@ UIWidgetPtr UIWidget::recursiveGetChildById(const std::string_view id)
         return widget;
 
     for (const auto& child : m_children) {
-        if (const auto& widget = child->recursiveGetChildById(id))
-            return widget;
+        if (const auto& w = child->recursiveGetChildById(id))
+            return w;
     }
 
     return nullptr;

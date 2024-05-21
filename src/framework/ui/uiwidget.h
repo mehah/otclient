@@ -117,7 +117,7 @@ protected:
 
 public:
     void addChild(const UIWidgetPtr& child);
-    void insertChild(size_t index, const UIWidgetPtr& child);
+    void insertChild(int32_t index, const UIWidgetPtr& child);
     void removeChild(const UIWidgetPtr& child);
     void focusChild(const UIWidgetPtr& child, Fw::FocusReason reason);
     void focusNextChild(Fw::FocusReason reason, bool rotate = false);
@@ -157,7 +157,7 @@ public:
     void setId(const std::string_view id);
     void setParent(const UIWidgetPtr& parent);
     void setLayout(const UILayoutPtr& layout);
-    bool setRect(const Rect& rect, const bool updateNow = true);
+    bool setRect(const Rect& rect);
     void setStyle(const std::string_view styleName);
     void setStyleFromNode(const OTMLNodePtr& styleNode);
     void setEnabled(bool enabled);
@@ -312,7 +312,7 @@ public:
     bool isFirstOnStyle() { return hasProp(PropFirstOnStyle); }
 
     bool isFirstChild() { return m_parent && m_childIndex == 1; }
-    bool isLastChild() { return m_parent && m_childIndex == m_parent->m_children.size(); }
+    bool isLastChild() { return m_parent && m_childIndex == static_cast<int32_t>(m_parent->m_children.size()); }
     bool isMiddleChild() { return !isFirstChild() && !isLastChild(); }
 
     bool hasChildren() { return !m_children.empty(); }
@@ -604,5 +604,5 @@ public:
 
     // custom style
 protected:
-    virtual void parseCustomStyle(const OTMLNodePtr& styleNode) {};
+    virtual void parseCustomStyle(const OTMLNodePtr& /*styleNode*/) {};
 };

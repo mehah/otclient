@@ -71,8 +71,8 @@ public:
     bool fileExists(std::string file);
     bool removeFile(std::string file);
     ticks_t getFileModificationTime(std::string file);
-    void openUrl(std::string url, bool now = false);
-    void openDir(std::string path, bool now = false);
+    bool openUrl(std::string url, bool now = false);
+    bool openDir(std::string path, bool now = false);
     std::string getCPUName();
     double getTotalSystemMemory();
     std::string getOSName();
@@ -84,7 +84,7 @@ public:
     std::string getDeviceShortName(DeviceType type = DeviceUnknown);
     std::string getOsShortName(OperatingSystem os = OsUnknown);
     std::string traceback(const std::string_view where, int level = 1, int maxDepth = 32);
-    void addKeyListener(std::function<void(const InputEvent&)> listener) {}
+    void addKeyListener(std::function<void(const InputEvent&)> /*listener*/) {}
 
     static Platform::DeviceType getDeviceTypeByName(std::string shortName);
     static Platform::OperatingSystem getOsByName(std::string shortName);

@@ -45,9 +45,9 @@ public:
     bool detachEffect(const AttachedEffectPtr& obj);
     AttachedEffectPtr getAttachedEffectById(uint16_t id);
 
-    virtual void onStartAttachEffect(const AttachedEffectPtr& effect) { };
-    virtual void onDispatcherAttachEffect(const AttachedEffectPtr& effect) { };
-    virtual void onStartDetachEffect(const AttachedEffectPtr& effect) { };
+    virtual void onStartAttachEffect(const AttachedEffectPtr& /*effect*/) { };
+    virtual void onDispatcherAttachEffect(const AttachedEffectPtr& /*effect*/) { };
+    virtual void onStartDetachEffect(const AttachedEffectPtr& /*effect*/) { };
 
     bool isOwnerHidden() { return m_ownerHidden > 0; }
 

@@ -3675,9 +3675,9 @@ void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
     for (uint32_t i = 0; i < neededItemsSize; i++) {
         const uint16_t needItemId = msg->getU16();
         const uint16_t count = msg->getU16();
-        const ItemPtr& item = Item::create(needItemId);
-        item->setCount(count);
-        needItems.push_back(item);
+        const auto& needItem = Item::create(needItemId);
+        needItem->setCount(count);
+        needItems.push_back(needItem);
     }
 
     g_lua.callGlobalField("g_game", "onImbuementWindow", itemId, slot, activeSlots, imbuements, needItems);

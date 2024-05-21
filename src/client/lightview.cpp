@@ -29,7 +29,7 @@
 #include <framework/core/asyncdispatcher.h>
 #include <framework/graphics/drawpoolmanager.h>
 
-LightView::LightView(const Size& size, const uint16_t tileSize) : m_pool(g_drawPool.get(DrawPoolType::LIGHT)) {
+LightView::LightView(const Size& size) : m_pool(g_drawPool.get(DrawPoolType::LIGHT)) {
     g_mainDispatcher.addEvent([this, size] {
         m_texture = std::make_shared<Texture>(size);
         m_texture->setSmooth(true);
