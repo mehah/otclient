@@ -21,7 +21,7 @@
  */
 
 #include "uiitem.h"
-#include "lightview.h
+#include "lightview.h"
 #include <framework/graphics/fontmanager.h>
 
 UIItem::UIItem() { setProp(PropDraggable, true, false); }
