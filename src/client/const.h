@@ -144,6 +144,7 @@ namespace Otc
         Fatal,
         Dodge,
         Momentum,
+        Transcendence,
         LastSkill
     };
 
@@ -545,7 +546,9 @@ namespace Otc
         GameSmoothWalkElevation = 115,
         GameNegativeOffset = 116,
         GameItemTooltipV8 = 117,
-        LastGameFeature = 118
+        GameForgeConvergence = 118,
+
+        LastGameFeature,
     };
 
     enum MagicEffectsType_t : uint8_t
