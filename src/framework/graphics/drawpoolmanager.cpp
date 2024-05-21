@@ -226,12 +226,3 @@ bool DrawPoolManager::drawPool(DrawPool* pool) {
 
     return true;
 }
-
-void DrawPoolManager::wait() const {
-    std::scoped_lock l(
-        get(DrawPoolType::FOREGROUND)->getMutexPreDraw(),
-        get(DrawPoolType::LIGHT)->getMutexPreDraw(),
-        get(DrawPoolType::FOREGROUND_MAP)->getMutexPreDraw(),
-        get(DrawPoolType::CREATURE_INFORMATION)->getMutexPreDraw()
-    );
-}
