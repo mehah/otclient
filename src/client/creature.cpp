@@ -58,7 +58,7 @@ void Creature::onCreate() {
     callLuaField("onCreate");
 }
 
-void Creature::draw(const Point& dest, bool drawThings, const LightViewPtr& lightView)
+void Creature::draw(const Point& dest, bool drawThings, const LightViewPtr& /*lightView*/)
 {
     if (!canBeSeen() || !canDraw())
         return;
@@ -1025,7 +1025,7 @@ uint16_t Creature::getCurrentAnimationPhase(const bool mount)
     return isDisabledWalkAnimation() ? 0 : m_walkAnimationPhase;
 }
 
-int Creature::getExactSize(int layer, int xPattern, int yPattern, int zPattern, int animationPhase)
+int Creature::getExactSize(int layer, int /*xPattern*/, int yPattern, int zPattern, int /*animationPhase*/)
 {
     if (m_exactSize > 0)
         return m_exactSize;
@@ -1041,7 +1041,7 @@ int Creature::getExactSize(int layer, int xPattern, int yPattern, int zPattern, 
             if (yPattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
                 continue;
 
-            for (int layer = 0; layer < layers; ++layer)
+            for (layer = 0; layer < layers; ++layer)
                 exactSize = std::max<int>(exactSize, Thing::getExactSize(layer, 0, yPattern, zPattern, 0));
         }
     } else {

@@ -41,7 +41,7 @@
 #include <framework/graphics/shadermanager.h>
 #include <framework/platform/platformwindow.h>
 
-MapView::MapView() : m_pool(g_drawPool.get(DrawPoolType::MAP)), m_lightView(std::make_unique<LightView>(Size(), g_gameConfig.getSpriteSize()))
+MapView::MapView() : m_pool(g_drawPool.get(DrawPoolType::MAP)), m_lightView(std::make_unique<LightView>(Size()))
 {
     m_floors.resize(g_gameConfig.getMapMaxZ() + 1);
 
@@ -116,11 +116,6 @@ void MapView::preLoad() {
     g_map.updateAttachedWidgets(static_self_cast<MapView>());
 }
 
-void MapView::draw(const Rect& rect)
-{
-    drawFloor();
-}
-
 void MapView::drawFloor()
 {
     const auto& cameraPosition = m_posInfo.camera;
@@ -149,7 +144,7 @@ void MapView::drawFloor()
                 g_drawPool.setOpacity(inRange ? .16 : .7);
             }
 
-            tile->draw(transformPositionTo2D(tile->getPosition()), m_posInfo, tileFlags);
+            tile->draw(transformPositionTo2D(tile->getPosition()), tileFlags);
 
             if (alwaysTransparent)
                 g_drawPool.resetOpacity();
@@ -268,11 +263,11 @@ void MapView::drawForeground(const Rect& rect)
         p += rect.topLeft();
         animatedText->drawText(p, rect);
     }
-
+#ifndef BOT_PROTECTION
     g_drawPool.scale(1.f);
     for (const auto& tile : m_foregroundTiles) {
         const auto& dest = transformPositionTo2D(tile->getPosition());
-#ifndef BOT_PROTECTION
+
         Point p = dest - m_posInfo.drawOffset;
         p.x *= m_posInfo.horizontalStretchFactor;
         p.y *= m_posInfo.verticalStretchFactor;
@@ -280,8 +275,8 @@ void MapView::drawForeground(const Rect& rect)
         p.y += 5;
 
         tile->drawTexts(p);
-#endif
     }
+#endif
 }
 
 void MapView::updateVisibleTiles()

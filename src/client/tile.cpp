@@ -50,7 +50,7 @@ void drawThing(const ThingPtr& thing, const Point& dest, int flags, uint8_t& dra
     updateElevation(thing, drawElevation);
 }
 
-void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, const LightViewPtr& lightView)
+void Tile::draw(const Point& dest, int flags, const LightViewPtr& lightView)
 {
     m_drawElevation = 0;
     m_lastDrawDest = dest;
@@ -82,12 +82,12 @@ void Tile::draw(const Point& dest, const MapPosInfo& mapRect, int flags, const L
     // after we render 2x2 lying corpses, we must redraw previous creatures/ontop above them
     if (m_tilesRedraw) {
         for (const auto& tile : *m_tilesRedraw) {
-            tile->drawCreature(tile->m_lastDrawDest, mapRect, flags, true);
+            tile->drawCreature(tile->m_lastDrawDest, flags, true);
             tile->drawTop(tile->m_lastDrawDest, flags, true);
         }
     }
 
-    drawCreature(dest, mapRect, flags, false);
+    drawCreature(dest, flags, false);
     drawTop(dest, flags, false);
     drawAttachedEffect(dest, lightView, true);
     drawAttachedParticlesEffect(dest);
@@ -109,7 +109,7 @@ void Tile::drawLight(const Point& dest, const LightViewPtr& lightView) {
     drawAttachedLightEffect(dest, lightView);
 }
 
-void Tile::drawCreature(const Point& dest, const MapPosInfo& mapRect, int flags, bool forceDraw)
+void Tile::drawCreature(const Point& dest, int flags, bool forceDraw)
 {
     if (!forceDraw && !m_drawTopAndCreature)
         return;

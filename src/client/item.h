@@ -103,7 +103,7 @@ public:
 
     void updatePatterns();
     int calculateAnimationPhase();
-    int getExactSize(int layer = 0, int xPattern = 0, int yPattern = 0, int zPattern = 0, int animationPhase = 0) override {
+    int getExactSize(int layer = 0, int /*xPattern*/ = 0, int /*yPattern*/ = 0, int /*zPattern*/ = 0, int /*animationPhase*/ = 0) override {
         return Thing::getExactSize(layer, m_numPatternX, m_numPatternY, m_numPatternZ, calculateAnimationPhase());
     }
 
