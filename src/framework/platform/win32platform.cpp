@@ -65,9 +65,7 @@ bool Platform::spawnProcess(std::string process, const std::vector<std::string>&
     const auto& wfile = stdext::utf8_to_utf16(process);
     const auto& wcommandLine = stdext::utf8_to_utf16(commandLine);
 
-    if (reinterpret_cast<size_t>(ShellExecuteW(nullptr, L"open", wfile.data(), wcommandLine.data(), nullptr, SW_SHOWNORMAL)) > 32)
-        return true;
-    return false;
+    return reinterpret_cast<size_t>(ShellExecuteW(nullptr, L"open", wfile.data(), wcommandLine.data(), nullptr, SW_SHOWNORMAL)) > 32;
 }
 
 int Platform::getProcessId()
@@ -162,7 +160,7 @@ bool Platform::openUrl(std::string url, bool now)
         url.insert(0, "http://");
 
     const auto& action = [url] {
-        return reinterpret_cast<int>(ShellExecuteW(nullptr, L"open", stdext::utf8_to_utf16(url).data(), nullptr, nullptr, SW_SHOWNORMAL)) >= 32;
+        return reinterpret_cast<size_t>(ShellExecuteW(nullptr, L"open", stdext::utf8_to_utf16(url).data(), nullptr, nullptr, SW_SHOWNORMAL)) >= 32;
     };
 
     if (now) return action();
@@ -174,7 +172,7 @@ bool Platform::openUrl(std::string url, bool now)
 bool Platform::openDir(std::string path, bool now)
 {
     const auto& action = [path] {
-        return reinterpret_cast<int>(ShellExecuteW(NULL, L"open", L"explorer.exe", stdext::utf8_to_utf16(path).c_str(), NULL, SW_SHOWNORMAL)) >= 32;
+        return reinterpret_cast<size_t>(ShellExecuteW(NULL, L"open", L"explorer.exe", stdext::utf8_to_utf16(path).c_str(), NULL, SW_SHOWNORMAL)) >= 32;
     };
 
     if (now) return action();
