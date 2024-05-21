@@ -1429,12 +1429,7 @@ void ProtocolGame::parseAnthem(const InputMessagePtr& msg)
 {
     uint8_t type = msg->getU8();
     if (type >= 0 && type <= 2) {
-        if (g_game.getClientVersion() >= 1310) {
-            msg->getU8();
-            msg->getU8();
-        } else {
-            msg->getU16(); // Anthem id
-        }
+        msg->getU16(); // Anthem id
     }
 }
 
