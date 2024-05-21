@@ -166,6 +166,7 @@ void GraphicalApplication::run()
             m_drawEvents->preLoad();
 
             BS::multi_future<void> threads;
+            threads.reserve(3);
 
             if (m_drawEvents->canDraw(DrawPoolType::LIGHT))
                 threads.emplace_back(g_asyncDispatcher.submit_task([&] {
