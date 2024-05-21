@@ -68,11 +68,10 @@ void UIMap::drawSelf(DrawPoolType drawPane)
             m_mapView->draw(mapRect);
         }, m_mapView->m_posInfo.rect, m_mapView->m_posInfo.srcRect, Color::black);
     } else if (drawPane == DrawPoolType::LIGHT) {
-        if (isDrawingLights()) {
-            g_drawPool.select(DrawPoolType::LIGHT);
+        g_drawPool.preDraw(drawPane, [this] {
             m_mapView->drawLights();
             m_mapView->m_lightView->draw(m_mapView->m_posInfo.rect, m_mapView->m_posInfo.srcRect);
-        }
+        }, true);
     } else if (drawPane == DrawPoolType::CREATURE_INFORMATION) {
         std::scoped_lock l(g_drawPool.get(drawPane)->getMutexPreDraw());
         g_drawPool.preDraw(drawPane, [this] {

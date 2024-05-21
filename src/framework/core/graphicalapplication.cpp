@@ -153,7 +153,7 @@ void GraphicalApplication::run()
     threads.emplace_back(g_asyncDispatcher.submit_task([&] {
         std::unique_lock lock(lightPool->getMutexPreDraw());
         lightCond.wait(lock, [this]() {
-            if (m_drawEvents->canDraw(DrawPoolType::MAP))
+            if (m_drawEvents->canDraw(DrawPoolType::LIGHT))
                 g_ui.render(DrawPoolType::LIGHT);
             return m_stopping;
         });
@@ -202,7 +202,7 @@ void GraphicalApplication::run()
             if (uiPool->canRepaint())
                 uiCond.notify_one();
 
-            if (lightPool->canRepaint())
+            if (m_drawEvents->canDraw(DrawPoolType::LIGHT))
                 lightCond.notify_one();
 
             if (fgMapPool->canRepaint())

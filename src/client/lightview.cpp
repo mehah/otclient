@@ -89,31 +89,32 @@ void LightView::resetShade(const Point& pos)
 
 void LightView::draw(const Rect& dest, const Rect& src)
 {
-    bool pixelUpdated = false;
+    static bool pixelUpdated = false;
 
     m_pool->getHashController().put(src.hash());
     m_pool->getHashController().put(m_globalLightColor.hash());
     m_pool->getHashController().update();
     if (m_pool->getHashController().wasModified()) {
+        std::scoped_lock l(m_pool->getMutex());
         updatePixels();
         pixelUpdated = true;
     }
     m_pool->getHashController().reset();
 
-    g_drawPool.preDraw(DrawPoolType::LIGHT, [this, &dest, &src, pixelUpdated] {
-        g_drawPool.addAction([=, this] {
-            if (pixelUpdated) {
-                m_texture->updatePixels(m_pixels.data());
-            }
+    g_drawPool.addAction([=, this] {
+        if (pixelUpdated) {
+            m_texture->updatePixels(m_pixels.data());
+            pixelUpdated = false;
+        }
 
-            updateCoords(dest, src);
-            g_painter->setCompositionMode(CompositionMode::MULTIPLY);
-            g_painter->resetTransformMatrix();
-            g_painter->resetColor();
-            g_painter->setTexture(m_texture.get());
-            g_painter->drawCoords(m_coords);
-        });
-    }, true);
+        updateCoords(dest, src);
+
+        g_painter->setCompositionMode(CompositionMode::MULTIPLY);
+        g_painter->resetTransformMatrix();
+        g_painter->resetColor();
+        g_painter->setTexture(m_texture.get());
+        g_painter->drawCoords(m_coords);
+    });
 
     m_lightData.lights.clear();
     m_lightData.tiles.assign(m_mapSize.area(), {});
@@ -136,8 +137,6 @@ void LightView::updateCoords(const Rect& dest, const Rect& src) {
 }
 
 void LightView::updatePixels() {
-    std::scoped_lock l(m_pool->getMutex());
-
     const size_t lightSize = m_lightData.lights.size();
 
     const int mapWidth = m_mapSize.width();
