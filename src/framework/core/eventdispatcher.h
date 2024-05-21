@@ -67,7 +67,21 @@ private:
     inline void executeScheduledEvents();
 
     const auto& getThreadTask() const {
-        return m_threads[getThreadId()];
+        const auto id = getThreadId();
+        bool grow = false;
+
+        {
+            std::shared_lock l(m_sharedLock);
+            grow = id >= m_threads.size();
+        }
+
+        if (grow) {
+            std::unique_lock l(m_sharedLock);
+            for (auto i = m_threads.size(); i <= id; ++i)
+                m_threads.emplace_back(std::make_unique<ThreadTask>());
+        }
+
+        return m_threads[id];
     }
 
     size_t m_pollEventsSize{};
@@ -87,7 +101,8 @@ private:
         std::vector<ScheduledEventPtr> scheduledEventList;
         std::mutex mutex;
     };
-    std::vector<std::unique_ptr<ThreadTask>> m_threads;
+    mutable std::vector<std::unique_ptr<ThreadTask>> m_threads;
+    mutable std::shared_mutex m_sharedLock;
 
     // Main Events
     std::vector<EventPtr> m_eventList;
