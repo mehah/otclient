@@ -842,7 +842,6 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Tile>("getTopMoveThing", &Tile::getTopMoveThing);
     g_lua.bindClassMemberFunction<Tile>("getTopMultiUseThing", &Tile::getTopMultiUseThing);
     g_lua.bindClassMemberFunction<Tile>("getPosition", &Tile::getPosition);
-    g_lua.bindClassMemberFunction<Tile>("getDrawElevation", &Tile::getDrawElevation);
     g_lua.bindClassMemberFunction<Tile>("getCreatures", &Tile::getCreatures);
     g_lua.bindClassMemberFunction<Tile>("getGround", &Tile::getGround);
     g_lua.bindClassMemberFunction<Tile>("isWalkable", &Tile::isWalkable);

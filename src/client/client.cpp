@@ -104,6 +104,9 @@ bool Client::canDraw(DrawPoolType type) const
         case DrawPoolType::FOREGROUND_MAP:
             return g_game.isOnline();
 
+        case DrawPoolType::LIGHT:
+            return g_game.isOnline() && m_mapWidget && m_mapWidget->isDrawingLights();
+
         default:
             return false;
     }

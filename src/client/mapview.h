@@ -244,6 +244,7 @@ private:
     uint8_t calcLastVisibleFloor() const;
 
     void drawFloor();
+    void drawLights();
 
     bool canFloorFade() const { return m_floorViewMode == FADE && m_floorFading; }
 

@@ -58,7 +58,7 @@ void Creature::onCreate() {
     callLuaField("onCreate");
 }
 
-void Creature::draw(const Point& dest, bool drawThings, LightView* lightView)
+void Creature::draw(const Point& dest, bool drawThings, const LightViewPtr& lightView)
 {
     if (!canBeSeen() || !canDraw())
         return;
@@ -74,29 +74,35 @@ void Creature::draw(const Point& dest, bool drawThings, LightView* lightView)
 
         const auto& _dest = dest + m_walkOffset * g_drawPool.getScaleFactor();
 
-        internalDraw(_dest, lightView);
+        internalDraw(_dest);
 
         if (isMarked())
-            internalDraw(_dest, nullptr, getMarkedColor());
+            internalDraw(_dest, getMarkedColor());
         else if (isHighlighted())
-            internalDraw(_dest, nullptr, getHighlightColor());
+            internalDraw(_dest, getHighlightColor());
     }
 
-    if (lightView) {
-        auto light = getLight();
+    // drawLight(dest, lightView);
+}
 
-        if (isLocalPlayer() && (g_map.getLight().intensity < 64 || m_position.z > g_gameConfig.getMapSeaFloor())) {
-            if (light.intensity == 0) {
-                light.intensity = 2;
-            } else if (light.color == 0 || light.color > 215) {
-                light.color = 215;
-            }
-        }
+void Creature::drawLight(const Point& dest, const LightViewPtr& lightView) {
+    if (!lightView) return;
 
-        if (light.intensity > 0) {
-            lightView->addLightSource(dest + (m_walkOffset + (Point(g_gameConfig.getSpriteSize() / 2))) * g_drawPool.getScaleFactor(), light);
+    auto light = getLight();
+
+    if (isLocalPlayer() && (g_map.getLight().intensity < 64 || m_position.z > g_gameConfig.getMapSeaFloor())) {
+        if (light.intensity == 0) {
+            light.intensity = 2;
+        } else if (light.color == 0 || light.color > 215) {
+            light.color = 215;
         }
     }
+
+    if (light.intensity > 0) {
+        lightView->addLightSource(dest + (m_walkOffset + (Point(g_gameConfig.getSpriteSize() / 2))) * g_drawPool.getScaleFactor(), light);
+    }
+
+    drawAttachedLightEffect(dest + m_walkOffset * g_drawPool.getScaleFactor(), lightView);
 }
 
 void Creature::draw(const Rect& destRect, uint8_t size, bool center)
@@ -115,9 +121,9 @@ void Creature::draw(const Rect& destRect, uint8_t size, bool center)
 
         internalDraw(p);
         if (isMarked())
-            internalDraw(p, nullptr, getMarkedColor());
+            internalDraw(p, getMarkedColor());
         else if (isHighlighted())
-            internalDraw(p, nullptr, getHighlightColor());
+            internalDraw(p, getHighlightColor());
     } g_drawPool.releaseFrameBuffer(destRect);
 }
 
@@ -240,7 +246,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, int
         g_drawPool.addTexturedPos(m_typingIconTexture, p.x + (nameSize.width() / 2.0) + 2, textRect.y() - 4);
 }
 
-void Creature::internalDraw(Point dest, LightView* lightView, const Color& color)
+void Creature::internalDraw(Point dest, const Color& color)
 {
     // Example of how to send a UniformValue to shader
     /*const auto& shaderAction = [this]()-> void {
@@ -253,7 +259,7 @@ void Creature::internalDraw(Point dest, LightView* lightView, const Color& color
     if (replaceColorShader)
         g_drawPool.setShaderProgram(g_painter->getReplaceColorShader());
     else
-        drawAttachedEffect(dest, lightView, false); // On Bottom
+        drawAttachedEffect(dest, nullptr, false); // On Bottom
 
     if (!isHided()) {
         // outfit is a real creature
@@ -351,7 +357,7 @@ void Creature::internalDraw(Point dest, LightView* lightView, const Color& color
     if (replaceColorShader)
         g_drawPool.resetShaderProgram();
     else {
-        drawAttachedEffect(dest, lightView, true); // On Top
+        drawAttachedEffect(dest, nullptr, true); // On Top
         drawAttachedParticlesEffect(dest);
     }
 }
