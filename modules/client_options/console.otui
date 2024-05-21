@@ -12,6 +12,10 @@ Panel
     !text: tr('Show status messages in console')
 
   OptionCheckBox
+    id: showOthersStatusMessagesInConsole
+    !text: tr('Show others\' status messages in console')
+
+  OptionCheckBox
     id: showTimestampsInConsole
     !text: tr('Show timestamps in console')
 

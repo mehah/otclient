@@ -14,6 +14,7 @@ local defaultOptions = {
     showTimestampsInConsole = true,
     showLevelsInConsole = true,
     showPrivateMessagesInConsole = true,
+    showOthersStatusMessagesInConsole = false,
     showPrivateMessagesOnScreen = true,
     showLeftPanel = true,
     showRightExtraPanel = false,
