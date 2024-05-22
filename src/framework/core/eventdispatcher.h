@@ -72,12 +72,12 @@ private:
 
         {
             std::shared_lock l(m_sharedLock);
-            grow = id >= m_threads.size();
+            grow = id >= static_cast<int16_t>(m_threads.size());
         }
 
         if (grow) {
             std::unique_lock l(m_sharedLock);
-            for (auto i = m_threads.size(); i <= id; ++i)
+            for (auto i = static_cast<int16_t>(m_threads.size()); i <= id; ++i)
                 m_threads.emplace_back(std::make_unique<ThreadTask>());
         }
 
