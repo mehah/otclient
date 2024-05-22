@@ -65,9 +65,7 @@ bool Platform::spawnProcess(std::string process, const std::vector<std::string>&
     const auto& wfile = stdext::utf8_to_utf16(process);
     const auto& wcommandLine = stdext::utf8_to_utf16(commandLine);
 
-    if (reinterpret_cast<size_t>(ShellExecuteW(nullptr, L"open", wfile.data(), wcommandLine.data(), nullptr, SW_SHOWNORMAL)) > 32)
-        return true;
-    return false;
+    return reinterpret_cast<size_t>(ShellExecuteW(nullptr, L"open", wfile.data(), wcommandLine.data(), nullptr, SW_SHOWNORMAL)) > 32;
 }
 
 int Platform::getProcessId()
@@ -84,13 +82,16 @@ bool Platform::isProcessRunning(const std::string_view name)
 
 bool Platform::killProcess(const std::string_view name)
 {
-    const HWND window = FindWindowA(name.data(), nullptr);
-    if (window == nullptr)
+    const HWND ww = FindWindowA(name.data(), nullptr);
+    if (ww == nullptr)
         return false;
-    const DWORD pid = GetProcessId(window);
+
+    const DWORD pid = GetProcessId(ww);
     const HANDLE handle = OpenProcess(PROCESS_ALL_ACCESS, false, pid);
+
     if (handle == nullptr)
         return false;
+
     const bool ok = TerminateProcess(handle, 1) != 0;
     CloseHandle(handle);
     return ok;
@@ -153,31 +154,31 @@ ticks_t Platform::getFileModificationTime(std::string file)
     return uli.QuadPart;
 }
 
-void Platform::openUrl(std::string url, bool now)
+bool Platform::openUrl(std::string url, bool now)
 {
     if (url.find("http://") == std::string::npos && url.find("https://") == std::string::npos)
         url.insert(0, "http://");
 
     const auto& action = [url] {
-        ShellExecuteW(nullptr, L"open", stdext::utf8_to_utf16(url).data(), nullptr, nullptr, SW_SHOWNORMAL);
+        return reinterpret_cast<size_t>(ShellExecuteW(nullptr, L"open", stdext::utf8_to_utf16(url).data(), nullptr, nullptr, SW_SHOWNORMAL)) >= 32;
     };
 
-    if (now) {
-        action();
-    } else {
-        g_dispatcher.scheduleEvent(action, 50);
-    }
+    if (now) return action();
+
+    g_dispatcher.scheduleEvent(action, 50);
+    return true;
 }
 
-void Platform::openDir(std::string path, bool now)
+bool Platform::openDir(std::string path, bool now)
 {
-    if (now) {
-        ShellExecuteW(NULL, L"open", L"explorer.exe", stdext::utf8_to_utf16(path).c_str(), NULL, SW_SHOWNORMAL);
-    } else {
-        g_dispatcher.scheduleEvent([path] {
-            ShellExecuteW(NULL, L"open", L"explorer.exe", stdext::utf8_to_utf16(path).c_str(), NULL, SW_SHOWNORMAL);
-        }, 50);
-    }
+    const auto& action = [path] {
+        return reinterpret_cast<size_t>(ShellExecuteW(NULL, L"open", L"explorer.exe", stdext::utf8_to_utf16(path).c_str(), NULL, SW_SHOWNORMAL)) >= 32;
+    };
+
+    if (now) return action();
+
+    g_dispatcher.scheduleEvent(action, 50);
+    return true;
 }
 
 std::string Platform::getCPUName()

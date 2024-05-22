@@ -89,7 +89,6 @@ public:
 
     MapView();
     ~MapView() override;
-    void draw(const Rect& rect);
     void drawForeground(const Rect& rect);
     void drawCreatureInformation();
     void preLoad();
@@ -244,6 +243,7 @@ private:
     uint8_t calcLastVisibleFloor() const;
 
     void drawFloor();
+    void drawLights();
 
     bool canFloorFade() const { return m_floorViewMode == FADE && m_floorFading; }
 

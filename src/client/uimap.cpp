@@ -65,10 +65,14 @@ void UIMap::drawSelf(DrawPoolType drawPane)
     if (drawPane == DrawPoolType::MAP) {
         g_drawPool.preDraw(drawPane, [this, &mapRect] {
             m_mapView->registerEvents();
-            m_mapView->draw(mapRect);
+            m_mapView->drawFloor();
         }, m_mapView->m_posInfo.rect, m_mapView->m_posInfo.srcRect, Color::black);
+    } else if (drawPane == DrawPoolType::LIGHT) {
+        g_drawPool.preDraw(drawPane, [this] {
+            m_mapView->drawLights();
+            m_mapView->m_lightView->draw(m_mapView->m_posInfo.rect, m_mapView->m_posInfo.srcRect);
+        }, true);
     } else if (drawPane == DrawPoolType::CREATURE_INFORMATION) {
-        std::scoped_lock l(g_drawPool.get(drawPane)->getMutexPreDraw());
         g_drawPool.preDraw(drawPane, [this] {
             m_mapView->drawCreatureInformation();
         });
@@ -141,7 +145,8 @@ void UIMap::setVisibleDimension(const Size& visibleDimension)
 
 void UIMap::setKeepAspectRatio(bool enable)
 {
-    if (m_keepAspectRatio = enable)
+    m_keepAspectRatio = enable;
+    if (enable)
         m_aspectRatio = getVisibleDimension().ratio();
 
     updateMapSize();

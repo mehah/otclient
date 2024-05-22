@@ -39,10 +39,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
         }
     } else {
         pool->m_alwaysGroupDrawings = true; // CREATURE_INFORMATION & TEXT
-
-        if (type == DrawPoolType::FOREGROUND_MAP || type == DrawPoolType::CREATURE_INFORMATION) {
-            pool->setFPS(60);
-        }
+        pool->setFPS(60);
     }
 
     pool->m_type = type;
@@ -65,13 +62,15 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
         auto& coords = m_coords.try_emplace(m_state.hash, nullptr).first->second;
         if (!coords) {
             auto state = getState(texture, color);
-            coords = m_objects[order].emplace_back(std::move(state)).coords.get();
+            coords = m_objects[order].emplace_back(std::move(state), m_lastCoordBufferSize).coords.get();
         }
 
         if (coordsBuffer)
             coords->append(coordsBuffer.get());
         else
             addCoords(coords, method, DrawMode::TRIANGLES);
+
+        m_lastCoordBufferSize = std::max<size_t>(m_lastCoordBufferSize, coords->size());
     } else {
         bool addNewObj = true;
 
@@ -86,6 +85,10 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
                 else
                     addCoords(prevObj.coords.get(), method, DrawMode::TRIANGLES);
 
+                if (prevObj.coords) {
+                    m_lastCoordBufferSize = std::max<size_t>(m_lastCoordBufferSize, prevObj.coords->size());
+                }
+
                 addNewObj = false;
             }
         }
@@ -93,7 +96,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
         if (addNewObj) {
             auto state = getState(texture, color);
             if (coordsBuffer) {
-                list.emplace_back(std::move(state)).coords->append(coordsBuffer.get());
+                list.emplace_back(std::move(state), m_lastCoordBufferSize).coords->append(coordsBuffer.get());
             } else
                 list.emplace_back(drawMode, std::move(state), std::move(method));
         }
@@ -170,10 +173,10 @@ bool DrawPool::updateHash(const DrawPool::DrawMethod& method, const TexturePtr& 
         }
 
         // check to skip the next drawing that is the same as the previous one.
-        if (!hasCoord && m_lastObjectHash == hash)
+        if (!hasCoord && m_hashCtrl.isLast(hash))
             return false;
 
-        m_objectHashs.emplace(m_lastObjectHash = hash);
+        m_hashCtrl.put(hash);
     }
 
     return true;
@@ -236,19 +239,20 @@ void DrawPool::resetState()
 {
     for (auto& objs : m_objects)
         objs.clear();
-    m_objectsFlushed.clear();
+
     m_coords.clear();
     m_parameters.clear();
+    m_objectsFlushed.clear();
 
-    m_objectHashs.clear();
+    m_hashCtrl.reset();
+
     m_state = {};
-    m_status.second = 0;
     m_lastFramebufferId = 0;
     m_shaderRefreshDelay = 0;
     m_scale = PlatformWindow::DEFAULT_DISPLAY_DENSITY;
 }
 
-bool DrawPool::canRepaint(const bool autoUpdateStatus)
+bool DrawPool::canRepaint()
 {
     if (m_repaint)
         return false;
@@ -257,12 +261,7 @@ bool DrawPool::canRepaint(const bool autoUpdateStatus)
     if (m_shaderRefreshDelay > 0 && (m_refreshDelay == 0 || m_shaderRefreshDelay < m_refreshDelay))
         refreshDelay = m_shaderRefreshDelay;
 
-    const bool canRepaint = m_status.first != m_status.second || (refreshDelay > 0 && m_refreshTimer.ticksElapsed() >= refreshDelay);
-
-    if (canRepaint && autoUpdateStatus) {
-        m_status.first = m_status.second;
-        m_refreshTimer.restart();
-    }
+    const bool canRepaint = m_hashCtrl.wasModified() || (refreshDelay > 0 && m_refreshTimer.ticksElapsed() >= refreshDelay);
 
     return canRepaint;
 }
@@ -348,7 +347,7 @@ void DrawPool::setFramebuffer(const Size& size) {
 }
 
 void DrawPool::removeFramebuffer() {
-    m_status.first = 0;
+    m_hashCtrl.reset();
     m_framebuffer = nullptr;
 }
 
@@ -386,7 +385,7 @@ void DrawPool::releaseFrameBuffer(const Rect& dest)
         frame->draw(dest);
     });
 
-    if (hasFrameBuffer() && !dest.isNull()) m_objectHashs.emplace(dest.hash());
+    if (hasFrameBuffer() && !dest.isNull()) m_hashCtrl.put(dest.hash());
     --m_bindedFramebuffers;
 }
 

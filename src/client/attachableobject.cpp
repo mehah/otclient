@@ -152,7 +152,7 @@ AttachedEffectPtr AttachableObject::getAttachedEffectById(uint16_t id)
     return *it;
 }
 
-void AttachableObject::drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop)
+void AttachableObject::drawAttachedEffect(const Point& dest, const LightViewPtr& lightView, bool isOnTop)
 {
     if (!hasAttachedEffects()) return;
     for (const auto& effect : m_data->attachedEffects) {
@@ -163,6 +163,12 @@ void AttachableObject::drawAttachedEffect(const Point& dest, LightView* lightVie
             });
         }
     }
+}
+
+void AttachableObject::drawAttachedLightEffect(const Point& dest, const LightViewPtr& lightView) {
+    if (!hasAttachedEffects()) return;
+    for (const auto& effect : m_data->attachedEffects)
+        effect->drawLight(dest, lightView);
 }
 
 void AttachableObject::attachParticleEffect(const std::string& name)

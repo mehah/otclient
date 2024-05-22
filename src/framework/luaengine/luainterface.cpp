@@ -644,77 +644,77 @@ int LuaInterface::luaCollectCppFunction(lua_State*)
     return 0;
 }
 
-void LuaInterface::registerTable(lua_State* L, const std::string& tableName)
+void LuaInterface::registerTable(lua_State* L_STATE, const std::string& tableName)
 {
     // _G[tableName] = {}
-    lua_newtable(L);
-    lua_setglobal(L, tableName.c_str());
+    lua_newtable(L_STATE);
+    lua_setglobal(L_STATE, tableName.c_str());
 }
 
-void LuaInterface::registerMethod(lua_State* L, const std::string& globalName, const std::string& methodName, lua_CFunction func)
+void LuaInterface::registerMethod(lua_State* L_STATE, const std::string& globalName, const std::string& methodName, lua_CFunction func)
 {
     // globalName.methodName = func
-    lua_getglobal(L, globalName.c_str());
-    lua_pushcfunction(L, func);
-    lua_setfield(L, -2, methodName.c_str());
+    lua_getglobal(L_STATE, globalName.c_str());
+    lua_pushcfunction(L_STATE, func);
+    lua_setfield(L_STATE, -2, methodName.c_str());
 
     // pop globalName
-    lua_pop(L, 1);
+    lua_pop(L_STATE, 1);
 }
 
 #ifndef LUAJIT_VERSION
 ///////////////////////////////////////////////////////////////////////////////
 // from here all next functions are interfaces for the Lua API
-int LuaInterface::luaBitNot(lua_State* L)
+int LuaInterface::luaBitNot(lua_State* L_STATE)
 {
-    int32_t number = static_cast<int64_t>(lua_tonumber(L, -1));
-    lua_pushnumber(L, ~number);
+    int32_t number = static_cast<int64_t>(lua_tonumber(L_STATE, -1));
+    lua_pushnumber(L_STATE, ~number);
     return 1;
 }
 
-int LuaInterface::luaBitAnd(lua_State* L)
+int LuaInterface::luaBitAnd(lua_State* L_STATE)
 {
-    int n = lua_gettop(L); \
-        uint32_t number = static_cast<uint32_t>(lua_tonumber(L, -1));
+    int n = lua_gettop(L_STATE); \
+        uint32_t number = static_cast<uint32_t>(lua_tonumber(L_STATE, -1));
     for (int i = 1; i < n; ++i)
-        number &= static_cast<uint32_t>(lua_tonumber(L, i));
-    lua_pushnumber(L, number);
+        number &= static_cast<uint32_t>(lua_tonumber(L_STATE, i));
+    lua_pushnumber(L_STATE, number);
     return 1;
 }
 
-int LuaInterface::luaBitOr(lua_State* L)
+int LuaInterface::luaBitOr(lua_State* L_STATE)
 {
-    int n = lua_gettop(L); \
-        uint32_t number = static_cast<uint32_t>(lua_tonumber(L, -1));
+    int n = lua_gettop(L_STATE); \
+        uint32_t number = static_cast<uint32_t>(lua_tonumber(L_STATE, -1));
     for (int i = 1; i < n; ++i)
-        number |= static_cast<uint32_t>(lua_tonumber(L, i));
-    lua_pushnumber(L, number);
+        number |= static_cast<uint32_t>(lua_tonumber(L_STATE, i));
+    lua_pushnumber(L_STATE, number);
     return 1;
 }
 
-int LuaInterface::luaBitXor(lua_State* L)
+int LuaInterface::luaBitXor(lua_State* L_STATE)
 {
-    int n = lua_gettop(L); \
-        uint32_t number = static_cast<uint32_t>(lua_tonumber(L, -1));
+    int n = lua_gettop(L_STATE); \
+        uint32_t number = static_cast<uint32_t>(lua_tonumber(L_STATE, -1));
     for (int i = 1; i < n; ++i)
-        number ^= static_cast<uint32_t>(lua_tonumber(L, i));
-    lua_pushnumber(L, number);
+        number ^= static_cast<uint32_t>(lua_tonumber(L_STATE, i));
+    lua_pushnumber(L_STATE, number);
     return 1;
 }
 
-int LuaInterface::luaBitLeftShift(lua_State* L)
+int LuaInterface::luaBitLeftShift(lua_State* L_STATE)
 {
-    uint32_t n1 = static_cast<uint32_t>(lua_tonumber(L, 1));
-    uint32_t n2 = static_cast<uint32_t>(lua_tonumber(L, 2));
-    lua_pushnumber(L, (n1 << n2));
+    uint32_t n1 = static_cast<uint32_t>(lua_tonumber(L_STATE, 1));
+    uint32_t n2 = static_cast<uint32_t>(lua_tonumber(L_STATE, 2));
+    lua_pushnumber(L_STATE, (n1 << n2));
     return 1;
 }
 
-int LuaInterface::luaBitRightShift(lua_State* L)
+int LuaInterface::luaBitRightShift(lua_State* L_STATE)
 {
-    uint32_t n1 = static_cast<uint32_t>(lua_tonumber(L, 1));
-    uint32_t n2 = static_cast<uint32_t>(lua_tonumber(L, 2));
-    lua_pushnumber(L, (n1 >> n2));
+    uint32_t n1 = static_cast<uint32_t>(lua_tonumber(L_STATE, 1));
+    uint32_t n2 = static_cast<uint32_t>(lua_tonumber(L_STATE, 2));
+    lua_pushnumber(L_STATE, (n1 >> n2));
     return 1;
 }
 #endif

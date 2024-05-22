@@ -693,9 +693,9 @@ bool ResourceManager::launchCorrect(std::vector<std::string>& args) { // curentl
             continue;
 
         if (entry.path().extension() == m_binaryPath.extension()) {
-            std::error_code ec;
-            auto writeTime = std::filesystem::last_write_time(entry.path(), ec);
-            if (!ec && writeTime > lastWrite) {
+            std::error_code _ec;
+            auto writeTime = std::filesystem::last_write_time(entry.path(), _ec);
+            if (!_ec && writeTime > lastWrite) {
                 lastWrite = writeTime;
                 binary = entry.path();
             }
@@ -715,8 +715,8 @@ bool ResourceManager::launchCorrect(std::vector<std::string>& args) { // curentl
         if (entry.path().extension() == m_binaryPath.extension()) {
             if (binary == entry.path())
                 continue;
-            std::error_code ec;
-            std::filesystem::remove(entry.path(), ec);
+            std::error_code _ec;
+            std::filesystem::remove(entry.path(), _ec);
         }
     }
 
@@ -728,7 +728,7 @@ bool ResourceManager::launchCorrect(std::vector<std::string>& args) { // curentl
 #endif
 }
 
-std::string ResourceManager::createArchive(const std::unordered_map<std::string, std::string>& files) { return ""; }
+std::string ResourceManager::createArchive(const std::unordered_map<std::string, std::string>& /*files*/) { return ""; }
 
 std::unordered_map<std::string, std::string> ResourceManager::decompressArchive(std::string dataOrPath)
 {

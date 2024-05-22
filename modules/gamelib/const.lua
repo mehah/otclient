@@ -194,6 +194,7 @@ GameEnterGameShowAppearance = 114
 GameSmoothWalkElevation = 115
 GameNegativeOffset = 116
 GameItemTooltipV8 = 117
+GameForgeConvergence = 118
 
 TextColors = {
     blue = '#9F9DFD',

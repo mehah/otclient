@@ -49,11 +49,11 @@ public:
     }
 
     Color(const Color& color) = default;
-    Color(const Color& color, float alpha) {
+    Color(const Color& color, float a) {
         m_r = color.m_r;
         m_g = color.m_g;
         m_b = color.m_b;
-        m_a = alpha;
+        m_a = a;
         update();
     }
 

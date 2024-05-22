@@ -83,6 +83,9 @@ void Map::notificateKeyRelease(const InputEvent& inputEvent) const
 
 void Map::notificateCameraMove(const Point& offset) const
 {
+    g_drawPool.repaint(DrawPoolType::FOREGROUND_MAP);
+    g_drawPool.repaint(DrawPoolType::CREATURE_INFORMATION);
+
     for (const auto& mapView : m_mapViews) {
         mapView->onCameraMove(offset);
     }
@@ -1217,7 +1220,7 @@ void Map::updateAttachedWidgets(const MapViewPtr& mapView)
         const auto& newWidgetRect = Rect(p, widgetRect.width(), widgetRect.height());
 
         widget->disableUpdateTemporarily();
-        widget->setRect(newWidgetRect, false);
+        widget->setRect(newWidgetRect);
     }
 }
 

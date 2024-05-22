@@ -26,7 +26,7 @@
 #include <framework/ui/declarations.h>
 #include "global.h"
 
-// core
+ // core
 class Map;
 class Game;
 class MapView;
@@ -59,7 +59,7 @@ class Spawn;
 #endif
 
 using MapViewPtr = std::shared_ptr<MapView>;
-using LightViewPtr = std::shared_ptr<LightView>;
+using LightViewPtr = std::unique_ptr<LightView>;
 using TilePtr = std::shared_ptr<Tile>;
 using ThingPtr = std::shared_ptr<Thing>;
 using ItemPtr = std::shared_ptr<Item>;

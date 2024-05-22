@@ -137,39 +137,16 @@ void GraphicalApplication::run()
 
     g_lua.callGlobalField("g_app", "onRun");
 
-    const auto& uiPool = g_drawPool.get(DrawPoolType::FOREGROUND);
-    const auto& fgMapPool = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
-
     const auto& FPS = [&] {
         m_mapProcessFrameCounter.setTargetFps(g_window.vsyncEnabled() || getMaxFps() || getTargetFps() ? 500u : 0u);
         return m_graphicFrameCounter.getFps();
     };
 
-    std::condition_variable uiCond, fgMapCond;
-    BS::multi_future<void> threads;
-
-    // THREAD - FOREGROUND UI
-    threads.emplace_back(g_asyncDispatcher.submit_task([&] {
-        std::unique_lock lock(uiPool->getMutexPreDraw());
-        uiCond.wait(lock, [this]() {
-            if (m_drawEvents->canDraw(DrawPoolType::MAP))
-                g_ui.render(DrawPoolType::FOREGROUND);
-            return m_stopping;
-        });
-    }));
-
-    // THREAD - FOREGROUND MAP
-    threads.emplace_back(g_asyncDispatcher.submit_task([&] {
-        std::unique_lock lock(fgMapPool->getMutexPreDraw());
-        fgMapCond.wait(lock, [this]() -> bool {
-            if (m_drawEvents->canDraw(DrawPoolType::MAP))
-                m_drawEvents->drawForgroundMap();
-            return m_stopping;
-        });
-    }));
-
     // THREAD - POOL & MAP
-    threads.emplace_back(g_asyncDispatcher.submit_task([&] {
+    const auto& mapThread = g_asyncDispatcher.submit_task([&] {
+        const auto uiPool = g_drawPool.get(DrawPoolType::FOREGROUND);
+        const auto fgMapPool = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
+
         g_eventThreadId = EventDispatcher::getThreadId();
         while (!m_stopping) {
             poll();
@@ -188,22 +165,31 @@ void GraphicalApplication::run()
 
             m_drawEvents->preLoad();
 
+            BS::multi_future<void> threads;
+            threads.reserve(3);
+
+            if (m_drawEvents->canDraw(DrawPoolType::LIGHT))
+                threads.emplace_back(g_asyncDispatcher.submit_task([&] {
+                g_ui.render(DrawPoolType::LIGHT);
+            }));
+
             if (uiPool->canRepaint())
-                uiCond.notify_one();
+                threads.emplace_back(g_asyncDispatcher.submit_task([&] {
+                g_ui.render(DrawPoolType::FOREGROUND);
+            }));
 
             if (fgMapPool->canRepaint())
-                fgMapCond.notify_one();
+                threads.emplace_back(g_asyncDispatcher.submit_task([&] {
+                m_drawEvents->drawForgroundMap();
+            }));
 
             m_drawEvents->drawMap();
 
-            g_drawPool.wait();
+            threads.wait();
 
             m_mapProcessFrameCounter.update();
         }
-
-        uiCond.notify_one();
-        fgMapCond.notify_one();
-    }));
+    });
 
     m_running = true;
     while (!m_stopping) {
@@ -225,8 +211,8 @@ void GraphicalApplication::run()
             });
         }
     }
+    mapThread.wait();
 
-    threads.wait();
     m_running = false;
     m_stopping = false;
 }

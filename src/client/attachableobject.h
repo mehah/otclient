@@ -45,9 +45,9 @@ public:
     bool detachEffect(const AttachedEffectPtr& obj);
     AttachedEffectPtr getAttachedEffectById(uint16_t id);
 
-    virtual void onStartAttachEffect(const AttachedEffectPtr& effect) { };
-    virtual void onDispatcherAttachEffect(const AttachedEffectPtr& effect) { };
-    virtual void onStartDetachEffect(const AttachedEffectPtr& effect) { };
+    virtual void onStartAttachEffect(const AttachedEffectPtr& /*effect*/) { };
+    virtual void onDispatcherAttachEffect(const AttachedEffectPtr& /*effect*/) { };
+    virtual void onStartDetachEffect(const AttachedEffectPtr& /*effect*/) { };
 
     bool isOwnerHidden() { return m_ownerHidden > 0; }
 
@@ -78,7 +78,9 @@ protected:
         std::vector<UIWidgetPtr> attachedWidgets;
     };
 
-    void drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop);
+    void drawAttachedEffect(const Point& dest, const LightViewPtr& lightView, bool isOnTop);
+    void drawAttachedLightEffect(const Point& dest, const LightViewPtr& lightView);
+
     void onDetachEffect(const AttachedEffectPtr& effect, bool callEvent = true);
     void drawAttachedParticlesEffect(const Point& dest);
 
