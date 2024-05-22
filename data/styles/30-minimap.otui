@@ -5,7 +5,6 @@ MinimapFlag < UIWidget
 MinimapCross < UIWidget
   focusable: false
   phantom: true
-  clipping: true
   image: /images/game/minimap/cross
   size: 16 16
 
