@@ -40,7 +40,7 @@ void LightView::resize(const Size& size, const uint16_t tileSize) {
     if (!m_texture || m_mapSize == size && m_tileSize == tileSize)
         return;
 
-    std::scoped_lock l(m_pool->getMutex(), m_pool->getMutexPreDraw());
+    std::scoped_lock l(m_pool->getMutex());
 
     m_mapSize = size;
     m_tileSize = tileSize;
