@@ -150,7 +150,6 @@ public:
     void onAfterDraw(std::function<void()>&& f) { m_afterDraw = std::move(f); }
 
     std::mutex& getMutex() { return m_mutexDraw; }
-    std::mutex& getMutexPreDraw() { return m_mutexPreDraw; }
 
     bool isDrawing() const {
         return m_repaint;
@@ -199,9 +198,12 @@ protected:
     struct DrawObject
     {
         DrawObject(std::function<void()> action) : action(std::move(action)) {}
-        DrawObject(PoolState&& state) : coords(std::make_unique<CoordsBuffer>()), state(std::move(state)) {}
+        DrawObject(PoolState&& state, const size_t coordSize) : coords(std::make_unique<CoordsBuffer>(coordSize)), state(std::move(state)) {}
         DrawObject(const DrawMode drawMode, PoolState&& state, DrawMethod&& method) :
-            state(std::move(state)), drawMode(drawMode) { methods.emplace_back(std::move(method)); }
+            state(std::move(state)), drawMode(drawMode) {
+            methods.reserve(10);
+            methods.emplace_back(std::move(method));
+        }
 
         void addMethod(DrawMethod&& method)
         {
@@ -376,6 +378,8 @@ private:
     float m_scaleFactor{ 1.f };
     float m_scale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
 
+    size_t m_lastCoordBufferSize{ 64 };
+
     FrameBufferPtr m_framebuffer;
 
     std::function<void()> m_beforeDraw;
@@ -383,7 +387,6 @@ private:
 
     std::atomic_bool m_repaint{ false };
     std::mutex m_mutexDraw;
-    std::mutex m_mutexPreDraw;
 
     friend class DrawPoolManager;
 };

@@ -62,13 +62,15 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
         auto& coords = m_coords.try_emplace(m_state.hash, nullptr).first->second;
         if (!coords) {
             auto state = getState(texture, color);
-            coords = m_objects[order].emplace_back(std::move(state)).coords.get();
+            coords = m_objects[order].emplace_back(std::move(state), m_lastCoordBufferSize).coords.get();
         }
 
         if (coordsBuffer)
             coords->append(coordsBuffer.get());
         else
             addCoords(coords, method, DrawMode::TRIANGLES);
+
+        m_lastCoordBufferSize = std::max<size_t>(m_lastCoordBufferSize, coords->size());
     } else {
         bool addNewObj = true;
 
@@ -83,6 +85,10 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
                 else
                     addCoords(prevObj.coords.get(), method, DrawMode::TRIANGLES);
 
+                if (prevObj.coords) {
+                    m_lastCoordBufferSize = std::max<size_t>(m_lastCoordBufferSize, prevObj.coords->size());
+                }
+
                 addNewObj = false;
             }
         }
@@ -90,7 +96,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
         if (addNewObj) {
             auto state = getState(texture, color);
             if (coordsBuffer) {
-                list.emplace_back(std::move(state)).coords->append(coordsBuffer.get());
+                list.emplace_back(std::move(state), m_lastCoordBufferSize).coords->append(coordsBuffer.get());
             } else
                 list.emplace_back(drawMode, std::move(state), std::move(method));
         }
