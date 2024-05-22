@@ -739,7 +739,7 @@ void ThingType::loadTexture(int animationPhase)
                             const uint32_t spriteIndex = getSpriteIndex(-1, -1, spriteMask ? 1 : l, x, y, z, animationPhase);
                             const auto& spriteImage = g_sprites.getSpriteImage(m_spritesIndex[spriteIndex]);
                             if (!spriteImage) {
-                                return;
+                                continue;
                             }
 
                             // verifies that the first block in the lower right corner is transparent.
