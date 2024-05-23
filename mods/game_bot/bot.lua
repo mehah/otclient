@@ -89,7 +89,7 @@ function clear()
   botMessages:updateLayout()
 
   for i, socket in pairs(botWebSockets) do
-    g_http.cancel(socket)
+    HTTP.cancel(i)
     botWebSockets[i] = nil
   end
 
@@ -498,7 +498,7 @@ function initCallbacks()
     onAttackingCreatureChange = botAttackingCreatureChange,
     onAddItem = botContainerAddItem,
     onRemoveItem = botContainerRemoveItem,
-    onGameEditText = botGameEditText,
+    onEditText = botGameEditText,
     onSpellCooldown = botSpellCooldown,
     onSpellGroupCooldown = botGroupSpellCooldown
   })
@@ -562,7 +562,7 @@ function terminateCallbacks()
     onImbuementWindow = botImbuementWindow,
     onModalDialog = botModalDialog,
     onAttackingCreatureChange = botAttackingCreatureChange,
-    onGameEditText = botGameEditText,
+    onEditText = botGameEditText,
     onSpellCooldown = botSpellCooldown,
     onSpellGroupCooldown = botGroupSpellCooldown
   })
