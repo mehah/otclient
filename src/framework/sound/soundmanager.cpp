@@ -24,13 +24,19 @@
 #include "combinedsoundsource.h"
 #include "soundbuffer.h"
 #include "soundfile.h"
-#include "soundsource.h"
 #include "streamsoundsource.h"
+#include "soundeffect.h"
 
+#include <cstdint>
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/resourcemanager.h>
+
+class StreamSoundSource;
+class CombinedSoundSource;
+class SoundFile;
+class SoundBuffer;
 
 SoundManager g_sounds;
 
@@ -224,11 +230,12 @@ void SoundManager::stopAll()
     }
 }
 
-SoundSourcePtr SoundManager::createSoundSource(const std::string& filename)
+SoundSourcePtr SoundManager::createSoundSource(const std::string& name)
 {
     SoundSourcePtr source;
 
     try {
+        const std::string& filename = resolveSoundFile(name);
         const auto it = m_buffers.find(filename);
         if (it != m_buffers.end()) {
             source = std::make_shared<SoundSource>();
@@ -303,4 +310,24 @@ void SoundManager::ensureContext() const
 {
     if (m_context)
         alcMakeContextCurrent(m_context);
+}
+
+void SoundManager::setPosition(const Point& pos)
+{
+    alListener3f(AL_POSITION, pos.x, pos.y, 0);
+}
+
+SoundEffectPtr SoundManager::createSoundEffect()
+{
+    SoundEffectPtr soundEffect = std::make_shared<SoundEffect>(m_device);
+    return soundEffect;
+}
+
+bool SoundManager::isEaxEnabled()
+{
+    if (alGetEnumValue("AL_EFFECT_EAXREVERB") != 0) {
+        return true;
+    } else {
+        return false;
+    }
 }

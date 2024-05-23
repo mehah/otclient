@@ -50,6 +50,7 @@
 #include <framework/sound/soundmanager.h>
 #include <framework/sound/soundsource.h>
 #include <framework/sound/streamsoundsource.h>
+#include <framework/sound/soundeffect.h>
 #endif
 
 #ifdef FRAMEWORK_NET
@@ -964,10 +965,30 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_sounds", "disableAudio", &SoundManager::disableAudio, &g_sounds);
     g_lua.bindSingletonFunction("g_sounds", "setAudioEnabled", &SoundManager::setAudioEnabled, &g_sounds);
     g_lua.bindSingletonFunction("g_sounds", "isAudioEnabled", &SoundManager::isAudioEnabled, &g_sounds);
+    g_lua.bindSingletonFunction("g_sounds", "setPosition", &SoundManager::setPosition, &g_sounds);
+    g_lua.bindSingletonFunction("g_sounds", "createSoundEffect", &SoundManager::createSoundEffect, &g_sounds);
+    g_lua.bindSingletonFunction("g_sounds", "isEaxEnabled", &SoundManager::isEaxEnabled, &g_sounds);
 
     g_lua.registerClass<SoundSource>();
+    g_lua.bindClassStaticFunction<SoundSource>("create", [] { return std::make_shared<SoundSource>(); });
+    g_lua.bindClassMemberFunction<SoundSource>("setName", &SoundSource::setName);
+    g_lua.bindClassMemberFunction<SoundSource>("play", &SoundSource::play);
+    g_lua.bindClassMemberFunction<SoundSource>("stop", &SoundSource::stop);
+    g_lua.bindClassMemberFunction<SoundSource>("isPlaying", &SoundSource::isPlaying);
+    g_lua.bindClassMemberFunction<SoundSource>("setGain", &SoundSource::setGain);
+    g_lua.bindClassMemberFunction<SoundSource>("setPosition", &SoundSource::setPosition);
+    g_lua.bindClassMemberFunction<SoundSource>("setVelocity", &SoundSource::setVelocity);
+    g_lua.bindClassMemberFunction<SoundSource>("setFading", &SoundSource::setFading);
+    g_lua.bindClassMemberFunction<SoundSource>("setLooping", &SoundSource::setLooping);
+    g_lua.bindClassMemberFunction<SoundSource>("setRelative", &SoundSource::setRelative);
+    g_lua.bindClassMemberFunction<SoundSource>("setReferenceDistance", &SoundSource::setReferenceDistance);
+    g_lua.bindClassMemberFunction<SoundSource>("setEffect", &SoundSource::setEffect);
+    g_lua.bindClassMemberFunction<SoundSource>("removeEffect", &SoundSource::removeEffect);
     g_lua.registerClass<CombinedSoundSource, SoundSource>();
     g_lua.registerClass<StreamSoundSource, SoundSource>();
+
+    g_lua.registerClass<SoundEffect>();
+    g_lua.bindClassMemberFunction<SoundEffect>("setPreset", &SoundEffect::setPreset);
 
     g_lua.registerClass<SoundChannel>();
     g_lua.bindClassMemberFunction<SoundChannel>("play", &SoundChannel::play);

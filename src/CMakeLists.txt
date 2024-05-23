@@ -408,6 +408,7 @@ if (TOGGLE_FRAMEWORK_SOUND)
 		framework/sound/soundmanager.cpp
 		framework/sound/soundsource.cpp
 		framework/sound/streamsoundsource.cpp
+		framework/sound/soundeffect.cpp
 	)
 endif()
 

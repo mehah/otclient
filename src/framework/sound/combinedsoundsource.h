@@ -46,6 +46,8 @@ public:
     void setPosition(const Point& pos) override;
     void setVelocity(const Point& velocity) override;
     void setFading(FadeState state, float fadetime) override;
+    void setEffect(SoundEffectPtr soundEffect) override;
+    void removeEffect() override;
 
 protected:
     void update() override;
