@@ -60,6 +60,18 @@ local function moveSpecialToolTip(first)
     SpecialoolTipLabel:setPosition(pos)
 end
 
+local function onWidgetDestroy(widget)
+    if widget == currentHoveredWidget then
+        if widget.tooltip then
+            g_tooltip.hide()
+        end
+        if widget.specialtooltip then
+            g_tooltip.hideSpecial()
+        end
+        currentHoveredWidget = nil
+    end
+end
+
 local function onWidgetHoverChange(widget, hovered)
     if hovered then
         if widget.tooltip and not g_mouse.isPressed() then
@@ -116,7 +128,8 @@ end
 function g_tooltip.init()
     connect(UIWidget, {
         onStyleApply = onWidgetStyleApply,
-        onHoverChange = onWidgetHoverChange
+        onHoverChange = onWidgetHoverChange,
+		onDestroy = onWidgetDestroy
     })
 
     addEvent(function()
@@ -145,7 +158,8 @@ end
 function g_tooltip.terminate()
     disconnect(UIWidget, {
         onStyleApply = onWidgetStyleApply,
-        onHoverChange = onWidgetHoverChange
+        onHoverChange = onWidgetHoverChange,
+		onDestroy = onWidgetDestroy
     })
 
     currentHoveredWidget = nil
