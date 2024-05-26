@@ -129,7 +129,7 @@ function g_tooltip.init()
     connect(UIWidget, {
         onStyleApply = onWidgetStyleApply,
         onHoverChange = onWidgetHoverChange,
-		onDestroy = onWidgetDestroy
+        onDestroy = onWidgetDestroy
     })
 
     addEvent(function()
@@ -159,7 +159,7 @@ function g_tooltip.terminate()
     disconnect(UIWidget, {
         onStyleApply = onWidgetStyleApply,
         onHoverChange = onWidgetHoverChange,
-		onDestroy = onWidgetDestroy
+        onDestroy = onWidgetDestroy
     })
 
     currentHoveredWidget = nil
