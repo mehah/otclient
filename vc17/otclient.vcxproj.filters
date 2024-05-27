@@ -558,6 +558,9 @@
     <ClCompile Include="..\src\framework\net\httplogin.cpp">
       <Filter>Source Files\framework\net</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\framework\sound\soundeffect.cpp">
+      <Filter>Source Files\framework\sound</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\framework\config.h">
@@ -1081,6 +1084,9 @@
     </ClInclude>
     <ClInclude Include="..\src\framework\util\BS_thread_pool.hpp">
       <Filter>Header Files\framework\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\sound\soundeffect.h">
+      <Filter>Header Files\framework\sound</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

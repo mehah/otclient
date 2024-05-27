@@ -329,6 +329,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClCompile Include="..\src\framework\sound\oggsoundfile.cpp" />
     <ClCompile Include="..\src\framework\sound\soundbuffer.cpp" />
     <ClCompile Include="..\src\framework\sound\soundchannel.cpp" />
+    <ClCompile Include="..\src\framework\sound\soundeffect.cpp" />
     <ClCompile Include="..\src\framework\sound\soundfile.cpp" />
     <ClCompile Include="..\src\framework\sound\soundmanager.cpp" />
     <ClCompile Include="..\src\framework\sound\soundsource.cpp" />
@@ -492,6 +493,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\framework\sound\oggsoundfile.h" />
     <ClInclude Include="..\src\framework\sound\soundbuffer.h" />
     <ClInclude Include="..\src\framework\sound\soundchannel.h" />
+    <ClInclude Include="..\src\framework\sound\soundeffect.h" />
     <ClInclude Include="..\src\framework\sound\soundfile.h" />
     <ClInclude Include="..\src\framework\sound\soundmanager.h" />
     <ClInclude Include="..\src\framework\sound\soundsource.h" />

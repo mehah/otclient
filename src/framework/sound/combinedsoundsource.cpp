@@ -107,6 +107,18 @@ void CombinedSoundSource::setFading(FadeState state, float fadetime)
         source->setFading(state, fadetime);
 }
 
+void CombinedSoundSource::setEffect(SoundEffectPtr soundEffect)
+{
+    for (const SoundSourcePtr& source : m_sources)
+        source->setEffect(soundEffect);
+}
+
+void CombinedSoundSource::removeEffect()
+{
+    for (const SoundSourcePtr& source : m_sources)
+        source->removeEffect();
+}
+
 void CombinedSoundSource::update()
 {
     for (const auto& source : m_sources)
