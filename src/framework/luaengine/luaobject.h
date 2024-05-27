@@ -84,8 +84,6 @@ public:
     template<typename T>
     std::shared_ptr<T> dynamic_self_cast() { return std::dynamic_pointer_cast<T>(shared_from_this()); }
 
-    void operator=(const LuaObject&) const {}
-
 private:
     int m_fieldsTableRef;
 };

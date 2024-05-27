@@ -164,15 +164,13 @@ void ModuleManager::enableAutoReload() {
         if (!module->isReloadable() || !module->canReload())
             continue;
 
-        ModuleData data = { module };
+        ModuleData data = { module, {} };
 
         bool hasFile = false;
-        for (const auto& path : g_resources.listDirectoryFiles("/" + module->getName(), true, false, true)) {
+        for (auto path : g_resources.listDirectoryFiles("/" + module->getName(), true, false, true)) {
             ticks_t time = g_resources.getFileTime(path);
             if (time > 0) {
-                auto fileInfo = std::make_shared<FileInfo>();
-                fileInfo->path = path;
-                fileInfo->time = time;
+                auto fileInfo = std::make_shared<FileInfo>(std::move(path), time);
                 data.files.emplace_back(fileInfo);
                 hasFile = true;
             }
