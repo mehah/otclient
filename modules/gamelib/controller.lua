@@ -5,7 +5,7 @@ local TypeEvent = {
 
 local function onGameStart(self)
     if self.dataUI ~= nil and self.dataUI.onGameStart then
-        self.ui = g_ui.loadUI('/' .. self.name .. '/' .. self.dataUI.name, self.dataUI.parent or g_ui.getRootWidget())
+        self.ui = g_ui.loadUI('/' .. self.name .. '/' .. self.dataUI.name, g_ui.getRootWidget())
     end
 
     if self.__onGameStart ~= nil then
@@ -48,7 +48,8 @@ Controller = {
     externalEvents = nil,
     keyboardEvents = nil,
     attrs = nil,
-    opcodes = nil
+    opcodes = nil,
+    keyboardAnchor = nil
 }
 
 function Controller:new()
@@ -107,7 +108,16 @@ function Controller:init()
     end
 end
 
+function Controller:setKeyboardAnchor(widget)
+    self.keyboardAnchor = widget
+end
+
 function Controller:setUI(name, parent, onGameStart)
+    if type(parent) == "boolean" then
+        onGameStart = parent
+        parent = nil
+    end
+
     self.dataUI = { name = name, parent = parent, onGameStart = onGameStart or false }
 end
 
@@ -126,7 +136,7 @@ function Controller:terminate()
     end
 
     for i, event in pairs(self.keyboardEvents) do
-        g_keyboard['unbind' .. event.name](event.args)
+        g_keyboard['unbind' .. event.name](event.args[1], event.args[2], event.args[3])
     end
 
     for i, opcode in pairs(self.opcodes) do
@@ -153,6 +163,7 @@ function Controller:terminate()
     self.attrs = nil
     self.opcodes = nil
     self.externalEvents = nil
+    self.keyboardAnchor = nil
     self.__onGameStart = nil
     self.__onGameEnd = nil
 end
@@ -235,25 +246,42 @@ function Controller:sendExtendedOpcode(opcode, ...)
 end
 
 function Controller:bindKeyDown(...)
+    local args = { ... }
+    if args[3] == nil or type(args[3]) == 'boolean' then
+        args[4] = args[3]
+        args[3] = self.keyboardAnchor
+    end
     table.insert(self.keyboardEvents, {
         name = 'KeyDown',
-        args = ...
+        args = args
     })
-    g_keyboard.bindKeyDown(...)
+    g_keyboard.bindKeyDown(args[1], args[2], args[3])
 end
 
 function Controller:bindKeyUp(...)
+    local args = { ... }
+    if args[3] == nil or type(args[3]) == 'boolean' then
+        args[4] = args[3]
+        args[3] = self.keyboardAnchor
+    end
     table.insert(self.keyboardEvents, {
         name = 'KeyUp',
-        args = ...
+        args = args
     })
-    g_keyboard.bindKeyUp(...)
+
+    print(args[1], args[2], args[3])
+    g_keyboard.bindKeyUp(args[1], args[2], args[3])
 end
 
 function Controller:bindKeyPress(...)
+    local args = { ... }
+    if args[3] == nil or type(args[3]) == 'boolean' then
+        args[4] = args[3]
+        args[3] = self.keyboardAnchor
+    end
     table.insert(self.keyboardEvents, {
         name = 'KeyPress',
-        args = ...
+        args = args
     })
-    g_keyboard.bindKeyPress(...)
+    g_keyboard.bindKeyPress(args[1], args[2], args[3])
 end
