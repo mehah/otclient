@@ -424,7 +424,7 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerChangeMapAwareRange:
                     parseChangeMapAwareRange(msg);
                     break;
-                // 12x
+                    // 12x
                 case Proto::GameServerLootContainers:
                     parseLootContainers(msg);
                     break;
@@ -1130,15 +1130,15 @@ void ProtocolGame::parseOpenContainer(const InputMessagePtr& msg)
 
     if (g_game.getFeature(Otc::GameContainerFilter)) {
         // Check if container is store inbox id
-        if (containerId == 23396) {
+        /*if (containerId == 23396) { // rework this, dont check by containerId (23396 == uint16_t and not uint8_t>
             msg->getU8();
             const uint8_t listSize = msg->getU8();
             for (auto i = -1; ++i < listSize;) {
                 msg->getU8();
                 msg->getString();
             }
-        } else {
-            // Parse store inbox category empty
+        } else*/ {
+        // Parse store inbox category empty
             msg->getU8();
             msg->getU8();
         }
@@ -1428,7 +1428,7 @@ void ProtocolGame::parseAnimatedText(const InputMessagePtr& msg)
 void ProtocolGame::parseAnthem(const InputMessagePtr& msg)
 {
     uint8_t type = msg->getU8();
-    if (type >= 0 && type <= 2) {
+    if (type <= 2) {
         msg->getU16(); // Anthem id
     }
 }
