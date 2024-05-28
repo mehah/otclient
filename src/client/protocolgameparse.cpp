@@ -1130,14 +1130,14 @@ void ProtocolGame::parseOpenContainer(const InputMessagePtr& msg)
 
     if (g_game.getFeature(Otc::GameContainerFilter)) {
         // Check if container is store inbox id
-        /*if (containerId == 23396) { // rework this, dont check by containerId (23396 == uint16_t and not uint8_t>
+        if (containerItem->getId() == 23396) {
             msg->getU8();
             const uint8_t listSize = msg->getU8();
             for (auto i = -1; ++i < listSize;) {
                 msg->getU8();
                 msg->getString();
             }
-        } else*/ {
+        } else {
         // Parse store inbox category empty
             msg->getU8();
             msg->getU8();
@@ -2138,7 +2138,8 @@ void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
     const Otc::MessageMode mode = Proto::translateMessageModeFromServer(code);
     std::string text;
 
-    g_logger.debug(stdext::format("code: %d, mode: %d", code, mode));
+    g_logger.debug(stdext::format("[parseTextMessage] code: %d, mode: %d", code, mode));
+
     switch (mode) {
         case Otc::MessageChannelManagement:
             msg->getU16(); // channelId
