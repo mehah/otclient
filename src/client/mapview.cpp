@@ -41,7 +41,7 @@
 #include <framework/graphics/shadermanager.h>
 #include <framework/platform/platformwindow.h>
 
-MapView::MapView() : m_pool(g_drawPool.get(DrawPoolType::MAP)), m_lightView(std::make_unique<LightView>(Size()))
+MapView::MapView() : m_lightView(std::make_unique<LightView>(Size())), m_pool(g_drawPool.get(DrawPoolType::MAP))
 {
     m_floors.resize(g_gameConfig.getMapMaxZ() + 1);
 

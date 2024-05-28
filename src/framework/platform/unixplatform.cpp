@@ -55,7 +55,7 @@ void Platform::init(std::vector<std::string>& args)
 #endif
 }
 
-void Platform::processArgs(std::vector<std::string>& args)
+void Platform::processArgs(std::vector<std::string>& /*args*/)
 {
     //nothing todo, linux args are already utf8 encoded
 }
@@ -89,12 +89,12 @@ int Platform::getProcessId()
     return getpid();
 }
 
-bool Platform::isProcessRunning(const std::string_view name)
+bool Platform::isProcessRunning(const std::string_view /*name*/)
 {
     return false;
 }
 
-bool Platform::killProcess(const std::string_view name)
+bool Platform::killProcess(const std::string_view /*name*/)
 {
     return false;
 }

@@ -28,7 +28,7 @@
 class SoundChannel : public LuaObject
 {
 public:
-    SoundChannel(int id) : m_id(id), m_gain(1) {}
+    SoundChannel(int id) : m_id(id), m_gain(1), m_pitch(1) {}
 
     SoundSourcePtr play(const std::string& filename, float fadetime = 0, float gain = 1.0f, float pitch = 1.0f);
     void stop(float fadetime = 0);
@@ -38,6 +38,12 @@ public:
 
     void setGain(float gain);
     float getGain() { return m_gain; }
+
+    void setPitch(float pitch);
+    float getPitch() { return m_pitch; }
+
+    void setPosition(const Point& pos);
+    Point getPosition() { return m_pos; }
 
     void setEnabled(bool enable);
     bool isEnabled() { return m_enabled; }
@@ -63,4 +69,6 @@ private:
     bool m_enabled{ true };
     int m_id;
     float m_gain;
+    float m_pitch;
+    Point m_pos;
 };

@@ -173,8 +173,8 @@ protected:
     struct DrawMethod
     {
         DrawMethodType type{ DrawMethodType::RECT };
-        Rect dest, src;
-        Point a, b, c;
+        Rect dest{}, src{};
+        Point a{}, b{}, c{};
         uint16_t intValue{ 0 };
     };
 

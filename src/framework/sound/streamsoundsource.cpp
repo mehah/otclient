@@ -36,6 +36,21 @@ StreamSoundSource::~StreamSoundSource()
     stop();
 }
 
+void StreamSoundSource::setFile(std::string filename)
+{
+    filename = g_resources.guessFilePath(filename, "ogg");
+    filename = g_resources.resolvePath(filename);
+
+    SoundFilePtr soundFile = SoundFile::loadSoundFile(filename);
+
+    if (!soundFile) {
+		g_logger.error(stdext::format("unable to load sound file '%s'", filename));
+		return;
+	}
+
+    setSoundFile(soundFile);
+}
+
 void StreamSoundSource::setSoundFile(const SoundFilePtr& soundFile)
 {
     m_soundFile = soundFile;
@@ -107,7 +122,6 @@ void StreamSoundSource::update()
     for (int i = 0; i < processed; ++i) {
         uint32_t buffer;
         alSourceUnqueueBuffers(m_sourceId, 1, &buffer);
-        //SoundManager::check_al_error("Couldn't unqueue audio buffer: ");
 
         if (!fillBufferAndQueue(buffer))
             break;

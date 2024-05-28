@@ -19,49 +19,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#ifndef SOUNDEFFECT_H
+#define SOUNDEFFECT_H
 
-#pragma once
+#include "declarations.h"
+#include <framework/luaengine/luaobject.h>
 
-#include "soundsource.h"
-
-class StreamSoundSource : public SoundSource
+class SoundEffect : public LuaObject
 {
-    enum
-    {
-        STREAM_BUFFER_SIZE = 1024 * 400,
-        STREAM_FRAGMENTS = 4,
-        STREAM_FRAGMENT_SIZE = STREAM_BUFFER_SIZE / STREAM_FRAGMENTS
-    };
 
 public:
-    enum DownMix { NoDownMix, DownMixLeft, DownMixRight };
+    explicit SoundEffect(ALCdevice* device);
+    ~SoundEffect() override;
 
-    StreamSoundSource();
-    ~StreamSoundSource() override;
+    void init(ALCdevice* device);
 
-    void play() override;
-    void stop() override;
-
-    bool isPlaying() override { return m_playing; }
-
-    void setSoundFile(const SoundFilePtr& soundFile);
-
-    void setFile(std::string filename);
-
-    void downMix(DownMix downMix);
-
-    void update() override;
+    void setPreset(const std::string& presetName);
+    void setReverbDensity(const float density) const;
+    void setReverbDiffusion(const float diffusion) const;
+    void setReverbGain(const float gain) const;
+    void setReverbGainHF(const float gainHF) const;
+    void setReverbGainLF(const float gainLF) const;
+    void setReverbDecayTime(const float decayTime) const;
+    void setReverbDecayHfRatio(const float decayHfRatio) const;
+    void setReverbDecayLfRatio(const float decayLfRatio) const;
+    void setReverbReflectionsGain(const float reflectionsGain) const;
+    void setReverbReflectionsDelay(const float reflectionsDelay) const;
 
 private:
-    void queueBuffers();
-    void unqueueBuffers() const;
-    bool fillBufferAndQueue(uint32_t buffer);
 
-    SoundFilePtr m_soundFile;
-    std::array<SoundBufferPtr, STREAM_FRAGMENTS> m_buffers;
-    DownMix m_downMix;
-    bool m_looping{ false };
-    bool m_playing{ false };
-    bool m_eof{ false };
-    bool m_waitingFile{ false };
+    friend class SoundManager;
+    friend class SoundSource;
+
+    void loadPreset(const EFXEAXREVERBPROPERTIES& preset);
+
+    ALCdevice* m_device;
+
+    uint m_effectSlot = 0;
+    uint m_effectId = 0;
 };
+
+#endif
