@@ -119,7 +119,12 @@ function setSkillValue(id, value)
     local skill = skillsWindow:recursiveGetChildById(id)
     if skill then
         local widget = skill:getChildById('value')
-        widget:setText(value)
+        if id == "skillId7" or id == "skillId9" or id == "skillId11" or id == "skillId13" or id == "skillId14" or id == "skillId15" or id == "skillId16" then
+            local value = value / 100
+            widget:setText(value .. "%")
+        else
+            widget:setText(value)
+        end
     end
 end
 
@@ -250,10 +255,22 @@ function refresh()
     local hasAdditionalSkills = g_game.getFeature(GameAdditionalSkills)
     for i = Skill.Fist, Skill.ManaLeechAmount do
         onSkillChange(player, i, player:getSkillLevel(i), player:getSkillLevelPercent(i))
-        onBaseSkillChange(player, i, player:getSkillBaseLevel(i))
 
         if i > Skill.Fishing then
-            toggleSkill('skillId' .. i, hasAdditionalSkills)
+            local ativedAdditionalSkills = hasAdditionalSkills
+            if ativedAdditionalSkills and g_game.getClientVersion() >= 1281 and (i == Skill.LifeLeechAmount or i == Skill.ManaLeechAmount) then
+                ativedAdditionalSkills = false
+            end
+
+            toggleSkill('skillId' .. i, ativedAdditionalSkills)
+        end
+    end
+
+    if g_game.getClientVersion() >= 1281 then
+        local lastSkill = g_game.getClientVersion() >= 1332 and Skill.Transcendence or Skill.Momentum
+        for i = Skill.Fatal, lastSkill do
+            onSkillChange(player, i, player:getSkillLevel(i), player:getSkillLevelPercent(i))
+            toggleSkill('skillId' .. i, player:getSkillLevel(i) > 0)
         end
     end
 
@@ -506,6 +523,10 @@ function onSkillChange(localPlayer, id, level, percent)
     setSkillPercent('skillId' .. id, percent, tr('You have %s percent to go', 100 - percent))
 
     onBaseSkillChange(localPlayer, id, localPlayer:getSkillBaseLevel(id))
+
+    if id > Skill.ManaLeechAmount then
+	    toggleSkill('skillId' .. id, level > 0)
+    end
 end
 
 function onBaseSkillChange(localPlayer, id, baseLevel)
