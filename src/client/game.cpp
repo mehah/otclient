@@ -743,7 +743,7 @@ void Game::look(const ThingPtr& thing, bool isBattleList)
     if (thing->isCreature() && isBattleList && m_protocolVersion >= 961)
         m_protocolGame->sendLookCreature(thing->getId());
     else {
-        const int thingId = thing->isCreature() ? Proto::Creature : thing->getId();
+        const int thingId = thing->isCreature() ? static_cast<int>(Proto::Creature) : thing->getId();
         m_protocolGame->sendLook(thing->getPosition(), thingId, thing->getStackPos());
     }
 }
@@ -756,7 +756,7 @@ void Game::move(const ThingPtr& thing, const Position& toPos, int count)
     if (!canPerformGameAction() || !thing || thing->getPosition() == toPos)
         return;
 
-    const auto thingId = thing->isCreature() ? Proto::Creature : thing->getId();
+    const auto thingId = thing->isCreature() ? static_cast<int>(Proto::Creature) : thing->getId();
     m_protocolGame->sendMove(thing->getPosition(), thingId, thing->getStackPos(), toPos, count);
 }
 
