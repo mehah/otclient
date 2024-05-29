@@ -105,6 +105,8 @@ public:
         get(drawPool)->repaint();
     }
 
+    bool isPreDrawing() const;
+
 private:
     DrawPool* getCurrentPool() const;
 
