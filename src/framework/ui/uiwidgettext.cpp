@@ -39,8 +39,7 @@ void UIWidget::updateText()
     if (isTextWrap() && m_rect.isValid()) {
         m_drawTextColors = m_textColors;
         m_drawText = m_font->wrapText(m_text, getWidth() - m_textOffset.x);
-    }
-    else {
+    } else {
         m_drawText = m_text;
         m_drawTextColors = m_textColors;
     }
@@ -64,7 +63,7 @@ void UIWidget::updateText()
     }
 
     m_textCachedScreenCoords = {};
-    g_app.repaint();
+    repaint();
 }
 
 void UIWidget::resizeToText()
@@ -123,12 +122,11 @@ void UIWidget::drawText(const Rect& screenCoords)
 
     g_drawPool.scale(m_fontScale);
     if (m_drawTextColors.empty() || m_colorCoordsBuffer.empty()) {
-        g_drawPool.addTexturedCoordsBuffer(m_font->getTexture(), m_coordsBuffer, m_color);
-    }
-    else {
+        g_drawPool.addTexturedCoordsBuffer(m_font->getTexture(), m_coordsBuffer, m_color, m_textDrawConductor);
+    } else {
         auto texture = m_font->getTexture();
         for (const auto& [color, coordsBuffer] : m_colorCoordsBuffer) {
-            g_drawPool.addTexturedCoordsBuffer(texture, coordsBuffer, color);
+            g_drawPool.addTexturedCoordsBuffer(texture, coordsBuffer, color, m_textDrawConductor);
         }
     }
     g_drawPool.scale(1.f); // reset scale
@@ -149,7 +147,7 @@ void UIWidget::setText(const std::string_view text, bool dontFireLuaCall)
 
     if (m_text == _text && m_textColors.empty())
         return;
-    
+
     m_textColors.clear();
     m_drawTextColors.clear();
     m_colorCoordsBuffer.clear();
@@ -163,7 +161,6 @@ void UIWidget::setText(const std::string_view text, bool dontFireLuaCall)
     }
 }
 
-
 void UIWidget::setColoredText(const std::string_view coloredText, bool dontFireLuaCall)
 {
     m_textColors.clear();
@@ -174,12 +171,11 @@ void UIWidget::setColoredText(const std::string_view coloredText, bool dontFireL
     std::regex exp("\\{([^\\}]+),[ ]*([^\\}]+)\\}");
 
     std::string _text{ coloredText.data() };
-    
+
     Color baseColor = Color::white;
     std::smatch res;
     std::string text = "";
-    while (std::regex_search(_text, res, exp))
-    {
+    while (std::regex_search(_text, res, exp)) {
         std::string prefix = res.prefix().str();
         if (prefix.size() > 0) {
             m_textColors.push_back(std::make_pair(text.size(), baseColor));

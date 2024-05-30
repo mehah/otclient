@@ -29,9 +29,9 @@
 #include <framework/luaengine/luainterface.h>
 
 #ifndef ANDROID
-    #if ENABLE_DISCORD_RPC == 1
-        #include <framework/discord/discord.h>
-    #endif
+#if ENABLE_DISCORD_RPC == 1
+#include <framework/discord/discord.h>
+#endif
 #endif
 
 #ifdef FRAMEWORK_NET
@@ -42,87 +42,86 @@
 extern "C" {
 #endif
 
-int main(int argc, const char* argv[])
-{
-    std::vector<std::string> args(argv, argv + argc);
+    int main(int argc, const char* argv[])
+    {
+        std::vector<std::string> args(argv, argv + argc);
 
-    // process args encoding
-    g_platform.init(args);
+        // process args encoding
+        g_platform.init(args);
 
-    // initialize resources
+        // initialize resources
 #ifdef ANDROID
     // Unzip Android assets/data.zip
-    g_androidManager.unZipAssetData();
-    g_resources.init(nullptr);
+        g_androidManager.unZipAssetData();
+        g_resources.init(nullptr);
 #else
-    g_resources.init(args[0].data());
+        g_resources.init(args[0].data());
 #endif
 
 #if ENABLE_ENCRYPTION == 1 && ENABLE_ENCRYPTION_BUILDER == 1
-    if (std::find(args.begin(), args.end(), "--encrypt") != args.end()) {
-        g_lua.init();
-        g_resources.runEncryption(args.size() >= 3 ? args[2] : ENCRYPTION_PASSWORD);
-        std::cout << "Encryption complete" << std::endl;
+        if (std::find(args.begin(), args.end(), "--encrypt") != args.end()) {
+            g_lua.init();
+            g_resources.runEncryption(args.size() >= 3 ? args[2] : ENCRYPTION_PASSWORD);
+            std::cout << "Encryption complete" << std::endl;
 #ifdef WIN32
-        MessageBoxA(NULL, "Encryption complete", "Success", 0);
+            MessageBoxA(NULL, "Encryption complete", "Success", 0);
+#endif
+            return 0;
+        }
+#endif
+
+        if (g_resources.launchCorrect(args)) {
+            return 0; // started other executable
+        }
+
+        // find script init.lua and run it
+        if (!g_resources.discoverWorkDir("init.lua"))
+            g_logger.fatal("Unable to find work directory, the application cannot be initialized.");
+
+#ifndef ANDROID
+#if ENABLE_DISCORD_RPC == 1
+        std::function<bool()> canUpdate = []() -> bool { return g_game.isOnline(); };
+        std::function<void(std::string&)> onUpdate = [](std::string& info) {
+#if SHOW_CHARACTER_NAME_RPC == 1
+            info = "Name: " + g_game.getCharacterName();
+#endif
+#if SHOW_CHARACTER_LEVEL_RPC == 1
+            const auto& level = std::to_string(g_game.getLocalPlayer()->getLevel());
+            info += info.empty() ? "Level: " + level : "[" + level + "]";
+#endif
+#if SHOW_CHARACTER_WORLD_RPC == 1
+            if (!info.empty()) info += "\n";
+            info += "World: " + g_game.getWorldName();
+#endif
+        };
+        g_discord.init(canUpdate, onUpdate);
+#endif
+#endif
+
+        // initialize application framework and otclient
+        g_app.init(args, new GraphicalApplicationContext(g_gameConfig.getSpriteSize(), ApplicationDrawEventsPtr(&g_client)));
+        g_client.init(args);
+#ifdef FRAMEWORK_NET
+        g_http.init();
+#endif
+
+        if (!g_lua.safeRunScript("init.lua"))
+            g_logger.fatal("Unable to run script init.lua!");
+
+        // the run application main loop
+        g_app.run();
+
+        // unload modules
+        g_app.deinit();
+
+        // terminate everything and free memory
+        g_client.terminate();
+        g_app.terminate();
+#ifdef FRAMEWORK_NET
+        g_http.terminate();
 #endif
         return 0;
     }
-#endif
-
-    if (g_resources.launchCorrect(args)) {
-        return 0; // started other executable
-    }
-
-    // find script init.lua and run it
-    if (!g_resources.discoverWorkDir("init.lua"))
-        g_logger.fatal("Unable to find work directory, the application cannot be initialized.");
-
-#ifndef ANDROID
-    #if ENABLE_DISCORD_RPC == 1
-    std::function<bool()> canUpdate = []() -> bool { return g_game.isOnline(); };
-    std::function<void(std::string&)> onUpdate = [](std::string& info) {
-#if SHOW_CHARACTER_NAME_RPC == 1
-        info = "Name: " + g_game.getCharacterName();
-#endif
-#if SHOW_CHARACTER_LEVEL_RPC == 1
-        const auto& level = std::to_string(g_game.getLocalPlayer()->getLevel());
-        info += info.empty() ? "Level: " + level : "[" + level + "]";
-#endif
-#if SHOW_CHARACTER_WORLD_RPC == 1
-        if (!info.empty()) info += "\n";
-        info += "World: " + g_game.getWorldName();
-#endif
-    };
-    g_discord.init(canUpdate, onUpdate);
-    #endif
-#endif
-
-    // initialize application framework and otclient
-    g_app.init(args, new GraphicalApplicationContext(
-        (uint8_t)ASYNC_DISPATCHER_MAX_THREAD, g_gameConfig.getSpriteSize(), ApplicationDrawEventsPtr(&g_client)));
-    g_client.init(args);
-#ifdef FRAMEWORK_NET
-    g_http.init();
-#endif
-
-    if (!g_lua.safeRunScript("init.lua"))
-        g_logger.fatal("Unable to run script init.lua!");
-
-    // the run application main loop
-    g_app.run();
-
-    // unload modules
-    g_app.deinit();
-
-    // terminate everything and free memory
-    g_client.terminate();
-    g_app.terminate();
-#ifdef FRAMEWORK_NET
-    g_http.terminate();
-#endif
-    return 0;
-}
 #ifdef ANDROID
 }
 #endif

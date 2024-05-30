@@ -309,6 +309,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     </ClCompile>
     <ClCompile Include="..\src\framework\luafunctions.cpp" />
     <ClCompile Include="..\src\framework\net\connection.cpp" />
+    <ClCompile Include="..\src\framework\net\httplogin.cpp" />
     <ClCompile Include="..\src\framework\net\inputmessage.cpp" />
     <ClCompile Include="..\src\framework\net\outputmessage.cpp" />
     <ClCompile Include="..\src\framework\net\protocol.cpp" />
@@ -328,6 +329,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClCompile Include="..\src\framework\sound\oggsoundfile.cpp" />
     <ClCompile Include="..\src\framework\sound\soundbuffer.cpp" />
     <ClCompile Include="..\src\framework\sound\soundchannel.cpp" />
+    <ClCompile Include="..\src\framework\sound\soundeffect.cpp" />
     <ClCompile Include="..\src\framework\sound\soundfile.cpp" />
     <ClCompile Include="..\src\framework\sound\soundmanager.cpp" />
     <ClCompile Include="..\src\framework\sound\soundsource.cpp" />
@@ -468,6 +470,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\framework\luaengine\luavaluecasts.h" />
     <ClInclude Include="..\src\framework\net\connection.h" />
     <ClInclude Include="..\src\framework\net\declarations.h" />
+    <ClInclude Include="..\src\framework\net\httplogin.h" />
     <ClInclude Include="..\src\framework\net\inputmessage.h" />
     <ClInclude Include="..\src\framework\net\outputmessage.h" />
     <ClInclude Include="..\src\framework\net\protocol.h" />
@@ -490,6 +493,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\framework\sound\oggsoundfile.h" />
     <ClInclude Include="..\src\framework\sound\soundbuffer.h" />
     <ClInclude Include="..\src\framework\sound\soundchannel.h" />
+    <ClInclude Include="..\src\framework\sound\soundeffect.h" />
     <ClInclude Include="..\src\framework\sound\soundfile.h" />
     <ClInclude Include="..\src\framework\sound\soundmanager.h" />
     <ClInclude Include="..\src\framework\sound\soundsource.h" />
@@ -497,7 +501,6 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\framework\stdext\cast.h" />
     <ClInclude Include="..\src\framework\stdext\compiler.h" />
     <ClInclude Include="..\src\framework\stdext\demangle.h" />
-    <ClInclude Include="..\src\framework\stdext\dumper.h" />
     <ClInclude Include="..\src\framework\stdext\exception.h" />
     <ClInclude Include="..\src\framework\stdext\format.h" />
     <ClInclude Include="..\src\framework\stdext\hash.h" />
@@ -525,6 +528,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\framework\ui\uitranslator.h" />
     <ClInclude Include="..\src\framework\ui\uiverticallayout.h" />
     <ClInclude Include="..\src\framework\ui\uiwidget.h" />
+    <ClInclude Include="..\src\framework\util\BS_thread_pool.hpp" />
     <ClInclude Include="..\src\framework\util\color.h" />
     <ClInclude Include="..\src\framework\util\crypt.h" />
     <ClInclude Include="..\src\framework\util\matrix.h" />

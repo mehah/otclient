@@ -222,6 +222,8 @@ public:
     void requestOutfit();
     void changeOutfit(const Outfit& outfit);
 
+    void sendTyping(bool typing);
+
     // vip related
     void addVip(const std::string_view name);
     void removeVip(int playerId);
@@ -377,6 +379,8 @@ public:
 
     void enableTileThingLuaCallback(bool value) { m_tileThingsLuaCallback = value; }
     bool isTileThingLuaCallbackEnabled() { return m_tileThingsLuaCallback; }
+
+    void stashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos);
 
 protected:
     void enableBotCall() { m_denyBotCall = false; }

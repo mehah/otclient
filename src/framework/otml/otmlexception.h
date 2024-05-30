@@ -30,7 +30,7 @@ class OTMLException : public stdext::exception
 public:
     OTMLException(const OTMLNodePtr& node, const std::string_view error);
     OTMLException(const OTMLDocumentPtr& doc, const std::string_view error, int line = -1);
-    ~OTMLException() noexcept override = default;;
+    ~OTMLException() noexcept override = default;
 
     const char* what() const noexcept override { return m_what.data(); }
 

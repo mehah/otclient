@@ -36,7 +36,8 @@
 class Thing : public AttachableObject
 {
 public:
-    virtual void draw(const Point& /*dest*/, bool drawThings = true, LightView* /*lightView*/ = nullptr) {}
+    virtual void draw(const Point& /*dest*/, bool /*drawThings*/ = true, const LightViewPtr & = nullptr) {}
+    virtual void drawLight(const Point& /*dest*/, const LightViewPtr&) {}
 
     LuaObjectPtr attachedObjectToLuaObject() override { return asLuaObject(); }
     bool isThing() override { return true; }
@@ -65,109 +66,108 @@ public:
     virtual bool isPlayer() { return false; }
     virtual bool isLocalPlayer() { return false; }
 
-    ThingType* getThingType() const { return m_thingType; }
-    Animator* getAnimator() const { return m_thingType->getAnimator(); }
-    Animator* getIdleAnimator() const { return m_thingType->getIdleAnimator(); }
+    Animator* getAnimator() const { return getThingType()->getAnimator(); }
+    Animator* getIdleAnimator() const { return getThingType()->getIdleAnimator(); }
 
-    virtual Point getDisplacement() const { return m_thingType->getDisplacement(); }
-    virtual int getDisplacementX() const { return m_thingType->getDisplacementX(); }
-    virtual int getDisplacementY() const { return m_thingType->getDisplacementY(); }
-    virtual int getExactSize(int layer = 0, int xPattern = 0, int yPattern = 0, int zPattern = 0, int animationPhase = 0) { return m_thingType->getExactSize(layer, xPattern, yPattern, zPattern, animationPhase); }
+    virtual Point getDisplacement() const { return getThingType()->getDisplacement(); }
+    virtual int getDisplacementX() const { return getThingType()->getDisplacementX(); }
+    virtual int getDisplacementY() const { return getThingType()->getDisplacementY(); }
+    virtual int getExactSize(int layer = 0, int xPattern = 0, int yPattern = 0, int zPattern = 0, int animationPhase = 0) { return getThingType()->getExactSize(layer, xPattern, yPattern, zPattern, animationPhase); }
 
-    virtual const Light& getLight() const { return m_thingType->getLight(); }
-    virtual bool hasLight() const { return m_thingType->hasLight(); }
+    virtual const Light& getLight() const { return getThingType()->getLight(); }
+    virtual bool hasLight() const { return getThingType()->hasLight(); }
 
-    const MarketData& getMarketData() { return m_thingType->getMarketData(); }
-    const Size& getSize() const { return m_thingType->getSize(); }
+    const MarketData& getMarketData() { return getThingType()->getMarketData(); }
+    const Size& getSize() const { return getThingType()->getSize(); }
 
-    int getWidth() const { return m_thingType->getWidth(); }
-    int getHeight() const { return m_thingType->getHeight(); }
-    int getRealSize()const { return m_thingType->getRealSize(); }
-    int getLayers() const { return m_thingType->getLayers(); }
-    int getNumPatternX()const { return m_thingType->getNumPatternX(); }
-    int getNumPatternY()const { return m_thingType->getNumPatternY(); }
-    int getNumPatternZ()const { return m_thingType->getNumPatternZ(); }
-    int getAnimationPhases()const { return m_thingType->getAnimationPhases(); }
-    int getGroundSpeed() const { return m_thingType->getGroundSpeed(); }
-    int getMaxTextLength()const { return m_thingType->getMaxTextLength(); }
-    int getMinimapColor()const { return m_thingType->getMinimapColor(); }
-    int getLensHelp()const { return m_thingType->getLensHelp(); }
-    int getElevation() const { return m_thingType->getElevation(); }
+    int getWidth() const { return getThingType()->getWidth(); }
+    int getHeight() const { return getThingType()->getHeight(); }
+    int getRealSize()const { return getThingType()->getRealSize(); }
+    int getLayers() const { return getThingType()->getLayers(); }
+    int getNumPatternX()const { return getThingType()->getNumPatternX(); }
+    int getNumPatternY()const { return getThingType()->getNumPatternY(); }
+    int getNumPatternZ()const { return getThingType()->getNumPatternZ(); }
+    int getAnimationPhases()const { return getThingType()->getAnimationPhases(); }
+    int getGroundSpeed() const { return getThingType()->getGroundSpeed(); }
+    int getMaxTextLength()const { return getThingType()->getMaxTextLength(); }
+    int getMinimapColor()const { return getThingType()->getMinimapColor(); }
+    int getLensHelp()const { return getThingType()->getLensHelp(); }
+    int getElevation() const { return getThingType()->getElevation(); }
 
-    int getClothSlot() { return m_thingType->getClothSlot(); }
+    int getClothSlot() { return getThingType()->getClothSlot(); }
 
-    bool blockProjectile() const { return m_thingType->blockProjectile(); }
+    bool blockProjectile() const { return getThingType()->blockProjectile(); }
 
-    virtual bool isContainer() { return m_thingType->isContainer(); }
+    virtual bool isContainer() { return getThingType()->isContainer(); }
 
     bool isCommon() { return !isGround() && !isGroundBorder() && !isOnTop() && !isCreature() && !isOnBottom(); }
 
-    bool isTopGround() { return !isCreature() && m_thingType->isTopGround(); }
-    bool isTopGroundBorder() { return !isCreature() && m_thingType->isTopGroundBorder(); }
-    bool isSingleGround() { return !isCreature() && m_thingType->isSingleGround(); }
-    bool isSingleGroundBorder() { return !isCreature() && m_thingType->isSingleGroundBorder(); }
-    bool isGround() { return !isCreature() && m_thingType->isGround(); }
-    bool isGroundBorder() { return !isCreature() && m_thingType->isGroundBorder(); }
-    bool isOnBottom() { return !isCreature() && m_thingType->isOnBottom(); }
-    bool isOnTop() { return !isCreature() && m_thingType->isOnTop(); }
+    bool isTopGround() { return !isCreature() && getThingType()->isTopGround(); }
+    bool isTopGroundBorder() { return !isCreature() && getThingType()->isTopGroundBorder(); }
+    bool isSingleGround() { return !isCreature() && getThingType()->isSingleGround(); }
+    bool isSingleGroundBorder() { return !isCreature() && getThingType()->isSingleGroundBorder(); }
+    bool isGround() { return !isCreature() && getThingType()->isGround(); }
+    bool isGroundBorder() { return !isCreature() && getThingType()->isGroundBorder(); }
+    bool isOnBottom() { return !isCreature() && getThingType()->isOnBottom(); }
+    bool isOnTop() { return !isCreature() && getThingType()->isOnTop(); }
 
-    bool isMarketable() { return m_thingType->isMarketable(); }
-    bool isStackable() { return m_thingType->isStackable(); }
-    bool isFluidContainer() { return m_thingType->isFluidContainer(); }
-    bool isForceUse() { return m_thingType->isForceUse(); }
-    bool isMultiUse() { return m_thingType->isMultiUse(); }
-    bool isWritable() { return m_thingType->isWritable(); }
-    bool isChargeable() { return m_thingType->isChargeable(); }
-    bool isWritableOnce() { return m_thingType->isWritableOnce(); }
-    bool isSplash() { return m_thingType->isSplash(); }
-    bool isNotWalkable() { return m_thingType->isNotWalkable(); }
-    bool isNotMoveable() { return m_thingType->isNotMoveable(); }
-    bool isMoveable() { return !m_thingType->isNotMoveable(); }
-    bool isNotPathable() { return m_thingType->isNotPathable(); }
-    bool isPickupable() { return m_thingType->isPickupable(); }
-    bool isHangable() { return m_thingType->isHangable(); }
-    bool isHookSouth() { return m_thingType->isHookSouth(); }
-    bool isHookEast() { return m_thingType->isHookEast(); }
-    bool isRotateable() { return m_thingType->isRotateable(); }
-    bool isDontHide() { return m_thingType->isDontHide(); }
-    bool isTranslucent() { return m_thingType->isTranslucent(); }
-    bool isLyingCorpse() { return m_thingType->isLyingCorpse(); }
-    bool isAnimateAlways() { return m_thingType->isAnimateAlways(); }
-    bool isFullGround() { return m_thingType->isFullGround(); }
-    bool isIgnoreLook() { return m_thingType->isIgnoreLook(); }
-    bool isCloth() { return m_thingType->isCloth(); }
-    bool isUsable() { return m_thingType->isUsable(); }
-    bool isWrapable() { return m_thingType->isWrapable(); }
-    bool isUnwrapable() { return m_thingType->isUnwrapable(); }
-    bool isTopEffect() { return m_thingType->isTopEffect(); }
-    bool isPodium() const { return m_thingType->isPodium(); }
-    bool isOpaque() const { return m_thingType->isOpaque(); }
-    bool isSingleDimension() const { return m_thingType->isSingleDimension(); }
-    bool isTall(const bool useRealSize = false) const { return m_thingType->isTall(useRealSize); }
+    bool isMarketable() { return getThingType()->isMarketable(); }
+    bool isStackable() { return getThingType()->isStackable(); }
+    bool isFluidContainer() { return getThingType()->isFluidContainer(); }
+    bool isForceUse() { return getThingType()->isForceUse(); }
+    bool isMultiUse() { return getThingType()->isMultiUse(); }
+    bool isWritable() { return getThingType()->isWritable(); }
+    bool isChargeable() { return getThingType()->isChargeable(); }
+    bool isWritableOnce() { return getThingType()->isWritableOnce(); }
+    bool isSplash() { return getThingType()->isSplash(); }
+    bool isNotWalkable() { return getThingType()->isNotWalkable(); }
+    bool isNotMoveable() { return getThingType()->isNotMoveable(); }
+    bool isMoveable() { return !getThingType()->isNotMoveable(); }
+    bool isNotPathable() { return getThingType()->isNotPathable(); }
+    bool isPickupable() { return getThingType()->isPickupable(); }
+    bool isHangable() { return getThingType()->isHangable(); }
+    bool isHookSouth() { return getThingType()->isHookSouth(); }
+    bool isHookEast() { return getThingType()->isHookEast(); }
+    bool isRotateable() { return getThingType()->isRotateable(); }
+    bool isDontHide() { return getThingType()->isDontHide(); }
+    bool isTranslucent() { return getThingType()->isTranslucent(); }
+    bool isLyingCorpse() { return getThingType()->isLyingCorpse(); }
+    bool isAnimateAlways() { return getThingType()->isAnimateAlways(); }
+    bool isFullGround() { return getThingType()->isFullGround(); }
+    bool isIgnoreLook() { return getThingType()->isIgnoreLook(); }
+    bool isCloth() { return getThingType()->isCloth(); }
+    bool isUsable() { return getThingType()->isUsable(); }
+    bool isWrapable() { return getThingType()->isWrapable(); }
+    bool isUnwrapable() { return getThingType()->isUnwrapable(); }
+    bool isTopEffect() { return getThingType()->isTopEffect(); }
+    bool isPodium() const { return getThingType()->isPodium(); }
+    bool isOpaque() const { return getThingType()->isOpaque(); }
+    bool isSingleDimension() const { return getThingType()->isSingleDimension(); }
+    bool isTall(const bool useRealSize = false) const { return getThingType()->isTall(useRealSize); }
 
-    bool hasMiniMapColor() const { return m_thingType->hasMiniMapColor(); }
-    bool hasLensHelp() const { return m_thingType->hasLensHelp(); }
-    bool hasDisplacement() const { return m_thingType->hasDisplacement(); }
-    bool hasElevation() const { return m_thingType->hasElevation(); }
-    bool hasAction() const { return m_thingType->hasAction(); }
-    bool hasWearOut() const { return m_thingType->hasWearOut(); }
-    bool hasClockExpire() const { return m_thingType->hasClockExpire(); }
-    bool hasExpire() const { return m_thingType->hasExpire(); }
-    bool hasExpireStop() const { return m_thingType->hasExpireStop(); }
-    bool hasAnimationPhases() const { return m_thingType->getAnimationPhases() > 1; }
-    bool isDecoKit() const { return m_thingType->isDecoKit(); }
+    bool hasMiniMapColor() const { return getThingType()->hasMiniMapColor(); }
+    bool hasLensHelp() const { return getThingType()->hasLensHelp(); }
+    bool hasDisplacement() const { return getThingType()->hasDisplacement(); }
+    bool hasElevation() const { return getThingType()->hasElevation(); }
+    bool hasAction() const { return getThingType()->hasAction(); }
+    bool hasWearOut() const { return getThingType()->hasWearOut(); }
+    bool hasClockExpire() const { return getThingType()->hasClockExpire(); }
+    bool hasExpire() const { return getThingType()->hasExpire(); }
+    bool hasExpireStop() const { return getThingType()->hasExpireStop(); }
+    bool hasAnimationPhases() const { return getThingType()->getAnimationPhases() > 1; }
+    bool isDecoKit() const { return getThingType()->isDecoKit(); }
 
-    PLAYER_ACTION getDefaultAction() { return m_thingType->getDefaultAction(); }
+    PLAYER_ACTION getDefaultAction() { return getThingType()->getDefaultAction(); }
 
-    uint16_t getClassification() { return m_thingType->getClassification(); }
+    uint16_t getClassification() { return getThingType()->getClassification(); }
 
     void canDraw(bool canDraw) { m_canDraw = canDraw; }
     inline bool canDraw(const Color& color = Color::white) const {
-        return m_canDraw && m_clientId > 0 && color.aF() > Fw::MIN_ALPHA && m_thingType && m_thingType->getOpacity() > Fw::MIN_ALPHA;
+        return m_canDraw && m_clientId > 0 && color.aF() > Fw::MIN_ALPHA && getThingType() && getThingType()->getOpacity() > Fw::MIN_ALPHA;
     }
 
     void setShader(const std::string_view name);
-    bool hasShader() { return m_shader != nullptr; }
+    bool hasShader() { return m_shaderId > 0; }
 
     void ungroup() { m_drawConductor.agroup = false; }
 
@@ -199,30 +199,33 @@ public:
     bool isHided() { return isOwnerHidden(); }
 
 protected:
+    virtual ThingType* getThingType() const = 0;
+
     void setAttachedEffectDirection(Otc::Direction dir) const
     {
-        for (const auto& effect : m_attachedEffects) {
-            if (effect->m_thingType && (effect->m_thingType->isCreature() || effect->m_thingType->isMissile()))
+        if (!hasAttachedEffects()) return;
+
+        for (const auto& effect : m_data->attachedEffects) {
+            if (effect->getThingType() && (effect->getThingType()->isCreature() || effect->getThingType()->isMissile()))
                 effect->m_direction = dir;
         }
     }
 
+    Color m_markedColor{ Color::white };
+    Color m_highlightColor{ Color::white };
+
+    Position m_position;
+    DrawConductor m_drawConductor{ false, DrawOrder::THIRD };
+
+    uint16_t m_clientId{ 0 };
+
+    int8_t m_stackPos{ -1 };
     uint8_t m_numPatternX{ 0 };
     uint8_t m_numPatternY{ 0 };
     uint8_t m_numPatternZ{ 0 };
 
-    uint16_t m_clientId{ 0 };
-
-    Position m_position;
-    ThingType* m_thingType{ nullptr };
-    DrawConductor m_drawConductor{ false, DrawOrder::THIRD };
-
-    Color m_markedColor{ Color::white };
-    Color m_highlightColor{ Color::white };
-
     // Shader
-    PainterShaderProgramPtr m_shader;
-    std::function<void()> m_shaderAction{ nullptr };
+    uint8_t m_shaderId{ 0 };
 
 private:
     void lua_setMarked(std::string_view color) { setMarked(Color(color)); }
@@ -231,5 +234,6 @@ private:
     bool m_canDraw{ true };
 
     friend class Client;
+    friend class Tile;
 };
 #pragma pack(pop)

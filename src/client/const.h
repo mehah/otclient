@@ -144,6 +144,7 @@ namespace Otc
         Fatal,
         Dodge,
         Momentum,
+        Transcendence,
         LastSkill
     };
 
@@ -543,7 +544,11 @@ namespace Otc
         GameContainerFilter = 113,
         GameEnterGameShowAppearance = 114,
         GameSmoothWalkElevation = 115,
-        LastGameFeature = 116
+        GameNegativeOffset = 116,
+        GameItemTooltipV8 = 117,
+        GameForgeConvergence = 118,
+
+        LastGameFeature,
     };
 
     enum MagicEffectsType_t : uint8_t
@@ -714,5 +719,13 @@ namespace Otc
         OFFER_STATE_EXPIRED = 2,
         OFFER_STATE_ACCEPTED = 3,
         OFFER_STATE_ACCEPTEDEX = 255
+    };
+
+    enum Supply_Stash_Actions_t : uint8_t
+    {
+        SUPPLY_STASH_ACTION_STOW_ITEM = 0,
+        SUPPLY_STASH_ACTION_STOW_CONTAINER = 1,
+        SUPPLY_STASH_ACTION_STOW_STACK = 2,
+        SUPPLY_STASH_ACTION_WITHDRAW = 3
     };
 }

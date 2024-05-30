@@ -76,7 +76,9 @@ class Item : public Thing
 public:
     static ItemPtr create(int id);
 
-    void draw(const Point& dest, bool drawThings = true, LightView* lightView = nullptr) override;
+    void draw(const Point& dest, bool drawThings = true, const LightViewPtr& lightView = nullptr) override;
+    void drawLight(const Point& dest, const LightViewPtr& lightView) override;
+
     void setId(uint32_t id) override;
 
     void setCountOrSubType(int value) { m_countOrSubType = value; updatePatterns(); }
@@ -84,10 +86,12 @@ public:
     void setSubType(int subType) { m_countOrSubType = subType; updatePatterns(); }
     void setColor(const Color& c) { if (m_color != c) m_color = c; }
     void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false) override;
+    void setTooltip(const std::string& str) { m_tooltip = str; }
 
     int getCountOrSubType() { return m_countOrSubType; }
     int getSubType();
     int getCount() { return isStackable() ? m_countOrSubType : 1; }
+    std::string getTooltip() { return m_tooltip; }
 
     bool isValid() { return getThingType() != nullptr; }
 
@@ -99,7 +103,7 @@ public:
 
     void updatePatterns();
     int calculateAnimationPhase();
-    int getExactSize(int layer = 0, int xPattern = 0, int yPattern = 0, int zPattern = 0, int animationPhase = 0) override {
+    int getExactSize(int layer = 0, int /*xPattern*/ = 0, int /*yPattern*/ = 0, int /*zPattern*/ = 0, int /*animationPhase*/ = 0) override {
         return Thing::getExactSize(layer, m_numPatternX, m_numPatternY, m_numPatternZ, calculateAnimationPhase());
     }
 
@@ -147,7 +151,9 @@ public:
 #endif
 
 private:
-    void internalDraw(int animationPhase, const Point& dest, const Color& color, bool drawThings, bool replaceColorShader, LightView* lightView = nullptr);
+    ThingType* getThingType() const override;
+
+    void internalDraw(int animationPhase, const Point& dest, const Color& color, bool drawThings, bool replaceColorShader, const LightViewPtr& lightView = nullptr);
     void setConductor();
 
     uint16_t m_countOrSubType{ 0 };
@@ -158,6 +164,7 @@ private:
     ticks_t m_lastPhase{ 0 };
 
     bool m_async{ true };
+    std::string m_tooltip;
 
 #ifdef FRAMEWORK_EDITOR
     uint16_t m_serverId{ 0 };

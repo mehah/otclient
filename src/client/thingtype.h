@@ -278,7 +278,7 @@ public:
     void exportImage(const std::string& fileName);
 #endif
 
-    void draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, const Color& color, bool drawThings = true, LightView* lightView = nullptr, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR);
+    void draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, const Color& color, bool drawThings = true, const LightViewPtr& lightView = nullptr, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR);
     void drawWithFrameBuffer(const TexturePtr& texture, const Rect& screenRect, const Rect& textureRect, const Color& color, const DrawConductor& conductor);
 
     uint16_t getId() { return m_id; }
@@ -393,6 +393,9 @@ public:
     int getExactHeight();
     TexturePtr getTexture(int animationPhase);
 
+    std::string getName() { return m_name; }
+    std::string getDescription() { return m_description; }
+
 private:
     static ThingFlagAttr thingAttrToThingFlagAttr(ThingAttr attr);
     static Size getBestTextureDimension(int w, int h, int count);
@@ -462,4 +465,7 @@ private:
     std::atomic_bool m_loading;
 
     Timer m_lastTimeUsage;
+
+    std::string m_name;
+    std::string m_description;
 };

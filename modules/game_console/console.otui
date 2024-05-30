@@ -173,3 +173,4 @@ Panel
     margin-bottom: 6
     shift-navigation: true
     max-length: 255
+    @onTextChange: onTextChange(self:getText())

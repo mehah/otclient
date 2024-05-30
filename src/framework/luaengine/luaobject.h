@@ -84,8 +84,6 @@ public:
     template<typename T>
     std::shared_ptr<T> dynamic_self_cast() { return std::dynamic_pointer_cast<T>(shared_from_this()); }
 
-    void operator=(const LuaObject&) const {}
-
 private:
     int m_fieldsTableRef;
 };
@@ -165,7 +163,7 @@ int LuaObject::luaCallLuaField(const std::string_view field, const T&... args)
     try {
         self = asLuaObject();
     } catch (...) {
-        g_logger.fine(stdext::format(
+        g_logger.warning(stdext::format(
             "(%s):luaCallLuaField: Calling lua during object construction is not allowed.", getClassName()));
         return 0;
     }

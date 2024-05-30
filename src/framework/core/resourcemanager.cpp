@@ -30,6 +30,7 @@
 #include <framework/platform/platform.h>
 #include <framework/net/protocolhttp.h>
 #include <framework/util/crypt.h>
+#include <framework/graphics/drawpoolmanager.h>
 
 #include <physfs.h>
 
@@ -379,11 +380,14 @@ std::string ResourceManager::resolvePath(const std::string& path)
     std::string fullPath;
     if (path.starts_with("/"))
         fullPath = path;
+    else if (g_drawPool.isPreDrawing())
+        fullPath = "/" + path;
     else {
         if (const std::string scriptPath = "/" + g_lua.getCurrentSourcePath(); !scriptPath.empty())
             fullPath += scriptPath + "/";
         fullPath += path;
     }
+
     if (!(fullPath.starts_with("/")))
         g_logger.traceWarning(stdext::format("the following file path is not fully resolved: %s", path));
 
@@ -693,9 +697,9 @@ bool ResourceManager::launchCorrect(std::vector<std::string>& args) { // curentl
             continue;
 
         if (entry.path().extension() == m_binaryPath.extension()) {
-            std::error_code ec;
-            auto writeTime = std::filesystem::last_write_time(entry.path(), ec);
-            if (!ec && writeTime > lastWrite) {
+            std::error_code _ec;
+            auto writeTime = std::filesystem::last_write_time(entry.path(), _ec);
+            if (!_ec && writeTime > lastWrite) {
                 lastWrite = writeTime;
                 binary = entry.path();
             }
@@ -715,8 +719,8 @@ bool ResourceManager::launchCorrect(std::vector<std::string>& args) { // curentl
         if (entry.path().extension() == m_binaryPath.extension()) {
             if (binary == entry.path())
                 continue;
-            std::error_code ec;
-            std::filesystem::remove(entry.path(), ec);
+            std::error_code _ec;
+            std::filesystem::remove(entry.path(), _ec);
         }
     }
 
@@ -728,9 +732,9 @@ bool ResourceManager::launchCorrect(std::vector<std::string>& args) { // curentl
 #endif
 }
 
-std::string ResourceManager::createArchive(const std::unordered_map<std::string, std::string>& files) { return ""; }
+std::string ResourceManager::createArchive(const std::unordered_map<std::string, std::string>& /*files*/) { return ""; }
 
-std::unordered_map<std::string, std::string> ResourceManager::decompressArchive(std::string dataOrPath)
+std::unordered_map<std::string, std::string> ResourceManager::decompressArchive(std::string /*dataOrPath*/)
 {
     std::unordered_map<std::string, std::string> ret;
     return ret;

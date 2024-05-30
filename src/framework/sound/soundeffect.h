@@ -19,22 +19,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#ifndef SOUNDEFFECT_H
+#define SOUNDEFFECT_H
 
-#pragma once
+#include "declarations.h"
+#include <framework/luaengine/luaobject.h>
 
-#include <iostream>
-
-namespace stdext
+class SoundEffect : public LuaObject
 {
-    static struct
-    {
-        struct dumper_dummy
-        {
-            ~dumper_dummy() { std::cout << std::endl; }
-            template<class T> dumper_dummy& operator<<(const T& v) { std::cout << v << " "; return *this; }
-        };
-        template<class T> dumper_dummy operator<<(const T& v) const { dumper_dummy d; d << v; return d; }
-    } dump;
-}
 
-using stdext::dump;
+public:
+    explicit SoundEffect(ALCdevice* device);
+    ~SoundEffect() override;
+
+    void init(ALCdevice* device);
+
+    void setPreset(const std::string& presetName);
+    void setReverbDensity(const float density) const;
+    void setReverbDiffusion(const float diffusion) const;
+    void setReverbGain(const float gain) const;
+    void setReverbGainHF(const float gainHF) const;
+    void setReverbGainLF(const float gainLF) const;
+    void setReverbDecayTime(const float decayTime) const;
+    void setReverbDecayHfRatio(const float decayHfRatio) const;
+    void setReverbDecayLfRatio(const float decayLfRatio) const;
+    void setReverbReflectionsGain(const float reflectionsGain) const;
+    void setReverbReflectionsDelay(const float reflectionsDelay) const;
+
+private:
+
+    friend class SoundManager;
+    friend class SoundSource;
+
+    void loadPreset(const EFXEAXREVERBPROPERTIES& preset);
+
+    ALCdevice* m_device;
+
+    uint m_effectSlot = 0;
+    uint m_effectId = 0;
+};
+
+#endif

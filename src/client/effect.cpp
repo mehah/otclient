@@ -27,7 +27,7 @@
 #include "map.h"
 #include <client/client.h>
 
-void Effect::draw(const Point& dest, bool drawThings, LightView* lightView)
+void Effect::draw(const Point& dest, bool drawThings, const LightViewPtr& lightView)
 {
     if (!canDraw() || isHided())
         return;
@@ -54,12 +54,16 @@ void Effect::draw(const Point& dest, bool drawThings, LightView* lightView)
         animationPhase = std::min<int>(static_cast<int>(m_animationTimer.ticksElapsed() / ticks), getAnimationPhases() - 1);
     }
 
-    int xPattern = m_numPatternX;
-    int yPattern = m_numPatternY;
-    if (g_game.getFeature(Otc::GameMapOldEffectRendering)) {
-        const int offsetX = m_position.x - g_map.getCentralPosition().x;
-        const int offsetY = m_position.y - g_map.getCentralPosition().y;
+    const int offsetX = m_position.x - g_map.getCentralPosition().x;
+    const int offsetY = m_position.y - g_map.getCentralPosition().y;
 
+    int xPattern = unsigned(offsetX) % getNumPatternX();
+    xPattern = 1 - xPattern - getNumPatternX();
+    if (xPattern < 0) xPattern += getNumPatternX();
+
+    int yPattern = unsigned(offsetY) % getNumPatternY();
+
+    if (g_game.getFeature(Otc::GameMapOldEffectRendering)) {
         xPattern = offsetX % getNumPatternX();
         if (xPattern < 0)
             xPattern += getNumPatternX();
@@ -69,13 +73,16 @@ void Effect::draw(const Point& dest, bool drawThings, LightView* lightView)
             yPattern += getNumPatternY();
     }
 
-    if (g_app.isDrawingEffectsOnTop() && !m_drawConductor.agroup) {
-        m_drawConductor.agroup = true;
-        m_drawConductor.order = DrawOrder::FOURTH;
+    if (g_drawPool.getCurrentType() == DrawPoolType::MAP) {
+        if (g_app.isDrawingEffectsOnTop() && !m_drawConductor.agroup) {
+            m_drawConductor.agroup = true;
+            m_drawConductor.order = DrawOrder::FOURTH;
+        }
+
+        if (drawThings && g_client.getEffectAlpha() < 1.f)
+            g_drawPool.setOpacity(g_client.getEffectAlpha(), true);
     }
 
-    if (drawThings &&  g_client.getEffectAlpha() < 1.f)
-        g_drawPool.setOpacity(g_client.getEffectAlpha(), true);
     getThingType()->draw(dest, 0, xPattern, yPattern, 0, animationPhase, Color::white, drawThings, lightView, m_drawConductor);
 }
 
@@ -125,7 +132,6 @@ void Effect::setId(uint32_t id)
         return;
 
     m_clientId = id;
-    m_thingType = g_things.getThingType(id, ThingCategoryEffect).get();
 }
 
 void Effect::setPosition(const Position& position, uint8_t stackPos, bool hasElevation)
@@ -137,4 +143,8 @@ void Effect::setPosition(const Position& position, uint8_t stackPos, bool hasEle
 
     m_numPatternX = m_position.x % getNumPatternX();
     m_numPatternY = m_position.y % getNumPatternY();
+}
+
+ThingType* Effect::getThingType() const {
+    return g_things.getThingType(m_clientId, ThingCategoryEffect).get();
 }

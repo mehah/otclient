@@ -32,6 +32,7 @@
 #include <framework/core/graphicalapplication.h>
 
 #include "../stdext/storage.h"
+#include <unordered_set>
 
 enum class DrawPoolType : uint8_t
 {
@@ -51,6 +52,57 @@ enum DrawOrder : uint8_t
     FOURTH, // TOP ~ TOP
     FIFTH,  // ABOVE ALL - MISSILE
     LAST
+};
+
+struct DrawHashController
+{
+    bool put(size_t hash) {
+        if (m_agroup)
+            return m_hashs.emplace(m_lastObjectHash = hash).second;
+
+        stdext::hash_union(m_currentHash, hash);
+        return true;
+    }
+
+    bool isLast(const size_t hash) const {
+        return m_lastObjectHash == hash;
+    }
+
+    void update() {
+        if (!m_agroup || m_hashs.empty()) return;
+
+        m_currentHash = 0;
+        for (const auto hash : m_hashs)
+            stdext::hash_union(m_currentHash, hash);
+        m_hashs.clear();
+    }
+
+    void forceUpdate() {
+        m_currentHash = 1;
+    }
+
+    bool wasModified() const {
+        return m_currentHash != m_lastHash;
+    }
+
+    void reset() {
+        m_hashs.clear();
+        m_lastHash = m_currentHash;
+        m_lastObjectHash = 0;
+    }
+
+    void agroup(bool v) {
+        m_agroup = v;
+    }
+
+private:
+    std::unordered_set<size_t> m_hashs;
+
+    size_t m_lastHash{ 0 };
+    size_t m_currentHash{ 0 };
+    size_t m_lastObjectHash{ 0 };
+
+    bool m_agroup{ true };
 };
 
 struct DrawConductor
@@ -80,8 +132,8 @@ public:
     bool hasFrameBuffer() const { return m_framebuffer != nullptr; }
     FrameBufferPtr getFrameBuffer() const { return m_framebuffer; }
 
-    bool canRepaint() { return canRepaint(false); }
-    void repaint() { m_status.first = 1; }
+    bool canRepaint();
+    void repaint() { m_hashCtrl.forceUpdate(); m_refreshTimer.update(-1000); }
     void resetState();
     void scale(float factor);
 
@@ -98,7 +150,14 @@ public:
     void onAfterDraw(std::function<void()>&& f) { m_afterDraw = std::move(f); }
 
     std::mutex& getMutex() { return m_mutexDraw; }
-    std::mutex& getMutexPreDraw() { return m_mutexPreDraw; }
+
+    bool isDrawing() const {
+        return m_repaint;
+    }
+
+    auto& getHashController() {
+        return m_hashCtrl;
+    }
 
 protected:
 
@@ -114,8 +173,8 @@ protected:
     struct DrawMethod
     {
         DrawMethodType type{ DrawMethodType::RECT };
-        Rect dest, src;
-        Point a, b, c;
+        Rect dest{}, src{};
+        Point a{}, b{}, c{};
         uint16_t intValue{ 0 };
     };
 
@@ -139,9 +198,12 @@ protected:
     struct DrawObject
     {
         DrawObject(std::function<void()> action) : action(std::move(action)) {}
-        DrawObject(PoolState&& state) : state(std::move(state)), coords(std::make_unique<CoordsBuffer>()) {}
+        DrawObject(PoolState&& state, const size_t coordSize) : coords(std::make_unique<CoordsBuffer>(coordSize)), state(std::move(state)) {}
         DrawObject(const DrawMode drawMode, PoolState&& state, DrawMethod&& method) :
-            drawMode(drawMode), state(std::move(state)) { methods.emplace_back(std::move(method)); }
+            state(std::move(state)), drawMode(drawMode) {
+            methods.reserve(10);
+            methods.emplace_back(std::move(method));
+        }
 
         void addMethod(DrawMethod&& method)
         {
@@ -149,11 +211,12 @@ protected:
             methods.emplace_back(std::move(method));
         }
 
-        DrawMode drawMode{ DrawMode::TRIANGLES };
-        std::unique_ptr<CoordsBuffer> coords;
-        PoolState state;
         std::vector<DrawMethod> methods;
         std::function<void()> action{ nullptr };
+        std::unique_ptr<CoordsBuffer> coords;
+
+        PoolState state;
+        DrawMode drawMode{ DrawMode::TRIANGLES };
     };
 
     struct DrawObjectState
@@ -187,9 +250,9 @@ private:
     void bindFrameBuffer(const Size& size, const Color& color = Color::white);
     void releaseFrameBuffer(const Rect& dest);
 
-    inline void setFPS(uint16_t fps) { m_refreshDelay = fps; }
+    inline void setFPS(uint16_t fps) { m_refreshDelay = 1000 / fps; }
 
-    void updateHash(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color);
+    bool updateHash(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color, const bool hasCoord);
     PoolState getState(const TexturePtr& texture, const Color& color);
 
     float getOpacity() const { return m_state.opacity; }
@@ -247,9 +310,9 @@ private:
         }
     }
 
-    void release(bool draw = true) {
+    void release(bool flush = true) {
         m_objectsDraw.clear();
-        if (draw) {
+        if (flush) {
             if (!m_objectsFlushed.empty())
                 m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(m_objectsFlushed.begin()), make_move_iterator(m_objectsFlushed.end()));
 
@@ -283,8 +346,6 @@ private:
         }
     }
 
-    bool canRepaint(bool autoUpdateStatus);
-
     const FrameBufferPtr& getTemporaryFrameBuffer(const uint8_t index);
 
     bool m_enabled{ true };
@@ -302,7 +363,7 @@ private:
 
     Timer m_refreshTimer;
 
-    std::pair<size_t, size_t> m_status{ 1, 0 };
+    DrawHashController m_hashCtrl;
 
     std::vector<Matrix3> m_transformMatrixStack;
     std::vector<FrameBufferPtr> m_temporaryFramebuffers;
@@ -317,6 +378,8 @@ private:
     float m_scaleFactor{ 1.f };
     float m_scale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
 
+    size_t m_lastCoordBufferSize{ 64 };
+
     FrameBufferPtr m_framebuffer;
 
     std::function<void()> m_beforeDraw;
@@ -324,7 +387,6 @@ private:
 
     std::atomic_bool m_repaint{ false };
     std::mutex m_mutexDraw;
-    std::mutex m_mutexPreDraw;
 
     friend class DrawPoolManager;
 };

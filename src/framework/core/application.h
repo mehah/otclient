@@ -28,13 +28,7 @@
 class ApplicationContext
 {
 public:
-    ApplicationContext(uint8_t asyncDispatchMaxThreads) : m_asyncDispatchMaxThreads(asyncDispatchMaxThreads) {}
-
-    void setAsyncDispatchMaxThreads(uint8_t maxThreads) { m_asyncDispatchMaxThreads = maxThreads; }
-    uint8_t getAsyncDispatchMaxThreads() { return m_asyncDispatchMaxThreads; }
-
-protected:
-    uint8_t m_asyncDispatchMaxThreads;
+    ApplicationContext() = default;
 };
 
 //@bindsingleton g_app

@@ -25,6 +25,7 @@
 
 #include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>
+#include <framework/core/asyncdispatcher.h>
 #include <framework/otml/otml.h>
 
 ModuleManager g_modules;
@@ -163,16 +164,13 @@ void ModuleManager::enableAutoReload() {
         if (!module->isReloadable() || !module->canReload())
             continue;
 
-        ModuleData data = { module };
+        ModuleData data = { module, {} };
 
         bool hasFile = false;
-        for (const auto& path : g_resources.listDirectoryFiles("/" + module->getName(), true, false, true)) {
+        for (auto path : g_resources.listDirectoryFiles("/" + module->getName(), true, false, true)) {
             ticks_t time = g_resources.getFileTime(path);
             if (time > 0) {
-                auto fileInfo = std::make_shared<FileInfo>();
-                fileInfo->path = path;
-                fileInfo->time = time;
-                data.files.emplace_back(fileInfo);
+                data.files.emplace_back(std::make_shared<FileInfo>(std::move(path), time));
                 hasFile = true;
             }
         }
@@ -185,7 +183,9 @@ void ModuleManager::enableAutoReload() {
         modules.emplace_back(data);
     }
 
-    g_dispatcher.cycleEvent([modules] {
+    static std::atomic_bool processing{ false };
+
+    auto action = [modules] {
         for (auto& module : modules) {
             bool reload = false;
 
@@ -200,9 +200,22 @@ void ModuleManager::enableAutoReload() {
             }
 
             if (reload) {
-                g_logger.info("Reloading " + module.ref->getName());
-                module.ref->reload();
+                g_dispatcher.addEvent([module = module.ref] {
+                    g_logger.info("Reloading " + module->getName());
+                    module->reload();
+                });
+                break;
             }
         }
-    }, 750);
+
+        processing.store(false);
+    };
+
+    g_dispatcher.cycleEvent([action = std::move(action)] {
+        if (processing.load())
+            return;
+
+        processing.store(true);
+        g_asyncDispatcher.detach_task(action);
+    }, 500);
 }

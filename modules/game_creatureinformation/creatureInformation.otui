@@ -1,0 +1,46 @@
+IconInformation < UIWidget
+  anchors.top: prev.top
+  anchors.left: prev.right
+  margin-left: 3
+
+UIWidget
+  id: creatureInformation
+  size: 32 32
+  !margin-left: math.floor(-32/ 1.5)
+  !margin-top: math.floor(-32 / 2)
+
+  UILabel
+    id: name
+    text-auto-resize: true
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.HorizontalCenter: parent.HorizontalCenter
+    !font: g_gameConfig.getCreatureNameFontName()
+
+  ProgressBar
+    id: lifeBar
+    width: 40
+    height: 4
+    image-draw-order: 2
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.HorizontalCenter: parent.HorizontalCenter
+
+  ProgressBar
+    id: manaBar
+    visible: false
+    background-color: blue
+    width: 40
+    height: 4
+    margin-top: 2
+    image-draw-order: 2
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.HorizontalCenter: parent.HorizontalCenter
+
+  UIWidget
+    id: icons
+    size: 128 32
+    visible: false
+    anchors.top: lifeBar.bottom
+    anchors.left: lifeBar.right

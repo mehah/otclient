@@ -32,6 +32,7 @@
 #include <framework/otml/otmlnode.h>
 
 #include "framework/graphics/texture.h"
+#include "framework/graphics/drawpool.h"
 
 template<typename T = int>
 struct EdgeGroup
@@ -70,7 +71,8 @@ enum FlagProp : uint32_t
     PropImageSmooth = 1 << 21,
     PropImageAutoResize = 1 << 22,
     PropImageIndividualAnimation = 1 << 23,
-    PropDisableUpdateTemporarily = 1 << 24
+    PropUpdateChildrenIndexStates = 1 << 24,
+    PropDisableUpdateTemporarily = 1 << 25
 };
 
 // @bindclass
@@ -115,7 +117,7 @@ protected:
 
 public:
     void addChild(const UIWidgetPtr& child);
-    void insertChild(size_t index, const UIWidgetPtr& child);
+    void insertChild(int32_t index, const UIWidgetPtr& child);
     void removeChild(const UIWidgetPtr& child);
     void focusChild(const UIWidgetPtr& child, Fw::FocusReason reason);
     void focusNextChild(Fw::FocusReason reason, bool rotate = false);
@@ -201,16 +203,28 @@ public:
     void setShader(const std::string_view name);
     bool hasShader() { return m_shader != nullptr; }
 
-    void setProp(FlagProp prop, bool v);
+    void setProp(FlagProp prop, bool v, bool callEvent = false);
     bool hasProp(FlagProp prop) { return (m_flagsProp & prop); }
 
     void disableUpdateTemporarily();
     void addOnDestroyCallback(const std::string& id, const std::function<void()>&& callback);
     void removeOnDestroyCallback(const std::string&);
 
+    void setBackgroundDrawOrder(uint8_t order) { m_backgroundDrawConductor.order = std::min<uint8_t>(order, DrawOrder::LAST - 1); }
+    void setImageDrawOrder(uint8_t order) { m_imageDrawConductor.order = std::min<uint8_t>(order, DrawOrder::LAST - 1); }
+    void setIconDrawOrder(uint8_t order) { m_iconDrawConductor.order = std::min<uint8_t>(order, DrawOrder::LAST - 1); }
+    void setTextDrawOrder(uint8_t order) { m_textDrawConductor.order = std::min<uint8_t>(order, DrawOrder::LAST - 1); }
+    void setBorderDrawOrder(uint8_t order) { m_borderDrawConductor.order = std::min<uint8_t>(order, DrawOrder::LAST - 1); }
+
 private:
     uint32_t m_flagsProp{ 0 };
     PainterShaderProgramPtr m_shader;
+
+    DrawConductor m_backgroundDrawConductor;
+    DrawConductor m_imageDrawConductor;
+    DrawConductor m_iconDrawConductor;
+    DrawConductor m_textDrawConductor;
+    DrawConductor m_borderDrawConductor;
 
     // state managment
 protected:
@@ -298,7 +312,7 @@ public:
     bool isFirstOnStyle() { return hasProp(PropFirstOnStyle); }
 
     bool isFirstChild() { return m_parent && m_childIndex == 1; }
-    bool isLastChild() { return m_parent && m_childIndex == m_parent->m_children.size(); }
+    bool isLastChild() { return m_parent && m_childIndex == static_cast<int32_t>(m_parent->m_children.size()); }
     bool isMiddleChild() { return !isFirstChild() && !isLastChild(); }
 
     bool hasChildren() { return !m_children.empty(); }
@@ -590,5 +604,5 @@ public:
 
     // custom style
 protected:
-    virtual void parseCustomStyle(const OTMLNodePtr& styleNode) {};
+    virtual void parseCustomStyle(const OTMLNodePtr& /*styleNode*/) {};
 };

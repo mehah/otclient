@@ -1,0 +1,9 @@
+Module
+  name: game_creatureinformation
+  description:
+  author: Mehah
+  website:
+  scripts: [creatureinformation]
+  sandboxed: true
+  @onLoad: controller:init()
+  @onUnload: controller:terminate()

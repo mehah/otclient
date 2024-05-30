@@ -33,8 +33,8 @@ public:
     DrawPool* get(const DrawPoolType type) const { return m_pools[static_cast<uint8_t>(type)]; }
 
     void select(DrawPoolType type);
-    void preDraw(const DrawPoolType type, const std::function<void()>& f) { return preDraw(type, f, {}, {}); }
-    void preDraw(DrawPoolType type, const std::function<void()>& f, const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha);
+    void preDraw(const DrawPoolType type, const std::function<void()>& f, const bool alwaysDraw = false) { preDraw(type, f, {}, {}, Color::alpha, alwaysDraw); }
+    void preDraw(DrawPoolType type, const std::function<void()>& f, const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha, const bool alwaysDraw = false);
 
     void addTexturedPoint(const TexturePtr& texture, const Point& point, const Color& color = Color::white) const
     { addTexturedRect(Rect(point, texture->getSize()), texture, color); }
@@ -46,12 +46,12 @@ public:
     { addTexturedRect(dest, texture, Rect(Point(), texture->getSize()), color); }
 
     void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white, const DrawConductor& condutor = DEFAULT_DRAW_CONDUCTOR) const;
-    void addTexturedCoordsBuffer(const TexturePtr& texture, const CoordsBufferPtr& coords, const Color& color = Color::white) const;
-    void addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white) const;
-    void addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white) const;
+    void addTexturedCoordsBuffer(const TexturePtr& texture, const CoordsBufferPtr& coords, const Color& color = Color::white, const DrawConductor& condutor = DEFAULT_DRAW_CONDUCTOR) const;
+    void addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white, const DrawConductor& condutor = DEFAULT_DRAW_CONDUCTOR) const;
+    void addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white, const DrawConductor& condutor = DEFAULT_DRAW_CONDUCTOR) const;
     void addFilledRect(const Rect& dest, const Color& color = Color::white, const DrawConductor& condutor = DEFAULT_DRAW_CONDUCTOR) const;
-    void addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color = Color::white) const;
-    void addBoundingRect(const Rect& dest, const Color& color = Color::white, uint16_t innerLineWidth = 1) const;
+    void addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color = Color::white, const DrawConductor& condutor = DEFAULT_DRAW_CONDUCTOR) const;
+    void addBoundingRect(const Rect& dest, const Color& color = Color::white, uint16_t innerLineWidth = 1, const DrawConductor& condutor = DEFAULT_DRAW_CONDUCTOR) const;
     void addAction(const std::function<void()>& action) const { getCurrentPool()->addAction(action); }
 
     void bindFrameBuffer(const Size& size, const Color& color = Color::white) const { getCurrentPool()->bindFrameBuffer(size, color); }
@@ -100,6 +100,12 @@ public:
     void flush() const { if (getCurrentPool()) getCurrentPool()->flush(); }
 
     DrawPoolType getCurrentType() const { return getCurrentPool()->m_type; }
+
+    inline void repaint(const DrawPoolType drawPool) const {
+        get(drawPool)->repaint();
+    }
+
+    bool isPreDrawing() const;
 
 private:
     DrawPool* getCurrentPool() const;

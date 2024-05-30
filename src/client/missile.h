@@ -31,7 +31,7 @@ class Missile : public Thing
 {
 public:
     Missile() { m_drawConductor = { true, DrawOrder::FIFTH }; };
-    void draw(const Point& dest, bool drawThings = true, LightView* lightView = nullptr);
+    void draw(const Point& dest, bool drawThings = true, const LightViewPtr& lightView = nullptr);
 
     void setId(uint32_t id) override;
     void setPath(const Position& fromPosition, const Position& toPosition);
@@ -40,10 +40,16 @@ public:
 
     MissilePtr asMissile() { return static_self_cast<Missile>(); }
 
+protected:
+    ThingType* getThingType() const override;
+
 private:
     Timer m_animationTimer;
     Point m_delta;
-    uint8_t m_distance{ 0 };
+
     float m_duration{ 0.f };
+
     Otc::Direction m_direction{ Otc::InvalidDirection };
+
+    uint8_t m_distance{ 0 };
 };

@@ -35,10 +35,10 @@
 
 UIWidget::UIWidget()
 {
-    setProp(PropEnabled, true);
-    setProp(PropVisible, true);
-    setProp(PropFocusable, true);
-    setProp(PropFirstOnStyle, true);
+    setProp(PropEnabled, true, false);
+    setProp(PropVisible, true, false);
+    setProp(PropFocusable, true, false);
+    setProp(PropFirstOnStyle, true, false);
 
     m_clickTimer.stop();
 
@@ -196,7 +196,7 @@ void UIWidget::addChild(const UIWidgetPtr& child)
     g_ui.onWidgetAppear(child);
 }
 
-void UIWidget::insertChild(size_t index, const UIWidgetPtr& child)
+void UIWidget::insertChild(int32_t index, const UIWidgetPtr& child)
 {
     if (!child) {
         g_logger.traceWarning("attempt to insert a null child into a UIWidget");
@@ -208,7 +208,7 @@ void UIWidget::insertChild(size_t index, const UIWidgetPtr& child)
         return;
     }
 
-    const size_t childrenSize = m_children.size();
+    const int32_t childrenSize = m_children.size();
 
     index = index <= 0 ? (childrenSize + index) : index - 1;
 
@@ -228,7 +228,7 @@ void UIWidget::insertChild(size_t index, const UIWidgetPtr& child)
 
     { // cache index
         child->m_childIndex = index + 1;
-        for (size_t i = child->m_childIndex; i < childrenSize; ++i)
+        for (auto i = child->m_childIndex; i < childrenSize; ++i)
             m_children[i]->m_childIndex = i + 1;
     }
 
@@ -868,7 +868,6 @@ void UIWidget::internalDestroy()
     releaseLuaFieldsTable();
 
     g_ui.onWidgetDestroy(static_self_cast<UIWidget>());
-
 }
 
 void UIWidget::destroy()
@@ -1282,7 +1281,7 @@ UIWidgetPtr UIWidget::getRootParent()
 
 UIWidgetPtr UIWidget::getChildAfter(const UIWidgetPtr& relativeChild)
 {
-    return relativeChild->m_childIndex == m_children.size() ?
+    return relativeChild->m_childIndex == static_cast<int32_t>(m_children.size()) ?
         nullptr : m_children[relativeChild->m_childIndex];
 }
 
@@ -1340,8 +1339,8 @@ UIWidgetPtr UIWidget::recursiveGetChildById(const std::string_view id)
         return widget;
 
     for (const auto& child : m_children) {
-        if (const auto& widget = child->recursiveGetChildById(id))
-            return widget;
+        if (const auto& w = child->recursiveGetChildById(id))
+            return w;
     }
 
     return nullptr;
@@ -1482,13 +1481,18 @@ UIWidgetPtr UIWidget::backwardsGetWidgetById(const std::string_view id)
     return widget;
 }
 
-void UIWidget::setProp(FlagProp prop, bool v)
+void UIWidget::setProp(FlagProp prop, bool v, bool callEvent)
 {
-    bool lastProp = hasProp(prop);
-    if (v) m_flagsProp |= prop; else m_flagsProp &= ~prop;
+    // Note: Be aware that setProp is called many times, there will be a cost,
+    // so only call this event if it is really necessary.
+    // callEvent = false by default
+    if (callEvent) {
+        const bool lastProp = hasProp(prop);
+        if (lastProp != v)
+            callLuaField("onPropertyChange", prop, v, lastProp);
+    }
 
-    if (lastProp != v)
-        callLuaField("onPropertyChange", prop, v);
+    if (v) m_flagsProp |= prop; else m_flagsProp &= ~prop;
 }
 
 bool UIWidget::setState(Fw::WidgetState state, bool on)
@@ -1615,12 +1619,20 @@ void UIWidget::updateChildrenIndexStates()
     if (isDestroyed())
         return;
 
-    for (const auto& child : m_children) {
-        child->updateState(Fw::FirstState);
-        child->updateState(Fw::MiddleState);
-        child->updateState(Fw::LastState);
-        child->updateState(Fw::AlternateState);
-    }
+    if (hasProp(PropUpdateChildrenIndexStates))
+        return;
+
+    setProp(PropUpdateChildrenIndexStates, true);
+
+    g_dispatcher.deferEvent([self = static_self_cast<UIWidget>()] {
+        for (const auto& child : self->m_children) {
+            child->updateState(Fw::FirstState);
+            child->updateState(Fw::MiddleState);
+            child->updateState(Fw::LastState);
+            child->updateState(Fw::AlternateState);
+        }
+        self->setProp(PropUpdateChildrenIndexStates, false);
+    });
 }
 
 void UIWidget::updateStyle()
@@ -1698,7 +1710,7 @@ void UIWidget::onStyleApply(const std::string_view, const OTMLNodePtr& styleNode
     parseTextStyle(styleNode);
     parseCustomStyle(styleNode);
 
-    g_app.repaint();
+    repaint();
 }
 
 void UIWidget::onGeometryChange(const Rect& oldRect, const Rect& newRect)
@@ -1714,7 +1726,7 @@ void UIWidget::onGeometryChange(const Rect& oldRect, const Rect& newRect)
 
     callLuaField("onGeometryChange", newRect, oldRect);
 
-    g_app.repaint();
+    repaint();
 }
 
 void UIWidget::onLayoutUpdate()
@@ -1985,7 +1997,8 @@ void UIWidget::setShader(const std::string_view name) {
     });
 }
 
-void UIWidget::repaint() { g_app.repaint(); }
+void UIWidget::repaint() { g_drawPool.repaint(DrawPoolType::FOREGROUND); }
+
 void UIWidget::disableUpdateTemporarily() {
     if (hasProp(PropDisableUpdateTemporarily) || !m_layout)
         return;
@@ -1993,12 +2006,13 @@ void UIWidget::disableUpdateTemporarily() {
     setProp(PropDisableUpdateTemporarily, true);
     m_layout->disableUpdates();
     g_dispatcher.deferEvent([self = static_self_cast<UIWidget>()] {
-        self->m_layout->enableUpdates();
-        self->m_layout->update();
+        if (self->m_layout) {
+            self->m_layout->enableUpdates();
+            self->m_layout->update();
+        }
         self->setProp(PropDisableUpdateTemporarily, false);
     });
 }
-
 void UIWidget::addOnDestroyCallback(const std::string& id, const std::function<void()>&& callback)
 {
     m_onDestroyCallbacks.emplace(id, callback);
@@ -2006,6 +2020,9 @@ void UIWidget::addOnDestroyCallback(const std::string& id, const std::function<v
 
 void UIWidget::removeOnDestroyCallback(const std::string& id)
 {
+    if (hasProp(PropDestroyed))
+        return;
+
     auto it = m_onDestroyCallbacks.find(id);
     if (it != m_onDestroyCallbacks.end())
         m_onDestroyCallbacks.erase(it);

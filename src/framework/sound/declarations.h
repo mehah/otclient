@@ -30,6 +30,8 @@
 #else
 #include <AL/al.h>
 #include <AL/alc.h>
+#include <AL/efx.h>
+#include <AL/efx-presets.h>
 #endif
 
 class SoundManager;
@@ -40,6 +42,7 @@ class SoundChannel;
 class StreamSoundSource;
 class CombinedSoundSource;
 class OggSoundFile;
+class SoundEffect;
 
 using SoundSourcePtr = std::shared_ptr<SoundSource>;
 using SoundFilePtr = std::shared_ptr<SoundFile>;
@@ -48,3 +51,4 @@ using SoundChannelPtr = std::shared_ptr<SoundChannel>;
 using StreamSoundSourcePtr = std::shared_ptr<StreamSoundSource>;
 using CombinedSoundSourcePtr = std::shared_ptr<CombinedSoundSource>;
 using OggSoundFilePtr = std::shared_ptr<OggSoundFile>;
+using SoundEffectPtr = std::shared_ptr<SoundEffect>;

@@ -41,6 +41,11 @@ MessageSettings = {
         screenTarget = 'statusLabel',
         consoleOption = 'showStatusMessagesInConsole'
     },
+    othersStatus = {
+        color = TextColors.white,
+        consoleTab = 'Server Log',
+        consoleOption = 'showOthersStatusMessagesInConsole'
+    },
     statusSmall = {
         color = TextColors.white,
         screenTarget = 'statusLabel'
@@ -74,10 +79,10 @@ MessageTypes = {
     [MessageModes.Heal] = MessageSettings.status,
     [MessageModes.Exp] = MessageSettings.status,
 
-    [MessageModes.DamageOthers] = MessageSettings.none,
-    [MessageModes.HealOthers] = MessageSettings.none,
-    [MessageModes.ExpOthers] = MessageSettings.none,
-    [MessageModes.Potion] = MessageSettings.none,
+    [MessageModes.DamageOthers] = MessageSettings.othersStatus,
+    [MessageModes.HealOthers] = MessageSettings.othersStatus,
+    [MessageModes.ExpOthers] = MessageSettings.othersStatus,
+    [MessageModes.Potion] = MessageSettings.othersStatus,
 
     [MessageModes.TradeNpc] = MessageSettings.centerWhite,
     [MessageModes.Guild] = MessageSettings.centerWhite,
@@ -119,7 +124,7 @@ function terminate()
 end
 
 function calculateVisibleTime(text)
-    return math.max(#text * 100, 4000)
+    return math.max(#text * 50, 4000)
 end
 
 function displayMessage(mode, text)

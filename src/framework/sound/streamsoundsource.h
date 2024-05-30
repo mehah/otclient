@@ -46,6 +46,8 @@ public:
 
     void setSoundFile(const SoundFilePtr& soundFile);
 
+    void setFile(std::string filename);
+
     void downMix(DownMix downMix);
 
     void update() override;

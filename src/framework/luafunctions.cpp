@@ -50,11 +50,13 @@
 #include <framework/sound/soundmanager.h>
 #include <framework/sound/soundsource.h>
 #include <framework/sound/streamsoundsource.h>
+#include <framework/sound/soundeffect.h>
 #endif
 
 #ifdef FRAMEWORK_NET
 #include <framework/net/protocol.h>
 #include <framework/net/protocolhttp.h>
+#include <framework/net/httplogin.h>
 #include <framework/net/server.h>
 #endif
 
@@ -182,6 +184,12 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_logger", "setLevel", &Logger::setLevel, &g_logger);
     g_lua.bindSingletonFunction("g_logger", "getLevel", &Logger::getLevel, &g_logger);
 
+    // Login Http
+    g_lua.registerClass<LoginHttp>();
+    g_lua.bindClassStaticFunction<LoginHttp>("create", [] { return std::make_shared<LoginHttp>(); });
+    g_lua.bindClassMemberFunction<LoginHttp>("httpLogin", &LoginHttp::httpLogin);
+
+    // Http
     g_lua.registerSingletonClass("g_http");
     g_lua.bindSingletonFunction("g_http", "setUserAgent", &Http::setUserAgent, &g_http);
     g_lua.bindSingletonFunction("g_http", "setEnableTimeOutOnReadWrite", &Http::setEnableTimeOutOnReadWrite, &g_http);
@@ -322,7 +330,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_app", "setCreatureInformationScale", &GraphicalApplication::setCreatureInformationScale, &g_app);
     g_lua.bindSingletonFunction("g_app", "setAnimatedTextScale", &GraphicalApplication::setAnimatedTextScale, &g_app);
     g_lua.bindSingletonFunction("g_app", "setStaticTextScale", &GraphicalApplication::setStaticTextScale, &g_app);
-    
+
     // PlatformWindow
     g_lua.registerSingletonClass("g_window");
     g_lua.bindSingletonFunction("g_window", "move", &PlatformWindow::move, &g_window);
@@ -428,6 +436,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_shaders", "setupMountShader", &ShaderManager::setupMountShader, &g_shaders);
     g_lua.bindSingletonFunction("g_shaders", "addMultiTexture", &ShaderManager::addMultiTexture, &g_shaders);
     g_lua.bindSingletonFunction("g_shaders", "getShader", &ShaderManager::getShader, &g_shaders);
+    g_lua.bindSingletonFunction("g_shaders", "clear", &ShaderManager::clear, &g_shaders);
 
     // UIWidget
     g_lua.registerClass<UIWidget>();
@@ -736,6 +745,12 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("hasShader", &UIWidget::hasShader);
     g_lua.bindClassMemberFunction<UIWidget>("disableUpdateTemporarily", &UIWidget::disableUpdateTemporarily);
 
+    g_lua.bindClassMemberFunction<UIWidget>("setBackgroundDrawOrder", &UIWidget::setBackgroundDrawOrder);
+    g_lua.bindClassMemberFunction<UIWidget>("setImageDrawOrder", &UIWidget::setImageDrawOrder);
+    g_lua.bindClassMemberFunction<UIWidget>("setIconDrawOrder", &UIWidget::setIconDrawOrder);
+    g_lua.bindClassMemberFunction<UIWidget>("setTextDrawOrder", &UIWidget::setTextDrawOrder);
+    g_lua.bindClassMemberFunction<UIWidget>("setBorderDrawOrder", &UIWidget::setBorderDrawOrder);
+
     // UILayout
     g_lua.registerClass<UILayout>();
     g_lua.bindClassMemberFunction<UILayout>("update", &UILayout::update);
@@ -950,10 +965,30 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_sounds", "disableAudio", &SoundManager::disableAudio, &g_sounds);
     g_lua.bindSingletonFunction("g_sounds", "setAudioEnabled", &SoundManager::setAudioEnabled, &g_sounds);
     g_lua.bindSingletonFunction("g_sounds", "isAudioEnabled", &SoundManager::isAudioEnabled, &g_sounds);
+    g_lua.bindSingletonFunction("g_sounds", "setPosition", &SoundManager::setPosition, &g_sounds);
+    g_lua.bindSingletonFunction("g_sounds", "createSoundEffect", &SoundManager::createSoundEffect, &g_sounds);
+    g_lua.bindSingletonFunction("g_sounds", "isEaxEnabled", &SoundManager::isEaxEnabled, &g_sounds);
 
     g_lua.registerClass<SoundSource>();
+    g_lua.bindClassStaticFunction<SoundSource>("create", [] { return std::make_shared<SoundSource>(); });
+    g_lua.bindClassMemberFunction<SoundSource>("setName", &SoundSource::setName);
+    g_lua.bindClassMemberFunction<SoundSource>("play", &SoundSource::play);
+    g_lua.bindClassMemberFunction<SoundSource>("stop", &SoundSource::stop);
+    g_lua.bindClassMemberFunction<SoundSource>("isPlaying", &SoundSource::isPlaying);
+    g_lua.bindClassMemberFunction<SoundSource>("setGain", &SoundSource::setGain);
+    g_lua.bindClassMemberFunction<SoundSource>("setPosition", &SoundSource::setPosition);
+    g_lua.bindClassMemberFunction<SoundSource>("setVelocity", &SoundSource::setVelocity);
+    g_lua.bindClassMemberFunction<SoundSource>("setFading", &SoundSource::setFading);
+    g_lua.bindClassMemberFunction<SoundSource>("setLooping", &SoundSource::setLooping);
+    g_lua.bindClassMemberFunction<SoundSource>("setRelative", &SoundSource::setRelative);
+    g_lua.bindClassMemberFunction<SoundSource>("setReferenceDistance", &SoundSource::setReferenceDistance);
+    g_lua.bindClassMemberFunction<SoundSource>("setEffect", &SoundSource::setEffect);
+    g_lua.bindClassMemberFunction<SoundSource>("removeEffect", &SoundSource::removeEffect);
     g_lua.registerClass<CombinedSoundSource, SoundSource>();
     g_lua.registerClass<StreamSoundSource, SoundSource>();
+
+    g_lua.registerClass<SoundEffect>();
+    g_lua.bindClassMemberFunction<SoundEffect>("setPreset", &SoundEffect::setPreset);
 
     g_lua.registerClass<SoundChannel>();
     g_lua.bindClassMemberFunction<SoundChannel>("play", &SoundChannel::play);

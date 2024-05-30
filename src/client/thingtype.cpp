@@ -26,6 +26,7 @@
 #include "map.h"
 #include "spriteappearances.h"
 #include "spritemanager.h"
+#include "localplayer.h"
 
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/asyncdispatcher.h>
@@ -43,6 +44,8 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
     m_null = false;
     m_id = clientId;
     m_category = category;
+    m_name = appearance.name();
+    m_description = appearance.description();
 
     const appearances::AppearanceFlags& flags = appearance.flags();
 
@@ -196,7 +199,7 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
         m_market.category = static_cast<ITEM_CATEGORY>(flags.market().category());
         m_market.tradeAs = flags.market().trade_as_object_id();
         m_market.showAs = flags.market().show_as_object_id();
-        m_market.name = flags.market().name();
+        m_market.name = m_name;
 
         for (const int32_t voc : flags.market().restrict_to_profession()) {
             m_market.restrictVocation |= voc;
@@ -450,8 +453,13 @@ void ThingType::unserialize(uint16_t clientId, ThingCategory category, const Fil
             case ThingAttrDisplacement:
             {
                 if (g_game.getClientVersion() >= 755) {
-                    m_displacement.x = fin->getU16();
-                    m_displacement.y = fin->getU16();
+                    if (g_game.getFeature(Otc::GameNegativeOffset)) {
+                        m_displacement.x = fin->get16();
+                        m_displacement.y = fin->get16();
+                    } else {
+                        m_displacement.x = fin->getU16();
+                        m_displacement.y = fin->getU16();
+                    }
                 } else {
                     m_displacement.x = 8;
                     m_displacement.y = 8;
@@ -617,7 +625,7 @@ void ThingType::drawWithFrameBuffer(const TexturePtr& texture, const Rect& scree
     g_drawPool.resetShaderProgram();
 }
 
-void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, const Color& color, bool drawThings, LightView* lightView, const DrawConductor& conductor)
+void ThingType::draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, const Color& color, bool drawThings, const LightViewPtr& lightView, const DrawConductor& conductor)
 {
     if (m_null)
         return;
@@ -677,11 +685,16 @@ TexturePtr ThingType::getTexture(int animationPhase)
 
     if (!m_loading) {
         m_loading = true;
-        g_asyncDispatcher.dispatch([this] {
+
+        auto action = [this] {
             for (int_fast8_t i = -1; ++i < m_animationPhases;)
                 loadTexture(i);
             m_loading = false;
-        });
+        };
+
+        if (g_game.getLocalPlayer() && g_game.getLocalPlayer()->isPendingGame())
+            g_dispatcher.asyncEvent(std::move(action));
+        else g_asyncDispatcher.detach_task(std::move(action));
     }
 
     return nullptr;
@@ -726,7 +739,7 @@ void ThingType::loadTexture(int animationPhase)
                             const uint32_t spriteIndex = getSpriteIndex(-1, -1, spriteMask ? 1 : l, x, y, z, animationPhase);
                             const auto& spriteImage = g_sprites.getSpriteImage(m_spritesIndex[spriteIndex]);
                             if (!spriteImage) {
-                                return;
+                                continue;
                             }
 
                             // verifies that the first block in the lower right corner is transparent.

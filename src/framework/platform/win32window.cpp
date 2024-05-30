@@ -255,8 +255,8 @@ struct WindowProcProxy
 {
     static LRESULT CALLBACK call(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
     {
-        auto* const window = static_cast<WIN32Window*>(&g_window);
-        return window->windowProc(hWnd, uMsg, wParam, lParam);
+        auto* const ww = static_cast<WIN32Window*>(&g_window);
+        return ww->windowProc(hWnd, uMsg, wParam, lParam);
     }
 };
 

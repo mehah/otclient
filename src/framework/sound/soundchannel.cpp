@@ -97,3 +97,17 @@ void SoundChannel::setGain(float gain)
         m_currentSource->setGain(gain);
     m_gain = gain;
 }
+
+void SoundChannel::setPitch(float pitch)
+{
+    if (m_currentSource)
+        m_currentSource->setPitch(pitch);
+    m_pitch = pitch; 
+}
+
+void SoundChannel::setPosition(const Point& pos)
+{
+    if (m_currentSource)
+        m_currentSource->setPosition(pos);
+    m_pos = pos;
+}

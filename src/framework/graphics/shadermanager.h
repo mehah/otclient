@@ -43,6 +43,7 @@ public:
 
     void init();
     void terminate();
+    void clear();
 
     // TODO: Move these setup methods to a ClientShaderManager
     void setupMapShader(const std::string_view name);
@@ -57,10 +58,15 @@ public:
     void addMultiTexture(const std::string_view name, const std::string_view file);
 
     PainterShaderProgramPtr getShader(const std::string_view name);
+    PainterShaderProgramPtr getShaderById(const uint8_t id) const {
+        return id > 0 && id <= m_shadersVector.size() ? m_shadersVector[id - 1] : nullptr;
+    }
 
 private:
+    void putShader(std::string name, const PainterShaderProgramPtr& shader);
 
     stdext::map<std::string, PainterShaderProgramPtr> m_shaders;
+    std::vector<PainterShaderProgramPtr> m_shadersVector;
 };
 
 extern ShaderManager g_shaders;

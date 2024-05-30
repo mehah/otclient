@@ -493,12 +493,12 @@ void ProtocolGame::sendEditList(uint32_t id, int doorId, const std::string_view 
     send(msg);
 }
 
-void ProtocolGame::sendLook(const Position& position, int thingId, int stackpos)
+void ProtocolGame::sendLook(const Position& position, int itemId, int stackpos)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientLook);
     addPosition(msg, position);
-    msg->addU16(thingId);
+    msg->addU16(itemId);
     msg->addU8(stackpos);
     send(msg);
 }
@@ -729,6 +729,14 @@ void ProtocolGame::sendRequestOutfit()
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientRequestOutfit);
+    send(msg);
+}
+
+void ProtocolGame::sendTyping(bool typing)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::GameServerCreatureTyping);
+    msg->addU8(typing);
     send(msg);
 }
 
@@ -1112,5 +1120,16 @@ void ProtocolGame::sendCloseImbuingWindow()
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientCloseImbuingWindow);
+    send(msg);
+}
+
+void ProtocolGame::sendStashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientUseStash);
+    msg->addU8(Otc::Supply_Stash_Actions_t::SUPPLY_STASH_ACTION_WITHDRAW);
+    msg->addU16(itemId);
+    msg->addU32(count);
+    msg->addU8(stackpos);
     send(msg);
 }

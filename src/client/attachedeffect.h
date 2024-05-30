@@ -30,7 +30,8 @@ class AttachedEffect : public LuaObject
 public:
     static AttachedEffectPtr create(uint16_t thingId, ThingCategory category);
 
-    void draw(const Point& /*dest*/, bool /*isOnTop*/, LightView* = nullptr);
+    void draw(const Point& /*dest*/, bool /*isOnTop*/, const LightViewPtr & = nullptr, const bool drawThing = true);
+    void drawLight(const Point& /*dest*/, const LightViewPtr&);
 
     uint16_t getId() { return m_id; }
 
@@ -88,6 +89,8 @@ public:
     const Light& getLight() const { return m_light; }
     void setLight(const Light& light) { m_light = light; }
 
+    ThingType* getThingType() const;
+
 private:
     int getCurrentAnimationPhase();
 
@@ -121,11 +124,10 @@ private:
     uint16_t m_thingId{ 0 };
     ThingCategory m_thingCategory{ ThingInvalidCategory };
 
-    ThingType* m_thingType{ nullptr };
-
     Size m_size;
 
     Timer m_animationTimer;
+    Timer m_bounceTimer;
 
     Otc::Direction m_direction{ Otc::North };
 

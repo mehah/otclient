@@ -83,6 +83,9 @@ void Map::notificateKeyRelease(const InputEvent& inputEvent) const
 
 void Map::notificateCameraMove(const Point& offset) const
 {
+    g_drawPool.repaint(DrawPoolType::FOREGROUND_MAP);
+    g_drawPool.repaint(DrawPoolType::CREATURE_INFORMATION);
+
     for (const auto& mapView : m_mapViews) {
         mapView->onCameraMove(offset);
     }
@@ -119,9 +122,23 @@ void Map::clean()
 
 void Map::cleanDynamicThings()
 {
-    for (const auto& [uid, creature] : m_knownCreatures) {
+    for (const auto& mapview : m_mapViews)
+        mapview->followCreature(nullptr);
+
+    std::vector<UIWidgetPtr> widgets;
+    widgets.reserve(m_attachedObjectWidgetMap.size());
+
+    // we pass the widget to a vector, as destroy() removes the element in m_attachedObjectWidgetMap
+    // and thus ends up having a conflict when removing the widget while it is reading.
+    for (const auto& [widget, object] : m_attachedObjectWidgetMap)
+        widgets.emplace_back(widget);
+
+    for (const auto& widget : widgets)
+        widget->destroy();
+
+    for (const auto& [uid, creature] : m_knownCreatures)
         removeThing(creature);
-    }
+
     m_knownCreatures.clear();
 
     for (int_fast8_t i = -1; ++i <= g_gameConfig.getMapMaxZ();)
@@ -1066,7 +1083,7 @@ void Map::findPathAsync(const Position& start, const Position& goal, const std::
         }
     }
 
-    g_asyncDispatcher.dispatch([=] {
+    g_asyncDispatcher.detach_task([=] {
         const auto ret = g_map.newFindPath(start, goal, visibleNodes);
         g_dispatcher.addEvent(std::bind(callback, ret));
     });
@@ -1148,6 +1165,9 @@ bool Map::removeAttachedWidgetFromObject(const UIWidgetPtr& widget) {
     if (it == m_attachedObjectWidgetMap.end())
         return false;
 
+    if (!widget->isDestroyed())
+        widget->destroy();
+
     m_attachedObjectWidgetMap.erase(it);
     return true;
 }
@@ -1178,8 +1198,12 @@ void Map::updateAttachedWidgets(const MapViewPtr& mapView)
 
         if (object->isThing() && object->static_self_cast<Thing>()->isCreature()) {
             const auto& creature = object->static_self_cast<Thing>()->static_self_cast<Creature>();
+
+            const auto displacementX = g_game.getFeature(Otc::GameNegativeOffset) ? 0 : creature->getDisplacementX();
+            const auto displacementY = g_game.getFeature(Otc::GameNegativeOffset) ? 0 : creature->getDisplacementY();
+
             const auto& jumpOffset = creature->getJumpOffset() * g_drawPool.getScaleFactor();
-            const auto& creatureOffset = Point(16 - creature->getDisplacementX(), -creature->getDisplacementY() - 2) + creature->getWalkOffset();
+            const auto& creatureOffset = Point(16 - displacementX, -displacementY - 2) + creature->getDrawOffset();
             p += creatureOffset * g_drawPool.getScaleFactor() - Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
         }
 
@@ -1195,6 +1219,7 @@ void Map::updateAttachedWidgets(const MapViewPtr& mapView)
         const auto& widgetRect = widget->getRect();
         const auto& newWidgetRect = Rect(p, widgetRect.width(), widgetRect.height());
 
+        widget->disableUpdateTemporarily();
         widget->setRect(newWidgetRect);
     }
 }

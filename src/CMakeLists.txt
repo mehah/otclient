@@ -119,26 +119,26 @@ endif()
 
 # === ASAN ===
 if(ASAN_ENABLED)
-  log_option_enabled("asan")
+	log_option_enabled("asan")
 
-  if(MSVC)
+	if(MSVC)
 	target_compile_options(${PROJECT_NAME} PUBLIC /fsanitize=address)
-  else()
+	else()
 	target_compile_options(${PROJECT_NAME} PUBLIC -fsanitize=address)
 	target_link_options(${PROJECT_NAME} PUBLIC -fsanitize=address)
-  endif()
+	endif()
 else()
-  log_option_disabled("asan")
+	log_option_disabled("asan")
 endif()
 
 
 # === DEBUG LOG ===
 # cmake -DDEBUG_LOG=ON ..
 if(CMAKE_BUILD_TYPE MATCHES Debug)
-  target_compile_definitions(${PROJECT_NAME} PRIVATE -DDEBUG_LOG=ON )
-  log_option_enabled("DEBUG LOG")
-  else()
-  log_option_disabled("DEBUG LOG")
+	target_compile_definitions(${PROJECT_NAME} PRIVATE -DDEBUG_LOG=ON )
+	log_option_enabled("DEBUG LOG")
+	else()
+	log_option_disabled("DEBUG LOG")
 endif(CMAKE_BUILD_TYPE MATCHES Debug)
 
 # *****************************************************************************
@@ -194,6 +194,8 @@ find_package(asio REQUIRED)
 find_package(Threads REQUIRED)
 find_package(STDUUID CONFIG REQUIRED)
 find_package(pugixml CONFIG REQUIRED)
+find_package(ZLIB REQUIRED)
+find_package(httplib CONFIG REQUIRED)
 if(APPLE)
 	# Required for Physfs
 	find_library(FOUNDATION Foundation REQUIRED)
@@ -264,6 +266,7 @@ set(SOURCE_FILES
 	framework/net/outputmessage.cpp
 	framework/net/protocol.cpp
 	framework/net/protocolhttp.cpp
+	framework/net/httplogin.cpp
 	framework/net/server.cpp
 	framework/otml/otmldocument.cpp
 	framework/otml/otmlemitter.cpp
@@ -405,6 +408,7 @@ if (TOGGLE_FRAMEWORK_SOUND)
 		framework/sound/soundmanager.cpp
 		framework/sound/soundsource.cpp
 		framework/sound/streamsoundsource.cpp
+		framework/sound/soundeffect.cpp
 	)
 endif()
 
@@ -414,6 +418,13 @@ target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES})
 # Includes and librarys
 # *****************************************************************************
 if(MSVC)
+
+	# Set variables to have Windows Vista Value so httplib will build 'inet_pton'
+	target_compile_definitions(${PROJECT_NAME}
+		PRIVATE
+		NTDDI_VERSION=0x06000000
+		_WIN32_WINNT=0x0600
+	)
 
 	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 		string(REPLACE "/Zi" "/Z7" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
@@ -526,11 +537,11 @@ else() # Linux
 		${CMAKE_THREAD_LIBS_INIT}
 		${Protobuf_INCLUDE_DIRS}
 		${GMP_INCLUDE_DIR}
-		${OPENSSL_INCLUDE_DIR}
 		${PHYSFS_INCLUDE_DIR}
 		${GLEW_INCLUDE_DIR}
 		${PARALLEL_HASHMAP_INCLUDE_DIRS}
 		${NLOHMANN_JSON_INCLUDE_DIR}
+		${OPENSSL_INCLUDE_DIR}
 	)
 	target_link_libraries(${PROJECT_NAME}
 		PRIVATE
@@ -545,10 +556,12 @@ else() # Linux
 		${DirectX_LIBRARIES}
 		${OGG_LIBRARY}
 		${GMP_LIBRARY}
-		${OPENSSL_LIBRARIES}
 		${STDUUID}
 		${FOUNDATION}
 		${IOKIT}
+		${OPENSSL_LIBRARY}
+		${OPENSSL_CRYPTO_LIBRARY}
+		${HTTPLIB_LIBRARY}
 
 		Threads::Threads
 		X11::X11
@@ -558,6 +571,10 @@ else() # Linux
 		Vorbis::vorbisfile
 		LibLZMA::LibLZMA
 		pugixml::pugixml
+		ZLIB::ZLIB
+		OpenSSL::SSL
+		OpenSSL::Crypto
+		httplib::httplib
 	)
 
 	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -577,7 +594,7 @@ if(WIN32)
 	PROPERTIES
 		LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE"
 		LINK_FLAGS_RELEASE "/SUBSYSTEM:windows /ENTRY:mainCRTStartup"
-		LINK_FLAGS_RELWITHDEBINFO "/SUBSYSTEM:windows /ENTRY:mainCRTStartup"
+		LINK_FLAGS_RELWITHDEBINFO "/SUBSYSTEM:CONSOLE"
 		LINK_FLAGS_MINSIZEREL "/SUBSYSTEM:windows /ENTRY:mainCRTStartup"
 	)
 endif(WIN32)

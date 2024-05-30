@@ -5,7 +5,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
 	git cmake curl zip unzip tar automake ca-certificates build-essential \
-	libglew-dev libx11-dev autoconf libtool pkg-config tzdata \
+	libglew-dev libx11-dev autoconf libtool pkg-config tzdata libssl3 \
 	&& dpkg-reconfigure --frontend noninteractive tzdata \
 	&& apt-get clean && apt-get autoclean
 

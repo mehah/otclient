@@ -38,5 +38,7 @@ Module
     - game_attachedeffects
     - game_joystick
     - game_walk
+    - game_stash
+    - game_creatureinformation
   @onLoad: init()
   @onUnload: terminate()

@@ -438,15 +438,20 @@ function load()
 end
 
 function isEnabledWASD()
-    local settings = g_settings.getNode('game_console')
-    return settings.wasdMode
+    return consoleToggleChat:isChecked()
 end
 
 function onTabChange(tabBar, tab)
+    local player = g_game.getLocalPlayer()
+    local message = consoleTextEdit:getText()
     if tab == defaultTab or tab == serverTab then
         consolePanel:getChildById('closeChannelButton'):disable()
+        if player then
+            player:setTyping(message ~= "")
+        end
     else
         consolePanel:getChildById('closeChannelButton'):enable()
+        player:setTyping(false)
     end
 end
 
@@ -1977,5 +1982,17 @@ function onChannelEvent(channelId, name, type)
         if tab then
             addTabText(fmt:format(name), SpeakTypesSettings.channelOrange, tab)
         end
+    end
+end
+
+function onTextChange(text)
+    local player = g_game.getLocalPlayer()
+    local tab = tab or getCurrentTab()
+    if tab == defaultTab or tab == serverTab then
+        if player then
+            player:setTyping(text ~= "")
+        end
+    else
+        player:setTyping(false)
     end
 end

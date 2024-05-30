@@ -53,6 +53,8 @@ void Client::init(std::vector<std::string>& /*args*/)
 
 void Client::terminate()
 {
+    m_mapWidget = nullptr;
+
 #ifdef FRAMEWORK_EDITOR
     g_creatures.terminate();
 #endif
@@ -94,10 +96,16 @@ void Client::drawForgroundMap()
 bool Client::canDraw(DrawPoolType type) const
 {
     switch (type) {
-        case DrawPoolType::CREATURE_INFORMATION:
         case DrawPoolType::FOREGROUND:
+            return true;
+
+        case DrawPoolType::MAP:
+        case DrawPoolType::CREATURE_INFORMATION:
         case DrawPoolType::FOREGROUND_MAP:
             return g_game.isOnline();
+
+        case DrawPoolType::LIGHT:
+            return g_game.isOnline() && m_mapWidget && m_mapWidget->isDrawingLights();
 
         default:
             return false;
@@ -114,7 +122,7 @@ bool Client::isUsingProtobuf()
     return g_game.isUsingProtobuf();
 }
 
-void Client::onLoadingAsyncTextureChanged(bool loadingAsync)
+void Client::onLoadingAsyncTextureChanged(bool /*loadingAsync*/)
 {
     g_sprites.reload();
 }
