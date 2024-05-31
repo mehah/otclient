@@ -50,6 +50,7 @@ endif()
 # *****************************************************************************
 
 # Define Framework options for use in compilation
+set(FRAMEWORK_DEFINITIONS "")
 if (TOGGLE_FRAMEWORK_GRAPHICS)
 	set(FRAMEWORK_DEFINITIONS ${FRAMEWORK_DEFINITIONS} -DFRAMEWORK_GRAPHICS)
 endif()
