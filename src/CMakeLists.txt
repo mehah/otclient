@@ -34,6 +34,9 @@ set(CMAKE_VERBOSE_MAKEFILE OFF)
 # Generate compile_commands.json
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# Conditional target linking for sound
+set(sound_LIBRARIES "")
+
 # *****************************************************************************
 # Client
 # *****************************************************************************
