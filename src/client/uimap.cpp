@@ -49,21 +49,9 @@ UIMap::~UIMap()
     g_map.removeMapView(m_mapView);
 }
 
-void UIMap::drawSelf(DrawPoolType drawPane)
-{
-    UIWidget::drawSelf(drawPane);
-
-    const auto& mapRect = g_app.isScaled() ? Rect(0, 0, g_graphics.getViewportSize()) : m_mapRect;
-    if (drawPane == DrawPoolType::FOREGROUND) {
-        g_drawPool.addBoundingRect(m_mapRect.expanded(1), Color::black);
-        g_drawPool.addAction([] {glDisable(GL_BLEND); });
-        g_drawPool.addFilledRect(m_mapRect, Color::alpha);
-        g_drawPool.addAction([] {glEnable(GL_BLEND); });
-        return;
-    }
-
+void UIMap::draw(DrawPoolType drawPane) {
     if (drawPane == DrawPoolType::MAP) {
-        g_drawPool.preDraw(drawPane, [this, &mapRect] {
+        g_drawPool.preDraw(drawPane, [this] {
             m_mapView->registerEvents();
             m_mapView->drawFloor();
         }, m_mapView->m_posInfo.rect, m_mapView->m_posInfo.srcRect, Color::black);
@@ -77,16 +65,28 @@ void UIMap::drawSelf(DrawPoolType drawPane)
             m_mapView->drawCreatureInformation();
         });
     } else if (drawPane == DrawPoolType::FOREGROUND_MAP) {
-        g_textDispatcher.poll();
-        g_drawPool.preDraw(drawPane, [this, &mapRect] {
+        g_drawPool.preDraw(drawPane, [this] {
+            const auto& mapRect = g_app.isScaled() ? Rect(0, 0, g_graphics.getViewportSize()) : m_mapRect;
             m_mapView->drawForeground(mapRect);
         });
     }
 }
 
+void UIMap::drawSelf(DrawPoolType drawPane)
+{
+    UIWidget::drawSelf(drawPane);
+
+    if (drawPane == DrawPoolType::FOREGROUND) {
+        g_drawPool.addBoundingRect(m_mapRect.expanded(1), Color::black);
+        g_drawPool.addAction([] {glDisable(GL_BLEND); });
+        g_drawPool.addFilledRect(m_mapRect, Color::alpha);
+        g_drawPool.addAction([] {glEnable(GL_BLEND); });
+        return;
+    }
+}
+
 void UIMap::updateMapRect() {
-    const auto& mapRect = g_app.isScaled() ? Rect(0, 0, g_graphics.getViewportSize()) : m_mapRect;
-    m_mapView->updateRect(mapRect);
+    m_mapView->updateRect(g_app.isScaled() ? Rect(0, 0, g_graphics.getViewportSize()) : m_mapRect);
 }
 
 bool UIMap::setZoom(int zoom)

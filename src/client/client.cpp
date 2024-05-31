@@ -75,22 +75,23 @@ void Client::preLoad() {
     }
 }
 
-void Client::drawMap()
+void Client::draw(DrawPoolType type)
 {
-    if (g_game.isOnline()) {
-        if (!m_mapWidget)
-            m_mapWidget = g_ui.getRootWidget()->recursiveGetChildById("gameMapPanel")->static_self_cast<UIMap>();
-
-        m_mapWidget->drawSelf(DrawPoolType::MAP);
-    } else m_mapWidget = nullptr;
-}
-
-void Client::drawForgroundMap()
-{
-    if (m_mapWidget) {
-        m_mapWidget->drawSelf(DrawPoolType::CREATURE_INFORMATION);
-        m_mapWidget->drawSelf(DrawPoolType::FOREGROUND_MAP);
+    if (!g_game.isOnline()) {
+        m_mapWidget = nullptr;
+        return;
     }
+
+    if (type == DrawPoolType::MAP && !m_mapWidget)
+        m_mapWidget = g_ui.getRootWidget()->recursiveGetChildById("gameMapPanel")->static_self_cast<UIMap>();
+
+    if (!m_mapWidget)
+        return;
+
+    if (type == DrawPoolType::FOREGROUND_MAP)
+        g_textDispatcher.poll();
+
+    m_mapWidget->draw(type);
 }
 
 bool Client::canDraw(DrawPoolType type) const
