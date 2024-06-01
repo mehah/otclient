@@ -318,7 +318,6 @@ void Item::setOtbId(uint16_t id)
         id = 0;
 
     m_clientId = id;
-    m_thingType = g_things.getThingType(m_clientId, ThingCategoryItem).get();
     setConductor();
 }
 
