@@ -210,3 +210,27 @@ MiniWindow
       SkillNameLabel
         !text: tr('Mana Leech Amount')
       SkillValueLabel
+
+    SmallSkillButton
+      id: skillId13
+      SkillNameLabel
+        !text: tr('Fatal')
+      SkillValueLabel
+
+    SmallSkillButton
+      id: skillId14
+      SkillNameLabel
+        !text: tr('Dodge')
+      SkillValueLabel
+
+    SmallSkillButton
+      id: skillId15
+      SkillNameLabel
+        !text: tr('Momentum')
+      SkillValueLabel
+
+    SmallSkillButton
+      id: skillId16
+      SkillNameLabel
+        !text: tr('Transcendence')
+      SkillValueLabel
