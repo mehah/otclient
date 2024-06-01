@@ -168,22 +168,26 @@ void GraphicalApplication::run()
             BS::multi_future<void> threads;
             threads.reserve(3);
 
-            if (m_drawEvents->canDraw(DrawPoolType::LIGHT))
+            if (m_drawEvents->canDraw(DrawPoolType::LIGHT)) {
                 threads.emplace_back(g_asyncDispatcher.submit_task([&] {
-                g_ui.render(DrawPoolType::LIGHT);
-            }));
+                    m_drawEvents->draw(DrawPoolType::LIGHT);
+                }));
+            }
 
-            if (uiPool->canRepaint())
+            if (uiPool->canRepaint()) {
                 threads.emplace_back(g_asyncDispatcher.submit_task([&] {
-                g_ui.render(DrawPoolType::FOREGROUND);
-            }));
+                    g_ui.render(DrawPoolType::FOREGROUND);
+                }));
+            }
 
-            if (fgMapPool->canRepaint())
+            if (fgMapPool->canRepaint()) {
                 threads.emplace_back(g_asyncDispatcher.submit_task([&] {
-                m_drawEvents->drawForgroundMap();
-            }));
+                    m_drawEvents->draw(DrawPoolType::CREATURE_INFORMATION);
+                    m_drawEvents->draw(DrawPoolType::FOREGROUND_MAP);
+                }));
+            }
 
-            m_drawEvents->drawMap();
+            m_drawEvents->draw(DrawPoolType::MAP);
 
             threads.wait();
 
