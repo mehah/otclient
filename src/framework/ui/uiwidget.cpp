@@ -1583,6 +1583,11 @@ void UIWidget::updateState(Fw::WidgetState state)
             updateChildren = newStatus != oldStatus;
             break;
         }
+        case Fw::MobileState:
+        {
+            newStatus = g_platform.isMobile();
+            break;
+        }
 
         default:
             return;
