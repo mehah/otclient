@@ -195,7 +195,7 @@ T LoadProcAddress(const char* name) {
     if (!addr) {
         g_logger.error(stdext::format("Failed to Load Proc Address during SoundEffect ctor for preset : %s", name));
     }
-    return std::bit_cast<T>(addr); // reinterpret_cast<T>(addr); if it crashes, this is why
+    return reinterpret_cast<T>(const_cast<void*>(addr));
 }
 
 #define LOAD_PROC(x) x = LoadProcAddress<decltype(x)>(#x)

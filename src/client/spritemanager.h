@@ -48,11 +48,12 @@ public:
     bool isLoaded() { return m_loaded; }
 
 private:
-    struct FileStream_m
-    {
-        FileStreamPtr file;
-        std::mutex mutex;
-    };
+     struct FileStream_m {
+         FileStreamPtr file;
+         std::mutex mutex;
+
+         FileStream_m(FileStreamPtr f) : file(std::move(f)) {}
+     };
 
     void load();
     FileStreamPtr getSpriteFile() const {
