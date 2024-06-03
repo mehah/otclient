@@ -37,8 +37,7 @@ public:
     static void registerLuaFunctions();
 
     void preLoad() override;
-    void drawMap() override;
-    void drawForgroundMap() override;
+    void draw(DrawPoolType type) override;
 
     bool canDraw(DrawPoolType type) const override;
     bool isLoadingAsyncTexture() override;

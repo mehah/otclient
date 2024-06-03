@@ -34,8 +34,7 @@ class ApplicationDrawEvents
 {
 protected:
     virtual void preLoad() = 0;
-    virtual void drawMap() = 0;
-    virtual void drawForgroundMap() = 0;
+    virtual void draw(DrawPoolType type) = 0;
 
     virtual bool canDraw(DrawPoolType type) const = 0;
     virtual bool isLoadingAsyncTexture() = 0;

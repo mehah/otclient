@@ -59,14 +59,12 @@ void UIManager::terminate()
 
 void UIManager::render(DrawPoolType drawPane) const
 {
-    if (drawPane == DrawPoolType::FOREGROUND) {
-        g_drawPool.preDraw(DrawPoolType::FOREGROUND, [this, drawPane] {
-            m_rootWidget->draw(m_rootWidget->getRect(), drawPane);
-        }, { 0,0, g_graphics.getViewportSize() }, {});
+    if (drawPane != DrawPoolType::FOREGROUND)
         return;
-    }
 
-    m_rootWidget->draw(m_rootWidget->getRect(), drawPane);
+    g_drawPool.preDraw(drawPane, [this, drawPane] {
+        m_rootWidget->draw(m_rootWidget->getRect(), drawPane);
+    }, { 0,0, g_graphics.getViewportSize() }, {});
 }
 
 void UIManager::resize(const Size& size) const { m_rootWidget->setSize(size); }
