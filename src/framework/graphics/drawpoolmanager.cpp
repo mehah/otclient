@@ -26,6 +26,10 @@
 
 thread_local static uint8_t CURRENT_POOL = static_cast<uint8_t>(DrawPoolType::LAST);
 
+void resetSelectedPool() {
+    CURRENT_POOL = static_cast<uint8_t>(DrawPoolType::LAST);
+}
+
 DrawPoolManager g_drawPool;
 
 void DrawPoolManager::init(uint16_t spriteSize)
@@ -164,12 +168,16 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     select(type);
     const auto pool = getCurrentPool();
 
-    if (pool->m_repaint.load())
+    if (pool->m_repaint.load()) {
+        resetSelectedPool();
         return;
+    }
 
     pool->resetState();
 
     if (f) f();
+
+    resetSelectedPool();
 
     if (!alwaysDraw)
         pool->m_hashCtrl.update();
@@ -186,8 +194,6 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     if (pool->m_repaint) {
         pool->m_refreshTimer.restart();
     }
-
-    select(DrawPoolType::LAST);
 }
 
 bool DrawPoolManager::drawPool(const DrawPoolType type) {
