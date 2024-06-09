@@ -504,8 +504,14 @@ void UIWidget::moveChildToIndex(const UIWidgetPtr& child, int index)
     m_children.insert(m_children.begin() + (index - 1), child);
 
     { // cache index
-        child->m_childIndex = index;
-        for (size_t i = index; i < childrenSize; ++i)
+        auto start = child->m_childIndex;
+        auto end = index;
+        if (start >= index) {
+            start = index;
+            end = child->m_childIndex;
+        }
+
+        for (int i = start - 1; i < end; ++i)
             m_children[i]->m_childIndex = i + 1;
     }
 
