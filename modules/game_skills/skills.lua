@@ -253,24 +253,26 @@ function refresh()
     onSpeedChange(player, player:getSpeed())
 
     local hasAdditionalSkills = g_game.getFeature(GameAdditionalSkills)
-    for i = Skill.Fist, Skill.ManaLeechAmount do
+    for i = Skill.Fist, Skill.Transcendence do
         onSkillChange(player, i, player:getSkillLevel(i), player:getSkillLevelPercent(i))
 
         if i > Skill.Fishing then
             local ativedAdditionalSkills = hasAdditionalSkills
-            if ativedAdditionalSkills and g_game.getClientVersion() >= 1281 and (i == Skill.LifeLeechAmount or i == Skill.ManaLeechAmount) then
-                ativedAdditionalSkills = false
+            if ativedAdditionalSkills then
+                if g_game.getClientVersion() >= 1281 then
+	            if i == Skill.LifeLeechAmount or i == Skill.ManaLeechAmount then
+                        ativedAdditionalSkills = false
+                    elseif g_game.getClientVersion() < 1332 and Skill.Transcendence then
+                        ativedAdditionalSkills = false
+                    elseif i >= Skill.Fatal and player:getSkillLevel(i) <= 0 then
+                        ativedAdditionalSkills = false
+                    end
+		elseif g_game.getClientVersion() < 1281 and i >= Skill.Fatal then
+                    ativedAdditionalSkills = false
+	        end
             end
 
             toggleSkill('skillId' .. i, ativedAdditionalSkills)
-        end
-    end
-
-    if g_game.getClientVersion() >= 1281 then
-        local lastSkill = g_game.getClientVersion() >= 1332 and Skill.Transcendence or Skill.Momentum
-        for i = Skill.Fatal, lastSkill do
-            onSkillChange(player, i, player:getSkillLevel(i), player:getSkillLevelPercent(i))
-            toggleSkill('skillId' .. i, player:getSkillLevel(i) > 0)
         end
     end
 
