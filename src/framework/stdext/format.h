@@ -22,8 +22,6 @@
 
 #pragma once
 
-#include "traits.h"
-
 #include <cassert>
 #include <cstdio>
 #include <cstring>
@@ -74,7 +72,7 @@ namespace stdext
     template<typename... Args>
     int snprintf(char* s, size_t maxlen, const char* format, const Args&... args)
     {
-        std::tuple<typename replace_extent<Args>::type...> tuple(args...);
+        std::tuple<std::decay_t<Args>...> tuple(args...);
         return expand_snprintf<std::tuple_size_v<decltype(tuple)>>::call(s, maxlen, format, tuple);
     }
 
