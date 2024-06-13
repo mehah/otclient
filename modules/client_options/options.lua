@@ -95,7 +95,7 @@ controller:bindKeyDown('Ctrl+N', toggleDisplays)
 function controller:onInit()
     for k, obj in pairs(options) do
         if type(obj) ~= "table" then
-            obj = { value = v }
+            obj = { value = obj }
             options[k] = obj
         end
         g_settings.setDefault(k, obj.value)
