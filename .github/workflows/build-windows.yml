@@ -61,6 +61,7 @@ jobs:
         with:
           configurePreset: ${{ matrix.buildtype }}
           buildPreset: ${{ matrix.buildtype }}
+          -G "Visual Studio 17 2022" -A x64
 
       - name: Create and Upload Artifact (exe)
         uses: actions/upload-artifact@main
