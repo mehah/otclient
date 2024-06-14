@@ -56,6 +56,11 @@ jobs:
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@main
 
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2
+        with:
+          vs-version: '[17.10]'
+    
       - name: Run CMake
         uses: lukka/run-cmake@main
         with:
