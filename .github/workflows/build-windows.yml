@@ -42,6 +42,7 @@ jobs:
       - uses: TheMrMilchmann/setup-msvc-dev@v3
         with:
           arch: x64
+          toolset: 14.39.33519
 
       - name: Restore artifacts and install vcpkg
         id: vcpkg-step
