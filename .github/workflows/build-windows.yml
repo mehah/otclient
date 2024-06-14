@@ -39,6 +39,10 @@ jobs:
           restore-keys: |
             ccache-${{ matrix.os }}
 
+      - uses: TheMrMilchmann/setup-msvc-dev@v3
+        with:
+          arch: x64
+
       - name: Restore artifacts and install vcpkg
         id: vcpkg-step
         run: |
@@ -56,10 +60,6 @@ jobs:
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@main
     
-      - uses: TheMrMilchmann/setup-msvc-dev@v3
-        with:
-          arch: x64
-
       - name: Run CMake
         uses: lukka/run-cmake@main
         with:
