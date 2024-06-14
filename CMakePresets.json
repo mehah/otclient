@@ -20,9 +20,7 @@
         "BUILD_STATIC_LIBRARY": "ON",
         "VCPKG_TARGET_TRIPLET": "x64-windows-static",
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-        "OPTIONS_ENABLE_SCCACHE": "ON",
-        "CMAKE_C_COMPILER": "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/bin/HostX64/x64/cl.exe",
-        "CMAKE_CXX_COMPILER": "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/bin/HostX64/x64/cl.exe"
+        "OPTIONS_ENABLE_SCCACHE": "ON"
       },
       "architecture": {
         "value": "x64",
