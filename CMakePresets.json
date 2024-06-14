@@ -20,7 +20,8 @@
         "BUILD_STATIC_LIBRARY": "ON",
         "VCPKG_TARGET_TRIPLET": "x64-windows-static",
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-        "OPTIONS_ENABLE_SCCACHE": "ON"
+        "OPTIONS_ENABLE_SCCACHE": "ON",
+        "SPEED_UP_BUILD_UNITY": "OFF"
       },
       "architecture": {
         "value": "x64",
@@ -65,7 +66,8 @@
       "cacheVariables": {
         "ASAN_ENABLED": "ON",
         "BUILD_STATIC_LIBRARY": "OFF",
-        "VCPKG_TARGET_TRIPLET": "x64-windows"
+        "VCPKG_TARGET_TRIPLET": "x64-windows",
+        "SPEED_UP_BUILD_UNITY": "OFF"
       },
       "architecture": {
         "value": "x64",
