@@ -116,18 +116,15 @@
     },
     {
       "name": "windows-release",
-      "configurePreset": "windows-release",
-      "cleanFirst": true
+      "configurePreset": "windows-release"
     },
     {
       "name": "windows-release-asan",
-      "configurePreset": "windows-release-asan",
-      "cleanFirst": true
+      "configurePreset": "windows-release-asan"
     },
     {
       "name": "windows-debug",
-      "configurePreset": "windows-debug",
-      "cleanFirst": true
+      "configurePreset": "windows-debug"
     }
   ]
 }
