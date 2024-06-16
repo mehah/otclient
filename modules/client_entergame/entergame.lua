@@ -420,8 +420,8 @@ function EnterGame.loginSuccess(requestId, jsonSession, jsonWorlds, jsonCharacte
   for _, world in ipairs(json.decode(jsonWorlds)) do
     worlds[world.id] = {
       name = world.name,
-      ip = world.externaladdress,
-      port = world.externalport,
+      ip = world.externaladdressprotected,
+      port = world.externalportprotected,
       previewState = world.previewstate == 1
     }
   end
