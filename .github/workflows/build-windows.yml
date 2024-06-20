@@ -30,19 +30,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@main
 
-      # - name: CCache
-      #   uses: hendrikmuhs/ccache-action@main
-      #   with:
-      #     max-size: "1G"
-      #     variant: "sccache"
-      #     key: ccache-${{ matrix.os }}-${{ matrix.buildtype }}
-      #     restore-keys: |
-      #       ccache-${{ matrix.os }}
+      - name: CCache
+        uses: hendrikmuhs/ccache-action@main
+        with:
+          max-size: "1G"
+          variant: "sccache"
+          key: ccache-${{ matrix.os }}-${{ matrix.buildtype }}
+          restore-keys: |
+            ccache-${{ matrix.os }}
 
-      # - uses: TheMrMilchmann/setup-msvc-dev@v3
-      #   with:
-      #     arch: x64
-      #     toolset: "14.40"
+      - uses: TheMrMilchmann/setup-msvc-dev@v3
+        with:
+          arch: x64
+          toolset: "14.40"
 
       - name: Restore artifacts and install vcpkg
         id: vcpkg-step
