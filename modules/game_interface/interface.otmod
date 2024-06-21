@@ -6,6 +6,7 @@ Module
   sandboxed: true
   scripts: [ widgets/uigamemap, widgets/uiitem, widgets/statsbar, gameinterface ]
   load-later:
+    - game_minimap
     - game_mainpanel
     - game_prey
     - game_imbuing
