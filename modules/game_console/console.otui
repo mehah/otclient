@@ -5,8 +5,8 @@ ConsoleLabel < UITextEdit
   margin-left: 2
   text-wrap: true
   text-auto-resize: true
-  selection-color: #111416
-  selection-background-color: #999999
+  selection-color: #f4f4f4ff
+  selection-background-color: #808080ff
   change-cursor-image: false
   cursor-visible: false
   editable: false
@@ -32,145 +32,226 @@ ConsoleTabBarPanel < MoveableTabBarPanel
   ScrollablePanel
     id: consoleBuffer
     anchors.fill: parent
-    margin-right: 12
+    image-source: /images/ui/3pixel_frame_borderimage
+    image-border: 4
+    padding: 1
+    padding-right: 12
+    padding-left: 4
+    padding-top: 4
     vertical-scrollbar: consoleScrollBar
     layout:
       type: verticalBox
       align-bottom: true
-    border-width: 1
-    border-color: #202327
-    background: #00000066
     inverted-scroll: true
-    padding: 1
 
-  VerticalScrollBar
+  VerticalQtScrollBar
     id: consoleScrollBar
     anchors.top: parent.top
     anchors.bottom: parent.bottom
     anchors.right: parent.right
     step: 14
     pixels-scroll: true
+    margin-top: 4
+    margin-right: 4
+    margin-bottom: 4
 
-ConsoleTabBarButton < MoveableTabBarButton
-  height: 28
-  padding: 15
+ConsoleTabBarButton < UIButton
+  size: 96 18
+  image-source: /images/ui/console_button
+  image-clip: 0 18 96 18
+  color: #7f7f7fff
+  font: verdana-11px-rounded
+  &ignoreTextResize: true
+  anchors.top: parent.top
+  anchors.left: parent.left
+  padding: 5
+  tab-spacing: 0
+
+  $checked:
+    image-clip: 0 0 96 18
+    color: #dfdfdfff
+
+  $on !checked:
+    image-clip: 0 18 96 18
+    color: #7f7f7fff
 
 Panel
   id: consolePanel
   anchors.fill: parent
 
-  CheckBox
-    id: toggleChat
-    !tooltip: tr('Disable chat mode, allow to walk using WASD')
+  UIWidget
+    image-source: /images/ui/2pixel_up_frame_borderimage
+    image-border: 3
+    anchors.fill: parent
+    margin-top: 16
+    focusable: false
+  Panel
+    id: consoleContentPanel
+    anchors.top: parent.top
     anchors.left: parent.left
-    anchors.top: parent.top
-    margin-left: 13
-    margin-top: 8
-    @onCheckChange: updateChatMode()
-
-  TabButton
-    id: prevChannelButton
-    icon: /images/game/console/leftarrow
-    anchors.left: toggleChat.right
-    anchors.top: parent.top
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
     margin-left: 3
-    margin-top: 6
+    margin-right: 3
+    margin-bottom: 22
+    margin-top: 20
+    padding: 1
+    focusable: false
 
   ConsoleTabBar
     id: consoleTabBar
-    anchors.left: prev.right
-    anchors.top: parent.top
-    anchors.right: next.left
-    margin-left: 5
-    margin-top: 3
-    margin-right: 5
+    anchors.left: parent.left
+    anchors.bottom: consoleContentPanel.top
+    anchors.right: closeChannelButton.left
+    margin-right: 20
+    margin-left: 18
+    margin-bottom: -7
     tab-spacing: 2
     movable: true
 
   TabButton
+    id: prevChannelButton
+    image-source: /images/ui/console_flash_left
+    image-clip: 36 0 18 18
+    anchors.left: parent.left
+    anchors.top: consoleTabBar.top
+    size: 18 18
+    enabled: false
+    &dynamicNavigation: 96
+
+    $disabled:
+      image-clip: 36 0 18 18
+
+    $!disabled:
+      image-clip: 0 0 18 18
+
+    $pressed !disabled:
+      image-clip: 18 0 18 18
+
+  TabButton
     id: nextChannelButton
-    icon: /images/game/console/rightarrow
-    anchors.right: next.left
-    anchors.top: parent.top
-    margin-right: 5
-    margin-top: 6
+    image-source: /images/ui/console_flash_right
+    image-clip: 36 0 18 18
+    anchors.left: consoleTabBar.right
+    anchors.top: consoleTabBar.top
+    margin-right: 1
+    size: 0 18
+    enabled: false
+    &dynamicNavigation: 96
+
+    $disabled:
+      image-clip: 36 0 18 18
+      width: 0
+
+    $!disabled:
+      image-clip: 0 0 18 18
+      width: 18
+
+    $pressed !disabled:
+      image-clip: 18 0 18 18
 
   TabButton
     id: closeChannelButton
     !tooltip: tr('Close this channel') .. ' (Ctrl+E)'
-    icon: /images/game/console/closechannel
-    anchors.right: next.left
-    anchors.top: parent.top
-    enabled: false
-    margin-right: 5
-    margin-top: 6
+    image-source: /images/ui/console_buttons
+    image-clip: 0 48 16 16
+    anchors.right: channelsButton.left
+    anchors.bottom: consoleContentPanel.top
+    margin-bottom: 5
+    margin-right: 1
+    size: 16 16
     @onClick: removeCurrentTab()
 
-  TabButton
-    id: clearChannelButton
-    !tooltip: tr('Clear current message window')
-    icon: /images/game/console/clearchannel
-    anchors.right: next.left
-    anchors.top: parent.top
-    margin-right: 5
-    margin-top: 6
-    @onClick: |
-      local consoleTabBar = self:getParent():getChildById('consoleTabBar')
-      clearChannel(consoleTabBar)
+    $hover !disabled:
+      image-clip: 0 48 16 16
+
+    $pressed:
+      image-clip: 16 48 16 16
 
   TabButton
     id: channelsButton
     !tooltip: tr('Open new channel') .. ' (Ctrl+O)'
-    icon: /images/game/console/channels
-    anchors.right: next.left
-    anchors.top: parent.top
-    margin-right: 5
-    margin-top: 6
+    image-source: /images/ui/console_buttons
+    image-clip: 0 0 16 16
+    anchors.right: ignoreButton.left
+    anchors.bottom: consoleContentPanel.top
+    margin-bottom: 5
+    margin-right: 1
+    size: 16 16
     @onClick: g_game.requestChannels()
+
+    $hover !disabled:
+      image-clip: 0 0 16 16
+
+    $pressed:
+      image-clip: 16 0 16 16
 
   TabButton
     id: ignoreButton
     !tooltip: tr('Ignore players')
-    icon: /images/game/console/ignore
+    image-source: /images/ui/console_buttons
+    image-clip: 0 32 16 16
     anchors.right: parent.right
-    anchors.top: parent.top
+    anchors.bottom: consoleContentPanel.top
+    margin-bottom: 5
     margin-right: 5
-    margin-top: 6
+    size: 16 16
     @onClick: onClickIgnoreButton()
 
-  Panel
-    id: consoleContentPanel
-    anchors.top: prev.bottom
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.bottom: consoleTextEdit.top
-    margin-left: 6
-    margin-right: 6
-    margin-bottom: 4
-    margin-top: 4
-    padding: 1
-    focusable: false
+    $hover !disabled:
+      image-clip: 0 32 16 16
+
+    $pressed:
+      image-clip: 16 32 16 16
 
   TabButton
     id: sayModeButton
-    icon: /images/game/console/say
-    !tooltip: tr('Adjust volume')
+    image-source: /images/ui/console_say
+    image-clip: 0 0 18 18
+    !tooltip: tr('Set talk type')
     &sayMode: 2
-    size: 20 20
-    anchors.left: parent.left
+    size: 18 18
+    anchors.left: consoleContentPanel.left
     anchors.bottom: parent.bottom
-    margin-left: 6
-    margin-bottom: 6
+    margin-bottom: 3
     @onClick: sayModeChange()
+
+    $pressed:
+      image-clip: 18 0 18 18
+
+    $hover !disabled:
+      image-clip: 0 0 18 18
 
   TextEdit
     id: consoleTextEdit
     anchors.left: sayModeButton.right
-    anchors.right: parent.right
+    anchors.right: toggleChat.left
     anchors.bottom: parent.bottom
-    margin-right: 6
-    margin-left: 6
-    margin-bottom: 6
+    margin-right: 5
+    margin-left: 5
+    margin-bottom: 3
     shift-navigation: true
     max-length: 255
+    height: 18
     @onTextChange: onTextChange(self:getText())
+
+  TopToggleButton
+    id: toggleChat
+    !tooltip: tr('Disable chat mode, allow to walk using WASD')
+    color: #c0c0c0ff
+    font: cipsoftFont
+    !text: tr('Chat Off')
+    anchors.right: consoleContentPanel.right
+    anchors.bottom: parent.bottom
+    margin-bottom: 3
+    size: 64 18
+    &isChecked: false
+    @onClick: |
+      if self.isChecked then
+        self.isChecked = false
+        self:setText(tr('Chat On'))
+      else
+        self.isChecked = true
+        self:setText(tr('Chat Off'))
+      end
+    @onCheckChange: updateChatMode()

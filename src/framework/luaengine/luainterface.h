@@ -356,6 +356,8 @@ public:
     void clearStack() { pop(stackSize()); }
     bool hasIndex(int index) { return (stackSize() >= (index < 0 ? -index : index) && index != 0); }
 
+    std::string getSource(int level = 2);
+
     void loadFiles(const std::string& directory, bool recursive = false, const std::string& contains = "");
 
     /// Pushes any type onto the stack

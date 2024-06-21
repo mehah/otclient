@@ -1,47 +1,112 @@
-OptionCheckBox < CheckBox
+OptionCheckBox < QtCheckBox
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.top: parent.top
+  color: #c0c0c0ff
   @onCheckChange: modules.client_options.setOption(self:getId(), self:isChecked())
-  height: 16
 
-  $first:
-    anchors.left: parent.left
+OptionCheckBoxMarked < OptionCheckBox
+  UIWidget
+    id: toolTipWidget
+    image-source: /images/icons/show_gui_help_grey
+    size: 12 12  
     anchors.right: parent.right
-    anchors.top: parent.top
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 3
 
-  $!first:
-    anchors.left: parent.left
+OptionScaleScroll < Label
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.top: parent.top
+  text-align: left
+  text-offset: 18 0
+  color: #c0c0c0ff
+
+  HorizontalQtScrollBar
+    id: valueBar
+    step: 1
     anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 2
+    margin-right: 3
+    width: 174
+    @onValueChange: |
+      modules.client_options.setOption(self:getParent():getId(), self:getValue())
 
-OptionScrollbar < HorizontalScrollBar
-  step: 1
-  @onValueChange: modules.client_options.setOption(self:getId(), self:getValue())
+OptionScaleScrollMarked < Label
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.top: parent.top
+  text-align: left
+  text-offset: 18 0
+  color: #c0c0c0ff
 
-MainWindow
+  UIWidget
+    id: toolTipWidget
+    image-source: /images/icons/show_gui_help_grey
+    size: 12 12
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 3
+
+  HorizontalQtScrollBar
+    id: valueBar
+    step: 1
+    anchors.right: toolTipWidget.left
+    margin-right: 10
+    width: 174
+    @onValueChange: |
+      modules.client_options.setOption(self:getParent():getId(), self:getValue())
+
+MiniQtWindow
   id: optionsWindow
-  !text: tr('Options')
-  size: 480 500
+  size: 685 530
+  anchors.centerIn: parent
+  visible: false
+  draggable: false
 
   @onEnter: modules.client_options.hide()
   @onEscape: modules.client_options.hide()
 
-  TabBarVertical
+  Label
+    !text: tr('Options')
+    font: verdana-11px-antialised
+    text-offset: 0 2
+    text-align: top
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    opacity: 0.5
+
+  TabBarQtVertical
     id: optionsTabBar
     anchors.top: parent.top
     anchors.left: parent.left
-    anchors.bottom: parent.bottom
+    margin-left: 16
+    margin-top: 29
+    size: 128 453
 
-  Panel
+  QtPanel
     id: optionsTabContent
     anchors.top: optionsTabBar.top
     anchors.left: optionsTabBar.right
     anchors.right: parent.right
     anchors.bottom: optionsTabBar.bottom
     margin-left: 10
+    margin-right: 10
 
-  Button
+  HorizontalSeparator
+    anchors.left: optionsTabBar.left
+    anchors.right: optionsTabContent.right
+    anchors.top: optionsTabContent.bottom
+    image-source: /images/ui/horizontal_line_bright
+    height: 1
+    margin-top: 15
+
+  QtButton
     !text: tr('Ok')
-    width: 64
+    size: 64 20
     anchors.right: parent.right
     anchors.bottom: parent.bottom
+    margin-bottom: 10
+    margin-right: 10
     @onClick: modules.client_options.hide()

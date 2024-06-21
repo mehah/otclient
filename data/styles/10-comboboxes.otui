@@ -104,3 +104,69 @@ ComboBoxRoundedPopupMenu < UIPopupMenu
 ComboBoxRounded < ComboBox
   image-source: /images/ui/combobox_rounded
   image-border: 3
+
+QtComboBoxPopupScrollMenuButton < UIButton
+  height: 23
+  font: verdana-11px-antialised
+  text-align: left
+  text-offset: 4 0
+  color: #dfdfdf
+  background-color: alpha
+  margin: 1
+
+  $hover !disabled:
+    color: #dfdfdf
+    background-color: #355d89
+
+  $disabled:
+    color: #dfdfdf88
+
+QtComboBoxPopupScrollMenu < UIPopupScrollMenu
+  image-source: /images/ui/combobox_square
+  image-clip: 0 69 91 23
+  image-border: 1
+
+QtComboBoxPopupMenuButton < UIButton
+  height: 20
+  text-align: left
+  text-offset: 5 0
+  color: #c0c0c0ff
+  background-color: #ffffff00
+
+  $hover !disabled:
+    color: #f4f4f4ff
+    background-color: #ffffff1b
+
+  $!hover !disabled:
+    color: #c0c0c0ff
+    background-color: #ffffff00
+
+  $disabled:
+    color: #888888ff
+    background-color: #ffffff00
+
+QtComboBoxPopupMenu < UIPopupMenu
+  image-source: /images/ui/combobox_new
+  image-clip: 0 60 91 20
+  image-border: 2
+
+QtComboBox < UIComboBox
+  color: #c0c0c0ff
+  size: 91 20
+  text-offset: -11 0
+  text-align: center
+  image-source: /images/ui/combobox_new
+  image-border: 2
+  image-border-right: 22
+  image-clip: 0 0 91 20
+
+  $pressed !disabled:
+    image-clip: 0 20 91 20
+    text-offset: -10 1
+
+  $on:
+    image-clip: 0 20 91 20
+    text-offset: -10 1
+
+  $disabled:
+    image-clip: 0 40 91 20

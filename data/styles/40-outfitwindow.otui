@@ -1,0 +1,800 @@
+CombatBox < UICheckBox
+  size: 20 20
+  image-clip: 0 0 20 20
+  margin: 2 4
+
+  $checked:
+    image-clip: 0 20 20 20
+
+ChaseModeBox < CombatBox
+  image-source: /images/game/combatmodes/chasemode
+MiniPanel < Panel
+  text-offset: 0 3
+  text-align: top
+  image-source: /images/ui/outfits/minipanel
+  image-border: 3
+  image-border-top: 22
+  padding-left: 6
+  padding-bottom: 6
+  padding-top: 25
+  padding-right: 6
+  color: #929292
+
+RotateButton < UIButton
+  anchors.bottom: parent.bottom
+  size: 20 20
+  margin-bottom: 3
+  image-source: /images/ui/outfits/rotate_button
+  image-color: #dfdfdf
+
+  $hover:
+    image-color: #ffffff
+
+PresetButton < Panel
+  height: 100
+  image-source: /images/ui/button
+  image-color: #dfdfdf
+  image-clip: 0 0 22 23
+  image-border: 3
+  border: 1 alpha
+  focusable: true
+  phantom: false
+
+  $hover:
+    image-color: #ffffff
+
+  $focus:
+    border: 1 white
+    image-color: #ffffff
+  
+  UICreature
+    id: creature
+    anchors.centerIn: parent
+    size: 64 64
+    margin-bottom: 10
+    phantom: true
+  
+  Label
+    id: title
+    anchors.top: creature.bottom
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-left: 5
+    margin-right: 5
+    margin-bottom: 5
+    text-align: bottom
+    text-wrap: true
+
+  Panel
+    id: rename
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 23
+    margin-left: 5
+    margin-right: 5
+    margin-bottom: 5
+    visible: false
+
+    TextEdit
+      id: input
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      width: 150
+      placeholder: Preset Name
+      max-length: 24
+    
+    Button
+      id: save
+      anchors.top: parent.top
+      anchors.right: parent.right
+      anchors.left: prev.right
+      margin-left: 5
+      text: Save
+
+SelectionButton < Panel
+  image-source: /images/ui/button
+  image-color: #dfdfdf
+  image-clip: 0 0 22 23
+  image-border: 3
+  border: 1 alpha
+  focusable: true
+  phantom: false
+
+  $hover:
+    image-color: #ffffff
+
+  $focus:
+    border: 1 white
+    image-color: #ffffff
+  
+  UICreature
+    id: outfit
+    anchors.centerIn: parent
+    size: 64 64
+    margin-bottom: 10
+    phantom: true
+  
+  Panel
+    id: bar
+    anchors.centerIn: parent
+    visible: false
+  
+  Label
+    id: name
+    anchors.top: outfit.bottom
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-left: 5
+    margin-right: 5
+    margin-bottom: 5
+    text-align: bottom
+    text-wrap: true
+
+OutfitWindow < MainWindow
+  size: 735 575
+  text: Customise Character
+  color: #929292
+  @onEnter: modules.game_outfit.accept()
+  @onEscape: modules.game_outfit.destroy()
+
+  MiniPanel
+    id: preview
+    anchors.top: parent.top
+    anchors.left: parent.left
+    size: 469 220
+    text: Preview
+
+    Panel
+      id: options
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.bottom: parent.bottom
+      width: 118
+      layout:
+        type: verticalBox
+        spacing: 5
+
+      FlatPanel
+        id: showFloor
+        height: 22
+        padding: 5
+
+        CheckBox
+          id: check
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          anchors.right: parent.right
+          text: Show Floor
+
+      FlatPanel
+        id: showOutfit
+        height: 22
+        padding: 5
+
+        CheckBox
+          id: check
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          anchors.right: parent.right
+          text: Show Outfit
+          checked: true
+
+      FlatPanel
+        id: showMount
+        height: 22
+        padding: 5
+
+        CheckBox
+          id: check
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          anchors.right: parent.right
+          text: Show Mount
+
+      FlatPanel
+        id: showWings
+        height: 22
+        padding: 5
+        visible:false
+
+        CheckBox
+          id: check
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          anchors.right: parent.right
+          text: Show Wings
+
+      FlatPanel
+        id: showAura
+        height: 22
+        padding: 5
+        visible:false
+        CheckBox
+          id: check
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          anchors.right: parent.right
+          text: Show Aura
+
+      FlatPanel
+        id: showShader
+        height: 22
+        padding: 5
+        visible:false
+        CheckBox
+          id: check
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          anchors.right: parent.right
+          text: Show Shader
+
+      FlatPanel
+        id: showBars
+        height: 22
+        padding: 5
+        visible:true
+        CheckBox
+          id: check
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          anchors.right: parent.right
+          text: Show Bars
+          
+      FlatPanel
+        id: showTitle
+        height: 22
+        padding: 5
+        visible:false
+        CheckBox
+          id: check
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          anchors.right: parent.right
+          text: Show title
+
+      FlatPanel
+        id: showEffects
+        height: 22
+        padding: 5
+        visible:false
+        CheckBox
+          id: check
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          anchors.right: parent.right
+          text: Show Effects
+
+    FlatPanel
+      id: panel
+      anchors.top: parent.top
+      anchors.left: prev.right
+      anchors.right: parent.right
+      anchors.bottom: parent.bottom
+      padding: 1
+      margin-left: 5
+      clipping: true
+
+      Panel
+        id: floor
+        anchors.centerIn: parent
+        size: 448 448
+        
+        layout:
+          type: grid
+          cell-size: 64 64
+          flow: true
+      
+      UICreature
+        id: creature
+        anchors.centerIn: parent
+        size: 256 256
+      
+      Panel
+        id: bars
+        anchors.horizontalCenter: prev.horizontalCenter
+        anchors.top: prev.top
+        margin-top: 47
+        margin-left: 28
+        size: 300 32
+
+        Label
+          id: name
+          anchors.top: parent.top
+          anchors.left: parent.left
+          anchors.right: parent.right
+          font: verdana-11px-rounded
+          color: #00BC00
+          text-align: center
+        
+        Panel
+          id: healthBar
+          anchors.top: name.bottom
+          anchors.horizontalCenter: name.horizontalCenter
+          size: 27 4
+          margin-top: 1
+          background: #00BC00
+          border: 1 black
+
+          Panel
+            id: image
+            anchors.centerIn: parent
+
+        Panel
+          id: manaBar
+          anchors.top: prev.bottom
+          anchors.horizontalCenter: name.horizontalCenter
+          size: 27 4
+          background: #0000FF
+          border: 1 black
+
+          Panel
+            id: image
+            anchors.centerIn: parent
+      
+      ChaseModeBox
+        id: movement
+        anchors.top: parent.top
+        anchors.left: parent.left
+        margin-top: 3
+        margin-left: 3
+        image-color: #dfdfdf
+        tooltip: Enable/Disable movement animation
+
+        $hover:
+          image-color: #ffffff
+
+      RotateButton
+        anchors.left: parent.left
+        margin-left: 3
+        image-clip: 0 0 20 20
+        @onClick: modules.game_outfit.rotate(1)
+
+        $pressed:
+          image-clip: 0 20 20 20
+      
+      RotateButton
+        anchors.right: parent.right
+        margin-right: 3
+        image-clip: 20 0 20 20
+        @onClick: modules.game_outfit.rotate(-1)
+
+        $pressed:
+          image-clip: 20 20 20 20
+  
+  MiniPanel
+    id: configure
+    anchors.top: prev.bottom
+    anchors.bottom: separator.top
+    anchors.left: parent.left
+    width: 130
+    margin-top: 5
+    margin-bottom: 5
+    text: Configure
+    layout:
+      type: verticalBox
+      spacing: 5
+
+    FlatPanel
+      id: addon1
+      height: 22
+      padding: 5
+
+      CheckBox
+        id: check
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        anchors.right: parent.right
+        text: Addon 1
+
+    FlatPanel
+      id: addon2
+      height: 22
+      padding: 5
+
+      CheckBox
+        id: check
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        anchors.right: parent.right
+        text: Addon 2
+
+    FlatPanel
+      id: mount
+      height: 22
+      padding: 5
+
+      CheckBox
+        id: check
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        anchors.right: parent.right
+        text: Mount
+
+  MiniPanel
+    id: appearance
+    anchors.top: preview.bottom
+    anchors.left: prev.right
+    anchors.right: preview.right
+    anchors.bottom: prev.bottom
+    margin-top: 5
+    margin-left: 5
+    text: Change Appearance
+
+    ScrollablePanel
+      id: settings
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      image-source: /images/ui/panel_flat
+      image-border: 1
+      padding: 5
+      padding-right: 15
+      height: 86
+      vertical-scrollbar: scrollbar
+      layout:
+        type: verticalBox
+        spacing: 2
+      
+      Panel
+        id: preset
+        height: 20
+
+        CheckBox
+          id: check
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          image-source: /images/ui/outfits/checkbox_round
+          text-offset: 15 0
+          text: Preset:
+          width: 84
+        
+        FlatPanel
+          id: name
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.left: prev.right
+          anchors.right: parent.right
+          text: -
+      
+      Panel
+        id: outfit
+        height: 20
+
+        CheckBox
+          id: check
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          image-source: /images/ui/outfits/checkbox_round
+          text-offset: 15 0
+          text: Outfit:
+          width: 84
+        
+        FlatPanel
+          id: name
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.left: prev.right
+          anchors.right: parent.right
+      
+      Panel
+        id: mount
+        height: 20
+
+        CheckBox
+          id: check
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          image-source: /images/ui/outfits/checkbox_round
+          text-offset: 15 0
+          text: Mount:
+          width: 84
+        
+        FlatPanel
+          id: name
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.left: prev.right
+          anchors.right: parent.right
+      
+      Panel
+        id: wings
+        height: 20
+        visible:false
+        CheckBox
+          id: check
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          image-source: /images/ui/outfits/checkbox_round
+          text-offset: 15 0
+          text: Wings:
+          width: 84
+        
+        FlatPanel
+          id: name
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.left: prev.right
+          anchors.right: parent.right
+      
+      Panel
+        id: aura
+        height: 20
+        visible:false
+        CheckBox
+          id: check
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          image-source: /images/ui/outfits/checkbox_round
+          text-offset: 15 0
+          text: Aura:
+          width: 84
+        
+        FlatPanel
+          id: name
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.left: prev.right
+          anchors.right: parent.right
+      
+      Panel
+        id: shader
+        height: 20
+        visible:false
+        CheckBox
+          id: check
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          image-source: /images/ui/outfits/checkbox_round
+          text-offset: 15 0
+          text: Shader:
+          width: 84
+        
+        FlatPanel
+          id: name
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.left: prev.right
+          anchors.right: parent.right
+      
+      Panel
+        id: healthBar
+        height: 20
+        visible:false
+        CheckBox
+          id: check
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          image-source: /images/ui/outfits/checkbox_round
+          text-offset: 15 0
+          text: Health Bar:
+          width: 84
+        
+        FlatPanel
+          id: name
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.left: prev.right
+          anchors.right: parent.right
+      
+      Panel
+        id: effects
+        height: 20
+        visible:false
+        CheckBox
+          id: check
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          image-source: /images/ui/outfits/checkbox_round
+          text-offset: 15 0
+          text: Effects Bar:
+          width: 84
+        
+        FlatPanel
+          id: name
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.left: prev.right
+          anchors.right: parent.right
+
+
+
+      Panel
+        id: title
+        height: 20
+        visible:false
+        CheckBox
+          id: check
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          image-source: /images/ui/outfits/checkbox_round 
+          text-offset: 15 0
+          text: title :
+          width: 84
+        
+        FlatPanel
+          id: name
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.left: prev.right
+          anchors.right: parent.right
+
+    VerticalScrollBar
+      id: scrollbar
+      anchors.top: settings.top
+      anchors.right: settings.right
+      anchors.bottom: settings.bottom
+      step: 24
+      pixel-scroll: true
+
+    Panel
+      id: colorMode
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.bottom: next.top
+      margin-top: 3
+      margin-bottom: 3
+      layout: horizontalBox
+
+      ButtonBox
+        id: head
+        width: 80
+        text: Head
+      ButtonBox
+        id: primary
+        width: 80
+        text: Primary
+      ButtonBox
+        id: secondary
+        width: 80
+        text: Secondary
+      ButtonBox
+        id: detail
+        width: 81
+        text: Detail
+
+    Panel
+      id: colorBoxPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.bottom: parent.bottom
+      height: 117
+      layout:
+        type: grid
+        cell-size: 15 15
+        cell-spacing: 2
+        num-columns: 19
+        num-lines: 7
+
+  MiniPanel
+    id: presetButtons
+    anchors.top: parent.top
+    anchors.left: preview.right
+    anchors.right: parent.right
+    margin-left: 5
+    padding-left: 21
+    height: 50
+    text: Manage Presets
+    layout:
+      type: horizontalBox
+      spacing: 5
+
+    Button
+      text: New
+      width: 43
+      font: cipsoftFont
+      @onClick: modules.game_outfit.newPreset()
+
+    Button
+      text: Rename
+      width: 43
+      font: cipsoftFont
+      @onClick: modules.game_outfit.renamePreset()
+
+    Button
+      text: Save
+      width: 43
+      font: cipsoftFont
+      @onClick: modules.game_outfit.savePreset()
+
+    Button
+      text: Delete
+      width: 43
+      font: cipsoftFont
+      @onClick: modules.game_outfit.deletePreset()
+
+  MiniPanel
+    id: listSearch
+    anchors.top: parent.top
+    anchors.left: preview.right
+    anchors.right: parent.right
+    margin-left: 5
+    height: 50
+    text: Filter
+
+    TextEdit
+      id: search
+      anchors.fill: parent
+      placeholder: Search by name
+      placeholder-color: #00000077
+
+  ScrollablePanel
+    id: presetsList
+    anchors.top: presetButtons.bottom
+    anchors.left: presetButtons.left
+    anchors.right: parent.right
+    anchors.bottom: separator.top
+    margin-top: 5
+    margin-bottom: 5
+    image-source: /images/ui/panel_flat
+    image-border: 1
+    padding: 4
+    padding-right: 15
+    vertical-scrollbar: presetsScroll
+    auto-focus: none
+    visible: false
+    layout:
+      type: verticalBox
+      spacing: 2
+  
+  VerticalScrollBar
+    id: presetsScroll
+    anchors.top: presetsList.top
+    anchors.right: presetsList.right
+    anchors.bottom: presetsList.bottom
+    step: 80
+    pixel-scroll: true
+    visible: false
+
+  ScrollablePanel
+    id: selectionList
+    anchors.top: presetButtons.bottom
+    anchors.left: presetButtons.left
+    anchors.right: parent.right
+    anchors.bottom: separator.top
+    margin-top: 5
+    margin-bottom: 5
+    image-source: /images/ui/panel_flat
+    image-border: 1
+    padding: 4
+    padding-right: 16
+    vertical-scrollbar: selectionScroll
+    layout:
+      type: grid
+      cell-size: 104 104
+      cell-spacing: 2
+      flow: true
+  
+  VerticalScrollBar
+    id: selectionScroll
+    anchors.top: selectionList.top
+    anchors.right: selectionList.right
+    anchors.bottom: selectionList.bottom
+    step: 80
+    pixel-scroll: true
+
+  HorizontalSeparator
+    id: separator
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-bottom: 30
+
+  Button
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    text: Cancel
+    width: 65
+    @onClick: modules.game_outfit.destroy()
+  
+  Button
+    anchors.bottom: parent.bottom
+    anchors.right: prev.left
+    text: Ok
+    width: 55
+    margin-right: 5
+    @onClick: modules.game_outfit.accept()

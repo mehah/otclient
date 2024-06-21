@@ -1,50 +1,61 @@
-if not UIWindow then
-    dofile 'uiwindow'
+if not UIMiniWindow then
+    dofile 'uiminiwindow'
 end
 
 -- @docclass
-UIMessageBox = extends(UIWindow, 'UIMessageBox')
+UIMessageBox = extends(UIMiniWindow, 'UIMessageBox')
 
 -- messagebox cannot be created from otui files
-UIMessageBox.create = nil
+function UIMessageBox.create(title, okCallback, cancelCallback)
+    local calendar = UIMessageBox.internalCreate()
+    return calendar
+end
+
 
 function UIMessageBox.display(title, message, buttons, onEnterCallback, onEscapeCallback)
-    local messageBox = UIMessageBox.internalCreate()
-    rootWidget:addChild(messageBox)
+    local staticSizes = {
+        width = {
+            max = 616,
+            min = 116
+        },
+        height = {
+            min = 56,
+            max = 616
+        }
+    }
+    local currentSizes = {
+        width = 0,
+        height = 0
+    }
 
-    messageBox:setStyle('MainWindow')
-    messageBox:setText(title)
+    local messageBox = g_ui.createWidget('MessageBoxWindow', rootWidget)
+    messageBox.title = messageBox:getChildById('title')
+    messageBox.title:setText(title)
 
-    local messageLabel = g_ui.createWidget('MessageBoxLabel', messageBox)
-    messageLabel:setText(message)
+    messageBox.content = messageBox:getChildById('content')
+    messageBox.content:setText(message)
+    messageBox.content:resizeToText()
+    messageBox.content:resize(messageBox.content:getWidth(), messageBox.content:getHeight())
+    currentSizes.width = currentSizes.width + messageBox.content:getWidth() + 32
+    currentSizes.height = currentSizes.height + messageBox.content:getHeight() + 20
 
-    local buttonsWidth = 0
-    local buttonsHeight = 0
+    messageBox.holder = messageBox:getChildById('holder')
 
-    local anchor = AnchorRight
-    if buttons.anchor then
-        anchor = buttons.anchor
-    end
-
-    local buttonHolder = g_ui.createWidget('MessageBoxButtonHolder', messageBox)
-    buttonHolder:addAnchor(anchor, 'parent', anchor)
-
+    currentSizes.height = currentSizes.height + 22
     for i = 1, #buttons do
         local button = messageBox:addButton(buttons[i].text, buttons[i].callback)
+        button:addAnchor(AnchorTop, 'parent', AnchorTop)
         if i == 1 then
-            button:setMarginLeft(0)
-            button:addAnchor(AnchorBottom, 'parent', AnchorBottom)
-            button:addAnchor(AnchorLeft, 'parent', AnchorLeft)
-            buttonsHeight = button:getHeight()
+            button:addAnchor(AnchorRight, 'parent', AnchorRight)
+            currentSizes.height = currentSizes.height + button:getHeight() + 22
         else
-            button:addAnchor(AnchorBottom, 'prev', AnchorBottom)
-            button:addAnchor(AnchorLeft, 'prev', AnchorRight)
+            button:addAnchor(AnchorRight, 'prev', AnchorLeft)
+            button:setMarginRight(10)
         end
-        buttonsWidth = buttonsWidth + button:getWidth() + button:getMarginLeft()
     end
 
-    buttonHolder:setWidth(buttonsWidth)
-    buttonHolder:setHeight(buttonsHeight)
+    messageBox:setWidth(math.min(staticSizes.width.max, math.max(staticSizes.width.min, currentSizes.width)))
+    messageBox:setHeight(math.min(staticSizes.height.max, math.max(staticSizes.height.min, currentSizes.height)))
 
     if onEnterCallback then
         connect(messageBox, {
@@ -57,10 +68,6 @@ function UIMessageBox.display(title, message, buttons, onEnterCallback, onEscape
         })
     end
 
-    messageBox:setWidth(math.max(messageLabel:getWidth(), messageBox:getTextSize().width, buttonHolder:getWidth()) +
-                            messageBox:getPaddingLeft() + messageBox:getPaddingRight())
-    messageBox:setHeight(messageLabel:getHeight() + messageBox:getPaddingTop() + messageBox:getPaddingBottom() +
-                             buttonHolder:getHeight() + buttonHolder:getMarginTop())
     return messageBox
 end
 
@@ -105,8 +112,10 @@ function displayGeneralBox(title, message, buttons, onEnterCallback, onEscapeCal
 end
 
 function UIMessageBox:addButton(text, callback)
-    local buttonHolder = self:getChildById('buttonHolder')
-    local button = g_ui.createWidget('MessageBoxButton', buttonHolder)
+    local holder = self:getChildById('holder')
+    local button = g_ui.createWidget('QtButton', holder)
+    button:setWidth(math.max(48, 10 + (string.len(text) * 8)))
+    button:setHeight(20)
     button:setText(text)
     connect(button, {
         onClick = callback

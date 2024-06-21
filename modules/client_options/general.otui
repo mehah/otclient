@@ -1,146 +1,156 @@
 Panel
-  OptionCheckBox
-    id: showPing
-    !text: tr('Show connection ping')
-    !tooltip: tr('Display connection speed to the server (milliseconds)')
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    height: 22
+  
+    OptionCheckBoxMarked
+      id: showPing
+      !text: tr('Show connection ping')
+      !tooltip: tr('Display connection speed to the server (milliseconds)')
 
-  OptionCheckBox
-    id: showLeftPanel
-    !text: tr('Show left panel')
-
-  OptionCheckBox
-    id: showRightExtraPanel
-    !text: tr('Show an extra right panel')
-
-  OptionCheckBox
-    id: openMaximized
-    !text: tr('Open containers maximized')
-
-  OptionCheckBox
-    id: displayNames
-    !text: tr('Display creature names')
-
-  OptionCheckBox
-    id: displayHealth
-    !text: tr('Display creature health bars')
-
-  OptionCheckBox
-    id: displayMana
-    !text: tr('Display player mana bar')
-
-  OptionCheckBox
-    id: displayText
-    !text: tr('Display text messages')
-
-  OptionCheckBox
-    id: enableHighlightMouseTarget
-    !text: tr('Highlight mouse target')
-
-  Label
-    id: creatureInformationScaleLabel
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 12
-    !enabled: g_gameConfig.isDrawingInformationByWidget() == false
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: showFps
+      !text: tr('Show frame rate')
 
-
-  OptionScrollbar
-    id: creatureInformationScale
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 3
-    minimum: 1
-    maximum: 9
-    !enabled: g_gameConfig.isDrawingInformationByWidget() == false
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: showLeftPanel
+      !text: tr('Show left panel')
 
-  Label
-    id: staticTextScaleLabel
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 12
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: showRightExtraPanel
+      !text: tr('Show an extra right panel')
 
-  OptionScrollbar
-    id: staticTextScale
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 3
-    minimum: 1
-    maximum: 9
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: openMaximized
+      !text: tr('Open containers maximized')
 
-  Label
-    id: animatedTextScaleLabel
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 12
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: displayNames
+      !text: tr('Display creature names')
 
-  OptionScrollbar
-    id: animatedTextScale
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 3
-    minimum: 1
-    maximum: 9
-    
-  Label
-    id: setEffectAlphaLabel
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: displayHealth
+      !text: tr('Display creature health bars')
+
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 12
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: displayMana
+      !text: tr('Display player mana bar')
 
-  OptionScrollbar
-    id: setEffectAlphaScroll
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 3
-    minimum: 10
-    maximum: 100
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: displayText
+      !text: tr('Display text messages')
 
-  Label
-    id: setMissileAlphaLabel
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 12
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: enableHighlightMouseTarget
+      !text: tr('Highlight mouse target')
 
-  OptionScrollbar
-    id: setMissileAlphaScroll
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 3
-    minimum: 10
-    maximum: 100
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBoxMarked
+      id: asyncTxtLoading
+      !text: tr('Async texture loading')
+      !tooltip: tr('This option makes textures load asynchronously and uses less RAM.')
 
-  Label
-    id: chooseCrosshairLabel
-    !text: tr('Crosshair:')
-    phantom: false
-    anchors.left: prev.left
-    anchors.top: prev.bottom
-    margin-top: 13
-
-  ComboBox
-    id: crosshair
-    width: 120
-    anchors.left: prev.right
-    anchors.top: prev.top
-    margin-top: -4
-    margin-left: 5
-    mouse-scroll: false
-
-  Button
-    id: changeLocale
-    !text: tr('Change language')
-    @onClick: modules.client_locales.createWindow()
-    anchors.top: prev.bottom
+  SmallReversedQtPanel
     anchors.left: parent.left
-    margin-top: 12
-    width: 120
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBoxMarked
+      id: drawEffectOnTop
+      !text: tr('Draw Effect On Top')
+      !tooltip: tr('Draw effect after drawing the entire floor.')
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 32
+  
+    Label
+      !text: 'Crosshair:'
+      anchors.left: parent.left
+      margin-left: 18
+      color: #c0c0c0ff
+      anchors.verticalCenter: parent.verticalCenter
+
+    QtComboBox
+      id: crosshair
+      width: 120
+      margin-left: 10
+      anchors.verticalCenter: prev.verticalCenter
+      anchors.left: prev.right
+      mouse-scroll: false

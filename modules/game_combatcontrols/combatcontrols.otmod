@@ -1,9 +1,0 @@
-Module
-  name: game_combatcontrols
-  description: Combat controls window
-  author: edubart, BeniS
-  website: https://github.com/edubart/otclient
-  sandboxed: true
-  scripts: [ combatcontrols ]
-  @onLoad: init()
-  @onUnload: terminate()

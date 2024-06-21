@@ -114,15 +114,15 @@ SpeakTypes = {
 SayModes = {
     [1] = {
         speakTypeDesc = 'whisper',
-        icon = '/images/game/console/whisper'
+        image = '/images/ui/console_whisper'
     },
     [2] = {
         speakTypeDesc = 'say',
-        icon = '/images/game/console/say'
+        image = '/images/ui/console_say'
     },
     [3] = {
         speakTypeDesc = 'yell',
-        icon = '/images/game/console/yell'
+        image = '/images/ui/console_yell'
     }
 }
 
@@ -279,12 +279,19 @@ function selectAll(consoleBuffer)
 end
 
 function toggleChat()
-    consoleToggleChat:setChecked(not consoleToggleChat:isChecked())
+    consoleToggleChat.isChecked = not consoleToggleChat.isChecked
+    if consoleToggleChat.isChecked then
+        consoleToggleChat:setText(tr('Chat Off'))
+        consoleToggleChat.isChecked = true
+    else
+        consoleToggleChat:setText(tr('Chat On'))
+        consoleToggleChat.isChecked = false
+    end
 end
 
 -- id of object first and then action
 function updateChatMode()
-    switchChat(not consoleToggleChat:isChecked())
+    switchChat(not consoleToggleChat.isChecked)
 end
 
 local function unbindMovingKeys()
@@ -325,7 +332,7 @@ end
 
 function switchChat(enabled)
     -- enabled should be true if we enabling the chat and false if disabling it
-    -- consoleToggleChat:setChecked(not consoleToggleChat:isChecked())
+    -- consoleToggleChat:setChecked(not consoleToggleChat.isChecked)
     if not (enabled and consoleTextEdit:isVisible()) then
         consoleTextEdit:setVisible(enabled)
         consoleTextEdit:setText('')
@@ -345,7 +352,7 @@ function switchChatOnCall()
         return
     end
 
-    if isChatEnabled() and consoleToggleChat:isChecked() then
+    if isChatEnabled() and consoleToggleChat.isChecked then
         toggleChat()
     else
         local message = consoleTextEdit:getText()
@@ -353,6 +360,8 @@ function switchChatOnCall()
             toggleChat()
         end
     end
+
+    updateChatMode()
 end
 
 function disableChatOnCall()
@@ -360,7 +369,7 @@ function disableChatOnCall()
         return
     end
 
-    if isChatEnabled() and not consoleToggleChat:isChecked() then
+    if isChatEnabled() and not consoleToggleChat.isChecked then
         toggleChat()
     end
 end
@@ -424,7 +433,7 @@ end
 function save()
     local settings = {}
     settings.messageHistory = messageHistory
-    settings.wasdMode = consoleToggleChat:isChecked()
+    settings.wasdMode = consoleToggleChat.isChecked
     g_settings.setNode('game_console', settings)
 end
 
@@ -432,13 +441,18 @@ function load()
     local settings = g_settings.getNode('game_console')
     if settings then
         messageHistory = settings.messageHistory or {}
-        consoleToggleChat:setChecked(settings.wasdMode or false)
+        consoleToggleChat.isChecked = settings.wasdMode or false
+        if consoleToggleChat.isChecked then
+            consoleToggleChat:setText(tr('Chat Off'))
+        else
+            consoleToggleChat:setText(tr('Chat On'))
+        end
     end
     loadCommunicationSettings()
 end
 
 function isEnabledWASD()
-    return consoleToggleChat:isChecked()
+    return consoleToggleChat.isChecked --note: testing required
 end
 
 function onTabChange(tabBar, tab)
@@ -452,6 +466,17 @@ function onTabChange(tabBar, tab)
     else
         consolePanel:getChildById('closeChannelButton'):enable()
         player:setTyping(false)
+    end
+
+    if tab.isOnRedMessage then
+        tab:setColor('#dfdfdfff')
+        tab.isOnRedMessage = false
+    end
+
+    if tab.newMessageEvent ~= nil then
+        tab:setColor('#dfdfdfff')
+        removeEvent(tab.newMessageEvent)
+        tab.newMessageEvent = nil
     end
 end
 
@@ -562,6 +587,18 @@ function addTab(name, focus)
     if focus then
         consoleTabBar:selectTab(tab)
     end
+
+    tab.onHoverChange = function()
+        if consoleTabBar:getId() ~= tab then
+            if tab.isOnRedMessage then
+                tab:setColor('#f75f5fff')
+            end
+            if tab.newMessageEvent ~= nil then
+                tab:setColor('#dfdfdfff')
+            end
+        end
+    end
+
     return tab
 end
 
@@ -901,13 +938,26 @@ function getHighlightedText(text)
     local tmpData = {}
 
     repeat
-        local tmp = { string.find(text, '{([^}]+)}', tmpData[#tmpData - 1]) }
+        local tmp = {string.find(text, '{([^}]+)}', tmpData[#tmpData - 1])}
         for _, v in pairs(tmp) do
             table.insert(tmpData, v)
         end
     until not (string.find(text, '{([^}]+)}', tmpData[#tmpData - 1]))
 
     return tmpData
+end
+
+local function changeNewNessageColor(tab)
+    if tab.newMessageEvent ~= nil or tab.isOnRedMessage then
+        return
+    end
+
+    tab:setColor('#dfdfdfff')
+    tab.newMessageEvent = scheduleEvent(function()
+        tab:setColor('#f75f5fff')
+        tab.isOnRedMessage = true
+        tab.newMessageEvent = nil
+    end, 1000)
 end
 
 function addTabText(text, speaktype, tab, creatureName)
@@ -925,7 +975,10 @@ function addTabText(text, speaktype, tab, creatureName)
     label:setId('consoleLabel' .. consoleBuffer:getChildCount())
     label:setText(text)
     label:setColor(speaktype.color)
-    consoleTabBar:blinkTab(tab)
+    -- consoleTabBar:blinkTab(tab)
+    if consoleTabBar:getCurrentTab() ~= tab then
+        changeNewNessageColor(tab)
+    end
 
     label.highlightInfo = {}
 
@@ -1354,7 +1407,7 @@ function sendMessage(message, tab)
     if (channel or tab == defaultTab) and not chatCommandPrivateReady then
         if tab == defaultTab then
             speaktypedesc = chatCommandSayMode or
-                SayModes[consolePanel:getChildById('sayModeButton').sayMode].speakTypeDesc
+                                SayModes[consolePanel:getChildById('sayModeButton').sayMode].speakTypeDesc
             if speaktypedesc ~= 'say' then
                 sayModeChange(2)
             end -- head back to say mode
@@ -1411,7 +1464,7 @@ function sayModeChange(sayMode)
         sayMode = 1
     end
 
-    buttom:setIcon(SayModes[sayMode].icon)
+    buttom:setImageSource(SayModes[sayMode].image)
     buttom.sayMode = sayMode
 end
 
@@ -1493,9 +1546,9 @@ function onTalk(name, level, mode, message, channelId, creaturePos)
     end
 
     if (mode == MessageModes.Say or mode == MessageModes.Whisper or mode == MessageModes.Yell or mode ==
-            MessageModes.Spell or mode == MessageModes.MonsterSay or mode == MessageModes.MonsterYell or mode ==
-            MessageModes.NpcFrom or mode == MessageModes.BarkLow or mode == MessageModes.BarkLoud or mode ==
-            MessageModes.NpcFromStartBlock) and creaturePos then
+        MessageModes.Spell or mode == MessageModes.MonsterSay or mode == MessageModes.MonsterYell or mode ==
+        MessageModes.NpcFrom or mode == MessageModes.BarkLow or mode == MessageModes.BarkLoud or mode ==
+        MessageModes.NpcFromStartBlock) and creaturePos then
         local staticText = StaticText.create()
         -- Remove curly braces from screen message
         local staticMessage = message
@@ -1542,7 +1595,7 @@ function onTalk(name, level, mode, message, channelId, creaturePos)
             modules.game_textmessage.displayPrivateMessage(name .. ':\n' .. message)
         end
     else
-        local channel = tr('Default')
+        local channel = tr('Local Chat')
         if not defaultMessage then
             channel = channels[channelId]
         end
@@ -1552,7 +1605,7 @@ function onTalk(name, level, mode, message, channelId, creaturePos)
         else
             -- server sent a message on a channel that is not open
             pwarning('message in channel id ' .. channelId ..
-                ' which is unknown, this is a server bug, relogin if you want to see messages in this channel')
+                         ' which is unknown, this is a server bug, relogin if you want to see messages in this channel')
         end
     end
 end
@@ -1931,7 +1984,7 @@ function onClickIgnoreButton()
 end
 
 function online()
-    defaultTab = addTab(tr('Default'), true)
+    defaultTab = addTab(tr('Local Chat'), true)
     serverTab = addTab(tr('Server Log'), false)
 
     if g_game.getClientVersion() >= 820 then
