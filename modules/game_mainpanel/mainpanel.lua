@@ -13,8 +13,13 @@ function reloadMainPanelSizes()
     if not main or not rightPanel then
         return
     end
+    
+    local height = 1
+    local function calculatePanelHeight(icon_count, max_icons_per_row, icon_size)
+        local rows = math.ceil(icon_count / max_icons_per_row)
+        return (rows * icon_size) + (rows * 3)
+    end
 
-    local height = 4
     for _, panel in ipairs(main:getChildren()) do
         if panel.panelHeight ~= nil then
             if panel:isVisible() then
@@ -22,23 +27,37 @@ function reloadMainPanelSizes()
                 height = height + panel.panelHeight
 
                 if panel:getId() == 'mainoptionspanel' and panel:isOn() then
-                    local currentOptionsAmount = math.ceil(optionsAmount / 5)
-                    local optionsHeight = (currentOptionsAmount * 28) + 3
-                    local currentSpecialsAmount = math.ceil(specialsAmount / 2)
-                    local specialsHeight = (currentSpecialsAmount * 28) + 3
-                    local maxPanelHeight = math.max(optionsHeight, specialsHeight)
+             
+                    local function calculatePanelHeightFromPanel(panel, icon_width, icon_height, max_icons_per_row)
+                        local icon_count = 0
+                        for _, icon in ipairs(panel:getChildren()) do
+                            if icon:isVisible() then
+                                icon_count = icon_count + 1
+                            end
+                        end
 
-                    if storeAmount > 1 then
-                        local currentStoreAmount = math.ceil(storeAmount / 1)
-                        local storeHeight = (currentStoreAmount * 20) + 3
-                        panel.onPanel.store:setHeight(storeHeight)
-                        maxPanelHeight = math.max(maxPanelHeight, storeHeight)
+                        local rows = math.ceil(icon_count / max_icons_per_row)
+                        return (rows * icon_height) + (rows * 3) 
                     end
 
-                    panel:setHeight(panel:getHeight() + maxPanelHeight)
-                    height = height + maxPanelHeight
-                    if storeAmount >= 2 then
-                        height = height + 15
+                    local options_panel = optionsController.ui.onPanel.options
+                    local options_height = calculatePanelHeightFromPanel(options_panel, 18, 18, 5) 
+
+                    local specials_panel = optionsController.ui.onPanel.specials
+                    local specials_height = calculatePanelHeightFromPanel(specials_panel, 18, 18, 2) 
+
+                    local max_panel_height = math.max(options_height, specials_height)
+                    panel:setHeight(panel:getHeight() + max_panel_height)
+                    height = height + options_height
+
+                    local store_panel = panel.onPanel.store
+                    local store_height = calculatePanelHeightFromPanel(store_panel, 18, 18, 1) 
+
+                    store_panel:setHeight(store_height)
+                    height = height + store_height
+
+                    if store_panel:getChildCount() >= 2 then
+                        height = height + 15 
                     end
                 end
             else
