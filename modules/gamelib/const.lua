@@ -198,7 +198,7 @@ GameEnterGameShowAppearance = 114
 GameSmoothWalkElevation = 115
 GameNegativeOffset = 116
 GameItemTooltipV8 = 117 
-GameWingsAurasEffectsShader = 118 -- note: change to 117 if not approved GameItemTooltipV8
+GameWingsAurasEffectsShader = 118
 GameForgeConvergence = 119
 
 TextColors = {
