@@ -181,8 +181,7 @@ function HTTP.onPost(operationId, url, err, data)
         err = err .. " (" .. data:sub(1, 100) .. ")"
       end
     end
-    -- data = result
-
+    data = result
   end
   if operation.callback then
     operation.callback(data, err)
@@ -309,4 +308,3 @@ connect(g_http,
 
 g_http.setUserAgent(HTTP.agent)
 g_http.setEnableTimeOutOnReadWrite(HTTP.enableTimeOut)
-

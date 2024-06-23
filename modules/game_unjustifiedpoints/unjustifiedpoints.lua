@@ -25,9 +25,9 @@ function init()
         onSkullChange = onSkullChange
     })
 
-    unjustifiedPointsButton = modules.client_topmenu.addRightGameToggleButton('unjustifiedPointsButton',
+    unjustifiedPointsButton = modules.game_mainpanel.addToggleButton('unjustifiedPointsButton',
                                                                               tr('Unjustified Points'),
-                                                                              '/images/topbuttons/unjustifiedpoints',
+                                                                              '/images/options/button_frags',
                                                                               toggle)
     unjustifiedPointsButton:setOn(true)
     unjustifiedPointsButton:hide()
@@ -82,6 +82,14 @@ function toggle()
         unjustifiedPointsWindow:close()
         unjustifiedPointsButton:setOn(false)
     else
+        if not unjustifiedPointsWindow:getParent() then
+            local panel = modules.game_interface.findContentPanelAvailable(unjustifiedPointsWindow, unjustifiedPointsWindow:getMinimumHeight())
+            if not panel then
+                return
+            end
+
+            panel:addChild(unjustifiedPointsWindow)
+        end
         unjustifiedPointsWindow:open()
         unjustifiedPointsButton:setOn(true)
     end

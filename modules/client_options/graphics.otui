@@ -1,167 +1,222 @@
 Panel
-  OptionCheckBox
-    id: vsync
-    !text: tr('Enable vertical synchronization')
-    !tooltip: tr('Limits your fps based on monitor refresh rate')
-
-  OptionCheckBox
-    id: showFps
-    !text: tr('Show frame rate')
-
-  OptionCheckBox
-    id: optimizeFps
-    !text: tr('Optimize FPS')
-    !tooltip: tr('Try to optimize when the frame rate is below 60. VISUAL PROBLEMS MAY OCCUR')
-
-  OptionCheckBox
-    id: forceEffectOptimization
-    !text: tr('Force Effect Optimization')
-    !tooltip: tr('Will avoid drawing effects on certain occasions.')
-
-  OptionCheckBox
-    id: enableLights
-    !text: tr('Enable lights')
-
-  OptionCheckBox
-    id: drawEffectOnTop
-    !text: tr('Draw Effect On Top')
-    !tooltip: tr('Draw effect after drawing the entire floor.')
-
-  OptionCheckBox
-    id: limitVisibleDimension
-    !text: tr('Limit Visible Dimension')
-    !tooltip: tr('The limit is based on your maximum range.')
-
-  OptionCheckBox
-    id: floatingEffect
-    !text: tr('Draw Floating Effects')
-
-  OptionCheckBox
-    id: fullscreen
-    !text: tr('Fullscreen')
-    tooltip: Ctrl+Shift+F
-
-  OptionCheckBox
-    id: dontStretchShrink
-    !text: tr('Don\'t stretch/shrink Game Window')
-
-  OptionCheckBox
-    id: asyncTxtLoading
-    !text: tr('Async texture loading')
-    !tooltip: tr('This option makes textures load asynchronously and uses less RAM.')
-
-  Label
-    id: floorViewModeLabel
-    !text: tr('Floor View Mode')..':'
-    phantom: false
-    anchors.left: prev.left
-    anchors.top: prev.bottom
-    margin-top: 13
-
-  ComboBox
-    id: floorViewMode
-    width: 180
-    anchors.left: prev.right
-    anchors.top: prev.top
-    margin-top: -4
-    margin-left: 5
-    mouse-scroll: false
-
-  Label
-    id: antialiasingModeLabel
-    !text: tr('Antialiasing Mode')..':'
-    phantom: false
-    anchors.left: floorViewModeLabel.left
-    anchors.top: prev.bottom
-    margin-top: 13
-
-  ComboBox
-    id: antialiasingMode
-    width: 120
-    anchors.left: prev.right
-    anchors.top: prev.top
-    margin-top: -4
-    margin-left: 5
-    mouse-scroll: false
-
-  Label
-    id: ambientLightLabel
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
-    anchors.top: antialiasingModeLabel.top
-    margin-top: 25
-    @onSetup: |
-      local value = modules.client_options.getOption('ambientLight')
-      self:setText(tr('Ambient light: %s%%', value))
+    anchors.top: parent.top
+    height: 22
 
-  OptionScrollbar
-    id: ambientLight
+    OptionCheckBoxMarked
+      id: vsync
+      !text: tr('Enable vertical synchronization')
+      !tooltip: tr('Limits your fps based on monitor refresh rate')
+
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 3
-    minimum: 0
-    maximum: 100
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBoxMarked
+      id: optimizeFps
+      !text: tr('Optimize FPS')
+      !tooltip: tr('Try to optimize when the frame rate is below 60. VISUAL PROBLEMS MAY OCCUR')
 
-  Label
-    id: shadowFloorIntensityLevel
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 12
-    @onSetup: |
-      local value = modules.client_options.getOption('shadowFloorIntensity')
-      self:setText(tr('Floor Shadowing Intensity: %s%%', value))
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBoxMarked
+      id: forceEffectOptimization
+      !text: tr('Force Effect Optimization')
+      !tooltip: tr('Will avoid drawing effects on certain occasions.')
 
-  OptionScrollbar
-    id: shadowFloorIntensity
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 3
-    minimum: 0
-    maximum: 100
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: enableLights
+      !text: tr('Enable lights')
 
-  Label
-    id: floorFadingLabel
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 12
-    @onSetup: |
-      local value = modules.client_options.getOption('floorFading')
-      self:setText(tr('Floor Fading: %s ms', value))
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: drawEffectOnTop
+      !text: tr('Draw Effect On Top')
+      !tooltip: tr('Draw effect after drawing the entire floor.')
 
-  OptionScrollbar
-    id: floorFading
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 3
-    minimum: 0
-    maximum: 1000
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBoxMarked
+      id: limitVisibleDimension
+      !text: tr('Limit Visible Dimension')
+      !tooltip: tr('The limit is based on your maximum range.')
 
-  Label
-    id: backgroundFrameRateLabel
-    !text: tr('Game framerate limit: %s', 'max')
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 12
-    @onSetup: |
-      local value = modules.client_options.getOption('backgroundFrameRate')
-      local text = value
-      if value <= 0 or value >= 201 then
-        text = 'max'
-      end
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: floatingEffect
+      !text: 'Draw Floating Effects'
 
-      self:setText(tr('Game framerate limit: %s', text))
-
-  OptionScrollbar
-    id: backgroundFrameRate
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 3
-    minimum: 10
-    maximum: 201
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBoxMarked
+      id: fullscreen
+      !text: 'Fullscreen'
+      !tooltip: 'Ctrl+Shift+F'
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: dontStretchShrink
+      !text: 'Don\'t stretch/shrink Game Window'
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 32
+  
+    Label
+      !text: 'Floor View Mode:'
+      anchors.left: parent.left
+      margin-left: 18
+      color: #c0c0c0ff
+      anchors.verticalCenter: parent.verticalCenter
+
+    QtComboBox
+      id: floorViewMode
+      width: 180
+      margin-left: 10
+      anchors.verticalCenter: prev.verticalCenter
+      anchors.left: prev.right
+      mouse-scroll: false
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 32
+  
+    Label
+      !text: 'Antialiasing Mode:'
+      anchors.left: parent.left
+      margin-left: 18
+      color: #c0c0c0ff
+      anchors.verticalCenter: parent.verticalCenter
+
+    QtComboBox
+      id: antialiasingMode
+      width: 180
+      margin-left: 10
+      anchors.verticalCenter: prev.verticalCenter
+      anchors.left: prev.right
+      mouse-scroll: false
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+
+    OptionScaleScroll
+      id: ambientLight
+      anchors.fill: parent
+      &minimumScrollValue: 0
+      &maximumScrollValue: 100
+      &scrollSize: 21
+      @onSetup: |
+        local value = modules.client_options.getOption('ambientLight')
+        self:setText(string.format('Ambient light: %s%%', value))
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+
+    OptionScaleScroll
+      id: shadowFloorIntensity
+      anchors.fill: parent
+      &minimumScrollValue: 0
+      &maximumScrollValue: 100
+      &scrollSize: 21
+      @onSetup: |
+        local value = modules.client_options.getOption('shadowFloorIntensity')
+        self:setText(string.format('Floor Shadowing Intensity: %s%%', value))
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+
+    OptionScaleScroll
+      id: floorFading
+      anchors.fill: parent
+      &minimumScrollValue: 0
+      &maximumScrollValue: 1000
+      &scrollSize: 21
+      @onSetup: |
+        local value = modules.client_options.getOption('floorFading')
+        self:setText(tr('Floor Fading: %s ms', value))
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+
+    OptionScaleScroll
+      id: backgroundFrameRate
+      !text: tr('Game framerate limit: %s', 'max')
+      anchors.fill: parent
+      &minimumScrollValue: 10
+      &maximumScrollValue: 201
+      &scrollSize: 21
+      @onSetup: |
+        local value = modules.client_options.getOption('backgroundFrameRate')
+        local text = value
+        if value <= 0 or value >= 201 then
+          text = 'max'
+        end
+
+        self:setText(tr('Game framerate limit: %s', text))

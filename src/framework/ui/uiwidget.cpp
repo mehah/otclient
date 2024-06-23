@@ -35,6 +35,16 @@
 
 UIWidget::UIWidget()
 {
+    m_source = g_lua.getSource(2);
+    int level = 3;
+    while((m_source.find("corelib") != std::string::npos || m_source.find("gamelib") != std::string::npos 
+           || m_source.find("game_bot/functions/ui") != std::string::npos || m_source.find("[C]") != std::string::npos) && level < 8) {
+        std::string tmp_src = g_lua.getSource(level);
+        if (tmp_src.length() <= 3) break;
+        m_source = tmp_src;
+        level += 1;
+    }
+	
     setProp(PropEnabled, true, false);
     setProp(PropVisible, true, false);
     setProp(PropFocusable, true, false);
@@ -504,8 +514,14 @@ void UIWidget::moveChildToIndex(const UIWidgetPtr& child, int index)
     m_children.insert(m_children.begin() + (index - 1), child);
 
     { // cache index
-        child->m_childIndex = index;
-        for (size_t i = index; i < childrenSize; ++i)
+        auto start = child->m_childIndex;
+        auto end = index;
+        if (start >= index) {
+            start = index;
+            end = child->m_childIndex;
+        }
+
+        for (int i = start - 1; i < end; ++i)
             m_children[i]->m_childIndex = i + 1;
     }
 
@@ -873,7 +889,7 @@ void UIWidget::internalDestroy()
 void UIWidget::destroy()
 {
     if (isDestroyed())
-        g_logger.warning(stdext::format("attempt to destroy widget '%s' two times", m_id));
+        g_logger.warning(stdext::format("attempt to destroy widget '%s' (%s) two times", m_id, m_source));
 
     // hold itself reference
     const UIWidgetPtr self = static_self_cast<UIWidget>();

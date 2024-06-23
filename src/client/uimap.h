@@ -35,6 +35,7 @@ public:
     ~UIMap() override;
 
     void drawSelf(DrawPoolType drawPane) override;
+    void draw(DrawPoolType drawPane);
 
     void movePixels(int x, int y) { m_mapView->move(x, y); }
     void followCreature(const CreaturePtr& creature) { m_mapView->followCreature(creature); }

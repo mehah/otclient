@@ -57,7 +57,11 @@ Skill = {
     LifeLeechChance = 9,
     LifeLeechAmount = 10,
     ManaLeechChance = 11,
-    ManaLeechAmount = 12
+    ManaLeechAmount = 12,
+    Fatal = 13,
+    Dodge = 14,
+    Momentum = 15,
+    Transcendence = 16
 }
 
 North = Directions.North
@@ -193,8 +197,9 @@ GameContainerFilter = 113
 GameEnterGameShowAppearance = 114
 GameSmoothWalkElevation = 115
 GameNegativeOffset = 116
-GameItemTooltipV8 = 117
-GameForgeConvergence = 118
+GameItemTooltipV8 = 117 
+GameWingsAurasEffectsShader = 118 -- note: change to 117 if not approved GameItemTooltipV8
+GameForgeConvergence = 119
 
 TextColors = {
     blue = '#9F9DFD',

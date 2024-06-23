@@ -42,36 +42,49 @@ UIWindow
   anchors.top: parent.top
   anchors.left: parent.left
   anchors.right: parent.right
-  image-source: /images/ui/panel_side
-  image-border: 4
-  padding: 3
+  padding-top: 3
   text-align: center
   //background-color: gray
   auto-focus: first
   draggable: false
   phantom: false
   focusable: false
+
   Button
     id: prevButton
-    image-source: /images/game/actionbar/1pixel-up-frame-background
-    icon: /images/game/actionbar/icon-arrow
+    image-source: /images/ui/lenshelp
+    image-clip: 0 17 17 17
     anchors.left: parent.left
     anchors.top: parent.top
-    size: 17 17
     margin-left: 2
+    size: 17 17
     @onClick: |
-      modules.game_actionbar.actionBar:getChildById('horizontalScroll'):decrement(36)
+      modules.game_actionbar.onDecrementHorizontalScroll(36)
+
+    $pressed:
+      image-clip: 17 17 17 17
+
+    $disabled:
+      image-clip: 34 17 17 17
+
   Button
     id: prevSkipButton
-    image-source: /images/game/actionbar/1pixel-up-frame-background
-    icon: /images/game/actionbar/icon-arrowskip
+    image-source: /images/ui/lenshelp
+    image-clip: 0 34 17 17
     anchors.left: parent.left
     anchors.top: prevButton.bottom
-    size: 17 17
     margin-left: 2
+    size: 17 17
     margin-top: 2
     @onClick: |
-      modules.game_actionbar.actionBar:getChildById('horizontalScroll'):decrement(999)
+      modules.game_actionbar.onDecrementHorizontalScroll(999)
+
+    $pressed:
+      image-clip: 17 34 17 17
+
+    $disabled:
+      image-clip: 34 34 17 17
+
   ScrollablePanel
     id: actionBarPanel
     anchors.top: parent.top
@@ -94,24 +107,60 @@ UIWindow
     step: 38
     pixels-scroll: true
     visible: false
+
   Button
-    id: nextButton
-    image-source: /images/game/actionbar/1pixel-up-frame-background
-    icon: /images/game/actionbar/icon-arrow-right
+    id: lockButton
+    image-source: /images/ui/actionbar_unlocked
+    image-clip: 0 0 12 34
     anchors.right: parent.right
     anchors.top: parent.top
-    size: 17 17
     margin-right: 2
+    &isLocked: false
+    size: 12 34
     @onClick: |
-      modules.game_actionbar.actionBar:getChildById('horizontalScroll'):increment(36)
+      if self.isLocked then
+        self.isLocked = false
+        self:setImageSource('/images/ui/actionbar_unlocked')
+      else
+        self.isLocked = true
+        self:setImageSource('/images/ui/actionbar_locked')
+      end
+      modules.game_actionbar.setLocked(self.isLocked)
+  
+    $pressed:
+      image-clip: 12 0 12 34
+
+  Button
+    id: nextButton
+    image-source: /images/ui/lenshelp
+    image-clip: 0 0 17 17
+    anchors.right: lockButton.left
+    anchors.top: parent.top
+    margin-right: 2
+    size: 17 17
+    @onClick: |
+      modules.game_actionbar.onIncrementHorizontalScroll(36)
+  
+    $pressed:
+      image-clip: 17 0 17 17
+
+    $disabled:
+      image-clip: 34 0 17 17
+
   Button
     id: nextSkipButton
-    image-source: /images/game/actionbar/1pixel-up-frame-background
-    icon: /images/game/actionbar/icon-arrowskip-right
-    anchors.right: parent.right
+    image-source: /images/ui/lenshelp
+    image-clip: 0 51 17 17
+    anchors.right: lockButton.left
     anchors.top: nextButton.bottom
-    size: 17 17
     margin-right: 2
+    size: 17 17
     margin-top: 2
     @onClick: |
-      modules.game_actionbar.actionBar:getChildById('horizontalScroll'):increment(999)
+      modules.game_actionbar.onIncrementHorizontalScroll(999)
+
+    $pressed:
+      image-clip: 17 51 17 17
+
+    $disabled:
+      image-clip: 34 51 17 17

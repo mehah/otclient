@@ -1,4 +1,4 @@
-local quiverSlot = modules.game_inventory.inventoryWindow:recursiveGetChildById('slot5')
+local quiverSlot = modules.game_mainpanel.getSlot5() or ""
 local label = quiverSlot.count
 
 label = label or g_ui.loadUIFromString([[

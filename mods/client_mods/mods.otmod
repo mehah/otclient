@@ -8,3 +8,4 @@ Module
     - client_profiles
     - game_buttons
     - game_itemselector
+    - client_textedit

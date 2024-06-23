@@ -405,7 +405,11 @@ void Game::processRemoveAutomapFlag(const Position& pos, int icon, const std::st
 }
 
 void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<int, std::string, int> >& outfitList,
-                                   const std::vector<std::tuple<int, std::string> >& mountList)
+                                   const std::vector<std::tuple<int, std::string> >& mountList,
+                                   const std::vector<std::tuple<int, std::string> >& wingsList,
+                                   const std::vector<std::tuple<int, std::string> >& aurasList,
+                                   const std::vector<std::tuple<int, std::string> >& effectList,
+                                   const std::vector<std::tuple<int, std::string>>& shaderList)
 {
     // create virtual creature outfit
     const auto& virtualOutfitCreature = std::make_shared<Creature>();
@@ -426,7 +430,7 @@ void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vecto
         virtualMountCreature->setOutfit(mountOutfit);
     }
 
-    g_lua.callGlobalField("g_game", "onOpenOutfitWindow", virtualOutfitCreature, outfitList, virtualMountCreature, mountList);
+    g_lua.callGlobalField("g_game", "onOpenOutfitWindow", virtualOutfitCreature, outfitList, virtualMountCreature, mountList, wingsList, aurasList, effectList, shaderList);
 }
 
 void Game::processOpenNpcTrade(const std::vector<std::tuple<ItemPtr, std::string, int, int, int> >& items)
@@ -743,7 +747,7 @@ void Game::look(const ThingPtr& thing, bool isBattleList)
     if (thing->isCreature() && isBattleList && m_protocolVersion >= 961)
         m_protocolGame->sendLookCreature(thing->getId());
     else {
-        const int thingId = thing->isCreature() ? Proto::Creature : thing->getId();
+        const int thingId = thing->isCreature() ? static_cast<int>(Proto::Creature) : thing->getId();
         m_protocolGame->sendLook(thing->getPosition(), thingId, thing->getStackPos());
     }
 }
@@ -756,7 +760,7 @@ void Game::move(const ThingPtr& thing, const Position& toPos, int count)
     if (!canPerformGameAction() || !thing || thing->getPosition() == toPos)
         return;
 
-    const auto thingId = thing->isCreature() ? Proto::Creature : thing->getId();
+    const auto thingId = thing->isCreature() ? static_cast<int>(Proto::Creature) : thing->getId();
     m_protocolGame->sendMove(thing->getPosition(), thingId, thing->getStackPos(), toPos, count);
 }
 

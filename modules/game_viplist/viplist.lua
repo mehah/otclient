@@ -14,8 +14,8 @@ function init()
 
     g_keyboard.bindKeyDown('Ctrl+P', toggle)
 
-    vipButton = modules.client_topmenu.addRightGameToggleButton('vipListButton', tr('VIP List') .. ' (Ctrl+P)',
-                                                                '/images/topbuttons/viplist', toggle)
+    vipButton = modules.game_mainpanel.addToggleButton('vipListButton', tr('VIP List') .. ' (Ctrl+P)',
+                                                                '/images/options/button_vip', toggle, false, 3)
     vipButton:setOn(true)
     vipWindow = g_ui.loadUI('viplist')
 
@@ -101,6 +101,14 @@ function toggle()
         vipWindow:close()
         vipButton:setOn(false)
     else
+        if not vipWindow:getParent() then
+            local panel = modules.game_interface.findContentPanelAvailable(vipWindow, vipWindow:getMinimumHeight())
+            if not panel then
+                return
+            end
+
+            panel:addChild(vipWindow)
+        end
         vipWindow:open()
         vipButton:setOn(true)
     end

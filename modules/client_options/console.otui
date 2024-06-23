@@ -1,28 +1,157 @@
 Panel
-  OptionCheckBox
-    id: showInfoMessagesInConsole
-    !text: tr('Show info messages in console')
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    height: 22
 
-  OptionCheckBox
-    id: showEventMessagesInConsole
-    !text: tr('Show event messages in console')
+    OptionCheckBox
+      id: showInfoMessagesInConsole
+      !text: tr('Show info messages')
 
-  OptionCheckBox
-    id: showStatusMessagesInConsole
-    !text: tr('Show status messages in console')
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: showEventMessagesInConsole
+      !text: tr('Show event messages')
 
-  OptionCheckBox
-    id: showTimestampsInConsole
-    !text: tr('Show timestamps in console')
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: showStatusMessagesInConsole
+      !text: tr('Show status messages')
 
-  OptionCheckBox
-    id: showLevelsInConsole
-    !text: tr('Show levels in console')
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: showOthersStatusMessagesInConsole
+      !text: tr('Show others status messages in console')
 
-  OptionCheckBox
-    id: showPrivateMessagesInConsole
-    !text: tr('Show private messages in console')
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: showTimestampsInConsole
+      !text: tr('Show timestamps')
 
-  OptionCheckBox
-    id: showPrivateMessagesOnScreen
-    !text: tr('Show private messages on screen')
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: showLevelsInConsole
+      !text: tr('Show levels')
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: showPrivateMessagesInConsole
+      !text: tr('Show private messages')
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: showPrivateMessagesOnScreen
+      !text: tr('Show private messages on screen')
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+
+    OptionScaleScroll
+      id: creatureInformationScale
+      anchors.fill: parent
+      &minimumScrollValue: 1
+      &maximumScrollValue: 9
+      &scrollSize: 21
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+
+    OptionScaleScroll
+      id: staticTextScale
+      anchors.fill: parent
+      &minimumScrollValue: 1
+      &maximumScrollValue: 9
+      &scrollSize: 21
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+
+    OptionScaleScroll
+      id: animatedTextScale
+      anchors.fill: parent
+      &minimumScrollValue: 1
+      &maximumScrollValue: 9
+      &scrollSize: 21
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+
+    OptionScaleScroll
+      id: setEffectAlphaScroll
+      anchors.fill: parent
+      &minimumScrollValue: 10
+      &maximumScrollValue: 100
+      &scrollSize: 21
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+
+    OptionScaleScroll
+      id: setMissileAlphaScroll
+      anchors.fill: parent
+      &minimumScrollValue: 10
+      &maximumScrollValue: 100
+      &scrollSize: 21

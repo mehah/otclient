@@ -30,6 +30,7 @@
 #include <framework/platform/platform.h>
 #include <framework/net/protocolhttp.h>
 #include <framework/util/crypt.h>
+#include <framework/graphics/drawpoolmanager.h>
 
 #include <physfs.h>
 
@@ -379,11 +380,14 @@ std::string ResourceManager::resolvePath(const std::string& path)
     std::string fullPath;
     if (path.starts_with("/"))
         fullPath = path;
+    else if (g_drawPool.isPreDrawing())
+        fullPath = "/" + path;
     else {
         if (const std::string scriptPath = "/" + g_lua.getCurrentSourcePath(); !scriptPath.empty())
             fullPath += scriptPath + "/";
         fullPath += path;
     }
+
     if (!(fullPath.starts_with("/")))
         g_logger.traceWarning(stdext::format("the following file path is not fully resolved: %s", path));
 
@@ -730,7 +734,7 @@ bool ResourceManager::launchCorrect(std::vector<std::string>& args) { // curentl
 
 std::string ResourceManager::createArchive(const std::unordered_map<std::string, std::string>& /*files*/) { return ""; }
 
-std::unordered_map<std::string, std::string> ResourceManager::decompressArchive(std::string dataOrPath)
+std::unordered_map<std::string, std::string> ResourceManager::decompressArchive(std::string /*dataOrPath*/)
 {
     std::unordered_map<std::string, std::string> ret;
     return ret;

@@ -2,15 +2,15 @@ MessageSettings = {
     none = {},
     consoleRed = {
         color = TextColors.red,
-        consoleTab = 'Default'
+        consoleTab = 'Local Chat'
     },
     consoleOrange = {
         color = TextColors.orange,
-        consoleTab = 'Default'
+        consoleTab = 'Local Chat'
     },
     consoleBlue = {
         color = TextColors.blue,
-        consoleTab = 'Default'
+        consoleTab = 'Local Chat'
     },
     centerRed = {
         color = TextColors.red,
@@ -40,6 +40,11 @@ MessageSettings = {
         consoleTab = 'Server Log',
         screenTarget = 'statusLabel',
         consoleOption = 'showStatusMessagesInConsole'
+    },
+    othersStatus = {
+        color = TextColors.white,
+        consoleTab = 'Server Log',
+        consoleOption = 'showOthersStatusMessagesInConsole'
     },
     statusSmall = {
         color = TextColors.white,
@@ -80,10 +85,10 @@ MessageTypes = {
     [MessageModes.Heal] = MessageSettings.status,
     [MessageModes.Exp] = MessageSettings.status,
 
-    [MessageModes.DamageOthers] = MessageSettings.none,
-    [MessageModes.HealOthers] = MessageSettings.none,
-    [MessageModes.ExpOthers] = MessageSettings.none,
-    [MessageModes.Potion] = MessageSettings.none,
+    [MessageModes.DamageOthers] = MessageSettings.othersStatus,
+    [MessageModes.HealOthers] = MessageSettings.othersStatus,
+    [MessageModes.ExpOthers] = MessageSettings.othersStatus,
+    [MessageModes.Potion] = MessageSettings.othersStatus,
 
     [MessageModes.TradeNpc] = MessageSettings.centerWhite,
     [MessageModes.Guild] = MessageSettings.centerWhite,
@@ -166,6 +171,7 @@ function calculateVisibleTime(text)
 end
 
 function displayMessage(mode, text)
+
     if not g_game.isOnline() then
         return
     end

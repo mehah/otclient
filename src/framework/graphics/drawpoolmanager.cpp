@@ -24,7 +24,11 @@
 #include "drawpool.h"
 #include "declarations.h"
 
-thread_local static uint8_t CURRENT_POOL;
+thread_local static uint8_t CURRENT_POOL = static_cast<uint8_t>(DrawPoolType::LAST);
+
+void resetSelectedPool() {
+    CURRENT_POOL = static_cast<uint8_t>(DrawPoolType::LAST);
+}
 
 DrawPoolManager g_drawPool;
 
@@ -49,6 +53,7 @@ void DrawPoolManager::terminate() const
 
 DrawPool* DrawPoolManager::getCurrentPool() const { return m_pools[CURRENT_POOL]; }
 void DrawPoolManager::select(DrawPoolType type) { CURRENT_POOL = static_cast<uint8_t>(type); }
+bool DrawPoolManager::isPreDrawing() const { return CURRENT_POOL != static_cast<uint8_t>(DrawPoolType::LAST); }
 
 void DrawPoolManager::draw()
 {
@@ -163,12 +168,16 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     select(type);
     const auto pool = getCurrentPool();
 
-    if (pool->m_repaint.load())
+    if (pool->m_repaint.load()) {
+        resetSelectedPool();
         return;
+    }
 
     pool->resetState();
 
     if (f) f();
+
+    resetSelectedPool();
 
     if (!alwaysDraw)
         pool->m_hashCtrl.update();
