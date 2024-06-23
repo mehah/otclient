@@ -3,24 +3,8 @@
 
 -- updater
 Services = {
-    --updater = "http://localhost/api/updater.php", --./updater
-    --status = "http://localhost/api/status.php", --./client_entergame | ./client_topmenu
-    --websites = "http://localhost/?subtopic=accountmanagement", --./client_entergame "Forgot password and/or email"
+    --updater = "http://localhost/api/updater.php",
 }
-
---[[ Servers_init = {
-    ["http://ip/login.php"] = {
-        ["port"] = 80,
-        ["protocol"] = 1332,
-        ["httpLogin"] = true
-    },
-    ["ip.net"] = {
-        ["port"] = 7171,
-        ["protocol"] = 860,
-        ["httpLogin"] = false
-    },
-
-} ]]
 
 g_app.setName("OTClient - Redemption");
 g_app.setCompactName("otclient");

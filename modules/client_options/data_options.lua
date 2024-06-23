@@ -1,54 +1,48 @@
 return {
-    vsync                             = {
+    vsync = {
         value = true,
         action = function(value, options, controller, panels, extraWidgets, extraWidgets)
             g_window.setVerticalSync(value)
         end
     },
-    showFps                           = {
+    showFps = {
         value = false,
         action = function(value, options, controller, panels, extraWidgets)
             modules.client_topmenu.setFpsVisible(value)
         end
     },
-    showPing                          = {
+    showPing = {
         value = false,
         action = function(value, options, controller, panels, extraWidgets)
             modules.client_topmenu.setPingVisible(value)
         end
     },
-    fullscreen                        = {
+    fullscreen = {
         value = false,
         action = function(value, options, controller, panels, extraWidgets)
             g_window.setFullscreen(value)
         end
     },
-    classicControl                    = false,
-    smartWalk                         = false,
-    preciseControl                    = {
+    classicControl = false,
+    smartWalk = false,
+    preciseControl = {
         value = false,
         action = function(value, options, controller, panels, extraWidgets)
             g_game.setScheduleLastWalk(not value)
         end
     },
-    autoChaseOverride                 = true,
-    moveStack                         = false,
-    showStatusMessagesInConsole       = true,
-    showEventMessagesInConsole        = true,
-    showInfoMessagesInConsole         = true,
-    showTimestampsInConsole           = true,
-    showLevelsInConsole               = true,
-    showPrivateMessagesInConsole      = true,
+    autoChaseOverride = true,
+    moveStack = false,
+    showStatusMessagesInConsole = true,
+    showEventMessagesInConsole = true,
+    showInfoMessagesInConsole = true,
+    showTimestampsInConsole = true,
+    showLevelsInConsole = true,
+    showPrivateMessagesInConsole = true,
     showOthersStatusMessagesInConsole = false,
-    showPrivateMessagesOnScreen       = true,
-    showOutfitsOnList                 = {
-        value = true,
-        action = function(value, options, controller, panels, extraWidgets)
-            CharacterList.updateCharactersAppearances(value)
-        end
-    },
-    openMaximized                     = false,
-    backgroundFrameRate               = {
+    showPrivateMessagesOnScreen = true,
+    openMaximized = false,
+    backgroundFrameRate = {
         value = 201,
         action = function(value, options, controller, panels, extraWidgets)
             local text, v = value, value
@@ -57,74 +51,39 @@ return {
                 v = 0
             end
 
-            panels.graphicsPanel:recursiveGetChildById('backgroundFrameRate'):setText(tr('Game framerate limit: %s', text))
+            panels.graphicsPanel:getChildById('backgroundFrameRateLabel'):setText(tr('Game framerate limit: %s', text))
             g_app.setMaxFps(v)
         end
-<<<<<<< HEAD
     },    
     enableLights = {
-=======
-    },
-    enableAudio                       = {
-        value = true,
-        action = function(value, options, controller, panels, extraWidgets)
-            if g_sounds then
-                g_sounds.setAudioEnabled(value)
-            end
-
-            if value then
-                extraWidgets.audioButton:setIcon('/images/topbuttons/button_mute_up')
-            else
-                extraWidgets.audioButton:setIcon('/images/topbuttons/button_mute_pressed')
-            end
-        end
-    },
-    enableMusicSound                  = {
-        value = true,
-        action = function(value, options, controller, panels, extraWidgets)
-            if g_sounds then
-                g_sounds.getChannel(SoundChannels.Music):setEnabled(value)
-            end
-        end
-    },
-    musicSoundVolume                  = {
-        value = 100,
-        action = function(value, options, controller, panels, extraWidgets)
-            if g_sounds then
-                g_sounds.getChannel(SoundChannels.Music):setGain(value / 100)
-            end
-            panels.soundPanel:recursiveGetChildById('musicSoundVolume'):setText(tr('Music volume: %d', value))
-        end
-    },
-    enableLights                      = {
->>>>>>> 1c3abadd2f5e6157ee47b040f16defd8f7fde75e
         value = true,
         action = function(value, options, controller, panels, extraWidgets)
             panels.gameMapPanel:setDrawLights(value and options.ambientLight.value < 100)
-            panels.graphicsPanel:recursiveGetChildById('ambientLight'):setEnabled(value)
+            panels.graphicsPanel:getChildById('ambientLight'):setEnabled(value)
+            panels.graphicsPanel:getChildById('ambientLightLabel'):setEnabled(value)
         end
     },
-    limitVisibleDimension             = {
+    limitVisibleDimension = {
         value = false,
         action = function(value, options, controller, panels, extraWidgets)
             panels.gameMapPanel:setLimitVisibleDimension(value)
         end
     },
-    floatingEffect                    = {
+    floatingEffect = {
         value = false,
         action = function(value, options, controller, panels, extraWidgets)
             g_map.setFloatingEffect(value)
         end
     },
-    ambientLight                      = {
+    ambientLight = {
         value = 0,
         action = function(value, options, controller, panels, extraWidgets)
-            panels.graphicsPanel:recursiveGetChildById('ambientLight'):setText(string.format('Ambient light: %s%%', value))
+            panels.graphicsPanel:getChildById('ambientLightLabel'):setText(tr('Ambient light: %s%%', value))
             panels.gameMapPanel:setMinimumAmbientLight(value / 100)
             panels.gameMapPanel:setDrawLights(options.enableLights.value)
         end
     },
-    displayNames                      = {
+    displayNames = {
         value = true,
         action = function(value, options, controller, panels, extraWidgets)
             panels.gameMapPanel:setDrawNames(value)
@@ -134,7 +93,7 @@ return {
             end
         end
     },
-    displayHealth                     = {
+    displayHealth = {
         value = true,
         action = function(value, options, controller, panels, extraWidgets)
             panels.gameMapPanel:setDrawHealthBars(value)
@@ -144,7 +103,7 @@ return {
             end
         end
     },
-    displayMana                       = {
+    displayMana = {
         value = true,
         action = function(value, options, controller, panels, extraWidgets)
             panels.gameMapPanel:setDrawManaBar(value)
@@ -154,25 +113,25 @@ return {
             end
         end
     },
-    displayText                       = {
+    displayText = {
         value = true,
         action = function(value, options, controller, panels, extraWidgets)
             g_app.setDrawTexts(value)
         end
     },
-    turnDelay                         = {
+    turnDelay = {
         value = 50,
         action = function(value, options, controller, panels, extraWidgets)
-            panels.controlPanel:recursiveGetChildById('turnDelay'):setText(string.format('Turn delay: %sms', value))
+            panels.controlPanel:getChildById('turnDelayLabel'):setText(tr('Turn delay: %sms', value))
         end
     },
-    hotkeyDelay                       = {
+    hotkeyDelay = {
         value = 70,
         action = function(value, options, controller, panels, extraWidgets)
-            panels.controlPanel:recursiveGetChildById('hotkeyDelay'):setText(string.format('Hotkey delay: %sms', value))
+            panels.controlPanel:getChildById('hotkeyDelayLabel'):setText(tr('Hotkey delay: %sms', value))
         end
     },
-    crosshair                         = {
+    crosshair = {
         value = 'default',
         action = function(value, options, controller, panels, extraWidgets)
             local crossPath = '/images/game/crosshair/'
@@ -182,72 +141,73 @@ return {
             end
 
             panels.gameMapPanel:setCrosshairTexture(newValue and crossPath .. newValue or nil)
-            panels.generalPanel:recursiveGetChildById('crosshair'):setCurrentOptionByData(newValue, true)
+            panels.generalPanel.crosshair:setCurrentOptionByData(newValue, true)
         end
     },
-    enableHighlightMouseTarget        = {
+    enableHighlightMouseTarget = {
         value = true,
         action = function(value, options, controller, panels, extraWidgets)
             panels.gameMapPanel:setDrawHighlightTarget(value)
         end
     },
-    antialiasingMode                  = {
+    antialiasingMode = {
         value = 1,
         action = function(value, options, controller, panels, extraWidgets)
             panels.gameMapPanel:setAntiAliasingMode(value)
-            panels.graphicsPanel:recursiveGetChildById('antialiasingMode'):setCurrentOptionByData(value, true)
+            panels.generalPanel.crosshair:setCurrentOptionByData(value, true)
         end
     },
-    shadowFloorIntensity              = {
+    shadowFloorIntensity = {
         value = 30,
         action = function(value, options, controller, panels, extraWidgets)
-            panels.graphicsPanel:recursiveGetChildById('shadowFloorIntensity'):setText(string.format(
-                'Shadow floor Intensity: %s%%', value))
+            panels.graphicsPanel:getChildById('shadowFloorIntensityLevel'):setText(tr('Shadow floor Intensity: %s%%',
+                value))
             panels.gameMapPanel:setShadowFloorIntensity(1 - (value / 100))
         end
     },
-    optimizeFps                       = {
+    optimizeFps = {
         value = true,
         action = function(value, options, controller, panels, extraWidgets)
             g_app.optimize(value)
         end
     },
-    forceEffectOptimization           = {
+    forceEffectOptimization = {
         value = true,
         action = function(value, options, controller, panels, extraWidgets)
             g_app.forceEffectOptimization(value)
         end
     },
-    drawEffectOnTop                   = {
+    drawEffectOnTop = {
         value = false,
         action = function(value, options, controller, panels, extraWidgets)
             g_app.setDrawEffectOnTop(value)
         end
     },
-    floorViewMode                     = {
+    floorViewMode = {
         value = 1,
         action = function(value, options, controller, panels, extraWidgets)
             panels.gameMapPanel:setFloorViewMode(value)
-            panels.graphicsPanel:recursiveGetChildById('floorViewMode'):setCurrentOptionByData(value, true)
+            panels.graphicsPanel.floorViewMode:setCurrentOptionByData(value, true)
 
             local fadeMode = value == 1
-            panels.graphicsPanel:recursiveGetChildById('floorFading'):setEnabled(fadeMode)
+            panels.graphicsPanel:getChildById('floorFading'):setEnabled(fadeMode)
+            panels.graphicsPanel:getChildById('floorFadingLabel'):setEnabled(fadeMode)
         end
     },
-    floorFading                       = {
+    floorFading = {
         value = 500,
         action = function(value, options, controller, panels, extraWidgets)
-            panels.graphicsPanel:recursiveGetChildById('floorFading'):setText(string.format('Floor Fading: %s ms', value))
+            panels.graphicsPanel:getChildById('floorFadingLabel'):setText(tr('Floor Fading: %s ms', value))
             panels.gameMapPanel:setFloorFading(tonumber(value))
         end
     },
-    asyncTxtLoading                   = {
+    asyncTxtLoading = {
         value = false,
         action = function(value, options, controller, panels, extraWidgets)
             if g_game.isUsingProtobuf() then
                 value = true
             elseif g_app.isEncrypted() then
-                local asyncWidget = panels.generalPanel:recursiveGetChildById('asyncTxtLoading')
+                local asyncWidget = panels.graphicsPanel:getChildById('asyncTxtLoading')
                 asyncWidget:setEnabled(false)
                 asyncWidget:setChecked(false)
                 return
@@ -256,7 +216,7 @@ return {
             g_app.setLoadingAsyncTexture(value)
         end
     },
-    creatureInformationScale          = {
+    creatureInformationScale = {
         value = 0,
         action = function(value, options, controller, panels, extraWidgets)
             if value == 0 then
@@ -265,11 +225,11 @@ return {
                 value = value / 2
             end
             g_app.setCreatureInformationScale(math.max(value + 0.5, 1))
-            panels.consolePanel:recursiveGetChildById('creatureInformationScale'):setText(string.format(
-                'Creature Information Scale: %sx', math.max(value + 0.5, 1)))
+            panels.generalPanel:getChildById('creatureInformationScaleLabel'):setText(
+                tr('Creature Information Scale: %sx', math.max(value + 0.5, 1)))
         end
     },
-    staticTextScale                   = {
+    staticTextScale = {
         value = 0,
         action = function(value, options, controller, panels, extraWidgets)
             if value == 0 then
@@ -278,11 +238,11 @@ return {
                 value = value / 2
             end
             g_app.setStaticTextScale(math.max(value + 0.5, 1))
-            panels.consolePanel:recursiveGetChildById('staticTextScale'):setText(string.format('Message Scale: %sx',
+            panels.generalPanel:getChildById('staticTextScaleLabel'):setText(tr('Message Scale: %sx',
                 math.max(value + 0.5, 1)))
         end
     },
-    animatedTextScale                 = {
+    animatedTextScale = {
         value = 0,
         action = function(value, options, controller, panels, extraWidgets)
             if value == 0 then
@@ -291,29 +251,23 @@ return {
                 value = value / 2
             end
             g_app.setAnimatedTextScale(math.max(value + 0.5, 1))
-            panels.consolePanel:recursiveGetChildById('animatedTextScale'):setText(
+            panels.generalPanel:getChildById('animatedTextScaleLabel'):setText(
                 tr('Animated Message Scale: %sx', math.max(value + 0.5, 1)))
         end
     },
-    showLeftExtraPanel                = {
-        value = false,
-        action = function(value, options, controller, panels, extraWidgets)
-            modules.game_interface.getLeftExtraPanel():setOn(value)
-        end
-    },
-    showLeftPanel                     = {
-        value = false,
+    showLeftPanel = {
+        value = true,
         action = function(value, options, controller, panels, extraWidgets)
             modules.game_interface.getLeftPanel():setOn(value)
         end
     },
-    showRightExtraPanel               = {
+    showRightExtraPanel = {
         value = false,
         action = function(value, options, controller, panels, extraWidgets)
             modules.game_interface.getRightExtraPanel():setOn(value)
         end
     },
-    dontStretchShrink                 = {
+    dontStretchShrink = {
         value = false,
         action = function(value, options, controller, panels, extraWidgets)
             addEvent(function()
@@ -321,34 +275,18 @@ return {
             end)
         end
     },
-    setEffectAlphaScroll              = {
+    setEffectAlphaScroll = {
         value = 100,
         action = function(value, options, controller, panels, extraWidgets)
             g_client.setEffectAlpha(value / 100)
-            panels.consolePanel:recursiveGetChildById('setEffectAlphaScroll'):setText(tr('Opacity Effect: %s%%', value))
+            panels.generalPanel:getChildById('setEffectAlphaLabel'):setText(tr('Opacity Effect: %s%%', value))
         end
     },
-    setMissileAlphaScroll             = {
+    setMissileAlphaScroll = {
         value = 100,
         action = function(value, options, controller, panels, extraWidgets)
             g_client.setMissileAlpha(value / 100)
-            panels.consolePanel:recursiveGetChildById('setMissileAlphaScroll'):setText(tr('Opacity Missile: %s%%', value))
+            panels.generalPanel:getChildById('setMissileAlphaLabel'):setText(tr('Opacity Missile: %s%%', value))
         end
     },
-    distFromCenScrollbar              = {
-        value = 0,
-        action = function(value, options, controller, panels, extraWidgets)
-            local bar = modules.game_healthcircle.optionPanel:recursiveGetChildById('distFromCenScrollbar')
-            bar:setText(tr('Distance: %s', bar:recursiveGetChildById('valueBar'):getValue()))
-            modules.game_healthcircle.setDistanceFromCenter(bar:recursiveGetChildById('valueBar'):getValue())
-        end
-    },
-    opacityScrollbar                  = {
-        value = 0,
-        action = function(value, options, controller, panels, extraWidgets)
-            local bar = modules.game_healthcircle.optionPanel:recursiveGetChildById('opacityScrollbar')
-            bar:setText(tr('Opacity: %s', bar:recursiveGetChildById('valueBar'):getValue() / 100))
-            modules.game_healthcircle.setCircleOpacity(bar:recursiveGetChildById('valueBar'):getValue() / 100)
-        end
-    }
 }

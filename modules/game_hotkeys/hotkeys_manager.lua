@@ -34,7 +34,7 @@ HotkeyColors = {
 
 hotkeysManagerLoaded = false
 hotkeysWindow = nil
-
+hotkeysButton = nil
 currentHotkeyLabel = nil
 currentItemPreview = nil
 itemWidget = nil
@@ -59,15 +59,14 @@ boundCombosCallback = {}
 hotkeysList = {}
 disableHotkeysCount = 0
 lastHotkeyTime = g_clock.millis()
-local hotkeysWindowButton = nil 
 
 -- public functions
 function init()
-
+    hotkeysButton = modules.client_topmenu.addLeftGameButton('hotkeysButton', tr('Hotkeys') .. ' (Ctrl+K)',
+                                                             '/images/topbuttons/hotkeys', toggle)
     g_keyboard.bindKeyDown('Ctrl+K', toggle)
     hotkeysWindow = g_ui.displayUI('hotkeys_manager')
     hotkeysWindow:setVisible(false)
-    hotkeysWindowButton = modules.client_topmenu.addRightGameToggleButton('hotkeysWindowButton', tr('Hotkeys'), '/images/options/hotkeys', toggle)
 
     currentHotkeys = hotkeysWindow:getChildById('currentHotkeys')
     currentItemPreview = hotkeysWindow:getChildById('itemPreview')
@@ -133,10 +132,10 @@ function terminate()
     unload()
 
     hotkeysWindow:destroy()
-
+    hotkeysButton:destroy()
     mouseGrabberWidget:destroy()
     hotkeysWindow = nil
-
+    hotkeysButton = nil
     hotkeyActionCombo = nil
     hotKeyTextLabel = nil
     hotkeyText = nil
@@ -151,7 +150,6 @@ function terminate()
     useOnTarget = nil
     useWith = nil
     currentHotkeys = nil
-    hotkeysWindowButton = nil
 end
 
 function configure(savePerServer, savePerCharacter)
@@ -490,7 +488,7 @@ function doKeyCombo(keyCombo)
         elseif hotKey.action == HOTKEY_ACTION_ATTACK_PREV then
             modules.game_battle.attackNext(true)
         elseif hotKey.action == HOTKEY_ACTION_TOGGLE_CHASE then
-            g_game.setChaseMode(ChaseOpponent)
+            modules.game_combatcontrols.toggleChaseMode()
         end
 
     elseif hotKey.itemId == nil then

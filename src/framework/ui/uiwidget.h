@@ -90,7 +90,6 @@ protected:
     friend class UIManager;
 
     std::string m_id;
-    std::string m_source;
     int16_t m_childIndex{ -1 };
 
     Rect m_rect;
@@ -325,7 +324,6 @@ public:
     bool intersectsPadding(const Rect rect) { return getPaddingRect().intersects(rect); }
 
     std::string getId() { return m_id; }
-    std::string getSource() { return m_source; }
     UIWidgetPtr getParent() { return m_parent; }
     UIWidgetPtr getFocusedChild() { return m_focusedChild; }
     UIWidgetPtr getHoveredChild();

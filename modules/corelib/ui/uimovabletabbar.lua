@@ -20,37 +20,18 @@ end
 
 local function updateNavigation(tabBar)
     if tabBar.prevNavigation then
-        if tabBar.prevNavigation.dynamicNavigation ~= nil and tabBar.prevNavigation.dynamicNavigation > 0 then
-            local fitsOnBar = math.floor(tabBar:getWidth() / tabBar.prevNavigation.dynamicNavigation)
-            if #tabBar.tabs >= fitsOnBar and (#tabBar.preTabs > 0 or table.find(tabBar.tabs, tabBar.currentTab) ~= 1) then
-                tabBar.prevNavigation:enable()
-            else
-                tabBar.prevNavigation:disable()
-            end
+        if #tabBar.preTabs > 0 or table.find(tabBar.tabs, tabBar.currentTab) ~= 1 then
+            tabBar.prevNavigation:enable()
         else
-            if #tabBar.preTabs > 0 or table.find(tabBar.tabs, tabBar.currentTab) ~= 1 then
-                tabBar.prevNavigation:enable()
-            else
-                tabBar.prevNavigation:disable()
-            end
+            tabBar.prevNavigation:disable()
         end
     end
 
     if tabBar.nextNavigation then
-        if tabBar.nextNavigation.dynamicNavigation ~= nil and tabBar.nextNavigation.dynamicNavigation > 0 then
-            local fitsOnBar = math.floor(tabBar:getWidth() / tabBar.nextNavigation.dynamicNavigation)
-            if #tabBar.tabs >= fitsOnBar and
-                (#tabBar.postTabs > 0 or table.find(tabBar.tabs, tabBar.currentTab) ~= #tabBar.tabs) then
-                tabBar.nextNavigation:enable()
-            else
-                tabBar.nextNavigation:disable()
-            end
+        if #tabBar.postTabs > 0 or table.find(tabBar.tabs, tabBar.currentTab) ~= #tabBar.tabs then
+            tabBar.nextNavigation:enable()
         else
-            if #tabBar.postTabs > 0 or table.find(tabBar.tabs, tabBar.currentTab) ~= #tabBar.tabs then
-                tabBar.nextNavigation:enable()
-            else
-                tabBar.nextNavigation:disable()
-            end
+            tabBar.nextNavigation:disable()
         end
     end
 end
@@ -283,9 +264,7 @@ function UIMoveableTabBar:addTab(text, panel, menuCallback)
     tab:setId('tab')
     tab:setDraggable(self.tabsMoveable)
     tab:setText(text)
-    if not tab.ignoreTextResize then
-        tab:setWidth(tab:getTextSize().width + tab:getPaddingLeft() + tab:getPaddingRight())
-    end
+    tab:setWidth(tab:getTextSize().width + tab:getPaddingLeft() + tab:getPaddingRight())
     tab.menuCallback = menuCallback or nil
     tab.onClick = onTabClick
     tab.onMousePress = onTabMousePress
@@ -359,7 +338,7 @@ function UIMoveableTabBar:clearTabs()
 end
 
 function UIMoveableTabBar:removeTab(tab)
-    local tabTables = {self.tabs, self.preTabs, self.postTabs}
+    local tabTables = { self.tabs, self.preTabs, self.postTabs }
     local index = nil
     local tabTable = nil
     for i = 1, #tabTables do

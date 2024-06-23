@@ -31,7 +31,7 @@ void UICreature::drawSelf(DrawPoolType drawPane)
 
     if (m_creature) {
         m_creature->setMarked(m_imageColor);
-        m_creature->draw(getPaddingRect(), m_creatureSize, m_center);
+        m_creature->draw(getPaddingRect(), m_creatureSize);
     }
 }
 
@@ -48,9 +48,7 @@ void UICreature::onStyleApply(const std::string_view styleName, const OTMLNodePt
     UIWidget::onStyleApply(styleName, styleNode);
 
     for (const auto& node : styleNode->children()) {
-        if (node->tag() == "creature-center") {
-            m_center = node->value<bool>();
-        } else if (node->tag() == "creature-size") {
+        if (node->tag() == "creature-size") {
             m_creatureSize = node->value<int>();
         } else if (node->tag() == "outfit-id") {
             auto outfit = getOutfit();

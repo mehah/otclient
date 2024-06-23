@@ -105,7 +105,7 @@ void Creature::drawLight(const Point& dest, const LightViewPtr& lightView) {
     drawAttachedLightEffect(dest + m_walkOffset * g_drawPool.getScaleFactor(), lightView);
 }
 
-void Creature::draw(const Rect& destRect, uint8_t size, bool center)
+void Creature::draw(const Rect& destRect, uint8_t size)
 {
     if (!getThingType())
         return;
@@ -115,10 +115,7 @@ void Creature::draw(const Rect& destRect, uint8_t size, bool center)
         frameSize = std::max<int>(frameSize * (size / 100.f), 2 * g_gameConfig.getSpriteSize() * (size / 100.f));
 
     g_drawPool.bindFrameBuffer(frameSize); {
-        auto p = Point(frameSize - g_gameConfig.getSpriteSize()) + getDisplacement();
-        if (center)
-            p /= 2;
-
+        const auto& p = Point(frameSize - g_gameConfig.getSpriteSize()) + getDisplacement();
         internalDraw(p);
         if (isMarked())
             internalDraw(p, getMarkedColor());
@@ -746,9 +743,7 @@ void Creature::setHealthPercent(uint8_t healthPercent)
 
 void Creature::setDirection(Otc::Direction direction)
 {
-    if (direction == Otc::InvalidDirection)
-        return;
-
+    assert(direction != Otc::InvalidDirection);
     m_direction = direction;
 
     // xPattern => creature direction
@@ -781,13 +776,6 @@ void Creature::setOutfit(const Outfit& outfit)
 
     if (m_outfit.hasMount()) {
         m_numPatternZ = std::min<int>(1, getNumPatternZ() - 1);
-    }
-
-    if ((g_game.getFeature(Otc::GameWingsAurasEffectsShader))) {
-        m_outfit.setWing(0);
-        m_outfit.setAura(0);
-        m_outfit.setEffect(0);
-        m_outfit.setShader("Outfit - Default");
     }
 
     if (const auto& tile = getTile())
@@ -1120,10 +1108,8 @@ void Creature::setStaticWalking(uint16_t v) {
 
     m_walkingAnimationSpeed = v;
 
-    if (v == 0) {
-        m_walkAnimationPhase = 0;
+    if (v == 0)
         return;
-    }
 
     m_walkUpdateEvent = g_dispatcher.cycleEvent([self = static_self_cast<Creature>()] {
         self->updateWalkAnimation();

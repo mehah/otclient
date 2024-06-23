@@ -1,104 +1,72 @@
 Panel
-  SmallReversedQtPanel
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: parent.top
-    height: 22
+  OptionCheckBox
+    id: classicControl
+    !text: tr('Classic control')
 
-    OptionCheckBox
-      id: classicControl
-      !text: tr('Classic control')
+  OptionCheckBox
+    id: autoChaseOverride
+    !text: tr('Allow auto chase override')
 
-  SmallReversedQtPanel
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 7
-    height: 22
-  
-    OptionCheckBox
-      id: autoChaseOverride
-      !text: tr('Allow auto chase override')
+  OptionCheckBox
+    id: moveStack
+    !text: tr('Move stacks directly')
 
-  SmallReversedQtPanel
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 7
-    height: 22
-  
-    OptionCheckBox
-      id: moveStack
-      !text: tr('Move stacks directly')
+  OptionCheckBox
+    id: smartWalk
+    !text: tr('Enable smart walking')
+    !tooltip: tr('Will detect when to use diagonal step based on the\nkeys you are pressing')
 
-  SmallReversedQtPanel
+  OptionCheckBox
+    id: preciseControl
+    !text: tr('Enable precise control')
+    !tooltip: tr('You will have more precision over the character walking,\nbut it can feel more abrupt or unnatural')
+    @onCheckChange: g_game.setScheduleLastWalk(not self:isChecked())
+
+  Label
+    id: turnDelayLabel
+    !text: tr('Turn delay: %sms', 30)
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 7
-    height: 22
-  
-    OptionCheckBoxMarked
-      id: smartWalk
-      !text: tr('Enable smart walking')
-      !tooltip: tr('Will detect when to use diagonal step based on the\nkeys you are pressing')
+    margin-top: 12
+    @onSetup: |
+      local value = modules.client_options.getOption('turnDelay')
+      self:setText(tr('Turn delay: %dms', value))
 
-  SmallReversedQtPanel
+  OptionScrollbar
+    id: turnDelay
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 7
-    height: 22
-  
-    OptionCheckBoxMarked
-      id: preciseControl
-      !text: tr('Enable precise control')
-      !tooltip: tr('You will have more precision over the character walking,\nbut it can feel more abrupt or unnatural')
-      @onCheckChange: g_game.setScheduleLastWalk(not self:isChecked())
+    margin-top: 3
+    minimum: 30
+    maximum: 250
 
-  SmallReversedQtPanel
+  Label
+    id: hotkeyDelayLabel
+    !text: tr('Hotkey delay: %dms', 30)
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 7
-    height: 22
+    margin-top: 12
+    @onSetup: |
+      local value = modules.client_options.getOption('hotkeyDelay')
+      self:setText(tr('Hotkey delay: %dms', value))
 
-    OptionScaleScroll
-      id: turnDelay
-      !text: tr('Turn delay: 30ms')
-      anchors.fill: parent
-      &minimumScrollValue: 30
-      &maximumScrollValue: 250
-      &scrollSize: 21
-      @onSetup: |
-        local value = modules.client_options.getOption('turnDelay')
-        self:setText(tr('Turn delay: %dms', value))
-
-  SmallReversedQtPanel
-    id: hotkeyDelay_label
+  OptionScrollbar
+    id: hotkeyDelay
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 7
-    height: 22
+    margin-top: 3
+    minimum: 30
+    maximum: 250
 
-    OptionScaleScroll
-      id: hotkeyDelay
-      !text: tr('Hotkey delay: 30ms')
-      anchors.fill: parent
-      &minimumScrollValue: 30
-      &maximumScrollValue: 250
-      &scrollSize: 21
-      @onSetup: |
-        local value = modules.client_options.getOption('hotkeyDelay')
-        self:setText(tr('Hotkey delay: %dms', value))
-
-  QtButton
+  Button
     id: hotkeysButton
-    !text: tr('Hotkeys Manager')
+    !text: tr('Set hotkeys')
     @onClick: modules.game_hotkeys.show()
     anchors.top: prev.bottom
     anchors.left: parent.left
     margin-top: 12
-
-    size: 120 20
+    width: 120

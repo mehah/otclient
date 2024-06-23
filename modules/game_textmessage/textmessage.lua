@@ -2,15 +2,15 @@ MessageSettings = {
     none = {},
     consoleRed = {
         color = TextColors.red,
-        consoleTab = 'Local Chat'
+        consoleTab = 'Default'
     },
     consoleOrange = {
         color = TextColors.orange,
-        consoleTab = 'Local Chat'
+        consoleTab = 'Default'
     },
     consoleBlue = {
         color = TextColors.blue,
-        consoleTab = 'Local Chat'
+        consoleTab = 'Default'
     },
     centerRed = {
         color = TextColors.red,
@@ -128,7 +128,6 @@ function calculateVisibleTime(text)
 end
 
 function displayMessage(mode, text)
-
     if not g_game.isOnline() then
         return
     end

@@ -38,32 +38,9 @@ public:
     uint8_t getCreatureSize() { return m_creatureSize; }
     void setCreatureSize(uint8_t size) { m_creatureSize = size; }
 
-    void setCenter(bool v) { m_center = v; }
-    bool isCentered() { return m_center; }
-
-    /*
-    // @ note:
-    this did not work:
-    UIcreature:getCreature():getDirection()
-    UIcreature:getDirection()
-    in game_outfit
-    function updatePreview()
-        local direction = previewCreature:getDirection()
-
-    plan b:
-    */
-    Otc::Direction getDirection() {
-        if (m_creature != nullptr) {
-            return m_creature->getDirection();
-        } else {
-            return Otc::InvalidDirection;
-        }
-    }
-    // @
 protected:
     void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
     Outfit getOutfit() { if (!m_creature) setOutfit({}); return m_creature->getOutfit(); }
     CreaturePtr m_creature;
     uint8_t m_creatureSize{ 0 };
-    bool m_center{ false };
 };

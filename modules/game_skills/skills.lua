@@ -26,8 +26,8 @@ function init()
         onGameEnd = offline
     })
 
-    skillsButton = modules.game_mainpanel.addToggleButton('skillsButton', tr('Skills') .. ' (Alt+S)',
-                                                                   '/images/options/button_skills', toggle, false, 1)
+    skillsButton = modules.client_topmenu.addRightGameToggleButton('skillsButton', tr('Skills') .. ' (Alt+S)',
+                                                                   '/images/topbuttons/skills', toggle)
     skillsButton:setOn(true)
     skillsWindow = g_ui.loadUI('skills')
 
@@ -325,14 +325,6 @@ function toggle()
         skillsWindow:close()
         skillsButton:setOn(false)
     else
-        if not skillsWindow:getParent() then
-            local panel = modules.game_interface.findContentPanelAvailable(skillsWindow, skillsWindow:getMinimumHeight())
-            if not panel then
-                return
-            end
-
-            panel:addChild(skillsWindow)
-        end
         skillsWindow:open()
         skillsButton:setOn(true)
         updateHeight()
@@ -369,10 +361,8 @@ end
 
 function onSkillButtonClick(button)
     local percentBar = button:getChildById('percent')
-    local skillIcon = button:getChildById('icon')
-    if percentBar and skillIcon then
+    if percentBar then
         showPercentBar(button, not percentBar:isVisible())
-        skillIcon:setVisible(skillIcon:isVisible())
 
         local char = g_game.getCharacterName()
         if percentBar:isVisible() then
@@ -387,10 +377,8 @@ end
 
 function showPercentBar(button, show)
     local percentBar = button:getChildById('percent')
-    local skillIcon = button:getChildById('icon')
-    if percentBar and skillIcon then
+    if percentBar then
         percentBar:setVisible(show)
-        skillIcon:setVisible(show)
         if show then
             button:setHeight(21)
         else

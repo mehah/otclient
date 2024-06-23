@@ -1,0 +1,93 @@
+HealthBar < ProgressBar
+  id: healthBar
+  background-color: #ff4444
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin: 1
+
+ManaBar < ProgressBar
+  id: manaBar
+  background-color: #4444ff
+  anchors.top: prev.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin: 1
+  margin-top: 3
+
+ExperienceBar < ProgressBar
+  id: experienceBar
+  background-color: #B6E866
+  anchors.top: prev.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin: 1
+  margin-top: 3
+
+SoulLabel < GameLabel
+  id: soulLabel
+  text-align: right
+  color: white
+  font: verdana-11px-rounded
+  anchors.bottom: parent.bottom
+  anchors.right: parent.right
+  anchors.left: parent.horizontalCenter
+  margin-top: 5
+  margin-right: 3
+  on: true
+
+  $!on:
+    visible: false
+    margin-top: 0
+    height: 0
+
+CapLabel < GameLabel
+  id: capLabel
+  color: white
+  font: verdana-11px-rounded
+  anchors.bottom: parent.bottom
+  anchors.left: parent.left
+  anchors.right: parent.horizontalCenter
+  margin-top: 5
+  margin-left: 3
+  on: true
+
+  $!on:
+    visible: false
+    margin-top: 0
+    height: 0
+
+ConditionWidget < UIWidget
+  size: 18 18
+
+  $!first:
+    margin-left: 2
+
+MiniWindow
+  icon: /images/topbuttons/healthinfo
+  id: healthInfoWindow
+  !text: tr('Health Info')
+  height: 123
+  @onOpen: modules.game_healthinfo.onMiniWindowOpen()
+  @onClose: modules.game_healthinfo.onMiniWindowClose()
+  &save: true
+
+  MiniWindowContents
+    HealthBar
+    ManaBar
+    ExperienceBar
+    Panel
+      id: conditionPanel
+      layout:
+        type: horizontalBox
+      height: 22
+      margin-top: 4
+      padding: 2
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      border-width: 1
+      border-color: #00000077
+      background-color: #ffffff11
+    SoulLabel
+    CapLabel
