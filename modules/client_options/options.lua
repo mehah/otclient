@@ -10,7 +10,6 @@ local panels = {
 }
 
 local extraWidgets = {
-    audioButton = nil,
     optionsButton = nil
 }
 
@@ -98,16 +97,10 @@ function controller:onInit()
         '/images/topbuttons/options',
         toggle)
 
-    extraWidgets.audioButton = modules.client_topmenu.addLeftButton('audioButton', tr('Audio'),
-        '/images/topbuttons/audio', function()
-            toggleOption('enableAudio')
-        end)
-
     panels.generalPanel = g_ui.loadUI('general')
     panels.controlPanel = g_ui.loadUI('control')
     panels.consolePanel = g_ui.loadUI('console')
     panels.graphicsPanel = g_ui.loadUI('graphics')
-    panels.soundPanel = g_ui.loadUI('audio')
 
     self.ui:hide()
     self.ui.optionsTabBar:setContentWidget(self.ui.optionsTabContent)
@@ -115,14 +108,12 @@ function controller:onInit()
     self.ui.optionsTabBar:addTab(tr('Control'), panels.controlPanel, '/images/optionstab/controls')
     self.ui.optionsTabBar:addTab(tr('Console'), panels.consolePanel, '/images/optionstab/console')
     self.ui.optionsTabBar:addTab(tr('Graphics'), panels.graphicsPanel, '/images/optionstab/graphics')
-    self.ui.optionsTabBar:addTab(tr('Audio'), panels.soundPanel, '/images/optionstab/audio')
 
     addEvent(setup)
 end
 
 function controller:onTerminate()
     extraWidgets.optionsButton:destroy()
-    extraWidgets.audioButton:destroy()
     panels = nil
     extraWidgets = nil
 end

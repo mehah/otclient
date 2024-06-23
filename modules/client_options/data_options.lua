@@ -54,38 +54,7 @@ return {
             panels.graphicsPanel:getChildById('backgroundFrameRateLabel'):setText(tr('Game framerate limit: %s', text))
             g_app.setMaxFps(v)
         end
-    },
-    enableAudio = {
-        value = true,
-        action = function(value, options, controller, panels, extraWidgets)
-            if g_sounds then
-                g_sounds.setAudioEnabled(value)
-            end
-
-            if value then
-                extraWidgets.audioButton:setIcon('/images/topbuttons/audio')
-            else
-                extraWidgets.audioButton:setIcon('/images/topbuttons/audio_mute')
-            end
-        end
-    },
-    enableMusicSound = {
-        value = true,
-        action = function(value, options, controller, panels, extraWidgets)
-            if g_sounds then
-                g_sounds.getChannel(SoundChannels.Music):setEnabled(value)
-            end
-        end
-    },
-    musicSoundVolume = {
-        value = 100,
-        action = function(value, options, controller, panels, extraWidgets)
-            if g_sounds then
-                g_sounds.getChannel(SoundChannels.Music):setGain(value / 100)
-            end
-            panels.soundPanel:getChildById('musicSoundVolumeLabel'):setText(tr('Music volume: %d', value))
-        end
-    },
+    },   
     enableLights = {
         value = true,
         action = function(value, options, controller, panels, extraWidgets)
