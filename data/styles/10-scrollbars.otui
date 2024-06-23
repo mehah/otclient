@@ -106,3 +106,83 @@ HorizontalScrollBar < UIScrollBar
   ScrollBarSlider
 
   ScrollBarValueLabel
+
+VerticalScrollBarQtSlider < UIButton
+  id: sliderButton
+  anchors.centerIn: parent
+  size: 12 44
+  image-source: /images/ui/scrollbar_new_vertical
+  image-clip: 22 0 12 44
+  image-border-top: 7
+  image-border-bottom: 7
+
+VerticalQtScrollBar < UIScrollBar
+  orientation: vertical
+  size: 10 78
+  image-source: /images/ui/scrollbar_new_vertical
+  image-clip: 0 0 10 78
+  image-border: 2
+  pixels-scroll: true
+  parent-scroll: true
+
+  UIButton
+    id: decrementButton
+    anchors.top: parent.top
+    anchors.right: parent.right
+    image-source: /images/ui/scrollbar_new_vertical
+    image-clip: 10 0 12 12
+    size: 12 12
+    $pressed:
+      image-clip: 10 12 12 12
+
+  UIButton
+    id: incrementButton
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    size: 12 12
+    image-source: /images/ui/scrollbar_new_vertical
+    image-clip: 10 24 12 12
+    $pressed:
+      image-clip: 10 36 12 12
+
+  VerticalScrollBarQtSlider
+
+HorizontalScrollBarQtSlider < UIButton
+  id: sliderButton
+  anchors.centerIn: parent
+  size: 44 12
+  image-source: /images/ui/scrollbar_new_horizontal
+  image-clip: 34 22 44 12
+  image-border-left: 7
+  image-border-right: 7
+
+HorizontalQtScrollBar < UIScrollBar
+  orientation: horizontal
+  size: 78 10
+  image-source: /images/ui/scrollbar_new_horizontal
+  image-clip: 0 0 78 10
+  image-border: 2
+  pixels-scroll: true
+  parent-scroll: true
+
+  UIButton
+    id: decrementButton
+    anchors.top: parent.top
+    anchors.left: parent.left
+    image-source: /images/ui/scrollbar_new_horizontal
+    image-clip: 42 10 12 12
+    size: 12 12
+    $pressed:
+      image-clip: 30 10 12 12
+
+  UIButton
+    id: incrementButton
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    size: 12 12
+    image-source: /images/ui/scrollbar_new_horizontal
+    image-clip: 66 10 12 12
+    $pressed:
+      image-clip: 54 10 12 12
+
+  HorizontalScrollBarQtSlider

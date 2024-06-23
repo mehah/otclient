@@ -39,6 +39,7 @@ BattleParty < BattleIcon
 MiniWindow
   id: battleWindow
   !text: tr('Battle')
+  color: #ffffff
   height: 166
   icon: /images/topbuttons/battle
   @onOpen: onOpen()

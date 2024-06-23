@@ -1,0 +1,7 @@
+Font
+  name: verdana-11px-monochrome-underline
+  texture: verdana-11px-monochrome_underline_cp1252
+  height: 14
+  glyph-size: 16 16
+  space-width: 3
+  spacing: -1 0
