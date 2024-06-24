@@ -1,6 +1,7 @@
 MinimapFlag < UIWidget
   size: 11 11
   focusable: false
+  clipping: true
 
 MinimapCross < UIWidget
   focusable: false

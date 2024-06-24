@@ -176,8 +176,8 @@ local function toggleIcon(bitChanged)
         {content = statsBar.parallelOnTop.icons,loadIconTransparent = true}, 
         {content = statsBar.defaultOnTop.icons,loadIconTransparent = true}, 
         {content = statsBar.compactOnTop.icons, loadIconTransparent = true}, 
-        {content = modules.game_mainpanel.getIconsPanelOff()},
-        {content = modules.game_mainpanel.getIconsPanelOn()}
+        {content = modules.game_inventory.getIconsPanelOff()},
+        {content = modules.game_inventory.getIconsPanelOn()}
     }
 
     for _, contentData in ipairs(contents) do
@@ -478,8 +478,8 @@ function StatsBar.OnGameEnd()
 
     StatsBar.hideAll()
 
-    modules.game_mainpanel.getIconsPanelOn():destroyChildren()
-    modules.game_mainpanel.getIconsPanelOff():destroyChildren()
+    modules.game_inventory.getIconsPanelOn():destroyChildren()
+    modules.game_inventory.getIconsPanelOff():destroyChildren()
 
     statsBar.largeOnTop.icons:destroyChildren()
     statsBar.parallelOnTop.icons:destroyChildren()

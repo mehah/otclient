@@ -1,4 +1,4 @@
-local quiverSlot = modules.game_mainpanel.getSlot5() or ""
+local quiverSlot = modules.game_inventory.getSlot5() or ""
 local label = quiverSlot.count
 
 label = label or g_ui.loadUIFromString([[

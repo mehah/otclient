@@ -1,8 +1,0 @@
-Tfs 1.5:
-https://github.com/kokekanon/forgottenserver-downgrade/pull/2
-https://github.com/kokekanon/forgottenserver-downgrade/pull/7
-https://github.com/kokekanon/forgottenserver-downgrade/pull/9
-
-Tfs 1.4.2:
-
-canary:
