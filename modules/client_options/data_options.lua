@@ -308,6 +308,18 @@ return {
             modules.game_interface.getRightExtraPanel():setOn(value)
         end
     },
+    showActionbar                    = {
+        value = false,
+        action = function(value, options, controller, panels, extraWidgets)
+            modules.game_actionbar.setActionBarVisible(value)
+        end
+    },
+    showSpellGroupCooldowns           = {
+        value = true,
+        action = function(value, options, controller, panels, extraWidgets)
+            modules.game_cooldown.setSpellGroupCooldownsVisible(value)
+        end
+    },
     dontStretchShrink                 = {
         value = false,
         action = function(value, options, controller, panels, extraWidgets)

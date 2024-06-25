@@ -275,3 +275,13 @@ function onSpellGroupCooldown(groupId, duration)
         groupCooldown[groupId] = true
     end
 end
+
+function setSpellGroupCooldownsVisible(visible)
+    if visible then
+        cooldownWindow:setHeight(30)
+        cooldownWindow:show()
+    else
+        cooldownWindow:hide()
+        cooldownWindow:setHeight(10)
+    end
+end
