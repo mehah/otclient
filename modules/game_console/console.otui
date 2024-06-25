@@ -254,4 +254,4 @@ Panel
         self.isChecked = true
         self:setText(tr('Chat Off'))
       end
-    @onCheckChange: updateChatMode()
+      updateChatMode()
