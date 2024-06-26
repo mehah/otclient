@@ -1428,8 +1428,8 @@ void ProtocolGame::parseAnimatedText(const InputMessagePtr& msg)
 
 void ProtocolGame::parseAnthem(const InputMessagePtr& msg)
 {
-    uint8_t type = msg->getU8();
-    if (type >= 0 && type <= 2) {
+    const uint8_t type = msg->getU8();
+    if (type <= 2) {
         msg->getU16(); // Anthem id
     }
 }
