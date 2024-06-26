@@ -3800,7 +3800,7 @@ void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
 
     const uint32_t neededItemsSize = msg->getU32(); // needed items size
     std::vector<ItemPtr> needItems;
-    for (auto i = 0; i < neededItemsSize; ++i) {
+    for (uint32_t i = 0; i < neededItemsSize; ++i) {
         const uint16_t needItemId = msg->getU16();
         const uint16_t count = msg->getU16();
         const auto& needItem = Item::create(needItemId);
@@ -3994,12 +3994,12 @@ void ProtocolGame::parseMarketBrowse(const InputMessagePtr& msg)
 
     std::vector<MarketOffer> offers;
     const uint32_t buyOfferCount = msg->getU32();
-    for (auto i = 0; i < buyOfferCount; ++i) {
+    for (uint32_t i = 0; i < buyOfferCount; ++i) {
         offers.push_back(readMarketOffer(msg, Otc::MARKETACTION_BUY, var));
     }
 
     const uint32_t sellOfferCount = msg->getU32();
-    for (auto i = 0; i < sellOfferCount; ++i) {
+    for (uint32_t i = 0; i < sellOfferCount; ++i) {
         offers.push_back(readMarketOffer(msg, Otc::MARKETACTION_SELL, var));
     }
     std::vector<std::vector<uint64_t>> intOffers;
