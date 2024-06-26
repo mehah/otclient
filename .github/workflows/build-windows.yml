@@ -48,13 +48,11 @@ jobs:
           echo "vcpkgGitCommitId=$vcpkgCommitId" >> "$GITHUB_OUTPUT"
 
       - name: Get vcpkg commit id from vcpkg.json
-        uses: lukka/run-vcpkg@v11
+        uses: lukka/run-vcpkg@main
         with:
           vcpkgGitURL: "https://github.com/microsoft/vcpkg.git"
           vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-          useVcpkgToolchainFile: true
-          vcpkgGitCommitId: '01f602195983451bc83e72f4214af2cbc495aa94'
-          appendedCacheKey: ${{ hashFiles( '**/vcpkg.json' ) }}
+          vcpkgGitCommitId: ${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}
 
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@main
