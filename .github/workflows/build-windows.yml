@@ -51,7 +51,6 @@ jobs:
         uses: lukka/run-vcpkg@main
         with:
           vcpkgGitURL: "https://github.com/microsoft/vcpkg.git"
-          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
           vcpkgGitCommitId: ${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}
 
       - name: Get latest CMake and ninja
