@@ -56,7 +56,7 @@ jobs:
 
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@main
-    
+
       - name: Run CMake
         uses: lukka/run-cmake@main
         with:
