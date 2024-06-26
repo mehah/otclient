@@ -23,7 +23,11 @@ function init()
     cooldownButton = modules.game_mainpanel.addToggleButton('cooldownButton', tr('Cooldowns'),
         '/images/options/cooldowns', toggle, false, 5)
 
-    cooldownButton:setOn(true)
+    if g_settings.get('cooldownWindow') then
+        cooldownButton:setOn(true)
+    else
+        cooldownButton:setOn(false)
+    end
 
     cooldownButton:hide()
 
@@ -54,6 +58,8 @@ function terminate()
         onSpellGroupCooldown = onSpellGroupCooldown,
         onSpellCooldown = onSpellCooldown
     })
+
+    g_settings.set('cooldownWindow', cooldownWindow:isVisible())
 
     cooldownWindow:destroy()
     cooldownButton:destroy()
@@ -109,14 +115,13 @@ end
 function toggle()
     local console = modules.game_console.consolePanel
     if cooldownButton:isOn() then
-        cooldownWindow:hide()
+        setSpellGroupCooldownsVisible(false)
         cooldownButton:setOn(false)
-
         if console then
             console:addAnchor(AnchorTop, modules.game_actionbar.getPanelActionbar():getId(), AnchorBottom)
         end
     else
-        cooldownWindow:show()
+        setSpellGroupCooldownsVisible(true)
         cooldownButton:setOn(true)
 
         if console then
@@ -129,14 +134,12 @@ end
 function online()
 
     if g_game.getFeature(GameSpellList) then
-
         cooldownButton:show()
         cooldownButton:setOn(true)
     else
-
         cooldownButton:hide()
         cooldownButton:setOn(false)
-        cooldownWindow:hide()
+        setSpellGroupCooldownsVisible(false)
     end
 
     if not lastPlayer or lastPlayer ~= g_game.getCharacterName() then
@@ -280,8 +283,10 @@ function setSpellGroupCooldownsVisible(visible)
     if visible then
         cooldownWindow:setHeight(30)
         cooldownWindow:show()
+        cooldownButton:setOn(true)
     else
         cooldownWindow:hide()
         cooldownWindow:setHeight(10)
+        cooldownButton:setOn(false)
     end
 end
