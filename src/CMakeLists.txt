@@ -223,23 +223,11 @@ if(TOGGLE_FRAMEWORK_SOUND)
 	find_package(Ogg CONFIG REQUIRED)
 
 	if(MSVC)
-		set(sound_LIBRARIES "${sound_LIBRARIES}
-			${VORBISFILE_LIBRARY}
-			${VORBIS_LIBRARY}
-			${OGG_LIBRARY}
-			OpenAL::OpenAL")		
+		set(sound_LIBRARIES "${sound_LIBRARIES} ${VORBISFILE_LIBRARY} ${VORBIS_LIBRARY} ${OGG_LIBRARY} OpenAL::OpenAL")		
 	elseif(ANDROID)
-		set(sound_LIBRARIES "${sound_LIBRARIES}
-			${OGG_LIBRARY}
-			OpenSLES
-			Vorbis::vorbis
-			Vorbis::vorbisfile")
+		set(sound_LIBRARIES "${sound_LIBRARIES} ${OGG_LIBRARY} OpenSLES Vorbis::vorbis Vorbis::vorbisfile")
 	else() # Linux
-		set(sound_LIBRARIES "${sound_LIBRARIES}
-			${OGG_LIBRARY}
-			OpenAL::OpenAL
-			Vorbis::vorbis
-			Vorbis::vorbisfile")
+		set(sound_LIBRARIES "${sound_LIBRARIES} ${OGG_LIBRARY} OpenAL::OpenAL Vorbis::vorbis Vorbis::vorbisfile")
 	endif()
 endif()
 if(ANDROID)
