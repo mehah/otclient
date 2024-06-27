@@ -3,25 +3,12 @@ Panel
   image-source: /images/background
   image-smooth: false
   image-fixed-ratio: true
-  anchors.top: topMenu.bottom
+  anchors.top: parent.top
   anchors.left: parent.left
   anchors.right: parent.right
   anchors.bottom: parent.bottom
   margin-top: 1
   focusable: false
-
-  UIWidget
-    anchors.top: parent.top
-    phantom: true
-    anchors.HorizontalCenter: parent.HorizontalCenter
-    text-align: center
-    text-auto-resize: true
-    margin-top: 50
-    color: #e98d02
-    text: OTCLient Redemption
-    font: verdana-11px-rounded
-    font-scale: 4
-    shader: Map - Party
 
   UILabel
     id: clientVersionLabel

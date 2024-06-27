@@ -11,7 +11,8 @@ local panels = {
 
 local extraWidgets = {
     audioButton = nil,
-    optionsButton = nil
+    optionsButton = nil,
+    optionsButtons = nil
 }
 
 local function toggleDisplays()
@@ -35,27 +36,33 @@ local function toggleOption(key)
 end
 
 local function setupComboBox()
+    local crosshairCombo = panels.generalPanel:recursiveGetChildById('crosshair')
+    local antialiasingModeCombobox = panels.graphicsPanel:recursiveGetChildById('antialiasingMode')
+    local floorViewModeCombobox = panels.graphicsPanel:recursiveGetChildById('floorViewMode')
+
     for k, v in pairs({ { 'Disabled', 'disabled' }, { 'Default', 'default' }, { 'Full', 'full' } }) do
-        panels.generalPanel.crosshair:addOption(v[1], v[2])
+        crosshairCombo:addOption(v[1], v[2])
     end
 
-    panels.generalPanel.crosshair.onOptionChange = function(comboBox, option)
+    crosshairCombo.onOptionChange = function(comboBox, option)
         setOption('crosshair', comboBox:getCurrentOption().data)
     end
 
+
     for k, t in pairs({ 'None', 'Antialiasing', 'Smooth Retro' }) do
-        panels.graphicsPanel.antialiasingMode:addOption(t, k - 1)
+        antialiasingModeCombobox:addOption(t, k - 1)
     end
 
-    panels.graphicsPanel.antialiasingMode.onOptionChange = function(comboBox, option)
+    antialiasingModeCombobox.onOptionChange = function(comboBox, option)
         setOption('antialiasingMode', comboBox:getCurrentOption().data)
     end
 
+
     for k, t in pairs({ 'Normal', 'Fade', 'Locked', 'Always', 'Always with transparency' }) do
-        panels.graphicsPanel.floorViewMode:addOption(t, k - 1)
+        floorViewModeCombobox:addOption(t, k - 1)
     end
 
-    panels.graphicsPanel.floorViewMode.onOptionChange = function(comboBox, option)
+    floorViewModeCombobox.onOptionChange = function(comboBox, option)
         setOption('floorViewMode', comboBox:getCurrentOption().data)
     end
 end
@@ -94,14 +101,10 @@ function controller:onInit()
         g_settings.setDefault(k, obj.value)
     end
 
-    extraWidgets.optionsButton = modules.client_topmenu.addLeftButton('optionsButton', tr('Options'),
-        '/images/topbuttons/options',
-        toggle)
-
-    extraWidgets.audioButton = modules.client_topmenu.addLeftButton('audioButton', tr('Audio'),
-        '/images/topbuttons/audio', function()
-            toggleOption('enableAudio')
-        end)
+    extraWidgets.optionsButton = modules.client_topmenu.addTopRightToggleButton('optionsButton', tr('Options'),
+        '/images/topbuttons/button_options', toggle)
+    extraWidgets.audioButton = modules.client_topmenu.addTopRightToggleButton('audioButton', tr('Audio'),
+        '/images/topbuttons/button_mute_up', function() toggleOption('enableAudio') end)
 
     panels.generalPanel = g_ui.loadUI('general')
     panels.controlPanel = g_ui.loadUI('control')
@@ -111,11 +114,11 @@ function controller:onInit()
 
     self.ui:hide()
     self.ui.optionsTabBar:setContentWidget(self.ui.optionsTabContent)
-    self.ui.optionsTabBar:addTab(tr('General'), panels.generalPanel, '/images/optionstab/game')
-    self.ui.optionsTabBar:addTab(tr('Control'), panels.controlPanel, '/images/optionstab/controls')
-    self.ui.optionsTabBar:addTab(tr('Console'), panels.consolePanel, '/images/optionstab/console')
-    self.ui.optionsTabBar:addTab(tr('Graphics'), panels.graphicsPanel, '/images/optionstab/graphics')
-    self.ui.optionsTabBar:addTab(tr('Audio'), panels.soundPanel, '/images/optionstab/audio')
+    self.ui.optionsTabBar:addTab(tr('Options'), panels.generalPanel, '/images/icons/icon_options')
+    self.ui.optionsTabBar:addTab(tr('Controls'), panels.controlPanel, '/images/icons/icon_controls')
+    self.ui.optionsTabBar:addTab(tr('Interface'), panels.consolePanel, '/images/icons/icon_interface')
+    self.ui.optionsTabBar:addTab(tr('Graphics'), panels.graphicsPanel, '/images/icons/icon_graphics')
+    self.ui.optionsTabBar:addTab(tr('Sound'), panels.soundPanel, '/images/icons/icon_sound')
 
     addEvent(setup)
 end
@@ -128,6 +131,10 @@ function controller:onTerminate()
 end
 
 function setOption(key, value, force)
+    if not modules.game_interface then
+        return
+    end
+
     local option = options[key]
     if option == nil or not force and option.value == value then
         return
@@ -146,6 +153,8 @@ function setOption(key, value, force)
                 widget:setChecked(value)
             elseif widget:getStyle().__class == 'UIScrollBar' then
                 widget:setValue(value)
+            elseif widget:recursiveGetChildById('valueBar') then
+                widget:recursiveGetChildById('valueBar'):setValue(value)
             end
             break
         end
@@ -153,6 +162,15 @@ function setOption(key, value, force)
 
     option.value = value
     g_settings.set(key, value)
+end
+
+function setupOptionsMainButton()
+    if extraWidgets.optionsButtons then
+        return
+    end
+
+    extraWidgets.optionsButtons = modules.game_mainpanel.addSpecialToggleButton('optionsMainButton', tr('Options'),
+        '/images/options/button_options', toggle, true)
 end
 
 function getOption(key)

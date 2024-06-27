@@ -1,8 +1,7 @@
 GameSidePanel < UIMiniWindowContainer
-  image-source: /images/ui/panel_side
+  image-source: /images/ui/2pixel_up_frame_borderimage
   image-border: 4
-  padding: 4
-  width: 198
+  width: 176
   layout:
     type: verticalBox
     //spacing: 1
@@ -14,8 +13,18 @@ SelectColumnButton < CheckBox
     opacity: 1
 
 GameBottomPanel < Panel
-  image-source: /images/ui/panel_bottom
-  image-border: 4
+  image-source: /images/ui/background_dark
+  image-repeated: true
+  padding-top: 6
+
+  UIWidget
+    image-source: /images/ui/divider_horizontal
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    margin-top: -6
+    height: 5
+    focusable: false
 
 GameMapPanel < UIGameMap
   padding: 4
@@ -32,9 +41,9 @@ UIWidget
 
   GameMapPanel
     id: gameMapPanel
-    anchors.left: gameLeftPanel.right
+    anchors.left: gameLeftExtraPanel.right
     anchors.right: gameRightExtraPanel.left
-    anchors.top: parent.top
+    anchors.top: gameTopPanel.bottom
     anchors.bottom: gameBottomPanel.top
     focusable: false
 
@@ -48,7 +57,7 @@ UIWidget
 
   GameBottomPanel
     id: gameBottomPanel
-    anchors.left: gameLeftPanel.right
+    anchors.left: gameLeftExtraPanel.right
     anchors.right: gameRightExtraPanel.left
     anchors.top: bottomSplitter.top
     anchors.bottom: parent.bottom
@@ -66,9 +75,33 @@ UIWidget
       visible: false
 
   GameSidePanel
-    id: gameRightPanel
+    id: gameLeftExtraPanel
+    anchors.left: prev.right
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    margin-left: 1
+    focusable: false
+    visible: true
+    on: true
+    $!on:
+      width: 0
+      visible: false
+
+  GameSidePanel
+    id: gameMainRightPanel
     anchors.right: parent.right
     anchors.top: parent.top
+    &ignoreFillAll: true
+    &onlyPhantomDrop: true
+    height: 200
+    focusable: false
+    height: 1
+    on: true
+
+  GameSidePanel
+    id: gameRightPanel
+    anchors.right: parent.right
+    anchors.top: gameMainRightPanel.bottom
     anchors.bottom: parent.bottom
     focusable: false
     on: true
@@ -100,18 +133,91 @@ UIWidget
     id: gameSelectRightExtraColumn
     anchors.right: gameRightExtraPanel.right
     anchors.bottom: gameRightExtraPanel.bottom
+    
+  SelectColumnButton
+    id: gameSelectLeftExtraColumn
+    anchors.right: gameLeftExtraPanel.right
+    anchors.bottom: gameLeftExtraPanel.bottom
 
   Splitter
     id: bottomSplitter
-    anchors.left: gameLeftPanel.right
+    anchors.left: gameLeftExtraPanel.right
     anchors.right: gameRightExtraPanel.left
     anchors.bottom: parent.bottom
     relative-margin: bottom
     margin-bottom: 172
-    @canUpdateMargin: function(self, newMargin) if modules.client_options.getOption('dontStretchShrink') then return self:getMarginBottom() end return math.max(math.min(newMargin, self:getParent():getHeight() - 300), 162) end
-    @onGeometryChange: function(self) self:setMarginBottom(math.min(math.max(self:getParent():getHeight() - 300, 162), self:getMarginBottom())) end
+    image-source: /images/ui/divider_horizontal
+    height: 5
+    @canUpdateMargin: function(self, newMargin) if modules.client_options.getOption('dontStretchShrink') then return self:getMarginBottom() end return math.max(math.min(newMargin, self:getParent():getHeight() - 300), 160) end
+    @onGeometryChange: function(self) self:setMarginBottom(math.min(math.max(self:getParent():getHeight() - 300, 160), self:getMarginBottom())) end
 
   UIWidget
     id: mouseGrabber
     focusable: false
     visible: false
+
+  TopStatsBar
+    id: gameTopPanel
+    anchors.left: gameLeftExtraPanel.right
+    anchors.right: gameRightExtraPanel.left
+    anchors.top: parent.top
+    focusable: false
+  Button
+    id: leftIncreaseSidePanels
+    anchors.left: gameLeftExtraPanel.right
+    anchors.top: parent.top
+    image-source: /images/ui/topstats_button_panel
+    image-clip: 27 0 9 27
+    size: 9 27
+    @onClick: onIncreaseLeftPanels()
+
+    $pressed !disabled:
+      image-clip: 36 0 9 27
+
+    $disabled:
+      image-clip: 45 0 9 27
+
+  Button
+    id: leftDecreaseSidePanels
+    anchors.left: leftIncreaseSidePanels.left
+    anchors.top: leftIncreaseSidePanels.bottom
+    image-source: /images/ui/topstats_button_panel
+    image-clip: 0 0 9 27
+    size: 9 27
+    @onClick: onDecreaseLeftPanels()
+
+    $pressed !disabled:
+      image-clip: 9 0 9 27
+
+    $disabled:
+      image-clip: 18 0 9 27
+
+  Button
+    id: rightIncreaseSidePanels
+    anchors.right: gameRightExtraPanel.left
+    anchors.top: parent.top
+    image-source: /images/ui/topstats_button_panel
+    image-clip: 27 27 9 27
+    size: 9 27
+    @onClick: onIncreaseRightPanels()
+
+    $pressed !disabled:
+      image-clip: 36 27 9 27
+
+    $disabled:
+      image-clip: 45 27 9 27
+
+  Button
+    id: rightDecreaseSidePanels
+    anchors.right: rightIncreaseSidePanels.right
+    anchors.top: rightIncreaseSidePanels.bottom
+    image-source: /images/ui/topstats_button_panel
+    image-clip: 0 27 9 27
+    size: 9 27
+    @onClick: onDecreaseRightPanels()
+
+    $pressed !disabled:
+      image-clip: 9 27 9 27
+
+    $disabled:
+      image-clip: 18 27 9 27

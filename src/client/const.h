@@ -546,9 +546,9 @@ namespace Otc
         GameSmoothWalkElevation = 115,
         GameNegativeOffset = 116,
         GameItemTooltipV8 = 117,
-        GameForgeConvergence = 118,
-
-        LastGameFeature,
+        GameWingsAurasEffectsShader = 118,
+        GameForgeConvergence = 119,
+        LastGameFeature
     };
 
     enum MagicEffectsType_t : uint8_t

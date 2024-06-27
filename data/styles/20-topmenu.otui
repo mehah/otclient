@@ -24,14 +24,40 @@ TopToggleButton < UIButton
   size: 26 26
   image-source: /images/ui/button_topgame
   image-clip: 26 0 26 26
-  image-color: #ffffffff
   image-border: 3
-  icon-color: #ffffffff
+  icon-offset: 0 0
+
+  $pressed:
+    image-clip: 52 0 26 26
+    icon-offset: 1 1
+
+  $disabled:
+    image-clip: 0 0 26 26
+    icon-offset: 1 1
+
+largeToggleButton < UIButton
+  size: 108 20
+  image-source: /images/options/store_large
+  image-clip: 0 0 108 20
+  image-border: 3
+
+  $pressed:
+    image-clip: 0 20 108 20
 
   $on:
-    image-clip: 0 0 26 26
-    image-color: #ffffffff
-    icon-color: #ffffffff
+    image-clip: 0 20 108 20
+	
+MainToggleButton < UIButton
+  size: 20 20
+  image-source: /images/options/button_empty
+  image-clip: 0 0 20 20
+  image-border: 3
+
+  $pressed:
+    image-clip: 20 0 20 20
+
+  $on:
+    image-clip: 20 0 20 20
 
 TopMenuButtonsPanel < Panel
   layout:

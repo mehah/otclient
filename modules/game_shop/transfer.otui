@@ -1,0 +1,80 @@
+MainWindow
+  id: transferWindow
+  !text: tr('Gift Tibia Coins')
+  size: 280 240
+  @onEscape: modules.game_shop.hideTransfer()
+
+  Label
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    text-wrap: true
+    height: 56
+    !text: tr('Please select the amount of Tibia Coins you would like to gift and enter the name of the character that should receive the Tibia Coins.')
+
+  Label
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    margin-top: 20
+    !text: tr('Reciepient:')
+
+  TextEdit
+    id: recipient
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.right: parent.right
+    width: 150
+    text-align: left
+
+  Label
+    id: coinsBalance
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 10
+    text-align: center
+    !text: tr('Transferable Tibia Coins:')
+
+  Label
+    id: coinsAmountLabel
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    margin-top: 20
+    !text: tr('Amount to gift: ')
+
+  SpinBox
+    id: coinsAmount
+    anchors.right: parent.right
+    width: 100
+    anchors.verticalCenter: prev.verticalCenter
+    text: 0
+    minimum: 0
+    maximum: 0
+    focusable: true
+    editable: true
+
+  HorizontalSeparator
+    anchors.right: parent.right
+    anchors.left: parent.left
+    anchors.bottom: cancelButton.top
+    margin-bottom: 8    
+
+  Button
+    id: cancelButton
+    !text: tr('Cancel')
+    font: cipsoftFont
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    size: 45 21
+    margin-top: 15
+    margin-right: 5
+    @onClick: modules.game_shop.hideTransfer()
+
+  Button
+    id: giftButton
+    !text: tr('Gift')
+    font: cipsoftFont
+    size: 45 21
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.right: prev.left
+    margin-right: 5
+    @onClick: modules.game_shop.transferCoins()

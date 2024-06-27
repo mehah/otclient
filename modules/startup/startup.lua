@@ -6,11 +6,11 @@ function init()
     if g_platform.isMobile() then
         g_window.setMinimumSize({ width = 640, height = 360 })
     else
-        g_window.setMinimumSize({ width = 800, height = 640 })
+        g_window.setMinimumSize({ width = 1020, height = 644 })
     end
 
     -- window size
-    local size = { width = 1024, height = 600 }
+    local size = { width = 1020, height = 644 }
     size = g_settings.getSize('window-size', size)
     g_window.resize(size)
 
