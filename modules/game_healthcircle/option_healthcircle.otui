@@ -139,7 +139,7 @@ Panel
     height: 32
   
     Label
-      !text: tr('Top Bar Style:')
+      !text: tr('Bar Style:')
       anchors.left: parent.left
       margin-left: 18
       color: #c0c0c0ff
