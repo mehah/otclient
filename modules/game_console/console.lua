@@ -247,6 +247,7 @@ function init()
 
     -- toggle WASD
     consoleToggleChat = consolePanel:getChildById('toggleChat')
+    
     load()
 
     if g_game.isOnline() then

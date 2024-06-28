@@ -139,17 +139,26 @@ Panel
     height: 32
   
     Label
-      !text: tr('Top Bar Style:')
+      !text: tr('Bar Style:')
       anchors.left: parent.left
       margin-left: 18
       color: #c0c0c0ff
       anchors.verticalCenter: parent.verticalCenter
 
     QtComboBox
-      id: chooseTopBarDimension
+      id: chooseStatsBarPlacement
       width: 120
       margin-left: 10
       anchors.verticalCenter: prev.verticalCenter
       anchors.left: prev.right
       mouse-scroll: false
-      @onTextChange: modules.game_interface.setStatsBarOption(self:getCurrentOption().data, 'top')
+      @onTextChange: modules.game_healthcircle.updateStatsBar()
+
+    QtComboBox
+      id: chooseStatsBarDimension
+      width: 120
+      margin-left: 10
+      anchors.verticalCenter: prev.verticalCenter
+      anchors.left: prev.right
+      mouse-scroll: false
+      @onTextChange: modules.game_healthcircle.updateStatsBar()
