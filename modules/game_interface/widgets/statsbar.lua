@@ -280,6 +280,9 @@ local function getStatsBarsIconContent()
         iconContents[#iconContents+1] = { content = statsBar.icons, loadIconTransparent = true }
     end
 
+    iconContents[#iconContents+1] = { content = modules.game_inventory.getIconsPanelOn(), loadIconTransparent = false }
+    iconContents[#iconContents+1] = { content = modules.game_inventory.getIconsPanelOff(), loadIconTransparent = false }
+
     return iconContents
 end
 
