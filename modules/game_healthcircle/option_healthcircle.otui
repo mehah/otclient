@@ -146,10 +146,19 @@ Panel
       anchors.verticalCenter: parent.verticalCenter
 
     QtComboBox
-      id: chooseTopBarDimension
+      id: chooseStatsBarPlacement
       width: 120
       margin-left: 10
       anchors.verticalCenter: prev.verticalCenter
       anchors.left: prev.right
       mouse-scroll: false
-      @onTextChange: modules.game_interface.setStatsBarOption(self:getCurrentOption().data, 'top')
+      @onTextChange: modules.game_healthcircle.updateStatsBar()
+
+    QtComboBox
+      id: chooseStatsBarDimension
+      width: 120
+      margin-left: 10
+      anchors.verticalCenter: prev.verticalCenter
+      anchors.left: prev.right
+      mouse-scroll: false
+      @onTextChange: modules.game_healthcircle.updateStatsBar()
