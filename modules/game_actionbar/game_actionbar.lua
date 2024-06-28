@@ -216,6 +216,16 @@ function setupActionBar()
     end
 end
 
+function setActionBarVisible(visible)
+    if visible then
+        actionBar:setHeight(34)
+        actionBar:show()
+    else
+        actionBar:setHeight(0)
+        actionBar:hide()
+    end
+end
+
 function createMenu(slotId)
     local menu = g_ui.createWidget('PopupMenu')
     slotToEdit = slotId

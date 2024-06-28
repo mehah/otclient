@@ -247,6 +247,7 @@ function init()
 
     -- toggle WASD
     consoleToggleChat = consolePanel:getChildById('toggleChat')
+    
     load()
 
     if g_game.isOnline() then
@@ -282,10 +283,8 @@ function toggleChat()
     consoleToggleChat.isChecked = not consoleToggleChat.isChecked
     if consoleToggleChat.isChecked then
         consoleToggleChat:setText(tr('Chat Off'))
-        consoleToggleChat.isChecked = true
     else
         consoleToggleChat:setText(tr('Chat On'))
-        consoleToggleChat.isChecked = false
     end
 end
 
@@ -372,6 +371,8 @@ function disableChatOnCall()
     if isChatEnabled() and not consoleToggleChat.isChecked then
         toggleChat()
     end
+
+    updateChatMode()
 end
 
 function isChatEnabled()
@@ -447,6 +448,7 @@ function load()
         else
             consoleToggleChat:setText(tr('Chat On'))
         end
+        updateChatMode()
     end
     loadCommunicationSettings()
 end

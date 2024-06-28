@@ -302,6 +302,18 @@ return {
             modules.game_interface.getLeftPanel():setOn(value)
         end
     },
+    showActionbar                    = {
+        value = false,
+        action = function(value, options, controller, panels, extraWidgets)
+            modules.game_actionbar.setActionBarVisible(value)
+        end
+    },
+    showSpellGroupCooldowns           = {
+        value = true,
+        action = function(value, options, controller, panels, extraWidgets)
+            modules.game_cooldown.setSpellGroupCooldownsVisible(value)
+        end
+    },
     showRightExtraPanel               = {
         value = false,
         action = function(value, options, controller, panels, extraWidgets)

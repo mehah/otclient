@@ -11,6 +11,7 @@ gameSelectedPanel = nil
 panelsList = {}
 panelsRadioGroup = nil
 gameTopPanel = nil
+gameBottomStatsBarPanel = nil
 gameBottomPanel = nil
 showTopMenuButton = nil
 logoutButton = nil
@@ -78,6 +79,7 @@ function init()
     gameLeftPanel = gameRootPanel:getChildById('gameLeftPanel')
     gameBottomPanel = gameRootPanel:getChildById('gameBottomPanel')
     gameTopPanel = gameRootPanel:getChildById('gameTopPanel')
+    gameBottomStatsBarPanel = gameRootPanel:getChildById('gameBottomStatsBarPanel')
 
     leftIncreaseSidePanels = gameRootPanel:getChildById('leftIncreaseSidePanels')
     leftDecreaseSidePanels = gameRootPanel:getChildById('leftDecreaseSidePanels')
@@ -1171,6 +1173,10 @@ function getGameTopStatsBar()
     return gameTopPanel
 end
 
+function getGameBottomStatsBar()
+    return gameBottomStatsBarPanel
+end
+
 function getGameMapPanel()
     return gameMapPanel
 end
@@ -1280,8 +1286,9 @@ function limitZoom()
 end
 
 
-function setStatsBarOption(dimension, placement)
-    StatsBar.setStatsBarOption(dimension, placement)
+function updateStatsBar(dimension, placement)
+    StatsBar.updateCurrentStats(dimension, placement)
+    StatsBar.updateStatsBarOption()
 end
 
 function onIncreaseLeftPanels()
