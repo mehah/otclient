@@ -1,3 +1,7 @@
+analyzerButton = nil
+analyzerWindow = nil
+expAnalyzerButton = nil
+
 function init()
     analyzerButton = modules.game_mainpanel.addToggleButton('analyzerButton', 
                                                             tr('Open analytics selector window'),
@@ -9,6 +13,8 @@ function init()
 
     analyzerWindow = g_ui.loadUI('game_analyzer')
     analyzerWindow:disableResize()
+
+    expAnalyzerButton = analyzerWindow:getChildById('expAnalyzerButton')
 
     connect(g_game, {
         onGameStart = online,
@@ -57,4 +63,8 @@ end
 
 function offline()
     analyzerWindow:setParent(nil, true)
+end
+
+function toggleAnalyzer(analyzer)
+    analyzer:setChecked(not expAnalyzerButton:isChecked())
 end
