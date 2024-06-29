@@ -1,19 +1,14 @@
 function init()
-    -- bottomPanel = modules.game_interface.getBottomPanel()
-    
-    print("analyzerxloaded")
-
     analyzerButton = modules.game_mainpanel.addToggleButton('analyzerButton', 
                                                             tr('Open analytics selector window'),
                                                             '/images/options/analyzers',
                                                             toggle)
 
-    analyzerButton:setOn(true)
+    analyzerButton:setOn(false)
     analyzerButton:hide()
 
     analyzerWindow = g_ui.loadUI('game_analyzer')
     analyzerWindow:disableResize()
-    analyzerWindow:setup()
 
     connect(g_game, {
         onGameStart = online,
@@ -43,9 +38,8 @@ function toggle()
         analyzerWindow:close()
         analyzerWindow:setOn(false)
     else
-        -- analyzerWindow:getMinimumHeight()
         if not analyzerWindow:getParent() then
-            local panel = modules.game_interface.findContentPanelAvailable(analyzerWindow, 200)
+            local panel = modules.game_interface.findContentPanelAvailable(analyzerWindow, analyzerWindow:getMinimumHeight())
             if not panel then
                 return
             end
@@ -58,9 +52,9 @@ function toggle()
 end
 
 function online()
-
+    analyzerButton:show()
 end
 
 function offline()
-    
+    analyzerWindow:setParent(nil, true)
 end
