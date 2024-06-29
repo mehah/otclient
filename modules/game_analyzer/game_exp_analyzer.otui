@@ -1,0 +1,7 @@
+MiniWindow
+  id: expAnalyzerWindow
+  !text: tr('XP Analyzer')
+  height: 63
+  @onOpen: modules.game_analyzer.onMiniWindowOpen()
+  @onClose: modules.game_analyzer.onMiniWindowClose()
+  &save: true

@@ -4,5 +4,9 @@ Module
   scripts: [ game_analyzer ]
   reloadable: true
   autoload: true
-  @onLoad: init()
-  @onUnload: terminate()
+  @onLoad: |
+    dofile 'game_analyzer'
+    GameAnalyzer.init()
+
+  @onUnload: |
+    GameAnalyzer.terminate()

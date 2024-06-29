@@ -1,20 +1,40 @@
+GameAnalyzer = {}
+GameExpAnalyzer = {}
+
+Analyzers = {
+    GameExpAnalyzer = {
+        name = "Experience",
+        toggle = GameExpAnalyzerToggle,
+    },
+}
+
+contentPanel = nil
 analyzerButton = nil
 analyzerWindow = nil
-expAnalyzerButton = nil
+expAnalyzerWindow = nil
 
-function init()
+function GameAnalyzer.init()
+    print("Init 2")
     analyzerButton = modules.game_mainpanel.addToggleButton('analyzerButton', 
                                                             tr('Open analytics selector window'),
                                                             '/images/options/analyzers',
-                                                            toggle)
+                                                            GameAnalyzer.toggle)
 
     analyzerButton:setOn(false)
-    analyzerButton:hide()
-
     analyzerWindow = g_ui.loadUI('game_analyzer')
+    expAnalyzerWindow = g_ui.loadUI('game_exp_analyzer')
+    xerecaAnalyzerWindow = g_ui.loadUI('game_xereca_analyzer')
+
     analyzerWindow:disableResize()
 
-    expAnalyzerButton = analyzerWindow:getChildById('expAnalyzerButton')
+    GameExpAnalyzer = modules.game_exp_analyzer
+    
+
+    loadContentPanel()
+
+    
+
+    -- expAnalyzerButton = analyzerWindow:recursiveGetChildById('expAnalyzerButton')
 
     connect(g_game, {
         onGameStart = online,
@@ -22,13 +42,16 @@ function init()
     })
 end
 
-function terminate()
+function GameAnalyzer.terminate()
     analyzerButton:destroy()
     analyzerWindow:destroy()
     disconnect(g_game, {
         onGameStart = online,
         onGameEnd = offline,
     })
+
+    GameAnalyzer = nil
+    GameExpAnalyzer = nil
 end
 
 function onMiniWindowOpen()
@@ -39,18 +62,21 @@ function onMiniWindowClose()
     analyzerButton:setOn(false)
 end
 
-function toggle()
+function loadContentPanel()
+    contentPanel = modules.game_interface.findContentPanelAvailable(analyzerWindow, analyzerWindow:getMinimumHeight())
+    if not contentPanel then
+        print("No content panel available")
+        return
+    end
+end
+
+function GameAnalyzer.toggle()
     if analyzerButton:isOn() then
         analyzerWindow:close()
         analyzerWindow:setOn(false)
     else
         if not analyzerWindow:getParent() then
-            local panel = modules.game_interface.findContentPanelAvailable(analyzerWindow, analyzerWindow:getMinimumHeight())
-            if not panel then
-                return
-            end
-
-            panel:addChild(analyzerWindow)
+            contentPanel:addChild(analyzerWindow)
         end
         analyzerWindow:open()
         analyzerButton:setOn(true)
@@ -62,9 +88,42 @@ function online()
 end
 
 function offline()
+    analyzerButton:hide()
     analyzerWindow:setParent(nil, true)
 end
 
 function toggleAnalyzer(analyzer)
-    analyzer:setChecked(not expAnalyzerButton:isChecked())
+    analyzer:setChecked(not analyzer:isChecked())
+    toggleFromAnalyzer(analyzer)
+end
+
+function toggleFromAnalyzer(analyzer)
+    local analyzerType = getFirstWordBeforeCapital(analyzer:getId())
+    analyzerType = 'Game' .. analyzerType .. 'Analyzer'
+    
+    local analyzerConfig = Analyzers[analyzerType]
+    if analyzerConfig and analyzerConfig.toggle then
+        analyzerConfig.toggle(analyzer)
+    else
+        print("Toggle function for " .. analyzerType .. " not found")
+    end
+end
+
+function GameExpAnalyzerToggle(analyzer)
+    if analyzer:isChecked() then
+        if not expAnalyzerWindow:getParent() then
+            contentPanel:addChild(expAnalyzerWindow)
+        end
+        expAnalyzerWindow:open()
+    else
+        expAnalyzerWindow:close()
+    end
+end
+
+function getFirstWordBeforeCapital(str)
+    local firstWord = str:match("^[^A-Z]*")
+    if firstWord then
+        firstWord = firstWord:sub(1, 1):upper() .. firstWord:sub(2)
+    end
+    return firstWord
 end
