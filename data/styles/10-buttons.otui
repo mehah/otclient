@@ -10,9 +10,6 @@ Button < UIButton
   padding: 5 10 5 10
   opacity: 1.0
 
-  $hover !disabled:
-    image-clip: 0 23 22 23
-
   $pressed:
     image-clip: 0 46 22 23
     text-offset: 1 1
@@ -85,3 +82,106 @@ AddButton < UIButton
 
   $disabled:
     image-color: #dfdfdf55
+
+PreviousConsoleQtButton < UIButton
+  size: 18 16
+  image-source: /images/ui/console_direction_button
+  image-clip: 36 0 18 16
+
+  $pressed:
+    image-clip: 18 0 18 16
+
+  $pressed disabled:
+    image-clip: 0 0 18 16
+
+  $disabled:
+    image-clip: 54 0 18 16
+
+PreviousConsoleRedQtButton < UIButton
+  size: 18 16
+  image-source: /images/ui/console_direction_button
+  image-clip: 90 0 18 16
+
+  $pressed:
+    image-clip: 72 0 18 16
+
+  $pressed disabled:
+    image-clip: 0 0 18 16
+
+  $disabled:
+    image-clip: 54 0 18 16
+
+NextConsoleQtButton < UIButton
+  size: 18 16
+  image-source: /images/ui/console_direction_button
+  image-clip: 36 16 18 16
+
+  $pressed:
+    image-clip: 18 16 18 16
+
+  $pressed disabled:
+    image-clip: 0 16 18 16
+
+  $disabled:
+    image-clip: 54 16 18 16
+
+NextConsoleRedQtButton < UIButton
+  size: 18 16
+  image-source: /images/ui/console_direction_button
+  image-clip: 90 16 18 16
+
+  $pressed:
+    image-clip: 72 16 18 16
+
+  $pressed disabled:
+    image-clip: 0 16 18 16
+
+  $disabled:
+    image-clip: 54 16 18 16
+
+PreviousQtButton < UIButton
+  size: 16 16
+  image-source: /images/ui/regular_direction_button
+  image-clip: 32 0 16 16
+
+  $pressed:
+    image-clip: 16 0 16 16
+
+  $pressed disabled:
+    image-clip: 0 0 16 16
+
+  $disabled:
+    image-clip: 48 0 16 16
+
+NextQtButton < UIButton
+  size: 16 16
+  image-source: /images/ui/regular_direction_button
+  image-clip: 32 16 16 16
+
+  $pressed:
+    image-clip: 16 16 16 16
+
+  $pressed disabled:
+    image-clip: 0 16 16 16
+
+  $disabled:
+    image-clip: 48 16 16 16
+
+QtButton < UIButton
+  font: cipsoftFont
+  size: 106 23
+  text-offset: 0 0
+  image-source: /images/ui/button
+  image-clip: 0 0 22 23
+  image-border: 3
+  padding: 5 10 5 10
+  opacity: 1.0
+  color: #b9b9b9ff
+
+  $pressed:
+    image-clip: 0 46 22 23
+    text-offset: 1 1
+
+  $disabled:
+    color: #dfdfdf88
+    opacity: 0.8

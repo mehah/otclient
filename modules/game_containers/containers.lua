@@ -154,7 +154,7 @@ function onContainerOpen(container, previousContainer)
     local layout = containerPanel:getLayout()
     local cellSize = layout:getCellSize()
     containerWindow:setContentMinimumHeight(cellSize.height)
-    containerWindow:setContentMaximumHeight(cellSize.height * layout:getNumLines())
+    containerWindow:setContentMaximumHeight(cellSize.height * layout:getNumLines() + 15)
 
     if not previousContainer then
         local panel = modules.game_interface.findContentPanelAvailable(containerWindow, cellSize.height)

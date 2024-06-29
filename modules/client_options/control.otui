@@ -1,72 +1,104 @@
 Panel
-  OptionCheckBox
-    id: classicControl
-    !text: tr('Classic control')
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    height: 22
 
-  OptionCheckBox
-    id: autoChaseOverride
-    !text: tr('Allow auto chase override')
+    OptionCheckBox
+      id: classicControl
+      !text: tr('Classic control')
 
-  OptionCheckBox
-    id: moveStack
-    !text: tr('Move stacks directly')
-
-  OptionCheckBox
-    id: smartWalk
-    !text: tr('Enable smart walking')
-    !tooltip: tr('Will detect when to use diagonal step based on the\nkeys you are pressing')
-
-  OptionCheckBox
-    id: preciseControl
-    !text: tr('Enable precise control')
-    !tooltip: tr('You will have more precision over the character walking,\nbut it can feel more abrupt or unnatural')
-    @onCheckChange: g_game.setScheduleLastWalk(not self:isChecked())
-
-  Label
-    id: turnDelayLabel
-    !text: tr('Turn delay: %sms', 30)
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 12
-    @onSetup: |
-      local value = modules.client_options.getOption('turnDelay')
-      self:setText(tr('Turn delay: %dms', value))
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: autoChaseOverride
+      !text: tr('Allow auto chase override')
 
-  OptionScrollbar
-    id: turnDelay
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 3
-    minimum: 30
-    maximum: 250
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: moveStack
+      !text: tr('Move stacks directly')
 
-  Label
-    id: hotkeyDelayLabel
-    !text: tr('Hotkey delay: %dms', 30)
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 12
-    @onSetup: |
-      local value = modules.client_options.getOption('hotkeyDelay')
-      self:setText(tr('Hotkey delay: %dms', value))
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBoxMarked
+      id: smartWalk
+      !text: tr('Enable smart walking')
+      !tooltip: tr('Will detect when to use diagonal step based on the\nkeys you are pressing')
 
-  OptionScrollbar
-    id: hotkeyDelay
+  SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 3
-    minimum: 30
-    maximum: 250
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBoxMarked
+      id: preciseControl
+      !text: tr('Enable precise control')
+      !tooltip: tr('You will have more precision over the character walking,\nbut it can feel more abrupt or unnatural')
+      @onCheckChange: g_game.setScheduleLastWalk(not self:isChecked())
 
-  Button
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+
+    OptionScaleScroll
+      id: turnDelay
+      !text: tr('Turn delay: 30ms')
+      anchors.fill: parent
+      &minimumScrollValue: 30
+      &maximumScrollValue: 250
+      &scrollSize: 21
+      @onSetup: |
+        local value = modules.client_options.getOption('turnDelay')
+        self:setText(tr('Turn delay: %dms', value))
+
+  SmallReversedQtPanel
+    id: hotkeyDelay_label
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+
+    OptionScaleScroll
+      id: hotkeyDelay
+      !text: tr('Hotkey delay: 30ms')
+      anchors.fill: parent
+      &minimumScrollValue: 30
+      &maximumScrollValue: 250
+      &scrollSize: 21
+      @onSetup: |
+        local value = modules.client_options.getOption('hotkeyDelay')
+        self:setText(tr('Hotkey delay: %dms', value))
+
+  QtButton
     id: hotkeysButton
-    !text: tr('Set hotkeys')
+    !text: tr('Hotkeys Manager')
     @onClick: modules.game_hotkeys.show()
     anchors.top: prev.bottom
     anchors.left: parent.left
     margin-top: 12
-    width: 120
+
+    size: 120 20

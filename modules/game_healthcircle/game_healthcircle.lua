@@ -505,15 +505,15 @@ manaCheckBox = nil
 experienceCheckBox = nil
 skillCheckBox = nil
 chooseSkillComboBox = nil
-distFromCenLabel = nil
+chooseStatsBarDimension = nil
+chooseStatsBarPlacement = nil
 distFromCenScrollbar = nil
-opacityLabel = nil
 opacityScrollbar = nil
 
 function addToOptionsModule()
     -- Add to options module
     optionPanel = g_ui.loadUI('option_healthcircle')
-    modules.client_options.addTab(tr('HP/MP Circle'), optionPanel, '/images/optionstab/health_circle')
+    modules.client_options.addTab('HP/MP Circle', optionPanel, '/images/icons/icon_health')
 
     -- UI values
     healthCheckBox = optionPanel:recursiveGetChildById('healthCheckBox')
@@ -521,20 +521,34 @@ function addToOptionsModule()
     experienceCheckBox = optionPanel:recursiveGetChildById('experienceCheckBox')
     skillCheckBox = optionPanel:recursiveGetChildById('skillCheckBox')
     chooseSkillComboBox = optionPanel:recursiveGetChildById('chooseSkillComboBox')
-    distFromCenLabel = optionPanel:recursiveGetChildById('distFromCenLabel')
+    chooseStatsBarDimension = optionPanel:recursiveGetChildById('chooseStatsBarDimension')
+    chooseStatsBarPlacement = optionPanel:recursiveGetChildById('chooseStatsBarPlacement')
     distFromCenScrollbar = optionPanel:recursiveGetChildById('distFromCenScrollbar')
-    opacityLabel = optionPanel:recursiveGetChildById('opacityLabel')
     opacityScrollbar = optionPanel:recursiveGetChildById('opacityScrollbar')
 
     -- ComboBox start values
-    chooseSkillComboBox:addOption(tr('Magic Level'), 'magic')
-    chooseSkillComboBox:addOption(tr('Fist Fighting'), 'fist')
-    chooseSkillComboBox:addOption(tr('Club Fighting'), 'club')
-    chooseSkillComboBox:addOption(tr('Sword Fighting'), 'sword')
-    chooseSkillComboBox:addOption(tr('Axe Fighting'), 'axe')
-    chooseSkillComboBox:addOption(tr('Distance Fighting'), 'distance')
-    chooseSkillComboBox:addOption(tr('Shielding'), 'shielding')
-    chooseSkillComboBox:addOption(tr('Fishing'), 'fishing')
+    chooseSkillComboBox:addOption('Magic Level', 'magic')
+    chooseSkillComboBox:addOption('Fist Fighting', 'fist')
+    chooseSkillComboBox:addOption('Club Fighting', 'club')
+    chooseSkillComboBox:addOption('Sword Fighting', 'sword')
+    chooseSkillComboBox:addOption('Axe Fighting', 'axe')
+    chooseSkillComboBox:addOption('Distance Fighting', 'distance')
+    chooseSkillComboBox:addOption('Shielding', 'shielding')
+    chooseSkillComboBox:addOption('Fishing', 'fishing')
+
+    chooseStatsBarPlacement:addOption(tr('Top'), 'top')
+    chooseStatsBarPlacement:addOption(tr('Bottom'), 'bottom')
+
+    chooseStatsBarDimension:addOption(tr('Hide'), 'hide')
+    chooseStatsBarDimension:addOption(tr('Compact'), 'compact')
+    chooseStatsBarDimension:addOption(tr('Default'), 'default')
+    chooseStatsBarDimension:addOption(tr('Large'), 'large')
+    chooseStatsBarDimension:addOption(tr('Parallel'), 'parallel')
+
+    statsBarMenuLoaded = true
+
+    chooseStatsBarDimension:setCurrentOptionByData(g_settings.getString('statsbar_dimension'), true)
+    chooseStatsBarPlacement:setCurrentOptionByData(g_settings.getString('statsbar_placement'), true)
 
     -- Set values
     healthCheckBox:setChecked(isHealthCircle)
@@ -545,10 +559,16 @@ function addToOptionsModule()
     -- Prevent skill overwritten before initialize
     skillsLoaded = true
 
-    distFromCenLabel:setText('Distance: ' .. distanceFromCenter)
+    distFromCenScrollbar:setText(tr('Distance') .. ': ' .. distanceFromCenter)
     distFromCenScrollbar:setValue(distanceFromCenter)
-    opacityLabel:setText('Opacity: ' .. opacityCircle)
+    opacityScrollbar:setText(tr('Opacity') .. ': ' .. opacityCircle)
     opacityScrollbar:setValue(opacityCircle * 100)
+end
+
+function updateStatsBar()
+    if statsBarMenuLoaded then
+        modules.game_interface.updateStatsBar(chooseStatsBarDimension:getCurrentOption().data, chooseStatsBarPlacement:getCurrentOption().data)
+    end
 end
 
 function setPlayerValues()
@@ -559,16 +579,21 @@ function setPlayerValues()
     chooseSkillComboBox:setCurrentOptionByData(skillType, true)
 end
 
+function setStatsBarOption(dimension, placement)
+    chooseStatsBarDimension:setCurrentOptionByData(dimension, true)
+    chooseStatsBarPlacement:setCurrentOptionByData(placement, true)
+end
+
 function destroyOptionsModule()
     healthCheckBox = nil
     manaCheckBox = nil
     experienceCheckBox = nil
     skillCheckBox = nil
     chooseSkillComboBox = nil
-    distFromCenLabel = nil
     distFromCenScrollbar = nil
-    opacityLabel = nil
     opacityScrollbar = nil
+    chooseStatsBarDimension = nil
+    chooseStatsBarPlacement = nil
 
     modules.client_options.removeTab('HP/MP Circle')
     optionPanel = nil

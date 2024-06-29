@@ -1,0 +1,193 @@
+ShowOffWidget < UIWidget
+  anchors.fill: parent
+
+  Label
+    id: image
+    size: 64 64
+    anchors.left: parent.left
+    anchors.top: parent.top
+    margin-top: 28
+    margin-left: 10
+    image-auto-resize: true
+
+  Label
+    id: description
+    anchors.left: image.right
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    anchors.top: image.top
+    margin-top: 10
+    margin-left: 10
+    margin-right: 40
+    color: #c0c0c0ff
+    text-wrap: true
+
+Panel
+  id: bottomMenu
+  size: 1020 116
+  anchors.bottom: parent.bottom
+  anchors.horizontalCenter: parent.horizontalCenter
+  image-source: /images/ui/panel_top
+  
+  UIWidget
+    phantom: true
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    text-align: center
+    text-auto-resize: true
+    color: #e98d02
+    margin-bottom: 110
+    text: OTClient Redemption
+    font: verdana-11px-rounded
+    font-scale: 4
+    shader: Map - Party
+
+  MiniQtScrollableWindow
+    id: showOffWindow
+    anchors.bottom: parent.bottom
+    anchors.top: parent.top
+    anchors.left: parent.left
+    size: 605 116
+    draggable: false
+
+    Label
+      id: showOffWindowText
+      !text: tr('Random Hit')
+      font: verdana-11px-antialised
+      text-offset: 0 2
+      text-align: top
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      opacity: 0.5
+
+  MiniQtWindow
+    id: eventsWindow
+    anchors.bottom: parent.bottom
+    anchors.top: parent.top
+    anchors.left: prev.right
+    margin-left: 1
+    size: 246 116
+    draggable: false
+
+    Label
+      !text: tr('Event Schedule')
+      font: verdana-11px-antialised
+      text-offset: 0 2
+      text-align: top
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      opacity: 0.5
+
+    UIWidget
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.bottom: parent.bottom
+      margin-left: 10
+      margin-right: 10
+      margin-top: 22
+      margin-bottom: 8
+      image-source: /images/ui/widget_border
+      padding: 2
+      @onClick: onClickOnCalendar()
+
+      CalendarTopMark
+        !text: tr('Active')
+        &disableLeftBright: true
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.horizontalCenter
+
+      CalendarDay
+        id: activeScheduleEvent
+        anchors.top: prev.bottom
+        anchors.left: prev.left
+        anchors.right: prev.right
+        anchors.bottom: parent.bottom
+
+      CalendarTopMark
+        !text: tr('Upcoming')
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.left: parent.horizontalCenter
+        margin-left: 1  
+
+      CalendarDay
+        id: upcomingScheduleEvent
+        anchors.top: prev.bottom
+        anchors.right: prev.right
+        anchors.left: prev.left
+        anchors.bottom: parent.bottom
+        @onClick: onClickOnCalendar()
+
+  MiniQtWindow
+    id: boostedWindow
+    anchors.bottom: parent.bottom
+    anchors.top: parent.top
+    anchors.left: prev.right
+    margin-left: 1
+    size: 169 116
+    draggable: false
+
+    Label
+      !text: tr('Boosted')
+      font: verdana-11px-antialised
+      text-offset: 0 2
+      text-align: top
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      opacity: 0.5
+
+    Panel
+      anchors.top: parent.top
+      anchors.left: parent.left
+      margin-left: 12
+      margin-top: 30
+      size: 64 64
+      image-source: /images/ui/panel_flat
+
+      Creature
+        id: creature
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+      UIWidget
+        id: creature2
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        visible: false
+
+    Label
+      !text: tr('Creature')
+      anchors.horizontalCenter: prev.horizontalCenter
+      anchors.top: prev.bottom
+      margin-top: 3
+
+    Panel
+      anchors.top: parent.top
+      anchors.right: parent.right
+      margin-right: 12
+      margin-top: 30
+      size: 64 64
+      image-source: /images/ui/panel_flat
+
+      Creature
+        id: boss
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+      UIWidget
+        id: boss2
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        visible: false
+
+    Label
+      !text: tr('Boss')
+      anchors.horizontalCenter: prev.horizontalCenter
+      anchors.top: prev.bottom
+      margin-top: 3

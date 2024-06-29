@@ -5,5 +5,5 @@ Module
   website: https://github.com/edubart/otclient
   sandboxed: true
   scripts: [ healthinfo ]
-  @onLoad: init()
-  @onUnload: terminate()
+  @onLoad: healthManaController:init()
+  @onUnload: healthManaController:terminate()

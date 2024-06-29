@@ -1,93 +1,104 @@
-HealthBar < ProgressBar
-  id: healthBar
-  background-color: #ff4444
-  anchors.top: parent.top
-  anchors.left: parent.left
-  anchors.right: parent.right
-  margin: 1
+PhantomMiniWindow
+  id: mainhealthmanapanel
+  draggable: true
+  phantom: false
+  &panelHeight: 32
+  height: 32
 
-ManaBar < ProgressBar
-  id: manaBar
-  background-color: #4444ff
-  anchors.top: prev.bottom
-  anchors.left: parent.left
-  anchors.right: parent.right
-  margin: 1
-  margin-top: 3
+  UIWidget
+    id: health
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    anchors.bottom: parent.verticalCenter
+    margin-left: 8
+    margin-right: 8
+    margin-top: 8
+    phantom: true
 
-ExperienceBar < ProgressBar
-  id: experienceBar
-  background-color: #B6E866
-  anchors.top: prev.bottom
-  anchors.left: parent.left
-  anchors.right: parent.right
-  margin: 1
-  margin-top: 3
-
-SoulLabel < GameLabel
-  id: soulLabel
-  text-align: right
-  color: white
-  font: verdana-11px-rounded
-  anchors.bottom: parent.bottom
-  anchors.right: parent.right
-  anchors.left: parent.horizontalCenter
-  margin-top: 5
-  margin-right: 3
-  on: true
-
-  $!on:
-    visible: false
-    margin-top: 0
-    height: 0
-
-CapLabel < GameLabel
-  id: capLabel
-  color: white
-  font: verdana-11px-rounded
-  anchors.bottom: parent.bottom
-  anchors.left: parent.left
-  anchors.right: parent.horizontalCenter
-  margin-top: 5
-  margin-left: 3
-  on: true
-
-  $!on:
-    visible: false
-    margin-top: 0
-    height: 0
-
-ConditionWidget < UIWidget
-  size: 18 18
-
-  $!first:
-    margin-left: 2
-
-MiniWindow
-  icon: /images/topbuttons/healthinfo
-  id: healthInfoWindow
-  !text: tr('Health Info')
-  height: 123
-  @onOpen: modules.game_healthinfo.onMiniWindowOpen()
-  @onClose: modules.game_healthinfo.onMiniWindowClose()
-  &save: true
-
-  MiniWindowContents
-    HealthBar
-    ManaBar
-    ExperienceBar
-    Panel
-      id: conditionPanel
-      layout:
-        type: horizontalBox
-      height: 22
-      margin-top: 4
-      padding: 2
-      anchors.top: prev.bottom
+    UIWidget
+      id: icon
+      image-source: /images/healthmana/hitpoints_symbol
       anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      size: 12 11
+
+    Label
+      id: text
+      !text: '155'
       anchors.right: parent.right
-      border-width: 1
-      border-color: #00000077
-      background-color: #ffffff11
-    SoulLabel
-    CapLabel
+      anchors.verticalCenter: parent.verticalCenter
+      width: 44
+      text-align: left
+      color: #c0c0c0ff
+
+    UIWidget
+      id: total
+      anchors.left: icon.right
+      anchors.right: text.left
+      anchors.verticalCenter: parent.verticalCenter
+      image-source: /images/healthmana/hitpoints_manapoints_bar_border
+      image-border-left: 6
+      image-border-right: 6
+      margin-left: 4
+      margin-right: 10
+      height: 11
+
+    UIWidget
+      id: current
+      anchors.left: total.left
+      image-source: /images/healthmana/hitpoints_bar_filled
+      image-border-left: 5
+      image-border-right: 7
+      anchors.verticalCenter: total.verticalCenter
+      height: 11
+      width: 47
+
+  UIWidget
+    id: mana
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.verticalCenter
+    anchors.bottom: parent.bottom
+    margin-left: 8
+    margin-right: 8
+    margin-top: 4
+    phantom: true
+
+    UIWidget
+      id: icon
+      image-source: /images/healthmana/mana_symbol
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      size: 12 11
+
+    Label
+      id: text
+      !text: '60'
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      width: 44
+      text-align: left
+      color: #c0c0c0ff
+
+    UIWidget
+      id: total
+      anchors.left: icon.right
+      anchors.right: text.left
+      anchors.verticalCenter: parent.verticalCenter
+      image-source: /images/healthmana/hitpoints_manapoints_bar_border
+      image-border-left: 6
+      image-border-right: 6
+      margin-left: 4
+      margin-right: 10
+      height: 11
+
+    UIWidget
+      id: current
+      anchors.left: total.left
+      image-source: /images/healthmana/mana_bar_filled
+      image-border-left: 5
+      image-border-right: 7
+      anchors.verticalCenter: total.verticalCenter
+      height: 11
+      width: 47
