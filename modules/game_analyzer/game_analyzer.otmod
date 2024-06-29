@@ -1,0 +1,8 @@
+Module
+  name: game_analyzer
+  sandboxed: true
+  scripts: [ game_analyzer ]
+  reloadable: true
+  autoload: true
+  @onLoad: init()
+  @onUnload: terminate()
