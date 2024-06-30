@@ -1586,7 +1586,7 @@ void ProtocolGame::parseCreatureLight(const InputMessagePtr& msg)
 
     const auto& creature = g_map.getCreatureById(id);
     if (!creature) {
-        g_logger.traceError("ProtocolGame::parseCreatureLight: could not get creature");
+        g_logger.traceError(stdext::format("ProtocolGame::parseCreatureLight: could not get creature with id %d", id));
         return;
     }
 
@@ -1649,7 +1649,7 @@ void ProtocolGame::parseCreatureShields(const InputMessagePtr& msg)
 
     const auto& creature = g_map.getCreatureById(id);
     if (!creature) {
-        g_logger.traceError("ProtocolGame::parseCreatureShields: could not get creature");
+        g_logger.traceError(stdext::format("ProtocolGame::parseCreatureShields: could not get creature with id %d", id));
         return;
     }
 
