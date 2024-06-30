@@ -200,8 +200,8 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerTrappers:
                     parseTrappers(msg);
                     break;
-                case Proto::GameServerCreatureIcons:
-                    parseCreatureIcons(msg);
+                case Proto::GameServerCreatureData:
+                    parseCreatureData(msg);
                     break;
                 case Proto::GameServerCreatureHealth:
                     parseCreatureHealth(msg);
@@ -1558,10 +1558,6 @@ void ProtocolGame::parseTrappers(const InputMessagePtr& msg)
 }
 
 void ProtocolGame::addCreatureIcon(const InputMessagePtr& msg, const CreaturePtr& creature) {
-    if (!creature) {
-        return;
-    }
-
     const uint8_t sizeIcons = msg->getU8();
     for (auto i = 0; i < sizeIcons; ++i) {
         msg->getU8(); // icon.serialize()
@@ -1572,18 +1568,33 @@ void ProtocolGame::addCreatureIcon(const InputMessagePtr& msg, const CreaturePtr
     // TODO: implement creature icons usage
 }
 
-void ProtocolGame::parseCreatureIcons(const InputMessagePtr& msg)
+void ProtocolGame::parseCreatureData(const InputMessagePtr& msg)
 {
     const uint32_t id = msg->getU32();
-    msg->getU8(); // event 14: player icons
+    const uint8_t type = msg->getU8();
 
     const auto& creature = g_map.getCreatureById(id);
     if (!creature) {
-        g_logger.traceError(stdext::format("ProtocolGame::parseCreatureIcons: could not get creature with id %d", id));
-        return;
+        g_logger.traceError(stdext::format("ProtocolGame::parseCreatureData: could not get creature with id %d", id));
     }
 
-    addCreatureIcon(msg, creature);
+    switch (type) {
+        case 0: // creature update
+            getCreature(msg);
+            break;
+        case 11: // creature mana percent
+            msg->getU8();
+            break;
+        case 12: // creature show status
+            msg->getU8();
+            break;
+        case 13: // player vocation
+            msg->getU8();
+            break;
+        case 14: // creature icons
+            addCreatureIcon(msg, creature);
+            break;
+    }
 }
 
 void ProtocolGame::parseCreatureHealth(const InputMessagePtr& msg)
