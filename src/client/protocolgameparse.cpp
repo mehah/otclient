@@ -200,6 +200,9 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerTrappers:
                     parseTrappers(msg);
                     break;
+                case Proto::GameServerCreatureIcons:
+                    parseCreatureIcons(msg);
+                    break;
                 case Proto::GameServerCreatureHealth:
                     parseCreatureHealth(msg);
                     break;
@@ -1552,6 +1555,35 @@ void ProtocolGame::parseTrappers(const InputMessagePtr& msg)
         } else
             g_logger.traceError("could not get creature");
     }
+}
+
+void ProtocolGame::addCreatureIcon(const InputMessagePtr& msg, const CreaturePtr& creature) {
+    if (!creature) {
+        return;
+    }
+
+    const uint8_t sizeIcons = msg->getU8();
+    for (auto i = 0; i < sizeIcons; ++i) {
+        msg->getU8(); // icon.serialize()
+        msg->getU8(); // icon.category
+        msg->getU16(); // icon.count
+    }
+
+    // TODO: implement creature icons usage
+}
+
+void ProtocolGame::parseCreatureIcons(const InputMessagePtr& msg)
+{
+    const uint32_t id = msg->getU32();
+    msg->getU8(); // event 14: player icons
+
+    const auto& creature = g_map.getCreatureById(id);
+    if (!creature) {
+        g_logger.traceError(stdext::format("ProtocolGame::parseCreatureIcons: could not get creature with id %d", id));
+        return;
+    }
+
+    addCreatureIcon(msg, creature);
 }
 
 void ProtocolGame::parseCreatureHealth(const InputMessagePtr& msg)

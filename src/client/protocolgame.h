@@ -209,6 +209,8 @@ private:
     void parseItemClasses(const InputMessagePtr& msg);
     void parseCreatureMark(const InputMessagePtr& msg);
     void parseTrappers(const InputMessagePtr& msg);
+    void addCreatureIcon(const InputMessagePtr& msg, const CreaturePtr& creature);
+    void parseCreatureIcons(const InputMessagePtr& msg);
     void parseCreatureHealth(const InputMessagePtr& msg);
     void parseCreatureLight(const InputMessagePtr& msg);
     void parseCreatureOutfit(const InputMessagePtr& msg) const;
