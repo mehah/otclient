@@ -26,6 +26,7 @@
 #include "luaexception.h"
 
 #include <tuple>
+#include <framework/stdext/traits.h>
 
 /// This namespace contains some dirty metaprogamming that uses a lot of C++0x features
 /// The purpose here is to create templates that can bind any function from C++
@@ -123,8 +124,8 @@ namespace luabinder
     template<typename Ret, typename... Args>
     LuaCppFunction bind_fun(const std::function<Ret(Args...)>& f)
     {
-        using Tuple = std::tuple<std::remove_cvref_t<Args>...>;
-        return bind_fun_specializer<std::remove_cvref_t<Ret>,
+        using Tuple = std::tuple<typename stdext::remove_const_ref<Args>::type...>;
+        return bind_fun_specializer<typename stdext::remove_const_ref<Ret>::type,
             decltype(f),
             Tuple>(f);
     }
@@ -138,8 +139,8 @@ namespace luabinder
     {
         static LuaCppFunction call(const Lambda& f)
         {
-            using Tuple = std::tuple<std::remove_cvref_t<Args>...>;
-            return bind_fun_specializer<std::remove_cvref_t<Ret>,
+            using Tuple = std::tuple<typename stdext::remove_const_ref<Args>::type...>;
+            return bind_fun_specializer<typename stdext::remove_const_ref<Ret>::type,
                 decltype(f),
                 Tuple>(f);
         }
@@ -199,9 +200,9 @@ namespace luabinder
     template<typename C, typename Ret, class FC, typename... Args>
     LuaCppFunction bind_mem_fun(Ret(FC::* f)(Args...))
     {
-        using Tuple = std::tuple<std::shared_ptr<FC>, std::remove_cvref_t<Args>...>;
+        using Tuple = std::tuple<std::shared_ptr<FC>, typename stdext::remove_const_ref<Args>::type...>;
         auto lambda = make_mem_func<Ret, FC>(f);
-        return bind_fun_specializer<std::remove_cvref_t<Ret>,
+        return bind_fun_specializer<typename stdext::remove_const_ref<Ret>::type,
             decltype(lambda),
             Tuple>(lambda);
     }
@@ -210,10 +211,10 @@ namespace luabinder
     template<typename C, typename Ret, class FC, typename... Args>
     LuaCppFunction bind_singleton_mem_fun(Ret(FC::* f)(Args...), C* instance)
     {
-        using Tuple = std::tuple<std::remove_cvref_t<Args>...>;
+        using Tuple = std::tuple<typename stdext::remove_const_ref<Args>::type...>;
         assert(instance);
         auto lambda = make_mem_func_singleton<Ret, FC>(f, static_cast<FC*>(instance));
-        return bind_fun_specializer<std::remove_cvref_t<Ret>,
+        return bind_fun_specializer<typename stdext::remove_const_ref<Ret>::type,
             decltype(lambda),
             Tuple>(lambda);
     }

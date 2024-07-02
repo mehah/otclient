@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include "traits.h"
+
 #include <cassert>
 #include <cstdio>
 #include <cstring>
@@ -68,12 +70,11 @@ namespace stdext
         }
     };
 
-#ifndef _MSC_VER
     // Improved snprintf that accepts std::string and other types
     template<typename... Args>
     int snprintf(char* s, size_t maxlen, const char* format, const Args&... args)
     {
-        std::tuple<std::decay_t<Args>...> tuple(args...);
+        std::tuple<typename replace_extent<Args>::type...> tuple(args...);
         return expand_snprintf<std::tuple_size_v<decltype(tuple)>>::call(s, maxlen, format, tuple);
     }
 
@@ -84,7 +85,6 @@ namespace stdext
         s[maxlen - 1] = 0;
         return strlen(s);
     }
-#endif
 
     template<typename... Args>
     std::string format() { return {}; }
