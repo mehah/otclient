@@ -436,7 +436,9 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_shaders", "setupMountShader", &ShaderManager::setupMountShader, &g_shaders);
     g_lua.bindSingletonFunction("g_shaders", "addMultiTexture", &ShaderManager::addMultiTexture, &g_shaders);
     g_lua.bindSingletonFunction("g_shaders", "getShader", &ShaderManager::getShader, &g_shaders);
-    g_lua.bindSingletonFunction("g_shaders", "clear", &ShaderManager::clear, &g_shaders);
+    g_lua.bindClassStaticFunction("g_shaders", "clear", [] {
+        g_mainDispatcher.addEvent([] { g_shaders.clear(); });
+    });
 
     // UIWidget
     g_lua.registerClass<UIWidget>();
@@ -561,6 +563,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("intersectsMargin", &UIWidget::intersectsMargin);
     g_lua.bindClassMemberFunction<UIWidget>("intersectsPadding", &UIWidget::intersectsPadding);
     g_lua.bindClassMemberFunction<UIWidget>("getId", &UIWidget::getId);
+    g_lua.bindClassMemberFunction<UIWidget>("getSource", &UIWidget::getSource);
     g_lua.bindClassMemberFunction<UIWidget>("getParent", &UIWidget::getParent);
     g_lua.bindClassMemberFunction<UIWidget>("getFocusedChild", &UIWidget::getFocusedChild);
     g_lua.bindClassMemberFunction<UIWidget>("getHoveredChild", &UIWidget::getHoveredChild);

@@ -1,0 +1,135 @@
+CalendarGrid < MiniQtWindow
+  size: 780 575
+
+  Label
+    !text: tr('Event Schedule')
+    font: verdana-11px-antialised
+    text-offset: 0 2
+    text-align: top
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    opacity: 0.5
+
+  BordedMiniWidget
+    id: calendarWidget
+    size: 754 433
+    margin-top: 59
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+
+    CalendarWeekDays
+      id: row1
+      &weekName: tr('Monday')
+      &disableLeftBright: true
+      anchors.top: parent.top
+      anchors.left: parent.left
+      margin-left: 2
+      margin-top: 2
+      width: 107
+
+    CalendarWeekDays
+      id: row2
+      &weekName: tr('Tuesday')
+      anchors.top: prev.top
+      anchors.left: prev.right
+      margin-left: 1
+      width: 107
+
+    CalendarWeekDays
+      id: row3
+      &weekName: tr('Wednesday')
+      anchors.top: prev.top
+      anchors.left: prev.right
+      margin-left: 1
+      width: 107
+
+    CalendarWeekDays
+      id: row4
+      &weekName: tr('Thursday')
+      anchors.top: prev.top
+      anchors.left: prev.right
+      margin-left: 1
+      width: 107
+
+    CalendarWeekDays
+      id: row5
+      &weekName: tr('Friday')
+      anchors.top: prev.top
+      anchors.left: prev.right
+      margin-left: 1
+      width: 107
+
+    CalendarWeekDays
+      id: row6
+      &weekName: tr('Saturday')
+      anchors.top: prev.top
+      anchors.left: prev.right
+      margin-left: 1
+      width: 107
+
+    CalendarWeekDays
+      id: row0
+      &weekName: tr('Sunday')
+      anchors.top: prev.top
+      anchors.left: prev.right
+      margin-left: 1
+      width: 107
+
+  Label
+    id: calendarCurrentMonth
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: parent.top
+    !text: tr('September 2023')
+    margin-top: 28
+    height: 16
+    text-align: center
+
+  PreviousQtButton
+    id: calendarPrevButton
+    anchors.verticalCenter: calendarCurrentMonth.verticalCenter
+    anchors.right: calendarCurrentMonth.left
+    margin-right: 10
+    @onClick: modules.client_bottommenu.onClickOnPreviousCalendar()
+
+  NextQtButton
+    id: calendarNextButton
+    anchors.verticalCenter: calendarCurrentMonth.verticalCenter
+    anchors.left: calendarCurrentMonth.right
+    margin-left: 10
+    @onClick: modules.client_bottommenu.onClickOnNextCalendar()
+
+  Label
+    id: calendarCurrentDate
+    anchors.right: parent.right
+    anchors.verticalCenter: calendarCurrentMonth.verticalCenter
+    !text: '2023-11-23, 11:23 CET'
+    margin-right: 16
+    height: 16
+    text-align: right
+
+  Label
+    anchors.left: calendarWidget.left
+    anchors.top: calendarWidget.bottom
+    !text: tr('* Event starts/ends at server save of this day.')
+    margin-top: 10
+    height: 16
+    text-align: left
+    opacity: 0.75
+
+  UIWidget
+    anchors.left: calendarWidget.left
+    anchors.right: calendarWidget.right
+    anchors.top: prev.bottom
+    margin-top: 10
+    height: 1
+    image-source: /images/ui/horizontal_line_bright
+
+  QtButton
+    !text: tr('Close')
+    anchors.right: calendarWidget.right
+    anchors.top: prev.bottom
+    margin-top: 10
+    width: 43
+    @onClick: modules.client_bottommenu.onClickCloseCalendar()

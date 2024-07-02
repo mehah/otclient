@@ -1,0 +1,9 @@
+Module
+  name: game_mainpanel
+  description: Main panel
+  author: marcosvf132
+  website: https://github.com/edubart/otclient
+  sandboxed: true
+  scripts: [ mainpanel ]
+  @onLoad: optionsController:init()
+  @onUnload: optionsController:terminate()

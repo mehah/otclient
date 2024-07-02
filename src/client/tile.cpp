@@ -52,8 +52,9 @@ void drawThing(const ThingPtr& thing, const Point& dest, int flags, uint8_t& dra
 
 void Tile::draw(const Point& dest, int flags, const LightViewPtr& lightView)
 {
-    m_drawElevation = 0;
     m_lastDrawDest = dest;
+
+    uint8_t drawElevation = 0;
 
 #ifndef BOT_PROTECTION
     if (m_fill != Color::alpha) {
@@ -66,7 +67,7 @@ void Tile::draw(const Point& dest, int flags, const LightViewPtr& lightView)
         if (!thing->isGround() && !thing->isGroundBorder() && !thing->isOnBottom())
             break;
 
-        drawThing(thing, dest, flags, m_drawElevation);
+        drawThing(thing, dest, flags, drawElevation);
     }
 
     drawAttachedEffect(dest, lightView, false);
@@ -75,20 +76,20 @@ void Tile::draw(const Point& dest, int flags, const LightViewPtr& lightView)
         for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
             const auto& item = *it;
             if (!item->isCommon()) continue;
-            drawThing(item, dest, flags, m_drawElevation);
+            drawThing(item, dest, flags, drawElevation);
         }
     }
 
     // after we render 2x2 lying corpses, we must redraw previous creatures/ontop above them
     if (m_tilesRedraw) {
         for (const auto& tile : *m_tilesRedraw) {
-            tile->drawCreature(tile->m_lastDrawDest, flags, true);
-            tile->drawTop(tile->m_lastDrawDest, flags, true);
+            tile->drawCreature(tile->m_lastDrawDest, flags, true, drawElevation);
+            tile->drawTop(tile->m_lastDrawDest, flags, true, drawElevation);
         }
     }
 
-    drawCreature(dest, flags, false);
-    drawTop(dest, flags, false);
+    drawCreature(dest, flags, false, drawElevation);
+    drawTop(dest, flags, false, drawElevation);
     drawAttachedEffect(dest, lightView, true);
     drawAttachedParticlesEffect(dest);
 }
@@ -109,7 +110,7 @@ void Tile::drawLight(const Point& dest, const LightViewPtr& lightView) {
     drawAttachedLightEffect(dest, lightView);
 }
 
-void Tile::drawCreature(const Point& dest, int flags, bool forceDraw)
+void Tile::drawCreature(const Point& dest, int flags, bool forceDraw, uint8_t drawElevation)
 {
     if (!forceDraw && !m_drawTopAndCreature)
         return;
@@ -118,7 +119,7 @@ void Tile::drawCreature(const Point& dest, int flags, bool forceDraw)
         for (const auto& thing : m_things) {
             if (!thing->isCreature() || thing->static_self_cast<Creature>()->isWalking()) continue;
 
-            drawThing(thing, dest, flags, m_drawElevation);
+            drawThing(thing, dest, flags, drawElevation);
         }
     }
 
@@ -132,14 +133,14 @@ void Tile::drawCreature(const Point& dest, int flags, bool forceDraw)
     }
 }
 
-void Tile::drawTop(const Point& dest, int flags, bool forceDraw)
+void Tile::drawTop(const Point& dest, int flags, bool forceDraw, uint8_t drawElevation)
 {
     if (!forceDraw && !m_drawTopAndCreature)
         return;
 
     if (m_effects) {
         for (const auto& effect : *m_effects)
-            drawThing(effect, dest, flags & Otc::DrawThings, m_drawElevation);
+            drawThing(effect, dest, flags & Otc::DrawThings, drawElevation);
     }
 
     if (hasTopItem()) {
@@ -302,6 +303,7 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
     thing->onAppear();
 
     updateThingStackPos();
+    updateElevation(thing, m_drawElevation);
     checkForDetachableThing();
 
     if (g_game.isTileThingLuaCallbackEnabled())
@@ -341,6 +343,12 @@ bool Tile::removeThing(const ThingPtr thing)
 
     updateThingStackPos();
     checkForDetachableThing();
+
+    if (thing->hasElevation()) {
+        m_drawElevation = 0;
+        for (const auto& t : m_things)
+            updateElevation(t, m_drawElevation);
+    }
 
     thing->onDisappear();
 

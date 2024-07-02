@@ -11,7 +11,8 @@ MiniWindow < UIMiniWindow
   image-border-bottom: 4
   focusable: false
   &minimizedHeight: 24
-
+  color: #909090
+  
   $on:
     image-border-bottom: 2
 
@@ -66,6 +67,31 @@ MiniWindow < UIMiniWindow
     $on pressed:
       image-clip: 14 28 14 14
 
+
+  UIButton
+    id: lockButton
+    anchors.top: minimizeButton.top
+    anchors.right: minimizeButton.left
+    margin-right: 2
+    size: 14 14
+    image-source: /images/ui/miniwindow_buttons
+    image-clip: 98 0 14 14
+
+    $hover:
+      image-clip: 98 14 14 14
+
+    $pressed:
+      image-clip: 98 28 14 14
+
+    $on:
+      image-clip: 84 0 14 14
+
+    $on hover:
+      image-clip: 84 14 14 14
+
+    $on pressed:
+      image-clip: 84 28 14 14
+
   VerticalScrollBar
     id: miniwindowScrollBar
     anchors.top: parent.top
@@ -104,3 +130,96 @@ MiniWindowContents < ScrollablePanel
 BorderlessGameWindow < UIWindow
   focusable: false
   margin: 2
+
+MiniQtScrollableWindow < UIMiniWindow
+  icon-rect: 4 4 16 16
+  width: 192
+  height: 200
+  image-source: /images/ui/window_new
+  image-border: 4
+  image-border-top: 16
+  image-border-bottom: 4
+  focusable: false
+  &minimizedHeight: 17
+
+  $on:
+    image-border-bottom: 2
+
+  UIWidget
+    id: miniwindowTopBar
+    anchors.top: parent.top
+    anchors.right: parent.right
+    anchors.left: parent.left
+    margin-right: 3
+    margin-left: 3
+    margin-top: 2
+    size: 258 18
+    phantom: true
+
+  VerticalQtScrollBar
+    id: miniwindowScrollBar
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    step: 14
+    margin-top: 16
+    margin-right: 3
+    margin-bottom: 3
+    pixels-scroll: true
+
+  ScrollablePanel
+    id: contentsPanel
+    anchors.fill: parent
+    anchors.right: miniwindowScrollBar.left
+    margin-top: 25
+    margin-left: 10
+    margin-bottom: 5
+    margin-right: 10
+    vertical-scrollbar: miniwindowScrollBar
+
+MiniQtWindow < UIMiniWindow
+  icon-rect: 4 4 16 16
+  width: 192
+  height: 200
+  image-source: /images/ui/window_new
+  image-border: 4
+  image-border-top: 16
+  image-border-bottom: 4
+  &minimizedHeight: 17
+  draggable: true
+
+  $on:
+    image-border-bottom: 2
+
+  UIWidget
+    id: miniwindowTopBar
+    anchors.top: parent.top
+    anchors.right: parent.right
+    anchors.left: parent.left
+    margin-right: 3
+    margin-left: 3
+    margin-top: 2
+    size: 258 18
+    phantom: true
+
+PhantomMiniWindow < UIMiniWindow
+  draggable: true
+  phantom: false
+  focusable: false
+  &moveOnlyToMain: true
+
+  UIWidget
+    image-source: /images/ui/background
+    image-repeated: true
+    anchors.fill: parent
+    margin-left: 3
+    margin-right: 3
+    phantom: true
+
+  UIWidget
+    id: miniwindowTopBar
+    phantom: true
+
+  UIButton
+    id: closeButton
+    phantom: true

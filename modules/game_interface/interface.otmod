@@ -4,8 +4,12 @@ Module
   author: OTClient team
   website: https://github.com/edubart/otclient
   sandboxed: true
-  scripts: [ widgets/uigamemap, widgets/uiitem, gameinterface ]
+  scripts: [ widgets/uigamemap, widgets/uiitem, widgets/statsbar, gameinterface ]
   load-later:
+    - game_minimap
+    - game_healthinfo
+    - game_inventory
+    - game_mainpanel
     - game_prey
     - game_imbuing
     - game_hotkeys
@@ -14,14 +18,10 @@ Module
     - game_console
     - game_actionbar
     - game_outfit
-    - game_healthinfo
     - game_skills
-    - game_inventory
-    - game_combatcontrols
     - game_containers
     - game_viplist
     - game_battle
-    - game_minimap
     - game_npctrade
     - game_textwindow
     - game_playertrade
@@ -37,6 +37,7 @@ Module
     - game_shaders
     - game_attachedeffects
     - game_stash
-    - game_creatureinformation
+    - game_healthcircle
+    - game_shop
   @onLoad: init()
   @onUnload: terminate()

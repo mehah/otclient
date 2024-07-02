@@ -126,3 +126,119 @@ TabBarVerticalButton < UIButton
     color: #80c7f8
   $on !checked:
     color: #F55E5E
+
+TabBarQtVerticalPanel < Panel
+TabBarQtVerticalButton < UIButton
+  font: cipsoftFont
+  size: 114 21
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin-left: 7
+  margin-right: 7
+  icon-align: left
+  icon-offset: 6 0
+  text-align: center
+  text-offset: 0 2
+  color: #b9b9b9ff
+  image-source: /images/ui/tabbutton_new_shadowed
+  image-clip: 0 0 114 21
+  $first:
+    anchors.top: parent.top
+    margin-top: 7
+  $!first:
+    anchors.top: prev.bottom
+    margin-top: 10
+  $checked:
+    image-clip: 0 21 114 21
+    text-offset: 1 3
+    icon-offset: 7 1
+  $!checked:
+    image-clip: 0 0 114 21
+    text-offset: 0 2
+    icon-offset: 6 0
+
+TabBarQtVertical < UITabBar
+  size: 128 442
+
+  UIWidget
+    anchors.fill: parent
+    image-source: /images/ui/background_dark
+    image-repeated: true
+
+  UIWidget
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    image-source: /images/ui/2pixel_up_frame_borderimage_dark
+    image-clip: 2 0 96 2
+    height: 2
+
+  UIWidget
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    image-source: /images/ui/2pixel_up_frame_borderimage_dark
+    image-clip: 0 2 2 96
+    width: 2
+
+  UIWidget
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    image-source: /images/ui/2pixel_up_frame_borderimage_dark
+    image-clip: 2 98 96 2
+    height: 2
+
+  UIWidget
+    anchors.right: parent.right
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    image-source: /images/ui/2pixel_up_frame_borderimage_dark
+    image-clip: 98 2 2 96
+    width: 2
+
+  UIWidget
+    anchors.top: parent.top
+    anchors.left: parent.left
+    image-source: /images/ui/2pixel_up_frame_borderimage_dark
+    image-clip: 0 0 2 2
+    size: 2 2
+
+  UIWidget
+    anchors.top: parent.top
+    anchors.right: parent.right
+    image-source: /images/ui/2pixel_up_frame_borderimage_dark
+    image-clip: 98 0 2 2
+    size: 2 2
+
+  UIWidget
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    image-source: /images/ui/2pixel_up_frame_borderimage_dark
+    image-clip: 0 98 2 2
+    size: 2 2
+
+  UIWidget
+    anchors.bottom: parent.bottom
+    anchors.right: parent.left
+    image-source: /images/ui/2pixel_up_frame_borderimage_dark
+    image-clip: 98 98 2 2
+    size: 2 2
+
+  ScrollablePanel
+    id: buttonsPanel
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: scrollBar.left
+    anchors.bottom: parent.bottom
+    vertical-scrollbar: scrollBar
+
+  VerticalScrollBar
+    id: scrollBar
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    step: 16
+    pixels-scroll: true
+    $!on:
+      width: 0

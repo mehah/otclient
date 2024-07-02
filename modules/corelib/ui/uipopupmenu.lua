@@ -78,7 +78,7 @@ function UIPopupMenu:addOption(optionName, optionCallback, shortcut)
                     shortcutLabel:getMarginRight()
     end
 
-    self:setWidth(math.max(self:getWidth(), width))
+    self:setWidth(math.max(190, math.max(self:getWidth(), width)))
 end
 
 function UIPopupMenu:addSeparator()
