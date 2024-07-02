@@ -1,0 +1,11 @@
+Tfs 0.4:
+
+Tfs 1.5:
+- https://github.com/kokekanon/forgottenserver-downgrade/pull/2
+- https://github.com/kokekanon/forgottenserver-downgrade/pull/7
+- https://github.com/kokekanon/forgottenserver-downgrade/pull/9
+
+Tfs 1.4.2:
+- https://github.com/kokekanon/TFS-1.4.2-Compatible-Aura-Effect-Wings-Shader-MEHAH/commit/77f80d505b01747a7c519e224d11c124de157a8f
+
+canary:

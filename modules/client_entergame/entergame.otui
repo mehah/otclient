@@ -2,6 +2,7 @@ EnterGameWindow < MainWindow
   !text: tr('Enter Game')
   size: 236 316
 
+
 EnterGameButton < Button
   width: 64
 
@@ -25,34 +26,86 @@ EnterGameWindow
   &authenticatorHeight: 44
   &stayLoggedBoxEnabled: false
   &stayLoggedBoxHeight: 24
+  &disableToken : false
+  size: 280 302
   @onEnter: EnterGame.doLogin()
 
-  MenuLabel
-    !text: tr('Account name')
+
+
+  Label
+    id: emailLabel
+    !text: tr('Acc Name:') 
     anchors.left: parent.left
     anchors.top: parent.top
-    text-auto-resize: true
 
-  PasswordTextEdit
+    opacity: 0.8
+
+      
+  Label
+    id: passwordLabel
+    !text: tr('Password:')
+    anchors.left: emailLabel.left
+    anchors.top: emailLabel.bottom
+    margin-top: 10
+    opacity: 0.8
+
+  HiddenTextQtToggleEdit
     id: accountNameTextEdit
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 2
-
-  MenuLabel
-    !text: tr('Password')
-    anchors.left: prev.left
-    anchors.top: prev.bottom
-    margin-top: 8
-    text-auto-resize: true
-
-  PasswordTextEdit
+    anchors.right: accountPasswordTextEdit.right
+    anchors.verticalCenter: emailLabel.verticalCenter
+    anchors.left: accountPasswordTextEdit.left
+    
+  HiddenTextQtEdit
     id: accountPasswordTextEdit
-    anchors.left: parent.left
     anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 2
+    anchors.left: passwordLabel.right
+    anchors.verticalCenter: passwordLabel.verticalCenter
+    margin-left: 5
+
+  QtCheckBox
+    id: rememberEmailBox
+    !text: tr('Remember password')
+    !tooltip: tr('Remember account and password when starts client')
+    anchors.left: passwordLabel.left
+    anchors.right: parent.right
+    anchors.top: accountPasswordTextEdit.bottom
+    margin-top: 10
+    opacity: 0.8
+    @onCheckChange: |
+      self:getParent():getChildById('autoLoginBox'):setEnabled(self:isChecked())
+      self:getParent():getChildById('rememberEmailTip'):setOn(self:isChecked())
+
+  UIWidget
+    id: rememberEmailTip
+    image-source: /images/icons/show_gui_help_grey
+    !specialtooltip: 'Be aware that your email address will be stored on your configuration file "config.otml" if you activate this option.'
+    anchors.right: accountNameTextEdit.right
+    anchors.verticalCenter: rememberEmailBox.verticalCenter
+    visible: false
+
+    $on:
+      visible: true
+
+    $!on:
+      visible: false
+
+  Label
+    !text: tr('Forgot password and/or email')
+    id: Forgot_password_email
+    font: verdana-11px-monochrome-underline
+    anchors.left: rememberEmailBox.left
+    anchors.right: parent.right
+    anchors.top: rememberEmailBox.bottom
+    opacity: 0.8
+    margin-top: 5
+    @onClick: g_platform.openUrl(Services.websites)
+    @onSetup: | 
+        if Services and Services.websites then
+            self:setVisible(true)
+        else
+            self:setVisible(false)
+            self:hide()
+        end
 
   MenuLabel
     id: authenticatorTokenLabel
@@ -80,7 +133,7 @@ EnterGameWindow
       visible: true
       margin-top: 2
 
-  CheckBox
+  QtCheckBox
     id: stayLoggedBox
     !text: tr('Stay logged during session')
     anchors.left: parent.left
@@ -162,17 +215,7 @@ EnterGameWindow
     anchors.top: clientComboBox.top
     margin-left: 3
 
-  CheckBox
-    id: rememberPasswordBox
-    !text: tr('Remember password')
-    !tooltip: tr('Remember account and password when starts client')
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 10
-    @onCheckChange: self:getParent():getChildById('autoLoginBox'):setEnabled(self:isChecked())
-
-  CheckBox
+  QtCheckBox
     id: autoLoginBox
     enabled: false
     !text: tr('Auto login')
@@ -182,7 +225,7 @@ EnterGameWindow
     anchors.top: prev.bottom
     margin-top: 2
 
-  CheckBox
+  QtCheckBox
     id: httpLoginBox
     enabled: true
     !text: tr('Enable HTTP login')
@@ -198,12 +241,28 @@ EnterGameWindow
     anchors.top: prev.bottom
     margin-top: 6
 
-  EnterGameButton
-    !text: tr('Ok')
+  QtButton
+    !text: tr('Login')
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 4
+    margin-top: 9
+    size: 86 20
     @onClick: EnterGame.doLogin()
+
+  QtButton
+    !text: tr('Create New Account')
+    anchors.left: parent.left
+    anchors.top: prev.bottom
+    margin-top: -17
+    size: 109 20
+    @onClick: g_platform.openUrl(Services.websites)
+
+    @onSetup: | 
+      if Services and Services.websites then
+        self:setVisible(true)
+      else
+        self:setVisible(false)
+      end
 
   Label
     id: serverInfoLabel
@@ -213,3 +272,4 @@ EnterGameWindow
     margin-top: 5
     color: green
     text-auto-resize: true
+

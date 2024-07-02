@@ -4,6 +4,8 @@ controller:registerEvents(g_game, {
         -- g_game.enableFeature(GameKeepUnawareTiles)
         -- g_game.enableFeature(GameSmoothWalkElevation)
         -- g_game.enableFeature(GameNegativeOffset)
+        -- g_game.enableFeature(GameWingsAurasEffectsShader)
+        
         g_game.enableFeature(GameFormatCreatureName)
 
         if version >= 750 then

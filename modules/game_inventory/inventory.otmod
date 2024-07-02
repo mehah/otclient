@@ -5,5 +5,5 @@ Module
   website: https://github.com/edubart/otclient
   sandboxed: true
   scripts: [ inventory ]
-  @onLoad: init()
-  @onUnload: terminate()
+  @onLoad: inventoryController:init()
+  @onUnload: inventoryController:terminate()

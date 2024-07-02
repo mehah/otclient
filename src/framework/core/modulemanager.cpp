@@ -161,7 +161,7 @@ void ModuleManager::enableAutoReload() {
 
     std::vector<ModuleData> modules;
     for (const auto& module : getModules()) {
-        if (!module->isReloadable() || !module->canReload())
+        if (!module->isReloadable())
             continue;
 
         ModuleData data = { module, {} };
