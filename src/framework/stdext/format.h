@@ -68,6 +68,7 @@ namespace stdext
         }
     };
 
+#ifndef _MSC_VER
     // Improved snprintf that accepts std::string and other types
     template<typename... Args>
     int snprintf(char* s, size_t maxlen, const char* format, const Args&... args)
@@ -83,6 +84,7 @@ namespace stdext
         s[maxlen - 1] = 0;
         return strlen(s);
     }
+#endif
 
     template<typename... Args>
     std::string format() { return {}; }
