@@ -23,7 +23,13 @@ function init()
     cooldownButton = modules.game_mainpanel.addToggleButton('cooldownButton', tr('Cooldowns'),
         '/images/options/cooldowns', toggle, false, 5)
 
-    cooldownButton:setOn(true)
+    if modules.client_options.getOption('showSpellGroupCooldowns') then
+        cooldownButton:setOn(true)
+        modules.client_options.setOption('showSpellGroupCooldowns', true)
+    else
+        cooldownButton:setOn(false)
+        modules.client_options.setOption('showSpellGroupCooldowns', false)
+    end
 
     cooldownButton:hide()
 
@@ -100,43 +106,34 @@ end
 
 function onMiniWindowOpen()
     cooldownButton:setOn(true)
+    modules.client_options.setOption('showSpellGroupCooldowns', true)
 end
 
 function onMiniWindowClose()
     cooldownButton:setOn(false)
+    modules.client_options.setOption('showSpellGroupCooldowns', false)
 end
 
 function toggle()
     local console = modules.game_console.consolePanel
     if cooldownButton:isOn() then
-        cooldownWindow:hide()
+        modules.client_options.setOption('showSpellGroupCooldowns', false)
         cooldownButton:setOn(false)
-
-        if console then
-            console:addAnchor(AnchorTop, modules.game_actionbar.getPanelActionbar():getId(), AnchorBottom)
-        end
     else
-        cooldownWindow:show()
+        modules.client_options.setOption('showSpellGroupCooldowns', true)
         cooldownButton:setOn(true)
-
-        if console then
-            console:addAnchor(AnchorTop, cooldownWindow:getId(), AnchorBottom)
-        end
-
     end
 end
 
 function online()
-
     if g_game.getFeature(GameSpellList) then
-
         cooldownButton:show()
         cooldownButton:setOn(true)
+        modules.client_options.setOption('showSpellGroupCooldowns', true)
     else
-
         cooldownButton:hide()
         cooldownButton:setOn(false)
-        cooldownWindow:hide()
+        modules.client_options.setOption('showSpellGroupCooldowns', false)
     end
 
     if not lastPlayer or lastPlayer ~= g_game.getCharacterName() then
@@ -274,4 +271,16 @@ function onSpellGroupCooldown(groupId, duration)
         initCooldown(progressRect, updateFunc, finishFunc)
         groupCooldown[groupId] = true
     end
+end
+
+function setSpellGroupCooldownsVisible(visible)
+    if visible then
+        cooldownWindow:setHeight(30)
+        cooldownWindow:show()
+    else
+        cooldownWindow:hide()
+        cooldownWindow:setHeight(10)
+    end
+
+    cooldownButton:setOn(visible)
 end

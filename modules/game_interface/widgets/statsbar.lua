@@ -1,9 +1,40 @@
-local statsBar
+local statsBarTop
+local statsBarBottom
+
+local statsBars = {}
+local statsBarDeepInfo = {}
+
+-- If you want to add more placements/dimensions, you'll need to add them here.
+-- This is used in getStatsBarMenuOptions(), createStatsBarWidgets(), 
+--                         hideAll() and destroyAllIcons() functions.
+local statsBarsPlacements = {
+    "Top",
+    "Bottom"
+}
+
+-- This is used in constructStatsBar(), getStatsBarMenuOptions(), 
+--                   reloadCurrentTab(), createStatsBarWidgets(), 
+--                       hideAll() and destroyALlIcons functions.
+local statsBarsDimensions = {
+    Large = {
+        height = 35
+    },
+    Default = {
+        height = 35
+    },
+    Parallel = {
+        height = 35
+    },
+    Compact = {
+        height = 20
+    }
+}
+
 local firstCall = true
 
 local currentStats = {
-    dimension = 'hide',
-    placement = 'hide'
+    dimension = "hide",
+    placement = "hide"
 }
 
 local skillsLineHeight = 20
@@ -20,8 +51,11 @@ local skillsTuples = {
 }
 
 StatsBar = {}
+
+
 local function createBlankIcon()
-    local statsBarConfigs = {statsBar.largeOnTop, statsBar.parallelOnTop, statsBar.defaultOnTop, statsBar.compactOnTop}
+    local statsBarConfigs = getConfigurations()
+    
     for _, statsBarConfig in ipairs(statsBarConfigs) do
         local icon = g_ui.createWidget('ConditionWidget', statsBarConfig.icons)
         icon:setImageSource('/images/ui/blank')
@@ -33,7 +67,25 @@ local function createBlankIcon()
     end
 end
 
+function getConfigurations()
+    -- This method will return all the stats bar configurations.
+    local configs = {}
+    for _, statsBar in pairs(statsBars) do
+        for _, placement in ipairs(statsBarsPlacements) do
+            for dimension, _ in pairs(statsBarsDimensions) do
+                local dimensionOnPlacement = tostring(dimension):lower() .. "On" .. placement
+                local key = "statsBar" .. placement:gsub("^%l", string.upper)
+                if statsBar[key] then
+                    table.insert(configs, statsBar[key][dimensionOnPlacement])
+                end
+            end
+        end
+    end
+    return configs
+end
+
 local function reloadSkillsTab(skills, parent)
+    -- This method might need some refactoring if you want to add side stats bars.
     local player = g_game.getLocalPlayer()
     if not player then
         return
@@ -47,7 +99,13 @@ local function reloadSkillsTab(skills, parent)
         end
     end
 
+    local statsBar = StatsBar.getCurrentStatsBar()
+    if not statsBar then
+        return
+    end
+
     statsBar:setHeight(statsBar:getHeight() - skills:getHeight())
+
     parent:setHeight(parent:getHeight() - (40 + skills:getHeight()))
     skills:setHeight(0)
     skills:destroyChildren()
@@ -109,31 +167,76 @@ local function reloadSkillsTab(skills, parent)
 
     end
 
-    skills:setHeight(lines * skillsLineHeight)
-    if parent:getId() == 'largeOnTop' then
-        skills:setHeight(skills:getHeight() + 5)
-    elseif lines == 0 then
-        skills:setHeight(skills:getHeight() + 5)
-    end
+    skills:setHeight((lines * skillsLineHeight) + 5)
     parent:setHeight(40 + skills:getHeight())
     statsBar:setHeight(statsBar:getHeight() + skills:getHeight())
 end
 
-function StatsBar.getCurrentStatsBar()
+function StatsBar.getAllStatsBarWithPosition()
+    -- This method will return all the stats bars based on their placement and dimension.
+    -- i.e statsBarTop.largeOnTop, statsBarTop.parallelOnTop, statsBarTop.defaultOnTop, statsBarTop.compactOnTop [..]
+    local statsBarsWithPosition = {}
+    for _, statsBar in pairs(statsBars) do
+        for _, placement in ipairs(statsBarsPlacements) do
+            for dimension, _ in pairs(statsBarsDimensions) do
+                local dimensionOnPlacement = tostring(dimension):lower() .. "On" .. placement
+                if statsBar[dimensionOnPlacement] then
+                    statsBarsWithPosition[#statsBarsWithPosition+1] = statsBar[dimensionOnPlacement]
+                end
+            end
+        end
+    end
+
+    return statsBarsWithPosition
+end
+
+function StatsBar.getCurrentStatsBarWithPosition()
+    -- This method will return the statsbar based on its placement and dimension.
+    -- i.e "largeOnTop" will return statsBarTop.largeOnTop.
+    -- It's made this way so we can call the current stats bar without having to use a switch statement.
+    -- And if it's necessary to add more stats bars like "largeOnLeft" it will be easier to add them
+    -- Without changing this code.
     if currentStats.dimension == 'hide' and currentStats.placement == 'hide' then
         return nil
     end
+    -- -- Get full position as a single string. 
+    -- -- i.e. largeOnTop // parallelOnBottom
+    local placement = currentStats.placement:gsub("^%l", string.upper)
+    local fullPosition = currentStats.dimension .. "On" .. placement
+    local statsBar = StatsBar.getCurrentStatsBar()
+    if not statsBar then
+        return nil
+    end
 
-    if currentStats.placement == 'top' then
-        if currentStats.dimension == 'large' then
-            return statsBar.largeOnTop
-        elseif currentStats.dimension == 'parallel' then
-            return statsBar.parallelOnTop
-        elseif currentStats.dimension == 'default' then
-            return statsBar.defaultOnTop
-        elseif currentStats.dimension == 'compact' then
-            return statsBar.compactOnTop
-        end
+    if statsBar[fullPosition] then
+    -- Return the stats bar based on the full position.
+    -- i.e. statsBarTop.largeOnTop
+        return statsBar[fullPosition]
+    else
+        print("No stats bar with position found for:", statsBar)
+    end
+
+    return nil
+end
+
+function StatsBar.getCurrentStatsBar()
+    -- This method will return the statsbar based on its placement.
+    -- i.e statsBarTop // statsBarBottom
+    if currentStats.dimension == 'hide' and currentStats.placement == 'hide' then
+        return nil
+    end
+    -- -- Get full placement. 
+    -- -- i.e. Top // Bottom
+    local placement = currentStats.placement:gsub("^%l", string.upper)
+
+    -- -- Get the stats bar based on the placement.
+    -- -- i.e. statsBarTop // statsBarBottom
+    local statsBar = "statsBar" .. placement
+
+    if statsBars[statsBar] then
+        return statsBars[statsBar]
+    else
+        print("No stats bar found for:", statsBar)
     end
 
     return nil
@@ -145,14 +248,13 @@ function StatsBar.reloadCurrentStatsBarQuickInfo()
         return
     end
 
-    local bar = StatsBar.getCurrentStatsBar()
+    local bar = StatsBar.getCurrentStatsBarWithPosition()
     if not bar then
         return
     end
 
     bar.health:setValue(player:getHealth(), player:getMaxHealth())
     bar.mana:setValue(player:getMana(), player:getMaxMana())
-
 end
 
 local function loadIcon(bitChanged, content, topmenu)
@@ -170,15 +272,22 @@ local function loadIcon(bitChanged, content, topmenu)
     return icon
 end
 
+local function getStatsBarsIconContent()
+    local iconContents = {}
+    local statsBars = StatsBar.getAllStatsBarWithPosition()
+
+    for _, statsBar in ipairs(statsBars) do
+        iconContents[#iconContents+1] = { content = statsBar.icons, loadIconTransparent = true }
+    end
+
+    iconContents[#iconContents+1] = { content = modules.game_inventory.getIconsPanelOn(), loadIconTransparent = false }
+    iconContents[#iconContents+1] = { content = modules.game_inventory.getIconsPanelOff(), loadIconTransparent = false }
+
+    return iconContents
+end
+
 local function toggleIcon(bitChanged)
-    local contents = {
-        {content = statsBar.largeOnTop.icons,loadIconTransparent = true},
-        {content = statsBar.parallelOnTop.icons,loadIconTransparent = true}, 
-        {content = statsBar.defaultOnTop.icons,loadIconTransparent = true}, 
-        {content = statsBar.compactOnTop.icons, loadIconTransparent = true}, 
-        {content = modules.game_mainpanel.getIconsPanelOff()},
-        {content = modules.game_mainpanel.getIconsPanelOn()}
-    }
+    local contents = getStatsBarsIconContent()
 
     for _, contentData in ipairs(contents) do
         local icon = contentData.content:getChildById(Icons[bitChanged].id)
@@ -220,7 +329,7 @@ function StatsBar.reloadCurrentStatsBarDeepInfo()
         return
     end
 
-    local bar = StatsBar.getCurrentStatsBar()
+    local bar = StatsBar.getCurrentStatsBarWithPosition()
     if not bar then
         return
     end
@@ -242,165 +351,57 @@ function StatsBar.reloadCurrentStatsBarDeepInfo()
     end
 end
 
-function StatsBar.hideAll()
+function constructStatsBar(dimension, placement)
+    local dimensionString = dimension:gsub("^%u", string.lower)
+    StatsBar.updateCurrentStats(dimensionString, placement)
 
-    statsBar.largeOnTop.skills:destroyChildren()
-    statsBar.largeOnTop.skills:setHeight(0)
-    statsBar.largeOnTop:setHeight(0)
-    statsBar.largeOnTop:hide()
+    local dimensionOnPlacement = dimensionString:gsub("^%u", string.lower) .. "On" .. placement:gsub("^%l", string.upper)
+    local statsBar = statsBars["statsBar" .. placement:gsub("^%l", string.upper)]
 
-    statsBar.parallelOnTop.skills:destroyChildren()
-    statsBar.parallelOnTop.skills:setHeight(0)
-    statsBar.parallelOnTop:setHeight(0)
-    statsBar.parallelOnTop:hide()
+    if statsBar[dimensionOnPlacement] then
+        statsBar:setHeight(statsBarsDimensions[dimension].height)
+        statsBar[dimensionOnPlacement]:setHeight(statsBarsDimensions[dimension].height)
+        statsBar[dimensionOnPlacement]:show()
+        statsBar[dimensionOnPlacement]:setPhantom(false)
+        statsBar[dimensionOnPlacement].health = statsBar[dimensionOnPlacement]:getChildById('health')
+        statsBar[dimensionOnPlacement].mana = statsBar[dimensionOnPlacement]:getChildById('mana')
+        statsBar[dimensionOnPlacement].skills = statsBar[dimensionOnPlacement]:getChildById('skills')
 
-    statsBar.defaultOnTop.skills:destroyChildren()
-    statsBar.defaultOnTop.skills:setHeight(0)
-    statsBar.defaultOnTop:setHeight(0)
-    statsBar.defaultOnTop:hide()
-
-    statsBar.compactOnTop.skills:destroyChildren()
-    statsBar.compactOnTop.skills:setHeight(0)
-    statsBar.compactOnTop:setHeight(0)
-    statsBar.compactOnTop:hide()
-
-    statsBar:setHeight(0)
-    currentStats = {
-        dimension = 'hide',
-        placement = 'hide'
-    }
-
-    -- modules.game_healthcircle.setTopBarOption(currentStats.dimension, currentStats.placement)
-end
-
-local function constructLargeOnTop()
-    statsBar:setHeight(35)
-    statsBar.largeOnTop:setHeight(35)
-    statsBar.largeOnTop:show()
-
-    currentStats = {
-        dimension = 'large',
-        placement = 'top'
-    }
-
-    statsBar.largeOnTop:show()
-    statsBar.largeOnTop:setPhantom(false)
-    statsBar.largeOnTop.health = statsBar.largeOnTop:getChildById('health')
-    statsBar.largeOnTop.mana = statsBar.largeOnTop:getChildById('mana')
-    statsBar.largeOnTop.skills = statsBar.largeOnTop:getChildById('skills')
-
-    reloadSkillsTab(statsBar.largeOnTop.skills, statsBar.largeOnTop)
+    reloadSkillsTab(statsBar[dimensionOnPlacement].skills, statsBar[dimensionOnPlacement])
     StatsBar.reloadCurrentStatsBarQuickInfo()
 
-    modules.game_healthcircle.setTopBarOption(currentStats.dimension, currentStats.placement)
-    return true
+    modules.game_healthcircle.setStatsBarOption()
+    else 
+        print("No stats bar found for:", dimensionOnPlacement .. " on constructStatsBar()")
+    end
 end
 
-local function constructParallelOnTop()
-    statsBar:setHeight(55)
-    statsBar.parallelOnTop:setHeight(55)
-    statsBar.parallelOnTop:show()
-
+function StatsBar.updateCurrentStats(dimension, placement)
     currentStats = {
-        dimension = 'parallel',
-        placement = 'top'
+        dimension = dimension,
+        placement = placement
     }
-
-    statsBar.parallelOnTop:show()
-    statsBar.parallelOnTop:setPhantom(false)
-    statsBar.parallelOnTop.health = statsBar.parallelOnTop:getChildById('health')
-    statsBar.parallelOnTop.mana = statsBar.parallelOnTop:getChildById('mana')
-    statsBar.parallelOnTop.skills = statsBar.parallelOnTop:getChildById('skills')
-
-    reloadSkillsTab(statsBar.parallelOnTop.skills, statsBar.parallelOnTop)
-    StatsBar.reloadCurrentStatsBarQuickInfo()
-
-    modules.game_healthcircle.setTopBarOption(currentStats.dimension, currentStats.placement)
-    return true
-end
-
-local function constructDefaultOnTop()
-    statsBar:setHeight(35)
-    statsBar.defaultOnTop:setHeight(35)
-    statsBar.defaultOnTop:show()
-
-    currentStats = {
-        dimension = 'default',
-        placement = 'top'
-    }
-
-    statsBar.defaultOnTop:show()
-    statsBar.defaultOnTop:setPhantom(false)
-    statsBar.defaultOnTop.health = statsBar.defaultOnTop:getChildById('health')
-    statsBar.defaultOnTop.mana = statsBar.defaultOnTop:getChildById('mana')
-    statsBar.defaultOnTop.skills = statsBar.defaultOnTop:getChildById('skills')
-
-    reloadSkillsTab(statsBar.defaultOnTop.skills, statsBar.defaultOnTop)
-    StatsBar.reloadCurrentStatsBarQuickInfo()
-
-    modules.game_healthcircle.setTopBarOption(currentStats.dimension, currentStats.placement)
-    return true
-end
-
-local function constructCompactOnTop()
-    statsBar:setHeight(35)
-    statsBar.compactOnTop:setHeight(35)
-    statsBar.compactOnTop:show()
-
-    currentStats = {
-        dimension = 'compact',
-        placement = 'top'
-    }
-
-    statsBar.compactOnTop:show()
-    statsBar.compactOnTop:setPhantom(false)
-    statsBar.compactOnTop.health = statsBar.compactOnTop:getChildById('health')
-    statsBar.compactOnTop.mana = statsBar.compactOnTop:getChildById('mana')
-    statsBar.compactOnTop.skills = statsBar.compactOnTop:getChildById('skills')
-
-    reloadSkillsTab(statsBar.compactOnTop.skills, statsBar.compactOnTop)
-    StatsBar.reloadCurrentStatsBarQuickInfo()
-
-    modules.game_healthcircle.setTopBarOption(currentStats.dimension, currentStats.placement)
-    return true
 end
 
 local function openDropMenu(mousePos)
     local menu = g_ui.createWidget('PopupMenu')
     menu:setGameMenu(true)
 
-    local current = StatsBar.getCurrentStatsBar()
-    if not (current) or current:getId() ~= 'compactOnTop' then
-        menu:addOption(tr('Switch to Compact Style'), function()
-            StatsBar.hideAll()
-            constructCompactOnTop()
-        end)
-    end
+    local current = StatsBar.getCurrentStatsBarWithPosition()
 
-    if not (current) or current:getId() ~= 'defaultOnTop' then
-        menu:addOption(tr('Switch to Default Style'), function()
-            StatsBar.hideAll()
-            constructDefaultOnTop()
-        end)
-    end
+    local menuOptions = getStatsBarMenuOptions(current)
 
-    if not (current) or current:getId() ~= 'largeOnTop' then
-        menu:addOption(tr('Switch to Large Style'), function()
+    -- Add options to the menu based on the current stats bar
+    for _, option in ipairs(menuOptions) do
+        menu:addOption(tr(option.label), function()
             StatsBar.hideAll()
-            constructLargeOnTop()
-        end)
-    end
-
-    if not (current) or current:getId() ~= 'parallelOnTop' then
-        menu:addOption(tr('Switch to Parallel Style'), function()
-            StatsBar.hideAll()
-            constructParallelOnTop()
+            constructStatsBar(option.dimension, option.placement)
         end)
     end
 
     menu:addSeparator()
 
-    local current = StatsBar.getCurrentStatsBar()
+    local current = StatsBar.getCurrentStatsBarWithPosition()
     if current and current.skills then
         for _, skillTuple in ipairs(skillsTuples) do
             if not g_settings.getBoolean('top_statsbar_' .. skillTuple.key) then
@@ -420,10 +421,50 @@ local function openDropMenu(mousePos)
     menu:addSeparator()
     menu:addOption(tr('Hide Customisable Status Bars'), function()
         StatsBar.hideAll()
-        modules.game_healthcircle.setTopBarOption(currentStats.dimension, currentStats.placement)
+        modules.game_healthcircle.setStatsBarOption("hide")
     end)
 
     menu:display(mousePos)
+end
+
+function shouldAddStatsBarOption(current, placement, style)
+    local id = current:getId()
+    return string.find(id, placement) and id ~= style
+end
+
+function getStatsBarMenuOptions(current)
+    local optionsMenu = {}
+
+    -- Create options available based on statsBarsPlacements and statsBarsDimensions tables.
+    for _, placement in ipairs(statsBarsPlacements) do
+        for dimension, _ in pairs(statsBarsDimensions) do
+            local style = tostring(dimension):gsub("^%u", string.lower) .. 'On' .. placement
+            if shouldAddStatsBarOption(current, placement, style) then
+                optionsMenu[#optionsMenu+1] = { 
+                    label = 'Switch to ' .. tostring(dimension) .. ' Style',
+                    dimension = dimension,
+                    placement = placement:gsub("^%u", string.lower),
+                    style = style
+                }
+            end
+        end
+    end
+    
+    -- Create options available to switch placements keeping the same style
+    -- i.e. from bottom to top // from top to bottom
+    for _, placement in ipairs(statsBarsPlacements) do
+        if not string.find(current:getId(), placement) then
+            optionsMenu[#optionsMenu+1] = {
+                label = 'Switch to ' .. placement .. ' Style',
+                dimension = currentStats.dimension:gsub("^%l", string.upper),
+                placement = placement:gsub("^%u", string.lower),
+                construct = constructStatsBar,
+                style = current:getId()
+            }
+        end
+    end
+
+    return optionsMenu
 end
 
 local function onStatsMousePress(tab, mousePos, mouseButton)
@@ -434,92 +475,111 @@ local function onStatsMousePress(tab, mousePos, mouseButton)
 end
 
 function StatsBar.reloadCurrentTab()
-    if currentStats.placement == 'top' then
-        if currentStats.dimension == 'large' then
-            return constructLargeOnTop()
-        elseif currentStats.dimension == 'parallel' then
-            return constructParallelOnTop()
-        elseif currentStats.dimension == 'default' then
-            return constructDefaultOnTop()
-        elseif currentStats.dimension == 'compact' then
-            return constructCompactOnTop()
-        end
+    local dimension = currentStats.dimension:gsub("^%l", string.upper)
+    if statsBarsDimensions[dimension] then
+        return constructStatsBar(dimension, currentStats.placement)
+    else 
+        print("No stats bars dimensions found: ", dimension, " on reloadCurrentTab()")
+        return
     end
 end
 
-function StatsBar.setStatsBarOption(dimension, placement)
+function StatsBar.updateStatsBarOption(dimension)
     StatsBar.hideAll()
+    StatsBar.firstLoadSettings()
+
+    if currentStats.dimension ~= "hide" and dimension ~= "hide" then
+        StatsBar.reloadCurrentTab()
+    end
+end
+
+local function getSettingOrDefault(setting, default)
+  local value = g_settings.getString(setting)
+  return value ~= "" and value or default
+end
+
+local function setSetting(setting, value)
+  g_settings.set(setting, value)
+end
+
+function StatsBar.loadSettings()
+    currentStats = {
+        dimension = getSettingOrDefault('statsbar_dimension', "compact"),
+        placement = getSettingOrDefault('statsbar_placement', "top")
+    }
+end
+
+function StatsBar.saveSettings()
+    setSetting('statsbar_dimension', currentStats.dimension)
+    setSetting('statsbar_placement', currentStats.placement)
+end
+
+function StatsBar.firstLoadSettings()
     if firstCall then
-        if g_settings.getString('top_statsbar_dimension') and g_settings.getString('top_statsbar_dimension') ~= "" then
-            dimension = g_settings.getString('top_statsbar_dimension')
-        else
-            dimension = "compact"
-        end
+        currentStats.dimension = getSettingOrDefault("statsbar_dimension", "compact")
+        currentStats.placement = getSettingOrDefault("statsbar_placement", "top")
 
         firstCall = false
     end
 
-    currentStats = {
-        dimension = dimension,
-        placement = placement
-    }
-    g_settings.set('top_statsbar_dimension', currentStats.dimension)
-    g_settings.set('top_statsbar_placement', currentStats.placement)
-
-    if dimension ~= "hide" then
-        StatsBar.reloadCurrentTab()
-    end
-
+    StatsBar.saveSettings()
+    StatsBar.loadSettings()
 end
 
 function StatsBar.OnGameEnd()
-    g_settings.set('top_statsbar_dimension', currentStats.dimension)
-    g_settings.set('top_statsbar_placement', currentStats.placement)
-
+    StatsBar.saveSettings()
     StatsBar.hideAll()
 
-    modules.game_mainpanel.getIconsPanelOn():destroyChildren()
-    modules.game_mainpanel.getIconsPanelOff():destroyChildren()
+    modules.game_inventory.getIconsPanelOn():destroyChildren()
+    modules.game_inventory.getIconsPanelOff():destroyChildren()
 
-    statsBar.largeOnTop.icons:destroyChildren()
-    statsBar.parallelOnTop.icons:destroyChildren()
-    statsBar.defaultOnTop.icons:destroyChildren()
-    statsBar.compactOnTop.icons:destroyChildren()
+    StatsBar.destroyAllIcons()
 end
 
 function StatsBar.OnGameStart()
-    currentStats = {
-        dimension = g_settings.getString('top_statsbar_dimension'),
-        placement = g_settings.getString('top_statsbar_placement')
-    }
-
-    if not (currentStats.dimension) or not (currentStats.placement) or currentStats.dimension == '' or
-        currentStats.placement == '' then
-        currentStats = {
-            dimension = 'default',
-            placement = 'top'
-        }
-    end
+    StatsBar.loadSettings()
 
     createBlankIcon()
     StatsBar.reloadCurrentTab()
-    modules.game_healthcircle.setTopBarOption(currentStats.dimension, currentStats.placement)
+    modules.game_healthcircle.setStatsBarOption()
+end
 
+function createStatsBarWidgets(statsBar)
+    -- This method will create the widgets based on the statsBar, statsBarsPlacements and statsBarsDimensions tables.
+    local widget = statsBar
+    for _, placement in ipairs(statsBarsPlacements) do
+      for dimension, _ in pairs(statsBarsDimensions) do
+        local elementName = tostring(dimension):gsub("^%u", string.lower) .. "On" .. placement
+        widget[elementName] = statsBar:getChildById(elementName)
+      end
+    end
+    widget.onMousePress = onStatsMousePress
+    return widget
 end
 
 function StatsBar.init()
-    statsBar = modules.game_interface.getGameTopStatsBar()
-    if not statsBar then
+    statsBarTop = modules.game_interface.getGameTopStatsBar()
+    statsBarBottom = modules.game_interface.getGameBottomStatsBar()
+
+    statsBars = {
+        statsBarTop = statsBarTop,
+        statsBarBottom = statsBarBottom
+    }
+
+    if not statsBarTop then
         return
     end
-    statsBar.largeOnTop = statsBar:getChildById('largeOnTop')
-    statsBar.parallelOnTop = statsBar:getChildById('parallelOnTop')
-    statsBar.defaultOnTop = statsBar:getChildById('defaultOnTop')
-    statsBar.compactOnTop = statsBar:getChildById('compactOnTop')
-    statsBar.onMousePress = onStatsMousePress
 
-    StatsBar.hideAll()
-    connect(LocalPlayer, {
+    if not statsBarBottom then
+        return
+    end
+
+    -- Create widgets based on statsBars table.
+    for _, statBar in pairs(statsBars) do
+        statBar = createStatsBarWidgets(statBar)
+    end
+
+    statsBarDeepInfo = {
         onExperienceChange = StatsBar.reloadCurrentStatsBarDeepInfo,
         onLevelChange = StatsBar.reloadCurrentStatsBarDeepInfo,
         onHealthChange = StatsBar.reloadCurrentStatsBarQuickInfo,
@@ -529,29 +589,67 @@ function StatsBar.init()
         onSkillChange = StatsBar.reloadCurrentStatsBarDeepInfo,
         onBaseSkillChange = StatsBar.reloadCurrentStatsBarDeepInfo,
         onStatesChange = StatsBar.reloadCurrentStatsBarQuickInfo_state
+    }
 
-    })
+    StatsBar.hideAll()
+    connect(LocalPlayer, statsBarDeepInfo)
     connect(g_game, {
         onGameStart = StatsBar.OnGameStart,
         onGameEnd = StatsBar.OnGameEnd
     })
 end
 
+function StatsBar.hideAll()
+    -- This iterates between the tables: statsBar -> statsBarsPlacements -> statsBarsDimensions
+    -- And hides all the stats bars based on these tables.
+    for _, bar in pairs(statsBars) do
+        for _, placement in pairs(statsBarsPlacements) do
+            for dimension, _ in pairs(statsBarsDimensions) do
+                local key = tostring(dimension):lower() .. "On" .. placement
+                if bar[key] and bar[key].skills then
+                    bar[key].skills:destroyChildren()
+                    bar[key].skills:setHeight(0)
+                    bar[key]:setHeight(0)
+                    bar[key]:hide()
+                end
+            end
+        end
+        bar:setHeight(0)
+    end
+end
+
+function StatsBar.destroyAllIcons()
+    -- This iterates between the tables: statsBar -> statsBarsPlacements -> statsBarsDimensions
+    -- And destroy all icons based on these tables.
+    for _, bar in pairs(statsBars) do
+        for _, placement in pairs(statsBarsPlacements) do
+            for dimension, _ in pairs(statsBarsDimensions) do
+                local key = tostring(dimension):lower() .. "On" .. placement
+                if bar[key] and bar[key].skills then
+                    bar[key].icons:destroyChildren()
+                end
+            end
+        end
+        bar:setHeight(0)
+    end
+end
+
+function StatsBar.destroyAllBars()
+    -- This iterates between the tables: statsBars
+    -- And destroy all bars based on these tables.
+    for _, bar in pairs(statsBars) do
+        bar:destroy()
+    end
+end
+
 function StatsBar.terminate()
-    disconnect(LocalPlayer, {
-        onExperienceChange = StatsBar.reloadCurrentStatsBarDeepInfo,
-        onLevelChange = StatsBar.reloadCurrentStatsBarDeepInfo,
-        onHealthChange = StatsBar.reloadCurrentStatsBarQuickInfo,
-        onManaChange = StatsBar.reloadCurrentStatsBarQuickInfo,
-        onMagicLevelChange = StatsBar.reloadCurrentStatsBarDeepInfo,
-        onBaseMagicLevelChange = StatsBar.reloadCurrentStatsBarDeepInfo,
-        onSkillChange = StatsBar.reloadCurrentStatsBarDeepInfo,
-        onBaseSkillChange = StatsBar.reloadCurrentStatsBarDeepInfo,
-        onStatesChange = StatsBar.reloadCurrentStatsBarQuickInfo_state
-    })
+    StatsBar.saveSettings()
+    
+    disconnect(LocalPlayer, statsBarDeepInfo)
     disconnect(g_game, {
         onGameStart = StatsBar.OnGameStart,
         OnGameEnd = StatsBar.OnGameEnd
     })
-    statsBar:destroy()
+    
+    StatsBar.destroyAllBars()
 end

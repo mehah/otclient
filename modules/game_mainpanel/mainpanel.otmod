@@ -5,5 +5,5 @@ Module
   website: https://github.com/edubart/otclient
   sandboxed: true
   scripts: [ mainpanel ]
-  @onLoad: init()
-  @onUnload: terminate()
+  @onLoad: optionsController:init()
+  @onUnload: optionsController:terminate()

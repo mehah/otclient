@@ -913,6 +913,16 @@ function loadActionBar()
     setupHotkeys()
 end
 
+function setActionBarVisible(visible)
+    if visible then
+        actionBar:setHeight(34)
+        actionBar:show()
+    else
+        actionBar:setHeight(0)
+        actionBar:hide()
+    end
+end
+
 function round(n)
     return n % 1 >= 0.5 and math.ceil(n) or math.floor(n)
 end

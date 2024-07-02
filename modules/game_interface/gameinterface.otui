@@ -45,6 +45,7 @@ UIWidget
     anchors.right: gameRightExtraPanel.left
     anchors.top: gameTopPanel.bottom
     anchors.bottom: gameBottomPanel.top
+    
     focusable: false
 
     Button
@@ -59,7 +60,7 @@ UIWidget
     id: gameBottomPanel
     anchors.left: gameLeftExtraPanel.right
     anchors.right: gameRightExtraPanel.left
-    anchors.top: bottomSplitter.top
+    anchors.top: gameBottomStatsBarPanel.bottom
     anchors.bottom: parent.bottom
 
   GameSidePanel
@@ -162,6 +163,16 @@ UIWidget
     anchors.right: gameRightExtraPanel.left
     anchors.top: parent.top
     focusable: false
+
+  TopStatsBar
+    id: gameBottomStatsBarPanel
+    anchors.left: gameLeftExtraPanel.right
+    anchors.right: gameRightExtraPanel.left
+    anchors.top: bottomSplitter.bottom
+    margin-left: 1
+    margin-right: 1
+    focusable: false
+
   Button
     id: leftIncreaseSidePanels
     anchors.left: gameLeftExtraPanel.right
