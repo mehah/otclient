@@ -505,7 +505,8 @@ manaCheckBox = nil
 experienceCheckBox = nil
 skillCheckBox = nil
 chooseSkillComboBox = nil
-chooseTopBarDimension = nil
+chooseStatsBarDimension = nil
+chooseStatsBarPlacement = nil
 distFromCenScrollbar = nil
 opacityScrollbar = nil
 
@@ -520,7 +521,8 @@ function addToOptionsModule()
     experienceCheckBox = optionPanel:recursiveGetChildById('experienceCheckBox')
     skillCheckBox = optionPanel:recursiveGetChildById('skillCheckBox')
     chooseSkillComboBox = optionPanel:recursiveGetChildById('chooseSkillComboBox')
-    chooseTopBarDimension = optionPanel:recursiveGetChildById('chooseTopBarDimension')
+    chooseStatsBarDimension = optionPanel:recursiveGetChildById('chooseStatsBarDimension')
+    chooseStatsBarPlacement = optionPanel:recursiveGetChildById('chooseStatsBarPlacement')
     distFromCenScrollbar = optionPanel:recursiveGetChildById('distFromCenScrollbar')
     opacityScrollbar = optionPanel:recursiveGetChildById('opacityScrollbar')
 
@@ -534,11 +536,19 @@ function addToOptionsModule()
     chooseSkillComboBox:addOption('Shielding', 'shielding')
     chooseSkillComboBox:addOption('Fishing', 'fishing')
 
-    chooseTopBarDimension:addOption(tr('Compact'), 'compact')
-    chooseTopBarDimension:addOption(tr('Default'), 'default')
-    chooseTopBarDimension:addOption(tr('Hide'), 'hide')
-    chooseTopBarDimension:addOption(tr('Large'), 'large')
-    chooseTopBarDimension:addOption(tr('Parallel'), 'parallel')
+    chooseStatsBarPlacement:addOption(tr('Top'), 'top')
+    chooseStatsBarPlacement:addOption(tr('Bottom'), 'bottom')
+
+    chooseStatsBarDimension:addOption(tr('Hide'), 'hide')
+    chooseStatsBarDimension:addOption(tr('Compact'), 'compact')
+    chooseStatsBarDimension:addOption(tr('Default'), 'default')
+    chooseStatsBarDimension:addOption(tr('Large'), 'large')
+    chooseStatsBarDimension:addOption(tr('Parallel'), 'parallel')
+
+    statsBarMenuLoaded = true
+
+    chooseStatsBarDimension:setCurrentOptionByData(g_settings.getString('statsbar_dimension'), true)
+    chooseStatsBarPlacement:setCurrentOptionByData(g_settings.getString('statsbar_placement'), true)
 
     -- Set values
     healthCheckBox:setChecked(isHealthCircle)
@@ -555,6 +565,12 @@ function addToOptionsModule()
     opacityScrollbar:setValue(opacityCircle * 100)
 end
 
+function updateStatsBar()
+    if statsBarMenuLoaded then
+        modules.game_interface.updateStatsBar(chooseStatsBarDimension:getCurrentOption().data, chooseStatsBarPlacement:getCurrentOption().data)
+    end
+end
+
 function setPlayerValues()
     local skillType = skillTypes[g_game.getCharacterName()]
     if not skillType then
@@ -563,8 +579,9 @@ function setPlayerValues()
     chooseSkillComboBox:setCurrentOptionByData(skillType, true)
 end
 
-function setTopBarOption(data, placement)
-    chooseTopBarDimension:setCurrentOptionByData(data, true)
+function setStatsBarOption(dimension, placement)
+    chooseStatsBarDimension:setCurrentOptionByData(dimension, true)
+    chooseStatsBarPlacement:setCurrentOptionByData(placement, true)
 end
 
 function destroyOptionsModule()
@@ -575,7 +592,8 @@ function destroyOptionsModule()
     chooseSkillComboBox = nil
     distFromCenScrollbar = nil
     opacityScrollbar = nil
-    chooseTopBarDimension = nil
+    chooseStatsBarDimension = nil
+    chooseStatsBarPlacement = nil
 
     modules.client_options.removeTab('HP/MP Circle')
     optionPanel = nil

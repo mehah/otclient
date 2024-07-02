@@ -200,6 +200,9 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerTrappers:
                     parseTrappers(msg);
                     break;
+                case Proto::GameServerCreatureData:
+                    parseCreatureData(msg);
+                    break;
                 case Proto::GameServerCreatureHealth:
                     parseCreatureHealth(msg);
                     break;
@@ -858,10 +861,13 @@ void ProtocolGame::parsePlayerHelpers(const InputMessagePtr& msg) const
     const uint32_t id = msg->getU32();
     const uint16_t helpers = msg->getU16();
 
-    if (g_map.getCreatureById(id))
-        Game::processPlayerHelpers(helpers);
-    else
-        g_logger.traceError(stdext::format("could not get creature with id %d", id));
+    const auto& creature = g_map.getCreatureById(id);
+    if (!creature) {
+        g_logger.traceError(stdext::format("ProtocolGame::parsePlayerHelpers: could not get creature with id %d", id));
+        return;
+    }
+
+    Game::processPlayerHelpers(helpers);
 }
 
 void ProtocolGame::parseGMActions(const InputMessagePtr& msg)
@@ -1531,11 +1537,13 @@ void ProtocolGame::parseCreatureMark(const InputMessagePtr& msg)
     const uint32_t id = msg->getU32();
     const uint8_t color = msg->getU8();
 
-    const CreaturePtr creature = g_map.getCreatureById(id);
-    if (creature)
-        creature->addTimedSquare(color);
-    else
-        g_logger.traceError("could not get creature");
+    const auto& creature = g_map.getCreatureById(id);
+    if (!creature) {
+        g_logger.traceError(stdext::format("ProtocolGame::parseCreatureMark: could not get creature with id %d", id));
+        return;
+    }
+
+    creature->addTimedSquare(color);
 }
 
 void ProtocolGame::parseTrappers(const InputMessagePtr& msg)
@@ -1547,10 +1555,53 @@ void ProtocolGame::parseTrappers(const InputMessagePtr& msg)
 
     for (auto i = 0; i < numTrappers; ++i) {
         const uint32_t id = msg->getU32();
-        if (const auto& creature = g_map.getCreatureById(id)) {
-            //TODO: set creature as trapper
-        } else
-            g_logger.traceError("could not get creature");
+        const auto& creature = g_map.getCreatureById(id);
+        if (!creature) {
+            g_logger.traceError(stdext::format("ProtocolGame::parseTrappers: could not get creature with id %d", id));
+            continue;
+        }
+
+        //TODO: set creature as trapper
+    }
+}
+
+void ProtocolGame::addCreatureIcon(const InputMessagePtr& msg, const CreaturePtr& creature) {
+    const uint8_t sizeIcons = msg->getU8();
+    for (auto i = 0; i < sizeIcons; ++i) {
+        msg->getU8(); // icon.serialize()
+        msg->getU8(); // icon.category
+        msg->getU16(); // icon.count
+    }
+
+    // TODO: implement creature icons usage
+}
+
+void ProtocolGame::parseCreatureData(const InputMessagePtr& msg)
+{
+    const uint32_t id = msg->getU32();
+    const uint8_t type = msg->getU8();
+
+    const auto& creature = g_map.getCreatureById(id);
+    if (!creature) {
+        g_logger.traceError(stdext::format("ProtocolGame::parseCreatureData: could not get creature with id %d", id));
+    }
+
+    switch (type) {
+        case 0: // creature update
+            getCreature(msg);
+            break;
+        case 11: // creature mana percent
+            msg->getU8();
+            break;
+        case 12: // creature show status
+            msg->getU8();
+            break;
+        case 13: // player vocation
+            msg->getU8();
+            break;
+        case 14: // creature icons
+            addCreatureIcon(msg, creature);
+            break;
     }
 }
 
@@ -1560,7 +1611,12 @@ void ProtocolGame::parseCreatureHealth(const InputMessagePtr& msg)
     const uint8_t healthPercent = msg->getU8();
 
     const auto& creature = g_map.getCreatureById(id);
-    if (creature) creature->setHealthPercent(healthPercent);
+    if (!creature) {
+        g_logger.traceError(stdext::format("ProtocolGame::parseCreatureHealth: could not get creature with id %d", id));
+        return;
+    }
+
+    creature->setHealthPercent(healthPercent);
 }
 
 void ProtocolGame::parseCreatureLight(const InputMessagePtr& msg)
@@ -1573,7 +1629,7 @@ void ProtocolGame::parseCreatureLight(const InputMessagePtr& msg)
 
     const auto& creature = g_map.getCreatureById(id);
     if (!creature) {
-        g_logger.traceError("could not get creature");
+        g_logger.traceError(stdext::format("ProtocolGame::parseCreatureLight: could not get creature with id %d", id));
         return;
     }
 
@@ -1587,7 +1643,7 @@ void ProtocolGame::parseCreatureOutfit(const InputMessagePtr& msg) const
 
     const auto& creature = g_map.getCreatureById(id);
     if (!creature) {
-        g_logger.traceError("could not get creature");
+        g_logger.traceError(stdext::format("ProtocolGame::parseCreatureOutfit: could not get creature with id %d", id));
         return;
     }
 
@@ -1605,7 +1661,10 @@ void ProtocolGame::parseCreatureSpeed(const InputMessagePtr& msg)
     const uint16_t speed = msg->getU16();
 
     const auto& creature = g_map.getCreatureById(id);
-    if (!creature) return;
+    if (!creature) {
+        g_logger.traceError(stdext::format("ProtocolGame::parseCreatureSpeed: could not get creature with id %d", id));
+        return;
+    }
 
     creature->setSpeed(speed);
     if (baseSpeed != 0)
@@ -1619,7 +1678,7 @@ void ProtocolGame::parseCreatureSkulls(const InputMessagePtr& msg)
 
     const auto& creature = g_map.getCreatureById(id);
     if (!creature) {
-        g_logger.traceError("could not get creature");
+        g_logger.traceError(stdext::format("ProtocolGame::parseCreatureSkulls: could not get creature with id %d", id));
         return;
     }
 
@@ -1633,7 +1692,7 @@ void ProtocolGame::parseCreatureShields(const InputMessagePtr& msg)
 
     const auto& creature = g_map.getCreatureById(id);
     if (!creature) {
-        g_logger.traceError("could not get creature");
+        g_logger.traceError(stdext::format("ProtocolGame::parseCreatureShields: could not get creature with id %d", id));
         return;
     }
 
@@ -1647,7 +1706,7 @@ void ProtocolGame::parseCreatureUnpass(const InputMessagePtr& msg)
 
     const auto& creature = g_map.getCreatureById(id);
     if (!creature) {
-        g_logger.traceError("could not get creature");
+        g_logger.traceError(stdext::format("ProtocolGame::parseCreatureUnpass: could not get creature with id %d", id));
         return;
     }
 
@@ -2639,7 +2698,7 @@ void ProtocolGame::parseCreaturesMark(const InputMessagePtr& msg)
             } else
                 creature->addTimedSquare(markType);
         } else
-            g_logger.traceError("could not get creature");
+            g_logger.traceError(stdext::format("ProtocolGame::parseCreaturesMark: could not get creature with id %d", id));
     }
 }
 
@@ -2649,10 +2708,12 @@ void ProtocolGame::parseCreatureType(const InputMessagePtr& msg)
     const uint8_t type = msg->getU8();
 
     const auto& creature = g_map.getCreatureById(id);
-    if (creature)
-        creature->setType(type);
-    else
-        g_logger.traceError("could not get creature");
+    if (!creature) {
+        g_logger.traceError(stdext::format("ProtocolGame::parseCreatureType: could not get creature with id %d", id));
+        return;
+    }
+
+    creature->setType(type);
 }
 
 void ProtocolGame::setMapDescription(const InputMessagePtr& msg, int x, int y, int z, int width, int height)
@@ -2820,7 +2881,7 @@ ThingPtr ProtocolGame::getMappedThing(const InputMessagePtr& msg) const
         if (const auto& thing = g_map.getCreatureById(id))
             return thing;
 
-        g_logger.traceError(stdext::format("no creature with id %u", id));
+        g_logger.traceError(stdext::format("ProtocolGame::getMappedThing: no creature with id %u", id));
     }
 
     return nullptr;
@@ -2838,7 +2899,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
             const uint32_t id = msg->getU32();
             creature = g_map.getCreatureById(id);
             if (!creature)
-                g_logger.traceError("server said that a creature is known, but it's not");
+                g_logger.traceError("ProtocolGame::getCreature: server said that a creature is known, but it's not");
         } else {
             const uint32_t removeId = msg->getU32();
             const uint32_t id = msg->getU32();
@@ -3029,9 +3090,8 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
         // this is send creature turn
         const uint32_t id = msg->getU32();
         creature = g_map.getCreatureById(id);
-
         if (!creature)
-            g_logger.traceError("invalid creature");
+            g_logger.traceError("ProtocolGame::getCreature: invalid creature");
 
         const auto direction = static_cast<Otc::Direction>(msg->getU8());
         if (creature)
@@ -4105,7 +4165,7 @@ void ProtocolGame::parseAttachedEffect(const InputMessagePtr& msg) {
 
     const auto& creature = g_map.getCreatureById(id);
     if (!creature) {
-        g_logger.traceError(stdext::format("could not get creature with id %d", id));
+        g_logger.traceError(stdext::format("ProtocolGame::parseAttachedEffect: could not get creature with id %d", id));
         return;
     }
 
@@ -4122,7 +4182,7 @@ void ProtocolGame::parseDetachEffect(const InputMessagePtr& msg) {
 
     const auto& creature = g_map.getCreatureById(id);
     if (!creature) {
-        g_logger.traceError(stdext::format("could not get creature with id %d", id));
+        g_logger.traceError(stdext::format("ProtocolGame::parseDetachEffect: could not get creature with id %d", id));
         return;
     }
 
@@ -4135,7 +4195,7 @@ void ProtocolGame::parseCreatureShader(const InputMessagePtr& msg) {
 
     const auto& creature = g_map.getCreatureById(id);
     if (!creature) {
-        g_logger.traceError(stdext::format("could not get creature with id %d", id));
+        g_logger.traceError(stdext::format("ProtocolGame::parseCreatureShader: could not get creature with id %d", id));
         return;
     }
 
@@ -4155,9 +4215,11 @@ void ProtocolGame::parseCreatureTyping(const InputMessagePtr& msg)
     const uint32_t id = msg->getU32();
     const bool typing = msg->getU8();
 
-    const CreaturePtr creature = g_map.getCreatureById(id);
-    if (creature)
-        creature->setTyping(typing);
-    else
-        g_logger.traceError("could not get creature");
+    const auto& creature = g_map.getCreatureById(id);
+    if (!creature) {
+        g_logger.traceError(stdext::format("ProtocolGame::parseCreatureTyping: could not get creature with id %d", id));
+        return;
+    }
+
+    creature->setTyping(typing);
 }
