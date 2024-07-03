@@ -49,7 +49,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
       - ThingCategoryCreature 
       - ThingExternalTexture: are images in Png | Apng
 
-    - Wiki  
+    - [Wiki](https://github.com/Nottinghster/otclient/wiki/Wiki-Attached-Effects)  
 
     - Example Code:
     (code sample: [effects.lua](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/effects.lua), [code test](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/attachedeffects.lua#L1))
