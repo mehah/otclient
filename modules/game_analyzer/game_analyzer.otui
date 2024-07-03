@@ -19,7 +19,7 @@ MiniWindow
       margin-top: 6
       margin-left: 4
       margin-right: 4
-      @onClick: modules.game_analyzer.toggleAnalyzer(self) 
+      @onClick: modules.game_analyzer.toggleAnalyzer(self)
       $checked:
         image-clip: 0 21 114 21
         text-offset: 0 1
