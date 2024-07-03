@@ -4,6 +4,8 @@ Module
   scripts: [ game_analyzer ]
   reloadable: true
   autoload: true
+  dependencies:
+    - game_interface
   @onLoad: |
     dofile 'game_analyzer'
     GameAnalyzer.init()
