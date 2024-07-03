@@ -2,7 +2,9 @@ MiniWindow
   id: expAnalyzerWindow
   !text: tr('XP Analyzer')
   height: 63
-
+  &save: true
+  
+  MiniWindowContents
   SkillNameLabel
     id: expGainLabel
     font: verdana-11px-monochrome

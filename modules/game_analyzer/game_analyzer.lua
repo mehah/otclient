@@ -25,6 +25,7 @@ function GameAnalyzer.init()
     analyzerButton:setOn(false)
     analyzerWindow = g_ui.loadUI('game_analyzer')
     analyzerWindow:disableResize()
+    analyzerWindow:setup()
     
     expAnalyzerInit()
     
@@ -44,8 +45,8 @@ end
 function expAnalyzerInit()
     expAnalyzerWindow = g_ui.loadUI('game_exp_analyzer')
     expAnalyzerWindow:disableResize()
+    expAnalyzerWindow:setup()
 
-    
     expHourStart = g_clock.seconds()
     
     local expGainValue = expAnalyzerWindow:getChildById('expGainValue')
