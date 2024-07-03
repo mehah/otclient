@@ -59,7 +59,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 </details>
 
-| <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Creature/001_Bone.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://media.giphy.com/media/SsBOvldu1FnSyNZW1z/giphy.gif" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Creature/003_particula.gif?raw=true" width="200" alt="Space Invaders" style="max-width: 200px;"> |
+| <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Creature/001_Bone.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/idk.jpg?raw=true" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Creature/003_particula.gif?raw=true" width="200" alt="Space Invaders" style="max-width: 200px;"> |
 |-------------------------------------------|---------------|-------------------------|
 | Creature Attached Effect | Light Attached Effect | Creature Particule |
 
@@ -99,9 +99,9 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 - Tile Widget [Wiki](https://github.com/mehah/otclient/wiki)
 
-| <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Tile/001_attachedeffect.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Tile/002_widget.png?raw=true" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="http://ksaveljev.github.io/2048.gif" width="110" alt="Space Invaders" style="max-width: 110px;"> |
+| <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Tile/001_attachedeffect.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Tile/002_widget.png?raw=true" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/idk.jpg?raw=true" width="110" alt="Space Invaders" style="max-width: 110px;"> |
 |-------------------------------------------|---------------|-------------------------|
-|Title Widget| Title Light | Title Attached Effect |
+|Title Attached Effect | Title Widget | Title light |
 
 
 
@@ -138,14 +138,14 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 - Access to widget children via widget.childId by [@Hugo0x1337](https://github.com/Hugo0x1337)
 - Shader System Fix (CTRL + Y) by [@FreshyPeshy](https://github.com/FreshyPeshy)
 
-| <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Shader/001_creature.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Shader/003_map.gif?raw=true" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="http://ksaveljev.github.io/2048.gif" width="110" alt="Space Invaders" style="max-width: 110px;"> |
+| <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Shader/001_creature.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Shader/003_map.gif?raw=true" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/idk.jpg?raw=true" width="110" alt="Space Invaders" style="max-width: 110px;"> |
 |-------------------------------------------|---------------|-------------------------|
 | Creature | Map | Mount |
 
 - Refactored Battle Module by [@andersonfaaria](https://github.com/andersonfaaria)
 
 - Health&Mana Circle by [@EgzoT](https://github.com/EgzoT), [@GustavoBlaze](https://github.com/GustavoBlaze), [@Tekadon58](https://github.com/Tekadon58) ([GITHUB Project](https://github.com/EgzoT/-OTClient-Mod-health_and_mana_circle))
-- Tibia Theme 1.2 by Zews ([Forum Thread](https://otland.net/threads/otc-tibia-theme-v1-2.230988/))
+- Tibia Theme 1.2 by Zews ([Forum Thread](https://otland.net/threads/otc-tibia-theme-v1-2.230988/))TF
 - Add option ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE in [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h) by [@SkullzOTS](https://github.com/SkullzOTS)
 - <details>
    <summary>Encryption System by [@Mrpox] (Note: This implementation is unsafe)</summary>
@@ -196,24 +196,34 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
   - To enable just go to [setup.otml](https://github.com/mehah/otclient/blob/main/data/setup.otml) and set draw-typing: true
 
 </details>
+<p align="center">
+ <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/typing%20ico/001.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> 
+
+</p>
 
 - <details>
-   <summary>Smooth Walk Elevation Feature by [@SkullzOTS](https://github.com/SkullzOTS)</summary>
+   <summary>Smooth Walk Elevation Feature by @SkullzOTS</summary>
 
   - by [@SkullzOTS](https://github.com/SkullzOTS)
   - View Feature: [Gyazo](https://i.gyazo.com/af0ed0f15a9e4d67bd4d0b2847bd6be7.gif)
   - To enable just go to [modules/game_features/features.lua](https://github.com/mehah/otclient/blob/main/modules/game_features/features.lua#L5), and uncomment line 5 (g_game.enableFeature(GameSmoothWalkElevation)).
 
 </details>
+<p align="center">
+ <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/smooth/001_smooth.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> 
+
+</p>
 
 - Lua Debugger for VSCode [see wiki](https://github.com/mehah/otclient/wiki/Lua-Debugging-(VSCode)) [@BenDol](https://github.com/BenDol)
 - Tutorial to Use OTC in TFS main [see wiki](https://github.com/mehah/otclient/wiki/Tutorial-to-Use-OTC-in-TFS-main)
 
 - 3D Sound and Sound Effects! by [@Codinablack](https://github.com/codinablack)
 
-| <img src="https://raw.githubusercontent.com/ivanperez-keera/haskanoid/master/screenshots/android.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://media.giphy.com/media/SsBOvldu1FnSyNZW1z/giphy.gif" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="http://ksaveljev.github.io/2048.gif" width="110" alt="Space Invaders" style="max-width: 110px;"> |
-|-------------------------------------------|---------------|-------------------------|
-| Example1. | Example1 | Example3 |
+
+| Example 1 | Example 2 | Example 3 |
+|---------|---------|---------|
+| <video src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/3d%20Sounds/001_example.mp4?raw=true" width="200" controls></video> | <video src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/3d%20Sounds/002_example.mp4?raw=true" width="200" controls></video> | <video src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/3d%20Sounds/003_example.mp4?raw=true" width="200" controls></video> |
+
 
 - <details>
    <summary>Layout based on tibia 13 by @marcosvf132</summary>
@@ -249,7 +259,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 </details>
 
 
-| <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Layout%2013/001_interface.png?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Layout%2013/002_ingame.png?raw=true" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="http://ksaveljev.github.io/2048.gif" width="110" alt="Space Invaders" style="max-width: 110px;"> |
+| <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Layout%2013/001_interface.png?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Layout%2013/002_ingame.png?raw=true" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/idk.jpg?raw=true" width="110" alt="Space Invaders" style="max-width: 110px;"> |
 |-------------------------------------------|---------------|-------------------------|
 | Interface. | In-game | Extended view |
 
@@ -262,7 +272,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 - Shader with Framebuffer | ([@SkullzOTS](https://github.com/SkullzOTS), [@Mryukiimaru](https://github.com/Mryukiimaru), [@JeanTheOne](https://github.com/JeanTheOne), [@KizaruHere](https://github.com/KizaruHere))
 
-| <img src="https://raw.githubusercontent.com/ivanperez-keera/haskanoid/master/screenshots/android.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://media.giphy.com/media/SsBOvldu1FnSyNZW1z/giphy.gif" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="http://ksaveljev.github.io/2048.gif" width="110" alt="Space Invaders" style="max-width: 110px;"> |
+| <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Shader/Framebuffer/001_creature.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Shader/Framebuffer/002_items.gif?raw=true" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Shader/Framebuffer/003_UICreature.gif?raw=true" width="110" alt="Space Invaders" style="max-width: 110px;"> |
 |-------------------------------------------|---------------|-------------------------|
 | Creature. | Items | UICreature |
 
@@ -335,11 +345,11 @@ https://github.com/mehah/otclient/blob/main/data/setup.otml#L21
 
 | TO-DO list            	| Status                            	| PR   	|
 |-----------------------	|-----------------------------------	|------	|
-| Android compatibility 	| ![](https://geps.dev/progress/50) 	| #787 	|
-| Highscore             	| ![](https://geps.dev/progress/20) 	| #787 	|
-| Familiar outfit       	| ![](https://geps.dev/progress/20) 	| #787 	|
-| Cyclopedia            	| ![](https://geps.dev/progress/20) 	| #787 	|
-| Analyzer              	| ![](https://geps.dev/progress/10)   |  #787    	|
+| Android compatibility 	| ![](https://geps.dev/progress/50) 	| [Branch](https://github.com/mehah/otclient/tree/mobile-working) 	|
+| Highscore             	| ![](https://geps.dev/progress/20) 	| None	|
+| Familiar outfit       	| ![](https://geps.dev/progress/20) 	| [#39](https://github.com/Nottinghster/otclient/pull/39) 	|
+| Cyclopedia            	| ![](https://geps.dev/progress/20) 	| [#47](https://github.com/Nottinghster/otclient/pull/47) 	|
+| Analyzer              	| ![](https://geps.dev/progress/10)   |  None    	|
 | Idk                   	| ![](https://geps.dev/progress/0)   |   #787   	|
 | Idk                   	| ![](https://geps.dev/progress/0)   |   #787   	|
 | Idk                   	| ![](https://geps.dev/progress/0)   |   #787   	|
