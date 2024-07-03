@@ -194,8 +194,8 @@ end
 function calculateExpPerHour(exp, expStart, currentTime, expHourStart)
     local expGained = exp - expStart
     local timeElapsed = currentTime - expHourStart
-    local expPerHour = math.floor(((expGained / timeElapsed) * 360) * 4)
-    print("Exp Per Hour:" .. expPerHour)
+    local expPerHour = math.floor((expGained / timeElapsed) * 3600) + 0
+    print("Exp Per Hour: " .. expPerHour)
     return comma_value(expPerHour)
 end
 
